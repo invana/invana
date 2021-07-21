@@ -1,10 +1,10 @@
 # Gremlin Driver
 
+**NOTE** - Under active development
+
 Async Python API for Apache TinkerPop's Gremlin supported databases.
 
-```shell
-pip install gremlin-driver
-```
+ 
 
 ## Features
 
