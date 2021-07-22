@@ -2,11 +2,11 @@
 
 **NOTE** - Under active development
 
-Async Python API for Apache TinkerPop's Gremlin supported databases.
+Python API for Apache TinkerPop's Gremlin supported databases.
 
 ## Installation
 ```shell
-pip install git+https //github.com/invanalabs/invana-python.git#egg=gremlin_driver
+pip install git+https //github.com/invanalabs/invana-python.git#egg=invana
 ```
 ## Features
 
@@ -48,7 +48,7 @@ pip install git+https //github.com/invanalabs/invana-python.git#egg=gremlin_driv
 
 ```python
 
-from gremlin_driver.client import InvanaClient
+from invana import InvanaClient
 
 client = InvanaClient("ws://localhost:8182/gremlin")
 
@@ -103,5 +103,4 @@ _ = await client.vertex.read_many(has__name__containing="engine")
 
 Apache License, version 2.0
 
-## Support 
 

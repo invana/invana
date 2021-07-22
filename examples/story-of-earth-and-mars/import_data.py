@@ -23,8 +23,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from gremlin_driver.client import InvanaClient
-from gremlin_driver.utils import async_to_sync
+from invana import InvanaClient
+from invana.utils import async_to_sync
 import logging
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 

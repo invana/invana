@@ -12,9 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from gremlin_driver.client import InvanaClient
+from invana import InvanaClient
 import time
-from gremlin_driver.utils import async_to_sync
+from invana.utils import async_to_sync
 import asyncio
 import logging
 
