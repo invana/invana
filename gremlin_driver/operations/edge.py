@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class EdgeOperations(CRUDOperationsBase):
 
-    async def create(self, label, properties, _from, _to):
+    async def create(self, label,  _from, _to, properties=None):
         """
 
         :param label:
@@ -45,7 +45,7 @@ class EdgeOperations(CRUDOperationsBase):
         data = self.get_data_from_responses(responses)
         return data[0] if data and data.__len__() > 0 else None
 
-    async def get_or_create(self, label, properties, _from, _to):
+    async def get_or_create(self, label, _from, _to, properties=None):
         """
 
         :param label:
@@ -59,10 +59,10 @@ class EdgeOperations(CRUDOperationsBase):
         self.validate_properties(properties)
         search_kwargs = {"has__label": label}
         search_kwargs.update(self.translator.convert_properties_to_query(**properties))
-        edges = await self.read_many(_from, _to, **search_kwargs)
+        edges = await self.read_many(_from=_from, _to=_to, **search_kwargs)
         if edges and edges.__len__() > 0:
             return edges[0]
-        return await self.create(label, properties, _from, _to)
+        return await self.create(label, _from, _to, properties=properties)
 
     async def update_one(self, edge_id, properties=None):
         logger.debug("Updating edge {edge_id} with properties {properties}".format(edge_id=edge_id,
@@ -143,19 +143,3 @@ class EdgeOperations(CRUDOperationsBase):
         await self.gremlin_client.execute_query(query_string + ".drop()")
         return None
 
-    # def filter_edge_and_get_neighbor_vertices(self, edge_id=None, label=None, query=None, limit=None,
-    #                                           skip=None):
-    #     cleaned_edges_data = self._read_many(label=label, query=query, limit=limit, skip=skip)
-    #     filtered_edges = self.filter_edge(label=label, query=query, limit=limit, skip=skip)
-    #
-    #     vertices_data = []
-    #     for _ in filtered_edges.inV().dedup().elementMap().toList():
-    #         vertices_data.append(VertexElement(_, serializer=self.serializer))
-    #
-    #     filtered_edges = self.filter_edge(label=label, query=query, limit=limit, skip=skip)
-    #
-    #     for _ in filtered_edges.outV().dedup().elementMap().toList():
-    #         vertices_data.append(VertexElement(_, serializer=self.serializer))
-    #     vertices_data = list(set(vertices_data))
-    #
-    #     return cleaned_edges_data + vertices_data

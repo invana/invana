@@ -17,9 +17,9 @@ from gremlin_driver.utils import async_to_sync
 
 
 async def test_queries(client):
-    vertex = await client.vertex.create(label="Person", properties={"name": "Sia"})
+    vertex = await client.vertex.create("Person", properties={"name": "Sia"})
     print(vertex)
-    vertex = await client.vertex.get_or_create(label="Person", properties={"name": "Sia"})
+    vertex = await client.vertex.get_or_create("Person", properties={"name": "Sia"})
     print(vertex)
     # vertex = await client.vertex.update_one(vertex.id, properties={"name": "Sia New"})
     vertex = await client.vertex.update_one(vertex.id, properties={"name": "Sia New"})

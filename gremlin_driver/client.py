@@ -33,8 +33,8 @@ class InvanaClient:
     def get_event_loop(self):
         return self.gremlin_client.loop
 
-    async def execute_query(self, gremlin_query):
-        return await self.execute_query(gremlin_query)
+    async def execute_query(self, gremlin_query, serialize=True):
+        return await self.gremlin_client.execute_query(gremlin_query, serialize=serialize)
 
     def execute_query_as_sync(self, gremlin_query, serialize=True):
         return self.gremlin_client.execute_query_as_sync(gremlin_query, serialize=serialize)

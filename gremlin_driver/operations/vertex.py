@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class VertexOperations(CRUDOperationsBase):
 
-    async def create(self, label=None, properties=None):
+    async def create(self, label, properties=None):
         """
         :param label:
         :param properties:
@@ -42,7 +42,7 @@ class VertexOperations(CRUDOperationsBase):
         data = self.get_data_from_responses(responses)
         return data[0] if data and data.__len__() > 0 else None
 
-    async def get_or_create(self, label=None, properties=None):
+    async def get_or_create(self, label, properties=None):
         """
 
         :param label:
@@ -57,7 +57,7 @@ class VertexOperations(CRUDOperationsBase):
         vertices = await self.read_many(**search_kwargs)
         if isinstance(vertices, list) and vertices.__len__() > 0:
             return vertices[0]
-        return await self.create(label=label, properties=properties)
+        return await self.create(label, properties=properties)
 
     async def update_one(self, vertex_id, properties=None):
         """

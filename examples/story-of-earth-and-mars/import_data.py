@@ -33,7 +33,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 async def import_data(client):
     for vertex in VERTICES_SAMPLES:
-        vtx_instance = await client.vertex.get_or_create(**vertex)
+        _label = vertex['label']
+        del vertex['label']
+        vtx_instance = await client.vertex.get_or_create(_label, **vertex)
         print("vtx_instance", vtx_instance)
 
     for edge in EDGES_SAMPLES:
@@ -43,9 +45,9 @@ async def import_data(client):
         print("to_vertex", to_vertex)
         edge_instance = await client.edge.get_or_create(
             edge['label'],
-            edge['properties'],
             from_vertex[0].id,
-            to_vertex[0].id
+            to_vertex[0].id,
+            properties=edge['properties']
         )
         print("edge_instance", edge_instance)
 
