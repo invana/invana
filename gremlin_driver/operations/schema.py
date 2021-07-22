@@ -34,8 +34,15 @@ class SchemaReadOperations(CRUDOperationsBase):
         for label in schema['vertex_labels'].keys():
             schema_dict[label] = schema['vertex_labels'][label]
             schema_dict[label]['property_schema'] = {}
-            for property_key in await self.get_vertex_schema(label):
+            property_keys = []
+            try:
+                property_keys = await self.get_vertex_schema(label)
+            except Exception as e:
+                logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
+                    label=label, error=e.__str__()))
+            for property_key in property_keys:
                 schema_dict[label]['property_schema'][property_key] = schema['property_keys'][property_key]
+
         return schema_dict
 
     async def get_all_edges_schema(self):
@@ -49,7 +56,13 @@ class SchemaReadOperations(CRUDOperationsBase):
         for label in schema['edge_labels'].keys():
             schema_dict[label] = schema['edge_labels'][label]
             schema_dict[label]['property_schema'] = {}
-            for property_key in await self.get_edge_schema(label):
+            property_keys = []
+            try:
+                property_keys = await self.get_vertex_schema(label)
+            except Exception as e:
+                logger.debug("Failed to get edge schema of label {label} with error {error}".format(
+                    label=label, error=e.__str__()))
+            for property_key in property_keys:
                 schema_dict[label]['property_schema'][property_key] = schema['property_keys'][property_key]
         return schema_dict
 

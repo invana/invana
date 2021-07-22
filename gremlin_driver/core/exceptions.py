@@ -46,5 +46,5 @@ class VertexDoesntExist(BaseException):
     pass
 
 
-class QueryFailedException(BaseException):
+class QueryFailedException(Exception):
     pass

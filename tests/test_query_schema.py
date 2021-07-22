@@ -22,14 +22,14 @@ logging.basicConfig(level=logging.DEBUG)
 async def test_queries(client):
     all_vertices_schema = await client.schema.get_all_vertices_schema()
     print("all_vertices_schema", all_vertices_schema)
-    # for k, v in all_vertices_schema.items():
-    #     print(k, v)
+    for k, v in all_vertices_schema.items():
+        print(k, v)
 
-    all_edges_schema = await client.schema.get_all_edges_schema()
-    print("all_edges_schema", all_edges_schema)
+    # all_edges_schema = await client.schema.get_all_edges_schema()
+    # print("all_edges_schema", all_edges_schema)
     # for k, v in all_edges_schema.items():
     #     print(k, v)
-
+    #
 
 _client = InvanaClient("ws://localhost:8182/gremlin")
 

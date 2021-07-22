@@ -49,13 +49,15 @@ class GremlinClient:
     async def serialize_response(response):
         return ResponseMessage(**response)
 
-    async def throw_status_based_errors(self, query_string, status_code):
+    async def throw_status_based_errors(self, query_string, status_code, response):
         if status_code != 206:
             await self.transporter.close()
         if status_code >= 300:
-            logger.error("Failed with status code {}".format(status_code))
+            logger.error("Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
+                    status_code, response.get("status", {}).get("message"), query_string))
             raise QueryFailedException(
-                "Query failed with status code {}. Query is : {}".format(status_code, query_string))
+                "Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
+                    status_code, response.get("status", {}).get("message"), query_string))
 
     async def execute_query(self, query_string, serialize=True):
         logger.debug("Executing query: {}".format(query_string))
@@ -70,9 +72,9 @@ class GremlinClient:
             response_data = await self.transporter.read()
             # yield response_data
             status_code = await self.get_status_code_from_response(response_data)
-            await self.throw_status_based_errors(query_string, status_code)
+            await self.throw_status_based_errors(query_string, status_code, response_data)
             responses.append(response_data)
-        await self.throw_status_based_errors(query_string, status_code)
+        await self.throw_status_based_errors(query_string, status_code, response_data)
         # for response in responses:
         #     print("==response", response)
         # print(response_data)
