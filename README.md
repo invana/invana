@@ -44,10 +44,6 @@ pip install git+https //github.com/invanalabs/invana-py.git#egg=invana
   - pagination__limit=10
   - pagination__range=[0, 10]
 
-## TODO
-  - supports for authentication
-
-  
 ## Usage
 
 ```python
@@ -101,7 +97,10 @@ edges = await client.edge.read_many(has__started__lte=2021)
 _ = await client.vertex.read_many(has__name__containing="engine")
 #<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
-```
+## TODO
+  - supports for authentication
+
+  ```
 
 ## Licenses
 
