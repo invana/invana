@@ -20,7 +20,7 @@ pip install git+https //github.com/invanalabs/invana-py.git#egg=invana
 - Supports querying with pagination
 - Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,
   `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.
-- Query data using filters using https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates. Example usages 
+- Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates. Following filter keyword patterns are supported with read_many()
   - has__id=1021
   - has__id__within=[200752, 82032, 4320], 
   - has__label__within=["Person", "Planet"]
@@ -56,7 +56,11 @@ user = await client.vertex.get_or_create("User", properties={
     "name": "Ravi",
     "username": "rrmerugu"
 })
+print(user)
 #<g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
+print(user.to_dict())
+#{'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+
 
 invana_studio_instance = await client.vertex.get_or_create("GithubProject", properties={
     "name": "invana-studio",
@@ -72,7 +76,11 @@ invana_engine_instance = await client.vertex.get_or_create("GithubProject", prop
 edge_instance = await client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
     "started": 2020
 })
+print(edge_instance)
 #<g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
+print(edge_instance.to_dict())
+#{'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inv_label': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
+
 
 engine_edge_instance = await client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
     "started": 2020
@@ -97,10 +105,9 @@ edges = await client.edge.read_many(has__started__lte=2021)
 _ = await client.vertex.read_many(has__name__containing="engine")
 #<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
+```
 ## TODO
   - supports for authentication
-
-  ```
 
 ## Licenses
 

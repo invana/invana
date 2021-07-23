@@ -19,7 +19,7 @@ from invana.utils import async_to_sync
 def print_list(list_data):
     print('----------')
     for data in list_data:
-        print(data)
+        print(data.to_dict())
     print('----------')
 
 
