@@ -12,12 +12,12 @@ pip install git+https //github.com/invanalabs/invana-py.git#egg=invana
 
 - Synchronous and Asynchronous Python API
 - Run your gremlin queries.
+- JSON response
 - Create vertices and edges with properties.
 - Read one or many vertices and edges.
 - Update properties of on or many vertices and edges.
 - Delete one or many vertices and edges.
 - Supports querying with pagination
-- Supports basic and token authentication on TinkerPop server.
 - Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,
   `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.
 - Query data using filters using https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates. Example usages 
