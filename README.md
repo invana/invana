@@ -43,6 +43,10 @@ pip install git+https //github.com/invanalabs/invana-py.git#egg=invana
   - has__name__notContaining="son"
   - pagination__limit=10
   - pagination__range=[0, 10]
+
+## TODO
+  - supports for authentication
+
   
 ## Usage
 
