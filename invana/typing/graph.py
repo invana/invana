@@ -22,12 +22,19 @@ def generate_chunks_from_list(it, size):
     return list(iter(lambda: tuple(islice(it, size)), ()))
 
 
-def create_id_object(**kwargs):
-    if kwargs['@type'] == "g:Int64":
-        return GInt64Item(**kwargs)
+def create_id_object(value):
+    if isinstance(value, dict):
+        if value['@type'] == "g:Int64":
+            return GInt64Item(**value)
+        elif value['@type'] == "janusgraph:RelationIdentifier":
+            return RelationIdItem(**value)
+    else:
+        return GStringItem(**{"@type": "g:String", "@value": value})
 
-    if kwargs['@type'] == "janusgraph:RelationIdentifier":
-        return RelationIdItem(**kwargs)
+
+def get_value(v):
+    if v and isinstance(v, dict):
+        pass
 
 
 def create_element_map_object(**kwargs):
@@ -36,10 +43,12 @@ def create_element_map_object(**kwargs):
         if isinstance(value, list):
             data = {"@value": {}}
             value_tuples = generate_chunks_from_list(value, 2)
-            if "RelationIdentifier" in value_tuples[0][1]['@type']:
+
+            if isinstance(value_tuples[2][0], dict) and "Direction" in value_tuples[2][0]['@type']:
                 data['@type'] = "g:Edge"
             else:
                 data['@type'] = "g:Vertex"
+
             data['@value']['id'] = value_tuples[0][1]
             data['@value']['label'] = value_tuples[1][1]
             data['@value']['properties'] = {}
@@ -56,6 +65,7 @@ def create_element_map_object(**kwargs):
                         value = value['@value']
                 prop_data['@value'] = {"key": v[0], "value": value}
                 data['@value']['properties'][v[0]] = prop_data
+
             if data['@type'] == "g:Edge":
                 for v in value_tuples[2:4]:
                     if isinstance(v, tuple) and isinstance(v[0], dict):
@@ -72,7 +82,20 @@ def create_element_map_object(**kwargs):
                 return GEdgeItem(**data)
 
 
-def convert_to_objects(*_, **kwargs):
+def convert_to_objects(*args, **kwargs):
+    if args.__len__() > 0:
+        for val in args:
+            if isinstance(val, dict):
+                return convert_to_objects(**val)
+            elif isinstance(val, str):
+                return convert_to_objects({"@type": "g:String", "@value": val})
+            elif isinstance(val, int):
+                return convert_to_objects({"@type": "g:Int64", "@value": val})
+            elif isinstance(val, float):
+                return convert_to_objects({"@type": "g:Float", "@value": val})
+            else:
+                raise Exception("Dont know how to serialise {} type data".format(val))
+
     if kwargs.get("@type") == "g:List":
         items = []
         for val in kwargs.get("@value", []):
@@ -80,14 +103,27 @@ def convert_to_objects(*_, **kwargs):
         return items
     elif kwargs.get("@type") == "g:Map":
         return create_element_map_object(**kwargs)
+    elif kwargs.get("@type") == "g:String":
+        return GStringItem(**kwargs)
     elif kwargs.get("@type") == "g:Int64":
         return GInt64Item(**kwargs)
+    elif kwargs.get("@type") == "g:Int32":
+        return GInt32Item(**kwargs)
+    elif kwargs.get("@type") == "g:Float":
+        return GFloatItem(**kwargs)
     elif kwargs.get("@type") == "g:Vertex":
         return GVertexItem(**kwargs)
     elif kwargs.get("@type") == "g:Edge":
         return GEdgeItem(**kwargs)
     elif kwargs.get("@type") == "g:Path":
         return GPathItem(**kwargs)
+
+    elif kwargs.get("@type") == "gx:LocalDate":
+        return GxLocalDateItem(**kwargs)
+
+    elif kwargs.get("@type") == "dse:Tuple":
+        return DSETupleItem(**kwargs)
+
     else:
         raise Exception("Dont know how to serialise {} type data".format(kwargs.get("@type")))
 
@@ -99,10 +135,13 @@ class ItemBase:
         if self.type != kwargs.get("@type"):
             raise Exception("This item type should be initialised for type {}. But received ".format(
                 self.type, kwargs.get("@type")))
-        self.value = kwargs.get("@value")
+        self.value = kwargs.get("@value") or kwargs.get("value")
 
-    def as_dict(self):
-        return {"@type": self.type, "@value": self.value}
+    def to_dict(self):
+        if self.type == "g:Map":
+            return {"@type": self.type, "@value": self.value}
+        else:
+            return self.value
 
     def __repr__(self):
         return "<{} value={}/>".format(self.type, self.value)
@@ -120,25 +159,60 @@ class ItemBase:
 class GMapItem(ItemBase):
     type = "g:Map"
 
-    def to_dict(self):
-        return {
-            "value": self.value,
-            "type": self.type
-        }
+    # def to_dict(self):
+    #     return {
+    #         "value": self.value,
+    #         "type": self.type
+    #     }
+
+
+class GFloatItem(ItemBase):
+    type = "g:Float"
+
+    # def to_dict(self):
+    #     return self.value
 
 
 class GInt64Item(ItemBase):
     type = "g:Int64"
 
+    # def to_dict(self):
+    #     return self.value
+
+
+class GInt32Item(ItemBase):
+    type = "g:Int32"
+
+    # def to_dict(self):
+    #     return self.value
+
+
+class GxLocalDateItem(ItemBase):
+    type = "gx:LocalDate"
+
+
+class DSETupleItem(ItemBase):
+    type = "dse:Tuple"
+
+    def __init__(self, **kwargs):
+        super(DSETupleItem, self).__init__(**kwargs)
+        self.value = self.to_object(**self.value)
+
+    def to_object(self, *_, **kwargs):
+        tuple_data = []
+        for val in kwargs.get("value", []):
+            tuple_data.append(convert_to_objects(val))
+        return tuple_data
+
     def to_dict(self):
-        return self.value
+        return [val.to_dict() for val in self.value]
 
 
 class GStringItem(ItemBase):
     type = "g:String"
 
-    def to_dict(self):
-        return self.value
+    # def to_dict(self):
+    #     return self.value
 
 
 class GListItem(ItemBase):
@@ -179,8 +253,9 @@ class PropertyItemBase:
         value = kwargs['@value']
         if value.get('id'):
             self.id = value['id']['@value']['relationId']
-        self.label = value['label']
-        self.value = value['value']
+        self.label = value.get('label') or value.get("key")
+
+        self.value = convert_to_objects(value['value'])
 
     def to_dict(self):
         return {"label": self.label, "property_id": self.id, "value": self.value}
@@ -202,13 +277,14 @@ class EdgePropertyItem(PropertyItemBase):
 
 class GPropertyItem(PropertyItemBase):
     _type = "g:Property"
-    label = None
-    value = None
 
-    def to_object(self, *_, **kwargs):
-        value = kwargs['@value']
-        self.label = value['key']
-        self.value = value['value']
+    # label = None
+    # value = None
+
+    # def to_object(self, *_, **kwargs):
+    #     value = kwargs['@value']
+    #     self.label = value['key']
+    #     self.value = value['value']
 
     def __repr__(self):
         return "<{} label={} value={} />".format(self.type, self.label, self.value)
@@ -236,7 +312,7 @@ class GraphElementItemBase(ItemBase):
 
     def to_object(self, *_, **kwargs):
         value = kwargs['@value']
-        self._id = create_id_object(**value['id'])
+        self._id = create_id_object(value['id'])
         self.label = value['label']
         self.assign_properties(kwargs['@value'])
 
@@ -247,7 +323,7 @@ class GraphElementItemBase(ItemBase):
     def to_dict(self):
         properties = {}
         for prop in self.properties:
-            properties[prop.label] = prop.value
+            properties[prop.label] = prop.value.to_dict()
 
         return {
             "id": self.id,
@@ -279,9 +355,9 @@ class GEdgeItem(GraphElementItemBase):
     def assign_edge_details(self, value):
         if value.get("inVLabel") and value.get("outVLabel"):
             self.inv_label = value['inVLabel']
-            self.inv = create_id_object(**value['inV'])
+            self.inv = create_id_object(value['inV'])
             self.outv_label = value['outVLabel']
-            self.outv = create_id_object(**value['outV'])
+            self.outv = create_id_object(value['outV'])
 
     def __repr__(self):
         e_info = ""
@@ -338,7 +414,7 @@ class ResultSet:
     def get_dict_or_original_value(d):
         try:
             return d.to_dict()
-        except:
+        except Exception:
             return d
 
     def to_dict(self):

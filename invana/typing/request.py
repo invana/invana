@@ -24,7 +24,7 @@ class RequestMessage:
                  traversal_source=None,
                  session=None,
                  op="eval",
-                 processor="traversal",  # ["", "session", "traversal"]
+                 processor="",  # ["", "session", "traversal"]
                  gremlin_version=None,
                  **extra_query_args
                  ):
@@ -75,19 +75,12 @@ class RequestMessage:
                 "bindings": {},
                 "language": "gremlin-groovy",
                 "aliases": {"g": self.traversal_source},
-                # "session": self._session,
             }
         }
         if self.session:
             message['args']['session'] = self.session
         message['args'].update(self.extra_query_args)
-        # return self.finalize_message(message, b"\x21", self.gremlin_version)
-
-        # return message
-        return b'!application/vnd.gremlin-v3.0+json{"requestId": {"@type": "g:UUID", "@value": "14999201-9fff-47c4-9cc0-ad1e8ee9177f"}, "processor": "", "op": "eval", "args": {"gremlin": "g.V().hasLabel(\'person\').count()", "aliases": {"g": "all_food.g"}}}'
-        #
-        # return b'!application/vnd.gremlin-v3.0+json{"requestId": {"@type": "g:UUID", "@value": "67f3c21b-e8d0-40f1-bdee-84baa7b3fd87"}, "processor": "", "op": "eval", "args": {"gremlin": "g.V().hasLabel(\'person\').count()", "aliases": {"g": "all_food.g"}}}'
-        # return message
+        return self.finalize_message(message, b"\x21", self.gremlin_version)
 
     @staticmethod
     def finalize_message(message, mime_len, mime_type):

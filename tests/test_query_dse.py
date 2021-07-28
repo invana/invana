@@ -28,14 +28,20 @@ def run_query(query_string):
     responses = client.execute_query_as_sync(query_string)
     message = responses[0]
     print("+result==", message)
-    print("+result==", message.to_dict())
+    print("+result==", message.result.to_dict())
+    for elem in message.result.to_dict()['data']:
+        print("+elem==", elem['properties'])
+        print("+elem==", elem)
+        # print("+elem==", elem['properties'])
 
     print("ENDED ===========================")
 
 
 # query_string = "g.V().hasLabel('Person').limit(2).toList()"
 # query_string = "g.V().hasLabel('Person').count()"
-raw_query = "g.V().hasLabel('person').count()"
+raw_query = "g.V().hasLabel('person').valueMap(true).toList()"
+raw_query = "g.V().hasLabel('person').elementMap().toList()"
+# raw_query = "g.E().elementMap().toList()"
 
 run_query(raw_query)
 
