@@ -30,16 +30,21 @@ class GremlinClient:
                  gremlin_url,
                  gremlin_traversal_source="g",
                  loop=None,
+                 gremlin_version=None,
                  read_timeout=3600, write_timeout=3600):
         self.gremlin_url = gremlin_url
         self.gremlin_traversal_source = gremlin_traversal_source
         self.loop = asyncio.get_event_loop() if loop is None else loop
+        self.gremlin_version = gremlin_version
         self.transporter = AiohttpTransport(read_timeout=read_timeout, write_timeout=write_timeout, loop=self.loop)
 
-    async def prepare_message(self, gremlin_query):
-        req = RequestMessage(query_string=gremlin_query, request_id=str(uuid.uuid4()),
-                             traversal_source=self.gremlin_traversal_source)
-        return req.get_request_data()
+    async def create_request_message(self, gremlin_query):
+        return RequestMessage(
+            query_string=gremlin_query,
+            request_id=str(uuid.uuid4()),
+            traversal_source=self.gremlin_traversal_source,
+            gremlin_version=self.gremlin_version)\
+            .build_message()
 
     @staticmethod
     async def get_status_code_from_response(response):
@@ -53,8 +58,9 @@ class GremlinClient:
         if status_code != 206:
             await self.transporter.close()
         if status_code >= 300:
+            logging.error(response)
             logger.error("Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
-                    status_code, response.get("status", {}).get("message"), query_string))
+                status_code, response.get("status", {}).get("message"), query_string))
             raise QueryFailedException(
                 "Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
                     status_code, response.get("status", {}).get("message"), query_string))
@@ -62,7 +68,7 @@ class GremlinClient:
     async def execute_query(self, query_string, serialize=True):
         logger.debug("Executing query: {}".format(query_string))
         await self.transporter.connect(self.gremlin_url)
-        message = await self.prepare_message(query_string)
+        message = await self.create_request_message(query_string)
         await self.transporter.write(message)
         responses = []
         response_data = await self.transporter.read()
@@ -70,14 +76,10 @@ class GremlinClient:
         status_code = await self.get_status_code_from_response(response_data)
         while status_code == 206:  # streaming, so read all the messages
             response_data = await self.transporter.read()
-            # yield response_data
             status_code = await self.get_status_code_from_response(response_data)
             await self.throw_status_based_errors(query_string, status_code, response_data)
             responses.append(response_data)
         await self.throw_status_based_errors(query_string, status_code, response_data)
-        # for response in responses:
-        #     print("==response", response)
-        # print(response_data)
         if serialize is True:
             return [ResponseMessage(**response_data) for response_data in responses]
         return responses

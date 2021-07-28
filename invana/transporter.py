@@ -51,7 +51,7 @@ class AiohttpTransport:
 
     async def write(self, message):
         async with async_timeout.timeout(self._write_timeout):
-            await self._websocket.send_str(json.dumps(message, default=str))
+            await self._websocket.send_bytes(message)
 
     async def read(self):
         # Inner function to perform async read.

@@ -328,8 +328,15 @@ class ResultSet:
     def __repr__(self):
         return "<ResultSet meta={meta} data={data} />".format(data=self.data, meta=self.meta)
 
+    @staticmethod
+    def get_dict_or_original_value( d):
+        try:
+            return d.to_dict()
+        except:
+            return d
+
     def to_dict(self):
         return {
-            "data": [d.to_dict() for d in self.data],
+            "data": [self.get_dict_or_original_value(d) for d in self.data],
             "meta": self.meta.to_dict()
         }
