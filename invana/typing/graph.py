@@ -130,9 +130,15 @@ class GMapItem(ItemBase):
 class GInt64Item(ItemBase):
     type = "g:Int64"
 
+    def to_dict(self):
+        return self.value
+
 
 class GStringItem(ItemBase):
     type = "g:String"
+
+    def to_dict(self):
+        return self.value
 
 
 class GListItem(ItemBase):
@@ -329,7 +335,7 @@ class ResultSet:
         return "<ResultSet meta={meta} data={data} />".format(data=self.data, meta=self.meta)
 
     @staticmethod
-    def get_dict_or_original_value( d):
+    def get_dict_or_original_value(d):
         try:
             return d.to_dict()
         except:
