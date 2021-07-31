@@ -35,7 +35,6 @@ def create_id_object(value):
 def create_element(value):
     data = {"@value": {}}
     value_tuples = generate_chunks_from_list(value, 2)
-    print("value_tuples", value_tuples)
     if isinstance(value_tuples[2][0], dict):
         if "Direction" in value_tuples[2][0]['@type']:
             data['@type'] = "g:Edge"
@@ -46,7 +45,6 @@ def create_element(value):
     data['@value']['label'] = value_tuples[1][1]
     data['@value']['properties'] = {}
     property_tuples = value_tuples[2:] if data['@type'] == "g:Vertex" else value_tuples[4:]
-
     for i, v in enumerate(property_tuples):  # cos first two tuples are id and label
         prop_data = {}
         prop_data['@type'] = "g:Property"
@@ -71,7 +69,6 @@ def create_element(value):
                 if v[0]['@value'] == "OUT":
                     data['@value']['outV'] = v[1]['@value'][1]
                     data['@value']['outVLabel'] = v[1]['@value'][3]
-
     if data['@type'] == "g:Vertex":
         return GVertexItem(**data)
     else:
@@ -85,7 +82,6 @@ def create_object_from_map(**kwargs):
             try:
                 return create_element(value)
             except Exception as e:
-                print("+++++", e)
                 return [convert_to_objects(v) for v in value]
 
         else:
@@ -103,13 +99,18 @@ def convert_to_objects(*args, **kwargs):
                 return convert_to_objects({"@type": "g:Int64", "@value": val})
             elif isinstance(val, float):
                 return convert_to_objects({"@type": "g:Float", "@value": val})
+            elif isinstance(val, list):
+                return convert_to_objects({"@type": "g:List", "@value": val})
             else:
                 raise Exception("Dont know how to serialise {} type data".format(val))
 
     if kwargs.get("@type") == "g:List":
         items = []
         for val in kwargs.get("@value", []):
-            items.append(convert_to_objects(**val))
+            if isinstance(val, dict):
+                items.append(convert_to_objects(**val))
+            else:
+                items.append(convert_to_objects(val))
         return items
     elif kwargs.get("@type") == "g:Map":
         return create_object_from_map(**kwargs)
@@ -354,7 +355,8 @@ class GraphElementItemBase(ItemBase):
 
     @property
     def id(self):
-        return self._id.value
+        return self._id.value if self._id else None
+        # return self._id.value
 
     def to_value(self):
         properties = {}

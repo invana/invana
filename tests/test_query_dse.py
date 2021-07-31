@@ -25,7 +25,7 @@ client = InvanaClient(
 
 def run_query(query_string):
     print("START ###########################", query_string)
-    responses = client.execute_query_as_sync(query_string)
+    responses = client.execute_query_as_sync(query_string, serialize=True)
     message = responses[0]
     print("+result==", message)
     print("+result==", message.result.to_value())
@@ -48,8 +48,9 @@ def run_query(query_string):
 # query_string = "g.V().hasLabel('Person').limit(2).toList()"
 # query_string = "g.V().hasLabel('Person').count()"
 raw_query = "g.V().hasLabel('person').valueMap(true).toList()"
-raw_query = "g.V().hasLabel('person').elementMap().toList()"
+# raw_query = "g.V().hasLabel('person').elementMap().toList()"
 # raw_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').elementMap().toList()"
+raw_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').valueMap('macro_goal').toList()"
 # raw_query = "g.V().hasId('dseg:/person/46ad98ac-f5c9-4411-815a-f81b3b667921').valueMap(true).toList()"
 # raw_query = "g.E().elementMap().toList()"
 
