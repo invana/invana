@@ -24,7 +24,7 @@ class StatusMessage:
     def __repr__(self):
         return "<StatusMessage />"
 
-    def to_dict(self):
+    def to_value(self):
         return {
             "message": self.message,
             "code": self.code,
@@ -45,9 +45,9 @@ class ResponseMessage:
             result=self.result,
             status=self.status.code)
 
-    def to_dict(self):
+    def to_value(self):
         return {
             "responseId": self.requestId,
-            "status": self.status.to_dict(),
-            "result": self.result.to_dict()
+            "status": self.status.to_value(),
+            "result": self.result.to_value()
         }

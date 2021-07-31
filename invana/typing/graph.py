@@ -32,54 +32,64 @@ def create_id_object(value):
         return GStringItem(**{"@type": "g:String", "@value": value})
 
 
-def get_value(v):
-    if v and isinstance(v, dict):
-        pass
+def create_element(value):
+    data = {"@value": {}}
+    value_tuples = generate_chunks_from_list(value, 2)
+    print("value_tuples", value_tuples)
+    if isinstance(value_tuples[2][0], dict):
+        if "Direction" in value_tuples[2][0]['@type']:
+            data['@type'] = "g:Edge"
+    if data.get("@type") is None:
+        data['@type'] = "g:Vertex"
+
+    data['@value']['id'] = value_tuples[0][1]
+    data['@value']['label'] = value_tuples[1][1]
+    data['@value']['properties'] = {}
+    property_tuples = value_tuples[2:] if data['@type'] == "g:Vertex" else value_tuples[4:]
+
+    for i, v in enumerate(property_tuples):  # cos first two tuples are id and label
+        prop_data = {}
+        prop_data['@type'] = "g:Property"
+        value = v[1]
+        if isinstance(value, dict):
+
+            if isinstance(value['@value'], list):
+                if value['@type'] not in ["g:List", "g:Map", "g:Set"]:
+                    value = value['@value'][0]
+
+            else:
+                value = value['@value']
+        prop_data['@value'] = {"key": v[0], "value": value}
+        data['@value']['properties'][v[0]] = prop_data
+
+    if data['@type'] == "g:Edge":
+        for v in value_tuples[2:4]:
+            if isinstance(v, tuple) and isinstance(v[0], dict):
+                if v[0]['@value'] == "IN":
+                    data['@value']['inV'] = v[1]['@value'][1]
+                    data['@value']['inVLabel'] = v[1]['@value'][3]
+                if v[0]['@value'] == "OUT":
+                    data['@value']['outV'] = v[1]['@value'][1]
+                    data['@value']['outVLabel'] = v[1]['@value'][3]
+
+    if data['@type'] == "g:Vertex":
+        return GVertexItem(**data)
+    else:
+        return GEdgeItem(**data)
 
 
-def create_element_map_object(**kwargs):
+def create_object_from_map(**kwargs):
     if kwargs['@type'] == "g:Map":
         value = kwargs['@value']
         if isinstance(value, list):
-            data = {"@value": {}}
-            value_tuples = generate_chunks_from_list(value, 2)
+            try:
+                return create_element(value)
+            except Exception as e:
+                print("+++++", e)
+                return [convert_to_objects(v) for v in value]
 
-            if isinstance(value_tuples[2][0], dict) and "Direction" in value_tuples[2][0]['@type']:
-                data['@type'] = "g:Edge"
-            else:
-                data['@type'] = "g:Vertex"
-
-            data['@value']['id'] = value_tuples[0][1]
-            data['@value']['label'] = value_tuples[1][1]
-            data['@value']['properties'] = {}
-            property_tuples = value_tuples[2:] if data['@type'] == "g:Vertex" else value_tuples[4:]
-
-            for i, v in enumerate(property_tuples):  # cos first two tuples are id and label
-                prop_data = {}
-                prop_data['@type'] = "g:Property"
-                value = v[1]
-                if isinstance(value, dict):
-                    if isinstance(value['@value'], list):
-                        value = value['@value'][0]
-                    else:
-                        value = value['@value']
-                prop_data['@value'] = {"key": v[0], "value": value}
-                data['@value']['properties'][v[0]] = prop_data
-
-            if data['@type'] == "g:Edge":
-                for v in value_tuples[2:4]:
-                    if isinstance(v, tuple) and isinstance(v[0], dict):
-                        if v[0]['@value'] == "IN":
-                            data['@value']['inV'] = v[1]['@value'][1]
-                            data['@value']['inVLabel'] = v[1]['@value'][3]
-                        if v[0]['@value'] == "OUT":
-                            data['@value']['outV'] = v[1]['@value'][1]
-                            data['@value']['outVLabel'] = v[1]['@value'][3]
-
-            if data['@type'] == "g:Vertex":
-                return GVertexItem(**data)
-            else:
-                return GEdgeItem(**data)
+        else:
+            raise Exception("Dont know how to serialise this ")
 
 
 def convert_to_objects(*args, **kwargs):
@@ -102,7 +112,7 @@ def convert_to_objects(*args, **kwargs):
             items.append(convert_to_objects(**val))
         return items
     elif kwargs.get("@type") == "g:Map":
-        return create_element_map_object(**kwargs)
+        return create_object_from_map(**kwargs)
     elif kwargs.get("@type") == "g:String":
         return GStringItem(**kwargs)
     elif kwargs.get("@type") == "g:Int64":
@@ -111,6 +121,10 @@ def convert_to_objects(*args, **kwargs):
         return GInt32Item(**kwargs)
     elif kwargs.get("@type") == "g:Float":
         return GFloatItem(**kwargs)
+    elif kwargs.get("@type") == "g:Set":
+        return GSetItem(**kwargs)
+    elif kwargs.get("@type") == "g:UUID":
+        return GUUIDItem(**kwargs)
     elif kwargs.get("@type") == "g:Vertex":
         return GVertexItem(**kwargs)
     elif kwargs.get("@type") == "g:Edge":
@@ -128,6 +142,16 @@ def convert_to_objects(*args, **kwargs):
         raise Exception("Dont know how to serialise {} type data".format(kwargs.get("@type")))
 
 
+# def convert_to_element_object(*args, **kwargs):
+#     if kwargs.get("@type") == "g:List":
+#         items = []
+#         for val in kwargs.get("@value", []):
+#             items.append(convert_to_objects(**val))
+#         return items
+#     elif kwargs.get("@type") == "g:Map":
+#         return create_object_from_map(**kwargs)
+# 
+
 class ItemBase:
     type = None
 
@@ -137,7 +161,7 @@ class ItemBase:
                 self.type, kwargs.get("@type")))
         self.value = kwargs.get("@value") or kwargs.get("value")
 
-    def to_dict(self):
+    def to_value(self):
         if self.type == "g:Map":
             return {"@type": self.type, "@value": self.value}
         else:
@@ -153,13 +177,15 @@ class ItemBase:
                 items.append(self.to_object(**val))
             return items
         elif kwargs.get("@type") == "g:Map":
-            return create_element_map_object(**kwargs)
+            return create_object_from_map(**kwargs)
+        else:
+            raise Exception("Dont kow how to create object")
 
 
 class GMapItem(ItemBase):
     type = "g:Map"
 
-    # def to_dict(self):
+    # def to_value(self):
     #     return {
     #         "value": self.value,
     #         "type": self.type
@@ -169,21 +195,35 @@ class GMapItem(ItemBase):
 class GFloatItem(ItemBase):
     type = "g:Float"
 
-    # def to_dict(self):
+    # def to_value(self):
+    #     return self.value
+
+
+class GSetItem(ItemBase):
+    type = "g:Set"
+
+    # def to_value(self):
+    #     return self.value
+
+
+class GUUIDItem(ItemBase):
+    type = "g:UUID"
+
+    # def to_value(self):
     #     return self.value
 
 
 class GInt64Item(ItemBase):
     type = "g:Int64"
 
-    # def to_dict(self):
+    # def to_value(self):
     #     return self.value
 
 
 class GInt32Item(ItemBase):
     type = "g:Int32"
 
-    # def to_dict(self):
+    # def to_value(self):
     #     return self.value
 
 
@@ -204,15 +244,12 @@ class DSETupleItem(ItemBase):
             tuple_data.append(convert_to_objects(val))
         return tuple_data
 
-    def to_dict(self):
-        return [val.to_dict() for val in self.value]
+    def to_value(self):
+        return [val.to_value() for val in self.value]
 
 
 class GStringItem(ItemBase):
     type = "g:String"
-
-    # def to_dict(self):
-    #     return self.value
 
 
 class GListItem(ItemBase):
@@ -254,10 +291,9 @@ class PropertyItemBase:
         if value.get('id'):
             self.id = value['id']['@value']['relationId']
         self.label = value.get('label') or value.get("key")
-
         self.value = convert_to_objects(value['value'])
 
-    def to_dict(self):
+    def to_value(self):
         return {"label": self.label, "property_id": self.id, "value": self.value}
 
     def __repr__(self):
@@ -320,10 +356,14 @@ class GraphElementItemBase(ItemBase):
     def id(self):
         return self._id.value
 
-    def to_dict(self):
+    def to_value(self):
         properties = {}
         for prop in self.properties:
-            properties[prop.label] = prop.value.to_dict()
+            # print("==prop", prop.value)
+            if isinstance(prop.value, list):
+                properties[prop.label] = [v.to_value() for v in prop.value]
+            else:
+                properties[prop.label] = prop.value.to_value()
 
         return {
             "id": self.id,
@@ -372,8 +412,8 @@ class GEdgeItem(GraphElementItemBase):
             type=self.type, id=self.id, e_info=e_info,
             properties=" ".join([prop.__str__() for prop in self.properties]))
 
-    def to_dict(self):
-        data = super(GEdgeItem, self).to_dict()
+    def to_value(self):
+        data = super(GEdgeItem, self).to_value()
         data['inv_label'] = self.inv_label
         data['inv'] = self.inv.value if self.inv else None
         data['outv_label'] = self.outv_label
@@ -397,8 +437,8 @@ class GPathItem:
     def __repr__(self):
         return "<{type} items={items}/>".format(type=self.type, items=self.items)
 
-    def to_dict(self):
-        return [d.to_dict() for d in self.items]
+    def to_value(self):
+        return [d.to_value() for d in self.items]
 
 
 class ResultSet:
@@ -413,12 +453,12 @@ class ResultSet:
     @staticmethod
     def get_dict_or_original_value(d):
         try:
-            return d.to_dict()
+            return d.to_value()
         except Exception:
             return d
 
-    def to_dict(self):
+    def to_value(self):
         return {
             "data": [self.get_dict_or_original_value(d) for d in self.data],
-            "meta": self.meta.to_dict()
+            "meta": self.meta.to_value()
         }

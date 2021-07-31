@@ -24,7 +24,7 @@ def run_query(query_string):
     elems = client.execute_query_as_sync(query_string)
     message = elems[0]
     print("+result==", message)
-    print("+result==", message.to_dict())
+    print("+result==", message.to_value())
     # for element in message.result.data:
     #     print("++element==", element)
     #     for prop in element.properties:
