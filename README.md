@@ -6,7 +6,7 @@ Async Python API for Apache TinkerPop's Gremlin supported databases.
 
 ## Installation
 ```shell
-pip install git+https //github.com/invanalabs/invana-py.git#egg=invana
+pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 
 
 ## Tested graph databases
