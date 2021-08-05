@@ -16,13 +16,6 @@ from invana import InvanaClient
 from invana.utils import async_to_sync
 
 
-def print_list(list_data):
-    print('----------')
-    for data in list_data:
-        print(data.to_value())
-    print('----------')
-
-
 async def import_data():
     client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
 
