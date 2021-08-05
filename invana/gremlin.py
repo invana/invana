@@ -29,14 +29,14 @@ class GremlinClient:
 
     def __init__(self,
                  gremlin_url,
-                 gremlin_traversal_source="g",
+                 traversal_source="g",
                  loop=None,
                  gremlin_version=None,
                  username=None,
                  password=None,
                  read_timeout=3600, write_timeout=3600):
         self.gremlin_url = gremlin_url
-        self.gremlin_traversal_source = gremlin_traversal_source
+        self.traversal_source = traversal_source
         self.loop = asyncio.get_event_loop() if loop is None else loop
         self.gremlin_version = gremlin_version
         self._username = username
@@ -48,7 +48,7 @@ class GremlinClient:
         return RequestMessage(
             query_string=gremlin_query,
             request_id=request_id,
-            traversal_source=self.gremlin_traversal_source,
+            traversal_source=self.traversal_source,
             gremlin_version=self.gremlin_version,
 
         ).build_query_message()

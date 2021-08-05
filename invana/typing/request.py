@@ -39,7 +39,7 @@ class RequestMessage:
                 "gremlin": gremlin_query,
                 "bindings": {},
                 "language": "gremlin-groovy",
-                "aliases": {"g": self.gremlin_traversal_source},
+                "aliases": {"g": self.traversal_source},
                 "session": request_id
             },
             'op': "eval",

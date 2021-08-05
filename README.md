@@ -7,21 +7,24 @@ Async Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 ```shell
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
+```
 
 
 ## Tested graph databases
+- [JanusGraph](https://janusgraph.org/) 
+- [DataStax Enterprise](https://www.datastax.com/products/datastax-enterprise) 
 
-```
 ## Features
 
 - Synchronous and Asynchronous Python API
+- Supports Basic authentication.
 - Run your gremlin queries.
 - JSON response
 - Create vertices and edges with properties.
 - Read one or many vertices and edges.
 - Update properties of on or many vertices and edges.
 - Delete one or many vertices and edges.
-- Supports querying with pagination
+- Supports querying with pagination.
 - Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,
   `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.
 - Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates. Following filter keyword patterns are supported with read_many()
@@ -51,10 +54,15 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 ## Usage
 
 ```python
-
 from invana import InvanaClient
 
 client = InvanaClient("ws://localhost:8182/gremlin")
+# or 
+client = InvanaClient("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
+```
+
+```python
+
 
 user = await client.vertex.get_or_create("User", properties={
     "name": "Ravi",
@@ -110,9 +118,7 @@ _ = await client.vertex.read_many(has__name__containing="engine")
 #<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
 ```
-## TODO
-  - supports for authentication
-
+ 
 ## Licenses
 
 Apache License, version 2.0
