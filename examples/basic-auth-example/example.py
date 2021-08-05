@@ -19,9 +19,22 @@ from invana.utils import async_to_sync
 async def import_data():
     client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
 
-    responses = await client.execute_query("g.V().limit(1).toList()", serialize=False)
-    for response in responses:
-        print(response)
+    results = await client.execute_query("g.V().limit(1).toList()")
+    for result in results:
+        print(result)
+        # <g:Vertex id=4104 label=Person name=<g:String value=ravi/>/>
+        print(result.to_value())
+        # [{'id': 4104, 'label': 'Person', 'properties': {'name': 'ravi'}}]
+
+
+async def import_data2():
+    client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
+
+    results = await client.execute_query("g.V().limit(1).toList()", serialize=False)
+    results = await client.execute_query("g.V().limit(1).next()", serialize=False, result_only=False)
+    for result in results:
+        print(result)
 
 
 async_to_sync(import_data())
+async_to_sync(import_data2())

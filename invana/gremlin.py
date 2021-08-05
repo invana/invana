@@ -89,7 +89,7 @@ class GremlinClient:
     async def receive_message(self):
         return await self.transporter.read()
 
-    async def execute_query(self, query_string, serialize=True):
+    async def execute_query(self, query_string, serialize=True, result_only=True):
         logger.debug("Executing query: {}".format(query_string))
         await self.transporter.connect(self.gremlin_url)
 
@@ -100,13 +100,13 @@ class GremlinClient:
         response_data = await self.receive_message()
         status_code = await self.get_status_code_from_response(response_data)
         if status_code == 407:
+            # if authentication is needed, this will ping the server with auth info.
             message = await self.create_auth_request_message(request_id)
-
             await self.send_message(message)
             response_data = await self.receive_message()
             status_code = await self.get_status_code_from_response(response_data)
-
             await self.throw_status_based_errors(query_string, status_code, response_data)
+
         await self.throw_status_based_errors(query_string, status_code, response_data)
         responses.append(response_data)
 
@@ -117,11 +117,18 @@ class GremlinClient:
             responses.append(response_data)
         await self.throw_status_based_errors(query_string, status_code, response_data)
         if serialize is True:
-            return [ResponseMessage(**response_data) for response_data in responses]
+            serialized_responses = [ResponseMessage(**response_data) for response_data in responses]
+            if result_only is True:
+                return [element for response in serialized_responses for element in response.result.data or []]
+            return serialized_responses
+        else:
+            if result_only is True:
+
+                return [element for response in responses for element in response['result']['data']['@value'] or []]
         return responses
 
-    def execute_query_as_sync(self, query_string, serialize=True):
-        return self.async_to_sync(self.execute_query(query_string, serialize=serialize))
+    def execute_query_as_sync(self, query_string, serialize=True, result_only=True):
+        return self.async_to_sync(self.execute_query(query_string, serialize=serialize, result_only=result_only))
 
     def async_to_sync(self, func):
         # if self.loop.is_closed():
