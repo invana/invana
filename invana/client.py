@@ -18,12 +18,13 @@ from .operations import VertexOperations, EdgeOperations, SchemaAllOperations, G
 class InvanaClient:
 
     def __init__(self,
-                 gremlin_url, gremlin_traversal_source="g",
+                 gremlin_url, gremlin_traversal_source="g", username=None, password=None,
                  loop=None, read_timeout=3600, write_timeout=3600):
         self.gremlin_client = GremlinClient(
             gremlin_url,
             gremlin_traversal_source=gremlin_traversal_source, loop=loop,
-            read_timeout=read_timeout, write_timeout=write_timeout
+            read_timeout=read_timeout, write_timeout=write_timeout,
+            username=username, password=password
         )
         self.vertex = VertexOperations(gremlin_client=self.gremlin_client)
         self.edge = EdgeOperations(gremlin_client=self.gremlin_client)

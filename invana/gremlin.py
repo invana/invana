@@ -15,6 +15,7 @@
 import asyncio
 import logging
 import uuid
+import base64
 
 from .core.exceptions import QueryFailedException
 from .transporter import AiohttpTransport
@@ -31,20 +32,32 @@ class GremlinClient:
                  gremlin_traversal_source="g",
                  loop=None,
                  gremlin_version=None,
+                 username=None,
+                 password=None,
                  read_timeout=3600, write_timeout=3600):
         self.gremlin_url = gremlin_url
         self.gremlin_traversal_source = gremlin_traversal_source
         self.loop = asyncio.get_event_loop() if loop is None else loop
         self.gremlin_version = gremlin_version
-        self.transporter = AiohttpTransport(read_timeout=read_timeout, write_timeout=write_timeout, loop=self.loop)
+        self._username = username
+        self._password = password
+        self.transporter = AiohttpTransport(read_timeout=read_timeout, write_timeout=write_timeout,
+                                            loop=self.loop, password=password, username=username)
 
-    async def create_request_message(self, gremlin_query):
+    async def create_request_message(self, request_id, gremlin_query):
         return RequestMessage(
             query_string=gremlin_query,
-            request_id=str(uuid.uuid4()),
+            request_id=request_id,
             traversal_source=self.gremlin_traversal_source,
-            gremlin_version=self.gremlin_version)\
-            .build_message()
+            gremlin_version=self.gremlin_version,
+
+        ).build_query_message()
+
+    async def create_auth_request_message(self, request_id):
+        return RequestMessage(
+            request_id=request_id,
+            username=self.transporter._username,
+            password=self.transporter._password).build_auth_message()
 
     @staticmethod
     async def get_status_code_from_response(response):
@@ -55,9 +68,14 @@ class GremlinClient:
         return ResponseMessage(**response)
 
     async def throw_status_based_errors(self, query_string, status_code, response):
-        if status_code != 206:
+        if status_code == 407:
+            return
+        elif status_code == 401:
             await self.transporter.close()
-        if status_code >= 300:
+            raise Exception(response['status']['message'])
+        elif status_code != 206:
+            await self.transporter.close()
+        elif status_code >= 300:
             logging.error(response)
             logger.error("Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
                 status_code, response.get("status", {}).get("message"), query_string))
@@ -65,17 +83,35 @@ class GremlinClient:
                 "Query failed with status code: {}.. Status message: {}.. Query is: {}".format(
                     status_code, response.get("status", {}).get("message"), query_string))
 
+    async def send_message(self, message):
+        await self.transporter.write(message)
+
+    async def receive_message(self):
+        return await self.transporter.read()
+
     async def execute_query(self, query_string, serialize=True):
         logger.debug("Executing query: {}".format(query_string))
         await self.transporter.connect(self.gremlin_url)
-        message = await self.create_request_message(query_string)
-        await self.transporter.write(message)
+
+        request_id = uuid.uuid4().__str__()
+        message = await self.create_request_message(request_id, query_string)
+        await self.send_message(message)
         responses = []
-        response_data = await self.transporter.read()
-        responses.append(response_data)
+        response_data = await self.receive_message()
         status_code = await self.get_status_code_from_response(response_data)
+        if status_code == 407:
+            message = await self.create_auth_request_message(request_id)
+
+            await self.send_message(message)
+            response_data = await self.receive_message()
+            status_code = await self.get_status_code_from_response(response_data)
+
+            await self.throw_status_based_errors(query_string, status_code, response_data)
+        await self.throw_status_based_errors(query_string, status_code, response_data)
+        responses.append(response_data)
+
         while status_code == 206:  # streaming, so read all the messages
-            response_data = await self.transporter.read()
+            response_data = await self.receive_message()
             status_code = await self.get_status_code_from_response(response_data)
             await self.throw_status_based_errors(query_string, status_code, response_data)
             responses.append(response_data)

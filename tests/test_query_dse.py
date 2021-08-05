@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 client = InvanaClient(
     "ws://localhost:8182/gremlin",
-    gremlin_traversal_source="all_food.g"
+    gremlin_traversal_source="all_food"
 )
 
 

@@ -461,6 +461,6 @@ class ResultSet:
 
     def to_value(self):
         return {
-            "data": [self.get_dict_or_original_value(d) for d in self.data],
+            "data": [self.get_dict_or_original_value(d) for d in self.data or []],
             "meta": self.meta.to_value()
         }

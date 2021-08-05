@@ -12,11 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import json
+import base64
 
 
 class RequestMessage:
     DEFAULT_GREMLIN_VERSION = b"application/vnd.gremlin-v3.0+json"
-    # DEFAULT_GREMLIN_VERSION = b"application/json"
 
     def __init__(self,
                  request_id=None,
@@ -26,6 +26,8 @@ class RequestMessage:
                  op="eval",
                  processor="",  # ["", "session", "traversal"]
                  gremlin_version=None,
+                 username=None,
+                 password=None,
                  **extra_query_args
                  ):
         """
@@ -50,6 +52,8 @@ class RequestMessage:
         :param query_string:
         :param traversal_source:
         :param session:
+        :param username:
+        :param password:
         :param args:
         :param op:
         :param processor:
@@ -62,10 +66,12 @@ class RequestMessage:
         self.op = op
         self.processor = processor
         self.session = session
+        self.username = username
+        self.password = password
         self.gremlin_version = gremlin_version or self.DEFAULT_GREMLIN_VERSION
         self.extra_query_args = extra_query_args
 
-    def build_message(self):
+    def build_query_message(self):
         message = {
             "requestId": {'@type': 'g:UUID', '@value': self.request_id},
             'processor': self.processor,
@@ -80,6 +86,24 @@ class RequestMessage:
         if self.session:
             message['args']['session'] = self.session
         message['args'].update(self.extra_query_args)
+        return self.finalize_message(message, b"\x21", self.gremlin_version)
+
+    def build_auth_message(self):
+        if self.username and self.password:
+            auth_bytes = b''.join([b'\x00', self.username.encode('utf-8'),
+                                   b'\x00', self.password.encode('utf-8')])
+            auth = base64.b64encode(auth_bytes).decode()
+        else:
+            raise Exception("Gremlin server requires authentication credentials in GremlinClient. "
+                            "For basic authentication provide username and password.")
+        message = {
+            "requestId": {'@type': 'g:UUID', '@value': self.request_id},
+            'processor': "traversal",
+            'op': "authentication",
+            "args": {
+                "sasl": auth
+            }
+        }
         return self.finalize_message(message, b"\x21", self.gremlin_version)
 
     @staticmethod

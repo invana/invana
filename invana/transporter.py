@@ -20,7 +20,7 @@ class AiohttpTransport:
     nest_asyncio_applied = False
 
     # Default heartbeat of 5.0 seconds.
-    def __init__(self, read_timeout=None, write_timeout=None, loop=None, **kwargs):
+    def __init__(self, read_timeout=None, write_timeout=None, loop=None, username=None, password=None, **kwargs):
         # Start event loop and initialize websocket and client to None
         self._loop = loop
         self._websocket = None
@@ -34,6 +34,10 @@ class AiohttpTransport:
             self._aiohttp_kwargs["max_msg_size"] = self._aiohttp_kwargs.pop("max_content_length")
         if "ssl_options" in self._aiohttp_kwargs:
             self._aiohttp_kwargs["ssl"] = self._aiohttp_kwargs.pop("ssl_options")
+
+        self.read_timeout = read_timeout
+        self._username = username
+        self._password = password
 
     async def connect(self, url, headers=None):
         # Start client session and use it to create a websocket with all the connection options provided.
