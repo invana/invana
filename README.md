@@ -117,6 +117,45 @@ _ = await client.vertex.read_many(has__name__containing="engine")
 
 ```
 
+
+## FAQ
+
+
+### How to get result as JSON
+```python
+from invana import InvanaClient
+
+client = InvanaClient("ws://localhost:8182/gremlin")
+ 
+user = await client.vertex.get_or_create("User", properties={
+  "name": "Ravi",
+  "username": "rrmerugu"
+})
+print(user)
+# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
+print(user.to_value())
+# {'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+
+```
+ 
+### How to get result as JSON
+```python
+from invana import InvanaClient
+
+client = InvanaClient("ws://localhost:8182/gremlin")
+ 
+user = await client.vertex.get_or_create("User", properties={
+  "name": "Ravi",
+  "username": "rrmerugu"
+})
+print(user)
+# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
+print(user.to_value())
+# {'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+
+```
+ 
+
 ## Licenses
 
 Apache License, version 2.0

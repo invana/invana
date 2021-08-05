@@ -47,15 +47,15 @@ def run_query(query_string):
 
 # query_string = "g.V().hasLabel('Person').limit(2).toList()"
 # query_string = "g.V().hasLabel('Person').count()"
-raw_query = "g.V().hasLabel('person').valueMap(true).toList()"
-# raw_query = "g.V().hasLabel('person').elementMap().toList()"
-# raw_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').elementMap().toList()"
-raw_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').valueMap('macro_goal').toList()"
-# raw_query = "g.V().hasId('dseg:/person/46ad98ac-f5c9-4411-815a-f81b3b667921').valueMap(true).toList()"
-# raw_query = "g.E().elementMap().toList()"
+execute_query = "g.V().hasLabel('person').valueMap(true).toList()"
+# execute_query = "g.V().hasLabel('person').elementMap().toList()"
+# execute_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').elementMap().toList()"
+execute_query = "g.V().hasId('dseg:/person/6c09f656-5aef-46df-97f9-e7f984c9a3d9').valueMap('macro_goal').toList()"
+# execute_query = "g.V().hasId('dseg:/person/46ad98ac-f5c9-4411-815a-f81b3b667921').valueMap(true).toList()"
+# execute_query = "g.E().elementMap().toList()"
 
-run_query(raw_query)
-# run_query(raw_query)
+run_query(execute_query)
+# run_query(execute_query)
 
 # query_string = "g.E().elementMap().limit(2).toList()"
 # run_query(query_string)

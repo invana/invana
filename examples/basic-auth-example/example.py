@@ -19,8 +19,9 @@ from invana.utils import async_to_sync
 async def import_data():
     client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
 
-    response = await client.execute_query("g.V().limit(1).toList()", serialize=True)
-    print(response)
+    responses = await client.execute_query("g.V().limit(1).toList()", serialize=False)
+    for response in responses:
+        print(response)
 
 
 async_to_sync(import_data())
