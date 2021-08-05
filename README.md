@@ -5,14 +5,15 @@
 Async Python API for Apache TinkerPop's Gremlin supported databases.
 
 ## Installation
+
 ```shell
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 ```
 
-
 ## Tested graph databases
-- [JanusGraph](https://janusgraph.org/) 
-- [DataStax Enterprise](https://www.datastax.com/products/datastax-enterprise) 
+
+- [JanusGraph](https://janusgraph.org/)
+- [DataStax Enterprise](https://www.datastax.com/products/datastax-enterprise)
 
 ## Features
 
@@ -27,9 +28,10 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 - Supports querying with pagination.
 - Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,
   `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.
-- Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates. Following filter keyword patterns are supported with read_many()
+- Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
+  Following filter keyword patterns are supported with read_many()
   - has__id=1021
-  - has__id__within=[200752, 82032, 4320], 
+  - has__id__within=[200752, 82032, 4320],
   - has__label__within=["Person", "Planet"]
   - has__label__without=["Person", "Planet"]
   - has__label="Person"
@@ -59,66 +61,62 @@ from invana import InvanaClient
 client = InvanaClient("ws://localhost:8182/gremlin")
 # or 
 client = InvanaClient("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
-```
-
-```python
-
-
+ 
 user = await client.vertex.get_or_create("User", properties={
-    "name": "Ravi",
-    "username": "rrmerugu"
+  "name": "Ravi",
+  "username": "rrmerugu"
 })
 print(user)
-#<g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
+# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
 print(user.to_value())
-#{'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+# {'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
 
 
 invana_studio_instance = await client.vertex.get_or_create("GithubProject", properties={
-    "name": "invana-studio",
-    "description": "opensource graph visualiser for Invana graph analytics engine"
+  "name": "invana-studio",
+  "description": "opensource graph visualiser for Invana graph analytics engine"
 })
-#<g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
 invana_engine_instance = await client.vertex.get_or_create("GithubProject", properties={
-    "name": "invana-engine",
-    "description": "Invana graph analytics engine"
+  "name": "invana-engine",
+  "description": "Invana graph analytics engine"
 })
 
 edge_instance = await client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
-    "started": 2020
+  "started": 2020
 })
 print(edge_instance)
-#<g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
+# <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
 print(edge_instance.to_value())
-#{'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inv_label': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
+# {'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inv_label': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
 
 
 engine_edge_instance = await client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
-    "started": 2020
+  "started": 2020
 })
-    
+
 _ = await client.vertex.read_many(has__label="GithubProject")
-#<g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
-#<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
 _ = await client.vertex.read_many(has__label__within=["GithubProject", "User"])
-#<g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
-#<g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
-#<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
+# <g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
 _ = await client.vertex.read_many(has__id=invana_studio_instance.id)
 # <g:Vertex id=4128 label=GithubProject name=invana-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
 edges = await client.edge.read_many(has__started__lte=2021)
-#<g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
-#<g:Edge id=93c-fuo-bv9-cqo User(20544)--authored-->GithubProject(16512) started=2020/>
+# <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
+# <g:Edge id=93c-fuo-bv9-cqo User(20544)--authored-->GithubProject(16512) started=2020/>
 
 _ = await client.vertex.read_many(has__name__containing="engine")
-#<g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
+# <g:Vertex id=16512 label=GithubProject name=invana-engine description=Invana graph analytics engine/>
 
 ```
- 
+
 ## Licenses
 
 Apache License, version 2.0
