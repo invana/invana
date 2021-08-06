@@ -73,6 +73,9 @@ class GremlinClient:
         elif status_code == 401:
             await self.transporter.close()
             raise Exception(response['status']['message'])
+        elif status_code == 597:
+            await self.transporter.close()
+            raise Exception(response['status']['message'])
         elif status_code != 206:
             await self.transporter.close()
         elif status_code >= 300:
@@ -123,7 +126,7 @@ class GremlinClient:
             return serialized_responses
         else:
             if result_only is True:
-
+                print(responses)
                 return [element for response in responses for element in response['result']['data']['@value'] or []]
         return responses
 

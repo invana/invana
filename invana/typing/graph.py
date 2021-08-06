@@ -416,10 +416,10 @@ class GEdgeItem(GraphElementItemBase):
 
     def to_value(self):
         data = super(GEdgeItem, self).to_value()
-        data['inv_label'] = self.inv_label
-        data['inv'] = self.inv.value if self.inv else None
-        data['outv_label'] = self.outv_label
-        data['outv'] = self.outv.value if self.outv else None
+        data['inVLabel'] = self.inv_label
+        data['inV'] = self.inv.value if self.inv else None
+        data['outVLabel'] = self.outv_label
+        data['outV'] = self.outv.value if self.outv else None
         return data
 
 

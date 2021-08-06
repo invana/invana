@@ -89,7 +89,7 @@ edge_instance = await client.edge.get_or_create("authored", user.id, invana_stud
 print(edge_instance)
 # <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
 print(edge_instance.to_value())
-# {'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inv_label': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
+# {'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inVLabel': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
 
 
 engine_edge_instance = await client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
