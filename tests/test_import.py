@@ -12,14 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from invana.gremlin import GremlinClient
-from invana.typing import ResponseMessage
+from invana_py.gremlin import GremlinClient
+from invana_py.typing import ResponseMessage
 
 driver = GremlinClient("ws://localhost:8182/gremlin")
 query_string = """
 g.addV('Person').property('first_name', 'Ravi').property('last_name', 'M').as('ravi').
-   addV('Company').property('name', 'Invana').property('about', 'Invana is a Knowledge Graphs company').as('invana'). 
-   addE('founded').from('ravi').to('invana').property("year", "2017").property("capital", "a penny").
+   addV('Company').property('name', 'Invana').property('about', 'Invana is a Knowledge Graphs company').as('invana_py'). 
+   addE('founded').from('ravi').to('invana_py').property("year", "2017").property("capital", "a penny").
    iterate()
 """
 # query_string = "g.V().drop()"

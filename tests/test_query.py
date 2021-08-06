@@ -12,8 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from invana.gremlin import GremlinClient
-from invana.typing import ResponseMessage
+from invana_py.gremlin import GremlinClient
+from invana_py.typing import ResponseMessage
 
 client = GremlinClient("ws://localhost:8182/gremlin")
 

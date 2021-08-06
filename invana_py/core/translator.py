@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from invana.core.exceptions import InvalidQueryArguments
+from invana_py.core.exceptions import InvalidQueryArguments
 
 
 class GremlinQueryTranslator:

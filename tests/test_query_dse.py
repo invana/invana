@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from invana import InvanaClient
+from invana_py import InvanaClient
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
