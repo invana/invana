@@ -16,7 +16,7 @@ from invana_py.utils import async_to_sync
 
 
 async def run_query():
-    client = InvanaClient("ws://localhost:8182/gremlin", traversal_source="all_food")
+    client = InvanaClient("ws://localhost:8182/gremlin", traversal_source="g")
 
     results = await client.execute_query("g.E().limit(1).toList()")
     print(results)

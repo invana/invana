@@ -361,9 +361,9 @@ class GraphElementItemBase(ItemBase):
     def to_value(self):
         properties = {}
         for prop in self.properties:
-            # print("==prop", prop.value)
             if isinstance(prop.value, list):
-                properties[prop.label] = [v.to_value() for v in prop.value]
+                properties[prop.label] = [[child_p.to_value() for child_p in p] if isinstance(p, list) else p.to_value()
+                                          for p in prop.value]
             else:
                 properties[prop.label] = prop.value.to_value()
 
