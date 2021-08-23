@@ -358,12 +358,16 @@ class GraphElementItemBase(ItemBase):
         return self._id.value if self._id else None
         # return self._id.value
 
+    def serialize_nested_list_data(self, property_list_data):
+        return [self.serialize_nested_list_data(p) if isinstance(p, list) else p.to_value() for p in property_list_data]
+
     def to_value(self):
         properties = {}
         for prop in self.properties:
             if isinstance(prop.value, list):
-                properties[prop.label] = [[child_p.to_value() for child_p in p] if isinstance(p, list) else p.to_value()
+                properties[prop.label] = [self.serialize_nested_list_data(p) if isinstance(p, list) else p.to_value()
                                           for p in prop.value]
+
             else:
                 properties[prop.label] = prop.value.to_value()
 

@@ -16,12 +16,12 @@ from invana_py.utils import async_to_sync
 
 
 async def run_query():
-    client = InvanaClient("ws://localhost:8182/gremlin", traversal_source="g")
+    client = InvanaClient("ws://localhost:8182/gremlin", traversal_source="all_food")
 
-    results = await client.execute_query("g.E().limit(1).toList()")
-    print(results)
+    results = await client.execute_query("g.E().elementMap().limit(4).toList()")
+    # print(results)
     for result in results:
-        print(result)
+        # print(result)
         print(result.to_value())
 
 
