@@ -13,3 +13,24 @@
 #    limitations under the License.
 #
 
+
+class Property:
+    key = None
+    value = None
+
+
+class NodeRelationShipBase:
+    id = None
+    label = None
+    properties = []
+
+
+class Node(NodeRelationShipBase):
+    pass
+
+
+class RelationShip(NodeRelationShipBase):
+    inv = None
+    inv_label = None
+    outv = None
+    outv_label = None

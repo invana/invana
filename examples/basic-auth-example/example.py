@@ -12,8 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from invana_py import InvanaClient
-from invana_py.utils import async_to_sync
+from invana_py__ import InvanaClient
+from invana_py__.utils import async_to_sync
 
 
 async def import_data():

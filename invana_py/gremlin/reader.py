@@ -12,4 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from gremlin_python.structure.io import graphsonV3d0
 
+
+class InvanaMapType(graphsonV3d0.MapType):
+    pass
+
+
+DESERIALIZER_MAP = {
+    "g:Map": InvanaMapType
+}
+
+invana_graphson_reader = graphsonV3d0.GraphSONReader(deserializer_map=DESERIALIZER_MAP)

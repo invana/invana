@@ -5,8 +5,10 @@ name = "pypi"
 
 [packages]
 aiohttp = "*"
+gremlinpython = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.8"

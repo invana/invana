@@ -12,4 +12,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from invana_py.gremlin import GremlinClient
 
+
+def test_create_vertex():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    # data = gremlin_client.vertex.create("Person", properties={"name": "Hello world"})
+    # print("========data", data)
+    gremlin_client.close_connection()
+
+
+def test_read_vertex():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    data = gremlin_client.vertex.read_one(has__id=20520)
+    print("=====data", data)
+    gremlin_client.close_connection()

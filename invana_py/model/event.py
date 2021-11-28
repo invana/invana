@@ -13,3 +13,8 @@
 #    limitations under the License.
 #
 
+class Event:
+    event_id = None
+    type = None
+    payload = None
+    created = None
