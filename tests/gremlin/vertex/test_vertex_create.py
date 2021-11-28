@@ -16,9 +16,21 @@ from invana_py.gremlin import GremlinClient
 import uuid
 
 
-def test_create_vertex():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.vertex.create(
-        "Person", properties={"name": f"Hello world - {uuid.uuid4().__str__()}"})
-    gremlin_client.close_connection()
+# def test_create():
+#     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+#     data = gremlin_client.vertex.create(
+#         "Person", properties={"name": f"Hello world - {uuid.uuid4().__str__()}"})
+#     gremlin_client.close_connection()
 
+
+def test_update_one():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    query_kwargs = {"has__id": 16576}
+    data = gremlin_client.vertex.read_one(**query_kwargs)
+    old_name = data['name']
+    new_name = f"Hello world - {uuid.uuid4().__str__()}"
+    data = gremlin_client.vertex.update_one(query_kwargs=query_kwargs,
+                                            properties={"name": new_name})
+    assert data['name'] == new_name
+    assert old_name != new_name
+    gremlin_client.close_connection()
