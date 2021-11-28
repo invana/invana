@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_python.process.graph_traversal import __
 from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.traversal import Cardinality
 
@@ -33,7 +32,8 @@ class VertexCRUD:
             element_type="V", g=self.gremlin_client.g, **query_kwargs)
 
     def read_one(self, **query_kwargs) -> Vertex:
-        return self._read(**query_kwargs).elementMap().next()
+        result = self._read(pagination__limit=1, **query_kwargs).elementMap().toList()
+        return result[0] if result.__len__() > 0 else None
 
     def read_many(self, **query_kwargs) -> list:
         return self._read(**query_kwargs).elementMap().toList()
@@ -48,4 +48,10 @@ class VertexCRUD:
         _ = self._read(**query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
-        return _.elementMap().next()
+        return _.elementMap().toList()
+
+    def delete_one(self, **query_kwargs):
+        return self._read(pagination__limit=1, **query_kwargs).drop().iterate()
+
+    def delete_many(self, **query_kwargs):
+        return self._read(**query_kwargs).drop().iterate()
