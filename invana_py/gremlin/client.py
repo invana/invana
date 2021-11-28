@@ -14,6 +14,7 @@
 #
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
+from .query import QueryKwargs2GremlinQuery
 from invana_py.gremlin.structure import VertexCRUD
 from .connection import DriverRemoteConnection
 from .reader import invana_graphson_reader
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class GremlinClient:
+    query_kwargs = QueryKwargs2GremlinQuery()
 
     def __init__(self, gremlin_url=None, traversal_source='g', strategies=None,
                  read_mode=False,

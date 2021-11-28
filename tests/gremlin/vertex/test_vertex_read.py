@@ -15,15 +15,33 @@
 from invana_py.gremlin import GremlinClient
 
 
-def test_create_vertex():
+def test_read_one_vertex():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    # data = gremlin_client.vertex.create("Person", properties={"name": "Hello world"})
-    # print("========data", data)
+    data = gremlin_client.vertex.read_one(has__label="Person")
+    assert data.label == "Person"
+    assert type(data) is not list
+    data = gremlin_client.vertex.read_one(has__id=8384)
+    assert data.id == 8384
     gremlin_client.close_connection()
 
 
-def test_read_vertex():
+def test_read_many_vertex():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.vertex.read_one(has__id=20520)
-    print("=====data", data)
+    data = gremlin_client.vertex.read_many(has__label="Person")
+    for d in data:
+        assert d.label == "Person"
+    assert type(data) is list
+    selected_ids = [8384, 16424, 16576]
+    data = gremlin_client.vertex.read_many(has__id__within=selected_ids)
+    assert type(data) is list
+    assert data.__len__() > 0
+
+    for d in data:
+        assert d.id in selected_ids
+    gremlin_client.close_connection()
+
+
+def test_execute_query():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    data = gremlin_client.execute_query("g.V().label().dedup()")
     gremlin_client.close_connection()
