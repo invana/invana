@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+import uuid
 import time
 import math
 
@@ -31,3 +31,7 @@ def calculate_time(func):
         end = time.time()
         print("Total time taken in : ", func.__name__, end - begin)
     return inner1_func
+
+
+def create_uuid():
+    return uuid.uuid4().__str__()

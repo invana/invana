@@ -13,13 +13,12 @@
 #    limitations under the License.
 #
 from invana_py.gremlin import GremlinClient
-import uuid
+from tests.sample_data import VERTICES_SAMPLES
 
 
 def test_create():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    for i in range(0, 10):
-        data = gremlin_client.vertex.create(
-            "Person", properties={"name": f"Hello world - {uuid.uuid4().__str__()}"})
-        print("==data", data)
+    for vertex in VERTICES_SAMPLES:
+        data = gremlin_client.vertex.create(**vertex)
+        assert data is not None
     gremlin_client.close_connection()

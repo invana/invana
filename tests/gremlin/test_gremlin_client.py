@@ -12,21 +12,26 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import pytest
 from gremlin_python.process.strategies import PartitionStrategy
 from invana_py.gremlin import GremlinClient
 from gremlin_python.process.traversal import T
+from gremlin_python.driver.protocol import GremlinServerError
 
 
 def test_client_with_readonly_strategy():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_only_mode=True)
-    gremlin_client.g.addV("MyLabel").toList()
+    with pytest.raises(GremlinServerError) as execinfo:
+        gremlin_client.g.addV("Person").toList()
+    assert execinfo.value.args[0] == "500: The provided traversal has a mutating step" \
+                                     " and thus is not read only: AddVertexStartStep({label=[Person]})"
+
     gremlin_client.close_connection()
 
 
 def test_client():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
     result = gremlin_client.execute_query("g.V().limit(1).toList()")
-    # print(result)
     gremlin_client.close_connection()
 
 

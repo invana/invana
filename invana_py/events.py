@@ -12,8 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import uuid
 from datetime import datetime
+
+from invana_py.utils import create_uuid
 
 
 def register_query_event(query_string):
@@ -21,27 +22,27 @@ def register_query_event(query_string):
     print("\nquery_event", e)
 
 
-class Event:
+class EventBase:
     event_id = None
     type = None
     payload = None
     created_at = None
+    finished_at = None
 
     def __init__(self, payload=None):
         self.created_at = self.get_datetime()
-        self.event_id = self.create_uuid()
+        self.event_id = create_uuid()
         self.payload = payload
-
-    @staticmethod
-    def create_uuid():
-        return uuid.uuid4().__str__()
 
     @staticmethod
     def get_datetime():
         return datetime.now()
 
+    def finished(self):
+        self.finished_at = self.get_datetime()
 
-class QueryEvent(Event):
+
+class QueryEvent(EventBase):
     type = "query"
 
     def __init__(self, query=None):
