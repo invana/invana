@@ -18,7 +18,7 @@ from datetime import datetime
 
 def register_query_event(query_string):
     e = QueryEvent(query=query_string)
-    print(e)
+    print("\nquery_event", e)
 
 
 class Event:

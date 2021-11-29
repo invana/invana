@@ -12,14 +12,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
-import uuid
+
+import time
+import math
 
 
-def test_create():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    for i in range(0, 10):
-        data = gremlin_client.vertex.create(
-            "Person", properties={"name": f"Hello world - {uuid.uuid4().__str__()}"})
-        print("==data", data)
-    gremlin_client.close_connection()
+# decorator to calculate duration
+# taken by any function.
+def calculate_time(func):
+    # added arguments inside the inner1,
+    # if function takes any arguments,
+    # can be added like this.
+    def inner1_func(*args, **kwargs):
+        # storing time before function execution
+        begin = time.time()
+        func(*args, **kwargs)
+        # storing time after function execution
+        end = time.time()
+        print("Total time taken in : ", func.__name__, end - begin)
+    return inner1_func

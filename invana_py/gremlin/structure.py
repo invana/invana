@@ -15,6 +15,7 @@
 from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.traversal import Cardinality
+from invana_py.utils import calculate_time
 from ..events import register_query_event
 import abc
 
@@ -47,16 +48,17 @@ class VertexCRUD(CRUDBase):
             _.property(Cardinality.single, k, v)
         return _.next()
 
+    # @calculate_time
     def read_one(self, **query_kwargs) -> Vertex:
-        _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs).elementMap()
+        _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
         register_query_event(_.__str__())
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
     def read_many(self, **query_kwargs) -> list:
-        _ = self.filter_by_query_kwargs(**query_kwargs).elementMap()
+        _ = self.filter_by_query_kwargs(**query_kwargs)
         register_query_event(_.__str__())
-        return _.toList()
+        return _.elementMap().toList()
 
     def update_one(self, query_kwargs=None, properties=None):
         _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
@@ -87,14 +89,14 @@ class EdgeCRUD(CRUDBase):
     def filter_e_by_query_kwargs(self, from_=None, to_=None, **query_kwargs):
         if from_ and to_:
             _ = self.gremlin_client.g.V(from_).outE()
-            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+            _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
             getattr(_, "where")(__.inV().hasId(to_))
         elif from_ and not to_:
             _ = self.gremlin_client.g.V(from_).outE()
-            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+            _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         elif not from_ and to_:
             _ = self.gremlin_client.g.V(to_).inE()
-            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+            _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         else:
             _ = self.filter_by_query_kwargs(**query_kwargs)
         return _

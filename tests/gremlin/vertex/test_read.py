@@ -18,11 +18,12 @@ from gremlin_python.process.traversal import T
 
 def test_read_one_vertex():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.vertex.read_one(has__label="Person")
-    assert data[T.label] == "Person"
-    assert type(data) is not list
-    data = gremlin_client.vertex.read_one(has__id=8384)
-    assert data[T.id] == 8384
+    old_data = gremlin_client.vertex.read_one(has__label="Person")
+    # print("\nold_data====", old_data)
+    assert old_data[T.label] == "Person"
+    assert type(old_data) is not list
+    data = gremlin_client.vertex.read_one(has__id=old_data[T.id])
+    assert data[T.id] == old_data[T.id]
     gremlin_client.close_connection()
 
 
