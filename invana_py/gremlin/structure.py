@@ -14,6 +14,7 @@
 #
 from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.traversal import Cardinality
+from ..events import register_query_event
 
 
 class VertexCRUD:
@@ -36,7 +37,9 @@ class VertexCRUD:
         return result[0] if result.__len__() > 0 else None
 
     def read_many(self, **query_kwargs) -> list:
-        return self._read(**query_kwargs).elementMap().toList()
+        _ = self._read(**query_kwargs)
+        register_query_event(_.__str__())
+        return _.elementMap().toList()
 
     def update_one(self, query_kwargs=None, properties=None):
         _ = self._read(pagination__limit=1, **query_kwargs)

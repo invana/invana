@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class GremlinClient:
     query_kwargs = QueryKwargs2GremlinQuery()
 
-    def __init__(self, gremlin_url=None, traversal_source='g', strategies=None,
+    def __init__(self, gremlin_url, traversal_source='g', strategies=None,
                  read_mode=False,
                  auth=None, **connection_kwargs):
         self.gremlin_url = gremlin_url

@@ -39,14 +39,14 @@ class QueryKwargs2GremlinQuery:
 
     @classmethod
     def check_if_property_or_special_props(cls, s):
-        if s in cls.special_properties:
-            return s
-        return '"{}"'.format(s)
+        # if s in cls.special_properties:
+        #     return s
+        return '{}'.format(s)
 
     @staticmethod
     def check_if_str(s):
-        if type(s) is str:
-            return '{}'.format(s)
+        # if type(s) is str:
+        #     return '{}'.format(s)
         return s
 
     @classmethod
@@ -65,22 +65,23 @@ class QueryKwargs2GremlinQuery:
             kwargs__list = kwarg_key.split("__")
             if kwargs__list.__len__() >= 2:
                 if kwargs__list.__len__() == 2:
-                    if kwargs__list == ["has", "label"] or kwargs__list == ["has", "id"]:
-                        getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(cls.check_if_str(value))
+                    if kwargs__list == ["has", "label"] or kwargs__list == ["has", "id"] or \
+                            kwargs__list == ["has", "value"]:
+                        getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(value)
                     else:
-                        getattr(_, kwargs__list[0])(cls.check_if_property_or_special_props(kwargs__list[1]),
-                                                    cls.check_if_str(value))
+                        getattr(_, kwargs__list[0])(kwargs__list[1], value)
                 else:
                     if kwargs__list[2] not in cls.allowed_predicates_list:
                         raise Exception("{} not allowed in search_kwargs. Only {} are allowed".format(
                             kwargs__list[2], cls.allowed_predicates_list))
-                    if kwargs__list[0:2] == ["has", "label"] or kwargs__list[0:2] == ["has", "id"]:
+                    if kwargs__list[0:2] == ["has", "label"] or kwargs__list[0:2] == ["has", "id"] or \
+                            kwargs__list == ["has", "value"]:
                         getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(
-                            getattr(P, kwargs__list[2])(cls.check_if_str(value)))
+                            getattr(P, kwargs__list[2])(value))
                     else:
                         getattr(_, kwargs__list[0])(
-                            cls.check_if_property_or_special_props(kwargs__list[1]),
-                            getattr(P, kwargs__list[2])(cls.check_if_str(value)))
+                            kwargs__list[1],
+                            getattr(P, kwargs__list[2])(value))
 
         for kwarg_key, value in cleaned_kwargs['pagination_kwargs'].items():
             kwargs__list = kwarg_key.split("__")
