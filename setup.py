@@ -23,7 +23,7 @@ setup(
     author_email='ravi@invana.io',
     url='https://github.com/invanalabs/invana-py',
     packages=find_packages(
-        exclude=("dist", "docs", "tests__", "scripts", "experiments")
+        exclude=("dist", "docs", "tests", "scripts", "experiments")
     ),
     install_requires=[
         'aiohttp'
