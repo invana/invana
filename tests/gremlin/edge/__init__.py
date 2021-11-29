@@ -11,18 +11,4 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#from invana_py__ import InvanaClient
-from invana_py__.utils import async_to_sync
-
-
-async def run_query():
-    client = InvanaClient("ws://megamind-ws:8182/gremlin", traversal_source="g")
-
-    results = await client.execute_query("g.V().elementMap().limit(4).toList()")
-    print(results)
-    for result in results:
-        # print(result)
-        print(result.to_value())
-
-
-async_to_sync(run_query())
+#

@@ -52,7 +52,3 @@ def test_read_many_with_pagination():
     gremlin_client.close_connection()
 
 
-def test_execute_query():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.V().label().dedup()")
-    gremlin_client.close_connection()

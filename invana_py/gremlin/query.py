@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_python.process.graph_traversal import GraphTraversal
+from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversalSource
 from gremlin_python.process.traversal import P
 
 
@@ -22,7 +22,6 @@ class QueryKwargs2GremlinQuery:
                                'notStartingWith', 'notContaining', 'notEndingWith']
     filter_key_starting_words_list = ['has']
     pagination_key_starting_words_list = ["pagination"]
-    special_properties = ["id", "label"]
 
     @classmethod
     def separate_filters_and_pagination_kwargs(cls, **search_kwargs):
@@ -38,28 +37,20 @@ class QueryKwargs2GremlinQuery:
         return {"filter_kwargs": filter_kwargs, "pagination_kwargs": pagination_kwargs}
 
     @classmethod
-    def check_if_property_or_special_props(cls, s):
-        # if s in cls.special_properties:
-        #     return s
-        return '{}'.format(s)
-
-    @staticmethod
-    def check_if_str(s):
-        # if type(s) is str:
-        #     return '{}'.format(s)
-        return s
-
-    @classmethod
     def process_query_kwargs(cls, element_type=None, g=None, **query_kwargs) -> GraphTraversal:
-        if element_type not in ["V", "E"]:
-            raise Exception("invalid element_type provided, valid values are : 'V', 'E'", )
-        _ = g.V() if element_type == "V" else g.E()
-        if element_type == "E" and "has__id" in query_kwargs:
-            """
-            This will fix the g.E().hasId("xyz") or g.E().has(id, "xyz") not working  issue 
-            """
-            _ = g.E(query_kwargs['has__id'])
-            del query_kwargs['has__id']
+        # if element_type not in ["V", "E"]:
+        #     raise Exception("invalid element_type provided, valid values are : 'V', 'E'", )
+        if element_type in ["V", "E"] and isinstance(g, GraphTraversalSource):
+            _ = g.V() if element_type == "V" else g.E()
+            if element_type == "E" and "has__id" in query_kwargs:
+                """
+                Note: overriding g.E()
+                This will fix the g.E().hasId("xyz") or g.E().has(id, "xyz") not working  issue 
+                """
+                _ = g.E(query_kwargs['has__id'])
+                del query_kwargs['has__id']
+        else:
+            _ = g
         cleaned_kwargs = cls.separate_filters_and_pagination_kwargs(**query_kwargs)
         for kwarg_key, value in cleaned_kwargs['filter_kwargs'].items():
             kwargs__list = kwarg_key.split("__")

@@ -13,48 +13,124 @@
 #    limitations under the License.
 #
 from gremlin_python.structure.graph import Vertex
+from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.traversal import Cardinality
 from ..events import register_query_event
+import abc
 
 
-class VertexCRUD:
+class CRUDBase(abc.ABC):
 
     def __init__(self, gremlin_client=None):
         self.gremlin_client = gremlin_client
 
-    def create(self, label=None, properties=None):
+    @abc.abstractmethod
+    def get_element_type(self):
+        pass
+
+    def filter_by_query_kwargs(self, element_type=None, g=None, **query_kwargs):
+        return self.gremlin_client.query_kwargs.process_query_kwargs(
+            element_type=element_type or self.get_element_type(),
+            g=g or self.gremlin_client.g,
+            **query_kwargs
+        )
+
+
+class VertexCRUD(CRUDBase):
+
+    def get_element_type(self):
+        return "V"
+
+    def create(self, label, properties=None):
         _ = self.gremlin_client.g.addV(label)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()
 
-    def _read(self, **query_kwargs):
-        return self.gremlin_client.query_kwargs.process_query_kwargs(
-            element_type="V", g=self.gremlin_client.g, **query_kwargs)
-
     def read_one(self, **query_kwargs) -> Vertex:
-        result = self._read(pagination__limit=1, **query_kwargs).elementMap().toList()
+        _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs).elementMap()
+        register_query_event(_.__str__())
+        result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
     def read_many(self, **query_kwargs) -> list:
-        _ = self._read(**query_kwargs)
+        _ = self.filter_by_query_kwargs(**query_kwargs).elementMap()
         register_query_event(_.__str__())
-        return _.elementMap().toList()
+        return _.toList()
 
     def update_one(self, query_kwargs=None, properties=None):
-        _ = self._read(pagination__limit=1, **query_kwargs)
+        _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
-        return _.elementMap().next()
+        result = _.elementMap().toList()
+        return result[0] if result.__len__() > 0 else None
 
     def update_many(self, query_kwargs=None, properties=None):
-        _ = self._read(**query_kwargs)
+        _ = self.filter_by_query_kwargs(**query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
-        return _.elementMap().toList()
+        result = _.elementMap().toList()
+        return result
 
     def delete_one(self, **query_kwargs):
-        return self._read(pagination__limit=1, **query_kwargs).drop().iterate()
+        return self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs).drop().iterate()
 
     def delete_many(self, **query_kwargs):
-        return self._read(**query_kwargs).drop().iterate()
+        return self.filter_by_query_kwargs(**query_kwargs).drop().iterate()
+
+
+class EdgeCRUD(CRUDBase):
+
+    def get_element_type(self):
+        return "E"
+
+    def filter_e_by_query_kwargs(self, from_=None, to_=None, **query_kwargs):
+        if from_ and to_:
+            _ = self.gremlin_client.g.V(from_).outE()
+            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+            getattr(_, "where")(__.inV().hasId(to_))
+        elif from_ and not to_:
+            _ = self.gremlin_client.g.V(from_).outE()
+            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+        elif not from_ and to_:
+            _ = self.gremlin_client.g.V(to_).inE()
+            _ = self.filter_by_query_kwargs(element_type=None, g=_, **query_kwargs)
+        else:
+            _ = self.filter_by_query_kwargs(**query_kwargs)
+        return _
+
+    def create(self, label, from_, to_, properties=None):
+        _ = self.gremlin_client.g.addE(label).from_(__.V(from_)).to(__.V(to_))
+        for k, v in properties.items():
+            _.property(Cardinality.single, k, v)
+        return _.next()
+
+    def read_one(self, from_=None, to_=None, **query_kwargs):
+        _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
+        result = _.elementMap().toList()
+        return result[0] if result.__len__() > 0 else None
+
+    def read_many(self, from_=None, to_=None, **query_kwargs):
+        _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs)
+        result = _.elementMap().toList()
+        return result
+
+    def update_one(self, from_=None, to_=None, properties=None, query_kwargs=None):
+        _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
+        for k, v in properties.items():
+            _.property(Cardinality.single, k, v)
+        result = _.elementMap().toList()
+        return result[0] if result.__len__() > 0 else None
+
+    def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
+        _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs)
+        for k, v in properties.items():
+            _.property(Cardinality.single, k, v)
+        result = _.elementMap().toList()
+        return result
+
+    def delete_one(self, from_=None, to_=None, **query_kwargs):
+        return self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs).drop().iterate()
+
+    def delete_many(self, from_=None, to_=None, **query_kwargs):
+        return self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs).drop().iterate()

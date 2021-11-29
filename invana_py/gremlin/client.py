@@ -15,7 +15,7 @@
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from .query import QueryKwargs2GremlinQuery
-from invana_py.gremlin.structure import VertexCRUD
+from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
 from .connection import DriverRemoteConnection
 from .reader import invana_graphson_reader
 import logging
@@ -27,7 +27,7 @@ class GremlinClient:
     query_kwargs = QueryKwargs2GremlinQuery()
 
     def __init__(self, gremlin_url, traversal_source='g', strategies=None,
-                 read_mode=False,
+                 read_only_mode=False,
                  auth=None, **connection_kwargs):
         self.gremlin_url = gremlin_url
         self.traversal_source = traversal_source
@@ -35,11 +35,12 @@ class GremlinClient:
         self.auth = auth
         self.connection = self.create_connection(gremlin_url, traversal_source, **connection_kwargs)
         self.g = traversal().withRemote(self.connection)
-        if read_mode:
+        if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
         self.vertex = VertexCRUD(gremlin_client=self)
+        self.edge = EdgeCRUD(gremlin_client=self)
 
     @staticmethod
     def create_connection(gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:

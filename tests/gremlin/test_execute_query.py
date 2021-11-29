@@ -14,8 +14,9 @@
 #
 from invana_py.gremlin import GremlinClient
 
+
 # gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
-# gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_mode=False)
+# gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_only_mode=False)
 # raw_result = gremlin_client.execute_query("g.V().limit(10).toList()")
 # value_map_result = gremlin_client.execute_query("g.V().limit(10).valueMap(true).toList()")
 # value_map_result = gremlin_client.execute_query("g.V().limit(10).valueMap('name').toList()")
@@ -37,3 +38,8 @@ from invana_py.gremlin import GremlinClient
 # #
 # print("node id", nodes)
 # print("node", nodes[0])
+
+def test_execute_query():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    data = gremlin_client.execute_query("g.V().label().dedup()")
+    gremlin_client.close_connection()

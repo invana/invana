@@ -17,18 +17,26 @@ from gremlin_python.statics import LongType
 
 
 def query_date(client):
-    result = client.vertex.read_many(has__label__within=["Planet", "Satellite"])
-    print("==result", result)
-    for res in result:
-        print(res)
-    result = client.vertex.read_many(has__mass_in_kgs__gt=LongType(641700000000000000000000))
-    print("==has__mass_in_kgs__gt", result)
-    for res in result:
-        print(res)
-    result = client.vertex.read_many(has__radius_in_kms__lt=LongType(4000))
-    print("==radius_in_kms", result)
-    for res in result:
-        print(res)
+    # result = client.vertex.read_many(has__label__within=["Planet", "Satellite"])
+    # print("==result", result)
+    # for res in result:
+    #     print(res)
+    # result = client.vertex.read_many(has__mass_in_kgs__gt=LongType(641700000000000000000000))
+    # print("==has__mass_in_kgs__gt", result)
+    # for res in result:
+    #     print(res)
+    # result = client.vertex.read_many(has__radius_in_kms__lt=LongType(4000))
+    # print("==radius_in_kms", result)
+    # for res in result:
+    #     print(res)
+
+    result = client.edge.read_one(has__label="has_planet")
+    print("===result", result)
+    result = client.edge.read_one(to_=41080)
+    print("===result to_ query", result)
+
+    result = client.edge.read_many(has__label="has_planet")
+    print("===result Planet query", result)
 
 
 _client = GremlinClient("ws://megamind-ws:8182/gremlin")

@@ -18,7 +18,7 @@ from gremlin_python.process.traversal import T
 
 
 def test_client_with_readonly_strategy():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_mode=False)
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_only_mode=True)
     gremlin_client.g.addV("MyLabel").toList()
     gremlin_client.close_connection()
 
