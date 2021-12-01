@@ -1,4 +1,4 @@
-# Invana Python API
+# Gremlin Connector
 
 **NOTE** - Under active development
 
