@@ -23,9 +23,9 @@ def run_query():
     # results = client.execute_query("g.V().elementMap().limit(4).toList()")
     # results = client.execute_query("g.E().elementMap().limit(4).toList()")
     # results = client.execute_query("g.V().valueMap(true).limit(4).toList()")
-    results = client.execute_query("g.E().valueMap(true).limit(4).toList()")
-    # results = client.execute_query("g.V().limit(4).toList()")
-    results = client.execute_query("g.E().limit(4).toList()")
+    # results = client.execute_query("g.E().valueMap(true).limit(4).toList()")
+    results = client.execute_query("g.V().limit(4).toList()")
+    # results = client.execute_query("g.E().limit(4).toList()")
     # results = client.execute_query("g.V().schema().toList()")
 
     print(results)

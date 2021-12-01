@@ -32,27 +32,41 @@ def test_e_datatype():
 
 def test_v_elementmap_datatype():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.V().elementMap().limit(1).next()")
+    data = gremlin_client.execute_query("g.V().elementMap().limit(1).toList()")
     assert isinstance(data[0], Node)
     gremlin_client.close_connection()
 
 
 def test_e_elementmap_datatype():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.E().elementMap().limit(1).next()")
+    data = gremlin_client.execute_query("g.E().elementMap().limit(1).toList()")
     assert isinstance(data[0], RelationShip)
     gremlin_client.close_connection()
 
 
 def test_v_valueMap_datatype():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.V().valueMap().limit(1).next()")
+    data = gremlin_client.execute_query("g.V().valueMap(true).limit(1).toList()")
     assert isinstance(data[0], Node)
     gremlin_client.close_connection()
 
 
 def test_e_valueMap_datatype():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.E().valueMap().limit(1).next()")
-    assert isinstance(data[0], RelationShip)
+    data = gremlin_client.execute_query("g.E().valueMap(true).limit(1).toList()")
+    assert isinstance(data[0], Node)
+    gremlin_client.close_connection()
+
+
+def test_v_valueMap_with_values_datatype():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    data = gremlin_client.execute_query("g.V().valueMap('name').limit(1).toList()")
+    assert isinstance(data[0], dict)
+    gremlin_client.close_connection()
+
+
+def test_e_valueMap_with_values_datatype():
+    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    data = gremlin_client.execute_query("g.E().valueMap('name').limit(1).toList()")
+    assert isinstance(data[0], dict)
     gremlin_client.close_connection()
