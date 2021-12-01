@@ -14,7 +14,7 @@
 #
 import pytest
 from gremlin_python.process.strategies import PartitionStrategy
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.process.traversal import T
 from gremlin_python.driver.protocol import GremlinServerError
 

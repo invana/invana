@@ -7,7 +7,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
+pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connector
 ```
 
 ## Tested graph databases
@@ -56,7 +56,7 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ## Usage
 
 ```python
-from invana_py import GremlinClient
+from gremlin_connector import GremlinClient
 
 client = GremlinClient("ws://localhost:8182/gremlin")
 # or 
@@ -73,13 +73,13 @@ print(user.to_value())
 
 
 invana_studio_instance = await client.vertex.get_or_create("GithubProject", properties={
-    "name": "invana_py-studio",
+    "name": "gremlin_connector-studio",
     "description": "opensource graph visualiser for Invana graph analytics engine"
 })
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
 invana_engine_instance = await client.vertex.get_or_create("GithubProject", properties={
-    "name": "invana_py-engine",
+    "name": "gremlin_connector-engine",
     "description": "Invana graph analytics engine"
 })
 
@@ -97,23 +97,23 @@ engine_edge_instance = await client.edge.get_or_create("authored", user.id, inva
 })
 
 _ = await client.vertex.read_many(has__label="GithubProject")
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
-# <g:Vertex id=16512 label=GithubProject name=invana_py-engine description=Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
 _ = await client.vertex.read_many(has__label__within=["GithubProject", "User"])
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 # <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
-# <g:Vertex id=16512 label=GithubProject name=invana_py-engine description=Invana graph analytics engine/>
+# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
 _ = await client.vertex.read_many(has__id=invana_studio_instance.id)
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
 edges = await client.edge.read_many(has__started__lte=2021)
 # <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
 # <g:Edge id=93c-fuo-bv9-cqo User(20544)--authored-->GithubProject(16512) started=2020/>
 
 _ = await client.vertex.read_many(has__name__containing="engine")
-# <g:Vertex id=16512 label=GithubProject name=invana_py-engine description=Invana graph analytics engine/>
+# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
 ```
 
@@ -122,7 +122,7 @@ _ = await client.vertex.read_many(has__name__containing="engine")
 ### How to get result as JSON
 
 ```python
-from invana_py import GremlinClient
+from gremlin_connector import GremlinClient
 
 client = GremlinClient("ws://localhost:8182/gremlin")
 
@@ -140,7 +140,7 @@ print(user.to_value())
 ### How to get execute_query result as JSON
 
 ```python
-from invana_py import GremlinClient
+from gremlin_connector import GremlinClient
 
 client = GremlinClient("ws://localhost:8182/gremlin", username="user", password="password")
 
@@ -156,7 +156,7 @@ for result in results:
 ### How to get raw response for execute_query
 
 ```python
-from invana_py import GremlinClient
+from gremlin_connector import GremlinClient
 
 client = GremlinClient("ws://localhost:8182/gremlin", username="user", password="password")
 

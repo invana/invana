@@ -12,8 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py import InvanaClient
-from invana_py.utils import async_to_sync
+from gremlin_connector import InvanaClient
+from gremlin_connector.utils import async_to_sync
 
 
 def print_list(list_data):
@@ -34,13 +34,13 @@ async def import_data():
     print(user)
 
     invana_studio_instance = await client.vertex.get_or_create("GithubProject", properties={
-        "name": "invana_py-studio",
+        "name": "gremlin_connector-studio",
         "description": "opensource graph visualiser for Invana graph analytics engine"
     })
     print(invana_studio_instance)
 
     invana_engine_instance = await client.vertex.get_or_create("GithubProject", properties={
-        "name": "invana_py-engine",
+        "name": "gremlin_connector-engine",
         "description": "Invana graph analytics engine"
     })
     print(invana_engine_instance)

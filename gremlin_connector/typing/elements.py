@@ -19,38 +19,49 @@ class Property:
     value = None
 
 
+class PropertiesObject:
+
+    def __repr__(self):
+        __str = ''
+        for k, v in self.__dict__.items():
+            __str += f'{k}="{v}"'
+        return __str
+
+
 class Node:
     id = None
     label = None
-    properties = []
+    properties = PropertiesObject()
 
     def __init__(self, _id, label, properties=None):
         self.id = _id
         self.label = label
-        self.properties = properties or []
+        if properties:
+            for k, v in properties.items():
+                setattr(self.properties, k, v)
 
     def __repr__(self):
-        property_string = "" if self.properties.__len__() == 0 else f"properties={self.properties}"
-        return f'<Node id="{self.id}" label="{self.label}" {property_string}>'
+        return f'<Node id="{self.id}" label="{self.label}" {self.properties}>'
 
 
 class RelationShip:
     id = None
     label = None
-    properties = []
+    properties = PropertiesObject()
 
     inv = None
     outv = None
 
-    def __init__(self, _id, label,  outv, inv, properties=None):
+    def __init__(self, _id, label, outv, inv, properties=None):
         self.id = _id
         self.label = label
         self.inv = inv
         self.outv = outv
-        self.properties = properties or []
+        if properties:
+            for k, v in properties.items():
+                setattr(self.properties, k, v)
 
     def __repr__(self):
-        property_string = "" if self.properties.__len__() == 0 else f"properties={self.properties}"
         return f'<RelationShip id="{self.id}" ' \
                f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label} ' \
-               f'{property_string}>'
+               f'{self.properties}>'

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from tests.sample_data import VERTICES_SAMPLES
 
 

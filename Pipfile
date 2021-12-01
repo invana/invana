@@ -4,8 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiohttp = "*"
-gremlinpython = "*"
+gremlinpython = "3.5.1"
 
 [dev-packages]
 pytest = "*"

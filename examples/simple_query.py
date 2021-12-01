@@ -11,10 +11,10 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 
 
-# from invana_py.utils import async_to_sync
+# from gremlin_connector.utils import async_to_sync
 
 
 def run_query():

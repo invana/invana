@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.process.traversal import T
 
 
@@ -20,8 +20,8 @@ def test_delete_one():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
     old_data = gremlin_client.vertex.read_one(has__label="Person")
     # delete data
-    gremlin_client.vertex.delete_one(has__id=old_data[T.id])
+    gremlin_client.vertex.delete_one(has__id=old_data.id)
     # validate if the data is deleted
-    data = gremlin_client.vertex.read_one(has__id=old_data[T.id])
+    data = gremlin_client.vertex.read_one(has__id=old_data.id)
     assert data is None
     gremlin_client.close_connection()

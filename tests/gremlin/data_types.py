@@ -12,8 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
-from invana_py.typing.elements import Node, RelationShip
+from gremlin_connector import GremlinClient
+from gremlin_connector.typing.elements import Node, RelationShip
 
 
 def test_v_datatype():

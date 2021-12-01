@@ -15,7 +15,7 @@
 from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.traversal import Cardinality
-from invana_py.utils import calculate_time
+from gremlin_connector.utils import calculate_time
 from ..events import register_query_event
 import abc
 

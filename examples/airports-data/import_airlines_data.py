@@ -16,8 +16,8 @@
 This script will import airlines data from Kevin Lawrence's book
 https://github.com/krlawrence/graph/tree/master/sample-data
 """
-from invana_py import InvanaClient
-from invana_py.utils import async_to_sync
+from gremlin_connector import InvanaClient
+from gremlin_connector.utils import async_to_sync
 import csv
 
 

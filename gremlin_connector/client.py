@@ -12,13 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+#
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
-from invana_py.contrib.janusgraph import JanusGraphSchema
-from .query import QueryKwargs2GremlinQuery
-from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
-from .connection import DriverRemoteConnection
-from .reader import invana_graphson_reader
+from gremlin_connector.dbs.janusgraph import JanusGraphSchema
+from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
+from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
+from gremlin_connector.gremlin.connection import DriverRemoteConnection
+from gremlin_connector.gremlin.reader import invana_graphson_reader
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,8 @@ logger = logging.getLogger(__name__)
 class GremlinClient:
     query_kwargs = QueryKwargs2GremlinQuery()
 
-    def __init__(self, gremlin_url, traversal_source='g', strategies=None,
+    def __init__(self, gremlin_url, traversal_source='g',
+                 strategies=None,
                  read_only_mode=False,
                  auth=None, **connection_kwargs):
         self.gremlin_url = gremlin_url

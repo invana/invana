@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.statics import long, FloatType
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 from gremlin_python.process.traversal import T

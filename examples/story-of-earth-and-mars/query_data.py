@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.statics import LongType
 
 

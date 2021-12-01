@@ -13,7 +13,7 @@
 #    limitations under the License.
 #
 from datetime import datetime
-from invana_py.utils import create_uuid
+from gremlin_connector.utils import create_uuid
 
 
 def register_query_event(query_string):

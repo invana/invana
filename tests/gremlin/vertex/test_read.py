@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.process.traversal import T
 
 
@@ -20,10 +20,10 @@ def test_read_one_vertex():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
     old_data = gremlin_client.vertex.read_one(has__label="Person")
     # print("\nold_data====", old_data)
-    assert old_data[T.label] == "Person"
+    assert old_data.label == "Person"
     assert type(old_data) is not list
-    data = gremlin_client.vertex.read_one(has__id=old_data[T.id])
-    assert data[T.id] == old_data[T.id]
+    data = gremlin_client.vertex.read_one(has__id=old_data.id)
+    assert data.id == old_data.id
     gremlin_client.close_connection()
 
 
@@ -31,15 +31,14 @@ def test_read_many_vertex():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
     data = gremlin_client.vertex.read_many(has__label="Person")
     for d in data:
-        assert d[T.label] == "Person"
+        assert d.label == "Person"
     assert type(data) is list
     selected_ids = [8384, 16424, 16576]
     data = gremlin_client.vertex.read_many(has__id__within=selected_ids)
     assert type(data) is list
     assert data.__len__() > 0
-
     for d in data:
-        assert d[T.id] in selected_ids
+        assert d.id in selected_ids
     gremlin_client.close_connection()
 
 
@@ -47,9 +46,7 @@ def test_read_many_with_pagination():
     gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
     data = gremlin_client.vertex.read_many(has__label="Person", pagination__limit=2)
     for d in data:
-        assert d[T.label] == "Person"
+        assert d.label == "Person"
     assert type(data) is list
     assert data.__len__() <= 2
     gremlin_client.close_connection()
-
-

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py.gremlin import GremlinClient
+from gremlin_connector import GremlinClient
 from gremlin_python.process.traversal import T
 from tests.sample_data import EDGES_SAMPLES
 
@@ -22,5 +22,5 @@ def test_create():
     for edge in EDGES_SAMPLES:
         from_vtx = gremlin_client.vertex.read_one(**edge['from_vertex_filters'])
         to_vtx = gremlin_client.vertex.read_one(**edge['to_vertex_filters'])
-        data = gremlin_client.edge.create(edge['label'], from_vtx[T.id], to_vtx[T.id], properties=edge['properties'], )
+        data = gremlin_client.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
     gremlin_client.close_connection()
