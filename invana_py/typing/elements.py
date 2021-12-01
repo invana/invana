@@ -19,18 +19,38 @@ class Property:
     value = None
 
 
-class NodeRelationShipBase:
+class Node:
     id = None
     label = None
     properties = []
 
+    def __init__(self, _id, label, properties=None):
+        self.id = _id
+        self.label = label
+        self.properties = properties or []
 
-class Node(NodeRelationShipBase):
-    pass
+    def __repr__(self):
+        property_string = "" if self.properties.__len__() == 0 else f"properties={self.properties}"
+        return f'<Node id="{self.id}" label="{self.label}" {property_string}>'
 
 
-class RelationShip(NodeRelationShipBase):
+class RelationShip:
+    id = None
+    label = None
+    properties = []
+
     inv = None
-    inv_label = None
     outv = None
-    outv_label = None
+
+    def __init__(self, _id, label,  outv, inv, properties=None):
+        self.id = _id
+        self.label = label
+        self.inv = inv
+        self.outv = outv
+        self.properties = properties or []
+
+    def __repr__(self):
+        property_string = "" if self.properties.__len__() == 0 else f"properties={self.properties}"
+        return f'<RelationShip id="{self.id}" ' \
+               f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label} ' \
+               f'{property_string}>'

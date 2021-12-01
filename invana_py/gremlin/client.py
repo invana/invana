@@ -14,6 +14,7 @@
 #
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
+from invana_py.contrib.janusgraph import JanusGraphSchema
 from .query import QueryKwargs2GremlinQuery
 from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
 from .connection import DriverRemoteConnection
@@ -39,8 +40,9 @@ class GremlinClient:
             self.strategies.append(ReadOnlyStrategy())
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
-        self.vertex = VertexCRUD(gremlin_client=self)
-        self.edge = EdgeCRUD(gremlin_client=self)
+        self.vertex = VertexCRUD(self)
+        self.edge = EdgeCRUD(self)
+        self.schema = JanusGraphSchema(self)
 
     @staticmethod
     def create_connection(gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:

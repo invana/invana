@@ -13,13 +13,11 @@
 #    limitations under the License.
 #
 from datetime import datetime
-
 from invana_py.utils import create_uuid
 
 
 def register_query_event(query_string):
     e = QueryEvent(query=query_string)
-    print("\nquery_event", e)
 
 
 class EventBase:

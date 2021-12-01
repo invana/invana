@@ -22,7 +22,7 @@ import abc
 
 class CRUDBase(abc.ABC):
 
-    def __init__(self, gremlin_client=None):
+    def __init__(self, gremlin_client):
         self.gremlin_client = gremlin_client
 
     @abc.abstractmethod

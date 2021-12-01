@@ -11,12 +11,13 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#"""
+#
+"""
 This script will import airlines data from Kevin Lawrence's book
 https://github.com/krlawrence/graph/tree/master/sample-data
 """
-from invana_py__ import InvanaClient
-from invana_py__.utils import async_to_sync
+from invana_py import InvanaClient
+from invana_py.utils import async_to_sync
 import csv
 
 

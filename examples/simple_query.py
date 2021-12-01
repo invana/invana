@@ -11,18 +11,28 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#from invana_py__ import InvanaClient
-from invana_py__.utils import async_to_sync
+from invana_py.gremlin import GremlinClient
 
 
-async def run_query():
-    client = InvanaClient("ws://megamind-ws:8182/gremlin", traversal_source="g")
+# from invana_py.utils import async_to_sync
 
-    results = await client.execute_query("g.V().elementMap().limit(4).toList()")
+
+def run_query():
+    client = GremlinClient("ws://megamind-ws:8182/gremlin", traversal_source="g")
+
+    # results = client.execute_query("g.V().elementMap().limit(4).toList()")
+    # results = client.execute_query("g.E().elementMap().limit(4).toList()")
+    # results = client.execute_query("g.V().valueMap(true).limit(4).toList()")
+    results = client.execute_query("g.E().valueMap(true).limit(4).toList()")
+    # results = client.execute_query("g.V().limit(4).toList()")
+    results = client.execute_query("g.E().limit(4).toList()")
+    # results = client.execute_query("g.V().schema().toList()")
+
     print(results)
     for result in results:
         # print(result)
-        print(result.to_value())
+        print(result)
+    client.close_connection()
 
 
-async_to_sync(run_query())
+run_query()
