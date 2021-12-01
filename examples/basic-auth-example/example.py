@@ -12,12 +12,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import InvanaClient
+from gremlin_connector import GremlinConnector
 from gremlin_connector.utils import async_to_sync
 
 
 async def import_data():
-    client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
+    client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
     results = await client.execute_query("g.V().limit(1).toList()")
     for result in results:
@@ -28,7 +28,7 @@ async def import_data():
 
 
 async def import_data2():
-    client = InvanaClient("ws://localhost:8182/gremlin", username="user", password="password")
+    client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
     results = await client.execute_query("g.V().limit(1).toList()", serialize=False)
     results = await client.execute_query("g.V().limit(1).next()", serialize=False, result_only=False)

@@ -12,13 +12,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 from tests.sample_data import VERTICES_SAMPLES
 
 
 def test_create():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
     for vertex in VERTICES_SAMPLES:
-        data = gremlin_client.vertex.create(**vertex)
+        data = gremlin_connector.vertex.create(**vertex)
         assert data is not None
-    gremlin_client.close_connection()
+    gremlin_connector.close_connection()

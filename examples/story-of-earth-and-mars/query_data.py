@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 from gremlin_python.statics import LongType
 
 
@@ -39,7 +39,7 @@ def query_date(client):
     print("===result Planet query", result)
 
 
-_client = GremlinClient("ws://megamind-ws:8182/gremlin")
+_client = GremlinConnector("ws://megamind-ws:8182/gremlin")
 
 query_date(_client)
 _client.close_connection()

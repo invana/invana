@@ -14,25 +14,25 @@
 #
 import pytest
 from gremlin_python.process.strategies import PartitionStrategy
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 from gremlin_python.process.traversal import T
 from gremlin_python.driver.protocol import GremlinServerError
 
 
 def test_client_with_readonly_strategy():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_only_mode=True)
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', read_only_mode=True)
     with pytest.raises(GremlinServerError) as execinfo:
-        gremlin_client.g.addV("Person").toList()
+        gremlin_connector.g.addV("Person").toList()
     assert execinfo.value.args[0] == "500: The provided traversal has a mutating step" \
                                      " and thus is not read only: AddVertexStartStep({label=[Person]})"
 
-    gremlin_client.close_connection()
+    gremlin_connector.close_connection()
 
 
 def test_client():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    result = gremlin_client.execute_query("g.V().limit(1).toList()")
-    gremlin_client.close_connection()
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    result = gremlin_connector.execute_query("g.V().limit(1).toList()")
+    gremlin_connector.close_connection()
 
 
 def test_client_with_partition_strategy():
@@ -40,9 +40,9 @@ def test_client_with_partition_strategy():
                                            # write_partition="a",
                                            read_partitions=["tenant_c", "tenant_b", "tenant_a"]
                                            )
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
-    nodes = gremlin_client.g.V().elementMap("name").limit(1).toList()
-    gremlin_client.close_connection()
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
+    nodes = gremlin_connector.g.V().elementMap("name").limit(1).toList()
+    gremlin_connector.close_connection()
 
 
 test_client()

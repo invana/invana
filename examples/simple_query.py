@@ -11,14 +11,14 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
 
 # from gremlin_connector.utils import async_to_sync
 
 
 def run_query():
-    client = GremlinClient("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    client = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
     # results = client.execute_query("g.V().elementMap().limit(4).toList()")
     # results = client.execute_query("g.E().elementMap().limit(4).toList()")

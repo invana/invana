@@ -56,11 +56,11 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connecto
 ## Usage
 
 ```python
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
-client = GremlinClient("ws://localhost:8182/gremlin")
+client = GremlinConnector("ws://localhost:8182/gremlin")
 # or 
-client = GremlinClient("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
+client = GremlinConnector("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
 
 user = await client.vertex.get_or_create("User", properties={
     "name": "Ravi",
@@ -122,9 +122,9 @@ _ = await client.vertex.read_many(has__name__containing="engine")
 ### How to get result as JSON
 
 ```python
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
-client = GremlinClient("ws://localhost:8182/gremlin")
+client = GremlinConnector("ws://localhost:8182/gremlin")
 
 user = await client.vertex.get_or_create("User", properties={
     "name": "Ravi",
@@ -140,9 +140,9 @@ print(user.to_value())
 ### How to get execute_query result as JSON
 
 ```python
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
-client = GremlinClient("ws://localhost:8182/gremlin", username="user", password="password")
+client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
 results = await client.execute_query("g.V().limit(1).toList()")
 for result in results:
@@ -156,9 +156,9 @@ for result in results:
 ### How to get raw response for execute_query
 
 ```python
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
-client = GremlinClient("ws://localhost:8182/gremlin", username="user", password="password")
+client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
 results = await client.execute_query("g.V().limit(1).toList()", serialize=False, result_only=True)
 for result in results:

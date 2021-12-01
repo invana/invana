@@ -16,8 +16,8 @@
 This script will import airlines data from Kevin Lawrence's book
 https://github.com/krlawrence/graph/tree/master/sample-data
 """
-from gremlin_connector import InvanaClient
-from gremlin_connector.utils import async_to_sync
+from gremlin_connector import GremlinConnector
+# from gremlin_connector.utils import async_to_sync
 import csv
 
 
@@ -67,7 +67,7 @@ def clean_edges(edge_data):
 
 async def import_data():
     node_id_map = {}
-    graph_client = InvanaClient("ws://localhost:8182/gremlin")
+    graph_client = GremlinConnector("ws://localhost:8182/gremlin")
     print("Initiating import: graph_client :", graph_client)
 
     with open('./air-routes-latest-nodes.csv') as f:
@@ -90,4 +90,5 @@ async def import_data():
             print("Created Edge", created_data)
 
 
-async_to_sync(import_data())
+# async_to_sync(import_data())
+import_data()

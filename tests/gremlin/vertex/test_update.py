@@ -12,19 +12,19 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 import uuid
 
 
 def test_update_one():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
     query_kwargs = {"has__id": 16576}
-    data = gremlin_client.vertex.read_one(**query_kwargs)
+    data = gremlin_connector.vertex.read_one(**query_kwargs)
     # print("====data", data, data.properties.name)
     old_name = data.properties.name
     new_name = f"Hello world - {uuid.uuid4().__str__()}"
-    data = gremlin_client.vertex.update_one(query_kwargs=query_kwargs,
+    data = gremlin_connector.vertex.update_one(query_kwargs=query_kwargs,
                                             properties={"name": new_name})
     assert data.properties.name == new_name
     assert old_name != new_name
-    gremlin_client.close_connection()
+    gremlin_connector.close_connection()

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import InvanaClient
+from gremlin_connector import GremlinConnector
 from gremlin_connector.utils import async_to_sync
 
 
@@ -24,7 +24,7 @@ def print_list(list_data):
 
 
 async def import_data():
-    client = InvanaClient("ws://localhost:8182/gremlin")
+    client = GremlinConnector("ws://localhost:8182/gremlin")
 
     # insta = await client.execute_query("g.V().drop()", serialize=True)
     user = await client.vertex.get_or_create("User", properties={

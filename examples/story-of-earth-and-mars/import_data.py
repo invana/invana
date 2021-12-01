@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 from gremlin_python.statics import long, FloatType
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 from gremlin_python.process.traversal import T
@@ -47,7 +47,7 @@ def delete_data(client):
     client.vertex.delete_many(has__label__within=["Planet", "Satellite", "Star"])
 
 
-_client = GremlinClient("ws://megamind-ws:8182/gremlin")
+_client = GremlinConnector("ws://megamind-ws:8182/gremlin")
 
 # delete_data(_client)
 import_data(_client)

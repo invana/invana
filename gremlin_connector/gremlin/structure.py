@@ -22,17 +22,17 @@ import abc
 
 class CRUDBase(abc.ABC):
 
-    def __init__(self, gremlin_client):
-        self.gremlin_client = gremlin_client
+    def __init__(self, gremlin_connector):
+        self.gremlin_connector = gremlin_connector
 
     @abc.abstractmethod
     def get_element_type(self):
         pass
 
     def filter_by_query_kwargs(self, element_type=None, g=None, **query_kwargs):
-        return self.gremlin_client.query_kwargs.process_query_kwargs(
+        return self.gremlin_connector.query_kwargs.process_query_kwargs(
             element_type=element_type or self.get_element_type(),
-            g=g or self.gremlin_client.g,
+            g=g or self.gremlin_connector.g,
             **query_kwargs
         )
 
@@ -43,7 +43,7 @@ class VertexCRUD(CRUDBase):
         return "V"
 
     def create(self, label, properties=None):
-        _ = self.gremlin_client.g.addV(label)
+        _ = self.gremlin_connector.g.addV(label)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()
@@ -88,21 +88,21 @@ class EdgeCRUD(CRUDBase):
 
     def filter_e_by_query_kwargs(self, from_=None, to_=None, **query_kwargs):
         if from_ and to_:
-            _ = self.gremlin_client.g.V(from_).outE()
+            _ = self.gremlin_connector.g.V(from_).outE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
             getattr(_, "where")(__.inV().hasId(to_))
         elif from_ and not to_:
-            _ = self.gremlin_client.g.V(from_).outE()
+            _ = self.gremlin_connector.g.V(from_).outE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         elif not from_ and to_:
-            _ = self.gremlin_client.g.V(to_).inE()
+            _ = self.gremlin_connector.g.V(to_).inE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         else:
             _ = self.filter_by_query_kwargs(**query_kwargs)
         return _
 
     def create(self, label, from_, to_, properties=None):
-        _ = self.gremlin_client.g.addE(label).from_(__.V(from_)).to(__.V(to_))
+        _ = self.gremlin_connector.g.addE(label).from_(__.V(from_)).to(__.V(to_))
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()

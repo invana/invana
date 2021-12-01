@@ -12,15 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 from gremlin_python.process.traversal import T
 from tests.sample_data import EDGES_SAMPLES
 
 
 def test_create():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
     for edge in EDGES_SAMPLES:
-        from_vtx = gremlin_client.vertex.read_one(**edge['from_vertex_filters'])
-        to_vtx = gremlin_client.vertex.read_one(**edge['to_vertex_filters'])
-        data = gremlin_client.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
-    gremlin_client.close_connection()
+        from_vtx = gremlin_connector.vertex.read_one(**edge['from_vertex_filters'])
+        to_vtx = gremlin_connector.vertex.read_one(**edge['to_vertex_filters'])
+        data = gremlin_connector.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
+    gremlin_connector.close_connection()

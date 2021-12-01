@@ -12,15 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinClient
+from gremlin_connector import GremlinConnector
 
 
-# gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
-# gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin', read_only_mode=False)
-# raw_result = gremlin_client.execute_query("g.V().limit(10).toList()")
-# value_map_result = gremlin_client.execute_query("g.V().limit(10).valueMap(true).toList()")
-# value_map_result = gremlin_client.execute_query("g.V().limit(10).valueMap('name').toList()")
-# element_map_result = gremlin_client.execute_query("g.V().limit(10).elementMap('name').toList()")
+# gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
+# gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', read_only_mode=False)
+# raw_result = gremlin_connector.execute_query("g.V().limit(10).toList()")
+# value_map_result = gremlin_connector.execute_query("g.V().limit(10).valueMap(true).toList()")
+# value_map_result = gremlin_connector.execute_query("g.V().limit(10).valueMap('name').toList()")
+# element_map_result = gremlin_connector.execute_query("g.V().limit(10).elementMap('name').toList()")
 # print("value_map_result=====", value_map_result)
 # print("element_map_result=====", element_map_result)
 # for r in raw_result:
@@ -31,15 +31,15 @@ from gremlin_connector import GremlinClient
 # #     print("======value_map elem =====", type(r), r, r.__dict__)
 #
 # print("++++++++")
-# nodes = gremlin_client.g.V().valueMap('name').toList()
-# nodes = gremlin_client.g.V().limit(1).toList()
-# nodes = gremlin_client.g.addV("MyLabel").toList()
-# gremlin_client.close_connection()
+# nodes = gremlin_connector.g.V().valueMap('name').toList()
+# nodes = gremlin_connector.g.V().limit(1).toList()
+# nodes = gremlin_connector.g.addV("MyLabel").toList()
+# gremlin_connector.close_connection()
 # #
 # print("node id", nodes)
 # print("node", nodes[0])
 
 def test_execute_query():
-    gremlin_client = GremlinClient('ws://megamind-ws:8182/gremlin')
-    data = gremlin_client.execute_query("g.V().label().dedup()")
-    gremlin_client.close_connection()
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    data = gremlin_connector.execute_query("g.V().label().dedup()")
+    gremlin_connector.close_connection()
