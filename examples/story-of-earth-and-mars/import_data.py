@@ -17,17 +17,18 @@ from gremlin_python.statics import long, FloatType
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 from gremlin_python.process.traversal import T
 
+
 # logging.basicConfig(level=logging.DEBUG)
 
 
 def import_data(client):
-    # for vertex in VERTICES_SAMPLES:
-    #     # _label = vertex['label']
-    #     # del vertex['label']
-    #     if 'mass_in_kgs' in vertex['properties']:
-    #         vertex['properties']['mass_in_kgs'] = FloatType(vertex['properties']['mass_in_kgs'])
-    #     vtx_instance = client.vertex.create(**vertex)
-    #     print("vtx_instance", vtx_instance)
+    for vertex in VERTICES_SAMPLES:
+        # _label = vertex['label']
+        # del vertex['label']
+        if 'mass_in_kgs' in vertex['properties']:
+            vertex['properties']['mass_in_kgs'] = FloatType(vertex['properties']['mass_in_kgs'])
+        vtx_instance = client.vertex.create(**vertex)
+        print("vtx_instance", vtx_instance)
 
     for edge in EDGES_SAMPLES:
         from_vertex = client.vertex.read_one(**edge['from_vertex_filters'])
@@ -36,8 +37,8 @@ def import_data(client):
         print("to_vertex", to_vertex)
         edge_instance = client.edge.create(
             edge['label'],
-            from_vertex[T.id],
-            to_vertex[T.id],
+            from_vertex.id,
+            to_vertex.id,
             properties=edge['properties']
         )
         print("edge_instance", edge_instance)

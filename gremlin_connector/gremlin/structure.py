@@ -55,6 +55,17 @@ class VertexCRUD(CRUDBase):
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
+    def get_or_create(self, label, properties=None):
+        properties = properties if properties else {}
+        properties_kwargs = {}
+        if label:
+            properties_kwargs[f"has__label"] = label
+        properties_kwargs.update({f"has__{k}": v for k, v in properties.items()})
+        result = self.read_one(**properties_kwargs)
+        if result:
+            return result
+        return self.create(label, properties=properties)
+
     def read_many(self, **query_kwargs) -> list:
         _ = self.filter_by_query_kwargs(**query_kwargs)
         register_query_event(_.__str__())
@@ -111,6 +122,17 @@ class EdgeCRUD(CRUDBase):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
+
+    def get_or_create(self, label, from_, to_, properties=None):
+        properties = properties if properties else {}
+        query_kwargs = {}
+        if label:
+            query_kwargs[f"has__label"] = label
+        query_kwargs.update({f"has__{k}": v for k, v in properties.items()})
+        result = self.read_one(from_=from_, to_=to_, **query_kwargs)
+        if result:
+            return result
+        return self.create(label, from_, to_, properties=properties)
 
     def read_many(self, from_=None, to_=None, **query_kwargs):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs)

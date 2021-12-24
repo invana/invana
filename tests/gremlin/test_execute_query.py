@@ -41,5 +41,5 @@ from gremlin_connector import GremlinConnector
 
 def test_execute_query():
     gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().label().dedup()")
+    data = gremlin_connector.execute_query("g.V().count()")
     gremlin_connector.close_connection()

@@ -1,4 +1,4 @@
-# Invana Python API
+# Gremlin Connector
 
 **NOTE** - Under active development
 
@@ -10,15 +10,15 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connector
 ```
 
-## Tested graph databases
+[comment]: <> (-  ## Tested graph databases )
 
-- [JanusGraph](https://janusgraph.org/)
-- [DataStax Enterprise](https://www.datastax.com/products/datastax-enterprise)
+[comment]: <> (- [JanusGraph]&#40;https://janusgraph.org/&#41;)
+
+[comment]: <> (- [DataStax Enterprise]&#40;https://www.datastax.com/products/datastax-enterprise&#41;)
 
 ## Features
 
 - Synchronous and Asynchronous Python API
-- Supports Basic authentication.
 - Run your gremlin queries.
 - JSON response
 - Create vertices and edges with properties.
@@ -62,28 +62,25 @@ client = GremlinConnector("ws://localhost:8182/gremlin")
 # or 
 client = GremlinConnector("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
 
-user = await client.vertex.get_or_create("User", properties={
+user = client.vertex.get_or_create("User", properties={
     "name": "Ravi",
     "username": "rrmerugu"
 })
 print(user)
-# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
-print(user.to_value())
-# {'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+ 
 
-
-invana_studio_instance = await client.vertex.get_or_create("GithubProject", properties={
+invana_studio_instance = client.vertex.get_or_create("GithubProject", properties={
     "name": "gremlin_connector-studio",
     "description": "opensource graph visualiser for Invana graph analytics engine"
 })
 # <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
-invana_engine_instance = await client.vertex.get_or_create("GithubProject", properties={
+invana_engine_instance = client.vertex.get_or_create("GithubProject", properties={
     "name": "gremlin_connector-engine",
     "description": "Invana graph analytics engine"
 })
 
-edge_instance = await client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
+edge_instance = client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
     "started": 2020
 })
 print(edge_instance)
@@ -92,27 +89,27 @@ print(edge_instance.to_value())
 # {'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inVLabel': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
 
 
-engine_edge_instance = await client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
+engine_edge_instance = client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
     "started": 2020
 })
 
-_ = await client.vertex.read_many(has__label="GithubProject")
+_ = client.vertex.read_many(has__label="GithubProject")
 # <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 # <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
-_ = await client.vertex.read_many(has__label__within=["GithubProject", "User"])
+_ = client.vertex.read_many(has__label__within=["GithubProject", "User"])
 # <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 # <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
 # <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
-_ = await client.vertex.read_many(has__id=invana_studio_instance.id)
+_ = client.vertex.read_many(has__id=invana_studio_instance.id)
 # <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
-edges = await client.edge.read_many(has__started__lte=2021)
+edges = client.edge.read_many(has__started__lte=2021)
 # <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
 # <g:Edge id=93c-fuo-bv9-cqo User(20544)--authored-->GithubProject(16512) started=2020/>
 
-_ = await client.vertex.read_many(has__name__containing="engine")
+_ = client.vertex.read_many(has__name__containing="engine")
 # <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
 
 ```
@@ -126,7 +123,7 @@ from gremlin_connector import GremlinConnector
 
 client = GremlinConnector("ws://localhost:8182/gremlin")
 
-user = await client.vertex.get_or_create("User", properties={
+user = client.vertex.get_or_create("User", properties={
     "name": "Ravi",
     "username": "rrmerugu"
 })
@@ -144,7 +141,7 @@ from gremlin_connector import GremlinConnector
 
 client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
-results = await client.execute_query("g.V().limit(1).toList()")
+results = client.execute_query("g.V().limit(1).toList()")
 for result in results:
     print(result)
     # <g:Vertex id=4104 label=Person name=<g:String value=ravi/>/>
@@ -160,12 +157,12 @@ from gremlin_connector import GremlinConnector
 
 client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
-results = await client.execute_query("g.V().limit(1).toList()", serialize=False, result_only=True)
+results = client.execute_query("g.V().limit(1).toList()")
 for result in results:
     print(result)
     # {'@type': 'g:Vertex', '@value': {'id': {'@type': 'g:Int64', '@value': 4104}, 'label': 'Person', 'properties': {'name': [{'@type': 'g:VertexProperty', '@value': {'id': {'@type': 'janusgraph:RelationIdentifier', '@value': {'relationId': '16p-360-1l1'}}, 'value': 'ravi', 'label': 'name'}}]}}}
 
-results = await client.execute_query("g.V().limit(1).next()", serialize=False, result_only=False)
+results = client.execute_query("g.V().limit(1).next()")
 for result in results:
     print(result)
     # {'requestId': 'c82520d7-57a7-45d2-98fd-881901a1290d', 'status': {'message': '', 'code': 200, 'attributes': {'@type': 'g:Map', '@value': ['host', '/172.18.0.1:47992']}}, 'result': {'data': {'@type': 'g:List', '@value': [{'@type': 'g:Vertex', '@value': {'id': {'@type': 'g:Int64', '@value': 4104}, 'label': 'Person', 'properties': {'name': [{'@type': 'g:VertexProperty', '@value': {'id': {'@type': 'janusgraph:RelationIdentifier', '@value': {'relationId': '16p-360-1l1'}}, 'value': 'ravi', 'label': 'name'}}]}}}]}, 'meta': {'@type': 'g:Map', '@value': []}}}

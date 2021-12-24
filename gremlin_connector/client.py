@@ -13,13 +13,16 @@
 #    limitations under the License.
 #
 #
+from gremlin_python.driver.resultset import ResultSet
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
-from gremlin_connector.dbs.janusgraph import JanusGraphSchema
+# from gremlin_connector.dbs.janusgraph import JanusGraphSchema
 from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
 from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
 from gremlin_connector.gremlin.connection import DriverRemoteConnection
 from gremlin_connector.gremlin.reader import invana_graphson_reader
+from gremlin_connector.exceptions import InvalidGraphBackendError
+from concurrent.futures import Future
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,15 +30,26 @@ logger = logging.getLogger(__name__)
 
 class GremlinConnector:
     query_kwargs = QueryKwargs2GremlinQuery()
+    SUPPORTED_GRAPH_BACKENDS = ['janusgraph', ]
+    DEFAULT_GRAPH_BACKEND = 'janusgraph'
 
-    def __init__(self, gremlin_url, traversal_source='g',
+    def __init__(self, gremlin_url,
+                 traversal_source='g',
                  strategies=None,
+                 graph_backend=None,
                  read_only_mode=False,
                  auth=None, **connection_kwargs):
+        graph_backend = graph_backend.lower() if graph_backend else self.DEFAULT_GRAPH_BACKEND
+        if graph_backend not in self.SUPPORTED_GRAPH_BACKENDS:
+            raise InvalidGraphBackendError()
         self.gremlin_url = gremlin_url
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
+        # if graph_backend == "janusgraph":
+        #     self.schema = JanusGraphSchema(self)
+        # else:
+        #     raise InvalidGraphBackendError()
         self.connection = self.create_connection(gremlin_url, traversal_source, **connection_kwargs)
         self.g = traversal().withRemote(self.connection)
         if read_only_mode:
@@ -44,7 +58,6 @@ class GremlinConnector:
             self.g = self.g.withStrategies(*self.strategies)
         self.vertex = VertexCRUD(self)
         self.edge = EdgeCRUD(self)
-        self.schema = JanusGraphSchema(self)
 
     @staticmethod
     def create_connection(gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:
@@ -69,9 +82,45 @@ class GremlinConnector:
         graph_strategies_str += ")."
         return graph_strategies_str
 
-    def execute_query(self, query_string) -> any:
+    # def execute_query(self, query_string, timeout=None) -> any:
+    #     if self.strategies.__len__() > 0:
+    #         strategy_prefix = self.get_strategies_object_to_string()
+    #         query_string = query_string.replace("g.", strategy_prefix, 1)
+    #     logger.info("Running query : {}".format(query_string))
+    #     request_options = {"evaluationTimeout": timeout} if timeout else {}
+    #     return self.connection.client.submit(query_string, request_options=request_options).next()
+
+    def execute_query(self, query_string, timeout=None) -> any:
         if self.strategies.__len__() > 0:
             strategy_prefix = self.get_strategies_object_to_string()
             query_string = query_string.replace("g.", strategy_prefix, 1)
         logger.info("Running query : {}".format(query_string))
-        return self.connection.client.submit(query_string).next()
+        request_options = {"evaluationTimeout": timeout} if timeout else {}
+        return self.connection.client.submitAsync(query_string, request_options=request_options).result().all().result()
+
+    def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
+        if self.strategies.__len__() > 0:
+            strategy_prefix = self.get_strategies_object_to_string()
+            query_string = query_string.replace("g.", strategy_prefix, 1)
+        logger.info("Running query : {}".format(query_string))
+        request_options = {"evaluationTimeout": timeout} if timeout else {}
+        result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
+        self.read_from_result_set(result_set, callback, finished_callback)
+
+    @staticmethod
+    def read_from_result_set(result_set, callback, finished_callback):
+
+        def cb(f):
+            try:
+                f.result()
+            except Exception as e:
+                raise e
+            else:
+                while not result_set.stream.empty():
+                    single_result = result_set.stream.get_nowait()
+                    callback(single_result)
+
+        result_set.done.add_done_callback(cb)
+
+        if finished_callback:
+            finished_callback()

@@ -13,7 +13,6 @@
 #    limitations under the License.
 #
 from gremlin_connector import GremlinConnector
-from gremlin_connector.utils import async_to_sync
 
 
 async def import_data():
@@ -30,11 +29,11 @@ async def import_data():
 async def import_data2():
     client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
-    results = await client.execute_query("g.V().limit(1).toList()", serialize=False)
-    results = await client.execute_query("g.V().limit(1).next()", serialize=False, result_only=False)
+    results = await client.execute_query("g.V().limit(1).toList()")
+    results = await client.execute_query("g.V().limit(1).next()")
     for result in results:
         print(result)
 
 
-async_to_sync(import_data())
-async_to_sync(import_data2())
+import_data()
+import_data2()

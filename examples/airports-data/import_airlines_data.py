@@ -65,16 +65,16 @@ def clean_edges(edge_data):
     }
 
 
-async def import_data():
+def import_data():
     node_id_map = {}
-    graph_client = GremlinConnector("ws://localhost:8182/gremlin")
+    graph_client = GremlinConnector("ws://megamind-ws:8182/gremlin", graph_backend="janusgraph")
     print("Initiating import: graph_client :", graph_client)
 
     with open('./air-routes-latest-nodes.csv') as f:
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_nodes(line)
-            created_data = await graph_client.vertex.create(cleaned_data['label'],
+            created_data = graph_client.vertex.create(cleaned_data['label'],
                                                             properties=cleaned_data['properties'])
             print("Created Node", created_data)
             node_id_map[cleaned_data['id']] = created_data.id
@@ -83,7 +83,7 @@ async def import_data():
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_edges(line)
-            created_data = await graph_client.edge.create(cleaned_data['label'],
+            created_data = graph_client.edge.create(cleaned_data['label'],
                                                           node_id_map[cleaned_data['from']],
                                                           node_id_map[cleaned_data['to']],
                                                           properties=cleaned_data['properties'])
