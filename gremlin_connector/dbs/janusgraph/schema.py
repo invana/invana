@@ -14,7 +14,9 @@
 #
 #
 from .utils import process_graph_schema_string
+from gremlin_connector.typing.schema import PropertySchema, VertexSchema, EdgeSchema
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,63 +25,84 @@ class JanusGraphSchemaReader:
     def __init__(self, gremlin_connector):
         self.gremlin_connector = gremlin_connector
 
-    def get_graph_schema(self):
+    def _get_graph_schema_overview(self):
         # TODO - can add more information from the print schema data like indexes etc to current output
-        responses = self.gremlin_connector.execute_query(
-            "mgmt = graph.openManagement(); mgmt.printSchema()")
-        return process_graph_schema_string(responses[0]['result']['data']['@value'][0])
+        responses = self.gremlin_connector.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        return process_graph_schema_string(responses[0])
+
+    def _get_vertex_property_keys(self, label):
+        try:
+            return self.gremlin_connector.execute_query(
+                "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
+            )
+        except Exception as e:
+            logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
+                label=label, error=e.__str__()))
+        return []
+
+    def _get_edge_property_keys(self, label):
+        try:
+            return self.gremlin_connector.execute_query(
+                "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
+            )
+        except Exception as e:
+            logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
+                label=label, error=e.__str__()))
+        return []
+
+    def get_graph_schema(self):
+        return {
+            "vertices": self.get_all_vertices_schema(),
+            "edges": self.get_all_edges_schema()
+        }
 
     def get_all_vertices_schema(self):
-        # TODO - validate performance
-        schema = self.get_graph_schema()
-        schema_dict = {}
-        for label in schema['vertex_labels'].keys():
-            schema_dict[label] = schema['vertex_labels'][label]
-            schema_dict[label]['property_schema'] = {}
-            property_keys = []
-            try:
-                property_keys = self.get_vertex_schema(label)
-            except Exception as e:
-                logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
-                    label=label, error=e.__str__()))
+        schema_data = self._get_graph_schema_overview()
+        all_vertex_schema = {}
+        for label, vertex_details in schema_data['vertex_labels'].items():
+            vertex_schema = VertexSchema(**vertex_details)
+            property_keys = self._get_vertex_property_keys(label)
             for property_key in property_keys:
-                schema_dict[label]['property_schema'][property_key] = schema['property_keys'][property_key]
-
-        return schema_dict
+                property_schema_data = schema_data['property_keys'][property_key]
+                property_schema = PropertySchema(**property_schema_data)
+                vertex_schema.add_property_schema(property_schema)
+            all_vertex_schema[label] = vertex_schema
+        return all_vertex_schema
 
     def get_all_edges_schema(self):
-        """
-        :return:
-        """
-        # TODO - validate performance
-        schema = self.get_graph_schema()
-        schema_dict = {}
-        for label in schema['edge_labels'].keys():
-            schema_dict[label] = schema['edge_labels'][label]
-            schema_dict[label]['property_schema'] = {}
-            property_keys = []
-            try:
-                property_keys = self.get_vertex_schema(label)
-            except Exception as e:
-                logger.debug("Failed to get edge schema of label {label} with error {error}".format(
-                    label=label, error=e.__str__()))
+        schema_data = self._get_graph_schema_overview()
+        all_edges_schema = {}
+        for label, edge_details in schema_data['edge_labels'].items():
+            edge_schema = EdgeSchema(**edge_details)
+            property_keys = self._get_edge_property_keys(label)
             for property_key in property_keys:
-                schema_dict[label]['property_schema'][property_key] = schema['property_keys'][property_key]
-        return schema_dict
-
-    def get_vertex_schema(self, label):
-        responses = self.gremlin_connector.execute_query(
-            "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-           
-        )
-        return responses[0]['result']['data']['@value'] if responses[0]['result']['data'] else []
+                property_schema_data = schema_data['property_keys'][property_key]
+                property_schema = PropertySchema(**property_schema_data)
+                edge_schema.add_property_schema(property_schema)
+            all_edges_schema[label] = edge_schema
+        return all_edges_schema
 
     def get_edge_schema(self, label):
-        responses = self.gremlin_connector.execute_query(
-            "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-           
-        )
-        return responses[0]['result']['data']['@value'] if responses[0]['result']['data'] else []
+        schema_data = self._get_graph_schema_overview()
+        edge_details = schema_data['edge_labels'][label]
+        edge_schema = EdgeSchema(**edge_details)
+        property_keys = self._get_edge_property_keys(label)
+        for property_key in property_keys:
+            property_schema_data = schema_data['property_keys'][property_key]
+            property_schema = PropertySchema(**property_schema_data)
+            edge_schema.add_property_schema(property_schema)
+        return edge_schema
+
+    def get_vertex_schema(self, label):
+        schema_data = self._get_graph_schema_overview()
+        vertex_details = schema_data['vertex_labels'][label]
+        vertex_schema = VertexSchema(**vertex_details)
+        property_keys = self._get_vertex_property_keys(label)
+        for property_key in property_keys:
+            property_schema_data = schema_data['property_keys'][property_key]
+            property_schema = PropertySchema(**property_schema_data)
+            vertex_schema.add_property_schema(property_schema)
+        return vertex_schema
 
 
 class JanusGraphSchema(JanusGraphSchemaReader):

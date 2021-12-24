@@ -19,10 +19,6 @@ from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 
 def import_data(client):
     for vertex in VERTICES_SAMPLES:
-        # _label = vertex['label']
-        # del vertex['label']
-        if 'mass_in_kgs' in vertex['properties']:
-            vertex['properties']['mass_in_kgs'] = FloatType(vertex['properties']['mass_in_kgs'])
         vtx_instance = client.vertex.create(**vertex)
         print("vtx_instance", vtx_instance)
 
@@ -41,11 +37,11 @@ def import_data(client):
 
 
 def delete_data(client):
-    client.vertex.delete_many(has__label__within=["Planet", "Satellite", "Star"])
+    client.vertex.delete_many(has__label__within=["Person", "Project"])
 
 
 _client = GremlinConnector("ws://megamind-ws:8182/gremlin")
 
-# delete_data(_client)
+delete_data(_client)
 import_data(_client)
 _client.close_connection()

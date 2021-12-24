@@ -36,22 +36,22 @@ def process_graph_schema_string(schema_string):
             continue
         if data_type == "vertices" and __count == 2:
             schema['vertex_labels'][line.split("|")[0].strip()] = {
-                "label_name": line.split("|")[0].strip(),
+                "name": line.split("|")[0].strip(),
                 "partitioned": line.split("|")[1].strip(),
                 "static": line.split("|")[2].strip(),
             }
         elif data_type == "edges" and __count == 4:
             schema['edge_labels'][line.split("|")[0].strip()] = {
-                "label_name": line.split("|")[0].strip(),
+                "name": line.split("|")[0].strip(),
                 "directed": line.split("|")[1].strip(),
                 "unidirected": line.split("|")[2].strip(),
                 "multiplicity": line.split("|")[3].strip(),
             }
         elif data_type == "properties" and __count == 6:
             schema['property_keys'][line.split("|")[0].strip()] = {
-                "label_name": line.split("|")[0].strip(),
+                "name": line.split("|")[0].strip(),
                 "cardinality": line.split("|")[1].strip(),
-                "data_type": line.split("|")[2].strip().replace("class java.lang.", ""),
+                "type": line.split("|")[2].strip().replace("class java.lang.", ""),
             }
 
         if line.startswith("Vertex Label Name"):

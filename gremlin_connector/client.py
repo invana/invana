@@ -16,7 +16,7 @@
 from gremlin_python.driver.resultset import ResultSet
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
-# from gremlin_connector.dbs.janusgraph import JanusGraphSchema
+from gremlin_connector.dbs.janusgraph import JanusGraphSchema
 from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
 from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
 from gremlin_connector.gremlin.connection import DriverRemoteConnection
@@ -46,10 +46,10 @@ class GremlinConnector:
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
-        # if graph_backend == "janusgraph":
-        #     self.schema = JanusGraphSchema(self)
-        # else:
-        #     raise InvalidGraphBackendError()
+        if graph_backend == "janusgraph":
+            self.schema = JanusGraphSchema(self)
+        else:
+            raise InvalidGraphBackendError()
         self.connection = self.create_connection(gremlin_url, traversal_source, **connection_kwargs)
         self.g = traversal().withRemote(self.connection)
         if read_only_mode:
