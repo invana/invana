@@ -16,7 +16,7 @@
 from gremlin_python.driver.resultset import ResultSet
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
-from gremlin_connector.dbs.janusgraph import JanusGraphSchema
+from gremlin_connector.schema.janusgraph import JanusGraphSchema
 from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
 from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
 from gremlin_connector.gremlin.connection import DriverRemoteConnection

@@ -15,7 +15,7 @@
 from gremlin_python.structure.io import graphsonV3d0
 from gremlin_connector.typing.elements import Node, RelationShip
 from gremlin_python.process.traversal import T, Direction
-from gremlin_connector.dbs.janusgraph.utils import get_id
+from gremlin_connector.schema.janusgraph.utils import get_id
 
 
 class InvanaMapType(graphsonV3d0.MapType):
