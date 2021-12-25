@@ -33,7 +33,6 @@ class Project(VertexModel):
     #     gremlin_connector = gremlin_connector
 
 
-project = Project.objects.create(name="Ravi", description="Hello World")
-# project = Project.objects.create(name="Ravi 4", description="Hello World")
-
-print("===project", project)
+for i in range(0, 10):
+    project = Project.objects.create(name=f"Ravi {i}", description="Hello World")
+    print("===project", project)
