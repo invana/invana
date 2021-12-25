@@ -86,7 +86,6 @@ class ModelBase(type):
         model_base_cls = bases[0].objects
         if "name" not in attrs:
             attrs['label_name'] = name
-        print("attrs", attrs)
         model_class = super_new(cls, name, bases, attrs)
         model_class.objects = model_base_cls(attrs['gremlin_connector'], model_class)
         return model_class

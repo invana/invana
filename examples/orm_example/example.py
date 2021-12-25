@@ -26,13 +26,9 @@ class Project(VertexModel):
         'name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
         'description': StringField(max_length=None, min_length=None, unique=True, read_only=True)
     }
-    # name = StringField(max_length=None, min_length=None, unique=True, read_only=True),
-    # description = StringField(max_length=None, min_length=None, unique=True, read_only=True)
-    #
-    # class Meta:
-    #     gremlin_connector = gremlin_connector
 
 
 for i in range(0, 10):
     project = Project.objects.create(name=f"Ravi {i}", description="Hello World")
     print("===project", project)
+gremlin_connector.close_connection()

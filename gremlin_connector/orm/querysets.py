@@ -30,13 +30,9 @@ class VertexQuerySet(QuerySetBase):
         super(VertexQuerySet, self).__init__(gremlin_connector)
         self.model = model
 
-    # @close_connection
-    # @create_connection
     def create(self, **kwargs):
-        print("model", self.model.label_name)
         crud = self.crud_cls(self.gremlin_connector)
         result = crud.create(self.model.label_name, properties=kwargs)
-        # crud.gremlin_connector.close_connection()
         return result
 
 
