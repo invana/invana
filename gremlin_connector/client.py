@@ -31,10 +31,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class StateTypes:
+    CONNECTED = "CONNECTED"
+    DISCONNECTED = "DISCONNECTED"
+
+
 class GremlinConnector:
     query_kwargs = QueryKwargs2GremlinQuery()
     SUPPORTED_GRAPH_BACKENDS = ['janusgraph', ]
     DEFAULT_GRAPH_BACKEND = 'janusgraph'
+    STATE = None
 
     def __init__(self, gremlin_url,
                  traversal_source='g',
@@ -62,14 +68,18 @@ class GremlinConnector:
         self.vertex = VertexCRUD(self)
         self.edge = EdgeCRUD(self)
 
-    @staticmethod
-    def create_connection(gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:
-        return DriverRemoteConnection(
+    def create_connection(self, gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:
+        _ = DriverRemoteConnection(
             gremlin_url,
             traversal_source=traversal_source,
             graphson_reader=invana_graphson_reader,
             **connection_kwargs
         )
+        self.update_state(StateTypes.CONNECTED)
+        return _
+
+    def update_state(self, new_state):
+        self.STATE = new_state
 
     @staticmethod
     def determine_response_error_reason(error_string):
