@@ -28,12 +28,21 @@ class VertexQuerySet(QuerySetBase):
 
     def __init__(self, gremlin_connector, model):
         super(VertexQuerySet, self).__init__(gremlin_connector)
+        self.crud = self.crud_cls(self.gremlin_connector)
+
         self.model = model
 
     def create(self, **kwargs):
-        crud = self.crud_cls(self.gremlin_connector)
-        result = crud.create(self.model.label_name, properties=kwargs)
+        result = self.crud.create(self.model.label_name, properties=kwargs)
         return result
+
+    def read_one(self, **query_kwargs):
+        query_kwargs['has__label'] = self.model.label_name
+        return self.crud.read_one(**query_kwargs)
+
+    def read_many(self, **query_kwargs):
+        query_kwargs['has__label'] = self.model.label_name
+        return self.crud.read_many(**query_kwargs)
 
 
 class EdgeQuerySet(QuerySetBase):
