@@ -16,6 +16,9 @@
 from gremlin_python.driver.resultset import ResultSet
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
+
+from gremlin_connector.events import QueryEvent, QueryResponseReceivedSuccessfullyEvent, \
+    QueryResponseReceivedWithErrorEvent, QueryFinishedEvent, QueryResponseErrorReasonTypes
 from gremlin_connector.schema.janusgraph import JanusGraphSchema
 from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
 from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
@@ -68,6 +71,12 @@ class GremlinConnector:
             **connection_kwargs
         )
 
+    @staticmethod
+    def determine_response_error_reason(error_string):
+        if "with error 597: No signature of method" in error_string:
+            return QueryResponseErrorReasonTypes.INVALID_QUERY
+        return QueryResponseErrorReasonTypes.OTHER
+
     def close_connection(self) -> None:
         return self.connection.client.close()
 
@@ -96,7 +105,24 @@ class GremlinConnector:
             query_string = query_string.replace("g.", strategy_prefix, 1)
         logger.info("Running query : {}".format(query_string))
         request_options = {"evaluationTimeout": timeout} if timeout else {}
-        return self.connection.client.submitAsync(query_string, request_options=request_options).result().all().result()
+        query_event = QueryEvent({"query_string": query_string})
+        try:
+            result = self.connection.client.submitAsync(query_string,
+                                                        request_options=request_options).result().all().result()
+            QueryResponseReceivedSuccessfullyEvent(query_event.event_id, query_event.get_elapsed_time())
+            QueryFinishedEvent(query_event.event_id, query_event.get_elapsed_time())
+
+
+        except Exception as e:
+            logger.debug("Failed to execute the query : {query_string} with error {error}".format(
+                query_string=query_string, error=e.__str__()))
+            error_reason = self.determine_response_error_reason(e.__str__())
+            QueryResponseReceivedWithErrorEvent(query_event.event_id, query_event.get_elapsed_time(),
+                                                error_reason=error_reason,
+                                                error_message=e.__str__())
+            QueryFinishedEvent(query_event.event_id, query_event.get_elapsed_time())
+            raise Exception(f"Failed to execute query with reason: {error_reason} and error message {e.__str__()}")
+        return result
 
     def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
         if self.strategies.__len__() > 0:

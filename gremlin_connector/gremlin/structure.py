@@ -16,7 +16,7 @@ from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.traversal import Cardinality
 from gremlin_connector.utils import calculate_time
-from ..events import register_query_event
+# from ..events import register_query_event
 import abc
 
 
@@ -51,7 +51,7 @@ class VertexCRUD(CRUDBase):
     # @calculate_time
     def read_one(self, **query_kwargs) -> Vertex:
         _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
-        register_query_event(_.__str__())
+        # register_query_event(_.__str__())
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
@@ -68,7 +68,7 @@ class VertexCRUD(CRUDBase):
 
     def read_many(self, **query_kwargs) -> list:
         _ = self.filter_by_query_kwargs(**query_kwargs)
-        register_query_event(_.__str__())
+        # register_query_event(_.__str__())
         return _.elementMap().toList()
 
     def update_one(self, query_kwargs=None, properties=None):

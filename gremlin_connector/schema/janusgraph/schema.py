@@ -34,7 +34,7 @@ class JanusGraphSchemaReader:
         try:
             return self.gremlin_connector.execute_query(
                 "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-            )
+            ) or []
         except Exception as e:
             logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
                 label=label, error=e.__str__()))
@@ -44,7 +44,7 @@ class JanusGraphSchemaReader:
         try:
             return self.gremlin_connector.execute_query(
                 "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-            )
+            ) or []
         except Exception as e:
             logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
                 label=label, error=e.__str__()))

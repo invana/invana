@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 from gremlin_connector import GremlinConnector
-
-
-# from gremlin_connector.utils import async_to_sync
+import logging
+logging.getLogger('asyncio').setLevel(logging.INFO)
+logging.basicConfig(filename='run.log', level=logging.DEBUG)
 
 
 def run_query():
@@ -25,6 +25,8 @@ def run_query():
     # results = client.execute_query("g.V().valueMap(true).limit(4).toList()")
     # results = client.execute_query("g.E().valueMap(true).limit(4).toList()")
     results = client.execute_query("g.V().limit(4).toList()")
+    results = client.execute_query("g.V().limit(4).toList()")
+    # results = client.execute_query("g.V().limit(4).tsoList()")
     # results = client.execute_query("g.E().limit(4).toList()")
     # results = client.execute_query("g.V().schema().toList()")
 

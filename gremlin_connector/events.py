@@ -12,42 +12,119 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import logging
+from abc import ABC
 from datetime import datetime
 from gremlin_connector.utils import create_uuid
 
 
-def register_query_event(query_string):
-    e = QueryEvent(query=query_string)
+class QueryStatusTypes:
+    STARTED = "STARTED"
+    RESPONSE_RECEIVED = "RESPONSE_RECEIVED"  # this status can be many for async execution
+    FINISHED = "FINISHED"
+
+    @classmethod
+    def get_allowed_types(cls):
+        return [k for k in list(cls.__dict__.keys()) if not k.startswith("__") and k.isupper()]
 
 
-class EventBase:
+class QueryResponseStatusTypes:
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+    @classmethod
+    def get_allowed_types(cls):
+        return [k for k in list(cls.__dict__.keys()) if not k.startswith("__") and k.isupper()]
+
+
+class QueryResponseErrorReasonTypes:
+    # theses are error statuses when query response is received
+    TIMED_OUT = "TIMED_OUT"
+    INVALID_QUERY = "INVALID_QUERY"
+    OTHER = "OTHER"
+
+    @classmethod
+    def get_allowed_types(cls):
+        return [k for k in list(cls.__dict__.keys()) if not k.startswith("__") and k.isupper()]
+
+
+class QueryEventBase:
     event_id = None
-    type = None
-    payload = None
+    event_status = None
     created_at = None
-    finished_at = None
-
-    def __init__(self, payload=None):
-        self.created_at = self.get_datetime()
-        self.event_id = create_uuid()
-        self.payload = payload
 
     @staticmethod
     def get_datetime():
         return datetime.now()
 
-    def finished(self):
-        self.finished_at = self.get_datetime()
+    def log_event(self):
+        raise NotImplementedError()
 
 
-class QueryEvent(EventBase):
-    type = "query"
+class QueryEvent(QueryEventBase):
+    request_payload = None
 
-    def __init__(self, query=None):
-        if query is None:
-            raise Exception("query param cannot be null for QueryEvent")
-        payload = {"query_string": query}
-        super(QueryEvent, self).__init__(payload=payload)
+    def __init__(self, request_payload):
+        if request_payload is None:
+            raise Exception("request_payload cannot be None")
+        self.event_id = create_uuid()
+        self.event_status = QueryStatusTypes.STARTED
+        self.created_at = self.get_datetime()
+        self.request_payload = request_payload
+        self.log_event()
 
-    def __str__(self):
-        return f"<QueryEvent {self.event_id}> query={self.payload.get('query_string')}"
+    def get_elapsed_time(self):
+        return (self.get_datetime() - self.created_at).total_seconds()
+
+    def log_event(self):
+        logging.debug(f"Query Event {self.event_id} {self.event_status} at {self.created_at}")
+
+
+class QueryResponseEventBase(QueryEventBase, ABC):
+    elapsed_time = None
+
+    def __init__(self, event_id, elapsed_time):
+        self.event_id = event_id
+        self.created_at = self.get_datetime()
+        self.elapsed_time = elapsed_time
+        if self.event_status not in QueryStatusTypes.get_allowed_types():
+            raise Exception(f"Invalid QueryEvent status {self.event_status}")
+        self.log_event()
+
+
+class QueryResponseReceivedSuccessfullyEvent(QueryResponseEventBase):
+    event_status = QueryStatusTypes.RESPONSE_RECEIVED
+    response_status = QueryResponseStatusTypes.SUCCESS
+
+    def __init__(self, event_id, elapsed_time):
+        super(QueryResponseReceivedSuccessfullyEvent, self).__init__(event_id, elapsed_time)
+
+    def log_event(self):
+        logging.debug(f"Query Event {self.event_id} {self.event_status} with response {self.response_status} "
+                      f"at {self.created_at}; elapsed_time {self.elapsed_time}")
+
+
+class QueryResponseReceivedWithErrorEvent(QueryResponseEventBase):
+    event_status = QueryStatusTypes.RESPONSE_RECEIVED
+    response_status = QueryResponseStatusTypes.FAILED
+
+    error_reason = None
+    error_message = None
+
+    def __init__(self, event_id, elapsed_time, error_reason=None, error_message=None):
+        if error_reason not in QueryResponseErrorReasonTypes.get_allowed_types():
+            raise Exception(f"error_reason cannot be {error_reason}")
+        super(QueryResponseReceivedWithErrorEvent, self).__init__(event_id, elapsed_time)
+        self.error_reason = error_reason
+        self.error_message = error_message
+
+    def log_event(self):
+        logging.debug(f"Query Event {self.event_id} {self.event_status} with response {self.response_status} "
+                      f"at {self.created_at}; elapsed_time {self.elapsed_time}; error_reason {self.error_reason}")
+
+
+class QueryFinishedEvent(QueryResponseEventBase):
+    event_status = QueryStatusTypes.FINISHED
+
+    def log_event(self):
+        logging.debug(f"Query Event {self.event_id} {self.event_status}; elapsed_time {self.elapsed_time}")

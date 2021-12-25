@@ -18,5 +18,5 @@ client = GremlinConnector("ws://megamind-ws:8182/gremlin")
 schema_data = client.schema.get_graph_schema()
 for k, v in schema_data.items():
     for kk, vv in v.items():
-        print(vv.name, vv.properties.keys())
+        print(vv.name, list(vv.properties.keys()))
 client.close_connection()
