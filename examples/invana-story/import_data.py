@@ -25,8 +25,6 @@ def import_data(client):
     for edge in EDGES_SAMPLES:
         from_vertex = client.vertex.read_one(**edge['from_vertex_filters'])
         to_vertex = client.vertex.read_one(**edge['to_vertex_filters'])
-        print("from_vertex", from_vertex)
-        print("to_vertex", to_vertex)
         edge_instance = client.edge.create(
             edge['label'],
             from_vertex.id,

@@ -70,7 +70,7 @@ def import_data():
     graph_client = GremlinConnector("ws://megamind-ws:8182/gremlin", graph_backend="janusgraph")
     print("Initiating import: graph_client :", graph_client)
 
-    with open('./air-routes-latest-nodes.csv') as f:
+    with open('./air-routes-latest-nodes.csv', encoding="utf8") as f:
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_nodes(line)
@@ -79,7 +79,7 @@ def import_data():
             print("Created Node", created_data)
             node_id_map[cleaned_data['id']] = created_data.id
 
-    with open('./air-routes-latest-edges.csv') as f:
+    with open('./air-routes-latest-edges.csv', encoding="utf8") as f:
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_edges(line)

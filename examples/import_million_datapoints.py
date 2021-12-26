@@ -12,9 +12,23 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from gremlin_connector import GremlinConnector
+import logging
 
+logging.getLogger('asyncio').setLevel(logging.INFO)
+logging.basicConfig(filename='run.log', level=logging.DEBUG)
+
+
+total_count = 1000
+import time
+
+start = time.time()
 client = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
-for i in range(100001, 300000):
+for i in range(0, total_count):
     result = client.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
-    print("result", result)
+    print(f"result {i}/{total_count} :: {result}")
+client.close_connection()
+end = time.time()
+elapsed_time = end - start
+
+print(f"elapsed_time {elapsed_time}")
