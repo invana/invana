@@ -16,7 +16,6 @@ from copy import copy
 
 from .querysets import VertexQuerySet, EdgeQuerySet
 
-
 # class ModelBase(type):
 #     """Metaclass for all models."""
 #
@@ -73,6 +72,8 @@ from .querysets import VertexQuerySet, EdgeQuerySet
 #
 #         # model_class.objects = attr_meta.objects
 #         return model_class
+from .utils import convert_to_camel_case
+
 
 class ModelBase(type):
 
@@ -83,11 +84,11 @@ class ModelBase(type):
         parents = [b for b in bases if isinstance(b, ModelBase)]
         if not parents:
             return super_new(cls, name, bases, attrs)
-        model_base_cls = bases[0].objects
+        model_base_cls = bases[0]
         if "name" not in attrs:
-            attrs['label_name'] = name
+            attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
         model_class = super_new(cls, name, bases, attrs)
-        model_class.objects = model_base_cls(attrs['gremlin_connector'], model_class)
+        model_class.objects = model_base_cls.objects(attrs['gremlin_connector'], model_class)
         return model_class
 
 
