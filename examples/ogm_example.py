@@ -23,7 +23,8 @@ class Project(VertexModel):
     gremlin_connector = gremlin_connector
     fields = {
         'name': StringField(max_length=10, unique=True, read_only=True),
-        'description': StringField(allow_null=True, min_length=10, unique=True, read_only=True)
+        'description': StringField(allow_null=True, min_length=10, unique=True, read_only=True),
+        'owner': StringField(min_length=10, default="rrmerugu-10")
     }
 
 
@@ -32,9 +33,14 @@ class Authored(EdgeModel):
     fields = {}
 
 
-projects = Project.objects.read_many()
+Project.objects.delete_many()
 
-Project.objects.create(name="Hello", description="Hello Wow, how are you")
+
+# Project.objects.create(name="Hello", description="Hello Wow, how are you")
+project = Project.objects.create(name="Hello   ")
+# project = Project.objects.create()
+
+projects = Project.objects.read_many()
 print("projects", projects)
 
 authored = Authored.objects.read_many()

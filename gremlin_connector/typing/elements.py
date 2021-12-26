@@ -24,7 +24,7 @@ class PropertiesObject:
     def __repr__(self):
         __str = ''
         for k, v in self.__dict__.items():
-            __str += f'{k}="{v}"'
+            __str += f' {k}="{v}"'
         return __str
 
 

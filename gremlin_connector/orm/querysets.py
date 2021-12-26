@@ -26,13 +26,15 @@ class QuerySetBase:
         if field is None:
             raise FieldNotFoundError(f"{field_name} doesn't exist in model '{model.__name__}'")
 
-        validated_value = field.validate(field_value, field_name=field_name)
+        validated_value = field.validate(field_value, field_name=field_name, model=model)
         return validated_value
 
-    def validate(self, **kwargs):
+    def validate(self, **properties):
         validated_data = {}
-        for k, v in kwargs.items():
-            validated_data[k] = self.get_validated_data(k, v, self.model)
+        for k, field in self.model.fields.items():
+            _ = self.get_validated_data(k, properties.get(k), self.model)
+            if _:
+                validated_data[k] = _
         return validated_data
 
     def __init__(self, gremlin_connector):

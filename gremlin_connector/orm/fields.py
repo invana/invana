@@ -20,6 +20,7 @@ from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, 
 import abc
 
 from gremlin_connector.orm.exceptions import ValidationError
+from gremlin_connector.orm.models import ModelBase
 
 
 class FieldBase:
@@ -43,7 +44,7 @@ class FieldBase:
     def get_field_type(self):
         return self.data_type
 
-    def validate(self, value: typing.Any, field_name=None) -> typing.Any:
+    def validate(self, value: typing.Any, field_name: str = None, model: ModelBase = None) -> typing.Any:
         return NotImplementedError()
 
     def get_validator(self, **kwargs):
@@ -53,21 +54,37 @@ class FieldBase:
 class StringField(FieldBase, ABC):
     data_type = str
 
-    def __init__(self, max_length=None, min_length=None, **kwargs):
+    def __init__(self, max_length=None, min_length=None, trim_whitespaces=True, **kwargs):
         if max_length is None and min_length is None:
             raise ValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
         # assert max_length is not None, "max_length is required"
         super().__init__(**kwargs)
         self.max_length = max_length
         self.min_length = min_length
+        self.trim_whitespaces = trim_whitespaces
 
-    def validate(self, value, field_name=None):
-        if self.max_length and value.__len__() > self.max_length:
-            raise ValidationError(
-                f"max_length for field '{field_name}' is {self.max_length} but the value has {value.__len__()}")
-        if self.min_length and value.__len__() < self.min_length:
-            raise ValidationError(
-                f"min_length for field '{field_name}' is {self.min_length} but the value has {value.__len__()}")
+    def validate(self, value, field_name=None, model=None):
+        assert value is None or isinstance(value, str)
+        assert self.max_length is None or isinstance(self.max_length, int)
+        assert self.min_length is None or isinstance(self.min_length, int)
+        assert self.allow_null is None or isinstance(self.allow_null, bool)
+        assert self.trim_whitespaces is None or isinstance(self.trim_whitespaces, bool)
+        if value is None and self.default:
+            value = self.default
+
+        if value is not None and self.trim_whitespaces is True:
+            value = value.strip()
+
+        if self.allow_null is False and value is None:
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+
+        if value:
+            if self.max_length and value.__len__() > self.max_length:
+                raise ValidationError(
+                    f"max_length for field '{model.label_name}{field_name}' is {self.max_length} but the value has {value.__len__()}")
+            if self.min_length and value.__len__() < self.min_length:
+                raise ValidationError(
+                    f"min_length for field '{model.label_name}{field_name}' is {self.min_length} but the value has {value.__len__()}")
 
         return self.data_type(value)
 
@@ -76,11 +93,11 @@ class BooleanField(FieldBase, ABC):
     data_type = bool
 
 
-class ByteField(FieldBase):
+class ByteField(FieldBase, ABC):
     data_type = ByteBufferType
 
 
-class ShortField(FieldBase):
+class ShortField(FieldBase, ABC):
     data_type = None
 
 
