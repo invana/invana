@@ -28,12 +28,15 @@ class Project(VertexModel):
     }
 
 
+Project.objects.delete_many()
+projects = Project.objects.read_many(pagination__limit=10)
+print("projects", projects.__len__())
 for i in range(0, 10):
     project = Project.objects.create(name=f"Ravi {i}", description="Hello World")
     print("===project", project)
-projects = Project.objects.read_one(has__id=78040)
+projects = Project.objects.read_one(has__id=project.id)
 print("projects", projects)
 
-projects = Project.objects.read_many(pagination__limit=10)
+projects = Project.objects.read_many()
 print("projects", projects.__len__())
 gremlin_connector.close_connection()

@@ -121,8 +121,6 @@ class GremlinConnector:
                                                         request_options=request_options).result().all().result()
             QueryResponseReceivedSuccessfullyEvent(query_event.event_id, query_event.get_elapsed_time())
             QueryFinishedEvent(query_event.event_id, query_event.get_elapsed_time())
-
-
         except Exception as e:
             logger.debug("Failed to execute the query : {query_string} with error {error}".format(
                 query_string=query_string, error=e.__str__()))
