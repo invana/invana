@@ -13,7 +13,6 @@
 #    limitations under the License.
 #
 from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
-from .decorators import close_connection, create_connection
 
 
 class QuerySetBase:
