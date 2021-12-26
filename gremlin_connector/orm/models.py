@@ -62,7 +62,7 @@ from .querysets import VertexQuerySet, EdgeQuerySet
 #                 fields_only_attrs[k] = v
 #                 del attrs[k]
 #
-#         fields = type("FieldCls", (), fields_only_attrs)
+#         properties = type("FieldCls", (), fields_only_attrs)
 #         attrs['_fields'] = fields
 #         attrs['objects'] = model_base_cls()
 #         # attrs['objects'] =

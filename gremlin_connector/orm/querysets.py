@@ -22,7 +22,7 @@ class QuerySetBase:
 
     @staticmethod
     def get_validated_data(field_name, field_value, model):
-        field = model.fields.get(field_name)
+        field = model.properties.get(field_name)
         if field is None:
             raise FieldNotFoundError(f"{field_name} doesn't exist in model '{model.__name__}'")
 
@@ -31,9 +31,9 @@ class QuerySetBase:
 
     def validate(self, **properties):
         validated_data = {}
-        for k, field in self.model.fields.items():
+        for k, field in self.model.properties.items():
             _ = self.get_validated_data(k, properties.get(k), self.model)
-            if _:
+            if _ is not None:
                 validated_data[k] = _
         return validated_data
 

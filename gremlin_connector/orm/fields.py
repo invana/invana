@@ -86,35 +86,62 @@ class StringField(FieldBase, ABC):
                 raise ValidationError(
                     f"min_length for field '{model.label_name}{field_name}' is {self.min_length} but the value has {value.__len__()}")
 
-        return self.data_type(value)
+        return self.data_type(value) if value else value
 
 
 class BooleanField(FieldBase, ABC):
     data_type = bool
 
+    def validate(self, value, field_name=None, model=None):
+        if value and not isinstance(value, self.data_type):
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be '{value}'. must be a boolean")
+        assert value is None or isinstance(value, self.data_type)
+        if self.default:
+            assert self.default is None or isinstance(self.default, bool)
+        if value is None and self.default:
+            value = self.default
 
-class ByteField(FieldBase, ABC):
-    data_type = ByteBufferType
+        return self.data_type(value) if value is not None else value
 
 
-class ShortField(FieldBase, ABC):
-    data_type = None
+class NumberFieldBase(FieldBase, ABC):
+
+    def __init__(self, min_value=None, max_value=None, **kwargs):
+        super().__init__(**kwargs)
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def validate(self, value, field_name=None, model=None):
+        if value and not isinstance(value, self.data_type) :
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+                                  f" expecting {self.data_type}")
+
+        assert self.max_value is None or isinstance(self.max_value, int)
+        assert self.min_value is None or isinstance(self.min_value, int)
+        assert self.allow_null is None or isinstance(self.allow_null, bool)
+        if value is None and self.default:
+            value = self.default
+
+        if self.allow_null is False and value is None:
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+
+        if value:
+            if self.max_value and value > self.max_value:
+                raise ValidationError(
+                    f"max_value for field '{model.label_name}{field_name}' is {self.max_value} but the value has {value}")
+            if self.min_value and value < self.min_value:
+                raise ValidationError(
+                    f"min_value for field '{model.label_name}{field_name}' is {self.min_value} but the value has {value}")
+
+        return self.data_type(value) if value else value
 
 
-class IntegerField(FieldBase):
+class IntegerField(NumberFieldBase, ABC):
     data_type = IntType
 
 
-class LongField(FieldBase):
-    data_type = LongType
-
-
-class FloatField(FieldBase):
+class FloatField(NumberFieldBase, ABC):
     data_type = FloatType
-
-
-class DoubleField(FieldBase):
-    data_type = None
 
 
 class GeoshapeField(FieldBase):
@@ -125,8 +152,19 @@ class DateField(FieldBase):
     pass
 
 
-class InstantField(FieldBase):
-    pass
+#
+# class LongField(NumberFieldBase, ABC):
+#     data_type = LongType
+#
+#
+# class DoubleField(FieldBase):
+#     data_type = None
+#
+# class ByteField(FieldBase, ABC):
+#     data_type = ByteBufferType
+#
+# class InstantField(FieldBase):
+#     pass
 
 
 class UUIDField(FieldBase):

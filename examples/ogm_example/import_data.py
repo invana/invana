@@ -23,7 +23,7 @@ gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_
 
 class Person(VertexModel):
     gremlin_connector = gremlin_connector
-    fields = {
+    properties = {
         'first_name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
         'last_name': StringField(max_length=None, min_length=None, unique=True, read_only=True)
     }
@@ -31,7 +31,7 @@ class Person(VertexModel):
 
 class Project(VertexModel):
     gremlin_connector = gremlin_connector
-    fields = {
+    properties = {
         'name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
         'description': StringField(max_length=None, min_length=None, unique=True, read_only=True)
     }
@@ -39,7 +39,7 @@ class Project(VertexModel):
 
 class Authored(EdgeModel):
     gremlin_connector = gremlin_connector
-    fields = {}
+    properties = {}
 
 
 def import_data():

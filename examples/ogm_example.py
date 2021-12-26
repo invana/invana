@@ -14,30 +14,33 @@
 #
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringField, DateField
+from gremlin_connector.orm.fields import StringField, DateField, IntegerField, FloatField, BooleanField
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
 class Project(VertexModel):
     gremlin_connector = gremlin_connector
-    fields = {
+    properties = {
         'name': StringField(max_length=10, unique=True, read_only=True),
         'description': StringField(allow_null=True, min_length=10, unique=True, read_only=True),
-        'owner': StringField(min_length=10, default="rrmerugu-10")
+        'owner': StringField(min_length=10, default="rrmerugu-10"),
+        'project_age': IntegerField(allow_null=True),
+        'height': FloatField(),
+        'is_active': BooleanField(default=True)
+
     }
 
 
 class Authored(EdgeModel):
     gremlin_connector = gremlin_connector
-    fields = {}
+    properties = {}
 
 
 Project.objects.delete_many()
 
-
 # Project.objects.create(name="Hello", description="Hello Wow, how are you")
-project = Project.objects.create(name="Hello   ")
+project = Project.objects.create(name="Hello   ", height=12.1, project_age=171, is_active=False)
 # project = Project.objects.create()
 
 projects = Project.objects.read_many()
