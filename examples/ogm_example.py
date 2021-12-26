@@ -41,4 +41,3 @@ authored = Authored.objects.read_many()
 print("authored", authored)
 
 gremlin_connector.close_connection()
-gremlin_connector.close_connection()
