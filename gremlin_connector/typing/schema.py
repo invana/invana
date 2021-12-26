@@ -32,6 +32,7 @@ class PropertySchema:
 class ElementSchemaBase:
     type = None
     name = None
+    properties = None
 
     def add_property_schema(self, property_schema: PropertySchema):
         self.properties[property_schema.name] = property_schema
