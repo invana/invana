@@ -15,3 +15,7 @@
 
 class ValidationError(Exception):
     pass
+
+
+class FieldNotFoundError(Exception):
+    pass

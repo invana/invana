@@ -38,12 +38,12 @@ class FieldBase:
         self.default = default
         self.allow_null = allow_null
         self.read_only = read_only
-        self.validator = self.get_validator(**kwargs)
+        # self.validator = self.get_validator(*, **kwargs)
 
     def get_field_type(self):
         return self.data_type
 
-    def validate(self, value: typing.Any) -> typing.Any:
+    def validate(self, value: typing.Any, field_name=None) -> typing.Any:
         return NotImplementedError()
 
     def get_validator(self, **kwargs):
@@ -53,18 +53,26 @@ class FieldBase:
 class StringField(FieldBase, ABC):
     data_type = str
 
-    def __init__(self, **kwargs):
-        assert "max_length" in kwargs, "max_length is required"
+    def __init__(self, max_length=None, min_length=None, **kwargs):
+        if max_length is None and min_length is None:
+            raise ValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
+        # assert max_length is not None, "max_length is required"
         super().__init__(**kwargs)
+        self.max_length = max_length
+        self.min_length = min_length
 
-    def get_validator(self, value, **kwargs):
-        max_length = kwargs.get("max_length")
-        if value.__len__() <= max_length:
-            raise ValidationError()
+    def validate(self, value, field_name=None):
+        if self.max_length and value.__len__() > self.max_length:
+            raise ValidationError(
+                f"max_length for field '{field_name}' is {self.max_length} but the value has {value.__len__()}")
+        if self.min_length and value.__len__() < self.min_length:
+            raise ValidationError(
+                f"min_length for field '{field_name}' is {self.min_length} but the value has {value.__len__()}")
+
         return self.data_type(value)
 
 
-class BooleanField(FieldBase):
+class BooleanField(FieldBase, ABC):
     data_type = bool
 
 

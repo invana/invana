@@ -22,8 +22,8 @@ gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_
 class Project(VertexModel):
     gremlin_connector = gremlin_connector
     fields = {
-        'name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
-        'description': StringField(max_length=None, min_length=None, unique=True, read_only=True)
+        'name': StringField(max_length=10, unique=True, read_only=True),
+        'description': StringField(allow_null=True, min_length=10, unique=True, read_only=True)
     }
 
 
@@ -33,9 +33,12 @@ class Authored(EdgeModel):
 
 
 projects = Project.objects.read_many()
+
+Project.objects.create(name="Hello", description="Hello Wow, how are you")
 print("projects", projects)
 
 authored = Authored.objects.read_many()
 print("authored", authored)
 
+gremlin_connector.close_connection()
 gremlin_connector.close_connection()
