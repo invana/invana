@@ -56,8 +56,8 @@ class StringProperty(FieldBase, ABC):
     data_type = str
 
     def __init__(self, max_length=None, min_length=None, trim_whitespaces=True, **kwargs):
-        if max_length is None and min_length is None:
-            raise ValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
+        # if max_length is None and min_length is None:
+        #     raise ValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
         # assert max_length is not None, "max_length is required"
         super().__init__(**kwargs)
         self.max_length = max_length
@@ -106,6 +106,7 @@ class BooleanProperty(FieldBase, ABC):
 
 
 class NumberFieldBase(FieldBase, ABC):
+    number_data_types = [int, float]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
@@ -113,7 +114,8 @@ class NumberFieldBase(FieldBase, ABC):
         self.max_value = max_value
 
     def validate(self, value, field_name=None, model=None):
-        if value and not isinstance(value, self.data_type):
+
+        if value and type(value) not in self.number_data_types:
             raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
                                   f" expecting {self.data_type}")
 
@@ -122,10 +124,8 @@ class NumberFieldBase(FieldBase, ABC):
         assert self.allow_null is None or isinstance(self.allow_null, bool)
         if value is None and self.default:
             value = self.default
-
         if self.allow_null is False and value is None:
             raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
-
         if value:
             if self.max_value and value > self.max_value:
                 raise ValidationError(

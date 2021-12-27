@@ -39,7 +39,6 @@ class QuerySetBase:
         return validated_data
 
     def serialize_to_datatypes(self, element):
-        print("====", element, isinstance(element, RelationShip))
         if element and (isinstance(element, Node) or isinstance(element, RelationShip)):
             for k, field in self.model.properties.items():
                 if hasattr(element.properties, k):
