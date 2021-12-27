@@ -87,7 +87,6 @@ class ModelBase(type):
         model_base_cls = bases[0]
         if "name" not in attrs:
             attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
-        print("attr", attrs)
         model_class = super_new(cls, name, bases, attrs)
         model_class.objects = model_base_cls.objects(attrs['gremlin_connector'], model_class)
         return model_class

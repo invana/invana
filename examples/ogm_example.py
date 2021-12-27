@@ -14,7 +14,8 @@
 #
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, \
+    BooleanProperty
 from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -33,21 +34,42 @@ class Project(VertexModel):
     }
 
 
+class Person(VertexModel):
+    gremlin_connector = gremlin_connector
+    properties = {
+        'first_name': StringProperty(min_length=5),
+        'last_name': StringProperty(min_length=5, allow_null=True),
+    }
+
+
 class Authored(EdgeModel):
     gremlin_connector = gremlin_connector
-    properties = {}
+    properties = {
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+
+    }
 
 
 Project.objects.delete_many()
+Person.objects.delete_many()
+Authored.objects.delete_many()
 
+person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu")
+print("person", person)
 # Project.objects.create(name="Hello", description="Hello Wow, how are you")
 project = Project.objects.create(name="Hello   ", height=12.1, project_age=171, is_active=False)
 # project = Project.objects.create()
+print("project", project)
+
+project = Project.objects.read_one()
+print("project read_one", type(project.properties.created_at))
 
 projects = Project.objects.read_many()
 print("projects", projects)
 
+authored_single = Authored.objects.create(person.id, project.id)
 authored = Authored.objects.read_many()
 print("authored", authored)
+print(type(authored[0].properties.created_at))
 
 gremlin_connector.close_connection()
