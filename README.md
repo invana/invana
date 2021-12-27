@@ -1,4 +1,5 @@
-# Gremlin Connector
+class GremlinConnector:
+pass# Gremlin Connector
 
 **NOTE** - Under active development
 
@@ -7,7 +8,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connector
+pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_connector
 ```
 
 [comment]: <> (-  ## Tested graph databases )
@@ -18,18 +19,20 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connecto
 
 ## Features
 
-- Synchronous and Asynchronous Python API
 - Run your gremlin queries.
 - JSON response
-- Create vertices and edges with properties.
+- CRUD on vertices and edges with properties.
 - Read one or many vertices and edges.
 - Update properties of on or many vertices and edges.
 - Delete one or many vertices and edges.
 - Supports querying with pagination.
-- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,
-  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.
+  [comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
+
+[comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
+
 - Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
-  Following filter keyword patterns are supported with read_many()
+  Following filter keyword patterns are supported with `read_many`, `read_one`, `delete_many`,
+  `delete_one`, `update_many`,`update_one`
     - has__id=1021
     - has__id__within=[200752, 82032, 4320],
     - has__label__within=["Person", "Planet"]
@@ -55,121 +58,157 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=gremlin_connecto
 
 ## Usage
 
+### Using OGM
+
 ```python
 from gremlin_connector import GremlinConnector
+from gremlin_connector.orm.models import VertexModel, EdgeModel
+from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from datetime import datetime
 
-client = GremlinConnector("ws://localhost:8182/gremlin")
-# or 
-client = GremlinConnector("ws://localhost:8182/gremlin", "graph_name", username="user", password="password")
+gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
-user = client.vertex.get_or_create("User", properties={
-    "name": "Ravi",
-    "username": "rrmerugu"
+
+class Project(VertexModel):
+    gremlin_connector = gremlin_connector
+    properties = {
+        'name': StringProperty(max_length=10, trim_whitespaces=True),
+        'description': StringProperty(allow_null=True, min_length=10),
+        'rating': FloatProperty(allow_null=True),
+        'is_active': BooleanProperty(default=True),
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+    }
+
+
+class Person(VertexModel):
+    gremlin_connector = gremlin_connector
+    properties = {
+        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
+        'last_name': StringProperty(allow_null=True),
+        'username': StringProperty(default="rrmerugu"),
+        'member_since': IntegerProperty(),
+
+    }
+
+
+class Authored(EdgeModel):
+    gremlin_connector = gremlin_connector
+    properties = {
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+    }
+
+
+Project.objects.delete_many()
+Person.objects.delete_many()
+Authored.objects.delete_many()
+
+person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
+print("person is :", person)
+project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
+print("project is:", project)
+
+projects = Project.objects.read_many()
+print("projects", projects)
+
+authored_single = Authored.objects.create(person.id, project.id)
+authored = Authored.objects.read_many()
+print("authored", authored)
+
+gremlin_connector.close_connection()
+
+```
+
+### Without using OGM
+
+```python
+from gremlin_connector import GremlinConnector
+from datetime import datetime
+
+gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
+
+user = gremlin_connector.vertex.get_or_create("Person", properties={
+    "first_name": "Ravi Raja",
+    "last_name": "Merugu"
 })
-print(user)
- 
 
-invana_studio_instance = client.vertex.get_or_create("GithubProject", properties={
+invana_studio_instance = gremlin_connector.vertex.get_or_create("Project", properties={
     "name": "gremlin_connector-studio",
     "description": "opensource graph visualiser for Invana graph analytics engine"
 })
 # <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
-invana_engine_instance = client.vertex.get_or_create("GithubProject", properties={
+invana_engine_instance = gremlin_connector.vertex.get_or_create("Project", properties={
     "name": "gremlin_connector-engine",
     "description": "Invana graph analytics engine"
 })
 
-edge_instance = client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
-    "started": 2020
-})
-print(edge_instance)
-# <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
-print(edge_instance.to_value())
-# {'id': '8p4-fuo-bv9-36o', 'label': 'authored', 'properties': {'started': 2020}, 'inVLabel': 'GithubProject', 'inv': 4128, 'outv_label': 'User', 'outv': 4128}
-
-
-engine_edge_instance = client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
-    "started": 2020
+edge_instance = gremlin_connector.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
+    "created_at": datetime.now()
 })
 
-_ = client.vertex.read_many(has__label="GithubProject")
-# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
-# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
-
-_ = client.vertex.read_many(has__label__within=["GithubProject", "User"])
-# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
-# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
-# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
-
-_ = client.vertex.read_many(has__id=invana_studio_instance.id)
-# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
-
-edges = client.edge.read_many(has__started__lte=2021)
-# <g:Edge id=8p4-fuo-bv9-36o User(20544)--authored-->GithubProject(4128) started=2020/>
-# <g:Edge id=93c-fuo-bv9-cqo User(20544)--authored-->GithubProject(16512) started=2020/>
-
-_ = client.vertex.read_many(has__name__containing="engine")
-# <g:Vertex id=16512 label=GithubProject name=gremlin_connector-engine description=Invana graph analytics engine/>
+engine_edge_instance = gremlin_connector.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
+    "created_at": datetime.now()
+})
 
 ```
 
-## FAQ
+### Performing raw queries
 
-### How to get result as JSON
+#### using execute_query method
 
 ```python
 from gremlin_connector import GremlinConnector
 
-client = GremlinConnector("ws://localhost:8182/gremlin")
+gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
+results = gremlin_connector.execute_query("g.V().limit(1).toList()", timeout=180)
+gremlin_connector.close_connection()
+```
 
-user = client.vertex.get_or_create("User", properties={
-    "name": "Ravi",
-    "username": "rrmerugu"
-})
-print(user)
-# <g:Vertex id=20544 label=User name=Ravi username=rrmerugu/>
-print(user.to_value())
-# {'id': 20544, 'label': 'User', 'properties': {'username': 'rrmerugu', 'name': 'Ravi'}}
+#### using execute_query_with_callback method
+```python
+from gremlin_connector import GremlinConnector
+
+gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
+gremlin_connector.execute_query_with_callback("g.V().limit(1).next()",
+                                              lambda res: print(res.__len__()),
+                                              finished_callback=lambda: gremlin_connector.close_connection(),
+                                              timeout=180)
+gremlin_connector.close_connection()
 
 ```
 
-### How to get execute_query result as JSON
+### Search usage (for read, delete, update)
+
+#### for read_many, read_one, delete_many, delete_one
 
 ```python
 from gremlin_connector import GremlinConnector
 
-client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
+gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
 
-results = client.execute_query("g.V().limit(1).toList()")
-for result in results:
-    print(result)
-    # <g:Vertex id=4104 label=Person name=<g:String value=ravi/>/>
-    print(result.to_value())
-    # [{'id': 4104, 'label': 'Person', 'properties': {'name': 'ravi'}}]
+# without ogm
+result = gremlin_connector.vertex.read_many(has__label="Project")
+result = gremlin_connector.vertex.read_many(has__label__within=["Project", "Person"])
+result = gremlin_connector.vertex.read_many(has__id=1271)
+result = gremlin_connector.vertex.read_many(has__label="Project", has__name__containing="engine")
+result = gremlin_connector.edge.read_many(has__label="authored", has__created_at__lte=2021)
+
+# with ogm
+result = Project.objects.read_many(has__id=1271)
+result = Project.objects.read_many(has__name__containing="engine")
+result = Authored.objects.read_many(has__created_at__lte=2021)
 
 ```
 
-### How to get raw response for execute_query
-
+#### for update_many, update_one
 ```python
-from gremlin_connector import GremlinConnector
 
-client = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
-
-results = client.execute_query("g.V().limit(1).toList()")
-for result in results:
-    print(result)
-    # {'@type': 'g:Vertex', '@value': {'id': {'@type': 'g:Int64', '@value': 4104}, 'label': 'Person', 'properties': {'name': [{'@type': 'g:VertexProperty', '@value': {'id': {'@type': 'janusgraph:RelationIdentifier', '@value': {'relationId': '16p-360-1l1'}}, 'value': 'ravi', 'label': 'name'}}]}}}
-
-results = client.execute_query("g.V().limit(1).next()")
-for result in results:
-    print(result)
-    # {'requestId': 'c82520d7-57a7-45d2-98fd-881901a1290d', 'status': {'message': '', 'code': 200, 'attributes': {'@type': 'g:Map', '@value': ['host', '/172.18.0.1:47992']}}, 'result': {'data': {'@type': 'g:List', '@value': [{'@type': 'g:Vertex', '@value': {'id': {'@type': 'g:Int64', '@value': 4104}, 'label': 'Person', 'properties': {'name': [{'@type': 'g:VertexProperty', '@value': {'id': {'@type': 'janusgraph:RelationIdentifier', '@value': {'relationId': '16p-360-1l1'}}, 'value': 'ravi', 'label': 'name'}}]}}}]}, 'meta': {'@type': 'g:Map', '@value': []}}}
+person = Person.objects.update_one(query_kwargs={"has__first_name__containing": "Ravi"},
+                                   properties={"last_name": f"Merugu (updated)"})
 
 ```
 
-## Licenses
+## License
 
 Apache License, version 2.0
 

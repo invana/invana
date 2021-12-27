@@ -12,66 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from copy import copy
-
 from .querysets import VertexQuerySet, EdgeQuerySet
-
-# class ModelBase(type):
-#     """Metaclass for all models."""
-#
-#     def __new__(cls, name, bases, attrs, **kwargs):
-#         super_new = super().__new__
-#
-#         # Also ensure initialization is only performed for subclasses of Model
-#         # (excluding Model class itself).
-#         parents = [b for b in bases if isinstance(b, ModelBase)]
-#         if not parents:
-#             return super_new(cls, name, bases, attrs)
-
-# class ModelBase(type):
-#
-#     def __new__(cls, name, bases, attrs):
-#         super_new = super().__new__
-#
-#         # Also ensure initialization is only performed for subclasses of Model
-#         # (excluding Model class itself).
-#         print("===attrs", attrs)
-#         parents = [b for b in bases if isinstance(b, ModelBase)
-#                    # or isinstance(b, Model)
-#                    ]
-#         if not parents:
-#             return super_new(cls, name, bases, attrs)
-#         print("bases", [b for b in bases], bases)
-#         print(cls.__class__.__bases__)
-#         for b in bases:
-#             print("===btype", type(b))
-#
-#
-#         attr_meta = attrs.pop('Meta', None)
-#         if attr_meta is None:
-#             raise Exception("class Meta must be defined ")
-#         print("attr_meta", attr_meta.__dict__)
-#
-#         model_base_cls = bases[0].objects
-#         print("model_base_cls", model_base_cls)
-#         fields_list = [k for k, v in attrs.items() if not k.startswith("__") and k != "Meta"]
-#         print("fields_list", fields_list)
-#         fields_only_attrs = copy(attrs)
-#         for k, v in fields_only_attrs.items():
-#             if not k.startswith("__") and k != "Meta":
-#                 fields_only_attrs[k] = v
-#                 del attrs[k]
-#
-#         properties = type("FieldCls", (), fields_only_attrs)
-#         attrs['_fields'] = fields
-#         attrs['objects'] = model_base_cls()
-#         # attrs['objects'] =
-#         model_class = super_new(cls, name, bases, attrs)
-#         # model_class.attr = 100
-#         print("attrs", attrs)
-#
-#         # model_class.objects = attr_meta.objects
-#         return model_class
 from .utils import convert_to_camel_case
 
 

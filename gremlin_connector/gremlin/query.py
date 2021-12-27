@@ -13,7 +13,7 @@
 #    limitations under the License.
 #
 from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversalSource
-from gremlin_python.process.traversal import P
+from gremlin_python.process.traversal import P, TextP
 
 
 class QueryKwargs2GremlinQuery:
@@ -22,6 +22,9 @@ class QueryKwargs2GremlinQuery:
                                'notStartingWith', 'notContaining', 'notEndingWith']
     filter_key_starting_words_list = ['has']
     pagination_key_starting_words_list = ["pagination"]
+
+    P = ["between", "eq", "gt", "gte", "inside", "lt", "lte", "neq", "not_", "outside", "within", "without"]
+    PText = ["TextP"]
 
     @classmethod
     def separate_filters_and_pagination_kwargs(cls, **search_kwargs):
@@ -67,12 +70,22 @@ class QueryKwargs2GremlinQuery:
                             kwargs__list[2], cls.allowed_predicates_list))
                     if kwargs__list[0:2] == ["has", "label"] or kwargs__list[0:2] == ["has", "id"] or \
                             kwargs__list == ["has", "value"]:
-                        getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(
-                            getattr(P, kwargs__list[2])(value))
+
+                        if hasattr(P, kwargs__list[2]):
+                            getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(
+                                getattr(P, kwargs__list[2])(value))
+                        elif hasattr(TextP, kwargs__list[2]):
+                            getattr(_, f"{kwargs__list[0]}{kwargs__list[1].capitalize()}")(
+                                getattr(TextP, kwargs__list[2])(value))
+                        else:
+                            raise ValueError(f" predicate {kwargs__list[2]} not found")
                     else:
-                        getattr(_, kwargs__list[0])(
-                            kwargs__list[1],
-                            getattr(P, kwargs__list[2])(value))
+                        if hasattr(P, kwargs__list[2]):
+                            getattr(_, kwargs__list[0])(kwargs__list[1], getattr(P, kwargs__list[2])(value))
+                        elif hasattr(TextP, kwargs__list[2]):
+                            getattr(_, kwargs__list[0])(kwargs__list[1], getattr(TextP, kwargs__list[2])(value))
+                        else:
+                            raise ValueError(f" predicate {kwargs__list[2]} not found")
 
         for kwarg_key, value in cleaned_kwargs['pagination_kwargs'].items():
             kwargs__list = kwarg_key.split("__")

@@ -145,14 +145,6 @@ class FloatProperty(NumberFieldBase, ABC):
     data_type = FloatType
 
 
-# class DateFieldBase(FieldBase, ABC):
-
-
-#
-# class DateField(DateFieldBase, ABC):
-#     data_type = datetime.datetime
-#
-
 class DateTimeProperty(FieldBase, ABC):
     data_type = datetime.datetime
 
@@ -186,3 +178,10 @@ class DateTimeProperty(FieldBase, ABC):
 #
 # class UUIDField(FieldBase):
 #     pass
+#
+# class DateFieldBase(FieldBase, ABC):
+#
+#
+# class DateField(DateFieldBase, ABC):
+#     data_type = datetime.datetime
+#
