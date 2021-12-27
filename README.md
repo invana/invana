@@ -40,7 +40,7 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git@revised-vers
 - Update properties of on or many vertices and edges.
 - Delete one or many vertices and edges.
 - Supports querying with pagination.
-  [comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
+[comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
 
 [comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
 
