@@ -14,7 +14,8 @@
 #
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringField, DateField, IntegerField, FloatField, BooleanField
+from gremlin_connector.orm.fields import StringField, DateTimeField, IntegerField, FloatField, BooleanField
+from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
@@ -22,13 +23,13 @@ gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_
 class Project(VertexModel):
     gremlin_connector = gremlin_connector
     properties = {
-        'name': StringField(max_length=10, unique=True, read_only=True),
-        'description': StringField(allow_null=True, min_length=10, unique=True, read_only=True),
+        'name': StringField(max_length=10),
+        'description': StringField(allow_null=True, min_length=10),
         'owner': StringField(min_length=10, default="rrmerugu-10"),
         'project_age': IntegerField(allow_null=True),
         'height': FloatField(),
-        'is_active': BooleanField(default=True)
-
+        'is_active': BooleanField(default=True),
+        'created_at': DateTimeField(default=lambda: datetime.now())
     }
 
 

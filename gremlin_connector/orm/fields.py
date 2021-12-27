@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import datetime
 import typing
 from abc import ABC
 
@@ -44,7 +45,7 @@ class FieldBase:
     def get_field_type(self):
         return self.data_type
 
-    def validate(self, value: typing.Any, field_name: str = None, model: ModelBase = None) -> typing.Any:
+    def validate(self, value, field_name=None, model=None):
         return NotImplementedError()
 
     def get_validator(self, **kwargs):
@@ -112,7 +113,7 @@ class NumberFieldBase(FieldBase, ABC):
         self.max_value = max_value
 
     def validate(self, value, field_name=None, model=None):
-        if value and not isinstance(value, self.data_type) :
+        if value and not isinstance(value, self.data_type):
             raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
                                   f" expecting {self.data_type}")
 
@@ -144,13 +145,27 @@ class FloatField(NumberFieldBase, ABC):
     data_type = FloatType
 
 
-class GeoshapeField(FieldBase):
-    data_type = None
+# class DateFieldBase(FieldBase, ABC):
 
 
-class DateField(FieldBase):
-    pass
+#
+# class DateField(DateFieldBase, ABC):
+#     data_type = datetime.datetime
+#
 
+class DateTimeField(FieldBase, ABC):
+    data_type = datetime.datetime
+
+    def validate(self, value, field_name=None, model=None):
+
+        if value is None and self.default:
+            value = self.default()
+        if value and not isinstance(value, self.data_type):
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+                                  f" expecting {self.data_type}")
+        if self.allow_null is False and value is None:
+            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+        return value
 
 #
 # class LongField(NumberFieldBase, ABC):
@@ -165,7 +180,9 @@ class DateField(FieldBase):
 #
 # class InstantField(FieldBase):
 #     pass
-
-
-class UUIDField(FieldBase):
-    pass
+#
+# class GeoshapeField(FieldBase):
+#     data_type = None
+#
+# class UUIDField(FieldBase):
+#     pass
