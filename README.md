@@ -5,6 +5,7 @@
 Python API for Apache TinkerPop's Gremlin supported databases.
 
 - [Installation](#installation)
+- [Supported graph databases](#supported-graph-databases)
 - [Features](#features)
 - [Usage](#usage)
     - [Performing CRUD on Graph](#performing-crud-on-graph)
@@ -24,9 +25,9 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 pip install git+https://github.com/invanalabs/gremlin-connector.git@revised-version#egg=gremlin_connector
 ```
 
-[comment]: <> (-  ## Tested graph databases )
+## Supported graph databases 
 
-[comment]: <> (- [JanusGraph]&#40;https://janusgraph.org/&#41;)
+- [JanusGraph](https://janusgraph.org/)
 
 [comment]: <> (- [DataStax Enterprise]&#40;https://www.datastax.com/products/datastax-enterprise&#41;)
 
