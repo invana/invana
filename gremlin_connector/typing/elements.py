@@ -28,10 +28,16 @@ class PropertiesObject:
         return __str
 
 
-class Node:
+class ElementBase:
     id = None
     label = None
     properties = PropertiesObject()
+
+    def to_json(self):
+        return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
+
+
+class Node(ElementBase):
 
     def __init__(self, _id, label, properties=None):
         self.id = _id
@@ -43,12 +49,11 @@ class Node:
     def __repr__(self):
         return f'<Node id="{self.id}" label="{self.label}" {self.properties}>'
 
+    def to_json(self):
+        return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
 
-class RelationShip:
-    id = None
-    label = None
-    properties = PropertiesObject()
 
+class RelationShip(ElementBase):
     inv = None
     outv = None
 

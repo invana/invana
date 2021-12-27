@@ -120,6 +120,7 @@ Authored.objects.delete_many()
 
 person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 print("person is :", person)
+print("person as json :", person.to_json())
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
 print("project is:", project)
 

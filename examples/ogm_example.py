@@ -83,4 +83,5 @@ print("person_updated", person)
 
 person = Person.objects.read_one(**{"has__first_name__containing": "Ravi"})
 print("person_updated", person)
+print("person_updated", person.to_json())
 gremlin_connector.close_connection()
