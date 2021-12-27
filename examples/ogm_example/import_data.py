@@ -15,7 +15,7 @@
 
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringField, DateField
+from gremlin_connector.orm.fields import StringProperty, DateField
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -24,16 +24,16 @@ gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_
 class Person(VertexModel):
     gremlin_connector = gremlin_connector
     properties = {
-        'first_name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
-        'last_name': StringField(max_length=None, min_length=None, unique=True, read_only=True)
+        'first_name': StringProperty(max_length=None, min_length=None, unique=True, read_only=True),
+        'last_name': StringProperty(max_length=None, min_length=None, unique=True, read_only=True)
     }
 
 
 class Project(VertexModel):
     gremlin_connector = gremlin_connector
     properties = {
-        'name': StringField(max_length=None, min_length=None, unique=True, read_only=True),
-        'description': StringField(max_length=None, min_length=None, unique=True, read_only=True)
+        'name': StringProperty(max_length=None, min_length=None, unique=True, read_only=True),
+        'description': StringProperty(max_length=None, min_length=None, unique=True, read_only=True)
     }
 
 

@@ -52,7 +52,7 @@ class FieldBase:
         raise NotImplementedError()  # pragma: no cover
 
 
-class StringField(FieldBase, ABC):
+class StringProperty(FieldBase, ABC):
     data_type = str
 
     def __init__(self, max_length=None, min_length=None, trim_whitespaces=True, **kwargs):
@@ -90,7 +90,7 @@ class StringField(FieldBase, ABC):
         return self.data_type(value) if value else value
 
 
-class BooleanField(FieldBase, ABC):
+class BooleanProperty(FieldBase, ABC):
     data_type = bool
 
     def validate(self, value, field_name=None, model=None):
@@ -137,11 +137,11 @@ class NumberFieldBase(FieldBase, ABC):
         return self.data_type(value) if value else value
 
 
-class IntegerField(NumberFieldBase, ABC):
+class IntegerProperty(NumberFieldBase, ABC):
     data_type = IntType
 
 
-class FloatField(NumberFieldBase, ABC):
+class FloatProperty(NumberFieldBase, ABC):
     data_type = FloatType
 
 
@@ -153,7 +153,7 @@ class FloatField(NumberFieldBase, ABC):
 #     data_type = datetime.datetime
 #
 
-class DateTimeField(FieldBase, ABC):
+class DateTimeProperty(FieldBase, ABC):
     data_type = datetime.datetime
 
     def validate(self, value, field_name=None, model=None):
