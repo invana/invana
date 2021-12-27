@@ -78,9 +78,7 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 ```python
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
-
-BooleanProperty
+from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
