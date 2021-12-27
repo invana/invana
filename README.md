@@ -1,9 +1,22 @@
-class GremlinConnector:
-pass# Gremlin Connector
+# Gremlin Connector
 
 **NOTE** - Under active development
 
 Python API for Apache TinkerPop's Gremlin supported databases.
+
+- [Installation](#installation)
+- [Features](#features)
+- [Usage](#usage)
+    - [Performing CRUD on Graph](#performing-crud-on-graph)
+        - [Using OGM](#using-ogm)
+        - [Without using OGM](#without-using-ogm)
+    - [Performing raw queries](#performing-raw-queries)
+        - [using execute_query method](#using-execute_query-method)
+        - [using execute_query_with_callback method](#using-execute_query_with_callback-method)
+    - [Search usage (for read, delete, update)](#search-usage-for-read-delete-update)
+        - [for read_many, read_one, delete_many, delete_one](#for-read_many-read_one-delete_many-delete_one)
+        - [for update_many, update_one](#for-update_many-update_one)
+- [License](#license)
 
 ## Installation
 
@@ -58,12 +71,16 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 
 ## Usage
 
-### Using OGM
+### Performing CRUD on Graph
+
+#### Using OGM
 
 ```python
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
+
+BooleanProperty
 from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -118,7 +135,7 @@ gremlin_connector.close_connection()
 
 ```
 
-### Without using OGM
+#### Without using OGM
 
 ```python
 from gremlin_connector import GremlinConnector
@@ -165,6 +182,7 @@ gremlin_connector.close_connection()
 ```
 
 #### using execute_query_with_callback method
+
 ```python
 from gremlin_connector import GremlinConnector
 
@@ -201,6 +219,7 @@ result = Authored.objects.read_many(has__created_at__lte=2021)
 ```
 
 #### for update_many, update_one
+
 ```python
 
 person = Person.objects.update_one(query_kwargs={"has__first_name__containing": "Ravi"},
