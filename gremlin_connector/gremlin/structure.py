@@ -139,7 +139,7 @@ class EdgeCRUD(CRUDBase):
         result = _.elementMap().toList()
         return result
 
-    def update_one(self, from_=None, to_=None, properties=None, query_kwargs=None):
+    def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)

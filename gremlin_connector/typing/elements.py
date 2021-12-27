@@ -24,7 +24,7 @@ class PropertiesObject:
     def __repr__(self):
         __str = ''
         for k, v in self.__dict__.items():
-            __str += f'{k}="{v}"'
+            __str += f'{k}={v} '
         return __str
 
 
@@ -63,5 +63,5 @@ class RelationShip:
 
     def __repr__(self):
         return f'<RelationShip id="{self.id}" ' \
-               f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label} ' \
-               f'{self.properties}>'
+               f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label}' \
+               f' {self.properties}>'

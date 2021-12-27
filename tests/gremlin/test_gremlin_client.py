@@ -24,7 +24,7 @@ def test_client_with_readonly_strategy():
     with pytest.raises(GremlinServerError) as execinfo:
         gremlin_connector.g.addV("Person").toList()
     assert execinfo.value.args[0] == "500: The provided traversal has a mutating step" \
-                                     " and thus is not read only: AddVertexStartStep({label=[Person]})"
+                                     " and thus is not read_large_data only: AddVertexStartStep({label=[Person]})"
 
     gremlin_connector.close_connection()
 
