@@ -22,7 +22,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/gremlin-connector.git@revised-version#egg=gremlin_connector
+pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_connector
 ```
 
 ## Supported graph databases 
@@ -33,18 +33,19 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git@revised-vers
 
 ## Features
 
-- Run your gremlin queries.
-- JSON response
-- CRUD on vertices and edges with properties.
-- Read one or many vertices and edges.
-- Update properties of on or many vertices and edges.
-- Delete one or many vertices and edges.
-- Supports querying with pagination.
 [comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
 
 [comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
 
-- Query data using search filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
+
+- Run your gremlin queries.
+- JSON response
+- CRUD operations on vertices and edges with properties.
+- Read one or many vertices and edges.
+- Update properties of on or many vertices and edges.
+- Delete one or many vertices and edges.
+- Supports querying with pagination.
+- Perform search using filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
   Following filter keyword patterns are supported with `read_many`, `read_one`, `delete_many`,
   `delete_one`, `update_many`,`update_one`
     - has__id=1021
