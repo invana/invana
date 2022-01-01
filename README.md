@@ -15,6 +15,9 @@ Python API for Apache TinkerPop's Gremlin supported databases.
     - [Search usage (for read, delete, update)](#search-usage-for-read-delete-update)
         - [for read_many, read_one, delete_many, delete_one](#for-read_many-read_one-delete_many-delete_one)
         - [for update_many, update_one](#for-update_many-update_one)
+    - [Perform count queries](#perform-count-queries)
+        - [count using OGM](#count-using-ogm)
+        - [count without using OGM](#count-without-using-ogm)
 - [License](#license)
 
 ## Installation
@@ -23,7 +26,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_connector
 ```
 
-## Supported graph databases 
+## Supported graph databases
 
 - [JanusGraph](https://janusgraph.org/)
 
@@ -34,7 +37,6 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 [comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
 
 [comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
-
 
 - Run your gremlin queries.
 - JSON response
@@ -78,7 +80,8 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 ```python
 from gremlin_connector import GremlinConnector
 from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
+    BooleanProperty
 from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -225,6 +228,22 @@ person = Person.objects.update_one(query_kwargs={"has__first_name__containing": 
                                    properties={"last_name": f"Merugu (updated)"})
 
 ```
+
+### Perform count queries
+
+#### count using OGM
+```python
+result = Person.objects.count()
+result = Person.objects.count(has__name__containing="engine")
+```
+
+#### count without using OGM
+```python
+result = gremlin_connector.vertex.count(has__label="Project", has__name__containing="engine")
+result = gremlin_connector.vertex.count(has__label__within=["Project", "Person"])
+```
+
+
 
 ## License
 
