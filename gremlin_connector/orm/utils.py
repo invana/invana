@@ -12,3 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import re
+
+
+def convert_to_camel_case(s):
+    r = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+    return r.sub(r'_\1', s).lower()

@@ -12,3 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
+
+
+class DriverRemoteConnection(_DriverRemoteConnection):
+
+    @property
+    def client(self):
+        return self._client

@@ -12,3 +12,23 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+#
+import abc
+from abc import ABC
+
+
+class AuthBase(abc.ABC):
+
+    @abc.abstractmethod
+    def get_drive_kwargs(self) -> dict:
+        pass
+
+
+class BasicAuth(AuthBase, ABC):
+
+    def __init__(self, username=None, password=None):
+        self.username = username
+        self.password = password
+
+    def get_driver_kwargs(self):
+        return {"username": self.username, "password": self.password}
