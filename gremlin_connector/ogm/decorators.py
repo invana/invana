@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector.orm.exceptions import ValidationError
+from gremlin_connector.ogm.exceptions import ValidationError
 
 
 def dont_allow_has_label_kwargs(**query_kwargs):

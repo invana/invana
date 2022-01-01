@@ -79,41 +79,42 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 
 ```python
 from gremlin_connector import GremlinConnector
-from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
-    BooleanProperty
+from gremlin_connector.ogm.models import VertexModel, EdgeModel
+from gremlin_connector.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
+
+BooleanProperty
 from datetime import datetime
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
 class Project(VertexModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'name': StringProperty(max_length=10, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'rating': FloatProperty(allow_null=True),
-        'is_active': BooleanProperty(default=True),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+  gremlin_connector = gremlin_connector
+  properties = {
+    'name': StringProperty(max_length=10, trim_whitespaces=True),
+    'description': StringProperty(allow_null=True, min_length=10),
+    'rating': FloatProperty(allow_null=True),
+    'is_active': BooleanProperty(default=True),
+    'created_at': DateTimeProperty(default=lambda: datetime.now())
+  }
 
 
 class Person(VertexModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
+  gremlin_connector = gremlin_connector
+  properties = {
+    'first_name': StringProperty(min_length=5, trim_whitespaces=True),
+    'last_name': StringProperty(allow_null=True),
+    'username': StringProperty(default="rrmerugu"),
+    'member_since': IntegerProperty(),
 
-    }
+  }
 
 
 class Authored(EdgeModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+  gremlin_connector = gremlin_connector
+  properties = {
+    'created_at': DateTimeProperty(default=lambda: datetime.now())
+  }
 
 
 Project.objects.delete_many()

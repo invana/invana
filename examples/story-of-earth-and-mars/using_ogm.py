@@ -13,8 +13,8 @@
 #    limitations under the License.
 #
 from gremlin_connector import GremlinConnector
-from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, \
+from gremlin_connector.ogm.models import VertexModel, EdgeModel
+from gremlin_connector.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, \
     BooleanProperty
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 

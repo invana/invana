@@ -14,8 +14,8 @@
 #
 
 from gremlin_connector import GremlinConnector
-from gremlin_connector.orm.models import VertexModel, EdgeModel
-from gremlin_connector.orm.fields import StringProperty
+from gremlin_connector.ogm.models import VertexModel, EdgeModel
+from gremlin_connector.ogm.fields import StringProperty
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 
 gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")

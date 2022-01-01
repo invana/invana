@@ -20,8 +20,8 @@ from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, 
     IntType
 import abc
 
-from gremlin_connector.orm.exceptions import ValidationError
-from gremlin_connector.orm.models import ModelBase
+from gremlin_connector.ogm.exceptions import ValidationError
+from gremlin_connector.ogm.models import ModelBase
 
 
 class FieldBase:
