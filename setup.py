@@ -16,17 +16,18 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='invana-py',
+    name='gremlin-connector',
     version='0.0.0',
-    description='Async Python API for Apache TinkerPop\'s Gremlin supported databases.',
+    description='Python API for Apache TinkerPop\'s Gremlin supported databases.',
     author='Ravi Raja Merugu',
     author_email='ravi@invana.io',
-    url='https://github.com/invanalabs/invana-py',
+    url='https://github.com/invanalabs/gremlin-connector',
     packages=find_packages(
-        exclude=("dist", "docs", "tests", "scripts", "experiments")
+        exclude=("dist", "docs", "tests", "examples")
     ),
     install_requires=[
-        'aiohttp'
+        'aiohttp==3.7.4',
+        'gremlinpython==3.5.1'
     ],
 
     python_requires='>=3.6',
