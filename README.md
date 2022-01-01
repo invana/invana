@@ -1,7 +1,5 @@
 # Gremlin Connector
 
-**NOTE** - Under active development
-
 Python API for Apache TinkerPop's Gremlin supported databases.
 
 - [Installation](#installation)
