@@ -36,6 +36,14 @@ class CRUDBase(abc.ABC):
             **query_kwargs
         )
 
+    def count(self, element_type=None, g=None, **query_kwargs):
+        traversal = self.gremlin_connector.query_kwargs.process_query_kwargs(
+            element_type=element_type or self.get_element_type(),
+            g=g or self.gremlin_connector.g,
+            **query_kwargs
+        )
+        return traversal.count().next()
+
 
 class VertexCRUD(CRUDBase):
 

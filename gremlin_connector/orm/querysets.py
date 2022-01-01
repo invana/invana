@@ -22,6 +22,9 @@ class QuerySetBase:
     crud_cls = None
     model = None
 
+    def __init__(self, gremlin_connector):
+        self.gremlin_connector = gremlin_connector
+
     @staticmethod
     def get_validated_data(field_name, field_value, model):
         field = model.properties.get(field_name)
@@ -75,8 +78,10 @@ class QuerySetBase:
                     setattr(element.properties, k, _)
         return element
 
-    def __init__(self, gremlin_connector):
-        self.gremlin_connector = gremlin_connector
+    def count(self, **query_kwargs):
+        dont_allow_has_label_kwargs(**query_kwargs)
+        query_kwargs['has__label'] = self.model.label_name
+        return self.crud.count(**query_kwargs)
 
 
 class VertexQuerySet(QuerySetBase):
