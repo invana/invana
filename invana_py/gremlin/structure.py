@@ -103,6 +103,48 @@ class VertexReadMixin(CRUDBase):
                                                         target_query_kwargs=target_query_kwargs)
         return incoming_vertices + outgoing_vertices
 
+    def get_in_edge_labels(self, label):
+        return self.graph.execute_query(f"g.V().hasLabel('{label}').inE().label().dedup()")
+
+    def get_out_edge_labels(self, label):
+        return self.graph.execute_query(f"g.V().hasLabel('{label}').outE().label().dedup()")
+
+    def get_in_edge_labels_stats(self, label):
+        edge_labels = self.get_in_edge_labels(label)
+        if edge_labels.__len__() == 0:
+            return {}
+        query_string = f"g.V().hasLabel('{label}')"
+        query_string += self._create_project_string(edge_labels)
+        query_string += self._create_by_string(edge_labels, "in")
+        result = self.graph.execute_query(query_string)
+        return result[0]
+
+    @staticmethod
+    def _create_project_string(labels):
+        query_string = "project("
+        for label in labels:
+            query_string += f"'{label}',"
+        query_string.strip(",")
+        query_string += ")"
+        return query_string
+
+    @staticmethod
+    def _create_by_string(labels, direction):
+        query_string = ""
+        for label in labels:
+            query_string += f".by({direction}('{label}').count())"
+        return query_string
+
+    def get_out_edge_labels_stats(self, label):
+        edge_labels = self.get_out_edge_labels(label)
+        if edge_labels.__len__() == 0:
+            return {}
+        query_string = f"g.V().hasLabel('{label}')"
+        query_string += self._create_project_string(edge_labels)
+        query_string += self._create_by_string(edge_labels, "out")
+        result = self.graph.execute_query(query_string)
+        return result[0]
+
 
 class VertexCRUD(VertexReadMixin, CRUDBase):
 

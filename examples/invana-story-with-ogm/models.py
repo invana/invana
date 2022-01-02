@@ -28,6 +28,13 @@ class User(VertexModel):
     }
 
 
+class Topic(VertexModel):
+    graph = graph
+    properties = {
+        'name': StringProperty(min_length=2)
+    }
+
+
 class Project(VertexModel):
     graph = graph
     properties = {
@@ -44,3 +51,8 @@ class Authored(EdgeModel):
     properties = {
         'started': IntegerProperty()
     }
+
+
+class Likes(EdgeModel):
+    graph = graph
+    properties = {}

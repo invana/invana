@@ -11,7 +11,7 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from models import User, Project, Authored
+from models import User, Project, Authored, Topic, Likes
 from connection import graph
 
 
@@ -51,6 +51,11 @@ def import_data():
                                                                  "started": 2021
                                                              })
     print(invana_py_edge_instance)
+
+    topic_instance = Topic.objects.get_or_create(name="graph-database")
+    print(topic_instance)
+    likes_instance = Likes.objects.get_or_create(user.id, topic_instance.id)
+    print(likes_instance)
 
 
 def flush_data():

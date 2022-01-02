@@ -33,12 +33,26 @@ result = graph.vertex.read_bothe(vertex_query_kwargs={"has__label": "User"})
 print("result read_bothe", result)
 
 print("======")
-result = graph.vertex.read_outgoing_vertices(source_query_kwargs={"has__label": "User"},
-                                             edge_kwargs={"has__label": "authored"},
-                                             target_query_kwargs={}
-                                             )
+result = graph.vertex.read_outgoing_vertices(
+    source_query_kwargs={"has__label": "User"},
+    edge_kwargs={"has__label": "authored"},
+    target_query_kwargs={"has__name__containing": "studio"}
+)
 print("result read_outgoing_vertices", result)
 for r in result:
     print("outgoing vertex", r)
+
+result = graph.execute_query("g.V().hasLabel('User').outE().label().dedup()")
+print("==dedup label result ", result)
+
+result = graph.execute_query("g.V().hasLabel('User').project('authored').by(out('authored').count())")
+print("==dedup label result ", result)
+
+result = graph.vertex.get_out_edge_labels_stats("User")
+print("==get_out_edge_labels_stats label result ", result)
+
+result = graph.vertex.get_in_edge_labels_stats("User")
+print("==get_in_edge_labels_stats label result ", result)
+
 
 graph.close_connection()
