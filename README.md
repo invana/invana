@@ -24,7 +24,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=invana_py
+pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ```
 
 ## Supported graph databases
