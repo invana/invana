@@ -27,7 +27,10 @@ def run_queries():
     print("vertices", vertices)
 
     stats = User.objects.get_out_edge_labels_stats()
-    print("stats", stats)
+    print("User get_out_edge_labels_stats", stats)
+
+    stats = User.objects.get_in_edge_labels_stats()
+    print("User get_in_edge_labels_stats", stats)
 
 
 run_queries()
