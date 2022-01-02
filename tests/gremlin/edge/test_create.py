@@ -12,15 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from gremlin_python.process.traversal import T
 from tests.sample_data import EDGES_SAMPLES
 
 
 def test_create():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
     for edge in EDGES_SAMPLES:
-        from_vtx = gremlin_connector.vertex.read_one(**edge['from_vertex_filters'])
-        to_vtx = gremlin_connector.vertex.read_one(**edge['to_vertex_filters'])
-        data = gremlin_connector.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
-    gremlin_connector.close_connection()
+        from_vtx = graph.vertex.read_one(**edge['from_vertex_filters'])
+        to_vtx = graph.vertex.read_one(**edge['to_vertex_filters'])
+        data = graph.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
+    graph.close_connection()

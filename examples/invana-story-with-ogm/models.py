@@ -12,15 +12,15 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from gremlin_connector.ogm.models import VertexModel, EdgeModel
-from gremlin_connector.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
+from invana_py.ogm.models import VertexModel, EdgeModel
+from invana_py.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
     BooleanProperty
 from datetime import datetime
-from connection import gremlin_connector
+from connection import graph
 
 
 class User(VertexModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'first_name': StringProperty(min_length=2),
         'last_name': StringProperty(allow_null=True, min_length=2),
@@ -29,7 +29,7 @@ class User(VertexModel):
 
 
 class Project(VertexModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'name': StringProperty(min_length=3),
         'description': StringProperty(allow_null=True, max_length=500),
@@ -40,7 +40,7 @@ class Project(VertexModel):
 
 
 class Authored(EdgeModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'started': IntegerProperty()
     }

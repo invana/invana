@@ -15,7 +15,7 @@
 
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
 from models import Star, Planet, Satellite, HasPlanet, HasSatellite, HasNeighborPlanet
-from connection import gremlin_connector
+from connection import graph
 
 
 def import_data():
@@ -89,4 +89,4 @@ def flush_data():
 
 flush_data()
 import_data()
-gremlin_connector.close_connection()
+graph.close_connection()

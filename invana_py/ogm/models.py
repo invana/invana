@@ -29,29 +29,29 @@ class ModelMetaBase(type):
         if "name" not in attrs:
             attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
         model_class = super_new(mcs, name, bases, attrs)
-        model_class.objects = model_base_cls.objects(attrs['gremlin_connector'], model_class)
+        model_class.objects = model_base_cls.objects(attrs['graph'], model_class)
         return model_class
 
 
 class VertexModel(metaclass=ModelMetaBase):
     """
     class Meta:
-        gremlin_connector = None
+        invana_py = None
     """
     objects = VertexQuerySet
-    gremlin_connector = None
+    graph = None
     label_name = None
 
     @classmethod
     def get_schema(cls):
-        return cls.gremlin_connector.schema.get_vertex_schema(cls.label_name)
+        return cls.graph.schema.get_vertex_schema(cls.label_name)
 
 
 class EdgeModel(metaclass=ModelMetaBase):
     objects = EdgeQuerySet
-    gremlin_connector = None
+    graph = None
     label_name = None
 
     @classmethod
     def get_schema(cls):
-        return cls.gremlin_connector.schema.get_edge_schema(cls.label_name)
+        return cls.graph.schema.get_edge_schema(cls.label_name)

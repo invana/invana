@@ -15,31 +15,31 @@
 from gremlin_python.structure.graph import Vertex
 from gremlin_python.process.graph_traversal import __
 from gremlin_python.process.traversal import Cardinality
-from gremlin_connector.utils import calculate_time
+from invana_py.utils import calculate_time
 # from ..events import register_query_event
 import abc
 
 
 class CRUDBase(abc.ABC):
 
-    def __init__(self, gremlin_connector):
-        self.gremlin_connector = gremlin_connector
+    def __init__(self, graph):
+        self.graph = graph
 
     @abc.abstractmethod
     def get_element_type(self):
         pass
 
     def filter_by_query_kwargs(self, element_type=None, g=None, **query_kwargs):
-        return self.gremlin_connector.query_kwargs.process_query_kwargs(
+        return self.graph.query_kwargs.process_query_kwargs(
             element_type=element_type or self.get_element_type(),
-            g=g or self.gremlin_connector.g,
+            g=g or self.graph.g,
             **query_kwargs
         )
 
     def count(self, element_type=None, g=None, **query_kwargs):
-        traversal = self.gremlin_connector.query_kwargs.process_query_kwargs(
+        traversal = self.graph.query_kwargs.process_query_kwargs(
             element_type=element_type or self.get_element_type(),
-            g=g or self.gremlin_connector.g,
+            g=g or self.graph.g,
             **query_kwargs
         )
         return traversal.count().next()
@@ -51,7 +51,7 @@ class VertexCRUD(CRUDBase):
         return "V"
 
     def create(self, label, properties=None):
-        _ = self.gremlin_connector.g.addV(label)
+        _ = self.graph.g.addV(label)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()
@@ -107,21 +107,21 @@ class EdgeCRUD(CRUDBase):
 
     def filter_e_by_query_kwargs(self, from_=None, to_=None, **query_kwargs):
         if from_ and to_:
-            _ = self.gremlin_connector.g.V(from_).outE()
+            _ = self.graph.g.V(from_).outE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
             getattr(_, "where")(__.inV().hasId(to_))
         elif from_ and not to_:
-            _ = self.gremlin_connector.g.V(from_).outE()
+            _ = self.graph.g.V(from_).outE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         elif not from_ and to_:
-            _ = self.gremlin_connector.g.V(to_).inE()
+            _ = self.graph.g.V(to_).inE()
             _ = self.filter_by_query_kwargs(g=_, **query_kwargs)
         else:
             _ = self.filter_by_query_kwargs(**query_kwargs)
         return _
 
     def create(self, label, from_, to_, properties=None):
-        _ = self.gremlin_connector.g.addE(label).from_(__.V(from_)).to(__.V(to_))
+        _ = self.graph.g.addE(label).from_(__.V(from_)).to(__.V(to_))
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()

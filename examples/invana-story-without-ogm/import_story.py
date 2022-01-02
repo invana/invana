@@ -11,55 +11,55 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
 
-def import_data(client):
-    user = client.vertex.get_or_create("User", properties={
+def import_data(graph):
+    user = graph.vertex.get_or_create("User", properties={
         "first_name": "Ravi",
         "last_name": "Merugu",
         "username": "rrmerugu"
     })
     print(user)
 
-    invana_studio_instance = client.vertex.get_or_create("GithubProject", properties={
-        "name": "gremlin_connector-studio",
+    invana_studio_instance = graph.vertex.get_or_create("GithubProject", properties={
+        "name": "invana_py-studio",
         "description": "opensource graph visualiser for Invana graph analytics engine"
     })
     print(invana_studio_instance)
 
-    invana_engine_instance = client.vertex.get_or_create("GithubProject", properties={
-        "name": "gremlin_connector-engine",
+    invana_engine_instance = graph.vertex.get_or_create("GithubProject", properties={
+        "name": "invana_py-engine",
         "description": "Invana graph analytics engine"
     })
     print(invana_engine_instance)
 
-    studio_edge_instance = client.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
+    studio_edge_instance = graph.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
         "started": 2020
     })
     print(studio_edge_instance)
 
-    engine_edge_instance = client.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
+    engine_edge_instance = graph.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
         "started": 2020
     })
     print(engine_edge_instance)
 
 
-def run_queries(client):
-    vertices = client.vertex.read_many(has__label="User")
+def run_queries(graph):
+    vertices = graph.vertex.read_many(has__label="User")
     print(vertices)
 
-    vertices = client.vertex.read_many(has__label__within=["GithubProject", "User"])
+    vertices = graph.vertex.read_many(has__label__within=["GithubProject", "User"])
     print(vertices)
 
-    edges = client.edge.read_many(has__started__lte=2021)
+    edges = graph.edge.read_many(has__started__lte=2021)
     print(edges)
 
-    vertices = client.vertex.read_many(has__name__containing="engine")
+    vertices = graph.vertex.read_many(has__name__containing="engine")
     print(vertices)
 
 
-client = GremlinConnector("ws://localhost:8182/gremlin")
-import_data(client)
-run_queries(client)
-client.close_connection()
+graph = InvanaGraph("ws://localhost:8182/gremlin")
+import_data(graph)
+run_queries(graph)
+graph.close_connection()

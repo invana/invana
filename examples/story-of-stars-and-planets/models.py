@@ -11,13 +11,13 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from gremlin_connector.ogm.fields import StringProperty, FloatProperty, IntegerProperty
-from gremlin_connector.ogm.models import VertexModel, EdgeModel
-from connection import gremlin_connector
+from invana_py.ogm.fields import StringProperty, FloatProperty, IntegerProperty
+from invana_py.ogm.models import VertexModel, EdgeModel
+from connection import graph
 
 
 class Star(VertexModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'name': StringProperty(),
         'mass_in_kgs': FloatProperty(),
@@ -26,7 +26,7 @@ class Star(VertexModel):
 
 
 class Planet(VertexModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'name': StringProperty(),
         'mass_in_kgs': FloatProperty(),
@@ -35,7 +35,7 @@ class Planet(VertexModel):
 
 
 class Satellite(VertexModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'name': StringProperty(),
         'mass_in_kgs': FloatProperty(allow_null=True),
@@ -44,21 +44,21 @@ class Satellite(VertexModel):
 
 
 class HasPlanet(EdgeModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),
     }
 
 
 class HasSatellite(EdgeModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),
     }
 
 
 class HasNeighborPlanet(EdgeModel):
-    gremlin_connector = gremlin_connector
+    graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),
     }

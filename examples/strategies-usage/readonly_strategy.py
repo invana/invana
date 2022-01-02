@@ -11,10 +11,10 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from gremlin_connector import GremlinConnector
-from gremlin_connector.strategies import ReadOnlyStrategy
+from invana_py import InvanaGraph
+from invana_py.strategies import ReadOnlyStrategy
 
 GREMLIN_SERVER_URL = 'ws://megamind-ws:8182/gremlin'
-gremlin_connector = GremlinConnector(GREMLIN_SERVER_URL, strategies=[ReadOnlyStrategy, ])
+graph = InvanaGraph(GREMLIN_SERVER_URL, strategies=[ReadOnlyStrategy, ])
 
-gremlin_connector.close_connection()
+graph.close_connection()

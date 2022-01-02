@@ -14,25 +14,25 @@
 #
 import pytest
 from gremlin_python.process.strategies import PartitionStrategy
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from gremlin_python.process.traversal import T
 from gremlin_python.driver.protocol import GremlinServerError
 
 
 def test_client_with_readonly_strategy():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', read_only_mode=True)
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin', read_only_mode=True)
     with pytest.raises(GremlinServerError) as execinfo:
-        gremlin_connector.g.addV("Person").toList()
+        graph.g.addV("Person").toList()
     assert execinfo.value.args[0] == "500: The provided traversal has a mutating step" \
                                      " and thus is not read_large_data only: AddVertexStartStep({label=[Person]})"
 
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_client():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    result = gremlin_connector.execute_query("g.V().limit(1).toList()")
-    gremlin_connector.close_connection()
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    result = graph.execute_query("g.V().limit(1).toList()")
+    graph.close_connection()
 
 
 def test_client_with_partition_strategy():
@@ -40,9 +40,9 @@ def test_client_with_partition_strategy():
                                            # write_partition="a",
                                            read_partitions=["tenant_c", "tenant_b", "tenant_a"]
                                            )
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
-    nodes = gremlin_connector.g.V().elementMap("name").limit(1).toList()
-    gremlin_connector.close_connection()
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
+    nodes = graph.g.V().elementMap("name").limit(1).toList()
+    graph.close_connection()
 
 
 test_client()

@@ -12,8 +12,8 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
 # GREMLIN_SERVER_URL="ws://megamind-ws:8182/gremlin"
 GREMLIN_SERVER_URL = "ws://localhost:8182/gremlin"
-gremlin_connector = GremlinConnector(GREMLIN_SERVER_URL, traversal_source="g")
+graph = InvanaGraph(GREMLIN_SERVER_URL, traversal_source="g")

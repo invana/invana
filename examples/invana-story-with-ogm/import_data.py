@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from models import User, Project, Authored
-from connection import gremlin_connector
+from connection import graph
 
 
 def import_data():
@@ -46,15 +46,11 @@ def import_data():
     })
     print(engine_edge_instance)
 
-    gremlin_connector_edge_instance = Authored.objects.get_or_create(user.id, gremlin_connector_instance.id, properties={
-        "started": 2022
-    })
+    gremlin_connector_edge_instance = Authored.objects.get_or_create(user.id, gremlin_connector_instance.id,
+                                                                     properties={
+                                                                         "started": 2022
+                                                                     })
     print(gremlin_connector_edge_instance)
-
-
-def run_queries():
-    vertices = Project.objects.read_many(has__name__containing="engine")
-    print("vertices", vertices)
 
 
 def flush_data():
@@ -65,5 +61,5 @@ def flush_data():
 
 flush_data()
 import_data()
-run_queries()
-gremlin_connector.close_connection()
+
+graph.close_connection()

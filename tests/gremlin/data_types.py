@@ -12,61 +12,61 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
-from gremlin_connector.typing.elements import Node, RelationShip
+from invana_py import InvanaGraph
+from invana_py.typing.elements import Node, RelationShip
 
 
 def test_v_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().limit(1).next()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.V().limit(1).next()")
     assert isinstance(data[0], Node)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_e_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.E().limit(1).next()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.E().limit(1).next()")
     assert isinstance(data[0], RelationShip)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_v_elementmap_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().elementMap().limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.V().elementMap().limit(1).toList()")
     assert isinstance(data[0], Node)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_e_elementmap_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.E().elementMap().limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.E().elementMap().limit(1).toList()")
     assert isinstance(data[0], RelationShip)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_v_valueMap_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().valueMap(true).limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.V().valueMap(true).limit(1).toList()")
     assert isinstance(data[0], Node)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_e_valueMap_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.E().valueMap(true).limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.E().valueMap(true).limit(1).toList()")
     assert isinstance(data[0], Node)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_v_valueMap_with_values_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().valueMap('name').limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.V().valueMap('name').limit(1).toList()")
     assert isinstance(data[0], dict)
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_e_valueMap_with_values_datatype():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.E().valueMap('name').limit(1).toList()")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.E().valueMap('name').limit(1).toList()")
     assert isinstance(data[0], dict)
-    gremlin_connector.close_connection()
+    graph.close_connection()

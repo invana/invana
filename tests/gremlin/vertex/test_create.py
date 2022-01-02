@@ -12,13 +12,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from tests.sample_data import VERTICES_SAMPLES
 
 
 def test_create():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
     for vertex in VERTICES_SAMPLES:
-        data = gremlin_connector.vertex.create(**vertex)
+        data = graph.vertex.create(**vertex)
         assert data is not None
-    gremlin_connector.close_connection()
+    graph.close_connection()

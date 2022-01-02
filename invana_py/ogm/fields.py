@@ -18,10 +18,7 @@ from abc import ABC
 
 from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, ListType, SetType, ByteBufferType, \
     IntType
-import abc
-
-from gremlin_connector.ogm.exceptions import ValidationError
-from gremlin_connector.ogm.models import ModelMetaBase
+from invana_py.ogm.exceptions import ValidationError
 
 
 class FieldBase:

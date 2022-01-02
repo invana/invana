@@ -12,23 +12,23 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
 
 def test_janusgraph_schema_reader():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    schema_data = gremlin_connector.schema.get_graph_schema()
-    gremlin_connector.close_connection()
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    schema_data = graph.schema.get_graph_schema()
+    graph.close_connection()
 
 
 def test_janusgraph_schema_vertex_reader():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    schema_data = gremlin_connector.schema.get_vertex_schema("Star")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    schema_data = graph.schema.get_vertex_schema("Star")
     assert schema_data.name == "Star"
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_janusgraph_get_all_vertices_schema():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    schema_data = gremlin_connector.schema.get_all_vertices_schema()
-    gremlin_connector.close_connection()
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    schema_data = graph.schema.get_all_vertices_schema()
+    graph.close_connection()

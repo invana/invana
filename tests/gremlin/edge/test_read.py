@@ -12,21 +12,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from tests.sample_data import EDGES_SAMPLES
 
 
 def test_read_one():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
     for edge in EDGES_SAMPLES:
-        data = gremlin_connector.edge.read_one(**{"has__label": edge['label']})
+        data = graph.edge.read_one(**{"has__label": edge['label']})
         assert data is not None
-    gremlin_connector.close_connection()
+    graph.close_connection()
 
 
 def test_read_many():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
     for edge in EDGES_SAMPLES:
-        data = gremlin_connector.edge.read_many(**{"has__label": edge['label']})
+        data = graph.edge.read_many(**{"has__label": edge['label']})
         assert data.__len__() > 0
-    gremlin_connector.close_connection()
+    graph.close_connection()

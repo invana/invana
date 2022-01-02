@@ -12,16 +12,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from gremlin_python.process.traversal import T
 
 
 def test_delete_one():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    old_data = gremlin_connector.vertex.read_one(has__label="Person")
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    old_data = graph.vertex.read_one(has__label="Person")
     # delete data
-    gremlin_connector.vertex.delete_one(has__id=old_data.id)
+    graph.vertex.delete_one(has__id=old_data.id)
     # validate if the data is deleted
-    data = gremlin_connector.vertex.read_one(has__id=old_data.id)
+    data = graph.vertex.read_one(has__id=old_data.id)
     assert data is None
-    gremlin_connector.close_connection()
+    graph.close_connection()

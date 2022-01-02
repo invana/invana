@@ -13,40 +13,45 @@
 #    limitations under the License.
 #
 #
-from gremlin_python.driver.resultset import ResultSet
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
-
-from gremlin_connector.events import QueryEvent, QueryResponseReceivedSuccessfullyEvent, \
+from invana_py.events import QueryEvent, QueryResponseReceivedSuccessfullyEvent, \
     QueryResponseReceivedWithErrorEvent, QueryFinishedEvent, QueryResponseErrorReasonTypes
-from gremlin_connector.schema.janusgraph import JanusGraphSchema
-from gremlin_connector.gremlin.query import QueryKwargs2GremlinQuery
-from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
-from gremlin_connector.gremlin.connection import DriverRemoteConnection
-from gremlin_connector.gremlin.reader import invana_graphson_reader
-from gremlin_connector.exceptions import InvalidGraphBackendError
-from concurrent.futures import Future
+from invana_py.schema.janusgraph import JanusGraphSchema
+from invana_py.gremlin.query import QueryKwargs2GremlinQuery
+from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
+from invana_py.gremlin.connection import DriverRemoteConnection
+from invana_py.gremlin.reader import invana_graphson_reader
+from invana_py.exceptions import InvalidGraphBackendError
 import logging
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_TIMEOUT = 180  # in seconds
 
-class StateTypes:
+
+class ConnectionStateTypes:
     CONNECTED = "CONNECTED"
+    CONNECTING = "CONNECTING"
+    RECONNECTING = "RECONNECTING"
+    DISCONNECTING = "DISCONNECTING"
     DISCONNECTED = "DISCONNECTED"
 
 
-class GremlinConnector:
+class InvanaGraph:
     query_kwargs = QueryKwargs2GremlinQuery()
     SUPPORTED_GRAPH_BACKENDS = ['janusgraph', ]
     DEFAULT_GRAPH_BACKEND = 'janusgraph'
-    STATE = None
+    CONNECTION_STATE = None
+    connection = None
+    g = None
 
     def __init__(self, gremlin_url,
                  traversal_source='g',
                  strategies=None,
                  graph_backend=None,
                  read_only_mode=False,
+                 timeout=None,
                  auth=None, **connection_kwargs):
         graph_backend = graph_backend.lower() if graph_backend else self.DEFAULT_GRAPH_BACKEND
         if graph_backend not in self.SUPPORTED_GRAPH_BACKENDS:
@@ -55,40 +60,50 @@ class GremlinConnector:
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
+        self.timeout = timeout or DEFAULT_TIMEOUT
         if graph_backend == "janusgraph":
             self.schema = JanusGraphSchema(self)
         else:
             raise InvalidGraphBackendError()
-        self.connection = self.create_connection(gremlin_url, traversal_source, **connection_kwargs)
-        self.g = traversal().withRemote(self.connection)
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
-        if self.strategies.__len__() > 0:
-            self.g = self.g.withStrategies(*self.strategies)
+
+        self.connection_kwargs = connection_kwargs
+        self.connect()
         self.vertex = VertexCRUD(self)
         self.edge = EdgeCRUD(self)
 
-    def create_connection(self, gremlin_url, traversal_source, **connection_kwargs) -> DriverRemoteConnection:
-        _ = DriverRemoteConnection(
-            gremlin_url,
-            traversal_source=traversal_source,
+    def connect(self):
+        self.update_connection_state(ConnectionStateTypes.CONNECTING)
+        self.connection = DriverRemoteConnection(
+            self.gremlin_url,
+            traversal_source=self.traversal_source,
             graphson_reader=invana_graphson_reader,
-            **connection_kwargs
+            **self.connection_kwargs
         )
-        self.update_state(StateTypes.CONNECTED)
-        return _
+        self.g = traversal().withRemote(self.connection)
+        if self.strategies.__len__() > 0:
+            self.g = self.g.withStrategies(*self.strategies)
+        self.update_connection_state(ConnectionStateTypes.CONNECTED)
 
-    def update_state(self, new_state):
-        self.STATE = new_state
+    def reconnect(self):
+        self.update_connection_state(ConnectionStateTypes.RECONNECTING)
+        self.connect()
+
+    def close_connection(self) -> None:
+        self.update_connection_state(ConnectionStateTypes.DISCONNECTING)
+        self.connection.client.close()
+        self.update_connection_state(ConnectionStateTypes.DISCONNECTED)
+
+    def update_connection_state(self, new_state):
+        self.CONNECTION_STATE = new_state
+        logger.debug(f"graph connector updated to state : {self.CONNECTION_STATE}")
 
     @staticmethod
     def determine_response_error_reason(error_string):
         if "with error 597: No signature of method" in error_string:
             return QueryResponseErrorReasonTypes.INVALID_QUERY
         return QueryResponseErrorReasonTypes.OTHER
-
-    def close_connection(self) -> None:
-        return self.connection.client.close()
 
     def get_strategies_object_to_string(self) -> str:
         graph_strategies_str = "g.withStrategies("
@@ -108,13 +123,17 @@ class GremlinConnector:
     #     logger.info("Running query : {}".format(query_string))
     #     request_options = {"evaluationTimeout": timeout} if timeout else {}
     #     return self.connection.client.submit(query_string, request_options=request_options).next()
-
-    def execute_query(self, query_string, timeout=None) -> any:
+    def get_query_with_strategies(self, query_string):
         if self.strategies.__len__() > 0:
             strategy_prefix = self.get_strategies_object_to_string()
             query_string = query_string.replace("g.", strategy_prefix, 1)
-        logger.info("Running query : {}".format(query_string))
-        request_options = {"evaluationTimeout": timeout} if timeout else {}
+        return query_string
+
+    def execute_query(self, query_string, timeout=None) -> any:
+        query_string = self.get_query_with_strategies(query_string)
+        logger.info("Executing query : {}".format(query_string))
+        timeout = timeout if timeout else self.timeout
+        request_options = {"evaluationTimeout": timeout}
         query_event = QueryEvent({"query_string": query_string})
         try:
             result = self.connection.client.submitAsync(query_string,
@@ -133,10 +152,8 @@ class GremlinConnector:
         return result
 
     def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
-        if self.strategies.__len__() > 0:
-            strategy_prefix = self.get_strategies_object_to_string()
-            query_string = query_string.replace("g.", strategy_prefix, 1)
-        logger.info("Running query : {}".format(query_string))
+        query_string = self.get_query_with_strategies(query_string)
+        logger.info("Executing query : {}".format(query_string))
         request_options = {"evaluationTimeout": timeout} if timeout else {}
         result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
         self.read_from_result_set(result_set, callback, finished_callback)

@@ -15,7 +15,7 @@
 import logging
 from abc import ABC
 from datetime import datetime
-from gremlin_connector.utils import create_uuid
+from invana_py.utils import create_uuid
 
 
 class QueryStatusTypes:

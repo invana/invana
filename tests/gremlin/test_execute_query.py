@@ -12,20 +12,20 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
 
 def test_execute_query():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    data = gremlin_connector.execute_query("g.V().count()")
-    gremlin_connector.close_connection()
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.execute_query("g.V().count()")
+    graph.close_connection()
 
 
 def test_execute_large_data_with_callback():
-    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
-    gremlin_connector.execute_query_with_callback("g.V().limit(200).toList()",
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    graph.execute_query_with_callback("g.V().limit(200).toList()",
                                                   lambda res: print(res.__len__()),
-                                                  lambda: gremlin_connector.close_connection()
+                                                  lambda: graph.close_connection()
                                                   )
 
-    gremlin_connector.close_connection()
+    graph.close_connection()

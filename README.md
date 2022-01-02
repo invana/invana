@@ -1,4 +1,4 @@
-# Gremlin Connector
+# invana-py
 
 Python API for Apache TinkerPop's Gremlin supported databases.
 
@@ -24,7 +24,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_connector
+pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=invana_py
 ```
 
 ## Supported graph databases
@@ -79,18 +79,16 @@ pip install git+https://github.com/invanalabs/gremlin-connector.git#egg=gremlin_
 #### Using OGM
 
 ```python
-from gremlin_connector import GremlinConnector
-from gremlin_connector.ogm.models import VertexModel, EdgeModel
-from gremlin_connector.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty,
-
-BooleanProperty
+from invana_py import InvanaGraph
+from invana_py.ogm.models import VertexModel, EdgeModel
+from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
-gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
 class Project(VertexModel):
-  gremlin_connector = gremlin_connector
+  graph = graph
   properties = {
     'name': StringProperty(max_length=10, trim_whitespaces=True),
     'description': StringProperty(allow_null=True, min_length=10),
@@ -101,7 +99,7 @@ class Project(VertexModel):
 
 
 class Person(VertexModel):
-  gremlin_connector = gremlin_connector
+  graph = graph
   properties = {
     'first_name': StringProperty(min_length=5, trim_whitespaces=True),
     'last_name': StringProperty(allow_null=True),
@@ -112,7 +110,7 @@ class Person(VertexModel):
 
 
 class Authored(EdgeModel):
-  gremlin_connector = gremlin_connector
+  graph = graph
   properties = {
     'created_at': DateTimeProperty(default=lambda: datetime.now())
   }
@@ -135,39 +133,39 @@ authored_single = Authored.objects.create(person.id, project.id)
 authored = Authored.objects.read_many()
 print("authored", authored)
 
-gremlin_connector.close_connection()
+graph.close_connection()
 
 ```
 
 #### Without using OGM
 
 ```python
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 from datetime import datetime
 
-gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
-user = gremlin_connector.vertex.get_or_create("Person", properties={
+user = graph.vertex.get_or_create("Person", properties={
     "first_name": "Ravi Raja",
     "last_name": "Merugu"
 })
 
-invana_studio_instance = gremlin_connector.vertex.get_or_create("Project", properties={
-    "name": "gremlin_connector-studio",
+invana_studio_instance = graph.vertex.get_or_create("Project", properties={
+    "name": "invana-studio",
     "description": "opensource graph visualiser for Invana graph analytics engine"
 })
-# <g:Vertex id=4128 label=GithubProject name=gremlin_connector-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
 
-invana_engine_instance = gremlin_connector.vertex.get_or_create("Project", properties={
-    "name": "gremlin_connector-engine",
+invana_engine_instance = graph.vertex.get_or_create("Project", properties={
+    "name": "invana_py-engine",
     "description": "Invana graph analytics engine"
 })
 
-edge_instance = gremlin_connector.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
+edge_instance = graph.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
     "created_at": datetime.now()
 })
 
-engine_edge_instance = gremlin_connector.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
+engine_edge_instance = graph.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
     "created_at": datetime.now()
 })
 
@@ -178,24 +176,24 @@ engine_edge_instance = gremlin_connector.edge.get_or_create("authored", user.id,
 #### using execute_query method
 
 ```python
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
-gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
-results = gremlin_connector.execute_query("g.V().limit(1).toList()", timeout=180)
-gremlin_connector.close_connection()
+graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
+results = graph.execute_query("g.V().limit(1).toList()", timeout=180)
+graph.close_connection()
 ```
 
 #### using execute_query_with_callback method
 
 ```python
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
-gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
-gremlin_connector.execute_query_with_callback("g.V().limit(1).next()",
+graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
+graph.execute_query_with_callback("g.V().limit(1).next()",
                                               lambda res: print(res.__len__()),
-                                              finished_callback=lambda: gremlin_connector.close_connection(),
+                                              finished_callback=lambda: graph.close_connection(),
                                               timeout=180)
-gremlin_connector.close_connection()
+graph.close_connection()
 
 ```
 
@@ -204,16 +202,16 @@ gremlin_connector.close_connection()
 #### for read_many, read_one, delete_many, delete_one
 
 ```python
-from gremlin_connector import GremlinConnector
+from invana_py import InvanaGraph
 
-gremlin_connector = GremlinConnector("ws://localhost:8182/gremlin", username="user", password="password")
+graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 
 # without ogm
-result = gremlin_connector.vertex.read_many(has__label="Project")
-result = gremlin_connector.vertex.read_many(has__label__within=["Project", "Person"])
-result = gremlin_connector.vertex.read_many(has__id=1271)
-result = gremlin_connector.vertex.read_many(has__label="Project", has__name__containing="engine")
-result = gremlin_connector.edge.read_many(has__label="authored", has__created_at__lte=2021)
+result = graph.vertex.read_many(has__label="Project")
+result = graph.vertex.read_many(has__label__within=["Project", "Person"])
+result = graph.vertex.read_many(has__id=1271)
+result = graph.vertex.read_many(has__label="Project", has__name__containing="engine")
+result = graph.edge.read_many(has__label="authored", has__created_at__lte=2021)
 
 # with ogm
 result = Project.objects.read_many(has__id=1271)
@@ -241,8 +239,8 @@ result = Person.objects.count(has__name__containing="engine")
 
 #### count without using OGM
 ```python
-result = gremlin_connector.vertex.count(has__label="Project", has__name__containing="engine")
-result = gremlin_connector.vertex.count(has__label__within=["Project", "Person"])
+result = graph.vertex.count(has__label="Project", has__name__containing="engine")
+result = graph.vertex.count(has__label__within=["Project", "Person"])
 ```
 
 

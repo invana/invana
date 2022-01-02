@@ -12,18 +12,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector.gremlin.structure import VertexCRUD, EdgeCRUD
+from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
 from .decorators import dont_allow_has_label_kwargs
 from .exceptions import FieldNotFoundError, ValidationError
-from gremlin_connector.typing.elements import Node, RelationShip
+from invana_py.typing.elements import Node, RelationShip
 
 
 class QuerySetBase:
     crud_cls = None
     model = None
 
-    def __init__(self, gremlin_connector):
-        self.gremlin_connector = gremlin_connector
+    def __init__(self, graph):
+        self.graph = graph
 
     @staticmethod
     def get_validated_data(field_name, field_value, model):
@@ -87,9 +87,9 @@ class QuerySetBase:
 class VertexQuerySet(QuerySetBase):
     crud_cls = VertexCRUD
 
-    def __init__(self, gremlin_connector, model):
-        super(VertexQuerySet, self).__init__(gremlin_connector)
-        self.crud = self.crud_cls(self.gremlin_connector)
+    def __init__(self, graph, model):
+        super(VertexQuerySet, self).__init__(graph)
+        self.crud = self.crud_cls(self.graph)
         self.model = model
 
     def create(self, **kwargs):
@@ -141,9 +141,9 @@ class VertexQuerySet(QuerySetBase):
 class EdgeQuerySet(QuerySetBase):
     crud_cls = EdgeCRUD
 
-    def __init__(self, gremlin_connector, model):
-        super(EdgeQuerySet, self).__init__(gremlin_connector)
-        self.crud = self.crud_cls(self.gremlin_connector)
+    def __init__(self, graph, model):
+        super(EdgeQuerySet, self).__init__(graph)
+        self.crud = self.crud_cls(self.graph)
         self.model = model
 
     def create(self, from_, to_, properties=None):

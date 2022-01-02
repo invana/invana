@@ -14,7 +14,7 @@
 #
 #
 from .utils import process_graph_schema_string
-from gremlin_connector.typing.schema import PropertySchema, VertexSchema, EdgeSchema
+from invana_py.typing.schema import PropertySchema, VertexSchema, EdgeSchema
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,17 +22,17 @@ logger = logging.getLogger(__name__)
 
 class JanusGraphSchemaReader:
 
-    def __init__(self, gremlin_connector):
-        self.gremlin_connector = gremlin_connector
+    def __init__(self, graph):
+        self.graph = graph
 
     def _get_graph_schema_overview(self):
         # TODO - can add more information from the print schema data like indexes etc to current output
-        responses = self.gremlin_connector.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        responses = self.graph.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
         return process_graph_schema_string(responses[0])
 
     def _get_vertex_property_keys(self, label):
         try:
-            return self.gremlin_connector.execute_query(
+            return self.graph.execute_query(
                 "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
             ) or []
         except Exception as e:
@@ -42,7 +42,7 @@ class JanusGraphSchemaReader:
 
     def _get_edge_property_keys(self, label):
         try:
-            return self.gremlin_connector.execute_query(
+            return self.graph.execute_query(
                 "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
             ) or []
         except Exception as e:
