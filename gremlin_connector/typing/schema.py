@@ -37,6 +37,9 @@ class ElementSchemaBase:
     def add_property_schema(self, property_schema: PropertySchema):
         self.properties[property_schema.name] = property_schema
 
+    def get_property_keys(self):
+        return list(self.properties.keys())
+
 
 class VertexSchema(ElementSchemaBase):
     type = "VERTEX"

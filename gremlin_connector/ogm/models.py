@@ -16,32 +16,42 @@ from .querysets import VertexQuerySet, EdgeQuerySet
 from .utils import convert_to_camel_case
 
 
-class ModelBase(type):
+class ModelMetaBase(type):
 
-    def __new__(cls, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs):
         super_new = super().__new__
         # Also ensure initialization is only performed for subclasses of Model
         # (excluding Model class itself).
-        parents = [b for b in bases if isinstance(b, ModelBase)]
+        parents = [b for b in bases if isinstance(b, ModelMetaBase)]
         if not parents:
-            return super_new(cls, name, bases, attrs)
+            return super_new(mcs, name, bases, attrs)
         model_base_cls = bases[0]
         if "name" not in attrs:
             attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
-        model_class = super_new(cls, name, bases, attrs)
+        model_class = super_new(mcs, name, bases, attrs)
         model_class.objects = model_base_cls.objects(attrs['gremlin_connector'], model_class)
         return model_class
 
 
-class VertexModel(metaclass=ModelBase):
+class VertexModel(metaclass=ModelMetaBase):
     """
     class Meta:
         gremlin_connector = None
     """
     objects = VertexQuerySet
+    gremlin_connector = None
     label_name = None
 
+    @classmethod
+    def get_schema(cls):
+        return cls.gremlin_connector.schema.get_vertex_schema(cls.label_name)
 
-class EdgeModel(metaclass=ModelBase):
+
+class EdgeModel(metaclass=ModelMetaBase):
     objects = EdgeQuerySet
+    gremlin_connector = None
     label_name = None
+
+    @classmethod
+    def get_schema(cls):
+        return cls.gremlin_connector.schema.get_edge_schema(cls.label_name)

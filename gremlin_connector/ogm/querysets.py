@@ -45,7 +45,7 @@ class QuerySetBase:
         allowed_property_keys = list(self.model.properties.keys())
         for k, v in properties.items():
             if k not in allowed_property_keys:
-                raise ValidationError(f"property {k} not allowed in {self.model.label_name}")
+                raise ValidationError(f"property '{k}' not allowed in {self.model.label_name}")
         for k, field in self.model.properties.items():
             _ = self.get_validated_data(k, properties.get(k), self.model)
             if _ is not None:
@@ -63,7 +63,7 @@ class QuerySetBase:
         allowed_property_keys = list(self.model.properties.keys())
         for k, v in properties.items():
             if k not in allowed_property_keys:
-                raise ValidationError(f"property {k} not allowed in {self.model.label_name}")
+                raise ValidationError(f"property '{k}' not allowed in {self.model.label_name}")
         for k, v in properties.items():
             _ = self.get_validated_data(k, v, self.model)
             if _ is not None:

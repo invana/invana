@@ -21,56 +21,12 @@ from gremlin_connector import GremlinConnector
 import csv
 
 
-def clean_nodes(node_data):
-    cleaned_data = {}
-    for k, v in node_data.items():
-        if k.startswith("~"):
-            cleaned_data[k.lstrip('~')] = v
-        elif ":" in k:
-            cleaned_data[k.split(":")[0]] = v
-
-    _id = cleaned_data['id']
-    _label = cleaned_data['label']
-    del cleaned_data['id']
-    del cleaned_data['label']
-    return {
-        "id": _id,
-        "label": _label,
-        "properties": cleaned_data
-    }
-
-
-def clean_edges(edge_data):
-    cleaned_data = {}
-    for k, v in edge_data.items():
-        if k.startswith("~"):
-            cleaned_data[k.lstrip('~')] = v
-        elif ":" in k:
-            cleaned_data[k.split(":")[0]] = v
-
-    _id = cleaned_data['id']
-    _label = cleaned_data['label']
-    _from = cleaned_data['from']
-    _to = cleaned_data['to']
-    del cleaned_data['id']
-    del cleaned_data['label']
-    del cleaned_data['from']
-    del cleaned_data['to']
-    return {
-        "id": _id,
-        "label": _label,
-        "from": _from,
-        "to": _to,
-        "properties": cleaned_data
-    }
-
-
 def import_data():
     node_id_map = {}
     graph_client = GremlinConnector("ws://megamind-ws:8182/gremlin", graph_backend="janusgraph")
     print("Initiating import: graph_client :", graph_client)
 
-    with open('./air-routes-latest-nodes.csv', encoding="utf8") as f:
+    with open('../../airlines-data/data/air-routes-latest-nodes.csv', encoding="utf8") as f:
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_nodes(line)
@@ -79,7 +35,7 @@ def import_data():
             print("Created Node", created_data)
             node_id_map[cleaned_data['id']] = created_data.id
 
-    with open('./air-routes-latest-edges.csv', encoding="utf8") as f:
+    with open('../../airlines-data/data/air-routes-latest-edges.csv', encoding="utf8") as f:
         reader = csv.DictReader(f)
         for line in reader:
             cleaned_data = clean_edges(line)

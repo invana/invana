@@ -21,7 +21,7 @@ from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, 
 import abc
 
 from gremlin_connector.ogm.exceptions import ValidationError
-from gremlin_connector.ogm.models import ModelBase
+from gremlin_connector.ogm.models import ModelMetaBase
 
 
 class FieldBase:
@@ -143,6 +143,10 @@ class IntegerProperty(NumberFieldBase, ABC):
 
 class FloatProperty(NumberFieldBase, ABC):
     data_type = FloatType
+
+
+class DoubleProperty(NumberFieldBase, ABC):
+    data_type = LongType
 
 
 class DateTimeProperty(FieldBase, ABC):
