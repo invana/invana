@@ -137,6 +137,45 @@ class VertexQuerySet(QuerySetBase):
         query_kwargs['has__label'] = self.model.label_name
         return self.crud.delete_many(**query_kwargs)
 
+    def read_incoming_vertices(self,
+                               source_query_kwargs: dict,
+                               edge_kwargs: dict,
+                               target_query_kwargs: dict
+                               ):
+        dont_allow_has_label_kwargs(**source_query_kwargs)
+        source_query_kwargs['has__label'] = self.model.label_name
+        return self.crud.read_incoming_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
+
+    def read_outgoing_vertices(self,
+                               source_query_kwargs: dict,
+                               edge_kwargs: dict,
+                               target_query_kwargs: dict
+                               ):
+        dont_allow_has_label_kwargs(**source_query_kwargs)
+        source_query_kwargs['has__label'] = self.model.label_name
+        return self.crud.read_outgoing_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
+
+    def read_incoming_and_outgoing_vertices(self,
+                                            source_query_kwargs: dict,
+                                            edge_kwargs: dict,
+                                            target_query_kwargs: dict
+                                            ):
+        dont_allow_has_label_kwargs(**source_query_kwargs)
+        source_query_kwargs['has__label'] = self.model.label_name
+        return self.crud.read_incoming_and_outgoing_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
+
+    def get_in_edge_labels(self):
+        return self.crud.get_in_edge_labels(self.model.label_name)
+
+    def get_out_edge_labels(self):
+        return self.crud.get_out_edge_labels(self.model.label_name)
+
+    def get_in_edge_labels_stats(self):
+        return self.crud.get_in_edge_labels_stats(self.model.label_name)
+
+    def get_out_edge_labels_stats(self):
+        return self.crud.get_out_edge_labels_stats(self.model.label_name)
+
 
 class EdgeQuerySet(QuerySetBase):
     crud_cls = EdgeCRUD

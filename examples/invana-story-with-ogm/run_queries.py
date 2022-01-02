@@ -26,6 +26,9 @@ def run_queries():
     vertices = User.objects.read_many()
     print("vertices", vertices)
 
+    stats = User.objects.get_out_edge_labels_stats()
+    print("stats", stats)
+
 
 run_queries()
 graph.close_connection()
