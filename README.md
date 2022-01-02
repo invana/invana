@@ -18,6 +18,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
     - [Perform count queries](#perform-count-queries)
         - [count using OGM](#count-using-ogm)
         - [count without using OGM](#count-without-using-ogm)
+- [Examples](#examples)
 - [License](#license)
 
 ## Installation
@@ -245,6 +246,10 @@ result = gremlin_connector.vertex.count(has__label__within=["Project", "Person"]
 ```
 
 
+
+## Examples
+
+Checkout examples [here](examples/) for reference.
 
 ## License
 
