@@ -1,26 +1,23 @@
-#   Copyright 2021 Invana
-#  #
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#  #
-#    http:www.apache.org/licenses/LICENSE-2.0
-#  #
-#    Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+#    Copyright 2021 Invana
 #
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#     http:www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
 from gremlin_connector import GremlinConnector
 
 
-def import_data():
-    client = GremlinConnector("ws://localhost:8182/gremlin")
-
-    # insta = client.execute_query("g.V().drop()", serialize=True)
+def import_data(client):
     user = client.vertex.get_or_create("User", properties={
-        "name": "Ravi",
+        "first_name": "Ravi",
+        "last_name": "Merugu",
         "username": "rrmerugu"
     })
     print(user)
@@ -47,10 +44,9 @@ def import_data():
     })
     print(engine_edge_instance)
 
-    vertices = client.vertex.read_many(has__id=invana_studio_instance.id)
-    print(vertices)
 
-    vertices = client.vertex.read_many(has__label="GithubProject")
+def run_queries(client):
+    vertices = client.vertex.read_many(has__label="User")
     print(vertices)
 
     vertices = client.vertex.read_many(has__label__within=["GithubProject", "User"])
@@ -63,4 +59,7 @@ def import_data():
     print(vertices)
 
 
-import_data()
+client = GremlinConnector("ws://localhost:8182/gremlin")
+import_data(client)
+run_queries(client)
+client.close_connection()

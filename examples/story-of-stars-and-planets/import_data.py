@@ -12,11 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from gremlin_connector import GremlinConnector
-from gremlin_connector.ogm.models import VertexModel, EdgeModel
-from gremlin_connector.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, \
-    BooleanProperty
+
 from sample_data import EDGES_SAMPLES, VERTICES_SAMPLES
+from models import Star, Planet, Satellite, HasPlanet, HasSatellite, HasNeighborPlanet
+from connection import gremlin_connector
 
 
 def import_data():
@@ -33,23 +32,29 @@ def import_data():
             if "mean_radius" in vertex['properties']:
                 vertex['properties']['mean_radius'] = float(vertex['properties']['mean_radius'])
             vtx_instance = Satellite.objects.create(**vertex['properties'])
-        print("====ver", vtx_instance)
+        print("====vertex", vtx_instance)
 
     for edge in EDGES_SAMPLES:
         from_vertex = None
         to_vertex = None
         if edge['from_vertex_filters']['has__label'] == "Star":
+            del edge['from_vertex_filters']['has__label']
             from_vertex = Star.objects.read_one(**edge['from_vertex_filters'])
         elif edge['from_vertex_filters']['has__label'] == "Planet":
+            del edge['from_vertex_filters']['has__label']
             from_vertex = Planet.objects.read_one(**edge['from_vertex_filters'])
         elif edge['from_vertex_filters']['has__label'] == "Satellite":
+            del edge['from_vertex_filters']['has__label']
             from_vertex = Satellite.objects.read_one(**edge['from_vertex_filters'])
 
         if edge['to_vertex_filters']['has__label'] == "Star":
+            del edge['to_vertex_filters']['has__label']
             to_vertex = Star.objects.read_one(**edge['to_vertex_filters'])
         elif edge['to_vertex_filters']['has__label'] == "Planet":
+            del edge['to_vertex_filters']['has__label']
             to_vertex = Planet.objects.read_one(**edge['to_vertex_filters'])
         elif edge['to_vertex_filters']['has__label'] == "Satellite":
+            del edge['to_vertex_filters']['has__label']
             to_vertex = Satellite.objects.read_one(**edge['to_vertex_filters'])
 
         if edge['label'] == "has_satellite":
@@ -73,58 +78,15 @@ def import_data():
         print("===edge_data", edge_data)
 
 
-gremlin_connector = GremlinConnector("ws://megamind-ws:8182/gremlin")
-gremlin_connector.vertex.delete_many(has__label__within=["Planet", "Satellite", "Star"])
+def flush_data():
+    Star.objects.delete_many()
+    Planet.objects.delete_many()
+    Satellite.objects.delete_many()
+    HasPlanet.objects.delete_many()
+    HasSatellite.objects.delete_many()
+    HasNeighborPlanet.objects.delete_many()
 
 
-class Star(VertexModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'name': StringProperty(),
-        'mass_in_kgs': FloatProperty(),
-        'radius_in_kms': IntegerProperty(),
-    }
-
-
-class Planet(VertexModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'name': StringProperty(),
-        'mass_in_kgs': FloatProperty(),
-        'radius_in_kms': IntegerProperty(),
-    }
-
-
-class Satellite(VertexModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'name': StringProperty(),
-        'mass_in_kgs': FloatProperty(allow_null=True),
-        'mean_radius': FloatProperty(allow_null=True),
-    }
-
-
-class HasPlanet(EdgeModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'distance_in_kms': IntegerProperty(),
-    }
-
-
-class HasSatellite(EdgeModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'distance_in_kms': IntegerProperty(),
-    }
-
-
-class HasNeighborPlanet(EdgeModel):
-    gremlin_connector = gremlin_connector
-    properties = {
-        'distance_in_kms': IntegerProperty(),
-    }
-
-
-# delete_data(_client)
+flush_data()
 import_data()
 gremlin_connector.close_connection()

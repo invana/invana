@@ -15,31 +15,17 @@
 from gremlin_connector import GremlinConnector
 
 
-# gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
-# gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin', read_only_mode=False)
-# raw_result = gremlin_connector.execute_query("g.V().limit(10).toList()")
-# value_map_result = gremlin_connector.execute_query("g.V().limit(10).valueMap(true).toList()")
-# value_map_result = gremlin_connector.execute_query("g.V().limit(10).valueMap('name').toList()")
-# element_map_result = gremlin_connector.execute_query("g.V().limit(10).elementMap('name').toList()")
-# print("value_map_result=====", value_map_result)
-# print("element_map_result=====", element_map_result)
-# for r in raw_result:
-#     print("======raw_result elem =====", type(r), r, r.__dict__)
-# for r in element_map_result:
-#     print("======element_map elem =====", type(r), r)
-# # for r in value_map_result:
-# #     print("======value_map elem =====", type(r), r, r.__dict__)
-#
-# print("++++++++")
-# nodes = gremlin_connector.g.V().valueMap('name').toList()
-# nodes = gremlin_connector.g.V().limit(1).toList()
-# nodes = gremlin_connector.g.addV("MyLabel").toList()
-# gremlin_connector.close_connection()
-# #
-# print("node id", nodes)
-# print("node", nodes[0])
-
 def test_execute_query():
     gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
     data = gremlin_connector.execute_query("g.V().count()")
+    gremlin_connector.close_connection()
+
+
+def test_execute_large_data_with_callback():
+    gremlin_connector = GremlinConnector('ws://megamind-ws:8182/gremlin')
+    gremlin_connector.execute_query_with_callback("g.V().limit(200).toList()",
+                                                  lambda res: print(res.__len__()),
+                                                  lambda: gremlin_connector.close_connection()
+                                                  )
+
     gremlin_connector.close_connection()
