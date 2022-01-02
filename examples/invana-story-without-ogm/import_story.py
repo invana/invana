@@ -23,13 +23,13 @@ def import_data(graph):
     print(user)
 
     invana_studio_instance = graph.vertex.get_or_create("GithubProject", properties={
-        "name": "invana_py-studio",
+        "name": "invana-studio",
         "description": "opensource graph visualiser for Invana graph analytics engine"
     })
     print(invana_studio_instance)
 
     invana_engine_instance = graph.vertex.get_or_create("GithubProject", properties={
-        "name": "invana_py-engine",
+        "name": "invana-engine",
         "description": "Invana graph analytics engine"
     })
     print(invana_engine_instance)

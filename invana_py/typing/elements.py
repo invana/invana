@@ -31,7 +31,9 @@ class PropertiesObject:
 class ElementBase:
     id = None
     label = None
-    properties = PropertiesObject()
+
+    def __init__(self, *args, **kwargs):
+        self.properties = PropertiesObject()
 
     def to_json(self):
         return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
@@ -40,6 +42,7 @@ class ElementBase:
 class Node(ElementBase):
 
     def __init__(self, _id, label, properties=None):
+        super(Node, self).__init__(_id, label, properties=properties)
         self.id = _id
         self.label = label
         if properties:
@@ -47,7 +50,7 @@ class Node(ElementBase):
                 setattr(self.properties, k, v)
 
     def __repr__(self):
-        return f'<Node id="{self.id}" label="{self.label}" {self.properties}>'
+        return f'<Node:{self.label} id="{self.id}" {self.properties}>'
 
     def to_json(self):
         return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
@@ -58,6 +61,7 @@ class RelationShip(ElementBase):
     outv = None
 
     def __init__(self, _id, label, outv, inv, properties=None):
+        super(RelationShip, self).__init__(_id, label, outv, inv, properties=properties)
         self.id = _id
         self.label = label
         self.inv = inv
@@ -67,6 +71,6 @@ class RelationShip(ElementBase):
                 setattr(self.properties, k, v)
 
     def __repr__(self):
-        return f'<RelationShip id="{self.id}" ' \
+        return f'<RelationShip:{self.label} id="{self.id}" ' \
                f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label}' \
                f' {self.properties}>'

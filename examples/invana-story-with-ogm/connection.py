@@ -14,6 +14,6 @@
 
 from invana_py import InvanaGraph
 
-# GREMLIN_SERVER_URL="ws://megamind-ws:8182/gremlin"
-GREMLIN_SERVER_URL = "ws://localhost:8182/gremlin"
+GREMLIN_SERVER_URL="ws://megamind-ws:8182/gremlin"
+# GREMLIN_SERVER_URL = "ws://localhost:8182/gremlin"
 graph = InvanaGraph(GREMLIN_SERVER_URL, traversal_source="g")

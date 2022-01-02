@@ -30,11 +30,11 @@ def import_data():
         description="Invana graph analytics engine"
     )
     print(invana_engine_instance)
-    gremlin_connector_instance = Project.objects.get_or_create(
-        name="gremlin-connector",
-        description="Async python API for gremlin supported graph databases"
+    invana_py_instance = Project.objects.get_or_create(
+        name="invana-py",
+        description="Python API for gremlin supported graph databases"
     )
-    print(gremlin_connector_instance)
+    print(invana_py_instance)
 
     studio_edge_instance = Authored.objects.get_or_create(user.id, invana_studio_instance.id, properties={
         "started": 2020
@@ -46,11 +46,11 @@ def import_data():
     })
     print(engine_edge_instance)
 
-    gremlin_connector_edge_instance = Authored.objects.get_or_create(user.id, gremlin_connector_instance.id,
-                                                                     properties={
-                                                                         "started": 2022
-                                                                     })
-    print(gremlin_connector_edge_instance)
+    invana_py_edge_instance = Authored.objects.get_or_create(user.id, invana_py_instance.id,
+                                                             properties={
+                                                                 "started": 2021
+                                                             })
+    print(invana_py_edge_instance)
 
 
 def flush_data():

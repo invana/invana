@@ -50,3 +50,14 @@ def test_read_many_with_pagination():
     assert type(data) is list
     assert data.__len__() <= 2
     graph.close_connection()
+
+
+def test_read_inv_edges():
+    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+    data = graph.vertex.read_inv_edges(vertex_query_kwargs={"has__label": "User"})
+    print("====data", data)
+    for d in data:
+        assert d.label == "Person"
+    assert type(data) is list
+    assert data.__len__() <= 2
+    graph.close_connection()

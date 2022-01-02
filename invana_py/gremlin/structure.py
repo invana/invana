@@ -25,8 +25,9 @@ class CRUDBase(abc.ABC):
     def __init__(self, graph):
         self.graph = graph
 
+    @staticmethod
     @abc.abstractmethod
-    def get_element_type(self):
+    def get_element_type():
         pass
 
     def filter_by_query_kwargs(self, element_type=None, g=None, **query_kwargs):
@@ -45,9 +46,68 @@ class CRUDBase(abc.ABC):
         return traversal.count().next()
 
 
-class VertexCRUD(CRUDBase):
+class VertexReadMixin(CRUDBase):
+    @staticmethod
+    def get_element_type():
+        return "V"
 
-    def get_element_type(self):
+    def read_ine(self, vertex_query_kwargs: dict, ine_kwargs: dict = None):
+        vtx_traversal = self.filter_by_query_kwargs(**vertex_query_kwargs).inE()
+        _ = self.filter_by_query_kwargs(g=vtx_traversal, **ine_kwargs or {})
+        result = _.elementMap().toList()
+        return result
+
+    def read_oute(self, vertex_query_kwargs: dict, oute_kwargs: dict = None):
+        vtx_traversal = self.filter_by_query_kwargs(**vertex_query_kwargs).outE()
+        _ = self.filter_by_query_kwargs(g=vtx_traversal, **oute_kwargs or {})
+        result = _.elementMap().toList()
+        return result
+
+    def read_bothe(self, vertex_query_kwargs: dict, bothe_kwargs: dict = None):
+        vtx_traversal = self.filter_by_query_kwargs(**vertex_query_kwargs).bothE()
+        _ = self.filter_by_query_kwargs(g=vtx_traversal, **bothe_kwargs or {})
+        result = _.elementMap().toList()
+        return result
+
+    def read_incoming_vertices(self,
+                               source_query_kwargs: dict,
+                               edge_kwargs: dict,
+                               target_query_kwargs: dict
+                               ):
+        source_traversal = self.filter_by_query_kwargs(**source_query_kwargs).inE()
+        edge_traversal = self.filter_by_query_kwargs(g=source_traversal, **edge_kwargs or {}).outV()
+        _ = self.filter_by_query_kwargs(g=edge_traversal, **target_query_kwargs or {})
+        result = _.elementMap().toList()
+        return result
+
+    def read_outgoing_vertices(self,
+                               source_query_kwargs: dict,
+                               edge_kwargs: dict,
+                               target_query_kwargs: dict
+                               ):
+        source_traversal = self.filter_by_query_kwargs(**source_query_kwargs).outE()
+        edge_traversal = self.filter_by_query_kwargs(g=source_traversal, **edge_kwargs or {}).inV()
+        _ = self.filter_by_query_kwargs(g=edge_traversal, **target_query_kwargs or {})
+        result = _.elementMap().toList()
+        return result
+
+    def read_incoming_and_outgoing_vertices(self,
+                                            source_query_kwargs: dict,
+                                            edge_kwargs: dict,
+                                            target_query_kwargs: dict):
+        incoming_vertices = self.read_incoming_vertices(source_query_kwargs=source_query_kwargs,
+                                                        edge_kwargs=edge_kwargs,
+                                                        target_query_kwargs=target_query_kwargs)
+        outgoing_vertices = self.read_outgoing_vertices(source_query_kwargs=source_query_kwargs,
+                                                        edge_kwargs=edge_kwargs,
+                                                        target_query_kwargs=target_query_kwargs)
+        return incoming_vertices + outgoing_vertices
+
+
+class VertexCRUD(VertexReadMixin, CRUDBase):
+
+    @staticmethod
+    def get_element_type():
         return "V"
 
     def create(self, label, properties=None):
@@ -102,7 +162,8 @@ class VertexCRUD(CRUDBase):
 
 class EdgeCRUD(CRUDBase):
 
-    def get_element_type(self):
+    @staticmethod
+    def get_element_type():
         return "E"
 
     def filter_e_by_query_kwargs(self, from_=None, to_=None, **query_kwargs):
