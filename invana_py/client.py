@@ -69,11 +69,11 @@ class InvanaGraph:
             self.strategies.append(ReadOnlyStrategy())
 
         self.connection_kwargs = connection_kwargs
-        self.connect()
+        # await self.connect()
         self.vertex = VertexCRUD(self)
         self.edge = EdgeCRUD(self)
 
-    def connect(self):
+    async def connect(self):
         self.update_connection_state(ConnectionStateTypes.CONNECTING)
         self.connection = DriverRemoteConnection(
             self.gremlin_url,
@@ -86,11 +86,11 @@ class InvanaGraph:
             self.g = self.g.withStrategies(*self.strategies)
         self.update_connection_state(ConnectionStateTypes.CONNECTED)
 
-    def reconnect(self):
+    async def reconnect(self):
         self.update_connection_state(ConnectionStateTypes.RECONNECTING)
-        self.connect()
+        await self.connect()
 
-    def close_connection(self) -> None:
+    async def close_connection(self) -> None:
         self.update_connection_state(ConnectionStateTypes.DISCONNECTING)
         self.connection.client.close()
         self.update_connection_state(ConnectionStateTypes.DISCONNECTED)
@@ -129,7 +129,7 @@ class InvanaGraph:
             query_string = query_string.replace("g.", strategy_prefix, 1)
         return query_string
 
-    def execute_query(self, query_string, timeout=None) -> any:
+    async def execute_query(self, query_string, timeout=None) -> any:
         query_string = self.get_query_with_strategies(query_string)
         logger.info("Executing query : {}".format(query_string))
         timeout = timeout if timeout else self.timeout
@@ -151,7 +151,7 @@ class InvanaGraph:
             raise Exception(f"Failed to execute query with reason: {error_reason} and error message {e.__str__()}")
         return result
 
-    def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
+    async def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
         query_string = self.get_query_with_strategies(query_string)
         logger.info("Executing query : {}".format(query_string))
         request_options = {"evaluationTimeout": timeout} if timeout else {}
