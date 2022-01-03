@@ -17,33 +17,35 @@ from gremlin_python.process.strategies import PartitionStrategy
 from invana_py import InvanaGraph
 from gremlin_python.process.traversal import T
 from gremlin_python.driver.protocol import GremlinServerError
+import os
+
+GREMLIN_SERVER_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://localhost:8182/gremlin")
 
 
-def test_client_with_readonly_strategy():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin', read_only_mode=True)
+@pytest.mark.asyncio
+async def test_graph_with_readonly_strategy():
+    graph = InvanaGraph(GREMLIN_SERVER_URL, read_only_mode=True)
+    await graph.connect()
     with pytest.raises(GremlinServerError) as execinfo:
-        graph.g.addV("Person").toList()
+        graph.g.addV("Person").next()
     assert execinfo.value.args[0] == "500: The provided traversal has a mutating step" \
-                                     " and thus is not read_large_data only: AddVertexStartStep({label=[Person]})"
-
-    graph.close_connection()
-
-
-def test_client():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
-    result = graph.execute_query("g.V().limit(1).toList()")
-    graph.close_connection()
+                                     " and thus is not read only: AddVertexStartStep({label=[Person]})"
+    await graph.close_connection()
 
 
-def test_client_with_partition_strategy():
+@pytest.mark.asyncio
+async def test_client(graph: InvanaGraph):
+    result = await graph.execute_query("g.V().limit(1).toList()")
+    assert isinstance(result, list)
+
+
+@pytest.mark.asyncio
+async def test_client_with_partition_strategy():
     partition_strategy = PartitionStrategy(partition_key="partition_key",
                                            # write_partition="a",
                                            read_partitions=["tenant_c", "tenant_b", "tenant_a"]
                                            )
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin', strategies=[partition_strategy])
+    graph = InvanaGraph(GREMLIN_SERVER_URL, strategies=[partition_strategy])
+    await graph.connect()
     nodes = graph.g.V().elementMap("name").limit(1).toList()
-    graph.close_connection()
-
-
-test_client()
-test_client_with_partition_strategy()
+    await graph.close_connection()

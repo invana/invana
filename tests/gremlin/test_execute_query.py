@@ -17,39 +17,21 @@ import pytest
 import asyncio
 import os
 
-GREMLIN_SERVER_URL = os.environ.get("GREMLIN_SERVER_URL")
-
-pytest_plugins = ('pytest_asyncio',)
-
-# @pytest.fixture(scope='session')
-# async def loop():
-#     return asyncio.get_event_loop()
-
 
 class TestInvanaGraph:
 
-    # @pytest.fixture
-    # async def graph(self):
-    #     from invana_py import InvanaGraph
-    #     graph = InvanaGraph(GREMLIN_SERVER_URL)
-    #     await graph.connect()
-    #     return graph
+    @pytest.mark.asyncio
+    async def test_execute_query(self, graph: InvanaGraph):
+        data = await graph.execute_query("g.V().count()")
+        assert type(data) is list
+        assert isinstance(data[0], int)
 
     @pytest.mark.asyncio
-    async def test_execute_query(self):
-        print("===test execute query")
-        from invana_py import InvanaGraph
-        graph = InvanaGraph(GREMLIN_SERVER_URL)
-        await graph.connect()
-        data = await graph.execute_query("g.V().count()")
-        print("======data", data)
-        await graph.close_connection()
+    async def test_execute_large_data_with_callback(self, graph: InvanaGraph):
+        def process_response(res):
+            assert isinstance(res.__len__(), int)
 
-    async def test_execute_large_data_with_callback(self):
-        graph = InvanaGraph('ws://localhost:8182/gremlin')
-        await graph.connect()
         await graph.execute_query_with_callback("g.V().limit(200).toList()",
-                                                lambda res: print(res.__len__()),
+                                                process_response,
                                                 lambda: graph.close_connection()
                                                 )
-        await graph.close_connection()

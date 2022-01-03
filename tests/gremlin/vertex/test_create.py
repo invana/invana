@@ -12,13 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from invana_py import InvanaGraph
 from tests.sample_data import VERTICES_SAMPLES
+from invana_py.typing.elements import Node
+import pytest
 
 
-def test_create():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+@pytest.mark.asyncio
+def test_vertex_create(graph):
     for vertex in VERTICES_SAMPLES:
         data = graph.vertex.create(**vertex)
         assert data is not None
-    graph.close_connection()
+        assert isinstance(data, Node)

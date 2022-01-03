@@ -18,7 +18,7 @@ VERTICES_SAMPLES = [
         "label": "Star",
         "properties": {
             "name": "Sun",
-            "mass_in_kgs": 1989000000000000000000000000000,
+            # "mass_in_kgs": 1989000000000000000000000000000,
             "radius_in_kms": 696340
         }
     },
@@ -26,7 +26,7 @@ VERTICES_SAMPLES = [
         "label": "Planet",
         "properties": {
             "name": "Earth",
-            "mass_in_kgs": 5972000000000000000000000,
+            # "mass_in_kgs": 5972000000000000000000000,
             "radius_in_kms": 6371
         }
     },
@@ -34,7 +34,7 @@ VERTICES_SAMPLES = [
         "label": "Planet",
         "properties": {
             "name": "Mars",
-            "mass_in_kgs": 641700000000000000000000,
+            # "mass_in_kgs": 641700000000000000000000,
             "radius_in_kms": 3396
         }
     },
@@ -42,7 +42,7 @@ VERTICES_SAMPLES = [
         "label": "Satellite",
         "properties": {
             "name": "Moon",
-            "mass_in_kgs": 73476730900000000000000
+            # "mass_in_kgs": 73476730900000000000000
         }
     },
     {

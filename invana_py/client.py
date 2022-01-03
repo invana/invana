@@ -46,13 +46,17 @@ class InvanaGraph:
     connection = None
     g = None
 
-    def __init__(self, gremlin_url,
+    def __init__(self,
+                 gremlin_url,
                  traversal_source='g',
                  strategies=None,
                  graph_backend=None,
                  read_only_mode=False,
                  timeout=None,
-                 auth=None, **connection_kwargs):
+                 loop=None,
+                 auth=None,
+                 transport_kwargs=None,
+                 **connection_kwargs):
         graph_backend = graph_backend.lower() if graph_backend else self.DEFAULT_GRAPH_BACKEND
         if graph_backend not in self.SUPPORTED_GRAPH_BACKENDS:
             raise InvalidGraphBackendError()
@@ -60,6 +64,7 @@ class InvanaGraph:
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
+        self.loop = loop
         self.timeout = timeout or DEFAULT_TIMEOUT
         if graph_backend == "janusgraph":
             self.schema = JanusGraphSchema(self)
@@ -69,6 +74,7 @@ class InvanaGraph:
             self.strategies.append(ReadOnlyStrategy())
 
         self.connection_kwargs = connection_kwargs
+        self.transport_kwargs = transport_kwargs or {"call_from_event_loop": True}
         # await self.connect()
         self.vertex = VertexCRUD(self)
         self.edge = EdgeCRUD(self)
@@ -79,7 +85,7 @@ class InvanaGraph:
             self.gremlin_url,
             traversal_source=self.traversal_source,
             graphson_reader=invana_graphson_reader,
-            **self.connection_kwargs
+            **self.transport_kwargs
         )
         self.g = traversal().withRemote(self.connection)
         if self.strategies.__len__() > 0:
