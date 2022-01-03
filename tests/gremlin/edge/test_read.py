@@ -14,19 +14,18 @@
 #
 from invana_py import InvanaGraph
 from tests.sample_data import EDGES_SAMPLES
+import pytest
 
 
-def test_read_one():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+@pytest.mark.asyncio
+async def test_read_one(graph):
     for edge in EDGES_SAMPLES:
-        data = graph.edge.read_one(**{"has__label": edge['label']})
+        data = await graph.edge.read_one(**{"has__label": edge['label']})
         assert data is not None
-    graph.close_connection()
 
 
-def test_read_many():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+@pytest.mark.asyncio
+async def test_read_many(graph):
     for edge in EDGES_SAMPLES:
-        data = graph.edge.read_many(**{"has__label": edge['label']})
+        data = await graph.edge.read_many(**{"has__label": edge['label']})
         assert data.__len__() > 0
-    graph.close_connection()

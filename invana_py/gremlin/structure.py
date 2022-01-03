@@ -37,7 +37,7 @@ class CRUDBase(abc.ABC):
             **query_kwargs
         )
 
-    def count(self, element_type=None, g=None, **query_kwargs):
+    async def count(self, element_type=None, g=None, **query_kwargs):
         traversal = self.graph.query_kwargs.process_query_kwargs(
             element_type=element_type or self.get_element_type(),
             g=g or self.graph.g,
@@ -152,53 +152,53 @@ class VertexCRUD(VertexReadMixin, CRUDBase):
     def get_element_type():
         return "V"
 
-    def create(self, label, properties=None):
+    async def create(self, label, properties=None):
         _ = self.graph.g.addV(label)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()
 
     # @calculate_time
-    def read_one(self, **query_kwargs) -> Vertex:
+    async def read_one(self, **query_kwargs) -> Vertex:
         _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
         # register_query_event(_.__str__())
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
-    def get_or_create(self, label, properties=None):
+    async def get_or_create(self, label, properties=None):
         properties = properties if properties else {}
         properties_kwargs = {}
         if label:
             properties_kwargs[f"has__label"] = label
         properties_kwargs.update({f"has__{k}": v for k, v in properties.items()})
-        result = self.read_one(**properties_kwargs)
+        result = await self.read_one(**properties_kwargs)
         if result:
             return result
-        return self.create(label, properties=properties)
+        return await self.create(label, properties=properties)
 
-    def read_many(self, **query_kwargs) -> list:
+    async def read_many(self, **query_kwargs) -> list:
         _ = self.filter_by_query_kwargs(**query_kwargs)
         # register_query_event(_.__str__())
         return _.elementMap().toList()
 
-    def update_one(self, query_kwargs=None, properties=None):
+    async def update_one(self, query_kwargs=None, properties=None):
         _ = self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
-    def update_many(self, query_kwargs=None, properties=None):
+    async def update_many(self, query_kwargs=None, properties=None):
         _ = self.filter_by_query_kwargs(**query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         result = _.elementMap().toList()
         return result
 
-    def delete_one(self, **query_kwargs):
+    async def delete_one(self, **query_kwargs):
         return self.filter_by_query_kwargs(pagination__limit=1, **query_kwargs).drop().iterate()
 
-    def delete_many(self, **query_kwargs):
+    async def delete_many(self, **query_kwargs):
         return self.filter_by_query_kwargs(**query_kwargs).drop().iterate()
 
 
@@ -223,49 +223,49 @@ class EdgeCRUD(CRUDBase):
             _ = self.filter_by_query_kwargs(**query_kwargs)
         return _
 
-    def create(self, label, from_, to_, properties=None):
+    async def create(self, label, from_, to_, properties=None):
         _ = self.graph.g.addE(label).from_(__.V(from_)).to(__.V(to_))
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         return _.next()
 
-    def read_one(self, from_=None, to_=None, **query_kwargs):
+    async def read_one(self, from_=None, to_=None, **query_kwargs):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
-    def get_or_create(self, label, from_, to_, properties=None):
+    async def get_or_create(self, label, from_, to_, properties=None):
         properties = properties if properties else {}
         query_kwargs = {}
         if label:
             query_kwargs[f"has__label"] = label
         query_kwargs.update({f"has__{k}": v for k, v in properties.items()})
-        result = self.read_one(from_=from_, to_=to_, **query_kwargs)
+        result = await self.read_one(from_=from_, to_=to_, **query_kwargs)
         if result:
             return result
-        return self.create(label, from_, to_, properties=properties)
+        return await self.create(label, from_, to_, properties=properties)
 
-    def read_many(self, from_=None, to_=None, **query_kwargs):
+    async def read_many(self, from_=None, to_=None, **query_kwargs):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs)
         result = _.elementMap().toList()
         return result
 
-    def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
+    async def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         result = _.elementMap().toList()
         return result[0] if result.__len__() > 0 else None
 
-    def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
+    async def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
         _ = self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs)
         for k, v in properties.items():
             _.property(Cardinality.single, k, v)
         result = _.elementMap().toList()
         return result
 
-    def delete_one(self, from_=None, to_=None, **query_kwargs):
+    async def delete_one(self, from_=None, to_=None, **query_kwargs):
         return self.filter_e_by_query_kwargs(from_=from_, to_=to_, pagination__limit=1, **query_kwargs).drop().iterate()
 
-    def delete_many(self, from_=None, to_=None, **query_kwargs):
+    async def delete_many(self, from_=None, to_=None, **query_kwargs):
         return self.filter_e_by_query_kwargs(from_=from_, to_=to_, **query_kwargs).drop().iterate()

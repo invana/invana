@@ -18,8 +18,8 @@ import pytest
 
 
 @pytest.mark.asyncio
-def test_edge_create(graph: InvanaGraph):
+async def test_edge_create(graph: InvanaGraph):
     for edge in EDGES_SAMPLES:
-        from_vtx = graph.vertex.read_one(**edge['from_vertex_filters'])
-        to_vtx = graph.vertex.read_one(**edge['to_vertex_filters'])
-        data = graph.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
+        from_vtx = await graph.vertex.read_one(**edge['from_vertex_filters'])
+        to_vtx = await graph.vertex.read_one(**edge['to_vertex_filters'])
+        data = await graph.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )

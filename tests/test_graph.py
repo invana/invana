@@ -15,7 +15,6 @@
 import pytest
 from gremlin_python.process.strategies import PartitionStrategy
 from invana_py import InvanaGraph
-from gremlin_python.process.traversal import T
 from gremlin_python.driver.protocol import GremlinServerError
 import os
 

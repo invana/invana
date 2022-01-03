@@ -18,8 +18,9 @@ import pytest
 
 
 @pytest.mark.asyncio
-def test_vertex_create(graph):
+async def test_vertex_create(graph):
     for vertex in VERTICES_SAMPLES:
-        data = graph.vertex.create(**vertex)
+        data = await graph.vertex.create(**vertex)
         assert data is not None
         assert isinstance(data, Node)
+#

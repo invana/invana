@@ -21,10 +21,10 @@ import pytest
 async def test_update_one(graph: InvanaGraph):
     ids = await graph.execute_query("g.V().limit(1).id().toList()")
     query_kwargs = {"has__id__within": ids}
-    data = graph.vertex.read_one(**query_kwargs)
+    data = await graph.vertex.read_one(**query_kwargs)
     old_name = data.properties.name
     new_name = f"Hello world - {uuid.uuid4().__str__()}"
-    data = graph.vertex.update_one(query_kwargs=query_kwargs,
-                                   properties={"name": new_name})
+    data = await  graph.vertex.update_one(query_kwargs=query_kwargs,
+                                          properties={"name": new_name})
     assert data.properties.name == new_name
     assert old_name != new_name

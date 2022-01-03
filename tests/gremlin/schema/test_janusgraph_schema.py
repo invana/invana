@@ -13,22 +13,20 @@
 #    limitations under the License.
 #
 from invana_py import InvanaGraph
+import pytest
 
 
-def test_janusgraph_schema_reader():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
-    schema_data = graph.schema.get_graph_schema()
-    graph.close_connection()
+@pytest.mark.asyncio
+async def test_janusgraph_schema_reader(graph: InvanaGraph):
+    schema_data = await graph.schema.get_graph_schema()
 
 
-def test_janusgraph_schema_vertex_reader():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
-    schema_data = graph.schema.get_vertex_schema("Star")
+@pytest.mark.asyncio
+async def test_janusgraph_schema_vertex_reader(graph: InvanaGraph):
+    schema_data = await graph.schema.get_vertex_schema("Star")
     assert schema_data.name == "Star"
-    graph.close_connection()
 
 
-def test_janusgraph_get_all_vertices_schema():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
-    schema_data = graph.schema.get_all_vertices_schema()
-    graph.close_connection()
+@pytest.mark.asyncio
+async def test_janusgraph_get_all_vertices_schema(graph: InvanaGraph):
+    schema_data = await graph.schema.get_all_vertices_schema()

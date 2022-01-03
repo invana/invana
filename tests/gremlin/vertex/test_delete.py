@@ -17,10 +17,10 @@ from invana_py import InvanaGraph
 
 
 @pytest.mark.asyncio
-def test_delete_one(graph: InvanaGraph):
-    old_data = graph.vertex.read_one(has__label="User")
+async def test_delete_one(graph: InvanaGraph):
+    old_data = await graph.vertex.read_one(has__label="User")
     # delete data
-    graph.vertex.delete_one(has__id=old_data.id)
+    await graph.vertex.delete_one(has__id=old_data.id)
     # validate if the data is deleted
-    data = graph.vertex.read_one(has__id=old_data.id)
+    data = await  graph.vertex.read_one(has__id=old_data.id)
     assert data is None

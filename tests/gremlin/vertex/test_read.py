@@ -19,22 +19,22 @@ from invana_py import InvanaGraph
 
 @pytest.mark.asyncio
 async def test_read_one_vertex(graph: InvanaGraph):
-    old_data = graph.vertex.read_one(has__label="User")
+    old_data = await graph.vertex.read_one(has__label="User")
     # print("\nold_data====", old_data)
     assert old_data.label == "User"
     assert type(old_data) is not list
-    data = graph.vertex.read_one(has__id=old_data.id)
+    data = await graph.vertex.read_one(has__id=old_data.id)
     assert data.id == old_data.id
 
 
 @pytest.mark.asyncio
 async def test_read_many_vertex(graph: InvanaGraph):
-    data = graph.vertex.read_many(has__label="User")
+    data = await graph.vertex.read_many(has__label="User")
     for d in data:
         assert d.label == "User"
     assert type(data) is list
     selected_ids = await graph.execute_query("g.V().hasLabel('User').id().toList()")
-    data = graph.vertex.read_many(has__id__within=selected_ids)
+    data = await  graph.vertex.read_many(has__id__within=selected_ids)
     assert type(data) is list
     assert data.__len__() > 0
     for d in data:
@@ -43,7 +43,7 @@ async def test_read_many_vertex(graph: InvanaGraph):
 
 @pytest.mark.asyncio
 async def test_read_many_with_pagination(graph: InvanaGraph):
-    data = graph.vertex.read_many(has__label="User", pagination__limit=2)
+    data = await graph.vertex.read_many(has__label="User", pagination__limit=2)
     for d in data:
         assert d.label == "User"
     assert type(data) is list
