@@ -25,22 +25,26 @@
 #     limitations under the License.
 from invana_py import InvanaGraph
 import logging
+import time
+import asyncio
 
 logging.getLogger('asyncio').setLevel(logging.INFO)
 logging.basicConfig(filename='run.log', level=logging.DEBUG)
 
 
-total_count = 1000
-import time
+async def main():
+    total_count = 10000
+    start = time.time()
+    graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    await graph.connect()
+    for i in range(0, total_count):
+        result = await graph.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
+        print(f"result {i}/{total_count} :: {result}")
+    await graph.close_connection()
+    end = time.time()
+    elapsed_time = end - start
 
-start = time.time()
-client = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    print(f"elapsed_time {elapsed_time}")
 
-for i in range(0, total_count):
-    result = client.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
-    print(f"result {i}/{total_count} :: {result}")
-client.close_connection()
-end = time.time()
-elapsed_time = end - start
 
-print(f"elapsed_time {elapsed_time}")
+asyncio.run(main())
