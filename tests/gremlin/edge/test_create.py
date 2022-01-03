@@ -13,14 +13,13 @@
 #    limitations under the License.
 #
 from invana_py import InvanaGraph
-from gremlin_python.process.traversal import T
 from tests.sample_data import EDGES_SAMPLES
+import pytest
 
 
-def test_create():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
+@pytest.mark.asyncio
+def test_edge_create(graph: InvanaGraph):
     for edge in EDGES_SAMPLES:
         from_vtx = graph.vertex.read_one(**edge['from_vertex_filters'])
         to_vtx = graph.vertex.read_one(**edge['to_vertex_filters'])
         data = graph.edge.create(edge['label'], from_vtx.id, to_vtx.id, properties=edge['properties'], )
-    graph.close_connection()

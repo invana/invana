@@ -14,17 +14,17 @@
 #
 from invana_py import InvanaGraph
 import uuid
+import pytest
 
 
-def test_update_one():
-    graph = InvanaGraph('ws://megamind-ws:8182/gremlin')
-    query_kwargs = {"has__id": 16576}
+@pytest.mark.asyncio
+async def test_update_one(graph: InvanaGraph):
+    ids = await graph.execute_query("g.V().limit(1).id().toList()")
+    query_kwargs = {"has__id__within": ids}
     data = graph.vertex.read_one(**query_kwargs)
-    # print("====data", data, data.properties.name)
     old_name = data.properties.name
     new_name = f"Hello world - {uuid.uuid4().__str__()}"
     data = graph.vertex.update_one(query_kwargs=query_kwargs,
-                                            properties={"name": new_name})
+                                   properties={"name": new_name})
     assert data.properties.name == new_name
     assert old_name != new_name
-    graph.close_connection()
