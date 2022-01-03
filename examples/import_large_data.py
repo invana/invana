@@ -33,13 +33,23 @@ logging.basicConfig(filename='run.log', level=logging.DEBUG)
 
 
 async def main():
-    total_count = 10000
+    total_count = 1000
     start = time.time()
     graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
     await graph.connect()
-    for i in range(0, total_count):
-        result = await graph.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
-        print(f"result {i}/{total_count} :: {result}")
+    batch = []
+    batch_size = 10
+    for i in range(1, total_count):
+        print(f"result {i}/{total_count} ")
+        if batch.__len__() == batch_size:
+            result = await asyncio.gather(*batch)
+            print("result", result)
+            batch = []
+        else:
+            batch.append(graph.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i}))
+    if batch.__len__() > 0:
+        result = await asyncio.gather(*batch)
+        print("result", result)
     await graph.close_connection()
     end = time.time()
     elapsed_time = end - start
@@ -47,4 +57,21 @@ async def main():
     print(f"elapsed_time {elapsed_time}")
 
 
-asyncio.run(main())
+async def main2():
+    total_count = 1000
+    start = time.time()
+    graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    await graph.connect()
+    for i in range(1, total_count):
+        vtx = await graph.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
+        print(f"result {i}/{total_count} ", vtx)
+
+    await graph.close_connection()
+    end = time.time()
+    elapsed_time = end - start
+
+    print(f"elapsed_time {elapsed_time}")
+
+
+# asyncio.run(main())
+asyncio.run(main2())
