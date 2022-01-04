@@ -2,9 +2,8 @@
 
 Python API for Apache TinkerPop's Gremlin supported databases.
 
-- [Installation](#installation)
-- [Supported graph databases](#supported-graph-databases)
 - [Features](#features)
+- [Installation](#installation)
 - [Usage](#usage)
     - [Performing CRUD on Graph](#performing-crud-on-graph)
         - [Using OGM](#using-ogm)
@@ -19,19 +18,8 @@ Python API for Apache TinkerPop's Gremlin supported databases.
         - [count using OGM](#count-using-ogm)
         - [count without using OGM](#count-without-using-ogm)
 - [Examples](#examples)
+- [Supported graph databases](#supported-graph-databases)
 - [License](#license)
-
-## Installation
-
-```shell
-pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
-```
-
-## Supported graph databases
-
-- [JanusGraph](https://janusgraph.org/)
-
-[comment]: <> (- [DataStax Enterprise]&#40;https://www.datastax.com/products/datastax-enterprise&#41;)
 
 ## Features
 
@@ -39,7 +27,8 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 
 [comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
 
-- Run your gremlin queries.
+- Asynchronous Python API.
+- Execute gremlin queries.
 - JSON response
 - CRUD operations on vertices and edges with properties.
 - Read one or many vertices and edges.
@@ -71,6 +60,15 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
     - has__name__notContaining="son"
     - pagination__limit=10
     - pagination__range=[0, 10]
+
+
+## Installation
+
+```shell
+pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
+```
+
+
 
 ## Usage
 
@@ -248,6 +246,12 @@ result = graph.vertex.count(has__label__within=["Project", "Person"])
 ## Examples
 
 Checkout examples [here](examples/) for reference.
+
+## Supported graph databases
+
+- [JanusGraph](https://janusgraph.org/)
+
+[comment]: <> (- [DataStax Enterprise]&#40;https://www.datastax.com/products/datastax-enterprise&#41;)
 
 ## License
 

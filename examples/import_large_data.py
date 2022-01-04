@@ -60,7 +60,7 @@ async def main():
 async def main2():
     total_count = 10000
     start = time.time()
-    graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    graph = InvanaGraph("ws://localhost:8182/gremlin", traversal_source="g")
     await graph.connect()
     for i in range(1, total_count):
         vtx = await graph.vertex.create("TestLabel", properties={"name": f"name - {i}", "count": i})
