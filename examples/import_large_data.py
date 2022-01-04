@@ -58,7 +58,7 @@ async def main():
 
 
 async def main2():
-    total_count = 1000
+    total_count = 10000
     start = time.time()
     graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
     await graph.connect()
@@ -73,5 +73,5 @@ async def main2():
     print(f"elapsed_time {elapsed_time}")
 
 
-# asyncio.run(main())
+#asyncio.run(main())
 asyncio.run(main2())
