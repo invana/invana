@@ -1,7 +1,5 @@
 from gremlin_python.driver.protocol import GremlinServerError
-
 from invana_py.utils import create_uuid, get_elapsed_time, get_datetime
-from datetime import datetime
 from .constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
 from .events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
     RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent
@@ -47,7 +45,7 @@ class QueryRequest(RequestBase):
                 error_reason = QueryResponseErrorReasonTypes.INVALID_QUERY
                 ResponseReceivedButFailedEvent(self, exception.status_code, exception)
 
-    def respose_received_successully(self, status_code):
+    def response_received_successfully(self, status_code):
         self.status = RequestStateTypes.RESPONSE_RECEIVED
         self.update_last_updated_at()
         ResponseReceivedSuccessfullyEvent(self, status_code)

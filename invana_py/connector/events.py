@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
-from invana_py.graph.constants import RequestStateTypes, GremlinServerErrorStatusCodes
-# from invana_py.graph.request import QueryRequest
+from invana_py.connector.constants import RequestStateTypes, GremlinServerErrorStatusCodes
+# from invana_py.connector.request import QueryRequest
 from invana_py.utils import create_uuid, get_datetime, get_elapsed_time
 import logging
 from dataclasses import dataclass, field
@@ -48,10 +48,6 @@ class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
     state = RequestStateTypes.FINISHED
     is_success = True
 
-    def __init__(self, request):
-        super(RequestFinishedSuccessfullyEvent, self).__init__(request)
-        self.log_event()
-
     def log_event(self):
         logger.debug(
             f"Request {self.request.request_id} {self.state} successfully "
@@ -93,8 +89,8 @@ class ResponseReceivedSuccessfullyEvent(ResponseEventBase, ABC):
 
     def log_event(self):
         logger.debug(
-            f"Request {self.request.request_id} {self.state} successfully "
-            f"at {self.created_at}; took {self.elapsed_time_ms}")
+            f"Request {self.request.request_id} {self.state} successfully with status code: "
+            f"{self.status_code} at {self.created_at}; took {self.elapsed_time_ms}")
 
 
 class ResponseReceivedButFailedEvent(ResponseEventBase, ABC):

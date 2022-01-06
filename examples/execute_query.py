@@ -11,7 +11,7 @@ async def main():
     await graph.connect()
     graph.g.V().toList()
     data = await graph.execute_query("g.V().limit(1).count()")
-    # data =  graph.vertex.read_many()
+    # data =  connector.vertex.read_many()
     print("======data", data)
     await graph.close_connection()
 

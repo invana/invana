@@ -1,4 +1,4 @@
-from invana_py.graph.connector import GremlinConnector
+from invana_py.connector.connector import GremlinConnector
 import pytest
 import logging
 

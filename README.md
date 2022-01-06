@@ -129,13 +129,13 @@ user = graph.vertex.get_or_create("Person", properties={
 
 invana_studio_instance = graph.vertex.get_or_create("Project", properties={
     "name": "invana-studio",
-    "description": "opensource graph visualiser for Invana graph analytics engine"
+    "description": "opensource connector visualiser for Invana connector analytics engine"
 })
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource graph visualiser for Invana graph analytics engine/>
+# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource connector visualiser for Invana connector analytics engine/>
 
 invana_engine_instance = graph.vertex.get_or_create("Project", properties={
     "name": "invana_py-engine",
-    "description": "Invana graph analytics engine"
+    "description": "Invana connector analytics engine"
 })
 
 edge_instance = graph.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={

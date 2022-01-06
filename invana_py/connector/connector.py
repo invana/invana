@@ -1,12 +1,13 @@
+from aiohttp import ServerDisconnectedError
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-# from invana_py.graph.events import QueryResponseReceivedSuccessfullyEvent, QueryFinishedEvent, \
+# from invana_py.connector.events import QueryResponseReceivedSuccessfullyEvent, QueryFinishedEvent, \
 #     QueryResponseReceivedWithErrorEvent, QueryEvent, QueryResponseErrorReasonTypes
-from invana_py.graph.request import QueryRequest
+from invana_py.connector.request import QueryRequest
 from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
-from invana_py.graph.utils import read_from_result_set_with_callback
+from invana_py.connector.utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ class GremlinConnector:
                  read_only_mode: bool = False,
                  graphson_reader=None,
                  timeout: int = None,
+                 call_from_event_loop=True,
                  auth=None, **transport_kwargs):
         """
 
@@ -52,11 +54,15 @@ class GremlinConnector:
         self.graphson_reader = graphson_reader
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
+        if call_from_event_loop:
+            transport_kwargs['call_from_event_loop'] = call_from_event_loop
         self.transport_kwargs = transport_kwargs
+
         self.connect()
 
     def connect(self):
         self.update_connection_state(ConnectionStateTypes.CONNECTING)
+        print("self.transport_kwargs", self.transport_kwargs)
         self.connection = DriverRemoteConnection(
             self.gremlin_url,
             traversal_source=self.traversal_source,
@@ -79,7 +85,7 @@ class GremlinConnector:
 
     def update_connection_state(self, new_state):
         self.CONNECTION_STATE = new_state
-        logger.debug(f"graph connector state updated to : {self.CONNECTION_STATE}")
+        logger.debug(f"GraphConnector state updated to : {self.CONNECTION_STATE}")
 
     def get_strategies_object_to_string(self) -> str:
         graph_strategies_str = "g.withStrategies("
@@ -99,29 +105,40 @@ class GremlinConnector:
         return query_string
 
     @staticmethod
-    def process_error_exception( exception: GremlinServerError):
+    def process_error_exception(exception: GremlinServerError):
         gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}")
         return exception.status_code, gremlin_server_error
 
-    def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False) -> any:
+    def _execute_query(self, query: str,
+                       timeout: int = None,
+                       callback=None,
+                       finished_callback=None,
+                       raise_exception: bool = False) -> any:
         """
 
         :param query:
         :param timeout:
+        :param callback:
+        :param finished_callback:
         :param raise_exception: When set to False, no exception will be raised.
         :return:
         """
+
         query_string = self.get_query_with_strategies(query)
-        logger.info("Executing query : {}".format(query_string))
         timeout = timeout if timeout else self.timeout
         request_options = {"evaluationTimeout": timeout}
         request = QueryRequest(query)
-        result = None
         try:
-            result = self.connection.client.submitAsync(
-                query_string, request_options=request_options).result().all().result()
-            request.respose_received_successully(200)
-            request.finished_with_success()
+            result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
+
+            if callback:
+                read_from_result_set_with_callback(result_set, callback, request, finished_callback=finished_callback)
+            else:
+                response = read_from_result_set_with_out_callback(result_set, request)
+                if finished_callback:
+                    finished_callback()
+
+                return response
         except GremlinServerError as e:
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
@@ -129,19 +146,39 @@ class GremlinConnector:
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
                                 f" and error message {e.__str__()}")
+        except ServerDisconnectedError as e :
+            # request.response_received_but_failed(e)
+            # request.finished_with_failure(e)
+            if raise_exception is True:
+                raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
         except Exception as e:
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
-        return result
 
-    def execute_query_with_callback(self, query_string, callback, finished_callback=None, timeout=None, ) -> any:
-        query_string = self.get_query_with_strategies(query_string)
-        logger.info("Executing query : {}".format(query_string))
-        request_options = {"evaluationTimeout": timeout} if timeout else {}
-        result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
-        read_from_result_set_with_callback(result_set, callback, finished_callback)
+    def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
+                      finished_callback=None) -> any:
+        """
+
+        :param query:
+        :param timeout:
+        :param raise_exception: When set to False, no exception will be raised.
+        :param finished_callback:
+        :return:
+        """
+        return self._execute_query(query, timeout=timeout, raise_exception=raise_exception,
+                                   finished_callback=finished_callback)
+
+    def execute_query_with_callback(self, query: str, callback, timeout=None,
+                                    raise_exception: bool = False, finished_callback=None) -> None:
+        # query_string = self.get_query_with_strategies(query)
+        # logger.info("Executing query : {}".format(query_string))
+        # request_options = {"evaluationTimeout": timeout} if timeout else {}
+        # result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
+        # read_from_result_set_with_callback(result_set, callback, finished_callback)
+        self._execute_query(query, callback=callback, timeout=timeout,
+                            raise_exception=raise_exception, finished_callback=finished_callback)
 
 
 if __name__ == "__main__":

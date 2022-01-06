@@ -22,18 +22,18 @@ async def import_data():
 
     invana_studio_instance = await Project.objects.get_or_create(
         name="invana-studio",
-        description="opensource graph visualiser for Invana graph analytics engine"
+        description="opensource connector visualiser for Invana connector analytics engine"
     )
     print(invana_studio_instance)
 
     invana_engine_instance = await  Project.objects.get_or_create(
         name="invana-engine",
-        description="Invana graph analytics engine"
+        description="Invana connector analytics engine"
     )
     print(invana_engine_instance)
     invana_py_instance = await Project.objects.get_or_create(
         name="invana-py",
-        description="Python API for gremlin supported graph databases"
+        description="Python API for gremlin supported connector databases"
     )
     print(invana_py_instance)
 
@@ -53,7 +53,7 @@ async def import_data():
                                                                     })
     print(invana_py_edge_instance)
 
-    topic_instance = await  Topic.objects.get_or_create(name="graph-database")
+    topic_instance = await  Topic.objects.get_or_create(name="connector-database")
     print(topic_instance)
     likes_instance = await  Likes.objects.get_or_create(user.id, topic_instance.id)
     print(likes_instance)
