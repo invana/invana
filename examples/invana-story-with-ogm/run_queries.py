@@ -14,24 +14,34 @@
 
 from models import User, Project, Authored
 from connection import graph
+import asyncio
 
 
-def run_queries():
-    vertices = Project.objects.read_many(has__name__containing="engine")
+async def run_queries():
+    vertices = await Project.objects.read_many(has__name__containing="engine")
     print("vertices", vertices)
 
-    vertices = Authored.objects.read_many()
+    vertices = await Authored.objects.read_many()
     print("vertices", vertices)
 
-    vertices = User.objects.read_many()
+    vertices = await User.objects.read_many()
     print("vertices", vertices)
 
-    stats = User.objects.get_out_edge_labels_stats()
-    print("User get_out_edge_labels_stats", stats)
+    # stats = await User.objects.get_out_edge_labels_stats()
+    # print("User get_out_edge_labels_stats", stats)
+    #
+    # stats = await User.objects.get_in_edge_labels_stats()
+    # print("User get_in_edge_labels_stats", stats)
 
-    stats = User.objects.get_in_edge_labels_stats()
-    print("User get_in_edge_labels_stats", stats)
+
+async def close_connection():
+    await graph.close_connection()
 
 
-run_queries()
-graph.close_connection()
+async def connect():
+    await graph.connect()
+
+
+asyncio.run(connect())
+asyncio.run(run_queries())
+asyncio.run(close_connection())

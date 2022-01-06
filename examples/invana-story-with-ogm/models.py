@@ -21,6 +21,7 @@ from connection import graph
 
 class User(VertexModel):
     graph = graph
+    display_property = "first_name"
     properties = {
         'first_name': StringProperty(min_length=2),
         'last_name': StringProperty(allow_null=True, min_length=2),
@@ -30,6 +31,7 @@ class User(VertexModel):
 
 class Topic(VertexModel):
     graph = graph
+    display_property = "name"
     properties = {
         'name': StringProperty(min_length=2)
     }

@@ -76,12 +76,13 @@ class QuerySetBase:
                 if hasattr(element.properties, k):
                     _ = self.get_validated_data(k, getattr(element.properties, k), self.model)
                     setattr(element.properties, k, _)
+            setattr(element, "display_property", self.model.display_property)
         return element
 
-    def count(self, **query_kwargs):
+    async def count(self, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        return self.crud.count(**query_kwargs)
+        return await self.crud.count(**query_kwargs)
 
 
 class VertexQuerySet(QuerySetBase):
@@ -92,59 +93,59 @@ class VertexQuerySet(QuerySetBase):
         self.crud = self.crud_cls(self.graph)
         self.model = model
 
-    def create(self, **kwargs):
+    async def create(self, **kwargs):
         validated_data = self.validate_for_create(**kwargs)
         result = self.crud.create(self.model.label_name, properties=validated_data)
-        return self.serialize_to_datatypes(result)
+        return await self.serialize_to_datatypes(result)
 
-    def get_or_create(self, **properties):
+    async def get_or_create(self, **properties):
         result = self.crud.get_or_create(self.model.label_name, properties=properties)
-        return self.serialize_to_datatypes(result)
+        return await self.serialize_to_datatypes(result)
 
-    def read_one(self, **query_kwargs):
+    async def read_one(self, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
         result = self.crud.read_one(**query_kwargs)
-        return self.serialize_to_datatypes(result)
+        return await self.serialize_to_datatypes(result)
 
-    def read_many(self, **query_kwargs):
+    async def read_many(self, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_many(**query_kwargs)
+        result = await self.crud.read_many(**query_kwargs)
         return [self.serialize_to_datatypes(res) for res in result]
 
-    def update_one(self, query_kwargs=None, properties=None):
+    async def update_one(self, query_kwargs=None, properties=None):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
         validated_data = self.validate_for_update(**properties)
-        result = self.crud.update_one(query_kwargs=query_kwargs, properties=validated_data)
-        return self.serialize_to_datatypes(result)
+        result = await self.crud.update_one(query_kwargs=query_kwargs, properties=validated_data)
+        return await self.serialize_to_datatypes(result)
 
-    def update_many(self, query_kwargs=None, properties=None):
+    async def update_many(self, query_kwargs=None, properties=None):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
         validated_data = self.validate_for_update(**properties)
-        result = self.crud.update_many(query_kwargs=query_kwargs, properties=validated_data)
+        result = await self.crud.update_many(query_kwargs=query_kwargs, properties=validated_data)
         return [self.serialize_to_datatypes(res) for res in result]
 
-    def delete_one(self, **query_kwargs):
+    async def delete_one(self, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_one(**query_kwargs)
+        return await self.crud.delete_one(**query_kwargs)
 
-    def delete_many(self, **query_kwargs):
+    async def delete_many(self, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_many(**query_kwargs)
+        return await self.crud.delete_many(**query_kwargs)
 
-    def read_incoming_vertices(self,
-                               source_query_kwargs: dict,
-                               edge_kwargs: dict,
-                               target_query_kwargs: dict
-                               ):
+    async def read_incoming_vertices(self,
+                                     source_query_kwargs: dict,
+                                     edge_kwargs: dict,
+                                     target_query_kwargs: dict
+                                     ):
         dont_allow_has_label_kwargs(**source_query_kwargs)
         source_query_kwargs['has__label'] = self.model.label_name
-        return self.crud.read_incoming_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
+        return await self.crud.read_incoming_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
 
     def read_outgoing_vertices(self,
                                source_query_kwargs: dict,
@@ -185,48 +186,48 @@ class EdgeQuerySet(QuerySetBase):
         self.crud = self.crud_cls(self.graph)
         self.model = model
 
-    def create(self, from_, to_, properties=None):
+    async def create(self, from_, to_, properties=None):
         properties = {} if properties is None else properties
         validated_data = self.validate_for_create(**properties)
-        result = self.crud.create(self.model.label_name, from_, to_, properties=validated_data)
+        result = await self.crud.create(self.model.label_name, from_, to_, properties=validated_data)
+        return await self.serialize_to_datatypes(result)
+
+    async def get_or_create(self, from_, to_, properties=None):
+        result = await self.crud.get_or_create(self.model.label_name, from_, to_, properties=properties)
         return self.serialize_to_datatypes(result)
 
-    def get_or_create(self, from_, to_, properties=None):
-        result = self.crud.get_or_create(self.model.label_name, from_, to_, properties=properties)
-        return self.serialize_to_datatypes(result)
-
-    def read_one(self, from_=None, to_=None, **query_kwargs):
+    async def read_one(self, from_=None, to_=None, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_one(from_=from_, to_=to_, **query_kwargs)
+        result = await self.crud.read_one(from_=from_, to_=to_, **query_kwargs)
         return self.serialize_to_datatypes(result)
 
-    def read_many(self, from_=None, to_=None, **query_kwargs):
+    async def read_many(self, from_=None, to_=None, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_many(from_=from_, to_=to_, **query_kwargs)
+        result = await self.crud.read_many(from_=from_, to_=to_, **query_kwargs)
         return [self.serialize_to_datatypes(res) for res in result]
 
-    def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
+    async def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
         dont_allow_has_label_kwargs(**query_kwargs)
         validated_data = self.validate_for_update(**properties)
         query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.update_one(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
+        result = await self.crud.update_one(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
         return self.serialize_to_datatypes(result)
 
-    def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
+    async def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
         dont_allow_has_label_kwargs(**query_kwargs)
         validated_data = self.validate_for_update(**properties)
         query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.update_many(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
+        result = await self.crud.update_many(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
         return [self.serialize_to_datatypes(res) for res in result]
 
-    def delete_one(self, from_=None, to_=None, **query_kwargs):
+    async def delete_one(self, from_=None, to_=None, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        return self.crud.update_many(from_=from_, to_=to_, **query_kwargs)
+        return await self.crud.update_many(from_=from_, to_=to_, **query_kwargs)
 
-    def delete_many(self, from_=None, to_=None, **query_kwargs):
+    async def delete_many(self, from_=None, to_=None, **query_kwargs):
         dont_allow_has_label_kwargs(**query_kwargs)
         query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_many(from_=from_, to_=to_, **query_kwargs)
+        return await self.crud.delete_many(from_=from_, to_=to_, **query_kwargs)

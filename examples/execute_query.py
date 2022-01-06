@@ -9,6 +9,7 @@ async def main():
     print("===test execute query")
     graph = InvanaGraph(GREMLIN_SERVER_URL)
     await graph.connect()
+    graph.g.V().toList()
     data = await graph.execute_query("g.V().limit(1).count()")
     # data =  graph.vertex.read_many()
     print("======data", data)

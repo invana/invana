@@ -28,6 +28,11 @@ class ModelMetaBase(type):
         model_base_cls = bases[0]
         if "name" not in attrs:
             attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
+        if "display_property" in attrs and attrs.get("display_property"):
+            if attrs.get("display_property") not in list(attrs["properties"].keys()):
+                raise AttributeError(f"display_property: {attrs['display_property']} not defined in the properties of {attrs['label_name']}")
+
+
         model_class = super_new(mcs, name, bases, attrs)
         model_class.objects = model_base_cls.objects(attrs['graph'], model_class)
         return model_class
@@ -41,6 +46,7 @@ class VertexModel(metaclass=ModelMetaBase):
     objects = VertexQuerySet
     graph = None
     label_name = None
+    display_property = None
 
     @classmethod
     def get_schema(cls):
@@ -51,6 +57,7 @@ class EdgeModel(metaclass=ModelMetaBase):
     objects = EdgeQuerySet
     graph = None
     label_name = None
+    display_property = None
 
     @classmethod
     def get_schema(cls):

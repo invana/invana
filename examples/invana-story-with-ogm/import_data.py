@@ -13,58 +13,67 @@
 #     limitations under the License.
 from models import User, Project, Authored, Topic, Likes
 from connection import graph
+import asyncio
 
 
-def import_data():
-    user = User.objects.get_or_create(first_name="Ravi", last_name="Merugu", username="rrmerugu")
+async def import_data():
+    user = await  User.objects.get_or_create(first_name="Ravi", last_name="Merugu", username="rrmerugu")
     print(user)
 
-    invana_studio_instance = Project.objects.get_or_create(
+    invana_studio_instance = await Project.objects.get_or_create(
         name="invana-studio",
         description="opensource graph visualiser for Invana graph analytics engine"
     )
     print(invana_studio_instance)
 
-    invana_engine_instance = Project.objects.get_or_create(
+    invana_engine_instance = await  Project.objects.get_or_create(
         name="invana-engine",
         description="Invana graph analytics engine"
     )
     print(invana_engine_instance)
-    invana_py_instance = Project.objects.get_or_create(
+    invana_py_instance = await Project.objects.get_or_create(
         name="invana-py",
         description="Python API for gremlin supported graph databases"
     )
     print(invana_py_instance)
 
-    studio_edge_instance = Authored.objects.get_or_create(user.id, invana_studio_instance.id, properties={
+    studio_edge_instance = await  Authored.objects.get_or_create(user.id, invana_studio_instance.id, properties={
         "started": 2020
     })
     print(studio_edge_instance)
 
-    engine_edge_instance = Authored.objects.get_or_create(user.id, invana_engine_instance.id, properties={
+    engine_edge_instance = await  Authored.objects.get_or_create(user.id, invana_engine_instance.id, properties={
         "started": 2020
     })
     print(engine_edge_instance)
 
-    invana_py_edge_instance = Authored.objects.get_or_create(user.id, invana_py_instance.id,
-                                                             properties={
-                                                                 "started": 2021
-                                                             })
+    invana_py_edge_instance = await  Authored.objects.get_or_create(user.id, invana_py_instance.id,
+                                                                    properties={
+                                                                        "started": 2021
+                                                                    })
     print(invana_py_edge_instance)
 
-    topic_instance = Topic.objects.get_or_create(name="graph-database")
+    topic_instance = await  Topic.objects.get_or_create(name="graph-database")
     print(topic_instance)
-    likes_instance = Likes.objects.get_or_create(user.id, topic_instance.id)
+    likes_instance = await  Likes.objects.get_or_create(user.id, topic_instance.id)
     print(likes_instance)
 
 
-def flush_data():
-    Project.objects.delete_many()
-    User.objects.delete_many()
-    Authored.objects.delete_many()
+async def flush_data():
+    await Project.objects.delete_many()
+    await User.objects.delete_many()
+    await Authored.objects.delete_many()
 
 
-flush_data()
-import_data()
+async def close_connection():
+    await graph.close_connection()
 
-graph.close_connection()
+
+async def connect():
+    await graph.connect()
+
+
+asyncio.run(connect())
+asyncio.run(flush_data())
+asyncio.run(import_data())
+asyncio.run(close_connection())
