@@ -4,38 +4,19 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
-    - [Performing CRUD on Graph](#performing-crud-on-graph)
-        - [Using OGM](#using-ogm)
-        - [Without using OGM](#without-using-ogm)
-    - [Performing raw queries](#performing-raw-queries)
-        - [using execute_query method](#using-execute_query-method)
-        - [using execute_query_with_callback method](#using-execute_query_with_callback-method)
-    - [Search usage (for read, delete, update)](#search-usage-for-read-delete-update)
-        - [for read_many, read_one, delete_many, delete_one](#for-read_many-read_one-delete_many-delete_one)
-        - [for update_many, update_one](#for-update_many-update_one)
-    - [Perform count queries](#perform-count-queries)
-        - [count using OGM](#count-using-ogm)
-        - [count without using OGM](#count-without-using-ogm)
 - [Examples](#examples)
 - [Supported graph databases](#supported-graph-databases)
 - [License](#license)
 
 ## Features
 
-[comment]: <> (- Vertex based queries methods `read_inedges`, `read_incoming_vertices_with_inedges`,)
-
-[comment]: <> (  `read_outgoing_vertices_with_inedges`, `read_bothv_with_outedges`.)
-
-- Asynchronous Python API.
-- Execute gremlin queries.
-- JSON response
-- CRUD operations on vertices and edges with properties.
-- Read one or many vertices and edges.
-- Update properties of on or many vertices and edges.
-- Delete one or many vertices and edges.
-- Supports querying with pagination.
-- Perform search using filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
+- Synchronous and Asynchronous Python API.
+- Object Mapper - Models, PropertyTypes, and Form validation
+- Execute gremlin queries
+- Built in QuerySets for performing standard CRUD operations on graph.
+- Query caching support
+- Utilities for logging queries and performance.
+- Django-ORM like search, perform search using filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
   Following filter keyword patterns are supported with `read_many`, `read_one`, `delete_many`,
   `delete_one`, `update_many`,`update_one`
     - has__id=1021
@@ -60,15 +41,13 @@ Python API for Apache TinkerPop's Gremlin supported databases.
     - has__name__notContaining="son"
     - pagination__limit=10
     - pagination__range=[0, 10]
-
+ 
 
 ## Installation
 
 ```shell
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ```
-
-
 
 ## Usage
 
@@ -86,32 +65,32 @@ graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
 class Project(VertexModel):
-  graph = graph
-  properties = {
-    'name': StringProperty(max_length=10, trim_whitespaces=True),
-    'description': StringProperty(allow_null=True, min_length=10),
-    'rating': FloatProperty(allow_null=True),
-    'is_active': BooleanProperty(default=True),
-    'created_at': DateTimeProperty(default=lambda: datetime.now())
-  }
+    graph = graph
+    properties = {
+        'name': StringProperty(max_length=10, trim_whitespaces=True),
+        'description': StringProperty(allow_null=True, min_length=10),
+        'rating': FloatProperty(allow_null=True),
+        'is_active': BooleanProperty(default=True),
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+    }
 
 
 class Person(VertexModel):
-  graph = graph
-  properties = {
-    'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-    'last_name': StringProperty(allow_null=True),
-    'username': StringProperty(default="rrmerugu"),
-    'member_since': IntegerProperty(),
+    graph = graph
+    properties = {
+        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
+        'last_name': StringProperty(allow_null=True),
+        'username': StringProperty(default="rrmerugu"),
+        'member_since': IntegerProperty(),
 
-  }
+    }
 
 
 class Authored(EdgeModel):
-  graph = graph
-  properties = {
-    'created_at': DateTimeProperty(default=lambda: datetime.now())
-  }
+    graph = graph
+    properties = {
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+    }
 
 
 Project.objects.delete_many()
@@ -188,9 +167,9 @@ from invana_py import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 graph.execute_query_with_callback("g.V().limit(1).next()",
-                                              lambda res: print(res.__len__()),
-                                              finished_callback=lambda: graph.close_connection(),
-                                              timeout=180)
+                                  lambda res: print(res.__len__()),
+                                  finished_callback=lambda: graph.close_connection(),
+                                  timeout=180)
 graph.close_connection()
 
 ```
@@ -230,18 +209,18 @@ person = Person.objects.update_one(query_kwargs={"has__first_name__containing": 
 ### Perform count queries
 
 #### count using OGM
+
 ```python
 result = Person.objects.count()
 result = Person.objects.count(has__name__containing="engine")
 ```
 
 #### count without using OGM
+
 ```python
 result = graph.vertex.count(has__label="Project", has__name__containing="engine")
 result = graph.vertex.count(has__label__within=["Project", "Person"])
 ```
-
-
 
 ## Examples
 
