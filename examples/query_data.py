@@ -20,10 +20,10 @@ connection.execute_query_with_callback(f"g.V().limit({response.data[0]}).toList(
                                        finished_callback=lambda: connection.close_connection()
                                        )
 
-# connection.execute_query_with_callback("g.V().limit(1000).toList()", callback,
-#                                        # finished_callback=lambda: connection.close_connection()
-#                                        )
-#
+connection.execute_query_with_callback("g.V().limit(1000).toList()", callback,
+                                       # finished_callback=lambda: connection.close_connection()
+                                       )
+
 # connection.execute_query_with_callback("g.V().limit(1000).toList()", callback,
 #                                        # finished_callback=lambda: connection.close_connection()
 #                                        )
