@@ -1,4 +1,4 @@
-from aiohttp import ServerDisconnectedError
+from aiohttp import ServerDisconnectedError, ClientConnectorError
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
@@ -62,7 +62,6 @@ class GremlinConnector:
 
     def connect(self):
         self.update_connection_state(ConnectionStateTypes.CONNECTING)
-        print("self.transport_kwargs", self.transport_kwargs)
         self.connection = DriverRemoteConnection(
             self.gremlin_url,
             traversal_source=self.traversal_source,
@@ -137,7 +136,6 @@ class GremlinConnector:
                 response = read_from_result_set_with_out_callback(result_set, request)
                 if finished_callback:
                     finished_callback()
-
                 return response
         except GremlinServerError as e:
             request.response_received_but_failed(e)
@@ -146,9 +144,19 @@ class GremlinConnector:
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
                                 f" and error message {e.__str__()}")
-        except ServerDisconnectedError as e :
-            # request.response_received_but_failed(e)
-            # request.finished_with_failure(e)
+        except ServerDisconnectedError as e:
+            request.server_disconnected_error(e)
+            request.finished_with_failure(e)
+            if raise_exception is True:
+                raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
+        except RuntimeError as e:
+            request.runtime_error(e)
+            request.finished_with_failure(e)
+            if raise_exception is True:
+                raise RuntimeError(f"Failed to execute {request} with error message {e.__str__()}")
+        except ClientConnectorError as e:
+            request.client_connection_error(e)
+            request.finished_with_failure(e)
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
         except Exception as e:
@@ -170,19 +178,7 @@ class GremlinConnector:
         return self._execute_query(query, timeout=timeout, raise_exception=raise_exception,
                                    finished_callback=finished_callback)
 
-    def execute_query_with_callback(self, query: str, callback, timeout=None,
-                                    raise_exception: bool = False, finished_callback=None) -> None:
-        # query_string = self.get_query_with_strategies(query)
-        # logger.info("Executing query : {}".format(query_string))
-        # request_options = {"evaluationTimeout": timeout} if timeout else {}
-        # result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
-        # read_from_result_set_with_callback(result_set, callback, finished_callback)
+    def execute_query_with_callback(self, query: str, callback, timeout=None, raise_exception: bool = False,
+                                    finished_callback=None) -> None:
         self._execute_query(query, callback=callback, timeout=timeout,
                             raise_exception=raise_exception, finished_callback=finished_callback)
-
-
-if __name__ == "__main__":
-    connection = GremlinConnector("ws://megamind-ws:8182/gremlin")
-    result = connection.execute_query("g.V().limit(1).ctoList()")
-    connection.close_connection()
-    print("result", result)

@@ -2,7 +2,8 @@ from gremlin_python.driver.protocol import GremlinServerError
 from invana_py.utils import create_uuid, get_elapsed_time, get_datetime
 from .constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
 from .events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
-    RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent
+    RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent, ServerDisconnectedErrorEvent, \
+    RunTimeErrorEvent, ClientConnectorErrorEvent
 
 
 class RequestBase:
@@ -17,7 +18,7 @@ class RequestBase:
 
 
 class QueryRequest(RequestBase):
-    status = None
+    state = None
     status_last_updated_at = None
 
     def __init__(self, query: str, request_options: dict = None):
@@ -30,12 +31,12 @@ class QueryRequest(RequestBase):
         self.status_last_updated_at = get_datetime()
 
     def started(self):
-        self.status = RequestStateTypes.STARTED
+        self.state = RequestStateTypes.STARTED
         self.update_last_updated_at()
         RequestStartedEvent(self)
 
     def response_received_but_failed(self, exception: GremlinServerError):
-        self.status = RequestStateTypes.RESPONSE_RECEIVED
+        self.state = RequestStateTypes.RESPONSE_RECEIVED
         self.update_last_updated_at()
         if getattr(exception, "status_code"):
             error_reason = None
@@ -46,18 +47,31 @@ class QueryRequest(RequestBase):
                 ResponseReceivedButFailedEvent(self, exception.status_code, exception)
 
     def response_received_successfully(self, status_code):
-        self.status = RequestStateTypes.RESPONSE_RECEIVED
+        self.state = RequestStateTypes.RESPONSE_RECEIVED
         self.update_last_updated_at()
         ResponseReceivedSuccessfullyEvent(self, status_code)
 
     def finished_with_failure(self, exception: GremlinServerError):
-        self.status = RequestStateTypes.FINISHED
+        self.state = RequestStateTypes.FINISHED
         self.update_last_updated_at()
         RequestFinishedButFailedEvent(self, exception)
 
     def finished_with_success(self):
-        self.status = RequestStateTypes.FINISHED
+        self.state = RequestStateTypes.FINISHED
         self.update_last_updated_at()
         RequestFinishedSuccessfullyEvent(self)
 
-        pass
+    def server_disconnected_error(self, e):
+        self.state = RequestStateTypes.SERVER_DISCONNECTED
+        self.update_last_updated_at()
+        ServerDisconnectedErrorEvent(self, e)
+
+    def runtime_error(self, e):
+        self.state = RequestStateTypes.RUNTIME_ERROR
+        self.update_last_updated_at()
+        RunTimeErrorEvent(self, e)
+
+    def client_connection_error(self, e):
+        self.state = RequestStateTypes.CLIENT_CONNECTION_ERROR
+        self.update_last_updated_at()
+        ClientConnectorErrorEvent(self, e)

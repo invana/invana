@@ -1,6 +1,6 @@
 import abc
 from abc import ABC
-from invana_py.connector.constants import RequestStateTypes, GremlinServerErrorStatusCodes
+from invana_py.connector.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseStatusTypes
 # from invana_py.connector.request import QueryRequest
 from invana_py.utils import create_uuid, get_datetime, get_elapsed_time
 import logging
@@ -40,13 +40,13 @@ class RequestStartedEvent(QueryRequestBase, ABC):
     def log_event(self):
         logger.debug(
             f"Request {self.request.request_id} {self.state} with "
-            f"query: f{self.request.query};; "
+            f"query: {self.request.query};; "
             f"request_options: {self.request.request_options};; at {self.created_at}")
 
 
 class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
     state = RequestStateTypes.FINISHED
-    is_success = True
+    status = QueryResponseStatusTypes.SUCCESS
 
     def log_event(self):
         logger.debug(
@@ -56,12 +56,14 @@ class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
 
 class RequestFinishedButFailedEvent(QueryRequestBase, ABC):
     state = RequestStateTypes.FINISHED
-    is_success = False
+    status = QueryResponseStatusTypes.FAILED
 
     def __init__(self, request, exception):
         super(RequestFinishedButFailedEvent, self).__init__(request)
-        self.status_code = exception.status_code
-        self.gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}")
+
+        self.status_code = exception.status_code if hasattr(exception, "status_code") else None
+        self.gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}") if \
+            hasattr(exception, "status_code") else None
         self.log_event()
 
     def log_event(self):
@@ -73,7 +75,7 @@ class RequestFinishedButFailedEvent(QueryRequestBase, ABC):
 
 class ResponseEventBase(QueryRequestBase, ABC):
     state = RequestStateTypes.RESPONSE_RECEIVED
-    is_success = None
+    status = None
 
     def __init__(self, request, status_code: int):
         super(ResponseEventBase, self).__init__(request)
@@ -81,7 +83,7 @@ class ResponseEventBase(QueryRequestBase, ABC):
 
 
 class ResponseReceivedSuccessfullyEvent(ResponseEventBase, ABC):
-    is_success = True
+    status = QueryResponseStatusTypes.SUCCESS
 
     def __init__(self, request, status_code: int):
         super(ResponseReceivedSuccessfullyEvent, self).__init__(request, status_code)
@@ -89,12 +91,12 @@ class ResponseReceivedSuccessfullyEvent(ResponseEventBase, ABC):
 
     def log_event(self):
         logger.debug(
-            f"Request {self.request.request_id} {self.state} successfully with status code: "
+            f"Request {self.request.request_id} {self.state}:{self.status} with status code: "
             f"{self.status_code} at {self.created_at}; took {self.elapsed_time_ms}")
 
 
 class ResponseReceivedButFailedEvent(ResponseEventBase, ABC):
-    is_success = False
+    status = QueryResponseStatusTypes.FAILED
     error_message = None
 
     def __init__(self, request, status_code, exception):
@@ -104,8 +106,53 @@ class ResponseReceivedButFailedEvent(ResponseEventBase, ABC):
 
     def log_event(self):
         logger.debug(
-            f"Request {self.request.request_id} {self.state} with error {self.error_message} "
+            f"Request {self.request.request_id} {self.state}:{self.status} with error {self.error_message} "
             f"at {self.created_at}; took {self.elapsed_time_ms}")
+
+
+class ServerDisconnectedErrorEvent(QueryRequestBase, ABC):
+    state = RequestStateTypes.SERVER_DISCONNECTED
+    error_message = None
+
+    def __init__(self, request, exception):
+        super(ServerDisconnectedErrorEvent, self).__init__(request)
+        self.error_message = exception.__str__()
+        self.log_event()
+
+    def log_event(self):
+        logger.debug(
+            f"Request {self.request.request_id} {self.state} with error {self.error_message} "
+            f"at {self.created_at}")
+
+
+class RunTimeErrorEvent(QueryRequestBase, ABC):
+    state = RequestStateTypes.RUNTIME_ERROR
+    error_message = None
+
+    def __init__(self, request, exception):
+        super(RunTimeErrorEvent, self).__init__(request)
+        self.error_message = exception.__str__()
+        self.log_event()
+
+    def log_event(self):
+        logger.debug(
+            f"Request {self.request.request_id} {self.state} with error {self.error_message} "
+            f"at {self.created_at}")
+
+
+class ClientConnectorErrorEvent(QueryRequestBase, ABC):
+    state = RequestStateTypes.CLIENT_CONNECTION_ERROR
+    error_message = None
+
+    def __init__(self, request, exception):
+        super(ClientConnectorErrorEvent, self).__init__(request)
+        self.error_message = exception.__str__()
+        self.log_event()
+
+    def log_event(self):
+        logger.debug(
+            f"Request {self.request.request_id} {self.state} with error {self.error_message} "
+            f"at {self.created_at}")
 
 # class QueryRequestBase:
 #     event_id = None

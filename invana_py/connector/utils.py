@@ -11,9 +11,8 @@ def read_from_result_set_with_callback(result_set, callback, request, finished_c
         else:
             while not result_set.stream.empty():
                 single_result = result_set.stream.get_nowait()
-                # print("==single_result", single_result)
-                callback(Response(request.request_id, single_result, 204))
-                request.response_received_successfully(204)
+                callback(Response(request.request_id, single_result, 206))
+                request.response_received_successfully(206)
             request.finished_with_success()
 
     result_set.done.add_done_callback(cb)

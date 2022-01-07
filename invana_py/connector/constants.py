@@ -2,6 +2,9 @@ class RequestStateTypes:
     STARTED = "STARTED"
     RESPONSE_RECEIVED = "RESPONSE_RECEIVED"  # this status can be many for async execution
     FINISHED = "FINISHED"
+    SERVER_DISCONNECTED = "SERVER_DISCONNECTED"
+    RUNTIME_ERROR = "RUNTIME_ERROR"
+    CLIENT_CONNECTION_ERROR = "CLIENT_CONNECTION_ERROR"
 
     @classmethod
     def get_allowed_types(cls):
