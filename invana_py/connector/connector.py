@@ -29,22 +29,24 @@ class GremlinConnector:
                  traversal_source: str = 'g',
                  strategies=None,
                  read_only_mode: bool = False,
-                 # graphson_reader=None,
                  timeout: int = DEFAULT_TIMEOUT,
                  call_from_event_loop=True,
                  deserializer_map=None,
-                 auth=None, **transport_kwargs):
+                 auth=None,
+                 **transport_kwargs):
         """
 
         :param gremlin_url:
         :param traversal_source:
         :param strategies:
         :param read_only_mode:
-        :param graphson_reader:
         :param timeout: in milliseconds
+        :param call_from_event_loop:
+        :param deserializer_map:
         :param auth:
         :param transport_kwargs:
         """
+
         self.CONNECTION_STATE = None
         self.connection = None
         self.g = None
@@ -60,8 +62,6 @@ class GremlinConnector:
         self.transport_kwargs = transport_kwargs
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.deserializer_map = INVANA_DESERIALIZER_MAP
-        self.graphson_reader = None
-
         self.connect()
 
     def connect(self):
@@ -90,7 +90,7 @@ class GremlinConnector:
         self.CONNECTION_STATE = new_state
         logger.debug(f"GraphConnector state updated to : {self.CONNECTION_STATE}")
 
-    def get_strategies_object_to_string(self) -> str:
+    def convert_strategies_object_to_string(self) -> str:
         graph_strategies_str = "g.withStrategies("
         for strategy in self.strategies:
             strategy_kwargs = ""
@@ -101,9 +101,9 @@ class GremlinConnector:
         graph_strategies_str += ")."
         return graph_strategies_str
 
-    def get_query_with_strategies(self, query_string):
+    def add_strategies_to_query(self, query_string):
         if self.strategies.__len__() > 0:
-            strategy_prefix = self.get_strategies_object_to_string()
+            strategy_prefix = self.convert_strategies_object_to_string()
             query_string = query_string.replace("g.", strategy_prefix, 1)
         return query_string
 
@@ -127,7 +127,7 @@ class GremlinConnector:
         :return:
         """
 
-        query_string = self.get_query_with_strategies(query)
+        query_string = self.add_strategies_to_query(query)
         timeout = timeout if timeout else self.timeout
         request_options = {"evaluationTimeout": timeout}
         request = QueryRequest(query)
@@ -144,7 +144,7 @@ class GremlinConnector:
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
             status_code, gremlin_server_error = self.process_error_exception(e)
-            e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}" \
+            e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
                       f" and error message {e.__str__()}"]
             if raise_exception is True:
                 raise e
