@@ -8,7 +8,6 @@ from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
-
 import logging
 
 logger = logging.getLogger(__name__)
