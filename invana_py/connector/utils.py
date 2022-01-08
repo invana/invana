@@ -40,3 +40,12 @@ def read_from_result_set_with_out_callback(result_set, request):
 
     result_set.done.add_done_callback(cb)
     return future.result()
+
+
+def get_id(_id):
+    if isinstance(_id, dict):
+        if isinstance(_id.get('@value'), dict) and _id.get("@value").get('relationId'):
+            return _id.get('@value').get('relationId')
+        else:
+            return _id.get('@value')
+    return _id

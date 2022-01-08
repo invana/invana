@@ -3,11 +3,12 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-# from invana_py.connector.events import QueryResponseReceivedSuccessfullyEvent, QueryFinishedEvent, \
-#     QueryResponseReceivedWithErrorEvent, QueryEvent, QueryResponseErrorReasonTypes
-from invana_py.connector.request import QueryRequest
+from .request import QueryRequest
 from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
-from invana_py.connector.utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
+from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
+from ..serializer.reader import INVANA_DESERIALIZER_MAP
+from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,17 +24,15 @@ class DriverRemoteConnection(_DriverRemoteConnection):
 
 
 class GremlinConnector:
-    CONNECTION_STATE = None
-    connection = None
-    g = None
 
     def __init__(self, gremlin_url: str,
                  traversal_source: str = 'g',
                  strategies=None,
                  read_only_mode: bool = False,
-                 graphson_reader=None,
-                 timeout: int = None,
+                 # graphson_reader=None,
+                 timeout: int = DEFAULT_TIMEOUT,
                  call_from_event_loop=True,
+                 deserializer_map=None,
                  auth=None, **transport_kwargs):
         """
 
@@ -46,17 +45,22 @@ class GremlinConnector:
         :param auth:
         :param transport_kwargs:
         """
+        self.CONNECTION_STATE = None
+        self.connection = None
+        self.g = None
         self.gremlin_url = gremlin_url
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
-        self.timeout = timeout or DEFAULT_TIMEOUT
-        self.graphson_reader = graphson_reader
+        self.timeout = timeout
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
         if call_from_event_loop:
             transport_kwargs['call_from_event_loop'] = call_from_event_loop
         self.transport_kwargs = transport_kwargs
+        INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
+        self.deserializer_map = INVANA_DESERIALIZER_MAP
+        self.graphson_reader = None
 
         self.connect()
 
@@ -65,7 +69,7 @@ class GremlinConnector:
         self.connection = DriverRemoteConnection(
             self.gremlin_url,
             traversal_source=self.traversal_source,
-            graphson_reader=self.graphson_reader,
+            graphson_reader=GraphSONReader(deserializer_map=self.deserializer_map),
             **self.transport_kwargs
         )
         self.g = traversal().withRemote(self.connection)

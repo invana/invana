@@ -1,11 +1,11 @@
 from invana_py.connector.connector import GremlinConnector
 
-gremlin_url = "ws://megamiwnd-ws:8182/gremlin"
+gremlin_url = "ws://megamind-ws:8182/gremlin"
 connection = GremlinConnector(gremlin_url)
 # connection.close()
-response = connection.execute_query("g.V().count().next()", raise_exception=True)
-# # response = connection.execute_query("g.V().limit(100).toList()")
-print("response", response)
+# response = connection.execute_query("g.V().count().next()")
+response = connection.execute_query("g.V().limit(1).toList()")
+print("response", response.data, type(response.data[0]))
 #
 
 # print("response", response.data.__len__())

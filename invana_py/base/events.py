@@ -1,4 +1,0 @@
-
-
-class EventBase:
-    pass
