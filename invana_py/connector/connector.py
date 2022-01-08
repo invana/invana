@@ -77,7 +77,7 @@ class GremlinConnector:
         self.update_connection_state(ConnectionStateTypes.RECONNECTING)
         self.connect()
 
-    def close_connection(self) -> None:
+    def close(self) -> None:
         self.update_connection_state(ConnectionStateTypes.DISCONNECTING)
         self.connection.client.close()
         self.update_connection_state(ConnectionStateTypes.DISCONNECTED)
@@ -129,7 +129,6 @@ class GremlinConnector:
         request = QueryRequest(query)
         try:
             result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
-
             if callback:
                 read_from_result_set_with_callback(result_set, callback, request, finished_callback=finished_callback)
             else:
@@ -141,29 +140,33 @@ class GremlinConnector:
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
             status_code, gremlin_server_error = self.process_error_exception(e)
+            e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}" \
+                      f" and error message {e.__str__()}"]
             if raise_exception is True:
-                raise Exception(f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
-                                f" and error message {e.__str__()}")
+                raise e
         except ServerDisconnectedError as e:
             request.server_disconnected_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
         except RuntimeError as e:
+            e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.runtime_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
-                raise RuntimeError(f"Failed to execute {request} with error message {e.__str__()}")
+                raise e
         except ClientConnectorError as e:
+            e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.client_connection_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
-                raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
+                raise e
         except Exception as e:
+            e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
             if raise_exception is True:
-                raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
+                raise e
 
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
                       finished_callback=None) -> any:

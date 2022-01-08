@@ -21,6 +21,9 @@ class QueryRequest(RequestBase):
     state = None
     status_last_updated_at = None
 
+    def __repr__(self):
+        return f"<QueryRequest {self.request_id}>"
+
     def __init__(self, query: str, request_options: dict = None):
         super(QueryRequest, self).__init__()
         self.query = query

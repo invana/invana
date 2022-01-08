@@ -8,14 +8,14 @@ def gremlin_url() -> str:
 
 
 @pytest.fixture(scope="function")
-async def connection(gremlin_url):
+def connection(gremlin_url):
     from invana_py.connector.connector import GremlinConnector
     connection = GremlinConnector(gremlin_url)
     # await connector.connect()
     # await initial_data(connector)
     yield connection
     # connector.vertex.delete_many()
-    connection.close_connection()
+    connection.close()
 
 #
 # async def initial_data(connector):

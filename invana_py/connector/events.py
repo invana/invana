@@ -48,6 +48,10 @@ class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
     state = RequestStateTypes.FINISHED
     status = QueryResponseStatusTypes.SUCCESS
 
+    def __init__(self, request):
+        super(RequestFinishedSuccessfullyEvent, self).__init__(request)
+        self.log_event()
+
     def log_event(self):
         logger.debug(
             f"Request {self.request.request_id} {self.state} successfully "
