@@ -5,7 +5,7 @@ from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
 from .request import QueryRequest
 from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
-from .traversal import InvanaTraversalSource
+from invana_py.traversal.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
