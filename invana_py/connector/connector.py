@@ -5,6 +5,7 @@ from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
 from .request import QueryRequest
 from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
+from .traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
@@ -29,6 +30,7 @@ class GremlinConnector:
                  strategies=None,
                  read_only_mode: bool = False,
                  timeout: int = DEFAULT_TIMEOUT,
+                 graph_traversal_source_cls=InvanaTraversalSource,
                  call_from_event_loop=True,
                  deserializer_map=None,
                  auth=None,
@@ -40,6 +42,7 @@ class GremlinConnector:
         :param strategies:
         :param read_only_mode:
         :param timeout: in milliseconds
+        :param graph_traversal_source_cls:
         :param call_from_event_loop:
         :param deserializer_map:
         :param auth:
@@ -53,6 +56,7 @@ class GremlinConnector:
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
+        self.graph_traversal_source_cls = graph_traversal_source_cls
         self.timeout = timeout
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
@@ -71,7 +75,7 @@ class GremlinConnector:
             graphson_reader=GraphSONReader(deserializer_map=self.deserializer_map),
             **self.transport_kwargs
         )
-        self.g = traversal().withRemote(self.connection)
+        self.g = traversal(self.graph_traversal_source_cls).withRemote(self.connection)
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
         self.update_connection_state(ConnectionStateTypes.CONNECTED)

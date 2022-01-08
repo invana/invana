@@ -5,6 +5,8 @@ connection = GremlinConnector(gremlin_url)
 # connection.close()
 # response = connection.execute_query("g.V().count().next()")
 response = connection.execute_query("g.V().limit(1).toList()")
+
+response = connection.g.V().search().toList()
 print("response", response.data, type(response.data[0]))
 #
 
