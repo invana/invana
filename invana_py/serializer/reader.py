@@ -21,7 +21,7 @@ from invana_py.serializer.structure import RelationShip, Node
 class InvanaMapType(graphsonV3d0.MapType):
 
     @staticmethod
-    def create_node(dict_data):
+    def create_node_object(dict_data):
         _ = dict_data.copy()
         node_id = get_id(_[T.id])
         node_label = _[T.label]
@@ -30,7 +30,7 @@ class InvanaMapType(graphsonV3d0.MapType):
         return Node(node_id, node_label, properties=_)
 
     @staticmethod
-    def create_edge(dict_data):
+    def create_relationship_object(dict_data):
         _ = dict_data.copy()
         node_id = get_id(_[T.id])
         node_label = _[T.label]
@@ -46,9 +46,9 @@ class InvanaMapType(graphsonV3d0.MapType):
     def objectify(cls, l, reader):
         new_dict = super(InvanaMapType, cls).objectify(l, reader)
         if T.id in new_dict and Direction.IN not in new_dict:
-            return cls.create_node(new_dict)
+            return cls.create_node_object(new_dict)
         if T.id in new_dict and Direction.IN in new_dict:
-            return cls.create_edge(new_dict)
+            return cls.create_relationship_object(new_dict)
         return new_dict
 
 

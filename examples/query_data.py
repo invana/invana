@@ -4,10 +4,10 @@ gremlin_url = "ws://megamind-ws:8182/gremlin"
 connection = GremlinConnector(gremlin_url)
 # connection.close()
 # response = connection.execute_query("g.V().count().next()")
-response = connection.execute_query("g.V().limit(1).toList()")
+response = connection.execute_query("g.V().limit(200).elementMap().toList()")
 
-response = connection.g.V().search().toList()
-print("response", response.data, type(response.data[0]))
+# response = connection.g.V().search().toList()
+print("response", response.data.__len__(), response.data, )
 #
 
 # print("response", response.data.__len__())
