@@ -29,11 +29,10 @@ class GremlinConnector:
                  traversal_source: str = 'g',
                  strategies=None,
                  read_only_mode: bool = False,
-                 timeout: int = DEFAULT_TIMEOUT,
+                 timeout: int = None,
                  graph_traversal_source_cls=None,
                  call_from_event_loop=True,
                  deserializer_map=None,
-                 auth=None,
                  **transport_kwargs):
         """
 
@@ -45,7 +44,6 @@ class GremlinConnector:
         :param graph_traversal_source_cls:
         :param call_from_event_loop:
         :param deserializer_map:
-        :param auth:
         :param transport_kwargs:
         """
 
@@ -55,10 +53,9 @@ class GremlinConnector:
         self.gremlin_url = gremlin_url
         self.traversal_source = traversal_source
         self.strategies = strategies or []
-        self.auth = auth
-        self.graph_traversal_source_cls = graph_traversal_source_cls if graph_traversal_source_cls \
-            else InvanaTraversalSource
-        self.timeout = timeout
+        self.graph_traversal_source_cls = InvanaTraversalSource if graph_traversal_source_cls is None \
+            else graph_traversal_source_cls
+        self.timeout = DEFAULT_TIMEOUT if timeout is None else timeout
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
         if call_from_event_loop:
@@ -132,7 +129,7 @@ class GremlinConnector:
         """
 
         query_string = self.add_strategies_to_query(query)
-        timeout = timeout if timeout else self.timeout
+        timeout = self.timeout if timeout is None else timeout
         request_options = {"evaluationTimeout": timeout}
         request = QueryRequest(query)
         try:

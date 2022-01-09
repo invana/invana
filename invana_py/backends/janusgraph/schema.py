@@ -25,30 +25,22 @@ class JanusGraphSchemaReader(SchemaReaderBase):
 
     def _get_graph_schema_overview(self):
         # TODO - can add more information from the print schema data like indexes etc to current output
-        # responses = self.connector.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
-        responses = self.connector.execute_query("g.V().limit(1).toList()")
-        print("responses",responses)
-        return process_graph_schema_string(responses[0])
+        response = self.connector.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
+        return process_graph_schema_string(response.data[0])
 
-    def _get_vertex_property_keys(self, label):
-        try:
-            return self.connector.execute_query(
-                "g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-            ) or []
-        except Exception as e:
-            logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
-                label=label, error=e.__str__()))
-        return []
+    def get_vertex_property_keys(self, label):
+        response = self.connector.execute_query(
+            f"g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();",
+            raise_exception=False
+        )
+        return response.data
 
-    def _get_edge_property_keys(self, label):
-        try:
-            return self.connector.execute_query(
-                "g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();".format(label=label)
-            ) or []
-        except Exception as e:
-            logger.debug("Failed to get vertex schema of label {label} with error {error}".format(
-                label=label, error=e.__str__()))
-        return []
+    def get_edge_property_keys(self, label):
+        response = self.connector.execute_query(
+            f"g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();",
+            raise_exception=False
+        )
+        return response.data
 
     def get_graph_schema(self):
         return {
@@ -61,7 +53,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
         all_vertex_schema = {}
         for label, vertex_details in schema_data['vertex_labels'].items():
             vertex_schema = VertexSchema(**vertex_details)
-            property_keys = self._get_vertex_property_keys(label)
+            property_keys = self.get_vertex_property_keys(label)
             for property_key in property_keys:
                 property_schema_data = schema_data['property_keys'][property_key]
                 property_schema = PropertySchema(**property_schema_data)
@@ -74,7 +66,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
         all_edges_schema = {}
         for label, edge_details in schema_data['edge_labels'].items():
             edge_schema = EdgeSchema(**edge_details)
-            property_keys = self._get_edge_property_keys(label)
+            property_keys = self.get_edge_property_keys(label)
             for property_key in property_keys:
                 property_schema_data = schema_data['property_keys'][property_key]
                 property_schema = PropertySchema(**property_schema_data)
@@ -86,7 +78,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
         schema_data = self._get_graph_schema_overview()
         edge_details = schema_data['edge_labels'][label]
         edge_schema = EdgeSchema(**edge_details)
-        property_keys = self._get_edge_property_keys(label)
+        property_keys = self.get_edge_property_keys(label)
         for property_key in property_keys:
             property_schema_data = schema_data['property_keys'][property_key]
             property_schema = PropertySchema(**property_schema_data)
@@ -97,7 +89,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
         schema_data = self._get_graph_schema_overview()
         vertex_details = schema_data['vertex_labels'][label]
         vertex_schema = VertexSchema(**vertex_details)
-        property_keys = self._get_vertex_property_keys(label)
+        property_keys = self.get_vertex_property_keys(label)
         for property_key in property_keys:
             property_schema_data = schema_data['property_keys'][property_key]
             property_schema = PropertySchema(**property_schema_data)

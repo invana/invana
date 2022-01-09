@@ -13,14 +13,6 @@
 #    limitations under the License.
 #
 
-def get_id(_id):
-    if isinstance(_id, dict):
-        if isinstance(_id.get('@value'), dict) and _id.get("@value").get('relationId'):
-            return _id.get('@value').get('relationId')
-        else:
-            return _id.get('@value')
-    return _id
-
 
 def process_graph_schema_string(schema_string):
     schema = {
