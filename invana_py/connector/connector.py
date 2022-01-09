@@ -9,6 +9,7 @@ from invana_py.traversal.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
+from invana_py.connector.response import Response
 import logging
 
 logger = logging.getLogger(__name__)
@@ -149,29 +150,34 @@ class GremlinConnector:
                       f" and error message {e.__str__()}"]
             if raise_exception is True:
                 raise e
+            return Response(request.request_id, 500, exception=e)
         except ServerDisconnectedError as e:
             request.server_disconnected_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
+            return Response(request.request_id, 500, exception=e)
         except RuntimeError as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.runtime_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
+            return Response(request.request_id, None, exception=e)
         except ClientConnectorError as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.client_connection_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
+            return Response(request.request_id, 500, exception=e)
         except Exception as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.response_received_but_failed(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
+            return Response(request.request_id, None, exception=e)
 
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
                       finished_callback=None) -> any:

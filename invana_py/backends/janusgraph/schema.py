@@ -33,14 +33,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             f"g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();",
             raise_exception=False
         )
-        return response.data
+        return response.data or []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
             f"g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();",
             raise_exception=False
         )
-        return response.data
+        return response.data or []
 
     def get_graph_schema(self):
         return {
