@@ -35,7 +35,8 @@ class VertexModelQuerySet(ModelQuerySetBase):
         return self.queryset.get_or_create(self.model.label_name, **properties)
 
     def create(self, **properties):
-        return self.queryset.create(self.model.label_name, **properties)
+        _ = self.queryset.create(self.model.label_name, **properties).element_map()
+        return _[0] if _.__len__() > 0 else None
 
     def delete(self, **search_kwargs):
         dont_allow_has_label_kwargs(**search_kwargs)
@@ -53,7 +54,8 @@ class EdgeModelQuerySet(ModelQuerySetBase):
         return self.queryset.get_or_create(self.model.label_name, from_, to_, **properties)
 
     def create(self, from_, to_, **properties):
-        return self.queryset.create(self.model.label_name, from_, to_, **properties)
+        _ = self.queryset.create(self.model.label_name, from_, to_, **properties).element_map()
+        return _[0] if _.__len__() > 0 else None
 
     def delete(self, **search_kwargs):
         dont_allow_has_label_kwargs(**search_kwargs)

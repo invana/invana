@@ -60,6 +60,10 @@ from invana_py import InvanaGraph
 from invana_py.ogm.models import VertexModel, EdgeModel
 from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
+from invana_py import InvanaGraph
+from invana_py.ogm.models import VertexModel, EdgeModel
+from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
@@ -93,24 +97,26 @@ class Authored(EdgeModel):
     }
 
 
-Project.objects.delete_many()
-Person.objects.delete_many()
-Authored.objects.delete_many()
+Project.objects.delete()
+Person.objects.delete()
+Authored.objects.delete()
 
 person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 print("person is :", person)
 print("person as json :", person.to_json())
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
-print("project is:", project)
+print("project is:", project.to_json())
 
-projects = Project.objects.read_many()
+projects = Project.objects.search().element_map()
 print("projects", projects)
 
 authored_single = Authored.objects.create(person.id, project.id)
-authored = Authored.objects.read_many()
+print("authored_single", authored_single)
+authored = Authored.objects.search().element_map()
 print("authored", authored)
 
 graph.close_connection()
+
 
 ```
 

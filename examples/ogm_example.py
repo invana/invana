@@ -39,16 +39,17 @@ Project.objects.delete()
 Person.objects.delete()
 Authored.objects.delete()
 
-person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000).element_map()
+person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 print("person is :", person)
-print("person as json :", person)
-project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False).element_map()
-print("project is:", project[0].to_json())
+print("person as json :", person.to_json())
+project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
+print("project is:", project.to_json())
 
 projects = Project.objects.search().element_map()
 print("projects", projects)
 
-authored_single = Authored.objects.create(person[0].id, project[0].id).element_map()
+authored_single = Authored.objects.create(person.id, project.id)
+print("authored_single", authored_single)
 authored = Authored.objects.search().element_map()
 print("authored", authored)
 
