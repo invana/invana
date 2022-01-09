@@ -42,10 +42,6 @@ class QuerySetBase(abc.ABC):
     def search(self, *args, **kwargs):
         pass
 
-    # @abc.abstractmethod
-    # def update(self, *args, **kwargs):
-    #     pass
-    #
     @abc.abstractmethod
     def delete(self, *args, **kwargs):
         pass
@@ -70,18 +66,15 @@ class VertexQuerySet(QuerySetBase, ABC):
     def search(self, **search_kwarg) -> QuerySetResult:
         return QuerySetResult(self.connector.g.V().search(**search_kwarg))
 
-    # def update(self, search_kwarg, **properties) -> QuerySetResult:
-    #     return QuerySetResult(self.search(**search_kwarg).get_traversal().update_properties(**properties))
-    #
     def delete(self, **search_kwarg):
         return self.search(**search_kwarg).get_traversal().drop()
 
     def get_or_create(self, label, **properties):
         elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
-            .get_traversal().elementMap().toList()
+            .element_map()
         created = False
         if elem.__len__() == 0:
-            elem = self.create(label, **properties).get_traversal().elementMap().toList()
+            elem = self.create(label, **properties).element_map()
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
 
@@ -90,9 +83,6 @@ class EdgeQuerySet(QuerySetBase, ABC):
 
     def create(self, label, from_, to_, **properties) -> QuerySetResult:
         return QuerySetResult(self.connector.g.create_edge(label, from_, to_, **properties))
-
-    # def update(self, search_kwarg, **properties) -> QuerySetResult:
-    #     return QuerySetResult(self.search(**search_kwarg).get_traversal().update_properties(**properties))
 
     def search(self, **search_kwarg) -> QuerySetResult:
         return QuerySetResult(self.connector.g.E().search(**search_kwarg))

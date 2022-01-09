@@ -15,12 +15,14 @@ class TestConnection:
 
     def test_query_failed_raise_exception(self, connection: GremlinConnector):
         with pytest.raises(GremlinServerError) as exec_info:
-            connection.execute_query("g.V().limit(1).toist()", raise_exception=True)
+            result = connection.execute_query("g.V().limit(1).toist()", raise_exception=True)
+            assert result.exception is not None
+
         assert isinstance(exec_info.value, GremlinServerError)
 
     def test_query_failed_dont_raise_exception(self, connection: GremlinConnector):
         result = connection.execute_query("g.V().limit(1).toist()", raise_exception=False)
-        assert result is None
+        assert result.exception is not None
 
     def test_query_failed_with_gremlin_server_error_exception_with_raise_exception(self, connection: GremlinConnector):
         with pytest.raises(GremlinServerError) as exec_info:

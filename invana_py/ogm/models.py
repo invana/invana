@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from .querysets import VertexQuerySet, EdgeQuerySet
+from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
 from .utils import convert_to_camel_case
 
 
@@ -38,17 +38,17 @@ class VertexModel(metaclass=ModelMetaBase):
     class Meta:
         invana_py = None
     """
-    objects = VertexQuerySet
+    objects = VertexModelQuerySet
     graph = None
     label_name = None
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.schema.get_vertex_schema(cls.label_name)
+        return cls.graph.backend.schame_reader.get_vertex_schema(cls.label_name)
 
 
 class EdgeModel(metaclass=ModelMetaBase):
-    objects = EdgeQuerySet
+    objects = EdgeModelQuerySet
     graph = None
     label_name = None
 

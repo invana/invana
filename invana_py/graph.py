@@ -28,7 +28,6 @@ class InvanaGraph:
                                           **transport_kwargs)
         graph_backend_cls = JanusGraphBackend if graph_backend_cls is None else graph_backend_cls
         self.backend = graph_backend_cls(self.connector)
-        self.schema_reader = JanusGraphSchemaReader(self.connector)
         self.vertex = VertexQuerySet(self.connector)
         self.edge = EdgeQuerySet(self.connector)
 
