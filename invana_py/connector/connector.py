@@ -7,7 +7,7 @@ from .request import QueryRequest
 from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
 from invana_py.traversal.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
-from ..serializer.reader import INVANA_DESERIALIZER_MAP
+from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
 import logging
 
@@ -30,7 +30,7 @@ class GremlinConnector:
                  strategies=None,
                  read_only_mode: bool = False,
                  timeout: int = DEFAULT_TIMEOUT,
-                 graph_traversal_source_cls=InvanaTraversalSource,
+                 graph_traversal_source_cls=None,
                  call_from_event_loop=True,
                  deserializer_map=None,
                  auth=None,
@@ -56,7 +56,8 @@ class GremlinConnector:
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.auth = auth
-        self.graph_traversal_source_cls = graph_traversal_source_cls
+        self.graph_traversal_source_cls = graph_traversal_source_cls if graph_traversal_source_cls \
+            else InvanaTraversalSource
         self.timeout = timeout
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())

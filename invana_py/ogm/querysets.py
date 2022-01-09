@@ -13,17 +13,20 @@ class QuerySetResult:
     def get_traversal(self):
         return self._traversal
 
-    def properties(self, *args):
+    def properties(self, *args) -> list:
         return self.get_traversal().properties(*args).toList()
 
-    def values(self, *args):
+    def values(self, *args) -> list:
         return self.get_traversal().values(*args).toList()
 
-    def value_map(self, *args):
+    def value_map(self, *args) -> list:
         return self.get_traversal().valueMap(*args).toList()
 
-    def element_map(self, *args):
+    def element_map(self, *args) -> list:
         return self.get_traversal().elementMap(*args).toList()
+
+    def update(self, **properties) -> list:
+        return self.get_traversal().update_properties(**properties).element_map()
 
 
 class QuerySetBase(abc.ABC):
@@ -39,10 +42,10 @@ class QuerySetBase(abc.ABC):
     def search(self, *args, **kwargs):
         pass
 
-    @abc.abstractmethod
-    def update(self, *args, **kwargs):
-        pass
-
+    # @abc.abstractmethod
+    # def update(self, *args, **kwargs):
+    #     pass
+    #
     @abc.abstractmethod
     def delete(self, *args, **kwargs):
         pass
@@ -64,23 +67,23 @@ class VertexQuerySet(QuerySetBase, ABC):
     def create(self, label, **properties) -> QuerySetResult:
         return QuerySetResult(self.connector.g.create_vertex(label, **properties))
 
-    def read(self, **search_kwarg) -> QuerySetResult:
+    def search(self, **search_kwarg) -> QuerySetResult:
         return QuerySetResult(self.connector.g.V().search(**search_kwarg))
 
-    def update(self, search_kwarg, **properties) -> QuerySetResult:
-        return QuerySetResult(self.read(**search_kwarg).get_traversal().update_properties(**properties))
-
+    # def update(self, search_kwarg, **properties) -> QuerySetResult:
+    #     return QuerySetResult(self.search(**search_kwarg).get_traversal().update_properties(**properties))
+    #
     def delete(self, **search_kwarg):
-        return self.read(**search_kwarg).get_traversal().drop()
+        return self.search(**search_kwarg).get_traversal().drop()
 
     def get_or_create(self, label, **properties):
-        elem = self.read(has__label=label, **self.create_has_filters(**properties)) \
+        elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
             .get_traversal().elementMap().toList()
         created = False
         if elem.__len__() == 0:
             elem = self.create(label, **properties).get_traversal().elementMap().toList()
             created = True
-        return created, elem
+        return created, elem[0] if elem.__len__() > 0 else None
 
 
 class EdgeQuerySet(QuerySetBase, ABC):
@@ -88,19 +91,20 @@ class EdgeQuerySet(QuerySetBase, ABC):
     def create(self, label, from_, to_, **properties) -> QuerySetResult:
         return QuerySetResult(self.connector.g.create_edge(label, from_, to_, **properties))
 
-    def update(self, search_kwarg, **properties) -> QuerySetResult:
-        return QuerySetResult(self.read(**search_kwarg).get_traversal().update_properties(**properties))
+    # def update(self, search_kwarg, **properties) -> QuerySetResult:
+    #     return QuerySetResult(self.search(**search_kwarg).get_traversal().update_properties(**properties))
 
-    def read(self, **search_kwarg) -> QuerySetResult:
+    def search(self, **search_kwarg) -> QuerySetResult:
         return QuerySetResult(self.connector.g.E().search(**search_kwarg))
 
     def delete(self, **search_kwarg):
-        return self.read(**search_kwarg).get_traversal().drop()
+        return self.search(**search_kwarg).get_traversal().drop()
 
     def get_or_create(self, label, from_, to_, **properties):
-        elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(__.inV().hasId(to_))
+        elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
+            __.inV().hasId(to_)).elementMap().toList()
         created = False
         if elem.__len__() == 0:
             elem = self.create(label, from_, to_, **properties).get_traversal().elementMap().toList()
             created = True
-        return created, elem
+        return created, elem[0] if elem.__len__() > 0 else None

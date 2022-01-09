@@ -1,5 +1,5 @@
 from invana_py.connector.connector import GremlinConnector
-from invana_py.serializer.structure import RelationShip, Node
+from invana_py.serializer.element_structure import RelationShip, Node
 
 
 class TestSearchTraversal:

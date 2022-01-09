@@ -1,5 +1,7 @@
 import pytest
 import os
+from invana_py.connector.connector import GremlinConnector
+from invana_py import InvanaGraph
 
 
 @pytest.fixture(scope="function")
@@ -9,51 +11,54 @@ def gremlin_url() -> str:
 
 @pytest.fixture(scope="function")
 def connection(gremlin_url):
-    from invana_py.connector.connector import GremlinConnector
     connector = GremlinConnector(gremlin_url)
-    initial_data(connector)
+    initial_data_with_connector(connector)
     yield connector
     connector.g.V().drop().iterate()
     connector.close()
 
 
+@pytest.fixture(scope="function")
+def graph(gremlin_url):
+    graph = InvanaGraph(gremlin_url)
+    initial_data_with_graph(graph)
+    initial_data_with_connector(graph.connector)
+    yield graph
+    graph.g.V().drop().iterate()
+    graph.close_connection()
+
+
 #
-def initial_data(connector):
+def initial_data_with_connector(connector: GremlinConnector):
     connector.g.addV("Organisation").property("name", "invana").next()
     connector.g.addV("Project").property("name", "invana engine").next()
     connector.g.addV("Project").property("name", "invana studio").next()
     connector.g.addV("User").property("name", "Ravi").next()
-
     for i in range(0, 10):
         connector.g.addV("TestUser").property("name", f"Ravi {i}").next()
 
-    # user = connector.vertex.get_or_create("User", properties={
-    #     "first_name": "Ravi",
-    #     "last_name": "Merugu",
-    #     "username": "rrmerugu"
-    # })
+
+def initial_data_with_graph(graph: InvanaGraph):
+    is_created, user = graph.vertex.get_or_create(
+        "User",
+        first_name="Ravi", last_name="Merugu", username="rrmerugu")
     # print(user)
-    #
-    # invana_studio_instance = connector.vertex.get_or_create("GithubProject", properties={
-    #     "name": "invana-studio",
-    #     "description": "opensource connector visualiser for Invana connector analytics engine"
-    # })
+
+    is_created, invana_studio_instance = graph.vertex.get_or_create(
+        "GithubProject",
+        name="invana-studio", description="opensource graph visualiser")
     # print(invana_studio_instance)
-    #
-    # invana_engine_instance = connector.vertex.get_or_create("GithubProject", properties={
-    #     "name": "invana-engine",
-    #     "description": "Invana connector analytics engine"
-    # })
+
+    is_created, invana_engine_instance = graph.vertex.get_or_create(
+        "GithubProject",
+        name="invana-engine", description="Invana connector analytics engine"
+    )
     # print(invana_engine_instance)
-    #
-    # studio_edge_instance = connector.edge.get_or_create("authored", user.id, invana_studio_instance.id,
-    #                                                     properties={
-    #                                                         "started": 2020
-    #                                                     })
+
+    is_created, studio_edge_instance = graph.edge.get_or_create(
+        "authored", user.id, invana_studio_instance.id, started=2020)
     # print(studio_edge_instance)
-    #
-    # engine_edge_instance = connector.edge.get_or_create("authored", user.id, invana_engine_instance.id,
-    #                                                     properties={
-    #                                                         "started": 2020
-    #                                                     })
+
+    is_created, engine_edge_instance = graph.edge.get_or_create(
+        "authored", user.id, invana_engine_instance.id, started=2020)
     # print(engine_edge_instance)
