@@ -28,6 +28,9 @@ class QuerySetResult:
     def update(self, **properties) -> list:
         return self.get_traversal().update_properties(**properties).element_map()
 
+    def count(self):
+        return self.get_traversal().count()
+
 
 class QuerySetBase(abc.ABC):
 
@@ -49,6 +52,10 @@ class QuerySetBase(abc.ABC):
     @abc.abstractmethod
     def get_or_create(self, *args, **kwargs):
         pass
+
+    # @abc.abstractmethod
+    # def count(self, *args, **kwargs):
+    #     pass
 
     @staticmethod
     def create_has_filters(**properties):
