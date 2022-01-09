@@ -1,19 +1,17 @@
 from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversalSource
 from gremlin_python.process.traversal import P, TextP, Bytecode
 from gremlin_python.process.graph_traversal import __ as AnonymousTraversal
+from .search import GraphSearch
 
 
 class InvanaTraversal(GraphTraversal):
 
     def search(self, **kwargs):
-        if "has__label" in kwargs:
-            self.bytecode.add_step('hasLabel', kwargs["has__label"])
-        if "has__id" in kwargs:
-            self.bytecode.add_step('hasId', kwargs["has__id"])
-        cleaned_kwargs = self.separate_filters_and_pagination_kwargs(**kwargs)
+        self.bytecode = GraphSearch.search(self.bytecode, **kwargs)
+        return self
 
-        # if len(args) > 0:
-        #     traversal.bytecode.add_step('has', 'name', P.within(args))
+    def paginate(self, *args):
+        self.bytecode = GraphSearch.paginate(self.bytecode, *args)
         return self
 
 
@@ -23,6 +21,10 @@ class __(AnonymousTraversal):
     @classmethod
     def search(cls, **kwargs):
         return cls.graph_traversal(None, None, Bytecode()).search(**kwargs)
+
+    @classmethod
+    def paginate(cls, *args):
+        return cls.graph_traversal(None, None, Bytecode()).paginate(*args)
 
 
 class InvanaTraversalSource(GraphTraversalSource):

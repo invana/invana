@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 logger = logging.getLogger(__name__)
 
 
-class QueryRequestBase:
+class QueryRequestEventBase:
     state = None
     error_message = None
 
@@ -30,7 +30,7 @@ class QueryRequestBase:
         return f"<{self.__class__.__name__}>"
 
 
-class RequestStartedEvent(QueryRequestBase, ABC):
+class RequestStartedEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.STARTED
 
     def __init__(self, request):
@@ -44,7 +44,7 @@ class RequestStartedEvent(QueryRequestBase, ABC):
             f"request_options: {self.request.request_options};; at {self.created_at}")
 
 
-class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
+class RequestFinishedSuccessfullyEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.FINISHED
     status = QueryResponseStatusTypes.SUCCESS
 
@@ -58,7 +58,7 @@ class RequestFinishedSuccessfullyEvent(QueryRequestBase, ABC):
             f"at {self.created_at}; elapsed_time {self.elapsed_time_ms}")
 
 
-class RequestFinishedButFailedEvent(QueryRequestBase, ABC):
+class RequestFinishedButFailedEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.FINISHED
     status = QueryResponseStatusTypes.FAILED
 
@@ -77,7 +77,7 @@ class RequestFinishedButFailedEvent(QueryRequestBase, ABC):
             f"at {self.created_at}; elapsed_time {self.elapsed_time_ms}")
 
 
-class ResponseEventBase(QueryRequestBase, ABC):
+class ResponseEventBase(QueryRequestEventBase, ABC):
     state = RequestStateTypes.RESPONSE_RECEIVED
     status = None
 
@@ -114,7 +114,7 @@ class ResponseReceivedButFailedEvent(ResponseEventBase, ABC):
             f"at {self.created_at}; took {self.elapsed_time_ms}")
 
 
-class ServerDisconnectedErrorEvent(QueryRequestBase, ABC):
+class ServerDisconnectedErrorEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.SERVER_DISCONNECTED
     error_message = None
 
@@ -129,7 +129,7 @@ class ServerDisconnectedErrorEvent(QueryRequestBase, ABC):
             f"at {self.created_at}")
 
 
-class RunTimeErrorEvent(QueryRequestBase, ABC):
+class RunTimeErrorEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.RUNTIME_ERROR
     error_message = None
 
@@ -144,7 +144,7 @@ class RunTimeErrorEvent(QueryRequestBase, ABC):
             f"at {self.created_at}")
 
 
-class ClientConnectorErrorEvent(QueryRequestBase, ABC):
+class ClientConnectorErrorEvent(QueryRequestEventBase, ABC):
     state = RequestStateTypes.CLIENT_CONNECTION_ERROR
     error_message = None
 

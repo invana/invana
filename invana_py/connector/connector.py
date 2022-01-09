@@ -75,7 +75,7 @@ class GremlinConnector:
             graphson_reader=GraphSONReader(deserializer_map=self.deserializer_map),
             **self.transport_kwargs
         )
-        self.g = traversal(self.graph_traversal_source_cls).withRemote(self.connection)
+        self.g = traversal(traversal_source_class=self.graph_traversal_source_cls).withRemote(self.connection)
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
         self.update_connection_state(ConnectionStateTypes.CONNECTED)

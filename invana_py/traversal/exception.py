@@ -1,0 +1,2 @@
+class InvalidSearchKwargError(ValueError):
+    pass
