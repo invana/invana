@@ -24,8 +24,22 @@ class GraphSearch:
     def split_key(_key):
         return _key.split("__")
 
+    @staticmethod
+    def reorder_kwargs(**kwargs):
+        if "has__id" in kwargs and "has__label" in kwargs:
+            _has__id = kwargs['has__id']
+            _has__label = kwargs['has__label']
+            del kwargs['has__id']
+            del kwargs['has__label']
+            reordered_kwargs = {'has__label': _has__label, 'has__id': _has__id}
+            reordered_kwargs.update(kwargs)
+            return reordered_kwargs
+
+        return kwargs
+
     @classmethod
     def search(cls, bytecode, **kwargs):
+        kwargs = cls.reorder_kwargs(**kwargs)
         for k, v in kwargs.items():
             key_split_list = cls.split_key(k)
             if key_split_list.__len__() == 2:

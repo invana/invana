@@ -23,14 +23,20 @@ class QuerySetResult:
     # def value_map(self, *args) -> list:
     #     return self.get_traversal().valueMap(*args).toList()
 
+    def to_list(self) -> list:
+        return self.value_list()
+
     def value_list(self, *args) -> list:
         return self.get_traversal().elementMap(*args).toList()
 
     def update(self, **properties) -> list:
-        return self.get_traversal().update_properties(**properties).element_map()
+        return self.get_traversal().update_properties(**properties).elementMap().toList()
 
     def count(self):
         return self.get_traversal().count()
+
+    def drop(self):
+        return self.get_traversal().drop().iterate()
 
     def order_by(self, *args):
         self.get_traversal().order_by(*args)
@@ -79,7 +85,7 @@ class VertexQuerySet(QuerySetBase, ABC):
         return QuerySetResult(self.connector.g.V().search(**search_kwarg))
 
     def delete(self, **search_kwarg):
-        return self.search(**search_kwarg).get_traversal().drop()
+        return self.search(**search_kwarg).drop()
 
     def get_or_create(self, label, **properties):
         elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
@@ -100,7 +106,7 @@ class EdgeQuerySet(QuerySetBase, ABC):
         return QuerySetResult(self.connector.g.E().search(**search_kwarg))
 
     def delete(self, **search_kwarg):
-        return self.search(**search_kwarg).get_traversal().drop()
+        return self.search(**search_kwarg).drop()
 
     def get_or_create(self, label, from_, to_, **properties):
         elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(

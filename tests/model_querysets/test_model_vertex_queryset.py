@@ -17,18 +17,6 @@ class Project(VertexModel):
     }
 
 
-class Person(VertexModel):
-    graph = graph
-
-    properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
-
-    }
-
-
 class Organisation(VertexModel):
     graph = graph
 
@@ -37,19 +25,10 @@ class Organisation(VertexModel):
     }
 
 
-class Authored(EdgeModel):
-    graph = graph
-
-    properties = {
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
-
-
 class TestVertexModelQuerySet:
 
     def test_create(self):
         graph.g.V().drop().iterate()
-
         project = Project.objects.create(name="invana-engine")
         assert isinstance(project, Node)
         assert isinstance(project.properties.created_at, datetime)
@@ -73,10 +52,6 @@ class TestVertexModelQuerySet:
             assert org.label == Organisation.label_name
         graph.g.V().drop().iterate()
 
-    # def test_search(self, graph: InvanaGraph):
-    #     vtx = graph.vertex.search(has__label="GithubProject", has__name="invana-engine").element_map()
-    #     assert isinstance(vtx[0], Node)
-
     def test_update(self):
         graph.g.V().drop().iterate()
         projects_list = ['invana-engine', 'invana-search']
@@ -86,3 +61,15 @@ class TestVertexModelQuerySet:
         instance = Project.objects.search(has__name="invana-engine").update(name=new_value)
         assert isinstance(instance[0], Node)
         assert instance[0].properties.name == new_value
+        graph.g.V().drop().iterate()
+
+    def test_delete(self):
+        graph.g.V().drop().iterate()
+        projects_list = ['invana-engine', 'invana-search']
+        project = Project.objects.create(name=projects_list[0])
+        Project.objects.delete(has__id=project.id)
+        projects = Project.objects.search(has__id=project.id).to_list()
+        assert projects.__len__() == 0
+        projects = Project.objects.search(has__name=projects_list[0]).to_list()
+        assert projects.__len__() == 0
+        graph.g.V().drop().iterate()

@@ -2,24 +2,6 @@ from invana_py.ogm.exceptions import ValidationError
 from ..serializer.element_structure import Node, RelationShip
 
 
-# def dont_allow_has_label_kwargs(**query_kwargs):
-#     keys = list(query_kwargs.keys())
-#     for k in keys:
-#         if k.startswith("has__label"):
-#             raise ValidationError("has__label search kwargs not allowed when using OGM")
-#
-
-# def dont_allow_has_label_kwargs(f):
-#     def wrapper(self, **search_kwargs):
-#         keys = list(search_kwargs.keys())
-#         for k in keys:
-#             if k.startswith("has__label"):
-#                 raise ValidationError("has__label search kwargs not allowed when using OGM")
-#         return f(self, **search_kwargs)
-#
-#     return wrapper
-
-
 def dont_allow_has_label_kwargs(f):
     def wrapper(self, **search_kwargs):
         keys = list(search_kwargs.keys())
@@ -52,9 +34,9 @@ def _serialize_to_model_datatypes(self, element):
 
 
 def validate_kwargs_for_create(f):
-    def wrapper(self, **kwargs):
+    def wrapper(self, *args, **kwargs):
         validated_kwargs = _validate_kwargs_for_create(self, **kwargs)
-        result = f(self, **validated_kwargs)
+        result = f(self, *args, **validated_kwargs)
         return _serialize_to_model_datatypes(self, result)
 
     return wrapper
@@ -104,13 +86,13 @@ def _validate_kwargs_for_search(self, **properties):
     allowed_property_keys = list(self.model.properties.keys())
     for k, v in properties.items():
         k_cleaned = k.replace("has__", "")
-        if k_cleaned == "label":
+        if k_cleaned in ["label", "id"]:
             validated_data[k] = v
         elif k_cleaned not in allowed_property_keys:
             raise ValidationError(f"property '{k_cleaned}' not allowed in {self.model.label_name} when using OGM")
     for k, v in properties.items():
         k_cleaned = k.replace("has__", "")
-        if k_cleaned != "label":
+        if k_cleaned not in ["label", "id"]:
             _ = self.get_validated_data(k_cleaned, v, self.model)
             if _ is not None:
                 validated_data[k] = _
