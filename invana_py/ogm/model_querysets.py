@@ -1,5 +1,5 @@
 from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatypes, validate_kwargs_for_create, \
-    validate_kwargs_for_update_or_search, add_has_label_kwargs_from_model
+    validate_kwargs_for_search, add_has_label_kwargs_from_model
 from .exceptions import FieldNotFoundError, ValidationError
 from .querysets import VertexQuerySet, EdgeQuerySet
 from ..serializer.element_structure import Node, RelationShip
@@ -46,32 +46,33 @@ class ModelQuerySetBase(abc.ABC):
 class VertexModelQuerySet(ModelQuerySetBase):
     queryset = VertexQuerySet
 
+    @validate_kwargs_for_create
     @serialize_to_model_datatypes
-    @validate_kwargs_for_update_or_search
     def get_or_create(self, **properties):
         return self.queryset.get_or_create(self.model.label_name, **properties)
 
-    @serialize_to_model_datatypes
     @validate_kwargs_for_create
+    @serialize_to_model_datatypes
     def create(self, **properties):
         _ = self.queryset.create(self.model.label_name, **properties).value_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
     def delete(self, **search_kwargs):
         return self.queryset.delete(**search_kwargs)
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
+    @serialize_to_model_datatypes
     def search(self, **search_kwargs):
         return self.queryset.search(**search_kwargs)
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
     def count(self, **search_kwargs):
         return self.search(**search_kwargs).count()
 
@@ -79,31 +80,32 @@ class VertexModelQuerySet(ModelQuerySetBase):
 class EdgeModelQuerySet(ModelQuerySetBase):
     queryset = EdgeQuerySet
 
+    @validate_kwargs_for_create
     @serialize_to_model_datatypes
-    @validate_kwargs_for_update_or_search
     def get_or_create(self, from_, to_, **properties):
         return self.queryset.get_or_create(self.model.label_name, from_, to_, **properties)
 
-    @serialize_to_model_datatypes
     @validate_kwargs_for_create
+    @serialize_to_model_datatypes
     def create(self, from_, to_, **properties):
         _ = self.queryset.create(self.model.label_name, from_, to_, **properties).value_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
     def delete(self, **search_kwargs):
         return self.queryset.delete(**search_kwargs)
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
+    @serialize_to_model_datatypes
     def search(self, **search_kwargs):
         return self.queryset.search(**search_kwargs)
 
     @dont_allow_has_label_kwargs
-    @validate_kwargs_for_update_or_search
     @add_has_label_kwargs_from_model
+    @validate_kwargs_for_search
     def count(self, **search_kwargs):
         return self.search(**search_kwargs).count()
