@@ -54,4 +54,4 @@ class EdgeModel(metaclass=ModelMetaBase):
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.schema.get_edge_schema(cls.label_name)
+        return cls.graph.backend.schame_reader.get_edge_schema(cls.label_name)

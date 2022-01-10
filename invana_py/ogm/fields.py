@@ -79,10 +79,10 @@ class StringProperty(FieldBase, ABC):
         if value:
             if self.max_length and value.__len__() > self.max_length:
                 raise ValidationError(
-                    f"max_length for field '{model.label_name}{field_name}' is {self.max_length} but the value has {value.__len__()}")
+                    f"max_length for field '{model.label_name}.{field_name}' is {self.max_length} but the value has {value.__len__()}")
             if self.min_length and value.__len__() < self.min_length:
                 raise ValidationError(
-                    f"min_length for field '{model.label_name}{field_name}' is {self.min_length} but the value has {value.__len__()}")
+                    f"min_length for field '{model.label_name}.{field_name}' is {self.min_length} but the value has {value.__len__()}")
 
         return self.data_type(value) if value else value
 

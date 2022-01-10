@@ -13,16 +13,17 @@ class QuerySetResult:
     def get_traversal(self):
         return self._traversal
 
-    def properties(self, *args) -> list:
-        return self.get_traversal().properties(*args).toList()
+    #
+    # def properties(self, *args) -> list:
+    #     return self.get_traversal().properties(*args).toList()
+    #
+    # def values(self, *args) -> list:
+    #     return self.get_traversal().values(*args).toList()
+    #
+    # def value_map(self, *args) -> list:
+    #     return self.get_traversal().valueMap(*args).toList()
 
-    def values(self, *args) -> list:
-        return self.get_traversal().values(*args).toList()
-
-    def value_map(self, *args) -> list:
-        return self.get_traversal().valueMap(*args).toList()
-
-    def element_map(self, *args) -> list:
+    def value_list(self, *args) -> list:
         return self.get_traversal().elementMap(*args).toList()
 
     def update(self, **properties) -> list:
@@ -30,6 +31,10 @@ class QuerySetResult:
 
     def count(self):
         return self.get_traversal().count()
+
+    def order_by(self, *args):
+        self.get_traversal().order_by(*args)
+        return self
 
 
 class QuerySetBase(abc.ABC):
@@ -78,10 +83,10 @@ class VertexQuerySet(QuerySetBase, ABC):
 
     def get_or_create(self, label, **properties):
         elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
-            .element_map()
+            .value_list()
         created = False
         if elem.__len__() == 0:
-            elem = self.create(label, **properties).element_map()
+            elem = self.create(label, **properties).value_list()
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
 
