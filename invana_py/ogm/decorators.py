@@ -52,7 +52,9 @@ def _validate_kwargs_for_create(self, **properties):
     allowed_property_keys = list(self.model.properties.keys())
     for k, v in properties.items():
         if k not in allowed_property_keys:
-            raise FieldValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
+            raise FieldValidationError(f"property '{self.model.label_name}.{k}' "
+                                       f"not allowed in {self.model.label_name}."
+                                       f" Hint: {allowed_property_keys} fields allowed")
     for k, field in self.model.properties.items():
         _ = self.get_validated_data(k, properties.get(k), self.model)
         if _ is not None:
@@ -89,7 +91,10 @@ def _validate_kwargs_for_search(self, **properties):
         if k_cleaned in ["label", "id"]:
             validated_data[k] = v
         elif k_cleaned not in allowed_property_keys:
-            raise FieldValidationError(f"property '{k_cleaned}' not allowed in {self.model.label_name} when using OGM")
+            raise FieldValidationError(f"property '{k_cleaned}' not allowed in"
+                                       f" {self.model.label_name} when using OGM."
+                                       f" Hint: {allowed_property_keys} fields allowed")
+
     for k, v in properties.items():
         k_cleaned = k.replace("has__", "")
         if k_cleaned not in ["label", "id"]:
