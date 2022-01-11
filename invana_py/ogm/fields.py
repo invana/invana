@@ -152,16 +152,39 @@ class DoubleProperty(NumberFieldBase, ABC):
 class DateTimeProperty(FieldBase, ABC):
     data_type = datetime.datetime
 
-    def validate(self, value, field_name=None, model=None):
+    def __init__(self, min_value=None, max_value=None, **kwargs):
+        super().__init__(**kwargs)
+        self.min_value = min_value
+        self.max_value = max_value
 
+    def validate_value_data_types(self, value, model, field_name):
+        if value and not isinstance(value, self.data_type):
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+                                       f"type {type(value)}, expecting {self.data_type}")
+        if self.max_value and not isinstance(self.max_value, self.data_type):
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+                                       f"type {type(self.max_value)}, expecting {self.data_type}")
+        if self.min_value and not isinstance(value, self.data_type):
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+                                       f"type {type(self.min_value)}, expecting {self.data_type}")
+
+        if value:
+            if self.max_value and value > self.max_value:
+                assert self.max_value is None or isinstance(self.max_value, datetime.datetime)
+                raise FieldValidationError(f"max_value for field '{model.label_name}.{field_name}' is"
+                                           f" {self.max_value} but the value has {value}")
+            if self.min_value and value < self.min_value:
+                assert self.min_value is None or isinstance(self.min_value, datetime.datetime)
+                raise FieldValidationError(f"min_value for field '{model.label_name}.{field_name}' is"
+                                           f" {self.min_value} but the value has {value}")
+
+    def validate(self, value, field_name=None, min_value=None, max_value=None, model=None):
         if value is None and self.default:
             value = self.default()
-        if value and not isinstance(value, self.data_type):
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
-                                       f" expecting {self.data_type}")
         if self.allow_null is False and value is None:
             raise FieldValidationError(
                 f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+        self.validate_value_data_types(value, model, field_name)
         return value
 
 #
