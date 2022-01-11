@@ -13,7 +13,7 @@
 #    limitations under the License.
 #
 
-class ValidationError(Exception):
+class FieldValidationError(Exception):
     pass
 
 

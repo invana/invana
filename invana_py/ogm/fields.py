@@ -18,7 +18,7 @@ from abc import ABC
 
 from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, ListType, SetType, ByteBufferType, \
     IntType
-from invana_py.ogm.exceptions import ValidationError
+from invana_py.ogm.exceptions import FieldValidationError
 
 
 class FieldBase:
@@ -26,13 +26,11 @@ class FieldBase:
 
     def __init__(self, *,
                  default: typing.Any = None,
-                 index: bool = False,
                  unique: bool = False,
                  allow_null: bool = False,
                  read_only: bool = False,
                  **kwargs):
         self.allow_null = allow_null
-        self.index = index
         self.unique = unique
         self.default = default
         self.allow_null = allow_null
@@ -54,7 +52,7 @@ class StringProperty(FieldBase, ABC):
 
     def __init__(self, max_length=None, min_length=None, trim_whitespaces=True, **kwargs):
         # if max_length is None and min_length is None:
-        #     raise ValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
+        #     raise FieldValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
         # assert max_length is not None, "max_length is required"
         super().__init__(**kwargs)
         self.max_length = max_length
@@ -74,15 +72,18 @@ class StringProperty(FieldBase, ABC):
             value = value.strip()
 
         if self.allow_null is False and value is None:
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+            raise FieldValidationError(
+                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
 
         if value:
             if self.max_length and value.__len__() > self.max_length:
-                raise ValidationError(
-                    f"max_length for field '{model.label_name}.{field_name}' is {self.max_length} but the value has {value.__len__()}")
+                raise FieldValidationError(
+                    f"max_length for field '{model.label_name}.{field_name}' is {self.max_length} but "
+                    f"the value has {value.__len__()}")
             if self.min_length and value.__len__() < self.min_length:
-                raise ValidationError(
-                    f"min_length for field '{model.label_name}.{field_name}' is {self.min_length} but the value has {value.__len__()}")
+                raise FieldValidationError(
+                    f"min_length for field '{model.label_name}.{field_name}' is {self.min_length} but "
+                    f"the value has {value.__len__()}")
 
         return self.data_type(value) if value else value
 
@@ -92,7 +93,8 @@ class BooleanProperty(FieldBase, ABC):
 
     def validate(self, value, field_name=None, model=None):
         if value and not isinstance(value, self.data_type):
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be '{value}'. must be a boolean")
+            raise FieldValidationError(
+                f"field '{model.label_name}.{field_name}' cannot be '{value}'. must be a boolean")
         assert value is None or isinstance(value, self.data_type)
         if self.default:
             assert self.default is None or isinstance(self.default, bool)
@@ -113,8 +115,8 @@ class NumberFieldBase(FieldBase, ABC):
     def validate(self, value, field_name=None, model=None):
 
         if value and type(value) not in self.number_data_types:
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
-                                  f" expecting {self.data_type}")
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+                                       f" expecting {self.data_type}")
 
         assert self.max_value is None or isinstance(self.max_value, int)
         assert self.min_value is None or isinstance(self.min_value, int)
@@ -122,13 +124,14 @@ class NumberFieldBase(FieldBase, ABC):
         if value is None and self.default:
             value = self.default
         if self.allow_null is False and value is None:
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+            raise FieldValidationError(
+                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
         if value:
             if self.max_value and value > self.max_value:
-                raise ValidationError(
+                raise FieldValidationError(
                     f"max_value for field '{model.label_name}{field_name}' is {self.max_value} but the value has {value}")
             if self.min_value and value < self.min_value:
-                raise ValidationError(
+                raise FieldValidationError(
                     f"min_value for field '{model.label_name}{field_name}' is {self.min_value} but the value has {value}")
 
         return self.data_type(value) if value else value
@@ -154,10 +157,11 @@ class DateTimeProperty(FieldBase, ABC):
         if value is None and self.default:
             value = self.default()
         if value and not isinstance(value, self.data_type):
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
-                                  f" expecting {self.data_type}")
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+                                       f" expecting {self.data_type}")
         if self.allow_null is False and value is None:
-            raise ValidationError(f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+            raise FieldValidationError(
+                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
         return value
 
 #

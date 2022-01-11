@@ -1,4 +1,4 @@
-from invana_py.ogm.exceptions import ValidationError
+from invana_py.ogm.exceptions import FieldValidationError
 from ..serializer.element_structure import Node, RelationShip
 
 
@@ -7,7 +7,7 @@ def dont_allow_has_label_kwargs(f):
         keys = list(search_kwargs.keys())
         for k in keys:
             if k.startswith("has__label"):
-                raise ValidationError("has__label search kwargs not allowed when using OGM")
+                raise FieldValidationError("has__label search kwargs not allowed when using OGM")
         return f(self, **search_kwargs)
 
     return wrapper
@@ -52,7 +52,7 @@ def _validate_kwargs_for_create(self, **properties):
     allowed_property_keys = list(self.model.properties.keys())
     for k, v in properties.items():
         if k not in allowed_property_keys:
-            raise ValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
+            raise FieldValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
     for k, field in self.model.properties.items():
         _ = self.get_validated_data(k, properties.get(k), self.model)
         if _ is not None:
@@ -89,7 +89,7 @@ def _validate_kwargs_for_search(self, **properties):
         if k_cleaned in ["label", "id"]:
             validated_data[k] = v
         elif k_cleaned not in allowed_property_keys:
-            raise ValidationError(f"property '{k_cleaned}' not allowed in {self.model.label_name} when using OGM")
+            raise FieldValidationError(f"property '{k_cleaned}' not allowed in {self.model.label_name} when using OGM")
     for k, v in properties.items():
         k_cleaned = k.replace("has__", "")
         if k_cleaned not in ["label", "id"]:
@@ -118,7 +118,7 @@ def _validate_kwargs_for_update(self, **properties):
     allowed_property_keys = list(self.model.properties.keys())
     for k, v in properties.items():
         if k not in allowed_property_keys:
-            raise ValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
+            raise FieldValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
     for k, v in properties.items():
         _ = self.get_validated_data(k, v, self.model)
         if _ is not None:
