@@ -16,8 +16,8 @@ import datetime
 import typing
 from abc import ABC
 
-from gremlin_python.statics import FloatType, LongType, SingleChar, SingleByte, ListType, SetType, ByteBufferType, \
-    IntType
+from gremlin_python.statics import FloatType, long, SingleChar, SingleByte, ListType, SetType, ByteBufferType, \
+    IntType, LongType
 from invana_py.ogm.exceptions import FieldValidationError
 
 
@@ -105,7 +105,7 @@ class BooleanProperty(FieldBase, ABC):
 
 
 class NumberFieldBase(FieldBase, ABC):
-    number_data_types = [int, float]
+    number_data_types = [int, float, long]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
