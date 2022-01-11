@@ -28,18 +28,18 @@ class Person(VertexModel):
 
 class TestIntegerField:
 
-    def test_integer_field(self):
+    def test_field(self):
         graph.g.V().drop()
         project = Person.objects.create(first_name="Ravi Raja", member_since=2022)
         assert isinstance(project.properties.member_since, int)
 
-    def test_integer_field_max_value(self):
+    def test_field_max_value(self):
         graph.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
             Person.objects.create(first_name="Ravi Raja", points=200, member_since=2022)
         assert "max_value for field" in exec_info.value.__str__()
 
-    def test_integer_field_min_value(self):
+    def test_field_min_value(self):
         graph.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
             Person.objects.create(first_name="Ravi Raja", points=0, member_since=2022)

@@ -129,10 +129,10 @@ class NumberFieldBase(FieldBase, ABC):
         if value:
             if self.max_value and value > self.max_value:
                 raise FieldValidationError(
-                    f"max_value for field '{model.label_name}{field_name}' is {self.max_value} but the value has {value}")
+                    f"max_value for field '{model.label_name}.{field_name}' is {self.max_value} but the value has {value}")
             if self.min_value and value < self.min_value:
                 raise FieldValidationError(
-                    f"min_value for field '{model.label_name}{field_name}' is {self.min_value} but the value has {value}")
+                    f"min_value for field '{model.label_name}.{field_name}' is {self.min_value} but the value has {value}")
 
         return self.data_type(value) if value else value
 
