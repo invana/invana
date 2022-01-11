@@ -1,9 +1,7 @@
 import pytest
-from invana_py.connector.connector import GremlinConnector
 from invana_py.ogm.exceptions import FieldValidationError
-from invana_py.ogm.fields import StringProperty, IntegerProperty, FloatProperty, BooleanProperty, DateTimeProperty, \
-    DoubleProperty
-from invana_py.ogm.models import VertexModel, EdgeModel
+from invana_py.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
+from invana_py.ogm.models import VertexModel
 from datetime import datetime
 from invana_py import InvanaGraph
 
