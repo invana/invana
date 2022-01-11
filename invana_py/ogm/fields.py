@@ -114,6 +114,7 @@ class NumberFieldBase(FieldBase, ABC):
 
     def validate(self, value, field_name=None, model=None):
 
+        # TODO - CHECK if min_value and max_value are assigned respective data types
         if value and type(value) not in self.number_data_types:
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
                                        f" expecting {self.data_type}")
@@ -126,7 +127,7 @@ class NumberFieldBase(FieldBase, ABC):
         if self.allow_null is False and value is None:
             raise FieldValidationError(
                 f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
-        if value:
+        if value is not None:
             if self.max_value and value > self.max_value:
                 raise FieldValidationError(
                     f"max_value for field '{model.label_name}.{field_name}' is {self.max_value} but the value has {value}")
@@ -168,7 +169,7 @@ class DateTimeProperty(FieldBase, ABC):
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
                                        f"type {type(self.min_value)}, expecting {self.data_type}")
 
-        if value:
+        if value is not None:
             if self.max_value and value > self.max_value:
                 assert self.max_value is None or isinstance(self.max_value, datetime.datetime)
                 raise FieldValidationError(f"max_value for field '{model.label_name}.{field_name}' is"
