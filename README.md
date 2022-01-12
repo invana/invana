@@ -4,44 +4,20 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 
 - [Features](#features)
 - [Installation](#installation)
-- [Examples](#examples)
+- [Usage](#usage)
 - [Supported graph databases](#supported-graph-databases)
 - [License](#license)
 
 ## Features
 
-- Synchronous and Asynchronous Python API.
-- Object Mapper - Models, PropertyTypes, and Form validation
-- Execute gremlin queries
-- Built in QuerySets for performing standard CRUD operations on graph.
-- Query caching support
-- Utilities for logging queries and performance.
-- Django-ORM like search, perform search using filters described in https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates.
-  Following filter keyword patterns are supported with `read_many`, `read_one`, `delete_many`,
-  `delete_one`, `update_many`,`update_one`
-    - has__id=1021
-    - has__id__within=[200752, 82032, 4320],
-    - has__label__within=["Person", "Planet"]
-    - has__label__without=["Person", "Planet"]
-    - has__label="Person"
-    - has__age__lte=25
-    - has__age__lt=25
-    - has__age__gte=25
-    - has__age__gt=25
-    - has__age__inside=(10, 20)
-    - has__age__outside=(10, 20)
-    - has__age__between=(10, 20)
-    - has__label__eq="Person"
-    - has__label__neq="Person"
-    - has__name__startingWith="Per"
-    - has__name__endingWith="son"
-    - has__name__containing="erson"
-    - has__name__notStartingWith="son"
-    - has__name__notEndingWith="son"
-    - has__name__notContaining="son"
-    - pagination__limit=10
-    - pagination__range=[0, 10]
- 
+- [x] Object Mapper - Models, PropertyTypes, and Form validation
+- [x] Execute gremlin queries
+- [x] Built in QuerySets for performing standard CRUD operations on graph.
+- [x] Utilities for logging queries and performance.
+- [x] Django-ORM like search when using OGM(ex: has__id__within=[200752, 82032, 4320],
+   has__name__startingWith="Per")(Refer [search-usage.md](search-usage.md) for more)
+- [ ] Query caching support [WIP]
+- [ ] Asynchronous Python API.
 
 ## Installation
 
@@ -56,10 +32,6 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 #### Using OGM
 
 ```python
-from invana_py import InvanaGraph
-from invana_py.ogm.models import VertexModel, EdgeModel
-from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
-from datetime import datetime
 from invana_py import InvanaGraph
 from invana_py.ogm.models import VertexModel, EdgeModel
 from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
@@ -228,9 +200,9 @@ result = graph.vertex.count(has__label="Project", has__name__containing="engine"
 result = graph.vertex.count(has__label__within=["Project", "Person"])
 ```
 
-## Examples
+[comment]: <> (## Examples)
 
-Checkout examples [here](examples/) for reference.
+[comment]: <> (Checkout examples [here]&#40;examples/&#41; for reference.)
 
 ## Supported graph databases
 

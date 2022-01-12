@@ -6,8 +6,6 @@ name = "pypi"
 [packages]
 gremlinpython = "3.5.1"
 aiohttp = "*"
-pytest-asyncio = "*"
-pytest = "*"
 
 [dev-packages]
 pytest = "*"
