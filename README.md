@@ -27,10 +27,7 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 
 ## Usage
 
-### Performing CRUD on Graph
-
-#### Using OGM
-
+### Model first graph
 ```python
 from invana_py import InvanaGraph
 from invana_py.ogm.models import VertexModel, EdgeModel
@@ -73,60 +70,66 @@ Project.objects.delete()
 Person.objects.delete()
 Authored.objects.delete()
 
-person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
-print("person is :", person)
-print("person as json :", person.to_json())
+person = Person.objects.get_or_create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
-print("project is:", project.to_json())
+authored_data = Authored.objects.create(person.id, project.id)
 
-projects = Project.objects.search().element_map()
-print("projects", projects)
-
-authored_single = Authored.objects.create(person.id, project.id)
-print("authored_single", authored_single)
-authored = Authored.objects.search().element_map()
-print("authored", authored)
+authored_list = Authored.objects.search().to_list()
+project_list = Project.objects.search().to_list()
 
 graph.close_connection()
-
-
 ```
 
-#### Without using OGM
-
+### Searching graph
 ```python
-from invana_py import InvanaGraph
-from datetime import datetime
+# search by id
+Project.objects.search(has__id=123).to_list()
+Project.objects.search(has__id__within=[123, 232]).to_list()
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+# search string - eq, neq, startingWith, endingWith, containing, notStartingWith, notEndingWith, notContaining
+Project.objects.search(has__name__eq="Ravi Raja").to_list()
+Project.objects.search(has__name__neq="Ravi Raja").to_list()
+Project.objects.search(has__name__neq="Ravi Raja").to_list()
+Project.objects.search(has__name__startingWith="Ravi").to_list()
+Project.objects.search(has__name__endingWith="Raja").to_list()
+Project.objects.search(has__name__containing="Raja").to_list()
+Project.objects.search(has__name__notStartingWith="Raja").to_list()
+Project.objects.search(has__name__notEndingWith="Raja").to_list()
+Project.objects.search(has__name__notContaining="Raja").to_list()
 
-user = graph.vertex.get_or_create("Person", properties={
-    "first_name": "Ravi Raja",
-    "last_name": "Merugu"
-})
+# lt, gt, lte, gte, inside, outside, between
+Project.objects.search(has__member_since__lte=3000).to_list()
+Project.objects.search(has__member_since__lt=3000).to_list()
+Project.objects.search(has__member_since__gte=1999).to_list()
+Project.objects.search(has__member_since__gt=1999).to_list()
+Project.objects.search(has__member_since__inside=(1000,3000)).to_list()
+Project.objects.search(has__member_since__outside=(1000,3000)).to_list()
+Project.objects.search(has__member_since__between=(1000,3000)).to_list()
+```
+Note: more info on usage [here](https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates) 
 
-invana_studio_instance = graph.vertex.get_or_create("Project", properties={
-    "name": "invana-studio",
-    "description": "opensource connector visualiser for Invana connector analytics engine"
-})
-# <g:Vertex id=4128 label=GithubProject name=invana_py-studio description=opensource connector visualiser for Invana connector analytics engine/>
-
-invana_engine_instance = graph.vertex.get_or_create("Project", properties={
-    "name": "invana_py-engine",
-    "description": "Invana connector analytics engine"
-})
-
-edge_instance = graph.edge.get_or_create("authored", user.id, invana_studio_instance.id, properties={
-    "created_at": datetime.now()
-})
-
-engine_edge_instance = graph.edge.get_or_create("authored", user.id, invana_engine_instance.id, properties={
-    "created_at": datetime.now()
-})
-
+### Order by 
+```python
+Project.objects.search().order_by('name').to_list() # asc order
+Project.objects.search().order_by('-name').to_list() # desc order
 ```
 
-### Performing raw queries
+### Pagination
+```python
+# using range for pagination
+queryset = Project.objects.search().order_by('name').range(1, 10).to_list()
+
+# using paginator
+from invana_py.ogm.paginator import QuerySetPaginator
+
+page_size = 5
+queryset = Project.objects.search().order_by("-serial_no")
+paginator = QuerySetPaginator(queryset, page_size)
+qs = paginator.page(1)
+first_page = qs.to_list()
+```
+
+### Running queries
 
 #### using execute_query method
 
@@ -149,60 +152,10 @@ graph.execute_query_with_callback("g.V().limit(1).next()",
                                   finished_callback=lambda: graph.close_connection(),
                                   timeout=180)
 graph.close_connection()
-
 ```
 
-### Search usage (for read, delete, update)
 
-#### for read_many, read_one, delete_many, delete_one
 
-```python
-from invana_py import InvanaGraph
-
-graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
-
-# without ogm
-result = graph.vertex.read_many(has__label="Project")
-result = graph.vertex.read_many(has__label__within=["Project", "Person"])
-result = graph.vertex.read_many(has__id=1271)
-result = graph.vertex.read_many(has__label="Project", has__name__containing="engine")
-result = graph.edge.read_many(has__label="authored", has__created_at__lte=2021)
-
-# with ogm
-result = Project.objects.read_many(has__id=1271)
-result = Project.objects.read_many(has__name__containing="engine")
-result = Authored.objects.read_many(has__created_at__lte=2021)
-
-```
-
-#### for update_many, update_one
-
-```python
-
-person = Person.objects.update_one(query_kwargs={"has__first_name__containing": "Ravi"},
-                                   properties={"last_name": f"Merugu (updated)"})
-
-```
-
-### Perform count queries
-
-#### count using OGM
-
-```python
-result = Person.objects.count()
-result = Person.objects.count(has__name__containing="engine")
-```
-
-#### count without using OGM
-
-```python
-result = graph.vertex.count(has__label="Project", has__name__containing="engine")
-result = graph.vertex.count(has__label__within=["Project", "Person"])
-```
-
-[comment]: <> (## Examples)
-
-[comment]: <> (Checkout examples [here]&#40;examples/&#41; for reference.)
 
 ## Supported graph databases
 

@@ -14,7 +14,18 @@
 #
 import re
 
+from invana_py.traversal.traversal import InvanaTraversal
+
 
 def convert_to_camel_case(s):
     r = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
     return r.sub(r'_\1', s).lower()
+
+
+def divide_chunks(l, n):
+    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
+
+
+def copy_traversal(traversal):
+    traversal = self.queryset_result.get_traversal()
+    return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(self.bytecode))

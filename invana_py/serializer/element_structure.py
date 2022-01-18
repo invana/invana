@@ -13,12 +13,6 @@
 #    limitations under the License.
 #
 
-
-class Property:
-    key = None
-    value = None
-
-
 class PropertiesObject:
 
     def __repr__(self):

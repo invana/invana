@@ -41,12 +41,12 @@ class TestVertexModelQuerySet:
             Project.objects.create(name=project_string)
         Organisation.objects.create(name="invana")
 
-        projects = Project.objects.search().value_list()
+        projects = Project.objects.search().to_list()
         for project in projects:
             assert isinstance(project, Node)
             assert project.label == Project.label_name
 
-        orgs = Organisation.objects.search().value_list()
+        orgs = Organisation.objects.search().to_list()
         for org in orgs:
             assert isinstance(org, Node)
             assert org.label == Organisation.label_name

@@ -54,7 +54,7 @@ class VertexModelQuerySet(ModelQuerySetBase):
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def create(self, **properties):
-        _ = self.queryset.create(self.model.label_name, **properties).value_list()
+        _ = self.queryset.create(self.model.label_name, **properties).to_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
@@ -88,7 +88,7 @@ class EdgeModelQuerySet(ModelQuerySetBase):
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def create(self, from_, to_, **properties):
-        _ = self.queryset.create(self.model.label_name, from_, to_, **properties).value_list()
+        _ = self.queryset.create(self.model.label_name, from_, to_, **properties).to_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs

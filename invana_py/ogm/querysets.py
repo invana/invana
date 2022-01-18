@@ -1,11 +1,13 @@
 from abc import ABC
 from gremlin_python.process.traversal import Cardinality
 from invana_py.connector.connector import GremlinConnector
+from .utils import divide_chunks
+from gremlin_python.process.translator import Order
 from ..traversal.traversal import __
 import abc
 
 
-class QuerySetResult:
+class QuerySetResultSet:
 
     def __init__(self, traversal):
         self._traversal = traversal
@@ -23,23 +25,39 @@ class QuerySetResult:
     # def value_map(self, *args) -> list:
     #     return self.get_traversal().valueMap(*args).toList()
 
-    def to_list(self) -> list:
-        return self.value_list()
-
-    def value_list(self, *args) -> list:
+    def to_list(self, *args) -> list:
         return self.get_traversal().elementMap(*args).toList()
+
+    def values_list(self, *args, flatten=False) -> list:
+        _ = self.get_traversal().properties(*args).toList()
+        if flatten is True:
+            return _
+        return divide_chunks(_, args.__len__())
 
     def update(self, **properties) -> list:
         return self.get_traversal().update_properties(**properties).elementMap().toList()
 
     def count(self):
-        return self.get_traversal().count()
+        _ = self.get_traversal().count().toList()
+        if _.__len__() > 0:
+            return _[0]
 
     def drop(self):
         return self.get_traversal().drop().iterate()
 
-    def order_by(self, *args):
-        self.get_traversal().order_by(*args)
+    def order_by(self, property_name):
+        """
+
+        :param property_name:
+        :return:
+        """
+        _ = self.get_traversal()
+        order_string = Order.desc if property_name.startswith("-") else Order.asc
+        _.order().by(property_name, order_string)
+        return self
+
+    def range(self, *args):
+        self.get_traversal().range(*args)
         return self
 
 
@@ -78,32 +96,32 @@ class QuerySetBase(abc.ABC):
 
 class VertexQuerySet(QuerySetBase, ABC):
 
-    def create(self, label, **properties) -> QuerySetResult:
-        return QuerySetResult(self.connector.g.create_vertex(label, **properties))
+    def create(self, label, **properties) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.create_vertex(label, **properties))
 
-    def search(self, **search_kwarg) -> QuerySetResult:
-        return QuerySetResult(self.connector.g.V().search(**search_kwarg))
+    def search(self, **search_kwarg) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.V().search(**search_kwarg))
 
     def delete(self, **search_kwarg):
         return self.search(**search_kwarg).drop()
 
     def get_or_create(self, label, **properties):
         elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
-            .value_list()
+            .to_list()
         created = False
         if elem.__len__() == 0:
-            elem = self.create(label, **properties).value_list()
+            elem = self.create(label, **properties).to_list()
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
 
 
 class EdgeQuerySet(QuerySetBase, ABC):
 
-    def create(self, label, from_, to_, **properties) -> QuerySetResult:
-        return QuerySetResult(self.connector.g.create_edge(label, from_, to_, **properties))
+    def create(self, label, from_, to_, **properties) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.create_edge(label, from_, to_, **properties))
 
-    def search(self, **search_kwarg) -> QuerySetResult:
-        return QuerySetResult(self.connector.g.E().search(**search_kwarg))
+    def search(self, **search_kwarg) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.E().search(**search_kwarg))
 
     def delete(self, **search_kwarg):
         return self.search(**search_kwarg).drop()

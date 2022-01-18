@@ -8,12 +8,11 @@ GREMLIN_SERVER_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://localhost:8182/g
 async def main():
     print("===test execute query")
     graph = InvanaGraph(GREMLIN_SERVER_URL)
-    await graph.connect()
     graph.g.V().toList()
-    data = await graph.execute_query("g.V().limit(1).count()")
+    data = graph.execute_query("g.V().limit(1).count()")
     # data =  connector.vertex.read_many()
     print("======data", data)
-    await graph.close_connection()
+    graph.close_connection()
 
 
 # loop = asyncio.get_event_loop()

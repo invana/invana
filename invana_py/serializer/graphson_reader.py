@@ -69,8 +69,17 @@ class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
                             Node(reader.toObject(d["inV"]), d.get("inVLabel", "vertex")))
 
 
+# class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
+#
+#     @classmethod
+#     def objectify(cls, d, reader):
+#         element = reader.toObject(d["element"]) if "element" in d else None
+#         return Property(d["key"], reader.toObject(d["value"]), element)
+
+
 INVANA_DESERIALIZER_MAP = {
     "g:Map": InvanaMapType,
     "g:Vertex": InvanaVertexDeserializer,
     "g:Edge": InvanaEdgeDeserializer,
+    # "g:Property": InvanaEdgeDeserializer,
 }

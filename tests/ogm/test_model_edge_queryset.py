@@ -68,7 +68,7 @@ class TestEdgeModelQuerySet:
             assert isinstance(project, Node)
             assert isinstance(authored_single, RelationShip)
 
-        authored_list = Authored.objects.search(has__name="link-for-invana-studio").value_list()
+        authored_list = Authored.objects.search(has__name="link-for-invana-studio").to_list()
         for authored_item in authored_list:
             assert authored_item.properties.name == "link-for-invana-studio"
         graph.g.V().drop().iterate()
