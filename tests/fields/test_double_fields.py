@@ -27,19 +27,19 @@ class TestDoubleField:
 
     def test_field(self):
         graph.g.V().drop()
-        star = Star.objects.create(name="Sun", distance_from_earth=1989000000000000000000000000000)
+        star = Star.objects.create(name="Sun", distance_from_earth=long(1989000000000000000000000000000))
         assert isinstance(star.properties.distance_from_earth, long)
 
     def test_field_max_value(self):
         graph.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
-            Star.objects.create(name="Sun", distance_from_earth=1989000000000000000000000000000 * 10000)
+            Star.objects.create(name="Sun", distance_from_earth=long(1989000000000000000000000000000) * 10000)
         assert "max_value for field" in exec_info.value.__str__()
 
     def test_field_min_value(self):
         graph.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
-            Star.objects.create(name="Sun", distance_from_earth=2)
+            Star.objects.create(name="Sun", distance_from_earth=long(2))
         assert "min_value for field " in exec_info.value.__str__()
 
     def test_field_default(self):

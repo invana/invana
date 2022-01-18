@@ -107,6 +107,7 @@ class BooleanProperty(FieldBase, ABC):
 class NumberFieldBase(FieldBase, ABC):
     number_data_types = [int, float, long]
 
+
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
         self.min_value = min_value
