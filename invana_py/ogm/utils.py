@@ -13,7 +13,7 @@
 #    limitations under the License.
 #
 import re
-
+import copy
 from invana_py.traversal.traversal import InvanaTraversal
 
 
@@ -27,5 +27,4 @@ def divide_chunks(l, n):
 
 
 def copy_traversal(traversal):
-    traversal = self.queryset_result.get_traversal()
-    return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(self.bytecode))
+    return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(traversal.bytecode))
