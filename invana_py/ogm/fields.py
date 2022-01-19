@@ -13,16 +13,18 @@
 #     limitations under the License.
 #
 import datetime
+import types
 import typing
 from abc import ABC
-
-from gremlin_python.statics import FloatType, long, SingleChar, SingleByte, ListType, SetType, ByteBufferType, \
-    IntType, LongType
+from invana_py.connector.data_types import FloatType, IntegerType, DoubleType, LongType, BooleanType, SingleByteType, \
+    SingleCharType, StringType, DateTimeType
+from gremlin_python.statics import long
 from invana_py.ogm.exceptions import FieldValidationError
 
 
 class FieldBase:
     data_type = None
+    allowed_data_types = []
 
     def __init__(self, *,
                  default: typing.Any = None,
@@ -36,41 +38,53 @@ class FieldBase:
         self.allow_null = allow_null
         self.read_only = read_only
         # self.validator = self.get_validator(*, **kwargs)
+        # self.validate_value_data_types()
 
     def get_field_type(self):
         return self.data_type
 
     def validate(self, value, field_name=None, model=None):
-        return NotImplementedError()
+        default_value = self.get_default_value()
+        value = default_value if value is None and default_value else value
+        if self.allow_null is False and value is None:
+            raise FieldValidationError(
+                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+        self.validate_value_data_types(value, model, field_name)
+        self.validate_field_kwargs(value, model, field_name)
+        return value
+
+    def get_default_value(self, ):
+        if self.default and isinstance(self.default, types.FunctionType):
+            return self.default()
+        return self.default
 
     def get_validator(self, **kwargs):
         raise NotImplementedError()  # pragma: no cover
 
+    def validate_value_data_types(self, value, model, field_name):
+        if value and type(value) not in self.allowed_data_types:
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+                                       f" allowed_data_types: {self.allowed_data_types}")
+
+    def validate_field_kwargs(self, value, model, field_name):
+        raise NotImplementedError()
+
 
 class StringProperty(FieldBase, ABC):
-    data_type = str
+    data_type = StringType
+    allowed_data_types = [StringType, str]
 
     def __init__(self, max_length=None, min_length=None, trim_whitespaces=True, **kwargs):
-        # if max_length is None and min_length is None:
-        #     raise FieldValidationError(f"Either min_length or max_length should be provided for {self.__name__}")
-        # assert max_length is not None, "max_length is required"
         super().__init__(**kwargs)
         self.max_length = max_length
         self.min_length = min_length
         self.trim_whitespaces = trim_whitespaces
 
-    def validate(self, value, field_name=None, model=None):
-        assert value is None or isinstance(value, str)
+    def validate_field_kwargs(self, value, model, field_name):
         assert self.max_length is None or isinstance(self.max_length, int)
         assert self.min_length is None or isinstance(self.min_length, int)
         assert self.allow_null is None or isinstance(self.allow_null, bool)
         assert self.trim_whitespaces is None or isinstance(self.trim_whitespaces, bool)
-        if value is None and self.default:
-            value = self.default
-
-        if value is not None and self.trim_whitespaces is True:
-            value = value.strip()
-
         if self.allow_null is False and value is None:
             raise FieldValidationError(
                 f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
@@ -85,41 +99,35 @@ class StringProperty(FieldBase, ABC):
                     f"min_length for field '{model.label_name}.{field_name}' is {self.min_length} but "
                     f"the value has {value.__len__()}")
 
+    def validate(self, value, field_name=None, model=None):
+        value = super(StringProperty, self).validate(value, field_name=field_name, model=model)
+        if value is not None and self.trim_whitespaces is True:
+            value = value.strip()
         return self.data_type(value) if value else value
 
 
 class BooleanProperty(FieldBase, ABC):
-    data_type = bool
+    data_type = BooleanType
+    allowed_data_types = [BooleanType, bool]
 
     def validate(self, value, field_name=None, model=None):
-        if value and not isinstance(value, self.data_type):
-            raise FieldValidationError(
-                f"field '{model.label_name}.{field_name}' cannot be '{value}'. must be a boolean")
-        assert value is None or isinstance(value, self.data_type)
-        if self.default:
-            assert self.default is None or isinstance(self.default, bool)
-        if value is None and self.default:
-            value = self.default
-
+        # assert value is None or isinstance(value, self.data_type)
+        # if self.default:
+        #     assert self.default is None or isinstance(self.default, bool)
+        # value = self.default if value is None and self.default else value
+        value = super(BooleanProperty, self).validate(value, field_name=field_name, model=model)
         return self.data_type(value) if value is not None else value
 
 
 class NumberFieldBase(FieldBase, ABC):
-    number_data_types = [int, float, long]
-
+    allowed_data_types = [IntegerType, FloatType, LongType, DoubleType, int, float, long]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
         self.min_value = min_value
         self.max_value = max_value
 
-    def validate(self, value, field_name=None, model=None):
-
-        # TODO - CHECK if min_value and max_value are assigned respective data types
-        if value and type(value) not in self.number_data_types:
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
-                                       f" expecting {self.data_type}")
-
+    def validate_field_kwargs(self, value, model, field_name):
         assert self.max_value is None or isinstance(self.max_value, int)
         assert self.min_value is None or isinstance(self.min_value, int)
         assert self.allow_null is None or isinstance(self.allow_null, bool)
@@ -136,11 +144,13 @@ class NumberFieldBase(FieldBase, ABC):
                 raise FieldValidationError(
                     f"min_value for field '{model.label_name}.{field_name}' is {self.min_value} but the value has {value}")
 
-        return self.data_type(value) if value else value
+    def validate(self, value, field_name=None, model=None):
+        value = super(NumberFieldBase, self).validate(value, field_name=field_name, model=model)
+        return self.data_type(value) if value is not None else value
 
 
 class IntegerProperty(NumberFieldBase, ABC):
-    data_type = IntType
+    data_type = IntegerType
 
 
 class FloatProperty(NumberFieldBase, ABC):
@@ -148,25 +158,30 @@ class FloatProperty(NumberFieldBase, ABC):
 
 
 class DoubleProperty(NumberFieldBase, ABC):
+    data_type = DoubleType
+
+
+class LongProperty(NumberFieldBase, ABC):
     data_type = LongType
 
 
 class DateTimeProperty(FieldBase, ABC):
-    data_type = datetime.datetime
+    data_type = DateTimeType
+    allowed_data_types = [DateTimeType, datetime.datetime]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
         self.min_value = min_value
         self.max_value = max_value
 
-    def validate_value_data_types(self, value, model, field_name):
-        if value and not isinstance(value, self.data_type):
+    def validate_field_kwargs(self, value, model, field_name):
+        if value and not isinstance(value, tuple(self.allowed_data_types)):
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
                                        f"type {type(value)}, expecting {self.data_type}")
-        if self.max_value and not isinstance(self.max_value, self.data_type):
+        if self.max_value and not isinstance(self.max_value, tuple(self.allowed_data_types)):
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
                                        f"type {type(self.max_value)}, expecting {self.data_type}")
-        if self.min_value and not isinstance(value, self.data_type):
+        if self.min_value and not isinstance(value, tuple(self.allowed_data_types)):
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
                                        f"type {type(self.min_value)}, expecting {self.data_type}")
 
@@ -180,14 +195,9 @@ class DateTimeProperty(FieldBase, ABC):
                 raise FieldValidationError(f"min_value for field '{model.label_name}.{field_name}' is"
                                            f" {self.min_value} but the value has {value}")
 
-    def validate(self, value, field_name=None, min_value=None, max_value=None, model=None):
-        if value is None and self.default:
-            value = self.default()
-        if self.allow_null is False and value is None:
-            raise FieldValidationError(
-                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
-        self.validate_value_data_types(value, model, field_name)
-        return value
+    def validate(self, value, field_name=None, model=None):
+        value = super(DateTimeProperty, self).validate(value, field_name=field_name, model=model)
+        return self.data_type(value) if value is not None else value
 
 #
 # class LongField(NumberFieldBase, ABC):
