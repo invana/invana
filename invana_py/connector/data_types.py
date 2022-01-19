@@ -14,7 +14,7 @@
 import datetime
 from .exceptions import ParserException
 
-__all__ = ['StringType', 'SingleCharType', 'SingleByteType', 'BooleanType', 'ShortType',
+__all__ = ['StringType', 'SingleCharType', 'BooleanType', 'ShortType',
            'IntegerType', 'LongType', 'FloatType', 'DoubleType', 'DateTimeType']
 # https://www.w3schools.com/java/java_data_types.asp
 
@@ -22,15 +22,17 @@ __all__ = ['StringType', 'SingleCharType', 'SingleByteType', 'BooleanType', 'Sho
 [x] String	Character sequence
 [x] Character	Individual character
 [x] Boolean	true or false
-[x] Byte	byte value
+[z] Byte	byte value
 [x] Short	short value
 [x] Integer	integer value
 [x] Long	long value
-Float	4 byte floating point number
-Double	8 byte floating point number
-Date	Specific instant in time (java.util.Date)
-Geoshape	Geographic shape like point, circle or box
-UUID
+[y] Float	4 byte floating point number
+[y] Double	8 byte floating point number
+[x] Date	Specific instant in time (java.util.Date)
+[ ] Geoshape	Geographic shape like point, circle or box
+[ ] UUID
+
+* x=implementation done , y= incomplete implementation, z= implemented, but broken
 """
 
 
@@ -53,17 +55,17 @@ class BooleanType:
         except Exception as e:
             raise e
 
-
-class SingleByteType(int):
-    """
-    Provides a way to pass a single byte via Gremlin.
-    """
-
-    def __new__(cls, b):
-        if -128 <= b < 128:
-            return int.__new__(cls, b)
-        else:
-            raise ValueError("value must be between -128 and 127 inclusive")
+#
+# class SingleByteType(int):
+#     """
+#     Provides a way to pass a single byte via Gremlin.
+#     """
+#
+#     def __new__(cls, b):
+#         if -128 <= b < 128:
+#             return int.__new__(cls, b)
+#         else:
+#             raise ValueError("value must be between -128 and 127 inclusive")
 
 
 class ByteType(bytes):

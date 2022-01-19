@@ -12,8 +12,8 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from invana_py import InvanaGraph
-from invana_py.ogm.models import VertexModel, EdgeModel
-from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from invana_py.ogm.models import VertexModel
+from invana_py.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -32,7 +32,7 @@ class MyProject(VertexModel):
 
 projects_data = [
     {
-        "name": "invana engine",
-        "description":
+        "name": "invana py",
+        "description": "API for gremlin supported graph databases"
     }
 ]

@@ -16,10 +16,12 @@ import datetime
 import types
 import typing
 from abc import ABC
-from invana_py.connector.data_types import FloatType, IntegerType, DoubleType, LongType, BooleanType, SingleByteType, \
-    SingleCharType, StringType, DateTimeType
+from invana_py.connector.data_types import FloatType, IntegerType, DoubleType, LongType, BooleanType, \
+    SingleCharType, StringType, DateTimeType, ByteType, ShortType
 from gremlin_python.statics import long
 from invana_py.ogm.exceptions import FieldValidationError
+
+__all__ = ['StringProperty', 'SingleCharProperty', 'BooleanProperty', ]
 
 
 class FieldBase:
@@ -28,12 +30,12 @@ class FieldBase:
 
     def __init__(self, *,
                  default: typing.Any = None,
-                 unique: bool = False,
+                 # unique: bool = False,
                  allow_null: bool = False,
                  read_only: bool = False,
                  **kwargs):
         self.allow_null = allow_null
-        self.unique = unique
+        # self.unique = unique
         self.default = default
         self.allow_null = allow_null
         self.read_only = read_only
@@ -69,6 +71,12 @@ class FieldBase:
     def validate_field_kwargs(self, value, model, field_name):
         raise NotImplementedError()
 
+    def convert_to_data_type(self, value, model, field_name):
+        try:
+            return self.data_type(value) if value is not None else value
+        except Exception as e:
+            raise FieldValidationError(f"field '{model.label_name}.{field_name}' failed with error: {e.__str__()}")
+
 
 class StringProperty(FieldBase, ABC):
     data_type = StringType
@@ -103,7 +111,19 @@ class StringProperty(FieldBase, ABC):
         value = super(StringProperty, self).validate(value, field_name=field_name, model=model)
         if value is not None and self.trim_whitespaces is True:
             value = value.strip()
-        return self.data_type(value) if value else value
+        return self.convert_to_data_type(value, model, field_name)
+
+
+class SingleCharProperty(FieldBase, ABC):
+    data_type = SingleCharType
+    allowed_data_types = [SingleCharType, str]
+
+    def validate_field_kwargs(self, value, model, field_name):
+        pass
+
+    def validate(self, value, field_name=None, model=None):
+        value = super(SingleCharProperty, self).validate(value, field_name=field_name, model=model)
+        return self.convert_to_data_type(value, model, field_name)
 
 
 class BooleanProperty(FieldBase, ABC):
@@ -111,16 +131,27 @@ class BooleanProperty(FieldBase, ABC):
     allowed_data_types = [BooleanType, bool]
 
     def validate(self, value, field_name=None, model=None):
-        # assert value is None or isinstance(value, self.data_type)
-        # if self.default:
-        #     assert self.default is None or isinstance(self.default, bool)
-        # value = self.default if value is None and self.default else value
         value = super(BooleanProperty, self).validate(value, field_name=field_name, model=model)
-        return self.data_type(value) if value is not None else value
+        return self.convert_to_data_type(value, model, field_name)
+
+
+"""
+TODO - uncomment this when tests are working fine
+class ByteProperty(FieldBase, ABC):
+    data_type = ByteType
+    allowed_data_types = [ByteType, bytes]
+
+    def validate_field_kwargs(self, value, model, field_name):
+        pass
+
+    def validate(self, value, field_name=None, model=None):
+        value = super(ByteProperty, self).validate(value, field_name=field_name, model=model)
+        return self.data_type(value) if value else value
+"""
 
 
 class NumberFieldBase(FieldBase, ABC):
-    allowed_data_types = [IntegerType, FloatType, LongType, DoubleType, int, float, long]
+    allowed_data_types = [IntegerType, FloatType, LongType, DoubleType, int, float, long, ShortType]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
         super().__init__(**kwargs)
@@ -143,14 +174,33 @@ class NumberFieldBase(FieldBase, ABC):
             if self.min_value and value < self.min_value:
                 raise FieldValidationError(
                     f"min_value for field '{model.label_name}.{field_name}' is {self.min_value} but the value has {value}")
+            if hasattr(self.data_type, 'limit'):
+                if value > self.data_type.limit - 1:
+                    raise FieldValidationError(
+                        f"max value allowed for '{self.data_type.__class__.__name__}' data type of "
+                        f"field '{model.label_name}.{field_name}'"
+                        f" is {self.data_type.limit - 1} but the value has {value}")
+                if value < 0 - self.data_type.limit:
+                    raise FieldValidationError(
+                        f"min_value allowed for '{self.data_type.__class__.__name__}' data type of "
+                        f"field '{model.label_name}.{field_name}'"
+                        f" is {self.min_value} but the value has {value}")
 
     def validate(self, value, field_name=None, model=None):
         value = super(NumberFieldBase, self).validate(value, field_name=field_name, model=model)
-        return self.data_type(value) if value is not None else value
+        return self.convert_to_data_type(value, model, field_name)
+
+
+class ShortProperty(NumberFieldBase, ABC):
+    data_type = ShortType
 
 
 class IntegerProperty(NumberFieldBase, ABC):
     data_type = IntegerType
+
+
+class LongProperty(NumberFieldBase, ABC):
+    data_type = LongType
 
 
 class FloatProperty(NumberFieldBase, ABC):
@@ -159,10 +209,6 @@ class FloatProperty(NumberFieldBase, ABC):
 
 class DoubleProperty(NumberFieldBase, ABC):
     data_type = DoubleType
-
-
-class LongProperty(NumberFieldBase, ABC):
-    data_type = LongType
 
 
 class DateTimeProperty(FieldBase, ABC):
@@ -197,7 +243,7 @@ class DateTimeProperty(FieldBase, ABC):
 
     def validate(self, value, field_name=None, model=None):
         value = super(DateTimeProperty, self).validate(value, field_name=field_name, model=model)
-        return self.data_type(value) if value is not None else value
+        return self.convert_to_data_type(value, model, field_name)
 
 #
 # class LongField(NumberFieldBase, ABC):
