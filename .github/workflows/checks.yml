@@ -4,8 +4,6 @@ on: [ push, pull_request ]
 jobs:
   test-runner-job:
     runs-on: ubuntu-18.04
-    env:
-      GREMLIN_SERVER_URL: 'ws://localhost:8182/gremlin'
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +28,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Run tests
         env:
-          GREMLIN_SERVER_URL: 'ws://localhost:8182/gremlin'
+          GREMLIN_SERVER_URL: ws://localhost:8182/gremlin
         run: |
           pip install -U tox
           tox
