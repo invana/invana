@@ -14,11 +14,11 @@ jobs:
     services:
       # Label used to access the service container
       janusgraph:
-        image: 'docker.io/janusgraph/janusgraph:latest'
+        image: 'janusgraph:latest'
         ports:
         - 8182:8182
         # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd --health-interval 10s --health-timeout 5s --health-retries 5
+#        options: --health-cmd --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
