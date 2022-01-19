@@ -14,7 +14,7 @@ jobs:
     services:
       # Label used to access the service container
       janusgraph:
-        image: 'janusgraph:latest'
+        image: 'docker.io/janusgraph/janusgraph:latest'
         ports:
         - 8182:8182
         # needed because the postgres container does not provide a healthcheck
