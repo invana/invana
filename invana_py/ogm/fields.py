@@ -130,6 +130,9 @@ class BooleanProperty(FieldBase, ABC):
     data_type = BooleanType
     allowed_data_types = [BooleanType, bool]
 
+    def validate_field_kwargs(self, value, model, field_name):
+        pass
+
     def validate(self, value, field_name=None, model=None):
         value = super(BooleanProperty, self).validate(value, field_name=field_name, model=model)
         return self.convert_to_data_type(value, model, field_name)

@@ -55,13 +55,15 @@ class QueryRequest(RequestBase):
     def response_received_but_failed(self, exception: GremlinServerError):
         self.state = RequestStateTypes.RESPONSE_RECEIVED
         self.update_last_updated_at()
-        if getattr(exception, "status_code"):
+        if hasattr(exception, "status_code"):
             error_reason = None
             gremlin_server_error = None
             if exception.status_code == 597:
                 gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}")
                 error_reason = QueryResponseErrorReasonTypes.INVALID_QUERY
                 ResponseReceivedButFailedEvent(self, exception.status_code, exception)
+        else:
+            ResponseReceivedButFailedEvent(self, "", exception)
 
     def response_received_successfully(self, status_code):
         self.state = RequestStateTypes.RESPONSE_RECEIVED
