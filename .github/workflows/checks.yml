@@ -31,7 +31,8 @@ jobs:
       - name: Run tests
         run: |
           pip install -U tox
-          tox -e py
+          export GREMLIN_SERVER_URL='ws://localhost:8182/gremlin'
+          tox -e
 
       - name: Upload coverage report
         run: bash <(curl -s https://codecov.io/bash)
