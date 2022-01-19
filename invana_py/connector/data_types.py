@@ -11,11 +11,11 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from gremlin_python.statics import long, ListType, DictType, SetType, timestamp, \
-    SingleChar
+import datetime
+from .exceptions import ParserException
 
 __all__ = ['StringType', 'SingleCharType', 'SingleByteType', 'BooleanType', 'ShortType',
-           'IntegerType', 'LongType', 'FloatType', 'DoubleType', ]
+           'IntegerType', 'LongType', 'FloatType', 'DoubleType', 'DateTimeType']
 # https://www.w3schools.com/java/java_data_types.asp
 
 """
@@ -103,7 +103,7 @@ class IntegerType(int):
             raise ValueError(f"IntegerType value must be between -{cls.limit} and {cls.limit - 1} inclusive")
 
 
-class LongType(long):
+class LongType(int):
     """
     Provides a way to pass a long datatype via Gremlin.
     """
@@ -124,8 +124,36 @@ class DoubleType(float):
     pass
 
 
-class DateTimeType(float):
-    pass
+class DateTimeType(datetime.datetime):
+
+    def __new__(cls, b, format=None):
+        if isinstance(b, datetime.datetime):
+            return b
+        elif isinstance(b, str):
+            assert format is not None, "format=None not allowed when str data is provided as input for DateTimeType"
+            try:
+                return datetime.datetime.strptime(b, format)
+            except Exception as e:
+                raise ParserException(f"Failed to parse string '{b}' with format '{format}'")
+        else:
+            raise ValueError(f"DateTimeType value must be datetime.datetime type or str with format ")
+
+
+class DateType(datetime.date):
+
+    def __new__(cls, b, format=None):
+        if isinstance(b, datetime.date):
+            return b
+        elif isinstance(b, datetime.datetime):
+            return b.date()
+        elif isinstance(b, str):
+            assert format is not None, "format=None not allowed when str data is provided as input for DateType"
+            try:
+                return datetime.datetime.strptime(b, format).date()
+            except Exception as e:
+                raise ParserException(f"Failed to parse string '{b}' with format '{format}'")
+        else:
+            raise ValueError(f"DateType value must be datetime.date type")
 
 # class UUIDType:
 #     mport uuid
