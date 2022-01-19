@@ -33,7 +33,6 @@ class TestDateType:
         datetime_string = 'Jun 1 2005 1:33PM'
         a = DateType(datetime_string, format='%b %d %Y %I:%M%p')
         assert isinstance(a, datetime.date)
-        print("======",a )
 
     def test_date_parse_failure(self):
         datetime_string = 'Jun 1 2005 1:33PM'
