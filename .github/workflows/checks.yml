@@ -1,4 +1,4 @@
-name: macOS
+name: Build Checks
 on: [ push, pull_request ]
 
 jobs:
@@ -32,7 +32,7 @@ jobs:
         run: |
           pip install -U tox
           export GREMLIN_SERVER_URL='ws://localhost:8182/gremlin'
-          tox -e
+          tox
 
       - name: Upload coverage report
         run: bash <(curl -s https://codecov.io/bash)
