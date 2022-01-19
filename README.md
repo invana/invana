@@ -16,7 +16,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 - [x] Utilities for logging queries and performance.
 - [x] Django-ORM like search when using OGM(ex: has__id__within=[200752, 82032, 4320],
    has__name__startingWith="Per")(Refer [search-usage.md](search-usage.md) for more)
-- [ ] Query caching support [WIP]
+- [ ] Query caching support
 - [ ] Asynchronous Python API.
 
 ## Installation
