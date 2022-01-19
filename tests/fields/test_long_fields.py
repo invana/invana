@@ -5,8 +5,9 @@ from invana_py.ogm.models import VertexModel
 from gremlin_python.statics import long
 from invana_py import InvanaGraph
 from invana_py.connector.data_types import LongType
+import os
 
-gremlin_url = "ws://megamind-ws:8182/gremlin"
+gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 graph = InvanaGraph(gremlin_url)
 
 DEFAULT_USERNAME = "rrmerugu"
