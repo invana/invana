@@ -4,11 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-gremlinpython = "3.5.1"
-aiohttp = "*"
+gremlinpython = "==3.5.1"
+aiohttp = "==3.7.4"
 
 [dev-packages]
-pytest = "*"
+pytest = "==6.2.5"
+pytest-asyncio = "==0.16.0"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.8"

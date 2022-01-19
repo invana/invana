@@ -1,232 +1,150 @@
-#   Copyright 2021 Invana
-#  #
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#  #
-#    http:www.apache.org/licenses/LICENSE-2.0
-#  #
-#    Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+#    Copyright 2021 Invana
 #
-from invana_py.gremlin.structure import VertexCRUD, EdgeCRUD
-from .decorators import dont_allow_has_label_kwargs
-from .exceptions import FieldNotFoundError, ValidationError
-from invana_py.typing.elements import Node, RelationShip
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#     http:www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
+
+from abc import ABC
+from gremlin_python.process.traversal import Cardinality
+from invana_py.connector.connector import GremlinConnector
+from .utils import divide_chunks
+from gremlin_python.process.translator import Order
+from ..traversal.traversal import __
+import abc
 
 
-class QuerySetBase:
-    crud_cls = None
-    model = None
+class QuerySetResultSet:
 
-    def __init__(self, graph):
-        self.graph = graph
+    def __init__(self, traversal):
+        self._traversal = traversal
+
+    def get_traversal(self):
+        return self._traversal
+
+    #
+    # def properties(self, *args) -> list:
+    #     return self.get_traversal().properties(*args).toList()
+    #
+    # def values(self, *args) -> list:
+    #     return self.get_traversal().values(*args).toList()
+    #
+    # def value_map(self, *args) -> list:
+    #     return self.get_traversal().valueMap(*args).toList()
+
+    def to_list(self, *args) -> list:
+        return self.get_traversal().elementMap(*args).toList()
+
+    def values_list(self, *args, flatten=False) -> list:
+        _ = self.get_traversal().properties(*args).toList()
+        if flatten is True:
+            return _
+        return divide_chunks(_, args.__len__())
+
+    def update(self, **properties) -> list:
+        return self.get_traversal().update_properties(**properties).elementMap().toList()
+
+    def count(self):
+        _ = self.get_traversal().count().toList()
+        if _.__len__() > 0:
+            return _[0]
+
+    def drop(self):
+        return self.get_traversal().drop().iterate()
+
+    def order_by(self, property_name):
+        """
+
+        :param property_name:
+        :return:
+        """
+        _ = self.get_traversal()
+        order_string = Order.desc if property_name.startswith("-") else Order.asc
+        _.order().by(property_name, order_string)
+        return self
+
+    def range(self, *args):
+        self.get_traversal().range(*args)
+        return self
+
+
+class QuerySetBase(abc.ABC):
+
+    def __init__(self, connector: GremlinConnector):
+        self.connector = connector
+
+    @abc.abstractmethod
+    def create(self, *args, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def search(self, *args, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def delete(self, *args, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def get_or_create(self, *args, **kwargs):
+        pass
+
+    # @abc.abstractmethod
+    # def count(self, *args, **kwargs):
+    #     pass
 
     @staticmethod
-    def get_validated_data(field_name, field_value, model):
-        field = model.properties.get(field_name)
-        if field is None:
-            raise FieldNotFoundError(f"{field_name} doesn't exist in model '{model.__name__}'")
-
-        validated_value = field.validate(field_value, field_name=field_name, model=model)
-        return validated_value
-
-    def validate_for_create(self, **properties):
-        """
-
-        :param properties:
-        # :param update_mode: when update_mode is True, OGM will not expect all the properties
-        :return:
-        """
-        validated_data = {}
-        allowed_property_keys = list(self.model.properties.keys())
+    def create_has_filters(**properties):
+        search_kwargs = {}
         for k, v in properties.items():
-            if k not in allowed_property_keys:
-                raise ValidationError(f"property '{k}' not allowed in {self.model.label_name}")
-        for k, field in self.model.properties.items():
-            _ = self.get_validated_data(k, properties.get(k), self.model)
-            if _ is not None:
-                validated_data[k] = _
-        return validated_data
-
-    def validate_for_update(self, **properties):
-        """
-        in update_mode, OGM will not expect all the properties
-
-        :param properties:
-        :return:
-        """
-        validated_data = {}
-        allowed_property_keys = list(self.model.properties.keys())
-        for k, v in properties.items():
-            if k not in allowed_property_keys:
-                raise ValidationError(f"property '{k}' not allowed in {self.model.label_name}")
-        for k, v in properties.items():
-            _ = self.get_validated_data(k, v, self.model)
-            if _ is not None:
-                validated_data[k] = _
-        return validated_data
-
-    def serialize_to_datatypes(self, element):
-        if element and (isinstance(element, Node) or isinstance(element, RelationShip)):
-            for k, field in self.model.properties.items():
-                if hasattr(element.properties, k):
-                    _ = self.get_validated_data(k, getattr(element.properties, k), self.model)
-                    setattr(element.properties, k, _)
-        return element
-
-    def count(self, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        return self.crud.count(**query_kwargs)
+            search_kwargs[f"has__{k}"] = v
+        return search_kwargs
 
 
-class VertexQuerySet(QuerySetBase):
-    crud_cls = VertexCRUD
+class VertexQuerySet(QuerySetBase, ABC):
 
-    def __init__(self, graph, model):
-        super(VertexQuerySet, self).__init__(graph)
-        self.crud = self.crud_cls(self.graph)
-        self.model = model
+    def create(self, label, **properties) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.create_vertex(label, **properties))
 
-    def create(self, **kwargs):
-        validated_data = self.validate_for_create(**kwargs)
-        result = self.crud.create(self.model.label_name, properties=validated_data)
-        return self.serialize_to_datatypes(result)
+    def search(self, **search_kwarg) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.V().search(**search_kwarg))
 
-    def get_or_create(self, **properties):
-        result = self.crud.get_or_create(self.model.label_name, properties=properties)
-        return self.serialize_to_datatypes(result)
+    def delete(self, **search_kwarg):
+        return self.search(**search_kwarg).drop()
 
-    def read_one(self, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_one(**query_kwargs)
-        return self.serialize_to_datatypes(result)
-
-    def read_many(self, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_many(**query_kwargs)
-        return [self.serialize_to_datatypes(res) for res in result]
-
-    def update_one(self, query_kwargs=None, properties=None):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        validated_data = self.validate_for_update(**properties)
-        result = self.crud.update_one(query_kwargs=query_kwargs, properties=validated_data)
-        return self.serialize_to_datatypes(result)
-
-    def update_many(self, query_kwargs=None, properties=None):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        validated_data = self.validate_for_update(**properties)
-        result = self.crud.update_many(query_kwargs=query_kwargs, properties=validated_data)
-        return [self.serialize_to_datatypes(res) for res in result]
-
-    def delete_one(self, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_one(**query_kwargs)
-
-    def delete_many(self, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_many(**query_kwargs)
-
-    def read_incoming_vertices(self,
-                               source_query_kwargs: dict,
-                               edge_kwargs: dict,
-                               target_query_kwargs: dict
-                               ):
-        dont_allow_has_label_kwargs(**source_query_kwargs)
-        source_query_kwargs['has__label'] = self.model.label_name
-        return self.crud.read_incoming_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
-
-    def read_outgoing_vertices(self,
-                               source_query_kwargs: dict,
-                               edge_kwargs: dict,
-                               target_query_kwargs: dict
-                               ):
-        dont_allow_has_label_kwargs(**source_query_kwargs)
-        source_query_kwargs['has__label'] = self.model.label_name
-        return self.crud.read_outgoing_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
-
-    def read_incoming_and_outgoing_vertices(self,
-                                            source_query_kwargs: dict,
-                                            edge_kwargs: dict,
-                                            target_query_kwargs: dict
-                                            ):
-        dont_allow_has_label_kwargs(**source_query_kwargs)
-        source_query_kwargs['has__label'] = self.model.label_name
-        return self.crud.read_incoming_and_outgoing_vertices(source_query_kwargs, edge_kwargs, target_query_kwargs)
-
-    def get_in_edge_labels(self):
-        return self.crud.get_in_edge_labels(self.model.label_name)
-
-    def get_out_edge_labels(self):
-        return self.crud.get_out_edge_labels(self.model.label_name)
-
-    def get_in_edge_labels_stats(self):
-        return self.crud.get_in_edge_labels_stats(self.model.label_name)
-
-    def get_out_edge_labels_stats(self):
-        return self.crud.get_out_edge_labels_stats(self.model.label_name)
+    def get_or_create(self, label, **properties):
+        elem = self.search(has__label=label, **self.create_has_filters(**properties)) \
+            .to_list()
+        created = False
+        if elem.__len__() == 0:
+            elem = self.create(label, **properties).to_list()
+            created = True
+        return created, elem[0] if elem.__len__() > 0 else None
 
 
-class EdgeQuerySet(QuerySetBase):
-    crud_cls = EdgeCRUD
+class EdgeQuerySet(QuerySetBase, ABC):
 
-    def __init__(self, graph, model):
-        super(EdgeQuerySet, self).__init__(graph)
-        self.crud = self.crud_cls(self.graph)
-        self.model = model
+    def create(self, label, from_, to_, **properties) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.create_edge(label, from_, to_, **properties))
 
-    def create(self, from_, to_, properties=None):
-        properties = {} if properties is None else properties
-        validated_data = self.validate_for_create(**properties)
-        result = self.crud.create(self.model.label_name, from_, to_, properties=validated_data)
-        return self.serialize_to_datatypes(result)
+    def search(self, **search_kwarg) -> QuerySetResultSet:
+        return QuerySetResultSet(self.connector.g.E().search(**search_kwarg))
 
-    def get_or_create(self, from_, to_, properties=None):
-        result = self.crud.get_or_create(self.model.label_name, from_, to_, properties=properties)
-        return self.serialize_to_datatypes(result)
+    def delete(self, **search_kwarg):
+        return self.search(**search_kwarg).drop()
 
-    def read_one(self, from_=None, to_=None, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_one(from_=from_, to_=to_, **query_kwargs)
-        return self.serialize_to_datatypes(result)
-
-    def read_many(self, from_=None, to_=None, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.read_many(from_=from_, to_=to_, **query_kwargs)
-        return [self.serialize_to_datatypes(res) for res in result]
-
-    def update_one(self, from_=None, to_=None, query_kwargs=None, properties=None):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        validated_data = self.validate_for_update(**properties)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.update_one(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
-        return self.serialize_to_datatypes(result)
-
-    def update_many(self, from_=None, to_=None, query_kwargs=None, properties=None):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        validated_data = self.validate_for_update(**properties)
-        query_kwargs['has__label'] = self.model.label_name
-        result = self.crud.update_many(from_=from_, to_=to_, query_kwargs=query_kwargs, properties=validated_data)
-        return [self.serialize_to_datatypes(res) for res in result]
-
-    def delete_one(self, from_=None, to_=None, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        return self.crud.update_many(from_=from_, to_=to_, **query_kwargs)
-
-    def delete_many(self, from_=None, to_=None, **query_kwargs):
-        dont_allow_has_label_kwargs(**query_kwargs)
-        query_kwargs['has__label'] = self.model.label_name
-        return self.crud.delete_many(from_=from_, to_=to_, **query_kwargs)
+    def get_or_create(self, label, from_, to_, **properties):
+        elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
+            __.inV().hasId(to_)).elementMap().toList()
+        created = False
+        if elem.__len__() == 0:
+            elem = self.create(label, from_, to_, **properties).get_traversal().elementMap().toList()
+            created = True
+        return created, elem[0] if elem.__len__() > 0 else None
