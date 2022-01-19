@@ -1,0 +1,37 @@
+name: Build Checks
+on: [ push, pull_request ]
+
+jobs:
+  test-runner-job:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+#        python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10" ]
+        python-version: [ "3.8", ]
+    # Service containers to run with `test-runner-job`
+    services:
+      # Label used to access the service container
+      janusgraph:
+        image: 'docker.io/janusgraph/janusgraph:latest'
+        ports:
+        - 8182:8182
+        # needed because the postgres container does not provide a healthcheck
+#        options: --health-cmd --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run tests
+#        env: ${{ matrix.env }}
+        run: |
+          pip install -U tox
+          tox
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          directory: tests
