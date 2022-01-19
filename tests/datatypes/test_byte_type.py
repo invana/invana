@@ -11,26 +11,25 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-import pytest
-
-from invana_py.connector.data_types import IntegerType, StringType, SingleByteType, ByteType
+from invana_py.connector.data_types import ByteType
 
 
-class TestDataTypes:
-
-
-    def test_single_byte_type(self):
-        a = SingleByteType(1)
-        assert isinstance(a, int)
-        assert a == 1
-
-    def test_single_char_type(self):
-        a = StringCharType("a")
-        assert isinstance(a, str)
-        assert a == "a"
+class TestByteType:
 
     def test_byte_type(self):
         b = b'h\x65llo'
-        a = ByteType(b)
-        assert isinstance(a, bytes)
-        assert a == b
+        b_instance = ByteType(b)
+        assert isinstance(b_instance, bytes)
+        assert b_instance == b
+
+    def test_byte_type_when_string_input_utf8_encoding(self):
+        b = "hello"
+        b_instance = ByteType(b, 'utf-8')
+        assert isinstance(b_instance, bytes)
+        assert b_instance == b'hello'
+
+    def test_byte_type_when_string_input_ascii_encoding(self):
+        b = "hello"
+        b_instance = ByteType(b, 'ascii')
+        assert isinstance(b_instance, bytes)
+        assert b_instance == b'hello'

@@ -19,12 +19,13 @@ __all__ = ['StringType', 'SingleCharType', 'SingleByteType', 'BooleanType', 'Sho
 # https://www.w3schools.com/java/java_data_types.asp
 
 """
-String	Character sequence
-Character	Individual character
-Boolean	true or false
+[x] String	Character sequence
+[x] Character	Individual character
+[x] Boolean	true or false
+
 Byte	byte value
 Short	short value
-Integer	integer value
+[x] Integer	integer value
 Long	long value
 Float	4 byte floating point number
 Double	8 byte floating point number
@@ -67,7 +68,14 @@ class SingleByteType(int):
 
 
 class ByteType(bytes):
-    pass
+    def __new__(cls, b, encoding=None):
+        if isinstance(b, bytes):
+            return bytes.__new__(cls, b)
+        elif isinstance(b, str):
+            assert encoding is not None, "encoding=None not allowed when str data is provided"
+            return bytes.__new__(cls, b, encoding)
+        else:
+            raise ValueError(f"ByteType value must be between -32768 and 32767 inclusive")
 
 
 class ShortType(int):

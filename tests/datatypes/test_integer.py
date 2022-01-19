@@ -13,24 +13,17 @@
 #     limitations under the License.
 import pytest
 
-from invana_py.connector.data_types import IntegerType, StringType, SingleByteType, ByteType
+from invana_py.connector.data_types import IntegerType
 
 
-class TestDataTypes:
+class TestIntegerType:
 
-
-    def test_single_byte_type(self):
-        a = SingleByteType(1)
+    def test_integer_type(self):
+        a = IntegerType(1)
         assert isinstance(a, int)
         assert a == 1
 
-    def test_single_char_type(self):
-        a = StringCharType("a")
-        assert isinstance(a, str)
-        assert a == "a"
-
-    def test_byte_type(self):
-        b = b'h\x65llo'
-        a = ByteType(b)
-        assert isinstance(a, bytes)
-        assert a == b
+    def test_integer_type_failure(self):
+        with pytest.raises(ValueError) as exec_info:
+            IntegerType(12123123213123123211)
+        assert exec_info.value.__str__() == 'IntegerType value must be between -2147483648 and 2147483647 inclusive'
