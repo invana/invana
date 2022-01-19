@@ -11,6 +11,8 @@ aiohttp = "==3.7.4"
 pytest = "==6.2.5"
 pytest-asyncio = "==0.16.0"
 pytest-cov = "*"
+tox = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.8"
