@@ -2,6 +2,11 @@
 
 Python API for Apache TinkerPop's Gremlin supported databases.
 
+[![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-py/blob/master/LICENSE) 
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/invanalabs/invana-py)](https://github.com/invanalabs/invana-py/commits)
+[![codecov](https://codecov.io/gh/invanalabs/invana-py/branch/master/graph/badge.svg)](https://codecov.io/gh/invanalabs/invana-py)
+
+
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
