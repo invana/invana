@@ -22,11 +22,10 @@ __all__ = ['StringType', 'SingleCharType', 'SingleByteType', 'BooleanType', 'Sho
 [x] String	Character sequence
 [x] Character	Individual character
 [x] Boolean	true or false
-
-Byte	byte value
-Short	short value
+[x] Byte	byte value
+[x] Short	short value
 [x] Integer	integer value
-Long	long value
+[x] Long	long value
 Float	4 byte floating point number
 Double	8 byte floating point number
 Date	Specific instant in time (java.util.Date)
@@ -72,7 +71,7 @@ class ByteType(bytes):
         if isinstance(b, bytes):
             return bytes.__new__(cls, b)
         elif isinstance(b, str):
-            assert encoding is not None, "encoding=None not allowed when str data is provided"
+            assert encoding is not None, "encoding=None not allowed when str data is provided as input"
             return bytes.__new__(cls, b, encoding)
         else:
             raise ValueError(f"ByteType value must be between -32768 and 32767 inclusive")
@@ -82,12 +81,13 @@ class ShortType(int):
     """
     Provides a way to pass a short datatype via Gremlin.
     """
+    limit = 32768
 
     def __new__(cls, b):
         if -32768 <= b < 32767:
             return int.__new__(cls, b)
         else:
-            raise ValueError(f"ShortType value must be between -32768 and 32767 inclusive")
+            raise ValueError(f"ShortType value must be between -{cls.limit} and {cls.limit - 1} inclusive")
 
 
 class IntegerType(int):

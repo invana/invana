@@ -11,6 +11,8 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
+import pytest
+
 from invana_py.connector.data_types import ByteType
 
 
@@ -24,12 +26,18 @@ class TestByteType:
 
     def test_byte_type_when_string_input_utf8_encoding(self):
         b = "hello"
-        b_instance = ByteType(b, 'utf-8')
+        b_instance = ByteType(b, encoding='utf-8')
         assert isinstance(b_instance, bytes)
         assert b_instance == b'hello'
 
     def test_byte_type_when_string_input_ascii_encoding(self):
         b = "hello"
-        b_instance = ByteType(b, 'ascii')
+        b_instance = ByteType(b, encoding='ascii')
         assert isinstance(b_instance, bytes)
         assert b_instance == b'hello'
+
+    def test_byte_type_when_string_fail_case(self):
+        b = "hello"
+        with pytest.raises(AssertionError) as exec_info:
+            ByteType(b)
+        assert exec_info.value.__str__() == 'encoding=None not allowed when str data is provided as input'

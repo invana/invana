@@ -11,26 +11,17 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-import pytest
-
-from invana_py.connector.data_types import IntegerType, StringType, SingleByteType, ByteType
+from invana_py.connector.data_types import DoubleType
 
 
-class TestDataTypes:
+class TestDoubleType:
 
+    def test_double(self):
+        a = DoubleType(1.2)
+        assert isinstance(a, float)
+        assert a == 1.2
 
-    def test_single_byte_type(self):
-        a = SingleByteType(1)
-        assert isinstance(a, int)
-        assert a == 1
-
-    def test_single_char_type(self):
-        a = StringCharType("a")
-        assert isinstance(a, str)
-        assert a == "a"
-
-    def test_byte_type(self):
-        b = b'h\x65llo'
-        a = ByteType(b)
-        assert isinstance(a, bytes)
-        assert a == b
+    def test_double_with_int_input(self):
+        a = DoubleType(1)
+        assert isinstance(a, float)
+        assert a == 1.0
