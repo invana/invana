@@ -142,7 +142,7 @@ first_page = qs.to_list()
 from invana_py import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
-results = graph.execute_query("g.V().limit(1).toList()", timeout=180)
+results = graph.execute_query("g.V().limit(1).toList()", timeout=180000)
 graph.close_connection()
 ```
 
@@ -155,7 +155,7 @@ graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="pa
 graph.execute_query_with_callback("g.V().limit(1).next()",
                                   lambda res: print(res.__len__()),
                                   finished_callback=lambda: graph.close_connection(),
-                                  timeout=180)
+                                  timeout=180000)
 graph.close_connection()
 ```
 
