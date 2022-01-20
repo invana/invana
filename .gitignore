@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 *.log
+.coverage
+.tox
+*.egg-info/

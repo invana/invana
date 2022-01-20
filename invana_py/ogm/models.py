@@ -1,18 +1,18 @@
-#   Copyright 2021 Invana
-#  #
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#  #
-#    http:www.apache.org/licenses/LICENSE-2.0
-#  #
-#    Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+#    Copyright 2021 Invana
 #
-from .querysets import VertexQuerySet, EdgeQuerySet
+#     Licensed under the Apache License, Version 2.0 (the "License");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#     http:www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
+#
+from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
 from .utils import convert_to_camel_case
 
 
@@ -38,20 +38,20 @@ class VertexModel(metaclass=ModelMetaBase):
     class Meta:
         invana_py = None
     """
-    objects = VertexQuerySet
+    objects = VertexModelQuerySet
     graph = None
     label_name = None
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.schema.get_vertex_schema(cls.label_name)
+        return cls.graph.backend.schame_reader.get_vertex_schema(cls.label_name)
 
 
 class EdgeModel(metaclass=ModelMetaBase):
-    objects = EdgeQuerySet
+    objects = EdgeModelQuerySet
     graph = None
     label_name = None
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.schema.get_edge_schema(cls.label_name)
+        return cls.graph.backend.schame_reader.get_edge_schema(cls.label_name)
