@@ -15,10 +15,26 @@
 #
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
+from ...ogm.models import VertexModel
 from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class JanusGraphSchemaCreate:
+
+    @staticmethod
+    def create_model(model: VertexModel):
+        query = """mgmt = graph.openManagement()\n"""
+        query += f"""{model.label_name} = mgmt.makeVertexLabel('{model.label_name}').make()\n"""
+        for prop_key, prop_model in model.properties.items():
+            query += f"{prop_key} = mgmt.makePropertyKey('{prop_key}')" \
+                     f".dataType({prop_model.get_data_type_class()}.class).make() \n"
+        query += f"mgmt.addProperties({model.label_name}, {', '.join(list(model.properties.keys()))})\n"
+        query += "mgmt.commit()"
+        response = model.graph.connector.execute_query(query)
+        return response
 
 
 class JanusGraphSchemaReader(SchemaReaderBase):

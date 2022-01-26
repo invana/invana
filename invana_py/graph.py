@@ -55,6 +55,19 @@ class InvanaGraph:
     def reconnect(self):
         return self.connector.reconnect()
 
+    def get_features(self):
+        response = self.connector.execute_query("graph.features()")
+        lines = response.data[0].lstrip("FEATURES\n").split("> ")
+        data = {}
+        for line in lines[1:]:
+            items = line.rstrip().split("\n")
+            data[items[0]] = {}
+            for item in items[1:]:
+                item = item.lstrip(">-- ").split(":")
+                data[items[0]][item[0].strip()] = bool(item[1])
+        response.data = data
+        return response
+
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
                       finished_callback=None) -> any:
         """

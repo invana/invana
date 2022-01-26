@@ -45,6 +45,9 @@ class FieldBase:
     def get_field_type(self):
         return self.data_type
 
+    def get_data_type_class(self):
+        return self.data_type.__name__.rstrip("Type")
+
     def validate(self, value, field_name=None, model=None):
         default_value = self.get_default_value()
         value = default_value if value is None and default_value else value
