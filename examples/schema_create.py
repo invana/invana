@@ -7,7 +7,7 @@ from datetime import datetime
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project3(VertexModel):
+class Project6(VertexModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
@@ -19,10 +19,11 @@ class Project3(VertexModel):
 
 
 schema_create = JanusGraphSchemaCreate()
-# response = schema_create.create_model(Project3)
+
+response = schema_create.create_model(Project6)
 # response = Project3.graph.connector.execute_query("graphNames = ConfiguredGraphFactory.getGraphNames();")
 # response = Project3.graph.connector.execute_query("graph.features()")
-response = Project3.graph.get_features()
+# response = Project3.graph.get_features()
 print("====response", response.data)
 
 graph.close_connection()

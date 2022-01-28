@@ -23,14 +23,31 @@ logger = logging.getLogger(__name__)
 
 
 class JanusGraphSchemaCreate:
+    """
+mgmt.getRelationTypes(PropertyKey.class)
+mgmt.getRelationTypes(EdgeLabel.class)
+mgmt.getVertexLabels()
+
+
+    """
 
     @staticmethod
     def create_model(model: VertexModel):
         query = """mgmt = graph.openManagement()\n"""
-        query += f"""{model.label_name} = mgmt.makeVertexLabel('{model.label_name}').make()\n"""
+        query += f"""
+if (mgmt.containsVertexLabel('{model.label_name}'))
+    {model.label_name} = mgmt.getVertexLabel('{model.label_name}')
+else 
+    {model.label_name} = mgmt.makeVertexLabel('{model.label_name}').make()
+""".lstrip("\n")
         for prop_key, prop_model in model.properties.items():
-            query += f"{prop_key} = mgmt.makePropertyKey('{prop_key}')" \
-                     f".dataType({prop_model.get_data_type_class()}.class).make() \n"
+            query += f"""
+if (mgmt.containsRelationType('{prop_key}'))
+    {prop_key} = mgmt.getPropertyKey('{prop_key}')
+else 
+    {prop_key} = mgmt.makePropertyKey('{prop_key}').dataType({prop_model.get_data_type_class()}.class).make()
+""".lstrip("\n")
+
         query += f"mgmt.addProperties({model.label_name}, {', '.join(list(model.properties.keys()))})\n"
         query += "mgmt.commit()"
         response = model.graph.connector.execute_query(query)
@@ -46,14 +63,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
 
     def get_vertex_property_keys(self, label):
         response = self.connector.execute_query(
-            f"g.V().hasLabel('{label}').propertyMap().select(Column.keys).next();",
+            f"g.V().hasLabel('{label}').propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
         return response.data or []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
-            f"g.E().hasLabel('{label}').propertyMap().select(Column.keys).next();",
+            f"g.E().hasLabel('{label}').propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
         return response.data or []
