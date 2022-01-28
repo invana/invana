@@ -71,17 +71,17 @@ class JanusGraphSchemaReader(SchemaReaderBase):
 
     def get_vertex_property_keys(self, label):
         response = self.connector.execute_query(
-            f"g.V().hasLabel('{label}').propertyMap().select(Column.keys).toList();",
+            f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data or []
+        return response.data[0] if response.data.__len__() > 0  else []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
-            f"g.E().hasLabel('{label}').propertyMap().select(Column.keys).toList();",
+            f"g.E().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data or []
+        return response.data[0] if response.data.__len__() > 0  else []
 
     def get_graph_schema(self):
         return {
