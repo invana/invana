@@ -1,7 +1,7 @@
 from invana_py import InvanaGraph
 from invana_py.backends.janusgraph.schema import JanusGraphSchemaCreate
 from invana_py.ogm.fields import StringProperty, FloatProperty, BooleanProperty, DateTimeProperty
-from invana_py.ogm.models import VertexModel
+from invana_py.ogm.models import VertexModel, EdgeModel
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
@@ -18,9 +18,24 @@ class Project6(VertexModel):
     }
 
 
+class User(VertexModel):
+    graph = graph
+    properties = {
+        'name': StringProperty(max_length=10, trim_whitespaces=True),
+    }
+
+
+class Authored(EdgeModel):
+    graph = graph
+    properties = {
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
+    }
+
+
 schema_create = JanusGraphSchemaCreate()
 
-response = schema_create.create_model(Project6)
+# response = schema_create.create_model(Project6)
+response = schema_create.create_model(Authored)
 # response = Project3.graph.connector.execute_query("graphNames = ConfiguredGraphFactory.getGraphNames();")
 # response = Project3.graph.connector.execute_query("graph.features()")
 # response = Project3.graph.get_features()

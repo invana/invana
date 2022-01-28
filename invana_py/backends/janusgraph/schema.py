@@ -15,7 +15,7 @@
 #
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
-from ...ogm.models import VertexModel
+from ...ogm.models import VertexModel, EdgeModel
 from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema
 import logging
 
@@ -32,13 +32,21 @@ mgmt.getVertexLabels()
     """
 
     @staticmethod
-    def create_model(model: VertexModel):
+    def create_model(model: [VertexModel, EdgeModel]):
         query = """mgmt = graph.openManagement()\n"""
+        if isinstance(model, VertexModel):
+            label_filter_key = "containsVertexLabel"
+            get_label_method = "getVertexLabel"
+            make_label_method = "makeVertexLabel"
+        else:
+            label_filter_key = "containsEdgeLabel"
+            get_label_method = "getEdgeLabel"
+            make_label_method = "makeEdgeLabel"
         query += f"""
-if (mgmt.containsVertexLabel('{model.label_name}'))
-    {model.label_name} = mgmt.getVertexLabel('{model.label_name}')
+if (mgmt.{label_filter_key}('{model.label_name}'))
+    {model.label_name} = mgmt.{get_label_method}('{model.label_name}')
 else 
-    {model.label_name} = mgmt.makeVertexLabel('{model.label_name}').make()
+    {model.label_name} = mgmt.{make_label_method}('{model.label_name}').make()
 """.lstrip("\n")
         for prop_key, prop_model in model.properties.items():
             query += f"""

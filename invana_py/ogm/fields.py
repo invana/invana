@@ -226,6 +226,9 @@ class DateTimeProperty(FieldBase, ABC):
         self.min_value = min_value
         self.max_value = max_value
 
+    def get_data_type_class(self):
+        return "Date"
+
     def validate_field_kwargs(self, value, model, field_name):
         if value and not isinstance(value, tuple(self.allowed_data_types)):
             raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "

@@ -46,6 +46,8 @@ class VertexModel(metaclass=ModelMetaBase):
     def get_schema(cls):
         return cls.graph.backend.schame_reader.get_vertex_schema(cls.label_name)
 
+    # def get
+
 
 class EdgeModel(metaclass=ModelMetaBase):
     objects = EdgeModelQuerySet
