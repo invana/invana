@@ -30,6 +30,8 @@ class Authored(EdgeModel):
     properties = {
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
+    allowed_inv_models = []
+    allowed_outv_models = []
 
 
 schema_create = JanusGraphSchemaCreate()
