@@ -51,10 +51,4 @@ class SchemaReaderBase(abc.ABC):
         pass
 
 
-class GraphBackendBase:
-    schema_reader_cls: SchemaReaderBase = None
-
-    def __init__(self, connector: GremlinConnector):
-        self.schema_reader = self.schema_reader_cls(connector)
-
 

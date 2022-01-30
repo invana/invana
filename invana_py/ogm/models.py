@@ -41,6 +41,7 @@ class VertexModel(metaclass=ModelMetaBase):
     objects = VertexModelQuerySet
     graph = None
     label_name = None
+    type = "VERTEX"
 
     @classmethod
     def get_schema(cls):
@@ -53,6 +54,7 @@ class EdgeModel(metaclass=ModelMetaBase):
     objects = EdgeModelQuerySet
     graph = None
     label_name = None
+    type = "EDGE"
 
     @classmethod
     def get_schema(cls):

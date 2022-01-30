@@ -34,14 +34,16 @@ mgmt.getVertexLabels()
     @staticmethod
     def create_model(model: [VertexModel, EdgeModel]):
         query = """mgmt = graph.openManagement()\n"""
-        if isinstance(model, VertexModel):
+        if model.type == "VERTEX":
             label_filter_key = "containsVertexLabel"
             get_label_method = "getVertexLabel"
             make_label_method = "makeVertexLabel"
-        else:
+        elif model.type == "EDGE":
             label_filter_key = "containsEdgeLabel"
             get_label_method = "getEdgeLabel"
             make_label_method = "makeEdgeLabel"
+        else:
+            raise ValueError("mode should of type vertex or edge")
         query += f"""
 if (mgmt.{label_filter_key}('{model.label_name}'))
     {model.label_name} = mgmt.{get_label_method}('{model.label_name}')
