@@ -28,7 +28,7 @@ class Authored2(EdgeModel):
     )
 
 
-# graph.management.create_model(Project171)
+graph.management.create_model(Project171)
 print(Project171.indexes)
 graph.management.rollback_open_transactions(i_understand=True)
 graph.management.create_indexes_from_model(Project171)

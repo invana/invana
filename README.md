@@ -2,10 +2,9 @@
 
 Python API for Apache TinkerPop's Gremlin supported databases.
 
-[![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-py/blob/master/LICENSE) 
+[![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-py/blob/master/LICENSE)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/invanalabs/invana-py)](https://github.com/invanalabs/invana-py/commits)
 [![codecov](https://codecov.io/gh/invanalabs/invana-py/branch/master/graph/badge.svg)](https://codecov.io/gh/invanalabs/invana-py)
-
 
 - [Features](#features)
 - [Installation](#installation)
@@ -19,8 +18,9 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 - [x] Execute gremlin queries
 - [x] Built in QuerySets for performing standard CRUD operations on graph.
 - [x] Utilities for logging queries and performance.
-- [x] Django-ORM like search when using OGM(ex: has__id__within=[200752, 82032, 4320],
-   has__name__startingWith="Per")(Refer [search-usage.md](search-usage.md) for more)
+- [x] Django-ORM like search when using OGM(ex: has__id__within=[200752, 82032, 4320], has__name__startingWith="Per")(
+  Refer [search-usage.md](search-usage.md) for more)
+- [ ] Index support
 - [ ] Query caching support
 - [ ] Asynchronous Python API.
 
@@ -33,11 +33,13 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ## Usage
 
 ### Model first graph
+
 ```python
 from invana_py import InvanaGraph
 from invana_py.ogm.models import VertexModel, EdgeModel
 from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
+from invana_py.ogm import indexes
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
@@ -51,6 +53,9 @@ class Project(VertexModel):
         'is_active': BooleanProperty(default=True),
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
+    indexes = (
+        indexes.CompositeIndex("name"),
+    )
 
 
 class Person(VertexModel):
@@ -62,6 +67,9 @@ class Person(VertexModel):
         'member_since': IntegerProperty(),
 
     }
+    indexes = (
+        indexes.CompositeIndex("username"),
+    )
 
 
 class Authored(EdgeModel):
@@ -70,6 +78,10 @@ class Authored(EdgeModel):
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
 
+
+graph.management.create_model(Project)
+graph.management.rollback_open_transactions(i_understand=True)
+graph.management.create_indexes_from_model(Project)
 
 Project.objects.delete()
 Person.objects.delete()
@@ -86,6 +98,7 @@ graph.close_connection()
 ```
 
 ### Searching graph
+
 ```python
 # search by id
 Project.objects.search(has__id=123).to_list()
@@ -107,19 +120,22 @@ Project.objects.search(has__member_since__lte=3000).to_list()
 Project.objects.search(has__member_since__lt=3000).to_list()
 Project.objects.search(has__member_since__gte=1999).to_list()
 Project.objects.search(has__member_since__gt=1999).to_list()
-Project.objects.search(has__member_since__inside=(1000,3000)).to_list()
-Project.objects.search(has__member_since__outside=(1000,3000)).to_list()
-Project.objects.search(has__member_since__between=(1000,3000)).to_list()
+Project.objects.search(has__member_since__inside=(1000, 3000)).to_list()
+Project.objects.search(has__member_since__outside=(1000, 3000)).to_list()
+Project.objects.search(has__member_since__between=(1000, 3000)).to_list()
 ```
-Note: more info on usage [here](https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates) 
 
-### Order by 
+Note: more info on usage [here](https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates)
+
+### Order by
+
 ```python
-Project.objects.search().order_by('name').to_list() # asc order
-Project.objects.search().order_by('-name').to_list() # desc order
+Project.objects.search().order_by('name').to_list()  # asc order
+Project.objects.search().order_by('-name').to_list()  # desc order
 ```
 
 ### Pagination
+
 ```python
 # using range for pagination
 queryset = Project.objects.search().order_by('name').range(1, 10).to_list()
@@ -158,9 +174,6 @@ graph.execute_query_with_callback("g.V().limit(1).next()",
                                   timeout=180)
 graph.close_connection()
 ```
-
-
-
 
 ## Supported graph databases
 
