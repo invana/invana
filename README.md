@@ -84,21 +84,25 @@ class Authored(EdgeModel):
 
 
 graph.management.create_model(Project)
+graph.management.create_model(Person)
+graph.management.create_model(Authored)
+# you should not create indexes when there is an open transaction.
+# so roll back open transactions, Don't do this if you don't know 
+# what you are doing.
 graph.management.rollback_open_transactions(i_understand=True)
 graph.management.create_indexes_from_model(Project)
+graph.management.create_indexes_from_model(Person)
+graph.management.create_indexes_from_model(Authored)
+ 
+graph.close_connection()
+```
 
-Project.objects.delete()
-Person.objects.delete()
-Authored.objects.delete()
-
+### Creating data
+```
 person = Person.objects.get_or_create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
 authored_data = Authored.objects.create(person.id, project.id)
 
-authored_list = Authored.objects.search().to_list()
-project_list = Project.objects.search().to_list()
-
-graph.close_connection()
 ```
 
 ### Searching graph

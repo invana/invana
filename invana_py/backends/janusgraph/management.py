@@ -16,6 +16,8 @@ from invana_py.backends.janusgraph.indexes import IndexQueryBuilder
 from invana_py.backends.janusgraph.schema import JanusGraphSchemaCreate, JanusGraphSchemaReader
 from invana_py.connector import GremlinConnector
 from invana_py.ogm.indexes import MixedIndex, CompositeIndex
+
+
 # https://gist.github.com/disruptek/98ed066933d05f22850329c5efc1d7b4
 
 class GraphBackendManagement:
@@ -59,7 +61,7 @@ graph.getOpenTransactions()
     def create_model(self, model):
         return self.schema_creator.create_model(model)
 
-    def create_indexes_from_model(self, model):
+    def create_indexes_from_model(self, model, timeout=None):
         indexes = model.indexes
         model_indexes = []
         for index in indexes:
@@ -69,7 +71,7 @@ graph.getOpenTransactions()
             elif isinstance(index, MixedIndex):
                 model_index = MixedIndex(*index.property_keys, label=model.label_name)
                 model_indexes.append(model_index)
-        return self.create_indexes(model_indexes)
+        return self.create_indexes(model_indexes, timeout=timeout)
 
     def _create_index(self, property_keys, label=None, index_name=None,
                       index_type: ["Mixed", "Composite"] = None,
