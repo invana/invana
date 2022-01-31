@@ -45,6 +45,9 @@ class FieldBase:
     def get_field_type(self):
         return self.data_type
 
+    def get_data_type_class(self):
+        return self.data_type.__name__.rstrip("Type")
+
     def validate(self, value, field_name=None, model=None):
         default_value = self.get_default_value()
         value = default_value if value is None and default_value else value
@@ -222,6 +225,9 @@ class DateTimeProperty(FieldBase, ABC):
         super().__init__(**kwargs)
         self.min_value = min_value
         self.max_value = max_value
+
+    def get_data_type_class(self):
+        return "Date"
 
     def validate_field_kwargs(self, value, model, field_name):
         if value and not isinstance(value, tuple(self.allowed_data_types)):
