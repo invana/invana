@@ -11,10 +11,12 @@ class Project171(VertexModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10)
+        'description': StringProperty(allow_null=True, min_length=10),
+        'created_at': DateTimeProperty(allow_null=True)
     }
     indexes = (
-        indexes.CompositeIndex("name"),
+        indexes.CompositeIndex("created_at"),
+        indexes.MixedIndex("created_at")
     )
 
 

@@ -15,9 +15,12 @@
 class IndexQueryBuilder:
 
     @staticmethod
-    def create_index_query(*property_keys, label=None, index_name=None):
+    def create_index_query(*property_keys, label=None, index_name=None,
+                           index_type: ['Mixed', 'Composite'] = None):
+        if index_type not in ['Mixed', 'Composite']:
+            raise Exception("index_type can only be 'Mixed' or 'Composite'")
         if index_name is None:
-            index_name = f"indexBy{'' if label is None else label.capitalize()}" \
+            index_name = f"{index_type}IndexBy{'' if label is None else label.capitalize()}" \
                          f"{''.join([f.capitalize() for f in property_keys])}"
 
         query = "\ngraph.tx().rollback()  //Never create new indexes while a transaction is active\n"
@@ -32,7 +35,10 @@ class IndexQueryBuilder:
                  f"{''.join([f'.addKey({f})' for f in property_keys])}"
         if label:
             query += f".indexOnly({label})"
-        query += f".buildCompositeIndex()\n"
+        if index_type == "Mixed":
+            query += f".buildMixedIndex('search')\n"
+        elif index_type == "Composite":
+            query += f".buildCompositeIndex()\n"
         query += "mgmt.commit()\n"
         return query, index_name
 

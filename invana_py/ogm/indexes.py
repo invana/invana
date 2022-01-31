@@ -42,6 +42,7 @@
 # 2. vertex-centric indexes (a.k.a relation indexes)
 
 class IndexBase:
+    index_type = None
 
     def __init__(self, *fields, label=None):
         self.property_keys = fields
@@ -51,13 +52,13 @@ class IndexBase:
         self.index_name = self.get_index_name()
 
     def get_index_name(self):
-        return f"indexBy{'' if self.label is None else self.label.capitalize()}" \
+        return f"{self.index_type}IndexBy{'' if self.label is None else self.label.capitalize()}" \
                f"{''.join([f.capitalize() for f in self.property_keys])}"
 
 
 class CompositeIndex(IndexBase):
-    pass
+    index_type = "Composite"
 
 
 class MixedIndex(IndexBase):
-    pass
+    index_type = "Mixed"

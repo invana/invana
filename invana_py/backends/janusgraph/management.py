@@ -84,7 +84,11 @@ graph.getOpenTransactions()
                 model_indexes.append(model_index)
         return self.create_indexes(model_indexes)
 
-    def _create_index(self, property_keys, label=None, index_name=None, timeout=None):
+    def _create_index(self, property_keys, label=None, index_name=None,
+                      index_type: ["Mixed", "Composite"] = None,
+                      timeout=None):
+        if index_type not in ["Mixed", "Composite"]:
+            raise ValueError('index_type should be ["Mixed", "Composite"]')
         timeout = timeout if timeout else 60 * 30 * 1000  # ie., 30 minutes
         # check for open transactions
         has_open_transactions = self.get_open_transactions_size().data[0] > 1
@@ -92,6 +96,7 @@ graph.getOpenTransactions()
             raise Exception("Cannot create_index when there are open transactions ")
 
         query, index_name__ = self.index_creator.create_index_query(property_keys, label=label,
+                                                                    index_type=index_type,
                                                                     index_name=index_name)
         query += self.index_creator.wait_for_index_query(index_name__)
         query += self.index_creator.reindex_query(index_name__)
@@ -99,6 +104,7 @@ graph.getOpenTransactions()
 
     def create_index(self, index: [MixedIndex, CompositeIndex], timeout=None):
         return self._create_index(*index.property_keys, label=index.label,
+                                  index_type=index.index_type,
                                   index_name=index.index_name, timeout=timeout)
 
     def create_indexes(self, indexes, timeout=None):
