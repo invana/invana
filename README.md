@@ -54,8 +54,8 @@ class Project(VertexModel):
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
-        indexes.CompositeIndex("name"),
-        indexes.CompositeIndex("created_at")
+        indexes.MixedIndex("name"),
+        indexes.MixedIndex("created_at")
     )
 
 
@@ -79,7 +79,7 @@ class Authored(EdgeModel):
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
-        indexes.CompositeIndex("created_at")
+        indexes.MixedIndex("created_at")
     )
 
 
