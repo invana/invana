@@ -11,11 +11,9 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-
+from invana_py.backends.janusgraph.management import GraphBackendManagement
 from .connector import GremlinConnector
 from .ogm.querysets import VertexQuerySet, EdgeQuerySet
-from .backends.janusgraph import JanusGraphBackend, JanusGraphSchemaReader
-from .backends.base import GraphBackendBase
 
 
 class InvanaGraph:
@@ -28,7 +26,6 @@ class InvanaGraph:
                  graph_traversal_source_cls=None,
                  call_from_event_loop=True,
                  deserializer_map=None,
-                 graph_backend_cls: GraphBackendBase = None,
                  auth=None,
                  **transport_kwargs):
         self.connector = GremlinConnector(gremlin_url,
@@ -40,10 +37,9 @@ class InvanaGraph:
                                           call_from_event_loop=call_from_event_loop,
                                           deserializer_map=deserializer_map,
                                           **transport_kwargs)
-        graph_backend_cls = JanusGraphBackend if graph_backend_cls is None else graph_backend_cls
-        self.backend = graph_backend_cls(self.connector)
         self.vertex = VertexQuerySet(self.connector)
         self.edge = EdgeQuerySet(self.connector)
+        self.management = GraphBackendManagement(self.connector)
 
     @property
     def g(self):
@@ -54,6 +50,19 @@ class InvanaGraph:
 
     def reconnect(self):
         return self.connector.reconnect()
+
+    def get_features(self):
+        response = self.connector.execute_query("graph.features()")
+        lines = response.data[0].lstrip("FEATURES\n").split("> ")
+        data = {}
+        for line in lines[1:]:
+            items = line.rstrip().split("\n")
+            data[items[0]] = {}
+            for item in items[1:]:
+                item = item.lstrip(">-- ").split(":")
+                data[items[0]][item[0].strip()] = bool(item[1])
+        response.data = data
+        return response
 
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
                       finished_callback=None) -> any:

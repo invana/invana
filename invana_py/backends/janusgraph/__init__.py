@@ -12,9 +12,4 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana_py.backends.base import GraphBackendBase
-from .schema import JanusGraphSchemaReader
-
-
-class JanusGraphBackend(GraphBackendBase):
-    schema_reader_cls = JanusGraphSchemaReader
+from .management import GraphBackendManagement

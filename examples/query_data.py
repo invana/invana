@@ -13,5 +13,4 @@ print("response", response.data)
 
 response = connector.g.V().hasLabel(user.label).hasId(user.id).elementMap().toList()
 print("response", response)
-
 connector.close()
