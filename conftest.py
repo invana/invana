@@ -1,7 +1,7 @@
 import pytest
 import os
-from invana_py.connector.connector import GremlinConnector
-from invana_py import InvanaGraph
+from invana.connector.connector import GremlinConnector
+from invana import InvanaGraph
 
 
 @pytest.fixture(scope="function")

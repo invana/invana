@@ -11,10 +11,10 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana_py import InvanaGraph
-from invana_py.ogm import indexes
-from invana_py.ogm.fields import StringProperty
-from invana_py.ogm.models import VertexModel
+from invana import InvanaGraph
+from invana.ogm import indexes
+from invana.ogm.fields import StringProperty
+from invana.ogm.models import VertexModel
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 

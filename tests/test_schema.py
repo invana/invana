@@ -1,4 +1,4 @@
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 import random
 
 

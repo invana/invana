@@ -1,10 +1,10 @@
 import pytest
-from invana_py.ogm.exceptions import FieldValidationError
-from invana_py.ogm.fields import StringProperty, DoubleProperty
-from invana_py.ogm.models import VertexModel
+from invana.ogm.exceptions import FieldValidationError
+from invana.ogm.fields import StringProperty, DoubleProperty
+from invana.ogm.models import VertexModel
 from gremlin_python.statics import long
-from invana_py import InvanaGraph
-from invana_py.connector.data_types import DoubleType
+from invana import InvanaGraph
+from invana.connector.data_types import DoubleType
 import os
 
 gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")

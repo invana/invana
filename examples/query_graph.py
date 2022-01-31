@@ -1,4 +1,4 @@
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 gremlin_url = "ws://megamind-ws:8182/gremlin"
 

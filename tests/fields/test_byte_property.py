@@ -11,11 +11,11 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-# from invana_py.ogm.fields import StringProperty, SingleCharProperty, ByteProperty
-# from invana_py.ogm.models import VertexModel
-# from invana_py.connector.data_types import ByteType
-# from invana_py.serializer.element_structure import Node
-# from invana_py import InvanaGraph
+# from invana.ogm.fields import StringProperty, SingleCharProperty, ByteProperty
+# from invana.ogm.models import VertexModel
+# from invana.connector.data_types import ByteType
+# from invana.serializer.element_structure import Node
+# from invana import InvanaGraph
 #
 # gremlin_url = "ws://megamind-ws:8182/gremlin"
 # graph = InvanaGraph(gremlin_url)

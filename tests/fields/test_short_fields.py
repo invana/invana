@@ -1,9 +1,9 @@
 import pytest
-from invana_py.ogm.exceptions import FieldValidationError
-from invana_py.ogm.fields import StringProperty, ShortProperty
-from invana_py.ogm.models import VertexModel
-from invana_py import InvanaGraph
-from invana_py.connector.data_types import ShortType
+from invana.ogm.exceptions import FieldValidationError
+from invana.ogm.fields import StringProperty, ShortProperty
+from invana.ogm.models import VertexModel
+from invana import InvanaGraph
+from invana.connector.data_types import ShortType
 import os
 
 gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")

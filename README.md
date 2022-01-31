@@ -27,7 +27,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
+pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 ```
 
 ## Usage
@@ -35,23 +35,21 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ### Model first graph
 
 ```python
-from invana_py import InvanaGraph
-from invana_py.ogm.models import VertexModel, EdgeModel
-from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from invana import InvanaGraph
+from invana.ogm import models, fields, indexes 
 from datetime import datetime
-from invana_py.ogm import indexes
-
+ 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project(VertexModel):
+class Project(models.VertexModel):
     graph = graph
     properties = {
-        'name': StringProperty(max_length=10, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'rating': FloatProperty(allow_null=True),
-        'is_active': BooleanProperty(default=True),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
+        'name': fields.StringProperty(max_length=10, trim_whitespaces=True),
+        'description': fields.StringProperty(allow_null=True, min_length=10),
+        'rating': fields.FloatProperty(allow_null=True),
+        'is_active': fields.BooleanProperty(default=True),
+        'created_at': fields.DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
         indexes.MixedIndex("name"),
@@ -59,13 +57,13 @@ class Project(VertexModel):
     )
 
 
-class Person(VertexModel):
+class Person(models.VertexModel):
     graph = graph
     properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
+        'first_name': fields.StringProperty(min_length=5, trim_whitespaces=True),
+        'last_name': fields.StringProperty(allow_null=True),
+        'username': fields.StringProperty(default="rrmerugu"),
+        'member_since': fields.IntegerProperty(),
 
     }
     indexes = (
@@ -73,10 +71,10 @@ class Person(VertexModel):
     )
 
 
-class Authored(EdgeModel):
+class Authored(models.EdgeModel):
     graph = graph
     properties = {
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
+        'created_at': fields.DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
         indexes.MixedIndex("created_at")
@@ -98,11 +96,12 @@ graph.close_connection()
 ```
 
 ### Creating data
-```
+
+```python
+
 person = Person.objects.get_or_create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
 authored_data = Authored.objects.create(person.id, project.id)
-
 ```
 
 ### Searching graph
@@ -152,7 +151,7 @@ Project.objects.search().order_by('-name').to_list()  # desc order
 queryset = Project.objects.search().order_by('name').range(1, 10).to_list()
 
 # using paginator
-from invana_py.ogm.paginator import QuerySetPaginator
+from invana.ogm.paginator import QuerySetPaginator
 
 page_size = 5
 queryset = Project.objects.search().order_by("-serial_no")
@@ -166,7 +165,7 @@ first_page = qs.to_list()
 #### using execute_query method
 
 ```python
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 results = graph.execute_query("g.V().limit(1).toList()", timeout=180)
@@ -176,7 +175,7 @@ graph.close_connection()
 #### using execute_query_with_callback method
 
 ```python
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 graph.execute_query_with_callback("g.V().limit(1).next()",

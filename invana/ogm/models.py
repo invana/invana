@@ -36,7 +36,7 @@ class ModelMetaBase(type):
 class VertexModel(metaclass=ModelMetaBase):
     """
     class Meta:
-        invana_py = None
+        invana = None
     """
     objects = VertexModelQuerySet
     graph = None

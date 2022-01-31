@@ -12,10 +12,10 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana_py.backends.janusgraph.indexes import IndexQueryBuilder
-from invana_py.backends.janusgraph.schema import JanusGraphSchemaCreate, JanusGraphSchemaReader
-from invana_py.connector import GremlinConnector
-from invana_py.ogm.indexes import MixedIndex, CompositeIndex
+from invana.backends.janusgraph.indexes import IndexQueryBuilder
+from invana.backends.janusgraph.schema import JanusGraphSchemaCreate, JanusGraphSchemaReader
+from invana.connector import GremlinConnector
+from invana.ogm.indexes import MixedIndex, CompositeIndex
 
 
 # https://gist.github.com/disruptek/98ed066933d05f22850329c5efc1d7b4
