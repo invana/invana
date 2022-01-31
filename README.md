@@ -1,4 +1,4 @@
-# invana-py
+# invana
 
 Python API for Apache TinkerPop's Gremlin supported databases.
 
@@ -14,7 +14,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 
 ## Features
 
-- [x] Object Mapper - Models, PropertyTypes, and Form validation
+- [x] Object Mapper - Models, Property data types, and Form validation
 - [x] Execute gremlin queries
 - [x] Built in QuerySets for performing standard CRUD operations on graph.
 - [x] Utilities for logging queries and performance.
