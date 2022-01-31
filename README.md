@@ -82,6 +82,7 @@ class Authored(EdgeModel):
         indexes.CompositeIndex("created_at")
     )
 
+
 graph.management.create_model(Project)
 graph.management.rollback_open_transactions(i_understand=True)
 graph.management.create_indexes_from_model(Project)
@@ -132,6 +133,8 @@ Note: more info on usage [here](https://tinkerpop.apache.org/docs/3.5.0/referenc
 
 ### Order by
 
+You need to add indexing to run order queries efficiently. Read
+more [here](https://docs.janusgraph.org/schema/index-management/index-performance/#ordering)
 
 ```python
 Project.objects.search().order_by('name').to_list()  # asc order
