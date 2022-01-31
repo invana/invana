@@ -20,7 +20,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 - [x] Utilities for logging queries and performance.
 - [x] Django-ORM like search when using OGM(ex: has__id__within=[200752, 82032, 4320], has__name__startingWith="Per")(
   Refer [search-usage.md](search-usage.md) for more)
-- [ ] Index support
+- [x] Index support
 - [ ] Query caching support
 - [ ] Asynchronous Python API.
 
@@ -55,6 +55,7 @@ class Project(VertexModel):
     }
     indexes = (
         indexes.CompositeIndex("name"),
+        indexes.CompositeIndex("created_at")
     )
 
 
@@ -77,7 +78,9 @@ class Authored(EdgeModel):
     properties = {
         'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
-
+    indexes = (
+        indexes.CompositeIndex("created_at")
+    )
 
 graph.management.create_model(Project)
 graph.management.rollback_open_transactions(i_understand=True)
@@ -128,6 +131,7 @@ Project.objects.search(has__member_since__between=(1000, 3000)).to_list()
 Note: more info on usage [here](https://tinkerpop.apache.org/docs/3.5.0/reference/#a-note-on-predicates)
 
 ### Order by
+
 
 ```python
 Project.objects.search().order_by('name').to_list()  # asc order
