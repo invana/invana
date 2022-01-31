@@ -1,6 +1,6 @@
 # invana
 
-Python API for Apache TinkerPop's Gremlin supported databases.
+Python API for modelling and managing graphs.
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-py/blob/master/LICENSE)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/invanalabs/invana-py)](https://github.com/invanalabs/invana-py/commits)
