@@ -55,6 +55,9 @@ class VertexSchema(ElementSchemaBase):
     def __repr__(self):
         return f"<VertexSchema name='{self.name}' partitioned={self.partitioned} static={self.static} />"
 
+    def properties_as_list(self):
+        return list(self.properties.values())
+
 
 class EdgeSchema(ElementSchemaBase):
     type = "EDGE"
@@ -72,3 +75,6 @@ class EdgeSchema(ElementSchemaBase):
     def __repr__(self):
         return f"<EdgeSchema name='{self.name}' unidirected={self.unidirected} " \
                f"directed={self.directed} multiplicity='{self.multiplicity}' />"
+
+    def properties_as_list(self):
+        return list(self.properties.values())
