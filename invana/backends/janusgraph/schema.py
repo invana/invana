@@ -128,7 +128,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             edge_schema.add_property_schema(property_schema)
         link_paths = self.connector.execute_query(
             f"g.E().hasLabel('{label}').project('outv_label', 'inv_label')"
-            f".by(outV().label()).by(inV().label()).toList()").data
+            f".by(outV().label()).by(inV().label()).dedup().toList()").data
         edge_schema.link_paths = [LinkPath(**link_path) for link_path in link_paths]
         return edge_schema
 

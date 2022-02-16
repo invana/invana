@@ -23,5 +23,6 @@ print(graph.connector.gremlin_url)
 
 response = graph.management.schema_reader.get_edge_schema("father")
 print(response.link_paths)
+print(response.properties)
 
 graph.close_connection()
