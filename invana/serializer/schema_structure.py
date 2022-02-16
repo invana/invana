@@ -30,8 +30,8 @@ class PropertySchema:
 
 
 class LinkPath:
-    outVLabel = None
-    inVLabel = None
+    outv_label = None
+    inv_label = None
 
     def __init__(self, outv_label, inv_label):
         self.outv_label = outv_label
