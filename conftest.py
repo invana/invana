@@ -39,6 +39,9 @@ def initial_data_with_connector(connector: GremlinConnector):
 
 
 def initial_data_with_graph(graph: InvanaGraph):
+    graph.connector.execute_query("g.V().drop()")
+    res = graph.connector.execute_query("g.V().count()")
+    print("Res==========", res.data)
     is_created, user = graph.vertex.get_or_create(
         "User",
         first_name="Ravi", last_name="Merugu", username="rrmerugu")

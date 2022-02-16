@@ -29,6 +29,18 @@ class PropertySchema:
         return f"<PropertySchema name='{self.name}' type='{self.type}' cardinality='{self.cardinality}' />"
 
 
+class LinkPath:
+    outVLabel = None
+    inVLabel = None
+
+    def __init__(self, outv_label, inv_label):
+        self.outv_label = outv_label
+        self.inv_label = inv_label
+
+    def __repr__(self):
+        return f"<LinkPath outVLabel='{self.outv_label}' inVLabel='{self.inv_label}' />"
+
+
 class ElementSchemaBase:
     type = None
     name = None
@@ -64,13 +76,15 @@ class EdgeSchema(ElementSchemaBase):
     unidirected = None
     directed = None
     multiplicity = None
+    link_paths: list = None
 
-    def __init__(self, name, unidirected=None, directed=None, multiplicity=None):
+    def __init__(self, name, unidirected=None, directed=None, multiplicity=None, link_paths=None):
         self.name = name
         self.unidirected = json.loads(unidirected)
         self.directed = json.loads(directed)
         self.multiplicity = multiplicity
         self.properties = {}
+        self.link_paths = link_paths or []
 
     def __repr__(self):
         return f"<EdgeSchema name='{self.name}' unidirected={self.unidirected} " \

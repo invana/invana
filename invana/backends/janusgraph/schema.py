@@ -16,7 +16,7 @@
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
 from ...ogm.models import VertexModel, EdgeModel
-from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema
+from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
 
 logger = logging.getLogger(__name__)
@@ -76,14 +76,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
             f"g.E().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_graph_schema(self):
         return {
@@ -126,6 +126,10 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             property_schema_data = schema_data['property_keys'][property_key]
             property_schema = PropertySchema(**property_schema_data)
             edge_schema.add_property_schema(property_schema)
+        link_paths = self.connector.execute_query(
+            f"g.E().hasLabel('{label}').project('outv_label', 'inv_label')"
+            f".by(outV().label()).by(inV().label()).toList()").data
+        edge_schema.link_paths = [LinkPath(**link_path) for link_path in link_paths]
         return edge_schema
 
     def get_vertex_schema(self, label):

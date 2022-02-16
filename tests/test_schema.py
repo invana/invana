@@ -20,3 +20,10 @@ class TestSchema:
         assert label == result.name
         assert "name" in list(result.properties.keys())
         assert "other_property" not in list(result.properties.keys())
+
+    def test_read_edge_labels(self, graph: InvanaGraph):
+        label = "authored"
+        result = graph.management.schema_reader.get_edge_schema(label)
+        assert label == result.name
+        assert "started" in list(result.properties.keys())
+        assert "other_property" not in list(result.properties.keys())
