@@ -1,5 +1,5 @@
-from invana_py.connector.connector import GremlinConnector
-from invana_py import InvanaGraph
+from invana.connector.connector import GremlinConnector
+from invana import InvanaGraph
 import logging
 logging.basicConfig(filename="log.txt", filemode="w", level=logging.DEBUG)
 gremlin_url = "ws://megamind-ws:8182/gremlin"

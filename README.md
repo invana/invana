@@ -27,6 +27,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
+docker run -p 8182:8182  --name janusgraph-default janusgraph/janusgraph:latest -d
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ```
 
@@ -35,11 +36,11 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana_py
 ### Model first graph
 
 ```python
-from invana_py import InvanaGraph
-from invana_py.ogm.models import VertexModel, EdgeModel
-from invana_py.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from invana import InvanaGraph
+from invana.ogm.models import VertexModel, EdgeModel
+from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
-from invana_py.ogm import indexes
+from invana.ogm import indexes
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
@@ -148,7 +149,7 @@ Project.objects.search().order_by('-name').to_list()  # desc order
 queryset = Project.objects.search().order_by('name').range(1, 10).to_list()
 
 # using paginator
-from invana_py.ogm.paginator import QuerySetPaginator
+from invana.ogm.paginator import QuerySetPaginator
 
 page_size = 5
 queryset = Project.objects.search().order_by("-serial_no")
@@ -162,7 +163,7 @@ first_page = qs.to_list()
 #### using execute_query method
 
 ```python
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 results = graph.execute_query("g.V().limit(1).toList()", timeout=180)
@@ -172,7 +173,7 @@ graph.close_connection()
 #### using execute_query_with_callback method
 
 ```python
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 graph = InvanaGraph("ws://localhost:8182/gremlin", username="user", password="password")
 graph.execute_query_with_callback("g.V().limit(1).next()",
