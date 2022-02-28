@@ -1,8 +1,8 @@
-from invana_py import InvanaGraph
-from invana_py.ogm import indexes
-from invana_py.ogm.indexes import IndexQueryBuilder
-from invana_py.ogm.fields import StringProperty, FloatProperty, BooleanProperty
-from invana_py.ogm.models import VertexModel
+from invana import InvanaGraph
+from invana.ogm import indexes
+from invana.ogm.indexes import IndexQueryBuilder
+from invana.ogm.fields import StringProperty, FloatProperty, BooleanProperty
+from invana.ogm.models import VertexModel
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 

@@ -1,8 +1,8 @@
 import math
-from invana_py import InvanaGraph
-from invana_py.ogm.fields import StringProperty, IntegerProperty
-from invana_py.ogm.models import VertexModel
-from invana_py.ogm.paginator import QuerySetPaginator
+from invana import InvanaGraph
+from invana.ogm.fields import StringProperty, IntegerProperty
+from invana.ogm.models import VertexModel
+from invana.ogm.paginator import QuerySetPaginator
 import os
 
 gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")

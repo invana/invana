@@ -1,6 +1,6 @@
 import os
 import asyncio
-from invana_py import InvanaGraph
+from invana import InvanaGraph
 
 GREMLIN_SERVER_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://localhost:8182/gremlin")
 

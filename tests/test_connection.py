@@ -1,8 +1,8 @@
 import pytest
 from aiohttp import ClientConnectorError
 from gremlin_python.driver.protocol import GremlinServerError
-from invana_py.connector.connector import GremlinConnector
-from invana_py.connector.response import Response
+from invana.connector.connector import GremlinConnector
+from invana.connector.response import Response
 
 
 class TestConnection:

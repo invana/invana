@@ -16,10 +16,10 @@ import datetime
 import types
 import typing
 from abc import ABC
-from invana_py.connector.data_types import FloatType, IntegerType, DoubleType, LongType, BooleanType, \
+from invana.connector.data_types import FloatType, IntegerType, DoubleType, LongType, BooleanType, \
     SingleCharType, StringType, DateTimeType, ByteType, ShortType
 from gremlin_python.statics import long
-from invana_py.ogm.exceptions import FieldValidationError
+from invana.ogm.exceptions import FieldValidationError
 
 __all__ = ['StringProperty', 'SingleCharProperty', 'BooleanProperty', ]
 

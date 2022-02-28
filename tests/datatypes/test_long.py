@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 import pytest
-from invana_py.connector.data_types import LongType
+from invana.connector.data_types import LongType
 
 
 class TestLongType:

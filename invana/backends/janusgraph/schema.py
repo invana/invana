@@ -16,7 +16,7 @@
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
 from ...ogm.models import VertexModel, EdgeModel
-from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema
+from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
 
 logger = logging.getLogger(__name__)
@@ -76,14 +76,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
             f"g.E().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_graph_schema(self):
         return {
@@ -95,26 +95,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
         schema_data = self._get_graph_schema_overview()
         all_vertex_schema = {}
         for label, vertex_details in schema_data['vertex_labels'].items():
-            vertex_schema = VertexSchema(**vertex_details)
-            property_keys = self.get_vertex_property_keys(label)
-            for property_key in property_keys:
-                property_schema_data = schema_data['property_keys'][property_key]
-                property_schema = PropertySchema(**property_schema_data)
-                vertex_schema.add_property_schema(property_schema)
-            all_vertex_schema[label] = vertex_schema
+            all_vertex_schema[label] = self.get_vertex_schema(label)
         return all_vertex_schema
 
     def get_all_edges_schema(self):
         schema_data = self._get_graph_schema_overview()
         all_edges_schema = {}
         for label, edge_details in schema_data['edge_labels'].items():
-            edge_schema = EdgeSchema(**edge_details)
-            property_keys = self.get_edge_property_keys(label)
-            for property_key in property_keys:
-                property_schema_data = schema_data['property_keys'][property_key]
-                property_schema = PropertySchema(**property_schema_data)
-                edge_schema.add_property_schema(property_schema)
-            all_edges_schema[label] = edge_schema
+            all_edges_schema[label] = self.get_edge_schema(label)
         return all_edges_schema
 
     def get_edge_schema(self, label):
@@ -126,6 +114,10 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             property_schema_data = schema_data['property_keys'][property_key]
             property_schema = PropertySchema(**property_schema_data)
             edge_schema.add_property_schema(property_schema)
+        link_paths = self.connector.execute_query(
+            f"g.E().hasLabel('{label}').project('outv_label', 'inv_label')"
+            f".by(outV().label()).by(inV().label()).dedup().toList()").data
+        edge_schema.link_paths = [LinkPath(**link_path) for link_path in link_paths]
         return edge_schema
 
     def get_vertex_schema(self, label):
