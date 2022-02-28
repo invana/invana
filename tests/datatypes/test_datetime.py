@@ -13,8 +13,8 @@
 #     limitations under the License.
 import pytest
 import datetime
-from invana_py.connector.data_types import DateTimeType
-from invana_py.connector.exceptions import ParserException
+from invana.connector.data_types import DateTimeType
+from invana.connector.exceptions import ParserException
 
 
 class TestDateTimeType:

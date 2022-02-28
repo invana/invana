@@ -1,5 +1,5 @@
-from invana_py import InvanaGraph
-from invana_py.serializer.element_structure import Node, RelationShip
+from invana import InvanaGraph
+from invana.serializer.element_structure import Node, RelationShip
 
 
 class TestVertexQuerySet:

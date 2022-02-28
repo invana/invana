@@ -11,9 +11,9 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana_py import InvanaGraph
-from invana_py.ogm.models import VertexModel
-from invana_py.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
+from invana import InvanaGraph
+from invana.ogm.models import VertexModel
+from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")

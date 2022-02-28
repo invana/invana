@@ -1,7 +1,7 @@
-from invana_py import InvanaGraph
-from invana_py.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
-from invana_py.ogm.models import EdgeModel, VertexModel
-from invana_py.serializer.element_structure import Node, RelationShip
+from invana import InvanaGraph
+from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
+from invana.ogm.models import EdgeModel, VertexModel
+from invana.serializer.element_structure import Node, RelationShip
 from datetime import datetime
 import os
 

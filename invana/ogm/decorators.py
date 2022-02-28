@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana_py.ogm.exceptions import FieldValidationError
+from invana.ogm.exceptions import FieldValidationError
 from ..serializer.element_structure import Node, RelationShip
 
 

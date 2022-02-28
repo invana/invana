@@ -11,8 +11,8 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana_py.ogm.fields import StringProperty, FloatProperty, IntegerProperty
-from invana_py.ogm.models import VertexModel, EdgeModel
+from invana.ogm.fields import StringProperty, FloatProperty, IntegerProperty
+from invana.ogm.models import VertexModel, EdgeModel
 from connection import graph
 
 

@@ -1,4 +1,4 @@
-from invana_py.connector.connector import GremlinConnector
+from invana.connector.connector import GremlinConnector
 
 gremlin_url = "ws://megamind-ws:8182/gremlin"
 connector = GremlinConnector(gremlin_url)

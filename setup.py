@@ -16,12 +16,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='invana-py',
+    name='invana',
     version='0.0.0',
     description='Python API for Apache TinkerPop\'s Gremlin supported databases.',
     author='Ravi Raja Merugu',
     author_email='ravi@invana.io',
-    url='https://github.com/invanalabs/invana-py',
+    url='https://github.com/invanalabs/invana',
     packages=find_packages(
         exclude=("dist", "docs", "tests", "examples")
     ),

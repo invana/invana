@@ -12,8 +12,8 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana_py.ogm.models import VertexModel, EdgeModel
-from invana_py.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
+from invana.ogm.models import VertexModel, EdgeModel
+from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
     BooleanProperty
 from datetime import datetime
 from connection import graph

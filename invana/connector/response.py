@@ -11,20 +11,21 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-#
-import re
-import copy
-from invana_py.traversal.traversal import InvanaTraversal
+
+from invana.utils import get_datetime
 
 
-def convert_to_camel_case(s):
-    r = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
-    return r.sub(r'_\1', s).lower()
+class Response:
 
+    def __init__(self, request_id, status_code, data=None, exception=None):
+        self.request_id = request_id
+        self.data = data
+        self.status_code = status_code
+        self.exception = exception
+        self.created_at = get_datetime()
 
-def divide_chunks(l, n):
-    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
+    def is_success(self):
+        return False if self.exception else True
 
-
-def copy_traversal(traversal):
-    return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(traversal.bytecode))
+    def __repr__(self):
+        return f"<Response:{self.request_id} status_code={self.status_code}>"

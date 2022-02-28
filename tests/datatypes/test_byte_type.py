@@ -13,7 +13,7 @@
 #     limitations under the License.
 import pytest
 
-from invana_py.connector.data_types import ByteType
+from invana.connector.data_types import ByteType
 
 
 class TestByteType:

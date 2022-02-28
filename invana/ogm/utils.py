@@ -11,4 +11,20 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
+#
+import re
+import copy
+from invana.traversal.traversal import InvanaTraversal
 
+
+def convert_to_camel_case(s):
+    r = re.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
+    return r.sub(r'_\1', s).lower()
+
+
+def divide_chunks(l, n):
+    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
+
+
+def copy_traversal(traversal):
+    return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(traversal.bytecode))

@@ -14,7 +14,7 @@
 
 import abc
 
-from invana_py.connector import GremlinConnector
+from invana.connector import GremlinConnector
 
 
 class SchemaReaderBase(abc.ABC):
