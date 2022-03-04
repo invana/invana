@@ -23,7 +23,7 @@ class GraphSearch:
     filter_key_starting_words_list = ['has']
     pagination_key_starting_words_list = ["pagination"]
 
-    P = ["between", "eq", "gt", "gte", "inside", "lt", "lte", "neq", "not_", "outside", "within", "without"]
+    # P = ["between", "eq", "gt", "gte", "inside", "lt", "lte", "neq", "not_", "outside", "within", "without"]
     has_filter_keys = ["has__label", "has__id", "has__value", "has__key", "has__not"]
 
     @classmethod
