@@ -52,6 +52,9 @@ class ElementSchemaBase:
     def get_property_keys(self):
         return list(self.properties.keys())
 
+    def to_json(self):
+        raise NotImplementedError()
+
 
 class VertexSchema(ElementSchemaBase):
     type = "VERTEX"
@@ -69,6 +72,15 @@ class VertexSchema(ElementSchemaBase):
 
     def properties_as_list(self):
         return list(self.properties.values())
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "type": self.type,
+            "partitioned": self.partitioned,
+            "static": self.static,
+            "properties": self.properties_as_list()
+        }
 
 
 class EdgeSchema(ElementSchemaBase):
@@ -92,3 +104,14 @@ class EdgeSchema(ElementSchemaBase):
 
     def properties_as_list(self):
         return list(self.properties.values())
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "type": self.type,
+            "unidirected": self.unidirected,
+            "directed": self.directed,
+            "multiplicity": self.multiplicity,
+            "properties": self.properties_as_list(),
+            "link_paths": [{"outv_label": path.outv_label, "inv_label": path.inv_label} for path in self.link_paths]
+        }
