@@ -1,6 +1,6 @@
-# invana
+# invana-py
 
-Python API for modelling and managing graphs.
+Python API for Apache TinkerPop's Gremlin supported databases.
 
 [![Apache license](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/invanalabs/invana-py/blob/master/LICENSE)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/invanalabs/invana-py)](https://github.com/invanalabs/invana-py/commits)
@@ -14,7 +14,7 @@ Python API for modelling and managing graphs.
 
 ## Features
 
-- [x] Object Mapper - Models, Property data types, and Form validation
+- [x] Object Mapper - Models, PropertyTypes, and Form validation
 - [x] Execute gremlin queries
 - [x] Built in QuerySets for performing standard CRUD operations on graph.
 - [x] Utilities for logging queries and performance.
@@ -27,6 +27,7 @@ Python API for modelling and managing graphs.
 ## Installation
 
 ```shell
+docker run -p 8182:8182  --name janusgraph-default janusgraph/janusgraph:latest -d
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 ```
 
@@ -36,34 +37,36 @@ pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 
 ```python
 from invana import InvanaGraph
-from invana.ogm import models, fields, indexes 
+from invana.ogm.models import VertexModel, EdgeModel
+from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
- 
+from invana.ogm import indexes
+
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project(models.VertexModel):
+class Project(VertexModel):
     graph = graph
     properties = {
-        'name': fields.StringProperty(max_length=10, trim_whitespaces=True),
-        'description': fields.StringProperty(allow_null=True, min_length=10),
-        'rating': fields.FloatProperty(allow_null=True),
-        'is_active': fields.BooleanProperty(default=True),
-        'created_at': fields.DateTimeProperty(default=lambda: datetime.now())
+        'name': StringProperty(max_length=10, trim_whitespaces=True),
+        'description': StringProperty(allow_null=True, min_length=10),
+        'rating': FloatProperty(allow_null=True),
+        'is_active': BooleanProperty(default=True),
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
-        indexes.MixedIndex("name"),
-        indexes.MixedIndex("created_at")
+        indexes.CompositeIndex("name"),
+        indexes.CompositeIndex("created_at")
     )
 
 
-class Person(models.VertexModel):
+class Person(VertexModel):
     graph = graph
     properties = {
-        'first_name': fields.StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': fields.StringProperty(allow_null=True),
-        'username': fields.StringProperty(default="rrmerugu"),
-        'member_since': fields.IntegerProperty(),
+        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
+        'last_name': StringProperty(allow_null=True),
+        'username': StringProperty(default="rrmerugu"),
+        'member_since': IntegerProperty(),
 
     }
     indexes = (
@@ -71,37 +74,32 @@ class Person(models.VertexModel):
     )
 
 
-class Authored(models.EdgeModel):
+class Authored(EdgeModel):
     graph = graph
     properties = {
-        'created_at': fields.DateTimeProperty(default=lambda: datetime.now())
+        'created_at': DateTimeProperty(default=lambda: datetime.now())
     }
     indexes = (
-        indexes.MixedIndex("created_at")
+        indexes.CompositeIndex("created_at")
     )
 
 
 graph.management.create_model(Project)
-graph.management.create_model(Person)
-graph.management.create_model(Authored)
-# you should not create indexes when there is an open transaction.
-# so roll back open transactions, Don't do this if you don't know 
-# what you are doing.
 graph.management.rollback_open_transactions(i_understand=True)
 graph.management.create_indexes_from_model(Project)
-graph.management.create_indexes_from_model(Person)
-graph.management.create_indexes_from_model(Authored)
- 
-graph.close_connection()
-```
 
-### Creating data
-
-```python
+Project.objects.delete()
+Person.objects.delete()
+Authored.objects.delete()
 
 person = Person.objects.get_or_create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
 authored_data = Authored.objects.create(person.id, project.id)
+
+authored_list = Authored.objects.search().to_list()
+project_list = Project.objects.search().to_list()
+
+graph.close_connection()
 ```
 
 ### Searching graph
