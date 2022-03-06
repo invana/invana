@@ -25,15 +25,17 @@ class PropertiesObject:
 class ElementBase:
     id = None
     label = None
+    type = None
 
     def __init__(self, *args, **kwargs):
         self.properties = PropertiesObject()
 
     def to_json(self):
-        return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
+        return {"id": self.id, "type": self.type, "label": self.label, "properties": self.properties.__dict__}
 
 
 class Node(ElementBase):
+    type = "vertex"
 
     def __init__(self, _id, label, properties=None):
         super(Node, self).__init__(_id, label, properties=properties)
@@ -46,13 +48,11 @@ class Node(ElementBase):
     def __repr__(self):
         return f'<Node:{self.label} id="{self.id}" {self.properties}>'
 
-    def to_json(self):
-        return {"id": self.id, "label": self.label, "properties": self.properties.__dict__}
-
 
 class RelationShip(ElementBase):
     inv = None
     outv = None
+    type = "edge"
 
     def __init__(self, _id, label, outv, inv, properties=None):
         super(RelationShip, self).__init__(_id, label, outv, inv, properties=properties)
