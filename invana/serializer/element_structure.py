@@ -68,3 +68,9 @@ class RelationShip(ElementBase):
         return f'<RelationShip:{self.label} id="{self.id}" ' \
                f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label}' \
                f' {self.properties}>'
+
+    def to_json(self):
+        base_data = super(RelationShip, self).to_json()
+        base_data['inv'] = self.inv
+        base_data['outv'] = self.outv
+        return base_data
