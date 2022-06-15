@@ -28,6 +28,8 @@ def process_graph_schema_string(schema_string):
         "edge_labels": {},
         "property_keys": {},
     }
+    if schema_string is None:
+        return schema
     data_type = None
     __count = 0  # {2: vertex labels, 4: edge labels , 6: property names,
     for line in schema_string.split("\n"):

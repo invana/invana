@@ -69,21 +69,22 @@ class JanusGraphSchemaReader(SchemaReaderBase):
     def _get_graph_schema_overview(self):
         # TODO - can add more information from the print schema data like indexes etc to current output
         response = self.connector.execute_query("mgmt = graph.openManagement(); mgmt.printSchema()")
-        return process_graph_schema_string(response.data[0])
+        return process_graph_schema_string(response.data[0]) if response.data.__len__() > 0 \
+            else process_graph_schema_string(None)
 
     def get_vertex_property_keys(self, label):
         response = self.connector.execute_query(
             f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_edge_property_keys(self, label):
         response = self.connector.execute_query(
             f"g.E().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
             raise_exception=False
         )
-        return response.data[0] if response.data.__len__() > 0  else []
+        return response.data[0] if response.data.__len__() > 0 else []
 
     def get_graph_schema(self):
         return {
