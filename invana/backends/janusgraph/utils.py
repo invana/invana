@@ -14,12 +14,22 @@
 #
 
 
+def extract_data_type(_type):
+    # TODO - fix this for different backends later
+    _d = _type.split("|")[2].strip()
+    if "class java.lang" in _d:
+        return _d.replace("class java.lang.", "")
+    return _d.split(".")[-1]
+
+
 def process_graph_schema_string(schema_string):
     schema = {
         "vertex_labels": {},
         "edge_labels": {},
         "property_keys": {},
     }
+    if schema_string is None:
+        return schema
     data_type = None
     __count = 0  # {2: vertex labels, 4: edge labels , 6: property names,
     for line in schema_string.split("\n"):
@@ -43,7 +53,7 @@ def process_graph_schema_string(schema_string):
             schema['property_keys'][line.split("|")[0].strip()] = {
                 "name": line.split("|")[0].strip(),
                 "cardinality": line.split("|")[1].strip(),
-                "type": line.split("|")[2].strip().replace("class java.lang.", ""),
+                "type": extract_data_type(line),
             }
 
         if line.startswith("Vertex Label Name"):

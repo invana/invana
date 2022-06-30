@@ -28,6 +28,9 @@ class PropertySchema:
     def __repr__(self):
         return f"<PropertySchema name='{self.name}' type='{self.type}' cardinality='{self.cardinality}' />"
 
+    def to_json(self):
+        return {"name": self.name, "type": self.type, "cardinality": self.cardinality}
+
 
 class LinkPath:
     outv_label = None
@@ -40,6 +43,9 @@ class LinkPath:
     def __repr__(self):
         return f"<LinkPath outVLabel='{self.outv_label}' inVLabel='{self.inv_label}' />"
 
+    def to_json(self):
+        return {"outv_label": self.outv_label, "inv_label": self.inv_label}
+
 
 class ElementSchemaBase:
     type = None
@@ -51,6 +57,9 @@ class ElementSchemaBase:
 
     def get_property_keys(self):
         return list(self.properties.keys())
+
+    def to_json(self):
+        raise NotImplementedError()
 
 
 class VertexSchema(ElementSchemaBase):
@@ -69,6 +78,15 @@ class VertexSchema(ElementSchemaBase):
 
     def properties_as_list(self):
         return list(self.properties.values())
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "type": self.type,
+            "partitioned": self.partitioned,
+            "static": self.static,
+            "properties": [property_data.to_json() for property_data in self.properties_as_list()],
+        }
 
 
 class EdgeSchema(ElementSchemaBase):
@@ -92,3 +110,14 @@ class EdgeSchema(ElementSchemaBase):
 
     def properties_as_list(self):
         return list(self.properties.values())
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "type": self.type,
+            "unidirected": self.unidirected,
+            "directed": self.directed,
+            "multiplicity": self.multiplicity,
+            "properties": [property_data.to_json() for property_data in self.properties_as_list()],
+            "link_paths": [path.to_json() for path in self.link_paths]
+        }
