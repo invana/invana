@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
+from .model_querysets import NodeQuerySet, RelationshipQuerySet
 from .utils import convert_to_camel_case
 
 
@@ -38,7 +38,7 @@ class StructuredNode(metaclass=ModelMetaBase):
     class Meta:
         invana = None
     """
-    objects = VertexModelQuerySet
+    objects = NodeQuerySet
     graph = None
     label_name = None
     type = "VERTEX"
@@ -51,7 +51,7 @@ class StructuredNode(metaclass=ModelMetaBase):
 
 
 class StructuredRelationship(metaclass=ModelMetaBase):
-    objects = EdgeModelQuerySet
+    objects = RelationshipQuerySet
     graph = None
     label_name = None
     type = "EDGE"

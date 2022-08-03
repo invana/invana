@@ -15,7 +15,7 @@
 from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatypes, validate_kwargs_for_create, \
     validate_kwargs_for_search, add_has_label_kwargs_from_model
 from .exceptions import FieldNotFoundError, FieldValidationError
-from .querysets import VertexQuerySet, EdgeQuerySet
+from .querysets import VertexQuerySet, RelationshipQuerySet
 from ..serializer.element_structure import Node, RelationShip
 import abc
 
@@ -57,7 +57,7 @@ class ModelQuerySetBase(abc.ABC):
         return validated_value
 
 
-class VertexModelQuerySet(ModelQuerySetBase):
+class NodeQuerySet(ModelQuerySetBase):
     queryset = VertexQuerySet
 
     @validate_kwargs_for_create
@@ -91,8 +91,8 @@ class VertexModelQuerySet(ModelQuerySetBase):
         return self.search(**search_kwargs).count()
 
 
-class EdgeModelQuerySet(ModelQuerySetBase):
-    queryset = EdgeQuerySet
+class RelationshipQuerySet(ModelQuerySetBase):
+    queryset = RelationshipQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes

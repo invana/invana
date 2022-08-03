@@ -129,7 +129,7 @@ class VertexQuerySet(QuerySetBase, ABC):
         return created, elem[0] if elem.__len__() > 0 else None
 
 
-class EdgeQuerySet(QuerySetBase, ABC):
+class RelationshipQuerySet(QuerySetBase, ABC):
 
     def create(self, label, from_, to_, **properties) -> QuerySetResultSet:
         return QuerySetResultSet(self.connector.g.create_edge(label, from_, to_, **properties))

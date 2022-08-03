@@ -13,7 +13,7 @@
 #     limitations under the License.
 from invana.backends.janusgraph.management import GraphBackendManagement
 from .connector import GremlinConnector
-from .ogm.querysets import VertexQuerySet, EdgeQuerySet
+from .ogm.querysets import VertexQuerySet, RelationshipQuerySet
 
 
 class InvanaGraph:
@@ -38,7 +38,7 @@ class InvanaGraph:
                                           deserializer_map=deserializer_map,
                                           **transport_kwargs)
         self.vertex = VertexQuerySet(self.connector)
-        self.edge = EdgeQuerySet(self.connector)
+        self.edge = RelationshipQuerySet(self.connector)
         self.management = GraphBackendManagement(self.connector)
 
     @property
