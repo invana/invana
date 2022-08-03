@@ -12,14 +12,14 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from invana import InvanaGraph
-from invana.ogm.models import VertexModel
+from invana.ogm.models import StructuredNode
 from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class MyProject(VertexModel):
+class MyProject(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),

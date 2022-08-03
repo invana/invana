@@ -1,7 +1,7 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
-from invana.ogm.models import VertexModel
+from invana.ogm.models import StructuredNode
 from datetime import datetime
 from invana import InvanaGraph
 import os
@@ -13,7 +13,7 @@ DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = 5
 
 
-class Person(VertexModel):
+class Person(StructuredNode):
     graph = graph
 
     properties = {

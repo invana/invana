@@ -43,7 +43,7 @@ pipenv install git+https://github.com/invana/invana@dev#egg=invana
 
 ```python
 from invana import InvanaGraph
-from invana.ogm.models import VertexModel, EdgeModel
+from invana.ogm.models import StructuredNode, StructuredRelationship
 from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 from invana.ogm import indexes
@@ -51,7 +51,7 @@ from invana.ogm import indexes
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project(VertexModel):
+class Project(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
@@ -66,7 +66,7 @@ class Project(VertexModel):
     )
 
 
-class Person(VertexModel):
+class Person(StructuredNode):
     graph = graph
     properties = {
         'first_name': StringProperty(min_length=5, trim_whitespaces=True),
@@ -80,7 +80,7 @@ class Person(VertexModel):
     )
 
 
-class Authored(EdgeModel):
+class Authored(StructuredRelationship):
     graph = graph
     properties = {
         'created_at': DateTimeProperty(default=lambda: datetime.now())

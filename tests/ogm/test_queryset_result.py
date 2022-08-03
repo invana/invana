@@ -1,7 +1,7 @@
 import math
 from invana import InvanaGraph
 from invana.ogm.fields import StringProperty, IntegerProperty
-from invana.ogm.models import VertexModel
+from invana.ogm.models import StructuredNode
 from invana.ogm.paginator import QuerySetPaginator
 import os
 
@@ -9,7 +9,7 @@ gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremli
 graph = InvanaGraph(gremlin_url)
 
 
-class Project(VertexModel):
+class Project(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(max_length=30, trim_whitespaces=True),

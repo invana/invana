@@ -1,7 +1,7 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, ShortProperty
-from invana.ogm.models import VertexModel
+from invana.ogm.models import StructuredNode
 from invana import InvanaGraph
 from invana.connector.data_types import ShortType
 import os
@@ -13,7 +13,7 @@ DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = ShortType(5)
 
 
-class Star(VertexModel):
+class Star(StructuredNode):
     graph = graph
 
     properties = {

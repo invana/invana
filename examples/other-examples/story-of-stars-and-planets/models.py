@@ -12,11 +12,11 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from invana.ogm.fields import StringProperty, FloatProperty, IntegerProperty
-from invana.ogm.models import VertexModel, EdgeModel
+from invana.ogm.models import StructuredNode, StructuredRelationship
 from connection import graph
 
 
-class Star(VertexModel):
+class Star(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(),
@@ -25,7 +25,7 @@ class Star(VertexModel):
     }
 
 
-class Planet(VertexModel):
+class Planet(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(),
@@ -34,7 +34,7 @@ class Planet(VertexModel):
     }
 
 
-class Satellite(VertexModel):
+class Satellite(StructuredNode):
     graph = graph
     properties = {
         'name': StringProperty(),
@@ -43,21 +43,21 @@ class Satellite(VertexModel):
     }
 
 
-class HasPlanet(EdgeModel):
+class HasPlanet(StructuredRelationship):
     graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),
     }
 
 
-class HasSatellite(EdgeModel):
+class HasSatellite(StructuredRelationship):
     graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),
     }
 
 
-class HasNeighborPlanet(EdgeModel):
+class HasNeighborPlanet(StructuredRelationship):
     graph = graph
     properties = {
         'distance_in_kms': IntegerProperty(),

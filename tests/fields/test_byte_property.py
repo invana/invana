@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 # from invana.ogm.fields import StringProperty, SingleCharProperty, ByteProperty
-# from invana.ogm.models import VertexModel
+# from invana.ogm.models import StructuredNode
 # from invana.connector.data_types import ByteType
 # from invana.serializer.element_structure import Node
 # from invana import InvanaGraph
@@ -23,7 +23,7 @@
 # DEFAULT_USERNAME = "rrmerugu"
 #
 #
-# class Person(VertexModel):
+# class Person(StructuredNode):
 #     graph = graph
 #
 #     properties = {

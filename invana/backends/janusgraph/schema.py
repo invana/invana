@@ -15,7 +15,7 @@
 #
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
-from ...ogm.models import VertexModel, EdgeModel
+from ...ogm.models import StructuredNode, StructuredRelationship
 from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
 
@@ -32,7 +32,7 @@ mgmt.getVertexLabels()
     """
 
     @staticmethod
-    def create_model(model: [VertexModel, EdgeModel]):
+    def create_model(model: [StructuredNode, StructuredRelationship]):
         query = """mgmt = graph.openManagement()\n"""
         if model.type == "VERTEX":
             label_filter_key = "containsVertexLabel"
