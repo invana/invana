@@ -28,7 +28,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEOUT = 180 * 1000  # in seconds
+DEFAULT_TIMEOUT = 180 * 1000  # in milli seconds
 
 
 class DriverRemoteConnection(_DriverRemoteConnection):
