@@ -1,6 +1,6 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
-from invana.ogm.fields import StringProperty, ShortProperty
+from invana.ogm.properties import StringProperty, ShortProperty
 from invana.ogm.models import NodeModel
 from invana.connector.data_types import ShortType
 from invana import settings, graph

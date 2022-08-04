@@ -1,6 +1,6 @@
 import math
 from invana import settings, graph
-from invana.ogm.fields import StringProperty, IntegerProperty
+from invana.ogm.properties import StringProperty, IntegerProperty
 from invana.ogm.models import NodeModel
 from invana.ogm.paginator import QuerySetPaginator
 import os

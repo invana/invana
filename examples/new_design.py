@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 from experiments.models import NodeModel, RelationshipModel
-from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, IntegerProperty
+from invana.ogm.properties import StringProperty, DateTimeProperty, FloatProperty, IntegerProperty
 
 
 class Star(NodeModel):

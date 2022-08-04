@@ -1,6 +1,6 @@
 from invana import InvanaGraph
 from invana.ogm.models import NodeModel, RelationshipModel
-from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from invana.ogm.properties import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")

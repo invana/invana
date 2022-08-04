@@ -14,7 +14,7 @@
 import pytest
 
 from invana.ogm.exceptions import FieldValidationError
-from invana.ogm.fields import StringProperty, SingleCharProperty
+from invana.ogm.properties import StringProperty, SingleCharProperty
 from invana.ogm.models import NodeModel
 from invana.connector.data_types import SingleCharType
 from invana.serializer.element_structure import Node

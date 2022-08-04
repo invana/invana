@@ -1,5 +1,5 @@
 # from invana import InvanaGraph
-from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
+from invana.ogm.properties import StringProperty, IntegerProperty, DateTimeProperty
 from invana.ogm.models import RelationshipModel, NodeModel
 from invana.serializer.element_structure import Node, RelationShip
 from datetime import datetime

@@ -13,7 +13,7 @@
 #     limitations under the License.
 from invana import InvanaGraph
 from invana.ogm.models import NodeModel
-from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
+from invana.ogm.properties import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")

@@ -14,7 +14,7 @@
 
 from invana.ogm.model_querysets import NodeModalQuerySet, RelationshipModalQuerySet
 from invana.ogm.utils import convert_to_camel_case
-from invana.ogm.fields import FieldBase
+from invana.ogm.properties import FieldBase
 from .. import graph
 
 

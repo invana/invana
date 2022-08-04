@@ -28,7 +28,7 @@ class InvanaGraph:
                  auth=None,
                  **transport_kwargs):
 
-        from invana.ogm.querysets import VertexQuerySet, RelationshipQuerySet
+        from invana.connector.querysets import VertexQuerySet, RelationshipQuerySet
 
         self.connector = GremlinConnector(gremlin_url,
                                           traversal_source=traversal_source,

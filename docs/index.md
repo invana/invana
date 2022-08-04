@@ -10,7 +10,7 @@ Python API for modelling and querying graph data.
 
 ```python
 from invana.ogm.models import NodeModel, RelationshipModel, RelationshipTo, RelationshipFrom
-from invana.ogm.fields import StringProperty, DateTimeProperty
+from invana.ogm.properties import StringProperty, DateTimeProperty
 from invana.ogm.relationships.cardinality import Multi, Simple, Many2One, One2Many, One2One
 from invana.ogm import indexes
 from invana.queryset import NodeModalQuerySet, RelationshipModalQuerySet

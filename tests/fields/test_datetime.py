@@ -1,6 +1,6 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
-from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
+from invana.ogm.properties import StringProperty, IntegerProperty, DateTimeProperty
 from invana.ogm.models import NodeModel
 from datetime import datetime, timedelta
 from invana import settings, graph

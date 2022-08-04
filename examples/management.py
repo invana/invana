@@ -13,7 +13,7 @@
 #     limitations under the License.
 from invana import InvanaGraph
 from invana.ogm import indexes
-from invana.ogm.fields import StringProperty
+from invana.ogm.properties import StringProperty
 from invana.ogm.models import NodeModel
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")

@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 from invana.ogm.models import NodeModel, RelationshipModel
-from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
+from invana.ogm.properties import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
     BooleanProperty
 from datetime import datetime
 from invana import settings

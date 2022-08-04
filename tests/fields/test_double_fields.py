@@ -1,6 +1,6 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
-from invana.ogm.fields import StringProperty, DoubleProperty
+from invana.ogm.properties import StringProperty, DoubleProperty
 from invana.ogm.models import NodeModel
 from gremlin_python.statics import long
 from invana.connector.data_types import DoubleType

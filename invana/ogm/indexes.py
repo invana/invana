@@ -19,8 +19,8 @@
 class IndexBase:
     index_type = None
 
-    def __init__(self, *fields, label=None):
-        self.property_keys = fields
+    def __init__(self, *properties, label=None):
+        self.property_keys = properties
         self.label = label
         if self.property_keys.__len__() == 0:
             raise ValueError("at least one property key should be provided for creating indexing")

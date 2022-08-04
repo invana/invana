@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 import copy
-from .querysets import QuerySetResultSet
+from invana.connector.querysets import QuerySetResultSet
 from .utils import copy_traversal
 
 

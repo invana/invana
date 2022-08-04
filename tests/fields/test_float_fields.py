@@ -1,6 +1,6 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
-from invana.ogm.fields import StringProperty, FloatProperty, LongProperty
+from invana.ogm.properties import StringProperty, FloatProperty, LongProperty
 from invana.ogm.models import NodeModel
 from invana.connector.data_types import FloatType
 from invana import settings, graph

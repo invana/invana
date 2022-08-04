@@ -44,7 +44,7 @@ pipenv install git+https://github.com/invana/invana@dev#egg=invana
 ```python
 from invana import InvanaGraph
 from invana.ogm.models import NodeModel, RelationshipModel
-from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
+from invana.ogm.properties import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 from invana.ogm import indexes
 
@@ -52,42 +52,42 @@ graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
 class Project(NodeModel):
-    graph = graph
-    properties = {
-        'name': StringProperty(max_length=10, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'rating': FloatProperty(allow_null=True),
-        'is_active': BooleanProperty(default=True),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
-    indexes = (
-        indexes.CompositeIndex("name"),
-        indexes.CompositeIndex("created_at")
-    )
+  graph = graph
+  properties = {
+    'name': StringProperty(max_length=10, trim_whitespaces=True),
+    'description': StringProperty(allow_null=True, min_length=10),
+    'rating': FloatProperty(allow_null=True),
+    'is_active': BooleanProperty(default=True),
+    'created_at': DateTimeProperty(default=lambda: datetime.now())
+  }
+  indexes = (
+    indexes.CompositeIndex("name"),
+    indexes.CompositeIndex("created_at")
+  )
 
 
 class Person(NodeModel):
-    graph = graph
-    properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
+  graph = graph
+  properties = {
+    'first_name': StringProperty(min_length=5, trim_whitespaces=True),
+    'last_name': StringProperty(allow_null=True),
+    'username': StringProperty(default="rrmerugu"),
+    'member_since': IntegerProperty(),
 
-    }
-    indexes = (
-        indexes.CompositeIndex("username"),
-    )
+  }
+  indexes = (
+    indexes.CompositeIndex("username"),
+  )
 
 
 class Authored(RelationshipModel):
-    graph = graph
-    properties = {
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
-    indexes = (
-        indexes.CompositeIndex("created_at")
-    )
+  graph = graph
+  properties = {
+    'created_at': DateTimeProperty(default=lambda: datetime.now())
+  }
+  indexes = (
+    indexes.CompositeIndex("created_at")
+  )
 
 
 graph.management.create_model(Project)

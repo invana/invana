@@ -1,7 +1,7 @@
 from invana import InvanaGraph
 from invana.ogm import indexes
 from invana.ogm.indexes import IndexQueryBuilder
-from invana.ogm.fields import StringProperty, FloatProperty, BooleanProperty
+from invana.ogm.properties import StringProperty, FloatProperty, BooleanProperty
 from invana.ogm.models import NodeModel
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
