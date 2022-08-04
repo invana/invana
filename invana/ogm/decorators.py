@@ -39,7 +39,7 @@ def _serialize_to_model_datatypes(self, element):
     if isinstance(element, list):
         return [_serialize_to_model_datatypes(self, res) for res in element]
     elif element and (isinstance(element, Node) or isinstance(element, RelationShip)):
-        for k, field in self.model.properties.items():
+        for k, field in self.model.get_properties().items():
             if hasattr(element.properties, k):
                 _ = self.get_validated_data(k, getattr(element.properties, k), self.model)
                 setattr(element.properties, k, _)
@@ -63,13 +63,13 @@ def _validate_kwargs_for_create(self, **properties):
     :return:
     """
     validated_data = {}
-    allowed_property_keys = list(self.model.properties.keys())
+    allowed_property_keys = list(self.model.get_property_keys())
     for k, v in properties.items():
         if k not in allowed_property_keys:
-            raise FieldValidationError(f"property '{self.model.label_name}.{k}' "
-                                       f"not allowed in {self.model.label_name}."
+            raise FieldValidationError(f"property '{self.model.__label__}.{k}' "
+                                       f"not allowed in {self.model.__label__}."
                                        f" Hint: {allowed_property_keys} fields allowed")
-    for k, field in self.model.properties.items():
+    for k, field in self.model.get_properties().items():
         _ = self.get_validated_data(k, properties.get(k), self.model)
         if _ is not None:
             validated_data[k] = _
@@ -107,7 +107,7 @@ def _validate_kwargs_for_search(self, **properties):
             validated_data[k] = v
         elif k_cleaned not in allowed_property_keys:
             raise FieldValidationError(f"property '{k_cleaned}' not allowed in"
-                                       f" {self.model.label_name} when using OGM."
+                                       f" {self.model.__label__} when using OGM."
                                        f" Hint: {allowed_property_keys} fields allowed")
 
     for k, v in properties.items():
@@ -138,7 +138,7 @@ def _validate_kwargs_for_update(self, **properties):
     allowed_property_keys = list(self.model.properties.keys())
     for k, v in properties.items():
         if k not in allowed_property_keys:
-            raise FieldValidationError(f"property '{self.model.label_name}.{k}' not allowed in {self.model.label_name}")
+            raise FieldValidationError(f"property '{self.model.__label__}.{k}' not allowed in {self.model.__label__}")
     for k, v in properties.items():
         _ = self.get_validated_data(k, v, self.model)
         if _ is not None:

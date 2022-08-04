@@ -50,25 +50,26 @@ class ModelQuerySetBase(abc.ABC):
 
     @staticmethod
     def get_validated_data(field_name, field_value, model):
-        field = model.properties.get(field_name)
+        # field = model.properties.get(field_name)
+        field = getattr(model, field_name)  # .properties.get(field_name)
         if field is None:
             raise FieldNotFoundError(f"{field_name} doesn't exist in model '{model.__name__}'")
         validated_value = field.validate(field_value, field_name=field_name, model=model)
         return validated_value
 
 
-class NodeQuerySet(ModelQuerySetBase):
+class NodeModalQuerySet(ModelQuerySetBase):
     queryset = VertexQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def get_or_create(self, **properties):
-        return self.queryset.get_or_create(self.model.label_name, **properties)
+        return self.queryset.get_or_create(self.model.__label__, **properties)
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def create(self, **properties):
-        _ = self.queryset.create(self.model.label_name, **properties).to_list()
+        _ = self.queryset.create(self.model.__label__, **properties).to_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
@@ -91,18 +92,18 @@ class NodeQuerySet(ModelQuerySetBase):
         return self.search(**search_kwargs).count()
 
 
-class RelationshipQuerySet(ModelQuerySetBase):
+class RelationshipModalQuerySet(ModelQuerySetBase):
     queryset = RelationshipQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def get_or_create(self, from_, to_, **properties):
-        return self.queryset.get_or_create(self.model.label_name, from_, to_, **properties)
+        return self.queryset.get_or_create(self.model.__label__, from_, to_, **properties)
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def create(self, from_, to_, **properties):
-        _ = self.queryset.create(self.model.label_name, from_, to_, **properties).to_list()
+        _ = self.queryset.create(self.model.__label__, from_, to_, **properties).to_list()
         return _[0] if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs

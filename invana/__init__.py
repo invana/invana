@@ -13,7 +13,8 @@
 #     limitations under the License.
 
 import logging
-from .graph import InvanaGraph
+from .core import graph
+from .core import InvanaGraph
 
 logging.getLogger('asyncio').setLevel(logging.INFO)
 logging.basicConfig(

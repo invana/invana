@@ -1,29 +1,21 @@
-from invana import InvanaGraph
+from invana import settings, graph
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
 from invana.ogm.models import RelationshipModel, NodeModel
 from invana.serializer.element_structure import Node, RelationShip
 from datetime import datetime
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 
 class Project(NodeModel):
-    graph = graph
-    properties = {
-        'name': StringProperty(max_length=30, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+    name = StringProperty(max_length=30, trim_whitespaces=True)
+    description = StringProperty(allow_null=True, min_length=10)
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 class Organisation(NodeModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, trim_whitespaces=True),
-    }
+    name = StringProperty(min_length=3, trim_whitespaces=True)
 
 
 class TestVertexModelQuerySet:
@@ -45,12 +37,12 @@ class TestVertexModelQuerySet:
         projects = Project.objects.search().to_list()
         for project in projects:
             assert isinstance(project, Node)
-            assert project.label == Project.label_name
+            assert project.label == Project.__label__
 
         orgs = Organisation.objects.search().to_list()
         for org in orgs:
             assert isinstance(org, Node)
-            assert org.label == Organisation.label_name
+            assert org.label == Organisation.__label__
         graph.g.V().drop().iterate()
 
     def test_update(self):

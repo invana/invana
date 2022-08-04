@@ -11,9 +11,18 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
+
+from invana.ogm.model_querysets import NodeModalQuerySet, RelationshipModalQuerySet
+from invana.ogm.utils import convert_to_camel_case
+from invana.ogm.fields import FieldBase
+from .. import graph
+
+
+# def create_graph():
+#     from invana.graph import InvanaGraph
+#     from invana import settings
 #
-from .model_querysets import NodeQuerySet, RelationshipQuerySet
-from .utils import convert_to_camel_case
+# graph = create_graph()
 
 
 class ModelMetaBase(type):
@@ -26,10 +35,11 @@ class ModelMetaBase(type):
         if not parents:
             return super_new(mcs, name, bases, attrs)
         model_base_cls = bases[0]
-        if "name" not in attrs:
-            attrs['label_name'] = name if model_base_cls.__name__ == "NodeModel" else convert_to_camel_case(name)
+        if "__label__" not in attrs:
+            # generate name for node/relationship
+            attrs['__label__'] = name if model_base_cls.__name__ == "NodeModel" else convert_to_camel_case(name)
         model_class = super_new(mcs, name, bases, attrs)
-        model_class.objects = model_base_cls.objects(attrs['graph'], model_class)
+        model_class.objects = model_base_cls.objects(graph, model_class)
         return model_class
 
 
@@ -38,24 +48,46 @@ class NodeModel(metaclass=ModelMetaBase):
     class Meta:
         invana = None
     """
-    objects = NodeQuerySet
-    graph = None
-    label_name = None
-    type = "VERTEX"
+    objects = NodeModalQuerySet
+    __label__ = None
+
+    # graph = None
+    # label_name = None
+    # type = "VERTEX"
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.backend.schame_reader.get_vertex_schema(cls.label_name)
+        return graph.backend.schame_reader.get_vertex_schema(cls.__label__)
 
-    # def get
+    @classmethod
+    def get_property_keys(cls):
+        return [i for i in cls.__dict__.keys() if i[:1] != '_' and isinstance(getattr(cls, i), FieldBase)]
+
+    @classmethod
+    def get_properties(cls):
+        property_keys = cls.get_property_keys()
+        property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
+        return dict(zip(property_keys, property_definitions))
 
 
 class RelationshipModel(metaclass=ModelMetaBase):
-    objects = RelationshipQuerySet
-    graph = None
-    label_name = None
-    type = "EDGE"
+    objects = RelationshipModalQuerySet
+    __label__ = None
+
+    # graph = None
+    # label_name = None
+    # type = "EDGE"
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.backend.schame_reader.get_edge_schema(cls.label_name)
+        return graph.backend.schame_reader.get_edge_schema(cls.__label__)
+
+    @classmethod
+    def get_property_keys(cls):
+        return [i for i in cls.__dict__.keys() if i[:1] != '_' and isinstance(getattr(cls, i), FieldBase)]
+
+    @classmethod
+    def get_properties(cls):
+        property_keys = cls.get_property_keys()
+        property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
+        return dict(zip(property_keys, property_definitions))

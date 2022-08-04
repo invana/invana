@@ -1,20 +1,17 @@
 import math
-from invana import InvanaGraph
+from invana import settings, graph
 from invana.ogm.fields import StringProperty, IntegerProperty
 from invana.ogm.models import NodeModel
 from invana.ogm.paginator import QuerySetPaginator
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 
 class Project(NodeModel):
     graph = graph
-    properties = {
-        'name': StringProperty(max_length=30, trim_whitespaces=True),
-        "serial_no": IntegerProperty()
-    }
+    name = StringProperty(max_length=30, trim_whitespaces=True)
+    serial_no = IntegerProperty()
 
 
 class TestQuerySetPaginator:

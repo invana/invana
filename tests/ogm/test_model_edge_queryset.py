@@ -1,50 +1,34 @@
-from invana import InvanaGraph
+# from invana import InvanaGraph
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
 from invana.ogm.models import RelationshipModel, NodeModel
 from invana.serializer.element_structure import Node, RelationShip
 from datetime import datetime
+from invana import settings, graph
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 
 class Project(NodeModel):
-    graph = graph
-    properties = {
-        'name': StringProperty(max_length=30, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+    name = StringProperty(max_length=30, trim_whitespaces=True)
+    description = StringProperty(allow_null=True, min_length=10)
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 class Person(NodeModel):
-    graph = graph
-
-    properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
-
-    }
+    first_name = StringProperty(min_length=5, trim_whitespaces=True)
+    last_name = StringProperty(allow_null=True)
+    username = StringProperty(default="rrmerugu")
+    member_since = IntegerProperty()
 
 
 class Organisation(NodeModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, trim_whitespaces=True),
-    }
+    name = StringProperty(min_length=3, trim_whitespaces=True)
 
 
 class Authored(RelationshipModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, trim_whitespaces=True),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+    name = StringProperty(min_length=3, trim_whitespaces=True)
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 class TestEdgeModelQuerySet:

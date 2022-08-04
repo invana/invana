@@ -3,24 +3,19 @@ from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, FloatProperty, LongProperty
 from invana.ogm.models import NodeModel
 from invana.connector.data_types import FloatType
-from invana import InvanaGraph
+from invana import settings, graph
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = 5
 
 
 class Star(NodeModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, max_length=30, trim_whitespaces=True),
-        'distance_from_earth_float': FloatProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
-                                            max_value=1989000000000000 * 100),
-    }
+    name = StringProperty(min_length=3, max_length=30, trim_whitespaces=True)
+    distance_from_earth_float = FloatProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
+                                              max_value=1989000000000000 * 100)
 
 
 class TestFloatField:
@@ -33,7 +28,8 @@ class TestFloatField:
     def test_field_max_value(self):
         graph.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
-            Star.objects.create(name="Sun", distance_from_earth_float=FloatType(1989000000000000000000000000000 * 10000))
+            Star.objects.create(name="Sun",
+                                distance_from_earth_float=FloatType(1989000000000000000000000000000 * 10000))
         assert "max_value for field" in exec_info.value.__str__()
 
     def test_field_min_value(self):

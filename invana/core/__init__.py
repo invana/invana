@@ -11,7 +11,15 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana import InvanaGraph
-from . import settings
+from .invana import InvanaGraph
+from .. import settings
 
-graph = InvanaGraph(settings.GREMLIN_URL)
+graph = InvanaGraph(settings.GREMLIN_URL,
+                    traversal_source=settings.TRAVERSAL_SOURCE,
+                    strategies=settings.STRATEGIES,
+                    read_only_mode=settings.READONLY_MODE,
+                    timeout=settings.TIMEOUT,
+                    graph_traversal_source_cls=settings.GRAPH_TRAVERSAL_SOURCE_CLS,
+                    call_from_event_loop=settings.CALL_FROM_EVENT_LOOP,
+                    deserializer_map=settings.DESERIALIZER_MAP,
+                    auth=settings.AUTH)

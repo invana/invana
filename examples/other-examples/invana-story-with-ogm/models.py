@@ -16,29 +16,27 @@ from invana.ogm.models import NodeModel, RelationshipModel
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
     BooleanProperty
 from datetime import datetime
-from connection import graph
+from invana import settings
+
+settings.GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
 
 
 class User(NodeModel):
-    graph = graph
-    display_property = "first_name"
-    properties = {
-        'first_name': StringProperty(min_length=2),
-        'last_name': StringProperty(allow_null=True, min_length=2),
-        'username': StringProperty(min_length=2, default="rrmerugu")
-    }
+    # graph = graph
+    # display_property = "first_name"
+    first_name = StringProperty(min_length=2)
+    last_name = StringProperty(allow_null=True, min_length=2)
+    username = StringProperty(min_length=2, default="rrmerugu")
 
 
 class Topic(NodeModel):
-    graph = graph
-    display_property = "name"
-    properties = {
-        'name': StringProperty(min_length=2)
-    }
+    # graph = graph
+    # display_property = "name"
+    name = StringProperty(min_length=2)
 
 
 class Project(NodeModel):
-    graph = graph
+    # graph = graph
     properties = {
         'name': StringProperty(min_length=3),
         'description': StringProperty(allow_null=True, max_length=500),

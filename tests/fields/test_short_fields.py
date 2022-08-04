@@ -2,25 +2,20 @@ import pytest
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, ShortProperty
 from invana.ogm.models import NodeModel
-from invana import InvanaGraph
 from invana.connector.data_types import ShortType
+from invana import settings, graph
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = ShortType(5)
 
 
 class Star(NodeModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, max_length=30, trim_whitespaces=True),
-        'age_short': ShortProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
-                                   max_value=32767),
-    }
+    name = StringProperty(min_length=3, max_length=30, trim_whitespaces=True)
+    age_short = ShortProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
+                              max_value=32767)
 
 
 class TestShortField:

@@ -12,6 +12,14 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
-TIMEOUT = 180
 
+GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
+TRAVERSAL_SOURCE = 'g'
+STRATEGIES = None
+READONLY_MODE = False
+TIMEOUT = 180
+GRAPH_TRAVERSAL_SOURCE_CLS = None
+CALL_FROM_EVENT_LOOP = True
+DESERIALIZER_MAP = None
+TRANSPORT_KWARGS = {}
+AUTH = None

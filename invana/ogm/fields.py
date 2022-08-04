@@ -53,7 +53,7 @@ class FieldBase:
         value = default_value if value is None and default_value else value
         if self.allow_null is False and value is None:
             raise FieldValidationError(
-                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+                f"field '{model.__label__}.{field_name}' cannot be null when allow_null is False")
         self.validate_value_data_types(value, model, field_name)
         self.validate_field_kwargs(value, model, field_name)
         return value
@@ -68,7 +68,7 @@ class FieldBase:
 
     def validate_value_data_types(self, value, model, field_name):
         if value and type(value) not in self.allowed_data_types:
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of type {type(value)},"
+            raise FieldValidationError(f"field '{model.__label__}.{field_name}' cannot be of type {type(value)},"
                                        f" allowed_data_types: {self.allowed_data_types}")
 
     def validate_field_kwargs(self, value, model, field_name):
@@ -78,7 +78,7 @@ class FieldBase:
         try:
             return self.data_type(value) if value is not None else value
         except Exception as e:
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' failed with error: {e.__str__()}")
+            raise FieldValidationError(f"field '{model.__label__}.{field_name}' failed with error: {e.__str__()}")
 
 
 class StringProperty(FieldBase, ABC):
@@ -98,16 +98,16 @@ class StringProperty(FieldBase, ABC):
         assert self.trim_whitespaces is None or isinstance(self.trim_whitespaces, bool)
         if self.allow_null is False and value is None:
             raise FieldValidationError(
-                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+                f"field '{model.__label__}.{field_name}' cannot be null when allow_null is False")
 
         if value:
             if self.max_length and value.__len__() > self.max_length:
                 raise FieldValidationError(
-                    f"max_length for field '{model.label_name}.{field_name}' is {self.max_length} but "
+                    f"max_length for field '{model.__label__}.{field_name}' is {self.max_length} but "
                     f"the value has {value.__len__()}")
             if self.min_length and value.__len__() < self.min_length:
                 raise FieldValidationError(
-                    f"min_length for field '{model.label_name}.{field_name}' is {self.min_length} but "
+                    f"min_length for field '{model.__label__}.{field_name}' is {self.min_length} but "
                     f"the value has {value.__len__()}")
 
     def validate(self, value, field_name=None, model=None):
@@ -172,24 +172,24 @@ class NumberFieldBase(FieldBase, ABC):
             value = self.default
         if self.allow_null is False and value is None:
             raise FieldValidationError(
-                f"field '{model.label_name}.{field_name}' cannot be null when allow_null is False")
+                f"field '{model.__label__}.{field_name}' cannot be null when allow_null is False")
         if value is not None:
             if self.max_value and value > self.max_value:
                 raise FieldValidationError(
-                    f"max_value for field '{model.label_name}.{field_name}' is {self.max_value} but the value has {value}")
+                    f"max_value for field '{model.__label__}.{field_name}' is {self.max_value} but the value has {value}")
             if self.min_value and value < self.min_value:
                 raise FieldValidationError(
-                    f"min_value for field '{model.label_name}.{field_name}' is {self.min_value} but the value has {value}")
+                    f"min_value for field '{model.__label__}.{field_name}' is {self.min_value} but the value has {value}")
             if hasattr(self.data_type, 'limit'):
                 if value > self.data_type.limit - 1:
                     raise FieldValidationError(
                         f"max value allowed for '{self.data_type.__class__.__name__}' data type of "
-                        f"field '{model.label_name}.{field_name}'"
+                        f"field '{model.__label__}.{field_name}'"
                         f" is {self.data_type.limit - 1} but the value has {value}")
                 if value < 0 - self.data_type.limit:
                     raise FieldValidationError(
                         f"min_value allowed for '{self.data_type.__class__.__name__}' data type of "
-                        f"field '{model.label_name}.{field_name}'"
+                        f"field '{model.__label__}.{field_name}'"
                         f" is {self.min_value} but the value has {value}")
 
     def validate(self, value, field_name=None, model=None):
@@ -231,23 +231,23 @@ class DateTimeProperty(FieldBase, ABC):
 
     def validate_field_kwargs(self, value, model, field_name):
         if value and not isinstance(value, tuple(self.allowed_data_types)):
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+            raise FieldValidationError(f"field '{model.__label__}.{field_name}' cannot be of "
                                        f"type {type(value)}, expecting {self.data_type}")
         if self.max_value and not isinstance(self.max_value, tuple(self.allowed_data_types)):
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+            raise FieldValidationError(f"field '{model.__label__}.{field_name}' cannot be of "
                                        f"type {type(self.max_value)}, expecting {self.data_type}")
         if self.min_value and not isinstance(value, tuple(self.allowed_data_types)):
-            raise FieldValidationError(f"field '{model.label_name}.{field_name}' cannot be of "
+            raise FieldValidationError(f"field '{model.__label__}.{field_name}' cannot be of "
                                        f"type {type(self.min_value)}, expecting {self.data_type}")
 
         if value is not None:
             if self.max_value and value > self.max_value:
                 assert self.max_value is None or isinstance(self.max_value, datetime.datetime)
-                raise FieldValidationError(f"max_value for field '{model.label_name}.{field_name}' is"
+                raise FieldValidationError(f"max_value for field '{model.__label__}.{field_name}' is"
                                            f" {self.max_value} but the value has {value}")
             if self.min_value and value < self.min_value:
                 assert self.min_value is None or isinstance(self.min_value, datetime.datetime)
-                raise FieldValidationError(f"min_value for field '{model.label_name}.{field_name}' is"
+                raise FieldValidationError(f"min_value for field '{model.__label__}.{field_name}' is"
                                            f" {self.min_value} but the value has {value}")
 
     def validate(self, value, field_name=None, model=None):

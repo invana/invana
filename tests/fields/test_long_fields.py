@@ -3,25 +3,20 @@ from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, LongProperty
 from invana.ogm.models import NodeModel
 from gremlin_python.statics import long
-from invana import InvanaGraph
 from invana.connector.data_types import LongType
+from invana import settings, graph
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = long(5)
 
 
 class Star(NodeModel):
-    graph = graph
-
-    properties = {
-        'name': StringProperty(min_length=3, max_length=30, trim_whitespaces=True),
-        'distance_from_earth_long': LongProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
-                                                 max_value=5000000000),
-    }
+    name = StringProperty(min_length=3, max_length=30, trim_whitespaces=True)
+    distance_from_earth_long = LongProperty(default=DEFAULT_POINTS_VALUE, min_value=5,
+                                            max_value=5000000000)
 
 
 class TestLongField:

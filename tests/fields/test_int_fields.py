@@ -3,28 +3,22 @@ from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
 from invana.ogm.models import NodeModel
 from datetime import datetime
-from invana import InvanaGraph
+from invana import settings, graph
 import os
 
-gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
-graph = InvanaGraph(gremlin_url)
+settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
 
 DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = 5
 
 
 class Person(NodeModel):
-    graph = graph
-
-    properties = {
-        'first_name': StringProperty(min_length=3, max_length=30, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default=DEFAULT_USERNAME),
-        'member_since': IntegerProperty(),
-        'points': IntegerProperty(default=DEFAULT_POINTS_VALUE, max_value=100, min_value=5),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-
-    }
+    first_name = StringProperty(min_length=3, max_length=30, trim_whitespaces=True)
+    last_name = StringProperty(allow_null=True)
+    username = StringProperty(default=DEFAULT_USERNAME)
+    member_since = IntegerProperty()
+    points = IntegerProperty(default=DEFAULT_POINTS_VALUE, max_value=100, min_value=5)
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 class TestIntegerField:

@@ -15,7 +15,6 @@
 #
 from .utils import process_graph_schema_string
 from ..base import SchemaReaderBase
-from ...ogm.models import NodeModel, RelationshipModel
 from ...serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
 
@@ -30,9 +29,11 @@ mgmt.getVertexLabels()
 
 
     """
+    # from ...ogm.models import NodeModel, RelationshipModel
 
     @staticmethod
-    def create_model(model: [NodeModel, RelationshipModel]):
+    # def create_model(model: [NodeModel, RelationshipModel]):
+    def create_model(model):
         query = """mgmt = graph.openManagement()\n"""
         if model.type == "VERTEX":
             label_filter_key = "containsVertexLabel"
@@ -45,10 +46,10 @@ mgmt.getVertexLabels()
         else:
             raise ValueError("mode should of type vertex or edge")
         query += f"""
-if (mgmt.{label_filter_key}('{model.label_name}'))
-    {model.label_name} = mgmt.{get_label_method}('{model.label_name}')
+if (mgmt.{label_filter_key}('{model.__label__}'))
+    {model.__label__} = mgmt.{get_label_method}('{model.__label__}')
 else 
-    {model.label_name} = mgmt.{make_label_method}('{model.label_name}').make()
+    {model.__label__} = mgmt.{make_label_method}('{model.__label__}').make()
 """.lstrip("\n")
         for prop_key, prop_model in model.properties.items():
             query += f"""
@@ -58,7 +59,7 @@ else
     {prop_key} = mgmt.makePropertyKey('{prop_key}').dataType({prop_model.get_data_type_class()}.class).make()
 """.lstrip("\n")
 
-        query += f"mgmt.addProperties({model.label_name}, {', '.join(list(model.properties.keys()))})\n"
+        query += f"mgmt.addProperties({model.__label__}, {', '.join(list(model.properties.keys()))})\n"
         query += "mgmt.commit()"
         response = model.graph.connector.execute_query(query)
         return response

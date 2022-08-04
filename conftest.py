@@ -1,7 +1,7 @@
 import pytest
 import os
 from invana.connector.connector import GremlinConnector
-from invana import InvanaGraph
+from invana import graph, settings, InvanaGraph
 
 
 @pytest.fixture(scope="function")
@@ -15,17 +15,19 @@ def connection(gremlin_url):
     initial_data_with_connector(connector)
     yield connector
     connector.g.V().drop().iterate()
-    connector.close()
+    # connector.close()
 
 
 @pytest.fixture(scope="function")
 def graph(gremlin_url):
-    graph = InvanaGraph(gremlin_url)
+    settings.GREMLIN_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremlin")
+
+    from invana import graph
     initial_data_with_graph(graph)
     initial_data_with_connector(graph.connector)
     yield graph
     graph.g.V().drop().iterate()
-    graph.close_connection()
+    # graph.close_connection()
 
 
 #

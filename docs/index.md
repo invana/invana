@@ -13,7 +13,7 @@ from invana.ogm.models import NodeModel, RelationshipModel, RelationshipTo, Rela
 from invana.ogm.fields import StringProperty, DateTimeProperty
 from invana.ogm.relationships.cardinality import Multi, Simple, Many2One, One2Many, One2One
 from invana.ogm import indexes
-from invana.queryset import NodeQuerySet, RelationshipQuerySet
+from invana.queryset import NodeModalQuerySet, RelationshipModalQuerySet
 
 
 class LivesIn(RelationshipModel):
