@@ -55,17 +55,17 @@ Authored.objects.delete()
 
 person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 print("person is :", person)
-project = Project.objects.create(name="Hello   ", is_active=False)
-print("project is:", project)
-
-# person.projects.
-
-projects = Project.objects.search().to_list()
-print("projects", projects)
-
-authored_single = Authored.objects.create(person.id, project.id)
-print("authored_single", authored_single)
-authored = Authored.objects.search().to_list()
-print("authored", authored)
+# project = Project.objects.create(name="Hello   ", is_active=False)
+# print("project is:", project)
+#
+# # person.projects.
+#
+# projects = Project.objects.search().to_list()
+# print("projects", projects)
+#
+# authored_single = Authored.objects.create(person.id, project.id)
+# print("authored_single", authored_single)
+# authored = Authored.objects.search().to_list()
+# print("authored", authored)
 
 graph.close_connection()

@@ -24,7 +24,7 @@ from invana.ogm.exceptions import FieldValidationError
 __all__ = ['StringProperty', 'SingleCharProperty', 'BooleanProperty', 'DateTimeProperty']
 
 
-class FieldBase:
+class PropertyBase:
     data_type = None
     allowed_data_types = []
 
@@ -81,7 +81,7 @@ class FieldBase:
             raise FieldValidationError(f"field '{model.__label__}.{field_name}' failed with error: {e.__str__()}")
 
 
-class StringProperty(FieldBase, ABC):
+class StringProperty(PropertyBase, ABC):
     data_type = StringType
     allowed_data_types = [StringType, str]
 
@@ -117,7 +117,7 @@ class StringProperty(FieldBase, ABC):
         return self.convert_to_data_type(value, model, field_name)
 
 
-class SingleCharProperty(FieldBase, ABC):
+class SingleCharProperty(PropertyBase, ABC):
     data_type = SingleCharType
     allowed_data_types = [SingleCharType, str]
 
@@ -129,7 +129,7 @@ class SingleCharProperty(FieldBase, ABC):
         return self.convert_to_data_type(value, model, field_name)
 
 
-class BooleanProperty(FieldBase, ABC):
+class BooleanProperty(PropertyBase, ABC):
     data_type = BooleanType
     allowed_data_types = [BooleanType, bool]
 
@@ -143,7 +143,7 @@ class BooleanProperty(FieldBase, ABC):
 
 """
 TODO - uncomment this when tests are working fine
-class ByteProperty(FieldBase, ABC):
+class ByteProperty(PropertyBase, ABC):
     data_type = ByteType
     allowed_data_types = [ByteType, bytes]
 
@@ -156,7 +156,7 @@ class ByteProperty(FieldBase, ABC):
 """
 
 
-class NumberFieldBase(FieldBase, ABC):
+class NumberFieldBase(PropertyBase, ABC):
     allowed_data_types = [IntegerType, FloatType, LongType, DoubleType, int, float, long, ShortType]
 
     def __init__(self, min_value=None, max_value=None, **kwargs):
@@ -217,7 +217,7 @@ class DoubleProperty(NumberFieldBase, ABC):
     data_type = DoubleType
 
 
-class DateTimeProperty(FieldBase, ABC):
+class DateTimeProperty(PropertyBase, ABC):
     data_type = DateTimeType
     allowed_data_types = [DateTimeType, datetime.datetime]
 
@@ -259,22 +259,22 @@ class DateTimeProperty(FieldBase, ABC):
 #     data_type = LongType
 #
 #
-# class DoubleField(FieldBase):
+# class DoubleField(PropertyBase):
 #     data_type = None
 #
-# class ByteField(FieldBase, ABC):
+# class ByteField(PropertyBase, ABC):
 #     data_type = ByteBufferType
 #
-# class InstantField(FieldBase):
+# class InstantField(PropertyBase):
 #     pass
 #
-# class GeoshapeField(FieldBase):
+# class GeoshapeField(PropertyBase):
 #     data_type = None
 #
-# class UUIDField(FieldBase):
+# class UUIDField(PropertyBase):
 #     pass
 #
-# class DateFieldBase(FieldBase, ABC):
+# class DateFieldBase(PropertyBase, ABC):
 #
 #
 # class DateField(DateFieldBase, ABC):

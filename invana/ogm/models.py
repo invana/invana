@@ -14,7 +14,7 @@
 
 from invana.ogm.model_querysets import NodeModalQuerySet, RelationshipModalQuerySet
 from invana.ogm.utils import convert_to_camel_case
-from invana.ogm.properties import FieldBase
+from invana.ogm.properties import PropertyBase
 from .. import graph
 
 
@@ -24,51 +24,78 @@ class Direction:
     UNDIRECTED = "UNDIRECTED"
 
 
+class PropertyManager:
+
+    @classmethod
+    def get_property_keys(cls, model):
+        return [i for i in model.__dict__.keys() if i[:1] != '_' and isinstance(getattr(model, i), PropertyBase)]
+
+    @classmethod
+    def get_relationship_keys(cls, model):
+        return [i for i in model.__dict__.keys() if i[:1] != '_' and isinstance(getattr(model, i), PropertyBase)]
+
+        # return [i for i in model.__dict__.keys() if i[:1] != '_'
+        #         and isinstance(getattr(model, i), (RelationshipUndirected, RelationshipFrom, RelationshipTo,))]
+
+    @classmethod
+    def get_properties(cls, model):
+        property_keys = cls.get_property_keys(model)
+        property_definitions = [getattr(model, prop_key) for prop_key in property_keys]
+        return dict(zip(property_keys, property_definitions))
+
+    @classmethod
+    def get_relationships(cls, model):
+        keys = cls.get_relationship_keys(model)
+        relationship_definitions = [getattr(model, k) for k in keys]
+        return dict(zip(keys, relationship_definitions))
+
+
 class ModelMetaBase(type):
 
     def __new__(mcs, name, bases, attrs):
         super_new = super().__new__
         # Also ensure initialization is only performed for subclasses of Model
         # (excluding Model class itself).
-        parents = [b for b in bases if isinstance(b, ModelMetaBase)]
-        if not parents:
-            return super_new(mcs, name, bases, attrs)
-        model_base_cls = bases[0]
-        if "__label__" not in attrs:
-            # generate name for node/relationship
-            attrs['__label__'] = name if model_base_cls.__name__ == "NodeModel" else convert_to_camel_case(name)
-        attrs['__graph__'] = graph
-        model_class = super_new(mcs, name, bases, attrs)
-        model_class.objects = model_base_cls.objects(graph, model_class)
+
+        model_class = super_new(ModelMetaBase, name, bases, attrs)
+
+        # parents = [b for b in bases if isinstance(b, ModelMetaBase)]
+        # if not parents:
+        #     return super_new(mcs, name, bases, attrs)
+        # model_base_cls = bases[0]
+
+        if hasattr(model_class, '__abstract_node__'):
+            delattr(model_class, '__abstract_node__')
+
+        elif hasattr(model_class, '__abstract_relationship__'):
+            delattr(model_class, '__abstract_relationship__')
+        else:
+
+            if "__label__" not in attrs:
+                # generate name for node/relationship
+                model_class.__label__ = name if issubclass(model_class, NodeModel) else convert_to_camel_case(name)
+            model_class.__graph__ = graph
+
+            # TODO - also find queryset managers like objects
+            model_class.__all_properties__ = PropertyManager.get_properties(model_class)
+            model_class.__all_relationships__ = PropertyManager.get_relationships(model_class)
+
+            model_class.objects = model_class.objects(graph, model_class)
         return model_class
 
 
-class NodeModel(metaclass=ModelMetaBase):
-    """
-    class Meta:
-        invana = None
-    """
-    objects = NodeModalQuerySet
+class ModelBase(metaclass=ModelMetaBase):
     __label__ = None
     __graph__ = None
-
-    # graph = None
-    # label_name = None
-    # type = "VERTEX"
-
-    @classmethod
-    def get_schema(cls):
-        return graph.backend.schame_reader.get_vertex_schema(cls.__label__)
+    __abstract_node__ = True
 
     @classmethod
     def get_property_keys(cls):
-        return [i for i in cls.__dict__.keys() if i[:1] != '_' and isinstance(getattr(cls, i), FieldBase)]
+        return cls.__all_properties__.keys()
 
     @classmethod
     def get_properties(cls):
-        property_keys = cls.get_property_keys()
-        property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
-        return dict(zip(property_keys, property_definitions))
+        return cls.__all_properties__
 
     def __eq__(self, other):
         if not isinstance(other, (NodeModel,)):
@@ -81,38 +108,50 @@ class NodeModel(metaclass=ModelMetaBase):
         return not self.__eq__(other)
 
 
-class RelationshipModel(metaclass=ModelMetaBase):
-    objects = RelationshipModalQuerySet
-    __label__ = None
-    __graph__ = None
+class NodeModel(ModelBase):
+    """
+    class Meta:
+        invana = None
+    """
+    objects = NodeModalQuerySet
+    __abstract_node__ = True
 
-    # graph = None
-    # label_name = None
-    # type = "EDGE"
+    @classmethod
+    def get_schema(cls):
+        return graph.backend.schame_reader.get_vertex_schema(cls.__label__)
+
+    # __label__ = None
+    # __graph__ = None
+
+
+class RelationshipModel(ModelBase):
+    objects = RelationshipModalQuerySet
+    __abstract_relationship__ = True
+
+    # __label__ = None
+    # __graph__ = None
 
     @classmethod
     def get_schema(cls):
         return graph.backend.schame_reader.get_edge_schema(cls.__label__)
 
-    @classmethod
-    def get_property_keys(cls):
-        return [i for i in cls.__dict__.keys() if i[:1] != '_' and isinstance(getattr(cls, i), FieldBase)]
-
-    @classmethod
-    def get_properties(cls):
-        property_keys = cls.get_property_keys()
-        property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
-        return dict(zip(property_keys, property_definitions))
-
-    def __eq__(self, other):
-        if not isinstance(other, (RelationshipModel,)):
-            return False
-        if hasattr(self, 'id') and hasattr(other, 'id'):
-            return self.id == other.id
-        return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    # @classmethod
+    # def get_property_keys(cls):
+    #     return cls.__all_properties__.keys()
+    #
+    # @classmethod
+    # def get_properties(cls):
+    #     return cls.__all_properties__
+    #
+    # def __eq__(self, other):
+    #     if not isinstance(other, (RelationshipModel,)):
+    #         return False
+    #     if hasattr(self, 'id') and hasattr(other, 'id'):
+    #         return self.id == other.id
+    #     return False
+    #
+    # def __ne__(self, other):
+    #     return not self.__eq__(other)
 
 
 class NodeRelationshipQuerySet:
@@ -147,9 +186,17 @@ def create_node_relationship_manager(model, relationship_model, direction, cardi
     return NodeRelationshipQuerySet(model, relationship_model, direction, cardinality=cardinality)
 
 
-def RelationshipTo(model, relationship_model, cardinality=None):
-    return create_node_relationship_manager(model, relationship_model, Direction.OUTGOING, cardinality)
+RelationshipTo = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
+                                                                                                      relationship_model,
+                                                                                                      Direction.OUTGOING,
+                                                                                                      cardinality)
 
+RelationshipFrom = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
+                                                                                                        relationship_model,
+                                                                                                        Direction.INCOMING,
+                                                                                                        cardinality)
 
-def RelationshipFrom(model, relationship_model, cardinality=None):
-    return create_node_relationship_manager(model, relationship_model, Direction.INCOMING, cardinality)
+RelationshipUndirected = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
+                                                                                                              relationship_model,
+                                                                                                              Direction.UNDIRECTED,
+                                                                                                              cardinality)
