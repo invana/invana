@@ -1,38 +1,28 @@
-from invana import InvanaGraph
+from invana import graph, settings
 from invana.ogm.models import NodeModel, RelationshipModel
 from invana.ogm.properties import StringProperty, DateTimeProperty, IntegerProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+settings.GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
 
 
 class Project(NodeModel):
-    graph = graph
-    properties = {
-        'name': StringProperty(max_length=10, trim_whitespaces=True),
-        'description': StringProperty(allow_null=True, min_length=10),
-        'rating': FloatProperty(allow_null=True),
-        'is_active': BooleanProperty(default=True),
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+    name = StringProperty(max_length=10, trim_whitespaces=True)
+    description = StringProperty(allow_null=True, min_length=10)
+    rating = FloatProperty(allow_null=True)
+    is_active = BooleanProperty(default=True)
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 class Person(NodeModel):
-    graph = graph
-    properties = {
-        'first_name': StringProperty(min_length=5, trim_whitespaces=True),
-        'last_name': StringProperty(allow_null=True),
-        'username': StringProperty(default="rrmerugu"),
-        'member_since': IntegerProperty(),
-
-    }
+    first_name = StringProperty(min_length=5, trim_whitespaces=True)
+    last_name = StringProperty(allow_null=True)
+    username = StringProperty(default="rrmerugu")
+    member_since = IntegerProperty()
 
 
 class Authored(RelationshipModel):
-    graph = graph
-    properties = {
-        'created_at': DateTimeProperty(default=lambda: datetime.now())
-    }
+    created_at = DateTimeProperty(default=lambda: datetime.now())
 
 
 Project.objects.delete()
@@ -41,9 +31,8 @@ Authored.objects.delete()
 
 person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
 print("person is :", person)
-print("person as json :", person.to_json())
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
-print("project is:", project.to_json())
+print("project is:", project)
 
 projects = Project.objects.search().to_list()
 print("projects", projects)
