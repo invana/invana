@@ -1,7 +1,7 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, FloatProperty, LongProperty
-from invana.ogm.models import StructuredNode
+from invana.ogm.models import NodeModel
 from invana.connector.data_types import FloatType
 from invana import InvanaGraph
 import os
@@ -13,7 +13,7 @@ DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = 5
 
 
-class Star(StructuredNode):
+class Star(NodeModel):
     graph = graph
 
     properties = {

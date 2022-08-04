@@ -1,6 +1,6 @@
 from invana import InvanaGraph
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
-from invana.ogm.models import StructuredRelationship, StructuredNode
+from invana.ogm.models import RelationshipModel, NodeModel
 from invana.serializer.element_structure import Node, RelationShip
 from datetime import datetime
 import os
@@ -9,7 +9,7 @@ gremlin_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind-ws:8182/gremli
 graph = InvanaGraph(gremlin_url)
 
 
-class Project(StructuredNode):
+class Project(NodeModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=30, trim_whitespaces=True),
@@ -18,7 +18,7 @@ class Project(StructuredNode):
     }
 
 
-class Person(StructuredNode):
+class Person(NodeModel):
     graph = graph
 
     properties = {
@@ -30,7 +30,7 @@ class Person(StructuredNode):
     }
 
 
-class Organisation(StructuredNode):
+class Organisation(NodeModel):
     graph = graph
 
     properties = {
@@ -38,7 +38,7 @@ class Organisation(StructuredNode):
     }
 
 
-class Authored(StructuredRelationship):
+class Authored(RelationshipModel):
     graph = graph
 
     properties = {

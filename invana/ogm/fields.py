@@ -21,7 +21,7 @@ from invana.connector.data_types import FloatType, IntegerType, DoubleType, Long
 from gremlin_python.statics import long
 from invana.ogm.exceptions import FieldValidationError
 
-__all__ = ['StringProperty', 'SingleCharProperty', 'BooleanProperty', ]
+__all__ = ['StringProperty', 'SingleCharProperty', 'BooleanProperty', 'DateTimeProperty']
 
 
 class FieldBase:

@@ -1,13 +1,13 @@
 from invana import InvanaGraph
 from invana.ogm.fields import StringProperty, DateTimeProperty
-from invana.ogm.models import StructuredNode, StructuredRelationship
+from invana.ogm.models import NodeModel, RelationshipModel
 from datetime import datetime
 from invana.ogm import indexes
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project171(StructuredNode):
+class Project171(NodeModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
@@ -20,7 +20,7 @@ class Project171(StructuredNode):
     )
 
 
-class Authored2(StructuredRelationship):
+class Authored2(RelationshipModel):
     graph = graph
     properties = {
         'created_at': DateTimeProperty(default=lambda: datetime.now())

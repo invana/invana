@@ -12,14 +12,14 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana.ogm.models import StructuredNode, StructuredRelationship
+from invana.ogm.models import NodeModel, RelationshipModel
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty, FloatProperty, \
     BooleanProperty
 from datetime import datetime
 from connection import graph
 
 
-class User(StructuredNode):
+class User(NodeModel):
     graph = graph
     display_property = "first_name"
     properties = {
@@ -29,7 +29,7 @@ class User(StructuredNode):
     }
 
 
-class Topic(StructuredNode):
+class Topic(NodeModel):
     graph = graph
     display_property = "name"
     properties = {
@@ -37,7 +37,7 @@ class Topic(StructuredNode):
     }
 
 
-class Project(StructuredNode):
+class Project(NodeModel):
     graph = graph
     properties = {
         'name': StringProperty(min_length=3),
@@ -48,13 +48,13 @@ class Project(StructuredNode):
     }
 
 
-class Authored(StructuredRelationship):
+class Authored(RelationshipModel):
     graph = graph
     properties = {
         'started': IntegerProperty()
     }
 
 
-class Likes(StructuredRelationship):
+class Likes(RelationshipModel):
     graph = graph
     properties = {}

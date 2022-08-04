@@ -27,13 +27,13 @@ class ModelMetaBase(type):
             return super_new(mcs, name, bases, attrs)
         model_base_cls = bases[0]
         if "name" not in attrs:
-            attrs['label_name'] = name if model_base_cls.__name__ == "StructuredNode" else convert_to_camel_case(name)
+            attrs['label_name'] = name if model_base_cls.__name__ == "NodeModel" else convert_to_camel_case(name)
         model_class = super_new(mcs, name, bases, attrs)
         model_class.objects = model_base_cls.objects(attrs['graph'], model_class)
         return model_class
 
 
-class StructuredNode(metaclass=ModelMetaBase):
+class NodeModel(metaclass=ModelMetaBase):
     """
     class Meta:
         invana = None
@@ -50,7 +50,7 @@ class StructuredNode(metaclass=ModelMetaBase):
     # def get
 
 
-class StructuredRelationship(metaclass=ModelMetaBase):
+class RelationshipModel(metaclass=ModelMetaBase):
     objects = RelationshipQuerySet
     graph = None
     label_name = None

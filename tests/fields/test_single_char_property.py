@@ -15,7 +15,7 @@ import pytest
 
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, SingleCharProperty
-from invana.ogm.models import StructuredNode
+from invana.ogm.models import NodeModel
 from invana.connector.data_types import SingleCharType
 from invana.serializer.element_structure import Node
 from invana import InvanaGraph
@@ -27,7 +27,7 @@ graph = InvanaGraph(gremlin_url)
 DEFAULT_USERNAME = "rrmerugu"
 
 
-class Person(StructuredNode):
+class Person(NodeModel):
     graph = graph
 
     properties = {

@@ -1,7 +1,7 @@
 import pytest
 from invana.ogm.exceptions import FieldValidationError
 from invana.ogm.fields import StringProperty, IntegerProperty, DateTimeProperty
-from invana.ogm.models import StructuredNode
+from invana.ogm.models import NodeModel
 from datetime import datetime
 from invana import InvanaGraph
 import os
@@ -12,7 +12,7 @@ graph = InvanaGraph(gremlin_url)
 DEFAULT_USERNAME = "rrmerugu"
 
 
-class Person(StructuredNode):
+class Person(NodeModel):
     graph = graph
 
     properties = {

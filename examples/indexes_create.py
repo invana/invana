@@ -2,12 +2,12 @@ from invana import InvanaGraph
 from invana.ogm import indexes
 from invana.ogm.indexes import IndexQueryBuilder
 from invana.ogm.fields import StringProperty, FloatProperty, BooleanProperty
-from invana.ogm.models import StructuredNode
+from invana.ogm.models import NodeModel
 
 graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
 
 
-class Project8(StructuredNode):
+class Project8(NodeModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
