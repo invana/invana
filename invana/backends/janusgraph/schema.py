@@ -29,29 +29,32 @@ mgmt.getVertexLabels()
 
 
     """
+
     # from ...ogm.models import NodeModel, RelationshipModel
 
     @staticmethod
     # def create_model(model: [NodeModel, RelationshipModel]):
     def create_model(model):
+        from ...ogm.models import NodeModel, RelationshipModel
+
         query = """mgmt = graph.openManagement()\n"""
-        if model.type == "VERTEX":
+        if issubclass(model, NodeModel):
             label_filter_key = "containsVertexLabel"
             get_label_method = "getVertexLabel"
             make_label_method = "makeVertexLabel"
-        elif model.type == "EDGE":
+        elif issubclass(model, RelationshipModel):
             label_filter_key = "containsEdgeLabel"
             get_label_method = "getEdgeLabel"
             make_label_method = "makeEdgeLabel"
         else:
-            raise ValueError("mode should of type vertex or edge")
+            raise ValueError("model should of type NodeModel or RelationshipModel")
         query += f"""
 if (mgmt.{label_filter_key}('{model.__label__}'))
     {model.__label__} = mgmt.{get_label_method}('{model.__label__}')
 else 
     {model.__label__} = mgmt.{make_label_method}('{model.__label__}').make()
 """.lstrip("\n")
-        for prop_key, prop_model in model.properties.items():
+        for prop_key, prop_model in model.get_properties().items():
             query += f"""
 if (mgmt.containsRelationType('{prop_key}'))
     {prop_key} = mgmt.getPropertyKey('{prop_key}')
@@ -59,9 +62,9 @@ else
     {prop_key} = mgmt.makePropertyKey('{prop_key}').dataType({prop_model.get_data_type_class()}.class).make()
 """.lstrip("\n")
 
-        query += f"mgmt.addProperties({model.__label__}, {', '.join(list(model.properties.keys()))})\n"
+        query += f"mgmt.addProperties({model.__label__}, {', '.join(list(model.get_property_keys()))})\n"
         query += "mgmt.commit()"
-        response = model.graph.connector.execute_query(query)
+        response = model.__graph__.connector.execute_query(query)
         return response
 
 

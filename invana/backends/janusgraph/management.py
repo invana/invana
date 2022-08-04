@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from .indexes import IndexQueryBuilder
+from .indexes import JanusGraphIndexQueryBuilder
 from .schema import JanusGraphSchemaCreate, JanusGraphSchemaReader
 from invana.connector import GremlinConnector
 from invana.ogm.indexes import MixedIndex, CompositeIndex
@@ -20,11 +20,11 @@ from invana.ogm.indexes import MixedIndex, CompositeIndex
 
 # https://gist.github.com/disruptek/98ed066933d05f22850329c5efc1d7b4
 
-class JanusGraphBackendManagement:
+class JanusGraphBackendManager:
 
     def __init__(self, connector: GremlinConnector):
         self.connector = connector
-        self.index_creator = IndexQueryBuilder()
+        self.index_creator = JanusGraphIndexQueryBuilder()
         self.schema_creator = JanusGraphSchemaCreate()
         self.schema_reader = JanusGraphSchemaReader(connector)
 
@@ -62,7 +62,7 @@ graph.getOpenTransactions()
         return self.schema_creator.create_model(model)
 
     def create_indexes_from_model(self, model):
-        indexes = model.indexes
+        indexes = model.__indexes__
         model_indexes = []
         for index in indexes:
             if isinstance(index, CompositeIndex):

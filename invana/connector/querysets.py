@@ -119,7 +119,7 @@ class QuerySetBase(abc.ABC):
         return search_kwargs
 
 
-class VertexQuerySet(QuerySetBase, ABC):
+class NodeQuerySet(QuerySetBase, ABC):
 
     def create(self, label, **properties) -> QuerySetResultSet:
         return QuerySetResultSet(self.connector.g.create_vertex(label, **properties))

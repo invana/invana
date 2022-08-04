@@ -18,11 +18,10 @@ from invana.ogm.properties import FieldBase
 from .. import graph
 
 
-# def create_graph():
-#     from invana.graph import InvanaGraph
-#     from invana import settings
-#
-# graph = create_graph()
+class Direction:
+    OUTGOING = "OUTGOING"
+    INCOMING = "INCOMING"
+    UNDIRECTED = "UNDIRECTED"
 
 
 class ModelMetaBase(type):
@@ -38,6 +37,7 @@ class ModelMetaBase(type):
         if "__label__" not in attrs:
             # generate name for node/relationship
             attrs['__label__'] = name if model_base_cls.__name__ == "NodeModel" else convert_to_camel_case(name)
+        attrs['__graph__'] = graph
         model_class = super_new(mcs, name, bases, attrs)
         model_class.objects = model_base_cls.objects(graph, model_class)
         return model_class
@@ -50,6 +50,7 @@ class NodeModel(metaclass=ModelMetaBase):
     """
     objects = NodeModalQuerySet
     __label__ = None
+    __graph__ = None
 
     # graph = None
     # label_name = None
@@ -69,10 +70,21 @@ class NodeModel(metaclass=ModelMetaBase):
         property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
         return dict(zip(property_keys, property_definitions))
 
+    def __eq__(self, other):
+        if not isinstance(other, (NodeModel,)):
+            return False
+        if hasattr(self, 'id') and hasattr(other, 'id'):
+            return self.id == other.id
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 class RelationshipModel(metaclass=ModelMetaBase):
     objects = RelationshipModalQuerySet
     __label__ = None
+    __graph__ = None
 
     # graph = None
     # label_name = None
@@ -91,3 +103,53 @@ class RelationshipModel(metaclass=ModelMetaBase):
         property_keys = cls.get_property_keys()
         property_definitions = [getattr(cls, prop_key) for prop_key in property_keys]
         return dict(zip(property_keys, property_definitions))
+
+    def __eq__(self, other):
+        if not isinstance(other, (RelationshipModel,)):
+            return False
+        if hasattr(self, 'id') and hasattr(other, 'id'):
+            return self.id == other.id
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class NodeRelationshipQuerySet:
+
+    def __init__(self, model: [NodeModel], direction, relationship_model: [RelationshipModel], cardinality):
+        self.model = model
+        self.direction = direction
+        self.relationship_model = relationship_model
+        self.cardinality = cardinality
+        self.queryset = RelationshipModalQuerySet(graph, relationship_model)
+
+    def add_relationship(self, node, **properties):
+        pass
+
+    def remove_relationship(self):
+        pass
+
+    def has_relationship(self):
+        pass
+
+    def update_relationship(self):
+        pass
+
+
+def create_node_relationship_manager(model, relationship_model, direction, cardinality=None):
+    if not issubclass(model, (str, NodeModel)):
+        raise ValueError(f'model must be a NodeModel or str; got {repr(model)}')
+
+    if not issubclass(relationship_model, (RelationshipModel,)):
+        raise ValueError(f'relationship_model must be a RelationshipModel instance; got {repr(relationship_model)}')
+
+    return NodeRelationshipQuerySet(model, relationship_model, direction, cardinality=cardinality)
+
+
+def RelationshipTo(model, relationship_model, cardinality=None):
+    return create_node_relationship_manager(model, relationship_model, Direction.OUTGOING, cardinality)
+
+
+def RelationshipFrom(model, relationship_model, cardinality=None):
+    return create_node_relationship_manager(model, relationship_model, Direction.INCOMING, cardinality)

@@ -12,7 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-class IndexQueryBuilder:
+class JanusGraphIndexQueryBuilder:
 
     @staticmethod
     def create_index_query(*property_keys, label=None, index_name=None,

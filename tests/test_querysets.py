@@ -2,7 +2,7 @@ from invana import InvanaGraph
 from invana.serializer.element_structure import Node, RelationShip
 
 
-class TestVertexQuerySet:
+class TestNodeQuerySet:
 
     def test_create(self, graph: InvanaGraph):
         vtx = graph.vertex.create("Person", name="Ravi").to_list()

@@ -45,10 +45,10 @@ ravi = Person.objects.create(name="Ravi")
 mars = Location.objects.create(name="Mars")
 
 # CRUD on relationships
-ravi.lives_in.connect(mars, since=2020) # create link 
-ravi.lives_in.is_connected(mars) # check if link exist
-ravi.lives_in.update_connection(mars, since=2021) #update the link properties
-ravi.lives_in.disconnect(mars) # remove link
+ravi.lives_in.add_relationship(mars, since=2020) # create link 
+ravi.lives_in.has_relationship(mars) # check if link exist
+ravi.lives_in.update_relationship(mars, since=2021) #update the link properties
+ravi.lives_in.remove_relationship(mars) # remove link
 ```
 
 

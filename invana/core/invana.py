@@ -11,7 +11,7 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from ..backends import JanusGraphBackendManagement
+from ..backends import JanusGraphBackendManager
 from ..connector import GremlinConnector
 
 
@@ -28,7 +28,7 @@ class InvanaGraph:
                  auth=None,
                  **transport_kwargs):
 
-        from invana.connector.querysets import VertexQuerySet, RelationshipQuerySet
+        from invana.connector.querysets import NodeQuerySet, RelationshipQuerySet
 
         self.connector = GremlinConnector(gremlin_url,
                                           traversal_source=traversal_source,
@@ -39,9 +39,9 @@ class InvanaGraph:
                                           call_from_event_loop=call_from_event_loop,
                                           deserializer_map=deserializer_map,
                                           **transport_kwargs)
-        self.vertex = VertexQuerySet(self.connector)
+        self.vertex = NodeQuerySet(self.connector)
         self.edge = RelationshipQuerySet(self.connector)
-        self.management = JanusGraphBackendManagement(self.connector)
+        self.management = JanusGraphBackendManager(self.connector)
 
     @property
     def g(self):
