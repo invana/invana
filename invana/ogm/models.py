@@ -64,11 +64,8 @@ class ModelMetaBase(type):
         #     return super_new(mcs, name, bases, attrs)
         # model_base_cls = bases[0]
 
-        if hasattr(model_class, '__abstract_node__'):
-            delattr(model_class, '__abstract_node__')
-
-        elif hasattr(model_class, '__abstract_relationship__'):
-            delattr(model_class, '__abstract_relationship__')
+        if hasattr(model_class, '__abstract__'):
+            delattr(model_class, '__abstract__')
         else:
 
             if "__label__" not in attrs:
@@ -87,7 +84,7 @@ class ModelMetaBase(type):
 class ModelBase(metaclass=ModelMetaBase):
     __label__ = None
     __graph__ = None
-    __abstract_node__ = True
+    __abstract__ = True
 
     @classmethod
     def get_property_keys(cls):
@@ -114,7 +111,7 @@ class NodeModel(ModelBase):
         invana = None
     """
     objects = NodeModalQuerySet
-    __abstract_node__ = True
+    __abstract__ = True
 
     @classmethod
     def get_schema(cls):
@@ -126,7 +123,7 @@ class NodeModel(ModelBase):
 
 class RelationshipModel(ModelBase):
     objects = RelationshipModalQuerySet
-    __abstract_relationship__ = True
+    __abstract__ = True
 
     # __label__ = None
     # __graph__ = None
