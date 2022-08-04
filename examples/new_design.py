@@ -11,7 +11,15 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana import InvanaGraph
+from experiments.models import NodeModel, RelationshipModel
+from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, IntegerProperty
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin")
-# graph = InvanaGraph("ws://localhost:8182/gremlin")
+
+class Star(NodeModel):
+    name = StringProperty(max_length=10, trim_whitespaces=True)
+    mass_in_kgs = FloatProperty()
+    radius_in_kms = IntegerProperty()
+
+
+all_stars = Star.objects.search().to_list()
+print(all_stars)

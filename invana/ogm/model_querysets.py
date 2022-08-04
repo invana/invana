@@ -16,7 +16,7 @@ from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatype
     validate_kwargs_for_search, add_has_label_kwargs_from_model
 from .exceptions import FieldNotFoundError, FieldValidationError
 from .querysets import VertexQuerySet, RelationshipQuerySet
-from ..serializer.element_structure import Node, RelationShip
+# from ..serializer.element_structure import Node, RelationShip
 import abc
 
 

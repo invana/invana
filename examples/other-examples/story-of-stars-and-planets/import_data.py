@@ -87,6 +87,6 @@ def flush_data():
     HasNeighborPlanet.objects.delete_many()
 
 
-flush_data()
+# flush_data()
 import_data()
 graph.close_connection()

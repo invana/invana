@@ -78,7 +78,7 @@ def _validate_kwargs_for_create(self, **properties):
 
 def add_has_label_kwargs_from_model(f):
     def wrapper(self, **kwargs):
-        kwargs['has__label'] = self.model.label_name
+        kwargs['has__label'] = self.model.__label__
         return f(self, **kwargs)
 
     return wrapper
@@ -99,7 +99,8 @@ def _validate_kwargs_for_search(self, **properties):
     :return:
     """
     validated_data = {}
-    allowed_property_keys = list(self.model.properties.keys())
+    _ = self.model.get_properties()
+    allowed_property_keys = list(self.model.get_property_keys())
     for k, v in properties.items():
         k_cleaned = k.replace("has__", "")
         if k_cleaned in ["label", "id"]:
