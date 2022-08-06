@@ -212,6 +212,9 @@ class NodeModel(ModelBase):
     objects = NodeModalQuerySet
     __abstract__ = True
 
+    def __repr__(self):
+        return f"{self.__label__}:{self.id}"
+
     @classmethod
     def get_schema(cls):
         return graph.backend.schame_reader.get_vertex_schema(cls.__label__)
@@ -223,8 +226,8 @@ class RelationshipModel(ModelBase):
     _inv = None
     _outv = None
 
-    # __label__ = None
-    # __graph__ = None
+    def __repr__(self):
+        return f"{self.__label__}:{self.id} [{self.outv} --> {self.inv}]"
 
     def __init__(self, *args, **kwargs):
         if "inv" in kwargs:
@@ -240,7 +243,7 @@ class RelationshipModel(ModelBase):
 
     @property
     def inv(self):
-        return self._id
+        return self._inv
 
     @inv.setter
     def inv(self, value):
@@ -248,7 +251,7 @@ class RelationshipModel(ModelBase):
 
     @property
     def outv(self):
-        return self._id
+        return self._outv
 
     @outv.setter
     def outv(self, value):
