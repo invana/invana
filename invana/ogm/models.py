@@ -16,6 +16,7 @@ from invana.ogm.model_querysets import NodeModalQuerySet, RelationshipModalQuery
 from invana.ogm.utils import convert_to_camel_case
 from invana.ogm.properties import PropertyBase
 from .. import graph
+import types
 
 
 class Direction:
@@ -81,10 +82,108 @@ class ModelMetaBase(type):
         return model_class
 
 
+def display_for(key):
+    def display_choice(self):
+        return getattr(self.__class__, key).choices[getattr(self, key)]
+
+    return display_choice
+
+
 class ModelBase(metaclass=ModelMetaBase):
     __label__ = None
     __graph__ = None
     __abstract__ = True
+    _id = None
+
+    def __init__(self, *args, **kwargs):
+
+        properties = getattr(self, "__all_properties__", None)
+
+        if "id" in kwargs:
+            self._id = kwargs["id"]
+            del kwargs['id']
+
+        for name, prop in properties.items():
+            if kwargs.get(name) is None:
+                if getattr(prop, 'default', False):
+                    setattr(self, name, prop.default)
+                else:
+                    setattr(self, name, None)
+            else:
+                setattr(self, name, kwargs[name])
+
+            # if getattr(prop, 'choices', None):
+            #     setattr(self, 'get_{0}_display'.format(name),
+            #             types.MethodType(display_for(name), self))
+
+            if name in kwargs:
+                del kwargs[name]
+
+        # # undefined properties (for magic @prop.setters etc)
+        # for name, property in kwargs.items():
+        #     setattr(self, name, property)
+
+        super(ModelBase, self).__init__(*args, **kwargs)
+
+    def translate_node_to_model_object(cls, node):
+        properties = node.properties
+        props = {"id": node.id}
+        for key, prop in cls.__all_properties__.items():
+            if hasattr(properties, key):
+                props[key] = getattr(properties, key)
+            else:
+                props[key] = None
+            # TODO - may be add validation again ? not sure because this is retrieved from db
+            #  and serialised/validated already - validate required / default fields ?
+            # TODO - check if data retrieved from db is validated?
+            # map property name from database to object property
+            #
+            # if key in node_properties:
+            #     props[key] = prop.inflate(node_properties[key], node)
+            # elif prop.has_default:
+            #     props[key] = prop.default_value()
+            # else:
+            #     props[key] = None
+
+        new_node = cls(**props)
+
+        # TODO - add model_instance
+        a = dir(new_node)
+        for k in dir(new_node):
+            if not k.startswith("_"):
+                v = getattr(new_node, k)
+                # if type(v) is object and  isinstance(v, NodeModalQuerySet):
+                #     pass
+                if isinstance(v, NodeRelationshipQuerySet):
+                    setattr(v, "node_model", new_node)
+        return new_node
+
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, value):
+        raise AttributeError('Operation Denied. assigning id after init not allowed.')
+
+    # def __setattr__(self, name, value):
+    #     if name == 'id':
+    #         raise AttributeError("Operation Denied. assigning id after init not allowed.")
+    #     else:
+    #         object.__setattr__(self, name, value)
+
+    def check_if_unsaved_object(self):
+        raise NotImplementedError()
+
+    def check_if_has_id(self):
+        raise NotImplementedError()
+
+    def save(self):
+        # save the
+        pass
+
+    def delete(self):
+        pass
 
     @classmethod
     def get_property_keys(cls):
@@ -117,20 +216,43 @@ class NodeModel(ModelBase):
     def get_schema(cls):
         return graph.backend.schame_reader.get_vertex_schema(cls.__label__)
 
-    # __label__ = None
-    # __graph__ = None
-
 
 class RelationshipModel(ModelBase):
     objects = RelationshipModalQuerySet
     __abstract__ = True
+    _inv = None
+    _outv = None
 
     # __label__ = None
     # __graph__ = None
 
+    def __init__(self, *args, **kwargs):
+        if "inv" in kwargs:
+            self._inv = kwargs["inv"]
+        if "outv" in kwargs:
+            self._outv = kwargs["outv"]
+        super(RelationshipModel, self).__init__(*args, **kwargs)
+
     @classmethod
     def get_schema(cls):
+        # TODO - make graph to cls.__graph__
         return graph.backend.schame_reader.get_edge_schema(cls.__label__)
+
+    @property
+    def inv(self):
+        return self._id
+
+    @inv.setter
+    def inv(self, value):
+        raise AttributeError('Operation Denied. assigning inv after init not allowed.')
+
+    @property
+    def outv(self):
+        return self._id
+
+    @outv.setter
+    def outv(self, value):
+        raise AttributeError('Operation Denied. assigning outv after init not allowed.')
 
     # @classmethod
     # def get_property_keys(cls):
@@ -152,16 +274,28 @@ class RelationshipModel(ModelBase):
 
 
 class NodeRelationshipQuerySet:
+    model = None
+    direction = None
+    relationship_model = None
+    cardinality = None
+    queryset = None
 
-    def __init__(self, model: [NodeModel], direction, relationship_model: [RelationshipModel], cardinality):
-        self.model = model
+    def __init__(self, node_model: [NodeModel], relationship_model: [RelationshipModel], direction, cardinality):
+        self.node_model = node_model
         self.direction = direction
         self.relationship_model = relationship_model
         self.cardinality = cardinality
         self.queryset = RelationshipModalQuerySet(graph, relationship_model)
 
     def add_relationship(self, node, **properties):
-        pass
+        # TODO - add validations if .id exist for self.model and node. or if any of the
+        # objects is unsaved object
+        args = []
+        if self.direction == Direction.OUTGOING:
+            args = [self.node_model.id, node.id]
+        elif self.direction == Direction.INCOMING:
+            args = [node.id, self.node_model.id]
+        return self.relationship_model.objects.create(*args, **properties)
 
     def remove_relationship(self):
         pass
@@ -173,27 +307,28 @@ class NodeRelationshipQuerySet:
         pass
 
 
-def create_node_relationship_manager(model, relationship_model, direction, cardinality=None):
-    if not issubclass(model, (str, NodeModel)):
-        raise ValueError(f'model must be a NodeModel or str; got {repr(model)}')
+def create_node_relationship_manager(node_model, relationship_model, direction, cardinality=None):
+    if not issubclass(node_model, (str, NodeModel)):
+        raise ValueError(f'model must be a NodeModel or str; got {repr(node_model)}')
 
     if not issubclass(relationship_model, (RelationshipModel,)):
         raise ValueError(f'relationship_model must be a RelationshipModel instance; got {repr(relationship_model)}')
 
-    return NodeRelationshipQuerySet(model, relationship_model, direction, cardinality=cardinality)
+    return NodeRelationshipQuerySet(node_model, relationship_model, direction, cardinality=cardinality)
 
 
-RelationshipTo = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
-                                                                                                      relationship_model,
-                                                                                                      Direction.OUTGOING,
-                                                                                                      cardinality)
+RelationshipTo = lambda node_model, relationship_model, cardinality=None: create_node_relationship_manager(node_model,
+                                                                                                           relationship_model,
+                                                                                                           Direction.OUTGOING,
+                                                                                                           cardinality)
 
-RelationshipFrom = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
-                                                                                                        relationship_model,
-                                                                                                        Direction.INCOMING,
-                                                                                                        cardinality)
+RelationshipFrom = lambda node_model, relationship_model, cardinality=None: create_node_relationship_manager(node_model,
+                                                                                                             relationship_model,
+                                                                                                             Direction.INCOMING,
+                                                                                                             cardinality)
 
-RelationshipUndirected = lambda model, relationship_model, cardinality=None: create_node_relationship_manager(model,
-                                                                                                              relationship_model,
-                                                                                                              Direction.UNDIRECTED,
-                                                                                                              cardinality)
+RelationshipUndirected = lambda node_model, relationship_model, cardinality=None: create_node_relationship_manager(
+    node_model,
+    relationship_model,
+    Direction.UNDIRECTED,
+    cardinality)

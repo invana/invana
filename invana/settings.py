@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 
-GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
+GREMLIN_URL = "ws://localhost:8182/gremlin"
 TRAVERSAL_SOURCE = 'g'
 STRATEGIES = None
 READONLY_MODE = False

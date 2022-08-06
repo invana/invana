@@ -70,7 +70,7 @@ class NodeModalQuerySet(ModelQuerySetBase):
     @serialize_to_model_datatypes
     def create(self, **properties):
         _ = self.queryset.create(self.model.__label__, **properties).to_list()
-        return _[0] if _.__len__() > 0 else None
+        return self.model.translate_node_to_model_object(self.model, _[0]) if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
     @add_has_label_kwargs_from_model
@@ -104,7 +104,7 @@ class RelationshipModalQuerySet(ModelQuerySetBase):
     @serialize_to_model_datatypes
     def create(self, from_, to_, **properties):
         _ = self.queryset.create(self.model.__label__, from_, to_, **properties).to_list()
-        return _[0] if _.__len__() > 0 else None
+        return self.model.translate_node_to_model_object(self.model, _[0]) if _.__len__() > 0 else None
 
     @dont_allow_has_label_kwargs
     @add_has_label_kwargs_from_model

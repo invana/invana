@@ -18,11 +18,11 @@ from invana.ogm.models import NodeModel, RelationshipModel, RelationshipTo, Rela
 from invana.ogm.properties import StringProperty, DateTimeProperty, IntegerProperty, BooleanProperty
 from datetime import datetime
 
-settings.GREMLIN_URL = "ws://megamind-ws:8182/gremlin"
+settings.GREMLIN_URL = "ws://localhost:8182/gremlin"
 
 
 class Project(NodeModel):
-    name = StringProperty(max_length=10, trim_whitespaces=True)
+    name = StringProperty(max_length=20, trim_whitespaces=True)
     description = StringProperty(allow_null=True, min_length=10)
     is_active = BooleanProperty(default=True)
     created_at = DateTimeProperty(default=lambda: datetime.now())
@@ -54,18 +54,20 @@ Person.objects.delete()
 Authored.objects.delete()
 
 person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
-print("person is :", person)
-# project = Project.objects.create(name="Hello   ", is_active=False)
-# print("project is:", project)
-#
-# # person.projects.
-#
-# projects = Project.objects.search().to_list()
-# print("projects", projects)
-#
+print("person is :", person, person.first_name, person.id)
+project = Project.objects.create(name="invana-studio", is_active=False)
+print("project is:", project, project.id)
+
+project_relation = person.projects.add_relationship(project)
+print("project_relation", project_relation)
+# person.projects.
+exit()
+projects = Project.objects.search().to_list()
+print("projects", projects)
+
 # authored_single = Authored.objects.create(person.id, project.id)
 # print("authored_single", authored_single)
-# authored = Authored.objects.search().to_list()
-# print("authored", authored)
+authored = Authored.objects.search().to_list()
+print("authored", authored)
 
 graph.close_connection()
