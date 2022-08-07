@@ -18,6 +18,8 @@ from invana.ogm.properties import PropertyBase
 from .. import graph
 import types
 
+from ..serializer.element_structure import RelationShip
+
 
 class Direction:
     OUTGOING = "OUTGOING"
@@ -125,9 +127,9 @@ class ModelBase(metaclass=ModelMetaBase):
 
         super(ModelBase, self).__init__(*args, **kwargs)
 
-    def translate_node_to_model_object(cls, node):
-        properties = node.properties
-        props = {"id": node.id}
+    def translate_node_to_model_object(cls, elem):
+        properties = elem.properties
+        props = {"id": elem.id}
         for key, prop in cls.__all_properties__.items():
             if hasattr(properties, key):
                 props[key] = getattr(properties, key)
@@ -136,27 +138,28 @@ class ModelBase(metaclass=ModelMetaBase):
             # TODO - may be add validation again ? not sure because this is retrieved from db
             #  and serialised/validated already - validate required / default fields ?
             # TODO - check if data retrieved from db is validated?
-            # map property name from database to object property
-            #
-            # if key in node_properties:
-            #     props[key] = prop.inflate(node_properties[key], node)
-            # elif prop.has_default:
-            #     props[key] = prop.default_value()
-            # else:
-            #     props[key] = None
 
-        new_node = cls(**props)
+        if isinstance(elem, RelationShip):
+            props["inv"] = elem.inv.id
+            props["inv_label"] = elem.inv.label
+            props["outv"] = elem.outv.id
+            props["outv_label"] = elem.outv.label
 
-        # TODO - add model_instance
-        a = dir(new_node)
-        for k in dir(new_node):
+        # if isinstance(elem, Node):
+
+        new_elem = cls(**props)
+        a = type(new_elem)
+        # if issubclass(type(elem), NodeModel):
+        for k in dir(new_elem):
+            # updating new_node instance info to NodeRelationshipQuerySet objects
+            # because in  "projects = RelationshipTo(Project, Authored)", projects is initialised
+            # way before this new instance is created, so updating the new instance info to projects object.
             if not k.startswith("_"):
-                v = getattr(new_node, k)
-                # if type(v) is object and  isinstance(v, NodeModalQuerySet):
-                #     pass
+                v = getattr(new_elem, k)
                 if isinstance(v, NodeRelationshipQuerySet):
-                    setattr(v, "node_model", new_node)
-        return new_node
+                    setattr(v, "node_model", new_elem)
+
+        return new_elem
 
     @property
     def id(self):
@@ -225,15 +228,24 @@ class RelationshipModel(ModelBase):
     __abstract__ = True
     _inv = None
     _outv = None
+    _inv_label = None
+    _outv_label = None
 
     def __repr__(self):
         return f"{self.__label__}:{self.id} [{self.outv} --> {self.inv}]"
 
     def __init__(self, *args, **kwargs):
-        if "inv" in kwargs:
-            self._inv = kwargs["inv"]
-        if "outv" in kwargs:
-            self._outv = kwargs["outv"]
+        self._inv = kwargs["inv"]
+        del kwargs["inv"]
+
+        self._inv_label = kwargs["inv_label"]
+        del kwargs["inv_label"]
+
+        self._outv = kwargs["outv"]
+        del kwargs["outv"]
+
+        self._outv_label = kwargs["outv_label"]
+        del kwargs["outv_label"]
         super(RelationshipModel, self).__init__(*args, **kwargs)
 
     @classmethod
@@ -250,12 +262,28 @@ class RelationshipModel(ModelBase):
         raise AttributeError('Operation Denied. assigning inv after init not allowed.')
 
     @property
+    def inv_label(self):
+        return self._inv_label
+
+    @inv_label.setter
+    def inv_label(self, value):
+        raise AttributeError('Operation Denied. assigning inv_label after init not allowed.')
+
+    @property
     def outv(self):
         return self._outv
 
     @outv.setter
     def outv(self, value):
         raise AttributeError('Operation Denied. assigning outv after init not allowed.')
+
+    @property
+    def outv_label(self):
+        return self._outv
+
+    @outv_label.setter
+    def outv_label(self, value):
+        raise AttributeError('Operation Denied. assigning outv_label after init not allowed.')
 
     # @classmethod
     # def get_property_keys(cls):
@@ -277,7 +305,7 @@ class RelationshipModel(ModelBase):
 
 
 class NodeRelationshipQuerySet:
-    model = None
+    node_model = None
     direction = None
     relationship_model = None
     cardinality = None
@@ -303,11 +331,22 @@ class NodeRelationshipQuerySet:
     def remove_relationship(self):
         pass
 
-    def has_relationship(self):
-        pass
+    def has_relationship(self, node, **properties):
+        from_ = None
+        to_ = None
+        if self.direction == Direction.OUTGOING:
+            from_ = self.node_model.id
+            to_ = node.id
+        elif self.direction == Direction.INCOMING:
+            from_ = node.id
+            to_ = self.node_model.id
+        _ = self.node_model.__graph__.edge.get_relationships(from_, to_,
+                                                             label=self.relationship_model.__label__,
+                                                             **properties)
+        return False if _.__len__() == 0 else True
 
-    def update_relationship(self):
-        pass
+    def update_relationship(self, node, **properties):
+        return self.relationship_model.objects.update(**properties)
 
 
 def create_node_relationship_manager(node_model, relationship_model, direction, cardinality=None):

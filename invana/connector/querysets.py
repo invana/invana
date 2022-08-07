@@ -143,6 +143,7 @@ class NodeQuerySet(QuerySetBase, ABC):
 class RelationshipQuerySet(QuerySetBase, ABC):
 
     def create(self, label, from_, to_, **properties) -> QuerySetResultSet:
+        # TODO - may be make label keyword arg , because
         return QuerySetResultSet(self.connector.g.create_edge(label, from_, to_, **properties))
 
     def search(self, **search_kwarg) -> QuerySetResultSet:
@@ -152,10 +153,13 @@ class RelationshipQuerySet(QuerySetBase, ABC):
         return self.search(**search_kwarg).drop()
 
     def get_or_create(self, label, from_, to_, **properties):
-        elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
-            __.inV().hasId(to_)).elementMap().toList()
+        elem = self.get_relationships(from_, to_, label, **properties)
         created = False
         if elem.__len__() == 0:
             elem = self.create(label, from_, to_, **properties).get_traversal().elementMap().toList()
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
+
+    def get_relationships(self, from_, to_, label=None, **properties):
+        return self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
+            __.inV().hasId(to_)).elementMap().toList()

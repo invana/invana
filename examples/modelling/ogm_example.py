@@ -58,8 +58,16 @@ print("person is :", person, person.first_name, person.id)
 project = Project.objects.create(name="invana-studio", is_active=False)
 print("project is:", project, project.id)
 
-project_relation = person.projects.add_relationship(project)
-print("project_relation", project_relation)
+has_rel = person.projects.has_relationship(project)
+print("has_rel", has_rel)
+if has_rel is False:
+    project_relation = person.projects.add_relationship(project)
+    print("project_relation", project_relation)
+
+has_rel = person.projects.has_relationship(project)
+print("new check has_rel", has_rel)
+rels = person.projects.has_relationship(project)
+print("rels", rels)
 # person.projects.
 exit()
 projects = Project.objects.search().to_list()
