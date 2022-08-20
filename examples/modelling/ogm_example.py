@@ -66,7 +66,10 @@ if has_rel is False:
 
 has_rel = person.projects.has_relationship(project)
 print("new check has_rel", has_rel)
-rels = person.projects.has_relationship(project)
+
+project_relation = person.projects.add_relationship(project)
+
+rels = person.projects.get_relationships()
 print("rels", rels)
 # person.projects.
 exit()

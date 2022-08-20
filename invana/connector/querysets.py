@@ -118,6 +118,10 @@ class QuerySetBase(abc.ABC):
             search_kwargs[f"has__{k}"] = v
         return search_kwargs
 
+    def get_relationships(self, from_, to_, label=None, **properties):
+        return self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
+            __.inV().hasId(to_)).elementMap().toList()
+
 
 class NodeQuerySet(QuerySetBase, ABC):
 
@@ -139,6 +143,12 @@ class NodeQuerySet(QuerySetBase, ABC):
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
 
+    def outgoing_relationships(self, node_id=None, label: [str, list] = None, **properties):
+        pass
+
+    def incoming_relationships(self, node_id=None, label: [str, list] = None, **properties):
+        pass
+
 
 class RelationshipQuerySet(QuerySetBase, ABC):
 
@@ -159,7 +169,3 @@ class RelationshipQuerySet(QuerySetBase, ABC):
             elem = self.create(label, from_, to_, **properties).get_traversal().elementMap().toList()
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
-
-    def get_relationships(self, from_, to_, label=None, **properties):
-        return self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
-            __.inV().hasId(to_)).elementMap().toList()

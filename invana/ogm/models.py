@@ -328,10 +328,7 @@ class NodeRelationshipQuerySet:
             args = [node.id, self.node_model.id]
         return self.relationship_model.objects.create(*args, **properties)
 
-    def remove_relationship(self):
-        pass
-
-    def has_relationship(self, node, **properties):
+    def get_relationships(self, node, **properties):
         from_ = None
         to_ = None
         if self.direction == Direction.OUTGOING:
@@ -340,9 +337,15 @@ class NodeRelationshipQuerySet:
         elif self.direction == Direction.INCOMING:
             from_ = node.id
             to_ = self.node_model.id
-        _ = self.node_model.__graph__.edge.get_relationships(from_, to_,
-                                                             label=self.relationship_model.__label__,
-                                                             **properties)
+        return self.node_model.__graph__.edge.get_relationships(from_, to_,
+                                                                label=self.relationship_model.__label__,
+                                                                **properties)
+
+    def remove_relationship(self):
+        pass
+
+    def has_relationship(self, node, **properties):
+        _ = self.get_relationships(node, **properties)
         return False if _.__len__() == 0 else True
 
     def update_relationship(self, node, **properties):
