@@ -37,7 +37,7 @@
     "@babel/core": "^7.13.8",
     "@electron-forge/cli": "^6.0.0-beta.54",
     "concurrently": "^6.0.0",
-    "electron": "^11.3.0",
+    "electron": "^18.3.7",
     "electron-builder": "^22.9.1",
     "electron-packager": "^15.2.0",
     "eslint-plugin-react": "^7.22.0",
