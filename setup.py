@@ -14,6 +14,16 @@
 #    limitations under the License.
 #
 from setuptools import setup, find_packages
+from pip._internal.req import parse_requirements
+from pip._internal.network.session import PipSession
+import os
+
+
+def get_install_requires():
+    requirements = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'),
+                                      session=PipSession())
+    return [str(requirement.requirement) for requirement in requirements]
+
 
 setup(
     name='invana',
@@ -25,10 +35,7 @@ setup(
     packages=find_packages(
         exclude=("dist", "docs", "tests", "examples")
     ),
-    install_requires=[
-        'aiohttp==3.7.4',
-        'gremlinpython==3.5.1'
-    ],
+    install_requires=get_install_requires(),
 
     python_requires='>=3.6',
     classifiers=[

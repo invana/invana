@@ -92,6 +92,14 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             "edges": self.get_all_edges_schema()
         }
 
+    def get_all_vertex_labels(self):
+        schema_data = self._get_graph_schema_overview()
+        return schema_data['vertex_labels'].keys()
+
+    def get_all_edge_labels(self):
+        schema_data = self._get_graph_schema_overview()
+        return schema_data['edge_labels'].keys()
+
     def get_all_vertices_schema(self):
         schema_data = self._get_graph_schema_overview()
         all_vertex_schema = {}
