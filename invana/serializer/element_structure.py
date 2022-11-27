@@ -71,6 +71,6 @@ class RelationShip(ElementBase):
 
     def to_json(self):
         base_data = super(RelationShip, self).to_json()
-        base_data['inv'] = self.inv
-        base_data['outv'] = self.outv
+        base_data['inv'] = self.inv.to_json()
+        base_data['outv'] = self.outv.to_json()
         return base_data
