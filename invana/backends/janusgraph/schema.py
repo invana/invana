@@ -73,8 +73,10 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             else process_graph_schema_string(None)
 
     def get_vertex_property_keys(self, label):
+        # query = f"g.V().hasLabel(\"{label}\").group().by(label).by(properties().label().dedup().fold())"  # not performant
+        query = f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();"
         response = self.connector.execute_query(
-            f"g.V().hasLabel('{label}').limit(1).propertyMap().select(Column.keys).toList();",
+            query,
             raise_exception=False
         )
         return response.data[0] if response.data.__len__() > 0 else []
@@ -127,6 +129,7 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             f"g.E().hasLabel('{label}').project('outv_label', 'inv_label')"
             f".by(outV().label()).by(inV().label()).dedup().toList()").data
         edge_schema.link_paths = [LinkPath(**link_path) for link_path in link_paths]
+        edge_schema.property_keys = property_keys
         return edge_schema
 
     def get_vertex_schema(self, label):
@@ -138,4 +141,5 @@ class JanusGraphSchemaReader(SchemaReaderBase):
             property_schema_data = schema_data['property_keys'][property_key]
             property_schema = PropertySchema(**property_schema_data)
             vertex_schema.add_property_schema(property_schema)
+        vertex_schema.property_keys = property_keys
         return vertex_schema

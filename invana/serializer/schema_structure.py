@@ -66,12 +66,14 @@ class VertexSchema(ElementSchemaBase):
     type = "VERTEX"
     partitioned = None
     static = None
+    property_keys: list = None
 
     def __init__(self, name, partitioned=None, static=None):
         self.name = name
         self.partitioned = json.loads(partitioned)
         self.static = json.loads(static)
         self.properties = {}
+        self.property_keys = []
 
     def __repr__(self):
         return f"<VertexSchema name='{self.name}' partitioned={self.partitioned} static={self.static} />"
@@ -95,6 +97,7 @@ class EdgeSchema(ElementSchemaBase):
     directed = None
     multiplicity = None
     link_paths: list = None
+    property_keys: list = None
 
     def __init__(self, name, unidirected=None, directed=None, multiplicity=None, link_paths=None):
         self.name = name
@@ -103,6 +106,7 @@ class EdgeSchema(ElementSchemaBase):
         self.multiplicity = multiplicity
         self.properties = {}
         self.link_paths = link_paths or []
+        self.property_keys = []
 
     def __repr__(self):
         return f"<EdgeSchema name='{self.name}' unidirected={self.unidirected} " \
