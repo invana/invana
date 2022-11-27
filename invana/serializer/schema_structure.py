@@ -88,6 +88,7 @@ class VertexSchema(ElementSchemaBase):
             "partitioned": self.partitioned,
             "static": self.static,
             "properties": [property_data.to_json() for property_data in self.properties_as_list()],
+            "property_keys": self.property_keys
         }
 
 
@@ -123,5 +124,6 @@ class EdgeSchema(ElementSchemaBase):
             "directed": self.directed,
             "multiplicity": self.multiplicity,
             "properties": [property_data.to_json() for property_data in self.properties_as_list()],
+            "property_keys": self.property_keys,
             "link_paths": [path.to_json() for path in self.link_paths]
         }
