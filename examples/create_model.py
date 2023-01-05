@@ -4,7 +4,7 @@ from invana.ogm.models import VertexModel, EdgeModel
 from datetime import datetime
 from invana.ogm import indexes
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
 
 
 class Project171(VertexModel):

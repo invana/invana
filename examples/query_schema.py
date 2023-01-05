@@ -2,7 +2,7 @@ from invana.connector.connector import GremlinConnector
 from invana import InvanaGraph
 import logging
 logging.basicConfig(filename="log.txt", filemode="w", level=logging.DEBUG)
-gremlin_url = "ws://megamind-ws:8182/gremlin"
+gremlin_url = "ws://megamind.local:8182/gremlin"
 graph = InvanaGraph(gremlin_url)
 
 schema = graph.management.schema_reader.get_graph_schema()

@@ -4,7 +4,7 @@ from invana.ogm.indexes import IndexQueryBuilder
 from invana.ogm.fields import StringProperty, FloatProperty, BooleanProperty
 from invana.ogm.models import VertexModel
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
 
 
 class Project8(VertexModel):

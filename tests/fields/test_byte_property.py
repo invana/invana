@@ -17,7 +17,7 @@
 # from invana.serializer.element_structure import Node
 # from invana import InvanaGraph
 #
-# gremlin_url = "ws://megamind-ws:8182/gremlin"
+# gremlin_url = "ws://megamind.local:8182/gremlin"
 # graph = InvanaGraph(gremlin_url)
 #
 # DEFAULT_USERNAME = "rrmerugu"

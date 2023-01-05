@@ -48,7 +48,7 @@ from invana.ogm.fields import StringProperty, DateTimeProperty, IntegerProperty,
 from datetime import datetime
 from invana.ogm import indexes
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
 
 
 class Project(VertexModel):

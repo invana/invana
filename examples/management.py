@@ -16,7 +16,7 @@ from invana.ogm import indexes
 from invana.ogm.fields import StringProperty
 from invana.ogm.models import VertexModel
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
 
 
 class Project11(VertexModel):

@@ -11,7 +11,10 @@
             "request": "launch",
             "program": "${file}",
             "cwd": "${workspaceFolder}",
-            "env": {"PYTHONPATH" : "${workspaceRoot}"},
+            "env": {
+                "PYTHONPATH" : "${workspaceRoot}",
+                "GREMLIN_SERVER_URL": "ws://megamind.local:8182/gremlin"
+            },
             "console": "integratedTerminal",
             "justMyCode": true
         } 

@@ -16,7 +16,7 @@ from invana.ogm.models import VertexModel
 from invana.ogm.fields import StringProperty, DateTimeProperty, FloatProperty, BooleanProperty
 from datetime import datetime
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
 
 
 class MyProject(VertexModel):

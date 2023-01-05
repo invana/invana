@@ -1,6 +1,6 @@
 from invana.connector.connector import GremlinConnector
 
-gremlin_url = "ws://megamind-ws:8182/gremlin"
+gremlin_url = "ws://megamind.local:8182/gremlin"
 connector = GremlinConnector(gremlin_url)
 connector.g.V().drop().iterate()
 connector.g.addV("Organisation").property("name", "invana").next()

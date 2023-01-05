@@ -24,7 +24,7 @@ logging.basicConfig(filename='run.log', level=logging.DEBUG)
 async def main():
     total_count = 1000
     start = time.time()
-    graph = InvanaGraph("ws://megamind-ws:8182/gremlin", traversal_source="g")
+    graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
     batch = []
     batch_size = 10
     for i in range(1, total_count):

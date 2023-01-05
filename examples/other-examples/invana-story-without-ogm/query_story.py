@@ -13,7 +13,7 @@
 #     limitations under the License.
 from invana import InvanaGraph
 
-graph = InvanaGraph("ws://megamind-ws:8182/gremlin")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin")
 
 result = graph.vertex.read_many(**{"has__label": "Project"})
 print("result read_many", result)

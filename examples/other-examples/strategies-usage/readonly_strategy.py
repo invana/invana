@@ -14,7 +14,7 @@
 from invana import InvanaGraph
 from invana.strategies import ReadOnlyStrategy
 
-GREMLIN_SERVER_URL = 'ws://megamind-ws:8182/gremlin'
+GREMLIN_SERVER_URL = 'ws://megamind.local:8182/gremlin'
 graph = InvanaGraph(GREMLIN_SERVER_URL, strategies=[ReadOnlyStrategy, ])
 
 graph.close_connection()
