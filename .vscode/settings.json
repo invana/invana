@@ -1,0 +1,5 @@
+{
+    "python.terminal.activateEnvironment": true,
+    "python.defaultInterpreterPath": "${env:PYTHON_INSTALL_LOC}",
+
+}
