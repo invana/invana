@@ -1,17 +1,17 @@
 import pytest
 import os
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 from invana import InvanaGraph
 
 
 @pytest.fixture(scope="function")
-def gremlin_url() -> str:
+def connection_uri() -> str:
     return os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
 
 
 @pytest.fixture(scope="function")
-def connection(gremlin_url):
-    connector = GremlinConnector(gremlin_url)
+def connection(connection_uri):
+    connector = GremlinConnector(connection_uri)
     initial_data_with_connector(connector)
     yield connector
     connector.g.V().drop().iterate()
@@ -19,8 +19,8 @@ def connection(gremlin_url):
 
 
 @pytest.fixture(scope="function")
-def graph(gremlin_url):
-    graph = InvanaGraph(gremlin_url)
+def graph(connection_uri):
+    graph = InvanaGraph(connection_uri)
     initial_data_with_graph(graph)
     initial_data_with_connector(graph.connector)
     yield graph

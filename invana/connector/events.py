@@ -14,9 +14,9 @@
 
 import abc
 from abc import ABC
-from invana.connector.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseStatusTypes
+from invana.base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseStatusTypes
 # from invana.connector.request import QueryRequest
-from invana.utils import create_uuid, get_datetime, get_elapsed_time
+from invana.helpers.utils import create_uuid, get_datetime, get_elapsed_time
 import logging
 from dataclasses import dataclass, field
 

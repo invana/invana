@@ -18,7 +18,7 @@ from .ogm.querysets import VertexQuerySet, EdgeQuerySet
 
 class InvanaGraph:
 
-    def __init__(self, gremlin_url: str,
+    def __init__(self, connection_uri: str,
                  traversal_source: str = 'g',
                  strategies=None,
                  read_only_mode: bool = False,
@@ -28,7 +28,7 @@ class InvanaGraph:
                  deserializer_map=None,
                  auth=None,
                  **transport_kwargs):
-        self.connector = GremlinConnector(gremlin_url,
+        self.connector = GremlinConnector(connection_uri,
                                           traversal_source=traversal_source,
                                           strategies=strategies,
                                           read_only_mode=read_only_mode,

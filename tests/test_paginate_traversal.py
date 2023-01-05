@@ -1,4 +1,4 @@
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 
 
 class TestPaginateTraversal:

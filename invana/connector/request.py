@@ -13,8 +13,8 @@
 #     limitations under the License.
 
 from gremlin_python.driver.protocol import GremlinServerError
-from invana.utils import create_uuid, get_elapsed_time, get_datetime
-from .constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
+from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
+from ..base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
 from .events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
     RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent, ServerDisconnectedErrorEvent, \
     RunTimeErrorEvent, ClientConnectorErrorEvent

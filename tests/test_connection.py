@@ -1,14 +1,14 @@
 import pytest
 from aiohttp import ClientConnectorError
 from gremlin_python.driver.protocol import GremlinServerError
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 from invana.connector.response import Response
 
 
 class TestConnection:
 
-    def test_connection(self, gremlin_url: str):
-        connection = GremlinConnector(gremlin_url)
+    def test_connection(self, connection_uri: str):
+        connection = GremlinConnector(connection_uri)
         result = connection.execute_query("g.V().limit(1).toList()")
         assert isinstance(result, Response)
         connection.close()

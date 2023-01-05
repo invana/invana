@@ -1,9 +1,9 @@
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 from invana import InvanaGraph
 import logging
 logging.basicConfig(filename="log.txt", filemode="w", level=logging.DEBUG)
-gremlin_url = "ws://megamind.local:8182/gremlin"
-graph = InvanaGraph(gremlin_url)
+connection_uri = "ws://megamind.local:8182/gremlin"
+graph = InvanaGraph(connection_uri)
 
 schema = graph.management.schema_reader.get_graph_schema()
 print(schema)
@@ -12,7 +12,7 @@ for k, vtx_schema in schema['vertices'].items():
 for k, vtx_schema in schema['edges'].items():
     print(vtx_schema.properties)
 # graph.close_connection()
-# connector = GremlinConnector(gremlin_url)
+# connector = GremlinConnector(connection_uri)
 # # connector.close()
 # response = connector.execute_query("g.V().count().next()")
 # # response = connector.execute_query("g.V().limit(200).elementMap().toList()")

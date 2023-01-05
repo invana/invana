@@ -1,7 +1,7 @@
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 
-gremlin_url = "ws://megamind.local:8182/gremlin"
-connector = GremlinConnector(gremlin_url)
+connection_uri = "ws://megamind.local:8182/gremlin"
+connector = GremlinConnector(connection_uri)
 
 for i in range(0, 300):
     connector.g.addV("TestUser").property("name", f"Ravi {i}").next()

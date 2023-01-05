@@ -1,4 +1,4 @@
-from invana.connector.connector import GremlinConnector
+from invana.gremlin.connector import GremlinConnector
 import uuid
 
 graph = GremlinConnector("ws://localhost:8182/gremlin")

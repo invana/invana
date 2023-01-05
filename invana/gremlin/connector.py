@@ -17,18 +17,20 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-from .request import QueryRequest
-from .constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
+from ..connector.request import QueryRequest
+from ..base.constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
 from invana.traversal.traversal import InvanaTraversalSource
-from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
+from ..connector.utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
 from invana.connector.response import Response
+from invana.base.connector import GraphConnectorBase
+from invana.settings import DEFAULT_TIMEOUT
 import logging
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEOUT = 180 * 1000  # in seconds
+
 
 
 class DriverRemoteConnection(_DriverRemoteConnection):
@@ -38,9 +40,9 @@ class DriverRemoteConnection(_DriverRemoteConnection):
         return self._client
 
 
-class GremlinConnector:
+class GremlinConnector(GraphConnectorBase):
 
-    def __init__(self, gremlin_url: str,
+    def __init__(self, connection_uri: str,
                  traversal_source: str = 'g',
                  strategies=None,
                  read_only_mode: bool = False,
@@ -51,7 +53,7 @@ class GremlinConnector:
                  **transport_kwargs):
         """
 
-        :param gremlin_url:
+        :param connection_uri:
         :param traversal_source:
         :param strategies:
         :param read_only_mode:
@@ -65,7 +67,7 @@ class GremlinConnector:
         self.CONNECTION_STATE = None
         self.connection = None
         self.g = None
-        self.gremlin_url = gremlin_url
+        self.connection_uri = connection_uri
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.graph_traversal_source_cls = InvanaTraversalSource if graph_traversal_source_cls is None \
@@ -79,11 +81,10 @@ class GremlinConnector:
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.deserializer_map = INVANA_DESERIALIZER_MAP
         self.connect()
-
-    def connect(self):
-        self.update_connection_state(ConnectionStateTypes.CONNECTING)
+ 
+    def _init_connection(self):
         self.connection = DriverRemoteConnection(
-            self.gremlin_url,
+            self.connection_uri,
             traversal_source=self.traversal_source,
             graphson_reader=GraphSONReader(deserializer_map=self.deserializer_map),
             **self.transport_kwargs
@@ -91,21 +92,10 @@ class GremlinConnector:
         self.g = traversal(traversal_source_class=self.graph_traversal_source_cls).withRemote(self.connection)
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
-        self.update_connection_state(ConnectionStateTypes.CONNECTED)
 
-    def reconnect(self):
-        self.update_connection_state(ConnectionStateTypes.RECONNECTING)
-        self.connect()
-
-    def close(self) -> None:
-        self.update_connection_state(ConnectionStateTypes.DISCONNECTING)
+    def _close_connection(self) -> None:
         self.connection.client.close()
-        self.update_connection_state(ConnectionStateTypes.DISCONNECTED)
-
-    def update_connection_state(self, new_state):
-        self.CONNECTION_STATE = new_state
-        logger.debug(f"GraphConnector state updated to : {self.CONNECTION_STATE}")
-
+ 
     def convert_strategies_object_to_string(self) -> str:
         graph_strategies_str = "g.withStrategies("
         for strategy in self.strategies:
