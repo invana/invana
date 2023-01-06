@@ -1,5 +1,5 @@
 from ..utils import process_graph_schema_string
-from invana.base.schema.reader import SchemaReaderBase
+from invana.gremlin.schema.writer import GremlinSchemaWriter
 from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class JanusGraphSchemaCreate:
+class JanusGraphSchemaCreate(GremlinSchemaWriter):
     """
 mgmt.getRelationTypes(PropertyKey.class)
 mgmt.getRelationTypes(EdgeLabel.class)
