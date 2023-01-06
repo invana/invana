@@ -13,7 +13,7 @@
 #     limitations under the License.
 from invana.backends.janusgraph.management import GraphBackendManagement
 from .connector import GremlinConnector
-from .ogm.querysets import VertexQuerySet, EdgeQuerySet
+from invana.gremlin.querysets import VertexQuerySet, EdgeQuerySet
 
 
 class InvanaGraph:

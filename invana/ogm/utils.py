@@ -22,9 +22,6 @@ def convert_to_camel_case(s):
     return r.sub(r'_\1', s).lower()
 
 
-def divide_chunks(l, n):
-    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
-
 
 def copy_traversal(traversal):
     return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(traversal.bytecode))

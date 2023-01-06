@@ -28,3 +28,5 @@ def get_datetime():
     return datetime.now()
 
 
+def divide_chunks(l, n):
+    return [l[i * n:(i + 1) * n] for i in range((len(l) + n - 1) // n)]
