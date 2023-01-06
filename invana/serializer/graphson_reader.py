@@ -14,7 +14,7 @@
 #
 from gremlin_python.structure.io import graphsonV3d0
 from gremlin_python.process.traversal import T, Direction
-from invana.connector.utils import get_id
+from invana.gremlin.utils import get_id
 from invana.serializer.element_structure import RelationShip, Node
 
 

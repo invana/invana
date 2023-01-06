@@ -13,39 +13,29 @@
 #     limitations under the License.
 
 from gremlin_python.driver.protocol import GremlinServerError
-from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
+# from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
 from ..base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
-from .events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
+from invana.connector.events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
     RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent, ServerDisconnectedErrorEvent, \
     RunTimeErrorEvent, ClientConnectorErrorEvent
+from invana.base.request import RequestBase
 
 
-class RequestBase:
-    created_at = None
-
-    def __init__(self):
-        self.request_id = create_uuid()
-        self.created_at = get_datetime()
-
-    def get_elapsed_time(self):
-        return get_elapsed_time(get_datetime(), self.created_at)
 
 
-class QueryRequest(RequestBase):
+class GremlinQueryRequest(RequestBase):
     state = None
     status_last_updated_at = None
 
     def __repr__(self):
-        return f"<QueryRequest {self.request_id}>"
+        return f"<GremlinQueryRequest {self.request_id}>"
 
     def __init__(self, query: str, request_options: dict = None):
-        super(QueryRequest, self).__init__()
+        super(GremlinQueryRequest, self).__init__()
         self.query = query
         self.request_options = request_options or {}
         self.started()
 
-    def update_last_updated_at(self):
-        self.status_last_updated_at = get_datetime()
 
     def started(self):
         self.state = RequestStateTypes.STARTED

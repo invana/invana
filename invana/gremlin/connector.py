@@ -17,20 +17,18 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-from ..connector.request import QueryRequest
+from invana.gremlin.request import GremlinQueryRequest
 from ..base.constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
 from invana.traversal.traversal import InvanaTraversalSource
-from ..connector.utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
+from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
-from invana.connector.response import Response
+from invana.gremlin.response import Response
 from invana.base.connector import GraphConnectorBase
 from invana.settings import DEFAULT_TIMEOUT
 import logging
 
 logger = logging.getLogger(__name__)
-
-
 
 
 class DriverRemoteConnection(_DriverRemoteConnection):

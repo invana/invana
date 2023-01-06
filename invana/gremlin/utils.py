@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 from concurrent.futures import Future
-from .response import Response
+from invana.gremlin.response import Response
 
 
 def read_from_result_set_with_callback(result_set, callback, request, finished_callback):
