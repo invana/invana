@@ -1,15 +1,11 @@
 import abc
 from abc import ABC
-from .connector import GraphConnectorBase
-from .resultsets import QueryResultSetBase
+from .base import QuerySetBase
+from ..resultsets import QueryResultSetBase
 
-class QuerySetBase(abc.ABC):
+ 
 
-    def __init__(self, connector: GraphConnectorBase):
-        self.connector = connector
-
-
-class CRUDQuerySetBase(abc.ABC):
+class CRUDQuerySetBase(QuerySetBase):
 
     @abc.abstractmethod
     def create(self, *args, **kwargs):
@@ -40,6 +36,9 @@ class CRUDQuerySetBase(abc.ABC):
     def create_has_filters(self, **kwargs):
         pass
  
+    @abc.abstractmethod
+    def bulk_write(self, *args, **kwargs):
+        pass
 
 
 class VertexCRUDQuerySetBase(CRUDQuerySetBase, ABC):
@@ -62,7 +61,6 @@ class VertexCRUDQuerySetBase(CRUDQuerySetBase, ABC):
 
 
  
-
 class EdgeCRUDQuerySetBase(CRUDQuerySetBase, ABC):
 
     @abc.abstractmethod

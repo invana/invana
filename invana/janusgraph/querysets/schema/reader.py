@@ -13,8 +13,8 @@
 #     limitations under the License.
 #
 #
-from ..utils import process_graph_schema_string
-from invana.gremlin.schema.reader import GremlinGraphSchemaReader
+from ...utils import process_graph_schema_string
+from invana.gremlin.querysets import GremlinSchemaReaderQuerySet
 from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 
-class JanusGraphSchemaReader(GremlinGraphSchemaReader):
+class JanusGraphSchemaReaderQuerySet(GremlinSchemaReaderQuerySet):
 
     def _get_graph_schema_overview(self):
         # TODO - can add more information from the print schema data like indexes etc to current output

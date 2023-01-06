@@ -1,11 +1,18 @@
 import abc
 import logging
 from .constants import ConnectionStateTypes
+from .querysets import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase, GraphManagementQuerySetBase
 
 logger = logging.getLogger(__name__)
 
+
 class GraphConnectorBase:
     
+    vertex_cls: VertexCRUDQuerySetBase = NotImplemented
+    edge_cls: EdgeCRUDQuerySetBase = NotImplemented
+    management_cls: GraphManagementQuerySetBase = NotImplemented
+ 
+
     def __init__(self, connection_uri:str, is_readonly=False, default_timeout=None, **kwargs ) -> None:
         self.CONNECTION_STATE = None
 

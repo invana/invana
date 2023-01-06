@@ -14,12 +14,11 @@
 
 from gremlin_python.driver.protocol import GremlinServerError
 # from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
-from ..base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
+from invana.base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseErrorReasonTypes
 from invana.connector.events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
     RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent, ServerDisconnectedErrorEvent, \
     RunTimeErrorEvent, ClientConnectorErrorEvent
-from invana.base.request import RequestBase
-
+from invana.base.transporter import RequestBase
 
 
 

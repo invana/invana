@@ -46,6 +46,7 @@ class QueryResponseErrorReasonTypes:
 
 
 class GremlinServerErrorStatusCodes:
+    # move this to gremlin module
     ERROR_401 = "UNAUTHORIZED"
     ERROR_403 = "FORBIDDEN"
     ERROR_407 = "AUTHENTICATE"

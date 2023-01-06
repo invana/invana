@@ -3,6 +3,7 @@ from invana.serializer.element_structure import RelationShip, Node
 
 def get_vertex_properties_of_edges(edges, graph):
     """
+    TODO - move this to gremlin
     By default, edge json will not have inv and outv properties,
     this method will fetch and stitch the fill vertex details to the edge inv and outv
     """

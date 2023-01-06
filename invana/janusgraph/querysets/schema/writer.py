@@ -1,13 +1,12 @@
-from ..utils import process_graph_schema_string
-from invana.gremlin.schema.writer import GremlinSchemaWriter
+from ...utils import process_graph_schema_string
+from invana.gremlin.querysets import GremlinSchemaWriterQuerySet
 from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
-
 logger = logging.getLogger(__name__)
 
 
-class JanusGraphSchemaCreate(GremlinSchemaWriter):
+class JanusGraphSchemaWriterQuerySet(GremlinSchemaWriterQuerySet):
     """
 mgmt.getRelationTypes(PropertyKey.class)
 mgmt.getRelationTypes(EdgeLabel.class)
@@ -17,7 +16,7 @@ mgmt.getVertexLabels()
     """
 
     @staticmethod
-    def create_model(model: [VertexModel, EdgeModel]):
+    def create(model: [VertexModel, EdgeModel]):
         query = """mgmt = graph.openManagement()\n"""
         if model.type == "VERTEX":
             label_filter_key = "containsVertexLabel"

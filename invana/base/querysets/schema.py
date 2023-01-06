@@ -13,11 +13,10 @@
 #     limitations under the License.
 
 import abc
+from ...connector import GraphConnectorBase
 
-from ..connector import GraphConnectorBase
 
-
-class SchemaReaderBase(abc.ABC):
+class SchemaReaderQuerySetBase(abc.ABC):
 
     def __init__(self, connector: GraphConnectorBase):
         self.connector = connector
@@ -52,3 +51,13 @@ class SchemaReaderBase(abc.ABC):
 
 
 
+class SchemaWriterQuerySetBase(abc.ABC):
+
+    def __init__(self, connector: GraphConnectorBase):
+        self.connector = connector
+
+    @abc.abstractmethod
+    def create_model(model: [VertexModel, EdgeModel]):
+        pass
+
+    

@@ -12,21 +12,21 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
+from invana.base.connector import GraphConnectorBase
 from aiohttp import ServerDisconnectedError, ClientConnectorError
+from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-from invana.gremlin.request import GremlinQueryRequest
 from ..base.constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
-from invana.gremlin.traversal.traversal import InvanaTraversalSource
+from .traversal.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
-from gremlin_python.structure.io.graphsonV3d0 import GraphSONReader
-from invana.gremlin.response import Response
-from invana.base.connector import GraphConnectorBase
 from invana.settings import DEFAULT_TIMEOUT
 import logging
+from .transporter import GremlinQueryRequest
+from .querysets import GremlinVertexQuerySet, GremlinEdgeQuerySet, GremlinGraphManagementQuerySet
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,11 @@ class DriverRemoteConnection(_DriverRemoteConnection):
 
 
 class GremlinConnector(GraphConnectorBase):
+
+    vertex_cls = GremlinVertexQuerySet
+    edge_cls = GremlinEdgeQuerySet
+    management_cls = GremlinGraphManagementQuerySet
+
 
     def __init__(self, connection_uri: str,
                  traversal_source: str = 'g',
@@ -79,6 +84,10 @@ class GremlinConnector(GraphConnectorBase):
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.deserializer_map = INVANA_DESERIALIZER_MAP
         self.connect()
+        self.vertex = self.vertex_cls(self.connector)
+        self.edge = self.edge_cls(self.connector)
+        self.management = self.management_cls(self.connector)
+
  
     def _init_connection(self):
         self.connection = DriverRemoteConnection(
@@ -111,6 +120,19 @@ class GremlinConnector(GraphConnectorBase):
             query_string = query_string.replace("g.", strategy_prefix, 1)
         return query_string
 
+    def get_features(self):
+        response = self.execute_query("graph.features()")
+        lines = response.data[0].lstrip("FEATURES\n").split("> ")
+        data = {}
+        for line in lines[1:]:
+            items = line.rstrip().split("\n")
+            data[items[0]] = {}
+            for item in items[1:]:
+                item = item.lstrip(">-- ").split(":")
+                data[items[0]][item[0].strip()] = bool(item[1])
+        response.data = data
+        return response
+
     @staticmethod
     def process_error_exception(exception: GremlinServerError):
         gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}")
@@ -134,52 +156,52 @@ class GremlinConnector(GraphConnectorBase):
         query_string = self.add_strategies_to_query(query)
         timeout = self.timeout if timeout is None else timeout
         request_options = {"evaluationTimeout": timeout}
-        request = QueryRequest(query)
+        request = GremlinQueryRequest(query)
         try:
             result_set = self.connection.client.submitAsync(query_string, request_options=request_options).result()
             if callback:
                 read_from_result_set_with_callback(result_set, callback, request, finished_callback=finished_callback)
             else:
-                response = read_from_result_set_with_out_callback(result_set, request)
+                GremlinQueryResponse = read_from_result_set_with_out_callback(result_set, request)
                 if finished_callback:
                     finished_callback()
-                return response
+                return GremlinQueryResponse
         except GremlinServerError as e:
-            request.response_received_but_failed(e)
+            request.GremlinQueryResponse_received_but_failed(e)
             request.finished_with_failure(e)
             status_code, gremlin_server_error = self.process_error_exception(e)
             e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
                       f" and error message {e.__str__()}"]
             if raise_exception is True:
                 raise e
-            return Response(request.request_id, 500, exception=e)
+            return GremlinQueryResponse(request.request_id, 500, exception=e)
         except ServerDisconnectedError as e:
             request.server_disconnected_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
-            return Response(request.request_id, 500, exception=e)
+            return GremlinQueryResponse(request.request_id, 500, exception=e)
         except RuntimeError as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.runtime_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
-            return Response(request.request_id, None, exception=e)
+            return GremlinQueryResponse(request.request_id, None, exception=e)
         except ClientConnectorError as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
             request.client_connection_error(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
-            return Response(request.request_id, 500, exception=e)
+            return GremlinQueryResponse(request.request_id, 500, exception=e)
         except Exception as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
-            request.response_received_but_failed(e)
+            request.GremlinQueryResponse_received_but_failed(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e
-            return Response(request.request_id, None, exception=e)
+            return GremlinQueryResponse(request.request_id, None, exception=e)
 
     def execute_query(self, query: str, timeout: int = None, raise_exception: bool = False,
                       finished_callback=None) -> any:
@@ -198,3 +220,4 @@ class GremlinConnector(GraphConnectorBase):
                                     finished_callback=None) -> None:
         self._execute_query(query, callback=callback, timeout=timeout,
                             raise_exception=raise_exception, finished_callback=finished_callback)
+

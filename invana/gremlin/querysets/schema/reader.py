@@ -14,7 +14,7 @@
 #
 #
 
-from invana.base.schema.reader import SchemaReaderBase
+from invana.base.querysets import SchemaReaderQuerySetBase
 from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 
-class GremlinGraphSchemaReader(SchemaReaderBase):
+class GremlinSchemaReaderQuerySet(SchemaReaderQuerySetBase):
 
     def _get_graph_schema_overview(self):
         raise Exception("Not Implemented because the performance is very poor")

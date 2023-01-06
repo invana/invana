@@ -15,7 +15,7 @@
 from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatypes, validate_kwargs_for_create, \
     validate_kwargs_for_search, add_has_label_kwargs_from_model
 from .exceptions import FieldNotFoundError, FieldValidationError
-from invana.gremlin.querysets import VertexQuerySet, EdgeQuerySet
+from invana.gremlin.querysets import GremlinVertexQuerySet, GremlinEdgeQuerySet
 from ..serializer.element_structure import Node, RelationShip
 import abc
 
@@ -58,7 +58,7 @@ class ModelQuerySetBase(abc.ABC):
 
 
 class VertexModelQuerySet(ModelQuerySetBase):
-    queryset = VertexQuerySet
+    queryset = GremlinVertexQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
@@ -92,7 +92,7 @@ class VertexModelQuerySet(ModelQuerySetBase):
 
 
 class EdgeModelQuerySet(ModelQuerySetBase):
-    queryset = EdgeQuerySet
+    queryset = GremlinEdgeQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
