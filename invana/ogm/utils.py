@@ -14,7 +14,7 @@
 #
 import re
 import copy
-from invana.traversal.traversal import InvanaTraversal
+from invana.gremlin.traversal.traversal import InvanaTraversal
 
 
 def convert_to_camel_case(s):

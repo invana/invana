@@ -17,7 +17,7 @@ from gremlin_python.process.traversal import Cardinality
 from invana.gremlin.connector import GremlinConnector
 from invana.helpers.utils import divide_chunks
 from gremlin_python.process.translator import Order
-from ..traversal.traversal import __
+from invana.gremlin.traversal.traversal import __
 import abc
 from invana.base.resultsets import QueryResultSetBase
 

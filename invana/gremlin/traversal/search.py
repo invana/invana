@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 from gremlin_python.process.traversal import TextP, P
-from ..base.exception import InvalidSearchKwargError
+from invana.base.exception import InvalidSearchKwargError
 
 
 class GraphSearch:
