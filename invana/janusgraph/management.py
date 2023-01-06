@@ -12,9 +12,10 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from invana.backends.janusgraph.indexes import IndexQueryBuilder
-from invana.backends.janusgraph.schema import JanusGraphSchemaCreate, JanusGraphSchemaReader
-from invana.connector import GremlinConnector
+from invana.janusgraph.indexes import IndexQueryBuilder
+from invana.janusgraph.schema.reader import  JanusGraphSchemaReader
+from invana.janusgraph.schema.writer import JanusGraphSchemaCreate
+from invana.gremlin.connector import GremlinConnector
 from invana.ogm.indexes import MixedIndex, CompositeIndex
 
 

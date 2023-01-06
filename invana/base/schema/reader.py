@@ -14,12 +14,12 @@
 
 import abc
 
-from invana.connector import GremlinConnector
+from ..connector import GraphConnectorBase
 
 
 class SchemaReaderBase(abc.ABC):
 
-    def __init__(self, connector: GremlinConnector):
+    def __init__(self, connector: GraphConnectorBase):
         self.connector = connector
 
     @abc.abstractmethod
