@@ -29,13 +29,13 @@ class Organisation(VertexModel):
 class TestVertexModelQuerySet:
 
     def test_create(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         project = Project.objects.create(name="invana-engine")
         assert isinstance(project, Node)
         assert isinstance(project.properties.created_at, datetime)
 
     def test_search(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
         projects_list = ['invana-engine', 'invana-search']
         for project_string in projects_list:
@@ -51,10 +51,10 @@ class TestVertexModelQuerySet:
         for org in orgs:
             assert isinstance(org, Node)
             assert org.label == Organisation.label_name
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
     def test_update(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         projects_list = ['invana-engine', 'invana-search']
         for project_string in projects_list:
             Project.objects.create(name=project_string)
@@ -62,10 +62,10 @@ class TestVertexModelQuerySet:
         instance = Project.objects.search(has__name="invana-engine").update(name=new_value)
         assert isinstance(instance[0], Node)
         assert instance[0].properties.name == new_value
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
     def test_delete(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         projects_list = ['invana-engine', 'invana-search']
         project = Project.objects.create(name=projects_list[0])
         Project.objects.delete(has__id=project.id)
@@ -73,4 +73,4 @@ class TestVertexModelQuerySet:
         assert projects.__len__() == 0
         projects = Project.objects.search(has__name=projects_list[0]).to_list()
         assert projects.__len__() == 0
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()

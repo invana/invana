@@ -29,6 +29,7 @@ from .transporter import GremlinQueryRequest
 from .querysets.vertex import GremlinVertexQuerySet
 from .querysets.edge import GremlinEdgeQuerySet
 from .querysets.management import GremlinGraphManagementQuerySet
+from .transporter import GremlinQueryResponse
 
 logger = logging.getLogger(__name__)
 
@@ -86,10 +87,6 @@ class GremlinConnector(GraphConnectorBase):
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.deserializer_map = INVANA_DESERIALIZER_MAP
         self.connect()
-    #     self.init_connector()
-
-    # def init_connector(self):
-        
         self.vertex = self.vertex_cls(self)
         self.edge = self.edge_cls(self)
         self.management = self.management_cls(self)
@@ -168,12 +165,12 @@ class GremlinConnector(GraphConnectorBase):
             if callback:
                 read_from_result_set_with_callback(result_set, callback, request, finished_callback=finished_callback)
             else:
-                GremlinQueryResponse = read_from_result_set_with_out_callback(result_set, request)
+                response = read_from_result_set_with_out_callback(result_set, request)
                 if finished_callback:
                     finished_callback()
-                return GremlinQueryResponse
+                return response
         except GremlinServerError as e:
-            request.GremlinQueryResponse_received_but_failed(e)
+            request.response_received_but_failed(e)
             request.finished_with_failure(e)
             status_code, gremlin_server_error = self.process_error_exception(e)
             e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
@@ -203,7 +200,7 @@ class GremlinConnector(GraphConnectorBase):
             return GremlinQueryResponse(request.request_id, 500, exception=e)
         except Exception as e:
             e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
-            request.GremlinQueryResponse_received_but_failed(e)
+            request.response_received_but_failed(e)
             request.finished_with_failure(e)
             if raise_exception is True:
                 raise e

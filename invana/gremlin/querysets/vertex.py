@@ -10,7 +10,7 @@ from ..resultsets import GremlinQueryResultSet
 class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC):
 
     def create(self, label, **properties) -> GremlinQueryResultSet:
-        return GremlinQueryResultSet(self.connector.g.create_vertex(label, **properties))
+        return GremlinQueryResultSet(self.connector.vertex.create(label, **properties))
 
     def search(self, **search_kwarg) -> GremlinQueryResultSet:
         return GremlinQueryResultSet(self.connector.g.V().search(**search_kwarg))

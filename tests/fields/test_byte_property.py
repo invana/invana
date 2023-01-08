@@ -36,22 +36,22 @@
 # class TestStringField:
 #
 #     def test_field(self):
-#         graph.g.V().drop()
+#         graph.connector.g.V().drop()
 #         project = Person.objects.create(first_name="Ravi Raja", gender='m', bytes_data=ByteType(b'xyz'))
 #         assert isinstance(project.properties.bytes_data, ByteType)
 #
 #     def test_field_exclusive_type(self):
-#         graph.g.V().drop()
+#         graph.connector.g.V().drop()
 #         project = Person.objects.create(first_name="Ravi Raja", gender='m', bytes_data=ByteType(b'xyz'))
 #         assert isinstance(project.properties.bytes_data, ByteType)
 #
 #     def test_field_allow_null(self):
-#         graph.g.V().drop()
+#         graph.connector.g.V().drop()
 #
 #         person = Person.objects.create(first_name="Ravi Raja")
 #         assert isinstance(person, Node)
 #
 #     # def test_field_default(self):
-#     #     graph.g.V().drop()
+#     #     graph.connector.g.V().drop()
 #     #     person = Person.objects.create(first_name="Ravi Raja")
 #     #     assert person.properties.bytes_data == b'xyz'

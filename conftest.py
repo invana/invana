@@ -24,8 +24,8 @@ def graph(connection_uri):
     initial_data_with_graph(graph)
     initial_data_with_connector(graph.connector)
     yield graph
-    graph.g.V().drop().iterate()
-    graph.close_connection()
+    graph.connector.g.V().drop().iterate()
+    graph.close()
 
 
 #

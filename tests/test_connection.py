@@ -2,7 +2,7 @@ import pytest
 from aiohttp import ClientConnectorError
 from gremlin_python.driver.protocol import GremlinServerError
 from invana.gremlin.connector import GremlinConnector
-from invana.connector.response import Response
+from invana.gremlin.transporter.response import GremlinQueryResponse
 
 
 class TestConnection:
@@ -10,7 +10,7 @@ class TestConnection:
     def test_connection(self, connection_uri: str):
         connection = GremlinConnector(connection_uri)
         result = connection.execute_query("g.V().limit(1).toList()")
-        assert isinstance(result, Response)
+        assert isinstance(result, GremlinQueryResponse)
         connection.close()
 
     def test_query_failed_raise_exception(self, connection: GremlinConnector):

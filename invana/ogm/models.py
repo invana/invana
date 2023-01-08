@@ -12,8 +12,12 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
 from .utils import convert_to_camel_case
+if TYPE_CHECKING:
+    from invana.graph import InvanaGraph
 
 
 class ModelMetaBase(type):
@@ -39,13 +43,13 @@ class VertexModel(metaclass=ModelMetaBase):
         invana = None
     """
     objects = VertexModelQuerySet
-    graph = None
+    graph: InvanaGraph = None
     label_name = None
     type = "VERTEX"
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.backend.schame_reader.get_vertex_schema(cls.label_name)
+        return cls.graph.connector.management.schema_reader.get_vertex_schema(cls.label_name)
 
     # def get
 
@@ -58,4 +62,4 @@ class EdgeModel(metaclass=ModelMetaBase):
 
     @classmethod
     def get_schema(cls):
-        return cls.graph.backend.schame_reader.get_edge_schema(cls.label_name)
+        return cls.graph.connector.management.schema_reader.get_edge_schema(cls.label_name)

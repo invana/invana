@@ -39,21 +39,21 @@ class Person(VertexModel):
 class TestStringField:
 
     def test_field(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         project = Person.objects.create(first_name="Ravi Raja", gender='m')
         assert isinstance(project.properties.gender, SingleCharType)
 
     def test_field_validation(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         with pytest.raises(FieldValidationError):
             Person.objects.create(first_name="Ravi Raja", gender='m12')
 
     def test_field_allow_null(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         person = Person.objects.create(first_name="Ravi Raja")
         assert isinstance(person, Node)
 
     def test_field_default(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         person = Person.objects.create(first_name="Ravi Raja")
         assert person.properties.gender == "m"

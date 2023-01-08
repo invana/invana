@@ -50,17 +50,17 @@ class Authored(EdgeModel):
 class TestEdgeModelQuerySet:
 
     def test_create(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
         project = Project.objects.create(name="invana-engine")
         authored_single = Authored.objects.create(person.id, project.id, name=f"link-for-invana-engine")
         assert isinstance(person, Node)
         assert isinstance(project, Node)
         assert isinstance(authored_single, RelationShip)
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
     def test_search(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
         for project_name in ["invana-engine", "invana-studio"]:
             project = Project.objects.create(name=project_name)
@@ -72,10 +72,10 @@ class TestEdgeModelQuerySet:
         authored_list = Authored.objects.search(has__name="link-for-invana-studio").to_list()
         for authored_item in authored_list:
             assert authored_item.properties.name == "link-for-invana-studio"
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
     def test_update(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
         project = Project.objects.create(name="invana-engine")
         Authored.objects.create(person.id, project.id, name=f"link-for-invana-engine")
@@ -84,10 +84,10 @@ class TestEdgeModelQuerySet:
 
         for authored_item in updated_authored:
             assert authored_item.properties.name == "link-for-invana-studio-updated"
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
 
     def test_delete(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         person = Person.objects.create(first_name="Ravi Raja", last_name="Merugu", member_since=2000)
         for project_name in ["invana-engine", "invana-studio"]:
             project = Project.objects.create(name=project_name)
@@ -101,4 +101,4 @@ class TestEdgeModelQuerySet:
         assert authored_list.__len__() == 0
         authored_list = Authored.objects.search().to_list()
         assert authored_list.__len__() > 0
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()

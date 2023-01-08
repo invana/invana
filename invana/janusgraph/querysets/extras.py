@@ -11,8 +11,8 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-
-from invana.gremlin.connector import GremlinConnector
+from invana.helpers.response import raise_exception_if_needed
+# from invana.gremlin.connector import GremlinConnector
 from invana.base.querysets.base import QuerySetBase
 
 
@@ -29,13 +29,16 @@ mgmt.getOpenInstances()
 
     def get_open_transactions_size(self):
         query = "graph.getOpenTransactions().size()"
-        return self.connector.execute_query(query)
-
+        response =  self.connector.execute_query(query)
+        raise_exception_if_needed(response)
+        return response.data[0]
+        
     def rollback_open_transactions(self, i_understand=False):
         """
         https://gist.github.com/disruptek/98ed066933d05f22850329c5efc1d7b4
         :return:
         """
+        print("Rolling back open transactions...")
         if i_understand is not True:
             raise Exception("This step will roll back all transactions, "
                             "Please pass i_understand=True if you understand what this means,"

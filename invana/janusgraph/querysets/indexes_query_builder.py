@@ -21,7 +21,7 @@ class IndexQueryBuilder:
             raise Exception("index_type can only be 'Mixed' or 'Composite'")
         if index_name is None:
             index_name = f"{index_type}IndexBy{'' if label is None else label.capitalize()}" \
-                         f"{''.join([f.capitalize() for f in property_keys])}"
+                         f"{''.join([k.capitalize() for k in property_keys])}"
 
         query = "\ngraph.tx().rollback()  //Never create new indexes while a transaction is active\n"
         query += "mgmt = graph.openManagement()\n"
@@ -32,7 +32,7 @@ class IndexQueryBuilder:
             query += f"{field} = mgmt.getPropertyKey('{field}')\n"
 
         query += f"mgmt.buildIndex('{index_name}', Vertex.class)" \
-                 f"{''.join([f'.addKey({f})' for f in property_keys])}"
+                 f"{''.join([f'.addKey({k})' for k in property_keys])}"
         if label:
             query += f".indexOnly({label})"
         if index_type == "Mixed":

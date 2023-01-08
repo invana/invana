@@ -1,4 +1,7 @@
-from invana.gremlin.connector import GremlinConnector
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from invana.gremlin.connector import GremlinConnector
 from invana.serializer.element_structure import RelationShip, Node
 
 

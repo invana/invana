@@ -30,6 +30,10 @@ class IndexBase:
         return f"{self.index_type}IndexBy{'' if self.label is None else self.label.capitalize()}" \
                f"{''.join([f.capitalize() for f in self.property_keys])}"
 
+    def __repr__(self) -> str:
+        property_keys_str = ",".join(self.property_keys)
+        return f"<{self.index_type} (index_name={self.index_name}; label={self.label}; properties={property_keys_str} />"
+
 
 class CompositeIndex(IndexBase):
     index_type = "Composite"

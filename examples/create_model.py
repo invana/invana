@@ -15,8 +15,8 @@ class Project171(VertexModel):
         'created_at': DateTimeProperty(allow_null=True)
     }
     indexes = (
-        indexes.CompositeIndex("created_at"),
-        indexes.MixedIndex("created_at")
+        indexes.CompositeIndex("name"),
+        indexes.MixedIndex("name")
     )
 
 
@@ -30,9 +30,9 @@ class Authored2(EdgeModel):
     )
 
 
-graph.management.create_model(Project171)
+graph.connector.management.schema_writer.create(Project171)
 print(Project171.indexes)
-graph.management.rollback_open_transactions(i_understand=True)
-graph.management.create_indexes_from_model(Project171)
+graph.connector.management.extras.rollback_open_transactions(i_understand=True)
+graph.connector.management.indexes.create_from_model(Project171)
 
-graph.close_connection()
+graph.close()

@@ -5,7 +5,10 @@ from .indexes import IndexQuerySetBase
 
 
 class GraphManagementQuerySetBase(QuerySetBase):
-
+    indexes: IndexQuerySetBase = None
+    schema_write : SchemaWriterQuerySetBase = None
+    schema_reader: SchemaReaderQuerySetBase = None
+    extras: QuerySetBase = None
 
     indexes_cls: IndexQuerySetBase = NotImplemented
     schema_write_cls: SchemaWriterQuerySetBase = NotImplemented

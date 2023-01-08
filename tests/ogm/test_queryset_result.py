@@ -20,7 +20,7 @@ class Project(VertexModel):
 class TestQuerySetResultSet:
 
     def test_order_by(self):
-        graph.g.V().drop().iterate()
+        graph.connector.g.V().drop().iterate()
         for i in range(1, 100):
             Project.objects.create(name=f"invana-engine {i}", serial_no=i)
 

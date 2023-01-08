@@ -5,7 +5,8 @@ import abc
 import logging
 from .constants import ConnectionStateTypes
 if TYPE_CHECKING:
-    from .querysets import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase, GraphManagementQuerySetBase
+    from .querysets.graph import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase
+    from .querysets.management import GraphManagementQuerySetBase
 
 logger = logging.getLogger(__name__)
 

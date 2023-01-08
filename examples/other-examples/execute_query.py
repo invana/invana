@@ -8,7 +8,7 @@ GREMLIN_SERVER_URL = os.environ.get("GREMLIN_SERVER_URL", "ws://localhost:8182/g
 async def main():
     print("===test execute query")
     graph = InvanaGraph(GREMLIN_SERVER_URL)
-    graph.g.V().toList()
+    graph.connector.g.V().toList()
     data = graph.execute_query("g.V().limit(1).count()")
     # data =  connector.vertex.read_many()
     print("======data", data)

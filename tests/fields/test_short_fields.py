@@ -26,23 +26,23 @@ class Star(VertexModel):
 class TestShortField:
 
     def test_field(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         star = Star.objects.create(name="Sun", age_short=ShortType(11212))
         assert isinstance(star.properties.age_short, ShortType)
 
     def test_field_max_value(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
             Star.objects.create(name="Sun", age_short=122222)
         assert "max_value for field" in exec_info.value.__str__()
 
     def test_field_min_value(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         with pytest.raises(FieldValidationError) as exec_info:
             Star.objects.create(name="Sun", age_short=ShortType(1))
         assert "min_value for field " in exec_info.value.__str__()
 
     def test_field_default(self):
-        graph.g.V().drop()
+        graph.connector.g.V().drop()
         star = Star.objects.create(name="Ravi")
         assert star.properties.age_short == DEFAULT_POINTS_VALUE
