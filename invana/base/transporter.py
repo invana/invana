@@ -1,7 +1,10 @@
 from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
 
 class RequestBase:
+
     created_at = None
+    request_id = None
+    status_last_updated_at = None
 
     def __init__(self):
         self.request_id = create_uuid()
@@ -16,6 +19,12 @@ class RequestBase:
 
 
 class ResponseBase:
+
+    request_id = None
+    data = None
+    status_code = None
+    exception = None
+    created_at = None
 
     def __init__(self, request_id, status_code, data=None, exception=None):
         self.request_id = request_id

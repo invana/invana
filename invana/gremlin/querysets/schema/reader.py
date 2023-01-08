@@ -14,8 +14,8 @@
 #
 #
 
-from invana.base.querysets import SchemaReaderQuerySetBase
-from invana.ogm.models import VertexModel, EdgeModel
+from invana.base.querysets.schema import SchemaReaderQuerySetBase
+# from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging
 

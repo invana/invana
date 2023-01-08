@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 from invana.gremlin.connector import GremlinConnector
-from invana.base.querysets import QuerySetBase
+from invana.base.querysets.base import QuerySetBase
 
 
 # https://gist.github.com/disruptek/98ed066933d05f22850329c5efc1d7b4

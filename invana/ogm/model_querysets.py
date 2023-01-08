@@ -14,9 +14,10 @@
 
 from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatypes, validate_kwargs_for_create, \
     validate_kwargs_for_search, add_has_label_kwargs_from_model
-from .exceptions import FieldNotFoundError, FieldValidationError
-from invana.gremlin.querysets import GremlinVertexQuerySet, GremlinEdgeQuerySet
-from ..serializer.element_structure import Node, RelationShip
+from .exceptions import FieldNotFoundError
+from invana.gremlin.querysets.vertex import GremlinVertexQuerySet
+from invana.gremlin.querysets.edge import GremlinEdgeQuerySet
+# from ..serializer.element_structure import Node, RelationShip
 import abc
 
 

@@ -1,8 +1,7 @@
 from invana.gremlin.connector import GremlinConnector
-from .querysets import JanusGraphExtrasQuerySet, JanusGraphGraphManagementQuerySet
+from .management import  JanusGraphGraphManagement
 
 
 class JanusGraphConnector(GremlinConnector):
-
-        management_cls = JanusGraphGraphManagementQuerySet
+        management_cls = JanusGraphGraphManagement
         

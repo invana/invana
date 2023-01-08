@@ -27,7 +27,7 @@ Python API for Apache TinkerPop's Gremlin supported databases.
 ## Installation
 
 ```shell
-docker run -p 8182:8182  --name janusgraph-default janusgraph/janusgraph:latest -d
+docker run  --restart=unless-stopped -p 8182:8182  -d --name janusgraph janusgraph/janusgraph:latest
 pip install git+https://github.com/invanalabs/invana-py.git#egg=invana
 
 or 

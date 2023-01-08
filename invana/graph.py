@@ -11,7 +11,7 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-from invana.janusgraph import JanusGraphConnector
+from invana.janusgraph.connector import JanusGraphConnector
 
 
 class InvanaGraph:
@@ -43,7 +43,7 @@ class InvanaGraph:
     # def g(self):
     #     return self.connector.g
 
-    def close_connection(self):
+    def close(self):
         return self.connector.close()
 
     def reconnect(self):

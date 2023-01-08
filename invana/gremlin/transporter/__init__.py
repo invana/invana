@@ -1,2 +1,2 @@
 from .request import GremlinQueryRequest
-from .response import GremlinResponse
+from .response import GremlinQueryResponse

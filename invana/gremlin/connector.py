@@ -26,7 +26,9 @@ from ..serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 from invana.settings import DEFAULT_TIMEOUT
 import logging
 from .transporter import GremlinQueryRequest
-from .querysets import GremlinVertexQuerySet, GremlinEdgeQuerySet, GremlinGraphManagementQuerySet
+from .querysets.vertex import GremlinVertexQuerySet
+from .querysets.edge import GremlinEdgeQuerySet
+from .querysets.management import GremlinGraphManagementQuerySet
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +86,13 @@ class GremlinConnector(GraphConnectorBase):
         INVANA_DESERIALIZER_MAP.update(deserializer_map or {})
         self.deserializer_map = INVANA_DESERIALIZER_MAP
         self.connect()
-        self.vertex = self.vertex_cls(self.connector)
-        self.edge = self.edge_cls(self.connector)
-        self.management = self.management_cls(self.connector)
+    #     self.init_connector()
+
+    # def init_connector(self):
+        
+        self.vertex = self.vertex_cls(self)
+        self.edge = self.edge_cls(self)
+        self.management = self.management_cls(self)
 
  
     def _init_connection(self):

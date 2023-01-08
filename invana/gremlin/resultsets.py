@@ -14,7 +14,7 @@
 
 from abc import ABC
 from gremlin_python.process.traversal import Cardinality
-from invana.gremlin.connector import GremlinConnector
+# from invana.gremlin.connector import GremlinConnector
 from invana.helpers.utils import divide_chunks
 from gremlin_python.process.translator import Order
 from invana.gremlin.traversal.traversal import __

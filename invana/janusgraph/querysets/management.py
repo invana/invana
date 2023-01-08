@@ -1,5 +1,5 @@
-from invana.gremlin.querysets import GremlinGraphManagementQuerySet
-from . import JanusGraphExtrasQuerySet
+from invana.gremlin.querysets.management import GremlinGraphManagementQuerySet
+from .extras import JanusGraphExtrasQuerySet
 
 
 class JanusGraphGraphManagementQuerySet(GremlinGraphManagementQuerySet):

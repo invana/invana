@@ -1,13 +1,13 @@
 import abc
 from abc import ABC
-from invana.gremlin.connector import GremlinConnector
-from invana.base.querysets import QuerySetBase
-from ..resultsets import GremlinQueryResultSet
+# from ..connector import GremlinConnector
+from invana.base.querysets.base import QuerySetBase
+# from ..resultsets import GremlinQueryResultSet
 
 
 class GremlinQuerySetBase(QuerySetBase, abc.ABC):
 
-    def __init__(self, connector: GremlinConnector):
+    def __init__(self, connector):
         self.connector = connector
 
     @staticmethod

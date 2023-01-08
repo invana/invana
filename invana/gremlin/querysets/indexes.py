@@ -1,8 +1,8 @@
-from invana.base.querysets import IndexCRUDBase
+from invana.base.querysets.indexes import IndexQuerySetBase
 from ..exceptions import CantImplementInGremlinError
 
 
-class GremlinIndexCRUDQuerySet(IndexCRUDBase):
+class GremlinIndexCRUDQuerySet(IndexQuerySetBase):
 
     def create(self, model, *args, **kwargs):
         raise CantImplementInGremlinError()

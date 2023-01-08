@@ -1,11 +1,11 @@
-from invana.base.querysets  import SchemaWriterQuerySetBase
-from invana.ogm.models import VertexModel, EdgeModel
+from invana.base.querysets.schema  import SchemaWriterQuerySetBase
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class GremlinSchemaWriterQuerySet(SchemaWriterQuerySetBase):
+    from invana.ogm.models import VertexModel, EdgeModel
 
     @staticmethod
     def create(model: [VertexModel, EdgeModel]):

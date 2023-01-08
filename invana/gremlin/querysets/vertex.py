@@ -1,7 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from .base import GremlinQuerySetBase
-from invana.base.querysets import VertexCRUDQuerySetBase
-from ..resultsets import GremlinQueryResultSet
+from invana.base.querysets.graph import VertexCRUDQuerySetBase
 import abc
+from ..resultsets import GremlinQueryResultSet
 
 
 

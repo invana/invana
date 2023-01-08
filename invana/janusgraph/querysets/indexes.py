@@ -1,8 +1,8 @@
-from invana.gremlin.querysets import GremlinIndexCRUD
+from invana.gremlin.querysets.indexes import GremlinIndexCRUDQuerySet
 from invana.ogm.indexes import MixedIndex, CompositeIndex
 # TODO - move MixedIndex, CompositeIndex to Janusgraph
 
-class JanusGraphIndexCRUD(GremlinIndexCRUD):
+class JanusGraphIndexCRUD(GremlinIndexCRUDQuerySet):
 
     def create_from_model(self, model, timeout_per_index=None):
         indexes = model.indexes

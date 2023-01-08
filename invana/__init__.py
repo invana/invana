@@ -13,9 +13,9 @@
 #     limitations under the License.
 
 import logging
-from .graph import InvanaGraph
-from .gremlin.connector import GremlinConnector
-from .janusgraph.connector import JanusGraphConnector
+from invana.graph import InvanaGraph
+from invana.gremlin.connector import GremlinConnector
+from invana.janusgraph.connector import JanusGraphConnector
 
 logging.getLogger('asyncio').setLevel(logging.INFO)
 logging.basicConfig(

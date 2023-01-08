@@ -1,5 +1,5 @@
 from ...utils import process_graph_schema_string
-from invana.gremlin.querysets import GremlinSchemaWriterQuerySet
+from invana.gremlin.querysets.schema import GremlinSchemaWriterQuerySet
 from invana.ogm.models import VertexModel, EdgeModel
 from invana.serializer.schema_structure import VertexSchema, PropertySchema, EdgeSchema, LinkPath
 import logging

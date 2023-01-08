@@ -1,7 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import abc
 import logging
 from .constants import ConnectionStateTypes
-from .querysets import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase, GraphManagementQuerySetBase
+if TYPE_CHECKING:
+    from .querysets import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase, GraphManagementQuerySetBase
 
 logger = logging.getLogger(__name__)
 

@@ -13,7 +13,7 @@
 #     limitations under the License.
 
 from concurrent.futures import Future
-from invana.gremlin.response import Response
+from invana.gremlin.transporter import GremlinQueryResponse
 
 
 def read_from_result_set_with_callback(result_set, callback, request, finished_callback):
@@ -25,7 +25,7 @@ def read_from_result_set_with_callback(result_set, callback, request, finished_c
         else:
             while not result_set.stream.empty():
                 single_result = result_set.stream.get_nowait()
-                callback(Response(request.request_id, 206, data=single_result))
+                callback(GremlinQueryResponse(request.request_id, 206, data=single_result))
                 request.response_received_successfully(206)
             request.finished_with_success()
 
@@ -48,7 +48,7 @@ def read_from_result_set_with_out_callback(result_set, request):
 
             while not result_set.stream.empty():
                 results += result_set.stream.get_nowait()
-            future.set_result(Response(request.request_id, 200, data=results))
+            future.set_result(GremlinQueryResponse(request.request_id, 200, data=results))
             request.response_received_successfully(200)
             request.finished_with_success()
 

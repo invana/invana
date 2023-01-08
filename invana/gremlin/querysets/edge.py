@@ -1,5 +1,5 @@
 from .base import GremlinQuerySetBase
-from invana.base.querysets import EdgeCRUDQuerySetBase
+from invana.base.querysets.graph import EdgeCRUDQuerySetBase
 from ..resultsets import GremlinQueryResultSet
 import abc
 

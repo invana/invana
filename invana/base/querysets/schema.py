@@ -13,13 +13,11 @@
 #     limitations under the License.
 
 import abc
-from ...connector import GraphConnectorBase
+from invana.base.querysets.base import QuerySetBase
+from invana.ogm.models import VertexModel, EdgeModel
 
+class SchemaReaderQuerySetBase(QuerySetBase):
 
-class SchemaReaderQuerySetBase(abc.ABC):
-
-    def __init__(self, connector: GraphConnectorBase):
-        self.connector = connector
 
     @abc.abstractmethod
     def get_graph_schema(self):
@@ -51,13 +49,11 @@ class SchemaReaderQuerySetBase(abc.ABC):
 
 
 
-class SchemaWriterQuerySetBase(abc.ABC):
+class SchemaWriterQuerySetBase(QuerySetBase):
 
-    def __init__(self, connector: GraphConnectorBase):
-        self.connector = connector
 
     @abc.abstractmethod
-    def create_model(model: [VertexModel, EdgeModel]):
+    def create(model: [VertexModel, EdgeModel]):
         pass
 
     

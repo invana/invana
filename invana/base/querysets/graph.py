@@ -1,7 +1,10 @@
+from __future__ import annotations
 import abc
-from abc import ABC
+from typing import TYPE_CHECKING
 from .base import QuerySetBase
-from ..resultsets import QueryResultSetBase
+if TYPE_CHECKING:
+    from ..resultsets import QueryResultSetBase
+
 
  
 
@@ -15,10 +18,10 @@ class CRUDQuerySetBase(QuerySetBase):
     def search(self, **kwargs) -> QueryResultSetBase:
         pass
 
-    @abc.abstractmethod
-    def update(self, **properties) -> list:
-        # TODO - validate in 
-        pass
+    # @abc.abstractmethod
+    # def update(self, **properties) -> list:
+    #     # TODO - validate in 
+    #     pass
 
     @abc.abstractmethod
     def delete(self, **kwargs):
@@ -41,7 +44,7 @@ class CRUDQuerySetBase(QuerySetBase):
         pass
 
 
-class VertexCRUDQuerySetBase(CRUDQuerySetBase, ABC):
+class VertexCRUDQuerySetBase(CRUDQuerySetBase, abc.ABC):
 
     @abc.abstractmethod
     def create(self, label, **properties) -> QueryResultSetBase:
@@ -61,7 +64,7 @@ class VertexCRUDQuerySetBase(CRUDQuerySetBase, ABC):
 
 
  
-class EdgeCRUDQuerySetBase(CRUDQuerySetBase, ABC):
+class EdgeCRUDQuerySetBase(CRUDQuerySetBase, abc.ABC):
 
     @abc.abstractmethod
     def create(self, label, from_, to_, **properties) -> QueryResultSetBase:
