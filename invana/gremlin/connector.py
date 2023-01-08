@@ -43,9 +43,9 @@ class DriverRemoteConnection(_DriverRemoteConnection):
 
 class GremlinConnector(GraphConnectorBase):
 
-    vertex_cls = GremlinVertexQuerySet
-    edge_cls = GremlinEdgeQuerySet
-    management_cls = GremlinGraphManagementQuerySet
+    vertex_cls: GremlinVertexQuerySet = GremlinVertexQuerySet
+    edge_cls: GremlinEdgeQuerySet = GremlinEdgeQuerySet
+    management_cls: GremlinGraphManagementQuerySet = GremlinGraphManagementQuerySet
 
 
     def __init__(self, connection_uri: str,
@@ -69,6 +69,9 @@ class GremlinConnector(GraphConnectorBase):
         :param deserializer_map:
         :param transport_kwargs:
         """
+
+        # super(GremlinConnector, self).__init__(request)
+
 
         self.CONNECTION_STATE = None
         self.connection = None

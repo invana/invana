@@ -42,7 +42,7 @@ class VertexModel(metaclass=ModelMetaBase):
     class Meta:
         invana = None
     """
-    objects = VertexModelQuerySet
+    objects: VertexModelQuerySet = VertexModelQuerySet
     graph: InvanaGraph = None
     label_name = None
     type = "VERTEX"
@@ -55,7 +55,7 @@ class VertexModel(metaclass=ModelMetaBase):
 
 
 class EdgeModel(metaclass=ModelMetaBase):
-    objects = EdgeModelQuerySet
+    objects: EdgeModelQuerySet = EdgeModelQuerySet
     graph = None
     label_name = None
     type = "EDGE"

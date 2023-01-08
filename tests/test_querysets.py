@@ -1,4 +1,4 @@
-from invana import InvanaGraph
+from invana.graph import InvanaGraph
 from invana.serializer.element_structure import Node, RelationShip
 
 

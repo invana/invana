@@ -20,6 +20,9 @@ class GraphConnectorBase:
 
     def __init__(self, connection_uri:str, is_readonly=False, default_timeout=None, **kwargs ) -> None:
         self.CONNECTION_STATE = None
+        self.connection_uri = connection_uri
+        self.is_readonly = is_readonly
+        self.default_timeout = default_timeout
 
     # @property
     # @abc.abstractmethod

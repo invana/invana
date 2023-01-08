@@ -11,7 +11,8 @@
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from .decorators import dont_allow_has_label_kwargs, serialize_to_model_datatypes, validate_kwargs_for_create, \
     validate_kwargs_for_search, add_has_label_kwargs_from_model
 from .exceptions import FieldNotFoundError
@@ -19,15 +20,22 @@ from invana.gremlin.querysets.vertex import GremlinVertexQuerySet
 from invana.gremlin.querysets.edge import GremlinEdgeQuerySet
 # from ..serializer.element_structure import Node, RelationShip
 import abc
+if TYPE_CHECKING:
+    from invana.graph import InvanaGraph
 
 
 class ModelQuerySetBase(abc.ABC):
     queryset = None
+    graph: InvanaGraph = None
 
-    def __init__(self, connector, model):
-        self.connector = connector
+    def __init__(self, graph, model):
+        self.graph = graph
         self.model = model
         self.queryset = self.queryset(self.connector)
+    
+    @property
+    def connector(self):
+        return self.graph.connector
 
     @abc.abstractmethod
     def get_or_create(self, *args, **kwargs):

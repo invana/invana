@@ -45,12 +45,12 @@ print("person as json :", person.to_json())
 project = Project.objects.create(name="Hello   ", rating=2.5, is_active=False)
 print("project is:", project.to_json())
 
-projects = Project.objects.search().to_list()
-print("projects", projects)
+# projects = Project.objects.search().to_list()
+# print("projects", projects)
 
 authored_single = Authored.objects.create(person.id, project.id)
 print("authored_single", authored_single)
 authored = Authored.objects.search().to_list()
 print("authored", authored)
 
-graph.close_connection()
+graph.close()
