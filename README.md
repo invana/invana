@@ -155,7 +155,7 @@ Project.objects.search().order_by('-name').to_list()  # desc order
 queryset = Project.objects.search().order_by('name').range(1, 10).to_list()
 
 # using paginator
-from invana.ogm.paginator import QuerySetPaginator
+from invana.gremlin.paginator import QuerySetPaginator
 
 page_size = 5
 queryset = Project.objects.search().order_by("-serial_no")

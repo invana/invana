@@ -14,8 +14,8 @@
 #
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
 from .utils import convert_to_camel_case
+from .model_querysets import VertexModelQuerySet, EdgeModelQuerySet
 if TYPE_CHECKING:
     from invana.graph import InvanaGraph
 
@@ -33,15 +33,12 @@ class ModelMetaBase(type):
         if "name" not in attrs:
             attrs['label_name'] = name if model_base_cls.__name__ == "VertexModel" else convert_to_camel_case(name)
         model_class = super_new(mcs, name, bases, attrs)
-        model_class.objects = model_base_cls.objects(attrs['graph'], model_class)
+        queryset = attrs['graph'].vertex if model_base_cls.__name__ == "VertexModel" else attrs['graph'].edge
+        model_class.objects = model_base_cls.objects(attrs['graph'], model_class, queryset)
         return model_class
 
 
 class VertexModel(metaclass=ModelMetaBase):
-    """
-    class Meta:
-        invana = None
-    """
     objects: VertexModelQuerySet = VertexModelQuerySet
     graph: InvanaGraph = None
     label_name = None
@@ -50,8 +47,6 @@ class VertexModel(metaclass=ModelMetaBase):
     @classmethod
     def get_schema(cls):
         return cls.graph.connector.management.schema_reader.get_vertex_schema(cls.label_name)
-
-    # def get
 
 
 class EdgeModel(metaclass=ModelMetaBase):

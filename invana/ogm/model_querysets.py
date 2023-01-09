@@ -28,10 +28,10 @@ class ModelQuerySetBase(abc.ABC):
     queryset = None
     graph: InvanaGraph = None
 
-    def __init__(self, graph, model):
+    def __init__(self, graph, model, queryset):
         self.graph = graph
         self.model = model
-        self.queryset = self.queryset(self.connector)
+        self.queryset = queryset
     
     @property
     def connector(self):
@@ -67,7 +67,7 @@ class ModelQuerySetBase(abc.ABC):
 
 
 class VertexModelQuerySet(ModelQuerySetBase):
-    queryset = GremlinVertexQuerySet
+    # queryset = GremlinVertexQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
@@ -101,7 +101,7 @@ class VertexModelQuerySet(ModelQuerySetBase):
 
 
 class EdgeModelQuerySet(ModelQuerySetBase):
-    queryset = GremlinEdgeQuerySet
+    # queryset = GremlinEdgeQuerySet
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
