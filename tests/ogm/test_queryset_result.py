@@ -2,7 +2,7 @@ import math
 from invana import InvanaGraph
 from invana.ogm.fields import StringProperty, IntegerProperty
 from invana.ogm.models import VertexModel
-from invana.ogm.paginator import QuerySetPaginator
+from invana.gremlin.paginator import GremlinQuerySetPaginator
 import os
 
 connection_uri = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
@@ -29,7 +29,7 @@ class TestQuerySetResultSet:
         page_size = 5
         total_pages = math.ceil(total / page_size)
         queryset = Project.objects.search().order_by("serial_no")
-        paginator = QuerySetPaginator(queryset, page_size)
+        paginator = GremlinQuerySetPaginator(queryset, page_size)
         for page_no in range(1, total_pages):
             qs = paginator.page(page_no)
             result = qs.to_list()

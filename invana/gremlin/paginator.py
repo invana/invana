@@ -13,16 +13,13 @@
 #     limitations under the License.
 
 import copy
-from ..gremlin.resultsets import GremlinQueryResultSet
-from .utils import copy_traversal
+from .resultsets import GremlinQueryResultSet
+# from ..base.resultsets import QueryResultSetBase
+from ..base.paginator import QuerySetPaginatorBase
+from ..ogm.utils import copy_traversal
 
 
-class QuerySetPaginator:
-
-    def __init__(self, queryset_result: GremlinQueryResultSet, page_size: int):
-        self.queryset_result = queryset_result
-        self.bytecode = copy.deepcopy(queryset_result.get_traversal().bytecode)
-        self.page_size = page_size
+class GremlinQuerySetPaginator(QuerySetPaginatorBase):
 
     def page(self, page_no) -> GremlinQueryResultSet:
         traversal = copy_traversal(self.queryset_result.get_traversal())
