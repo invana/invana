@@ -20,9 +20,12 @@ import os
 
 
 def get_install_requires():
-    requirements = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'),
-                                      session=PipSession())
-    return [str(requirement.requirement) for requirement in requirements]
+    # requirements = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'),
+    #                                   session=PipSession())
+    # return [str(requirement.requirement) for requirement in requirements]
+    return [
+        "gremlinpython==3.5.1"
+    ]
 
 
 setup(
