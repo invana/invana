@@ -7,8 +7,8 @@ from invana import InvanaGraph
 from invana.connector.data_types import DoubleType
 import os
 
-connection_uri = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
-graph = InvanaGraph(connection_uri)
+gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
+graph = InvanaGraph(gremlin_server_url)
 
 DEFAULT_USERNAME = "rrmerugu"
 DEFAULT_POINTS_VALUE = long(5)

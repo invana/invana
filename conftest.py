@@ -1,17 +1,22 @@
 import pytest
 import os
 from invana.gremlin.connector import GremlinConnector
+from invana.janusgraph.connector import JanusGraphConnector
 from invana import InvanaGraph
 
 
 @pytest.fixture(scope="function")
-def connection_uri() -> str:
+def gremlin_server_url() -> str:
     return os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
+
+@pytest.fixture(scope="function")
+def janusgraph_server_url() -> str:
+    return os.environ.get("JANUSGRAPH_SERVER_URL", "ws://megamind.local:8184/gremlin")
 
 
 @pytest.fixture(scope="function")
-def connection(connection_uri):
-    connector = GremlinConnector(connection_uri)
+def gremlin_connector(gremlin_server_url):
+    connector = GremlinConnector(gremlin_server_url)
     initial_data_with_connector(connector)
     yield connector
     connector.g.V().drop().iterate()
@@ -19,8 +24,24 @@ def connection(connection_uri):
 
 
 @pytest.fixture(scope="function")
-def graph(connection_uri):
-    graph = InvanaGraph(connection_uri)
+def janusgraph_connector(janusgraph_server_url):
+    connector = JanusGraphConnector(janusgraph_server_url)
+    initial_data_with_connector(connector)
+    yield connector
+    connector.g.V().drop().iterate()
+    connector.close()
+
+@pytest.fixture(scope="function")
+def connectors_store(gremlin_connector, janusgraph_connector):
+    # https://stackoverflow.com/a/42400786/3448851
+    return {
+        "gremlin_connector": gremlin_connector,
+        "janusgraph_connector": janusgraph_connector
+    }
+
+@pytest.fixture(scope="function")
+def graph(gremlin_server_url):
+    graph = InvanaGraph(gremlin_server_url)
     initial_data_with_graph(graph)
     initial_data_with_connector(graph.connector)
     yield graph

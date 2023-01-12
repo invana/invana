@@ -5,8 +5,8 @@ from invana.ogm.models import VertexModel
 from invana.gremlin.paginator import GremlinQuerySetPaginator
 import os
 
-connection_uri = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
-graph = InvanaGraph(connection_uri)
+gremlin_server_url = os.environ.get("GREMLIN_SERVER_URL", "ws://megamind.local:8182/gremlin")
+graph = InvanaGraph(gremlin_server_url)
 
 
 class Project(VertexModel):
