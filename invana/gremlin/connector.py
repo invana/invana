@@ -96,6 +96,7 @@ class GremlinConnector(GraphConnectorBase):
 
  
     def _init_connection(self):
+        logger.debug(f"create driver connection  ")
         self.connection = DriverRemoteConnection(
             self.connection_uri,
             traversal_source=self.traversal_source,
@@ -105,6 +106,8 @@ class GremlinConnector(GraphConnectorBase):
         self.g = traversal(traversal_source_class=self.graph_traversal_source_cls).withRemote(self.connection)
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
+        import time 
+        time.sleep(1)
 
     def _close_connection(self) -> None:
         self.connection.client.close()

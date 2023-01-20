@@ -4,6 +4,7 @@ from invana.serializer.element_structure import Node, RelationShip
 
 class TestVertexQuerySet:
 
+    # TODO - add more edge and vertices querysets
     def test_create(self, graph: InvanaGraph):
         vtx = graph.connector.vertex.create("Person", name="Ravi").to_list()
         assert isinstance(vtx[0], Node)

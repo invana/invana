@@ -13,8 +13,6 @@ pytest-asyncio = "==0.16.0"
 pytest-cov = "*"
 tox = "*"
 pylint = "*"
-mkdocs = "*"
-mkdocs-material = "*"
 
 [requires]
 python_version = "3.8"
