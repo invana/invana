@@ -63,6 +63,8 @@ class GremlinQueryResultSet(QueryResultSetBase):
         """
         _ = self.get_traversal()
         order_string = Order.desc if property_name.startswith("-") else Order.asc
+        if property_name.startswith("-"):
+            property_name = property_name.split("-")[1]
         _.order().by(property_name, order_string)
         return self
 
