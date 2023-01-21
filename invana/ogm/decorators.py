@@ -14,7 +14,7 @@
 
 from invana.ogm.exceptions import FieldValidationError
 from ..serializer.element_structure import Node, RelationShip
-
+from .utils import get_absolute_field_name
 
 def dont_allow_has_label_kwargs(f):
     def wrapper(self, **search_kwargs):
@@ -100,21 +100,36 @@ def _validate_kwargs_for_search(self, **properties):
     """
     validated_data = {}
     allowed_property_keys = list(self.model.properties.keys())
+
+    # validate if the property_key is in Model.property_keys
     for k, v in properties.items():
-        k_cleaned = k.replace("has__", "")
+        k_cleaned = get_absolute_field_name(k)
+        # k_cleaned = k.replace("has__", "")
+        # if "__" in k_cleaned: # remove the search predicate like name__startingWith
+        #     k_cleaned = k_cleaned.split("__")[0]
+
         if k_cleaned in ["label", "id"]:
             validated_data[k] = v
+
         elif k_cleaned not in allowed_property_keys:
             raise FieldValidationError(f"property '{k_cleaned}' not allowed in"
                                        f" {self.model.label_name} when using OGM."
                                        f" Hint: {allowed_property_keys} fields allowed")
 
-    for k, v in properties.items():
-        k_cleaned = k.replace("has__", "")
-        if k_cleaned not in ["label", "id"]:
-            _ = self.get_validated_data(k_cleaned, v, self.model)
+    # validate if the property_key value matches the Model Field type definition
+    for field_name_kwarg, field_kwarg_value in properties.items():
+        field_name = get_absolute_field_name(field_name_kwarg)
+        if field_name not in ["label", "id"]:
+            _ = None
+            if type(field_kwarg_value) in (list, tuple):
+                _ = []
+                for v in field_kwarg_value:
+                    _.append(self.get_validated_data(field_name, v, self.model))
+                _ = tuple(_) if type(field_kwarg_value) is tuple else _
+            else:
+                _ = self.get_validated_data(field_name, field_kwarg_value, self.model)
             if _ is not None:
-                validated_data[k] = _
+                validated_data[field_name_kwarg] = _
     return validated_data
 
 

@@ -19,6 +19,7 @@ from .exceptions import FieldNotFoundError
 from invana.gremlin.querysets.vertex import GremlinVertexQuerySet
 from invana.gremlin.querysets.edge import GremlinEdgeQuerySet
 # from ..serializer.element_structure import Node, RelationShip
+from .utils import get_absolute_field_name
 import abc
 if TYPE_CHECKING:
     from invana.graph import InvanaGraph
@@ -59,6 +60,7 @@ class ModelQuerySetBase(abc.ABC):
 
     @staticmethod
     def get_validated_data(field_name, field_value, model):
+        field_name = get_absolute_field_name(field_name)
         field = model.properties.get(field_name)
         if field is None:
             raise FieldNotFoundError(f"{field_name} doesn't exist in model '{model.__name__}'")

@@ -25,3 +25,13 @@ def convert_to_camel_case(s):
 
 def copy_traversal(traversal):
     return InvanaTraversal(traversal.graph, traversal.traversal_strategies, copy.deepcopy(traversal.bytecode))
+
+
+def get_absolute_field_name(field_name):
+    # this field_name will include 
+    # has__id, has__label, has__name__startingWith
+    field_name = field_name.replace("has__", "")
+
+    if "__" in field_name: # remove the search predicate like name__startingWith
+        field_name = field_name.split("__")[0]
+    return field_name

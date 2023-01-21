@@ -203,6 +203,7 @@ class ShortProperty(NumberFieldBase, ABC):
 
 class IntegerProperty(NumberFieldBase, ABC):
     data_type = IntegerType
+    allowed_data_types = [IntegerType, int]
 
 
 class LongProperty(NumberFieldBase, ABC):
