@@ -1,6 +1,24 @@
 from invana.serializer.element_structure import RelationShip, Node
 
 
+
+def create_indexes_only_from_model(graph, *model_classes, i_understand_rollback=False):
+    # TODO - add validations if graph is InvanaGraph instance and model_classes are Model instances 
+    if i_understand_rollback is False:
+        # This reason being failures in Janusgraph indexes would cause stalled index status.  
+        raise Exception("Cannot attempt to create indexes when i_understand_rollback=False ")
+    for model_class in model_classes:
+        graph.connector.management.extras.rollback_open_transactions(i_understand=True)
+        graph.connector.management.indexes.create_from_model(model_class)
+
+
+def install_models(graph, *model_classes,  i_understand_rollback=False):
+    for model_class in model_classes:
+        graph.connector.management.schema_writer.create(model_class)
+    create_indexes_only_from_model(graph, *model_classes, i_understand_rollback=i_understand_rollback)
+
+
+
 def get_vertex_properties_of_edges(edges, graph):
     """
     TODO - move this to gremlin
