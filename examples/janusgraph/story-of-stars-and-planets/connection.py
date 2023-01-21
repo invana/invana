@@ -13,5 +13,5 @@
 #     limitations under the License.
 from invana import InvanaGraph
 
-# invana = InvanaGraph("ws://megamind.local:8182/gremlin")
-graph = InvanaGraph("ws://localhost:8182/gremlin")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin")
+# graph = InvanaGraph("ws://localhost:8182/gremlin")

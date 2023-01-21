@@ -37,56 +37,56 @@ def import_data():
     for edge in EDGES_SAMPLES:
         from_vertex = None
         to_vertex = None
-        if edge['from_vertex_filters']['has__label'] == "Star":
-            del edge['from_vertex_filters']['has__label']
-            from_vertex = Star.objects.read_one(**edge['from_vertex_filters'])
-        elif edge['from_vertex_filters']['has__label'] == "Planet":
-            del edge['from_vertex_filters']['has__label']
-            from_vertex = Planet.objects.read_one(**edge['from_vertex_filters'])
-        elif edge['from_vertex_filters']['has__label'] == "Satellite":
-            del edge['from_vertex_filters']['has__label']
-            from_vertex = Satellite.objects.read_one(**edge['from_vertex_filters'])
+        if edge['from_vertex_filters']['label'] == "Star":
+            del edge['from_vertex_filters']['label']
+            from_vertex = Star.objects.get_or_none(**edge['from_vertex_filters'])
+        elif edge['from_vertex_filters']['label'] == "Planet":
+            del edge['from_vertex_filters']['label']
+            from_vertex = Planet.objects.get_or_none(**edge['from_vertex_filters'])
+        elif edge['from_vertex_filters']['label'] == "Satellite":
+            del edge['from_vertex_filters']['label']
+            from_vertex = Satellite.objects.get_or_none(**edge['from_vertex_filters'])
 
-        if edge['to_vertex_filters']['has__label'] == "Star":
-            del edge['to_vertex_filters']['has__label']
-            to_vertex = Star.objects.read_one(**edge['to_vertex_filters'])
-        elif edge['to_vertex_filters']['has__label'] == "Planet":
-            del edge['to_vertex_filters']['has__label']
-            to_vertex = Planet.objects.read_one(**edge['to_vertex_filters'])
-        elif edge['to_vertex_filters']['has__label'] == "Satellite":
-            del edge['to_vertex_filters']['has__label']
-            to_vertex = Satellite.objects.read_one(**edge['to_vertex_filters'])
+        if edge['to_vertex_filters']['label'] == "Star":
+            del edge['to_vertex_filters']['label']
+            to_vertex = Star.objects.get_or_none(**edge['to_vertex_filters'])
+        elif edge['to_vertex_filters']['label'] == "Planet":
+            del edge['to_vertex_filters']['label']
+            to_vertex = Planet.objects.get_or_none(**edge['to_vertex_filters'])
+        elif edge['to_vertex_filters']['label'] == "Satellite":
+            del edge['to_vertex_filters']['label']
+            to_vertex = Satellite.objects.get_or_none(**edge['to_vertex_filters'])
 
         if edge['label'] == "has_satellite":
             edge_data = HasSatellite.objects.create(
                 from_vertex.id,
                 to_vertex.id,
-                properties=edge['properties']
+                **edge['properties']
             )
         elif edge['label'] == "has_planet":
             edge_data = HasPlanet.objects.create(
                 from_vertex.id,
                 to_vertex.id,
-                properties=edge['properties']
+                **edge['properties']
             )
         elif edge['label'] == "has_neighbor_planet":
             edge_data = HasNeighborPlanet.objects.create(
                 from_vertex.id,
                 to_vertex.id,
-                properties=edge['properties']
+                **edge['properties']
             )
         print("===edge_data", edge_data)
 
 
 def flush_data():
-    Star.objects.delete_many()
-    Planet.objects.delete_many()
-    Satellite.objects.delete_many()
-    HasPlanet.objects.delete_many()
-    HasSatellite.objects.delete_many()
-    HasNeighborPlanet.objects.delete_many()
+    Star.objects.delete()
+    Planet.objects.delete()
+    Satellite.objects.delete()
+    HasPlanet.objects.delete()
+    HasSatellite.objects.delete()
+    HasNeighborPlanet.objects.delete()
 
 
 flush_data()
 import_data()
-graph.close_connection()
+graph.close()

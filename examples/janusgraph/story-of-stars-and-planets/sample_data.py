@@ -67,12 +67,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 384400
         },
         "from_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Earth"
+            "label": "Planet",
+            "name": "Earth"
         },
         "to_vertex_filters": {
-            "has__label": "Satellite",
-            "has__name": "Moon"
+            "label": "Satellite",
+            "name": "Moon"
         }
     },
     {
@@ -82,12 +82,12 @@ EDGES_SAMPLES = [
 
         },
         "from_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Mars"
+            "label": "Planet",
+            "name": "Mars"
         },
         "to_vertex_filters": {
-            "has__label": "Satellite",
-            "has__name": "Phobos"
+            "label": "Satellite",
+            "name": "Phobos"
         }
     },
     {
@@ -96,12 +96,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 23458
         },
         "from_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Mars"
+            "label": "Planet",
+            "name": "Mars"
         },
         "to_vertex_filters": {
-            "has__label": "Satellite",
-            "has__name": "Deimos"
+            "label": "Satellite",
+            "name": "Deimos"
         }
     },
     {
@@ -110,12 +110,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 250000000
         },
         "from_vertex_filters": {
-            "has__label": "Star",
-            "has__name": "Sun"
+            "label": "Star",
+            "name": "Sun"
         },
         "to_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Mars"
+            "label": "Planet",
+            "name": "Mars"
         }
     },
     {
@@ -124,12 +124,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 152000000
         },
         "from_vertex_filters": {
-            "has__label": "Star",
-            "has__name": "Sun"
+            "label": "Star",
+            "name": "Sun"
         },
         "to_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Earth"
+            "label": "Planet",
+            "name": "Earth"
         }
     },
     {
@@ -138,12 +138,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 378000000
         },
         "from_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Earth"
+            "label": "Planet",
+            "name": "Earth"
         },
         "to_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Mars"
+            "label": "Planet",
+            "name": "Mars"
         }
     },
     {
@@ -152,12 +152,12 @@ EDGES_SAMPLES = [
             "distance_in_kms": 378000000
         },
         "from_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Mars"
+            "label": "Planet",
+            "name": "Mars"
         },
         "to_vertex_filters": {
-            "has__label": "Planet",
-            "has__name": "Earth"
+            "label": "Planet",
+            "name": "Earth"
         }
     },
 

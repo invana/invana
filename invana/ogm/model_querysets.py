@@ -74,6 +74,12 @@ class VertexModelQuerySet(ModelQuerySetBase):
     def get_or_create(self, **properties):
         return self.queryset.get_or_create(self.model.label_name, **properties)
 
+    @dont_allow_has_label_kwargs
+    @validate_kwargs_for_search
+    @serialize_to_model_datatypes
+    def get_or_none(self, **search_kwargs):
+        return self.queryset.get_or_none(self.model.label_name, **search_kwargs)
+
     @validate_kwargs_for_create
     @serialize_to_model_datatypes
     def create(self, **properties):
@@ -107,6 +113,13 @@ class EdgeModelQuerySet(ModelQuerySetBase):
     @serialize_to_model_datatypes
     def get_or_create(self, from_, to_, **properties):
         return self.queryset.get_or_create(self.model.label_name, from_, to_, **properties)
+
+    # @dont_allow_has_label_kwargs
+    # @add_has_label_kwargs_from_model
+    # @validate_kwargs_for_search
+    # @serialize_to_model_datatypes
+    # def get_or_none(self, **search_kwargs):
+    #     return self.queryset.get_or_none(**search_kwargs)
 
     @validate_kwargs_for_create
     @serialize_to_model_datatypes

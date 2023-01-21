@@ -63,7 +63,7 @@ class GraphSearch:
                     bytecode.add_step(key_split_list[0], key_split_list[1], v)
             elif key_split_list.__len__() > 2:
                 if key_split_list[2] not in cls.allowed_predicates_list:
-                    raise InvalidSearchKwargError(
+                     raise InvalidSearchKwargError(
                         f"{key_split_list[2]} not allowed in search_kwargs. "
                         f"Only {cls.allowed_predicates_list} are allowed")
                 if k.startswith(tuple(cls.has_filter_keys)):
