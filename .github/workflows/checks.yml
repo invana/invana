@@ -12,10 +12,16 @@ jobs:
     # Service containers to run with `test-runner-job`
     services:
       # Label used to access the service container
-      janusgraph:
+      gremlin: # TODO - change this to gremlin server
         image: 'docker.io/janusgraph/janusgraph:latest'
         ports:
         - 8182:8182
+        # needed because the postgres container does not provide a healthcheck
+#        options: --health-cmd --health-interval 10s --health-timeout 5s --health-retries 5
+      janusgraph-2:
+        image: 'docker.io/janusgraph/janusgraph:latest'
+        ports:
+        - 8184:8182
         # needed because the postgres container does not provide a healthcheck
 #        options: --health-cmd --health-interval 10s --health-timeout 5s --health-retries 5
 
