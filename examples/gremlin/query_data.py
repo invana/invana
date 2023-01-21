@@ -2,7 +2,7 @@ from invana.gremlin.connector import GremlinConnector
 
 connection_uri = "ws://megamind.local:8182/gremlin"
 connector = GremlinConnector(connection_uri)
-connector.g.V().drop().iterate()
+# connector.g.V().drop().iterate()
 connector.g.addV("Organisation").property("name", "invana").next()
 connector.g.addV("Project").property("name", "invana engine").next()
 connector.g.addV("Project").property("name", "invana studio").next()

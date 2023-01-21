@@ -8,9 +8,9 @@ graph = InvanaGraph(connection_uri)
 schema = graph.management.schema_reader.get_graph_schema()
 print(schema)
 for k, vtx_schema in schema['vertices'].items():
-    print(vtx_schema.properties)
+    print(vtx_schema.to_json())
 for k, vtx_schema in schema['edges'].items():
-    print(vtx_schema.properties)
+    print(vtx_schema)
 # graph.close_connection()
 # connector = GremlinConnector(connection_uri)
 # # connector.close()
@@ -22,4 +22,4 @@ for k, vtx_schema in schema['edges'].items():
 # print("response", response.data, response.data, )
 #
 # print(response.data)
-graph.close_connection()
+graph.close()

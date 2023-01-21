@@ -4,10 +4,10 @@ from invana.ogm.models import VertexModel, EdgeModel
 from datetime import datetime
 from invana.ogm import indexes
 
-graph = InvanaGraph("ws://megamind.local:8182/gremlin", traversal_source="g")
+graph = InvanaGraph("ws://megamind.local:8182/gremlin")
 
 
-class Project171(VertexModel):
+class Project(VertexModel):
     graph = graph
     properties = {
         'name': StringProperty(max_length=10, trim_whitespaces=True),
@@ -20,7 +20,7 @@ class Project171(VertexModel):
     )
 
 
-class Authored2(EdgeModel):
+class Authored(EdgeModel):
     graph = graph
     properties = {
         'created_at': DateTimeProperty(default=lambda: datetime.now())
@@ -30,9 +30,12 @@ class Authored2(EdgeModel):
     )
 
 
-graph.connector.management.schema_writer.create(Project171)
-print(Project171.indexes)
-graph.connector.management.extras.rollback_open_transactions(i_understand=True)
-graph.connector.management.indexes.create_from_model(Project171)
+def create_indexes(*model_classes):
+    for model_class in model_classes:
+        graph.connector.management.schema_writer.create(model_class)
+        print(model_class.indexes)
+        graph.connector.management.extras.rollback_open_transactions(i_understand=True)
+        graph.connector.management.indexes.create_from_model(model_class)
+    graph.close()
 
-graph.close()
+create_indexes(Project, Authored)
