@@ -32,6 +32,9 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
             .to_list()
         return elem[0] if elem.__len__() > 0 else None
 
+    def get_by_id(self, nodeId):
+        return self.search(has__id=nodeId).next()
+
     def bulk_write(self, *args, **kwargs):
         # TODO - implement this
         raise NotImplementedError()

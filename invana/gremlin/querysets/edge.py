@@ -25,9 +25,14 @@ class GremlinEdgeQuerySet(GremlinQuerySetBase, EdgeCRUDQuerySetBase, abc.ABC):
             created = True
         return created, elem[0] if elem.__len__() > 0 else None
 
-    def get_or_none(self, *args, **kwargs):
-        # TODO - implement this
-        raise NotImplementedError()
+    def get_or_none(self, label, from_, to_, **properties):
+        elem = self.connector.g.V(from_).outE().search(has__label=label, **properties).where(
+            __.inV().hasId(to_)).elementMap().toList()
+        return elem[0] if elem.__len__() > 0 else None
+
+
+    def get_by_id(self, relationId):
+        return self.connector.g.E(relationId).next()
 
     def bulk_write(self, *args, **kwargs):
         # TODO - implement this
