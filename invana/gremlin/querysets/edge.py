@@ -30,10 +30,10 @@ class GremlinEdgeQuerySet(GremlinQuerySetBase, EdgeCRUDQuerySetBase, abc.ABC):
             __.inV().hasId(to_)).elementMap().toList()
         return elem[0] if elem.__len__() > 0 else None
 
-
     def get_by_id(self, relationId):
         return self.connector.g.E(relationId).next()
 
     def bulk_write(self, *args, **kwargs):
         # TODO - implement this
         raise NotImplementedError()
+

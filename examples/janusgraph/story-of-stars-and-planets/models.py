@@ -15,6 +15,7 @@ from invana.ogm.fields import StringProperty, FloatProperty, IntegerProperty
 from invana.ogm.models import VertexModel, EdgeModel
 from connection import graph
 
+# from gremlin_python.process.graph_traversal import __
 
 class Star(VertexModel):
     graph = graph

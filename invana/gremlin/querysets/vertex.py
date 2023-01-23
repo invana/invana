@@ -4,6 +4,7 @@ from .base import GremlinQuerySetBase
 from invana.base.querysets.graph import VertexCRUDQuerySetBase
 import abc
 from ..resultsets import GremlinQueryResultSet
+from gremlin_python.process.graph_traversal import __
 
 
 
@@ -38,3 +39,28 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
     def bulk_write(self, *args, **kwargs):
         # TODO - implement this
         raise NotImplementedError()
+
+    # def oute_labels(self, **search_kwargs):
+    #     # TODO - performance may hurt with label
+    #     pass
+
+    # def ine_labels(self,  **search_kwargs):
+    #     pass
+
+    def oute_labels_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().outE().label().toList()
+
+    def ine_labels_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().inE().label().toList()
+
+    def bothe_labels_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().bothE().label().toList()
+
+    def oute_label_stats_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().outE().groupCount().by(__.label()).toList()
+
+    def ine_label_stats_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().inE().groupCount().by(__.label()).toList()
+
+    def bothe_label_stats_by_id(self, node_id):
+        return self.search(has__id=node_id).get_traversal().bothE().groupCount().by(__.label()).toList()
