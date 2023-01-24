@@ -12,6 +12,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
+from gremlin_python.structure.graph import  Path as _Path
 
 class PropertiesObject:
 
@@ -20,6 +21,12 @@ class PropertiesObject:
         for k, v in self.__dict__.items():
             __str += f'{k}={v} '
         return __str
+
+class Path(_Path):
+
+    def to_json(self):
+        return [obj.to_json() for obj in self.objects ]
+
 
 
 class ElementBase:

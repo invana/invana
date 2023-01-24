@@ -15,7 +15,8 @@
 from gremlin_python.structure.io import graphsonV3d0
 from gremlin_python.process.traversal import T, Direction
 from invana.gremlin.utils import get_id
-from invana.serializer.element_structure import RelationShip, Node
+from invana.serializer.element_structure import RelationShip, Node, Path
+ 
 
 
 class InvanaMapType(graphsonV3d0.MapType):
@@ -69,6 +70,13 @@ class InvanaEdgeDeserializer(graphsonV3d0.EdgeDeserializer):
                             Node(reader.toObject(d["inV"]), d.get("inVLabel", "vertex")))
 
 
+class InvanaPathDeserializer(graphsonV3d0.PathDeserializer):
+
+    @classmethod
+    def objectify(cls, d, reader):
+        return Path(reader.toObject(d["labels"]), reader.toObject(d["objects"]))
+
+
 # class PropertyDeserializer(graphsonV3d0.PropertyDeserializer):
 #
 #     @classmethod
@@ -81,5 +89,7 @@ INVANA_DESERIALIZER_MAP = {
     "g:Map": InvanaMapType,
     "g:Vertex": InvanaVertexDeserializer,
     "g:Edge": InvanaEdgeDeserializer,
+    "g:Path": InvanaPathDeserializer,
+
     # "g:Property": InvanaEdgeDeserializer,
 }

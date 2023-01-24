@@ -1,14 +1,23 @@
 from invana.serializer.element_structure import RelationShip, Node
+import logging
+logger = logging.getLogger(__name__)
 
 
 def create_indexes_only_from_model(graph, *model_classes, i_understand_rollback=False):
     # TODO - add validations if graph is InvanaGraph instance and model_classes are Model instances 
-    if i_understand_rollback is False:
-        # This reason being failures in Janusgraph indexes would cause stalled index status.  
-        raise Exception("Cannot attempt to create indexes when i_understand_rollback=False ")
+
     for model_class in model_classes:
-        graph.connector.management.extras.rollback_open_transactions(i_understand=True)
-        graph.connector.management.indexes.create_from_model(model_class)
+            if hasattr(model_class, "indexes"):
+                if  i_understand_rollback is True:
+                    logger.info(f"Found {model_class.indexes.length} indexes on model '{model_class.label_name}'. Creating indexes")
+                    graph.connector.management.extras.rollback_open_transactions(i_understand=True)
+                    graph.connector.management.indexes.create_from_model(model_class)
+                else:
+                    # This reason being failures in Janusgraph indexes would cause stalled index status.  
+                    raise Exception("Cannot attempt to create indexes when i_understand_rollback=False ")
+            else:
+                logger.warning(f"""Found no indexes on model '{model_class.label_name}'.
+Review your model and create indexes for performance !!""")
 
 
 def install_models(graph, *model_classes,  i_understand_rollback=False):

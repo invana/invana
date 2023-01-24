@@ -29,8 +29,8 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
         return created, elem[0] if elem.__len__() > 0 else None
 
     def get_or_none(self,label, **search_kwarg):
-        elem = self.search(has__label=label, **self.create_has_filters(**search_kwarg))\
-            .to_list()
+        search_kwarg['has__label'] = label
+        elem = self.search(**search_kwarg).to_list()
         return elem[0] if elem.__len__() > 0 else None
 
     def get_by_id(self, nodeId):
