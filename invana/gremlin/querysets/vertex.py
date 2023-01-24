@@ -7,7 +7,6 @@ from ..resultsets import GremlinQueryResultSet
 from gremlin_python.process.graph_traversal import __
 
 
-
 class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC):
 
     def create(self, label, **properties) -> GremlinQueryResultSet:
@@ -64,3 +63,55 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
 
     def bothe_label_stats_by_id(self, node_id):
         return self.search(has__id=node_id).get_traversal().bothE().groupCount().by(__.label()).toList()
+
+    def getNodeInComingNeighbors(self, node_id, *edge_labels, neighbors_labels=None):
+        """
+        p = Programming.objects.get_or_none(has__name="Django")
+        graph.connector.vertex.getNodeInComingNeighbors(p.id,).toList()        
+        """
+
+        _ =  self.search(has__id=node_id).get_traversal()
+        if edge_labels.__len__()> 0:
+            _.inE(*edge_labels)
+        else:
+            _.inE()
+        _.outV()            
+        if neighbors_labels:
+            _.hasLabel(*neighbors_labels)
+        return _.path().by(__.elementMap())
+
+
+    def getNodeOutGoingNeighbors(self, node_id, *edge_labels, neighbors_labels=None): # target_node_labels
+        """
+        p = Person.objects.get_or_none(has__first_name="rrmerugu")
+
+        graph.connector.vertex.getNodeOutGoingNeighbors(p.id, "has_role").toList()        
+        graph.connector.vertex.getNodeOutGoingNeighbors(p.id, "has_skill", neighbors_labels=["Programming"]).toList()
+        """
+        _ =  self.search(has__id=node_id).get_traversal()
+        if edge_labels.__len__()> 0:
+            _.outE(*edge_labels)
+        else:
+            _.outE()
+        _.inV()            
+        if neighbors_labels:
+            _.hasLabel(*neighbors_labels)
+        return _.path().by(__.elementMap())
+
+
+    def getNodeAllNeighbors(self, node_id, *edge_labels, neighbors_labels=None): # target_node_labels
+        """
+        p = Person.objects.get_or_none(has__first_name="rrmerugu")
+
+        graph.connector.vertex.getNodeAllNeighbors(p.id, "has_role").toList()        
+        graph.connector.vertex.getNodeAllNeighbors(p.id, "has_skill", "has_role").toList()
+        """
+        _ =  self.search(has__id=node_id).get_traversal()
+        if edge_labels.__len__()> 0:
+            _.bothE(*edge_labels)
+        else:
+            _.bothE()
+        _.bothV()            
+        if neighbors_labels:
+            _.hasLabel(*neighbors_labels)
+        return _.path().by(__.elementMap())
