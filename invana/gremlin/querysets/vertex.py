@@ -64,8 +64,10 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
     def bothe_label_stats_by_id(self, node_id):
         return self.search(has__id=node_id).get_traversal().bothE().groupCount().by(__.label()).toList()
 
-    def getNodeInComingNeighbors(self, node_id, *edge_labels, neighbors_labels=None):
+    def getNodeInComingNeighbors(self, node_id, *edge_labels, neighbor_labels=None):
+        #TODO - fix then method naming convention
         """
+    
         p = Programming.objects.get_or_none(has__name="Django")
         graph.connector.vertex.getNodeInComingNeighbors(p.id,).toList()        
         """
@@ -76,17 +78,18 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
         else:
             _.inE()
         _.outV()            
-        if neighbors_labels:
-            _.hasLabel(*neighbors_labels)
+        if neighbor_labels:
+            _.hasLabel(*neighbor_labels)
         return _.path().by(__.elementMap())
 
 
-    def getNodeOutGoingNeighbors(self, node_id, *edge_labels, neighbors_labels=None): # target_node_labels
+    def getNodeOutGoingNeighbors(self, node_id, *edge_labels, neighbor_labels=None): # target_node_labels
+        #TODO - fix then method naming convention
         """
         p = Person.objects.get_or_none(has__first_name="rrmerugu")
 
         graph.connector.vertex.getNodeOutGoingNeighbors(p.id, "has_role").toList()        
-        graph.connector.vertex.getNodeOutGoingNeighbors(p.id, "has_skill", neighbors_labels=["Programming"]).toList()
+        graph.connector.vertex.getNodeOutGoingNeighbors(p.id, "has_skill", neighbor_labels=["Programming"]).toList()
         """
         _ =  self.search(has__id=node_id).get_traversal()
         if edge_labels.__len__()> 0:
@@ -94,12 +97,13 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
         else:
             _.outE()
         _.inV()            
-        if neighbors_labels:
-            _.hasLabel(*neighbors_labels)
+        if neighbor_labels:
+            _.hasLabel(*neighbor_labels)
         return _.path().by(__.elementMap())
 
 
-    def getNodeAllNeighbors(self, node_id, *edge_labels, neighbors_labels=None): # target_node_labels
+    def getNodeAllNeighbors(self, node_id, *edge_labels, neighbor_labels=None): # target_node_labels
+        #TODO - fix then method naming convention
         """
         p = Person.objects.get_or_none(has__first_name="rrmerugu")
 
@@ -112,6 +116,8 @@ class GremlinVertexQuerySet(GremlinQuerySetBase, VertexCRUDQuerySetBase, abc.ABC
         else:
             _.bothE()
         _.bothV()            
-        if neighbors_labels:
-            _.hasLabel(*neighbors_labels)
+        if neighbor_labels:
+            _.hasLabel(*neighbor_labels)
         return _.path().by(__.elementMap())
+
+

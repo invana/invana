@@ -24,6 +24,28 @@ class InvanaTraversal(GraphTraversal):
         self.bytecode = GraphSearch.search(self.bytecode, **kwargs)
         return self
 
+    def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):
+        if direction not in ["in", "out", None]:
+            raise Exception("valid directions are 'in' or 'out' or None")
+        if direction == "in":
+            self.inE(*edge_labels)
+        elif direction == "out":
+            self.outE(*edge_labels)
+        elif direction is None:
+            self.bothE(*edge_labels)
+        # self.inV()            
+        # if neighbor_labels:
+        #     _.hasLabel(*neighbor_labels)
+        # return _.path().by(__.elementMap())            
+        return self
+
+
+    def to(self, *vertex_labels, **vertex_search_kwargs):
+        # vertex_labels
+        return self.get_traversal().search(**vertex_search_kwargs)
+
+
+
     def paginate(self, *args):
         self.bytecode = GraphSearch.paginate(self.bytecode, *args)
         return self
@@ -52,6 +74,11 @@ class __(AnonymousTraversal):
     @classmethod
     def search(cls, **kwargs):
         return cls.graph_traversal(None, None, Bytecode()).search(**kwargs)
+
+    @classmethod
+    def traverse_through(cls, *edge_labels,  direction="in", **edge_search_kwargs):
+        return cls.graph_traversal(None, None, Bytecode()) \
+            .traverse_through(*edge_labels,  direction=direction, **edge_search_kwargs)
 
     @classmethod
     def paginate(cls, *args):

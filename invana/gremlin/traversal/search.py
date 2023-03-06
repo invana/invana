@@ -53,6 +53,8 @@ class GraphSearch:
 
     @classmethod
     def search(cls, bytecode, **kwargs):
+        """
+        """
         kwargs = cls.reorder_kwargs(**kwargs)
         for k, v in kwargs.items():
             key_split_list = cls.split_key(k)

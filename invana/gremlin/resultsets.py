@@ -72,3 +72,9 @@ class GremlinQueryResultSet(QueryResultSetBase):
         self.get_traversal().range(*args)
         return self
 
+    def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):
+        return self.get_traversal().traverse_through(*edge_labels,  direction=direction, **edge_search_kwargs)
+
+    # def to(self, **vertex_search_kwargs):
+    #     return self.get_traversal().search(**vertex_search_kwargs)
+
