@@ -16,11 +16,17 @@ from gremlin_python.process.graph_traversal import GraphTraversal, GraphTraversa
 from gremlin_python.process.traversal import P, TextP, Bytecode, Cardinality
 from gremlin_python.process.graph_traversal import __ as AnonymousTraversal
 from .search import GraphSearch
-
+import copy
 
 class InvanaTraversal(GraphTraversal):
 
+
+    def clone(self):
+        return InvanaTraversal(self.graph, self.traversal_strategies, copy.deepcopy(self.bytecode))
+
     def search(self, **kwargs):
+        if kwargs.keys().__len__() == 0:
+            raise Exception("search() should have kwargs")
         self.bytecode = GraphSearch.search(self.bytecode, **kwargs)
         return self
 
@@ -40,10 +46,9 @@ class InvanaTraversal(GraphTraversal):
         return self
 
 
-    def to(self, *vertex_labels, **vertex_search_kwargs):
-        # vertex_labels
-        return self.get_traversal().search(**vertex_search_kwargs)
-
+    # def to(self, *vertex_labels, **vertex_search_kwargs):
+    #     vertex_search_kwargs['has__label__within'] = vertex_labels
+    #     return self.search(**vertex_search_kwargs)
 
 
     def paginate(self, *args):
@@ -76,9 +81,14 @@ class __(AnonymousTraversal):
         return cls.graph_traversal(None, None, Bytecode()).search(**kwargs)
 
     @classmethod
-    def traverse_through(cls, *edge_labels,  direction="in", **edge_search_kwargs):
+    def traverse_through(cls, *edge_labels,  direction=None, **edge_search_kwargs):
         return cls.graph_traversal(None, None, Bytecode()) \
             .traverse_through(*edge_labels,  direction=direction, **edge_search_kwargs)
+
+    # @classmethod
+    # def to(cls,  *vertex_labels, **vertex_search_kwargs):
+    #     return cls.graph_traversal(None, None, Bytecode()) \
+    #         .to( *vertex_labels, **vertex_search_kwargs)
 
     @classmethod
     def paginate(cls, *args):
@@ -112,3 +122,8 @@ class InvanaTraversalSource(GraphTraversalSource):
         traversal = self.get_graph_traversal()
         traversal.create_edge(label, from_vtx_id, to_vtx_id, **properties)
         return traversal
+ 
+    # def traverse_through(self, *edge_labels,  direction=None, **edge_search_kwargs):
+    #     traversal = self.get_graph_traversal()
+    #     traversal.traverse_through(*edge_labels,  direction=direction, **edge_search_kwargs)
+    #     return traversal
