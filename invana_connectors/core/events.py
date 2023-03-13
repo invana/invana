@@ -14,7 +14,8 @@
 
 import abc
 from abc import ABC
-from .base.constants import RequestStateTypes, GremlinServerErrorStatusCodes, QueryResponseStatusTypes
+from .base.constants import RequestStateTypes, QueryResponseStatusTypes
+from invana_connectors.gremlin.constants import GremlinServerErrorStatusCodes
 # from invana.connector.request import QueryRequest
 from .utils import create_uuid, get_datetime, get_elapsed_time
 import logging

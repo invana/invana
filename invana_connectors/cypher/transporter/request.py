@@ -12,26 +12,25 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 
-from gremlin_python.driver.protocol import GremlinServerError
-# from invana.helpers.utils import create_uuid, get_elapsed_time, get_datetime
 from invana_connectors.core.base.constants import RequestStateTypes, QueryResponseErrorReasonTypes
 from invana_connectors.core.events import ResponseReceivedButFailedEvent, ResponseReceivedSuccessfullyEvent, \
     RequestFinishedSuccessfullyEvent, RequestFinishedButFailedEvent, RequestStartedEvent, ServerDisconnectedErrorEvent, \
     RunTimeErrorEvent, ClientConnectorErrorEvent
 from invana_connectors.core.base.transporter import RequestBase
-from invana_connectors.gremlin.constants import GremlinServerErrorStatusCodes
+from ..constants import CypherServerErrorStatusCodes
+from neo4j.exceptions import ClientError
 
 
 
-class GremlinQueryRequest(RequestBase):
+class CypherQueryRequest(RequestBase):
     state = None
     status_last_updated_at = None
 
     def __repr__(self):
-        return f"<GremlinQueryRequest {self.request_id}>"
+        return f"<CypherQueryRequest {self.request_id}>"
 
     def __init__(self, query: str, request_options: dict = None):
-        super(GremlinQueryRequest, self).__init__()
+        super(CypherQueryRequest, self).__init__()
         self.query = query
         self.request_options = request_options or {}
         self.started()
@@ -42,14 +41,14 @@ class GremlinQueryRequest(RequestBase):
         self.update_last_updated_at()
         RequestStartedEvent(self)
 
-    def response_received_but_failed(self, exception: GremlinServerError):
+    def response_received_but_failed(self, exception: ClientError):
         self.state = RequestStateTypes.RESPONSE_RECEIVED
         self.update_last_updated_at()
         if hasattr(exception, "status_code"):
             error_reason = None
             gremlin_server_error = None
             if exception.status_code == 597:
-                gremlin_server_error = getattr(GremlinServerErrorStatusCodes, f"ERROR_{exception.status_code}")
+                gremlin_server_error = getattr(CypherServerErrorStatusCodes, f"ERROR_{exception.status_code}")
                 error_reason = QueryResponseErrorReasonTypes.INVALID_QUERY
                 ResponseReceivedButFailedEvent(self, exception.status_code, exception)
         else:
@@ -60,7 +59,7 @@ class GremlinQueryRequest(RequestBase):
         self.update_last_updated_at()
         ResponseReceivedSuccessfullyEvent(self, status_code)
 
-    def finished_with_failure(self, exception: GremlinServerError):
+    def finished_with_failure(self, exception: ClientError):
         self.state = RequestStateTypes.FINISHED
         self.update_last_updated_at()
         RequestFinishedButFailedEvent(self, exception)

@@ -13,6 +13,8 @@
 #     limitations under the License.
 from invana_connectors.core.base.connector import GraphConnectorBase
 from neo4j import GraphDatabase, READ_ACCESS
+from .transporter import CypherQueryRequest, CypherQueryResponse
+from neo4j.exceptions import ClientError
 import neo4j
 import logging
 logger = logging.getLogger(__name__)
@@ -44,8 +46,48 @@ class CypherConnectorBase(GraphConnectorBase):
         self.connection.close()
 
     def execute_query(self, query:str, timeout:int=None, raise_exception:bool= False, finished_callback=None ):
-        records, summary, keys = self.driver.execute_query(query,  {},
+        request = CypherQueryRequest(query)
+        try:
+            records, summary, keys = self.driver.execute_query(query,  {},
                                                         database_="neo4j",
                                                         routing_=neo4j.RoutingControl.READERS)
- 
+
+            return CypherQueryResponse(request.request_id, 200, data=records)
+        except ClientError as e:
+            request.response_received_but_failed(e)
+            request.finished_with_failure(e)
+            status_code, gremlin_server_error = self.process_error_exception(e)
+            e.args = [f"Failed to execute {request} with reason: {status_code}:{gremlin_server_error}"
+                      f" and error message {e.__str__()}"]
+            if raise_exception is True:
+                raise e
+            return CypherQueryResponse(request.request_id, 500, exception=e)
+        # except ServerDisconnectedError as e:
+        #     request.server_disconnected_error(e)
+        #     request.finished_with_failure(e)
+        #     if raise_exception is True:
+        #         raise Exception(f"Failed to execute {request} with error message {e.__str__()}")
+        #     return GremlinQueryResponse(request.request_id, 500, exception=e)
+        # except RuntimeError as e:
+        #     e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
+        #     request.runtime_error(e)
+        #     request.finished_with_failure(e)
+        #     if raise_exception is True:
+        #         raise e
+        #     return GremlinQueryResponse(request.request_id, None, exception=e)
+        # except ClientConnectorError as e:
+        #     e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
+        #     request.client_connection_error(e)
+        #     request.finished_with_failure(e)
+        #     if raise_exception is True:
+        #         raise e
+        #     return GremlinQueryResponse(request.request_id, 500, exception=e)
+        # except Exception as e:
+        #     e.args = [f"Failed to execute {request} with error message {e.__str__()}"]
+        #     request.response_received_but_failed(e)
+        #     request.finished_with_failure(e)
+        #     if raise_exception is True:
+        #         raise e
+        #     return GremlinQueryResponse(request.request_id, None, exception=e)
+
         return records

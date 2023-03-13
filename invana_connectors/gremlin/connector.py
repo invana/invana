@@ -19,10 +19,11 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.strategies import ReadOnlyStrategy
 from gremlin_python.driver.protocol import GremlinServerError
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection as _DriverRemoteConnection
-from invana_connectors.core.base.constants import GremlinServerErrorStatusCodes, ConnectionStateTypes
+from invana_connectors.core.base.constants import  ConnectionStateTypes
+from invana_connectors.gremlin.constants import GremlinServerErrorStatusCodes
 from invana_connectors.gremlin.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
-from .graphson_reader import INVANA_DESERIALIZER_MAP
+from .serializer.graphson_reader import INVANA_DESERIALIZER_MAP
 
 import logging
 from .transporter import GremlinQueryRequest
