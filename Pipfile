@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 gremlinpython = "==3.5.1"
 aiohttp = "==3.7.4"
+neo4j = "*"
 
 [dev-packages]
 pytest = "==6.2.5"
@@ -13,6 +14,7 @@ pytest-asyncio = "==0.16.0"
 pytest-cov = "*"
 tox = "*"
 pylint = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.8"

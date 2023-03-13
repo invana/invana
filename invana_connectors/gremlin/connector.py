@@ -23,7 +23,7 @@ from invana_connectors.core.base.constants import GremlinServerErrorStatusCodes,
 from invana_connectors.gremlin.traversal import InvanaTraversalSource
 from .utils import read_from_result_set_with_callback, read_from_result_set_with_out_callback
 from .graphson_reader import INVANA_DESERIALIZER_MAP
-from ..settings import DEFAULT_TIMEOUT
+
 import logging
 from .transporter import GremlinQueryRequest
 # from .querysets.vertex import GremlinVertexQuerySet
@@ -46,13 +46,15 @@ class GremlinConnectorBase(GraphConnectorBase):
     # vertex_cls: GremlinVertexQuerySet = GremlinVertexQuerySet
     # edge_cls: GremlinEdgeQuerySet = GremlinEdgeQuerySet
     # management_cls: GremlinGraphManagementQuerySet = GremlinGraphManagementQuerySet
-
+    connection = None
+    g = None
 
     def __init__(self, connection_uri: str,
+                 read_only_mode: bool = False,
+                 default_timeout: int = None,
+                 auth=None,
                  traversal_source: str = 'g',
                  strategies=None,
-                 read_only_mode: bool = False,
-                 timeout: int = None,
                  graph_traversal_source_cls=None,
                  call_from_event_loop=True,
                  deserializer_map=None,
@@ -73,15 +75,13 @@ class GremlinConnectorBase(GraphConnectorBase):
         # super(GremlinConnector, self).__init__(request)
 
 
-        self.CONNECTION_STATE = None
+        super().__init__(connection_uri=connection_uri, default_timeout=default_timeout,  is_readonly=read_only_mode)
         self.connection = None
         self.g = None
-        self.connection_uri = connection_uri
         self.traversal_source = traversal_source
         self.strategies = strategies or []
         self.graph_traversal_source_cls = InvanaTraversalSource if graph_traversal_source_cls is None \
             else graph_traversal_source_cls
-        self.timeout = DEFAULT_TIMEOUT if timeout is None else timeout
         if read_only_mode:
             self.strategies.append(ReadOnlyStrategy())
         if call_from_event_loop:
@@ -96,7 +96,7 @@ class GremlinConnectorBase(GraphConnectorBase):
 
  
     def _init_connection(self):
-        logger.debug(f"create driver connection  ")
+        logger.debug(f"create gremlin driver connection  ")
         self.connection = DriverRemoteConnection(
             self.connection_uri,
             traversal_source=self.traversal_source,
@@ -107,7 +107,7 @@ class GremlinConnectorBase(GraphConnectorBase):
         if self.strategies.__len__() > 0:
             self.g = self.g.withStrategies(*self.strategies)
         import time 
-        time.sleep(1)
+        time.sleep(1) # TODO - need fix for this.
 
     def _close_connection(self) -> None:
         self.connection.client.close()
@@ -163,7 +163,7 @@ class GremlinConnectorBase(GraphConnectorBase):
         """
 
         query_string = self.add_strategies_to_query(query)
-        timeout = self.timeout if timeout is None else timeout
+        timeout = self.default_timeout if timeout is None else timeout
         request_options = {"evaluationTimeout": timeout}
         request = GremlinQueryRequest(query)
         try:
