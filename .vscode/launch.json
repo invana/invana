@@ -13,7 +13,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONPATH" : "${workspaceRoot}",
-                "GREMLIN_SERVER_URL": "ws://megamind.local:8182/gremlin"
+                "GRAPH_CONNECTION_URL": "ws://megamind.local:8182/gremlin"
             },
             "console": "integratedTerminal",
             "justMyCode": true

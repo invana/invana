@@ -28,10 +28,10 @@ def get_install_requires():
 setup(
     name='invana',
     version='0.0.0',
-    description='Python API for Apache TinkerPop\'s Gremlin supported databases.',
+    description='Python API for modelling and querying knowledge graphs.',
     author='Ravi Raja Merugu',
     author_email='ravi@invana.io',
-    url='https://github.com/invanalabs/invana',
+    url='https://github.com/invana/invana',
     packages=find_packages(
         exclude=("dist", "docs", "tests", "examples")
     ),
