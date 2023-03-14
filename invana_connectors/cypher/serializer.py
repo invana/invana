@@ -19,6 +19,11 @@ class RecordsSerialiser:
         inv = self.serialize_neo4j_node_to_invana_node(rel._end_node)
         return RelationShip(rel.id, rel.type, outv, inv, properties=rel._properties)
 
+    def serialize_neo4j_others(self, r):
+        return r
+        # outv = self.serialize_neo4j_node_to_invana_node(rel._start_node)
+        # inv = self.serialize_neo4j_node_to_invana_node(rel._end_node)
+        # return RelationShip(rel.id, rel.type, outv, inv, properties=rel._properties)
 
 
 def convert_cypher_response_to_invana_objects(records):
@@ -37,6 +42,9 @@ def convert_cypher_response_to_invana_objects(records):
                 elif isinstance(r, Neo4jRelationship):
                     rel = serializer.serialize_neo4j_rel_to_invana_rel(r)
                     records_serialized.append(rel)
+                else:
+                    other = serializer.serialize_neo4j_others(r)
+                    records_serialized.append(other)
 
 
             
