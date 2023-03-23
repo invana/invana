@@ -7,8 +7,7 @@ from neo4j.graph import (
 from neo4j.data import Record
 
 
-class RecordsSerialiser:
-
+class Neo4jRecordsSerialiser:
 
     def serialize_neo4j_node_to_invana_node(self, node):
         labels = list(node.labels)
@@ -21,19 +20,12 @@ class RecordsSerialiser:
 
     def serialize_neo4j_others(self, r):
         return r
-        # outv = self.serialize_neo4j_node_to_invana_node(rel._start_node)
-        # inv = self.serialize_neo4j_node_to_invana_node(rel._end_node)
-        # return RelationShip(rel.id, rel.type, outv, inv, properties=rel._properties)
-
+  
 
 def convert_cypher_response_to_invana_objects(records):
-
-    serializer = RecordsSerialiser()
-
+    serializer = Neo4jRecordsSerialiser()
     records_serialized = []
     for record in records:
-        t = type(record)
-
         if isinstance(record, Record):
             for r in record:
                 if isinstance(r, Neo4jNode):
@@ -45,7 +37,38 @@ def convert_cypher_response_to_invana_objects(records):
                 else:
                     other = serializer.serialize_neo4j_others(r)
                     records_serialized.append(other)
-
-
-            
     return records_serialized
+
+
+class NeoModelResponseSerializer:
+
+    def get_properties(self, node):
+        properties = {} 
+        exclude_keys = ["id", "nodes"]
+        for p in node.__dir__():
+            if not p.startswith("_") and not callable(getattr(node, p)) and p not in exclude_keys:
+                properties[p] = getattr(node, p)
+        return properties
+    
+    def serialize_neo4model_node_to_invana_node(self, node):
+        properties =self.get_properties(node)
+        return Node(node.id, node.__class__.__name__, properties=properties)
+    
+
+def convert_neomodel_response_to_invana_objects(response):
+    serializer = NeoModelResponseSerializer()
+    records_serialized = []
+    if isinstance(response , list):
+        for record in response:
+            if isinstance(record, Record):
+                for r in record:
+                    if isinstance(r, Neo4jNode):
+                        node = serializer.serialize_neo4j_node_to_invana_node(r)
+                        records_serialized.append(node)
+                    elif isinstance(r, Neo4jRelationship):
+                        rel = serializer.serialize_neo4j_rel_to_invana_rel(r)
+                        records_serialized.append(rel)
+                    else:
+                        other = serializer.serialize_neo4j_others(r)
+                        records_serialized.append(other)
+    return serializer.serialize_neo4model_node_to_invana_node(response)

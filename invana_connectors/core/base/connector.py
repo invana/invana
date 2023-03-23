@@ -3,22 +3,23 @@ from typing import TYPE_CHECKING
 
 import abc
 import logging
-from .constants import ConnectionStateTypes
+from invana_connectors.core.base.constants import ConnectionStateTypes
 from invana_connectors.settings import DEFAULT_TIMEOUT
-# if TYPE_CHECKING:
-#     from .querysets.graph import  VertexCRUDQuerySetBase, EdgeCRUDQuerySetBase
+if TYPE_CHECKING:
+    from invana_connectors.querysets import  NodeQuerySetBase, RelationShipQuerySetBase
 #     from .querysets.management import GraphManagementQuerySetBase
 
 logger = logging.getLogger(__name__)
 
 
-class GraphConnectorBase:
+class GraphConnectorBase(object):
     
-    # vertex_cls: VertexCRUDQuerySetBase = NotImplemented
-    # edge_cls: EdgeCRUDQuerySetBase = NotImplemented
+    nodes_cls: NodeQuerySetBase = NotImplemented
+    relationships_cls: RelationShipQuerySetBase = NotImplemented
     # management_cls: GraphManagementQuerySetBase = NotImplemented
  
-
+    nodes: NodeQuerySetBase = None
+    relationships : RelationShipQuerySetBase = None
     def __init__(self, connection_uri:str, is_readonly=False, default_timeout=None, auth=None, **kwargs ) -> None:
         self.CONNECTION_STATE = None
         self.connection_uri = connection_uri
@@ -26,6 +27,13 @@ class GraphConnectorBase:
         self.auth = auth
         self.default_timeout = DEFAULT_TIMEOUT if default_timeout is None else default_timeout
 
+    def __new__(cls, *args, **kwargs):
+        instance = super(GraphConnectorBase, cls).__new__(cls)
+        # instance = cls(*args, **kwargs)
+        instance.nodes = instance.nodes_cls(instance)
+        instance.relationships  = instance.relationships_cls(instance)
+        return instance
+    
     # @property
     # @abc.abstractmethod
     # def connection_uri(self):
