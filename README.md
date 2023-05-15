@@ -15,7 +15,7 @@ Python API for modelling and querying knowledge graphs.
 
 ## Features
 
-- [x] Object Mapper - Models, PropertyTypes, and Form validation
+<!-- - [x] Object Mapper - Models, PropertyTypes, and Form validation
 - [x] Execute gremlin queries
 - [x] Built in QuerySets for performing standard CRUD operations on graph.
 - [x] Utilities for logging queries and performance.
@@ -23,7 +23,19 @@ Python API for modelling and querying knowledge graphs.
   Refer [search-usage.md](search-usage.md) for more)
 - [x] Index support
 - [ ] Query caching support
-- [ ] Asynchronous Python API.
+- [ ] Asynchronous Python API. -->
+ - [ ] Object Mapper - Models, PropertyTypes, and Form validation
+ - [ ] Execute gremlin and cypher queries
+ - [ ] Built in QuerySets for performing standard CRUD operations on graph.
+ - [ ] Utilities for logging queries and performance.
+ - [ ] Django-ORM like search when using OGM.
+ - [ ] Index support.
+ - [ ] Query caching support
+
+## Requirements
+
+ 1. graph database 
+ 2. Python 3.7+
 
 ## Installation
 
@@ -194,11 +206,22 @@ graph.close_connection()
 ## Setup test
 ```
 docker run --restart=unless-stopped -p 8182:8182 -d --name janusgraph janusgraph/janusgraph:latest
-docker run --restart=unless-stopped -p 8184:8182 -d --name janusgraph-1 janusgraph/janusgraph:latest
 ```
 ## Supported graph databases
 
 - [JanusGraph](https://janusgraph.org/)
+- [CosmosDB](https://azure.microsoft.com/en-us/products/cosmos-db/)
+- [Amazon Neptune](https://aws.amazon.com/neptune/)
+- [DSEGraph](https://www.datastax.com/products/datastax-graph)
+
+
+Working on supporting more databases:
+
+- [ArcadeDB](https://arcadedb.com)
+- [Neo4j](https://neo4j.com)
+
+
+
 
 [comment]: <> (- [DataStax Enterprise]&#40;https://www.datastax.com/products/datastax-enterprise&#41;)
 
