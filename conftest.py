@@ -1,7 +1,7 @@
 import pytest
 import os
 from invana.gremlin.connector import GremlinConnector
-from invana.janusgraph.connector import JanusGraphConnector
+from invana.backends.janusgraph.connector import JanusGraphConnector
 from invana import InvanaGraph
 
 

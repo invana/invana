@@ -15,7 +15,7 @@
 import logging
 from invana.graph import InvanaGraph
 from invana.gremlin.connector import GremlinConnector
-from invana.janusgraph.connector import JanusGraphConnector
+from invana.backends.janusgraph.connector import JanusGraphConnector
 
 logging.getLogger('asyncio').setLevel(logging.INFO)
 logging.basicConfig(
