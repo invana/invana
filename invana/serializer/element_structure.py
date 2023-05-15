@@ -55,6 +55,8 @@ class Node(ElementBase):
     def __repr__(self):
         return f'<Node:{self.label} id="{self.id}" {self.properties}>'
 
+    def __short_repr__(self):
+              return f'{self.label}::{self.id}'
 
 class RelationShip(ElementBase):
     inv = None
@@ -72,9 +74,9 @@ class RelationShip(ElementBase):
                 setattr(self.properties, k, v)
 
     def __repr__(self):
-        return f'<RelationShip:{self.label} id="{self.id}" ' \
-               f'{self.outv.id}:{self.outv.label} -> {self.label} -> {self.inv.id}:{self.inv.label}' \
-               f' {self.properties}>'
+        return f'<RelationShip:{self.label}::{self.id} ' \
+                f'({self.outv.__short_repr__()}) -> {self.label} -> ({self.inv.__short_repr__()})' \
+                f' {self.properties}>'
 
     def to_json(self):
         base_data = super(RelationShip, self).to_json()
