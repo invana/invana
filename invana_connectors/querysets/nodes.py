@@ -15,13 +15,13 @@ class NodeNonReturnableQuerySetBase(NonReturnableQuerySetBase):
     def create(self, label, **properties):
         raise NotImplementedError()
 
-    # @abc.abstractmethod
-    # def get_or_create(self, label, **properties):
-    #     raise NotImplementedError()
+    @abc.abstractmethod
+    def get_or_create(self, label, **properties):
+        raise NotImplementedError()
 
-    # @abc.abstractmethod
-    # def get_or_none(self, label, **properties):
-    #     raise NotImplementedError()
+    @abc.abstractmethod
+    def get_or_none(self, label, **properties):
+        raise NotImplementedError()
 
 
 

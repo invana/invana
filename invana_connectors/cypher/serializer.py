@@ -5,6 +5,7 @@ from neo4j.graph import (
     Relationship as Neo4jRelationship,
 )
 from neo4j.data import Record
+from neomodel.contrib import SemiStructuredNode
 
 
 class Neo4jRecordsSerialiser:
@@ -60,15 +61,16 @@ def convert_neomodel_response_to_invana_objects(response):
     records_serialized = []
     if isinstance(response , list):
         for record in response:
-            if isinstance(record, Record):
-                for r in record:
-                    if isinstance(r, Neo4jNode):
-                        node = serializer.serialize_neo4j_node_to_invana_node(r)
-                        records_serialized.append(node)
-                    elif isinstance(r, Neo4jRelationship):
-                        rel = serializer.serialize_neo4j_rel_to_invana_rel(r)
-                        records_serialized.append(rel)
-                    else:
-                        other = serializer.serialize_neo4j_others(r)
-                        records_serialized.append(other)
+            if isinstance(record, Node) or isinstance(record, RelationShip):
+                records_serialized.append(record)
+            if isinstance(record, SemiStructuredNode) or isinstance(record, SemiStructuredNode):
+                node = serializer.serialize_neo4model_node_to_invana_node(record)
+                records_serialized.append(node)
+            elif isinstance(record, Neo4jRelationship):
+                rel = serializer.serialize_neo4j_rel_to_invana_rel(record)
+                records_serialized.append(rel)
+            else:
+                other = serializer.serialize_neo4j_others(record)
+                records_serialized.append(other)
+        return records_serialized
     return serializer.serialize_neo4model_node_to_invana_node(response)

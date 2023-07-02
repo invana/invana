@@ -18,3 +18,15 @@ class NodeCypherQuerySet(NodeQuerySetBase):
         label_cls = get_or_create_class(label)
         return label_cls(**properties).save()
  
+    @serialize_neomodel_to_invana_objects
+    def get_or_create(self, label, **properties):
+        label_cls = get_or_create_class(label)
+        node = label_cls.nodes.get_or_none(**properties)
+        if node:
+            return node
+        return self.create(label, **properties)
+
+    @serialize_neomodel_to_invana_objects
+    def get_or_none(self, label, **properties):
+        label_cls = get_or_create_class(label)
+        return label_cls.nodes.get_or_none(**properties)
