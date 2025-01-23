@@ -101,7 +101,7 @@ export const TreeView: React.FC<TreeViewProps> = ({ searchable = false, ...props
 }
 
 export const TreeItem: React.FC<{ item: TreeItem }> = ({ item }) => {
-  const [isExpanded, setIsExpanded] = React.useState(item.isExpanded || true)
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(item.isExpanded || true)
   const hasChildren = item.children && item.children.length > 0
 
   return (
