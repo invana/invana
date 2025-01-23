@@ -22,6 +22,17 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true
+    },
+    "storybook-build": {
+      "cache": false,
+      "persistent": true,
+      "outputs": [
+        "storybook-static/**"
+      ]
     }
   }
 }

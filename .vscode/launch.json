@@ -25,6 +25,28 @@
         "build"
       ],
       "console": "integratedTerminal",
+    },
+    {
+      "name": "turbo:storybook",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "turbo",
+      "runtimeArgs": [
+        "run",
+        "storybook"
+      ],
+      "console": "integratedTerminal",
+    },
+    {
+      "name": "turbo:storybook-build",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "turbo",
+      "runtimeArgs": [
+        "run",
+        "storybook-build"
+      ],
+      "console": "integratedTerminal"
     }
   ]
 }
