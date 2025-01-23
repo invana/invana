@@ -24,7 +24,9 @@ export const DEFAULT_NODE_STYLE: NodeOptions = { // https://g6.antv.antgroup.com
 }
 
 export const DEFAULT_EDGE_STYLE: EdgeOptions = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
-  type: 'line',
+  // type: 'line',
+  type: 'cubic-vertical',
+
   style: {
     // labelText: (d) => {
     //   if (d.id) return d.id
