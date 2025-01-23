@@ -54,15 +54,11 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
     });
   };
 
-
-
   // graph.on('edge:contextmenu', (evt) => {
   //   const edge = evt.item;  // The edge on which the context menu was triggered
   //   console.log('Edge right-clicked:', edge);
   // });
   graph.on(NodeEvent.CONTEXT_MENU, handleNodeContextMenu);
-
-
   // React.useEffect(() => {
   //   //@ts-ignore
   //   graph.on(NodeEvent.CONTEXT_MENU, handleNodeContextMenu);
@@ -73,7 +69,6 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
   // }, [graph]);
 
   console.log("contextMenu graph", graph)
-
   console.log("=====contextMenuData.visible", contextMenuData.visible)
   return (
     <>

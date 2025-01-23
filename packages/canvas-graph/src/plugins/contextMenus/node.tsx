@@ -10,9 +10,8 @@ export class NodeContextMenu extends BaseContextMenu {
     this.graph.on(NodeEvent.CONTEXT_MENU, (evt: any) => {
       evt.preventDefault();
       console.log('CONTEXT_MENU event', evt);
-      //@ts-ignore
-      const { canvas, item } = evt;
-      console.log("CONTEXT_MENU canvasX, canvasY", canvas.x, canvas.y);
+      const { canvas, target } = evt;
+      console.log("CONTEXT_MENU canvasX, canvasY", canvas.x, canvas.y, target);
       const content = `
         <div style="padding: 8px; cursor: pointer;" data-action="edit">Edit Node</div>
         <div style="padding: 8px; cursor: pointer;" data-action="delete">Delete Node</div>

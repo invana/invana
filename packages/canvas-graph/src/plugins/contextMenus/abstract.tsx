@@ -8,10 +8,10 @@ export abstract class BaseContextMenu {
     this.container = document.createElement('div');
     this.container.style.position = 'absolute';
     this.container.style.display = 'none';
-    this.container.style.backgroundColor = '#fff';
-    this.container.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.15)';
-    this.container.style.borderRadius = '4px';
-    this.container.style.padding = '8px';
+    // this.container.style.backgroundColor = '#fff';
+    // this.container.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.15)';
+    // this.container.style.borderRadius = '4px';
+    // this.container.style.padding = '8px';
     this.container.style.zIndex = '1000';
     document.body.appendChild(this.container);
   }
