@@ -205,6 +205,8 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
+            asChild
+
             className="rounded-none"
             tooltip={<p>Force Layout</p>}
           >
@@ -215,6 +217,8 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
+            asChild
+
             className="rounded-none"
             tooltip={<p>Circlular Layout</p>}
           >
@@ -226,6 +230,8 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
+            asChild
+
             className="rounded-none"
             tooltip={<p>Grid Layout</p>}
           >
@@ -238,6 +244,7 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
+            asChild
             className="rounded-none rotate-270"
             tooltip={<p>Dagre Layout</p>}
           >
