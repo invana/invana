@@ -14,7 +14,6 @@ interface NodeContextMenuProps {
   className?: string;
 }
 
-
 export const menuItems: MenuItem[] = [
   {
     id: 'files',
@@ -65,15 +64,29 @@ export const menuItems: MenuItem[] = [
         id: 'notifications',
         label: 'Notifications',
         icon: Bell,
-        shortcut: '⌘N',
+        shortcut: '⌘N'
       }
     ]
   },
   {
     id: 'messages',
-    label: 'Messages',
+    label: 'graph algorithms',
     icon: Mail,
     shortcut: '⌘M',
+    children: [
+      {
+        id: 'shared',
+        label: 'Shared Files',
+        icon: FolderOpen,
+        shortcut: '⌘S',
+      },
+      {
+        id: 'recent',
+        label: 'Recent Files',
+        icon: File,
+        shortcut: '⌘R',
+      }
+    ]
   }
 ]
 
@@ -101,10 +114,10 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
   };
 
   const closeContextMenu = () => {
-    // setContextMenuData({
-    //   ...contextMenuData,
-    //   visible: false,
-    // });
+    setContextMenuData({
+      ...contextMenuData,
+      visible: false,
+    });
   };
 
   graph.on(NodeEvent.CONTEXT_MENU, handleNodeContextMenu);
@@ -132,7 +145,7 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
           onMouseLeave={closeContextMenu}
         >
           <Card>
-            <CardHeader>
+            <CardHeader className=''>
               <CardTitle className='break-words'>{contextMenuData?.data?.label as string}</CardTitle>
               {/* {contextMenuData?.data?.style?.x ?? 0}, {contextMenuData?.data?.style?.y ?? 0} */}
               <CardDescription className='text-xs'>
