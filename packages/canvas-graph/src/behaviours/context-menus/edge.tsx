@@ -141,10 +141,17 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
     this.container.style.left = `${client.x + padding.x}px`;
     this.container.style.top = `${client.y + padding.y}px`;
     this.container.style.display = 'block';
-    const tooltipElement = document.querySelector('#EdgeTooltipBehavior') as HTMLElement;
-    console.log("EdgeContextMenuBehavior -> showContainer -> tooltipElement", tooltipElement)
-    if (tooltipElement) {
-      tooltipElement.style.display = 'none';
+    const div = document.querySelector('#EdgeTooltipBehavior') as HTMLElement;
+    console.log("EdgeContextMenuBehavior -> showContainer -> div", div)
+    if (div) {
+      div.style.display = 'none';
+    }
+  }
+
+  hideCanvasContextMenu = () => {
+    const div = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
+    if (div) {
+      div.style.display = 'none';
     }
   }
 
@@ -160,6 +167,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
       />
     } />)
     this.showContainer(event);
+    this.hideCanvasContextMenu()
   }
 
 

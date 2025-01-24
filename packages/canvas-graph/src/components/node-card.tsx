@@ -17,7 +17,7 @@ export const NodeCard: React.FC<NodeCardSmallProps> = ({ node, extra, showProper
   return (
     <Card className=" shadow-lg w-[260px]">
       <CardHeader className=''>
-        <CardTitle className='break-words'>{node?.label as string}</CardTitle>
+        <CardTitle className='break-words text-xl'>{node?.label as string}</CardTitle>
         <CardDescription className='text-xs'>
           <div><strong>ID:</strong> {node?.id}</div>
           <div><strong>Label:</strong> {node?.data?.type || 'N/A'}</div>

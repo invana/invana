@@ -62,20 +62,34 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.container.style.display = 'block';
   }
 
+  hideCanvasContextMenu = () => {
+    const div = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
+    if (div) {
+      div.style.display = 'none';
+    }
+  }
+
   onEdgeMouseOver(event: IPointerEvent) {
     console.log("===onEdgeMouseOver", event)
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
     this.onMouseMove(event)
-    this.root.render(<EdgeCard edge={edge} showProperties={true} />)
+    this.root.render(
+      <EdgeCard
+        edge={edge}
+        showProperties={false}
+        extra={
+          <p className='text-xs pl-4 pr-4 pb-4'>(right-click on edge for more options)</p>
+        } />
+    )
     graph.on(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
     graph.on(EdgeEvent.POINTER_OUT, () => {
       graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
       this.hideContainer();
     });
     graph.on(EdgeEvent.CONTEXT_MENU, this.onContextMenu.bind(this));
-
+    this.hideCanvasContextMenu();
   }
 
   onContextMenu = (e: IPointerEvent) => {

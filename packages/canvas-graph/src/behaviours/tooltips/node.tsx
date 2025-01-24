@@ -68,6 +68,13 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     this.hideContainer();
   }
 
+  hideCanvasContextMenu = () => {
+    const div = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
+    if (div) {
+      div.style.display = 'none';
+    }
+  }
+
   onNodeMouseOver = (event: IPointerEvent) => {
     const { graph } = this.context;
     console.log("onNodeMouseOver", event)
@@ -76,7 +83,14 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     console.log("NodeEvent.POINTER_OVER node", node)
     this.onNodeMouseMove(event)
 
-    this.root.render(<NodeCard node={node} showProperties={true} />)
+    this.root.render(
+      <NodeCard
+        node={node}
+        showProperties={false}
+        extra={
+          <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>
+        } />
+    )
 
     graph.on(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
 
@@ -84,6 +98,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
 
     graph.on(NodeEvent.CONTEXT_MENU, this.onContextMenu);
 
+    this.hideCanvasContextMenu();
   }
 
   hideContainer = () => {

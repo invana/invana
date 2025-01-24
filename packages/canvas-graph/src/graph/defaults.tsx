@@ -25,7 +25,8 @@ export const defaultOptions: GraphOptions = {
     'tooltip-node',
     'tooltip-edge',
     'node-context-menu',
-    'edge-context-menu'
+    'edge-context-menu',
+    'canvas-context-menu'
   ],
   transforms: [
     MAP_NODE_SIZE

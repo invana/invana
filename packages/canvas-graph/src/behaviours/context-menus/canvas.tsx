@@ -1,14 +1,12 @@
-import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
+import { BaseBehavior, CanvasEvent } from '@antv/g6';
+import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
-import { ICanvasNode } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
-import { NodeCard } from '@invana/canvas-graph/components/node-card';
 import React from 'react';
 
 
-export interface NodeContextMenuOptions extends BaseBehaviorOptions {
+export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
   className?: string;
   menuItems: MenuItem[];
 }
@@ -83,19 +81,19 @@ export const menuItems: MenuItem[] = [
   }
 ]
 
-export class NodeContextMenuBehavior extends BaseBehavior {
+export class CanvasContextMenuBehavior extends BaseBehavior {
 
   container!: HTMLElement;
   root!: Root
 
-  constructor(context: RuntimeContext, options: NodeContextMenuOptions) {
+  constructor(context: RuntimeContext, options: CanvasContextMenuOptions) {
     super(context, options);
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
   }
 
-  public update(options: Partial<NodeContextMenuOptions>): void {
+  public update(options: Partial<CanvasContextMenuOptions>): void {
     this.unbindEvents();
     super.update(options);
     this.bindEvents();
@@ -104,12 +102,11 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
   createContainer() {
     this.container = document.createElement('div');
-    this.container.id = 'NodeContextMenuBehavior';
+    this.container.id = 'CanvasContextMenuBehavior';
     this.container.style.position = 'absolute';
     this.container.style.zIndex = '1000';
     document.body.prepend(this.container);
   }
-
 
   onPointerMover = (event: IPointerEvent) => {
     this.hideContainer();
@@ -117,19 +114,16 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
   bindEvents() {
     const { graph } = this.context;
-    graph.on(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
+    graph.on(CanvasEvent.CONTEXT_MENU, this.onCanvasContextMenu.bind(this));
     graph.on(CanvasEvent.CLICK, () => this.hideContainer());
-    graph.on(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
-    graph.on(NodeEvent.POINTER_MOVE, this.onPointerMover.bind(this));
+    // graph.on(CanvasEvent.POINTER_LEAVE, this.hideContainer);
   }
 
 
   unbindEvents() {
     const { graph } = this.context;
-    graph.off(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
+    graph.off(CanvasEvent.CONTEXT_MENU, this.onCanvasContextMenu.bind(this));
     graph.off(CanvasEvent.CLICK, () => this.hideContainer());
-    graph.off(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
-    graph.off(NodeEvent.POINTER_MOVE, this.onPointerMover.bind(this));
   }
 
   hideContainer = () => {
@@ -141,46 +135,17 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     this.container.style.left = `${client.x + padding.x}px`;
     this.container.style.top = `${client.y + padding.y}px`;
     this.container.style.display = 'block';
-    const div = document.querySelector('#NodeTooltipBehavior') as HTMLElement;
-    console.log("NodeContextMenuBehavior -> showContainer -> div", div)
-    if (div) {
-      div.style.display = 'none';
-    }
+
   }
 
-  hideCanvasContextMenu = () => {
-    const div = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
-    if (div) {
-      div.style.display = 'none';
-    }
-  }
-
-  onNodeContextMenu(event: IPointerEvent) {
+  onCanvasContextMenu(event: IPointerEvent) {
     event.preventDefault();
-    const { graph } = this.context;
-    const nodeId = ((event.target as unknown) as HTMLElement).id as string;
-    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
-    this.root.render(<NodeCard node={node} extra={
-      <NestedMenu
-        className='rounded-none w-[260px] shadow-none p-0 border-none'
-        menuItems={menuItems}
-      />
-    } />)
+    this.root.render(< NestedMenu
+      className='w-[260px] bg-white rounded-md pl-0 pr-0 pt-2 pb-2 shadow-sm'
+      menuItems={menuItems}
+    />)
     this.showContainer(event);
-    this.hideCanvasContextMenu()
   }
-
-
-  // onNodeMouseLeave(event: IPointerEvent) {
-  //   // const { graph } = this.context;
-  //   this.hideContainer();
-  // }
-
-
-
-  // onMouseMove(event: IPointerEvent) {
-  //   this.showContainer(event);
-  // }
 
   destroy() {
     this.root.unmount();
