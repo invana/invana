@@ -1,13 +1,15 @@
 import { BaseBehavior, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
-import { Card, CardDescription, CardHeader, CardTitle } from '@invana/ui';
 import { ICanvasNode } from '@invana/data-store';
 import { createRoot } from 'react-dom/client';
 import React from 'react';
+import { NodeCard } from '../components/node-card';
 
 export interface TooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
 }
+
+
 
 export class TooltipBehavior extends BaseBehavior<TooltipBehaviorOptions> {
   constructor(context: RuntimeContext, options: TooltipBehaviorOptions) {
@@ -44,18 +46,7 @@ export class TooltipBehavior extends BaseBehavior<TooltipBehaviorOptions> {
       console.log("NodeEvent.POINTER_OVER node", node)
       onMouseMove(event)
 
-
-      root.render(
-        <Card className=" shadow-lg">
-          <CardHeader className=''>
-            <CardTitle className='break-words'>{node?.label as string}</CardTitle>
-            <CardDescription className='text-xs'>
-              <div><strong>ID:</strong> {node?.id}</div>
-              <div><strong>Label:</strong> {node?.data?.type || 'N/A'}</div>
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )
+      root.render(<NodeCard node={node} />)
 
       graph.on(NodeEvent.POINTER_MOVE, onMouseMove);
 

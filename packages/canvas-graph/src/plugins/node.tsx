@@ -7,6 +7,7 @@ import { Graph, IElementEvent, NodeData, NodeEvent } from '@antv/g6';
 import { ICanvasNode } from '@invana/data-store';
 import { ContextMenuBase } from './abstract';
 import { File, FolderOpen, Bell, Shield, Mail, Settings, Users } from 'lucide-react'
+import { NodeCard } from '../components/node-card';
 
 
 interface NodeContextMenuProps {
@@ -132,11 +133,10 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
   // console.log("=====contextMenuData", contextMenuData)
   return (
     <>
-      {contextMenuData.visible && (
+      {contextMenuData.visible && contextMenuData.data && (
         <div
           style={{
             position: 'absolute',
-            width: 240,
             top: contextMenuData.y,
             left: contextMenuData.x,
             zIndex: 10000,
@@ -144,20 +144,10 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
           }}
           onMouseLeave={closeContextMenu}
         >
-          <Card>
-            <CardHeader className=''>
-              <CardTitle className='break-words'>{contextMenuData?.data?.label as string}</CardTitle>
-              {/* {contextMenuData?.data?.style?.x ?? 0}, {contextMenuData?.data?.style?.y ?? 0} */}
-              <CardDescription className='text-xs'>
-                <div><strong>ID:</strong> {contextMenuData?.data?.id}</div>
-                <div><strong>Label:</strong> {contextMenuData?.data?.data?.type || 'N/A'}</div>
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className='text-sm p-0'>
-              <NestedMenu className='rounded-none p-0 border-none' menuItems={menuItems} />
-            </CardContent>
-          </Card>
+          <NodeCard
+            node={contextMenuData.data}
+            extra={<NestedMenu className='rounded-none p-0 border-none' menuItems={menuItems} />}
+          />
         </div>
       )}
     </>
