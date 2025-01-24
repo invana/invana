@@ -19,16 +19,16 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
     visible: boolean;
     x: number;
     y: number;
-    nodeData: (NodeData & { data?: ICanvasNode }) | null;
+    data: (NodeData & { data?: ICanvasNode }) | null;
   }>({
     visible: false,
     x: 0,
     y: 0,
-    nodeData: null,
+    data: null,
   });
 
   const handleNodeContextMenu = (e: IElementEvent) => {
-    // e.preventDefault();
+    e.preventDefault();
     e.originalEvent.stopPropagation()
     e.originalEvent.preventDefault()
 
@@ -47,7 +47,7 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
       visible: true,
       x: client.x,
       y: client.y,
-      nodeData: node,
+      data: node,
     });
   };
 
@@ -84,15 +84,15 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
         >
           <Card>
             <CardHeader>
-              <CardTitle className='text-xl'>{contextMenuData?.nodeData?.label as string}</CardTitle>
-              {contextMenuData?.nodeData?.style?.x ?? 0}, {contextMenuData?.nodeData?.style?.y ?? 0}
+              <CardTitle className='text-xl'>{contextMenuData?.data?.label as string}</CardTitle>
+              {contextMenuData?.data?.style?.x ?? 0}, {contextMenuData?.data?.style?.y ?? 0}
             </CardHeader>
 
             <CardContent>
               <div>
                 {/* <h3 className="font-bold ">Node Information</h3> */}
-                <p><strong>ID:</strong> {contextMenuData?.nodeData?.id}</p>
-                <p><strong>Label:</strong> {contextMenuData?.nodeData?.data?.type || 'N/A'}</p>
+                <p><strong>ID:</strong> {contextMenuData?.data?.id}</p>
+                <p><strong>Label:</strong> {contextMenuData?.data?.data?.type || 'N/A'}</p>
                 {/* <p className="text-gray-600">Right-click menu actions can go here.</p> */}
               </div>
             </CardContent>
