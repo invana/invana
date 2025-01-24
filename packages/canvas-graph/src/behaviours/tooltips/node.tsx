@@ -25,13 +25,13 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
 
   bindEvents() {
     const { graph } = this.context;
-    graph.on(NodeEvent.POINTER_OVER, this.onMouseOver);
+    graph.on(NodeEvent.POINTER_OVER, this.onNodeMouseOver);
   }
 
   unbindEvents() {
     const { graph } = this.context;
-    graph.off(NodeEvent.POINTER_OVER, this.onMouseOver);
-    graph.off(NodeEvent.POINTER_MOVE, this.onMouseMove);
+    graph.off(NodeEvent.POINTER_OVER, this.onNodeMouseOver);
+    graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
     graph.off(NodeEvent.CONTEXT_MENU, this.onContextMenu);
   }
 
@@ -43,40 +43,42 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     document.body.appendChild(this.container);
   }
 
-
-
-  onMouseMove = (e: IPointerEvent) => {
-    const { client } = e;
-    this.container.style.left = `${client.x + 10}px`;
-    this.container.style.top = `${client.y + 10}px`;
+  showContainer = (event: IPointerEvent, padding: { x: number, y: number } = { x: 0, y: 0 }) => {
+    const { client } = event;
+    this.container.style.left = `${client.x + padding.x}px`;
+    this.container.style.top = `${client.y + padding.y}px`;
     this.container.style.display = 'block';
+  }
+
+  onNodeMouseMove = (event: IPointerEvent) => {
+    this.showContainer(event, { x: 10, y: 10 });
   };
 
   onContextMenu = (event: IPointerEvent) => {
     console.log("onContextMenu", event)
     const { graph } = this.context;
-    graph.off(NodeEvent.POINTER_MOVE, this.onMouseMove);
+    graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
     graph.off(NodeEvent.CONTEXT_MENU, this.onContextMenu);
-    this.hideTooltip();
+    this.hideContainer();
   }
 
   onMoueLeave = (event: IPointerEvent) => {
     const { graph } = this.context;
-    graph.off(NodeEvent.POINTER_MOVE, this.onMouseMove);
-    this.hideTooltip();
+    graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
+    this.hideContainer();
   }
 
-  onMouseOver = (event: IPointerEvent) => {
+  onNodeMouseOver = (event: IPointerEvent) => {
     const { graph } = this.context;
-    console.log("onMouseOver", event)
+    console.log("onNodeMouseOver", event)
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
     console.log("NodeEvent.POINTER_OVER node", node)
-    this.onMouseMove(event)
+    this.onNodeMouseMove(event)
 
     this.root.render(<NodeCard node={node} />)
 
-    graph.on(NodeEvent.POINTER_MOVE, this.onMouseMove);
+    graph.on(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
 
     graph.on(NodeEvent.POINTER_OUT, this.onMoueLeave);
 
@@ -84,13 +86,14 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
 
   }
 
-  hideTooltip = () => {
+  hideContainer = () => {
     this.container.style.display = 'none';
   }
 
-
-  destroy(): void {
+  destroy() {
     this.root.unmount();
+    document.body.removeChild(this.container);
     this.unbindEvents();
   }
+
 }
