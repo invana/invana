@@ -110,20 +110,26 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     document.body.prepend(this.container);
   }
 
+
+  onPointerMover = (event: IPointerEvent) => {
+    this.hideContainer();
+  }
+
   bindEvents() {
     const { graph } = this.context;
     graph.on(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
     graph.on(CanvasEvent.CLICK, () => this.hideContainer());
     graph.on(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
-
+    graph.on(NodeEvent.POINTER_MOVE, this.onPointerMover.bind(this));
   }
+
 
   unbindEvents() {
     const { graph } = this.context;
     graph.off(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
     graph.off(CanvasEvent.CLICK, () => this.hideContainer());
     graph.off(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
-
+    graph.off(NodeEvent.POINTER_MOVE, this.onPointerMover.bind(this));
   }
 
   hideContainer = () => {
@@ -135,6 +141,11 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     this.container.style.left = `${client.x + padding.x}px`;
     this.container.style.top = `${client.y + padding.y}px`;
     this.container.style.display = 'block';
+    const tooltipElement = document.querySelector('#NodeTooltipBehavior') as HTMLElement;
+    console.log("NodeContextMenuBehavior -> showContainer -> tooltipElement", tooltipElement)
+    if (tooltipElement) {
+      tooltipElement.style.display = 'none';
+    }
   }
 
   onNodeContextMenu(event: IPointerEvent) {

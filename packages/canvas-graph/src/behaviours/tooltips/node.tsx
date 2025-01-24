@@ -31,7 +31,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
   unbindEvents() {
     const { graph } = this.context;
     graph.off(NodeEvent.POINTER_OVER, this.onNodeMouseOver);
-    graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
+    // graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
     graph.off(NodeEvent.CONTEXT_MENU, this.onContextMenu);
   }
 
