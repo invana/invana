@@ -1,47 +1,58 @@
-import G6, { BaseBehavior } from '@antv/g6';
+import { BaseBehavior, EdgeEvent } from '@antv/g6';
 import { Card } from '@invana/ui';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import type { BaseBehaviorOptions, RuntimeContext } from '@antv/g6';
+import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 
 
-export interface TooltipOptions extends BaseBehaviorOptions {
+export interface EdgeTooltipOptions extends BaseBehaviorOptions {
   className?: string;
 }
 
 
-export class TooltipBehavior extends BaseBehavior {
+export class EdgeTooltipBehavior extends BaseBehavior {
   private tooltipContainer: HTMLElement | null = null;
 
-  constructor(context: RuntimeContext, options: TooltipOptions) {
-    console.log("==TooltipBehavior", TooltipBehavior)
+  constructor(context: RuntimeContext, options: EdgeTooltipOptions) {
+    console.log("==EdgeTooltipBehavior", EdgeTooltipBehavior)
     super(context, options);
     // Create a container for the tooltip
     this.tooltipContainer = document.createElement('div');
-    this.tooltipContainer.id = 'TooltipBehavior';
+    this.tooltipContainer.id = 'EdgeTooltipBehavior';
     this.tooltipContainer.style.position = 'absolute';
     this.tooltipContainer.style.pointerEvents = 'none';
     document.body.appendChild(this.tooltipContainer);
+    this.events = [
+      [EdgeEvent.POINTER_OVER, this.onEdgeMouseEnter.bind(this)],
+      [EdgeEvent.POINTER_OUT, this.onEdgeMouseLeave.bind(this)],
+      [EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this)],
+    ];
   }
 
-  getEvents() {
-    return {
-      'node:mouseenter': 'onNodeMouseEnter',
-      'node:mouseleave': 'onNodeMouseLeave',
-      'mousemove': 'onMouseMove',
-    };
+  // events = [
+  //   // const events: { [key: string]: (evt: IPointerEvent) => void } = {}
+  //   // events[EdgeEvent.POINTER_OVER] = this.onEdgeMouseEnter
+  //   // events[EdgeEvent.POINTER_OUT] = this.onEdgeMouseLeave
+  //   // events[EdgeEvent.POINTER_MOVE] = this.onMouseMove
+
+  //   // return events
+  //   // return [
+  //   // mouseOver: this.onEdgeMouseEnter,
+  //   ['edge:pointerover', this.onEdgeMouseEnter],
+  //   //   'node:mouseleave': 'onEdgeMouseLeave',
+  //   //   'mousemove': 'onMouseMove',
+  //   // ];
+  // ]
+
+  private onEdgeMouseEnter(evt: IPointerEvent) {
+    console.log("===onEdgeMouseEnter", evt)
+    // if (item) {
+    //   const model = item.getModel();
+    //   this.updateTooltip(true, evt.canvasX, evt.canvasY, model);
+    // }
   }
 
-  private onNodeMouseEnter(evt: { item: any; canvasX: number; canvasY: number }) {
-    console.log("===onNodeMouseEnter", evt)
-    const { item } = evt;
-    if (item) {
-      const model = item.getModel();
-      this.updateTooltip(true, evt.canvasX, evt.canvasY, model);
-    }
-  }
-
-  private onNodeMouseLeave() {
+  private onEdgeMouseLeave() {
     this.updateTooltip(false);
   }
 
@@ -80,4 +91,3 @@ export class TooltipBehavior extends BaseBehavior {
   }
 }
 
-export default TooltipBehavior;

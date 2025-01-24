@@ -8,8 +8,8 @@ import { GraphManager } from '../graphManager';
 import { ICanvasData } from '@invana/data-store';
 // import { NodeContextMenu } from '../plugins/contextMenus/node';
 import { NodeContextMenu } from '../plugins/node';
-import { TooltipBehavior } from '../behaviours';
-// import TooltipBehavior from '../behaviours/tooltip';
+import { NodeTooltipBehavior, EdgeTooltipBehavior } from '../behaviours';
+// import NodeTooltipBehavior from '../behaviours/tooltip';
 // import { CanvasToolBar } from '../plugins/';
 
 
@@ -32,7 +32,8 @@ import { TooltipBehavior } from '../behaviours';
 
 
 
-register(ExtensionCategory.BEHAVIOR, 'custom-behavior', TooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
 
 export interface CanvasGraphProps {
   initialData: ICanvasData;

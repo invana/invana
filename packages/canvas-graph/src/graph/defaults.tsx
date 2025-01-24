@@ -22,7 +22,8 @@ export const defaultOptions: GraphOptions = {
     HOVER_ACTIVATE,
     CLICK_SELECT,
     BRUSH_SELECT,
-    'custom-behavior'
+    'tooltip-node',
+    'tooltip-edge'
   ],
   transforms: [
     MAP_NODE_SIZE
