@@ -2,7 +2,10 @@ import { BaseBehavior, EdgeEvent } from '@antv/g6';
 import { Card } from '@invana/ui';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
+import type { BaseBehaviorOptions, EdgeData, IPointerEvent, RuntimeContext } from '@antv/g6';
+import { createRoot, Root } from 'react-dom/client';
+import { ICanvasEdge } from '@invana/data-store';
+import { NodeCard } from '@invana/canvas-graph/components/node-card';
 
 
 export interface EdgeTooltipOptions extends BaseBehaviorOptions {
@@ -11,63 +14,104 @@ export interface EdgeTooltipOptions extends BaseBehaviorOptions {
 
 
 export class EdgeTooltipBehavior extends BaseBehavior {
-  private tooltipContainer: HTMLElement | null = null;
+
+  container!: HTMLElement;
+  root!: Root
 
   constructor(context: RuntimeContext, options: EdgeTooltipOptions) {
     console.log("==EdgeTooltipBehavior", EdgeTooltipBehavior)
     super(context, options);
-    // Create a container for the tooltip
-    this.tooltipContainer = document.createElement('div');
-    this.tooltipContainer.id = 'EdgeTooltipBehavior';
-    this.tooltipContainer.style.position = 'absolute';
-    this.tooltipContainer.style.pointerEvents = 'none';
-    document.body.appendChild(this.tooltipContainer);
-    this.events = [
-      [EdgeEvent.POINTER_OVER, this.onEdgeMouseEnter.bind(this)],
-      [EdgeEvent.POINTER_OUT, this.onEdgeMouseLeave.bind(this)],
-      [EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this)],
-    ];
+    this.createContainer();
+    this.root = createRoot(this.container);
+    this.bindEvents();
   }
 
-  // events = [
-  //   // const events: { [key: string]: (evt: IPointerEvent) => void } = {}
-  //   // events[EdgeEvent.POINTER_OVER] = this.onEdgeMouseEnter
-  //   // events[EdgeEvent.POINTER_OUT] = this.onEdgeMouseLeave
-  //   // events[EdgeEvent.POINTER_MOVE] = this.onMouseMove
 
-  //   // return events
-  //   // return [
-  //   // mouseOver: this.onEdgeMouseEnter,
-  //   ['edge:pointerover', this.onEdgeMouseEnter],
-  //   //   'node:mouseleave': 'onEdgeMouseLeave',
-  //   //   'mousemove': 'onMouseMove',
-  //   // ];
-  // ]
-
-  private onEdgeMouseEnter(evt: IPointerEvent) {
-    console.log("===onEdgeMouseEnter", evt)
-    // if (item) {
-    //   const model = item.getModel();
-    //   this.updateTooltip(true, evt.canvasX, evt.canvasY, model);
-    // }
+  public update(options: Partial<EdgeTooltipOptions>): void {
+    this.unbindEvents();
+    super.update(options);
+    this.bindEvents();
+    // this.onToggleVisibility({} as IEvent);
   }
 
-  private onEdgeMouseLeave() {
-    this.updateTooltip(false);
+
+  createContainer() {
+    this.container = document.createElement('div');
+    this.container.id = 'EdgeTooltipBehavior';
+    this.container.style.position = 'absolute';
+    this.container.style.pointerEvents = 'none';
+    document.body.appendChild(this.container);
   }
 
-  private onMouseMove(evt: { canvasX: number; canvasY: number }) {
-    if (this.tooltipContainer?.style.display === 'block') {
-      this.updateTooltip(true, evt.canvasX, evt.canvasY);
-    }
+  bindEvents() {
+    const { graph } = this.context;
+    graph.on(EdgeEvent.POINTER_OVER, this.onEdgeMouseOver.bind(this));
+    graph.on(EdgeEvent.POINTER_OUT, this.onEdgeMouseLeave.bind(this));
+    graph.on(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+  }
+
+  unbindEvents() {
+    const { graph } = this.context;
+    graph.off(EdgeEvent.POINTER_OVER, this.onEdgeMouseOver.bind(this));
+    graph.off(EdgeEvent.POINTER_OUT, this.onEdgeMouseLeave.bind(this));
+    graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+  }
+
+  hideTooltip = () => {
+    this.container.style.display = 'none';
+  }
+
+  private onEdgeMouseOver(event: IPointerEvent) {
+    console.log("===onEdgeMouseOver", event)
+    const { graph } = this.context;
+    console.log("onMouseOver", event)
+    const edgeId = ((event.target as unknown) as HTMLElement).id as string;
+    const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
+    console.log("EdgeEvent.POINTER_OVER node", edge)
+    this.onMouseMove(event)
+
+    this.root.render(<NodeCard node={edge} />)
+
+    graph.on(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+
+    graph.on(EdgeEvent.POINTER_OUT, () => {
+      graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+      this.hideTooltip();
+    });
+
+    graph.on(EdgeEvent.CONTEXT_MENU, this.onContextMenu.bind(this));
+
+  }
+
+  onContextMenu = (e: IPointerEvent) => {
+    console.log("onContextMenu", e)
+    const { graph } = this.context;
+    graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+    graph.off(EdgeEvent.CONTEXT_MENU, this.onContextMenu.bind(this));
+    this.hideTooltip();
+  }
+
+  private onEdgeMouseLeave(event: IPointerEvent) {
+    console.log("===onEdgeMouseLeave", event)
+    const { graph } = this.context;
+    graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
+    this.hideTooltip();
+  }
+
+  private onMouseMove(event: IPointerEvent) {
+    console.log("===onMouseMove", event)
+    const { client } = event;
+    this.container.style.left = `${client.x + 10}px`;
+    this.container.style.top = `${client.y + 10}px`;
+    this.container.style.display = 'block';
   }
 
   private updateTooltip(visible: boolean, x?: number, y?: number, model?: any) {
-    if (this.tooltipContainer) {
-      this.tooltipContainer.style.display = visible ? 'block' : 'none';
+    if (this.container) {
+      this.container.style.display = visible ? 'block' : 'none';
       if (visible && x !== undefined && y !== undefined) {
-        this.tooltipContainer.style.left = `${x + 10}px`;
-        this.tooltipContainer.style.top = `${y + 10}px`;
+        this.container.style.left = `${x + 10}px`;
+        this.container.style.top = `${y + 10}px`;
 
         ReactDOM.render(
           visible && model ? (
@@ -76,17 +120,17 @@ export class EdgeTooltipBehavior extends BaseBehavior {
               <p>{model.info || 'No additional information available.'}</p>
             </Card>
           ) : <></>,
-          this.tooltipContainer
+          this.container
         );
       }
     }
   }
 
   destroy() {
-    if (this.tooltipContainer) {
-      ReactDOM.unmountComponentAtNode(this.tooltipContainer);
-      document.body.removeChild(this.tooltipContainer);
-      this.tooltipContainer = null;
+    if (this.container) {
+      ReactDOM.unmountComponentAtNode(this.container);
+      document.body.removeChild(this.container);
+      this.container = null;
     }
   }
 }
