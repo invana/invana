@@ -76,7 +76,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     console.log("NodeEvent.POINTER_OVER node", node)
     this.onNodeMouseMove(event)
 
-    this.root.render(<NodeCard node={node} />)
+    this.root.render(<NodeCard node={node} showProperties={true} />)
 
     graph.on(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
 
