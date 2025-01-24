@@ -114,6 +114,7 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     const { graph } = this.context;
     graph.on(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
     graph.on(CanvasEvent.CLICK, () => this.hideContainer());
+    graph.on(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
 
   }
 
@@ -121,6 +122,8 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     const { graph } = this.context;
     graph.off(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
     graph.off(CanvasEvent.CLICK, () => this.hideContainer());
+    graph.off(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
+
   }
 
   hideContainer = () => {
