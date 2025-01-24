@@ -1,6 +1,6 @@
 import { GraphOptions } from '@antv/g6';
 import { defaultLayoutsOptions } from './layouts';
-import { DRAG_CANVAS, ZOOM_CANVAS, DRAG_ELEMENT, HOVER_ACTIVATE, CLICK_SELECT, BRUSH_SELECT } from '../options/behaviors';
+import { DRAG_CANVAS, ZOOM_CANVAS, DRAG_ELEMENT, HOVER_ACTIVATE, CLICK_SELECT, LASSO_SELECT } from '../options/behaviors';
 import { MAP_NODE_SIZE } from '../options/transforms';
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 import { HISTORY_PLUGIN, MINIMAP_PLUGIN, TOOLTIP_PLUGIN } from '../options/plugins';
@@ -16,12 +16,12 @@ export const defaultOptions: GraphOptions = {
   autoFit: 'view', // 'view' | 'graph' | 'center'
   animation: false,
   behaviors: [
-    DRAG_CANVAS,
+    // DRAG_CANVAS,
     ZOOM_CANVAS,
     DRAG_ELEMENT,
     HOVER_ACTIVATE,
     CLICK_SELECT,
-    BRUSH_SELECT,
+    LASSO_SELECT,
     'tooltip-node',
     'tooltip-edge',
     'node-context-menu',

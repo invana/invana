@@ -24,8 +24,15 @@ export const CLICK_SELECT = {
   trigger: ['shift'],
 }
 
-export const BRUSH_SELECT = {
-  type: 'brush-select',
-  immediately: true,
-  mode: 'default',
+export const LASSO_SELECT = {
+  key: 'lasso-select',
+  type: 'lasso-select',
+  mode: 'diff',
+  trigger: 'shift',
+  style: {
+    fill: '#00f',
+    fillOpacity: 0.1,
+    stroke: '#0ff',
+    lineWidth: 2,
+  },
 }
