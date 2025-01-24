@@ -21,7 +21,8 @@ export const defaultOptions: GraphOptions = {
     // DRAG_ELEMENT,
     HOVER_ACTIVATE,
     CLICK_SELECT,
-    BRUSH_SELECT
+    BRUSH_SELECT,
+    'custom-behavior'
   ],
   transforms: [
     MAP_NODE_SIZE
@@ -35,7 +36,7 @@ export const defaultOptions: GraphOptions = {
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
     // GRID_PLUGIN
-    TOOLTIP_PLUGIN
+    // TOOLTIP_PLUGIN
   ],
   data: {
     nodes: [],

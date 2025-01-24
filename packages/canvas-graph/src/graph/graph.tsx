@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
-import { Graph, GraphOptions } from '@antv/g6';
+import { ExtensionCategory, Graph, GraphOptions, register } from '@antv/g6';
 import { defaultOptions } from './defaults';
 // import { GraphStore } from '../graphStore';
 import { CanvasToolBar } from '../plugins';
@@ -8,6 +8,8 @@ import { GraphManager } from '../graphManager';
 import { ICanvasData } from '@invana/data-store';
 // import { NodeContextMenu } from '../plugins/contextMenus/node';
 import { NodeContextMenu } from '../plugins/node';
+import { TooltipBehavior } from '../plugins/tooltip';
+// import TooltipBehavior from '../behaviours/tooltip';
 // import { CanvasToolBar } from '../plugins/';
 
 
@@ -27,6 +29,10 @@ import { NodeContextMenu } from '../plugins/node';
 //     </>
 //   );
 // }
+
+
+
+register(ExtensionCategory.BEHAVIOR, 'custom-behavior', TooltipBehavior, true);
 
 export interface CanvasGraphProps {
   initialData: ICanvasData;
@@ -137,6 +143,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
         () => removeEventListener("contextmenu", handleContextMenu));
     };
   }, []);
+
+
 
   return (
     <div style={props?.style || {}} className='graph-canvas'>
