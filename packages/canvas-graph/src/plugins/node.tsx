@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@invana/ui';
-import { Graph, NodeEvent } from '@antv/g6';
+import { Card, CardContent, CardHeader, CardTitle } from '@invana/ui';
+import { Graph, IElementEvent, NodeData, NodeEvent } from '@antv/g6';
 import { ICanvasNode } from '@invana/data-store';
 
 
@@ -19,7 +19,7 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
     visible: boolean;
     x: number;
     y: number;
-    nodeData: ICanvasNode | null;
+    nodeData: (NodeData & { data?: ICanvasNode }) | null;
   }>({
     visible: false,
     x: 0,
@@ -27,16 +27,26 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
     nodeData: null,
   });
 
-  const handleNodeContextMenu = (e: any) => {
-    e.preventDefault();
+  const handleNodeContextMenu = (e: IElementEvent) => {
+    // e.preventDefault();
+    e.originalEvent.stopPropagation()
+    e.originalEvent.preventDefault()
+
+    const node = graph.getNodeData(e.target.id) as (NodeData & { data?: ICanvasNode });
+
+
+    // graph.setElementState(node.id, 'dragging', false);
     console.log("handleNodeContextMenu -> e", e)
-    const { canvas } = e;
-    const node = graph.getNodeData(e.target.id);
-    console.log('handleNodeContextMenu CONTEXT_MENU event', e, canvas, node);
+    const { canvas, client } = e;
+    console.log('handleNodeContextMenu CONTEXT_MENU event', e, canvas, client, node,);
+    console.log("nodeStyle", node.style, node?.style?.x)
+    // const point = graph.getClientByCanvas({ x: node?.clientX ?? 0, y: node?.clientY ?? 0 });
+    // console.log("nodeStyle, point", point)
+
     setContextMenuData({
       visible: true,
-      x: canvas.x,
-      y: canvas.y,
+      x: client.x,
+      y: client.y,
       nodeData: node,
     });
   };
@@ -64,20 +74,26 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
         <div
           style={{
             position: 'absolute',
+            width: 240,
             top: contextMenuData.y,
             left: contextMenuData.x,
-            zIndex: 10,
+            zIndex: 10000,
             pointerEvents: 'auto',
           }}
           onMouseLeave={closeContextMenu}
         >
           <Card>
+            <CardHeader>
+              <CardTitle className='text-xl'>{contextMenuData?.nodeData?.label as string}</CardTitle>
+              {contextMenuData?.nodeData?.style?.x ?? 0}, {contextMenuData?.nodeData?.style?.y ?? 0}
+            </CardHeader>
+
             <CardContent>
               <div>
-                <h3 className="font-bold text-2xl">Node Information</h3>
+                {/* <h3 className="font-bold ">Node Information</h3> */}
                 <p><strong>ID:</strong> {contextMenuData?.nodeData?.id}</p>
                 <p><strong>Label:</strong> {contextMenuData?.nodeData?.data?.type || 'N/A'}</p>
-                <p className="text-gray-600">Right-click menu actions can go here.</p>
+                {/* <p className="text-gray-600">Right-click menu actions can go here.</p> */}
               </div>
             </CardContent>
           </Card>
