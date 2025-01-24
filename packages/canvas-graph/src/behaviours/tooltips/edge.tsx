@@ -106,31 +106,11 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.container.style.display = 'block';
   }
 
-  private updateTooltip(visible: boolean, x?: number, y?: number, model?: any) {
-    if (this.container) {
-      this.container.style.display = visible ? 'block' : 'none';
-      if (visible && x !== undefined && y !== undefined) {
-        this.container.style.left = `${x + 10}px`;
-        this.container.style.top = `${y + 10}px`;
-
-        ReactDOM.render(
-          visible && model ? (
-            <Card className="p-4 shadow-lg">
-              <h4 className="text-lg font-semibold">{model.label || 'Node'}</h4>
-              <p>{model.info || 'No additional information available.'}</p>
-            </Card>
-          ) : <></>,
-          this.container
-        );
-      }
-    }
-  }
-
   destroy() {
     if (this.container) {
-      ReactDOM.unmountComponentAtNode(this.container);
+      this.root.unmount();
       document.body.removeChild(this.container);
-      this.container = null;
+      this.unbindEvents();
     }
   }
 }
