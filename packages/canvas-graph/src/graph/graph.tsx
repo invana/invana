@@ -10,6 +10,7 @@ import { ICanvasData } from '@invana/data-store';
 import { NodeContextMenu } from '../plugins/node';
 import { NodeTooltipBehavior, EdgeTooltipBehavior } from '../behaviours';
 import { NodeContextMenuBehavior } from '../behaviours/context-menus/node';
+import { EdgeContextMenuBehavior } from '../behaviours/context-menus/edge';
 // import NodeTooltipBehavior from '../behaviours/tooltip';
 // import { CanvasToolBar } from '../plugins/';
 
@@ -36,6 +37,7 @@ import { NodeContextMenuBehavior } from '../behaviours/context-menus/node';
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 
 
 

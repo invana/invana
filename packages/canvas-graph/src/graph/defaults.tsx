@@ -24,7 +24,8 @@ export const defaultOptions: GraphOptions = {
     BRUSH_SELECT,
     'tooltip-node',
     'tooltip-edge',
-    'node-context-menu'
+    'node-context-menu',
+    'edge-context-menu'
   ],
   transforms: [
     MAP_NODE_SIZE
