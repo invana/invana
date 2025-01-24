@@ -33,8 +33,8 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.container = document.createElement('div');
     this.container.id = 'EdgeTooltipBehavior';
     this.container.style.position = 'absolute';
-    this.container.style.pointerEvents = 'none';
-    document.body.appendChild(this.container);
+    // this.container.style.pointerEvents = 'none';
+    document.body.prepend(this.container);
   }
 
   bindEvents() {

@@ -1,0 +1,170 @@
+import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
+import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
+import { createRoot, Root } from 'react-dom/client';
+import { ICanvasNode } from '@invana/data-store';
+import { MenuItem, NestedMenu } from '@invana/ui';
+import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
+import { NodeCard } from '@invana/canvas-graph/components/node-card';
+import React from 'react';
+
+
+export interface NodeContextMenuOptions extends BaseBehaviorOptions {
+  className?: string;
+  menuItems: MenuItem[];
+}
+
+export const menuItems: MenuItem[] = [
+  {
+    id: 'files',
+    label: 'Incoming',
+    icon: FolderOpen,
+    shortcut: '⌘F',
+    children: [
+      {
+        id: 'shared',
+        label: 'Shared Files',
+        icon: FolderOpen,
+        shortcut: '⌘S',
+      },
+      {
+        id: 'recent',
+        label: 'Recent Files',
+        icon: FileText,
+        shortcut: '⌘R',
+      }
+    ]
+  },
+  {
+    id: 'settings',
+    label: 'OutGoing',
+    icon: Settings,
+    shortcut: '⌘,',
+    children: [
+      {
+        id: 'account',
+        label: 'Account Settings',
+        icon: Users,
+        children: [
+          {
+            id: 'profile',
+            label: 'Profile',
+            icon: Users,
+            shortcut: '⌘P'
+          },
+          {
+            id: 'security',
+            label: 'Security',
+            icon: Shield,
+            shortcut: '⌘L'
+          }
+        ]
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        icon: Bell,
+        shortcut: '⌘N'
+      }
+    ]
+  },
+  {
+    id: 'messages',
+    label: 'graph algorithms',
+    icon: Mail,
+    shortcut: '⌘M',
+    children: [
+      {
+        id: 'shared',
+        label: 'Shared Files',
+        icon: FolderOpen,
+        shortcut: '⌘S',
+      }
+    ]
+  }
+]
+
+export class NodeContextMenuBehavior extends BaseBehavior {
+
+  container!: HTMLElement;
+  root!: Root
+
+  constructor(context: RuntimeContext, options: NodeContextMenuOptions) {
+    super(context, options);
+    this.createContainer();
+    this.root = createRoot(this.container);
+    this.bindEvents();
+  }
+
+  public update(options: Partial<NodeContextMenuOptions>): void {
+    this.unbindEvents();
+    super.update(options);
+    this.bindEvents();
+    // this.onToggleVisibility({} as IEvent);
+  }
+
+  createContainer() {
+    this.container = document.createElement('div');
+    this.container.id = 'NodeContextMenuBehavior';
+    this.container.style.position = 'absolute';
+    this.container.style.zIndex = '1000';
+    document.body.prepend(this.container);
+  }
+
+  bindEvents() {
+    const { graph } = this.context;
+    graph.on(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
+    graph.on(CanvasEvent.CLICK, () => this.hideContainer());
+
+  }
+
+  unbindEvents() {
+    const { graph } = this.context;
+    graph.off(NodeEvent.CONTEXT_MENU, this.onNodeContextMenu.bind(this));
+    graph.off(CanvasEvent.CLICK, () => this.hideContainer());
+  }
+
+  hideContainer = () => {
+    this.container.style.display = 'none';
+  }
+
+  showContainer = (event: IPointerEvent, padding: { x: number, y: number } = { x: 0, y: 0 }) => {
+    const { client } = event;
+    this.container.style.left = `${client.x + padding.x}px`;
+    this.container.style.top = `${client.y + padding.y}px`;
+    this.container.style.display = 'block';
+  }
+
+  onNodeContextMenu(event: IPointerEvent) {
+    event.preventDefault();
+    const { graph } = this.context;
+    const nodeId = ((event.target as unknown) as HTMLElement).id as string;
+    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+    this.root.render(<NodeCard node={node} extra={
+      <NestedMenu
+        className='rounded-none w-[260px] shadow-none p-0 border-none'
+        menuItems={menuItems}
+      />
+    } />)
+    this.showContainer(event);
+  }
+
+
+  // onNodeMouseLeave(event: IPointerEvent) {
+  //   // const { graph } = this.context;
+  //   this.hideContainer();
+  // }
+
+
+
+  // onMouseMove(event: IPointerEvent) {
+  //   this.showContainer(event);
+  // }
+
+  destroy() {
+    this.root.unmount();
+    document.body.removeChild(this.container);
+    this.unbindEvents();
+  }
+
+}
+

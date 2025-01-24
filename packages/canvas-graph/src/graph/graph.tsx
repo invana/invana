@@ -9,6 +9,7 @@ import { ICanvasData } from '@invana/data-store';
 // import { NodeContextMenu } from '../plugins/contextMenus/node';
 import { NodeContextMenu } from '../plugins/node';
 import { NodeTooltipBehavior, EdgeTooltipBehavior } from '../behaviours';
+import { NodeContextMenuBehavior } from '../behaviours/context-menus/node';
 // import NodeTooltipBehavior from '../behaviours/tooltip';
 // import { CanvasToolBar } from '../plugins/';
 
@@ -34,6 +35,9 @@ import { NodeTooltipBehavior, EdgeTooltipBehavior } from '../behaviours';
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
+
+
 
 export interface CanvasGraphProps {
   initialData: ICanvasData;
@@ -150,7 +154,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   return (
     <div style={props?.style || {}} className='graph-canvas'>
       {graph && header && <CanvasToolBar getGraph={() => graph} />}
-      {graph && <NodeContextMenu getGraph={() => graph} />}
+      {/* {graph && <NodeContextMenu getGraph={() => graph} />} */}
 
       <MemoizedGraphin
         ref={localRef}

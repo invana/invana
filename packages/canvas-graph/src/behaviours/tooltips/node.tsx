@@ -39,7 +39,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     this.container = document.createElement('div');
     this.container.id = 'NodeTooltipBehavior';
     this.container.style.position = 'absolute';
-    this.container.style.pointerEvents = 'none';
+    // this.container.style.pointerEvents = 'none';
     document.body.appendChild(this.container);
   }
 
