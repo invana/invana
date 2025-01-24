@@ -8,7 +8,7 @@ import { GraphManager } from '../graphManager';
 import { ICanvasData } from '@invana/data-store';
 // import { NodeContextMenu } from '../plugins/contextMenus/node';
 import { NodeContextMenu } from '../plugins/node';
-import { TooltipBehavior } from '../plugins/tooltip';
+import { TooltipBehavior } from '../behaviours';
 // import TooltipBehavior from '../behaviours/tooltip';
 // import { CanvasToolBar } from '../plugins/';
 

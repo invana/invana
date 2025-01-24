@@ -1,0 +1,1 @@
+export { TooltipBehavior } from "./tooltip";

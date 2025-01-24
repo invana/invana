@@ -1,83 +1,71 @@
-import G6, { BaseBehavior } from '@antv/g6';
-import { Card } from '@invana/ui';
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import type { BaseBehaviorOptions, RuntimeContext } from '@antv/g6';
+import { BaseBehavior, NodeEvent } from '@antv/g6';
+import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
+import { Card, CardDescription, CardHeader, CardTitle } from '@invana/ui';
+import { ICanvasNode } from '@invana/data-store';
+import { createRoot } from 'react-dom/client';
+import React from 'react';
 
-
-export interface TooltipOptions extends BaseBehaviorOptions {
+export interface TooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
 }
 
-
-export class TooltipBehavior extends BaseBehavior {
-  private tooltipContainer: HTMLElement | null = null;
-
-  constructor(context: RuntimeContext, options: TooltipOptions) {
-    console.log("==TooltipBehavior", TooltipBehavior)
+export class TooltipBehavior extends BaseBehavior<TooltipBehaviorOptions> {
+  constructor(context: RuntimeContext, options: TooltipBehaviorOptions) {
     super(context, options);
-    // Create a container for the tooltip
-    this.tooltipContainer = document.createElement('div');
-    this.tooltipContainer.id = 'TooltipBehavior';
-    this.tooltipContainer.style.position = 'absolute';
-    this.tooltipContainer.style.pointerEvents = 'none';
-    document.body.appendChild(this.tooltipContainer);
-  }
+    const tooltip = document.createElement('div');
+    tooltip.id = 'TooltipBehavior';
+    tooltip.style.position = 'absolute';
+    const root = createRoot(tooltip);
 
-  getEvents() {
-    return {
-      'node:mouseenter': 'onNodeMouseEnter',
-      'node:mouseleave': 'onNodeMouseLeave',
-      'mousemove': 'onMouseMove',
+    const onMouseMove = (e: IPointerEvent) => {
+      const { client } = e;
+      tooltip.style.left = `${client.x + 10}px`;
+      tooltip.style.top = `${client.y + 10}px`;
+      tooltip.style.display = 'block';
     };
-  }
 
-  private onNodeMouseEnter(evt: { item: any; canvasX: number; canvasY: number }) {
-    console.log("===onNodeMouseEnter", evt)
-    const { item } = evt;
-    if (item) {
-      const model = item.getModel();
-      this.updateTooltip(true, evt.canvasX, evt.canvasY, model);
+    const onContextMenu = (e: IPointerEvent) => {
+      console.log("onContextMenu", e)
+      graph.off(NodeEvent.POINTER_MOVE, onMouseMove);
+      graph.off(NodeEvent.CONTEXT_MENU, onContextMenu);
+      hideTooltip();
     }
-  }
 
-  private onNodeMouseLeave() {
-    this.updateTooltip(false);
-  }
-
-  private onMouseMove(evt: { canvasX: number; canvasY: number }) {
-    if (this.tooltipContainer?.style.display === 'block') {
-      this.updateTooltip(true, evt.canvasX, evt.canvasY);
+    const hideTooltip = () => {
+      tooltip.style.display = 'none';
     }
-  }
 
-  private updateTooltip(visible: boolean, x?: number, y?: number, model?: any) {
-    if (this.tooltipContainer) {
-      this.tooltipContainer.style.display = visible ? 'block' : 'none';
-      if (visible && x !== undefined && y !== undefined) {
-        this.tooltipContainer.style.left = `${x + 10}px`;
-        this.tooltipContainer.style.top = `${y + 10}px`;
+    document.body.appendChild(tooltip);
 
-        ReactDOM.render(
-          visible && model ? (
-            <Card className="p-4 shadow-lg">
-              <h4 className="text-lg font-semibold">{model.label || 'Node'}</h4>
-              <p>{model.info || 'No additional information available.'}</p>
-            </Card>
-          ) : <></>,
-          this.tooltipContainer
-        );
-      }
-    }
-  }
+    const { graph } = this.context;
+    graph.on(NodeEvent.POINTER_OVER, (event: IPointerEvent) => {
+      const nodeId = ((event.target as unknown) as HTMLElement).id as string;
+      const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+      console.log("NodeEvent.POINTER_OVER node", node)
+      onMouseMove(event)
 
-  destroy() {
-    if (this.tooltipContainer) {
-      ReactDOM.unmountComponentAtNode(this.tooltipContainer);
-      document.body.removeChild(this.tooltipContainer);
-      this.tooltipContainer = null;
-    }
+
+      root.render(
+        <Card className=" shadow-lg">
+          <CardHeader className=''>
+            <CardTitle className='break-words'>{node?.label as string}</CardTitle>
+            <CardDescription className='text-xs'>
+              <div><strong>ID:</strong> {node?.id}</div>
+              <div><strong>Label:</strong> {node?.data?.type || 'N/A'}</div>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )
+
+      graph.on(NodeEvent.POINTER_MOVE, onMouseMove);
+
+      graph.on(NodeEvent.POINTER_OUT, () => {
+        graph.off(NodeEvent.POINTER_MOVE, onMouseMove);
+        hideTooltip();
+      });
+
+      graph.on(NodeEvent.CONTEXT_MENU, onContextMenu);
+
+    });
   }
 }
-
-export default TooltipBehavior;
