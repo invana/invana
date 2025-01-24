@@ -16,7 +16,7 @@ interface EdgeCardSmallProps {
 export const EdgeCard: React.FC<EdgeCardSmallProps> = ({ edge, extra, showProperties = false }) => {
   console.log("EdgeCard edge", edge)
   return (
-    <Card className=" shadow-lg w-[240px]">
+    <Card className=" shadow-lg w-[260px]">
       <CardHeader className=''>
         <CardTitle className='break-words'>{edge?.label as string}</CardTitle>
         <CardDescription className='text-xs'>

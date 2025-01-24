@@ -15,7 +15,7 @@ interface NodeCardSmallProps {
 
 export const NodeCard: React.FC<NodeCardSmallProps> = ({ node, extra, showProperties = false }) => {
   return (
-    <Card className=" shadow-lg w-[240px]">
+    <Card className=" shadow-lg w-[260px]">
       <CardHeader className=''>
         <CardTitle className='break-words'>{node?.label as string}</CardTitle>
         <CardDescription className='text-xs'>
