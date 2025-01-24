@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@invana/ui';
-import React from 'react';
+
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -35,58 +35,54 @@ export const Basic: Story = {
   },
 };
 
+export const CardWithFooter: Story = {
+  args: {
+    // primary: true,
+    className: 'secondary',
+    children: (
+      <>
+        <CardHeader>
+          <CardTitle>Card with Footer</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>This card includes a footer for additional actions or information.</p>
+        </CardContent>
+        <CardFooter>
+          <button className="btn btn-primary">Action</button>
+        </CardFooter>
+      </>
+    ),
+  },
+};
 
+export const InteractiveCard: Story = {
+  args: {
+    className: 'max-w-md  hover:shadow-lg cursor-pointer transition-shadow',
+    children: (
+      <>
+        <CardHeader>
+          <CardTitle>Interactive Card</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Hover over this card to see the interactive shadow effect.</p>
+        </CardContent>
+      </>
+    ),
+  },
+};
 
-
-
-// // Card with Footer
-// export const WithFooter = Template.bind({});
-// WithFooter.args = {
-//   className: "max-w-md p-4",
-//   children: (
-//     <>
-//       <CardHeader>
-//         <CardTitle>Card with Footer</CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         <p>This card includes a footer for additional actions or information.</p>
-//       </CardContent>
-//       <CardFooter>
-//         <button className="btn btn-primary">Action</button>
-//       </CardFooter>
-//     </>
-//   ),
-// };
-
-
-// // Interactive Card
-// export const Interactive = Template.bind({});
-// Interactive.args = {
-//   className: "max-w-md p-4 hover:shadow-lg cursor-pointer transition-shadow",
-//   children: (
-//     <>
-//       <CardHeader>
-//         <CardTitle>Interactive Card</CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         <p>Hover over this card to see the interactive shadow effect.</p>
-//       </CardContent>
-//     </>
-//   ),
-// };
-
-// // Custom Styled Card
-// export const CustomStyled = Template.bind({});
-// CustomStyled.args = {
-//   className: "max-w-md p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg",
-//   children: (
-//     <>
-//       <CardHeader>
-//         <CardTitle>Custom Styled Card</CardTitle>
-//       </CardHeader>
-//       <CardContent>
-//         <p>This card uses a gradient background and custom text styling.</p>
-//       </CardContent>
-//     </>
-//   ),
-// };
+export const CustomStyledCard: Story = {
+  args: {
+    className: 'max-w-md p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg',
+    children: (
+      <>
+        <CardHeader>
+          <CardTitle>Custom Styled Card</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>This card uses a gradient background and custom text styling.</p>
+        </CardContent>
+      </>
+    ),
+  },
+};

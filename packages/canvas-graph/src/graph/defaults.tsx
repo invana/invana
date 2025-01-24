@@ -18,7 +18,7 @@ export const defaultOptions: GraphOptions = {
   behaviors: [
     DRAG_CANVAS,
     ZOOM_CANVAS,
-    DRAG_ELEMENT,
+    // DRAG_ELEMENT,
     HOVER_ACTIVATE,
     CLICK_SELECT,
     BRUSH_SELECT

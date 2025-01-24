@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@invana/ui';
+import {
+  Card, CardContent, CardDescription, CardHeader,
+  CardTitle, MenuItem, NestedMenu
+} from '@invana/ui';
 import { Graph, IElementEvent, NodeData, NodeEvent } from '@antv/g6';
 import { ICanvasNode } from '@invana/data-store';
+import { ContextMenuBase } from './abstract';
+import { File, FolderOpen, Bell, Shield, Mail, Settings, Users } from 'lucide-react'
 
 
 interface NodeContextMenuProps {
@@ -9,40 +14,84 @@ interface NodeContextMenuProps {
   className?: string;
 }
 
+
+export const menuItems: MenuItem[] = [
+  {
+    id: 'files',
+    label: 'Incoming',
+    icon: FolderOpen,
+    shortcut: '⌘F',
+    children: [
+      {
+        id: 'shared',
+        label: 'Shared Files',
+        icon: FolderOpen,
+        shortcut: '⌘S',
+      },
+      {
+        id: 'recent',
+        label: 'Recent Files',
+        icon: File,
+        shortcut: '⌘R',
+      }
+    ]
+  },
+  {
+    id: 'settings',
+    label: 'OutGoing',
+    icon: Settings,
+    shortcut: '⌘,',
+    children: [
+      {
+        id: 'account',
+        label: 'Account Settings',
+        icon: Users,
+        children: [
+          {
+            id: 'profile',
+            label: 'Profile',
+            icon: Users,
+            shortcut: '⌘P'
+          },
+          {
+            id: 'security',
+            label: 'Security',
+            icon: Shield,
+            shortcut: '⌘L'
+          }
+        ]
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        icon: Bell,
+        shortcut: '⌘N',
+      }
+    ]
+  },
+  {
+    id: 'messages',
+    label: 'Messages',
+    icon: Mail,
+    shortcut: '⌘M',
+  }
+]
+
+export type ContextMenuData = ContextMenuBase<(NodeData & { data?: ICanvasNode })>
+
 export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, className }) => {
   console.log("NodeContextMenu -> getGraph", getGraph, className)
-  // const { graph } = React.useContext(GraphinContext);
   const graph = getGraph();
-  console.log("NodeContextMenu -> graph", graph)
-
-  const [contextMenuData, setContextMenuData] = useState<{
-    visible: boolean;
-    x: number;
-    y: number;
-    data: (NodeData & { data?: ICanvasNode }) | null;
-  }>({
-    visible: false,
-    x: 0,
-    y: 0,
-    data: null,
+  const [contextMenuData, setContextMenuData] = useState<ContextMenuData>({
+    visible: false, x: 0, y: 0, data: null,
   });
 
   const handleNodeContextMenu = (e: IElementEvent) => {
     e.preventDefault();
     e.originalEvent.stopPropagation()
     e.originalEvent.preventDefault()
-
     const node = graph.getNodeData(e.target.id) as (NodeData & { data?: ICanvasNode });
-
-
-    // graph.setElementState(node.id, 'dragging', false);
-    console.log("handleNodeContextMenu -> e", e)
-    const { canvas, client } = e;
-    console.log('handleNodeContextMenu CONTEXT_MENU event', e, canvas, client, node,);
-    console.log("nodeStyle", node.style, node?.style?.x)
-    // const point = graph.getClientByCanvas({ x: node?.clientX ?? 0, y: node?.clientY ?? 0 });
-    // console.log("nodeStyle, point", point)
-
+    const { client } = e;
     setContextMenuData({
       visible: true,
       x: client.x,
@@ -52,10 +101,10 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
   };
 
   const closeContextMenu = () => {
-    setContextMenuData({
-      ...contextMenuData,
-      visible: false,
-    });
+    // setContextMenuData({
+    //   ...contextMenuData,
+    //   visible: false,
+    // });
   };
 
   graph.on(NodeEvent.CONTEXT_MENU, handleNodeContextMenu);
@@ -67,7 +116,7 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
     };
   }, [graph]);
 
-  console.log("=====contextMenuData", contextMenuData)
+  // console.log("=====contextMenuData", contextMenuData)
   return (
     <>
       {contextMenuData.visible && (
@@ -84,17 +133,16 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
         >
           <Card>
             <CardHeader>
-              <CardTitle className='text-xl'>{contextMenuData?.data?.label as string}</CardTitle>
-              {contextMenuData?.data?.style?.x ?? 0}, {contextMenuData?.data?.style?.y ?? 0}
+              <CardTitle className='break-words'>{contextMenuData?.data?.label as string}</CardTitle>
+              {/* {contextMenuData?.data?.style?.x ?? 0}, {contextMenuData?.data?.style?.y ?? 0} */}
+              <CardDescription className='text-xs'>
+                <div><strong>ID:</strong> {contextMenuData?.data?.id}</div>
+                <div><strong>Label:</strong> {contextMenuData?.data?.data?.type || 'N/A'}</div>
+              </CardDescription>
             </CardHeader>
 
-            <CardContent>
-              <div>
-                {/* <h3 className="font-bold ">Node Information</h3> */}
-                <p><strong>ID:</strong> {contextMenuData?.data?.id}</p>
-                <p><strong>Label:</strong> {contextMenuData?.data?.data?.type || 'N/A'}</p>
-                {/* <p className="text-gray-600">Right-click menu actions can go here.</p> */}
-              </div>
+            <CardContent className='text-sm p-0'>
+              <NestedMenu className='rounded-none p-0 border-none' menuItems={menuItems} />
             </CardContent>
           </Card>
         </div>

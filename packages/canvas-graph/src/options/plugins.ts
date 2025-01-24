@@ -28,8 +28,9 @@ export const GRID_PLUGIN = {
 export const TOOLTIP_PLUGIN = {
   type: 'tooltip',
   enable: true,
+  enterable: true,
   trigger: 'hover',
-  //@ts-ignore
+
   getContent: (e: IElementEvent, items: NodeData | EdgeData | ComboData[]): Promise<HTMLElement | string> => {
     // console.log("TOOLTIP_PLUGIN e", e, items);
     if (!items || items.length === 0) return Promise.resolve("");

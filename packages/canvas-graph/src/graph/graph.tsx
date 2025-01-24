@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph, GraphOptions } from '@antv/g6';
 import { defaultOptions } from './defaults';
@@ -127,8 +127,19 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
 
   console.log("props.initialData", props.initialData);
 
+  useEffect(() => {
+    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+    document.querySelectorAll('.graph-canvas').forEach(
+      () => addEventListener("contextmenu", handleContextMenu));
+
+    return () => {
+      document.querySelectorAll('.graph-canvas').forEach(
+        () => removeEventListener("contextmenu", handleContextMenu));
+    };
+  }, []);
+
   return (
-    <div style={props?.style || {}}>
+    <div style={props?.style || {}} className='graph-canvas'>
       {graph && header && <CanvasToolBar getGraph={() => graph} />}
       {graph && <NodeContextMenu getGraph={() => graph} />}
 
