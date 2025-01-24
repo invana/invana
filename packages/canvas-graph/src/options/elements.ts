@@ -11,6 +11,16 @@ export const DEFAULT_NODE_STYLE: NodeOptions = { // https://g6.antv.antgroup.com
     strokeOpacity: 1
 
   },
+  state: {
+    highlight: {
+      // fill: '#D580FF',
+      halo: true,
+      lineWidth: 0,
+    },
+    dim: {
+      fill: '#343434',
+    },
+  },
   // size: [80, 40],
   // style: {
   //   fill: '#0fbb60',
@@ -46,6 +56,14 @@ export const DEFAULT_EDGE_STYLE: EdgeOptions = {  // https://g6.antv.antgroup.co
     //   style: {
     // stroke: '#343434',
     lineWidth: 1
+  },
+  state: {
+    highlight: {
+      lineWidth: 4,
+    },
+    dim: {
+      stroke: '#343434',
+    }
   },
   palette: {
     type: 'group',

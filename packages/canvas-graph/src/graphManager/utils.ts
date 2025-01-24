@@ -20,7 +20,7 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
     style: {
       size: shape?.size || 20,
       // labelText: (d: any) => d[labelField] || id,
-      halo: true,
+      // halo: true,
       // fill: shape?.bgColor,
       // stroke: shape?.borderColor,
       // lineWidth: shape?.BorderWidth,
