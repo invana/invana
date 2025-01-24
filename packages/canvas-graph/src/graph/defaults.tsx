@@ -3,7 +3,7 @@ import { defaultLayoutsOptions } from './layouts';
 import { DRAG_CANVAS, ZOOM_CANVAS, DRAG_ELEMENT, HOVER_ACTIVATE, CLICK_SELECT, LASSO_SELECT } from '../options/behaviors';
 import { MAP_NODE_SIZE } from '../options/transforms';
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
-import { HISTORY_PLUGIN, MINIMAP_PLUGIN, TOOLTIP_PLUGIN } from '../options/plugins';
+import { HISTORY_PLUGIN, MINIMAP_PLUGIN } from '../options/plugins';
 
 export const DEFAULT_LAYOUT = 'grid'
 
@@ -40,7 +40,6 @@ export const defaultOptions: GraphOptions = {
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
     // GRID_PLUGIN
-    // TOOLTIP_PLUGIN
   ],
   data: {
     nodes: [],
