@@ -29,9 +29,7 @@ export const EdgeCard: React.FC<EdgeCardSmallProps> = ({ edge, extra, showProper
       {
         showProperties && <ElementProperties properties={edge.data?.properties || {}} />
       }
-      {
-        extra ? <CardContent className='p-0'> {extra}</CardContent> : <></>
-      }
+      {extra && <div> {extra}</div>}
     </Card>
   );
 };
