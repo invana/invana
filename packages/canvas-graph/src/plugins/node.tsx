@@ -146,7 +146,12 @@ export const NodeContextMenu: React.FC<NodeContextMenuProps> = ({ getGraph, clas
         >
           <NodeCard
             node={contextMenuData.data}
-            extra={<NestedMenu className='rounded-none shadow-none p-0 border-none' menuItems={menuItems} />}
+            extra={
+              <NestedMenu
+                className='rounded-none w-[260px] shadow-none p-0 border-none'
+                menuItems={menuItems}
+              />
+            }
           />
         </div>
       )}

@@ -2,7 +2,7 @@
 
 import { EdgeData } from '@antv/g6';
 import { ICanvasEdge } from '@invana/data-store';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@invana/ui';
+import { Card, CardHeader, CardTitle, CardDescription } from '@invana/ui';
 import React from 'react';
 import { ElementProperties } from './element-properties';
 
@@ -27,7 +27,7 @@ export const EdgeCard: React.FC<EdgeCardSmallProps> = ({ edge, extra, showProper
         </CardDescription>
       </CardHeader>
       {
-        showProperties && <ElementProperties properties={edge.data?.properties || {}} />
+        showProperties && <ElementProperties className={"pr-4 pl-4"} properties={edge.data?.properties || {}} />
       }
       {extra && <div> {extra}</div>}
     </Card>

@@ -4,10 +4,15 @@ import { IProperties } from '@invana/data-store';
 import React from 'react';
 
 
-export const ElementProperties: React.FC<IProperties> = ({ properties }) => {
+export interface ElementPropertiesProps {
+  properties: IProperties;
+  className?: string;
+}
+
+export const ElementProperties: React.FC<IProperties> = ({ properties, className }) => {
   console.log("ElementPropertiesCard edge", properties)
   return (
-    <div className="text-sm">
+    <div className={"text-sm " + className}>
       <h4 className="font-bold mb-2 uppercase">Properties</h4>
       {Object.entries(properties).map(([key, value], index, array) => (
         <div key={key} className={`mb-2 pb-2 ${index !== array.length - 1 ? 'border-b' : ''}`}>

@@ -23,9 +23,9 @@ export const NodeCard: React.FC<NodeCardSmallProps> = ({ node, extra, showProper
           <div><strong>Label:</strong> {node?.data?.type || 'N/A'}</div>
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className='p-0'>
         {
-          showProperties && <ElementProperties properties={node.data?.properties || {}} />
+          showProperties && <ElementProperties className={"pr-4 pl-4"} properties={node.data?.properties || {}} />
         }
         {extra && <div>{extra}</div>}
       </CardContent>
