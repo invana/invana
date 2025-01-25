@@ -6,7 +6,6 @@ import {
   Network,
   Settings
 } from 'lucide-react'
-import React from 'react';
 
 
 const sideBarTopNavitems: SideBarNavitemProps[] = [

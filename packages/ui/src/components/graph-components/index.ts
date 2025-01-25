@@ -1,3 +1,3 @@
-export { EdgeCard } from './edge-card';
-export { NodeCard } from './node-card';
-export { ElementProperties } from './element-properties';
+export * from './edge-card';
+export * from './node-card';
+export * from './element-properties';

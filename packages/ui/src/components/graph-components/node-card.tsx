@@ -1,6 +1,5 @@
 
 
-import { NodeData } from '@antv/g6';
 import { ICanvasNode } from '@invana/data-store';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@invana/ui';
 import React from 'react';
@@ -8,8 +7,9 @@ import { ElementProperties } from './element-properties';
 import { cn } from "../../lib/utils";
 
 
+
 export interface NodeCardProps {
-  node: ICanvasNode & { label?: string };
+  node: ICanvasNode;
   extra?: React.ReactNode;
   className?: string;
   showProperties?: boolean;

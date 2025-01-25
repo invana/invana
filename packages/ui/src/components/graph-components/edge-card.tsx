@@ -1,6 +1,5 @@
 
 
-import { EdgeData } from '@antv/g6';
 import { ICanvasEdge } from '@invana/data-store';
 import { Card, CardHeader, CardTitle, CardDescription } from '@invana/ui';
 import React from 'react';
@@ -8,8 +7,9 @@ import { ElementProperties } from './element-properties';
 import { cn } from "../../lib/utils";
 
 
-interface EdgeCardProps {
-  edge: ICanvasEdge & { label?: string };
+
+export interface EdgeCardProps {
+  edge: ICanvasEdge;
   className?: string;
   showProperties?: boolean
   extra?: React.ReactNode;

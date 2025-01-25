@@ -63,6 +63,7 @@ export const DEFAULT_EDGE_STYLE: EdgeOptions = {  // https://g6.antv.antgroup.co
     },
     dim: {
       stroke: '#343434',
+      // labelFill: '#343434',
     }
   },
   palette: {

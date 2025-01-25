@@ -1,9 +1,10 @@
 import { BaseBehavior, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
-import { ICanvasNode } from '@invana/data-store';
+import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
-import { NodeCard } from '../../components/node-card';
+import { NodeCard } from '@invana/ui';
+
 
 export interface NodeTooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
@@ -88,9 +89,16 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     console.log("NodeEvent.POINTER_OVER node", node)
     this.onNodeMouseMove(event)
 
+    const nodeData: ICanvasNode = {
+      id: node.id as string,
+      label: node.label as string,
+      type: node.data?.type ?? '',
+      properties: node.data?.properties as IProperties
+    }
+
     this.root.render(
       <NodeCard
-        node={node}
+        node={nodeData}
         showProperties={false}
         extra={
           <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>

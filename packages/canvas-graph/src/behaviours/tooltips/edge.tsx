@@ -1,8 +1,8 @@
 import { BaseBehavior, EdgeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, EdgeData, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
-import { ICanvasEdge } from '@invana/data-store';
-import { EdgeCard } from '@invana/canvas-graph/components/edge-card';
+import { ICanvasEdge, IProperties } from '@invana/data-store';
+import { EdgeCard } from '@invana/ui';
 import React from 'react';
 
 
@@ -80,9 +80,18 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
     this.onMouseMove(event)
+
+    const edgeData: ICanvasEdge = {
+      id: edge.id as string,
+      label: edge.label as string,
+      type: edge.data?.type ?? '',
+      source: edge.source,
+      target: edge.target,
+      properties: edge.data?.properties as IProperties
+    }
     this.root.render(
       <EdgeCard
-        edge={edge}
+        edge={edgeData}
         showProperties={false}
         extra={
           <p className='text-xs pl-4 pr-4 pb-4'>(right-click on edge for more options)</p>

@@ -1,10 +1,10 @@
 import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
-import { ICanvasNode } from '@invana/data-store';
+import { ICanvasNode, IProperties } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
-import { NodeCard } from '@invana/canvas-graph/components/node-card';
+import { NodeCard } from '@invana/ui';
 import React from 'react';
 
 
@@ -160,7 +160,15 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     const { graph } = this.context;
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
-    this.root.render(<NodeCard node={node} extra={
+
+    const nodeData: ICanvasNode = {
+      id: node.id as string,
+      label: node.label as string,
+      type: node.data?.type ?? '',
+      properties: node.data?.properties as IProperties
+    }
+
+    this.root.render(<NodeCard node={nodeData} extra={
       <NestedMenu
         className='rounded-none w-[260px] shadow-none p-0 border-none'
         menuItems={menuItems}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { NodeCard } from '@invana/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 
