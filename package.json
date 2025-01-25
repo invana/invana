@@ -1,6 +1,6 @@
 {
   "name": "invana-studio",
-  "description": "This repo contains the UI components for the Invana Studio",
+  "description": "This repo contains the UI & graph components for the Invana Studio",
   "private": true,
   "scripts": {
     "build": "turbo build",
