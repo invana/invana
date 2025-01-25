@@ -19,6 +19,8 @@ export const DEFAULT_NODE_STYLE: NodeOptions = { // https://g6.antv.antgroup.com
     },
     dim: {
       fill: '#343434',
+      labelFill: '#343434',
+      // opacity: 0.3
     },
   },
   // size: [80, 40],
@@ -49,7 +51,7 @@ export const DEFAULT_EDGE_STYLE: EdgeOptions = {  // https://g6.antv.antgroup.co
     labelBackgroundOpacity: 0.8,
     // labelBackgroundStroke: '#9ec9ff',
     labelFill: '#646464',
-    opacity: 0.3,
+    opacity: 0.6,
 
     endArrow: true,
     // edge: {
@@ -63,6 +65,7 @@ export const DEFAULT_EDGE_STYLE: EdgeOptions = {  // https://g6.antv.antgroup.co
     },
     dim: {
       stroke: '#343434',
+      // opacity: 0.3
       // labelFill: '#343434',
     }
   },
