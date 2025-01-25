@@ -28,7 +28,7 @@ export const LASSO_SELECT = {
   key: 'lasso-select',
   type: 'lasso-select',
   mode: 'diff',
-  trigger: 'shift',
+  trigger: 'Drag',
   style: {
     fill: '#00f',
     fillOpacity: 0.1,

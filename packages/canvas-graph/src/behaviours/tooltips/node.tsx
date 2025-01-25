@@ -68,8 +68,13 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     this.hideContainer();
   }
 
-  hideCanvasContextMenu = () => {
-    const div = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
+  hideOtherMenus = () => {
+    const canvas = document.querySelector('#CanvasContextMenuBehavior') as HTMLElement;
+    if (canvas) {
+      canvas.style.display = 'none';
+    }
+
+    const div = document.querySelector('#EdgeContextMenuBehavior') as HTMLElement;
     if (div) {
       div.style.display = 'none';
     }
@@ -98,7 +103,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
 
     graph.on(NodeEvent.CONTEXT_MENU, this.onContextMenu);
 
-    this.hideCanvasContextMenu();
+    this.hideOtherMenus();
   }
 
   hideContainer = () => {
