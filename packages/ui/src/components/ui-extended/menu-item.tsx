@@ -62,7 +62,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       {hasChildren && (
         <ul
           className={cn(
-            "absolute min-w-[240px] rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+            "absolute min-w-[240px] rounded-md border p-1  bg-card text-card-foreground  shadow-md",
             "invisible opacity-0 translate-x-2",
             "group-hover/item:visible group-hover/item:opacity-100 group-hover/item:translate-x-0",
             "transition-all duration-150 ease-in-out",
