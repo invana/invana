@@ -38,7 +38,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           "focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:outline-none",
           className,
           level === 0 ? "font-medium" : "font-normal",
-          // "group-hover/item:bg-accent/50"
+          "group-hover/item:bg-accent/50"
         )}
         role={hasChildren ? 'menuitem' : undefined}
         aria-haspopup={hasChildren ? 'true' : undefined}
