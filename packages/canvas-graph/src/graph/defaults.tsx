@@ -16,7 +16,7 @@ export const defaultOptions: GraphOptions = {
   autoFit: 'view', // 'view' | 'graph' | 'center'
   animation: false,
   behaviors: [
-    // DRAG_CANVAS,
+    DRAG_CANVAS,
     ZOOM_CANVAS,
     DRAG_ELEMENT,
     HOVER_ACTIVATE,
