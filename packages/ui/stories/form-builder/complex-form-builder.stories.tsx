@@ -1,11 +1,11 @@
-import { FormGenerator } from '@/form-generator/form-generator';
+import { NodeDisplaySettings } from '@/index';
 import type { Meta, StoryObj } from '@storybook/react';
 
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: 'Form Builder/Form Builder',
-  component: FormGenerator,
+  title: 'Form Builder/Complex Form',
+  component: NodeDisplaySettings,
   parameters: {
     layout: 'centered',
   },
@@ -13,7 +13,7 @@ const meta = {
   args: {
 
   },
-} satisfies Meta<typeof FormGenerator>;
+} satisfies Meta<typeof NodeDisplaySettings>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -22,6 +22,6 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
-    className: 'w-[300px]',
+    // className: 'w-[300px]',
   },
 };

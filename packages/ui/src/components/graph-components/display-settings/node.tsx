@@ -1,314 +1,455 @@
-import { ICanvasNodeDisplay } from '@invana/data-store';
-import React, { useState } from 'react';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+"use client"
+import React from "react"
+import { useState } from "react"
+import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ICanvasNodeDisplay } from "@invana/data-store"
+import { cn } from "@/lib/utils"
+import { FormField } from "@/form-generator/form-field"
 
+interface NodeDisplaySettingsProps {
+  onSubmit?: (data: ICanvasNodeDisplay) => void
+  labelPosition?: "side" | "top";
+  className?: string
+}
 
+const shapeTypes = [
+  { label: "Circle", value: "circle" },
+  { label: "Rectangle", value: "rectangle" },
+  { label: "Diamond", value: "diamond" },
+  { label: "Triangle", value: "triangle" },
+  { label: "Hexagon", value: "hexagon" },
+]
 
-export const NodeDisplaySettings: React.FC = () => {
+const fieldTypes = [
+  { label: "Text", value: "text" },
+  { label: "Number", value: "number" },
+  { label: "Boolean", value: "boolean" },
+  { label: "Color", value: "color" },
+  { label: "Select", value: "select" },
+  { label: "Icon", value: "icon" },
+  { label: "Image", value: "image" },
+  { label: "Geo Location", value: "geo" },
+  { label: "Time", value: "time" },
+]
 
-  const [settings, setSettings] = useState<ICanvasNodeDisplay>({
-    shape: {
-      type: "circle",
-      size: 40,
-      bgColor: "#3b82f6",
-      bgOpacity: 1,
-      bgPadding: 8,
-      borderColor: "#2563eb",
-      BorderWidth: 2,
-      borderRadius: 4,
-      dottedBorder: false,
-      dottedBorderSpacing: 4,
-      animated: false,
-      iconFontFamily: "Material Icons",
-      iconCode: "circle",
-      iconColor: "#ffffff",
-      iconSize: 24,
-      iconOpacity: 1,
-      iconRotate: 0,
+export function NodeDisplaySettings({ labelPosition = "top", className = 'w-[420px]', ...props }: NodeDisplaySettingsProps) {
+  const form = useForm<ICanvasNodeDisplay>({
+    defaultValues: {
+      shape: {
+        type: "circle",
+      },
+      label: {},
+      labelField: "",
     },
-    label: {
-      bgColor: "#ffffff",
-      bgOpacity: 0.8,
-      bgPadding: 4,
-      borderColor: "#e2e8f0",
-      BorderWidth: 1,
-      borderRadius: 2,
-      dottedBorder: false,
-      dottedBorderSpacing: 0,
-      textColor: "#1e293b",
-      textFontSize: 12,
-      textFontWeight: "normal",
-      textFontFamily: "Inter",
-      textOpacity: 1,
-    },
-    labelField: "label",
-  },)
+  })
 
-  const updateSettings = (path: string[], value: string | number) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev }
-      let current = newSettings
-      for (let i = 0; i < path.length - 1; i++) {
-        current = current[path[i]]
-      }
-      current[path[path.length - 1]] = value
-      return newSettings
-    })
+  const [formData, setFormData] = useState<ICanvasNodeDisplay>()
+
+  function onSubmit(data: ICanvasNodeDisplay) {
+    setFormData(data)
+    props.onSubmit?.(data)
+    console.log("Form submitted:", data)
   }
 
-  const SubsectionTitle = ({ children }: { children: React.ReactNode }) => (
-    <h4 className="text-xs font-medium text-muted-foreground mb-2">{children}</h4>
-  )
+  const shapeFields = [
+    {
+      name: "type",
+      type: "select",
+      options: shapeTypes,
+      group: "general",
+      row: "basic",
+    },
+    {
+      name: "size",
+      type: "number",
+      min: 0,
+      max: 500,
+      step: 1,
+      group: "general",
+      row: "basic",
+    },
+    {
+      name: "animated",
+      type: "boolean",
+      group: "general",
+      row: "basic",
+    },
+    {
+      name: "bgColor",
+      type: "color",
+      group: "background",
+      row: "bg-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
+    },
+    {
+      name: "bgOpacity",
+      type: "number",
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "background",
+      row: "bg-main",
+    },
+    {
+      name: "bgPadding",
+      type: "number",
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "background",
+      row: "bg-main",
+    },
+    {
+      name: "borderColor",
+      type: "color",
+      group: "border",
+      row: "border-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
+    },
+    {
+      name: "BorderWidth",
+      type: "number",
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "borderRadius",
+      type: "number",
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "dottedBorder",
+      type: "boolean",
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "dottedBorderSpacing",
+      type: "number",
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "iconFontFamily",
+      type: "text",
+      group: "icon",
+      row: "icon-main",
+    },
+    {
+      name: "iconCode",
+      type: "icon",
+      group: "icon",
+      row: "icon-main",
+    },
+    {
+      name: "iconColor",
+      type: "color",
+      group: "icon",
+      row: "icon-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
+    },
+    {
+      name: "iconSize",
+      type: "number",
+      min: 0,
+      max: 100,
+      step: 1,
+      group: "icon",
+      row: "icon-main",
+    },
+    {
+      name: "iconOpacity",
+      type: "number",
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "icon",
+      row: "icon-main",
+    },
+    {
+      name: "iconRotate",
+      type: "number",
+      min: 0,
+      max: 360,
+      step: 1,
+      group: "icon",
+      row: "icon-main",
+    },
+  ]
+
+  const labelFields = [
+    {
+      name: "bgColor",
+      type: "color",
+      group: "background",
+      row: "bg-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
+    },
+    {
+      name: "bgOpacity",
+      type: "number",
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "background",
+      row: "bg-main",
+    },
+    {
+      name: "bgPadding",
+      type: "number",
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "background",
+      row: "bg-main",
+    },
+    {
+      name: "borderColor",
+      type: "color",
+      group: "border",
+      row: "border-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
+    },
+    {
+      name: "BorderWidth",
+      type: "number",
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "borderRadius",
+      type: "number",
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "dottedBorder",
+      type: "boolean",
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "dottedBorderSpacing",
+      type: "number",
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+      row: "border-main",
+    },
+    {
+      name: "textColor",
+      type: "color",
+      group: "text",
+      row: "text-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#000000",
+    },
+    {
+      name: "textFontSize",
+      type: "number",
+      min: 8,
+      max: 72,
+      step: 1,
+      group: "text",
+      row: "text-main",
+    },
+    {
+      name: "textFontWeight",
+      type: "text",
+      group: "text",
+      row: "text-main",
+    },
+    {
+      name: "textFontFamily",
+      type: "text",
+      group: "text",
+      row: "text-main",
+    },
+    {
+      name: "textOpacity",
+      type: "number",
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "text",
+      row: "text-main",
+    },
+  ]
+
+  const shapeRowConfig = [
+    {
+      id: "general-basic-1",
+      fields: ["type", "size"],
+    },
+    {
+      id: "general-basic-2",
+      fields: ["animated"],
+    },
+    {
+      id: "background-main-1",
+      fields: ["bgPadding", "bgOpacity"],
+    },
+    {
+      id: "background-main-2",
+      fields: ["bgColor"],
+    },
+    {
+      id: "border-main-1",
+      fields: ["borderColor", "BorderWidth"],
+    },
+    {
+      id: "border-main-2",
+      fields: ["borderRadius", "dottedBorder"],
+    },
+    {
+      id: "border-main-3",
+      fields: ["dottedBorderSpacing"],
+    },
+    {
+      id: "icon-main-1",
+      fields: ["iconCode", "iconSize"],
+    },
+    {
+      id: "icon-main-2",
+      fields: ["iconOpacity", "iconRotate"],
+    },
+  ]
+
+  const labelRowConfig = [
+    {
+      id: "background-main-1",
+      fields: ["bgColor", "bgOpacity"],
+    },
+    {
+      id: "background-main-2",
+      fields: ["bgPadding"],
+    },
+    {
+      id: "border-main-1",
+      fields: ["borderColor", "BorderWidth"],
+    },
+    {
+      id: "border-main-2",
+      fields: ["borderRadius", "dottedBorder"],
+    },
+    {
+      id: "text-main-1",
+      fields: ["textColor", "textFontSize"],
+    },
+    {
+      id: "text-main-2",
+      fields: ["textOpacity", "textFontWeight"],
+    },
+  ]
 
   return (
-    <div>
-      <h3 className="font-medium mb-2 text-foreground">Nodes settings</h3>
-      <div className="space-y-4">
-        {/* Shape Settings */}
-        <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/40">
-          <SubsectionTitle>Shape</SubsectionTitle>
+    <div className={cn("container mx-auto p-4 ", className)}>
+      {/* <div className="grid gap-4 lg:grid-cols-2"> */}
+      <Card className="lg:max-h-[800px] lg:overflow-auto">
 
-          <div>
-            <Label htmlFor="nodeType" className="text-xs text-foreground">
-              Type
-            </Label>
-            <Select
-              value={settings.shape?.type}
-              onValueChange={(value) => updateSettings(["shape", "type"], value)}
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="circle">Circle</SelectItem>
-                <SelectItem value="rectangle">Rectangle</SelectItem>
-                <SelectItem value="diamond">Diamond</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-3">
-            <SubsectionTitle>Background</SubsectionTitle>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="nodeBgColor" className="text-xs text-foreground">
-                  Color
-                </Label>
-                <Input
-                  id="nodeBgColor"
-                  type="color"
-                  className="h-8 bg-background border-input"
-                  value={settings.shape?.bgColor as string}
-                  onChange={(e) => updateSettings(["shape", "bgColor"], e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="nodeBgOpacity" className="text-xs text-foreground">
-                  Opacity
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Slider
-                    id="nodeBgOpacity"
-                    className="flex-1"
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    value={[settings.shape?.bgOpacity || 1]}
-                    onValueChange={([value]) => updateSettings(["shape", "bgOpacity"], value)}
+        <CardContent className="p-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="labelField"
+                render={({ field }) => (
+                  <FormField.Select
+                    label="Label Field Type"
+                    options={fieldTypes}
+                    placeholder="Select field type"
+                    labelPosition={labelPosition}
+                    {...field}
                   />
-                  <span className="text-xs w-8 text-right text-foreground">
-                    {settings.shape?.bgOpacity}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+                )}
+              />
 
-          <div className="space-y-3">
-            <SubsectionTitle>Border</SubsectionTitle>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="nodeBorderColor" className="text-xs text-foreground">
-                  Color
-                </Label>
-                <Input
-                  id="nodeBorderColor"
-                  type="color"
-                  className="h-8 bg-background border-input"
-                  value={settings.shape?.borderColor as string}
-                  onChange={(e) => updateSettings(["shape", "borderColor"], e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="nodeBorderWidth" className="text-xs text-foreground">
-                  Width
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Slider
-                    id="nodeBorderWidth"
-                    className="flex-1"
-                    min={0}
-                    max={10}
-                    step={1}
-                    value={[settings.shape?.BorderWidth || 1]}
-                    onValueChange={([value]) => updateSettings(["shape", "BorderWidth"], value)}
+              <Tabs defaultValue="shape" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="shape">Shape</TabsTrigger>
+                  <TabsTrigger value="label">Label</TabsTrigger>
+                </TabsList>
+                <TabsContent value="shape" className="mt-2">
+                  <FormField.ObjectField
+                    control={form.control}
+                    name="shape"
+                    fields={shapeFields}
+                    rowConfig={shapeRowConfig}
+                    labelPosition={labelPosition}
                   />
-                  <span className="text-xs w-8 text-right text-foreground">
-                    {settings.shape?.BorderWidth}
-                  </span>
-                </div>
-              </div>
-              <div className="col-span-2 flex items-center justify-between">
-                <Label htmlFor="nodeDottedBorder" className="text-xs text-foreground">
-                  Dotted
-                </Label>
-                <Switch
-                  id="nodeDottedBorder"
-                  className="scale-75"
-                  checked={settings.shape?.dottedBorder}
-                  onCheckedChange={(checked) => updateSettings(["shape", "dottedBorder"], checked)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <SubsectionTitle>Size & Animation</SubsectionTitle>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-2">
-                <Label htmlFor="nodeSize" className="text-xs text-foreground">
-                  Size
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Slider
-                    id="nodeSize"
-                    className="flex-1"
-                    min={20}
-                    max={100}
-                    step={1}
-                    value={[settings.shape?.size || 40]}
-                    onValueChange={([value]) => updateSettings(["shape", "size"], value)}
+                </TabsContent>
+                <TabsContent value="label" className="mt-2">
+                  <FormField.ObjectField
+                    control={form.control}
+                    name="label"
+                    fields={labelFields}
+                    rowConfig={labelRowConfig}
+                    labelPosition={labelPosition}
                   />
-                  <span className="text-xs w-8 text-right text-foreground">{settings.shape?.size}</span>
-                </div>
-              </div>
-              <div className="col-span-2 flex items-center justify-between">
-                <Label htmlFor="nodeAnimated" className="text-xs text-foreground">
-                  Animated
-                </Label>
-                <Switch
-                  id="nodeAnimated"
-                  className="scale-75"
-                  checked={settings.shape?.animated}
-                  onCheckedChange={(checked) => updateSettings(["shape", "animated"], checked)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+                </TabsContent>
+              </Tabs>
 
-        {/* Label Settings */}
-        <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/40">
-          <SubsectionTitle>Label</SubsectionTitle>
-
-          <div className="space-y-3">
-            <SubsectionTitle>Text</SubsectionTitle>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="nodeTextColor" className="text-xs text-foreground">
-                  Color
-                </Label>
-                <Input
-                  id="nodeTextColor"
-                  type="color"
-                  className="h-8 bg-background border-input"
-                  value={settings.label?.textColor as string}
-                  onChange={(e) => updateSettings(["label", "textColor"], e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="nodeTextWeight" className="text-xs text-foreground">
-                  Weight
-                </Label>
-                <Select
-                  value={settings.label?.textFontWeight}
-                  onValueChange={(value) => updateSettings(["label", "textFontWeight"], value)}
-                >
-                  <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Weight" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="bold">Bold</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="nodeTextSize" className="text-xs text-foreground">
-                  Size
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Slider
-                    id="nodeTextSize"
-                    className="flex-1"
-                    min={8}
-                    max={24}
-                    step={1}
-                    value={[settings.label?.textFontSize || 12]}
-                    onValueChange={([value]) => updateSettings(["label", "textFontSize"], value)}
-                  />
-                  <span className="text-xs w-8 text-right text-foreground">
-                    {settings.label?.textFontSize}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <SubsectionTitle>Background</SubsectionTitle>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="nodeLabelBgColor" className="text-xs text-foreground">
-                  Color
-                </Label>
-                <Input
-                  id="nodeLabelBgColor"
-                  type="color"
-                  className="h-8 bg-background border-input"
-                  value={settings.label?.bgColor as string}
-                  onChange={(e) => updateSettings(["label", "bgColor"], e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="nodeLabelBgOpacity" className="text-xs text-foreground">
-                  Opacity
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <Slider
-                    id="nodeLabelBgOpacity"
-                    className="flex-1"
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    value={[settings.label?.bgOpacity || 0.8]}
-                    onValueChange={([value]) => updateSettings(["label", "bgOpacity"], value)}
-                  />
-                  <span className="text-xs w-8 text-right text-foreground">
-                    {settings.label?.bgOpacity}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              <button
+                type="submit"
+                className="w-full rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+              >
+                Generate Configuration
+              </button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      {/* </div> */}
     </div>
-  );
-};
+  )
+}
 

@@ -75,18 +75,7 @@ export function FormGenerator({ labelPosition = "side", className = 'w-[320px]' 
       group: "general",
       row: "basic",
     },
-    {
-      name: "bgColor",
-      type: "color",
-      group: "background",
-      row: "bg-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
+
     {
       name: "bgOpacity",
       type: "number",
@@ -104,6 +93,18 @@ export function FormGenerator({ labelPosition = "side", className = 'w-[320px]' 
       step: 1,
       group: "background",
       row: "bg-main",
+    },
+    {
+      name: "bgColor",
+      type: "color",
+      group: "background",
+      row: "bg-main",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+      defaultValue: "#ffffff",
     },
     {
       name: "borderColor",
@@ -334,11 +335,11 @@ export function FormGenerator({ labelPosition = "side", className = 'w-[320px]' 
     },
     {
       id: "background-main-1",
-      fields: ["bgColor", "bgOpacity"],
+      fields: ["bgPadding", "bgOpacity"],
     },
     {
       id: "background-main-2",
-      fields: ["bgPadding"],
+      fields: ["bgColor",],
     },
     {
       id: "border-main-1",
