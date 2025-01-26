@@ -22,6 +22,8 @@ type Story = StoryObj<typeof meta>;
 
 
 const config: FormBuilderConfig = {
+  title: "User Profile",
+  description: "Fill in your details to create a new account",
   labelPosition: "top",
   fields: [
     {
@@ -92,7 +94,7 @@ const config: FormBuilderConfig = {
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
-    // className: 'w-[300px]',
+    // className: 'w-[360px]',
     config,
     defaultValues: {
       "name": "change me",
@@ -102,18 +104,5 @@ export const Default: Story = {
     onSubmit: (data) => {
       console.log("Form submitted", data)
     },
-
-    // footer: (
-    //   <div>
-    //        <Button type="submit" className="flex-1">
-    //               Submit
-    //             </Button>
-    //             <Button type="button" variant="outline" onClick={handleReset} className="flex-1">
-    //               Reset
-    //             </Button>
-
-
-    //   </div>
-    // )
   },
 };
