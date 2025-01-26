@@ -98,13 +98,14 @@ export function BooleanField({ label, description, value, onChange, labelPositio
   if (labelPosition === "side") {
     return (
       <FormItem className="flex items-center justify-between rounded-md border p-2">
+        <FormControl>
+          <Switch checked={value} onCheckedChange={onChange} />
+        </FormControl>
         <div>
           {label && <FormLabel className="text-xs">{label}</FormLabel>}
           {description && <FormDescription className="text-xs">{description}</FormDescription>}
         </div>
-        <FormControl>
-          <Switch checked={value} onCheckedChange={onChange} />
-        </FormControl>
+
       </FormItem>
     )
   }
@@ -113,10 +114,11 @@ export function BooleanField({ label, description, value, onChange, labelPositio
     <FormItem className="space-y-2">
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className="flex items-center justify-between rounded-md border p-2">
-        {description && <FormDescription className="text-xs">{description}</FormDescription>}
         <FormControl>
           <Switch checked={value} onCheckedChange={onChange} />
         </FormControl>
+        {description && <FormDescription className="text-xs ml-2">{description}</FormDescription>}
+
       </div>
     </FormItem>
   )

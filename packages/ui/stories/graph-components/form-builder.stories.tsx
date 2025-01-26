@@ -21,9 +21,7 @@ type Story = StoryObj<typeof meta>;
 
 
 const config: FormBuilderConfig = {
-  title: "Example Form",
-  description: "This is an example form using the form builder component",
-  labelPosition: "side",
+  labelPosition: "top",
   fields: [
     {
       type: "text",
@@ -49,7 +47,7 @@ const config: FormBuilderConfig = {
       type: "boolean",
       name: "subscribe",
       label: "Subscribe to newsletter",
-      description: "Receive updates about our products",
+      description: "Receive updates about our products and announcements",
     },
     {
       type: "color",
@@ -65,6 +63,7 @@ const config: FormBuilderConfig = {
       type: "select",
       name: "country",
       label: "Country",
+      description: "Select your country",
       options: [
         { label: "United States", value: "us" },
         { label: "United Kingdom", value: "uk" },
@@ -86,7 +85,7 @@ const config: FormBuilderConfig = {
       id: "preferences",
       fields: ["favoriteColor", "icon"],
     },
-  ],
+  ]
 }
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
@@ -94,5 +93,10 @@ export const Default: Story = {
   args: {
     // className: 'w-[300px]',
     config,
+    defaultValues: {
+      "name": "change me",
+      "age": 97,
+      "favoriteColor": "#22c55e"
+    }
   },
 };

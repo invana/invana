@@ -29,11 +29,8 @@ export function FormBuilder({ config, onSubmit, defaultValues = {} }: FormBuilde
     <div className="container mx-auto p-4">
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="lg:max-h-[800px] lg:overflow-auto">
-          <CardHeader className="p-4">
-            {config.title && <CardTitle className="text-lg">{config.title}</CardTitle>}
-            {config.description && <CardDescription>{config.description}</CardDescription>}
-          </CardHeader>
+        <Card className="lg:overflow-auto">
+
           <CardContent className="p-4">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
