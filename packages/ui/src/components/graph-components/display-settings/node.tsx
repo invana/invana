@@ -1,18 +1,23 @@
 "use client"
 import React from "react"
 import { useState } from "react"
-import { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ICanvasNodeDisplay } from "@invana/data-store"
 import { cn } from "@/lib/utils"
 import { FormField } from "@/form-generator/form-field"
+import { Button } from "@/components/ui"
 
-interface NodeDisplaySettingsProps {
+
+export interface NodeDisplaySettingsProps {
   onSubmit?: (data: ICanvasNodeDisplay) => void
+  defaultValues: ICanvasNodeDisplay;
+  propertyKeys: string[];
   labelPosition?: "side" | "top";
-  className?: string
+  className?: string;
+  showReset?: boolean;
 }
 
 const shapeTypes = [
@@ -23,36 +28,95 @@ const shapeTypes = [
   { label: "Hexagon", value: "hexagon" },
 ]
 
-const fieldTypes = [
-  { label: "Text", value: "text" },
-  { label: "Number", value: "number" },
-  { label: "Boolean", value: "boolean" },
-  { label: "Color", value: "color" },
-  { label: "Select", value: "select" },
-  { label: "Icon", value: "icon" },
-  { label: "Image", value: "image" },
-  { label: "Geo Location", value: "geo" },
-  { label: "Time", value: "time" },
-]
+// const fieldTypes = [
+//   { label: "Text", value: "text" },
+//   { label: "Number", value: "number" },
+//   { label: "Boolean", value: "boolean" },
+//   { label: "Color", value: "color" },
+//   { label: "Select", value: "select" },
+//   { label: "Icon", value: "icon" },
+//   { label: "Image", value: "image" },
+//   { label: "Geo Location", value: "geo" },
+//   { label: "Time", value: "time" },
+// ]
 
-export function NodeDisplaySettings({ labelPosition = "top", className = 'w-[420px]', ...props }: NodeDisplaySettingsProps) {
+export function NodeDisplaySettings({ showReset = false,
+  propertyKeys = [],
+  defaultValues = {},
+  labelPosition = "top", className = 'w-[420px]', ...props }: NodeDisplaySettingsProps) {
   const form = useForm<ICanvasNodeDisplay>({
-    defaultValues: {
-      shape: {
-        type: "circle",
-      },
-      label: {},
-      labelField: "",
-    },
+    defaultValues: defaultValues
   })
 
-  const [formData, setFormData] = useState<ICanvasNodeDisplay>()
+  // const [formData, setFormData] = useState<ICanvasNodeDisplay>()
 
   function onSubmit(data: ICanvasNodeDisplay) {
-    setFormData(data)
+    // setFormData(data)
     props.onSubmit?.(data)
     console.log("Form submitted:", data)
   }
+
+  function handleReset() {
+    form.reset(defaultValues)
+    // setFormData(undefined)
+  }
+
+
+  // labelField: string;
+  // geoField: string;
+  // imageField: string;
+  // timestampField: string;
+  const importantFields = [
+    {
+      name: "labelField",
+      type: "select",
+      options: propertyKeys.map(key => ({ label: key, value: key })),
+      // group: "general",
+      row: "basic",
+    },
+    {
+      name: "imageField",
+      type: "select",
+      options: propertyKeys.map(key => ({ label: key, value: key })),
+      // group: "general",
+      row: "basic",
+    },
+    {
+      name: "geoField",
+      type: "select",
+      options: propertyKeys.map(key => ({ label: key, value: key })),
+      // group: "general",
+      row: "basic",
+    },
+    {
+      name: "timestampField",
+      type: "select",
+      options: propertyKeys.map(key => ({ label: key, value: key })),
+      // group: "general",
+      row: "basic",
+    },
+  ]
+  const importantFieldsRowConfig = [
+    {
+      id: "imp-fields-basic-1",
+      fields: ["labelField", "imageField"],
+    },
+    {
+      id: "imp-fields-basic-2",
+      fields: ["geoField", "timestampField"],
+    }
+  ];
+
+  // const importantFieldsTab = (
+  //   <FormField.ObjectField
+  //     control={form.control}
+  //     name="important"
+  //     fields={importantFields}
+  //     rowConfig={importantFieldsRowConfig}
+  //     labelPosition={labelPosition}
+  //   />
+  // );
+
 
   const shapeFields = [
     {
@@ -392,14 +456,14 @@ export function NodeDisplaySettings({ labelPosition = "top", className = 'w-[420
   ]
 
   return (
-    <div className={cn("container mx-auto p-4 ", className)}>
+    <div className={cn("container mx-auto p-4 w-[520px] h-full", className)}>
       {/* <div className="grid gap-4 lg:grid-cols-2"> */}
-      <Card className="lg:max-h-[800px] lg:overflow-auto">
+      <Card className=" overflow-auto">
 
         <CardContent className="p-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="labelField"
                 render={({ field }) => (
@@ -411,6 +475,13 @@ export function NodeDisplaySettings({ labelPosition = "top", className = 'w-[420
                     {...field}
                   />
                 )}
+              /> */}
+              <FormField.ObjectField
+                control={form.control}
+                name="shape"
+                fields={importantFields}
+                rowConfig={importantFieldsRowConfig}
+                labelPosition={labelPosition}
               />
 
               <Tabs defaultValue="shape" className="w-full">
@@ -438,12 +509,14 @@ export function NodeDisplaySettings({ labelPosition = "top", className = 'w-[420
                 </TabsContent>
               </Tabs>
 
-              <button
-                type="submit"
-                className="w-full rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
-              >
-                Generate Configuration
-              </button>
+              <Button type="submit" className="">
+                Submit
+              </Button>
+              {showReset && (
+                <Button type="button" variant="outline" onClick={handleReset} className="ml-3">
+                  Reset
+                </Button>
+              )}
             </form>
           </Form>
         </CardContent>

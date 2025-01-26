@@ -50,10 +50,18 @@ export interface ICanvasEdgeShapeDisplay {
   dottedBorderSpacing: number;
 }
 
+
+export interface ICanvasNodeImpotantFields {
+  labelField: string;
+  geoField: string;
+  imageField: string;
+  timestampField: string;
+}
 export interface ICanvasNodeDisplay {
   shape?: Partial<ICanvasNodeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
-  labelField?: string
+  fields?: Partial<ICanvasNodeImpotantFields>;
+  // labelField?: string
 }
 
 export interface ICanvasEdgeDisplay {

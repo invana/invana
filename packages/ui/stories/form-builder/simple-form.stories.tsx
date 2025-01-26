@@ -1,4 +1,4 @@
-import { SimpleFormGenerator } from '@/form-generator/simple-form';
+import { SimpleFormGenerator } from '@/components/graph-components/simple-form';
 import { FormBuilderConfig } from '@/form-generator/types';
 import { Button } from '@/index';
 import type { Meta, StoryObj } from '@storybook/react';
