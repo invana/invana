@@ -7,11 +7,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+} from "../../components/ui/form"
+import { Input } from "../../components/ui/input"
+import { Switch } from "../../components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { cn } from "../../lib/utils"
 import { ColorSwatches } from "../ui/color-swatches"
 import { SliderField } from "./slider-field"
 import { IconPreview } from "../ui/icon-preview"

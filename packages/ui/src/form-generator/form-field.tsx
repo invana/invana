@@ -1,7 +1,7 @@
 import React from "react"
 import type { Control } from "react-hook-form"
-import { FormField as FormFieldBase } from "@/components/ui/form"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { FormField as FormFieldBase } from "../components/ui/form"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion"
 import { Field } from "./fields/field-base"
 
 interface ObjectFieldProps {

@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import { Check } from "lucide-react"
 import { useState, useEffect } from "react"
 

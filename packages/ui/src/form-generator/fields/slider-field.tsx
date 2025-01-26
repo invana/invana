@@ -1,7 +1,7 @@
 "use client"
 
-import { Slider } from "@/components/ui/slider"
-import { Input } from "@/components/ui/input"
+import { Slider } from "../../components/ui/slider"
+import { Input } from "../../components/ui/input"
 import { useState } from "react"
 import React from "react"
 

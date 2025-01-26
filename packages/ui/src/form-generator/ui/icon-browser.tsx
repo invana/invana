@@ -2,9 +2,9 @@
 import React from "react"
 import * as LucideIcons from "lucide-react"
 import { useState, useMemo } from "react"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
+import { Input } from "../../components/ui/input"
+import { ScrollArea } from "../../components/ui/scroll-area"
+import { cn } from "../../lib/utils"
 import { Check } from "lucide-react"
 
 interface IconBrowserProps {

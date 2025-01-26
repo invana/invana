@@ -1,14 +1,14 @@
 "use client"
 import React from "react"
 import { useState } from "react"
-import { Form } from "@/components/ui/form"
+import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "../../../components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { ICanvasNodeDisplay } from "@invana/data-store"
-import { cn } from "@/lib/utils"
-import { FormField } from "@/form-generator/form-field"
-import { Button } from "@/components/ui"
+import { cn } from "../../../lib/utils"
+import { FormField } from "../../../form-generator/form-field"
+import { Button } from "../../../components/ui"
 
 
 export interface NodeDisplaySettingsProps {

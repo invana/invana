@@ -1,11 +1,11 @@
 "use client"
-import { useState } from "react"
-import { Form } from "@/components/ui/form"
+import React, { useState } from "react"
+import { Form } from "../../components/ui/form"
 import { useForm } from "react-hook-form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
 import { FormField } from "../../form-generator/form-field"
 import { FormBuilderConfig } from "../../form-generator/types"
-import { Button } from "@/components/ui"
+import { Button } from "../../components/ui"
 import { cn } from "@/lib/utils"
 
 interface FormBuilderProps {

@@ -1,14 +1,15 @@
 "use client"
 import React from "react"
 import { useState } from "react"
-import { Form } from "@/components/ui/form"
+import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "../../../components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { ICanvasEdgeDisplay } from "@invana/data-store"
-import { cn } from "@/lib/utils"
-import { FormField } from "@/form-generator/form-field"
-import { Button } from "@/components/ui"
+import { cn } from "../../../lib/utils"
+import { FormField } from "../../../form-generator/form-field"
+import { Button } from "../../../components/ui"
+
 
 
 export interface EdgeDisplaySettingsProps {
@@ -62,10 +63,180 @@ export function EdgeDisplaySettings({ showReset = false,
   }
 
 
-  // labelField: string;
-  // geoField: string;
-  // imageField: string;
-  // timestampField: string;
+  const shapeFields = [
+    {
+      name: "strokeColor",
+      type: "color" as const,
+      group: "stroke",
+      presetColors: [
+        { label: "Black", value: "#000000" },
+        { label: "Gray", value: "#6b7280" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+    },
+    {
+      name: "strokeWidth",
+      type: "number" as const,
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "stroke",
+    },
+    {
+      name: "strokeOpacity",
+      type: "number" as const,
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "stroke",
+    },
+    {
+      name: "strokeArrowheadSize",
+      type: "text" as const,
+      group: "arrowhead",
+    },
+    {
+      name: "strokeArrowheadColor",
+      type: "color" as const,
+      group: "arrowhead",
+      presetColors: [
+        { label: "Black", value: "#000000" },
+        { label: "Gray", value: "#6b7280" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+    },
+    {
+      name: "strokeArrowheadOpacity",
+      type: "number" as const,
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "arrowhead",
+    },
+    {
+      name: "animated",
+      type: "boolean" as const,
+      group: "animation",
+    },
+    {
+      name: "dottedBorder",
+      type: "boolean" as const,
+      group: "border",
+    },
+    {
+      name: "dottedBorderSpacing",
+      type: "number" as const,
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+    },
+  ]
+
+  const labelFields = [
+    {
+      name: "bgColor",
+      type: "color" as const,
+      group: "background",
+      presetColors: [
+        { label: "White", value: "#ffffff" },
+        { label: "Gray", value: "#f3f4f6" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+    },
+    {
+      name: "bgOpacity",
+      type: "number" as const,
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "background",
+    },
+    {
+      name: "bgPadding",
+      type: "number" as const,
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "background",
+    },
+    {
+      name: "borderColor",
+      type: "color" as const,
+      group: "border",
+      presetColors: [
+        { label: "Black", value: "#000000" },
+        { label: "Gray", value: "#6b7280" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+    },
+    {
+      name: "borderWidth",
+      type: "number" as const,
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+    },
+    {
+      name: "borderRadius",
+      type: "number" as const,
+      min: 0,
+      max: 50,
+      step: 1,
+      group: "border",
+    },
+    {
+      name: "dottedBorder",
+      type: "boolean" as const,
+      group: "border",
+    },
+    {
+      name: "dottedBorderSpacing",
+      type: "number" as const,
+      min: 0,
+      max: 20,
+      step: 1,
+      group: "border",
+    },
+    {
+      name: "textColor",
+      type: "color" as const,
+      group: "text",
+      presetColors: [
+        { label: "Black", value: "#000000" },
+        { label: "Gray", value: "#6b7280" },
+        { label: "Primary", value: "#3b82f6" },
+      ],
+    },
+    {
+      name: "textFontSize",
+      type: "number" as const,
+      min: 8,
+      max: 72,
+      step: 1,
+      group: "text",
+    },
+    {
+      name: "textFontWeight",
+      type: "text" as const,
+      group: "text",
+    },
+    {
+      name: "textFontFamily",
+      type: "text" as const,
+      group: "text",
+    },
+    {
+      name: "textOpacity",
+      type: "number" as const,
+      min: 0,
+      max: 1,
+      step: 0.1,
+      group: "text",
+    },
+  ]
+
   const importantFields = [
     {
       name: "labelField",
@@ -80,380 +251,28 @@ export function EdgeDisplaySettings({ showReset = false,
       options: propertyKeys.map(key => ({ label: key, value: key })),
       // group: "general",
       row: "basic",
-    },
-    {
-      name: "geoField",
-      type: "select",
-      options: propertyKeys.map(key => ({ label: key, value: key })),
-      // group: "general",
-      row: "basic",
-    },
-    {
-      name: "timestampField",
-      type: "select",
-      options: propertyKeys.map(key => ({ label: key, value: key })),
-      // group: "general",
-      row: "basic",
-    },
+    }
   ]
+
   const importantFieldsRowConfig = [
     {
       id: "imp-fields-basic-1",
       fields: ["labelField", "imageField"],
-    },
-    {
-      id: "imp-fields-basic-2",
-      fields: ["geoField", "timestampField"],
     }
+
   ];
-
-  // const importantFieldsTab = (
-  //   <FormField.ObjectField
-  //     control={form.control}
-  //     name="important"
-  //     fields={importantFields}
-  //     rowConfig={importantFieldsRowConfig}
-  //     labelPosition={labelPosition}
-  //   />
-  // );
-
-
-  const shapeFields = [
-    {
-      name: "type",
-      type: "select",
-      options: shapeTypes,
-      group: "general",
-      row: "basic",
-    },
-    {
-      name: "size",
-      type: "number",
-      min: 0,
-      max: 500,
-      step: 1,
-      group: "general",
-      row: "basic",
-    },
-    {
-      name: "animated",
-      type: "boolean",
-      group: "general",
-      row: "basic",
-    },
-    {
-      name: "bgColor",
-      type: "color",
-      group: "background",
-      row: "bg-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
-    {
-      name: "bgOpacity",
-      type: "number",
-      min: 0,
-      max: 1,
-      step: 0.1,
-      group: "background",
-      row: "bg-main",
-    },
-    {
-      name: "bgPadding",
-      type: "number",
-      min: 0,
-      max: 50,
-      step: 1,
-      group: "background",
-      row: "bg-main",
-    },
-    {
-      name: "borderColor",
-      type: "color",
-      group: "border",
-      row: "border-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
-    {
-      name: "borderWidth",
-      type: "number",
-      min: 0,
-      max: 20,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "borderRadius",
-      type: "number",
-      min: 0,
-      max: 50,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "dottedBorder",
-      type: "boolean",
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "dottedBorderSpacing",
-      type: "number",
-      min: 0,
-      max: 20,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "iconFontFamily",
-      type: "text",
-      group: "icon",
-      row: "icon-main",
-    },
-    {
-      name: "iconCode",
-      type: "icon",
-      group: "icon",
-      row: "icon-main",
-    },
-    {
-      name: "iconColor",
-      type: "color",
-      group: "icon",
-      row: "icon-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
-    {
-      name: "iconSize",
-      type: "number",
-      min: 0,
-      max: 100,
-      step: 1,
-      group: "icon",
-      row: "icon-main",
-    },
-    {
-      name: "iconOpacity",
-      type: "number",
-      min: 0,
-      max: 1,
-      step: 0.1,
-      group: "icon",
-      row: "icon-main",
-    },
-    {
-      name: "iconRotate",
-      type: "number",
-      min: 0,
-      max: 360,
-      step: 1,
-      group: "icon",
-      row: "icon-main",
-    },
-  ]
-
-  const labelFields = [
-    {
-      name: "bgColor",
-      type: "color",
-      group: "background",
-      row: "bg-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
-    {
-      name: "bgOpacity",
-      type: "number",
-      min: 0,
-      max: 1,
-      step: 0.1,
-      group: "background",
-      row: "bg-main",
-    },
-    {
-      name: "bgPadding",
-      type: "number",
-      min: 0,
-      max: 50,
-      step: 1,
-      group: "background",
-      row: "bg-main",
-    },
-    {
-      name: "borderColor",
-      type: "color",
-      group: "border",
-      row: "border-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#ffffff",
-    },
-    {
-      name: "borderWidth",
-      type: "number",
-      min: 0,
-      max: 20,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "borderRadius",
-      type: "number",
-      min: 0,
-      max: 50,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "dottedBorder",
-      type: "boolean",
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "dottedBorderSpacing",
-      type: "number",
-      min: 0,
-      max: 20,
-      step: 1,
-      group: "border",
-      row: "border-main",
-    },
-    {
-      name: "textColor",
-      type: "color",
-      group: "text",
-      row: "text-main",
-      presetColors: [
-        { label: "White", value: "#ffffff" },
-        { label: "Gray", value: "#f3f4f6" },
-        { label: "Primary", value: "#3b82f6" },
-      ],
-      defaultValue: "#000000",
-    },
-    {
-      name: "textFontSize",
-      type: "number",
-      min: 8,
-      max: 72,
-      step: 1,
-      group: "text",
-      row: "text-main",
-    },
-    {
-      name: "textFontWeight",
-      type: "text",
-      group: "text",
-      row: "text-main",
-    },
-    {
-      name: "textFontFamily",
-      type: "text",
-      group: "text",
-      row: "text-main",
-    },
-    {
-      name: "textOpacity",
-      type: "number",
-      min: 0,
-      max: 1,
-      step: 0.1,
-      group: "text",
-      row: "text-main",
-    },
-  ]
 
   const shapeRowConfig = [
     {
-      id: "general-basic-1",
-      fields: ["type", "size"],
+      id: "stroke-main-1",
+      fields: ["strokeColor", "strokeWidth"],
     },
     {
-      id: "general-basic-2",
-      fields: ["animated"],
-    },
-    {
-      id: "background-main-1",
-      fields: ["bgPadding", "bgOpacity"],
-    },
-    {
-      id: "background-main-2",
-      fields: ["bgColor"],
-    },
-    {
-      id: "border-main-1",
-      fields: ["borderColor", "borderWidth"],
-    },
-    {
-      id: "border-main-2",
-      fields: ["borderRadius", "dottedBorder"],
-    },
-    {
-      id: "border-main-3",
-      fields: ["dottedBorderSpacing"],
-    },
-    {
-      id: "icon-main-1",
-      fields: ["iconCode", "iconSize"],
-    },
-    {
-      id: "icon-main-2",
-      fields: ["iconOpacity", "iconRotate"],
+      id: "stroke-main-2",
+      fields: ["strokeOpacity"],
     },
   ]
 
-  const labelRowConfig = [
-    {
-      id: "background-main-1",
-      fields: ["bgColor", "bgOpacity"],
-    },
-    {
-      id: "background-main-2",
-      fields: ["bgPadding"],
-    },
-    {
-      id: "border-main-1",
-      fields: ["borderColor", "borderWidth"],
-    },
-    {
-      id: "border-main-2",
-      fields: ["borderRadius", "dottedBorder"],
-    },
-    {
-      id: "text-main-1",
-      fields: ["textColor", "textFontSize"],
-    },
-    {
-      id: "text-main-2",
-      fields: ["textOpacity", "textFontWeight"],
-    },
-  ]
 
   return (
     <div className={cn("container mx-auto p-4 w-[520px] h-full", className)}>
@@ -478,7 +297,7 @@ export function EdgeDisplaySettings({ showReset = false,
               /> */}
               <FormField.ObjectField
                 control={form.control}
-                name="shape"
+                name="fields"
                 fields={importantFields}
                 rowConfig={importantFieldsRowConfig}
                 labelPosition={labelPosition}
@@ -496,6 +315,8 @@ export function EdgeDisplaySettings({ showReset = false,
                     fields={shapeFields}
                     rowConfig={shapeRowConfig}
                     labelPosition={labelPosition}
+                  // defaultExpanded={["stroke"]}
+
                   />
                 </TabsContent>
                 <TabsContent value="label" className="mt-2">
@@ -503,7 +324,7 @@ export function EdgeDisplaySettings({ showReset = false,
                     control={form.control}
                     name="label"
                     fields={labelFields}
-                    rowConfig={labelRowConfig}
+                    // rowConfig={labelRowConfig}
                     labelPosition={labelPosition}
                   />
                 </TabsContent>

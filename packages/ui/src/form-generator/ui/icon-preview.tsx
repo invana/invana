@@ -1,12 +1,12 @@
 "use client"
 import React from "react"
 import * as LucideIcons from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover"
+import { Input } from "../../components/ui/input"
+import { ScrollArea } from "../../components/ui/scroll-area"
 import { Check } from "lucide-react"
 import { useState, useMemo } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 interface IconPreviewProps {
   value?: string

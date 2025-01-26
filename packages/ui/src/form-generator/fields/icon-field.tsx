@@ -1,8 +1,8 @@
 "use client"
 
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { FormControl, FormItem, FormLabel, FormMessage } from "../../components/ui/form"
 import { IconBrowser } from "../ui/icon-browser"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import * as icons from "lucide-react"
 import React from "react"
 
