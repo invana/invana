@@ -1,4 +1,4 @@
-import React from "react"
+import React, { forwardRef } from "react"
 import type { Control } from "react-hook-form"
 import {
   FormControl,
@@ -56,7 +56,14 @@ export function InputField({ label, description, labelPosition = "side", classNa
   )
 }
 
-export function SelectField({ label, description, options = [], value, onChange, labelPosition = "side" }: FieldProps) {
+export const SelectField = forwardRef<HTMLSelectElement, FieldProps>(({
+  label,
+  description,
+  options = [],
+  value,
+  onChange,
+  labelPosition = "side"
+}, ref) => {
   return (
     <FormItem
       className={cn(
@@ -68,7 +75,7 @@ export function SelectField({ label, description, options = [], value, onChange,
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
         <Select value={value} onValueChange={onChange}>
           <FormControl>
-            <SelectTrigger className="h-8">
+            <SelectTrigger className="h-8" ref={ref}>
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
           </FormControl>
@@ -85,7 +92,7 @@ export function SelectField({ label, description, options = [], value, onChange,
       </div>
     </FormItem>
   )
-}
+})
 
 export function BooleanField({ label, description, value, onChange, labelPosition = "side" }: FieldProps) {
   if (labelPosition === "side") {

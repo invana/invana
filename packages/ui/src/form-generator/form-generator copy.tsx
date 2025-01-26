@@ -8,7 +8,6 @@ import { FormField } from "./form-field"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ICanvasNodeDisplay } from "@invana/data-store"
 import React from "react"
-import { cn } from "@/lib/utils"
 
 interface FormGeneratorProps {
   labelPosition?: "side" | "top";
@@ -35,7 +34,7 @@ const fieldTypes = [
   { label: "Time", value: "time" },
 ]
 
-export function FormGenerator({ labelPosition = "side", className = 'w-[520px]' }: FormGeneratorProps) {
+export function FormGenerator({ labelPosition = "side", className = 'w-[320px]' }: FormGeneratorProps) {
   const form = useForm<ICanvasNodeDisplay>({
     defaultValues: {
       shape: {
@@ -391,10 +390,12 @@ export function FormGenerator({ labelPosition = "side", className = 'w-[520px]' 
   ]
 
   return (
-    <div className={cn("container mx-auto p-4 ")}>
+    <div className={"container mx-auto p-4 " + className}>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="lg:max-h-[800px] lg:overflow-auto">
-
+          <CardHeader className="p-4">
+            <CardTitle className="text-lg">Canvas Node Configuration</CardTitle>
+          </CardHeader>
           <CardContent className="p-4">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -448,7 +449,16 @@ export function FormGenerator({ labelPosition = "side", className = 'w-[520px]' 
           </CardContent>
         </Card>
 
-
+        <Card className="lg:max-h-[800px] lg:overflow-auto">
+          <CardHeader className="p-4">
+            <CardTitle className="text-lg">Generated Configuration</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <pre className="whitespace-pre-wrap rounded-md bg-muted p-4 text-sm">
+              {JSON.stringify(formData, null, 2)}
+            </pre>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
