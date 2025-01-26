@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: 'Graph Components/NodeCard',
+  title: 'Graph UI Components/NodeCard',
   component: NodeCard,
   parameters: {
     layout: 'centered',
