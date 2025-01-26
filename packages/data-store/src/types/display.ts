@@ -51,7 +51,7 @@ export interface ICanvasEdgeShapeDisplay {
 }
 
 
-export interface ICanvasNodeImpotantFields {
+export interface ICanvasNodeImportantFields {
   labelField: string;
   geoField: string;
   imageField: string;
@@ -60,14 +60,19 @@ export interface ICanvasNodeImpotantFields {
 export interface ICanvasNodeDisplay {
   shape?: Partial<ICanvasNodeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
-  fields?: Partial<ICanvasNodeImpotantFields>;
+  fields?: Partial<ICanvasNodeImportantFields>;
   // labelField?: string
+}
+
+export interface ICanvaEdgeImportantFields {
+  labelField: string;
+  timestampField: string;
 }
 
 export interface ICanvasEdgeDisplay {
   shape?: Partial<ICanvasEdgeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
-  labelField?: string
+  fields?: ICanvaEdgeImportantFields
 }
 
 export interface ICanvasBg {
