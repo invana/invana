@@ -83,8 +83,17 @@ export interface ICanvasBg {
 
 export interface ICanvasDisplay {
   bg: ICanvasBg;
+  theme: 'light' | 'dark' | 'system';
+  colorNodesBy: 'type' | 'defaultColor'
+  colorEdgeBy: 'type' | 'SourceNode' | 'TargetNode' | 'defaultColor'
+
+}
+
+export interface ICanvasDisplaySettings {
   nodes: ICanvasNodeDisplay[];
   edges: ICanvasEdgeDisplay[];
-  theme: 'light' | 'dark' | 'system';
+  canvas: ICanvasDisplay;
+  defaultNode: ICanvasNodeDisplay;
+  defaultEdge: ICanvasEdgeDisplay;
 }
 
