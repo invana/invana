@@ -22,13 +22,13 @@ export interface EdgeDisplaySettingsProps {
   header?: React.ReactNode
 }
 
-const shapeTypes = [
-  { label: "Circle", value: "circle" },
-  { label: "Rectangle", value: "rectangle" },
-  { label: "Diamond", value: "diamond" },
-  { label: "Triangle", value: "triangle" },
-  { label: "Hexagon", value: "hexagon" },
-]
+// const shapeTypes = [
+//   { label: "Circle", value: "circle" },
+//   { label: "Rectangle", value: "rectangle" },
+//   { label: "Diamond", value: "diamond" },
+//   { label: "Triangle", value: "triangle" },
+//   { label: "Hexagon", value: "hexagon" },
+// ]
 
 // const fieldTypes = [
 //   { label: "Text", value: "text" },
@@ -281,10 +281,10 @@ export function EdgeDisplaySettings({
 
   return (
 
-    <div className={cn("min-h-screen ")}>
+    <div className={cn("min-h-screen ", className)}>
       <form onSubmit={form.handleSubmit(onSubmit)} >
 
-        <Card className=" mx-auto w-full max-w-lg h-[calc(100vh-2rem)] flex flex-col w-[520px]  ">
+        <Card className=" mx-auto w-full max-w-lg h-[calc(100vh-2rem)] flex flex-col  ">
 
           {props.header && <CardHeader>{props.header}</CardHeader>}
 

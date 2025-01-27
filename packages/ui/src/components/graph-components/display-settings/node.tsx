@@ -3,7 +3,7 @@ import React from "react"
 import { useState } from "react"
 import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
-import { Card, CardContent } from "../../../components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "../../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { ICanvasNodeDisplay } from "@invana/data-store"
 import { cn } from "../../../lib/utils"
@@ -18,6 +18,8 @@ export interface NodeDisplaySettingsProps {
   labelPosition?: "side" | "top";
   className?: string;
   showReset?: boolean;
+  header?: React.ReactNode
+
 }
 
 const shapeTypes = [
@@ -43,7 +45,9 @@ const shapeTypes = [
 export function NodeDisplaySettings({ showReset = false,
   propertyKeys = [],
   defaultValues = {},
-  labelPosition = "top", className = 'w-[420px]', ...props }: NodeDisplaySettingsProps) {
+  labelPosition = "top",
+  className = 'w-[420px]',
+  ...props }: NodeDisplaySettingsProps) {
   const form = useForm<ICanvasNodeDisplay>({
     defaultValues: defaultValues
   })
@@ -456,13 +460,16 @@ export function NodeDisplaySettings({ showReset = false,
   ]
 
   return (
-    <div className={cn("container mx-auto p-4 w-[520px] h-full", className)}>
-      {/* <div className="grid gap-4 lg:grid-cols-2"> */}
-      <Card className=" overflow-auto">
+    <div className={cn("min-h-screen ", className)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} >
 
-        <CardContent className="p-4">
+        <Card className=" mx-auto w-full max-w-lg h-[calc(100vh-2rem)] flex flex-col w-[520px]  ">
+
+          {props.header && <CardHeader>{props.header}</CardHeader>}
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <CardContent className=" space-y-4 flex-1 overflow-y-auto ">
+
               {/* <FormField
                 control={form.control}
                 name="labelField"
@@ -476,9 +483,10 @@ export function NodeDisplaySettings({ showReset = false,
                   />
                 )}
               /> */}
+              {/* <div className="  h-[100% - 90px]"> */}
               <FormField.ObjectField
                 control={form.control}
-                name="shape"
+                name="fields"
                 fields={importantFields}
                 rowConfig={importantFieldsRowConfig}
                 labelPosition={labelPosition}
@@ -496,6 +504,8 @@ export function NodeDisplaySettings({ showReset = false,
                     fields={shapeFields}
                     rowConfig={shapeRowConfig}
                     labelPosition={labelPosition}
+                  // defaultExpanded={["stroke"]}
+
                   />
                 </TabsContent>
                 <TabsContent value="label" className="mt-2">
@@ -508,20 +518,26 @@ export function NodeDisplaySettings({ showReset = false,
                   />
                 </TabsContent>
               </Tabs>
+              {/* </div> */}
+            </CardContent>
 
-              <Button type="submit" className="">
-                Submit
-              </Button>
-              {showReset && (
-                <Button type="button" variant="outline" onClick={handleReset} className="ml-3">
-                  Reset
+            {/* Fixed footer with submit button */}
+            <CardFooter className="pt-2 !pb-2 mt-2 ">
+              <div className="flex justify-between w-full">
+                <Button type="submit" className=" ">
+                  Update Settings
                 </Button>
-              )}
-            </form>
+                {showReset && (
+                  <Button type="button" variant="outline" onClick={handleReset}>
+                    Reset
+                  </Button>
+                )}
+              </div>
+            </CardFooter>
           </Form>
-        </CardContent>
-      </Card>
-      {/* </div> */}
+        </Card>
+      </form>
+
     </div>
   )
 }
