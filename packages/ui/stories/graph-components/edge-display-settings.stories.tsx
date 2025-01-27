@@ -25,7 +25,8 @@ export const Default: Story = {
     onSubmit: (data) => {
       console.log("onSubmit", data);
     },
-    className: "min-w-[480px] h-full",
+    header: "Edge Settings"
+    // className: "min-w-[480px] h-full",
     // showProperties: true,
   },
 };

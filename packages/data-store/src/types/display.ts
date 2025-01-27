@@ -40,7 +40,7 @@ export interface ICanvasEdgeShapeDisplay {
   strokeColor: IColor;
   strokeWidth: number;
   strokeOpacity: number;
-  strokeArrowheadSize: string;
+  strokeArrowheadSize: number;
   strokeArrowheadColor: IColor;
   strokeArrowheadOpacity: number;
 
