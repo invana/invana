@@ -3,7 +3,7 @@
 import { Slider } from "../../components/ui/slider"
 import { Input } from "../../components/ui/input"
 import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import React from "react"
 
 interface SliderFieldProps {

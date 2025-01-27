@@ -2,7 +2,7 @@ import { BaseBehavior, CanvasEvent, EdgeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, EdgeData, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
-import { ICanvasEdgeInfo, MenuItem, NestedMenu } from '@invana/ui';
+import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { EdgeCard } from '@invana/ui';
 // import React from 'react';
@@ -161,7 +161,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
 
-    const edgeData: ICanvasEdgeInfo = {
+    const edgeData: ICanvasEdge = {
       id: edge.id as string,
       label: edge.label as string,
       type: edge.data?.type ?? '',
