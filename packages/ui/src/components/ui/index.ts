@@ -16,3 +16,4 @@ export * from './input';
 export * from './checkbox';
 export * from './label';
 export * from './dropdown-menu';
+export * from './resizable';

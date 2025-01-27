@@ -18,7 +18,6 @@ export default defineConfig({
       "@invana/ui": path.resolve(__dirname, "../ui/src"),
       "@invana/canvas-datasets": path.resolve(__dirname, "../canvas-datasets"),
       "@invana/data-store": path.resolve(__dirname, "../../packages/data-store"),
-
     },
   },
   build: {

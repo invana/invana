@@ -120,6 +120,7 @@ const ExplorerPage: React.FC = () => {
             ref={containerRef}
             style={{ width: "100%", height: "100%" }}
             // className={"h-full"}
+            //@ts-ignore
             graphManager={graphManagerRef.current}
             initialData={flightData}
             onReady={() => {
