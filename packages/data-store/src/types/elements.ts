@@ -14,7 +14,7 @@ export interface ICanvasElement {
   type: string; // ex: Person, Entities
   label?: string; // this will be the display label; not the node label
   properties: IProperties;
-  displayLabel?: string;
+  // displayLabel?: string;
 }
 
 export interface ICanvasNode extends ICanvasElement {

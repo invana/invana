@@ -15,11 +15,6 @@ import { Graph } from '@antv/g6';
 import { QueryForm } from '@/ui/forms/query-form';
 
 
-
-
-
-
-
 const ExplorerPage: React.FC = () => {
 
   // const { theme } = useTheme();
@@ -124,6 +119,7 @@ const ExplorerPage: React.FC = () => {
           <CanvasGraph
             ref={containerRef}
             style={{ width: "100%", height: "100%" }}
+            // className={"h-full"}
             graphManager={graphManagerRef.current}
             initialData={flightData}
             onReady={() => {

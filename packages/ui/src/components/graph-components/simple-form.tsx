@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React from "react"
 import { Form } from "../../components/ui/form"
 import { useForm } from "react-hook-form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
@@ -8,7 +8,7 @@ import { FormBuilderConfig } from "../../form-generator/types"
 import { Button } from "../../components/ui"
 import { cn } from "@/lib/utils"
 
-interface FormBuilderProps {
+export interface FormBuilderProps {
   config: FormBuilderConfig
   onSubmit?: (data: any) => void
   defaultValues?: any
@@ -16,22 +16,22 @@ interface FormBuilderProps {
   showReset?: boolean
 }
 
-export function SimpleFormGenerator({ config, onSubmit, defaultValues = {},
-  className, showReset = false }: FormBuilderProps) {
+export const SimpleFormGenerator: React.FC<FormBuilderProps> = ({ config, onSubmit, defaultValues = {},
+  className, showReset = false }) => {
   const form = useForm({
     defaultValues,
   })
 
-  const [formData, setFormData] = useState<any>()
+  // const [formData, setFormData] = useState<any>()
 
   function handleSubmit(data: any) {
-    setFormData(data)
+    // setFormData(data)
     onSubmit?.(data)
   }
 
   function handleReset() {
     form.reset(defaultValues)
-    setFormData(undefined)
+    // setFormData(undefined)
   }
 
   return (
@@ -48,6 +48,7 @@ export function SimpleFormGenerator({ config, onSubmit, defaultValues = {},
             <FormField.ObjectField
               control={form.control}
               name=""
+              //@ts-ignore
               fields={config.fields}
               rowConfig={config.rowConfig}
               labelPosition={config.labelPosition}

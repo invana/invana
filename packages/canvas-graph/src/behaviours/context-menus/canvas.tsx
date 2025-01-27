@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g
 import { createRoot, Root } from 'react-dom/client';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
-import React from 'react';
+// import React from 'react';
 
 
 export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
@@ -108,7 +108,7 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
     document.body.prepend(this.container);
   }
 
-  onPointerMover = (event: IPointerEvent) => {
+  onPointerMover = (_: IPointerEvent) => {
     this.hideContainer();
   }
 

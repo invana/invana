@@ -1,6 +1,5 @@
 import { SimpleFormGenerator } from '@/components/graph-components/simple-form';
 import { FormBuilderConfig } from '@/form-generator/types';
-import { Button } from '@/index';
 import type { Meta, StoryObj } from '@storybook/react';
 
 
@@ -13,7 +12,6 @@ const meta = {
   },
   tags: ['autodocs'],
   args: {
-
   },
 } satisfies Meta<typeof SimpleFormGenerator>;
 
@@ -27,7 +25,7 @@ const config: FormBuilderConfig = {
   labelPosition: "top",
   fields: [
     {
-      type: "text",
+      type: "text" as const,
       name: "name",
       label: "Name",
       description: "Your full name",
@@ -37,7 +35,7 @@ const config: FormBuilderConfig = {
       },
     },
     {
-      type: "number",
+      type: "number" as const,
       name: "age",
       label: "Age",
       min: 0,
@@ -47,13 +45,13 @@ const config: FormBuilderConfig = {
       },
     },
     {
-      type: "boolean",
+      type: "boolean" as const,
       name: "subscribe",
       label: "Subscribe to newsletter",
       description: "Receive updates about our products and announcements",
     },
     {
-      type: "color",
+      type: "color" as const,
       name: "favoriteColor",
       label: "Favorite Color",
       presetColors: [
@@ -63,7 +61,7 @@ const config: FormBuilderConfig = {
       ],
     },
     {
-      type: "select",
+      type: "select" as const,
       name: "country",
       label: "Country",
       description: "Select your country",
@@ -74,7 +72,7 @@ const config: FormBuilderConfig = {
       ],
     },
     {
-      type: "icon",
+      type: "icon" as const,
       name: "icon",
       label: "Select Icon",
     },

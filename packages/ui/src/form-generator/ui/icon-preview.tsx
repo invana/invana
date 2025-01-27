@@ -1,5 +1,4 @@
 "use client"
-import React from "react"
 import * as LucideIcons from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover"
 import { Input } from "../../components/ui/input"
@@ -14,7 +13,7 @@ interface IconPreviewProps {
   className?: string
 }
 
-export function IconPreview({ value, onChange, className }: IconPreviewProps) {
+export const IconPreview: React.FC<IconPreviewProps> = ({ value, onChange, className }) => {
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
 

@@ -1,8 +1,8 @@
 "use client"
-import React from "react"
 import { cn } from "../../lib/utils"
 import { Check } from "lucide-react"
 import { useState, useEffect } from "react"
+import React from "react";
 
 interface ColorOption {
   label: string
@@ -17,7 +17,7 @@ interface ColorSwatchesProps {
   defaultValue?: string
 }
 
-export function ColorSwatches({
+export const ColorSwatches: React.FC<ColorSwatchesProps> = ({
   value,
   onChange,
   presetColors = [
@@ -26,7 +26,7 @@ export function ColorSwatches({
     { label: "Blue", value: "rgb(59, 130, 246)" },
   ],
   defaultValue = "rgb(0, 0, 0)",
-}: ColorSwatchesProps) {
+}) => {
   const [customColor, setCustomColor] = useState(value || defaultValue)
   const [isCustom, setIsCustom] = useState(false)
 

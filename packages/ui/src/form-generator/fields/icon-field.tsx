@@ -14,7 +14,7 @@ interface IconFieldProps {
   labelPosition?: "side" | "top"
 }
 
-export function IconField({ label, value, onChange, className, labelPosition = "side" }: IconFieldProps) {
+export const IconField: React.FC<IconFieldProps> = ({ label, value, onChange, className, labelPosition = "side" }) => {
   // Get the selected icon component
   const SelectedIcon = value ? (icons as any)[value] : null
 

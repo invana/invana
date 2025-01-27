@@ -1,9 +1,7 @@
-import React, { forwardRef } from "react"
-import type { Control } from "react-hook-form"
+import { forwardRef } from "react"
 import {
   FormControl,
   FormDescription,
-  FormField as FormFieldBase,
   FormItem,
   FormLabel,
   FormMessage,
@@ -18,6 +16,8 @@ import { IconPreview } from "../ui/icon-preview"
 import { ImageField } from "./image-field"
 import { GeoField } from "./geo-field"
 import { TimeField } from "./time-field"
+import React from "react";
+
 
 interface FieldProps {
   label?: string
@@ -35,13 +35,15 @@ interface FieldProps {
   labelPosition?: "side" | "top"
 }
 
-export function InputField({ label, description, labelPosition = "side", className, ...props }: FieldProps) {
-  const { presetColors, options, min, max, step, defaultValue, ...domProps } = props
+export const InputField: React.FC<FieldProps> = ({ label, description, labelPosition = "side",
+  className, ...props }) => {
+  const { ...domProps } = props
   return (
     <FormItem
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-center gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
@@ -56,7 +58,7 @@ export function InputField({ label, description, labelPosition = "side", classNa
   )
 }
 
-export const SelectField = forwardRef<HTMLSelectElement, FieldProps>(({
+export const SelectField = forwardRef<HTMLButtonElement, FieldProps>(({
   label,
   description,
   options = [],
@@ -133,19 +135,22 @@ export function ColorField({
   defaultValue,
   labelPosition = "side",
   className,
-  ...domProps
 }: FieldProps) {
   return (
     <FormItem
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-center gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
+
+
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
         <FormControl>
-          <ColorSwatches value={value} onChange={onChange} presetColors={presetColors} defaultValue={defaultValue} />
+          <ColorSwatches value={value} onChange={onChange} presetColors={presetColors}
+            defaultValue={defaultValue} />
         </FormControl>
         {description && <FormDescription className="text-xs">{description}</FormDescription>}
         <FormMessage className="text-xs" />
@@ -154,7 +159,9 @@ export function ColorField({
   )
 }
 
-export function NumberField({ label, description, value, onChange, labelPosition = "side", ...props }: FieldProps) {
+export const NumberField: React.FC<FieldProps> = ({ label, description, value, onChange,
+  labelPosition = "side",
+}) => {
   return (
     <FormItem
       className={cn(
@@ -165,7 +172,7 @@ export function NumberField({ label, description, value, onChange, labelPosition
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
         <FormControl>
-          <SliderField value={value} onChange={onChange} {...props} />
+          <SliderField value={value} onChange={onChange} />
         </FormControl>
         {description && <FormDescription className="text-xs">{description}</FormDescription>}
         <FormMessage className="text-xs" />
@@ -181,14 +188,16 @@ export function IconPreviewField({
   onChange,
   labelPosition = "side",
   className,
-  ...props
+  // ...props
 }: FieldProps) {
   return (
     <FormItem
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-center gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
+
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
@@ -209,14 +218,16 @@ export function ImagePreviewField({
   onChange,
   labelPosition = "side",
   className,
-  ...props
+  // ...props
 }: FieldProps) {
   return (
     <FormItem
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-start gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
+
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
@@ -237,14 +248,16 @@ export function GeoLocationField({
   onChange,
   labelPosition = "side",
   className,
-  ...props
+  // ...props
 }: FieldProps) {
   return (
     <FormItem
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-start gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
+
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
@@ -272,12 +285,13 @@ export function TimePickerField({
       className={cn(
         labelPosition === "side" && "grid grid-cols-3 items-start gap-2",
         labelPosition === "top" && "space-y-2",
+        className
       )}
     >
       {label && <FormLabel className="text-xs">{label}</FormLabel>}
       <div className={cn(labelPosition === "side" && "col-span-2", "space-y-1")}>
         <FormControl>
-          <TimeField value={value} onChange={onChange} />
+          <TimeField value={value} onChange={onChange} {...props} />
         </FormControl>
         {description && <FormDescription className="text-xs">{description}</FormDescription>}
         <FormMessage className="text-xs" />

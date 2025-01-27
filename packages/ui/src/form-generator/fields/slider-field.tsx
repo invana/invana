@@ -3,6 +3,7 @@
 import { Slider } from "../../components/ui/slider"
 import { Input } from "../../components/ui/input"
 import { useState } from "react"
+import { cn } from "@/lib/utils"
 import React from "react"
 
 interface SliderFieldProps {
@@ -14,7 +15,8 @@ interface SliderFieldProps {
   className?: string
 }
 
-export function SliderField({ value = 0, onChange, min = 0, max = 100, step = 1, className }: SliderFieldProps) {
+export const SliderField: React.FC<SliderFieldProps> = ({ value = 0, onChange, min = 0,
+  max = 100, step = 1, className }) => {
   const [localValue, setLocalValue] = useState(value)
 
   const handleChange = (newValue: number) => {
@@ -23,7 +25,7 @@ export function SliderField({ value = 0, onChange, min = 0, max = 100, step = 1,
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-2", className)}>
       <Slider
         value={[localValue]}
         onValueChange={([newValue]) => handleChange(newValue)}

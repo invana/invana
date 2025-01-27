@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 import { Moon, Package, Sun, } from 'lucide-react'
 import {
   Tooltip,

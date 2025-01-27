@@ -1,6 +1,5 @@
 "use client"
 import React from "react"
-import { useState } from "react"
 import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
 import { Card, CardContent, CardFooter, CardHeader } from "../../../components/ui/card"
@@ -42,14 +41,14 @@ export interface EdgeDisplaySettingsProps {
 //   { label: "Time", value: "time" },
 // ]
 
-export function EdgeDisplaySettings({
+export const EdgeDisplaySettings: React.FC<EdgeDisplaySettingsProps> = ({
   showReset = true,
   propertyKeys = [],
   defaultValues = {},
   labelPosition = "top",
   className = 'w-[420px]',
   ...props
-}: EdgeDisplaySettingsProps) {
+}) => {
   const form = useForm<ICanvasEdgeDisplay>({
     defaultValues: defaultValues
   })
@@ -245,14 +244,14 @@ export function EdgeDisplaySettings({
   const importantFields = [
     {
       name: "labelField",
-      type: "select",
+      type: "select" as const,
       options: propertyKeys.map(key => ({ label: key, value: key })),
       // group: "general",
       row: "basic",
     },
     {
       name: "imageField",
-      type: "select",
+      type: "select" as const,
       options: propertyKeys.map(key => ({ label: key, value: key })),
       // group: "general",
       row: "basic",

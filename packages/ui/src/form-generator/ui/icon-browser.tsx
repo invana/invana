@@ -13,7 +13,7 @@ interface IconBrowserProps {
   className?: string
 }
 
-export function IconBrowser({ value, onChange, className }: IconBrowserProps) {
+export const IconBrowser: React.FC<IconBrowserProps> = ({ value, onChange, className }) => {
   const [search, setSearch] = useState("")
 
   // Filter and memoize icons

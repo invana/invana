@@ -22,6 +22,7 @@ export interface CanvasGraphProps {
   initialData: ICanvasData;
   options?: Omit<GraphOptions, 'data'>;
   style?: React.CSSProperties;
+  className?: string;
   // graph?: Graph;
   graphManager?: GraphManager; //comes with inbuilt graphStore or user can pass their own
   onReady?: () => void;
@@ -34,7 +35,7 @@ const MemoizedGraphin = React.memo(Graphin);
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   console.log("CanvasGraph props", props, "======")
-  const { options, style, header = false } = props;
+  const { options, header = false } = props;
 
   const localRef = useRef<Graph | null>(null);
   //@ts-ignore
@@ -65,7 +66,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   }, []);
 
   return (
-    <div style={props?.style || {}} className='graph-canvas'>
+    <div style={props?.style || {}} className={'graph-canvas ' + props.className || ''}>
       {graph && header && <CanvasToolBar getGraph={() => graph} />}
 
 
@@ -87,7 +88,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
             console.log("CanvasGraph -> onReady", "no onReady callback")
           }
         }}
-        style={style}
+        // style={style}
         options={graphOptions}
       >
 

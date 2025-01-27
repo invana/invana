@@ -63,7 +63,7 @@ export class GraphDataCRUD extends GraphBase {
     if (!this.data.hasNode(id)) {
       throw new Error(`Node with id ${id} does not exist.`);
     }
-    this._updateNode(id, { ...display })
+    this._updateNode(id, { display })
   }
 
   // Delete a node
@@ -106,7 +106,7 @@ export class GraphDataCRUD extends GraphBase {
     if (!this.data.hasEdge(id)) {
       throw new Error(`Edge with id ${id} does not exist.`);
     }
-    this._updateEdge(id, { ...display })
+    this._updateEdge(id, { display })
   }
 
   // Read an edge

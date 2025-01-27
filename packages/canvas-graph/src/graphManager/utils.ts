@@ -4,7 +4,9 @@ import { EdgeData, NodeData } from "@antv/g6";
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
 
-  const { id, type, properties, shape, labelField } = node;
+  const { id, type, properties, display } = node;
+  const labelField = display?.fields?.labelField;
+  const shape = display?.shape;
   return {
     id: id,
     x: node.x || 0,
@@ -41,7 +43,9 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
 
 export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => {
 
-  const { id, type, properties, labelField, source, target } = node;
+  const { id, type, properties, display, source, target } = node;
+
+  const labelField = display?.fields?.labelField;
   return {
     id: id,
     source: source,

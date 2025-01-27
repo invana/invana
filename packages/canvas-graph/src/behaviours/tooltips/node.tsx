@@ -2,7 +2,7 @@ import { BaseBehavior, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
-import React from 'react';
+// import React from 'react';
 import { NodeCard } from '@invana/ui';
 
 
@@ -63,7 +63,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     this.hideContainer();
   }
 
-  onMoueLeave = (event: IPointerEvent) => {
+  onMoueLeave = (_: IPointerEvent) => {
     const { graph } = this.context;
     graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
     this.hideContainer();

@@ -18,6 +18,21 @@ export interface BaseFieldConfig {
   }
 }
 
+
+// export interface IField {
+//   name: string;
+//   type: "number" | "boolean" | "select" | "time" | "image" | "text" | "color" | "icon" | "geo";
+//   options?: { label: string; value: string; }[];
+//   group?: string;
+//   row?: string;
+//   min?: number;
+//   max?: number;
+//   step?: number;
+//   presetColors?: { label: string; value: string; }[];
+//   defaultValue?: string;
+// }
+
+
 export interface TextFieldConfig extends BaseFieldConfig {
   type: "text"
 }

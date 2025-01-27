@@ -23,7 +23,7 @@ interface ColorPickerProps {
   onChange?: (value: string) => void
 }
 
-export function ColorPicker({ value = "#000000", onChange }: ColorPickerProps) {
+export const ColorPicker: React.FC<ColorPickerProps> = ({ value = "#000000", onChange }) => {
   const [color, setColor] = useState(value.toString())
 
   const handleChange = (newColor: string) => {

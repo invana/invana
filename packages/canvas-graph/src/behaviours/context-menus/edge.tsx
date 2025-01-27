@@ -5,7 +5,7 @@ import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { ICanvasEdgeInfo, MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { EdgeCard } from '@invana/ui';
-import React from 'react';
+// import React from 'react';
 
 
 export interface EdgeContextMenuOptions extends BaseBehaviorOptions {
@@ -111,7 +111,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
   }
 
 
-  onPointerMover = (event: IPointerEvent) => {
+  onPointerMover = (_: IPointerEvent) => {
     this.hideContainer();
   }
 

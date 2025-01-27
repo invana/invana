@@ -5,7 +5,7 @@ import { ICanvasNode, IProperties } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
-import React from 'react';
+// import React from 'react';
 
 
 export interface NodeContextMenuOptions extends BaseBehaviorOptions {
@@ -111,7 +111,7 @@ export class NodeContextMenuBehavior extends BaseBehavior {
   }
 
 
-  onPointerMover = (event: IPointerEvent) => {
+  onPointerMover = (_: IPointerEvent) => {
     this.hideContainer();
   }
 

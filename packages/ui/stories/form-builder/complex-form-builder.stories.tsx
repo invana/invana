@@ -1,4 +1,5 @@
 import { NodeDisplaySettings } from '@/index';
+import { ICanvasNodeDisplay } from '@invana/data-store';
 import type { Meta, StoryObj } from '@storybook/react';
 
 
@@ -23,5 +24,10 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     // className: 'w-[300px]',
+    onSubmit: (data: ICanvasNodeDisplay) => {
+      console.log("onSubmit", data)
+    },
+    defaultValues: {},
+    propertyKeys: []
   },
 };

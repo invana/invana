@@ -1,10 +1,11 @@
-import React from "react"
 import type { Control } from "react-hook-form"
 import { FormField as FormFieldBase } from "../components/ui/form"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion"
 import { Field } from "./fields/field-base"
+import React from "react"
 
-interface ObjectFieldProps {
+
+export interface ObjectFieldProps {
   control: Control<any>
   name: string
   fields: Array<{
@@ -28,7 +29,7 @@ interface ObjectFieldProps {
   labelPosition?: "side" | "top"
 }
 
-function ObjectField({ control, name, fields, rowConfig, labelPosition = "side" }: ObjectFieldProps) {
+const ObjectField: React.FC<ObjectFieldProps> = ({ control, name, fields, rowConfig, labelPosition = "side" }) => {
   // Organize fields by groups
   const groupedFields = fields.reduce(
     (acc, field) => {
@@ -42,7 +43,7 @@ function ObjectField({ control, name, fields, rowConfig, labelPosition = "side" 
     {} as Record<string, typeof fields>,
   )
 
-  const renderFields = (fields: typeof ObjectFieldProps.prototype.fields) => {
+  const renderFields = (fields: ObjectFieldProps['fields']) => {
     if (!rowConfig) {
       // If no row configuration, render fields two per row
       return (
@@ -174,7 +175,11 @@ function chunk<T>(array: T[], size: number): T[][] {
   }, [] as T[][])
 }
 
-export const FormField = Object.assign(FormFieldBase, {
+export type FormFieldType = typeof FormFieldBase & {
+  ObjectField: typeof ObjectField;
+}
+
+export const FormField: FormFieldType = Object.assign(FormFieldBase, {
   ...Field,
   ObjectField,
 })
