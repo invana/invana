@@ -2,7 +2,10 @@ import React, { useRef, useState } from 'react';
 import { LogoComponent, sideBarBottomNavitems, sideBarTopNavitems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
-  BlankLayout
+  BlankLayout,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
 } from '@invana/ui';
 import { ReactFlowProvider } from '@invana/canvas-flow';
 import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
@@ -13,6 +16,7 @@ import { flightData } from '@invana/example-datasets'
 import { SearchIcon } from 'lucide-react'
 import { Graph } from '@antv/g6';
 import { QueryForm } from '@/ui/forms/query-form';
+import useLayout from '@/hooks/useLayout'
 
 
 const ExplorerPage: React.FC = () => {
@@ -23,6 +27,8 @@ const ExplorerPage: React.FC = () => {
   // const initGraphManager = React.useCallback((manager: GraphManager) => {
   //   setGraphManager(manager);
   // }, []);
+
+  const { leftSidebar, setLeftSidebar, rightSidebar, setRightSidebar } = useLayout()
 
 
   const [isReady, setIsReady] = useState(false);
@@ -80,7 +86,6 @@ const ExplorerPage: React.FC = () => {
       sideBarTopNavitems={sideBarTopNavitems}
       sideBarBottomNavitems={sideBarBottomNavitems}
     >
-
       <ReactFlowProvider fitView>
         <AppHeader
           left={
@@ -91,7 +96,6 @@ const ExplorerPage: React.FC = () => {
               <span>Explorer</span>
             </>
           }
-
           center={
             <>
               {isReady && containerRef.current && <CanvasToolBar getGraph={containerRef.current.getGraph} />}
@@ -101,34 +105,38 @@ const ExplorerPage: React.FC = () => {
             <>
               <AppHeaderRight />
             </>
-
           }
         >
         </AppHeader>
-
         <AppMain>
+          {/* {showQueryModal && <QueryForm />} */}
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="  w-full "
+          >
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={30}>
+              <QueryForm />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={75}>
+              {/* <div className="flex h-full items-center justify-center"> */}
 
-
-
-
-          {showQueryModal && <QueryForm />}
-
-
-
-
-          <CanvasGraph
-            ref={containerRef}
-            style={{ width: "100%", height: "100%" }}
-            // className={"h-full"}
-            //@ts-ignore
-            graphManager={graphManagerRef.current}
-            initialData={flightData}
-            onReady={() => {
-              console.log("onReady")
-              setIsReady(true)
-            }}
-            options={options}
-          />
+              <CanvasGraph
+                ref={containerRef}
+                style={{ width: "100%", height: "100%" }}
+                // className={"h-full"}
+                //@ts-ignore
+                graphManager={graphManagerRef.current}
+                initialData={flightData}
+                onReady={() => {
+                  console.log("onReady")
+                  setIsReady(true)
+                }}
+                options={options}
+              />
+              {/* </div> */}
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </AppMain>
 
         <AppFooter

@@ -13,11 +13,21 @@ type QueryLanguage = 'gremlin' | 'cypher'
 export const QueryForm = (props) => {
 
   const [language, setLanguage] = useState<QueryLanguage>('gremlin')
-  const [query, setQuery] = useState(`-- Write your ${language} query here
-SELECT * FROM users
-WHERE status = 'active'
-ORDER BY created_at DESC
-LIMIT 10;`)
+
+  const queryString = `-- Write your ${language} query here
+g.V()
+.limit(10)
+.elementMap()
+.toList()
+`
+  const queryHistory = [
+    {
+      query: queryString,
+      createdAt: new Date()
+    }
+  ]
+
+  const [query, setQuery] = useState(queryString)
 
   const handleExecuteQuery = () => {
     console.log('Executing query:', query)
@@ -29,21 +39,42 @@ LIMIT 10;`)
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-2xl font-bold">Query Console</CardTitle>
-          <div className="flex items-center gap-4">
-            <Select
-              value={language}
-              onValueChange={(value) => handleLanguageChange(value as QueryLanguage)}
-            >
+    <div className="h-full flex flex-col">
+      <Card className="flex-1 flex flex-col border-0 rounded-none">
+        <CardHeader className="flex flex-row border-b items-center justify-between space-y-0">
+          <CardTitle className="  font-bold">Query Console</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col gap-4 p-0">
+
+          <div className="flex-1     overflow-hidden bg-background">
+            <Editor
+              height="100%"
+              defaultLanguage="sql"
+              language="sql"
+              theme="vs-dark"
+              value={query}
+              onChange={(value) => setQuery(value || "")}
+              options={{
+                minimap: { enabled: false },
+                lineNumbers: "on",
+                lineHeight: 24,
+                padding: { top: 13, bottom: 13 },
+                scrollBeyondLastLine: false,
+                fontSize: 13,
+                tabSize: 2,
+                wordWrap: "on",
+                automaticLayout: true,
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4 px-3 pt-0 pb-0">
+            <Select value={language} onValueChange={(value) => handleLanguageChange(value as QueryLanguage)}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select language" />
+                <SelectValue placeholder="Select language" defaultValue={"gremlin"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mysql">MySQL</SelectItem>
-                <SelectItem value="postgresql">PostgreSQL</SelectItem>
+                <SelectItem value="gremlin">gremlin</SelectItem>
+                <SelectItem value="cypher">cypher</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleExecuteQuery} className="gap-2">
@@ -51,32 +82,21 @@ LIMIT 10;`)
               Execute Query
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-lg overflow-hidden bg-background">
-            <Editor
-              height="400px"
-              defaultLanguage="sql"
-              language="sql"
-              theme="vs-dark"
-              value={query}
-              onChange={(value) => setQuery(value || '')}
-              options={{
-                minimap: { enabled: false },
-                lineNumbers: 'on',
-                lineHeight: 24,
-                padding: { top: 16, bottom: 16 },
-                scrollBeyondLastLine: false,
-                fontSize: 14,
-                tabSize: 2,
-                wordWrap: 'on',
-                automaticLayout: true,
-              }}
-            />
-          </div>
-          <div className="mt-4 p-4 rounded-lg border bg-muted/40">
-            <h3 className="font-semibold mb-2">Results</h3>
-            <p className="text-muted-foreground">Execute a query to see results here.</p>
+          <div className="h-68 overflow-auto p-2 border-0 !border-t bg-muted/40">
+            <h3 className="font-semibold mb-2">Query history</h3>
+
+            {
+              queryHistory.map((item, index) => (
+                <div key={index} className="mb-2 p-2 border rounded-md">
+                  <pre className="text-sm">{item.query}</pre>
+                  <span className="text-xs text-muted-foreground">
+                    {item.createdAt.toLocaleString()}
+                  </span>
+                </div>
+              ))
+            }
+
+            {/* <p className="text-muted-foreground">Execute a query to see results here.</p> */}
           </div>
         </CardContent>
       </Card>
