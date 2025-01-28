@@ -43,7 +43,12 @@ const ExplorerPage: React.FC = () => {
 
 
   const sideBarTopNavitems: SideBarNavitemProps[] = [
-    { name: "SearchIcon", onClick: () => setLeftSidebar("search"), icon: SearchIcon },
+    {
+      name: "SearchIcon", onClick: () => {
+        console.log("SearchIcon clicked", leftSidebar)
+        return leftSidebar === undefined ? setLeftSidebar("search") : setLeftSidebar(undefined)
+      }, icon: SearchIcon
+    },
     { name: "Query", href: "/explorer", icon: Compass },
     { name: "Modeller", href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
