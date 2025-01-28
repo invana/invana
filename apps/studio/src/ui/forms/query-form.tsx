@@ -1,6 +1,7 @@
 import {
   Card, CardHeader, CardTitle, Select, SelectTrigger,
-  SelectValue, SelectContent, SelectItem, Button, CardContent
+  SelectValue, SelectContent, SelectItem, Button, CardContent,
+  CardFooter
 } from "@invana/ui"
 import { Play } from "lucide-react"
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
@@ -26,6 +27,10 @@ g.V()
 .toList()
 `
   const queryHistory = [
+    {
+      query: queryString,
+      createdAt: new Date()
+    },
     {
       query: queryString,
       createdAt: new Date()
@@ -59,13 +64,13 @@ g.V()
 
   return (
     <div className={cn("h-full w-full flex flex-col", props.className)}>
-      <Card className="flex-1 flex flex-col border-0 rounded-none">
-        <CardHeader className="flex flex-row border-b items-center justify-between space-y-0">
-          <CardTitle className="font-bold uppercase">Query Console</CardTitle>
+      <Card className="flex-1 flex flex-col  rounded-none">
+        <CardHeader className="flex flex-row border-b items-center p2 justify-between space-y-0">
+          <CardTitle className="font-bold uppercase  ">Query Console</CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col gap-4 p-0">
 
-          <div className="flex-1 overflow-hidden bg-background">
+          <div className="flex-1 overflow-hidden border-b bg-background">
             <Editor
               height="100%"
               defaultLanguage="sql"
@@ -87,23 +92,38 @@ g.V()
               }}
             />
           </div>
-          <div className="flex items-center justify-between gap-4 px-3 pt-0 pb-0">
-            <Select value={language} onValueChange={(value) => handleLanguageChange(value as QueryLanguage)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select language" defaultValue={"gremlin"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gremlin">gremlin</SelectItem>
-                <SelectItem value="cypher">cypher</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleExecuteQuery} className="gap-2">
-              <Play className="w-4 h-4" />
-              Execute Query
-            </Button>
-          </div>
-          <div className="h-90 overflow-auto p-2 border-0 !border-t bg-muted/40">
-            <h3 className="font-semibold mb-2">Query history</h3>
+
+
+
+
+        </CardContent>
+        <CardFooter className=" flex items-center justify-between "  >
+          {/* <div > */}
+          <Select value={language} onValueChange={(value) => handleLanguageChange(value as QueryLanguage)}>
+            <SelectTrigger className="w-[180px] px-2 py-1">
+              <SelectValue placeholder="Select language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gremlin">gremlin</SelectItem>
+              <SelectItem value="cypher">cypher</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleExecuteQuery} className="gap-2">
+            <Play className="w-4 h-4" />
+            Execute Query
+          </Button>
+          {/* </div> */}
+        </CardFooter>
+      </Card>
+      <Card className=" flex   max-h-[200px] flex-col rounded-none">
+        <CardHeader>
+          <CardTitle>
+            Query history
+
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col gap-4 p-0">
+          <div className="  overflow-auto p-2 border-0 !border-t">
             {
               queryHistory.map((item, index) => (
                 <div key={index} className="mb-2 p-2 border rounded-md">
@@ -118,6 +138,7 @@ g.V()
           </div>
         </CardContent>
       </Card>
-    </div>
+
+    </div >
   )
 }

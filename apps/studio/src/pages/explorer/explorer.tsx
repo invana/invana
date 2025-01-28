@@ -15,7 +15,7 @@ import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
-import { Activity, Compass, MonitorCog, Network, Search, SearchIcon } from 'lucide-react'
+import { Activity, Compass, MonitorCog, Network, Search, SearchIcon, Terminal } from 'lucide-react'
 import { Graph } from '@antv/g6';
 import { QueryForm } from '@/ui/forms/query-form';
 import useLayout from '@/hooks/useLayout'
@@ -44,12 +44,21 @@ const ExplorerPage: React.FC = () => {
 
   const sideBarTopNavitems: SideBarNavitemProps[] = [
     {
-      name: "SearchIcon", onClick: () => {
+      name: "Search",
+      onClick: () => {
         console.log("SearchIcon clicked", leftSidebar)
         return leftSidebar === undefined ? setLeftSidebar("search") : setLeftSidebar(undefined)
-      }, icon: SearchIcon
+      },
+      icon: SearchIcon
     },
-    { name: "Query", href: "/explorer", icon: Compass },
+    {
+      name: "Query",
+      onClick: () => {
+        console.log("SearchIcon clicked", rightSidebar)
+        return rightSidebar === undefined ? setRightSidebar("search") : setRightSidebar(undefined)
+      },
+      icon: Terminal
+    },
     { name: "Modeller", href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
     { name: "Activity History", href: "#", icon: Activity },
@@ -123,11 +132,17 @@ const ExplorerPage: React.FC = () => {
         <AppMain>
 
           {
-            leftSidebar && <div className={"w-[480px]  flex h-[calc(100vh-80px)] z-[1000] border-r overflow-hidden absolute"}>
+            leftSidebar && <div className={"w-[480px]  flex h-[calc(100vh-80px)] z-[1000]   overflow-hidden absolute"}>
+
               <QueryForm />
             </div>
           }
 
+          {
+            rightSidebar && <div className={"w-[320px] right-0 flex h-[calc(100vh-80px)] z-[1000]   overflow-hidden absolute"}>
+              <QueryForm />
+            </div>
+          }
           <CanvasGraph
             ref={containerRef}
             style={{ width: "100%", height: "100%" }}

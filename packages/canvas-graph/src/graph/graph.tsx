@@ -36,7 +36,6 @@ const MemoizedGraphin = React.memo(Graphin);
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   console.log("CanvasGraph props", props, "======")
   const { options, header = false } = props;
-
   const localRef = useRef<Graph | null>(null);
   //@ts-ignore
   const graphManager = props.graphManager ? props.graphManager : new GraphManager(null);
