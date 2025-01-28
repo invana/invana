@@ -3,14 +3,19 @@ import {
   SelectValue, SelectContent, SelectItem, Button, CardContent
 } from "@invana/ui"
 import { Play } from "lucide-react"
-import Editor from '@monaco-editor/react'
-import { useState } from "react"
+import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import { useRef, useState } from "react"
+import { cn } from "@invana/ui/lib/utils"
 
 
 type QueryLanguage = 'gremlin' | 'cypher'
 
+export interface QueryFormProps {
+  children?: React.ReactNode
+  className?: string
+}
 
-export const QueryForm = (props) => {
+export const QueryForm = (props: QueryFormProps) => {
 
   const [language, setLanguage] = useState<QueryLanguage>('gremlin')
 
@@ -38,8 +43,22 @@ g.V()
     setLanguage(newLanguage)
   }
 
+  //@ts-ignore
+  const editorRef = useRef<any | null>(null);
+
+  const handleEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor;
+    editor.focus();
+    const model = editor.getModel();
+    if (model) {
+      const lineCount = model.getLineCount();
+      const lastLineLength = model.getLineLength(lineCount);
+      editor.setPosition({ lineNumber: lineCount, column: lastLineLength + 1 });
+    }
+  };
+
   return (
-    <div className="h-full flex flex-col">
+    <div className={cn("h-full w-full flex flex-col", props.className)}>
       <Card className="flex-1 flex flex-col border-0 rounded-none">
         <CardHeader className="flex flex-row border-b items-center justify-between space-y-0">
           <CardTitle className="font-bold uppercase">Query Console</CardTitle>
@@ -53,6 +72,7 @@ g.V()
               language="sql"
               theme="vs-dark"
               value={query}
+              onMount={handleEditorDidMount}
               onChange={(value) => setQuery(value || "")}
               options={{
                 minimap: { enabled: false },
@@ -84,7 +104,6 @@ g.V()
           </div>
           <div className="h-90 overflow-auto p-2 border-0 !border-t bg-muted/40">
             <h3 className="font-semibold mb-2">Query history</h3>
-
             {
               queryHistory.map((item, index) => (
                 <div key={index} className="mb-2 p-2 border rounded-md">
@@ -95,7 +114,6 @@ g.V()
                 </div>
               ))
             }
-
             {/* <p className="text-muted-foreground">Execute a query to see results here.</p> */}
           </div>
         </CardContent>

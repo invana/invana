@@ -3,6 +3,7 @@ import { LogoComponent, sideBarBottomNavitems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout,
+  Card,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -115,6 +116,13 @@ const ExplorerPage: React.FC = () => {
         >
         </AppHeader>
         <AppMain>
+
+          {
+            leftSidebar && <div className={"w-[480px]  flex h-[calc(100vh-80px)] z-[1000] border-r overflow-hidden absolute"}>
+              <QueryForm />
+            </div>
+          }
+
           <CanvasGraph
             ref={containerRef}
             style={{ width: "100%", height: "100%" }}
