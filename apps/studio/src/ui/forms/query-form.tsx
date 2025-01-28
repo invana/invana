@@ -90,6 +90,14 @@ g.V()
                 wordWrap: "on",
                 automaticLayout: true,
               }}
+              beforeMount={(monaco) => {
+                return () => {
+                  if (editorRef.current) {
+                    editorRef.current.dispose();
+                    editorRef.current = null;
+                  }
+                };
+              }}
             />
           </div>
 
