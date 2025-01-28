@@ -42,11 +42,11 @@ g.V()
     <div className="h-full flex flex-col">
       <Card className="flex-1 flex flex-col border-0 rounded-none">
         <CardHeader className="flex flex-row border-b items-center justify-between space-y-0">
-          <CardTitle className="  font-bold">Query Console</CardTitle>
+          <CardTitle className="font-bold uppercase">Query Console</CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col gap-4 p-0">
 
-          <div className="flex-1     overflow-hidden bg-background">
+          <div className="flex-1 overflow-hidden bg-background">
             <Editor
               height="100%"
               defaultLanguage="sql"
@@ -82,7 +82,7 @@ g.V()
               Execute Query
             </Button>
           </div>
-          <div className="h-68 overflow-auto p-2 border-0 !border-t bg-muted/40">
+          <div className="h-90 overflow-auto p-2 border-0 !border-t bg-muted/40">
             <h3 className="font-semibold mb-2">Query history</h3>
 
             {
