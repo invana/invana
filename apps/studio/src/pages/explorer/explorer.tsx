@@ -118,7 +118,7 @@ const ExplorerPage: React.FC = () => {
           <CanvasGraph
             ref={containerRef}
             style={{ width: "100%", height: "100%" }}
-            // className={"h-full w-full"}
+            className={"bg-background"}
             //@ts-expect-error
             graphManager={graphManagerRef.current}
             initialData={flightData}
