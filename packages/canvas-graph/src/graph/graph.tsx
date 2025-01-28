@@ -66,7 +66,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   }, []);
 
   return (
-    <div style={props?.style || {}} className={'graph-canvas ' + props.className || ''}>
+    <div style={props?.style || {}} className={'graph-canvas overflow-hidden ' + props.className || ''}>
       {graph && header && <CanvasToolBar getGraph={() => graph} />}
 
 

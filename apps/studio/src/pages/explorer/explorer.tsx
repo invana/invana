@@ -115,45 +115,19 @@ const ExplorerPage: React.FC = () => {
         >
         </AppHeader>
         <AppMain>
-          <ResizablePanelGroup
-            direction="horizontal"
-            className="  w-full "
-          >
-            <ResizablePanel
-              minSize={leftSidebar ? 20 : 0.5}
-              defaultSize={leftSidebar ? 20 : 0.5}
-              key={leftSidebar ? "open" : "closed"} // Add key to force re-render
-              style={{
-                transition: 'flex-basis 0.2s ease-in-out'
-              }}
-              onResize={(e) => {
-                console.log("onResize", e)
-              }}
-              collapsible={true}
-              maxSize={30}
-            >
-              {leftSidebar == 'search' && <QueryForm />}
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={75}>
-              {/* <div className="flex h-full items-center justify-center"> */}
-
-              <CanvasGraph
-                ref={containerRef}
-                style={{ width: "100%", height: "100%" }}
-                // className={"h-full"}
-                //@ts-ignore
-                graphManager={graphManagerRef.current}
-                initialData={flightData}
-                onReady={() => {
-                  console.log("onReady")
-                  setIsReady(true)
-                }}
-                options={options}
-              />
-              {/* </div> */}
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          <CanvasGraph
+            ref={containerRef}
+            style={{ width: "100%", height: "100%" }}
+            // className={"h-full w-full"}
+            //@ts-expect-error
+            graphManager={graphManagerRef.current}
+            initialData={flightData}
+            onReady={() => {
+              console.log("onReady")
+              setIsReady(true)
+            }}
+            options={options}
+          />
         </AppMain>
 
         <AppFooter
