@@ -5,12 +5,9 @@ import { Bell, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 
-
-
-export function LeftNav({ items, activeItem: externalActiveItem, onItemClick }: DefaultNewLayoutProps["leftNavProps"]) {
+export const LeftNav: React.FC<DefaultNewLayoutProps["leftNavProps"]> = ({ items, activeItem: externalActiveItem, onItemClick }) => {
   const [activeItem, setActiveItem] = React.useState(externalActiveItem ?? items[0]?.label)
-  const { toggleLeftSidebar, toggleRightSidebar, isBottomPanelCollapsed } = usePanelStore()
-  console.log("isBottomPanelCollapsed", isBottomPanelCollapsed)
+  const { toggleLeftContent, toggleRightContent } = usePanelStore()
 
   const bottomNavItems = [
     { icon: Settings, label: "Settings", href: "#" },
@@ -25,9 +22,9 @@ export function LeftNav({ items, activeItem: externalActiveItem, onItemClick }: 
           onClick={() => {
             setActiveItem(item.label)
             if (item.toggleSidebar === "query") {
-              toggleLeftSidebar()
+              toggleLeftContent("query")
             } else if (item.toggleSidebar === "docs") {
-              toggleRightSidebar()
+              toggleRightContent("docs")
             }
             onItemClick?.(item)
           }}

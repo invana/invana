@@ -1,65 +1,38 @@
 import { create } from "zustand"
 
-type SidebarType = "query" | "docs" | undefined
 
 interface PanelState {
-  leftNavSize: number
-  bottomNavSize: number | undefined
-  isLeftSidebarVisible: boolean
-  isRightSidebarVisible: boolean
-  isBottomPanelCollapsed: boolean
-  sidebar: SidebarType
-  activeFooterItem: string | undefined
-  setLeftNavSize: (size: number) => void
-  setBottomNavSize: (size: number | undefined) => void
-  toggleLeftSidebar: () => void
-  toggleRightSidebar: () => void
-  toggleBottomPanel: () => void
-  setSidebar: (type: SidebarType) => void
-  setActiveFooterItem: (item: string | undefined) => void
-  expandBottomPanel: () => void
-  defaultBottomSize: number
-  defaultBottomExpandedSize: number
+  // Content states
+  leftContentName: string | undefined
+  rightContentName: string | undefined
+  bottomContentName: string | undefined
+
+  // Functions
+  setLeftContentName: (name: string | undefined) => void
+  setRightContentName: (name: string | undefined) => void
+  setBottomContentName: (name: string | undefined) => void
+
+  toggleLeftContent: (name: Exclude<string | undefined, undefined>) => void
+  toggleRightContent: (name: Exclude<string | undefined, undefined>) => void
+  toggleBottomContent: (name: Exclude<string | undefined, undefined>) => void
 }
 
-const defaultBottomSize = 3
-const defaultBottomExpandedSize = 30
-
 export const usePanelStore = create<PanelState>((set) => ({
-  leftNavSize: 0,
-  bottomNavSize: defaultBottomSize,
-  isLeftSidebarVisible: false,
-  isRightSidebarVisible: false,
-  isBottomPanelCollapsed: true,
-  sidebar: undefined,
-  activeFooterItem: undefined,
-  defaultBottomSize,
-  defaultBottomExpandedSize,
-  setLeftNavSize: (size) => set({ leftNavSize: size }),
-  setBottomNavSize: (size) =>
-    set((state) => ({
-      bottomNavSize: size,
-      isBottomPanelCollapsed: size === undefined,
-    })),
-  toggleLeftSidebar: () =>
-    set((state) => ({
-      isLeftSidebarVisible: !state.isLeftSidebarVisible,
-    })),
-  toggleRightSidebar: () =>
-    set((state) => ({
-      isRightSidebarVisible: !state.isRightSidebarVisible,
-    })),
-  toggleBottomPanel: () =>
-    set((state) => ({
-      bottomNavSize: state.bottomNavSize === defaultBottomSize ? defaultBottomExpandedSize : defaultBottomSize,
-      isBottomPanelCollapsed: !state.isBottomPanelCollapsed,
-    })),
-  setSidebar: (type) => set({ sidebar: type }),
-  setActiveFooterItem: (item) => set({ activeFooterItem: item }),
-  expandBottomPanel: () =>
-    set((state) => ({
-      bottomNavSize: defaultBottomExpandedSize,
-      isBottomPanelCollapsed: false,
-    })),
-}))
+  leftContentName: undefined,
+  rightContentName: undefined,
+  bottomContentName: undefined,
 
+  setLeftContentName: (name) => set({ leftContentName: name }),
+  setRightContentName: (name) => set({ rightContentName: name }),
+  setBottomContentName: (name) => set({ bottomContentName: name }),
+
+  toggleLeftContent: (name) => set((state) => ({
+    leftContentName: state.leftContentName === name ? undefined : name
+  })),
+  toggleRightContent: (name) => set((state) => ({
+    rightContentName: state.rightContentName === name ? undefined : name
+  })),
+  toggleBottomContent: (name) => set((state) => ({
+    bottomContentName: state.bottomContentName === name ? undefined : name
+  }))
+}))

@@ -8,19 +8,18 @@ export interface RightSidebarProps {
 }
 
 export const RightSidebar: React.FC<RightSidebarProps> = ({ children }) => {
-  const { isRightSidebarVisible, toggleRightSidebar } = usePanelStore()
-
+  const { rightContentName, toggleRightContent } = usePanelStore()
   return (
     <div
       className={cn(
         "absolute right-0 top-0 h-full w-80 border-l backdrop-blur ",
         "supports-[backdrop-filter]:bg-background/60 transition-transform duration-300 ease-in-out z-50 shadow-lg",
-        !isRightSidebarVisible && "translate-x-full",
+        !rightContentName && "translate-x-full",
       )}
     >
-      <PanelContent title="Documentation" onClose={toggleRightSidebar} showClose>
+      <PanelContent title="Documentation" onClose={() => toggleRightContent('docs')} showClose>
         {children}
       </PanelContent>
-    </div>
+    </div >
   )
 }
