@@ -22,8 +22,6 @@ type Story = StoryObj<typeof meta>;
 
 
 
-
-
 const MainContent: React.FC = () => {
   const { setNavSize, sidebar } = usePanel()
   const isNavTreeVisible = sidebar === "query"

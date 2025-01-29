@@ -1,10 +1,9 @@
 "use client"
 
-import { Package, Sun, MonitorSmartphone, Compass, Database, Activity, Settings } from "lucide-react"
+import { Package, Sun, MonitorSmartphone } from "lucide-react"
 import React from "react"
 import { Button, Separator, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui"
 import useTheme from "@/hooks/useTheme"
-import { usePanel } from "./context/panel-context"
 // const navItems = [
 //   { icon: Home, label: "Dashboard", href: "#" },
 //   { icon: Users, label: "Users", href: "#" },
@@ -30,39 +29,39 @@ export interface LeftNavProps {
 
 
 
-export const LeftNav: React.FC<LeftNavProps> = ({ props }) => {
+export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBottomNavitems }) => {
   // const [activeItem, setActiveItem] = React.useState("Dashboard")
   // const { sidebar, setSidebar } = usePanel()
 
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();
 
-  const { sidebar, setSidebar } = usePanel()
-  const sideBarTopNavitems: SideBarNavitemProps[] = [
-    // { name: "Home", href: "/", icon: Home },
-    {
-      name: "Query Console",
-      onClick: () => {
-        console.log("Explorer Clicked")
-        if (sidebar === 'explorer') {
-          setSidebar(undefined)
-        } else {
-          setSidebar('query')
-        }
-      }, icon: Compass
-    },
-    // { name: "Modeller", href: "/modeller", icon: Network },
-    {
-      name: "Database Connection",
-      onClick: () => { },
-      icon: Database
-    },
-  ]
+  // const { sidebar, setSidebar } = usePanel()
+  // const sideBarTopNavitems: SideBarNavitemProps[] = [
+  //   // { name: "Home", href: "/", icon: Home },
+  //   {
+  //     name: "Query Console",
+  //     onClick: () => {
+  //       console.log("Explorer Clicked")
+  //       if (sidebar === 'explorer') {
+  //         setSidebar(undefined)
+  //       } else {
+  //         setSidebar('query')
+  //       }
+  //     }, icon: Compass
+  //   },
+  //   // { name: "Modeller", href: "/modeller", icon: Network },
+  //   {
+  //     name: "Database Connection",
+  //     onClick: () => { },
+  //     icon: Database
+  //   },
+  // ]
 
-  const sideBarBottomNavitems: SideBarNavitemProps[] = [
-    { name: "Activity", href: "/activity", icon: Activity },
-    { name: "Settings", href: "#", icon: Settings },
-  ]
+  // const sideBarBottomNavitems: SideBarNavitemProps[] = [
+  //   { name: "Activity", href: "/activity", icon: Activity },
+  //   { name: "Settings", href: "#", icon: Settings },
+  // ]
 
 
 
