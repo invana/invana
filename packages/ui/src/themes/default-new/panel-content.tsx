@@ -5,14 +5,15 @@ import React from "react" // Added import for React
 interface PanelContentProps {
   title: React.ReactNode
   children?: React.ReactNode
+  className?: string
   onClose?: () => void
   showClose?: boolean
 }
 
-export function PanelContent({ title, children, onClose, showClose }: PanelContentProps) {
+export function PanelContent({ title, children, onClose, showClose, className }: PanelContentProps) {
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b   px-3 py-1">
+    <div className={`flex h-full items-center justify-center ${className}`}>
+      {/* <div className="flex items-center justify-between border-b   px-3 py-1">
         <h3 className="font-semibold">{title}</h3>
         {showClose && (
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
@@ -21,7 +22,8 @@ export function PanelContent({ title, children, onClose, showClose }: PanelConte
           </Button>
         )}
       </div>
-      <div className="flex-1 overflow-auto p-3">{children}</div>
+      <div className="flex-1 overflow-auto p-3">{children}</div> */}
+      {children}
     </div>
   )
 }

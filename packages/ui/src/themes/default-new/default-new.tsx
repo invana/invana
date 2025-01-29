@@ -18,7 +18,9 @@ export function DefaultNewLayout({ className, leftNavProps, leftContent, mainCon
   const {
     leftContentName,
     rightContentName,
+    bottomContentName,
     toggleLeftContent,
+    toggleBottomContent
   } = usePanelStore()
 
   return (
@@ -88,32 +90,18 @@ export function DefaultNewLayout({ className, leftNavProps, leftContent, mainCon
                     // }
                   }}
                 >
-                  <ResizablePanel minSize={30}>
-                    <PanelContent
-                      title={
-                        <div className="flex items-center justify-between">
-                          <span>Main Content</span>
-                          {/* <Button variant="ghost" size="sm" onClick={toggleBottomPanel} className="h-6 w-6 p-0">
-                            {isBottomPanelCollapsed ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4" />
-                            )}
-                            <span className="sr-only">
-                              {isBottomPanelCollapsed ? "Expand" : "Collapse"} bottom panel
-                            </span>
-                          </Button> */}
-                        </div>
-                      }
-                    >
+                  <ResizablePanel minSize={30} >
+                    <div className="flex h-full items-center justify-center">
+
                       {mainContent}
-                    </PanelContent>
+                    </div>
                   </ResizablePanel>
                   <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
                   <ResizablePanel minSize={2}>
                     <div className="flex flex-col h-full">
                       <div className="flex-1 overflow-auto">
                         <h1>Bottom here</h1>
+                        <Button onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
                       </div>
 
                     </div>

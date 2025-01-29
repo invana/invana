@@ -1,15 +1,12 @@
-import { Bell, Search, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import React from "react"
+
 export interface AppHeaderProps {
   left?: React.ReactNode
   center?: React.ReactNode
   right?: React.ReactNode
 }
 
-export function Header({ left, center, right }: AppHeaderProps) {
+export const Header: React.FC<AppHeaderProps> = ({ left, center, right }) => {
   return (
     <header className="flex h-[50px] items-center border-b border-border bg-background px-4">
       <div className="flex flex-1 items-center gap-4">

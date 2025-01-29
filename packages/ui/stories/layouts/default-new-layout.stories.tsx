@@ -66,14 +66,7 @@ export const Default: Story = {
           <li>Drag the vertical handle to resize the content sections</li>
         </ul>
       </div>
-      <div className="rounded-lg border bg-card">
-        <div className="border-b px-4 py-3">
-          <h4 className="font-semibold">Quick Actions</h4>
-        </div>
-        <div className="p-4">
 
-        </div>
-      </div>
     </div>,
     rightContent: <div className="prose prose-sm dark:prose-invert">
       <h3>Getting Started</h3>
