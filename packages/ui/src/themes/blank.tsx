@@ -1,4 +1,3 @@
-import React from "react"
 import { Moon, Package, Sun, } from 'lucide-react'
 import {
   Tooltip,
@@ -9,7 +8,7 @@ import {
 import { Separator } from "../components/ui/separator"
 import { Button } from "../components/ui"
 import useTheme from "../hooks/useTheme"
-
+import React from "react"
 
 export interface SideBarNavitemProps {
   name: string

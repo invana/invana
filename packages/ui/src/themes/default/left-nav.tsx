@@ -1,44 +1,188 @@
 "use client"
 
-import * as React from "react"
-import { Home, Settings, Users, BarChart2, Mail } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Package, Sun, MonitorSmartphone, Compass, Database, Activity, Settings } from "lucide-react"
+import React from "react"
+import { Button, Separator, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui"
+import useTheme from "@/hooks/useTheme"
 import { usePanel } from "./context/panel-context"
+// const navItems = [
+//   { icon: Home, label: "Dashboard", href: "#" },
+//   { icon: Users, label: "Users", href: "#" },
+//   { icon: Mail, label: "Messages", href: "#" },
+//   { icon: BarChart2, label: "Analytics", href: "#" },
+//   { icon: Settings, label: "Settings", href: "#" },
+// ]
 
-const navItems = [
-  { icon: Home, label: "Dashboard", href: "#" },
-  { icon: Users, label: "Users", href: "#" },
-  { icon: Mail, label: "Messages", href: "#" },
-  { icon: BarChart2, label: "Analytics", href: "#" },
-  { icon: Settings, label: "Settings", href: "#" },
-]
 
-export function LeftNav() {
-  const [activeItem, setActiveItem] = React.useState("Dashboard")
+
+export interface SideBarNavitemProps {
+  name: string
+  href?: string
+  onClick?: () => void
+  icon: React.ElementType
+}
+
+export interface LeftNavProps {
+  sideBarTopNavitems?: SideBarNavitemProps[];
+  sideBarBottomNavitems?: SideBarNavitemProps[];
+}
+
+
+
+
+export const LeftNav: React.FC<LeftNavProps> = ({ props }) => {
+  // const [activeItem, setActiveItem] = React.useState("Dashboard")
+  // const { sidebar, setSidebar } = usePanel()
+
+  const { theme, initTheme, toggleTheme } = useTheme();
+  initTheme();
+
   const { sidebar, setSidebar } = usePanel()
+  const sideBarTopNavitems: SideBarNavitemProps[] = [
+    // { name: "Home", href: "/", icon: Home },
+    {
+      name: "Query Console",
+      onClick: () => {
+        console.log("Explorer Clicked")
+        if (sidebar === 'explorer') {
+          setSidebar(undefined)
+        } else {
+          setSidebar('query')
+        }
+      }, icon: Compass
+    },
+    // { name: "Modeller", href: "/modeller", icon: Network },
+    {
+      name: "Database Connection",
+      onClick: () => { },
+      icon: Database
+    },
+  ]
+
+  const sideBarBottomNavitems: SideBarNavitemProps[] = [
+    { name: "Activity", href: "/activity", icon: Activity },
+    { name: "Settings", href: "#", icon: Settings },
+  ]
+
+
 
   return (
     <div className="w-[50px] h-screen border-r bg-background flex flex-col items-center py-4">
-      {navItems.map((item) => (
-        <button
-          key={item.label}
-          onClick={() => {
-            setActiveItem(item.label)
-            // Toggle query sidebar when clicking the Dashboard/Home icon
-            if (item.label === "Dashboard") {
-              setSidebar(sidebar === "query" ? undefined : "query")
-            }
-          }}
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-lg text-sm transition-colors hover:bg-accent",
-            activeItem === item.label && "bg-accent",
-          )}
-          title={item.label}
-        >
-          <item.icon className="h-5 w-5" />
-          <span className="sr-only">{item.label}</span>
-        </button>
-      ))}
+      <div className="grid min-h-screen w-full lg:grid-cols-[50px_1fr]">
+        <nav className="hidden border-r border-border bg-background lg:block">
+          <div className="flex h-[50px] items-center justify-center border-b">
+            <a href="#">
+              <Package className="h-5 w-5 text-foreground" />
+            </a>
+          </div>
+          <div className="flex flex-col justify-between h-[calc(100vh-50px)]">
+            <div className="">
+              {sideBarTopNavitems?.map((item) => (
+                <React.Fragment key={item.name}>
+                  <Tooltip key={item.name}>
+                    <TooltipTrigger asChild>
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          className="flex h-[50px] w-full items-center justify-center 
+                      text-muted-foreground transition-colors 
+                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {/* <p className="text-xss">{item.name}</p> */}
+                        </a>
+                      ) : item.onClick ? (
+                        <button
+                          onClick={item.onClick}
+                          className="flex h-[50px] w-full items-center justify-center 
+                      text-muted-foreground transition-colors 
+                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
+                        >
+                          <item.icon className="h-5 w-5" />
+                        </button>
+                      ) : (
+                        <div
+                          className="flex h-[50px] w-full items-center justify-center 
+                      text-muted-foreground transition-colors 
+                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
+                        >
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      {item.name}
+                    </TooltipContent>
+                  </Tooltip>
+                  <Separator />
+                </React.Fragment>
+
+              ))}
+            </div>
+            <div className="">
+              {sideBarBottomNavitems?.map((item) => (
+                <Tooltip key={item.name}>
+                  <TooltipTrigger asChild>
+                    <a
+                      href={item.href}
+                      className="flex h-[50px] w-full px-2 py-2 items-center justify-center 
+                      text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="sr-only">{item.name}</span>
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    {item.name}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="flex h-[50px] w-full px-2 py-2 items-center justify-center rounded-none
+                      text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    onClick={toggleTheme}
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="h-4 w-4 text-foreground" />
+                    ) : (
+                      <MonitorSmartphone className="h-4 w-4 text-foreground" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Toggle theme</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+          {/* <div className="border-t">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-[50px] w-full justify-center rounded-none p-0 transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="/placeholder-user.jpg" alt="User" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <span className="sr-only">User Profile</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                John Doe
+                <br />
+                <span className="text-xs text-muted-foreground">john@example.com</span>
+              </TooltipContent>
+            </Tooltip>
+          </div> */}
+        </nav>
+        <div className="flex flex-col">
+          {/* {props.children} */}
+        </div>
+      </div>
     </div>
   )
 }

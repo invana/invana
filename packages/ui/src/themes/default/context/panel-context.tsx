@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-type SidebarType = "query" | undefined
+type SidebarType = string | undefined
 
 interface PanelContextType {
   navSize: number

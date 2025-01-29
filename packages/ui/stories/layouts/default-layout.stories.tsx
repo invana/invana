@@ -1,10 +1,9 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@invana/ui';
 import { DefaultLayout } from '@/themes/default/default';
 import type { Meta, StoryObj } from '@storybook/react';
-import React from 'react';
 import { usePanel } from '@/themes/default/context/panel-context';
 import { cn } from '@/lib/utils';
-
+import React from 'react';
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
   title: 'Layouts/DefaultLayout',
@@ -25,10 +24,9 @@ type Story = StoryObj<typeof meta>;
 
 
 
-const MainContent = () => {
-  const { navSize, setNavSize, sidebar } = usePanel()
+const MainContent: React.FC = () => {
+  const { setNavSize, sidebar } = usePanel()
   const isNavTreeVisible = sidebar === "query"
-
 
   return <div className="h-[calc(100vh-50px)]">
     <ResizablePanelGroup
