@@ -61,7 +61,7 @@ module.exports = {
         "2px": '2px',
         lg: `var(--radius)`,
         md: `calc(var(--radius) - 2px)`,
-        sm: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 6px)",
       },
       rotate: {
         '270': '270deg',

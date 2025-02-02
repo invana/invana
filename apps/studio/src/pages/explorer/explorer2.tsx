@@ -100,7 +100,7 @@ const ExplorerPage: React.FC = () => {
         {leftContentName === "search" && <div>Search Content</div>}
         {
           leftContentName === "query" &&
-          <PanelContent title="Navigation Tree" onClose={() => setLeftContentName(undefined)} showClose>
+          <PanelContent title={"Query Console"} onClose={() => setLeftContentName(undefined)} showClose>
             <QueryForm />
           </PanelContent>
         }

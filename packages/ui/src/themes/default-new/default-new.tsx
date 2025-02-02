@@ -95,8 +95,8 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                     <ResizablePanel minSize={3}>
                       <div className="flex flex-col h-full">
                         <div className="flex-1 overflow-auto">
-                          <h1>Bottom here</h1>
-                          <Button onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
+                          {/* <h1>Bottom here</h1> */}
+                          <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
                         </div>
 
                       </div>
