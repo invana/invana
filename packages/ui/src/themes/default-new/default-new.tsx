@@ -14,7 +14,7 @@ import { RightSidebar } from "./right-sidebar"
 import React from "react"
 
 
-export function DefaultNewLayout({ className, leftNavProps, leftContent, mainContent, rightContent }: DefaultNewLayoutProps) {
+export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({ className, leftNavProps, leftContent, mainContent, rightContent }) => {
   const {
     leftContentName,
     rightContentName,
@@ -55,6 +55,7 @@ export function DefaultNewLayout({ className, leftNavProps, leftContent, mainCon
             <ResizablePanelGroup
               direction="horizontal"
               onLayout={(sizes) => {
+                console.debug("sizes", sizes)
                 // if (leftContentName) {
                 //   setLeftNavSize(sizes[0])
                 // }
@@ -80,6 +81,7 @@ export function DefaultNewLayout({ className, leftNavProps, leftContent, mainCon
                 <ResizablePanelGroup
                   direction="vertical"
                   onLayout={(sizes) => {
+                    console.debug("sizes", sizes)
                     // Update bottom panel size and collapse state
                     // setBottomNavSize(sizes[1])
                     // // Update collapsed state based on size

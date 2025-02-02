@@ -1,8 +1,4 @@
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@invana/ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { usePanel } from '@/themes/default/context/panel-context';
-import { cn } from '@/lib/utils';
-import React from 'react';
 import { NavItem } from '@/themes/default-new/types';
 import { Home, Users, Mail, BarChart2, FileText, Settings } from 'lucide-react';
 import { DefaultNewLayout } from '@/themes/default-new/default-new';
