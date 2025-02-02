@@ -104,7 +104,7 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
     this.container = document.createElement('div');
     this.container.id = 'CanvasContextMenuBehavior';
     this.container.style.position = 'absolute';
-    this.container.style.zIndex = '1000';
+    this.container.style.zIndex = '10';
     document.body.prepend(this.container);
   }
 

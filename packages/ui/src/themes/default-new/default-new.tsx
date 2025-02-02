@@ -74,7 +74,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                   withHandle
                   className={cn("transition-opacity duration-300", !leftContentName && "hidden")}
                 />
-                <ResizablePanel defaultSize={leftContentName ? 75 : 100}>
+                <ResizablePanel defaultSize={leftContentName ? (100 - leftContentSize) : 100}>
                   <ResizablePanelGroup
                     direction="vertical"
                     onLayout={(sizes) => {

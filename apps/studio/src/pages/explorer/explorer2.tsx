@@ -69,7 +69,7 @@ const ExplorerPage: React.FC = () => {
       name: "Activity History",
       key: 'activity-history',
       onClick: () => {
-        return setLeftContentName("activity-history")
+        return toggleLeftContent("activity-history")
       },
       icon: Activity
     },
@@ -83,7 +83,8 @@ const ExplorerPage: React.FC = () => {
   useEffect(() => {
     console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
     const graph = containerRef.current?.getGraph();
-    if (graph) {
+    if (graph && isReady) {
+
       graph.resize();
       graph.layout();
       graph.render();

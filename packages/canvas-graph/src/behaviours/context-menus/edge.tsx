@@ -106,7 +106,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
     this.container = document.createElement('div');
     this.container.id = 'EdgeContextMenuBehavior';
     this.container.style.position = 'absolute';
-    this.container.style.zIndex = '1000';
+    this.container.style.zIndex = '10';
     document.body.prepend(this.container);
   }
 

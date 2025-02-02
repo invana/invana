@@ -2,8 +2,8 @@ import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
-import { MenuItem, NestedMenu } from '@invana/ui';
-import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
+import { Button, ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
+import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 // import React from 'react';
 
@@ -106,8 +106,8 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     this.container = document.createElement('div');
     this.container.id = 'NodeContextMenuBehavior';
     this.container.style.position = 'absolute';
-    this.container.style.zIndex = '1000';
-    document.body.prepend(this.container);
+    this.container.style.zIndex = '10';
+    document.body.append(this.container);
   }
 
 
@@ -169,10 +169,55 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     }
 
     this.root.render(<NodeCard node={nodeData} extra={
-      <NestedMenu
-        className='rounded-none w-[260px] shadow-none p-0 border-none'
-        menuItems={menuItems}
-      />
+      <div>
+        <div className='px-3 mb-3 mt-2  h-5  flex items-center space-x-2 text-sm'>
+
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-none "
+            tooltip={<p>{"Focus Node"}</p>}
+          >
+            <CircleDot className="h-4 w-4" />
+          </ButtonWithTooltip>
+          <Separator orientation="vertical" className='h-6' />
+
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-none   active:bg-gray:500"
+            tooltip={<p>{"Star a query"}</p>}
+          >
+            <Terminal className="h-4 w-4" />
+          </ButtonWithTooltip>
+
+          <Separator orientation="vertical" className='h-6' />
+
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-none   active:bg-gray:500"
+            tooltip={<p>{"Lock Node"}</p>}
+          >
+            <Lock className="h-4 w-4" />
+          </ButtonWithTooltip>
+
+          <Separator orientation="vertical" className='h-6' />
+
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-none   active:bg-gray:500"
+            tooltip={<p>{"Node Display settings"}</p>}
+          >
+            <Monitor className="h-4 w-4" />
+          </ButtonWithTooltip>
+        </div>
+        <NestedMenu
+          className='rounded-none w-[260px] shadow-none p-0 border-none'
+          menuItems={menuItems}
+        />
+      </div>
     } />)
     this.showContainer(event);
     this.hideCanvasContextMenu()

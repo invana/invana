@@ -7,7 +7,7 @@ interface PanelState {
   rightContentName: string | undefined
   bottomContentName: string | undefined
 
-  leftContentSize: number | undefined
+  leftContentSize: number;
   setLeftContentSize: (name: number) => void
 
   mainTopContentSize: number
@@ -23,19 +23,25 @@ interface PanelState {
   toggleBottomContent: (name: Exclude<string | undefined, undefined>) => void
 }
 
+const defaultLeftContentSize = 25;
+const defaultMainTopContentSize = 97;
+
 export const usePanelStore = create<PanelState>((set) => ({
   leftContentName: undefined,
   rightContentName: undefined,
   bottomContentName: undefined,
 
 
-  leftContentSize: undefined,
+  leftContentSize: defaultLeftContentSize,
   setLeftContentSize: (size) => set({ leftContentSize: size }),
 
-  mainTopContentSize: 97,
+  mainTopContentSize: defaultMainTopContentSize,
   setMainTopContentSize: (size) => set({ mainTopContentSize: size }),
 
-  setLeftContentName: (name) => set({ leftContentName: name }),
+  setLeftContentName: (name: string | undefined) => {
+    // set({  })
+    return set({ leftContentName: name, leftContentSize: defaultLeftContentSize })
+  },
   setRightContentName: (name) => set({ rightContentName: name }),
   setBottomContentName: (name) => set({ bottomContentName: name }),
 
