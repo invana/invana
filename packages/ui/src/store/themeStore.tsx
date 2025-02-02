@@ -10,10 +10,10 @@ interface ThemeState {
 }
 
 
-const storeName = "themeStore"
+export const storeName = "themeStore"
 
 
-const getInitialTheme = (storeName: string) => {
+export const getInitialTheme = (storeName: string) => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const storedTheme = window.localStorage.getItem(storeName);
     if (storedTheme) {

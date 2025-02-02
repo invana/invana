@@ -1,7 +1,7 @@
 import { Network } from 'lucide-react';
 import React from 'react';
 import { CanvasFlow, CanvasToolBar, defaultFlowCanvasOptions } from '@invana/canvas-flow';
-import { LogoComponent, sideBarBottomNavitems, sideBarTopNavitems } from '../constants';
+import { LogoComponent, bottomNavItems, topNavItems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout
@@ -20,8 +20,8 @@ const ModellerPage: React.FC = () => {
   return (
     <BlankLayout
       logo={LogoComponent}
-      sideBarBottomNavitems={sideBarBottomNavitems}
-      sideBarTopNavitems={sideBarTopNavitems}
+      bottomNavItems={bottomNavItems}
+      topNavItems={topNavItems}
     >
 
       <ReactFlowProvider fitView>

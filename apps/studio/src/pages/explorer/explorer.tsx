@@ -1,11 +1,13 @@
 import React, { useRef, useState } from 'react';
-import { LogoComponent, sideBarBottomNavitems, sideBarTopNavitems } from '../constants';
+import { LogoComponent, bottomNavItems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout,
+  Card,
   ResizableHandle,
   ResizablePanel,
-  ResizablePanelGroup
+  ResizablePanelGroup,
+  LeftNavItem
 } from '@invana/ui';
 import { ReactFlowProvider } from '@invana/canvas-flow';
 import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
@@ -13,7 +15,7 @@ import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
-import { SearchIcon } from 'lucide-react'
+import { Activity, Compass, MonitorCog, Network, Search, SearchIcon, Terminal } from 'lucide-react'
 import { Graph } from '@antv/g6';
 import { QueryForm } from '@/ui/forms/query-form';
 import useLayout from '@/hooks/useLayout'
@@ -28,6 +30,9 @@ const ExplorerPage: React.FC = () => {
   //   setGraphManager(manager);
   // }, []);
 
+
+
+
   const { leftSidebar, setLeftSidebar, rightSidebar, setRightSidebar } = useLayout()
 
 
@@ -35,16 +40,34 @@ const ExplorerPage: React.FC = () => {
   const containerRef = useRef<{ getGraph: () => Graph } | null>(null);
   const graphManagerRef = useRef(null);
 
-  const [showQueryModal, setShowQueryModal] = useState(false);
 
-  if (!sideBarTopNavitems.some(item => item.name === "Search")) {
-    sideBarTopNavitems.push({
-      name: "Search", onClick: () => {
-        console.log("Search clicked")
-        setShowQueryModal(true)
-      }, icon: SearchIcon
-    });
-  }
+
+  const topNavItems: LeftNavItem[] = [
+    {
+      name: "Search",
+      key: "search",
+      onClick: () => {
+        console.log("SearchIcon clicked", leftSidebar)
+        return leftSidebar === undefined ? setLeftSidebar("search") : setLeftSidebar(undefined)
+      },
+      icon: SearchIcon
+    },
+    {
+      name: "Query",
+      key: "query",
+      onClick: () => {
+        console.log("SearchIcon clicked", rightSidebar)
+        return rightSidebar === undefined ? setRightSidebar("search") : setRightSidebar(undefined)
+      },
+      icon: Terminal
+    },
+    { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
+    // { name: "Data Management", href: "/connections", icon: Database },
+    { name: "Activity History", key: 'activity-history', href: "#", icon: Activity },
+    { name: "Display Settings", key: 'display-settings', href: "#", icon: MonitorCog },
+  ]
+
+
 
   // useEffect(() => {
   //   // Initialize graphManager here and set it to graphManagerRef.current
@@ -76,15 +99,15 @@ const ExplorerPage: React.FC = () => {
 
   // console.log("===data2", data)
 
-  console.log("=====showQueryModal", showQueryModal)
+
   const options = { ...defaultOptions }
 
-  console.log("ExplorerPage")
+  console.log("ExplorerPage leftSidebar", leftSidebar, leftSidebar ? 25 : 0)
   return (
     <BlankLayout
       logo={LogoComponent}
-      sideBarTopNavitems={sideBarTopNavitems}
-      sideBarBottomNavitems={sideBarBottomNavitems}
+      topNavItems={topNavItems}
+      bottomNavItems={bottomNavItems}
     >
       <ReactFlowProvider fitView>
         <AppHeader
@@ -109,34 +132,32 @@ const ExplorerPage: React.FC = () => {
         >
         </AppHeader>
         <AppMain>
-          {/* {showQueryModal && <QueryForm />} */}
-          <ResizablePanelGroup
-            direction="horizontal"
-            className="  w-full "
-          >
-            <ResizablePanel defaultSize={25} minSize={20} maxSize={30}>
-              <QueryForm />
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={75}>
-              {/* <div className="flex h-full items-center justify-center"> */}
 
-              <CanvasGraph
-                ref={containerRef}
-                style={{ width: "100%", height: "100%" }}
-                // className={"h-full"}
-                //@ts-ignore
-                graphManager={graphManagerRef.current}
-                initialData={flightData}
-                onReady={() => {
-                  console.log("onReady")
-                  setIsReady(true)
-                }}
-                options={options}
-              />
-              {/* </div> */}
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          {
+            leftSidebar && <div className={"w-[480px]  flex h-[calc(100vh-80px)] z-[1000]   overflow-hidden absolute"}>
+
+              <QueryForm />
+            </div>
+          }
+
+          {
+            rightSidebar && <div className={"w-[320px] right-0 flex h-[calc(100vh-80px)] z-[1000]   overflow-hidden absolute"}>
+              <QueryForm />
+            </div>
+          }
+          <CanvasGraph
+            ref={containerRef}
+            style={{ width: "100%", height: "100%" }}
+            className={"bg-background"}
+            //@ts-expect-error
+            graphManager={graphManagerRef.current}
+            initialData={flightData}
+            onReady={() => {
+              console.log("onReady")
+              setIsReady(true)
+            }}
+            options={options}
+          />
         </AppMain>
 
         <AppFooter

@@ -1,92 +1,81 @@
-import { Moon, Package, Sun, } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../components/ui/tooltip"
-import { Separator } from "../components/ui/separator"
-import { Button } from "../components/ui"
-import useTheme from "../hooks/useTheme"
+"use client"
+
+import { Package, Sun, MonitorSmartphone } from "lucide-react"
 import React from "react"
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui"
+import useTheme from "../../hooks/useTheme"
+import { LeftNavItem, LeftNavItems } from "../../components/theme/left-nav-items"
+// const navItems = [
+//   { icon: Home, label: "Dashboard", href: "#" },
+//   { icon: Users, label: "Users", href: "#" },
+//   { icon: Mail, label: "Messages", href: "#" },
+//   { icon: BarChart2, label: "Analytics", href: "#" },
+//   { icon: Settings, label: "Settings", href: "#" },
+// ]
 
-export interface LeftNavItem {
-  name: string
-  key: string
-  href?: string
-  onClick?: () => void
-  icon: React.ElementType
-}
-
-
-export interface BlankLayoutProps {
-  children: React.ReactNode;
-  logo: React.ReactNode;
+export interface LeftNavProps {
   topNavItems?: LeftNavItem[];
   bottomNavItems?: LeftNavItem[];
 }
 
 
-export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
+
+
+export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems }) => {
+  // const [activeItem, setActiveItem] = React.useState("Dashboard")
+  // const { sidebar, setSidebar } = usePanel()
 
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();
 
+  // const { sidebar, setSidebar } = usePanel()
+  // const topNavItems: LeftNavItem[] = [
+  //   // { name: "Home", href: "/", icon: Home },
+  //   {
+  //     name: "Query Console",
+  //     onClick: () => {
+  //       console.log("Explorer Clicked")
+  //       if (sidebar === 'explorer') {
+  //         setSidebar(undefined)
+  //       } else {
+  //         setSidebar('query')
+  //       }
+  //     }, icon: Compass
+  //   },
+  //   // { name: "Modeller", href: "/modeller", icon: Network },
+  //   {
+  //     name: "Database Connection",
+  //     onClick: () => { },
+  //     icon: Database
+  //   },
+  // ]
+
+  // const bottomNavItems: LeftNavItem[] = [
+  //   { name: "Activity", href: "/activity", icon: Activity },
+  //   { name: "Settings", href: "#", icon: Settings },
+  // ]
+
+
+
   return (
-    <TooltipProvider delayDuration={0}>
+    <div className="w-[50px] h-screen border-r bg-background flex flex-col items-center py-4">
       <div className="grid min-h-screen w-full lg:grid-cols-[50px_1fr]">
         <nav className="hidden border-r border-border bg-background lg:block">
           <div className="flex h-[50px] items-center justify-center border-b">
-            <a href="/">
+            <a href="#">
               <Package className="h-5 w-5 text-foreground" />
             </a>
           </div>
           <div className="flex flex-col justify-between h-[calc(100vh-50px)]">
             <div className="">
-              {props.topNavItems?.map((item) => (
-                <React.Fragment key={item.name}>
-                  <Tooltip key={item.name}>
-                    <TooltipTrigger asChild>
-                      {item.href ? (
-                        <a
-                          href={item.href}
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                          {/* <p className="text-xss">{item.name}</p> */}
-                        </a>
-                      ) : item.onClick ? (
-                        <button
-                          onClick={item.onClick}
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                        </button>
-                      ) : (
-                        <div
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                        </div>
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      {item.name}
-                    </TooltipContent>
-                  </Tooltip>
-                  <Separator />
-                </React.Fragment>
+              <LeftNavItems items={topNavItems ?? []} />
 
-              ))}
             </div>
             <div className="">
-              {props.bottomNavItems?.map((item) => (
+
+              <LeftNavItems items={bottomNavItems ?? []} />
+
+              {/* {bottomNavItems?.map((item) => (
                 <Tooltip key={item.name}>
                   <TooltipTrigger asChild>
                     <a
@@ -102,7 +91,7 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
                     {item.name}
                   </TooltipContent>
                 </Tooltip>
-              ))}
+              ))} */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -115,7 +104,7 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
                     {theme === "dark" ? (
                       <Sun className="h-4 w-4 text-foreground" />
                     ) : (
-                      <Moon className="h-4 w-4 text-foreground" />
+                      <MonitorSmartphone className="h-4 w-4 text-foreground" />
                     )}
                   </Button>
                 </TooltipTrigger>
@@ -146,10 +135,10 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
           </div> */}
         </nav>
         <div className="flex flex-col">
-          {props.children}
+          {/* {props.children} */}
         </div>
       </div>
-    </TooltipProvider>
+    </div>
   )
 }
 

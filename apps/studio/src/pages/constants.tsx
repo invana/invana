@@ -1,10 +1,10 @@
-import { SideBarNavitemProps } from "@invana/ui";
+import { LeftNavItem } from "@invana/ui";
 import { Activity, CircleHelp, Compass, MonitorCog, Network, Package } from "lucide-react";
 
 
 export const LogoComponent = <Package className="h-5 w-5 text-foreground" />
 
-export const sideBarTopNavitems: SideBarNavitemProps[] = [
+export const topNavItems: LeftNavItem[] = [
   // { name: "Home", href: "/home", icon: Home },
   { name: "Explorer", href: "/explorer", icon: Compass },
   { name: "Modeller", href: "/modeller", icon: Network },
@@ -13,7 +13,7 @@ export const sideBarTopNavitems: SideBarNavitemProps[] = [
   { name: "Display Settings", href: "#", icon: MonitorCog },
 ]
 
-export const sideBarBottomNavitems: SideBarNavitemProps[] = [
+export const bottomNavItems: LeftNavItem[] = [
   // { name: "Activity", href: "/activity", icon: Activity },
   { name: "Invana", href: "https://invana.ai", icon: CircleHelp },
 ]

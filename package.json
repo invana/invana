@@ -20,8 +20,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "@monaco-editor/react": "^4.6.0"
-  }
+  ]
 }

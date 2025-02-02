@@ -57,7 +57,7 @@ const ConnectPage: React.FC = () => {
   initTheme()
 
   return (
-    <BlankLayout logo={LogoComponent} sideBarTopNavitems={[]} sideBarBottomNavitems={[]}>
+    <BlankLayout logo={LogoComponent} topNavItems={[]} bottomNavItems={[]}>
       <div className="min-h-screen p-4">
 
         <div className="flex justify-end">

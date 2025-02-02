@@ -33,7 +33,7 @@ export const defaultOptions: GraphOptions = {
   ],
   layout: defaultLayoutsOptions.find((item) => item.type === DEFAULT_LAYOUT),
   theme: theme,
-  background: theme === 'dark' ? '#222222' : '#ffffff',
+  // background: theme === 'dark' ? 'transparent' : '#ffffff',
   node: DEFAULT_NODE_STYLE,
   edge: DEFAULT_EDGE_STYLE,
   plugins: [
