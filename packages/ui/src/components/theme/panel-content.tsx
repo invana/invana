@@ -18,7 +18,7 @@ export function PanelContent({ title, header, children, onClose, showClose, clas
         {title && <h3 className="font-semibold">{title}</h3>}
         {header && <>{header}</>}
         {showClose && (
-          <Button variant="ghost" size="icon" className="h-8 w-8 relative right-[-10px]" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 relative hover:bg-transparent hover:text-sky-500 right-[-10px]" onClick={onClose}>
             <X className="h-3 w-3" />
             <span className="sr-only">Close panel</span>
           </Button>
