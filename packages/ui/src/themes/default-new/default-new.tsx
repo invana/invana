@@ -7,7 +7,7 @@ import {
 } from "../../components/ui/resizable"
 import { DefaultNewLayoutProps } from './types';
 import { usePanelStore } from "./store"
-import { PanelContent } from "./panel-content"
+// import { PanelContent } from "./panel-content"
 import { RightSidebar } from "./right-sidebar"
 import React from "react"
 import { AppHeader } from "../app";
@@ -27,7 +27,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
     leftContentName,
     rightContentName,
     bottomContentName,
-    toggleLeftContent,
+    // toggleLeftContent,
     toggleBottomContent
   } = usePanelStore()
 
@@ -40,9 +40,9 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
           center={headerProps?.center}
           right={headerProps?.right}
         />
-        <div className="relative h-[calc(100vh-50px)] flex flex-1">
+        <div className="relative h-[calc(100vh-45px)] flex flex-1">
           <LeftNav {...leftNavProps} />
-          <main className="flex-1">
+          <main className="flex-1  w-[calc(100vw-45px)]">
             <div className="h-full">
               <ResizablePanelGroup
                 direction="horizontal"
@@ -61,9 +61,9 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                     display: leftContentName ? "block" : "none",
                   }}
                 >
-                  <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose>
-                    {leftContent}
-                  </PanelContent>
+                  {/* <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose> */}
+                  {leftContent}
+                  {/* </PanelContent> */}
                 </ResizablePanel>
                 <ResizableHandle
                   withHandle
@@ -86,9 +86,9 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                   >
                     <ResizablePanel minSize={30} >
                       {/* <div className="flex h-full items-center justify-center"> */}
-                      <PanelContent title="Main Content" showClose={true}>
-                        {mainContent}
-                      </PanelContent>
+                      {/* <PanelContent title="Main Content" showClose={true}> */}
+                      {mainContent}
+                      {/* </PanelContent> */}
                       {/* </div> */}
                     </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />

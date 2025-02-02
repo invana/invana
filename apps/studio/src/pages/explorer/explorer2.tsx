@@ -6,6 +6,12 @@ import { Activity, Book, Compass, Home, MonitorCog, Network, SearchIcon, Termina
 import { Button } from '@invana/ui';
 import { useState, useRef } from 'react';
 import { Graph } from '@antv/g6';
+import { ProductCopyRightInfo, ProductName } from '@/constants';
+import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
+import { flightData } from '@invana/example-datasets'
+import AppHeaderRight from '@/ui/header/app-header-right';
+import { QueryForm } from '@/ui/forms/query-form';
+import { PanelContent } from '@invana/ui/themes/default-new/panel-content';
 
 
 
@@ -21,6 +27,7 @@ const ExplorerPage: React.FC = () => {
   const {
     leftContentName,
     rightContentName,
+    setLeftContentName,
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent,
@@ -32,7 +39,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: SearchIcon,
       name: "Search",
-      key: "query",
+      key: "search",
       onClick: () => {
         return toggleLeftContent("search")
       },
@@ -41,7 +48,7 @@ const ExplorerPage: React.FC = () => {
       name: "Query",
       key: "query",
       onClick: () => {
-        return toggleLeftContent("search")
+        return toggleLeftContent("query")
       },
       icon: Terminal
     },
@@ -60,26 +67,27 @@ const ExplorerPage: React.FC = () => {
 
   ]
 
+  const options = { ...defaultOptions }
 
 
   return <DefaultNewLayout
     headerProps={{
       left: (
         <>
-          <Home size={24} />
-          <span>Dashboard</span>
-        </>
-      ),
-      center: (
-        <>
-          <span className='font-bold mr-2'>Hello World</span>
+          <span className='ml-3'><Compass className='w-5 h-5' /></span>
+          <span className='font-bold mr-2 ml-3'>{ProductName}</span>
           <span className='mr-2'>|</span>
           <span>Explorer</span>
         </>
       ),
+      center: (
+        <>
+          {isReady && containerRef.current && <CanvasToolBar getGraph={containerRef.current.getGraph} />}
+        </>
+      ),
       right: (
         <>
-          <Button variant="ghost">Help</Button>
+          <AppHeaderRight />
         </>
       )
     }}
@@ -87,6 +95,32 @@ const ExplorerPage: React.FC = () => {
     leftNavProps={{
       topNavItems: topNavItems,
     }}
+    leftContent={
+      <div className="space-y-2 min-w-[300px]">
+        {leftContentName === "search" && <div>Search Content</div>}
+        {
+          leftContentName === "query" &&
+          <PanelContent title="Navigation Tree" onClose={() => setLeftContentName(undefined)} showClose>
+            <QueryForm />
+          </PanelContent>
+        }
+      </div>
+    }
+    mainContent={
+      <CanvasGraph
+        ref={containerRef}
+        style={{ width: "100%", height: "100%" }}
+        className={"bg-background"}
+        //@ts-expect-error
+        graphManager={graphManagerRef.current}
+        initialData={flightData}
+        onReady={() => {
+          console.log("onReady")
+          setIsReady(true)
+        }}
+        options={options}
+      />
+    }
 
 
 
