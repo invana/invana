@@ -15,7 +15,7 @@ export function PanelContent({ title, header, children, onClose, showClose, clas
   return (
     <div className={` h-full ${className}`}>
       <div className="flex items-center justify-between border-b  px-3 py-0">
-        {title && <h3 className="font-semibold">{title}</h3>}
+        {title && <h4 className="font-semibold">{title}</h4>}
         {header && <>{header}</>}
         {showClose && (
           <Button variant="ghost" size="icon" className="h-8 w-8 relative hover:bg-transparent hover:text-sky-500 right-[-10px]" onClick={onClose}>
@@ -24,7 +24,7 @@ export function PanelContent({ title, header, children, onClose, showClose, clas
           </Button>
         )}
       </div>
-      <div className=" overflow-auto px-3 py-0">{children}</div>
+      <div className="overflow-y-auto px-3 py-3">{children}</div>
     </div>
   )
 }

@@ -12,6 +12,7 @@ import { flightData } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
+import { ActivityHistoryView } from '@/ui/components/activity-history';
 
 
 
@@ -62,7 +63,14 @@ const ExplorerPage: React.FC = () => {
     // },
     // { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
-    { name: "Activity History", key: 'activity-history', href: "#", icon: Activity },
+    {
+      name: "Activity History",
+      key: 'activity-history',
+      onClick: () => {
+        return setLeftContentName("activity-history")
+      },
+      icon: Activity
+    },
     { name: "Display Settings", key: 'display-settings', href: "#", icon: MonitorCog },
 
   ]
@@ -97,11 +105,14 @@ const ExplorerPage: React.FC = () => {
     }}
     leftContent={
       <div className="space-y-2 min-w-[300px]">
-        {leftContentName === "search" && <div>Search Content</div>}
-        {
-          leftContentName === "query" &&
+        {leftContentName === "query" &&
           <PanelContent title={"Query Console"} onClose={() => setLeftContentName(undefined)} showClose>
             <QueryForm />
+          </PanelContent>
+        }
+        {leftContentName === "activity-history" &&
+          <PanelContent title={"Activity History"} onClose={() => setLeftContentName(undefined)} showClose>
+            <ActivityHistoryView />
           </PanelContent>
         }
       </div>

@@ -64,10 +64,10 @@ g.V()
 
   return (
     <div className={cn("h-full w-full flex flex-col", props.className)}>
-      <Card className="flex-1 flex flex-col  rounded-none">
-        <CardHeader className="flex flex-row border-b items-center p2 justify-between space-y-0">
+      <Card className="flex-1 flex flex-col  rounded-none p-0">
+        {/* <CardHeader className="flex flex-row border-b items-center p2 justify-between space-y-0">
           <CardTitle className="font-bold uppercase  ">Query Console</CardTitle>
-        </CardHeader>
+        </CardHeader> */}
         <CardContent className="flex-1 flex flex-col gap-4 p-0">
 
           <div className="flex-1 overflow-hidden border-b bg-background ">
