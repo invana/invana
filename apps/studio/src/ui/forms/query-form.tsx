@@ -136,7 +136,6 @@ g.V()
               </div>
             ))
           }
-          {/* <p className="text-muted-foreground">Execute a query to see results here.</p> */}
         </CardContent>
       </Card>
 
