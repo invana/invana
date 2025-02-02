@@ -91,10 +91,11 @@ export function DefaultNewLayout({ className, leftNavProps, leftContent, mainCon
                   }}
                 >
                   <ResizablePanel minSize={30} >
-                    <div className="flex h-full items-center justify-center">
-
+                    {/* <div className="flex h-full items-center justify-center"> */}
+                    <PanelContent title="Main Content" showClose={true}>
                       {mainContent}
-                    </div>
+                    </PanelContent>
+                    {/* </div> */}
                   </ResizablePanel>
                   <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
                   <ResizablePanel minSize={2}>
