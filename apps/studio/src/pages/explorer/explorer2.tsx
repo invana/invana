@@ -11,7 +11,7 @@ import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph
 import { flightData } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
-import { PanelContent } from '@invana/ui/themes/default-new/panel-content';
+import { PanelContent } from '@invana/ui/components/theme/panel-content';
 
 
 
