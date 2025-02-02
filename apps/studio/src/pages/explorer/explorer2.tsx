@@ -32,6 +32,7 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     mainTopContentSize,
+    leftContentSize,
     toggleBottomContent,
   } = usePanelStore()
 
@@ -80,14 +81,15 @@ const ExplorerPage: React.FC = () => {
 
 
   useEffect(() => {
-    console.log("mainTopContentSize", mainTopContentSize)
+    console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
     const graph = containerRef.current?.getGraph();
     if (graph) {
       graph.resize();
-      // graph.render();
+      graph.layout();
+      graph.render();
       graph.fitView();
     }
-  }, [mainTopContentSize]);
+  }, [mainTopContentSize, leftContentSize]);
 
 
 
