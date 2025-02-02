@@ -37,11 +37,11 @@ const ExplorerPage: React.FC = () => {
 
   const topNavItems: LeftNavItem[] = [
     {
-      icon: SearchIcon,
-      name: "Search",
-      key: "search",
+      icon: Network,
+      name: "Model",
+      key: "model",
       onClick: () => {
-        return toggleLeftContent("search")
+        return toggleLeftContent("model")
       },
     },
     {
@@ -52,15 +52,15 @@ const ExplorerPage: React.FC = () => {
       },
       icon: Terminal
     },
-    {
-      icon: Book,
-      key: "documentation",
-      name: "documentation",
-      onClick: () => {
-        console.log("Clicked:", "Documentation")
-      }
-    },
-    { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
+    // {
+    //   icon: Book,
+    //   key: "documentation",
+    //   name: "documentation",
+    //   onClick: () => {
+    //     console.log("Clicked:", "Documentation")
+    //   }
+    // },
+    // { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
     { name: "Activity History", key: 'activity-history', href: "#", icon: Activity },
     { name: "Display Settings", key: 'display-settings', href: "#", icon: MonitorCog },
@@ -120,6 +120,9 @@ const ExplorerPage: React.FC = () => {
         }}
         options={options}
       />
+    }
+    rightContent={
+      <></>
     }
 
 

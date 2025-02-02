@@ -4,7 +4,7 @@ import {
   CardFooter
 } from "@invana/ui"
 import { Play } from "lucide-react"
-import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import Editor, { OnMount } from '@monaco-editor/react'
 import { useRef, useState } from "react"
 import { cn } from "@invana/ui/lib/utils"
 
@@ -70,9 +70,9 @@ g.V()
         </CardHeader>
         <CardContent className="flex-1 flex flex-col gap-4 p-0">
 
-          <div className="flex-1 overflow-hidden border-b bg-background">
+          <div className="flex-1 overflow-hidden border-b bg-background ">
             <Editor
-              height="100%"
+              height={450}
               defaultLanguage="sql"
               language="sql"
               theme="vs-dark"

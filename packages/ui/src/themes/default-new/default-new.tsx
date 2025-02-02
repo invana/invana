@@ -54,9 +54,9 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                 }}
               >
                 <ResizablePanel
-                  defaultSize={25}
-                  minSize={15}
-                  maxSize={40}
+                  defaultSize={35}
+                  minSize={20}
+                  maxSize={45}
                   style={{
                     display: leftContentName ? "block" : "none",
                   }}
