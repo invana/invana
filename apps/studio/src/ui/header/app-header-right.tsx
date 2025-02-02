@@ -89,19 +89,26 @@ const AppHeaderRight: React.FC = () => {
                 <Plus className="mr-2 h-4 w-4" />Add Connection
               </Link>
             </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer" onClick={logoutConnection} >
+              {/* <Button variant={"ghost"} className="px-2 py-2 "> */}
+              <LogOut className="mr-2 h-4 w-4" />Logout
+              {/* </Button> */}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         : <></>}
-      <Separator orientation="vertical" className="h-6 ml-2" />
+      {/* <Separator orientation="vertical" className="h-6 ml-2" /> */}
 
-      <Tooltip>
+      {/* <Tooltip>
         <TooltipTrigger asChild>
           <Button variant={"ghost"} onClick={logoutConnection} className="px-2 py-2 ">
             <LogOut className=' h-4 ' />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Logout</TooltipContent>
-      </Tooltip>
+      </Tooltip> */}
       {/* <Tooltip>
         <TooltipTrigger asChild>
           <Avatar className="h-8 w-8">
