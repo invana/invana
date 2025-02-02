@@ -84,7 +84,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                       // }
                     }}
                   >
-                    <ResizablePanel minSize={30} >
+                    <ResizablePanel minSize={30} defaultSize={97} >
                       {/* <div className="flex h-full items-center justify-center"> */}
                       {/* <PanelContent title="Main Content" showClose={true}> */}
                       {mainContent}
@@ -92,7 +92,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                       {/* </div> */}
                     </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
-                    <ResizablePanel minSize={2}>
+                    <ResizablePanel minSize={3}>
                       <div className="flex flex-col h-full">
                         <div className="flex-1 overflow-auto">
                           <h1>Bottom here</h1>
