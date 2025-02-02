@@ -1,31 +1,35 @@
 import { Button } from "../ui/button"
 import { X } from "lucide-react"
 import React from "react" // Added import for React
+import { Card, CardHeader, CardContent } from "@invana/ui"
 
 interface PanelContentProps {
   title?: React.ReactNode
-  header?: React.ReactNode
+  // header?: React.ReactNode
   children?: React.ReactNode
   className?: string
   onClose?: () => void
   showClose?: boolean
 }
 
-export function PanelContent({ title, header, children, onClose, showClose, className }: PanelContentProps) {
+export function PanelContent({ title, children, onClose, showClose, className }: PanelContentProps) {
   return (
-    <div className={` h-full ${className}`}>
-      <div className="flex items-center justify-between border-b  px-3 py-0">
-        {title && <h4 className="font-semibold">{title}</h4>}
-        {header && <>{header}</>}
+    <Card className={` h-full ${className}`}>
+      <CardHeader className="relative py-1 border-b">
+        {title && <h4 className="font-semibold  ">{title}</h4>}
         {showClose && (
-          <Button variant="ghost" size="icon" className="h-8 w-8 relative hover:bg-transparent hover:text-sky-500 right-[-10px]" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="absolute right-0 top-[-5px]  h-8 w-8 hover:bg-transparent hover:text-sky-500" onClick={onClose}>
             <X className="h-3 w-3" />
             <span className="sr-only">Close panel</span>
           </Button>
         )}
-      </div>
-      <div className="overflow-y-auto px-3 py-3">{children}</div>
-    </div>
+      </CardHeader>
+      {/* <div className="flex items-center justify-between border-b  px-3 py-0">
+        {header && <>{header}</>}
+
+      </div> */}
+      <CardContent>{children}</CardContent>
+    </Card>
   )
 }
 

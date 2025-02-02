@@ -112,7 +112,7 @@ const ExplorerPage: React.FC = () => {
         }
         {leftContentName === "activity-history" &&
           <PanelContent title={"Activity History"} onClose={() => setLeftContentName(undefined)} showClose>
-            <ActivityHistoryView />
+            <ActivityHistoryView className='p-3' />
           </PanelContent>
         }
       </div>
