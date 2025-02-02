@@ -1,6 +1,6 @@
 import { BlankLayout, Button } from "@invana/ui";
 import { Link } from "react-router-dom";
-import { LogoComponent, sideBarBottomNavitems, sideBarTopNavitems } from "../constants";
+import { LogoComponent, bottomNavItems, topNavItems } from "../constants";
 import { AppFooter, AppHeader, AppMain } from "@invana/ui/themes/app";
 import AppHeaderRight from "@/ui/header/app-header-right";
 import { ProductCopyRightInfo } from "@/constants";
@@ -11,8 +11,8 @@ export default function NotFoundPage() {
   return (
     <BlankLayout
       logo={LogoComponent}
-      sideBarBottomNavitems={sideBarBottomNavitems}
-      sideBarTopNavitems={sideBarTopNavitems}
+      bottomNavItems={bottomNavItems}
+      topNavItems={topNavItems}
     >
 
       <AppHeader

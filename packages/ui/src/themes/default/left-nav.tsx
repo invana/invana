@@ -2,8 +2,9 @@
 
 import { Package, Sun, MonitorSmartphone } from "lucide-react"
 import React from "react"
-import { Button, Separator, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui"
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui"
 import useTheme from "@/hooks/useTheme"
+import { LeftNavItem, LeftNavItems } from "@/components/theme/left-nav-items"
 // const navItems = [
 //   { icon: Home, label: "Dashboard", href: "#" },
 //   { icon: Users, label: "Users", href: "#" },
@@ -12,24 +13,15 @@ import useTheme from "@/hooks/useTheme"
 //   { icon: Settings, label: "Settings", href: "#" },
 // ]
 
-
-
-export interface SideBarNavitemProps {
-  name: string
-  href?: string
-  onClick?: () => void
-  icon: React.ElementType
-}
-
 export interface LeftNavProps {
-  sideBarTopNavitems?: SideBarNavitemProps[];
-  sideBarBottomNavitems?: SideBarNavitemProps[];
+  topNavItems?: LeftNavItem[];
+  bottomNavItems?: LeftNavItem[];
 }
 
 
 
 
-export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBottomNavitems }) => {
+export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems }) => {
   // const [activeItem, setActiveItem] = React.useState("Dashboard")
   // const { sidebar, setSidebar } = usePanel()
 
@@ -37,7 +29,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBot
   initTheme();
 
   // const { sidebar, setSidebar } = usePanel()
-  // const sideBarTopNavitems: SideBarNavitemProps[] = [
+  // const topNavItems: LeftNavItem[] = [
   //   // { name: "Home", href: "/", icon: Home },
   //   {
   //     name: "Query Console",
@@ -58,7 +50,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBot
   //   },
   // ]
 
-  // const sideBarBottomNavitems: SideBarNavitemProps[] = [
+  // const bottomNavItems: LeftNavItem[] = [
   //   { name: "Activity", href: "/activity", icon: Activity },
   //   { name: "Settings", href: "#", icon: Settings },
   // ]
@@ -76,50 +68,14 @@ export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBot
           </div>
           <div className="flex flex-col justify-between h-[calc(100vh-50px)]">
             <div className="">
-              {sideBarTopNavitems?.map((item) => (
-                <React.Fragment key={item.name}>
-                  <Tooltip key={item.name}>
-                    <TooltipTrigger asChild>
-                      {item.href ? (
-                        <a
-                          href={item.href}
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                          {/* <p className="text-xss">{item.name}</p> */}
-                        </a>
-                      ) : item.onClick ? (
-                        <button
-                          onClick={item.onClick}
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                        </button>
-                      ) : (
-                        <div
-                          className="flex h-[50px] w-full items-center justify-center 
-                      text-muted-foreground transition-colors 
-                      hover:bg-accent hover:text-accent-foreground px-2 py-2"
-                        >
-                          <item.icon className="h-5 w-5" />
-                        </div>
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      {item.name}
-                    </TooltipContent>
-                  </Tooltip>
-                  <Separator />
-                </React.Fragment>
+              <LeftNavItems items={topNavItems ?? []} />
 
-              ))}
             </div>
             <div className="">
-              {sideBarBottomNavitems?.map((item) => (
+
+              <LeftNavItems items={bottomNavItems ?? []} />
+
+              {/* {bottomNavItems?.map((item) => (
                 <Tooltip key={item.name}>
                   <TooltipTrigger asChild>
                     <a
@@ -135,7 +91,7 @@ export const LeftNav: React.FC<LeftNavProps> = ({ sideBarTopNavitems, sideBarBot
                     {item.name}
                   </TooltipContent>
                 </Tooltip>
-              ))}
+              ))} */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

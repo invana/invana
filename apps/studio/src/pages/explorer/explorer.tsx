@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { LogoComponent, sideBarBottomNavitems } from '../constants';
+import { LogoComponent, bottomNavItems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout,
@@ -7,7 +7,7 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  SideBarNavitemProps
+  LeftNavItem
 } from '@invana/ui';
 import { ReactFlowProvider } from '@invana/canvas-flow';
 import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
@@ -42,7 +42,7 @@ const ExplorerPage: React.FC = () => {
 
 
 
-  const sideBarTopNavitems: SideBarNavitemProps[] = [
+  const topNavItems: LeftNavItem[] = [
     {
       name: "Search",
       onClick: () => {
@@ -104,8 +104,8 @@ const ExplorerPage: React.FC = () => {
   return (
     <BlankLayout
       logo={LogoComponent}
-      sideBarTopNavitems={sideBarTopNavitems}
-      sideBarBottomNavitems={sideBarBottomNavitems}
+      topNavItems={topNavItems}
+      bottomNavItems={bottomNavItems}
     >
       <ReactFlowProvider fitView>
         <AppHeader

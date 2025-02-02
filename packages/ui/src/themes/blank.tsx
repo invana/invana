@@ -10,8 +10,9 @@ import { Button } from "../components/ui"
 import useTheme from "../hooks/useTheme"
 import React from "react"
 
-export interface SideBarNavitemProps {
+export interface LeftNavItem {
   name: string
+  key: string
   href?: string
   onClick?: () => void
   icon: React.ElementType
@@ -21,8 +22,8 @@ export interface SideBarNavitemProps {
 export interface BlankLayoutProps {
   children: React.ReactNode;
   logo: React.ReactNode;
-  sideBarTopNavitems?: SideBarNavitemProps[];
-  sideBarBottomNavitems?: SideBarNavitemProps[];
+  topNavItems?: LeftNavItem[];
+  bottomNavItems?: LeftNavItem[];
 }
 
 
@@ -42,7 +43,7 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
           </div>
           <div className="flex flex-col justify-between h-[calc(100vh-50px)]">
             <div className="">
-              {props.sideBarTopNavitems?.map((item) => (
+              {props.topNavItems?.map((item) => (
                 <React.Fragment key={item.name}>
                   <Tooltip key={item.name}>
                     <TooltipTrigger asChild>
@@ -85,7 +86,7 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
               ))}
             </div>
             <div className="">
-              {props.sideBarBottomNavitems?.map((item) => (
+              {props.bottomNavItems?.map((item) => (
                 <Tooltip key={item.name}>
                   <TooltipTrigger asChild>
                     <a

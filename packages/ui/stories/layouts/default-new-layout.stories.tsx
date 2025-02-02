@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { NavItem } from '@/themes/default-new/types';
-import { Home, Users, Mail, BarChart2, FileText, Settings } from 'lucide-react';
+import { Home, Users, Mail, BarChart2, FileText, Settings, Compass, Book } from 'lucide-react';
 import { DefaultNewLayout } from '@/themes/default-new/default-new';
+import React from 'react';
+import { Button, LeftNavItem } from '@invana/ui';
+
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
   title: 'Layouts/DefaultNewLayout',
@@ -19,25 +21,50 @@ type Story = StoryObj<typeof meta>;
 
 
 
-const navItems: NavItem[] = [
-  { icon: Home, label: "Dashboard", href: "#", toggleSidebar: "query" },
-  { icon: Users, label: "Users", href: "#" },
-  { icon: Mail, label: "Messages", href: "#" },
-  { icon: BarChart2, label: "Analytics", href: "#" },
-  { icon: FileText, label: "Documentation", href: "#", toggleSidebar: "docs" },
-  { icon: Settings, label: "Settings", href: "#" },
+const topNavItems: LeftNavItem[] = [
+  {
+    icon: Compass,
+    key: "dashboard",
+    name: "Dashboard",
+    onClick: () => {
+      console.log("Clicked:", "Dashboard")
+    }
+  },
+  {
+    icon: Book,
+    key: "documentation",
+    name: "documentation",
+    onClick: () => {
+      console.log("Clicked:", "Documentation")
+    }
+  },
+  // { icon: Users, name: "Users", },
+  // { icon: Mail, name: "Messages", },
+  // { icon: BarChart2, name: "Analytics", },
+  // { icon: FileText, name: "Documentation", toggleSidebar: "docs" },
+  // { icon: Settings, name: "Settings", },
 ]
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
-    className: "h-screen w-full",
+    headerProps: {
+      left: <>
+        <Home size={24} />
+        <span>Dashboard</span>
+      </>,
+      center: < >
+        <span className='font-bold mr-2'>Hello World</span>
+        <span className='mr-2'>|</span>
+        <span>Explorer</span>
+      </>,
+      right: <>
+        <Button variant="ghost" >Help</Button>
+      </>
+
+    },
     leftNavProps: {
-      items: navItems,
-      activeItem: "Dashboard",
-      onItemClick: (item) => {
-        console.log("Clicked:", item.label)
-      },
+      topNavItems: topNavItems,
     },
     leftContent: <div className="space-y-2 min-w-[300px]">
       {Array.from({ length: 10 }).map((_, i) => (

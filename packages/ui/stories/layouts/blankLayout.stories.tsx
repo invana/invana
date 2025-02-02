@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BlankLayout } from '@invana/ui';
-import type { SideBarNavitemProps } from '@invana/ui';
+import type { LeftNavItem } from '@invana/ui';
 import {
   Activity, Compass, Database, Home,
   Network,
@@ -8,14 +8,14 @@ import {
 } from 'lucide-react'
 
 
-const sideBarTopNavitems: SideBarNavitemProps[] = [
+const topNavItems: LeftNavItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Explorer", href: "/explorer", icon: Compass },
   { name: "Modeller", href: "/modeller", icon: Network },
   { name: "Database Connection", href: "/connections", icon: Database },
 ]
 
-const sideBarBottomNavitems: SideBarNavitemProps[] = [
+const bottomNavItems: LeftNavItem[] = [
   { name: "Activity", href: "/activity", icon: Activity },
   { name: "Settings", href: "#", icon: Settings },
 ]
@@ -40,8 +40,8 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     logo: <Compass className='h-4 w-4' />,
-    sideBarTopNavitems: sideBarTopNavitems,
-    sideBarBottomNavitems: sideBarBottomNavitems,
+    topNavItems: topNavItems,
+    bottomNavItems: bottomNavItems,
     children: <div>Main Content here</div>,
   },
 };
