@@ -104,15 +104,28 @@ const ExplorerPage: React.FC = () => {
       topNavItems: topNavItems,
     }}
     leftContent={
-      <div className="space-y-2 min-w-[300px]">
+      <div className="space-y-2 ">
+        {leftContentName === "model" &&
+          <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
+            <div className='h-full px-3 py-2'>
+              <p >Graph model comes here</p>
+
+            </div>
+          </PanelContent>
+        }
         {leftContentName === "query" &&
           <PanelContent title={"Query Console"} onClose={() => setLeftContentName(undefined)} showClose>
-            <QueryForm />
+            <QueryForm className=' ' />
           </PanelContent>
         }
         {leftContentName === "activity-history" &&
           <PanelContent title={"Activity History"} onClose={() => setLeftContentName(undefined)} showClose>
-            <ActivityHistoryView className='p-3' />
+            <ActivityHistoryView className='p-3 mb-3 h-[calc(100vh-80px)] ' />
+          </PanelContent>
+        }
+        {leftContentName === "display-settings" &&
+          <PanelContent title={"Display Settings"} onClose={() => setLeftContentName(undefined)} showClose>
+            <p>Display Settings here </p>
           </PanelContent>
         }
       </div>

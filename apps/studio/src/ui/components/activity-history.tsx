@@ -21,7 +21,7 @@ g.V()
 
 
   return (
-    <div className={cn("h-full w-full flex flex-col", props.className)}>
+    <div className={cn("w-full flex flex-col", props.className)}>
 
       {
         queryHistory.map((item, index) => (

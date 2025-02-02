@@ -68,47 +68,43 @@ g.V()
         {/* <CardHeader className="flex flex-row border-b items-center p2 justify-between space-y-0">
           <CardTitle className="font-bold uppercase  ">Query Console</CardTitle>
         </CardHeader> */}
-        <CardContent className="flex-1 flex flex-col gap-4 p-0">
+        <CardContent className="p-0">
 
-          <div className="flex-1 overflow-hidden border-b bg-background ">
-            <Editor
-              height={450}
-              defaultLanguage="sql"
-              language="sql"
-              theme="vs-dark"
-              value={query}
-              onMount={handleEditorDidMount}
-              onChange={(value) => setQuery(value || "")}
-              options={{
-                minimap: { enabled: false },
-                lineNumbers: "on",
-                lineHeight: 24,
-                padding: { top: 13, bottom: 13 },
-                scrollBeyondLastLine: false,
-                fontSize: 13,
-                tabSize: 2,
-                wordWrap: "on",
-                automaticLayout: true,
-              }}
-              beforeMount={(monaco) => {
-                return () => {
-                  if (editorRef.current) {
-                    editorRef.current.dispose();
-                    editorRef.current = null;
-                  }
-                };
-              }}
-            />
-          </div>
-
-
-
-
+          {/* <div className="flex-1 overflow-hidden border-b bg-background "> */}
+          <Editor
+            height={'calc(100vh - 450px)'}
+            defaultLanguage="sql"
+            language="sql"
+            theme="vs-dark"
+            value={query}
+            onMount={handleEditorDidMount}
+            onChange={(value) => setQuery(value || "")}
+            options={{
+              minimap: { enabled: false },
+              lineNumbers: "on",
+              lineHeight: 24,
+              padding: { top: 13, bottom: 13 },
+              scrollBeyondLastLine: false,
+              fontSize: 13,
+              tabSize: 2,
+              wordWrap: "on",
+              automaticLayout: true,
+            }}
+            beforeMount={(_) => {
+              return () => {
+                if (editorRef.current) {
+                  editorRef.current.dispose();
+                  editorRef.current = null;
+                }
+              };
+            }}
+          />
+          {/* </div> */}
         </CardContent>
         <CardFooter className=" flex items-center justify-between "  >
           {/* <div > */}
           <Select value={language} onValueChange={(value) => handleLanguageChange(value as QueryLanguage)}>
-            <SelectTrigger className="w-[180px] px-2 py-1">
+            <SelectTrigger className="w-[180px] px-2   border-sm py-1">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
             <SelectContent>
@@ -123,27 +119,24 @@ g.V()
           {/* </div> */}
         </CardFooter>
       </Card>
-      <Card className=" flex   max-h-[200px] flex-col rounded-none">
+      <Card className=" flex flex-col rounded-none">
         <CardHeader>
           <CardTitle>
-            Query history
-
+            last query
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col gap-4 p-0">
-          <div className="  overflow-auto p-2 border-0 !border-t">
-            {
-              queryHistory.map((item, index) => (
-                <div key={index} className="mb-2 p-2 border rounded-md">
-                  <pre className="text-sm">{item.query}</pre>
-                  <span className="text-xs text-muted-foreground">
-                    {item.createdAt.toLocaleString()}
-                  </span>
-                </div>
-              ))
-            }
-            {/* <p className="text-muted-foreground">Execute a query to see results here.</p> */}
-          </div>
+        <CardContent className="flex-1 flex flex-col gap-4 p-0 h-[350px] overflow-y-auto p-2 border-0 !border-t">
+          {
+            queryHistory.map((item, index) => (
+              <div key={index} className="mb-2 p-2 border rounded-md">
+                <pre className="text-sm">{item.query}</pre>
+                <span className="text-xs text-muted-foreground">
+                  {item.createdAt.toLocaleString()}
+                </span>
+              </div>
+            ))
+          }
+          {/* <p className="text-muted-foreground">Execute a query to see results here.</p> */}
         </CardContent>
       </Card>
 
