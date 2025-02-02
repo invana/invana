@@ -1,14 +1,17 @@
 "use client"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
+import { cn } from "../../lib/utils"
+import { Button } from "../../components/ui/button"
+import {
+  ResizablePanelGroup, ResizablePanel,
+  ResizableHandle
+} from "../../components/ui/resizable"
 import { DefaultNewLayoutProps } from './types';
 import { usePanelStore } from "./store"
 import { PanelContent } from "./panel-content"
 import { RightSidebar } from "./right-sidebar"
 import React from "react"
 import { AppHeader } from "../app";
-import { TooltipProvider } from "@/components/ui";
+import { TooltipProvider } from "../../components/ui";
 import { LeftNav } from "./left-nav";
 
 

@@ -1,7 +1,7 @@
 import React from "react"
 import { Moon, Sun } from "lucide-react"
-import useTheme from "@/hooks/useTheme"
-import { LeftNavItem, LeftNavItems } from "@/components/theme/left-nav-items"
+import useTheme from "../../hooks/useTheme"
+import { LeftNavItem, LeftNavItems } from "../../components/theme/left-nav-items"
 import { Tooltip, TooltipTrigger, Button, TooltipContent } from '../../components/ui';
 
 

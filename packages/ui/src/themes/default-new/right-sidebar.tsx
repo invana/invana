@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import { PanelContent } from "./panel-content"
 import { usePanelStore } from "./store"
 import React from "react"

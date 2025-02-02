@@ -2,9 +2,9 @@
 
 import { Package, Sun, MonitorSmartphone } from "lucide-react"
 import React from "react"
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui"
-import useTheme from "@/hooks/useTheme"
-import { LeftNavItem, LeftNavItems } from "@/components/theme/left-nav-items"
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui"
+import useTheme from "../../hooks/useTheme"
+import { LeftNavItem, LeftNavItems } from "../../components/theme/left-nav-items"
 // const navItems = [
 //   { icon: Home, label: "Dashboard", href: "#" },
 //   { icon: Users, label: "Users", href: "#" },
