@@ -45,6 +45,7 @@ const ExplorerPage: React.FC = () => {
   const topNavItems: LeftNavItem[] = [
     {
       name: "Search",
+      key: "search",
       onClick: () => {
         console.log("SearchIcon clicked", leftSidebar)
         return leftSidebar === undefined ? setLeftSidebar("search") : setLeftSidebar(undefined)
@@ -53,16 +54,17 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Query",
+      key: "query",
       onClick: () => {
         console.log("SearchIcon clicked", rightSidebar)
         return rightSidebar === undefined ? setRightSidebar("search") : setRightSidebar(undefined)
       },
       icon: Terminal
     },
-    { name: "Modeller", href: "/modeller", icon: Network },
+    { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
-    { name: "Activity History", href: "#", icon: Activity },
-    { name: "Display Settings", href: "#", icon: MonitorCog },
+    { name: "Activity History", key: 'activity-history', href: "#", icon: Activity },
+    { name: "Display Settings", key: 'display-settings', href: "#", icon: MonitorCog },
   ]
 
 

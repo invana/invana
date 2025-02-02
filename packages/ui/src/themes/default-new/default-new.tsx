@@ -12,9 +12,14 @@ import { TooltipProvider } from "@/components/ui";
 import { LeftNav } from "./left-nav";
 
 
-export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({ className,
+export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
+  className,
   headerProps,
-  leftNavProps, leftContent, mainContent, rightContent }) => {
+  leftNavProps,
+  leftContent,
+  mainContent,
+  rightContent }) => {
+
   const {
     leftContentName,
     rightContentName,
