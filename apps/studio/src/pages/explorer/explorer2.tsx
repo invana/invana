@@ -4,7 +4,7 @@ import { DefaultNewLayout } from '@invana/ui/themes/default-new/default-new';
 import { usePanelStore } from '@invana/ui/themes/default-new/store';
 import { Activity, Book, Compass, Home, MonitorCog, Network, SearchIcon, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Graph } from '@antv/g6';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
@@ -31,6 +31,7 @@ const ExplorerPage: React.FC = () => {
     setLeftContentName,
     bottomContentName,
     toggleLeftContent,
+    mainTopContentSize,
     toggleBottomContent,
   } = usePanelStore()
 
@@ -76,6 +77,18 @@ const ExplorerPage: React.FC = () => {
   ]
 
   const options = { ...defaultOptions }
+
+
+  useEffect(() => {
+    console.log("mainTopContentSize", mainTopContentSize)
+    const graph = containerRef.current?.getGraph();
+    if (graph) {
+      graph.resize();
+      // graph.render();
+      graph.fitView();
+    }
+  }, [mainTopContentSize]);
+
 
 
   return <DefaultNewLayout
@@ -131,6 +144,9 @@ const ExplorerPage: React.FC = () => {
       </div>
     }
     mainContent={
+
+      // <div className="flex h-full items-center justify-center ">
+
       <CanvasGraph
         ref={containerRef}
         style={{ width: "100%", height: "100%" }}
@@ -144,6 +160,8 @@ const ExplorerPage: React.FC = () => {
         }}
         options={options}
       />
+
+      // </div>
     }
     rightContent={
       <></>

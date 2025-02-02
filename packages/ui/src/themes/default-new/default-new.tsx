@@ -27,6 +27,10 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
     leftContentName,
     rightContentName,
     bottomContentName,
+    leftContentSize,
+    setLeftContentSize,
+    mainTopContentSize,
+    setMainTopContentSize,
     // toggleLeftContent,
     toggleBottomContent
   } = usePanelStore()
@@ -48,13 +52,14 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                 direction="horizontal"
                 onLayout={(sizes) => {
                   console.debug("sizes", sizes)
+                  setLeftContentSize(sizes[0])
                   // if (leftContentName) {
                   //   setLeftNavSize(sizes[0])
                   // }
                 }}
               >
                 <ResizablePanel
-                  defaultSize={35}
+                  defaultSize={leftContentSize}
                   minSize={20}
                   maxSize={45}
                   style={{
@@ -73,9 +78,9 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                   <ResizablePanelGroup
                     direction="vertical"
                     onLayout={(sizes) => {
-                      console.debug("sizes", sizes)
+                      console.debug("Vertical sizes", sizes)
                       // Update bottom panel size and collapse state
-                      // setBottomNavSize(sizes[1])
+                      setMainTopContentSize(sizes[0])
                       // // Update collapsed state based on size
                       // if (sizes[1] <= defaultBottomSize + 1) {
                       //   setBottomNavSize(defaultBottomSize)
@@ -84,15 +89,15 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                       // }
                     }}
                   >
-                    <ResizablePanel minSize={30} defaultSize={97} >
-                      {/* <div className="flex h-full items-center justify-center"> */}
-                      {/* <PanelContent title="Main Content" showClose={true}> */}
-                      {mainContent}
-                      {/* </PanelContent> */}
-                      {/* </div> */}
+                    <ResizablePanel minSize={30} defaultSize={mainTopContentSize} >
+                      <div className="flex h-full items-center justify-center">
+                        {/* <PanelContent title="Main Content" showClose={true}> */}
+                        {mainContent}
+                        {/* </PanelContent> */}
+                      </div>
                     </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
-                    <ResizablePanel minSize={3}>
+                    <ResizablePanel minSize={3} defaultSize={100 - mainTopContentSize}>
                       <div className="flex flex-col h-full">
                         <div className="flex-1 overflow-auto">
                           {/* <h1>Bottom here</h1> */}
