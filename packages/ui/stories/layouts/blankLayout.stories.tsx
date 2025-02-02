@@ -9,15 +9,15 @@ import {
 
 
 const topNavItems: LeftNavItem[] = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Explorer", href: "/explorer", icon: Compass },
-  { name: "Modeller", href: "/modeller", icon: Network },
-  { name: "Database Connection", href: "/connections", icon: Database },
+  { name: "Home", key: "home", href: "/", icon: Home },
+  { name: "Explorer", key: "explorer", href: "/explorer", icon: Compass },
+  { name: "Modeller", key: "modeller", href: "/modeller", icon: Network },
+  { name: "Database Connection", key: "connections", href: "/connections", icon: Database },
 ]
 
 const bottomNavItems: LeftNavItem[] = [
-  { name: "Activity", href: "/activity", icon: Activity },
-  { name: "Settings", href: "#", icon: Settings },
+  { name: "Activity", key: "activity", href: "/activity", icon: Activity },
+  { name: "Settings", key: "settings", href: "#", icon: Settings },
 ]
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export

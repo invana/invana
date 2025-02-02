@@ -12,8 +12,6 @@ export interface LeftNavProps {
 
 
 export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems }) => {
-  const [activeItem, setActiveItem] = React.useState<null | string>(null)
-
 
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();

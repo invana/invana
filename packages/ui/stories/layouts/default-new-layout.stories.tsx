@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Home, Users, Mail, BarChart2, FileText, Settings, Compass, Book } from 'lucide-react';
+import { Home, Compass, Book } from 'lucide-react';
 import { DefaultNewLayout } from '@/themes/default-new/default-new';
-import React from 'react';
 import { Button, LeftNavItem } from '@invana/ui';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
