@@ -16,13 +16,8 @@ export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems })
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();
 
-  // const bottomNavItems = [
-  //   { icon: Settings, label: "Settings", href: "#" },
-  //   { icon: Bell, label: "Notifications", href: "#" },
-  // ]
-
   return (
-    <div className="w-[50px] h-full border-r bg-background flex flex-col items-center">
+    <div className="w-[45px] h-full border-r bg-background flex flex-col items-center">
       <LeftNavItems items={topNavItems ?? []} />
 
       <div className="flex-1" />
@@ -48,11 +43,13 @@ export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems })
                       text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             onClick={toggleTheme}
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4 text-foreground" />
-            ) : (
-              <Moon className="h-4 w-4 text-foreground" />
-            )}
+            {
+              theme === "dark" ? (
+                <Sun className="h-4 w-4 text-foreground" />
+              ) : (
+                <Moon className="h-4 w-4 text-foreground" />
+              )
+            }
           </Button>
         </TooltipTrigger>
         <TooltipContent>Toggle theme</TooltipContent>
