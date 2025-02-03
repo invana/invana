@@ -1,7 +1,7 @@
 
 import { LeftNavItem } from '@invana/ui';
-import { DefaultNewLayout } from '@invana/ui/themes/default-new/default-new';
-import { usePanelStore } from '@invana/ui/themes/default-new/store';
+import { DefaultLayout } from '@invana/ui/themes/default/default-new';
+import { usePanelStore } from '@invana/ui/themes/default/store';
 import { Activity, Book, Compass, Home, MonitorCog, Network, SearchIcon, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
@@ -104,7 +104,7 @@ const ExplorerPage: React.FC = () => {
 
 
 
-  return <DefaultNewLayout
+  return <DefaultLayout
     headerProps={{
       left: (
         <>

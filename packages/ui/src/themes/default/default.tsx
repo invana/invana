@@ -4,7 +4,7 @@ import {
   ResizablePanelGroup, ResizablePanel,
   ResizableHandle
 } from "../../components/ui/resizable"
-import { DefaultNewLayoutProps } from './types';
+import { DefaultLayoutProps } from './types';
 import { usePanelStore } from "./store"
 // import { PanelContent } from "./panel-content"
 import { RightSidebar } from "./right-sidebar"
@@ -14,7 +14,7 @@ import { TooltipProvider } from "../../components/ui";
 import { LeftNav } from "./left-nav";
 
 
-export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
+export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
   className,
   headerProps,
   leftNavProps,
