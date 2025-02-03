@@ -1,3 +1,4 @@
+import type { IPointerEvent } from '@antv/g6';
 
 
 
@@ -9,11 +10,12 @@ export const HOVER_ACTIVATE = {
   degree: 1,
   state: 'highlight',
   inactiveState: 'dim',
-  onHover: (event: any) => {
-    // console.log("====onHover", event)
+  // animate: true,
+  onHover: (event: IPointerEvent) => {
+    console.log("====onHover", event)
     event.view.setCursor('pointer');
   },
-  onHoverEnd: (event: any) => {
+  onHoverEnd: (event: IPointerEvent) => {
     event.view.setCursor('default');
   },
 }

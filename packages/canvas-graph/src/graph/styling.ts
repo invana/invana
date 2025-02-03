@@ -54,6 +54,8 @@ export class GraphStyling {
     return style
   }
 
+
+
   setTheme(theme: ThemeOptions) {
     const nodeStyle = this.defaultNodeStyleBasedOnTheme(theme);
     const edgeStyle = this.defaultEdgeStyleBasedOnTheme(theme);

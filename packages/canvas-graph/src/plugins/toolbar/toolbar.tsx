@@ -54,17 +54,26 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
       getGraph()?.zoomTo(currentZoom - 0.2, animation);
   };
 
-  const fitView = () => {
-    getGraph()?.fitView({}, animation);
-  };
+  // const fitView = () => {
+  //   getGraph()?.fitView({}, animation);
+  // };
 
   const onZoomChange = (value: string) => {
-    if (value === "fitview") {
-      fitView();
+    const graph = getGraph();
+    if (graph) {
+      if (value === "fitview") {
+        graph.resize();
+        graph?.fitView({}, animation);
+
+      }
+      else {
+        graph.zoomTo(Number(value) / 100, animation);
+      }
+      // graph.resize();
+      // graph.layout();
+      // graph.render();
     }
-    else {
-      getGraph()?.zoomTo(Number(value) / 100);
-    }
+
   };
 
   const eraseCanvas = () => {
@@ -96,6 +105,16 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
     }
   }
 
+  const reDraw = () => {
+    const graph = getGraph();
+    if (graph) {
+      graph.resize();
+      graph.layout();
+      graph.render();
+      graph.fitView();
+    }
+  }
+
 
   // if (!getGraph()) {
   //   return
@@ -122,7 +141,7 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
         variant="ghost"
         size="icon-sm"
         className="rounded-none"
-        onClick={() => getGraph()?.render()}
+        onClick={() => reDraw()}
         tooltip={<p>Redraw</p>}
       >
         <RefreshCcw className="h-4 w-4 " />
