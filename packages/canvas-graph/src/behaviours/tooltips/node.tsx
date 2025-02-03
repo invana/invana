@@ -2,7 +2,7 @@ import { BaseBehavior, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
-// import React from 'react';
+import React from 'react';
 import { NodeCard } from '@invana/ui';
 
 

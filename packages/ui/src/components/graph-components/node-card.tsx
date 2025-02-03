@@ -15,9 +15,9 @@ export interface NodeCardProps {
   showProperties?: boolean;
 }
 
-export const NodeCard: React.FC<NodeCardProps> = ({ node, extra, className = 'w-[260px]', showProperties = false }) => {
+export const NodeCard: React.FC<NodeCardProps> = ({ node, extra, className = '', showProperties = false }) => {
   return (
-    <Card className={cn(" shadow-lg", className)}>
+    <Card className={cn("shadow-lg w-[260px]", className)}>
       <CardHeader className=''>
         <CardTitle className='break-words text-xl'>{node?.label as string}</CardTitle>
         <CardDescription className='text-xs'>
@@ -27,7 +27,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({ node, extra, className = 'w-
       </CardHeader>
       <CardContent className='p-0'>
         {
-          showProperties && <ElementProperties className={"pr-4 pl-4"} properties={node?.properties || {}} />
+          showProperties && <ElementProperties className={"pr-3 pl-3"} properties={node?.properties || {}} />
         }
         {extra && <div>{extra}</div>}
       </CardContent>

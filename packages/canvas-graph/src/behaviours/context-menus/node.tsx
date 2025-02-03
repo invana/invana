@@ -2,7 +2,7 @@ import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
-import { Button, ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
+import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 // import React from 'react';

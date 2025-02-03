@@ -29,7 +29,7 @@ export const EdgeCard: React.FC<EdgeCardProps> = ({ edge, extra, className = ' w
         </CardDescription>
       </CardHeader>
       {
-        showProperties && <ElementProperties className={"pr-4 pl-4"} properties={edge?.properties || {}} />
+        showProperties && <ElementProperties className={"pr-3 pl-3"} properties={edge?.properties || {}} />
       }
       {extra && <div> {extra}</div>}
     </Card>

@@ -3,10 +3,10 @@ import type { BaseBehaviorOptions, EdgeData, IPointerEvent, RuntimeContext } fro
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { EdgeCard } from '@invana/ui';
-// import React from 'react';
+import React from 'react';
 
 
-export interface EdgeTooltipOptions extends BaseBehaviorOptions {
+export interface EdgeTooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
 }
 
@@ -15,14 +15,14 @@ export class EdgeTooltipBehavior extends BaseBehavior {
   container!: HTMLElement;
   root!: Root
 
-  constructor(context: RuntimeContext, options: EdgeTooltipOptions) {
+  constructor(context: RuntimeContext, options: EdgeTooltipBehaviorOptions) {
     super(context, options);
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
   }
 
-  public update(options: Partial<EdgeTooltipOptions>): void {
+  public update(options: Partial<EdgeTooltipBehaviorOptions>): void {
     this.unbindEvents();
     super.update(options);
     this.bindEvents();
@@ -33,6 +33,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.container = document.createElement('div');
     this.container.id = 'EdgeTooltipBehavior';
     this.container.style.position = 'absolute';
+    this.container.classList.add('h-full');
     // this.container.style.pointerEvents = 'none';
     document.body.appendChild(this.container);
   }
