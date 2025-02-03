@@ -47,9 +47,11 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
   createContainer() {
     this.container = document.createElement('div');
     this.container.id = 'PropertyViewerBehavior';
-    // this.container.style.position = 'absolute';
-    this.container.style.top = '0px';
-    this.container.style.right = '0px';
+    this.container.style.position = 'absolute';
+    // this.container.style.top = '0px';
+    // this.container.style.right = '0px';
+    this.container.className = this.options.className ?? 'top-[45px] right-[0px] h-[calc(100vh-45px)]';
+    // this.container.classList.add(this.options.className ?? '');
     this.hideContainer();
     // this.container.style.pointerEvents = 'none';
     document.body.appendChild(this.container);
@@ -70,7 +72,7 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
       properties: node.data?.properties as IProperties
     }
     const component: React.ReactNode = <NodeCard
-      className='h-screen'
+      className='h-full'
       node={nodeData}
       showProperties={true}
     />
@@ -91,7 +93,7 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     }
 
     const component: React.ReactNode = <EdgeCard
-      className='h-screen'
+      className='h-full'
       edge={edgeData}
       showProperties={true}
     />

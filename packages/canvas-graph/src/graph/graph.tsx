@@ -18,7 +18,7 @@ register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavio
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
 
-register(ExtensionCategory.BEHAVIOR, 'node-property-viewer', PropertyViewerBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
 
 
 export interface CanvasGraphProps {

@@ -79,18 +79,28 @@ const ExplorerPage: React.FC = () => {
 
   const options = { ...defaultOptions }
 
+  if (options.behaviors) {
+    options.behaviors = options.behaviors.filter(b => b !== 'property-viewer');
 
-  useEffect(() => {
-    console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
-    const graph = containerRef.current?.getGraph();
-    if (graph && isReady) {
+    options.behaviors.push({
+      key: 'property-viewer',
+      type: 'property-viewer',
+      className: 'top-[45px] right-[0px] h-[calc(100vh-72px)]',
+    });
+  }
 
-      graph.resize();
-      graph.layout();
-      graph.render();
-      graph.fitView();
-    }
-  }, [mainTopContentSize, leftContentSize, isReady]);
+
+  // useEffect(() => {
+  //   console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
+  //   const graph = containerRef.current?.getGraph();
+  //   if (graph && isReady) {
+
+  //     graph.resize();
+  //     graph.layout();
+  //     graph.render();
+  //     graph.fitView();
+  //   }
+  // }, [mainTopContentSize, leftContentSize, isReady]);
 
 
 
