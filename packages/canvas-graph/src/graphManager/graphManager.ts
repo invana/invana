@@ -1,20 +1,24 @@
 
 
 import {
-  Graph
+  Graph,
+  GraphOptions
 } from '@antv/g6';
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
+import { GraphStyling } from '../graph/styling';
 
 
 export class GraphManager {
 
   g6graph!: Graph;
-  graphStore: GraphStore;
+  store: GraphStore;
+  styling!: GraphStyling
 
-  constructor(g6graph: Graph, graphStore?: GraphStore) {
+  constructor(g6graph: Graph, options: Omit<GraphOptions, 'data'>) {
     this.g6graph = g6graph;
-    this.graphStore = graphStore ? graphStore : new GraphStore();
+    this.styling = new GraphStyling(this.g6graph, options)
+    this.store = new GraphStore();
     this.initDataListeners();
   }
 
@@ -26,24 +30,24 @@ export class GraphManager {
     this.g6graph = g6graph;
   }
 
-  /** Set theme */
-  setTheme(theme: 'light' | 'dark') {
-    this.g6graph.setOptions({ theme });
-    // const themeConfig = theme === 'light'
-    //   ? { defaultNode: { style: { fill: '#fff', stroke: '#000' } } }
-    //   : { defaultNode: { style: { fill: '#333', stroke: '#fff' } } };
+  // /** Set theme */
+  // setTheme(theme: 'light' | 'dark') {
+  //   this.g6graph.setOptions({ theme });
+  //   // const themeConfig = theme === 'light'
+  //   //   ? { defaultNode: { style: { fill: '#fff', stroke: '#000' } } }
+  //   //   : { defaultNode: { style: { fill: '#333', stroke: '#fff' } } };
 
-    // this.g6graph.updateItem('global', themeConfig);
-    // this.g6graph.refresh();
-  }
+  //   // this.g6graph.updateItem('global', themeConfig);
+  //   // this.g6graph.refresh();
+  // }
 
 
   initDataListeners() {
 
     // node
-    this.graphStore.data.on('nodeAdded', ({ key }) => {
+    this.store.data.on('nodeAdded', ({ key }) => {
       // console.log(`Node created: ${key}`);
-      const node = this.graphStore.fineNodeById(key);
+      const node = this.store.fineNodeById(key);
       // console.log("node", node);
       if (node) {
         const g6Node = convert_icanvas_node_to_g6_node(node);
@@ -52,38 +56,36 @@ export class GraphManager {
       }
     });
 
-    this.graphStore.data.on('nodeDropped', (nodeKey) => {
+    this.store.data.on('nodeDropped', (nodeKey) => {
       console.log(`Node deleted: ${nodeKey}`);
     });
 
-    this.graphStore.data.on('nodeAttributesUpdated', (nodeKey) => {
+    this.store.data.on('nodeAttributesUpdated', (nodeKey) => {
       console.log(`Node updated: ${nodeKey}`);
     });
 
     // edge
-    this.graphStore.data.on('edgeAdded', ({ key }) => {
+    this.store.data.on('edgeAdded', ({ key }) => {
       // console.log(`Edge created: ${key}`);
-      const edge = this.graphStore.fineEdgeById(key);
+      const edge = this.store.fineEdgeById(key);
       // console.log("edge", edge);
       if (edge) {
         const g6Edge = convert_icanvas_edge_to_g6_edge(edge);
         // console.log("g6Edge", g6Edge);
         this.g6graph.addEdgeData([g6Edge])
       }
-
-
     });
 
-    this.graphStore.data.on('edgeDropped', (edgeKey) => {
+    this.store.data.on('edgeDropped', (edgeKey) => {
       console.log(`Edge deleted: ${edgeKey}`);
     });
 
-    this.graphStore.data.on('edgeAttributesUpdated', (edgeKey) => {
+    this.store.data.on('edgeAttributesUpdated', (edgeKey) => {
       console.log(`Edge updated: ${edgeKey}`);
     });
 
     // g6graph
-    this.graphStore.data.on('cleared', () => {
+    this.store.data.on('cleared', () => {
       console.log(`Graph cleared`);
     });
   }

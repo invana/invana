@@ -20,6 +20,12 @@
       ],
       "@invana/canvas-flow/*": [
         "../../packages/canvas-flow/src/*"
+      ],
+      "@invana/canvas-graph": [
+        "../../packages/canvas-graph/src"
+      ],
+      "@invana/canvas-graph/*": [
+        "../../packages/canvas-graph/src/*"
       ]
     },
     "jsx": "react-jsx"

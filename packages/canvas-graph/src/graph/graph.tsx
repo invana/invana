@@ -24,23 +24,22 @@ export interface CanvasGraphProps {
   options?: Omit<GraphOptions, 'data'>;
   style?: React.CSSProperties;
   className?: string;
-  // graph?: Graph;
-  graphManager?: GraphManager; //comes with inbuilt graphStore or user can pass their own
+  // graphManager?: GraphManager; //comes with inbuilt graphStore or user can pass their own
   onReady?: () => void;
   header?: boolean;
 }
 
-
 const MemoizedGraphin = React.memo(Graphin);
+
 
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   console.log("CanvasGraph props", props, "======")
   const { options, header = false } = props;
   const localRef = useRef<Graph | null>(null);
-  //@ts-ignore
-  const graphManager = props.graphManager ? props.graphManager : new GraphManager(null);
   const graphOptions: GraphOptions = { ...defaultOptions, ...options };
+  //@ts-ignore
+  const graphManager = new GraphManager(localRef.current, graphOptions);
   const [graph, setGraph] = React.useState<Graph | null>(null);
 
 
@@ -53,6 +52,11 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
       console.log("getGraph called", localRef.current);
       return localRef.current;
     },
+    getGraphManager: () => {
+      console.log("getGraphManager")
+      return graphManager
+    }
+
   }));
 
   useEffect(() => {
@@ -75,7 +79,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
           if (graphManager) {
             graphManager.setGraph(graph);
           }
-          graphManager?.graphStore.addData(
+          graphManager?.store.addData(
             props.initialData ?? { 'nodes': [], 'edges': [] },
             () => graphManager?.g6graph.render()
           );
@@ -89,7 +93,6 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
         // style={style}
         options={graphOptions}
       >
-
       </MemoizedGraphin>
     </div>
   );

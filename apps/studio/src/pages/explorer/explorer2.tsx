@@ -2,12 +2,12 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { usePanelStore } from '@invana/ui/themes/default/store';
-import { Activity, Book, Compass, Home, MonitorCog, Network, SearchIcon, Terminal } from 'lucide-react';
+import { Activity, Compass, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
 import { Graph } from '@antv/g6';
-import { ProductCopyRightInfo, ProductName } from '@/constants';
-import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
+import { ProductName } from '@/constants';
+import { CanvasGraph, CanvasToolBar, defaultOptions, GraphManager } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
@@ -21,20 +21,20 @@ const ExplorerPage: React.FC = () => {
 
 
   const [isReady, setIsReady] = useState(false);
-  const containerRef = useRef<{ getGraph: () => Graph } | null>(null);
-  const graphManagerRef = useRef(null);
+  const containerRef = useRef<{
+    getGraph: () => Graph
+    getGraphManager: () => GraphManager
+  } | null>(null);
+  // const graphManagerRef = useRef(null);
 
   const { theme, } = useThemeStore()
 
 
   const {
     leftContentName,
-    rightContentName,
     setLeftContentName,
     bottomContentName,
     toggleLeftContent,
-    mainTopContentSize,
-    leftContentSize,
     toggleBottomContent,
   } = usePanelStore()
 
@@ -103,13 +103,13 @@ const ExplorerPage: React.FC = () => {
   //     graph.fitView();
   //   }
   // }, [mainTopContentSize, leftContentSize, isReady]);
-
-
   useEffect(() => {
     if (containerRef.current && isReady) {
-      const graph = containerRef.current.getGraph();
-      graph.setTheme(theme); // Refresh the graph when theme changes
-      console.log("====graph", graph)
+      const graphManager = containerRef.current.getGraphManager();
+      graphManager.styling.setTheme(theme)
+
+      // graph.setTheme(theme); // Refresh the graph when theme changes
+      // console.log("====graph", graph)
     }
   }, [theme, isReady]);
 
@@ -174,7 +174,7 @@ const ExplorerPage: React.FC = () => {
         style={{ width: "100%", height: "100%" }}
         className={"bg-background"}
         //@ts-expect-error
-        graphManager={graphManagerRef.current}
+        // graphManager={graphManagerRef.current}
         initialData={flightData}
         onReady={() => {
           console.log("onReady")
