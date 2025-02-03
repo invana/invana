@@ -1,6 +1,6 @@
 
-import { LeftNavItem } from '@invana/ui';
-import { DefaultLayout } from '@invana/ui/themes/default/default-new';
+import { LeftNavItem, useThemeStore } from '@invana/ui';
+import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { usePanelStore } from '@invana/ui/themes/default/store';
 import { Activity, Book, Compass, Home, MonitorCog, Network, SearchIcon, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
@@ -23,6 +23,8 @@ const ExplorerPage: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   const containerRef = useRef<{ getGraph: () => Graph } | null>(null);
   const graphManagerRef = useRef(null);
+
+  const { theme, } = useThemeStore()
 
 
   const {
@@ -103,6 +105,13 @@ const ExplorerPage: React.FC = () => {
   // }, [mainTopContentSize, leftContentSize, isReady]);
 
 
+  useEffect(() => {
+    if (containerRef.current && isReady) {
+      const graph = containerRef.current.getGraph();
+      graph.setTheme(theme); // Refresh the graph when theme changes
+      console.log("====graph", graph)
+    }
+  }, [theme, isReady]);
 
   return <DefaultLayout
     headerProps={{

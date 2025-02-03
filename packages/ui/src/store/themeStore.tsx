@@ -17,7 +17,7 @@ export const getInitialTheme = (storeName: string) => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const storedTheme = window.localStorage.getItem(storeName);
     if (storedTheme) {
-      return storedTheme as 'light' | 'dark';
+      return JSON.parse(storedTheme).state.theme as 'light' | 'dark';
     }
   }
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;

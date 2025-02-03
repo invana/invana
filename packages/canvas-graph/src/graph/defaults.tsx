@@ -4,12 +4,58 @@ import { DRAG_CANVAS, ZOOM_CANVAS, DRAG_ELEMENT, HOVER_ACTIVATE, CLICK_SELECT, L
 import { MAP_NODE_SIZE } from '../options/transforms';
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 import { HISTORY_PLUGIN, MINIMAP_PLUGIN } from '../options/plugins';
+import { getInitialTheme, storeName } from '@invana/ui/store';
 
 export const DEFAULT_LAYOUT = 'grid'
 
+const theme = getInitialTheme(storeName)
+// const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+// const theme = prefersDark ? 'dark' : 'light';
+// const theme = themeStore.
+console.log("======theme", theme)
+// const theme = 'light';
 
-const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-const theme = prefersDark ? 'dark' : 'light';
+const defaultNodeStyleBasedOnTheme = (theme: 'dark' | 'light') => {
+  const defaultNodeStyle = { ...DEFAULT_NODE_STYLE };
+  if (!defaultNodeStyle.state) {
+    defaultNodeStyle.state = {};
+  }
+  if (!defaultNodeStyle.state.dim) {
+    defaultNodeStyle.state.dim = {};
+  }
+
+  const dimLabelFill = theme === 'dark' ? '#343434' : '#aaaaaa'
+  const dimFill = theme === 'dark' ? '#343434' : '#aaaaaa';
+
+  defaultNodeStyle.state.dim = {
+    ...defaultNodeStyle.state.dim,
+    fill: dimFill,
+    labelFill: dimLabelFill
+  };
+
+  return defaultNodeStyle
+}
+
+const defaultEdgeStyleBasedOnTheme = (theme: 'dark' | 'light') => {
+  const defaultEdgeStyle = { ...DEFAULT_EDGE_STYLE };
+  if (!defaultEdgeStyle.state) {
+    defaultEdgeStyle.state = {};
+  }
+  if (!defaultEdgeStyle.state.dim) {
+    defaultEdgeStyle.state.dim = {};
+  }
+
+  const dimLabelFill = theme === 'dark' ? '#343434' : '#aaaaaa'
+  const dimStroke = theme === 'dark' ? '#343434' : '#aaaaaa';
+
+  defaultEdgeStyle.state.dim = {
+    ...defaultEdgeStyle.state.dim,
+    stroke: dimStroke,
+    labelFill: dimLabelFill
+  };
+
+  return defaultEdgeStyle
+}
 
 export const defaultOptions: GraphOptions = {
   autoResize: true,
@@ -35,8 +81,8 @@ export const defaultOptions: GraphOptions = {
   layout: defaultLayoutsOptions.find((item) => item.type === DEFAULT_LAYOUT),
   theme: theme,
   // background: theme === 'dark' ? 'transparent' : '#ffffff',
-  node: DEFAULT_NODE_STYLE,
-  edge: DEFAULT_EDGE_STYLE,
+  node: defaultNodeStyleBasedOnTheme(theme),
+  edge: defaultEdgeStyleBasedOnTheme(theme),
   plugins: [
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,

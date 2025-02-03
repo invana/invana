@@ -11,13 +11,11 @@ import { EdgeContextMenuBehavior } from '../behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '../behaviours/context-menus/canvas';
 
 
-
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
-
 register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
 
 
@@ -44,6 +42,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   const graphManager = props.graphManager ? props.graphManager : new GraphManager(null);
   const graphOptions: GraphOptions = { ...defaultOptions, ...options };
   const [graph, setGraph] = React.useState<Graph | null>(null);
+
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
