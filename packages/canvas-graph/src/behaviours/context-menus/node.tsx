@@ -5,7 +5,7 @@ import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
-// import React from 'react';
+import React from 'react';
 
 
 export interface NodeContextMenuOptions extends BaseBehaviorOptions {
@@ -168,7 +168,7 @@ export class NodeContextMenuBehavior extends BaseBehavior {
       properties: node.data?.properties as IProperties
     }
 
-    this.root.render(<NodeCard node={nodeData} extra={
+    const component: React.ReactNode = <NodeCard node={nodeData} extra={
       <div>
         <div className='px-3 mb-3 mt-2  h-5  flex items-center space-x-2 text-sm'>
 
@@ -218,7 +218,9 @@ export class NodeContextMenuBehavior extends BaseBehavior {
           menuItems={menuItems}
         />
       </div>
-    } />)
+    } />
+
+    this.root.render(component)
     this.showContainer(event);
     this.hideCanvasContextMenu()
   }

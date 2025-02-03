@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, EdgeData, IPointerEvent, RuntimeContext } fro
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { EdgeCard } from '@invana/ui';
-// import React from 'react';
+import React from 'react';
 
 
 export interface EdgeTooltipBehaviorOptions extends BaseBehaviorOptions {
@@ -89,14 +89,14 @@ export class EdgeTooltipBehavior extends BaseBehavior {
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
-    this.root.render(
-      <EdgeCard
-        edge={edgeData}
-        showProperties={false}
-        extra={
-          <p className='text-xs pl-4 pr-4 pb-4'>(right-click on edge for more options)</p>
-        } />
-    )
+
+    const component: React.ReactNode = <EdgeCard
+      edge={edgeData}
+      showProperties={false}
+      extra={
+        <p className='text-xs pl-4 pr-4 pb-4'>(right-click on edge for more options)</p>
+      } />
+    this.root.render(component)
     graph.on(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
     graph.on(EdgeEvent.POINTER_OUT, () => {
       graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));

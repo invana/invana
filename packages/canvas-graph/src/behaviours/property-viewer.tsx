@@ -2,7 +2,7 @@ import { BaseBehavior, CanvasEvent, EdgeEvent, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData, EdgeData } from '@antv/g6';
 import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
-// import React from 'react';
+import React from 'react';
 import { EdgeCard, NodeCard } from '@invana/ui';
 
 
@@ -26,13 +26,10 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     graph.on(NodeEvent.CLICK, this.onNodeClicked);
     graph.on(NodeEvent.POINTER_OVER, this.onNodeHovered);
 
-
     graph.on(EdgeEvent.CLICK, this.onEdgeClicked);
     graph.on(EdgeEvent.POINTER_OVER, this.onEdgeHovered);
 
-
     graph.on(CanvasEvent.CLICK, this.hideContainer);
-
   }
 
   unbindEvents() {
@@ -43,17 +40,14 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     graph.off(EdgeEvent.CLICK, this.onNodeClicked);
     graph.off(EdgeEvent.POINTER_OVER, this.hideContainer);
 
-
     graph.off(CanvasEvent.CLICK, this.hideContainer);
-
-
   }
 
 
   createContainer() {
     this.container = document.createElement('div');
     this.container.id = 'PropertyViewerBehavior';
-    this.container.style.position = 'absolute';
+    // this.container.style.position = 'absolute';
     this.container.style.top = '0px';
     this.container.style.right = '0px';
     this.hideContainer();
@@ -75,13 +69,12 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
-    this.root.render(
-      <NodeCard
-        className='h-screen'
-        node={nodeData}
-        showProperties={true}
-      />
-    )
+    const component: React.ReactNode = <NodeCard
+      className='h-screen'
+      node={nodeData}
+      showProperties={true}
+    />
+    this.root.render(component)
   }
 
   showEdgeData = (event: IPointerEvent) => {
@@ -96,13 +89,13 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
-    this.root.render(
-      <EdgeCard
-        className='h-screen'
-        edge={edgeData}
-        showProperties={true}
-      />
-    )
+
+    const component: React.ReactNode = <EdgeCard
+      className='h-screen'
+      edge={edgeData}
+      showProperties={true}
+    />
+    this.root.render(component)
   }
 
   onNodeHovered = (event: IPointerEvent) => {

@@ -2,7 +2,7 @@ import { BaseBehavior, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
-// import React from 'react';
+import React from 'react';
 import { NodeCard } from '@invana/ui';
 
 
@@ -96,14 +96,13 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
       properties: node.data?.properties as IProperties
     }
 
-    this.root.render(
-      <NodeCard
-        node={nodeData}
-        showProperties={false}
-        extra={
-          <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>
-        } />
-    )
+    const component: React.ReactNode = <NodeCard
+      node={nodeData}
+      showProperties={false}
+      extra={
+        <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>
+      } />
+    this.root.render(component)
 
     graph.on(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
 

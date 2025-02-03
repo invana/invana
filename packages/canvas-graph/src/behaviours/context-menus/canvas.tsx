@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g
 import { createRoot, Root } from 'react-dom/client';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
-// import React from 'react';
+import React from 'react';
 
 
 export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
@@ -142,10 +142,11 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
     event.preventDefault();
     // event.stopPropagation();
 
-    this.root.render(< NestedMenu
+    const component: React.ReactNode = <NestedMenu
       className='w-[260px] bg-white rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
       menuItems={menuItems}
-    />)
+    />
+    this.root.render(component)
     this.showContainer(event);
   }
 

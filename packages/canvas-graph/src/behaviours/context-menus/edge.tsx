@@ -5,7 +5,7 @@ import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { EdgeCard } from '@invana/ui';
-// import React from 'react';
+import React from 'react';
 
 
 export interface EdgeContextMenuOptions extends BaseBehaviorOptions {
@@ -170,12 +170,17 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
       properties: edge.data?.properties as IProperties
     }
 
-    this.root.render(<EdgeCard edge={edgeData} extra={
-      <NestedMenu
-        className='rounded-none w-[260px] shadow-none p-0 border-none'
-        menuItems={menuItems}
-      />
-    } />)
+    const component: React.ReactNode = <EdgeCard
+      edge={edgeData}
+      extra={
+        <NestedMenu
+          className='rounded-none w-[260px] shadow-none p-0 border-none'
+          menuItems={menuItems}
+        />
+      }
+    />
+
+    this.root.render(component)
     this.showContainer(event);
     this.hideCanvasContextMenu()
   }
