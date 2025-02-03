@@ -1,8 +1,8 @@
-import { BaseBehavior, NodeEvent } from '@antv/g6';
+import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
-import React from 'react';
+// import React from 'react';
 import { NodeCard } from '@invana/ui';
 
 
@@ -24,11 +24,13 @@ export class NodePropertyViewerBehavior extends BaseBehavior<NodePropertyViewerB
   bindEvents() {
     const { graph } = this.context;
     graph.on(NodeEvent.CLICK, this.onNodeClicked);
+    graph.on(CanvasEvent.CLICK, this.hideContainer);
   }
 
   unbindEvents() {
     const { graph } = this.context;
     graph.off(NodeEvent.CLICK, this.onNodeClicked);
+    graph.off(CanvasEvent.CLICK, this.hideContainer);
   }
 
   createContainer() {
@@ -41,12 +43,9 @@ export class NodePropertyViewerBehavior extends BaseBehavior<NodePropertyViewerB
     document.body.appendChild(this.container);
   }
 
-  // showContainer = (event: IPointerEvent, padding: { x: number, y: number } = { x: 0, y: 0 }) => {
-  //   const { client } = event;
-  //   this.container.style.left = `${client.x + padding.x}px`;
-  //   this.container.style.top = `${client.y + padding.y}px`;
-  //   this.container.style.display = 'block';
-  // }
+  showContainer = () => {
+    this.container.style.display = 'block';
+  }
 
   // onNodeMouseMove = (event: IPointerEvent) => {
   //   this.showContainer(event, { x: 10, y: 10 });
@@ -79,12 +78,12 @@ export class NodePropertyViewerBehavior extends BaseBehavior<NodePropertyViewerB
   // }
 
   onNodeClicked = (event: IPointerEvent) => {
+    this.showContainer()
     const { graph } = this.context;
     console.log("onNodeClicked", event)
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
     console.log("NodeEvent.CLICKED node", node)
-
     const nodeData: ICanvasNode = {
       id: node.id as string,
       label: node.label as string,
@@ -92,7 +91,7 @@ export class NodePropertyViewerBehavior extends BaseBehavior<NodePropertyViewerB
       properties: node.data?.properties as IProperties
     }
     console.log("NodeEvent.CLICKED nodeData", nodeData)
-
+    this.hideOtherPropertyViewers();
     this.root.render(
       <NodeCard
         className='h-screen'
@@ -100,8 +99,6 @@ export class NodePropertyViewerBehavior extends BaseBehavior<NodePropertyViewerB
         showProperties={true}
       />
     )
-
-    this.hideOtherPropertyViewers();
   }
 
   hideOtherPropertyViewers = () => {

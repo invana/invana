@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, EdgeData, IPointerEvent, RuntimeContext } fro
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { EdgeCard } from '@invana/ui';
-import React from 'react';
+// import React from 'react';
 
 
 export interface EdgeTooltipBehaviorOptions extends BaseBehaviorOptions {
