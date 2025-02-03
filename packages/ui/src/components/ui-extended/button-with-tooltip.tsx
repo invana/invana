@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip"
+import { cn } from "../../lib/utils"
 
 
 export interface ButtonWithTooltipProps extends ButtonProps {
@@ -17,7 +18,7 @@ export function ButtonWithTooltip(props: ButtonWithTooltipProps) {
     <TooltipProvider>
       <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
-          <Button variant="ghost" {...props}>
+          <Button variant="ghost" className={cn('hover:bg-transparent', props.className)} {...props}>
             {props.children}
           </Button>
         </TooltipTrigger>

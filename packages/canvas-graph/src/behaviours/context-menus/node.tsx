@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } fro
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
-import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor } from 'lucide-react';
+import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 import React from 'react';
 
@@ -170,13 +170,17 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
     const component: React.ReactNode = <NodeCard node={nodeData} extra={
       <div>
-        <div className='px-3 mb-3 mt-2  h-5  flex items-center space-x-2 text-sm'>
+        <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
 
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
             className="rounded-none "
             tooltip={<p>{"Focus Node"}</p>}
+            onClick={() => {
+              graph.focusElement(nodeData.id)
+              this.hideContainer()
+            }}
           >
             <CircleDot className="h-4 w-4" />
           </ButtonWithTooltip>
@@ -185,8 +189,8 @@ export class NodeContextMenuBehavior extends BaseBehavior {
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
-            className="rounded-none   active:bg-gray:500"
-            tooltip={<p>{"Star a query"}</p>}
+            className="rounded-none  active:bg-gray:500"
+            tooltip={<p>{"Start a query"}</p>}
           >
             <Terminal className="h-4 w-4" />
           </ButtonWithTooltip>
@@ -196,7 +200,18 @@ export class NodeContextMenuBehavior extends BaseBehavior {
           <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
-            className="rounded-none   active:bg-gray:500"
+            className="rounded-none  active:bg-gray:500"
+            tooltip={<p>{"Tag this Node"}</p>}
+          >
+            <Tag className="h-4 w-4" />
+          </ButtonWithTooltip>
+
+          <Separator orientation="vertical" className='h-6' />
+
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-none  active:bg-gray:500"
             tooltip={<p>{"Lock Node"}</p>}
           >
             <Lock className="h-4 w-4" />

@@ -2,7 +2,7 @@ import { NodeOptions, EdgeOptions } from "@antv/g6"
 
 export const DEFAULT_NODE_STYLE: NodeOptions = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   style: {
-    halo: true,
+    // halo: true,
     labelText: (d) => d.id,
     labelPosition: 'bottom',
     labelAutoRotate: true,
