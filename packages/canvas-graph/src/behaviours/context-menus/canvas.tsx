@@ -38,25 +38,7 @@ export const menuItems: MenuItem[] = [
     icon: Settings,
     shortcut: '⌘,',
     children: [
-      {
-        id: 'account',
-        label: 'Account Settings',
-        icon: Users,
-        children: [
-          {
-            id: 'profile',
-            label: 'Profile',
-            icon: Users,
-            shortcut: '⌘P'
-          },
-          {
-            id: 'security',
-            label: 'Security',
-            icon: Shield,
-            shortcut: '⌘L'
-          }
-        ]
-      },
+
       {
         id: 'notifications',
         label: 'Notifications',
@@ -143,7 +125,7 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
     // event.stopPropagation();
 
     const component: React.ReactNode = <NestedMenu
-      className='w-[260px] bg-white rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
+      className='w-[260px] bg-card text-card-foreground rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
       menuItems={menuItems}
     />
     this.root.render(component)

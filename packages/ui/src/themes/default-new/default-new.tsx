@@ -1,6 +1,5 @@
 "use client"
 import { cn } from "../../lib/utils"
-import { Button } from "../../components/ui/button"
 import {
   ResizablePanelGroup, ResizablePanel,
   ResizableHandle
@@ -27,13 +26,11 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
   const {
     leftContentName,
     rightContentName,
-    bottomContentName,
     leftContentSize,
     setLeftContentSize,
     mainTopContentSize,
     setMainTopContentSize,
     // toggleLeftContent,
-    toggleBottomContent
   } = usePanelStore()
 
   return (

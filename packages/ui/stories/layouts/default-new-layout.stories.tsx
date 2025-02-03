@@ -93,6 +93,8 @@ export const Default: Story = {
       </div>
 
     </div>,
+    mainBottomContent: <></>
+    ,
     rightContent: <div className="prose prose-sm dark:prose-invert">
       <h3>Getting Started</h3>
       <p>Welcome to the documentation. This panel provides helpful information about using the dashboard.</p>
