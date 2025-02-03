@@ -1,14 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NodeData, EdgeData, ComboData, NodeOptions, EdgeOptions } from '@antv/g6';
+import { NodeData, EdgeData, ComboData, NodeOptions, EdgeOptions, CanvasOptions } from '@antv/g6';
 
 
 export type ThemeOptions = 'dark' | 'light' | 'system';
 
-export interface ICanvasGraphStore {
+export interface CanvasGraphState {
   theme: ThemeOptions;
   setTheme: (theme: ThemeOptions) => void;
 
+  // graph data starts
   nodes: NodeData[];
   edges: EdgeData[];
   combos: ComboData[];
@@ -17,19 +18,41 @@ export interface ICanvasGraphStore {
   addEdge: (edge: EdgeData) => void;
   addCombo: (combo: ComboData) => void;
 
+  updateNode: (node: NodeData) => void;
+  updateEdge: (edge: EdgeData) => void;
+  updateCombo: (combo: ComboData) => void;
+
+  removeNode: (node: NodeData) => void;
+  removeEdge: (edge: EdgeData) => void;
+  removeCombo: (combo: ComboData) => void;
+  // graph data ends
+
+  // extra annotations starts
+  selectedData: { nodes: NodeData[], edges: EdgeData[], combos: ComboData[] };
+  setSelectedData: (nodes: NodeData[], edges: EdgeData[], combos: ComboData[]) => void;
+
+  taggedNodes: NodeData[];
+  setTaggedNodes: (nodes: NodeData[]) => void;
+  /// extra annotations ends
+
   clear: () => void;
 
+  // styling starts 
   nodeSettings: NodeOptions[],
   setNodeSettings: (settings: NodeOptions[]) => void;
 
   edgeSettings: EdgeOptions[],
   setEgdeSettings: (settings: EdgeOptions[]) => void,
+
+  canvasSettings: CanvasOptions,
+  setCanvasSettings: (settings: CanvasOptions) => void;
+  // styling ends
 }
 
 const storeName = 'canvas-graph-store';
 
 export const useCanvasGraphStore = create(
-  persist<ICanvasGraphStore>(
+  persist<CanvasGraphState>(
     (set) => ({
       theme: 'dark',
       setTheme: (theme: ThemeOptions) => {
@@ -61,6 +84,11 @@ export const useCanvasGraphStore = create(
       edgeSettings: [],
       setEgdeSettings: (settings: EdgeOptions[]) => {
         set({ edgeSettings: settings })
+      },
+
+      canvasSettings: {},
+      setCanvasSettings: (settings: CanvasOptions) => {
+        set({ canvasSettings: settings })
       }
 
     }),
