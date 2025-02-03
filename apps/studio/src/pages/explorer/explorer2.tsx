@@ -1,7 +1,7 @@
 
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultLayout } from '@invana/ui/themes/default/default';
-import { usePanelStore } from '@invana/ui/themes/default/store';
+import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
 import { Activity, Compass, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
@@ -36,7 +36,7 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent,
-  } = usePanelStore()
+  } = useDefaultLayoutStore()
 
 
 

@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from 'zustand/middleware';
 
 
-interface PanelState {
+interface DefaultLayoutState {
   // Content states
   leftContentName: string | undefined
   rightContentName: string | undefined
@@ -27,8 +27,8 @@ interface PanelState {
 const defaultLeftContentSize = 25;
 const defaultMainTopContentSize = 97;
 
-export const usePanelStore = create(
-  persist<PanelState>(
+export const useDefaultLayoutStore = create(
+  persist<DefaultLayoutState>(
     (set) => ({
       leftContentName: undefined,
       rightContentName: undefined,
@@ -57,7 +57,7 @@ export const usePanelStore = create(
       }))
     }),
     {
-      name: 'panel-storage',
+      name: 'layout-storage',
     }
   )
 )

@@ -5,7 +5,7 @@ import {
   ResizableHandle
 } from "../../components/ui/resizable"
 import { DefaultLayoutProps } from './types';
-import { usePanelStore } from "./store"
+import { useDefaultLayoutStore } from "./store"
 // import { PanelContent } from "./panel-content"
 import { RightSidebar } from "./right-sidebar"
 import React from "react"
@@ -31,7 +31,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
     mainTopContentSize,
     setMainTopContentSize,
     // toggleLeftContent,
-  } = usePanelStore()
+  } = useDefaultLayoutStore()
 
   return (
     <TooltipProvider delayDuration={0}>
