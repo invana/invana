@@ -40,25 +40,7 @@ export const menuItems: MenuItem[] = [
     icon: Settings,
     shortcut: '⌘,',
     children: [
-      {
-        id: 'account',
-        label: 'Account Settings',
-        icon: Users,
-        children: [
-          {
-            id: 'profile',
-            label: 'Profile',
-            icon: Users,
-            shortcut: '⌘P'
-          },
-          {
-            id: 'security',
-            label: 'Security',
-            icon: Shield,
-            shortcut: '⌘L'
-          }
-        ]
-      },
+
       {
         id: 'notifications',
         label: 'Notifications',
