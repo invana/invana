@@ -60,7 +60,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
               >
                 <ResizablePanel
                   defaultSize={leftContentSize}
-                  minSize={20}
+                  minSize={15}
                   maxSize={45}
                   style={{
                     display: leftContentName ? "block" : "none",
@@ -98,11 +98,11 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                     </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
                     <ResizablePanel minSize={3} defaultSize={100 - mainTopContentSize}>
-                      <div className="flex flex-col h-full">
-                        <div className="flex-1 overflow-auto">
-                          {/* <h1>Bottom here</h1> */}
-                          <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
-                        </div>
+                      <div className="flex-1 flex-col h-full">
+                        {/* <div className="flex-1 overflow-auto"> */}
+                        {/* <h1>Bottom here</h1> */}
+                        <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
+                        {/* </div> */}
 
                       </div>
                     </ResizablePanel>

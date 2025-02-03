@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist } from 'zustand/middleware';
 
 
 interface PanelState {
@@ -26,32 +27,37 @@ interface PanelState {
 const defaultLeftContentSize = 25;
 const defaultMainTopContentSize = 97;
 
-export const usePanelStore = create<PanelState>((set) => ({
-  leftContentName: undefined,
-  rightContentName: undefined,
-  bottomContentName: undefined,
+export const usePanelStore = create(
+  persist<PanelState>(
+    (set) => ({
+      leftContentName: undefined,
+      rightContentName: undefined,
+      bottomContentName: undefined,
 
+      leftContentSize: 0,
+      setLeftContentSize: (size) => set({ leftContentSize: size }),
 
-  leftContentSize: defaultLeftContentSize,
-  setLeftContentSize: (size) => set({ leftContentSize: size }),
+      mainTopContentSize: defaultMainTopContentSize,
+      setMainTopContentSize: (size) => set({ mainTopContentSize: size }),
 
-  mainTopContentSize: defaultMainTopContentSize,
-  setMainTopContentSize: (size) => set({ mainTopContentSize: size }),
+      setLeftContentName: (name: string | undefined) => {
+        return set({ leftContentName: name, leftContentSize: defaultLeftContentSize })
+      },
+      setRightContentName: (name) => set({ rightContentName: name }),
+      setBottomContentName: (name) => set({ bottomContentName: name }),
 
-  setLeftContentName: (name: string | undefined) => {
-    // set({  })
-    return set({ leftContentName: name, leftContentSize: defaultLeftContentSize })
-  },
-  setRightContentName: (name) => set({ rightContentName: name }),
-  setBottomContentName: (name) => set({ bottomContentName: name }),
-
-  toggleLeftContent: (name) => set((state) => ({
-    leftContentName: state.leftContentName === name ? undefined : name
-  })),
-  toggleRightContent: (name) => set((state) => ({
-    rightContentName: state.rightContentName === name ? undefined : name
-  })),
-  toggleBottomContent: (name) => set((state) => ({
-    bottomContentName: state.bottomContentName === name ? undefined : name
-  }))
-}))
+      toggleLeftContent: (name) => set((state) => ({
+        leftContentName: state.leftContentName === name ? undefined : name
+      })),
+      toggleRightContent: (name) => set((state) => ({
+        rightContentName: state.rightContentName === name ? undefined : name
+      })),
+      toggleBottomContent: (name) => set((state) => ({
+        bottomContentName: state.bottomContentName === name ? undefined : name
+      }))
+    }),
+    {
+      name: 'panel-storage',
+    }
+  )
+)
