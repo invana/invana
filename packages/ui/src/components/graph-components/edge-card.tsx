@@ -18,9 +18,9 @@ export interface EdgeCardProps {
 export const EdgeCard: React.FC<EdgeCardProps> = ({ edge, extra, className = ' w-[260px]', showProperties = false }) => {
   console.log("EdgeCard edge", edge)
   return (
-    <Card className={cn(" shadow-lg ", className)}>
+    <Card className={cn(" shadow-lg  w-[260px]", className)}>
       <CardHeader className=''>
-        <CardTitle className='break-words'>{edge?.label as string}</CardTitle>
+        <CardTitle className='break-words text-xl'>{edge?.label as string}</CardTitle>
         <CardDescription className='text-xs'>
           <div><strong>ID:</strong> {edge?.id}</div>
           <div><strong>Label:</strong> {edge?.type || 'N/A'}</div>

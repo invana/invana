@@ -56,6 +56,7 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     this.container.style.position = 'absolute';
     this.container.style.top = '0px';
     this.container.style.right = '0px';
+    this.hideContainer();
     // this.container.style.pointerEvents = 'none';
     document.body.appendChild(this.container);
   }
@@ -66,18 +67,14 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
 
   showNodeData = (event: IPointerEvent) => {
     const { graph } = this.context;
-    console.log("onNodeClicked", event)
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
-    console.log("NodeEvent.CLICKED node", node)
     const nodeData: ICanvasNode = {
       id: node.id as string,
       label: node.label as string,
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
-    console.log("NodeEvent.CLICKED nodeData", nodeData)
-    this.hideOtherPropertyViewers();
     this.root.render(
       <NodeCard
         className='h-screen'
@@ -91,7 +88,6 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
-    console.log("EdgeEvent.CLICKED edge", edge)
     const edgeData: ICanvasEdge = {
       id: edge.id as string,
       label: edge.label as string,
@@ -100,7 +96,6 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
-    this.hideOtherPropertyViewers();
     this.root.render(
       <EdgeCard
         className='h-screen'
@@ -131,14 +126,6 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     this.showNodeData(event)
   }
 
-
-
-  hideOtherPropertyViewers = () => {
-    const div = document.querySelector('#EdgePropertyViewerBehavior') as HTMLElement;
-    if (div) {
-      div.style.display = 'none';
-    }
-  }
 
   hideContainer = () => {
     this.container.style.display = 'none';
