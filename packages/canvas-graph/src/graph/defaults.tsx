@@ -28,7 +28,6 @@ export const defaultOptions: GraphOptions = {
     'edge-context-menu',
     'canvas-context-menu',
     'node-property-viewer',
-    'edge-property-viewer'
   ],
   transforms: [
     MAP_NODE_SIZE

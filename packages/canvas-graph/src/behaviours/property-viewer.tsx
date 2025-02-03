@@ -1,0 +1,153 @@
+import { BaseBehavior, CanvasEvent, EdgeEvent, NodeEvent } from '@antv/g6';
+import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData, EdgeData } from '@antv/g6';
+import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
+import { createRoot, Root } from 'react-dom/client';
+// import React from 'react';
+import { EdgeCard, NodeCard } from '@invana/ui';
+
+
+export interface PropertyViewerBehaviorOptions extends BaseBehaviorOptions {
+  className?: string;
+}
+
+export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorOptions> {
+  container!: HTMLDivElement;
+  root!: Root
+
+  constructor(context: RuntimeContext, options: PropertyViewerBehaviorOptions) {
+    super(context, options);
+    this.createContainer();
+    this.root = createRoot(this.container);
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    const { graph } = this.context;
+    graph.on(NodeEvent.CLICK, this.onNodeClicked);
+    graph.on(NodeEvent.POINTER_OVER, this.onNodeHovered);
+
+
+    graph.on(EdgeEvent.CLICK, this.onEdgeClicked);
+    graph.on(EdgeEvent.POINTER_OVER, this.onEdgeHovered);
+
+
+    graph.on(CanvasEvent.CLICK, this.hideContainer);
+
+  }
+
+  unbindEvents() {
+    const { graph } = this.context;
+    graph.off(NodeEvent.CLICK, this.onNodeClicked);
+    graph.off(NodeEvent.POINTER_OVER, this.hideContainer);
+
+    graph.off(EdgeEvent.CLICK, this.onNodeClicked);
+    graph.off(EdgeEvent.POINTER_OVER, this.hideContainer);
+
+
+    graph.off(CanvasEvent.CLICK, this.hideContainer);
+
+
+  }
+
+
+  createContainer() {
+    this.container = document.createElement('div');
+    this.container.id = 'PropertyViewerBehavior';
+    this.container.style.position = 'absolute';
+    this.container.style.top = '0px';
+    this.container.style.right = '0px';
+    // this.container.style.pointerEvents = 'none';
+    document.body.appendChild(this.container);
+  }
+
+  showContainer = () => {
+    this.container.style.display = 'block';
+  }
+
+  showNodeData = (event: IPointerEvent) => {
+    const { graph } = this.context;
+    console.log("onNodeClicked", event)
+    const nodeId = ((event.target as unknown) as HTMLElement).id as string;
+    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+    console.log("NodeEvent.CLICKED node", node)
+    const nodeData: ICanvasNode = {
+      id: node.id as string,
+      label: node.label as string,
+      type: node.data?.type ?? '',
+      properties: node.data?.properties as IProperties
+    }
+    console.log("NodeEvent.CLICKED nodeData", nodeData)
+    this.hideOtherPropertyViewers();
+    this.root.render(
+      <NodeCard
+        className='h-screen'
+        node={nodeData}
+        showProperties={true}
+      />
+    )
+  }
+
+  showEdgeData = (event: IPointerEvent) => {
+    const { graph } = this.context;
+    const edgeId = ((event.target as unknown) as HTMLElement).id as string;
+    const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
+    console.log("EdgeEvent.CLICKED edge", edge)
+    const edgeData: ICanvasEdge = {
+      id: edge.id as string,
+      label: edge.label as string,
+      type: edge.data?.type ?? '',
+      source: edge.source,
+      target: edge.target,
+      properties: edge.data?.properties as IProperties
+    }
+    this.hideOtherPropertyViewers();
+    this.root.render(
+      <EdgeCard
+        className='h-screen'
+        edge={edgeData}
+        showProperties={true}
+      />
+    )
+  }
+
+  onNodeHovered = (event: IPointerEvent) => {
+    this.showNodeData(event)
+  }
+
+
+  onEdgeHovered = (event: IPointerEvent) => {
+    this.showEdgeData(event);
+  }
+
+  onEdgeClicked = (event: IPointerEvent) => {
+    console.log("EdgeEvent.CLICKED event", event)
+    this.showContainer()
+    this.showEdgeData(event)
+  }
+
+  onNodeClicked = (event: IPointerEvent) => {
+    console.log("NodeEvent.CLICKED event", event)
+    this.showContainer()
+    this.showNodeData(event)
+  }
+
+
+
+  hideOtherPropertyViewers = () => {
+    const div = document.querySelector('#EdgePropertyViewerBehavior') as HTMLElement;
+    if (div) {
+      div.style.display = 'none';
+    }
+  }
+
+  hideContainer = () => {
+    this.container.style.display = 'none';
+  }
+
+  destroy() {
+    this.root.unmount();
+    document.body.removeChild(this.container);
+    this.unbindEvents();
+  }
+
+}

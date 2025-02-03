@@ -5,7 +5,7 @@ import { defaultOptions } from './defaults';
 import { CanvasToolBar } from '../plugins';
 import { GraphManager } from '../graphManager';
 import { ICanvasData } from '@invana/data-store';
-import { NodeTooltipBehavior, EdgeTooltipBehavior, NodePropertyViewerBehavior, EdgePropertyViewerBehavior } from '../behaviours';
+import { NodeTooltipBehavior, EdgeTooltipBehavior, PropertyViewerBehavior } from '../behaviours';
 import { NodeContextMenuBehavior } from '../behaviours/context-menus/node';
 import { EdgeContextMenuBehavior } from '../behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '../behaviours/context-menus/canvas';
@@ -18,8 +18,7 @@ register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavio
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
 
-register(ExtensionCategory.BEHAVIOR, 'node-property-viewer', NodePropertyViewerBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'edge-property-viewer', EdgePropertyViewerBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-property-viewer', PropertyViewerBehavior, true);
 
 
 export interface CanvasGraphProps {
