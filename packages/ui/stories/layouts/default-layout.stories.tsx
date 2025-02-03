@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 
 
 
-const MainContent: React.FC = () => {
+const mainTopContent: React.FC = () => {
   const { setNavSize, sidebar } = usePanel()
   const isNavTreeVisible = sidebar === "query"
 
@@ -123,6 +123,6 @@ const MainContent: React.FC = () => {
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
-    children: <MainContent />
+    children: <mainTopContent />
   },
 };

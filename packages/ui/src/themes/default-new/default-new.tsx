@@ -20,7 +20,8 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
   headerProps,
   leftNavProps,
   leftContent,
-  mainContent,
+  mainTopContent,
+  mainBottomContent,
   rightContent }) => {
 
   const {
@@ -92,7 +93,7 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                     <ResizablePanel minSize={30} defaultSize={mainTopContentSize} >
                       <div className="flex h-full items-center justify-center">
                         {/* <PanelContent title="Main Content" showClose={true}> */}
-                        {mainContent}
+                        {mainTopContent}
                         {/* </PanelContent> */}
                       </div>
                     </ResizablePanel>
@@ -101,8 +102,8 @@ export const DefaultNewLayout: React.FC<DefaultNewLayoutProps> = ({
                       <div className="flex-1 flex-col h-full">
                         {/* <div className="flex-1 overflow-auto"> */}
                         {/* <h1>Bottom here</h1> */}
-                        <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
                         {/* </div> */}
+                        {mainBottomContent}
 
                       </div>
                     </ResizablePanel>

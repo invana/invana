@@ -90,7 +90,7 @@ const ExplorerPage: React.FC = () => {
       graph.render();
       graph.fitView();
     }
-  }, [mainTopContentSize, leftContentSize]);
+  }, [mainTopContentSize, leftContentSize, isReady]);
 
 
 
@@ -146,7 +146,7 @@ const ExplorerPage: React.FC = () => {
         }
       </div>
     }
-    mainContent={
+    mainTopContent={
 
       // <div className="flex h-full items-center justify-center ">
 
@@ -165,6 +165,11 @@ const ExplorerPage: React.FC = () => {
       />
 
       // </div>
+    }
+    mainBottomContent={
+      <>
+        <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
+      </>
     }
     rightContent={
       <></>

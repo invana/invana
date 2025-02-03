@@ -18,7 +18,8 @@ export interface DefaultNewLayoutProps {
 
 
   leftContent: React.ReactNode
-  mainContent: React.ReactNode
+  mainTopContent: React.ReactNode
+  mainBottomContent: React.ReactNode
   rightContent: React.ReactNode
 }
 

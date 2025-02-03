@@ -75,7 +75,7 @@ export const Default: Story = {
         </div>
       ))}
     </div>,
-    mainContent: <div className="space-y-8">
+    mainTopContent: <div className="space-y-8">
       <div className="prose dark:prose-invert">
         <h3>Welcome to the Dashboard</h3>
         <p>
