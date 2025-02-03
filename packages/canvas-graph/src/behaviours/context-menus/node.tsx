@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } fro
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
-import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
+import { FolderOpen, Settings, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 import React from 'react';
 
