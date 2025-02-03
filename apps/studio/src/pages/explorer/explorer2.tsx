@@ -87,7 +87,7 @@ const ExplorerPage: React.FC = () => {
     options.behaviors.push({
       key: 'property-viewer',
       type: 'property-viewer',
-      className: 'top-[45px] right-[0px] h-[calc(100vh-72px)]',
+      className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
     });
   }
 
