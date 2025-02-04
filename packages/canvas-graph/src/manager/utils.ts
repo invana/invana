@@ -124,6 +124,9 @@ export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle): E
       type: style.shape?.type ?? defaultEdgeStyle.shape?.type,
       halo: style.shape?.halo ?? defaultEdgeStyle.shape?.halo,
 
+      //@ts-ignore
+      labelText: (d) => d.id,
+
       // stroke
       lineWidth: style.shape?.strokeWidth ?? defaultEdgeStyle.shape?.strokeWidth,
       stroke: style.shape?.strokeColor ?? defaultEdgeStyle.shape?.strokeColor,
