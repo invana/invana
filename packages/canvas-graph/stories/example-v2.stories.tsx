@@ -27,6 +27,19 @@ export const FlightData: Story = {
     },
     onReady: (canvasManager) => {
       console.log("CanvasGraphV2.onReady canvasManager", canvasManager)
+
+      setTimeout(() => {
+        const nodes = [
+          { id: "newNode", type: "newType", properties: { name: "New Node" } },
+          { id: "newNode-2", type: "newType", properties: { name: "New Node 2" } },
+          { id: "newNode-3", type: "newType", properties: { name: "New Node 3" } },
+        ];
+
+        nodes.map(node => {
+          canvasManager.store.addNode(node);
+        })
+        canvasManager.render();
+      }, 3000);
     },
     initData: flightData,
     containerStyle: { "width": "100%", "height": "calc(100vh - 46px)" }
