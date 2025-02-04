@@ -33,6 +33,10 @@ export interface CanvasGraphState {
 
   taggedNodes: NodeData[];
   setTaggedNodes: (nodes: NodeData[]) => void;
+
+
+  animateData: { nodes: NodeData[], edges: EdgeData[] };
+  setAnimateData: (nodes: NodeData[], edges: EdgeData[]) => void;
   /// extra annotations ends
 
   clear: () => void;
