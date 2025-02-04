@@ -1,6 +1,8 @@
-import { Graph, ThemeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 import { CanvasManagerOptions, ICanvasStyleOptions } from './types';
+import { convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
+import { defaultEdgeStyle, defaultNodeStyle } from './defaults';
 
 
 export class GraphStyle {
@@ -9,8 +11,22 @@ export class GraphStyle {
   options!: CanvasManagerOptions
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
+    console.log("GraphStyle.constructor", graph, options);
     this.graph = graph;
     this.options = options;
+    this.init();
+  }
+
+  init() {
+    const theme = this.options.styles?.canvas?.theme ?? 'system';
+    const options: GraphOptions = { theme };
+
+    const defaultNodeStyle = convert_node_canvas_style_to_g6_style(this.options?.styles?.defaultNode ?? {});
+    options.node = defaultNodeStyle as NodeOptions;
+
+    const defaulEdgeStyle = convert_edge_canvas_style_to_g6_sytle(this.options?.styles?.defaultEdge ?? {});
+    options.edge = defaulEdgeStyle as EdgeOptions
+    this.graph.setOptions(options)
   }
 
   defaultNodeStyleBasedOnTheme = (theme: ThemeOptions) => {

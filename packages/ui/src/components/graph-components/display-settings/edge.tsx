@@ -4,7 +4,7 @@ import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
 import { Card, CardContent, CardFooter, CardHeader } from "../../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
-import { ICanvasEdgeStyle } from "@invana/data-store"
+import { CanvasEdgeStyle } from "@invana/data-store"
 import { cn } from "../../../lib/utils"
 import { FormField } from "../../../form-generator/form-field"
 import { Button } from "../../../components/ui"
@@ -12,8 +12,8 @@ import { Button } from "../../../components/ui"
 
 
 export interface EdgeDisplaySettingsProps {
-  onSubmit?: (data: ICanvasEdgeStyle) => void
-  defaultValues: ICanvasEdgeStyle;
+  onSubmit?: (data: CanvasEdgeStyle) => void
+  defaultValues: CanvasEdgeStyle;
   propertyKeys: string[];
   labelPosition?: "side" | "top";
   className?: string;
@@ -49,13 +49,13 @@ export const EdgeDisplaySettings: React.FC<EdgeDisplaySettingsProps> = ({
   className = 'w-[420px]',
   ...props
 }) => {
-  const form = useForm<ICanvasEdgeStyle>({
+  const form = useForm<CanvasEdgeStyle>({
     defaultValues: defaultValues
   })
 
-  // const [formData, setFormData] = useState<ICanvasEdgeStyle>()
+  // const [formData, setFormData] = useState<CanvasEdgeStyle>()
 
-  function onSubmit(data: ICanvasEdgeStyle) {
+  function onSubmit(data: CanvasEdgeStyle) {
     // setFormData(data)
     props.onSubmit?.(data)
     console.log("Form submitted:", data)

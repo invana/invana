@@ -1,4 +1,4 @@
-import { ICanvasEdgeStyle, CanvasNodeStyle } from "./display";
+import { CanvasEdgeStyle, CanvasNodeStyle } from "./display";
 
 export type IPropertiesData = string | number | boolean | object | IPropertiesData[];
 
@@ -26,7 +26,7 @@ export interface ICanvasNode extends ICanvasElement {
 export interface ICanvasEdge extends ICanvasElement {
   source: string;
   target: string;
-  display?: ICanvasEdgeStyle
+  display?: CanvasEdgeStyle
 }
 
 export interface ICanvasData {

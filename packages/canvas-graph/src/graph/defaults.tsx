@@ -3,11 +3,11 @@ import { defaultLayoutsOptions } from './layouts';
 import { DRAG_CANVAS, ZOOM_CANVAS, DRAG_ELEMENT, HOVER_ACTIVATE, CLICK_SELECT, LASSO_SELECT } from '../options/behaviors';
 import { MAP_NODE_SIZE } from '../options/transforms';
 import { HISTORY_PLUGIN, MINIMAP_PLUGIN } from '../options/plugins';
-import { getInitialTheme, storeName } from '@invana/ui/store';
+import { getInitialTheme } from '@invana/ui/store';
 
 export const DEFAULT_LAYOUT = 'grid'
 
-const theme = getInitialTheme(storeName)
+const theme = getInitialTheme()
 // const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 // const theme = prefersDark ? 'dark' : 'light';
 // const theme = themeStore.

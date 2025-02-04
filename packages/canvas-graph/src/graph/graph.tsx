@@ -81,7 +81,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
           }
           canvasManager?.store.addData(
             props.initialData ?? { 'nodes': [], 'edges': [] },
-            () => canvasManager?.g6graph.render()
+            () => canvasManager?.getGraph().render()
           );
           setGraph(graph);
           if (props.onReady) {

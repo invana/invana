@@ -6,8 +6,9 @@ export interface ICanvasNodeShapeDisplayBase {
   bgOpacity: number;
   bgPadding: number;
   borderColor: IColor;
-  BorderWidth: number;
+  borderWidth: number;
   borderRadius: number;
+  borderOpacity: number;
 
   dottedBorder: boolean;
   dottedBorderSpacing: number;
@@ -19,7 +20,8 @@ export interface ICanvasTextDisplay {
   textFontWeight: string;
   textFontFamily: string;
   textOpacity: number;
-  textPosition: 'top' | 'center' | 'bottom';
+  textPosition: 'top' | 'center' | 'bottom' | 'left' | 'right';
+  textAutoRotate: boolean;
 }
 
 export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanvasTextDisplay { }
@@ -75,15 +77,16 @@ export interface ICanvaEdgeImportantFields {
   timestampField: string;
 }
 
-export interface ICanvasEdgeStyle {
+export interface CanvasEdgeStyle {
   shape?: Partial<ICanvasEdgeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
   fields?: Partial<ICanvaEdgeImportantFields>
 }
 
+export type ICanvasTheme = 'light' | 'dark' | 'system' | string;
 
 export interface ICanvasStyle {
-  theme: 'light' | 'dark' | 'system' | string;
+  theme: ICanvasTheme;
   bgColor: IColor;
   // bgPattern?: 'lines' | 'dots' | 'crosses';
   // bgPatternColor?: IColor;

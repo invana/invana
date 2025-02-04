@@ -1,35 +1,41 @@
 
-import { CanvasNodeStyle, ICanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
+import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
 import { ICanvasStyleOptions } from "./types"
+import { getInitialTheme } from "@invana/ui"
 
 
-export const defaultNodeDisplaySettings: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
+export const defaultNodeStyle: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'circle',
     size: 20,
     halo: true,
+    bgColor: '#656565',
+    bgOpacity: 1
   },
   label: {
-    textColor: '#646464',
+    textColor: '#999999',
     textFontSize: 12,
-    textPosition: 'top'
+    textPosition: 'top',
+    textAutoRotate: true
   },
   fields: {
     labelField: 'property.name'
   }
 }
 
-export const defaultEdgeDisplaySettings: ICanvasEdgeStyle = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
+export const defaultEdgeStyle: CanvasEdgeStyle = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'cubic-vertical',
-    halo: true,
+    halo: false,
     strokeWidth: 1,
-    strokeColor: '#999999'
+    strokeColor: '#999999',
+    strokeOpacity: 0.6,
   },
   label: {
-    textColor: '#646464',
+    textColor: '#999999',
     textFontSize: 12,
-    textPosition: 'center'
+    textPosition: 'center',
+    textAutoRotate: true
   },
   fields: {
     labelField: 'property.name'
@@ -37,14 +43,14 @@ export const defaultEdgeDisplaySettings: ICanvasEdgeStyle = {  // https://g6.ant
 }
 
 export const defaultCanvasDisplaySettings: ICanvasStyle = {
-  theme: 'system',
+  theme: getInitialTheme(),
   bgColor: '#222222',
   colorNodesBy: 'type',
   colorEdgesBy: 'type'
 }
 
 export const defaultStyleOptions: ICanvasStyleOptions = {
-  defaultNode: defaultNodeDisplaySettings,
-  defaultEdge: defaultEdgeDisplaySettings,
+  defaultNode: defaultNodeStyle,
+  defaultEdge: defaultEdgeStyle,
   canvas: defaultCanvasDisplaySettings
 }
