@@ -16,7 +16,12 @@ export interface GraphinRef extends Graph {
   graph: Graph;
 }
 
-export const CanvasGraphV2: React.FC = () => {
+
+export interface CanvasGraphV2Props {
+  style?: React.CSSProperties;
+}
+
+export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
   // Sample graph data
   const data: GraphData = {
     nodes: [
@@ -58,16 +63,19 @@ export const CanvasGraphV2: React.FC = () => {
     node: { style: { size: 20, labelText: (d) => d.id, } },
     edge: { style: { stroke: '#666' } },
 
-    background: '#222222',
+    // background: '#222222',
     data: data,
-    autoResize: true,
+    // autoResize: true,
+    // autoFit: 'view', // 'view' | 'graph' | 'center'
+    // animation: false,
     layout: layout,
+
     // autoFit: { type: 'view' }, // 'view' | 'graph' | 'center'
-    behaviors: ['drag-element', 'zoom-canvas', 'click-select'],
+    behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
   }
 
   return (
-    <div>
+    <div className='h-full w-full' style={props.style ?? {}}>
       <Graphin options={options} ref={graphinRef} />
       <div style={{ marginTop: '10px' }}>
         <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>

@@ -27,19 +27,7 @@ export const FlightData: Story = {
     //   edges: flightData.edges,
     // },
     // header: true,
-    // style: { "width": "100%", "height": "calc(100vh - 40px)" }
+    style: { "width": "100%", "height": "calc(100vh - 45px)" }
   },
 };
 
-export const LesMiserables: Story = {
-  args: {
-    // options: {
-    // },
-    // initialData: {
-    //   nodes: lesMiserablesData.nodes,
-    //   edges: lesMiserablesData.edges,
-    // },
-    // header: true,
-    // style: { "width": "100%", "height": "calc(100vh - 40px)" }
-  },
-};
