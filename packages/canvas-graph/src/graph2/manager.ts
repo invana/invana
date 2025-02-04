@@ -5,7 +5,7 @@ import { Graph, GraphOptions } from '@antv/g6';
 export class GraphManager22 {
 
   constructor(graph: Graph, options: GraphOptions) {
-    console.log("GraphManager constructor called", graph, options)
+    console.log("CanvasManager constructor called", graph, options)
   }
 
   setTheme(theme: string) {

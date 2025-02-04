@@ -25,8 +25,8 @@ const ExplorerPage: React.FC = () => {
 
   // const { theme } = useTheme();
   // const [data, setData] = React.useState({ nodes: [], edges: [] });
-  // const [graphManager, setGraphManager] = React.useState<GraphManager | null>(null);
-  // const initGraphManager = React.useCallback((manager: GraphManager) => {
+  // const [canvasManager, setGraphManager] = React.useState<CanvasManager | null>(null);
+  // const initGraphManager = React.useCallback((manager: CanvasManager) => {
   //   setGraphManager(manager);
   // }, []);
 
@@ -70,15 +70,15 @@ const ExplorerPage: React.FC = () => {
 
 
   // useEffect(() => {
-  //   // Initialize graphManager here and set it to graphManagerRef.current
+  //   // Initialize canvasManager here and set it to graphManagerRef.current
   //   // Example:
-  //   // graphManagerRef.current = new GraphManager();
+  //   // graphManagerRef.current = new CanvasManager();
   //   setIsReady(true);
   // }, []);
 
 
 
-  // const graphManager = new GraphManager(null);
+  // const canvasManager = new CanvasManager(null);
 
   // const [graph, setGraph] = React.useState<Graph>(null);
 
@@ -150,7 +150,7 @@ const ExplorerPage: React.FC = () => {
             style={{ width: "100%", height: "100%" }}
             className={"bg-background"}
             //@ts-expect-error
-            graphManager={graphManagerRef.current}
+            canvasManager={graphManagerRef.current}
             initialData={flightData}
             onReady={() => {
               console.log("onReady")

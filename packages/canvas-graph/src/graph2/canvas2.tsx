@@ -3,7 +3,7 @@ import { Graphin } from '@antv/graphin';
 import { Graph, GraphOptions } from '@antv/g6';
 import { Button } from '@invana/ui';
 import { CanvasGraphV2Props } from './types';
-import { GraphManager } from '../graphManager';
+import { CanvasManager } from '../manager';
 // import { flightData as data } from '@invana/example-datasets/datasets';
 // import '@antv/graphin/dist/index.css';
 
@@ -58,16 +58,19 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
 
   return (
     <div className='h-full w-full' style={props.style ?? {}}>
-      <Graphin options={options} onReady={(graph) => {
-        console.log("Graphin onReady", graph);
-        const graphManager: GraphManager = new GraphManager(graph, options)
-        props.onReady(graphManager);
-        graphManager?.store.addData(
-          props.initData ?? { 'nodes': [], 'edges': [] },
-          () => graphManager?.g6graph.render()
-        );
-      }}
-        ref={graphinRef} />
+      <Graphin
+        options={options}
+        onReady={(graph) => {
+          console.log("Graphin onReady", graph);
+          const canvasManager: CanvasManager = new CanvasManager(graph, options)
+          props.onReady(canvasManager);
+          canvasManager?.store.addData(
+            props.initData ?? { 'nodes': [], 'edges': [] },
+            () => canvasManager?.g6graph.render()
+          );
+        }}
+        ref={graphinRef}
+      />
       <div style={{ marginTop: '10px' }}>
         <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
         <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>

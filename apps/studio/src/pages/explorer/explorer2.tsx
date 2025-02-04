@@ -7,7 +7,7 @@ import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
 import { Graph } from '@antv/g6';
 import { ProductName } from '@/constants';
-import { CanvasGraph, CanvasToolBar, defaultOptions, GraphManager } from '@invana/canvas-graph';
+import { CanvasGraph, CanvasToolBar, defaultOptions, CanvasManager } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
@@ -23,7 +23,7 @@ const ExplorerPage: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   const containerRef = useRef<{
     getGraph: () => Graph
-    getGraphManager: () => GraphManager
+    getGraphManager: () => CanvasManager
   } | null>(null);
   // const graphManagerRef = useRef(null);
 
@@ -105,8 +105,8 @@ const ExplorerPage: React.FC = () => {
   // }, [mainTopContentSize, leftContentSize, isReady]);
   useEffect(() => {
     if (containerRef.current && isReady) {
-      const graphManager = containerRef.current.getGraphManager();
-      graphManager.styling.setTheme(theme)
+      const canvasManager = containerRef.current.getGraphManager();
+      canvasManager.styling.setTheme(theme)
 
       // graph.setTheme(theme); // Refresh the graph when theme changes
       // console.log("====graph", graph)
@@ -174,7 +174,7 @@ const ExplorerPage: React.FC = () => {
         style={{ width: "100%", height: "100%" }}
         className={"bg-background"}
         //@ts-expect-error
-        // graphManager={graphManagerRef.current}
+        // canvasManager={graphManagerRef.current}
         initialData={flightData}
         onReady={() => {
           console.log("onReady")

@@ -25,8 +25,8 @@ export const FlightData: Story = {
       defaultEdge: defaultEdgeDisplaySettings,
       canvas: defaultCanvasDisplaySettings
     },
-    onReady: (graphManager) => {
-      console.log("CanvasGraphV2.onReady graphManager", graphManager)
+    onReady: (canvasManager) => {
+      console.log("CanvasGraphV2.onReady canvasManager", canvasManager)
     },
     initData: flightData,
     style: { "width": "100%", "height": "calc(100vh - 46px)" }

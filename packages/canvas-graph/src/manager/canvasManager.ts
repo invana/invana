@@ -9,7 +9,7 @@ import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from
 import { GraphStyling } from '../graph/styling';
 
 
-export class GraphManager {
+export class CanvasManager {
 
   g6graph!: Graph;
   store: GraphStore;

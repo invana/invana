@@ -3,7 +3,7 @@ import { Graphin } from '@antv/graphin';
 import { ExtensionCategory, Graph, GraphOptions, register } from '@antv/g6';
 import { defaultOptions } from './defaults';
 import { CanvasToolBar } from '../plugins';
-import { GraphManager } from '../graphManager';
+import { CanvasManager } from '../manager';
 import { ICanvasData } from '@invana/data-store';
 import { NodeTooltipBehavior, EdgeTooltipBehavior, PropertyViewerBehavior } from '../behaviours';
 import { NodeContextMenuBehavior } from '../behaviours/context-menus/node';
@@ -24,7 +24,7 @@ export interface CanvasGraphProps {
   options?: Omit<GraphOptions, 'data'>;
   style?: React.CSSProperties;
   className?: string;
-  // graphManager?: GraphManager; //comes with inbuilt graphStore or user can pass their own
+  // canvasManager?: CanvasManager; //comes with inbuilt graphStore or user can pass their own
   onReady?: () => void;
   header?: boolean;
 }
@@ -39,7 +39,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   const localRef = useRef<Graph | null>(null);
   const graphOptions: GraphOptions = { ...defaultOptions, ...options };
   //@ts-ignore
-  const graphManager = new GraphManager(localRef.current, graphOptions);
+  const canvasManager = new CanvasManager(localRef.current, graphOptions);
   const [graph, setGraph] = React.useState<Graph | null>(null);
 
 
@@ -54,7 +54,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
     },
     getGraphManager: () => {
       console.log("getGraphManager")
-      return graphManager
+      return canvasManager
     }
 
   }));
@@ -76,12 +76,12 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
       <MemoizedGraphin
         ref={localRef}
         onReady={(graph) => {
-          if (graphManager) {
-            graphManager.setGraph(graph);
+          if (canvasManager) {
+            canvasManager.setGraph(graph);
           }
-          graphManager?.store.addData(
+          canvasManager?.store.addData(
             props.initialData ?? { 'nodes': [], 'edges': [] },
-            () => graphManager?.g6graph.render()
+            () => canvasManager?.g6graph.render()
           );
           setGraph(graph);
           if (props.onReady) {
