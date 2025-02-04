@@ -66,7 +66,7 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
           props.onReady(canvasManager);
           canvasManager?.store.addData(
             props.initData ?? { 'nodes': [], 'edges': [] },
-            () => canvasManager?.g6graph.render()
+            () => canvasManager?.render()
           );
         }}
         ref={graphinRef}
