@@ -6,7 +6,7 @@ import {
 } from '@antv/g6';
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
-import { GraphStyle } from '../graph/styling';
+import { GraphStyle } from './styling';
 
 
 export class CanvasManager {
