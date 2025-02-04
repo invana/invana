@@ -1,1 +1,1 @@
-export * from './canvasManager'
+export * from './manager'

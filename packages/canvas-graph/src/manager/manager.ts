@@ -13,7 +13,7 @@ export class CanvasManager {
 
   private graph!: Graph;
   store: GraphStore;
-  styling!: GraphStyle
+  styling: GraphStyle
 
   constructor(graph: Graph, options: GraphOptions) {
     this.graph = graph;
