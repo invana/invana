@@ -2,7 +2,7 @@
 import { CanvasNodeStyle, ICanvasEdgeStyle, ICanvasDisplay } from "@invana/data-store"
 
 
-export const defaulNodeDisplaySettings: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
+export const defaultNodeDisplaySettings: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'circle',
     size: 20,
