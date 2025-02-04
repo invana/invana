@@ -2,7 +2,7 @@ import { Graph, GraphOptions, ThemeOptions } from '@antv/g6'
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 
 
-export class GraphStyling {
+export class GraphStyle {
 
   graph!: Graph
   options!: GraphOptions

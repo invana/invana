@@ -1,4 +1,4 @@
-import { ICanvasData, ICanvasStyle } from '@invana/data-store';
+import { ICanvasData, ICanvasStyleOptions } from '@invana/data-store';
 import React from 'react';
 import { CanvasManager } from '../manager';
 
@@ -10,8 +10,8 @@ import { CanvasManager } from '../manager';
 
 export interface CanvasGraphV2Props {
   initData?: ICanvasData
-  display?: ICanvasStyle
-  style?: React.CSSProperties;
+  styles?: ICanvasStyleOptions
+  containerStyle?: React.CSSProperties;
   onReady: (canvasManager: CanvasManager) => void;
 
   // interactions: CanvasInteractions

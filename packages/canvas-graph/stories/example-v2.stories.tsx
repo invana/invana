@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 export const FlightData: Story = {
   args: {
-    display: {
+    styles: {
       defaultNode: defaultNodeDisplaySettings,
       defaultEdge: defaultEdgeDisplaySettings,
       canvas: defaultCanvasDisplaySettings
@@ -29,7 +29,7 @@ export const FlightData: Story = {
       console.log("CanvasGraphV2.onReady canvasManager", canvasManager)
     },
     initData: flightData,
-    style: { "width": "100%", "height": "calc(100vh - 46px)" }
+    containerStyle: { "width": "100%", "height": "calc(100vh - 46px)" }
   },
 };
 

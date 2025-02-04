@@ -1,5 +1,5 @@
 
-import { CanvasNodeStyle, ICanvasEdgeStyle, ICanvasDisplay } from "@invana/data-store"
+import { CanvasNodeStyle, ICanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
 
 
 export const defaultNodeDisplaySettings: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
@@ -35,7 +35,7 @@ export const defaultEdgeDisplaySettings: ICanvasEdgeStyle = {  // https://g6.ant
   }
 }
 
-export const defaultCanvasDisplaySettings: ICanvasDisplay = {
+export const defaultCanvasDisplaySettings: ICanvasStyle = {
   theme: 'dark',
   bgColor: '#222222',
   colorNodesBy: 'type',

@@ -82,7 +82,7 @@ export interface ICanvasEdgeStyle {
 }
 
 
-export interface ICanvasDisplay {
+export interface ICanvasStyle {
   theme: 'light' | 'dark' | 'system' | string;
   bgColor: IColor;
   // bgPattern?: 'lines' | 'dots' | 'crosses';
@@ -92,14 +92,14 @@ export interface ICanvasDisplay {
 }
 
 
-export interface ICanvasStyle {
+export interface ICanvasStyleOptions {
   nodes?: {
     [key: string]: Partial<CanvasNodeStyle>
   },
   edges?: {
     [key: string]: Partial<ICanvasEdgeStyle>
   },
-  canvas?: Partial<ICanvasDisplay>;
+  canvas?: Partial<ICanvasStyle>;
   defaultNode?: Partial<CanvasNodeStyle>;
   defaultEdge?: Partial<ICanvasEdgeStyle>;
 }

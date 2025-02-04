@@ -6,18 +6,18 @@ import {
 } from '@antv/g6';
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
-import { GraphStyling } from '../graph/styling';
+import { GraphStyle } from '../graph/styling';
 
 
 export class CanvasManager {
 
   private graph!: Graph;
   store: GraphStore;
-  styling!: GraphStyling
+  styling!: GraphStyle
 
   constructor(graph: Graph, options: GraphOptions) {
     this.graph = graph;
-    this.styling = new GraphStyling(this.graph, options)
+    this.styling = new GraphStyle(this.graph, options)
     this.store = new GraphStore();
     this.initDataListeners();
   }

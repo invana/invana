@@ -57,7 +57,7 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
 
 
   return (
-    <div className='h-full w-full' style={props.style ?? {}}>
+    <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <Graphin
         options={options}
         onReady={(graph) => {
