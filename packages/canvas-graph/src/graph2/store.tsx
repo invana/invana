@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ICanvasNode, ICanvasEdge, ICanvasEdgeDisplay, ICanvasNodeDisplay } from '@invana/data-store';
+import { ICanvasNode, ICanvasEdge, ICanvasEdgeStyle, CanvasNodeStyle } from '@invana/data-store';
 
 interface CanvasSettings {
   width: number;

@@ -2,7 +2,7 @@ import { Graph, GraphOptions } from '@antv/g6';
 
 
 
-export class GraphManager {
+export class GraphManager22 {
 
   constructor(graph: Graph, options: GraphOptions) {
     console.log("GraphManager constructor called", graph, options)

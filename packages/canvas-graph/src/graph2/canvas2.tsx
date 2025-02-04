@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
-import { GraphData } from '@antv/g6';
-import { Graph } from '@antv/g6';
+import { Graph, GraphOptions } from '@antv/g6';
 import { Button } from '@invana/ui';
+import { CanvasGraphV2Props } from './types';
+import { GraphManager } from '../graphManager';
 // import { flightData as data } from '@invana/example-datasets/datasets';
 // import '@antv/graphin/dist/index.css';
 
@@ -16,29 +17,8 @@ export interface GraphinRef extends Graph {
   graph: Graph;
 }
 
-
-export interface CanvasGraphV2Props {
-  style?: React.CSSProperties;
-}
-
 export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
   // Sample graph data
-  const data: GraphData = {
-    nodes: [
-      { id: 'node-1', label: 'Node 1' },
-      { id: 'node-2', label: 'Node 2' },
-      { id: 'node-3', label: 'Node 3' },
-      { id: 'node-4', label: 'Node 4' },
-      { id: 'node-5', label: 'Node 5' },
-    ],
-    edges: [
-      { source: 'node-1', target: 'node-2' },
-      { source: 'node-2', target: 'node-3' },
-      { source: 'node-3', target: 'node-4' },
-      { source: 'node-4', target: 'node-5' },
-      { source: 'node-5', target: 'node-1' },
-    ],
-  };
 
   // Layout state
   const [layout, setLayout] = useState<GraphinLayout>({ type: 'circular' });
@@ -56,15 +36,15 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     }
   };
 
-  const options = {
+  const options: GraphOptions = {
     // container: containerRef.current,
     // width: "100%",
     // height: "100%",
-    node: { style: { size: 20, labelText: (d) => d.id, } },
-    edge: { style: { stroke: '#666' } },
+    // node: { style: { size: 20, labelText: (d) => d.id, } },
+    // edge: { style: { stroke: '#666' } },
 
     // background: '#222222',
-    data: data,
+    // data: props.data,
     // autoResize: true,
     // autoFit: 'view', // 'view' | 'graph' | 'center'
     // animation: false,
@@ -74,9 +54,20 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
   }
 
+
+
   return (
     <div className='h-full w-full' style={props.style ?? {}}>
-      <Graphin options={options} ref={graphinRef} />
+      <Graphin options={options} onReady={(graph) => {
+        console.log("Graphin onReady", graph);
+        const graphManager: GraphManager = new GraphManager(graph, options)
+        props.onReady(graphManager);
+        graphManager?.store.addData(
+          props.initData ?? { 'nodes': [], 'edges': [] },
+          () => graphManager?.g6graph.render()
+        );
+      }}
+        ref={graphinRef} />
       <div style={{ marginTop: '10px' }}>
         <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
         <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>

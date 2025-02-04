@@ -1,5 +1,5 @@
 import { GraphBase } from './base';
-import { ICanvasData, ICanvasEdge, ICanvasEdgeDisplay, ICanvasItemID, ICanvasNode, ICanvasNodeDisplay, IProperties } from '../types';
+import { ICanvasData, ICanvasEdge, ICanvasEdgeStyle, ICanvasItemID, ICanvasNode, CanvasNodeStyle, IProperties } from '../types';
 
 
 export class GraphDataCRUD extends GraphBase {
@@ -59,7 +59,7 @@ export class GraphDataCRUD extends GraphBase {
     this._updateNode(id, { x, y })
   }
 
-  updateNodeDisplay(id: ICanvasItemID, display: ICanvasNodeDisplay): void {
+  updateNodeDisplay(id: ICanvasItemID, display: CanvasNodeStyle): void {
     if (!this.data.hasNode(id)) {
       throw new Error(`Node with id ${id} does not exist.`);
     }
@@ -102,7 +102,7 @@ export class GraphDataCRUD extends GraphBase {
     this._updateEdge(id, { properties })
   }
 
-  updateEdgeDisplay(id: ICanvasItemID, display: ICanvasEdgeDisplay): void {
+  updateEdgeDisplay(id: ICanvasItemID, display: ICanvasEdgeStyle): void {
     if (!this.data.hasEdge(id)) {
       throw new Error(`Edge with id ${id} does not exist.`);
     }

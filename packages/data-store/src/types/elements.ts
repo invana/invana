@@ -1,4 +1,4 @@
-import { ICanvasEdgeDisplay, ICanvasNodeDisplay } from "./display";
+import { ICanvasEdgeStyle, CanvasNodeStyle } from "./display";
 
 export type IPropertiesData = string | number | boolean | object | IPropertiesData[];
 
@@ -10,7 +10,7 @@ export interface IProperties {
 export type ICanvasItemID = string;
 
 export interface ICanvasElement {
-  id: ICanvasItemID;
+  id: ICanvasItemID | string;
   type: string; // ex: Person, Entities
   label?: string; // this will be the display label; not the node label
   properties: IProperties;
@@ -20,13 +20,13 @@ export interface ICanvasElement {
 export interface ICanvasNode extends ICanvasElement {
   x?: number;
   y?: number;
-  display?: ICanvasNodeDisplay;
+  display?: CanvasNodeStyle;
 }
 
 export interface ICanvasEdge extends ICanvasElement {
   source: string;
   target: string;
-  display?: ICanvasEdgeDisplay
+  display?: ICanvasEdgeStyle
 }
 
 export interface ICanvasData {

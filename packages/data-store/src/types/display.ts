@@ -19,6 +19,7 @@ export interface ICanvasTextDisplay {
   textFontWeight: string;
   textFontFamily: string;
   textOpacity: number;
+  textPosition: 'top' | 'center' | 'bottom';
 }
 
 export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanvasTextDisplay { }
@@ -26,6 +27,8 @@ export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanva
 export interface ICanvasNodeShapeDisplay extends ICanvasNodeShapeDisplayBase {
   type: string;
   size: number;
+
+  halo: boolean;
   animated: boolean;
 
   iconFontFamily: string;
@@ -37,6 +40,9 @@ export interface ICanvasNodeShapeDisplay extends ICanvasNodeShapeDisplayBase {
 }
 
 export interface ICanvasEdgeShapeDisplay {
+  type: string;
+  halo: boolean;
+
   strokeColor: IColor;
   strokeWidth: number;
   strokeOpacity: number;
@@ -57,7 +63,7 @@ export interface ICanvasNodeImportantFields {
   imageField: string;
   timestampField: string;
 }
-export interface ICanvasNodeDisplay {
+export interface CanvasNodeStyle {
   shape?: Partial<ICanvasNodeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
   fields?: Partial<ICanvasNodeImportantFields>;
@@ -69,31 +75,32 @@ export interface ICanvaEdgeImportantFields {
   timestampField: string;
 }
 
-export interface ICanvasEdgeDisplay {
+export interface ICanvasEdgeStyle {
   shape?: Partial<ICanvasEdgeShapeDisplay>;
   label?: Partial<ICanvasLabelDisplay>;
-  fields?: ICanvaEdgeImportantFields
+  fields?: Partial<ICanvaEdgeImportantFields>
 }
 
-export interface ICanvasBg {
-  bgColor?: IColor;
-  pattern?: 'lines' | 'dots' | 'crosses';
-  patternColor?: IColor;
-}
 
 export interface ICanvasDisplay {
-  bg: ICanvasBg;
-  theme: 'light' | 'dark' | 'system';
-  colorNodesBy: 'type' | 'defaultColor'
-  colorEdgeBy: 'type' | 'SourceNode' | 'TargetNode' | 'defaultColor'
-
+  theme: 'light' | 'dark' | 'system' | string;
+  bgColor: IColor;
+  // bgPattern?: 'lines' | 'dots' | 'crosses';
+  // bgPatternColor?: IColor;
+  colorNodesBy: 'type' | 'defaultColor';
+  colorEdgesBy: 'type' | 'sourceNode' | 'targetNode' | 'defaultColor';
 }
 
-export interface ICanvasDisplaySettings {
-  nodes: ICanvasNodeDisplay[];
-  edges: ICanvasEdgeDisplay[];
-  canvas: ICanvasDisplay;
-  defaultNode: ICanvasNodeDisplay;
-  defaultEdge: ICanvasEdgeDisplay;
+
+export interface ICanvasStyle {
+  nodes?: {
+    [key: string]: Partial<CanvasNodeStyle>
+  },
+  edges?: {
+    [key: string]: Partial<ICanvasEdgeStyle>
+  },
+  canvas?: Partial<ICanvasDisplay>;
+  defaultNode?: Partial<CanvasNodeStyle>;
+  defaultEdge?: Partial<ICanvasEdgeStyle>;
 }
 

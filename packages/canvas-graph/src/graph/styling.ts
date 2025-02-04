@@ -5,9 +5,9 @@ import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 export class GraphStyling {
 
   graph!: Graph
-  options!: Omit<GraphOptions, 'data'>
+  options!: GraphOptions
 
-  constructor(graph: Graph, options: Omit<GraphOptions, 'data'>) {
+  constructor(graph: Graph, options: GraphOptions) {
     this.graph = graph;
     this.options = options;
   }

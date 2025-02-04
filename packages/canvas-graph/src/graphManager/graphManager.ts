@@ -15,7 +15,7 @@ export class GraphManager {
   store: GraphStore;
   styling!: GraphStyling
 
-  constructor(g6graph: Graph, options: Omit<GraphOptions, 'data'>) {
+  constructor(g6graph: Graph, options: GraphOptions) {
     this.g6graph = g6graph;
     this.styling = new GraphStyling(this.g6graph, options)
     this.store = new GraphStore();
