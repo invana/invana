@@ -4,6 +4,7 @@ import { Graph, GraphOptions } from '@antv/g6';
 import { Button } from '@invana/ui';
 import { CanvasGraphV2Props } from './types';
 import { CanvasManager } from '../manager';
+import { CanvasManagerOptions } from '../manager/types';
 // import { flightData as data } from '@invana/example-datasets/datasets';
 // import '@antv/graphin/dist/index.css';
 
@@ -36,7 +37,7 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     }
   };
 
-  const options: GraphOptions = {
+  const graphOptions: GraphOptions = {
     // container: containerRef.current,
     // width: "100%",
     // height: "100%",
@@ -54,20 +55,21 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
   }
 
-
+  const options: CanvasManagerOptions = props.options ?? {}
+  const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
   return (
     <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <Graphin
-        options={options}
+        options={graphOptions}
+        // options={options}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
-          const canvasManager: CanvasManager = new CanvasManager(graph, props.options ?? {});
+          const canvasManager: CanvasManager = new CanvasManager(graph, options);
+
+          canvasManager.store.addData(initData, () => canvasManager.render());
           props.onReady(canvasManager);
-          canvasManager?.store.addData(
-            props.initData ?? { 'nodes': [], 'edges': [] },
-            () => canvasManager?.render()
-          );
+
         }}
         ref={graphinRef}
       />

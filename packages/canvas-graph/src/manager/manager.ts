@@ -18,7 +18,7 @@ export class CanvasManager {
   constructor(graph: Graph, options: CanvasManagerOptions) {
     console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
-    this.styling = new GraphStyle(this.graph, options.styles)
+    this.styling = new GraphStyle(this.graph, options)
     this.store = new GraphStore();
     this.initDataListeners();
   }

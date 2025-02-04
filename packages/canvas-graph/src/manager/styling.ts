@@ -1,14 +1,14 @@
 import { Graph, ThemeOptions } from '@antv/g6'
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
-import { ICanvasStyleOptions } from './types';
+import { CanvasManagerOptions, ICanvasStyleOptions } from './types';
 
 
 export class GraphStyle {
 
   graph!: Graph
-  options!: ICanvasStyleOptions
+  options!: CanvasManagerOptions
 
-  constructor(graph: Graph, options: ICanvasStyleOptions) {
+  constructor(graph: Graph, options: CanvasManagerOptions) {
     this.graph = graph;
     this.options = options;
   }
