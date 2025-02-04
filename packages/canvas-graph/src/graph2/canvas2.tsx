@@ -62,7 +62,7 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
         options={options}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
-          const canvasManager: CanvasManager = new CanvasManager(graph, options)
+          const canvasManager: CanvasManager = new CanvasManager(graph, props.options ?? {});
           props.onReady(canvasManager);
           canvasManager?.store.addData(
             props.initData ?? { 'nodes': [], 'edges': [] },

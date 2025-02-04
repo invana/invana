@@ -2,11 +2,11 @@
 
 import {
   Graph,
-  GraphOptions
 } from '@antv/g6';
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
 import { GraphStyle } from './styling';
+import { CanvasManagerOptions } from './types';
 
 
 export class CanvasManager {
@@ -15,9 +15,10 @@ export class CanvasManager {
   store: GraphStore;
   styling: GraphStyle
 
-  constructor(graph: Graph, options: GraphOptions) {
+  constructor(graph: Graph, options: CanvasManagerOptions) {
+    console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
-    this.styling = new GraphStyle(this.graph, options)
+    this.styling = new GraphStyle(this.graph, options.styles)
     this.store = new GraphStore();
     this.initDataListeners();
   }
