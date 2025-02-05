@@ -1,8 +1,9 @@
 import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
 import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
 import { CanvasManagerOptions, ICanvasStyleOptions } from './types';
-import { convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
+import { convert_canvas_style_to_g6_style, convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
 import { defaultEdgeStyle, defaultNodeStyle } from './defaults';
+import { ICanvasStyle } from '@invana/data-store';
 
 
 export class GraphStyle {
@@ -11,21 +12,30 @@ export class GraphStyle {
   options!: CanvasManagerOptions
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
-    console.log("GraphStyle.constructor", graph, options);
+    console.log("GraphStyle.constructor", graph, options.styles);
     this.graph = graph;
     this.options = options;
     this.init();
   }
 
   init() {
-    const theme = this.options.styles?.canvas?.theme ?? 'system';
-    const options: GraphOptions = { theme };
-
-    const defaultNodeStyle = convert_node_canvas_style_to_g6_style(this.options?.styles?.defaultNode ?? {});
+    // canvas styling
+    const canvasStyle = convert_canvas_style_to_g6_style(this.options?.styles?.canvas as ICanvasStyle ?? {});
+    const options: GraphOptions = { ...canvasStyle };
+    // node styling
+    const defaultNodeStyle = convert_node_canvas_style_to_g6_style(
+      this.options?.styles?.defaultNode ?? {},
+      canvasStyle.theme as string
+    );
     options.node = defaultNodeStyle as NodeOptions;
-
-    const defaulEdgeStyle = convert_edge_canvas_style_to_g6_sytle(this.options?.styles?.defaultEdge ?? {});
+    // edge styling
+    const defaulEdgeStyle = convert_edge_canvas_style_to_g6_sytle(
+      this.options?.styles?.defaultEdge ?? {},
+      canvasStyle.theme as string
+    );
     options.edge = defaulEdgeStyle as EdgeOptions
+    // update graph options
+    console.log("finalOptions", options)
     this.graph.setOptions(options)
   }
 
@@ -37,10 +47,8 @@ export class GraphStyle {
     if (!style.state.dim) {
       style.state.dim = {};
     }
-
     const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
     const dimFill = theme === 'dark' ? '#242424' : '#aaaaaa';
-
     style.state.dim = {
       ...style.state.dim,
       fill: dimFill,

@@ -86,7 +86,7 @@ export interface CanvasEdgeStyle {
 export type ICanvasTheme = 'light' | 'dark' | 'system' | string;
 
 export interface ICanvasStyle {
-  theme: ICanvasTheme;
+  theme?: ICanvasTheme;
   bgColor: IColor;
   // bgPattern?: 'lines' | 'dots' | 'crosses';
   // bgPatternColor?: IColor;

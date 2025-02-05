@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 // import { flightData, lesMiserablesData } from '@invana/example-datasets'
 import { CanvasGraphV2 } from '@invana/canvas-graph/graph2/canvas2';
-import { flightData } from '@invana/example-datasets/datasets';
-import { defaultNodeStyle, defaultCanvasDisplaySettings, defaultEdgeStyle } from '@invana/canvas-graph/manager/defaults';
+// import { flightData as data } from '@invana/example-datasets/datasets';
+import { lesMiserablesData as data } from "@invana/example-datasets";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta = {
@@ -22,9 +22,19 @@ export const FlightData: Story = {
   args: {
     options: {
       styles: {
-        defaultNode: defaultNodeStyle,
-        defaultEdge: defaultEdgeStyle,
-        canvas: defaultCanvasDisplaySettings
+        defaultNode: {
+          shape: {
+            bgColor: "green",
+          }
+        },
+        defaultEdge: {
+          shape: {
+            strokeColor: "red",
+          }
+        },
+        canvas: {
+
+        }
       }
     },
     onReady: (canvasManager) => {
@@ -43,7 +53,7 @@ export const FlightData: Story = {
         canvasManager.render();
       }, 3000);
     },
-    initData: flightData,
+    initData: data,
     containerStyle: { "width": "100%", "height": "calc(100vh - 46px)" }
   },
 };

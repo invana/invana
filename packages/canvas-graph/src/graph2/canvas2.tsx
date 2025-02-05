@@ -5,6 +5,10 @@ import { Button } from '@invana/ui';
 import { CanvasGraphV2Props } from './types';
 import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
+import { defaultStyleOptions } from '../manager/defaults';
+// import { deepMerge } from '@invana/data-store';
+import { mergeDeep } from '@invana/data-store';
+
 // import { flightData as data } from '@invana/example-datasets/datasets';
 // import '@antv/graphin/dist/index.css';
 
@@ -55,7 +59,8 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
   }
 
-  const options: CanvasManagerOptions = props.options ?? {}
+  const options: CanvasManagerOptions = mergeDeep(defaultStyleOptions, props.options ?? {});
+  console.log("=======options CanvasManagerOptions", options)
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
   return (
@@ -66,10 +71,8 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
-
           canvasManager.store.addData(initData, () => canvasManager.render());
           props.onReady(canvasManager);
-
         }}
         ref={graphinRef}
       />

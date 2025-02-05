@@ -19,7 +19,7 @@ export const defaultNodeStyle: CanvasNodeStyle = { // https://g6.antv.antgroup.c
     textAutoRotate: true
   },
   fields: {
-    labelField: 'property.name'
+    labelField: 'id'
   }
 }
 
@@ -38,11 +38,11 @@ export const defaultEdgeStyle: CanvasEdgeStyle = {  // https://g6.antv.antgroup.
     textAutoRotate: true
   },
   fields: {
-    labelField: 'property.name'
+    labelField: 'id'
   }
 }
 
-export const defaultCanvasDisplaySettings: ICanvasStyle = {
+export const defaultCanvasStyle: ICanvasStyle = {
   theme: getInitialTheme(),
   bgColor: '#222222',
   colorNodesBy: 'type',
@@ -52,5 +52,5 @@ export const defaultCanvasDisplaySettings: ICanvasStyle = {
 export const defaultStyleOptions: ICanvasStyleOptions = {
   defaultNode: defaultNodeStyle,
   defaultEdge: defaultEdgeStyle,
-  canvas: defaultCanvasDisplaySettings
+  canvas: defaultCanvasStyle
 }

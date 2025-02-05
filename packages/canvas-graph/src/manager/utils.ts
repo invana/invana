@@ -1,8 +1,9 @@
-import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode } from "@invana/data-store";
-import { EdgeData, NodeData } from "@antv/g6";
+import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle } from "@invana/data-store";
+import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
 import { NodeStyle } from "@antv/g6/lib/spec/element/node";
-import { defaultEdgeStyle, defaultNodeStyle } from "./defaults";
+import { defaultCanvasStyle, defaultEdgeStyle, defaultNodeStyle } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
+import { ICanvasStyleOptions } from "./types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
@@ -78,7 +79,11 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
 }
 
-export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle): NodeStyle => {
+export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, theme: string): NodeStyle => {
+
+  const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
+  const dimFill = theme === 'dark' ? '#242424' : '#aaaaaa';
+
   const g6Style: NodeStyle = {
     type: style.shape?.type ?? defaultNodeStyle?.shape?.type,
     style: {
@@ -104,21 +109,27 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle): N
       highlight: {
         // fill: '#D580FF',
         halo: true,
-        // lineWidth: 0,
+        lineWidth: 0,
       },
       dim: {
-        fill: '#343434',
-        labelFill: '#343434',
-        // opacity: 0.3
+        fill: dimFill,
+        labelFill: dimLabelFill
       },
-    }
+    },
+    palette: {
+      type: 'group',
+      field: 'type',
+    },
   }
   console.log("node.g6Style", g6Style);
 
   return g6Style;
 }
 
-export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle): EdgeStyle => {
+export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, theme: string): EdgeStyle => {
+  const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
+  const dimStroke = theme === 'dark' ? '#242424' : '#aaaaaa';
+
   const g6Style: EdgeStyle = {
     style: {
       type: style.shape?.type ?? defaultEdgeStyle.shape?.type,
@@ -145,12 +156,29 @@ export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle): E
         lineWidth: 4,
       },
       dim: {
-        stroke: '#343434',
+        stroke: dimStroke,
+        labelFill: dimLabelFill,
         // opacity: 0.3
-        labelFill: '#343434',
       }
+    },
+    palette: {
+      type: 'group',
+      field: 'type',
     },
   }
   console.log("edge.g6Style", g6Style);
   return g6Style
+}
+
+export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<GraphOptions> => {
+
+  return {
+    theme: style.theme ?? defaultCanvasStyle.theme,
+    background: style.bgColor as string ?? defaultCanvasStyle.bgColor as string,
+  }
+  // if (style.hasOwnProperty('shape')) {
+  //   return convert_node_canvas_style_to_g6_style(style as CanvasNodeStyle);
+  // } else {
+  //   return convert_edge_canvas_style_to_g6_sytle(style as CanvasEdgeStyle);
+  // }
 }

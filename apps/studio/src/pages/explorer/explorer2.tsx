@@ -106,7 +106,7 @@ const ExplorerPage: React.FC = () => {
   useEffect(() => {
     if (containerRef.current && isReady) {
       const canvasManager = containerRef.current.getGraphManager();
-      canvasManager.styling.setTheme(theme)
+      // canvasManager.styling.setTheme(theme)
 
       // graph.setTheme(theme); // Refresh the graph when theme changes
       // console.log("====graph", graph)
