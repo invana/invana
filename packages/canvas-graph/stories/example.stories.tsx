@@ -1,18 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
 // import { flightData, lesMiserablesData } from '@invana/example-datasets'
-import { CanvasGraphV2 } from '@invana/canvas-graph/graph2/canvas2';
 // import { flightData as data } from '@invana/example-datasets/datasets';
 import { lesMiserablesData as data } from "@invana/example-datasets";
+import { CanvasGraph } from '@invana/canvas-graph/canvas';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta = {
-  title: 'CanvasGraphV2',
-  component: CanvasGraphV2,
+  title: 'CanvasGraph',
+  component: CanvasGraph,
   parameters: {
     layout: 'fullscreen',
   },
   // tags: ['autodocs'],
-} satisfies Meta<typeof CanvasGraphV2>;
+} satisfies Meta<typeof CanvasGraph>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -38,7 +38,7 @@ export const FlightData: Story = {
       }
     },
     onReady: (canvasManager) => {
-      console.log("CanvasGraphV2.onReady canvasManager", canvasManager)
+      console.log("CanvasGraph.onReady canvasManager", canvasManager)
 
       setTimeout(() => {
         const nodes = [

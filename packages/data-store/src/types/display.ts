@@ -88,8 +88,6 @@ export type ICanvasTheme = 'light' | 'dark' | 'system' | string;
 export interface ICanvasStyle {
   theme?: ICanvasTheme;
   bgColor: IColor;
-  // bgPattern?: 'lines' | 'dots' | 'crosses';
-  // bgPatternColor?: IColor;
   colorNodesBy: 'type' | 'defaultColor';
   colorEdgesBy: 'type' | 'sourceNode' | 'targetNode' | 'defaultColor';
 }

@@ -5,7 +5,7 @@ import { Button } from '@invana/ui';
 import { CanvasGraphV2Props } from './types';
 import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
-import { defaultStyleOptions } from '../manager/defaults';
+import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 // import { deepMerge } from '@invana/data-store';
 import { mergeDeep } from '@invana/data-store';
 
@@ -22,7 +22,7 @@ export interface GraphinRef extends Graph {
   graph: Graph;
 }
 
-export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
+export const CanvasGraph: React.FC<CanvasGraphV2Props> = (props) => {
   // Sample graph data
 
   // Layout state
@@ -59,7 +59,7 @@ export const CanvasGraphV2: React.FC<CanvasGraphV2Props> = (props) => {
     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
   }
 
-  const options: CanvasManagerOptions = mergeDeep(defaultStyleOptions, props.options ?? {});
+  const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
   console.log("=======options CanvasManagerOptions", options)
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 

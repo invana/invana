@@ -1,9 +1,7 @@
 import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
-import { DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from '../options/elements';
-import { CanvasManagerOptions, ICanvasStyleOptions } from './types';
+import { CanvasManagerOptions } from './types';
 import { convert_canvas_style_to_g6_style, convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
-import { defaultEdgeStyle, defaultNodeStyle } from './defaults';
-import { CanvasNodeStyle, ICanvasStyle, mergeDeep } from '@invana/data-store';
+import { ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
 
@@ -56,8 +54,8 @@ export class GraphStyle {
 
     // default node styling
     if (newOptions.styles?.defaultNode) {
-      const defaultNodeStyle = this.getUpdatedDefaultNodeStyle(options, options?.styles?.canvas?.theme as string);
-      graphOptions.node = defaultNodeStyle as NodeOptions
+      const DEFAULT_NODE_STYLE = this.getUpdatedDefaultNodeStyle(options, options?.styles?.canvas?.theme as string);
+      graphOptions.node = DEFAULT_NODE_STYLE as NodeOptions
     }
 
 
@@ -74,45 +72,45 @@ export class GraphStyle {
     this.graph.setOptions(graphOptions)
   }
 
-  defaultNodeStyleBasedOnTheme = (theme: ThemeOptions) => {
-    const style = { ...DEFAULT_NODE_STYLE };
-    if (!style.state) {
-      style.state = {};
-    }
-    if (!style.state.dim) {
-      style.state.dim = {};
-    }
-    const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
-    const dimFill = theme === 'dark' ? '#242424' : '#aaaaaa';
-    style.state.dim = {
-      ...style.state.dim,
-      fill: dimFill,
-      labelFill: dimLabelFill
-    };
+  // defaultNodeStyleBasedOnTheme = (theme: ThemeOptions) => {
+  //   const style = { ...DEFAULT_NODE_STYLE };
+  //   if (!style.state) {
+  //     style.state = {};
+  //   }
+  //   if (!style.state.dim) {
+  //     style.state.dim = {};
+  //   }
+  //   const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
+  //   const dimFill = theme === 'dark' ? '#242424' : '#aaaaaa';
+  //   style.state.dim = {
+  //     ...style.state.dim,
+  //     fill: dimFill,
+  //     labelFill: dimLabelFill
+  //   };
 
-    return style
-  }
+  //   return style
+  // }
 
-  defaultEdgeStyleBasedOnTheme = (theme: ThemeOptions) => {
-    const style = { ...DEFAULT_EDGE_STYLE };
-    if (!style.state) {
-      style.state = {};
-    }
-    if (!style.state.dim) {
-      style.state.dim = {};
-    }
+  // defaultEdgeStyleBasedOnTheme = (theme: ThemeOptions) => {
+  //   const style = { ...DEFAULT_EDGE_STYLE };
+  //   if (!style.state) {
+  //     style.state = {};
+  //   }
+  //   if (!style.state.dim) {
+  //     style.state.dim = {};
+  //   }
 
-    const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
-    const dimStroke = theme === 'dark' ? '#242424' : '#aaaaaa';
+  //   const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
+  //   const dimStroke = theme === 'dark' ? '#242424' : '#aaaaaa';
 
-    style.state.dim = {
-      ...style.state.dim,
-      stroke: dimStroke,
-      labelFill: dimLabelFill
-    };
+  //   style.state.dim = {
+  //     ...style.state.dim,
+  //     stroke: dimStroke,
+  //     labelFill: dimLabelFill
+  //   };
 
-    return style
-  }
+  //   return style
+  // }
 
   setTheme(theme: ThemeOptions) {
     // const nodeStyle = this.defaultNodeStyleBasedOnTheme(theme);

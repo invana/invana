@@ -4,7 +4,7 @@ import { ICanvasStyleOptions } from "./types"
 import { getInitialTheme } from "@invana/ui"
 
 
-export const defaultNodeStyle: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
+export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'circle',
     size: 20,
@@ -23,7 +23,7 @@ export const defaultNodeStyle: CanvasNodeStyle = { // https://g6.antv.antgroup.c
   }
 }
 
-export const defaultEdgeStyle: CanvasEdgeStyle = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
+export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'cubic-vertical',
     halo: false,
@@ -42,15 +42,25 @@ export const defaultEdgeStyle: CanvasEdgeStyle = {  // https://g6.antv.antgroup.
   }
 }
 
-export const defaultCanvasStyle: ICanvasStyle = {
+export const DEFAULT_CANVAS_STYLE: ICanvasStyle = {
   theme: getInitialTheme(),
   bgColor: '#222222',
   colorNodesBy: 'type',
   colorEdgesBy: 'type'
 }
 
-export const defaultStyleOptions: ICanvasStyleOptions = {
-  defaultNode: defaultNodeStyle,
-  defaultEdge: defaultEdgeStyle,
-  canvas: defaultCanvasStyle
+export const DEFAULT_STYLE_OPTIONS: ICanvasStyleOptions = {
+  defaultNode: DEFAULT_NODE_STYLE,
+  defaultEdge: DEFAULT_EDGE_STYLE,
+  canvas: DEFAULT_CANVAS_STYLE
 }
+
+export const DEFAULT_CANVAS_GRAPH_OPTIONS = {
+  styles: DEFAULT_STYLE_OPTIONS,
+
+}
+
+
+// plugins: [{ type: 'background', background: '#fff' }],
+
+

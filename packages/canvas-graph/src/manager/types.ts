@@ -13,7 +13,27 @@ export interface ICanvasStyleOptions {
   defaultEdge?: Partial<CanvasEdgeStyle>;
 }
 
+
+
+
+export interface CanvasGraphPlugin {
+  key: string;
+  [option: string]: string | object | number | boolean;
+}
+
+export interface CanvasGraphBehavior {
+  key: string;
+  [option: string]: string | object | number | boolean;
+}
+
+export interface CanvasGraphTransform {
+  key: string;
+  [option: string]: string | object | number | boolean;
+}
+
 export interface CanvasManagerOptions {
   styles?: ICanvasStyleOptions;
-  // behaviors?: object[];
+  plugins?: CanvasGraphPlugin[];
+  behaviors?: CanvasGraphBehavior[];
+  transforms?: CanvasGraphTransform[];
 }
