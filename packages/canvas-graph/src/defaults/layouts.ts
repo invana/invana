@@ -1,12 +1,13 @@
 import { NodeData } from "@antv/g6"
+import { CanvasGraphLayout } from "../manager/types"
 
 
-export const GRAPHIN_FORCE_LAYOUT = {
+export const GRAPHIN_FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'graphin-force',
   label: 'graphin-force',
 }
 
-export const GRID_LAYOUT = {
+export const GRID_LAYOUT: CanvasGraphLayout = {
   type: 'grid',
   label: 'grid',
   // align: 'CENTER',   // Alignment of the nodes
@@ -21,7 +22,7 @@ export const GRID_LAYOUT = {
   workerEnabled: true, // Optional, enable web-worker
 }
 
-export const CIRCULAR_LAYOUT = {
+export const CIRCULAR_LAYOUT: CanvasGraphLayout = {
   type: 'circular',
   label: 'circular',
   options: {
@@ -36,7 +37,7 @@ export const CIRCULAR_LAYOUT = {
   }
 }
 
-export const RADIAL_LAYOUT = {
+export const RADIAL_LAYOUT: CanvasGraphLayout = {
   type: 'radial',
   label: 'radial',
   options: {
@@ -52,7 +53,7 @@ export const RADIAL_LAYOUT = {
   }
 }
 
-export const FORCE_LAYOUT = {
+export const FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'force',
   label: 'force',
 
@@ -77,7 +78,7 @@ export const FORCE_LAYOUT = {
   }
 }
 
-export const GFORCE_LAYOUT = {
+export const GFORCE_LAYOUT: CanvasGraphLayout = {
   type: 'gForce',
   label: 'gForce',
   linkDistance: 150, // Optional, edge length
@@ -96,7 +97,7 @@ export const GFORCE_LAYOUT = {
   gpuEnabled: false, // Optional, enable GPU parallel computing, supported in G6 4.0
 }
 
-export const DAGRE_LAYOUT = {
+export const DAGRE_LAYOUT: CanvasGraphLayout = {
   type: 'dagre',
   label: 'dagre',
   rankdir: 'TB', // Optional, direction for rank nodes. Available values: 'TB' 'BT' 'LR' 'RL'
@@ -107,7 +108,7 @@ export const DAGRE_LAYOUT = {
 }
 
 
-export const D3_FORCE_LAYOUT = {
+export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'd3-force',
   collide: {
     //   // Prevent nodes from overlapping by specifying a collision radius for each node.
@@ -133,14 +134,14 @@ export const D3_FORCE_LAYOUT = {
   // },
 }
 
-export const CONCENTRIC_LAYOUT = {
+export const CONCENTRIC_LAYOUT: CanvasGraphLayout = {
   type: 'concentric',
   label: 'concentric',
   maxLevelDiff: 0.5,
   sortBy: 'degree',
   // center: [200, 200], // Optional
   // linkDistance: 50, // Optional, edge length
-  // preventOverlap: true, // Optional, must be used with nodeSize
+  preventOverlap: true, // Optional, must be used with nodeSize
   // nodeSize: 30, // Optional
   // sweep: 10, // Optional
   // equidistant: false, // Optional
@@ -148,10 +149,10 @@ export const CONCENTRIC_LAYOUT = {
   // clockwise: false, // Optional
   // maxLevelDiff: 10, // Optional
   // sortBy: 'degree', // Optional
-  // workerEnabled: false, // Optional, enable web-worker
+  workerEnabled: true, // Optional, enable web-worker
 }
 
-export const ANTV_DAGRE_LAYOUT = {
+export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   type: 'antv-dagre',
   label: 'dagre',
 
@@ -166,7 +167,7 @@ export const ANTV_DAGRE_LAYOUT = {
   // controlPoints: true, // Optional
 }
 
-export const FRUCHTERMAN_LAYOUT = {
+export const FRUCHTERMAN_LAYOUT: CanvasGraphLayout = {
   type: 'fruchterman',
   label: 'fruchterman',
   // center: [200, 200], // Optional, default is the center of the graph

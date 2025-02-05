@@ -1,6 +1,6 @@
 
 import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
-import { ICanvasStyleOptions } from "./types"
+import { CanvasManagerOptions, ICanvasStyleOptions } from "./types"
 import { getInitialTheme } from "@invana/ui"
 
 
@@ -55,8 +55,12 @@ export const DEFAULT_STYLE_OPTIONS: ICanvasStyleOptions = {
   canvas: DEFAULT_CANVAS_STYLE
 }
 
-export const DEFAULT_CANVAS_GRAPH_OPTIONS = {
+export const DEFAULT_CANVAS_GRAPH_OPTIONS: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS,
+  plugins: [],
+  behaviors: [],
+  transforms: [],
+  layout: undefined
 
 }
 

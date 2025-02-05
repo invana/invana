@@ -15,7 +15,6 @@ export class GraphStyle {
     console.log("GraphStyle.constructor", graph, options.styles);
     this.graph = graph;
     this.options = options;
-    this.updateDefaults(this.options);
   }
 
 
@@ -34,12 +33,12 @@ export class GraphStyle {
     );
   }
 
-  private updateOptions = (options: CanvasManagerOptions) => {
-    this.options = options;
-  }
+  // private updateOptions = (options: CanvasManagerOptions) => {
+  //   this.options = options;
+  // }
 
 
-  updateDefaults(newOptions: CanvasManagerOptions) {
+  getUpdateOptions(newOptions: CanvasManagerOptions): GraphOptions {
 
     // update existing options with the new options 
     const options: CanvasManagerOptions = mergeDeep(this.options, newOptions);
@@ -66,10 +65,11 @@ export class GraphStyle {
     }
 
     // update location options variable
-    this.updateOptions(options);
+    // this.updateOptions(options);
     // update graph graphOptions
     console.log("graphOptions", graphOptions)
-    this.graph.setOptions(graphOptions)
+    // this.graph.setOptions(graphOptions)
+    return graphOptions
   }
 
   // defaultNodeStyleBasedOnTheme = (theme: ThemeOptions) => {
@@ -112,22 +112,22 @@ export class GraphStyle {
   //   return style
   // }
 
-  setTheme(theme: ThemeOptions) {
-    // const nodeStyle = this.defaultNodeStyleBasedOnTheme(theme);
-    // const edgeStyle = this.defaultEdgeStyleBasedOnTheme(theme);
+  // setTheme(theme: ThemeOptions) {
+  //   // const nodeStyle = this.defaultNodeStyleBasedOnTheme(theme);
+  //   // const edgeStyle = this.defaultEdgeStyleBasedOnTheme(theme);
 
-    // this.graph.setOptions({
-    //   theme,
-    //   node: nodeStyle,
-    //   edge: edgeStyle
-    // })
-    this.updateDefaults()
-    // this.graph.setTheme(theme)
-    // // update node styling
-    // this.graph.setNode(nodeStyle);
-    // // update edge styling
-    // this.graph.setEdge(edgeStyle)
-    // this.graph.refresh();
-  }
+  //   // this.graph.setOptions({
+  //   //   theme,
+  //   //   node: nodeStyle,
+  //   //   edge: edgeStyle
+  //   // })
+  //   this.updateDefaults()
+  //   // this.graph.setTheme(theme)
+  //   // // update node styling
+  //   // this.graph.setNode(nodeStyle);
+  //   // // update edge styling
+  //   // this.graph.setEdge(edgeStyle)
+  //   // this.graph.refresh();
+  // }
 
 }

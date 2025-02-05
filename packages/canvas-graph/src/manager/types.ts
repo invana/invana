@@ -14,20 +14,25 @@ export interface ICanvasStyleOptions {
 }
 
 
-
+export interface CanvasGraphLayout {
+  type: string;
+  // key: string;
+  [option: string]: string | object | number | boolean;
+}
 
 export interface CanvasGraphPlugin {
+  type: string;
   key: string;
   [option: string]: string | object | number | boolean;
 }
 
 export interface CanvasGraphBehavior {
-  key: string;
+  type: string;
   [option: string]: string | object | number | boolean;
 }
 
 export interface CanvasGraphTransform {
-  key: string;
+  type: string;
   [option: string]: string | object | number | boolean;
 }
 
@@ -35,5 +40,6 @@ export interface CanvasManagerOptions {
   styles?: ICanvasStyleOptions;
   plugins?: CanvasGraphPlugin[];
   behaviors?: CanvasGraphBehavior[];
+  layout?: CanvasGraphLayout | undefined;
   transforms?: CanvasGraphTransform[];
 }

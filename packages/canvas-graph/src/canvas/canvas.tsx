@@ -8,15 +8,13 @@ import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 // import { deepMerge } from '@invana/data-store';
 import { mergeDeep } from '@invana/data-store';
+import { CIRCULAR_LAYOUT } from '../defaults/layouts';
 
 // import { flightData as data } from '@invana/example-datasets/datasets';
 // import '@antv/graphin/dist/index.css';
 
 
-export type GraphinLayout = {
-  type: string;
-  [key: string]: any;
-};
+
 
 export interface GraphinRef extends Graph {
   graph: Graph;
@@ -25,39 +23,17 @@ export interface GraphinRef extends Graph {
 export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   // Sample graph data
 
-  // Layout state
-  const [layout, setLayout] = useState<GraphinLayout>({ type: 'circular' });
-
   // Ref for Graphin instance
   const graphinRef = useRef<GraphinRef>(null);
 
   // Update layout
   // For Graphin 3.x "force" is generally "grid", plus other options like "circular", "concentric", etc.
-  const handleLayoutChange = (layoutType: 'circular' | 'grid') => {
-    setLayout({ type: layoutType });
+  const handleLayoutChange = (layoutType: 'circular' | 'grid' | 'radial') => {
     if (graphinRef.current?.graph) {
       graphinRef.current.graph.setLayout({ type: layoutType });
       graphinRef.current.graph.layout();
     }
   };
-
-  const graphOptions: GraphOptions = {
-    // container: containerRef.current,
-    // width: "100%",
-    // height: "100%",
-    // node: { style: { size: 20, labelText: (d) => d.id, } },
-    // edge: { style: { stroke: '#666' } },
-
-    // background: '#222222',
-    // data: props.data,
-    // autoResize: true,
-    // autoFit: 'view', // 'view' | 'graph' | 'center'
-    // animation: false,
-    layout: layout,
-
-    // autoFit: { type: 'view' }, // 'view' | 'graph' | 'center'
-    behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas', 'click-select'],
-  }
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
   console.log("=======options CanvasManagerOptions", options)
@@ -66,13 +42,13 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   return (
     <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <Graphin
-        options={graphOptions}
+        options={{}}
         // options={options}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
           canvasManager.store.addData(initData, () => canvasManager.render());
-          props.onReady(canvasManager);
+          props?.onReady?.(canvasManager);
         }}
         ref={graphinRef}
       />

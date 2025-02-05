@@ -2,6 +2,7 @@
 
 import {
   Graph,
+  GraphOptions,
 } from '@antv/g6';
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
@@ -12,19 +13,56 @@ import { CanvasManagerOptions } from './types';
 export class CanvasManager {
 
   private graph!: Graph;
-  store: GraphStore;
-  styling: GraphStyle
+  private store: GraphStore;
+  private styling: GraphStyle
+  private options: CanvasManagerOptions // CanvasGraph options
+  private g6Options: GraphOptions // CanvasGraph options converted to G6 options
+
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
     console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
-    this.styling = new GraphStyle(this.graph, options)
+    this.options = options;
+    this.g6Options = {};
+
+    this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
     this.initDataListeners();
+    // set on first load 
+    this.updateOptions(this.options)
   }
 
   getGraph(): Graph {
     return this.graph;
+  }
+
+  updateOptions(options: CanvasManagerOptions) {
+    console.log("updateOptions input options", options);
+
+    let g6Options: GraphOptions = this.g6Options
+    if (options.styles) {
+      const styleOptions = this.styling.getUpdateOptions(options);
+      g6Options = { ...g6Options, ...styleOptions, }
+    }
+
+    if (options.layout) {
+      g6Options = { ...g6Options, layout: options.layout ?? {} }
+    }
+
+    if (options.transforms) {
+      g6Options = { ...g6Options, transforms: options.transforms ?? {} }
+    }
+
+    if (options.plugins) {
+      g6Options = { ...g6Options, plugins: options.plugins ?? {} }
+    }
+
+    if (options.behaviors) {
+      g6Options = { ...g6Options, behaviors: options.behaviors ?? {} }
+    }
+
+    console.log("CanvasManager.updateOptions", g6Options);
+    this.graph.setOptions(g6Options);
   }
 
   // /** Set theme */
