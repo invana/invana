@@ -11,7 +11,7 @@ import {
   CircleDashed, Eraser, LayoutGrid, Lock, Minus,
   MoveLeft, MoveRight, Network, Plus, RefreshCcw, Share2, Unlock
 } from "lucide-react";
-import { defaultLayoutsOptions } from "@invana/canvas-graph/graph/layouts";
+import { defaultLayoutsOptions } from "@invana/canvas-graph/graph__/layouts";
 
 interface CanvasToolBarProps {
   getGraph: () => Graph;
