@@ -2,15 +2,18 @@ import type { IPointerEvent } from '@antv/g6';
 import { CanvasGraphBehavior } from '../manager/types';
 
 export const DRAG_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
-  type: 'drag-canvas'
+  type: 'drag-canvas',
+  key: 'drag-canvas',
 }
 
 export const DRAG_ELEMENT_BEHAVIOR: CanvasGraphBehavior = {
-  type: 'drag-element'
+  type: 'drag-element',
+  key: 'drag-element',
 }
 
 export const ZOOM_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
   type: 'zoom-canvas',
+  key: 'zoom-canvas',
   options: {
     minZoom: 0.5,
     maxZoom: 2,
@@ -19,6 +22,7 @@ export const ZOOM_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
 
 export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
   type: 'hover-activate',
+  key: 'hover-activate',
   degree: 1,
   state: 'highlight',
   inactiveState: 'dim',
@@ -33,13 +37,14 @@ export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
 
 export const CLICK_SELECT_BEHAVIOR: CanvasGraphBehavior = {
   type: 'click-select',
+  key: 'click-select',
   multiple: true,
   trigger: 'ctrl',
 }
 
 export const LASSO_SELECT_BEHAVIOR: CanvasGraphBehavior = {
-  key: 'lasso-select',
   type: 'lasso-select',
+  key: 'lasso-select',
   mode: 'diff',
   trigger: 'Drag',
   style: {
@@ -52,24 +57,30 @@ export const LASSO_SELECT_BEHAVIOR: CanvasGraphBehavior = {
 
 export const NODE_TOOLTIP_BEHAVIOR: CanvasGraphBehavior = {
   type: 'tooltip-node',
+  key: 'tooltip-node',
 }
 
 export const EDGE_TOOLTIP_BEHAVIOR: CanvasGraphBehavior = {
   type: 'tooltip-edge',
+  key: 'tooltip-edge',
 }
 
 export const NODE_CONTEXT_MENU_BEHAVIOR: CanvasGraphBehavior = {
   type: 'node-context-menu',
+  key: 'node-context-menu',
 }
 
 export const EDGE_CONTEXT_MENU_BEHAVIOR: CanvasGraphBehavior = {
   type: 'edge-context-menu',
+  key: 'edge-context-menu',
 }
 
 export const CANVAS_CONTEXT_MENU_BEHAVIOR: CanvasGraphBehavior = {
   type: 'canvas-context-menu',
+  key: 'canvas-context-menu',
 }
 
 export const PROPERTY_VIEWER_BEHAVIOR: CanvasGraphBehavior = {
   type: 'property-viewer',
+  key: 'property-viewer',
 }

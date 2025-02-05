@@ -7,13 +7,13 @@ import {
 import { GraphStore } from '@invana/data-store/index'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
 import { GraphStyle } from './styling';
-import { CanvasManagerOptions } from './types';
+import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';
 
 
 export class CanvasManager {
 
   private graph!: Graph;
-  private store: GraphStore;
+  store: GraphStore;
   private styling: GraphStyle
   private options: CanvasManagerOptions // CanvasGraph options
   private g6Options: GraphOptions // CanvasGraph options converted to G6 options
@@ -36,7 +36,16 @@ export class CanvasManager {
     return this.graph;
   }
 
-  updateOptions(options: CanvasManagerOptions) {
+  getUniqueItemsByItem(options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) {
+
+    const uniqueItems = options.reduce((acc, item) => {
+      acc[item.type] = item
+      return acc
+    }, {} as Record<string, CanvasGraphPlugin | CanvasGraphBehavior | CanvasGraphTransform>)
+    return Object.values(uniqueItems)
+  }
+
+  updateOptions(options: CanvasManagerOptions, callback?: () => void) {
     console.log("updateOptions input options", options);
 
     let g6Options: GraphOptions = this.g6Options
@@ -46,24 +55,29 @@ export class CanvasManager {
     }
 
     if (options.layout) {
-      g6Options = { ...g6Options, layout: options.layout ?? {} }
+      g6Options['layout'] = options.layout || {}
     }
 
     if (options.transforms) {
-      g6Options = { ...g6Options, transforms: options.transforms ?? {} }
+      g6Options['transforms'] = this.getUniqueItemsByItem(options.transforms || [])
     }
 
     if (options.plugins) {
-      g6Options = { ...g6Options, plugins: options.plugins ?? {} }
+      g6Options['plugins'] = this.getUniqueItemsByItem(options.plugins || [])
     }
 
     if (options.behaviors) {
-      g6Options = { ...g6Options, behaviors: options.behaviors ?? {} }
+      g6Options['behaviors'] = this.getUniqueItemsByItem(options.behaviors || [])
     }
 
     console.log("CanvasManager.updateOptions", g6Options);
     this.graph.setOptions(g6Options);
+    if (callback) {
+      callback()
+    }
   }
+
+
 
   // /** Set theme */
   // setTheme(theme: 'light' | 'dark') {

@@ -61,7 +61,6 @@ export const DEFAULT_CANVAS_GRAPH_OPTIONS: CanvasManagerOptions = {
   behaviors: [],
   transforms: [],
   layout: undefined
-
 }
 
 

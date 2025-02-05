@@ -8,7 +8,7 @@ import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
 
 export class GraphStyle {
 
-  private graph!: Graph
+  private graph: Graph
   private options!: CanvasManagerOptions
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
@@ -64,9 +64,6 @@ export class GraphStyle {
       graphOptions.edge = defaulEdgeStyle as EdgeOptions
     }
 
-    // update location options variable
-    // this.updateOptions(options);
-    // update graph graphOptions
     console.log("graphOptions", graphOptions)
     // this.graph.setOptions(graphOptions)
     return graphOptions

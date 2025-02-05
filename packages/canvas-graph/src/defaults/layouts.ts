@@ -149,7 +149,7 @@ export const CONCENTRIC_LAYOUT: CanvasGraphLayout = {
   // clockwise: false, // Optional
   // maxLevelDiff: 10, // Optional
   // sortBy: 'degree', // Optional
-  workerEnabled: true, // Optional, enable web-worker
+  workerEnabled: false, // Optional, enable web-worker
 }
 
 export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {

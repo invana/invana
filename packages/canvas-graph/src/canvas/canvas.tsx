@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph, GraphOptions } from '@antv/g6';
 import { Button } from '@invana/ui';
@@ -34,6 +34,18 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
       graphinRef.current.graph.layout();
     }
   };
+
+
+  // useEffect(() => {
+  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+  //   document.querySelectorAll('.graph-canvas').forEach(
+  //     () => addEventListener("contextmenu", handleContextMenu));
+
+  //   return () => {
+  //     document.querySelectorAll('.graph-canvas').forEach(
+  //       () => removeEventListener("contextmenu", handleContextMenu));
+  //   };
+  // }, []);
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
   console.log("=======options CanvasManagerOptions", options)

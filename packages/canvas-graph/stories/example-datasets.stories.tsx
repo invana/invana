@@ -42,8 +42,8 @@ register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, 
 const defaultOptions: CanvasManagerOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
-    DRAG_ELEMENT_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
+    DRAG_ELEMENT_BEHAVIOR,
     HOVER_ACTIVATE_BEHAVIOR,
     CLICK_SELECT_BEHAVIOR,
     LASSO_SELECT_BEHAVIOR,
@@ -60,7 +60,7 @@ const defaultOptions: CanvasManagerOptions = {
   plugins: [
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
-    GRID_PLUGIN
+    // GRID_PLUGIN
   ],
   layout: GRID_LAYOUT
 }
@@ -76,13 +76,13 @@ export const FlightData: Story = {
   },
 };
 
-export const LesMiserables: Story = {
-  args: {
-    options: defaultOptions,
-    initData: {
-      nodes: lesMiserablesData.nodes,
-      edges: lesMiserablesData.edges,
-    },
-    containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" }
-  },
-};
+// export const LesMiserables: Story = {
+//   args: {
+//     options: defaultOptions,
+//     initData: {
+//       nodes: lesMiserablesData.nodes,
+//       edges: lesMiserablesData.edges,
+//     },
+//     containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" }
+//   },
+// };

@@ -173,10 +173,10 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
 
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
-    autoResize: true,
-    autoFit: 'view', // 'view' | 'graph' | 'center'
-    animation: true,
-    background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
+    // autoResize: true,
+    // autoFit: 'view', // 'view' | 'graph' | 'center'
+    // animation: false,
+    // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {
   //   return convert_node_canvas_style_to_g6_style(style as CanvasNodeStyle);
