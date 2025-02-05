@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph, GraphOptions } from '@antv/g6';
 import { Button } from '@invana/ui';
-import { CanvasGraphV2Props } from './types';
+import { CanvasGraphProps } from './types';
 import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
@@ -22,7 +22,7 @@ export interface GraphinRef extends Graph {
   graph: Graph;
 }
 
-export const CanvasGraph: React.FC<CanvasGraphV2Props> = (props) => {
+export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   // Sample graph data
 
   // Layout state

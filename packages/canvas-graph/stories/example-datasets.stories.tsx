@@ -21,12 +21,11 @@ export const FlightData: Story = {
   args: {
     options: {
     },
-    initialData: {
+    initData: {
       nodes: flightData.nodes,
       edges: flightData.edges,
     },
-    header: true,
-    style: { "width": "100%", "height": "calc(100vh - 40px)" }
+    containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" }
   },
 };
 
@@ -34,11 +33,10 @@ export const LesMiserables: Story = {
   args: {
     options: {
     },
-    initialData: {
+    initData: {
       nodes: lesMiserablesData.nodes,
       edges: lesMiserablesData.edges,
     },
-    header: true,
-    style: { "width": "100%", "height": "calc(100vh - 40px)" }
+    containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" }
   },
 };

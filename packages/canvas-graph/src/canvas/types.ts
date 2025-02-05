@@ -9,11 +9,11 @@ import { CanvasManagerOptions } from '../manager/types';
 // }
 
 
-export interface CanvasGraphV2Props {
+export interface CanvasGraphProps {
   initData?: ICanvasData
   options?: CanvasManagerOptions
   containerStyle?: React.CSSProperties;
-  onReady: (canvasManager: CanvasManager) => void;
+  onReady?: (canvasManager: CanvasManager) => void;
 
   // interactions: CanvasInteractions
   // layouts: object[]
