@@ -14,7 +14,7 @@ export class CanvasManager {
 
   private graph!: Graph;
   store: GraphStore;
-  private styling: GraphStyle
+  styling: GraphStyle
   private options: CanvasManagerOptions // CanvasGraph options
   private g6Options: GraphOptions // CanvasGraph options converted to G6 options
 

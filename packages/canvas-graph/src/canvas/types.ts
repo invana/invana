@@ -14,6 +14,7 @@ export interface CanvasGraphProps {
   options?: CanvasManagerOptions
   containerStyle?: React.CSSProperties;
   onReady?: (canvasManager: CanvasManager) => void;
+  onDestroy?: () => void;
 
   // interactions: CanvasInteractions
   // layouts: object[]

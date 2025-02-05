@@ -1,18 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Graphin } from '@antv/graphin';
-import { Graph, GraphOptions } from '@antv/g6';
+import { Graph } from '@antv/g6';
 import { Button } from '@invana/ui';
 import { CanvasGraphProps } from './types';
 import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
-// import { deepMerge } from '@invana/data-store';
 import { mergeDeep } from '@invana/data-store';
-import { CIRCULAR_LAYOUT } from '../defaults/layouts';
-
-// import { flightData as data } from '@invana/example-datasets/datasets';
-// import '@antv/graphin/dist/index.css';
-
 
 
 
@@ -55,12 +49,16 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
     <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <Graphin
         options={{}}
-        // options={options}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
           canvasManager.store.addData(initData, () => canvasManager.render());
           props?.onReady?.(canvasManager);
+        }}
+        onDestroy={() => {
+          console.log("Graphin onDestroy");
+          graphinRef.current?.graph?.destroy();
+          props?.onDestroy?.();
         }}
         ref={graphinRef}
       />

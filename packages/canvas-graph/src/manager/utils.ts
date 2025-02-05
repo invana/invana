@@ -80,8 +80,8 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
 export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, theme: string): NodeStyle => {
 
-  const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
-  const dimFill = theme === 'dark' ? '#242424' : '#aaaaaa';
+  const dimLabelFill = theme === 'dark' ? '#999999' : '#aaaaaa'
+  const dimFill = theme === 'dark' ? '#999999' : '#aaaaaa';
 
   const g6Style: NodeStyle = {
     type: style.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
@@ -126,8 +126,8 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, theme: string): EdgeStyle => {
-  const dimLabelFill = theme === 'dark' ? '#242424' : '#aaaaaa'
-  const dimStroke = theme === 'dark' ? '#242424' : '#aaaaaa';
+  const dimLabelFill = theme === 'dark' ? '#999999' : '#aaaaaa'
+  const dimStroke = theme === 'dark' ? '#999999' : '#aaaaaa';
 
   const g6Style: EdgeStyle = {
     style: {
@@ -173,9 +173,9 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
 
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
-    // autoResize: true,
-    // autoFit: 'view', // 'view' | 'graph' | 'center'
-    // animation: false,
+    autoResize: true,
+    autoFit: 'view', // 'view' | 'graph' | 'center'
+    animation: false,
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {

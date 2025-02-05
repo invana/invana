@@ -1,4 +1,4 @@
-import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
 import { CanvasManagerOptions } from './types';
 import { convert_canvas_style_to_g6_style, convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
 import { ICanvasStyle, mergeDeep } from '@invana/data-store';
@@ -68,6 +68,33 @@ export class GraphStyle {
     // this.graph.setOptions(graphOptions)
     return graphOptions
   }
+
+
+  hideAllNodes() {
+    this.graph.getNodeData().forEach((node) => this.graph.hideElement(node.id))
+  }
+
+  showAllNodes() {
+    this.graph.getNodeData().forEach((node) => this.graph.showElement(node.id))
+  }
+
+  hideAllEdges() {
+    console.log("this.graph.getEdgeData() called")
+    this.graph.getEdgeData().forEach((edge) => {
+      if (edge?.id) {
+        this.graph.hideElement(edge.id);
+      }
+    });
+  }
+
+  showAllEdges() {
+    this.graph.getEdgeData().forEach((edge) => {
+      if (edge?.id) {
+        this.graph.showElement(edge?.id);
+      }
+    });
+  }
+
 
   // defaultNodeStyleBasedOnTheme = (theme: ThemeOptions) => {
   //   const style = { ...DEFAULT_NODE_STYLE };
