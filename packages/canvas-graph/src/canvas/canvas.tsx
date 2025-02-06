@@ -40,7 +40,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   // }, []);
 
   const localRef = useRef<Graph | null>(null);
-  // const graphManagerRef = useRef<CanvasManager | null>(null);
+  // const canvasManagerRef = useRef<CanvasManager | null>(null);
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
@@ -52,12 +52,12 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
       return localRef.current;
     },
     getGraphManager: () => {
-      // console.log("getGraphManager called", graphManagerRef.current);
-      // return graphManagerRef.current;
+      // console.log("getGraphManager called", canvasManagerRef.current);
+      // return canvasManagerRef.current;
     }
     // getGraphManager: () => {
     //   console.log("getGraphManager")
-    //   return graphManager
+    //   return canvasManager
     // }
 
   }));
@@ -78,7 +78,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
           canvasManager.store.addData(initData, () => canvasManager.render());
           props?.onReady?.(canvasManager);
-          // graphManagerRef.current = canvasManager;
+          // canvasManagerRef.current = canvasManager;
         }}
         onDestroy={() => {
           console.log("Graphin onDestroy");
