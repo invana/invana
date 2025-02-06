@@ -1,7 +1,9 @@
+import { CanvasGraphPlugin } from "../manager/types"
 
 
-export const MINIMAP_PLUGIN = {
+export const MINIMAP_PLUGIN: CanvasGraphPlugin = {
   type: 'minimap',
+  key: 'minimap',
   size: [240, 160],
   className: 'minimap',
   position: 'bottom-left',
@@ -12,15 +14,18 @@ export const MINIMAP_PLUGIN = {
   // },
 }
 
-export const HISTORY_PLUGIN = {
+export const HISTORY_PLUGIN: CanvasGraphPlugin = {
   type: 'history',
   key: 'history',
 }
 
-export const GRID_PLUGIN = {
-  type: 'grid-line', key: 'grid-line', follow: true, lineStyle: {
+export const GRID_PLUGIN: CanvasGraphPlugin = {
+  type: 'grid-line',
+  key: 'grid-line',
+  follow: true,
+  lineStyle: {
     stroke: '#222222', // Set grid line color
     lineWidth: 1, // Set line width
-  },
+  }
 }
 

@@ -9,11 +9,9 @@ interface ThemeState {
   initTheme: () => void;
 }
 
+export const storeName = "themeStore";
 
-export const storeName = "themeStore"
-
-
-export const getInitialTheme = (storeName: string) => {
+export const getInitialTheme = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const storedTheme = window.localStorage.getItem(storeName);
     if (storedTheme) {
@@ -27,7 +25,7 @@ export const getInitialTheme = (storeName: string) => {
 export const useThemeStore = create(
   persist<ThemeState>(
     (set, get) => ({
-      theme: getInitialTheme(storeName), // Default theme based on localStorage or system setting
+      theme: getInitialTheme(), // Default theme based on localStorage or system setting
       setTheme: (theme: 'light' | 'dark') => {
         set(() => ({ theme }));
         get().initTheme();

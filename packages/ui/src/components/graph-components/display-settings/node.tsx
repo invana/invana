@@ -4,15 +4,15 @@ import { Form } from "../../../components/ui/form"
 import { useForm } from "react-hook-form"
 import { Card, CardContent, CardFooter, CardHeader } from "../../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
-import { ICanvasNodeDisplay } from "@invana/data-store"
+import { CanvasNodeStyle } from "@invana/data-store"
 import { cn } from "../../../lib/utils"
 import { FormField } from "../../../form-generator/form-field"
 import { Button } from "../../../components/ui"
 
 
 export interface NodeDisplaySettingsProps {
-  onSubmit?: (data: ICanvasNodeDisplay) => void
-  defaultValues: ICanvasNodeDisplay;
+  onSubmit?: (data: CanvasNodeStyle) => void
+  defaultValues: CanvasNodeStyle;
   propertyKeys: string[];
   labelPosition?: "side" | "top";
   className?: string;
@@ -47,13 +47,13 @@ export const NodeDisplaySettings: React.FC<NodeDisplaySettingsProps> = ({ showRe
   labelPosition = "top",
   className = 'w-[420px]',
   ...props }) => {
-  const form = useForm<ICanvasNodeDisplay>({
+  const form = useForm<CanvasNodeStyle>({
     defaultValues: defaultValues
   })
 
-  // const [formData, setFormData] = useState<ICanvasNodeDisplay>()
+  // const [formData, setFormData] = useState<CanvasNodeStyle>()
 
-  function onSubmit(data: ICanvasNodeDisplay) {
+  function onSubmit(data: CanvasNodeStyle) {
     // setFormData(data)
     props.onSubmit?.(data)
     console.log("Form submitted:", data)
