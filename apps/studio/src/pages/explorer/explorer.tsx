@@ -3,10 +3,6 @@ import { LogoComponent, bottomNavItems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout,
-  Card,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
   LeftNavItem
 } from '@invana/ui';
 import { ReactFlowProvider } from '@invana/canvas-flow';
@@ -15,7 +11,7 @@ import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { CanvasGraph, CanvasToolBar, defaultOptions } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
-import { Activity, Compass, MonitorCog, Network, Search, SearchIcon, Terminal } from 'lucide-react'
+import { Activity, MonitorCog, Network, SearchIcon, Terminal } from 'lucide-react'
 import { Graph } from '@antv/g6';
 import { QueryForm } from '@/ui/forms/query-form';
 import useLayout from '@/hooks/useLayout'

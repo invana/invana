@@ -4,7 +4,7 @@ import {
   Graph,
   GraphOptions,
 } from '@antv/g6';
-import { GraphStore } from '@invana/data-store/index'
+import { GraphStore } from '@invana/data-store'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
 import { GraphStyle } from './styling';
 import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';

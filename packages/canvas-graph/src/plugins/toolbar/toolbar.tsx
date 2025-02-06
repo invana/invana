@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 // import { defaultLayoutsOptions } from "@invana/canvas-graph/graph__/layouts";
 
-interface CanvasToolBarProps {
+export interface CanvasToolBarProps {
   getGraph: () => Graph;
   className?: string;
 }
