@@ -164,14 +164,14 @@ const ExplorerPage: React.FC = () => {
   // }, [mainTopContentSize, leftContentSize, isReady]);
 
 
-  // useEffect(() => {
-  //   console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
-  //   if (canvasManagerRef.current && isReady) {
-  //     // const canvasManager = canvasGraphRef.current.getGraphManager();
-  //     console.log("getUpdatedStylingOptions, theme", theme)
-  //     canvasManagerRef.current.setTheme(theme)
-  //   }
-  // }, [theme, isReady]);
+  useEffect(() => {
+    console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
+    if (canvasManagerRef.current && isReady) {
+      // const canvasManager = canvasGraphRef.current.getGraphManager();
+      console.log("getUpdatedStylingOptions, theme", theme)
+      canvasManagerRef.current.setTheme(theme)
+    }
+  }, [theme, isReady]);
 
   return <DefaultLayout
     headerProps={{
