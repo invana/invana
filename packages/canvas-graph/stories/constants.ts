@@ -39,12 +39,17 @@ export const defaultOptions: CanvasManagerOptions = {
     PROPERTY_VIEWER_BEHAVIOR
   ],
   transforms: [
-    MAP_NODE_SIZE_TRANSFORMER
+    // MAP_NODE_SIZE_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
     // GRID_PLUGIN
   ],
-  layout: GRID_LAYOUT
+  layout: GRID_LAYOUT,
+  styles: {
+    canvas: {
+      // theme: 'light',
+    }
+  }
 }
