@@ -57,14 +57,14 @@ export class GraphStyle {
     }
 
     // default node styling
-    if (newOptions.styles?.defaultNode) {
+    if (newOptions.styles?.defaultNode || newOptions.styles?.canvas?.theme) {
       const DEFAULT_NODE_STYLE = this.getUpdatedDefaultNodeStyle(options, options?.styles?.canvas?.theme as string);
       graphOptions.node = DEFAULT_NODE_STYLE as NodeOptions
     }
 
 
     // default edge styling
-    if (newOptions.styles?.defaultEdge) {
+    if (newOptions.styles?.defaultEdge || newOptions.styles?.canvas?.theme) {
       const defaulEdgeStyle = this.getUpdatedDefaultEdgeStyle(options, options?.styles?.canvas?.theme as string);
       graphOptions.edge = defaulEdgeStyle as EdgeOptions
     }
