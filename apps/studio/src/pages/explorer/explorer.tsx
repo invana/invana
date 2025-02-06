@@ -2,7 +2,7 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
-import { Activity, Compass, MonitorCog, Network, Terminal } from 'lucide-react';
+import { Activity, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -22,7 +22,7 @@ import {
 import { MAP_NODE_SIZE_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
-import { ExtensionCategory, register } from '@antv/g6';
+import { ExtensionCategory, Graph, register } from '@antv/g6';
 import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
 import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
@@ -92,6 +92,7 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent,
+    // mainTopContentSize, leftContentSize
   } = useDefaultLayoutStore()
 
 
@@ -150,7 +151,7 @@ const ExplorerPage: React.FC = () => {
 
   // useEffect(() => {
   //   console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
-  //   const graph = canvasGraphRef.current?.getGraph();
+  //   const graph = graphManagerRef.current?.getGraph();
   //   if (graph && isReady) {
 
   //     graph.resize();
@@ -162,6 +163,7 @@ const ExplorerPage: React.FC = () => {
 
 
   useEffect(() => {
+    console.log("theme updated====== ", theme, graphManagerRef.current, isReady)
     if (graphManagerRef.current && isReady) {
       // const canvasManager = canvasGraphRef.current.getGraphManager();
       console.log("getUpdatedStylingOptions, theme", theme)
@@ -181,7 +183,7 @@ const ExplorerPage: React.FC = () => {
       ),
       center: (
         <>
-          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={graphManagerRef.current.getGraph} />}
+          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={() => graphManagerRef.current!.getGraph()} />}
         </>
       ),
       right: (
@@ -231,7 +233,7 @@ const ExplorerPage: React.FC = () => {
         initData={flightData}
         onReady={(graphManager: CanvasManager) => {
           console.log("onReady", graphManager)
-          // graphManagerRef.current = graphManager;
+          graphManagerRef.current = graphManager;
           setIsReady(true)
         }}
         options={options}

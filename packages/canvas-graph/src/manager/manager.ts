@@ -33,6 +33,7 @@ export class CanvasManager {
   }
 
   getGraph(): Graph {
+    console.log("getGraph", this);
     return this.graph;
   }
 
