@@ -1,4 +1,4 @@
-import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
 import { CanvasManagerOptions } from './types';
 import {
   convert_canvas_style_to_g6_style,

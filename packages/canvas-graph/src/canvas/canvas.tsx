@@ -42,10 +42,6 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   const localRef = useRef<Graph | null>(null);
   const graphManagerRef = useRef<CanvasManager | null>(null);
 
-
-
-
-
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
     // get: () => {
