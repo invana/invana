@@ -5,7 +5,7 @@ import ConnectPage from "./pages/connect/connect";
 import ProtectedRoute from "./pages/protected-route";
 import ModellerPage from "./pages/modeller/modeller";
 // import ExplorerPage from "./pages/explorer/explorer";
-import ExplorerPage from "./pages/explorer/explorer2";
+import ExplorerPage from "./pages/explorer/explorer";
 import { LANDING_ROUTE } from './constants';
 import '@invana/config-tailwind/index.css';
 import '@invana/canvas-graph/index.css';
