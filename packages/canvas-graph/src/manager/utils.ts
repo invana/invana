@@ -3,6 +3,7 @@ import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
 import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
+import { CanvasManagerOptions } from "./types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
@@ -78,33 +79,37 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
 }
 
-export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, theme: string): NodeStyle => {
-  console.log("convert_node_canvas_style_to_g6_style", style, theme);
+export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
+  console.log("convert_node_canvas_style_to_g6_style", options);
 
+  const defaultStyle: CanvasNodeStyle = options.styles?.defaultNode || {};
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
 
   const g6Style: NodeStyle = {
-    type: style.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
+    type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
-      size: style.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined,
-      halo: style.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo,
+      size: () => {
+        const size = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+        return size
+      },
+      halo: defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo,
 
       //@ts-ignore
       labelText: (d) => d.id,
       // fill
-      fill: style.shape?.bgColor ?? DEFAULT_NODE_STYLE?.shape?.bgColor,
-      fillOpacity: style.shape?.bgOpacity ?? DEFAULT_NODE_STYLE?.shape?.bgOpacity,
+      fill: defaultStyle.shape?.bgColor ?? DEFAULT_NODE_STYLE?.shape?.bgColor,
+      fillOpacity: defaultStyle.shape?.bgOpacity ?? DEFAULT_NODE_STYLE?.shape?.bgOpacity,
 
       // label
-      labelPosition: style.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
-      labelAutoRotate: style.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
+      labelPosition: defaultStyle.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
+      labelAutoRotate: defaultStyle.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
 
       // lineWidth: 2,
-      stroke: style.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
-      strokeOpacity: style.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
+      stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
+      strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
 
-      labelTextColor: style.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
+      labelTextColor: defaultStyle.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
       // lineStroke: '#D580FF',
 
     },
@@ -131,29 +136,32 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
   return g6Style;
 }
 
-export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, theme: string): EdgeStyle => {
-  console.log("convert_edge_canvas_style_to_g6_sytle", style, theme);
+export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
+
+  console.log("convert_edge_canvas_style_to_g6_sytle options", options);
+
+  const defaultStyle: CanvasEdgeStyle = options?.styles?.defaultEdge || {};
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
   const g6Style: EdgeStyle = {
     style: {
-      type: style.shape?.type ?? DEFAULT_EDGE_STYLE.shape?.type,
-      halo: style.shape?.halo ?? DEFAULT_EDGE_STYLE.shape?.halo,
+      type: defaultStyle.shape?.type ?? DEFAULT_EDGE_STYLE.shape?.type,
+      halo: defaultStyle.shape?.halo ?? DEFAULT_EDGE_STYLE.shape?.halo,
       endArrow: true,
       //@ts-ignore
       // labelText: (d) => d.id,
 
       // stroke
-      lineWidth: style.shape?.strokeWidth ?? DEFAULT_EDGE_STYLE.shape?.strokeWidth,
-      stroke: style.shape?.strokeColor ?? DEFAULT_EDGE_STYLE.shape?.strokeColor,
+      lineWidth: defaultStyle.shape?.strokeWidth ?? DEFAULT_EDGE_STYLE.shape?.strokeWidth,
+      stroke: defaultStyle.shape?.strokeColor ?? DEFAULT_EDGE_STYLE.shape?.strokeColor,
 
       // label
-      labelTextAlign: style.label?.textPosition ?? DEFAULT_EDGE_STYLE.label?.textPosition,
-      labelAutoRotate: style.label?.textAutoRotate ?? DEFAULT_EDGE_STYLE.label?.textAutoRotate,
-      labelFill: style.label?.textColor ?? DEFAULT_EDGE_STYLE.label?.textColor,
+      labelTextAlign: defaultStyle.label?.textPosition ?? DEFAULT_EDGE_STYLE.label?.textPosition,
+      labelAutoRotate: defaultStyle.label?.textAutoRotate ?? DEFAULT_EDGE_STYLE.label?.textAutoRotate,
+      labelFill: defaultStyle.label?.textColor ?? DEFAULT_EDGE_STYLE.label?.textColor,
 
       // opacity
-      opacity: style.shape?.strokeOpacity ?? DEFAULT_EDGE_STYLE.shape?.strokeOpacity,
+      opacity: defaultStyle.shape?.strokeOpacity ?? DEFAULT_EDGE_STYLE.shape?.strokeOpacity,
 
     },
     state: {
