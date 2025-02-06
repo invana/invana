@@ -159,15 +159,15 @@ const ExplorerPage: React.FC = () => {
   //     graph.fitView();
   //   }
   // }, [mainTopContentSize, leftContentSize, isReady]);
-  // useEffect(() => {
-  //   if (canvasGraphRef.current && isReady) {
-  //     // const canvasManager = canvasGraphRef.current.getGraphManager();
-  //     // canvasManager.styling.setTheme(theme)
 
-  //     // graph.setTheme(theme); // Refresh the graph when theme changes
-  //     // console.log("====graph", graph)
-  //   }
-  // }, [theme, isReady]);
+
+  useEffect(() => {
+    if (graphManagerRef.current && isReady) {
+      // const canvasManager = canvasGraphRef.current.getGraphManager();
+      console.log("getUpdatedStylingOptions, theme", theme)
+      graphManagerRef.current.setTheme(theme)
+    }
+  }, [theme, isReady]);
 
   return <DefaultLayout
     headerProps={{
@@ -200,7 +200,6 @@ const ExplorerPage: React.FC = () => {
           <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
             <div className='h-full px-3 py-2'>
               <p >Graph model comes here</p>
-
             </div>
           </PanelContent>
         }
@@ -224,7 +223,6 @@ const ExplorerPage: React.FC = () => {
     mainTopContent={
 
       // <div className="flex h-full items-center justify-center ">
-
 
       <CanvasGraph
         // ref={canvasGraphRef}

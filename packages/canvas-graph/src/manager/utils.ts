@@ -173,9 +173,9 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
 
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
-    autoResize: true,
+    autoResize: false,
     autoFit: 'view', // 'view' | 'graph' | 'center'
-    animation: false,
+    animation: true,
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {
