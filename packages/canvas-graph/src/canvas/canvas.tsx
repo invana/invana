@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from './types';
@@ -8,10 +8,10 @@ import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
 
 
-
-export interface GraphinRef extends Graph {
-  graph: Graph;
-}
+// export interface GraphinRef extends Graph {
+//   graph: Graph;
+// }
+const MemoizedGraphin = React.memo(Graphin);
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   // Sample graph data
@@ -28,32 +28,32 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   // };
 
 
-  useEffect(() => {
-    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-    document.querySelectorAll('.graph-canvas').forEach(
-      () => addEventListener("contextmenu", handleContextMenu));
+  // useEffect(() => {
+  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+  //   document.querySelectorAll('.graph-canvas').forEach(
+  //     () => addEventListener("contextmenu", handleContextMenu));
 
-    return () => {
-      document.querySelectorAll('.graph-canvas').forEach(
-        () => removeEventListener("contextmenu", handleContextMenu));
-    };
-  }, []);
+  //   return () => {
+  //     document.querySelectorAll('.graph-canvas').forEach(
+  //       () => removeEventListener("contextmenu", handleContextMenu));
+  //   };
+  // }, []);
 
   const localRef = useRef<Graph | null>(null);
-  const graphManagerRef = useRef<CanvasManager | null>(null);
+  // const graphManagerRef = useRef<CanvasManager | null>(null);
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
-    get: () => {
-      console.log('someMethod called');
-    },
+    // get: () => {
+    //   console.log('someMethod called');
+    // },
     getGraph: () => {
       console.log("getGraph called", localRef.current);
       return localRef.current;
     },
     getGraphManager: () => {
-      console.log("getGraphManager called", graphManagerRef.current);
-      return graphManagerRef.current;
+      // console.log("getGraphManager called", graphManagerRef.current);
+      // return graphManagerRef.current;
     }
     // getGraphManager: () => {
     //   console.log("getGraphManager")
@@ -63,7 +63,6 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   }));
 
 
-  const MemoizedGraphin = React.memo(Graphin);
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
   console.log("=======options CanvasManagerOptions", options)
@@ -73,13 +72,13 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
     <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <MemoizedGraphin
         ref={localRef}
-        options={{}}
+        options={options}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
           canvasManager.store.addData(initData, () => canvasManager.render());
           props?.onReady?.(canvasManager);
-          graphManagerRef.current = canvasManager;
+          // graphManagerRef.current = canvasManager;
         }}
         onDestroy={() => {
           console.log("Graphin onDestroy");

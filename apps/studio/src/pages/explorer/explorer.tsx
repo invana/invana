@@ -13,6 +13,7 @@ import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
 import { ActivityHistoryView } from '@/ui/components/activity-history';
 import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
+import { CanvasGraphProps } from '@invana/canvas-graph';
 import {
   CANVAS_CONTEXT_MENU_BEHAVIOR, CLICK_SELECT_BEHAVIOR, DRAG_CANVAS_BEHAVIOR,
   DRAG_ELEMENT_BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR,
@@ -79,8 +80,9 @@ const ExplorerPage: React.FC = () => {
   const graphManagerRef = useRef<CanvasManager | null>(null);
   const canvasGraphRef = useRef<{
     getGraph: () => Graph
-    getGraphManager: () => CanvasManager
+    // getGraphManager: () => CanvasManager
   } | null>(null);
+  // const canvasGraphRef = useRef<CanvasGraphProps>(null);
   // const graphManagerRef = useRef(null);
 
   const { theme, } = useThemeStore()
@@ -162,14 +164,14 @@ const ExplorerPage: React.FC = () => {
   // }, [mainTopContentSize, leftContentSize, isReady]);
 
 
-  useEffect(() => {
-    console.log("theme updated====== ", theme, graphManagerRef.current, isReady)
-    if (graphManagerRef.current && isReady) {
-      // const canvasManager = canvasGraphRef.current.getGraphManager();
-      console.log("getUpdatedStylingOptions, theme", theme)
-      graphManagerRef.current.setTheme(theme)
-    }
-  }, [theme, isReady]);
+  // useEffect(() => {
+  //   console.log("theme updated====== ", theme, graphManagerRef.current, isReady)
+  //   if (graphManagerRef.current && isReady) {
+  //     // const canvasManager = canvasGraphRef.current.getGraphManager();
+  //     console.log("getUpdatedStylingOptions, theme", theme)
+  //     graphManagerRef.current.setTheme(theme)
+  //   }
+  // }, [theme, isReady]);
 
   return <DefaultLayout
     headerProps={{
@@ -183,7 +185,7 @@ const ExplorerPage: React.FC = () => {
       ),
       center: (
         <>
-          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={() => graphManagerRef.current!.getGraph()} />}
+          {/* {isReady && canvasGraphRef.current && <CanvasToolBar getGraph={() => canvasGraphRef.current!.getGraph()} />} */}
         </>
       ),
       right: (
@@ -233,7 +235,7 @@ const ExplorerPage: React.FC = () => {
         initData={flightData}
         onReady={(graphManager: CanvasManager) => {
           console.log("CanvasGraph.onReady", graphManager)
-          // graphManagerRef.current = graphManager;
+          // graphManagerRef.current = graphManager;  
           // setIsReady(true)
         }}
         onDestroy={() => {
