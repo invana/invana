@@ -5,15 +5,70 @@ import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
 import { Activity, Compass, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import { useState, useRef, useEffect } from 'react';
-import { Graph } from '@antv/g6';
 import { ProductName } from '@/constants';
-import { CanvasGraph, CanvasToolBar, defaultOptions, GraphManager } from '@invana/canvas-graph';
+import { CanvasGraph } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
 import { ActivityHistoryView } from '@/ui/components/activity-history';
+import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
+import {
+  CANVAS_CONTEXT_MENU_BEHAVIOR, CLICK_SELECT_BEHAVIOR, DRAG_CANVAS_BEHAVIOR,
+  DRAG_ELEMENT_BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR,
+  HOVER_ACTIVATE_BEHAVIOR, LASSO_SELECT_BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR,
+  NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
+} from '@invana/canvas-graph/defaults/behaviors';
+import { MAP_NODE_SIZE_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
+import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
+import { GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
+import { ExtensionCategory, register } from '@antv/g6';
+import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
+import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
+import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
+import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
+import { CanvasManager } from '@invana/canvas-graph/manager';
+import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
+import { CanvasToolBar } from '@invana/canvas-graph/plugins';
 
+
+register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
+
+
+const defaultOptions: CanvasManagerOptions = {
+  behaviors: [
+    DRAG_CANVAS_BEHAVIOR,
+    ZOOM_CANVAS_BEHAVIOR,
+    DRAG_ELEMENT_BEHAVIOR,
+    HOVER_ACTIVATE_BEHAVIOR,
+    CLICK_SELECT_BEHAVIOR,
+    LASSO_SELECT_BEHAVIOR,
+    NODE_TOOLTIP_BEHAVIOR,
+    EDGE_TOOLTIP_BEHAVIOR,
+    NODE_CONTEXT_MENU_BEHAVIOR,
+    EDGE_CONTEXT_MENU_BEHAVIOR,
+    CANVAS_CONTEXT_MENU_BEHAVIOR,
+    {
+      ...PROPERTY_VIEWER_BEHAVIOR,
+      className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
+    }
+  ],
+  transforms: [
+    MAP_NODE_SIZE_TRANSFORMER
+  ],
+  plugins: [
+    MINIMAP_PLUGIN,
+    HISTORY_PLUGIN,
+    // GRID_PLUGIN
+  ],
+  layout: GRID_LAYOUT,
+  styles: DEFAULT_STYLE_OPTIONS
+}
 
 
 const ExplorerPage: React.FC = () => {
@@ -21,10 +76,11 @@ const ExplorerPage: React.FC = () => {
 
 
   const [isReady, setIsReady] = useState(false);
-  const containerRef = useRef<{
-    getGraph: () => Graph
-    getGraphManager: () => GraphManager
-  } | null>(null);
+  const graphManagerRef = useRef<CanvasManager | null>(null);
+  // const canvasGraphRef = useRef<{
+  //   getGraph: () => Graph
+  //   getGraphManager: () => CanvasManager
+  // } | null>(null);
   // const graphManagerRef = useRef(null);
 
   const { theme, } = useThemeStore()
@@ -81,20 +137,20 @@ const ExplorerPage: React.FC = () => {
 
   const options = { ...defaultOptions }
 
-  if (options.behaviors) {
-    options.behaviors = options.behaviors.filter(b => b !== 'property-viewer');
+  // if (options.behaviors) {
+  //   options.behaviors = options.behaviors.filter(b => b !== 'property-viewer');
 
-    options.behaviors.push({
-      key: 'property-viewer',
-      type: 'property-viewer',
-      className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
-    });
-  }
+  //   options.behaviors.push({
+  //     key: 'property-viewer',
+  //     type: 'property-viewer',
+  //     className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
+  //   });
+  // }
 
 
   // useEffect(() => {
   //   console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
-  //   const graph = containerRef.current?.getGraph();
+  //   const graph = canvasGraphRef.current?.getGraph();
   //   if (graph && isReady) {
 
   //     graph.resize();
@@ -103,21 +159,21 @@ const ExplorerPage: React.FC = () => {
   //     graph.fitView();
   //   }
   // }, [mainTopContentSize, leftContentSize, isReady]);
-  useEffect(() => {
-    if (containerRef.current && isReady) {
-      const graphManager = containerRef.current.getGraphManager();
-      graphManager.styling.setTheme(theme)
+  // useEffect(() => {
+  //   if (canvasGraphRef.current && isReady) {
+  //     // const canvasManager = canvasGraphRef.current.getGraphManager();
+  //     // canvasManager.styling.setTheme(theme)
 
-      // graph.setTheme(theme); // Refresh the graph when theme changes
-      // console.log("====graph", graph)
-    }
-  }, [theme, isReady]);
+  //     // graph.setTheme(theme); // Refresh the graph when theme changes
+  //     // console.log("====graph", graph)
+  //   }
+  // }, [theme, isReady]);
 
   return <DefaultLayout
     headerProps={{
       left: (
         <>
-          <span className='ml-3'><Compass className='w-5 h-5' /></span>
+          {/* <span className='ml-3'><Compass className='w-5 h-5' /></span> */}
           <span className='font-bold mr-2 ml-3'>{ProductName}</span>
           <span className='mr-2'>|</span>
           <span>Explorer</span>
@@ -125,7 +181,7 @@ const ExplorerPage: React.FC = () => {
       ),
       center: (
         <>
-          {isReady && containerRef.current && <CanvasToolBar getGraph={containerRef.current.getGraph} />}
+          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={graphManagerRef.current.getGraph} />}
         </>
       ),
       right: (
@@ -169,15 +225,15 @@ const ExplorerPage: React.FC = () => {
 
       // <div className="flex h-full items-center justify-center ">
 
+
       <CanvasGraph
-        ref={containerRef}
-        style={{ width: "100%", height: "100%" }}
+        // ref={canvasGraphRef}
+        containerStyle={{ width: "100%", height: "100%" }}
         className={"bg-background"}
-        //@ts-expect-error
-        // graphManager={graphManagerRef.current}
-        initialData={flightData}
-        onReady={() => {
-          console.log("onReady")
+        initData={flightData}
+        onReady={(graphManager: CanvasManager) => {
+          console.log("onReady", graphManager)
+          // graphManagerRef.current = graphManager;
           setIsReady(true)
         }}
         options={options}

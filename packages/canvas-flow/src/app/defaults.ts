@@ -3,7 +3,7 @@ import { FlowCanvasOptions } from "./types"
 import { BackgroundVariant, ConnectionLineType, MarkerType } from "@xyflow/react"
 
 
-export const defaultCanvasStyle = {
+export const DEFAULT_CANVAS_STYLE = {
     width: "100%",
     height: "100vh"
 }
@@ -33,7 +33,7 @@ export const defaultFlowCanvasOptions: FlowCanvasOptions = {
     },
     nodes: [],
     edges: [],
-    style: defaultCanvasStyle,
+    style: DEFAULT_CANVAS_STYLE,
     extraNodeTypes: {},
     extraEdgeTypes: {},
     layoutDirection: "LR",

@@ -4,3 +4,7 @@ export { EdgeTooltipBehavior } from "./tooltips/edge";
 export type { EdgeTooltipBehaviorOptions } from "./tooltips/edge";
 export { PropertyViewerBehavior } from './property-viewer';
 export type { PropertyViewerBehaviorOptions } from './property-viewer';
+// export * from './context-menus/node';
+// export * from './context-menus/edge';
+// export * from './context-menus/canvas';
+// export * from './selections/hover-activate';
