@@ -1,6 +1,10 @@
-import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, NodeOptions, ThemeOptions } from '@antv/g6'
 import { CanvasManagerOptions } from './types';
-import { convert_canvas_style_to_g6_style, convert_edge_canvas_style_to_g6_sytle, convert_node_canvas_style_to_g6_style } from './utils';
+import {
+  convert_canvas_style_to_g6_style,
+  convert_edge_canvas_style_to_g6_sytle,
+  convert_node_canvas_style_to_g6_style
+} from './utils';
 import { ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
@@ -38,10 +42,11 @@ export class GraphStyle {
   // }
 
 
-  getUpdateOptions(newOptions: CanvasManagerOptions): GraphOptions {
+  getUpdatedStylingOptions(newOptions: CanvasManagerOptions): GraphOptions {
 
     // update existing options with the new options 
     const options: CanvasManagerOptions = mergeDeep(this.options, newOptions);
+    console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
 
     let graphOptions: GraphOptions = {}
 
@@ -140,12 +145,14 @@ export class GraphStyle {
   //   // const nodeStyle = this.defaultNodeStyleBasedOnTheme(theme);
   //   // const edgeStyle = this.defaultEdgeStyleBasedOnTheme(theme);
 
+
+  //   this.getUpdatedStylingOptions
   //   // this.graph.setOptions({
   //   //   theme,
   //   //   node: nodeStyle,
   //   //   edge: edgeStyle
   //   // })
-  //   this.updateDefaults()
+  //   // this.updateDefaults()
   //   // this.graph.setTheme(theme)
   //   // // update node styling
   //   // this.graph.setNode(nodeStyle);

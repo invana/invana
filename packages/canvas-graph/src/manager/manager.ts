@@ -37,7 +37,6 @@ export class CanvasManager {
   }
 
   getUniqueItemsByItem(options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) {
-
     const uniqueItems = options.reduce((acc, item) => {
       acc[item.type] = item
       return acc
@@ -50,7 +49,7 @@ export class CanvasManager {
 
     let g6Options: GraphOptions = this.g6Options
     if (options.styles) {
-      const styleOptions = this.styling.getUpdateOptions(options);
+      const styleOptions = this.styling.getUpdatedStylingOptions(options);
       g6Options = { ...g6Options, ...styleOptions, }
     }
 
@@ -71,10 +70,23 @@ export class CanvasManager {
     }
 
     console.log("CanvasManager.updateOptions", g6Options);
+    this.options = options;
     this.graph.setOptions(g6Options);
+    this.graph.render();
     if (callback) {
       callback()
     }
+  }
+
+  setTheme(theme: string) {
+    const newOptions: CanvasManagerOptions = {
+      styles: {
+        canvas: {
+          theme: theme
+        }
+      }
+    }
+    this.updateOptions(newOptions)
   }
 
 
@@ -82,12 +94,12 @@ export class CanvasManager {
   // /** Set theme */
   // setTheme(theme: 'light' | 'dark') {
   //   this.graph.setOptions({ theme });
-  //   // const themeConfig = theme === 'light'
-  //   //   ? { defaultNode: { style: { fill: '#fff', stroke: '#000' } } }
-  //   //   : { defaultNode: { style: { fill: '#333', stroke: '#fff' } } };
+  //   const themeConfig = theme === 'light'
+  //     ? { node: { style: { fill: '#fff', stroke: '#000' } } }
+  //     : { defaultNode: { style: { fill: '#333', stroke: '#fff' } } };
 
-  //   // this.graph.updateItem('global', themeConfig);
-  //   // this.graph.refresh();
+  //   this.graph.updateItem('global', themeConfig);
+  //   this.graph.refresh();
   // }
 
 
