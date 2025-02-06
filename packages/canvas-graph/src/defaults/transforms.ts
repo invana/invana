@@ -7,5 +7,5 @@ export const MAP_NODE_SIZE_TRANSFORMER: CanvasGraphTransform = {
   scale: 'linear',
   maxSize: 60,
   minSize: 20,
-  mapLabelSize: [12, 24]
+  mapLabelSize: [8, 24]
 }

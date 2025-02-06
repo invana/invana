@@ -59,7 +59,7 @@ const defaultOptions: CanvasManagerOptions = {
     }
   ],
   transforms: [
-    MAP_NODE_SIZE_TRANSFORMER
+    // MAP_NODE_SIZE_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
@@ -77,10 +77,10 @@ const ExplorerPage: React.FC = () => {
 
   const [isReady, setIsReady] = useState(false);
   const graphManagerRef = useRef<CanvasManager | null>(null);
-  // const canvasGraphRef = useRef<{
-  //   getGraph: () => Graph
-  //   getGraphManager: () => CanvasManager
-  // } | null>(null);
+  const canvasGraphRef = useRef<{
+    getGraph: () => Graph
+    getGraphManager: () => CanvasManager
+  } | null>(null);
   // const graphManagerRef = useRef(null);
 
   const { theme, } = useThemeStore()
@@ -232,9 +232,14 @@ const ExplorerPage: React.FC = () => {
         className={"bg-background"}
         initData={flightData}
         onReady={(graphManager: CanvasManager) => {
-          console.log("onReady", graphManager)
-          graphManagerRef.current = graphManager;
-          setIsReady(true)
+          console.log("CanvasGraph.onReady", graphManager)
+          // graphManagerRef.current = graphManager;
+          // setIsReady(true)
+        }}
+        onDestroy={() => {
+          console.log("CanvasGraph.onDestroy")
+          // setIsReady(false)
+          // graphManagerRef.current = null;
         }}
         options={options}
       />

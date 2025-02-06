@@ -86,7 +86,7 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
   const g6Style: NodeStyle = {
     type: style.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
-      size: style.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size,
+      size: style.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined,
       halo: style.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo,
 
       //@ts-ignore
