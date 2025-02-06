@@ -79,6 +79,7 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 }
 
 export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, theme: string): NodeStyle => {
+  console.log("convert_node_canvas_style_to_g6_style", style, theme);
 
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
@@ -135,6 +136,7 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, theme: string): EdgeStyle => {
+  console.log("convert_edge_canvas_style_to_g6_sytle", style, theme);
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
 
