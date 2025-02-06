@@ -16,14 +16,13 @@ export class CanvasManager {
   store: GraphStore;
   styling: GraphStyle
   private options: CanvasManagerOptions // CanvasGraph options
-  private g6Options: GraphOptions // CanvasGraph options converted to G6 options
+  // private g6Options: GraphOptions // CanvasGraph options converted to G6 options
 
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
     console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
     this.options = options;
-    this.g6Options = {};
 
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
@@ -48,13 +47,15 @@ export class CanvasManager {
   updateOptions(options: CanvasManagerOptions, callback?: () => void) {
     console.log("updateOptions input options", options);
 
-    let g6Options: GraphOptions = this.g6Options
+    let g6Options: GraphOptions = {}
     if (options.styles) {
       const styleOptions = this.styling.getUpdatedStylingOptions(options);
       g6Options = { ...g6Options, ...styleOptions, }
     }
 
     if (options.layout) {
+
+      console.log("updateOptions.options.layout", options.layout);
       g6Options['layout'] = options.layout || {}
     }
 
@@ -71,9 +72,14 @@ export class CanvasManager {
     }
 
     console.log("CanvasManager.updateOptions", g6Options);
-    this.options = options;
+
     this.graph.setOptions(g6Options);
-    this.graph.render();
+    this.graph.draw();
+    if (options.layout) {
+      this.graph.layout()
+    }
+
+    this.options = { ...this.options, ...options };
     if (callback) {
       callback()
     }

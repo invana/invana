@@ -175,7 +175,10 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
     autoResize: false,
     autoFit: 'view', // 'view' | 'graph' | 'center'
-    animation: true,
+    animation: {
+      duration: 200,
+      easing: 'linear',
+    },
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {

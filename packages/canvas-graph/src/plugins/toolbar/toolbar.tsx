@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Graph, History } from "@antv/g6";
-// import { useGraphin } from "@antv/graphin";
+import { History } from "@antv/g6";
 import {
   ButtonWithTooltip, Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue, Separator,
@@ -13,7 +12,7 @@ import {
 } from "lucide-react";
 import { ALL_AVAILABLE_LAYOUTS } from "@invana/canvas-graph/defaults/layouts";
 import { CanvasManager } from "@invana/canvas-graph/manager";
-// import { defaultLayoutsOptions } from "@invana/canvas-graph/graph__/layouts";
+
 
 export interface CanvasToolBarProps {
   getCanvasManager: () => CanvasManager
