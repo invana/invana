@@ -80,8 +80,8 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
 export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, theme: string): NodeStyle => {
 
-  const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
-  const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
+  // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
+  // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
 
   const g6Style: NodeStyle = {
     type: style.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
@@ -99,35 +99,48 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
       labelPosition: style.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
       labelAutoRotate: style.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
 
+      // lineWidth: 2,
       stroke: style.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
       strokeOpacity: style.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
 
       labelTextColor: style.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
+      // lineStroke: '#D580FF',
+
     },
     state: {
       highlight: {
         // fill: '#D580FF',
         halo: true,
-        lineWidth: 0,
+        lineWidth: 2,
+        lineStroke: '#D580FF',
       },
       dim: {
-        fill: dimFill,
-        labelFill: dimLabelFill
+        fillOpacity: 0.1,
+        labelFillOpacity: 0.1,
+        lineWidth: 0,
+
+        // fill: dimFill,
+        // labelFill: dimLabelFill
       },
     },
-    palette: {
-      type: 'group',
-      field: 'label',
-    },
-  }
+
+  };
+
+
+
+
   console.log("node.g6Style", g6Style);
 
   return g6Style;
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, theme: string): EdgeStyle => {
-  const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
-  const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
+  // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
+  // const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
+
+
+
+
 
   const g6Style: EdgeStyle = {
     style: {
@@ -153,10 +166,13 @@ export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, th
     state: {
       highlight: {
         lineWidth: 4,
+        opacity: 0.7,
       },
       dim: {
-        stroke: dimStroke,
-        labelFill: dimLabelFill,
+        // stroke: dimStroke,
+        opacity: 0.1,
+        labelFillOpacity: 0.1,
+        // labelFill: dimLabelFill,
         // opacity: 0.3
       }
     },
