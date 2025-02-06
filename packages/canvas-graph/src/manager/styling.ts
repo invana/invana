@@ -5,7 +5,7 @@ import {
   convert_edge_canvas_style_to_g6_sytle,
   convert_node_canvas_style_to_g6_style
 } from './utils';
-import { ICanvasStyle, mergeDeep } from '@invana/data-store';
+import { CanvasNodeStyle, ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
 
@@ -24,17 +24,35 @@ export class GraphStyle {
 
 
   private getUpdatedDefaultNodeStyle = (options: CanvasManagerOptions, theme: string): NodeStyle => {
-    return convert_node_canvas_style_to_g6_style(
+    const nodeStyle: NodeStyle = convert_node_canvas_style_to_g6_style(
       options?.styles?.defaultNode ?? {},
       theme as string
     )
+    if (nodeStyle.style) {
+      delete (nodeStyle.style as { fill?: string }).fill;
+    }
+
+    nodeStyle.palette = {
+      type: 'group',
+      field: 'type',
+    };
+    return nodeStyle
   }
 
   private getUpdatedDefaultEdgeStyle = (options: CanvasManagerOptions, theme: string): EdgeStyle => {
-    return convert_edge_canvas_style_to_g6_sytle(
+    const edgeStyle: EdgeStyle = convert_edge_canvas_style_to_g6_sytle(
       options?.styles?.defaultEdge ?? {},
       theme as string
     );
+
+    if (edgeStyle.style) {
+      delete (edgeStyle.style as { stroke?: string }).stroke;
+    }
+    edgeStyle.palette = {
+      type: 'group',
+      field: 'type',
+    };
+    return edgeStyle
   }
 
   // private updateOptions = (options: CanvasManagerOptions) => {

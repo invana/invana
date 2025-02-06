@@ -8,9 +8,10 @@ export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup
   shape: {
     type: 'circle',
     size: 20,
-    halo: true,
+    halo: false,
     bgColor: '#6a994e',
-    bgOpacity: 1
+    bgOpacity: 1,
+    // borderColor: '#565656',
   },
   label: {
     textColor: '#999999',
@@ -29,7 +30,7 @@ export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgrou
     halo: false,
     strokeWidth: 1,
     strokeColor: '#cad2c5',
-    strokeOpacity: 0.6,
+    strokeOpacity: 0.3,
   },
   label: {
     textColor: '#999999',
