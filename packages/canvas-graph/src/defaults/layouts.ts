@@ -57,9 +57,10 @@ export const FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'force',
   label: 'force',
 
+  animation: false,
   preventOverlap: true,
   // center: [200, 200], // Optional, default is the center of the graph
-  linkDistance: 100, // Optional, edge length
+  // linkDistance: 100, // Optional, edge length
   nodeStrength: 30, // Optional
   edgeStrength: 0.8, // Optional
   collideStrength: 0.8, // Optional
@@ -110,6 +111,7 @@ export const DAGRE_LAYOUT: CanvasGraphLayout = {
 
 export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'd3-force',
+  animation: false,
   collide: {
     //   // Prevent nodes from overlapping by specifying a collision radius for each node.
     radius: (d: NodeData) => {
@@ -121,12 +123,12 @@ export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
       }
       // return d.style && Array.isArray(d.style.size) ? d.style.size[0] * 2 : (typeof d.style.size === 'number' ? d.style.size : 0)
     }
-  }
+  },
   // link: {
   //   distance: 150,
   //   strength: 2
   // },
-  // preventOverlap: true,
+  preventOverlap: true,
   // nodeStrength: -100,   // Repulsion force between nodes
   // linkDistance: 100,   // Distance between connected nodes
   // collide: {
@@ -179,3 +181,17 @@ export const FRUCHTERMAN_LAYOUT: CanvasGraphLayout = {
   // workerEnabled: false, // Optional, enable web-worker
   // gpuEnabled: false, // Optional, enable GPU parallel computing, supported in G6 4.0
 }
+
+export const ALL_AVAILABLE_LAYOUTS: CanvasGraphLayout[] = [
+  GRAPHIN_FORCE_LAYOUT,
+  GRID_LAYOUT,
+  CIRCULAR_LAYOUT,
+  RADIAL_LAYOUT,
+  FORCE_LAYOUT,
+  GFORCE_LAYOUT,
+  DAGRE_LAYOUT,
+  D3_FORCE_LAYOUT,
+  CONCENTRIC_LAYOUT,
+  ANTV_DAGRE_LAYOUT,
+  FRUCHTERMAN_LAYOUT,
+]

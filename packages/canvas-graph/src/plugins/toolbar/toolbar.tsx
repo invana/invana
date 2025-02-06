@@ -11,6 +11,7 @@ import {
   CircleDashed, Eraser, LayoutGrid, Lock, Minus,
   MoveLeft, MoveRight, Network, Plus, RefreshCcw, Share2, Unlock
 } from "lucide-react";
+import { ALL_AVAILABLE_LAYOUTS } from "@invana/canvas-graph/defaults/layouts";
 // import { defaultLayoutsOptions } from "@invana/canvas-graph/graph__/layouts";
 
 export interface CanvasToolBarProps {
@@ -98,12 +99,12 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
 
   const updateLayout = (layoutName: string) => {
     console.log("updatedLayout called", layoutName)
-    // const layoutConfig = defaultLayoutsOptions.find((item) => item.type === layoutName);
-    // console.log("updateLayout -> layoutConfig", layoutConfig)
-    // if (layoutConfig) {
-    //   getGraph()?.setLayout(layoutConfig);
-    //   getGraph()?.render()
-    // }
+    const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
+    console.log("updateLayout -> layoutConfig", layoutConfig)
+    if (layoutConfig) {
+      getGraph()?.setLayout(layoutConfig);
+      getGraph()?.render()
+    }
   }
 
   const reDraw = () => {

@@ -78,10 +78,10 @@ const ExplorerPage: React.FC = () => {
 
   const [isReady, setIsReady] = useState(false);
   const graphManagerRef = useRef<CanvasManager | null>(null);
-  const canvasGraphRef = useRef<{
-    getGraph: () => Graph
-    // getGraphManager: () => CanvasManager
-  } | null>(null);
+  // const canvasGraphRef = useRef<{
+  //   getGraph: () => Graph
+  //   // getGraphManager: () => CanvasManager
+  // } | null>(null);
   // const canvasGraphRef = useRef<CanvasGraphProps>(null);
   // const graphManagerRef = useRef(null);
 
@@ -185,7 +185,7 @@ const ExplorerPage: React.FC = () => {
       ),
       center: (
         <>
-          {/* {isReady && canvasGraphRef.current && <CanvasToolBar getGraph={() => canvasGraphRef.current!.getGraph()} />} */}
+          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={() => graphManagerRef.current!.getGraph()} />}
         </>
       ),
       right: (
@@ -235,13 +235,13 @@ const ExplorerPage: React.FC = () => {
         initData={flightData}
         onReady={(graphManager: CanvasManager) => {
           console.log("CanvasGraph.onReady", graphManager)
-          // graphManagerRef.current = graphManager;  
-          // setIsReady(true)
+          graphManagerRef.current = graphManager;
+          setIsReady(true)
         }}
         onDestroy={() => {
           console.log("CanvasGraph.onDestroy")
-          // setIsReady(false)
-          // graphManagerRef.current = null;
+          setIsReady(false)
+          graphManagerRef.current = null;
         }}
         options={options}
       />
