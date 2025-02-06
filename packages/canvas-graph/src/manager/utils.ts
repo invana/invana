@@ -126,12 +126,7 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
     },
 
   };
-
-
-
-
   console.log("node.g6Style", g6Style);
-
   return g6Style;
 }
 
@@ -139,16 +134,11 @@ export const convert_edge_canvas_style_to_g6_sytle = (style: CanvasEdgeStyle, th
   console.log("convert_edge_canvas_style_to_g6_sytle", style, theme);
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
-
-
-
-
-
   const g6Style: EdgeStyle = {
     style: {
       type: style.shape?.type ?? DEFAULT_EDGE_STYLE.shape?.type,
       halo: style.shape?.halo ?? DEFAULT_EDGE_STYLE.shape?.halo,
-
+      endArrow: true,
       //@ts-ignore
       // labelText: (d) => d.id,
 
