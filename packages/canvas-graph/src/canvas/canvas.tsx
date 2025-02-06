@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from './types';
@@ -28,25 +28,25 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   // };
 
 
-  // useEffect(() => {
-  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-  //   document.querySelectorAll('.graph-canvas').forEach(
-  //     () => addEventListener("contextmenu", handleContextMenu));
+  useEffect(() => {
+    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+    document.querySelectorAll('.graph-canvas').forEach(
+      () => addEventListener("contextmenu", handleContextMenu));
 
-  //   return () => {
-  //     document.querySelectorAll('.graph-canvas').forEach(
-  //       () => removeEventListener("contextmenu", handleContextMenu));
-  //   };
-  // }, []);
+    return () => {
+      document.querySelectorAll('.graph-canvas').forEach(
+        () => removeEventListener("contextmenu", handleContextMenu));
+    };
+  }, []);
 
   const localRef = useRef<Graph | null>(null);
   const graphManagerRef = useRef<CanvasManager | null>(null);
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
-    // get: () => {
-    //   console.log('someMethod called');
-    // },
+    get: () => {
+      console.log('someMethod called');
+    },
     getGraph: () => {
       console.log("getGraph called", localRef.current);
       return localRef.current;
@@ -63,7 +63,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   }));
 
 
-
+  const MemoizedGraphin = React.memo(Graphin);
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
   console.log("=======options CanvasManagerOptions", options)
@@ -71,7 +71,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
 
   return (
     <div className='h-full w-full' style={props.containerStyle ?? {}}>
-      <Graphin
+      <MemoizedGraphin
         ref={localRef}
         options={{}}
         onReady={(graph) => {
