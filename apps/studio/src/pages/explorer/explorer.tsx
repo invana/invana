@@ -77,13 +77,13 @@ const ExplorerPage: React.FC = () => {
 
 
   const [isReady, setIsReady] = useState(false);
-  const graphManagerRef = useRef<CanvasManager | null>(null);
+  const canvasManagerRef = useRef<CanvasManager | null>(null);
   // const canvasGraphRef = useRef<{
   //   getGraph: () => Graph
   //   // getGraphManager: () => CanvasManager
   // } | null>(null);
   // const canvasGraphRef = useRef<CanvasGraphProps>(null);
-  // const graphManagerRef = useRef(null);
+  // const canvasManagerRef = useRef(null);
 
   const { theme, } = useThemeStore()
 
@@ -153,7 +153,7 @@ const ExplorerPage: React.FC = () => {
 
   // useEffect(() => {
   //   console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
-  //   const graph = graphManagerRef.current?.getGraph();
+  //   const graph = canvasManagerRef.current?.getGraph();
   //   if (graph && isReady) {
 
   //     graph.resize();
@@ -165,11 +165,11 @@ const ExplorerPage: React.FC = () => {
 
 
   // useEffect(() => {
-  //   console.log("theme updated====== ", theme, graphManagerRef.current, isReady)
-  //   if (graphManagerRef.current && isReady) {
+  //   console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
+  //   if (canvasManagerRef.current && isReady) {
   //     // const canvasManager = canvasGraphRef.current.getGraphManager();
   //     console.log("getUpdatedStylingOptions, theme", theme)
-  //     graphManagerRef.current.setTheme(theme)
+  //     canvasManagerRef.current.setTheme(theme)
   //   }
   // }, [theme, isReady]);
 
@@ -185,7 +185,7 @@ const ExplorerPage: React.FC = () => {
       ),
       center: (
         <>
-          {isReady && graphManagerRef.current && <CanvasToolBar getGraph={() => graphManagerRef.current!.getGraph()} />}
+          {isReady && canvasManagerRef.current ? <CanvasToolBar getCanvasManager={() => canvasManagerRef.current!} /> : null}
         </>
       ),
       right: (
@@ -233,15 +233,15 @@ const ExplorerPage: React.FC = () => {
         containerStyle={{ width: "100%", height: "100%" }}
         className={"bg-background"}
         initData={flightData}
-        onReady={(graphManager: CanvasManager) => {
-          console.log("CanvasGraph.onReady", graphManager)
-          graphManagerRef.current = graphManager;
+        onReady={(canvasManager: CanvasManager) => {
+          console.log("CanvasGraph.onReady", canvasManager)
+          canvasManagerRef.current = canvasManager;
           setIsReady(true)
         }}
         onDestroy={() => {
           console.log("CanvasGraph.onDestroy")
           setIsReady(false)
-          graphManagerRef.current = null;
+          canvasManagerRef.current = null;
         }}
         options={options}
       />

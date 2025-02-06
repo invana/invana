@@ -12,10 +12,11 @@ import {
   MoveLeft, MoveRight, Network, Plus, RefreshCcw, Share2, Unlock
 } from "lucide-react";
 import { ALL_AVAILABLE_LAYOUTS } from "@invana/canvas-graph/defaults/layouts";
+import { CanvasManager } from "@invana/canvas-graph/manager";
 // import { defaultLayoutsOptions } from "@invana/canvas-graph/graph__/layouts";
 
 export interface CanvasToolBarProps {
-  getGraph: () => Graph;
+  getCanvasManager: () => CanvasManager
   className?: string;
 }
 
@@ -25,42 +26,43 @@ const animation = {
   easing: 'linear',
 };
 
-export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, className }) => {
+export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getCanvasManager, className }) => {
 
   // const { graph: contextGraph } = useGraphin(); // Access the graph instance from context
 
-  console.log("CanvasToolBar -> graph", getGraph())
+  console.log("CanvasToolBar -> getCanvasManager", getCanvasManager())
 
+  const graph = getCanvasManager().getGraph();
 
-  const history: History | undefined = getGraph()?.getPluginInstance('history') as History;
+  const history: History | undefined = graph.getPluginInstance('history') as History;
 
   const getIsLocked = () => {
-    const behaviors = getGraph()?.getBehaviors() || [];
+    const behaviors = graph?.getBehaviors() || [];
     return !behaviors.includes('drag-element')
   }
 
   const [isLocked, setIsLocked] = useState<true | false>(getIsLocked())
 
-  const zoom = getGraph()?.getZoom() ?? 1;
+  const zoom = graph?.getZoom() ?? 1;
 
   const zoomIn = () => {
-    const currentZoom = getGraph()?.getZoom();
+    const currentZoom = graph?.getZoom();
     if (currentZoom)
-      getGraph()?.zoomTo(currentZoom + 0.2, animation);
+      graph?.zoomTo(currentZoom + 0.2, animation);
   };
 
   const zoomOut = () => {
-    const currentZoom = getGraph()?.getZoom();
+    const currentZoom = graph?.getZoom();
     if (currentZoom)
-      getGraph()?.zoomTo(currentZoom - 0.2, animation);
+      graph?.zoomTo(currentZoom - 0.2, animation);
   };
 
   // const fitView = () => {
-  //   getGraph()?.fitView({}, animation);
+  //   graph?.fitView({}, animation);
   // };
 
   const onZoomChange = (value: string) => {
-    const graph = getGraph();
+    // const graph = graph;
     if (graph) {
       if (value === "fitview") {
         graph.resize();
@@ -78,20 +80,20 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
   };
 
   const eraseCanvas = () => {
-    getGraph()?.clear();
+    graph?.clear();
   }
 
 
   const toggleLockCanvas = () => {
     // remove drag-element from behaviours
-    const behaviors = getGraph()?.getBehaviors() || [];
+    const behaviors = graph?.getBehaviors() || [];
     if (getIsLocked()) {
       const updatedBehaviors = behaviors.filter(b => b !== 'drag-element');
-      getGraph()?.setBehaviors(updatedBehaviors);
+      graph?.setBehaviors(updatedBehaviors);
       setIsLocked(false)
     } else {
       const updatedBehaviors = [...behaviors, 'drag-element'];
-      getGraph()?.setBehaviors(updatedBehaviors);
+      graph?.setBehaviors(updatedBehaviors);
       setIsLocked(true)
     }
   }
@@ -102,13 +104,13 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
     const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
     console.log("updateLayout -> layoutConfig", layoutConfig)
     if (layoutConfig) {
-      getGraph()?.setLayout(layoutConfig);
-      getGraph()?.render()
+      graph?.setLayout(layoutConfig);
+      graph?.render()
     }
   }
 
   const reDraw = () => {
-    const graph = getGraph();
+    // const graph = graph;
     if (graph) {
       graph.resize();
       graph.layout();
@@ -118,7 +120,7 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getGraph, classNam
   }
 
 
-  // if (!getGraph()) {
+  // if (!graph) {
   //   return
   // }
 
