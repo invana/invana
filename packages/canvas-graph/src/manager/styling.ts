@@ -46,7 +46,7 @@ export class GraphStyle {
 
     // update existing options with the new options 
     const options: CanvasManagerOptions = mergeDeep(this.options, newOptions);
-    console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
+    // console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
 
     let graphOptions: GraphOptions = {}
 
