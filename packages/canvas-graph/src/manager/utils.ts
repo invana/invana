@@ -108,6 +108,7 @@ export const convert_node_canvas_style_to_g6_style = (style: CanvasNodeStyle, th
       // lineStroke: '#D580FF',
 
     },
+    // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
       highlight: {
         // fill: '#D580FF',
@@ -187,6 +188,8 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
       duration: 200,
       easing: 'linear',
     },
+
+
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {

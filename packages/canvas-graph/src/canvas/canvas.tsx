@@ -69,7 +69,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
   return (
-    <div className='h-full w-full' style={props.containerStyle ?? {}}>
+    <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
       <MemoizedGraphin
         ref={localRef}
         options={options}

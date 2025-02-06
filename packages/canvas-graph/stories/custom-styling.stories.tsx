@@ -1,13 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-// import { flightData, lesMiserablesData } from '@invana/example-datasets'
-// import { flightData as data } from '@invana/example-datasets/datasets';
-import { lesMiserablesData as data } from "@invana/example-datasets";
+import { flightData, lesMiserablesData } from '@invana/example-datasets'
 import { CanvasGraph } from '@invana/canvas-graph/canvas';
 import { defaultOptions } from './constants';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta = {
-  title: 'Example',
+  title: 'Custome Styling',
   component: CanvasGraph,
   parameters: {
     layout: 'fullscreen',
@@ -17,8 +15,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-
 
 
 export const FlightData: Story = {
@@ -40,7 +36,25 @@ export const FlightData: Story = {
     //     }
     //   }
     // },
-    options: defaultOptions,
+    options: {
+      ...defaultOptions,
+      styles: {
+        nodes: {
+          'Customer Country': {
+            shape: {
+              size: 40
+            }
+          }
+        },
+        edges: {
+          'used_vehicle': {
+            shape: {
+              strokeColor: "#cccccc",
+            }
+          }
+        }
+      }
+    },
     onReady: (canvasManager) => {
       console.log("CanvasGraph.onReady canvasManager", canvasManager)
 
@@ -57,8 +71,8 @@ export const FlightData: Story = {
       //   canvasManager.render();
       // }, 3000);
     },
-    initData: data,
-    containerStyle: { "width": "100%", "height": "calc(100vh - 46px)" }
+    initData: flightData,
+    containerStyle: { "width": "100%", "height": "100vh", 'background': '#222' },
   },
 };
 

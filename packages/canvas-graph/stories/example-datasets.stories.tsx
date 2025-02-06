@@ -25,13 +25,14 @@ export const FlightData: Story = {
       nodes: flightData.nodes,
       edges: flightData.edges,
     },
-    containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" },
+    containerStyle: { "width": "100%", "height": "100vh", 'background': '#222' },
     onReady(canvasManager) {
       console.log("canvasManager", canvasManager)
       // setTimeout(() => {
       // canvasManager.styling.hideAllNodes();
       // }, 3000);
     },
+
   },
 };
 
@@ -42,6 +43,6 @@ export const LesMiserables: Story = {
       nodes: lesMiserablesData.nodes,
       edges: lesMiserablesData.edges,
     },
-    containerStyle: { "width": "100%", "height": "calc(100vh - 40px)" }
+    containerStyle: { "width": "100%", "height": "100vh", 'background': '#222' },
   },
 };
