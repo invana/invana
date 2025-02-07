@@ -1,4 +1,3 @@
-
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
@@ -13,17 +12,16 @@ import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
 import { ActivityHistoryView } from '@/ui/components/activity-history';
 import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
-import { CanvasGraphProps } from '@invana/canvas-graph';
 import {
   CANVAS_CONTEXT_MENU_BEHAVIOR, CLICK_SELECT_BEHAVIOR, DRAG_CANVAS_BEHAVIOR,
   DRAG_ELEMENT_BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR,
   HOVER_ACTIVATE_BEHAVIOR, LASSO_SELECT_BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR,
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
-import { MAP_NODE_SIZE_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
+import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
-import { ExtensionCategory, Graph, register } from '@antv/g6';
+import { ExtensionCategory, register } from '@antv/g6';
 import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
 import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
@@ -60,7 +58,8 @@ const defaultOptions: CanvasManagerOptions = {
     }
   ],
   transforms: [
-    // MAP_NODE_SIZE_TRANSFORMER
+    MAP_NODE_SIZE_TRANSFORMER,
+    PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
