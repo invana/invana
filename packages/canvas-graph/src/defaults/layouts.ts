@@ -1,5 +1,6 @@
 import { NodeData } from "@antv/g6"
 import { CanvasGraphLayout } from "../manager/types"
+import { CanvasGraphNode } from "../types"
 
 
 export const GRAPHIN_FORCE_LAYOUT: CanvasGraphLayout = {
@@ -114,12 +115,13 @@ export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
   animation: false,
   collide: {
     //   // Prevent nodes from overlapping by specifying a collision radius for each node.
-    radius: (d: NodeData) => {
+    radius: (d: CanvasGraphNode) => {
+      console.log("d3-force-layout.radius", d);
       const size = d.style?.size
       if (Array.isArray(size) && size.length > 0) {
-        return size[0] * 2
+        return size[0] * 6
       } else {
-        return 20
+        return 80
       }
       // return d.style && Array.isArray(d.style.size) ? d.style.size[0] * 2 : (typeof d.style.size === 'number' ? d.style.size : 0)
     }

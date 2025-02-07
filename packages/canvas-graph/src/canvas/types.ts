@@ -16,6 +16,7 @@ export interface CanvasGraphProps {
   onReady?: (canvasManager: CanvasManager) => void;
   onDestroy?: () => void;
   className?: string;
+  showHeader?: boolean;
 
   // interactions: CanvasInteractions
   // layouts: object[]

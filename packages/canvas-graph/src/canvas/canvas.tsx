@@ -14,11 +14,13 @@ import { CanvasToolBar } from '../plugins';
 // }
 const MemoizedGraphin = React.memo(Graphin);
 
-export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
+export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: CanvasGraphProps, ref) => {
+  const { showHeader = false } = props;
   // Sample graph data
 
 
 
+  const [isGraphReady, setIsGraphReady] = React.useState(false);
   // Ref for Graphin instance
 
   // Update layout
@@ -43,7 +45,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   // }, []);
 
   const localRef = useRef<Graph | null>(null);
-  // const canvasManagerRef = useRef<CanvasManager | null>(null);
+  const canvasManagerRef = useRef<CanvasManager | null>(null);
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
@@ -56,7 +58,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
     },
     getGraphManager: () => {
       // console.log("getGraphManager called", canvasManagerRef.current);
-      // return canvasManagerRef.current;
+      return canvasManagerRef.current;
     }
     // getGraphManager: () => {
     //   console.log("getGraphManager")
@@ -74,7 +76,9 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   return (
     <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
 
-      {/* <CanvasToolBar className='h-50' /> */}
+      {
+        isGraphReady && showHeader && <CanvasToolBar className='h-50 bg-background text-foreground' getCanvasManager={() => canvasManagerRef.current as CanvasManager} />
+      }
       <MemoizedGraphin
         ref={localRef}
         options={options}
@@ -83,7 +87,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
           const canvasManager: CanvasManager = new CanvasManager(graph, options);
           canvasManager.store.addData(initData, () => canvasManager.render());
           props?.onReady?.(canvasManager);
-          // canvasManagerRef.current = canvasManager;
+          canvasManagerRef.current = canvasManager;
+          setIsGraphReady(true);
         }}
         onDestroy={() => {
           console.log("Graphin onDestroy");
