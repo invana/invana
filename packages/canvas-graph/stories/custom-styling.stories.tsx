@@ -38,27 +38,27 @@ export const FlightData: Story = {
     // },
     options: {
       ...defaultOptions,
-      styles: {
-        nodes: {
-          'Customer Country': {
-            shape: {
-              size: 40
-            }
-          },
-          'Launch Site': {
-            shape: {
-              size: 70
-            }
-          }
-        },
-        edges: {
-          'used_vehicle': {
-            shape: {
-              strokeColor: "#cccccc",
-            }
-          }
-        }
-      }
+      // styles: {
+      //   nodes: {
+      //     'Customer Country': {
+      //       shape: {
+      //         size: 40
+      //       }
+      //     },
+      //     'Launch Site': {
+      //       shape: {
+      //         size: 70
+      //       }
+      //     }
+      //   },
+      //   edges: {
+      //     'used_vehicle': {
+      //       shape: {
+      //         strokeColor: "#cccccc",
+      //       }
+      //     }
+      //   }
+      // }
     },
     onReady: (canvasManager) => {
       console.log("CanvasGraph.onReady canvasManager", canvasManager)

@@ -91,7 +91,10 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
   const customNodeStyles = options.styles?.nodes || {};
-  const g6Style: NodeStyle = {
+
+
+
+  const g6Style: NodeStyle & { style: any } = {
     type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
       // size: (d: CanvasGraphNode) => {
@@ -167,11 +170,31 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
         // fill: dimFill,
         // labelFill: dimLabelFill
       },
-    },
-
+    }
   };
+
+  const getNodeSize = (d: CanvasGraphNode) => {
+    const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+    for (const nodeType in customNodeStyles) {
+      if (d?.data?.type === nodeType) {
+        const customStyle = customNodeStyles[nodeType];
+        return customStyle?.shape?.size ?? defaultSize
+      }
+    }
+    return defaultSize
+  }
+  if (!check_if_node_size_transformer_enabled(options)) {
+    g6Style.style.size = getNodeSize;
+
+  }
   console.log("node.g6Style", g6Style);
+
   return g6Style;
+}
+
+export const check_if_node_size_transformer_enabled = (options: CanvasManagerOptions) => {
+  return options.transforms?.some(transform => transform.key === 'map-node-size');
+
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
