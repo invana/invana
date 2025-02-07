@@ -6,6 +6,7 @@ import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
+import { CanvasToolBar } from '../plugins';
 
 
 // export interface GraphinRef extends Graph {
@@ -15,6 +16,8 @@ const MemoizedGraphin = React.memo(Graphin);
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   // Sample graph data
+
+
 
   // Ref for Graphin instance
 
@@ -70,6 +73,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
 
   return (
     <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
+
+      {/* <CanvasToolBar className='h-50' /> */}
       <MemoizedGraphin
         ref={localRef}
         options={options}

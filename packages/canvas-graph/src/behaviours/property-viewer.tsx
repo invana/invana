@@ -1,9 +1,10 @@
 import { BaseBehavior, CanvasEvent, EdgeEvent, NodeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData, EdgeData } from '@antv/g6';
+import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
 import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
 import { EdgeCard, NodeCard } from '@invana/ui';
+import { CanvasGraphEdge, CanvasGraphNode } from '../types';
 
 
 export interface PropertyViewerBehaviorOptions extends BaseBehaviorOptions {
@@ -64,7 +65,7 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
   showNodeData = (event: IPointerEvent) => {
     const { graph } = this.context;
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
-    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+    const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
     const nodeData: ICanvasNode = {
       id: node.id as string,
       label: node.label as string,
@@ -82,7 +83,7 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
   showEdgeData = (event: IPointerEvent) => {
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
-    const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
+    const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
     const edgeData: ICanvasEdge = {
       id: edge.id as string,
       label: edge.label as string,

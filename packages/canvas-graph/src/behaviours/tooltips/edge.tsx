@@ -4,6 +4,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { EdgeCard } from '@invana/ui';
 import React from 'react';
+import { CanvasGraphEdge } from '@invana/canvas-graph/types';
 
 
 export interface EdgeTooltipBehaviorOptions extends BaseBehaviorOptions {
@@ -78,7 +79,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     console.log("===onEdgeMouseOver", event)
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
-    const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
+    const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
     this.onMouseMove(event)
 
     const edgeData: ICanvasEdge = {

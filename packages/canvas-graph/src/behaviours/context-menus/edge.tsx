@@ -6,6 +6,7 @@ import { MenuItem, NestedMenu } from '@invana/ui';
 import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { EdgeCard } from '@invana/ui';
 import React from 'react';
+import { CanvasGraphEdge } from '@invana/canvas-graph/types';
 
 
 export interface EdgeContextMenuOptions extends BaseBehaviorOptions {
@@ -159,7 +160,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
     event.preventDefault();
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
-    const edge = graph.getEdgeData(edgeId) as (EdgeData & { data?: ICanvasEdge });
+    const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
 
     const edgeData: ICanvasEdge = {
       id: edge.id as string,
