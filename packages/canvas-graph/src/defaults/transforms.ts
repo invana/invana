@@ -7,8 +7,8 @@ export const MAP_NODE_SIZE_TRANSFORMER: CanvasGraphTransform = {
   key: 'map-node-size',
   scale: 'log',
   // centrality: 'degree',
-  maxSize: 60,
-  minSize: 20,
+  maxSize: 50,
+  minSize: 15,
   mapLabelSize: [8, 16],
 
 }
