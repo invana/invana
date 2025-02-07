@@ -90,6 +90,12 @@ export interface ICanvasStyle {
   bgColor: IColor;
   colorNodesBy: 'type' | 'defaultColor';
   colorEdgesBy: 'type' | 'sourceNode' | 'targetNode' | 'defaultColor';
+  // scaleNode: {
+  //   minSize: number;
+  //   maxSize: number;
+  //   scaleLabel: boolean;
+  //   scale: 'linear' | 'log' | 'pow' | 'sqrt';
+  // } 
 }
 
 
