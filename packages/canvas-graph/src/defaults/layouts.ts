@@ -104,8 +104,8 @@ export const DAGRE_LAYOUT: CanvasGraphLayout = {
   label: 'dagre',
   rankdir: 'TB', // Optional, direction for rank nodes. Available values: 'TB' 'BT' 'LR' 'RL'
   align: 'UL', // Optional, align nodes. Available values: 'UL', 'UR', 'DL', 'DR'
-  nodesep: 50, // Optional, the separation between adjacent nodes in the same rank
-  ranksep: 50, // Optional, the separation between adjacent edges in the same rank
+  nodesep: 250, // Optional, the separation between adjacent nodes in the same rank
+  ranksep: 250, // Optional, the separation between adjacent edges in the same rank
   controlPoints: true, // Optional, add intermediate control points to make edges smooth
 }
 
