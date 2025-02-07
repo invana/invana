@@ -30,7 +30,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                 hover:text-accent-foreground px-2 py-2
               ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-4 w-4" />
               </a>
             ) : item.onClick ? (
               <button
@@ -43,7 +43,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
           hover:bg-accent  hover:text-sky-500 px-2 py-2
           ${activeItem === item.name ? 'bg-accent text-sky-500' : ''}`}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-4 w-4" />
               </button>
             ) : (
               <div
@@ -52,7 +52,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
             hover:text-accent-foreground px-2 py-2
           ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-4 w-4" />
               </div>
             )}
           </TooltipTrigger>
