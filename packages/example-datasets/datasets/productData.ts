@@ -59,6 +59,15 @@ const events: ICanvasNode[] = customers.map((customer, i) => [
   },
 ]).flat();
 
+const platforms: ICanvasNode[] = [{
+  id: `platform_1`,
+  type: "Platform",
+  label: `Invana`,
+  properties: { industry: `Data Science`, employees: 10 },
+  x: getRandomInt(300, 700),
+  y: getRandomInt(300, 700),
+}];
+
 const edges: ICanvasEdge[] = customers.flatMap((customer, i) => [
   { id: `edge_cart_${i + 1}`, type: "Action", label: "Adds to Cart", source: customer.id, target: `cart_${i + 1}` },
   { id: `edge_cart_to_product_${i + 1}`, type: "Action", label: "Refers to Product", source: `cart_${i + 1}`, target: products[i % 50].id },
@@ -66,10 +75,11 @@ const edges: ICanvasEdge[] = customers.flatMap((customer, i) => [
   { id: `edge_customer_purchase_${i + 1}`, type: "Action", label: "Customer Purchase", source: customer.id, target: `purchase_${i + 1}` },
   { id: `edge_review_${i + 1}`, type: "Action", label: "Writes Review", source: customer.id, target: `review_${i + 1}` },
   { id: `edge_review_to_product_${i + 1}`, type: "Action", label: "Reviews Product", source: `review_${i + 1}`, target: products[i % 50].id },
+  { id: `edge_customer_to_platform_${i + 1}`, type: "Action", label: "Has Customer", source: platforms[0].id, target: customer.id },
 ]);
 
 export const productDataSet: ICanvasData = {
-  nodes: [...customers, ...products, ...events, ...reviews],
+  nodes: [...customers, ...products, ...events, ...reviews, ...platforms],
   edges,
 };
 
