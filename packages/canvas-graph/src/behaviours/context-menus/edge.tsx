@@ -1,5 +1,5 @@
 import { BaseBehavior, CanvasEvent, EdgeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, IPointerEvent, EdgeData, RuntimeContext } from '@antv/g6';
+import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';

@@ -18,14 +18,14 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
     y: node.y ?? 0,
 
     type: 'circle', // type ??
-    label: properties[labelField as keyof typeof properties] ?? id,
+    label: properties ? properties[labelField as keyof typeof properties] ?? id : id,
     data: {
       type: type,
       properties: properties,
     },
 
     style: {
-      size: shape?.size ?? 20,
+      // size: shape?.size ?? 20,
       // labelText: (d: any) => d[labelField] ?? id,
       // halo: true,
       // fill: shape?.bgColor,
@@ -94,16 +94,16 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   const g6Style: NodeStyle = {
     type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
-      size: (d: CanvasGraphNode) => {
-        const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
-        for (const nodeType in customNodeStyles) {
-          if (d?.data?.type === nodeType) {
-            const customStyle = customNodeStyles[nodeType];
-            return customStyle?.shape?.size ?? defaultSize
-          }
-        }
-        return defaultSize
-      },
+      // size: (d: CanvasGraphNode) => {
+      //   const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+      //   for (const nodeType in customNodeStyles) {
+      //     if (d?.data?.type === nodeType) {
+      //       const customStyle = customNodeStyles[nodeType];
+      //       return customStyle?.shape?.size ?? defaultSize
+      //     }
+      //   }
+      //   return defaultSize
+      // },
       halo: (d: CanvasGraphNode) => {
         const defaultHalo = defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo;
         for (const nodeType in customNodeStyles) {

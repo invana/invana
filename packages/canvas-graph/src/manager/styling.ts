@@ -21,7 +21,7 @@ export class GraphStyle {
     this.options = options;
   }
 
-  private getUpdatedDefaultNodeStyle = (options: CanvasManagerOptions, theme: string): NodeStyle => {
+  private getUpdatedDefaultNodeStyle = (options: CanvasManagerOptions): NodeStyle => {
     const nodeStyle: NodeStyle = convert_node_canvas_style_to_g6_style(
       options
     )
@@ -67,13 +67,13 @@ export class GraphStyle {
 
     // default node styling
     if (newOptions.styles?.defaultNode || newOptions.styles?.canvas?.theme) {
-      const DEFAULT_NODE_STYLE = this.getUpdatedDefaultNodeStyle(options, options?.styles?.canvas?.theme as string);
+      const DEFAULT_NODE_STYLE = this.getUpdatedDefaultNodeStyle(options);
       graphOptions.node = DEFAULT_NODE_STYLE as NodeOptions
     }
 
     // default edge styling
     if (newOptions.styles?.defaultEdge || newOptions.styles?.canvas?.theme) {
-      const defaulEdgeStyle = this.getUpdatedDefaultEdgeStyle(options, options?.styles?.canvas?.theme as string);
+      const defaulEdgeStyle = this.getUpdatedDefaultEdgeStyle(options);
       graphOptions.edge = defaulEdgeStyle as EdgeOptions
     }
 

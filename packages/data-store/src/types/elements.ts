@@ -13,7 +13,7 @@ export interface ICanvasElement {
   id: ICanvasItemID | string;
   type: string; // ex: Person, Entities
   label?: string; // this will be the display label; not the node label
-  properties: IProperties;
+  properties?: IProperties;
   // displayLabel?: string;
 }
 

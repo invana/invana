@@ -36,7 +36,12 @@ const platforms: ICanvasNode[] = [{
 }];
 
 const edges: ICanvasEdge[] = customers.flatMap((customer, i) => {
-  const productCount = getRandomInt(0, 3); // Each customer can have 0-3 products
+  let productCount;
+  if (i < 25) { // First half of customers
+    productCount = getRandomInt(2, 5); // Buy 2-5 products
+  } else {
+    productCount = getRandomInt(0, 1); // Buy 0-1 products
+  }
   const customerProducts = Array.from({ length: productCount }, (_, j) => products[getRandomInt(0, products.length - 1)]);
   const hasReview = Math.random() < 0.7; // 70% chance of having a review
 
@@ -44,11 +49,34 @@ const edges: ICanvasEdge[] = customers.flatMap((customer, i) => {
   const purchaseId = `purchase_${i + 1}`;
   const reviewId = `review_${i + 1}`;
 
-  const events = [
-    { id: cartId, type: "Event", label: "Add to Cart", properties: { timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)) }, x: getRandomInt(50, 500), y: getRandomInt(50, 500) },
-    { id: purchaseId, type: "Event", label: "Purchase", properties: { timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)), payment: "Credit Card" }, x: getRandomInt(50, 500), y: getRandomInt(50, 500) },
-    { id: reviewId, type: "Event", label: "Write Review", properties: { rating: getRandomInt(1, 5), comment: `Review for customer ${i + 1}`, timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)) }, x: getRandomInt(50, 500), y: getRandomInt(600, 900) }
-  ];
+  const cartNode = {
+    id: cartId,
+    type: "AddToCart",
+    label: "Add to Cart",
+    properties: { timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)) },
+    x: getRandomInt(50, 500),
+    y: getRandomInt(50, 500),
+  };
+
+  const purchaseNode = {
+    id: purchaseId,
+    type: "Purchased",
+    label: "Purchase",
+    properties: { timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)), payment: "Credit Card" },
+    x: getRandomInt(50, 500),
+    y: getRandomInt(50, 500),
+  };
+
+  const reviewNode = {
+    id: reviewId,
+    type: "Review",
+    label: "Write Review",
+    properties: { rating: getRandomInt(1, 5), comment: `Review for customer ${i + 1}`, timestamp: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)) },
+    x: getRandomInt(50, 500),
+    y: getRandomInt(600, 900),
+  };
+
+  const allEventNodes = [cartNode, purchaseNode, reviewNode]
 
   const reviewEdges = hasReview ? [
     { id: `edge_review_${i + 1}`, type: "Action", label: "Writes Review", source: customer.id, target: reviewId },
@@ -88,7 +116,6 @@ const edges: ICanvasEdge[] = customers.flatMap((customer, i) => {
 // Extract event nodes from edges
 const eventNodes = edges.reduce((acc, edge) => {
   if (edge.source.startsWith('cart_') && !acc.find(node => node.id === edge.source)) {
-    const customerIndex = parseInt(edge.source.split('_')[1])
     acc.push({
       id: edge.source,
       type: "Event",
@@ -99,7 +126,6 @@ const eventNodes = edges.reduce((acc, edge) => {
     })
   }
   if (edge.source.startsWith('purchase_') && !acc.find(node => node.id === edge.source)) {
-    const customerIndex = parseInt(edge.source.split('_')[1])
     acc.push({
       id: edge.source,
       type: "Event",

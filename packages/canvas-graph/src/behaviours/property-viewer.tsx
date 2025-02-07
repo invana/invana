@@ -1,5 +1,5 @@
 import { BaseBehavior, CanvasEvent, EdgeEvent, NodeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, NodeData } from '@antv/g6';
+import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent } from '@antv/g6';
 import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
