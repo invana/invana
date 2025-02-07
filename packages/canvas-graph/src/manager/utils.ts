@@ -153,6 +153,9 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
 
       // lineStroke: '#D580FF',
 
+      // iconFontFamily: 'iconfont',
+      // iconText: '\ue602',
+
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
