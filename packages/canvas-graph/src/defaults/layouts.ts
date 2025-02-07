@@ -118,11 +118,10 @@ export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
       console.log("d3-force-layout.radius", d);
       const size = d.style?.size
       if (Array.isArray(size) && size.length > 0) {
-        return size[0] * 6
+        return size[0] * 2.5
       } else {
-        return 80
+        return 40
       }
-      // return d.style && Array.isArray(d.style.size) ? d.style.size[0] * 2 : (typeof d.style.size === 'number' ? d.style.size : 0)
     }
   },
   // link: {
@@ -132,9 +131,7 @@ export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
   preventOverlap: true,
   // nodeStrength: -100,   // Repulsion force between nodes
   // linkDistance: 100,   // Distance between connected nodes
-  // collide: {
-  //   radius: 40,
-  // },
+
 }
 
 export const CONCENTRIC_LAYOUT: CanvasGraphLayout = {
