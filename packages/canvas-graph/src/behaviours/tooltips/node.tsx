@@ -4,6 +4,7 @@ import { ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
 import { NodeCard } from '@invana/ui';
+import { CanvasGraphNode } from '@invana/canvas-graph/types';
 
 
 export interface NodeTooltipBehaviorOptions extends BaseBehaviorOptions {
@@ -85,7 +86,7 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     const { graph } = this.context;
     console.log("onNodeMouseOver", event)
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
-    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+    const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
     console.log("NodeEvent.POINTER_OVER node", node)
     this.onNodeMouseMove(event)
 

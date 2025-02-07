@@ -4,6 +4,7 @@ import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
 import { CanvasManagerOptions } from "./types";
+import { CanvasGraphNode } from "../types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
@@ -49,12 +50,13 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
   const { id, type, properties, display, source, target } = node;
 
-  const labelField = display?.fields?.labelField;
-  return {
+  const labelField = display?.fields;
+  console.log("=====labelField", labelField)
+  const data: EdgeData = {
     id: id,
     source: source,
     target: target,
-    label: properties[labelField as keyof typeof properties] ?? id,
+    // label: properties[labelField as keyof typeof properties] ?? id,
     data: {
       type: type,
       properties: properties,
@@ -77,6 +79,9 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
     },
   };
 
+  // data['']
+  return data
+
 }
 
 export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
@@ -85,31 +90,64 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   const defaultStyle: CanvasNodeStyle = options.styles?.defaultNode || {};
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
-
+  const customNodeStyles = options.styles?.nodes || {};
   const g6Style: NodeStyle = {
     type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
-      size: () => {
-        const size = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
-        return size
+      size: (d: CanvasGraphNode) => {
+        const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+        for (const nodeType in customNodeStyles) {
+          if (d?.data?.type === nodeType) {
+            const customStyle = customNodeStyles[nodeType];
+            return customStyle?.shape?.size ?? defaultSize
+          }
+        }
+        return defaultSize
       },
-      halo: defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo,
+      halo: (d: CanvasGraphNode) => {
+        const defaultHalo = defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo;
+        for (const nodeType in customNodeStyles) {
+          if (d?.data?.type === nodeType) {
+            const customStyle = customNodeStyles[nodeType];
+            return customStyle?.shape?.halo ?? defaultHalo
+          }
+        }
+        return defaultHalo
+      },
 
-      //@ts-ignore
-      labelText: (d) => d.id,
-      // fill
+      labelText: (d: CanvasGraphNode) => {
+        for (const nodeType in customNodeStyles) {
+          if (d?.data?.type === nodeType) {
+            const customStyle = customNodeStyles[nodeType];
+            const labelField = customStyle?.fields?.labelField;
+
+            if (!labelField) {
+              return d.id;
+            }
+            // else {
+            //   if (labelField.includes("properties.")) {
+            //     const propertyFieldName = labelField.split(".")[1];
+            //     return d.data.properties.get(propertyFieldName) ?? d.id;
+            //   }
+            //   return d.data.properties[labelField as keyof typeof d.data.properties] ?? d.id;
+            // }
+            return customStyle?.shape?.halo ?? d.id
+          }
+        }
+        return d.id
+      },// fill
       fill: defaultStyle.shape?.bgColor ?? DEFAULT_NODE_STYLE?.shape?.bgColor,
       fillOpacity: defaultStyle.shape?.bgOpacity ?? DEFAULT_NODE_STYLE?.shape?.bgOpacity,
 
       // label
       labelPosition: defaultStyle.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
       labelAutoRotate: defaultStyle.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
+      labelTextColor: defaultStyle.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
 
       // lineWidth: 2,
       stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
       strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
 
-      labelTextColor: defaultStyle.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
       // lineStroke: '#D580FF',
 
     },

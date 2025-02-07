@@ -6,6 +6,7 @@ import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
 import { FolderOpen, Settings, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 import React from 'react';
+import { CanvasGraphNode } from '@invana/canvas-graph/types';
 
 
 export interface NodeContextMenuOptions extends BaseBehaviorOptions {
@@ -141,7 +142,7 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     event.preventDefault();
     const { graph } = this.context;
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
-    const node = graph.getNodeData(nodeId) as (NodeData & { data?: ICanvasNode });
+    const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
 
     const nodeData: ICanvasNode = {
       id: node.id as string,
