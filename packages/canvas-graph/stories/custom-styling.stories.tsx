@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { flightData, lesMiserablesData, productDataSet } from '@invana/example-datasets'
+import { productDataSet } from '@invana/example-datasets'
 import { CanvasGraph } from '@invana/canvas-graph/canvas';
 import { defaultOptions } from './constants';
 
@@ -78,6 +78,7 @@ export const FlightData: Story = {
     },
     initData: productDataSet,
     containerStyle: { "width": "100%", "height": "100vh", 'background': '#222' },
+    showHeader: true
   },
 };
 
