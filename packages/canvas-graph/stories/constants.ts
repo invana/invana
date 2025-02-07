@@ -4,7 +4,7 @@ import {
   HOVER_ACTIVATE_BEHAVIOR, LASSO_SELECT_BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR,
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
-import { MAP_NODE_SIZE_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
+import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 import { GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
@@ -40,6 +40,7 @@ export const defaultOptions: CanvasManagerOptions = {
   ],
   transforms: [
     // MAP_NODE_SIZE_TRANSFORMER
+    PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
