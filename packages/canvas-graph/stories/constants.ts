@@ -54,3 +54,5 @@ export const defaultOptions: CanvasManagerOptions = {
     }
   }
 }
+
+export const defaultContainerStyle = { "width": "100%", "height": "100vh", 'background': '#222' }

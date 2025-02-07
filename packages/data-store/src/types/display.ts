@@ -27,7 +27,7 @@ export interface ICanvasTextDisplay {
 export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanvasTextDisplay { }
 
 export interface ICanvasNodeShapeDisplay extends ICanvasNodeShapeDisplayBase {
-  type: string;
+  type: 'circle' | 'rect' | 'diamond' | 'hexagon' | 'triangle' | 'ellipse' | 'star' | string;
   size: number;
 
   halo: boolean;
