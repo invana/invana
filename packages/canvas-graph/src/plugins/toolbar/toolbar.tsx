@@ -247,6 +247,18 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getCanvasManager, 
             <CircleDashed className="h-4 w-4" />
           </ButtonWithTooltip>
         </ToggleGroupItem>
+        {/* <ToggleGroupItem value="radial">
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-sm"
+            asChild
+
+            className="rounded-none"
+            tooltip={<p>radial Layout</p>}
+          >
+            <CircleDashed className="h-4 w-4" />
+          </ButtonWithTooltip>
+        </ToggleGroupItem> */}
 
         <ToggleGroupItem value="grid">
           <ButtonWithTooltip
