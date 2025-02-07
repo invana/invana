@@ -1,4 +1,3 @@
-import { NodeData } from "@antv/g6"
 import { CanvasGraphLayout } from "../manager/types"
 import { CanvasGraphNode } from "../types"
 

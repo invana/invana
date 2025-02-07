@@ -39,7 +39,7 @@ export const defaultOptions: CanvasManagerOptions = {
     PROPERTY_VIEWER_BEHAVIOR
   ],
   transforms: [
-    // MAP_NODE_SIZE_TRANSFORMER
+    MAP_NODE_SIZE_TRANSFORMER,
     PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [

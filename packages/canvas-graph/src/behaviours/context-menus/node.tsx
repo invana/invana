@@ -1,5 +1,5 @@
 import { BaseBehavior, CanvasEvent, NodeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, IPointerEvent, NodeData, RuntimeContext } from '@antv/g6';
+import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
