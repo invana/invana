@@ -158,11 +158,11 @@ export const CONCENTRIC_LAYOUT: CanvasGraphLayout = {
 
 export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   type: 'antv-dagre',
-  label: 'dagre',
+  label: 'antv-dagre',
 
   nodeSize: [60, 30],
-  nodesep: 60,
-  ranksep: 40,
+  nodesep: 260,
+  ranksep: 140,
   controlPoints: true,
   rankdir: 'LR', // Optional, default is the center of the graph
   // align: 'DL', // Optional
