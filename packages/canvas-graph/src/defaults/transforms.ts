@@ -9,3 +9,8 @@ export const MAP_NODE_SIZE_TRANSFORMER: CanvasGraphTransform = {
   minSize: 20,
   mapLabelSize: [8, 24]
 }
+
+export const PROCESS_PARALLEL_TRANSFORMER: CanvasGraphTransform = {
+  type: 'process-parallel-edges',
+  key: 'process-parallel-edges',
+}

@@ -1,4 +1,4 @@
-import Graph from "graphology";
+import Graph, { MultiGraph } from "graphology";
 
 
 // export interface IGraphBase {
@@ -11,7 +11,7 @@ export class GraphBase {
   data: Graph;
 
   constructor() {
-    this.data = new Graph();
+    this.data = new MultiGraph();
   }
 
   public getGraph(): Graph {
