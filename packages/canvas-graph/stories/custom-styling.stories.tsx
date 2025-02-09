@@ -26,20 +26,23 @@ export const FlightData: Story = {
         nodes: {
           'Customer Country': {
             shape: {
-              size: 40
+              size: 40,
+              type: 'rect',
             }
           },
           'Launch Site': {
             shape: {
-              size: 70
+              size: 70,
+              type: 'hexagon',
             }
           }
         },
         edges: {
-          'used_vehicle': {
+          'launched_from': {
             shape: {
               strokeColor: "#cccccc",
-            }
+              type: 'line'
+            },
           }
         }
       }

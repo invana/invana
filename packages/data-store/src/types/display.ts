@@ -27,18 +27,19 @@ export interface ICanvasTextDisplay {
 export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanvasTextDisplay { }
 
 export interface ICanvasNodeShapeDisplay extends ICanvasNodeShapeDisplayBase {
-  type: 'circle' | 'rect' | 'diamond' | 'hexagon' | 'triangle' | 'ellipse' | 'star' | string;
+  type: 'circle' | 'rect' | 'diamond' | 'hexagon' | 'triangle' | 'star' | string;
   size: number;
 
   halo: boolean;
   animated: boolean;
 
   iconFontFamily: string;
-  iconCode: string;
-  iconColor: IColor;
-  iconSize: number;
-  iconOpacity: number;
-  iconRotate: number;
+  iconText: string;
+  iconSrc: string; // for a remote image to load
+  // iconColor: IColor;
+  // iconSize: number;
+  // iconOpacity: number;
+  // iconRotate: number;
 }
 
 export interface ICanvasEdgeShapeDisplay {
@@ -60,10 +61,10 @@ export interface ICanvasEdgeShapeDisplay {
 
 
 export interface ICanvasNodeImportantFields {
-  labelField: string;
-  geoField: string;
-  imageField: string;
-  timestampField: string;
+  labelField: string | undefined;
+  geoField: string | undefined;
+  imageField: string | undefined;
+  timestampField: string | undefined;
 }
 export interface CanvasNodeStyle {
   shape?: Partial<ICanvasNodeShapeDisplay>;
