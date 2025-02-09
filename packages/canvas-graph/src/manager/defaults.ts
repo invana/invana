@@ -19,6 +19,7 @@ export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup
     textPosition: 'top',
     textAutoRotate: true
   },
+
   fields: {
     labelField: 'id'
   }

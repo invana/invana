@@ -27,17 +27,23 @@ export const FlightData: Story = {
           'Customer Country': {
             shape: {
               size: 40,
-              type: 'rect'
+              type: 'rect',
+              iconSrc: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnKLdsc-TdAF7KaMurqTv97pngOg3NzFnHGg&s'
             },
             label: {
               textColor: 'red'
+            }
+          },
+          'Vehicle Type': {
+            shape: {
+              iconText: '🚀',
             }
           },
           'Launch Site': {
             shape: {
               size: 70,
               type: 'hexagon',
-              iconText: '🚀',
+              iconText: '🏞'
             }
           }
         },

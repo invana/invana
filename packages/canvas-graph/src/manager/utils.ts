@@ -154,8 +154,10 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
       strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
       // lineStroke: '#D580FF',
       // iconFontFamily: 'iconfont',
-      iconFontFamily: (d: CanvasGraphNode) => do_style_override(d, 'iconFontFamily', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.iconFontFamily),
-      iconText: (d: CanvasGraphNode) => do_style_override(d, 'iconText', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.iconText)
+      iconFontFamily: (d: CanvasGraphNode) => do_style_override(d, 'iconFontFamily', 'shape', customNodeStyles, undefined),
+      iconText: (d: CanvasGraphNode) => do_style_override(d, 'iconText', 'shape', customNodeStyles, undefined),
+      iconSrc: (d: CanvasGraphNode) => do_style_override(d, 'iconSrc', 'shape', customNodeStyles, undefined),
+
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
@@ -189,7 +191,14 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   if (!check_if_node_size_transformer_enabled(options)) {
     // g6Style.style.size = getNodeSize;
     g6Style.style.size = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
+    if (g6Style.style.iconSrc) {
+      g6Style.style.iconHeight = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
+      g6Style.style.iconWidth = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
+    }
+
   }
+
+
   console.log("node.g6Style", g6Style);
   return g6Style;
 }
