@@ -226,7 +226,7 @@ export const NodeDisplaySettings: React.FC<NodeDisplaySettingsProps> = ({ showRe
       row: "icon-main",
     },
     {
-      name: "iconCode",
+      name: "iconText",
       type: "icon" as const,
       group: "icon",
       row: "icon-main",
@@ -423,7 +423,7 @@ export const NodeDisplaySettings: React.FC<NodeDisplaySettingsProps> = ({ showRe
     },
     {
       id: "icon-main-1",
-      fields: ["iconCode", "iconSize"],
+      fields: ["iconText", "iconSize"],
     },
     {
       id: "icon-main-2",

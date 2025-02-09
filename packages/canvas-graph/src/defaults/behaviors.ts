@@ -23,6 +23,7 @@ export const ZOOM_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
 export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
   type: 'hover-activate',
   key: 'hover-activate',
+  animated: true,
   degree: 1,
   state: 'highlight',
   inactiveState: 'dim',
@@ -39,7 +40,8 @@ export const CLICK_SELECT_BEHAVIOR: CanvasGraphBehavior = {
   type: 'click-select',
   key: 'click-select',
   multiple: true,
-  trigger: 'ctrl',
+  trigger: ['shift'],
+
 }
 
 export const LASSO_SELECT_BEHAVIOR: CanvasGraphBehavior = {

@@ -4,7 +4,7 @@ import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
 import { CanvasManagerOptions } from "./types";
-import { CanvasGraphNode } from "../types";
+import { CanvasGraphEdge, CanvasGraphNode } from "../types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
@@ -39,7 +39,7 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
       // fontOpacity: label?.textOpacity,
 
       // iconFontFamily: shape?.iconFontFamily,
-      // iconText: shape?.iconCode,
+      // iconText: shape?.iconText,
     },
   };
 
@@ -75,7 +75,7 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
       // fontOpacity: label?.textOpacity,
 
       // iconFontFamily: shape?.iconFontFamily,
-      // iconText: shape?.iconCode,
+      // iconText: shape?.iconText,
     },
   };
 
@@ -85,6 +85,9 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 }
 
 export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
+  /*
+  https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
+  */
   console.log("convert_node_canvas_style_to_g6_style", options);
 
   const defaultStyle: CanvasNodeStyle = options.styles?.defaultNode || {};
@@ -92,10 +95,17 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
   const customNodeStyles = options.styles?.nodes || {};
 
-
-
   const g6Style: NodeStyle & { style: any } = {
-    type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
+    type: (d: CanvasGraphNode) => {
+      for (const nodeType in customNodeStyles) {
+        if (d?.data?.type === nodeType) {
+          const customStyle = customNodeStyles[nodeType];
+          return customStyle?.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type
+        }
+      }
+      return DEFAULT_NODE_STYLE?.shape?.type
+    },
+    // type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
       // size: (d: CanvasGraphNode) => {
       //   const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
@@ -150,12 +160,13 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
       // lineWidth: 2,
       stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
       strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
-
       // lineStroke: '#D580FF',
-
       // iconFontFamily: 'iconfont',
       // iconText: '\ue602',
-
+      // iconText: '\uD83E\uDD84'
+      // iconText: '✈',
+      // iconHeight: 30,
+      // iconWidth: 30,
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
@@ -172,7 +183,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
 
         // fill: dimFill,
         // labelFill: dimLabelFill
-      },
+      }
     }
   };
 
@@ -188,33 +199,58 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   }
   if (!check_if_node_size_transformer_enabled(options)) {
     g6Style.style.size = getNodeSize;
-
   }
   console.log("node.g6Style", g6Style);
-
   return g6Style;
 }
 
 export const check_if_node_size_transformer_enabled = (options: CanvasManagerOptions) => {
   return options.transforms?.some(transform => transform.key === 'map-node-size');
-
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
-
   console.log("convert_edge_canvas_style_to_g6_sytle options", options);
-
   const defaultStyle: CanvasEdgeStyle = options?.styles?.defaultEdge || {};
+  const customEdgeStyles = options.styles?.edges || {};
+
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimStroke = theme === 'dark' ? '#232323' : '#cccccc';
   const g6Style: EdgeStyle = {
+
+    type: (d: CanvasGraphEdge) => {
+      for (const edgeType in customEdgeStyles) {
+        if (d?.data?.type === edgeType) {
+          const customStyle = customEdgeStyles[edgeType];
+          return customStyle?.shape?.type ?? DEFAULT_EDGE_STYLE?.shape?.type
+        }
+      }
+      return DEFAULT_EDGE_STYLE.shape?.type
+    },
+
     style: {
-      type: defaultStyle.shape?.type ?? DEFAULT_EDGE_STYLE.shape?.type,
+
       halo: defaultStyle.shape?.halo ?? DEFAULT_EDGE_STYLE.shape?.halo,
       endArrow: true,
       //@ts-ignore
       // labelText: (d) => d.id,
+      labelText: (d: CanvasGraphEdge) => {
+        for (const edgeType in customEdgeStyles) {
+          if (d?.data?.type === edgeType) {
+            const customStyle = customEdgeStyles[edgeType];
+            const labelField = customStyle?.fields?.labelField;
 
+            if (labelField) {
+              if (labelField.includes("properties.")) {
+                const propertyFieldName = labelField.split(".")[1];
+                return d.data.properties ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
+              } else if (labelField === "id") {
+                return d.id;
+              }
+            }
+          }
+        }
+
+      },// fill
       // stroke
       lineWidth: defaultStyle.shape?.strokeWidth ?? DEFAULT_EDGE_STYLE.shape?.strokeWidth,
       stroke: defaultStyle.shape?.strokeColor ?? DEFAULT_EDGE_STYLE.shape?.strokeColor,
@@ -226,7 +262,6 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
 
       // opacity
       opacity: defaultStyle.shape?.strokeOpacity ?? DEFAULT_EDGE_STYLE.shape?.strokeOpacity,
-
     },
     state: {
       highlight: {
@@ -251,7 +286,6 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
 }
 
 export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<GraphOptions> => {
-
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
     autoResize: false,
@@ -259,9 +293,7 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
     animation: {
       duration: 200,
       easing: 'linear',
-    },
-
-
+    }
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {
