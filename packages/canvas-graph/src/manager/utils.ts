@@ -3,7 +3,7 @@ import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
 import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
-import { CanvasManagerOptions } from "./types";
+import { CanvasManagerOptions, ICanvasStyleOptions } from "./types";
 import { CanvasGraphEdge, CanvasGraphNode } from "../types";
 
 
@@ -84,6 +84,29 @@ export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => 
 
 }
 
+export const do_node_shape_override = (d: CanvasGraphNode,
+  fieldName: string,
+  dataType: 'shape' | 'label' | 'state',
+  customNodeStyles: ICanvasStyleOptions['nodes'], defaultValue: undefined | any) => {
+  /*
+
+  */
+  for (const nodeType in customNodeStyles) {
+    if (d?.data?.type === nodeType) {
+      const customStyle = customNodeStyles[nodeType];
+      if (dataType === 'shape') {
+        return customStyle?.shape?.[fieldName as keyof typeof customStyle.shape] ?? defaultValue
+      } else if (dataType === 'label') {
+        return customStyle?.label?.[fieldName as keyof typeof customStyle.label] ?? defaultValue
+      }
+      // else if (dataType === 'state') {
+      //   return customStyle?.state?.[fieldName as keyof typeof customStyle.state] ?? defaultValue
+      // }
+    }
+  }
+  return defaultValue
+}
+
 export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
@@ -96,37 +119,30 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   const customNodeStyles = options.styles?.nodes || {};
 
   const g6Style: NodeStyle & { style: any } = {
-    type: (d: CanvasGraphNode) => {
-      for (const nodeType in customNodeStyles) {
-        if (d?.data?.type === nodeType) {
-          const customStyle = customNodeStyles[nodeType];
-          return customStyle?.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type
-        }
-      }
-      return DEFAULT_NODE_STYLE?.shape?.type
-    },
+    // type: (d: CanvasGraphNode) => {
+    //   for (const nodeType in customNodeStyles) {
+    //     if (d?.data?.type === nodeType) {
+    //       const customStyle = customNodeStyles[nodeType];
+    //       return customStyle?.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type
+    //     }
+    //   }
+    //   return DEFAULT_NODE_STYLE?.shape?.type
+    // },
+    type: (d: CanvasGraphNode) => do_node_shape_override(d, 'type', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.type),
     // type: defaultStyle.shape?.type ?? DEFAULT_NODE_STYLE?.shape?.type,
     style: {
-      // size: (d: CanvasGraphNode) => {
-      //   const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+      halo: (d: CanvasGraphNode) => do_node_shape_override(d, 'halo', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.halo),
+
+      // halo: (d: CanvasGraphNode) => {
+      //   const defaultHalo = defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo;
       //   for (const nodeType in customNodeStyles) {
       //     if (d?.data?.type === nodeType) {
       //       const customStyle = customNodeStyles[nodeType];
-      //       return customStyle?.shape?.size ?? defaultSize
+      //       return customStyle?.shape?.halo ?? defaultHalo
       //     }
       //   }
-      //   return defaultSize
+      //   return defaultHalo
       // },
-      halo: (d: CanvasGraphNode) => {
-        const defaultHalo = defaultStyle.shape?.halo ?? DEFAULT_NODE_STYLE?.shape?.halo;
-        for (const nodeType in customNodeStyles) {
-          if (d?.data?.type === nodeType) {
-            const customStyle = customNodeStyles[nodeType];
-            return customStyle?.shape?.halo ?? defaultHalo
-          }
-        }
-        return defaultHalo
-      },
 
       labelText: (d: CanvasGraphNode) => {
         for (const nodeType in customNodeStyles) {
@@ -149,24 +165,29 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
         }
         return d.id
       },// fill
-      fill: defaultStyle.shape?.bgColor ?? DEFAULT_NODE_STYLE?.shape?.bgColor,
-      fillOpacity: defaultStyle.shape?.bgOpacity ?? DEFAULT_NODE_STYLE?.shape?.bgOpacity,
+      fill: (d: CanvasGraphNode) => do_node_shape_override(d, 'bgColor', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.bgColor),
+      // fill: defaultStyle.shape?.bgColor ?? DEFAULT_NODE_STYLE?.shape?.bgColor,
+      // fillOpacity: defaultStyle.shape?.bgOpacity ?? DEFAULT_NODE_STYLE?.shape?.bgOpacity,
+      fillOpacity: (d: CanvasGraphNode) => do_node_shape_override(d, 'bgOpacity', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.bgOpacity),
 
       // label
-      labelPosition: defaultStyle.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
-      labelAutoRotate: defaultStyle.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
-      labelTextColor: defaultStyle.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
+      // labelPosition: defaultStyle.label?.textPosition ?? DEFAULT_NODE_STYLE?.label?.textPosition,
+      labelPosition: (d: CanvasGraphNode) => do_node_shape_override(d, 'textPosition', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textPosition),
+      labelAutoRotate: (d: CanvasGraphNode) => do_node_shape_override(d, 'textAutoRotate', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textAutoRotate),
+      labelTextColor: (d: CanvasGraphNode) => do_node_shape_override(d, 'textColor', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textColor),
+
+      // labelAutoRotate: defaultStyle.label?.textAutoRotate ?? DEFAULT_NODE_STYLE?.label?.textAutoRotate,
+      // labelTextColor: defaultStyle.label?.textColor ?? DEFAULT_NODE_STYLE?.label?.textColor,
 
       // lineWidth: 2,
-      stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
+      // stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
+      stroke: (d: CanvasGraphNode) => do_node_shape_override(d, 'borderColor', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.borderColor),
+
       strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
       // lineStroke: '#D580FF',
       // iconFontFamily: 'iconfont',
-      // iconText: '\ue602',
-      // iconText: '\uD83E\uDD84'
-      // iconText: '✈',
-      // iconHeight: 30,
-      // iconWidth: 30,
+      iconFontFamily: (d: CanvasGraphNode) => do_node_shape_override(d, 'iconFontFamily', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.iconFontFamily),
+      iconText: (d: CanvasGraphNode) => do_node_shape_override(d, 'iconText', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.iconText)
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
@@ -187,18 +208,19 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
     }
   };
 
-  const getNodeSize = (d: CanvasGraphNode) => {
-    const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
-    for (const nodeType in customNodeStyles) {
-      if (d?.data?.type === nodeType) {
-        const customStyle = customNodeStyles[nodeType];
-        return customStyle?.shape?.size ?? defaultSize
-      }
-    }
-    return defaultSize
-  }
+  // const getNodeSize = (d: CanvasGraphNode) => {
+  //   const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
+  //   for (const nodeType in customNodeStyles) {
+  //     if (d?.data?.type === nodeType) {
+  //       const customStyle = customNodeStyles[nodeType];
+  //       return customStyle?.shape?.size ?? defaultSize
+  //     }
+  //   }
+  //   return defaultSize
+  // }
   if (!check_if_node_size_transformer_enabled(options)) {
-    g6Style.style.size = getNodeSize;
+    // g6Style.style.size = getNodeSize;
+    g6Style.style.size = (d: CanvasGraphNode) => do_node_shape_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
   }
   console.log("node.g6Style", g6Style);
   return g6Style;

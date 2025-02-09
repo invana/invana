@@ -27,13 +27,17 @@ export const FlightData: Story = {
           'Customer Country': {
             shape: {
               size: 40,
-              type: 'rect',
+              type: 'rect'
+            },
+            label: {
+              textColor: 'red'
             }
           },
           'Launch Site': {
             shape: {
               size: 70,
               type: 'hexagon',
+              iconText: '🚀',
             }
           }
         },
@@ -41,7 +45,7 @@ export const FlightData: Story = {
           'launched_from': {
             shape: {
               strokeColor: "#cccccc",
-              type: 'line'
+              // type: 'line'
             },
           }
         }
