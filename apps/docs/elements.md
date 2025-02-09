@@ -35,3 +35,6 @@ https://g6.antv.antgroup.com/en/manual/core-concept/element
 
 ### registering the icon
 https://graphin.antv.vision/en-US/graphin/render/demos
+
+
+https://graphin.antv.vision/en-US/graphin/render/node

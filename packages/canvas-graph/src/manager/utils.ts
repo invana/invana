@@ -1,4 +1,4 @@
-import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle } from "@invana/data-store";
+import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle, mergeDeep } from "@invana/data-store";
 import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
 import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
@@ -11,7 +11,7 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
 
   const { id, type, properties, display } = node;
   const labelField = display?.fields?.labelField;
-  const shape = display?.shape;
+  // const shape = display?.shape;
   return {
     id: id,
     x: node.x ?? 0,
@@ -114,15 +114,14 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   */
   console.log("convert_node_canvas_style_to_g6_style", options);
 
-  const defaultStyle: CanvasNodeStyle = options.styles?.defaultNode || {};
+  const defaultStyle: CanvasNodeStyle = mergeDeep(DEFAULT_NODE_STYLE, options.styles?.defaultNode || {});
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
   const customNodeStyles = options.styles?.nodes || {};
-
   const g6Style: NodeStyle & { style: any } = {
-    type: (d: CanvasGraphNode) => do_style_override(d, 'type', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.type),
+    type: (d: CanvasGraphNode) => do_style_override(d, 'type', 'shape', customNodeStyles, defaultStyle?.shape?.type),
     style: {
-      halo: (d: CanvasGraphNode) => do_style_override(d, 'halo', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.halo),
+      halo: (d: CanvasGraphNode) => do_style_override(d, 'halo', 'shape', customNodeStyles, defaultStyle?.shape?.halo),
       labelText: (d: CanvasGraphNode) => {
         for (const nodeType in customNodeStyles) {
           if (d?.data?.type === nodeType) {
@@ -132,6 +131,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
             if (labelField) {
               if (labelField.includes("properties.")) {
                 const propertyFieldName = labelField.split(".")[1];
+                //@ts-ignore
                 return d.data.properties && propertyFieldName ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
               } else if (labelField === "id") {
                 return d.id;
@@ -141,19 +141,17 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
         }
         return d.id
       },// fill
-      fill: (d: CanvasGraphNode) => do_style_override(d, 'bgColor', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.bgColor),
-      fillOpacity: (d: CanvasGraphNode) => do_style_override(d, 'bgOpacity', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.bgOpacity),
-
+      fill: (d: CanvasGraphNode) => do_style_override(d, 'bgColor', 'shape', customNodeStyles, defaultStyle?.shape?.bgColor),
+      fillOpacity: (d: CanvasGraphNode) => do_style_override(d, 'bgOpacity', 'shape', customNodeStyles, defaultStyle?.shape?.bgOpacity),
       // label
-      labelPosition: (d: CanvasGraphNode) => do_style_override(d, 'textPosition', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textPosition),
-      labelAutoRotate: (d: CanvasGraphNode) => do_style_override(d, 'textAutoRotate', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textAutoRotate),
-      labelTextColor: (d: CanvasGraphNode) => do_style_override(d, 'textColor', 'label', customNodeStyles, DEFAULT_NODE_STYLE?.label?.textColor),
+      labelPosition: (d: CanvasGraphNode) => do_style_override(d, 'textPosition', 'label', customNodeStyles, defaultStyle?.label?.textPosition),
+      labelAutoRotate: (d: CanvasGraphNode) => do_style_override(d, 'textAutoRotate', 'label', customNodeStyles, defaultStyle?.label?.textAutoRotate),
+      labelTextColor: (d: CanvasGraphNode) => do_style_override(d, 'textColor', 'label', customNodeStyles, defaultStyle?.label?.textColor),
       // lineWidth: 2,
-      // stroke: defaultStyle.shape?.borderColor ?? DEFAULT_NODE_STYLE?.shape?.borderColor,
-      stroke: (d: CanvasGraphNode) => do_style_override(d, 'borderColor', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.borderColor),
-      strokeOpacity: defaultStyle.shape?.borderOpacity ?? DEFAULT_NODE_STYLE?.shape?.borderOpacity,
+      // stroke: defaultStyle.shape?.borderColor ?? defaultStyle?.shape?.borderColor,
+      stroke: (d: CanvasGraphNode) => do_style_override(d, 'borderColor', 'shape', customNodeStyles, defaultStyle?.shape?.borderColor),
+      strokeOpacity: defaultStyle.shape?.borderOpacity ?? defaultStyle?.shape?.borderOpacity,
       // lineStroke: '#D580FF',
-      // iconFontFamily: 'iconfont',
       iconFontFamily: (d: CanvasGraphNode) => do_style_override(d, 'iconFontFamily', 'shape', customNodeStyles, undefined),
       iconText: (d: CanvasGraphNode) => do_style_override(d, 'iconText', 'shape', customNodeStyles, undefined),
       iconSrc: (d: CanvasGraphNode) => do_style_override(d, 'iconSrc', 'shape', customNodeStyles, undefined),
@@ -171,32 +169,31 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
         fillOpacity: 0.1,
         labelFillOpacity: 0.1,
         lineWidth: 0,
-
         // fill: dimFill,
         // labelFill: dimLabelFill
       }
     }
   };
 
-  // const getNodeSize = (d: CanvasGraphNode) => {
-  //   const defaultSize = defaultStyle.shape?.size ?? DEFAULT_NODE_STYLE?.shape?.size ?? undefined;
-  //   for (const nodeType in customNodeStyles) {
-  //     if (d?.data?.type === nodeType) {
-  //       const customStyle = customNodeStyles[nodeType];
-  //       return customStyle?.shape?.size ?? defaultSize
-  //     }
-  //   }
-  //   return defaultSize
-  // }
   if (!check_if_node_size_transformer_enabled(options)) {
     // g6Style.style.size = getNodeSize;
-    g6Style.style.size = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
-    if (g6Style.style.iconSrc) {
-      g6Style.style.iconHeight = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
-      g6Style.style.iconWidth = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, DEFAULT_NODE_STYLE?.shape?.size)
-    }
-
+    g6Style.style.size = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, defaultStyle?.shape?.size)
+    // if (g6Style.style.iconSrc) {
+    //   // g6Style.style.iconHeight = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, defaultStyle?.shape?.size)
+    //   // g6Style.style.iconWidth = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, defaultStyle?.shape?.size)
+    // }
   }
+
+  // if (g6Style.style.type) {
+  //   g6Style.style.iconClip = (d: CanvasGraphNode) => {
+  //     if (g6Style.style.type(d) === 'circle') {
+  //       return {
+  //         r: 50,
+  //       };
+  //     }
+  //     return false;
+  //   };
+  // }
 
 
   console.log("node.g6Style", g6Style);
@@ -209,12 +206,12 @@ export const check_if_node_size_transformer_enabled = (options: CanvasManagerOpt
 
 export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
   console.log("convert_edge_canvas_style_to_g6_sytle options", options);
-  const defaultStyle: CanvasEdgeStyle = options?.styles?.defaultEdge || {};
+  const defaultStyle: CanvasEdgeStyle = mergeDeep(DEFAULT_EDGE_STYLE, options?.styles?.defaultEdge || {});
   const customEdgeStyles = options.styles?.edges || {};
   const g6Style: EdgeStyle = {
-    type: (d: CanvasGraphEdge) => do_style_override(d, 'type', 'shape', customEdgeStyles, DEFAULT_EDGE_STYLE?.shape?.type),
+    type: (d: CanvasGraphEdge) => do_style_override(d, 'type', 'shape', customEdgeStyles, defaultStyle?.shape?.type),
     style: {
-      halo: (d: CanvasGraphEdge) => do_style_override(d, 'halo', 'shape', customEdgeStyles, DEFAULT_EDGE_STYLE?.shape?.halo),
+      halo: (d: CanvasGraphEdge) => do_style_override(d, 'halo', 'shape', customEdgeStyles, defaultStyle?.shape?.halo),
       endArrow: true,
       labelText: (d: CanvasGraphEdge) => {
         for (const edgeType in customEdgeStyles) {
@@ -225,6 +222,7 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
             if (labelField) {
               if (labelField.includes("properties.")) {
                 const propertyFieldName = labelField.split(".")[1];
+                //@ts-ignore
                 return d.data.properties ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
               } else if (labelField === "id") {
                 return d.id;
@@ -235,14 +233,14 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
         return
       },// fill
       // stroke
-      lineWidth: (d: CanvasGraphEdge) => do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, DEFAULT_EDGE_STYLE?.shape?.strokeWidth),
-      stroke: (d: CanvasGraphEdge) => do_style_override(d, 'strokeColor', 'shape', customEdgeStyles, DEFAULT_EDGE_STYLE?.shape?.strokeColor),
-      opacity: (d: CanvasGraphEdge) => do_style_override(d, 'strokeOpacity', 'label', customEdgeStyles, DEFAULT_EDGE_STYLE?.shape?.strokeOpacity),
+      lineWidth: (d: CanvasGraphEdge) => do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeWidth),
+      stroke: (d: CanvasGraphEdge) => do_style_override(d, 'strokeColor', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeColor),
+      opacity: (d: CanvasGraphEdge) => do_style_override(d, 'strokeOpacity', 'label', customEdgeStyles, defaultStyle?.shape?.strokeOpacity),
 
       // label
-      labelTextAlign: (d: CanvasGraphEdge) => do_style_override(d, 'textPosition', 'label', customEdgeStyles, DEFAULT_EDGE_STYLE?.label?.textPosition),
-      labelAutoRotate: (d: CanvasGraphEdge) => do_style_override(d, 'labelAutoRotate', 'label', customEdgeStyles, DEFAULT_EDGE_STYLE?.label?.textAutoRotate),
-      labelFill: (d: CanvasGraphEdge) => do_style_override(d, 'textColor', 'label', customEdgeStyles, DEFAULT_EDGE_STYLE?.label?.textColor),
+      labelTextAlign: (d: CanvasGraphEdge) => do_style_override(d, 'textPosition', 'label', customEdgeStyles, defaultStyle?.label?.textPosition),
+      labelAutoRotate: (d: CanvasGraphEdge) => do_style_override(d, 'labelAutoRotate', 'label', customEdgeStyles, defaultStyle?.label?.textAutoRotate),
+      labelFill: (d: CanvasGraphEdge) => do_style_override(d, 'textColor', 'label', customEdgeStyles, defaultStyle?.label?.textColor),
     },
     state: {
       highlight: {
