@@ -20,7 +20,7 @@ import {
 } from '@invana/canvas-graph/defaults/behaviors';
 import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
-import { GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
+import { D3_FORCE_LAYOUT, GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
 import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
 import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
@@ -66,7 +66,7 @@ const defaultOptions: CanvasManagerOptions = {
     HISTORY_PLUGIN,
     // GRID_PLUGIN
   ],
-  layout: GRID_LAYOUT,
+  layout: D3_FORCE_LAYOUT,
   styles: DEFAULT_STYLE_OPTIONS
 }
 
