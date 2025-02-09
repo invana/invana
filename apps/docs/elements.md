@@ -26,3 +26,12 @@ Quadratic An edge with a quadratic Bézier curve
 Cubic An edge with a cubic Bézier curve
 CubicVertical A cubic Bézier curve edge that is primarily vertical
 CubicHorizontal A cubic Bézier curve edge that is primarily horizontal
+
+
+
+###
+https://g6.antv.antgroup.com/en/manual/core-concept/element
+
+
+### registering the icon
+https://graphin.antv.vision/en-US/graphin/render/demos
