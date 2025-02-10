@@ -29,18 +29,18 @@ export const SimpleExample: Story = {
             // type: 'rect',
           },
           fields: {
-            labelField: 'name'
+            labelField: 'properties.name'
           }
         },
         nodes: {
           User: {
             fields: {
-              labelField: 'name'
+              labelField: 'properties.name'
             }
           },
           Post: {
             fields: {
-              labelField: 'title'
+              labelField: 'properties.title'
             }
           }
         },

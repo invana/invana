@@ -6,13 +6,11 @@ export const usersDataSet: ICanvasData = {
   nodes: [
     {
       id: "user1",
-      label: "Alice",
       properties: { name: "Alice", age: 30 },
       type: "User",
     },
     {
       id: "user2",
-      label: "Bob",
       properties: { name: "Bob" },
       type: "User",
     },
