@@ -7,7 +7,7 @@ import {
 import { GraphStore, ICanvasData, ICanvasNode } from '@invana/data-store'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './style_utils';
 import { GraphStyle } from './styling';
-import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';
+import { CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
 import { getUniqueItemsByItem } from './utils';
 

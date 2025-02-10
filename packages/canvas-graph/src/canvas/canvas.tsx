@@ -1,79 +1,97 @@
-import React, {
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
-import { Graph } from '@antv/g6'
-import { CanvasManager } from "../manager";
-import { mergeDeep } from '@invana/data-store';
-import { getUniqueItemsByItem } from '../manager/utils';
+import { Graph } from '@antv/g6';
+import { CanvasGraphProps } from './types';
+import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
-import { CanvasToolBar } from '../plugins';
-import { CanvasGraphProps } from './types';
+import { mergeDeep } from '@invana/data-store';
 
 
+// export interface GraphinRef extends Graph {
+//   graph: Graph;
+// }
+// const MemoizedGraphin = React.memo(Graphin, () => true);
 
-export const CanvasGraph: React.FC<CanvasGraphProps> = ((props) => {
-  const [isGraphReady, setIsGraphReady] = useState(false);
+export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
+  // Sample graph data
+
+  // Ref for Graphin instance
+
+  // Update layout
+  // For Graphin 3.x "force" is generally "grid", plus other options like "circular", "concentric", etc.
+  // const handleLayoutChange = (layoutType: 'circular' | 'grid' | 'radial') => {
+  //   if (graphinRef.current?.graph) {
+  //     graphinRef.current.graph.setLayout({ type: layoutType });
+  //     graphinRef.current.graph.layout();
+  //   }
+  // };
+
+
+  // useEffect(() => {
+  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+  //   document.querySelectorAll('.graph-canvas').forEach(
+  //     () => addEventListener("contextmenu", handleContextMenu));
+
+  //   return () => {
+  //     document.querySelectorAll('.graph-canvas').forEach(
+  //       () => removeEventListener("contextmenu", handleContextMenu));
+  //   };
+  // }, []);
+
   const localRef = useRef<Graph | null>(null);
-  const canvasManagerRef = useRef<CanvasManager | null>(null);
-  const showHeader = props.showHeader ?? false;
+  // const canvasManagerRef = useRef<CanvasManager | null>(null);
 
-
-
-  const options: CanvasManagerOptions = useMemo(() => {
-    const optionsData = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-
-    if (optionsData.transforms) {
-      optionsData['transforms'] = getUniqueItemsByItem(optionsData.transforms || [])
+  useImperativeHandle(ref, () => ({
+    // Expose methods or properties to the parent component
+    // get: () => {
+    //   console.log('someMethod called');
+    // },
+    getGraph: () => {
+      console.log("getGraph called", localRef.current);
+      return localRef.current;
+    },
+    getGraphManager: () => {
+      // console.log("getGraphManager called", canvasManagerRef.current);
+      // return canvasManagerRef.current;
     }
+    // getGraphManager: () => {
+    //   console.log("getGraphManager")
+    //   return canvasManager
+    // }
 
-    if (optionsData.plugins) {
-      optionsData['plugins'] = getUniqueItemsByItem(optionsData.plugins || [])
-    }
+  }));
 
-    if (optionsData.behaviors) {
-      optionsData['behaviors'] = getUniqueItemsByItem(optionsData.behaviors || [])
-    }
-    return optionsData
-  }, [props.options]);
 
-  const initData = useMemo(() => {
-    return props.initData ?? { 'nodes': [], 'edges': [] };
-  }, [props.initData]);
 
-  const onReady = useCallback((graph: Graph) => {
-    console.log("Graphin onReady", graph);
-    const canvasManager: CanvasManager = new CanvasManager(graph, options);
-    canvasManager.store.addData(initData, () => canvasManager.render());
-    props?.onReady?.(canvasManager);
-    canvasManagerRef.current = canvasManager;
-    setIsGraphReady(true);
-  }, [options, initData, props]);
+  const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
+  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props,)
+  const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
-  const onDestroy = useCallback(() => {
-    console.log("Graphin onDestroy");
-    props?.onDestroy?.();
-  }, [props]);
-
-  console.log("CanvasGraph loaded", props.graphName, options.plugins?.length, options);
   return (
-    <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
-
-      {
-        isGraphReady && showHeader && <CanvasToolBar className='h-50 bg-background text-foreground' getCanvasManager={() => canvasManagerRef.current as CanvasManager} />
-      }
+    <div className='h-full w-full' style={props.containerStyle ?? {}}>
       <Graphin
-        key={props?.graphName}
         ref={localRef}
-        options={options}
-        onReady={onReady}
-        onDestroy={onDestroy}
+        id={props.graphName}
+        options={{}}
+        onReady={(graph) => {
+          console.log("Graphin onReady", graph);
+          const canvasManager: CanvasManager = new CanvasManager(graph, options);
+          canvasManager.store.addData(initData, () => canvasManager.render());
+          props?.onReady?.(canvasManager);
+          // canvasManagerRef.current = canvasManager;
+        }}
+        onDestroy={() => {
+          console.log("Graphin onDestroy");
+          // localRef.current?.destroy();
+          props?.onDestroy?.();
+        }}
+      // ref={graphinRef}
       />
+      {/* <div style={{ marginTop: '10px' }}>
+        <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
+        <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>
+      </div> */}
     </div>
   );
 });
-
