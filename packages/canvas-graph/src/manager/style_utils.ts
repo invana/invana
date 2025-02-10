@@ -74,7 +74,6 @@ export const generateElementLabel = (
   defaultValue: undefined | string | number | boolean) => {
 
   if (d.label) {
-    console.log("=====generateElementLabel d.label", d.label)
     return d.label;
   }
 
@@ -82,8 +81,6 @@ export const generateElementLabel = (
     if (d?.data?.type === nodeType) {
       const customStyle = customNodeStyles[nodeType];
       const labelField = customStyle?.fields?.labelField;
-      console.log("=====customStyle", nodeType, labelField)
-
       if (labelField) {
         if (labelField.includes("properties.")) {
           const propertyFieldName = labelField.split(".")[1];
@@ -102,8 +99,6 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
   */
-  console.log("convert_node_canvas_style_to_g6_style", options);
-
   const defaultStyle: CanvasNodeStyle = mergeDeep(DEFAULT_NODE_STYLE, options.styles?.defaultNode || {});
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
@@ -166,9 +161,6 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   //     return false;
   //   };
   // }
-
-
-  console.log("node.g6Style", g6Style);
   return g6Style;
 }
 
@@ -177,7 +169,6 @@ export const check_if_node_size_transformer_enabled = (options: CanvasManagerOpt
 }
 
 export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
-  console.log("convert_edge_canvas_style_to_g6_sytle options", options);
   const defaultStyle: CanvasEdgeStyle = mergeDeep(DEFAULT_EDGE_STYLE, options?.styles?.defaultEdge || {});
   const customEdgeStyles = options.styles?.edges || {};
   const g6Style: EdgeStyle = {
@@ -235,7 +226,6 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
       field: 'type',
     },
   }
-  console.log("edge.g6Style", g6Style);
   return g6Style
 }
 

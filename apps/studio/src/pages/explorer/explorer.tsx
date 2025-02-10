@@ -3,10 +3,10 @@ import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
 import { Activity, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
-import { flightData } from '@invana/example-datasets'
+import { flightData as initDataset } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
@@ -91,9 +91,12 @@ const graphModelOptions: CanvasManagerOptions = {
   ],
   transforms: [
     // MAP_NODE_SIZE_TRANSFORMER,
-    PROCESS_PARALLEL_TRANSFORMER
+    // PROCESS_PARALLEL_TRANSFORMER
   ],
-  plugins: [],
+  plugins: [
+    // MINIMAP_PLUGIN,
+    // HISTORY_PLUGIN,
+  ],
   layout: D3_FORCE_LAYOUT,
   styles: DEFAULT_STYLE_OPTIONS
 };
@@ -167,6 +170,15 @@ const ExplorerPage: React.FC = () => {
     return canvasManagerRef.current?.getModelAsGraphData();
   }
 
+
+  const initGraphData = useMemo(() => {
+    return initDataset ?? { 'nodes': [], 'edges': [] };
+  }, []);
+
+
+  const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
+
+
   return <DefaultLayout
     headerProps={{
       left: (
@@ -196,10 +208,11 @@ const ExplorerPage: React.FC = () => {
       <div className="space-y-2 ">
         {leftContentName === "model" &&
           <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
-            <CanvasGraph
-              key='model'
+            <MemoizedCanvasGraph
+              graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
+              showHeader={false}
               initData={getSchemaGraphData()}
               options={graphModelOptions}
             />
@@ -224,12 +237,12 @@ const ExplorerPage: React.FC = () => {
     }
     mainTopContent={
       // <div className="flex h-full items-center justify-center ">
-      <CanvasGraph
+      <MemoizedCanvasGraph
         // ref={canvasGraphRef}
-        key={'graphData'}
+        graphName={'graphData'}
         containerStyle={{ width: "100%", height: "100%" }}
         className={"bg-background"}
-        initData={flightData}
+        initData={initGraphData}
         onReady={(canvasManager: CanvasManager) => {
           console.log("CanvasGraph.onReady", canvasManager)
           canvasManagerRef.current = canvasManager;

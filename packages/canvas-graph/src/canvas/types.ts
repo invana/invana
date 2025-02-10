@@ -10,7 +10,7 @@ import { CanvasManagerOptions } from '../manager/types';
 
 
 export interface CanvasGraphProps {
-  key?: string
+  graphName?: string
   initData?: ICanvasData
   options?: CanvasManagerOptions
   containerStyle?: React.CSSProperties;

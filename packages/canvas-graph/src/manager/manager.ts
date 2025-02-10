@@ -9,6 +9,7 @@ import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from
 import { GraphStyle } from './styling';
 import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
+import { getUniqueItemsByItem } from './utils';
 
 
 export class CanvasManager {
@@ -79,13 +80,7 @@ export class CanvasManager {
     }
   }
 
-  getUniqueItemsByItem(options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) {
-    const uniqueItems = options.reduce((acc, item) => {
-      acc[item.type] = item
-      return acc
-    }, {} as Record<string, CanvasGraphPlugin | CanvasGraphBehavior | CanvasGraphTransform>)
-    return Object.values(uniqueItems)
-  }
+
 
   updateOptions(options: CanvasManagerOptions, callback?: () => void) {
     console.log("updateOptions input options", options);
@@ -103,15 +98,15 @@ export class CanvasManager {
     }
 
     if (options.transforms) {
-      g6Options['transforms'] = this.getUniqueItemsByItem(options.transforms || [])
+      g6Options['transforms'] = getUniqueItemsByItem(options.transforms || [])
     }
 
     if (options.plugins) {
-      g6Options['plugins'] = this.getUniqueItemsByItem(options.plugins || [])
+      g6Options['plugins'] = getUniqueItemsByItem(options.plugins || [])
     }
 
     if (options.behaviors) {
-      g6Options['behaviors'] = this.getUniqueItemsByItem(options.behaviors || [])
+      g6Options['behaviors'] = getUniqueItemsByItem(options.behaviors || [])
     }
 
     console.log("CanvasManager.updateOptions", g6Options);
