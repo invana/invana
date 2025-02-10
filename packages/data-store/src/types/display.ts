@@ -89,8 +89,12 @@ export type ICanvasTheme = 'light' | 'dark' | 'system' | string;
 export interface ICanvasStyle {
   theme?: ICanvasTheme;
   bgColor: IColor;
-  colorNodesBy: 'type' | 'defaultColor';
-  colorEdgesBy: 'type' | 'sourceNode' | 'targetNode' | 'defaultColor';
+  colorNodesBy: 'type' | 'default-color';
+  colorEdgesBy: 'type' | 'source-node' | 'target-node' | 'default-color';
+  labels: {
+    showNodeLabels: boolean;
+    showEdgeLabels: boolean;
+  }
   // scaleNode: {
   //   minSize: number;
   //   maxSize: number;

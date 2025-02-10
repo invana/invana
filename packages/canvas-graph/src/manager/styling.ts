@@ -1,13 +1,15 @@
-import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, ID, NodeOptions } from '@antv/g6'
 import { CanvasManagerOptions } from './types';
 import {
   convert_canvas_style_to_g6_style,
   convert_edge_canvas_style_to_g6_sytle,
-  convert_node_canvas_style_to_g6_style
+  convert_node_canvas_style_to_g6_style,
+  generateElementLabel
 } from './utils';
 import { ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
+import { CanvasGraphEdge, CanvasGraphNode } from '../types';
 
 
 export class GraphStyle {
@@ -83,6 +85,56 @@ export class GraphStyle {
   }
 
 
+  hideNodeLabel(nodeId: string) {
+    console.log("===hideNodeLabel", nodeId)
+    this.graph.updateNodeData([{ id: nodeId, style: { labelText: undefined } }])
+    // this.graph.render()
+  }
+
+  showNodeLabel(nodeId: string) {
+    const customNodeStyles = this.options.styles?.nodes || {};
+    const d = this.graph.getNodeData(nodeId) as CanvasGraphNode;
+    if (d) {
+      const labelText = generateElementLabel(d, customNodeStyles, d.id)
+      this.graph.updateNodeData([{ id: nodeId, style: { labelText } }])
+      this.graph.render()
+
+    } else {
+      console.error("node not found", nodeId)
+    }
+  }
+
+  hideEdgeLabel(edgeId: string) {
+    this.graph.updateEdgeData([{ id: edgeId, style: { labelText: undefined } }])
+    this.graph.render()
+  }
+
+  showEdgeLabel(edgeId: string) {
+    const customEdgeStyles = this.options.styles?.edges || {};
+    const d = this.graph.getEdgeData(edgeId) as CanvasGraphEdge;
+    if (d) {
+      const labelText = generateElementLabel(d, customEdgeStyles, undefined)
+      this.graph.updateEdgeData([{ id: edgeId, style: { labelText: labelText } }]);
+      this.graph.render()
+    } else {
+      console.error("edge not found", edgeId)
+    }
+  }
+
+  hideAllNodeLabels() {
+    console.log("hideAllNodeLabels called")
+    this.graph.getNodeData().forEach((node) => this.hideNodeLabel(node.id))
+    this.graph.render();
+  }
+
+  hideAllEdgeLabels() {
+    this.graph.getEdgeData().forEach((edge) => {
+      if (edge.id) {
+        this.hideEdgeLabel(edge.id)
+      }
+    })
+  }
+
   hideAllNodes() {
     this.graph.getNodeData().forEach((node) => this.graph.hideElement(node.id))
   }
@@ -91,11 +143,20 @@ export class GraphStyle {
     this.graph.getNodeData().forEach((node) => this.graph.showElement(node.id))
   }
 
+  hideEdge(edgeId: string) {
+    this.graph.hideElement(edgeId);
+  }
+
+  showEdge(edgeId: string) {
+    this.graph.showElement(edgeId);
+  }
+
+
   hideAllEdges() {
     console.log("this.graph.getEdgeData() called")
     this.graph.getEdgeData().forEach((edge) => {
       if (edge?.id) {
-        this.graph.hideElement(edge.id);
+        this.hideEdge(edge.id);
       }
     });
   }
@@ -103,7 +164,7 @@ export class GraphStyle {
   showAllEdges() {
     this.graph.getEdgeData().forEach((edge) => {
       if (edge?.id) {
-        this.graph.showElement(edge?.id);
+        this.showEdge(edge?.id);
       }
     });
   }
