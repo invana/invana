@@ -115,7 +115,7 @@ export const D3_FORCE_LAYOUT: CanvasGraphLayout = {
   collide: {
     //   // Prevent nodes from overlapping by specifying a collision radius for each node.
     radius: (d: CanvasGraphNode) => {
-      console.log("d3-force-layout.radius", d);
+      // console.log("d3-force-layout.radius", d);
       const size = d.style?.size
       if (Array.isArray(size) && size.length > 0) {
         return size[0] * 2.5

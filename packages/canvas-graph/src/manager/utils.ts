@@ -108,6 +108,29 @@ export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
   return defaultValue
 }
 
+export const generateElementLabel = (
+  d: CanvasGraphNode | CanvasGraphEdge,
+  customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
+  defaultValue: any) => {
+  for (const nodeType in customNodeStyles) {
+    if (d?.data?.type === nodeType) {
+      const customStyle = customNodeStyles[nodeType];
+      const labelField = customStyle?.fields?.labelField;
+
+      if (labelField) {
+        if (labelField.includes("properties.")) {
+          const propertyFieldName = labelField.split(".")[1];
+          //@ts-ignore,
+          return d.data.properties && propertyFieldName ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
+        } else if (labelField === "id") {
+          return d.id;
+        }
+      }
+    }
+  }
+  return defaultValue
+}
+
 export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
@@ -122,25 +145,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
     type: (d: CanvasGraphNode) => do_style_override(d, 'type', 'shape', customNodeStyles, defaultStyle?.shape?.type),
     style: {
       halo: (d: CanvasGraphNode) => do_style_override(d, 'halo', 'shape', customNodeStyles, defaultStyle?.shape?.halo),
-      labelText: (d: CanvasGraphNode) => {
-        for (const nodeType in customNodeStyles) {
-          if (d?.data?.type === nodeType) {
-            const customStyle = customNodeStyles[nodeType];
-            const labelField = customStyle?.fields?.labelField;
-
-            if (labelField) {
-              if (labelField.includes("properties.")) {
-                const propertyFieldName = labelField.split(".")[1];
-                //@ts-ignore
-                return d.data.properties && propertyFieldName ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
-              } else if (labelField === "id") {
-                return d.id;
-              }
-            }
-          }
-        }
-        return d.id
-      },// fill
+      labelText: (d: CanvasGraphNode) => generateElementLabel(d, customNodeStyles, d.id),// fill
       fill: (d: CanvasGraphNode) => do_style_override(d, 'bgColor', 'shape', customNodeStyles, defaultStyle?.shape?.bgColor),
       fillOpacity: (d: CanvasGraphNode) => do_style_override(d, 'bgOpacity', 'shape', customNodeStyles, defaultStyle?.shape?.bgOpacity),
       // label
@@ -213,25 +218,28 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
     style: {
       halo: (d: CanvasGraphEdge) => do_style_override(d, 'halo', 'shape', customEdgeStyles, defaultStyle?.shape?.halo),
       endArrow: true,
-      labelText: (d: CanvasGraphEdge) => {
-        for (const edgeType in customEdgeStyles) {
-          if (d?.data?.type === edgeType) {
-            const customStyle = customEdgeStyles[edgeType];
-            const labelField = customStyle?.fields?.labelField;
 
-            if (labelField) {
-              if (labelField.includes("properties.")) {
-                const propertyFieldName = labelField.split(".")[1];
-                //@ts-ignore
-                return d.data.properties ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
-              } else if (labelField === "id") {
-                return d.id;
-              }
-            }
-          }
-        }
-        return
-      },// fill
+      labelText: (d: CanvasGraphNode) => generateElementLabel(d, customEdgeStyles, undefined),// fill
+
+      // labelText: (d: CanvasGraphEdge) => {
+      //   for (const edgeType in customEdgeStyles) {
+      //     if (d?.data?.type === edgeType) {
+      //       const customStyle = customEdgeStyles[edgeType];
+      //       const labelField = customStyle?.fields?.labelField;
+
+      //       if (labelField) {
+      //         if (labelField.includes("properties.")) {
+      //           const propertyFieldName = labelField.split(".")[1];
+      //           //@ts-ignore
+      //           return d.data.properties ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
+      //         } else if (labelField === "id") {
+      //           return d.id;
+      //         }
+      //       }
+      //     }
+      //   }
+      //   return
+      // },// fill
       // stroke
       lineWidth: (d: CanvasGraphEdge) => do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeWidth),
       stroke: (d: CanvasGraphEdge) => do_style_override(d, 'strokeColor', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeColor),

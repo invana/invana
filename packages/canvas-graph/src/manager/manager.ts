@@ -143,8 +143,9 @@ export class CanvasManager {
     });
   }
 
+
   render() {
-    this.graph.render();
+    return this.graph.render();
   }
 
 }
