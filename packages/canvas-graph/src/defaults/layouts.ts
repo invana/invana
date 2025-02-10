@@ -157,10 +157,10 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   label: 'antv-dagre',
 
   nodeSize: [60, 30],
-  nodesep: 260,
-  ranksep: 140,
+  nodesep: 100,
+  ranksep: 70,
   controlPoints: true,
-  rankdir: 'LR', // Optional, default is the center of the graph
+  // rankdir: 'LR', // Optional, default is the center of the graph
   // align: 'DL', // Optional
   // nodesep: 20, // Optional
   // ranksep: 50, // Optional
