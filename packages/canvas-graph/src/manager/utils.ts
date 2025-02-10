@@ -8,80 +8,40 @@ import { CanvasGraphEdge, CanvasGraphNode } from "../types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
-
   const { id, type, properties, display } = node;
-  const labelField = display?.fields?.labelField;
+  // const labelField = display?.fields?.labelField;
   // const shape = display?.shape;
   return {
     id: id,
     x: node.x ?? 0,
     y: node.y ?? 0,
-
     type: 'circle', // type ??
-    label: properties ? properties[labelField as keyof typeof properties] ?? id : id,
+    label: node.label,
+    // label: properties ? properties[labelField as keyof typeof properties] ?? id : id,
     data: {
       type: type,
       properties: properties,
-    },
-
-    style: {
-      // size: shape?.size ?? 20,
-      // labelText: (d: any) => d[labelField] ?? id,
-      // halo: true,
-      // fill: shape?.bgColor,
-      // stroke: shape?.borderColor,
-      // lineWidth: shape?.borderWidth,
-      // radius: shape?.borderRadius,
-      // cursor: 'pointer',
-      // fontSize: label?.textFontSize,
-      // fontWeight: label?.textFontWeight,
-      // fontFamily: label?.textFontFamily,
-      // fontOpacity: label?.textOpacity,
-
-      // iconFontFamily: shape?.iconFontFamily,
-      // iconText: shape?.iconText,
-    },
+    }
   };
-
 }
 
 
-export const convert_icanvas_edge_to_g6_edge = (node: ICanvasEdge): EdgeData => {
-
-  const { id, type, properties, display, source, target } = node;
-
-  const labelField = display?.fields;
-  console.log("=====labelField", labelField)
+export const convert_icanvas_edge_to_g6_edge = (edge: ICanvasEdge): EdgeData => {
+  const { id, type, properties, display, source, target } = edge;
+  // const labelField = display?.fields;
+  // console.log("=====labelField", labelField)
   const data: EdgeData = {
     id: id,
     source: source,
     target: target,
+    label: edge.label,
     // label: properties[labelField as keyof typeof properties] ?? id,
     data: {
       type: type,
       properties: properties,
-    },
-
-    style: {
-      // labelText: (d: any) => d[labelField] ?? id,
-      // fill: shape?.bgColor,
-      // stroke: shape?.borderColor,
-      // lineWidth: shape?.borderWidth,
-      // radius: shape?.borderRadius,
-      // cursor: 'pointer',
-      // fontSize: label?.textFontSize,
-      // fontWeight: label?.textFontWeight,
-      // fontFamily: label?.textFontFamily,
-      // fontOpacity: label?.textOpacity,
-
-      // iconFontFamily: shape?.iconFontFamily,
-      // iconText: shape?.iconText,
-    },
+    }
   };
-
-  // data['']
   return data
-
 }
 
 export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
@@ -112,6 +72,12 @@ export const generateElementLabel = (
   d: CanvasGraphNode | CanvasGraphEdge,
   customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
   defaultValue: any) => {
+
+  if (d.label) {
+    console.log("=====generateElementLabel d.label", d.label)
+    return d.label;
+  }
+
   for (const nodeType in customNodeStyles) {
     if (d?.data?.type === nodeType) {
       const customStyle = customNodeStyles[nodeType];
