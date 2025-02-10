@@ -1,7 +1,7 @@
 import { ICanvasData, ICanvasEdge, ICanvasNode } from "@invana/data-store";
 
 
-export const processMiningExample: ICanvasData = {
+export const processMiningSimpleDataset: ICanvasData = {
   nodes: [
     { id: '0', label: 'Start', type: 'start', },
     { id: '1', label: 'Task A', type: 'task', },

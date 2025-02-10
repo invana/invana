@@ -160,6 +160,7 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   nodesep: 100,
   ranksep: 70,
   controlPoints: true,
+  sortByCombo: true,
   // rankdir: 'LR', // Optional, default is the center of the graph
   // align: 'DL', // Optional
   // nodesep: 20, // Optional

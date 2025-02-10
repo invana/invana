@@ -20,6 +20,7 @@ export interface ICanvasElement {
 export interface ICanvasNode extends ICanvasElement {
   x?: number;
   y?: number;
+  combo?: string;
   display?: CanvasNodeStyle;
 }
 
@@ -32,4 +33,5 @@ export interface ICanvasEdge extends ICanvasElement {
 export interface ICanvasData {
   nodes: ICanvasNode[];
   edges: ICanvasEdge[];
+  combos?: ICanvasNode[]
 }

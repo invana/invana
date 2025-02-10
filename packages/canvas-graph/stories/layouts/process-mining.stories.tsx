@@ -1,6 +1,6 @@
 import { CanvasGraph } from '@invana/canvas-graph';
 import type { Meta, StoryObj } from '@storybook/react';
-import { processMiningExample } from '@invana/example-datasets'
+import { processMiningSimpleDataset, processMiningComboDataset } from '@invana/example-datasets'
 import { defaultContainerStyle, defaultOptions } from '../constants';
 import { ANTV_DAGRE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 
@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 
-export const ProcessMining: Story = {
+export const SimpleExample: Story = {
   args: {
     options: {
       ...defaultOptions,
@@ -37,14 +37,32 @@ export const ProcessMining: Story = {
       },
       layout: ANTV_DAGRE_LAYOUT
     },
-    initData: processMiningExample,
+    initData: processMiningSimpleDataset,
     containerStyle: defaultContainerStyle,
-    onReady(canvasManager) {
-      console.log("canvasManager", canvasManager)
-      // setTimeout(() => {
-      // canvasManager.styling.hideAllNodes();
-      // }, 3000);
-    },
+  },
+};
 
+
+export const WithGrouping: Story = {
+  args: {
+    options: {
+      ...defaultOptions,
+      styles: {
+        defaultNode: {
+          shape: {
+            size: 70,
+            type: 'rect',
+          },
+        },
+        defaultEdge: {
+          shape: {
+            type: 'polyline',
+          }
+        }
+      },
+      layout: ANTV_DAGRE_LAYOUT
+    },
+    initData: processMiningComboDataset,
+    containerStyle: defaultContainerStyle,
   },
 };

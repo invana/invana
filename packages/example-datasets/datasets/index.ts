@@ -1,4 +1,5 @@
 export * from './flightsData'
 export * from './lesMiserablesData'
 export * from './productData'
-export * from './processMining'
+export * from './process-mining-simple'
+export * from './process-mining-combo'
