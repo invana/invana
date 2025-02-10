@@ -57,7 +57,9 @@ export const TopToBottom: Story = {
       },
       layout: {
         ...DENDROGRAM_LAYOUT,
-        direction: 'TB'
+        direction: 'TB',
+        nodeSep: 120,
+
       }
     }, initData: modellingMethodsDataset,
     containerStyle: defaultContainerStyle

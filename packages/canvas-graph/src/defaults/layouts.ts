@@ -40,7 +40,8 @@ export const CIRCULAR_LAYOUT: CanvasGraphLayout = {
 export const RADIAL_LAYOUT: CanvasGraphLayout = {
   type: 'radial',
   label: 'radial',
-  preventOverlap: true
+  preventOverlap: true,
+  strictRadial: true
   // options: {
   // center: [0, 0], // Optional, default is the center of the graph
   // linkDistance: 150, // Optional, edge length
@@ -172,7 +173,7 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
 export const DENDROGRAM_LAYOUT: CanvasGraphLayout = {
   type: 'dendrogram',
   direction: 'LR', // H / V / LR / RL / TB / BT
-  nodeSep: 36,
+  nodeSep: 50,
   rankSep: 250,
 }
 
