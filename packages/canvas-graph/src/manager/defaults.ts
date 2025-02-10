@@ -44,7 +44,7 @@ export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgrou
   }
 }
 
-export const DEFAULT_CANVAS_STYLE: ICanvasStyle = {
+export const DEFAULT_CANVAS_STYLE: Partial<ICanvasStyle> = {
   theme: getInitialTheme(),
   bgColor: '#222222',
   colorNodesBy: 'type',

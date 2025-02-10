@@ -5,7 +5,7 @@ import {
   convert_edge_canvas_style_to_g6_sytle,
   convert_node_canvas_style_to_g6_style,
   generateElementLabel
-} from './utils';
+} from './style_utils';
 import { ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';

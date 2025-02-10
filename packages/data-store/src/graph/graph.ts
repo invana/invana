@@ -32,18 +32,13 @@ export class GraphStore extends GraphDataCRUD {
     graph.forEachNode((_, attributes) => {
       if (!attributes.type) return; // Skip nodes without a type
       console.log("attributes", attributes);
-
       const nodeProperties = attributes.properties || {};
-
       if (!this.nodeSchemas.has(attributes.type)) {
         this.nodeSchemas.set(attributes.type, new Map());
       }
-
       const schema = this.nodeSchemas.get(attributes.type)!;
-
       Object.keys(nodeProperties || {}).forEach((key) => {
         if (key === 'type') return;
-
         if (!schema.has(key)) {
           schema.set(key, {
             name: key,
@@ -58,23 +53,25 @@ export class GraphStore extends GraphDataCRUD {
 
     // Iterate through all edges once
     graph.forEachEdge((edge, attributes, source, target) => {
+      console.log("<<edge", edge, attributes, source, target);
+
+      const sourceNode = graph.getNodeAttributes(source);
+      const targetNode = graph.getNodeAttributes(target);
+      console.log("sourceNode", sourceNode, targetNode);
       if (!attributes.type) return; // Skip edges without a type
       const edgeProperties = attributes.properties || {};
-
       if (!this.edgeSchemas.has(attributes.type)) {
         this.edgeSchemas.set(attributes.type, {
           name: attributes.type,
           properties: [],
-          source,
-          target,
+          source: sourceNode?.type,
+          target: targetNode?.type,
           isDirected: graph.isDirected(edge),
         });
       }
-
       const schema = this.edgeSchemas.get(attributes.type)!;
       Object.keys(edgeProperties).forEach((key) => {
         if (key === 'type') return;
-
         if (!schema.properties.some((p) => p.name === key)) {
           schema.properties.push({
             name: key,

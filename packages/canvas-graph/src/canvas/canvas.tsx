@@ -16,63 +16,24 @@ const MemoizedGraphin = React.memo(Graphin);
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: CanvasGraphProps, ref) => {
   const { showHeader = false } = props;
-  // Sample graph data
-
-
-
   const [isGraphReady, setIsGraphReady] = React.useState(false);
-  // Ref for Graphin instance
-
-  // Update layout
-  // For Graphin 3.x "force" is generally "grid", plus other options like "circular", "concentric", etc.
-  // const handleLayoutChange = (layoutType: 'circular' | 'grid' | 'radial') => {
-  //   if (graphinRef.current?.graph) {
-  //     graphinRef.current.graph.setLayout({ type: layoutType });
-  //     graphinRef.current.graph.layout();
-  //   }
-  // };
-
-
-  // useEffect(() => {
-  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-  //   document.querySelectorAll('.graph-canvas').forEach(
-  //     () => addEventListener("contextmenu", handleContextMenu));
-
-  //   return () => {
-  //     document.querySelectorAll('.graph-canvas').forEach(
-  //       () => removeEventListener("contextmenu", handleContextMenu));
-  //   };
-  // }, []);
 
   const localRef = useRef<Graph | null>(null);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
 
   useImperativeHandle(ref, () => ({
     // Expose methods or properties to the parent component
-    // get: () => {
-    //   console.log('someMethod called');
-    // },
     getGraph: () => {
-      console.log("getGraph called", localRef.current);
       return localRef.current;
     },
     getGraphManager: () => {
-      // console.log("getGraphManager called", canvasManagerRef.current);
       return canvasManagerRef.current;
     }
-    // getGraphManager: () => {
-    //   console.log("getGraphManager")
-    //   return canvasManager
-    // }
-
   }));
 
-
-
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-  console.log("=======options CanvasManagerOptions", options)
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
-
+  console.log("CanvasGraph loaded", options);
   return (
     <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
 
@@ -80,6 +41,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: Canvas
         isGraphReady && showHeader && <CanvasToolBar className='h-50 bg-background text-foreground' getCanvasManager={() => canvasManagerRef.current as CanvasManager} />
       }
       <MemoizedGraphin
+        key={props?.key}
         ref={localRef}
         options={options}
         onReady={(graph) => {
