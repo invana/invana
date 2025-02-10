@@ -110,6 +110,9 @@ const ExplorerPage: React.FC = () => {
   const { theme, } = useThemeStore()
 
 
+  const modelGraphData = useRef<any>(null);
+  const queryGraphData = useRef<any>(null);
+
   const {
     leftContentName,
     setLeftContentName,
@@ -209,6 +212,7 @@ const ExplorerPage: React.FC = () => {
         {leftContentName === "model" &&
           <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
             <CanvasGraph
+              // ref={modelGraphData}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
