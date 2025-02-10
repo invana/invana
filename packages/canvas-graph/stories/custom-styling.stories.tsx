@@ -62,22 +62,17 @@ export const FlightData: Story = {
       console.log("CanvasGraph.onReady canvasManager", canvasManager)
 
       setTimeout(() => {
-        // const nodes = [
-        //   { id: "newNode", type: "newType", properties: { name: "New Node" } },
-        //   { id: "newNode-2", type: "newType", properties: { name: "New Node 2" } },
-        //   { id: "newNode-3", type: "newType", properties: { name: "New Node 3" } },
-        // ];
-
-        // nodes.map(node => {
-        //   canvasManager.store.addNode(node);
-        // })
-
-
-        // canvasManager.render().then(() => {
-        canvasManager.styling.hideAllNodeLabels();
-        // })
-
-
+        const nodes = [
+          { id: "newNode", type: "newType", properties: { name: "New Node" } },
+          { id: "newNode-2", type: "newType", properties: { name: "New Node 2" } },
+          { id: "newNode-3", type: "newType", properties: { name: "New Node 3" } },
+        ];
+        nodes.map(node => {
+          canvasManager.store.addNode(node);
+        })
+        canvasManager.render().then(() => {
+          console.log("CanvasGraph.rendered")
+        })
       }, 1000);
     },
     initData: flightData,
