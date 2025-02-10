@@ -65,7 +65,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
 
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props,)
+  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props.options?.plugins,)
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
   return (
