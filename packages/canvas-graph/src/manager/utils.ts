@@ -82,6 +82,7 @@ export const generateElementLabel = (
     if (d?.data?.type === nodeType) {
       const customStyle = customNodeStyles[nodeType];
       const labelField = customStyle?.fields?.labelField;
+      console.log("=====customStyle", nodeType, labelField)
 
       if (labelField) {
         if (labelField.includes("properties.")) {
