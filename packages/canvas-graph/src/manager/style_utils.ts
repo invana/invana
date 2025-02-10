@@ -8,7 +8,7 @@ import { CanvasGraphEdge, CanvasGraphNode } from "../types";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
-  const { id, type, properties, display } = node;
+  const { id, type, properties } = node;
   // const labelField = display?.fields?.labelField;
   // const shape = display?.shape;
   return {
@@ -27,7 +27,7 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
 
 
 export const convert_icanvas_edge_to_g6_edge = (edge: ICanvasEdge): EdgeData => {
-  const { id, type, properties, display, source, target } = edge;
+  const { id, type, properties, source, target } = edge;
   // const labelField = display?.fields;
   // console.log("=====labelField", labelField)
   const data: EdgeData = {
@@ -48,7 +48,7 @@ export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
   fieldName: string,
   dataType: 'shape' | 'label' | 'state',
   customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
-  defaultValue: undefined | any) => {
+  defaultValue: undefined | string | number | boolean) => {
   /*
 
   */
@@ -71,7 +71,7 @@ export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
 export const generateElementLabel = (
   d: CanvasGraphNode | CanvasGraphEdge,
   customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
-  defaultValue: any) => {
+  defaultValue: undefined | string | number | boolean) => {
 
   if (d.label) {
     console.log("=====generateElementLabel d.label", d.label)

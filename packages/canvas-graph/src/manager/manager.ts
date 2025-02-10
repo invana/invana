@@ -4,8 +4,8 @@ import {
   Graph,
   GraphOptions,
 } from '@antv/g6';
-import { GraphStore } from '@invana/data-store'
-import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
+import { GraphStore, ICanvasData, ICanvasNode } from '@invana/data-store'
+import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './style_utils';
 import { GraphStyle } from './styling';
 import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
@@ -38,6 +38,45 @@ export class CanvasManager {
 
   getGraphSchema(): IGraphSchema {
     return this.store.generateSchema();
+  }
+
+  getModelAsGraphData(): ICanvasData {
+    const schema = this.getGraphSchema();
+    console.log("getModelAsGraphData.schema", schema);
+    const nodes = schema.nodes.map(node => {
+      console.log("getModelAsGraphData.node", node)
+      const properties = node.properties.reduce((acc: any, prop) => {
+        acc[prop.name] = prop.type;
+        return acc;
+      }, {});
+
+      return {
+        id: node.name,
+        type: node.name,
+        label: node.name,
+        properties: properties
+      } as ICanvasNode
+    })
+
+    const edges = schema.edges.map(edge => {
+      const properties = edge.properties.reduce((acc: any, prop) => {
+        acc[prop.name] = prop.type;
+        return acc;
+      }, {});
+      console.log("getModelAsGraphData.edge", edge)
+      return {
+        id: edge.name,
+        type: edge.name,
+        label: edge.name,
+        source: edge.source,
+        target: edge.target,
+        properties: properties
+      }
+    })
+    return {
+      nodes: nodes,
+      edges: edges,
+    }
   }
 
   getUniqueItemsByItem(options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) {

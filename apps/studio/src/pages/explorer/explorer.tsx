@@ -3,7 +3,7 @@ import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
 import { Activity, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
 import { flightData } from '@invana/example-datasets'
@@ -20,7 +20,7 @@ import {
 } from '@invana/canvas-graph/defaults/behaviors';
 import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
-import { D3_FORCE_LAYOUT, GRID_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
+import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
 import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
 import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
@@ -71,19 +71,39 @@ const defaultOptions: CanvasManagerOptions = {
 }
 
 
+const graphModelOptions: CanvasManagerOptions = {
+  behaviors: [
+    DRAG_CANVAS_BEHAVIOR,
+    ZOOM_CANVAS_BEHAVIOR,
+    DRAG_ELEMENT_BEHAVIOR,
+    HOVER_ACTIVATE_BEHAVIOR,
+    CLICK_SELECT_BEHAVIOR,
+    LASSO_SELECT_BEHAVIOR,
+    NODE_TOOLTIP_BEHAVIOR,
+    EDGE_TOOLTIP_BEHAVIOR,
+    NODE_CONTEXT_MENU_BEHAVIOR,
+    EDGE_CONTEXT_MENU_BEHAVIOR,
+    CANVAS_CONTEXT_MENU_BEHAVIOR,
+    // {
+    //   ...PROPERTY_VIEWER_BEHAVIOR,
+    //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
+    // }
+  ],
+  transforms: [
+    // MAP_NODE_SIZE_TRANSFORMER,
+    PROCESS_PARALLEL_TRANSFORMER
+  ],
+  plugins: [],
+  layout: D3_FORCE_LAYOUT,
+  styles: DEFAULT_STYLE_OPTIONS
+};
+
+
+
 const ExplorerPage: React.FC = () => {
-
-
 
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
-  // const canvasGraphRef = useRef<{
-  //   getGraph: () => Graph
-  //   // getGraphManager: () => CanvasManager
-  // } | null>(null);
-  // const canvasGraphRef = useRef<CanvasGraphProps>(null);
-  // const canvasManagerRef = useRef(null);
-
   const { theme, } = useThemeStore()
 
 
@@ -93,9 +113,7 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent,
-    // mainTopContentSize, leftContentSize
   } = useDefaultLayoutStore()
-
 
 
   const topNavItems: LeftNavItem[] = [
@@ -137,40 +155,17 @@ const ExplorerPage: React.FC = () => {
 
   ]
 
-  const options = { ...defaultOptions }
-
-  // if (options.behaviors) {
-  //   options.behaviors = options.behaviors.filter(b => b !== 'property-viewer');
-
-  //   options.behaviors.push({
-  //     key: 'property-viewer',
-  //     type: 'property-viewer',
-  //     className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
-  //   });
-  // }
-
-
-  // useEffect(() => {
-  //   console.log("mainTopContentSize or leftContentSize updated ", mainTopContentSize, leftContentSize)
-  //   const graph = canvasManagerRef.current?.getGraph();
-  //   if (graph && isReady) {
-
-  //     graph.resize();
-  //     graph.layout();
-  //     graph.render();
-  //     graph.fitView();
-  //   }
-  // }, [mainTopContentSize, leftContentSize, isReady]);
-
-
   useEffect(() => {
     console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
     if (canvasManagerRef.current && isReady) {
-      // const canvasManager = canvasGraphRef.current.getGraphManager();
       console.log("getUpdatedStylingOptions, theme", theme)
       canvasManagerRef.current.setTheme(theme)
     }
   }, [theme, isReady]);
+
+  const getSchemaGraphData = () => {
+    return canvasManagerRef.current?.getModelAsGraphData();
+  }
 
   return <DefaultLayout
     headerProps={{
@@ -201,9 +196,13 @@ const ExplorerPage: React.FC = () => {
       <div className="space-y-2 ">
         {leftContentName === "model" &&
           <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
-            <div className='h-full px-3 py-2'>
-              <p >Graph model comes here</p>
-            </div>
+            <CanvasGraph
+              key='model'
+              containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
+              className={"bg-background"}
+              initData={getSchemaGraphData()}
+              options={graphModelOptions}
+            />
           </PanelContent>
         }
         {leftContentName === "query" &&
@@ -224,11 +223,10 @@ const ExplorerPage: React.FC = () => {
       </div>
     }
     mainTopContent={
-
       // <div className="flex h-full items-center justify-center ">
-
       <CanvasGraph
         // ref={canvasGraphRef}
+        key={'graphData'}
         containerStyle={{ width: "100%", height: "100%" }}
         className={"bg-background"}
         initData={flightData}
@@ -242,9 +240,8 @@ const ExplorerPage: React.FC = () => {
           setIsReady(false)
           canvasManagerRef.current = null;
         }}
-        options={options}
+        options={defaultOptions}
       />
-
       // </div>
     }
     mainBottomContent={
