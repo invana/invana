@@ -27,7 +27,7 @@ export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup
 
 export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
-    type: 'cubic-horizontal', // 'quadratic', 'cubic-vertical',  'cubic-horizontal',
+    type: 'line', // 'quadratic', 'cubic-vertical',  'cubic-horizontal',
     halo: false,
     strokeWidth: 1,
     strokeColor: '#cad2c5',
