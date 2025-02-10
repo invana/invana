@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { flightData } from '@invana/example-datasets'
 import { CanvasGraph } from '@invana/canvas-graph/canvas';
-import { defaultContainerStyle, defaultOptions } from './constants';
+import { defaultContainerStyle, defaultOptions } from '../constants';
 import '@invana/config-tailwind/index.css';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
