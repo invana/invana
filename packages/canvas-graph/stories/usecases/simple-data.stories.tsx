@@ -56,8 +56,8 @@ export const SimpleExample: Story = {
     initData: usersDataSet,
     containerStyle: defaultContainerStyle,
     onReady(canvasManager) {
-      console.log("canvasManager", canvasManager);
-      console.log("canvasManager.getGraphSchema()", JSON.stringify(canvasManager.getGraphSchema(), null, 2));
+      // console.log("canvasManager", canvasManager);
+      console.log("canvasManager.getGraphSchema()", canvasManager.getGraphSchema());
     },
   },
 };

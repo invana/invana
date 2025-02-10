@@ -1,4 +1,4 @@
-import { EdgeOptions, Graph, GraphOptions, ID, NodeOptions } from '@antv/g6'
+import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
 import { CanvasManagerOptions } from './types';
 import {
   convert_canvas_style_to_g6_style,
@@ -96,7 +96,8 @@ export class GraphStyle {
     const d = this.graph.getNodeData(nodeId) as CanvasGraphNode;
     if (d) {
       const labelText = generateElementLabel(d, customNodeStyles, d.id)
-      this.graph.updateNodeData([{ id: nodeId, style: { labelText } }])
+      //@ts-ignore
+      this.graph.updateNodeData([{ id: nodeId, style: { labelText: labelText } }])
       this.graph.render()
 
     } else {
@@ -114,6 +115,7 @@ export class GraphStyle {
     const d = this.graph.getEdgeData(edgeId) as CanvasGraphEdge;
     if (d) {
       const labelText = generateElementLabel(d, customEdgeStyles, undefined)
+      //@ts-ignore
       this.graph.updateEdgeData([{ id: edgeId, style: { labelText: labelText } }]);
       this.graph.render()
     } else {

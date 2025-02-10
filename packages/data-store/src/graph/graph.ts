@@ -1,4 +1,4 @@
-import { IEdgeSchema, IGraphSchema, INodeSchema, ISchemaProperty } from '../types/schema';
+import { IEdgeSchema, IGraphSchema, ISchemaProperty } from '../types/schema';
 import { GraphDataCRUD } from './crud';
 
 
@@ -31,7 +31,6 @@ export class GraphStore extends GraphDataCRUD {
     // Iterate through all nodes once
     graph.forEachNode((_, attributes) => {
       if (!attributes.type) return; // Skip nodes without a type
-      console.log("attributes", attributes);
       const nodeProperties = attributes.properties || {};
       if (!this.nodeSchemas.has(attributes.type)) {
         this.nodeSchemas.set(attributes.type, new Map());
@@ -53,11 +52,8 @@ export class GraphStore extends GraphDataCRUD {
 
     // Iterate through all edges once
     graph.forEachEdge((edge, attributes, source, target) => {
-      console.log("<<edge", edge, attributes, source, target);
-
       const sourceNode = graph.getNodeAttributes(source);
       const targetNode = graph.getNodeAttributes(target);
-      console.log("sourceNode", sourceNode, targetNode);
       if (!attributes.type) return; // Skip edges without a type
       const edgeProperties = attributes.properties || {};
       if (!this.edgeSchemas.has(attributes.type)) {

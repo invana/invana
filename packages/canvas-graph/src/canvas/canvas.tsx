@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from './types';
@@ -7,6 +7,7 @@ import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
 import { CanvasToolBar } from '../plugins';
+import { getUniqueItemsByItem } from '../manager/utils';
 
 
 // export interface GraphinRef extends Graph {
@@ -31,9 +32,38 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: Canvas
     }
   }));
 
-  const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-  const initData = props.initData ?? { 'nodes': [], 'edges': [] }
-  console.log("CanvasGraph loaded", options);
+  // useEffect(() => {
+  //   console.log("CanvasGraph mounted -- key", props.key);
+  //   return () => {
+  //     console.log("CanvasGraph unmounted -- key", props.key);
+  //   }
+  // }, [])
+
+  const options: CanvasManagerOptions = useMemo(() => {
+    const optionsData = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
+
+    console.log("==optionsData", optionsData)
+
+    if (optionsData.transforms) {
+      optionsData['transforms'] = getUniqueItemsByItem(optionsData.transforms || [])
+    }
+
+    if (optionsData.plugins) {
+      optionsData['plugins'] = getUniqueItemsByItem(optionsData.plugins || [])
+    }
+
+    if (optionsData.behaviors) {
+      optionsData['behaviors'] = getUniqueItemsByItem(optionsData.behaviors || [])
+    }
+    console.log("==optionsData loaded", optionsData)
+    return optionsData
+  }, [props.options]);
+
+  const initData = useMemo(() => {
+    return props.initData ?? { 'nodes': [], 'edges': [] };
+  }, [props.initData]);
+
+  console.log("CanvasGraph loaded", props.graphName, options.plugins?.length, options);
   return (
     <div className='h-full w-full bg-background' style={props.containerStyle ?? {}}>
 
@@ -41,7 +71,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: Canvas
         isGraphReady && showHeader && <CanvasToolBar className='h-50 bg-background text-foreground' getCanvasManager={() => canvasManagerRef.current as CanvasManager} />
       }
       <MemoizedGraphin
-        key={props?.key}
+        key={props?.graphName}
         ref={localRef}
         options={options}
         onReady={(graph) => {
@@ -50,7 +80,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: Canvas
           canvasManager.store.addData(initData, () => canvasManager.render());
           props?.onReady?.(canvasManager);
           canvasManagerRef.current = canvasManager;
-          setIsGraphReady(true);
+          // setIsGraphReady(true);
         }}
         onDestroy={() => {
           console.log("Graphin onDestroy");
@@ -60,8 +90,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props: Canvas
       // ref={graphinRef}
       />
       {/* <div style={{ marginTop: '10px' }}>
-        <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
-        <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>
+      <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
+      <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>
       </div> */}
     </div>
   );
