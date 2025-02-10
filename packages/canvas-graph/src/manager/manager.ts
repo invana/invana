@@ -8,6 +8,7 @@ import { GraphStore } from '@invana/data-store'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './utils';
 import { GraphStyle } from './styling';
 import { CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphTransform, CanvasManagerOptions } from './types';
+import { IGraphSchema } from '@invana/data-store/types/schema';
 
 
 export class CanvasManager {
@@ -33,6 +34,10 @@ export class CanvasManager {
   getGraph(): Graph {
     console.log("getGraph", this);
     return this.graph;
+  }
+
+  getGraphSchema(): IGraphSchema {
+    return this.store.generateSchema();
   }
 
   getUniqueItemsByItem(options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) {
