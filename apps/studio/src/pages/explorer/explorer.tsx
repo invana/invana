@@ -176,7 +176,7 @@ const ExplorerPage: React.FC = () => {
   }, []);
 
 
-  const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
+  // const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
 
 
   return <DefaultLayout
@@ -208,7 +208,7 @@ const ExplorerPage: React.FC = () => {
       <div className="space-y-2 ">
         {leftContentName === "model" &&
           <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
-            <MemoizedCanvasGraph
+            <CanvasGraph
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
@@ -237,7 +237,7 @@ const ExplorerPage: React.FC = () => {
     }
     mainTopContent={
       // <div className="flex h-full items-center justify-center ">
-      <MemoizedCanvasGraph
+      <CanvasGraph
         // ref={canvasGraphRef}
         graphName={'graphData'}
         containerStyle={{ width: "100%", height: "100%" }}
