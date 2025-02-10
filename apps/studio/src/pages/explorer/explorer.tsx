@@ -3,7 +3,7 @@ import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
 import { Activity, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
 import { flightData as initDataset } from '@invana/example-datasets'
@@ -171,9 +171,9 @@ const ExplorerPage: React.FC = () => {
   }
 
 
-  const initGraphData = useMemo(() => {
-    return initDataset ?? { 'nodes': [], 'edges': [] };
-  }, []);
+  // const initGraphData = useMemo(() => {
+  //   return initDataset ?? { 'nodes': [], 'edges': [] };
+  // }, []);
 
 
   // const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
@@ -242,7 +242,7 @@ const ExplorerPage: React.FC = () => {
         graphName={'graphData'}
         containerStyle={{ width: "100%", height: "100%" }}
         className={"bg-background"}
-        initData={initGraphData}
+        initData={initDataset}
         onReady={(canvasManager: CanvasManager) => {
           console.log("CanvasGraph.onReady", canvasManager)
           canvasManagerRef.current = canvasManager;
