@@ -32,6 +32,7 @@ export const SimpleExample: Story = {
         defaultEdge: {
           shape: {
             type: 'polyline',
+            strokeOpacity: 0.8
           }
         }
       },
@@ -57,6 +58,7 @@ export const WithGrouping: Story = {
         defaultEdge: {
           shape: {
             type: 'polyline',
+            strokeOpacity: 0.8
           }
         }
       },
