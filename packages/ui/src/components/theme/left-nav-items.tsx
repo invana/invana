@@ -10,6 +10,7 @@ export interface LeftNavItem {
   className?: string;
   iconClassName?: string;
   iconStroke?: number;
+  tooltipSide?: 'left' | 'right'
   showSeperator?: boolean
   icon: React.ElementType | LucideIcon
   tooltip?: React.ReactNode
@@ -60,7 +61,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
               </div>
             )}
           </TooltipTrigger>
-          <TooltipContent side="right">
+          <TooltipContent side={item.tooltipSide ? item.tooltipSide : 'right'}>
             {item.name}
           </TooltipContent>
         </Tooltip>
