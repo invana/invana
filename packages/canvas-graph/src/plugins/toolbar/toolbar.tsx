@@ -114,7 +114,7 @@ export const CanvasToolBar: React.FC<CanvasToolBarProps> = ({ getCanvasManager, 
       graph.resize();
       graph.layout();
       graph.render();
-      graph.fitView();
+      // graph.fitView();
     }
   }
 
