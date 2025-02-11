@@ -47,6 +47,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
           <main className="flex-1  w-[calc(100vw-45px)]">
             <div className="h-full">
               <ResizablePanelGroup
+                autoSaveId="left-persistence"
                 direction="horizontal"
                 onLayout={(sizes) => {
                   console.debug("sizes", sizes)
@@ -72,6 +73,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
                 <ResizablePanel defaultSize={leftContentName ? (100 - leftContentSize) : 100}>
                   <ResizablePanelGroup
                     direction="vertical"
+                    autoSaveId="main-persistence"
                     onLayout={(sizes) => {
                       console.debug("Vertical sizes", sizes)
                       // Update bottom panel size and collapse state
