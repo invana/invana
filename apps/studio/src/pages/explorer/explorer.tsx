@@ -111,10 +111,10 @@ const ExplorerPage: React.FC = () => {
   const { theme, } = useThemeStore()
 
   const {
-    leftContentName,
-    setLeftContentName,
+    rightContentName,
+    setRightContentName,
     bottomContentName,
-    toggleLeftContent,
+    toggleRightContent,
     toggleBottomContent
   } = useDefaultV2LayoutStore()
 
@@ -124,7 +124,7 @@ const ExplorerPage: React.FC = () => {
       name: "Graph Information",
       key: "graph-info",
       onClick: () => {
-        return toggleLeftContent("graph-info")
+        return toggleRightContent("graph-info")
       },
     },
     {
@@ -132,14 +132,14 @@ const ExplorerPage: React.FC = () => {
       name: "Model",
       key: "model",
       onClick: () => {
-        return toggleLeftContent("model")
+        return toggleRightContent("model")
       },
     },
     {
       name: "Query",
       key: "query",
       onClick: () => {
-        return toggleLeftContent("query")
+        return toggleRightContent("query")
       },
       icon: Terminal
     },
@@ -157,7 +157,7 @@ const ExplorerPage: React.FC = () => {
       name: "Activity History",
       key: 'activity-history',
       onClick: () => {
-        return toggleLeftContent("activity-history")
+        return toggleRightContent("activity-history")
       },
       icon: Activity
     },
@@ -213,21 +213,25 @@ const ExplorerPage: React.FC = () => {
       )
     }}
 
+    leftContent={
+      <></>
+    }
+
     leftNavProps={{
       topNavItems: topNavItems,
     }}
-    leftContent={
+    rightContent={
       <div className="space-y-2 ">
-        {leftContentName === "graph-info" &&
+        {rightContentName === "graph-info" &&
           <PanelContent title={"Graph Information"} key={'graph-info-panel'}
-            onClose={() => setLeftContentName(undefined)}
+            onClose={() => setRightContentName(undefined)}
             bodyClassName='h-[calc(100vh-70px)] overflow-y-auto'
             showClose>
             <GraphInformation schemaData={getSchemaGraphData()} />
           </PanelContent>
         }
-        {leftContentName === "model" &&
-          <PanelContent title={"Model"} key={'model-panel'} onClose={() => setLeftContentName(undefined)} showClose>
+        {rightContentName === "model" &&
+          <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modelGraphData}
               graphName={'model'}
@@ -239,18 +243,18 @@ const ExplorerPage: React.FC = () => {
             />
           </PanelContent>
         }
-        {leftContentName === "query" &&
-          <PanelContent title={"Query Console"} key={'query-panel'} onClose={() => setLeftContentName(undefined)} showClose>
+        {rightContentName === "query" &&
+          <PanelContent title={"Query Console"} key={'query-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <QueryForm className=' ' />
           </PanelContent>
         }
-        {leftContentName === "activity-history" &&
-          <PanelContent title={"Activity History"} key={'activity-panel'} onClose={() => setLeftContentName(undefined)} showClose>
+        {rightContentName === "activity-history" &&
+          <PanelContent title={"Activity History"} key={'activity-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <ActivityHistoryView className='p-3 mb-3 h-[calc(100vh-80px)] ' />
           </PanelContent>
         }
-        {leftContentName === "display-settings" &&
-          <PanelContent title={"Display Settings"} key={'display-panel'} onClose={() => setLeftContentName(undefined)} showClose>
+        {rightContentName === "display-settings" &&
+          <PanelContent title={"Display Settings"} key={'display-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <p>Display Settings here </p>
           </PanelContent>
         }
@@ -283,9 +287,9 @@ const ExplorerPage: React.FC = () => {
         <Button size={"sm"} onClick={() => toggleBottomContent('query')}>Toggle Bottom {bottomContentName}</Button>
       </>
     }
-    rightContent={
-      <></>
-    }
+  // rightContent={
+  //   <></>
+  // }
 
 
 
