@@ -62,7 +62,7 @@ const defaultOptions: CanvasManagerOptions = {
     PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
-    MINIMAP_PLUGIN,
+    // MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
     // GRID_PLUGIN
   ],
@@ -110,8 +110,8 @@ const ExplorerPage: React.FC = () => {
   const { theme, } = useThemeStore()
 
 
-  const modelGraphData = useRef<any>(null);
-  const queryGraphData = useRef<any>(null);
+  // const modelGraphData = useRef<any>(null);
+  // const queryGraphData = useRef<any>(null);
 
   const {
     leftContentName,
@@ -119,6 +119,8 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent,
+    leftContentSize,
+
   } = useDefaultLayoutStore()
 
 
