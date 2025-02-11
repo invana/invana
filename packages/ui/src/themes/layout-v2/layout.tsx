@@ -7,7 +7,6 @@ import {
 import { DefaultV2LayoutProps } from './types';
 import { useDefaultV2LayoutStore } from "./store"
 // import { PanelContent } from "./panel-content"
-import { RightSidebar } from "./right-sidebar"
 import React from "react"
 import { AppHeader } from "../app";
 import { TooltipProvider } from "../../components/ui";
@@ -19,16 +18,13 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
   headerProps,
   leftNavProps,
   rightNavProps,
-  leftContent,
   mainTopContent,
   mainBottomContent,
   rightContent }) => {
 
   const {
-    leftContentName,
     rightContentSize,
     rightContentName,
-    leftContentSize,
     // setLeftContentSize,
     mainTopContentSize,
     // setMainTopContentSize,

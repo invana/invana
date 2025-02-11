@@ -43,8 +43,9 @@ export const LeftNav: React.FC<LeftNavProps> = ({ showToggleTheme = false, class
               <Button
                 variant="ghost"
                 size="icon"
-                className="flex h-[50px] w-full px-2 py-2 items-center justify-center rounded-none
-                      text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                className="flex h-[50px] w-full px-2 py-2 items-center justify-center
+                 rounded-none text-muted-foreground transition-colors 
+                 hover:bg-accent hover:text-accent-foreground"
                 onClick={toggleTheme}
               >
                 {
