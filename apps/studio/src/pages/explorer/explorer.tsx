@@ -6,7 +6,7 @@ import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
-import { flightData as initDataset } from '@invana/example-datasets'
+import { lesMiserablesData as initDataset } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
