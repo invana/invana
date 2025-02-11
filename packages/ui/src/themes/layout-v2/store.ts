@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from 'zustand/middleware';
 
 
-interface DefaultV1LayoutState {
+interface DefaultV2LayoutState {
   // Content states
   leftContentName: string | undefined
   rightContentName: string | undefined
@@ -27,8 +27,8 @@ interface DefaultV1LayoutState {
 const defaultLeftContentSize = 25;
 const defaultMainTopContentSize = 97;
 
-export const useDefaultV1LayoutStore = create(
-  persist<DefaultV1LayoutState>(
+export const useDefaultV2LayoutStore = create(
+  persist<DefaultV2LayoutState>(
     (set) => ({
       leftContentName: undefined,
       rightContentName: undefined,
