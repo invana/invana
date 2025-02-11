@@ -25,6 +25,7 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
 
   const {
     leftContentName,
+    rightContentSize,
     rightContentName,
     leftContentSize,
     // setLeftContentSize,
@@ -43,8 +44,9 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
           right={headerProps?.right}
         />
         <div className="relative h-[calc(100vh-45px)] flex flex-1">
-          <LeftNav {...leftNavProps} />
-          <main className="flex-1  w-[calc(100vw-45px)]">
+          <LeftNav className=" border-r" {...leftNavProps} />
+          <main className="w-[calc(100vw-90px)]">
+            {/* w-[calc(100vw-90px)] */}
             <div className="h-full">
               <ResizablePanelGroup
                 autoSaveId="left-persistence"
@@ -54,23 +56,8 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                   // setLeftContentSize(sizes[0])
                 }}
               >
-                <ResizablePanel
-                  defaultSize={leftContentSize}
-                  minSize={15}
-                  maxSize={45}
-                  style={{
-                    display: leftContentName ? "block" : "none",
-                  }}
-                >
-                  {/* <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose> */}
-                  {leftContent}
-                  {/* </PanelContent> */}
-                </ResizablePanel>
-                <ResizableHandle
-                  withHandle
-                  className={cn("transition-opacity duration-300", !leftContentName && "hidden")}
-                />
-                <ResizablePanel defaultSize={leftContentName ? (100 - leftContentSize) : 100}>
+
+                <ResizablePanel defaultSize={rightContentName ? (100 - rightContentSize) : 100}>
                   <ResizablePanelGroup
                     direction="vertical"
                     autoSaveId="main-persistence"
@@ -99,10 +86,30 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                     </ResizablePanel>
                   </ResizablePanelGroup>
                 </ResizablePanel>
+
+                <ResizableHandle
+                  withHandle
+                  className={cn("transition-opacity duration-300", !rightContentName && "hidden")}
+                />
+                <ResizablePanel
+                  defaultSize={rightContentSize}
+                  minSize={15}
+                  maxSize={45}
+                  style={{
+                    display: rightContentName ? "block" : "none",
+                  }}
+                >
+                  {/* <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose> */}
+                  {rightContent}
+                  {/* </PanelContent> */}
+                </ResizablePanel>
+
               </ResizablePanelGroup>
             </div>
           </main>
-          {rightContentName && <RightSidebar>{rightContent}</RightSidebar>}
+          {/* {rightContentName && <RightSidebar>{rightContent}</RightSidebar>} */}
+          <LeftNav className=" border-l" {...leftNavProps} />
+
         </div>
       </div>
     </TooltipProvider>

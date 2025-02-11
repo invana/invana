@@ -8,16 +8,17 @@ import { Tooltip, TooltipTrigger, Button, TooltipContent } from '../../component
 export interface LeftNavProps {
   topNavItems?: LeftNavItem[];
   bottomNavItems?: LeftNavItem[];
+  className?: string
 }
 
 
-export const LeftNav: React.FC<LeftNavProps> = ({ topNavItems, bottomNavItems }) => {
+export const LeftNav: React.FC<LeftNavProps> = ({ className = '', topNavItems, bottomNavItems }) => {
 
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();
 
   return (
-    <div className="w-[45px] h-full border-r bg-background flex flex-col items-center">
+    <div className={`w-[45px] h-full  flex flex-col items-center ${className}`}>
       <LeftNavItems items={topNavItems ?? []} />
 
       <div className="flex-1" />

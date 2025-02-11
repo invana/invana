@@ -11,6 +11,9 @@ interface DefaultV2LayoutState {
   leftContentSize: number;
   setLeftContentSize: (name: number) => void
 
+  rightContentSize: number;
+  setRightContentSize: (name: number) => void
+
   mainTopContentSize: number
   setMainTopContentSize: (name: number) => void
 
@@ -36,6 +39,9 @@ export const useDefaultV2LayoutStore = create(
 
       leftContentSize: 0,
       setLeftContentSize: (size) => set({ leftContentSize: size }),
+
+      rightContentSize: 0,
+      setRightContentSize: (size) => set({ rightContentSize: size }),
 
       mainTopContentSize: defaultMainTopContentSize,
       setMainTopContentSize: (size) => set({ mainTopContentSize: size }),
