@@ -100,22 +100,22 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                     display: rightContentName ? "block" : "none",
                   }}
                 >
-                  <ResizablePanelGroup
+                  {/* <ResizablePanelGroup
                     direction="vertical"
                     autoSaveId="right-persistence"
                   >
-                    <ResizablePanel minSize={30} defaultSize={mainTopContentSize} className="overflow-y-auto" >
-                      {/* <div className="flex h-full items-center justify-center"> */}
-                      {rightContent}
-                      {/* </div> */}
-                    </ResizablePanel>
+                    <ResizablePanel minSize={30} defaultSize={mainTopContentSize} className="overflow-y-auto" > */}
+                  {/* <div className="flex h-full items-center justify-center"> */}
+                  {rightContent}
+                  {/* </div> */}
+                  {/* </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
                     <ResizablePanel minSize={3} defaultSize={100 - mainTopContentSize}>
                       <div className="flex-1 flex-col h-full">
 
                       </div>
                     </ResizablePanel>
-                  </ResizablePanelGroup>
+                  </ResizablePanelGroup> */}
 
                   {/* <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose> */}
                   {/* {rightContent} */}
