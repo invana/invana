@@ -1,7 +1,7 @@
 import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, CircleDashed, Eraser, Info, LayoutGrid, Lock, MonitorCog, Network, Share2, SquareMenu, Terminal } from 'lucide-react';
+import { Activity, Book, Brush, CircleDashed, Eraser, Info, LassoSelect, LayoutGrid, Lock, MonitorCog, Network, RefreshCw, Share2, SquareMenu, Terminal, Type } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -191,8 +191,8 @@ const ExplorerPage: React.FC = () => {
 
   const leftTopNavItems: LeftNavItem[] = [
     {
-      icon: Eraser,
-      name: "Eraser",
+      icon: LassoSelect,
+      name: "Lasso select",
       className: 'my-1',
       iconStroke: 2,
       // className: "p-0",
@@ -201,8 +201,18 @@ const ExplorerPage: React.FC = () => {
       },
     },
     {
-      icon: Lock,
-      name: "Lock",
+      icon: Brush,
+      name: "Brush",
+      className: 'my-1',
+      iconStroke: 2,
+      // className: "p-0",
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: Type,
+      name: "Add Comment",
       className: 'my-1 mb-3',
       showSeperator: true,
       iconStroke: 2,
@@ -210,6 +220,7 @@ const ExplorerPage: React.FC = () => {
         // return toggleRightContent("graph-info")
       },
     },
+
     {
       icon: Share2,
       name: "D3 Force layout",
@@ -247,6 +258,34 @@ const ExplorerPage: React.FC = () => {
         // return toggleRightContent("graph-info")
       },
     },
+    {
+      icon: Eraser,
+      name: "Eraser",
+      className: 'my-1',
+      iconStroke: 2,
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: RefreshCw,
+      name: "Re draw",
+      className: 'my-1',
+      iconStroke: 2,
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: Lock,
+      name: "Lock",
+      className: 'my-1 mb-3',
+      showSeperator: true,
+      iconStroke: 2,
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
   ]
   useEffect(() => {
     console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
@@ -260,6 +299,9 @@ const ExplorerPage: React.FC = () => {
     return canvasManagerRef.current?.getModelAsGraphData();
   }
 
+  useEffect(() => {
+    setRightContentName("graph-info")
+  }, [])
 
   return <DefaultV2Layout
     headerProps={{
