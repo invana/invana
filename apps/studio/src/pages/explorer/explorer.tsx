@@ -1,7 +1,7 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Info, MonitorCog, Network, Terminal } from 'lucide-react';
+import { Activity, Book, Info, MonitorCog, Network, SquareMenu, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -143,14 +143,14 @@ const ExplorerPage: React.FC = () => {
       },
       icon: Terminal
     },
-    // {
-    //   icon: Book,
-    //   key: "documentation",
-    //   name: "documentation",
-    //   onClick: () => {
-    //     console.log("Clicked:", "Documentation")
-    //   }
-    // },
+    {
+      icon: Book,
+      key: "documentation",
+      name: "documentation",
+      onClick: () => {
+        console.log("Clicked:", "Documentation")
+      }
+    },
     // { name: "Modeller", key: 'modeller', href: "/modeller", icon: Network },
     // { name: "Data Management", href: "/connections", icon: Database },
     {
@@ -162,7 +162,14 @@ const ExplorerPage: React.FC = () => {
       icon: Activity
     },
     { name: "Display Settings", key: 'display-settings', href: "#", icon: MonitorCog },
-
+    {
+      icon: SquareMenu,
+      key: "property-viewer",
+      name: "Property Viewer",
+      onClick: () => {
+        console.log("Clicked:", "Property Viewer")
+      }
+    },
   ]
 
   useEffect(() => {
@@ -220,12 +227,15 @@ const ExplorerPage: React.FC = () => {
     leftNavProps={{
       topNavItems: topNavItems,
     }}
+    rightNavProps={{
+      topNavItems: topNavItems,
+    }}
     rightContent={
-      <div className="space-y-2 ">
+      <div className="space-y-2 h-full">
         {rightContentName === "graph-info" &&
           <PanelContent title={"Graph Information"} key={'graph-info-panel'}
             onClose={() => setRightContentName(undefined)}
-            bodyClassName='h-[calc(100vh-70px)] overflow-y-auto'
+            bodyClassName='h-[calc(100vh-70px)] '
             showClose>
             <GraphInformation schemaData={getSchemaGraphData()} />
           </PanelContent>

@@ -18,6 +18,7 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
   className,
   headerProps,
   leftNavProps,
+  rightNavProps,
   leftContent,
   mainTopContent,
   mainBottomContent,
@@ -99,8 +100,25 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                     display: rightContentName ? "block" : "none",
                   }}
                 >
+                  <ResizablePanelGroup
+                    direction="vertical"
+                    autoSaveId="right-persistence"
+                  >
+                    <ResizablePanel minSize={30} defaultSize={mainTopContentSize} className="overflow-y-auto" >
+                      {/* <div className="flex h-full items-center justify-center"> */}
+                      {rightContent}
+                      {/* </div> */}
+                    </ResizablePanel>
+                    <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
+                    <ResizablePanel minSize={3} defaultSize={100 - mainTopContentSize}>
+                      <div className="flex-1 flex-col h-full">
+
+                      </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+
                   {/* <PanelContent title="Navigation Tree" onClose={() => toggleLeftContent('query')} showClose> */}
-                  {rightContent}
+                  {/* {rightContent} */}
                   {/* </PanelContent> */}
                 </ResizablePanel>
 
@@ -108,7 +126,7 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
             </div>
           </main>
           {/* {rightContentName && <RightSidebar>{rightContent}</RightSidebar>} */}
-          <LeftNav className=" border-l" {...leftNavProps} />
+          <LeftNav showToggleTheme={true} className=" border-l" {...rightNavProps} />
 
         </div>
       </div>

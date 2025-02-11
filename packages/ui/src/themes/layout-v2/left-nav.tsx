@@ -8,11 +8,12 @@ import { Tooltip, TooltipTrigger, Button, TooltipContent } from '../../component
 export interface LeftNavProps {
   topNavItems?: LeftNavItem[];
   bottomNavItems?: LeftNavItem[];
-  className?: string
+  className?: string,
+  showToggleTheme?: boolean
 }
 
 
-export const LeftNav: React.FC<LeftNavProps> = ({ className = '', topNavItems, bottomNavItems }) => {
+export const LeftNav: React.FC<LeftNavProps> = ({ showToggleTheme = false, className = '', topNavItems, bottomNavItems }) => {
 
   const { theme, initTheme, toggleTheme } = useTheme();
   initTheme();
@@ -35,26 +36,30 @@ export const LeftNav: React.FC<LeftNavProps> = ({ className = '', topNavItems, b
           <span className="sr-only">{item.name}</span>
         </button>
       ))} */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="flex h-[50px] w-full px-2 py-2 items-center justify-center rounded-none
+      {
+        showToggleTheme && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="flex h-[50px] w-full px-2 py-2 items-center justify-center rounded-none
                       text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            onClick={toggleTheme}
-          >
-            {
-              theme === "dark" ? (
-                <Sun className="h-4 w-4 text-foreground" />
-              ) : (
-                <Moon className="h-4 w-4 text-foreground" />
-              )
-            }
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Toggle theme</TooltipContent>
-      </Tooltip>
+                onClick={toggleTheme}
+              >
+                {
+                  theme === "dark" ? (
+                    <Sun className="h-4 w-4 text-foreground" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-foreground" />
+                  )
+                }
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Toggle theme</TooltipContent>
+          </Tooltip>
+        )
+      }
     </div>
   )
 }
