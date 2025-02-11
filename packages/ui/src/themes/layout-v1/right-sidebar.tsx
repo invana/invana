@@ -1,6 +1,6 @@
 import { cn } from "../../lib/utils"
 import { PanelContent } from "../../components/theme/panel-content"
-import { useLeftNavAppLayoutStore } from "./store"
+import { useDefaultV1LayoutStore } from "./store"
 import React from "react"
 
 export interface RightSidebarProps {
@@ -8,7 +8,7 @@ export interface RightSidebarProps {
 }
 
 export const RightSidebar: React.FC<RightSidebarProps> = ({ children }) => {
-  const { rightContentName, toggleRightContent } = useLeftNavAppLayoutStore()
+  const { rightContentName, toggleRightContent } = useDefaultV1LayoutStore()
   return (
     <div
       className={cn(

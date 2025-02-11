@@ -1,19 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Home, Compass, Book } from 'lucide-react';
-import { LeftNavAppLayout } from '@/themes/left-nav-app/default';
+import { DefaultV1Layout } from '@/themes/layout-v1/layout';
 import { Button, LeftNavItem } from '@invana/ui';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: 'Layouts/LeftNavAppLayout',
-  component: LeftNavAppLayout,
+  title: 'Layouts/DefaultV1Layout',
+  component: DefaultV1Layout,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
   args: {
   },
-} satisfies Meta<typeof LeftNavAppLayout>;
+} satisfies Meta<typeof DefaultV1Layout>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
