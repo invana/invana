@@ -232,8 +232,8 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
 export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<GraphOptions> => {
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
-    autoResize: true,
-    autoFit: 'view', // 'view' | 'graph' | 'center'
+    // autoResize: false,
+    // autoFit: 'view', // 'view' | 'graph' | 'center'
     animation: {
       duration: 200,
       easing: 'linear',

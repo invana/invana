@@ -33,7 +33,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       <ButtonOrLink
         href={href}
         className={cn(
-          "flex w-full items-center justify-between rounded-md px-4 py-2 text-sm",
+          "flex w-full items-center justify-between  px-4 py-2 text-sm",
           "hover:bg-accent hover:text-accent-foreground",
           "focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:outline-none",
           className,
@@ -62,7 +62,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       {hasChildren && (
         <ul
           className={cn(
-            "absolute min-w-[240px] rounded-md border p-1  bg-card text-card-foreground  shadow-md",
+            "absolute min-w-[240px] border p-1  bg-card text-card-foreground  shadow-md",
             "invisible opacity-0 translate-x-2",
             "group-hover/item:visible group-hover/item:opacity-100 group-hover/item:translate-x-0",
             "transition-all duration-150 ease-in-out",

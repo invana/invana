@@ -14,29 +14,15 @@ export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
 export const menuItems: MenuItem[] = [
   {
     id: 'files',
-    label: 'Incoming',
+    label: 'Display Settings',
     icon: FolderOpen,
-    shortcut: '⌘F',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      },
-      {
-        id: 'recent',
-        label: 'Recent Files',
-        icon: FileText,
-        shortcut: '⌘R',
-      }
-    ]
+    // shortcut: '⌘F',
   },
   {
-    id: 'settings',
-    label: 'OutGoing',
+    id: 'Run Analysis',
+    label: 'Run Analysis',
     icon: Settings,
-    shortcut: '⌘,',
+    // shortcut: '⌘,',
     children: [
 
       {
@@ -47,20 +33,7 @@ export const menuItems: MenuItem[] = [
       }
     ]
   },
-  {
-    id: 'messages',
-    label: 'graph algorithms',
-    icon: Mail,
-    shortcut: '⌘M',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      }
-    ]
-  }
+
 ]
 
 export class CanvasContextMenuBehavior extends BaseBehavior {

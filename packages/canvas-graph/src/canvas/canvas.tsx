@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from './types';
@@ -39,6 +39,16 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
   //   };
   // }, []);
 
+  useEffect(() => {
+    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
+
+
   const localRef = useRef<Graph | null>(null);
   // const canvasManagerRef = useRef<CanvasManager | null>(null);
 
@@ -65,7 +75,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
 
 
   const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props.options?.plugins,)
+  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props.options,)
   const initData = props.initData ?? { 'nodes': [], 'edges': [] }
 
   return (
@@ -73,6 +83,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) =
       <Graphin
         ref={localRef}
         id={props.graphName}
+        className='graph-canvas'
         options={{}}
         onReady={(graph) => {
           console.log("Graphin onReady", graph);
