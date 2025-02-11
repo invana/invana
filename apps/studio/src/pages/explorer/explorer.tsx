@@ -185,19 +185,6 @@ const ExplorerPage: React.FC = () => {
   }
 
 
-  // const initGraphData = useMemo(() => {
-  //   return initDataset ?? { 'nodes': [], 'edges': [] };
-  // }, []);
-
-
-  // const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
-
-
-  // document.addEventListener("contextmenu", function (event) {
-  //   event.preventDefault();
-  //   // alert("Right-click is disabled on this element!");
-  // });
-
   return <DefaultV2Layout
     headerProps={{
       left: (
