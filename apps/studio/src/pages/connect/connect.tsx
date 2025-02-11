@@ -4,6 +4,7 @@ import {
   Badge,
   BookOpenIcon, Database, LightbulbIcon,
   Link,
+  Trash,
 } from 'lucide-react';
 import { LANDING_ROUTE } from '../../constants';
 // import { useConnectionStore } from '../../store/connectionStore';
@@ -11,6 +12,9 @@ import { GraphDBConnection } from '../../models';
 import { ConnectForm } from '../../ui/forms/connect-form';
 import { LogoComponent } from '../constants';
 import useConnections from '@/hooks/useConnection';
+import { projectsListDataSet } from '@/projectsList';
+import useProjects from '@/hooks/useProject';
+import { useNavigate } from 'react-router-dom';
 
 
 export interface ILearnMoreItem {
@@ -42,8 +46,11 @@ const learnMoreItems: ILearnMoreItem[] = [
 
 const ConnectPage: React.FC = () => {
 
+  const { createProject, setActiveProjectId, deleteAllProjects } = useProjects()
+  const navigate = useNavigate();
+
   const { initTheme } = useThemeStore();
-  const { connections, setActiveConnectionId } = useConnections();
+  const { connections, setActiveConnectionId, createConnection, deleteConnections } = useConnections();
   const [showForm, setShowForm] = React.useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('newConnection') === 'true';
@@ -51,8 +58,36 @@ const ConnectPage: React.FC = () => {
 
   const switchToConnection = (connectionId: string) => {
     setActiveConnectionId(connectionId);
-    window.location.href = LANDING_ROUTE;
+
+    // delete all projects before switching to a new connection
+    deleteAllProjects();
+    // add example 
+    projectsListDataSet.map((project) => {
+      createProject(project)
+    })
+    if (projectsListDataSet.length > 0) {
+      // const project = projectsListDataSet[0]
+      // setActiveProjectId(project?.id)
+      // navigate(`/graph/${project?.id}`)
+      navigate(LANDING_ROUTE)
+    } else {
+      window.location.href = LANDING_ROUTE;
+    }
   }
+
+  React.useEffect(() => {
+    // Check if there are any existing connections
+    // Create a default "Hello World" connection
+    const helloWorldConnection: GraphDBConnection = {
+      id: 'examples-101',
+      name: 'examples-101',
+      hosturl: 'localhost:8182',
+      queryLanguage: 'gremlin',
+      username: '',
+      password: '',
+    };
+    createConnection(helloWorldConnection)
+  }, []);
 
   initTheme()
 
@@ -92,12 +127,21 @@ const ConnectPage: React.FC = () => {
                   {connections.length === 0 ? (
                     <p className="text-zinc-500">There are no connections.</p>
                   ) : (
-                    connections.slice(-3).map((connection: GraphDBConnection, index: number) => (
+                    connections.slice(-5).map((connection: GraphDBConnection, index: number) => (
                       <div key={index} className="group">
-                        <Button variant={"ghost"} onClick={() => switchToConnection(connection.id)}
-                          className="w-full justify-start p-0 hover:bg-transparent text-blue-500 dark:text-blue-400 hover:text-blue-300">
-                          <Database /> {connection.name} - [{connection.queryLanguage}]
-                        </Button>
+                        <div className="flex justify-between items-center">
+                          <Button variant={"ghost"} onClick={() => switchToConnection(connection.id)}
+                            className="w-full justify-start p-0 hover:bg-transparent text-blue-500 dark:text-blue-400 hover:text-blue-300">
+                            <Database /> {connection.name} - [{connection.queryLanguage}]
+                          </Button>
+                          <Button variant={"ghost"} onClick={() => {
+                            console.log("deleting connection", connection.id);
+                            deleteConnections([connection.id])
+                          }}
+                            className="  p-0 hover:bg-transparent text-muted-500   hover:text-red-300">
+                            <Trash className='w-4 h-4' />
+                          </Button>
+                        </div>
                         <p className="text-xs text-zinc-500">{connection.hosturl}</p>
                       </div>
                     ))

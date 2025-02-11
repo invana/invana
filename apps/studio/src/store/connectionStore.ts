@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { GraphDBConnection } from '../models';
 import { LOCALSTORAGE_KEYS } from '@/constants';
 
@@ -8,12 +7,15 @@ import { LOCALSTORAGE_KEYS } from '@/constants';
 export interface GraphDBConnectionState {
   connections: GraphDBConnection[];
   getConnections: () => Promise<GraphDBConnection[]>;
-  createConnection: (connection: Omit<GraphDBConnection, 'id'>) => Promise<GraphDBConnection>;
+  createConnection: (connection: GraphDBConnection) => Promise<GraphDBConnection>;
   isConnectionNameExists: (name: string) => boolean;
 
   getActiveConnection: () => GraphDBConnection | undefined;
   activeConnectionId: string | undefined;
   setActiveConnectionId: (id: string | undefined) => void;
+
+  deleteConnections: (connectionIds: string[]) => void;
+  deleteAllConnections: () => void;
 
 }
 
@@ -28,12 +30,16 @@ export const useConnectionStore = create(
       },
       createConnection: async (connection) => {
         const newGraphDBConnection: GraphDBConnection = {
-          id: uuidv4(),
           ...connection
         };
-        set((state) => ({
-          connections: [...state.connections, newGraphDBConnection],
-        }));
+        set((state) => {
+          if (state.connections.find(c => c.id === newGraphDBConnection.id)) {
+            return state;
+          }
+          return {
+            connections: [...state.connections, newGraphDBConnection],
+          };
+        });
         return newGraphDBConnection;
       },
       isConnectionNameExists: (name: string) => {
@@ -48,6 +54,25 @@ export const useConnectionStore = create(
       },
       getActiveConnection: () => {
         return get().connections.find((connection) => connection.id === get().activeConnectionId);
+      },
+      deleteConnections: (connectionIds: string[]) => {
+        set((state) => {
+          const newConnections = state.connections.filter((connection) => !connectionIds.includes(connection.id));
+          let newActiveConnectionId = state.activeConnectionId;
+          if (connectionIds.includes(state.activeConnectionId || "")) {
+            newActiveConnectionId = undefined;
+          }
+          return {
+            connections: newConnections,
+            activeConnectionId: newActiveConnectionId
+          }
+        })
+      },
+      deleteAllConnections: () => {
+        set(() => ({
+          connections: [],
+          activeConnectionId: undefined
+        }))
       }
     }),
     {

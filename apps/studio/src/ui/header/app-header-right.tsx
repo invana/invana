@@ -53,7 +53,7 @@ const AppHeaderRight: React.FC = () => {
       {connections.length > 0 ?
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2 ">
+            <Button variant="ghost" className="flex items-center space-x-1 ">
               <Database className=" h-4 " />
               <span >{activeConnection?.name || "select connection"}</span>
               <ChevronDown className="h-4 w-4" />

@@ -6,7 +6,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Modeling Methods",
       "label": "Modeling Methods",
-      "type": "Modeling Methods",
+      "type": "Concept",
       properties: {
         "depth": 0,
         "blank": {},
@@ -15,7 +15,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Classification",
       "label": "Classification",
-      "type": "Classification",
+      "type": "Concept",
       properties: {
         "depth": 1,
         "blank": {},
@@ -24,7 +24,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Logistic regression",
       "label": "Logistic regression",
-      "type": "Logistic regression",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -33,7 +33,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Linear discriminant analysis",
       "label": "Linear discriminant analysis",
-      "type": "Linear discriminant analysis",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -42,7 +42,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Rules",
       "label": "Rules",
-      "type": "Rules",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -51,7 +51,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Decision trees",
       "label": "Decision trees",
-      "type": "Decision trees",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -60,7 +60,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Naive Bayes",
       "label": "Naive Bayes",
-      "type": "Naive Bayes",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -69,7 +69,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "K nearest neighbor",
       "label": "K nearest neighbor",
-      "type": "K nearest neighbor",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -78,7 +78,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Probabilistic neural network",
       "label": "Probabilistic neural network",
-      "type": "Probabilistic neural network",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -87,7 +87,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Support vector machine",
       "label": "Support vector machine",
-      "type": "Support vector machine",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -96,7 +96,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Consensus",
       "label": "Consensus",
-      "type": "Consensus",
+      "type": "Concept",
       properties: {
         "depth": 1,
         "blank": {},
@@ -105,7 +105,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Models diversity",
       "label": "Models diversity",
-      "type": "Models diversity",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -114,7 +114,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different initializations",
       "label": "Different initializations",
-      "type": "Different initializations",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -123,7 +123,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different parameter choices",
       "label": "Different parameter choices",
-      "type": "Different parameter choices",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -132,7 +132,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different architectures",
       "label": "Different architectures",
-      "type": "Different architectures",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -141,7 +141,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different modeling methods",
       "label": "Different modeling methods",
-      "type": "Different modeling methods",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -150,7 +150,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different training sets",
       "label": "Different training sets",
-      "type": "Different training sets",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -159,7 +159,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Different feature sets",
       "label": "Different feature sets",
-      "type": "Different feature sets",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -168,7 +168,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Methods",
       "label": "Methods",
-      "type": "Methods",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -177,7 +177,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Classifier selection",
       "label": "Classifier selection",
-      "type": "Classifier selection",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -186,7 +186,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Classifier fusion",
       "label": "Classifier fusion",
-      "type": "Classifier fusion",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -195,7 +195,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Common",
       "label": "Common",
-      "type": "Common",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -204,7 +204,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Bagging",
       "label": "Bagging",
-      "type": "Bagging",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -213,7 +213,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Boosting",
       "label": "Boosting",
-      "type": "Boosting",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -222,7 +222,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "AdaBoost",
       "label": "AdaBoost",
-      "type": "AdaBoost",
+      "type": "Concept",
       properties: {
         "depth": 3,
         "blank": {},
@@ -231,7 +231,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Regression",
       "label": "Regression",
-      "type": "Regression",
+      "type": "Concept",
       properties: {
         "depth": 1,
         "blank": {},
@@ -240,7 +240,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Multiple linear regression",
       "label": "Multiple linear regression",
-      "type": "Multiple linear regression",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -249,7 +249,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Partial least squares",
       "label": "Partial least squares",
-      "type": "Partial least squares",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -258,7 +258,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Multi-layer feedforward neural network",
       "label": "Multi-layer feedforward neural network",
-      "type": "Multi-layer feedforward neural network",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -267,7 +267,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "General regression neural network",
       "label": "General regression neural network",
-      "type": "General regression neural network",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},
@@ -276,7 +276,7 @@ export const modellingMethodsDataset: ICanvasData = {
     {
       "id": "Support vector regression",
       "label": "Support vector regression",
-      "type": "Support vector regression",
+      "type": "Concept",
       properties: {
         "depth": 2,
         "blank": {},

@@ -14,6 +14,9 @@ const useConnections = () => {
   const setActiveConnectionId = useConnectionStore((state) => state.setActiveConnectionId);
   const getActiveConnection = useConnectionStore((state) => state.getActiveConnection);
 
+  const deleteConnections = useConnectionStore((state) => state.deleteConnections);
+  const deleteAllConnections = useConnectionStore((state) => state.deleteAllConnections);
+
   return {
     connections,
     getConnections,
@@ -21,7 +24,9 @@ const useConnections = () => {
     isConnectionNameExists,
     activeConnectionId,
     setActiveConnectionId,
-    getActiveConnection
+    getActiveConnection,
+    deleteConnections,
+    deleteAllConnections
   };
 };
 
