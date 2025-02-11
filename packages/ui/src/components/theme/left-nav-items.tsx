@@ -30,7 +30,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                 href={item.href}
                 onClick={() => setActiveItem(item.name)}
                 className={`flex border-0 items-center justify-center 
-              text-muted-foreground transition-colors rounded-md
+              text-foreground transition-colors rounded-md
               hover:bg-accent  hover:text-sky-500 px-2 py-2 ${item.className || ''}
               ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
@@ -43,7 +43,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                   setActiveItem(item.name === activeItem ? null : item.name)
                 }}
                 className={`flex border-0   items-center justify-center 
-          text-muted-foreground transition-colors rounded-md
+          text-foreground transition-colors rounded-md
           hover:bg-accent  hover:text-sky-500 px-2 py-2  ${item.className || ''}
           ${activeItem === item.name ? ' text-sky-500' : ''}`}
               >
@@ -52,7 +52,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
             ) : (
               <div
                 className={`flex border-0  items-center justify-center 
-          text-muted-foreground transition-colors  rounded-md
+          text-foreground transition-colors  rounded-md
             hover:text-accent-foreground px-2 py-2 ${item.className || ''}
           ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
