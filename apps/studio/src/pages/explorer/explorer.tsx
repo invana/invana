@@ -1,7 +1,7 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, Info, MonitorCog, Network, SquareMenu, Terminal } from 'lucide-react';
+import { Activity, Book, CircleDashed, Eraser, Info, LayoutGrid, Lock, MonitorCog, Network, Share2, SquareMenu, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -118,11 +118,12 @@ const ExplorerPage: React.FC = () => {
     toggleBottomContent
   } = useDefaultV2LayoutStore()
 
-  const topNavItems: LeftNavItem[] = [
+  const rightTopNavItems: LeftNavItem[] = [
     {
       icon: Info,
       name: "Graph Information",
       key: "graph-info",
+      className: " h-[45px]",
       onClick: () => {
         return toggleRightContent("graph-info")
       },
@@ -131,6 +132,7 @@ const ExplorerPage: React.FC = () => {
       icon: Network,
       name: "Model",
       key: "model",
+      className: " h-[45px]",
       onClick: () => {
         return toggleRightContent("model")
       },
@@ -138,6 +140,8 @@ const ExplorerPage: React.FC = () => {
     {
       name: "Query",
       key: "query",
+      className: " h-[45px]",
+
       onClick: () => {
         return toggleRightContent("query")
       },
@@ -147,6 +151,8 @@ const ExplorerPage: React.FC = () => {
       icon: Book,
       key: "documentation",
       name: "documentation",
+      className: " h-[45px]",
+
       onClick: () => {
         console.log("Clicked:", "Documentation")
       }
@@ -156,6 +162,8 @@ const ExplorerPage: React.FC = () => {
     {
       name: "Activity History",
       key: 'activity-history',
+      className: " h-[45px]",
+
       onClick: () => {
         return toggleRightContent("activity-history")
       },
@@ -166,12 +174,67 @@ const ExplorerPage: React.FC = () => {
       icon: SquareMenu,
       key: "property-viewer",
       name: "Property Viewer",
+      className: " h-[45px]",
       onClick: () => {
         console.log("Clicked:", "Property Viewer")
       }
     },
   ]
 
+
+  const leftTopNavItems: LeftNavItem[] = [
+    {
+      icon: Eraser,
+      name: "Eraser",
+      key: "eraser",
+      // className: "p-0",
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: Lock,
+      name: "Lock",
+      key: "lock",
+      showSeperator: true,
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: Share2,
+      name: "D3 Force layout",
+      key: "d3-force-layout",
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: CircleDashed,
+      name: "Circular Layout",
+      key: "circular-layout",
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: LayoutGrid,
+      name: "Grid Layout",
+      key: "grid-layout",
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+    {
+      icon: Network,
+      name: "Dagre layout",
+      key: "dagre-layout",
+      showSeperator: true,
+      onClick: () => {
+        // return toggleRightContent("graph-info")
+      },
+    },
+  ]
   useEffect(() => {
     console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
     if (canvasManagerRef.current && isReady) {
@@ -212,10 +275,10 @@ const ExplorerPage: React.FC = () => {
     }
 
     leftNavProps={{
-      topNavItems: topNavItems,
+      topNavItems: leftTopNavItems,
     }}
     rightNavProps={{
-      topNavItems: topNavItems,
+      topNavItems: rightTopNavItems,
     }}
     rightContent={
       <div className="space-y-2 h-full">

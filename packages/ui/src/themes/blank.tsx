@@ -9,14 +9,8 @@ import { Separator } from "../components/ui/separator"
 import { Button } from "../components/ui"
 import useTheme from "../hooks/useTheme"
 import React from "react"
+import { LeftNavItem } from '@/components/theme/left-nav-items'
 
-export interface LeftNavItem {
-  name: string
-  key: string
-  href?: string
-  onClick?: () => void
-  icon: React.ElementType
-}
 
 
 export interface BlankLayoutProps {
@@ -80,7 +74,7 @@ export const BlankLayout: React.FC<BlankLayoutProps> = (props) => {
                       {item.name}
                     </TooltipContent>
                   </Tooltip>
-                  <Separator />
+                  {item.showSeperator && <Separator />}
                 </React.Fragment>
 
               ))}

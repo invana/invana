@@ -7,6 +7,9 @@ export interface LeftNavItem {
   name: string
   href?: string
   onClick?: () => void
+  className?: string;
+  iconClassName?: string;
+  showSeperator?: boolean
   icon: React.ElementType | LucideIcon
   tooltip?: React.ReactNode
 }
@@ -25,12 +28,12 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
               <a
                 href={item.href}
                 onClick={() => setActiveItem(item.name)}
-                className={`flex h-[45px] w-full items-center justify-center 
-              text-muted-foreground transition-colors 
-                hover:text-accent-foreground px-2 py-2
+                className={`flex border-0 w-full items-center justify-center 
+              text-muted-foreground transition-colors
+                hover:text-accent-foreground px-2 py-2 ${item.className || ''}
               ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
               </a>
             ) : item.onClick ? (
               <button
@@ -38,21 +41,21 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                   if (item.onClick) item.onClick();
                   setActiveItem(item.name === activeItem ? null : item.name)
                 }}
-                className={`flex h-[45px] w-full items-center justify-center 
+                className={`flex border-0 w-full items-center justify-center 
           text-muted-foreground transition-colors 
-          hover:bg-accent  hover:text-sky-500 px-2 py-2
-          ${activeItem === item.name ? 'bg-accent text-sky-500' : ''}`}
+          hover:bg-accent  hover:text-sky-500 px-2 py-2 ${item.className || ''}
+          ${activeItem === item.name ? ' text-sky-500' : ''}`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
               </button>
             ) : (
               <div
-                className={`flex h-[45px] w-full items-center justify-center 
+                className={`flex border-0 w-full items-center justify-center 
           text-muted-foreground transition-colors 
-            hover:text-accent-foreground px-2 py-2
+            hover:text-accent-foreground px-2 py-2 ${item.className || ''}
           ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
               </div>
             )}
           </TooltipTrigger>
@@ -60,7 +63,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
             {item.name}
           </TooltipContent>
         </Tooltip>
-        <Separator />
+        {item.showSeperator && <Separator />}
       </React.Fragment>
 
     ))
