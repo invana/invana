@@ -31,7 +31,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                 onClick={() => setActiveItem(item.name)}
                 className={`flex border-0 items-center justify-center 
               text-muted-foreground transition-colors
-                hover:text-accent-foreground px-2 py-2 ${item.className || ''}
+              hover:bg-accent  hover:text-sky-500 px-2 py-2 ${item.className || ''}
               ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
                 <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
