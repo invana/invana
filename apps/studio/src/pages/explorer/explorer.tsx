@@ -210,7 +210,7 @@ const ExplorerPage: React.FC = () => {
     leftContent={
       <div className="space-y-2 ">
         {leftContentName === "model" &&
-          <PanelContent title={"Model"} onClose={() => setLeftContentName(undefined)} showClose>
+          <PanelContent title={"Model"} key={'model-panel'} onClose={() => setLeftContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modelGraphData}
               graphName={'model'}
@@ -223,17 +223,17 @@ const ExplorerPage: React.FC = () => {
           </PanelContent>
         }
         {leftContentName === "query" &&
-          <PanelContent title={"Query Console"} onClose={() => setLeftContentName(undefined)} showClose>
+          <PanelContent title={"Query Console"} key={'query-panel'} onClose={() => setLeftContentName(undefined)} showClose>
             <QueryForm className=' ' />
           </PanelContent>
         }
         {leftContentName === "activity-history" &&
-          <PanelContent title={"Activity History"} onClose={() => setLeftContentName(undefined)} showClose>
+          <PanelContent title={"Activity History"} key={'activity-panel'} onClose={() => setLeftContentName(undefined)} showClose>
             <ActivityHistoryView className='p-3 mb-3 h-[calc(100vh-80px)] ' />
           </PanelContent>
         }
         {leftContentName === "display-settings" &&
-          <PanelContent title={"Display Settings"} onClose={() => setLeftContentName(undefined)} showClose>
+          <PanelContent title={"Display Settings"} key={'display-panel'} onClose={() => setLeftContentName(undefined)} showClose>
             <p>Display Settings here </p>
           </PanelContent>
         }
