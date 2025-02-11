@@ -1,6 +1,6 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
-import { DefaultLayout } from '@invana/ui/themes/default/default';
-import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
+import { LeftNavAppLayout } from '@invana/ui/themes/left-nav-app/layout';
+import { useLeftNavAppLayoutStore } from '@invana/ui/themes/left-nav-app/store';
 import { Activity, Info, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
@@ -116,7 +116,7 @@ const ExplorerPage: React.FC = () => {
     bottomContentName,
     toggleLeftContent,
     toggleBottomContent
-  } = useDefaultLayoutStore()
+  } = useLeftNavAppLayoutStore()
 
   const topNavItems: LeftNavItem[] = [
     {
@@ -191,7 +191,7 @@ const ExplorerPage: React.FC = () => {
   //   // alert("Right-click is disabled on this element!");
   // });
 
-  return <DefaultLayout
+  return <LeftNavAppLayout
     headerProps={{
       left: (
         <>
