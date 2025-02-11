@@ -1,7 +1,7 @@
 import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, Brush, CircleDashed, Eraser, Info, LassoSelect, LayoutGrid, Lock, MonitorCog, Network, RefreshCw, Share2, SquareMenu, Terminal, Type } from 'lucide-react';
+import { Activity, Book, Brush, CircleDashed, Eraser, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, MonitorCog, Network, RefreshCw, Share2, SquareMenu, Terminal, Type } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -125,6 +125,7 @@ const ExplorerPage: React.FC = () => {
       name: "Graph Information",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
+      tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("graph-info")
       },
@@ -134,6 +135,7 @@ const ExplorerPage: React.FC = () => {
       name: "Model",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
+      tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("model")
       },
@@ -142,7 +144,7 @@ const ExplorerPage: React.FC = () => {
       name: "Query",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
-
+      tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("query")
       },
@@ -153,7 +155,7 @@ const ExplorerPage: React.FC = () => {
       name: "Documentation",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
-
+      tooltipSide: "right",
       onClick: () => {
         console.log("Clicked:", "Documentation")
       }
@@ -164,7 +166,7 @@ const ExplorerPage: React.FC = () => {
       name: "Activity History",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
-
+      tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("activity-history")
       },
@@ -174,14 +176,15 @@ const ExplorerPage: React.FC = () => {
       name: "Display Settings",
       iconClassName: "w-5 h-5",
       href: "#",
+      tooltipSide: "right",
       icon: MonitorCog
     },
     {
       icon: SquareMenu,
-
       name: "Property Viewer",
       className: "my-1.5",
       iconClassName: "w-5 h-5",
+      tooltipSide: "right",
       onClick: () => {
         console.log("Clicked:", "Property Viewer")
       }
@@ -195,6 +198,7 @@ const ExplorerPage: React.FC = () => {
       name: "Lasso select",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -205,6 +209,7 @@ const ExplorerPage: React.FC = () => {
       name: "Brush",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -216,6 +221,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1 mb-3',
       showSeperator: true,
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -226,6 +232,7 @@ const ExplorerPage: React.FC = () => {
       name: "D3 Force layout",
       className: 'my-1 mt-3',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -235,6 +242,7 @@ const ExplorerPage: React.FC = () => {
       name: "Circular Layout",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -244,6 +252,7 @@ const ExplorerPage: React.FC = () => {
       name: "Grid Layout",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -254,6 +263,7 @@ const ExplorerPage: React.FC = () => {
       showSeperator: true,
       className: 'my-1 mb-3',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -263,6 +273,7 @@ const ExplorerPage: React.FC = () => {
       name: "Eraser",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -272,6 +283,7 @@ const ExplorerPage: React.FC = () => {
       name: "Re draw",
       className: 'my-1',
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -282,6 +294,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1 mb-3',
       showSeperator: true,
       iconStroke: 2,
+      tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
       },
@@ -331,9 +344,21 @@ const ExplorerPage: React.FC = () => {
 
     leftNavProps={{
       topNavItems: leftTopNavItems,
+
     }}
     rightNavProps={{
       topNavItems: rightTopNavItems,
+      bottomNavItems: [
+        {
+          icon: LifeBuoy,
+          name: "Help",
+          className: 'my-1',
+          iconStroke: 2,
+          onClick: () => {
+            // return toggleRightContent("graph-info")
+          },
+        }
+      ]
     }}
     rightContent={
       <div className="space-y-2 h-full">
