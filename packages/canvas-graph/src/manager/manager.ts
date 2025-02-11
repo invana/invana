@@ -24,7 +24,7 @@ export class CanvasManager {
 
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
-    console.log("CanvasManager.constructor", graph, options);
+    // console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
@@ -36,7 +36,7 @@ export class CanvasManager {
   }
 
   getGraph(): Graph {
-    console.log("getGraph", this);
+    // console.log("getGraph", this);
     return this.graph;
   }
 
@@ -46,9 +46,9 @@ export class CanvasManager {
 
   getModelAsGraphData(): ICanvasData {
     const schema = this.getGraphSchema();
-    console.log("getModelAsGraphData.schema", schema);
+    // console.log("getModelAsGraphData.schema", schema);
     const nodes = schema.nodes.map(node => {
-      console.log("getModelAsGraphData.node", node)
+      // console.log("getModelAsGraphData.node", node)
       const properties = node.properties.reduce((acc: any, prop) => {
         acc[prop.name] = prop.type;
         return acc;
@@ -67,7 +67,7 @@ export class CanvasManager {
         acc[prop.name] = prop.type;
         return acc;
       }, {});
-      console.log("getModelAsGraphData.edge", edge)
+      // console.log("getModelAsGraphData.edge", edge)
       return {
         id: edge.name,
         type: edge.name,
@@ -86,7 +86,7 @@ export class CanvasManager {
 
 
   updateOptions(options: CanvasManagerOptions, callback?: () => void) {
-    console.log("updateOptions input options", options);
+    // console.log("updateOptions input options", options);
 
     let g6Options: GraphOptions = {}
     if (options.styles) {
@@ -96,7 +96,7 @@ export class CanvasManager {
 
     if (options.layout) {
 
-      console.log("updateOptions.options.layout", options.layout);
+      // console.log("updateOptions.options.layout", options.layout);
       g6Options['layout'] = options.layout || {}
     }
 
@@ -112,7 +112,7 @@ export class CanvasManager {
       g6Options['behaviors'] = getUniqueItemsByItem(options.behaviors || [])
     }
 
-    console.log("CanvasManager.updateOptions", g6Options);
+    // console.log("CanvasManager.updateOptions", g6Options);
 
     this.graph.setOptions(g6Options);
     this.graph.draw();
@@ -141,7 +141,7 @@ export class CanvasManager {
 
     // node
     this.store.data.on('nodeAdded', ({ key }) => {
-      // console.log(`Node created: ${key}`);
+      console.log(`Node created: ${key}`);
       const node = this.store.fineNodeById(key);
       // console.log("node", node);
       if (node) {
@@ -182,6 +182,7 @@ export class CanvasManager {
     // graph
     this.store.data.on('cleared', () => {
       console.log(`Graph cleared`);
+      this.graph.clear();
     });
   }
 

@@ -1,10 +1,5 @@
-import { Graph } from "@antv/g6";
-import { CanvasManagerOptions } from "./types";
 import { CanvasManager } from "./manager";
 import { ALL_AVAILABLE_LAYOUTS } from "../defaults/layouts";
-
-
-
 
 
 export class GraphCanvasUtils {
@@ -12,7 +7,6 @@ export class GraphCanvasUtils {
   private canvas_manager: CanvasManager
 
   constructor(canvas_manager: CanvasManager) {
-    console.log("GraphCanvasUtils.constructor", canvas_manager);
     this.canvas_manager = canvas_manager
   }
 
@@ -32,14 +26,13 @@ export class GraphCanvasUtils {
       this.getGraph()?.zoomTo(currentZoom - 0.2);
   }
 
-
   fitView() {
-    console.log("------fitView");
     this.getGraph()?.fitView();
   }
 
   eraseCanvas() {
-    this.getGraph()?.clear();
+    this.canvas_manager.store.deleteData();
+    // this.getGraph()?.clear();
   }
 
   reDraw() {
@@ -47,9 +40,7 @@ export class GraphCanvasUtils {
   }
 
   updateLayout = (layoutName: string) => {
-    console.log("updatedLayout called", layoutName)
     const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
-    console.log("updateLayout -> layoutConfig", layoutConfig)
     if (layoutConfig) {
       this.getGraph()?.setLayout(layoutConfig);
       this.getGraph()?.render()

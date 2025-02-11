@@ -68,11 +68,11 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                     }}
                   >
                     <ResizablePanel minSize={30} defaultSize={mainTopContentSize} >
-                      <div className="flex h-full items-center justify-center">
-                        {/* <PanelContent title="Main Content" showClose={true}> */}
-                        {mainTopContent}
-                        {/* </PanelContent> */}
-                      </div>
+                      {/* <div className="flex h-full items-center justify-center"> */}
+                      {/* <PanelContent title="Main Content" showClose={true}> */}
+                      {mainTopContent}
+                      {/* </PanelContent> */}
+                      {/* </div> */}
                     </ResizablePanel>
                     <ResizableHandle withHandle className={cn("transition-opacity duration-300")} />
                     <ResizablePanel minSize={3} defaultSize={100 - mainTopContentSize}>

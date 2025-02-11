@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { LOCALSTORAGE_KEYS } from '@/constants';
 import { ICanvasData } from '@invana/data-store';
+import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 
 export interface Project {
   id: string;
@@ -11,6 +11,7 @@ export interface Project {
   updated_at: Date;
   tags: string[];
   data: ICanvasData;
+  options?: CanvasManagerOptions
 }
 
 export interface ProjectState {
@@ -22,6 +23,9 @@ export interface ProjectState {
   getActiveProject: () => Project | undefined;
   activeProjectId: string | undefined;
   setActiveProjectId: (id: string | undefined) => void;
+
+  deleteProjects: (projectIds: string[]) => void;
+  deleteAllProjects: () => void;
 
 }
 
@@ -59,6 +63,26 @@ export const useProjectStore = create(
       },
       getActiveProject: () => {
         return get().projects.find((project) => project.id === get().activeProjectId);
+      },
+      deleteProjects: (projectIds: string[]) => {
+        set((state) => {
+          const newProjects = state.projects.filter((project) => !projectIds.includes(project.id));
+          let newActiveProjectId = state.activeProjectId;
+
+          if (projectIds.includes(state.activeProjectId || "")) {
+            newActiveProjectId = undefined;
+          }
+          return {
+            projects: newProjects,
+            activeProjectId: newActiveProjectId
+          }
+        })
+      },
+      deleteAllProjects: () => {
+        set(() => ({
+          projects: [],
+          activeProjectId: undefined
+        }))
       }
     }),
     {

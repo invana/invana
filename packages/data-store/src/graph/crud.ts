@@ -127,5 +127,10 @@ export class GraphDataCRUD extends GraphBase {
     }
     this.data.dropEdge(id);
   }
+
+  deleteData() {
+    console.log("deleteData");
+    this.data.clear();
+  }
 }
 

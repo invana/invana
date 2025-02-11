@@ -13,6 +13,8 @@ const useProjects = () => {
   const activeProjectId = useProjectStore((state) => state.activeProjectId);
   const setActiveProjectId = useProjectStore((state) => state.setActiveProjectId);
   const getActiveProject = useProjectStore((state) => state.getActiveProject);
+  const deleteProjects = useProjectStore((state) => state.deleteProjects);
+  const deleteAllProjects = useProjectStore((state) => state.deleteAllProjects);
 
   return {
     projects,
@@ -21,7 +23,9 @@ const useProjects = () => {
     isProjectNameExists,
     activeProjectId,
     setActiveProjectId,
-    getActiveProject
+    getActiveProject,
+    deleteProjects,
+    deleteAllProjects
   };
 };
 

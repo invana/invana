@@ -1,12 +1,15 @@
 import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, Brush, CircleDashed, Eraser, Expand, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, Menu, MonitorCog, Network, RefreshCw, Share2, Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut } from 'lucide-react';
+import {
+  Activity, Book, Box, Brush, CircleDashed, Eraser, LassoSelect,
+  LayoutGrid, LifeBuoy, Lock, Menu, MonitorCog, Network, RefreshCw, Share2,
+  Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut
+} from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
-import { flightData as initDataset } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
@@ -18,21 +21,31 @@ import {
   HOVER_ACTIVATE_BEHAVIOR, LASSO_SELECT_BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR,
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
-import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
+import {
+  MAP_NODE_SIZE_TRANSFORMER,
+  PROCESS_PARALLEL_TRANSFORMER
+} from '@invana/canvas-graph/defaults/transforms';
 import { HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
-import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
+import {
+  EdgeTooltipBehavior, NodeTooltipBehavior,
+  PropertyViewerBehavior
+} from '@invana/canvas-graph/behaviours';
 import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
 import { CanvasManager } from '@invana/canvas-graph/manager';
 import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
-import { CanvasToolBar } from '@invana/canvas-graph/plugins';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
 import { ProjectSwitcher } from '@/ui/components/projects-switcher';
+import { useParams } from 'react-router-dom';
+import { mergeDeep } from '@invana/data-store';
+import { Project } from '@/store/projectStore';
+import useConnections from '@/hooks/useConnection';
+import WelcomeView from '@/ui/components/welcome-view';
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
@@ -73,7 +86,6 @@ const defaultOptions: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS
 }
 
-
 const graphModelOptions: CanvasManagerOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
@@ -105,27 +117,34 @@ const graphModelOptions: CanvasManagerOptions = {
 };
 
 
-
 const ExplorerPage: React.FC = () => {
+  const { graphId } = useParams();
 
+
+  const { getActiveConnection } = useConnections();
+
+  console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore()
 
+
+  const projectData: Project | undefined = projectsListDataSet.find((project) => project.id === graphId)
+
+  console.log("projectData", projectData)
   const {
     rightContentName,
     setRightContentName,
     bottomContentName,
     toggleRightContent,
     toggleBottomContent,
-    setRightContentSize
   } = useDefaultV2LayoutStore()
 
   const rightTopNavItems: LeftNavItem[] = [
     {
-      icon: Info,
+      icon: Box,
       name: "Graph Information",
-      className: "my-1.5",
+      className: "my-1.5 mt-5",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -198,7 +217,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: LassoSelect,
       name: "Lasso select",
-      className: 'my-1',
+      className: 'my-1 mt-5',
       iconStroke: 2,
       tooltipSide: "left",
       // className: "p-0",
@@ -401,7 +420,11 @@ const ExplorerPage: React.FC = () => {
             onClose={() => setRightContentName(undefined)}
             bodyClassName='h-[calc(100vh-70px)] '
             showClose>
-            <GraphInformation schemaData={getSchemaGraphData()} />
+            {canvasManagerRef.current && projectData &&
+              <GraphInformation
+                canvasManager={canvasManagerRef.current}
+                project={projectData}
+              />}
           </PanelContent>
         }
         {rightContentName === "model" &&
@@ -436,24 +459,26 @@ const ExplorerPage: React.FC = () => {
     }
     mainTopContent={
       // <div className="flex h-full items-center justify-center ">
-      <CanvasGraph
-        // ref={canvasGraphRef}
-        graphName={'graphData'}
-        containerStyle={{ width: "100%", height: "100%" }}
-        className={"bg-background"}
-        initData={initDataset}
-        onReady={(canvasManager: CanvasManager) => {
-          console.log("CanvasGraph.onReady", canvasManager)
-          canvasManagerRef.current = canvasManager;
-          setIsReady(true)
-        }}
-        onDestroy={() => {
-          console.log("CanvasGraph.onDestroy")
-          setIsReady(false)
-          canvasManagerRef.current = null;
-        }}
-        options={defaultOptions}
-      />
+      projectData ?
+        <CanvasGraph
+          // ref={canvasGraphRef}
+          graphName={'graphData'}
+          containerStyle={{ width: "100%", height: "100%" }}
+          className={"bg-background"}
+          initData={projectData.data}
+          onReady={(canvasManager: CanvasManager) => {
+            console.log("CanvasGraph.onReady", canvasManager)
+            canvasManagerRef.current = canvasManager;
+            setIsReady(true)
+          }}
+          onDestroy={() => {
+            console.log("CanvasGraph.onDestroy")
+            setIsReady(false)
+            canvasManagerRef.current = null;
+          }}
+          options={mergeDeep(defaultOptions, projectData.options || {})}
+        />
+        : <WelcomeView />
       // </div>
     }
     mainBottomContent={
