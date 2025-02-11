@@ -1,7 +1,7 @@
 import { CanvasGraphLayout } from "../manager/types"
 import { CanvasGraphNode } from "../types"
 
-
+// for more options on layout see:  https://observablehq.com/d/2db6b0cc5e97d8d6#cell-38 or https://g6.antv.vision/en/manual/core-concept/layout
 export const GRAPHIN_FORCE_LAYOUT: CanvasGraphLayout = {
   type: 'graphin-force',
   label: 'graphin-force',
@@ -25,16 +25,20 @@ export const GRID_LAYOUT: CanvasGraphLayout = {
 export const CIRCULAR_LAYOUT: CanvasGraphLayout = {
   type: 'circular',
   label: 'circular',
-  options: {
-    // center: [0, 0], // Optional, default is the center of the graph
-    // radius: null, // Optional
-    // startRadius: 10, // Optional
-    // endRadius: 100, // Optional
-    // clockwise: false, // Optional
-    // divisions: 5, // Optional
-    // ordering: 'degree', // Optional
-    // angleRatio: 1, // Optional
-  }
+  preventOverlap: true,
+  angleRatio: 1, // Optional
+  nodeSize: (d: CanvasGraphNode) => ((d.size as number) || 30) + 10,
+  nodeSpacing: (d: CanvasGraphNode) => 10,
+  // options: {
+  // center: [0, 0], // Optional, default is the center of the graph
+  // radius: null, // Optional
+  // startRadius: 10, // Optional
+  // endRadius: 100, // Optional
+  // clockwise: false, // Optional
+  // divisions: 5, // Optional
+  // ordering: 'degree', // Optional
+  // angleRatio: 1, // Optional
+  // }
 }
 
 export const RADIAL_LAYOUT: CanvasGraphLayout = {
@@ -157,13 +161,12 @@ export const CONCENTRIC_LAYOUT: CanvasGraphLayout = {
 export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   type: 'antv-dagre',
   label: 'antv-dagre',
-
   nodeSize: [60, 30],
-  nodesep: 100,
+  nodesep: 10,
   ranksep: 70,
   controlPoints: true,
   sortByCombo: true,
-  // rankdir: 'LR', // Optional, default is the center of the graph
+  rankdir: 'LR', // Optional, default is the center of the graph
   // align: 'DL', // Optional
   // nodesep: 20, // Optional
   // ranksep: 50, // Optional
@@ -202,4 +205,5 @@ export const ALL_AVAILABLE_LAYOUTS: CanvasGraphLayout[] = [
   CONCENTRIC_LAYOUT,
   ANTV_DAGRE_LAYOUT,
   FRUCHTERMAN_LAYOUT,
+  DENDROGRAM_LAYOUT
 ]
