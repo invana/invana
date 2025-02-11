@@ -6,7 +6,7 @@ import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
-import { lesMiserablesData as initDataset } from '@invana/example-datasets'
+import { flightData as initDataset } from '@invana/example-datasets'
 import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
@@ -186,6 +186,11 @@ const ExplorerPage: React.FC = () => {
   // const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
 
 
+  // document.addEventListener("contextmenu", function (event) {
+  //   event.preventDefault();
+  //   // alert("Right-click is disabled on this element!");
+  // });
+
   return <DefaultLayout
     headerProps={{
       left: (
@@ -228,7 +233,7 @@ const ExplorerPage: React.FC = () => {
         }
         {leftContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setLeftContentName(undefined)} showClose>
-            <CanvasGraph
+            {/* <CanvasGraph
               // ref={modelGraphData}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
@@ -236,7 +241,7 @@ const ExplorerPage: React.FC = () => {
               showHeader={false}
               initData={getSchemaGraphData()}
               options={graphModelOptions}
-            />
+            /> */}
           </PanelContent>
         }
         {leftContentName === "query" &&

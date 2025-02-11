@@ -27,9 +27,9 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
     leftContentName,
     rightContentName,
     leftContentSize,
-    setLeftContentSize,
+    // setLeftContentSize,
     mainTopContentSize,
-    setMainTopContentSize,
+    // setMainTopContentSize,
     // toggleLeftContent,
   } = useDefaultLayoutStore()
 
@@ -50,10 +50,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
                 direction="horizontal"
                 onLayout={(sizes) => {
                   console.debug("sizes", sizes)
-                  setLeftContentSize(sizes[0])
-                  // if (leftContentName) {
-                  //   setLeftNavSize(sizes[0])
-                  // }
+                  // setLeftContentSize(sizes[0])
                 }}
               >
                 <ResizablePanel
@@ -78,13 +75,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({
                     onLayout={(sizes) => {
                       console.debug("Vertical sizes", sizes)
                       // Update bottom panel size and collapse state
-                      setMainTopContentSize(sizes[0])
-                      // // Update collapsed state based on size
-                      // if (sizes[1] <= defaultBottomSize + 1) {
-                      //   setBottomNavSize(defaultBottomSize)
-                      // } else if (sizes[1] >= defaultBottomExpandedSize - 1) {
-                      //   setBottomNavSize(defaultBottomExpandedSize)
-                      // }
+                      // setMainTopContentSize(sizes[0])
                     }}
                   >
                     <ResizablePanel minSize={30} defaultSize={mainTopContentSize} >
