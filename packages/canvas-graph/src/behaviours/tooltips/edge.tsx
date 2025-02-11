@@ -76,7 +76,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
   }
 
   onEdgeMouseOver(event: IPointerEvent) {
-    console.log("===onEdgeMouseOver", event)
+    // console.log("===onEdgeMouseOver", event)
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
@@ -108,7 +108,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
   }
 
   onContextMenu = (e: IPointerEvent) => {
-    console.log("onContextMenu", e)
+    // console.log("onContextMenu", e)
     const { graph } = this.context;
     graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
     graph.off(EdgeEvent.CONTEXT_MENU, this.onContextMenu.bind(this));
@@ -116,7 +116,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
   }
 
   onEdgeMouseLeave(event: IPointerEvent) {
-    console.log("===onEdgeMouseLeave", event)
+    // console.log("===onEdgeMouseLeave", event)
     const { graph } = this.context;
     graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
     this.hideContainer();

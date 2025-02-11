@@ -31,6 +31,9 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
     // toggleLeftContent,
   } = useDefaultV2LayoutStore()
 
+
+  console.debug("rightContentSize", rightContentSize)
+
   return (
     <TooltipProvider delayDuration={0}>
 
@@ -54,7 +57,7 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
                 }}
               >
 
-                <ResizablePanel defaultSize={rightContentName ? (100 - rightContentSize) : 100}>
+                <ResizablePanel  >
                   <ResizablePanelGroup
                     direction="vertical"
                     autoSaveId="main-persistence"

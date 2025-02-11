@@ -10,14 +10,16 @@ import { GraphStyle } from './styling';
 import { CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
 import { getUniqueItemsByItem } from './utils';
+import { GraphCanvasUtils } from './canvas_utils';
 
 
 export class CanvasManager {
 
   private graph!: Graph;
   store: GraphStore;
-  styling: GraphStyle
-  private options: CanvasManagerOptions // CanvasGraph options
+  styling: GraphStyle;
+  canvas_utils: GraphCanvasUtils;
+  private options: CanvasManagerOptions; // CanvasGraph options
   // private g6Options: GraphOptions // CanvasGraph options converted to G6 options
 
 
@@ -27,6 +29,7 @@ export class CanvasManager {
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
+    this.canvas_utils = new GraphCanvasUtils(this)
     this.initDataListeners();
     // set on first load 
     this.updateOptions(this.options)

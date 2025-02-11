@@ -166,9 +166,9 @@ const ExplorerPage: React.FC = () => {
   ]
 
   useEffect(() => {
-    console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
+    // console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
     if (canvasManagerRef.current && isReady) {
-      console.log("getUpdatedStylingOptions, theme", theme)
+      // console.log("getUpdatedStylingOptions, theme", theme)
       canvasManagerRef.current.setTheme(theme)
     }
   }, [theme, isReady]);
