@@ -1,7 +1,7 @@
 import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, Brush, CircleDashed, Eraser, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, MonitorCog, Network, RefreshCw, Share2, SquareMenu, Terminal, Type } from 'lucide-react';
+import { Activity, Book, Brush, CircleDashed, Eraser, Expand, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, MonitorCog, Network, RefreshCw, Share2, Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -116,7 +116,8 @@ const ExplorerPage: React.FC = () => {
     setRightContentName,
     bottomContentName,
     toggleRightContent,
-    toggleBottomContent
+    toggleBottomContent,
+    setRightContentSize
   } = useDefaultV2LayoutStore()
 
   const rightTopNavItems: LeftNavItem[] = [
@@ -274,9 +275,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.eraseCanvas(),
     },
     {
       icon: RefreshCw,
@@ -284,9 +283,15 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.reDraw(),
+    },
+    {
+      icon: Shrink,
+      name: "Fit view ",
+      className: 'my-1',
+      iconStroke: 2,
+      tooltipSide: "left",
+      onClick: () => canvasManagerRef.current?.canvas_utils.fitView(),
     },
     {
       icon: Lock,
@@ -300,10 +305,30 @@ const ExplorerPage: React.FC = () => {
       },
     },
   ]
+
+  const leftBottomNavItems: LeftNavItem[] = [
+    {
+      icon: ZoomIn,
+      name: "Zoom In",
+      className: 'my-1',
+      iconStroke: 2,
+      tooltipSide: "right",
+      onClick: () => canvasManagerRef.current?.canvas_utils.zoomIn(),
+    },
+    {
+      icon: ZoomOut,
+      name: "Zoom Out",
+      className: 'my-1 mb-3',
+      showSeperator: true,
+      iconStroke: 2,
+      tooltipSide: "right",
+      onClick: () => canvasManagerRef.current?.canvas_utils.zoomOut(),
+    }
+  ]
   useEffect(() => {
-    console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
+    // console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
     if (canvasManagerRef.current && isReady) {
-      console.log("getUpdatedStylingOptions, theme", theme)
+      // console.log("getUpdatedStylingOptions, theme", theme)
       canvasManagerRef.current.setTheme(theme)
     }
   }, [theme, isReady]);
@@ -312,9 +337,22 @@ const ExplorerPage: React.FC = () => {
     return canvasManagerRef.current?.getModelAsGraphData();
   }
 
+  // useEffect(() => {
+  //   setRightContentName("graph-info")
+  // }, [])
+
   useEffect(() => {
-    setRightContentName("graph-info")
-  }, [])
+    console.log("rightContentName", rightContentName)
+    if (rightContentName === undefined) {
+      setRightContentSize(0)
+      // canvasManagerRef.current?.getGraph().resize()
+      canvasManagerRef.current?.getGraph().fitView()
+
+      // canvasManagerRef.current?.render()
+    } else {
+      console.log("====")
+    }
+  }, [rightContentName, setRightContentSize])
 
   return <DefaultV2Layout
     headerProps={{
@@ -344,6 +382,7 @@ const ExplorerPage: React.FC = () => {
 
     leftNavProps={{
       topNavItems: leftTopNavItems,
+      bottomNavItems: leftBottomNavItems
 
     }}
     rightNavProps={{

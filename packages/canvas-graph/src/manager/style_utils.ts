@@ -233,7 +233,7 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
   return {
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
     autoResize: true,
-    // autoFit: 'view', // 'view' | 'graph' | 'center'
+    autoFit: 'view', // 'view' | 'graph' | 'center'
     animation: {
       duration: 200,
       easing: 'linear',
