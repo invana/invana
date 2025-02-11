@@ -28,7 +28,7 @@ export const CIRCULAR_LAYOUT: CanvasGraphLayout = {
   preventOverlap: true,
   angleRatio: 1, // Optional
   nodeSize: (d: CanvasGraphNode) => ((d.size as number) || 30) + 10,
-  nodeSpacing: (d: CanvasGraphNode) => 10,
+  nodeSpacing: 10,
   // options: {
   // center: [0, 0], // Optional, default is the center of the graph
   // radius: null, // Optional
