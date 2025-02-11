@@ -16,7 +16,7 @@ interface PanelContentProps {
 export function PanelContent({ title, children, onClose, showClose,
   headerClassName, bodyClassName }: PanelContentProps) {
   return (
-    <Card className={` h-full  ${headerClassName}`}>
+    <Card className={` h-full border-none ${headerClassName}`}>
       <CardHeader className="relative py-1 border-b">
         {title && <h4 className="font-semibold  ">{title}</h4>}
         {showClose && (

@@ -228,7 +228,7 @@ const ExplorerPage: React.FC = () => {
         }
         {leftContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setLeftContentName(undefined)} showClose>
-            {/* <CanvasGraph
+            <CanvasGraph
               // ref={modelGraphData}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
@@ -236,7 +236,7 @@ const ExplorerPage: React.FC = () => {
               showHeader={false}
               initData={getSchemaGraphData()}
               options={graphModelOptions}
-            /> */}
+            />
           </PanelContent>
         }
         {leftContentName === "query" &&
