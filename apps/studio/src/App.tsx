@@ -18,6 +18,7 @@ const App = () => {
         <Route path="/connect" element={<ConnectPage />} />
         <Route path="/modeller" element={<ProtectedRoute><ModellerPage /></ProtectedRoute>} />
         <Route path="/explorer" element={<ProtectedRoute><ExplorerPage /></ProtectedRoute>} />
+        <Route path="/graph/:graphId" element={<ProtectedRoute><ExplorerPage /></ProtectedRoute>} />
 
         {/* Other routes */}
         <Route path="*" element={<NotFoundPage />} />  {/* Catch-all route for 404 */}

@@ -1,7 +1,7 @@
 import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
-import { Activity, Book, Brush, CircleDashed, Eraser, Expand, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, MonitorCog, Network, RefreshCw, Share2, Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut } from 'lucide-react';
+import { Activity, Book, Brush, CircleDashed, Eraser, Expand, Info, LassoSelect, LayoutGrid, LifeBuoy, Lock, Menu, MonitorCog, Network, RefreshCw, Share2, Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -31,7 +31,8 @@ import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
 import { CanvasToolBar } from '@invana/canvas-graph/plugins';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
-
+import { projectsListDataSet } from '@/projectsList';
+import { ProjectSwitcher } from '@/ui/components/projects-switcher';
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
@@ -350,15 +351,17 @@ const ExplorerPage: React.FC = () => {
     headerProps={{
       left: (
         <>
-          {/* <span className='ml-3'><Compass className='w-5 h-5' /></span> */}
-          <span className='font-bold mr-2 ml-3'>{ProductName}</span>
+          <span className='ml-3'><Menu className='w-5 h-5' /></span>
+          <span className='font-bold mr-2 ml-2'>{ProductName}</span>
           <span className='mr-2'>|</span>
           <span>Explorer</span>
         </>
       ),
       center: (
         <>
-          {isReady && canvasManagerRef.current ? <CanvasToolBar getCanvasManager={() => canvasManagerRef.current!} /> : null}
+          {/* {isReady && canvasManagerRef.current ? <CanvasToolBar getCanvasManager={() => canvasManagerRef.current!} /> : null} */}
+
+          <ProjectSwitcher />
         </>
       ),
       right: (
