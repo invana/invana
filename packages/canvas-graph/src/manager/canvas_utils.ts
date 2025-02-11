@@ -1,6 +1,7 @@
 import { Graph } from "@antv/g6";
 import { CanvasManagerOptions } from "./types";
 import { CanvasManager } from "./manager";
+import { ALL_AVAILABLE_LAYOUTS } from "../defaults/layouts";
 
 
 
@@ -43,6 +44,16 @@ export class GraphCanvasUtils {
 
   reDraw() {
     this.getGraph()?.layout();
+  }
+
+  updateLayout = (layoutName: string) => {
+    console.log("updatedLayout called", layoutName)
+    const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
+    console.log("updateLayout -> layoutConfig", layoutConfig)
+    if (layoutConfig) {
+      this.getGraph()?.setLayout(layoutConfig);
+      this.getGraph()?.render()
+    }
   }
 
 }
