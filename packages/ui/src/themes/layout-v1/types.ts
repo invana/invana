@@ -11,7 +11,7 @@ import { LeftNavProps } from "./left-nav"
 
 
 
-export interface LeftNavAppLayoutProps {
+export interface DefaultV1LayoutProps {
   className?: string
   leftNavProps: LeftNavProps
   headerProps: AppHeaderProps

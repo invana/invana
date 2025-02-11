@@ -4,8 +4,8 @@ import {
   ResizablePanelGroup, ResizablePanel,
   ResizableHandle
 } from "../../components/ui/resizable"
-import { LeftNavAppLayoutProps } from './types';
-import { useLeftNavAppLayoutStore } from "./store"
+import { DefaultV1LayoutProps } from './types';
+import { useDefaultV1LayoutStore } from "./store"
 // import { PanelContent } from "./panel-content"
 import { RightSidebar } from "./right-sidebar"
 import React from "react"
@@ -14,7 +14,7 @@ import { TooltipProvider } from "../../components/ui";
 import { LeftNav } from "./left-nav";
 
 
-export const LeftNavAppLayout: React.FC<LeftNavAppLayoutProps> = ({
+export const DefaultV1Layout: React.FC<DefaultV1LayoutProps> = ({
   className,
   headerProps,
   leftNavProps,
@@ -31,7 +31,7 @@ export const LeftNavAppLayout: React.FC<LeftNavAppLayoutProps> = ({
     mainTopContentSize,
     // setMainTopContentSize,
     // toggleLeftContent,
-  } = useLeftNavAppLayoutStore()
+  } = useDefaultV1LayoutStore()
 
   return (
     <TooltipProvider delayDuration={0}>
