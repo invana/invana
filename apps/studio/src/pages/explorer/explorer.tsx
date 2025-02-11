@@ -19,7 +19,7 @@ import {
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
 import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
-import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
+import { HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
 import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
@@ -29,7 +29,7 @@ import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/conte
 import { CanvasManager } from '@invana/canvas-graph/manager';
 import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
 import { CanvasToolBar } from '@invana/canvas-graph/plugins';
-import { SchemaListView } from '@/ui/components/schema-list';
+import { GraphInformation } from '@/ui/components/graph-information';
 
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
@@ -223,12 +223,7 @@ const ExplorerPage: React.FC = () => {
             onClose={() => setLeftContentName(undefined)}
             bodyClassName='h-[calc(100vh-70px)] overflow-y-auto'
             showClose>
-            <h1 className='text-2xl mt-2 font-semibold'>les miserables dataset</h1>
-            <p className='mt-2 text-zinc-500 dark:text-zinc-400'>Updated at Feb 11, 2025</p>
-            <p className='mt-2 mb-3'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
-
-            <SchemaListView schemaData={getSchemaGraphData()} />
+            <GraphInformation schemaData={getSchemaGraphData()} />
           </PanelContent>
         }
         {leftContentName === "model" &&
