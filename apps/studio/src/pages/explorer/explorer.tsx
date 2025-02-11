@@ -234,9 +234,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1 mt-3',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('d3-force'),
     },
     {
       icon: CircleDashed,
@@ -244,9 +242,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('circular'),
     },
     {
       icon: LayoutGrid,
@@ -254,9 +250,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('grid'),
     },
     {
       icon: Network,
@@ -265,9 +259,7 @@ const ExplorerPage: React.FC = () => {
       className: 'my-1 mb-3',
       iconStroke: 2,
       tooltipSide: "left",
-      onClick: () => {
-        // return toggleRightContent("graph-info")
-      },
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('antv-dagre'),
     },
     {
       icon: Eraser,
