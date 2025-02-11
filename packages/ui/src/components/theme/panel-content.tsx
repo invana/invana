@@ -7,14 +7,16 @@ interface PanelContentProps {
   title?: React.ReactNode
   // header?: React.ReactNode
   children?: React.ReactNode
-  className?: string
+  headerClassName?: string
+  bodyClassName?: string
   onClose?: () => void
   showClose?: boolean
 }
 
-export function PanelContent({ title, children, onClose, showClose, className }: PanelContentProps) {
+export function PanelContent({ title, children, onClose, showClose,
+  headerClassName, bodyClassName }: PanelContentProps) {
   return (
-    <Card className={` h-full  ${className}`}>
+    <Card className={` h-full  ${headerClassName}`}>
       <CardHeader className="relative py-1 border-b">
         {title && <h4 className="font-semibold  ">{title}</h4>}
         {showClose && (
@@ -28,7 +30,7 @@ export function PanelContent({ title, children, onClose, showClose, className }:
         {header && <>{header}</>}
 
       </div> */}
-      <CardContent className="overflow-y-auto">
+      <CardContent className={`overflow-y-auto h-full ${bodyClassName}`}>
         {children}
       </CardContent>
     </Card>
