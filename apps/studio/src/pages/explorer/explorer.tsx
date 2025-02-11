@@ -333,18 +333,18 @@ const ExplorerPage: React.FC = () => {
   //   setRightContentName("graph-info")
   // }, [])
 
-  useEffect(() => {
-    console.log("rightContentName", rightContentName)
-    if (rightContentName === undefined) {
-      setRightContentSize(0)
-      // canvasManagerRef.current?.getGraph().resize()
-      canvasManagerRef.current?.getGraph().fitView()
+  // useEffect(() => {
+  //   console.log("rightContentName", rightContentName)
+  //   if (rightContentName === undefined) {
+  //     setRightContentSize(0)
+  //     // canvasManagerRef.current?.getGraph().resize()
+  //     canvasManagerRef.current?.getGraph().fitView()
 
-      // canvasManagerRef.current?.render()
-    } else {
-      console.log("====")
-    }
-  }, [rightContentName, setRightContentSize])
+  //     // canvasManagerRef.current?.render()
+  //   } else {
+  //     console.log("====")
+  //   }
+  // }, [rightContentName, setRightContentSize])
 
   return <DefaultV2Layout
     headerProps={{
