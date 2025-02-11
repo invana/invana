@@ -1,7 +1,7 @@
 import { LeftNavItem, useThemeStore } from '@invana/ui';
 import { DefaultLayout } from '@invana/ui/themes/default/default';
 import { useDefaultLayoutStore } from '@invana/ui/themes/default/store';
-import { Activity, MonitorCog, Network, Terminal } from 'lucide-react';
+import { Activity, Info, MonitorCog, Network, Terminal } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
 import { ProductName } from '@/constants';
@@ -109,22 +109,23 @@ const ExplorerPage: React.FC = () => {
   const canvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore()
 
-
-  // const modelGraphData = useRef<any>(null);
-  // const queryGraphData = useRef<any>(null);
-
   const {
     leftContentName,
     setLeftContentName,
     bottomContentName,
     toggleLeftContent,
-    toggleBottomContent,
-    leftContentSize,
-
+    toggleBottomContent
   } = useDefaultLayoutStore()
 
-
   const topNavItems: LeftNavItem[] = [
+    {
+      icon: Info,
+      name: "Graph Information",
+      key: "graph-info",
+      onClick: () => {
+        return toggleLeftContent("graph-info")
+      },
+    },
     {
       icon: Network,
       name: "Model",
@@ -211,6 +212,13 @@ const ExplorerPage: React.FC = () => {
     }}
     leftContent={
       <div className="space-y-2 ">
+        {leftContentName === "graph-info" &&
+          <PanelContent title={"Graph Information"} key={'graph-info-panel'}
+            onClose={() => setLeftContentName(undefined)} showClose>
+
+            <p>Graph info</p>
+          </PanelContent>
+        }
         {leftContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setLeftContentName(undefined)} showClose>
             <CanvasGraph
