@@ -29,6 +29,7 @@ import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/conte
 import { CanvasManager } from '@invana/canvas-graph/manager';
 import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
 import { CanvasToolBar } from '@invana/canvas-graph/plugins';
+import { SchemaListView } from '@/ui/components/schema-list';
 
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
@@ -214,9 +215,15 @@ const ExplorerPage: React.FC = () => {
       <div className="space-y-2 ">
         {leftContentName === "graph-info" &&
           <PanelContent title={"Graph Information"} key={'graph-info-panel'}
-            onClose={() => setLeftContentName(undefined)} showClose>
+            onClose={() => setLeftContentName(undefined)}
+            bodyClassName='h-[calc(100vh-70px)] overflow-y-auto'
+            showClose>
+            <h1 className='text-2xl mt-2 font-semibold'>les miserables dataset</h1>
+            <p className='mt-2 text-zinc-500 dark:text-zinc-400'>Updated at Feb 11, 2025</p>
+            <p className='mt-2 mb-3'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
 
-            <p>Graph info</p>
+            <SchemaListView schemaData={getSchemaGraphData()} />
           </PanelContent>
         }
         {leftContentName === "model" &&
