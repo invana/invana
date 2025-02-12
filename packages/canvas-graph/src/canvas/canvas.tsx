@@ -19,6 +19,7 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
       const graph = new GraphG6({
         container: containerRef.current,
       });
+      console.log("===+++++", props.graphName, graph)
       graphRef.current = graph;
       console.log("Created graph")
       const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});

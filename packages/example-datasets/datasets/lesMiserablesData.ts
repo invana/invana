@@ -343,9 +343,9 @@ export const lesMiserablesData: ICanvasData = {
     // console.log("node", node)
     return {
       id: node.id,
-      type: node.group.toString(),
+      type: `Group ${node.group.toString()}`,
       properties: {
-        group: node.group
+        group: node.group.toString()
       }
     }
   }),

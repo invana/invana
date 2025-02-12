@@ -121,7 +121,7 @@ const ExplorerPage: React.FC = () => {
   const { graphId } = useParams();
 
 
-  const { getActiveConnection } = useConnections();
+  // const { getActiveConnection } = useConnections();
 
   console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
