@@ -86,7 +86,7 @@ export class CanvasManager {
 
 
   updateOptions(options: CanvasManagerOptions, callback?: () => void) {
-    // console.log("updateOptions input options", options);
+    console.log("updateOptions input options", options);
 
     let g6Options: GraphOptions = {}
     if (options.styles) {
@@ -97,7 +97,12 @@ export class CanvasManager {
     if (options.layout) {
 
       // console.log("updateOptions.options.layout", options.layout);
-      g6Options['layout'] = options.layout || {}
+      g6Options['layout'] = options.layout || {};
+      // Ensure layout.postLayout exists to avoid errors
+      g6Options.layout.preLayout = false
+      if (options.layout && typeof options.layout.postLayout !== 'function') {
+        options.layout.postLayout = () => { };
+      }
     }
 
     if (options.transforms) {
@@ -114,10 +119,12 @@ export class CanvasManager {
 
     // console.log("CanvasManager.updateOptions", g6Options);
 
+
     this.graph.setOptions(g6Options);
     this.graph.draw();
     if (options.layout) {
       this.graph.layout()
+      this.graph.render()
     }
 
     this.options = { ...this.options, ...options };

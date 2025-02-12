@@ -422,6 +422,7 @@ const ExplorerPage: React.FC = () => {
             showClose>
             {canvasManagerRef.current && projectData &&
               <GraphInformation
+                key={'graph-info'}
                 canvasManager={canvasManagerRef.current}
                 project={projectData}
               />}

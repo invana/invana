@@ -56,8 +56,8 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
     this.showContainer(event, { x: 10, y: 10 });
   };
 
-  onContextMenu = (event: IPointerEvent) => {
-    console.log("onContextMenu", event)
+  onContextMenu = (_: IPointerEvent) => {
+    // console.log("onContextMenu", event)
     const { graph } = this.context;
     graph.off(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
     graph.off(NodeEvent.CONTEXT_MENU, this.onContextMenu);
@@ -84,10 +84,10 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
 
   onNodeMouseOver = (event: IPointerEvent) => {
     const { graph } = this.context;
-    console.log("onNodeMouseOver", event)
+    // console.log("onNodeMouseOver", event)
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
-    console.log("NodeEvent.POINTER_OVER node", node)
+    // console.log("NodeEvent.POINTER_OVER node", node)
     this.onNodeMouseMove(event)
 
     const nodeData: ICanvasNode = {

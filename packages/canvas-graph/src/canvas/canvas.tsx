@@ -1,5 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import { Graphin } from '@antv/graphin';
+import React, { memo, useEffect, useRef } from 'react';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from './types';
 import { CanvasManager } from '../manager';
@@ -7,102 +6,61 @@ import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
 
+const CanvasGraphRaw: React.FC<CanvasGraphProps> = (props) => {
 
-// export interface GraphinRef extends Graph {
-//   graph: Graph;
-// }
-// const MemoizedGraphin = React.memo(Graphin, () => true);
-
-export const CanvasGraph: React.FC<CanvasGraphProps> = forwardRef((props, ref) => {
   // Sample graph data
-
-  // Ref for Graphin instance
-
-  // Update layout
-  // For Graphin 3.x "force" is generally "grid", plus other options like "circular", "concentric", etc.
-  // const handleLayoutChange = (layoutType: 'circular' | 'grid' | 'radial') => {
-  //   if (graphinRef.current?.graph) {
-  //     graphinRef.current.graph.setLayout({ type: layoutType });
-  //     graphinRef.current.graph.layout();
-  //   }
-  // };
-
-
-  // useEffect(() => {
-  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-  //   document.querySelectorAll('.graph-canvas').forEach(
-  //     () => addEventListener("contextmenu", handleContextMenu));
-
-  //   return () => {
-  //     document.querySelectorAll('.graph-canvas').forEach(
-  //       () => removeEventListener("contextmenu", handleContextMenu));
-  //   };
-  // }, []);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const graphRef: React.MutableRefObject<Graph | null> = useRef(null);
 
   useEffect(() => {
-    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-    document.addEventListener("contextmenu", handleContextMenu);
 
+    if (containerRef.current) {
+      const graph = new Graph({
+        container: containerRef.current,
+      });
+      graphRef.current = graph;
+      console.log("Created graph")
+      const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
+      console.log("CanvasGraph.options", options);
+      const initData = props.initData ?? { 'nodes': [], 'edges': [] }
+      const canvasManager: CanvasManager = new CanvasManager(graph, options);
+      canvasManager.store.addData(initData, () => canvasManager.render());
+      props?.onReady?.(canvasManager);
+    }
     return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    };
+      console.log("CanvasGraph.cleanup");
+      const graph = graphRef.current;
+      if (graph) {
+        // if (graph.rendered) {
+        // graph.destroy();
+        // props?.onDestroy?.();
+        // graphRef.current = null;
+        // }
+
+
+        // Defer destruction to avoid unmounting during render
+        // setTimeout(() => {
+        graph.destroy();
+        graphRef.current = null;
+        if (props?.onDestroy) {
+          props?.onDestroy?.();
+        }
+        // }, 0);
+      }
+    }
   }, []);
 
 
-  const localRef = useRef<Graph | null>(null);
-  // const canvasManagerRef = useRef<CanvasManager | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    // Expose methods or properties to the parent component
-    // get: () => {
-    //   console.log('someMethod called');
-    // },
-    getGraph: () => {
-      console.log("getGraph called", localRef.current);
-      return localRef.current;
-    },
-    getGraphManager: () => {
-      // console.log("getGraphManager called", canvasManagerRef.current);
-      // return canvasManagerRef.current;
-    }
-    // getGraphManager: () => {
-    //   console.log("getGraphManager")
-    //   return canvasManager
-    // }
-
-  }));
-
-
-
-  const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-  console.log("=======CanvasGraph.loaded options CanvasManagerOptions", props.graphName, props.options,)
-  const initData = props.initData ?? { 'nodes': [], 'edges': [] }
-
+  console.log("CanvasGraph.props", props);
   return (
-    <div className='h-full w-full' style={props.containerStyle ?? {}}>
-      <Graphin
-        ref={localRef}
-        id={props.graphName}
-        className='graph-canvas'
-        options={{}}
-        onReady={(graph) => {
-          console.log("Graphin onReady", graph);
-          const canvasManager: CanvasManager = new CanvasManager(graph, options);
-          canvasManager.store.addData(initData, () => canvasManager.render());
-          props?.onReady?.(canvasManager);
-          // canvasManagerRef.current = canvasManager;
-        }}
-        onDestroy={() => {
-          console.log("Graphin onDestroy");
-          // localRef.current?.destroy();
-          props?.onDestroy?.();
-        }}
-      // ref={graphinRef}
-      />
-      {/* <div style={{ marginTop: '10px' }}>
-        <Button className='mr-3' onClick={() => handleLayoutChange('circular')}>Circular Layout</Button>
-        <Button onClick={() => handleLayoutChange('grid')}>Grid Layout</Button>
-      </div> */}
+    <div
+      ref={containerRef}
+      className={`h-full w-full ${props.className || ''}`}
+      style={props.containerStyle ?? {}
+      }>
     </div>
   );
-});
+};
+
+export const CanvasGraph = memo(CanvasGraphRaw, () => false);
+

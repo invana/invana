@@ -28,6 +28,7 @@ export const lesMiserables: Story = {
       }
     },
     initData: lesMiserablesData,
-    containerStyle: defaultContainerStyle
+    containerStyle: defaultContainerStyle,
+    onDestroy: () => { },
   },
 };

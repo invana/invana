@@ -10,7 +10,7 @@ const meta = {
   component: CanvasGraph,
   parameters: {
     layout: 'fullscreen',
-  },
+  }
   // tags: ['autodocs'],
 } satisfies Meta<typeof CanvasGraph>;
 
@@ -38,7 +38,9 @@ export const LeftToRight: Story = {
       }
     },
     initData: modellingMethodsDataset,
-    containerStyle: defaultContainerStyle
+    containerStyle: defaultContainerStyle,
+    onReady: (canvasManager) => { },
+    onDestroy: () => { },
   },
 };
 
@@ -61,8 +63,11 @@ export const TopToBottom: Story = {
         nodeSep: 120,
 
       }
-    }, initData: modellingMethodsDataset,
-    containerStyle: defaultContainerStyle
+    },
+    initData: modellingMethodsDataset,
+    containerStyle: defaultContainerStyle,
+    onDestroy: () => { },
+
   },
 };
 
@@ -86,7 +91,10 @@ export const Radial: Story = {
         radial: true,
 
       }
-    }, initData: modellingMethodsDataset,
-    containerStyle: defaultContainerStyle
+    },
+    initData: modellingMethodsDataset,
+    containerStyle: defaultContainerStyle,
+    onDestroy: () => { },
+
   },
 };

@@ -40,7 +40,9 @@ export class GraphCanvasUtils {
   }
 
   updateLayout = (layoutName: string) => {
+    console.log("====updateLayout", layoutName);
     const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
+    console.log("layoutConfig", layoutConfig);
     if (layoutConfig) {
       this.getGraph()?.setLayout(layoutConfig);
       this.getGraph()?.render()
