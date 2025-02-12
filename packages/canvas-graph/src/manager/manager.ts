@@ -119,18 +119,20 @@ export class CanvasManager {
 
     // console.log("CanvasManager.updateOptions", g6Options);
 
-
-    this.graph.setOptions(g6Options);
-    this.graph.draw();
-    if (options.layout) {
-      // this.graph.layout()
-      this.graph.render()
+    const graph = this.getGraph();
+    if (graph) {
+      graph.setOptions(g6Options);
+      graph.draw();
+      if (options.layout) {
+        // this.graph.layout()
+        graph.render()
+      }
     }
-
     this.options = { ...this.options, ...options };
     if (callback) {
       callback()
     }
+
   }
 
   setTheme(theme: string) {
@@ -146,6 +148,7 @@ export class CanvasManager {
 
   initDataListeners() {
 
+
     // node
     this.store.data.on('nodeAdded', ({ key }) => {
       // console.log(`Node created: ${key}`);
@@ -154,7 +157,7 @@ export class CanvasManager {
       if (node) {
         const g6Node = convert_icanvas_node_to_g6_node(node);
         // console.log("g6Node", g6Node);
-        this.graph.addNodeData([g6Node])
+        this.getGraph()?.addNodeData([g6Node])
       }
     });
 
@@ -174,7 +177,7 @@ export class CanvasManager {
       if (edge) {
         const g6Edge = convert_icanvas_edge_to_g6_edge(edge);
         // console.log("g6Edge", g6Edge);
-        this.graph.addEdgeData([g6Edge])
+        this.getGraph()?.addEdgeData([g6Edge])
       }
     });
 
@@ -189,13 +192,18 @@ export class CanvasManager {
     // graph
     this.store.data.on('cleared', () => {
       console.log(`Graph cleared`);
-      this.graph.clear();
+      this.getGraph()?.clear();
     });
   }
 
 
   render() {
-    return this.graph.render();
+    const graph = this.getGraph();
+    if (!graph.destroyed) {
+      return this.getGraph().render();
+    } else {
+      return () => { }
+    }
   }
 
 }

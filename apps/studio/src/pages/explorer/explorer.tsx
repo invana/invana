@@ -473,11 +473,11 @@ const ExplorerPage: React.FC = () => {
           onReady={(canvasManager: CanvasManager) => {
             console.log("CanvasGraph.onReady", canvasManager)
             canvasManagerRef.current = canvasManager;
-            setIsReady(true)
+            // setIsReady(true)
           }}
           onDestroy={() => {
             console.log("CanvasGraph.onDestroy")
-            setIsReady(false)
+            // setIsReady(false)
             canvasManagerRef.current = null;
           }}
           options={mergeDeep(defaultOptions, projectData.options || {})}

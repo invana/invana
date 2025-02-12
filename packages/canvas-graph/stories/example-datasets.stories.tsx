@@ -44,5 +44,11 @@ export const LesMiserables: Story = {
       edges: lesMiserablesData.edges,
     },
     containerStyle: defaultContainerStyle,
+    onReady(canvasManager) {
+      console.log("onReady", canvasManager)
+      // setTimeout(() => {
+      // canvasManager.styling.hideAllNodes();
+      // }, 3000);
+    },
   },
 };

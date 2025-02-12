@@ -14,6 +14,7 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
 
   useEffect(() => {
 
+    console.log("CanvasGraph.useEffect");
     if (containerRef.current) {
       const graph = new GraphG6({
         container: containerRef.current,
@@ -29,17 +30,19 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
     }
     return () => {
       console.log("CanvasGraph.cleanup");
-      const graph = graphRef.current;
-      if (graph) {
-        // Defer destruction to avoid unmounting during render
-        graph.destroy();
-        if (props?.onDestroy) {
-          props?.onDestroy?.();
-        }
-
-        graphRef.current = null;
-
+      // const graph = graphRef.current;
+      // if (graph) {
+      // Defer destruction to avoid synchronous unmount
+      // setTimeout(() => {
+      if (graphRef.current && !graphRef.current.destroyed) {
+        graphRef.current.destroy();
       }
+      if (props?.onDestroy) {
+        props?.onDestroy?.();
+      }
+      graphRef.current = null;
+      // }, 0);
+      // }
     }
   }, []);
 
@@ -51,7 +54,7 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
       id={props.graphName}
       className={`h-full w-full ${props.className || ''}`}
       style={props.containerStyle ?? {}
-      }>
+      }>Hello
     </div>
   );
 };
