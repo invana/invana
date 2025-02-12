@@ -58,7 +58,7 @@ const WelcomeView: React.FC = () => {
         {/* Start Section */}
         <div className="space-y-6">
           <div>
-            <h3 className="mb-4 text-lg"> Recent graphs</h3>
+            <h3 className="mb-4 text-lg font-semibold"> Recent graphs</h3>
             <div className="space-y-2">
               {projects.length === 0 ? (
                 <p className="text-zinc-500">There are no connections.</p>
@@ -76,19 +76,19 @@ const WelcomeView: React.FC = () => {
                 ))
               )}
 
-              {/* <Button variant={"ghost"} onClick={() => setShowForm(true)} className="w-full justify-start p-0 hover:bg-transparent">
-                <Link /> Create a new connection
-              </Button> */}
+              <Button variant={"ghost"} onClick={() => console.log("")} className="w-full justify-start p-0 hover:bg-transparent">
+                Create a new connection
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Walkthroughs Section */}
         <div>
-          <h3 className="text-lg mb-4">Learn more</h3>
+          <h3 className="text-lg mb-4 font-semibold">Learn more</h3>
           <div className="space-y-2">
             {learnMoreItems.map((item, index) => (
-              <Card key={index} className="bg-zinc-800/50 border-zinc-700 hover:bg-zinc-800 transition-colors cursor-pointer">
+              <Card key={index} className="bg-zinc-800/50 border-zinc-700 hover:bg-zinc-800 dark:bg-zinc-700 dark:border-zinc-600 dark:hover:bg-zinc-600 transition-colors cursor-pointer">
                 <Button variant="ghost" className="w-full justify-start p-4 h-auto">
                   <item.icon className="mr-4 h-5 w-5 text-blue-400" />
                   <div className="text-left ">
