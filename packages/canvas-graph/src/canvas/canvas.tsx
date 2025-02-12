@@ -47,7 +47,7 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
   }, []);
 
 
-  console.log("CanvasGraph.props", props);
+  console.log("CanvasGraph.props", props.graphName, props);
   return (
     <div
       ref={containerRef}
@@ -60,4 +60,7 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
 };
 
 export const CanvasGraph = memo(Graph);
+// export const CanvasGraph: React.FC<CanvasGraphProps> = memo((props) => {
+//   return Graph(props);
+// });
 

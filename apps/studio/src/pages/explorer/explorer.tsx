@@ -430,7 +430,7 @@ const ExplorerPage: React.FC = () => {
         }
         {rightContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
-            {projectData ?
+            {projectData && canvasManagerRef.current ?
               <CanvasGraph
                 // ref={modelGraphData}
                 graphName={'model'}
@@ -473,12 +473,12 @@ const ExplorerPage: React.FC = () => {
           onReady={(canvasManager: CanvasManager) => {
             console.log("CanvasGraph.onReady", canvasManager)
             canvasManagerRef.current = canvasManager;
-            // setIsReady(true)
+            setIsReady(true)
           }}
           onDestroy={() => {
             console.log("CanvasGraph.onDestroy")
             // setIsReady(false)
-            canvasManagerRef.current = null;
+            // canvasManagerRef.current = null;
           }}
           options={mergeDeep(defaultOptions, projectData.options || {})}
         />
