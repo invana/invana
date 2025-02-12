@@ -32,13 +32,13 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
       const graph = graphRef.current;
       if (graph) {
         // Defer destruction to avoid unmounting during render
-        // setTimeout(() => {
         graph.destroy();
-        graphRef.current = null;
         if (props?.onDestroy) {
           props?.onDestroy?.();
         }
-        // }, 0);
+
+        graphRef.current = null;
+
       }
     }
   }, []);

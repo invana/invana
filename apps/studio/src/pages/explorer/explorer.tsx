@@ -430,15 +430,18 @@ const ExplorerPage: React.FC = () => {
         }
         {rightContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
-            <CanvasGraph
-              // ref={modelGraphData}
-              graphName={'model'}
-              containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
-              className={"bg-background"}
-              showHeader={false}
-              initData={getSchemaGraphData()}
-              options={graphModelOptions}
-            />
+            {projectData ?
+              <CanvasGraph
+                // ref={modelGraphData}
+                graphName={'model'}
+                containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
+                className={"bg-background"}
+                showHeader={false}
+                initData={getSchemaGraphData()}
+                options={mergeDeep(graphModelOptions, projectData.options || {})}
+
+              /> : <></>
+            }
           </PanelContent>
         }
         {rightContentName === "query" &&
