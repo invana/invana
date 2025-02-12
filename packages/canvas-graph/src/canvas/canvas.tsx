@@ -7,55 +7,54 @@ import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
 
 const Graph: React.FC<CanvasGraphProps> = (props) => {
-
-  // Sample graph data
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const graphRef: React.MutableRefObject<GraphG6 | null> = useRef(null);
+  const graphRef = useRef<GraphG6 | null>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
-
-    console.log("CanvasGraph.useEffect");
-    if (containerRef.current) {
+    // Only initialize if not already initialized
+    if (!initialized.current && containerRef.current) {
+      console.log("CanvasGraph.useEffect - initializing");
       const graph = new GraphG6({
         container: containerRef.current,
       });
-      console.log("===+++++", props.graphName, graph)
       graphRef.current = graph;
-      console.log("Created graph")
-      const options: CanvasManagerOptions = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options ?? {});
-      console.log("CanvasGraph.options", options);
-      const initData = props.initData ?? { 'nodes': [], 'edges': [] }
+      const options: CanvasManagerOptions = mergeDeep(
+        DEFAULT_CANVAS_GRAPH_OPTIONS,
+        props.options ?? {}
+      );
+      const initData = props.initData ?? { nodes: [], edges: [] };
       const canvasManager: CanvasManager = new CanvasManager(graph, options);
       canvasManager.store.addData(initData, () => canvasManager.render());
       props?.onReady?.(canvasManager);
+      initialized.current = true;
     }
+
     return () => {
       console.log("CanvasGraph.cleanup");
-      // const graph = graphRef.current;
-      // if (graph) {
-      // Defer destruction to avoid synchronous unmount
-      // setTimeout(() => {
-      if (graphRef.current && !graphRef.current.destroyed) {
-        graphRef.current.destroy();
+      // Reset the initialization flag and defer destruction
+      initialized.current = false;
+      const graph = graphRef.current;
+      if (graph && !graph.destroyed) {
+        setTimeout(() => {
+          graph.destroy();
+          graphRef.current = null;
+          if (props?.onDestroy) {
+            props.onDestroy();
+          }
+        }, 0);
       }
-      if (props?.onDestroy) {
-        props?.onDestroy?.();
-      }
-      graphRef.current = null;
-      // }, 0);
-      // }
-    }
-  }, []);
+    };
+  }, []); // Empty dependency array ensures this effect runs only on mount/unmount
 
-
-  console.log("CanvasGraph.props", props.graphName, props);
   return (
     <div
       ref={containerRef}
       id={props.graphName}
       className={`h-full w-full ${props.className || ''}`}
-      style={props.containerStyle ?? {}
-      }>Hello
+      style={props.containerStyle ?? {}}
+    >
+      Hello
     </div>
   );
 };
