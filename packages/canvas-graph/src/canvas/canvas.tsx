@@ -1,21 +1,21 @@
 import React, { memo, useEffect, useRef } from 'react';
-import { Graph } from '@antv/g6';
+import { Graph as GraphG6 } from '@antv/g6';
 import { CanvasGraphProps } from './types';
 import { CanvasManager } from '../manager';
 import { CanvasManagerOptions } from '../manager/types';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../manager/defaults';
 import { mergeDeep } from '@invana/data-store';
 
-const CanvasGraphRaw: React.FC<CanvasGraphProps> = (props) => {
+const Graph: React.FC<CanvasGraphProps> = (props) => {
 
   // Sample graph data
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const graphRef: React.MutableRefObject<Graph | null> = useRef(null);
+  const graphRef: React.MutableRefObject<GraphG6 | null> = useRef(null);
 
   useEffect(() => {
 
     if (containerRef.current) {
-      const graph = new Graph({
+      const graph = new GraphG6({
         container: containerRef.current,
       });
       graphRef.current = graph;
@@ -31,13 +31,6 @@ const CanvasGraphRaw: React.FC<CanvasGraphProps> = (props) => {
       console.log("CanvasGraph.cleanup");
       const graph = graphRef.current;
       if (graph) {
-        // if (graph.rendered) {
-        // graph.destroy();
-        // props?.onDestroy?.();
-        // graphRef.current = null;
-        // }
-
-
         // Defer destruction to avoid unmounting during render
         // setTimeout(() => {
         graph.destroy();
@@ -55,6 +48,7 @@ const CanvasGraphRaw: React.FC<CanvasGraphProps> = (props) => {
   return (
     <div
       ref={containerRef}
+      id={props.graphName}
       className={`h-full w-full ${props.className || ''}`}
       style={props.containerStyle ?? {}
       }>
@@ -62,5 +56,5 @@ const CanvasGraphRaw: React.FC<CanvasGraphProps> = (props) => {
   );
 };
 
-export const CanvasGraph = memo(CanvasGraphRaw, () => false);
+export const CanvasGraph = memo(Graph);
 

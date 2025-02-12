@@ -44,8 +44,11 @@ export class GraphCanvasUtils {
     const layoutConfig = ALL_AVAILABLE_LAYOUTS.find((item) => item.type === layoutName);
     console.log("layoutConfig", layoutConfig);
     if (layoutConfig) {
-      this.getGraph()?.setLayout(layoutConfig);
-      this.getGraph()?.render()
+      // this.getGraph()?.setLayout(layoutConfig);
+      // this.getGraph()?.render()
+      this.canvas_manager.updateOptions({ layout: layoutConfig });
+    } else {
+      console.error("Layout not found", layoutName);
     }
   }
 

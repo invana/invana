@@ -123,7 +123,7 @@ export class CanvasManager {
     this.graph.setOptions(g6Options);
     this.graph.draw();
     if (options.layout) {
-      this.graph.layout()
+      // this.graph.layout()
       this.graph.render()
     }
 

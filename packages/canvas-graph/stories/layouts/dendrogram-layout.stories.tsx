@@ -39,7 +39,7 @@ export const LeftToRight: Story = {
     },
     initData: modellingMethodsDataset,
     containerStyle: defaultContainerStyle,
-    onReady: (canvasManager) => { },
+    onReady: (_) => { },
     onDestroy: () => { },
   },
 };

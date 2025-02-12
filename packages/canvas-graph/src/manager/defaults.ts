@@ -1,5 +1,5 @@
 
-import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
+import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle, mergeDeep } from "@invana/data-store"
 import { CanvasManagerOptions, ICanvasStyleOptions } from "./types"
 import { getInitialTheme } from "@invana/ui"
 
@@ -56,6 +56,19 @@ export const DEFAULT_STYLE_OPTIONS: ICanvasStyleOptions = {
   defaultEdge: DEFAULT_EDGE_STYLE,
   canvas: DEFAULT_CANVAS_STYLE
 }
+
+export const DEFAULT_MODEL_STYLE_OPTIONS: ICanvasStyleOptions = {
+  defaultNode: DEFAULT_NODE_STYLE,
+  defaultEdge: mergeDeep(DEFAULT_EDGE_STYLE,
+    {
+      shape: {
+        strokeOpacity: 0.8,
+      }
+    }
+  ),
+  canvas: DEFAULT_CANVAS_STYLE
+}
+
 
 export const DEFAULT_CANVAS_GRAPH_OPTIONS: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS,

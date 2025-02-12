@@ -36,7 +36,7 @@ import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
 import { CanvasManager } from '@invana/canvas-graph/manager';
-import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
+import { DEFAULT_MODEL_STYLE_OPTIONS, DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
@@ -89,16 +89,16 @@ const defaultOptions: CanvasManagerOptions = {
 const graphModelOptions: CanvasManagerOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
-    ZOOM_CANVAS_BEHAVIOR,
+    // ZOOM_CANVAS_BEHAVIOR,
     DRAG_ELEMENT_BEHAVIOR,
-    HOVER_ACTIVATE_BEHAVIOR,
-    CLICK_SELECT_BEHAVIOR,
-    LASSO_SELECT_BEHAVIOR,
+    // HOVER_ACTIVATE_BEHAVIOR,
+    // CLICK_SELECT_BEHAVIOR,
+    // LASSO_SELECT_BEHAVIOR,
     NODE_TOOLTIP_BEHAVIOR,
     EDGE_TOOLTIP_BEHAVIOR,
-    NODE_CONTEXT_MENU_BEHAVIOR,
-    EDGE_CONTEXT_MENU_BEHAVIOR,
-    CANVAS_CONTEXT_MENU_BEHAVIOR,
+    // NODE_CONTEXT_MENU_BEHAVIOR,
+    // EDGE_CONTEXT_MENU_BEHAVIOR,
+    // CANVAS_CONTEXT_MENU_BEHAVIOR,
     // {
     //   ...PROPERTY_VIEWER_BEHAVIOR,
     //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
@@ -113,7 +113,7 @@ const graphModelOptions: CanvasManagerOptions = {
     // HISTORY_PLUGIN,
   ],
   layout: D3_FORCE_LAYOUT,
-  styles: DEFAULT_STYLE_OPTIONS
+  styles: DEFAULT_MODEL_STYLE_OPTIONS
 };
 
 
