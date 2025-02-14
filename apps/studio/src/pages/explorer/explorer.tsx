@@ -439,11 +439,11 @@ const ExplorerPage: React.FC = () => {
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modeGraphRef}
-              graphName={'model'}
-              containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
-              className={"bg-background"}
-              showHeader={false}
-              initData={getSchemaGraphData()}
+              // graphName={'model'}
+              // containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
+              // className={"bg-background"}
+              // showHeader={false}
+              // initData={getSchemaGraphData()}
               options={graphModelOptions}
             />
           </PanelContent>
@@ -470,20 +470,20 @@ const ExplorerPage: React.FC = () => {
       projectData ?
         <CanvasGraph
           // ref={canvasGraphRef}
-          graphName={'graphData'}
-          containerStyle={{ width: "100%", height: "100%" }}
-          className={"bg-background"}
-          initData={projectData.data}
-          onReady={(canvasManager: CanvasManager) => {
-            console.log("CanvasGraph.onReady", canvasManager)
-            canvasManagerRef.current = canvasManager;
-            setIsReady(true)
-          }}
-          onDestroy={() => {
-            console.log("CanvasGraph.onDestroy")
-            setIsReady(false)
-            canvasManagerRef.current = null;
-          }}
+          // graphName={'graphData'}
+          // containerStyle={{ width: "100%", height: "100%" }}
+          // className={"bg-background"}
+          // initData={projectData.data}
+          // onReady={(canvasManager: CanvasManager) => {
+          //   console.log("CanvasGraph.onReady", canvasManager)
+          //   canvasManagerRef.current = canvasManager;
+          //   setIsReady(true)
+          // }}
+          // onDestroy={() => {
+          //   console.log("CanvasGraph.onDestroy")
+          //   setIsReady(false)
+          //   canvasManagerRef.current = null;
+          // }}
           options={mergeDeep(defaultOptions, projectData.options || {})}
         />
         : <WelcomeView />
