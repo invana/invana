@@ -88,17 +88,17 @@ const defaultOptions: CanvasManagerOptions = {
 
 const graphModelOptions: CanvasManagerOptions = {
   behaviors: [
-    DRAG_CANVAS_BEHAVIOR,
-    ZOOM_CANVAS_BEHAVIOR,
-    DRAG_ELEMENT_BEHAVIOR,
-    HOVER_ACTIVATE_BEHAVIOR,
-    CLICK_SELECT_BEHAVIOR,
-    LASSO_SELECT_BEHAVIOR,
+    // DRAG_CANVAS_BEHAVIOR,
+    // ZOOM_CANVAS_BEHAVIOR,
+    // DRAG_ELEMENT_BEHAVIOR,
+    // HOVER_ACTIVATE_BEHAVIOR,
+    // CLICK_SELECT_BEHAVIOR,
+    // LASSO_SELECT_BEHAVIOR,
     NODE_TOOLTIP_BEHAVIOR,
-    EDGE_TOOLTIP_BEHAVIOR,
-    NODE_CONTEXT_MENU_BEHAVIOR,
-    EDGE_CONTEXT_MENU_BEHAVIOR,
-    CANVAS_CONTEXT_MENU_BEHAVIOR,
+    // EDGE_TOOLTIP_BEHAVIOR,
+    // NODE_CONTEXT_MENU_BEHAVIOR,
+    // EDGE_CONTEXT_MENU_BEHAVIOR,
+    // CANVAS_CONTEXT_MENU_BEHAVIOR,
     // {
     //   ...PROPERTY_VIEWER_BEHAVIOR,
     //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
@@ -366,6 +366,9 @@ const ExplorerPage: React.FC = () => {
   //   }
   // }, [rightContentName, setRightContentSize])
 
+  const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
+  const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
+
   return <DefaultV2Layout
     headerProps={{
       left: (
@@ -430,7 +433,7 @@ const ExplorerPage: React.FC = () => {
         {rightContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
-              // ref={modelGraphData}
+              ref={modeGraphRef}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
@@ -461,7 +464,7 @@ const ExplorerPage: React.FC = () => {
       // <div className="flex h-full items-center justify-center ">
       projectData ?
         <CanvasGraph
-          // ref={canvasGraphRef}
+          ref={canvasGraphRef}
           graphName={'graphData'}
           containerStyle={{ width: "100%", height: "100%" }}
           className={"bg-background"}
