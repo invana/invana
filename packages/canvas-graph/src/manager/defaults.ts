@@ -62,6 +62,7 @@ export const DEFAULT_MODEL_STYLE_OPTIONS: ICanvasStyleOptions = {
   defaultEdge: mergeDeep(DEFAULT_EDGE_STYLE,
     {
       shape: {
+        type: 'line',
         strokeOpacity: 0.8,
       }
     }
