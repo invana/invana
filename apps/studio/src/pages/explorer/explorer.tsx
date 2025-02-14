@@ -44,8 +44,8 @@ import { ProjectSwitcher } from '@/ui/components/projects-switcher';
 import { useParams } from 'react-router-dom';
 import { mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
-import useConnections from '@/hooks/useConnection';
 import WelcomeView from '@/ui/components/welcome-view';
+import { useMemo } from 'react';
 
 register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
@@ -349,10 +349,9 @@ const ExplorerPage: React.FC = () => {
       canvasManagerRef.current.setTheme(theme)
     }
   }, [theme, isReady]);
-
-  const getSchemaGraphData = () => {
-    return canvasManagerRef.current?.getModelAsGraphData();
-  }
+  const getSchemaGraphData = useMemo(() => {
+    return () => canvasManagerRef.current?.getModelAsGraphData();
+  }, []);
 
   // useEffect(() => {
   //   setRightContentName("graph-info")
@@ -371,8 +370,8 @@ const ExplorerPage: React.FC = () => {
   //   }
   // }, [rightContentName, setRightContentSize])
 
-  const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
-  const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
+  // const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
+  // const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
 
   return <DefaultV2Layout
     headerProps={{
@@ -381,14 +380,15 @@ const ExplorerPage: React.FC = () => {
           <span className='ml-3'><Menu className='w-5 h-5' /></span>
           <span className='font-bold mr-2 ml-2'>{ProductName}</span>
           <span className='mr-2'>|</span>
-          <span>Explorer</span>
+          {/* <span>Explorer</span> */}
+          <ProjectSwitcher />
         </>
       ),
       center: (
         <>
           {/* {isReady && canvasManagerRef.current ? <CanvasToolBar getCanvasManager={() => canvasManagerRef.current!} /> : null} */}
 
-          <ProjectSwitcher />
+          {/* <ProjectSwitcher /> */}
         </>
       ),
       right: (
@@ -438,7 +438,7 @@ const ExplorerPage: React.FC = () => {
         {rightContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
-              ref={modeGraphRef}
+              // ref={modeGraphRef}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
@@ -469,7 +469,7 @@ const ExplorerPage: React.FC = () => {
       // <div className="flex h-full items-center justify-center ">
       projectData ?
         <CanvasGraph
-          ref={canvasGraphRef}
+          // ref={canvasGraphRef}
           graphName={'graphData'}
           containerStyle={{ width: "100%", height: "100%" }}
           className={"bg-background"}

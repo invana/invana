@@ -35,6 +35,11 @@ export class CanvasManager {
     this.updateOptions(this.options)
   }
 
+  destroy() {
+    this.graph.destroy();
+    this.store.data.clear();
+  }
+
   getGraph(): Graph {
     // console.log("getGraph", this);
     return this.graph;
@@ -141,7 +146,7 @@ export class CanvasManager {
 
     // node
     this.store.data.on('nodeAdded', ({ key }) => {
-      console.log(`Node created: ${key}`);
+      // console.log(`Node created: ${key}`);
       const node = this.store.fineNodeById(key);
       // console.log("node", node);
       if (node) {
