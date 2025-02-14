@@ -36,7 +36,7 @@ import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
 import { CanvasManager } from '@invana/canvas-graph/manager';
-import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
+import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
@@ -112,8 +112,14 @@ const graphModelOptions: CanvasManagerOptions = {
     // MINIMAP_PLUGIN,
     // HISTORY_PLUGIN,
   ],
-  layout: D3_FORCE_LAYOUT,
-  styles: DEFAULT_STYLE_OPTIONS
+  layout: {
+    link: {
+      distance: 200,
+      // strength: 2
+    },
+    ...D3_FORCE_LAYOUT
+  },
+  styles: MODEL_STYLE_OPTIONS
 };
 
 
@@ -121,7 +127,6 @@ const ExplorerPage: React.FC = () => {
   const { graphId } = useParams();
 
 
-  const { getActiveConnection } = useConnections();
 
   console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
