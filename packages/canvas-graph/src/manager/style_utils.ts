@@ -133,8 +133,8 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
         lineStroke: '#D580FF',
       },
       dim: {
-        fillOpacity: 0.1,
-        labelFillOpacity: 0.1,
+        fillOpacity: 0.4,
+        labelFillOpacity: 0.4,
         lineWidth: 0,
         // fill: dimFill,
         // labelFill: dimLabelFill

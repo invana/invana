@@ -21,11 +21,14 @@ export class CanvasManager {
   canvas_utils: GraphCanvasUtils;
   private options: CanvasManagerOptions; // CanvasGraph options
   // private g6Options: GraphOptions // CanvasGraph options converted to G6 options
+  private container: HTMLDivElement;
 
-
-  constructor(graph: Graph, options: CanvasManagerOptions) {
+  constructor(container: HTMLDivElement,
+    initData: ICanvasData,
+    options: CanvasManagerOptions) {
     // console.log("CanvasManager.constructor", graph, options);
-    this.graph = graph;
+    this.container = container
+    this.graph = this.createGraph();
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
@@ -33,6 +36,20 @@ export class CanvasManager {
     this.initDataListeners();
     // set on first load 
     this.updateOptions(this.options)
+    this.store.addData(initData, () => this.render());
+  }
+
+  destroyGraph() {
+    this.getGraph()?.destroy();
+    this.store.data.removeAllListeners();
+    this.store.data.clear();
+  }
+
+
+  createGraph(): Graph {
+    return new Graph({
+      container: this.container,
+    });
   }
 
   getGraph(): Graph {

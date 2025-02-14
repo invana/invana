@@ -8,24 +8,20 @@ import { mergeDeep } from '@invana/data-store';
 
 const Graph: React.FC<CanvasGraphProps> = (props) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const graphRef = useRef<GraphG6 | null>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
     // Only initialize if not already initialized
     if (!initialized.current && containerRef.current) {
       console.log("CanvasGraph.useEffect - initializing");
-      const graph = new GraphG6({
-        container: containerRef.current,
-      });
-      graphRef.current = graph;
+
       const options: CanvasManagerOptions = mergeDeep(
         DEFAULT_CANVAS_GRAPH_OPTIONS,
         props.options ?? {}
       );
       const initData = props.initData ?? { nodes: [], edges: [] };
-      const canvasManager: CanvasManager = new CanvasManager(graph, options);
-      canvasManager.store.addData(initData, () => canvasManager.render());
+      const canvasManager: CanvasManager = new CanvasManager(containerRef
+        .current, initData, options);
       props?.onReady?.(canvasManager);
       initialized.current = true;
     }
