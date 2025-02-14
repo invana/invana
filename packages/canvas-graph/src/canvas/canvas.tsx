@@ -15,13 +15,13 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
     if (!initialized.current && containerRef.current) {
       console.log("CanvasGraph.useEffect - initializing");
 
-      const options: CanvasManagerOptions = mergeDeep(
-        DEFAULT_CANVAS_GRAPH_OPTIONS,
-        props.options ?? {}
-      );
+
       const initData = props.initData ?? { nodes: [], edges: [] };
-      const canvasManager: CanvasManager = new CanvasManager(containerRef
-        .current, initData, options);
+      const canvasManager: CanvasManager = new CanvasManager(
+        containerRef.current,
+        initData,
+        props.options || {}
+      );
       props?.onReady?.(canvasManager);
       initialized.current = true;
     }
@@ -30,19 +30,20 @@ const Graph: React.FC<CanvasGraphProps> = (props) => {
       console.log("CanvasGraph.cleanup");
       // Reset the initialization flag and defer destruction
       initialized.current = false;
-      const graph = graphRef.current;
-      if (graph && !graph.destroyed) {
-        setTimeout(() => {
-          graph.destroy();
-          graphRef.current = null;
-          if (props?.onDestroy) {
-            props.onDestroy();
-          }
-        }, 0);
-      }
+      // const graph = graphRef.current;
+      // if (graph && !graph.destroyed) {
+      //   setTimeout(() => {
+      //     graph.destroy();
+      //     graphRef.current = null;
+      //     if (props?.onDestroy) {
+      //       props.onDestroy();
+      //     }
+      //   }, 0);
+      // }
     };
   }, []); // Empty dependency array ensures this effect runs only on mount/unmount
 
+  console.log("CanvasGraph.render");
   return (
     <div
       ref={containerRef}

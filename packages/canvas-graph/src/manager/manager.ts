@@ -4,13 +4,14 @@ import {
   Graph,
   GraphOptions,
 } from '@antv/g6';
-import { GraphStore, ICanvasData, ICanvasNode } from '@invana/data-store'
+import { GraphStore, ICanvasData, ICanvasNode, mergeDeep } from '@invana/data-store'
 import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './style_utils';
 import { GraphStyle } from './styling';
 import { CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
 import { getUniqueItemsByItem } from './utils';
 import { GraphCanvasUtils } from './canvas_utils';
+import { DEFAULT_CANVAS_GRAPH_OPTIONS } from './defaults';
 
 
 export class CanvasManager {
@@ -29,7 +30,10 @@ export class CanvasManager {
     // console.log("CanvasManager.constructor", graph, options);
     this.container = container
     this.graph = this.createGraph();
-    this.options = options;
+    this.options = mergeDeep(
+      DEFAULT_CANVAS_GRAPH_OPTIONS,
+      options ?? {}
+    );;
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
     this.canvas_utils = new GraphCanvasUtils(this)

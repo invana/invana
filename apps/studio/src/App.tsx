@@ -8,6 +8,8 @@ import ExplorerPage from "./pages/explorer/explorer";
 import { LANDING_ROUTE } from './constants';
 import '@invana/config-tailwind/index.css';
 import '@invana/canvas-graph/index.css';
+import { TestPage } from './pages/test-page/test-page';
+import { TestPage2 } from './pages/test-page/test-page2';
 
 
 const App = () => {
@@ -20,6 +22,8 @@ const App = () => {
         <Route path="/modeller" element={<ProtectedRoute><ModellerPage /></ProtectedRoute>} />
         <Route path="/explorer" element={<ProtectedRoute><ExplorerPage /></ProtectedRoute>} />
         <Route path="/graph/:graphId" element={<ProtectedRoute><ExplorerPage /></ProtectedRoute>} />
+        <Route path="/test-page" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
+        <Route path="/test-page2" element={<ProtectedRoute><TestPage2 /></ProtectedRoute>} />
 
         {/* Other routes */}
         <Route path="*" element={<NotFoundPage />} />  {/* Catch-all route for 404 */}
