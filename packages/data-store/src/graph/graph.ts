@@ -55,17 +55,25 @@ export class GraphStore extends GraphDataCRUD {
       const sourceNode = graph.getNodeAttributes(source);
       const targetNode = graph.getNodeAttributes(target);
       if (!attributes.type) return; // Skip edges without a type
-      const edgeProperties = attributes.properties || {};
-      if (!this.edgeSchemas.has(attributes.type)) {
-        this.edgeSchemas.set(attributes.type, {
-          name: attributes.type,
+
+      const edgeType = attributes.type;
+      const sourceNodeType = sourceNode?.type || 'unknown';
+      const targetNodeType = targetNode?.type || 'unknown';
+      const edgeSchemaName = `${edgeType}-${sourceNodeType}-${targetNodeType}`;
+
+
+      if (!this.edgeSchemas.has(edgeSchemaName)) {
+        this.edgeSchemas.set(edgeSchemaName, {
+          name: edgeSchemaName,
           properties: [],
-          source: sourceNode?.type,
-          target: targetNode?.type,
+          source: sourceNodeType,
+          target: targetNodeType,
           isDirected: graph.isDirected(edge),
         });
       }
-      const schema = this.edgeSchemas.get(attributes.type)!;
+      const schema = this.edgeSchemas.get(edgeSchemaName)!;
+      const edgeProperties = attributes.properties || {};
+
       Object.keys(edgeProperties).forEach((key) => {
         if (key === 'type') return;
         if (!schema.properties.some((p) => p.name === key)) {

@@ -45,14 +45,14 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = React.memo(forwardRef((pr
 
 
 
-  useEffect(() => {
-    const handleContextMenu = (event: MouseEvent) => event.preventDefault();
-    document.addEventListener("contextmenu", handleContextMenu);
+  // useEffect(() => {
+  //   const handleContextMenu = (event: MouseEvent) => event.preventDefault();
+  //   document.addEventListener("contextmenu", handleContextMenu);
 
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("contextmenu", handleContextMenu);
+  //   };
+  // }, []);
 
 
   const localRef = useRef<Graph | null>(null);

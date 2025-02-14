@@ -98,7 +98,7 @@ const graphModelOptions: CanvasManagerOptions = {
     EDGE_TOOLTIP_BEHAVIOR,
     // NODE_CONTEXT_MENU_BEHAVIOR,
     // EDGE_CONTEXT_MENU_BEHAVIOR,
-    // CANVAS_CONTEXT_MENU_BEHAVIOR,
+    CANVAS_CONTEXT_MENU_BEHAVIOR,
     // {
     //   ...PROPERTY_VIEWER_BEHAVIOR,
     //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
