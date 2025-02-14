@@ -2,6 +2,7 @@
 import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
 import { CanvasManagerOptions, ICanvasStyleOptions } from "./types"
 import { getInitialTheme } from "@invana/ui"
+import { mergeDeep } from "@invana/data-store";
 
 
 export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
@@ -54,6 +55,24 @@ export const DEFAULT_CANVAS_STYLE: Partial<ICanvasStyle> = {
 export const DEFAULT_STYLE_OPTIONS: ICanvasStyleOptions = {
   defaultNode: DEFAULT_NODE_STYLE,
   defaultEdge: DEFAULT_EDGE_STYLE,
+  canvas: DEFAULT_CANVAS_STYLE
+}
+
+export const MODEL_STYLE_OPTIONS: ICanvasStyleOptions = {
+  defaultNode: DEFAULT_NODE_STYLE,
+  defaultEdge: mergeDeep(
+    {
+      shape: {
+        type: 'line',
+        strokeOpacity: 1
+      },
+      label: {
+        textOpacity: 1
+      }
+    },
+    DEFAULT_EDGE_STYLE,
+
+  ),
   canvas: DEFAULT_CANVAS_STYLE
 }
 
