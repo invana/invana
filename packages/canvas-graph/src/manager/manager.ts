@@ -24,7 +24,7 @@ export class CanvasManager {
 
 
   constructor(graph: Graph, options: CanvasManagerOptions) {
-    // console.log("CanvasManager.constructor", graph, options);
+    console.log("CanvasManager.constructor", graph, options);
     this.graph = graph;
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
@@ -87,7 +87,7 @@ export class CanvasManager {
 
   updateOptions(options: CanvasManagerOptions, callback?: () => void) {
     // console.log("updateOptions input options", options);
-
+    console.log("g6Options updateOptions", options)
     let g6Options: GraphOptions = {}
     if (options.styles) {
       const styleOptions = this.styling.getUpdatedStylingOptions(options);
@@ -113,7 +113,7 @@ export class CanvasManager {
     }
 
     // console.log("CanvasManager.updateOptions", g6Options);
-
+    console.log("g6Options", g6Options)
     this.graph.setOptions(g6Options);
     this.graph.draw();
     if (options.layout) {
