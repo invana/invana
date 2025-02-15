@@ -29,9 +29,10 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
 
   const data = { nodes, edges } as GraphData;
 
+  console.log("CanvasGraph -> props", props)
   const graphinProps = convertToGraphinOptions(props);
-
   console.log('data', data, graphinProps.options?.layout);
+
   return (
     <div>
       <Button
@@ -49,11 +50,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
           ]
         )}
       > Add Data</Button>
-
-
-
       <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p>
-      <Graphin options={{ data: data, ...graphinProps.options }} />
+      <Graphin options={{ data: data, ...graphinProps.options, theme: 'dark' }} />
     </div>
   )
 }

@@ -29,3 +29,9 @@ export const GRID_PLUGIN: CanvasGraphPlugin = {
   }
 }
 
+export const BACKGROUND_PLUGIN: CanvasGraphPlugin = {
+  type: 'background',
+  key: 'background',
+  background: '#000'
+}
+
