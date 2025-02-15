@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { mergeDeep } from '@invana/data-store';
 import { Graphin } from '@antv/graphin';
 import { CanvasGraphProps } from '../types';
-import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../styling/defaults';
 import { CanvasManager } from '../canvas/manager';
 
 
@@ -23,8 +21,9 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
   return (
     <Graphin
+      className={props.className || ''}
       onReady={(graph) => {
-        const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
+        const options = props.options
         const initData = props.initData ?? { 'nodes': [], 'edges': [] }
         console.log("Graphin onReady", props.graphName, graph, options);
         canvasManagerRef.current = new CanvasManager(graph, options);

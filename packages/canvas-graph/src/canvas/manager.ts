@@ -24,16 +24,32 @@ export class CanvasManager {
 
 
   constructor(graph: Graph, options: CanvasGraphOptions) {
-    console.log("CanvasManager.constructor", graph, options);
+    console.log("CanvasManager.constructor", options);
     this.graph = graph;
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
     this.canvas_utils = new GraphCanvasUtils(this)
+    // listeners
     this.initDataListeners();
+    this.setAutoResizeListeners()
     // set on first load 
     this.updateOptions(this.options)
   }
+
+  setAutoResizeListeners = () => {
+    const graphOptions = this.graph.getOptions();
+
+    window.addEventListener('resize', () => {
+      this.graph.resize(); // Resize the graph
+    });
+
+    if (graphOptions.container instanceof HTMLElement) {
+      graphOptions.container?.addEventListener('resize', () => {
+        this.graph.resize(); // Resize the graph
+      });
+    }
+  };
 
   destroy() {
     // this.graph.destroy();

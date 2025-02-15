@@ -54,6 +54,7 @@ export interface CanvasGraphOptions {
 export interface CanvasGraphProps {
   options: CanvasGraphOptions
   initData?: ICanvasData;
+  className?: string;
   containerStyle?: React.CSSProperties;
   onReady?: (manager: CanvasManager) => void;
   onDestroy?: () => void;

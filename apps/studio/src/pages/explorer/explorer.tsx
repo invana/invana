@@ -373,6 +373,8 @@ const ExplorerPage: React.FC = () => {
   // const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
   // const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
 
+  const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
+
   return <DefaultV2Layout
     headerProps={{
       left: (
@@ -439,11 +441,11 @@ const ExplorerPage: React.FC = () => {
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modeGraphRef}
-              // graphName={'model'}
-              // containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
-              // className={"bg-background"}
+              graphName={'model'}
+              containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
+              className={"bg-background"}
               // showHeader={false}
-              // initData={getSchemaGraphData()}
+              initData={getSchemaGraphData()}
               options={graphModelOptions}
             />
           </PanelContent>
@@ -470,21 +472,21 @@ const ExplorerPage: React.FC = () => {
       projectData ?
         <CanvasGraph
           // ref={canvasGraphRef}
-          // graphName={'graphData'}
-          // containerStyle={{ width: "100%", height: "100%" }}
-          // className={"bg-background"}
-          // initData={projectData.data}
-          // onReady={(canvasManager: CanvasManager) => {
-          //   console.log("CanvasGraph.onReady", canvasManager)
-          //   canvasManagerRef.current = canvasManager;
-          //   setIsReady(true)
-          // }}
-          // onDestroy={() => {
-          //   console.log("CanvasGraph.onDestroy")
-          //   setIsReady(false)
-          //   canvasManagerRef.current = null;
-          // }}
-          options={mergeDeep(defaultOptions, projectData.options || {})}
+          graphName={'graphData'}
+          containerStyle={{ width: "100%", height: "100%" }}
+          className={"bg-background"}
+          initData={projectData.data}
+          onReady={(canvasManager: CanvasManager) => {
+            console.log("CanvasGraph.onReady", canvasManager)
+            canvasManagerRef.current = canvasManager;
+            setIsReady(true)
+          }}
+          onDestroy={() => {
+            console.log("CanvasGraph.onDestroy")
+            setIsReady(false)
+            canvasManagerRef.current = null;
+          }}
+          options={projectDataOptions}
         />
         : <WelcomeView />
       // </div>
