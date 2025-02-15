@@ -131,6 +131,7 @@ const ExplorerPage: React.FC = () => {
   console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
+  const modelCanvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore()
 
 
@@ -361,8 +362,11 @@ const ExplorerPage: React.FC = () => {
     console.log("rightContentName", rightContentName)
     if (rightContentName === undefined) {
       // setRightContentSize(0)
-      // canvasManagerRef.current?.getGraph().resize()
+      canvasManagerRef.current?.getGraph().resize()
       canvasManagerRef.current?.getGraph().fitView()
+
+      modelCanvasManagerRef.current?.getGraph().resize()
+      modelCanvasManagerRef.current?.getGraph().fitView()
 
       // canvasManagerRef.current?.render()
     } else {
@@ -450,6 +454,10 @@ const ExplorerPage: React.FC = () => {
               className={"bg-background"}
               // showHeader={false}
               initData={getSchemaGraphData()}
+              onReady={(canvasManager: CanvasManager) => {
+                console.log("CanvasGraph.onReady", canvasManager)
+                modelCanvasManagerRef.current = canvasManager;
+              }}
               options={graphModelOptions}
             />
           </PanelContent>
