@@ -36,7 +36,7 @@ export class CanvasManager {
   }
 
   destroy() {
-    this.graph.destroy();
+    // this.graph.destroy();
     this.store.data.clear();
   }
 

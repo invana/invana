@@ -6,7 +6,7 @@ import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../styling/defaults';
 import { CanvasManager } from '../canvas/manager';
 
 
-export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
+const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
   const canvasManagerRef = useRef<CanvasManager | null>(null);
 
@@ -37,8 +37,10 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
       }}
       onDestroy={() => {
         console.log("Graphin onDestroy");
-        // localRef.current?.destroy();
-        canvasManagerRef.current?.destroy();
+        const mgr = canvasManagerRef.current;
+        canvasManagerRef.current = null;
+        mgr?.destroy();
+
         props?.onDestroy?.();
       }}
       options={{}}
@@ -47,3 +49,4 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   )
 }
 
+export const CanvasGraph = React.memo(CanvasGraph_);
