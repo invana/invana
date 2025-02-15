@@ -1,5 +1,6 @@
 import type { IPointerEvent } from '@antv/g6';
-import { CanvasGraphBehavior } from '../../src_backup/manager/types';
+import { CanvasGraphBehavior } from '../types';
+
 
 export const DRAG_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
   type: 'drag-canvas',

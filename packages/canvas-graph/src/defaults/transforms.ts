@@ -1,4 +1,4 @@
-import { CanvasGraphTransform } from "../../src_backup/manager/types";
+import { CanvasGraphTransform } from "../types"
 
 
 export const MAP_NODE_SIZE_TRANSFORMER: CanvasGraphTransform = {

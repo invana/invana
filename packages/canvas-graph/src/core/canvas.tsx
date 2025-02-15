@@ -10,7 +10,7 @@ import { convertToGraphinOptions } from './utils';
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
 
-  const { nodes, edges, addNode, addEdge, setGraphData } = useGraphStore();
+  const { nodes, edges, addData, addNode, addEdge } = useGraphStore();
 
   useEffect(() => {
     // Simulate fetching or initializing graph data
@@ -23,8 +23,8 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
       { id: 'edge1', type: 'line', source: '1', target: '2' },
     ];
 
-    setGraphData(initialNodes, initialEdges);
-  }, [setGraphData]);
+    addData(initialNodes, initialEdges);
+  }, [addData]);
 
 
   const data = { nodes, edges } as GraphData;
@@ -39,6 +39,19 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
         onClick={() => addNode({ id: (nodes.length + 1).toString(), type: 'circle', label: `Alice ${nodes.length}`, x: 100, y: 150 })}
       >Add Node</Button>
       <Button onClick={() => addEdge({ id: `edge${edges.length + 1}`, type: 'line', source: '1', target: '2' })}>Add Edge</Button>
+      <Button
+        onClick={() => addData(
+          [
+            { id: (nodes.length + 1).toString(), type: 'circle', label: `David ${(nodes.length + 1).toString()}`, x: 700, y: 150 },
+          ],
+          [
+            { id: `edge - ${(edges.length + 1).toString()}`, type: 'line', source: '1', target: (nodes.length + 1).toString(), },
+          ]
+        )}
+      > Add Data</Button>
+
+
+
       <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p>
       <Graphin options={{ data: data, ...graphinProps.options }} />
     </div>

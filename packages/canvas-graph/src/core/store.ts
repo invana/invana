@@ -12,6 +12,9 @@ interface GraphStore {
 
   // Actions to modify the store
   setGraphData: (nodes: ICanvasNode[], edges: ICanvasEdge[]) => void
+
+  addData: (nodes: ICanvasNode[], edges: ICanvasEdge[]) => void
+
   addNode: (node: ICanvasNode) => void
   addEdge: (edge: ICanvasEdge) => void
   updateNode: (updatedNode: ICanvasNode) => void
@@ -31,43 +34,49 @@ const useGraphStore = create<GraphStore>((set, get) => ({
   selectedNode: null,
 
   setGraphData: (nodes, edges) => set({ nodes, edges }),
+  addData: (nodes: ICanvasNode[], edges: ICanvasEdge[]) => {
+    set(state => ({
+      nodes: [...state.nodes, ...nodes],
+      edges: [...state.edges, ...edges]
+    }))
+  },
 
-  addNode: (node) =>
+  addNode: (node: ICanvasNode) =>
     set(state => ({
       nodes: [...state.nodes, node]
     })),
 
-  addEdge: (edge) =>
+  addEdge: (edge: ICanvasEdge) =>
     set(state => ({
       edges: [...state.edges, edge]
     })),
 
-  updateNode: (updatedNode) =>
+  updateNode: (updatedNode: ICanvasNode) =>
     set(state => ({
       nodes: state.nodes.map(node =>
         node.id === updatedNode.id ? updatedNode : node
       )
     })),
 
-  updateEdge: (updatedEdge) =>
+  updateEdge: (updatedEdge: ICanvasEdge) =>
     set(state => ({
       edges: state.edges.map(edge =>
         edge.id === updatedEdge.id ? updatedEdge : edge
       )
     })),
 
-  removeNode: (nodeId) =>
+  removeNode: (nodeId: string) =>
     set(state => ({
       nodes: state.nodes.filter(node => node.id !== nodeId),
       edges: state.edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId)
     })),
 
-  removeEdge: (edgeId) =>
+  removeEdge: (edgeId: string) =>
     set(state => ({
       edges: state.edges.filter(edge => edge.id !== edgeId)
     })),
 
-  selectNode: (node) => set({ selectedNode: node }),
+  selectNode: (node: ICanvasNode) => set({ selectedNode: node }),
   clearSelection: () => set({ selectedNode: null })
 }))
 

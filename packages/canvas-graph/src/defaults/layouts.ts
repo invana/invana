@@ -1,5 +1,5 @@
-import { CanvasGraphLayout } from "../../src_backup/manager/types"
-import { CanvasGraphNode } from "../../src_backup/types"
+import { CanvasGraphLayout, CanvasGraphNode } from "../types"
+
 
 // for more options on layout see:  https://observablehq.com/d/2db6b0cc5e97d8d6#cell-38 or https://g6.antv.vision/en/manual/core-concept/layout
 export const GRAPHIN_FORCE_LAYOUT: CanvasGraphLayout = {

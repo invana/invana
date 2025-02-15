@@ -41,7 +41,7 @@ export const defaultOptions: CanvasGraphOptions = {
   ],
   transforms: [
     MAP_NODE_SIZE_TRANSFORMER,
-    PROCESS_PARALLEL_TRANSFORMER
+    // PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
@@ -51,7 +51,7 @@ export const defaultOptions: CanvasGraphOptions = {
   layout: D3_FORCE_LAYOUT,
   styles: {
     canvas: {
-      // theme: 'light',
+      theme: 'dark',
     }
   }
 }
