@@ -1,4 +1,4 @@
-import { CanvasGraphPlugin } from "../manager/types"
+import { CanvasGraphPlugin } from "../../src_backup/manager/types"
 
 
 export const MINIMAP_PLUGIN: CanvasGraphPlugin = {

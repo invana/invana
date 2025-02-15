@@ -47,8 +47,8 @@ import { Project } from '@/store/projectStore';
 import WelcomeView from '@/ui/components/welcome-view';
 import { useMemo } from 'react';
 
-register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);

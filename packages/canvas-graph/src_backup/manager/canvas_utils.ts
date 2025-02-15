@@ -1,5 +1,5 @@
 import { CanvasManager } from "./manager";
-import { ALL_AVAILABLE_LAYOUTS } from "../defaults/layouts";
+import { ALL_AVAILABLE_LAYOUTS } from "../../src/defaults/layouts";
 
 
 export class GraphCanvasUtils {
