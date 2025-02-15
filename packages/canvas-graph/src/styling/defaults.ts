@@ -8,7 +8,7 @@ import { CanvasGraphOptions, ICanvasStyleOptions } from "../types";
 export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'circle',
-    size: 15,
+    size: 20,
     halo: false,
     bgColor: '#6a994e',
     bgOpacity: 1,
@@ -32,13 +32,14 @@ export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgrou
     halo: false,
     strokeWidth: 1,
     strokeColor: '#cad2c5',
-    strokeOpacity: 0.3,
+    strokeOpacity: 0.8,
   },
   label: {
     textColor: '#999999',
     textFontSize: 8,
     textPosition: 'center',
-    textAutoRotate: true
+    textAutoRotate: true,
+    textOpacity: 1
   },
   fields: {
     labelField: undefined

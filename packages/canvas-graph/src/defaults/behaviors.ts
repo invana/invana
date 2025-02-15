@@ -29,7 +29,6 @@ export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
   state: 'highlight',
   inactiveState: 'dim',
   onHover: (event: IPointerEvent) => {
-    console.log("====onHover", event)
     event.view.setCursor('pointer');
   },
   onHoverEnd: (event: IPointerEvent) => {

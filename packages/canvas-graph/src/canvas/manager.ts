@@ -39,6 +39,7 @@ export class CanvasManager {
 
   setAutoResizeListeners = () => {
     const graphOptions = this.graph.getOptions();
+    console.log("=====graphOptions", graphOptions.container)
 
     window.addEventListener('resize', () => {
       this.graph.resize(); // Resize the graph
@@ -48,6 +49,10 @@ export class CanvasManager {
       graphOptions.container?.addEventListener('resize', () => {
         this.graph.resize(); // Resize the graph
       });
+
+      graphOptions.container?.addEventListener('contextmenu', () => {
+        alert('contextmenu')
+      })
     }
   };
 
