@@ -357,23 +357,27 @@ const ExplorerPage: React.FC = () => {
   //   setRightContentName("graph-info")
   // }, [])
 
-  // useEffect(() => {
-  //   console.log("rightContentName", rightContentName)
-  //   if (rightContentName === undefined) {
-  //     setRightContentSize(0)
-  //     // canvasManagerRef.current?.getGraph().resize()
-  //     canvasManagerRef.current?.getGraph().fitView()
+  useEffect(() => {
+    console.log("rightContentName", rightContentName)
+    if (rightContentName === undefined) {
+      // setRightContentSize(0)
+      // canvasManagerRef.current?.getGraph().resize()
+      canvasManagerRef.current?.getGraph().fitView()
 
-  //     // canvasManagerRef.current?.render()
-  //   } else {
-  //     console.log("====")
-  //   }
-  // }, [rightContentName, setRightContentSize])
+      // canvasManagerRef.current?.render()
+    } else {
+      console.log("====")
+    }
+  }, [rightContentName])
 
   // const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
   // const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
 
   const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
+
+
+
+
 
   return <DefaultV2Layout
     headerProps={{
