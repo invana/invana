@@ -1,14 +1,14 @@
 
 import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store"
-import { CanvasManagerOptions, ICanvasStyleOptions } from "./types"
 import { getInitialTheme } from "@invana/ui"
 import { mergeDeep } from "@invana/data-store";
+import { CanvasGraphOptions, ICanvasStyleOptions } from "../types";
 
 
 export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup.com/en/examples/element/label/#background
   shape: {
     type: 'circle',
-    size: 15,
+    size: 20,
     halo: false,
     bgColor: '#6a994e',
     bgOpacity: 1,
@@ -32,13 +32,14 @@ export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgrou
     halo: false,
     strokeWidth: 1,
     strokeColor: '#cad2c5',
-    strokeOpacity: 0.3,
+    strokeOpacity: 0.8,
   },
   label: {
     textColor: '#999999',
     textFontSize: 8,
     textPosition: 'center',
-    textAutoRotate: true
+    textAutoRotate: true,
+    textOpacity: 1
   },
   fields: {
     labelField: undefined
@@ -76,7 +77,7 @@ export const MODEL_STYLE_OPTIONS: ICanvasStyleOptions = {
   canvas: DEFAULT_CANVAS_STYLE
 }
 
-export const DEFAULT_CANVAS_GRAPH_OPTIONS: CanvasManagerOptions = {
+export const DEFAULT_CANVAS_GRAPH_OPTIONS: CanvasGraphOptions = {
   styles: DEFAULT_STYLE_OPTIONS,
   plugins: [],
   behaviors: [],

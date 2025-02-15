@@ -1,5 +1,5 @@
-import { CanvasManager } from "./manager";
 import { ALL_AVAILABLE_LAYOUTS } from "../defaults/layouts";
+import { CanvasManager } from "./manager";
 
 
 export class GraphCanvasUtils {
@@ -31,7 +31,7 @@ export class GraphCanvasUtils {
   }
 
   eraseCanvas() {
-    this.canvas_manager.store.deleteData();
+    this.canvas_manager.store.clear();
     // this.getGraph()?.clear();
   }
 

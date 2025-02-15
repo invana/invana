@@ -1,11 +1,6 @@
 
 
 
-
-```
-
-
-
 /*
 
 data - graph data 
@@ -20,4 +15,4 @@ plugins - context menus, tooltips, background patterns - grid, dotted, history, 
 
 layout - 
 
-*/```
+*/

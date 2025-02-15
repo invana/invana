@@ -1,5 +1,6 @@
 import type { IPointerEvent } from '@antv/g6';
-import { CanvasGraphBehavior } from '../manager/types';
+import { CanvasGraphBehavior } from '../types';
+
 
 export const DRAG_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
   type: 'drag-canvas',
@@ -28,7 +29,6 @@ export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
   state: 'highlight',
   inactiveState: 'dim',
   onHover: (event: IPointerEvent) => {
-    console.log("====onHover", event)
     event.view.setCursor('pointer');
   },
   onHoverEnd: (event: IPointerEvent) => {
@@ -58,13 +58,13 @@ export const LASSO_SELECT_BEHAVIOR: CanvasGraphBehavior = {
 }
 
 export const NODE_TOOLTIP_BEHAVIOR: CanvasGraphBehavior = {
-  type: 'tooltip-node',
-  key: 'tooltip-node',
+  type: 'node-tooltip',
+  key: 'node-tooltip',
 }
 
 export const EDGE_TOOLTIP_BEHAVIOR: CanvasGraphBehavior = {
-  type: 'tooltip-edge',
-  key: 'tooltip-edge',
+  type: 'edge-tooltip',
+  key: 'edge-tooltip',
 }
 
 export const NODE_CONTEXT_MENU_BEHAVIOR: CanvasGraphBehavior = {

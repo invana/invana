@@ -32,8 +32,8 @@ import { CanvasToolBar } from '@invana/canvas-graph/plugins';
 import { GraphInformation } from '@/ui/components/graph-information';
 
 
-register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);

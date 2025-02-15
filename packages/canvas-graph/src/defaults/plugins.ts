@@ -1,4 +1,4 @@
-import { CanvasGraphPlugin } from "../manager/types"
+import { CanvasGraphPlugin } from "../types"
 
 
 export const MINIMAP_PLUGIN: CanvasGraphPlugin = {
@@ -27,5 +27,11 @@ export const GRID_PLUGIN: CanvasGraphPlugin = {
     stroke: '#222222', // Set grid line color
     lineWidth: 1, // Set line width
   }
+}
+
+export const BACKGROUND_PLUGIN: CanvasGraphPlugin = {
+  type: 'background',
+  key: 'background',
+  background: '#000'
 }
 

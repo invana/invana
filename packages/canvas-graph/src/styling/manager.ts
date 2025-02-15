@@ -1,29 +1,28 @@
 import { EdgeOptions, Graph, GraphOptions, NodeOptions } from '@antv/g6'
-import { CanvasManagerOptions } from './types';
 import {
   convert_canvas_style_to_g6_style,
   convert_edge_canvas_style_to_g6_sytle,
   convert_node_canvas_style_to_g6_style,
   generateElementLabel
-} from './style_utils';
+} from './utils';
 import { ICanvasStyle, mergeDeep } from '@invana/data-store';
 import { NodeStyle } from '@antv/g6/lib/spec/element/node';
 import { EdgeStyle } from '@antv/g6/lib/spec/element/edge';
-import { CanvasGraphEdge, CanvasGraphNode } from '../types';
+import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions } from '../types';
 
 
 export class GraphStyle {
 
   private graph: Graph
-  private options!: CanvasManagerOptions
+  private options!: CanvasGraphOptions
 
-  constructor(graph: Graph, options: CanvasManagerOptions) {
+  constructor(graph: Graph, options: CanvasGraphOptions) {
     console.log("GraphStyle.constructor", graph, options.styles);
     this.graph = graph;
     this.options = options;
   }
 
-  private getUpdatedDefaultNodeStyle = (options: CanvasManagerOptions): NodeStyle => {
+  private getUpdatedDefaultNodeStyle = (options: CanvasGraphOptions): NodeStyle => {
     const nodeStyle: NodeStyle = convert_node_canvas_style_to_g6_style(
       options
     )
@@ -38,7 +37,7 @@ export class GraphStyle {
     return nodeStyle
   }
 
-  private getUpdatedDefaultEdgeStyle = (options: CanvasManagerOptions): EdgeStyle => {
+  private getUpdatedDefaultEdgeStyle = (options: CanvasGraphOptions): EdgeStyle => {
 
     const edgeStyle: EdgeStyle = convert_edge_canvas_style_to_g6_sytle(
       options
@@ -54,9 +53,9 @@ export class GraphStyle {
     return edgeStyle
   }
 
-  getUpdatedStylingOptions(newOptions: CanvasManagerOptions): GraphOptions {
+  getUpdatedStylingOptions(newOptions: CanvasGraphOptions): GraphOptions {
     // update existing options with the new options 
-    const options: CanvasManagerOptions = mergeDeep(this.options, newOptions);
+    const options: CanvasGraphOptions = mergeDeep(this.options, newOptions);
     // console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
 
     let graphOptions: GraphOptions = {}

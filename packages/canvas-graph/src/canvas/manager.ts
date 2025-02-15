@@ -5,12 +5,12 @@ import {
   GraphOptions,
 } from '@antv/g6';
 import { GraphStore, ICanvasData, ICanvasNode } from '@invana/data-store'
-import { convert_icanvas_edge_to_g6_edge, convert_icanvas_node_to_g6_node } from './style_utils';
-import { GraphStyle } from './styling';
-import { CanvasManagerOptions } from './types';
 import { IGraphSchema } from '@invana/data-store/types/schema';
-import { getUniqueItemsByItem } from './utils';
+import { getUniqueItemsByItem } from '../core/utils';
+import { GraphStyle } from '../styling/manager';
+import { convert_icanvas_node_to_g6_node, convert_icanvas_edge_to_g6_edge } from '../styling/utils';
 import { GraphCanvasUtils } from './canvas_utils';
+import { CanvasGraphOptions } from '../types';
 
 
 export class CanvasManager {
@@ -19,20 +19,46 @@ export class CanvasManager {
   store: GraphStore;
   styling: GraphStyle;
   canvas_utils: GraphCanvasUtils;
-  private options: CanvasManagerOptions; // CanvasGraph options
+  private options: CanvasGraphOptions  // CanvasGraph options
   // private g6Options: GraphOptions // CanvasGraph options converted to G6 options
 
 
-  constructor(graph: Graph, options: CanvasManagerOptions) {
-    console.log("CanvasManager.constructor", graph, options);
+  constructor(graph: Graph, options: CanvasGraphOptions) {
+    console.log("CanvasManager.constructor", options);
     this.graph = graph;
     this.options = options;
     this.styling = new GraphStyle(this.graph, this.options)
     this.store = new GraphStore();
     this.canvas_utils = new GraphCanvasUtils(this)
+    // listeners
     this.initDataListeners();
+    this.setAutoResizeListeners()
     // set on first load 
     this.updateOptions(this.options)
+  }
+
+  setAutoResizeListeners = () => {
+    const graphOptions = this.graph.getOptions();
+    console.log("=====graphOptions", graphOptions.container)
+
+    window.addEventListener('resize', () => {
+      this.graph.resize(); // Resize the graph
+    });
+
+    if (graphOptions.container instanceof HTMLElement) {
+      graphOptions.container?.addEventListener('resize', () => {
+        this.graph.resize(); // Resize the graph
+      });
+
+      graphOptions.container?.addEventListener('contextmenu', () => {
+        alert('contextmenu')
+      })
+    }
+  };
+
+  destroy() {
+    // this.graph.destroy();
+    this.store.data.clear();
   }
 
   getGraph(): Graph {
@@ -85,7 +111,7 @@ export class CanvasManager {
 
 
 
-  updateOptions(options: CanvasManagerOptions, callback?: () => void) {
+  updateOptions(options: CanvasGraphOptions, callback?: () => void) {
     // console.log("updateOptions input options", options);
     console.log("g6Options updateOptions", options)
     let g6Options: GraphOptions = {}
@@ -127,7 +153,7 @@ export class CanvasManager {
   }
 
   setTheme(theme: string) {
-    const newOptions: CanvasManagerOptions = {
+    const newOptions: CanvasGraphOptions = {
       styles: {
         canvas: {
           theme: theme
@@ -141,7 +167,7 @@ export class CanvasManager {
 
     // node
     this.store.data.on('nodeAdded', ({ key }) => {
-      console.log(`Node created: ${key}`);
+      // console.log(`Node created: ${key}`);
       const node = this.store.fineNodeById(key);
       // console.log("node", node);
       if (node) {
@@ -193,4 +219,3 @@ export class CanvasManager {
 
 }
 
-export default GraphStore;

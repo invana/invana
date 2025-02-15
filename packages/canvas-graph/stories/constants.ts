@@ -5,25 +5,26 @@ import {
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
 import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
-import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
-import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
+import { MINIMAP_PLUGIN, HISTORY_PLUGIN, GRID_PLUGIN, BACKGROUND_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
+// import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
-import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/behaviours';
-import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
-import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
-import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
+import { EdgeTooltipBehavior, NodeTooltipBehavior, PropertyViewerBehavior } from '@invana/canvas-graph/plugins/behaviours';
+import { NodeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/node';
+import { EdgeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/edge';
+import { CanvasContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/canvas';
+import { CanvasGraphOptions } from '@invana/canvas-graph/types';
 
 
-register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
+register(ExtensionCategory.BEHAVIOR, NODE_TOOLTIP_BEHAVIOR.type, NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR.type, EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR.type, NodeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR.type, EdgeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, CANVAS_CONTEXT_MENU_BEHAVIOR.type, CanvasContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR.type, PropertyViewerBehavior, true);
 
 
-export const defaultOptions: CanvasManagerOptions = {
+export const defaultOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
@@ -45,12 +46,13 @@ export const defaultOptions: CanvasManagerOptions = {
   plugins: [
     MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
+    BACKGROUND_PLUGIN
     // GRID_PLUGIN
   ],
   layout: D3_FORCE_LAYOUT,
   styles: {
     canvas: {
-      // theme: 'light',
+      theme: 'dark',
     }
   }
 }
