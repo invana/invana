@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { ICanvasEdge, ICanvasNode, mergeDeep } from '@invana/data-store';
 import { Graphin } from '@antv/graphin';
 import { Graph, type GraphData } from '@antv/g6';
-import useGraphStore from './store';
+// import useGraphStore from './store';
 import { Button } from '@invana/ui';
 import { CanvasGraphProps } from '../types';
 import { convertToGraphinOptions } from './utils';
@@ -12,54 +12,70 @@ import { CanvasManager } from '../canvas/manager';
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
 
-  const { nodes, edges, addData, addNode, addEdge } = useGraphStore();
+  // const { nodes, edges, addData, addNode, addEdge } = useGraphStore();
   const canvasManagerRef = useRef<CanvasManager | null>(null);
 
-  useEffect(() => {
-    // Simulate fetching or initializing graph data
-    const initialNodes: ICanvasNode[] = [
-      { id: '1', type: 'circle', label: 'Alice', x: 100, y: 150 },
-      { id: '2', type: 'circle', label: 'Bob', x: 300, y: 150 },
-    ];
+  // useEffect(() => {
+  //   // Simulate fetching or initializing graph data
+  //   const initialNodes: ICanvasNode[] = [
+  //     { id: '1', type: 'circle', label: 'Alice', x: 100, y: 150 },
+  //     { id: '2', type: 'circle', label: 'Bob', x: 300, y: 150 },
+  //   ];
 
-    const initialEdges: ICanvasEdge[] = [
-      { id: 'edge1', type: 'line', source: '1', target: '2' },
-    ];
+  //   const initialEdges: ICanvasEdge[] = [
+  //     { id: 'edge1', type: 'line', source: '1', target: '2' },
+  //   ];
 
-    addData(initialNodes, initialEdges);
-  }, [addData]);
+  //   addData(initialNodes, initialEdges);
+  // }, [addData]);
 
 
-  const data = { nodes, edges } as GraphData;
+  // const data = { nodes, edges } as GraphData;
 
   console.log("CanvasGraph -> props", props)
   console.log("CanvasGraph -> graph", canvasManagerRef.current)
-  const graphinProps = convertToGraphinOptions(props);
-  console.log('data', data, graphinProps.options?.layout);
 
-  const handAddData = () => {
-    addData(
-      [
-        { id: (nodes.length + 1).toString(), type: 'circle', label: `David ${(nodes.length + 1).toString()}`, x: 700, y: 150 },
-      ],
-      [
-        { id: `edge - ${(edges.length + 1).toString()}`, type: 'line', source: '1', target: (nodes.length + 1).toString(), },
-      ]
+  const handleAddData = () => {
+
+    const nodesCount = canvasManagerRef.current?.store.data.nodes.length;
+    const edgesCount = canvasManagerRef.current?.store.data.edges.length;
+
+    canvasManagerRef.current?.store.addData(
+      {
+        nodes: [
+          {
+            id: ((nodesCount ?? 0) + 1).toString(),
+            type: 'User',
+            label: `David ${((nodesCount ?? 0) + 1).toString()}`,
+            properties: {}
+          },
+        ],
+        edges: [
+          {
+            id: `edge - ${((edgesCount ?? 0) + 1).toString()}`,
+            type: 'link',
+            source: '1',
+            target: ((nodesCount ?? 0) + 1).toString(),
+            properties: {}
+          },
+        ],
+      },
+      () => canvasManagerRef.current?.render()
     )
   }
 
 
   return (
     <div>
-      <Button
+      {/* <Button
         className='mr-3'
         onClick={() => addNode({ id: (nodes.length + 1).toString(), type: 'circle', label: `Alice ${nodes.length}`, x: 100, y: 150 })}
       >Add Node</Button>
-      <Button onClick={() => addEdge({ id: `edge${edges.length + 1}`, type: 'line', source: '1', target: '2' })}>Add Edge</Button>
+      <Button onClick={() => addEdge({ id: `edge${edges.length + 1}`, type: 'line', source: '1', target: '2' })}>Add Edge</Button> */}
       <Button
-        onClick={() => handAddData()}
+        onClick={() => handleAddData()}
       > Add Data</Button>
-      <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p>
+      {/* <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p> */}
       <Graphin
         onReady={(graph) => {
           const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
