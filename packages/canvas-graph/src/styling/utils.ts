@@ -1,10 +1,9 @@
 import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle, mergeDeep } from "@invana/data-store";
 import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
 import { NodeStyle } from "@antv/g6/lib/spec/element/node";
-import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
-import { CanvasManagerOptions, ICanvasStyleOptions } from "./types";
-import { CanvasGraphEdge, CanvasGraphNode } from "../types";
+import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions, ICanvasStyleOptions } from "../types";
+import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
@@ -95,7 +94,7 @@ export const generateElementLabel = (
   return defaultValue
 }
 
-export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOptions): NodeStyle => {
+export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOptions): NodeStyle => {
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
   */
@@ -126,6 +125,11 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
+
+      // default: {
+      //   fillOpacity: (d: CanvasGraphEdge) => do_style_override(d, 'borderOpacity', 'shape', customNodeStyles, defaultStyle?.shape?.borderOpacity),
+      //   labelFillOpacity: (d: CanvasGraphEdge) => do_style_override(d, 'textOpacity', 'label', customNodeStyles, defaultStyle?.label?.textOpacity),
+      // },
       highlight: {
         // fill: '#D580FF',
         halo: true,
@@ -135,7 +139,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
       dim: {
         fillOpacity: 0.1,
         labelFillOpacity: 0.1,
-        lineWidth: 0,
+        // lineWidth: 0,
         // fill: dimFill,
         // labelFill: dimLabelFill
       }
@@ -164,11 +168,11 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasManagerOpti
   return g6Style;
 }
 
-export const check_if_node_size_transformer_enabled = (options: CanvasManagerOptions) => {
+export const check_if_node_size_transformer_enabled = (options: CanvasGraphOptions) => {
   return options.transforms?.some(transform => transform.key === 'map-node-size');
 }
 
-export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOptions): EdgeStyle => {
+export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOptions): EdgeStyle => {
   const defaultStyle: CanvasEdgeStyle = mergeDeep(DEFAULT_EDGE_STYLE, options?.styles?.defaultEdge || {});
   const customEdgeStyles = options.styles?.edges || {};
   const g6Style: EdgeStyle = {
@@ -178,30 +182,11 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
       endArrow: true,
 
       labelText: (d: CanvasGraphNode) => generateElementLabel(d, customEdgeStyles, undefined),// fill
-
-      // labelText: (d: CanvasGraphEdge) => {
-      //   for (const edgeType in customEdgeStyles) {
-      //     if (d?.data?.type === edgeType) {
-      //       const customStyle = customEdgeStyles[edgeType];
-      //       const labelField = customStyle?.fields?.labelField;
-
-      //       if (labelField) {
-      //         if (labelField.includes("properties.")) {
-      //           const propertyFieldName = labelField.split(".")[1];
-      //           //@ts-ignore
-      //           return d.data.properties ? d.data.properties[propertyFieldName as keyof typeof d.data.properties] : undefined;
-      //         } else if (labelField === "id") {
-      //           return d.id;
-      //         }
-      //       }
-      //     }
-      //   }
-      //   return
-      // },// fill
       // stroke
       lineWidth: (d: CanvasGraphEdge) => do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeWidth),
       stroke: (d: CanvasGraphEdge) => do_style_override(d, 'strokeColor', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeColor),
-      opacity: (d: CanvasGraphEdge) => do_style_override(d, 'strokeOpacity', 'label', customEdgeStyles, defaultStyle?.shape?.strokeOpacity),
+      opacity: (d: CanvasGraphEdge) => do_style_override(d, 'strokeOpacity', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeOpacity),
+      labelFillOpacity: (d: CanvasGraphEdge) => do_style_override(d, 'textOpacity', 'label', customEdgeStyles, defaultStyle?.label?.textOpacity),
 
       // label
       labelTextAlign: (d: CanvasGraphEdge) => do_style_override(d, 'textPosition', 'label', customEdgeStyles, defaultStyle?.label?.textPosition),
@@ -209,14 +194,19 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasManagerOpti
       labelFill: (d: CanvasGraphEdge) => do_style_override(d, 'textColor', 'label', customEdgeStyles, defaultStyle?.label?.textColor),
     },
     state: {
+      // default: {
+      //   opacity: (d: CanvasGraphEdge) => do_style_override(d, 'strokeOpacity', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeOpacity),
+      //   labelFillOpacity: (d: CanvasGraphEdge) => do_style_override(d, 'textOpacity', 'label', customEdgeStyles, defaultStyle?.label?.textOpacity),
+      // },
+
       highlight: {
         lineWidth: 4,
         opacity: 0.7,
       },
       dim: {
         // stroke: dimStroke,
-        opacity: 0.1,
-        labelFillOpacity: 0.1,
+        opacity: 0.2,
+        labelFillOpacity: 0.2,
         // labelFill: dimLabelFill,
         // opacity: 0.3
       }

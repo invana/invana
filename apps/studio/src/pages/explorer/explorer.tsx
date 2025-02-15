@@ -14,7 +14,6 @@ import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
 import { ActivityHistoryView } from '@/ui/components/activity-history';
-import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 import {
   CANVAS_CONTEXT_MENU_BEHAVIOR, CLICK_SELECT_BEHAVIOR, DRAG_CANVAS_BEHAVIOR,
   DRAG_ELEMENT_BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR,
@@ -31,12 +30,10 @@ import { ExtensionCategory, register } from '@antv/g6';
 import {
   EdgeTooltipBehavior, NodeTooltipBehavior,
   PropertyViewerBehavior
-} from '@invana/canvas-graph/behaviours';
-import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
-import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
-import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
-import { CanvasManager } from '@invana/canvas-graph/manager';
-import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
+} from '@invana/canvas-graph/plugins/behaviours';
+import { NodeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/node';
+import { EdgeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/edge';
+import { CanvasContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/canvas';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
@@ -44,18 +41,21 @@ import { ProjectSwitcher } from '@/ui/components/projects-switcher';
 import { useParams } from 'react-router-dom';
 import { mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
-import useConnections from '@/hooks/useConnection';
 import WelcomeView from '@/ui/components/welcome-view';
+import { useMemo } from 'react';
+import { CanvasGraphOptions } from '@invana/canvas-graph/types';
+import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
+import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 
-register(ExtensionCategory.BEHAVIOR, 'tooltip-node', NodeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'tooltip-edge', EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
 
 
-const defaultOptions: CanvasManagerOptions = {
+const defaultOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
@@ -86,7 +86,7 @@ const defaultOptions: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS
 }
 
-const graphModelOptions: CanvasManagerOptions = {
+const graphModelOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
@@ -98,7 +98,7 @@ const graphModelOptions: CanvasManagerOptions = {
     EDGE_TOOLTIP_BEHAVIOR,
     // NODE_CONTEXT_MENU_BEHAVIOR,
     // EDGE_CONTEXT_MENU_BEHAVIOR,
-    // CANVAS_CONTEXT_MENU_BEHAVIOR,
+    CANVAS_CONTEXT_MENU_BEHAVIOR,
     // {
     //   ...PROPERTY_VIEWER_BEHAVIOR,
     //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
@@ -131,6 +131,7 @@ const ExplorerPage: React.FC = () => {
   console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
+  const modelCanvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore()
 
 
@@ -349,30 +350,38 @@ const ExplorerPage: React.FC = () => {
       canvasManagerRef.current.setTheme(theme)
     }
   }, [theme, isReady]);
-
-  const getSchemaGraphData = () => {
-    return canvasManagerRef.current?.getModelAsGraphData();
-  }
+  const getSchemaGraphData = useMemo(() => {
+    return () => canvasManagerRef.current?.getModelAsGraphData();
+  }, []);
 
   // useEffect(() => {
   //   setRightContentName("graph-info")
   // }, [])
 
-  // useEffect(() => {
-  //   console.log("rightContentName", rightContentName)
-  //   if (rightContentName === undefined) {
-  //     setRightContentSize(0)
-  //     // canvasManagerRef.current?.getGraph().resize()
-  //     canvasManagerRef.current?.getGraph().fitView()
+  useEffect(() => {
+    console.log("rightContentName", rightContentName)
+    if (rightContentName === undefined) {
+      // setRightContentSize(0)
+      canvasManagerRef.current?.getGraph().resize()
+      canvasManagerRef.current?.getGraph().fitView()
 
-  //     // canvasManagerRef.current?.render()
-  //   } else {
-  //     console.log("====")
-  //   }
-  // }, [rightContentName, setRightContentSize])
+      modelCanvasManagerRef.current?.getGraph().resize()
+      modelCanvasManagerRef.current?.getGraph().fitView()
 
-  const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
-  const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
+      // canvasManagerRef.current?.render()
+    } else {
+      console.log("====")
+    }
+  }, [rightContentName])
+
+  // const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
+  // const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
+
+  const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
+
+
+
+
 
   return <DefaultV2Layout
     headerProps={{
@@ -381,14 +390,15 @@ const ExplorerPage: React.FC = () => {
           <span className='ml-3'><Menu className='w-5 h-5' /></span>
           <span className='font-bold mr-2 ml-2'>{ProductName}</span>
           <span className='mr-2'>|</span>
-          <span>Explorer</span>
+          {/* <span>Explorer</span> */}
+          <ProjectSwitcher />
         </>
       ),
       center: (
         <>
           {/* {isReady && canvasManagerRef.current ? <CanvasToolBar getCanvasManager={() => canvasManagerRef.current!} /> : null} */}
 
-          <ProjectSwitcher />
+          {/* <ProjectSwitcher /> */}
         </>
       ),
       right: (
@@ -438,12 +448,16 @@ const ExplorerPage: React.FC = () => {
         {rightContentName === "model" &&
           <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
-              ref={modeGraphRef}
+              // ref={modeGraphRef}
               graphName={'model'}
               containerStyle={{ width: "100%", height: "calc(100vh - 70px)" }}
               className={"bg-background"}
-              showHeader={false}
+              // showHeader={false}
               initData={getSchemaGraphData()}
+              onReady={(canvasManager: CanvasManager) => {
+                console.log("CanvasGraph.onReady", canvasManager)
+                modelCanvasManagerRef.current = canvasManager;
+              }}
               options={graphModelOptions}
             />
           </PanelContent>
@@ -469,7 +483,7 @@ const ExplorerPage: React.FC = () => {
       // <div className="flex h-full items-center justify-center ">
       projectData ?
         <CanvasGraph
-          ref={canvasGraphRef}
+          // ref={canvasGraphRef}
           graphName={'graphData'}
           containerStyle={{ width: "100%", height: "100%" }}
           className={"bg-background"}
@@ -484,7 +498,7 @@ const ExplorerPage: React.FC = () => {
             setIsReady(false)
             canvasManagerRef.current = null;
           }}
-          options={mergeDeep(defaultOptions, projectData.options || {})}
+          options={projectDataOptions}
         />
         : <WelcomeView />
       // </div>

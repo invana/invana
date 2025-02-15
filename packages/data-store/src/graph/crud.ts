@@ -5,7 +5,7 @@ import { ICanvasData, ICanvasEdge, CanvasEdgeStyle, ICanvasItemID, ICanvasNode, 
 export class GraphDataCRUD extends GraphBase {
 
 
-  addData(data: ICanvasData, callback: () => void) {
+  addData(data: ICanvasData, callback?: () => void) {
     console.log("addData", data);
     data.nodes.forEach(node => {
       this.addNode(node);
@@ -17,7 +17,6 @@ export class GraphDataCRUD extends GraphBase {
       callback();
     }
   }
-
 
   // Create a node
   addNode(node: ICanvasNode): void {
@@ -128,9 +127,6 @@ export class GraphDataCRUD extends GraphBase {
     this.data.dropEdge(id);
   }
 
-  deleteData() {
-    console.log("deleteData");
-    this.data.clear();
-  }
+
 }
 

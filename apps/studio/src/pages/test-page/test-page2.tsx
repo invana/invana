@@ -4,14 +4,15 @@ import { DRAG_CANVAS_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR, DRAG_ELEMENT_BEHAVIOR, HOVE
 import { D3_FORCE_LAYOUT } from "@invana/canvas-graph/defaults/layouts";
 import { HISTORY_PLUGIN } from "@invana/canvas-graph/defaults/plugins";
 import { PROCESS_PARALLEL_TRANSFORMER } from "@invana/canvas-graph/defaults/transforms";
-import { DEFAULT_STYLE_OPTIONS } from "@invana/canvas-graph/manager/defaults";
-import { CanvasManagerOptions } from "@invana/canvas-graph/manager/types";
+
 import { CanvasGraph } from "@invana/canvas-graph";
 import { lesMiserablesData, flightData } from "@invana/example-datasets";
 import { mergeDeep } from "@invana/data-store";
 import { useRef } from "react";
+import { CanvasGraphOptions } from "@invana/canvas-graph/types";
+import { DEFAULT_STYLE_OPTIONS } from "@invana/canvas-graph/styling/defaults";
 
-const defaultOptions: CanvasManagerOptions = {
+const defaultOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
@@ -42,7 +43,7 @@ const defaultOptions: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS
 }
 
-const graphModelOptions: CanvasManagerOptions = {
+const graphModelOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     // ZOOM_CANVAS_BEHAVIOR,

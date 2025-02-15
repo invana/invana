@@ -2,7 +2,7 @@ import { BaseBehavior, CanvasEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { MenuItem, NestedMenu } from '@invana/ui';
-import { FolderOpen, Settings, Bell } from 'lucide-react';
+import { FolderOpen, Settings } from 'lucide-react';
 import React from 'react';
 
 
@@ -16,24 +16,14 @@ export const menuItems: MenuItem[] = [
     id: 'files',
     label: 'Display Settings',
     icon: FolderOpen,
-    // shortcut: '⌘F',
+    shortcut: '⌘F'
   },
   {
     id: 'Run Analysis',
     label: 'Run Analysis',
     icon: Settings,
-    // shortcut: '⌘,',
-    children: [
-
-      {
-        id: 'notifications',
-        label: 'Notifications',
-        icon: Bell,
-        shortcut: '⌘N'
-      }
-    ]
-  },
-
+    shortcut: '⌘,'
+  }
 ]
 
 export class CanvasContextMenuBehavior extends BaseBehavior {

@@ -2,7 +2,7 @@ import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMe
 import { projectsListDataSet } from '../../projectsList';
 
 import React, { useState } from 'react';
-import { Database, ChevronDown, Search, SquareX, Box, LogOut } from 'lucide-react';
+import { ChevronDown, Search, Box, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useProjects from '@/hooks/useProject';
 import { Project } from '@/store/projectStore';

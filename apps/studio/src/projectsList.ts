@@ -24,7 +24,7 @@ export const projectsListDataSet: Project[] = [
       styles: {
         defaultEdge: {
           shape: {
-            type: 'cubic-horizontal',
+            // type: 'cubic-horizontal',
             // type: 'quadratic'
           }
         }
@@ -52,7 +52,7 @@ export const projectsListDataSet: Project[] = [
   },
   {
     id: 'event-flow',
-    name: 'Event Flow - Process Mining Example',
+    name: 'Process Mining Example',
     description: 'A simple project to demonstrate the power of GraphQL and Apollo Client',
     updated_at: new Date(),
     tags: ['event-flow', 'process-mining'],
