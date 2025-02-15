@@ -14,7 +14,6 @@ import AppHeaderRight from '@/ui/header/app-header-right';
 import { QueryForm } from '@/ui/forms/query-form';
 import { PanelContent } from '@invana/ui/components/theme/panel-content';
 import { ActivityHistoryView } from '@/ui/components/activity-history';
-import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 import {
   CANVAS_CONTEXT_MENU_BEHAVIOR, CLICK_SELECT_BEHAVIOR, DRAG_CANVAS_BEHAVIOR,
   DRAG_ELEMENT_BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR,
@@ -31,12 +30,10 @@ import { ExtensionCategory, register } from '@antv/g6';
 import {
   EdgeTooltipBehavior, NodeTooltipBehavior,
   PropertyViewerBehavior
-} from '@invana/canvas-graph/behaviours';
-import { NodeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/node';
-import { EdgeContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/edge';
-import { CanvasContextMenuBehavior } from '@invana/canvas-graph/behaviours/context-menus/canvas';
-import { CanvasManager } from '@invana/canvas-graph/manager';
-import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/manager/defaults';
+} from '@invana/canvas-graph/plugins/behaviours';
+import { NodeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/node';
+import { EdgeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/edge';
+import { CanvasContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/canvas';
 import { GraphInformation } from '@/ui/components/graph-information';
 import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
@@ -46,6 +43,9 @@ import { mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
 import WelcomeView from '@/ui/components/welcome-view';
 import { useMemo } from 'react';
+import { CanvasGraphOptions } from '@invana/canvas-graph/types';
+import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
+import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 
 register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
@@ -55,7 +55,7 @@ register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBeh
 register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
 
 
-const defaultOptions: CanvasManagerOptions = {
+const defaultOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,
@@ -86,7 +86,7 @@ const defaultOptions: CanvasManagerOptions = {
   styles: DEFAULT_STYLE_OPTIONS
 }
 
-const graphModelOptions: CanvasManagerOptions = {
+const graphModelOptions: CanvasGraphOptions = {
   behaviors: [
     DRAG_CANVAS_BEHAVIOR,
     ZOOM_CANVAS_BEHAVIOR,

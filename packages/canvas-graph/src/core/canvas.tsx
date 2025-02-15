@@ -35,71 +35,62 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   console.log("CanvasGraph -> props", props)
   console.log("CanvasGraph -> graph", canvasManagerRef.current)
 
-  const handleAddData = () => {
+  // const handleAddData = () => {
 
-    const nodesCount = canvasManagerRef.current?.store.data.nodes.length;
-    const edgesCount = canvasManagerRef.current?.store.data.edges.length;
+  //   const nodesCount = canvasManagerRef.current?.store.data.nodes.length;
+  //   const edgesCount = canvasManagerRef.current?.store.data.edges.length;
 
-    canvasManagerRef.current?.store.addData(
-      {
-        nodes: [
-          {
-            id: ((nodesCount ?? 0) + 1).toString(),
-            type: 'User',
-            label: `David ${((nodesCount ?? 0) + 1).toString()}`,
-            properties: {}
-          },
-        ],
-        edges: [
-          {
-            id: `edge - ${((edgesCount ?? 0) + 1).toString()}`,
-            type: 'link',
-            source: '1',
-            target: ((nodesCount ?? 0) + 1).toString(),
-            properties: {}
-          },
-        ],
-      },
-      () => canvasManagerRef.current?.render()
-    )
-  }
+  //   canvasManagerRef.current?.store.addData(
+  //     {
+  //       nodes: [
+  //         {
+  //           id: ((nodesCount ?? 0) + 1).toString(),
+  //           type: 'User',
+  //           label: `David ${((nodesCount ?? 0) + 1).toString()}`,
+  //           properties: {}
+  //         },
+  //       ],
+  //       edges: [
+  //         {
+  //           id: `edge - ${((edgesCount ?? 0) + 1).toString()}`,
+  //           type: 'link',
+  //           source: '1',
+  //           target: ((nodesCount ?? 0) + 1).toString(),
+  //           properties: {}
+  //         },
+  //       ],
+  //     },
+  //     () => canvasManagerRef.current?.render()
+  //   )
+  // }
 
 
   return (
-    <div>
-      {/* <Button
-        className='mr-3'
-        onClick={() => addNode({ id: (nodes.length + 1).toString(), type: 'circle', label: `Alice ${nodes.length}`, x: 100, y: 150 })}
-      >Add Node</Button>
-      <Button onClick={() => addEdge({ id: `edge${edges.length + 1}`, type: 'line', source: '1', target: '2' })}>Add Edge</Button> */}
-      <Button
-        onClick={() => handleAddData()}
-      > Add Data</Button>
-      {/* <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p> */}
-      <Graphin
-        onReady={(graph) => {
-          const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
-          const initData = props.initData ?? { 'nodes': [], 'edges': [] }
-          console.log("Graphin onReady", props.graphName, graph, options);
-          canvasManagerRef.current = new CanvasManager(graph, options);
-          if (canvasManagerRef.current) {
-            canvasManagerRef.current.store.addData(initData, () => canvasManagerRef.current?.render());
-          }
-          if (props.onReady) {
-            props?.onReady?.(canvasManagerRef.current);
-          }
-        }}
-        onDestroy={() => {
-          console.log("Graphin onDestroy");
-          // localRef.current?.destroy();
-          canvasManagerRef.current?.destroy();
-          props?.onDestroy?.();
-        }}
-        options={{}}
-        style={props.containerStyle}
-      // options={{ data: data, ...graphinProps.options, theme: 'dark' }}
-      />
-    </div>
+
+    <Graphin
+      onReady={(graph) => {
+        const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
+        const initData = props.initData ?? { 'nodes': [], 'edges': [] }
+        console.log("Graphin onReady", props.graphName, graph, options);
+        canvasManagerRef.current = new CanvasManager(graph, options);
+        if (canvasManagerRef.current) {
+          canvasManagerRef.current.store.addData(initData, () => canvasManagerRef.current?.render());
+        }
+        if (props.onReady) {
+          props?.onReady?.(canvasManagerRef.current);
+        }
+      }}
+      onDestroy={() => {
+        console.log("Graphin onDestroy");
+        // localRef.current?.destroy();
+        canvasManagerRef.current?.destroy();
+        props?.onDestroy?.();
+      }}
+      options={{}}
+      style={props.containerStyle}
+    // options={{ data: data, ...graphinProps.options, theme: 'dark' }}
+    />
+
   )
 }
 
