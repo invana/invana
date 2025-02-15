@@ -31,7 +31,7 @@ export class GraphCanvasUtils {
   }
 
   eraseCanvas() {
-    this.canvas_manager.store.deleteData();
+    this.canvas_manager.store.clear();
     // this.getGraph()?.clear();
   }
 

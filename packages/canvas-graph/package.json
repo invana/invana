@@ -22,6 +22,7 @@
     "@invana/data-store": "^0.0.0",
     "@invana/example-datasets": "^0.0.0",
     "@invana/ui": "^0.0.0",
+    "graphology": "^0.26.0",
     "lucide-react": "^0.468.0"
   },
   "peerDependencies": {

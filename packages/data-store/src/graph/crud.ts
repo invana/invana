@@ -18,7 +18,6 @@ export class GraphDataCRUD extends GraphBase {
     }
   }
 
-
   // Create a node
   addNode(node: ICanvasNode): void {
     const { id, ...attributes } = node;
@@ -128,9 +127,6 @@ export class GraphDataCRUD extends GraphBase {
     this.data.dropEdge(id);
   }
 
-  deleteData() {
-    console.log("deleteData");
-    this.data.clear();
-  }
+
 }
 

@@ -112,5 +112,13 @@ export class GraphStore extends GraphDataCRUD {
   //   };
   // }
 
+
+  clear() {
+    console.log("clearData");
+    this.data.clear();
+    this.nodeSchemas = new Map();
+    this.edgeSchemas = new Map();
+  }
+
 }
 
