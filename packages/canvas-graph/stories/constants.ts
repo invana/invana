@@ -5,7 +5,7 @@ import {
   NODE_TOOLTIP_BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR, ZOOM_CANVAS_BEHAVIOR
 } from '@invana/canvas-graph/defaults/behaviors';
 import { MAP_NODE_SIZE_TRANSFORMER, PROCESS_PARALLEL_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
-import { MINIMAP_PLUGIN, HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
+import { MINIMAP_PLUGIN, HISTORY_PLUGIN, GRID_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 // import { CanvasManagerOptions } from '@invana/canvas-graph/manager/types';
 import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { ExtensionCategory, register } from '@antv/g6';
@@ -41,7 +41,7 @@ export const defaultOptions: CanvasGraphOptions = {
   ],
   transforms: [
     MAP_NODE_SIZE_TRANSFORMER,
-    // PROCESS_PARALLEL_TRANSFORMER
+    PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
     MINIMAP_PLUGIN,
