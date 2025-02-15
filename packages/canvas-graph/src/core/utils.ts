@@ -1,5 +1,8 @@
 import { GraphinProps } from "@antv/graphin";
-import { CanvasGraphProps } from "../types";
+import {
+  CanvasGraphBehavior, CanvasGraphPlugin, CanvasGraphProps,
+  CanvasGraphTransform
+} from "../types";
 
 
 export const convertToGraphinOptions = (props: CanvasGraphProps): GraphinProps => {
@@ -13,5 +16,14 @@ export const convertToGraphinOptions = (props: CanvasGraphProps): GraphinProps =
       // data: props.initData || { nodes: [], edges: []}
     },
   }
+}
 
+
+
+export const getUniqueItemsByItem = (options: CanvasGraphPlugin[] | CanvasGraphBehavior[] | CanvasGraphTransform[]) => {
+  const uniqueItems = options.reduce((acc, item) => {
+    acc[item.type] = item
+    return acc
+  }, {} as Record<string, CanvasGraphPlugin | CanvasGraphBehavior | CanvasGraphTransform>)
+  return Object.values(uniqueItems)
 }

@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react';
-import { ICanvasEdge, ICanvasNode } from '@invana/data-store';
+import React, { useEffect, useRef } from 'react';
+import { ICanvasEdge, ICanvasNode, mergeDeep } from '@invana/data-store';
 import { Graphin } from '@antv/graphin';
-import type { GraphData } from '@antv/g6';
+import { Graph, type GraphData } from '@antv/g6';
 import useGraphStore from './store';
 import { Button } from '@invana/ui';
 import { CanvasGraphProps } from '../types';
 import { convertToGraphinOptions } from './utils';
+import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../styling/defaults';
+import { CanvasManager } from '../canvas/manager';
 
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
 
   const { nodes, edges, addData, addNode, addEdge } = useGraphStore();
+  const canvasManagerRef = useRef<CanvasManager | null>(null);
 
   useEffect(() => {
     // Simulate fetching or initializing graph data
@@ -30,8 +33,21 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
   const data = { nodes, edges } as GraphData;
 
   console.log("CanvasGraph -> props", props)
+  console.log("CanvasGraph -> graph", canvasManagerRef.current)
   const graphinProps = convertToGraphinOptions(props);
   console.log('data', data, graphinProps.options?.layout);
+
+  const handAddData = () => {
+    addData(
+      [
+        { id: (nodes.length + 1).toString(), type: 'circle', label: `David ${(nodes.length + 1).toString()}`, x: 700, y: 150 },
+      ],
+      [
+        { id: `edge - ${(edges.length + 1).toString()}`, type: 'line', source: '1', target: (nodes.length + 1).toString(), },
+      ]
+    )
+  }
+
 
   return (
     <div>
@@ -41,17 +57,32 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
       >Add Node</Button>
       <Button onClick={() => addEdge({ id: `edge${edges.length + 1}`, type: 'line', source: '1', target: '2' })}>Add Edge</Button>
       <Button
-        onClick={() => addData(
-          [
-            { id: (nodes.length + 1).toString(), type: 'circle', label: `David ${(nodes.length + 1).toString()}`, x: 700, y: 150 },
-          ],
-          [
-            { id: `edge - ${(edges.length + 1).toString()}`, type: 'line', source: '1', target: (nodes.length + 1).toString(), },
-          ]
-        )}
+        onClick={() => handAddData()}
       > Add Data</Button>
       <p>Total nodes: {nodes.length}. Total Edges: {edges.length}</p>
-      <Graphin options={{ data: data, ...graphinProps.options, theme: 'dark' }} />
+      <Graphin
+        onReady={(graph) => {
+          const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
+          const initData = props.initData ?? { 'nodes': [], 'edges': [] }
+          console.log("Graphin onReady", props.graphName, graph, options);
+          canvasManagerRef.current = new CanvasManager(graph, options);
+          if (canvasManagerRef.current) {
+            canvasManagerRef.current.store.addData(initData, () => canvasManagerRef.current?.render());
+          }
+          if (props.onReady) {
+            props?.onReady?.(canvasManagerRef.current);
+          }
+        }}
+        onDestroy={() => {
+          console.log("Graphin onDestroy");
+          // localRef.current?.destroy();
+          canvasManagerRef.current?.destroy();
+          props?.onDestroy?.();
+        }}
+        options={{}}
+        style={props.containerStyle}
+      // options={{ data: data, ...graphinProps.options, theme: 'dark' }}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { ICanvasNode, ICanvasEdge, ICanvasData } from "@invana/data-store";
 import { NodeData, EdgeData } from "@antv/g6";
 import { CanvasNodeStyle, CanvasEdgeStyle, ICanvasStyle } from "@invana/data-store";
+import { CanvasManager } from "./canvas/manager";
 
 
 export type CanvasGraphNode = NodeData & { data?: ICanvasNode }
@@ -54,6 +55,8 @@ export interface CanvasGraphProps {
   options: CanvasGraphOptions
   initData?: ICanvasData;
   containerStyle?: React.CSSProperties;
-  onReady?: (canvasGraph: any) => void;
+  onReady?: (manager: CanvasManager) => void;
+  onDestroy?: () => void;
+  graphName?: string;
 
 }
