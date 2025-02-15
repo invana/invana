@@ -1,72 +1,27 @@
 import React, { useEffect, useRef } from 'react';
-import { ICanvasEdge, ICanvasNode, mergeDeep } from '@invana/data-store';
+import { mergeDeep } from '@invana/data-store';
 import { Graphin } from '@antv/graphin';
-import { Graph, type GraphData } from '@antv/g6';
-// import useGraphStore from './store';
-import { Button } from '@invana/ui';
 import { CanvasGraphProps } from '../types';
-import { convertToGraphinOptions } from './utils';
 import { DEFAULT_CANVAS_GRAPH_OPTIONS } from '../styling/defaults';
 import { CanvasManager } from '../canvas/manager';
 
 
 export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
 
-  // const { nodes, edges, addData, addNode, addEdge } = useGraphStore();
   const canvasManagerRef = useRef<CanvasManager | null>(null);
 
-  // useEffect(() => {
-  //   // Simulate fetching or initializing graph data
-  //   const initialNodes: ICanvasNode[] = [
-  //     { id: '1', type: 'circle', label: 'Alice', x: 100, y: 150 },
-  //     { id: '2', type: 'circle', label: 'Bob', x: 300, y: 150 },
-  //   ];
+  useEffect(() => {
 
-  //   const initialEdges: ICanvasEdge[] = [
-  //     { id: 'edge1', type: 'line', source: '1', target: '2' },
-  //   ];
-
-  //   addData(initialNodes, initialEdges);
-  // }, [addData]);
-
-
-  // const data = { nodes, edges } as GraphData;
+    return () => {
+      console.log("CanvasGraph useEffect cleanup");
+      canvasManagerRef.current?.destroy();
+    }
+  }, [])
 
   console.log("CanvasGraph -> props", props)
   console.log("CanvasGraph -> graph", canvasManagerRef.current)
 
-  // const handleAddData = () => {
-
-  //   const nodesCount = canvasManagerRef.current?.store.data.nodes.length;
-  //   const edgesCount = canvasManagerRef.current?.store.data.edges.length;
-
-  //   canvasManagerRef.current?.store.addData(
-  //     {
-  //       nodes: [
-  //         {
-  //           id: ((nodesCount ?? 0) + 1).toString(),
-  //           type: 'User',
-  //           label: `David ${((nodesCount ?? 0) + 1).toString()}`,
-  //           properties: {}
-  //         },
-  //       ],
-  //       edges: [
-  //         {
-  //           id: `edge - ${((edgesCount ?? 0) + 1).toString()}`,
-  //           type: 'link',
-  //           source: '1',
-  //           target: ((nodesCount ?? 0) + 1).toString(),
-  //           properties: {}
-  //         },
-  //       ],
-  //     },
-  //     () => canvasManagerRef.current?.render()
-  //   )
-  // }
-
-
   return (
-
     <Graphin
       onReady={(graph) => {
         const options = mergeDeep(DEFAULT_CANVAS_GRAPH_OPTIONS, props.options || {})
@@ -88,9 +43,7 @@ export const CanvasGraph: React.FC<CanvasGraphProps> = (props) => {
       }}
       options={{}}
       style={props.containerStyle}
-    // options={{ data: data, ...graphinProps.options, theme: 'dark' }}
     />
-
   )
 }
 
