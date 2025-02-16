@@ -380,9 +380,6 @@ const ExplorerPage: React.FC = () => {
   const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
 
 
-
-
-
   return <DefaultV2Layout
     headerProps={{
       left: (
