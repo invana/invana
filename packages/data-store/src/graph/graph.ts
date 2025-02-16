@@ -59,7 +59,7 @@ export class GraphStore extends GraphDataCRUD {
       const edgeType = attributes.type;
       const sourceNodeType = sourceNode?.type || 'unknown';
       const targetNodeType = targetNode?.type || 'unknown';
-      const edgeSchemaName = `${edgeType}`;
+      const edgeSchemaName = `${edgeType}-${sourceNodeType}-${targetNodeType}`;
 
 
       if (!this.edgeSchemas.has(edgeSchemaName)) {
@@ -76,7 +76,7 @@ export class GraphStore extends GraphDataCRUD {
 
       Object.keys(edgeProperties).forEach((key) => {
         if (key === 'type') return;
-        if (!schema.properties.some((p) => p.name === key)) {
+        if (!schema.properties.find((p) => p.name === key)) {
           schema.properties.push({
             name: key,
             type: typeof edgeProperties[key],

@@ -50,9 +50,9 @@ export class CanvasManager {
         this.graph.resize(); // Resize the graph
       });
 
-      graphOptions.container?.addEventListener('contextmenu', () => {
-        alert('contextmenu')
-      })
+      // graphOptions.container?.addEventListener('contextmenu', () => {
+      //   alert('contextmenu')
+      // })
     }
   };
 
