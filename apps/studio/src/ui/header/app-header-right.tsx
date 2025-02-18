@@ -23,22 +23,23 @@ const AppHeaderRight: React.FC = () => {
         </TooltipTrigger>
         <TooltipContent>Star or Fork this project</TooltipContent>
       </Tooltip> */}
-      <Separator orientation="vertical" className="h-6 ml-2" />
+      <Separator orientation="vertical" className="h-6 ml-3 mr-3" />
 
 
       {/* <Separator orientation="vertical" className="h-6 ml-2" /> */}
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant={'outline'} size={'sm'} className="px-2 py-2 ">
-            Share <Share strokeWidth={1} className='h-3 w-3' />
+          <Button variant={'outline'} size={'sm'} className="px-2 py-2 text-xs">
+            SHARE <Share strokeWidth={1} className='h-3 w-3' />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Logout</TooltipContent>
       </Tooltip>
+      {/* <Separator orientation="vertical" className="h-6 ml-3 " /> */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Avatar className="h-8 w-8 mr-2">
+          <Avatar className="h-8 w-8 mr-2 ml-2">
             <AvatarImage src="/placeholder-user.jpg" alt="User" />
             <AvatarFallback className='bg-emerald-700 text-sm text-white font-bold'>RM</AvatarFallback>
           </Avatar>
