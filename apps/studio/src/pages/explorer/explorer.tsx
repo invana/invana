@@ -151,7 +151,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Box,
       name: "Graph Information",
-      className: "my-1.5 mt-5",
+      className: "my-3 mt-10",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -161,7 +161,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Network,
       name: "Model",
-      className: "my-1.5",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -170,7 +170,7 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Query",
-      className: "my-1.5",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -181,7 +181,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Book,
       name: "Documentation",
-      className: "my-1.5",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -192,7 +192,7 @@ const ExplorerPage: React.FC = () => {
     // { name: "Data Management", href: "/connections", icon: Database },
     {
       name: "Activity History",
-      className: "my-1.5",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
@@ -202,6 +202,7 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Display Settings",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       href: "#",
       tooltipSide: "right",
@@ -210,7 +211,7 @@ const ExplorerPage: React.FC = () => {
     {
       icon: SquareMenu,
       name: "Property Viewer",
-      className: "my-1.5",
+      className: "my-3",
       iconClassName: "w-5 h-5",
       tooltipSide: "right",
       onClick: () => {
