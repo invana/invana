@@ -46,6 +46,7 @@ import { useMemo } from 'react';
 import { CanvasGraphOptions } from '@invana/canvas-graph/types';
 import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
 import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
+import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
 
 register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
@@ -388,6 +389,7 @@ const ExplorerPage: React.FC = () => {
           <span className='font-bold mr-2 ml-2'>{ProductName}</span>
           <span className='mr-2'>|</span>
           {/* <span>Explorer</span> */}
+          <WorkspaceSwitcher />
           <ProjectSwitcher />
         </>
       ),
