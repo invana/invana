@@ -8,6 +8,8 @@ import {
 } from '@invana/ui';
 import { Share } from 'lucide-react';
 import React from 'react';
+import CommandPalette from '../components/command/command-with-trigger';
+import { ErrorBoundary } from '../components/error-boundary';
 
 
 const AppHeaderRight: React.FC = () => {
@@ -23,6 +25,10 @@ const AppHeaderRight: React.FC = () => {
         </TooltipTrigger>
         <TooltipContent>Star or Fork this project</TooltipContent>
       </Tooltip> */}
+
+      <ErrorBoundary>
+        <CommandPalette />
+      </ErrorBoundary>
       <Separator orientation="vertical" className="h-6 ml-3 mr-3" />
 
 
