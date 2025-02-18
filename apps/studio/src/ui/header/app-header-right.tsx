@@ -6,7 +6,7 @@ import {
   Separator,
   Tooltip, TooltipContent, TooltipTrigger
 } from '@invana/ui';
-import { Share } from 'lucide-react';
+import { Bell, Book, Share, Share2Icon } from 'lucide-react';
 import React from 'react';
 import CommandPalette from '../components/command/command-with-trigger';
 import { ErrorBoundary } from '../components/error-boundary';
@@ -36,11 +36,28 @@ const AppHeaderRight: React.FC = () => {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant={'outline'} size={'sm'} className="px-2 py-2 text-xs">
-            SHARE <Share strokeWidth={1} className='h-3 w-3' />
+          <Button variant={'ghost'} className="text-xs font-bold">
+            <Share2Icon />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Logout</TooltipContent>
+        <TooltipContent>Share this report</TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant={'ghost'} size={'sm'} className="  ">
+            <Book />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Learn </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant={'ghost'} size={'sm'} className=" ">
+            <Bell />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Notification</TooltipContent>
       </Tooltip>
       {/* <Separator orientation="vertical" className="h-6 ml-3 " /> */}
       <Tooltip>
