@@ -8,15 +8,14 @@ export interface NestedMenuProps {
 }
 
 export const NestedMenu: React.FC<NestedMenuProps> = (props) => {
-  console.log("NestedMenu props", props)
   return (
     <nav
-      className={cn("w-[240px] p-0 pt-2 pb-2 border  bg-card text-card-foreground shadow-sm", props.className)}
+      className={cn("w-[220px] !py-0 border  bg-card text-card-foreground shadow-sm", props.className)}
       role="menubar"
     >
-      <ul className="space-y-0.5" role="menu">
+      <ul className="space-y-0.5 p-0" role="menu">
         {props.menuItems.map((item) => (
-          <MenuItem key={item.id} {...item} />
+          <MenuItem key={item.id} {...item} className={'px-3 py-1.5'} />
         ))}
       </ul>
     </nav>
