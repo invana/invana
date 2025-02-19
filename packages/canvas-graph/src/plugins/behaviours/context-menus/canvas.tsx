@@ -88,7 +88,7 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
     // event.stopPropagation();
 
     const component: React.ReactNode = <NestedMenu
-      className='w-[260px] bg-card text-card-foreground rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
+      className='w-[220px] bg-card text-card-foreground rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
       menuItems={menuItems}
     />
     this.root.render(component)
