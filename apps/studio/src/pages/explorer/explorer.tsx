@@ -151,8 +151,9 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Box,
       name: "Graph Information",
-      className: "my-3 mt-10",
+      className: "py-3 mt-8 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
       tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("graph-info")
@@ -161,8 +162,10 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Network,
       name: "Model",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("model")
@@ -170,8 +173,10 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Query",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("query")
@@ -181,8 +186,10 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Book,
       name: "Documentation",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       tooltipSide: "right",
       onClick: () => {
         console.log("Clicked:", "Documentation")
@@ -192,8 +199,10 @@ const ExplorerPage: React.FC = () => {
     // { name: "Data Management", href: "/connections", icon: Database },
     {
       name: "Activity History",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       tooltipSide: "right",
       onClick: () => {
         return toggleRightContent("activity-history")
@@ -202,8 +211,10 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Display Settings",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       href: "#",
       tooltipSide: "right",
       icon: MonitorCog
@@ -211,8 +222,10 @@ const ExplorerPage: React.FC = () => {
     {
       icon: SquareMenu,
       name: "Property Viewer",
-      className: "my-3",
+      className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
       tooltipSide: "right",
       onClick: () => {
         console.log("Clicked:", "Property Viewer")

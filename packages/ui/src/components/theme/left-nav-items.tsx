@@ -8,6 +8,7 @@ export interface LeftNavItem {
   href?: string
   onClick?: () => void
   className?: string;
+  activeClass?: string
   iconClassName?: string;
   iconStroke?: number;
   tooltipSide?: 'left' | 'right'
@@ -46,7 +47,7 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
                 className={`flex border-0   items-center justify-center 
           text-foreground transition-colors rounded-md
           hover:bg-accent  hover:text-sky-500 px-2 py-2  ${item.className || ''}
-          ${activeItem === item.name ? ' text-sky-500' : ''}`}
+          ${activeItem === item.name ? `text-sky-500 ${item?.activeClass || ''}` : ''}`}
               >
                 <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
               </button>
