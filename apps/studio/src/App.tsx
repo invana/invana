@@ -6,6 +6,7 @@ import ProtectedRoute from "./pages/protected-route";
 // import ModellerPage from "./pages/modeller/modeller";
 import ExplorerPage from "./pages/explorer/explorer";
 import { LANDING_ROUTE } from './constants';
+import './index.css';
 // import '@invana/config-tailwind/index.css';
 // import '@invana/canvas-graph/index.css';
 // import { TestPage2 } from './pages/test-page/test-page2';

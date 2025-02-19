@@ -37,7 +37,7 @@ export const DefaultV2Layout: React.FC<DefaultV2LayoutProps> = ({
   return (
     <TooltipProvider delayDuration={0}>
 
-      <div className={cn("flex h-screen flex-col bg-background text-foreground", className)}>
+      <div className={cn("flex h-screen flex-col bg-background overflow-hidden text-foreground", className)}>
         <AppHeader
           left={headerProps?.left}
           center={headerProps?.center}
