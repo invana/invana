@@ -21,7 +21,7 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
   return (
     <Graphin
-      className={props.className || ''}
+      className={props.className || ' overflow-none'}
       onReady={(graph) => {
         const options = props.options
         const initData = props.initData ?? { 'nodes': [], 'edges': [] }

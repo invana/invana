@@ -2,7 +2,7 @@ import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
-  Activity, Book, Box, Brush, CircleDashed, Eraser, LassoSelect,
+  Activity, Book, Box, Brush, Circle, CircleDashed, Eraser, LassoSelect,
   LayoutGrid, LifeBuoy, Lock, Menu, MonitorCog, Network, RefreshCw, Share2,
   Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
@@ -47,6 +47,7 @@ import { CanvasGraphOptions } from '@invana/canvas-graph/types';
 import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
 import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
+import NodeDetail from '@/ui/components/node-detail';
 
 register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
 register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
@@ -220,16 +221,24 @@ const ExplorerPage: React.FC = () => {
       icon: MonitorCog
     },
     {
-      icon: SquareMenu,
-      name: "Property Viewer",
+      icon: Circle,
+      name: "Node Detail",
       className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
-      onClick: () => {
-        console.log("Clicked:", "Property Viewer")
-      }
+      onClick: () => toggleRightContent("node-detail")
+    },
+    {
+      icon: Circle,
+      name: "Insights",
+      className: "py-3 my-2 px-3 rounded-none",
+      iconClassName: "w-5 h-5",
+      activeClass: "bg-gray-800",
+
+      tooltipSide: "right",
+      onClick: () => toggleRightContent("insight-viewer")
     },
   ]
 
@@ -490,6 +499,17 @@ const ExplorerPage: React.FC = () => {
             <p>Display Settings here </p>
           </PanelContent>
         }
+        {rightContentName === "node-detail" &&
+          <PanelContent title={"Node details"} key={'node-details'} onClose={() => setRightContentName(undefined)} showClose>
+            <NodeDetail />
+          </PanelContent>
+        }
+        {rightContentName === "insight-viewer" &&
+          <PanelContent title={"Insight viewer"} key={'insight-viewer'} onClose={() => setRightContentName(undefined)} showClose>
+            <NodeDetail />
+          </PanelContent>
+        }
+
       </div>
     }
     mainTopContent={
