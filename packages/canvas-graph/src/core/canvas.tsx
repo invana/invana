@@ -19,6 +19,18 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
   console.log("CanvasGraph -> props", props)
   console.log("CanvasGraph -> graph", canvasManagerRef.current)
 
+
+
+  useEffect(() => {
+    const disableRightClick = (e) => e.preventDefault();
+    document.addEventListener("contextmenu", disableRightClick);
+
+    return () => {
+      document.removeEventListener("contextmenu", disableRightClick);
+    };
+  }, []);
+
+
   return (
     <Graphin
       className={props.className || ' overflow-none'}
