@@ -186,10 +186,14 @@ const ExplorerPage: React.FC = () => {
   // const MemoizedCanvasGraph = React.memo(CanvasGraph, () => true);
 
 
-  // document.addEventListener("contextmenu", function (event) {
-  //   event.preventDefault();
-  //   // alert("Right-click is disabled on this element!");
-  // });
+  // useEffect(() => {
+  //   const disableRightClick = (e) => e.preventDefault();
+  //   document.addEventListener("contextmenu", disableRightClick);
+
+  //   return () => {
+  //     document.removeEventListener("contextmenu", disableRightClick);
+  //   };
+  // }, []);
 
   return <DefaultV1Layout
     headerProps={{
