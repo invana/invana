@@ -29,26 +29,26 @@ const NodeDetail: React.FC<NodeDetailProps> = () => {
         <p className="mt-2 text-sm">
           <Badge >Node Type</Badge>
         </p>
-        <p className='mt-2 text-zinc-500 dark:text-zinc-400 text-sm'>
+        {/* <p className='mt-2 text-zinc-500 dark:text-zinc-400 text-sm'>
           Updated at {new Date().toLocaleDateString()}
-        </p>
+        </p> */}
       </div>
       {/* <p className='mt-2 mb-3 text-sm'>Node Description</p> */}
 
-      <div className='border-b border-t mt-5 mb-3'>
+      <div className='border-b border-t mt-5 mb-3 px-1 mx-[-12px]'>
         <h2 className='font-semibold tex uppercase inline-flex items-center'>
           <List className='mr-2 h-4' /> Properties
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 border-b pb-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4  pb-3 sm:grid-cols-1">
 
         {Object.entries(properties).map(([key, value]) => (
-          <div key={key}>
+          <div key={key} className='border-b pb-2'>
             <label className='font-bold text-sm' htmlFor={key} >
               {key}
             </label>
-            {key === 'profilePic' ? <img src={value} alt="Profile" className="w-20 h-20  " /> : <div>{value}</div>}
+            {key === 'profilePic' ? <img src={String(value)} alt="Profile" className="w-20 h-20  " /> : <div>{value}</div>}
           </div>
         ))}
         {/* </div>
