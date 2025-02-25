@@ -9,6 +9,7 @@ import { CanvasGraphEdge } from '@invana/canvas-graph/types';
 
 export interface EdgeTooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
+  showRightClickHelpText?: boolean
 }
 
 export class EdgeTooltipBehavior extends BaseBehavior {
@@ -16,8 +17,12 @@ export class EdgeTooltipBehavior extends BaseBehavior {
   container!: HTMLElement;
   root!: Root
 
+  static defaultOptions: Partial<EdgeTooltipBehaviorOptions> = {
+    showRightClickHelpText: false
+  };
+
   constructor(context: RuntimeContext, options: EdgeTooltipBehaviorOptions) {
-    super(context, options);
+    super(context, Object.assign({}, EdgeTooltipBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();

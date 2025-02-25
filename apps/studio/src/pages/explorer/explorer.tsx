@@ -58,72 +58,6 @@ register(ExtensionCategory.BEHAVIOR, CANVAS_CONTEXT_MENU_BEHAVIOR.type, CanvasCo
 register(ExtensionCategory.BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR.type, PropertyViewerBehavior, true);
 
 
-const defaultOptions: CanvasGraphOptions = {
-  behaviors: [
-    DRAG_CANVAS_BEHAVIOR,
-    ZOOM_CANVAS_BEHAVIOR,
-    DRAG_ELEMENT_BEHAVIOR,
-    HOVER_ACTIVATE_BEHAVIOR,
-    CLICK_SELECT_BEHAVIOR,
-    LASSO_SELECT_BEHAVIOR,
-    NODE_TOOLTIP_BEHAVIOR,
-    EDGE_TOOLTIP_BEHAVIOR,
-    NODE_CONTEXT_MENU_BEHAVIOR,
-    EDGE_CONTEXT_MENU_BEHAVIOR,
-    CANVAS_CONTEXT_MENU_BEHAVIOR,
-    {
-      ...PROPERTY_VIEWER_BEHAVIOR,
-      className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
-    }
-  ],
-  transforms: [
-    MAP_NODE_SIZE_TRANSFORMER,
-    PROCESS_PARALLEL_TRANSFORMER
-  ],
-  plugins: [
-    // MINIMAP_PLUGIN,
-    HISTORY_PLUGIN,
-    // GRID_PLUGIN
-  ],
-  layout: D3_FORCE_LAYOUT,
-  styles: DEFAULT_STYLE_OPTIONS
-}
-
-const graphModelOptions: CanvasGraphOptions = {
-  behaviors: [
-    DRAG_CANVAS_BEHAVIOR,
-    ZOOM_CANVAS_BEHAVIOR,
-    DRAG_ELEMENT_BEHAVIOR,
-    HOVER_ACTIVATE_BEHAVIOR,
-    // CLICK_SELECT_BEHAVIOR,
-    // LASSO_SELECT_BEHAVIOR,
-    NODE_TOOLTIP_BEHAVIOR,
-    EDGE_TOOLTIP_BEHAVIOR,
-    // NODE_CONTEXT_MENU_BEHAVIOR,
-    // EDGE_CONTEXT_MENU_BEHAVIOR,
-    CANVAS_CONTEXT_MENU_BEHAVIOR,
-    // {
-    //   ...PROPERTY_VIEWER_BEHAVIOR,
-    //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
-    // }
-  ],
-  transforms: [
-    // MAP_NODE_SIZE_TRANSFORMER,
-    // PROCESS_PARALLEL_TRANSFORMER
-  ],
-  plugins: [
-    // MINIMAP_PLUGIN,
-    // HISTORY_PLUGIN,
-  ],
-  layout: {
-    link: {
-      distance: 200,
-      // strength: 2
-    },
-    ...D3_FORCE_LAYOUT
-  },
-  styles: MODEL_STYLE_OPTIONS
-};
 
 
 const ExplorerPage: React.FC = () => {
@@ -148,6 +82,81 @@ const ExplorerPage: React.FC = () => {
     toggleRightContent,
     toggleBottomContent,
   } = useDefaultV2LayoutStore()
+
+
+  const defaultOptions: CanvasGraphOptions = {
+    behaviors: [
+      DRAG_CANVAS_BEHAVIOR,
+      ZOOM_CANVAS_BEHAVIOR,
+      DRAG_ELEMENT_BEHAVIOR,
+      HOVER_ACTIVATE_BEHAVIOR,
+      CLICK_SELECT_BEHAVIOR,
+      LASSO_SELECT_BEHAVIOR,
+      {
+        ...NODE_TOOLTIP_BEHAVIOR,
+        showRightClickHelpText: true
+      },
+      {
+        ...EDGE_TOOLTIP_BEHAVIOR,
+        showRightClickHelpText: true
+      },
+      NODE_CONTEXT_MENU_BEHAVIOR,
+      EDGE_CONTEXT_MENU_BEHAVIOR,
+      CANVAS_CONTEXT_MENU_BEHAVIOR,
+      {
+        ...PROPERTY_VIEWER_BEHAVIOR,
+        className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
+      }
+    ],
+    transforms: [
+      MAP_NODE_SIZE_TRANSFORMER,
+      PROCESS_PARALLEL_TRANSFORMER
+    ],
+    plugins: [
+      // MINIMAP_PLUGIN,
+      HISTORY_PLUGIN,
+      // GRID_PLUGIN
+    ],
+    layout: D3_FORCE_LAYOUT,
+    styles: DEFAULT_STYLE_OPTIONS
+  }
+
+  const graphModelOptions: CanvasGraphOptions = {
+    behaviors: [
+      DRAG_CANVAS_BEHAVIOR,
+      ZOOM_CANVAS_BEHAVIOR,
+      DRAG_ELEMENT_BEHAVIOR,
+      HOVER_ACTIVATE_BEHAVIOR,
+      // CLICK_SELECT_BEHAVIOR,
+      // LASSO_SELECT_BEHAVIOR,
+      NODE_TOOLTIP_BEHAVIOR,
+      EDGE_TOOLTIP_BEHAVIOR,
+      // NODE_CONTEXT_MENU_BEHAVIOR,
+      // EDGE_CONTEXT_MENU_BEHAVIOR,
+      CANVAS_CONTEXT_MENU_BEHAVIOR,
+      // {
+      //   ...PROPERTY_VIEWER_BEHAVIOR,
+      //   className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
+      // }
+    ],
+    transforms: [
+      // MAP_NODE_SIZE_TRANSFORMER,
+      // PROCESS_PARALLEL_TRANSFORMER
+    ],
+    plugins: [
+      // MINIMAP_PLUGIN,
+      // HISTORY_PLUGIN,
+    ],
+    layout: {
+      link: {
+        distance: 200,
+        // strength: 2
+      },
+      ...D3_FORCE_LAYOUT
+    },
+    styles: MODEL_STYLE_OPTIONS
+  };
+
 
   const rightTopNavItems: LeftNavItem[] = [
     {

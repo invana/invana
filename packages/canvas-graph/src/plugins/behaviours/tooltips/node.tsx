@@ -9,6 +9,7 @@ import { CanvasGraphNode } from '@invana/canvas-graph/types';
 
 export interface NodeTooltipBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
+  showRightClickHelpText?: boolean
 }
 
 export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions> {
@@ -16,14 +17,16 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
   container!: HTMLDivElement;
   root!: Root
 
-  constructor(context: RuntimeContext, options: NodeTooltipBehaviorOptions) {
-    super(context, options);
+  static defaultOptions: Partial<NodeTooltipBehaviorOptions> = {
+    showRightClickHelpText: false
+  };
 
+  constructor(context: RuntimeContext, options: NodeTooltipBehaviorOptions) {
+    super(context, Object.assign({}, NodeTooltipBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
   }
-
 
   bindEvents() {
     const { graph } = this.context;
@@ -96,13 +99,18 @@ export class NodeTooltipBehavior extends BaseBehavior<NodeTooltipBehaviorOptions
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
-
+    const { showRightClickHelpText } = this.options;
+    console.log("=======showRightClickHelpText", showRightClickHelpText)
+    let extraContent: React.ReactNode | undefined = undefined;
+    if (showRightClickHelpText) {
+      extraContent = <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>;
+    }
     const component: React.ReactNode = <NodeCard
       node={nodeData}
       showProperties={false}
-      extra={
-        <p className='text-xs pl-4 pr-4 pb-4'>(right-click on node for more options)</p>
-      } />
+      extra={extraContent}
+
+    />
     this.root.render(component)
 
     graph.on(NodeEvent.POINTER_MOVE, this.onNodeMouseMove);
