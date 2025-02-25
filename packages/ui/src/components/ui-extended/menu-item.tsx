@@ -6,10 +6,11 @@ import { cn } from '../../lib/utils'
 export interface MenuItem {
   id: string
   label: string
-  icon?: LucideIcon
+  icon?: React.ElementType | LucideIcon
   shortcut?: string
   className?: string
   href?: string
+  onClick?: () => void
   children?: MenuItem[]
 }
 
@@ -23,15 +24,20 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   children,
   className,
   level = 0,
-  href
+  href,
+  onClick
 }) => {
   const hasChildren = children && children.length > 0
   const ButtonOrLink = href ? 'a' : 'button'
 
+  const clickTrigger = href ? { href: href } : { onClick: onClick }
+
   return (
     <li className="relative group/item">
       <ButtonOrLink
-        href={href}
+        // href={href}
+        // onClick={onClick}
+        {...clickTrigger}
         className={cn(
           "flex w-full items-center justify-between  px-4 py-2 text-sm",
           "hover:bg-accent hover:text-accent-foreground",

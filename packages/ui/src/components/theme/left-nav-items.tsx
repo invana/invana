@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react"
 
 
 export interface LeftNavItem {
+  key?: string
   name: string
   href?: string
   onClick?: () => void

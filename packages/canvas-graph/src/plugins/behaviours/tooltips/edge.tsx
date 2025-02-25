@@ -112,7 +112,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.hideOtherMenus();
   }
 
-  onContextMenu = (e: IPointerEvent) => {
+  onContextMenu = (_: IPointerEvent) => {
     // console.log("onContextMenu", e)
     const { graph } = this.context;
     graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));
@@ -120,7 +120,7 @@ export class EdgeTooltipBehavior extends BaseBehavior {
     this.hideContainer();
   }
 
-  onEdgeMouseLeave(event: IPointerEvent) {
+  onEdgeMouseLeave(_: IPointerEvent) {
     // console.log("===onEdgeMouseLeave", event)
     const { graph } = this.context;
     graph.off(EdgeEvent.POINTER_MOVE, this.onMouseMove.bind(this));

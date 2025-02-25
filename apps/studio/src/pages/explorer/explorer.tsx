@@ -1,10 +1,10 @@
-import { useThemeStore } from '@invana/ui';
+import { MenuItem, useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
-  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, Eraser, FileText, FolderOpen, LassoSelect,
+  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeClosedIcon, EyeOff, FileText, FolderOpen, LassoSelect,
   LayoutGrid, LifeBuoy, Lock, Mail, Menu, MonitorCog, Network, RefreshCw, Settings, Share2,
-  Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut
+  Shrink, SquareMenu, Tag, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect } from 'react';
@@ -26,7 +26,7 @@ import {
 } from '@invana/canvas-graph/defaults/transforms';
 import { HISTORY_PLUGIN } from '@invana/canvas-graph/defaults/plugins';
 import { D3_FORCE_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
-import { ExtensionCategory, register } from '@antv/g6';
+import { ExtensionCategory, Graph, IPointerEvent, register } from '@antv/g6';
 import {
   EdgeTooltipBehavior, NodeTooltipBehavior,
   PropertyViewerBehavior
@@ -43,7 +43,7 @@ import { mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
 import WelcomeView from '@/ui/components/welcome-view';
 import { useMemo } from 'react';
-import { CanvasGraphOptions } from '@invana/canvas-graph/types';
+import { CanvasGraphNode, CanvasGraphOptions } from '@invana/canvas-graph/types';
 import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
 import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
@@ -84,6 +84,113 @@ const ExplorerPage: React.FC = () => {
   } = useDefaultV2LayoutStore()
 
 
+  const createNodeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
+    const graph = canvasManagerRef.current?.getGraph() as Graph;
+    const nodeId = ((event.target as unknown) as HTMLElement).id as string;
+    const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
+    return [
+      {
+        id: 'files',
+        label: 'Incomin custom',
+        icon: FolderOpen,
+        shortcut: '⌘F',
+        children: [
+          {
+            id: 'shared',
+            label: 'Shared Files',
+            icon: FolderOpen,
+            shortcut: '⌘S',
+          },
+          {
+            id: 'recent',
+            label: 'Recent Files',
+            icon: FileText,
+            shortcut: '⌘R',
+          }
+        ]
+      },
+      {
+        id: 'settings',
+        label: 'OutGoing',
+        icon: Settings,
+        shortcut: '⌘,',
+        children: [
+
+          {
+            id: 'notifications',
+            label: 'Notifications',
+            icon: Bell,
+            shortcut: '⌘N'
+          }
+        ]
+      },
+      {
+        id: 'messages',
+        label: 'graph algorithms',
+        icon: Mail,
+        shortcut: '⌘M',
+        children: [
+          {
+            id: 'shared',
+            label: 'Shared Files',
+            icon: FolderOpen,
+            shortcut: '⌘S',
+          }
+        ]
+      }
+    ]
+  }
+
+  const createNodeContextMenuMainMenuItems = (event: IPointerEvent): MenuItem[] => {
+    console.log("createNodeContextMenuMainMenuItems", event)
+
+    const graph = canvasManagerRef.current?.getGraph() as Graph;
+    const nodeId = ((event.target as unknown) as HTMLElement).id as string;
+    return [
+      {
+        id: 'focus-node',
+        label: 'Focus Node',
+        className: 'rounded-none  active:bg-gray:500',
+        icon: CircleDot,
+        onClick: () => {
+          graph.focusElement(nodeId)
+        }
+      },
+      {
+        id: 'Start a query',
+        label: 'Start a query',
+        icon: Terminal,
+        onClick: () => {
+          alert("Start a query")
+        }
+      },
+      {
+        id: 'Tag this Node',
+        label: 'Tag this Node',
+        icon: Tag,
+        onClick: () => {
+          alert("Tag this Node")
+        },
+      },
+      {
+        id: 'Lock this Node',
+        label: 'Lock this Node',
+        icon: Lock,
+        onClick: () => {
+          alert("Lock this Node")
+        },
+      },
+      {
+        id: 'Hide Node',
+        label: 'Hide this Node',
+        icon: EyeOff,
+        onClick: () => {
+          alert("Hide this Node")
+        },
+      }
+    ]
+  }
+
   const defaultOptions: CanvasGraphOptions = {
     behaviors: [
       DRAG_CANVAS_BEHAVIOR,
@@ -102,57 +209,8 @@ const ExplorerPage: React.FC = () => {
       },
       {
         ...NODE_CONTEXT_MENU_BEHAVIOR,
-        menuItems: [
-          {
-            id: 'files',
-            label: 'Incoming',
-            icon: FolderOpen,
-            shortcut: '⌘F',
-            children: [
-              {
-                id: 'shared',
-                label: 'Shared Files',
-                icon: FolderOpen,
-                shortcut: '⌘S',
-              },
-              {
-                id: 'recent',
-                label: 'Recent Files',
-                icon: FileText,
-                shortcut: '⌘R',
-              }
-            ]
-          },
-          {
-            id: 'settings',
-            label: 'OutGoing',
-            icon: Settings,
-            shortcut: '⌘,',
-            children: [
-
-              {
-                id: 'notifications',
-                label: 'Notifications',
-                icon: Bell,
-                shortcut: '⌘N'
-              }
-            ]
-          },
-          {
-            id: 'messages',
-            label: 'graph algorithms',
-            icon: Mail,
-            shortcut: '⌘M',
-            children: [
-              {
-                id: 'shared',
-                label: 'Shared Files',
-                icon: FolderOpen,
-                shortcut: '⌘S',
-              }
-            ]
-          }
-        ]
+        createMainMenuItemsFn: createNodeContextMenuMainMenuItems,
+        createMenuItemsFn: createNodeContextMenuItems
       },
       {
         ...EDGE_CONTEXT_MENU_BEHAVIOR,

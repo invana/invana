@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BlankLayout } from '@invana/ui';
-import type { LeftNavItem } from '@invana/ui';
 import {
   Activity, Compass, Database, Home,
   Network,
   Settings
 } from 'lucide-react'
+import { LeftNavItem } from '@/components/theme/left-nav-items';
 
 
 const topNavItems: LeftNavItem[] = [
