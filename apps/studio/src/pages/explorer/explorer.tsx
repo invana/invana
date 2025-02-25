@@ -7,7 +7,7 @@ import {
   Shrink, SquareMenu, Tag, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ProductName } from '@/constants';
 import { CanvasGraph } from '@invana/canvas-graph';
 import AppHeaderRight from '@/ui/header/app-header-right';
@@ -254,9 +254,9 @@ const ExplorerPage: React.FC = () => {
     ]
   }
 
-  const getRightContentName = () => {
-    return rightContentName
-  }
+  const getRightContentName = useCallback(() => {
+    return rightContentName;
+  }, [rightContentName]);
 
 
   const defaultOptions: CanvasGraphOptions = {
@@ -308,17 +308,20 @@ const ExplorerPage: React.FC = () => {
         ...PROPERTY_VIEWER_BEHAVIOR,
         // className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
         onNodeHover: (event: IPointerEvent, data: ICanvasNode) => {
-          console.log("=====onNodeHover", getRightContentName(), data)
+          console.log("=====onNodeHover.newData", getRightContentName(), data)
+          console.log("=====onNodeHover.existing data", propertyViewerData)
+
           if (getRightContentName() !== "property-viewer") {
             return
           }
           setPropertyViewerData(data)
         },
         onNodeClick: (event: IPointerEvent, data: ICanvasNode) => {
-          console.log("=====onNodeClick", getRightContentName(), data)
+          console.log("=====onNodeClick", rightContentName, data)
           setRightContentName('property-viewer');
           setPropertyViewerData(data)
         },
+
         onClose: () => {
           // if (rightContentName === 'property-viewer') {
           setRightContentName(undefined)
@@ -653,12 +656,21 @@ const ExplorerPage: React.FC = () => {
     }
   }, [rightContentName])
 
+
+  useEffect(() => {
+    console.log("propertyViewerData", propertyViewerData)
+    if (propertyViewerData && rightContentName !== "property-viewer") {
+      setRightContentName('property-viewer')
+    }
+  }, [propertyViewerData, setRightContentName, rightContentName])
+
   // const modeGraphRef = useRef<typeof CanvasGraph | null>(null)
   // const canvasGraphRef = useRef<typeof CanvasGraph | null>(null)
 
   const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
 
-  console.log("====propertyViewerData", rightContentName, propertyViewerData)
+  console.log("====propertyViewerData", rightContentName, propertyViewerData,)
+  console.log("===projectDataOptions", projectDataOptions)
 
   return <DefaultV2Layout
     headerProps={{
@@ -756,7 +768,10 @@ const ExplorerPage: React.FC = () => {
           </PanelContent>
         }
         {rightContentName === "property-viewer" && typeof propertyViewerData === 'object' &&
-          <PanelContent title={"Property Viewer"} key={'property-viewer'} onClose={() => setRightContentName(undefined)} showClose>
+          <PanelContent title={"Property Viewer"} key={'property-viewer'} onClose={() => {
+            setRightContentName(undefined)
+            setPropertyViewerData(null)
+          }} showClose>
             <PropertyViewer data={propertyViewerData as ICanvasNode} />
           </PanelContent>
         }
@@ -775,26 +790,26 @@ const ExplorerPage: React.FC = () => {
     }
     mainTopContent={
       // <div className="flex h-full items-center justify-center ">
-      projectData ?
-        <CanvasGraph
-          // ref={canvasGraphRef}
-          graphName={'graphData'}
-          containerStyle={{ width: "100%", height: "100%" }}
-          className={"bg-background"}
-          initData={projectData.data}
-          onReady={(canvasManager: CanvasManager) => {
-            console.log("CanvasGraph.onReady", canvasManager)
-            canvasManagerRef.current = canvasManager;
-            // setIsReady(true)
-          }}
-          onDestroy={() => {
-            console.log("CanvasGraph.onDestroy")
-            // setIsReady(false)
-            canvasManagerRef.current = null;
-          }}
-          options={projectDataOptions}
-        />
-        : <WelcomeView />
+      // projectData ?
+      <CanvasGraph
+        // ref={canvasGraphRef}
+        graphName={'graphData'}
+        containerStyle={{ width: "100%", height: "100%" }}
+        className={"bg-background"}
+        initData={projectData?.data}
+        onReady={(canvasManager: CanvasManager) => {
+          console.log("CanvasGraph.onReady", canvasManager)
+          canvasManagerRef.current = canvasManager;
+          setIsReady(true)
+        }}
+        onDestroy={() => {
+          console.log("CanvasGraph.onDestroy")
+          setIsReady(false)
+          canvasManagerRef.current = null;
+        }}
+        options={projectDataOptions}
+      />
+      // : <WelcomeView />
       // </div>
     }
     mainBottomContent={
