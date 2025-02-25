@@ -11,28 +11,19 @@ export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
   menuItems: MenuItem[];
 }
 
-export const menuItems: MenuItem[] = [
-  {
-    id: 'files',
-    label: 'Display Settings',
-    icon: FolderOpen,
-    shortcut: '⌘F'
-  },
-  {
-    id: 'Run Analysis',
-    label: 'Run Analysis',
-    icon: Settings,
-    shortcut: '⌘,'
-  }
-]
 
 export class CanvasContextMenuBehavior extends BaseBehavior {
 
   container!: HTMLElement;
   root!: Root
 
+  static defaultOptions: Partial<CanvasContextMenuOptions> = {
+    className: '',
+    menuItems: []
+  };
+
   constructor(context: RuntimeContext, options: CanvasContextMenuOptions) {
-    super(context, options);
+    super(context, Object.assign({}, CanvasContextMenuBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
@@ -86,6 +77,7 @@ export class CanvasContextMenuBehavior extends BaseBehavior {
   onCanvasContextMenu(event: IPointerEvent) {
     event.preventDefault();
     // event.stopPropagation();
+    const { menuItems } = this.options;
 
     const component: React.ReactNode = <NestedMenu
       className='w-[240px] bg-card text-card-foreground rounded-sm pl-0 pr-0 pt-2 pb-2 shadow-sm'
