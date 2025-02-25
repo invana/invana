@@ -254,6 +254,11 @@ const ExplorerPage: React.FC = () => {
     ]
   }
 
+  const getRightContentName = () => {
+    return rightContentName
+  }
+
+
   const defaultOptions: CanvasGraphOptions = {
     behaviors: [
       DRAG_CANVAS_BEHAVIOR,
@@ -303,37 +308,44 @@ const ExplorerPage: React.FC = () => {
         ...PROPERTY_VIEWER_BEHAVIOR,
         // className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
         onNodeHover: (event: IPointerEvent, data: ICanvasNode) => {
-          console.log("=====onNodeHover", rightContentName, data)
-          if (rightContentName !== "property-viewer") {
+          console.log("=====onNodeHover", getRightContentName(), data)
+          if (getRightContentName() !== "property-viewer") {
             return
           }
           setPropertyViewerData(data)
         },
         onNodeClick: (event: IPointerEvent, data: ICanvasNode) => {
-          setPropertyViewerData(data)
+          console.log("=====onNodeClick", getRightContentName(), data)
           setRightContentName('property-viewer');
+          setPropertyViewerData(data)
         },
-        onNodeClose: () => {
+        onClose: () => {
+          // if (rightContentName === 'property-viewer') {
           setRightContentName(undefined)
+          // }
+          // if (propertyViewerData) {
           setPropertyViewerData(null)
+          // }
         },
         onEdgeHover: (event: IPointerEvent, data: ICanvasEdge) => {
-          console.log("=====onEdgeHover", rightContentName, data)
-
-          if (rightContentName !== "property-viewer") {
+          console.log("=====onEdgeHover", getRightContentName(), data)
+          if (getRightContentName() !== "property-viewer") {
             return
           }
           setPropertyViewerData(data)
         },
         onEdgeClick: (event: IPointerEvent, data: ICanvasEdge) => {
-          setPropertyViewerData(data)
           setRightContentName('property-viewer');
-
+          setPropertyViewerData(data)
         },
-        onEdgeClose: () => {
-          setRightContentName(undefined)
-          setPropertyViewerData(null)
-        }
+        // onEdgeClose: () => {
+        //   if (rightContentName === 'property-viewer') {
+        //     setRightContentName(undefined)
+        //   }
+        //   if (propertyViewerData) {
+        //     setPropertyViewerData(null)
+        //   }
+        // }
       }
     ],
     transforms: [
@@ -773,11 +785,11 @@ const ExplorerPage: React.FC = () => {
           onReady={(canvasManager: CanvasManager) => {
             console.log("CanvasGraph.onReady", canvasManager)
             canvasManagerRef.current = canvasManager;
-            setIsReady(true)
+            // setIsReady(true)
           }}
           onDestroy={() => {
             console.log("CanvasGraph.onDestroy")
-            setIsReady(false)
+            // setIsReady(false)
             canvasManagerRef.current = null;
           }}
           options={projectDataOptions}

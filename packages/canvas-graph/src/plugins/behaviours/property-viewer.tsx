@@ -1,5 +1,5 @@
 import { BaseBehavior, CanvasEvent, EdgeEvent, NodeEvent } from '@antv/g6';
-import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent } from '@antv/g6';
+import type { BaseBehaviorOptions, RuntimeContext, IPointerEvent, IEvent } from '@antv/g6';
 import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
@@ -11,11 +11,11 @@ export interface PropertyViewerBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
   onNodeHover?: (event: IPointerEvent, data: ICanvasNode) => void;
   onNodeClick?: (event: IPointerEvent, data: ICanvasNode) => void;
-  onNodeClose?: () => void;
 
   onEdgeHover?: (event: IPointerEvent, data: ICanvasEdge) => void;
   onEdgeClick?: (event: IPointerEvent, data: ICanvasEdge) => void;
-  onEdgeClose?: () => void;
+
+  onClose?: () => void;
 }
 
 export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorOptions> {
@@ -26,11 +26,11 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     className: '',
     onNodeHover: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeHover not set") },
     onNodeClick: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeClick not set") },
-    onNodeClose: () => { console.log("PropertyViewerBehavior.onNodeClose not set") },
 
     onEdgeHover: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeHover not set") },
     onEdgeClick: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeClick not set") },
-    onEdgeClose: () => { console.log("PropertyViewerBehavior.onEdgeClose not set") }
+
+    onClose: () => { console.log("PropertyViewerBehavior.onClose not set") }
 
   };
 
@@ -55,10 +55,10 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
   unbindEvents() {
     const { graph } = this.context;
     graph.off(NodeEvent.CLICK, this.onNodeClicked);
-    graph.off(NodeEvent.POINTER_OVER, this.hideContainer);
+    graph.off(NodeEvent.POINTER_OVER, this.onNodeHovered);
 
-    graph.off(EdgeEvent.CLICK, this.onNodeClicked);
-    graph.off(EdgeEvent.POINTER_OVER, this.hideContainer);
+    graph.off(EdgeEvent.CLICK, this.onEdgeClicked);
+    graph.off(EdgeEvent.POINTER_OVER, this.onEdgeHovered);
 
     graph.off(CanvasEvent.CLICK, this.hideContainer);
   }
@@ -123,10 +123,10 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
   }
 
   showEdgeData = (event: IPointerEvent) => {
-    const { onNodeHover } = this.options;
+    const { onEdgeHover } = this.options;
     const edgeData = this.getEdgeData(event)
-    if (onNodeHover) {
-      onNodeHover(event, edgeData)
+    if (onEdgeHover) {
+      onEdgeHover(event, edgeData)
     } else {
       const component: React.ReactNode = <EdgeCard
         className='h-full !w-full'
@@ -177,11 +177,11 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     }
   }
 
-  hideContainer = () => {
-    this.options?.onNodeClose()
-    this.options?.onEdgeClose()
-
-
+  hideContainer = (event?: IEvent) => {
+    console.log("=====hideContainer", event)
+    if (event) {
+      this.options?.onClose()
+    }
     this.container.style.display = 'none';
 
   }

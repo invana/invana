@@ -31,6 +31,8 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
   }, []);
 
 
+  console.log("CanvasGraph.props", props)
+
   return (
     <Graphin
       className={props.className || ' overflow-none'}
