@@ -39,7 +39,7 @@ import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
 import { ProjectSwitcher } from '@/ui/components/projects-switcher';
 import { useParams } from 'react-router-dom';
-import { ICanvasEdge, ICanvasNode, IProperties, mergeDeep } from '@invana/data-store';
+import { ICanvasEdge, ICanvasNode, mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
 import { useMemo } from 'react';
 import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions } from '@invana/canvas-graph/types';
@@ -255,6 +255,7 @@ const ExplorerPage: React.FC = () => {
   }
 
   const getRightContentName = useCallback(() => {
+    console.log("===getRightContentName", rightContentName)
     return rightContentName;
   }, [rightContentName]);
 
@@ -789,28 +790,30 @@ const ExplorerPage: React.FC = () => {
       </div>
     }
     mainTopContent={
-      // <div className="flex h-full items-center justify-center ">
-      // projectData ?
-      <CanvasGraph
-        // ref={canvasGraphRef}
-        graphName={'graphData'}
-        containerStyle={{ width: "100%", height: "100%" }}
-        className={"bg-background"}
-        initData={projectData?.data}
-        onReady={(canvasManager: CanvasManager) => {
-          console.log("CanvasGraph.onReady", canvasManager)
-          canvasManagerRef.current = canvasManager;
-          setIsReady(true)
-        }}
-        onDestroy={() => {
-          console.log("CanvasGraph.onDestroy")
-          setIsReady(false)
-          canvasManagerRef.current = null;
-        }}
-        options={projectDataOptions}
-      />
-      // : <WelcomeView />
-      // </div>
+      <div className="flex h-full items-center justify-center ">
+        {
+          projectData ?
+            <CanvasGraph
+              // ref={canvasGraphRef}
+              graphName={'graphData'}
+              containerStyle={{ width: "100%", height: "100%" }}
+              className={"bg-background"}
+              initData={projectData?.data}
+              onReady={(canvasManager: CanvasManager) => {
+                console.log("CanvasGraph.onReady", canvasManager)
+                canvasManagerRef.current = canvasManager;
+                setIsReady(true)
+              }}
+              onDestroy={() => {
+                console.log("CanvasGraph.onDestroy")
+                setIsReady(false)
+                canvasManagerRef.current = null;
+              }}
+              options={projectDataOptions}
+            />
+            : <WelcomeView />
+        }
+      </div >
     }
     mainBottomContent={
       <>
