@@ -2,7 +2,7 @@ import { BaseBehavior, CanvasEvent, EdgeEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
-import { MenuItem, NestedMenu } from '@invana/ui';
+import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
 import { EdgeCard } from '@invana/ui';
 import React from 'react';
 import { CanvasGraphEdge } from '@invana/canvas-graph/types';
@@ -10,7 +10,8 @@ import { CanvasGraphEdge } from '@invana/canvas-graph/types';
 
 export interface EdgeContextMenuOptions extends BaseBehaviorOptions {
   className?: string;
-  menuItems: MenuItem[];
+  createMainMenuItemsFn?(event: IPointerEvent): MenuItem[];
+  createMenuItemsFn(event: IPointerEvent): MenuItem[];
 }
 
 
@@ -21,7 +22,8 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
 
   static defaultOptions: Partial<EdgeContextMenuOptions> = {
     className: '',
-    menuItems: []
+    createMenuItemsFn: (event: IPointerEvent) => [],
+    createMainMenuItemsFn: (event: IPointerEvent) => []
   };
 
   constructor(context: RuntimeContext, options: EdgeContextMenuOptions) {
@@ -105,15 +107,43 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
-    const { menuItems } = this.options;
+    // const { menuItems } = this.options;
+    const { createMenuItemsFn, createMainMenuItemsFn } = this.options;
+    const menuItems = createMenuItemsFn(event)
+    const mainMenuItems = createMainMenuItemsFn(event)
 
     const component: React.ReactNode = <EdgeCard
       edge={edgeData}
       extra={
-        <NestedMenu
-          className='rounded-none w-[260px] shadow-none p-0 border-none'
-          menuItems={menuItems}
-        />
+        <div>
+          {mainMenuItems.length > 0 &&
+            <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
+              {
+                mainMenuItems.map((menuItem: MenuItem, index: number) => {
+                  return <>
+                    <ButtonWithTooltip
+                      variant="ghost"
+                      size="icon-sm"
+                      className="rounded-none  active:bg-gray:500"
+                      tooltip={<p>{menuItem.label}</p>}
+                      onClick={() => {
+                        menuItem?.onClick?.()
+                        this.hideContainer()
+                      }}
+                    >
+                      {menuItem.icon && <menuItem.icon className="h-4 w-4" />}
+                      {/* {menuItem.label} */}
+                    </ButtonWithTooltip>
+                    {index !== mainMenuItems.length - 1 && <Separator orientation="vertical" className='h-6' />}
+                  </>
+                })}
+            </div>
+          }
+          <NestedMenu
+            className='rounded-none w-[260px] shadow-none p-0 border-none'
+            menuItems={menuItems}
+          />
+        </div>
       }
     />
 
