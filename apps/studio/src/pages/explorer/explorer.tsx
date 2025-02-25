@@ -473,7 +473,7 @@ const ExplorerPage: React.FC = () => {
           </PanelContent>
         }
         {rightContentName === "model" &&
-          <PanelContent title={"Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
+          <PanelContent title={"Graph Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modeGraphRef}
               graphName={'model'}
