@@ -193,6 +193,17 @@ export const FRUCHTERMAN_LAYOUT: CanvasGraphLayout = {
   // gpuEnabled: false, // Optional, enable GPU parallel computing, supported in G6 4.0
 }
 
+export const MINDMAP_LAYOUT: CanvasGraphLayout = {
+  type: 'mindmap',
+  label: 'mindmap',
+  direction: 'LR',
+  getHeight: () => 32,
+  getWidth: () => 32,
+  getVGap: () => 4,
+  getHGap: () => 100,
+  animation: false
+}
+
 export const ALL_AVAILABLE_LAYOUTS: CanvasGraphLayout[] = [
   GRAPHIN_FORCE_LAYOUT,
   GRID_LAYOUT,
@@ -205,5 +216,6 @@ export const ALL_AVAILABLE_LAYOUTS: CanvasGraphLayout[] = [
   CONCENTRIC_LAYOUT,
   ANTV_DAGRE_LAYOUT,
   FRUCHTERMAN_LAYOUT,
-  DENDROGRAM_LAYOUT
+  DENDROGRAM_LAYOUT,
+  MINDMAP_LAYOUT
 ]

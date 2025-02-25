@@ -122,6 +122,15 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       iconText: (d: CanvasGraphNode) => do_style_override(d, 'iconText', 'shape', customNodeStyles, undefined),
       iconSrc: (d: CanvasGraphNode) => do_style_override(d, 'iconSrc', 'shape', customNodeStyles, undefined),
 
+
+
+      // port: true,
+      // ports: [
+      //   { "key": "right", "placement": "right", "fill": "#F4664A" },
+      //   { "key": "left", "placement": "left", "fill": "#F4664A" },
+      //   // { "key": "left", "placement": [0, 0.5], "fill": "#D580FF" }
+      // ],
+
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
     state: {
@@ -224,10 +233,10 @@ export const convert_canvas_style_to_g6_style = (style: ICanvasStyle): Partial<G
     theme: style.theme ?? DEFAULT_CANVAS_STYLE.theme,
     autoResize: true,
     autoFit: 'view', // 'view' | 'graph' | 'center'
-    animation: {
-      duration: 200,
-      easing: 'linear',
-    }
+    // animation: {
+    //   duration: 200,
+    //   easing: 'linear',
+    // }
     // background: style.bgColor as string ?? DEFAULT_CANVAS_STYLE.bgColor as string,
   }
   // if (style.hasOwnProperty('shape')) {
