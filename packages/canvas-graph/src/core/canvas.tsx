@@ -32,6 +32,8 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
 
   console.log("CanvasGraph.props", props)
+  const propsSizeInBytes = new Blob([JSON.stringify(props)]).size;
+  console.log(`CanvasGraph.props Props size: ${propsSizeInBytes} bytes`);
 
   return (
     <Graphin
@@ -62,4 +64,14 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
   )
 }
 
-export const CanvasGraph = React.memo(CanvasGraph_);
+// export const CanvasGraph = React.memo(CanvasGraph_, (prevProps, nextProps) => {
+//   // Compare relevant props to determine if a re-render is needed
+//   return JSON.stringify(prevProps.initData) === JSON.stringify(nextProps.initData) &&
+//     JSON.stringify(prevProps.options) === JSON.stringify(nextProps.options) &&
+//     prevProps.className === nextProps.className &&
+//     prevProps.containerStyle === nextProps.containerStyle;
+// });
+
+// export const CanvasGraph = CanvasGraph_;
+
+export const CanvasGraph = React.memo(CanvasGraph_)

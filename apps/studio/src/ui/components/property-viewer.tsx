@@ -37,13 +37,21 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
         <Copy className="mr-1 h-4" />{data.id}</p>
       <h1 className='text-2xl mt-2 font-semibold'>{data.label}</h1>
       <div className="flex items-center space-x-4">
-        <div className="mt-2 text-sm">
+        <div className=" text-sm">
           <Badge>{data.type}</Badge>
         </div>
+
         {/* <p className='mt-2 text-zinc-500 dark:text-zinc-400 text-sm'>
           Updated at {new Date().toLocaleDateString()}
         </p> */}
       </div>
+      {
+        'source' in data && 'target' in data &&
+        <div className='mt-2 text-sm'>
+          <div>source: {(data as ICanvasEdge).source}</div>
+          <div>target: {(data as ICanvasEdge).target}</div>
+        </div>
+      }
       {/* <p className='mt-2 mb-3 text-sm'>Node Description</p> */}
 
       <div className='border-b border-t mt-5 mb-3 px-1 mx-[-12px]'>
