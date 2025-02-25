@@ -9,14 +9,33 @@ import { CanvasGraphEdge, CanvasGraphNode } from '@invana/canvas-graph/types';
 
 export interface PropertyViewerBehaviorOptions extends BaseBehaviorOptions {
   className?: string;
+  onNodeHover?: (event: IPointerEvent, data: ICanvasNode) => void;
+  onNodeClick?: (event: IPointerEvent, data: ICanvasNode) => void;
+  onNodeClose?: () => void;
+
+  onEdgeHover?: (event: IPointerEvent, data: ICanvasEdge) => void;
+  onEdgeClick?: (event: IPointerEvent, data: ICanvasEdge) => void;
+  onEdgeClose?: () => void;
 }
 
 export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorOptions> {
   container!: HTMLDivElement;
   root!: Root
 
+  static defaultOptions: Partial<PropertyViewerBehaviorOptions> = {
+    className: '',
+    onNodeHover: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeHover not set") },
+    onNodeClick: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeClick not set") },
+    onNodeClose: () => { console.log("PropertyViewerBehavior.onNodeClose not set") },
+
+    onEdgeHover: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeHover not set") },
+    onEdgeClick: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeClick not set") },
+    onEdgeClose: () => { console.log("PropertyViewerBehavior.onEdgeClose not set") }
+
+  };
+
   constructor(context: RuntimeContext, options: PropertyViewerBehaviorOptions) {
-    super(context, options);
+    super(context, Object.assign({}, PropertyViewerBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
@@ -58,33 +77,42 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
     document.body.appendChild(this.container);
   }
 
-  showContainer = () => {
-    this.container.style.display = 'block';
-  }
 
-  showNodeData = (event: IPointerEvent) => {
+
+  getNodeData = (event: IPointerEvent): ICanvasNode => {
+
     const { graph } = this.context;
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
-    const nodeData: ICanvasNode = {
+    return {
       id: node.id as string,
       label: node.label as string,
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
-    const component: React.ReactNode = <NodeCard
-      className='h-full w-full'
-      node={nodeData}
-      showProperties={true}
-    />
-    this.root.render(component)
   }
 
-  showEdgeData = (event: IPointerEvent) => {
+  showNodeData = (event: IPointerEvent) => {
+    const nodeData = this.getNodeData(event);
+    const { onNodeHover } = this.options;
+    if (onNodeHover) {
+      onNodeHover(event, nodeData)
+    } else {
+      const component: React.ReactNode = <NodeCard
+        className='h-full w-full'
+        node={nodeData}
+        showProperties={true}
+      />
+      this.root.render(component)
+    }
+
+  }
+
+  getEdgeData = (event: IPointerEvent): ICanvasEdge => {
     const { graph } = this.context;
     const edgeId = ((event.target as unknown) as HTMLElement).id as string;
     const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
-    const edgeData: ICanvasEdge = {
+    return {
       id: edge.id as string,
       label: edge.label as string,
       type: edge.data?.type ?? '',
@@ -92,13 +120,21 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
+  }
 
-    const component: React.ReactNode = <EdgeCard
-      className='h-full !w-full'
-      edge={edgeData}
-      showProperties={true}
-    />
-    this.root.render(component)
+  showEdgeData = (event: IPointerEvent) => {
+    const { onNodeHover } = this.options;
+    const edgeData = this.getEdgeData(event)
+    if (onNodeHover) {
+      onNodeHover(event, edgeData)
+    } else {
+      const component: React.ReactNode = <EdgeCard
+        className='h-full !w-full'
+        edge={edgeData}
+        showProperties={true}
+      />
+      this.root.render(component)
+    }
   }
 
   onNodeHovered = (event: IPointerEvent) => {
@@ -112,19 +148,42 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
 
   onEdgeClicked = (event: IPointerEvent) => {
     console.log("EdgeEvent.CLICKED event", event)
-    this.showContainer()
-    this.showEdgeData(event)
+    this.showEdgeContainer(event)
+    // this.showEdgeData(event)
+  }
+
+  showEdgeContainer = (event: IPointerEvent) => {
+    const edgeData = this.getEdgeData(event);
+    if (this.options.onEdgeClick) {
+      this.options.onEdgeClick(event, edgeData)
+    } else {
+      this.container.style.display = 'block';
+    }
   }
 
   onNodeClicked = (event: IPointerEvent) => {
     console.log("NodeEvent.CLICKED event", event)
-    this.showContainer()
-    this.showNodeData(event)
+    this.showNodeContainer(event)
+    // this.showNodeData(event)
   }
 
 
+  showNodeContainer = (event: IPointerEvent) => {
+    const nodeData = this.getNodeData(event);
+    if (this.options.onNodeClick) {
+      this.options.onNodeClick(event, nodeData)
+    } else {
+      this.container.style.display = 'block';
+    }
+  }
+
   hideContainer = () => {
+    this.options?.onNodeClose()
+    this.options?.onEdgeClose()
+
+
     this.container.style.display = 'none';
+
   }
 
   destroy() {

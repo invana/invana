@@ -39,15 +39,15 @@ import { LeftNavItem } from '@invana/ui/components/theme/left-nav-items';
 import { projectsListDataSet } from '@/projectsList';
 import { ProjectSwitcher } from '@/ui/components/projects-switcher';
 import { useParams } from 'react-router-dom';
-import { mergeDeep } from '@invana/data-store';
+import { ICanvasEdge, ICanvasNode, IProperties, mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
-import WelcomeView from '@/ui/components/welcome-view';
 import { useMemo } from 'react';
 import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions } from '@invana/canvas-graph/types';
 import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
 import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
-import NodeDetail from '@/ui/components/node-detail';
+import PropertyViewer from '@/ui/components/property-viewer';
+import WelcomeView from '@/ui/components/welcome-view';
 
 
 register(ExtensionCategory.BEHAVIOR, NODE_TOOLTIP_BEHAVIOR.type, NodeTooltipBehavior, true);
@@ -69,7 +69,10 @@ const ExplorerPage: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
   const modelCanvasManagerRef = useRef<CanvasManager | null>(null);
-  const { theme, } = useThemeStore()
+  const { theme, } = useThemeStore();
+
+
+  const [propertyViewerData, setPropertyViewerData] = useState<ICanvasNode | ICanvasEdge | null>(null)
 
 
   const projectData: Project | undefined = projectsListDataSet.find((project) => project.id === graphId)
@@ -261,16 +264,19 @@ const ExplorerPage: React.FC = () => {
       LASSO_SELECT_BEHAVIOR,
       {
         ...NODE_TOOLTIP_BEHAVIOR,
-        showRightClickHelpText: true
+        showRightClickHelpText: true,
+
       },
       {
         ...EDGE_TOOLTIP_BEHAVIOR,
-        showRightClickHelpText: true
+        showRightClickHelpText: true,
+
       },
       {
         ...NODE_CONTEXT_MENU_BEHAVIOR,
         createMainMenuItemsFn: createNodeContextMenuMainMenuItems,
-        createMenuItemsFn: createNodeContextMenuItems
+        createMenuItemsFn: createNodeContextMenuItems,
+
       },
       {
         ...EDGE_CONTEXT_MENU_BEHAVIOR,
@@ -295,7 +301,39 @@ const ExplorerPage: React.FC = () => {
       },
       {
         ...PROPERTY_VIEWER_BEHAVIOR,
-        className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
+        // className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]',
+        onNodeHover: (event: IPointerEvent, data: ICanvasNode) => {
+          console.log("=====onNodeHover", rightContentName, data)
+          if (rightContentName !== "property-viewer") {
+            return
+          }
+          setPropertyViewerData(data)
+        },
+        onNodeClick: (event: IPointerEvent, data: ICanvasNode) => {
+          setPropertyViewerData(data)
+          setRightContentName('property-viewer');
+        },
+        onNodeClose: () => {
+          setRightContentName(undefined)
+          setPropertyViewerData(null)
+        },
+        onEdgeHover: (event: IPointerEvent, data: ICanvasEdge) => {
+          console.log("=====onEdgeHover", rightContentName, data)
+
+          if (rightContentName !== "property-viewer") {
+            return
+          }
+          setPropertyViewerData(data)
+        },
+        onEdgeClick: (event: IPointerEvent, data: ICanvasEdge) => {
+          setPropertyViewerData(data)
+          setRightContentName('property-viewer');
+
+        },
+        onEdgeClose: () => {
+          setRightContentName(undefined)
+          setPropertyViewerData(null)
+        }
       }
     ],
     transforms: [
@@ -428,7 +466,7 @@ const ExplorerPage: React.FC = () => {
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
-      onClick: () => toggleRightContent("node-detail")
+      onClick: () => toggleRightContent("property-viewer")
     },
     {
       icon: Circle,
@@ -608,6 +646,7 @@ const ExplorerPage: React.FC = () => {
 
   const projectDataOptions = useMemo(() => mergeDeep(defaultOptions, projectData?.options || {}), [projectData?.options])
 
+  console.log("====propertyViewerData", rightContentName, propertyViewerData)
 
   return <DefaultV2Layout
     headerProps={{
@@ -704,16 +743,21 @@ const ExplorerPage: React.FC = () => {
             <p>Display Settings here </p>
           </PanelContent>
         }
-        {rightContentName === "node-detail" &&
+        {rightContentName === "property-viewer" && typeof propertyViewerData === 'object' &&
+          <PanelContent title={"Property Viewer"} key={'property-viewer'} onClose={() => setRightContentName(undefined)} showClose>
+            <PropertyViewer data={propertyViewerData as ICanvasNode} />
+          </PanelContent>
+        }
+        {/* {rightContentName === "property-viewer" && propertyViewerData && typeof propertyViewerData === 'object' &&
           <PanelContent title={"Node details"} key={'node-details'} onClose={() => setRightContentName(undefined)} showClose>
-            <NodeDetail />
+            <PropertyViewer data={propertyViewerData} />
           </PanelContent>
-        }
-        {rightContentName === "insight-viewer" &&
+        } */}
+        {/* {rightContentName === "insight-viewer" &&
           <PanelContent title={"Insight viewer"} key={'insight-viewer'} onClose={() => setRightContentName(undefined)} showClose>
-            <NodeDetail />
+            <PropertyViewer />
           </PanelContent>
-        }
+        } */}
 
       </div>
     }
