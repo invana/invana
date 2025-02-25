@@ -162,14 +162,14 @@ const ExplorerPage: React.FC = () => {
     },
     {
       icon: Network,
-      name: "Model",
+      name: "Graph Model",
       className: "py-3 my-2 px-3 rounded-none",
       iconClassName: "w-4 h-4",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
       onClick: () => {
-        return toggleRightContent("model")
+        return toggleRightContent("graph-model")
       },
     },
     {
@@ -472,7 +472,7 @@ const ExplorerPage: React.FC = () => {
               />}
           </PanelContent>
         }
-        {rightContentName === "model" &&
+        {rightContentName === "graph-model" &&
           <PanelContent title={"Graph Model"} key={'model-panel'} onClose={() => setRightContentName(undefined)} showClose>
             <CanvasGraph
               // ref={modeGraphRef}
