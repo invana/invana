@@ -278,39 +278,7 @@ const ExplorerPage: React.FC = () => {
       },
     },
 
-    {
-      icon: Share2,
-      name: "D3 Force layout",
-      className: 'my-1 mt-3',
-      iconStroke: 2,
-      tooltipSide: "left",
-      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('d3-force'),
-    },
-    {
-      icon: CircleDashed,
-      name: "Circular Layout",
-      className: 'my-1',
-      iconStroke: 2,
-      tooltipSide: "left",
-      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('circular'),
-    },
-    {
-      icon: LayoutGrid,
-      name: "Grid Layout",
-      className: 'my-1',
-      iconStroke: 2,
-      tooltipSide: "left",
-      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('grid'),
-    },
-    {
-      icon: Network,
-      name: "Dagre layout",
-      showSeperator: true,
-      className: 'my-1 mb-3',
-      iconStroke: 2,
-      tooltipSide: "left",
-      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('antv-dagre'),
-    },
+
     {
       icon: Eraser,
       name: "Eraser",
@@ -346,9 +314,7 @@ const ExplorerPage: React.FC = () => {
         // return toggleRightContent("graph-info")
       },
     },
-  ]
 
-  const leftBottomNavItems: LeftNavItem[] = [
     {
       icon: ZoomIn,
       name: "Zoom In",
@@ -366,6 +332,45 @@ const ExplorerPage: React.FC = () => {
       tooltipSide: "right",
       onClick: () => canvasManagerRef.current?.canvas_utils.zoomOut(),
     }
+  ]
+
+  const leftBottomNavItems: LeftNavItem[] = [
+
+    {
+      icon: Share2,
+      name: "D3 Force layout",
+      className: 'my-1 mt-3',
+      iconStroke: 2,
+      tooltipSide: "left",
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('d3-force'),
+    },
+    {
+      icon: CircleDashed,
+      name: "Circular Layout",
+      className: 'my-1',
+      iconStroke: 2,
+      tooltipSide: "left",
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('circular'),
+    },
+    {
+      icon: LayoutGrid,
+      name: "Grid Layout",
+      className: 'my-1',
+      iconStroke: 2,
+      tooltipSide: "left",
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('grid'),
+    },
+    {
+      icon: Network,
+      name: "Dagre layout",
+      showSeperator: true,
+      className: 'my-1 mb-3',
+      iconStroke: 2,
+      tooltipSide: "left",
+      onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('antv-dagre'),
+    },
+
+
   ]
   useEffect(() => {
     // console.log("theme updated====== ", theme, canvasManagerRef.current, isReady)
