@@ -49,12 +49,13 @@ import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph
 import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
 import NodeDetail from '@/ui/components/node-detail';
 
-register(ExtensionCategory.BEHAVIOR, 'node-tooltip', NodeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'edge-tooltip', EdgeTooltipBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'node-context-menu', NodeContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'edge-context-menu', EdgeContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'canvas-context-menu', CanvasContextMenuBehavior, true);
-register(ExtensionCategory.BEHAVIOR, 'property-viewer', PropertyViewerBehavior, true);
+
+register(ExtensionCategory.BEHAVIOR, NODE_TOOLTIP_BEHAVIOR.type, NodeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, EDGE_TOOLTIP_BEHAVIOR.type, EdgeTooltipBehavior, true);
+register(ExtensionCategory.BEHAVIOR, NODE_CONTEXT_MENU_BEHAVIOR.type, NodeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, EDGE_CONTEXT_MENU_BEHAVIOR.type, EdgeContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, CANVAS_CONTEXT_MENU_BEHAVIOR.type, CanvasContextMenuBehavior, true);
+register(ExtensionCategory.BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR.type, PropertyViewerBehavior, true);
 
 
 const defaultOptions: CanvasGraphOptions = {
