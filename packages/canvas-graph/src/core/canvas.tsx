@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { CanvasGraphProps } from '../types';
 import { CanvasManager } from '../canvas/manager';
@@ -8,33 +8,26 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
   const canvasManagerRef = useRef<CanvasManager | null>(null);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("CanvasGraph useEffect cleanup");
+  //     canvasManagerRef.current?.destroy();
+  //   }
+  // }, [])
 
-    return () => {
-      console.log("CanvasGraph useEffect cleanup");
-      canvasManagerRef.current?.destroy();
-    }
-  }, [])
+  console.log("CanvasGraph props", props)
+  console.log("CanvasGraph graph", canvasManagerRef.current)
+  // useEffect(() => {
+  //   const disableRightClick = (e: MouseEvent) => e.preventDefault();
+  //   document.addEventListener("contextmenu", disableRightClick);
 
-  console.log("CanvasGraph -> props", props)
-  console.log("CanvasGraph -> graph", canvasManagerRef.current)
-
-
-
-  useEffect(() => {
-    const disableRightClick = (e: MouseEvent) => e.preventDefault();
-    document.addEventListener("contextmenu", disableRightClick);
-
-    return () => {
-      document.removeEventListener("contextmenu", disableRightClick);
-    };
-  }, []);
-
-
+  //   return () => {
+  //     document.removeEventListener("contextmenu", disableRightClick);
+  //   };
+  // }, []);
   console.log("CanvasGraph.props", props)
   const propsSizeInBytes = new Blob([JSON.stringify(props)]).size;
   console.log(`CanvasGraph.props Props size: ${propsSizeInBytes} bytes`);
-
   return (
     <Graphin
       className={props.className || ' overflow-none'}

@@ -24,11 +24,11 @@ export class PropertyViewerBehavior extends BaseBehavior<PropertyViewerBehaviorO
 
   static defaultOptions: Partial<PropertyViewerBehaviorOptions> = {
     className: '',
-    onNodeHover: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeHover not set") },
-    onNodeClick: (event: IPointerEvent, data: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeClick not set") },
+    onNodeHover: (_: IPointerEvent, __: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeHover not set") },
+    onNodeClick: (_: IPointerEvent, __: ICanvasNode) => { console.log("PropertyViewerBehavior.onNodeClick not set") },
 
-    onEdgeHover: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeHover not set") },
-    onEdgeClick: (event: IPointerEvent, data: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeClick not set") },
+    onEdgeHover: (_: IPointerEvent, __: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeHover not set") },
+    onEdgeClick: (_: IPointerEvent, __: ICanvasEdge) => { console.log("PropertyViewerBehavior.onEdgeClick not set") },
 
     onClose: () => { console.log("PropertyViewerBehavior.onClose not set") }
 

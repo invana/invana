@@ -22,8 +22,8 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
 
   static defaultOptions: Partial<EdgeContextMenuOptions> = {
     className: '',
-    createMenuItemsFn: (event: IPointerEvent) => [],
-    createMainMenuItemsFn: (event: IPointerEvent) => []
+    createMenuItemsFn: (_: IPointerEvent) => [],
+    createMainMenuItemsFn: (_: IPointerEvent) => []
   };
 
   constructor(context: RuntimeContext, options: EdgeContextMenuOptions) {

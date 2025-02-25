@@ -44,8 +44,8 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
   static defaultOptions: Partial<NodeContextMenuOptions> = {
     className: '',
-    createMenuItemsFn: (event: IPointerEvent) => [],
-    createMainMenuItemsFn: (event: IPointerEvent) => []
+    createMenuItemsFn: (_: IPointerEvent) => [],
+    createMainMenuItemsFn: (_: IPointerEvent) => []
   };
 
   constructor(context: RuntimeContext, options: NodeContextMenuOptions) {
