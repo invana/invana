@@ -3,15 +3,39 @@ import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
-import { CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 import React from 'react';
 import { CanvasGraphNode } from '@invana/canvas-graph/types';
 
 
+
+
+/*
+
+      {
+        ...CANVAS_CONTEXT_MENU_BEHAVIOR,
+        menuItems: [
+          {
+            id: 'files',
+            label: 'Display Settings',
+            icon: FolderOpen,
+            shortcut: '⌘F'
+          },
+          {
+            id: 'Run Analysis',
+            label: 'Run Analysis',
+            icon: Settings,
+            shortcut: '⌘,'
+          }
+        ]
+      }
+*/
+
 export interface NodeContextMenuOptions extends BaseBehaviorOptions {
   className?: string;
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
+  createMainMenuItemsFn?(event: IPointerEvent): MenuItem[];
+  createMenuItemsFn?(event: IPointerEvent): MenuItem[];
 }
 
 export class NodeContextMenuBehavior extends BaseBehavior {
@@ -21,7 +45,9 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
   static defaultOptions: Partial<NodeContextMenuOptions> = {
     className: '',
-    menuItems: []
+    menuItems: [],
+    createMenuItemsFn: (event: IPointerEvent) => [],
+    createMainMenuItemsFn: (event: IPointerEvent) => []
   };
 
   constructor(context: RuntimeContext, options: NodeContextMenuOptions) {
@@ -101,27 +127,37 @@ export class NodeContextMenuBehavior extends BaseBehavior {
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
-    const { menuItems } = this.options;
+    const { createMenuItemsFn, createMainMenuItemsFn } = this.options;
+    const menuItems = this.options.createMenuItemsFn ? createMenuItemsFn(event) : this.options.menuItems;
+    const mainMenuItems = createMainMenuItemsFn(event)
+
+    console.log("====mainMenuItems", mainMenuItems)
+
 
     const component: React.ReactNode = <NodeCard node={nodeData} extra={
       <div>
-        <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
-
-          <ButtonWithTooltip
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-none "
-            tooltip={<p>{"Focus Node"}</p>}
-            onClick={() => {
-              graph.focusElement(nodeData.id)
-              this.hideContainer()
-            }}
-          >
-            <CircleDot className="h-4 w-4" />
-          </ButtonWithTooltip>
-          <Separator orientation="vertical" className='h-6' />
-
-          <ButtonWithTooltip
+        {mainMenuItems.length > 0 &&
+          <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
+            {
+              mainMenuItems.map((menuItem: MenuItem, index: number) => {
+                return <>
+                  <ButtonWithTooltip
+                    variant="ghost"
+                    size="icon-sm"
+                    className="rounded-none  active:bg-gray:500"
+                    tooltip={<p>{menuItem.label}</p>}
+                    onClick={() => {
+                      menuItem?.onClick?.()
+                      this.hideContainer()
+                    }}
+                  >
+                    {menuItem.icon && <menuItem.icon className="h-4 w-4" />}
+                    {/* {menuItem.label} */}
+                  </ButtonWithTooltip>
+                  {index !== mainMenuItems.length - 1 && <Separator orientation="vertical" className='h-6' />}
+                </>
+              })}
+            {/* <ButtonWithTooltip
             variant="ghost"
             size="icon-sm"
             className="rounded-none  active:bg-gray:500"
@@ -161,8 +197,9 @@ export class NodeContextMenuBehavior extends BaseBehavior {
             tooltip={<p>{"Node Display settings"}</p>}
           >
             <Monitor className="h-4 w-4" />
-          </ButtonWithTooltip>
-        </div>
+          </ButtonWithTooltip> */}
+          </div>
+        }
         <NestedMenu
           className='rounded-none w-[260px] shadow-none p-0 border-none'
           menuItems={menuItems}

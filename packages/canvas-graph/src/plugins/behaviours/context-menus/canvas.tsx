@@ -2,7 +2,6 @@ import { BaseBehavior, CanvasEvent } from '@antv/g6';
 import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g6';
 import { createRoot, Root } from 'react-dom/client';
 import { MenuItem, NestedMenu } from '@invana/ui';
-import { FolderOpen, Settings } from 'lucide-react';
 import React from 'react';
 
 

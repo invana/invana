@@ -4,7 +4,7 @@ import { ICanvasEdge, ICanvasNode, IProperties } from '@invana/data-store';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
 import { EdgeCard, NodeCard } from '@invana/ui';
-import { CanvasGraphEdge, CanvasGraphNode } from '../types';
+import { CanvasGraphEdge, CanvasGraphNode } from '@invana/canvas-graph/types';
 
 
 export interface PropertyViewerBehaviorOptions extends BaseBehaviorOptions {

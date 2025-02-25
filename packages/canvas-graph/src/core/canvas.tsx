@@ -22,7 +22,7 @@ const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
 
   useEffect(() => {
-    const disableRightClick = (e) => e.preventDefault();
+    const disableRightClick = (e: MouseEvent) => e.preventDefault();
     document.addEventListener("contextmenu", disableRightClick);
 
     return () => {

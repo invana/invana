@@ -77,7 +77,7 @@ export const FlightData: Story = {
     },
     initData: flightData,
     containerStyle: defaultContainerStyle,
-    showHeader: true
+    // showHeader: true
   },
 };
 

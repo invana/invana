@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Home, Compass, Book } from 'lucide-react';
 import { DefaultV1Layout } from '@/themes/layout-v1/layout';
-import { Button, LeftNavItem } from '@invana/ui';
+import { Button } from '@invana/ui';
+import { LeftNavItem } from '@/components/theme/left-nav-items';
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
