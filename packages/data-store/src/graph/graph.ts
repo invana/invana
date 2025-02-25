@@ -64,7 +64,7 @@ export class GraphStore extends GraphDataCRUD {
 
       if (!this.edgeSchemas.has(edgeSchemaName)) {
         this.edgeSchemas.set(edgeSchemaName, {
-          name: edgeSchemaName,
+          name: edgeType,
           properties: [],
           source: sourceNodeType,
           target: targetNodeType,
