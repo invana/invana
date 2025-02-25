@@ -33,9 +33,8 @@ import { CanvasGraphNode } from '@invana/canvas-graph/types';
 
 export interface NodeContextMenuOptions extends BaseBehaviorOptions {
   className?: string;
-  menuItems?: MenuItem[];
   createMainMenuItemsFn?(event: IPointerEvent): MenuItem[];
-  createMenuItemsFn?(event: IPointerEvent): MenuItem[];
+  createMenuItemsFn(event: IPointerEvent): MenuItem[];
 }
 
 export class NodeContextMenuBehavior extends BaseBehavior {
@@ -45,7 +44,6 @@ export class NodeContextMenuBehavior extends BaseBehavior {
 
   static defaultOptions: Partial<NodeContextMenuOptions> = {
     className: '',
-    menuItems: [],
     createMenuItemsFn: (event: IPointerEvent) => [],
     createMainMenuItemsFn: (event: IPointerEvent) => []
   };
@@ -128,43 +126,43 @@ export class NodeContextMenuBehavior extends BaseBehavior {
       properties: node.data?.properties as IProperties
     }
     const { createMenuItemsFn, createMainMenuItemsFn } = this.options;
-    const menuItems = this.options.createMenuItemsFn ? createMenuItemsFn(event) : this.options.menuItems;
+    const menuItems = createMenuItemsFn(event)
     const mainMenuItems = createMainMenuItemsFn(event)
 
-    console.log("====mainMenuItems", mainMenuItems)
 
-
-    const component: React.ReactNode = <NodeCard node={nodeData} extra={
-      <div>
-        {mainMenuItems.length > 0 &&
-          <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
-            {
-              mainMenuItems.map((menuItem: MenuItem, index: number) => {
-                return <>
-                  <ButtonWithTooltip
-                    variant="ghost"
-                    size="icon-sm"
-                    className="rounded-none  active:bg-gray:500"
-                    tooltip={<p>{menuItem.label}</p>}
-                    onClick={() => {
-                      menuItem?.onClick?.()
-                      this.hideContainer()
-                    }}
-                  >
-                    {menuItem.icon && <menuItem.icon className="h-4 w-4" />}
-                    {/* {menuItem.label} */}
-                  </ButtonWithTooltip>
-                  {index !== mainMenuItems.length - 1 && <Separator orientation="vertical" className='h-6' />}
-                </>
-              })}
-          </div>
-        }
-        <NestedMenu
-          className='rounded-none w-[260px] shadow-none p-0 border-none'
-          menuItems={menuItems}
-        />
-      </div>
-    } />
+    const component: React.ReactNode = <NodeCard
+      node={nodeData}
+      extra={
+        <div>
+          {mainMenuItems.length > 0 &&
+            <div className='px-3 mb-3 mt-2 h-5 flex items-center justify-between text-sm'>
+              {
+                mainMenuItems.map((menuItem: MenuItem, index: number) => {
+                  return <>
+                    <ButtonWithTooltip
+                      variant="ghost"
+                      size="icon-sm"
+                      className="rounded-none  active:bg-gray:500"
+                      tooltip={<p>{menuItem.label}</p>}
+                      onClick={() => {
+                        menuItem?.onClick?.()
+                        this.hideContainer()
+                      }}
+                    >
+                      {menuItem.icon && <menuItem.icon className="h-4 w-4" />}
+                      {/* {menuItem.label} */}
+                    </ButtonWithTooltip>
+                    {index !== mainMenuItems.length - 1 && <Separator orientation="vertical" className='h-6' />}
+                  </>
+                })}
+            </div>
+          }
+          <NestedMenu
+            className='rounded-none w-[260px] shadow-none p-0 border-none'
+            menuItems={menuItems}
+          />
+        </div>
+      } />
 
     this.root.render(component)
     this.showContainer(event);

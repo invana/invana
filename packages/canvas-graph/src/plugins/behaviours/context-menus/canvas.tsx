@@ -10,7 +10,6 @@ export interface CanvasContextMenuOptions extends BaseBehaviorOptions {
   menuItems: MenuItem[];
 }
 
-
 export class CanvasContextMenuBehavior extends BaseBehavior {
 
   container!: HTMLElement;

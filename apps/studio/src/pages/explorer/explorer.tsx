@@ -43,7 +43,7 @@ import { mergeDeep } from '@invana/data-store';
 import { Project } from '@/store/projectStore';
 import WelcomeView from '@/ui/components/welcome-view';
 import { useMemo } from 'react';
-import { CanvasGraphNode, CanvasGraphOptions } from '@invana/canvas-graph/types';
+import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions } from '@invana/canvas-graph/types';
 import { CanvasManager } from '@invana/canvas-graph/canvas/manager';
 import { DEFAULT_STYLE_OPTIONS, MODEL_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 import WorkspaceSwitcher from '@/ui/components/workspace-switcher';
@@ -88,6 +88,65 @@ const ExplorerPage: React.FC = () => {
     const graph = canvasManagerRef.current?.getGraph() as Graph;
     const nodeId = ((event.target as unknown) as HTMLElement).id as string;
     const node = graph.getNodeData(nodeId) as (CanvasGraphNode);
+    return [
+      {
+        id: 'files',
+        label: 'Incomin custom',
+        icon: FolderOpen,
+        shortcut: '⌘F',
+        children: [
+          {
+            id: 'shared',
+            label: 'Shared Files',
+            icon: FolderOpen,
+            shortcut: '⌘S',
+          },
+          {
+            id: 'recent',
+            label: 'Recent Files',
+            icon: FileText,
+            shortcut: '⌘R',
+          }
+        ]
+      },
+      {
+        id: 'settings',
+        label: 'OutGoing',
+        icon: Settings,
+        shortcut: '⌘,',
+        children: [
+
+          {
+            id: 'notifications',
+            label: 'Notifications',
+            icon: Bell,
+            shortcut: '⌘N'
+          }
+        ]
+      },
+      {
+        id: 'messages',
+        label: 'graph algorithms',
+        icon: Mail,
+        shortcut: '⌘M',
+        children: [
+          {
+            id: 'shared',
+            label: 'Shared Files',
+            icon: FolderOpen,
+            shortcut: '⌘S',
+          }
+        ]
+      }
+    ]
+  }
+
+
+
+  const createEdgeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
+    const graph = canvasManagerRef.current?.getGraph() as Graph;
+    const edgeId = ((event.target as unknown) as HTMLElement).id as string;
+    const edge = graph.getEdgeData(edgeId) as (CanvasGraphEdge);
     return [
       {
         id: 'files',
@@ -214,57 +273,7 @@ const ExplorerPage: React.FC = () => {
       },
       {
         ...EDGE_CONTEXT_MENU_BEHAVIOR,
-        menuItems: [
-          {
-            id: 'files',
-            label: 'Incoming2',
-            icon: FolderOpen,
-            shortcut: '⌘F',
-            children: [
-              {
-                id: 'shared',
-                label: 'Shared Files',
-                icon: FolderOpen,
-                shortcut: '⌘S',
-              },
-              {
-                id: 'recent',
-                label: 'Recent Files',
-                icon: FileText,
-                shortcut: '⌘R',
-              }
-            ]
-          },
-          {
-            id: 'settings',
-            label: 'OutGoing',
-            icon: Settings,
-            shortcut: '⌘,',
-            children: [
-
-              {
-                id: 'notifications',
-                label: 'Notifications',
-                icon: Bell,
-                shortcut: '⌘N'
-              }
-            ]
-          },
-          {
-            id: 'messages',
-            label: 'graph algorithms',
-            icon: Mail,
-            shortcut: '⌘M',
-            children: [
-              {
-                id: 'shared',
-                label: 'Shared Files',
-                icon: FolderOpen,
-                shortcut: '⌘S',
-              }
-            ]
-          }
-        ]
+        createMenuItemsFn: createEdgeContextMenuItems,
       },
       {
         ...CANVAS_CONTEXT_MENU_BEHAVIOR,
