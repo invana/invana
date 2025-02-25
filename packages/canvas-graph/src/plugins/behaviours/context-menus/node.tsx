@@ -157,47 +157,6 @@ export class NodeContextMenuBehavior extends BaseBehavior {
                   {index !== mainMenuItems.length - 1 && <Separator orientation="vertical" className='h-6' />}
                 </>
               })}
-            {/* <ButtonWithTooltip
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-none  active:bg-gray:500"
-            tooltip={<p>{"Start a query"}</p>}
-          >
-            <Terminal className="h-4 w-4" />
-          </ButtonWithTooltip>
-
-          <Separator orientation="vertical" className='h-6' />
-
-          <ButtonWithTooltip
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-none  active:bg-gray:500"
-            tooltip={<p>{"Tag this Node"}</p>}
-          >
-            <Tag className="h-4 w-4" />
-          </ButtonWithTooltip>
-
-          <Separator orientation="vertical" className='h-6' />
-
-          <ButtonWithTooltip
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-none  active:bg-gray:500"
-            tooltip={<p>{"Lock Node"}</p>}
-          >
-            <Lock className="h-4 w-4" />
-          </ButtonWithTooltip>
-
-          <Separator orientation="vertical" className='h-6' />
-
-          <ButtonWithTooltip
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-none   active:bg-gray:500"
-            tooltip={<p>{"Node Display settings"}</p>}
-          >
-            <Monitor className="h-4 w-4" />
-          </ButtonWithTooltip> */}
           </div>
         }
         <NestedMenu
@@ -211,18 +170,6 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     this.showContainer(event);
     this.hideCanvasContextMenu()
   }
-
-
-  // onNodeMouseLeave(event: IPointerEvent) {
-  //   // const { graph } = this.context;
-  //   this.hideContainer();
-  // }
-
-
-
-  // onMouseMove(event: IPointerEvent) {
-  //   this.showContainer(event);
-  // }
 
   destroy() {
     this.root.unmount();
