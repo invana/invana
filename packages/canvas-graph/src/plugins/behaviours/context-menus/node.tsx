@@ -3,7 +3,7 @@ import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasNode, IProperties } from '@invana/data-store';
 import { ButtonWithTooltip, MenuItem, NestedMenu, Separator } from '@invana/ui';
-import { FolderOpen, Settings, Bell, Mail, FileText, CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
+import { CircleDot, Terminal, Lock, Monitor, Tag } from 'lucide-react';
 import { NodeCard } from '@invana/ui';
 import React from 'react';
 import { CanvasGraphNode } from '@invana/canvas-graph/types';
@@ -14,65 +14,18 @@ export interface NodeContextMenuOptions extends BaseBehaviorOptions {
   menuItems: MenuItem[];
 }
 
-export const menuItems: MenuItem[] = [
-  {
-    id: 'files',
-    label: 'Incoming',
-    icon: FolderOpen,
-    shortcut: '⌘F',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      },
-      {
-        id: 'recent',
-        label: 'Recent Files',
-        icon: FileText,
-        shortcut: '⌘R',
-      }
-    ]
-  },
-  {
-    id: 'settings',
-    label: 'OutGoing',
-    icon: Settings,
-    shortcut: '⌘,',
-    children: [
-
-      {
-        id: 'notifications',
-        label: 'Notifications',
-        icon: Bell,
-        shortcut: '⌘N'
-      }
-    ]
-  },
-  {
-    id: 'messages',
-    label: 'graph algorithms',
-    icon: Mail,
-    shortcut: '⌘M',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      }
-    ]
-  }
-]
-
 export class NodeContextMenuBehavior extends BaseBehavior {
 
   container!: HTMLElement;
   root!: Root
 
+  static defaultOptions: Partial<NodeContextMenuOptions> = {
+    className: '',
+    menuItems: []
+  };
+
   constructor(context: RuntimeContext, options: NodeContextMenuOptions) {
-    super(context, options);
+    super(context, Object.assign({}, NodeContextMenuBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
@@ -93,7 +46,6 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     document.body.append(this.container);
   }
 
-
   onPointerMover = (_: IPointerEvent) => {
     this.hideContainer();
   }
@@ -105,7 +57,6 @@ export class NodeContextMenuBehavior extends BaseBehavior {
     graph.on(NodeEvent.POINTER_LEAVE, () => this.hideContainer());
     graph.on(NodeEvent.POINTER_MOVE, this.onPointerMover.bind(this));
   }
-
 
   unbindEvents() {
     const { graph } = this.context;
@@ -150,6 +101,7 @@ export class NodeContextMenuBehavior extends BaseBehavior {
       type: node.data?.type ?? '',
       properties: node.data?.properties as IProperties
     }
+    const { menuItems } = this.options;
 
     const component: React.ReactNode = <NodeCard node={nodeData} extra={
       <div>

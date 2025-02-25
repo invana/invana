@@ -3,7 +3,6 @@ import type { BaseBehaviorOptions, IPointerEvent, RuntimeContext } from '@antv/g
 import { createRoot, Root } from 'react-dom/client';
 import { ICanvasEdge, IProperties } from '@invana/data-store';
 import { MenuItem, NestedMenu } from '@invana/ui';
-import { FolderOpen, Settings, Users, Shield, Bell, Mail, FileText } from 'lucide-react';
 import { EdgeCard } from '@invana/ui';
 import React from 'react';
 import { CanvasGraphEdge } from '@invana/canvas-graph/types';
@@ -14,83 +13,19 @@ export interface EdgeContextMenuOptions extends BaseBehaviorOptions {
   menuItems: MenuItem[];
 }
 
-export const menuItems: MenuItem[] = [
-  {
-    id: 'files',
-    label: 'Incoming',
-    icon: FolderOpen,
-    shortcut: '⌘F',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      },
-      {
-        id: 'recent',
-        label: 'Recent Files',
-        icon: FileText,
-        shortcut: '⌘R',
-      }
-    ]
-  },
-  {
-    id: 'settings',
-    label: 'OutGoing',
-    icon: Settings,
-    shortcut: '⌘,',
-    children: [
-      {
-        id: 'account',
-        label: 'Account Settings',
-        icon: Users,
-        children: [
-          {
-            id: 'profile',
-            label: 'Profile',
-            icon: Users,
-            shortcut: '⌘P'
-          },
-          {
-            id: 'security',
-            label: 'Security',
-            icon: Shield,
-            shortcut: '⌘L'
-          }
-        ]
-      },
-      {
-        id: 'notifications',
-        label: 'Notifications',
-        icon: Bell,
-        shortcut: '⌘N'
-      }
-    ]
-  },
-  {
-    id: 'messages',
-    label: 'graph algorithms',
-    icon: Mail,
-    shortcut: '⌘M',
-    children: [
-      {
-        id: 'shared',
-        label: 'Shared Files',
-        icon: FolderOpen,
-        shortcut: '⌘S',
-      }
-    ]
-  }
-]
 
 export class EdgeContextMenuBehavior extends BaseBehavior {
 
   container!: HTMLElement;
   root!: Root
 
+  static defaultOptions: Partial<EdgeContextMenuOptions> = {
+    className: '',
+    menuItems: []
+  };
+
   constructor(context: RuntimeContext, options: EdgeContextMenuOptions) {
-    super(context, options);
+    super(context, Object.assign({}, EdgeContextMenuBehavior.defaultOptions, options));
     this.createContainer();
     this.root = createRoot(this.container);
     this.bindEvents();
@@ -170,6 +105,7 @@ export class EdgeContextMenuBehavior extends BaseBehavior {
       target: edge.target,
       properties: edge.data?.properties as IProperties
     }
+    const { menuItems } = this.options;
 
     const component: React.ReactNode = <EdgeCard
       edge={edgeData}

@@ -2,8 +2,8 @@ import { useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
-  Activity, Book, Box, Brush, Circle, CircleDashed, Eraser, LassoSelect,
-  LayoutGrid, LifeBuoy, Lock, Menu, MonitorCog, Network, RefreshCw, Share2,
+  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, Eraser, FileText, FolderOpen, LassoSelect,
+  LayoutGrid, LifeBuoy, Lock, Mail, Menu, MonitorCog, Network, RefreshCw, Settings, Share2,
   Shrink, SquareMenu, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
@@ -100,9 +100,131 @@ const ExplorerPage: React.FC = () => {
         ...EDGE_TOOLTIP_BEHAVIOR,
         showRightClickHelpText: true
       },
-      NODE_CONTEXT_MENU_BEHAVIOR,
-      EDGE_CONTEXT_MENU_BEHAVIOR,
-      CANVAS_CONTEXT_MENU_BEHAVIOR,
+      {
+        ...NODE_CONTEXT_MENU_BEHAVIOR,
+        menuItems: [
+          {
+            id: 'files',
+            label: 'Incoming',
+            icon: FolderOpen,
+            shortcut: '⌘F',
+            children: [
+              {
+                id: 'shared',
+                label: 'Shared Files',
+                icon: FolderOpen,
+                shortcut: '⌘S',
+              },
+              {
+                id: 'recent',
+                label: 'Recent Files',
+                icon: FileText,
+                shortcut: '⌘R',
+              }
+            ]
+          },
+          {
+            id: 'settings',
+            label: 'OutGoing',
+            icon: Settings,
+            shortcut: '⌘,',
+            children: [
+
+              {
+                id: 'notifications',
+                label: 'Notifications',
+                icon: Bell,
+                shortcut: '⌘N'
+              }
+            ]
+          },
+          {
+            id: 'messages',
+            label: 'graph algorithms',
+            icon: Mail,
+            shortcut: '⌘M',
+            children: [
+              {
+                id: 'shared',
+                label: 'Shared Files',
+                icon: FolderOpen,
+                shortcut: '⌘S',
+              }
+            ]
+          }
+        ]
+      },
+      {
+        ...EDGE_CONTEXT_MENU_BEHAVIOR,
+        menuItems: [
+          {
+            id: 'files',
+            label: 'Incoming2',
+            icon: FolderOpen,
+            shortcut: '⌘F',
+            children: [
+              {
+                id: 'shared',
+                label: 'Shared Files',
+                icon: FolderOpen,
+                shortcut: '⌘S',
+              },
+              {
+                id: 'recent',
+                label: 'Recent Files',
+                icon: FileText,
+                shortcut: '⌘R',
+              }
+            ]
+          },
+          {
+            id: 'settings',
+            label: 'OutGoing',
+            icon: Settings,
+            shortcut: '⌘,',
+            children: [
+
+              {
+                id: 'notifications',
+                label: 'Notifications',
+                icon: Bell,
+                shortcut: '⌘N'
+              }
+            ]
+          },
+          {
+            id: 'messages',
+            label: 'graph algorithms',
+            icon: Mail,
+            shortcut: '⌘M',
+            children: [
+              {
+                id: 'shared',
+                label: 'Shared Files',
+                icon: FolderOpen,
+                shortcut: '⌘S',
+              }
+            ]
+          }
+        ]
+      },
+      {
+        ...CANVAS_CONTEXT_MENU_BEHAVIOR,
+        menuItems: [
+          {
+            id: 'files',
+            label: 'Display Settings',
+            icon: FolderOpen,
+            shortcut: '⌘F'
+          },
+          {
+            id: 'Run Analysis',
+            label: 'Run Analysis',
+            icon: Settings,
+            shortcut: '⌘,'
+          }
+        ]
+      },
       {
         ...PROPERTY_VIEWER_BEHAVIOR,
         className: 'top-[44px] right-[0px] w-[320px] h-[calc(100vh-72px)]'
