@@ -220,7 +220,8 @@ const ExplorerPage: React.FC = () => {
         label: 'Start a query',
         icon: Terminal,
         onClick: () => {
-          alert("Start a query")
+          // alert("Start a query")
+          setRightContentName('query')
         }
       },
       {
