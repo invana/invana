@@ -37,9 +37,9 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
         <Copy className="mr-1 h-4" />{data.id}</p>
       <h1 className='text-2xl mt-2 font-semibold'>{data.label}</h1>
       <div className="flex items-center space-x-4">
-        <p className="mt-2 text-sm">
-          <Badge >{data.type}</Badge>
-        </p>
+        <div className="mt-2 text-sm">
+          <Badge>{data.type}</Badge>
+        </div>
         {/* <p className='mt-2 text-zinc-500 dark:text-zinc-400 text-sm'>
           Updated at {new Date().toLocaleDateString()}
         </p> */}
@@ -53,13 +53,12 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       </div>
 
       <div className="grid grid-cols-1 gap-4  pb-3 sm:grid-cols-1">
-
         {Object.entries(data?.properties || {}).map(([key, value]) => (
           <div key={key} className='border-b pb-2'>
             <label className='font-bold text-sm' htmlFor={key} >
               {key}
             </label>
-            {key === 'profilePic' ? <img src={String(value)} alt="Profile" className="w-20 h-20  " /> : <div>{value}</div>}
+            {key === 'profilePic' ? <img src={String(value)} alt="Profile" className="w-20 h-20  " /> : <div>{String(value)}</div>}
           </div>
         ))}
       </div>

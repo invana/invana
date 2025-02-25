@@ -34,7 +34,7 @@ export const mergeDeep = (target: any, source: any): any => {
     const sourceValue = source[key];
 
     if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-      target[key] = targetValue.concat(sourceValue);
+      target[key] = Array.from(new Set(targetValue.concat(sourceValue)));
     } else if (isObject(targetValue) && isObject(sourceValue)) {
       target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
     } else {
