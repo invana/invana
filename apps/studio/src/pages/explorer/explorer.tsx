@@ -2,9 +2,9 @@ import { MenuItem, useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
-  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeClosedIcon, EyeOff, FileText, FolderOpen, LassoSelect,
+  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeOff, FileText, FolderOpen, LassoSelect,
   LayoutGrid, LifeBuoy, Lock, Mail, Menu, MonitorCog, Network, RefreshCw, Settings, Share2,
-  Shrink, SquareMenu, Tag, Terminal, Type, ZoomIn, ZoomOut
+  Shrink, Tag, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -59,25 +59,15 @@ register(ExtensionCategory.BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR.type, PropertyView
 
 
 
-
 const ExplorerPage: React.FC = () => {
   const { graphId } = useParams();
-
-
-
-  console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
   const modelCanvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore();
 
-
   const [propertyViewerData, setPropertyViewerData] = useState<ICanvasNode | ICanvasEdge | null>(null)
-
-
   const projectData: Project | undefined = projectsListDataSet.find((project) => project.id === graphId)
-
-  console.log("projectData", projectData)
   const {
     rightContentName,
     setRightContentName,
@@ -85,7 +75,6 @@ const ExplorerPage: React.FC = () => {
     toggleRightContent,
     toggleBottomContent,
   } = useDefaultV2LayoutStore()
-
 
   const createNodeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
     const graph = canvasManagerRef.current?.getGraph() as Graph;
@@ -143,8 +132,6 @@ const ExplorerPage: React.FC = () => {
       }
     ]
   }
-
-
 
   const createEdgeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
     const graph = canvasManagerRef.current?.getGraph() as Graph;
