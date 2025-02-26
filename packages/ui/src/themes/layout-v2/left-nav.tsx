@@ -42,18 +42,15 @@ export const LeftNav: React.FC<LeftNavProps> = ({ showToggleTheme = false, class
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
-                className="flex px-2 py-2 items-center 
-                justify-center 
-                 rounded-md text-muted-foreground transition-colors 
-                 hover:bg-accent hover:text-accent-foreground"
+                size="nav-icon"
+                className="mt-2"
                 onClick={toggleTheme}
               >
                 {
                   theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
+                    <Sun className="h-5 w-5  " />
                   ) : (
-                    <Moon className="h-5 w-5" />
+                    <Moon className="h-5 w-5 " />
                   )
                 }
               </Button>

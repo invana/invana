@@ -394,7 +394,7 @@ const ExplorerPage: React.FC = () => {
       icon: Box,
       name: "Graph Information",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
       tooltipSide: "right",
       onClick: () => {
@@ -405,7 +405,7 @@ const ExplorerPage: React.FC = () => {
       icon: Network,
       name: "Graph Model",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -416,7 +416,7 @@ const ExplorerPage: React.FC = () => {
     {
       name: "Query",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -429,7 +429,7 @@ const ExplorerPage: React.FC = () => {
       icon: Book,
       name: "Documentation",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -442,7 +442,7 @@ const ExplorerPage: React.FC = () => {
     {
       name: "Activity History",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -454,7 +454,7 @@ const ExplorerPage: React.FC = () => {
     {
       name: "Display Settings",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       href: "#",
@@ -465,7 +465,7 @@ const ExplorerPage: React.FC = () => {
       icon: Circle,
       name: "Node Detail",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -475,7 +475,7 @@ const ExplorerPage: React.FC = () => {
       icon: Circle,
       name: "Insights",
       className: "py-3 my-2 px-3",
-      iconClassName: "w-5 h-5",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
