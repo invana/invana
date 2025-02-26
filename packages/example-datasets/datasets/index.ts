@@ -5,3 +5,4 @@ export * from './process-mining-simple'
 export * from './process-mining-combo'
 export * from './modelling-methods'
 export * from './usersData'
+export * from './pubmedExampleDataset1';

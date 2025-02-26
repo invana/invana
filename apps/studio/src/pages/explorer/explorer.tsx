@@ -2,9 +2,9 @@ import { MenuItem, useThemeStore } from '@invana/ui';
 import { DefaultV2Layout } from '@invana/ui/themes/layout-v2/layout';
 import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
-  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeClosedIcon, EyeOff, FileText, FolderOpen, LassoSelect,
+  Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeOff, FileText, FolderOpen, LassoSelect,
   LayoutGrid, LifeBuoy, Lock, Mail, Menu, MonitorCog, Network, RefreshCw, Settings, Share2,
-  Shrink, SquareMenu, Tag, Terminal, Type, ZoomIn, ZoomOut
+  Shrink, Slash, Tag, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -59,25 +59,15 @@ register(ExtensionCategory.BEHAVIOR, PROPERTY_VIEWER_BEHAVIOR.type, PropertyView
 
 
 
-
 const ExplorerPage: React.FC = () => {
   const { graphId } = useParams();
-
-
-
-  console.log("=====graphId", graphId)
   const [isReady, setIsReady] = useState(false);
   const canvasManagerRef = useRef<CanvasManager | null>(null);
   const modelCanvasManagerRef = useRef<CanvasManager | null>(null);
   const { theme, } = useThemeStore();
 
-
   const [propertyViewerData, setPropertyViewerData] = useState<ICanvasNode | ICanvasEdge | null>(null)
-
-
   const projectData: Project | undefined = projectsListDataSet.find((project) => project.id === graphId)
-
-  console.log("projectData", projectData)
   const {
     rightContentName,
     setRightContentName,
@@ -85,7 +75,6 @@ const ExplorerPage: React.FC = () => {
     toggleRightContent,
     toggleBottomContent,
   } = useDefaultV2LayoutStore()
-
 
   const createNodeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
     const graph = canvasManagerRef.current?.getGraph() as Graph;
@@ -143,8 +132,6 @@ const ExplorerPage: React.FC = () => {
       }
     ]
   }
-
-
 
   const createEdgeContextMenuItems = (event: IPointerEvent): MenuItem[] => {
     const graph = canvasManagerRef.current?.getGraph() as Graph;
@@ -406,8 +393,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Box,
       name: "Graph Information",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
       tooltipSide: "right",
       onClick: () => {
@@ -417,8 +404,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Network,
       name: "Graph Model",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -428,8 +415,8 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Query",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -441,8 +428,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Book,
       name: "Documentation",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -454,8 +441,8 @@ const ExplorerPage: React.FC = () => {
     // { name: "Data Management", href: "/connections", icon: Database },
     {
       name: "Activity History",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -466,8 +453,8 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Display Settings",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       href: "#",
@@ -477,8 +464,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Circle,
       name: "Node Detail",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -487,8 +474,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Circle,
       name: "Insights",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -502,7 +489,7 @@ const ExplorerPage: React.FC = () => {
       icon: LassoSelect,
       name: "Lasso select",
       className: 'my-1 mt-5',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
@@ -513,7 +500,7 @@ const ExplorerPage: React.FC = () => {
       icon: Brush,
       name: "Brush",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
@@ -525,7 +512,7 @@ const ExplorerPage: React.FC = () => {
       name: "Add Comment",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -537,7 +524,7 @@ const ExplorerPage: React.FC = () => {
       icon: Eraser,
       name: "Eraser",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.eraseCanvas(),
     },
@@ -545,7 +532,7 @@ const ExplorerPage: React.FC = () => {
       icon: RefreshCw,
       name: "Re draw",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.reDraw(),
     },
@@ -553,7 +540,7 @@ const ExplorerPage: React.FC = () => {
       icon: Shrink,
       name: "Fit view ",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.fitView(),
     },
@@ -562,7 +549,7 @@ const ExplorerPage: React.FC = () => {
       name: "Lock",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -573,7 +560,7 @@ const ExplorerPage: React.FC = () => {
       icon: ZoomIn,
       name: "Zoom In",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "right",
       onClick: () => canvasManagerRef.current?.canvas_utils.zoomIn(),
     },
@@ -582,7 +569,7 @@ const ExplorerPage: React.FC = () => {
       name: "Zoom Out",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "right",
       onClick: () => canvasManagerRef.current?.canvas_utils.zoomOut(),
     }
@@ -594,7 +581,7 @@ const ExplorerPage: React.FC = () => {
       icon: Share2,
       name: "D3 Force layout",
       className: 'my-1 mt-3',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('d3-force'),
     },
@@ -602,7 +589,7 @@ const ExplorerPage: React.FC = () => {
       icon: CircleDashed,
       name: "Circular Layout",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('circular'),
     },
@@ -610,7 +597,7 @@ const ExplorerPage: React.FC = () => {
       icon: LayoutGrid,
       name: "Grid Layout",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('grid'),
     },
@@ -619,7 +606,7 @@ const ExplorerPage: React.FC = () => {
       name: "Dagre layout",
       showSeperator: true,
       className: 'my-1 mb-3',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('antv-dagre'),
     },
@@ -677,11 +664,12 @@ const ExplorerPage: React.FC = () => {
     headerProps={{
       left: (
         <>
-          <span className='ml-3'><Menu className='w-5 h-5' /></span>
-          <span className='font-bold mr-2 ml-2'>{ProductName}</span>
+          <span className='px-3'><Menu className='w-6 h-6' /></span>
+          <span className='font-bold mr-2 text-xl'>{ProductName}</span>
           <span className='mr-2'>|</span>
           {/* <span>Explorer</span> */}
           <WorkspaceSwitcher />
+          {/* <span className='mr-2 '><Slash /></span> */}
           <ProjectSwitcher />
         </>
       ),
@@ -715,6 +703,7 @@ const ExplorerPage: React.FC = () => {
           icon: LifeBuoy,
           name: "Help",
           className: 'my-1',
+          iconClassName: 'w-5 h-5',
           iconStroke: 2,
           onClick: () => {
             // return toggleRightContent("graph-info")
@@ -790,7 +779,7 @@ const ExplorerPage: React.FC = () => {
       </div>
     }
     mainTopContent={
-      <div className="flex h-full items-center justify-center ">
+      <div className="flex h-full ">
         {
           projectData ?
             <CanvasGraph

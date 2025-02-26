@@ -7,19 +7,17 @@ module.exports = {
   ],
   theme: {
     fontSize: {
-      default: '0.75rem',  // 12px
-      xss: '0.625rem',   // 10px
-      xs: '0.6875rem',   // 11px
-      base: '0.75rem',  // 12px
-      sm: '0.875rem',     // 14px
-      lg: '1rem',         // 16px
-      xl: '1.125rem',     // 18px
-      '2xl': '1.75rem',  // 22px
-      '3xl': '1.925rem',  // 26px
-      '4xl': '2.6rem',      // 32px
-      '5xl': '3.5rem',    // 40px
-      '6xl': '4rem',      // 48px
-      '7xl': '6rem',   // 60px
+      default: '0.8125rem',  // 13px
+      xss: '0.5625rem',      // 9px
+      xs: '0.6875rem',       // 11px
+      base: '0.8125rem',     // 13px
+      sm: '1rem',            // 16px
+      lg: '1.25rem',         // 20px
+      xl: '1.625rem',        // 26px
+      '2xl': '2rem',         // 32px
+      '3xl': '3rem',         // 48px
+      '4xl': '3.5rem',       // 56px
+      '5xl': '4.25rem',      // 68px
     },
     extend: {
       colors: {
@@ -65,13 +63,16 @@ module.exports = {
       },
       rotate: {
         '270': '270deg',
-        // '135': '135deg',
-        // Add any other custom rotation values here
       },
     }
   },
   plugins: [
     require("tailwindcss-animate"),
+    function ({ addBase }) {
+      addBase({
+        'html, body': { fontSize: '13px' },
+      })
+    },
     function ({ addVariant }) {
       addVariant('parent', ':merge(.parent) &');
     },

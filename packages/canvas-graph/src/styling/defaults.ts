@@ -30,9 +30,9 @@ export const DEFAULT_EDGE_STYLE: CanvasEdgeStyle = {  // https://g6.antv.antgrou
   shape: {
     type: 'line', // 'quadratic', 'cubic-vertical',  'cubic-horizontal',
     halo: false,
-    strokeWidth: 1,
+    strokeWidth: 1.5,
     strokeColor: '#cad2c5',
-    strokeOpacity: 0.8,
+    strokeOpacity: 0.4,
   },
   label: {
     textColor: '#999999',

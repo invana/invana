@@ -1,5 +1,5 @@
 import React from "react"
-import { Tooltip, TooltipTrigger, TooltipContent, Separator } from "../ui"
+import { Tooltip, TooltipTrigger, TooltipContent, Separator, Button } from "../ui"
 import type { LucideIcon } from "lucide-react"
 
 
@@ -32,34 +32,34 @@ export const LeftNavItems: React.FC<{ items: LeftNavItem[] }> = ({ items }) => {
               <a
                 href={item.href}
                 onClick={() => setActiveItem(item.name)}
-                className={`flex border-0 items-center justify-center 
-              text-foreground transition-colors rounded-md
-              hover:bg-accent  hover:text-sky-500 px-2 py-2 ${item.className || ''}
+                className={` flex border-0 items-center justify-center 
+              transition-colors rounded-md
+              hover:bg-accenthover:text-sky-500 px-2 py-2 ${item.className || ''}
               ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
+                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "w-5 h-5"} />
               </a>
             ) : item.onClick ? (
-              <button
+              <Button
+                size="nav-icon"
+                variant={"ghost"}
                 onClick={() => {
                   if (item.onClick) item.onClick();
                   setActiveItem(item.name === activeItem ? null : item.name)
                 }}
-                className={`flex border-0   items-center justify-center 
-          text-foreground transition-colors rounded-md
-          hover:bg-accent  hover:text-sky-500 px-2 py-2  ${item.className || ''}
+                className={`${item.className || ''}
           ${activeItem === item.name ? `text-sky-500 ${item?.activeClass || ''}` : ''}`}
               >
-                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
-              </button>
+                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "w-5 h-5"} />
+              </Button>
             ) : (
               <div
-                className={`flex border-0  items-center justify-center 
-          text-foreground transition-colors  rounded-md
+                className={` flex border-0  items-center justify-center 
+          transition-colors  rounded-md
             hover:text-accent-foreground px-2 py-2 ${item.className || ''}
           ${activeItem === item.name ? 'bg-accent text-accent-foreground' : ''}`}
               >
-                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "h-4 w-4"} />
+                <item.icon strokeWidth={item.iconStroke ? item.iconStroke : 2} className={item.iconClassName ? item.iconClassName : "w-5 h-5"} />
               </div>
             )}
           </TooltipTrigger>

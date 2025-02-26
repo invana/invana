@@ -45,7 +45,7 @@ const WelcomeView: React.FC = () => {
   const activeConnection = getActiveConnection()
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 mt-[7%]">
+    <div className="max-w-6xl ml-[120px] space-y-6 mt-[120px]">
       <div>
         <h1 className="text-4xl font-semibold">Welcome to {activeConnection?.name}</h1>
         {/* <h2 className="text-2xl font-light">
@@ -64,21 +64,21 @@ const WelcomeView: React.FC = () => {
                 <p className="text-zinc-500">There are no connections.</p>
               ) : (
                 projects.slice(-5).map((project: Project, index: number) => (
-                  <div key={index} className="group">
+                  <div key={index} className="group mb-4">
                     <div className="flex justify-between items-center">
                       <Button variant={"ghost"} onClick={() => switchToProject(project)}
                         className="w-full justify-start p-0 hover:bg-transparent text-blue-500 dark:text-blue-400 hover:text-blue-300">
                         {project.name}
                       </Button>
                     </div>
-                    <p className="text-xs text-zinc-500">{project.description}</p>
+                    <p className=" text-zinc-500">{project.description}</p>
                   </div>
                 ))
               )}
 
-              <Button variant={"ghost"} onClick={() => console.log("")} className="w-full justify-start p-0 hover:bg-transparent">
+              {/* <Button variant={"ghost"} onClick={() => console.log("")} className="w-full justify-start p-0 hover:bg-transparent">
                 Create a new connection
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
