@@ -35,7 +35,7 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       {/* Your component content here */}
       <p className='text-zinc-500 dark:text-zinc-400 inline-flex items-center'>
         <Copy className="mr-1 h-4" />{data.id}</p>
-      <h1 className='text-2xl mt-2 font-semibold'>{data.label}</h1>
+      <h1 className='text-2xl mt-2 '>{data.label}</h1>
       <div className="flex items-center space-x-4">
         <div className=" ">
           <Badge>{data.type}</Badge>
