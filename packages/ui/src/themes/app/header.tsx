@@ -11,7 +11,7 @@ export const AppHeader: React.FC<AppHeaderProps> = (props) => {
   return (
     <header className="flex h-[45px] items-center border-b border-border bg-background ">
       <div className="flex flex-1 items-center gap-4">
-        <div className="flex items-center gap-2 text-foreground text-xl">
+        <div className="flex items-center gap-2 text-foreground">
           {/* header left */}
           {props?.left}
         </div>

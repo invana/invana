@@ -10,7 +10,7 @@ const Toolbar: React.FC = () => {
       {/* <div> */}
       <ButtonWithTooltip
         variant="ghost"
-        size="icon-sm"
+        size="nav-icon"
         className="rounded-none hover:bg-gray-100 active:bg-gray:500"
         tooltip={<p>{"Unlock Canvas"}</p>}
       >

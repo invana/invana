@@ -1,6 +1,6 @@
 import { CanvasEdgeStyle, CanvasNodeStyle } from "./display";
 
-export type IPropertiesData = string | number | boolean | object | IPropertiesData[];
+export type IPropertiesData = string | number | boolean | object | IPropertiesData[] | null;
 
 
 export interface IProperties {

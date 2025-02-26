@@ -106,7 +106,7 @@ const ConnectPage: React.FC = () => {
             <TooltipContent>Star or Fork this project</TooltipContent>
           </Tooltip>
         </div>
-        <div className="max-w-6xl mx-auto space-y-6 mt-[7%]">
+        <div className="max-w-6xl ml-[120px] space-y-6 mt-[120px]">
           <div>
             <h1 className="text-4xl font-semibold">Invana Studio</h1>
             <h2 className="text-2xl font-light">
@@ -165,7 +165,7 @@ const ConnectPage: React.FC = () => {
                       <div className="text-left ">
                         <div className="font-medium text-white">{item.title}</div>
                         {item.description && (
-                          <div className="text-sm text-zinc-400">{item.description}</div>
+                          <div className="text-zinc-400">{item.description}</div>
                         )}
                         {/* {item?.badge} */}
                       </div>
