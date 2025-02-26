@@ -7,17 +7,17 @@ module.exports = {
   ],
   theme: {
     fontSize: {
-      default: '0.75rem',   // 12px
-      xss: '0.5625rem',     // 9px
-      xs: '0.625rem',       // 10px
-      base: '0.75rem',      // 12px
-      sm: '0.875rem',       // 14px
-      lg: '1.125rem',       // 18px
-      xl: '1.625rem',       // 26px
-      '2xl': '2.2rem',        // 32px
-      '3xl': '3rem',        // 48px
-      '4xl': '3.5rem',      // 56px
-      '5xl': '4.25rem',     // 68px
+      default: '0.8125rem',  // 13px
+      xss: '0.5625rem',      // 9px
+      xs: '0.625rem',        // 10px
+      base: '0.8125rem',     // 13px
+      sm: '1rem',            // 16px
+      lg: '1.25rem',         // 20px
+      xl: '1.625rem',        // 26px
+      '2xl': '2rem',         // 32px
+      '3xl': '3rem',         // 48px
+      '4xl': '3.5rem',       // 56px
+      '5xl': '4.25rem',      // 68px
     },
     extend: {
       colors: {

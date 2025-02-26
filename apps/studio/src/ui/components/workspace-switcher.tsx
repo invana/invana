@@ -43,7 +43,7 @@ const WorkspaceSwitcher: React.FC = () => {
       {connections.length > 0 ?
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-1 ">
+            <Button variant="ghost" className="flex text-sm bg-transparent items-center space-x-1 ">
               <Folder className=" h-4 " />
               <span >{activeConnection?.name || "select connection"}</span>
               <ChevronDown className="h-4 w-4" />

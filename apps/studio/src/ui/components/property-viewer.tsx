@@ -38,7 +38,7 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       <h1 className='text-2xl mt-2 '>{data.label}</h1>
       <div className="flex items-center space-x-4">
         <div className=" ">
-          <Badge>{data.type}</Badge>
+          label: {data.type}
         </div>
 
         {/* <p className='mt-2 text-zinc-500 dark:text-zinc-400 text-sm'>
@@ -47,7 +47,7 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       </div>
       {
         'source' in data && 'target' in data &&
-        <div className='mt-2  '>
+        <div className=''>
           <div>source: {(data as ICanvasEdge).source}</div>
           <div>target: {(data as ICanvasEdge).target}</div>
         </div>
@@ -56,7 +56,8 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
 
       <div className='border-b border-t mt-5 mb-3 px-1 mx-[-12px]'>
         <h2 className='font-semibold tex uppercase inline-flex items-center'>
-          <List className='mr-2 h-4' /> Properties
+          {/* <List className='mr-2 h-4' />  */}
+          Properties
         </h2>
       </div>
 
