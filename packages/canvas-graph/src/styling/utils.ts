@@ -142,12 +142,12 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       highlight: {
         // fill: '#D580FF',
         halo: true,
-        lineWidth: 2,
+        lineWidth: 4,
         lineStroke: '#D580FF',
       },
       dim: {
-        fillOpacity: 0.4,
-        labelFillOpacity: 0.4,
+        fillOpacity: 0.2,
+        labelFillOpacity: 0.2,
         // lineWidth: 0,
         // fill: dimFill,
         // labelFill: dimLabelFill
@@ -209,13 +209,17 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
       // },
 
       highlight: {
-        lineWidth: 4,
+        lineWidth: (d: CanvasGraphEdge) => {
+          const width = do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeWidth);
+          return width as number * 3;
+        },
         opacity: 0.7,
       },
       dim: {
         // stroke: dimStroke,
-        opacity: 0.6,
-        labelFillOpacity: 0.6,
+        lineWidth: 1,
+        opacity: 0.4,
+        labelFillOpacity: 0.4,
         // labelFill: dimLabelFill,
         // opacity: 0.3
       }
