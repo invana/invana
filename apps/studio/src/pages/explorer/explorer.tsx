@@ -4,7 +4,7 @@ import { useDefaultV2LayoutStore } from '@invana/ui/themes/layout-v2/store';
 import {
   Activity, Bell, Book, Box, Brush, Circle, CircleDashed, CircleDot, Eraser, EyeOff, FileText, FolderOpen, LassoSelect,
   LayoutGrid, LifeBuoy, Lock, Mail, Menu, MonitorCog, Network, RefreshCw, Settings, Share2,
-  Shrink, Tag, Terminal, Type, ZoomIn, ZoomOut
+  Shrink, Slash, Tag, Terminal, Type, ZoomIn, ZoomOut
 } from 'lucide-react';
 import { Button } from '@invana/ui';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -664,11 +664,12 @@ const ExplorerPage: React.FC = () => {
     headerProps={{
       left: (
         <>
-          <span className='ml-3'><Menu className='w-5 h-5' /></span>
-          <span className='font-bold mr-2 ml-2'>{ProductName}</span>
+          <span className='px-3'><Menu className='w-6 h-6' /></span>
+          <span className='font-bold mr-2'>{ProductName}</span>
           <span className='mr-2'>|</span>
           {/* <span>Explorer</span> */}
           <WorkspaceSwitcher />
+          {/* <span className='mr-2 '><Slash /></span> */}
           <ProjectSwitcher />
         </>
       ),
@@ -778,7 +779,7 @@ const ExplorerPage: React.FC = () => {
       </div>
     }
     mainTopContent={
-      <div className="flex h-full items-center justify-center ">
+      <div className="flex h-full ">
         {
           projectData ?
             <CanvasGraph

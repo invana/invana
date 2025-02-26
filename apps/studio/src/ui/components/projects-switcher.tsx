@@ -38,7 +38,7 @@ export const ProjectSwitcher: React.FC = () => {
       {projectsListDataSet.length > 0 ?
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex text-sm bg-transparent items-center space-x-1">
+            <Button variant="ghost" className="flex text-sm hover:bg-transparent pl-0 pr-0">
               {/* <Box className=" h-4 " /> */}
               <span>
                 {activeProject?.name || "select a graph"}
@@ -46,7 +46,7 @@ export const ProjectSwitcher: React.FC = () => {
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-260 ">
+          <DropdownMenuContent align="start" className="w-260 ">
             <DropdownMenuLabel>Switch graph</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="px-2 py-1.5">
