@@ -38,7 +38,7 @@ export const ProjectSwitcher: React.FC = () => {
       {projectsListDataSet.length > 0 ?
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex text-sm hover:bg-transparent pl-0 pr-0">
+            <Button variant="ghost" className="flex  hover:bg-transparent pl-0 pr-0">
               {/* <Box className=" h-4 " /> */}
               <span>
                 {activeProject?.name || "select a graph"}

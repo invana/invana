@@ -665,7 +665,7 @@ const ExplorerPage: React.FC = () => {
       left: (
         <>
           <span className='px-3'><Menu className='w-6 h-6' /></span>
-          <span className='font-bold mr-2'>{ProductName}</span>
+          <span className='font-bold mr-2 text-xl'>{ProductName}</span>
           <span className='mr-2'>|</span>
           {/* <span>Explorer</span> */}
           <WorkspaceSwitcher />
