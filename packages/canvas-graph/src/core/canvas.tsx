@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Graphin } from '@antv/graphin';
 import { Graph } from '@antv/g6';
 import { CanvasGraphProps } from '../types';
@@ -8,16 +8,15 @@ import { CanvasManager } from '../canvas/manager';
 const CanvasGraph_: React.FC<CanvasGraphProps> = (props) => {
 
   const canvasManagerRef = useRef<CanvasManager | null>(null);
-
   const graphRef = useRef<Graph>(null);
-  // useEffect(() => {
-  //   const disableRightClick = (e: MouseEvent) => e.preventDefault();
-  //   document.addEventListener("contextmenu", disableRightClick);
 
-  //   return () => {
-  //     document.removeEventListener("contextmenu", disableRightClick);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const disableRightClick = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener("contextmenu", disableRightClick);
+    return () => {
+      document.removeEventListener("contextmenu", disableRightClick);
+    };
+  }, []);
 
   console.log("CanvasGraph.props", props)
   const propsSizeInBytes = new Blob([JSON.stringify(props)]).size;

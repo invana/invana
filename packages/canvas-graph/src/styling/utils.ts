@@ -146,8 +146,8 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
         lineStroke: '#D580FF',
       },
       dim: {
-        fillOpacity: 0.1,
-        labelFillOpacity: 0.1,
+        fillOpacity: 0.4,
+        labelFillOpacity: 0.4,
         // lineWidth: 0,
         // fill: dimFill,
         // labelFill: dimLabelFill
@@ -214,8 +214,8 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
       },
       dim: {
         // stroke: dimStroke,
-        opacity: 0.2,
-        labelFillOpacity: 0.2,
+        opacity: 0.6,
+        labelFillOpacity: 0.6,
         // labelFill: dimLabelFill,
         // opacity: 0.3
       }
