@@ -143,7 +143,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
         // fill: '#D580FF',
         halo: true,
         lineWidth: 4,
-        lineStroke: '#D580FF',
+        // lineStroke: '#D580FF',
       },
       dim: {
         fillOpacity: 0.2,
@@ -213,7 +213,9 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
           const width = do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, defaultStyle?.shape?.strokeWidth);
           return width as number * 3;
         },
-        opacity: 0.7,
+        // halo: true,
+
+        opacity: 1,
       },
       dim: {
         // stroke: dimStroke,
