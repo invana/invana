@@ -51,9 +51,9 @@ export const LeftNav: React.FC<LeftNavProps> = ({ showToggleTheme = false, class
               >
                 {
                   theme === "dark" ? (
-                    <Sun className="h-4 w-4 text-foreground" />
+                    <Sun className="h-5 w-5" />
                   ) : (
-                    <Moon className="h-4 w-4 text-foreground" />
+                    <Moon className="h-5 w-5" />
                   )
                 }
               </Button>

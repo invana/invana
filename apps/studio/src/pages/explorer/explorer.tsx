@@ -393,8 +393,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Box,
       name: "Graph Information",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
       tooltipSide: "right",
       onClick: () => {
@@ -404,8 +404,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Network,
       name: "Graph Model",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -415,8 +415,8 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Query",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -428,8 +428,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Book,
       name: "Documentation",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -441,8 +441,8 @@ const ExplorerPage: React.FC = () => {
     // { name: "Data Management", href: "/connections", icon: Database },
     {
       name: "Activity History",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -453,8 +453,8 @@ const ExplorerPage: React.FC = () => {
     },
     {
       name: "Display Settings",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       href: "#",
@@ -464,8 +464,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Circle,
       name: "Node Detail",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -474,8 +474,8 @@ const ExplorerPage: React.FC = () => {
     {
       icon: Circle,
       name: "Insights",
-      className: "py-3 my-2 px-3 rounded-none",
-      iconClassName: "w-4 h-4",
+      className: "py-3 my-2 px-3",
+      iconClassName: "w-5 h-5",
       activeClass: "bg-gray-800",
 
       tooltipSide: "right",
@@ -489,7 +489,7 @@ const ExplorerPage: React.FC = () => {
       icon: LassoSelect,
       name: "Lasso select",
       className: 'my-1 mt-5',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
@@ -500,7 +500,7 @@ const ExplorerPage: React.FC = () => {
       icon: Brush,
       name: "Brush",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       // className: "p-0",
       onClick: () => {
@@ -512,7 +512,7 @@ const ExplorerPage: React.FC = () => {
       name: "Add Comment",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -524,7 +524,7 @@ const ExplorerPage: React.FC = () => {
       icon: Eraser,
       name: "Eraser",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.eraseCanvas(),
     },
@@ -532,7 +532,7 @@ const ExplorerPage: React.FC = () => {
       icon: RefreshCw,
       name: "Re draw",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.reDraw(),
     },
@@ -540,7 +540,7 @@ const ExplorerPage: React.FC = () => {
       icon: Shrink,
       name: "Fit view ",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.fitView(),
     },
@@ -549,7 +549,7 @@ const ExplorerPage: React.FC = () => {
       name: "Lock",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => {
         // return toggleRightContent("graph-info")
@@ -560,7 +560,7 @@ const ExplorerPage: React.FC = () => {
       icon: ZoomIn,
       name: "Zoom In",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "right",
       onClick: () => canvasManagerRef.current?.canvas_utils.zoomIn(),
     },
@@ -569,7 +569,7 @@ const ExplorerPage: React.FC = () => {
       name: "Zoom Out",
       className: 'my-1 mb-3',
       showSeperator: true,
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "right",
       onClick: () => canvasManagerRef.current?.canvas_utils.zoomOut(),
     }
@@ -581,7 +581,7 @@ const ExplorerPage: React.FC = () => {
       icon: Share2,
       name: "D3 Force layout",
       className: 'my-1 mt-3',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('d3-force'),
     },
@@ -589,7 +589,7 @@ const ExplorerPage: React.FC = () => {
       icon: CircleDashed,
       name: "Circular Layout",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('circular'),
     },
@@ -597,7 +597,7 @@ const ExplorerPage: React.FC = () => {
       icon: LayoutGrid,
       name: "Grid Layout",
       className: 'my-1',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('grid'),
     },
@@ -606,7 +606,7 @@ const ExplorerPage: React.FC = () => {
       name: "Dagre layout",
       showSeperator: true,
       className: 'my-1 mb-3',
-      iconStroke: 2,
+      iconStroke: 1,
       tooltipSide: "left",
       onClick: () => canvasManagerRef.current?.canvas_utils.updateLayout('antv-dagre'),
     },
@@ -702,6 +702,7 @@ const ExplorerPage: React.FC = () => {
           icon: LifeBuoy,
           name: "Help",
           className: 'my-1',
+          iconClassName: 'w-5 h-5',
           iconStroke: 2,
           onClick: () => {
             // return toggleRightContent("graph-info")

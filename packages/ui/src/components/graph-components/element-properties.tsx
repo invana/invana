@@ -14,7 +14,7 @@ export const ElementProperties: React.FC<IProperties> = ({ properties, className
   return (
     <div className={"text-sm " + className}>
       <h4 className="font-bold mb-2 uppercase">Properties</h4>
-      {Object.entries(properties).map(([key, value], index, array) => (
+      {properties && Object.entries(properties).map(([key, value], index, array) => (
         <div key={key} className={`mb-2 pb-2 ${index !== array.length - 1 ? 'border-b' : ''}`}>
           <h5 className='font-bold'>{key}</h5>
           <div>
