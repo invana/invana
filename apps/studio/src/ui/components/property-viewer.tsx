@@ -33,11 +33,11 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
   return (
     <div className={className}>
       {/* Your component content here */}
-      <p className='text-zinc-500 dark:text-zinc-400 text-sm inline-flex items-center'>
+      <p className='text-zinc-500 dark:text-zinc-400 inline-flex items-center'>
         <Copy className="mr-1 h-4" />{data.id}</p>
       <h1 className='text-2xl mt-2 font-semibold'>{data.label}</h1>
       <div className="flex items-center space-x-4">
-        <div className=" text-sm">
+        <div className=" ">
           <Badge>{data.type}</Badge>
         </div>
 
@@ -47,7 +47,7 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       </div>
       {
         'source' in data && 'target' in data &&
-        <div className='mt-2 text-sm'>
+        <div className='mt-2  '>
           <div>source: {(data as ICanvasEdge).source}</div>
           <div>target: {(data as ICanvasEdge).target}</div>
         </div>
@@ -63,10 +63,13 @@ const PropertyViewer: React.FC<PropertyViewerProps> = ({ className, data }) => {
       <div className="grid grid-cols-1 gap-4  pb-3 sm:grid-cols-1">
         {Object.entries(data?.properties || {}).map(([key, value]) => (
           <div key={key} className='border-b pb-2'>
-            <label className='font-bold text-sm' htmlFor={key} >
+            <label className='font-bold ' htmlFor={key} >
               {key}
             </label>
-            {key === 'profilePic' ? <img src={String(value)} alt="Profile" className="w-20 h-20  " /> : <div>{String(value)}</div>}
+            {key === 'profilePic'
+              ? <img src={String(value)} alt="Profile" className="w-20 h-20  " />
+              : <div>{String(value)}</div>
+            }
           </div>
         ))}
       </div>

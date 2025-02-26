@@ -72,6 +72,11 @@ module.exports = {
   },
   plugins: [
     require("tailwindcss-animate"),
+    function ({ addBase }) {
+      addBase({
+        'html, body': { fontSize: '13px' },
+      })
+    },
     function ({ addVariant }) {
       addVariant('parent', ':merge(.parent) &');
     },

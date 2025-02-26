@@ -1,4 +1,7 @@
-import { lesMiserablesData, flightData, modellingMethodsDataset, processMiningSimpleDataset } from "@invana/example-datasets";
+import {
+  lesMiserablesData, flightData, modellingMethodsDataset,
+  processMiningSimpleDataset, pubmedExampleDataset1
+} from "@invana/example-datasets";
 import { Project } from "./store/projectStore";
 import { ANTV_DAGRE_LAYOUT } from "@invana/canvas-graph/defaults/layouts";
 
@@ -11,6 +14,15 @@ export const projectsListDataSet: Project[] = [
     updated_at: new Date(),
     tags: ['GraphQL', 'Apollo Client', 'React', 'TypeScript'],
     data: lesMiserablesData,
+    options: {}
+  },
+  {
+    id: 'pubmed-example-dataset-1',
+    name: 'PubMed Example Dataset',
+    description: 'A simple project to demonstrate the power of GraphQL and Apollo Client',
+    updated_at: new Date(),
+    tags: ['PubMed', 'TypeScript'],
+    data: pubmedExampleDataset1,
     options: {}
   },
   {
