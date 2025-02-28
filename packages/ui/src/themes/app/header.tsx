@@ -16,7 +16,6 @@ export const AppHeader: React.FC<AppHeaderProps> = (props) => {
           {props?.left}
         </div>
         <div className="flex-1 flex justify-center items-center gap-1 sm:gap-2">
-          {/* header middle */}
           {props?.center}
         </div>
         <div className="flex items-center gap-1 sm:gap-2">

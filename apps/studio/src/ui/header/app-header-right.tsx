@@ -27,12 +27,12 @@ const AppHeaderRight: React.FC = () => {
         </TooltipTrigger>
         <TooltipContent>Star or Fork this project</TooltipContent>
       </Tooltip> */}
-
-        {/* <ErrorBoundary>
-        <CommandPalette />
-      </ErrorBoundary> */}
+        {/* 
+        <ErrorBoundary>
+          <CommandPalette />
+        </ErrorBoundary>
         <Separator orientation="vertical" className="h-6 ml-3 mr-3" />
-
+ */}
 
         {/* <Separator orientation="vertical" className="h-6 ml-2" /> */}
 
@@ -64,10 +64,12 @@ const AppHeaderRight: React.FC = () => {
         {/* <Separator orientation="vertical" className="h-6 ml-3 " /> */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <Avatar className="h-10 w-10 mr-2 ml-2">
-              <AvatarImage src="/placeholder-user.jpg" alt="User" />
-              <AvatarFallback className='bg-emerald-700 text-sm text-white font-bold'>RM</AvatarFallback>
-            </Avatar>
+            <div className=' mr-3 ml-2'>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src="/placeholder-user.jpg" alt="User" />
+                <AvatarFallback className='bg-emerald-700 text-sm text-white font-bold'>RM</AvatarFallback>
+              </Avatar>
+            </div>
           </TooltipTrigger>
           <TooltipContent>Anonymous User</TooltipContent>
         </Tooltip>
