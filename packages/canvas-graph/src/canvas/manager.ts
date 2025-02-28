@@ -74,7 +74,7 @@ export class CanvasManager {
     const schema = this.getGraphSchema();
     // console.log("getModelAsGraphData.schema", schema);
     const nodes = schema.nodes.map(node => {
-      // console.log("getModelAsGraphData.node", node)
+      console.log("getModelAsGraphData.node", node)
       const properties = node.properties.reduce((acc: any, prop) => {
         acc[prop.name] = prop.type;
         return acc;
@@ -93,9 +93,9 @@ export class CanvasManager {
         acc[prop.name] = prop.type;
         return acc;
       }, {});
-      // console.log("getModelAsGraphData.edge", edge)
+      console.log("getModelAsGraphData.edge", edge)
       return {
-        id: edge.name,
+        id: `${edge.source}-${edge.target}`,
         type: edge.name,
         label: edge.name,
         source: edge.source,

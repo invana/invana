@@ -20,7 +20,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({ node, extra, className = '',
     <Card className={cn("shadow-lg w-[260px]", className)}>
       <CardHeader className=''>
         <CardTitle className='break-words text-xl'>{node?.label as string}</CardTitle>
-        <CardDescription className='text-xs'>
+        <CardDescription className='text-sm'>
           <div><strong>ID:</strong> {node?.id}</div>
           <div><strong>Label:</strong> {node?.type || 'N/A'}</div>
         </CardDescription>
