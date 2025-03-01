@@ -170,7 +170,8 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   // align: 'DL', // Optional
   // nodesep: 20, // Optional
   // ranksep: 50, // Optional
-  // controlPoints: true, // Optional
+  // controlPoints: true, // Optional,
+  animation: false
 }
 
 export const DENDROGRAM_LAYOUT: CanvasGraphLayout = {

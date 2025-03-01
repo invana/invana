@@ -38,11 +38,11 @@ export const SimpleExample: Story = {
               labelField: 'properties.name'
             }
           },
-          Post: {
-            fields: {
-              labelField: 'properties.title'
-            }
-          }
+          // Post: {
+          //   fields: {
+          //     labelField: 'properties.title'
+          //   }
+          // }
         },
         defaultEdge: {
           shape: {
