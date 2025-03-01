@@ -28,7 +28,7 @@ export const CIRCULAR_LAYOUT: CanvasGraphLayout = {
   preventOverlap: true,
   angleRatio: 1, // Optional
   nodeSize: (d: CanvasGraphNode) => ((d.size as number) || 30) + 10,
-  nodeSpacing: 10,
+  // nodeSpacing: 10,
   // options: {
   // center: [0, 0], // Optional, default is the center of the graph
   // radius: null, // Optional
@@ -162,7 +162,7 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
   type: 'antv-dagre',
   label: 'antv-dagre',
   nodeSize: [60, 30],
-  nodesep: 10,
+  nodesep: 60,
   ranksep: 70,
   controlPoints: true,
   sortByCombo: true,
