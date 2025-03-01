@@ -15,7 +15,7 @@ export const DEFAULT_NODE_STYLE: CanvasNodeStyle = { // https://g6.antv.antgroup
     // borderColor: '#565656',
   },
   label: {
-    textColor: '#999999',
+    textColor: '#ffffff',
     textFontSize: 8,
     textPosition: 'top',
     textAutoRotate: true

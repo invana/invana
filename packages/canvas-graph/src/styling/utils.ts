@@ -71,6 +71,7 @@ export const generateElementLabel = (
   d: CanvasGraphNode | CanvasGraphEdge,
   customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
   defaultValue: undefined | string | number | boolean) => {
+  console.log(`generateElementLabel : d.label : ${d.label}; defaultValue: ${defaultValue}`)
 
   if (d.label) {
     return d.label;
@@ -80,6 +81,9 @@ export const generateElementLabel = (
     if (d?.data?.type === nodeType) {
       const customStyle = customNodeStyles[nodeType];
       const labelField = customStyle?.fields?.labelField;
+
+
+      console.log(`generateElementLabel : labelField : ${labelField}; defaultValue: ${defaultValue}`)
       if (labelField) {
         if (labelField.includes("properties.")) {
           const propertyFieldName = labelField.split(".")[1];
@@ -91,6 +95,9 @@ export const generateElementLabel = (
       }
     }
   }
+  console.log(`generateElementLabel  defaultValue: ${defaultValue}`)
+  console.log("=================--")
+
   return defaultValue
 }
 
@@ -102,6 +109,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
   const customNodeStyles = options.styles?.nodes || {};
+  console.log("customNodeStyles", customNodeStyles)
   const g6Style: NodeStyle & { style: any } = {
     type: (d: CanvasGraphNode) => do_style_override(d, 'type', 'shape', customNodeStyles, defaultStyle?.shape?.type),
     style: {
@@ -110,9 +118,11 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       fill: (d: CanvasGraphNode) => do_style_override(d, 'bgColor', 'shape', customNodeStyles, defaultStyle?.shape?.bgColor),
       fillOpacity: (d: CanvasGraphNode) => do_style_override(d, 'bgOpacity', 'shape', customNodeStyles, defaultStyle?.shape?.bgOpacity),
       // label
-      labelPosition: (d: CanvasGraphNode) => do_style_override(d, 'textPosition', 'label', customNodeStyles, defaultStyle?.label?.textPosition),
+      labelPlacement: (d: CanvasGraphNode) => do_style_override(d, 'textPosition', 'label', customNodeStyles, defaultStyle?.label?.textPosition),
+      // labelPlacement: 'center',
       labelAutoRotate: (d: CanvasGraphNode) => do_style_override(d, 'textAutoRotate', 'label', customNodeStyles, defaultStyle?.label?.textAutoRotate),
       labelTextColor: (d: CanvasGraphNode) => do_style_override(d, 'textColor', 'label', customNodeStyles, defaultStyle?.label?.textColor),
+      // labelTextColor: '#ffffff',
       // lineWidth: 2,
       // stroke: defaultStyle.shape?.borderColor ?? defaultStyle?.shape?.borderColor,
       stroke: (d: CanvasGraphNode) => do_style_override(d, 'borderColor', 'shape', customNodeStyles, defaultStyle?.shape?.borderColor),
@@ -130,6 +140,11 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       //   { "key": "left", "placement": "left", "fill": "#F4664A" },
       //   // { "key": "left", "placement": [0, 0.5], "fill": "#D580FF" }
       // ],
+
+      // labelWordWrap: true,
+      // labelMaxLines: 4,
+      // labelMaxWidth: '200px',
+
 
     },
     // https://g6.antv.antgroup.com/en/manual/core-concept/state#state-type
@@ -174,6 +189,8 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
   //     return false;
   //   };
   // }
+
+  console.log("===========g6Style", g6Style)
   return g6Style;
 }
 
@@ -201,6 +218,13 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
       labelTextAlign: (d: CanvasGraphEdge) => do_style_override(d, 'textPosition', 'label', customEdgeStyles, defaultStyle?.label?.textPosition),
       labelAutoRotate: (d: CanvasGraphEdge) => do_style_override(d, 'labelAutoRotate', 'label', customEdgeStyles, defaultStyle?.label?.textAutoRotate),
       labelFill: (d: CanvasGraphEdge) => do_style_override(d, 'textColor', 'label', customEdgeStyles, defaultStyle?.label?.textColor),
+
+
+
+      labelWordWrap: true,
+      labelMaxLines: 4,
+      labelMaxWidth: '80%',
+
     },
     state: {
       // default: {

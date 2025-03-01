@@ -27,7 +27,7 @@ export const SimpleExample: Story = {
           shape: {
             size: 70,
             type: 'rect',
-          },
+          }
         },
         defaultEdge: {
           shape: {
