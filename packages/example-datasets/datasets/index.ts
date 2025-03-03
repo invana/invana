@@ -7,3 +7,4 @@ export * from './modelling-methods'
 export * from './usersData'
 export * from './pubmedExampleDataset1';
 export * from './krebsCycle';
+export * from './covid-time-series-geo';
