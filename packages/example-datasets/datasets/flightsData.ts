@@ -1082,5 +1082,3 @@ export const flightData: ICanvasData = {
     }
   })
 }
-
-console.log("===flightData", flightData)

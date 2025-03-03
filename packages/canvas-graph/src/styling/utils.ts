@@ -56,9 +56,6 @@ export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
   node value overrides the default value;
 
   */
-  if (fieldName === 'type') {
-    console.log(`do_style_override : fieldName : ${fieldName}; dataType: ${dataType}; nodeValue: ${nodeValue}; defaultValue: ${defaultValue}; d: ${d}`, d, customNodeStyles)
-  }
   if (nodeValue) {
     return nodeValue
   }
@@ -76,9 +73,9 @@ export const do_style_override = (d: CanvasGraphNode | CanvasGraphEdge,
       // }
     }
   }
-  if (fieldName === 'type') {
-    console.log("do_style_override : defaultValue", defaultValue)
-  }
+  // if (fieldName === 'type') {
+  //   console.log("do_style_override : defaultValue", defaultValue)
+  // }
   return defaultValue
 }
 
@@ -103,7 +100,7 @@ export const generateElementLabel = (
   d: CanvasGraphNode | CanvasGraphEdge,
   customNodeStyles: ICanvasStyleOptions['nodes'] | ICanvasStyleOptions['edges'],
   defaultValue: undefined | string | number | boolean) => {
-  console.log(`generateElementLabel : d.label : ${d.label}; defaultValue: ${defaultValue}`)
+  // console.log(`generateElementLabel : d.label : ${d.label}; defaultValue: ${defaultValue}`)
 
   if (d.label) {
     return d.label;
@@ -123,7 +120,7 @@ export const generateElementLabel = (
     if (d?.data?.type === nodeType) {
       const customStyle = customNodeStyles[nodeType];
       const labelField = customStyle?.fields?.labelField;
-      console.log(`generateElementLabel : labelField : ${labelField}; defaultValue: ${defaultValue}`)
+      // console.log(`generateElementLabel : labelField : ${labelField}; defaultValue: ${defaultValue}`)
       if (labelField) {
         return getLabelBasedOnLabelField(
           d,
