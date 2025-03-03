@@ -31,11 +31,12 @@ export class GraphStyle {
     if (nodeStyle.style) {
       delete (nodeStyle.style as { fill?: string }).fill;
     }
-
-    nodeStyle.palette = {
-      type: 'group',
-      field: 'type',
-    };
+    if (options.styles?.canvas?.colorNodesBy) {
+      nodeStyle.palette = {
+        type: 'group',
+        field: options.styles?.canvas?.colorNodesBy,
+      };
+    }
     return nodeStyle
   }
 
@@ -48,19 +49,25 @@ export class GraphStyle {
     if (edgeStyle.style) {
       delete (edgeStyle.style as { stroke?: string }).stroke;
     }
-    edgeStyle.palette = {
-      type: 'group',
-      field: 'type',
-    };
+    // edgeStyle.palette = {
+    //   type: 'group',
+    //   field: 'type',
+    // };
+    if (options.styles?.canvas?.colorEdgesBy) {
+      edgeStyle.palette = {
+        type: 'group',
+        field: options.styles?.canvas?.colorEdgesBy,
+      };
+    }
     return edgeStyle
   }
 
   getUpdatedStylingOptions(options: CanvasGraphOptions): GraphOptions {
     // update existing options with the new options 
     // const options: CanvasGraphOptions = mergeDeep(this.options, newOptions);
-    console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
+    console.log("getUpdatedStylingOptions.options", options)
 
-    let graphOptions: GraphOptions = {}
+    let graphOptions: GraphOptions = {};
 
     // canvas styling
     if (options.styles?.canvas) {
