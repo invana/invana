@@ -169,9 +169,10 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       labelPlacement: (d: CanvasGraphNode) => do_style_override(d, 'textPosition', 'label', customNodeStyles, d?.data?.display?.label?.textPosition, defaultStyle?.label?.textPosition),
       labelAutoRotate: (d: CanvasGraphNode) => do_style_override(d, 'textAutoRotate', 'label', customNodeStyles, d?.data?.display?.label?.textAutoRotate, defaultStyle?.label?.textAutoRotate),
       labelTextColor: (d: CanvasGraphNode) => do_style_override(d, 'textColor', 'label', customNodeStyles, d?.data?.display?.label?.textColor, defaultStyle?.label?.textColor),
-
-
-
+      labelWordWrap: (d: CanvasGraphNode) => do_style_override(d, 'textWrap', 'label', customNodeStyles, d?.data?.display?.label?.textWrap, defaultStyle?.label?.textWrap),
+      labelMaxWidth: (d: CanvasGraphNode) => do_style_override(d, 'textMaxWidth', 'label', customNodeStyles, d?.data?.display?.label?.textMaxWidth, defaultStyle?.label?.textMaxWidth),
+      labelMaxLines: (d: CanvasGraphNode) => do_style_override(d, 'textMaxLines', 'label', customNodeStyles, d?.data?.display?.label?.textMaxLines, defaultStyle?.label?.textMaxLines),
+      labelFontSize: (d: CanvasGraphNode) => do_style_override(d, 'textFontSize', 'label', customNodeStyles, d?.data?.display?.label?.textFontSize, defaultStyle?.label?.textFontSize),
 
       // port: true,
       // ports: [
@@ -257,12 +258,15 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
       labelTextAlign: (d: CanvasGraphEdge) => do_style_override(d, 'textPosition', 'label', customEdgeStyles, d?.data?.display?.label?.textPosition, defaultStyle?.label?.textPosition),
       labelAutoRotate: (d: CanvasGraphEdge) => do_style_override(d, 'labelAutoRotate', 'label', customEdgeStyles, d?.data?.display?.label?.textAutoRotate, defaultStyle?.label?.textAutoRotate),
       labelFill: (d: CanvasGraphEdge) => do_style_override(d, 'textColor', 'label', customEdgeStyles, d?.data?.display?.label?.textColor, defaultStyle?.label?.textColor),
+      labelWordWrap: (d: CanvasGraphEdge) => do_style_override(d, 'textWrap', 'label', customEdgeStyles, d?.data?.display?.label?.textWrap, defaultStyle?.label?.textWrap),
+      labelMaxWidth: (d: CanvasGraphEdge) => do_style_override(d, 'textMaxWidth', 'label', customEdgeStyles, d?.data?.display?.label?.textMaxWidth, defaultStyle?.label?.textMaxWidth),
+      labelMaxLines: (d: CanvasGraphEdge) => do_style_override(d, 'textMaxLines', 'label', customEdgeStyles, d?.data?.display?.label?.textMaxLines, defaultStyle?.label?.textMaxLines),
+      labelFontSize: (d: CanvasGraphEdge) => do_style_override(d, 'textFontSize', 'label', customEdgeStyles, d?.data?.display?.label?.textFontSize, defaultStyle?.label?.textFontSize),
 
 
-
-      labelWordWrap: true,
-      labelMaxLines: 4,
-      labelMaxWidth: '80%',
+      // labelWordWrap: true,
+      // labelMaxLines: 4,
+      // labelMaxWidth: '80%',
 
     },
     state: {

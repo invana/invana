@@ -20,8 +20,11 @@ export interface ICanvasTextDisplay {
   textFontWeight: string;
   textFontFamily: string;
   textOpacity: number;
-  textPosition: 'top' | 'center' | 'bottom' | 'left' | 'right';
+  textPosition: 'left' | 'right' | 'top' | 'bottom' | 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
   textAutoRotate: boolean;
+  textMaxWidth: number;
+  textWrap: boolean;
+  textMaxLines: number;
 }
 
 export interface ICanvasLabelDisplay extends ICanvasNodeShapeDisplayBase, ICanvasTextDisplay { }
