@@ -43,14 +43,7 @@ const data: ICanvasData = {
       properties: {
         text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book"  // This is the label of the node
       },
-      display: {
-        shape: {
-          type: 'rect',
-        },
-        fields: {
-          labelField: 'properties.text'
-        }
-      }
+
     },
     {
       id: "o1",
@@ -85,6 +78,25 @@ export const NodeTypes: Story = {
 
     options: {
       ...defaultOptions,
+      styles: {
+        nodes: {
+          Tweet: {
+            shape: {
+              type: 'rect',
+            },
+            label: {
+              textMaxWidth: 200,
+              textWrap: true,
+              textMaxLines: 4,
+              textPosition: 'right',
+              textFontSize: 4
+            },
+            fields: {
+              labelField: 'properties.text'
+            }
+          }
+        }
+      },
       layout: ANTV_DAGRE_LAYOUT
     },
     onReady: (canvasManager) => {
