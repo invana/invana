@@ -14,6 +14,7 @@ import { NodeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours
 import { EdgeContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/edge';
 import { CanvasContextMenuBehavior } from '@invana/canvas-graph/plugins/behaviours/context-menus/canvas';
 import { CanvasGraphOptions } from '@invana/canvas-graph/types';
+import { DEFAULT_STYLE_OPTIONS } from '@invana/canvas-graph/styling/defaults';
 
 
 register(ExtensionCategory.BEHAVIOR, NODE_TOOLTIP_BEHAVIOR.type, NodeTooltipBehavior, true);
@@ -44,17 +45,13 @@ export const defaultOptions: CanvasGraphOptions = {
     PROCESS_PARALLEL_TRANSFORMER
   ],
   plugins: [
-    MINIMAP_PLUGIN,
+    // MINIMAP_PLUGIN,
     HISTORY_PLUGIN,
     BACKGROUND_PLUGIN
     // GRID_PLUGIN
   ],
   layout: D3_FORCE_LAYOUT,
-  styles: {
-    canvas: {
-      theme: 'dark',
-    }
-  }
+  styles: DEFAULT_STYLE_OPTIONS
 }
 
 export const defaultContainerStyle = { "width": "100%", "height": "100vh", 'background': '#222' }

@@ -23,7 +23,6 @@ export const krebsCycle: Story = {
   args: {
     options: {
       ...defaultOptions,
-
       layout: ANTV_DAGRE_LAYOUT
     },
     initData: krebsCycleDataSet,

@@ -29,12 +29,12 @@ export const usersDataSet: ICanvasData = {
       type: "Follows",
       properties: { since: 2022 },
     },
-    {
-      id: "user2->post1",
-      source: "user2",
-      target: "post1",
-      type: "Likes",
-      properties: { weight: 5 },
-    },
+    // {
+    //   id: "user2->post1",
+    //   source: "user2",
+    //   target: "post1",
+    //   type: "Likes",
+    //   properties: { weight: 5 },
+    // },
   ] as ICanvasEdge[],
 };
