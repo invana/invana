@@ -4,7 +4,7 @@ import {
   Graph,
   GraphOptions,
 } from '@antv/g6';
-import { GraphStore, ICanvasData, ICanvasNode } from '@invana/data-store'
+import { GraphStore, ICanvasData, ICanvasNode, mergeDeep } from '@invana/data-store'
 import { IGraphSchema } from '@invana/data-store/types/schema';
 import { getUniqueItemsByItem } from '../core/utils';
 import { GraphStyle } from '../styling/manager';
@@ -111,8 +111,11 @@ export class CanvasManager {
 
 
 
-  updateOptions(options: CanvasGraphOptions, callback?: () => void) {
+  updateOptions(newOptions: CanvasGraphOptions, callback?: () => void) {
     // console.log("updateOptions input options", options);
+
+    const options: CanvasGraphOptions = mergeDeep(this.options, newOptions);
+
     console.log("g6Options updateOptions", options)
     let g6Options: GraphOptions = {}
     if (options.styles) {
@@ -146,7 +149,7 @@ export class CanvasManager {
       this.graph.layout()
     }
 
-    this.options = { ...this.options, ...options };
+    this.options = options;
     if (callback) {
       callback()
     }
