@@ -1,8 +1,8 @@
 import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle, mergeDeep } from "@invana/data-store";
 import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
-import { NodeStyle } from "@antv/g6/lib/spec/element/node";
+import { NodeStyle, StaticNodeOptions } from "@antv/g6/lib/spec/element/node";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
-import { CanvasGraphEdge, CanvasGraphNode, CanvasGraphOptions, ICanvasStyleOptions } from "../types";
+import { CanvasGraphEdge, CanvasGraphLayout, CanvasGraphNode, CanvasGraphOptions, ICanvasStyleOptions } from "../types";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
 
 
@@ -140,16 +140,48 @@ export const generateElementLabel = (
   return defaultValue
 }
 
+
+export const generatePorts = (g6Style, layout: CanvasGraphLayout | undefined) => {
+  if (!layout) {
+    return g6Style
+  }
+  if (!g6Style.style) {
+    g6Style.style = {}
+  }
+
+  const direction = layout?.direction || layout?.rankdir;
+  if (direction === 'LR' || direction === 'RL') {
+    g6Style.style.port = true;
+    g6Style.style.ports = [
+      { "key": "right", "placement": "right", "fill": "#F4664A" },
+      { "key": "left", "placement": "left", "fill": "#F4664A" },
+    ]
+  }
+  else if (direction === 'TB' || direction === 'BT') {
+    g6Style.style.port = true;
+    g6Style.style.ports = [
+      { "key": "top", "placement": "top", "fill": "#F4664A" },
+      { "key": "bottom", "placement": "bottom", "fill": "#F4664A" },
+    ]
+  }
+
+  return g6Style
+
+}
+
+
 export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOptions): NodeStyle => {
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
   */
+
+  console.log("====convert_node_canvas_style_to_g6_style.options", options)
   const defaultStyle: CanvasNodeStyle = mergeDeep(DEFAULT_NODE_STYLE, options.styles?.defaultNode || {});
   // const dimLabelFill = theme === 'dark' ? '#232323' : '#cccccc'
   // const dimFill = theme === 'dark' ? '#232323' : '#cccccc';
   const customNodeStyles = options.styles?.nodes || {};
   console.log("customNodeStyles", customNodeStyles)
-  const g6Style: NodeStyle & { style: any } = {
+  let g6Style: NodeStyle & { style: any } = {
     type: (d: CanvasGraphNode) => do_style_override(d, 'type', 'shape', customNodeStyles, d?.data?.display?.shape?.type, defaultStyle?.shape?.type),
     style: {
       labelText: (d: CanvasGraphNode) => generateElementLabel(d, customNodeStyles, d?.data?.label || d.id),// fill
@@ -174,12 +206,6 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       labelMaxLines: (d: CanvasGraphNode) => do_style_override(d, 'textMaxLines', 'label', customNodeStyles, d?.data?.display?.label?.textMaxLines, defaultStyle?.label?.textMaxLines),
       labelFontSize: (d: CanvasGraphNode) => do_style_override(d, 'textFontSize', 'label', customNodeStyles, d?.data?.display?.label?.textFontSize, defaultStyle?.label?.textFontSize),
 
-      // port: true,
-      // ports: [
-      //   { "key": "right", "placement": "right", "fill": "#F4664A" },
-      //   { "key": "left", "placement": "left", "fill": "#F4664A" },
-      //   // { "key": "left", "placement": [0, 0.5], "fill": "#D580FF" }
-      // ],
 
       // labelWordWrap: true,
       // labelMaxLines: 4,
@@ -218,6 +244,15 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
     //   // g6Style.style.iconWidth = (d: CanvasGraphNode) => do_style_override(d, 'size', 'shape', customNodeStyles, defaultStyle?.shape?.size)
     // }
   }
+
+  g6Style = generatePorts(g6Style, options.layout);
+  // if (options?.layout?.direction === 'LR' || options?.layout?.rankdir === 'LR') {
+  //   g6Style.style.port = true;
+  //   g6Style.style.ports = [
+  //     { "key": "right", "placement": "right", "fill": "#F4664A" },
+  //     { "key": "left", "placement": "left", "fill": "#F4664A" },
+  //   ]
+  // }
 
   // if (g6Style.style.type) {
   //   g6Style.style.iconClip = (d: CanvasGraphNode) => {
