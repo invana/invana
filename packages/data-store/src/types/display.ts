@@ -94,7 +94,8 @@ export interface ICanvasStyle {
   labels: {
     showNodeLabels: boolean;
     showEdgeLabels: boolean;
-  }
+  },
+  animation: boolean
   // scaleNode: {
   //   minSize: number;
   //   maxSize: number;

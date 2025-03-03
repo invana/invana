@@ -23,6 +23,8 @@ export class GraphStyle {
   }
 
   private getUpdatedDefaultNodeStyle = (options: CanvasGraphOptions): NodeStyle => {
+
+    console.log("getUpdatedDefaultNodeStyle.options", options)
     const nodeStyle: NodeStyle = convert_node_canvas_style_to_g6_style(
       options
     )
@@ -53,27 +55,27 @@ export class GraphStyle {
     return edgeStyle
   }
 
-  getUpdatedStylingOptions(newOptions: CanvasGraphOptions): GraphOptions {
+  getUpdatedStylingOptions(options: CanvasGraphOptions): GraphOptions {
     // update existing options with the new options 
-    const options: CanvasGraphOptions = mergeDeep(this.options, newOptions);
-    // console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
+    // const options: CanvasGraphOptions = mergeDeep(this.options, newOptions);
+    console.log("getUpdatedStylingOptions.options", JSON.stringify(options, null, 4))
 
     let graphOptions: GraphOptions = {}
 
     // canvas styling
-    if (newOptions.styles?.canvas) {
+    if (options.styles?.canvas) {
       const canvasStyle = convert_canvas_style_to_g6_style(options?.styles?.canvas as ICanvasStyle ?? {});
       graphOptions = { ...canvasStyle, ...graphOptions };
     }
 
     // default node styling
-    if (newOptions.styles?.defaultNode || newOptions.styles?.canvas?.theme) {
-      const DEFAULT_NODE_STYLE = this.getUpdatedDefaultNodeStyle(options);
-      graphOptions.node = DEFAULT_NODE_STYLE as NodeOptions
+    if (options.styles?.defaultNode || options.styles?.canvas?.theme) {
+      const defaultNodeStyle = this.getUpdatedDefaultNodeStyle(options);
+      graphOptions.node = defaultNodeStyle as NodeOptions
     }
 
     // default edge styling
-    if (newOptions.styles?.defaultEdge || newOptions.styles?.canvas?.theme) {
+    if (options.styles?.defaultEdge || options.styles?.canvas?.theme) {
       const defaulEdgeStyle = this.getUpdatedDefaultEdgeStyle(options);
       graphOptions.edge = defaulEdgeStyle as EdgeOptions
     }

@@ -50,7 +50,8 @@ export const DEFAULT_CANVAS_STYLE: Partial<ICanvasStyle> = {
   theme: getInitialTheme(),
   bgColor: '#222222',
   colorNodesBy: 'type',
-  colorEdgesBy: 'type'
+  colorEdgesBy: 'type',
+  animation: false
 }
 
 export const DEFAULT_STYLE_OPTIONS: ICanvasStyleOptions = {
