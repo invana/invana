@@ -23,7 +23,7 @@ export interface ICanvasStyleOptions {
 export interface CanvasGraphLayout {
   type: string;
   // key: string;
-  [option: string]: string | object | number | boolean;
+  [option: string]: string | object | number | boolean | undefined | null;
 }
 
 export interface CanvasGraphPlugin {

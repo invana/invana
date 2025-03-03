@@ -84,6 +84,7 @@ export const Radial: Story = {
       layout: {
         ...DENDROGRAM_LAYOUT,
         radial: true,
+        direction: undefined,
 
       }
     }, initData: modellingMethodsDataset,
