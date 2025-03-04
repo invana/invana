@@ -24,16 +24,16 @@ export const ZOOM_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
 export const HOVER_ACTIVATE_BEHAVIOR: CanvasGraphBehavior = {
   type: 'hover-activate',
   key: 'hover-activate',
-  animated: true,
+  animated: false,
   degree: 1,
   state: 'highlight',
   inactiveState: 'dim',
-  onHover: (event: IPointerEvent) => {
-    event.view.setCursor('pointer');
-  },
-  onHoverEnd: (event: IPointerEvent) => {
-    event.view.setCursor('default');
-  },
+  // onHover: (event: IPointerEvent) => {
+  //   event.view.setCursor('pointer');
+  // },
+  // onHoverEnd: (event: IPointerEvent) => {
+  //   event.view.setCursor('default');
+  // },
 }
 
 export const CLICK_SELECT_BEHAVIOR: CanvasGraphBehavior = {
@@ -86,3 +86,8 @@ export const PROPERTY_VIEWER_BEHAVIOR: CanvasGraphBehavior = {
   type: 'property-viewer',
   key: 'property-viewer',
 }
+
+// export const OPTIMIZED_DRAG_CANVAS_BEHAVIOR: CanvasGraphBehavior = {
+//   type: 'optimize-viewport-transform',
+//   key: 'optimize-viewport-transform'
+// }
