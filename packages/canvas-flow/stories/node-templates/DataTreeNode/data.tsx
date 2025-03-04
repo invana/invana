@@ -1,6 +1,4 @@
-import { DataTreeNodeProps } from "@invana/canvas-flow/templates/nodes/DataTreeNode";
 import { Folder, File, Database } from 'lucide-react'
-import React from "react";
 
 
 export const data = {

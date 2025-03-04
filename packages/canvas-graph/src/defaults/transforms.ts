@@ -17,3 +17,9 @@ export const PROCESS_PARALLEL_TRANSFORMER: CanvasGraphTransform = {
   type: 'process-parallel-edges',
   key: 'process-parallel-edges',
 }
+
+
+export const PLACE_RADIAL_LABELS_TRANSFORMER: CanvasGraphTransform = {
+  type: 'place-radial-labels',
+  key: 'place-radial-labels',
+}

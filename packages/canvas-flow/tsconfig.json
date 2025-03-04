@@ -10,5 +10,11 @@
         "../../packages/ui/src/*"
       ]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "stories/**"
+  ]
 }
