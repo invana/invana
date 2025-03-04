@@ -1,6 +1,6 @@
 import { CanvasEdgeStyle, CanvasNodeStyle, ICanvasEdge, ICanvasNode, ICanvasStyle, mergeDeep } from "@invana/data-store";
 import { EdgeData, GraphOptions, NodeData } from "@antv/g6";
-import { NodeStyle, StaticNodeOptions } from "@antv/g6/lib/spec/element/node";
+import { NodeStyle } from "@antv/g6/lib/spec/element/node";
 import { EdgeStyle } from "@antv/g6/lib/spec/element/edge";
 import { CanvasGraphEdge, CanvasGraphLayout, CanvasGraphNode, CanvasGraphOptions, ICanvasStyleOptions } from "../types";
 import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./defaults";
@@ -8,19 +8,17 @@ import { DEFAULT_CANVAS_STYLE, DEFAULT_EDGE_STYLE, DEFAULT_NODE_STYLE } from "./
 
 export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => {
   const { id, type, properties } = node;
-  // const labelField = display?.fields?.labelField;
-  // const shape = display?.shape;
   return {
     id: id,
     x: node.x ?? 0,
     y: node.y ?? 0,
-    type: 'circle', // type ??
+    type: 'circle',
     label: node.label,
-    // label: properties ? properties[labelField as keyof typeof properties] ?? id : id,
     data: {
       type: type,
       properties: properties,
-      display: node.display
+      display: node.display,
+      timestamp: node?.properties?.timestamp
     }
   };
 }
@@ -28,18 +26,16 @@ export const convert_icanvas_node_to_g6_node = (node: ICanvasNode): NodeData => 
 
 export const convert_icanvas_edge_to_g6_edge = (edge: ICanvasEdge): EdgeData => {
   const { id, type, properties, source, target } = edge;
-  // const labelField = display?.fields;
-  // console.log("=====labelField", labelField)
   const data: EdgeData = {
     id: id,
     source: source,
     target: target,
     label: edge.label,
-    // label: properties[labelField as keyof typeof properties] ?? id,
     data: {
       type: type,
       properties: properties,
-      display: edge.display
+      display: edge.display,
+      timestamp: edge?.properties?.timestamp
     }
   };
   return data
@@ -167,6 +163,9 @@ export const generatePorts = (g6Style, layout: CanvasGraphLayout | undefined) =>
 }
 
 
+// export const 
+
+
 export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOptions): NodeStyle => {
   /*
   https://g6.antv.antgroup.com/en/api/elements/nodes/base-node#icon-style-icon
@@ -219,7 +218,7 @@ export const convert_node_canvas_style_to_g6_style = (options: CanvasGraphOption
       // },
       highlight: {
         // fill: '#D580FF',
-        halo: true,
+        // halo: true,
         lineWidth: 4,
         // lineStroke: '#D580FF',
       },
@@ -308,10 +307,11 @@ export const convert_edge_canvas_style_to_g6_sytle = (options: CanvasGraphOption
       // },
 
       highlight: {
-        lineWidth: (d: CanvasGraphEdge) => {
-          const width = do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, d?.data?.display?.shape?.strokeWidth, defaultStyle?.shape?.strokeWidth);
-          return width as number * 3;
-        },
+        // lineWidth: (d: CanvasGraphEdge) => {
+        //   const width = do_style_override(d, 'strokeWidth', 'shape', customEdgeStyles, d?.data?.display?.shape?.strokeWidth, defaultStyle?.shape?.strokeWidth);
+        //   return width as number * 3;
+        // },
+        lineWidth: 4,
         // halo: true,
 
         opacity: 1,

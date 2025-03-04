@@ -26,7 +26,7 @@ const createData = (): ICanvasData => {
       key !== "Lat" &&
       key !== "Long"
     );
-    dateKeys.slice(0, 5).map((dateKey: any) => {
+    dateKeys.slice(0, 1).map((dateKey: any) => {
       const nodeKey = `${row["Province/State"] ? `${row["Province/State"]}-${row["Country/Region"]}-${dateKey}` : row["Country/Region"]}-${dateKey}`;
       const dateObj = new Date(dateKey.split('/').map((n: string, i: number) => i === 2 ? '20' + n : n).join('/'));
 
@@ -38,7 +38,7 @@ const createData = (): ICanvasData => {
           country: row["Country/Region"],
           province_or_state: row["Province/State"],
           cases_confirmed: row[dateKey],
-          date: dateObj,
+          timestamp: dateObj,
           lat: row["Lat"],
           long: row["Long"]
         }
@@ -64,7 +64,7 @@ const createData = (): ICanvasData => {
       key !== "Lat" &&
       key !== "Long"
     );
-    dateKeys.slice(0, 5).map((dateKey: any) => {
+    dateKeys.slice(0, 1).map((dateKey: any) => {
       const from_key = `${row["Province/State"] ? `${row["Province/State"]}-${row["Country/Region"]}-${dateKey}` : row["Country/Region"]}-${dateKey}`;
       const dateObj = new Date(dateKey.split('/').map((n: string, i: number) => i === 2 ? '20' + n : n).join('/'));
 
@@ -75,13 +75,13 @@ const createData = (): ICanvasData => {
         source: `${row["Country/Region"]}`,
         properties: {
           cases_confirmed: row[dateKey],
-          date: dateObj,
+          timestamp: dateObj,
         }
       });
     })
 
     edges.set(`COVIDCases-${row["Country/Region"]}`, {
-      id: `$COVIDCases-${row["Country/Region"]}`,
+      id: `COVIDCases-${row["Country/Region"]}`,
       type: 'is_related_to',
       source: 'COVIDCases',
       target: `${row["Country/Region"]}`,

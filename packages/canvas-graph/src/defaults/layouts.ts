@@ -67,22 +67,22 @@ export const FORCE_LAYOUT: CanvasGraphLayout = {
   preventOverlap: true,
   // center: [200, 200], // Optional, default is the center of the graph
   // linkDistance: 100, // Optional, edge length
-  nodeStrength: 30, // Optional
-  edgeStrength: 0.8, // Optional
-  collideStrength: 0.8, // Optional
-  nodeSize: 30, // Optional
-  alpha: 0.9, // Optional
-  alphaDecay: 0.3, // Optional
-  alphaMin: 0.01, // Optional
+  // nodeStrength: 30, // Optional
+  // edgeStrength: 0.8, // Optional
+  // collideStrength: 0.8, // Optional
+  // nodeSize: 30, // Optional
+  // alpha: 0.9, // Optional
+  // alphaDecay: 0.3, // Optional
+  // alphaMin: 0.01, // Optional
   // forceSimulation: null, // Optional
-  onTick: () => {
-    // Optional
-    console.log('ticking');
-  },
-  onLayoutEnd: () => {
-    // Optional
-    console.log('force layout done');
-  }
+  // onTick: () => {
+  //   // Optional
+  //   console.log('ticking');
+  // },
+  // onLayoutEnd: () => {
+  //   // Optional
+  //   console.log('force layout done');
+  // }
 }
 
 export const GFORCE_LAYOUT: CanvasGraphLayout = {
