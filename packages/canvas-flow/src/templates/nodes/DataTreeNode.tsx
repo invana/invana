@@ -18,7 +18,7 @@ export type DataTreeNodeItem = {
 
 export type DataTreeNodeProps = NodeProps & {
   data: {
-    id: string
+    id?: string
     headerTitle: React.ReactNode
     icon?: React.ReactNode
     headerDescription?: React.ReactNode

@@ -8,6 +8,7 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
   nodes: [{
     id: "1",
     type: "DataTreeNode",
+    position: { x: -300, y: 0 },
     data: {
       headerTitle: "SQL Database",
       headerDescription: "This node represents a SQL Database.",
@@ -26,7 +27,6 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         }
       ]
     },
-    position: { x: -300, y: 0 }
   },
   {
     id: "2",

@@ -46,7 +46,7 @@ export const ViewportControls: React.FC = () => {
 
       <ButtonWithTooltip
         variant="ghost"
-        size="icon-sm"
+        size="icon"
         className="rounded-none"
         onClick={() => zoomOut({ duration: 300 })}
         tooltip={<p>Zoom out</p>}
@@ -55,7 +55,7 @@ export const ViewportControls: React.FC = () => {
       </ButtonWithTooltip>
       <ButtonWithTooltip
         variant="ghost"
-        size="icon-sm"
+        size="icon"
         className="rounded-none"
         onClick={() => zoomIn({ duration: 300 })}
         tooltip={<p>Zoom In</p>}

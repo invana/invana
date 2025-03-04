@@ -176,7 +176,7 @@ export const ANTV_DAGRE_LAYOUT: CanvasGraphLayout = {
 
 export const DENDROGRAM_LAYOUT: CanvasGraphLayout = {
   type: 'dendrogram',
-  direction: 'LR', // H / V / LR / RL / TB / BT
+  // direction: 'LR', // H / V / LR / RL / TB / BT
   nodeSep: 50,
   rankSep: 250,
 }
@@ -204,6 +204,8 @@ export const MINDMAP_LAYOUT: CanvasGraphLayout = {
   getHGap: () => 100,
   animation: false
 }
+
+// export const 
 
 export const ALL_AVAILABLE_LAYOUTS: CanvasGraphLayout[] = [
   GRAPHIN_FORCE_LAYOUT,

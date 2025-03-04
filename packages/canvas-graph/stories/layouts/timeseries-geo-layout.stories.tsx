@@ -4,6 +4,7 @@ import { COVIDTimeSeriesGeoDataSet } from '@invana/example-datasets'
 import { defaultContainerStyle, defaultOptions } from '../constants';
 import { ANTV_DAGRE_LAYOUT, DENDROGRAM_LAYOUT, FORCE_LAYOUT, GRAPHIN_FORCE_LAYOUT, MINDMAP_LAYOUT } from '@invana/canvas-graph/defaults/layouts';
 import { CanvasGraphPlugin } from '@invana/canvas-graph/types';
+import { PLACE_RADIAL_LABELS_TRANSFORMER } from '@invana/canvas-graph/defaults/transforms';
 
 
 
@@ -66,21 +67,31 @@ export const LeftToRight: Story = {
         ...(defaultOptions.plugins || []),
         TIMEBAR_PLUGIN
       ],
+      transforms: [PLACE_RADIAL_LABELS_TRANSFORMER,],
       styles: {
         defaultNode: {
           fields: {
             timestampField: 'properties.timestamp',
           }
-        }
-      },
-      layout: FORCE_LAYOUT
-      // layout: MINDMAP_LAYOUT
-      // layout: {
-      //   ...DENDROGRAM_LAYOUT,
-      //   radial: true,
-      //   direction: undefined,
+        },
+        // defaultEdge: {
+        //   shape: {
+        //     type: 'cubic-radial',
+        //   },
 
-      // }
+        //   fields: {
+        //     timestampField: 'properties.timestamp',
+        //   }
+        // }
+      },
+      // layout: FORCE_LAYOUT
+      // layout: MINDMAP_LAYOUT
+      layout: {
+        ...DENDROGRAM_LAYOUT,
+        radial: true,
+        // direction: undefined,
+
+      }
       // layout: {
       // ...ANTV_DAGRE_LAYOUT,
       // radial: true,

@@ -107,7 +107,7 @@ export const CanvasControls = () => {
       <Separator orientation="vertical" className="h-4" />
       <ButtonWithTooltip
         variant="ghost"
-        size="icon-sm"
+        size="icon"
         className="rounded-none px-4"
         onClick={() => toggleLockViewport()}
         tooltip={<p>{lockViewport ? "Unlock Canvas" : "Lock Canvas"}</p>}
@@ -117,7 +117,7 @@ export const CanvasControls = () => {
       <Separator orientation="vertical" className="h-4" />
       <ButtonWithTooltip
         variant="ghost"
-        size="icon-sm"
+        size="icon"
         className="rounded-none px-4"
         onClick={() => eraseCanvas()}
         tooltip={<p>Erase Everything</p>}
