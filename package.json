@@ -42,7 +42,7 @@
     "electron-packager": "^15.2.0",
     "eslint-plugin-react": "^7.22.0",
     "style-loader": "^2.0.0",
-    "wait-on": "^5.2.1"
+    "wait-on": "^8.0.2"
   },
   "scripts": {
     "start": "PORT=3000 react-scripts start",
