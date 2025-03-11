@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "build-storybook": "storybook build",
-    "build:styles": "postcss ./src/index.css -o ./dist/canvas-flow.css --env production",
+    "build:styles": "postcss ./src/index.css -o ./dist/canvas-reactflow.css --env production",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6011",
     "storybook-build": "storybook build"
