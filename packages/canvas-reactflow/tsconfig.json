@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@invana/canvas-flow/*": [
+      "@invana/canvas-reactflow/*": [
         "./src/*"
       ],
       "@invana/ui/*": [
