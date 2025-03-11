@@ -1,4 +1,4 @@
-import { DataTreeNodeProps } from "@invana/canvas-flow/templates/nodes/DataTreeNode";
+import { DataTreeNodeProps } from "@invana/canvas-reactflow/templates/nodes/DataTreeNode";
 import { Edge } from "@xyflow/react";
 import { Database, File, Folder } from "lucide-react";
 import React from "react";

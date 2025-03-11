@@ -15,11 +15,11 @@
       "@invana/ui/*": [
         "../../packages/ui/src/*"
       ],
-      "@invana/canvas-flow": [
-        "../../packages/canvas-flow/src"
+      "@invana/canvas-reactflow": [
+        "../../packages/canvas-reactflowsrc"
       ],
-      "@invana/canvas-flow/*": [
-        "../../packages/canvas-flow/src/*"
+      "@invana/canvas-reactflow/*": [
+        "../../packages/canvas-reactflowsrc/*"
       ],
       "@invana/canvas-graph": [
         "../../packages/canvas-graph/src"

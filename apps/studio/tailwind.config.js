@@ -5,7 +5,7 @@ export const presets = [sharedConfig];
 export const content = [
   "./src/**/*.{ts,tsx}",
   "../../packages/ui/src/**/*.{ts,tsx}",
-  "../../packages/canvas-flow/src/**/*.{ts,tsx}",
+  "../../packages/canvas-reactflowsrc/**/*.{ts,tsx}",
   "../../packages/canvas-graph/src/**/*.{ts,tsx}"
 
 ];

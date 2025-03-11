@@ -1,12 +1,12 @@
 import { Network } from 'lucide-react';
 import React from 'react';
-import { CanvasFlow, CanvasToolBar, defaultFlowCanvasOptions } from '@invana/canvas-flow';
+import { CanvasFlow, CanvasToolBar, defaultFlowCanvasOptions } from '@invana/canvas-reactflow';
 import { LogoComponent, bottomNavItems, topNavItems } from '../constants';
 import { ProductCopyRightInfo, ProductName } from '@/constants';
 import {
   BlankLayout
 } from '@invana/ui';
-import { ReactFlowProvider } from '@invana/canvas-flow';
+import { ReactFlowProvider } from '@invana/canvas-reactflow';
 import { data } from '../explorer/dummy-data'
 import { AppHeader, AppFooter, AppMain } from '@invana/ui/themes/app'
 import useTheme from '@invana/ui/hooks/useTheme';
