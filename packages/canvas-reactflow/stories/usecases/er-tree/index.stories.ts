@@ -18,7 +18,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 
-
 const layoutEngine = new DagreLayoutEngine()
 
 const { layoutedNodes, layoutedEdges } = layoutEngine.getLayoutedElements(data.nodes, data.edges)
