@@ -40,7 +40,7 @@ function DataTreeNodeItem({ item }: { item: DataTreeNodeItem }) {
           item.onClick?.(item.id, item.label);
         }}
         className={cn(
-          "flex items-center gap-2 w-full rounded-sm px-2 py-1 relative hover:bg-accent hover:text-accent-foreground",
+          "flex items-center gap-2 w-full rounded-sm px-2 py-2 relative hover:bg-accent hover:text-accent-foreground",
           hasChildren && "cursor-pointer font-medium"
         )}
       >
@@ -62,7 +62,7 @@ function DataTreeNodeItem({ item }: { item: DataTreeNodeItem }) {
           <div className="absolute left-0 top-0 bottom-0 border-l border-muted-foreground/25" />
           {item.children?.map((child, index) => (
             <div key={child.id} className="relative">
-              <div className="absolute -left-4 top-[15px] w-4 border-t border-muted-foreground/25 mt-[-2.5px]" />
+              <div className="absolute -left-4 top-[15px] w-4 border-t border-muted-foreground/25 mt-[0.5px]" />
               <DataTreeNodeItem key={index} item={child} />
             </div>
           ))}
@@ -100,7 +100,7 @@ const DataTreeNode = ({ id, data, selected = false, ...props }: DataTreeNodeProp
 
         <div className="flex">
 
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-2 text-[16px]">
             {data.icon &&
               <span>
                 {data.icon}
