@@ -52,6 +52,7 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
     <div style={options.style}>
       <ReactFlow
         ref={ref}
+        // onInit={ }
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodes={nodes}
