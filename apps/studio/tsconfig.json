@@ -16,10 +16,10 @@
         "../../packages/ui/src/*"
       ],
       "@invana/canvas-reactflow": [
-        "../../packages/canvas-reactflowsrc"
+        "../../packages/canvas-reactflow/src"
       ],
       "@invana/canvas-reactflow/*": [
-        "../../packages/canvas-reactflowsrc/*"
+        "../../packages/canvas-reactflow/src/*"
       ],
       "@invana/canvas-graph": [
         "../../packages/canvas-graph/src"
