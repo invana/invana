@@ -62,7 +62,7 @@ function DataTreeNodeItem({ item }: { item: DataTreeNodeItem }) {
           <div className="absolute left-0 top-0 bottom-0 border-l border-muted-foreground/25" />
           {item.children?.map((child, index) => (
             <div key={child.id} className="relative">
-              <div className="absolute -left-4 top-[15px] w-4 border-t border-muted-foreground/25" />
+              <div className="absolute -left-4 top-[15px] w-4 border-t border-muted-foreground/25 mt-[-2.5px]" />
               <DataTreeNodeItem key={index} item={child} />
             </div>
           ))}
