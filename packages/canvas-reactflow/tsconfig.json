@@ -2,19 +2,19 @@
   "extends": "@invana/config-typescript/tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "@invana/canvas-reactflow/*": [
-        "./src/*"
-      ],
-      "@invana/ui/*": [
-        "../../packages/ui/src/*"
-      ]
-    }
+    // "paths": {
+    //   "@invana/canvas-reactflow/*": [
+    //     "./src/*"
+    //   ],
+    //   "@invana/ui/*": [
+    //     "../../packages/ui/src/*"
+    //   ]
+    // }
   },
-  "exclude": [
-    "node_modules",
-    "**/*.stories.ts",
-    "**/*.stories.tsx",
-    "stories/**"
-  ]
+  // "exclude": [
+  //   "node_modules",
+  //   "**/*.stories.ts",
+  //   "**/*.stories.tsx",
+  //   "stories/**"
+  // ]
 }

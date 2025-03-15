@@ -16,7 +16,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, './src'),
       "@invana/ui": path.resolve(__dirname, '../../packages/ui/src'),
-      "@invana/canvas-reactflow": path.resolve(__dirname, '../../packages/canvas-reactflowsrc'),
+      "@invana/canvas-reactflow": path.resolve(__dirname, '../../packages/canvas-reactflow/src'),
       "@invana/canvas-graph": path.resolve(__dirname, '../../packages/canvas-graph/src'),
       "@invana/data-store": path.resolve(__dirname, '../../packages/data-store'),
 
