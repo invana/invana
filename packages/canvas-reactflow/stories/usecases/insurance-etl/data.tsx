@@ -446,52 +446,55 @@ export const getData = () => {
       }
     });
 
-    const getDashboard = (dashboardName: string): TableauDashboard | undefined => {
-      return insuranceSystem.tableauDashboards.find((dashboard) => {
-        console.log("dashboard.name", dashboard.name, dashboardName, dashboard.name === dashboardName)
-        return dashboard.name === dashboardName;
-      });
-    }
 
-    insuranceSystem.etlProcesses.forEach(etlProcess => {
-      etlProcess.dashboards.forEach(dashboardName => {
-        const dashboard = getDashboard(dashboardName);
-        console.log("=====dashboard", dashboard, dashboardName)
-        dashboard?.sourceColumns.forEach((sourceCol) => {
-          // edges between table/column and etl/dashboard 
-          sourceCol.columns.forEach(column => {
-            const tableId = `table_${sourceCol.table.split(".")[1]}`
-            const etlId = `etl_${etl.name}`;
-            const edge = {
-              id: `${tableId}_column_${column}_${etlId}_${dashboard.name}`,
-              source: tableId,
-              sourceHandle: `${tableId}_column_${column}`,
-              target: etlId,
-              targetHandle: `${etlId}_${dashboard.name}`
-            }
-            edges.push(edge);
-          });
 
-          /// edges between etl/dashboard to dashboard/column 
-          sourceCol.columns.forEach(column => {
-            const etlId = `etl_${etl.name}`;
-            const dashboardId = `dashboard_${dashboard.name}`;
-            const edge = {
-              id: `${etlId}_${dashboard.name}_${dashboardId}_${column}`,
-              source: etlId,
-              sourceHandle: `${etlId}_${dashboard.name}`,
-              target: dashboardId,
-              targetHandle: `${dashboardId}_${column}`,
-            }
-            edges.push(edge);
-          });
-        })
 
-      })
-    })
 
   });
+  const getDashboard = (dashboardName: string): TableauDashboard | undefined => {
+    return insuranceSystem.tableauDashboards.find((dashboard) => {
+      console.log("dashboard.name", dashboard.name, dashboardName, dashboard.name === dashboardName)
+      return dashboard.name === dashboardName;
+    });
+  }
+  insuranceSystem.etlProcesses.forEach(etlProcess => {
+    etlProcess.dashboards.forEach(dashboardName => {
+      const dashboard = getDashboard(dashboardName);
+      console.log("=====dashboard", dashboard, dashboardName)
+      dashboard?.sourceColumns.forEach((sourceCol) => {
+        // edges between table/column and etl/dashboard 
+        sourceCol.columns.forEach(column => {
+          const tableId = `table_${sourceCol.table.split(".")[1]}`
+          const etlId = `etl_${etlProcess.name}`;
+          const edge = {
+            id: `${tableId}_column_${column}_${etlId}_${dashboard.name}`,
+            source: tableId,
+            sourceHandle: `${tableId}_column_${column}`,
+            target: etlId,
+            targetHandle: `${etlId}_${dashboard.name}`
+          }
+          edges.push(edge);
+        });
 
+        // edges between etl/dashboard to dashboard/column 
+        sourceCol.columns.forEach((column) => {
+          const etlId = `etl_${etlProcess.name}`;
+          const dashboardId = `dashboard_${dashboard.name}`;
+          // Check if the target handle exists before creating the edge
+          const edge = {
+            id: `${etlId}_${dashboard.name}_${dashboardId}_${column}`,
+            source: etlId,
+            sourceHandle: `${etlId}_${dashboard.name}`,
+            target: dashboardId,
+            // Make sure this ID matches exactly what's defined in the dashboard node's children
+            targetHandle: `${dashboardId}_${column}`,
+          }
+          edges.push(edge);
+        });
+      })
+
+    })
+  })
   // Add dashboard nodes
   insuranceSystem.tableauDashboards.forEach((dashboard, dashboardIndex) => {
     const dashboardId = `dashboard_${dashboard.name}`;
@@ -537,7 +540,19 @@ export const getData = () => {
     // });
   });
 
-  return { nodes, edges };
+  // Deduplicate edges by ID
+  const uniqueEdgesMap = new Map();
+  edges.forEach(edge => {
+    uniqueEdgesMap.set(edge.id, edge);
+  });
+
+  // Convert the map values back to array
+  const uniqueEdges = Array.from(uniqueEdgesMap.values());
+
+  // Replace the original edges array with the deduplicated version
+  // edges.length = 0;
+  // uniqueEdges.forEach(edge => edges.push(edge));
+  return { nodes, edges: uniqueEdges };
 };
 
 
