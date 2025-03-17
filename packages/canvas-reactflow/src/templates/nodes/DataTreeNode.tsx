@@ -55,15 +55,16 @@ function DataTreeNodeItem({ item, nodeId,
         key={"i-" + item.label}
 
         onClick={(e: React.MouseEvent) => {
+          onFieldClick(e)
+
           if (hasChildren) { setIsExpanded(!isExpanded); }
           item.onClick?.(item.id, item.label);
-          onFieldClick(e)
         }}
 
         className={cn(
-          "flex items-center gap-2 w-full rounded-sm px-2 py-2 relative hover:bg-accent hover:text-accent-foreground",
+          "flex items-center gap-2 w-full rounded-sm px-2 py-2 relative",
           hasChildren && "cursor-pointer font-medium",
-          "nodeField io"
+          "nodeField io "
         )}
       >
         {hasChildren && (
@@ -141,7 +142,7 @@ const DataTreeNode = ({ id, data, selected = false, ...props }: DataTreeNodeProp
 
 
   return (
-    <BaseNodeTemplate id={id} selected={selected} className="w-[260px] p-0">
+    <BaseNodeTemplate id={id} selected={selected} className="w-[280px] p-0">
       <div
         className="cursor-pointer relative rounded-t-sm border-b py-2 px-3 bg-background mb-3"
       >

@@ -1,3 +1,43 @@
+[data-canvas-theme="dark"] {
+  /* --canvas-bg: #111111;
+  --canvas-text: #ffffff;
+  --canvas-node-bg: #343434;
+  --canvas-node-text: #ffffff;
+
+  --canvas-node-selected-border: #6aadeb;
+  --canvas-border: #4d4d4d;
+
+  --canavas-header-bg: #212121;
+
+  --canvas-handle-color: #8a8a8a;  
+
+  --canvas-node-field-hightlight-bg: rgb(86, 101, 105);
+  --canvas-node-field-hightlight-text: #fff;
+
+  --canvas-node-shadow:  rgb(51 51 51 / 70%); */
+
+}
+
+[data-canvas-theme="light"] {
+  /* --canvas-bg: #ffffff;
+  --canvas-text: #111111;
+  --canvas-node-bg: #efefef;
+  --canvas-node-text: #111111;
+
+  --canvas-node-selected-border: #6aadeb;
+  --canvas-border: #cacaca;
+
+  --canavas-header-bg: #cfcfcf;
+
+  --canvas-handle-color: #ccc; 
+
+  --canvas-node-field-hightlight-bg: rgb(86, 101, 105);
+  --canvas-node-field-hightlight-text: #fff;
+
+    --canvas-node-shadow:  rgb(232 232 232 / 70%); */
+
+}
+
 .react-flow.dark {
   --xy-background-color-default: transparent !important;
 }
@@ -9,7 +49,7 @@
   background: none !important;
 }
 
-.nodeField {
+/* .nodeField {
   cursor: pointer !important;
 
 }
@@ -17,8 +57,9 @@
 .nodeField.highlight {
   background-color: var(--canvas-node-field-hightlight-bg);
   color: var(--canvas-node-field-hightlight-text);
+  background-color: #fff;
 }
 
 .nodeField.inactive {
   opacity: 0.2;
-}
+} */

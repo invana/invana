@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -23,6 +23,7 @@ import { CanvasToolBar } from "../plugins/toolbars/CanvasToolBar";
 // import { ButtonWithTooltip } from "@invana/ui";
 import { DevTools } from "../plugins/toolbars/DevTools";
 import { FlowInstanceType } from "../interactions/interactions";
+import { resetHandlePathHighlight } from "../interactions/EntityRelationHighlight";
 
 
 
@@ -30,7 +31,7 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
   options = { ...defaultFlowCanvasOptions, ...options };
   const ref = useRef<ReactFlowInstance | null>(null);
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance | null>(null);
-  const onInit = (reactFlowInstance: ReactFlowInstance) => {
+  const onInit = (reactFlowInstance: ReactFlowInstance<Node, Edge>) => {
     setFlowInstance(reactFlowInstance);
     // onLayoutUpdated(direction, reactFlowInstance);
   };
@@ -42,6 +43,13 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
   const [nodes, _setNodes, onNodesChange] = useNodesState(defaultNodes);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [edges, _setEdges, onEdgesChange] = useEdgesState(options?.edges || []);
+
+
+  useEffect(() => {
+    console.log("Mode changed to:", options.canvas?.colorMode);
+    const mode: "light" | "dark" = options.canvas?.colorMode === "system" ? "dark" : options.canvas?.colorMode || "dark"
+    document.querySelector("html")?.setAttribute("data-canvas-theme", mode);
+  }, [options.canvas?.colorMode]);
 
   // const [colorMode, setColorMode] = React.useState<ColorMode>(options.canvas?.colorMode || 'system');
 
@@ -56,6 +64,11 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
   //   setColorMode(newTheme);
   // }
 
+  const onPanelClick = (event: React.MouseEvent<Element, MouseEvent>) => {
+
+    resetHandlePathHighlight(nodes, edges, _setNodes, _setEdges)
+  }
+
   // console.log("colorMode", options.canvas?.colorMode);
   return (
     <div style={options.style}>
@@ -69,6 +82,8 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
           edges={edges}
           colorMode={options.canvas?.colorMode}
           onInit={onInit}
+          edgeStyles={{}}
+          onPaneClick={onPanelClick}
           onEdgeClick={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeClick(event, edge, flowInstance)}
           onEdgeMouseEnter={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseEnter(event, edge, flowInstance)}
           onEdgeMouseLeave={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseLeave(event, edge, flowInstance)}

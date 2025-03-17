@@ -24,7 +24,7 @@ const DataFieldsNode = ({ id, data, selected = false }: DataFieldsNodeProps) => 
   const fields = data.fields || [];
 
   return (
-    <BaseNodeTemplate id={id} selected={selected} className="min-w-[240px] p-0">
+    <BaseNodeTemplate id={id} selected={selected} className="min-w-[280px] p-0">
       <Handle type="source" className="absolute top-5" position={Position.Right} id={id} />
       <Handle type="target" className="absolute top-5" position={Position.Left} id={id} />
 
