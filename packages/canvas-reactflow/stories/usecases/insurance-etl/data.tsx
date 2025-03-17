@@ -509,14 +509,15 @@ export const getData = () => {
         headerTitle: dashboard.name + ' Dashboard',
         headerDescription: dashboard.description,
         icon: <LayoutDashboard className="h-4 w-4 shrink-0  __text-gray-500" />,
-        children: dashboard.sourceColumns[0].columns.map((column) => {
-          return {
-            label: column,
-            id: `${dashboardId}_${column}`,
-            icon: <Columns className="h-4 w-4 shrink-0  __text-gray-500" />
-          };
+        children: dashboard.sourceColumns.flatMap((sourceCol) => {
+          return sourceCol.columns.map((column) => {
+            return {
+              label: column,
+              id: `${dashboardId}_${column}`,
+              icon: <Columns className="h-4 w-4 shrink-0  __text-gray-500" />
+            };
+          });
         })
-
       },
       position: {
         x: 0,
