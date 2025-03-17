@@ -22,7 +22,7 @@ export const HIGHLIGHT_CONSTANTS = {
   HIGHLIGHT_FIELD_CLASSES: ['bg-sky-400', 'text-zinc-900'],
   INACTIVE_FIELD_CLASSES: ['text-zinc-700'],
   EDGE_HIGHLIGHTED_STROKE: '#38bdf8',
-  EDGE_INVACTIVE_STROKE: '#999',
+  EDGE_INVACTIVE_STROKE: '#222222',
   EDGE_NORMAL_STROKE: '#444444'
 }
 
@@ -145,7 +145,7 @@ export const highlightHandlePathByNodeHandleId = (
     } else {
       // edge.hidden = true // 
       edge.style = {
-        // ...edge.style,
+        ...edge.style,
         stroke: HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
         opacity: 0.4
       };

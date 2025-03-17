@@ -45,6 +45,7 @@ function DataTreeNodeItem({ item, nodeId,
 
 
   const store = useStoreApi();
+
   const { edges, nodes, setNodes, setEdges } = store.getState();
   const onFieldMouseOver = (e: React.MouseEvent) => {
     console.log("===onFieldMouseOver", e)
@@ -73,8 +74,8 @@ function DataTreeNodeItem({ item, nodeId,
   return (
     <div >
       <button
-        onMouseOver={onFieldMouseOver}
-        onMouseOut={onFieldMouseOut}
+        onMouseOver={(e: React.MouseEvent) => onFieldMouseOver(e)}
+        onMouseOut={(e: React.MouseEvent) => onFieldMouseOut(e)}
         id={generateFieldName(nodeId, item.id)}
         data-node-id={nodeId}
         data-handle-id={item.id}
