@@ -202,12 +202,12 @@ export const insuranceSystem = {
 
   etlProcesses: [
     {
-      name: "daily_policy_transfer(ETL)",
+      name: "daily_policy_transfer_etl",
       description: "Extracts policy data from production to analytics",
       sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.policy_metrics"],
       schedule: "Daily at 01:00 AM",
-      dashboards: ["policy_performance", "regional_analysis"]
+      dashboards: ["policy_performance", "claims_processing"]
     }
   ],
 
@@ -218,7 +218,7 @@ export const insuranceSystem = {
       sourceTables: ["insurance_analytics.analytics.policy_metrics"],
       sourceColumns: [
         {
-          table: "policy_metrics",
+          table: "insurance_analytics.policy_metrics",
           columns: ["policy_type", "month", "total_policies", "active_policies", "total_premium", "average_premium"]
         }
       ]
@@ -229,7 +229,7 @@ export const insuranceSystem = {
       sourceTables: ["insurance_prod.public.claims"],
       sourceColumns: [
         {
-          table: "claims",
+          table: "insurance_prod.claims",
           columns: ["incident_date", "filing_date", "resolution_date", "status", "claim_amount"]
         }
       ]
@@ -238,11 +238,9 @@ export const insuranceSystem = {
 }
 
 
-
 export const getData = () => {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
-  let edgeId = 1;
 
   // Track node IDs for edge creation
   const tableIds: { [key: string]: string } = {};
@@ -265,7 +263,7 @@ export const getData = () => {
         children: db.tables.map((table) => {
           return {
             label: table.name,
-            id: `table_${table.name}`,
+            id: `${dbId}_table_${table.name}`,
             icon: <Table className="h-4 w-4 shrink-0  __text-gray-500" />
           }
         })
@@ -325,70 +323,15 @@ export const getData = () => {
 
       // Connect database to table
       edges.push({
-        id: `e${edgeId++}`,
+        id: `e_${dbId}_${tableId}`,
         source: dbId,
+        sourceHandle: `${dbId}_table_${table.name}`,
         target: tableId,
-        animated: false
       });
     });
 
-    // Add view nodes
-    // db.views.forEach((view, viewIndex) => {
-    //   const viewId = `view_${view.name}`;
-
-    //   // Add view node
-    //   nodes.push({
-    //     id: viewId,
-    //     data: {
-    //       type: 'view',
-    //       label: view.name,
-    //       schema: view.schema,
-    //       definition: view.definition
-    //     },
-    //     position: {
-    //       x: 0,
-    //       y: 0
-    //     }
-    //   });
-
-    //   // Connect view to its source table if it's defined in the view definition
-    //   const tableMatches = [...view.definition.matchAll(/FROM\s+(\w+)/gi)];
-    //   if (tableMatches.length > 0) {
-    //     const sourceTable = tableMatches[0][1];
-    //     if (tableIds[sourceTable]) {
-    //       edges.push({
-    //         id: `e${edgeId++}`,
-    //         source: viewId,
-    //         target: tableIds[sourceTable],
-    //         animated: false,
-    //         style: { strokeDasharray: '5,5' }
-    //       });
-    //     }
-    //   }
-    // });
   });
 
-  // Add foreign key relationships
-  // insuranceSystem.databases.forEach(db => {
-  //   db.tables.forEach(table => {
-  //     table.columns.forEach(column => {
-  //       if (column.isForeignKey && column.references) {
-  //         const sourceTableId = tableIds[table.name];
-  //         const targetTableId = tableIds[column.references.table];
-
-  //         if (sourceTableId && targetTableId) {
-  //           edges.push({
-  //             id: `e${edgeId++}`,
-  //             source: sourceTableId,
-  //             target: targetTableId,
-  //             animated: false,
-  //             label: column.name
-  //           });
-  //         }
-  //       }
-  //     });
-  //   });
-  // });
 
   // Add ETL process nodes
   insuranceSystem.etlProcesses.forEach((etl, etlIndex) => {
@@ -418,35 +361,78 @@ export const getData = () => {
       }
     });
 
-    // Connect source tables to ETL
-    etl.sourceTables.forEach(sourceTablePath => {
-      const parts = sourceTablePath.split('.');
-      const tableName = parts[parts.length - 1];
+    const getDashboard = (dashboardName: string): TableauDashboard | undefined => {
+      return insuranceSystem.tableauDashboards.find((dashboard) => {
+        console.log("dashboard.name", dashboard.name, dashboardName, dashboard.name === dashboardName)
+        return dashboard.name === dashboardName;
+      });
+    }
 
-      if (tableIds[tableName]) {
-        edges.push({
-          id: `e${edgeId++}`,
-          source: tableIds[tableName],
-          target: etlId,
-          animated: true
-        });
-      }
-    });
+    insuranceSystem.etlProcesses.forEach(etlProcess => {
+      etlProcess.dashboards.forEach(dashboardName => {
+        const dashboard = getDashboard(dashboardName);
+        console.log("=====dashboard", dashboard, dashboardName)
+        dashboard?.sourceColumns.forEach((sourceCol) => {
+          // edges between table/column and etl/dashboard 
+          sourceCol.columns.forEach(column => {
+            const tableId = `table_${sourceCol.table.split(".")[1]}`
+            const etlId = `etl_${etl.name}`;
+            const edge = {
+              id: `${tableId}_column_${column}_${etlId}_${dashboard.name}`,
+              source: tableId,
+              sourceHandle: `${tableId}_column_${column}`,
+              target: etlId,
+              targetHandle: `${etlId}_${dashboard.name}`
+            }
+            edges.push(edge);
+          });
+
+          /// edges between etl/dashboard to dashboard/column 
+          sourceCol.columns.forEach(column => {
+            const etlId = `etl_${etl.name}`;
+            const dashboardId = `dashboard_${dashboard.name}`;
+            const edge = {
+              id: `${etlId}_${dashboard.name}_${dashboardId}_${column}`,
+              source: etlId,
+              sourceHandle: `${etlId}_${dashboard.name}`,
+              target: dashboardId,
+              targetHandle: `${dashboardId}_${column}`,
+            }
+            edges.push(edge);
+          });
+        })
+
+      })
+    })
+
+    // insuranceSystem.tableauDashboards.forEach((dashboard) => {
+
+
+    // })
+
+
+    // // Connect database to table
+    // edges.push({
+    //   id: `e_${dbId}_${tableId}`,
+    //   source: dbId,
+    //   sourceHandle: `${dbId}_table_${table.name}`,
+    //   target: tableId,
+    // });
 
     // Connect ETL to target tables
-    etl.targetTables.forEach(targetTablePath => {
-      const parts = targetTablePath.split('.');
-      const tableName = parts[parts.length - 1];
+    // etl.targetTables.forEach(targetTablePath => {
+    //   const parts = targetTablePath.split('.');
+    //   const tableName = parts[parts.length - 1];
 
-      if (tableIds[tableName]) {
-        edges.push({
-          id: `e${edgeId++}`,
-          source: etlId,
-          target: tableIds[tableName],
-          animated: true
-        });
-      }
-    });
+    //   if (tableIds[tableName]) {
+    //     edges.push({
+    //       id: `e${edgeId++}`,
+    //       source: etlId,
+    //       target: tableIds[tableName],
+    //       animated: true
+    //     });
+    //   }
+    // });
   });
 
   // Add dashboard nodes
@@ -467,7 +453,7 @@ export const getData = () => {
           return {
             label: column,
             id: `${dashboardId}_${column}`,
-            icon: <LayoutDashboard className="h-4 w-4 shrink-0  __text-gray-500" />
+            icon: <Columns className="h-4 w-4 shrink-0  __text-gray-500" />
           };
         })
 
@@ -479,19 +465,19 @@ export const getData = () => {
     });
 
     // Connect source tables to dashboard
-    dashboard.sourceTables.forEach(sourceTablePath => {
-      const parts = sourceTablePath.split('.');
-      const tableName = parts[parts.length - 1];
+    // dashboard.sourceTables.forEach(sourceTablePath => {
+    //   const parts = sourceTablePath.split('.');
+    //   const tableName = parts[parts.length - 1];
 
-      if (tableIds[tableName]) {
-        edges.push({
-          id: `e${edgeId++}`,
-          source: tableIds[tableName],
-          target: dashboardId,
-          animated: false
-        });
-      }
-    });
+    //   if (tableIds[tableName]) {
+    //     edges.push({
+    //       id: `e${edgeId++}`,
+    //       source: tableIds[tableName],
+    //       target: dashboardId,
+    //       animated: false
+    //     });
+    //   }
+    // });
   });
 
   return { nodes, edges };
