@@ -160,11 +160,10 @@ export const highlightHandlePathByNodeHandleId = (
       ? [generateFieldName(nodeId, handleId)]
       : getNodeHandles(toHighlightEdges);
 
+  console.log("====toHighlightHandleIds", toHighlightHandleIds)
   toHighlightHandleIds.forEach((handleId) => {
     console.log("====toHighlightHandleId handleId", handleId)
     const el: HTMLElement | null = document.getElementById(handleId);
-    // console.log("====toHighlightHandleId el", el?.id)
-
     if (el) {
       // el.classList.add("highlight");
       // el.classList.add("bg-white")
