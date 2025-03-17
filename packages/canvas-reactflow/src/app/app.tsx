@@ -82,7 +82,7 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
           edges={edges}
           colorMode={options.canvas?.colorMode}
           onInit={onInit}
-          edgeStyles={{}}
+          // edgeStyles={{}}
           onPaneClick={onPanelClick}
           onEdgeClick={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeClick(event, edge, flowInstance)}
           onEdgeMouseEnter={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseEnter(event, edge, flowInstance)}
