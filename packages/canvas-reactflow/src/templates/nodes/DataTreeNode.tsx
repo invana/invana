@@ -75,7 +75,7 @@ function DataTreeNodeItem({ item, nodeId,
         )}
         {item.icon}
         <span className="truncate">{item.label}</span>
-        <Handle type="source" className="bg-neutral-600 border-neutral-600 rounded-[2px] w-[1px] h-[1px]" position={Position.Right} id={item.id} />
+        <Handle type="source" className="bg-neutral-600 rounded-[2px] w-[1px] h-[1px]" position={Position.Right} id={item.id} />
         <Handle type="target" className="bg-neutral-600 rounded-[2px] w-[1px] h-[1px]" position={Position.Left} id={item.id} />
 
       </button>
