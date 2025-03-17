@@ -42,3 +42,7 @@ export const addNodeDefaults = (node: Node, nodeDefaults: Partial<Node>, layoutD
     ...nodeDefaults
   }
 }
+
+export const generateFieldName = (nodeId: string, handleId: string) => {
+  return nodeId + "-" + handleId;
+};
