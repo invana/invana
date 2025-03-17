@@ -12,7 +12,7 @@ import { MarkerType } from "@xyflow/react";
 const nodes = nodesData.map((n) => {
   return {
     id: n['Entity_ID:ID'],
-    type: 'GenericNode',
+    type: 'GenericNode2',
     data: {
       type: n[':Label'],
       label: n['name']
@@ -25,7 +25,7 @@ const edges = edgesData.map((e) => {
     id: `${e[':START_ID']}-${e[':END_ID']}`,
     source: e[':START_ID'],
     target: e[':END_ID'],
-    type: 'smoothstep',
+    type: 'bezier',
     data: {
       type: e[':TYPE'],
       timestamp: e['timestamp']
