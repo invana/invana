@@ -161,7 +161,10 @@ export const highlightHandlePathByNodeHandleId = (
       : getNodeHandles(toHighlightEdges);
 
   toHighlightHandleIds.forEach((handleId) => {
+    console.log("====toHighlightHandleId handleId", handleId)
     const el: HTMLElement | null = document.getElementById(handleId);
+    // console.log("====toHighlightHandleId el", el?.id)
+
     if (el) {
       // el.classList.add("highlight");
       // el.classList.add("bg-white")
@@ -188,9 +191,6 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
     HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
       el.classList.remove(cls)
     })
-
-
-
   });
 
   // remove edge path hightlights of all handle paths

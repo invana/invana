@@ -13,8 +13,8 @@ export const BaseNodeTemplate = React.forwardRef<
       ref={ref}
       id={"node-" + id}
       className={cn(
-        "default-node rounded-md border  bg-card p-2 m-0 text-card-foreground",
-        "dark:bg-neutral-800 dark:text-dark-card-foreground",
+        "default-node rounded-md border p-2 m-0 ",
+
         // "with-auto",
         // " text-center",
         className,
@@ -22,6 +22,7 @@ export const BaseNodeTemplate = React.forwardRef<
         "hover:ring-1",
         "dark:hover:ring-dark-ring",
       )}
+      style={props.style || {}}
       tabIndex={0}
       {...props}
     />

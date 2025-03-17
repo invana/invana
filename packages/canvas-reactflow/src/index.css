@@ -49,6 +49,13 @@
   background: none !important;
 }
 
+.react-flow__node {
+  background-color: transparent !important;
+  border: none !important;
+  /* border; */
+  /* border-radius: 3px; */
+}
+
 /* .nodeField {
   cursor: pointer !important;
 

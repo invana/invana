@@ -14,7 +14,11 @@ const LabeledGroupNode: React.FC<NodeProps<LabeledGroupNode>> = ({ id, data, sel
   return (
     <BaseNodeTemplate id={id} selected={selected}
       // ${props.width ? `w-[${props.width}px]` : ''}
-      className={`bg-white !text-left !bg-opacity-50 h-full rounded-sm overflow-hidden p-0 `}>
+      className={`bg-white !text-left !bg-opacity-50 h-full rounded-sm overflow-hidden p-0 
+              bg-card text-card-foreground 
+        dark:bg-neutral-800 dark:text-dark-card-foreground  
+      
+      `}>
       {data.label && (
         <div className="bg-neutral-600 border-r border-b border-neutral-700 w-fit p-2 text-xs rounded-br-sm text-card-foreground">
           {data.label}

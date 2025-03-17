@@ -18,7 +18,9 @@ const CardNode: React.FC<NodeProps<CardNodeProps>> = ({ id, data, selected = fal
     <BaseNodeTemplate
       selected={selected}
       id={id}
-      className="min-w-[240px] text-card-foreground p-0"
+      className="min-w-[240px] text-card-foreground p-0
+        bg-card text-card-foreground 
+        dark:bg-neutral-800 dark:text-dark-card-foreground      "
     >
       {/* border-gray-600 dark:border-gray-300 */}
       <div className="flex items-center p-2 mb-2 border-b pb-2 border-b bg-neutral-900 rounded-t-md ">

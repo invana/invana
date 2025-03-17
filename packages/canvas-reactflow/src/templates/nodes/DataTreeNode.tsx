@@ -31,16 +31,42 @@ export type DataTreeNodeProps = NodeProps & {
 
 
 function DataTreeNodeItem({ item, nodeId,
-  onFieldClick,
-  onFieldMouseOut,
-  onFieldMouseOver
+  // onFieldClick,
+  // onFieldMouseOut,
+  // onFieldMouseOver
 
 }: {
   item: DataTreeNodeItem, nodeId: string,
-  onFieldClick: (e: React.MouseEvent) => void,
-  onFieldMouseOut: (e: React.MouseEvent) => void,
-  onFieldMouseOver: (e: React.MouseEvent) => void,
+  // onFieldClick: (e: React.MouseEvent) => void,
+  // onFieldMouseOut: (e: React.MouseEvent) => void,
+  // onFieldMouseOver: (e: React.MouseEvent) => void,
 }) {
+
+
+
+  const store = useStoreApi();
+  const { edges, nodes, setNodes, setEdges } = store.getState();
+  const onFieldMouseOver = (e: React.MouseEvent) => {
+    console.log("===onFieldMouseOver", e)
+    const el = e.currentTarget;
+    const nodeId: string = el.getAttribute("data-node-id") || "";
+    const handleId: string | null = el.getAttribute("data-handle-id");
+    console.log("onFieldMouseOver", nodeId, handleId)
+    highlightHandlePathByNodeHandleId(nodeId, handleId, nodes, edges, setNodes, setEdges);
+    // https://github.com/wbkd/react-flow/issues/2418
+  };
+
+  const onFieldMouseOut = (e: React.MouseEvent) => {
+    console.log("===onFieldMouseOut", e);
+    resetHandlePathHighlight(nodes, edges, setNodes, setEdges);
+  };
+
+  const onFieldClick = (e: React.MouseEvent) => {
+    console.log("===onFieldClick", e);
+    onFieldMouseOver(e);
+  };
+
+
   const [isExpanded, setIsExpanded] = React.useState(item.isExpanded ?? true)
   const hasChildren = item.children && item.children.length > 0
 
@@ -87,9 +113,9 @@ function DataTreeNodeItem({ item, nodeId,
             <div key={child.id} className="relative">
               <div className="absolute -left-4 top-[15px] w-4 border-t border-muted-foreground/25 mt-[0.5px]" />
               <DataTreeNodeItem key={index} nodeId={nodeId} item={child}
-                onFieldClick={onFieldClick}
-                onFieldMouseOut={onFieldMouseOut}
-                onFieldMouseOver={onFieldMouseOver}
+              // onFieldClick={onFieldClick}
+              // onFieldMouseOut={onFieldMouseOut}
+              // onFieldMouseOver={onFieldMouseOver}
               />
             </div>
           ))}
@@ -116,33 +142,36 @@ const DataTreeNode = ({ id, data, selected = false, ...props }: DataTreeNodeProp
 
   const filteredItems = filterItems(data.children || [], searchQuery);
 
-  const store = useStoreApi();
-  const { edges, nodes, setNodes, setEdges } = store.getState();
+  // const store = useStoreApi();
+  // const { edges, nodes, setNodes, setEdges } = store.getState();
   // const nodes = getNodes();
 
-  const onFieldMouseOver = (e: React.MouseEvent) => {
-    console.log("===onFieldMouseOver", e)
-    const el = e.currentTarget;
-    const nodeId: string = el.getAttribute("data-node-id") || "";
-    const handleId: string | null = el.getAttribute("data-handle-id");
-    console.log("onFieldMouseOver", nodeId, handleId)
-    highlightHandlePathByNodeHandleId(nodeId, handleId, nodes, edges, setNodes, setEdges);
-    // https://github.com/wbkd/react-flow/issues/2418
-  };
+  // const onFieldMouseOver = (e: React.MouseEvent) => {
+  //   console.log("===onFieldMouseOver", e)
+  //   const el = e.currentTarget;
+  //   const nodeId: string = el.getAttribute("data-node-id") || "";
+  //   const handleId: string | null = el.getAttribute("data-handle-id");
+  //   console.log("onFieldMouseOver", nodeId, handleId)
+  //   highlightHandlePathByNodeHandleId(nodeId, handleId, nodes, edges, setNodes, setEdges);
+  //   // https://github.com/wbkd/react-flow/issues/2418
+  // };
 
-  const onFieldMouseOut = (e: React.MouseEvent) => {
-    console.log("===onFieldMouseOut", e);
-    resetHandlePathHighlight(nodes, edges, setNodes, setEdges);
-  };
+  // const onFieldMouseOut = (e: React.MouseEvent) => {
+  //   console.log("===onFieldMouseOut", e);
+  //   resetHandlePathHighlight(nodes, edges, setNodes, setEdges);
+  // };
 
-  const onFieldClick = (e: React.MouseEvent) => {
-    console.log("===onFieldClick", e);
-    onFieldMouseOver(e);
-  };
+  // const onFieldClick = (e: React.MouseEvent) => {
+  //   console.log("===onFieldClick", e);
+  //   onFieldMouseOver(e);
+  // };
 
 
   return (
-    <BaseNodeTemplate id={id} selected={selected} className="w-[280px] p-0">
+    <BaseNodeTemplate id={id} selected={selected}
+      className="w-[280px] p-0
+        bg-card text-card-foreground 
+        dark:bg-neutral-800 dark:text-dark-card-foreground  ">
       <div
         className="cursor-pointer relative rounded-t-sm border-b py-2 px-3 bg-background mb-3"
       >
@@ -177,9 +206,9 @@ const DataTreeNode = ({ id, data, selected = false, ...props }: DataTreeNodeProp
             key={item.id}
             nodeId={id}
             item={item}
-            onFieldClick={onFieldClick}
-            onFieldMouseOut={onFieldMouseOut}
-            onFieldMouseOver={onFieldMouseOver}
+          // onFieldClick={onFieldClick}
+          // onFieldMouseOut={onFieldMouseOut}
+          // onFieldMouseOver={onFieldMouseOver}
           />
         ))}
       </div>
