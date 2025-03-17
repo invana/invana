@@ -405,34 +405,6 @@ export const getData = () => {
       })
     })
 
-    // insuranceSystem.tableauDashboards.forEach((dashboard) => {
-
-
-    // })
-
-
-    // // Connect database to table
-    // edges.push({
-    //   id: `e_${dbId}_${tableId}`,
-    //   source: dbId,
-    //   sourceHandle: `${dbId}_table_${table.name}`,
-    //   target: tableId,
-    // });
-
-    // Connect ETL to target tables
-    // etl.targetTables.forEach(targetTablePath => {
-    //   const parts = targetTablePath.split('.');
-    //   const tableName = parts[parts.length - 1];
-
-    //   if (tableIds[tableName]) {
-    //     edges.push({
-    //       id: `e${edgeId++}`,
-    //       source: etlId,
-    //       target: tableIds[tableName],
-    //       animated: true
-    //     });
-    //   }
-    // });
   });
 
   // Add dashboard nodes
