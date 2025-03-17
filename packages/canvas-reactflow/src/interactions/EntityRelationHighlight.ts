@@ -18,6 +18,14 @@ export const getNextOutgoingEdges = (nodeId: string, handleId: StringOrNull, nod
 };
 
 
+export const HIGHLIGHT_CONSTANTS = {
+  HIGHLIGHT_FIELD_CLASSES: ['bg-sky-400', 'text-zinc-900'],
+  INACTIVE_FIELD_CLASSES: ['text-zinc-700'],
+  EDGE_HIGHLIGHTED_STROKE: '#38bdf8',
+  EDGE_INVACTIVE_STROKE: '#999',
+  EDGE_NORMAL_STROKE: '#444444'
+}
+
 const getAllIncomers = (
   nodeId: string,
   handleId: StringOrNull,
@@ -115,31 +123,36 @@ export const highlightHandlePathByNodeHandleId = (
 
   // make all other columns inactive
   document.querySelectorAll(".nodeField").forEach((el) => {
-    el.classList.add("inactive");
+    // el.classList.add("inactive");
+    HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
+      el.classList.add(cls)
+    })
   });
 
   // highlight edges
   const toHighlightEdges = allIncomingEdges.concat(allOutgoingEdges);
   const toHighlightEdgesIds = toHighlightEdges.map((edge: Edge) => edge.id);
-  const edgesHighlited = edges?.map((edge) => {
-    console.log();
+  console.log("====toHighlightEdgesIds", toHighlightEdgesIds, edges)
+  const edgesHighlighted = edges?.map((edge) => {
     if (toHighlightEdgesIds.includes(edge.id)) {
       edge.animated = true;
       edge.style = {
         ...edge.style,
-        stroke: "lightblue",
+        // stroke: "lightblue",
+        stroke: HIGHLIGHT_CONSTANTS.EDGE_HIGHLIGHTED_STROKE,
         opacity: 1
       };
     } else {
       // edge.hidden = true // 
       edge.style = {
         // ...edge.style,
+        stroke: HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
         opacity: 0.4
       };
     }
     return edge;
   });
-  setEdges(edgesHighlited);
+  setEdges(edgesHighlighted);
 
   // hightlight current handle when no edges are present
   const toHighlightHandleIds =
@@ -150,8 +163,15 @@ export const highlightHandlePathByNodeHandleId = (
   toHighlightHandleIds.forEach((handleId) => {
     const el: HTMLElement | null = document.getElementById(handleId);
     if (el) {
-      el.classList.add("highlight");
-      el.classList.remove("inactive");
+      // el.classList.add("highlight");
+      // el.classList.add("bg-white")
+      HIGHLIGHT_CONSTANTS.HIGHLIGHT_FIELD_CLASSES.map((cls) => {
+        el.classList.add(cls)
+      })
+      HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
+        el.classList.remove(cls)
+      })
+      // el.classList.remove("inactive");
     }
   });
 };
@@ -160,8 +180,17 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
   console.log("resetHandlePathHighlight");
   // remove highlighting of all handles
   document.querySelectorAll(".nodeField").forEach((el) => {
-    el.classList.remove("highlight");
-    el.classList.remove("inactive");
+    // el.classList.remove("highlight");
+    // el.classList.remove("inactive");
+    HIGHLIGHT_CONSTANTS.HIGHLIGHT_FIELD_CLASSES.map((cls) => {
+      el.classList.remove(cls)
+    })
+    HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
+      el.classList.remove(cls)
+    })
+
+
+
   });
 
   // remove edge path hightlights of all handle paths
@@ -169,7 +198,7 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
     edge.animated = false;
     edge.style = {
       ...edge.style,
-      stroke: "#ccc",
+      stroke: HIGHLIGHT_CONSTANTS.EDGE_NORMAL_STROKE,
       opacity: 1
     };
     edge.hidden = false;

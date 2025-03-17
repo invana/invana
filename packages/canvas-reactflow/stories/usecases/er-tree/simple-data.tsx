@@ -18,12 +18,12 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         {
           label: "Table 1",
           id: "table-1",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />
         },
         {
           label: "Table 2",
           id: "table-2",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />
         }
       ]
     },
@@ -40,12 +40,12 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         {
           label: "File 1",
           id: "file-1",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />
         },
         {
           label: "File 2",
           id: "file-2",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />
         }
       ]
     },
@@ -64,34 +64,34 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         {
           label: "Columns",
           id: "columns-1",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
           children: [
-            { label: "Column 1", id: "column-1-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-            { label: "Column 2", id: "column-1-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+            { label: "Column 1", id: "column-1-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+            { label: "Column 2", id: "column-1-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
           ]
         },
         {
           label: "Extra_info",
           id: 'extra_info-1',
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
 
           children: [
             {
               label: "Indexes",
               id: "indexes-1",
-              icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+              icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
               children: [
-                { label: "Index 1", id: "index-1-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-                { label: "Index 2", id: "index-1-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+                { label: "Index 1", id: "index-1-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+                { label: "Index 2", id: "index-1-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
               ]
             },
             {
               label: "Views",
               id: "views-1",
-              icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+              icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
               children: [
-                { label: "View 1", id: "view-1-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-                { label: "View 2", id: "view-1-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+                { label: "View 1", id: "view-1-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+                { label: "View 2", id: "view-1-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
               ]
             }
           ]
@@ -113,33 +113,33 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         {
           label: "Columns",
           id: "columns-2",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
           children: [
-            { label: "Column 1", id: "column-2-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-            { label: "Column 2", id: "column-2-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+            { label: "Column 1", id: "column-2-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+            { label: "Column 2", id: "column-2-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
           ]
         },
         {
           label: "Extra_info",
           id: 'extra_info-2',
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
           children: [
             {
               label: "Indexes",
               id: "indexes-2",
-              icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+              icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
               children: [
-                { label: "Index 1", id: "index-2-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-                { label: "Index 2", id: "index-2-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+                { label: "Index 1", id: "index-2-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+                { label: "Index 2", id: "index-2-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
               ]
             },
             {
               label: "Views",
               id: "views-2",
-              icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+              icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
               children: [
-                { label: "View 1", id: "view-2-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-                { label: "View 2", id: "view-2-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+                { label: "View 1", id: "view-2-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+                { label: "View 2", id: "view-2-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
               ]
             }
           ]
@@ -162,10 +162,10 @@ export const data: { nodes: DataTreeNodeProps[], edges: Edge[] } = {
         {
           id: "report-1",
           label: "Report 1",
-          icon: <File className="h-4 w-4 shrink-0 text-gray-500" />,
+          icon: <File className="h-4 w-4 shrink-0  __text-gray-500" />,
           children: [
-            { label: "Column 1", id: "column-5-1", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> },
-            { label: "Column 2", id: "column-5-2", icon: <File className="h-4 w-4 shrink-0 text-gray-500" /> }
+            { label: "Column 1", id: "column-5-1", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> },
+            { label: "Column 2", id: "column-5-2", icon: <File className="h-4 w-4 shrink-0  __text-gray-500" /> }
           ]
         },
       ]

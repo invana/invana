@@ -43,6 +43,11 @@ export interface FlowCanvasOptions {
   display?: {
     plugins: { [key: string]: boolean; }
   }
+  // edgeStyles?: 
+  //   edgeStyles={{
+  //       stroke: '#ff5733',    // Global edge stroke color
+  //       strokeWidth: 4,       // Global edge stroke width
+  //     }}
 }
 
 export type StringOrNull = string | null | undefined;
