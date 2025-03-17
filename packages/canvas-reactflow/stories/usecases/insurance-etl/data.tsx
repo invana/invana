@@ -1,0 +1,501 @@
+
+
+/**
+ * Mapper utility for insurance database schema visualization
+ * This file contains sample data structures representing PostgreSQL databases
+ * with tables, views, indexes, and ETL system connections to Tableau dashboards
+ */
+import { Node, Edge } from '@xyflow/react';
+import { Columns, Database, LayoutDashboard, Table, Table2, View } from 'lucide-react';
+import React from 'react';
+
+// Types for the database structure
+export interface Column {
+  name: string;
+  type: string;
+  isPrimaryKey?: boolean;
+  isForeignKey?: boolean;
+  references?: {
+    table: string;
+    column: string;
+  };
+}
+
+export interface Index {
+  name: string;
+  columns: string[];
+  isUnique?: boolean;
+}
+
+export interface Table {
+  name: string;
+  schema: string;
+  description: string;
+  columns: Column[];
+  indexes: Index[];
+}
+
+export interface View {
+  name: string;
+  schema: string;
+  description: string;
+  definition: string;
+  columns: Column[];
+}
+
+export interface Database {
+  name: string;
+  tables: Table[];
+  views: View[];
+}
+
+export interface TableauDashboard {
+  name: string;
+  description: string;
+  sourceTables: string[];
+  sourceColumns: {
+    table: string;
+    columns: string[];
+  }[];
+}
+
+export interface ETLProcess {
+  name: string;
+  description: string;
+  sourceTables: string[];
+  targetTables: string[];
+  schedule: string;
+  dashboards: string[];
+}
+
+// Mock Insurance Database System
+export const insuranceSystem = {
+  databases: [
+    {
+      name: "insurance_prod",
+      tables: [
+        {
+          name: "customers",
+          schema: "public",
+          description: "Customer personal and contact information",
+          columns: [
+            { name: "customer_id", type: "uuid", isPrimaryKey: true },
+            { name: "first_name", type: "varchar(100)" },
+            { name: "last_name", type: "varchar(100)" },
+            { name: "date_of_birth", type: "date" },
+            { name: "email", type: "varchar(255)" },
+            { name: "phone", type: "varchar(20)" },
+            { name: "address", type: "text" },
+            { name: "city", type: "varchar(100)" },
+            { name: "state", type: "varchar(50)" },
+            { name: "zip_code", type: "varchar(20)" },
+            { name: "created_at", type: "timestamp" },
+            { name: "updated_at", type: "timestamp" }
+          ],
+          indexes: [
+            { name: "idx_customers_email", columns: ["email"], isUnique: true },
+            { name: "idx_customers_name", columns: ["last_name", "first_name"] }
+          ]
+        },
+        {
+          name: "policies",
+          schema: "public",
+          description: "Insurance policies information",
+          columns: [
+            { name: "policy_id", type: "uuid", isPrimaryKey: true },
+            {
+              name: "customer_id", type: "uuid", isForeignKey: true,
+              references: { table: "customers", column: "customer_id" }
+            },
+            {
+              name: "agent_id", type: "uuid", isForeignKey: true,
+              references: { table: "agents", column: "agent_id" }
+            },
+            { name: "policy_number", type: "varchar(50)" },
+            { name: "policy_type", type: "varchar(50)" },
+            { name: "coverage_amount", type: "decimal(15,2)" },
+            { name: "premium_amount", type: "decimal(15,2)" },
+            { name: "start_date", type: "date" },
+            { name: "end_date", type: "date" },
+            { name: "status", type: "varchar(20)" },
+            { name: "created_at", type: "timestamp" },
+            { name: "updated_at", type: "timestamp" }
+          ],
+          indexes: [
+            { name: "idx_policies_number", columns: ["policy_number"], isUnique: true },
+            { name: "idx_policies_customer", columns: ["customer_id"] },
+            { name: "idx_policies_status", columns: ["status"] }
+          ]
+        },
+        {
+          name: "claims",
+          schema: "public",
+          description: "Insurance claims data",
+          columns: [
+            { name: "claim_id", type: "uuid", isPrimaryKey: true },
+            {
+              name: "policy_id", type: "uuid", isForeignKey: true,
+              references: { table: "policies", column: "policy_id" }
+            },
+            { name: "claim_number", type: "varchar(50)" },
+            { name: "incident_date", type: "date" },
+            { name: "filing_date", type: "date" },
+            { name: "description", type: "text" },
+            { name: "claim_amount", type: "decimal(15,2)" },
+            { name: "status", type: "varchar(20)" },
+            { name: "resolution_date", type: "date" },
+            { name: "created_at", type: "timestamp" },
+            { name: "updated_at", type: "timestamp" }
+          ],
+          indexes: [
+            { name: "idx_claims_number", columns: ["claim_number"], isUnique: true },
+            { name: "idx_claims_policy", columns: ["policy_id"] },
+            { name: "idx_claims_status", columns: ["status"] }
+          ]
+        }
+      ],
+      views: [
+        {
+          name: "active_policies",
+          schema: "public",
+          description: "All currently active insurance policies",
+          definition: "SELECT * FROM policies WHERE status = 'ACTIVE' AND end_date > CURRENT_DATE",
+          columns: [
+            { name: "policy_id", type: "uuid" },
+            { name: "customer_id", type: "uuid" },
+            { name: "policy_number", type: "varchar(50)" },
+            { name: "policy_type", type: "varchar(50)" },
+            { name: "premium_amount", type: "decimal(15,2)" },
+            { name: "end_date", type: "date" }
+          ]
+        }
+      ]
+    },
+    {
+      name: "insurance_analytics",
+      tables: [
+        {
+          name: "policy_metrics",
+          schema: "analytics",
+          description: "Aggregated policy statistics for reporting",
+          columns: [
+            { name: "metric_id", type: "serial", isPrimaryKey: true },
+            { name: "policy_type", type: "varchar(50)" },
+            { name: "region", type: "varchar(50)" },
+            { name: "month", type: "date" },
+            { name: "total_policies", type: "integer" },
+            { name: "active_policies", type: "integer" },
+            { name: "new_policies", type: "integer" },
+            { name: "canceled_policies", type: "integer" },
+            { name: "total_premium", type: "decimal(15,2)" },
+            { name: "average_premium", type: "decimal(15,2)" }
+          ],
+          indexes: [
+            { name: "idx_metrics_date_type", columns: ["month", "policy_type"] },
+            { name: "idx_metrics_region", columns: ["region"] }
+          ]
+        }
+      ],
+      views: []
+    }
+  ],
+
+  etlProcesses: [
+    {
+      name: "daily_policy_transfer(ETL)",
+      description: "Extracts policy data from production to analytics",
+      sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.customers"],
+      targetTables: ["insurance_analytics.analytics.policy_metrics"],
+      schedule: "Daily at 01:00 AM",
+      dashboards: ["policy_performance", "regional_analysis"]
+    }
+  ],
+
+  tableauDashboards: [
+    {
+      name: "policy_performance",
+      description: "Analysis of policy renewal rates and premium trends",
+      sourceTables: ["insurance_analytics.analytics.policy_metrics"],
+      sourceColumns: [
+        {
+          table: "policy_metrics",
+          columns: ["policy_type", "month", "total_policies", "active_policies", "total_premium", "average_premium"]
+        }
+      ]
+    },
+    {
+      name: "claims_processing",
+      description: "Claims processing time and resolution metrics",
+      sourceTables: ["insurance_prod.public.claims"],
+      sourceColumns: [
+        {
+          table: "claims",
+          columns: ["incident_date", "filing_date", "resolution_date", "status", "claim_amount"]
+        }
+      ]
+    }
+  ],
+}
+
+
+
+export const getData = () => {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+  let edgeId = 1;
+
+  // Track node IDs for edge creation
+  const tableIds: { [key: string]: string } = {};
+
+  // Create database nodes
+  insuranceSystem.databases.forEach((db, dbIndex) => {
+    const dbId = `db_${db.name}`;
+
+    // Add database node
+    const database = {
+      id: dbId,
+      type: "DataTreeNode",
+      data: {
+        type: 'database',
+        headerTitle: db.name.replace('_', ' ').charAt(0).toUpperCase() + db.name.replace('_', ' ').slice(1),
+        icon: <Database className="h-4 w-4" />,
+
+        name: db.name,
+        searchable: true,
+        children: db.tables.map((table) => {
+          return {
+            label: table.name,
+            id: `table_${table.name}`,
+            icon: <Table className="h-4 w-4 shrink-0  __text-gray-500" />
+          }
+        })
+      }
+    }
+    nodes.push(database);
+
+    console.log("====nodes", JSON.stringify(database), db.tables)
+
+    // Add table nodes
+    db.tables.forEach((table, tableIndex) => {
+      const tableId = `table_${table.name}`;
+      tableIds[table.name] = tableId;
+
+      // Add table node
+      nodes.push({
+        id: tableId,
+        type: "DataTreeNode",
+        data: {
+          type: 'table',
+          headerTitle: table.name,
+          headerDescription: table.description,
+          icon: <Table className="h-4 w-4" />,
+          searchable: true,
+          children: [
+            {
+              label: "Columns",
+              id: `${tableId}_columns`,
+              icon: <Columns className="h-4 w-4 shrink-0  __text-gray-500" />,
+              children: table.columns.map((column) => {
+                return {
+                  label: column.name,
+                  id: `${tableId}_column_${column.name}`,
+                  // icon: <Columns className="h-4 w-4 shrink-0  __text-gray-500" />
+                };
+              })
+            },
+            {
+              label: "Indexes",
+              id: `${tableId}_indexes`,
+              icon: <View className="h-4 w-4 shrink-0  __text-gray-500" />,
+              children: table.indexes.map((index) => {
+                return {
+                  label: index.name,
+                  id: `${tableId}_index_${index.name}`,
+                  // icon: <Index className="h-4 w-4 shrink-0  __text-gray-500" />
+                };
+              })
+            }
+          ]
+        },
+        position: {
+          x: 0,
+          y: 0
+        }
+      });
+
+      // Connect database to table
+      edges.push({
+        id: `e${edgeId++}`,
+        source: dbId,
+        target: tableId,
+        animated: false
+      });
+    });
+
+    // Add view nodes
+    // db.views.forEach((view, viewIndex) => {
+    //   const viewId = `view_${view.name}`;
+
+    //   // Add view node
+    //   nodes.push({
+    //     id: viewId,
+    //     data: {
+    //       type: 'view',
+    //       label: view.name,
+    //       schema: view.schema,
+    //       definition: view.definition
+    //     },
+    //     position: {
+    //       x: 0,
+    //       y: 0
+    //     }
+    //   });
+
+    //   // Connect view to its source table if it's defined in the view definition
+    //   const tableMatches = [...view.definition.matchAll(/FROM\s+(\w+)/gi)];
+    //   if (tableMatches.length > 0) {
+    //     const sourceTable = tableMatches[0][1];
+    //     if (tableIds[sourceTable]) {
+    //       edges.push({
+    //         id: `e${edgeId++}`,
+    //         source: viewId,
+    //         target: tableIds[sourceTable],
+    //         animated: false,
+    //         style: { strokeDasharray: '5,5' }
+    //       });
+    //     }
+    //   }
+    // });
+  });
+
+  // Add foreign key relationships
+  // insuranceSystem.databases.forEach(db => {
+  //   db.tables.forEach(table => {
+  //     table.columns.forEach(column => {
+  //       if (column.isForeignKey && column.references) {
+  //         const sourceTableId = tableIds[table.name];
+  //         const targetTableId = tableIds[column.references.table];
+
+  //         if (sourceTableId && targetTableId) {
+  //           edges.push({
+  //             id: `e${edgeId++}`,
+  //             source: sourceTableId,
+  //             target: targetTableId,
+  //             animated: false,
+  //             label: column.name
+  //           });
+  //         }
+  //       }
+  //     });
+  //   });
+  // });
+
+  // Add ETL process nodes
+  insuranceSystem.etlProcesses.forEach((etl, etlIndex) => {
+    const etlId = `etl_${etl.name}`;
+
+    // Add ETL node
+    nodes.push({
+      id: etlId,
+      type: "DataTreeNode",
+
+      data: {
+        type: 'etl',
+        headerTitle: etl.name,
+        schedule: etl.schedule,
+        headerDescription: etl.description,
+        children: etl.dashboards.map((dashboard) => {
+          return {
+            label: dashboard,
+            id: `${etlId}_${dashboard}`,
+            icon: <LayoutDashboard className="h-4 w-4 shrink-0  __text-gray-500" />
+          };
+        })
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+
+    // Connect source tables to ETL
+    etl.sourceTables.forEach(sourceTablePath => {
+      const parts = sourceTablePath.split('.');
+      const tableName = parts[parts.length - 1];
+
+      if (tableIds[tableName]) {
+        edges.push({
+          id: `e${edgeId++}`,
+          source: tableIds[tableName],
+          target: etlId,
+          animated: true
+        });
+      }
+    });
+
+    // Connect ETL to target tables
+    etl.targetTables.forEach(targetTablePath => {
+      const parts = targetTablePath.split('.');
+      const tableName = parts[parts.length - 1];
+
+      if (tableIds[tableName]) {
+        edges.push({
+          id: `e${edgeId++}`,
+          source: etlId,
+          target: tableIds[tableName],
+          animated: true
+        });
+      }
+    });
+  });
+
+  // Add dashboard nodes
+  insuranceSystem.tableauDashboards.forEach((dashboard, dashboardIndex) => {
+    const dashboardId = `dashboard_${dashboard.name}`;
+
+    // Add dashboard node
+    nodes.push({
+      id: dashboardId,
+      type: "DataTreeNode",
+
+      data: {
+        type: 'dashboard',
+        headerTitle: dashboard.name + ' Dashboard',
+        headerDescription: dashboard.description,
+        icon: <LayoutDashboard className="h-4 w-4 shrink-0  __text-gray-500" />,
+        children: dashboard.sourceColumns[0].columns.map((column) => {
+          return {
+            label: column,
+            id: `${dashboardId}_${column}`,
+            icon: <LayoutDashboard className="h-4 w-4 shrink-0  __text-gray-500" />
+          };
+        })
+
+      },
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+
+    // Connect source tables to dashboard
+    dashboard.sourceTables.forEach(sourceTablePath => {
+      const parts = sourceTablePath.split('.');
+      const tableName = parts[parts.length - 1];
+
+      if (tableIds[tableName]) {
+        edges.push({
+          id: `e${edgeId++}`,
+          source: tableIds[tableName],
+          target: dashboardId,
+          animated: false
+        });
+      }
+    });
+  });
+
+  return { nodes, edges };
+};
+
+
+export default insuranceSystem;
