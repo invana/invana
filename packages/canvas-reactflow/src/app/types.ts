@@ -4,6 +4,7 @@ import {
   BackgroundProps,
   ReactFlowInstance
 } from "@xyflow/react"
+import CanvasInteractions from "../interactions/interactions";
 
 
 export interface ReactFlowProps extends ReactFlowPropsOriginal {
@@ -32,6 +33,9 @@ export interface FlowCanvasOptions {
   // templates
   extraNodeTypes?: NodeTypes;
   extraEdgeTypes?: EdgeTypes;
+  // interactions
+  canvasInteractions?: CanvasInteractions;
+
   // layout
   layoutDirection?: LayoutDirections;
   debug?: boolean;
@@ -40,3 +44,5 @@ export interface FlowCanvasOptions {
     plugins: { [key: string]: boolean; }
   }
 }
+
+export type StringOrNull = string | null | undefined;

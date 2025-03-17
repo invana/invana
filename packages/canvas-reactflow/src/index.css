@@ -8,3 +8,17 @@
   padding: none !important;
   background: none !important;
 }
+
+.nodeField {
+  cursor: pointer !important;
+
+}
+
+.nodeField.highlight {
+  background-color: var(--canvas-node-field-hightlight-bg);
+  color: var(--canvas-node-field-hightlight-text);
+}
+
+.nodeField.inactive {
+  opacity: 0.2;
+}

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -6,6 +6,12 @@ import {
   useNodesState,
   useEdgesState,
   Panel,
+  Edge,
+  Node,
+  useReactFlow,
+  ReactFlowInstance,
+  NodeTypes,
+  ReactFlowProvider,
   // ColorMode
 } from "@xyflow/react";
 import { FlowCanvasOptions } from "./types";
@@ -16,14 +22,18 @@ import { CanvasToolBar } from "../plugins/toolbars/CanvasToolBar";
 // import { Moon, Sun } from "lucide-react";
 // import { ButtonWithTooltip } from "@invana/ui";
 import { DevTools } from "../plugins/toolbars/DevTools";
+import { FlowInstanceType } from "../interactions/interactions";
 
 
 
 export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
   options = { ...defaultFlowCanvasOptions, ...options };
-  console.log("CanvasFlow colorMode", options.canvas?.colorMode)
-  const ref = useRef<HTMLDivElement>(null);
-
+  const ref = useRef<ReactFlowInstance | null>(null);
+  const [flowInstance, setFlowInstance] = useState<ReactFlowInstance | null>(null);
+  const onInit = (reactFlowInstance: ReactFlowInstance) => {
+    setFlowInstance(reactFlowInstance);
+    // onLayoutUpdated(direction, reactFlowInstance);
+  };
   const defaultNodes = options.nodes.map(
     node => addNodeDefaults(node, options.canvas?.defaultNodeOptions || {}, options.layoutDirection)
   )
@@ -46,36 +56,43 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
   //   setColorMode(newTheme);
   // }
 
-  console.log("colorMode", options.canvas?.colorMode);
-
+  // console.log("colorMode", options.canvas?.colorMode);
   return (
     <div style={options.style}>
-      <ReactFlow
-        ref={ref}
-        // onInit={ }
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodes={nodes}
-        edges={edges}
-        colorMode={options.canvas?.colorMode}
-        {...(options.canvas ? Object.fromEntries(
-          Object.entries(options.canvas).filter(([key]) => key !== 'defaultNodeOptions' && key !== 'colorMode')
-        ) : {})}
-      >
-        {options.display?.plugins?.miniMap && <MiniMap zoomable pannable position="bottom-left" />}
-        {options.display?.plugins?.background && <Background {...options.background} />}
-        {options.display?.plugins?.devTools &&
-          <DevTools position="bottom-right" className=" border rounded shadow-sm" />
-        }
+      <ReactFlowProvider>
 
-        {options.display?.plugins?.controls &&
-          <Panel position="top-left" className="transition-colors flex items-center border shadow-sm
+        <ReactFlow
+          // ref={ref}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodes={nodes}
+          edges={edges}
+          colorMode={options.canvas?.colorMode}
+          onInit={onInit}
+          onEdgeClick={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeClick(event, edge, flowInstance)}
+          onEdgeMouseEnter={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseEnter(event, edge, flowInstance)}
+          onEdgeMouseLeave={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseLeave(event, edge, flowInstance)}
+          onNodeMouseEnter={(event: React.MouseEvent, node: Node) => options.canvasInteractions && options.canvasInteractions.onNodeMouseEnter(event, node, flowInstance)}
+          onNodeMouseLeave={(event: React.MouseEvent, node: Node) => options.canvasInteractions && options.canvasInteractions.onNodeMouseLeave(event, node, flowInstance)}
+
+          {...(options.canvas ? Object.fromEntries(
+            Object.entries(options.canvas).filter(([key]) => key !== 'defaultNodeOptions' && key !== 'colorMode')
+          ) : {})}
+        >
+          {options.display?.plugins?.miniMap && <MiniMap zoomable pannable position="bottom-left" />}
+          {options.display?.plugins?.background && <Background {...options.background} />}
+          {options.display?.plugins?.devTools &&
+            <DevTools position="bottom-right" className=" border rounded shadow-sm" />
+          }
+
+          {options.display?.plugins?.controls &&
+            <Panel position="top-left" className="transition-colors flex items-center border shadow-sm
               bg-card text-card-foreground ">
-            <CanvasToolBar />
-          </Panel>
-        }
+              <CanvasToolBar />
+            </Panel>
+          }
 
-        {/* {options.display?.plugins?.colorMode &&
+          {/* {options.display?.plugins?.colorMode &&
           <Panel position="top-right" className=" bg-card text-card-foreground border  flex items-center transition-colors">
             <ButtonWithTooltip
               variant="ghost"
@@ -93,9 +110,10 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
           </Panel>
         } */}
 
-        {options.children}
-      </ReactFlow>
-    </div>
+          {options.children}
+        </ReactFlow>
+      </ReactFlowProvider>
+    </div >
   );
 };
 

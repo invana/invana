@@ -26,6 +26,9 @@ export const defaultFlowCanvasOptions: FlowCanvasOptions = {
             markerEnd: {
                 type: MarkerType.ArrowClosed,
                 // color: '#b1b1b7',
+            },
+            style: {
+                opacity: 1
             }
         },
         connectionLineType: ConnectionLineType.Bezier,
