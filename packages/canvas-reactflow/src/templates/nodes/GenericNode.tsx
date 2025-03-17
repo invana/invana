@@ -18,7 +18,11 @@ export const GenericNode = ({ id, data, selected = false, ...props }: NodeProps<
   const resizable = false;
 
   return (
-    <BaseNodeTemplate id={id} selected={selected} className="min-w-[200px] text-center">
+    <BaseNodeTemplate id={id} selected={selected}
+      className="min-w-[200px] text-center
+            bg-card text-card-foreground 
+        dark:bg-neutral-800 dark:text-dark-card-foreground  
+    ">
       <>
         {resizable && <NodeResizer minWidth={100} minHeight={30} />}
         {data.label}

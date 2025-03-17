@@ -5,6 +5,7 @@ import nodesData from '../../example-data/all-nodes.json';
 import edgesData from '../../example-data/all-relationships.json';
 import DagreLayoutEngine from '../../dagre-layout';
 import { MarkerType } from "@xyflow/react";
+import { stringToPastelColor } from '@invana/canvas-reactflow/lib/color_utils';
 
 
 
@@ -13,6 +14,9 @@ const nodes = nodesData.map((n) => {
   return {
     id: n['Entity_ID:ID'],
     type: 'GenericNode2',
+    style: {
+      background: stringToPastelColor(n[':Label'])
+    },
     data: {
       type: n[':Label'],
       label: n['name']
