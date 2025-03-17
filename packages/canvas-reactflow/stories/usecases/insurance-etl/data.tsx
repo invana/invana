@@ -71,127 +71,7 @@ export interface ETLProcess {
 // Mock Insurance Database System
 export const insuranceSystem = {
   databases: [
-    {
-      name: "insurance_prod",
-      tables: [
-        {
-          name: "customers",
-          schema: "public",
-          description: "Customer personal and contact information",
-          columns: [
-            { name: "customer_id", type: "uuid", isPrimaryKey: true },
-            { name: "first_name", type: "varchar(100)" },
-            { name: "last_name", type: "varchar(100)" },
-            { name: "date_of_birth", type: "date" },
-            { name: "email", type: "varchar(255)" },
-            { name: "phone", type: "varchar(20)" },
-            { name: "address", type: "text" },
-            { name: "city", type: "varchar(100)" },
-            { name: "state", type: "varchar(50)" },
-            { name: "zip_code", type: "varchar(20)" },
-            { name: "created_at", type: "timestamp" },
-            { name: "updated_at", type: "timestamp" }
-          ],
-          indexes: [
-            { name: "idx_customers_email", columns: ["email"], isUnique: true },
-            { name: "idx_customers_name", columns: ["last_name", "first_name"] }
-          ]
-        },
-        {
-          name: "policies",
-          schema: "public",
-          description: "Insurance policies information",
-          columns: [
-            { name: "policy_id", type: "uuid", isPrimaryKey: true },
-            {
-              name: "customer_id", type: "uuid", isForeignKey: true,
-              references: { table: "customers", column: "customer_id" }
-            },
-            {
-              name: "agent_id", type: "uuid", isForeignKey: true,
-              references: { table: "agents", column: "agent_id" }
-            },
-            { name: "policy_number", type: "varchar(50)" },
-            { name: "policy_type", type: "varchar(50)" },
-            { name: "coverage_amount", type: "decimal(15,2)" },
-            { name: "premium_amount", type: "decimal(15,2)" },
-            { name: "start_date", type: "date" },
-            { name: "end_date", type: "date" },
-            { name: "status", type: "varchar(20)" },
-            { name: "created_at", type: "timestamp" },
-            { name: "updated_at", type: "timestamp" }
-          ],
-          indexes: [
-            { name: "idx_policies_number", columns: ["policy_number"], isUnique: true },
-            { name: "idx_policies_customer", columns: ["customer_id"] },
-            { name: "idx_policies_status", columns: ["status"] }
-          ]
-        },
-        {
-          name: "claims",
-          schema: "public",
-          description: "Insurance claims data",
-          columns: [
-            { name: "claim_id", type: "uuid", isPrimaryKey: true },
-            {
-              name: "policy_id", type: "uuid", isForeignKey: true,
-              references: { table: "policies", column: "policy_id" }
-            },
-            { name: "claim_number", type: "varchar(50)" },
-            { name: "incident_date", type: "date" },
-            { name: "filing_date", type: "date" },
-            { name: "description", type: "text" },
-            { name: "claim_amount", type: "decimal(15,2)" },
-            { name: "status", type: "varchar(20)" },
-            { name: "resolution_date", type: "date" },
-            { name: "created_at", type: "timestamp" },
-            { name: "updated_at", type: "timestamp" }
-          ],
-          indexes: [
-            { name: "idx_claims_number", columns: ["claim_number"], isUnique: true },
-            { name: "idx_claims_policy", columns: ["policy_id"] },
-            { name: "idx_claims_status", columns: ["status"] }
-          ]
-        },
-        {
-          name: "agents",
-          schema: "public",
-          description: "Insurance sales agents information",
-          columns: [
-            { name: "agent_id", type: "uuid", isPrimaryKey: true },
-            { name: "first_name", type: "varchar(100)" },
-            { name: "last_name", type: "varchar(100)" },
-            { name: "email", type: "varchar(255)" },
-            { name: "phone", type: "varchar(20)" },
-            { name: "hire_date", type: "date" },
-            { name: "region", type: "varchar(50)" },
-            { name: "status", type: "varchar(20)" },
-            { name: "created_at", type: "timestamp" },
-            { name: "updated_at", type: "timestamp" }
-          ],
-          indexes: [
-            { name: "idx_agents_email", columns: ["email"], isUnique: true },
-            { name: "idx_agents_region", columns: ["region"] }
-          ]
-        }
-      ],
-      views: [
-        {
-          name: "active_policies",
-          schema: "public",
-          description: "All currently active insurance policies",
-          definition: "SELECT * FROM policies WHERE status = 'ACTIVE' AND end_date > CURRENT_DATE",
-          columns: [
-            { name: "policy_id", type: "uuid" },
-            { name: "customer_id", type: "uuid" },
-            { name: "policy_number", type: "varchar(50)" },
-            { name: "policy_type", type: "varchar(50)" },
-            { name: "premium_amount", type: "decimal(15,2)" },
-            { name: "end_date", type: "date" }
-          ]
-        }
-      ]
-    },
+
     {
       name: "insurance_analytics",
       tables: [
@@ -287,7 +167,7 @@ export const insuranceSystem = {
     {
       name: "daily_policy_transfer_etl",
       description: "Extracts policy data from production to analytics",
-      sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.customers"],
+      sourceTables: ["insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.policy_metrics"],
       schedule: "Daily at 01:00 AM",
       dashboards: ["policy_performance", "financial_overview"]
@@ -295,7 +175,7 @@ export const insuranceSystem = {
     {
       name: "customer_segmentation_etl",
       description: "Processes customer data for demographic analysis",
-      sourceTables: ["insurance_prod.public.customers", "insurance_prod.public.policies"],
+      sourceTables: ["insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.customer_analytics"],
       schedule: "Daily at 02:00 AM",
       dashboards: ["customer_insights", "regional_performance"]
@@ -303,7 +183,7 @@ export const insuranceSystem = {
     {
       name: "claims_analytics_etl",
       description: "Processes claims data for risk and payout analysis",
-      sourceTables: ["insurance_prod.public.claims", "insurance_prod.public.policies"],
+      sourceTables: ["insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.claims_analytics"],
       schedule: "Daily at 03:00 AM",
       dashboards: ["claims_processing", "risk_management", "financial_overview"]
@@ -311,7 +191,7 @@ export const insuranceSystem = {
     {
       name: "agent_performance_etl",
       description: "Analyzes agent sales and customer satisfaction metrics",
-      sourceTables: ["insurance_prod.public.agents", "insurance_prod.public.policies"],
+      sourceTables: ["insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.agent_performance"],
       schedule: "Daily at 04:00 AM",
       dashboards: ["agent_performance", "regional_performance"]
@@ -319,7 +199,7 @@ export const insuranceSystem = {
     {
       name: "comprehensive_risk_etl",
       description: "Combines all data sources for holistic risk assessment",
-      sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.claims", "insurance_prod.public.customers"],
+      sourceTables: ["insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.claims_analytics", "insurance_analytics.analytics.policy_metrics"],
       schedule: "Weekly on Sunday at 01:00 AM",
       dashboards: ["risk_management", "executive_dashboard"]
@@ -341,12 +221,8 @@ export const insuranceSystem = {
     {
       name: "claims_processing",
       description: "Claims processing time and resolution metrics",
-      sourceTables: ["insurance_prod.public.claims", "insurance_analytics.analytics.claims_analytics"],
+      sourceTables: ["insurance_analytics.analytics.claims_analytics"],
       sourceColumns: [
-        {
-          table: "insurance_prod.claims",
-          columns: ["incident_date", "filing_date", "resolution_date", "status", "claim_amount"]
-        },
         {
           table: "insurance_analytics.claims_analytics",
           columns: ["total_claims", "average_processing_days", "total_payout", "average_claim_amount"]
