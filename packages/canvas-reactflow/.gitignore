@@ -25,3 +25,4 @@ dist-ssr
 
 *storybook.log
 storybook-static/
+stories/example-data/
