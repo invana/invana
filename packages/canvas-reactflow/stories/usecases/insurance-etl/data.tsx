@@ -152,6 +152,27 @@ export const insuranceSystem = {
             { name: "idx_claims_policy", columns: ["policy_id"] },
             { name: "idx_claims_status", columns: ["status"] }
           ]
+        },
+        {
+          name: "agents",
+          schema: "public",
+          description: "Insurance sales agents information",
+          columns: [
+            { name: "agent_id", type: "uuid", isPrimaryKey: true },
+            { name: "first_name", type: "varchar(100)" },
+            { name: "last_name", type: "varchar(100)" },
+            { name: "email", type: "varchar(255)" },
+            { name: "phone", type: "varchar(20)" },
+            { name: "hire_date", type: "date" },
+            { name: "region", type: "varchar(50)" },
+            { name: "status", type: "varchar(20)" },
+            { name: "created_at", type: "timestamp" },
+            { name: "updated_at", type: "timestamp" }
+          ],
+          indexes: [
+            { name: "idx_agents_email", columns: ["email"], isUnique: true },
+            { name: "idx_agents_region", columns: ["region"] }
+          ]
         }
       ],
       views: [
@@ -194,6 +215,68 @@ export const insuranceSystem = {
             { name: "idx_metrics_date_type", columns: ["month", "policy_type"] },
             { name: "idx_metrics_region", columns: ["region"] }
           ]
+        },
+        {
+          name: "customer_analytics",
+          schema: "analytics",
+          description: "Customer demographic and behavior analysis",
+          columns: [
+            { name: "customer_metric_id", type: "serial", isPrimaryKey: true },
+            { name: "age_group", type: "varchar(20)" },
+            { name: "region", type: "varchar(50)" },
+            { name: "state", type: "varchar(50)" },
+            { name: "customer_count", type: "integer" },
+            { name: "avg_policies_per_customer", type: "decimal(5,2)" },
+            { name: "customer_lifetime_value", type: "decimal(15,2)" },
+            { name: "retention_rate", type: "decimal(5,2)" },
+            { name: "month", type: "date" },
+            { name: "updated_at", type: "timestamp" }
+          ],
+          indexes: [
+            { name: "idx_customer_analytics_region", columns: ["region"] },
+            { name: "idx_customer_analytics_age", columns: ["age_group"] }
+          ]
+        },
+        {
+          name: "claims_analytics",
+          schema: "analytics",
+          description: "Claims analysis and risk assessment",
+          columns: [
+            { name: "claims_metric_id", type: "serial", isPrimaryKey: true },
+            { name: "policy_type", type: "varchar(50)" },
+            { name: "region", type: "varchar(50)" },
+            { name: "month", type: "date" },
+            { name: "total_claims", type: "integer" },
+            { name: "approved_claims", type: "integer" },
+            { name: "rejected_claims", type: "integer" },
+            { name: "pending_claims", type: "integer" },
+            { name: "average_claim_amount", type: "decimal(15,2)" },
+            { name: "total_payout", type: "decimal(15,2)" },
+            { name: "average_processing_days", type: "decimal(5,1)" }
+          ],
+          indexes: [
+            { name: "idx_claims_analytics_type", columns: ["policy_type"] },
+            { name: "idx_claims_analytics_region", columns: ["region"] }
+          ]
+        },
+        {
+          name: "agent_performance",
+          schema: "analytics",
+          description: "Sales agent performance metrics",
+          columns: [
+            { name: "performance_id", type: "serial", isPrimaryKey: true },
+            { name: "agent_id", type: "uuid" },
+            { name: "month", type: "date" },
+            { name: "policies_sold", type: "integer" },
+            { name: "premium_generated", type: "decimal(15,2)" },
+            { name: "customer_satisfaction", type: "decimal(3,1)" },
+            { name: "renewal_rate", type: "decimal(5,2)" },
+            { name: "region", type: "varchar(50)" }
+          ],
+          indexes: [
+            { name: "idx_agent_performance_agent", columns: ["agent_id"] },
+            { name: "idx_agent_performance_month", columns: ["month"] }
+          ]
         }
       ],
       views: []
@@ -207,7 +290,39 @@ export const insuranceSystem = {
       sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.customers"],
       targetTables: ["insurance_analytics.analytics.policy_metrics"],
       schedule: "Daily at 01:00 AM",
-      dashboards: ["policy_performance", "claims_processing"]
+      dashboards: ["policy_performance", "financial_overview"]
+    },
+    {
+      name: "customer_segmentation_etl",
+      description: "Processes customer data for demographic analysis",
+      sourceTables: ["insurance_prod.public.customers", "insurance_prod.public.policies"],
+      targetTables: ["insurance_analytics.analytics.customer_analytics"],
+      schedule: "Daily at 02:00 AM",
+      dashboards: ["customer_insights", "regional_performance"]
+    },
+    {
+      name: "claims_analytics_etl",
+      description: "Processes claims data for risk and payout analysis",
+      sourceTables: ["insurance_prod.public.claims", "insurance_prod.public.policies"],
+      targetTables: ["insurance_analytics.analytics.claims_analytics"],
+      schedule: "Daily at 03:00 AM",
+      dashboards: ["claims_processing", "risk_management", "financial_overview"]
+    },
+    {
+      name: "agent_performance_etl",
+      description: "Analyzes agent sales and customer satisfaction metrics",
+      sourceTables: ["insurance_prod.public.agents", "insurance_prod.public.policies"],
+      targetTables: ["insurance_analytics.analytics.agent_performance"],
+      schedule: "Daily at 04:00 AM",
+      dashboards: ["agent_performance", "regional_performance"]
+    },
+    {
+      name: "comprehensive_risk_etl",
+      description: "Combines all data sources for holistic risk assessment",
+      sourceTables: ["insurance_prod.public.policies", "insurance_prod.public.claims", "insurance_prod.public.customers"],
+      targetTables: ["insurance_analytics.analytics.claims_analytics", "insurance_analytics.analytics.policy_metrics"],
+      schedule: "Weekly on Sunday at 01:00 AM",
+      dashboards: ["risk_management", "executive_dashboard"]
     }
   ],
 
@@ -226,11 +341,105 @@ export const insuranceSystem = {
     {
       name: "claims_processing",
       description: "Claims processing time and resolution metrics",
-      sourceTables: ["insurance_prod.public.claims"],
+      sourceTables: ["insurance_prod.public.claims", "insurance_analytics.analytics.claims_analytics"],
       sourceColumns: [
         {
           table: "insurance_prod.claims",
           columns: ["incident_date", "filing_date", "resolution_date", "status", "claim_amount"]
+        },
+        {
+          table: "insurance_analytics.claims_analytics",
+          columns: ["total_claims", "average_processing_days", "total_payout", "average_claim_amount"]
+        }
+      ]
+    },
+    {
+      name: "customer_insights",
+      description: "Customer demographic analysis and behavior patterns",
+      sourceTables: ["insurance_analytics.analytics.customer_analytics"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.customer_analytics",
+          columns: ["age_group", "region", "state", "customer_count", "avg_policies_per_customer", "retention_rate"]
+        }
+      ]
+    },
+    {
+      name: "risk_management",
+      description: "Risk analysis and fraud detection patterns",
+      sourceTables: ["insurance_analytics.analytics.claims_analytics", "insurance_analytics.analytics.policy_metrics"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.claims_analytics",
+          columns: ["policy_type", "region", "total_claims", "approved_claims", "rejected_claims", "average_claim_amount"]
+        },
+        {
+          table: "insurance_analytics.policy_metrics",
+          columns: ["policy_type", "total_policies", "new_policies"]
+        }
+      ]
+    },
+    {
+      name: "agent_performance",
+      description: "Sales performance metrics by agent and region",
+      sourceTables: ["insurance_analytics.analytics.agent_performance"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.agent_performance",
+          columns: ["month", "agent_id", "policies_sold", "premium_generated", "customer_satisfaction", "renewal_rate", "region"]
+        }
+      ]
+    },
+    {
+      name: "financial_overview",
+      description: "Premium income versus claims payout analysis",
+      sourceTables: ["insurance_analytics.analytics.policy_metrics", "insurance_analytics.analytics.claims_analytics"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.policy_metrics",
+          columns: ["month", "total_premium", "policy_type"]
+        },
+        {
+          table: "insurance_analytics.claims_analytics",
+          columns: ["month", "total_payout", "policy_type"]
+        }
+      ]
+    },
+    {
+      name: "regional_performance",
+      description: "Performance metrics by geographic region",
+      sourceTables: ["insurance_analytics.analytics.policy_metrics", "insurance_analytics.analytics.customer_analytics", "insurance_analytics.analytics.agent_performance"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.policy_metrics",
+          columns: ["region", "total_policies", "total_premium"]
+        },
+        {
+          table: "insurance_analytics.customer_analytics",
+          columns: ["region", "state", "customer_count"]
+        },
+        {
+          table: "insurance_analytics.agent_performance",
+          columns: ["region", "policies_sold"]
+        }
+      ]
+    },
+    {
+      name: "executive_dashboard",
+      description: "High-level KPIs for executive decision making",
+      sourceTables: ["insurance_analytics.analytics.policy_metrics", "insurance_analytics.analytics.claims_analytics", "insurance_analytics.analytics.customer_analytics"],
+      sourceColumns: [
+        {
+          table: "insurance_analytics.policy_metrics",
+          columns: ["total_policies", "total_premium", "new_policies"]
+        },
+        {
+          table: "insurance_analytics.claims_analytics",
+          columns: ["total_claims", "total_payout", "average_processing_days"]
+        },
+        {
+          table: "insurance_analytics.customer_analytics",
+          columns: ["customer_count", "retention_rate", "customer_lifetime_value"]
         }
       ]
     }

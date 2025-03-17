@@ -18,9 +18,9 @@ type Story = StoryObj<typeof meta>;
 
 
 const layoutEngine = new DagreLayoutEngine({
-  nodeWidth: 200,
-  nodeHeight: 60,
-  padding: 30
+  nodeWidth: 500,
+  // nodeHeight: 60,
+  padding: 100
 })
 const data = getData()
 const { layoutedNodes, layoutedEdges } = layoutEngine.getLayoutedElements(data.nodes, data.edges)
