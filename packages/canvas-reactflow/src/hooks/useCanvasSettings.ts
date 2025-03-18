@@ -3,15 +3,9 @@ import { BackgroundProps, BackgroundVariant, useStoreApi } from '@xyflow/react';
 import { LayoutDirections } from '../app/types';
 
 
-// interface CanvasSettings {
-//   background: BackgroundProps;
-//   layoutDirection: LayoutDirection;
-// }
-
 const useCanvasSettings = () => {
 
   const store = useStoreApi()
-
 
   // Manage Viewport Lock
   const [lockViewport, setLockViewport] = useState<boolean>(false);
@@ -26,7 +20,6 @@ const useCanvasSettings = () => {
       return newLockViewport;
     });
   }, []);
-
 
   const [background, setBackground_] = useState<BackgroundProps>({
     color: '#ffffff',

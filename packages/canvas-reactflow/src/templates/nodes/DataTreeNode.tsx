@@ -6,6 +6,7 @@ import { cn } from "../../lib/utils";
 import { SearchInput } from "@invana/ui";
 import { highlightHandlePathByNodeHandleId, resetHandlePathHighlight } from "@invana/canvas-reactflow/interactions/EntityRelationHighlight";
 import { generateFieldName } from "@invana/canvas-reactflow/app";
+// import useCanvasReactFlowStore from "@invana/canvas-reactflow/hooks/useCanvasReactFlow";
 
 
 export type DataTreeNodeItem = {
@@ -32,11 +33,15 @@ export type DataTreeNodeProps = NodeProps<DataTreeNode>
 function DataTreeNodeItem({ item, nodeId }: { item: DataTreeNodeItem, nodeId: string }) {
 
   const store = useStoreApi();
+  // const { setSelectedField } = useCanvasReactFlowStore();
+
   const { edges, nodes, setNodes, setEdges } = store.getState();
+  // const {setSelectedField} = canvasReactFlowStore.;
 
   const onFieldMouseOver = (nodeId: string, handleId: string, e: React.MouseEvent) => {
     console.log("===onFieldMouseOver", nodeId, handleId, e)
     e.stopPropagation()
+    // setSelectedField([nodeId, handleId]);
     highlightHandlePathByNodeHandleId(nodeId, handleId, nodes, edges, setNodes, setEdges);
     // https://github.com/wbkd/react-flow/issues/2418
   };
