@@ -6,7 +6,7 @@ import { getData } from './data';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta = {
-  title: 'Use Cases/Insurance Analytics',
+  title: 'Use Cases',
   component: CanvasFlow,
   parameters: {
     layout: 'fullscreen',
@@ -19,29 +19,26 @@ type Story = StoryObj<typeof meta>;
 
 const layoutEngine = new DagreLayoutEngine({
   nodeWidth: 500,
-  // nodeHeight: 60,
   padding: 100
 })
 const data = getData()
 const { layoutedNodes, layoutedEdges } = layoutEngine.getLayoutedElements(data.nodes, data.edges)
-console.log("==layoutedNodes", layoutedNodes, layoutedEdges)
-export const Basic: Story = {
+
+export const InsuranceAnalytics: Story = {
   args: {
     nodes: layoutedNodes,
     edges: layoutedEdges,
     canvas: {
       colorMode: 'light'
+    },
+    display: {
+      plugins: {
+        devTools: false,
+        miniMap: true,
+        controls: false,
+        background: true,
+        theme: true
+      }
     }
-    // nodes: data.nodes,
-    // edges: data.edges
   },
 };
-
-
-// export const ERDriagramGrouped: Story = {
-//   name: "Grouped ER",
-//   args: {
-//     nodes: groupdData.nodes,
-//     edges: groupdData.edges
-//   },
-// };
