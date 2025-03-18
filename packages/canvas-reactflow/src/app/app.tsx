@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -24,19 +24,16 @@ import { mergeDeep } from "@invana/data-store";
 
 export const CanvasFlow: React.FC<FlowCanvasOptions> = (useOptions) => {
   const options = mergeDeep(defaultFlowCanvasOptions, useOptions);
-  const ref = useRef<ReactFlowInstance | null>(null);
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance | null>(null);
   const onInit = (reactFlowInstance: ReactFlowInstance<Node, Edge>) => {
     setFlowInstance(reactFlowInstance);
     // onLayoutUpdated(direction, reactFlowInstance);
   };
   const defaultNodes = options.nodes.map(
-    node => addNodeDefaults(node, options.canvas?.defaultNodeOptions || {}, options.layoutDirection)
+    (node: Node) => addNodeDefaults(node, options.canvas?.defaultNodeOptions || {}, options.layoutDirection)
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [nodes, _setNodes, onNodesChange] = useNodesState(defaultNodes);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [edges, _setEdges, onEdgesChange] = useEdgesState(options?.edges || []);
 
 
@@ -60,7 +57,7 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (useOptions) => {
   // }
 
   const onPanelClick = (event: React.MouseEvent<Element, MouseEvent>) => {
-
+    console.log("onPanelClick", event);
     resetHandlePathHighlight(nodes, edges, _setNodes, _setEdges)
   }
 
@@ -70,14 +67,12 @@ export const CanvasFlow: React.FC<FlowCanvasOptions> = (useOptions) => {
       <ReactFlowProvider>
 
         <ReactFlow
-          // ref={ref}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodes={nodes}
           edges={edges}
           colorMode={options.canvas?.colorMode}
           onInit={onInit}
-          // edgeStyles={{}}
           onPaneClick={onPanelClick}
           onEdgeClick={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeClick(event, edge, flowInstance)}
           onEdgeMouseEnter={(event: React.MouseEvent, edge: Edge) => options.canvasInteractions && options.canvasInteractions.onEdgeMouseEnter(event, edge, flowInstance)}

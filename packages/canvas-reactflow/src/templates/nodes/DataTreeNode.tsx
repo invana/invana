@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Handle, NodeProps, Position, useStoreApi } from "@xyflow/react";
+import { Handle, NodeProps, Position, Node, useStoreApi } from "@xyflow/react";
 import { BaseNodeTemplate } from "../../components/BaseNodeTemplate";
 import { ChevronRight } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -18,17 +18,16 @@ export type DataTreeNodeItem = {
 
 }
 
-export type DataTreeNodeProps = NodeProps & {
-  data: {
-    id?: string
-    headerTitle: React.ReactNode
-    icon?: React.ReactNode
-    headerDescription?: React.ReactNode
-    children: DataTreeNodeItem[]
-    searchable?: boolean
-  }
-}
+export type DataTreeNode = Node<{
+  // id?: string
+  headerTitle: React.ReactNode | string
+  icon?: React.ReactNode
+  headerDescription?: React.ReactNode | string
+  children: DataTreeNodeItem[]
+  searchable?: boolean
+}>
 
+export type DataTreeNodeProps = NodeProps<DataTreeNode>
 
 function DataTreeNodeItem({ item, nodeId }: { item: DataTreeNodeItem, nodeId: string }) {
 

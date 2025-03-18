@@ -35,8 +35,8 @@ export default class CanvasInteractions {
 
 
 
-    onNodeClick = (event: React.MouseEvent, edge: Edge) => { }
-    onNodeDoubleClick = (event: React.MouseEvent, edge: Edge) => { }
+    onNodeClick = (_event: React.MouseEvent, _edge: Edge) => { }
+    onNodeDoubleClick = (_event: React.MouseEvent, _edge: Edge) => { }
     onNodeMouseEnter = (event: React.MouseEvent, node: Node, flowInstance: FlowInstanceType) => {
         console.log("==onNodeMouseEnter", node.id);
         if (flowInstance) { canvasInteractionActions.highlightNodeAndNeighbors(event, node, flowInstance) }
@@ -46,7 +46,7 @@ export default class CanvasInteractions {
         console.log("==onNodeMouseLeave", node.id);
         if (flowInstance) { canvasInteractionActions.unHightlightNodeAndNeighbors(event, node, flowInstance) }
     }
-    onNodeContextMenu = (event: React.MouseEvent, node: Node) => {
+    onNodeContextMenu = (_event: React.MouseEvent, _node: Node) => {
 
 
     }
@@ -58,7 +58,7 @@ export default class CanvasInteractions {
     // onSelectionContextMenu = (event: React.MouseEvent, nodes: Node[]) => { }
 
 
-    onPaneClick = (event: React.MouseEvent, flowInstance: FlowInstanceType) => { // Called when user clicks directly on the canvas
+    onPaneClick = (_event: React.MouseEvent, _flowInstance: FlowInstanceType) => { // Called when user clicks directly on the canvas
 
     }
 
