@@ -8,27 +8,22 @@ import {
   Panel,
   Edge,
   Node,
-  useReactFlow,
   ReactFlowInstance,
-  NodeTypes,
   ReactFlowProvider,
-  // ColorMode
 } from "@xyflow/react";
 import { FlowCanvasOptions } from "./types";
 import '@xyflow/react/dist/style.css';
 import { defaultFlowCanvasOptions } from "./defaults";
 import { addNodeDefaults } from "./utils";
 import { CanvasToolBar } from "../plugins/toolbars/CanvasToolBar";
-// import { Moon, Sun } from "lucide-react";
-// import { ButtonWithTooltip } from "@invana/ui";
 import { DevTools } from "../plugins/toolbars/DevTools";
-import { FlowInstanceType } from "../interactions/interactions";
 import { resetHandlePathHighlight } from "../interactions/EntityRelationHighlight";
+import { mergeDeep } from "@invana/data-store";
 
 
 
-export const CanvasFlow: React.FC<FlowCanvasOptions> = (options) => {
-  options = { ...defaultFlowCanvasOptions, ...options };
+export const CanvasFlow: React.FC<FlowCanvasOptions> = (useOptions) => {
+  const options = mergeDeep(defaultFlowCanvasOptions, useOptions);
   const ref = useRef<ReactFlowInstance | null>(null);
   const [flowInstance, setFlowInstance] = useState<ReactFlowInstance | null>(null);
   const onInit = (reactFlowInstance: ReactFlowInstance<Node, Edge>) => {

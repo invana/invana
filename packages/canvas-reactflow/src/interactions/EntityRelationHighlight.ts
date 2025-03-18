@@ -117,14 +117,13 @@ export const highlightHandlePathByNodeHandleId = (
   setNodes: any,
   setEdges: any
 ) => {
-  console.log("highlightHandlePathByNodeHandleId", nodeId, handleId)
+  console.log("highlightHandlePathByNodeHandleId", nodeId, handleId, nodes, edges)
   resetHandlePathHighlight(nodes, edges, setNodes, setEdges);
   const allIncomingEdges = getAllIncomers(nodeId, handleId, nodes, edges);
   const allOutgoingEdges = getAllOutgoers(nodeId, handleId, nodes, edges);
 
   // make all other columns inactive
   document.querySelectorAll(".nodeField").forEach((el) => {
-    // el.classList.add("inactive");
     HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
       el.classList.add(cls)
     })
@@ -134,47 +133,40 @@ export const highlightHandlePathByNodeHandleId = (
   const toHighlightEdges = allIncomingEdges.concat(allOutgoingEdges);
   const toHighlightEdgesIds = toHighlightEdges.map((edge: Edge) => edge.id);
   console.log("====toHighlightEdgesIds", toHighlightEdgesIds, edges)
-  const edgesHighlighted = edges?.map((edge) => {
-    if (toHighlightEdgesIds.includes(edge.id)) {
-      edge.animated = true;
-      edge.style = {
+
+  // highlight edges of the neighbors
+  const updatedEdges = edges.map((edge) => {
+    const isHighlighted = toHighlightEdgesIds.includes(edge.id);
+    return {
+      ...edge,
+      animated: isHighlighted,
+      style: {
         ...edge.style,
-        // stroke: "lightblue",
-        stroke: HIGHLIGHT_CONSTANTS.EDGE_HIGHLIGHTED_STROKE,
-        opacity: 1
-      };
-    } else {
-      // edge.hidden = true // 
-      edge.style = {
-        ...edge.style,
-        stroke: HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
-        opacity: 0.4
-      };
-    }
-    return edge;
+        stroke: isHighlighted
+          ? HIGHLIGHT_CONSTANTS.EDGE_HIGHLIGHTED_STROKE
+          : HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
+        opacity: isHighlighted ? 1 : 0.6,
+      },
+    };
   });
-  setEdges(edgesHighlighted);
+  setEdges(updatedEdges); // Pass the updated array directly
 
   // hightlight current handle when no edges are present
   const toHighlightHandleIds =
-    toHighlightEdges.length === 0
+    toHighlightEdges.length === 0 && handleId
       ? [generateFieldName(nodeId, handleId)]
       : getNodeHandles(toHighlightEdges);
 
-  console.log("====toHighlightHandleIds", toHighlightHandleIds)
+  // highlight fields
   toHighlightHandleIds.forEach((handleId) => {
-    console.log("====toHighlightHandleId handleId", handleId)
     const el: HTMLElement | null = document.getElementById(handleId);
     if (el) {
-      // el.classList.add("highlight");
-      // el.classList.add("bg-white")
       HIGHLIGHT_CONSTANTS.HIGHLIGHT_FIELD_CLASSES.map((cls) => {
         el.classList.add(cls)
       })
       HIGHLIGHT_CONSTANTS.INACTIVE_FIELD_CLASSES.map((cls) => {
         el.classList.remove(cls)
       })
-      // el.classList.remove("inactive");
     }
   });
 };
@@ -183,8 +175,6 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
   console.log("resetHandlePathHighlight");
   // remove highlighting of all handles
   document.querySelectorAll(".nodeField").forEach((el) => {
-    // el.classList.remove("highlight");
-    // el.classList.remove("inactive");
     HIGHLIGHT_CONSTANTS.HIGHLIGHT_FIELD_CLASSES.map((cls) => {
       el.classList.remove(cls)
     })
@@ -192,9 +182,8 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
       el.classList.remove(cls)
     })
   });
-
   // remove edge path hightlights of all handle paths
-  const edgesHighlighted = edges?.map((edge) => {
+  const edgesUnHighlighted = edges?.map((edge) => {
     edge.animated = false;
     edge.style = {
       ...edge.style,
@@ -204,5 +193,5 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
     edge.hidden = false;
     return edge;
   });
-  setEdges(edgesHighlighted);
+  setEdges(edgesUnHighlighted); // Pass the updated array directly
 };
