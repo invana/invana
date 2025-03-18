@@ -63,7 +63,7 @@ const getAllIncomers = (
 const getAllOutgoers = (nodeId: string, handleId: StringOrNull, nodes: Node[], edges: Edge[], prevOutgoers: Edge[] = []) => {
   const outGoingEdges = getNextOutgoingEdges(nodeId, handleId, nodes, edges);
   console.log("====outGoingEdges", outGoingEdges);
-  return outGoingEdges.reduce((memo: any, outGoingEdge: Edge) => {
+  const result = outGoingEdges.reduce((memo: any, outGoingEdge: Edge) => {
     memo.push(outGoingEdge);
     console.log("====outGoingEdge", outGoingEdge);
 
@@ -86,6 +86,7 @@ const getAllOutgoers = (nodeId: string, handleId: StringOrNull, nodes: Node[], e
     }
     return memo;
   }, []);
+  return result;
 };
 
 export const getNodeHandles = (edges: Edge[]) => {
