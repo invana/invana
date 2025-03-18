@@ -3,14 +3,14 @@ import { generateFieldName } from "../app/utils";
 import { StringOrNull } from "../app/types";
 import { Node, Edge } from '@xyflow/react'
 
-export const getNextIncomingEdges = (nodeId: string, handleId: StringOrNull, nodes: Node[], edges: Edge[]) => {
+export const getNextIncomingEdges = (nodeId: string, handleId: StringOrNull, _nodes: Node[], edges: Edge[]) => {
   const incomingEdges = edges
     .filter((e) => e.target === nodeId && e.targetHandle === handleId)
     .map((e) => e);
   return incomingEdges;
 };
 
-export const getNextOutgoingEdges = (nodeId: string, handleId: StringOrNull, nodes: Node[], edges: Edge[]) => {
+export const getNextOutgoingEdges = (nodeId: string, handleId: StringOrNull, _nodes: Node[], edges: Edge[]) => {
   const outgoingEdges = edges
     .filter((e) => e.source === nodeId && e.sourceHandle === handleId)
     .map((e) => e);
@@ -100,8 +100,8 @@ export const getNodeHandles = (edges: Edge[]) => {
         return [];
       } else {
         return [
-          generateFieldName(edge.source, edge.sourceHandle),
-          generateFieldName(edge.target, edge.targetHandle)
+          generateFieldName(edge.source, edge.sourceHandle || ''),
+          generateFieldName(edge.target, edge.targetHandle || '')
         ];
       }
     })
@@ -146,6 +146,7 @@ export const highlightHandlePathByNodeHandleId = (
           ? HIGHLIGHT_CONSTANTS.EDGE_HIGHLIGHTED_STROKE
           : HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
         opacity: isHighlighted ? 1 : 0.4,
+        strokeWidth: isHighlighted ? 2 : 1,
       },
     };
   });
@@ -171,7 +172,7 @@ export const highlightHandlePathByNodeHandleId = (
   });
 };
 
-export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes: any, setEdges: any) => {
+export const resetHandlePathHighlight = (_nodes: Node[], edges: Edge[], _setNodes: any, setEdges: any) => {
   console.log("resetHandlePathHighlight");
   // remove highlighting of all handles
   document.querySelectorAll(".nodeField").forEach((el) => {
@@ -188,6 +189,7 @@ export const resetHandlePathHighlight = (nodes: Node[], edges: Edge[], setNodes:
     edge.style = {
       ...edge.style,
       stroke: HIGHLIGHT_CONSTANTS.EDGE_NORMAL_STROKE,
+      strokeWidth: 1,
       opacity: 1
     };
     edge.hidden = false;
