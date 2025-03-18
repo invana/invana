@@ -22,8 +22,8 @@ export const HIGHLIGHT_CONSTANTS = {
   HIGHLIGHT_FIELD_CLASSES: ['bg-sky-400', 'text-zinc-900'],
   INACTIVE_FIELD_CLASSES: ['text-zinc-700'],
   EDGE_HIGHLIGHTED_STROKE: '#38bdf8',
-  EDGE_INVACTIVE_STROKE: '#222222',
-  EDGE_NORMAL_STROKE: '#444444'
+  EDGE_INVACTIVE_STROKE: '#cccccc',
+  EDGE_NORMAL_STROKE: '#999999'
 }
 
 const getAllIncomers = (
@@ -145,7 +145,7 @@ export const highlightHandlePathByNodeHandleId = (
         stroke: isHighlighted
           ? HIGHLIGHT_CONSTANTS.EDGE_HIGHLIGHTED_STROKE
           : HIGHLIGHT_CONSTANTS.EDGE_INVACTIVE_STROKE,
-        opacity: isHighlighted ? 1 : 0.6,
+        opacity: isHighlighted ? 1 : 0.4,
       },
     };
   });
