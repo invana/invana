@@ -29,6 +29,9 @@ export const Basic: Story = {
   args: {
     nodes: layoutedNodes,
     edges: layoutedEdges,
+    canvas: {
+      colorMode: 'light'
+    }
     // nodes: data.nodes,
     // edges: data.edges
   },

@@ -15,7 +15,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@invana/canvas-reactflow": path.resolve(__dirname, "src"),
-      "@invana/ui": path.resolve(__dirname, "../ui/src")
+      "@invana/ui": path.resolve(__dirname, "../ui/src"),
+      "@invana/data-store": path.resolve(__dirname, '../../packages/data-store'),
+
     },
   },
   build: {
