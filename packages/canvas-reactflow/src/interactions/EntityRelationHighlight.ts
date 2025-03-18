@@ -19,7 +19,7 @@ export const getNextOutgoingEdges = (nodeId: string, handleId: StringOrNull, _no
 
 
 export const HIGHLIGHT_CONSTANTS = {
-  HIGHLIGHT_FIELD_CLASSES: ['bg-sky-400', 'text-zinc-900'],
+  HIGHLIGHT_FIELD_CLASSES: ['bg-sky-400', 'text-zinc-900', 'hover:rounded-[2px]'],
   INACTIVE_FIELD_CLASSES: ['text-zinc-700'],
   EDGE_HIGHLIGHTED_STROKE: '#38bdf8',
   EDGE_INVACTIVE_STROKE: '#cccccc',
