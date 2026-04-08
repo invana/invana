@@ -1,3 +1,8 @@
+commit-msg:
+  commands:
+    conventional-commit:
+      run: cz check --commit-msg-file {1}
+
 pre-commit:
   parallel: true
   commands:

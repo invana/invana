@@ -1,0 +1,116 @@
+site_name: Invana
+site_description: Graph Intelligence Platform — Structured knowledge graphs into interactive decision simulation environments
+site_url: https://invana.github.io/invana
+repo_url: https://github.com/invana/invana
+repo_name: invana/invana
+edit_uri: edit/main/docs/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/graph-outline
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+      - Configuration: getting-started/configuration.md
+  - Concepts:
+      - Architecture: concepts/architecture.md
+      - Ontology Modelling: concepts/ontology-modelling.md
+      - Query Engine: concepts/query-engine.md
+      - Connectors: concepts/connectors.md
+      - Algorithms: concepts/algorithms.md
+      - Simulations: concepts/simulations.md
+  - Guides:
+      - Connecting to Neo4j: guides/connecting-neo4j.md
+      - Building an Ontology: guides/building-ontology.md
+      - Running Queries: guides/running-queries.md
+      - Running Simulations: guides/running-simulations.md
+      - "Example: Tic-Tac-Toe": guides/tic-tac-toe-example.md
+  - Studio:
+      - Overview: studio/overview.md
+      - Graph Modelling: studio/modelling.md
+      - Query Workspace: studio/query-workspace.md
+      - Visualization: studio/visualization.md
+      - Simulation Dashboard: studio/simulation-dashboard.md
+  - Deployment:
+      - Docker: deployment/docker.md
+      - Production: deployment/production.md
+  - API Reference:
+      - Overview: api-reference/overview.md
+  - Development:
+      - Contributing: development/contributing.md
+      - RFCs: development/rfcs.md
+      - Changelog: development/changelog.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - tags
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/invana
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/invana
+
+copyright: Copyright &copy; 2026 Invana
