@@ -57,11 +57,13 @@ nav:
       - Algorithms: concepts/algorithms.md
       - Simulations: concepts/simulations.md
   - Guides:
-      - Connecting to Neo4j: guides/connecting-neo4j.md
       - Building an Ontology: guides/building-ontology.md
-      - Running Queries: guides/running-queries.md
-      - Running Simulations: guides/running-simulations.md
-      - "Example: Tic-Tac-Toe": guides/tic-tac-toe-example.md
+      - Graph Operations:
+          - Data: guides/graph/data.md
+          - Schema: guides/graph/schema.md
+      # - Running Queries: guides/running-queries.md
+      # - Running Simulations: guides/running-simulations.md
+      # - "Example: Tic-Tac-Toe": guides/tic-tac-toe-example.md
   - Studio:
       - Overview: studio/overview.md
       - Graph Modelling: studio/modelling.md
