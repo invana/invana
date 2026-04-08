@@ -1,15 +1,19 @@
 [project]
-name = "invana"
+name = "invana-engine"
 version = "0.0.0"
 description = "Invana — Graph Intelligence Platform"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn>=0.34",
     "pydantic>=2.0",
     "gremlinpython>=3.7",
-    "aiohttp>=3.9",
+    "neo4j>=5.0",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
 ]
 
 [dependency-groups]
@@ -18,7 +22,6 @@ dev = [
     "pytest-asyncio>=0.25",
     "pytest-cov>=6.0",
     "ruff>=0.11",
-    "neo4j>=5.0",
 ]
 
 [build-system]

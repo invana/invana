@@ -474,20 +474,23 @@ wheels = [
 ]
 
 [[package]]
-name = "invana"
+name = "invana-engine"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [
-    { name = "aiohttp" },
-    { name = "fastapi" },
     { name = "gremlinpython" },
+    { name = "neo4j" },
     { name = "pydantic" },
+]
+
+[package.optional-dependencies]
+server = [
+    { name = "fastapi" },
     { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "neo4j" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -496,16 +499,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", specifier = ">=3.9" },
-    { name = "fastapi", specifier = ">=0.115" },
+    { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.115" },
     { name = "gremlinpython", specifier = ">=3.7" },
+    { name = "neo4j", specifier = ">=5.0" },
     { name = "pydantic", specifier = ">=2.0" },
-    { name = "uvicorn", specifier = ">=0.34" },
+    { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.34" },
 ]
+provides-extras = ["server"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "neo4j", specifier = ">=5.0" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-asyncio", specifier = ">=0.25" },
     { name = "pytest-cov", specifier = ">=6.0" },

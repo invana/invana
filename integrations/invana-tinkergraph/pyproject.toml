@@ -5,8 +5,7 @@ description = "TinkerGraph connector for Invana (dev/testing)"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "invana",
-    "gremlinpython>=3.7",
+    "invana-engine",
 ]
 
 [dependency-groups]
@@ -18,7 +17,7 @@ dev = [
 ]
 
 [tool.uv.sources]
-invana = { path = "../../engine", editable = true }
+invana-engine = { path = "../../engine", editable = true }
 
 [build-system]
 requires = ["hatchling"]
