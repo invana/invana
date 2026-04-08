@@ -427,7 +427,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.115" },
-    { name = "gremlinpython", specifier = ">=3.7" },
+    { name = "gremlinpython", specifier = ">=3.8.1" },
     { name = "neo4j", specifier = ">=5.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.34" },

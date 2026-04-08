@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
     "pydantic>=2.0",
-    "gremlinpython>=3.7",
+    "gremlinpython>=3.8.1",
     "neo4j>=5.0",
 ]
 
