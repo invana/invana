@@ -25,6 +25,7 @@ from invana.graph.connectors.base.exceptions import (
     SerializationError,
 )
 from invana.graph.connectors.cypher.connector import OpenCypherConnector
+from invana.graph.connectors.gremlin.connector import GremlinConnector
 
 __all__ = [
     "BaseConnector",
@@ -38,6 +39,7 @@ __all__ = [
     "FilterGroup",
     "FilterOp",
     "GraphResponse",
+    "GremlinConnector",
     "IndexInfo",
     "LogicalOp",
     "NodeType",

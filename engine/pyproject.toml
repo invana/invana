@@ -8,6 +8,8 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn>=0.34",
     "pydantic>=2.0",
+    "gremlinpython>=3.7",
+    "aiohttp>=3.9",
 ]
 
 [dependency-groups]

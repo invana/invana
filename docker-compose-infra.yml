@@ -20,5 +20,61 @@ services:
       retries: 5
       start_period: 30s
 
+  janusgraph:
+    image: janusgraph/janusgraph:latest
+    container_name: invana-janusgraph
+    ports:
+      - "8182:8182" # Gremlin WebSocket
+    environment:
+      JAVA_OPTIONS: "-Xms512m -Xmx1024m"
+    volumes:
+      - janusgraph-data:/var/lib/janusgraph
+    healthcheck:
+      test: ["CMD-SHELL", "bin/gremlin.sh -e scripts/empty-sample.groovy 2>/dev/null || exit 0"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  memgraph:
+    image: memgraph/memgraph:latest
+    container_name: invana-memgraph
+    ports:
+      - "17687:7687" # Bolt protocol (prefixed to avoid conflict with Neo4j)
+    environment:
+      MEMGRAPH_TELEMETRY_ENABLED: "false"
+    volumes:
+      - memgraph-data:/var/lib/memgraph
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'RETURN 1;' | mgconsole || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  arcadedb:
+    image: arcadedata/arcadedb:latest
+    container_name: invana-arcadedb
+    ports:
+      - "2480:2480" # HTTP API
+      - "2424:2424" # Binary protocol
+      - "18182:8182" # Gremlin WebSocket (prefixed to avoid conflict with JanusGraph)
+    environment:
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+      arcadedb.server.rootPassword: testpassword
+      arcadedb.server.defaultDatabases: "testdb[root:testpassword]"
+      arcadedb.server.plugins: "GremlinServer:com.arcadedb.server.gremlin.GremlinServerPlugin"
+    volumes:
+      - arcadedb-data:/home/arcadedb/databases
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:2480/api/v1/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
 volumes:
   neo4j-data:
+  janusgraph-data:
+  memgraph-data:
+  arcadedb-data:

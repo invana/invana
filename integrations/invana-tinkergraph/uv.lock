@@ -478,14 +478,18 @@ name = "invana"
 version = "0.0.0"
 source = { editable = "../../engine" }
 dependencies = [
+    { name = "aiohttp" },
     { name = "fastapi" },
+    { name = "gremlinpython" },
     { name = "pydantic" },
     { name = "uvicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.9" },
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "gremlinpython", specifier = ">=3.7" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "uvicorn", specifier = ">=0.34" },
 ]

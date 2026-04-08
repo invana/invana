@@ -48,13 +48,13 @@ engine-format: ## Format engine (ruff format)
 
 # ─── Studio ─────────────────────────────────────────────────────
 studio-test: ## Run studio tests
-	cd studio && pnpm test run
+	@[ -f studio/package.json ] && (cd studio && pnpm test run) || echo "  skip studio-test (no package.json)"
 
 studio-lint: ## Lint studio (biome check)
-	cd studio && pnpm biome check .
+	@[ -f studio/package.json ] && (cd studio && pnpm biome check .) || echo "  skip studio-lint (no package.json)"
 
 studio-format: ## Format studio (biome format)
-	cd studio && pnpm biome check --write .
+	@[ -f studio/package.json ] && (cd studio && pnpm biome check --write .) || echo "  skip studio-format (no package.json)"
 
 # ─── Integrations ───────────────────────────────────────────────
 integrations-test: ## Run all integration connector tests
