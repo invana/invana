@@ -1,0 +1,23 @@
+[project]
+name = "invana-arcadedb"
+version = "0.0.0"
+description = "ArcadeDB connector for Invana (Cypher + Gremlin)"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    "invana",
+    "gremlinpython>=3.7",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.25",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/invana_arcadedb"]

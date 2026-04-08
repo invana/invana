@@ -4,8 +4,8 @@ Structured knowledge graphs into interactive decision simulation environments.
 
 ## Architecture
 
-- **Monorepo**: `engine/` (Python 3.14 + FastAPI) + `studio/` (React 19 + TypeScript)
-- **Distribution**: Single pip package (`pip install invana`) and Docker images
+- **Monorepo**: `engine/` (Python 3.14 + FastAPI) + `studio/` (React 19 + TypeScript) + `integrations/` (connector packages)
+- **Distribution**: `pip install invana` (core) + `pip install invana-neo4j` (per connector) + Docker images
 - **CLI**: `invana start`, `invana migrate`, `invana version`
 
 ## Stack
@@ -29,14 +29,20 @@ Structured knowledge graphs into interactive decision simulation environments.
 - **Testing**: Vitest + Testing Library + Playwright
 - **Query editor**: CodeMirror 6
 
+### Integrations (Python — separate packages)
+- **Pattern**: `integrations/invana-{db}/` — each is an independent pip package
+- **Packages**: invana-neo4j, invana-memgraph, invana-arcadedb, invana-janusgraph, invana-neptune, invana-tinkergraph
+- **Each has**: own `pyproject.toml`, `.venv`, deps, tests
+- **Depends on**: `invana` (engine core)
+
 ### Infrastructure
 - **CI**: GitHub Actions
-- **Pre-commit**: Lefthook (ruff + biome)
+- **Pre-commit**: pre-commit (ruff + biome + commitizen)
 - **Versioning**: Unified SemVer + CalVer release tags
 - **Changesets**: For changelog and version bumps
-- **Docker**: Multi-target Dockerfile (invana | engine | studio)
+- **Docker**: Multi-target Dockerfile (engine | studio)
 - **Docs**: MkDocs Material
-- **Registry**: Docker Hub (invana/invana, invana/engine, invana/studio)
+- **Registry**: Docker Hub (invana/engine, invana/studio)
 
 ## Supported Graph Databases
 - **Cypher**: Neo4j, Memgraph, ArcadeDB

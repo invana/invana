@@ -6,15 +6,15 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
-  # ─── Python (engine) ──────────────────────────────────────────
+  # ─── Python (engine + integrations) ────────────────────────────
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.4
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^engine/
+        files: ^(engine|integrations)/
       - id: ruff-format
-        files: ^engine/
+        files: ^(engine|integrations)/
 
   # ─── TypeScript (studio) ──────────────────────────────────────
   - repo: https://github.com/biomejs/pre-commit

@@ -1,6 +1,7 @@
 .PHONY: help setup dev docs docs-build \
        engine-test engine-lint engine-format \
        studio-test studio-lint studio-format \
+       integrations-test integrations-lint integrations-format \
        test lint format \
        build release publish docker \
        clean
@@ -17,6 +18,9 @@ setup: ## Install all dependencies (dev tools + engine + studio + docs)
 	@[ -f engine/pyproject.toml ] && (cd engine && uv sync) || echo "  skip engine (no pyproject.toml)"
 	@[ -f studio/package.json ]   && (cd studio && pnpm install) || echo "  skip studio (no package.json)"
 	@[ -f docs/pyproject.toml ]   && (cd docs && uv sync) || echo "  skip docs (no pyproject.toml)"
+	@for dir in integrations/*/; do \
+		[ -f "$$dir/pyproject.toml" ] && (cd "$$dir" && uv sync) || echo "  skip $$dir"; \
+	done
 	@echo "\n✓ Setup complete"
 
 # ─── Development ────────────────────────────────────────────────
@@ -52,12 +56,28 @@ studio-lint: ## Lint studio (biome check)
 studio-format: ## Format studio (biome format)
 	cd studio && pnpm biome check --write .
 
+# ─── Integrations ───────────────────────────────────────────────
+integrations-test: ## Run all integration connector tests
+	@for dir in integrations/*/; do \
+		[ -f "$$dir/pyproject.toml" ] && (echo "  testing $$dir" && cd "$$dir" && uv run pytest tests/ -x -q) || true; \
+	done
+
+integrations-lint: ## Lint all integrations
+	@for dir in integrations/*/; do \
+		[ -f "$$dir/pyproject.toml" ] && (cd "$$dir" && uv run ruff check .) || true; \
+	done
+
+integrations-format: ## Format all integrations
+	@for dir in integrations/*/; do \
+		[ -f "$$dir/pyproject.toml" ] && (cd "$$dir" && uv run ruff format .) || true; \
+	done
+
 # ─── All ────────────────────────────────────────────────────────
-test: engine-test studio-test ## Run all tests
+test: engine-test studio-test integrations-test ## Run all tests
 
-lint: engine-lint studio-lint ## Lint everything
+lint: engine-lint studio-lint integrations-lint ## Lint everything
 
-format: engine-format studio-format ## Format everything
+format: engine-format studio-format integrations-format ## Format everything
 
 # ─── Build & Release ────────────────────────────────────────────
 build: ## Build studio + engine wheel
@@ -80,8 +100,11 @@ release: ## Tag and push a release (reads version from engine/pyproject.toml)
 		echo "✓ Tag $$TAG pushed"; \
 	else echo "Aborted."; fi
 
-publish: ## Publish wheel to PyPI
+publish: ## Publish engine + integrations to PyPI
 	cd engine && uv publish
+	@for dir in integrations/*/; do \
+		[ -f "$$dir/pyproject.toml" ] && (echo "  publishing $$dir" && cd "$$dir" && uv publish) || true; \
+	done
 
 # ─── Docker ─────────────────────────────────────────────────────
 docker: ## Build engine + studio Docker images
@@ -96,5 +119,6 @@ clean: ## Remove build artifacts and caches
 	rm -rf engine/dist/ engine/build/
 	rm -rf studio/dist/
 	rm -rf docs/site/
+	rm -rf integrations/*/dist/ integrations/*/build/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
