@@ -53,8 +53,9 @@ Structured knowledge graphs into interactive decision simulation environments.
 
 1. Don't write code without complete implementation design decisions.
 2. Always ask when in doubt.
-3. Engine and Studio are built together, distributed flexibly (one image or separate).
-4. Coverage target: 80% minimum for both engine and studio.
-5. Every user-facing change requires a changeset.
-6. Studio uses `@invana/design-kit` for all UI components — don't create custom components unless absolutely necessary.
-7. Studio uses `@invana/canvas` for all graph rendering — no PixiJS code in studio. 
+3. make the development setup work across operating systems for seamless community developer contributions. 
+4. Engine and Studio are built together, distributed flexibly (one image or separate).
+5. Coverage target: 80% minimum for both engine and studio.
+6. Every user-facing change requires a changeset.
+7. Studio uses `@invana/design-kit` for all UI components — don't create custom components unless absolutely necessary.
+8. Studio uses `@invana/canvas` for all graph rendering — no PixiJS code in studio. 

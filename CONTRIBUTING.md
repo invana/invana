@@ -19,28 +19,36 @@ Thank you for your interest in contributing to Invana! This guide will help you 
 git clone https://github.com/invana/invana.git
 cd invana
 
+# Install all dependencies + pre-commit hooks
+make setup
+
 # Start both engine and studio in dev mode
-./scripts/dev.sh
+make dev
 ```
+
+Run `make help` to see all available commands.
 
 ### Engine (Python)
 
 ```bash
-cd engine
-uv sync                         # Install dependencies
-uv run pytest                   # Run tests
-uv run ruff check .             # Lint
-uv run ruff format .            # Format
+make engine-test                # Run tests
+make engine-lint                # Lint (ruff check)
+make engine-format              # Format (ruff format)
 ```
 
 ### Studio (TypeScript/React)
 
 ```bash
-cd studio
-pnpm install                    # Install dependencies
-pnpm dev                        # Start dev server
-pnpm test                       # Run tests
-pnpm lint                       # Lint with Biome
+make studio-test                # Run tests
+make studio-lint                # Lint (biome check)
+make studio-format              # Format (biome format)
+```
+
+### Docs
+
+```bash
+make docs                       # Serve docs locally (http://localhost:8000)
+make docs-build                 # Build docs static site
 ```
 
 ## Making Changes
@@ -63,20 +71,47 @@ This creates a file in `.changeset/` describing your change and its semver impac
 
 ### Commit Messages
 
-Use [Conventional Commits](https://www.conventionalcommits.org/):
+We enforce [Conventional Commits](https://www.conventionalcommits.org/) via [commitizen](https://commitizen-tools.github.io/commitizen/). Non-conforming commit messages are **rejected automatically** by the `commit-msg` hook.
+
+**Format:** `<type>(<optional scope>): <description>`
+
+**Allowed types:**
+
+| Type       | Use when...                                    |
+|------------|------------------------------------------------|
+| `feat`     | Adding a new feature                           |
+| `fix`      | Fixing a bug                                   |
+| `docs`     | Documentation only changes                     |
+| `style`    | Code style (formatting, no logic change)       |
+| `refactor` | Code change that neither fixes nor adds        |
+| `perf`     | Performance improvement                        |
+| `test`     | Adding or updating tests                       |
+| `build`    | Build system or dependency changes             |
+| `ci`       | CI/CD configuration changes                    |
+| `chore`    | Maintenance tasks                              |
+| `revert`   | Reverting a previous commit                    |
+| `bump`     | Version bumps                                  |
+
+**Examples:**
 
 ```
 feat(query-engine): add query plan caching
 fix(connectors): handle Neo4j connection timeout
 docs: update quickstart guide
 chore: bump dependencies
+refactor(studio): extract sidebar into design-kit component
 ```
+
+**Scopes** are optional but encouraged — use the module name (`engine`, `studio`, `docs`, `query-engine`, `connectors`, etc.).
 
 ### Pre-commit Hooks
 
-Lefthook runs automatically on commit:
-- **Python**: `ruff check --fix` + `ruff format`
-- **TypeScript**: `biome check --write`
+[pre-commit](https://pre-commit.com/) runs automatically on every commit (installed via `make setup`):
+
+- **commit-msg**: Validates commit message format (commitizen)
+- **pre-commit**: Lints and formats staged files
+  - Python: `ruff check --fix` + `ruff format`
+  - TypeScript: `biome check`
 
 ### Testing
 
