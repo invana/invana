@@ -57,7 +57,7 @@ Structured knowledge graphs into interactive decision simulation environments.
 
 ## Rules
 
-1. Don't write code without complete implementation design decisions.
+1. Don't write code without complete implementation design decisions, write RFC in `docs/rfcs` first before writing code. 
 2. Always ask when in doubt.
 3. make the development setup work across operating systems for seamless community developer contributions. 
 4. Engine and Studio are built together, distributed flexibly (one image or separate).
