@@ -58,3 +58,4 @@ docs/site/
 *.log
 *.bak
 *.tmp
+.ruff_cache/

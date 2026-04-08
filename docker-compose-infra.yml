@@ -1,0 +1,24 @@
+# Infrastructure services for local development and testing.
+# Usage: docker compose -f docker-compose-infra.yml up -d
+
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: invana-neo4j
+    ports:
+      - "7474:7474" # HTTP browser
+      - "7687:7687" # Bolt protocol
+    environment:
+      NEO4J_AUTH: neo4j/testpassword
+      NEO4J_PLUGINS: '["graph-data-science"]'
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  neo4j-data:
