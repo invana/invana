@@ -1,0 +1,19 @@
+# Invana Code Owners
+# These users will be automatically requested for review
+
+# Default — catch all
+* @invana/maintainers
+
+# Engine
+engine/ @invana/engine-team
+
+# Studio
+studio/ @invana/studio-team
+
+# Infrastructure
+docker/ @invana/platform
+deploy/ @invana/platform
+.github/ @invana/platform
+
+# Documentation
+docs/ @invana/maintainers

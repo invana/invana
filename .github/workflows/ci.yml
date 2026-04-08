@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Ruff check
+        run: cd engine && uv run ruff check .
+
+      - name: Ruff format check
+        run: cd engine && uv run ruff format --check .
+
+      - name: Biome check
+        run: cd studio && pnpm biome check .
+
+      - name: TypeScript type check
+        run: cd studio && pnpm tsc --noEmit
+
+  engine-tests:
+    name: Engine Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run unit tests
+        run: |
+          cd engine
+          uv run pytest tests/unit/ \
+            --cov --cov-report=xml --cov-report=term \
+            -x -q
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: engine/coverage.xml
+          flags: engine
+          fail_ci_if_error: false
+
+  studio-tests:
+    name: Studio Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run unit & component tests
+        run: |
+          cd studio
+          pnpm test run --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: studio/coverage/coverage-final.json
+          flags: studio
+          fail_ci_if_error: false
+
+  changeset-check:
+    name: Changeset Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changeset
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+          # Skip changeset check for docs-only or CI-only changes
+          if echo "$CHANGED" | grep -qE '^(engine/src|studio/src)/'; then
+            if ! echo "$CHANGED" | grep -q '^\.changeset/'; then
+              echo "::error::Missing changeset. Run 'pnpm changeset' to add one."
+              exit 1
+            fi
+          fi
+          echo "Changeset check passed."

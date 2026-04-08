@@ -1,0 +1,55 @@
+name: Setup Invana Dev Environment
+description: Composite action to setup Python, Node, and caches
+
+inputs:
+  python-version:
+    description: Python version
+    default: "3.14"
+  node-version:
+    description: Node.js version
+    default: "22"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Cache uv
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/uv
+          engine/.venv
+        key: uv-${{ runner.os }}-${{ hashFiles('engine/uv.lock') }}
+        restore-keys: uv-${{ runner.os }}-
+
+    - name: Cache pnpm
+      uses: actions/cache@v4
+      with:
+        path: studio/node_modules
+        key: pnpm-${{ runner.os }}-${{ hashFiles('studio/pnpm-lock.yaml') }}
+        restore-keys: pnpm-${{ runner.os }}-
+
+    - name: Install engine dependencies
+      shell: bash
+      run: cd engine && uv sync
+
+    - name: Install studio dependencies
+      shell: bash
+      run: cd studio && pnpm install --frozen-lockfile

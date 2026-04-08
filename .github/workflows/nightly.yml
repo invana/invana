@@ -1,0 +1,77 @@
+name: Nightly Integration Tests
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # 3 AM UTC daily
+  workflow_dispatch:
+
+jobs:
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      neo4j:
+        image: neo4j:5-community
+        ports:
+          - 7687:7687
+        env:
+          NEO4J_AUTH: neo4j/test-password
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p test-password 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+      memgraph:
+        image: memgraph/memgraph:latest
+        ports:
+          - 7688:7687
+
+      tinkergraph:
+        image: tinkerpop/gremlin-server:latest
+        ports:
+          - 8182:8182
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run integration tests
+        run: |
+          cd engine
+          uv run pytest tests/integration/ \
+            --cov --cov-report=xml \
+            -x -q
+        env:
+          NEO4J_URI: bolt://localhost:7687
+          NEO4J_USER: neo4j
+          NEO4J_PASSWORD: test-password
+          MEMGRAPH_URI: bolt://localhost:7688
+          GREMLIN_URI: ws://localhost:8182/gremlin
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: integration
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Install Playwright browsers
+        run: cd studio && pnpm exec playwright install --with-deps chromium
+
+      - name: Build & start Invana
+        run: |
+          cd studio && pnpm build
+          cd ../engine && uv run invana start --host 0.0.0.0 --port 8000 &
+          sleep 5
+
+      - name: Run E2E tests
+        run: cd studio && pnpm exec playwright test
+
+      - name: Upload E2E report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: studio/playwright-report/

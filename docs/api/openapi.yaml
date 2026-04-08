@@ -1,0 +1,76 @@
+openapi: "3.1.0"
+info:
+  title: Invana API
+  description: |
+    Graph Intelligence Platform — API for ontology modelling, query execution,
+    graph database connections, and decision simulations.
+  version: "0.1.0"
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+tags:
+  - name: health
+    description: Health checks
+  - name: connections
+    description: Graph database connection management
+  - name: models
+    description: Ontology and schema management
+  - name: queries
+    description: Query execution
+  - name: simulations
+    description: Decision simulation management
+  - name: auth
+    description: Authentication and authorization
+
+paths:
+  /api/v1/health:
+    get:
+      tags: [health]
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  # ─── Connections ───
+  # Defined in docs/api/schemas/connection.yaml (to be designed in RFC-002)
+
+  # ─── Models ───
+  # Defined in docs/api/schemas/ontology.yaml (to be designed in RFC-003)
+
+  # ─── Queries ───
+  # Defined in docs/api/schemas/query.yaml (to be designed in RFC-004)
+
+  # ─── Simulations ───
+  # Defined in docs/api/schemas/simulation.yaml (to be designed in RFC-007)
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, version]
+      properties:
+        status:
+          type: string
+          enum: [healthy]
+        version:
+          type: string
+          example: "0.1.0"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
