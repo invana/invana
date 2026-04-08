@@ -11,11 +11,12 @@ help: ## Show this help
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ─── Setup ──────────────────────────────────────────────────────
-setup: ## Install all dependencies (engine + studio + docs)
+setup: ## Install all dependencies (dev tools + engine + studio + docs)
+	uv sync
+	uv run pre-commit install --install-hooks --hook-type pre-commit --hook-type commit-msg
 	@[ -f engine/pyproject.toml ] && (cd engine && uv sync) || echo "  skip engine (no pyproject.toml)"
 	@[ -f studio/package.json ]   && (cd studio && pnpm install) || echo "  skip studio (no package.json)"
 	@[ -f docs/pyproject.toml ]   && (cd docs && uv sync) || echo "  skip docs (no pyproject.toml)"
-	@command -v lefthook >/dev/null && lefthook install || echo "  skip lefthook (not installed)"
 	@echo "\n✓ Setup complete"
 
 # ─── Development ────────────────────────────────────────────────
