@@ -1,9 +1,18 @@
+"""OpenCypher schema-reading queryset implementation."""
+
 from invana.graph.connectors.base.data_types.schema_elements import ConstraintInfo, IndexInfo
 from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReaderQuerySet
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 
 
 class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
+    """OpenCypher implementation of schema-reading operations.
+
+    ``get_indexes()`` and ``get_constraints()`` return empty lists because
+    standard openCypher has no universal introspection commands. Vendor
+    connectors override these with database-specific queries.
+    """
+
     async def get_node_labels(self) -> list[str]:
         query, params = OpenCypherQueryBuilder.get_node_labels()
         raw = await self._connector.execute(query, params)

@@ -1,3 +1,5 @@
+"""Base queryset class."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -8,6 +10,12 @@ if TYPE_CHECKING:
 
 
 class BaseQuerySet:
+    """Base class for all querysets.
+
+    Holds a reference to the parent connector and provides access to the
+    serializer for deserializing raw query results.
+    """
+
     def __init__(self, connector: BaseConnector) -> None:
         self._connector = connector
 

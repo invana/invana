@@ -73,6 +73,7 @@ nav:
       - Production: deployment/production.md
   - API Reference:
       - Overview: api-reference/overview.md
+      - Code Reference: api-reference/
   - Development:
       - Contributing: development/contributing.md
       - RFCs: development/rfcs.md
@@ -105,6 +106,29 @@ markdown_extensions:
 plugins:
   - search
   - tags
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [../engine/src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: true
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+            merge_init_into_class: true
+            docstring_style: google
+            show_if_no_docstring: true
+            inherited_members: true
+            group_by_category: true
+            show_category_heading: true
+            show_labels: true
 
 extra:
   social:

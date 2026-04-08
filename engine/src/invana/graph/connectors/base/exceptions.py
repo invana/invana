@@ -1,3 +1,6 @@
+"""Connector exception hierarchy."""
+
+
 class ConnectorError(Exception):
     """Base exception for all connector errors."""
 

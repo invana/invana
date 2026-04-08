@@ -1,9 +1,13 @@
+"""OpenCypher bulk operations queryset implementation."""
+
 from invana.graph.connectors.base.data_types.data_elements import Edge, Vertex
 from invana.graph.connectors.base.querysets.bulk import BaseBulkQuerySet
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 
 
 class OpenCypherBulkQuerySet(BaseBulkQuerySet):
+    """OpenCypher implementation of bulk operations using ``UNWIND``."""
+
     async def bulk_create_vertices(self, label: str, records: list[dict]) -> list[Vertex]:
         query, params = OpenCypherQueryBuilder.bulk_create_nodes(label, records)
         raw = await self._connector.execute(query, params)

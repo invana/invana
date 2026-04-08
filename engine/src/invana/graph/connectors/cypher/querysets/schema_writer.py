@@ -1,9 +1,13 @@
+"""OpenCypher schema-writing queryset implementation."""
+
 from typing import Literal
 
 from invana.graph.connectors.base.querysets.schema_writer import BaseSchemaWriterQuerySet
 
 
 class OpenCypherSchemaWriterQuerySet(BaseSchemaWriterQuerySet):
+    """OpenCypher implementation of schema-writing operations."""
+
     async def create_index(
         self,
         label: str,

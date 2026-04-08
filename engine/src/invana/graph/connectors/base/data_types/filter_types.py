@@ -1,7 +1,11 @@
+"""Filter comparison operators."""
+
 from enum import StrEnum
 
 
 class FilterOp(StrEnum):
+    """Comparison operators for property filters."""
+
     EQ = "eq"
     NEQ = "neq"
     GT = "gt"

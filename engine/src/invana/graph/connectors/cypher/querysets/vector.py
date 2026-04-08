@@ -1,3 +1,5 @@
+"""OpenCypher vector search queryset implementation."""
+
 from typing import Literal
 
 from invana.graph.connectors.base.data_types.data_elements import Vertex

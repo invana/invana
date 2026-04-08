@@ -1,3 +1,5 @@
+"""OpenCypher data-reading queryset implementation."""
+
 from typing import Literal
 
 from invana.graph.connectors.base.data_types.data_elements import Edge, GraphResponse, Path, Vertex
@@ -7,6 +9,8 @@ from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 
 
 class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
+    """OpenCypher implementation of data-reading operations."""
+
     async def read_vertices(
         self,
         label: str,

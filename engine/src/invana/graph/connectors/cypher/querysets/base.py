@@ -1,3 +1,5 @@
+"""Base class for OpenCypher querysets."""
+
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
 
 

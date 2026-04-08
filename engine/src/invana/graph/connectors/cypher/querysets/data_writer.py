@@ -1,9 +1,13 @@
+"""OpenCypher data-writing queryset implementation."""
+
 from invana.graph.connectors.base.data_types.data_elements import Edge, Vertex
 from invana.graph.connectors.base.querysets.data_writer import BaseDataWriterQuerySet
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 
 
 class OpenCypherDataWriterQuerySet(BaseDataWriterQuerySet):
+    """OpenCypher implementation of data-writing operations."""
+
     async def create_vertex(self, label: str, properties: dict) -> Vertex:
         query, params = OpenCypherQueryBuilder.create_node(label, properties)
         raw = await self._connector.execute(query, params)

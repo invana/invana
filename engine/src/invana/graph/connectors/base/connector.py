@@ -1,3 +1,5 @@
+"""Base connector abstract class."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -64,14 +66,17 @@ class BaseConnector(ABC):
     # --- End of integration-implemented methods ---
 
     @abstractmethod
-    def capabilities(self) -> set[Capability]: ...
+    def capabilities(self) -> set[Capability]:
+        """Return the set of capabilities supported by this connector."""
 
     async def connect(self) -> None:
+        """Create the driver and verify connectivity."""
         self._driver = await self._create_driver()
         self._connected = True
         await self.health_check()
 
     async def disconnect(self) -> None:
+        """Close the driver and mark the connector as disconnected."""
         if self._driver:
             await self._close_driver()
             self._connected = False

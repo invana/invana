@@ -1,3 +1,5 @@
+"""OpenCypher graph algorithms queryset implementation."""
+
 from typing import Any
 
 from invana.graph.connectors.base.data_types.data_elements import Path, Vertex
