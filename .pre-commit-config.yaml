@@ -1,0 +1,25 @@
+repos:
+  # ─── Commit message ───────────────────────────────────────────
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.4.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # ─── Python (engine) ──────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^engine/
+      - id: ruff-format
+        files: ^engine/
+
+  # ─── TypeScript (studio) ──────────────────────────────────────
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.0.0
+    hooks:
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        files: ^studio/
