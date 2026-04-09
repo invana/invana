@@ -12,10 +12,12 @@ from invana.graph.connectors.base.data_types.filter_types import FilterOp
 from invana.graph.connectors.base.data_types.filters import FilterExpression, FilterGroup, LogicalOp
 from invana.graph.connectors.base.data_types.schema_elements import (
     ConstraintInfo,
+    EdgeSchemaInfo,
     EdgeType,
     IndexInfo,
     NodeType,
     PropertyDefinition,
+    PropertyInfo,
 )
 from invana.graph.connectors.base.exceptions import (
     ConnectionError,
@@ -34,6 +36,7 @@ __all__ = [
     "ConnectorError",
     "ConstraintInfo",
     "Edge",
+    "EdgeSchemaInfo",
     "EdgeType",
     "FilterExpression",
     "FilterGroup",
@@ -47,6 +50,7 @@ __all__ = [
     "OpenCypherConnector",
     "Path",
     "PropertyDefinition",
+    "PropertyInfo",
     "QueryExecutionError",
     "QueryResult",
     "ResultMetadata",

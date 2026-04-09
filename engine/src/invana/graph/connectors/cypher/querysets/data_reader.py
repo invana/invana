@@ -2,10 +2,10 @@
 
 from typing import Literal
 
-from invana.graph.connectors.base.data_types.data_elements import Edge, GraphResponse, Path, Vertex
-from invana.graph.connectors.base.data_types.filters import FilterGroup
 from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
+from invana.graph.types.data_elements import Edge, GraphResponse, Path, Vertex
+from invana.graph.types.filters import FilterGroup
 
 
 class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):

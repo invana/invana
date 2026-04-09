@@ -8,6 +8,9 @@ dependencies = [
     "pydantic>=2.0",
     "gremlinpython>=3.8.1",
     "neo4j>=5.0",
+    "sqlalchemy[asyncio]>=2.0",
+    "aiosqlite>=0.20",
+    "alembic>=1.15",
 ]
 
 [project.optional-dependencies]

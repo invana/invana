@@ -2,8 +2,8 @@
 
 from abc import ABC, abstractmethod
 
-from invana.graph.connectors.base.data_types.data_elements import Edge, Vertex
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
+from invana.graph.types.data_elements import Edge, Vertex
 
 
 class BaseBulkQuerySet(BaseQuerySet, ABC):

@@ -1,4 +1,4 @@
-from invana.graph.connectors.base.data_types.data_elements import (
+from invana.graph.types.data_elements import (
     Edge,
     GraphResponse,
     Path,
@@ -6,19 +6,22 @@ from invana.graph.connectors.base.data_types.data_elements import (
     ResultMetadata,
     Vertex,
 )
-from invana.graph.connectors.base.data_types.filter_types import FilterOp
-from invana.graph.connectors.base.data_types.filters import FilterExpression, FilterGroup, LogicalOp
-from invana.graph.connectors.base.data_types.schema_elements import (
+from invana.graph.types.filter_types import FilterOp
+from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.schema_elements import (
     ConstraintInfo,
+    EdgeSchemaInfo,
     EdgeType,
     IndexInfo,
     NodeType,
     PropertyDefinition,
+    PropertyInfo,
 )
 
 __all__ = [
     "ConstraintInfo",
     "Edge",
+    "EdgeSchemaInfo",
     "EdgeType",
     "FilterExpression",
     "FilterGroup",
@@ -29,6 +32,7 @@ __all__ = [
     "NodeType",
     "Path",
     "PropertyDefinition",
+    "PropertyInfo",
     "QueryResult",
     "ResultMetadata",
     "Vertex",

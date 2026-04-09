@@ -3,8 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import Literal
 
-from invana.graph.connectors.base.data_types.data_elements import Vertex
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
+from invana.graph.types.data_elements import Vertex
 
 
 class BaseVectorQuerySet(BaseQuerySet, ABC):

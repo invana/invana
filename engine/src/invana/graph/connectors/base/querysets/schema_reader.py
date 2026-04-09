@@ -2,8 +2,13 @@
 
 from abc import ABC, abstractmethod
 
-from invana.graph.connectors.base.data_types.schema_elements import ConstraintInfo, IndexInfo
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
+from invana.graph.types.schema_elements import (
+    ConstraintInfo,
+    EdgeSchemaInfo,
+    IndexInfo,
+    PropertyInfo,
+)
 
 
 class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
@@ -28,3 +33,37 @@ class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
     @abstractmethod
     async def get_constraints(self) -> list[ConstraintInfo]:
         """Return all constraints in the database."""
+
+    @abstractmethod
+    async def get_property_schema(
+        self,
+        label: str,
+        *,
+        sample_size: int = 100,
+    ) -> list[PropertyInfo]:
+        """Infer property types from existing data by sampling."""
+
+    @abstractmethod
+    async def get_edge_schema(
+        self,
+        label: str,
+        *,
+        sample_size: int = 100,
+    ) -> EdgeSchemaInfo:
+        """Infer edge endpoint patterns and property keys from existing data."""
+
+    async def get_edge_multiplicity(self, label: str) -> str:
+        """Return the multiplicity for an edge label.
+
+        Defaults to ``"MULTI"``. Gremlin vendors override to query
+        the management API.
+        """
+        return "MULTI"
+
+    async def get_property_cardinality(self, label: str, key: str) -> str:
+        """Return the value cardinality for a property key.
+
+        Defaults to ``"SINGLE"``. Gremlin vendors override to query
+        the management API.
+        """
+        return "SINGLE"

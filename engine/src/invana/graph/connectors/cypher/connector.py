@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from invana.graph.connectors.base.connector import BaseConnector
-from invana.graph.connectors.base.constants import Capability
 from invana.graph.connectors.base.serializers import BaseSerializer
 from invana.graph.connectors.cypher.querysets.algorithms import OpenCypherAlgorithmsQuerySet
 from invana.graph.connectors.cypher.querysets.bulk import OpenCypherBulkQuerySet
@@ -15,6 +14,7 @@ from invana.graph.connectors.cypher.querysets.schema_reader import OpenCypherSch
 from invana.graph.connectors.cypher.querysets.schema_writer import OpenCypherSchemaWriterQuerySet
 from invana.graph.connectors.cypher.querysets.vector import OpenCypherVectorQuerySet
 from invana.graph.connectors.cypher.serializers import OpenCypherSerializer
+from invana.graph.types.constants import Capability
 
 
 class OpenCypherConnector(BaseConnector):

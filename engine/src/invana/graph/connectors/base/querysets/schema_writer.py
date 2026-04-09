@@ -1,7 +1,7 @@
 """Abstract schema-writing queryset."""
 
 from abc import ABC, abstractmethod
-from typing import Literal
+from typing import Any, Literal
 
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
 
@@ -15,8 +15,9 @@ class BaseSchemaWriterQuerySet(BaseQuerySet, ABC):
         label: str,
         properties: list[str],
         *,
-        index_type: Literal["btree", "fulltext", "composite"] = "btree",
+        index_type: Literal["range", "btree", "composite", "fulltext", "text", "point", "lookup"] = "range",
         name: str | None = None,
+        options: dict[str, Any] | None = None,
     ) -> None:
         """Create an index on the given label and properties."""
 
@@ -30,7 +31,13 @@ class BaseSchemaWriterQuerySet(BaseQuerySet, ABC):
         label: str,
         properties: list[str],
         *,
-        constraint_type: Literal["unique", "exists", "node_key"] = "unique",
+        constraint_type: Literal[
+            "unique",
+            "exists",
+            "node_key",
+            "relationship_unique",
+            "relationship_exists",
+        ] = "unique",
         name: str | None = None,
     ) -> None:
         """Create a constraint on the given label and properties."""

@@ -11,8 +11,8 @@ from typing import Any
 from gremlin_python.process.graph_traversal import GraphTraversalSource, __
 from gremlin_python.process.traversal import P, TextP
 
-from invana.graph.connectors.base.data_types.filter_types import FilterOp
-from invana.graph.connectors.base.data_types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.filter_types import FilterOp
+from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
 
 
 def _project_edge(traversal: Any) -> Any:

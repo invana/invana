@@ -1,9 +1,14 @@
 """Gremlin schema-reading queryset implementation."""
 
-from invana.graph.connectors.base.data_types.schema_elements import ConstraintInfo, IndexInfo
 from invana.graph.connectors.base.decorators import not_supported_by_vendor
 from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReaderQuerySet
 from invana.graph.connectors.gremlin.query_builder import GremlinQueryBuilder
+from invana.graph.types.schema_elements import (
+    ConstraintInfo,
+    EdgeSchemaInfo,
+    IndexInfo,
+    PropertyInfo,
+)
 
 
 class GremlinSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
@@ -34,3 +39,19 @@ class GremlinSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
 
     @not_supported_by_vendor("Gremlin does not have a standard constraint introspection API.")
     async def get_constraints(self) -> list[ConstraintInfo]: ...
+
+    @not_supported_by_vendor("Gremlin does not have a standard property schema introspection API.")
+    async def get_property_schema(
+        self,
+        label: str,
+        *,
+        sample_size: int = 100,
+    ) -> list[PropertyInfo]: ...
+
+    @not_supported_by_vendor("Gremlin does not have a standard edge schema introspection API.")
+    async def get_edge_schema(
+        self,
+        label: str,
+        *,
+        sample_size: int = 100,
+    ) -> EdgeSchemaInfo: ...

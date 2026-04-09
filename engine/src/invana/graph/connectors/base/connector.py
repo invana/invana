@@ -5,7 +5,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from invana.graph.connectors.base.constants import Capability
 from invana.graph.connectors.base.querysets.algorithms import BaseAlgorithmsQuerySet
 from invana.graph.connectors.base.querysets.bulk import BaseBulkQuerySet
 from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
@@ -14,6 +13,7 @@ from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReade
 from invana.graph.connectors.base.querysets.schema_writer import BaseSchemaWriterQuerySet
 from invana.graph.connectors.base.querysets.vector import BaseVectorQuerySet
 from invana.graph.connectors.base.serializers import BaseSerializer
+from invana.graph.types.constants import Capability
 
 
 class BaseConnector(ABC):

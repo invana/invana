@@ -17,7 +17,6 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 
 from invana.graph.connectors.base.connector import BaseConnector
-from invana.graph.connectors.base.constants import Capability
 from invana.graph.connectors.base.exceptions import ConnectionError, QueryExecutionError
 from invana.graph.connectors.base.serializers import BaseSerializer
 from invana.graph.connectors.gremlin.querysets.algorithms import GremlinAlgorithmsQuerySet
@@ -28,6 +27,7 @@ from invana.graph.connectors.gremlin.querysets.schema_reader import GremlinSchem
 from invana.graph.connectors.gremlin.querysets.schema_writer import GremlinSchemaWriterQuerySet
 from invana.graph.connectors.gremlin.querysets.vector import GremlinVectorQuerySet
 from invana.graph.connectors.gremlin.serializers import GremlinSerializer
+from invana.graph.types.constants import Capability
 
 
 class GremlinConnector(BaseConnector):

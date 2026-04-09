@@ -11,9 +11,9 @@ from typing import Any
 
 from gremlin_python.process.traversal import T
 
-from invana.graph.connectors.base.data_types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex
 from invana.graph.connectors.base.exceptions import SerializationError
 from invana.graph.connectors.base.serializers import BaseSerializer
+from invana.graph.types.data_elements import Edge, GraphResponse, Path, ResultMetadata, Vertex
 
 
 class GremlinSerializer(BaseSerializer):

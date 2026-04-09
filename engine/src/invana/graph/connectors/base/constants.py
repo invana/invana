@@ -1,21 +1,9 @@
-"""Connector constants and enumerations."""
+"""Connector constants and enumerations.
 
-from enum import StrEnum
+Canonical definitions live in ``invana.graph.types.constants``.
+This module re-exports them for backward compatibility.
+"""
 
+from invana.graph.types.constants import Capability, QueryLanguage
 
-class QueryLanguage(StrEnum):
-    """Supported query languages."""
-
-    CYPHER = "cypher"
-    GREMLIN = "gremlin"
-
-
-class Capability(StrEnum):
-    """Capabilities that a connector may advertise."""
-
-    CYPHER = "cypher"
-    GREMLIN = "gremlin"
-    VECTOR_SEARCH = "vector_search"
-    FULLTEXT_INDEX = "fulltext_index"
-    SCHEMA_ENFORCEMENT = "schema_enforcement"
-    TRANSACTIONS = "transactions"
+__all__ = ["Capability", "QueryLanguage"]

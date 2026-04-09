@@ -1,8 +1,8 @@
 """Gremlin bulk operations queryset implementation."""
 
-from invana.graph.connectors.base.data_types.data_elements import Edge, Vertex
 from invana.graph.connectors.base.querysets.bulk import BaseBulkQuerySet
 from invana.graph.connectors.gremlin.query_builder import GremlinQueryBuilder
+from invana.graph.types.data_elements import Edge, Vertex
 
 
 class GremlinBulkQuerySet(BaseBulkQuerySet):

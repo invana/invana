@@ -6,8 +6,8 @@ Parameters use $p0, $p1, ... naming to avoid collisions.
 
 from __future__ import annotations
 
-from invana.graph.connectors.base.data_types.filter_types import FilterOp
-from invana.graph.connectors.base.data_types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.filter_types import FilterOp
+from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
 
 
 class _ParamCounter:

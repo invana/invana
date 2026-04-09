@@ -1,6 +1,6 @@
 """Gremlin schema-writing queryset implementation."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from invana.graph.connectors.base.decorators import not_supported_by_vendor
 from invana.graph.connectors.base.querysets.schema_writer import BaseSchemaWriterQuerySet
@@ -19,8 +19,9 @@ class GremlinSchemaWriterQuerySet(BaseSchemaWriterQuerySet):
         label: str,
         properties: list[str],
         *,
-        index_type: Literal["btree", "fulltext", "composite"] = "btree",
+        index_type: Literal["range", "btree", "composite", "fulltext", "text", "point", "lookup"] = "range",
         name: str | None = None,
+        options: dict[str, Any] | None = None,
     ) -> None: ...
 
     @not_supported_by_vendor("Gremlin does not have a standard drop index API.")
@@ -32,7 +33,13 @@ class GremlinSchemaWriterQuerySet(BaseSchemaWriterQuerySet):
         label: str,
         properties: list[str],
         *,
-        constraint_type: Literal["unique", "exists", "node_key"] = "unique",
+        constraint_type: Literal[
+            "unique",
+            "exists",
+            "node_key",
+            "relationship_unique",
+            "relationship_exists",
+        ] = "unique",
         name: str | None = None,
     ) -> None: ...
 

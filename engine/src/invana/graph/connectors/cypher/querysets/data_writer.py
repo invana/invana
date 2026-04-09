@@ -1,8 +1,8 @@
 """OpenCypher data-writing queryset implementation."""
 
-from invana.graph.connectors.base.data_types.data_elements import Edge, Vertex
 from invana.graph.connectors.base.querysets.data_writer import BaseDataWriterQuerySet
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
+from invana.graph.types.data_elements import Edge, Vertex
 
 
 class OpenCypherDataWriterQuerySet(BaseDataWriterQuerySet):
