@@ -21,10 +21,10 @@ A `loaders` module under `engine/src/invana/` that reads structured CSV files an
 ### Module Location
 
 ```
-engine/src/invana/loaders/
+engine/src/invana/graph/loaders/
 ```
 
-This is a sibling to `graph/` and `modeller/`, not nested inside connectors, because loading is an application-layer concern that uses connectors (via their public interface) rather than belonging to the connector layer itself.
+This is nested inside `graph/` because loading is a graph-layer concern that uses connectors (via their public interface) directly alongside them.
 
 ### Directory Structure
 
@@ -179,7 +179,7 @@ The loader is connector-agnostic: it calls only `connector.bulk.bulk_create_vert
 
 ```python
 # Load a full dataset
-from invana.loaders import CSVLoader, LoaderConfig
+from invana.graph.loaders import CSVLoader, LoaderConfig
 from invana.graph.connectors import OpenCypherConnector
 
 async with OpenCypherConnector("bolt://localhost:7687", username="neo4j", password="password") as conn:
@@ -311,11 +311,11 @@ The `usage_example.py` files in each dataset should be updated after implementat
 
 | Step | Scope | Notes |
 |---|---|---|
-| 1. `LoaderConfig` + `LoaderStats` dataclasses | `engine/src/invana/loaders/csv.py` | No DB dependency |
+| 1. `LoaderConfig` + `LoaderStats` dataclasses | `engine/src/invana/graph/loaders/csv.py` | No DB dependency |
 | 2. CSV parsing helpers | same file | `_parse_column_name`, `_coerce_value`, `_parse_node_row`, `_parse_edge_row` |
 | 3. `CSVLoader.load_nodes_file` | same file | calls `connector.bulk.bulk_create_vertices`, builds `id_mapping` |
 | 4. `CSVLoader.load_edges_file` | same file | resolves IDs from `id_mapping`, calls `connector.bulk.bulk_create_edges` |
 | 5. `CSVLoader.load_directory` | same file | auto-discovery, delegates to steps 3+4 |
-| 6. Unit tests | `engine/tests/loaders/` | Fully standalone, no DB |
+| 6. Unit tests | `engine/tests/graph/loaders/` | Fully standalone, no DB |
 | 7. Update `datasets/*/usage_example.py` | `datasets/` | Use `CSVLoader` as canonical example |
 | 8. Integration tests | `integrations/invana-neo4j/tests/` | Load movies dataset, assert counts |

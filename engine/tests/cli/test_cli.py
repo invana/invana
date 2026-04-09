@@ -126,7 +126,7 @@ class TestLoaderCommandErrors:
         (tmp_path / "nodes").mkdir()
         (tmp_path / "relationships").mkdir()
 
-        from invana.loaders import LoaderStats
+        from invana.graph.loaders import LoaderStats
 
         with (
             patch("invana.cli.commands.loader._run_loader", return_value=LoaderStats()),

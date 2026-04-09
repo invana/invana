@@ -202,7 +202,7 @@ For programmatic use — in scripts, pipelines, or tests — use `CSVLoader` dir
 ```python
 import asyncio
 from invana.graph.connectors import OpenCypherConnector
-from invana.loaders import CSVLoader, LoaderConfig
+from invana.graph.loaders import CSVLoader, LoaderConfig
 
 async def main():
     connector = OpenCypherConnector(
@@ -250,7 +250,7 @@ async with connector:
 ### Configuration reference
 
 ```python
-from invana.loaders import LoaderConfig
+from invana.graph.loaders import LoaderConfig
 
 config = LoaderConfig(
     batch_size=500,          # records sent per connector call

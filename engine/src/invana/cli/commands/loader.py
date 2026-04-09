@@ -43,7 +43,7 @@ def _print_summary(path: str, stats, dry_run: bool) -> None:
 
 async def _run_loader(connector, path: str, config) -> object:
     """Run the CSV loader inside the connector's async context."""
-    from invana.loaders import CSVLoader
+    from invana.graph.loaders import CSVLoader
 
     loader = CSVLoader(connector=connector, config=config)
     async with connector:
@@ -82,7 +82,7 @@ def loader_cmd(
     no_source_ids: bool,
 ) -> None:
     """Load CSV datasets from PATH into a graph database."""
-    from invana.loaders import LoaderConfig
+    from invana.graph.loaders import LoaderConfig
     from invana.settings import settings
     from invana.utils import import_class_from_dotted_path
 

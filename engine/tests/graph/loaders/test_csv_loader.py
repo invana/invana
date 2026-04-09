@@ -10,8 +10,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from invana.graph.types.data_elements import Edge, Vertex
-from invana.loaders.csv import (
+from invana.graph.loaders.csv import (
     CSVLoader,
     LoaderConfig,
     LoaderStats,
@@ -22,6 +21,7 @@ from invana.loaders.csv import (
     _parse_edge_row,
     _parse_node_row,
 )
+from invana.graph.types.data_elements import Edge, Vertex
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
