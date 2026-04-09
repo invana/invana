@@ -2,6 +2,24 @@
 # Usage: docker compose -f docker-compose-infra.yml up -d
 
 services:
+  postgres:
+    image: postgres:17
+    container_name: invana-postgres
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_USER: invana
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: invana
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invana"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   neo4j:
     image: neo4j:5-community
     container_name: invana-neo4j
@@ -74,6 +92,7 @@ services:
       start_period: 30s
 
 volumes:
+  postgres-data:
   neo4j-data:
   janusgraph-data:
   memgraph-data:

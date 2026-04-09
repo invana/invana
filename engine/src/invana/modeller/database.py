@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import os
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from invana.modeller.models import Base
 
+DEFAULT_DATABASE_URL = os.environ.get(
+    "INVANA_DATABASE_URL",
+    "postgresql+asyncpg://invana:testpassword@localhost:15432/invana",
+)
 
-async def create_db_engine(url: str = "sqlite+aiosqlite:///invana.db"):
+
+async def create_db_engine(url: str = DEFAULT_DATABASE_URL):
     """Create the async engine and ensure tables exist."""
     engine = create_async_engine(url, echo=False)
     async with engine.begin() as conn:
