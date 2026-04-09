@@ -27,7 +27,7 @@ setup: ## Install all dependencies (dev tools + engine + studio + docs)
 # ─── Development ────────────────────────────────────────────────
 dev: ## Start engine + studio dev servers
 	@echo "Starting Invana development environment..."
-	@(cd engine && uv run uvicorn invana.main:app --reload --host 127.0.0.1 --port 8200) & \
+	@(cd engine && uv run uvicorn invana.server.app:create_app --factory --reload --host 127.0.0.1 --port 8200) & \
 	 (cd studio && pnpm dev --host 127.0.0.1 --port 8300) & \
 	 wait
 
