@@ -7,12 +7,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from invana.db import create_db_engine, create_session_factory, create_sync_engine
+from invana.logging import configure_logging
 from invana.settings import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage DB engine lifecycle: migrate on startup, dispose on shutdown."""
+    configure_logging(level=settings.log_level)
     engine = await create_db_engine()
     app.state.db_engine = engine
     app.state.db_session_factory = create_session_factory(engine)

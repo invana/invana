@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     debug: bool = False
     host: str = "127.0.0.1"
     port: int = 8000
-    log_level: str = "info"
+    log_level: str = "DEBUG"
 
     # App-state database (PostgreSQL / SQLite)
     database_url: str = "postgresql+asyncpg://invana:invana@localhost:35432/invana"

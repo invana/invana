@@ -7,11 +7,13 @@ import click
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.start import start_cmd
+from invana.logging import configure_logging
 
 
 @click.group()
 def app() -> None:
     """Invana — Graph Intelligence Platform."""
+    configure_logging()
 
 
 @app.command("version")
