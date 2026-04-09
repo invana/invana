@@ -47,7 +47,7 @@ _SCHEMA_EAGER = (selectinload(GraphSchema.versions),)
 
 
 class SchemaStore:
-    """CRUD operations for the graph schema editor's app-state tables."""
+    """CRUD operations for the graph modeller's app-state tables."""
 
     # ------------------------------------------------------------------
     # Schema CRUD

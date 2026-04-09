@@ -1,4 +1,4 @@
-"""Pydantic request/response schemas for the Graph Schema Editor API."""
+"""Pydantic request/response schemas for the Graph Modeller API."""
 
 from __future__ import annotations
 

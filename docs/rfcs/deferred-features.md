@@ -12,7 +12,7 @@ A running list of features that were explicitly considered and intentionally def
 
 ---
 
-## From RFC-002 — Graph Schema Editor
+## From RFC-002 — Graph Modeller
 
 | Feature | Reason deferred | Suggested RFC |
 |---|---|---|
@@ -20,7 +20,7 @@ A running list of features that were explicitly considered and intentionally def
 | **Annotations** — Multi-language labels and descriptions (BCP-47 language tags) | Requires namespace support as prerequisite. | RFC-003: Ontology & Semantics Layer |
 | **Relationship semantics** — `inverse_of`, `is_transitive`, `is_symmetric` on edge types | Informational metadata, not enforced by graph DBs. Belongs with the semantics layer. | RFC-003: Ontology & Semantics Layer |
 | **OWL / SHACL / JSON-LD export & import** — Standards-based schema interoperability (`rdflib`, `pyshacl`) | Significant complexity; adds heavy dependencies. Only relevant when integrating with semantic web tooling. | RFC-003: Ontology & Semantics Layer |
-| **Reasoning / inference** — Runtime materialisation of inferred edges and properties based on semantic declarations | Requires semantics layer + reasoning engine. Out of scope for a graph schema editor. | RFC-003: Ontology & Semantics Layer |
+| **Reasoning / inference** — Runtime materialisation of inferred edges and properties based on semantic declarations | Requires semantics layer + reasoning engine. Out of scope for the graph modeller. | RFC-003: Ontology & Semantics Layer |
 | **Graph data migrations** — Automated or assisted migration of existing graph data when a schema version introduces breaking changes (backfill missing properties, rename properties, coerce types, handle removed node/edge types) | Schema versioning and projection come first; data migration builds on both. Complex enough to warrant its own RFC. | RFC-00X: Graph Data Migrations |
 
 ---
