@@ -3,22 +3,31 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-from invana.modeller.models import Base
 
 DEFAULT_DATABASE_URL = os.environ.get(
     "INVANA_DATABASE_URL",
     "postgresql+asyncpg://invana:testpassword@localhost:15432/invana",
 )
 
+_ALEMBIC_INI = str(Path(__file__).resolve().parents[3] / "alembic.ini")
+
+
+def run_migrations(url: str = DEFAULT_DATABASE_URL) -> None:
+    """Run Alembic migrations to head."""
+    cfg = Config(_ALEMBIC_INI)
+    cfg.set_main_option("sqlalchemy.url", url)
+    command.upgrade(cfg, "head")
+
 
 async def create_db_engine(url: str = DEFAULT_DATABASE_URL):
-    """Create the async engine and ensure tables exist."""
+    """Create the async engine and run migrations to bring the schema up to date."""
+    run_migrations(url)
     engine = create_async_engine(url, echo=False)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     return engine
 
 

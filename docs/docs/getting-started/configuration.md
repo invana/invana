@@ -44,6 +44,53 @@ export INVANA_DATABASE_URL="postgresql+asyncpg://user:pass@localhost:5432/invana
 |---|---|---|
 | `INVANA_STUDIO_ENABLED` | `true` | Serve the Studio web UI. Set `false` for API-only mode. |
 
+## Database Migrations
+
+Invana uses [Alembic](https://alembic.sqlalchemy.org/) to manage database schema migrations for the app state database.
+
+### Running Migrations
+
+Apply all pending migrations:
+
+```bash
+make engine-migrate
+```
+
+Or directly with Alembic:
+
+```bash
+cd engine && uv run alembic upgrade head
+```
+
+Migrations run automatically on application startup, so you typically don't need to run them manually.
+
+### Creating Migrations
+
+After modifying SQLAlchemy models in `engine/src/invana/modeller/models.py`, generate a new migration:
+
+```bash
+make engine-migration msg="add new column to graph_schemas"
+```
+
+This auto-generates a migration file in `engine/src/invana/modeller/migrations/versions/`. Review the generated file before committing.
+
+### Checking Migration Status
+
+```bash
+make engine-migrate-history
+```
+
+### Downgrading
+
+To roll back the last migration:
+
+```bash
+cd engine && uv run alembic downgrade -1
+```
+
+!!! warning
+    Downgrading may cause data loss. Always back up your database before downgrading in production.
+
 ## Configuration File
 
 You can also use a `.env` file in the working directory:

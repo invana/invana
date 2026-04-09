@@ -1,5 +1,6 @@
 .PHONY: help setup dev docs docs-build \
        engine-test engine-lint engine-format \
+       engine-migrate engine-migration engine-migrate-history \
        studio-test studio-lint studio-format \
        integrations-test integrations-lint integrations-format \
        test lint format \
@@ -45,6 +46,15 @@ engine-lint: ## Lint engine (ruff check)
 
 engine-format: ## Format engine (ruff format)
 	cd engine && uv run ruff format .
+
+engine-migrate: ## Run database migrations to latest
+	cd engine && uv run alembic upgrade head
+
+engine-migration: ## Generate a new migration (usage: make engine-migration msg="add foo table")
+	cd engine && uv run alembic revision --autogenerate -m "$(msg)"
+
+engine-migrate-history: ## Show migration history and current revision
+	cd engine && uv run alembic history && echo "\nCurrent:" && uv run alembic current
 
 # ─── Studio ─────────────────────────────────────────────────────
 studio-test: ## Run studio tests

@@ -33,6 +33,7 @@ async def db_engine():
         echo=False,
         execution_options={"schema_translate_map": {None: schema}},
     )
+    # Tests use create_all for speed; production uses Alembic migrations.
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
