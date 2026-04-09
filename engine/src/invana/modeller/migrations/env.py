@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -13,12 +12,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Import all models so metadata is fully populated for autogenerate.
 from invana.modeller.models import Base  # noqa: F401
+from invana.settings import settings
 
 config = context.config
 
-# Allow INVANA_DATABASE_URL env-var to override alembic.ini.
-if db_url := os.environ.get("INVANA_DATABASE_URL"):
-    config.set_main_option("sqlalchemy.url", db_url)
+# Override alembic.ini URL with the value from settings / .env.
+config.set_main_option("sqlalchemy.url", settings.database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

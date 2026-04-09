@@ -6,10 +6,10 @@ services:
     image: postgres:17
     container_name: invana-postgres
     ports:
-      - "15432:5432"
+      - "35432:5432"
     environment:
       POSTGRES_USER: invana
-      POSTGRES_PASSWORD: testpassword
+      POSTGRES_PASSWORD: invana
       POSTGRES_DB: invana
     volumes:
       - postgres-data:/var/lib/postgresql/data

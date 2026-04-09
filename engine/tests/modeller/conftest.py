@@ -1,6 +1,5 @@
 """Shared fixtures for schema tests."""
 
-import os
 import uuid
 
 import pytest
@@ -9,18 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from invana.modeller.models import Base
 from invana.modeller.store import SchemaStore
-
-TEST_DATABASE_URL = os.environ.get(
-    "INVANA_DATABASE_URL",
-    "postgresql+asyncpg://invana:testpassword@localhost:15432/invana",
-)
+from invana.settings import settings
 
 
 @pytest_asyncio.fixture
 async def db_engine():
     """Create a PostgreSQL async engine with isolated schema per test session."""
     schema = f"test_{uuid.uuid4().hex[:8]}"
-    engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+    engine = create_async_engine(settings.database_url, echo=False)
 
     # Create an isolated schema for this test session
     async with engine.begin() as conn:
@@ -29,7 +24,7 @@ async def db_engine():
 
     # Engine with search path set to the test schema
     engine = create_async_engine(
-        TEST_DATABASE_URL,
+        settings.database_url,
         echo=False,
         execution_options={"schema_translate_map": {None: schema}},
     )
@@ -40,7 +35,7 @@ async def db_engine():
     yield engine
 
     # Cleanup: drop the test schema
-    cleanup_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+    cleanup_engine = create_async_engine(settings.database_url, echo=False)
     async with cleanup_engine.begin() as conn:
         await conn.exec_driver_sql(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
     await cleanup_engine.dispose()
