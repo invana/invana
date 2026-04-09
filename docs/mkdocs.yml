@@ -58,6 +58,7 @@ nav:
       - Simulations: concepts/simulations.md
   - Guides:
       - Building an Ontology: guides/building-ontology.md
+      - Loading Data: guides/loading-data.md
       - Graph Operations:
           - Data: guides/graph/data.md
           - Schema: guides/graph/schema.md
