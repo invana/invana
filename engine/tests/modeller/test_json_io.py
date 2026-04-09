@@ -10,7 +10,7 @@ from invana.modeller.versioner import Versioner
 @pytest.mark.asyncio
 class TestJsonExportImport:
     async def _create_full_schema(self, session, store):
-        """Create a schema with node types, edge types, indexes, and activate it."""
+        """Create a schema with property keys, node types, edge types, constraints, indexes, and activate it."""
         schema = await store.create_schema(
             session,
             name="Export Test",
@@ -20,18 +20,23 @@ class TestJsonExportImport:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        # Global property keys
+        await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await store.create_property_key(session, version_id=version.id, name="age", type="integer")
+        await store.create_property_key(session, version_id=version.id, name="email", type="string")
+        await store.create_property_key(session, version_id=version.id, name="since", type="integer")
+        await session.commit()
+
         await store.create_node_type(
             session,
             version_id=version.id,
             name="Person",
             description="A person",
-            color="#FF0000",
-            properties=[
-                {"name": "name", "type": "string", "required": True, "unique": True},
-                {"name": "age", "type": "integer"},
+            property_mappings=[
+                {"property_key": "name"},
+                {"property_key": "age"},
                 {
-                    "name": "email",
-                    "type": "string",
+                    "property_key": "email",
                     "validation_rules": [
                         {"rule_type": "pattern", "params": {"pattern": "^.+@.+$"}},
                     ],
@@ -45,7 +50,25 @@ class TestJsonExportImport:
             source_node_types=["Person"],
             target_node_types=["Person"],
             multiplicity="MULTI",
-            properties=[{"name": "since", "type": "integer"}],
+            property_mappings=[{"property_key": "since"}],
+        )
+        await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="person_name_unique",
+            target_kind="node_type",
+            target_label="Person",
+            constraint_type="unique",
+            properties=["name"],
+        )
+        await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="person_name_exists",
+            target_kind="node_type",
+            target_label="Person",
+            constraint_type="exists",
+            properties=["name"],
         )
         await store.create_index(
             session,
@@ -68,10 +91,12 @@ class TestJsonExportImport:
         export = SchemaExporter.export(version, schema.name, schema.description)
 
         assert export.schema_name == "Export Test"
+        assert len(export.property_keys) == 4
         assert len(export.node_types) == 1
         assert export.node_types[0].name == "Person"
-        assert len(export.node_types[0].properties) == 3
+        assert len(export.node_types[0].property_mappings) == 3
         assert len(export.edge_types) == 1
+        assert len(export.constraints) == 2
         assert len(export.indexes) == 1
 
     async def test_export_json_round_trip(self, session, store):
@@ -83,6 +108,8 @@ class TestJsonExportImport:
         parsed = SchemaExport.model_validate_json(json_str)
         assert parsed.schema_name == export.schema_name
         assert len(parsed.node_types) == len(export.node_types)
+        assert len(parsed.property_keys) == len(export.property_keys)
+        assert len(parsed.constraints) == len(export.constraints)
 
     async def test_import(self, session, store):
         schema, version = await self._create_full_schema(session, store)
@@ -103,9 +130,11 @@ class TestJsonExportImport:
         new_version = await store.get_version(session, new_version_id)
         assert new_version is not None
         assert new_version.status == "draft"
+        assert len(new_version.property_keys) == 4
         assert len(new_version.node_types) == 1
         assert new_version.node_types[0].name == "Person"
         assert len(new_version.edge_types) == 1
+        assert len(new_version.constraints) == 2
         assert len(new_version.indexes) == 1
 
     async def test_import_preserves_validation_rules(self, session, store):
@@ -125,6 +154,6 @@ class TestJsonExportImport:
 
         new_version = await store.get_version(session, new_version_id)
         person_type = new_version.node_types[0]
-        email_prop = next(p for p in person_type.properties if p.name == "email")
-        assert len(email_prop.validation_rules) == 1
-        assert email_prop.validation_rules[0].rule_type == "pattern"
+        email_mapping = next(m for m in person_type.property_mappings if m.property_key.name == "email")
+        assert len(email_mapping.validation_rules) == 1
+        assert email_mapping.validation_rules[0].rule_type == "pattern"

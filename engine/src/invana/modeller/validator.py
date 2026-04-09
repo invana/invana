@@ -17,13 +17,14 @@ from typing import Any
 from invana.modeller.inheritance import (
     build_type_map,
     get_subtypes,
-    resolve_effective_properties,
+    resolve_effective_mappings,
 )
 from invana.modeller.models import (
+    ConstraintDefinition,
     EdgeTypeDefinition,
     NodeTypeDefinition,
-    PropertyDefinition,
     SchemaVersion,
+    TypePropertyMapping,
     ValidationRule,
 )
 
@@ -56,8 +57,10 @@ class _CachedSchema:
     node_types: dict[str, NodeTypeDefinition]
     edge_types: dict[str, EdgeTypeDefinition]
 
-    # Pre-resolved effective properties (own + inherited)
-    effective_properties: dict[str, list[PropertyDefinition]] = field(default_factory=dict)
+    # Pre-resolved effective property mappings (own + inherited)
+    effective_mappings: dict[str, list[TypePropertyMapping]] = field(default_factory=dict)
+    # Constraints grouped by target_label
+    constraints_by_label: dict[str, list[ConstraintDefinition]] = field(default_factory=dict)
     # Subtype sets per parent type
     subtypes: dict[str, set[str]] = field(default_factory=dict)
 
@@ -67,19 +70,25 @@ def _build_cache(version: SchemaVersion, validation_mode: str = "strict") -> _Ca
     nt_map = build_type_map(version.node_types)
     et_map = {et.name: et for et in version.edge_types}
 
-    effective: dict[str, list[PropertyDefinition]] = {}
+    effective: dict[str, list[TypePropertyMapping]] = {}
     subtypes_map: dict[str, set[str]] = {}
 
     for nt in version.node_types:
-        effective[nt.name] = resolve_effective_properties(nt, nt_map)
+        effective[nt.name] = resolve_effective_mappings(nt, nt_map)
         subtypes_map[nt.name] = get_subtypes(nt.name, nt_map)
+
+    # Group constraints by target_label for fast lookup
+    constraints_by_label: dict[str, list[ConstraintDefinition]] = {}
+    for c in version.constraints:
+        constraints_by_label.setdefault(c.target_label, []).append(c)
 
     return _CachedSchema(
         version_id=version.id,
         validation_mode=validation_mode,
         node_types=nt_map,
         edge_types=et_map,
-        effective_properties=effective,
+        effective_mappings=effective,
+        constraints_by_label=constraints_by_label,
         subtypes=subtypes_map,
     )
 
@@ -261,9 +270,10 @@ class SchemaValidator:
             return errors
 
         mode = self._get_validation_mode(nt)
-        effective_props = self._cache.effective_properties.get(label, [])
+        effective = self._cache.effective_mappings.get(label, [])
+        label_constraints = self._cache.constraints_by_label.get(label, [])
 
-        errors.extend(self._validate_properties(properties, effective_props, mode))
+        errors.extend(self._validate_properties(properties, effective, label_constraints, mode))
         return errors
 
     def validate_vertex_update(
@@ -288,13 +298,14 @@ class SchemaValidator:
             return errors
 
         mode = self._get_validation_mode(nt)
-        effective_props = self._cache.effective_properties.get(label, [])
+        effective = self._cache.effective_mappings.get(label, [])
 
         # On update, don't check required — only validate provided properties
         errors.extend(
             self._validate_properties(
                 properties,
-                effective_props,
+                effective,
+                [],  # no constraint checks on update
                 mode,
                 check_required=False,
             )
@@ -356,24 +367,13 @@ class SchemaValidator:
                     )
                 )
 
-        # Allowed properties check
-        if et.allowed_properties is not None:
-            for key in properties:
-                if key not in et.allowed_properties:
-                    errors.append(
-                        ValidationError(
-                            code="disallowed_property",
-                            message=f"Property '{key}' not in allowed properties for edge '{label}'.",
-                            field=key,
-                        )
-                    )
-
-        # Property validation (use source node's validation mode)
+        # Property validation
         source_nt = self._cache.node_types.get(source_label)
         mode = self._get_validation_mode(source_nt)
+        label_constraints = self._cache.constraints_by_label.get(label, [])
 
-        prop_defs = list(et.properties) if et.properties else []
-        errors.extend(self._validate_properties(properties, prop_defs, mode))
+        mappings = list(et.property_mappings) if et.property_mappings else []
+        errors.extend(self._validate_properties(properties, mappings, label_constraints, mode))
 
         return errors
 
@@ -384,30 +384,34 @@ class SchemaValidator:
     def _validate_properties(
         self,
         properties: dict[str, Any],
-        definitions: list[PropertyDefinition],
+        mappings: list[TypePropertyMapping],
+        constraints: list[ConstraintDefinition],
         mode: str,
         *,
         check_required: bool = True,
     ) -> list[ValidationError]:
-        """Validate a property dict against property definitions."""
+        """Validate a property dict against property mappings and constraints."""
         errors: list[ValidationError] = []
-        prop_map = {p.name: p for p in definitions}
+        # Build lookup: property key name → mapping
+        mapping_by_name: dict[str, TypePropertyMapping] = {m.property_key.name: m for m in mappings}
 
-        # Check required properties are present
+        # Check required properties from "exists" constraints
         if check_required:
-            for pdef in definitions:
-                if pdef.required and pdef.name not in properties:
-                    errors.append(
-                        ValidationError(
-                            code="missing_required",
-                            message=f"Required property '{pdef.name}' is missing.",
-                            field=pdef.name,
-                        )
-                    )
+            for c in constraints:
+                if c.constraint_type == "exists":
+                    for pname in c.properties:
+                        if pname not in properties:
+                            errors.append(
+                                ValidationError(
+                                    code="missing_required",
+                                    message=f"Required property '{pname}' is missing (constraint '{c.name}').",
+                                    field=pname,
+                                )
+                            )
 
         for key, value in properties.items():
-            pdef = prop_map.get(key)
-            if pdef is None:
+            mapping = mapping_by_name.get(key)
+            if mapping is None:
                 if mode == "strict":
                     errors.append(
                         ValidationError(
@@ -421,18 +425,20 @@ class SchemaValidator:
             if value is None:
                 continue  # None values skip type/rule checks
 
+            pk = mapping.property_key
+
             # Type check
-            if not _check_type(value, pdef.type):
+            if not _check_type(value, pk.type):
                 errors.append(
                     ValidationError(
                         code="type_mismatch",
-                        message=f"Property '{key}' expected type '{pdef.type}', got {type(value).__name__}.",
+                        message=f"Property '{key}' expected type '{pk.type}', got {type(value).__name__}.",
                         field=key,
                     )
                 )
 
             # Value cardinality check
-            if pdef.value_cardinality == "SINGLE" and isinstance(value, list):
+            if pk.value_cardinality == "SINGLE" and isinstance(value, list):
                 errors.append(
                     ValidationError(
                         code="cardinality_violation",
@@ -440,7 +446,7 @@ class SchemaValidator:
                         field=key,
                     )
                 )
-            elif pdef.value_cardinality == "SET" and isinstance(value, list) and len(value) != len(set(value)):
+            elif pk.value_cardinality == "SET" and isinstance(value, list) and len(value) != len(set(value)):
                 errors.append(
                     ValidationError(
                         code="cardinality_violation",
@@ -449,8 +455,13 @@ class SchemaValidator:
                     )
                 )
 
-            # Validation rules
-            if hasattr(pdef, "validation_rules") and pdef.validation_rules:
-                errors.extend(_validate_rules(value, pdef.validation_rules, key))
+            # Validation rules: global (property key) + type-specific (mapping)
+            all_rules: list[ValidationRule] = []
+            if pk.validation_rules:
+                all_rules.extend(pk.validation_rules)
+            if mapping.validation_rules:
+                all_rules.extend(mapping.validation_rules)
+            if all_rules:
+                errors.extend(_validate_rules(value, all_rules, key))
 
         return errors

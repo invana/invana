@@ -7,7 +7,7 @@ from invana.modeller.inheritance import (
     build_hierarchy,
     build_type_map,
     get_subtypes,
-    resolve_effective_properties,
+    resolve_effective_mappings,
 )
 
 
@@ -20,25 +20,30 @@ class TestInheritance:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        await store.create_property_key(session, version_id=version.id, name="id", type="string")
+        await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await store.create_property_key(session, version_id=version.id, name="department", type="string")
+        await session.commit()
+
         await store.create_node_type(
             session,
             version_id=version.id,
             name="Entity",
-            properties=[{"name": "id", "type": "string", "required": True}],
+            property_mappings=[{"property_key": "id"}],
         )
         await store.create_node_type(
             session,
             version_id=version.id,
             name="Person",
             parent_type="Entity",
-            properties=[{"name": "name", "type": "string", "required": True}],
+            property_mappings=[{"property_key": "name"}],
         )
         await store.create_node_type(
             session,
             version_id=version.id,
             name="Employee",
             parent_type="Person",
-            properties=[{"name": "department", "type": "string"}],
+            property_mappings=[{"property_key": "department"}],
         )
         await session.commit()
         return version.id
@@ -51,13 +56,13 @@ class TestInheritance:
         chain = build_hierarchy(type_map["Employee"], type_map)
         assert chain == ["Entity", "Person", "Employee"]
 
-    async def test_resolve_effective_properties(self, session, store):
+    async def test_resolve_effective_mappings(self, session, store):
         version_id = await self._create_types(session, store)
         node_types = await store.list_node_types(session, version_id)
         type_map = build_type_map(node_types)
 
-        effective = resolve_effective_properties(type_map["Employee"], type_map)
-        names = [p.name for p in effective]
+        effective = resolve_effective_mappings(type_map["Employee"], type_map)
+        names = [m.property_key.name for m in effective]
         assert "id" in names
         assert "name" in names
         assert "department" in names

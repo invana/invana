@@ -55,19 +55,38 @@ The graph modeller sits between the API/Studio layer and the connector layer. It
 
 Stored in the engine's app state database via SQLAlchemy async models.
 
+#### Design Principle: Global Property Keys
+
+In graph databases, a property key is a **global concept** — it defines a name and data type that is shared across all vertex and edge labels:
+
+- **JanusGraph**: `mgmt.makePropertyKey("name").dataType(String.class).make()` — the property key is global; once defined, its type cannot change.
+- **Neo4j**: Properties are ad-hoc, but best practice (and Neo4j 5 type constraints) treats property types as consistent across labels.
+- **Ontologies (future RFC-003)**: RDF properties like `schema:name` are global — defined once, used by many classes with different constraints per class.
+
+**Constraints** (uniqueness, existence) and **indexes** are **not** properties of the property key itself — they are scoped to a specific **(label, property)** pair. For example, `name` might be unique for `Person` but not for `Company`. This matches how every graph database actually enforces constraints:
+
+- Neo4j: `CREATE CONSTRAINT FOR (p:Person) REQUIRE p.name IS UNIQUE`
+- JanusGraph: `mgmt.buildIndex("personByName", Vertex.class).addKey(name).indexOnly(person).unique().buildCompositeIndex()`
+
+The data model below reflects this separation.
+
 ```mermaid
 erDiagram
     GraphSchema ||--o{ SchemaVersion : "has versions"
+    SchemaVersion ||--o{ PropertyKeyDefinition : "defines"
     SchemaVersion ||--o{ NodeTypeDefinition : "defines"
     SchemaVersion ||--o{ EdgeTypeDefinition : "defines"
+    SchemaVersion ||--o{ ConstraintDefinition : "defines"
     SchemaVersion ||--o{ IndexDefinition : "defines"
-    NodeTypeDefinition ||--o{ PropertyDefinition : "has"
+    SchemaVersion ||--o{ SchemaProjection : "projected to"
+    PropertyKeyDefinition ||--o{ TypePropertyMapping : "used by"
+    PropertyKeyDefinition ||--o{ ValidationRule : "global rules"
+    NodeTypeDefinition ||--o{ TypePropertyMapping : "has"
     NodeTypeDefinition ||--o| NodeTypeDefinition : "extends (parent)"
-    EdgeTypeDefinition ||--o{ PropertyDefinition : "has"
+    EdgeTypeDefinition ||--o{ TypePropertyMapping : "has"
     EdgeTypeDefinition }o--o{ NodeTypeDefinition : "source types"
     EdgeTypeDefinition }o--o{ NodeTypeDefinition : "target types"
-    PropertyDefinition ||--o{ ValidationRule : "has"
-    SchemaVersion ||--o{ SchemaProjection : "projected to"
+    TypePropertyMapping ||--o{ ValidationRule : "type-specific rules"
 
     GraphSchema {
         uuid id PK
@@ -86,6 +105,15 @@ erDiagram
         string change_summary
         datetime created_at
         datetime activated_at
+    }
+
+    PropertyKeyDefinition {
+        uuid id PK
+        uuid version_id FK
+        string name "camelCase property name — unique per version"
+        string type "string | integer | float | boolean | datetime | date | uuid | geo | list[T] | map | vector"
+        string value_cardinality "SINGLE | LIST | SET — default SINGLE"
+        string description "what this property represents"
     }
 
     NodeTypeDefinition {
@@ -108,20 +136,25 @@ erDiagram
         json source_node_types "list of allowed source NodeTypeDefinition names"
         json target_node_types "list of allowed target NodeTypeDefinition names"
         string multiplicity "MULTI | SIMPLE | ONE2MANY | MANY2ONE | ONE2ONE"
-        json allowed_properties "nullable — restrict which property keys are valid (Gremlin DBs)"
     }
 
-    PropertyDefinition {
+    TypePropertyMapping {
         uuid id PK
-        string parent_kind "node_type | edge_type"
-        uuid parent_id FK
-        string name "camelCase property name"
-        string type "string | integer | float | boolean | datetime | date | uuid | geo | list[T] | map | vector"
-        string value_cardinality "SINGLE | LIST | SET — default SINGLE"
-        boolean required "false"
-        boolean unique "false"
+        uuid property_key_id FK "which global property key"
+        uuid node_type_id FK "nullable — which node type uses this property"
+        uuid edge_type_id FK "nullable — which edge type uses this property"
         string default_value "JSON-encoded, nullable"
-        int sort_order "display ordering"
+        int sort_order "display ordering in Studio"
+    }
+
+    ConstraintDefinition {
+        uuid id PK
+        uuid version_id FK
+        string name "constraint name — unique per version"
+        string target_kind "node_type | edge_type"
+        string target_label "NodeTypeDefinition or EdgeTypeDefinition name"
+        string constraint_type "unique | exists | node_key | relationship_unique | relationship_exists"
+        json properties "ordered list of property key names"
     }
 
     IndexDefinition {
@@ -132,13 +165,13 @@ erDiagram
         string target_label "NodeTypeDefinition or EdgeTypeDefinition name"
         json properties "ordered list of property names covered by this index"
         string index_type "range | composite | fulltext | text | point | lookup"
-        boolean is_unique "false — composite unique index"
         json index_options "type-specific options (e.g. analyzer for fulltext)"
     }
 
     ValidationRule {
         uuid id PK
-        uuid property_id FK
+        uuid property_key_id FK "nullable — global rule on the property key itself"
+        uuid type_property_mapping_id FK "nullable — type-specific rule"
         string rule_type "range | pattern | enum | min_length | max_length | custom"
         json params "rule-specific parameters"
     }
@@ -154,23 +187,64 @@ erDiagram
     }
 ```
 
+#### Key Design Decisions
+
+1. **`PropertyKeyDefinition` is global per version.** A property named `"name"` of type `"string"` is defined once. If `Person`, `Company`, and `Movie` all have a `name` property, they all reference the same `PropertyKeyDefinition`. This enforces type consistency — `name` cannot be a string for `Person` and an integer for `Company`.
+
+2. **`TypePropertyMapping` links property keys to types.** Each mapping says "this type uses this property key" and adds type-specific configuration: display order and default value. This is where `required` and `unique` used to live, but those are now proper constraints.
+
+3. **`ConstraintDefinition` is first-class.** Constraints like uniqueness, existence, and composite keys are explicit entities scoped to a (label, properties) pair — not flags on a property definition. This enables:
+   - `name` unique for `Person` but not for `Company`
+   - Composite uniqueness: `(firstName, lastName)` unique together for `Person`
+   - `node_key` constraints (multiple properties that together uniquely identify a node)
+
+4. **`IndexDefinition` no longer has `is_unique`.** Unique indexes are expressed as `ConstraintDefinition(constraint_type="unique")`. The Projector translates constraints to the appropriate DB DDL (which might be a unique index under the hood, as in Neo4j).
+
+5. **`ValidationRule` supports two scopes.** A rule on `PropertyKeyDefinition` applies everywhere that property is used (e.g., `age >= 0`). A rule on `TypePropertyMapping` applies only to that type's usage (e.g., `Person.age max 150`, `Building.age max 1000`).
+
+6. **`EdgeTypeDefinition.allowed_properties` is removed.** It was a Gremlin-specific workaround. The correct model is: an edge type only has the properties explicitly mapped to it via `TypePropertyMapping`. If a property isn't mapped, it's not allowed (in strict mode).
+
 ### Type Inheritance
 
-Node types support single inheritance via `parent_type`. A child type inherits all properties and validation rules from its parent.
+Node types support single inheritance via `parent_type`. A child type inherits all property mappings and validation rules from its parent.
 
 ```json
 {
-  "name": "Employee",
-  "parent_type": "Person",
-  "description": "A person employed by a company",
-  "properties": [
-    {"name": "employeeId", "type": "string", "required": true, "unique": true},
+  "property_keys": [
+    {"name": "name", "type": "string"},
+    {"name": "email", "type": "string"},
+    {"name": "born", "type": "datetime"},
+    {"name": "employeeId", "type": "string"},
     {"name": "department", "type": "string"}
+  ],
+  "node_types": [
+    {
+      "name": "Person",
+      "property_mappings": [
+        {"property_key": "name", "sort_order": 0},
+        {"property_key": "email", "sort_order": 1},
+        {"property_key": "born", "sort_order": 2}
+      ]
+    },
+    {
+      "name": "Employee",
+      "parent_type": "Person",
+      "description": "A person employed by a company",
+      "property_mappings": [
+        {"property_key": "employeeId", "sort_order": 0},
+        {"property_key": "department", "sort_order": 1}
+      ]
+    }
+  ],
+  "constraints": [
+    {"name": "person_email_unique", "target_label": "Person", "constraint_type": "unique", "properties": ["email"]},
+    {"name": "employee_id_unique", "target_label": "Employee", "constraint_type": "unique", "properties": ["employeeId"]},
+    {"name": "employee_id_exists", "target_label": "Employee", "constraint_type": "exists", "properties": ["employeeId"]}
   ]
 }
 ```
 
-`Employee` inherits `name`, `born`, `email` and all their validation rules from `Person`, plus adds its own properties.
+`Employee` inherits `name`, `born`, `email` property mappings and all their validation rules from `Person`, plus adds its own properties. Note how `email` uniqueness is scoped to `Person` (and inherited by `Employee`) via `ConstraintDefinition`, not via a flag on the property key itself.
 
 Inheritance rules:
 
@@ -333,21 +407,20 @@ The Projector reads an activated `SchemaVersion` and translates it into connecto
 
 | Schema concept | Connector call | Condition |
 |---|---|---|
-| `PropertyDefinition(unique=True)` on node prop | `schema_writer.create_constraint(label, [prop], constraint_type="unique")` | Always |
-| `PropertyDefinition(required=True)` on node prop | `schema_writer.create_constraint(label, [prop], constraint_type="exists")` | Only if `SCHEMA_ENFORCEMENT` capability |
-| `PropertyDefinition(unique=True, required=True)` on multiple node props | `schema_writer.create_constraint(label, props, constraint_type="node_key")` | Only if `SCHEMA_ENFORCEMENT` capability |
-| `PropertyDefinition(unique=True)` on edge prop | `schema_writer.create_constraint(label, [prop], constraint_type="relationship_unique")` | Only if `RELATIONSHIP_PROPERTY_CONSTRAINTS` capability |
-| `PropertyDefinition(required=True)` on edge prop | `schema_writer.create_constraint(label, [prop], constraint_type="relationship_exists")` | Only if `RELATIONSHIP_PROPERTY_CONSTRAINTS` capability |
+| `ConstraintDefinition(constraint_type="unique")` | `schema_writer.create_constraint(label, props, constraint_type="unique")` | Always |
+| `ConstraintDefinition(constraint_type="exists")` | `schema_writer.create_constraint(label, props, constraint_type="exists")` | Only if `SCHEMA_ENFORCEMENT` capability |
+| `ConstraintDefinition(constraint_type="node_key")` | `schema_writer.create_constraint(label, props, constraint_type="node_key")` | Only if `SCHEMA_ENFORCEMENT` capability |
+| `ConstraintDefinition(constraint_type="relationship_unique")` | `schema_writer.create_constraint(label, props, constraint_type="relationship_unique")` | Only if `RELATIONSHIP_PROPERTY_CONSTRAINTS` capability |
+| `ConstraintDefinition(constraint_type="relationship_exists")` | `schema_writer.create_constraint(label, props, constraint_type="relationship_exists")` | Only if `RELATIONSHIP_PROPERTY_CONSTRAINTS` capability |
 | `IndexDefinition(index_type="range")` | `schema_writer.create_index(label, props, index_type="range")` | Always |
 | `IndexDefinition(index_type="composite")` | `schema_writer.create_index(label, props, index_type="composite")` | Only if `COMPOSITE_INDEX` capability |
 | `IndexDefinition(index_type="fulltext")` | `schema_writer.create_index(label, props, index_type="fulltext", options=...)` | Only if `FULLTEXT_INDEX` capability |
 | `IndexDefinition(index_type="text")` | `schema_writer.create_index(label, props, index_type="text")` | Only if `TEXT_INDEX` capability |
 | `IndexDefinition(index_type="point")` | `schema_writer.create_index(label, props, index_type="point")` | Only if `POINT_INDEX` capability |
-| `IndexDefinition(is_unique=True)` | `schema_writer.create_constraint(label, props, constraint_type="node_key")` | Only if `SCHEMA_ENFORCEMENT` capability |
-| `PropertyDefinition(type="vector")` | `vector.create_vector_index(label, prop, dimensions=...)` | Only if `VECTOR_SEARCH` capability |
+| `PropertyKeyDefinition(type="vector")` | `vector.create_vector_index(label, prop, dimensions=...)` | Only if `VECTOR_SEARCH` capability |
 | `EdgeTypeDefinition(multiplicity=SIMPLE)` | `schema_writer.create_constraint(label, ..., constraint_type="relationship_uniqueness")` | Only if `RELATIONSHIP_UNIQUENESS` capability; engine-enforced otherwise |
 | `EdgeTypeDefinition(multiplicity=*)` other than MULTI | **Enforced at engine level** (pre-write count check) | DB limitation |
-| `PropertyDefinition(value_cardinality=LIST\|SET)` | `schema_writer.create_property_key(name, cardinality=...)` | Only if `PROPERTY_CARDINALITY` capability (Gremlin DBs) |
+| `PropertyKeyDefinition(value_cardinality=LIST\|SET)` | `schema_writer.create_property_key(name, cardinality=...)` | Only if `PROPERTY_CARDINALITY` capability (Gremlin DBs) |
 | `ValidationRule(rule_type=*)` | **Not projected** — enforced at engine level | DB limitation |
 | `EdgeTypeDefinition(source, target)` | **Not projected** — enforced at engine level | Most DBs don't restrict edge endpoints |
 | `NodeTypeDefinition(parent_type)` | **Not projected** — inheritance is application-level | DBs have no type hierarchy concept |
@@ -401,13 +474,13 @@ For connecting to an existing database with data already in it, the Introspector
 |---|---|---|
 | 1. Discover node labels | `schema_reader.get_node_labels()` | Create `NodeTypeDefinition` per label |
 | 2. Discover edge labels | `schema_reader.get_edge_labels()` | Create `EdgeTypeDefinition` per label |
-| 3. Discover properties | `schema_reader.get_property_keys(label)` | Create `PropertyDefinition` per key |
-| 4. Infer property types | **New:** `schema_reader.get_property_schema(label)` | Set `PropertyDefinition.type` |
+| 3. Discover properties | `schema_reader.get_property_keys(label)` | Create `PropertyKeyDefinition` per unique key; create `TypePropertyMapping` per (type, key) pair |
+| 4. Infer property types | **New:** `schema_reader.get_property_schema(label)` | Set `PropertyKeyDefinition.type` |
 | 5. Infer edge endpoints | **New:** `schema_reader.get_edge_schema(label)` | Set `EdgeTypeDefinition.source/target` |
 | 6. Discover indexes | `schema_reader.get_indexes()` | Create `IndexDefinition` per index; infer `index_type` from index metadata |
-| 7. Discover constraints | `schema_reader.get_constraints()` | Set `unique=True` / `required=True` on `PropertyDefinition`; composite unique constraint → `IndexDefinition(is_unique=True)` |
+| 7. Discover constraints | `schema_reader.get_constraints()` | Create `ConstraintDefinition` per constraint (unique, exists, node_key, etc.) |
 | 7a. Discover multiplicity | **New:** `schema_reader.get_edge_multiplicity(label)` | Set `EdgeTypeDefinition.multiplicity` (Gremlin DBs) |
-| 7b. Discover value cardinality | **New:** `schema_reader.get_property_cardinality(label, key)` | Set `PropertyDefinition.value_cardinality` (Gremlin DBs) |
+| 7b. Discover value cardinality | **New:** `schema_reader.get_property_cardinality(label, key)` | Set `PropertyKeyDefinition.value_cardinality` (Gremlin DBs) |
 | 8. Get counts | `data_reader.count_vertices(label)` / `count_edges(label)` | Metadata for Studio display |
 
 The result is a `SchemaVersion` in `draft` status that the user can review and refine in Studio before activating.
@@ -526,19 +599,29 @@ The auto-classification is a **recommendation** — the user can override the ve
 ```python
 class SchemaDiff(BaseModel):
     """Diff between two schema versions."""
+    added_property_keys: list[str]
+    removed_property_keys: list[str]
+    modified_property_keys: list[PropertyKeyDiff]
     added_node_types: list[str]
     removed_node_types: list[str]
     modified_node_types: list[NodeTypeDiff]
     added_edge_types: list[str]
     removed_edge_types: list[str]
     modified_edge_types: list[EdgeTypeDiff]
+    added_constraints: list[str]
+    removed_constraints: list[str]
+    added_indexes: list[str]
+    removed_indexes: list[str]
     classification: Literal["major", "minor", "patch"]
+
+class PropertyKeyDiff(BaseModel):
+    name: str
+    changes: dict[str, tuple[Any, Any]]  # field: (old, new)
 
 class NodeTypeDiff(BaseModel):
     name: str
-    added_properties: list[str]
-    removed_properties: list[str]
-    modified_properties: list[PropertyDiff]
+    added_property_mappings: list[str]     # property key names added to this type
+    removed_property_mappings: list[str]   # property key names removed from this type
     metadata_changes: dict[str, tuple[Any, Any]]  # field: (old, new)
 
 class PropertyDiff(BaseModel):
@@ -590,10 +673,10 @@ Validations performed:
 |---|---|---|
 | Label exists in schema | Vertex create, Edge create | Label not defined in active version |
 | Abstract type check | Vertex create | Cannot create instances of `is_abstract=True` node types |
-| Required properties present | Vertex create | Missing required `PropertyDefinition` (own + inherited) |
-| Property type matches | Vertex/Edge create/update | Value doesn't match `PropertyDefinition.type` (own + inherited) |
+| Required properties present | Vertex create | Missing a property that has an `exists` constraint on this label |
+| Property type matches | Vertex/Edge create/update | Value doesn't match `PropertyKeyDefinition.type` (own + inherited) |
 | Value cardinality | Vertex/Edge create/update | Multiple values provided for a `SINGLE` cardinality property; duplicate values in a `SET` property |
-| Unique constraint (pre-check) | Vertex create/update | Duplicate detected (best-effort; DB constraint is the real enforcer) |
+| Unique constraint (pre-check) | Vertex create/update | Duplicate detected for a property with a `unique` constraint on this label (best-effort; DB constraint is the real enforcer) |
 | Range validation | Vertex/Edge create/update | Value outside `ValidationRule(rule_type="range")` bounds |
 | Pattern validation | Vertex/Edge create/update | Value doesn't match `ValidationRule(rule_type="pattern")` regex |
 | Enum validation | Vertex/Edge create/update | Value not in `ValidationRule(rule_type="enum")` allowed list |
@@ -604,7 +687,7 @@ Validations performed:
 | Multiplicity: ONE2MANY | Edge create | This source vertex already has an outgoing edge of this label |
 | Multiplicity: MANY2ONE | Edge create | This target vertex already has an incoming edge of this label |
 | Multiplicity: ONE2ONE | Edge create | Either vertex already has any edge of this label |
-| Allowed properties (edge) | Edge create/update | Property key not in `EdgeTypeDefinition.allowed_properties` (when set) |
+| Unmapped property (strict mode) | Vertex/Edge create/update | Property key not mapped to this type via `TypePropertyMapping` |
 | Inherited rule compliance | Vertex/Edge create/update | Child type data must satisfy all parent type validation rules |
 
 Validation can be **strict** (reject on any error) or **permissive** (warn but allow). Controlled at two levels:

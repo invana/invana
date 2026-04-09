@@ -24,28 +24,52 @@ class ValidationRuleResponse(ValidationRuleSchema):
 
 
 # ---------------------------------------------------------------------------
-# Properties
+# Property Keys (global per version)
 # ---------------------------------------------------------------------------
 
 
-class PropertyCreate(BaseModel):
+class PropertyKeyCreate(BaseModel):
     name: str
     type: str = "string"
     value_cardinality: Literal["SINGLE", "LIST", "SET"] = "SINGLE"
-    required: bool = False
-    unique: bool = False
+    description: str = ""
+    validation_rules: list[ValidationRuleSchema] = []
+
+
+class PropertyKeyResponse(BaseModel):
+    id: str
+    name: str
+    type: str
+    value_cardinality: str
+    description: str
+    validation_rules: list[ValidationRuleResponse] = []
+
+    model_config = {"from_attributes": True}
+
+
+class PropertyKeyUpdate(BaseModel):
+    name: str | None = None
+    type: str | None = None
+    value_cardinality: Literal["SINGLE", "LIST", "SET"] | None = None
+    description: str | None = None
+    validation_rules: list[ValidationRuleSchema] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Type Property Mappings
+# ---------------------------------------------------------------------------
+
+
+class TypePropertyMappingCreate(BaseModel):
+    property_key: str  # name of the global property key
     default_value: str | None = None
     sort_order: int = 0
     validation_rules: list[ValidationRuleSchema] = []
 
 
-class PropertyResponse(BaseModel):
+class TypePropertyMappingResponse(BaseModel):
     id: str
-    name: str
-    type: str
-    value_cardinality: str
-    required: bool
-    unique: bool
+    property_key: PropertyKeyResponse
     default_value: str | None
     sort_order: int
     validation_rules: list[ValidationRuleResponse] = []
@@ -54,15 +78,40 @@ class PropertyResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class PropertyUpdate(BaseModel):
-    name: str | None = None
-    type: str | None = None
-    value_cardinality: Literal["SINGLE", "LIST", "SET"] | None = None
-    required: bool | None = None
-    unique: bool | None = None
+class TypePropertyMappingUpdate(BaseModel):
     default_value: str | None = None
     sort_order: int | None = None
     validation_rules: list[ValidationRuleSchema] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Constraints
+# ---------------------------------------------------------------------------
+
+
+class ConstraintCreate(BaseModel):
+    name: str
+    target_kind: Literal["node_type", "edge_type"]
+    target_label: str
+    constraint_type: Literal["unique", "exists", "node_key", "relationship_unique", "relationship_exists"]
+    properties: list[str]
+
+
+class ConstraintResponse(BaseModel):
+    id: str
+    name: str
+    target_kind: str
+    target_label: str
+    constraint_type: str
+    properties: list[str]
+
+    model_config = {"from_attributes": True}
+
+
+class ConstraintUpdate(BaseModel):
+    name: str | None = None
+    properties: list[str] | None = None
+    constraint_type: Literal["unique", "exists", "node_key", "relationship_unique", "relationship_exists"] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -76,9 +125,7 @@ class NodeTypeCreate(BaseModel):
     parent_type: str | None = None
     is_abstract: bool = False
     validation_mode: Literal["strict", "permissive"] | None = None
-    color: str | None = None
-    icon: str | None = None
-    properties: list[PropertyCreate] = []
+    property_mappings: list[TypePropertyMappingCreate] = []
 
 
 class NodeTypeResponse(BaseModel):
@@ -88,10 +135,8 @@ class NodeTypeResponse(BaseModel):
     parent_type: str | None
     is_abstract: bool
     validation_mode: str | None
-    color: str | None
-    icon: str | None
-    properties: list[PropertyResponse] = []
-    effective_properties: list[PropertyResponse] = []
+    property_mappings: list[TypePropertyMappingResponse] = []
+    effective_property_mappings: list[TypePropertyMappingResponse] = []
     hierarchy: list[str] = Field(default_factory=list, description="Parent chain from root to self")
 
     model_config = {"from_attributes": True}
@@ -103,8 +148,6 @@ class NodeTypeUpdate(BaseModel):
     parent_type: str | None = None
     is_abstract: bool | None = None
     validation_mode: Literal["strict", "permissive"] | None = None
-    color: str | None = None
-    icon: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -118,8 +161,7 @@ class EdgeTypeCreate(BaseModel):
     source_node_types: list[str] = []
     target_node_types: list[str] = []
     multiplicity: Literal["MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE"] = "MULTI"
-    allowed_properties: list[str] | None = None
-    properties: list[PropertyCreate] = []
+    property_mappings: list[TypePropertyMappingCreate] = []
 
 
 class EdgeTypeResponse(BaseModel):
@@ -129,8 +171,7 @@ class EdgeTypeResponse(BaseModel):
     source_node_types: list[str]
     target_node_types: list[str]
     multiplicity: str
-    allowed_properties: list[str] | None
-    properties: list[PropertyResponse] = []
+    property_mappings: list[TypePropertyMappingResponse] = []
 
     model_config = {"from_attributes": True}
 
@@ -141,7 +182,6 @@ class EdgeTypeUpdate(BaseModel):
     source_node_types: list[str] | None = None
     target_node_types: list[str] | None = None
     multiplicity: Literal["MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE"] | None = None
-    allowed_properties: list[str] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -155,7 +195,6 @@ class IndexCreate(BaseModel):
     target_label: str
     properties: list[str]
     index_type: Literal["range", "composite", "fulltext", "text", "point", "lookup"] = "range"
-    is_unique: bool = False
     index_options: dict[str, Any] | None = None
 
 
@@ -166,7 +205,6 @@ class IndexResponse(BaseModel):
     target_label: str
     properties: list[str]
     index_type: str
-    is_unique: bool
     index_options: dict[str, Any] | None
 
     model_config = {"from_attributes": True}
@@ -176,7 +214,6 @@ class IndexUpdate(BaseModel):
     name: str | None = None
     properties: list[str] | None = None
     index_type: Literal["range", "composite", "fulltext", "text", "point", "lookup"] | None = None
-    is_unique: bool | None = None
     index_options: dict[str, Any] | None = None
 
 
@@ -201,8 +238,10 @@ class VersionResponse(BaseModel):
     change_summary: str
     created_at: datetime
     activated_at: datetime | None
+    property_keys: list[PropertyKeyResponse] = []
     node_types: list[NodeTypeResponse] = []
     edge_types: list[EdgeTypeResponse] = []
+    constraints: list[ConstraintResponse] = []
     indexes: list[IndexResponse] = []
 
     model_config = {"from_attributes": True}
@@ -255,34 +294,37 @@ class SchemaUpdate(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class PropertyDiff(BaseModel):
+class PropertyKeyDiff(BaseModel):
     name: str
     changes: dict[str, tuple[Any, Any]] = {}
 
 
 class NodeTypeDiff(BaseModel):
     name: str
-    added_properties: list[str] = []
-    removed_properties: list[str] = []
-    modified_properties: list[PropertyDiff] = []
+    added_property_mappings: list[str] = []
+    removed_property_mappings: list[str] = []
     metadata_changes: dict[str, tuple[Any, Any]] = {}
 
 
 class EdgeTypeDiff(BaseModel):
     name: str
-    added_properties: list[str] = []
-    removed_properties: list[str] = []
-    modified_properties: list[PropertyDiff] = []
+    added_property_mappings: list[str] = []
+    removed_property_mappings: list[str] = []
     metadata_changes: dict[str, tuple[Any, Any]] = {}
 
 
 class SchemaDiff(BaseModel):
+    added_property_keys: list[str] = []
+    removed_property_keys: list[str] = []
+    modified_property_keys: list[PropertyKeyDiff] = []
     added_node_types: list[str] = []
     removed_node_types: list[str] = []
     modified_node_types: list[NodeTypeDiff] = []
     added_edge_types: list[str] = []
     removed_edge_types: list[str] = []
     modified_edge_types: list[EdgeTypeDiff] = []
+    added_constraints: list[str] = []
+    removed_constraints: list[str] = []
     added_indexes: list[str] = []
     removed_indexes: list[str] = []
     classification: Literal["major", "minor", "patch"] = "patch"
@@ -367,6 +409,8 @@ class SchemaExport(BaseModel):
     schema_description: str = ""
     validation_mode: str = "strict"
     version: str | None = None
+    property_keys: list[PropertyKeyCreate] = []
     node_types: list[NodeTypeCreate] = []
     edge_types: list[EdgeTypeCreate] = []
+    constraints: list[ConstraintCreate] = []
     indexes: list[IndexCreate] = []

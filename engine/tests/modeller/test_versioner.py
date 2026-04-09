@@ -99,7 +99,14 @@ class TestVersioner:
         # v2: add a node type → minor
         v2 = await store.create_version(session, schema_id=schema.id, based_on="1.0.0")
         await session.commit()
-        await store.create_node_type(session, version_id=v2.id, name="Person")
+        await store.create_property_key(session, version_id=v2.id, name="name", type="string")
+        await session.commit()
+        await store.create_node_type(
+            session,
+            version_id=v2.id,
+            name="Person",
+            property_mappings=[{"property_key": "name"}],
+        )
         await session.commit()
 
         activated = await versioner.activate(session, version_id=v2.id)
@@ -169,18 +176,21 @@ class TestDiff:
         assert "Legacy" in diff.removed_node_types
         assert diff.classification == "major"
 
-    async def test_diff_modified_property(self, session, store):
+    async def test_diff_modified_property_key(self, session, store):
+        """Changing a property key's type is a major change."""
         versioner = Versioner(store)
         schema = await store.create_schema(session, name="Diff Prop")
         await session.commit()
 
         v1 = await store.create_version(session, schema_id=schema.id)
         await session.commit()
+        await store.create_property_key(session, version_id=v1.id, name="val", type="string")
+        await session.commit()
         await store.create_node_type(
             session,
             version_id=v1.id,
             name="Thing",
-            properties=[{"name": "val", "type": "string"}],
+            property_mappings=[{"property_key": "val"}],
         )
         await session.commit()
         await versioner.activate(session, version_id=v1.id)
@@ -188,10 +198,10 @@ class TestDiff:
 
         v2 = await store.create_version(session, schema_id=schema.id, based_on="1.0.0")
         await session.commit()
-        # Change the property type → major
-        nts = await store.list_node_types(session, v2.id)
-        prop = nts[0].properties[0]
-        prop.type = "integer"
+        # Change the property key type → major
+        pks = await store.list_property_keys(session, v2.id)
+        val_pk = next(pk for pk in pks if pk.name == "val")
+        val_pk.type = "integer"
         await session.flush()
         await session.commit()
 
@@ -199,8 +209,7 @@ class TestDiff:
         await session.commit()
 
         diff = await versioner.diff(session, schema_id=schema.id, from_version="1.0.0", to_version="2.0.0")
-        assert len(diff.modified_node_types) == 1
-        assert diff.modified_node_types[0].name == "Thing"
-        assert len(diff.modified_node_types[0].modified_properties) == 1
-        assert "type" in diff.modified_node_types[0].modified_properties[0].changes
+        assert len(diff.modified_property_keys) == 1
+        assert diff.modified_property_keys[0].name == "val"
+        assert "type" in diff.modified_property_keys[0].changes
         assert diff.classification == "major"

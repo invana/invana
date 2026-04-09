@@ -14,16 +14,17 @@ from typing import TYPE_CHECKING, Any
 from sqlalchemy import update
 
 from invana.modeller.models import (
+    ConstraintDefinition,
     EdgeTypeDefinition,
     IndexDefinition,
     NodeTypeDefinition,
-    PropertyDefinition,
+    PropertyKeyDefinition,
     SchemaVersion,
 )
 from invana.modeller.schemas import (
     EdgeTypeDiff,
     NodeTypeDiff,
-    PropertyDiff,
+    PropertyKeyDiff,
     SchemaDiff,
 )
 
@@ -37,35 +38,52 @@ if TYPE_CHECKING:
 # Diffing helpers
 # ---------------------------------------------------------------------------
 
-_PROPERTY_DIFF_FIELDS = ("type", "value_cardinality", "required", "unique", "default_value", "sort_order")
-_NODE_META_FIELDS = ("description", "parent_type", "is_abstract", "validation_mode", "color", "icon")
-_EDGE_META_FIELDS = ("description", "source_node_types", "target_node_types", "multiplicity", "allowed_properties")
+_PROPERTY_KEY_DIFF_FIELDS = ("type", "value_cardinality", "description")
+_NODE_META_FIELDS = ("description", "parent_type", "is_abstract", "validation_mode")
+_EDGE_META_FIELDS = ("description", "source_node_types", "target_node_types", "multiplicity")
 
 
-def _diff_properties(
-    old_props: list[PropertyDefinition],
-    new_props: list[PropertyDefinition],
-) -> tuple[list[str], list[str], list[PropertyDiff]]:
-    old_map = {p.name: p for p in old_props}
-    new_map = {p.name: p for p in new_props}
+def _diff_property_keys(
+    old_keys: list[PropertyKeyDefinition],
+    new_keys: list[PropertyKeyDefinition],
+) -> tuple[list[str], list[str], list[PropertyKeyDiff]]:
+    old_map = {pk.name: pk for pk in old_keys}
+    new_map = {pk.name: pk for pk in new_keys}
 
     added = [n for n in new_map if n not in old_map]
     removed = [n for n in old_map if n not in new_map]
 
-    modified: list[PropertyDiff] = []
+    modified: list[PropertyKeyDiff] = []
     for name in old_map:
         if name not in new_map:
             continue
         changes: dict[str, tuple[Any, Any]] = {}
-        for field in _PROPERTY_DIFF_FIELDS:
+        for field in _PROPERTY_KEY_DIFF_FIELDS:
             old_val = getattr(old_map[name], field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 changes[field] = (old_val, new_val)
         if changes:
-            modified.append(PropertyDiff(name=name, changes=changes))
+            modified.append(PropertyKeyDiff(name=name, changes=changes))
 
     return added, removed, modified
+
+
+def _diff_type_mappings(
+    old_type: NodeTypeDefinition | EdgeTypeDefinition,
+    new_type: NodeTypeDefinition | EdgeTypeDefinition,
+) -> tuple[list[str], list[str]]:
+    """Diff property mappings between two type definitions.
+
+    Returns (added_mapping_names, removed_mapping_names) where names are
+    the property key names used in each mapping.
+    """
+    old_names = {m.property_key.name for m in old_type.property_mappings}
+    new_names = {m.property_key.name for m in new_type.property_mappings}
+
+    added = sorted(new_names - old_names)
+    removed = sorted(old_names - new_names)
+    return added, removed
 
 
 def _diff_node_types(
@@ -82,23 +100,19 @@ def _diff_node_types(
     for name in old_map:
         if name not in new_map:
             continue
-        added_p, removed_p, modified_p = _diff_properties(
-            old_map[name].properties,
-            new_map[name].properties,
-        )
+        added_m, removed_m = _diff_type_mappings(old_map[name], new_map[name])
         meta: dict[str, tuple[Any, Any]] = {}
         for field in _NODE_META_FIELDS:
             old_val = getattr(old_map[name], field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 meta[field] = (old_val, new_val)
-        if added_p or removed_p or modified_p or meta:
+        if added_m or removed_m or meta:
             modified.append(
                 NodeTypeDiff(
                     name=name,
-                    added_properties=added_p,
-                    removed_properties=removed_p,
-                    modified_properties=modified_p,
+                    added_property_mappings=added_m,
+                    removed_property_mappings=removed_m,
                     metadata_changes=meta,
                 )
             )
@@ -120,28 +134,33 @@ def _diff_edge_types(
     for name in old_map:
         if name not in new_map:
             continue
-        added_p, removed_p, modified_p = _diff_properties(
-            old_map[name].properties,
-            new_map[name].properties,
-        )
+        added_m, removed_m = _diff_type_mappings(old_map[name], new_map[name])
         meta: dict[str, tuple[Any, Any]] = {}
         for field in _EDGE_META_FIELDS:
             old_val = getattr(old_map[name], field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 meta[field] = (old_val, new_val)
-        if added_p or removed_p or modified_p or meta:
+        if added_m or removed_m or meta:
             modified.append(
                 EdgeTypeDiff(
                     name=name,
-                    added_properties=added_p,
-                    removed_properties=removed_p,
-                    modified_properties=modified_p,
+                    added_property_mappings=added_m,
+                    removed_property_mappings=removed_m,
                     metadata_changes=meta,
                 )
             )
 
     return added, removed, modified
+
+
+def _diff_constraints(
+    old_constraints: list[ConstraintDefinition],
+    new_constraints: list[ConstraintDefinition],
+) -> tuple[list[str], list[str]]:
+    old_names = {c.name for c in old_constraints}
+    new_names = {c.name for c in new_constraints}
+    return sorted(new_names - old_names), sorted(old_names - new_names)
 
 
 def _diff_indexes(
@@ -155,38 +174,39 @@ def _diff_indexes(
 
 def _classify(diff: SchemaDiff) -> str:
     """Auto-classify a diff as major, minor, or patch."""
-    # Major: anything removed, or a type/required change on a property
-    if diff.removed_node_types or diff.removed_edge_types:
+    # Major: anything removed, or a type change on a property key
+    if diff.removed_node_types or diff.removed_edge_types or diff.removed_property_keys:
         return "major"
 
-    for nt_diff in diff.modified_node_types:
-        if nt_diff.removed_properties:
+    # Removing constraints is a schema change but not necessarily breaking
+    # However, removing property keys used by types is breaking
+    for pk_diff in diff.modified_property_keys:
+        if "type" in pk_diff.changes:
             return "major"
-        for pd in nt_diff.modified_properties:
-            if "type" in pd.changes:
-                return "major"
-            # Making a property required is a breaking change
-            if "required" in pd.changes and pd.changes["required"][1] is True:
-                return "major"
+
+    for nt_diff in diff.modified_node_types:
+        if nt_diff.removed_property_mappings:
+            return "major"
 
     for et_diff in diff.modified_edge_types:
-        if et_diff.removed_properties:
+        if et_diff.removed_property_mappings:
             return "major"
-        for pd in et_diff.modified_properties:
-            if "type" in pd.changes:
-                return "major"
-            if "required" in pd.changes and pd.changes["required"][1] is True:
-                return "major"
 
     # Minor: anything added
-    if diff.added_node_types or diff.added_edge_types or diff.added_indexes:
+    if (
+        diff.added_node_types
+        or diff.added_edge_types
+        or diff.added_indexes
+        or diff.added_property_keys
+        or diff.added_constraints
+    ):
         return "minor"
 
     for nt_diff in diff.modified_node_types:
-        if nt_diff.added_properties:
+        if nt_diff.added_property_mappings:
             return "minor"
     for et_diff in diff.modified_edge_types:
-        if et_diff.added_properties:
+        if et_diff.added_property_mappings:
             return "minor"
 
     return "patch"
@@ -194,17 +214,24 @@ def _classify(diff: SchemaDiff) -> str:
 
 def compute_diff(old: SchemaVersion, new: SchemaVersion) -> SchemaDiff:
     """Compute the diff between two fully-loaded ``SchemaVersion`` objects."""
+    added_pk, removed_pk, modified_pk = _diff_property_keys(old.property_keys, new.property_keys)
     added_nt, removed_nt, modified_nt = _diff_node_types(old.node_types, new.node_types)
     added_et, removed_et, modified_et = _diff_edge_types(old.edge_types, new.edge_types)
+    added_con, removed_con = _diff_constraints(old.constraints, new.constraints)
     added_idx, removed_idx = _diff_indexes(old.indexes, new.indexes)
 
     diff = SchemaDiff(
+        added_property_keys=added_pk,
+        removed_property_keys=removed_pk,
+        modified_property_keys=modified_pk,
         added_node_types=added_nt,
         removed_node_types=removed_nt,
         modified_node_types=modified_nt,
         added_edge_types=added_et,
         removed_edge_types=removed_et,
         modified_edge_types=modified_et,
+        added_constraints=added_con,
+        removed_constraints=removed_con,
         added_indexes=added_idx,
         removed_indexes=removed_idx,
     )

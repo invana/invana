@@ -1,9 +1,9 @@
-"""Inheritance resolver — computes effective properties for child node types.
+"""Inheritance resolver — computes effective property mappings for child node types.
 
 Rules:
 - Single inheritance only (``parent_type`` field).
-- Child inherits all parent properties and their validation rules.
-- Child can add new properties but cannot remove or change type of inherited ones.
+- Child inherits all parent property mappings and their validation rules.
+- Child can add new property mappings but cannot remove or change type of inherited ones.
 - Inherited validation rules cannot be relaxed; child can add stricter rules.
 - Depth limit: 5 levels maximum.
 - Abstract types cannot be instantiated.
@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import copy
 
-from invana.modeller.models import NodeTypeDefinition, PropertyDefinition
+from invana.modeller.models import NodeTypeDefinition, TypePropertyMapping
 
 MAX_INHERITANCE_DEPTH = 5
 
@@ -60,31 +60,33 @@ def build_hierarchy(
     return chain
 
 
-def resolve_effective_properties(
+def resolve_effective_mappings(
     node_type: NodeTypeDefinition,
     type_map: dict[str, NodeTypeDefinition],
-) -> list[PropertyDefinition]:
-    """Compute the full set of properties for *node_type*, including inherited ones.
+) -> list[TypePropertyMapping]:
+    """Compute the full set of property mappings for *node_type*, including inherited ones.
 
-    Returns a new list where inherited properties appear first (in parent order),
-    followed by the type's own properties. Inherited ``PropertyDefinition`` objects
+    Returns a new list where inherited mappings appear first (in parent order),
+    followed by the type's own mappings.  Inherited ``TypePropertyMapping`` objects
     are shallow copies with the ``id`` preserved for rule lookups.
+
+    De-duplication is by property key name (via ``mapping.property_key.name``).
     """
     hierarchy = build_hierarchy(node_type, type_map)
     seen_names: set[str] = set()
-    effective: list[PropertyDefinition] = []
+    effective: list[TypePropertyMapping] = []
 
     for type_name in hierarchy:
         nt = type_map[type_name]
-        for prop in nt.properties:
-            if prop.name not in seen_names:
+        for mapping in nt.property_mappings:
+            pk_name = mapping.property_key.name
+            if pk_name not in seen_names:
                 if nt is node_type:
-                    effective.append(prop)
+                    effective.append(mapping)
                 else:
-                    # Shallow copy for an inherited property
-                    inherited = copy.copy(prop)
+                    inherited = copy.copy(mapping)
                     effective.append(inherited)
-                seen_names.add(prop.name)
+                seen_names.add(pk_name)
 
     return effective
 

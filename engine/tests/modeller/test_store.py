@@ -86,6 +86,39 @@ class TestVersionCRUD:
 
 
 @pytest.mark.asyncio
+class TestPropertyKeyCRUD:
+    async def test_create_property_key(self, session, store):
+        schema = await store.create_schema(session, name="PK Test")
+        await session.commit()
+        version = await store.create_version(session, schema_id=schema.id)
+        await session.commit()
+
+        pk = await store.create_property_key(
+            session,
+            version_id=version.id,
+            name="name",
+            type="string",
+        )
+        assert pk.id is not None
+        assert pk.name == "name"
+        assert pk.type == "string"
+        assert pk.value_cardinality == "SINGLE"
+
+    async def test_list_property_keys(self, session, store):
+        schema = await store.create_schema(session, name="PK List")
+        await session.commit()
+        version = await store.create_version(session, schema_id=schema.id)
+        await session.commit()
+
+        await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await store.create_property_key(session, version_id=version.id, name="age", type="integer")
+        await session.commit()
+
+        keys = await store.list_property_keys(session, version.id)
+        assert len(keys) == 2
+
+
+@pytest.mark.asyncio
 class TestNodeTypeCRUD:
     async def test_create_node_type(self, session, store):
         schema = await store.create_schema(session, name="NT Test")
@@ -93,19 +126,24 @@ class TestNodeTypeCRUD:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        # Create property keys first
+        await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await store.create_property_key(session, version_id=version.id, name="age", type="integer")
+        await session.commit()
+
         nt = await store.create_node_type(
             session,
             version_id=version.id,
             name="Person",
             description="A person node",
-            properties=[
-                {"name": "name", "type": "string", "required": True},
-                {"name": "age", "type": "integer"},
+            property_mappings=[
+                {"property_key": "name"},
+                {"property_key": "age"},
             ],
         )
         assert nt.id is not None
         assert nt.name == "Person"
-        assert len(nt.properties) == 2
+        assert len(nt.property_mappings) == 2
 
     async def test_create_node_type_with_validation_rules(self, session, store):
         schema = await store.create_schema(session, name="Rules Test")
@@ -113,21 +151,28 @@ class TestNodeTypeCRUD:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        await store.create_property_key(session, version_id=version.id, name="price", type="float")
+        await store.create_property_key(
+            session,
+            version_id=version.id,
+            name="status",
+            type="string",
+        )
+        await session.commit()
+
         nt = await store.create_node_type(
             session,
             version_id=version.id,
             name="Product",
-            properties=[
+            property_mappings=[
                 {
-                    "name": "price",
-                    "type": "float",
+                    "property_key": "price",
                     "validation_rules": [
                         {"rule_type": "range", "params": {"min": 0, "max": 10000}},
                     ],
                 },
                 {
-                    "name": "status",
-                    "type": "string",
+                    "property_key": "status",
                     "validation_rules": [
                         {"rule_type": "enum", "params": {"values": ["active", "inactive"]}},
                     ],
@@ -180,17 +225,20 @@ class TestEdgeTypeCRUD:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        await store.create_property_key(session, version_id=version.id, name="since", type="integer")
+        await session.commit()
+
         et = await store.create_edge_type(
             session,
             version_id=version.id,
             name="KNOWS",
             source_node_types=["Person"],
             target_node_types=["Person"],
-            properties=[{"name": "since", "type": "integer"}],
+            property_mappings=[{"property_key": "since"}],
         )
         assert et.name == "KNOWS"
         assert et.source_node_types == ["Person"]
-        assert len(et.properties) == 1
+        assert len(et.property_mappings) == 1
 
     async def test_edge_multiplicity(self, session, store):
         schema = await store.create_schema(session, name="Multi Test")
@@ -205,6 +253,49 @@ class TestEdgeTypeCRUD:
             multiplicity="ONE2MANY",
         )
         assert et.multiplicity == "ONE2MANY"
+
+
+@pytest.mark.asyncio
+class TestConstraintCRUD:
+    async def test_create_and_list_constraints(self, session, store):
+        schema = await store.create_schema(session, name="Con Test")
+        await session.commit()
+        version = await store.create_version(session, schema_id=schema.id)
+        await session.commit()
+
+        c = await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="unique_person_name",
+            target_kind="node_type",
+            target_label="Person",
+            constraint_type="unique",
+            properties=["name"],
+        )
+        assert c.name == "unique_person_name"
+        assert c.constraint_type == "unique"
+        await session.commit()
+
+        constraints = await store.list_constraints(session, version.id)
+        assert len(constraints) == 1
+
+    async def test_delete_constraint(self, session, store):
+        schema = await store.create_schema(session, name="Con Del")
+        await session.commit()
+        version = await store.create_version(session, schema_id=schema.id)
+        await session.commit()
+        c = await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="temp_con",
+            target_kind="node_type",
+            target_label="Temp",
+            constraint_type="exists",
+            properties=["x"],
+        )
+        await session.commit()
+        result = await store.delete_constraint(session, c.id)
+        assert result is True
 
 
 @pytest.mark.asyncio
@@ -258,11 +349,14 @@ class TestCloneVersion:
         v1 = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        await store.create_property_key(session, version_id=v1.id, name="name", type="string")
+        await session.commit()
+
         await store.create_node_type(
             session,
             version_id=v1.id,
             name="Person",
-            properties=[{"name": "name", "type": "string", "required": True}],
+            property_mappings=[{"property_key": "name"}],
         )
         await store.create_edge_type(
             session,
@@ -270,6 +364,15 @@ class TestCloneVersion:
             name="KNOWS",
             source_node_types=["Person"],
             target_node_types=["Person"],
+        )
+        await store.create_constraint(
+            session,
+            version_id=v1.id,
+            name="unique_person_name",
+            target_kind="node_type",
+            target_label="Person",
+            constraint_type="unique",
+            properties=["name"],
         )
         await store.create_index(
             session,
@@ -291,7 +394,10 @@ class TestCloneVersion:
         await session.commit()
 
         v2_full = await store.get_version(session, v2.id)
+        assert len(v2_full.property_keys) == 1
+        assert v2_full.property_keys[0].name == "name"
         assert len(v2_full.node_types) == 1
         assert v2_full.node_types[0].name == "Person"
         assert len(v2_full.edge_types) == 1
+        assert len(v2_full.constraints) == 1
         assert len(v2_full.indexes) == 1

@@ -14,13 +14,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from invana.modeller.models import (
+    ConstraintDefinition,
     EdgeTypeDefinition,
     GraphSchema,
     IndexDefinition,
     NodeTypeDefinition,
-    PropertyDefinition,
+    PropertyKeyDefinition,
     SchemaProjection,
     SchemaVersion,
+    TypePropertyMapping,
     ValidationRule,
 )
 
@@ -32,13 +34,16 @@ if TYPE_CHECKING:
 # Eager-loading helpers
 # ---------------------------------------------------------------------------
 
+_MAPPING_EAGER = (
+    selectinload(TypePropertyMapping.property_key).selectinload(PropertyKeyDefinition.validation_rules),
+    selectinload(TypePropertyMapping.validation_rules),
+)
+
 _VERSION_EAGER = (
-    selectinload(SchemaVersion.node_types)
-    .selectinload(NodeTypeDefinition.properties)
-    .selectinload(PropertyDefinition.validation_rules),
-    selectinload(SchemaVersion.edge_types)
-    .selectinload(EdgeTypeDefinition.properties)
-    .selectinload(PropertyDefinition.validation_rules),
+    selectinload(SchemaVersion.property_keys).selectinload(PropertyKeyDefinition.validation_rules),
+    selectinload(SchemaVersion.node_types).selectinload(NodeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
+    selectinload(SchemaVersion.edge_types).selectinload(EdgeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
+    selectinload(SchemaVersion.constraints),
     selectinload(SchemaVersion.indexes),
     selectinload(SchemaVersion.projections),
 )
@@ -161,6 +166,82 @@ class SchemaStore:
         return list(result.scalars().all())
 
     # ------------------------------------------------------------------
+    # Property Key CRUD
+    # ------------------------------------------------------------------
+
+    async def create_property_key(
+        self,
+        session: AsyncSession,
+        *,
+        version_id: str,
+        name: str,
+        type: str = "string",
+        value_cardinality: str = "SINGLE",
+        description: str = "",
+        validation_rules: list[dict] | None = None,
+    ) -> PropertyKeyDefinition:
+        await self._ensure_draft(session, version_id)
+        pk = PropertyKeyDefinition(
+            version_id=version_id,
+            name=name,
+            type=type,
+            value_cardinality=value_cardinality,
+            description=description,
+        )
+        session.add(pk)
+        await session.flush()
+
+        if validation_rules:
+            for rule_data in validation_rules:
+                rule = ValidationRule(
+                    property_key_id=pk.id,
+                    rule_type=rule_data["rule_type"],
+                    params=rule_data.get("params", {}),
+                )
+                session.add(rule)
+            await session.flush()
+
+        return pk
+
+    async def get_property_key(self, session: AsyncSession, pk_id: str) -> PropertyKeyDefinition | None:
+        stmt = (
+            select(PropertyKeyDefinition)
+            .where(PropertyKeyDefinition.id == pk_id)
+            .options(selectinload(PropertyKeyDefinition.validation_rules))
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_property_key_by_name(
+        self, session: AsyncSession, version_id: str, name: str
+    ) -> PropertyKeyDefinition | None:
+        stmt = (
+            select(PropertyKeyDefinition)
+            .where(PropertyKeyDefinition.version_id == version_id, PropertyKeyDefinition.name == name)
+            .options(selectinload(PropertyKeyDefinition.validation_rules))
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def list_property_keys(self, session: AsyncSession, version_id: str) -> list[PropertyKeyDefinition]:
+        stmt = (
+            select(PropertyKeyDefinition)
+            .where(PropertyKeyDefinition.version_id == version_id)
+            .options(selectinload(PropertyKeyDefinition.validation_rules))
+        )
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def delete_property_key(self, session: AsyncSession, pk_id: str) -> bool:
+        pk = await self.get_property_key(session, pk_id)
+        if pk is None:
+            return False
+        await self._ensure_draft(session, pk.version_id)
+        await session.delete(pk)
+        await session.flush()
+        return True
+
+    # ------------------------------------------------------------------
     # Node Type CRUD
     # ------------------------------------------------------------------
 
@@ -174,9 +255,7 @@ class SchemaStore:
         parent_type: str | None = None,
         is_abstract: bool = False,
         validation_mode: str | None = None,
-        color: str | None = None,
-        icon: str | None = None,
-        properties: list[dict] | None = None,
+        property_mappings: list[dict] | None = None,
     ) -> NodeTypeDefinition:
         await self._ensure_draft(session, version_id)
 
@@ -187,24 +266,24 @@ class SchemaStore:
             parent_type=parent_type,
             is_abstract=is_abstract,
             validation_mode=validation_mode,
-            color=color,
-            icon=icon,
         )
         session.add(node_type)
         await session.flush()
 
-        if properties:
-            for prop_data in properties:
-                await self._create_property(session, node_type_id=node_type.id, **prop_data)
+        if property_mappings:
+            for mapping_data in property_mappings:
+                await self._create_type_property_mapping(
+                    session, version_id=version_id, node_type_id=node_type.id, **mapping_data
+                )
 
-        # Reload with eager-loaded properties
+        # Reload with eager-loaded mappings
         return await self.get_node_type(session, node_type.id)
 
     async def get_node_type(self, session: AsyncSession, node_type_id: str) -> NodeTypeDefinition | None:
         stmt = (
             select(NodeTypeDefinition)
             .where(NodeTypeDefinition.id == node_type_id)
-            .options(selectinload(NodeTypeDefinition.properties).selectinload(PropertyDefinition.validation_rules))
+            .options(selectinload(NodeTypeDefinition.property_mappings).options(*_MAPPING_EAGER))
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
@@ -213,7 +292,7 @@ class SchemaStore:
         stmt = (
             select(NodeTypeDefinition)
             .where(NodeTypeDefinition.version_id == version_id)
-            .options(selectinload(NodeTypeDefinition.properties).selectinload(PropertyDefinition.validation_rules))
+            .options(selectinload(NodeTypeDefinition.property_mappings).options(*_MAPPING_EAGER))
         )
         result = await session.execute(stmt)
         return list(result.scalars().all())
@@ -257,8 +336,7 @@ class SchemaStore:
         source_node_types: list[str] | None = None,
         target_node_types: list[str] | None = None,
         multiplicity: str = "MULTI",
-        allowed_properties: list[str] | None = None,
-        properties: list[dict] | None = None,
+        property_mappings: list[dict] | None = None,
     ) -> EdgeTypeDefinition:
         await self._ensure_draft(session, version_id)
 
@@ -269,23 +347,24 @@ class SchemaStore:
             source_node_types=source_node_types or [],
             target_node_types=target_node_types or [],
             multiplicity=multiplicity,
-            allowed_properties=allowed_properties,
         )
         session.add(edge_type)
         await session.flush()
 
-        if properties:
-            for prop_data in properties:
-                await self._create_property(session, edge_type_id=edge_type.id, **prop_data)
+        if property_mappings:
+            for mapping_data in property_mappings:
+                await self._create_type_property_mapping(
+                    session, version_id=version_id, edge_type_id=edge_type.id, **mapping_data
+                )
 
-        # Reload with eager-loaded properties
+        # Reload with eager-loaded mappings
         return await self.get_edge_type(session, edge_type.id)
 
     async def get_edge_type(self, session: AsyncSession, edge_type_id: str) -> EdgeTypeDefinition | None:
         stmt = (
             select(EdgeTypeDefinition)
             .where(EdgeTypeDefinition.id == edge_type_id)
-            .options(selectinload(EdgeTypeDefinition.properties).selectinload(PropertyDefinition.validation_rules))
+            .options(selectinload(EdgeTypeDefinition.property_mappings).options(*_MAPPING_EAGER))
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
@@ -294,7 +373,7 @@ class SchemaStore:
         stmt = (
             select(EdgeTypeDefinition)
             .where(EdgeTypeDefinition.version_id == version_id)
-            .options(selectinload(EdgeTypeDefinition.properties).selectinload(PropertyDefinition.validation_rules))
+            .options(selectinload(EdgeTypeDefinition.property_mappings).options(*_MAPPING_EAGER))
         )
         result = await session.execute(stmt)
         return list(result.scalars().all())
@@ -325,6 +404,53 @@ class SchemaStore:
         return True
 
     # ------------------------------------------------------------------
+    # Constraint CRUD
+    # ------------------------------------------------------------------
+
+    async def create_constraint(
+        self,
+        session: AsyncSession,
+        *,
+        version_id: str,
+        name: str,
+        target_kind: str,
+        target_label: str,
+        constraint_type: str,
+        properties: list[str],
+    ) -> ConstraintDefinition:
+        await self._ensure_draft(session, version_id)
+        constraint = ConstraintDefinition(
+            version_id=version_id,
+            name=name,
+            target_kind=target_kind,
+            target_label=target_label,
+            constraint_type=constraint_type,
+            properties=properties,
+        )
+        session.add(constraint)
+        await session.flush()
+        return constraint
+
+    async def get_constraint(self, session: AsyncSession, constraint_id: str) -> ConstraintDefinition | None:
+        stmt = select(ConstraintDefinition).where(ConstraintDefinition.id == constraint_id)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def list_constraints(self, session: AsyncSession, version_id: str) -> list[ConstraintDefinition]:
+        stmt = select(ConstraintDefinition).where(ConstraintDefinition.version_id == version_id)
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def delete_constraint(self, session: AsyncSession, constraint_id: str) -> bool:
+        constraint = await self.get_constraint(session, constraint_id)
+        if constraint is None:
+            return False
+        await self._ensure_draft(session, constraint.version_id)
+        await session.delete(constraint)
+        await session.flush()
+        return True
+
+    # ------------------------------------------------------------------
     # Index CRUD
     # ------------------------------------------------------------------
 
@@ -338,7 +464,6 @@ class SchemaStore:
         target_label: str,
         properties: list[str],
         index_type: str = "range",
-        is_unique: bool = False,
         index_options: dict | None = None,
     ) -> IndexDefinition:
         await self._ensure_draft(session, version_id)
@@ -349,7 +474,6 @@ class SchemaStore:
             target_label=target_label,
             properties=properties,
             index_type=index_type,
-            is_unique=is_unique,
             index_options=index_options,
         )
         session.add(idx)
@@ -430,46 +554,45 @@ class SchemaStore:
             msg = f"Version {version_id} is not a draft (status={status}). Only draft versions can be modified."
             raise ValueError(msg)
 
-    async def _create_property(
+    async def _create_type_property_mapping(
         self,
         session: AsyncSession,
         *,
+        version_id: str,
         node_type_id: str | None = None,
         edge_type_id: str | None = None,
-        name: str,
-        type: str = "string",
-        value_cardinality: str = "SINGLE",
-        required: bool = False,
-        unique: bool = False,
+        property_key: str,
         default_value: str | None = None,
         sort_order: int = 0,
         validation_rules: list[dict] | None = None,
-    ) -> PropertyDefinition:
-        prop = PropertyDefinition(
+    ) -> TypePropertyMapping:
+        # Look up the property key by name within this version
+        pk = await self.get_property_key_by_name(session, version_id, property_key)
+        if pk is None:
+            msg = f"Property key '{property_key}' not found in version {version_id}."
+            raise ValueError(msg)
+
+        mapping = TypePropertyMapping(
+            property_key_id=pk.id,
             node_type_id=node_type_id,
             edge_type_id=edge_type_id,
-            name=name,
-            type=type,
-            value_cardinality=value_cardinality,
-            required=required,
-            unique=unique,
             default_value=default_value,
             sort_order=sort_order,
         )
-        session.add(prop)
+        session.add(mapping)
         await session.flush()
 
         if validation_rules:
             for rule_data in validation_rules:
                 rule = ValidationRule(
-                    property_id=prop.id,
+                    type_property_mapping_id=mapping.id,
                     rule_type=rule_data["rule_type"],
                     params=rule_data.get("params", {}),
                 )
                 session.add(rule)
+            await session.flush()
 
-        await session.flush()
-        return prop
+        return mapping
 
     async def _clone_version_contents(
         self,
@@ -477,28 +600,38 @@ class SchemaStore:
         source: SchemaVersion,
         target: SchemaVersion,
     ) -> None:
-        """Deep-clone node types, edge types, indexes, and properties from *source* into *target*."""
+        """Deep-clone property keys, node types, edge types, constraints, and indexes."""
         # Reload with eager loading
         source = await self.get_version(session, source.id)
         if source is None:
             return
 
+        # Clone property keys first (types and mappings depend on them)
+        for pk in source.property_keys:
+            await self.create_property_key(
+                session,
+                version_id=target.id,
+                name=pk.name,
+                type=pk.type,
+                value_cardinality=pk.value_cardinality,
+                description=pk.description,
+                validation_rules=[
+                    {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in pk.validation_rules
+                ],
+            )
+
         # Clone node types
         for nt in source.node_types:
-            props = [
+            mappings = [
                 {
-                    "name": p.name,
-                    "type": p.type,
-                    "value_cardinality": p.value_cardinality,
-                    "required": p.required,
-                    "unique": p.unique,
-                    "default_value": p.default_value,
-                    "sort_order": p.sort_order,
+                    "property_key": m.property_key.name,
+                    "default_value": m.default_value,
+                    "sort_order": m.sort_order,
                     "validation_rules": [
-                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in p.validation_rules
+                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in m.validation_rules
                     ],
                 }
-                for p in nt.properties
+                for m in nt.property_mappings
             ]
             await self.create_node_type(
                 session,
@@ -508,27 +641,21 @@ class SchemaStore:
                 parent_type=nt.parent_type,
                 is_abstract=nt.is_abstract,
                 validation_mode=nt.validation_mode,
-                color=nt.color,
-                icon=nt.icon,
-                properties=props,
+                property_mappings=mappings,
             )
 
         # Clone edge types
         for et in source.edge_types:
-            props = [
+            mappings = [
                 {
-                    "name": p.name,
-                    "type": p.type,
-                    "value_cardinality": p.value_cardinality,
-                    "required": p.required,
-                    "unique": p.unique,
-                    "default_value": p.default_value,
-                    "sort_order": p.sort_order,
+                    "property_key": m.property_key.name,
+                    "default_value": m.default_value,
+                    "sort_order": m.sort_order,
                     "validation_rules": [
-                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in p.validation_rules
+                        {"rule_type": r.rule_type, "params": copy.deepcopy(r.params)} for r in m.validation_rules
                     ],
                 }
-                for p in et.properties
+                for m in et.property_mappings
             ]
             await self.create_edge_type(
                 session,
@@ -538,8 +665,19 @@ class SchemaStore:
                 source_node_types=copy.deepcopy(et.source_node_types),
                 target_node_types=copy.deepcopy(et.target_node_types),
                 multiplicity=et.multiplicity,
-                allowed_properties=copy.deepcopy(et.allowed_properties) if et.allowed_properties else None,
-                properties=props,
+                property_mappings=mappings,
+            )
+
+        # Clone constraints
+        for c in source.constraints:
+            await self.create_constraint(
+                session,
+                version_id=target.id,
+                name=c.name,
+                target_kind=c.target_kind,
+                target_label=c.target_label,
+                constraint_type=c.constraint_type,
+                properties=copy.deepcopy(c.properties),
             )
 
         # Clone indexes
@@ -552,6 +690,5 @@ class SchemaStore:
                 target_label=idx.target_label,
                 properties=copy.deepcopy(idx.properties),
                 index_type=idx.index_type,
-                is_unique=idx.is_unique,
                 index_options=copy.deepcopy(idx.index_options) if idx.index_options else None,
             )

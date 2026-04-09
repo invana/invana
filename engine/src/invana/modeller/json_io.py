@@ -1,8 +1,8 @@
 """JSON export/import for schema versions.
 
 ``SchemaExporter`` serialises a ``SchemaVersion`` (with all contained types,
-properties, rules, and indexes) into a ``SchemaExport`` Pydantic model that
-round-trips cleanly to JSON.
+property keys, mappings, constraints, rules, and indexes) into a
+``SchemaExport`` Pydantic model that round-trips cleanly to JSON.
 
 ``SchemaImporter`` takes a ``SchemaExport`` and creates a new draft
 ``SchemaVersion`` inside an existing ``GraphSchema``.
@@ -15,11 +15,13 @@ from typing import TYPE_CHECKING
 
 from invana.modeller.models import SchemaVersion
 from invana.modeller.schemas import (
+    ConstraintCreate,
     EdgeTypeCreate,
     IndexCreate,
     NodeTypeCreate,
-    PropertyCreate,
+    PropertyKeyCreate,
     SchemaExport,
+    TypePropertyMappingCreate,
     ValidationRuleSchema,
 )
 
@@ -45,23 +47,36 @@ class SchemaExporter:
         validation_mode: str = "strict",
     ) -> SchemaExport:
         """Return a ``SchemaExport`` snapshot of *version*."""
-        node_types: list[NodeTypeCreate] = []
-        for nt in version.node_types:
-            props = [
-                PropertyCreate(
-                    name=p.name,
-                    type=p.type,
-                    value_cardinality=p.value_cardinality,
-                    required=p.required,
-                    unique=p.unique,
-                    default_value=p.default_value,
-                    sort_order=p.sort_order,
+        # Property keys
+        property_keys: list[PropertyKeyCreate] = []
+        for pk in version.property_keys:
+            property_keys.append(
+                PropertyKeyCreate(
+                    name=pk.name,
+                    type=pk.type,
+                    value_cardinality=pk.value_cardinality,
+                    description=pk.description,
                     validation_rules=[
                         ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
-                        for r in p.validation_rules
+                        for r in pk.validation_rules
                     ],
                 )
-                for p in nt.properties
+            )
+
+        # Node types
+        node_types: list[NodeTypeCreate] = []
+        for nt in version.node_types:
+            mappings = [
+                TypePropertyMappingCreate(
+                    property_key=m.property_key.name,
+                    default_value=m.default_value,
+                    sort_order=m.sort_order,
+                    validation_rules=[
+                        ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
+                        for r in m.validation_rules
+                    ],
+                )
+                for m in nt.property_mappings
             ]
             node_types.append(
                 NodeTypeCreate(
@@ -70,29 +85,24 @@ class SchemaExporter:
                     parent_type=nt.parent_type,
                     is_abstract=nt.is_abstract,
                     validation_mode=nt.validation_mode,
-                    color=nt.color,
-                    icon=nt.icon,
-                    properties=props,
+                    property_mappings=mappings,
                 )
             )
 
+        # Edge types
         edge_types: list[EdgeTypeCreate] = []
         for et in version.edge_types:
-            props = [
-                PropertyCreate(
-                    name=p.name,
-                    type=p.type,
-                    value_cardinality=p.value_cardinality,
-                    required=p.required,
-                    unique=p.unique,
-                    default_value=p.default_value,
-                    sort_order=p.sort_order,
+            mappings = [
+                TypePropertyMappingCreate(
+                    property_key=m.property_key.name,
+                    default_value=m.default_value,
+                    sort_order=m.sort_order,
                     validation_rules=[
                         ValidationRuleSchema(rule_type=r.rule_type, params=copy.deepcopy(r.params))
-                        for r in p.validation_rules
+                        for r in m.validation_rules
                     ],
                 )
-                for p in et.properties
+                for m in et.property_mappings
             ]
             edge_types.append(
                 EdgeTypeCreate(
@@ -101,11 +111,24 @@ class SchemaExporter:
                     source_node_types=copy.deepcopy(et.source_node_types) or [],
                     target_node_types=copy.deepcopy(et.target_node_types) or [],
                     multiplicity=et.multiplicity,
-                    allowed_properties=copy.deepcopy(et.allowed_properties) if et.allowed_properties else None,
-                    properties=props,
+                    property_mappings=mappings,
                 )
             )
 
+        # Constraints
+        constraints: list[ConstraintCreate] = []
+        for c in version.constraints:
+            constraints.append(
+                ConstraintCreate(
+                    name=c.name,
+                    target_kind=c.target_kind,
+                    target_label=c.target_label,
+                    constraint_type=c.constraint_type,
+                    properties=copy.deepcopy(c.properties),
+                )
+            )
+
+        # Indexes
         indexes: list[IndexCreate] = []
         for idx in version.indexes:
             indexes.append(
@@ -115,7 +138,6 @@ class SchemaExporter:
                     target_label=idx.target_label,
                     properties=copy.deepcopy(idx.properties),
                     index_type=idx.index_type,
-                    is_unique=idx.is_unique,
                     index_options=copy.deepcopy(idx.index_options) if idx.index_options else None,
                 )
             )
@@ -125,8 +147,10 @@ class SchemaExporter:
             schema_description=schema_description,
             validation_mode=validation_mode,
             version=version.version,
+            property_keys=property_keys,
             node_types=node_types,
             edge_types=edge_types,
+            constraints=constraints,
             indexes=indexes,
         )
 
@@ -155,20 +179,28 @@ class SchemaImporter:
         """
         version = await self._store.create_version(session, schema_id=schema_id)
 
+        # Import property keys first (node/edge types reference them by name)
+        for pk_data in data.property_keys:
+            await self._store.create_property_key(
+                session,
+                version_id=version.id,
+                name=pk_data.name,
+                type=pk_data.type,
+                value_cardinality=pk_data.value_cardinality,
+                description=pk_data.description,
+                validation_rules=[{"rule_type": r.rule_type, "params": r.params} for r in pk_data.validation_rules],
+            )
+
         # Import node types
         for nt_data in data.node_types:
-            props = [
+            mappings = [
                 {
-                    "name": p.name,
-                    "type": p.type,
-                    "value_cardinality": p.value_cardinality,
-                    "required": p.required,
-                    "unique": p.unique,
-                    "default_value": p.default_value,
-                    "sort_order": p.sort_order,
-                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in p.validation_rules],
+                    "property_key": m.property_key,
+                    "default_value": m.default_value,
+                    "sort_order": m.sort_order,
+                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in m.validation_rules],
                 }
-                for p in nt_data.properties
+                for m in nt_data.property_mappings
             ]
             await self._store.create_node_type(
                 session,
@@ -178,25 +210,19 @@ class SchemaImporter:
                 parent_type=nt_data.parent_type,
                 is_abstract=nt_data.is_abstract,
                 validation_mode=nt_data.validation_mode,
-                color=nt_data.color,
-                icon=nt_data.icon,
-                properties=props,
+                property_mappings=mappings,
             )
 
         # Import edge types
         for et_data in data.edge_types:
-            props = [
+            mappings = [
                 {
-                    "name": p.name,
-                    "type": p.type,
-                    "value_cardinality": p.value_cardinality,
-                    "required": p.required,
-                    "unique": p.unique,
-                    "default_value": p.default_value,
-                    "sort_order": p.sort_order,
-                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in p.validation_rules],
+                    "property_key": m.property_key,
+                    "default_value": m.default_value,
+                    "sort_order": m.sort_order,
+                    "validation_rules": [{"rule_type": r.rule_type, "params": r.params} for r in m.validation_rules],
                 }
-                for p in et_data.properties
+                for m in et_data.property_mappings
             ]
             await self._store.create_edge_type(
                 session,
@@ -206,8 +232,19 @@ class SchemaImporter:
                 source_node_types=et_data.source_node_types,
                 target_node_types=et_data.target_node_types,
                 multiplicity=et_data.multiplicity,
-                allowed_properties=et_data.allowed_properties,
-                properties=props,
+                property_mappings=mappings,
+            )
+
+        # Import constraints
+        for c_data in data.constraints:
+            await self._store.create_constraint(
+                session,
+                version_id=version.id,
+                name=c_data.name,
+                target_kind=c_data.target_kind,
+                target_label=c_data.target_label,
+                constraint_type=c_data.constraint_type,
+                properties=c_data.properties,
             )
 
         # Import indexes
@@ -220,7 +257,6 @@ class SchemaImporter:
                 target_label=idx_data.target_label,
                 properties=idx_data.properties,
                 index_type=idx_data.index_type,
-                is_unique=idx_data.is_unique,
                 index_options=idx_data.index_options,
             )
 

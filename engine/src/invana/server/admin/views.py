@@ -7,13 +7,15 @@ from starlette_admin import StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.modeller.models import (
+    ConstraintDefinition,
     EdgeTypeDefinition,
     GraphSchema,
     IndexDefinition,
     NodeTypeDefinition,
-    PropertyDefinition,
+    PropertyKeyDefinition,
     SchemaProjection,
     SchemaVersion,
+    TypePropertyMapping,
     ValidationRule,
 )
 
@@ -44,7 +46,7 @@ class SchemaVersionView(ModelView):
 
 
 class NodeTypeDefinitionView(ModelView):
-    fields = ["id", "version_id", "name", "description", "parent_type", "is_abstract", "color", "icon"]
+    fields = ["id", "version_id", "name", "description", "parent_type", "is_abstract"]
     search_fields = ["name"]
 
 
@@ -61,16 +63,38 @@ class EdgeTypeDefinitionView(ModelView):
     search_fields = ["name"]
 
 
-class PropertyDefinitionView(ModelView):
+class PropertyKeyDefinitionView(ModelView):
     fields = [
         "id",
-        "node_type_id",
-        "edge_type_id",
+        "version_id",
         "name",
         "type",
         StringField("value_cardinality", label="Value Cardinality"),
-        "required",
-        "unique",
+        "description",
+    ]
+    search_fields = ["name"]
+
+
+class TypePropertyMappingView(ModelView):
+    fields = [
+        "id",
+        "property_key_id",
+        "node_type_id",
+        "edge_type_id",
+        "default_value",
+        "sort_order",
+    ]
+
+
+class ConstraintDefinitionView(ModelView):
+    fields = [
+        "id",
+        "version_id",
+        "name",
+        StringField("target_kind", label="Target Kind"),
+        "target_label",
+        StringField("constraint_type", label="Constraint Type"),
+        "properties",
     ]
     search_fields = ["name"]
 
@@ -78,7 +102,8 @@ class PropertyDefinitionView(ModelView):
 class ValidationRuleView(ModelView):
     fields = [
         "id",
-        "property_id",
+        "property_key_id",
+        "type_property_mapping_id",
         StringField("rule_type", label="Rule Type"),
         "params",
     ]
@@ -93,7 +118,6 @@ class IndexDefinitionView(ModelView):
         "target_label",
         "properties",
         StringField("index_type", label="Index Type"),
-        "is_unique",
         "index_options",
     ]
     search_fields = ["name"]
@@ -122,7 +146,9 @@ def mount_admin(app: FastAPI) -> None:
     admin.add_view(SchemaVersionView(SchemaVersion))
     admin.add_view(NodeTypeDefinitionView(NodeTypeDefinition))
     admin.add_view(EdgeTypeDefinitionView(EdgeTypeDefinition))
-    admin.add_view(PropertyDefinitionView(PropertyDefinition))
+    admin.add_view(PropertyKeyDefinitionView(PropertyKeyDefinition))
+    admin.add_view(TypePropertyMappingView(TypePropertyMapping))
+    admin.add_view(ConstraintDefinitionView(ConstraintDefinition))
     admin.add_view(ValidationRuleView(ValidationRule))
     admin.add_view(IndexDefinitionView(IndexDefinition))
     admin.add_view(SchemaProjectionView(SchemaProjection))

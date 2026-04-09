@@ -87,6 +87,14 @@ _INDEX_TYPE_CAPABILITY: dict[str, Capability] = {
     "lookup": Capability.LOOKUP_INDEX,
 }
 
+# Constraint types that require specific capabilities
+_CONSTRAINT_TYPE_CAPABILITY: dict[str, Capability] = {
+    "exists": Capability.SCHEMA_ENFORCEMENT,
+    "node_key": Capability.SCHEMA_ENFORCEMENT,
+    "relationship_unique": Capability.RELATIONSHIP_PROPERTY_CONSTRAINTS,
+    "relationship_exists": Capability.RELATIONSHIP_PROPERTY_CONSTRAINTS,
+}
+
 # ---------------------------------------------------------------------------
 # Projector
 # ---------------------------------------------------------------------------
@@ -177,6 +185,21 @@ class Projector:
         for dc in desired_constraints:
             if dc.key in live_con_keys:
                 continue
+            # Check capability gate
+            required_cap = _CONSTRAINT_TYPE_CAPABILITY.get(dc.constraint_type)
+            if required_cap and required_cap not in caps:
+                errors.append(
+                    {
+                        "type": "unsupported_constraint",
+                        "name": dc.name,
+                        "constraint_type": dc.constraint_type,
+                        "message": (
+                            f"Constraint type '{dc.constraint_type}' requires capability "
+                            f"'{required_cap}' not supported by connector."
+                        ),
+                    }
+                )
+                continue
             try:
                 await connector.schema_writer.create_constraint(
                     dc.label,
@@ -260,70 +283,17 @@ class Projector:
         version: SchemaVersion,
         caps: set[Capability],
     ) -> list[_DesiredConstraint]:
-        """Derive the set of constraints that should exist from node/edge property definitions."""
+        """Derive the set of constraints from the explicit ConstraintDefinition entities."""
         desired: list[_DesiredConstraint] = []
 
-        # Node type constraints
-        for nt in version.node_types:
-            unique_required: list[str] = []
-            for prop in nt.properties:
-                if prop.unique:
-                    name = f"constraint_{nt.name}_{prop.name}_unique"
-                    desired.append(
-                        _DesiredConstraint(
-                            name=name,
-                            label=nt.name,
-                            properties=[prop.name],
-                            constraint_type="unique",
-                        )
-                    )
-                if prop.required and Capability.SCHEMA_ENFORCEMENT in caps:
-                    name = f"constraint_{nt.name}_{prop.name}_exists"
-                    desired.append(
-                        _DesiredConstraint(
-                            name=name,
-                            label=nt.name,
-                            properties=[prop.name],
-                            constraint_type="exists",
-                        )
-                    )
-                if prop.unique and prop.required:
-                    unique_required.append(prop.name)
-
-            # Node key for multiple unique+required properties
-            if len(unique_required) > 1 and Capability.SCHEMA_ENFORCEMENT in caps:
-                name = f"constraint_{nt.name}_node_key"
-                desired.append(
-                    _DesiredConstraint(
-                        name=name,
-                        label=nt.name,
-                        properties=unique_required,
-                        constraint_type="node_key",
-                    )
+        for c in version.constraints:
+            desired.append(
+                _DesiredConstraint(
+                    name=c.name,
+                    label=c.target_label,
+                    properties=c.properties,
+                    constraint_type=c.constraint_type,
                 )
-
-        # Edge type constraints
-        for et in version.edge_types:
-            for prop in et.properties:
-                if prop.unique and Capability.RELATIONSHIP_PROPERTY_CONSTRAINTS in caps:
-                    name = f"constraint_{et.name}_{prop.name}_rel_unique"
-                    desired.append(
-                        _DesiredConstraint(
-                            name=name,
-                            label=et.name,
-                            properties=[prop.name],
-                            constraint_type="relationship_unique",
-                        )
-                    )
-                if prop.required and Capability.RELATIONSHIP_PROPERTY_CONSTRAINTS in caps:
-                    name = f"constraint_{et.name}_{prop.name}_rel_exists"
-                    desired.append(
-                        _DesiredConstraint(
-                            name=name,
-                            label=et.name,
-                            properties=[prop.name],
-                            constraint_type="relationship_exists",
-                        )
-                    )
+            )
 
         return desired

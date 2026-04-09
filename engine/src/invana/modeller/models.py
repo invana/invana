@@ -2,14 +2,16 @@
 
 Tables
 ------
-- ``graph_schemas``          — top-level schema container
-- ``schema_versions``        — immutable snapshots (draft → active → archived)
-- ``node_type_definitions``  — node types with inheritance and display metadata
-- ``edge_type_definitions``  — edge types with multiplicity and endpoint restrictions
-- ``property_definitions``   — properties on node/edge types
-- ``validation_rules``       — per-property validation rules
-- ``index_definitions``      — schema-managed indexes
-- ``schema_projections``     — records of DDL pushed to graph databases
+- ``graph_schemas``              — top-level schema container
+- ``schema_versions``            — immutable snapshots (draft → active → archived)
+- ``property_key_definitions``   — global property keys (name + type), one per version
+- ``node_type_definitions``      — node types with inheritance and display metadata
+- ``edge_type_definitions``      — edge types with multiplicity and endpoint restrictions
+- ``type_property_mappings``     — links property keys to node/edge types
+- ``validation_rules``           — per-property-key or per-mapping validation rules
+- ``constraint_definitions``     — explicit constraints (unique, exists, node_key) on labels
+- ``index_definitions``          — schema-managed indexes
+- ``schema_projections``         — records of DDL pushed to graph databases
 """
 
 from __future__ import annotations
@@ -92,10 +94,48 @@ class SchemaVersion(Base):
     activated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     schema: Mapped[GraphSchema] = relationship(back_populates="versions")
+    property_keys: Mapped[list[PropertyKeyDefinition]] = relationship(
+        back_populates="version", cascade="all, delete-orphan"
+    )
     node_types: Mapped[list[NodeTypeDefinition]] = relationship(back_populates="version", cascade="all, delete-orphan")
     edge_types: Mapped[list[EdgeTypeDefinition]] = relationship(back_populates="version", cascade="all, delete-orphan")
+    constraints: Mapped[list[ConstraintDefinition]] = relationship(
+        back_populates="version", cascade="all, delete-orphan"
+    )
     indexes: Mapped[list[IndexDefinition]] = relationship(back_populates="version", cascade="all, delete-orphan")
     projections: Mapped[list[SchemaProjection]] = relationship(back_populates="version", cascade="all, delete-orphan")
+
+
+# ---------------------------------------------------------------------------
+# Property Key Definition (global per version)
+# ---------------------------------------------------------------------------
+
+
+class PropertyKeyDefinition(Base):
+    """A global property key — defined once per version, used by many types."""
+
+    __tablename__ = "property_key_definitions"
+    __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_property_key"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[str] = mapped_column(String(64), nullable=False, default="string")
+    value_cardinality: Mapped[str] = mapped_column(
+        Enum("SINGLE", "LIST", "SET", name="value_cardinality_enum"),
+        default="SINGLE",
+    )
+    description: Mapped[str] = mapped_column(Text, default="")
+
+    version: Mapped[SchemaVersion] = relationship(back_populates="property_keys")
+    mappings: Mapped[list[TypePropertyMapping]] = relationship(
+        back_populates="property_key", cascade="all, delete-orphan"
+    )
+    validation_rules: Mapped[list[ValidationRule]] = relationship(
+        back_populates="property_key",
+        cascade="all, delete-orphan",
+        foreign_keys="ValidationRule.property_key_id",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -114,14 +154,12 @@ class NodeTypeDefinition(Base):
     parent_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_abstract: Mapped[bool] = mapped_column(Boolean, default=False)
     validation_mode: Mapped[str | None] = mapped_column(String(16), nullable=True)
-    color: Mapped[str | None] = mapped_column(String(16), nullable=True)
-    icon: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     version: Mapped[SchemaVersion] = relationship(back_populates="node_types")
-    properties: Mapped[list[PropertyDefinition]] = relationship(
+    property_mappings: Mapped[list[TypePropertyMapping]] = relationship(
         back_populates="node_type",
         cascade="all, delete-orphan",
-        foreign_keys="PropertyDefinition.node_type_id",
+        foreign_keys="TypePropertyMapping.node_type_id",
     )
 
 
@@ -144,50 +182,49 @@ class EdgeTypeDefinition(Base):
         Enum("MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE", name="multiplicity_enum"),
         default="MULTI",
     )
-    allowed_properties: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     version: Mapped[SchemaVersion] = relationship(back_populates="edge_types")
-    properties: Mapped[list[PropertyDefinition]] = relationship(
+    property_mappings: Mapped[list[TypePropertyMapping]] = relationship(
         back_populates="edge_type",
         cascade="all, delete-orphan",
-        foreign_keys="PropertyDefinition.edge_type_id",
+        foreign_keys="TypePropertyMapping.edge_type_id",
     )
 
 
 # ---------------------------------------------------------------------------
-# Property Definition
+# Type Property Mapping (links property keys to types)
 # ---------------------------------------------------------------------------
 
 
-class PropertyDefinition(Base):
-    __tablename__ = "property_definitions"
+class TypePropertyMapping(Base):
+    """How a specific node/edge type uses a global property key."""
+
+    __tablename__ = "type_property_mappings"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    property_key_id: Mapped[str] = mapped_column(
+        ForeignKey("property_key_definitions.id", ondelete="CASCADE"), nullable=False
+    )
     node_type_id: Mapped[str | None] = mapped_column(
         ForeignKey("node_type_definitions.id", ondelete="CASCADE"), nullable=True
     )
     edge_type_id: Mapped[str | None] = mapped_column(
         ForeignKey("edge_type_definitions.id", ondelete="CASCADE"), nullable=True
     )
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    type: Mapped[str] = mapped_column(String(64), nullable=False, default="string")
-    value_cardinality: Mapped[str] = mapped_column(
-        Enum("SINGLE", "LIST", "SET", name="value_cardinality_enum"),
-        default="SINGLE",
-    )
-    required: Mapped[bool] = mapped_column(Boolean, default=False)
-    unique: Mapped[bool] = mapped_column(Boolean, default=False)
     default_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
+    property_key: Mapped[PropertyKeyDefinition] = relationship(back_populates="mappings")
     node_type: Mapped[NodeTypeDefinition | None] = relationship(
-        back_populates="properties", foreign_keys=[node_type_id]
+        back_populates="property_mappings", foreign_keys=[node_type_id]
     )
     edge_type: Mapped[EdgeTypeDefinition | None] = relationship(
-        back_populates="properties", foreign_keys=[edge_type_id]
+        back_populates="property_mappings", foreign_keys=[edge_type_id]
     )
     validation_rules: Mapped[list[ValidationRule]] = relationship(
-        back_populates="property", cascade="all, delete-orphan"
+        back_populates="type_property_mapping",
+        cascade="all, delete-orphan",
+        foreign_keys="ValidationRule.type_property_mapping_id",
     )
 
 
@@ -200,14 +237,58 @@ class ValidationRule(Base):
     __tablename__ = "validation_rules"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    property_id: Mapped[str] = mapped_column(ForeignKey("property_definitions.id", ondelete="CASCADE"), nullable=False)
+    property_key_id: Mapped[str | None] = mapped_column(
+        ForeignKey("property_key_definitions.id", ondelete="CASCADE"), nullable=True
+    )
+    type_property_mapping_id: Mapped[str | None] = mapped_column(
+        ForeignKey("type_property_mappings.id", ondelete="CASCADE"), nullable=True
+    )
     rule_type: Mapped[str] = mapped_column(
         Enum("range", "pattern", "enum", "min_length", "max_length", "custom", name="rule_type_enum"),
         nullable=False,
     )
     params: Mapped[dict] = mapped_column(JSON, default=dict)
 
-    property: Mapped[PropertyDefinition] = relationship(back_populates="validation_rules")
+    property_key: Mapped[PropertyKeyDefinition | None] = relationship(
+        back_populates="validation_rules", foreign_keys=[property_key_id]
+    )
+    type_property_mapping: Mapped[TypePropertyMapping | None] = relationship(
+        back_populates="validation_rules", foreign_keys=[type_property_mapping_id]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Constraint Definition
+# ---------------------------------------------------------------------------
+
+
+class ConstraintDefinition(Base):
+    """Explicit constraint on a label's properties (unique, exists, node_key, etc.)."""
+
+    __tablename__ = "constraint_definitions"
+    __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_constraint"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    target_kind: Mapped[str] = mapped_column(
+        Enum("node_type", "edge_type", name="constraint_target_kind_enum"), nullable=False
+    )
+    target_label: Mapped[str] = mapped_column(String(255), nullable=False)
+    constraint_type: Mapped[str] = mapped_column(
+        Enum(
+            "unique",
+            "exists",
+            "node_key",
+            "relationship_unique",
+            "relationship_exists",
+            name="constraint_type_enum",
+        ),
+        nullable=False,
+    )
+    properties: Mapped[list] = mapped_column(JSON, nullable=False)
+
+    version: Mapped[SchemaVersion] = relationship(back_populates="constraints")
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +312,6 @@ class IndexDefinition(Base):
         Enum("range", "composite", "fulltext", "text", "point", "lookup", name="index_type_enum"),
         default="range",
     )
-    is_unique: Mapped[bool] = mapped_column(Boolean, default=False)
     index_options: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     version: Mapped[SchemaVersion] = relationship(back_populates="indexes")

@@ -26,7 +26,7 @@ from invana.modeller.inheritance import (
     build_hierarchy,
     build_type_map,
     get_subtypes,
-    resolve_effective_properties,
+    resolve_effective_mappings,
 )
 from invana.modeller.introspector import Introspector
 from invana.modeller.json_io import SchemaExporter, SchemaImporter
@@ -56,5 +56,5 @@ __all__ = [
     "create_db_engine",
     "create_session_factory",
     "get_subtypes",
-    "resolve_effective_properties",
+    "resolve_effective_mappings",
 ]

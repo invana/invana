@@ -15,16 +15,23 @@ class TestSchemaValidator:
         version = await store.create_version(session, schema_id=schema.id)
         await session.commit()
 
+        # Create global property keys
+        await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await store.create_property_key(session, version_id=version.id, name="age", type="integer")
+        await store.create_property_key(session, version_id=version.id, name="email", type="string")
+        await store.create_property_key(session, version_id=version.id, name="department", type="string")
+        await store.create_property_key(session, version_id=version.id, name="since", type="integer")
+        await session.commit()
+
         await store.create_node_type(
             session,
             version_id=version.id,
             name="Person",
-            properties=[
-                {"name": "name", "type": "string", "required": True},
-                {"name": "age", "type": "integer"},
+            property_mappings=[
+                {"property_key": "name"},
+                {"property_key": "age"},
                 {
-                    "name": "email",
-                    "type": "string",
+                    "property_key": "email",
                     "validation_rules": [
                         {"rule_type": "pattern", "params": {"pattern": r"^[\w.+-]+@[\w-]+\.[\w.]+$"}},
                     ],
@@ -36,8 +43,8 @@ class TestSchemaValidator:
             version_id=version.id,
             name="Employee",
             parent_type="Person",
-            properties=[
-                {"name": "department", "type": "string", "required": True},
+            property_mappings=[
+                {"property_key": "department"},
             ],
         )
         await store.create_node_type(
@@ -52,7 +59,36 @@ class TestSchemaValidator:
             name="KNOWS",
             source_node_types=["Person"],
             target_node_types=["Person"],
-            properties=[{"name": "since", "type": "integer"}],
+            property_mappings=[{"property_key": "since"}],
+        )
+        # Constraints: name required on Person, department required on Employee
+        await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="person_name_exists",
+            target_kind="node_type",
+            target_label="Person",
+            constraint_type="exists",
+            properties=["name"],
+        )
+        await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="employee_dept_exists",
+            target_kind="node_type",
+            target_label="Employee",
+            constraint_type="exists",
+            properties=["department"],
+        )
+        # Also add inherited required for Employee's inherited "name"
+        await store.create_constraint(
+            session,
+            version_id=version.id,
+            name="employee_name_exists",
+            target_kind="node_type",
+            target_label="Employee",
+            constraint_type="exists",
+            properties=["name"],
         )
         await session.commit()
 
@@ -140,7 +176,7 @@ class TestSchemaValidator:
         assert not any(e.code == "unknown_property" for e in errors)
 
     async def test_inherited_properties_validated(self, session, store):
-        """Employee inherits 'name' (required) from Person."""
+        """Employee inherits 'name' (required via constraint) from Person."""
         version = await self._setup_schema(session, store)
         validator = SchemaValidator()
         validator.load(version)
