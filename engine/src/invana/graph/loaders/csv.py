@@ -262,8 +262,8 @@ class CSVLoader:
 
         stats.duration_seconds = time.monotonic() - start
         logger.info(
-            "Loaded directory %s: %d vertices, %d edges, %d errors (%.2fs)",
-            path,
+            "  loaded %-40s vertices=%-6d edges=%-6d errors=%d  (%.2fs)",
+            Path(path).name,
             stats.vertices_created,
             stats.edges_created,
             len(stats.errors),
@@ -287,6 +287,7 @@ class CSVLoader:
         start = time.monotonic()
 
         rows = _read_csv(path)
+        logger.info("  [nodes]         %-35s %d rows", path.name, len(rows))
         parsed = [_parse_node_row(r, label) for r in rows]
 
         by_label: dict[str, list[dict]] = {}
@@ -321,6 +322,7 @@ class CSVLoader:
         start = time.monotonic()
 
         rows = _read_csv(path)
+        logger.info("  [relationships] %-35s %d rows", path.name, len(rows))
         parsed = [_parse_edge_row(r, label) for r in rows]
 
         by_label: dict[str, list[dict]] = {}
