@@ -1,0 +1,151 @@
+Id,Label,Properties:name,Properties:icdCode,Properties:category,Properties:prevalence,Properties:mortality,Properties:severity,Properties:chronicStatus,Properties:symptoms,Properties:riskFactors,Properties:source,Properties:confidence
+DISEASE_00001,Disease,Bipolar_Disorder,K23.8,PSYCHIATRIC,13.44,0.22,mild,chronic,cough; fever; chest pain,stress; diabetes; obesity,ICD10,0.925
+DISEASE_00002,Disease,Migraine,K42.1,METABOLIC,5.98,1.65,mild,acute,chest pain; cough,smoking; hypertension; stress; age,ICD10,0.981
+DISEASE_00003,Disease,Asthma,F72.1,CARDIOVASCULAR,10.26,4.4,mild,acute,shortness of breath; dizziness; fatigue; cough,diabetes; family history; sedentary lifestyle,ICD10,0.92
+DISEASE_00004,Disease,Cancer,F66.9,RESPIRATORY,14.78,1.8,moderate,acute,nausea; fatigue,age; stress,ICD10,0.904
+DISEASE_00005,Disease,Insomnia,J51.7,PSYCHIATRIC,3.79,1.31,severe,chronic,headache; fever; shortness of breath; dizziness,hypertension; poor diet,ICD10,0.972
+DISEASE_00006,Disease,Stroke,K46.0,ONCOLOGY,0.19,2.94,mild,acute,fever; chest pain; fatigue,obesity; sedentary lifestyle; stress,ICD10,0.961
+DISEASE_00007,Disease,Parkinsons,F55.9,NEUROLOGICAL,14.77,0.47,moderate,chronic,fever; abdominal pain; chest pain; headache,hypertension; age; diabetes; smoking,ICD10,0.944
+DISEASE_00008,Disease,Schizophrenia,J99.2,INFECTIOUS,7.96,1.69,mild,chronic,fever; nausea; dizziness; abdominal pain,obesity; diabetes; family history; smoking,ICD10,0.946
+DISEASE_00009,Disease,Bronchitis,K75.0,PSYCHIATRIC,7.33,1.71,moderate,chronic,abdominal pain; headache; fever; nausea,hypertension; obesity; stress; smoking,ICD10,0.942
+DISEASE_00010,Disease,Hypertension,K29.0,PSYCHIATRIC,7.18,1.97,mild,acute,cough; chest pain,diabetes; obesity; stress; poor diet,ICD10,0.975
+DISEASE_00011,Disease,Insomnia,J93.2,NEUROLOGICAL,2.87,0.02,severe,chronic,nausea; fatigue,diabetes; stress; smoking; age,ICD10,0.943
+DISEASE_00012,Disease,Osteoporosis,F36.1,RESPIRATORY,1.48,1.25,severe,chronic,dizziness; abdominal pain; headache; chest pain,family history; stress; sedentary lifestyle,ICD10,0.906
+DISEASE_00013,Disease,Hyperlipidemia,K90.1,GASTROINTESTINAL,1.72,3.81,moderate,chronic,headache; nausea; dizziness; abdominal pain,smoking; family history; obesity; diabetes,ICD10,0.948
+DISEASE_00014,Disease,Bronchitis,K11.4,ONCOLOGY,12.27,1.06,moderate,acute,shortness of breath; cough; fever,poor diet; age; stress; hypertension,ICD10,0.935
+DISEASE_00015,Disease,Schizophrenia,K40.6,ONCOLOGY,3.27,0.45,severe,acute,fever; nausea; cough; abdominal pain,smoking; hypertension,ICD10,0.919
+DISEASE_00016,Disease,Bronchitis,J98.8,ONCOLOGY,5.05,2.08,mild,chronic,fever; shortness of breath; chest pain,age; sedentary lifestyle; poor diet; stress,ICD10,0.905
+DISEASE_00017,Disease,Parkinsons,I26.0,INFECTIOUS,13.84,2.54,moderate,acute,fever; shortness of breath; nausea; abdominal pain,smoking; poor diet; age; stress,ICD10,0.931
+DISEASE_00018,Disease,Obesity,I64.2,PSYCHIATRIC,1.77,3.35,severe,chronic,nausea; headache; dizziness,age; family history; hypertension,ICD10,0.972
+DISEASE_00019,Disease,Atrial_Fibrillation,E76.0,METABOLIC,0.45,4.38,moderate,acute,headache; abdominal pain; cough; fever,poor diet; hypertension; family history,ICD10,0.917
+DISEASE_00020,Disease,Schizophrenia,I59.8,ONCOLOGY,11.07,1.77,severe,acute,dizziness; fever; fatigue,sedentary lifestyle; stress,ICD10,0.942
+DISEASE_00021,Disease,Asthma,F12.5,METABOLIC,14.02,0.29,severe,chronic,fatigue; abdominal pain; shortness of breath,age; stress,ICD10,0.94
+DISEASE_00022,Disease,Parkinsons,E10.9,GASTROINTESTINAL,5.51,4.21,moderate,chronic,chest pain; headache,poor diet; smoking; sedentary lifestyle,ICD10,0.933
+DISEASE_00023,Disease,Parkinsons,K50.5,CARDIOVASCULAR,4.19,2.39,mild,acute,chest pain; nausea; fever; dizziness,smoking; diabetes,ICD10,0.944
+DISEASE_00024,Disease,Pneumonia,F29.5,PSYCHIATRIC,13.49,1.02,mild,chronic,chest pain; abdominal pain; fever; dizziness,obesity; age; hypertension,ICD10,0.936
+DISEASE_00025,Disease,Migraine,J87.7,INFECTIOUS,2.82,0.27,mild,chronic,chest pain; fatigue; abdominal pain,obesity; family history; sedentary lifestyle; smoking,ICD10,0.977
+DISEASE_00026,Disease,Hypertension,J23.7,PSYCHIATRIC,12.35,4.95,mild,acute,abdominal pain; fever; shortness of breath,sedentary lifestyle; obesity; smoking,ICD10,0.9
+DISEASE_00027,Disease,Pneumonia,J37.9,GASTROINTESTINAL,4.71,4.26,mild,acute,dizziness; cough,diabetes; poor diet; family history,ICD10,0.907
+DISEASE_00028,Disease,Disease_028_28,K79.9,METABOLIC,8.92,3.94,mild,acute,dizziness; fever; shortness of breath,smoking; diabetes,ICD10,0.921
+DISEASE_00029,Disease,Disease_029_29,E80.7,NEUROLOGICAL,0.2,0.8,moderate,acute,shortness of breath; cough,sedentary lifestyle; stress,ICD10,0.977
+DISEASE_00030,Disease,Disease_030_30,J17.9,GASTROINTESTINAL,13.03,1.22,severe,chronic,dizziness; chest pain; fever,diabetes; hypertension; smoking; poor diet,ICD10,0.964
+DISEASE_00031,Disease,Disease_031_31,E77.3,METABOLIC,10.53,3.71,severe,chronic,shortness of breath; cough; abdominal pain; headache,obesity; sedentary lifestyle; smoking,ICD10,0.936
+DISEASE_00032,Disease,Disease_032_32,E30.1,METABOLIC,11.84,4.24,mild,chronic,nausea; chest pain; dizziness; fatigue,hypertension; smoking,ICD10,0.96
+DISEASE_00033,Disease,Disease_033_33,I86.2,ONCOLOGY,5.99,3.1,moderate,acute,shortness of breath; abdominal pain; fever; nausea,age; hypertension; sedentary lifestyle; family history,ICD10,0.901
+DISEASE_00034,Disease,Disease_034_34,K80.5,RESPIRATORY,6.54,4.45,severe,chronic,chest pain; nausea; fever,poor diet; sedentary lifestyle; diabetes; stress,ICD10,0.922
+DISEASE_00035,Disease,Disease_035_35,K58.2,RESPIRATORY,12.6,4.06,moderate,chronic,dizziness; fatigue; chest pain; fever,family history; poor diet; stress,ICD10,0.936
+DISEASE_00036,Disease,Disease_036_36,J43.3,NEUROLOGICAL,3.91,3.51,mild,acute,nausea; fatigue,family history; sedentary lifestyle,ICD10,0.931
+DISEASE_00037,Disease,Disease_037_37,K78.4,PSYCHIATRIC,7.42,3.5,mild,acute,dizziness; chest pain,age; poor diet; sedentary lifestyle; hypertension,ICD10,0.914
+DISEASE_00038,Disease,Disease_038_38,I84.6,RESPIRATORY,8.33,4.9,mild,chronic,chest pain; shortness of breath; dizziness,stress; smoking; obesity; diabetes,ICD10,0.965
+DISEASE_00039,Disease,Disease_039_39,E60.9,METABOLIC,4.4,2.64,severe,chronic,cough; chest pain,obesity; diabetes,ICD10,0.965
+DISEASE_00040,Disease,Disease_040_40,F57.8,CARDIOVASCULAR,0.45,4.41,severe,acute,shortness of breath; cough; dizziness; headache,smoking; age; hypertension,ICD10,0.926
+DISEASE_00041,Disease,Disease_041_41,K84.6,GASTROINTESTINAL,0.14,4.42,moderate,acute,headache; fever; chest pain,obesity; family history; diabetes; sedentary lifestyle,ICD10,0.95
+DISEASE_00042,Disease,Disease_042_42,F32.7,INFECTIOUS,4.14,0.11,moderate,acute,shortness of breath; chest pain; dizziness,diabetes; stress; hypertension,ICD10,0.927
+DISEASE_00043,Disease,Disease_043_43,F78.0,NEUROLOGICAL,5.71,3.55,moderate,acute,cough; abdominal pain; fever; headache,hypertension; smoking; obesity,ICD10,0.909
+DISEASE_00044,Disease,Disease_044_44,F41.0,PSYCHIATRIC,3.4,3.99,severe,acute,chest pain; nausea,family history; poor diet,ICD10,0.923
+DISEASE_00045,Disease,Disease_045_45,J12.6,METABOLIC,7.11,4.51,moderate,chronic,shortness of breath; dizziness; fatigue,sedentary lifestyle; stress; hypertension; family history,ICD10,0.952
+DISEASE_00046,Disease,Disease_046_46,E61.2,NEUROLOGICAL,7.73,0.88,moderate,chronic,dizziness; chest pain; nausea,family history; poor diet; hypertension,ICD10,0.909
+DISEASE_00047,Disease,Disease_047_47,K74.8,CARDIOVASCULAR,5.44,0.39,mild,chronic,abdominal pain; chest pain; shortness of breath,hypertension; obesity,ICD10,0.951
+DISEASE_00048,Disease,Disease_048_48,E81.9,CARDIOVASCULAR,3.68,0.16,moderate,acute,abdominal pain; fatigue; chest pain,family history; stress; diabetes,ICD10,0.924
+DISEASE_00049,Disease,Disease_049_49,I47.8,INFECTIOUS,12.84,3.45,moderate,acute,fatigue; shortness of breath,age; sedentary lifestyle; smoking,ICD10,0.985
+DISEASE_00050,Disease,Disease_050_50,F80.0,INFECTIOUS,12.7,1.13,moderate,acute,cough; headache; abdominal pain,hypertension; stress; diabetes; sedentary lifestyle,ICD10,0.918
+DISEASE_00051,Disease,Disease_051_51,E88.0,ONCOLOGY,6.24,1.67,severe,chronic,shortness of breath; cough; nausea; headache,stress; smoking; age,ICD10,0.985
+DISEASE_00052,Disease,Disease_052_52,F83.6,METABOLIC,12.26,0.16,severe,acute,chest pain; shortness of breath,sedentary lifestyle; obesity; smoking,ICD10,0.913
+DISEASE_00053,Disease,Disease_053_53,K36.3,CARDIOVASCULAR,14.64,0.78,mild,acute,nausea; abdominal pain; chest pain,diabetes; stress; hypertension; obesity,ICD10,0.903
+DISEASE_00054,Disease,Disease_054_54,F77.7,ONCOLOGY,9.75,2.61,mild,acute,abdominal pain; headache; nausea,age; stress; smoking,ICD10,0.935
+DISEASE_00055,Disease,Disease_055_55,E12.0,RESPIRATORY,12.16,0.01,moderate,acute,cough; abdominal pain; dizziness,stress; age; obesity,ICD10,0.969
+DISEASE_00056,Disease,Disease_056_56,I18.6,GASTROINTESTINAL,6.48,4.1,mild,chronic,fatigue; nausea; abdominal pain; cough,smoking; sedentary lifestyle; poor diet,ICD10,0.96
+DISEASE_00057,Disease,Disease_057_57,I29.7,PSYCHIATRIC,12.06,4.21,mild,chronic,shortness of breath; chest pain; headache; abdominal pain,smoking; obesity; stress; age,ICD10,0.918
+DISEASE_00058,Disease,Disease_058_58,J19.2,GASTROINTESTINAL,4.26,2.04,severe,chronic,dizziness; fatigue; chest pain,diabetes; stress; hypertension,ICD10,0.931
+DISEASE_00059,Disease,Disease_059_59,I21.6,NEUROLOGICAL,4.93,4.46,severe,chronic,fatigue; fever; cough; shortness of breath,stress; sedentary lifestyle; age,ICD10,0.941
+DISEASE_00060,Disease,Disease_060_60,K75.3,RESPIRATORY,14.63,0.74,severe,acute,shortness of breath; nausea; cough,stress; hypertension; family history; diabetes,ICD10,0.942
+DISEASE_00061,Disease,Disease_061_61,E34.8,CARDIOVASCULAR,6.4,2.45,moderate,acute,fever; shortness of breath; dizziness,age; poor diet; diabetes,ICD10,0.907
+DISEASE_00062,Disease,Disease_062_62,J37.2,GASTROINTESTINAL,2.77,4.99,mild,acute,shortness of breath; fatigue; nausea; cough,obesity; smoking,ICD10,0.958
+DISEASE_00063,Disease,Disease_063_63,E49.1,GASTROINTESTINAL,0.79,1.15,mild,acute,cough; abdominal pain; dizziness,family history; smoking,ICD10,0.904
+DISEASE_00064,Disease,Disease_064_64,I10.0,METABOLIC,7.14,3.34,severe,acute,headache; abdominal pain,hypertension; smoking; sedentary lifestyle,ICD10,0.964
+DISEASE_00065,Disease,Disease_065_65,J85.0,PSYCHIATRIC,5.0,2.22,severe,chronic,shortness of breath; abdominal pain; cough; nausea,family history; smoking; poor diet,ICD10,0.932
+DISEASE_00066,Disease,Disease_066_66,F45.9,NEUROLOGICAL,11.09,0.84,mild,chronic,fatigue; abdominal pain; dizziness; nausea,hypertension; stress; diabetes; obesity,ICD10,0.923
+DISEASE_00067,Disease,Disease_067_67,E44.2,GASTROINTESTINAL,6.87,4.77,mild,acute,dizziness; cough; abdominal pain; fever,sedentary lifestyle; smoking,ICD10,0.931
+DISEASE_00068,Disease,Disease_068_68,J58.8,RESPIRATORY,6.53,0.22,mild,chronic,shortness of breath; cough; headache,sedentary lifestyle; family history,ICD10,0.964
+DISEASE_00069,Disease,Disease_069_69,I36.4,CARDIOVASCULAR,13.45,0.64,severe,chronic,dizziness; abdominal pain,obesity; stress; age; hypertension,ICD10,0.93
+DISEASE_00070,Disease,Disease_070_70,E75.1,METABOLIC,0.52,1.13,mild,acute,dizziness; cough,smoking; obesity,ICD10,0.97
+DISEASE_00071,Disease,Disease_071_71,J13.0,CARDIOVASCULAR,8.57,1.96,severe,acute,fever; dizziness; nausea,hypertension; family history; stress; obesity,ICD10,0.984
+DISEASE_00072,Disease,Disease_072_72,J46.3,PSYCHIATRIC,9.02,2.54,mild,chronic,chest pain; shortness of breath,poor diet; family history,ICD10,0.917
+DISEASE_00073,Disease,Disease_073_73,K59.2,ONCOLOGY,12.73,1.4,mild,chronic,shortness of breath; fatigue,sedentary lifestyle; age; poor diet,ICD10,0.918
+DISEASE_00074,Disease,Disease_074_74,E20.0,ONCOLOGY,11.99,3.28,severe,acute,fever; cough; nausea,stress; hypertension,ICD10,0.929
+DISEASE_00075,Disease,Disease_075_75,E66.9,NEUROLOGICAL,8.04,4.57,mild,acute,nausea; fever; chest pain,age; diabetes,ICD10,0.923
+DISEASE_00076,Disease,Disease_076_76,I19.2,PSYCHIATRIC,9.54,0.86,mild,chronic,fatigue; shortness of breath,age; stress,ICD10,0.952
+DISEASE_00077,Disease,Disease_077_77,F17.2,CARDIOVASCULAR,0.55,4.51,mild,acute,chest pain; fatigue; dizziness,diabetes; obesity; hypertension; family history,ICD10,0.956
+DISEASE_00078,Disease,Disease_078_78,I70.6,CARDIOVASCULAR,10.78,4.25,severe,chronic,abdominal pain; headache,smoking; obesity; family history; hypertension,ICD10,0.923
+DISEASE_00079,Disease,Disease_079_79,I96.7,ONCOLOGY,10.32,3.42,mild,chronic,nausea; fatigue; chest pain; shortness of breath,poor diet; stress,ICD10,0.95
+DISEASE_00080,Disease,Disease_080_80,K48.2,PSYCHIATRIC,7.85,0.79,severe,chronic,cough; fever; dizziness; shortness of breath,sedentary lifestyle; diabetes,ICD10,0.961
+DISEASE_00081,Disease,Disease_081_81,K34.0,RESPIRATORY,14.4,1.5,mild,acute,abdominal pain; fever; chest pain; dizziness,stress; sedentary lifestyle; diabetes; poor diet,ICD10,0.909
+DISEASE_00082,Disease,Disease_082_82,I12.1,CARDIOVASCULAR,6.12,1.75,severe,acute,fatigue; abdominal pain; nausea; dizziness,hypertension; smoking; obesity; sedentary lifestyle,ICD10,0.946
+DISEASE_00083,Disease,Disease_083_83,E93.1,PSYCHIATRIC,1.15,4.89,severe,chronic,chest pain; fatigue,obesity; poor diet; age,ICD10,0.938
+DISEASE_00084,Disease,Disease_084_84,E68.7,RESPIRATORY,1.04,2.72,mild,acute,abdominal pain; fatigue,family history; obesity; poor diet,ICD10,0.983
+DISEASE_00085,Disease,Disease_085_85,F35.4,PSYCHIATRIC,13.81,0.46,moderate,acute,nausea; cough; chest pain; abdominal pain,obesity; sedentary lifestyle; smoking; hypertension,ICD10,0.924
+DISEASE_00086,Disease,Disease_086_86,E27.4,RESPIRATORY,0.61,4.22,mild,acute,abdominal pain; dizziness; fatigue,age; diabetes,ICD10,0.981
+DISEASE_00087,Disease,Disease_087_87,I65.7,INFECTIOUS,1.66,2.41,mild,chronic,chest pain; abdominal pain; shortness of breath,diabetes; hypertension; smoking; sedentary lifestyle,ICD10,0.982
+DISEASE_00088,Disease,Disease_088_88,E90.8,GASTROINTESTINAL,7.92,0.53,severe,chronic,nausea; cough; fatigue,obesity; diabetes,ICD10,0.975
+DISEASE_00089,Disease,Disease_089_89,F45.4,ONCOLOGY,10.19,4.57,moderate,chronic,fever; abdominal pain,obesity; smoking; sedentary lifestyle; age,ICD10,0.952
+DISEASE_00090,Disease,Disease_090_90,I44.4,GASTROINTESTINAL,11.28,0.67,severe,acute,abdominal pain; fever; shortness of breath; headache,hypertension; smoking; obesity,ICD10,0.975
+DISEASE_00091,Disease,Disease_091_91,F75.3,NEUROLOGICAL,2.98,1.97,mild,acute,cough; shortness of breath; chest pain; fatigue,family history; smoking; age,ICD10,0.912
+DISEASE_00092,Disease,Disease_092_92,F85.6,RESPIRATORY,14.01,3.62,moderate,chronic,headache; fever; chest pain; dizziness,sedentary lifestyle; poor diet; family history; obesity,ICD10,0.983
+DISEASE_00093,Disease,Disease_093_93,K72.5,NEUROLOGICAL,2.6,3.26,severe,acute,fever; cough,family history; obesity; poor diet,ICD10,0.932
+DISEASE_00094,Disease,Disease_094_94,E84.2,CARDIOVASCULAR,7.48,4.78,moderate,chronic,dizziness; chest pain; cough; abdominal pain,age; family history; stress,ICD10,0.969
+DISEASE_00095,Disease,Disease_095_95,I17.3,ONCOLOGY,6.41,2.95,mild,chronic,dizziness; fatigue; headache; abdominal pain,age; sedentary lifestyle; smoking; diabetes,ICD10,0.989
+DISEASE_00096,Disease,Disease_096_96,I84.4,PSYCHIATRIC,12.92,1.16,mild,acute,cough; chest pain; nausea; fever,diabetes; poor diet; family history,ICD10,0.97
+DISEASE_00097,Disease,Disease_097_97,E45.7,INFECTIOUS,4.11,2.45,moderate,chronic,chest pain; fever; shortness of breath,diabetes; family history,ICD10,0.98
+DISEASE_00098,Disease,Disease_098_98,E53.0,GASTROINTESTINAL,9.91,3.33,severe,acute,dizziness; headache,poor diet; obesity; age,ICD10,0.947
+DISEASE_00099,Disease,Disease_099_99,F18.5,RESPIRATORY,2.87,2.47,moderate,chronic,cough; dizziness,age; poor diet; family history; smoking,ICD10,0.905
+DISEASE_00100,Disease,Disease_100_100,E82.6,RESPIRATORY,0.76,2.67,moderate,chronic,fatigue; dizziness,diabetes; sedentary lifestyle; stress,ICD10,0.956
+DISEASE_00101,Disease,Disease_101_101,E57.1,INFECTIOUS,6.08,2.97,mild,acute,dizziness; nausea; cough; chest pain,stress; age; diabetes; hypertension,ICD10,0.913
+DISEASE_00102,Disease,Disease_102_102,F65.6,PSYCHIATRIC,2.78,3.62,mild,acute,shortness of breath; chest pain; fever; cough,age; diabetes,ICD10,0.979
+DISEASE_00103,Disease,Disease_103_103,E23.1,INFECTIOUS,13.37,1.8,moderate,chronic,chest pain; cough; nausea; headache,diabetes; poor diet; sedentary lifestyle,ICD10,0.902
+DISEASE_00104,Disease,Disease_104_104,I74.8,RESPIRATORY,1.36,2.36,moderate,chronic,fatigue; chest pain,sedentary lifestyle; age; obesity,ICD10,0.984
+DISEASE_00105,Disease,Disease_105_105,J28.0,GASTROINTESTINAL,6.63,4.71,severe,chronic,headache; dizziness,hypertension; obesity; poor diet; family history,ICD10,0.952
+DISEASE_00106,Disease,Disease_106_106,E54.7,RESPIRATORY,11.17,1.2,mild,chronic,dizziness; nausea; cough,sedentary lifestyle; stress; hypertension,ICD10,0.967
+DISEASE_00107,Disease,Disease_107_107,I43.6,GASTROINTESTINAL,5.9,1.17,severe,chronic,chest pain; nausea; shortness of breath; abdominal pain,poor diet; age; diabetes,ICD10,0.99
+DISEASE_00108,Disease,Disease_108_108,J42.0,CARDIOVASCULAR,9.22,0.79,severe,acute,shortness of breath; dizziness; headache; cough,diabetes; stress; sedentary lifestyle,ICD10,0.948
+DISEASE_00109,Disease,Disease_109_109,F56.6,RESPIRATORY,14.75,1.48,moderate,chronic,headache; chest pain; cough; fever,hypertension; sedentary lifestyle,ICD10,0.915
+DISEASE_00110,Disease,Disease_110_110,K39.0,RESPIRATORY,14.07,2.54,severe,chronic,abdominal pain; nausea,family history; obesity; sedentary lifestyle,ICD10,0.94
+DISEASE_00111,Disease,Disease_111_111,J44.3,INFECTIOUS,10.45,1.13,mild,chronic,abdominal pain; headache; fatigue,diabetes; stress,ICD10,0.934
+DISEASE_00112,Disease,Disease_112_112,I30.8,INFECTIOUS,14.12,3.47,severe,chronic,abdominal pain; fatigue,hypertension; obesity; smoking,ICD10,0.914
+DISEASE_00113,Disease,Disease_113_113,I13.9,METABOLIC,2.34,0.62,severe,chronic,chest pain; abdominal pain; fatigue,stress; hypertension; obesity; sedentary lifestyle,ICD10,0.965
+DISEASE_00114,Disease,Disease_114_114,E32.7,INFECTIOUS,0.07,2.41,moderate,acute,abdominal pain; fatigue; shortness of breath; nausea,family history; poor diet; hypertension,ICD10,0.943
+DISEASE_00115,Disease,Disease_115_115,J62.0,RESPIRATORY,6.03,0.39,severe,chronic,abdominal pain; fatigue; shortness of breath,stress; poor diet,ICD10,0.943
+DISEASE_00116,Disease,Disease_116_116,K22.5,ONCOLOGY,2.66,4.31,severe,acute,fatigue; shortness of breath,smoking; family history,ICD10,0.953
+DISEASE_00117,Disease,Disease_117_117,F70.1,NEUROLOGICAL,9.06,2.85,moderate,acute,abdominal pain; fatigue; chest pain; headache,diabetes; stress; family history; age,ICD10,0.911
+DISEASE_00118,Disease,Disease_118_118,E57.3,METABOLIC,14.3,0.39,mild,chronic,nausea; fever,poor diet; obesity; diabetes; stress,ICD10,0.91
+DISEASE_00119,Disease,Disease_119_119,E83.6,RESPIRATORY,7.42,2.28,severe,acute,chest pain; dizziness,smoking; age; obesity; stress,ICD10,0.924
+DISEASE_00120,Disease,Disease_120_120,K79.3,PSYCHIATRIC,10.05,3.91,mild,chronic,fatigue; dizziness,poor diet; diabetes; family history; smoking,ICD10,0.905
+DISEASE_00121,Disease,Disease_121_121,J61.0,METABOLIC,13.47,3.03,severe,acute,fever; nausea; shortness of breath,smoking; poor diet,ICD10,0.959
+DISEASE_00122,Disease,Disease_122_122,K22.7,GASTROINTESTINAL,7.41,0.07,severe,acute,chest pain; shortness of breath,poor diet; diabetes; stress; sedentary lifestyle,ICD10,0.91
+DISEASE_00123,Disease,Disease_123_123,E95.7,NEUROLOGICAL,10.93,1.37,mild,chronic,fatigue; cough; nausea,obesity; stress; hypertension; smoking,ICD10,0.97
+DISEASE_00124,Disease,Disease_124_124,K99.5,INFECTIOUS,1.32,2.81,severe,chronic,abdominal pain; cough; fever; fatigue,smoking; poor diet; stress,ICD10,0.986
+DISEASE_00125,Disease,Disease_125_125,F87.9,NEUROLOGICAL,7.36,3.47,mild,acute,nausea; headache,obesity; smoking; stress,ICD10,0.97
+DISEASE_00126,Disease,Disease_126_126,K28.0,ONCOLOGY,1.04,1.82,severe,acute,chest pain; fever; shortness of breath; headache,obesity; sedentary lifestyle; diabetes; poor diet,ICD10,0.942
+DISEASE_00127,Disease,Disease_127_127,J63.7,NEUROLOGICAL,8.84,1.25,mild,acute,abdominal pain; nausea,family history; poor diet; smoking,ICD10,0.976
+DISEASE_00128,Disease,Disease_128_128,F85.4,INFECTIOUS,2.89,1.34,moderate,acute,cough; fever; chest pain,sedentary lifestyle; hypertension; poor diet; age,ICD10,0.907
+DISEASE_00129,Disease,Disease_129_129,J73.8,METABOLIC,9.04,2.42,severe,acute,cough; shortness of breath; fatigue,sedentary lifestyle; poor diet,ICD10,0.976
+DISEASE_00130,Disease,Disease_130_130,F18.0,METABOLIC,9.27,4.12,mild,acute,shortness of breath; nausea; chest pain; fatigue,sedentary lifestyle; diabetes,ICD10,0.95
+DISEASE_00131,Disease,Disease_131_131,F74.9,ONCOLOGY,10.99,3.19,mild,chronic,shortness of breath; cough; abdominal pain,stress; hypertension; family history; poor diet,ICD10,0.928
+DISEASE_00132,Disease,Disease_132_132,F23.7,PSYCHIATRIC,14.42,3.48,mild,chronic,chest pain; nausea; abdominal pain,stress; poor diet; sedentary lifestyle,ICD10,0.942
+DISEASE_00133,Disease,Disease_133_133,J72.4,METABOLIC,13.04,2.61,moderate,acute,dizziness; nausea; abdominal pain; chest pain,poor diet; age; diabetes; smoking,ICD10,0.955
+DISEASE_00134,Disease,Disease_134_134,K29.2,RESPIRATORY,9.23,3.26,moderate,chronic,abdominal pain; shortness of breath; nausea; chest pain,smoking; family history; obesity,ICD10,0.959
+DISEASE_00135,Disease,Disease_135_135,J71.7,INFECTIOUS,3.07,1.47,severe,acute,headache; nausea; fatigue; fever,stress; sedentary lifestyle; age,ICD10,0.955
+DISEASE_00136,Disease,Disease_136_136,K65.1,ONCOLOGY,4.46,2.65,severe,chronic,nausea; fever,sedentary lifestyle; smoking,ICD10,0.964
+DISEASE_00137,Disease,Disease_137_137,J98.0,GASTROINTESTINAL,12.2,4.51,severe,chronic,chest pain; cough; dizziness,poor diet; diabetes; sedentary lifestyle; hypertension,ICD10,0.967
+DISEASE_00138,Disease,Disease_138_138,K15.1,PSYCHIATRIC,11.47,1.81,moderate,chronic,dizziness; cough; headache; shortness of breath,age; hypertension,ICD10,0.951
+DISEASE_00139,Disease,Disease_139_139,J41.4,RESPIRATORY,5.58,0.7,moderate,chronic,fever; fatigue,diabetes; poor diet; obesity; hypertension,ICD10,0.951
+DISEASE_00140,Disease,Disease_140_140,J81.5,METABOLIC,12.84,3.03,mild,acute,dizziness; abdominal pain; cough; fever,diabetes; obesity; family history; poor diet,ICD10,0.935
+DISEASE_00141,Disease,Disease_141_141,K74.1,CARDIOVASCULAR,6.6,3.27,mild,acute,abdominal pain; cough; shortness of breath; dizziness,poor diet; age; stress,ICD10,0.97
+DISEASE_00142,Disease,Disease_142_142,E97.2,RESPIRATORY,1.1,2.01,severe,chronic,abdominal pain; shortness of breath,family history; poor diet; age,ICD10,0.908
+DISEASE_00143,Disease,Disease_143_143,J54.5,CARDIOVASCULAR,12.75,4.09,severe,chronic,cough; chest pain; fever; dizziness,sedentary lifestyle; smoking; obesity; age,ICD10,0.949
+DISEASE_00144,Disease,Disease_144_144,F91.0,NEUROLOGICAL,10.0,2.88,moderate,acute,fatigue; nausea; shortness of breath,age; sedentary lifestyle; obesity,ICD10,0.924
+DISEASE_00145,Disease,Disease_145_145,K96.2,CARDIOVASCULAR,1.39,0.89,severe,acute,dizziness; headache; cough,stress; sedentary lifestyle; hypertension,ICD10,0.983
+DISEASE_00146,Disease,Disease_146_146,E71.6,GASTROINTESTINAL,7.74,1.2,moderate,acute,headache; cough,poor diet; smoking,ICD10,0.975
+DISEASE_00147,Disease,Disease_147_147,K28.6,NEUROLOGICAL,3.65,4.06,moderate,chronic,headache; cough,age; poor diet,ICD10,0.984
+DISEASE_00148,Disease,Disease_148_148,E14.9,INFECTIOUS,12.85,4.6,mild,chronic,chest pain; shortness of breath; fatigue,obesity; poor diet; diabetes,ICD10,0.961
+DISEASE_00149,Disease,Disease_149_149,I42.9,PSYCHIATRIC,4.64,2.57,mild,acute,fatigue; nausea; headache,obesity; diabetes; smoking,ICD10,0.958
+DISEASE_00150,Disease,Disease_150_150,E51.6,RESPIRATORY,7.67,0.69,severe,chronic,nausea; dizziness,smoking; obesity; stress; sedentary lifestyle,ICD10,0.941

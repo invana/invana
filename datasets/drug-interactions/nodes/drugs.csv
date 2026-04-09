@@ -1,0 +1,501 @@
+Id,Label,Properties:name,Properties:brandName,Properties:type,Properties:fdaApproved,Properties:molecularWeight,Properties:dosageForm,Properties:dosageMg,Properties:manufacturer,Properties:approvalDate,Properties:indication,Properties:contraindications,Properties:sideEffects,Properties:source,Properties:confidence
+DRUG_00001,Drug,Ibuprofen,Medmax,ANTIDEPRESSANT,False,624.54,injection,311,AbbVie,1995-12-09,blood pressure control,pregnancy; kidney impairment; heart failure,dry mouth; diarrhea; nausea,FDA_ORANGE_BOOK,0.989
+DRUG_00002,Drug,Warfarin,Medforte,OPIOID,True,553.83,injection,149,Pfizer,1992-05-06,infection control,allergy history,drowsiness; nausea; fatigue; insomnia,FDA_ORANGE_BOOK,0.863
+DRUG_00003,Drug,Sertraline,MedSR,CORTICOSTEROID,False,629.59,syrup,458,Novartis,1990-08-13,inflammation reduction,bleeding disorders; kidney impairment,nausea; dizziness; constipation; headache,FDA_ORANGE_BOOK,0.965
+DRUG_00004,Drug,Simvastatin,Medex,NSAID,False,258.21,syrup,82,Amgen,2007-10-22,cardiac protection,pregnancy,insomnia; diarrhea; rash; dry mouth,FDA_ORANGE_BOOK,0.908
+DRUG_00005,Drug,Hydrocodone,MaxXR,PROTON_PUMP_INHIBITOR,False,255.18,syrup,353,Johnson & Johnson,1994-06-19,diabetes treatment,bleeding disorders,nausea; drowsiness; dry mouth; fatigue; headache,FDA_ORANGE_BOOK,0.883
+DRUG_00006,Drug,Albuterol,Vitamax,ANTICONVULSANT,False,528.45,syrup,141,Merck,1998-03-11,inflammation reduction,heart failure; pregnancy; bleeding disorders,fatigue; dizziness,FDA_ORANGE_BOOK,0.896
+DRUG_00007,Drug,Zolpidem,MaxER,BRONCHODILATOR,False,736.05,tablet,135,Johnson & Johnson,1990-09-04,cholesterol management,pregnancy; heart failure,constipation; fatigue; diarrhea; insomnia; headache,FDA_ORANGE_BOOK,0.964
+DRUG_00008,Drug,Bupropion,Genmax,CORTICOSTEROID,True,223.25,capsule,199,Amgen,2004-04-07,pain relief,allergy history; heart failure,diarrhea; dizziness,FDA_ORANGE_BOOK,0.907
+DRUG_00009,Drug,Ibuprofen,Bioplus,ANTIBIOTIC,True,252.99,capsule,448,AbbVie,1999-11-07,blood pressure control,bleeding disorders,drowsiness; constipation; dizziness; headache; dry mouth,FDA_ORANGE_BOOK,0.946
+DRUG_00010,Drug,Tramadol,BioXR,CORTICOSTEROID,True,299.08,tablet,133,Bristol Myers Squibb,1995-09-02,pain relief,pregnancy,insomnia; drowsiness; dizziness; nausea; headache,FDA_ORANGE_BOOK,0.855
+DRUG_00011,Drug,Alprazolam,UltraER,ANTICONVULSANT,True,317.58,cream,298,GlaxoSmithKline,2005-09-05,anxiety reduction,pregnancy; allergy history,drowsiness; rash; constipation; dry mouth,FDA_ORANGE_BOOK,0.923
+DRUG_00012,Drug,Bupropion,MaxER,ACE_INHIBITOR,False,395.44,tablet,207,Johnson & Johnson,1993-01-16,anxiety reduction,allergy history,diarrhea; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.877
+DRUG_00013,Drug,Codeine,Pharmaol,OPIOID,False,664.75,tablet,85,Bristol Myers Squibb,1990-11-24,cholesterol management,allergy history,drowsiness; nausea; dizziness,FDA_ORANGE_BOOK,0.961
+DRUG_00014,Drug,Simvastatin,NovoER,PROTON_PUMP_INHIBITOR,False,168.38,syrup,412,Roche,2015-04-17,anxiety reduction,liver disease,drowsiness; rash; insomnia,FDA_ORANGE_BOOK,0.894
+DRUG_00015,Drug,Albuterol,Genforte,BRONCHODILATOR,False,361.53,syrup,97,Bristol Myers Squibb,2018-12-29,depression treatment,allergy history; kidney impairment,constipation; drowsiness; insomnia; rash; dry mouth,FDA_ORANGE_BOOK,0.909
+DRUG_00016,Drug,Atorvastatin,GenSR,PROTON_PUMP_INHIBITOR,False,258.52,syrup,358,Bristol Myers Squibb,2006-12-04,pain relief,bleeding disorders,nausea; drowsiness,FDA_ORANGE_BOOK,0.949
+DRUG_00017,Drug,Diclofenac,Medine,CORTICOSTEROID,True,376.92,syrup,439,Pfizer,2010-12-16,diabetes treatment,allergy history,drowsiness; insomnia,FDA_ORANGE_BOOK,0.886
+DRUG_00018,Drug,Atorvastatin,ProXR,ANTIDEPRESSANT,False,735.3,syrup,14,AbbVie,2015-06-12,diabetes treatment,allergy history,drowsiness; nausea; dizziness; constipation; insomnia,FDA_ORANGE_BOOK,0.975
+DRUG_00019,Drug,Metformin,Prool,DIURETIC,True,498.77,tablet,403,Bristol Myers Squibb,2000-10-12,diabetes treatment,pregnancy; heart failure; liver disease,headache; fatigue,FDA_ORANGE_BOOK,0.86
+DRUG_00020,Drug,Ibuprofen,Novoplus,ACE_INHIBITOR,True,206.06,cream,256,Novartis,2010-08-26,pain relief,liver disease; bleeding disorders; allergy history,nausea; dizziness,FDA_ORANGE_BOOK,0.956
+DRUG_00021,Drug,Clonazepam,Bioine,ANXIOLYTIC,False,718.61,tablet,169,AbbVie,1998-11-02,cholesterol management,heart failure,dizziness; constipation; headache; rash,FDA_ORANGE_BOOK,0.894
+DRUG_00022,Drug,Clonazepam,Vitamax,PROTON_PUMP_INHIBITOR,True,497.67,tablet,21,Sanofi,2008-03-09,pain relief,bleeding disorders; pregnancy,dizziness; dry mouth; rash,FDA_ORANGE_BOOK,0.986
+DRUG_00023,Drug,Azithromycin,Maxol,CORTICOSTEROID,False,544.44,capsule,117,Merck,1991-04-25,diabetes treatment,heart failure; kidney impairment; pregnancy,dry mouth; nausea; rash; fatigue,FDA_ORANGE_BOOK,0.951
+DRUG_00024,Drug,Naproxen,BioSR,ANTIDEPRESSANT,True,571.18,cream,486,Roche,2011-05-14,blood pressure control,heart failure; kidney impairment,diarrhea; nausea; fatigue,FDA_ORANGE_BOOK,0.963
+DRUG_00025,Drug,Naproxen,Bioex,BETA_BLOCKER,False,566.89,tablet,433,Amgen,2021-07-22,cardiac protection,pregnancy; bleeding disorders; kidney impairment,insomnia; constipation; dry mouth; headache; fatigue,FDA_ORANGE_BOOK,0.985
+DRUG_00026,Drug,Warfarin,UltraLA,BRONCHODILATOR,False,749.2,capsule,84,Bristol Myers Squibb,2022-10-31,cholesterol management,liver disease,rash; headache,FDA_ORANGE_BOOK,0.904
+DRUG_00027,Drug,Cephalexin,Ultraex,STATIN,False,523.36,cream,166,Merck,2019-04-17,blood pressure control,liver disease,dizziness; insomnia; constipation; nausea; headache,FDA_ORANGE_BOOK,0.903
+DRUG_00028,Drug,Pregabalin,MedXR,BETA_BLOCKER,False,416.94,injection,84,Merck,2019-07-25,inflammation reduction,pregnancy; heart failure,nausea; dizziness; diarrhea; headache; constipation,FDA_ORANGE_BOOK,0.899
+DRUG_00029,Drug,Amlodipine,Bioex,HYPNOTIC,True,765.35,capsule,498,Pfizer,2001-04-21,blood pressure control,allergy history; pregnancy,fatigue; rash; dizziness; insomnia,FDA_ORANGE_BOOK,0.865
+DRUG_00030,Drug,Amoxicillin,Medmax,STATIN,False,262.03,capsule,145,Novartis,1992-08-27,diabetes treatment,bleeding disorders,insomnia; rash; dry mouth,FDA_ORANGE_BOOK,0.974
+DRUG_00031,Drug,Ibuprofen,Pharmaine,ANTIBIOTIC,False,547.87,cream,221,Johnson & Johnson,2022-10-03,depression treatment,heart failure; allergy history,headache; rash,FDA_ORANGE_BOOK,0.906
+DRUG_00032,Drug,Escitalopram,MedXR,ANXIOLYTIC,True,752.88,cream,212,Roche,2005-06-01,inflammation reduction,kidney impairment; liver disease; heart failure,dizziness; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.874
+DRUG_00033,Drug,Lorazepam,Maxmax,ANTICONVULSANT,True,560.3,syrup,262,Pfizer,2005-09-05,blood pressure control,heart failure; kidney impairment; bleeding disorders,dry mouth; drowsiness,FDA_ORANGE_BOOK,0.851
+DRUG_00034,Drug,Venlafaxine,VitaLA,ACE_INHIBITOR,False,258.52,injection,442,Sanofi,2021-01-26,anxiety reduction,bleeding disorders; pregnancy; kidney impairment,insomnia; rash; drowsiness,FDA_ORANGE_BOOK,0.906
+DRUG_00035,Drug,Naproxen,UltraSR,BETA_BLOCKER,False,248.59,syrup,454,Johnson & Johnson,1990-05-21,diabetes treatment,pregnancy,dry mouth; insomnia; headache; diarrhea,FDA_ORANGE_BOOK,0.925
+DRUG_00036,Drug,Ibuprofen,Ultraol,CORTICOSTEROID,False,788.18,cream,310,AbbVie,2017-08-05,blood pressure control,allergy history; bleeding disorders; heart failure,insomnia; diarrhea,FDA_ORANGE_BOOK,0.889
+DRUG_00037,Drug,Fentanyl,Vitaex,BETA_BLOCKER,True,265.84,injection,411,Johnson & Johnson,2008-10-23,cholesterol management,bleeding disorders; pregnancy,rash; drowsiness; insomnia; diarrhea,FDA_ORANGE_BOOK,0.921
+DRUG_00038,Drug,Metformin,Genforte,OPIOID,True,520.38,syrup,406,Bristol Myers Squibb,2011-05-04,cholesterol management,kidney impairment; heart failure,constipation; dizziness; drowsiness; headache; insomnia,FDA_ORANGE_BOOK,0.951
+DRUG_00039,Drug,Duloxetine,Bioforte,ANTIBIOTIC,False,715.98,syrup,59,GlaxoSmithKline,1999-12-13,diabetes treatment,liver disease; allergy history,fatigue; headache,FDA_ORANGE_BOOK,0.928
+DRUG_00040,Drug,Metoprolol,VitaER,PROTON_PUMP_INHIBITOR,True,408.16,tablet,183,AbbVie,2006-01-22,cardiac protection,bleeding disorders,insomnia; dizziness,FDA_ORANGE_BOOK,0.889
+DRUG_00041,Drug,Fentanyl,PharmaLA,ACE_INHIBITOR,False,558.15,capsule,377,Amgen,1992-09-26,cardiac protection,liver disease; heart failure,nausea; drowsiness,FDA_ORANGE_BOOK,0.963
+DRUG_00042,Drug,Bupropion,UltraLA,ANTICONVULSANT,True,469.35,injection,291,Pfizer,2007-11-22,pain relief,liver disease; kidney impairment,nausea; fatigue; diarrhea; drowsiness; constipation,FDA_ORANGE_BOOK,0.987
+DRUG_00043,Drug,Azithromycin,Neool,ANTIBIOTIC,True,317.64,injection,407,Roche,2016-02-04,blood pressure control,pregnancy; heart failure; liver disease,nausea; rash,FDA_ORANGE_BOOK,0.903
+DRUG_00044,Drug,Simvastatin,Medex,DIURETIC,False,760.4,tablet,428,Merck,2010-02-27,anxiety reduction,pregnancy,constipation; headache,FDA_ORANGE_BOOK,0.872
+DRUG_00045,Drug,Metoprolol,Ultraine,BETA_BLOCKER,False,284.09,cream,298,AbbVie,2007-12-11,diabetes treatment,pregnancy; kidney impairment,nausea; drowsiness; rash,FDA_ORANGE_BOOK,0.872
+DRUG_00046,Drug,Meloxicam,Proex,ANTIDEPRESSANT,False,608.86,syrup,208,Johnson & Johnson,2004-02-12,cholesterol management,liver disease; bleeding disorders,fatigue; insomnia,FDA_ORANGE_BOOK,0.965
+DRUG_00047,Drug,Prednisone,Ultramax,BRONCHODILATOR,True,250.12,cream,221,Sanofi,2011-03-15,inflammation reduction,pregnancy,dry mouth; drowsiness; nausea; rash; headache,FDA_ORANGE_BOOK,0.946
+DRUG_00048,Drug,Levothyroxine,NovoSR,CORTICOSTEROID,True,713.33,capsule,256,Merck,2023-07-09,anxiety reduction,allergy history; liver disease; heart failure,headache; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.874
+DRUG_00049,Drug,Tramadol,PharmaLA,ANTIDEPRESSANT,True,768.45,capsule,492,Pfizer,2000-01-05,depression treatment,bleeding disorders,dry mouth; diarrhea; nausea,FDA_ORANGE_BOOK,0.913
+DRUG_00050,Drug,Hydrocodone,Genex,OPIOID,True,249.77,syrup,201,Sanofi,2017-11-13,cholesterol management,heart failure; liver disease,diarrhea; constipation; drowsiness,FDA_ORANGE_BOOK,0.967
+DRUG_00051,Drug,Drug_051_51,Biool,NSAID,False,579.95,injection,484,Novartis,2013-12-08,pain relief,bleeding disorders; heart failure; liver disease,dizziness; drowsiness; fatigue; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.935
+DRUG_00052,Drug,Drug_052_52,VitaXR,CORTICOSTEROID,True,322.3,injection,124,Sanofi,1998-03-31,cholesterol management,kidney impairment; allergy history,headache; fatigue,FDA_ORANGE_BOOK,0.855
+DRUG_00053,Drug,Drug_053_53,NovoER,BRONCHODILATOR,True,725.86,syrup,78,Novartis,2000-07-16,pain relief,liver disease,dry mouth; fatigue; diarrhea; insomnia; constipation,FDA_ORANGE_BOOK,0.933
+DRUG_00054,Drug,Drug_054_54,UltraLA,NSAID,True,620.97,injection,247,GlaxoSmithKline,1993-07-27,cholesterol management,allergy history,dizziness; drowsiness; constipation; rash,FDA_ORANGE_BOOK,0.951
+DRUG_00055,Drug,Drug_055_55,Medmax,HYPNOTIC,False,668.79,syrup,364,Roche,2014-05-07,inflammation reduction,bleeding disorders; heart failure; kidney impairment,headache; rash; dry mouth; constipation; dizziness,FDA_ORANGE_BOOK,0.933
+DRUG_00056,Drug,Drug_056_56,Ultraex,HYPNOTIC,False,583.36,capsule,383,Sanofi,2016-11-30,diabetes treatment,allergy history; kidney impairment,fatigue; constipation; dizziness; nausea,FDA_ORANGE_BOOK,0.851
+DRUG_00057,Drug,Drug_057_57,NeoXR,ACE_INHIBITOR,False,734.72,injection,230,Merck,2001-03-31,anxiety reduction,pregnancy; liver disease; allergy history,fatigue; diarrhea; constipation,FDA_ORANGE_BOOK,0.988
+DRUG_00058,Drug,Drug_058_58,Pharmaex,OPIOID,False,467.42,capsule,355,Pfizer,2013-08-14,depression treatment,allergy history; liver disease; bleeding disorders,fatigue; nausea; insomnia; rash,FDA_ORANGE_BOOK,0.929
+DRUG_00059,Drug,Drug_059_59,Pharmaplus,ANTIBIOTIC,True,642.92,tablet,467,GlaxoSmithKline,1992-11-25,cardiac protection,pregnancy,dry mouth; fatigue,FDA_ORANGE_BOOK,0.874
+DRUG_00060,Drug,Drug_060_60,UltraXR,BRONCHODILATOR,True,724.93,tablet,216,Novartis,2015-06-24,depression treatment,heart failure; pregnancy; liver disease,dry mouth; dizziness; headache; constipation; fatigue,FDA_ORANGE_BOOK,0.913
+DRUG_00061,Drug,Drug_061_61,Pharmaol,BETA_BLOCKER,True,581.82,cream,16,AbbVie,2023-03-03,inflammation reduction,kidney impairment,fatigue; diarrhea,FDA_ORANGE_BOOK,0.854
+DRUG_00062,Drug,Drug_062_62,Genine,ANTIBIOTIC,False,581.28,injection,173,Pfizer,2020-05-11,depression treatment,kidney impairment,dizziness; dry mouth,FDA_ORANGE_BOOK,0.907
+DRUG_00063,Drug,Drug_063_63,VitaLA,CORTICOSTEROID,False,442.03,syrup,346,GlaxoSmithKline,2002-07-06,cardiac protection,allergy history; liver disease,diarrhea; constipation,FDA_ORANGE_BOOK,0.979
+DRUG_00064,Drug,Drug_064_64,Pharmaex,CORTICOSTEROID,True,341.33,syrup,48,AbbVie,2003-07-01,cardiac protection,bleeding disorders,drowsiness; headache; insomnia; dizziness,FDA_ORANGE_BOOK,0.967
+DRUG_00065,Drug,Drug_065_65,VitaLA,ANXIOLYTIC,True,667.1,syrup,313,GlaxoSmithKline,2003-09-22,infection control,allergy history,diarrhea; nausea,FDA_ORANGE_BOOK,0.953
+DRUG_00066,Drug,Drug_066_66,Neoex,HYPNOTIC,False,739.68,capsule,288,AbbVie,1993-01-08,anxiety reduction,pregnancy; liver disease,dizziness; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.873
+DRUG_00067,Drug,Drug_067_67,BioLA,CORTICOSTEROID,True,273.81,syrup,59,Bristol Myers Squibb,2015-12-25,anxiety reduction,pregnancy; heart failure,rash; constipation; fatigue; dry mouth,FDA_ORANGE_BOOK,0.9
+DRUG_00068,Drug,Drug_068_68,Ultraforte,BETA_BLOCKER,True,552.86,cream,462,AbbVie,1995-06-29,infection control,allergy history; pregnancy,constipation; fatigue; dry mouth; nausea,FDA_ORANGE_BOOK,0.874
+DRUG_00069,Drug,Drug_069_69,Vitaplus,ACE_INHIBITOR,False,152.31,injection,251,Merck,2008-03-18,diabetes treatment,pregnancy; liver disease,headache; drowsiness; dizziness; dry mouth,FDA_ORANGE_BOOK,0.853
+DRUG_00070,Drug,Drug_070_70,Vitaine,HYPNOTIC,True,559.43,syrup,189,Amgen,2017-08-25,cholesterol management,pregnancy; bleeding disorders,dry mouth; constipation; nausea; headache,FDA_ORANGE_BOOK,0.869
+DRUG_00071,Drug,Drug_071_71,Vitaine,NSAID,True,702.24,syrup,5,Bristol Myers Squibb,2021-04-02,depression treatment,bleeding disorders; pregnancy,fatigue; drowsiness,FDA_ORANGE_BOOK,0.867
+DRUG_00072,Drug,Drug_072_72,BioER,HYPNOTIC,True,392.44,capsule,48,Amgen,1993-09-19,cardiac protection,bleeding disorders; liver disease,fatigue; dizziness; dry mouth; insomnia,FDA_ORANGE_BOOK,0.987
+DRUG_00073,Drug,Drug_073_73,Vitaforte,ANTICONVULSANT,True,577.17,tablet,8,Sanofi,2008-02-29,diabetes treatment,liver disease,dry mouth; diarrhea,FDA_ORANGE_BOOK,0.955
+DRUG_00074,Drug,Drug_074_74,VitaXR,DIURETIC,True,284.42,syrup,357,Johnson & Johnson,1992-05-28,depression treatment,bleeding disorders,dry mouth; nausea; constipation; rash; fatigue,FDA_ORANGE_BOOK,0.879
+DRUG_00075,Drug,Drug_075_75,Pharmaol,HYPNOTIC,True,643.2,capsule,63,Amgen,2009-08-13,depression treatment,allergy history,drowsiness; headache; dizziness; dry mouth; insomnia,FDA_ORANGE_BOOK,0.987
+DRUG_00076,Drug,Drug_076_76,Medine,ANTIBIOTIC,True,659.22,capsule,424,Roche,2021-10-16,cholesterol management,bleeding disorders; liver disease; pregnancy,constipation; diarrhea; insomnia,FDA_ORANGE_BOOK,0.926
+DRUG_00077,Drug,Drug_077_77,Genplus,ANTICONVULSANT,True,648.91,capsule,113,AbbVie,2005-06-20,blood pressure control,heart failure; kidney impairment,dry mouth; dizziness,FDA_ORANGE_BOOK,0.964
+DRUG_00078,Drug,Drug_078_78,PharmaLA,ACE_INHIBITOR,False,257.68,cream,71,Sanofi,2022-09-29,cholesterol management,bleeding disorders,rash; fatigue,FDA_ORANGE_BOOK,0.967
+DRUG_00079,Drug,Drug_079_79,NovoSR,ANTICONVULSANT,True,626.57,syrup,448,Johnson & Johnson,1993-07-30,cardiac protection,liver disease; allergy history,drowsiness; dry mouth; nausea; insomnia; rash,FDA_ORANGE_BOOK,0.942
+DRUG_00080,Drug,Drug_080_80,MedER,ANTICONVULSANT,False,759.4,capsule,251,Amgen,2003-04-17,anxiety reduction,bleeding disorders; pregnancy; liver disease,nausea; constipation; insomnia; rash,FDA_ORANGE_BOOK,0.986
+DRUG_00081,Drug,Drug_081_81,Bioforte,STATIN,True,285.42,cream,306,Pfizer,2006-12-02,diabetes treatment,liver disease; allergy history; bleeding disorders,constipation; insomnia; nausea; fatigue,FDA_ORANGE_BOOK,0.895
+DRUG_00082,Drug,Drug_082_82,Ultramax,ANTIDEPRESSANT,False,310.03,tablet,155,Pfizer,2014-12-06,diabetes treatment,liver disease; bleeding disorders; allergy history,rash; insomnia; dizziness; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.883
+DRUG_00083,Drug,Drug_083_83,Novool,ANXIOLYTIC,False,207.46,syrup,42,Amgen,2017-12-31,infection control,kidney impairment; pregnancy; bleeding disorders,rash; fatigue; dizziness; headache; diarrhea,FDA_ORANGE_BOOK,0.974
+DRUG_00084,Drug,Drug_084_84,BioSR,HYPNOTIC,True,453.94,injection,458,Amgen,2008-02-05,blood pressure control,pregnancy,rash; diarrhea,FDA_ORANGE_BOOK,0.951
+DRUG_00085,Drug,Drug_085_85,ProLA,ANTIDEPRESSANT,True,601.38,syrup,328,Johnson & Johnson,1996-12-19,depression treatment,kidney impairment; liver disease; bleeding disorders,fatigue; rash; diarrhea; dry mouth; constipation,FDA_ORANGE_BOOK,0.88
+DRUG_00086,Drug,Drug_086_86,Proforte,CORTICOSTEROID,False,503.8,cream,89,Roche,2022-09-16,cardiac protection,bleeding disorders,fatigue; constipation; nausea; headache,FDA_ORANGE_BOOK,0.936
+DRUG_00087,Drug,Drug_087_87,Pharmaine,ANXIOLYTIC,True,782.87,capsule,314,AbbVie,1994-04-20,depression treatment,allergy history,nausea; rash,FDA_ORANGE_BOOK,0.898
+DRUG_00088,Drug,Drug_088_88,ProXR,STATIN,False,312.52,syrup,214,Sanofi,2016-03-14,inflammation reduction,heart failure; liver disease; bleeding disorders,drowsiness; constipation; insomnia; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.901
+DRUG_00089,Drug,Drug_089_89,Ultraol,DIURETIC,False,382.43,injection,432,GlaxoSmithKline,2006-06-27,inflammation reduction,allergy history,fatigue; headache; insomnia,FDA_ORANGE_BOOK,0.97
+DRUG_00090,Drug,Drug_090_90,Prool,ANTIDEPRESSANT,False,372.51,injection,358,GlaxoSmithKline,2011-09-11,blood pressure control,pregnancy; bleeding disorders,drowsiness; dizziness,FDA_ORANGE_BOOK,0.914
+DRUG_00091,Drug,Drug_091_91,Ultraine,OPIOID,False,386.66,tablet,315,Novartis,2010-04-19,inflammation reduction,heart failure; bleeding disorders,dry mouth; headache; insomnia; diarrhea,FDA_ORANGE_BOOK,0.897
+DRUG_00092,Drug,Drug_092_92,UltraSR,BETA_BLOCKER,False,321.7,tablet,324,Roche,1992-11-20,cardiac protection,kidney impairment; allergy history; bleeding disorders,nausea; drowsiness; headache; insomnia,FDA_ORANGE_BOOK,0.87
+DRUG_00093,Drug,Drug_093_93,Proine,ACE_INHIBITOR,False,667.62,syrup,114,AbbVie,2010-01-23,diabetes treatment,kidney impairment; pregnancy; heart failure,constipation; drowsiness; headache,FDA_ORANGE_BOOK,0.888
+DRUG_00094,Drug,Drug_094_94,MedXR,CORTICOSTEROID,False,272.42,tablet,480,AbbVie,2018-03-05,blood pressure control,liver disease,fatigue; headache; dry mouth; nausea,FDA_ORANGE_BOOK,0.944
+DRUG_00095,Drug,Drug_095_95,UltraSR,ACE_INHIBITOR,True,511.7,syrup,361,Pfizer,2009-03-27,anxiety reduction,pregnancy,dizziness; constipation; rash; dry mouth; nausea,FDA_ORANGE_BOOK,0.921
+DRUG_00096,Drug,Drug_096_96,Vitaine,ANTICONVULSANT,True,550.76,capsule,260,Sanofi,2010-12-12,depression treatment,allergy history; kidney impairment; bleeding disorders,constipation; nausea; drowsiness; diarrhea,FDA_ORANGE_BOOK,0.895
+DRUG_00097,Drug,Drug_097_97,Ultraforte,ANTIBIOTIC,False,429.96,syrup,493,Pfizer,2009-04-05,cardiac protection,bleeding disorders,dizziness; dry mouth,FDA_ORANGE_BOOK,0.868
+DRUG_00098,Drug,Drug_098_98,MedER,ANTIDEPRESSANT,False,381.41,capsule,419,GlaxoSmithKline,2018-08-19,anxiety reduction,bleeding disorders,dizziness; insomnia,FDA_ORANGE_BOOK,0.954
+DRUG_00099,Drug,Drug_099_99,Pharmamax,ANTICONVULSANT,True,296.71,injection,241,GlaxoSmithKline,2004-02-02,blood pressure control,allergy history; bleeding disorders; liver disease,fatigue; headache; nausea; insomnia,FDA_ORANGE_BOOK,0.966
+DRUG_00100,Drug,Drug_100_100,Vitaforte,ANTIDEPRESSANT,True,588.46,tablet,168,Roche,2010-10-02,diabetes treatment,kidney impairment; liver disease,nausea; fatigue; headache,FDA_ORANGE_BOOK,0.98
+DRUG_00101,Drug,Drug_101_101,Bioplus,BETA_BLOCKER,True,742.51,syrup,404,Johnson & Johnson,1992-01-12,cardiac protection,allergy history; liver disease,constipation; rash,FDA_ORANGE_BOOK,0.982
+DRUG_00102,Drug,Drug_102_102,Novoforte,ANTICONVULSANT,True,490.77,tablet,80,Roche,2005-01-30,cardiac protection,pregnancy,nausea; rash; fatigue,FDA_ORANGE_BOOK,0.856
+DRUG_00103,Drug,Drug_103_103,NeoSR,ANTIBIOTIC,True,163.7,capsule,303,Novartis,2014-11-14,cholesterol management,bleeding disorders; allergy history; liver disease,fatigue; headache; drowsiness; rash,FDA_ORANGE_BOOK,0.951
+DRUG_00104,Drug,Drug_104_104,MaxLA,BETA_BLOCKER,False,641.73,tablet,36,Amgen,2011-08-03,pain relief,kidney impairment,fatigue; drowsiness; insomnia; dizziness,FDA_ORANGE_BOOK,0.955
+DRUG_00105,Drug,Drug_105_105,BioER,DIURETIC,True,206.77,tablet,180,Bristol Myers Squibb,2016-09-27,blood pressure control,liver disease; kidney impairment; allergy history,diarrhea; rash; dizziness; dry mouth; constipation,FDA_ORANGE_BOOK,0.947
+DRUG_00106,Drug,Drug_106_106,UltraLA,BRONCHODILATOR,False,565.08,tablet,439,GlaxoSmithKline,1996-05-14,infection control,allergy history; liver disease; bleeding disorders,drowsiness; rash; dizziness; nausea,FDA_ORANGE_BOOK,0.891
+DRUG_00107,Drug,Drug_107_107,UltraLA,ANXIOLYTIC,True,369.74,cream,328,Merck,2018-03-12,blood pressure control,pregnancy,headache; constipation; rash; diarrhea; dizziness,FDA_ORANGE_BOOK,0.918
+DRUG_00108,Drug,Drug_108_108,Prool,NSAID,False,647.11,cream,332,Roche,2000-10-21,cholesterol management,pregnancy; allergy history,constipation; dizziness; rash,FDA_ORANGE_BOOK,0.906
+DRUG_00109,Drug,Drug_109_109,Promax,DIURETIC,True,490.6,capsule,411,AbbVie,2006-01-12,blood pressure control,kidney impairment; bleeding disorders; pregnancy,dizziness; dry mouth; fatigue,FDA_ORANGE_BOOK,0.952
+DRUG_00110,Drug,Drug_110_110,Proforte,PROTON_PUMP_INHIBITOR,False,292.73,capsule,208,Merck,2000-11-21,inflammation reduction,bleeding disorders; liver disease,fatigue; drowsiness; insomnia; headache,FDA_ORANGE_BOOK,0.953
+DRUG_00111,Drug,Drug_111_111,ProER,ACE_INHIBITOR,True,551.96,cream,67,Johnson & Johnson,2003-03-06,cardiac protection,kidney impairment,headache; insomnia; fatigue; diarrhea,FDA_ORANGE_BOOK,0.929
+DRUG_00112,Drug,Drug_112_112,Ultraol,BRONCHODILATOR,True,375.43,capsule,327,Pfizer,2016-07-28,anxiety reduction,allergy history; kidney impairment; heart failure,drowsiness; rash; nausea,FDA_ORANGE_BOOK,0.969
+DRUG_00113,Drug,Drug_113_113,Medine,ANTIBIOTIC,True,613.88,injection,134,GlaxoSmithKline,2017-06-14,inflammation reduction,liver disease; allergy history,constipation; fatigue; dizziness; insomnia; nausea,FDA_ORANGE_BOOK,0.978
+DRUG_00114,Drug,Drug_114_114,Maxplus,ACE_INHIBITOR,True,238.3,injection,304,Merck,2017-11-17,inflammation reduction,allergy history; heart failure,drowsiness; fatigue; constipation; headache,FDA_ORANGE_BOOK,0.859
+DRUG_00115,Drug,Drug_115_115,Medmax,DIURETIC,True,158.01,injection,327,Johnson & Johnson,1991-12-22,inflammation reduction,pregnancy; heart failure,headache; rash,FDA_ORANGE_BOOK,0.935
+DRUG_00116,Drug,Drug_116_116,Ultraol,BRONCHODILATOR,False,752.0,tablet,408,Johnson & Johnson,2015-06-06,infection control,heart failure; bleeding disorders,insomnia; constipation; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.885
+DRUG_00117,Drug,Drug_117_117,Ultraplus,NSAID,False,401.46,syrup,472,GlaxoSmithKline,1990-06-25,diabetes treatment,kidney impairment; pregnancy,diarrhea; drowsiness,FDA_ORANGE_BOOK,0.979
+DRUG_00118,Drug,Drug_118_118,Genine,ANTIDEPRESSANT,True,586.29,injection,429,Sanofi,2014-06-06,anxiety reduction,heart failure; kidney impairment; pregnancy,nausea; diarrhea; drowsiness; rash,FDA_ORANGE_BOOK,0.921
+DRUG_00119,Drug,Drug_119_119,ProER,ANXIOLYTIC,True,679.37,syrup,323,Sanofi,2001-02-01,infection control,liver disease; allergy history,headache; nausea,FDA_ORANGE_BOOK,0.891
+DRUG_00120,Drug,Drug_120_120,Medforte,STATIN,False,530.5,injection,31,Merck,2004-05-12,depression treatment,heart failure; bleeding disorders; allergy history,insomnia; constipation; dry mouth; drowsiness; dizziness,FDA_ORANGE_BOOK,0.879
+DRUG_00121,Drug,Drug_121_121,Pharmaplus,NSAID,False,224.49,syrup,351,Amgen,2008-02-13,inflammation reduction,kidney impairment,insomnia; headache,FDA_ORANGE_BOOK,0.935
+DRUG_00122,Drug,Drug_122_122,Bioplus,PROTON_PUMP_INHIBITOR,True,306.0,cream,13,Bristol Myers Squibb,1990-06-10,inflammation reduction,allergy history; pregnancy; liver disease,dry mouth; constipation,FDA_ORANGE_BOOK,0.969
+DRUG_00123,Drug,Drug_123_123,PharmaSR,ACE_INHIBITOR,False,671.04,capsule,335,Merck,2014-05-30,inflammation reduction,heart failure; kidney impairment; liver disease,drowsiness; fatigue,FDA_ORANGE_BOOK,0.987
+DRUG_00124,Drug,Drug_124_124,BioXR,OPIOID,True,734.95,capsule,224,Sanofi,1997-12-12,depression treatment,pregnancy; allergy history; heart failure,headache; rash; constipation; drowsiness,FDA_ORANGE_BOOK,0.988
+DRUG_00125,Drug,Drug_125_125,Novoforte,BRONCHODILATOR,False,201.04,cream,270,Pfizer,2012-03-29,inflammation reduction,heart failure,dry mouth; dizziness,FDA_ORANGE_BOOK,0.977
+DRUG_00126,Drug,Drug_126_126,Maxex,PROTON_PUMP_INHIBITOR,False,340.22,injection,60,Johnson & Johnson,2023-11-14,depression treatment,pregnancy; liver disease; kidney impairment,headache; insomnia; drowsiness; dry mouth; diarrhea,FDA_ORANGE_BOOK,0.904
+DRUG_00127,Drug,Drug_127_127,Genforte,ANTICONVULSANT,False,207.08,capsule,354,Pfizer,1996-10-29,inflammation reduction,allergy history; heart failure; kidney impairment,nausea; fatigue; rash,FDA_ORANGE_BOOK,0.938
+DRUG_00128,Drug,Drug_128_128,VitaER,ANTIDEPRESSANT,False,176.8,capsule,32,Johnson & Johnson,2012-02-22,anxiety reduction,heart failure; liver disease,fatigue; headache; drowsiness; rash; constipation,FDA_ORANGE_BOOK,0.94
+DRUG_00129,Drug,Drug_129_129,ProER,BRONCHODILATOR,False,436.94,injection,339,GlaxoSmithKline,1996-04-13,anxiety reduction,bleeding disorders,headache; dry mouth,FDA_ORANGE_BOOK,0.903
+DRUG_00130,Drug,Drug_130_130,Genine,NSAID,False,734.06,cream,253,Sanofi,1991-02-02,diabetes treatment,liver disease,dizziness; headache; nausea; constipation; fatigue,FDA_ORANGE_BOOK,0.901
+DRUG_00131,Drug,Drug_131_131,GenER,STATIN,False,794.83,cream,389,Pfizer,2012-01-07,infection control,heart failure; bleeding disorders; pregnancy,insomnia; dizziness; rash; fatigue,FDA_ORANGE_BOOK,0.964
+DRUG_00132,Drug,Drug_132_132,Genplus,ANTIDEPRESSANT,True,760.99,tablet,308,Roche,1999-12-09,diabetes treatment,bleeding disorders,constipation; dry mouth; nausea; headache,FDA_ORANGE_BOOK,0.893
+DRUG_00133,Drug,Drug_133_133,BioER,ANTIBIOTIC,False,204.31,capsule,195,Bristol Myers Squibb,1999-07-01,infection control,allergy history; liver disease,rash; diarrhea; dizziness; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.924
+DRUG_00134,Drug,Drug_134_134,Ultraex,HYPNOTIC,False,196.45,tablet,33,Novartis,2001-09-03,inflammation reduction,liver disease; allergy history; kidney impairment,nausea; dizziness,FDA_ORANGE_BOOK,0.978
+DRUG_00135,Drug,Drug_135_135,BioER,CORTICOSTEROID,True,279.49,tablet,491,Bristol Myers Squibb,1996-02-06,cardiac protection,heart failure; pregnancy,constipation; dizziness; drowsiness; headache,FDA_ORANGE_BOOK,0.948
+DRUG_00136,Drug,Drug_136_136,UltraLA,ANTICONVULSANT,True,325.12,syrup,300,Merck,2008-08-13,infection control,heart failure; pregnancy,fatigue; dry mouth; headache; rash; diarrhea,FDA_ORANGE_BOOK,0.87
+DRUG_00137,Drug,Drug_137_137,Vitaine,PROTON_PUMP_INHIBITOR,True,533.84,injection,202,Johnson & Johnson,2005-09-06,cholesterol management,pregnancy; kidney impairment,diarrhea; fatigue; insomnia; constipation; rash,FDA_ORANGE_BOOK,0.921
+DRUG_00138,Drug,Drug_138_138,PharmaSR,DIURETIC,True,621.18,tablet,355,Pfizer,2007-11-01,inflammation reduction,bleeding disorders; pregnancy,fatigue; dizziness; nausea; insomnia; rash,FDA_ORANGE_BOOK,0.894
+DRUG_00139,Drug,Drug_139_139,Proforte,ANXIOLYTIC,True,473.62,cream,411,Merck,2001-05-01,pain relief,liver disease; heart failure; pregnancy,dry mouth; drowsiness; headache; constipation,FDA_ORANGE_BOOK,0.978
+DRUG_00140,Drug,Drug_140_140,Pharmaex,ANTIBIOTIC,False,624.55,injection,233,Pfizer,2013-05-19,pain relief,allergy history,constipation; insomnia; nausea; fatigue,FDA_ORANGE_BOOK,0.902
+DRUG_00141,Drug,Drug_141_141,VitaER,OPIOID,False,494.55,cream,380,Merck,2009-08-29,pain relief,pregnancy; kidney impairment; allergy history,headache; dry mouth; rash; diarrhea,FDA_ORANGE_BOOK,0.971
+DRUG_00142,Drug,Drug_142_142,Bioine,ANTICONVULSANT,True,533.55,syrup,435,Merck,2013-07-27,cardiac protection,heart failure; liver disease,insomnia; rash; drowsiness; nausea; diarrhea,FDA_ORANGE_BOOK,0.851
+DRUG_00143,Drug,Drug_143_143,NeoER,OPIOID,True,559.14,injection,317,Pfizer,1996-06-06,diabetes treatment,pregnancy; bleeding disorders,dry mouth; headache; drowsiness; rash; constipation,FDA_ORANGE_BOOK,0.916
+DRUG_00144,Drug,Drug_144_144,ProXR,ANXIOLYTIC,True,268.58,capsule,195,Bristol Myers Squibb,2021-07-20,depression treatment,heart failure; bleeding disorders,diarrhea; rash,FDA_ORANGE_BOOK,0.853
+DRUG_00145,Drug,Drug_145_145,MedLA,ANTIDEPRESSANT,True,334.47,tablet,419,AbbVie,2021-07-31,cholesterol management,heart failure; bleeding disorders; kidney impairment,diarrhea; dizziness; insomnia; dry mouth,FDA_ORANGE_BOOK,0.975
+DRUG_00146,Drug,Drug_146_146,Genforte,ANTICONVULSANT,False,622.45,injection,337,Roche,2022-12-14,anxiety reduction,liver disease; allergy history,rash; insomnia; constipation,FDA_ORANGE_BOOK,0.87
+DRUG_00147,Drug,Drug_147_147,MedSR,NSAID,True,480.11,syrup,283,Bristol Myers Squibb,2005-09-22,cardiac protection,heart failure; bleeding disorders; allergy history,insomnia; dizziness; nausea; drowsiness,FDA_ORANGE_BOOK,0.969
+DRUG_00148,Drug,Drug_148_148,Genforte,DIURETIC,True,592.3,tablet,51,GlaxoSmithKline,2002-01-18,infection control,bleeding disorders; pregnancy,headache; drowsiness,FDA_ORANGE_BOOK,0.89
+DRUG_00149,Drug,Drug_149_149,GenLA,BETA_BLOCKER,True,489.3,injection,120,Roche,1997-07-01,blood pressure control,bleeding disorders; allergy history,dry mouth; rash; constipation,FDA_ORANGE_BOOK,0.964
+DRUG_00150,Drug,Drug_150_150,UltraER,ANTICONVULSANT,False,722.28,syrup,328,Amgen,1990-07-15,anxiety reduction,kidney impairment; liver disease,dry mouth; fatigue,FDA_ORANGE_BOOK,0.862
+DRUG_00151,Drug,Drug_151_151,Biool,BRONCHODILATOR,True,791.45,tablet,391,Pfizer,2002-01-10,infection control,pregnancy; allergy history,headache; dry mouth; diarrhea; fatigue; constipation,FDA_ORANGE_BOOK,0.874
+DRUG_00152,Drug,Drug_152_152,Neoplus,BRONCHODILATOR,True,432.27,syrup,167,Novartis,2003-08-04,diabetes treatment,allergy history; kidney impairment,dizziness; rash; nausea,FDA_ORANGE_BOOK,0.889
+DRUG_00153,Drug,Drug_153_153,Novoine,BETA_BLOCKER,False,701.13,capsule,113,Novartis,1997-10-11,pain relief,pregnancy; kidney impairment; allergy history,diarrhea; dry mouth; insomnia,FDA_ORANGE_BOOK,0.934
+DRUG_00154,Drug,Drug_154_154,Novoplus,ACE_INHIBITOR,False,583.23,syrup,137,Roche,2012-04-19,infection control,allergy history,rash; constipation; headache,FDA_ORANGE_BOOK,0.936
+DRUG_00155,Drug,Drug_155_155,MaxSR,STATIN,True,152.1,capsule,253,Pfizer,2019-08-09,infection control,liver disease; bleeding disorders,dizziness; rash,FDA_ORANGE_BOOK,0.882
+DRUG_00156,Drug,Drug_156_156,Proplus,ANTIDEPRESSANT,False,602.16,cream,88,AbbVie,2012-01-16,inflammation reduction,liver disease,nausea; dizziness; diarrhea; dry mouth; rash,FDA_ORANGE_BOOK,0.865
+DRUG_00157,Drug,Drug_157_157,Genmax,STATIN,True,338.41,syrup,482,Bristol Myers Squibb,2005-05-06,pain relief,bleeding disorders; liver disease; allergy history,dry mouth; drowsiness,FDA_ORANGE_BOOK,0.854
+DRUG_00158,Drug,Drug_158_158,Ultraine,OPIOID,True,564.68,injection,260,Sanofi,2009-11-27,anxiety reduction,allergy history,fatigue; nausea,FDA_ORANGE_BOOK,0.858
+DRUG_00159,Drug,Drug_159_159,Medforte,CORTICOSTEROID,True,466.27,capsule,298,Pfizer,1990-08-17,pain relief,pregnancy; allergy history,dry mouth; constipation,FDA_ORANGE_BOOK,0.941
+DRUG_00160,Drug,Drug_160_160,Vitaforte,STATIN,False,412.55,injection,376,Bristol Myers Squibb,2015-02-06,infection control,pregnancy; kidney impairment; bleeding disorders,dizziness; drowsiness; nausea,FDA_ORANGE_BOOK,0.851
+DRUG_00161,Drug,Drug_161_161,Ultramax,ANTIDEPRESSANT,True,765.52,capsule,97,Johnson & Johnson,2011-03-09,inflammation reduction,pregnancy; kidney impairment; liver disease,dizziness; insomnia,FDA_ORANGE_BOOK,0.964
+DRUG_00162,Drug,Drug_162_162,Proplus,ACE_INHIBITOR,True,612.81,injection,346,GlaxoSmithKline,2012-12-31,blood pressure control,kidney impairment; bleeding disorders; allergy history,headache; insomnia; dry mouth,FDA_ORANGE_BOOK,0.912
+DRUG_00163,Drug,Drug_163_163,Novool,HYPNOTIC,True,671.43,cream,237,Merck,2023-06-16,infection control,allergy history,insomnia; headache,FDA_ORANGE_BOOK,0.921
+DRUG_00164,Drug,Drug_164_164,NeoSR,ANTIBIOTIC,True,409.79,tablet,82,Johnson & Johnson,2014-11-27,blood pressure control,bleeding disorders,constipation; diarrhea; drowsiness,FDA_ORANGE_BOOK,0.872
+DRUG_00165,Drug,Drug_165_165,Pharmaol,ANTIBIOTIC,True,677.22,cream,250,Roche,2000-08-30,inflammation reduction,bleeding disorders; kidney impairment,insomnia; dry mouth,FDA_ORANGE_BOOK,0.974
+DRUG_00166,Drug,Drug_166_166,BioXR,BRONCHODILATOR,False,536.93,tablet,73,Johnson & Johnson,2010-02-21,depression treatment,heart failure; bleeding disorders; pregnancy,dry mouth; rash; constipation,FDA_ORANGE_BOOK,0.854
+DRUG_00167,Drug,Drug_167_167,Medine,PROTON_PUMP_INHIBITOR,True,404.68,cream,306,Pfizer,2002-11-21,infection control,kidney impairment,fatigue; insomnia,FDA_ORANGE_BOOK,0.915
+DRUG_00168,Drug,Drug_168_168,Bioforte,HYPNOTIC,True,437.89,capsule,313,Roche,2005-07-12,anxiety reduction,heart failure; kidney impairment,nausea; headache; drowsiness; diarrhea,FDA_ORANGE_BOOK,0.898
+DRUG_00169,Drug,Drug_169_169,Bioforte,ANXIOLYTIC,False,660.94,syrup,186,Pfizer,2019-06-13,cardiac protection,heart failure,nausea; drowsiness; constipation; dizziness; insomnia,FDA_ORANGE_BOOK,0.876
+DRUG_00170,Drug,Drug_170_170,MaxLA,PROTON_PUMP_INHIBITOR,True,758.53,injection,224,Pfizer,1991-09-05,cholesterol management,allergy history; liver disease,fatigue; dry mouth,FDA_ORANGE_BOOK,0.873
+DRUG_00171,Drug,Drug_171_171,BioSR,STATIN,False,363.95,capsule,125,Roche,2020-04-10,infection control,allergy history; kidney impairment,nausea; drowsiness; rash,FDA_ORANGE_BOOK,0.914
+DRUG_00172,Drug,Drug_172_172,Bioplus,ANXIOLYTIC,True,516.57,syrup,345,Pfizer,1993-04-23,depression treatment,liver disease,headache; insomnia,FDA_ORANGE_BOOK,0.9
+DRUG_00173,Drug,Drug_173_173,Neoex,BETA_BLOCKER,False,749.07,syrup,255,Pfizer,2018-03-30,depression treatment,heart failure; bleeding disorders; liver disease,nausea; drowsiness,FDA_ORANGE_BOOK,0.88
+DRUG_00174,Drug,Drug_174_174,Maxol,CORTICOSTEROID,True,655.88,cream,96,Pfizer,1999-01-05,cholesterol management,allergy history; kidney impairment; heart failure,nausea; headache; constipation,FDA_ORANGE_BOOK,0.945
+DRUG_00175,Drug,Drug_175_175,Bioforte,ACE_INHIBITOR,True,493.65,syrup,202,Johnson & Johnson,2015-08-05,blood pressure control,pregnancy; allergy history,rash; nausea; insomnia; drowsiness; constipation,FDA_ORANGE_BOOK,0.912
+DRUG_00176,Drug,Drug_176_176,Pharmaex,NSAID,True,529.93,injection,280,Merck,1999-10-16,blood pressure control,allergy history; pregnancy; heart failure,constipation; diarrhea; drowsiness,FDA_ORANGE_BOOK,0.92
+DRUG_00177,Drug,Drug_177_177,Vitaplus,STATIN,False,745.94,cream,270,AbbVie,2008-02-08,infection control,kidney impairment; bleeding disorders; liver disease,dry mouth; headache; fatigue,FDA_ORANGE_BOOK,0.857
+DRUG_00178,Drug,Drug_178_178,Medmax,ANTIDEPRESSANT,True,414.87,capsule,51,Amgen,2015-09-04,blood pressure control,kidney impairment; bleeding disorders,insomnia; nausea,FDA_ORANGE_BOOK,0.922
+DRUG_00179,Drug,Drug_179_179,NovoXR,PROTON_PUMP_INHIBITOR,False,712.2,tablet,19,Merck,1992-10-25,blood pressure control,heart failure; bleeding disorders; kidney impairment,dry mouth; drowsiness,FDA_ORANGE_BOOK,0.965
+DRUG_00180,Drug,Drug_180_180,BioER,ANTIBIOTIC,True,622.02,syrup,451,Amgen,1993-09-15,anxiety reduction,liver disease,fatigue; insomnia; headache; dry mouth; diarrhea,FDA_ORANGE_BOOK,0.963
+DRUG_00181,Drug,Drug_181_181,Pharmaol,DIURETIC,True,502.38,syrup,374,Merck,2016-05-19,inflammation reduction,bleeding disorders,nausea; rash,FDA_ORANGE_BOOK,0.99
+DRUG_00182,Drug,Drug_182_182,PharmaSR,BETA_BLOCKER,True,207.45,syrup,308,Novartis,2013-03-06,depression treatment,pregnancy; heart failure,constipation; headache,FDA_ORANGE_BOOK,0.943
+DRUG_00183,Drug,Drug_183_183,Pharmaol,PROTON_PUMP_INHIBITOR,True,792.41,syrup,495,AbbVie,1999-04-28,cholesterol management,liver disease,fatigue; nausea; dry mouth,FDA_ORANGE_BOOK,0.964
+DRUG_00184,Drug,Drug_184_184,BioER,ANTIDEPRESSANT,True,449.26,capsule,380,Novartis,2012-05-29,blood pressure control,kidney impairment,diarrhea; nausea; insomnia; dry mouth; headache,FDA_ORANGE_BOOK,0.96
+DRUG_00185,Drug,Drug_185_185,NovoSR,DIURETIC,True,307.86,injection,224,Roche,1996-08-06,inflammation reduction,kidney impairment,rash; diarrhea; dry mouth; headache; constipation,FDA_ORANGE_BOOK,0.98
+DRUG_00186,Drug,Drug_186_186,Novoforte,BETA_BLOCKER,True,414.76,tablet,437,Johnson & Johnson,2012-07-17,cholesterol management,liver disease,diarrhea; constipation; fatigue; headache; drowsiness,FDA_ORANGE_BOOK,0.965
+DRUG_00187,Drug,Drug_187_187,UltraSR,OPIOID,True,411.7,syrup,268,Bristol Myers Squibb,2007-08-17,diabetes treatment,bleeding disorders; allergy history,drowsiness; nausea; fatigue; constipation; dry mouth,FDA_ORANGE_BOOK,0.88
+DRUG_00188,Drug,Drug_188_188,MedER,ANTICONVULSANT,False,349.42,capsule,20,Merck,1996-12-14,cholesterol management,liver disease; heart failure; allergy history,diarrhea; rash; dizziness; dry mouth; fatigue,FDA_ORANGE_BOOK,0.95
+DRUG_00189,Drug,Drug_189_189,VitaER,ACE_INHIBITOR,True,532.52,cream,190,AbbVie,2003-11-04,diabetes treatment,kidney impairment; allergy history,dry mouth; rash; drowsiness; fatigue; headache,FDA_ORANGE_BOOK,0.854
+DRUG_00190,Drug,Drug_190_190,Neoex,CORTICOSTEROID,False,724.21,syrup,279,Sanofi,1990-07-26,inflammation reduction,allergy history; heart failure; kidney impairment,diarrhea; headache; constipation,FDA_ORANGE_BOOK,0.883
+DRUG_00191,Drug,Drug_191_191,Pharmaol,BRONCHODILATOR,False,609.87,capsule,350,GlaxoSmithKline,2006-10-14,infection control,heart failure; pregnancy; kidney impairment,insomnia; dizziness,FDA_ORANGE_BOOK,0.978
+DRUG_00192,Drug,Drug_192_192,NovoXR,ANXIOLYTIC,True,608.98,cream,380,Sanofi,2001-06-11,cardiac protection,bleeding disorders; heart failure,nausea; diarrhea,FDA_ORANGE_BOOK,0.98
+DRUG_00193,Drug,Drug_193_193,MaxXR,ANTIDEPRESSANT,False,591.14,tablet,231,Bristol Myers Squibb,2002-03-15,anxiety reduction,heart failure; bleeding disorders,constipation; drowsiness; dry mouth; rash,FDA_ORANGE_BOOK,0.902
+DRUG_00194,Drug,Drug_194_194,ProLA,DIURETIC,True,634.03,cream,152,Roche,2017-10-14,diabetes treatment,bleeding disorders; pregnancy,rash; diarrhea; dizziness; nausea,FDA_ORANGE_BOOK,0.956
+DRUG_00195,Drug,Drug_195_195,VitaSR,NSAID,True,197.52,cream,183,Merck,1997-09-14,cardiac protection,liver disease; kidney impairment,insomnia; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.981
+DRUG_00196,Drug,Drug_196_196,MaxSR,BRONCHODILATOR,True,553.07,capsule,279,GlaxoSmithKline,1992-07-21,pain relief,kidney impairment,diarrhea; rash; nausea,FDA_ORANGE_BOOK,0.903
+DRUG_00197,Drug,Drug_197_197,Ultraforte,CORTICOSTEROID,False,261.81,injection,63,Novartis,1993-09-06,diabetes treatment,allergy history; heart failure,constipation; headache; diarrhea,FDA_ORANGE_BOOK,0.95
+DRUG_00198,Drug,Drug_198_198,BioSR,PROTON_PUMP_INHIBITOR,True,584.5,tablet,277,GlaxoSmithKline,2012-07-17,diabetes treatment,allergy history,fatigue; headache; rash; insomnia; constipation,FDA_ORANGE_BOOK,0.914
+DRUG_00199,Drug,Drug_199_199,Ultraplus,HYPNOTIC,False,447.24,tablet,206,Bristol Myers Squibb,2003-03-04,pain relief,heart failure; pregnancy; allergy history,constipation; drowsiness,FDA_ORANGE_BOOK,0.901
+DRUG_00200,Drug,Drug_200_200,Proine,NSAID,False,395.21,cream,111,Sanofi,2003-09-12,depression treatment,liver disease; bleeding disorders,fatigue; rash,FDA_ORANGE_BOOK,0.978
+DRUG_00201,Drug,Drug_201_201,Proine,ANTIBIOTIC,False,360.03,tablet,279,Amgen,2003-01-22,cardiac protection,kidney impairment,insomnia; diarrhea; headache; constipation,FDA_ORANGE_BOOK,0.85
+DRUG_00202,Drug,Drug_202_202,Neomax,OPIOID,False,339.47,capsule,428,Bristol Myers Squibb,1994-11-07,infection control,pregnancy; heart failure; bleeding disorders,dizziness; nausea; diarrhea,FDA_ORANGE_BOOK,0.92
+DRUG_00203,Drug,Drug_203_203,Medplus,NSAID,True,349.81,tablet,64,Novartis,2019-12-13,pain relief,kidney impairment,headache; insomnia,FDA_ORANGE_BOOK,0.912
+DRUG_00204,Drug,Drug_204_204,MaxXR,ANTIDEPRESSANT,False,367.41,syrup,10,Roche,2012-11-04,depression treatment,pregnancy; heart failure,dizziness; headache; fatigue; diarrhea; nausea,FDA_ORANGE_BOOK,0.906
+DRUG_00205,Drug,Drug_205_205,Vitaol,ANTIBIOTIC,False,194.29,capsule,480,Bristol Myers Squibb,2000-06-15,inflammation reduction,liver disease; bleeding disorders,rash; dry mouth,FDA_ORANGE_BOOK,0.895
+DRUG_00206,Drug,Drug_206_206,Pharmaol,BRONCHODILATOR,True,612.71,tablet,346,Merck,2023-09-19,cardiac protection,allergy history; bleeding disorders; heart failure,constipation; nausea; fatigue,FDA_ORANGE_BOOK,0.977
+DRUG_00207,Drug,Drug_207_207,MaxSR,ANTIDEPRESSANT,False,683.12,capsule,278,AbbVie,2013-10-26,infection control,heart failure,diarrhea; insomnia; drowsiness,FDA_ORANGE_BOOK,0.924
+DRUG_00208,Drug,Drug_208_208,Proforte,STATIN,False,603.34,tablet,406,Johnson & Johnson,2019-06-04,blood pressure control,bleeding disorders,dizziness; constipation,FDA_ORANGE_BOOK,0.958
+DRUG_00209,Drug,Drug_209_209,VitaLA,ANTIBIOTIC,True,719.08,injection,427,Sanofi,2005-12-21,inflammation reduction,bleeding disorders,nausea; dry mouth; fatigue,FDA_ORANGE_BOOK,0.924
+DRUG_00210,Drug,Drug_210_210,Medforte,BRONCHODILATOR,False,595.15,capsule,466,Roche,1990-10-26,inflammation reduction,kidney impairment,nausea; rash; headache; constipation; diarrhea,FDA_ORANGE_BOOK,0.941
+DRUG_00211,Drug,Drug_211_211,GenLA,BETA_BLOCKER,True,672.83,syrup,477,Johnson & Johnson,1991-10-13,pain relief,pregnancy,nausea; constipation,FDA_ORANGE_BOOK,0.911
+DRUG_00212,Drug,Drug_212_212,Pharmaine,ANXIOLYTIC,True,661.94,syrup,389,Sanofi,2007-01-28,cardiac protection,bleeding disorders; kidney impairment,rash; nausea,FDA_ORANGE_BOOK,0.862
+DRUG_00213,Drug,Drug_213_213,ProER,NSAID,True,431.25,cream,113,Merck,2006-10-06,depression treatment,heart failure; kidney impairment,diarrhea; headache; fatigue; rash; drowsiness,FDA_ORANGE_BOOK,0.89
+DRUG_00214,Drug,Drug_214_214,Proforte,ANTICONVULSANT,True,165.04,injection,458,Sanofi,2012-09-13,infection control,pregnancy,drowsiness; fatigue; nausea; diarrhea; constipation,FDA_ORANGE_BOOK,0.919
+DRUG_00215,Drug,Drug_215_215,Ultraol,ACE_INHIBITOR,True,363.61,injection,269,Pfizer,2000-01-28,cardiac protection,heart failure; allergy history,headache; rash; insomnia; drowsiness; nausea,FDA_ORANGE_BOOK,0.899
+DRUG_00216,Drug,Drug_216_216,MaxXR,PROTON_PUMP_INHIBITOR,False,270.7,capsule,152,Pfizer,2004-02-23,infection control,allergy history,nausea; insomnia,FDA_ORANGE_BOOK,0.989
+DRUG_00217,Drug,Drug_217_217,Maxol,ANTICONVULSANT,True,619.64,tablet,59,Roche,2005-03-01,pain relief,kidney impairment; liver disease,dry mouth; constipation; insomnia; drowsiness,FDA_ORANGE_BOOK,0.957
+DRUG_00218,Drug,Drug_218_218,VitaLA,NSAID,True,253.08,cream,252,Pfizer,2002-03-06,infection control,allergy history; bleeding disorders,headache; drowsiness,FDA_ORANGE_BOOK,0.93
+DRUG_00219,Drug,Drug_219_219,NeoXR,DIURETIC,False,467.34,capsule,426,Novartis,2022-12-25,blood pressure control,pregnancy; allergy history,diarrhea; nausea; insomnia; headache; drowsiness,FDA_ORANGE_BOOK,0.917
+DRUG_00220,Drug,Drug_220_220,Neomax,STATIN,True,158.04,tablet,448,Merck,1999-03-05,cholesterol management,allergy history; pregnancy; kidney impairment,constipation; nausea,FDA_ORANGE_BOOK,0.989
+DRUG_00221,Drug,Drug_221_221,Novoplus,ANTIBIOTIC,True,278.07,syrup,138,Roche,2013-11-11,depression treatment,heart failure; kidney impairment,headache; nausea; constipation; dry mouth,FDA_ORANGE_BOOK,0.933
+DRUG_00222,Drug,Drug_222_222,VitaER,OPIOID,False,793.63,injection,418,AbbVie,1998-05-11,depression treatment,bleeding disorders; liver disease,constipation; diarrhea; nausea; dizziness,FDA_ORANGE_BOOK,0.855
+DRUG_00223,Drug,Drug_223_223,NeoSR,ANTIDEPRESSANT,True,691.89,cream,239,AbbVie,2013-10-15,cholesterol management,allergy history; liver disease; kidney impairment,nausea; diarrhea; insomnia; fatigue; dizziness,FDA_ORANGE_BOOK,0.864
+DRUG_00224,Drug,Drug_224_224,Genplus,ANXIOLYTIC,True,554.87,capsule,272,AbbVie,1994-04-10,anxiety reduction,heart failure; pregnancy; allergy history,dizziness; fatigue,FDA_ORANGE_BOOK,0.904
+DRUG_00225,Drug,Drug_225_225,Ultraforte,BRONCHODILATOR,False,627.21,syrup,339,Bristol Myers Squibb,1991-02-04,cardiac protection,heart failure,drowsiness; rash; insomnia; fatigue; nausea,FDA_ORANGE_BOOK,0.878
+DRUG_00226,Drug,Drug_226_226,Pharmaex,NSAID,False,442.69,capsule,192,AbbVie,2009-03-03,infection control,pregnancy,fatigue; dry mouth,FDA_ORANGE_BOOK,0.901
+DRUG_00227,Drug,Drug_227_227,Bioex,HYPNOTIC,True,652.2,capsule,267,Amgen,2020-04-28,cholesterol management,heart failure,headache; dry mouth; diarrhea; dizziness; constipation,FDA_ORANGE_BOOK,0.875
+DRUG_00228,Drug,Drug_228_228,Medplus,ANXIOLYTIC,True,461.52,injection,369,AbbVie,2019-10-25,pain relief,liver disease; kidney impairment; heart failure,diarrhea; fatigue; rash; dry mouth,FDA_ORANGE_BOOK,0.9
+DRUG_00229,Drug,Drug_229_229,NovoSR,CORTICOSTEROID,False,353.95,tablet,87,Merck,2016-02-06,pain relief,pregnancy,drowsiness; insomnia,FDA_ORANGE_BOOK,0.984
+DRUG_00230,Drug,Drug_230_230,Pharmamax,CORTICOSTEROID,True,266.66,tablet,89,Novartis,1992-09-02,blood pressure control,liver disease; kidney impairment,headache; constipation; dry mouth,FDA_ORANGE_BOOK,0.856
+DRUG_00231,Drug,Drug_231_231,Ultraol,ANTICONVULSANT,False,635.5,syrup,233,Novartis,2021-10-25,cholesterol management,bleeding disorders; kidney impairment; pregnancy,rash; fatigue,FDA_ORANGE_BOOK,0.953
+DRUG_00232,Drug,Drug_232_232,UltraSR,HYPNOTIC,True,638.35,tablet,489,AbbVie,2019-05-05,inflammation reduction,allergy history; bleeding disorders,drowsiness; diarrhea,FDA_ORANGE_BOOK,0.883
+DRUG_00233,Drug,Drug_233_233,UltraLA,HYPNOTIC,True,677.03,tablet,446,Roche,1992-06-13,infection control,heart failure; bleeding disorders,constipation; insomnia; rash,FDA_ORANGE_BOOK,0.987
+DRUG_00234,Drug,Drug_234_234,Genex,ANTIBIOTIC,False,742.01,cream,439,AbbVie,2017-03-09,infection control,liver disease; bleeding disorders; heart failure,dry mouth; fatigue; diarrhea; dizziness; drowsiness,FDA_ORANGE_BOOK,0.907
+DRUG_00235,Drug,Drug_235_235,Neoplus,NSAID,True,784.09,injection,162,Sanofi,2002-09-27,blood pressure control,heart failure; allergy history; bleeding disorders,nausea; diarrhea; headache; fatigue; rash,FDA_ORANGE_BOOK,0.859
+DRUG_00236,Drug,Drug_236_236,Genmax,NSAID,True,638.55,capsule,72,Merck,1994-09-10,inflammation reduction,liver disease; pregnancy; kidney impairment,fatigue; constipation; rash; insomnia,FDA_ORANGE_BOOK,0.982
+DRUG_00237,Drug,Drug_237_237,Medmax,ANTIDEPRESSANT,False,308.31,capsule,435,Roche,2003-04-02,diabetes treatment,liver disease; heart failure,dry mouth; constipation; dizziness; insomnia,FDA_ORANGE_BOOK,0.899
+DRUG_00238,Drug,Drug_238_238,Genmax,STATIN,True,383.52,injection,206,Amgen,1996-08-02,anxiety reduction,kidney impairment; heart failure,constipation; fatigue; nausea,FDA_ORANGE_BOOK,0.936
+DRUG_00239,Drug,Drug_239_239,Ultraol,ANTIDEPRESSANT,False,357.8,injection,285,Sanofi,2014-07-03,cholesterol management,heart failure; bleeding disorders,rash; drowsiness,FDA_ORANGE_BOOK,0.968
+DRUG_00240,Drug,Drug_240_240,BioXR,ACE_INHIBITOR,False,349.05,injection,379,AbbVie,1994-10-18,blood pressure control,bleeding disorders; liver disease,rash; constipation; dry mouth; nausea; headache,FDA_ORANGE_BOOK,0.98
+DRUG_00241,Drug,Drug_241_241,GenSR,HYPNOTIC,True,705.7,syrup,169,AbbVie,1992-01-26,cardiac protection,allergy history,rash; fatigue; headache; nausea,FDA_ORANGE_BOOK,0.898
+DRUG_00242,Drug,Drug_242_242,Bioplus,ANTIBIOTIC,False,755.89,capsule,400,Novartis,2012-06-20,cardiac protection,pregnancy; heart failure,constipation; insomnia; headache,FDA_ORANGE_BOOK,0.99
+DRUG_00243,Drug,Drug_243_243,PharmaSR,NSAID,False,762.39,injection,485,Bristol Myers Squibb,2007-04-25,depression treatment,bleeding disorders; kidney impairment; heart failure,dry mouth; constipation; insomnia; rash; headache,FDA_ORANGE_BOOK,0.937
+DRUG_00244,Drug,Drug_244_244,VitaLA,BRONCHODILATOR,False,709.84,cream,441,Pfizer,2001-03-25,infection control,kidney impairment; pregnancy; liver disease,diarrhea; rash; dry mouth; nausea,FDA_ORANGE_BOOK,0.921
+DRUG_00245,Drug,Drug_245_245,MaxER,NSAID,False,290.51,injection,377,Bristol Myers Squibb,2001-09-03,infection control,heart failure,fatigue; headache; dry mouth,FDA_ORANGE_BOOK,0.98
+DRUG_00246,Drug,Drug_246_246,Maxmax,OPIOID,False,183.98,injection,215,Roche,1995-08-07,anxiety reduction,liver disease,drowsiness; fatigue,FDA_ORANGE_BOOK,0.929
+DRUG_00247,Drug,Drug_247_247,Genex,ANTIBIOTIC,True,452.6,injection,470,Amgen,1992-12-26,blood pressure control,heart failure; pregnancy; liver disease,fatigue; dizziness,FDA_ORANGE_BOOK,0.934
+DRUG_00248,Drug,Drug_248_248,Medol,ACE_INHIBITOR,False,508.51,syrup,169,Johnson & Johnson,1997-11-30,depression treatment,kidney impairment; liver disease; allergy history,diarrhea; nausea,FDA_ORANGE_BOOK,0.92
+DRUG_00249,Drug,Drug_249_249,Pharmaol,PROTON_PUMP_INHIBITOR,True,317.75,syrup,344,Pfizer,2019-04-16,cholesterol management,kidney impairment; pregnancy; bleeding disorders,fatigue; drowsiness,FDA_ORANGE_BOOK,0.949
+DRUG_00250,Drug,Drug_250_250,NovoXR,PROTON_PUMP_INHIBITOR,True,493.87,syrup,225,Merck,2014-03-16,anxiety reduction,bleeding disorders; allergy history; heart failure,dry mouth; drowsiness,FDA_ORANGE_BOOK,0.89
+DRUG_00251,Drug,Drug_251_251,Pharmaol,NSAID,True,481.44,syrup,327,Bristol Myers Squibb,2017-03-14,inflammation reduction,allergy history; bleeding disorders,headache; drowsiness; insomnia; dizziness,FDA_ORANGE_BOOK,0.89
+DRUG_00252,Drug,Drug_252_252,UltraLA,ANTICONVULSANT,False,213.84,capsule,262,Pfizer,2011-05-06,depression treatment,allergy history; kidney impairment,insomnia; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.976
+DRUG_00253,Drug,Drug_253_253,Proplus,ANXIOLYTIC,True,477.98,capsule,156,AbbVie,1998-08-23,blood pressure control,liver disease; heart failure; kidney impairment,fatigue; rash; insomnia; dry mouth,FDA_ORANGE_BOOK,0.894
+DRUG_00254,Drug,Drug_254_254,GenER,BETA_BLOCKER,True,362.25,syrup,202,Merck,2009-09-25,pain relief,heart failure; allergy history,nausea; insomnia; constipation; dry mouth; dizziness,FDA_ORANGE_BOOK,0.874
+DRUG_00255,Drug,Drug_255_255,BioER,OPIOID,True,453.48,injection,227,Pfizer,1998-10-09,pain relief,heart failure,insomnia; diarrhea; constipation; fatigue,FDA_ORANGE_BOOK,0.902
+DRUG_00256,Drug,Drug_256_256,NovoLA,ANTICONVULSANT,False,763.36,tablet,425,Merck,2007-06-23,depression treatment,heart failure; kidney impairment; bleeding disorders,dizziness; rash,FDA_ORANGE_BOOK,0.926
+DRUG_00257,Drug,Drug_257_257,Proplus,OPIOID,True,745.57,capsule,340,Johnson & Johnson,1990-09-24,pain relief,allergy history,nausea; constipation,FDA_ORANGE_BOOK,0.956
+DRUG_00258,Drug,Drug_258_258,Genol,NSAID,True,748.26,injection,75,Novartis,1996-01-18,diabetes treatment,pregnancy,constipation; dizziness,FDA_ORANGE_BOOK,0.887
+DRUG_00259,Drug,Drug_259_259,MedER,OPIOID,False,178.22,syrup,390,Pfizer,2008-07-27,cardiac protection,liver disease,insomnia; nausea; diarrhea,FDA_ORANGE_BOOK,0.894
+DRUG_00260,Drug,Drug_260_260,Novool,STATIN,True,303.94,cream,354,Roche,2019-11-10,blood pressure control,allergy history,diarrhea; rash; fatigue; headache; dry mouth,FDA_ORANGE_BOOK,0.878
+DRUG_00261,Drug,Drug_261_261,ProER,NSAID,False,628.92,capsule,281,Bristol Myers Squibb,2016-07-12,diabetes treatment,pregnancy; liver disease,rash; dry mouth; drowsiness; constipation,FDA_ORANGE_BOOK,0.905
+DRUG_00262,Drug,Drug_262_262,Pharmaine,CORTICOSTEROID,False,451.49,cream,221,Amgen,2013-11-25,diabetes treatment,bleeding disorders,drowsiness; insomnia,FDA_ORANGE_BOOK,0.938
+DRUG_00263,Drug,Drug_263_263,Prool,NSAID,False,441.76,injection,121,GlaxoSmithKline,2020-10-23,cholesterol management,allergy history; pregnancy,rash; dry mouth; headache,FDA_ORANGE_BOOK,0.897
+DRUG_00264,Drug,Drug_264_264,GenSR,NSAID,True,630.64,capsule,36,AbbVie,1998-10-23,cholesterol management,heart failure; allergy history; pregnancy,dry mouth; insomnia,FDA_ORANGE_BOOK,0.951
+DRUG_00265,Drug,Drug_265_265,Vitaex,ANTICONVULSANT,False,766.69,injection,254,Amgen,2012-12-22,infection control,pregnancy,dizziness; rash; headache; insomnia,FDA_ORANGE_BOOK,0.874
+DRUG_00266,Drug,Drug_266_266,UltraLA,BETA_BLOCKER,False,631.57,cream,451,GlaxoSmithKline,1999-02-12,inflammation reduction,pregnancy; liver disease; allergy history,insomnia; fatigue; rash,FDA_ORANGE_BOOK,0.936
+DRUG_00267,Drug,Drug_267_267,Medforte,DIURETIC,False,584.08,tablet,6,Merck,2020-11-27,diabetes treatment,liver disease; allergy history; kidney impairment,dry mouth; drowsiness; rash,FDA_ORANGE_BOOK,0.911
+DRUG_00268,Drug,Drug_268_268,ProXR,ACE_INHIBITOR,True,517.24,cream,218,Roche,2005-04-16,blood pressure control,kidney impairment; bleeding disorders; pregnancy,rash; dizziness; dry mouth,FDA_ORANGE_BOOK,0.957
+DRUG_00269,Drug,Drug_269_269,PharmaSR,STATIN,False,432.73,cream,343,Pfizer,2003-05-20,cardiac protection,liver disease; bleeding disorders,insomnia; fatigue; headache; diarrhea,FDA_ORANGE_BOOK,0.926
+DRUG_00270,Drug,Drug_270_270,VitaXR,DIURETIC,False,787.54,injection,309,Roche,2022-01-16,infection control,liver disease,insomnia; drowsiness; dizziness,FDA_ORANGE_BOOK,0.877
+DRUG_00271,Drug,Drug_271_271,Genplus,ANTICONVULSANT,False,277.75,capsule,461,Pfizer,2013-11-07,cardiac protection,bleeding disorders; kidney impairment; heart failure,headache; dizziness; constipation; fatigue,FDA_ORANGE_BOOK,0.948
+DRUG_00272,Drug,Drug_272_272,Novoine,ACE_INHIBITOR,True,605.27,tablet,445,Pfizer,2000-07-14,cholesterol management,pregnancy,constipation; rash; insomnia,FDA_ORANGE_BOOK,0.977
+DRUG_00273,Drug,Drug_273_273,Vitaol,DIURETIC,True,288.92,injection,220,Bristol Myers Squibb,2015-01-28,cardiac protection,allergy history,rash; nausea; dizziness,FDA_ORANGE_BOOK,0.941
+DRUG_00274,Drug,Drug_274_274,Genine,PROTON_PUMP_INHIBITOR,True,161.88,injection,201,Sanofi,2018-04-21,cardiac protection,pregnancy; liver disease,dizziness; nausea; constipation; dry mouth,FDA_ORANGE_BOOK,0.916
+DRUG_00275,Drug,Drug_275_275,MaxXR,STATIN,False,733.74,syrup,412,Pfizer,1994-06-01,depression treatment,heart failure,drowsiness; fatigue; dry mouth; diarrhea; headache,FDA_ORANGE_BOOK,0.958
+DRUG_00276,Drug,Drug_276_276,Proplus,STATIN,True,641.95,injection,284,Roche,2005-08-12,inflammation reduction,pregnancy; liver disease,constipation; drowsiness; headache; insomnia,FDA_ORANGE_BOOK,0.851
+DRUG_00277,Drug,Drug_277_277,Bioine,BRONCHODILATOR,False,746.33,cream,423,GlaxoSmithKline,2001-08-18,depression treatment,pregnancy,insomnia; dry mouth; drowsiness; constipation,FDA_ORANGE_BOOK,0.858
+DRUG_00278,Drug,Drug_278_278,Vitaol,STATIN,True,321.01,tablet,24,Pfizer,2017-11-29,blood pressure control,pregnancy,dry mouth; insomnia; fatigue,FDA_ORANGE_BOOK,0.907
+DRUG_00279,Drug,Drug_279_279,Neomax,BRONCHODILATOR,False,405.54,capsule,442,Bristol Myers Squibb,2020-03-18,infection control,pregnancy,drowsiness; fatigue,FDA_ORANGE_BOOK,0.863
+DRUG_00280,Drug,Drug_280_280,Maxol,ANXIOLYTIC,False,720.93,syrup,440,Johnson & Johnson,2018-05-18,cholesterol management,bleeding disorders; liver disease; pregnancy,diarrhea; headache; fatigue; rash; insomnia,FDA_ORANGE_BOOK,0.968
+DRUG_00281,Drug,Drug_281_281,Ultraforte,CORTICOSTEROID,True,745.19,syrup,103,Roche,2011-10-25,pain relief,pregnancy,rash; diarrhea; nausea; fatigue; drowsiness,FDA_ORANGE_BOOK,0.988
+DRUG_00282,Drug,Drug_282_282,Proforte,NSAID,False,406.22,capsule,343,Johnson & Johnson,1993-09-04,pain relief,heart failure; bleeding disorders,insomnia; constipation; nausea,FDA_ORANGE_BOOK,0.981
+DRUG_00283,Drug,Drug_283_283,Vitaplus,ANTIDEPRESSANT,True,307.96,injection,62,Sanofi,2001-09-26,depression treatment,allergy history,rash; dizziness; dry mouth; nausea; headache,FDA_ORANGE_BOOK,0.867
+DRUG_00284,Drug,Drug_284_284,MaxLA,BETA_BLOCKER,True,157.85,cream,43,Sanofi,1996-04-27,anxiety reduction,liver disease; kidney impairment; heart failure,dry mouth; rash,FDA_ORANGE_BOOK,0.88
+DRUG_00285,Drug,Drug_285_285,Novool,STATIN,False,183.9,injection,323,Johnson & Johnson,2014-03-20,inflammation reduction,allergy history; pregnancy,constipation; dizziness,FDA_ORANGE_BOOK,0.918
+DRUG_00286,Drug,Drug_286_286,Genol,BETA_BLOCKER,True,318.27,capsule,393,Merck,2014-04-06,anxiety reduction,kidney impairment,insomnia; fatigue,FDA_ORANGE_BOOK,0.906
+DRUG_00287,Drug,Drug_287_287,Bioex,NSAID,True,647.28,cream,276,Bristol Myers Squibb,2000-05-23,inflammation reduction,heart failure,constipation; headache; diarrhea,FDA_ORANGE_BOOK,0.927
+DRUG_00288,Drug,Drug_288_288,Ultraforte,OPIOID,True,712.33,capsule,126,Amgen,2008-12-08,infection control,liver disease; heart failure; bleeding disorders,nausea; dry mouth; insomnia; headache,FDA_ORANGE_BOOK,0.868
+DRUG_00289,Drug,Drug_289_289,Genol,PROTON_PUMP_INHIBITOR,True,572.17,tablet,474,Amgen,2017-03-09,inflammation reduction,pregnancy; heart failure,diarrhea; rash,FDA_ORANGE_BOOK,0.881
+DRUG_00290,Drug,Drug_290_290,PharmaER,CORTICOSTEROID,False,424.98,cream,250,Sanofi,2015-07-31,pain relief,heart failure,nausea; drowsiness,FDA_ORANGE_BOOK,0.96
+DRUG_00291,Drug,Drug_291_291,Vitaex,ANXIOLYTIC,True,795.19,tablet,84,Pfizer,1991-06-29,inflammation reduction,pregnancy; liver disease; allergy history,headache; dry mouth,FDA_ORANGE_BOOK,0.973
+DRUG_00292,Drug,Drug_292_292,Ultraplus,ACE_INHIBITOR,True,356.42,capsule,337,Novartis,2018-06-22,blood pressure control,liver disease; bleeding disorders,dizziness; constipation; dry mouth; nausea; fatigue,FDA_ORANGE_BOOK,0.891
+DRUG_00293,Drug,Drug_293_293,Novoex,DIURETIC,True,515.59,tablet,281,Merck,1995-12-23,cholesterol management,heart failure; kidney impairment,drowsiness; dry mouth; headache,FDA_ORANGE_BOOK,0.911
+DRUG_00294,Drug,Drug_294_294,Vitaol,ANXIOLYTIC,False,179.48,injection,327,Novartis,2001-03-02,infection control,pregnancy; bleeding disorders,constipation; headache,FDA_ORANGE_BOOK,0.961
+DRUG_00295,Drug,Drug_295_295,Bioine,HYPNOTIC,False,707.95,syrup,353,Roche,1992-01-06,cholesterol management,bleeding disorders; heart failure; allergy history,diarrhea; nausea; rash,FDA_ORANGE_BOOK,0.877
+DRUG_00296,Drug,Drug_296_296,NeoSR,ANTICONVULSANT,False,342.55,cream,254,Novartis,2022-11-06,diabetes treatment,liver disease,insomnia; constipation; dizziness,FDA_ORANGE_BOOK,0.922
+DRUG_00297,Drug,Drug_297_297,GenXR,ANTIDEPRESSANT,False,569.09,injection,150,Roche,2005-02-04,cardiac protection,bleeding disorders; heart failure,nausea; constipation; dizziness,FDA_ORANGE_BOOK,0.851
+DRUG_00298,Drug,Drug_298_298,Ultraex,ANTICONVULSANT,True,345.52,tablet,184,Sanofi,2003-07-25,diabetes treatment,liver disease; pregnancy,dry mouth; headache; fatigue,FDA_ORANGE_BOOK,0.918
+DRUG_00299,Drug,Drug_299_299,Novoex,HYPNOTIC,True,256.84,capsule,28,Bristol Myers Squibb,2006-08-31,infection control,bleeding disorders,dizziness; dry mouth; rash,FDA_ORANGE_BOOK,0.915
+DRUG_00300,Drug,Drug_300_300,Pharmaine,PROTON_PUMP_INHIBITOR,False,599.08,tablet,268,Novartis,2021-09-15,depression treatment,kidney impairment; bleeding disorders; allergy history,drowsiness; headache; dry mouth,FDA_ORANGE_BOOK,0.932
+DRUG_00301,Drug,Drug_301_301,MaxSR,HYPNOTIC,True,566.9,syrup,81,Sanofi,2007-09-30,cholesterol management,bleeding disorders; kidney impairment,diarrhea; insomnia; drowsiness,FDA_ORANGE_BOOK,0.888
+DRUG_00302,Drug,Drug_302_302,Pharmaplus,STATIN,False,403.22,cream,9,Sanofi,2009-05-29,blood pressure control,heart failure; allergy history; pregnancy,insomnia; headache; dizziness,FDA_ORANGE_BOOK,0.968
+DRUG_00303,Drug,Drug_303_303,GenXR,ANTIBIOTIC,True,651.81,capsule,448,Roche,2008-02-25,blood pressure control,heart failure; kidney impairment; allergy history,diarrhea; fatigue; constipation; insomnia; headache,FDA_ORANGE_BOOK,0.939
+DRUG_00304,Drug,Drug_304_304,Genforte,NSAID,False,413.24,syrup,301,Bristol Myers Squibb,2022-03-16,infection control,heart failure,dry mouth; headache; diarrhea; rash; dizziness,FDA_ORANGE_BOOK,0.918
+DRUG_00305,Drug,Drug_305_305,Medex,ANTICONVULSANT,False,552.96,injection,437,Amgen,1999-08-05,pain relief,bleeding disorders; heart failure,fatigue; dry mouth; diarrhea; rash,FDA_ORANGE_BOOK,0.892
+DRUG_00306,Drug,Drug_306_306,Neool,HYPNOTIC,False,691.78,injection,454,Merck,1994-07-11,blood pressure control,kidney impairment,nausea; constipation; fatigue; dizziness; drowsiness,FDA_ORANGE_BOOK,0.941
+DRUG_00307,Drug,Drug_307_307,Pharmamax,BETA_BLOCKER,True,504.3,tablet,141,Johnson & Johnson,2007-08-06,pain relief,bleeding disorders,fatigue; constipation; insomnia; rash; diarrhea,FDA_ORANGE_BOOK,0.876
+DRUG_00308,Drug,Drug_308_308,GenSR,ANTIDEPRESSANT,True,649.46,tablet,157,AbbVie,2017-01-14,cardiac protection,liver disease; allergy history; kidney impairment,headache; insomnia; drowsiness; dizziness,FDA_ORANGE_BOOK,0.979
+DRUG_00309,Drug,Drug_309_309,UltraER,STATIN,False,746.41,capsule,50,Pfizer,2016-08-22,diabetes treatment,bleeding disorders,insomnia; drowsiness; dizziness; rash; constipation,FDA_ORANGE_BOOK,0.932
+DRUG_00310,Drug,Drug_310_310,NovoER,OPIOID,True,753.19,capsule,492,Bristol Myers Squibb,2011-05-23,diabetes treatment,liver disease; kidney impairment; bleeding disorders,nausea; headache; drowsiness; dry mouth; dizziness,FDA_ORANGE_BOOK,0.942
+DRUG_00311,Drug,Drug_311_311,Novoforte,DIURETIC,True,428.33,tablet,311,Merck,1994-12-12,blood pressure control,bleeding disorders; liver disease,fatigue; headache; dry mouth,FDA_ORANGE_BOOK,0.939
+DRUG_00312,Drug,Drug_312_312,Genol,STATIN,True,436.19,cream,33,Johnson & Johnson,1998-05-17,depression treatment,liver disease; heart failure,nausea; dry mouth; insomnia; dizziness; constipation,FDA_ORANGE_BOOK,0.89
+DRUG_00313,Drug,Drug_313_313,NovoXR,PROTON_PUMP_INHIBITOR,True,323.7,cream,72,AbbVie,1999-05-05,cardiac protection,heart failure; pregnancy,nausea; fatigue; headache; rash; insomnia,FDA_ORANGE_BOOK,0.987
+DRUG_00314,Drug,Drug_314_314,Medforte,PROTON_PUMP_INHIBITOR,True,709.63,cream,302,Johnson & Johnson,1992-12-12,blood pressure control,heart failure,diarrhea; insomnia,FDA_ORANGE_BOOK,0.94
+DRUG_00315,Drug,Drug_315_315,Vitaforte,HYPNOTIC,False,187.52,injection,303,GlaxoSmithKline,1992-07-02,depression treatment,allergy history; pregnancy,headache; fatigue; constipation,FDA_ORANGE_BOOK,0.96
+DRUG_00316,Drug,Drug_316_316,Genplus,HYPNOTIC,True,242.64,tablet,377,Johnson & Johnson,2010-05-23,inflammation reduction,allergy history,dizziness; fatigue; nausea; insomnia; constipation,FDA_ORANGE_BOOK,0.86
+DRUG_00317,Drug,Drug_317_317,NovoXR,OPIOID,False,254.9,capsule,246,Sanofi,1995-06-22,diabetes treatment,kidney impairment,fatigue; nausea; drowsiness,FDA_ORANGE_BOOK,0.876
+DRUG_00318,Drug,Drug_318_318,UltraXR,ANTIBIOTIC,True,564.25,capsule,481,Merck,2020-10-29,blood pressure control,pregnancy; kidney impairment; bleeding disorders,headache; fatigue; dizziness,FDA_ORANGE_BOOK,0.926
+DRUG_00319,Drug,Drug_319_319,Novoine,DIURETIC,True,764.93,injection,27,Amgen,2003-03-27,diabetes treatment,liver disease; heart failure,fatigue; constipation; rash; nausea,FDA_ORANGE_BOOK,0.87
+DRUG_00320,Drug,Drug_320_320,Neomax,ANTIBIOTIC,False,217.35,injection,386,Roche,2008-06-30,depression treatment,pregnancy,dizziness; insomnia; nausea,FDA_ORANGE_BOOK,0.983
+DRUG_00321,Drug,Drug_321_321,VitaXR,CORTICOSTEROID,False,674.99,syrup,84,Pfizer,2013-09-04,pain relief,pregnancy; kidney impairment,dizziness; dry mouth,FDA_ORANGE_BOOK,0.898
+DRUG_00322,Drug,Drug_322_322,Genex,ANXIOLYTIC,True,387.83,syrup,205,GlaxoSmithKline,1992-01-05,pain relief,bleeding disorders; pregnancy; allergy history,dry mouth; fatigue; constipation; dizziness,FDA_ORANGE_BOOK,0.952
+DRUG_00323,Drug,Drug_323_323,Pharmamax,STATIN,True,337.9,syrup,309,Johnson & Johnson,1996-01-15,blood pressure control,bleeding disorders,dry mouth; diarrhea; drowsiness; rash,FDA_ORANGE_BOOK,0.872
+DRUG_00324,Drug,Drug_324_324,UltraER,ANTICONVULSANT,False,177.82,cream,209,Bristol Myers Squibb,2010-07-04,pain relief,bleeding disorders; liver disease; kidney impairment,nausea; dry mouth; headache; drowsiness,FDA_ORANGE_BOOK,0.857
+DRUG_00325,Drug,Drug_325_325,PharmaXR,ANTIBIOTIC,False,576.41,tablet,51,AbbVie,1996-08-31,anxiety reduction,heart failure; allergy history,dry mouth; headache; rash; drowsiness; insomnia,FDA_ORANGE_BOOK,0.907
+DRUG_00326,Drug,Drug_326_326,Novoplus,STATIN,True,422.76,tablet,29,Bristol Myers Squibb,2003-04-28,pain relief,liver disease; allergy history; bleeding disorders,diarrhea; drowsiness; dizziness; dry mouth,FDA_ORANGE_BOOK,0.961
+DRUG_00327,Drug,Drug_327_327,Neoforte,ACE_INHIBITOR,False,284.64,injection,74,Sanofi,1993-01-01,depression treatment,kidney impairment; heart failure; liver disease,dry mouth; dizziness; constipation,FDA_ORANGE_BOOK,0.965
+DRUG_00328,Drug,Drug_328_328,Vitaex,ANTIDEPRESSANT,False,282.84,capsule,54,Johnson & Johnson,2023-12-11,anxiety reduction,pregnancy,headache; dry mouth; nausea; drowsiness,FDA_ORANGE_BOOK,0.938
+DRUG_00329,Drug,Drug_329_329,VitaSR,ACE_INHIBITOR,False,772.17,injection,118,GlaxoSmithKline,2019-08-04,anxiety reduction,kidney impairment,headache; constipation,FDA_ORANGE_BOOK,0.874
+DRUG_00330,Drug,Drug_330_330,MaxSR,NSAID,False,262.77,syrup,93,Pfizer,1990-12-30,diabetes treatment,kidney impairment,headache; dizziness; constipation; rash; nausea,FDA_ORANGE_BOOK,0.914
+DRUG_00331,Drug,Drug_331_331,ProLA,BRONCHODILATOR,False,217.95,capsule,419,Novartis,2004-07-08,infection control,kidney impairment,diarrhea; nausea; drowsiness; headache; dizziness,FDA_ORANGE_BOOK,0.889
+DRUG_00332,Drug,Drug_332_332,Novoplus,BETA_BLOCKER,False,358.54,syrup,486,Sanofi,2000-02-13,diabetes treatment,pregnancy,headache; fatigue; dry mouth,FDA_ORANGE_BOOK,0.968
+DRUG_00333,Drug,Drug_333_333,Neoine,ANTIDEPRESSANT,False,624.72,tablet,258,Merck,2000-04-14,infection control,pregnancy,rash; dry mouth; insomnia; fatigue; dizziness,FDA_ORANGE_BOOK,0.864
+DRUG_00334,Drug,Drug_334_334,Novoine,ANXIOLYTIC,True,208.15,capsule,306,Pfizer,2003-04-28,cardiac protection,bleeding disorders; heart failure; pregnancy,constipation; insomnia; diarrhea; headache; rash,FDA_ORANGE_BOOK,0.909
+DRUG_00335,Drug,Drug_335_335,MedXR,ANTIDEPRESSANT,False,543.83,syrup,184,AbbVie,2023-07-26,blood pressure control,bleeding disorders,diarrhea; drowsiness; nausea,FDA_ORANGE_BOOK,0.887
+DRUG_00336,Drug,Drug_336_336,Pharmaex,ANXIOLYTIC,False,432.47,syrup,120,Merck,2001-03-11,anxiety reduction,liver disease; kidney impairment,constipation; dizziness,FDA_ORANGE_BOOK,0.92
+DRUG_00337,Drug,Drug_337_337,Proine,DIURETIC,True,700.95,cream,397,GlaxoSmithKline,2019-11-17,cholesterol management,allergy history; kidney impairment; pregnancy,nausea; dizziness,FDA_ORANGE_BOOK,0.922
+DRUG_00338,Drug,Drug_338_338,NovoSR,BETA_BLOCKER,False,189.43,syrup,443,GlaxoSmithKline,2013-02-13,pain relief,allergy history,nausea; dry mouth; constipation; drowsiness,FDA_ORANGE_BOOK,0.98
+DRUG_00339,Drug,Drug_339_339,Vitaex,ANTIDEPRESSANT,False,251.21,syrup,258,Roche,2015-10-09,pain relief,heart failure,dry mouth; fatigue; nausea; headache,FDA_ORANGE_BOOK,0.978
+DRUG_00340,Drug,Drug_340_340,Ultraforte,ANTIDEPRESSANT,True,391.16,syrup,43,GlaxoSmithKline,2002-07-12,cholesterol management,bleeding disorders,drowsiness; insomnia; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.876
+DRUG_00341,Drug,Drug_341_341,BioLA,CORTICOSTEROID,True,230.55,tablet,130,GlaxoSmithKline,2017-10-07,anxiety reduction,bleeding disorders; pregnancy; liver disease,dizziness; drowsiness; rash; fatigue; insomnia,FDA_ORANGE_BOOK,0.896
+DRUG_00342,Drug,Drug_342_342,VitaSR,DIURETIC,False,508.32,injection,433,Novartis,2022-07-19,blood pressure control,bleeding disorders,constipation; diarrhea; rash; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.864
+DRUG_00343,Drug,Drug_343_343,Proplus,ANTIBIOTIC,False,469.13,cream,162,Pfizer,1996-01-07,depression treatment,allergy history; bleeding disorders,rash; dizziness; headache; drowsiness; constipation,FDA_ORANGE_BOOK,0.97
+DRUG_00344,Drug,Drug_344_344,Biool,ANTIBIOTIC,False,272.28,cream,198,Merck,2017-06-23,infection control,heart failure,constipation; diarrhea; nausea; dry mouth,FDA_ORANGE_BOOK,0.924
+DRUG_00345,Drug,Drug_345_345,Pharmaine,BRONCHODILATOR,False,758.08,syrup,211,Bristol Myers Squibb,2005-06-12,pain relief,kidney impairment; pregnancy,diarrhea; fatigue; constipation,FDA_ORANGE_BOOK,0.977
+DRUG_00346,Drug,Drug_346_346,Pharmaex,ANTIDEPRESSANT,True,540.87,syrup,167,Sanofi,2016-09-04,anxiety reduction,bleeding disorders,nausea; diarrhea,FDA_ORANGE_BOOK,0.923
+DRUG_00347,Drug,Drug_347_347,Bioforte,BETA_BLOCKER,False,678.08,capsule,38,Roche,2010-11-25,blood pressure control,allergy history,drowsiness; insomnia,FDA_ORANGE_BOOK,0.913
+DRUG_00348,Drug,Drug_348_348,VitaSR,BETA_BLOCKER,True,329.2,tablet,377,AbbVie,1996-02-28,cardiac protection,heart failure; liver disease,rash; diarrhea; fatigue,FDA_ORANGE_BOOK,0.865
+DRUG_00349,Drug,Drug_349_349,Medol,HYPNOTIC,True,407.66,syrup,204,Roche,1992-02-23,inflammation reduction,bleeding disorders,drowsiness; dizziness; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.98
+DRUG_00350,Drug,Drug_350_350,Ultraol,PROTON_PUMP_INHIBITOR,False,292.5,cream,389,AbbVie,2022-06-09,cholesterol management,allergy history,constipation; headache,FDA_ORANGE_BOOK,0.867
+DRUG_00351,Drug,Drug_351_351,ProSR,PROTON_PUMP_INHIBITOR,False,565.99,syrup,92,Sanofi,2003-07-25,cardiac protection,bleeding disorders; heart failure,insomnia; drowsiness; fatigue,FDA_ORANGE_BOOK,0.934
+DRUG_00352,Drug,Drug_352_352,Ultraol,ANTICONVULSANT,True,302.7,tablet,150,Roche,2008-10-12,infection control,allergy history,diarrhea; fatigue; drowsiness; nausea,FDA_ORANGE_BOOK,0.891
+DRUG_00353,Drug,Drug_353_353,Neoex,OPIOID,False,423.51,syrup,429,Amgen,2017-09-11,cardiac protection,liver disease; allergy history; pregnancy,diarrhea; dry mouth; insomnia; headache,FDA_ORANGE_BOOK,0.897
+DRUG_00354,Drug,Drug_354_354,Neomax,ANXIOLYTIC,True,169.18,injection,125,AbbVie,2005-07-25,infection control,bleeding disorders; pregnancy,dizziness; nausea; diarrhea,FDA_ORANGE_BOOK,0.922
+DRUG_00355,Drug,Drug_355_355,Medplus,PROTON_PUMP_INHIBITOR,True,360.14,cream,323,GlaxoSmithKline,2004-03-23,cardiac protection,pregnancy,constipation; fatigue; dizziness,FDA_ORANGE_BOOK,0.944
+DRUG_00356,Drug,Drug_356_356,Medmax,OPIOID,False,709.17,injection,49,Merck,2015-03-03,cardiac protection,kidney impairment; bleeding disorders; heart failure,diarrhea; constipation; rash; dizziness; dry mouth,FDA_ORANGE_BOOK,0.937
+DRUG_00357,Drug,Drug_357_357,Novool,ANXIOLYTIC,True,336.63,cream,329,Novartis,2016-06-15,depression treatment,kidney impairment,dry mouth; diarrhea; fatigue,FDA_ORANGE_BOOK,0.878
+DRUG_00358,Drug,Drug_358_358,Medine,STATIN,False,419.6,capsule,231,Sanofi,1996-03-02,depression treatment,liver disease; kidney impairment; bleeding disorders,headache; dizziness; nausea; fatigue; drowsiness,FDA_ORANGE_BOOK,0.935
+DRUG_00359,Drug,Drug_359_359,BioXR,ACE_INHIBITOR,True,388.94,injection,361,Bristol Myers Squibb,1999-09-20,pain relief,liver disease; kidney impairment; pregnancy,rash; constipation; dry mouth,FDA_ORANGE_BOOK,0.92
+DRUG_00360,Drug,Drug_360_360,Vitaex,ACE_INHIBITOR,False,289.08,syrup,85,Amgen,2011-04-26,depression treatment,liver disease; kidney impairment; pregnancy,drowsiness; fatigue,FDA_ORANGE_BOOK,0.928
+DRUG_00361,Drug,Drug_361_361,Maxmax,ANXIOLYTIC,True,383.86,cream,301,Pfizer,1991-10-21,infection control,kidney impairment; bleeding disorders,insomnia; headache; drowsiness,FDA_ORANGE_BOOK,0.869
+DRUG_00362,Drug,Drug_362_362,Genol,BRONCHODILATOR,False,669.78,tablet,383,GlaxoSmithKline,2000-12-19,pain relief,allergy history; liver disease,nausea; diarrhea,FDA_ORANGE_BOOK,0.967
+DRUG_00363,Drug,Drug_363_363,Maxplus,STATIN,True,618.97,cream,121,Sanofi,1995-09-09,infection control,bleeding disorders; pregnancy; kidney impairment,diarrhea; dizziness; constipation,FDA_ORANGE_BOOK,0.861
+DRUG_00364,Drug,Drug_364_364,Novoex,OPIOID,True,435.24,syrup,454,Merck,2007-09-28,inflammation reduction,heart failure; liver disease; bleeding disorders,dizziness; constipation; fatigue; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.857
+DRUG_00365,Drug,Drug_365_365,Pharmaplus,ANXIOLYTIC,True,236.7,tablet,291,Bristol Myers Squibb,2008-10-18,cardiac protection,liver disease; kidney impairment,headache; rash; constipation; insomnia,FDA_ORANGE_BOOK,0.91
+DRUG_00366,Drug,Drug_366_366,GenSR,CORTICOSTEROID,True,282.64,injection,44,Pfizer,2013-08-14,cholesterol management,kidney impairment; allergy history; pregnancy,nausea; rash,FDA_ORANGE_BOOK,0.888
+DRUG_00367,Drug,Drug_367_367,Medol,PROTON_PUMP_INHIBITOR,True,570.88,capsule,118,Roche,2008-05-21,inflammation reduction,heart failure,headache; fatigue; diarrhea; insomnia; nausea,FDA_ORANGE_BOOK,0.892
+DRUG_00368,Drug,Drug_368_368,Proforte,ANTIDEPRESSANT,False,162.26,cream,339,Roche,2001-04-26,diabetes treatment,liver disease; allergy history; pregnancy,constipation; nausea,FDA_ORANGE_BOOK,0.916
+DRUG_00369,Drug,Drug_369_369,Maxplus,BRONCHODILATOR,False,214.42,tablet,57,Novartis,2014-02-14,cholesterol management,liver disease,dry mouth; constipation; headache; fatigue,FDA_ORANGE_BOOK,0.859
+DRUG_00370,Drug,Drug_370_370,Genol,ANXIOLYTIC,False,358.59,injection,92,AbbVie,1994-04-21,pain relief,pregnancy,dry mouth; fatigue; insomnia,FDA_ORANGE_BOOK,0.857
+DRUG_00371,Drug,Drug_371_371,Genol,BRONCHODILATOR,False,782.24,tablet,16,Pfizer,2013-10-20,cardiac protection,bleeding disorders; allergy history; liver disease,drowsiness; headache; dizziness; rash; insomnia,FDA_ORANGE_BOOK,0.862
+DRUG_00372,Drug,Drug_372_372,ProXR,OPIOID,False,263.46,tablet,390,Novartis,1992-06-24,infection control,liver disease; bleeding disorders; kidney impairment,dizziness; diarrhea; constipation,FDA_ORANGE_BOOK,0.987
+DRUG_00373,Drug,Drug_373_373,Biomax,NSAID,True,276.24,syrup,230,Sanofi,1998-09-24,cholesterol management,bleeding disorders; pregnancy; kidney impairment,fatigue; drowsiness; headache; insomnia; nausea,FDA_ORANGE_BOOK,0.978
+DRUG_00374,Drug,Drug_374_374,Vitaplus,NSAID,False,386.14,injection,23,Bristol Myers Squibb,1999-06-05,pain relief,bleeding disorders; allergy history,insomnia; rash; constipation,FDA_ORANGE_BOOK,0.896
+DRUG_00375,Drug,Drug_375_375,GenLA,ACE_INHIBITOR,True,343.59,injection,349,Bristol Myers Squibb,2005-08-16,inflammation reduction,heart failure; liver disease,fatigue; dry mouth; rash; diarrhea; constipation,FDA_ORANGE_BOOK,0.955
+DRUG_00376,Drug,Drug_376_376,Pharmaforte,BETA_BLOCKER,False,622.07,capsule,483,Merck,2018-02-02,blood pressure control,pregnancy,drowsiness; nausea,FDA_ORANGE_BOOK,0.857
+DRUG_00377,Drug,Drug_377_377,Maxex,OPIOID,False,674.19,injection,279,Roche,2002-04-08,pain relief,pregnancy,rash; fatigue; diarrhea; nausea,FDA_ORANGE_BOOK,0.906
+DRUG_00378,Drug,Drug_378_378,GenER,ANXIOLYTIC,True,465.78,capsule,359,Pfizer,1994-07-26,inflammation reduction,liver disease,nausea; constipation,FDA_ORANGE_BOOK,0.907
+DRUG_00379,Drug,Drug_379_379,NeoXR,ACE_INHIBITOR,False,622.89,capsule,313,AbbVie,1998-02-18,infection control,kidney impairment; bleeding disorders; allergy history,rash; fatigue,FDA_ORANGE_BOOK,0.986
+DRUG_00380,Drug,Drug_380_380,BioXR,CORTICOSTEROID,False,540.87,cream,102,Johnson & Johnson,2007-10-10,anxiety reduction,pregnancy; allergy history,dizziness; headache; constipation,FDA_ORANGE_BOOK,0.925
+DRUG_00381,Drug,Drug_381_381,Vitaine,ANXIOLYTIC,True,244.94,capsule,9,GlaxoSmithKline,2013-07-10,depression treatment,liver disease,dizziness; nausea; constipation,FDA_ORANGE_BOOK,0.874
+DRUG_00382,Drug,Drug_382_382,Vitaplus,ACE_INHIBITOR,True,637.07,tablet,192,Novartis,1993-12-27,depression treatment,kidney impairment,constipation; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.903
+DRUG_00383,Drug,Drug_383_383,GenLA,CORTICOSTEROID,True,598.63,capsule,29,Amgen,1992-10-12,cardiac protection,allergy history,rash; dry mouth; fatigue; dizziness,FDA_ORANGE_BOOK,0.957
+DRUG_00384,Drug,Drug_384_384,Novoplus,ANXIOLYTIC,True,691.54,syrup,19,Merck,2020-07-06,anxiety reduction,heart failure; kidney impairment,drowsiness; fatigue; dizziness,FDA_ORANGE_BOOK,0.926
+DRUG_00385,Drug,Drug_385_385,Maxine,CORTICOSTEROID,True,437.56,capsule,179,Johnson & Johnson,1990-01-29,inflammation reduction,allergy history; heart failure; kidney impairment,dry mouth; diarrhea,FDA_ORANGE_BOOK,0.913
+DRUG_00386,Drug,Drug_386_386,MedER,ANXIOLYTIC,True,704.77,syrup,307,Sanofi,2004-10-02,cardiac protection,allergy history,headache; diarrhea; rash; dizziness; nausea,FDA_ORANGE_BOOK,0.895
+DRUG_00387,Drug,Drug_387_387,Ultraex,ANTIBIOTIC,True,721.33,cream,276,Novartis,2020-10-03,pain relief,pregnancy,rash; constipation; dizziness; headache; nausea,FDA_ORANGE_BOOK,0.954
+DRUG_00388,Drug,Drug_388_388,VitaER,STATIN,True,673.48,tablet,381,Novartis,1994-04-04,anxiety reduction,heart failure; bleeding disorders,dizziness; diarrhea; insomnia; headache; fatigue,FDA_ORANGE_BOOK,0.95
+DRUG_00389,Drug,Drug_389_389,Bioine,ANTIBIOTIC,False,267.37,tablet,250,GlaxoSmithKline,2015-04-09,blood pressure control,pregnancy; bleeding disorders,constipation; rash; diarrhea,FDA_ORANGE_BOOK,0.957
+DRUG_00390,Drug,Drug_390_390,Bioex,NSAID,True,640.43,injection,133,Amgen,1997-01-27,cardiac protection,liver disease; heart failure; kidney impairment,dry mouth; drowsiness; insomnia; constipation,FDA_ORANGE_BOOK,0.879
+DRUG_00391,Drug,Drug_391_391,Bioine,ANTIDEPRESSANT,True,626.26,syrup,163,Pfizer,1991-08-25,infection control,pregnancy; heart failure,dizziness; drowsiness; rash,FDA_ORANGE_BOOK,0.91
+DRUG_00392,Drug,Drug_392_392,UltraSR,ACE_INHIBITOR,True,458.41,tablet,479,Johnson & Johnson,2003-09-11,cholesterol management,heart failure; kidney impairment,insomnia; fatigue; dizziness,FDA_ORANGE_BOOK,0.942
+DRUG_00393,Drug,Drug_393_393,Neomax,PROTON_PUMP_INHIBITOR,False,560.17,capsule,256,Novartis,2006-05-23,blood pressure control,allergy history; bleeding disorders; pregnancy,rash; fatigue; constipation; diarrhea; insomnia,FDA_ORANGE_BOOK,0.917
+DRUG_00394,Drug,Drug_394_394,ProLA,CORTICOSTEROID,True,328.97,syrup,6,Johnson & Johnson,2016-01-10,diabetes treatment,kidney impairment,headache; drowsiness; dizziness,FDA_ORANGE_BOOK,0.933
+DRUG_00395,Drug,Drug_395_395,NovoER,BRONCHODILATOR,False,684.64,capsule,440,Amgen,2020-07-06,anxiety reduction,bleeding disorders; kidney impairment; pregnancy,headache; fatigue; dizziness; nausea,FDA_ORANGE_BOOK,0.932
+DRUG_00396,Drug,Drug_396_396,ProSR,DIURETIC,True,729.48,injection,308,AbbVie,2008-06-01,diabetes treatment,liver disease; pregnancy; bleeding disorders,fatigue; dry mouth; insomnia; nausea,FDA_ORANGE_BOOK,0.856
+DRUG_00397,Drug,Drug_397_397,Ultraine,ANTIDEPRESSANT,False,728.62,cream,404,Novartis,1996-11-14,pain relief,heart failure; liver disease; pregnancy,nausea; rash; constipation; dry mouth,FDA_ORANGE_BOOK,0.873
+DRUG_00398,Drug,Drug_398_398,Novoine,HYPNOTIC,False,538.27,tablet,323,Bristol Myers Squibb,2004-10-07,pain relief,heart failure,drowsiness; diarrhea; dry mouth; fatigue; insomnia,FDA_ORANGE_BOOK,0.91
+DRUG_00399,Drug,Drug_399_399,Vitamax,HYPNOTIC,True,251.13,syrup,285,Amgen,1995-03-20,blood pressure control,heart failure; pregnancy; bleeding disorders,constipation; headache,FDA_ORANGE_BOOK,0.886
+DRUG_00400,Drug,Drug_400_400,NovoLA,BETA_BLOCKER,True,470.26,capsule,45,Roche,1990-02-15,blood pressure control,kidney impairment,headache; rash; dry mouth; insomnia; fatigue,FDA_ORANGE_BOOK,0.948
+DRUG_00401,Drug,Drug_401_401,GenXR,DIURETIC,False,617.38,cream,387,Amgen,2000-10-06,diabetes treatment,liver disease; bleeding disorders,fatigue; headache,FDA_ORANGE_BOOK,0.964
+DRUG_00402,Drug,Drug_402_402,PharmaXR,ANTIBIOTIC,False,345.94,syrup,212,Sanofi,2009-10-26,cholesterol management,bleeding disorders,nausea; headache; dizziness; rash,FDA_ORANGE_BOOK,0.94
+DRUG_00403,Drug,Drug_403_403,Neoforte,HYPNOTIC,True,444.79,capsule,248,AbbVie,1990-11-15,blood pressure control,kidney impairment,drowsiness; constipation,FDA_ORANGE_BOOK,0.926
+DRUG_00404,Drug,Drug_404_404,NeoXR,BETA_BLOCKER,True,207.83,tablet,377,Bristol Myers Squibb,2012-07-23,diabetes treatment,kidney impairment; bleeding disorders; heart failure,drowsiness; headache,FDA_ORANGE_BOOK,0.86
+DRUG_00405,Drug,Drug_405_405,Novoex,PROTON_PUMP_INHIBITOR,False,255.66,injection,485,Amgen,2018-10-23,infection control,liver disease,dry mouth; drowsiness; dizziness; rash; insomnia,FDA_ORANGE_BOOK,0.91
+DRUG_00406,Drug,Drug_406_406,UltraLA,ACE_INHIBITOR,True,591.61,capsule,90,Roche,1996-05-08,cardiac protection,liver disease; bleeding disorders,nausea; dizziness,FDA_ORANGE_BOOK,0.871
+DRUG_00407,Drug,Drug_407_407,ProSR,DIURETIC,False,152.05,injection,489,Johnson & Johnson,2005-09-07,depression treatment,heart failure; bleeding disorders,headache; rash,FDA_ORANGE_BOOK,0.898
+DRUG_00408,Drug,Drug_408_408,VitaER,ANTICONVULSANT,True,314.81,syrup,480,Bristol Myers Squibb,2019-07-24,pain relief,kidney impairment; pregnancy,headache; insomnia; nausea,FDA_ORANGE_BOOK,0.876
+DRUG_00409,Drug,Drug_409_409,VitaLA,OPIOID,True,409.23,cream,193,Bristol Myers Squibb,1993-10-10,inflammation reduction,kidney impairment; allergy history,dizziness; rash; fatigue; nausea; insomnia,FDA_ORANGE_BOOK,0.862
+DRUG_00410,Drug,Drug_410_410,UltraER,ACE_INHIBITOR,True,452.73,injection,449,Bristol Myers Squibb,1993-03-07,depression treatment,bleeding disorders; liver disease; pregnancy,fatigue; dizziness; nausea; constipation; rash,FDA_ORANGE_BOOK,0.906
+DRUG_00411,Drug,Drug_411_411,Pharmaex,HYPNOTIC,False,483.87,capsule,249,Roche,2015-07-13,pain relief,pregnancy; allergy history; kidney impairment,drowsiness; dizziness; fatigue; nausea; constipation,FDA_ORANGE_BOOK,0.888
+DRUG_00412,Drug,Drug_412_412,MedXR,CORTICOSTEROID,False,361.69,cream,97,Sanofi,2013-06-23,inflammation reduction,bleeding disorders,rash; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.986
+DRUG_00413,Drug,Drug_413_413,Neomax,ANTIBIOTIC,True,211.41,tablet,23,Johnson & Johnson,2016-06-25,anxiety reduction,liver disease,nausea; fatigue; diarrhea; headache,FDA_ORANGE_BOOK,0.933
+DRUG_00414,Drug,Drug_414_414,Maxol,STATIN,False,448.26,syrup,369,Roche,2006-05-23,infection control,heart failure; bleeding disorders,rash; dry mouth; nausea; fatigue; diarrhea,FDA_ORANGE_BOOK,0.884
+DRUG_00415,Drug,Drug_415_415,Vitaplus,OPIOID,False,396.98,syrup,209,Johnson & Johnson,2016-03-04,anxiety reduction,bleeding disorders,diarrhea; drowsiness; constipation; fatigue,FDA_ORANGE_BOOK,0.895
+DRUG_00416,Drug,Drug_416_416,Novomax,ANTIBIOTIC,True,269.83,injection,340,Roche,2012-01-02,blood pressure control,liver disease; pregnancy,dizziness; insomnia; fatigue; drowsiness,FDA_ORANGE_BOOK,0.978
+DRUG_00417,Drug,Drug_417_417,ProSR,ANTIDEPRESSANT,True,470.06,cream,289,Sanofi,2006-01-30,diabetes treatment,bleeding disorders,constipation; nausea; dizziness,FDA_ORANGE_BOOK,0.988
+DRUG_00418,Drug,Drug_418_418,NeoLA,BRONCHODILATOR,True,475.62,cream,135,Johnson & Johnson,2018-11-04,blood pressure control,heart failure; allergy history; pregnancy,rash; fatigue; dry mouth; headache; insomnia,FDA_ORANGE_BOOK,0.87
+DRUG_00419,Drug,Drug_419_419,ProER,ACE_INHIBITOR,True,297.05,tablet,25,Sanofi,2013-01-09,depression treatment,pregnancy; heart failure; kidney impairment,rash; dry mouth; insomnia; drowsiness,FDA_ORANGE_BOOK,0.864
+DRUG_00420,Drug,Drug_420_420,Ultraol,PROTON_PUMP_INHIBITOR,True,227.52,injection,79,Bristol Myers Squibb,1991-02-25,pain relief,heart failure; pregnancy,dizziness; dry mouth; insomnia; nausea,FDA_ORANGE_BOOK,0.907
+DRUG_00421,Drug,Drug_421_421,Pharmaine,DIURETIC,True,308.46,syrup,15,GlaxoSmithKline,1999-07-23,inflammation reduction,kidney impairment,diarrhea; headache,FDA_ORANGE_BOOK,0.892
+DRUG_00422,Drug,Drug_422_422,Medol,DIURETIC,True,636.79,capsule,265,AbbVie,2012-06-19,cardiac protection,heart failure,fatigue; nausea; drowsiness; dizziness,FDA_ORANGE_BOOK,0.942
+DRUG_00423,Drug,Drug_423_423,Maxol,ACE_INHIBITOR,True,449.33,syrup,483,Bristol Myers Squibb,2013-09-02,depression treatment,kidney impairment,constipation; dry mouth; insomnia,FDA_ORANGE_BOOK,0.927
+DRUG_00424,Drug,Drug_424_424,BioER,CORTICOSTEROID,True,668.5,cream,271,Bristol Myers Squibb,1990-03-13,inflammation reduction,liver disease,dry mouth; fatigue; drowsiness,FDA_ORANGE_BOOK,0.9
+DRUG_00425,Drug,Drug_425_425,NeoXR,ANTICONVULSANT,False,507.54,syrup,195,AbbVie,1995-09-29,cholesterol management,allergy history; pregnancy,fatigue; rash,FDA_ORANGE_BOOK,0.941
+DRUG_00426,Drug,Drug_426_426,Ultraine,BRONCHODILATOR,True,385.39,injection,427,Merck,2002-10-21,anxiety reduction,liver disease; pregnancy,diarrhea; dry mouth; drowsiness; fatigue,FDA_ORANGE_BOOK,0.9
+DRUG_00427,Drug,Drug_427_427,Proplus,NSAID,True,585.91,syrup,411,Amgen,1993-08-09,cholesterol management,liver disease; pregnancy; bleeding disorders,dizziness; fatigue; constipation; rash; insomnia,FDA_ORANGE_BOOK,0.957
+DRUG_00428,Drug,Drug_428_428,Novoex,BETA_BLOCKER,True,701.19,syrup,24,Merck,2016-09-15,cardiac protection,liver disease; allergy history,diarrhea; headache,FDA_ORANGE_BOOK,0.947
+DRUG_00429,Drug,Drug_429_429,PharmaXR,PROTON_PUMP_INHIBITOR,False,150.56,cream,208,AbbVie,2022-10-20,diabetes treatment,pregnancy; liver disease; heart failure,constipation; drowsiness; diarrhea; nausea; insomnia,FDA_ORANGE_BOOK,0.976
+DRUG_00430,Drug,Drug_430_430,Ultramax,ANTICONVULSANT,True,367.5,capsule,296,Novartis,2015-01-02,diabetes treatment,pregnancy; liver disease,rash; diarrhea; constipation; dry mouth,FDA_ORANGE_BOOK,0.87
+DRUG_00431,Drug,Drug_431_431,NovoXR,OPIOID,True,629.66,injection,331,Pfizer,2017-02-15,diabetes treatment,heart failure; bleeding disorders; pregnancy,nausea; fatigue; dizziness; rash,FDA_ORANGE_BOOK,0.979
+DRUG_00432,Drug,Drug_432_432,Genforte,BRONCHODILATOR,False,301.72,tablet,362,Pfizer,1992-05-29,cholesterol management,heart failure; kidney impairment,insomnia; rash; fatigue; diarrhea,FDA_ORANGE_BOOK,0.947
+DRUG_00433,Drug,Drug_433_433,MedER,PROTON_PUMP_INHIBITOR,False,224.43,injection,10,Johnson & Johnson,1991-06-24,anxiety reduction,pregnancy; heart failure,drowsiness; constipation; dry mouth; dizziness; fatigue,FDA_ORANGE_BOOK,0.952
+DRUG_00434,Drug,Drug_434_434,BioSR,NSAID,True,261.08,syrup,193,AbbVie,1997-05-27,inflammation reduction,kidney impairment,dizziness; drowsiness; insomnia; headache,FDA_ORANGE_BOOK,0.968
+DRUG_00435,Drug,Drug_435_435,Medforte,DIURETIC,False,214.92,injection,22,Merck,2000-03-10,diabetes treatment,heart failure; allergy history; liver disease,fatigue; rash; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.919
+DRUG_00436,Drug,Drug_436_436,MedSR,BETA_BLOCKER,True,664.27,tablet,72,Pfizer,1996-03-28,depression treatment,allergy history; pregnancy,fatigue; drowsiness; diarrhea,FDA_ORANGE_BOOK,0.927
+DRUG_00437,Drug,Drug_437_437,Maxine,ANTIDEPRESSANT,True,662.85,injection,454,AbbVie,2009-06-10,inflammation reduction,liver disease; kidney impairment; allergy history,rash; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.859
+DRUG_00438,Drug,Drug_438_438,VitaXR,BETA_BLOCKER,False,703.5,capsule,75,Bristol Myers Squibb,2008-10-24,blood pressure control,liver disease; kidney impairment,constipation; dizziness; nausea; diarrhea,FDA_ORANGE_BOOK,0.979
+DRUG_00439,Drug,Drug_439_439,GenLA,BETA_BLOCKER,True,268.14,capsule,6,AbbVie,2021-06-08,inflammation reduction,bleeding disorders; kidney impairment,headache; rash; constipation; diarrhea; fatigue,FDA_ORANGE_BOOK,0.889
+DRUG_00440,Drug,Drug_440_440,Medplus,HYPNOTIC,True,456.63,syrup,250,AbbVie,2010-02-24,pain relief,allergy history,diarrhea; nausea; constipation,FDA_ORANGE_BOOK,0.918
+DRUG_00441,Drug,Drug_441_441,ProXR,BRONCHODILATOR,False,560.18,capsule,280,Novartis,1993-11-05,diabetes treatment,allergy history; liver disease,drowsiness; dizziness,FDA_ORANGE_BOOK,0.908
+DRUG_00442,Drug,Drug_442_442,Maxmax,STATIN,False,529.32,injection,393,Amgen,2006-01-07,blood pressure control,bleeding disorders; pregnancy; liver disease,dizziness; rash; diarrhea,FDA_ORANGE_BOOK,0.934
+DRUG_00443,Drug,Drug_443_443,Vitamax,NSAID,True,315.07,capsule,306,Amgen,2003-10-02,infection control,heart failure; liver disease,diarrhea; dry mouth,FDA_ORANGE_BOOK,0.971
+DRUG_00444,Drug,Drug_444_444,Ultramax,NSAID,True,354.02,tablet,9,Sanofi,2012-05-25,anxiety reduction,kidney impairment; bleeding disorders,fatigue; diarrhea,FDA_ORANGE_BOOK,0.976
+DRUG_00445,Drug,Drug_445_445,GenSR,ANTIBIOTIC,True,495.25,capsule,191,Amgen,1991-02-26,cardiac protection,liver disease,insomnia; nausea; dry mouth,FDA_ORANGE_BOOK,0.894
+DRUG_00446,Drug,Drug_446_446,Pharmaplus,OPIOID,True,420.2,tablet,189,Bristol Myers Squibb,1992-02-25,anxiety reduction,bleeding disorders,nausea; constipation,FDA_ORANGE_BOOK,0.915
+DRUG_00447,Drug,Drug_447_447,Ultraex,ANXIOLYTIC,False,417.38,capsule,225,Sanofi,2003-07-21,cholesterol management,liver disease; kidney impairment; pregnancy,nausea; dry mouth; drowsiness; insomnia; fatigue,FDA_ORANGE_BOOK,0.853
+DRUG_00448,Drug,Drug_448_448,Novoine,OPIOID,True,286.1,injection,202,Pfizer,1990-12-27,blood pressure control,liver disease; kidney impairment; bleeding disorders,dizziness; dry mouth; headache,FDA_ORANGE_BOOK,0.911
+DRUG_00449,Drug,Drug_449_449,GenSR,BETA_BLOCKER,False,268.5,syrup,290,Amgen,1990-11-09,depression treatment,allergy history; liver disease; bleeding disorders,rash; headache; dizziness; nausea; drowsiness,FDA_ORANGE_BOOK,0.98
+DRUG_00450,Drug,Drug_450_450,Vitaine,BRONCHODILATOR,True,559.58,tablet,81,Bristol Myers Squibb,2005-10-05,anxiety reduction,liver disease; pregnancy; heart failure,constipation; fatigue; rash; insomnia; headache,FDA_ORANGE_BOOK,0.875
+DRUG_00451,Drug,Drug_451_451,MedSR,ANTIBIOTIC,False,508.39,capsule,193,Novartis,2020-01-07,blood pressure control,bleeding disorders,dry mouth; rash,FDA_ORANGE_BOOK,0.904
+DRUG_00452,Drug,Drug_452_452,GenSR,ANTIBIOTIC,True,577.16,syrup,55,Merck,2000-06-07,cholesterol management,allergy history; heart failure; liver disease,nausea; drowsiness; rash,FDA_ORANGE_BOOK,0.935
+DRUG_00453,Drug,Drug_453_453,Bioplus,DIURETIC,False,714.24,capsule,237,Johnson & Johnson,1996-03-01,depression treatment,bleeding disorders; pregnancy,insomnia; nausea; fatigue; headache; dry mouth,FDA_ORANGE_BOOK,0.952
+DRUG_00454,Drug,Drug_454_454,Novoforte,ANTIBIOTIC,False,632.74,injection,313,Novartis,2010-02-16,blood pressure control,pregnancy; kidney impairment,diarrhea; dizziness; insomnia; rash; headache,FDA_ORANGE_BOOK,0.929
+DRUG_00455,Drug,Drug_455_455,Proforte,HYPNOTIC,False,667.09,cream,157,Merck,2000-08-10,pain relief,liver disease; heart failure,nausea; rash; dizziness; headache; dry mouth,FDA_ORANGE_BOOK,0.919
+DRUG_00456,Drug,Drug_456_456,Pharmaol,NSAID,True,311.15,tablet,164,Bristol Myers Squibb,2013-09-12,pain relief,heart failure; pregnancy,diarrhea; insomnia; drowsiness; headache; constipation,FDA_ORANGE_BOOK,0.866
+DRUG_00457,Drug,Drug_457_457,UltraSR,ANTICONVULSANT,False,532.43,injection,492,Johnson & Johnson,1995-02-01,blood pressure control,kidney impairment,dizziness; drowsiness,FDA_ORANGE_BOOK,0.913
+DRUG_00458,Drug,Drug_458_458,MaxER,ANTICONVULSANT,False,474.26,syrup,190,Merck,1999-11-29,pain relief,allergy history; pregnancy,dry mouth; dizziness; diarrhea; drowsiness; insomnia,FDA_ORANGE_BOOK,0.86
+DRUG_00459,Drug,Drug_459_459,Promax,DIURETIC,False,780.73,cream,360,Roche,2004-12-02,pain relief,heart failure; kidney impairment; pregnancy,drowsiness; constipation; dry mouth,FDA_ORANGE_BOOK,0.912
+DRUG_00460,Drug,Drug_460_460,Bioplus,HYPNOTIC,True,573.65,cream,57,Sanofi,2012-04-14,diabetes treatment,bleeding disorders,rash; dizziness,FDA_ORANGE_BOOK,0.943
+DRUG_00461,Drug,Drug_461_461,Maxex,ACE_INHIBITOR,True,755.56,cream,203,AbbVie,2016-07-02,cardiac protection,liver disease,headache; diarrhea,FDA_ORANGE_BOOK,0.866
+DRUG_00462,Drug,Drug_462_462,Proex,HYPNOTIC,True,587.12,syrup,235,GlaxoSmithKline,2022-06-17,cholesterol management,liver disease; kidney impairment,dry mouth; constipation; diarrhea; dizziness,FDA_ORANGE_BOOK,0.97
+DRUG_00463,Drug,Drug_463_463,Genmax,STATIN,True,591.54,capsule,148,Roche,1991-08-22,pain relief,pregnancy; liver disease,rash; drowsiness; dizziness,FDA_ORANGE_BOOK,0.982
+DRUG_00464,Drug,Drug_464_464,VitaLA,PROTON_PUMP_INHIBITOR,False,761.92,capsule,17,GlaxoSmithKline,1999-06-22,diabetes treatment,allergy history,rash; nausea; dizziness,FDA_ORANGE_BOOK,0.873
+DRUG_00465,Drug,Drug_465_465,Medex,ANTIBIOTIC,False,477.85,syrup,398,Pfizer,1994-08-03,pain relief,kidney impairment; bleeding disorders,drowsiness; dizziness; headache; dry mouth; fatigue,FDA_ORANGE_BOOK,0.889
+DRUG_00466,Drug,Drug_466_466,UltraER,STATIN,True,513.44,cream,141,GlaxoSmithKline,2022-09-24,depression treatment,kidney impairment,dizziness; insomnia; diarrhea; constipation,FDA_ORANGE_BOOK,0.883
+DRUG_00467,Drug,Drug_467_467,Bioforte,ANTICONVULSANT,False,569.81,capsule,258,Sanofi,2020-03-13,cholesterol management,allergy history; bleeding disorders,insomnia; dizziness; drowsiness; nausea,FDA_ORANGE_BOOK,0.988
+DRUG_00468,Drug,Drug_468_468,Neoex,ANTIBIOTIC,False,635.73,cream,95,Amgen,1991-06-20,inflammation reduction,pregnancy; liver disease,constipation; diarrhea; dizziness; drowsiness,FDA_ORANGE_BOOK,0.926
+DRUG_00469,Drug,Drug_469_469,Maxmax,ANXIOLYTIC,True,165.1,cream,463,Amgen,2020-11-27,cholesterol management,pregnancy; allergy history,diarrhea; rash; drowsiness; dizziness; fatigue,FDA_ORANGE_BOOK,0.904
+DRUG_00470,Drug,Drug_470_470,UltraXR,STATIN,True,350.59,capsule,310,Roche,2008-04-17,cardiac protection,allergy history; bleeding disorders,drowsiness; dry mouth; dizziness; constipation,FDA_ORANGE_BOOK,0.908
+DRUG_00471,Drug,Drug_471_471,PharmaXR,ANTIBIOTIC,True,605.4,syrup,153,AbbVie,1991-12-29,pain relief,bleeding disorders,dry mouth; rash; diarrhea; constipation,FDA_ORANGE_BOOK,0.875
+DRUG_00472,Drug,Drug_472_472,Pharmaine,BRONCHODILATOR,False,323.08,tablet,329,GlaxoSmithKline,2013-01-10,blood pressure control,pregnancy,dry mouth; rash,FDA_ORANGE_BOOK,0.907
+DRUG_00473,Drug,Drug_473_473,NovoLA,DIURETIC,False,471.38,syrup,450,Novartis,2010-07-14,anxiety reduction,liver disease; kidney impairment; pregnancy,insomnia; drowsiness; constipation; diarrhea,FDA_ORANGE_BOOK,0.869
+DRUG_00474,Drug,Drug_474_474,Biool,ANTICONVULSANT,True,557.97,cream,125,Amgen,2005-10-03,diabetes treatment,pregnancy,fatigue; diarrhea; dry mouth,FDA_ORANGE_BOOK,0.908
+DRUG_00475,Drug,Drug_475_475,Proforte,HYPNOTIC,False,758.15,injection,261,AbbVie,2005-01-12,diabetes treatment,liver disease; pregnancy; heart failure,dry mouth; insomnia; fatigue; headache,FDA_ORANGE_BOOK,0.934
+DRUG_00476,Drug,Drug_476_476,ProER,PROTON_PUMP_INHIBITOR,False,358.38,tablet,143,Pfizer,2011-07-13,cholesterol management,allergy history; heart failure; pregnancy,constipation; diarrhea,FDA_ORANGE_BOOK,0.912
+DRUG_00477,Drug,Drug_477_477,MaxXR,ANTICONVULSANT,False,421.78,tablet,328,Amgen,2017-09-22,cholesterol management,heart failure,rash; dry mouth; drowsiness,FDA_ORANGE_BOOK,0.918
+DRUG_00478,Drug,Drug_478_478,PharmaLA,DIURETIC,False,425.56,cream,146,Amgen,2016-06-13,infection control,kidney impairment; bleeding disorders; allergy history,nausea; dizziness; drowsiness; headache,FDA_ORANGE_BOOK,0.913
+DRUG_00479,Drug,Drug_479_479,GenER,ANTIBIOTIC,True,605.67,capsule,67,Roche,2007-08-21,infection control,pregnancy; allergy history; kidney impairment,nausea; constipation; dizziness; headache,FDA_ORANGE_BOOK,0.979
+DRUG_00480,Drug,Drug_480_480,Neoine,ANTICONVULSANT,True,629.24,cream,61,GlaxoSmithKline,2017-12-01,pain relief,allergy history,dizziness; fatigue,FDA_ORANGE_BOOK,0.879
+DRUG_00481,Drug,Drug_481_481,Novomax,CORTICOSTEROID,True,291.63,injection,202,Novartis,2008-09-26,cholesterol management,liver disease; kidney impairment,insomnia; diarrhea; fatigue; headache; constipation,FDA_ORANGE_BOOK,0.852
+DRUG_00482,Drug,Drug_482_482,MedSR,OPIOID,True,397.47,capsule,454,Sanofi,2005-11-22,inflammation reduction,kidney impairment,constipation; headache,FDA_ORANGE_BOOK,0.986
+DRUG_00483,Drug,Drug_483_483,GenXR,HYPNOTIC,True,439.91,cream,265,Novartis,2018-06-28,cardiac protection,pregnancy; bleeding disorders,dry mouth; dizziness; rash,FDA_ORANGE_BOOK,0.975
+DRUG_00484,Drug,Drug_484_484,Pharmaex,ANXIOLYTIC,True,327.35,cream,386,AbbVie,1997-05-19,blood pressure control,bleeding disorders,rash; nausea; insomnia,FDA_ORANGE_BOOK,0.932
+DRUG_00485,Drug,Drug_485_485,Proforte,ANTIBIOTIC,True,338.36,cream,339,Johnson & Johnson,1991-11-08,anxiety reduction,pregnancy; allergy history,nausea; headache; rash; drowsiness,FDA_ORANGE_BOOK,0.939
+DRUG_00486,Drug,Drug_486_486,Vitaforte,CORTICOSTEROID,True,186.2,tablet,17,Roche,2005-12-16,anxiety reduction,kidney impairment,dry mouth; insomnia,FDA_ORANGE_BOOK,0.933
+DRUG_00487,Drug,Drug_487_487,Vitamax,ANTICONVULSANT,True,500.28,tablet,193,Bristol Myers Squibb,2008-04-13,cardiac protection,liver disease; allergy history; bleeding disorders,nausea; rash; constipation,FDA_ORANGE_BOOK,0.868
+DRUG_00488,Drug,Drug_488_488,PharmaLA,STATIN,False,490.15,tablet,475,Amgen,2009-10-05,cholesterol management,bleeding disorders; allergy history; pregnancy,nausea; constipation; dry mouth; headache; dizziness,FDA_ORANGE_BOOK,0.956
+DRUG_00489,Drug,Drug_489_489,Novoine,CORTICOSTEROID,False,759.1,tablet,227,Bristol Myers Squibb,2014-06-17,cholesterol management,bleeding disorders,nausea; fatigue,FDA_ORANGE_BOOK,0.889
+DRUG_00490,Drug,Drug_490_490,Novoex,DIURETIC,False,320.76,tablet,236,Johnson & Johnson,2005-11-09,depression treatment,heart failure,insomnia; diarrhea; dizziness; constipation; fatigue,FDA_ORANGE_BOOK,0.883
+DRUG_00491,Drug,Drug_491_491,MaxSR,ANTIDEPRESSANT,True,489.44,capsule,265,GlaxoSmithKline,2001-12-29,inflammation reduction,pregnancy; allergy history; kidney impairment,nausea; diarrhea,FDA_ORANGE_BOOK,0.939
+DRUG_00492,Drug,Drug_492_492,NeoER,HYPNOTIC,True,540.86,injection,98,Johnson & Johnson,2005-12-31,inflammation reduction,allergy history; liver disease; heart failure,dry mouth; nausea; headache; constipation; dizziness,FDA_ORANGE_BOOK,0.878
+DRUG_00493,Drug,Drug_493_493,Genex,DIURETIC,True,341.77,cream,216,Roche,1990-03-02,anxiety reduction,liver disease; allergy history; pregnancy,nausea; insomnia; diarrhea; drowsiness; dry mouth,FDA_ORANGE_BOOK,0.937
+DRUG_00494,Drug,Drug_494_494,Biool,PROTON_PUMP_INHIBITOR,False,517.76,capsule,178,Bristol Myers Squibb,2003-04-27,inflammation reduction,heart failure; pregnancy; allergy history,nausea; diarrhea; drowsiness; dry mouth; dizziness,FDA_ORANGE_BOOK,0.974
+DRUG_00495,Drug,Drug_495_495,Biool,ANTIDEPRESSANT,True,487.82,syrup,219,Amgen,1994-03-23,cholesterol management,kidney impairment; pregnancy,drowsiness; nausea; diarrhea; dizziness; dry mouth,FDA_ORANGE_BOOK,0.92
+DRUG_00496,Drug,Drug_496_496,Novoplus,ANTIDEPRESSANT,False,502.67,capsule,225,Novartis,2010-10-13,infection control,liver disease; bleeding disorders,dry mouth; rash; diarrhea; drowsiness; constipation,FDA_ORANGE_BOOK,0.904
+DRUG_00497,Drug,Drug_497_497,Ultraplus,STATIN,True,737.52,cream,54,Sanofi,2020-04-13,blood pressure control,liver disease; heart failure; allergy history,headache; rash,FDA_ORANGE_BOOK,0.941
+DRUG_00498,Drug,Drug_498_498,Biool,NSAID,True,655.08,syrup,19,Merck,2020-08-29,pain relief,allergy history; heart failure,dry mouth; insomnia; headache,FDA_ORANGE_BOOK,0.989
+DRUG_00499,Drug,Drug_499_499,Vitaforte,DIURETIC,False,240.16,injection,35,Pfizer,2017-08-11,cardiac protection,bleeding disorders; allergy history,dizziness; drowsiness; constipation; diarrhea,FDA_ORANGE_BOOK,0.961
+DRUG_00500,Drug,Drug_500_500,UltraSR,ACE_INHIBITOR,True,353.44,tablet,331,AbbVie,2016-06-19,cardiac protection,bleeding disorders; heart failure,dizziness; headache,FDA_ORANGE_BOOK,0.931

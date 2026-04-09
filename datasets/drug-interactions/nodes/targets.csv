@@ -1,0 +1,201 @@
+Id,Label,Properties:name,Properties:uniprotId,Properties:family,Properties:chromosome,Properties:geneSymbol,Properties:organism,Properties:tissueSpecificity,Properties:molecularFunction,Properties:cellularLocation,Properties:expression,Properties:source,Properties:confidence
+TARGET_00001,Target,Protein_Target_001,P71888,ION_CHANNEL,chr1,GENE614,Homo sapiens,muscle,DNA binding,membrane,low,UNIPROT,0.83
+TARGET_00002,Target,Protein_Target_002,P61798,STRUCTURAL_PROTEIN,chr1,GENE645,Homo sapiens,brain,receptor binding,cytoplasm,medium,UNIPROT,0.896
+TARGET_00003,Target,Protein_Target_003,P52613,CYTOKINE,chr15,GENE118,Homo sapiens,heart,protein kinase activity,cytoplasm,low,UNIPROT,0.88
+TARGET_00004,Target,Protein_Target_004,P60526,ION_CHANNEL,chr12,GENE925,Homo sapiens,kidney,receptor binding,cytoplasm,medium,UNIPROT,0.909
+TARGET_00005,Target,Protein_Target_005,P15827,TRANSPORTER,chr11,GENE393,Homo sapiens,liver,enzyme activity,membrane,medium,UNIPROT,0.933
+TARGET_00006,Target,Protein_Target_006,P47746,NUCLEAR_RECEPTOR,chr19,GENE451,Homo sapiens,muscle,DNA binding,membrane,medium,UNIPROT,0.809
+TARGET_00007,Target,Protein_Target_007,P63540,GPCR,chr11,GENE954,Homo sapiens,heart,receptor binding,nucleus,high,UNIPROT,0.845
+TARGET_00008,Target,Protein_Target_008,P84690,HORMONE,chr2,GENE243,Homo sapiens,muscle,transporter activity,membrane,low,UNIPROT,0.829
+TARGET_00009,Target,Protein_Target_009,P11267,HORMONE,chr17,GENE224,Homo sapiens,liver,structural molecule activity,mitochondria,medium,UNIPROT,0.832
+TARGET_00010,Target,Protein_Target_010,P66671,STRUCTURAL_PROTEIN,chr22,GENE206,Homo sapiens,heart,enzyme activity,mitochondria,low,UNIPROT,0.914
+TARGET_00011,Target,Protein_Target_011,P85341,ION_CHANNEL,chr17,GENE425,Homo sapiens,liver,receptor binding,cytoplasm,low,UNIPROT,0.86
+TARGET_00012,Target,Protein_Target_012,P78459,GPCR,chr11,GENE108,Homo sapiens,liver,enzyme activity,mitochondria,medium,UNIPROT,0.877
+TARGET_00013,Target,Protein_Target_013,P20107,NUCLEAR_RECEPTOR,chr5,GENE774,Homo sapiens,kidney,protein kinase activity,membrane,high,UNIPROT,0.936
+TARGET_00014,Target,Protein_Target_014,P90283,CYTOKINE,chr17,GENE449,Homo sapiens,muscle,receptor binding,membrane,high,UNIPROT,0.872
+TARGET_00015,Target,Protein_Target_015,P91988,GPCR,chr14,GENE204,Homo sapiens,kidney,protein kinase activity,nucleus,medium,UNIPROT,0.919
+TARGET_00016,Target,Protein_Target_016,P28958,CYTOKINE,chr5,GENE317,Homo sapiens,brain,protein kinase activity,nucleus,high,UNIPROT,0.862
+TARGET_00017,Target,Protein_Target_017,P19690,HORMONE,chr11,GENE842,Homo sapiens,kidney,transporter activity,cytoplasm,low,UNIPROT,0.885
+TARGET_00018,Target,Protein_Target_018,P67215,TRANSPORTER,chr15,GENE666,Homo sapiens,muscle,transporter activity,nucleus,medium,UNIPROT,0.874
+TARGET_00019,Target,Protein_Target_019,P11938,TRANSPORTER,chr18,GENE195,Homo sapiens,brain,DNA binding,cytoplasm,medium,UNIPROT,0.83
+TARGET_00020,Target,Protein_Target_020,P90499,ENZYME,chr13,GENE100,Homo sapiens,liver,transporter activity,mitochondria,medium,UNIPROT,0.941
+TARGET_00021,Target,Protein_Target_021,P22057,STRUCTURAL_PROTEIN,chr20,GENE113,Homo sapiens,kidney,transporter activity,mitochondria,medium,UNIPROT,0.935
+TARGET_00022,Target,Protein_Target_022,P44720,ENZYME,chr19,GENE975,Homo sapiens,kidney,transporter activity,membrane,medium,UNIPROT,0.923
+TARGET_00023,Target,Protein_Target_023,P41633,GPCR,chr18,GENE193,Homo sapiens,kidney,DNA binding,mitochondria,high,UNIPROT,0.886
+TARGET_00024,Target,Protein_Target_024,P97581,TRANSPORTER,chr7,GENE782,Homo sapiens,liver,transporter activity,cytoplasm,medium,UNIPROT,0.819
+TARGET_00025,Target,Protein_Target_025,P73328,ENZYME,chr13,GENE235,Homo sapiens,muscle,protein kinase activity,mitochondria,high,UNIPROT,0.903
+TARGET_00026,Target,Protein_Target_026,P54943,GPCR,chr10,GENE871,Homo sapiens,muscle,protein kinase activity,membrane,low,UNIPROT,0.83
+TARGET_00027,Target,Protein_Target_027,P87183,ENZYME,chr3,GENE514,Homo sapiens,heart,structural molecule activity,nucleus,high,UNIPROT,0.888
+TARGET_00028,Target,Protein_Target_028,P34920,ENZYME,chr19,GENE463,Homo sapiens,kidney,receptor binding,nucleus,medium,UNIPROT,0.803
+TARGET_00029,Target,Protein_Target_029,P85625,NUCLEAR_RECEPTOR,chr3,GENE173,Homo sapiens,brain,structural molecule activity,nucleus,medium,UNIPROT,0.894
+TARGET_00030,Target,Protein_Target_030,P78822,NUCLEAR_RECEPTOR,chr11,GENE196,Homo sapiens,liver,structural molecule activity,cytoplasm,low,UNIPROT,0.876
+TARGET_00031,Target,Protein_Target_031,P59855,CYTOKINE,chr16,GENE685,Homo sapiens,kidney,enzyme activity,nucleus,high,UNIPROT,0.9
+TARGET_00032,Target,Protein_Target_032,P37665,KINASE,chr8,GENE847,Homo sapiens,heart,receptor binding,cytoplasm,high,UNIPROT,0.88
+TARGET_00033,Target,Protein_Target_033,P10918,HORMONE,chr7,GENE214,Homo sapiens,liver,structural molecule activity,cytoplasm,low,UNIPROT,0.856
+TARGET_00034,Target,Protein_Target_034,P92545,KINASE,chr14,GENE399,Homo sapiens,kidney,receptor binding,nucleus,low,UNIPROT,0.856
+TARGET_00035,Target,Protein_Target_035,P46611,ION_CHANNEL,chr11,GENE449,Homo sapiens,muscle,enzyme activity,membrane,high,UNIPROT,0.802
+TARGET_00036,Target,Protein_Target_036,P40471,KINASE,chr20,GENE904,Homo sapiens,heart,structural molecule activity,cytoplasm,high,UNIPROT,0.832
+TARGET_00037,Target,Protein_Target_037,P77184,ENZYME,chr6,GENE731,Homo sapiens,lung,structural molecule activity,membrane,high,UNIPROT,0.936
+TARGET_00038,Target,Protein_Target_038,P93274,GPCR,chr6,GENE483,Homo sapiens,brain,protein kinase activity,membrane,medium,UNIPROT,0.95
+TARGET_00039,Target,Protein_Target_039,P34977,NUCLEAR_RECEPTOR,chr8,GENE626,Homo sapiens,muscle,enzyme activity,cytoplasm,low,UNIPROT,0.882
+TARGET_00040,Target,Protein_Target_040,P61573,ENZYME,chr6,GENE671,Homo sapiens,liver,structural molecule activity,cytoplasm,low,UNIPROT,0.855
+TARGET_00041,Target,Protein_Target_041,P22932,HORMONE,chr17,GENE357,Homo sapiens,heart,enzyme activity,cytoplasm,high,UNIPROT,0.914
+TARGET_00042,Target,Protein_Target_042,P36711,ENZYME,chr4,GENE455,Homo sapiens,kidney,enzyme activity,mitochondria,low,UNIPROT,0.861
+TARGET_00043,Target,Protein_Target_043,P88681,NUCLEAR_RECEPTOR,chr15,GENE399,Homo sapiens,muscle,receptor binding,mitochondria,low,UNIPROT,0.881
+TARGET_00044,Target,Protein_Target_044,P78944,STRUCTURAL_PROTEIN,chr5,GENE789,Homo sapiens,kidney,structural molecule activity,mitochondria,medium,UNIPROT,0.895
+TARGET_00045,Target,Protein_Target_045,P62484,GPCR,chr2,GENE195,Homo sapiens,liver,receptor binding,cytoplasm,medium,UNIPROT,0.898
+TARGET_00046,Target,Protein_Target_046,P73538,ION_CHANNEL,chr8,GENE109,Homo sapiens,heart,DNA binding,nucleus,high,UNIPROT,0.858
+TARGET_00047,Target,Protein_Target_047,P38103,NUCLEAR_RECEPTOR,chr12,GENE275,Homo sapiens,liver,receptor binding,cytoplasm,high,UNIPROT,0.834
+TARGET_00048,Target,Protein_Target_048,P47867,KINASE,chr6,GENE129,Homo sapiens,liver,protein kinase activity,nucleus,high,UNIPROT,0.886
+TARGET_00049,Target,Protein_Target_049,P14930,HORMONE,chr1,GENE987,Homo sapiens,lung,DNA binding,mitochondria,low,UNIPROT,0.84
+TARGET_00050,Target,Protein_Target_050,P76635,KINASE,chr21,GENE934,Homo sapiens,muscle,receptor binding,cytoplasm,low,UNIPROT,0.885
+TARGET_00051,Target,Protein_Target_051,P53768,KINASE,chr9,GENE187,Homo sapiens,heart,structural molecule activity,mitochondria,low,UNIPROT,0.879
+TARGET_00052,Target,Protein_Target_052,P66404,ENZYME,chr22,GENE904,Homo sapiens,kidney,receptor binding,cytoplasm,high,UNIPROT,0.919
+TARGET_00053,Target,Protein_Target_053,P52715,HORMONE,chr6,GENE249,Homo sapiens,kidney,DNA binding,nucleus,medium,UNIPROT,0.877
+TARGET_00054,Target,Protein_Target_054,P15400,ION_CHANNEL,chr16,GENE829,Homo sapiens,heart,transporter activity,membrane,low,UNIPROT,0.879
+TARGET_00055,Target,Protein_Target_055,P80922,ENZYME,chr9,GENE423,Homo sapiens,liver,protein kinase activity,nucleus,high,UNIPROT,0.8
+TARGET_00056,Target,Protein_Target_056,P78330,ION_CHANNEL,chr21,GENE943,Homo sapiens,liver,enzyme activity,cytoplasm,high,UNIPROT,0.88
+TARGET_00057,Target,Protein_Target_057,P27678,ION_CHANNEL,chr15,GENE788,Homo sapiens,kidney,enzyme activity,mitochondria,high,UNIPROT,0.932
+TARGET_00058,Target,Protein_Target_058,P83959,CYTOKINE,chr19,GENE809,Homo sapiens,brain,protein kinase activity,nucleus,low,UNIPROT,0.846
+TARGET_00059,Target,Protein_Target_059,P66637,HORMONE,chr14,GENE618,Homo sapiens,heart,transporter activity,cytoplasm,high,UNIPROT,0.891
+TARGET_00060,Target,Protein_Target_060,P27255,HORMONE,chr6,GENE699,Homo sapiens,muscle,structural molecule activity,mitochondria,high,UNIPROT,0.932
+TARGET_00061,Target,Protein_Target_061,P14347,CYTOKINE,chr15,GENE355,Homo sapiens,liver,receptor binding,nucleus,low,UNIPROT,0.85
+TARGET_00062,Target,Protein_Target_062,P69230,TRANSPORTER,chr21,GENE136,Homo sapiens,brain,enzyme activity,cytoplasm,low,UNIPROT,0.819
+TARGET_00063,Target,Protein_Target_063,P93214,GPCR,chr5,GENE719,Homo sapiens,liver,receptor binding,nucleus,high,UNIPROT,0.856
+TARGET_00064,Target,Protein_Target_064,P66984,KINASE,chr13,GENE945,Homo sapiens,kidney,DNA binding,mitochondria,low,UNIPROT,0.937
+TARGET_00065,Target,Protein_Target_065,P63852,ENZYME,chr2,GENE334,Homo sapiens,kidney,transporter activity,nucleus,low,UNIPROT,0.877
+TARGET_00066,Target,Protein_Target_066,P14288,NUCLEAR_RECEPTOR,chr14,GENE508,Homo sapiens,muscle,transporter activity,cytoplasm,medium,UNIPROT,0.913
+TARGET_00067,Target,Protein_Target_067,P58720,NUCLEAR_RECEPTOR,chr16,GENE724,Homo sapiens,heart,structural molecule activity,mitochondria,high,UNIPROT,0.889
+TARGET_00068,Target,Protein_Target_068,P18897,KINASE,chr20,GENE323,Homo sapiens,muscle,DNA binding,membrane,medium,UNIPROT,0.809
+TARGET_00069,Target,Protein_Target_069,P34754,ENZYME,chr14,GENE710,Homo sapiens,heart,transporter activity,membrane,medium,UNIPROT,0.931
+TARGET_00070,Target,Protein_Target_070,P96728,ION_CHANNEL,chr7,GENE555,Homo sapiens,heart,structural molecule activity,nucleus,medium,UNIPROT,0.9
+TARGET_00071,Target,Protein_Target_071,P75283,CYTOKINE,chr11,GENE498,Homo sapiens,lung,receptor binding,nucleus,low,UNIPROT,0.908
+TARGET_00072,Target,Protein_Target_072,P17576,TRANSPORTER,chr22,GENE974,Homo sapiens,muscle,protein kinase activity,nucleus,high,UNIPROT,0.817
+TARGET_00073,Target,Protein_Target_073,P44817,KINASE,chr17,GENE216,Homo sapiens,brain,receptor binding,cytoplasm,high,UNIPROT,0.928
+TARGET_00074,Target,Protein_Target_074,P84335,ION_CHANNEL,chr20,GENE336,Homo sapiens,lung,DNA binding,cytoplasm,high,UNIPROT,0.913
+TARGET_00075,Target,Protein_Target_075,P11943,KINASE,chr2,GENE901,Homo sapiens,brain,DNA binding,nucleus,medium,UNIPROT,0.844
+TARGET_00076,Target,Protein_Target_076,P42438,TRANSPORTER,chr11,GENE448,Homo sapiens,kidney,enzyme activity,cytoplasm,low,UNIPROT,0.882
+TARGET_00077,Target,Protein_Target_077,P37952,HORMONE,chr22,GENE325,Homo sapiens,heart,structural molecule activity,nucleus,low,UNIPROT,0.877
+TARGET_00078,Target,Protein_Target_078,P42973,NUCLEAR_RECEPTOR,chr20,GENE220,Homo sapiens,brain,DNA binding,membrane,low,UNIPROT,0.926
+TARGET_00079,Target,Protein_Target_079,P72578,HORMONE,chr18,GENE276,Homo sapiens,brain,structural molecule activity,cytoplasm,low,UNIPROT,0.876
+TARGET_00080,Target,Protein_Target_080,P42312,STRUCTURAL_PROTEIN,chr3,GENE823,Homo sapiens,brain,transporter activity,mitochondria,low,UNIPROT,0.916
+TARGET_00081,Target,Protein_Target_081,P37765,STRUCTURAL_PROTEIN,chr4,GENE188,Homo sapiens,liver,transporter activity,membrane,high,UNIPROT,0.899
+TARGET_00082,Target,Protein_Target_082,P27110,GPCR,chr16,GENE945,Homo sapiens,heart,enzyme activity,mitochondria,high,UNIPROT,0.849
+TARGET_00083,Target,Protein_Target_083,P28405,TRANSPORTER,chr8,GENE808,Homo sapiens,muscle,structural molecule activity,nucleus,high,UNIPROT,0.891
+TARGET_00084,Target,Protein_Target_084,P88984,HORMONE,chr15,GENE829,Homo sapiens,lung,enzyme activity,nucleus,high,UNIPROT,0.815
+TARGET_00085,Target,Protein_Target_085,P22349,CYTOKINE,chr14,GENE348,Homo sapiens,heart,structural molecule activity,cytoplasm,high,UNIPROT,0.915
+TARGET_00086,Target,Protein_Target_086,P75612,KINASE,chr14,GENE447,Homo sapiens,lung,enzyme activity,cytoplasm,high,UNIPROT,0.935
+TARGET_00087,Target,Protein_Target_087,P79448,TRANSPORTER,chr8,GENE758,Homo sapiens,brain,protein kinase activity,mitochondria,medium,UNIPROT,0.931
+TARGET_00088,Target,Protein_Target_088,P91900,KINASE,chr10,GENE904,Homo sapiens,muscle,transporter activity,cytoplasm,medium,UNIPROT,0.853
+TARGET_00089,Target,Protein_Target_089,P85729,HORMONE,chr19,GENE964,Homo sapiens,lung,structural molecule activity,mitochondria,low,UNIPROT,0.857
+TARGET_00090,Target,Protein_Target_090,P50512,KINASE,chr5,GENE231,Homo sapiens,lung,structural molecule activity,nucleus,high,UNIPROT,0.946
+TARGET_00091,Target,Protein_Target_091,P65687,STRUCTURAL_PROTEIN,chr16,GENE957,Homo sapiens,muscle,receptor binding,cytoplasm,medium,UNIPROT,0.8
+TARGET_00092,Target,Protein_Target_092,P20637,HORMONE,chr3,GENE974,Homo sapiens,brain,receptor binding,cytoplasm,medium,UNIPROT,0.888
+TARGET_00093,Target,Protein_Target_093,P93295,ENZYME,chr2,GENE321,Homo sapiens,liver,receptor binding,mitochondria,low,UNIPROT,0.822
+TARGET_00094,Target,Protein_Target_094,P64948,NUCLEAR_RECEPTOR,chr9,GENE458,Homo sapiens,muscle,DNA binding,nucleus,medium,UNIPROT,0.92
+TARGET_00095,Target,Protein_Target_095,P75082,HORMONE,chr18,GENE934,Homo sapiens,muscle,DNA binding,mitochondria,low,UNIPROT,0.935
+TARGET_00096,Target,Protein_Target_096,P77370,TRANSPORTER,chr3,GENE333,Homo sapiens,lung,transporter activity,nucleus,high,UNIPROT,0.815
+TARGET_00097,Target,Protein_Target_097,P50349,TRANSPORTER,chr11,GENE975,Homo sapiens,brain,transporter activity,nucleus,low,UNIPROT,0.911
+TARGET_00098,Target,Protein_Target_098,P87647,TRANSPORTER,chr7,GENE489,Homo sapiens,kidney,protein kinase activity,nucleus,low,UNIPROT,0.81
+TARGET_00099,Target,Protein_Target_099,P27792,KINASE,chr11,GENE799,Homo sapiens,kidney,enzyme activity,membrane,low,UNIPROT,0.834
+TARGET_00100,Target,Protein_Target_100,P49952,HORMONE,chr1,GENE582,Homo sapiens,kidney,enzyme activity,membrane,high,UNIPROT,0.881
+TARGET_00101,Target,Protein_Target_101,P71602,STRUCTURAL_PROTEIN,chr4,GENE171,Homo sapiens,liver,transporter activity,nucleus,low,UNIPROT,0.903
+TARGET_00102,Target,Protein_Target_102,P13866,ION_CHANNEL,chr14,GENE231,Homo sapiens,muscle,structural molecule activity,membrane,high,UNIPROT,0.84
+TARGET_00103,Target,Protein_Target_103,P78385,KINASE,chr6,GENE607,Homo sapiens,heart,receptor binding,membrane,medium,UNIPROT,0.911
+TARGET_00104,Target,Protein_Target_104,P23076,KINASE,chr17,GENE364,Homo sapiens,liver,receptor binding,membrane,high,UNIPROT,0.875
+TARGET_00105,Target,Protein_Target_105,P53042,TRANSPORTER,chr17,GENE222,Homo sapiens,muscle,receptor binding,nucleus,medium,UNIPROT,0.908
+TARGET_00106,Target,Protein_Target_106,P92053,ENZYME,chr18,GENE142,Homo sapiens,heart,protein kinase activity,mitochondria,low,UNIPROT,0.805
+TARGET_00107,Target,Protein_Target_107,P13632,ENZYME,chr16,GENE609,Homo sapiens,liver,transporter activity,nucleus,low,UNIPROT,0.919
+TARGET_00108,Target,Protein_Target_108,P92420,CYTOKINE,chr13,GENE135,Homo sapiens,lung,DNA binding,nucleus,high,UNIPROT,0.888
+TARGET_00109,Target,Protein_Target_109,P88910,KINASE,chr11,GENE983,Homo sapiens,muscle,protein kinase activity,nucleus,low,UNIPROT,0.841
+TARGET_00110,Target,Protein_Target_110,P85157,ENZYME,chr12,GENE444,Homo sapiens,lung,protein kinase activity,nucleus,medium,UNIPROT,0.939
+TARGET_00111,Target,Protein_Target_111,P76290,GPCR,chr13,GENE236,Homo sapiens,kidney,protein kinase activity,cytoplasm,low,UNIPROT,0.899
+TARGET_00112,Target,Protein_Target_112,P63726,NUCLEAR_RECEPTOR,chr5,GENE865,Homo sapiens,heart,enzyme activity,membrane,medium,UNIPROT,0.852
+TARGET_00113,Target,Protein_Target_113,P54354,STRUCTURAL_PROTEIN,chr2,GENE841,Homo sapiens,lung,DNA binding,mitochondria,high,UNIPROT,0.9
+TARGET_00114,Target,Protein_Target_114,P39953,GPCR,chr21,GENE837,Homo sapiens,liver,structural molecule activity,membrane,high,UNIPROT,0.899
+TARGET_00115,Target,Protein_Target_115,P57773,GPCR,chr21,GENE369,Homo sapiens,lung,structural molecule activity,nucleus,high,UNIPROT,0.819
+TARGET_00116,Target,Protein_Target_116,P77917,KINASE,chr1,GENE568,Homo sapiens,liver,structural molecule activity,membrane,high,UNIPROT,0.814
+TARGET_00117,Target,Protein_Target_117,P91136,ENZYME,chr5,GENE735,Homo sapiens,heart,receptor binding,membrane,high,UNIPROT,0.817
+TARGET_00118,Target,Protein_Target_118,P58497,ION_CHANNEL,chr22,GENE805,Homo sapiens,lung,structural molecule activity,membrane,medium,UNIPROT,0.803
+TARGET_00119,Target,Protein_Target_119,P85047,ION_CHANNEL,chr20,GENE100,Homo sapiens,brain,enzyme activity,nucleus,medium,UNIPROT,0.919
+TARGET_00120,Target,Protein_Target_120,P16962,ENZYME,chr7,GENE558,Homo sapiens,muscle,DNA binding,membrane,medium,UNIPROT,0.86
+TARGET_00121,Target,Protein_Target_121,P18552,NUCLEAR_RECEPTOR,chr3,GENE449,Homo sapiens,kidney,DNA binding,cytoplasm,medium,UNIPROT,0.856
+TARGET_00122,Target,Protein_Target_122,P27096,ENZYME,chr9,GENE947,Homo sapiens,liver,transporter activity,mitochondria,low,UNIPROT,0.939
+TARGET_00123,Target,Protein_Target_123,P25010,TRANSPORTER,chr1,GENE976,Homo sapiens,liver,DNA binding,cytoplasm,low,UNIPROT,0.82
+TARGET_00124,Target,Protein_Target_124,P46490,STRUCTURAL_PROTEIN,chr11,GENE481,Homo sapiens,liver,enzyme activity,nucleus,low,UNIPROT,0.865
+TARGET_00125,Target,Protein_Target_125,P47448,STRUCTURAL_PROTEIN,chr18,GENE430,Homo sapiens,brain,transporter activity,nucleus,low,UNIPROT,0.86
+TARGET_00126,Target,Protein_Target_126,P42594,KINASE,chr7,GENE366,Homo sapiens,liver,transporter activity,mitochondria,medium,UNIPROT,0.826
+TARGET_00127,Target,Protein_Target_127,P44606,ENZYME,chr18,GENE321,Homo sapiens,brain,receptor binding,cytoplasm,low,UNIPROT,0.846
+TARGET_00128,Target,Protein_Target_128,P20380,ION_CHANNEL,chr12,GENE488,Homo sapiens,liver,protein kinase activity,mitochondria,medium,UNIPROT,0.803
+TARGET_00129,Target,Protein_Target_129,P56685,KINASE,chr1,GENE859,Homo sapiens,brain,enzyme activity,mitochondria,medium,UNIPROT,0.944
+TARGET_00130,Target,Protein_Target_130,P48725,ENZYME,chr18,GENE285,Homo sapiens,kidney,transporter activity,mitochondria,medium,UNIPROT,0.809
+TARGET_00131,Target,Protein_Target_131,P68719,ENZYME,chr4,GENE260,Homo sapiens,kidney,enzyme activity,cytoplasm,low,UNIPROT,0.869
+TARGET_00132,Target,Protein_Target_132,P77850,KINASE,chr17,GENE411,Homo sapiens,brain,protein kinase activity,mitochondria,high,UNIPROT,0.806
+TARGET_00133,Target,Protein_Target_133,P56849,ION_CHANNEL,chr11,GENE996,Homo sapiens,brain,transporter activity,mitochondria,high,UNIPROT,0.881
+TARGET_00134,Target,Protein_Target_134,P70332,STRUCTURAL_PROTEIN,chr17,GENE348,Homo sapiens,liver,enzyme activity,mitochondria,high,UNIPROT,0.943
+TARGET_00135,Target,Protein_Target_135,P30747,ION_CHANNEL,chr21,GENE524,Homo sapiens,liver,DNA binding,nucleus,high,UNIPROT,0.917
+TARGET_00136,Target,Protein_Target_136,P32369,CYTOKINE,chr17,GENE540,Homo sapiens,kidney,structural molecule activity,membrane,high,UNIPROT,0.832
+TARGET_00137,Target,Protein_Target_137,P52010,HORMONE,chr22,GENE400,Homo sapiens,heart,DNA binding,nucleus,medium,UNIPROT,0.888
+TARGET_00138,Target,Protein_Target_138,P17573,NUCLEAR_RECEPTOR,chr3,GENE982,Homo sapiens,muscle,enzyme activity,cytoplasm,medium,UNIPROT,0.916
+TARGET_00139,Target,Protein_Target_139,P13276,ION_CHANNEL,chr5,GENE969,Homo sapiens,brain,enzyme activity,membrane,medium,UNIPROT,0.809
+TARGET_00140,Target,Protein_Target_140,P48920,CYTOKINE,chr7,GENE540,Homo sapiens,lung,receptor binding,nucleus,high,UNIPROT,0.827
+TARGET_00141,Target,Protein_Target_141,P29530,STRUCTURAL_PROTEIN,chr17,GENE611,Homo sapiens,liver,protein kinase activity,membrane,medium,UNIPROT,0.867
+TARGET_00142,Target,Protein_Target_142,P85494,KINASE,chr6,GENE337,Homo sapiens,brain,transporter activity,nucleus,medium,UNIPROT,0.938
+TARGET_00143,Target,Protein_Target_143,P96951,NUCLEAR_RECEPTOR,chr9,GENE197,Homo sapiens,lung,protein kinase activity,nucleus,low,UNIPROT,0.819
+TARGET_00144,Target,Protein_Target_144,P24893,ENZYME,chr22,GENE236,Homo sapiens,muscle,DNA binding,cytoplasm,low,UNIPROT,0.911
+TARGET_00145,Target,Protein_Target_145,P63410,ENZYME,chr7,GENE638,Homo sapiens,kidney,transporter activity,membrane,high,UNIPROT,0.834
+TARGET_00146,Target,Protein_Target_146,P43083,CYTOKINE,chr16,GENE614,Homo sapiens,lung,protein kinase activity,nucleus,high,UNIPROT,0.842
+TARGET_00147,Target,Protein_Target_147,P64321,CYTOKINE,chr6,GENE868,Homo sapiens,brain,receptor binding,nucleus,high,UNIPROT,0.837
+TARGET_00148,Target,Protein_Target_148,P57986,TRANSPORTER,chr21,GENE593,Homo sapiens,brain,structural molecule activity,mitochondria,low,UNIPROT,0.815
+TARGET_00149,Target,Protein_Target_149,P49768,ENZYME,chr22,GENE533,Homo sapiens,kidney,DNA binding,cytoplasm,low,UNIPROT,0.801
+TARGET_00150,Target,Protein_Target_150,P14042,CYTOKINE,chr20,GENE666,Homo sapiens,kidney,enzyme activity,nucleus,medium,UNIPROT,0.831
+TARGET_00151,Target,Protein_Target_151,P92165,ION_CHANNEL,chr18,GENE310,Homo sapiens,liver,structural molecule activity,cytoplasm,high,UNIPROT,0.807
+TARGET_00152,Target,Protein_Target_152,P85206,CYTOKINE,chr18,GENE221,Homo sapiens,lung,receptor binding,nucleus,medium,UNIPROT,0.805
+TARGET_00153,Target,Protein_Target_153,P80517,HORMONE,chr19,GENE951,Homo sapiens,kidney,DNA binding,membrane,high,UNIPROT,0.889
+TARGET_00154,Target,Protein_Target_154,P59897,CYTOKINE,chr9,GENE354,Homo sapiens,lung,protein kinase activity,mitochondria,low,UNIPROT,0.821
+TARGET_00155,Target,Protein_Target_155,P45163,ENZYME,chr12,GENE609,Homo sapiens,kidney,DNA binding,nucleus,medium,UNIPROT,0.881
+TARGET_00156,Target,Protein_Target_156,P85015,CYTOKINE,chr11,GENE805,Homo sapiens,kidney,transporter activity,membrane,medium,UNIPROT,0.862
+TARGET_00157,Target,Protein_Target_157,P91445,STRUCTURAL_PROTEIN,chr21,GENE607,Homo sapiens,kidney,structural molecule activity,nucleus,low,UNIPROT,0.942
+TARGET_00158,Target,Protein_Target_158,P90565,KINASE,chr20,GENE799,Homo sapiens,heart,receptor binding,cytoplasm,high,UNIPROT,0.921
+TARGET_00159,Target,Protein_Target_159,P16693,ENZYME,chr2,GENE111,Homo sapiens,brain,receptor binding,mitochondria,low,UNIPROT,0.906
+TARGET_00160,Target,Protein_Target_160,P90086,ION_CHANNEL,chr13,GENE233,Homo sapiens,heart,DNA binding,membrane,low,UNIPROT,0.889
+TARGET_00161,Target,Protein_Target_161,P34631,ENZYME,chr5,GENE932,Homo sapiens,muscle,enzyme activity,mitochondria,low,UNIPROT,0.876
+TARGET_00162,Target,Protein_Target_162,P60565,CYTOKINE,chr20,GENE870,Homo sapiens,lung,protein kinase activity,cytoplasm,low,UNIPROT,0.814
+TARGET_00163,Target,Protein_Target_163,P63225,GPCR,chr3,GENE506,Homo sapiens,liver,enzyme activity,membrane,high,UNIPROT,0.847
+TARGET_00164,Target,Protein_Target_164,P91662,TRANSPORTER,chr5,GENE278,Homo sapiens,muscle,receptor binding,membrane,high,UNIPROT,0.896
+TARGET_00165,Target,Protein_Target_165,P59114,NUCLEAR_RECEPTOR,chr19,GENE451,Homo sapiens,brain,structural molecule activity,cytoplasm,low,UNIPROT,0.944
+TARGET_00166,Target,Protein_Target_166,P14162,ENZYME,chr18,GENE417,Homo sapiens,lung,enzyme activity,nucleus,high,UNIPROT,0.865
+TARGET_00167,Target,Protein_Target_167,P66849,TRANSPORTER,chr4,GENE748,Homo sapiens,muscle,DNA binding,cytoplasm,low,UNIPROT,0.928
+TARGET_00168,Target,Protein_Target_168,P96264,CYTOKINE,chr8,GENE376,Homo sapiens,muscle,receptor binding,membrane,low,UNIPROT,0.819
+TARGET_00169,Target,Protein_Target_169,P87091,HORMONE,chr19,GENE523,Homo sapiens,liver,transporter activity,nucleus,medium,UNIPROT,0.936
+TARGET_00170,Target,Protein_Target_170,P28413,ION_CHANNEL,chr8,GENE817,Homo sapiens,lung,receptor binding,cytoplasm,low,UNIPROT,0.883
+TARGET_00171,Target,Protein_Target_171,P13584,TRANSPORTER,chr8,GENE819,Homo sapiens,liver,structural molecule activity,mitochondria,medium,UNIPROT,0.879
+TARGET_00172,Target,Protein_Target_172,P41896,ENZYME,chr7,GENE480,Homo sapiens,muscle,DNA binding,nucleus,medium,UNIPROT,0.837
+TARGET_00173,Target,Protein_Target_173,P88955,GPCR,chr18,GENE778,Homo sapiens,lung,DNA binding,membrane,low,UNIPROT,0.929
+TARGET_00174,Target,Protein_Target_174,P11396,ION_CHANNEL,chr21,GENE130,Homo sapiens,heart,enzyme activity,membrane,low,UNIPROT,0.803
+TARGET_00175,Target,Protein_Target_175,P63018,ION_CHANNEL,chr1,GENE140,Homo sapiens,lung,enzyme activity,membrane,high,UNIPROT,0.869
+TARGET_00176,Target,Protein_Target_176,P26889,STRUCTURAL_PROTEIN,chr11,GENE576,Homo sapiens,brain,structural molecule activity,membrane,high,UNIPROT,0.944
+TARGET_00177,Target,Protein_Target_177,P21683,HORMONE,chr12,GENE434,Homo sapiens,kidney,transporter activity,cytoplasm,medium,UNIPROT,0.932
+TARGET_00178,Target,Protein_Target_178,P13058,HORMONE,chr8,GENE244,Homo sapiens,heart,protein kinase activity,membrane,high,UNIPROT,0.817
+TARGET_00179,Target,Protein_Target_179,P73868,NUCLEAR_RECEPTOR,chr1,GENE151,Homo sapiens,kidney,receptor binding,membrane,high,UNIPROT,0.846
+TARGET_00180,Target,Protein_Target_180,P97503,ENZYME,chr11,GENE668,Homo sapiens,lung,structural molecule activity,membrane,low,UNIPROT,0.872
+TARGET_00181,Target,Protein_Target_181,P11449,CYTOKINE,chr14,GENE523,Homo sapiens,liver,structural molecule activity,mitochondria,medium,UNIPROT,0.848
+TARGET_00182,Target,Protein_Target_182,P86490,KINASE,chr19,GENE237,Homo sapiens,liver,structural molecule activity,cytoplasm,low,UNIPROT,0.866
+TARGET_00183,Target,Protein_Target_183,P58032,NUCLEAR_RECEPTOR,chr1,GENE485,Homo sapiens,lung,receptor binding,mitochondria,low,UNIPROT,0.829
+TARGET_00184,Target,Protein_Target_184,P44014,ION_CHANNEL,chr15,GENE473,Homo sapiens,brain,receptor binding,mitochondria,low,UNIPROT,0.927
+TARGET_00185,Target,Protein_Target_185,P19434,ENZYME,chr9,GENE912,Homo sapiens,brain,receptor binding,mitochondria,medium,UNIPROT,0.931
+TARGET_00186,Target,Protein_Target_186,P44038,ION_CHANNEL,chr10,GENE495,Homo sapiens,brain,structural molecule activity,nucleus,low,UNIPROT,0.93
+TARGET_00187,Target,Protein_Target_187,P80855,TRANSPORTER,chr12,GENE807,Homo sapiens,kidney,DNA binding,mitochondria,medium,UNIPROT,0.836
+TARGET_00188,Target,Protein_Target_188,P74632,KINASE,chr2,GENE516,Homo sapiens,lung,enzyme activity,cytoplasm,medium,UNIPROT,0.875
+TARGET_00189,Target,Protein_Target_189,P94936,STRUCTURAL_PROTEIN,chr11,GENE197,Homo sapiens,muscle,enzyme activity,membrane,low,UNIPROT,0.907
+TARGET_00190,Target,Protein_Target_190,P96589,TRANSPORTER,chr2,GENE536,Homo sapiens,liver,protein kinase activity,cytoplasm,medium,UNIPROT,0.892
+TARGET_00191,Target,Protein_Target_191,P72488,ENZYME,chr4,GENE917,Homo sapiens,liver,receptor binding,cytoplasm,low,UNIPROT,0.801
+TARGET_00192,Target,Protein_Target_192,P78536,HORMONE,chr11,GENE955,Homo sapiens,brain,structural molecule activity,membrane,medium,UNIPROT,0.946
+TARGET_00193,Target,Protein_Target_193,P51485,CYTOKINE,chr12,GENE595,Homo sapiens,muscle,protein kinase activity,cytoplasm,medium,UNIPROT,0.854
+TARGET_00194,Target,Protein_Target_194,P79569,CYTOKINE,chr6,GENE631,Homo sapiens,kidney,transporter activity,mitochondria,low,UNIPROT,0.88
+TARGET_00195,Target,Protein_Target_195,P79638,NUCLEAR_RECEPTOR,chr14,GENE213,Homo sapiens,lung,DNA binding,nucleus,low,UNIPROT,0.833
+TARGET_00196,Target,Protein_Target_196,P97568,HORMONE,chr6,GENE300,Homo sapiens,heart,protein kinase activity,membrane,high,UNIPROT,0.936
+TARGET_00197,Target,Protein_Target_197,P89020,KINASE,chr4,GENE729,Homo sapiens,kidney,transporter activity,nucleus,low,UNIPROT,0.848
+TARGET_00198,Target,Protein_Target_198,P63737,KINASE,chr20,GENE338,Homo sapiens,liver,receptor binding,cytoplasm,medium,UNIPROT,0.82
+TARGET_00199,Target,Protein_Target_199,P47394,GPCR,chr12,GENE476,Homo sapiens,liver,transporter activity,membrane,medium,UNIPROT,0.833
+TARGET_00200,Target,Protein_Target_200,P43855,STRUCTURAL_PROTEIN,chr5,GENE948,Homo sapiens,heart,receptor binding,cytoplasm,medium,UNIPROT,0.923

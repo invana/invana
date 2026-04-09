@@ -1,0 +1,11 @@
+Id,Label,FromId,ToId,Properties:rating,Properties:summary,Properties:review_date
+REL_REVIEWED_1,REVIEWED,PERSON_8,MOVIE_1,5,An amazing sci-fi masterpiece that redefined cinema,1999-04-15
+REL_REVIEWED_2,REVIEWED,PERSON_8,MOVIE_2,4,Great sequel that expands the Matrix universe,2003-05-20
+REL_REVIEWED_3,REVIEWED,PERSON_8,MOVIE_3,3,Satisfying conclusion to the trilogy,2003-11-10
+REL_REVIEWED_4,REVIEWED,PERSON_8,MOVIE_4,4,Excellent performances by Keanu and Al Pacino,1997-10-17
+REL_REVIEWED_5,REVIEWED,PERSON_8,MOVIE_5,5,Masterful courtroom drama with incredible acting,1992-12-11
+REL_REVIEWED_6,REVIEWED,PERSON_8,MOVIE_6,4,Top-notch action and unforgettable characters,1986-05-16
+REL_REVIEWED_7,REVIEWED,PERSON_8,MOVIE_7,4,Heartwarming story with great chemistry,1996-12-13
+REL_REVIEWED_8,REVIEWED,PERSON_8,MOVIE_8,5,Perfect coming-of-age story with brilliant performances,1986-08-08
+REL_REVIEWED_9,REVIEWED,PERSON_8,MOVIE_9,4,Brilliant comedy-drama with outstanding performances,1997-12-25
+REL_REVIEWED_10,REVIEWED,PERSON_8,MOVIE_10,3,Visually stunning but emotionally heavy,1998-10-02

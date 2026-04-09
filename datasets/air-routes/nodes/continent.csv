@@ -1,0 +1,8 @@
+Id,Label,Properties:type_string,Properties:code_string,Properties:desc_string
+3742,continent,continent,EU,Europe
+3743,continent,continent,AF,Africa
+3744,continent,continent,,North America
+3745,continent,continent,SA,South America
+3746,continent,continent,AS,Asia
+3747,continent,continent,OC,Oceania
+3748,continent,continent,AN,Antarctica

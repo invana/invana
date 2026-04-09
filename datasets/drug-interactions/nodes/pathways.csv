@@ -1,0 +1,101 @@
+Id,Label,Properties:name,Properties:keggId,Properties:type,Properties:description,Properties:geneCount,Properties:significance,Properties:enrichmentScore,Properties:cellType,Properties:source,Properties:confidence
+PATHWAY_00001,Pathway,Biological_Pathway_001,hsa77013,METABOLIC,Coordinates DNA repair and genome stability,42,0.03375,4.77,neuron,KEGG,0.845
+PATHWAY_00002,Pathway,Biological_Pathway_002,hsa30305,IMMUNE,Controls cell cycle progression and division,109,0.019489,9.11,fibroblast,KEGG,0.887
+PATHWAY_00003,Pathway,Biological_Pathway_003,hsa63160,IMMUNE,Mediates immune response and inflammation,178,0.009379,3.69,hepatocyte,KEGG,0.824
+PATHWAY_00004,Pathway,Biological_Pathway_004,hsa47249,IMMUNE,Coordinates DNA repair and genome stability,35,0.002633,3.29,neuron,KEGG,0.836
+PATHWAY_00005,Pathway,Biological_Pathway_005,hsa64534,PROTEIN_SYNTHESIS,Manages protein synthesis and degradation,69,0.048717,1.61,hepatocyte,KEGG,0.757
+PATHWAY_00006,Pathway,Biological_Pathway_006,hsa68649,PROTEIN_SYNTHESIS,Manages protein synthesis and degradation,77,0.021209,1.73,neuron,KEGG,0.902
+PATHWAY_00007,Pathway,Biological_Pathway_007,hsa17234,APOPTOSIS,Controls apoptosis and cell survival,57,0.01885,6.55,hepatocyte,KEGG,0.869
+PATHWAY_00008,Pathway,Biological_Pathway_008,hsa78526,CELL_CYCLE,Controls cell cycle progression and division,194,0.046751,7.98,fibroblast,KEGG,0.779
+PATHWAY_00009,Pathway,Biological_Pathway_009,hsa85586,CELL_CYCLE,Mediates immune response and inflammation,162,0.034047,9.23,cardiomyocyte,KEGG,0.946
+PATHWAY_00010,Pathway,Biological_Pathway_010,hsa52385,DNA_REPAIR,Coordinates DNA repair and genome stability,85,0.044774,6.88,neuron,KEGG,0.904
+PATHWAY_00011,Pathway,Biological_Pathway_011,hsa29416,SIGNALING,Mediates signal transduction pathways,50,0.045727,9.2,cardiomyocyte,KEGG,0.9
+PATHWAY_00012,Pathway,Biological_Pathway_012,hsa34414,DNA_REPAIR,Manages protein synthesis and degradation,54,0.004598,3.71,cardiomyocyte,KEGG,0.8
+PATHWAY_00013,Pathway,Biological_Pathway_013,hsa22294,METABOLIC,Controls cell cycle progression and division,177,0.040523,6.2,hepatocyte,KEGG,0.769
+PATHWAY_00014,Pathway,Biological_Pathway_014,hsa48204,APOPTOSIS,Controls cell cycle progression and division,40,0.039433,4.22,cardiomyocyte,KEGG,0.77
+PATHWAY_00015,Pathway,Biological_Pathway_015,hsa71959,PROTEIN_SYNTHESIS,Controls apoptosis and cell survival,164,0.018323,6.76,hepatocyte,KEGG,0.756
+PATHWAY_00016,Pathway,Biological_Pathway_016,hsa41958,PROTEIN_SYNTHESIS,Controls cell cycle progression and division,146,0.022769,7.87,cardiomyocyte,KEGG,0.933
+PATHWAY_00017,Pathway,Biological_Pathway_017,hsa43071,CELL_CYCLE,Manages protein synthesis and degradation,69,0.04166,8.09,hepatocyte,KEGG,0.813
+PATHWAY_00018,Pathway,Biological_Pathway_018,hsa30295,LIPID_METABOLISM,Mediates signal transduction pathways,190,0.028335,9.06,cardiomyocyte,KEGG,0.819
+PATHWAY_00019,Pathway,Biological_Pathway_019,hsa71612,DNA_REPAIR,Controls cell cycle progression and division,103,0.034359,6.04,hepatocyte,KEGG,0.905
+PATHWAY_00020,Pathway,Biological_Pathway_020,hsa25135,PROTEIN_SYNTHESIS,Manages protein synthesis and degradation,168,0.018688,3.6,hepatocyte,KEGG,0.833
+PATHWAY_00021,Pathway,Biological_Pathway_021,hsa48569,CELL_CYCLE,Controls apoptosis and cell survival,46,0.038227,5.96,neuron,KEGG,0.936
+PATHWAY_00022,Pathway,Biological_Pathway_022,hsa43263,PROTEIN_SYNTHESIS,Controls cell cycle progression and division,121,0.046551,9.48,neuron,KEGG,0.757
+PATHWAY_00023,Pathway,Biological_Pathway_023,hsa55942,IMMUNE,Manages protein synthesis and degradation,63,0.00819,5.02,neuron,KEGG,0.86
+PATHWAY_00024,Pathway,Biological_Pathway_024,hsa77335,METABOLIC,Regulates lipid metabolism and storage,118,0.027329,5.34,hepatocyte,KEGG,0.819
+PATHWAY_00025,Pathway,Biological_Pathway_025,hsa30261,CELL_CYCLE,Regulates cellular metabolism and energy production,29,0.024366,8.55,hepatocyte,KEGG,0.926
+PATHWAY_00026,Pathway,Biological_Pathway_026,hsa58644,APOPTOSIS,Controls apoptosis and cell survival,88,0.003626,2.43,cardiomyocyte,KEGG,0.919
+PATHWAY_00027,Pathway,Biological_Pathway_027,hsa14226,DNA_REPAIR,Regulates lipid metabolism and storage,61,0.031607,2.12,neuron,KEGG,0.753
+PATHWAY_00028,Pathway,Biological_Pathway_028,hsa88743,IMMUNE,Mediates signal transduction pathways,190,0.026928,2.19,neuron,KEGG,0.884
+PATHWAY_00029,Pathway,Biological_Pathway_029,hsa13721,SIGNALING,Controls apoptosis and cell survival,93,0.012307,4.75,fibroblast,KEGG,0.936
+PATHWAY_00030,Pathway,Biological_Pathway_030,hsa48826,CELL_CYCLE,Coordinates DNA repair and genome stability,81,0.027813,4.25,neuron,KEGG,0.905
+PATHWAY_00031,Pathway,Biological_Pathway_031,hsa42237,IMMUNE,Mediates signal transduction pathways,112,0.012349,4.96,hepatocyte,KEGG,0.751
+PATHWAY_00032,Pathway,Biological_Pathway_032,hsa53598,IMMUNE,Mediates immune response and inflammation,118,0.039324,5.1,fibroblast,KEGG,0.808
+PATHWAY_00033,Pathway,Biological_Pathway_033,hsa64601,SIGNALING,Controls apoptosis and cell survival,67,0.023467,7.0,fibroblast,KEGG,0.837
+PATHWAY_00034,Pathway,Biological_Pathway_034,hsa15553,DNA_REPAIR,Controls cell cycle progression and division,78,0.036861,9.19,hepatocyte,KEGG,0.878
+PATHWAY_00035,Pathway,Biological_Pathway_035,hsa55907,CELL_CYCLE,Manages protein synthesis and degradation,78,0.012065,5.59,cardiomyocyte,KEGG,0.777
+PATHWAY_00036,Pathway,Biological_Pathway_036,hsa88225,SIGNALING,Controls apoptosis and cell survival,61,0.040535,7.39,cardiomyocyte,KEGG,0.908
+PATHWAY_00037,Pathway,Biological_Pathway_037,hsa81293,PROTEIN_SYNTHESIS,Controls cell cycle progression and division,74,0.036744,7.05,fibroblast,KEGG,0.854
+PATHWAY_00038,Pathway,Biological_Pathway_038,hsa43378,LIPID_METABOLISM,Mediates signal transduction pathways,106,0.020015,2.81,fibroblast,KEGG,0.925
+PATHWAY_00039,Pathway,Biological_Pathway_039,hsa57294,IMMUNE,Mediates immune response and inflammation,198,0.007229,5.7,neuron,KEGG,0.842
+PATHWAY_00040,Pathway,Biological_Pathway_040,hsa83472,SIGNALING,Manages protein synthesis and degradation,139,0.034545,4.96,hepatocyte,KEGG,0.767
+PATHWAY_00041,Pathway,Biological_Pathway_041,hsa54974,CELL_CYCLE,Controls cell cycle progression and division,101,0.048202,5.93,neuron,KEGG,0.841
+PATHWAY_00042,Pathway,Biological_Pathway_042,hsa13672,IMMUNE,Manages protein synthesis and degradation,138,0.019684,9.44,hepatocyte,KEGG,0.889
+PATHWAY_00043,Pathway,Biological_Pathway_043,hsa74974,IMMUNE,Coordinates DNA repair and genome stability,157,0.019082,9.58,fibroblast,KEGG,0.892
+PATHWAY_00044,Pathway,Biological_Pathway_044,hsa23335,PROTEIN_SYNTHESIS,Coordinates DNA repair and genome stability,107,0.028608,7.26,fibroblast,KEGG,0.751
+PATHWAY_00045,Pathway,Biological_Pathway_045,hsa39007,METABOLIC,Mediates signal transduction pathways,50,0.020299,1.65,cardiomyocyte,KEGG,0.945
+PATHWAY_00046,Pathway,Biological_Pathway_046,hsa64961,APOPTOSIS,Mediates signal transduction pathways,145,0.040457,3.43,fibroblast,KEGG,0.811
+PATHWAY_00047,Pathway,Biological_Pathway_047,hsa80385,LIPID_METABOLISM,Controls cell cycle progression and division,53,0.008557,8.48,hepatocyte,KEGG,0.779
+PATHWAY_00048,Pathway,Biological_Pathway_048,hsa44386,SIGNALING,Regulates cellular metabolism and energy production,200,0.02949,2.75,neuron,KEGG,0.916
+PATHWAY_00049,Pathway,Biological_Pathway_049,hsa67161,METABOLIC,Controls apoptosis and cell survival,172,0.032028,9.86,cardiomyocyte,KEGG,0.805
+PATHWAY_00050,Pathway,Biological_Pathway_050,hsa89103,IMMUNE,Mediates immune response and inflammation,198,0.048292,8.26,hepatocyte,KEGG,0.93
+PATHWAY_00051,Pathway,Biological_Pathway_051,hsa12757,IMMUNE,Coordinates DNA repair and genome stability,62,0.018671,2.84,hepatocyte,KEGG,0.898
+PATHWAY_00052,Pathway,Biological_Pathway_052,hsa43840,SIGNALING,Controls apoptosis and cell survival,196,0.009185,7.74,neuron,KEGG,0.879
+PATHWAY_00053,Pathway,Biological_Pathway_053,hsa15578,CELL_CYCLE,Regulates cellular metabolism and energy production,42,0.041459,7.76,cardiomyocyte,KEGG,0.869
+PATHWAY_00054,Pathway,Biological_Pathway_054,hsa22132,IMMUNE,Coordinates DNA repair and genome stability,146,0.033549,8.67,neuron,KEGG,0.891
+PATHWAY_00055,Pathway,Biological_Pathway_055,hsa37524,DNA_REPAIR,Manages protein synthesis and degradation,121,0.00753,4.87,fibroblast,KEGG,0.853
+PATHWAY_00056,Pathway,Biological_Pathway_056,hsa52101,SIGNALING,Mediates immune response and inflammation,180,0.010754,5.92,hepatocyte,KEGG,0.756
+PATHWAY_00057,Pathway,Biological_Pathway_057,hsa55546,PROTEIN_SYNTHESIS,Regulates lipid metabolism and storage,20,0.02756,4.13,cardiomyocyte,KEGG,0.772
+PATHWAY_00058,Pathway,Biological_Pathway_058,hsa88782,METABOLIC,Controls cell cycle progression and division,63,0.029607,9.22,hepatocyte,KEGG,0.796
+PATHWAY_00059,Pathway,Biological_Pathway_059,hsa23862,DNA_REPAIR,Manages protein synthesis and degradation,110,0.018099,7.83,cardiomyocyte,KEGG,0.827
+PATHWAY_00060,Pathway,Biological_Pathway_060,hsa22861,DNA_REPAIR,Mediates immune response and inflammation,98,0.044297,6.5,fibroblast,KEGG,0.762
+PATHWAY_00061,Pathway,Biological_Pathway_061,hsa95671,IMMUNE,Coordinates DNA repair and genome stability,111,0.041113,8.61,cardiomyocyte,KEGG,0.804
+PATHWAY_00062,Pathway,Biological_Pathway_062,hsa94494,DNA_REPAIR,Controls cell cycle progression and division,185,0.042585,9.55,fibroblast,KEGG,0.823
+PATHWAY_00063,Pathway,Biological_Pathway_063,hsa59626,LIPID_METABOLISM,Regulates lipid metabolism and storage,124,0.037908,1.52,cardiomyocyte,KEGG,0.884
+PATHWAY_00064,Pathway,Biological_Pathway_064,hsa39796,CELL_CYCLE,Mediates signal transduction pathways,171,0.002838,1.99,cardiomyocyte,KEGG,0.865
+PATHWAY_00065,Pathway,Biological_Pathway_065,hsa37091,APOPTOSIS,Mediates signal transduction pathways,103,0.031435,1.62,neuron,KEGG,0.787
+PATHWAY_00066,Pathway,Biological_Pathway_066,hsa59407,APOPTOSIS,Mediates immune response and inflammation,109,0.044147,2.36,neuron,KEGG,0.914
+PATHWAY_00067,Pathway,Biological_Pathway_067,hsa71391,IMMUNE,Controls apoptosis and cell survival,199,0.008857,8.44,neuron,KEGG,0.936
+PATHWAY_00068,Pathway,Biological_Pathway_068,hsa83001,PROTEIN_SYNTHESIS,Mediates signal transduction pathways,28,0.036512,7.89,neuron,KEGG,0.8
+PATHWAY_00069,Pathway,Biological_Pathway_069,hsa68634,CELL_CYCLE,Regulates cellular metabolism and energy production,111,0.010596,3.79,fibroblast,KEGG,0.784
+PATHWAY_00070,Pathway,Biological_Pathway_070,hsa49105,LIPID_METABOLISM,Controls cell cycle progression and division,88,0.020747,5.74,hepatocyte,KEGG,0.928
+PATHWAY_00071,Pathway,Biological_Pathway_071,hsa75041,SIGNALING,Mediates signal transduction pathways,57,0.002505,1.73,cardiomyocyte,KEGG,0.765
+PATHWAY_00072,Pathway,Biological_Pathway_072,hsa17420,DNA_REPAIR,Manages protein synthesis and degradation,116,0.038414,4.61,fibroblast,KEGG,0.828
+PATHWAY_00073,Pathway,Biological_Pathway_073,hsa48325,METABOLIC,Mediates signal transduction pathways,194,0.042039,3.35,neuron,KEGG,0.86
+PATHWAY_00074,Pathway,Biological_Pathway_074,hsa47818,SIGNALING,Controls cell cycle progression and division,23,0.041259,8.57,neuron,KEGG,0.881
+PATHWAY_00075,Pathway,Biological_Pathway_075,hsa51428,DNA_REPAIR,Mediates signal transduction pathways,100,0.006173,6.25,fibroblast,KEGG,0.853
+PATHWAY_00076,Pathway,Biological_Pathway_076,hsa11027,SIGNALING,Regulates cellular metabolism and energy production,147,0.042062,4.92,fibroblast,KEGG,0.862
+PATHWAY_00077,Pathway,Biological_Pathway_077,hsa59643,IMMUNE,Manages protein synthesis and degradation,78,0.02647,2.15,neuron,KEGG,0.895
+PATHWAY_00078,Pathway,Biological_Pathway_078,hsa85495,SIGNALING,Manages protein synthesis and degradation,183,0.042464,9.6,neuron,KEGG,0.904
+PATHWAY_00079,Pathway,Biological_Pathway_079,hsa76289,CELL_CYCLE,Controls apoptosis and cell survival,45,0.046999,7.92,neuron,KEGG,0.805
+PATHWAY_00080,Pathway,Biological_Pathway_080,hsa86825,SIGNALING,Regulates lipid metabolism and storage,184,0.010972,9.09,cardiomyocyte,KEGG,0.929
+PATHWAY_00081,Pathway,Biological_Pathway_081,hsa96519,IMMUNE,Mediates immune response and inflammation,33,0.013744,4.19,hepatocyte,KEGG,0.913
+PATHWAY_00082,Pathway,Biological_Pathway_082,hsa56935,LIPID_METABOLISM,Regulates cellular metabolism and energy production,60,0.02918,7.62,fibroblast,KEGG,0.773
+PATHWAY_00083,Pathway,Biological_Pathway_083,hsa11051,IMMUNE,Coordinates DNA repair and genome stability,86,0.009232,6.42,cardiomyocyte,KEGG,0.889
+PATHWAY_00084,Pathway,Biological_Pathway_084,hsa14912,LIPID_METABOLISM,Manages protein synthesis and degradation,31,0.018316,5.71,fibroblast,KEGG,0.831
+PATHWAY_00085,Pathway,Biological_Pathway_085,hsa99603,CELL_CYCLE,Manages protein synthesis and degradation,65,0.042637,3.56,neuron,KEGG,0.898
+PATHWAY_00086,Pathway,Biological_Pathway_086,hsa70789,APOPTOSIS,Regulates cellular metabolism and energy production,77,0.046541,2.21,cardiomyocyte,KEGG,0.824
+PATHWAY_00087,Pathway,Biological_Pathway_087,hsa34039,CELL_CYCLE,Regulates lipid metabolism and storage,153,0.002397,2.96,hepatocyte,KEGG,0.869
+PATHWAY_00088,Pathway,Biological_Pathway_088,hsa89318,METABOLIC,Coordinates DNA repair and genome stability,147,0.047895,7.44,hepatocyte,KEGG,0.915
+PATHWAY_00089,Pathway,Biological_Pathway_089,hsa46863,LIPID_METABOLISM,Mediates immune response and inflammation,8,0.023119,4.29,cardiomyocyte,KEGG,0.789
+PATHWAY_00090,Pathway,Biological_Pathway_090,hsa24162,SIGNALING,Controls apoptosis and cell survival,145,0.00103,2.65,hepatocyte,KEGG,0.863
+PATHWAY_00091,Pathway,Biological_Pathway_091,hsa60650,CELL_CYCLE,Controls cell cycle progression and division,162,0.038997,2.65,neuron,KEGG,0.938
+PATHWAY_00092,Pathway,Biological_Pathway_092,hsa61686,DNA_REPAIR,Controls apoptosis and cell survival,155,0.0035,5.59,fibroblast,KEGG,0.787
+PATHWAY_00093,Pathway,Biological_Pathway_093,hsa85383,CELL_CYCLE,Regulates cellular metabolism and energy production,64,0.025142,5.26,hepatocyte,KEGG,0.902
+PATHWAY_00094,Pathway,Biological_Pathway_094,hsa13687,PROTEIN_SYNTHESIS,Mediates signal transduction pathways,6,0.042663,3.01,neuron,KEGG,0.787
+PATHWAY_00095,Pathway,Biological_Pathway_095,hsa11366,IMMUNE,Manages protein synthesis and degradation,191,0.035087,5.96,neuron,KEGG,0.932
+PATHWAY_00096,Pathway,Biological_Pathway_096,hsa89644,DNA_REPAIR,Coordinates DNA repair and genome stability,18,0.039417,3.27,neuron,KEGG,0.857
+PATHWAY_00097,Pathway,Biological_Pathway_097,hsa23365,IMMUNE,Mediates immune response and inflammation,116,0.018115,2.56,hepatocyte,KEGG,0.815
+PATHWAY_00098,Pathway,Biological_Pathway_098,hsa36418,IMMUNE,Coordinates DNA repair and genome stability,143,0.049786,7.75,neuron,KEGG,0.837
+PATHWAY_00099,Pathway,Biological_Pathway_099,hsa43760,DNA_REPAIR,Controls cell cycle progression and division,197,0.049413,9.73,hepatocyte,KEGG,0.948
+PATHWAY_00100,Pathway,Biological_Pathway_100,hsa24330,PROTEIN_SYNTHESIS,Coordinates DNA repair and genome stability,20,0.025598,8.34,neuron,KEGG,0.835

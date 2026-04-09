@@ -1,0 +1,81 @@
+Id,Label,Properties:name,Properties:type,Properties:description,Properties:targetClass,Properties:reversibility,Properties:specificity,Properties:potency,Properties:selectivity,Properties:source,Properties:confidence
+MECHANISM_00001,Mechanism,Mechanism_of_Action_01,ENZYME_INHIBITION,Allosteric modulation of receptor conformation,transporter,reversible,0.18,49.324,745.2,CHEMBL,0.879
+MECHANISM_00002,Mechanism,Mechanism_of_Action_02,DNA_INTERACTION,Competitive antagonism of neurotransmitter receptors,channel,competitive,0.71,78.87,387.7,CHEMBL,0.827
+MECHANISM_00003,Mechanism,Mechanism_of_Action_03,TRANSPORTER_INHIBITION,Competitive antagonism of neurotransmitter receptors,channel,competitive,0.46,48.495,817.4,CHEMBL,0.73
+MECHANISM_00004,Mechanism,Mechanism_of_Action_04,TRANSPORTER_INHIBITION,Selective blocking of ion channel conductance,receptor,competitive,0.26,40.332,937.1,CHEMBL,0.783
+MECHANISM_00005,Mechanism,Mechanism_of_Action_05,ENZYME_INHIBITION,Irreversible binding to protein cysteine residues,transporter,irreversible,0.41,28.943,93.5,CHEMBL,0.774
+MECHANISM_00006,Mechanism,Mechanism_of_Action_06,DNA_INTERACTION,Irreversible binding to protein cysteine residues,channel,irreversible,0.58,96.208,240.6,CHEMBL,0.741
+MECHANISM_00007,Mechanism,Mechanism_of_Action_07,RECEPTOR_ANTAGONIST,Competitive inhibition of target enzyme active site,channel,competitive,0.91,6.7,817.5,CHEMBL,0.86
+MECHANISM_00008,Mechanism,Mechanism_of_Action_08,RECEPTOR_AGONIST,Inhibition of protein-protein interactions,transporter,irreversible,0.78,10.105,505.0,CHEMBL,0.823
+MECHANISM_00009,Mechanism,Mechanism_of_Action_09,ENZYME_INHIBITION,Non-competitive inhibition through allosteric binding,channel,reversible,0.12,10.758,322.7,CHEMBL,0.926
+MECHANISM_00010,Mechanism,Mechanism_of_Action_10,CHANNEL_BLOCKER,Allosteric modulation of receptor conformation,enzyme,irreversible,0.32,53.148,838.5,CHEMBL,0.803
+MECHANISM_00011,Mechanism,Mechanism_of_Action_11,TRANSPORTER_INHIBITION,Competitive inhibition of target enzyme active site,enzyme,competitive,0.28,47.394,431.7,CHEMBL,0.77
+MECHANISM_00012,Mechanism,Mechanism_of_Action_12,DNA_INTERACTION,Competitive antagonism of neurotransmitter receptors,transporter,irreversible,0.29,94.535,955.2,CHEMBL,0.886
+MECHANISM_00013,Mechanism,Mechanism_of_Action_13,PROTEIN_BINDING,Competitive antagonism of neurotransmitter receptors,channel,competitive,0.85,97.069,321.6,CHEMBL,0.867
+MECHANISM_00014,Mechanism,Mechanism_of_Action_14,ENZYME_INHIBITION,Inhibition of protein-protein interactions,channel,irreversible,0.45,38.265,815.5,CHEMBL,0.707
+MECHANISM_00015,Mechanism,Mechanism_of_Action_15,DNA_INTERACTION,Competitive antagonism of neurotransmitter receptors,channel,reversible,1.0,91.806,983.1,CHEMBL,0.819
+MECHANISM_00016,Mechanism,Mechanism_of_Action_16,PROTEIN_BINDING,Allosteric modulation of receptor conformation,channel,irreversible,0.17,89.888,613.8,CHEMBL,0.787
+MECHANISM_00017,Mechanism,Mechanism_of_Action_17,CHANNEL_BLOCKER,Inhibition of protein-protein interactions,receptor,irreversible,0.63,76.479,734.2,CHEMBL,0.93
+MECHANISM_00018,Mechanism,Mechanism_of_Action_18,DNA_INTERACTION,Agonistic activation of G-protein coupled receptors,channel,irreversible,0.13,3.307,471.5,CHEMBL,0.746
+MECHANISM_00019,Mechanism,Mechanism_of_Action_19,CHANNEL_BLOCKER,Allosteric modulation of receptor conformation,channel,reversible,0.24,66.55,854.3,CHEMBL,0.886
+MECHANISM_00020,Mechanism,Mechanism_of_Action_20,PROTEIN_BINDING,Inhibition of protein-protein interactions,transporter,competitive,0.48,4.481,286.8,CHEMBL,0.751
+MECHANISM_00021,Mechanism,Mechanism_of_Action_21,CHANNEL_BLOCKER,Agonistic activation of G-protein coupled receptors,receptor,irreversible,0.43,63.113,295.8,CHEMBL,0.728
+MECHANISM_00022,Mechanism,Mechanism_of_Action_22,PROTEIN_BINDING,Inhibition of protein-protein interactions,transporter,competitive,0.41,20.618,499.3,CHEMBL,0.851
+MECHANISM_00023,Mechanism,Mechanism_of_Action_23,RECEPTOR_ANTAGONIST,Competitive inhibition of target enzyme active site,transporter,irreversible,0.96,24.333,160.8,CHEMBL,0.75
+MECHANISM_00024,Mechanism,Mechanism_of_Action_24,RNA_INTERFERENCE,Non-competitive inhibition through allosteric binding,enzyme,competitive,0.25,19.511,758.9,CHEMBL,0.889
+MECHANISM_00025,Mechanism,Mechanism_of_Action_25,DNA_INTERACTION,Competitive antagonism of neurotransmitter receptors,receptor,competitive,0.19,50.049,822.4,CHEMBL,0.936
+MECHANISM_00026,Mechanism,Mechanism_of_Action_26,PROTEIN_BINDING,Selective blocking of ion channel conductance,receptor,competitive,0.77,29.73,770.9,CHEMBL,0.916
+MECHANISM_00027,Mechanism,Mechanism_of_Action_27,DNA_INTERACTION,Selective blocking of ion channel conductance,enzyme,competitive,0.97,17.592,676.7,CHEMBL,0.876
+MECHANISM_00028,Mechanism,Mechanism_of_Action_28,CHANNEL_BLOCKER,Competitive inhibition of target enzyme active site,channel,reversible,0.21,33.801,730.0,CHEMBL,0.93
+MECHANISM_00029,Mechanism,Mechanism_of_Action_29,RECEPTOR_AGONIST,Non-competitive inhibition through allosteric binding,enzyme,reversible,0.84,18.682,924.8,CHEMBL,0.936
+MECHANISM_00030,Mechanism,Mechanism_of_Action_30,RNA_INTERFERENCE,Competitive antagonism of neurotransmitter receptors,transporter,irreversible,0.64,29.172,874.1,CHEMBL,0.711
+MECHANISM_00031,Mechanism,Mechanism_of_Action_31,RECEPTOR_AGONIST,Irreversible binding to protein cysteine residues,transporter,competitive,0.98,48.766,670.8,CHEMBL,0.949
+MECHANISM_00032,Mechanism,Mechanism_of_Action_32,CHANNEL_BLOCKER,Irreversible binding to protein cysteine residues,receptor,irreversible,0.93,42.555,889.8,CHEMBL,0.875
+MECHANISM_00033,Mechanism,Mechanism_of_Action_33,RECEPTOR_AGONIST,Allosteric modulation of receptor conformation,receptor,irreversible,0.59,24.628,862.4,CHEMBL,0.719
+MECHANISM_00034,Mechanism,Mechanism_of_Action_34,RECEPTOR_AGONIST,Inhibition of protein-protein interactions,channel,competitive,0.54,9.837,806.7,CHEMBL,0.856
+MECHANISM_00035,Mechanism,Mechanism_of_Action_35,DNA_INTERACTION,Agonistic activation of G-protein coupled receptors,receptor,reversible,1.0,3.608,88.3,CHEMBL,0.736
+MECHANISM_00036,Mechanism,Mechanism_of_Action_36,TRANSPORTER_INHIBITION,Inhibition of protein-protein interactions,enzyme,reversible,0.1,41.692,376.6,CHEMBL,0.913
+MECHANISM_00037,Mechanism,Mechanism_of_Action_37,TRANSPORTER_INHIBITION,Selective blocking of ion channel conductance,receptor,competitive,0.82,10.078,466.9,CHEMBL,0.906
+MECHANISM_00038,Mechanism,Mechanism_of_Action_38,RECEPTOR_ANTAGONIST,Irreversible binding to protein cysteine residues,receptor,competitive,0.73,32.52,632.7,CHEMBL,0.885
+MECHANISM_00039,Mechanism,Mechanism_of_Action_39,DNA_INTERACTION,Inhibition of protein-protein interactions,enzyme,irreversible,0.65,45.829,174.8,CHEMBL,0.886
+MECHANISM_00040,Mechanism,Mechanism_of_Action_40,DNA_INTERACTION,Competitive antagonism of neurotransmitter receptors,receptor,irreversible,0.22,2.175,705.1,CHEMBL,0.701
+MECHANISM_00041,Mechanism,Mechanism_of_Action_41,CHANNEL_BLOCKER,Competitive inhibition of target enzyme active site,enzyme,competitive,0.14,23.258,598.1,CHEMBL,0.802
+MECHANISM_00042,Mechanism,Mechanism_of_Action_42,CHANNEL_BLOCKER,Selective blocking of ion channel conductance,enzyme,reversible,0.56,28.218,174.6,CHEMBL,0.701
+MECHANISM_00043,Mechanism,Mechanism_of_Action_43,RECEPTOR_ANTAGONIST,Selective blocking of ion channel conductance,enzyme,competitive,0.53,29.706,300.1,CHEMBL,0.789
+MECHANISM_00044,Mechanism,Mechanism_of_Action_44,ENZYME_INHIBITION,Competitive antagonism of neurotransmitter receptors,transporter,irreversible,0.49,23.839,665.9,CHEMBL,0.863
+MECHANISM_00045,Mechanism,Mechanism_of_Action_45,CHANNEL_BLOCKER,Inhibition of protein-protein interactions,enzyme,irreversible,0.59,9.414,306.7,CHEMBL,0.899
+MECHANISM_00046,Mechanism,Mechanism_of_Action_46,RNA_INTERFERENCE,Agonistic activation of G-protein coupled receptors,transporter,irreversible,0.47,82.265,339.5,CHEMBL,0.802
+MECHANISM_00047,Mechanism,Mechanism_of_Action_47,DNA_INTERACTION,Inhibition of protein-protein interactions,transporter,competitive,0.68,37.992,672.7,CHEMBL,0.884
+MECHANISM_00048,Mechanism,Mechanism_of_Action_48,RECEPTOR_ANTAGONIST,Selective blocking of ion channel conductance,channel,reversible,0.23,32.917,989.2,CHEMBL,0.9
+MECHANISM_00049,Mechanism,Mechanism_of_Action_49,ENZYME_INHIBITION,Competitive inhibition of target enzyme active site,channel,irreversible,0.86,23.514,432.8,CHEMBL,0.862
+MECHANISM_00050,Mechanism,Mechanism_of_Action_50,DNA_INTERACTION,Agonistic activation of G-protein coupled receptors,channel,irreversible,0.62,19.231,845.8,CHEMBL,0.766
+MECHANISM_00051,Mechanism,Mechanism_of_Action_51,TRANSPORTER_INHIBITION,Inhibition of protein-protein interactions,transporter,irreversible,0.99,13.97,409.5,CHEMBL,0.838
+MECHANISM_00052,Mechanism,Mechanism_of_Action_52,RECEPTOR_ANTAGONIST,Non-competitive inhibition through allosteric binding,transporter,competitive,0.11,72.332,279.1,CHEMBL,0.795
+MECHANISM_00053,Mechanism,Mechanism_of_Action_53,CHANNEL_BLOCKER,Selective blocking of ion channel conductance,transporter,reversible,0.18,7.475,29.6,CHEMBL,0.835
+MECHANISM_00054,Mechanism,Mechanism_of_Action_54,TRANSPORTER_INHIBITION,Allosteric modulation of receptor conformation,transporter,competitive,0.84,95.377,349.9,CHEMBL,0.838
+MECHANISM_00055,Mechanism,Mechanism_of_Action_55,PROTEIN_BINDING,Allosteric modulation of receptor conformation,transporter,competitive,0.3,45.806,193.0,CHEMBL,0.939
+MECHANISM_00056,Mechanism,Mechanism_of_Action_56,PROTEIN_BINDING,Competitive inhibition of target enzyme active site,channel,competitive,0.96,19.062,689.1,CHEMBL,0.822
+MECHANISM_00057,Mechanism,Mechanism_of_Action_57,RECEPTOR_ANTAGONIST,Competitive inhibition of target enzyme active site,transporter,competitive,0.95,24.268,375.6,CHEMBL,0.703
+MECHANISM_00058,Mechanism,Mechanism_of_Action_58,DNA_INTERACTION,Inhibition of protein-protein interactions,enzyme,irreversible,0.46,68.35,723.0,CHEMBL,0.949
+MECHANISM_00059,Mechanism,Mechanism_of_Action_59,RECEPTOR_ANTAGONIST,Irreversible binding to protein cysteine residues,transporter,reversible,0.92,96.024,240.4,CHEMBL,0.853
+MECHANISM_00060,Mechanism,Mechanism_of_Action_60,RECEPTOR_ANTAGONIST,Inhibition of protein-protein interactions,receptor,irreversible,0.51,69.141,594.4,CHEMBL,0.905
+MECHANISM_00061,Mechanism,Mechanism_of_Action_61,TRANSPORTER_INHIBITION,Agonistic activation of G-protein coupled receptors,channel,reversible,0.2,82.657,353.3,CHEMBL,0.776
+MECHANISM_00062,Mechanism,Mechanism_of_Action_62,DNA_INTERACTION,Irreversible binding to protein cysteine residues,enzyme,reversible,0.52,65.56,138.6,CHEMBL,0.842
+MECHANISM_00063,Mechanism,Mechanism_of_Action_63,DNA_INTERACTION,Selective blocking of ion channel conductance,transporter,reversible,0.57,25.428,995.3,CHEMBL,0.77
+MECHANISM_00064,Mechanism,Mechanism_of_Action_64,RNA_INTERFERENCE,Agonistic activation of G-protein coupled receptors,receptor,competitive,0.23,85.985,775.3,CHEMBL,0.733
+MECHANISM_00065,Mechanism,Mechanism_of_Action_65,RECEPTOR_AGONIST,Allosteric modulation of receptor conformation,channel,irreversible,0.42,3.766,896.3,CHEMBL,0.708
+MECHANISM_00066,Mechanism,Mechanism_of_Action_66,RNA_INTERFERENCE,Competitive antagonism of neurotransmitter receptors,transporter,competitive,0.27,52.953,100.8,CHEMBL,0.78
+MECHANISM_00067,Mechanism,Mechanism_of_Action_67,RECEPTOR_AGONIST,Irreversible binding to protein cysteine residues,enzyme,competitive,0.5,38.992,535.8,CHEMBL,0.727
+MECHANISM_00068,Mechanism,Mechanism_of_Action_68,RNA_INTERFERENCE,Agonistic activation of G-protein coupled receptors,transporter,reversible,0.82,36.198,460.2,CHEMBL,0.884
+MECHANISM_00069,Mechanism,Mechanism_of_Action_69,RNA_INTERFERENCE,Competitive inhibition of target enzyme active site,transporter,reversible,0.3,3.265,201.4,CHEMBL,0.729
+MECHANISM_00070,Mechanism,Mechanism_of_Action_70,RNA_INTERFERENCE,Selective blocking of ion channel conductance,channel,irreversible,0.92,14.572,405.3,CHEMBL,0.801
+MECHANISM_00071,Mechanism,Mechanism_of_Action_71,CHANNEL_BLOCKER,Agonistic activation of G-protein coupled receptors,channel,competitive,0.29,47.103,646.0,CHEMBL,0.892
+MECHANISM_00072,Mechanism,Mechanism_of_Action_72,RECEPTOR_ANTAGONIST,Agonistic activation of G-protein coupled receptors,transporter,competitive,0.56,10.97,685.0,CHEMBL,0.778
+MECHANISM_00073,Mechanism,Mechanism_of_Action_73,PROTEIN_BINDING,Allosteric modulation of receptor conformation,receptor,irreversible,0.14,3.33,665.3,CHEMBL,0.772
+MECHANISM_00074,Mechanism,Mechanism_of_Action_74,RECEPTOR_ANTAGONIST,Competitive inhibition of target enzyme active site,channel,irreversible,0.28,63.71,283.8,CHEMBL,0.904
+MECHANISM_00075,Mechanism,Mechanism_of_Action_75,RECEPTOR_AGONIST,Agonistic activation of G-protein coupled receptors,enzyme,irreversible,0.23,37.272,908.4,CHEMBL,0.825
+MECHANISM_00076,Mechanism,Mechanism_of_Action_76,RECEPTOR_AGONIST,Competitive inhibition of target enzyme active site,enzyme,irreversible,0.81,16.897,404.0,CHEMBL,0.887
+MECHANISM_00077,Mechanism,Mechanism_of_Action_77,CHANNEL_BLOCKER,Inhibition of protein-protein interactions,enzyme,irreversible,0.65,64.94,208.4,CHEMBL,0.702
+MECHANISM_00078,Mechanism,Mechanism_of_Action_78,CHANNEL_BLOCKER,Selective blocking of ion channel conductance,transporter,reversible,0.3,44.611,309.6,CHEMBL,0.85
+MECHANISM_00079,Mechanism,Mechanism_of_Action_79,ENZYME_INHIBITION,Competitive inhibition of target enzyme active site,channel,reversible,0.77,50.023,272.7,CHEMBL,0.718
+MECHANISM_00080,Mechanism,Mechanism_of_Action_80,DNA_INTERACTION,Non-competitive inhibition through allosteric binding,channel,irreversible,0.29,24.45,124.5,CHEMBL,0.712
