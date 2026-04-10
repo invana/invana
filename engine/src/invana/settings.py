@@ -35,12 +35,6 @@ class Settings(BaseSettings):
     secret_key: str = ""
     token_expiry_minutes: int = 1440
 
-    # Graph connector (used by CLI and future API routes)
-    graph_uri: str = ""
-    graph_username: str = ""
-    graph_password: str = ""
-    graph_connector: str = ""  # dotted path, e.g. "invana_neo4j.Neo4jConnector"
-
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True
     telemetry_otlp_endpoint: str = "http://localhost:4317"

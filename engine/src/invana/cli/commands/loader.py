@@ -52,18 +52,17 @@ async def _run_loader(connector, path: str, config) -> object:
 
 @click.command("loader")
 @click.argument("path")
-@click.option("--uri", default=None, help="Graph DB connection URI (env: INVANA_GRAPH_URI).")
-@click.option("--username", default=None, help="DB username (env: INVANA_GRAPH_USERNAME).")
-@click.option("--password", default=None, help="DB password (env: INVANA_GRAPH_PASSWORD).")
+@click.option("--uri", required=True, help="Graph DB connection URI, e.g. bolt://localhost:7687.")
+@click.option("--username", default=None, help="DB username.")
+@click.option("--password", default=None, help="DB password.")
 @click.option(
     "--connector",
     "connector_path",
-    default=None,
+    required=True,
     help=(
-        "Full dotted path to a connector class, e.g. "
-        "invana.graph.connectors.cypher.connector.OpenCypherConnector "
-        "or invana_neo4j.connector.Neo4jConnector "
-        "(env: INVANA_GRAPH_CONNECTOR). Required."
+        "Full dotted path to the connector class, e.g. "
+        "invana_neo4j.Neo4jConnector or "
+        "invana.graph.connectors.OpenCypherConnector."
     ),
 )
 @click.option("--batch-size", default=500, show_default=True, help="Records per bulk call.")
@@ -72,10 +71,10 @@ async def _run_loader(connector, path: str, config) -> object:
 @click.option("--no-source-ids", is_flag=True, default=False, help="Omit _csv_source_id property.")
 def loader_cmd(
     path: str,
-    uri: str | None,
+    uri: str,
     username: str | None,
     password: str | None,
-    connector_path: str | None,
+    connector_path: str,
     batch_size: int,
     skip_on_error: bool,
     dry_run: bool,
@@ -83,36 +82,24 @@ def loader_cmd(
 ) -> None:
     """Load CSV datasets from PATH into a graph database."""
     from invana.graph.loaders import LoaderConfig
-    from invana.settings import settings
     from invana.utils import import_class_from_dotted_path
-
-    # CLI flags win, then settings/env
-    _uri = uri or settings.graph_uri
-    _username = username or settings.graph_username or None
-    _password = password or settings.graph_password or None
-    _connector_path = connector_path or settings.graph_connector or None
-
-    if not _uri:
-        raise click.UsageError("--uri is required (or set INVANA_GRAPH_URI).")
-    if not _connector_path:
-        raise click.UsageError("--connector is required (or set INVANA_GRAPH_CONNECTOR).")
 
     if dry_run:
         click.echo(f"DRY RUN — parsing {path} (no DB writes)")
 
     try:
-        connector_cls = import_class_from_dotted_path(_connector_path)
+        connector_cls = import_class_from_dotted_path(connector_path)
     except (ValueError, ImportError, AttributeError) as exc:
         raise click.ClickException(str(exc)) from exc
 
     # Instantiate connector
     kwargs: dict = {}
-    if _username is not None:
-        kwargs["username"] = _username
-    if _password is not None:
-        kwargs["password"] = _password
+    if username is not None:
+        kwargs["username"] = username
+    if password is not None:
+        kwargs["password"] = password
 
-    connector = connector_cls(_uri, **kwargs)
+    connector = connector_cls(uri, **kwargs)
 
     config = LoaderConfig(
         batch_size=batch_size,
@@ -122,7 +109,7 @@ def loader_cmd(
     )
 
     if not dry_run:
-        click.echo(f"Loading {path} → {_uri}")
+        click.echo(f"Loading {path} → {uri}")
 
     try:
         stats = asyncio.run(_run_loader(connector, path, config))
