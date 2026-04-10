@@ -41,5 +41,11 @@ class Settings(BaseSettings):
     graph_password: str = ""
     graph_connector: str = ""  # dotted path, e.g. "invana_neo4j.Neo4jConnector"
 
+    # Telemetry (OpenTelemetry)
+    telemetry_enabled: bool = True
+    telemetry_otlp_endpoint: str = "http://localhost:4317"
+    telemetry_service_name: str = "invana-engine"
+    telemetry_environment: str = "development"
+
 
 settings = Settings()

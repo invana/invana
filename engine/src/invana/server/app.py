@@ -7,17 +7,21 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from invana.db import create_db_engine, create_session_factory, create_sync_engine
-from invana.logging import configure_logging
 from invana.settings import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage DB engine lifecycle: migrate on startup, dispose on shutdown."""
-    configure_logging(level=settings.log_level)
     engine = await create_db_engine()
     app.state.db_engine = engine
     app.state.db_session_factory = create_session_factory(engine)
+
+    if settings.telemetry_enabled:
+        from invana.telemetry import instrument_app
+
+        instrument_app(app, engine)
+
     yield
     await engine.dispose()
     app.state.sync_engine.dispose()
@@ -37,6 +41,11 @@ def create_app() -> FastAPI:
 
     # Sync engine created eagerly — starlette-admin needs it at mount time.
     app.state.sync_engine = create_sync_engine()
+
+    if settings.telemetry_enabled:
+        from invana.telemetry import TelemetryMiddleware
+
+        app.add_middleware(TelemetryMiddleware)
 
     app.include_router(health_router)
     mount_admin(app)

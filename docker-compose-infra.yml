@@ -91,9 +91,25 @@ services:
       retries: 10
       start_period: 30s
 
+  # ── Observability ─────────────────────────────────────────────────────────
+  # HyperDX Local: no auth, no backend API, config stored in browser localStorage.
+  # Includes: ClickHouse + OTel Collector (no MongoDB, no HyperDX API server)
+  # UI:  http://localhost:8080  (no login required)
+  # OTLP gRPC endpoint for Invana telemetry: http://localhost:4317
+  hyperdx:
+    image: docker.hyperdx.io/hyperdx/hyperdx-local:latest
+    container_name: invana-hyperdx
+    ports:
+      - "8080:8080"   # HyperDX UI
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8123:8123"   # ClickHouse HTTP (optional, direct access)
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   neo4j-data:
   janusgraph-data:
   memgraph-data:
   arcadedb-data:
+  hyperdx-ch-data:

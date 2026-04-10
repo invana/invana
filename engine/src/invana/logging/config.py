@@ -2,12 +2,22 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 import logging.config
 
 DEFAULT_LOGGING_CONFIG: dict = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        # Applied to the console handler — silences noisy libs from terminal output
+        # WITHOUT dropping records from the pipeline. Third-party loggers still
+        # propagate to root, so the OTel OTLP handler (when enabled) ships them to
+        # the telemetry backend for analysis.
+        "suppress_noisy": {
+            "()": "invana.logging.filters.SuppressNoisyFilter",
+        },
+    },
     "formatters": {
         "simple": {
             "format": "{levelname} - {asctime} : {message}",
@@ -22,40 +32,50 @@ DEFAULT_LOGGING_CONFIG: dict = {
             "class": "logging.StreamHandler",
             "level": "INFO",
             "formatter": "simple",
+            "filters": ["suppress_noisy"],
         },
     },
     "root": {
+        # DEBUG so every record is created and available to all handlers
+        # (OTLP handler added by telemetry will see everything).
+        # The console handler's suppress_noisy filter governs what appears on screen.
         "handlers": ["console"],
-        "level": "INFO",
+        "level": "DEBUG",
     },
     "loggers": {
         "invana": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
+            # propagate=True: records flow up to root, where the OTLP handler lives.
+            # The console handler on root has suppress_noisy but invana.* passes through,
+            # so invana logs appear on console AND are shipped to OTel.
+            "level": "DEBUG",
+            "propagate": True,
         },
-        # Suppress verbose output from third-party graph driver libraries.
-        "neo4j": {"level": "CRITICAL", "propagate": True},
-        "gremlin_python": {"level": "ERROR", "propagate": True},
-        "gremlinpython": {"level": "ERROR", "propagate": True},
     },
 }
 
 
-def configure_logging(config: dict | None = None) -> None:
+def configure_logging(level: str = "INFO", config: dict | None = None) -> None:
     """
     Configure the Invana logging system.
 
     Args:
-        config: A :func:`logging.config.dictConfig`-compatible dict.
-                Defaults to ``DEFAULT_LOGGING_CONFIG`` when omitted.
+        level:  Log level for all Invana loggers (root + invana.*).
+                Ignored when ``config`` is provided explicitly.
+        config: A full :func:`logging.config.dictConfig`-compatible dict.
+                When provided, ``level`` is ignored and this exact config is used.
 
     Examples::
 
-        # Common case
-        configure_logging()
+        # Common case — level from settings
+        configure_logging(level="DEBUG")
 
-        # Custom config (integration packages, custom deployments)
-        configure_logging({"version": 1, "root": {"level": "WARNING"}, ...})
+        # Fully custom config
+        configure_logging(config={"version": 1, "root": {"level": "WARNING"}, ...})
     """
-    logging.config.dictConfig(config if config is not None else DEFAULT_LOGGING_CONFIG)
+    if config is None:
+        cfg = copy.deepcopy(DEFAULT_LOGGING_CONFIG)
+        cfg["root"]["level"] = level
+        cfg["handlers"]["console"]["level"] = level
+        cfg["loggers"]["invana"]["level"] = level
+        config = cfg
+    logging.config.dictConfig(config)

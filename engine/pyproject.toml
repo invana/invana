@@ -6,6 +6,8 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
     "pydantic>=2.0",
+    "pydantic-settings>=2.13.1",
+    "click>=8.0",
     "gremlinpython>=3.8.1",
     "neo4j>=5.0",
     "sqlalchemy[asyncio]>=2.0",
@@ -17,9 +19,16 @@ dependencies = [
 server = [
     "fastapi>=0.115",
     "uvicorn>=0.34",
-    "pydantic-settings>=2.13.1",
     "starlette-admin>=0.16",
     "psycopg2-binary>=2.9",
+]
+telemetry = [
+    "opentelemetry-api>=1.25",
+    "opentelemetry-sdk>=1.25",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.25",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
+    "opentelemetry-instrumentation-logging>=0.46b0",
 ]
 
 [dependency-groups]
