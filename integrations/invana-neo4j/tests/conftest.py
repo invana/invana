@@ -16,10 +16,15 @@ NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME", "neo4j")
 NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "testpassword")
 NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
 
+# Labels and relationship types created exclusively by schema tests.
+# Cleanup is scoped to these to avoid touching other datasets in the DB.
+_TEST_NODE_LABELS = ["Person", "Company", "User", "Article", "Doc", "Employee", "Product"]
+_TEST_REL_TYPES = ["KNOWS"]
+
 
 @pytest.fixture
 async def connector():
-    """Provides a connected Neo4jConnector and cleans up data after each test."""
+    """Provides a connected Neo4jConnector and cleans up schema-test data after each test."""
     conn = Neo4jConnector(
         NEO4J_URI,
         username=NEO4J_USERNAME,
@@ -28,26 +33,29 @@ async def connector():
     )
     await conn.connect()
     yield conn
-    # Clean up all test data after each test
-    await conn.execute("MATCH (n) DETACH DELETE n")
-    # Drop user-created constraints (before indexes — constraints have backing indexes)
-    constraints = await conn.execute("SHOW CONSTRAINTS YIELD name RETURN name")
-    for cst in constraints:
+    # Drop user-created constraints first (they have backing indexes)
+    with contextlib.suppress(Exception):
+        constraints = await conn.execute("SHOW CONSTRAINTS YIELD name RETURN name")
+        for cst in constraints:
+            with contextlib.suppress(Exception):
+                await conn.execute(f"DROP CONSTRAINT `{cst['name']}` IF EXISTS")
+    # Drop user-created indexes (skip LOOKUP indexes which are system-managed)
+    with contextlib.suppress(Exception):
+        indexes = await conn.execute("SHOW INDEXES YIELD name, type WHERE type <> 'LOOKUP' RETURN name")
+        for idx in indexes:
+            with contextlib.suppress(Exception):
+                await conn.execute(f"DROP INDEX `{idx['name']}` IF EXISTS")
+    # Delete only nodes belonging to test-specific labels to avoid touching other datasets
+    for label in _TEST_NODE_LABELS:
         with contextlib.suppress(Exception):
-            await conn.execute(f"DROP CONSTRAINT `{cst['name']}`")
-    # Drop user-created indexes (skip LOOKUP indexes)
-    indexes = await conn.execute("SHOW INDEXES YIELD name, type WHERE type <> 'LOOKUP' RETURN name")
-    for idx in indexes:
-        with contextlib.suppress(Exception):
-            await conn.execute(f"DROP INDEX `{idx['name']}`")
+            await conn.execute(f"MATCH (n:`{label}`) DETACH DELETE n")
     # Drop any leftover GDS projections
-    try:
+    with contextlib.suppress(Exception):
         projections = await conn.execute("CALL gds.graph.list() YIELD graphName RETURN graphName")
         for proj in projections:
             with contextlib.suppress(Exception):
                 await conn.execute("CALL gds.graph.drop($name)", {"name": proj["graphName"]})
-    except Exception:
-        pass  # GDS might not be installed
+    await conn.disconnect()
     await conn.disconnect()
 
 

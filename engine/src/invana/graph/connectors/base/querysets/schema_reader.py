@@ -1,11 +1,14 @@
 """Abstract schema-reading queryset."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
+    GraphSchemaSnapshot,
     IndexInfo,
     PropertyInfo,
 )
@@ -67,3 +70,34 @@ class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
         the management API.
         """
         return "SINGLE"
+
+    async def get_full_schema(self, *, sample_size: int = 100) -> GraphSchemaSnapshot:
+        """Return a complete snapshot of the graph schema.
+
+        Calls all individual introspection methods and combines the results
+        into a single :class:`GraphSchemaSnapshot`.  The vendor-specific
+        ``get_indexes()`` and ``get_constraints()`` overrides are used
+        automatically.
+        """
+        node_labels = await self.get_node_labels()
+        edge_labels = await self.get_edge_labels()
+
+        node_schemas: dict[str, list[PropertyInfo]] = {}
+        for label in node_labels:
+            node_schemas[label] = await self.get_property_schema(label, sample_size=sample_size)
+
+        edge_schemas: dict[str, EdgeSchemaInfo] = {}
+        for label in edge_labels:
+            edge_schemas[label] = await self.get_edge_schema(label, sample_size=sample_size)
+
+        indexes = await self.get_indexes()
+        constraints = await self.get_constraints()
+
+        return GraphSchemaSnapshot(
+            node_labels=node_labels,
+            edge_labels=edge_labels,
+            node_schemas=node_schemas,
+            edge_schemas=edge_schemas,
+            indexes=indexes,
+            constraints=constraints,
+        )

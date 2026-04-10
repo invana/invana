@@ -28,7 +28,7 @@ services:
       - "7687:7687" # Bolt protocol
     environment:
       NEO4J_AUTH: neo4j/testpassword
-      NEO4J_PLUGINS: '["graph-data-science"]'
+      NEO4J_PLUGINS: '["graph-data-science","apoc"]'
     volumes:
       - neo4j-data:/data
     healthcheck:

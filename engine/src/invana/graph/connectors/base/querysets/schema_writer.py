@@ -15,7 +15,7 @@ class BaseSchemaWriterQuerySet(BaseQuerySet, ABC):
         label: str,
         properties: list[str],
         *,
-        index_type: Literal["range", "btree", "composite", "fulltext", "text", "point", "lookup"] = "range",
+        index_type: Literal["range", "btree", "composite"] = "range",
         name: str | None = None,
         options: dict[str, Any] | None = None,
     ) -> None:
@@ -31,13 +31,7 @@ class BaseSchemaWriterQuerySet(BaseQuerySet, ABC):
         label: str,
         properties: list[str],
         *,
-        constraint_type: Literal[
-            "unique",
-            "exists",
-            "node_key",
-            "relationship_unique",
-            "relationship_exists",
-        ] = "unique",
+        constraint_type: Literal["unique"] = "unique",
         name: str | None = None,
     ) -> None:
         """Create a constraint on the given label and properties."""

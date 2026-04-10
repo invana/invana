@@ -120,3 +120,23 @@ class ConstraintInfo(BaseModel):
     label: str
     properties: list[str]
     type: Literal["unique", "exists", "node_key", "relationship_unique", "relationship_exists"]
+
+
+class GraphSchemaSnapshot(BaseModel):
+    """Complete snapshot of the graph database schema at a point in time.
+
+    Attributes:
+        node_labels: All node labels present in the database.
+        edge_labels: All relationship types present in the database.
+        node_schemas: Inferred property schema per node label.
+        edge_schemas: Inferred edge endpoint schema per relationship type.
+        indexes: All indexes in the database.
+        constraints: All constraints in the database.
+    """
+
+    node_labels: list[str] = []
+    edge_labels: list[str] = []
+    node_schemas: dict[str, list[PropertyInfo]] = {}
+    edge_schemas: dict[str, EdgeSchemaInfo] = {}
+    indexes: list[IndexInfo] = []
+    constraints: list[ConstraintInfo] = []
