@@ -262,7 +262,7 @@ class CSVLoader:
 
         stats.duration_seconds = time.monotonic() - start
         logger.info(
-            "  loaded %-40s vertices=%-6d edges=%-6d errors=%d  (%.2fs)",
+            "  loaded %s  vertices=%-6d edges=%-6d errors=%d  (%.2fs)",
             Path(path).name,
             stats.vertices_created,
             stats.edges_created,
@@ -287,7 +287,6 @@ class CSVLoader:
         start = time.monotonic()
 
         rows = _read_csv(path)
-        logger.info("  [nodes]         %-35s %d rows", path.name, len(rows))
         parsed = [_parse_node_row(r, label) for r in rows]
 
         by_label: dict[str, list[dict]] = {}
@@ -322,7 +321,6 @@ class CSVLoader:
         start = time.monotonic()
 
         rows = _read_csv(path)
-        logger.info("  [relationships] %-35s %d rows", path.name, len(rows))
         parsed = [_parse_edge_row(r, label) for r in rows]
 
         by_label: dict[str, list[dict]] = {}
@@ -348,6 +346,10 @@ class CSVLoader:
 
     async def _create_vertices_for_label(self, label: str, nodes: list[dict], stats: LoaderStats) -> None:
         cfg = self._config
+        total = len(nodes)
+        created = 0
+        failed = 0
+
         for batch in _chunk(nodes, cfg.batch_size):
             # Flat property dicts — exactly what bulk_create_vertices expects
             records = []
@@ -357,6 +359,7 @@ class CSVLoader:
                 records.append(props)
 
             if cfg.dry_run:
+                created += len(records)
                 stats.vertices_created += len(records)
                 stats.vertices_by_label[label] = stats.vertices_by_label.get(label, 0) + len(records)
                 continue
@@ -367,18 +370,34 @@ class CSVLoader:
                     src_id = v.properties.get(cfg.source_id_property)
                     if src_id is not None:
                         self._id_mapping[str(src_id)] = v.id
+                created += len(vertices)
                 stats.vertices_created += len(vertices)
                 stats.vertices_by_label[label] = stats.vertices_by_label.get(label, 0) + len(vertices)
-                failed = len(records) - len(vertices)
-                if failed > 0:
-                    stats.vertices_failed += failed
+                batch_failed = len(records) - len(vertices)
+                if batch_failed > 0:
+                    failed += batch_failed
+                    stats.vertices_failed += batch_failed
             except Exception as exc:
                 msg = f"Failed to create {label} vertices (batch of {len(records)}): {exc}"
                 logger.error(msg)
                 stats.errors.append(msg)
+                failed += len(records)
                 stats.vertices_failed += len(records)
                 if not cfg.skip_on_error:
                     raise
+
+        pct_err = (failed / total * 100) if total else 0.0
+        if failed == 0:
+            logger.info("  [nodes]         %-20s  err: %.2f%%  %d/%d", label, pct_err, created, total)
+        else:
+            logger.warning(
+                "  [nodes]         %-20s  err: %.2f%%  %d/%d  (%d failed)",
+                label,
+                pct_err,
+                created,
+                total,
+                failed,
+            )
 
     async def _create_edges_for_label(self, label: str, edges: list[dict], stats: LoaderStats) -> None:
         cfg = self._config
@@ -411,23 +430,52 @@ class CSVLoader:
                 }
             )
 
+        total = len(resolved)
+        unresolved = len(edges) - total
+        created_count = 0
+        failed_count = unresolved  # unresolved refs already count as failed
+
         for batch in _chunk(resolved, cfg.batch_size):
             if cfg.dry_run:
+                created_count += len(batch)
                 stats.edges_created += len(batch)
                 stats.edges_by_label[label] = stats.edges_by_label.get(label, 0) + len(batch)
                 continue
 
             try:
                 created = await self._connector.bulk.bulk_create_edges(label, batch)
+                created_count += len(created)
                 stats.edges_created += len(created)
                 stats.edges_by_label[label] = stats.edges_by_label.get(label, 0) + len(created)
-                failed = len(batch) - len(created)
-                if failed > 0:
-                    stats.edges_failed += failed
+                batch_failed = len(batch) - len(created)
+                if batch_failed > 0:
+                    failed_count += batch_failed
+                    stats.edges_failed += batch_failed
             except Exception as exc:
                 msg = f"Failed to create {label} edges (batch of {len(batch)}): {exc}"
                 logger.error(msg)
                 stats.errors.append(msg)
+                failed_count += len(batch)
                 stats.edges_failed += len(batch)
                 if not cfg.skip_on_error:
                     raise
+
+        total_edges = len(edges)
+        pct_err = (failed_count / total_edges * 100) if total_edges else 0.0
+        if failed_count == 0:
+            logger.info(
+                "  [relationships] %-20s  err: %.2f%%  %d/%d",
+                label,
+                pct_err,
+                created_count,
+                total_edges,
+            )
+        else:
+            logger.warning(
+                "  [relationships] %-20s  err: %.2f%%  %d/%d  (%d failed)",
+                label,
+                pct_err,
+                created_count,
+                total_edges,
+                failed_count,
+            )
