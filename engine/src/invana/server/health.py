@@ -10,6 +10,20 @@ from invana.settings import settings
 health_router = APIRouter(tags=["health"])
 
 
+@health_router.get("/")
+async def root() -> JSONResponse:
+    """Root endpoint — basic service info."""
+    return JSONResponse(
+        status_code=200,
+        content={
+            "app_name": settings.app_name,
+            "version": settings.app_version,
+            "docs": "/docs",
+            "health": "/health",
+        },
+    )
+
+
 @health_router.get("/health")
 async def health(request: Request) -> JSONResponse:
     """Liveness / readiness probe."""
