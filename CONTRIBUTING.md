@@ -36,6 +36,23 @@ make engine-lint                # Lint (ruff check)
 make engine-format              # Format (ruff format)
 ```
 
+#### Installing optional extras
+
+The engine has optional dependency groups. `uv sync` is exact — running it with one `--extra` removes packages from a previously installed `--extra`. Always specify all desired extras together:
+
+```bash
+# Install a single extra
+uv sync --extra server
+
+# Install multiple extras (required to keep all of them)
+uv sync --extra server --extra telemetry
+
+# Install everything
+uv sync --extra all
+```
+
+Available extras: `server`, `telemetry`, `all`.
+
 ### Studio (TypeScript/React)
 
 ```bash

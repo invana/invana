@@ -30,6 +30,10 @@ telemetry = [
     "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
     "opentelemetry-instrumentation-logging>=0.46b0",
 ]
+all = [
+    "invana-engine[server]",
+    "invana-engine[telemetry]",
+]
 
 [dependency-groups]
 dev = [

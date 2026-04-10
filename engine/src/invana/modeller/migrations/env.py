@@ -57,29 +57,8 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    When called inside an already-running event loop (e.g. FastAPI lifespan)
-    we fall back to a *synchronous* psycopg2 connection so we don't need to
-    nest ``asyncio.run()``.
-    """
-    try:
-        asyncio.get_running_loop()
-        _is_async = True
-    except RuntimeError:
-        _is_async = False
-
-    if _is_async:
-        # We're inside an event loop — use a sync connection instead.
-        from sqlalchemy import create_engine
-
-        sync_url = config.get_main_option("sqlalchemy.url", "").replace("+asyncpg", "")
-        connectable = create_engine(sync_url, poolclass=pool.NullPool)
-        with connectable.connect() as connection:
-            do_run_migrations(connection)
-        connectable.dispose()
-    else:
-        asyncio.run(run_async_migrations())
+    """Run migrations in 'online' mode using asyncpg."""
+    asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():

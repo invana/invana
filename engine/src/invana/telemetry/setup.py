@@ -110,7 +110,7 @@ def instrument_app(app, engine) -> None:
         excluded_urls="health,metrics,ping",
     )
     SQLAlchemyInstrumentor().instrument(
-        engine=engine,
+        engine=engine.sync_engine,
         enable_commenter=True,  # injects trace-context into SQL comments
     )
 

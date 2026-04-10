@@ -27,8 +27,7 @@ def run_migrations(url: str = settings.database_url) -> None:
 
 
 async def create_db_engine(url: str = settings.database_url):
-    """Create an async engine and run migrations to bring the schema up to date."""
-    run_migrations(url)
+    """Create an async engine. Run `invana migrate` before starting the server."""
     return create_async_engine(
         url,
         echo=settings.database_echo,

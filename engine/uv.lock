@@ -697,6 +697,18 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "fastapi" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-proto-grpc" },
+    { name = "opentelemetry-instrumentation-fastapi" },
+    { name = "opentelemetry-instrumentation-logging" },
+    { name = "opentelemetry-instrumentation-sqlalchemy" },
+    { name = "opentelemetry-sdk" },
+    { name = "psycopg2-binary" },
+    { name = "starlette-admin" },
+    { name = "uvicorn" },
+]
 server = [
     { name = "fastapi" },
     { name = "psycopg2-binary" },
@@ -727,6 +739,8 @@ requires-dist = [
     { name = "click", specifier = ">=8.0" },
     { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.115" },
     { name = "gremlinpython", specifier = ">=3.8.1" },
+    { name = "invana-engine", extras = ["server"], marker = "extra == 'all'" },
+    { name = "invana-engine", extras = ["telemetry"], marker = "extra == 'all'" },
     { name = "neo4j", specifier = ">=5.0" },
     { name = "opentelemetry-api", marker = "extra == 'telemetry'", specifier = ">=1.25" },
     { name = "opentelemetry-exporter-otlp-proto-grpc", marker = "extra == 'telemetry'", specifier = ">=1.25" },
@@ -741,7 +755,7 @@ requires-dist = [
     { name = "starlette-admin", marker = "extra == 'server'", specifier = ">=0.16" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.34" },
 ]
-provides-extras = ["server", "telemetry"]
+provides-extras = ["server", "telemetry", "all"]
 
 [package.metadata.requires-dev]
 dev = [
