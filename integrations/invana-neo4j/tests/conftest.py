@@ -56,7 +56,6 @@ async def connector():
             with contextlib.suppress(Exception):
                 await conn.execute("CALL gds.graph.drop($name)", {"name": proj["graphName"]})
     await conn.disconnect()
-    await conn.disconnect()
 
 
 @pytest.fixture
