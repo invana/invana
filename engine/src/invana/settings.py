@@ -41,5 +41,10 @@ class Settings(BaseSettings):
     telemetry_service_name: str = "invana-engine"
     telemetry_environment: str = "development"
 
+    # Graphs — runtime connection pool
+    encryption_key: str = ""  # INVANA_ENCRYPTION_KEY — required in production; 32-byte URL-safe base64 Fernet key
+    graph_health_interval_s: int = 30  # INVANA_GRAPH_HEALTH_INTERVAL_S
+    graph_retry_max_interval_s: int = 60  # INVANA_GRAPH_RETRY_MAX_INTERVAL_S
+
 
 settings = Settings()

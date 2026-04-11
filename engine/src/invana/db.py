@@ -11,6 +11,7 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
+from fastapi import Request
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -54,3 +55,10 @@ def create_sync_engine(url: str | None = None):
 def create_session_factory(engine) -> async_sessionmaker[AsyncSession]:
     """Return an async session factory bound to *engine*."""
     return async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+async def get_session(request: Request):
+    """FastAPI dependency that yields a single ``AsyncSession`` from the app's session factory."""
+    session_factory = request.app.state.db_session_factory
+    async with session_factory() as session:
+        yield session
