@@ -12,6 +12,10 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@codemirror/commands": "^6.10.3",
+		"@codemirror/lang-javascript": "^6.2.5",
+		"@codemirror/state": "^6.6.0",
+		"@codemirror/view": "^6.41.0",
 		"@invana/canvas-core": "file:../../canvas/packages/canvas-core",
 		"@invana/layouts-d3-force": "file:../../canvas/packages/layouts-d3-force",
 		"@invana/styling": "github:invana/design-kit#releases/styling",

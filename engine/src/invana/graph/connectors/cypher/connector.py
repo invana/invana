@@ -81,7 +81,7 @@ class OpenCypherConnector(BaseConnector):
         if self._driver:
             await self._driver.close()
 
-    async def execute(self, query: str, parameters: dict | None = None) -> list[neo4j.Record]:
+    async def _execute_raw(self, query: str, parameters: dict | None = None) -> list[neo4j.Record]:
         try:
             async with self._driver.session(database=self._database) as session:
                 result = await session.run(query, parameters or {})

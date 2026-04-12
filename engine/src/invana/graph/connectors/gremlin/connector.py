@@ -112,7 +112,7 @@ class GremlinConnector(BaseConnector):
             raise ConnectionError("Not connected. Call connect() first.")
         return self._g
 
-    async def execute(self, query: str, parameters: dict | None = None) -> Any:
+    async def _execute_raw(self, query: str, parameters: dict | None = None) -> Any:
         """Execute a raw Gremlin script string.
 
         For traversal-based execution, use ``execute_traversal()`` instead.

@@ -4,6 +4,7 @@ import type {
 	GraphRead,
 	GraphUpdate,
 } from "../../types/graphs";
+import type { QueryRequest, QueryResponse } from "../../types/query";
 import { request } from "./client";
 
 export const graphsApi = {
@@ -28,4 +29,10 @@ export const graphsApi = {
 
 	reconnect: (id: string) =>
 		request<GraphRead>(`/api/v1/graphs/${id}/reconnect`, { method: "POST" }),
+
+	query: (id: string, body: QueryRequest) =>
+		request<QueryResponse>(`/api/v1/graphs/${id}/query`, {
+			method: "POST",
+			body: JSON.stringify(body),
+		}),
 };

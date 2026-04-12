@@ -14,6 +14,7 @@ from invana.graph.connectors.base.querysets.schema_writer import BaseSchemaWrite
 from invana.graph.connectors.base.querysets.vector import BaseVectorQuerySet
 from invana.graph.connectors.base.serializers import BaseSerializer
 from invana.graph.types.constants import Capability
+from invana.graph.types.data_elements import GraphResponse
 
 
 class BaseConnector(ABC):
@@ -39,6 +40,10 @@ class BaseConnector(ABC):
         self._serializer = self._create_serializer()
         self._init_querysets()
 
+    @property
+    def serializer(self) -> BaseSerializer:
+        return self._serializer
+
     @abstractmethod
     def _create_serializer(self) -> BaseSerializer: ...
 
@@ -56,8 +61,13 @@ class BaseConnector(ABC):
         """Close the vendor-specific driver."""
 
     @abstractmethod
-    async def execute(self, query: str, parameters: dict | None = None) -> Any:
-        """Execute a raw query via the vendor driver."""
+    async def _execute_raw(self, query: str, parameters: dict | None = None) -> Any:
+        """Execute a raw query via the vendor driver and return raw results."""
+
+    async def execute(self, query: str, parameters: dict | None = None) -> GraphResponse:
+        """Execute a query and return a fully deserialised GraphResponse."""
+        raw = await self._execute_raw(query, parameters)
+        return self._serializer.deserialize_graph_response(raw)
 
     @abstractmethod
     async def health_check(self) -> bool:

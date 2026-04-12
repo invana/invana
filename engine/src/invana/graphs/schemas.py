@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.graph.types.data_elements import GraphResponse
+
 
 class GraphCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
@@ -57,7 +59,7 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     result_type: str  # "graph" | "tabular"
     query_language: str  # "cypher" | "gremlin"
-    data: list[dict] | None = None  # Vertex/Edge/Path dicts when result_type="graph"
+    data: GraphResponse | None = None  # serialised nodes/edges/records when result_type="graph"
     rows: list[dict] | None = None  # raw rows when result_type="tabular"
     execution_time_ms: int
     row_count: int

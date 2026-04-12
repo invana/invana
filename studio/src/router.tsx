@@ -4,6 +4,7 @@ import { ErrorPage } from "./pages/ErrorPage";
 import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphEditPage } from "./pages/graphs/GraphEditPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
+import { ExplorerPage } from "./pages/graphs/explorer/ExplorerPage";
 import { ModellerPage } from "./pages/graphs/modeller/ModellerPage";
 
 export const router = createBrowserRouter([
@@ -11,6 +12,11 @@ export const router = createBrowserRouter([
 	{
 		path: "graphs/:id/modeller",
 		element: <ModellerPage />,
+		errorElement: <ErrorPage />,
+	},
+	{
+		path: "graphs/:id/explorer",
+		element: <ExplorerPage />,
 		errorElement: <ErrorPage />,
 	},
 
