@@ -250,10 +250,9 @@ class GraphConnectionManager:
                 name=graph.name,
                 description=f"Auto-introspected from {graph.uri}",
             )
-            version = await schema_store.create_version(session, schema_id=schema.id)
 
-            introspector = Introspector(connector)
-            await introspector.populate_version(session, version)
+            introspector = Introspector(schema_store)
+            await introspector.introspect(session, schema_id=schema.id, connector=connector)
 
             await GraphModelStore().set_schema(session, graph.id, schema.id)
             await session.commit()

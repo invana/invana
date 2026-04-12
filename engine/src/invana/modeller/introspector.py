@@ -61,21 +61,41 @@ class Introspector:
         node_labels = await reader.get_node_labels()
         discovered["node_labels"] = len(node_labels)
 
+        # Collect properties per label first so property keys can be created up-front
+        node_properties: dict[str, list[dict]] = {}
         for label in node_labels:
-            properties = await self._discover_node_properties(reader, label, caps)
+            node_properties[label] = await self._discover_node_properties(reader, label, caps)
+
+        await self._ensure_property_keys(session, version.id, node_properties.values())
+
+        for label in node_labels:
+            props = node_properties[label]
+            property_mappings = [{"property_key": p["name"]} for p in props] or None
             await self._store.create_node_type(
                 session,
                 version_id=version.id,
                 name=label,
-                properties=properties,
+                property_mappings=property_mappings,
             )
 
         # 3. Discover edge labels + properties + endpoints
         edge_labels = await reader.get_edge_labels()
         discovered["edge_labels"] = len(edge_labels)
 
+        edge_infos: dict[str, dict] = {}
         for label in edge_labels:
-            edge_info = await self._discover_edge_info(reader, label, caps)
+            edge_infos[label] = await self._discover_edge_info(reader, label, caps)
+
+        await self._ensure_property_keys(
+            session,
+            version.id,
+            (info.get("properties", []) for info in edge_infos.values()),
+        )
+
+        for label in edge_labels:
+            edge_info = edge_infos[label]
+            props = edge_info.get("properties", [])
+            property_mappings = [{"property_key": p["name"]} for p in props] or None
             await self._store.create_edge_type(
                 session,
                 version_id=version.id,
@@ -83,7 +103,7 @@ class Introspector:
                 source_node_types=edge_info.get("source_node_types", []),
                 target_node_types=edge_info.get("target_node_types", []),
                 multiplicity=edge_info.get("multiplicity", "MULTI"),
-                properties=edge_info.get("properties", []),
+                property_mappings=property_mappings,
             )
 
         # 4. Discover indexes
@@ -105,39 +125,70 @@ class Introspector:
             except Exception:
                 logger.warning("Failed to import index %s", idx.name, exc_info=True)
 
-        # 5. Discover constraints → mark properties as unique/required
+        # 5. Discover constraints and persist as ConstraintDefinition records
         constraints = await reader.get_constraints()
         discovered["constraints"] = len(constraints)
 
-        # Build a lookup of node types by name for patching
-        node_types = await self._store.list_node_types(session, version.id)
-        nt_by_name = {nt.name: nt for nt in node_types}
-
         for constraint in constraints:
-            nt = nt_by_name.get(constraint.label)
-            if nt is None:
-                continue
-            prop_by_name = {p.name: p for p in nt.properties}
-            for prop_name in constraint.properties:
-                prop = prop_by_name.get(prop_name)
-                if prop is None:
-                    continue
-                if constraint.type in ("unique", "node_key"):
-                    prop.unique = True
-                if constraint.type in ("exists", "node_key"):
-                    prop.required = True
+            try:
+                await self._store.create_constraint(
+                    session,
+                    version_id=version.id,
+                    name=constraint.name,
+                    target_kind="node_type",
+                    target_label=constraint.label,
+                    constraint_type=constraint.type,
+                    properties=constraint.properties,
+                )
+            except Exception:
+                logger.warning("Failed to import constraint %s", constraint.name, exc_info=True)
 
+        await session.flush()
+
+        # 6. Activate the newly built version so it is immediately queryable.
+        from invana.modeller.versioner import Versioner  # noqa: PLC0415
+
+        versioner = Versioner(self._store)
+        await versioner.activate(
+            session,
+            version_id=version.id,
+            change_summary="Auto-introspected from live database",
+        )
         await session.flush()
 
         return {
             "version_id": version.id,
-            "status": "draft",
+            "status": "active",
             "discovered": discovered,
         }
 
     # ------------------------------------------------------------------
     # Discovery helpers
     # ------------------------------------------------------------------
+
+    async def _ensure_property_keys(
+        self,
+        session: AsyncSession,
+        version_id: str,
+        prop_lists: Any,
+    ) -> None:
+        """Create PropertyKeyDefinition for each unique property name not yet in this version."""
+        seen: set[str] = set()
+        for props in prop_lists:
+            for prop in props:
+                name = prop["name"]
+                if name in seen:
+                    continue
+                seen.add(name)
+                existing = await self._store.get_property_key_by_name(session, version_id, name)
+                if existing is None:
+                    await self._store.create_property_key(
+                        session,
+                        version_id=version_id,
+                        name=name,
+                        type=prop.get("type", "string"),
+                        value_cardinality=prop.get("value_cardinality", "SINGLE"),
+                    )
 
     async def _discover_node_properties(
         self,

@@ -5,6 +5,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from invana.db import create_db_engine, create_session_factory, create_sync_engine
 from invana.settings import settings
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
     from invana.server.health import health_router
     from invana.server.routes.graphs import graphs_router
     from invana.server.routes.query import query_router
+    from invana.server.routes.schemas import schemas_router
 
     app = FastAPI(
         title=settings.app_name,
@@ -61,8 +63,17 @@ def create_app() -> FastAPI:
 
         app.add_middleware(TelemetryMiddleware)
 
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     app.include_router(health_router)
     app.include_router(graphs_router)
+    app.include_router(schemas_router)
     app.include_router(query_router)
     mount_admin(app)
     return app

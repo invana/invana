@@ -1,0 +1,36 @@
+/* All @import statements must come before other at-rules */
+@import "tailwindcss";
+@import "@invana/ui/styles.css";
+/* Direct path bypasses missing "style" condition in @invana/themes exports */
+@import "../node_modules/@invana/themes/dist/styles.css";
+@import "../node_modules/@invana/styling/src/themes/default.css";
+@import "../node_modules/@invana/styling/src/themes/tailwind.css";
+@import "../node_modules/@invana/styling/src/themes/vite.css";
+
+@theme {
+	--text-xs: 0.8rem;
+	--text-sm: 0.9rem;
+	--text-base: 1rem;
+	--text-lg: 1.15rem;
+	--text-xl: 1.3rem;
+}
+
+/* Thin scrollbars */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+	background-color: var(--color-border);
+	border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+	background-color: var(--color-muted-foreground);
+}
