@@ -18,9 +18,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 			{!item ? (
 				<div className="flex flex-col items-center justify-center gap-2 text-muted-foreground p-6 mt-12">
 					<Network className="w-8 h-8 opacity-20" />
-					<p className="text-xs text-center">
-						Click a node or edge to inspect it
-					</p>
+					<p className="text-center">Click a node or edge to inspect it</p>
 				</div>
 			) : (
 				<div className="p-4 flex flex-col gap-4">
@@ -35,7 +33,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 							>
 								{item.type}
 							</span>
-							<span className="text-sm font-semibold">{item.label}</span>
+							<span className="font-semibold">{item.label}</span>
 						</div>
 						<p className="text-[10px] text-muted-foreground font-mono break-all">
 							{item.id}
@@ -44,7 +42,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 
 					{item.type === "edge" && (
 						<div>
-							<p className="text-xs text-muted-foreground mb-1.5">Endpoints</p>
+							<p className="text-muted-foreground mb-1.5">Endpoints</p>
 							<div className="flex flex-col gap-1 text-xs font-mono">
 								<div className="flex gap-2">
 									<span className="text-muted-foreground w-12 shrink-0">
@@ -67,11 +65,9 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 					)}
 
 					<div>
-						<p className="text-xs text-muted-foreground mb-1.5">Properties</p>
+						<p className="text-muted-foreground mb-1.5">Properties</p>
 						{Object.keys(item.properties).length === 0 ? (
-							<p className="text-xs text-muted-foreground italic">
-								No properties
-							</p>
+							<p className="text-muted-foreground italic">No properties</p>
 						) : (
 							<div className="flex flex-col gap-1.5">
 								{Object.entries(item.properties).map(([key, val]) => (
@@ -95,7 +91,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 	const designContent = (
 		<div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
 			<Paintbrush className="w-8 h-8 opacity-20" />
-			<p className="text-xs text-center">Style overrides — coming soon</p>
+			<p className="text-center">Style overrides — coming soon</p>
 		</div>
 	);
 

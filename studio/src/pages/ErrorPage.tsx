@@ -25,7 +25,7 @@ export function ErrorPage() {
 					{is404 ? "404" : "500"}
 				</span>
 				<h1 className="text-xl font-semibold">{title}</h1>
-				<p className="text-sm text-muted-foreground">{description}</p>
+				<p className="text-muted-foreground">{description}</p>
 			</div>
 			<div className="flex items-center gap-2">
 				<Button variant="outline" size="sm" onClick={() => navigate(-1)}>

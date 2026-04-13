@@ -15,9 +15,7 @@ interface Props {
 export function ConstraintTable({ constraints }: Props) {
 	if (constraints.length === 0) {
 		return (
-			<p className="text-sm text-muted-foreground py-2">
-				No constraints defined.
-			</p>
+			<p className="text-muted-foreground py-2">No constraints defined.</p>
 		);
 	}
 

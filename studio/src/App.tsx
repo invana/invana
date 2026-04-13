@@ -64,7 +64,7 @@ export default function App() {
 					<div className="flex items-center gap-2 px-2">
 						<span className="font-bold text-xl select-none">Invana Studio</span>
 						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground text-sm">
+						<span className="text-muted-foreground">
 							{isActive("/graphs") ? "Graphs" : ""}
 						</span>
 					</div>

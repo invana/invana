@@ -14,9 +14,7 @@ interface Props {
 
 export function IndexTable({ indexes }: Props) {
 	if (indexes.length === 0) {
-		return (
-			<p className="text-sm text-muted-foreground py-2">No indexes defined.</p>
-		);
+		return <p className="text-muted-foreground py-2">No indexes defined.</p>;
 	}
 
 	return (

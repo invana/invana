@@ -119,7 +119,7 @@ export function QueryPanel({
 				<select
 					value={language}
 					onChange={(e) => setLanguage(e.target.value as Language)}
-					className="text-xs bg-muted border border-border rounded px-2 py-1 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary"
+					className="bg-muted border border-border rounded px-2 py-1 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary"
 				>
 					{LANGUAGES.map((l) => (
 						<option key={l} value={l}>
@@ -140,7 +140,7 @@ export function QueryPanel({
 		<ScrollArea className="h-full">
 			{history.length === 0 ? (
 				<div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-					<p className="text-xs">No queries yet</p>
+					<p className="">No queries yet</p>
 				</div>
 			) : (
 				<div className="flex flex-col">
@@ -151,7 +151,7 @@ export function QueryPanel({
 							onClick={() => loadHistoryEntry(entry)}
 							className="text-left px-3 py-2 hover:bg-accent transition-colors border-b border-border last:border-0"
 						>
-							<p className="text-xs font-mono text-foreground truncate">
+							<p className="font-mono text-foreground truncate">
 								{entry.query}
 							</p>
 							<div className="flex items-center gap-2 mt-0.5">
@@ -193,7 +193,7 @@ export function QueryPanel({
 			footerContent={
 				<div className="p-2 w-full">
 					<Button
-						className="w-full h-8 text-xs gap-1.5"
+						className="w-full h-8 gap-1.5"
 						onClick={handleRun}
 						disabled={isRunning || activeTab === "history"}
 					>

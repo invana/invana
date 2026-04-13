@@ -60,7 +60,7 @@ export function ModellerPage() {
 		</div>
 	) : !graph?.schema_id ? (
 		<div className="flex flex-col items-center justify-center h-full gap-3 p-4 text-muted-foreground">
-			<p className="text-xs text-center">
+			<p className="text-center">
 				No schema yet — run Introspect to discover your database schema.
 			</p>
 		</div>
@@ -148,11 +148,11 @@ export function ModellerPage() {
 					<div className="flex items-center gap-2 px-2">
 						<span className="font-bold text-xl select-none">Invana Studio</span>
 						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground text-sm">Modeller</span>
+						<span className="text-muted-foreground">Modeller</span>
 						{graph && (
 							<>
 								<Separator orientation="vertical" className="h-4" />
-								<span className="text-sm font-medium">{graph.name}</span>
+								<span className="font-medium">{graph.name}</span>
 							</>
 						)}
 					</div>

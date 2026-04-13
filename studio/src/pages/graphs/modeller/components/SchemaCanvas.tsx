@@ -202,7 +202,7 @@ export function SchemaCanvas({
 	return (
 		<div className="w-full h-full relative bg-background">
 			{nodeTypes.length === 0 && edgeTypes.length === 0 && (
-				<div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+				<div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
 					No schema loaded — run Introspect to discover your database schema.
 				</div>
 			)}

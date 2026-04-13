@@ -32,13 +32,11 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 					{nodeType.is_abstract && <Badge variant="outline">abstract</Badge>}
 				</div>
 				{nodeType.description ? (
-					<p className="text-sm text-muted-foreground">
-						{nodeType.description}
-					</p>
+					<p className="text-muted-foreground">{nodeType.description}</p>
 				) : (
-					<p className="text-sm text-muted-foreground">—</p>
+					<p className="text-muted-foreground">—</p>
 				)}
-				<div className="flex gap-4 text-xs text-muted-foreground mt-1">
+				<div className="flex gap-4 text-muted-foreground mt-1">
 					<span>
 						<span className="font-medium">parent:</span>{" "}
 						{nodeType.parent_type ?? "—"}
@@ -49,7 +47,7 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 					</span>
 				</div>
 				{nodeType.hierarchy.length > 1 && (
-					<p className="text-xs text-muted-foreground">
+					<p className="text-muted-foreground">
 						{nodeType.hierarchy.join(" → ")}
 					</p>
 				)}
@@ -59,7 +57,7 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 
 			{/* Properties */}
 			<div>
-				<h3 className="text-sm font-semibold mb-2">Properties</h3>
+				<h3 className="font-semibold mb-2">Properties</h3>
 				<PropertyMappingTable mappings={nodeType.property_mappings} />
 			</div>
 
@@ -67,7 +65,7 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 
 			{/* Constraints */}
 			<div>
-				<h3 className="text-sm font-semibold mb-2">Constraints on this type</h3>
+				<h3 className="font-semibold mb-2">Constraints on this type</h3>
 				<ConstraintTable constraints={filteredConstraints} />
 			</div>
 
@@ -75,7 +73,7 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 
 			{/* Indexes */}
 			<div>
-				<h3 className="text-sm font-semibold mb-2">Indexes on this type</h3>
+				<h3 className="font-semibold mb-2">Indexes on this type</h3>
 				<IndexTable indexes={filteredIndexes} />
 			</div>
 		</div>

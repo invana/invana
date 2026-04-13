@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCreateGraphMutation } from "../../hooks/queries/useGraphs";
@@ -21,21 +22,31 @@ export function GraphCreatePage() {
 	};
 
 	return (
-		<div className="flex flex-col h-full">
-			<div className="px-6 py-4 border-b">
-				<h1 className="text-lg font-semibold">New Graph Connection</h1>
-				<p className="text-sm text-muted-foreground">
-					Connect to a graph database to get started
-				</p>
-			</div>
-			<div className="flex-1 overflow-auto px-6 py-6">
-				<div className="max-w-xl">
-					<GraphForm
-						isSubmitting={mutation.isPending}
-						onSubmit={handleSubmit}
-						onCancel={() => navigate("/graphs")}
-					/>
+		<div className="h-full overflow-auto">
+			<div className="max-w-lg mx-auto px-10 py-16">
+				{/* Back link */}
+				<button
+					type="button"
+					onClick={() => navigate("/graphs")}
+					className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors mb-10"
+				>
+					<ArrowLeft className="w-4 h-4" />
+					<span>Back</span>
+				</button>
+
+				{/* Header */}
+				<div className="mb-8">
+					<h1 className="text-2xl font-bold">New Graph Connection</h1>
+					<p className="text-muted-foreground mt-1">
+						Connect to a graph database to get started
+					</p>
 				</div>
+
+				<GraphForm
+					isSubmitting={mutation.isPending}
+					onSubmit={handleSubmit}
+					onCancel={() => navigate("/graphs")}
+				/>
 			</div>
 		</div>
 	);

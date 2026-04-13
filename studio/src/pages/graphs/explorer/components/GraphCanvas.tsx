@@ -188,7 +188,7 @@ export function GraphCanvas({ data, onSelectionChange }: GraphCanvasProps) {
 						<line x1="12" y1="7" x2="5" y2="17" />
 						<line x1="12" y1="7" x2="19" y2="17" />
 					</svg>
-					<span className="text-xs">Run a query to explore the graph</span>
+					<span className="">Run a query to explore the graph</span>
 				</div>
 			)}
 		</div>

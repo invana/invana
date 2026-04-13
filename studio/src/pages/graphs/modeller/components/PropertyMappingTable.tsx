@@ -14,11 +14,7 @@ interface Props {
 
 export function PropertyMappingTable({ mappings }: Props) {
 	if (mappings.length === 0) {
-		return (
-			<p className="text-sm text-muted-foreground py-2">
-				No properties defined.
-			</p>
-		);
+		return <p className="text-muted-foreground py-2">No properties defined.</p>;
 	}
 
 	return (

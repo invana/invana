@@ -41,9 +41,7 @@ export function PropertyKeyTable({
 
 	if (propertyKeys.length === 0) {
 		return (
-			<p className="text-sm text-muted-foreground py-2">
-				No property keys defined.
-			</p>
+			<p className="text-muted-foreground py-2">No property keys defined.</p>
 		);
 	}
 
@@ -63,7 +61,7 @@ export function PropertyKeyTable({
 						<TableCell className="font-mono text-xs">{pk.name}</TableCell>
 						<TableCell>{pk.type}</TableCell>
 						<TableCell>{pk.value_cardinality}</TableCell>
-						<TableCell className="text-muted-foreground text-xs">
+						<TableCell className="text-muted-foreground">
 							{usedBy(pk.name)}
 						</TableCell>
 					</TableRow>

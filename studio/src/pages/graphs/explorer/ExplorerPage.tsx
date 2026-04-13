@@ -136,11 +136,11 @@ export function ExplorerPage() {
 					<div className="flex items-center gap-2 px-2">
 						<span className="font-bold text-xl select-none">Invana Studio</span>
 						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground text-sm">Explorer</span>
+						<span className="text-muted-foreground">Explorer</span>
 						{graph && (
 							<>
 								<Separator orientation="vertical" className="h-4" />
-								<span className="text-sm font-medium">{graph.name}</span>
+								<span className="font-medium">{graph.name}</span>
 							</>
 						)}
 					</div>

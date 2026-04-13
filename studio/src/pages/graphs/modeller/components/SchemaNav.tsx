@@ -60,7 +60,7 @@ function NavItem({
 		<button
 			type="button"
 			onClick={onClick}
-			className={`w-full text-left px-6 py-1 text-sm rounded-sm transition-colors ${
+			className={`w-full text-left px-6 py-1 rounded-sm transition-colors ${
 				active
 					? "bg-accent text-accent-foreground font-medium"
 					: "hover:bg-accent/50 text-foreground"
@@ -86,7 +86,7 @@ function GlobalItem({
 		<button
 			type="button"
 			onClick={onClick}
-			className={`flex w-full items-center justify-between px-3 py-1.5 text-sm rounded-sm transition-colors ${
+			className={`flex w-full items-center justify-between px-3 py-1.5 rounded-sm transition-colors ${
 				active
 					? "bg-accent text-accent-foreground font-medium"
 					: "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
@@ -128,9 +128,7 @@ export function SchemaNav({
 				{nodeTypesOpen && (
 					<div className="flex flex-col">
 						{nodeTypes.length === 0 ? (
-							<p className="px-6 py-1 text-xs text-muted-foreground italic">
-								None
-							</p>
+							<p className="px-6 py-1 text-muted-foreground italic">None</p>
 						) : (
 							nodeTypes.map((nt) => (
 								<NavItem
@@ -154,9 +152,7 @@ export function SchemaNav({
 				{edgeTypesOpen && (
 					<div className="flex flex-col">
 						{edgeTypes.length === 0 ? (
-							<p className="px-6 py-1 text-xs text-muted-foreground italic">
-								None
-							</p>
+							<p className="px-6 py-1 text-muted-foreground italic">None</p>
 						) : (
 							edgeTypes.map((et) => (
 								<NavItem

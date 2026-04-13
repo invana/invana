@@ -117,9 +117,7 @@ export function GraphForm({
 					onChange={(e) => set("name", e.target.value)}
 					disabled={isSubmitting}
 				/>
-				{errors.name && (
-					<p className="text-sm text-destructive">{errors.name}</p>
-				)}
+				{errors.name && <p className="text-destructive">{errors.name}</p>}
 			</div>
 
 			{/* Description */}
@@ -168,7 +166,7 @@ export function GraphForm({
 					</Select>
 				)}
 				{errors.connector_class && (
-					<p className="text-sm text-destructive">{errors.connector_class}</p>
+					<p className="text-destructive">{errors.connector_class}</p>
 				)}
 			</div>
 
@@ -184,7 +182,7 @@ export function GraphForm({
 					onChange={(e) => set("uri", e.target.value)}
 					disabled={isSubmitting}
 				/>
-				{errors.uri && <p className="text-sm text-destructive">{errors.uri}</p>}
+				{errors.uri && <p className="text-destructive">{errors.uri}</p>}
 			</div>
 
 			{/* Auth */}
@@ -204,7 +202,7 @@ export function GraphForm({
 					<Label htmlFor="password">
 						Password
 						{isEdit && (
-							<span className="text-muted-foreground text-xs ml-1">
+							<span className="text-muted-foreground ml-1">
 								(leave blank to keep)
 							</span>
 						)}

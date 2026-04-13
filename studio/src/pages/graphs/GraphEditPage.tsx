@@ -40,9 +40,7 @@ export function GraphEditPage() {
 						`Edit "${graph?.name}"`
 					)}
 				</h1>
-				<p className="text-sm text-muted-foreground">
-					Update connection settings
-				</p>
+				<p className="text-muted-foreground">Update connection settings</p>
 			</div>
 
 			<div className="flex-1 overflow-auto px-6 py-6">
@@ -56,7 +54,7 @@ export function GraphEditPage() {
 					)}
 
 					{isError && (
-						<p className="text-sm text-destructive">
+						<p className="text-destructive">
 							{error instanceof Error ? error.message : "Failed to load graph"}
 						</p>
 					)}
