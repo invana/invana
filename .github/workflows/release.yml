@@ -1,9 +1,7 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch: # disabled: was push on v* tags
 
 permissions:
   contents: write

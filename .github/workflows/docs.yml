@@ -1,11 +1,7 @@
 name: Docs
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/**"
-  workflow_dispatch:
+  workflow_dispatch: # disabled: was push on main (docs/**)
 
 permissions:
   pages: write

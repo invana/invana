@@ -1,9 +1,7 @@
 name: Nightly Integration Tests
 
 on:
-  schedule:
-    - cron: "0 3 * * *"  # 3 AM UTC daily
-  workflow_dispatch:
+  workflow_dispatch: # disabled: was schedule (0 3 * * *)
 
 jobs:
   integration:
