@@ -41,18 +41,18 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
 
     async def get_node_labels(self) -> list[str]:
         query, params = OpenCypherQueryBuilder.get_node_labels()
-        raw = await self._connector.execute(query, params)
-        return [record["label"] for record in raw]
+        response = await self._connector.execute(query, params)
+        return [record["label"] for record in response.records]
 
     async def get_edge_labels(self) -> list[str]:
         query, params = OpenCypherQueryBuilder.get_edge_labels()
-        raw = await self._connector.execute(query, params)
-        return [record["relationshipType"] for record in raw]
+        response = await self._connector.execute(query, params)
+        return [record["relationshipType"] for record in response.records]
 
     async def get_property_keys(self, label: str) -> list[str]:
         query, params = OpenCypherQueryBuilder.get_property_keys(label)
-        raw = await self._connector.execute(query, params)
-        return [record["key"] for record in raw]
+        response = await self._connector.execute(query, params)
+        return [record["key"] for record in response.records]
 
     async def get_indexes(self) -> list[IndexInfo]:
         # Standard openCypher doesn't have a universal SHOW INDEXES command.
@@ -76,9 +76,9 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
             "WITH key, collect(n[key])[..5] AS samples, count(*) AS cnt "
             "RETURN key, samples, cnt"
         )
-        raw = await self._connector.execute(query, {"sample_size": sample_size})
+        response = await self._connector.execute(query, {"sample_size": sample_size})
         results: list[PropertyInfo] = []
-        for record in raw:
+        for record in response.records:
             samples = record.get("samples", [])
             results.append(
                 PropertyInfo(
@@ -104,9 +104,9 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
             "collect(DISTINCT tgt[0]) AS target_labels, "
             "reduce(acc = [], k IN collect(ks) | acc + k) AS all_keys"
         )
-        raw = await self._connector.execute(query, {"sample_size": sample_size})
-        if raw:
-            record = raw[0]
+        response = await self._connector.execute(query, {"sample_size": sample_size})
+        if response.records:
+            record = response.records[0]
             all_keys = list(dict.fromkeys(record.get("all_keys", [])))
             return EdgeSchemaInfo(
                 name=label,

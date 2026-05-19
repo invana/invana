@@ -258,7 +258,7 @@ class GraphConnectionManager:
             await session.commit()
             logger.info("Auto-introspected schema for graph %r (schema_id=%s).", graph.id, schema.id)
         except Exception as exc:
-            logger.warning("Auto-introspect failed for graph %r: %s", graph.id, exc)
+            logger.warning("Auto-introspect failed for graph %r: %s", graph.id, exc, exc_info=True)
             # Non-fatal — graph stays ACTIVE, schema stays null, user can retry via /introspect
 
 

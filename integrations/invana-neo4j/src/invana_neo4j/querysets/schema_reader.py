@@ -23,13 +23,13 @@ class Neo4jSchemaReaderQuerySet(OpenCypherSchemaReaderQuerySet):
     }
 
     async def get_indexes(self) -> list[IndexInfo]:
-        raw = await self._connector.execute(
+        response = await self._connector.execute(
             "SHOW INDEXES YIELD name, labelsOrTypes, properties, type "
             "WHERE type <> 'LOOKUP' "
             "RETURN name, labelsOrTypes, properties, type"
         )
         result = []
-        for record in raw:
+        for record in response.records:
             labels = record["labelsOrTypes"]
             result.append(
                 IndexInfo(
@@ -42,11 +42,11 @@ class Neo4jSchemaReaderQuerySet(OpenCypherSchemaReaderQuerySet):
         return result
 
     async def get_constraints(self) -> list[ConstraintInfo]:
-        raw = await self._connector.execute(
+        response = await self._connector.execute(
             "SHOW CONSTRAINTS YIELD name, labelsOrTypes, properties, type RETURN name, labelsOrTypes, properties, type"
         )
         result = []
-        for record in raw:
+        for record in response.records:
             labels = record["labelsOrTypes"]
             result.append(
                 ConstraintInfo(
