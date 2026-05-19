@@ -58,7 +58,7 @@ export function PropertyKeyTable({
 			<TableBody>
 				{propertyKeys.map((pk) => (
 					<TableRow key={pk.id}>
-						<TableCell className="font-mono text-xs">{pk.name}</TableCell>
+						<TableCell className="font-mono">{pk.name}</TableCell>
 						<TableCell>{pk.type}</TableCell>
 						<TableCell>{pk.value_cardinality}</TableCell>
 						<TableCell className="text-muted-foreground">

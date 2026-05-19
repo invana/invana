@@ -30,10 +30,10 @@ export function IndexTable({ indexes }: Props) {
 			<TableBody>
 				{indexes.map((idx) => (
 					<TableRow key={idx.id}>
-						<TableCell className="font-mono text-xs">{idx.name}</TableCell>
+						<TableCell className="font-mono">{idx.name}</TableCell>
 						<TableCell>{idx.index_type}</TableCell>
 						<TableCell>{idx.target_label}</TableCell>
-						<TableCell className="font-mono text-xs">
+						<TableCell className="font-mono">
 							{idx.properties.join(", ")}
 						</TableCell>
 					</TableRow>

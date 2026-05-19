@@ -18,7 +18,7 @@ export function ExplorerStatusBar({
 	return (
 		<div className="flex items-center justify-between w-full h-full px-2">
 			{/* Left */}
-			<div className="flex items-center gap-2 text-xs text-muted-foreground">
+			<div className="flex items-center gap-2 text-sm text-muted-foreground">
 				<span
 					className={`w-1.5 h-1.5 rounded-full shrink-0 ${
 						isActive ? "bg-green-500" : "bg-destructive animate-pulse"
@@ -38,7 +38,7 @@ export function ExplorerStatusBar({
 			</div>
 
 			{/* Right */}
-			<div className="flex items-center gap-3 text-xs text-muted-foreground">
+			<div className="flex items-center gap-3 text-sm text-muted-foreground">
 				<span>{nodeCount} nodes</span>
 				<span>{relationshipCount} relationships</span>
 				<span>{queryCount} queries</span>

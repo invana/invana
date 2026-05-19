@@ -27,7 +27,7 @@ export function EdgeTypeDetail({ edgeType, constraints, indexes }: Props) {
 			{/* Header */}
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
-					<span className="text-lg font-semibold">{edgeType.name}</span>
+					<span className="text-xl font-semibold">{edgeType.name}</span>
 					<Badge variant="secondary">edge type</Badge>
 				</div>
 				{edgeType.description ? (

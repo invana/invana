@@ -30,9 +30,7 @@ export function PropertyMappingTable({ mappings }: Props) {
 			<TableBody>
 				{mappings.map((m) => (
 					<TableRow key={m.id}>
-						<TableCell className="font-mono text-xs">
-							{m.property_key.name}
-						</TableCell>
+						<TableCell className="font-mono">{m.property_key.name}</TableCell>
 						<TableCell>{m.property_key.type}</TableCell>
 						<TableCell>{m.property_key.value_cardinality}</TableCell>
 						<TableCell>

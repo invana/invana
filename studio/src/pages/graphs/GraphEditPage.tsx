@@ -33,7 +33,7 @@ export function GraphEditPage() {
 	return (
 		<div className="flex flex-col h-full">
 			<div className="px-6 py-4 border-b">
-				<h1 className="text-lg font-semibold">
+				<h1 className="text-xl font-semibold">
 					{isLoading ? (
 						<Skeleton className="h-5 w-48" />
 					) : (

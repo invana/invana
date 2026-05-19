@@ -68,7 +68,7 @@ export function DetailPanel({
 	if (selected.kind === "property-keys") {
 		return (
 			<div className="flex flex-col gap-4">
-				<h2 className="text-base font-semibold">Property Keys</h2>
+				<h2 className="text-xl font-semibold">Property Keys</h2>
 				<PropertyKeyTable
 					propertyKeys={propertyKeys}
 					nodeTypes={nodeTypes}
@@ -81,7 +81,7 @@ export function DetailPanel({
 	if (selected.kind === "constraints") {
 		return (
 			<div className="flex flex-col gap-4">
-				<h2 className="text-base font-semibold">Constraints</h2>
+				<h2 className="text-xl font-semibold">Constraints</h2>
 				<ConstraintTable constraints={constraints} />
 			</div>
 		);
@@ -90,7 +90,7 @@ export function DetailPanel({
 	if (selected.kind === "indexes") {
 		return (
 			<div className="flex flex-col gap-4">
-				<h2 className="text-base font-semibold">Indexes</h2>
+				<h2 className="text-xl font-semibold">Indexes</h2>
 				<IndexTable indexes={indexes} />
 			</div>
 		);

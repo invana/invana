@@ -32,10 +32,10 @@ export function ConstraintTable({ constraints }: Props) {
 			<TableBody>
 				{constraints.map((c) => (
 					<TableRow key={c.id}>
-						<TableCell className="font-mono text-xs">{c.name}</TableCell>
+						<TableCell className="font-mono">{c.name}</TableCell>
 						<TableCell>{c.constraint_type}</TableCell>
 						<TableCell>{c.target_label}</TableCell>
-						<TableCell className="font-mono text-xs">
+						<TableCell className="font-mono">
 							{c.properties.join(", ")}
 						</TableCell>
 					</TableRow>

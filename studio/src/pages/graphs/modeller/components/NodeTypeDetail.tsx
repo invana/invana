@@ -27,7 +27,7 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 			{/* Header */}
 			<div className="flex flex-col gap-1">
 				<div className="flex items-center gap-2">
-					<span className="text-lg font-semibold">{nodeType.name}</span>
+					<span className="text-xl font-semibold">{nodeType.name}</span>
 					<Badge variant="secondary">node type</Badge>
 					{nodeType.is_abstract && <Badge variant="outline">abstract</Badge>}
 				</div>

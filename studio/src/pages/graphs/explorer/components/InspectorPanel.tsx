@@ -43,7 +43,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 					{item.type === "edge" && (
 						<div>
 							<p className="text-muted-foreground mb-1.5">Endpoints</p>
-							<div className="flex flex-col gap-1 text-xs font-mono">
+							<div className="flex flex-col gap-1 font-mono">
 								<div className="flex gap-2">
 									<span className="text-muted-foreground w-12 shrink-0">
 										source
@@ -75,7 +75,7 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 										<span className="text-[10px] text-muted-foreground">
 											{key}
 										</span>
-										<span className="text-xs font-mono text-foreground break-all">
+										<span className="font-mono text-foreground break-all">
 											{String(val)}
 										</span>
 									</div>

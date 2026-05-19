@@ -24,7 +24,7 @@ export function ErrorPage() {
 				<span className="text-7xl font-black text-muted-foreground/20 select-none leading-none">
 					{is404 ? "404" : "500"}
 				</span>
-				<h1 className="text-xl font-semibold">{title}</h1>
+				<h1 className="text-2xl font-semibold">{title}</h1>
 				<p className="text-muted-foreground">{description}</p>
 			</div>
 			<div className="flex items-center gap-2">

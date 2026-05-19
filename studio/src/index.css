@@ -8,11 +8,18 @@
 @import "../node_modules/@invana/styling/src/themes/vite.css";
 
 @theme {
-	--text-xs: 0.8rem;
-	--text-sm: 0.9rem;
-	--text-base: 1rem;
-	--text-lg: 1.15rem;
-	--text-xl: 1.3rem;
+	--text-xs: 0.6875rem;
+	--text-sm: 0.75rem;
+	--text-base: 0.8125rem;
+	--text-lg: 0.875rem;
+	--text-xl: 1rem;
+	--text-2xl: 1.25rem;
+}
+
+body {
+	font-size: var(--text-base);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu",
+		"Droid Sans", sans-serif;
 }
 
 /* Thin scrollbars */

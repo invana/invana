@@ -213,7 +213,7 @@ export function ModellerPage() {
 			footer={{
 				className: "!h-[25px]",
 				left: (
-					<div className="flex items-center gap-4 px-2 text-xs text-muted-foreground">
+					<div className="flex items-center gap-4 px-2 text-sm text-muted-foreground">
 						{graph && (
 							<>
 								<span>{graph.name}</span>
@@ -240,7 +240,7 @@ export function ModellerPage() {
 					</div>
 				),
 				right: (
-					<div className="flex items-center gap-3 px-2 text-xs text-muted-foreground">
+					<div className="flex items-center gap-3 px-2 text-sm text-muted-foreground">
 						{version?.version && <span>v{version.version}</span>}
 						<span>Modeller</span>
 					</div>
