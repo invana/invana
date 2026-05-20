@@ -2,6 +2,17 @@
 
 Structured knowledge graphs into interactive decision simulation environments.
 
+## Current scope: MVP
+
+**The active scope is `docs/internal/mvp.md`.** Treat it as the authoritative work list. When choosing what to build:
+
+1. **Build only what `docs/internal/mvp.md` lists.** Anything not in MVP is out of scope, even if `docs/system-design.md` or an RFC describes it.
+2. **Respect deferred items.** Lines marked `[-]` in `mvp.md` are explicit non-goals — do not implement them, do not scaffold for them, do not "while I'm here" them.
+3. **Per-feature triplets.** Each feature lists Backend / Frontend / Integrations. Build all three together — do not let one side ship ahead and constrain the other.
+4. **Follow the slice order.** The "Delivery Plan — Vertical Slices" section (S0 → S12) is the sequencing. Don't start a slice until the prior slice's "Done when" is reproducible from a clean checkout.
+5. **Don't re-scope silently.** If MVP looks wrong or incomplete for the task at hand, surface it and update `mvp.md` first — then implement.
+6. **System-design + RFCs are reference, not scope.** `docs/system-design.md` defines the long-term shape; RFCs define design decisions. Neither expands MVP scope.
+
 ## Architecture
 
 - **Monorepo**: `engine/` (Python 3.14 + FastAPI) + `studio/` (React 19 + TypeScript) + `integrations/` (connector packages)
