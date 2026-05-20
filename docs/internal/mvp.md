@@ -18,35 +18,53 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 
 ## Layer 1 — Identity & Access
 
-### 1.1 User auth (register, login, refresh, me)
-- **Backend:** [ ] `User` model · bcrypt hashing · `/auth/register` (invite-gated) · `/auth/login` · `/auth/refresh` · `/auth/me` · JWT encode/decode (HS256, access 15m + refresh 7d) · `get_current_user` dep applied to all non-`/auth` routes
-- **Frontend:** [ ] `LoginPage` · `RegisterPage` (invite-redeem) · `stores/auth.store.ts` (Zustand) · axios interceptor (attach Bearer, refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
-- **Integrations:** `passlib[bcrypt]` (password hashing) · `PyJWT` (token codec) · browser `localStorage` (token cache, v1; HttpOnly cookies deferred)
+**Implemented in Slice S1** — full design in [`docs/internal/mvp/layer-1-identity-access.md`](mvp/layer-1-identity-access.md).
+
+### 1.1 User auth (register, login, refresh, logout, me + patch + password + delete-self)
+- **Backend:** [x] `User` model · bcrypt hashing (passlib + `bcrypt<5` pin) · `/api/v1/auth/register` (invite-gated) · `/login` · `/refresh` (rotates refresh token) · `/logout` · `/me` (GET) · `/me` (PATCH first/last name) · `/me/password` (revokes all this user's refresh tokens) · `/me` (DELETE with sole-superuser guard) · HS256 access JWT (15m), opaque server-side refresh token (7d) · `get_current_user` dep
+- **Frontend:** [x] `LoginPage` · `RegisterPage` (invite-redeem) · `ProfileSettingsPage` with tabs (Basic info · Password · Danger zone) · `stores/auth.store.ts` (Zustand, persisted) · axios interceptor (attach Bearer, single-flight refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
+- **Integrations:** `passlib[bcrypt]` · `bcrypt<5` (passlib 1.7.4 wrap-bug guard) · `PyJWT` · `pydantic[email]` · `itsdangerous` (SessionMiddleware) · browser `localStorage` (HttpOnly cookies deferred)
 
 ### 1.2 CLI bootstrap
-- **Backend:** [ ] `invana init` command — prompts for admin credentials, creates root user, writes initial workspace, emits first-login URL/token · idempotent guard if root user exists
-- **Frontend:** [ ] First-login flow (token redeem → set password if not already set) — reuses `LoginPage`
-- **Integrations:** existing CLI framework (`typer` or `click` — match what `engine/src/invana/cli/` already uses) · `rich` for prompt UX if not already in
+- **Backend:** [x] `invana init` command (Click) — prompts for first name (required), last name (optional), email, password+confirm; creates root user with `is_superuser=True` + a personal workspace (slug derived from first name) + admin membership; idempotent (refuses if any superuser exists); also supports `--non-interactive` with flags for CI
+- **Frontend:** [x] Existing `LoginPage` is the first-login surface — no separate first-login flow needed
+- **Integrations:** `click` (existing)
 
-### 1.3 Invitations
-- **Backend:** [ ] `Invitation` entity (token, email, role, expires_at, accepted_at) · `POST /auth/invitations` (issue) · `POST /auth/register?invite=<token>` accept path
-- **Frontend:** [ ] Invitations list in admin/settings (copy-link UX, no email send in MVP) · `RegisterPage` reads `?invite=<token>` query param
-- **Integrations:** email send is **deferred** for MVP — invitation URLs are copy-pasted by the inviter
+### 1.3 Invitations (workspace-scoped)
+- **Backend:** [x] `Invitation` entity carries `workspace_id` + `role` + `token_hash` (sha256) · `POST /api/v1/workspaces/{wid}/invitations` (admin only; returns one-shot `redeem_url`) · `GET /workspaces/{wid}/invitations` · `DELETE /workspaces/{wid}/invitations/{id}` · `POST /auth/register?invite=<token>` accept path attaches the user as a `WorkspaceMember` with the invitation's role
+- **Frontend:** [x] `/workspaces/:workspaceSlug/settings/invitations` page (admin only) — issue dialog shows the redeem URL once with a copy button; per-row revoke; `RegisterPage` reads `?invite=<token>`
+- **Integrations:** email send is **deferred** for MVP — invitation URLs are copy-pasted
 
-### 1.4 Roles
+### 1.4 Roles (workspace-scoped)
 - **Role is workspace-scoped, not user-scoped.** Role lives on `workspace_members.role` enum (`developer` | `analyst` | `admin`). Platform-level admin is `users.is_superuser` (gates `/admin`). The same user can be `admin` of their personal workspace and `developer` of another. See `docs/internal/mvp/layer-1-identity-access.md` for the full role matrix.
 - **Backend:** [x] `workspaces` + `workspace_members` tables · `workspace_role` enum · `get_workspace_membership` dep · `require_workspace_admin` / `require_workspace_builder` / `require_workspace_member` deps · `require_superuser` dep
-- **Frontend:** [x] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership` · `RoleGate` component for conditional UI
+- **Frontend:** [x] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership`, `membershipForSlug` · `RoleGate` component for conditional UI
 - **Integrations:** none
 
 ### 1.5 Admin UI gating
-- **Backend:** [ ] starlette-admin behind JWT + admin role check
-- **Frontend:** [ ] Admin link in app shell shown only to admins
+- **Backend:** [x] `starlette-admin` mounted at `/admin`, gated by `SuperuserAuthProvider` — session-cookie auth (Starlette `SessionMiddleware`), email + password sign-in, `is_superuser=True` required (re-checked on every request, not trusted from session alone). **Distinct from the JWT Bearer flow** — `/admin` uses its own login form; API routes use Bearer tokens.
+- **Frontend:** [x] App-shell dropdown shows "Platform admin" link only to superusers (uses `RoleGate require="superuser"`)
+- **Integrations:** `starlette-admin` · `itsdangerous` (SessionMiddleware signing)
+
+### 1.6 Workspaces
+- **Backend:** [x] `Workspace` entity (`name`, `slug` unique global, `created_by_id`) · `POST /api/v1/workspaces` (any authenticated user; creator becomes admin) · `GET /workspaces` (returns workspaces the caller is a member of) · `GET /workspaces/{wid}/members` · `PATCH /workspaces/{wid}/members/{user_id}` (admin only; sole-admin demotion guard → 409) · `DELETE /workspaces/{wid}/members/{user_id}` (admin only; sole-admin removal guard → 409)
+- **Frontend:** [x] `/workspaces/:workspaceSlug/settings/members` page · slug-scoped URLs throughout · workspace name shown in app-shell header
+- **Integrations:** none
+- **Deferred (post-S1):** [-] Workspace edit/delete endpoints · [-] Workspace switcher UI (current Studio derives active workspace from the session) · [-] Promote/demote endpoints separate from PATCH member role
+
+### 1.7 Account self-service (Profile settings)
+- **Backend:** [x] `PATCH /auth/me` (first/last name) · `POST /auth/me/password` (verifies current; rotates all refresh tokens on success) · `DELETE /auth/me` (verifies password; refuses if user is the sole active superuser → 409; otherwise hard-deletes — cascade downward)
+- **Frontend:** [x] `/settings/profile` with three tabs: **Basic info** (email read-only · first/last name editable), **Password** (current + new + confirm), **Danger zone** (delete account with email + password confirmation dialog and cascade preview)
+- **Integrations:** none
+
+### 1.8 Admin model browser
+- **Backend:** [x] starlette-admin model views for `Users` · `Workspaces` · `WorkspaceMembers` · `Invitations` · `RefreshTokens`. Sensitive columns (`password_hash`, `token_hash`) deliberately excluded from `fields` so they aren't shown or editable. Tightened mutability: Users disable create; Invitations disable create + edit (delete = revoke); RefreshTokens disable create + edit (delete = manual revoke).
+- **Frontend:** N/A — starlette-admin renders its own UI
 - **Integrations:** `starlette-admin` (existing)
 
-## Layer 2 — Workspace (global registries)
+## Layer 2 — Workspace registries
 
-Global registries: defined once, bound into many missions.
+Per-workspace registries (introduced as a workspace concern by L1.6): defined once **per workspace**, bound into many missions inside that workspace. "Global" in the original draft meant "global to a workspace," not "global to the platform" — clarified now that workspaces are first-class.
 
 ### 2.1 Connectors registry (graph DB drivers only in MVP)
 - **Backend:** [ ] Existing connectors at `engine/src/invana/graph/connectors/` for Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph (RFC-001) — these are **query drivers**, not source-ingestion connectors

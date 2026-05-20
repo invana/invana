@@ -261,13 +261,14 @@ POST /api/v1/auth/me/password             [require_member]
 DELETE /api/v1/auth/me                    [require_member]
   Body:     { "password": "..." }
   Effects:  verifies password; hard-deletes the user row. Cascade per
-            RFC-012 / project delete-semantics memory: missions owned by
-            this user cascade down. Refresh tokens cascade via FK.
-            Guard: if the user is the ONLY admin (role=admin and the
-            single remaining active admin), the request is rejected
+            RFC-012 / project delete-semantics memory: workspaces created
+            by this user cascade down (members, invitations, refresh
+            tokens) via FK.
+            Guard: if the user has is_superuser=True AND would leave
+            zero remaining active superusers, the request is rejected
             with 409 to prevent the platform locking itself out.
   Returns:  204 (client clears session and redirects to /login)
-  Errors:   401 (wrong password), 409 (sole remaining admin)
+  Errors:   401 (wrong password), 409 (sole remaining superuser)
 
 ─────────────────────────────────────────────────────────────────────────
 WORKSPACES
@@ -326,14 +327,14 @@ Behaviour:
 
 ### Studio UI
 
-New routes:
+New routes (workspace-scoped routes use the workspace **slug** to mirror the engine's `/workspaces/{wid}/...` API, but with a human-readable identifier the user sees in the URL bar; the page resolves slug → `workspace_id` via `useAuth().membershipForSlug(slug)`):
 
 ```
-/login                 — LoginPage
-/register?invite=<t>   — RegisterPage (reads invite from query)
-/settings/profile      — ProfileSettingsPage  (any authenticated user)
-/settings/users        — admin-only: list users + role
-/settings/invitations  — admin-only: issue / list / revoke
+/login                                                  — LoginPage
+/register?invite=<t>                                    — RegisterPage
+/settings/profile                                       — ProfileSettingsPage (user-level)
+/workspaces/:workspaceSlug/settings/members             — WorkspaceMembersPage
+/workspaces/:workspaceSlug/settings/invitations         — WorkspaceInvitationsPage (admin-only)
 ```
 
 All other routes wrapped in `<ProtectedRoute>` — redirects to `/login` if no valid access token.
@@ -388,17 +389,52 @@ Destructive on-branch change; branch has not shipped, no data migration path nee
 
 Python (`engine/pyproject.toml`):
 - `passlib[bcrypt]`
+- `bcrypt<5` (pinned — passlib 1.7.4 trips its internal "wrap bug" probe on bcrypt 5.x, which now raises on >72-byte inputs during library init)
 - `PyJWT`
+- `pydantic[email]` (for `EmailStr` in request schemas)
+- `itsdangerous` (transitive, but explicit in `[server]` extras — required by Starlette's `SessionMiddleware`, which the `/admin` auth provider relies on)
 
 TypeScript (`studio/package.json`):
 - `axios`
 
-Settings (no new env vars in MVP):
-- `INVANA_SECRET_KEY` (existing) — JWT signing.
-- New settings fields (defaults, no env override needed):
-  - `access_token_ttl_minutes = 15`
-  - `refresh_token_ttl_days = 7`
-  - `invitation_ttl_days = 7`
+Settings:
+- `INVANA_SECRET_KEY` (existing) — JWT signing **and** SessionMiddleware cookie signing. In `env=development` an insecure default is used with a loud warning at startup (mirroring the existing `INVANA_ENCRYPTION_KEY` pattern); in any other env the setting is required and the app refuses to start without it.
+- New settings under the `auth_` prefix (override via `INVANA_AUTH_*`):
+  - `auth_min_password_length = 12`
+  - `auth_bcrypt_rounds = 12`
+  - `auth_jwt_algorithm = "HS256"`
+  - `auth_token_bytes = 32`  *(entropy for opaque refresh + invite tokens)*
+  - `auth_access_token_ttl_minutes = 15`
+  - `auth_refresh_token_ttl_days = 7`
+  - `auth_invitation_ttl_days = 7`
+- `studio_base_url` (default `http://localhost:8300`) — used to build invitation redeem URLs.
+
+### starlette-admin auth provider
+
+`/admin/*` is mounted as a Starlette **sub-app**, so it has its own `state` separate from the parent FastAPI. Gating implementation:
+
+- `SuperuserAuthProvider` (in `engine/src/invana/server/admin/auth.py`) extends `starlette_admin.auth.AuthProvider`. It receives a reference to the parent FastAPI app at construction time (in `mount_admin`) so it can read `parent_app.state.db_session_factory` — the lifespan-managed factory — without trying to look up state on the sub-app.
+- `login(username, password, ...)`: case-folds email, looks up `User`, runs a dummy bcrypt verify if the user is missing/inactive to even out timing, refuses unless `is_superuser=True`, stashes `admin_user_id` in `request.session` on success.
+- `is_authenticated()` runs on every request, re-loads the user from the DB, and revalidates `is_active + is_superuser` (a stale `admin_user_id` in a session cookie can't escalate after a demote). Stores the resolved user on `request.state.admin_user` for `get_admin_user()` to display.
+- Sessions ride on Starlette's `SessionMiddleware`, signed with `settings.secret_key`. Cookie name: `invana_admin_session`. `same_site="lax"`.
+
+This is a **separate auth flow from the JWT Bearer API.** A user logs into `/admin` via the admin's own form; the JWT access token from the Studio API is not honored by `/admin`, and vice versa. They share the underlying `User` row and the `is_superuser` flag.
+
+#### Admin model browser (read/edit surface)
+
+starlette-admin model views are registered for the five Layer 1 tables. Sensitive columns are excluded from `fields` so they're neither rendered nor editable:
+
+| View              | Sensitive cols excluded | Create | Edit | Delete |
+|-------------------|-------------------------|--------|------|--------|
+| Users             | `password_hash`         | ✗      | ✓    | ✓      |
+| Workspaces        |                         | ✓      | ✓    | ✓      |
+| Workspace members |                         | ✓      | ✓    | ✓      |
+| Invitations       | `token_hash`            | ✗      | ✗    | ✓      |
+| Refresh tokens    | `token_hash`            | ✗      | ✗    | ✓      |
+
+Users are bootstrapped via `invana init` or the workspace invitations API — never the admin UI. Invitations carry a one-shot raw token surfaced exactly once in the create response; admin-UI re-create would defeat that contract. Refresh tokens are session state — view + delete (manual revocation) only.
+
+Note: starlette-admin exposes `can_create` / `can_edit` / `can_delete` as **methods** on `BaseView` (`def can_X(self, request) -> bool`), not class attributes. Override them as methods returning `False`; a bool class attribute crashes with `TypeError: 'bool' object is not callable` because the framework calls them as bound methods.
 
 ## Alternatives Considered
 
@@ -433,53 +469,66 @@ Settings (no new env vars in MVP):
 
 ## Open Questions
 
-- [ ] Rotate refresh on every refresh? **Proposal: yes.**
+Resolved during S1 implementation:
+- [x] Rotate refresh on every refresh? **Yes** — implemented; each `/auth/refresh` revokes the presented refresh and issues a new pair.
+- [x] Role promotion / demotion endpoint? **Yes (workspace-scoped)** — implemented as `PATCH /workspaces/{wid}/members/{user_id}` with a sole-admin demotion guard (409). Removing a member with `DELETE /workspaces/{wid}/members/{user_id}` carries the same guard.
+
+Still open (deferred past S1):
 - [ ] In-process token bucket for `/auth/login` rate limiting, or fully defer? **Proposal: defer.**
 - [ ] Analyst write-back gated by per-agent policy (`auto-commit` vs. `review-required`, L7.3)? **Proposal: yes** — same policy applies regardless of who runs the agent.
 - [ ] `audit_log` for auth events (login, invitation issue/accept, role change) in MVP? **Proposal: not in MVP; emit through RFC-006 logging.**
-- [ ] Role promotion / demotion endpoint (admin changes another user's role)? **Proposal: defer to post-S1.** The sole-admin delete guard surfaces this gap, but for MVP the workaround is: invite a second admin first, then delete. Documented in the delete-account error message.
+- [ ] Workspace edit / delete endpoints (rename a workspace, remove it entirely with downward cascade). Currently you can only create + manage members; the workspace itself is immutable from the API.
+- [ ] Workspace switcher UI in Studio. Studio currently treats the first workspace returned by `/auth/me` as active; selecting a different workspace lives in the auth store but has no UI hook yet.
+- [ ] Alembic reset on `arch/redesign` (cross-cutting in `mvp.md`). S1 added the auth migration **on top of** the existing two graph migrations rather than wiping them — the graph code still uses those tables. The full reset can happen when S3 reshapes graphs for mission scoping.
 
 ## Implementation Plan
 
-Maps to MVP Slice **S1**. BE + FE tracked together.
+Maps to MVP Slice **S1**. BE + FE tracked together. **Shipped** — see commits `0915c7d` (initial Layer 1) and `e30e7e7` (admin views + slug-scoped routes).
 
 1. **Deps**
-   - [ ] Add `passlib[bcrypt]`, `PyJWT` to `engine/pyproject.toml`; `uv lock`.
-   - [ ] Add `axios` to `studio/package.json`; `pnpm install`.
+   - [x] Add `passlib[bcrypt]`, `bcrypt<5`, `PyJWT`, `pydantic[email]` to `engine/pyproject.toml`; `uv lock`.
+   - [x] Add `axios` to `studio/package.json`.
+   - [x] `itsdangerous` added to `[server]` extras for `SessionMiddleware`.
 
 2. **Schema**
-   - [ ] Reset Alembic history on `arch/redesign`.
-   - [ ] Initial migration: `users`, `invitations`, `refresh_tokens`, role enum.
+   - [ ] *Deferred:* Reset Alembic history on `arch/redesign`. (See Open Questions — the auth migration was added on top of the existing two graph migrations; full reset waits for S3.)
+   - [x] Initial auth migration `b2f1a7c3d401`: `users`, `workspaces`, `workspace_members`, `invitations`, `refresh_tokens`, `workspace_role` enum.
 
 3. **Engine — auth module** (`engine/src/invana/auth/`)
-   - [ ] `models.py` — SQLAlchemy models.
-   - [ ] `schemas.py` — pydantic request/response.
-   - [ ] `passwords.py` — passlib context, hash + verify.
-   - [ ] `jwt.py` — encode/decode access tokens.
-   - [ ] `tokens.py` — refresh-token issue / validate / revoke.
-   - [ ] `services.py` — register, login, refresh, logout, me (get + patch + change_password + delete_self with sole-admin guard), invitations CRUD.
-   - [ ] `deps.py` — `get_current_user`, `require_member`, `require_builder`, `require_admin`.
-   - [ ] `routes.py` — FastAPI router under `/api/v1/auth`.
+   - [x] `models.py` — SQLAlchemy models (no role on User; role on WorkspaceMember).
+   - [x] `schemas.py` — pydantic request/response.
+   - [x] `passwords.py` — passlib context, hash + verify, settings-driven.
+   - [x] `jwt.py` — encode/decode access tokens.
+   - [x] `tokens.py` — refresh-token issue / validate / revoke / revoke-all-for-user.
+   - [x] `services.py` — auth flows + workspace lifecycle + member/invitation CRUD.
+   - [x] `deps.py` — `get_current_user`, `require_superuser`, `get_workspace_membership`, `require_workspace_{member,builder,admin}`.
+   - [x] `routes.py` — `/api/v1/auth/*` and `/api/v1/workspaces/*` routers.
 
 4. **Engine — wiring**
-   - [ ] Add settings fields (`access_token_ttl_minutes`, `refresh_token_ttl_days`, `invitation_ttl_days`).
-   - [ ] Attach `get_current_user` to every router except `/auth/*`.
-   - [ ] Wrap `/admin` mount in JWT + admin middleware (currently unprotected, RFC-003).
+   - [x] Add settings under `auth_*` prefix and dev fallback for `INVANA_SECRET_KEY`.
+   - [x] Mount auth + workspaces routers; add `SessionMiddleware`.
+   - [x] Replace `/admin` mount with `SuperuserAuthProvider`-gated mount.
+   - [ ] *Deferred:* Attach `get_current_user` to legacy `/api/v1/graphs`/`/schemas`/`/query` routers. (S3 re-prefixes these under `/missions/{mid}/...` and attaches workspace deps then — gating them now would be undone.)
 
-5. **CLI** (`engine/src/invana/cli/main.py`)
-   - [ ] Add `invana init` Click command. Reuses register-without-invitation path.
+5. **CLI** (`engine/src/invana/cli/commands/init.py`)
+   - [x] `invana init` Click command — interactive + `--non-interactive`; creates root user + personal workspace + admin membership; idempotent.
 
 6. **Studio**
-   - [ ] Replace `services/api/client.ts` `fetch` with axios + interceptors.
-   - [ ] `stores/auth.store.ts` (Zustand, persisted).
-   - [ ] `useAuth` hook + `ProtectedRoute` + `RoleGate`.
-   - [ ] `LoginPage`, `RegisterPage` (reads `?invite=`; collects first/last name + password).
-   - [ ] `/settings/profile` with three tabs: Basic info, Password, Danger zone (delete account with email + password confirmation).
-   - [ ] Admin: `/settings/users`, `/settings/invitations`.
-   - [ ] App shell: hide admin links via `RoleGate`.
+   - [x] Replace `services/api/client.ts` `fetch` with axios + interceptors (single-flight refresh).
+   - [x] `stores/auth.store.ts` (Zustand, persisted, self-registers with the client).
+   - [x] `useAuth` hook + `ProtectedRoute` + `RoleGate`.
+   - [x] `LoginPage`, `RegisterPage` (reads `?invite=`; collects first/last name + password).
+   - [x] `/settings/profile` with three tabs: Basic info, Password, Danger zone.
+   - [x] `/workspaces/:workspaceSlug/settings/members` and `/workspaces/:workspaceSlug/settings/invitations` (slug-scoped).
+   - [x] App-shell user-menu dropdown with role-gated links to invitations + platform admin.
 
 7. **Docs**
-   - [ ] Update `docs/internal/mvp.md` Layer 1.4 role enum to `developer | analyst | admin`.
+   - [x] `docs/internal/mvp.md` Layer 1 updated to reflect workspace-scoped roles, new endpoints, and the §1.6–§1.8 additions (workspaces, profile, admin browser).
+   - [x] `CONTRIBUTING.md` first-time bootstrap section: `invana init`, env vars, local dev port table.
+
+8. **Admin** (`engine/src/invana/server/admin/`)
+   - [x] `SuperuserAuthProvider` — session-based, holds parent-app reference, re-validates `is_superuser` on every request.
+   - [x] Model views for Users / Workspaces / WorkspaceMembers / Invitations / RefreshTokens with sensitive columns excluded and tightened mutability.
 
 8. **Done when** (Slice S1 demo gate)
    - From a clean checkout: `invana init` → admin created.
