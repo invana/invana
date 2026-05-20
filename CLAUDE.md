@@ -79,4 +79,5 @@ Structured knowledge graphs into interactive decision simulation environments.
 7. Don't mock the tests, unless asked, always test using graph databases.
 8. Every user-facing change requires a changeset.
 9. Studio uses `@invana/design-kit` for all UI components — don't create custom components unless absolutely necessary.
-10. Studio uses `@invana/canvas` for all graph rendering — no PixiJS code in studio. 
+10. Studio uses `@invana/canvas` for all graph rendering — no PixiJS code in studio.
+11. **Never commit automatically.** Only run `git commit` when the user has explicitly asked for it in the current turn (e.g. "commit", "commit the changes"). Finishing a task is not implicit approval to commit — leave changes staged or unstaged and let the user decide. This rule applies even when a previous turn included a commit request; each commit needs its own ask. Same goes for `git push` and any other action that publishes work outside the local repo.
