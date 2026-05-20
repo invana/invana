@@ -5,7 +5,7 @@ description = "Invana — Graph Intelligence Platform"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "pydantic>=2.0",
+    "pydantic[email]>=2.0",
     "pydantic-settings>=2.13.1",
     "click>=8.0",
     "gremlinpython>=3.8.1",
@@ -14,6 +14,12 @@ dependencies = [
     "asyncpg>=0.30",
     "alembic>=1.15",
     "cryptography>=42",
+    "passlib[bcrypt]>=1.7.4",
+    # Pin bcrypt < 5: passlib 1.7.4 trips its internal "wrap bug" check on
+    # bcrypt 5.x, which now raises ValueError for >72-byte passwords during
+    # passlib's library init. Upstream fix is awaited in passlib 1.8.
+    "bcrypt<5",
+    "PyJWT>=2.8",
 ]
 
 [project.optional-dependencies]
@@ -22,6 +28,7 @@ server = [
     "uvicorn>=0.34",
     "starlette-admin>=0.16",
     "psycopg2-binary>=2.9",
+    "itsdangerous>=2.2",
 ]
 telemetry = [
     "opentelemetry-api>=1.25",

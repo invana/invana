@@ -155,11 +155,19 @@ class GraphView(ModelView):
 
 
 def mount_admin(app: FastAPI) -> None:
-    """Create and mount the starlette-admin instance on *app*."""
+    """Create and mount the starlette-admin instance on *app*.
+
+    Gated by ``SuperuserAuthProvider`` — only users with ``is_superuser=True``
+    can sign in. Session cookies via ``SessionMiddleware`` (added in
+    ``server/app.py``).
+    """
+    from invana.server.admin.auth import SuperuserAuthProvider
+
     admin = Admin(
         app.state.sync_engine,
         title="Invana Admin",
         base_url="/admin",
+        auth_provider=SuperuserAuthProvider(parent_app=app),
     )
     admin.add_view(GraphView(Graph))
     admin.add_view(GraphSchemaView(GraphSchema))

@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from invana.db import create_db_engine, create_session_factory, create_sync_engine
 from invana.settings import settings
@@ -42,6 +43,7 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
+    from invana.auth.routes import auth_router, workspaces_router
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
     from invana.server.routes.graphs import graphs_router
@@ -63,6 +65,15 @@ def create_app() -> FastAPI:
 
         app.add_middleware(TelemetryMiddleware)
 
+    # Session cookies for starlette-admin's auth flow. Signed with the
+    # same secret as the JWT — separate cookie domain isn't needed.
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.secret_key or "invana-dev-session-fallback",
+        session_cookie="invana_admin_session",
+        same_site="lax",
+    )
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -72,6 +83,8 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health_router)
+    app.include_router(auth_router)
+    app.include_router(workspaces_router)
     app.include_router(graphs_router)
     app.include_router(schemas_router)
     app.include_router(query_router)

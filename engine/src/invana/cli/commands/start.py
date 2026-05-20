@@ -22,9 +22,10 @@ def start_cmd(host: str | None, port: int | None, reload: bool) -> None:
     _port = port or settings.port
 
     uvicorn.run(
-        "invana.server.app:app",
+        "invana.server.app:create_app",
         host=_host,
         port=_port,
         reload=reload,
         log_level=settings.log_level,
+        factory=True,
     )

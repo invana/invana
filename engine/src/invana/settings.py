@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 # 32 zero bytes base64url-encoded — NEVER use in production.
 _DEV_ENCRYPTION_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
+# Insecure dev-only fallback for INVANA_SECRET_KEY (JWT signing). NEVER use in production.
+_DEV_SECRET_KEY = "invana-dev-insecure-secret-key-do-not-use-in-prod"  # noqa: S105
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -40,9 +43,22 @@ class Settings(BaseSettings):
     database_max_overflow: int = 20
     database_echo: bool = False
 
-    # Auth
+    # Auth — secret_key kept as a top-level for env-name stability (INVANA_SECRET_KEY).
     secret_key: str = ""
+    # Legacy single-TTL knob retained for any older readers; superseded by AUTH_* below.
     token_expiry_minutes: int = 1440
+
+    # Auth — all tunable constants. Override via INVANA_AUTH_* env vars.
+    auth_min_password_length: int = 12
+    auth_bcrypt_rounds: int = 12
+    auth_jwt_algorithm: str = "HS256"
+    auth_token_bytes: int = 32  # bytes of entropy for opaque refresh + invite tokens
+    auth_access_token_ttl_minutes: int = 15
+    auth_refresh_token_ttl_days: int = 7
+    auth_invitation_ttl_days: int = 7
+
+    # URL Studio is served from — used to build invitation redeem URLs.
+    studio_base_url: str = "http://localhost:8300"
 
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True
@@ -72,6 +88,21 @@ class Settings(BaseSettings):
                 "Set INVANA_ENCRYPTION_KEY in your .env file before storing real credentials."
             )
             self.encryption_key = _DEV_ENCRYPTION_KEY
+        return self
+
+    @model_validator(mode="after")
+    def resolve_secret_key(self) -> Settings:
+        if not self.secret_key:
+            if self.env != "development":
+                raise ValueError(
+                    "INVANA_SECRET_KEY must be set in non-development environments. "
+                    "Generate with: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
+                )
+            logger.warning(
+                "INVANA_SECRET_KEY is not set. Using an insecure dev-only default key. "
+                "Set INVANA_SECRET_KEY in your .env file before issuing real tokens."
+            )
+            self.secret_key = _DEV_SECRET_KEY
         return self
 
 

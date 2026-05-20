@@ -28,6 +28,56 @@ make dev
 
 Run `make help` to see all available commands.
 
+### First-time bootstrap (auth)
+
+The engine and Studio both require an authenticated user to do anything beyond `/login`. On a fresh checkout — or after wiping the Postgres data volume — create the **root superuser** + their personal workspace via the CLI:
+
+```bash
+# Interactive — prompts for first name, last name (optional), email, password
+uv run --directory engine invana init
+
+# Non-interactive (CI / scripted setup)
+uv run --directory engine invana init --non-interactive \
+  --email admin@invana.dev \
+  --password "<at-least-12-chars>" \
+  --first-name "Root" \
+  --last-name "Admin"
+```
+
+The command is **idempotent** — if any user with `is_superuser=true` already exists, it exits without making changes. To re-bootstrap, wipe the `users` table (or the whole DB) first.
+
+What gets created:
+
+- A `users` row with `is_superuser = true` (gates `starlette-admin` at `/admin`)
+- A `workspaces` row (default slug derived from your first name)
+- A `workspace_members` row linking you as `admin` of that workspace
+
+From there: log into Studio (`http://localhost:8300/login`), open the user menu → **Invitations**, and issue invite URLs for additional users. Per `docs/system-design.md §4.1`, the CLI does **not** register additional users; everyone after the root is invite-gated.
+
+### Required environment variables
+
+`INVANA_SECRET_KEY` and `INVANA_ENCRYPTION_KEY` are **required in production** and fall back to insecure dev defaults in `env=development` (loud warning at startup). For local dev you can ignore them; for any shared / non-dev deployment, generate real ones:
+
+```bash
+# JWT signing key (INVANA_SECRET_KEY)
+python -c 'import secrets; print(secrets.token_urlsafe(48))'
+
+# Fernet encryption key (INVANA_ENCRYPTION_KEY) — used for graph connector + LLM-provider secrets at rest
+python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
+```
+
+Put them in `engine/.env`. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/internal/mvp/layer-1-identity-access.md`](docs/internal/mvp/layer-1-identity-access.md).
+
+### Default ports (local dev)
+
+| Service          | Port  | Override                                   |
+|------------------|-------|--------------------------------------------|
+| Engine (FastAPI) | 8200  | `INVANA_PORT` / `invana start --port`      |
+| Studio (Vite)    | 8300  | `studio/vite.config.ts`                    |
+| Postgres         | 35432 | `docker-compose-infra.yml`                 |
+
+Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` in `studio/.env.local` if needed.
+
 ### Engine (Python)
 
 ```bash

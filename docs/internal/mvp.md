@@ -34,8 +34,9 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 - **Integrations:** email send is **deferred** for MVP — invitation URLs are copy-pasted by the inviter
 
 ### 1.4 Roles
-- **Backend:** [ ] `User.role` enum (`admin` | `member`) · `require_admin` dep
-- **Frontend:** [ ] Conditional rendering for admin-only actions; `useAuth` exposes role
+- **Role is workspace-scoped, not user-scoped.** Role lives on `workspace_members.role` enum (`developer` | `analyst` | `admin`). Platform-level admin is `users.is_superuser` (gates `/admin`). The same user can be `admin` of their personal workspace and `developer` of another. See `docs/internal/mvp/layer-1-identity-access.md` for the full role matrix.
+- **Backend:** [x] `workspaces` + `workspace_members` tables · `workspace_role` enum · `get_workspace_membership` dep · `require_workspace_admin` / `require_workspace_builder` / `require_workspace_member` deps · `require_superuser` dep
+- **Frontend:** [x] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership` · `RoleGate` component for conditional UI
 - **Integrations:** none
 
 ### 1.5 Admin UI gating

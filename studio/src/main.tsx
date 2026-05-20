@@ -5,6 +5,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
+// Side-effect import: the auth store registers itself with the axios client
+// at module load so request interceptors can read tokens.
+import "./stores/auth.store";
 import "./index.css";
 
 const queryClient = new QueryClient({

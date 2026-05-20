@@ -11,6 +11,14 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Import all models so metadata is fully populated for autogenerate.
+from invana.auth.models import (  # noqa: F401
+    Invitation,
+    RefreshToken,
+    User,
+    Workspace,
+    WorkspaceMember,
+)
+from invana.graphs.models import Graph  # noqa: F401
 from invana.modeller.models import Base  # noqa: F401
 from invana.settings import settings
 
