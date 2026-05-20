@@ -32,7 +32,7 @@ function SectionHeader({
 		<button
 			type="button"
 			onClick={onClick}
-			className="flex w-full items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors"
+			className="flex w-full items-center justify-between px-3 py-1.5 text-base font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors"
 		>
 			<span className="flex items-center gap-1">
 				{open ? (
@@ -93,7 +93,7 @@ function GlobalItem({
 			}`}
 		>
 			<span>{label}</span>
-			<span className="text-xs">{count}</span>
+			<span className="text-base">{count}</span>
 		</button>
 	);
 }

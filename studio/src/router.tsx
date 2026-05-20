@@ -8,9 +8,9 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphEditPage } from "./pages/graphs/GraphEditPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
+import { GraphInvitationsPage } from "./pages/settings/GraphInvitationsPage";
+import { GraphMembersPage } from "./pages/settings/GraphMembersPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
-import { WorkspaceInvitationsPage } from "./pages/settings/WorkspaceInvitationsPage";
-import { WorkspaceMembersPage } from "./pages/settings/WorkspaceMembersPage";
 
 // Lazy-loaded — these import @invana/canvas-core which is currently broken on
 // this branch. Keeping them lazy means the auth + settings flows don't break
@@ -79,12 +79,12 @@ export const router = createBrowserRouter([
 			{ path: "graphs/:id/edit", element: <GraphEditPage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
 			{
-				path: "workspaces/:workspaceSlug/settings/members",
-				element: <WorkspaceMembersPage />,
+				path: "u/:username/:slug/settings/members",
+				element: <GraphMembersPage />,
 			},
 			{
-				path: "workspaces/:workspaceSlug/settings/invitations",
-				element: <WorkspaceInvitationsPage />,
+				path: "u/:username/:slug/settings/invitations",
+				element: <GraphInvitationsPage />,
 			},
 			{ path: "*", element: <ErrorPage /> },
 		],

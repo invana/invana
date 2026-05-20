@@ -22,47 +22,53 @@ import { Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { ApiError } from "../../services/api/client";
-import { workspacesApi } from "../../services/api/workspaces";
-import type { WorkspaceRole } from "../../types/auth";
+import { graphMembershipApi } from "../../services/api/graph-membership";
+import type { GraphRole } from "../../types/auth";
 
-export function WorkspaceInvitationsPage() {
-	const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
-	const { membershipForSlug } = useAuth();
+export function GraphInvitationsPage() {
+	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { membershipForGraph, rolesForGraph } = useAuth();
 	const qc = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const [redeemUrl, setRedeemUrl] = useState<string | null>(null);
 
-	const membership = membershipForSlug(workspaceSlug);
-	const wid = membership?.workspace_id ?? "";
-	const isAdminHere = membership?.role === "admin";
+	const membership = membershipForGraph(username, slug);
+	const { isAdmin: isAdminHere } = rolesForGraph(username, slug);
 
 	const { data: invitations, isLoading } = useQuery({
-		queryKey: ["workspace", wid, "invitations"],
-		queryFn: () => workspacesApi.listInvitations(wid),
-		enabled: !!wid && !!isAdminHere,
+		queryKey: ["graph", username, slug, "invitations"],
+		queryFn: () =>
+			graphMembershipApi.listInvitations(username as string, slug as string),
+		enabled: !!username && !!slug && !!isAdminHere,
 	});
 
-	if (!workspaceSlug) return <Navigate to="/" replace />;
+	if (!username || !slug) return <Navigate to="/" replace />;
 	if (!membership) {
 		return (
 			<div className="p-8 text-muted-foreground">
-				You aren&apos;t a member of this workspace.
+				You aren&apos;t a member of this Graph.
 			</div>
 		);
 	}
 	if (!isAdminHere) {
 		return (
 			<div className="p-8 text-muted-foreground">
-				Only workspace admins can manage invitations.
+				Only Graph admins can manage invitations.
 			</div>
 		);
 	}
 
 	async function onDelete(id: string) {
 		try {
-			await workspacesApi.deleteInvitation(wid, id);
+			await graphMembershipApi.deleteInvitation(
+				username as string,
+				slug as string,
+				id,
+			);
 			toast.success("Invitation revoked.");
-			qc.invalidateQueries({ queryKey: ["workspace", wid, "invitations"] });
+			qc.invalidateQueries({
+				queryKey: ["graph", username, slug, "invitations"],
+			});
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to revoke.");
 		}
@@ -75,11 +81,11 @@ export function WorkspaceInvitationsPage() {
 					<h1 className="text-2xl font-semibold">
 						Invitations &mdash;{" "}
 						<span className="text-muted-foreground font-normal">
-							{membership.workspace_name}
+							{membership.graph_name}
 						</span>
 					</h1>
-					<p className="text-muted-foreground text-sm">
-						Invite developers and analysts to this workspace.
+					<p className="text-muted-foreground text-base">
+						Invite developers and analysts to this Graph.
 					</p>
 				</div>
 				<Button onClick={() => setOpen(true)}>New invitation</Button>
@@ -90,7 +96,7 @@ export function WorkspaceInvitationsPage() {
 			) : !invitations || invitations.length === 0 ? (
 				<div className="text-muted-foreground italic">No invitations yet.</div>
 			) : (
-				<table className="w-full text-sm">
+				<table className="w-full text-base">
 					<thead className="text-left text-muted-foreground border-b">
 						<tr>
 							<th className="py-2">Email</th>
@@ -138,7 +144,8 @@ export function WorkspaceInvitationsPage() {
 
 			<NewInvitationDialog
 				open={open}
-				workspaceId={wid}
+				username={username}
+				slug={slug}
 				onClose={() => setOpen(false)}
 				onCreated={(url) => setRedeemUrl(url)}
 			/>
@@ -150,30 +157,32 @@ export function WorkspaceInvitationsPage() {
 
 function NewInvitationDialog({
 	open,
-	workspaceId,
+	username,
+	slug,
 	onClose,
 	onCreated,
 }: {
 	open: boolean;
-	workspaceId: string;
+	username: string;
+	slug: string;
 	onClose: () => void;
 	onCreated: (url: string) => void;
 }) {
 	const qc = useQueryClient();
 	const [email, setEmail] = useState("");
-	const [role, setRole] = useState<WorkspaceRole>("developer");
+	const [role, setRole] = useState<GraphRole>("developer");
 	const [submitting, setSubmitting] = useState(false);
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		setSubmitting(true);
 		try {
-			const inv = await workspacesApi.createInvitation(workspaceId, {
+			const inv = await graphMembershipApi.createInvitation(username, slug, {
 				email,
 				role,
 			});
 			qc.invalidateQueries({
-				queryKey: ["workspace", workspaceId, "invitations"],
+				queryKey: ["graph", username, slug, "invitations"],
 			});
 			onClose();
 			setEmail("");
@@ -193,7 +202,7 @@ function NewInvitationDialog({
 			<DialogContent>
 				<form onSubmit={onSubmit}>
 					<DialogHeader>
-						<DialogTitle>Invite to workspace</DialogTitle>
+						<DialogTitle>Invite to Graph</DialogTitle>
 						<DialogDescription>
 							The invitation URL will be shown once — copy it and share with the
 							invitee.
@@ -214,7 +223,7 @@ function NewInvitationDialog({
 							<Label htmlFor="invRole">Role</Label>
 							<Select
 								value={role}
-								onValueChange={(v) => setRole(v as WorkspaceRole)}
+								onValueChange={(v) => setRole(v as GraphRole)}
 							>
 								<SelectTrigger id="invRole">
 									<SelectValue />

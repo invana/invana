@@ -1,4 +1,4 @@
-"""Pydantic request / response shapes for the /auth and /workspaces APIs."""
+"""Pydantic request / response shapes for the /auth and graph-scoped APIs."""
 
 from __future__ import annotations
 
@@ -6,52 +6,57 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from invana.auth.models import WorkspaceRole
+from invana.graphs.models import GraphRole
 from invana.settings import settings
 
 # ---------------------------------------------------------------------------
-# Workspace membership shapes (denormalised onto the user payload)
+# Username
+# ---------------------------------------------------------------------------
+
+# Validation regex — lowercase, digits, hyphens; no leading/trailing hyphen.
+# (Pydantic uses Rust regex which doesn't support look-ahead, so consecutive-hyphen
+# rejection is enforced separately in the service-layer validator.)
+USERNAME_PATTERN = r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+USERNAME_MIN = 2
+USERNAME_MAX = 64
+
+
+class UsernameAvailabilityResponse(BaseModel):
+    available: bool
+    # Populated only when available=False. Discriminates UI messaging.
+    # Values: "taken" | "reserved" | "invalid_format".
+    reason: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Graph membership shapes (denormalised onto the user payload)
 # ---------------------------------------------------------------------------
 
 
-class WorkspaceMembershipOut(BaseModel):
-    """A user's membership in a workspace — what /auth/me returns."""
+class GraphMembershipOut(BaseModel):
+    """A user's membership in a Graph — what /auth/me returns."""
 
-    workspace_id: str
-    workspace_name: str
-    workspace_slug: str
-    role: WorkspaceRole
-
-
-class WorkspaceOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    name: str
-    slug: str
-    created_by_id: str | None
-    created_at: datetime
-    updated_at: datetime
+    graph_id: str
+    graph_name: str
+    graph_slug: str
+    owner_username: str
+    role: GraphRole
 
 
-class WorkspaceCreateRequest(BaseModel):
-    name: str = Field(min_length=1, max_length=255)
-    slug: str = Field(min_length=1, max_length=255, pattern=r"^[a-z0-9][a-z0-9-]*$")
-
-
-class WorkspaceMemberOut(BaseModel):
-    """A row in /workspaces/{wid}/members."""
+class GraphMemberOut(BaseModel):
+    """A row in /u/{username}/{slug}/members."""
 
     user_id: str
+    username: str
     email: EmailStr
     first_name: str
     last_name: str | None
-    role: WorkspaceRole
+    role: GraphRole
     created_at: datetime
 
 
-class WorkspaceMemberRoleUpdate(BaseModel):
-    role: WorkspaceRole
+class GraphMemberRoleUpdate(BaseModel):
+    role: GraphRole
 
 
 # ---------------------------------------------------------------------------
@@ -64,10 +69,12 @@ class UserOut(BaseModel):
 
     id: str
     email: EmailStr
+    username: str
     first_name: str
     last_name: str | None
     is_superuser: bool
-    workspaces: list[WorkspaceMembershipOut]
+    username_last_changed_at: datetime | None
+    graphs: list[GraphMembershipOut]
 
 
 class AuthResponse(BaseModel):
@@ -85,6 +92,7 @@ class AuthResponse(BaseModel):
 class RegisterRequest(BaseModel):
     first_name: str = Field(min_length=1, max_length=120)
     last_name: str | None = Field(default=None, max_length=120)
+    username: str = Field(min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=USERNAME_PATTERN)
     password: str = Field(min_length=settings.auth_min_password_length, max_length=1024)
 
 
@@ -110,6 +118,13 @@ class MePatchRequest(BaseModel):
     first_name: str | None = Field(default=None, min_length=1, max_length=120)
     # Explicit-null is allowed — clients can pass {"last_name": null} to clear it.
     last_name: str | None = Field(default=None, max_length=120)
+    # Optional; rate-limited at the service layer (cooldown).
+    username: str | None = Field(
+        default=None,
+        min_length=USERNAME_MIN,
+        max_length=USERNAME_MAX,
+        pattern=USERNAME_PATTERN,
+    )
 
 
 class ChangePasswordRequest(BaseModel):
@@ -122,13 +137,13 @@ class DeleteMeRequest(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Invitations (workspace-scoped)
+# Invitations (graph-scoped)
 # ---------------------------------------------------------------------------
 
 
 class InvitationCreateRequest(BaseModel):
     email: EmailStr
-    role: WorkspaceRole
+    role: GraphRole
 
 
 class InvitationOut(BaseModel):
@@ -136,8 +151,8 @@ class InvitationOut(BaseModel):
 
     id: str
     email: EmailStr
-    workspace_id: str
-    role: WorkspaceRole
+    graph_id: str
+    role: GraphRole
     invited_by_id: str | None
     expires_at: datetime
     accepted_at: datetime | None

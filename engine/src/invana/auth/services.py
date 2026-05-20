@@ -1,11 +1,15 @@
-"""Business logic for auth + workspace lifecycle.
+"""Business logic for /auth/* — registration, login, refresh, me, password, delete.
 
-Functions return raw DTOs or raise ``HTTPException``. They flush but do
-not commit — the route handler commits once at the end of the request.
+Functions return raw DTOs or raise ``HTTPException``. They flush but do not
+commit — the route handler commits once at the end of the request.
+
+Graph-scoped business logic (membership, invitations) lives in
+:mod:`invana.graphs.services`.
 """
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
@@ -14,30 +18,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from invana.auth import jwt as jwt_codec
-from invana.auth.models import (
-    Invitation,
-    User,
-    Workspace,
-    WorkspaceMember,
-    WorkspaceRole,
-)
+from invana.auth.models import User
 from invana.auth.passwords import WeakPasswordError, hash_password, verify_password
 from invana.auth.schemas import (
+    USERNAME_MAX,
+    USERNAME_MIN,
     AuthResponse,
     ChangePasswordRequest,
     DeleteMeRequest,
-    InvitationCreateRequest,
-    InvitationCreateResponse,
-    InvitationOut,
+    GraphMembershipOut,
     LoginRequest,
     MePatchRequest,
     RegisterRequest,
+    UsernameAvailabilityResponse,
     UserOut,
-    WorkspaceCreateRequest,
-    WorkspaceMemberOut,
-    WorkspaceMemberRoleUpdate,
-    WorkspaceMembershipOut,
-    WorkspaceOut,
 )
 from invana.auth.tokens import (
     find_active_refresh_token,
@@ -47,6 +41,7 @@ from invana.auth.tokens import (
     revoke_all_refresh_tokens_for_user,
     revoke_refresh_token,
 )
+from invana.graphs.models import Graph, GraphMember, Invitation
 from invana.settings import settings
 
 _GENERIC_AUTH_FAILURE = HTTPException(
@@ -54,24 +49,96 @@ _GENERIC_AUTH_FAILURE = HTTPException(
     detail="Invalid email or password.",
 )
 
+# Server-side validation guard. Mirrors USERNAME_PATTERN in schemas.py but is
+# defensive against payloads that bypass pydantic (e.g. the CLI).
+_USERNAME_RE = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
+_USERNAME_DOUBLE_HYPHEN = re.compile(r"--")
+
+# Reserved at the username layer. The /u/ URL prefix isolates usernames from
+# Studio's top-level routes, so only the single segment ``u`` itself needs to
+# be reserved.
+_RESERVED_USERNAMES: frozenset[str] = frozenset({"u"})
+
+
+# ---------------------------------------------------------------------------
+# Username validation + availability
+# ---------------------------------------------------------------------------
+
+
+def _validate_username_format(raw: str) -> str:
+    """Normalize and validate a username string. Raise 422 on failure."""
+    normalized = raw.strip().lower()
+    if not (USERNAME_MIN <= len(normalized) <= USERNAME_MAX):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"username must be {USERNAME_MIN}-{USERNAME_MAX} characters.",
+        )
+    if not _USERNAME_RE.match(normalized):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="username may contain lowercase letters, digits, and hyphens, "
+            "and must start and end with a letter or digit.",
+        )
+    if _USERNAME_DOUBLE_HYPHEN.search(normalized):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="username may not contain consecutive hyphens.",
+        )
+    return normalized
+
+
+async def _username_taken(session: AsyncSession, *, username: str, exclude_user_id: str | None = None) -> bool:
+    stmt = select(func.count(User.id)).where(User.username == username)
+    if exclude_user_id is not None:
+        stmt = stmt.where(User.id != exclude_user_id)
+    return (await session.execute(stmt)).scalar_one() > 0
+
+
+async def check_username_availability(session: AsyncSession, *, raw: str) -> UsernameAvailabilityResponse:
+    """Advisory check used by Studio's live-availability indicator.
+
+    Final uniqueness is enforced at register / PATCH time — clients must not
+    treat ``available=true`` as a reservation.
+    """
+    normalized = raw.strip().lower()
+    bad_length = not (USERNAME_MIN <= len(normalized) <= USERNAME_MAX)
+    bad_chars = not _USERNAME_RE.match(normalized)
+    double_hyphen = bool(_USERNAME_DOUBLE_HYPHEN.search(normalized))
+    if bad_length or bad_chars or double_hyphen:
+        return UsernameAvailabilityResponse(available=False, reason="invalid_format")
+    if normalized in _RESERVED_USERNAMES:
+        return UsernameAvailabilityResponse(available=False, reason="reserved")
+    if await _username_taken(session, username=normalized):
+        return UsernameAvailabilityResponse(available=False, reason="taken")
+    return UsernameAvailabilityResponse(available=True)
+
 
 # ---------------------------------------------------------------------------
 # Auth-response building (loads memberships)
 # ---------------------------------------------------------------------------
 
 
-async def _list_memberships(session: AsyncSession, *, user_id: str) -> list[WorkspaceMembershipOut]:
+async def _list_memberships(session: AsyncSession, *, user_id: str) -> list[GraphMembershipOut]:
     stmt = (
-        select(WorkspaceMember)
-        .where(WorkspaceMember.user_id == user_id)
-        .options(selectinload(WorkspaceMember.workspace))
+        select(GraphMember)
+        .where(GraphMember.user_id == user_id)
+        .options(selectinload(GraphMember.graph).selectinload(Graph.members))
     )
     rows = (await session.execute(stmt)).scalars().all()
+
+    # Owner username is derived from Graph.created_by_id → users.username. Batch the lookup.
+    owner_ids = {m.graph.created_by_id for m in rows}
+    owners: dict[str, str] = {}
+    if owner_ids:
+        owner_rows = (await session.execute(select(User.id, User.username).where(User.id.in_(owner_ids)))).all()
+        owners = {oid: uname for oid, uname in owner_rows}
+
     return [
-        WorkspaceMembershipOut(
-            workspace_id=m.workspace_id,
-            workspace_name=m.workspace.name,
-            workspace_slug=m.workspace.slug,
+        GraphMembershipOut(
+            graph_id=m.graph_id,
+            graph_name=m.graph.name,
+            graph_slug=m.graph.slug,
+            owner_username=owners.get(m.graph.created_by_id, ""),
             role=m.role,
         )
         for m in rows
@@ -82,10 +149,12 @@ async def _user_out(session: AsyncSession, *, user: User) -> UserOut:
     return UserOut(
         id=user.id,
         email=user.email,
+        username=user.username,
         first_name=user.first_name,
         last_name=user.last_name,
         is_superuser=user.is_superuser,
-        workspaces=await _list_memberships(session, user_id=user.id),
+        username_last_changed_at=user.username_last_changed_at,
+        graphs=await _list_memberships(session, user_id=user.id),
     )
 
 
@@ -100,7 +169,7 @@ async def _build_auth_response(session: AsyncSession, *, user: User) -> AuthResp
 
 
 # ---------------------------------------------------------------------------
-# Registration via workspace-scoped invitation
+# Registration via graph-scoped invitation
 # ---------------------------------------------------------------------------
 
 
@@ -116,9 +185,14 @@ async def register_with_invite(
         raise HTTPException(status.HTTP_410_GONE, detail="Invitation has expired.")
 
     # If a user with this email already exists, accepting the invite just
-    # creates the workspace membership — we don't try to set a new password.
+    # creates the graph membership — username and password fields are ignored.
     existing_user = await _find_user_by_email(session, invitation.email)
     if existing_user is None:
+        username = _validate_username_format(payload.username)
+        if username in _RESERVED_USERNAMES:
+            raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
+        if await _username_taken(session, username=username):
+            raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
         try:
             password_hash = hash_password(payload.password)
         except WeakPasswordError as e:
@@ -126,6 +200,7 @@ async def register_with_invite(
 
         user = User(
             email=invitation.email.lower(),
+            username=username,
             password_hash=password_hash,
             first_name=payload.first_name.strip(),
             last_name=(payload.last_name.strip() if payload.last_name else None) or None,
@@ -136,15 +211,15 @@ async def register_with_invite(
         await session.flush()
     else:
         # Email already known — registration is a no-op on the user record;
-        # we still attach the new workspace membership.
+        # we still attach the new graph membership. Submitted username is ignored.
         user = existing_user
 
-    # Attach (or upgrade) the workspace membership.
-    member = await _get_membership(session, workspace_id=invitation.workspace_id, user_id=user.id)
+    # Attach (or upgrade) the graph membership.
+    member = await _get_membership(session, graph_id=invitation.graph_id, user_id=user.id)
     if member is None:
         session.add(
-            WorkspaceMember(
-                workspace_id=invitation.workspace_id,
+            GraphMember(
+                graph_id=invitation.graph_id,
                 user_id=user.id,
                 role=invitation.role,
             )
@@ -209,6 +284,24 @@ async def patch_me(session: AsyncSession, *, user: User, payload: MePatchRequest
     if "last_name" in raw:
         last = raw["last_name"]
         user.last_name = last.strip() if (last and last.strip()) else None
+    if "username" in raw and raw["username"] is not None:
+        new_username = _validate_username_format(raw["username"])
+        if new_username != user.username:
+            # Enforce cooldown.
+            cooldown_days = settings.auth_username_change_cooldown_days
+            if cooldown_days > 0 and user.username_last_changed_at is not None:
+                next_allowed = user.username_last_changed_at + timedelta(days=cooldown_days)
+                if datetime.now(UTC) < next_allowed:
+                    raise HTTPException(
+                        status.HTTP_409_CONFLICT,
+                        detail=(f"Username can be changed again on {next_allowed.date().isoformat()}."),
+                    )
+            if new_username in _RESERVED_USERNAMES:
+                raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
+            if await _username_taken(session, username=new_username, exclude_user_id=user.id):
+                raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
+            user.username = new_username
+            user.username_last_changed_at = datetime.now(UTC)
     await session.flush()
     return await _user_out(session, user=user)
 
@@ -229,7 +322,17 @@ async def delete_me(session: AsyncSession, *, user: User, payload: DeleteMeReque
     if user.is_superuser and await _is_sole_active_superuser(session, user_id=user.id):
         raise HTTPException(
             status.HTTP_409_CONFLICT,
-            detail=("You are the only superuser. Promote another user before deleting this account."),
+            detail="You are the only superuser. Promote another user before deleting this account.",
+        )
+    # Guard B: refuse if user owns any Graph that has other members.
+    # The Graph.created_by_id FK is RESTRICT, so DB would error anyway — fail early with a clear message.
+    if await _owns_shared_graph(session, user_id=user.id):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail=(
+                "You own Graphs that have other members. Remove other members "
+                "or transfer admin before deleting this account."
+            ),
         )
     await session.delete(user)
 
@@ -243,158 +346,15 @@ async def _is_sole_active_superuser(session: AsyncSession, *, user_id: str) -> b
     return (await session.execute(stmt)).scalar_one() == 0
 
 
-# ---------------------------------------------------------------------------
-# Workspaces
-# ---------------------------------------------------------------------------
-
-
-async def create_workspace(session: AsyncSession, *, user: User, payload: WorkspaceCreateRequest) -> WorkspaceOut:
-    slug = payload.slug.lower()
-    existing = (await session.execute(select(Workspace).where(Workspace.slug == slug))).scalar_one_or_none()
-    if existing is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, detail="A workspace with this slug already exists.")
-    workspace = Workspace(name=payload.name.strip(), slug=slug, created_by_id=user.id)
-    session.add(workspace)
-    await session.flush()
-    session.add(WorkspaceMember(workspace_id=workspace.id, user_id=user.id, role=WorkspaceRole.admin))
-    await session.flush()
-    return WorkspaceOut.model_validate(workspace)
-
-
-async def list_my_workspaces(session: AsyncSession, *, user: User) -> list[WorkspaceOut]:
+async def _owns_shared_graph(session: AsyncSession, *, user_id: str) -> bool:
+    """True if the user owns any Graph with at least one OTHER member."""
     stmt = (
-        select(Workspace)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
-        .where(WorkspaceMember.user_id == user.id)
-        .order_by(Workspace.created_at.desc())
+        select(func.count())
+        .select_from(Graph)
+        .join(GraphMember, GraphMember.graph_id == Graph.id)
+        .where(Graph.created_by_id == user_id, GraphMember.user_id != user_id)
     )
-    rows = (await session.execute(stmt)).scalars().all()
-    return [WorkspaceOut.model_validate(w) for w in rows]
-
-
-async def list_workspace_members(session: AsyncSession, *, workspace_id: str) -> list[WorkspaceMemberOut]:
-    stmt = (
-        select(WorkspaceMember)
-        .where(WorkspaceMember.workspace_id == workspace_id)
-        .options(selectinload(WorkspaceMember.user))
-        .order_by(WorkspaceMember.created_at.asc())
-    )
-    return [
-        WorkspaceMemberOut(
-            user_id=m.user_id,
-            email=m.user.email,
-            first_name=m.user.first_name,
-            last_name=m.user.last_name,
-            role=m.role,
-            created_at=m.created_at,
-        )
-        for m in (await session.execute(stmt)).scalars().all()
-    ]
-
-
-async def update_workspace_member_role(
-    session: AsyncSession,
-    *,
-    workspace_id: str,
-    target_user_id: str,
-    payload: WorkspaceMemberRoleUpdate,
-) -> WorkspaceMemberOut:
-    member = await _get_membership(session, workspace_id=workspace_id, user_id=target_user_id)
-    if member is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Member not found.")
-    if (
-        member.role is WorkspaceRole.admin
-        and payload.role is not WorkspaceRole.admin
-        and await _is_sole_workspace_admin(session, workspace_id=workspace_id, user_id=target_user_id)
-    ):
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            detail="Cannot demote the only admin of this workspace.",
-        )
-    member.role = payload.role
-    await session.flush()
-    await session.refresh(member, ["user"])
-    return WorkspaceMemberOut(
-        user_id=member.user_id,
-        email=member.user.email,
-        first_name=member.user.first_name,
-        last_name=member.user.last_name,
-        role=member.role,
-        created_at=member.created_at,
-    )
-
-
-async def remove_workspace_member(session: AsyncSession, *, workspace_id: str, target_user_id: str) -> None:
-    member = await _get_membership(session, workspace_id=workspace_id, user_id=target_user_id)
-    if member is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Member not found.")
-    if member.role is WorkspaceRole.admin and await _is_sole_workspace_admin(
-        session, workspace_id=workspace_id, user_id=target_user_id
-    ):
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            detail="Cannot remove the only admin of this workspace.",
-        )
-    await session.delete(member)
-
-
-async def _is_sole_workspace_admin(session: AsyncSession, *, workspace_id: str, user_id: str) -> bool:
-    stmt = select(func.count()).where(
-        WorkspaceMember.workspace_id == workspace_id,
-        WorkspaceMember.role == WorkspaceRole.admin,
-        WorkspaceMember.user_id != user_id,
-    )
-    return (await session.execute(stmt)).scalar_one() == 0
-
-
-# ---------------------------------------------------------------------------
-# Invitations (workspace-scoped)
-# ---------------------------------------------------------------------------
-
-
-async def create_invitation(
-    session: AsyncSession,
-    *,
-    invited_by: User,
-    workspace_id: str,
-    payload: InvitationCreateRequest,
-) -> InvitationCreateResponse:
-    raw_token = generate_token()
-    expires_at = datetime.now(UTC) + timedelta(days=settings.auth_invitation_ttl_days)
-    invitation = Invitation(
-        token_hash=hash_token(raw_token),
-        email=payload.email.lower(),
-        workspace_id=workspace_id,
-        role=payload.role,
-        invited_by_id=invited_by.id,
-        expires_at=expires_at,
-    )
-    session.add(invitation)
-    await session.flush()
-
-    return InvitationCreateResponse(
-        id=invitation.id,
-        email=invitation.email,
-        workspace_id=invitation.workspace_id,
-        role=invitation.role,
-        invited_by_id=invitation.invited_by_id,
-        expires_at=invitation.expires_at,
-        accepted_at=invitation.accepted_at,
-        created_at=invitation.created_at,
-        redeem_url=_redeem_url(raw_token),
-    )
-
-
-async def list_workspace_invitations(session: AsyncSession, *, workspace_id: str) -> list[InvitationOut]:
-    stmt = select(Invitation).where(Invitation.workspace_id == workspace_id).order_by(Invitation.created_at.desc())
-    return [InvitationOut.model_validate(r) for r in (await session.execute(stmt)).scalars().all()]
-
-
-async def delete_invitation(session: AsyncSession, *, workspace_id: str, invitation_id: str) -> None:
-    invitation = await session.get(Invitation, invitation_id)
-    if invitation is None or invitation.workspace_id != workspace_id:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invitation not found.")
-    await session.delete(invitation)
+    return (await session.execute(stmt)).scalar_one() > 0
 
 
 # ---------------------------------------------------------------------------
@@ -407,10 +367,10 @@ async def _find_user_by_email(session: AsyncSession, email: str) -> User | None:
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
-async def _get_membership(session: AsyncSession, *, workspace_id: str, user_id: str) -> WorkspaceMember | None:
-    stmt = select(WorkspaceMember).where(
-        WorkspaceMember.workspace_id == workspace_id,
-        WorkspaceMember.user_id == user_id,
+async def _get_membership(session: AsyncSession, *, graph_id: str, user_id: str) -> GraphMember | None:
+    stmt = select(GraphMember).where(
+        GraphMember.graph_id == graph_id,
+        GraphMember.user_id == user_id,
     )
     return (await session.execute(stmt)).scalar_one_or_none()
 
@@ -418,11 +378,6 @@ async def _get_membership(session: AsyncSession, *, workspace_id: str, user_id: 
 async def _find_invitation_by_raw_token(session: AsyncSession, raw_token: str) -> Invitation | None:
     stmt = select(Invitation).where(Invitation.token_hash == hash_token(raw_token))
     return (await session.execute(stmt)).scalar_one_or_none()
-
-
-def _redeem_url(raw_token: str) -> str:
-    base = settings.studio_base_url.rstrip("/")
-    return f"{base}/register?invite={raw_token}"
 
 
 # ---------------------------------------------------------------------------
@@ -435,18 +390,24 @@ async def bootstrap_root(
     *,
     email: str,
     password: str,
+    username: str,
     first_name: str,
     last_name: str | None,
-    workspace_name: str,
-    workspace_slug: str,
-) -> tuple[User, Workspace]:
-    """Create the root superuser + their personal workspace + admin membership.
+) -> User:
+    """Create the root superuser. Does NOT create a personal Graph (RFC-017).
 
     Idempotent guard at the call site: refuse if any superuser already exists.
     """
+    normalized_username = _validate_username_format(username)
+    if normalized_username in _RESERVED_USERNAMES:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
+    if await _username_taken(session, username=normalized_username):
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
+
     password_hash = hash_password(password)
     user = User(
         email=email.lower(),
+        username=normalized_username,
         password_hash=password_hash,
         first_name=first_name.strip(),
         last_name=(last_name.strip() if last_name else None) or None,
@@ -455,20 +416,31 @@ async def bootstrap_root(
     )
     session.add(user)
     await session.flush()
-
-    workspace = Workspace(
-        name=workspace_name.strip(),
-        slug=workspace_slug.lower(),
-        created_by_id=user.id,
-    )
-    session.add(workspace)
-    await session.flush()
-
-    session.add(WorkspaceMember(workspace_id=workspace.id, user_id=user.id, role=WorkspaceRole.admin))
-    await session.flush()
-    return user, workspace
+    return user
 
 
 async def any_superuser_exists(session: AsyncSession) -> bool:
     stmt = select(func.count(User.id)).where(User.is_superuser.is_(True))
     return (await session.execute(stmt)).scalar_one() > 0
+
+
+# ---------------------------------------------------------------------------
+# Shared invitation helpers — used by graphs/services.py for create-invitation
+# ---------------------------------------------------------------------------
+
+
+def make_invitation_expiry() -> datetime:
+    return datetime.now(UTC) + timedelta(days=settings.auth_invitation_ttl_days)
+
+
+def new_invitation_raw_token() -> str:
+    return generate_token()
+
+
+def invitation_token_hash(raw: str) -> str:
+    return hash_token(raw)
+
+
+def studio_redeem_url(raw_token: str) -> str:
+    base = settings.studio_base_url.rstrip("/")
+    return f"{base}/register?invite={raw_token}"

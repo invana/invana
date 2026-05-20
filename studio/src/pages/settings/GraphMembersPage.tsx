@@ -13,38 +13,42 @@ import { Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { ApiError } from "../../services/api/client";
-import { workspacesApi } from "../../services/api/workspaces";
-import type { WorkspaceRole } from "../../types/auth";
+import { graphMembershipApi } from "../../services/api/graph-membership";
+import type { GraphRole } from "../../types/auth";
 
-export function WorkspaceMembersPage() {
-	const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
-	const { user, membershipForSlug } = useAuth();
+export function GraphMembersPage() {
+	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { user, membershipForGraph, rolesForGraph } = useAuth();
 	const qc = useQueryClient();
 
-	const membership = membershipForSlug(workspaceSlug);
-	const wid = membership?.workspace_id ?? "";
+	const membership = membershipForGraph(username, slug);
+	const { isAdmin: isAdminHere } = rolesForGraph(username, slug);
 
 	const { data: members, isLoading } = useQuery({
-		queryKey: ["workspace", wid, "members"],
-		queryFn: () => workspacesApi.listMembers(wid),
-		enabled: !!wid,
+		queryKey: ["graph", username, slug, "members"],
+		queryFn: () =>
+			graphMembershipApi.listMembers(username as string, slug as string),
+		enabled: !!username && !!slug && !!membership,
 	});
 
-	if (!workspaceSlug) return <Navigate to="/" replace />;
+	if (!username || !slug) return <Navigate to="/" replace />;
 	if (!membership) {
 		return (
 			<div className="p-8 text-muted-foreground">
-				You aren&apos;t a member of this workspace.
+				You aren&apos;t a member of this Graph.
 			</div>
 		);
 	}
 
-	const isAdminHere = membership.role === "admin";
-
-	async function onRoleChange(userId: string, role: WorkspaceRole) {
+	async function onRoleChange(userId: string, role: GraphRole) {
 		try {
-			await workspacesApi.updateMemberRole(wid, userId, role);
-			qc.invalidateQueries({ queryKey: ["workspace", wid, "members"] });
+			await graphMembershipApi.updateMemberRole(
+				username as string,
+				slug as string,
+				userId,
+				role,
+			);
+			qc.invalidateQueries({ queryKey: ["graph", username, slug, "members"] });
 			toast.success("Role updated.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Update failed.");
@@ -53,8 +57,12 @@ export function WorkspaceMembersPage() {
 
 	async function onRemove(userId: string) {
 		try {
-			await workspacesApi.removeMember(wid, userId);
-			qc.invalidateQueries({ queryKey: ["workspace", wid, "members"] });
+			await graphMembershipApi.removeMember(
+				username as string,
+				slug as string,
+				userId,
+			);
+			qc.invalidateQueries({ queryKey: ["graph", username, slug, "members"] });
 			toast.success("Member removed.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Removal failed.");
@@ -67,13 +75,13 @@ export function WorkspaceMembersPage() {
 				<h1 className="text-2xl font-semibold">
 					Members &mdash;{" "}
 					<span className="text-muted-foreground font-normal">
-						{membership.workspace_name}
+						{membership.graph_name}
 					</span>
 				</h1>
-				<p className="text-muted-foreground text-sm">
+				<p className="text-muted-foreground text-base">
 					{isAdminHere
-						? "Manage roles and remove members from this workspace."
-						: "All members in this workspace."}
+						? "Manage roles and remove members from this Graph."
+						: "All members in this Graph."}
 				</p>
 			</header>
 
@@ -82,10 +90,11 @@ export function WorkspaceMembersPage() {
 			) : !members || members.length === 0 ? (
 				<div className="text-muted-foreground italic">No members.</div>
 			) : (
-				<table className="w-full text-sm">
+				<table className="w-full text-base">
 					<thead className="text-left text-muted-foreground border-b">
 						<tr>
 							<th className="py-2">Name</th>
+							<th className="py-2">@username</th>
 							<th className="py-2">Email</th>
 							<th className="py-2">Role</th>
 							<th />
@@ -102,18 +111,19 @@ export function WorkspaceMembersPage() {
 									<td className="py-2">
 										{display}
 										{isSelf && (
-											<span className="text-muted-foreground ml-2 text-xs">
+											<span className="text-muted-foreground ml-2 text-base">
 												(you)
 											</span>
 										)}
 									</td>
+									<td className="py-2 text-muted-foreground">@{m.username}</td>
 									<td className="py-2 text-muted-foreground">{m.email}</td>
 									<td className="py-2">
 										{isAdminHere && !isSelf ? (
 											<Select
 												value={m.role}
 												onValueChange={(v) =>
-													onRoleChange(m.user_id, v as WorkspaceRole)
+													onRoleChange(m.user_id, v as GraphRole)
 												}
 											>
 												<SelectTrigger className="w-32 h-8">

@@ -43,8 +43,8 @@ export function LoginPage() {
 						I
 					</div>
 					<h1 className="text-2xl font-semibold">Sign in to Invana</h1>
-					<p className="text-muted-foreground text-sm">
-						Use the credentials your workspace admin sent you.
+					<p className="text-muted-foreground text-base">
+						Use the credentials your Graph admin sent you.
 					</p>
 				</div>
 				<form className="space-y-4" onSubmit={handleSubmit}>

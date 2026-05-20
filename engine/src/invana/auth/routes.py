@@ -1,44 +1,46 @@
-"""HTTP routes for /api/v1/auth/* and /api/v1/workspaces/*."""
+"""HTTP routes for /api/v1/auth/*.
+
+Graph-scoped routes (members, invitations, connection) live in
+:mod:`invana.graphs.routes`.
+"""
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth import services
-from invana.auth.deps import (
-    get_current_user,
-    require_workspace_admin,
-    require_workspace_member,
-)
-from invana.auth.models import User, WorkspaceMember
+from invana.auth.deps import get_current_user
+from invana.auth.models import User
 from invana.auth.schemas import (
     AuthResponse,
     ChangePasswordRequest,
     DeleteMeRequest,
-    InvitationCreateRequest,
-    InvitationCreateResponse,
-    InvitationOut,
     LoginRequest,
     LogoutRequest,
     MePatchRequest,
     RefreshRequest,
     RegisterRequest,
+    UsernameAvailabilityResponse,
     UserOut,
-    WorkspaceCreateRequest,
-    WorkspaceMemberOut,
-    WorkspaceMemberRoleUpdate,
-    WorkspaceOut,
 )
 from invana.db import get_session
 
 auth_router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
-workspaces_router = APIRouter(prefix="/api/v1/workspaces", tags=["workspaces"])
 
 
-# ---------------------------------------------------------------------------
-# /api/v1/auth — registration, login, refresh, logout, me
-# ---------------------------------------------------------------------------
+@auth_router.get("/username-available", response_model=UsernameAvailabilityResponse)
+async def username_available(
+    username: str = Query(..., min_length=1, max_length=128),
+    session: AsyncSession = Depends(get_session),
+) -> UsernameAvailabilityResponse:
+    """Advisory check used by Studio's live-availability indicator.
+
+    Unauthenticated. Final uniqueness is enforced at register / PATCH time —
+    clients must not treat ``available=true`` as a reservation. The endpoint
+    is rate-limited per IP at the gateway layer (see settings).
+    """
+    return await services.check_username_availability(session, raw=username)
 
 
 @auth_router.post("/register", response_model=AuthResponse)
@@ -114,123 +116,4 @@ async def delete_me(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-# ---------------------------------------------------------------------------
-# /api/v1/workspaces — list, create
-# ---------------------------------------------------------------------------
-
-
-@workspaces_router.get("", response_model=list[WorkspaceOut])
-async def list_workspaces(
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> list[WorkspaceOut]:
-    return await services.list_my_workspaces(session, user=user)
-
-
-@workspaces_router.post("", response_model=WorkspaceOut, status_code=status.HTTP_201_CREATED)
-async def create_workspace(
-    payload: WorkspaceCreateRequest,
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> WorkspaceOut:
-    out = await services.create_workspace(session, user=user, payload=payload)
-    await session.commit()
-    return out
-
-
-# ---------------------------------------------------------------------------
-# /api/v1/workspaces/{workspace_id}/members
-# ---------------------------------------------------------------------------
-
-
-@workspaces_router.get("/{workspace_id}/members", response_model=list[WorkspaceMemberOut])
-async def list_members(
-    workspace_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_member),
-    session: AsyncSession = Depends(get_session),
-) -> list[WorkspaceMemberOut]:
-    return await services.list_workspace_members(session, workspace_id=workspace_id)
-
-
-@workspaces_router.patch("/{workspace_id}/members/{user_id}", response_model=WorkspaceMemberOut)
-async def update_member_role(
-    payload: WorkspaceMemberRoleUpdate,
-    workspace_id: str = Path(...),
-    user_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_admin),
-    session: AsyncSession = Depends(get_session),
-) -> WorkspaceMemberOut:
-    out = await services.update_workspace_member_role(
-        session,
-        workspace_id=workspace_id,
-        target_user_id=user_id,
-        payload=payload,
-    )
-    await session.commit()
-    return out
-
-
-@workspaces_router.delete("/{workspace_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_member(
-    workspace_id: str = Path(...),
-    user_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_admin),
-    session: AsyncSession = Depends(get_session),
-) -> Response:
-    await services.remove_workspace_member(session, workspace_id=workspace_id, target_user_id=user_id)
-    await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-# ---------------------------------------------------------------------------
-# /api/v1/workspaces/{workspace_id}/invitations
-# ---------------------------------------------------------------------------
-
-
-@workspaces_router.post(
-    "/{workspace_id}/invitations",
-    response_model=InvitationCreateResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_invitation(
-    payload: InvitationCreateRequest,
-    workspace_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_admin),
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> InvitationCreateResponse:
-    out = await services.create_invitation(
-        session,
-        invited_by=user,
-        workspace_id=workspace_id,
-        payload=payload,
-    )
-    await session.commit()
-    return out
-
-
-@workspaces_router.get("/{workspace_id}/invitations", response_model=list[InvitationOut])
-async def list_invitations(
-    workspace_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_admin),
-    session: AsyncSession = Depends(get_session),
-) -> list[InvitationOut]:
-    return await services.list_workspace_invitations(session, workspace_id=workspace_id)
-
-
-@workspaces_router.delete(
-    "/{workspace_id}/invitations/{invitation_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-async def delete_invitation(
-    workspace_id: str = Path(...),
-    invitation_id: str = Path(...),
-    _: WorkspaceMember = Depends(require_workspace_admin),
-    session: AsyncSession = Depends(get_session),
-) -> Response:
-    await services.delete_invitation(session, workspace_id=workspace_id, invitation_id=invitation_id)
-    await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-__all__ = ["auth_router", "workspaces_router"]
+__all__ = ["auth_router"]

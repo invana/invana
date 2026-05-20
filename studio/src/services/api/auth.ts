@@ -1,7 +1,21 @@
-import type { AuthResponse, AuthUser, WorkspaceRole } from "../../types/auth";
+import type {
+	AuthResponse,
+	AuthUser,
+	UsernameAvailabilityResponse,
+} from "../../types/auth";
 import { apiClient } from "./client";
 
 export const authApi = {
+	usernameAvailable: async (username: string) =>
+		(
+			await apiClient.get<UsernameAvailabilityResponse>(
+				"/api/v1/auth/username-available",
+				{
+					params: { username },
+				},
+			)
+		).data,
+
 	login: async (email: string, password: string) =>
 		(
 			await apiClient.post<AuthResponse>("/api/v1/auth/login", {
@@ -12,7 +26,12 @@ export const authApi = {
 
 	register: async (
 		invite: string,
-		body: { first_name: string; last_name: string | null; password: string },
+		body: {
+			first_name: string;
+			last_name: string | null;
+			username: string;
+			password: string;
+		},
 	) =>
 		(
 			await apiClient.post<AuthResponse>(
@@ -32,6 +51,7 @@ export const authApi = {
 	patchMe: async (body: {
 		first_name?: string;
 		last_name?: string | null;
+		username?: string;
 	}) => (await apiClient.patch<AuthUser>("/api/v1/auth/me", body)).data,
 
 	changePassword: async (current_password: string, new_password: string) => {
@@ -46,4 +66,4 @@ export const authApi = {
 	},
 };
 
-export type { WorkspaceRole };
+export type { GraphRole } from "../../types/auth";

@@ -1,30 +1,22 @@
 """SQLAlchemy async models for Layer 1 — Identity & Access.
 
-Role model
-----------
-Role is **workspace-scoped**, not user-scoped. The same user can be ``admin``
-of their personal workspace and ``developer`` (or ``analyst``) in another
-workspace they were invited to collaborate in.
+Identity (User + RefreshToken) lives here. Graph-scoped membership and
+invitations live in :mod:`invana.graphs.models` alongside the Graph
+container and GraphConnection per RFC-017.
 
-- ``users``                — first-class authenticated principal. No role here.
-                             ``is_superuser`` is the platform-level flag
-                             (gates starlette-admin and DB-level operations).
-- ``workspaces``           — the unit role attaches to. ``invana init``
-                             creates the root user's personal workspace.
-- ``workspace_members``    — (workspace, user) -> role. Composite PK.
-- ``invitations``          — single-use, workspace-scoped registration token.
-                             Joining a workspace via invitation creates the
-                             membership row (and, if needed, a new user).
-- ``refresh_tokens``       — opaque, hashed refresh-token store.
+- ``users``           — authenticated principal. Carries ``username`` (URL
+                        identity, globally unique) plus ``email`` (login
+                        identity). ``is_superuser`` is the platform-level
+                        flag (gates starlette-admin and DB-level ops).
+- ``refresh_tokens``  — opaque, hashed refresh-token store.
 """
 
 from __future__ import annotations
 
-import enum
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.modeller.models import Base
@@ -38,92 +30,34 @@ def _new_id() -> str:
     return str(uuid.uuid4())
 
 
-class WorkspaceRole(enum.StrEnum):
-    """Per-workspace role. See layer-1-identity-access.md."""
-
-    developer = "developer"
-    analyst = "analyst"
-    admin = "admin"
-
-
-# Single shared Enum definition. `create_type=False` everywhere — the migration
-# creates the PG type exactly once.
-_workspace_role_enum = Enum(
-    WorkspaceRole,
-    name="workspace_role",
-    values_callable=lambda x: [m.value for m in x],
-    create_type=False,
-)
-
-
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False, index=True)
+    # URL identity. Lowercase + digits + hyphen, 2-64, no leading/trailing/consecutive hyphens.
+    # All graph-scoped URLs live under /u/{username}/{slug}, so usernames cannot collide
+    # with Studio top-level routes (RFC-017). Globally unique, case-insensitive (stored lowercase).
+    username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     first_name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     # Platform-level superuser flag. Gates starlette-admin. Set ONLY by
-    # `invana init` for the root user. Has no bearing on workspace-level roles.
+    # `invana init` for the root user. Has no bearing on graph-level roles.
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # Stamp set on every username change; enforces auth_username_change_cooldown_days.
+    username_last_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
     )
 
     refresh_tokens: Mapped[list[RefreshToken]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    memberships: Mapped[list[WorkspaceMember]] = relationship(back_populates="user", cascade="all, delete-orphan")
-
-
-class Workspace(Base):
-    __tablename__ = "workspaces"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    created_by_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    memberships: Mapped[list[GraphMember]] = relationship(  # noqa: F821 — forward ref resolved via SQLAlchemy registry
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
-    )
-
-    members: Mapped[list[WorkspaceMember]] = relationship(back_populates="workspace", cascade="all, delete-orphan")
-
-
-class WorkspaceMember(Base):
-    __tablename__ = "workspace_members"
-
-    workspace_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("workspaces.id", ondelete="CASCADE"), primary_key=True
-    )
-    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    role: Mapped[WorkspaceRole] = mapped_column(_workspace_role_enum, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
-
-    workspace: Mapped[Workspace] = relationship(back_populates="members")
-    user: Mapped[User] = relationship(back_populates="memberships")
-
-
-class Invitation(Base):
-    __tablename__ = "invitations"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(String(320), nullable=False, index=True)
-    workspace_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
-    )
-    role: Mapped[WorkspaceRole] = mapped_column(_workspace_role_enum, nullable=False)
-    invited_by_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
 
 class RefreshToken(Base):

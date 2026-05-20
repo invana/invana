@@ -1,4 +1,9 @@
-"""Pydantic request and response models for the Graph API."""
+"""Pydantic request and response models for the GraphConnection API.
+
+These shapes back the legacy ``/api/v1/graph-connections/*`` surface
+(formerly ``/api/v1/graphs/*``). S2 will replace this with Graph-scoped
+connection routes under ``/u/{username}/{slug}/connection``.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from invana.graph.types.data_elements import GraphResponse
 
 
-class GraphCreate(BaseModel):
+class GraphConnectionCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: str = Field(default="")
     uri: str = Field(..., min_length=1, max_length=2048)
@@ -18,7 +23,7 @@ class GraphCreate(BaseModel):
     read_only: bool = False
 
 
-class GraphUpdate(BaseModel):
+class GraphConnectionUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     uri: str | None = Field(default=None, min_length=1, max_length=2048)
@@ -27,10 +32,11 @@ class GraphUpdate(BaseModel):
     # connector_class is intentionally excluded — immutable once schema is seeded
 
 
-class GraphRead(BaseModel):
+class GraphConnectionRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    graph_id: str | None
     name: str
     description: str
     uri: str
@@ -45,8 +51,8 @@ class GraphRead(BaseModel):
     # auth_encrypted is intentionally excluded — credentials are never returned
 
 
-class GraphListResponse(BaseModel):
-    items: list[GraphRead]
+class GraphConnectionListResponse(BaseModel):
+    items: list[GraphConnectionRead]
     total: int
 
 
@@ -63,3 +69,10 @@ class QueryResponse(BaseModel):
     rows: list[dict] | None = None  # raw rows when result_type="tabular"
     execution_time_ms: int
     row_count: int
+
+
+# Back-compat aliases — let importers migrate at their own pace.
+GraphCreate = GraphConnectionCreate
+GraphUpdate = GraphConnectionUpdate
+GraphRead = GraphConnectionRead
+GraphListResponse = GraphConnectionListResponse

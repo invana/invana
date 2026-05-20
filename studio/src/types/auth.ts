@@ -1,21 +1,24 @@
-/** Shared auth + workspace types. Must mirror engine schemas. */
+/** Shared auth + graph membership types. Must mirror engine schemas (RFC-017). */
 
-export type WorkspaceRole = "developer" | "analyst" | "admin";
+export type GraphRole = "developer" | "analyst" | "admin";
 
-export interface WorkspaceMembership {
-	workspace_id: string;
-	workspace_name: string;
-	workspace_slug: string;
-	role: WorkspaceRole;
+export interface GraphMembership {
+	graph_id: string;
+	graph_name: string;
+	graph_slug: string;
+	owner_username: string;
+	role: GraphRole;
 }
 
 export interface AuthUser {
 	id: string;
 	email: string;
+	username: string;
 	first_name: string;
 	last_name: string | null;
 	is_superuser: boolean;
-	workspaces: WorkspaceMembership[];
+	username_last_changed_at: string | null;
+	graphs: GraphMembership[];
 }
 
 export interface AuthResponse {
@@ -25,29 +28,21 @@ export interface AuthResponse {
 	token_type: string;
 }
 
-export interface Workspace {
-	id: string;
-	name: string;
-	slug: string;
-	created_by_id: string | null;
-	created_at: string;
-	updated_at: string;
-}
-
-export interface WorkspaceMember {
+export interface GraphMember {
 	user_id: string;
+	username: string;
 	email: string;
 	first_name: string;
 	last_name: string | null;
-	role: WorkspaceRole;
+	role: GraphRole;
 	created_at: string;
 }
 
 export interface Invitation {
 	id: string;
 	email: string;
-	workspace_id: string;
-	role: WorkspaceRole;
+	graph_id: string;
+	role: GraphRole;
 	invited_by_id: string | null;
 	expires_at: string;
 	accepted_at: string | null;
@@ -56,4 +51,9 @@ export interface Invitation {
 
 export interface InvitationCreateResponse extends Invitation {
 	redeem_url: string;
+}
+
+export interface UsernameAvailabilityResponse {
+	available: boolean;
+	reason?: "taken" | "reserved" | "invalid_format";
 }

@@ -3,6 +3,9 @@
  * per mvp.md). The store also wires itself into the axios client via
  * registerAuthAccess so the interceptors can read/refresh tokens without
  * a circular import.
+ *
+ * Per RFC-017 the active Graph is derived from the URL (/u/:username/:slug),
+ * not from session state. The store therefore tracks only the user + tokens.
  */
 
 import { create } from "zustand";
@@ -14,7 +17,6 @@ interface AuthState {
 	user: AuthUser | null;
 	accessToken: string | null;
 	refreshToken: string | null;
-	activeWorkspaceId: string | null;
 	hydrated: boolean;
 	setSession: (params: {
 		user: AuthUser;
@@ -23,7 +25,6 @@ interface AuthState {
 	}) => void;
 	setTokens: (params: { accessToken: string; refreshToken: string }) => void;
 	setUser: (user: AuthUser) => void;
-	setActiveWorkspaceId: (id: string | null) => void;
 	clear: () => void;
 }
 
@@ -35,33 +36,17 @@ export const useAuthStore = create<AuthState>()(
 			user: null,
 			accessToken: null,
 			refreshToken: null,
-			activeWorkspaceId: null,
 			hydrated: false,
 			setSession: ({ user, accessToken, refreshToken }) =>
-				set({
-					user,
-					accessToken,
-					refreshToken,
-					activeWorkspaceId: user.workspaces[0]?.workspace_id ?? null,
-				}),
+				set({ user, accessToken, refreshToken }),
 			setTokens: ({ accessToken, refreshToken }) =>
 				set({ accessToken, refreshToken }),
-			setUser: (user) =>
-				set((s) => ({
-					user,
-					activeWorkspaceId:
-						s.activeWorkspaceId &&
-						user.workspaces.some((w) => w.workspace_id === s.activeWorkspaceId)
-							? s.activeWorkspaceId
-							: (user.workspaces[0]?.workspace_id ?? null),
-				})),
-			setActiveWorkspaceId: (id) => set({ activeWorkspaceId: id }),
+			setUser: (user) => set({ user }),
 			clear: () =>
 				set({
 					user: null,
 					accessToken: null,
 					refreshToken: null,
-					activeWorkspaceId: null,
 				}),
 		}),
 		{

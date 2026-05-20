@@ -1,6 +1,6 @@
 # MVP — Implementation Checklist
 
-Practical, build-ordered MVP scope derived from `docs/system-design.md`. Grouped by the 8-layer OS model. Each item is a unit of work — not a sentence, not an RFC. RFC links where the design already exists; `TBD` otherwise.
+Practical, build-ordered MVP scope derived from `docs/system-design.md`. Grouped by layer. Each item is a unit of work — not a sentence, not an RFC. RFC links where the design already exists; `TBD` otherwise.
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` deferred post-1.0
 
@@ -14,31 +14,41 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 
 `N/A` is a legitimate value — say it explicitly so a future reader doesn't assume an omission is an oversight. When BE and FE are built in lockstep, this triplet is also the per-slice contract surface.
 
+## Architecture summary (RFC-017)
+
+The MVP container model is **`User → Graph (1:1 GraphConnection)`**. There is no Workspace and no Mission entity — both are folded into `Graph`. `Graph` carries members, invitations, the DB connection (1:1), schema, intent/objectives, datasets, skills, instructions, LLM bindings, and agents.
+
+All graph-scoped URLs are namespaced under `/u/:username/:slug/...`. Users have a globally unique `username`; `graphs.slug` is unique per owner.
+
+A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills / Datasets) before all analytical features unlock — see § 2.2.
+
 ---
 
 ## Layer 1 — Identity & Access
 
-**Implemented in Slice S1** — full design in [`docs/internal/mvp/layer-1-identity-access.md`](mvp/layer-1-identity-access.md).
+**Shipped in Slice S1** under prior Workspace nomenclature — full design in [`docs/internal/mvp/layer-1-identity-access.md`](mvp/layer-1-identity-access.md).
+
+> **Rename pending (RFC-017).** Behaviors below are implemented; the **Workspace → Graph** rename + **username** addition + **removal of auto-created personal workspace** from `invana init` is the active work in Slice S1.5. Items show their target post-rename shape.
 
 ### 1.1 User auth (register, login, refresh, logout, me + patch + password + delete-self)
-- **Backend:** [x] `User` model · bcrypt hashing (passlib + `bcrypt<5` pin) · `/api/v1/auth/register` (invite-gated) · `/login` · `/refresh` (rotates refresh token) · `/logout` · `/me` (GET) · `/me` (PATCH first/last name) · `/me/password` (revokes all this user's refresh tokens) · `/me` (DELETE with sole-superuser guard) · HS256 access JWT (15m), opaque server-side refresh token (7d) · `get_current_user` dep
-- **Frontend:** [x] `LoginPage` · `RegisterPage` (invite-redeem) · `ProfileSettingsPage` with tabs (Basic info · Password · Danger zone) · `stores/auth.store.ts` (Zustand, persisted) · axios interceptor (attach Bearer, single-flight refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
+- **Backend:** [~] `User` model · bcrypt hashing (passlib + `bcrypt<5` pin) · `/api/v1/auth/register` (invite-gated) · `/login` · `/refresh` (rotates refresh token) · `/logout` · `/me` (GET) · `/me` (PATCH first/last name + username) · `/me/password` (revokes all this user's refresh tokens) · `/me` (DELETE with sole-superuser guard) · `GET /api/v1/auth/username-available?username=foo` (unauthenticated; returns `{available: bool, reason?: string}`) · HS256 access JWT (15m), opaque server-side refresh token (7d) · `get_current_user` dep — **add `users.username`** (globally unique, validated lowercase `[a-z0-9-]`, 2–64 chars, mutable with rate-limit; collected at registration)
+- **Frontend:** [~] `LoginPage` · `RegisterPage` (invite-redeem) — **add username field**; `ProfileSettingsPage` with tabs (Basic info · Password · Danger zone) — **add username edit in Basic info with cooldown indicator**; `stores/auth.store.ts` (Zustand, persisted) · axios interceptor (attach Bearer, single-flight refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
 - **Integrations:** `passlib[bcrypt]` · `bcrypt<5` (passlib 1.7.4 wrap-bug guard) · `PyJWT` · `pydantic[email]` · `itsdangerous` (SessionMiddleware) · browser `localStorage` (HttpOnly cookies deferred)
 
 ### 1.2 CLI bootstrap
-- **Backend:** [x] `invana init` command (Click) — prompts for first name (required), last name (optional), email, password+confirm; creates root user with `is_superuser=True` + a personal workspace (slug derived from first name) + admin membership; idempotent (refuses if any superuser exists); also supports `--non-interactive` with flags for CI
-- **Frontend:** [x] Existing `LoginPage` is the first-login surface — no separate first-login flow needed
+- **Backend:** [~] `invana init` command (Click) — prompts for **username (required, validated)**, first name (required), last name (optional), email, password+confirm; creates root user with `is_superuser=True`; idempotent (refuses if any superuser exists); also supports `--non-interactive` with flags for CI. **No personal Graph is auto-created** — the user creates their first Graph manually after login.
+- **Frontend:** [~] Existing `LoginPage` is the first-login surface; on first login the user lands on an empty `/graphs` list and is prompted to create their first Graph.
 - **Integrations:** `click` (existing)
 
-### 1.3 Invitations (workspace-scoped)
-- **Backend:** [x] `Invitation` entity carries `workspace_id` + `role` + `token_hash` (sha256) · `POST /api/v1/workspaces/{wid}/invitations` (admin only; returns one-shot `redeem_url`) · `GET /workspaces/{wid}/invitations` · `DELETE /workspaces/{wid}/invitations/{id}` · `POST /auth/register?invite=<token>` accept path attaches the user as a `WorkspaceMember` with the invitation's role
-- **Frontend:** [x] `/workspaces/:workspaceSlug/settings/invitations` page (admin only) — issue dialog shows the redeem URL once with a copy button; per-row revoke; `RegisterPage` reads `?invite=<token>`
+### 1.3 Invitations (graph-scoped)
+- **Backend:** [~] `Invitation` entity carries `graph_id` + `role` + `token_hash` (sha256) · `POST /api/v1/u/{username}/{slug}/invitations` (admin only; returns one-shot `redeem_url`) · `GET .../invitations` · `DELETE .../invitations/{id}` · `POST /auth/register?invite=<token>` accept path attaches the user as a `GraphMember` with the invitation's role
+- **Frontend:** [~] `/u/:username/:slug/settings/invitations` page (admin only) — issue dialog shows the redeem URL once with a copy button; per-row revoke; `RegisterPage` reads `?invite=<token>`
 - **Integrations:** email send is **deferred** for MVP — invitation URLs are copy-pasted
 
-### 1.4 Roles (workspace-scoped)
-- **Role is workspace-scoped, not user-scoped.** Role lives on `workspace_members.role` enum (`developer` | `analyst` | `admin`). Platform-level admin is `users.is_superuser` (gates `/admin`). The same user can be `admin` of their personal workspace and `developer` of another. See `docs/internal/mvp/layer-1-identity-access.md` for the full role matrix.
-- **Backend:** [x] `workspaces` + `workspace_members` tables · `workspace_role` enum · `get_workspace_membership` dep · `require_workspace_admin` / `require_workspace_builder` / `require_workspace_member` deps · `require_superuser` dep
-- **Frontend:** [x] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership`, `membershipForSlug` · `RoleGate` component for conditional UI
+### 1.4 Roles (graph-scoped)
+- **Role is graph-scoped, not user-scoped.** Role lives on `graph_members.role` enum (`developer` | `analyst` | `admin`). Platform-level admin is `users.is_superuser` (gates `/admin`). The same user can be `admin` of one Graph and `developer` of another. See `docs/internal/mvp/layer-1-identity-access.md` for the full role matrix.
+- **Backend:** [~] `graphs` + `graph_members` tables · `graph_role` enum · `get_graph_membership` dep · `require_graph_admin` / `require_graph_builder` / `require_graph_member` deps · `require_superuser` dep
+- **Frontend:** [~] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership`, `membershipForGraph(username, slug)` · `RoleGate` component for conditional UI
 - **Integrations:** none
 
 ### 1.5 Admin UI gating
@@ -46,75 +56,76 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 - **Frontend:** [x] App-shell dropdown shows "Platform admin" link only to superusers (uses `RoleGate require="superuser"`)
 - **Integrations:** `starlette-admin` · `itsdangerous` (SessionMiddleware signing)
 
-### 1.6 Workspaces
-- **Backend:** [x] `Workspace` entity (`name`, `slug` unique global, `created_by_id`) · `POST /api/v1/workspaces` (any authenticated user; creator becomes admin) · `GET /workspaces` (returns workspaces the caller is a member of) · `GET /workspaces/{wid}/members` · `PATCH /workspaces/{wid}/members/{user_id}` (admin only; sole-admin demotion guard → 409) · `DELETE /workspaces/{wid}/members/{user_id}` (admin only; sole-admin removal guard → 409)
-- **Frontend:** [x] `/workspaces/:workspaceSlug/settings/members` page · slug-scoped URLs throughout · workspace name shown in app-shell header
-- **Integrations:** none
-- **Deferred (post-S1):** [-] Workspace edit/delete endpoints · [-] Workspace switcher UI (current Studio derives active workspace from the session) · [-] Promote/demote endpoints separate from PATCH member role
-
-### 1.7 Account self-service (Profile settings)
-- **Backend:** [x] `PATCH /auth/me` (first/last name) · `POST /auth/me/password` (verifies current; rotates all refresh tokens on success) · `DELETE /auth/me` (verifies password; refuses if user is the sole active superuser → 409; otherwise hard-deletes — cascade downward)
-- **Frontend:** [x] `/settings/profile` with three tabs: **Basic info** (email read-only · first/last name editable), **Password** (current + new + confirm), **Danger zone** (delete account with email + password confirmation dialog and cascade preview)
+### 1.6 Account self-service (Profile settings)
+- **Backend:** [~] `PATCH /auth/me` (first/last name, **username** — rate-limited) · `POST /auth/me/password` (verifies current; rotates all refresh tokens on success) · `DELETE /auth/me` (verifies password; refuses if user is the sole active superuser → 409; refuses if user owns any Graph with other members → 409; otherwise hard-deletes — cascade downward)
+- **Frontend:** [~] `/settings/profile` with three tabs: **Basic info** (email read-only · username editable with cooldown · first/last name editable), **Password** (current + new + confirm), **Danger zone** (delete account with email + password confirmation dialog and cascade preview)
 - **Integrations:** none
 
-### 1.8 Admin model browser
-- **Backend:** [x] starlette-admin model views for `Users` · `Workspaces` · `WorkspaceMembers` · `Invitations` · `RefreshTokens`. Sensitive columns (`password_hash`, `token_hash`) deliberately excluded from `fields` so they aren't shown or editable. Tightened mutability: Users disable create; Invitations disable create + edit (delete = revoke); RefreshTokens disable create + edit (delete = manual revoke).
+### 1.7 Admin model browser
+- **Backend:** [~] starlette-admin model views for `Users` (with username column) · `Graphs` · `GraphConnections` · `GraphMembers` · `Invitations` · `RefreshTokens`. Sensitive columns (`password_hash`, `token_hash`, `auth_encrypted`) deliberately excluded from `fields` so they aren't shown or editable. Tightened mutability: Users disable create; Invitations disable create + edit (delete = revoke); RefreshTokens disable create + edit (delete = manual revoke).
 - **Frontend:** N/A — starlette-admin renders its own UI
 - **Integrations:** `starlette-admin` (existing)
 
-## Layer 2 — Workspace registries
+---
 
-Per-workspace registries (introduced as a workspace concern by L1.6): defined once **per workspace**, bound into many missions inside that workspace. "Global" in the original draft meant "global to a workspace," not "global to the platform" — clarified now that workspaces are first-class.
+## Layer 2 — Graph (container + settings)
 
-### 2.1 Connectors registry (graph DB drivers only in MVP)
-- **Backend:** [ ] Existing connectors at `engine/src/invana/graph/connectors/` for Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph (RFC-001) — these are **query drivers**, not source-ingestion connectors
-- **Frontend:** [ ] Existing `GraphConnectionForm` in Studio
-- **Integrations:** `neo4j` (driver) · `gremlinpython` · per-driver native libs already in `integrations/invana-{db}/`
-- **Deferred (post-MVP):** [-] Source-ingestion connectors (PDF / DOCX / XLSX / CSV / TXT / Git / MySQL) — datasets are produced externally in MVP, see L4 · [-] Connector plugin interface · [-] Custom connector registration
+The Graph is the unit of work. It carries everything previously split across Workspace and Mission: identity (slug + owner + members), the DB binding (1:1 `GraphConnection`), intent + objectives, and the analytical bindings (Skills, Instructions, LLM providers, Agents). Membership comes from Layer 1.
 
-### 2.2 Skills registry
-- **Backend:** [ ] `Skill` entity — `name`, `description`, `content` (markdown), `when_to_use` · CRUD routes
-- **Frontend:** [ ] `SkillsListPage` · `SkillEditorPage` with markdown editor · `useSkills` hook
+### 2.1 Graph entity + CRUD
+- **Backend:** [ ] `Graph` entity — `name`, `slug` (unique per `created_by_id`), `intent` (markdown, required at creation), `description`, `objectives`, `success_criteria`, `status` (`active` | `archived`), `setup_state` (JSONB per § 2.2), `created_by_id` · `POST /api/v1/graphs` (any authenticated user; creator becomes admin) · `GET /api/v1/graphs` (returns Graphs the caller is a member of, namespaced as `/u/:username/:slug`) · `GET /api/v1/u/{username}/{slug}` · `PATCH .../` (name, description, objectives, success_criteria, status) · `DELETE .../` (admin only; hard delete, cascade downward per RFC-012 cascade matrix; sole-admin self-removal blocked → 409)
+- **Frontend:** [ ] `/graphs` list (Graphs the user is a member of) · "New Graph" modal (name → autogen slug → intent) · `/u/:username/:slug` overview page · graph switcher in app shell · graph header (name, status, role badge)
+- **Integrations:** none
+
+### 2.2 Graph setup wizard + feature gating
+- **Backend:** [ ] `setup_state` JSONB on `graphs` — keys `graph_info`, `intent`, `skills`, `datasets`, each `{completed_at, skipped_at}` · service computes derived `setup_complete` from required sections · `require_graph_setup_complete` dep for feature routes
+- **Frontend:** [ ] `/u/:username/:slug` shows wizard progress when incomplete · four sections: **Graph Info** (connection form — required), **Intent** (objectives + success_criteria — required), **Skills** (≥1 or "none for now" — skippable), **Datasets** (≥1 or "none for now" — skippable) · modeller / explorer / query unlocked once **Graph Info** is complete · agent *runs* fail-fast (clear error) if zero skills or zero datasets at run time — no structural gate on creating an agent
+- **Integrations:** none
+
+### 2.3 GraphConnection (1:1 child of Graph)
+- **Backend:** [ ] `GraphConnection` entity — `graph_id` UNIQUE, `driver` (cypher / gremlin variant), `url`, `auth_encrypted` (Fernet), `options` (JSONB) · `GET /api/v1/u/{username}/{slug}/connection` · `PUT .../connection` (replace) · `POST .../connection/ping` (round-trip test) · existing connectors at `engine/src/invana/graph/connectors/` for Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph (RFC-001) — these are **query drivers**, not source-ingestion connectors
+- **Frontend:** [ ] Existing `GraphConnectionForm` reused inside the Graph Info wizard section · ping result inline
+- **Integrations:** `neo4j` (driver) · `gremlinpython` · per-driver native libs already in `integrations/invana-{db}/` · `cryptography.Fernet`
+- **Deferred (post-MVP):** [-] Multi-connection Graphs · [-] Source-ingestion connectors (PDF / DOCX / XLSX / CSV / TXT / Git / MySQL) — datasets are produced externally in MVP, see L3 · [-] Connector plugin interface · [-] Custom connector registration
+
+### 2.4 Skills (graph-scoped)
+- **Backend:** [ ] `Skill` entity — `graph_id`, `name`, `description`, `content` (markdown), `when_to_use` · CRUD under `/api/v1/u/{username}/{slug}/skills/...`
+- **Frontend:** [ ] Skills tab in Graph settings · list + editor pages · markdown editor (reuse CodeMirror instance) · `useSkills` hook
 - **Integrations:** CodeMirror 6 markdown mode (reuse query console instance) · `@invana/design-kit` form components
 
-### 2.3 LLM configs registry
-- **Backend:** [ ] `LLMProvider` entity — provider enum (anthropic / openai / google / azure / local) · `model_id` · `api_key_encrypted` (Fernet) · `base_url` (optional) · guardrails (token budgets, allowed model families) · default-provider flag enforced at service layer · CRUD routes · `POST /llm/{id}/ping` for credential test
-- **Frontend:** [ ] LLM settings tab · provider/model selector · masked api-key field · guardrails form · "Test connection" button
-- **Integrations:** `cryptography.Fernet` (reuses `INVANA_ENCRYPTION_KEY`) · per-provider Python SDK lazy-imported: `anthropic` (primary), `openai`, `google-generativeai` (optional, post-MVP can be deferred)
+### 2.5 Instructions (graph-scoped)
+- **Backend:** [ ] `Instruction` entity — `graph_id`, `name`, `content` (markdown), `priority` · CRUD under `/api/v1/u/{username}/{slug}/instructions/...`
+- **Frontend:** [ ] Instructions tab in Graph settings · markdown editor · list
+- **Integrations:** CodeMirror 6 markdown mode
 
-### 2.4 Agents registry
-- **Backend:** [ ] `Agent` entity — composes `skill_ids[]` + `llm_config_id` + operating policy JSONB (autonomy level, fire conditions, reporting) · CRUD routes
-- **Frontend:** [ ] `AgentsListPage` · `AgentEditorPage` with skill picker, LLM picker, policy form
-- **Integrations:** none (depends on 2.2 + 2.3 entities only)
+### 2.6 LLM providers (graph-scoped)
+- **Backend:** [ ] `LLMProvider` entity — `graph_id`, provider enum (anthropic / openai / google / azure / local) · `model_id` · `api_key_encrypted` (Fernet) · `base_url` (optional) · guardrails (token budgets, allowed model families) · default-provider flag enforced at service layer · CRUD under `/api/v1/u/{username}/{slug}/llm/...` · `POST .../llm/{id}/ping` for credential test
+- **Frontend:** [ ] LLM tab in Graph settings · provider/model selector · masked api-key field · guardrails form · "Test connection" button
+- **Integrations:** `cryptography.Fernet` (reuses `INVANA_ENCRYPTION_KEY`) · per-provider Python SDK lazy-imported: `anthropic` (primary), `openai`, `google-generativeai` (optional)
 
-## Layer 3 — Mission
+### 2.7 Agents (graph-scoped)
+- **Backend:** [ ] `Agent` entity — `graph_id`, composes `skill_ids[]` + `llm_config_id` + operating policy JSONB (autonomy level, fire conditions, reporting) · CRUD under `/api/v1/u/{username}/{slug}/agents/...`
+- **Frontend:** [ ] Agents tab in Graph settings · list + editor pages · skill picker · LLM picker · policy form
+- **Integrations:** none (depends on 2.4 + 2.6 entities only)
 
-### 3.1 Mission CRUD + tags
-- **Backend:** [ ] `Mission` entity — `name`, `slug` (unique per owner), `description`, `objectives`, `goals`, `success_criteria`, `status` (`Open` | `Closed`), `owner_id` · `MissionTag` flat join (no global tags table) · ownership service + dep · all routes under `/api/v1/missions/{mid}/...`
-- **Frontend:** [ ] `/missions` list · `/missions/new` wizard (name → objectives + goals + success criteria → tags → bindings) · `/missions/{mid}` overview · `useMissions` (TanStack Query) · mission switcher in app shell
-- **Integrations:** none
-
-### 3.2 Mission bindings (Skills · Agents · LLMs · Graph DBs · Datasets)
-- **Backend:** [ ] Per-resource join tables (or a unified `mission_bindings` polymorphic table — pick during S2) · binding service · enforced visibility (mission only sees what it bound)
-- **Frontend:** [ ] Bindings panel in mission settings · multi-select picker per resource type · unbind confirmation
-- **Integrations:** none
-
-### 3.3 Mission lifecycle (Open / Closed)
-- **Backend:** [ ] `status` enum · middleware/dep that blocks mutating routes on closed missions · `POST /missions/{mid}/close` + `/reopen`
-- **Frontend:** [ ] Close/reopen toggle in settings · read-only banner across all mission pages when closed · disable mutating actions
-- **Integrations:** none
-
-### 3.4 Mission settings shell
-- **Backend:** [ ] N/A (composition of other features)
-- **Frontend:** [ ] `/missions/{mid}/settings` with tabs: **General** · **Graphs** · **LLM** · **Skills** · **Instructions** · **Agents** · **Datasets** · (no `Connectors` tab in MVP)
+### 2.8 Graph settings shell
+- **Backend:** N/A (composition of other features)
+- **Frontend:** [ ] `/u/:username/:slug/settings` with tabs: **General** · **Connection** · **Intent** · **Members** · **Invitations** · **Skills** · **Instructions** · **LLM** · **Agents** · **Datasets**
 - **Integrations:** `@invana/design-kit` tab component
 
-### 3.5 Delete semantics
+### 2.9 Graph lifecycle (active / archived)
+- **Backend:** [ ] `status` enum · middleware/dep that blocks mutating routes on archived Graphs · `POST .../archive` + `.../unarchive`
+- **Frontend:** [ ] Archive toggle in General settings · read-only banner across all Graph pages when archived · disable mutating actions
+- **Integrations:** none
+
+### 2.10 Delete semantics
 - **Backend:** [ ] Hard delete · downward-only cascade per RFC-012 cascade matrix · server-side ownership check before delete
 - **Frontend:** [ ] Confirmation dialog showing cascade preview (counts of children that will be removed)
 - **Integrations:** none
 
-## Layer 4 — Ingestion (Datasets via `dataset-importer`)
+---
+
+## Layer 3 — Ingestion (Datasets via `dataset-importer`)
 
 **MVP scope shift.** No connector framework in MVP. Users prepare graph JSON externally (their script, their pipeline, their LLM, whatever) and feed it to Invana via a thin Python API. Invana's job is to *accept, validate, derive a system graph model, and store* — not to ingest from raw sources.
 
@@ -176,7 +187,7 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 { "id": "e-001", "from": "doc-001", "to": "person-42", "properties": { "weight": 0.8 } }
 ```
 
-`type` is implicit from the filename. `id` is the source-stable identifier used for identity resolution by the stitcher (L5). Edge `from`/`to` must resolve to node `id`s present in the same dataset (or already imported into the mission — TBD per cross-dataset reference policy).
+`type` is implicit from the filename. `id` is the source-stable identifier used for identity resolution by the stitcher (L4). Edge `from`/`to` must resolve to node `id`s present in the same dataset (or already imported into the Graph — TBD per cross-dataset reference policy).
 
 ### Validation (run during the import job)
 - [ ] **Model validation** — `model.json` parses cleanly; enum values non-empty; type names valid; edge `from`/`to` reference declared node types
@@ -197,7 +208,7 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - [ ] MinIO added to `docker-compose-infra.yml` for dev
 - [ ] `INVANA_S3_*` settings (endpoint, access key, secret key, bucket, region) — S3-compatible so prod can swap to AWS S3 / GCS / R2
 - [ ] On import, files (`model.json`, `nodes/*.json`, `edges/*.json`) are uploaded to MinIO before the job runs
-- [ ] Bucket layout: `s3://<bucket>/missions/<mission_id>/datasets/<dataset_id>/{model.json,nodes/*,edges/*}`
+- [ ] Bucket layout: `s3://<bucket>/graphs/<graph_id>/datasets/<dataset_id>/{model.json,nodes/*,edges/*}`
 - [ ] Retention — files retained until the Dataset row is hard-deleted; deletion cascades to MinIO objects
 - [ ] Streamed uploads for large files; multipart for files > 64 MB
 
@@ -207,32 +218,32 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - [ ] Job stages: `upload → validate model → validate records → derive system graph model → persist → done`
 - [ ] **Structured log lines** persisted per job: `timestamp`, `level`, `stage`, `message`, optional `record_ref`
 - [ ] Log storage: append-only table (`import_job_logs`) or MinIO append blob — TBD per volume; MVP = Postgres table for simplicity
-- [ ] **Log streaming to UI** via Server-Sent Events: `GET /missions/{mid}/datasets/{dsid}/jobs/{jid}/logs/stream`
-- [ ] Idempotent re-import — same `(mission_id, name)` triggers a new `ImportJob` that replaces the dataset's files + records atomically on success; failed jobs leave prior state intact
+- [ ] **Log streaming to UI** via Server-Sent Events: `GET /u/{username}/{slug}/datasets/{dsid}/jobs/{jid}/logs/stream`
+- [ ] Idempotent re-import — same `(graph_id, name)` triggers a new `ImportJob` that replaces the dataset's files + records atomically on success; failed jobs leave prior state intact
 
 ### `dataset-importer` Python API
-- [ ] `invana.datasets.import_dataset(mission_id, name, path, *, refresh=False, strict=False)` — single entrypoint
+- [ ] `invana.datasets.import_dataset(graph, name, path, *, refresh=False, strict=False)` — single entrypoint; `graph` accepts either a `Graph` handle or `"username/slug"`
 - [ ] Uploads `path/` to MinIO, creates Dataset + ImportJob rows, dispatches to executor, returns `ImportJob` handle
 - [ ] `job.wait()` / `job.stream_logs()` helpers for scripts
 - [ ] Returns `Dataset` (with model + counts) once job succeeds; raises with validation report on failure
-- [ ] CLI shim: `invana datasets import --mission <slug> --name <name> --path <dir> [--refresh] [--strict]`
+- [ ] CLI shim: `invana datasets import --graph <username/slug> --name <name> --path <dir> [--refresh] [--strict]`
 
 ### Engine surface
-- [ ] Dataset entity — `id`, `mission_id`, `name`, `graph_model` (JSONB), `storage_uri` (s3://…), `record_counts`, `last_job_id`, `created_at`, `updated_at`
-- [ ] `POST /api/v1/missions/{mid}/datasets` — register a dataset, kicks off the import job
-- [ ] `GET  /api/v1/missions/{mid}/datasets` — list
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}` — detail (model + counts + last job)
-- [ ] `DELETE /api/v1/missions/{mid}/datasets/{dsid}` — hard delete (DB + MinIO)
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/jobs` — list job runs
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/jobs/{jid}` — job detail (status, progress, error/warning counts)
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/jobs/{jid}/logs` — paginated logs
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/jobs/{jid}/logs/stream` — SSE log stream
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/files` — file tree (lists MinIO keys under the dataset's prefix)
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/files/{path}` — fetch a file (signed URL or proxied)
-- [ ] `GET  /api/v1/missions/{mid}/datasets/{dsid}/records?type=<T>&page=<n>&page_size=<m>` — paginated record view, scoped to one node/edge type
+- [ ] Dataset entity — `id`, `graph_id`, `name`, `graph_model` (JSONB), `storage_uri` (s3://…), `record_counts`, `last_job_id`, `created_at`, `updated_at`
+- [ ] `POST /api/v1/u/{username}/{slug}/datasets` — register a dataset, kicks off the import job
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets` — list
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}` — detail (model + counts + last job)
+- [ ] `DELETE /api/v1/u/{username}/{slug}/datasets/{dsid}` — hard delete (DB + MinIO)
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/jobs` — list job runs
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/jobs/{jid}` — job detail (status, progress, error/warning counts)
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/jobs/{jid}/logs` — paginated logs
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/jobs/{jid}/logs/stream` — SSE log stream
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/files` — file tree (lists MinIO keys under the dataset's prefix)
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/files/{path}` — fetch a file (signed URL or proxied)
+- [ ] `GET  /api/v1/u/{username}/{slug}/datasets/{dsid}/records?type=<T>&page=<n>&page_size=<m>` — paginated record view, scoped to one node/edge type
 
 ### Studio surface
-- [ ] Dataset browser — list per mission, show graph-model summary + record counts + last job status
+- [ ] Dataset browser — list per Graph, show graph-model summary + record counts + last job status
 - [ ] "Import dataset" form — drag-drop a folder/tarball/zip; uploaded to MinIO via signed URLs; engine kicks off the import job
 - [ ] **Dataset detail page — four tabs:**
   - [ ] **Logs** — live SSE log stream during a run; full history when complete; filter by stage / level; copyable
@@ -242,7 +253,7 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - [ ] Job status badge on browser + detail pages: queued / running / succeeded / failed
 - [ ] Validation report panel on failed jobs — grouped by file, expandable per error, links to the offending record in the Files tab
 
-### L4 Integrations (consolidated)
+### L3 Integrations (consolidated)
 - **MinIO** in dev `docker-compose-infra.yml`; S3-compatible — prod swaps to AWS S3 / GCS / R2
 - **aioboto3** (async S3 client) · `boto3-stubs` (typings)
 - **pydantic v2** (model.json + constraint validators)
@@ -258,108 +269,118 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - [-] Source-connector instance configuration UI
 - [-] Cross-dataset edge references (edges in dataset A pointing at nodes in dataset B) — MVP requires self-contained datasets
 
-## Layer 5 — Modeling (User Graph Model · Stitcher)
+---
 
-### 5.1 User graph model editor
-- **Backend:** [ ] Reuse existing `GraphSchema` machinery (RFC-002) · ensure mission-scoped (FK added in S3) · existing versioning carries over
-- **Frontend:** [ ] Nest existing `ModellerPage` under `/missions/{mid}/graph/{gid}/modeller` · `missionId` URL param forwarded to API
+## Layer 4 — Modeling (User Graph Model · Stitcher)
+
+### 4.1 User graph model editor
+- **Backend:** [ ] Reuse existing `GraphSchema` machinery (RFC-002) · re-scope to `graph_id` (FK added during the rename) · existing versioning carries over
+- **Frontend:** [ ] Nest existing `ModellerPage` under `/u/:username/:slug/modeller` · graph slug forwarded to API
 - **Integrations:** existing modeller code (`engine/src/invana/modeller/`)
 
-### 5.2 Stitcher — mapping (system type → user concept)
+### 4.2 Stitcher — mapping (system type → user concept)
 - **Backend:** [ ] `StitchMapping` entity (`dataset_id`, `system_type`, `user_type`, `property_map` JSONB) · CRUD routes · validation that referenced types exist in both ends
-- **Frontend:** [ ] Mapping UI — two columns: dataset system-types (left, from L4 graph_model) · user model concepts (right) · drag-to-map · per-property mapping form
+- **Frontend:** [ ] Mapping UI — two columns: dataset system-types (left, from L3 graph_model) · user model concepts (right) · drag-to-map · per-property mapping form
 - **Integrations:** none
 
-### 5.3 Stitcher — identity resolution
+### 4.3 Stitcher — identity resolution
 - **Backend:** [ ] Identity-resolution config per mapping (deterministic by `id`, or property-match rules: exact / case-insensitive / fuzzy) · resolution engine · conflict report
 - **Frontend:** [ ] ID-resolution rule editor · conflict-review UI (pairs of records flagged as possibly-same, accept/reject)
-- **Integrations:** `rapidfuzz` (string similarity for fuzzy matching) — *evaluate at S8 spike*
+- **Integrations:** `rapidfuzz` (string similarity for fuzzy matching) — *evaluate at S7 spike*
 
-### 5.4 Stitcher — materialization (into bound graph DB)
+### 4.4 Stitcher — materialization (into bound GraphConnection)
 - **Backend:** [ ] `StitchJob` entity (similar shape to `ImportJob`) · executed via LocalExecutor · writes nodes/edges to the bound graph DB · idempotent re-stitch · structured log lines
-- **Frontend:** [ ] "Materialize" button in mission overview · job status + progress · stats (nodes/edges materialized) · log viewer (reuses SSE pattern from L4)
+- **Frontend:** [ ] "Materialize" button in Graph overview · job status + progress · stats (nodes/edges materialized) · log viewer (reuses SSE pattern from L3)
 - **Integrations:** existing graph DB connectors · RFC-016 executor · `sse-starlette`
 
-### 5.5 Stitch trace + provenance
-- **Backend:** [ ] Every materialized node/edge carries `dataset_id` + `record_id` + `stitch_job_id` as properties or in a side-table · `GET /missions/{mid}/provenance/{node_or_edge_id}`
+### 4.5 Stitch trace + provenance
+- **Backend:** [ ] Every materialized node/edge carries `dataset_id` + `record_id` + `stitch_job_id` as properties or in a side-table · `GET /u/{username}/{slug}/provenance/{node_or_edge_id}`
 - **Frontend:** [ ] Provenance panel in Explorer — click a node/edge → see source dataset + record + import job
 - **Integrations:** none
 
-## Layer 6 — Knowledge Graph
+---
 
-### 6.1 Query API
-- **Backend:** [ ] Existing `/query` route re-prefixed under `/missions/{mid}/graphs/{gid}/query` (Cypher + Gremlin) · ownership dep
-- **Frontend:** [ ] Existing query console (CodeMirror) nested under mission route
+## Layer 5 — Knowledge Graph
+
+### 5.1 Query API
+- **Backend:** [ ] Existing `/query` route re-prefixed under `/u/{username}/{slug}/query` (Cypher + Gremlin) · graph-membership dep
+- **Frontend:** [ ] Existing query console (CodeMirror) nested under Graph route
 - **Integrations:** existing graph DB connectors
 
-### 6.2 Semantic / vector retrieval
-- **Backend:** [ ] Vector-index mixin for graph DBs that support it (per CLAUDE.md) · embedding generation pipeline · `POST /missions/{mid}/graphs/{gid}/search?type=semantic`
+### 5.2 Semantic / vector retrieval
+- **Backend:** [ ] Vector-index mixin for graph DBs that support it (per CLAUDE.md) · embedding generation pipeline · `POST /u/{username}/{slug}/search?type=semantic`
 - **Frontend:** [ ] Semantic search box in Explorer · result list with similarity scores
 - **Integrations:** embedding provider TBD — likely `anthropic` (when/if available) or `openai` text-embedding-3-small; spike before committing · per-DB vector index support (Neo4j vector index, Memgraph, ArcadeDB)
 
-### 6.3 Skill-mediated retrieval
+### 5.3 Skill-mediated retrieval
 - **Backend:** [ ] Skill-execution path that returns ranked grounded snippets (each with provenance) · invoked by agent loop
-- **Frontend:** [ ] Surfaced inside agent UI (L7) — not a standalone page
-- **Integrations:** depends on 2.2 Skills + L7 agent runtime
+- **Frontend:** [ ] Surfaced inside agent UI (L6) — not a standalone page
+- **Integrations:** depends on 2.4 Skills + L6 agent runtime
 
-### 6.4 Provenance on retrieval responses
+### 5.4 Provenance on retrieval responses
 - **Backend:** [ ] Every retrieval response schema includes `nodes[]`, `edges[]`, `records[]` (with `dataset_id` + `record_id`), `import_job_id`
 - **Frontend:** [ ] Citation chips on every answer · click-through opens the source record in dataset Files/Records tab
 - **Integrations:** none
 
-### 6.5 Studio Explorer (existing)
+### 5.5 Studio Explorer (existing)
 - **Backend:** [ ] No change
-- **Frontend:** [ ] Nest existing `ExplorerPage` under `/missions/{mid}/graph/{gid}/explorer`
+- **Frontend:** [ ] Nest existing `ExplorerPage` under `/u/:username/:slug/explorer`
 - **Integrations:** `@invana/canvas` (PixiJS 8, WebGPU/WebGL — existing)
 
-## Layer 7 — Intelligence (Agents · LLM grounding · Success scoring)
+---
 
-### 7.1 Agent runtime
-- **Backend:** [ ] Agent loop service: read mission instructions → plan with bound skills → query graph for grounded context → call bound LLM → handle result (return / write-back / fail) · `POST /missions/{mid}/agents/{aid}/run` (manual fire) · streaming response via SSE
-- **Frontend:** [ ] "Ask" / "Run agent" UI in mission overview · streaming response panel · agent picker
+## Layer 6 — Intelligence (Agents · LLM grounding · Success scoring)
+
+### 6.1 Agent runtime
+- **Backend:** [ ] Agent loop service: read Graph instructions → plan with bound skills → query graph for grounded context → call bound LLM → handle result (return / write-back / fail) · `POST /u/{username}/{slug}/agents/{aid}/run` (manual fire) · streaming response via SSE · fail-fast with clear error if the Graph has zero skills or zero datasets bound at run time
+- **Frontend:** [ ] "Ask" / "Run agent" UI in Graph overview · streaming response panel · agent picker
 - **Integrations:** per-provider Python SDK (`anthropic` first) · `sse-starlette` for streaming
 
-### 7.2 Grounded LLM call
+### 6.2 Grounded LLM call
 - **Backend:** [ ] Prompt template assembly (instructions + skills + retrieved context) · grounding contract enforcement (refuse to call LLM with empty retrieved context for grounded ops) · prompt caching where supported (Anthropic API)
 - **Frontend:** [ ] Citation chips on rendered LLM output linking back to source records
 - **Integrations:** `anthropic` SDK (prompt caching first-class)
 
-### 7.3 Agent write-back
+### 6.3 Agent write-back
 - **Backend:** [ ] Writeback service · validates new nodes/edges against user graph model · stamps provenance (`agent_run_id`, `created_by=agent`) · auto-commit vs review-required toggle on agent policy
 - **Frontend:** [ ] Review panel (when policy=review) — diff view of proposed writes, accept/reject per node/edge
 - **Integrations:** existing graph DB connectors
 
-### 7.4 Agent observability
-- **Backend:** [ ] `AgentRun` entity — captures prompt, retrieved context, LLM response, write-back delta, status, latency, token usage · `GET /missions/{mid}/agent-runs` + detail
-- **Frontend:** [ ] Agent runs list per mission · run detail (prompt + context + response + delta tabs, mirrors dataset detail UX)
-- **Integrations:** reuses log/streaming infra from L4
+### 6.4 Agent observability
+- **Backend:** [ ] `AgentRun` entity — captures prompt, retrieved context, LLM response, write-back delta, status, latency, token usage · `GET /u/{username}/{slug}/agent-runs` + detail
+- **Frontend:** [ ] Agent runs list per Graph · run detail (prompt + context + response + delta tabs, mirrors dataset detail UX)
+- **Integrations:** reuses log/streaming infra from L3
 
-### 7.5 Success-criteria scoring
+### 6.5 Success-criteria scoring
 - **Backend:** [ ] Criteria evaluator — each criterion is a query against the knowledge graph returning pass/fail · scheduled or on-demand re-eval
-- **Frontend:** [ ] Progress badge + breakdown on mission overview · per-criterion status
+- **Frontend:** [ ] Progress badge + breakdown on Graph overview · per-criterion status
 - **Integrations:** none
 
-### 7.6 Groundedness enforcement + "cannot answer" path
+### 6.6 Groundedness enforcement + "cannot answer" path
 - **Backend:** [ ] Detect empty retrieved context · explicit "cannot answer" response payload (distinct from a model-generated empty answer) · log groundedness-fail as defect-class event
 - **Frontend:** [ ] Distinct visual rendering for "cannot answer" — never styled like a normal answer
 - **Integrations:** none
 
-## Layer 8 — Interfaces
+---
 
-### 8.1 CLI
-- **Backend:** [ ] `invana init` (L1.2) · `invana start` (run engine + studio) · `invana migrate` (alembic upgrade) · `invana version` · `invana datasets import ...` (L4) · CLI does **not** register additional users (system-design §4.1)
+## Layer 7 — Interfaces
+
+### 7.1 CLI
+- **Backend:** [ ] `invana init` (L1.2) · `invana start` (run engine + studio) · `invana migrate` (alembic upgrade) · `invana version` · `invana datasets import ...` (L3) · CLI does **not** register additional users (system-design §4.1)
 - **Frontend:** N/A
 - **Integrations:** `typer` / `click` (whichever is in `engine/src/invana/cli/`) · `rich` for output formatting · `httpx` if CLI talks to engine over HTTP
 
-### 8.2 Studio UI shell
+### 7.2 Studio UI shell
 - **Backend:** [ ] Optionally serve Studio static assets from FastAPI in single-image Docker mode (`/static/*` → built Studio bundle)
-- **Frontend:** [ ] Application shell — sidebar, header, mission switcher · all routes mission-scoped (`/missions/{mid}/...`) · markdown editor reused for Skills + Instructions · design-kit components only (CLAUDE.md #9) · `@invana/canvas` for all graph rendering (CLAUDE.md #10)
+- **Frontend:** [ ] Application shell — sidebar, header, Graph switcher · all Graph-scoped routes under `/u/:username/:slug/...` · markdown editor reused for Skills + Instructions · design-kit components only (CLAUDE.md #9) · `@invana/canvas` for all graph rendering (CLAUDE.md #10)
 - **Integrations:** React 19 · Vite · `@invana/design-kit` · `@invana/canvas` · TanStack Query · Zustand · React Router · CodeMirror 6 · TailwindCSS 4
 
-### 8.3 External-agent API (§4.11)
-- **Backend:** [ ] `ScopedToken` entity (`mission_id`, `scope` enum `read` | `read_write`, `created_at`, `last_used_at`, `revoked_at`) · `POST /missions/{mid}/tokens` (issue, returned exactly once) · token-auth dep parallel to JWT · retrieval endpoints reusing 6.x · write-back endpoints reusing 7.3 · closed-mission read-only freeze
-- **Frontend:** [ ] Tokens tab in mission settings · "Issue token" flow showing token once with copy button · revoke action · last-used timestamp
+### 7.3 External-agent API (§4.11)
+- **Backend:** [ ] `ScopedToken` entity (`graph_id`, `scope` enum `read` | `read_write`, `created_at`, `last_used_at`, `revoked_at`) · `POST /u/{username}/{slug}/tokens` (issue, returned exactly once) · token-auth dep parallel to JWT · retrieval endpoints reusing 5.x · write-back endpoints reusing 6.3 · archived-Graph read-only freeze
+- **Frontend:** [ ] Tokens tab in Graph settings · "Issue token" flow showing token once with copy button · revoke action · last-used timestamp
 - **Integrations:** `secrets` (stdlib) for opaque API key generation · same Fernet key for at-rest storage of token hash
+
+---
 
 ## Integrations index
 
@@ -374,7 +395,7 @@ Single roll-up of every third-party dependency and infra service referenced abov
 - **Object storage:** `aioboto3`, `boto3-stubs[s3]`
 - **CLI:** existing (`typer` or `click`), `rich`
 - **LLM SDKs (lazy-imported):** `anthropic` (primary), `openai` (optional), `google-generativeai` (optional, post-MVP-friendly)
-- **Identity resolution (spike):** `rapidfuzz` (string similarity, post-S8a evaluation)
+- **Identity resolution (spike):** `rapidfuzz` (string similarity, post-S7a evaluation)
 - **Graph DB drivers (existing):** `neo4j`, `gremlinpython`, per-driver libs in `integrations/invana-{db}/`
 - **Admin:** `starlette-admin` (existing)
 
@@ -410,12 +431,12 @@ Single roll-up of every third-party dependency and infra service referenced abov
 
 ## Cross-cutting
 
-- [ ] Encryption at rest — Fernet key (`INVANA_ENCRYPTION_KEY`) for `graphs.auth_encrypted` + `llm_providers.api_key_encrypted`
+- [ ] Encryption at rest — Fernet key (`INVANA_ENCRYPTION_KEY`) for `graph_connections.auth_encrypted` + `llm_providers.api_key_encrypted`
 - [ ] Object storage — MinIO in dev (`docker-compose-infra.yml`); S3-compatible client so prod can swap to AWS S3 / GCS / R2. Used for dataset files (model + nodes + edges). `INVANA_S3_*` settings.
 - [ ] Logging — RFC-006
 - [ ] Telemetry — RFC-007
 - [ ] CORS — permissive in dev, `INVANA_CORS_ALLOWED_ORIGINS` in prod
-- [ ] Alembic — reset on `arch/redesign`; single new initial migration covers full redesigned schema (RFC-012)
+- [ ] Alembic — reset on `arch/redesign`; single new initial migration covers full redesigned schema (RFC-012 + RFC-017)
 - [ ] Pluggable executor (RFC-016) — orchestration as a boundary; MVP ships **LocalExecutor** (in-process asyncio); distributed executors deferred
 - [ ] Changesets — every user-facing change carries one (CLAUDE.md rule #8)
 - [ ] Docker images — `invana/engine`, `invana/studio` (multi-target Dockerfile)
@@ -423,16 +444,17 @@ Single roll-up of every third-party dependency and infra service referenced abov
 
 ## Deferred (post-1.0)
 
-- [-] Org / team sharing of missions
+- [-] Org / team layer above Graph
 - [-] Soft deletes / trash / undo
 - [-] Ontology / semantics layer beyond user graph model
 - [-] Auto-generation of user models from imported sources (RFC-015, planned)
 - [-] Refresh-token rotation policy
 - [-] HttpOnly cookie token storage (Studio uses localStorage in v1)
-- [-] Managed/hosted graph DB provisioning + DROP on mission delete
-- [-] Strategy layer between Mission and children
+- [-] Managed/hosted graph DB provisioning + DROP on Graph delete
+- [-] Multi-connection Graphs (Graph ↔ GraphConnection stays 1:1 in MVP)
 - [-] Source-ingestion connectors (PDF, DOCX, XLSX, CSV, TXT, Git, MySQL) — MVP uses external `dataset-importer` JSON instead
 - [-] Tasks / Pipelines / Schedulers — only needed once source connectors exist
+- [-] Username-change redirects (old usernames just 404 in MVP)
 
 ---
 
@@ -444,111 +466,110 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 - **Contract-first per slice.** Pydantic schemas → FastAPI OpenAPI → generated TS client in `studio/scripts/`. Both sides code against the same generated types. No hand-typed FE shapes.
 - **Each slice is shippable.** "Done when" is a reproducible user action, not a checklist. If it can't be demoed in 30 seconds from a clean checkout, the slice isn't done — don't start the next one.
-- **One moving target at a time.** Greenfield layers (L4 ingestion, L5 stitcher, L7 agents) get their own RFC before code.
-- **Parallel tracks where possible.** After mission shell lands, multiple slices run as independent BE+FE pairs.
+- **One moving target at a time.** Greenfield layers (L3 ingestion, L4 stitcher, L6 agents) get their own RFC before code.
+- **Parallel tracks where possible.** After the Graph shell lands, multiple slices run as independent BE+FE pairs.
 
 ## Slice sequence
 
 ### S0 — Foundations (½ day, no UI)
 - Alembic reset on `arch/redesign`
 - `settings.secret_key` + `INVANA_ENCRYPTION_KEY` wired
-- Empty `auth/` and `missions/` modules mounted
+- Empty `auth/` and `graphs/` modules mounted
 - OpenAPI → TS client generator in `studio/scripts/`
 
 **Done when:** `make dev` runs and Studio compiles against an empty typed client.
 
 ### S1 — Auth + bootstrap (gates everything)
-- **BE:** User · bcrypt · JWT (access+refresh) · `/auth/*` · `invana init` CLI · `get_current_user` dep
-- **FE:** `auth.store` · axios interceptor · `LoginPage` · `RegisterPage` (invite token) · protected route shell
+- **BE:** User (incl. username) · bcrypt · JWT (access+refresh) · `/auth/*` · `invana init` CLI (no auto Graph) · `get_current_user` dep
+- **FE:** `auth.store` · axios interceptor · `LoginPage` · `RegisterPage` (invite token) · protected route shell · post-login lands on `/graphs` (empty state prompts to create first Graph)
 
-**Done when:** `invana init` creates root user; UI login lands on empty `/missions`.
+**Done when:** `invana init` creates root user with a username; UI login lands on empty `/graphs`.
 
-### S2 — Mission shell
-- **BE:** Mission + MissionTag · ownership service · `/missions` CRUD
-- **FE:** `/missions` list · `/missions/new` wizard (name → objectives + goals + success criteria → tags) · `/missions/{mid}` overview
+### S1.5 — Workspace → Graph rename (RFC-017)
+- **BE:** rename `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Add `users.username` + validation + rate-limited PATCH. Add `graphs.intent` + `graphs.setup_state`. `UNIQUE (created_by_id, slug)`. Re-prefix Layer 1 routes to `/u/:username/:slug/...`. Reset Alembic, regenerate initial migration. Update admin views.
+- **FE:** rename pages, routes, hooks, copy. URLs become `/u/:username/:slug/...`. Add username field to `RegisterPage` + `ProfileSettingsPage`. Remove personal-workspace assumptions from app shell.
+- **Manual verification:** Layer 1 flows + create-first-Graph flow on the renamed schema.
 
-**Done when:** user creates, lists, opens, deletes a mission.
+**Done when:** existing Layer 1 behaviors all work under the new names, and `invana init` no longer creates a default Graph.
 
-### S3 — Graph DB binding (mostly re-prefix)
-- **BE:** add `mission_id` FK to `graphs` + `graph_schemas` · re-prefix existing `graphs`/`query`/`schemas` routers under `/missions/{mid}/...` · ownership dep
-- **FE:** Settings → Graphs tab using existing `GraphConnectionForm` · query console nested
+### S2 — Graph shell + setup wizard
+- **BE:** `Graph` CRUD · `GraphConnection` (1:1, required) · `setup_state` JSONB + `require_graph_setup_complete` dep · ping-connection endpoint · re-prefix existing `graphs` (now `graph_connections`) / `query` / `schemas` routers under `/u/:username/:slug/...`
+- **FE:** `/graphs` list · "New Graph" modal (name → autogen slug → intent) · `/u/:username/:slug` overview with wizard progress · Graph Info section (`GraphConnectionForm` + ping) · Intent section · skippable Skills / Datasets sections
 
-**Done when:** user attaches Neo4j to a mission and runs a Cypher query.
+**Done when:** user creates a Graph, completes the Graph Info section by attaching Neo4j, sees modeller / explorer / query unlock.
 
-### S4 — User graph model (reuse modeller)
-- **BE:** nothing new — already mission-scoped after S3
-- **FE:** nest existing `ModellerPage` under `/missions/{mid}/graph/{gid}/modeller`
+### S3 — User graph model (reuse modeller)
+- **BE:** ensure `GraphSchema` is graph-scoped
+- **FE:** nest existing `ModellerPage` under `/u/:username/:slug/modeller`
 
-**Done when:** user authors ontology against the bound graph.
+**Done when:** user authors ontology against the bound Graph.
 
-### S5 — LLM provider
-*Pre-work: resolve RFC-012 (mission-scoped) vs system-design §2/§5 (global registry + binding) divergence. ½ day RFC amendment.*
+### S4 — LLM provider (graph-scoped)
+- **BE:** `LLMProvider` entity + Fernet · CRUD under `/u/:username/:slug/llm/...` · `POST .../llm/{id}/ping` round-trip
+- **FE:** LLM tab in Graph settings · register provider · test-call button
 
-- **BE:** `LLMProvider` entity + Fernet · CRUD · `/llm/ping` round-trip
-- **FE:** Settings → LLM tab · register provider · test-call button
+**Done when:** saved Anthropic key produces a 200 from `/llm/{id}/ping` for the active Graph.
 
-**Done when:** saved Anthropic key produces a 200 from `/llm/ping`.
-
-### S6 — Skills + Instructions
-- **BE:** Skill + Instruction CRUD
-- **FE:** Settings → Skills + Instructions tabs · CodeMirror markdown editor (reuse query console instance)
+### S5 — Skills + Instructions (graph-scoped)
+- **BE:** Skill + Instruction CRUD under `/u/:username/:slug/{skills,instructions}/...`
+- **FE:** Skills + Instructions tabs in Graph settings · CodeMirror markdown editor (reuse query console instance)
 
 **Done when:** user authors a skill, sees it persisted, edits it.
 
-> **S3, S4, S5, S6 run as parallel tracks once S2 lands.** Different BE modules, different FE routes, no shared state.
+> **S3, S4, S5 run as parallel tracks once S2 lands.** Different BE modules, different FE routes, no shared state.
 
-### S7 — Dataset import (MVP — no connectors)
+### S6 — Dataset import (MVP — no connectors)
 *Pre-work: RFC for the on-disk dataset format (`model.json` + `nodes/<Type>.json` + `edges/<Type>.json`), property-constraint vocabulary, and validation rules. Half-day spec.*
 
-- **S7a — Model + validators (BE only):**
-  - Dataset + ImportJob entities (Postgres) · `graph_model` JSONB column
+- **S6a — Model + validators (BE only):**
+  - Dataset + ImportJob entities (Postgres) · `graph_model` JSONB column · `graph_id` FK
   - Pydantic schema for `model.json` + property constraints (string/int/float/bool/enum/datetime/uuid/json with required/min/max/length/pattern/enum.values)
   - Record validator runs model-driven checks; produces structured validation report (file, record_index, record_id, field, rule, message)
   - Referential integrity + node-id uniqueness checks
-- **S7b — MinIO storage (BE only):**
+- **S6b — MinIO storage (BE only):**
   - MinIO in `docker-compose-infra.yml` · `INVANA_S3_*` settings · async S3 client
-  - Bucket layout `missions/<mid>/datasets/<dsid>/...` · streamed + multipart uploads
+  - Bucket layout `graphs/<graph_id>/datasets/<dsid>/...` · streamed + multipart uploads
   - File tree + file-fetch endpoints
-- **S7c — LocalExecutor + job lifecycle + log streaming (BE only):**
+- **S6c — LocalExecutor + job lifecycle + log streaming (BE only):**
   - RFC-016 executor interface + LocalExecutor impl
   - ImportJob stages: upload → validate model → validate records → derive system graph model → persist → done
   - `import_job_logs` table with structured rows (timestamp, level, stage, message, record_ref)
   - SSE log stream endpoint
-- **S7d — `dataset-importer` Python API + CLI (BE only):**
-  - `invana.datasets.import_dataset(mission_id, name, path, *, refresh=False, strict=False)` returns `ImportJob` handle with `.wait()` / `.stream_logs()`
-  - CLI: `invana datasets import --mission <slug> --name <name> --path <dir>`
-- **S7e — Studio dataset detail (FE):**
+- **S6d — `dataset-importer` Python API + CLI (BE only):**
+  - `invana.datasets.import_dataset(graph, name, path, *, refresh=False, strict=False)` returns `ImportJob` handle with `.wait()` / `.stream_logs()`
+  - CLI: `invana datasets import --graph <username/slug> --name <name> --path <dir>`
+- **S6e — Studio dataset detail (FE):**
   - Dataset browser + import form (drag-drop folder/tarball)
   - Detail page with four tabs: **Logs** (live SSE), **Files** (MinIO tree + preview), **Model** (form + small canvas diagram), **Dataset** (paginated record table, type selector, columns from model)
   - Job status badge · validation report panel on failed jobs
 
-**Done when:** user prepares a folder with `model.json` + `nodes/Document.json` (one bad row violating `max_length`) + `edges/MENTIONS.json`, runs `invana datasets import --mission demo --name wiki --path ./examples/wiki`, opens Studio and sees: live logs streaming in **Logs**, the uploaded files in **Files**, the model rendered in **Model**, and the paginated records in **Dataset** with the failed row flagged in the validation report.
+**Done when:** user prepares a folder with `model.json` + `nodes/Document.json` (one bad row violating `max_length`) + `edges/MENTIONS.json`, runs `invana datasets import --graph ravi/demo --name wiki --path ./examples/wiki`, opens Studio and sees: live logs streaming in **Logs**, the uploaded files in **Files**, the model rendered in **Model**, and the paginated records in **Dataset** with the failed row flagged in the validation report.
 
 > Tasks / Pipelines / Schedulers / Source connectors / Distributed executors are **post-MVP**. Datasets are produced *externally* in MVP; the executor boundary is in place so Celery / Ray / K8s can drop in later without UI changes.
 
-### S8 — Stitcher (smallest viable)
-- **S8a:** mapping UI — dataset system-types on left, user-model concepts on right, drag-to-map
-- **S8b:** materialize one dataset into the bound graph DB
-- **S8c:** provenance — every materialized node carries `dataset_id` + `task_id`
+### S7 — Stitcher (smallest viable)
+- **S7a:** mapping UI — dataset system-types on left, user-model concepts on right, drag-to-map
+- **S7b:** materialize one dataset into the bound GraphConnection
+- **S7c:** provenance — every materialized node carries `dataset_id` + `record_id` + `stitch_job_id`
 
 **Done when:** user maps `Document` → user's `Document` concept, sees nodes in Explorer with source records attached.
 
-### S9 — Pipelines
-Chain + schedule on top of S7. Pure additive.
+### S8 — Pipelines
+Chain + schedule on top of S6. Pure additive. *(Deferred candidate — only land if S6→S9 has slack.)*
 
-### S10 — Agent runtime (vertical sub-slices)
-- **S10a:** Agent entity + manual "run once" button (no autonomy)
-- **S10b:** grounded LLM call — agent reads instructions, queries graph, calls LLM with retrieved context, displays response with citation chips
-- **S10c:** write-back into the graph + every run recorded
-- **S10d:** success-criteria scoring + mission progress badge
+### S9 — Agent runtime (vertical sub-slices)
+- **S9a:** Agent entity + manual "run once" button (no autonomy)
+- **S9b:** grounded LLM call — agent reads Graph instructions, queries graph, calls LLM with retrieved context, displays response with citation chips
+- **S9c:** write-back into the graph + every run recorded
+- **S9d:** success-criteria scoring + progress badge on Graph overview
 
-**Done when:** user clicks "Ask" in a mission, gets an answer with clickable provenance back to source records.
+**Done when:** user clicks "Ask" on a Graph, gets an answer with clickable provenance back to source records.
 
-### S11 — External-agent API (§4.11)
-Scoped tokens · retrieval endpoints (query / semantic / skill-mediated) · provenance in every response · closed-mission read-only freeze.
+### S10 — External-agent API (§4.11)
+Scoped tokens · retrieval endpoints (query / semantic / skill-mediated) · provenance in every response · archived-Graph read-only freeze.
 
-### S12 — Mission lifecycle
-`Open → Closed` toggle + read-only enforcement on every mutating route. Can slot in right after S2 — small and unblocks demo storytelling.
+### S11 — Graph lifecycle
+`active → archived` toggle + read-only enforcement on every mutating route. Can slot in right after S2 — small and unblocks demo storytelling.
 
 ## Per-slice working pattern
 
@@ -558,21 +579,21 @@ Scoped tokens · retrieval endpoints (query / semantic / skill-mediated) · prov
 
 ## Risk notes
 
-- **Don't start S7 until S5+S6 are stable.** Agent loop needs LLM + Skills; keep one moving target at a time.
-- **S7 is much cheaper in MVP** because there's no connector framework — just JSON validation + storage. Ship it small, ship it fast.
+- **Don't start S6 until S4+S5 are stable.** Agent loop needs LLM + Skills; keep one moving target at a time.
+- **S6 is much cheaper in MVP** because there's no connector framework — just JSON validation + storage. Ship it small, ship it fast.
 - **Hold the line on "no source connectors in MVP."** Every "but PDFs would be easy" request is a slippery slope back into a connector framework. Users producing JSON externally is the contract.
-- **Resolve workspace-global vs mission-scoped Skills/LLM before S5.** Re-doing it after S10 ships is the worst time.
+- **S1.5 (the rename) is mechanical but touches everywhere.** Land it before S2 starts so no new code is written against the old names.
 - **Generated TS client is the contract.** Hand-typed FE shapes will drift.
 
 ## Parallelization map
 
 ```
-S0 → S1 → S2 ─┬─→ S3 ──→ S4
-              ├─→ S5
-              ├─→ S6
-              ├─→ S12
-              └─→ (S7 RFC) → S7a → S7b → S7c → S7d → S8 → S9
-                                                          └→ S10 → S11
+S0 → S1 → S1.5 → S2 ─┬─→ S3
+                     ├─→ S4
+                     ├─→ S5
+                     ├─→ S11
+                     └─→ (S6 RFC) → S6a → S6b → S6c → S6d → S6e → S7 → (S8)
+                                                                  └→ S9 → S10
 ```
 
-Net: **S0→S6 is mostly assembly and re-prefixing — fast.** S7→S10 is the actual new platform — slow, RFC-gated, where the real learning happens.
+Net: **S0→S5 is mostly assembly and re-prefixing — fast.** S6→S9 is the actual new platform — slow, RFC-gated, where the real learning happens.

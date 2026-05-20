@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
     from invana.graph.connectors.base.connector import BaseConnector
-    from invana.graphs.models import Graph
+    from invana.graphs.models import GraphConnection
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class GraphConnectionManager:
             raise GraphUnavailableError(graph_id)
         return connector
 
-    async def register(self, graph: Graph) -> None:
+    async def register(self, graph: GraphConnection) -> None:
         """Connect a newly created graph and add it to the registry."""
         asyncio.create_task(self._connect_graph(graph))
 
@@ -126,7 +126,7 @@ class GraphConnectionManager:
             except Exception:
                 logger.warning("Error disconnecting graph %r during deregister.", graph_id)
 
-    async def reconnect(self, graph: Graph) -> None:
+    async def reconnect(self, graph: GraphConnection) -> None:
         """Disconnect existing connector (if any) and reconnect with fresh config.
 
         Called on PATCH when URI/auth changes, or on POST /graphs/{id}/reconnect.
@@ -138,7 +138,7 @@ class GraphConnectionManager:
     # Internal — connection + retry
     # -----------------------------------------------------------------------
 
-    async def _connect_graph(self, graph: Graph) -> None:
+    async def _connect_graph(self, graph: GraphConnection) -> None:
         connector = _build_connector(graph, self._encryption_key)
         try:
             t0 = time.monotonic()
@@ -166,7 +166,7 @@ class GraphConnectionManager:
                 existing.cancel()
             self._retry_tasks[graph.id] = asyncio.create_task(self._backoff_retry(graph))
 
-    async def _backoff_retry(self, graph: Graph) -> None:
+    async def _backoff_retry(self, graph: GraphConnection) -> None:
         """Exponential backoff retry: 1s → 2s → 4s … capped at ``graph_retry_max_interval_s``.
 
         Always re-fetches the graph from DB so it picks up any URI/auth
@@ -238,7 +238,7 @@ class GraphConnectionManager:
     # Internal — auto-introspect
     # -----------------------------------------------------------------------
 
-    async def _auto_introspect(self, session: AsyncSession, graph: Graph, connector: BaseConnector) -> None:
+    async def _auto_introspect(self, session: AsyncSession, graph: GraphConnection, connector: BaseConnector) -> None:
         """Seed a GraphSchema from live DB introspection on first successful connect."""
         try:
             from invana.modeller.introspector import Introspector
@@ -267,7 +267,7 @@ class GraphConnectionManager:
 # -----------------------------------------------------------------------
 
 
-def _build_connector(graph: Graph, encryption_key: str) -> BaseConnector:
+def _build_connector(graph: GraphConnection, encryption_key: str) -> BaseConnector:
     """Instantiate the vendor connector class from the persisted Graph record."""
     auth = decrypt_credentials(graph.auth_encrypted, encryption_key) if graph.auth_encrypted else {}
     ConnectorClass = import_class_from_dotted_path(graph.connector_class)

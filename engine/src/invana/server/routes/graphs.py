@@ -1,16 +1,21 @@
-"""REST endpoints for managing Graph connection records.
+"""REST endpoints for managing GraphConnection records (legacy connection surface).
+
+S2 will move connection management under ``/u/{username}/{slug}/connection``
+as part of the Graph setup wizard. Until then, this surface remains as
+``/api/v1/graph-connections/*`` so the ``/api/v1/graphs`` namespace stays
+free for Graph container CRUD landing in S2.
 
 Endpoints
 ---------
-POST   /api/v1/graphs                      create
-GET    /api/v1/graphs                      list
-GET    /api/v1/graphs/{id}                 get
-PATCH  /api/v1/graphs/{id}                 update
-DELETE /api/v1/graphs/{id}                 soft-delete
+POST   /api/v1/graph-connections                      create
+GET    /api/v1/graph-connections                      list
+GET    /api/v1/graph-connections/{id}                 get
+PATCH  /api/v1/graph-connections/{id}                 update
+DELETE /api/v1/graph-connections/{id}                 soft-delete
 
-POST   /api/v1/graphs/{id}/reconnect       force re-connect
-POST   /api/v1/graphs/{id}/introspect      re-run schema introspection
-POST   /api/v1/graphs/{id}/project         apply schema to the graph DB
+POST   /api/v1/graph-connections/{id}/reconnect       force re-connect
+POST   /api/v1/graph-connections/{id}/introspect      re-run schema introspection
+POST   /api/v1/graph-connections/{id}/project         apply schema to the graph DB
 """
 
 from __future__ import annotations
@@ -22,11 +27,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.db import get_session
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
-from invana.graphs.schemas import GraphCreate, GraphListResponse, GraphRead, GraphUpdate
-from invana.graphs.store import GraphModelStore
+from invana.graphs.schemas import (
+    GraphConnectionCreate,
+    GraphConnectionListResponse,
+    GraphConnectionRead,
+    GraphConnectionUpdate,
+)
+from invana.graphs.store import GraphConnectionStore
 from invana.settings import settings
 
-graphs_router = APIRouter(prefix="/api/v1/graphs", tags=["graphs"])
+graphs_router = APIRouter(prefix="/api/v1/graph-connections", tags=["graph-connections"])
 
 
 # ---------------------------------------------------------------------------
@@ -38,8 +48,8 @@ def _get_manager(request: Request) -> GraphConnectionManager:
     return request.app.state.graph_connection_manager
 
 
-def _store() -> GraphModelStore:
-    return GraphModelStore()
+def _store() -> GraphConnectionStore:
+    return GraphConnectionStore()
 
 
 # ---------------------------------------------------------------------------
@@ -47,12 +57,12 @@ def _store() -> GraphModelStore:
 # ---------------------------------------------------------------------------
 
 
-@graphs_router.post("", status_code=HTTPStatus.CREATED, response_model=GraphRead)
+@graphs_router.post("", status_code=HTTPStatus.CREATED, response_model=GraphConnectionRead)
 async def create_graph(
-    body: GraphCreate,
+    body: GraphConnectionCreate,
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
-) -> GraphRead:
+) -> GraphConnectionRead:
     """Create a new graph connection record and initiate connection."""
     store = _store()
     graph = await store.create(session, data=body, encryption_key=settings.encryption_key)
@@ -62,38 +72,38 @@ async def create_graph(
     # Fire-and-forget — connection happens in background
     await manager.register(graph)
 
-    return GraphRead.model_validate(graph)
+    return GraphConnectionRead.model_validate(graph)
 
 
-@graphs_router.get("", response_model=GraphListResponse)
+@graphs_router.get("", response_model=GraphConnectionListResponse)
 async def list_graphs(
     session: AsyncSession = Depends(get_session),
-) -> GraphListResponse:
+) -> GraphConnectionListResponse:
     """Return all graph records (including INACTIVE)."""
     graphs = await _store().list_all(session)
-    return GraphListResponse(
-        items=[GraphRead.model_validate(g) for g in graphs],
+    return GraphConnectionListResponse(
+        items=[GraphConnectionRead.model_validate(g) for g in graphs],
         total=len(graphs),
     )
 
 
-@graphs_router.get("/{graph_id}", response_model=GraphRead)
+@graphs_router.get("/{graph_id}", response_model=GraphConnectionRead)
 async def get_graph(
     graph_id: str,
     session: AsyncSession = Depends(get_session),
-) -> GraphRead:
+) -> GraphConnectionRead:
     """Return a single graph record."""
     graph = await _store().get_or_404(session, graph_id)
-    return GraphRead.model_validate(graph)
+    return GraphConnectionRead.model_validate(graph)
 
 
-@graphs_router.patch("/{graph_id}", response_model=GraphRead)
+@graphs_router.patch("/{graph_id}", response_model=GraphConnectionRead)
 async def update_graph(
     graph_id: str,
-    body: GraphUpdate,
+    body: GraphConnectionUpdate,
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
-) -> GraphRead:
+) -> GraphConnectionRead:
     """Update graph metadata or connection details.
 
     If ``uri`` or ``auth`` changes the manager will reconnect automatically.
@@ -107,7 +117,7 @@ async def update_graph(
     if uri_or_auth_changed:
         await manager.reconnect(graph)
 
-    return GraphRead.model_validate(graph)
+    return GraphConnectionRead.model_validate(graph)
 
 
 @graphs_router.delete("/{graph_id}", status_code=HTTPStatus.NO_CONTENT)

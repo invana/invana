@@ -28,11 +28,19 @@ import { useAuth } from "./hooks/useAuth";
 export default function App() {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
-	const { user, displayName, role, logout, activeMembership } = useAuth();
+	const { user, displayName, logout, membershipForGraph, rolesForGraph } =
+		useAuth();
 
 	const isActive = (prefix: string) => pathname.startsWith(prefix);
 
-	// Extract graphId from /graphs/:id/... routes
+	// Active Graph comes from the URL (RFC-017): /u/:username/:slug[/...].
+	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)/);
+	const activeUsername = graphMatch?.[1];
+	const activeSlug = graphMatch?.[2];
+	const activeMembership = membershipForGraph(activeUsername, activeSlug);
+	const { role: activeRole } = rolesForGraph(activeUsername, activeSlug);
+
+	// Legacy GraphConnection routes (S2 will fold these into Graph-scoped pages).
 	const graphIdMatch = pathname.match(/^\/graphs\/([^/]+)/);
 	const currentGraphId = graphIdMatch ? graphIdMatch[1] : null;
 	const isGraphDetailPage = !!currentGraphId && currentGraphId !== "new";
@@ -44,7 +52,7 @@ export default function App() {
 			leftNav={{
 				top: (
 					<div className="flex items-center justify-center w-full py-3">
-						<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm select-none">
+						<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-base select-none">
 							I
 						</div>
 					</div>
@@ -90,7 +98,7 @@ export default function App() {
 						<span className="font-bold text-xl select-none">Invana Studio</span>
 						<Separator orientation="vertical" className="h-4" />
 						<span className="text-muted-foreground">
-							{activeMembership?.workspace_name ??
+							{activeMembership?.graph_name ??
 								(isActive("/graphs") ? "Graphs" : "")}
 						</span>
 					</div>
@@ -105,22 +113,27 @@ export default function App() {
 									size="sm"
 									className="flex items-center gap-2 h-7"
 								>
-									<div className="w-5 h-5 rounded-full bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center">
+									<div className="w-5 h-5 rounded-full bg-primary text-primary-foreground font-bold text-base flex items-center justify-center">
 										{initial}
 									</div>
-									<span className="text-sm">{displayName}</span>
+									<span className="text-base">{displayName}</span>
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="w-56">
 								<DropdownMenuLabel>
 									<div className="flex flex-col">
 										<span>{displayName}</span>
-										<span className="text-xs text-muted-foreground font-normal">
+										<span className="text-base text-muted-foreground font-normal">
 											{user?.email}
 										</span>
-										{role && (
-											<span className="text-xs text-muted-foreground font-normal mt-1">
-												Role: {role}
+										{user?.username && (
+											<span className="text-base text-muted-foreground font-normal">
+												@{user.username}
+											</span>
+										)}
+										{activeRole && (
+											<span className="text-base text-muted-foreground font-normal mt-1">
+												Role: {activeRole}
 											</span>
 										)}
 									</div>
@@ -134,27 +147,25 @@ export default function App() {
 									<DropdownMenuItem
 										onClick={() =>
 											navigate(
-												`/workspaces/${activeMembership.workspace_slug}/settings/members`,
+												`/u/${activeMembership.owner_username}/${activeMembership.graph_slug}/settings/members`,
 											)
 										}
 									>
 										<Users className="w-4 h-4 mr-2" />
-										Workspace members
+										Graph members
 									</DropdownMenuItem>
 								)}
-								{activeMembership && (
-									<RoleGate require="admin">
-										<DropdownMenuItem
-											onClick={() =>
-												navigate(
-													`/workspaces/${activeMembership.workspace_slug}/settings/invitations`,
-												)
-											}
-										>
-											<Mail className="w-4 h-4 mr-2" />
-											Invitations
-										</DropdownMenuItem>
-									</RoleGate>
+								{activeMembership && activeRole === "admin" && (
+									<DropdownMenuItem
+										onClick={() =>
+											navigate(
+												`/u/${activeMembership.owner_username}/${activeMembership.graph_slug}/settings/invitations`,
+											)
+										}
+									>
+										<Mail className="w-4 h-4 mr-2" />
+										Invitations
+									</DropdownMenuItem>
 								)}
 								<RoleGate require="superuser">
 									<DropdownMenuItem

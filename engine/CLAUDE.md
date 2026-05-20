@@ -6,7 +6,7 @@ Python service powering Invana. FastAPI + SQLAlchemy async + Alembic + uv + Ruff
 
 - [`docs/system-design.md`](../docs/system-design.md) — platform-wide system design (vocabulary, missions, agents, knowledge graph flow). Applies to engine + studio + integrations.
 - [`docs/rfcs/`](../docs/rfcs/) — every non-trivial change has an RFC. Read the relevant RFC(s) before editing.
-- Most recent architectural change: **RFC-012 — Mission-Centric Architecture**. Mission is now the top-level entity; everything else (graphs, schemas, skills, instructions, LLM configs, models) is mission-scoped.
+- Most recent architectural change: **RFC-017 — Graph as the Primary Container** (partially supersedes RFC-012). `User → Graph (1:1 GraphConnection)` is the new container model. Mission is removed as an entity; its fields fold onto `Graph`. All graph-scoped URLs live under `/api/v1/u/{username}/{slug}/...`. Users carry a globally unique `username`.
 
 ## Stack
 
@@ -25,20 +25,20 @@ See [`docs/system-design.md`](../docs/system-design.md) for platform vocabulary 
 
 ```
 src/invana/
-  auth/          JWT, User, get_current_user
-  missions/      Mission, MissionTag (top-level entity)
-  graphs/        Graph + GraphConnectionManager (RFC-008)
+  auth/          JWT, User (with username), get_current_user, RefreshToken (Layer 1)
+  graphs/        Graph (container) + GraphConnection (1:1) + GraphMember + Invitation
+                 + GraphConnectionManager (RFC-008) + graph-scoped deps/services/routes
   modeller/      GraphSchema and all schema/version/projection tables (RFC-002)
-  skills/        Skill, Instruction, LLMProvider
-  models_registry/  Model (logical models per mission)
   graph/         Connector protocol code (BaseConnector, OpenCypherConnector, GremlinConnector)
   server/        FastAPI app + routers + starlette-admin
-  cli/           `invana start`, `invana migrate`, `invana load`
+  cli/           `invana start`, `invana migrate`, `invana init`, `invana version`
   telemetry/     OpenTelemetry
   logging/       structured logging
   db.py          async engine, session factory, get_session dep, run_migrations
   settings.py    pydantic-settings, env prefix INVANA_
 ```
+
+Future modules (per `docs/internal/mvp.md`): `datasets/`, `stitcher/`, `skills/`, `instructions/`, `llm_providers/`, `agents/` — all graph-scoped.
 
 ## Rules that apply here
 
@@ -49,9 +49,9 @@ From repo-root `CLAUDE.md`:
 3. **Few, focused tests.** Coverage target ~80%; positive + negative cases, not exhaustive permutations.
 4. **Every user-facing change needs a changeset.**
 
-## Delete semantics (mission-centric era)
+## Delete semantics (RFC-017 era)
 
-Hard deletes everywhere. Cascade flows **downward only** through ownership: `User → Mission → graphs / graph_schemas / skills / instructions / llm_providers / models`. Lookup / association tables (e.g. `mission_tags`) never cascade upward into their parents. See RFC-012 § Delete Semantics for the full matrix.
+Hard deletes everywhere. Cascade flows **downward only** through ownership: `User → Graph → GraphConnection / GraphMember / Invitation / (future) datasets / skills / instructions / llm_providers / agents`. `Graph.created_by_id` uses ON DELETE RESTRICT — owner deletion is blocked while Graphs with other members remain (account-deletion guard B). See RFC-012 § Delete Semantics for the legacy matrix (still applicable for non-Graph FK choices).
 
 ## Common commands
 
@@ -79,6 +79,6 @@ uv run pytest -k "missions and create"
 
 - Don't introduce soft-delete columns (`deleted_at`). Deletes are hard.
 - Don't create per-table encryption keys; reuse `settings.encryption_key`.
-- Don't bypass `get_current_user` on mission-scoped routes.
-- Don't change `graphs.connector_class` after the schema is auto-seeded (immutable, RFC-008).
+- Don't bypass `get_current_user` on user-level routes or `require_graph_*` on graph-scoped routes.
+- Don't change `graph_connections.connector_class` after the schema is auto-seeded (immutable, RFC-008).
 - Don't rename SQLAlchemy table names without a fresh Alembic revision.

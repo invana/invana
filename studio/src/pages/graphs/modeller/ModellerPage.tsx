@@ -102,7 +102,7 @@ export function ModellerPage() {
 	const leftNav = {
 		top: (
 			<div className="flex items-center justify-center w-full py-3">
-				<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm select-none">
+				<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-base select-none">
 					I
 				</div>
 			</div>
@@ -213,7 +213,7 @@ export function ModellerPage() {
 			footer={{
 				className: "!h-[25px]",
 				left: (
-					<div className="flex items-center gap-4 px-2 text-sm text-muted-foreground">
+					<div className="flex items-center gap-4 px-2 text-base text-muted-foreground">
 						{graph && (
 							<>
 								<span>{graph.name}</span>
@@ -240,7 +240,7 @@ export function ModellerPage() {
 					</div>
 				),
 				right: (
-					<div className="flex items-center gap-3 px-2 text-sm text-muted-foreground">
+					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
 						{version?.version && <span>v{version.version}</span>}
 						<span>Modeller</span>
 					</div>

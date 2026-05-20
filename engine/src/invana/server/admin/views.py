@@ -7,14 +7,8 @@ from starlette.requests import Request
 from starlette_admin import StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
-from invana.auth.models import (
-    Invitation,
-    RefreshToken,
-    User,
-    Workspace,
-    WorkspaceMember,
-)
-from invana.graphs.models import Graph
+from invana.auth.models import RefreshToken, User
+from invana.graphs.models import Graph, GraphConnection, GraphMember, Invitation
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
@@ -159,28 +153,33 @@ class UserView(ModelView):
     fields = [
         "id",
         "email",
+        "username",
         "first_name",
         "last_name",
         "is_superuser",
         "is_active",
+        "username_last_changed_at",
         "created_at",
         "updated_at",
     ]
-    search_fields = ["email", "first_name", "last_name"]
-    sortable_fields = ["email", "created_at", "updated_at"]
+    search_fields = ["email", "username", "first_name", "last_name"]
+    sortable_fields = ["email", "username", "created_at", "updated_at"]
 
-    # Users come from `invana init` (root) or workspace invitations — not admin UI.
+    # Users come from `invana init` (root) or graph invitations — not admin UI.
     def can_create(self, request: Request) -> bool:
         return False
 
 
-class WorkspaceView(ModelView):
-    label = "Workspaces"
-    icon = "fa fa-folder"
+class GraphContainerView(ModelView):
+    label = "Graphs"
+    icon = "fa fa-project-diagram"
     fields = [
         "id",
-        "name",
         "slug",
+        "name",
+        "description",
+        "intent",
+        StringField("status", label="Status"),
         "created_by_id",
         "created_at",
         "updated_at",
@@ -189,11 +188,11 @@ class WorkspaceView(ModelView):
     sortable_fields = ["name", "slug", "created_at"]
 
 
-class WorkspaceMemberView(ModelView):
-    label = "Workspace members"
+class GraphMemberView(ModelView):
+    label = "Graph members"
     icon = "fa fa-users"
     fields = [
-        "workspace_id",
+        "graph_id",
         "user_id",
         StringField("role", label="Role"),
         "created_at",
@@ -207,7 +206,7 @@ class InvitationView(ModelView):
     fields = [
         "id",
         "email",
-        "workspace_id",
+        "graph_id",
         StringField("role", label="Role"),
         "invited_by_id",
         "expires_at",
@@ -246,9 +245,12 @@ class RefreshTokenView(ModelView):
         return False
 
 
-class GraphView(ModelView):
+class GraphConnectionView(ModelView):
+    label = "Graph connections"
+    icon = "fa fa-plug"
     fields = [
         "id",
+        "graph_id",
         "name",
         "description",
         "uri",
@@ -279,15 +281,17 @@ def mount_admin(app: FastAPI) -> None:
         base_url="/admin",
         auth_provider=SuperuserAuthProvider(parent_app=app),
     )
-    # Auth (Layer 1)
+    # Identity (Layer 1)
     admin.add_view(UserView(User, label="Users", icon="fa fa-user"))
-    admin.add_view(WorkspaceView(Workspace, label="Workspaces", icon="fa fa-folder"))
-    admin.add_view(WorkspaceMemberView(WorkspaceMember, label="Workspace members", icon="fa fa-users"))
-    admin.add_view(InvitationView(Invitation, label="Invitations", icon="fa fa-envelope"))
     admin.add_view(RefreshTokenView(RefreshToken, label="Refresh tokens", icon="fa fa-key"))
 
-    # Graphs + modeller (existing)
-    admin.add_view(GraphView(Graph))
+    # Graph domain (Layer 2 — RFC-017)
+    admin.add_view(GraphContainerView(Graph, label="Graphs", icon="fa fa-project-diagram"))
+    admin.add_view(GraphConnectionView(GraphConnection, label="Graph connections", icon="fa fa-plug"))
+    admin.add_view(GraphMemberView(GraphMember, label="Graph members", icon="fa fa-users"))
+    admin.add_view(InvitationView(Invitation, label="Invitations", icon="fa fa-envelope"))
+
+    # Modeller (existing)
     admin.add_view(GraphSchemaView(GraphSchema))
     admin.add_view(SchemaVersionView(SchemaVersion))
     admin.add_view(NodeTypeDefinitionView(NodeTypeDefinition))

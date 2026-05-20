@@ -11,12 +11,21 @@ import {
 	TabbedPanel,
 } from "@invana/ui";
 import { AlertTriangle, KeyRound, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
 import { ApiError } from "../../services/api/client";
+
+const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const USERNAME_COOLDOWN_DAYS = 30;
+
+type UsernameState =
+	| { kind: "idle" }
+	| { kind: "checking" }
+	| { kind: "available" }
+	| { kind: "unavailable"; reason: string };
 
 export function ProfileSettingsPage() {
 	const { user, setUser, clear } = useAuth();
@@ -26,7 +35,7 @@ export function ProfileSettingsPage() {
 		<div className="max-w-2xl mx-auto px-6 py-10">
 			<header className="mb-8">
 				<h1 className="text-2xl font-semibold">Account settings</h1>
-				<p className="text-muted-foreground text-sm">
+				<p className="text-muted-foreground text-base">
 					Update your profile, change your password, or close your account.
 				</p>
 			</header>
@@ -41,8 +50,10 @@ export function ProfileSettingsPage() {
 							<BasicInfoTab
 								initial={{
 									email: user.email,
+									username: user.username,
 									first_name: user.first_name,
 									last_name: user.last_name,
+									username_last_changed_at: user.username_last_changed_at,
 								}}
 								onSaved={(updated) => setUser({ ...user, ...updated })}
 							/>
@@ -70,32 +81,111 @@ export function ProfileSettingsPage() {
 
 // ─── Basic info ─────────────────────────────────────────────────────────────
 
+interface BasicInfoInitial {
+	email: string;
+	username: string;
+	first_name: string;
+	last_name: string | null;
+	username_last_changed_at: string | null;
+}
+
 function BasicInfoTab({
 	initial,
 	onSaved,
 }: {
-	initial: { email: string; first_name: string; last_name: string | null };
-	onSaved: (u: { first_name: string; last_name: string | null }) => void;
+	initial: BasicInfoInitial;
+	onSaved: (u: {
+		username: string;
+		first_name: string;
+		last_name: string | null;
+		username_last_changed_at: string | null;
+	}) => void;
 }) {
 	const [firstName, setFirstName] = useState(initial.first_name);
 	const [lastName, setLastName] = useState(initial.last_name ?? "");
+	const [username, setUsername] = useState(initial.username);
 	const [submitting, setSubmitting] = useState(false);
+	const [usernameState, setUsernameState] = useState<UsernameState>({
+		kind: "idle",
+	});
+	const debounceRef = useRef<number | undefined>(undefined);
+
+	const cooldownUntil = computeCooldownUntil(initial.username_last_changed_at);
+	const inCooldown = cooldownUntil !== null && cooldownUntil > new Date();
+
+	const usernameChanged = username.trim().toLowerCase() !== initial.username;
+	const usernameOk = !usernameChanged || usernameState.kind === "available";
+
+	useEffect(() => {
+		if (debounceRef.current) window.clearTimeout(debounceRef.current);
+		const value = username.trim().toLowerCase();
+		if (!usernameChanged) {
+			setUsernameState({ kind: "idle" });
+			return;
+		}
+		if (value.length < 2) {
+			setUsernameState({ kind: "idle" });
+			return;
+		}
+		if (!USERNAME_RE.test(value) || value.includes("--")) {
+			setUsernameState({ kind: "unavailable", reason: "invalid_format" });
+			return;
+		}
+		setUsernameState({ kind: "checking" });
+		debounceRef.current = window.setTimeout(async () => {
+			try {
+				const res = await authApi.usernameAvailable(value);
+				setUsernameState(
+					res.available
+						? { kind: "available" }
+						: { kind: "unavailable", reason: res.reason ?? "taken" },
+				);
+			} catch {
+				setUsernameState({ kind: "idle" });
+			}
+		}, 300);
+		return () => {
+			if (debounceRef.current) window.clearTimeout(debounceRef.current);
+		};
+	}, [username, usernameChanged]);
 
 	const dirty =
 		firstName.trim() !== initial.first_name ||
-		(lastName.trim() || null) !== (initial.last_name ?? null);
+		(lastName.trim() || null) !== (initial.last_name ?? null) ||
+		usernameChanged;
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
+		if (usernameChanged && inCooldown && cooldownUntil) {
+			toast.error(
+				`Username can be changed again on ${cooldownUntil.toLocaleDateString()}.`,
+			);
+			return;
+		}
+		if (usernameChanged && usernameState.kind !== "available") {
+			toast.error("Pick a valid, available username before saving.");
+			return;
+		}
 		setSubmitting(true);
 		try {
-			const updated = await authApi.patchMe({
-				first_name: firstName.trim(),
-				last_name: lastName.trim() || null,
-			});
+			const patch: {
+				first_name?: string;
+				last_name?: string | null;
+				username?: string;
+			} = {};
+			if (firstName.trim() !== initial.first_name) {
+				patch.first_name = firstName.trim();
+			}
+			if ((lastName.trim() || null) !== (initial.last_name ?? null)) {
+				patch.last_name = lastName.trim() || null;
+			}
+			if (usernameChanged) patch.username = username.trim().toLowerCase();
+			const updated = await authApi.patchMe(patch);
 			onSaved({
+				username: updated.username,
 				first_name: updated.first_name,
 				last_name: updated.last_name,
+				username_last_changed_at: updated.username_last_changed_at,
 			});
 			toast.success("Profile updated.");
 		} catch (err) {
@@ -110,9 +200,28 @@ function BasicInfoTab({
 			<div className="space-y-2">
 				<Label htmlFor="email">Email</Label>
 				<Input id="email" value={initial.email} disabled readOnly />
-				<p className="text-xs text-muted-foreground">
+				<p className="text-base text-muted-foreground">
 					Email cannot be changed.
 				</p>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="username">Username</Label>
+				<Input
+					id="username"
+					required
+					minLength={2}
+					maxLength={64}
+					autoCapitalize="off"
+					autoCorrect="off"
+					disabled={inCooldown}
+					value={username}
+					onChange={(e) => setUsername(e.target.value.toLowerCase())}
+				/>
+				<UsernameStatus
+					state={usernameState}
+					changed={usernameChanged}
+					cooldownUntil={cooldownUntil}
+				/>
 			</div>
 			<div className="grid grid-cols-2 gap-3">
 				<div className="space-y-2">
@@ -133,10 +242,66 @@ function BasicInfoTab({
 					/>
 				</div>
 			</div>
-			<Button type="submit" disabled={!dirty || submitting}>
+			<Button type="submit" disabled={!dirty || submitting || !usernameOk}>
 				{submitting ? "Saving…" : "Save changes"}
 			</Button>
 		</form>
+	);
+}
+
+function computeCooldownUntil(lastChanged: string | null): Date | null {
+	if (!lastChanged) return null;
+	const d = new Date(lastChanged);
+	d.setDate(d.getDate() + USERNAME_COOLDOWN_DAYS);
+	return d;
+}
+
+function UsernameStatus({
+	state,
+	changed,
+	cooldownUntil,
+}: {
+	state: UsernameState;
+	changed: boolean;
+	cooldownUntil: Date | null;
+}) {
+	if (cooldownUntil && cooldownUntil > new Date()) {
+		return (
+			<p className="text-base text-muted-foreground">
+				Username can be changed again on {cooldownUntil.toLocaleDateString()}.
+			</p>
+		);
+	}
+	if (!changed) {
+		return (
+			<p className="text-base text-muted-foreground">
+				Lowercase letters, digits, and hyphens. Changes are rate-limited.
+			</p>
+		);
+	}
+	if (state.kind === "checking") {
+		return <p className="text-base text-muted-foreground">Checking…</p>;
+	}
+	if (state.kind === "available") {
+		return (
+			<p className="text-base text-emerald-600 dark:text-emerald-400">
+				Username available.
+			</p>
+		);
+	}
+	if (state.kind === "unavailable") {
+		const message =
+			state.reason === "taken"
+				? "Username is taken."
+				: state.reason === "reserved"
+					? "Username is reserved."
+					: "Invalid format.";
+		return <p className="text-base text-destructive">{message}</p>;
+	}
+	return (
+		<p className="text-base text-muted-foreground">
+			Lowercase letters, digits, and hyphens. Changes are rate-limited.
+		</p>
 	);
 }
 
@@ -253,10 +418,10 @@ function DangerZoneTab({
 		<div className="pt-4 space-y-4">
 			<div className="border border-destructive/30 rounded-md p-4 bg-destructive/5">
 				<h3 className="font-medium text-destructive">Delete account</h3>
-				<p className="text-sm text-muted-foreground mt-1">
-					This permanently deletes your account and removes all workspaces you
-					own — with their datasets, skills, agents, and bindings. This cannot
-					be undone.
+				<p className="text-base text-muted-foreground mt-1">
+					This permanently deletes your account and removes all Graphs you own —
+					with their datasets, skills, agents, and bindings. This cannot be
+					undone.
 				</p>
 				<Button
 					variant="destructive"
@@ -272,8 +437,8 @@ function DangerZoneTab({
 					<DialogHeader>
 						<DialogTitle>Delete account</DialogTitle>
 						<DialogDescription>
-							Type your email and password to confirm. All missions you own,
-							with their datasets, skills, agents, and bindings, will be deleted
+							Type your email and password to confirm. All Graphs you own, with
+							their datasets, skills, agents, and bindings, will be deleted
 							permanently.
 						</DialogDescription>
 					</DialogHeader>

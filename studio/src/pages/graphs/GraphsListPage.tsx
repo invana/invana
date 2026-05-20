@@ -186,7 +186,7 @@ export function GraphsListPage() {
 					<div className="flex flex-col gap-8">
 						{/* Connect */}
 						<div>
-							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-xs">
+							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-base">
 								Connect
 							</p>
 							<button
@@ -201,7 +201,7 @@ export function GraphsListPage() {
 
 						{/* Recent (last 5) */}
 						<div>
-							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-xs">
+							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-base">
 								Recent
 							</p>
 							{isLoading && (
@@ -240,7 +240,7 @@ export function GraphsListPage() {
 					{/* ── Right column: All connections with search + pagination ── */}
 					<div>
 						<div className="flex items-center justify-between mb-4">
-							<p className="font-semibold uppercase tracking-widest text-muted-foreground text-xs">
+							<p className="font-semibold uppercase tracking-widest text-muted-foreground text-base">
 								Graph Connections
 							</p>
 							{!isLoading && allGraphs.length > 0 && (

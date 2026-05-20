@@ -56,6 +56,12 @@ class Settings(BaseSettings):
     auth_access_token_ttl_minutes: int = 15
     auth_refresh_token_ttl_days: int = 7
     auth_invitation_ttl_days: int = 7
+    # Username change cooldown — RFC-017. PATCH /auth/me with a new username inside the
+    # window returns 409. Set to 0 to disable the cooldown (useful in tests).
+    auth_username_change_cooldown_days: int = 30
+    # IP-based rate limit on GET /auth/username-available — the endpoint reveals
+    # whether a username is taken, so cap scraping cost. 0 disables the limit.
+    auth_username_available_rate_limit_per_minute: int = 30
 
     # URL Studio is served from — used to build invitation redeem URLs.
     studio_base_url: str = "http://localhost:8300"
