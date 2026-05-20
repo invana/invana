@@ -377,7 +377,7 @@ The migration runner at `engine/src/invana/db.py:23` is unchanged.
 
 ## Implementation Plan
 
-1. [ ] Write `engine/system-design.md` — engine-only architecture doc reflecting this RFC.
+1. [ ] Write `docs/system-design.md` — platform system-design doc reflecting this RFC.
 2. [ ] Write `engine/CLAUDE.md` — engine-scoped Claude context.
 3. [ ] `engine/src/invana/auth/` — User model, security helpers, dependency, router. Wire JWT settings.
 4. [ ] `engine/src/invana/missions/` — Mission + MissionTag + service + router.
@@ -392,7 +392,7 @@ The migration runner at `engine/src/invana/db.py:23` is unchanged.
 13. [ ] Studio: move modeller/explorer under `/missions/{mid}/graph/{gid}/...`; remove `/graphs` routes; update `useGraphs` to be mission-scoped.
 14. [ ] Add changeset entry describing the breaking redesign (CLAUDE.md rule #8).
 
-Per user direction, no automated tests are written for this redesign. Verification is by manual run-through (see `engine/system-design.md` and the Phase-1 plan file).
+Per user direction, no automated tests are written for this redesign. Verification is by manual run-through (see `docs/system-design.md` and the Phase-1 plan file).
 
 ---
 

@@ -4,7 +4,7 @@ Python service powering Invana. FastAPI + SQLAlchemy async + Alembic + uv + Ruff
 
 ## Read first
 
-- [`engine/system-design.md`](./system-design.md) — module map, ER diagram, cascade matrix, request lifecycle, auth flow, connector resolution.
+- [`docs/system-design.md`](../docs/system-design.md) — platform-wide system design (vocabulary, missions, agents, knowledge graph flow). Applies to engine + studio + integrations.
 - [`docs/rfcs/`](../docs/rfcs/) — every non-trivial change has an RFC. Read the relevant RFC(s) before editing.
 - Most recent architectural change: **RFC-012 — Mission-Centric Architecture**. Mission is now the top-level entity; everything else (graphs, schemas, skills, instructions, LLM configs, models) is mission-scoped.
 
@@ -21,7 +21,7 @@ Python service powering Invana. FastAPI + SQLAlchemy async + Alembic + uv + Ruff
 
 ## Module layout
 
-See `system-design.md` for the full map. Quick orientation:
+See [`docs/system-design.md`](../docs/system-design.md) for platform vocabulary and flow. Quick engine orientation:
 
 ```
 src/invana/

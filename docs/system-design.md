@@ -3,6 +3,8 @@
 > **Invana is a Graph Intelligence Operating System.**
 >
 > A platform where humans and AI collaborate inside *missions*, grounded in *knowledge graphs* that are stitched together from connector-ingested data and user-authored ontology, and reasoned over by agents and LLMs against the mission's declared objectives, goals, and success criteria.
+>
+> At its core, Invana does **context engineering for AI**: it turns scattered, heterogeneous data into curated, ontology-grounded, queryable context that agents and LLMs — inside or outside the platform — can reason over reliably.
 
 This document describes Invana in terms of **what it is, who lives in it, and how work flows through it** — not schemas, APIs, or file layout. RFCs and module docs cite this document for vocabulary and flow; technical specifics live there.
 
@@ -10,7 +12,7 @@ This document describes Invana in terms of **what it is, who lives in it, and ho
 
 ## 1. What Invana is
 
-Invana is an operating system for graph-shaped intelligence work.
+Invana is an operating system for graph-shaped intelligence work — and, more concretely, a substrate for **context engineering**: producing the curated, grounded, queryable context that AI needs to be useful on real work.
 
 The OS metaphor is load-bearing:
 
@@ -33,6 +35,7 @@ Because Invana is an operating system — not a vertical tool — the same primi
 
 | Use case                        | How it composes in Invana                                                                                                       |
 |---------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| **Context engineering for AI**  | Any mix of connectors + user ontology + stitching; the resulting knowledge graph is served as curated context to external agents/LLMs (IDE assistants, chat copilots, app backends) via query and retrieval. |
 | **Coding agents**               | Git-repo connectors + code/AST skills + a code-aware LLM, reasoning over a repo-shaped knowledge graph.                          |
 | **Deep search / research**      | Document connectors (PDF/DOCX/web) + entity-extraction skills, reasoning over a citation- and concept-linked knowledge graph.    |
 | **Explainability**              | Any source + provenance-preserving stitcher + tracing skills; every answer is back-traceable to graph nodes and source records.  |
@@ -220,6 +223,18 @@ The LLM never reasons in a vacuum — it is always grounded by the knowledge gra
 1. When the success criteria are met — or the user decides the mission is done — the user transitions the mission `Open → Closed`.
 2. Closed missions are **read-only**: knowledge graph, conversations, task history, and agent runs remain fully inspectable. No new tasks fire, no agents run.
 3. Reopening is an explicit action — it returns the mission to `Open` and re-enables ingestion and agents.
+
+### 4.11 Serving the graph as context to an external agent
+
+Missions are not only consumed by agents *inside* Invana. The same curated knowledge graph can be served as context to external agents and LLMs — IDE assistants, chat copilots, application backends, custom pipelines.
+
+1. The mission owner issues a **scoped credential** (token or API key) authorising read-or-write access for a specific external client, bound to a specific mission.
+2. The external client calls a **retrieval surface** over the knowledge graph: structured query (Cypher/Gremlin), semantic/vector lookup, or skill-mediated retrieval that returns ranked, grounded snippets.
+3. Every response carries **provenance**: which graph nodes/edges answered the query, and through which ingested records and connector tasks they entered the graph. The external agent can cite back into the mission.
+4. The external client may optionally **write back** — new entities, annotations, conversation traces — under the same authorisation. These writes are mission-scoped and follow the same idempotency and observability rules as in-mission writes.
+5. Closing the mission freezes the external surface to read-only, in lockstep with §4.10.
+
+This is the same loop as §4.9, but inverted: the *agent* lives outside, and Invana is the curated-context layer it grounds against.
 
 ---
 

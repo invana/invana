@@ -50,10 +50,11 @@ Structured knowledge graphs into interactive decision simulation environments.
 - **Vector**: Mixin for DBs with vector index support
 
 ## Key Features
-1. **Graph Modelling** — Ontology, semantics, schema versioning, constraints
-2. **Query Engine** — High-performance async, Cypher + Gremlin, connection pooling
-3. **Visualization** — PixiJS 8 with WebGPU, handles 100K+ nodes at 60fps
-4. **Simulation** — Game theory, hypothesis testing, parameter sweeps, rule engine
+1. **Curated Context** — Turn scattered data into curated context: connectors ingest from heterogeneous sources, stitching binds them under a shared ontology, producing a queryable knowledge graph agents can reason over.
+2. **Graph Modelling** — Ontology, semantics, schema versioning, constraints
+3. **Query Engine** — High-performance async, Cypher + Gremlin, connection pooling
+4. **Visualization** — PixiJS 8 with WebGPU, handles 100K+ nodes at 60fps
+5. **Simulation** — Game theory, hypothesis testing, parameter sweeps, rule engine
 
 ## Rules
 
