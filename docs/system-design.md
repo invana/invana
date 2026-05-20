@@ -75,8 +75,10 @@ This is the canonical vocabulary used everywhere else in the system.
 
 - **Pipeline** — An ordered or scheduled composition of tasks (sequence, fan-out, recurrence).
 
+- **Dataset** — The output of a connector run. A dataset is the named pairing of (a) the **records captured** from the source and (b) the **system graph model** describing their shape. Connectors produce datasets; the stitcher consumes them. Re-running a task refreshes its dataset rather than producing a duplicate.
+
 - **Graph Model** — The ontology describing node types, edge types, and their properties. Two flavors coexist in every mission:
-  - **System Graph Model** — *derived automatically* from connector output. Reflects what was actually ingested.
+  - **System Graph Model** — *derived automatically* by a connector and carried inside a **Dataset**. Reflects what was actually ingested.
   - **User Graph Model** — *authored by the user*. A semantic overlay describing the concepts the user wants to reason about, independent of data sources.
 
 - **Knowledge Graph** — The live, queryable graph inside a mission. Produced by **stitching** the system graph model(s) with the user graph model and binding ingested data to that stitched ontology.
@@ -99,7 +101,7 @@ Invana is organized into eight conceptual layers. Each layer consumes only the l
 ├──────────────────────────────────────────────────────────────────┤
 │  5. Modeling          User graph model · Stitcher                 │
 ├──────────────────────────────────────────────────────────────────┤
-│  4. Ingestion         Tasks · Pipelines · System graph models     │
+│  4. Ingestion         Tasks · Pipelines · Datasets (data + model) │
 ├──────────────────────────────────────────────────────────────────┤
 │  3. Mission           Instructions · Bindings · Lifecycle         │
 ├──────────────────────────────────────────────────────────────────┤
@@ -113,8 +115,8 @@ Invana is organized into eight conceptual layers. Each layer consumes only the l
 1. **Identity & Access** — bootstrap admin from CLI, UI authentication, invitations, role assignment.
 2. **Workspace** — the global, reusable registries. Skills, Agents, LLM Configs, and Connectors are defined here once and bound into many missions.
 3. **Mission** — where intent lives. Each mission picks what it needs from the workspace registries and declares its instructions.
-4. **Ingestion** — connector tasks and pipelines pull data in and emit a system graph model alongside the data.
-5. **Modeling** — the user authors a domain ontology; the stitcher reconciles it with the system models.
+4. **Ingestion** — connector tasks and pipelines pull data in; each run yields a **Dataset** (captured records + the system graph model describing their shape).
+5. **Modeling** — the user authors a domain ontology; the stitcher reconciles it with the system models carried by the datasets.
 6. **Knowledge Graph** — the stitched, queryable graph the mission reasons over.
 7. **Intelligence** — agents, driven by an LLM and a skill set, grounded in the knowledge graph, evaluated against the mission's success criteria.
 8. **Interfaces** — CLI, Studio UI, and API are projections of the layers below.
@@ -180,12 +182,13 @@ Global registries are inert until a mission binds them.
 
 1. The user configures a bound connector instance with a concrete **target** (a folder of PDFs, a Git URL, a MySQL DSN, …).
 2. Executing it produces a **task**. Composing tasks (chain, fan-out, schedule) produces a **pipeline**.
-3. Task execution yields three things in the mission:
+3. Task execution yields a **Dataset** — the named output of the run, consisting of:
    - **Raw records** captured from the source.
    - A **system graph model** — automatically derived, describing what was ingested (entity types, relationships, properties).
-   - **Graph data** populating the knowledge graph against that system model.
 
-A connector's emitted system model is its honest description of the source. The user does not have to agree with its shape — that's what the user graph model and the stitcher are for.
+The dataset is the unit that downstream layers consume; the stitcher reads from datasets, not directly from connectors. A connector's emitted system model is its honest description of the source — the user does not have to agree with its shape; that's what the user graph model and the stitcher are for.
+
+Re-running the same task refreshes its dataset in place rather than producing a duplicate (idempotency, see §5).
 
 ### 4.7 Authoring a user graph model
 
@@ -193,15 +196,15 @@ At any point — before, during, or after ingestion — the user authors a **use
 
 The user graph model has no data of its own initially. It is a **semantic overlay**: the user's view of the world, independent of which sources happen to feed it.
 
-### 4.8 Stitching — system + user models → knowledge graph
+### 4.8 Stitching — datasets + user model → knowledge graph
 
-The **stitcher** is what makes Invana more than a data pipeline. It reconciles system models (one per connector) with the user model:
+The **stitcher** is what makes Invana more than a data pipeline. It takes the mission's **datasets** (each carrying its records and its system graph model) and reconciles them with the user model:
 
-1. **Map** — system entity types are mapped to user ontology concepts (a connector's `pdf:Document` may map to user's `Document`; a MySQL table `customers` may map to user's `Customer`).
-2. **Resolve identity** — the same real-world entity arriving from multiple sources is unified.
+1. **Map** — each dataset's system entity types are mapped to user ontology concepts (a PDF dataset's `pdf:Document` may map to user's `Document`; a MySQL dataset's `customers` table may map to user's `Customer`).
+2. **Resolve identity** — the same real-world entity appearing in multiple datasets is unified.
 3. **Materialize** — the stitched view becomes the mission's working knowledge graph.
 
-Stitching is idempotent: re-running a connector and re-stitching converges; it does not duplicate. The user can review and override stitching decisions.
+Stitching is idempotent: refreshing a dataset and re-stitching converges; it does not duplicate. The user can review and override stitching decisions.
 
 ### 4.9 The AI loop — interacting with the knowledge graph
 
@@ -244,15 +247,17 @@ This is the same loop as §4.9, but inverted: the *agent* lives outside, and Inv
 
 - **System model vs user model.** Both must exist. The system model is the source's honest description of itself; the user model is the user's honest description of the problem. Forcing either side to compromise produces brittle pipelines. Stitching is a first-class step, not an import detail, because that's where the two truths are reconciled.
 
-- **Idempotency.** Re-running a connector, re-stitching, or re-binding should converge to the same state. Operations on the knowledge graph are designed to be safely repeatable.
+- **Idempotency.** Re-running a task (refreshing its dataset), re-stitching, or re-binding should converge to the same state. Operations on the knowledge graph are designed to be safely repeatable.
 
 - **Deletes.** Hard deletes only, with downward-only cascade. Lookup/association tables must never delete their parents.
 
-- **Observability.** Every task run, every agent invocation, every stitch decision is inspectable from within the mission. A user can always trace an answer back through the LLM call → graph queries → ingested records → originating connector task.
+- **Groundedness & explainability.** Every answer Invana surfaces is grounded in the mission's knowledge graph and traceable back to the records that produced it. The LLM reasons *over* facts; it does not invent them. When a question cannot be answered from the graph, the system says so — it does not generate plausible-sounding fillings. This is a contract, not a feature: an answer that cannot be traced through `LLM call → graph query → ingested record → originating dataset / task` is treated as a defect, not a quirk.
+
+- **Observability.** Every task run, every agent invocation, every stitch decision is inspectable from within the mission. A user can always trace an answer back through the LLM call → graph queries → ingested records → originating connector task. Observability is what *operationally* enforces groundedness — without the trace, the contract is unverifiable.
 
 - **Extensibility.** Custom connectors and custom skills are first-class citizens of the OS. The platform does not privilege built-in connectors over user-registered ones; they share the same registration, binding, and execution surface.
 
-- **Generality before verticals.** Invana is a substrate, not a product for a single use case. Coding agents, deep research, analytics, explainability, knowledge management, and decision support are all expressed as the same composition: connectors → graph models → stitched knowledge graph → skills → agents → LLM. The platform does not hard-code any vertical; vertical experiences are built *on top of* the OS by choosing which primitives to compose.
+- **Generality before verticals.** Invana is a substrate, not a product for a single use case. Coding agents, deep research, analytics, explainability, knowledge management, and decision support are all expressed as the same composition: connectors → datasets → stitched knowledge graph → skills → agents → LLM. The platform does not hard-code any vertical; vertical experiences are built *on top of* the OS by choosing which primitives to compose.
 
 ---
 
@@ -262,4 +267,4 @@ This is the same loop as §4.9, but inverted: the *agent* lives outside, and Inv
 - **Not a database schema.** Tables, columns, and graph-store details live in implementation RFCs.
 - **Not an implementation plan.** Sequencing, milestones, and module boundaries live in delivery docs.
 
-This document is the shared mental model. When an RFC or module doc uses the words *mission*, *connector*, *system graph model*, *user graph model*, *stitcher*, or *knowledge graph*, it means them as defined here.
+This document is the shared mental model. When an RFC or module doc uses the words *mission*, *connector*, *dataset*, *system graph model*, *user graph model*, *stitcher*, or *knowledge graph*, it means them as defined here.

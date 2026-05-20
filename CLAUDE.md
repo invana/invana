@@ -51,10 +51,11 @@ Structured knowledge graphs into interactive decision simulation environments.
 
 ## Key Features
 1. **Curated Context** — Turn scattered data into curated context: connectors ingest from heterogeneous sources, stitching binds them under a shared ontology, producing a queryable knowledge graph agents can reason over.
-2. **Graph Modelling** — Ontology, semantics, schema versioning, constraints
-3. **Query Engine** — High-performance async, Cypher + Gremlin, connection pooling
-4. **Visualization** — PixiJS 8 with WebGPU, handles 100K+ nodes at 60fps
-5. **Simulation** — Game theory, hypothesis testing, parameter sweeps, rule engine
+2. **Explainability** — No hallucinations. Every answer is grounded in the mission's knowledge graph and traceable through LLM → query → record → dataset. When the graph can't answer, the system says so.
+3. **Graph Modelling** — Ontology, semantics, schema versioning, constraints
+4. **Query Engine** — High-performance async, Cypher + Gremlin, connection pooling
+5. **Visualization** — PixiJS 8 with WebGPU, handles 100K+ nodes at 60fps
+6. **Simulation** — Game theory, hypothesis testing, parameter sweeps, rule engine
 
 ## Rules
 
