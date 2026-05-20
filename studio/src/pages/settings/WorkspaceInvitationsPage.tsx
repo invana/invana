@@ -18,6 +18,7 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { ApiError } from "../../services/api/client";
@@ -25,20 +26,31 @@ import { workspacesApi } from "../../services/api/workspaces";
 import type { WorkspaceRole } from "../../types/auth";
 
 export function WorkspaceInvitationsPage() {
-	const { activeWorkspaceId, isAdmin } = useAuth();
+	const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
+	const { membershipForSlug } = useAuth();
 	const qc = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const [redeemUrl, setRedeemUrl] = useState<string | null>(null);
 
-	const wid = activeWorkspaceId ?? "";
+	const membership = membershipForSlug(workspaceSlug);
+	const wid = membership?.workspace_id ?? "";
+	const isAdminHere = membership?.role === "admin";
+
 	const { data: invitations, isLoading } = useQuery({
 		queryKey: ["workspace", wid, "invitations"],
 		queryFn: () => workspacesApi.listInvitations(wid),
-		enabled: !!wid && isAdmin,
+		enabled: !!wid && !!isAdminHere,
 	});
 
-	if (!activeWorkspaceId) return null;
-	if (!isAdmin) {
+	if (!workspaceSlug) return <Navigate to="/" replace />;
+	if (!membership) {
+		return (
+			<div className="p-8 text-muted-foreground">
+				You aren&apos;t a member of this workspace.
+			</div>
+		);
+	}
+	if (!isAdminHere) {
 		return (
 			<div className="p-8 text-muted-foreground">
 				Only workspace admins can manage invitations.
@@ -60,9 +72,14 @@ export function WorkspaceInvitationsPage() {
 		<div className="max-w-3xl mx-auto px-6 py-10">
 			<header className="mb-6 flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-semibold">Invitations</h1>
+					<h1 className="text-2xl font-semibold">
+						Invitations &mdash;{" "}
+						<span className="text-muted-foreground font-normal">
+							{membership.workspace_name}
+						</span>
+					</h1>
 					<p className="text-muted-foreground text-sm">
-						Invite developers and analysts to your workspace.
+						Invite developers and analysts to this workspace.
 					</p>
 				</div>
 				<Button onClick={() => setOpen(true)}>New invitation</Button>

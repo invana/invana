@@ -9,6 +9,7 @@ import {
 } from "@invana/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
+import { Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { ApiError } from "../../services/api/client";
@@ -16,9 +17,12 @@ import { workspacesApi } from "../../services/api/workspaces";
 import type { WorkspaceRole } from "../../types/auth";
 
 export function WorkspaceMembersPage() {
-	const { activeWorkspaceId, isAdmin, user } = useAuth();
+	const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
+	const { user, membershipForSlug } = useAuth();
 	const qc = useQueryClient();
-	const wid = activeWorkspaceId ?? "";
+
+	const membership = membershipForSlug(workspaceSlug);
+	const wid = membership?.workspace_id ?? "";
 
 	const { data: members, isLoading } = useQuery({
 		queryKey: ["workspace", wid, "members"],
@@ -26,7 +30,16 @@ export function WorkspaceMembersPage() {
 		enabled: !!wid,
 	});
 
-	if (!activeWorkspaceId) return null;
+	if (!workspaceSlug) return <Navigate to="/" replace />;
+	if (!membership) {
+		return (
+			<div className="p-8 text-muted-foreground">
+				You aren&apos;t a member of this workspace.
+			</div>
+		);
+	}
+
+	const isAdminHere = membership.role === "admin";
 
 	async function onRoleChange(userId: string, role: WorkspaceRole) {
 		try {
@@ -51,9 +64,14 @@ export function WorkspaceMembersPage() {
 	return (
 		<div className="max-w-3xl mx-auto px-6 py-10">
 			<header className="mb-6">
-				<h1 className="text-2xl font-semibold">Members</h1>
+				<h1 className="text-2xl font-semibold">
+					Members &mdash;{" "}
+					<span className="text-muted-foreground font-normal">
+						{membership.workspace_name}
+					</span>
+				</h1>
 				<p className="text-muted-foreground text-sm">
-					{isAdmin
+					{isAdminHere
 						? "Manage roles and remove members from this workspace."
 						: "All members in this workspace."}
 				</p>
@@ -91,7 +109,7 @@ export function WorkspaceMembersPage() {
 									</td>
 									<td className="py-2 text-muted-foreground">{m.email}</td>
 									<td className="py-2">
-										{isAdmin && !isSelf ? (
+										{isAdminHere && !isSelf ? (
 											<Select
 												value={m.role}
 												onValueChange={(v) =>
@@ -112,7 +130,7 @@ export function WorkspaceMembersPage() {
 										)}
 									</td>
 									<td className="py-2 text-right">
-										{isAdmin && !isSelf && (
+										{isAdminHere && !isSelf && (
 											<Button
 												variant="ghost"
 												size="sm"

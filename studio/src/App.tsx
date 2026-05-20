@@ -130,18 +130,32 @@ export default function App() {
 									<UserCircle className="w-4 h-4 mr-2" />
 									Profile settings
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => navigate("/settings/members")}>
-									<Users className="w-4 h-4 mr-2" />
-									Workspace members
-								</DropdownMenuItem>
-								<RoleGate require="admin">
+								{activeMembership && (
 									<DropdownMenuItem
-										onClick={() => navigate("/settings/invitations")}
+										onClick={() =>
+											navigate(
+												`/workspaces/${activeMembership.workspace_slug}/settings/members`,
+											)
+										}
 									>
-										<Mail className="w-4 h-4 mr-2" />
-										Invitations
+										<Users className="w-4 h-4 mr-2" />
+										Workspace members
 									</DropdownMenuItem>
-								</RoleGate>
+								)}
+								{activeMembership && (
+									<RoleGate require="admin">
+										<DropdownMenuItem
+											onClick={() =>
+												navigate(
+													`/workspaces/${activeMembership.workspace_slug}/settings/invitations`,
+												)
+											}
+										>
+											<Mail className="w-4 h-4 mr-2" />
+											Invitations
+										</DropdownMenuItem>
+									</RoleGate>
+								)}
 								<RoleGate require="superuser">
 									<DropdownMenuItem
 										onClick={() => {

@@ -78,9 +78,12 @@ export const router = createBrowserRouter([
 			{ path: "graphs/new", element: <GraphCreatePage /> },
 			{ path: "graphs/:id/edit", element: <GraphEditPage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
-			{ path: "settings/members", element: <WorkspaceMembersPage /> },
 			{
-				path: "settings/invitations",
+				path: "workspaces/:workspaceSlug/settings/members",
+				element: <WorkspaceMembersPage />,
+			},
+			{
+				path: "workspaces/:workspaceSlug/settings/invitations",
 				element: <WorkspaceInvitationsPage />,
 			},
 			{ path: "*", element: <ErrorPage /> },

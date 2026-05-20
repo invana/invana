@@ -20,6 +20,16 @@ export function useAuth() {
 		[user, activeWorkspaceId],
 	);
 
+	function membershipForSlug(slug: string | undefined) {
+		if (!slug) return null;
+		return user?.workspaces.find((w) => w.workspace_slug === slug) ?? null;
+	}
+
+	function membershipForId(id: string | undefined) {
+		if (!id) return null;
+		return user?.workspaces.find((w) => w.workspace_id === id) ?? null;
+	}
+
 	const role: WorkspaceRole | null = activeMembership?.role ?? null;
 	const isAuthenticated = !!accessToken && !!user;
 	const isSuperuser = !!user?.is_superuser;
@@ -48,6 +58,8 @@ export function useAuth() {
 		role,
 		activeWorkspaceId,
 		activeMembership,
+		membershipForSlug,
+		membershipForId,
 		isAuthenticated,
 		isSuperuser,
 		isAdmin,
