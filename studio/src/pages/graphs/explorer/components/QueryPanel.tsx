@@ -1,6 +1,8 @@
 import { defaultKeymap } from "@codemirror/commands";
-import { javascript } from "@codemirror/lang-javascript";
-import { EditorState } from "@codemirror/state";
+import { StreamLanguage } from "@codemirror/language";
+import { cypher } from "@codemirror/legacy-modes/mode/cypher";
+import { groovy } from "@codemirror/legacy-modes/mode/groovy";
+import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import {
 	Button,
@@ -65,6 +67,17 @@ const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
 	gremlin: "Gremlin",
 };
 
+// Stream-language wrappers for CM 6. Cypher is supported natively in
+// legacy-modes; Gremlin's host language is Groovy, so groovy gives us the
+// closest highlighting (strings, comments, keywords, numbers).
+const LANGUAGE_EXTENSION: Record<
+	QueryLanguage,
+	ReturnType<typeof StreamLanguage.define>
+> = {
+	cypher: StreamLanguage.define(cypher),
+	gremlin: StreamLanguage.define(groovy),
+};
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 export interface QueryPanelProps {
@@ -94,6 +107,7 @@ export function QueryPanel({
 
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
+	const languageCompartmentRef = useRef(new Compartment());
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	// ── Keep selectors valid if the available list shifts ────────────────────
@@ -137,7 +151,7 @@ export function QueryPanel({
 			doc: defaultQuery,
 			extensions: [
 				keymap.of(defaultKeymap),
-				javascript(),
+				languageCompartmentRef.current.of(LANGUAGE_EXTENSION[defaultLanguage]),
 				darkTheme,
 				EditorView.lineWrapping,
 			],
@@ -151,6 +165,18 @@ export function QueryPanel({
 			editorViewRef.current = null;
 		};
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+	// Reconfigure the language compartment on language switch — keeps the
+	// editor state (doc, selection, undo history) intact.
+	useEffect(() => {
+		const view = editorViewRef.current;
+		if (!view) return;
+		view.dispatch({
+			effects: languageCompartmentRef.current.reconfigure(
+				LANGUAGE_EXTENSION[language],
+			),
+		});
+	}, [language]);
 
 	// ── Handlers ──────────────────────────────────────────────────────────────
 

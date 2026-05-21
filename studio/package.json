@@ -13,7 +13,8 @@
 	},
 	"dependencies": {
 		"@codemirror/commands": "^6.10.3",
-		"@codemirror/lang-javascript": "^6.2.5",
+		"@codemirror/language": "^6.12.3",
+		"@codemirror/legacy-modes": "^6.5.3",
 		"@codemirror/state": "^6.6.0",
 		"@codemirror/view": "^6.41.0",
 		"@invana/styling": "github:invana/design-kit#releases/styling",
