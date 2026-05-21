@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ThemeToggle } from "../../../components/ThemeToggle";
-import { useGraphQuery } from "../../../hooks/queries/useGraphs";
+import { useLegacyGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
 import type { SelectedItem } from "./components/DetailPanel";
@@ -16,7 +16,8 @@ import { SchemaNav } from "./components/SchemaNav";
 export function ModellerPage() {
 	const navigate = useNavigate();
 	const { id: graphId } = useParams<{ id: string }>();
-	const { data: graph, isLoading: graphLoading } = useGraphQuery(graphId ?? "");
+	const { data: graph, isLoading: graphLoading } =
+		useLegacyGraphConnectionQuery(graphId ?? "");
 	const {
 		data: version,
 		isLoading: versionLoading,

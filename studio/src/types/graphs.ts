@@ -1,8 +1,87 @@
-// ── Status ────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Graph container types (RFC-017)
+//
+// `Graph` is the primary container (was Workspace + Mission). It has a 1:1
+// `GraphConnection` child. URLs: /u/{owner_username}/{slug}.
+// ─────────────────────────────────────────────────────────────────────────────
 
-export type GraphStatus = "CONNECTING" | "ACTIVE" | "ERROR" | "INACTIVE";
+export type GraphContainerStatus = "active" | "archived";
 
-// ── Connector classes — dotted Python import paths ────────────────────────────
+export interface SetupSectionState {
+	completed_at?: string;
+	skipped_at?: string;
+}
+
+export type SetupState = Partial<
+	Record<"graph_info" | "intent" | "skills" | "datasets", SetupSectionState>
+>;
+
+export interface Graph {
+	id: string;
+	slug: string;
+	name: string;
+	description: string | null;
+	intent: string | null;
+	objectives: string | null;
+	success_criteria: string | null;
+	setup_state: SetupState;
+	status: GraphContainerStatus;
+	owner_id: string;
+	owner_username: string;
+	member_count: number;
+	has_connection: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface GraphCreate {
+	name: string;
+	slug: string;
+	intent?: string | null;
+}
+
+export interface GraphUpdate {
+	name?: string;
+	description?: string | null;
+	intent?: string | null;
+	objectives?: string | null;
+	success_criteria?: string | null;
+	status?: GraphContainerStatus;
+}
+
+export interface GraphListResponse {
+	items: Graph[];
+	total: number;
+}
+
+export type SetupSection = "graph_info" | "intent" | "skills" | "datasets";
+export const SETUP_SECTIONS: readonly SetupSection[] = [
+	"graph_info",
+	"intent",
+	"skills",
+	"datasets",
+] as const;
+export const SETUP_REQUIRED: readonly SetupSection[] = [
+	"graph_info",
+	"intent",
+] as const;
+export const SETUP_SKIPPABLE: readonly SetupSection[] = [
+	"skills",
+	"datasets",
+] as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GraphConnection types (legacy `Graph` model, renamed per RFC-017)
+//
+// 1:1 child of `Graph`. Carries DB binding details (URI, driver, encrypted
+// auth) and runtime health. Edited via /u/:username/:slug/connection.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type GraphConnectionStatus =
+	| "CONNECTING"
+	| "ACTIVE"
+	| "ERROR"
+	| "INACTIVE";
 
 export const CONNECTOR_OPTIONS = [
 	{ label: "Neo4j", value: "invana_neo4j.connector.Neo4jConnector" },
@@ -27,16 +106,15 @@ export const CONNECTOR_OPTIONS = [
 
 export type ConnectorClass = (typeof CONNECTOR_OPTIONS)[number]["value"];
 
-// ── API shapes — mirror engine Pydantic schemas exactly ───────────────────────
-
-export interface GraphRead {
+export interface GraphConnectionRead {
 	id: string;
+	graph_id: string | null;
 	name: string;
 	description: string;
 	uri: string;
 	connector_class: string;
 	read_only: boolean;
-	status: GraphStatus;
+	status: GraphConnectionStatus;
 	last_health_check_at: string | null;
 	latency_ms: number | null;
 	schema_id: string | null;
@@ -44,16 +122,18 @@ export interface GraphRead {
 	updated_at: string;
 }
 
-export interface GraphCreate {
+export interface GraphConnectionCreate {
 	name: string;
 	description?: string;
 	uri: string;
 	connector_class: string;
-	auth: { username: string; password: string };
+	// Empty object means "keep existing credentials" on PUT-edit (server treats
+	// falsy auth as no-op). On create, send {username, password}.
+	auth: { username: string; password: string } | Record<string, never>;
 	read_only: boolean;
 }
 
-export interface GraphUpdate {
+export interface GraphConnectionUpdate {
 	name?: string;
 	description?: string;
 	uri?: string;
@@ -62,7 +142,11 @@ export interface GraphUpdate {
 	// connector_class intentionally excluded — immutable after creation
 }
 
-export interface GraphListResponse {
-	items: GraphRead[];
+export interface GraphConnectionListResponse {
+	items: GraphConnectionRead[];
 	total: number;
 }
+
+// Back-compat alias — to be removed once Studio fully migrates off the
+// legacy `GraphStatus` name (it refers to the connection's runtime status).
+export type GraphStatus = GraphConnectionStatus;

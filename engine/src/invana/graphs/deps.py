@@ -89,3 +89,27 @@ async def require_graph_admin(
     if member.role is not GraphRole.admin:
         raise _forbidden("This action requires the admin role in this Graph.")
     return member
+
+
+async def require_graph_setup_complete(
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+) -> Graph:
+    """Gate routes that need the setup wizard's required sections finished.
+
+    Required sections are ``graph_info`` + ``intent`` (see
+    ``invana.graphs.schemas.SETUP_REQUIRED``). 409s with the list of incomplete
+    sections so the Studio can deep-link the user back to the wizard.
+    """
+    from invana.graphs.services import is_setup_complete  # avoid import cycle  # noqa: PLC0415
+
+    ok, missing = is_setup_complete(graph)
+    if not ok:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "error": "graph_setup_incomplete",
+                "missing_sections": missing,
+                "graph_id": graph.id,
+            },
+        )
+    return graph

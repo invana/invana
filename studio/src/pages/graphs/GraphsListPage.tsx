@@ -18,7 +18,6 @@ import {
 	ChevronRight,
 	FilePlus2,
 	MoreHorizontal,
-	RefreshCw,
 	Search,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -27,45 +26,50 @@ import { toast } from "sonner";
 import {
 	useDeleteGraphMutation,
 	useGraphsQuery,
-	useReconnectGraphMutation,
 } from "../../hooks/queries/useGraphs";
-import type { GraphRead } from "../../types/graphs";
-import { CONNECTOR_OPTIONS } from "../../types/graphs";
+import type { Graph } from "../../types/graphs";
 
 const PAGE_SIZE = 6;
 
-function connectorLabel(connectorClass: string): string {
-	return (
-		CONNECTOR_OPTIONS.find((o) => o.value === connectorClass)?.label ??
-		connectorClass
-	);
+function formatRelative(iso: string): string {
+	const then = new Date(iso).getTime();
+	const now = Date.now();
+	const diff = Math.max(0, now - then);
+	const minutes = Math.floor(diff / 60_000);
+	if (minutes < 1) return "just now";
+	if (minutes < 60) return `${minutes}m ago`;
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours}h ago`;
+	const days = Math.floor(hours / 24);
+	if (days < 30) return `${days}d ago`;
+	return new Date(iso).toLocaleDateString();
 }
 
-function formatLatency(ms: number | null): string {
-	if (ms === null) return "—";
-	return `${ms} ms`;
+function setupProgress(graph: Graph): { done: number; total: number } {
+	const sections = ["graph_info", "intent", "skills", "datasets"] as const;
+	const done = sections.filter((s) => {
+		const entry = graph.setup_state?.[s];
+		return !!entry?.completed_at || !!entry?.skipped_at;
+	}).length;
+	return { done, total: sections.length };
 }
 
 function GraphRow({
 	graph,
 	onOpen,
-	onEdit,
-	onReconnect,
 	onDelete,
-	reconnecting,
 }: {
-	graph: GraphRead;
+	graph: Graph;
 	onOpen: () => void;
-	onEdit: () => void;
-	onReconnect: () => void;
 	onDelete: () => void;
-	reconnecting: boolean;
 }) {
+	const { done, total } = setupProgress(graph);
+	const setupDone = done === total;
 	return (
 		<div className="flex items-center gap-3 py-1.5 group">
 			<div
 				className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-					graph.status === "ACTIVE" ? "bg-green-500" : "bg-muted-foreground/40"
+					setupDone ? "bg-green-500" : "bg-muted-foreground/40"
 				}`}
 			/>
 			<button
@@ -76,15 +80,17 @@ function GraphRow({
 				<span className="font-medium shrink-0 group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
 					{graph.name}
 				</span>
-				<span className="text-muted-foreground truncate font-mono">
-					{connectorLabel(graph.connector_class)} — {graph.uri}
-				</span>
+				{/* <span className="text-muted-foreground truncate font-mono">
+          /u/{graph.owner_username}/{graph.slug}
+          {graph.intent ? ` — ${graph.intent}` : ""}
+        </span> */}
 			</button>
-			{graph.latency_ms !== null && (
-				<span className="text-muted-foreground/60 shrink-0 tabular-nums">
-					{formatLatency(graph.latency_ms)}
-				</span>
-			)}
+			{/* <span className="text-muted-foreground/60 shrink-0 tabular-nums">
+        {done}/{total} setup
+      </span> */}
+			{/* <span className="text-muted-foreground/60 shrink-0 tabular-nums">
+        {graph.member_count} {graph.member_count === 1 ? "member" : "members"}
+      </span> */}
 			<div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -94,11 +100,7 @@ function GraphRow({
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-						<DropdownMenuItem onClick={onReconnect} disabled={reconnecting}>
-							<RefreshCw className="h-3.5 w-3.5 mr-2" />
-							Reconnect
-						</DropdownMenuItem>
+						<DropdownMenuItem onClick={onOpen}>Open</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
 							className="text-destructive focus:text-destructive"
@@ -117,8 +119,7 @@ export function GraphsListPage() {
 	const navigate = useNavigate();
 	const { data, isLoading, isError, error } = useGraphsQuery();
 	const deleteMutation = useDeleteGraphMutation();
-	const reconnectMutation = useReconnectGraphMutation();
-	const [deleteTarget, setDeleteTarget] = useState<GraphRead | null>(null);
+	const [deleteTarget, setDeleteTarget] = useState<Graph | null>(null);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 
@@ -130,8 +131,9 @@ export function GraphsListPage() {
 		return allGraphs.filter(
 			(g) =>
 				g.name.toLowerCase().includes(q) ||
-				g.uri.toLowerCase().includes(q) ||
-				connectorLabel(g.connector_class).toLowerCase().includes(q),
+				g.slug.toLowerCase().includes(q) ||
+				g.owner_username.toLowerCase().includes(q) ||
+				(g.intent ?? "").toLowerCase().includes(q),
 		);
 	}, [allGraphs, search]);
 
@@ -142,31 +144,33 @@ export function GraphsListPage() {
 		safePage * PAGE_SIZE,
 	);
 
-	// Reset to page 1 when search changes
 	const handleSearch = (val: string) => {
 		setSearch(val);
 		setPage(1);
 	};
 
-	const handleDelete = () => {
-		if (!deleteTarget) return;
-		deleteMutation.mutate(deleteTarget.id, {
-			onSuccess: () => {
-				toast.success(`"${deleteTarget.name}" deleted`);
-				setDeleteTarget(null);
-			},
-			onError: (err) => {
-				toast.error(err.message);
-				setDeleteTarget(null);
-			},
-		});
+	const openGraph = (graph: Graph) => {
+		navigate(`/u/${graph.owner_username}/${graph.slug}`);
 	};
 
-	const handleReconnect = (graph: GraphRead) => {
-		reconnectMutation.mutate(graph.id, {
-			onSuccess: () => toast.success(`Reconnecting "${graph.name}"…`),
-			onError: (err) => toast.error(err.message),
-		});
+	const handleDelete = () => {
+		if (!deleteTarget) return;
+		deleteMutation.mutate(
+			{
+				username: deleteTarget.owner_username,
+				slug: deleteTarget.slug,
+			},
+			{
+				onSuccess: () => {
+					toast.success(`"${deleteTarget.name}" deleted`);
+					setDeleteTarget(null);
+				},
+				onError: (err) => {
+					toast.error(err.message);
+					setDeleteTarget(null);
+				},
+			},
+		);
 	};
 
 	return (
@@ -182,12 +186,11 @@ export function GraphsListPage() {
 
 				{/* Two-column layout */}
 				<div className="grid grid-cols-[300px_1fr] gap-16">
-					{/* ── Left column: Connect + Recent ── */}
+					{/* ── Left column: Create + Recent ── */}
 					<div className="flex flex-col gap-8">
-						{/* Connect */}
 						<div>
 							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-base">
-								Connect
+								Create
 							</p>
 							<button
 								type="button"
@@ -195,11 +198,10 @@ export function GraphsListPage() {
 								className="flex items-center gap-2.5 py-1.5 text-left text-foreground hover:text-primary transition-colors group"
 							>
 								<FilePlus2 className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-								<span>New Connection</span>
+								<span>New Graph</span>
 							</button>
 						</div>
 
-						{/* Recent (last 5) */}
 						<div>
 							<p className="font-semibold uppercase tracking-widest text-muted-foreground mb-4 text-base">
 								Recent
@@ -215,33 +217,35 @@ export function GraphsListPage() {
 								<p className="text-muted-foreground">None yet</p>
 							)}
 							{!isLoading &&
-								allGraphs.slice(0, 5).map((graph) => (
-									<button
-										key={graph.id}
-										type="button"
-										onClick={() => navigate(`/graphs/${graph.id}/modeller`)}
-										className="flex items-center gap-2 py-1 w-full text-left group"
-									>
-										<div
-											className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-												graph.status === "ACTIVE"
-													? "bg-green-500"
-													: "bg-muted-foreground/40"
-											}`}
-										/>
-										<span className="font-medium truncate group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
-											{graph.name}
-										</span>
-									</button>
-								))}
+								allGraphs.slice(0, 5).map((graph) => {
+									const { done, total } = setupProgress(graph);
+									const setupDone = done === total;
+									return (
+										<button
+											key={graph.id}
+											type="button"
+											onClick={() => openGraph(graph)}
+											className="flex items-center gap-2 py-1 w-full text-left group"
+										>
+											<div
+												className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+													setupDone ? "bg-green-500" : "bg-muted-foreground/40"
+												}`}
+											/>
+											<span className="font-medium truncate group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
+												{graph.name}
+											</span>
+										</button>
+									);
+								})}
 						</div>
 					</div>
 
-					{/* ── Right column: All connections with search + pagination ── */}
+					{/* ── Right column: Graphs ── */}
 					<div>
 						<div className="flex items-center justify-between mb-4">
 							<p className="font-semibold uppercase tracking-widest text-muted-foreground text-base">
-								Graph Connections
+								Graphs
 							</p>
 							{!isLoading && allGraphs.length > 0 && (
 								<span className="text-muted-foreground/60 tabular-nums">
@@ -250,13 +254,12 @@ export function GraphsListPage() {
 							)}
 						</div>
 
-						{/* Search */}
 						{!isLoading && allGraphs.length > 0 && (
 							<div className="relative mb-4">
 								<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
 								<input
 									type="text"
-									placeholder="Search by name, URI or connector…"
+									placeholder="Search by name, slug, owner or intent…"
 									value={search}
 									onChange={(e) => handleSearch(e.target.value)}
 									className="w-full bg-muted/50 border border-border rounded-md pl-8 pr-3 py-1.5 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary"
@@ -264,7 +267,6 @@ export function GraphsListPage() {
 							</div>
 						)}
 
-						{/* List */}
 						{isLoading && (
 							<div className="flex flex-col gap-3">
 								{["s1", "s2", "s3", "s4"].map((k) => (
@@ -282,7 +284,9 @@ export function GraphsListPage() {
 						)}
 
 						{!isLoading && !isError && allGraphs.length === 0 && (
-							<p className="text-muted-foreground">No graph connections yet</p>
+							<p className="text-muted-foreground">
+								No graphs yet — create one to get started.
+							</p>
 						)}
 
 						{!isLoading &&
@@ -301,16 +305,12 @@ export function GraphsListPage() {
 										<GraphRow
 											key={graph.id}
 											graph={graph}
-											onOpen={() => navigate(`/graphs/${graph.id}/modeller`)}
-											onEdit={() => navigate(`/graphs/${graph.id}/edit`)}
-											onReconnect={() => handleReconnect(graph)}
+											onOpen={() => openGraph(graph)}
 											onDelete={() => setDeleteTarget(graph)}
-											reconnecting={reconnectMutation.isPending}
 										/>
 									))}
 								</div>
 
-								{/* Pagination */}
 								{totalPages > 1 && (
 									<div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
 										<span className="text-muted-foreground/60">
@@ -373,8 +373,10 @@ export function GraphsListPage() {
 							Delete &ldquo;{deleteTarget?.name}&rdquo;?
 						</DialogTitle>
 						<DialogDescription>
-							This will remove the connection record. The graph database itself
-							will not be affected. This action cannot be undone.
+							This removes the Graph, its connection record, members, and
+							invitations. The underlying graph database is not affected. Last
+							updated{" "}
+							{deleteTarget ? formatRelative(deleteTarget.updated_at) : ""}.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>

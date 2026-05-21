@@ -1,12 +1,18 @@
-"""HTTP routes for /api/v1/u/{username}/{slug}/* — graph-scoped surface.
+"""HTTP routes for the Graph container + graph-scoped sub-resources (RFC-017).
 
-Members + invitations land here in S1.5. Graph CRUD itself (POST /graphs, GET
-/graphs, PATCH/DELETE) lands in S2 alongside the setup wizard.
+Two routers live here:
+
+- ``graphs_collection_router`` at ``/api/v1/graphs`` — POST (create) + GET (list
+  graphs the current user is a member of). The current user is the implicit
+  owner on POST.
+- ``graph_router`` at ``/api/v1/u/{username}/{slug}`` — GET / PATCH / DELETE on
+  the Graph itself, plus members + invitations. Future S2+ resources
+  (connection, llm, skills, datasets) hang off the same prefix.
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Path, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth.deps import get_current_user
@@ -25,10 +31,88 @@ from invana.graphs.deps import (
     require_graph_member,
     resolve_graph_by_username_slug,
 )
+from invana.graphs.manager import GraphConnectionManager
 from invana.graphs.models import Graph, GraphMember
+from invana.graphs.schemas import (
+    GraphConnectionCreate,
+    GraphConnectionRead,
+    GraphCreate,
+    GraphListResponse,
+    GraphRead,
+    GraphUpdate,
+    SetupSectionUpdate,
+)
+from invana.settings import settings
 
-# All routes are namespaced /api/v1/u/{username}/{slug}/...
+
+def _get_manager(request: Request) -> GraphConnectionManager:
+    return request.app.state.graph_connection_manager
+
+
+# ---------------------------------------------------------------------------
+# Collection — /api/v1/graphs
+# ---------------------------------------------------------------------------
+
+graphs_collection_router = APIRouter(prefix="/api/v1/graphs", tags=["graphs"])
+
+
+@graphs_collection_router.post("", response_model=GraphRead, status_code=status.HTTP_201_CREATED)
+async def create_graph(
+    payload: GraphCreate,
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GraphRead:
+    out = await services.create_graph(session, owner=user, payload=payload)
+    await session.commit()
+    return out
+
+
+@graphs_collection_router.get("", response_model=GraphListResponse)
+async def list_graphs(
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GraphListResponse:
+    items = await services.list_graphs_for_user(session, user_id=user.id)
+    return GraphListResponse(items=items, total=len(items))
+
+
+# ---------------------------------------------------------------------------
+# Per-graph — /api/v1/u/{username}/{slug}
+# ---------------------------------------------------------------------------
+
 graph_router = APIRouter(prefix="/api/v1/u/{username}/{slug}", tags=["graphs"])
+
+
+@graph_router.get("", response_model=GraphRead)
+async def get_graph(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GraphRead:
+    return await services.get_graph_detail(session, graph=graph)
+
+
+@graph_router.patch("", response_model=GraphRead)
+async def patch_graph(
+    payload: GraphUpdate,
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GraphRead:
+    out = await services.update_graph(session, graph=graph, payload=payload)
+    await session.commit()
+    return out
+
+
+@graph_router.delete("", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_graph(
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    await services.delete_graph(session, graph=graph)
+    await session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # ---------------------------------------------------------------------------
@@ -119,4 +203,104 @@ async def delete_invitation(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-__all__ = ["graph_router"]
+# ---------------------------------------------------------------------------
+# Connection sub-resource — /u/{username}/{slug}/connection
+# ---------------------------------------------------------------------------
+
+
+@graph_router.get("/connection", response_model=GraphConnectionRead | None)
+async def get_connection(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GraphConnectionRead | None:
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    return GraphConnectionRead.model_validate(connection) if connection else None
+
+
+@graph_router.put("/connection", response_model=GraphConnectionRead)
+async def put_connection(
+    payload: GraphConnectionCreate,
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
+) -> GraphConnectionRead:
+    connection, created = await services.put_graph_connection(
+        session,
+        graph=graph,
+        payload=payload,
+        encryption_key=settings.encryption_key,
+    )
+    await session.commit()
+    await session.refresh(connection)
+
+    if created:
+        await manager.register(connection)
+    else:
+        await manager.reconnect(connection)
+
+    return GraphConnectionRead.model_validate(connection)
+
+
+@graph_router.delete("/connection", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_connection(
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
+) -> Response:
+    connection = await services.delete_graph_connection(session, graph=graph)
+    await session.commit()
+    if connection is not None:
+        await manager.deregister(connection.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@graph_router.post("/setup/{section}", response_model=GraphRead)
+async def update_setup_section(
+    payload: SetupSectionUpdate,
+    section: str = Path(...),
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> GraphRead:
+    out = await services.update_setup_section(session, graph=graph, section=section, action=payload.action)
+    await session.commit()
+    return out
+
+
+@graph_router.post("/connection/test")
+async def test_connection(
+    payload: GraphConnectionCreate,
+    _: GraphMember = Depends(require_graph_admin),
+    __: Graph = Depends(resolve_graph_by_username_slug),
+) -> dict:
+    """Validate connection credentials without persisting them.
+
+    Build a transient connector with the provided settings, try to connect,
+    discard. Used by the studio's "Test Connection" button to gate the
+    save action.
+    """
+    return await services.test_connection_credentials(
+        uri=payload.uri,
+        connector_class=payload.connector_class,
+        auth=payload.auth,
+    )
+
+
+@graph_router.post("/connection/ping", status_code=status.HTTP_202_ACCEPTED)
+async def ping_connection(
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
+) -> dict:
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
+    await manager.reconnect(connection)
+    return {"detail": "ping initiated"}
+
+
+__all__ = ["graph_router", "graphs_collection_router"]

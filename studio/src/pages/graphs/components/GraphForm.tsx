@@ -10,9 +10,10 @@ import {
 	Switch,
 	Textarea,
 } from "@invana/ui";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
 import { CONNECTOR_OPTIONS } from "../../../types/graphs";
-import type { GraphCreate, GraphUpdate } from "../../../types/graphs";
+import type { GraphConnectionCreate } from "../../../types/graphs";
 
 export interface GraphFormValues {
 	name: string;
@@ -24,12 +25,22 @@ export interface GraphFormValues {
 	read_only: boolean;
 }
 
+type TestState =
+	| { kind: "untested" }
+	| { kind: "testing" }
+	| { kind: "passed"; latencyMs?: number }
+	| { kind: "failed"; error: string };
+
 interface GraphFormProps {
 	initialValues?: Partial<GraphFormValues>;
 	isEdit?: boolean;
 	isSubmitting?: boolean;
-	onSubmit: (values: GraphCreate | GraphUpdate) => void;
+	onSubmit: (values: GraphConnectionCreate) => void;
 	onCancel: () => void;
+	/** Returns {ok, latency_ms?, error?}. Required to enable Save. */
+	onTest: (
+		values: GraphConnectionCreate,
+	) => Promise<{ ok: boolean; latency_ms?: number; error?: string }>;
 }
 
 const DEFAULT_VALUES: GraphFormValues = {
@@ -48,6 +59,7 @@ export function GraphForm({
 	isSubmitting = false,
 	onSubmit,
 	onCancel,
+	onTest,
 }: GraphFormProps) {
 	const [values, setValues] = useState<GraphFormValues>({
 		...DEFAULT_VALUES,
@@ -56,6 +68,7 @@ export function GraphForm({
 	const [errors, setErrors] = useState<
 		Partial<Record<keyof GraphFormValues, string>>
 	>({});
+	const [testState, setTestState] = useState<TestState>({ kind: "untested" });
 
 	const set = <K extends keyof GraphFormValues>(
 		key: K,
@@ -63,45 +76,76 @@ export function GraphForm({
 	) => {
 		setValues((prev) => ({ ...prev, [key]: value }));
 		if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+		// Any connection-relevant change invalidates a previous test result.
+		if (
+			key === "uri" ||
+			key === "username" ||
+			key === "password" ||
+			key === "connector_class"
+		) {
+			setTestState({ kind: "untested" });
+		}
 	};
 
 	const validate = (): boolean => {
 		const next: typeof errors = {};
 		if (!values.name.trim()) next.name = "Name is required";
 		if (!values.uri.trim()) next.uri = "URI is required";
-		if (!isEdit && !values.connector_class)
-			next.connector_class = "Connector is required";
+		if (!values.connector_class) next.connector_class = "Connector is required";
 		setErrors(next);
 		return Object.keys(next).length === 0;
+	};
+
+	const buildCreatePayload = (): GraphConnectionCreate => {
+		// On edit with no re-entered credentials, send empty auth so the server
+		// preserves the stored auth (its `if payload.auth:` check skips re-encrypt).
+		const credsTouched = !!values.username || !!values.password;
+		return {
+			name: values.name,
+			description: values.description || undefined,
+			uri: values.uri,
+			connector_class: values.connector_class,
+			auth:
+				isEdit && !credsTouched
+					? {}
+					: { username: values.username, password: values.password },
+			read_only: values.read_only,
+		};
+	};
+
+	const handleTest = async () => {
+		if (!validate()) return;
+		setTestState({ kind: "testing" });
+		try {
+			const result = await onTest(buildCreatePayload());
+			if (result.ok) {
+				setTestState({ kind: "passed", latencyMs: result.latency_ms });
+			} else {
+				setTestState({
+					kind: "failed",
+					error: result.error ?? "Connection failed.",
+				});
+			}
+		} catch (err) {
+			setTestState({
+				kind: "failed",
+				error: err instanceof Error ? err.message : "Connection failed.",
+			});
+		}
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!validate()) return;
+		if (testState.kind !== "passed") return;
 
-		if (isEdit) {
-			const update: GraphUpdate = {
-				name: values.name,
-				description: values.description || undefined,
-				uri: values.uri,
-				read_only: values.read_only,
-			};
-			if (values.username || values.password) {
-				update.auth = { username: values.username, password: values.password };
-			}
-			onSubmit(update);
-		} else {
-			const create: GraphCreate = {
-				name: values.name,
-				description: values.description || undefined,
-				uri: values.uri,
-				connector_class: values.connector_class,
-				auth: { username: values.username, password: values.password },
-				read_only: values.read_only,
-			};
-			onSubmit(create);
-		}
+		// PUT /connection is full-replace and validates against GraphConnectionCreate
+		// (connector_class required). connector_class is immutable on edit but must
+		// still be in the body — buildCreatePayload echoes the prefilled value.
+		onSubmit(buildCreatePayload());
 	};
+
+	const saveDisabled = isSubmitting || testState.kind !== "passed";
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -232,23 +276,67 @@ export function GraphForm({
 				</Label>
 			</div>
 
+			{/* Test status banner */}
+			{testState.kind === "passed" && (
+				<div className="flex items-center gap-2 text-green-500">
+					<CheckCircle2 className="w-4 h-4" />
+					<span>
+						Connection works
+						{testState.latencyMs !== undefined && (
+							<span className="text-muted-foreground">
+								{" "}
+								· {testState.latencyMs} ms
+							</span>
+						)}
+					</span>
+				</div>
+			)}
+			{testState.kind === "failed" && (
+				<div className="flex items-start gap-2 text-destructive">
+					<XCircle className="w-4 h-4 mt-0.5 shrink-0" />
+					<span>{testState.error}</span>
+				</div>
+			)}
+			{testState.kind === "untested" && (
+				<p className="text-muted-foreground">
+					Test the connection to enable {isEdit ? "Save Changes" : "Create"}.
+				</p>
+			)}
+
 			{/* Actions */}
-			<div className="flex justify-end gap-3 pt-2">
+			<div className="flex justify-between gap-3 pt-2">
 				<Button
 					type="button"
 					variant="outline"
-					onClick={onCancel}
-					disabled={isSubmitting}
+					onClick={handleTest}
+					disabled={isSubmitting || testState.kind === "testing"}
 				>
-					Cancel
+					{testState.kind === "testing" ? (
+						<>
+							<Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+							Testing…
+						</>
+					) : (
+						"Test Connection"
+					)}
 				</Button>
-				<Button type="submit" disabled={isSubmitting}>
-					{isSubmitting
-						? "Saving…"
-						: isEdit
-							? "Save Changes"
-							: "Create Connection"}
-				</Button>
+				<div className="flex gap-3">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onCancel}
+						disabled={isSubmitting}
+					>
+						Cancel
+					</Button>
+					<Button type="submit" disabled={saveDisabled}>
+						{isSubmitting
+							? "Saving…"
+							: isEdit
+								? "Save Changes"
+								: "Create Connection"}
+					</Button>
+				</div>
 			</div>
 		</form>
 	);

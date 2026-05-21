@@ -1,8 +1,12 @@
-"""REST endpoints for reading graph schema data (read-only in v1).
+"""Schema endpoints — graph-scoped under /u/{username}/{slug}/schema.
 
-Endpoints
----------
-GET  /api/v1/schemas/{schema_id}/active-version   get active version w/ all type data
+Endpoint
+--------
+GET /api/v1/u/{username}/{slug}/schema/active-version
+
+Resolves to the active version of the GraphConnection's schema. Falls back
+to the latest version regardless of status if no active version exists yet.
+Graph must have completed the setup wizard's required sections.
 """
 
 from __future__ import annotations
@@ -13,40 +17,40 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.db import get_session
+from invana.graphs import services
+from invana.graphs.deps import require_graph_member, require_graph_setup_complete
+from invana.graphs.models import Graph, GraphMember
 from invana.modeller.schemas import VersionResponse
 from invana.modeller.store import SchemaStore
 
-schemas_router = APIRouter(prefix="/api/v1/schemas", tags=["schemas"])
+schemas_router = APIRouter(prefix="/api/v1/u/{username}/{slug}/schema", tags=["schemas"])
 
 
-def _store() -> SchemaStore:
-    return SchemaStore()
-
-
-@schemas_router.get("/{schema_id}/active-version", response_model=VersionResponse)
+@schemas_router.get("/active-version", response_model=VersionResponse)
 async def get_active_version(
-    schema_id: str,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(require_graph_setup_complete),
     session: AsyncSession = Depends(get_session),
 ) -> VersionResponse:
-    """Return the active schema version.
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None or connection.schema_id is None:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail={"error": "no_schema", "graph_id": graph.id},
+        )
 
-    Falls back to the latest draft if no active version exists yet
-    (e.g. immediately after first introspection).
-    """
-    store = _store()
-    version = await store.get_active_version(session, schema_id)
+    store = SchemaStore()
+    version = await store.get_active_version(session, connection.schema_id)
 
     if version is None:
-        # Fall back to the latest version regardless of status
-        versions = await store.list_versions(session, schema_id)
+        versions = await store.list_versions(session, connection.schema_id)
         if versions:
-            # list_versions orders by created_at asc; take the last one
             latest_id = versions[-1].id
             version = await store.get_version(session, latest_id)
 
     if version is None:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail={"error": "version_not_found", "schema_id": schema_id},
+            detail={"error": "version_not_found", "schema_id": connection.schema_id},
         )
     return VersionResponse.model_validate(version)

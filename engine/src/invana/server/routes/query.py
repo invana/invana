@@ -1,8 +1,12 @@
-"""Raw query execution endpoint.
+"""Raw query execution endpoint — graph-scoped under /u/{username}/{slug}.
 
 Endpoint
 --------
-POST /api/v1/graphs/{id}/query
+POST /api/v1/u/{username}/{slug}/query
+
+The query language is inferred from the connector's reported capabilities.
+Read-only connections have write operations rejected before execution.
+Graph must have completed the setup wizard's required sections.
 """
 
 from __future__ import annotations
@@ -14,11 +18,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.db import get_session
 from invana.graph.types.constants import Capability, QueryLanguage
+from invana.graphs import services
+from invana.graphs.deps import require_graph_member, require_graph_setup_complete
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
+from invana.graphs.models import Graph, GraphMember
 from invana.graphs.schemas import QueryRequest, QueryResponse
-from invana.graphs.store import GraphModelStore
 
-query_router = APIRouter(prefix="/api/v1/graphs", tags=["query"])
+query_router = APIRouter(prefix="/api/v1/u/{username}/{slug}", tags=["query"])
 
 
 def _get_manager(request: Request) -> GraphConnectionManager:
@@ -26,11 +32,6 @@ def _get_manager(request: Request) -> GraphConnectionManager:
 
 
 def _resolve_query_language(connector) -> QueryLanguage:
-    """Determine the query language from the connector's capabilities.
-
-    Prefers Cypher when both are advertised (e.g. ArcadeDB supports both).
-    Raises 422 if neither is supported.
-    """
     caps = connector.capabilities()
     if Capability.CYPHER in caps:
         return QueryLanguage.CYPHER
@@ -45,38 +46,36 @@ def _resolve_query_language(connector) -> QueryLanguage:
     )
 
 
-@query_router.post("/{graph_id}/query", response_model=QueryResponse)
+@query_router.post("/query", response_model=QueryResponse)
 async def run_query(
-    graph_id: str,
     body: QueryRequest,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(require_graph_setup_complete),
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> QueryResponse:
-    """Execute a raw Cypher or Gremlin query against the specified graph.
-
-    The query language is inferred from the connector's reported capabilities.
-    Read-only graphs have write operations rejected before execution.
-    """
-    graph = await GraphModelStore().get_or_404(session, graph_id)
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail={"error": "no_connection", "graph_id": graph.id},
+        )
 
     try:
-        connector = manager.get_connector(graph_id)
+        connector = manager.get_connector(connection.id)
     except GraphUnavailableError:
         raise HTTPException(
             status_code=HTTPStatus.SERVICE_UNAVAILABLE,
-            detail={"error": "graph_not_active", "graph_id": graph_id},
+            detail={"error": "graph_not_active", "connection_id": connection.id},
         ) from None
 
     query_language = _resolve_query_language(connector)
 
-    if graph.read_only:
+    if connection.read_only:
         _assert_read_only_query(body.query, query_language)
 
     try:
-        raw_result = await connector.execute(
-            body.query,
-            parameters=body.parameters,
-        )
+        raw_result = await connector.execute(body.query, parameters=body.parameters)
     except Exception as exc:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -101,7 +100,6 @@ _GREMLIN_WRITE_FRAGMENTS = (".addv(", ".adde(", ".property(", ".drop(")
 
 
 def _assert_read_only_query(query: str, query_language: QueryLanguage) -> None:
-    """Raise 403 if the query looks like a write operation on a read-only graph."""
     normalised = query.strip().lower()
 
     if query_language == QueryLanguage.CYPHER:
@@ -127,7 +125,6 @@ def _assert_read_only_query(query: str, query_language: QueryLanguage) -> None:
 
 
 def _detect_result_type(result: list) -> str:
-    """Infer whether the result represents graph data or tabular data."""
     if not result:
         return "tabular"
     first = result[0]

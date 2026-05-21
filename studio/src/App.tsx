@@ -28,17 +28,18 @@ import { useAuth } from "./hooks/useAuth";
 export default function App() {
 	const navigate = useNavigate();
 	const { pathname } = useLocation();
-	const { user, displayName, logout, membershipForGraph, rolesForGraph } =
-		useAuth();
+	const { user, displayName, logout, membershipForGraph } = useAuth();
 
 	const isActive = (prefix: string) => pathname.startsWith(prefix);
 
 	// Active Graph comes from the URL (RFC-017): /u/:username/:slug[/...].
+	// When off-graph (e.g. /graphs list, /settings/profile), fall back to the
+	// user's first graph so the top-right menu's graph-scoped items stay reachable.
 	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)/);
-	const activeUsername = graphMatch?.[1];
-	const activeSlug = graphMatch?.[2];
-	const activeMembership = membershipForGraph(activeUsername, activeSlug);
-	const { role: activeRole } = rolesForGraph(activeUsername, activeSlug);
+	const urlMembership = membershipForGraph(graphMatch?.[1], graphMatch?.[2]);
+	const fallbackMembership = user?.graphs?.[0] ?? null;
+	const activeMembership = urlMembership ?? fallbackMembership;
+	const activeRole = activeMembership?.role ?? null;
 
 	// Legacy GraphConnection routes (S2 will fold these into Graph-scoped pages).
 	const graphIdMatch = pathname.match(/^\/graphs\/([^/]+)/);

@@ -1,7 +1,7 @@
-import type { GraphRead } from "../../../../types/graphs";
+import type { GraphConnectionRead } from "../../../../types/graphs";
 
 interface ExplorerStatusBarProps {
-	graph: GraphRead | undefined;
+	graph: GraphConnectionRead | undefined;
 	nodeCount: number;
 	relationshipCount: number;
 	queryCount: number;

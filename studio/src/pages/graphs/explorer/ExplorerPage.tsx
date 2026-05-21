@@ -4,7 +4,7 @@ import { Database, GitGraph, Network, Settings } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ThemeToggle } from "../../../components/ThemeToggle";
-import { useGraphQuery } from "../../../hooks/queries/useGraphs";
+import { useLegacyGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import type { QueryResultItem } from "../../../types/query";
 import { CanvasToolbar } from "./components/CanvasToolbar";
 import { ExplorerStatusBar } from "./components/ExplorerStatusBar";
@@ -28,7 +28,7 @@ export function ExplorerPage() {
 	const navigate = useNavigate();
 	const { id: graphId } = useParams<{ id: string }>();
 
-	const { data: graph } = useGraphQuery(graphId ?? "");
+	const { data: graph } = useLegacyGraphConnectionQuery(graphId ?? "");
 	const { mutation, history } = useQueryExecution(graphId ?? "");
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
