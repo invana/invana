@@ -139,7 +139,10 @@ export function ModellerPage() {
 			leftSection={{
 				defaultSize: settingsPanel.isOpen ? "420px" : "260px",
 				minSize: settingsPanel.isOpen ? "320px" : "180px",
-				maxSize: settingsPanel.isOpen ? "640px" : "480px",
+				// Generous max so wide schema lists (long type names, deep
+				// trees) can spread out. mainSection.minSize keeps the canvas
+				// usable.
+				maxSize: settingsPanel.isOpen ? "800px" : "900px",
 				collapsible: false,
 				content: withSettingsTakeover(leftContent),
 			}}

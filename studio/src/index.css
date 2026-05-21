@@ -25,6 +25,16 @@ body {
 		"Droid Sans", sans-serif;
 }
 
+/* Allow the @invana/themes AppLayoutV1 <main className="w-full"> flex item
+   to shrink below its intrinsic content width. Without this, nested
+   ResizablePanelGroups with pixel-sized child panels can push the layout
+   past the viewport because flex items default to `min-width: auto`.
+   Source patch belongs in design-kit; this is the studio-side workaround
+   until that lands. */
+main.w-full {
+	min-width: 0;
+}
+
 /* Thin scrollbars */
 * {
 	scrollbar-width: thin;

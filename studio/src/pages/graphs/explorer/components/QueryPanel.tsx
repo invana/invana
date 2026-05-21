@@ -2,18 +2,35 @@ import { defaultKeymap } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import { Button, ScrollArea, TabbedPanel } from "@invana/ui";
-import { Clock, Play, Terminal } from "lucide-react";
+import {
+	Button,
+	ScrollArea,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+	TabbedPanel,
+} from "@invana/ui";
+import { Clock, Paperclip, Play, Terminal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { QueryLanguage } from "../../../../types/graphs";
+import type { LLMProvider } from "../../../../types/llm";
 import type { QueryHistoryEntry } from "../../../../types/query";
 
-// ── Query language options ────────────────────────────────────────────────────
+// ── Query type + payload shapes ──────────────────────────────────────────────
 
-const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
-	cypher: "Cypher",
-	gremlin: "Gremlin",
-};
+export type QueryMode = "nl" | "ql";
+
+/** Unified payload — ExplorerPage dispatches on `mode`. */
+export type QueryRunPayload =
+	| { mode: "ql"; query: string; language: QueryLanguage }
+	| {
+			mode: "nl";
+			query: string;
+			llmProviderId: string;
+			attachments: File[];
+	  };
 
 // ── CodeMirror dark theme ─────────────────────────────────────────────────────
 
@@ -22,7 +39,11 @@ const darkTheme = EditorView.theme(
 		"&": {
 			color: "#d4d4d4",
 			backgroundColor: "transparent",
-			height: "100%",
+			// Auto-grow within bounds: starts at 200px, scrolls past 500px.
+			// Bounds match the NL textarea so toggling modes feels consistent.
+			height: "auto",
+			minHeight: "200px",
+			maxHeight: "500px",
 		},
 		".cm-scroller": {
 			overflow: "auto",
@@ -40,12 +61,18 @@ const darkTheme = EditorView.theme(
 	{ dark: true },
 );
 
+const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
+	cypher: "Cypher",
+	gremlin: "Gremlin",
+};
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 export interface QueryPanelProps {
 	availableLanguages: readonly QueryLanguage[];
 	defaultLanguage: QueryLanguage;
-	onRun: (query: string, language: QueryLanguage) => void;
+	llmProviders: readonly LLMProvider[];
+	onRun: (payload: QueryRunPayload) => void;
 	isRunning: boolean;
 	history: QueryHistoryEntry[];
 }
@@ -55,22 +82,38 @@ export interface QueryPanelProps {
 export function QueryPanel({
 	availableLanguages,
 	defaultLanguage,
+	llmProviders,
 	onRun,
 	isRunning,
 	history,
 }: QueryPanelProps) {
-	const [activeTab, setActiveTab] = useState<"console" | "history">("console");
+	const [mode, setMode] = useState<QueryMode>("ql");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
+	const [llmProviderId, setLlmProviderId] = useState<string>("");
+	const [nlQuery, setNlQuery] = useState("");
+	const [attachments, setAttachments] = useState<File[]>([]);
+
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	// If a previously-selected language is no longer offered (connector
-	// switched, capabilities re-resolved), fall back to the new default.
+	// ── Keep selectors valid if the available list shifts ────────────────────
 	useEffect(() => {
 		if (!availableLanguages.includes(language)) {
 			setLanguage(defaultLanguage);
 		}
 	}, [availableLanguages, language, defaultLanguage]);
+
+	useEffect(() => {
+		if (llmProviders.length === 0) {
+			setLlmProviderId("");
+			return;
+		}
+		const stillValid = llmProviders.some((p) => p.id === llmProviderId);
+		if (stillValid) return;
+		const preferred = llmProviders.find((p) => p.is_default) ?? llmProviders[0];
+		setLlmProviderId(preferred?.id ?? "");
+	}, [llmProviders, llmProviderId]);
 
 	const languageOptions = useMemo(
 		() =>
@@ -81,13 +124,13 @@ export function QueryPanel({
 		[availableLanguages],
 	);
 
-	// ── Initialise CodeMirror ─────────────────────────────────────────────────
+	// ── Initialise CodeMirror once (stays mounted across mode toggles) ────────
 	// biome-ignore lint/correctness/useExhaustiveDependencies: editor init runs once on mount
 	useEffect(() => {
 		if (!editorContainerRef.current) return;
 
 		const defaultQuery =
-			language === "gremlin"
+			defaultLanguage === "gremlin"
 				? "g.V().hasLabel('Person').limit(25)"
 				: "MATCH (n) RETURN n LIMIT 25";
 
@@ -101,11 +144,7 @@ export function QueryPanel({
 			],
 		});
 
-		const view = new EditorView({
-			state,
-			parent: editorContainerRef.current,
-		});
-
+		const view = new EditorView({ state, parent: editorContainerRef.current });
 		editorViewRef.current = view;
 
 		return () => {
@@ -114,10 +153,34 @@ export function QueryPanel({
 		};
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+	// ── Handlers ──────────────────────────────────────────────────────────────
+
 	const handleRun = () => {
-		const query = editorViewRef.current?.state.doc.toString().trim() ?? "";
-		if (!query) return;
-		onRun(query, language);
+		if (mode === "ql") {
+			const query = editorViewRef.current?.state.doc.toString().trim() ?? "";
+			if (!query) return;
+			onRun({ mode: "ql", query, language });
+		} else {
+			const query = nlQuery.trim();
+			if (!query || !llmProviderId) return;
+			onRun({ mode: "nl", query, llmProviderId, attachments });
+		}
+	};
+
+	const handleAttachClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	const handleAttachChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files;
+		if (!files) return;
+		setAttachments((prev) => [...prev, ...Array.from(files)]);
+		// Reset so the same file can be re-picked after removal.
+		e.target.value = "";
+	};
+
+	const removeAttachment = (index: number) => {
+		setAttachments((prev) => prev.filter((_, i) => i !== index));
 	};
 
 	const loadHistoryEntry = (entry: QueryHistoryEntry) => {
@@ -129,76 +192,199 @@ export function QueryPanel({
 		if (availableLanguages.includes(entry.language)) {
 			setLanguage(entry.language);
 		}
-		setActiveTab("console");
+		setMode("ql");
 	};
 
-	// ── Tab contents ──────────────────────────────────────────────────────────
+	const noLlmProviders = llmProviders.length === 0;
+	const runDisabled =
+		isRunning || (mode === "nl" && (noLlmProviders || !nlQuery.trim()));
 
-	const consoleContent = (
-		<div className="flex flex-col h-full">
-			{/* Language selector */}
-			<div className="px-2 py-1.5 border-b border-border shrink-0">
-				<select
-					value={language}
-					onChange={(e) => setLanguage(e.target.value as QueryLanguage)}
-					disabled={languageOptions.length <= 1}
-					className="bg-muted border border-border rounded px-2 py-1 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-default disabled:opacity-70"
-				>
-					{languageOptions.map((l) => (
-						<option key={l.value} value={l.value}>
-							{l.label}
-						</option>
-					))}
-				</select>
+	// ── Query form — selects + editor + attach/run, in that order ────────────
+	// All selects are @invana/ui's Radix-based <Select> so tab key navigates:
+	// query-type → LLM/lang → editor → (attach) → Run.
+	const queryForm = (
+		<div className="flex flex-col shrink-0 border-b border-border">
+			{/* 1. Inline selects: query-type + LLM/lang on the same row. */}
+			<div className="px-2 py-1.5 shrink-0 flex items-center gap-2 flex-wrap">
+				<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
+					<SelectTrigger className="h-7 w-auto">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="nl">Natural Language</SelectItem>
+						<SelectItem value="ql">Query Language</SelectItem>
+					</SelectContent>
+				</Select>
+
+				{mode === "nl" ? (
+					noLlmProviders ? (
+						<span className="text-muted-foreground">
+							No LLM — configure in Settings → LLMs.
+						</span>
+					) : (
+						<Select value={llmProviderId} onValueChange={setLlmProviderId}>
+							<SelectTrigger className="h-7 w-auto">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{llmProviders.map((p) => (
+									<SelectItem key={p.id} value={p.id}>
+										{p.provider} · {p.model_id}
+										{p.is_default ? " (default)" : ""}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					)
+				) : (
+					<Select
+						value={language}
+						onValueChange={(v) => setLanguage(v as QueryLanguage)}
+						disabled={languageOptions.length <= 1}
+					>
+						<SelectTrigger className="h-7 w-auto">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{languageOptions.map((l) => (
+								<SelectItem key={l.value} value={l.value}>
+									{l.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				)}
 			</div>
-			{/* Editor */}
-			<div
-				ref={editorContainerRef}
-				className="flex-1 overflow-hidden min-h-0"
-			/>
+
+			{/* 2. Editor — auto-grow 200-500px. CodeMirror stays mounted in NL
+			    mode so editor state survives toggling. */}
+			<div className="shrink-0 border-t border-border">
+				<div
+					ref={editorContainerRef}
+					className={mode === "ql" ? "" : "hidden"}
+				/>
+				{mode === "nl" && (
+					<textarea
+						value={nlQuery}
+						onChange={(e) => setNlQuery(e.target.value)}
+						placeholder="Ask anything about your graph…"
+						className="block w-full min-h-[200px] max-h-[500px] bg-transparent p-2 text-foreground outline-none resize-none text-base placeholder:text-muted-foreground field-sizing-content"
+					/>
+				)}
+			</div>
+
+			{/* 3. Action row — Attach (NL only) + Run. Part of the form, not a
+			    separate footer, so they stay anchored to the editor. */}
+			<div className="px-2 py-1.5 border-t border-border shrink-0 flex items-center gap-2">
+				{mode === "nl" && (
+					<>
+						<input
+							ref={fileInputRef}
+							type="file"
+							multiple
+							onChange={handleAttachChange}
+							className="hidden"
+						/>
+						<Button
+							variant="outline"
+							size="sm"
+							className="h-7"
+							onClick={handleAttachClick}
+						>
+							<Paperclip className="w-3 h-3 mr-1" />
+							Attach
+						</Button>
+						{attachments.length > 0 && (
+							<div className="flex items-center gap-1 flex-wrap">
+								{attachments.map((file, i) => (
+									<span
+										key={`${file.name}-${i}`}
+										className="inline-flex items-center gap-1 bg-muted border border-border rounded px-1.5 py-0.5 text-muted-foreground"
+									>
+										{file.name}
+										<button
+											type="button"
+											onClick={() => removeAttachment(i)}
+											className="hover:text-foreground"
+										>
+											<X className="w-3 h-3" />
+										</button>
+									</span>
+								))}
+							</div>
+						)}
+					</>
+				)}
+				<div className="flex-1" />
+				<Button
+					size="sm"
+					className="h-7 gap-1.5"
+					onClick={handleRun}
+					disabled={runDisabled}
+				>
+					<Play className="w-3 h-3" />
+					{isRunning ? "Running…" : "Run"}
+				</Button>
+			</div>
 		</div>
 	);
 
-	const historyContent = (
-		<ScrollArea className="h-full">
-			{history.length === 0 ? (
-				<div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-					<p className="">No queries yet</p>
-				</div>
-			) : (
-				<div className="flex flex-col">
-					{history.map((entry) => (
-						<button
-							key={entry.id}
-							type="button"
-							onClick={() => loadHistoryEntry(entry)}
-							className="text-left px-3 py-2 hover:bg-accent transition-colors border-b border-border last:border-0"
-						>
-							<p className="font-mono text-foreground truncate">
-								{entry.query}
-							</p>
-							<div className="flex items-center gap-2 mt-0.5">
-								<span className="text-[10px] text-muted-foreground">
-									{entry.executedAt.toLocaleTimeString()}
-								</span>
-								<span className="text-[10px] text-muted-foreground">
-									{entry.rowCount} rows
-								</span>
-								<span className="text-[10px] text-muted-foreground">
-									{entry.executionTimeMs}ms
-								</span>
-							</div>
-						</button>
-					))}
-				</div>
-			)}
-		</ScrollArea>
+	// ── History — its own section below the form ─────────────────────────────
+	// Visual separation from the query form: thick top border on the wrapper +
+	// muted bg on the header so it reads as a distinct panel.
+	const historySection = (
+		<div className="flex-1 min-h-0 flex flex-col border-t-4 border-border">
+			<div className="px-3 py-2 flex items-center gap-1.5 text-muted-foreground bg-muted/40 border-b border-border shrink-0 font-medium uppercase tracking-wide">
+				<Clock className="w-3.5 h-3.5" />
+				History ({history.length})
+			</div>
+			<ScrollArea className="flex-1 min-h-0">
+				{history.length === 0 ? (
+					<div className="px-3 py-4 text-muted-foreground">No queries yet.</div>
+				) : (
+					<div className="flex flex-col">
+						{history.map((entry) => (
+							<button
+								key={entry.id}
+								type="button"
+								onClick={() => loadHistoryEntry(entry)}
+								className="text-left px-3 py-2 hover:bg-accent transition-colors border-b border-border last:border-0"
+							>
+								<p className="font-mono text-foreground truncate">
+									{entry.query}
+								</p>
+								<div className="flex items-center gap-2 mt-0.5">
+									<span className="text-xs text-muted-foreground">
+										{entry.executedAt.toLocaleTimeString()}
+									</span>
+									<span className="text-xs text-muted-foreground">
+										{entry.rowCount} rows
+									</span>
+									<span className="text-xs text-muted-foreground">
+										{entry.executionTimeMs}ms
+									</span>
+								</div>
+							</button>
+						))}
+					</div>
+				)}
+			</ScrollArea>
+		</div>
+	);
+
+	// ── Render ────────────────────────────────────────────────────────────────
+	// TabbedPanel wraps the entire surface (left-side panels in Studio always
+	// use TabbedPanel, even single-tab). The form's Attach + Run live inside
+	// the form itself — history is a separate section below.
+	const consoleContent = (
+		<div className="flex flex-col h-full min-h-0">
+			{queryForm}
+			{historySection}
+		</div>
 	);
 
 	return (
 		<TabbedPanel
-			activeTab={activeTab}
-			onTabChange={(v) => setActiveTab(v as "console" | "history")}
 			tabs={[
 				{
 					value: "console",
@@ -206,25 +392,8 @@ export function QueryPanel({
 					icon: Terminal,
 					content: consoleContent,
 				},
-				{
-					value: "history",
-					label: `History (${history.length})`,
-					icon: Clock,
-					content: historyContent,
-				},
 			]}
-			footerContent={
-				<div className="p-2 w-full">
-					<Button
-						className="w-full h-8 gap-1.5"
-						onClick={handleRun}
-						disabled={isRunning || activeTab === "history"}
-					>
-						<Play className="w-3 h-3" />
-						{isRunning ? "Running…" : "Run Query"}
-					</Button>
-				</div>
-			}
+			defaultTab="console"
 		/>
 	);
 }

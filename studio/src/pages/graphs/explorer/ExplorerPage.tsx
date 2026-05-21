@@ -1,5 +1,6 @@
 import { AppLayoutV2 } from "@invana/themes";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
 	GraphCanvas,
 	type GraphCanvasEdge,
@@ -7,13 +8,14 @@ import {
 } from "../../../components/canvas/GraphCanvas";
 import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
+import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import type { QueryLanguage } from "../../../types/graphs";
 import type { QueryResultItem } from "../../../types/query";
 import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import { CanvasToolbar } from "./components/CanvasToolbar";
 import { ExplorerStatusBar } from "./components/ExplorerStatusBar";
 import { InspectorPanel } from "./components/InspectorPanel";
-import { QueryPanel } from "./components/QueryPanel";
+import { QueryPanel, type QueryRunPayload } from "./components/QueryPanel";
 import { useQueryExecution } from "./hooks/useQueryExecution";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
@@ -36,6 +38,11 @@ export function ExplorerPage() {
 	} = useGraphWorkspace({ sectionId: "explorer" });
 
 	const { mutation, history } = useQueryExecution(username, graphSlug);
+	const { data: llmProvidersResponse } = useLLMProvidersQuery(
+		username,
+		graphSlug,
+	);
+	const llmProviders = llmProvidersResponse?.items ?? [];
 	const header = useAppHeader({ pageLabel: "Explorer" });
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
@@ -71,8 +78,20 @@ export function ExplorerPage() {
 		: FALLBACK_QUERY_LANGUAGES;
 	const defaultLanguage: QueryLanguage = availableLanguages[0] ?? "cypher";
 
-	const handleRun = async (query: string, language: QueryLanguage) => {
-		const result = await mutation.mutateAsync({ query, language });
+	const handleRun = async (payload: QueryRunPayload) => {
+		if (payload.mode === "nl") {
+			// NL execution isn't wired yet — the engine only exposes the QL
+			// `/query` endpoint today. Surface that clearly instead of silently
+			// sending an NL prompt as Cypher/Gremlin.
+			toast.info(
+				"Natural-language queries aren't wired to the engine yet. Pick Query Language to run.",
+			);
+			return;
+		}
+		const result = await mutation.mutateAsync({
+			query: payload.query,
+			language: payload.language,
+		});
 		if (result.result_type === "graph" && result.data) {
 			const nodes: QueryResultItem[] = result.data.nodes.map((n) => ({
 				...n,
@@ -118,7 +137,10 @@ export function ExplorerPage() {
 			leftSection={{
 				defaultSize: settingsPanel.isOpen ? "420px" : "300px",
 				minSize: settingsPanel.isOpen ? "320px" : "240px",
-				maxSize: settingsPanel.isOpen ? "640px" : "400px",
+				// Generous max so long Cypher/Gremlin queries can spread out.
+				// mainSection.minSize below still keeps the canvas usable when
+				// the user drags the divider far right.
+				maxSize: settingsPanel.isOpen ? "800px" : "900px",
 				collapsible: false,
 				content: withSettingsTakeover(
 					connectionMissing ? (
@@ -127,6 +149,7 @@ export function ExplorerPage() {
 						<QueryPanel
 							availableLanguages={availableLanguages}
 							defaultLanguage={defaultLanguage}
+							llmProviders={llmProviders}
 							onRun={handleRun}
 							isRunning={mutation.isPending}
 							history={history}
