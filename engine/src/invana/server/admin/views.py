@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from starlette.requests import Request
-from starlette_admin import StringField
+from starlette_admin import DropDown, StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.auth.models import RefreshToken, User
 from invana.graphs.models import Graph, GraphConnection, GraphMember, Invitation
+from invana.instructions.models import Instruction
+from invana.llm_providers.models import LLMProvider
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
@@ -21,6 +23,7 @@ from invana.modeller.models import (
     TypePropertyMapping,
     ValidationRule,
 )
+from invana.skills.models import Skill
 
 
 class GraphSchemaView(ModelView):
@@ -266,6 +269,56 @@ class GraphConnectionView(ModelView):
     search_fields = ["name", "uri"]
 
 
+class LLMProviderView(ModelView):
+    label = "LLM providers"
+    icon = "fa fa-sparkles"
+    # ``api_key_encrypted`` deliberately excluded from `fields` — ciphertext
+    # isn't useful in admin and we don't want it edited by hand.
+    fields = [
+        "id",
+        "graph_id",
+        StringField("provider", label="Provider"),
+        "model_id",
+        "base_url",
+        "guardrails",
+        "is_default",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["model_id", "base_url"]
+
+
+class SkillView(ModelView):
+    label = "Skills"
+    icon = "fa fa-wand-magic-sparkles"
+    fields = [
+        "id",
+        "graph_id",
+        "name",
+        "description",
+        "content",
+        "when_to_use",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["name", "description"]
+
+
+class InstructionView(ModelView):
+    label = "Instructions"
+    icon = "fa fa-scroll"
+    fields = [
+        "id",
+        "graph_id",
+        "name",
+        "content",
+        "priority",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["name"]
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -281,25 +334,62 @@ def mount_admin(app: FastAPI) -> None:
         base_url="/admin",
         auth_provider=SuperuserAuthProvider(parent_app=app),
     )
-    # Identity (Layer 1)
-    admin.add_view(UserView(User, label="Users", icon="fa fa-user"))
-    admin.add_view(RefreshTokenView(RefreshToken, label="Refresh tokens", icon="fa fa-key"))
+    # ── Identity (Layer 1) ───────────────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Identity",
+            icon="fa fa-id-badge",
+            views=[
+                UserView(User, label="Users", icon="fa fa-user"),
+                RefreshTokenView(RefreshToken, label="Refresh tokens", icon="fa fa-key"),
+            ],
+        ),
+    )
 
-    # Graph domain (Layer 2 — RFC-017)
-    admin.add_view(GraphContainerView(Graph, label="Graphs", icon="fa fa-project-diagram"))
-    admin.add_view(GraphConnectionView(GraphConnection, label="Graph connections", icon="fa fa-plug"))
-    admin.add_view(GraphMemberView(GraphMember, label="Graph members", icon="fa fa-users"))
-    admin.add_view(InvitationView(Invitation, label="Invitations", icon="fa fa-envelope"))
+    # ── Graph container + membership (Layer 2 — RFC-017) ─────────────────────
+    admin.add_view(
+        DropDown(
+            label="Graphs",
+            icon="fa fa-project-diagram",
+            views=[
+                GraphContainerView(Graph, label="Graphs", icon="fa fa-circle-nodes"),
+                GraphConnectionView(GraphConnection, label="Graph connections", icon="fa fa-plug"),
+                GraphMemberView(GraphMember, label="Graph members", icon="fa fa-users"),
+                InvitationView(Invitation, label="Invitations", icon="fa fa-envelope"),
+            ],
+        ),
+    )
 
-    # Modeller (existing)
-    admin.add_view(GraphSchemaView(GraphSchema))
-    admin.add_view(SchemaVersionView(SchemaVersion))
-    admin.add_view(NodeTypeDefinitionView(NodeTypeDefinition))
-    admin.add_view(EdgeTypeDefinitionView(EdgeTypeDefinition))
-    admin.add_view(PropertyKeyDefinitionView(PropertyKeyDefinition))
-    admin.add_view(TypePropertyMappingView(TypePropertyMapping))
-    admin.add_view(ConstraintDefinitionView(ConstraintDefinition))
-    admin.add_view(ValidationRuleView(ValidationRule))
-    admin.add_view(IndexDefinitionView(IndexDefinition))
-    admin.add_view(SchemaProjectionView(SchemaProjection))
+    # ── Graph-scoped bindings (LLM / Skills / Instructions) ──────────────────
+    admin.add_view(
+        DropDown(
+            label="Agent bindings",
+            icon="fa fa-robot",
+            views=[
+                LLMProviderView(LLMProvider, label="LLM providers", icon="fa fa-sparkles"),
+                SkillView(Skill, label="Skills", icon="fa fa-wand-magic-sparkles"),
+                InstructionView(Instruction, label="Instructions", icon="fa fa-scroll"),
+            ],
+        ),
+    )
+
+    # ── Modeller (schema + versions + type / property / constraint defs) ─────
+    admin.add_view(
+        DropDown(
+            label="Modeller",
+            icon="fa fa-diagram-project",
+            views=[
+                GraphSchemaView(GraphSchema, label="Schemas"),
+                SchemaVersionView(SchemaVersion, label="Schema versions"),
+                NodeTypeDefinitionView(NodeTypeDefinition, label="Node types"),
+                EdgeTypeDefinitionView(EdgeTypeDefinition, label="Edge types"),
+                PropertyKeyDefinitionView(PropertyKeyDefinition, label="Property keys"),
+                TypePropertyMappingView(TypePropertyMapping, label="Type-property mappings"),
+                ConstraintDefinitionView(ConstraintDefinition, label="Constraints"),
+                ValidationRuleView(ValidationRule, label="Validation rules"),
+                IndexDefinitionView(IndexDefinition, label="Indexes"),
+                SchemaProjectionView(SchemaProjection, label="Projections"),
+            ],
+        ),
+    )
     admin.mount_to(app)

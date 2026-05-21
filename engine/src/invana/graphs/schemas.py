@@ -1,9 +1,9 @@
 """Pydantic request/response models for the Graph + GraphConnection APIs.
 
 The ``Graph*`` shapes back the Graph-container surface
-(``/api/v1/graphs`` + ``/api/v1/u/{username}/{slug}``). The
+(``/api/v1/graphs`` + ``/api/v1/u/{username}/{graphSlug}``). The
 ``GraphConnection*`` shapes back the graph-scoped connection sub-resource
-at ``/u/{username}/{slug}/connection``.
+at ``/u/{username}/{graphSlug}/connection``.
 """
 
 from __future__ import annotations
@@ -40,11 +40,11 @@ class GraphUpdate(BaseModel):
     objectives: str | None = None
     success_criteria: str | None = None
     status: GraphStatus | None = None
-    # slug is not editable here — would break /u/{username}/{slug} URLs.
+    # slug is not editable here — would break /u/{username}/{graphSlug} URLs.
 
 
 class GraphRead(BaseModel):
-    """Graph container payload — used by /api/v1/graphs and /u/{username}/{slug}."""
+    """Graph container payload — used by /api/v1/graphs and /u/{username}/{graphSlug}."""
 
     id: str
     slug: str
@@ -81,7 +81,7 @@ SETUP_SKIPPABLE = ("skills", "datasets")
 
 
 class SetupSectionUpdate(BaseModel):
-    """POST /u/{username}/{slug}/setup/{section} body."""
+    """POST /u/{username}/{graphSlug}/setup/{section} body."""
 
     action: str = Field(..., pattern=r"^(complete|skip|reset)$")
 

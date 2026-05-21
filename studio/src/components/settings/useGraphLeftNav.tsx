@@ -2,6 +2,7 @@ import {
 	Database,
 	GitGraph,
 	Home,
+	Info,
 	Layers,
 	Lightbulb,
 	Network,
@@ -23,7 +24,10 @@ interface SectionMeta {
 }
 
 const SETTINGS_SECTIONS: SectionMeta[] = [
-	{ key: "info", label: "Info", icon: Database, adminOnly: true },
+	// "Info" is a read-only overview of the graph (status + stats). The DB
+	// connection form lives under its own "Connection" icon below.
+	{ key: "info", label: "Info", icon: Info, adminOnly: true },
+	{ key: "connection", label: "Connection", icon: Database, adminOnly: true },
 	{ key: "intent", label: "Intent", icon: Lightbulb, adminOnly: true },
 	{ key: "llms", label: "LLMs", icon: Sparkles, adminOnly: true },
 	{ key: "skills", label: "Skills", icon: Wand2, adminOnly: true },

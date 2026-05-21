@@ -77,6 +77,10 @@ uv run pytest
 uv run pytest -k "missions and create"
 ```
 
+## Rules
+
+- **Every new SQLAlchemy model gets a starlette-admin view.** When you add a new model (in any module — `graphs/`, `llm_providers/`, `skills/`, `instructions/`, future `datasets/` / `agents/` / etc.), also add a `ModelView` for it in `src/invana/server/admin/views.py` and register it under the appropriate `DropDown` section (Identity / Graphs / Agent bindings / Modeller / new section if none fit). Exclude sensitive columns from `fields` (anything ending in `_encrypted`, `_hash`, or a raw token) so they aren't displayed or editable. Mirror the existing patterns: `User.password_hash`, `Invitation.token_hash`, `GraphConnection.auth_encrypted`, `LLMProvider.api_key_encrypted` are all excluded.
+
 ## Don't
 
 - Don't introduce soft-delete columns (`deleted_at`). Deletes are hard.

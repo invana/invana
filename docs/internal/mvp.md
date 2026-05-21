@@ -112,8 +112,8 @@ The Graph is the unit of work. It carries everything previously split across Wor
 
 ### 2.8 Graph settings shell
 - **Backend:** N/A (composition of other features)
-- **Frontend:** [x] Each settings section is its own icon in the graph page's `leftNav` rail (Info / Intent / LLMs / Skills / Datasets / Members / Invitations). Clicking a section sets `?settings=<section>`; the `leftSection` swaps in just that section's content (swap-style, VS Code-shaped). Overview / Explorer / Modeller all share the rail via `useGraphLeftNav`. Standalone `/u/.../settings/<section>` routes remain as deep-link / maximize targets, rendering the same section components inside page chrome.
-- **Integrations:** `@invana/themes` `AppLayoutV2.leftSection` slot, `@invana/ui` (no Sheet/Drawer — abandoned in favour of the rail+swap pattern).
+- **Frontend:** [x] Rail icons (Info / Intent / LLMs / Skills / Instructions / Datasets / Members) drive `?settings=<section>`; the `leftSection` swaps to `<SettingsPanel/>`, which renders the active section inside its **own `@invana/ui` `TabbedPanel`** (tab strip + close + maximize `headerActions`). Members section hosts Invitations as a nested tab via `MembersInvitationsSection` — no separate Invitations rail icon; `/settings/invitations` 301s to `/settings/members`. Same rail across Overview / Explorer / Modeller via `useGraphLeftNav`. Each section's full-page maximize route remains at `/u/.../settings/<section>`.
+- **Integrations:** `@invana/themes` `AppLayoutV2.leftSection` slot, `@invana/ui` `TabbedPanel`.
 
 ### 2.9 Graph lifecycle (active / archived)
 - **Backend:** [ ] `status` enum · middleware/dep that blocks mutating routes on archived Graphs · `POST .../archive` + `.../unarchive`

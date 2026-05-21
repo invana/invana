@@ -44,7 +44,7 @@ class GraphMembershipOut(BaseModel):
 
 
 class GraphMemberOut(BaseModel):
-    """A row in /u/{username}/{slug}/members."""
+    """A row in /u/{username}/{graphSlug}/members."""
 
     user_id: str
     username: str

@@ -1,6 +1,7 @@
 import { Button, TabbedPanel } from "@invana/ui";
 import {
 	Database,
+	Info,
 	Layers,
 	Lightbulb,
 	Maximize2,
@@ -12,6 +13,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
+import { InfoSection } from "./sections/InfoSection";
 import { InstructionsSection } from "./sections/InstructionsSection";
 import { IntentSection } from "./sections/IntentSection";
 import { LLMsSection } from "./sections/LLMsSection";
@@ -110,7 +112,8 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 // ── Section metadata ─────────────────────────────────────────────────────────
 
 const MAXIMIZE_SUBPATHS: Record<SettingsSection, string> = {
-	info: "connection",
+	info: "info",
+	connection: "connection",
 	intent: "intent",
 	llms: "llms",
 	skills: "skills",
@@ -126,7 +129,8 @@ const SINGLE_TAB_SECTIONS: Record<
 	SingleTabSection,
 	{ label: string; icon: typeof Database }
 > = {
-	info: { label: "Info", icon: Database },
+	info: { label: "Info", icon: Info },
+	connection: { label: "Connection", icon: Database },
 	intent: { label: "Intent", icon: Lightbulb },
 	llms: { label: "LLMs", icon: Sparkles },
 	skills: { label: "Skills", icon: Wand2 },
@@ -145,6 +149,8 @@ function SectionContent({
 }) {
 	switch (section) {
 		case "info":
+			return <InfoSection username={username} graphSlug={graphSlug} />;
+		case "connection":
 			return <ConnectionSection username={username} graphSlug={graphSlug} />;
 		case "intent":
 			return <IntentSection username={username} graphSlug={graphSlug} />;

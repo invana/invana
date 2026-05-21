@@ -105,7 +105,7 @@ async def delete_graph(session: AsyncSession, *, graph: Graph) -> None:
 
 
 # ---------------------------------------------------------------------------
-# GraphConnection sub-resource — /u/{username}/{slug}/connection
+# GraphConnection sub-resource — /u/{username}/{graphSlug}/connection
 # ---------------------------------------------------------------------------
 
 

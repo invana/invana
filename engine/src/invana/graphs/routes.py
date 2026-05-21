@@ -5,7 +5,7 @@ Two routers live here:
 - ``graphs_collection_router`` at ``/api/v1/graphs`` — POST (create) + GET (list
   graphs the current user is a member of). The current user is the implicit
   owner on POST.
-- ``graph_router`` at ``/api/v1/u/{username}/{slug}`` — GET / PATCH / DELETE on
+- ``graph_router`` at ``/api/v1/u/{username}/{graphSlug}`` — GET / PATCH / DELETE on
   the Graph itself, plus members + invitations. Future S2+ resources
   (connection, llm, skills, datasets) hang off the same prefix.
 """
@@ -77,7 +77,7 @@ async def list_graphs(
 
 
 # ---------------------------------------------------------------------------
-# Per-graph — /api/v1/u/{username}/{slug}
+# Per-graph — /api/v1/u/{username}/{graphSlug}
 # ---------------------------------------------------------------------------
 
 graph_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["graphs"])
@@ -204,7 +204,7 @@ async def delete_invitation(
 
 
 # ---------------------------------------------------------------------------
-# Connection sub-resource — /u/{username}/{slug}/connection
+# Connection sub-resource — /u/{username}/{graphSlug}/connection
 # ---------------------------------------------------------------------------
 
 

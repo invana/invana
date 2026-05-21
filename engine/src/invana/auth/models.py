@@ -36,7 +36,7 @@ class User(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False, index=True)
     # URL identity. Lowercase + digits + hyphen, 2-64, no leading/trailing/consecutive hyphens.
-    # All graph-scoped URLs live under /u/{username}/{slug}, so usernames cannot collide
+    # All graph-scoped URLs live under /u/{username}/{graphSlug}, so usernames cannot collide
     # with Studio top-level routes (RFC-017). Globally unique, case-insensitive (stored lowercase).
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
