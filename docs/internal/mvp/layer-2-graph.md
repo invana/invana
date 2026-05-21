@@ -1,12 +1,12 @@
 # Layer 2 — Graph (container + settings)
 
-> **Status**: S1.5 + S2 shipped · S3 partial (schema wired; canvas stubbed) · **Tracked by** [RFC-017](../../rfcs/017-graph-as-primary-container.md)
+> **Status**: S1.5 + S2 + S4 shipped · S3 partial (schema wired; canvas stubbed) · **Tracked by** [RFC-017](../../rfcs/017-graph-as-primary-container.md)
 > **Author**: Invana Team
 > **Created**: 2026-05-21
 > **Updated**: 2026-05-21
-> **Maps to MVP**: Layer 2 of `docs/internal/mvp.md`, Slices **S1.5** + **S2** + partial **S3**
+> **Maps to MVP**: Layer 2 of `docs/internal/mvp.md`, Slices **S1.5** + **S2** + **S4** + partial **S3**
 
-> **About this doc.** Layer 2 collapses the original Workspace + Mission split into a single `Graph` container (per RFC-017). Membership and invitations come from Layer 1; everything else — DB binding (1:1 `GraphConnection`), intent/objectives, setup wizard, settings landing — lives here. This doc records the shipped surface; § 2.4–2.7 (Skills, Instructions, LLM, Agents) are scaffolded in `mvp.md` and ship in later slices.
+> **About this doc.** Layer 2 collapses the original Workspace + Mission split into a single `Graph` container (per RFC-017). Membership and invitations come from Layer 1; everything else — DB binding (1:1 `GraphConnection`), intent/objectives, setup wizard, settings UX, LLM providers — lives here. This doc records the shipped surface; § 2.4 (Skills), § 2.5 (Instructions), § 2.7 (Agents) are scaffolded in `mvp.md` and ship in later slices.
 
 ---
 
@@ -60,18 +60,45 @@ A new Graph progresses through a 4-section **setup wizard** (Graph Info / Intent
 **Studio**
 - `/u/:username/:graphSlug/settings/connection` — `GraphForm`. Test Connection gates Save (Save disabled until Test succeeds). Always sends `GraphConnectionCreate` on PUT (full-replace semantics); on edit, the connector input is locked (immutable) and an empty `auth: {}` is sent when credentials are not re-entered.
 
-### 2.8 Graph settings shell
+### 2.6 LLM providers (S4)
+
+**Engine** — `engine/src/invana/llm_providers/`:
+- `LLMProvider` entity: `graph_id` (FK CASCADE), `provider` enum (`anthropic | openai | google | azure | ollama | local`), `model_id`, `api_key_encrypted` (Fernet bytes, nullable), `base_url`, `guardrails` JSONB, `is_default` bool. Partial unique index `(graph_id) WHERE is_default = true` enforces "at most one default per Graph".
+- Routes at `/api/v1/u/{username}/{graphSlug}/llm` — admin-only for writes (`require_graph_admin`), member for reads:
+  - `GET /` — list
+  - `POST /` — create
+  - `GET /{id}` — detail
+  - `PATCH /{id}` — update (re-encrypts `api_key` only if supplied; omitting leaves the stored value)
+  - `DELETE /{id}` — hard delete
+  - `POST /{id}/ping` — credential test
+  - `POST /{id}/set-default` — flips this row's `is_default=true` and unsets siblings in one transaction
+- Ping behaviour: lazy-imports the provider SDK in a thread (anthropic / openai do a 1-token roundtrip); google / azure / local fall back to an HTTP probe of `base_url` if set, otherwise accept the config and let the first real call surface auth errors; ollama probes `base_url`. Reuses `invana.graphs.encryption.encrypt_credentials` to keep one Fernet path across the engine.
 
 **Studio**
-- `/u/:username/:graphSlug/settings` — landing index. Lists sub-settings as links: Connection · Intent · Skills (S5 placeholder) · Datasets (S6 placeholder) · Members · Invitations.
-- Admin-only sections are filtered out for non-admins via `rolesForGraph(username, graphSlug)`.
-- Left rail (`App.tsx`) shows a graph-scoped **Graph settings** entry only while inside a Graph; off-graph, only Profile.
-- Bottom rail still has Profile (`/settings/profile`).
-- Members + Invitations pages (`/settings/members`, `/settings/invitations`) come from Layer 1.
+- `LLMsSection` in the settings panel (rail icon "Sparkles"): list view with row actions (Set default · Edit · Delete) + add/edit form.
+- Provider-driven field visibility from `LLM_PROVIDER_OPTIONS`: Ollama/local hide `api_key`, OpenAI/Azure/Ollama show `base_url`.
+- Provider is **immutable on edit** (parallels `connector_class` on `/connection`) — the field renders as a disabled Input.
+- Save-first Test: a transient ping requires a saved row, so on a new provider Save is allowed without Test (the create itself surfaces SDK auth errors). On edit, the Test button updates the row + pings; result drives a green/red banner the same shape as the Connection form's Test.
+- `api_key` on edit: omitting leaves the stored key untouched; typing a new value re-encrypts. Helper text says "leave blank to keep stored key".
+- Full-page maximize target at `/u/:username/:graphSlug/settings/llms` (`GraphLLMsSettingsPage` — thin wrapper).
+
+### 2.8 Graph settings shell (rail + swap pattern)
+
+The original "landing page with sub-section links" was replaced (per user feedback) with a docked rail-icon UX that lives across **every** graph page. No drawer, no modal.
+
+**Studio**
+- Each settings section is a top-level icon in the page's `leftNav` rail: Info · Intent · LLMs · Skills · Datasets · Members · Invitations. Defined once in `useGraphLeftNav(username, graphSlug, activeTab)` and consumed by Overview, Explorer, and Modeller — so every graph page exposes the same chrome.
+- Clicking a section icon calls `useSettingsPanel().setSection(section)`, which sets `?settings=<section>` on the current URL. The page's `leftSection` slot then swaps from its default content (QueryPanel on Explorer, SchemaNav on Modeller, hidden on Overview) to `<SettingsPanel/>`, which renders just that section's content plus a small header with `maximize` + `close` buttons. Closing clears the URL param; navigating to a different graph view also clears it.
+- `SettingsPanel` is a section dispatcher only — no inner sub-nav (the rail _is_ the sub-nav).
+- Standalone routes at `/u/:username/:graphSlug/settings/<section>` remain as deep-link / maximize targets, rendering the same `<XSection>` component inside page chrome with a "Back to overview" link.
+- Admin-only sections are filtered out of the rail for non-admins via `rolesForGraph(username, graphSlug)` (members can see Members; everything else is admin-only).
+- Bottom rail across the App shell holds only `Profile` (the prior "Graph settings" gear was removed — the rail-icon approach makes it redundant).
+
+**Overview-specific note.** Overview now wraps its own `AppLayoutV2` (route lifted out of `App.tsx`'s children to top-level, alongside Explorer/Modeller). `leftSection` only renders when `?settings` is set, so the page is full-width otherwise. The wizard + quick-actions content lives in `mainSection`.
 
 ### 2.x Studio Explorer / Modeller (Layer 4.1 / Layer 5.5)
 
-Mounted under `/u/:username/:graphSlug/{modeller,explorer}` and consume Layer 2 endpoints via the graph-scoped query and schema routes. Canvas rendering is stubbed — see Risk notes in `mvp.md`.
+Mounted under `/u/:username/:graphSlug/{modeller,explorer}` and consume Layer 2 endpoints via the graph-scoped query and schema routes. Both pages share `useGraphLeftNav` so the section icons + view icons stay consistent. Canvas rendering is stubbed — see Risk notes in `mvp.md`.
 
 ## Removed legacy surface
 
@@ -111,13 +138,29 @@ row_count           int    — nodes+edges for graph; len(records) for tabular
 
 Detection: any nodes or edges present ⇒ `graph`; otherwise ⇒ `tabular`.
 
+### `LLMProviderCreate` (POST /llm body)
+
+```
+provider     enum    required — anthropic|openai|google|azure|ollama|local
+model_id     string  required, 1–255
+api_key      string  optional — required for non-ollama / non-local providers
+base_url     string  optional, ≤ 2048 — used by azure / ollama / local
+guardrails   object  default {}
+is_default   bool    default false — service unsets other defaults in the same Graph
+```
+
+`LLMProviderRead` strips `api_key_encrypted` and surfaces `has_api_key: bool` instead, so clients can show "key set ✓" without exposing ciphertext.
+
 ## Notable design choices
 
 - **PUT semantics on `/connection`.** Full-replace, not partial update. The client always sends `GraphConnectionCreate`. This lets a single endpoint handle both "first save" and "edit" without a separate POST / PATCH split; the server's `put_graph_connection` service branches on `existing is None`.
-- **Immutable `connector_class`.** Changing the connector after schema introspection invalidates the seeded schema. Enforced server-side (409). On the form, the Connector select is rendered as a disabled Input on edit, with the existing value shown.
-- **Empty `auth` preserves credentials.** Removes the need for a separate "leave-blank-to-keep" sentinel. Server: `if payload.auth:` only re-encrypts when a non-empty dict is sent.
+- **Immutable `connector_class` and `provider`.** Changing them after configuration invalidates downstream state (seeded schema; running agents). Both are enforced as immutable on edit — server-side for `connector_class` (409), client-side for `provider` (form renders the field as a disabled Input).
+- **Empty `auth` preserves credentials.** Removes the need for a separate "leave-blank-to-keep" sentinel on `/connection`. Server: `if payload.auth:` only re-encrypts when a non-empty dict is sent. The LLM provider PATCH uses the same shape (`api_key`: omit-to-keep, supply-to-rotate).
 - **Wizard section auto-completion.** `graph_info` completes on every save (not just first) so resetting + re-saving leaves the section complete. `intent` completes whenever a non-empty intent lands via PATCH.
 - **`graphSlug` in routing code.** The URL path parameter is named `graphSlug` (not `slug`) in router paths, `useParams` types, API client + hook arg names, and mutation arg keys. The data field on the Graph entity stays `slug`. This disambiguates the URL-param meaning from the generic concept of "a slug" elsewhere in the codebase.
+- **Settings UX is rail+swap, not modal/drawer.** Each section is a top-level icon in the page's `leftNav` rail; the `leftSection` slot swaps from its default content (QueryPanel, SchemaNav) to the section's content (`SettingsPanel`) when `?settings` is set. Mutually exclusive — single panel at a time, no chrome crowding. The user's canvas/inspector/overview stay visible at full size so "test the change against current work" remains a one-click round-trip.
+- **URL-as-source-of-truth for the settings panel.** Section selection lives entirely in `?settings=<section>` (no React state). Refresh preserves the section; browser back closes the panel; Cmd-click on the rail icon's underlying link opens the full-page route in a new tab. `useSettingsPanel` is a tiny wrapper around `useSearchParams`.
+- **Save-first Test on LLM providers.** Unlike `/connection/test` (which spins up a transient connector), LLM ping needs a persisted row to read the Fernet-encrypted key from. So the LLMs form allows Save without Test on a new row (create surfaces SDK auth errors directly); on edit, Test does a PATCH-then-ping and renders a green/red banner like the connection form.
 
 ## Open items (not blocking)
 

@@ -101,9 +101,9 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Integrations:** CodeMirror 6 markdown mode
 
 ### 2.6 LLM providers (graph-scoped)
-- **Backend:** [ ] `LLMProvider` entity — `graph_id`, provider enum (anthropic / openai / google / azure / local) · `model_id` · `api_key_encrypted` (Fernet) · `base_url` (optional) · guardrails (token budgets, allowed model families) · default-provider flag enforced at service layer · CRUD under `/api/v1/u/{username}/{graphSlug}/llm/...` · `POST .../llm/{id}/ping` for credential test
-- **Frontend:** [ ] LLM tab in Graph settings · provider/model selector · masked api-key field · guardrails form · "Test connection" button
-- **Integrations:** `cryptography.Fernet` (reuses `INVANA_ENCRYPTION_KEY`) · per-provider Python SDK lazy-imported: `anthropic` (primary), `openai`, `google-generativeai` (optional)
+- **Backend:** [x] `LLMProvider` entity (graph-scoped, CASCADE) with provider enum (anthropic / openai / google / azure / ollama / local). CRUD + `POST .../llm/{id}/ping` + `POST .../llm/{id}/set-default` under `/api/v1/u/{username}/{graphSlug}/llm/...`. Partial unique `(graph_id) WHERE is_default = true`. Reuses `invana.graphs.encryption` for Fernet on `api_key`.
+- **Frontend:** [x] LLMs section (rail icon — see § 2.8) · provider-driven form (Ollama hides api_key, OpenAI/Azure show base_url) · masked api-key field · Test gating via save-first → ping → green/red · Set default / Edit / Delete row actions · maximize-to-full-page route at `/settings/llms`.
+- **Integrations:** `cryptography.Fernet` (reuses `INVANA_ENCRYPTION_KEY`) · per-provider Python SDK lazy-imported: `anthropic`, `openai` (Google/Azure use a base-URL HTTP probe until SDKs are wired; Ollama uses an HTTP probe).
 
 ### 2.7 Agents (graph-scoped)
 - **Backend:** [ ] `Agent` entity — `graph_id`, composes `skill_ids[]` + `llm_config_id` + operating policy JSONB (autonomy level, fire conditions, reporting) · CRUD under `/api/v1/u/{username}/{graphSlug}/agents/...`
@@ -112,8 +112,8 @@ The Graph is the unit of work. It carries everything previously split across Wor
 
 ### 2.8 Graph settings shell
 - **Backend:** N/A (composition of other features)
-- **Frontend:** [~] `/u/:username/:graphSlug/settings` landing page with sub-settings links (Connection · Intent · Skills (S5) · Datasets (S6) · Members · Invitations); admin-only sections hidden for non-admins. General + LLM + Instructions + Agents land with their slices.
-- **Integrations:** `@invana/design-kit` (links/cards)
+- **Frontend:** [x] Each settings section is its own icon in the graph page's `leftNav` rail (Info / Intent / LLMs / Skills / Datasets / Members / Invitations). Clicking a section sets `?settings=<section>`; the `leftSection` swaps in just that section's content (swap-style, VS Code-shaped). Overview / Explorer / Modeller all share the rail via `useGraphLeftNav`. Standalone `/u/.../settings/<section>` routes remain as deep-link / maximize targets, rendering the same section components inside page chrome.
+- **Integrations:** `@invana/themes` `AppLayoutV2.leftSection` slot, `@invana/ui` (no Sheet/Drawer — abandoned in favour of the rail+swap pattern).
 
 ### 2.9 Graph lifecycle (active / archived)
 - **Backend:** [ ] `status` enum · middleware/dep that blocks mutating routes on archived Graphs · `POST .../archive` + `.../unarchive`
@@ -503,11 +503,11 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 - **BE:** [x] `GraphSchema` graph-scoped — `/u/:username/:graphSlug/schema/active-version` + `/connection/introspect`.
 - **FE:** [~] `ModellerPage` at `/u/:username/:graphSlug/modeller`; Introspect wired up. **Schema canvas stubbed** — canvas re-integration tracked under Risk notes.
 
-### S4 — LLM provider (graph-scoped)
-- **BE:** `LLMProvider` entity + Fernet · CRUD under `/u/:username/:graphSlug/llm/...` · `POST .../llm/{id}/ping` round-trip
-- **FE:** LLM tab in Graph settings · register provider · test-call button
+### S4 — LLM provider (graph-scoped) — **shipped** ✅
+- **BE:** [x] `LLMProvider` entity + Fernet · CRUD + ping + set-default under `/u/:username/:graphSlug/llm/...` · partial unique on `is_default`.
+- **FE:** [x] LLMs section in the graph rail · register / edit / delete provider · Test (save-first → ping) · Set default.
 
-**Done when:** saved Anthropic key produces a 200 from `/llm/{id}/ping` for the active Graph.
+**Done when:** saved Anthropic key produces a 200 from `/llm/{id}/ping` for the active Graph. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.6).
 
 ### S5 — Skills + Instructions (graph-scoped)
 - **BE:** Skill + Instruction CRUD under `/u/:username/:graphSlug/{skills,instructions}/...`
