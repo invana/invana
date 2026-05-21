@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
+import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
@@ -31,7 +32,15 @@ export function ExplorerPage() {
 		graphSlug: string;
 	}>();
 
-	const { data: graph } = useGraphConnectionQuery(username, graphSlug);
+	const { data: graph, isLoading: connectionLoading } = useGraphConnectionQuery(
+		username,
+		graphSlug,
+	);
+	// `useGraphConnectionQuery` returns null when no GraphConnection row is
+	// attached to this graph. The query is fully resolved (not loading) but
+	// produced no row → we need to gate the Explorer chrome behind a setup
+	// banner because the query/canvas can't function without a connector.
+	const connectionMissing = !connectionLoading && !graph;
 	const { mutation, history } = useQueryExecution(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "explorer");
@@ -104,6 +113,8 @@ export function ExplorerPage() {
 				content:
 					settingsPanel.isOpen && username && graphSlug ? (
 						<SettingsPanel username={username} graphSlug={graphSlug} />
+					) : connectionMissing ? (
+						<SetupRequiredBanner pageLabel="Explorer" />
 					) : (
 						<QueryPanel
 							defaultLanguage={defaultLanguage}
@@ -116,6 +127,8 @@ export function ExplorerPage() {
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",
+				// Canvas stays in place even when the connection isn't attached
+				// — it'll render empty. The leftSection banner is the explainer.
 				content: canvasContent,
 			}}
 			rightSection={{

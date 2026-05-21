@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
+import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
@@ -25,6 +26,9 @@ export function ModellerPage() {
 		username,
 		graphSlug,
 	);
+	// The Modeller's introspect + active-schema path requires a connection.
+	// Gate the entire main + left content behind a banner until that's set up.
+	const connectionMissing = !graphLoading && !graph;
 	const {
 		data: version,
 		isLoading: versionLoading,
@@ -93,6 +97,8 @@ export function ModellerPage() {
 			<Skeleton className="h-4 w-1/2" />
 			<Skeleton className="h-4 w-2/3" />
 		</div>
+	) : connectionMissing ? (
+		<SetupRequiredBanner pageLabel="Modeller" />
 	) : !graph?.schema_id ? (
 		<div className="flex flex-col items-center justify-center h-full gap-3 p-4 text-muted-foreground">
 			<p className="text-center">
@@ -152,6 +158,8 @@ export function ModellerPage() {
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",
+				// Canvas stays in place even when the connection isn't attached
+				// — it'll render empty. The leftSection banner is the explainer.
 				content: (
 					<SchemaCanvas
 						nodeTypes={nodeTypes}
