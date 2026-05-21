@@ -5,6 +5,7 @@ import {
 	Lightbulb,
 	Mail,
 	Maximize2,
+	ScrollText,
 	Sparkles,
 	Users,
 	Wand2,
@@ -13,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
+import { InstructionsSection } from "./sections/InstructionsSection";
 import { IntentSection } from "./sections/IntentSection";
 import { InvitationsSection } from "./sections/InvitationsSection";
 import { LLMsSection } from "./sections/LLMsSection";
@@ -23,9 +25,9 @@ import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 interface SectionChrome {
 	label: string;
 	icon: typeof Database;
-	/** Sub-path under /u/:username/:graphSlug/settings/. Null = no full-page
-	 *  form, so the maximize button is hidden (Members + Invitations). */
-	maximizeSubpath: string | null;
+	/** Sub-path under /u/:username/:graphSlug/settings/ for the maximize
+	 *  (full-page) view of this section. */
+	maximizeSubpath: string;
 }
 
 // Title, icon, and maximize destination for each section. The icon mirrors
@@ -35,9 +37,18 @@ const CHROME: Record<SettingsSection, SectionChrome> = {
 	intent: { label: "Intent", icon: Lightbulb, maximizeSubpath: "intent" },
 	llms: { label: "LLMs", icon: Sparkles, maximizeSubpath: "llms" },
 	skills: { label: "Skills", icon: Wand2, maximizeSubpath: "skills" },
+	instructions: {
+		label: "Instructions",
+		icon: ScrollText,
+		maximizeSubpath: "instructions",
+	},
 	datasets: { label: "Datasets", icon: Layers, maximizeSubpath: "datasets" },
-	members: { label: "Members", icon: Users, maximizeSubpath: null },
-	invitations: { label: "Invitations", icon: Mail, maximizeSubpath: null },
+	members: { label: "Members", icon: Users, maximizeSubpath: "members" },
+	invitations: {
+		label: "Invitations",
+		icon: Mail,
+		maximizeSubpath: "invitations",
+	},
 };
 
 interface Props {
@@ -65,21 +76,19 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 					<span className="font-medium truncate">{chrome.label}</span>
 				</div>
 				<div className="flex items-center gap-0.5 shrink-0">
-					{chrome.maximizeSubpath && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-6 w-6"
-							onClick={() =>
-								navigate(
-									`/u/${username}/${graphSlug}/settings/${chrome.maximizeSubpath}`,
-								)
-							}
-							title="Open as full page"
-						>
-							<Maximize2 className="w-3.5 h-3.5" />
-						</Button>
-					)}
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-6 w-6"
+						onClick={() =>
+							navigate(
+								`/u/${username}/${graphSlug}/settings/${chrome.maximizeSubpath}`,
+							)
+						}
+						title="Open as full page"
+					>
+						<Maximize2 className="w-3.5 h-3.5" />
+					</Button>
 					<Button
 						variant="ghost"
 						size="icon"
@@ -122,7 +131,9 @@ function SectionContent({
 		case "llms":
 			return <LLMsSection username={username} graphSlug={graphSlug} />;
 		case "skills":
-			return <SkillsSection />;
+			return <SkillsSection username={username} graphSlug={graphSlug} />;
+		case "instructions":
+			return <InstructionsSection username={username} graphSlug={graphSlug} />;
 		case "datasets":
 			return <DatasetsSection />;
 		case "members":

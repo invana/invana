@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -9,30 +9,15 @@ import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
+import { GraphInstructionsSettingsPage } from "./pages/graphs/settings/GraphInstructionsSettingsPage";
 import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
+import { GraphInvitationsSettingsPage } from "./pages/graphs/settings/GraphInvitationsSettingsPage";
 import { GraphLLMsSettingsPage } from "./pages/graphs/settings/GraphLLMsSettingsPage";
+import { GraphMembersSettingsPage } from "./pages/graphs/settings/GraphMembersSettingsPage";
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
 import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
+import { GraphSkillsSettingsPage } from "./pages/graphs/settings/GraphSkillsSettingsPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
-
-// Tiny redirector for legacy /settings/<section> deep-links (members +
-// invitations) that no longer have a full-page form — those sections live
-// exclusively in the docked SettingsPanel now. Preserves deep-linkability
-// by opening the panel on the graph overview with ?settings=<section>.
-function SettingsPanelRedirect({
-	section,
-}: {
-	section: "members" | "invitations";
-}) {
-	const { username, graphSlug } = useParams<{
-		username: string;
-		graphSlug: string;
-	}>();
-	if (!username || !graphSlug) return <Navigate to="/" replace />;
-	return (
-		<Navigate to={`/u/${username}/${graphSlug}?settings=${section}`} replace />
-	);
-}
 
 // Lazy-loaded — Explorer/Modeller carry the heaviest UI (graph rendering once
 // the new canvas integration lands). Lazy keeps the auth + settings flows
@@ -126,16 +111,13 @@ export const router = createBrowserRouter([
 				path: "u/:username/:graphSlug/settings/intent",
 				element: <GraphIntentSettingsPage />,
 			},
-			// Members + Invitations have no full-page form anymore — they live only
-			// in the docked SettingsPanel. Keep the URLs as redirects so existing
-			// deep-links continue to work.
 			{
 				path: "u/:username/:graphSlug/settings/members",
-				element: <SettingsPanelRedirect section="members" />,
+				element: <GraphMembersSettingsPage />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/invitations",
-				element: <SettingsPanelRedirect section="invitations" />,
+				element: <GraphInvitationsSettingsPage />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/llms",
@@ -143,13 +125,11 @@ export const router = createBrowserRouter([
 			},
 			{
 				path: "u/:username/:graphSlug/settings/skills",
-				element: (
-					<GraphSectionPlaceholderPage
-						title="Skills"
-						description="Define the skills available to agents querying this graph."
-						slice="S5"
-					/>
-				),
+				element: <GraphSkillsSettingsPage />,
+			},
+			{
+				path: "u/:username/:graphSlug/settings/instructions",
+				element: <GraphInstructionsSettingsPage />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/datasets",

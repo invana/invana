@@ -6,6 +6,7 @@ export type SettingsSection =
 	| "intent"
 	| "llms"
 	| "skills"
+	| "instructions"
 	| "datasets"
 	| "members"
 	| "invitations";

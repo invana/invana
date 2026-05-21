@@ -1,23 +1,26 @@
-import { Button, Input, Label, Skeleton, Textarea } from "@invana/ui";
-import { Plus, Trash2, Wand2 } from "lucide-react";
+import { Badge, Button, Input, Label, Skeleton, Textarea } from "@invana/ui";
+import { Plus, ScrollText, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
-	useCreateSkillMutation,
-	useDeleteSkillMutation,
-	useSkillsQuery,
-	useUpdateSkillMutation,
-} from "../../../hooks/queries/useSkills";
-import type { Skill, SkillCreate } from "../../../types/skills";
+	useCreateInstructionMutation,
+	useDeleteInstructionMutation,
+	useInstructionsQuery,
+	useUpdateInstructionMutation,
+} from "../../../hooks/queries/useInstructions";
+import type {
+	Instruction,
+	InstructionCreate,
+} from "../../../types/instructions";
 
 interface Props {
 	username: string;
 	graphSlug: string;
 }
 
-export function SkillsSection({ username, graphSlug }: Props) {
-	const { data, isLoading } = useSkillsQuery(username, graphSlug);
-	const [editing, setEditing] = useState<"new" | Skill | null>(null);
+export function InstructionsSection({ username, graphSlug }: Props) {
+	const { data, isLoading } = useInstructionsQuery(username, graphSlug);
+	const [editing, setEditing] = useState<"new" | Instruction | null>(null);
 
 	if (isLoading) {
 		return (
@@ -30,7 +33,7 @@ export function SkillsSection({ username, graphSlug }: Props) {
 
 	if (editing) {
 		return (
-			<SkillForm
+			<InstructionForm
 				username={username}
 				graphSlug={graphSlug}
 				existing={editing === "new" ? null : editing}
@@ -45,30 +48,31 @@ export function SkillsSection({ username, graphSlug }: Props) {
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<p className="text-muted-foreground">
-					Capabilities the Graph's agents can apply.
+					Operational directives the Graph's agents follow. Higher priority
+					wins.
 				</p>
 				<Button onClick={() => setEditing("new")}>
 					<Plus className="w-4 h-4 mr-1" />
-					Add skill
+					Add instruction
 				</Button>
 			</div>
 
 			{items.length === 0 ? (
 				<div className="border border-border rounded-lg p-8 flex flex-col items-center gap-3 text-center">
-					<Wand2 className="w-8 h-8 text-muted-foreground opacity-50" />
+					<ScrollText className="w-8 h-8 text-muted-foreground opacity-50" />
 					<p className="text-muted-foreground">
-						No skills yet. Add one to describe what your agents can do.
+						No instructions yet. Add one to shape how your agents behave.
 					</p>
 				</div>
 			) : (
 				<div className="border border-border rounded-lg divide-y divide-border">
-					{items.map((s) => (
-						<SkillRow
-							key={s.id}
+					{items.map((i) => (
+						<InstructionRow
+							key={i.id}
 							username={username}
 							graphSlug={graphSlug}
-							skill={s}
-							onEdit={() => setEditing(s)}
+							instruction={i}
+							onEdit={() => setEditing(i)}
 						/>
 					))}
 				</div>
@@ -77,25 +81,30 @@ export function SkillsSection({ username, graphSlug }: Props) {
 	);
 }
 
-function SkillRow({
+function InstructionRow({
 	username,
 	graphSlug,
-	skill,
+	instruction,
 	onEdit,
 }: {
 	username: string;
 	graphSlug: string;
-	skill: Skill;
+	instruction: Instruction;
 	onEdit: () => void;
 }) {
-	const remove = useDeleteSkillMutation(username, graphSlug);
+	const remove = useDeleteInstructionMutation(username, graphSlug);
 	return (
 		<div className="flex items-start gap-4 px-4 py-3">
 			<div className="flex-1 min-w-0">
-				<p className="font-medium">{skill.name}</p>
-				{skill.description && (
+				<div className="flex items-center gap-2">
+					<p className="font-medium truncate">{instruction.name}</p>
+					<Badge variant="secondary" className="shrink-0">
+						p{instruction.priority}
+					</Badge>
+				</div>
+				{instruction.content && (
 					<p className="text-muted-foreground mt-0.5 line-clamp-2">
-						{skill.description}
+						{instruction.content}
 					</p>
 				)}
 			</div>
@@ -109,10 +118,10 @@ function SkillRow({
 					className="h-8 w-8"
 					disabled={remove.isPending}
 					onClick={() => {
-						if (!confirm(`Delete skill "${skill.name}"?`)) return;
-						remove.mutate(skill.id, {
+						if (!confirm(`Delete instruction "${instruction.name}"?`)) return;
+						remove.mutate(instruction.id, {
 							onError: (err) => toast.error(err.message),
-							onSuccess: () => toast.success("Skill deleted"),
+							onSuccess: () => toast.success("Instruction deleted"),
 						});
 					}}
 				>
@@ -123,7 +132,7 @@ function SkillRow({
 	);
 }
 
-function SkillForm({
+function InstructionForm({
 	username,
 	graphSlug,
 	existing,
@@ -131,36 +140,34 @@ function SkillForm({
 }: {
 	username: string;
 	graphSlug: string;
-	existing: Skill | null;
+	existing: Instruction | null;
 	onDone: () => void;
 }) {
 	const isEdit = !!existing;
-	const create = useCreateSkillMutation(username, graphSlug);
-	const update = useUpdateSkillMutation(username, graphSlug);
+	const create = useCreateInstructionMutation(username, graphSlug);
+	const update = useUpdateInstructionMutation(username, graphSlug);
 
 	const [name, setName] = useState(existing?.name ?? "");
-	const [description, setDescription] = useState(existing?.description ?? "");
 	const [content, setContent] = useState(existing?.content ?? "");
-	const [whenToUse, setWhenToUse] = useState(existing?.when_to_use ?? "");
+	const [priority, setPriority] = useState(existing?.priority ?? 100);
 
-	const formValid = !!name.trim();
+	const formValid = !!name.trim() && priority >= 0 && priority <= 1000;
 	const isSubmitting = create.isPending || update.isPending;
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!formValid) return;
-		const payload: SkillCreate = {
+		const payload: InstructionCreate = {
 			name: name.trim(),
-			description,
 			content,
-			when_to_use: whenToUse,
+			priority,
 		};
 		if (isEdit && existing) {
 			update.mutate(
 				{ id: existing.id, data: payload },
 				{
 					onSuccess: () => {
-						toast.success("Skill saved");
+						toast.success("Instruction saved");
 						onDone();
 					},
 					onError: (err) => toast.error(err.message),
@@ -169,7 +176,7 @@ function SkillForm({
 		} else {
 			create.mutate(payload, {
 				onSuccess: () => {
-					toast.success("Skill added");
+					toast.success("Instruction added");
 					onDone();
 				},
 				onError: (err) => toast.error(err.message),
@@ -180,45 +187,39 @@ function SkillForm({
 	return (
 		<form onSubmit={handleSubmit} className="space-y-5" noValidate>
 			<div className="space-y-1.5">
-				<Label htmlFor="skill-name">
+				<Label htmlFor="instr-name">
 					Name <span className="text-destructive">*</span>
 				</Label>
 				<Input
-					id="skill-name"
-					placeholder="entity-resolution"
+					id="instr-name"
+					placeholder="cite-sources"
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					maxLength={255}
 				/>
 			</div>
 			<div className="space-y-1.5">
-				<Label htmlFor="skill-description">Description</Label>
-				<Textarea
-					id="skill-description"
-					placeholder="One-line summary of what this skill does."
-					rows={2}
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
+				<Label htmlFor="instr-priority">
+					Priority{" "}
+					<span className="text-muted-foreground">(0–1000, default 100)</span>
+				</Label>
+				<Input
+					id="instr-priority"
+					type="number"
+					min={0}
+					max={1000}
+					value={priority}
+					onChange={(e) => setPriority(Number(e.target.value))}
 				/>
 			</div>
 			<div className="space-y-1.5">
-				<Label htmlFor="skill-content">Content (markdown)</Label>
+				<Label htmlFor="instr-content">Content (markdown)</Label>
 				<Textarea
-					id="skill-content"
-					placeholder="Step-by-step instructions, examples, and constraints…"
-					rows={8}
+					id="instr-content"
+					placeholder="Always cite the source node ID when answering factual questions…"
+					rows={10}
 					value={content}
 					onChange={(e) => setContent(e.target.value)}
-				/>
-			</div>
-			<div className="space-y-1.5">
-				<Label htmlFor="skill-when">When to use</Label>
-				<Textarea
-					id="skill-when"
-					placeholder="Signals the agent uses to decide when to apply this skill."
-					rows={4}
-					value={whenToUse}
-					onChange={(e) => setWhenToUse(e.target.value)}
 				/>
 			</div>
 
@@ -232,7 +233,11 @@ function SkillForm({
 					Cancel
 				</Button>
 				<Button type="submit" disabled={!formValid || isSubmitting}>
-					{isSubmitting ? "Saving…" : isEdit ? "Save changes" : "Add skill"}
+					{isSubmitting
+						? "Saving…"
+						: isEdit
+							? "Save changes"
+							: "Add instruction"}
 				</Button>
 			</div>
 		</form>

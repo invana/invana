@@ -45,11 +45,13 @@ def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.auth.routes import auth_router
     from invana.graphs.routes import graph_router, graphs_collection_router
+    from invana.instructions.routes import instructions_router
     from invana.llm_providers.routes import llm_providers_router
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
     from invana.server.routes.query import query_router
     from invana.server.routes.schemas import schemas_router
+    from invana.skills.routes import skills_router
 
     app = FastAPI(
         title=settings.app_name,
@@ -88,6 +90,8 @@ def create_app() -> FastAPI:
     app.include_router(graphs_collection_router)
     app.include_router(graph_router)
     app.include_router(llm_providers_router)
+    app.include_router(skills_router)
+    app.include_router(instructions_router)
     app.include_router(schemas_router)
     app.include_router(query_router)
     mount_admin(app)
