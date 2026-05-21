@@ -80,7 +80,7 @@ async def list_graphs(
 # Per-graph — /api/v1/u/{username}/{slug}
 # ---------------------------------------------------------------------------
 
-graph_router = APIRouter(prefix="/api/v1/u/{username}/{slug}", tags=["graphs"])
+graph_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["graphs"])
 
 
 @graph_router.get("", response_model=GraphRead)

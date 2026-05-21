@@ -84,6 +84,35 @@ async function attemptRefresh(): Promise<string | null> {
 	return refreshInflight;
 }
 
+/**
+ * Normalize FastAPI's error body into a human-readable string for the toast.
+ *
+ * - 422 returns `{ detail: [{type, loc, msg, input}, ...] }` — join the msgs +
+ *   pretty-print the loc so the user sees something like:
+ *     `path.graphSlug — Field required`
+ * - Other errors return `{ detail: "..." }` — pass through.
+ * - Anything else falls back to `error.message`.
+ */
+function formatErrorDetail(error: AxiosError): string {
+	const detail = (error.response?.data as { detail?: unknown } | undefined)
+		?.detail;
+	if (typeof detail === "string") return detail;
+	if (Array.isArray(detail)) {
+		return detail
+			.map((d) => {
+				const item = d as { msg?: string; loc?: unknown[] };
+				const loc = Array.isArray(item.loc)
+					? item.loc.filter((p) => p !== "body" && p !== "path").join(".")
+					: "";
+				return loc
+					? `${loc} — ${item.msg ?? "invalid"}`
+					: (item.msg ?? "invalid");
+			})
+			.join("; ");
+	}
+	return error.message;
+}
+
 apiClient.interceptors.response.use(
 	(res) => res,
 	async (error: AxiosError) => {
@@ -102,10 +131,7 @@ apiClient.interceptors.response.use(
 			}
 		}
 
-		const detail =
-			(error.response?.data as { detail?: string } | undefined)?.detail ??
-			error.message;
-		throw new ApiError(status ?? 0, detail);
+		throw new ApiError(status ?? 0, formatErrorDetail(error));
 	},
 );
 

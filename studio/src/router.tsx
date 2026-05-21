@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -11,13 +11,25 @@ import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
 import { GraphInstructionsSettingsPage } from "./pages/graphs/settings/GraphInstructionsSettingsPage";
 import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
-import { GraphInvitationsSettingsPage } from "./pages/graphs/settings/GraphInvitationsSettingsPage";
 import { GraphLLMsSettingsPage } from "./pages/graphs/settings/GraphLLMsSettingsPage";
 import { GraphMembersSettingsPage } from "./pages/graphs/settings/GraphMembersSettingsPage";
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
 import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
 import { GraphSkillsSettingsPage } from "./pages/graphs/settings/GraphSkillsSettingsPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
+
+// Legacy deep-link: /settings/invitations → /settings/members (Invitations is
+// now a tab inside Members).
+function InvitationsRedirect() {
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
+	if (!username || !graphSlug) return <Navigate to="/" replace />;
+	return (
+		<Navigate to={`/u/${username}/${graphSlug}/settings/members`} replace />
+	);
+}
 
 // Lazy-loaded — Explorer/Modeller carry the heaviest UI (graph rendering once
 // the new canvas integration lands). Lazy keeps the auth + settings flows
@@ -115,9 +127,12 @@ export const router = createBrowserRouter([
 				path: "u/:username/:graphSlug/settings/members",
 				element: <GraphMembersSettingsPage />,
 			},
+			// Invitations are now a tab inside the Members section. Preserve the
+			// legacy /settings/invitations URL by redirecting to /settings/members
+			// where the Invitations tab opens.
 			{
 				path: "u/:username/:graphSlug/settings/invitations",
-				element: <GraphInvitationsSettingsPage />,
+				element: <InvitationsRedirect />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/llms",

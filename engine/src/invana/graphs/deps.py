@@ -2,11 +2,13 @@
 
 Resolution chain (per RFC-017):
 
-    resolve_graph_by_username_slug(username, slug)
+    resolve_graph_by_username_slug(username, graphSlug)
     └─> get_graph_membership(current_user, graph)
         └─> require_graph_{member,builder,admin}
 
-All graph-scoped URLs are namespaced as ``/api/v1/u/{username}/{slug}/...``.
+All graph-scoped URLs are namespaced as ``/api/v1/u/{username}/{graphSlug}/...``.
+The path-param is named ``graphSlug`` to disambiguate from the generic word
+"slug" elsewhere; the Graph entity's data field is still ``Graph.slug``.
 """
 
 from __future__ import annotations
@@ -31,10 +33,10 @@ def _forbidden(detail: str) -> HTTPException:
 
 async def resolve_graph_by_username_slug(
     username: str = Path(..., description="Owner username from the URL prefix."),
-    slug: str = Path(..., description="Graph slug, unique per owner."),
+    graphSlug: str = Path(..., description="Graph slug, unique per owner."),
     session: AsyncSession = Depends(get_session),
 ) -> Graph:
-    """Resolve ``/u/{username}/{slug}`` to a Graph row.
+    """Resolve ``/u/{username}/{graphSlug}`` to a Graph row.
 
     404 if the username doesn't exist, the slug doesn't exist under that owner,
     or the Graph is owned by a different user (per-owner slug uniqueness).
@@ -42,7 +44,7 @@ async def resolve_graph_by_username_slug(
     stmt = (
         select(Graph)
         .join(User, User.id == Graph.created_by_id)
-        .where(User.username == username.lower(), Graph.slug == slug.lower())
+        .where(User.username == username.lower(), Graph.slug == graphSlug.lower())
     )
     graph = (await session.execute(stmt)).scalar_one_or_none()
     if graph is None:

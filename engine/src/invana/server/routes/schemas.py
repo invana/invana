@@ -1,8 +1,8 @@
-"""Schema endpoints — graph-scoped under /u/{username}/{slug}/schema.
+"""Schema endpoints — graph-scoped under /u/{username}/{graphSlug}/schema.
 
 Endpoint
 --------
-GET /api/v1/u/{username}/{slug}/schema/active-version
+GET /api/v1/u/{username}/{graphSlug}/schema/active-version
 
 Resolves to the active version of the GraphConnection's schema. Falls back
 to the latest version regardless of status if no active version exists yet.
@@ -23,7 +23,7 @@ from invana.graphs.models import Graph, GraphMember
 from invana.modeller.schemas import VersionResponse
 from invana.modeller.store import SchemaStore
 
-schemas_router = APIRouter(prefix="/api/v1/u/{username}/{slug}/schema", tags=["schemas"])
+schemas_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/schema", tags=["schemas"])
 
 
 @schemas_router.get("/active-version", response_model=VersionResponse)

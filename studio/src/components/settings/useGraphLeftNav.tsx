@@ -4,7 +4,6 @@ import {
 	Home,
 	Layers,
 	Lightbulb,
-	Mail,
 	Network,
 	ScrollText,
 	Sparkles,
@@ -35,8 +34,9 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 		adminOnly: true,
 	},
 	{ key: "datasets", label: "Datasets", icon: Layers, adminOnly: true },
+	// Members + Invitations are one rail icon — Invitations renders as a tab
+	// inside the Members section content (see MembersInvitationsSection).
 	{ key: "members", label: "Members", icon: Users },
-	{ key: "invitations", label: "Invitations", icon: Mail, adminOnly: true },
 ];
 
 type ActiveTab = "overview" | "explorer" | "modeller" | null;

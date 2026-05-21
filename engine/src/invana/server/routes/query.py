@@ -1,8 +1,8 @@
-"""Raw query execution endpoint — graph-scoped under /u/{username}/{slug}.
+"""Raw query execution endpoint — graph-scoped under /u/{username}/{graphSlug}.
 
 Endpoint
 --------
-POST /api/v1/u/{username}/{slug}/query
+POST /api/v1/u/{username}/{graphSlug}/query
 
 The query language is inferred from the connector's reported capabilities.
 Read-only connections have write operations rejected before execution.
@@ -25,7 +25,7 @@ from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
 from invana.graphs.models import Graph, GraphMember
 from invana.graphs.schemas import QueryRequest, QueryResponse
 
-query_router = APIRouter(prefix="/api/v1/u/{username}/{slug}", tags=["query"])
+query_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["query"])
 
 
 def _get_manager(request: Request) -> GraphConnectionManager:

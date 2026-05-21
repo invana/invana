@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MembersSection } from "../../../components/settings/sections/MembersSection";
+import { MembersInvitationsSection } from "../../../components/settings/sections/MembersInvitationsSection";
 
 export function GraphMembersSettingsPage() {
 	const { username, graphSlug } = useParams<{
@@ -31,7 +31,7 @@ export function GraphMembersSettingsPage() {
 					<h1 className="text-2xl font-bold mt-1">Members</h1>
 				</div>
 
-				<MembersSection username={username} graphSlug={graphSlug} />
+				<MembersInvitationsSection username={username} graphSlug={graphSlug} />
 			</div>
 		</div>
 	);

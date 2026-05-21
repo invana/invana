@@ -1,55 +1,23 @@
-import { Button, ScrollArea, Separator } from "@invana/ui";
+import { Button, TabbedPanel } from "@invana/ui";
 import {
 	Database,
 	Layers,
 	Lightbulb,
-	Mail,
 	Maximize2,
 	ScrollText,
 	Sparkles,
-	Users,
 	Wand2,
-	X,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
 import { InstructionsSection } from "./sections/InstructionsSection";
 import { IntentSection } from "./sections/IntentSection";
-import { InvitationsSection } from "./sections/InvitationsSection";
 import { LLMsSection } from "./sections/LLMsSection";
-import { MembersSection } from "./sections/MembersSection";
+import { MembersInvitationsSection } from "./sections/MembersInvitationsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
-
-interface SectionChrome {
-	label: string;
-	icon: typeof Database;
-	/** Sub-path under /u/:username/:graphSlug/settings/ for the maximize
-	 *  (full-page) view of this section. */
-	maximizeSubpath: string;
-}
-
-// Title, icon, and maximize destination for each section. The icon mirrors
-// whatever's shown in the rail so the panel header reads as "you are here".
-const CHROME: Record<SettingsSection, SectionChrome> = {
-	info: { label: "Info", icon: Database, maximizeSubpath: "connection" },
-	intent: { label: "Intent", icon: Lightbulb, maximizeSubpath: "intent" },
-	llms: { label: "LLMs", icon: Sparkles, maximizeSubpath: "llms" },
-	skills: { label: "Skills", icon: Wand2, maximizeSubpath: "skills" },
-	instructions: {
-		label: "Instructions",
-		icon: ScrollText,
-		maximizeSubpath: "instructions",
-	},
-	datasets: { label: "Datasets", icon: Layers, maximizeSubpath: "datasets" },
-	members: { label: "Members", icon: Users, maximizeSubpath: "members" },
-	invitations: {
-		label: "Invitations",
-		icon: Mail,
-		maximizeSubpath: "invitations",
-	},
-};
 
 interface Props {
 	username: string;
@@ -57,69 +25,121 @@ interface Props {
 }
 
 /**
- * Renders the *content* of the currently selected settings section in the
- * leftSection of an AppLayoutV2. The sub-nav for picking sections lives in
- * the leftNav icon rail (see `useGraphLeftNav`) — this component only handles
- * "given a section key, render its content + a header with maximize/close".
+ * Docked settings sidebar. Each rail-icon section renders as its own
+ * `@invana/ui` `TabbedPanel` — most sections have a single tab (the section
+ * itself) while Members hosts a two-tab nested panel (Members + Invitations)
+ * via `MembersInvitationsSection`. Switching between sections is driven by
+ * the rail icons via `?settings=<section>` (see `useGraphLeftNav`).
+ *
+ * The TabbedPanel's built-in chrome handles the close button (wired to
+ * `useSettingsPanel().close`); the maximize button lives in `headerActions`.
  */
 export function SettingsPanel({ username, graphSlug }: Props) {
 	const navigate = useNavigate();
 	const { section, close } = useSettingsPanel();
-	const chrome = CHROME[section];
-	const Icon = chrome.icon;
+
+	const subpath = MAXIMIZE_SUBPATHS[section];
+	const headerActions = {
+		right: (
+			<Button
+				variant="ghost"
+				size="icon"
+				className="h-6 w-6"
+				onClick={() =>
+					navigate(`/u/${username}/${graphSlug}/settings/${subpath}`)
+				}
+				title="Open as full page"
+			>
+				<Maximize2 className="w-3.5 h-3.5" />
+			</Button>
+		),
+	};
+
+	// Members hosts its own two-tab TabbedPanel (Members + Invitations).
+	if (section === "members") {
+		return (
+			<MembersInvitationsSection
+				username={username}
+				graphSlug={graphSlug}
+				className="h-full"
+				showClose
+				onClose={close}
+				headerActions={headerActions}
+			/>
+		);
+	}
+
+	// All other sections render as a single-tab TabbedPanel so the chrome
+	// (tab strip + close + maximize) matches Members visually.
+	const meta = SINGLE_TAB_SECTIONS[section];
+	const Icon = meta.icon;
+	const inPad = (c: ReactNode) => <div className="p-5">{c}</div>;
 
 	return (
-		<div className="flex flex-col h-full w-full bg-background border-r border-border">
-			<div className="px-4 py-3 flex items-center justify-between gap-2 shrink-0">
-				<div className="flex items-center gap-2 min-w-0">
-					<Icon className="w-4 h-4 text-muted-foreground shrink-0" />
-					<span className="font-medium truncate">{chrome.label}</span>
-				</div>
-				<div className="flex items-center gap-0.5 shrink-0">
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-6 w-6"
-						onClick={() =>
-							navigate(
-								`/u/${username}/${graphSlug}/settings/${chrome.maximizeSubpath}`,
-							)
-						}
-						title="Open as full page"
-					>
-						<Maximize2 className="w-3.5 h-3.5" />
-					</Button>
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-6 w-6"
-						onClick={close}
-						title="Close settings"
-					>
-						<X className="w-3.5 h-3.5" />
-					</Button>
-				</div>
-			</div>
-			<Separator />
-			<ScrollArea className="flex-1">
-				<div className="p-5">
-					<SectionContent
-						section={section}
-						username={username}
-						graphSlug={graphSlug}
-					/>
-				</div>
-			</ScrollArea>
-		</div>
+		<TabbedPanel
+			className="h-full"
+			tabs={[
+				{
+					value: section,
+					label: meta.label,
+					icon: Icon,
+					content: inPad(
+						<SectionContent
+							section={section}
+							username={username}
+							graphSlug={graphSlug}
+						/>,
+					),
+				},
+			]}
+			// Controlled — without this, TabbedPanel's internal currentTab
+			// state holds the value from when it first mounted and never reacts
+			// to a section change (so clicking another rail icon doesn't swap
+			// the content until refresh).
+			activeTab={section}
+			onTabChange={() => {
+				/* single-tab panel — no internal switching */
+			}}
+			showClose
+			onClose={close}
+			headerActions={headerActions}
+		/>
 	);
 }
+
+// ── Section metadata ─────────────────────────────────────────────────────────
+
+const MAXIMIZE_SUBPATHS: Record<SettingsSection, string> = {
+	info: "connection",
+	intent: "intent",
+	llms: "llms",
+	skills: "skills",
+	instructions: "instructions",
+	datasets: "datasets",
+	members: "members",
+};
+
+// Sections whose panel is a single-tab TabbedPanel. Members is handled
+// separately (above) because it has two tabs.
+type SingleTabSection = Exclude<SettingsSection, "members">;
+const SINGLE_TAB_SECTIONS: Record<
+	SingleTabSection,
+	{ label: string; icon: typeof Database }
+> = {
+	info: { label: "Info", icon: Database },
+	intent: { label: "Intent", icon: Lightbulb },
+	llms: { label: "LLMs", icon: Sparkles },
+	skills: { label: "Skills", icon: Wand2 },
+	instructions: { label: "Instructions", icon: ScrollText },
+	datasets: { label: "Datasets", icon: Layers },
+};
 
 function SectionContent({
 	section,
 	username,
 	graphSlug,
 }: {
-	section: SettingsSection;
+	section: SingleTabSection;
 	username: string;
 	graphSlug: string;
 }) {
@@ -136,9 +156,5 @@ function SectionContent({
 			return <InstructionsSection username={username} graphSlug={graphSlug} />;
 		case "datasets":
 			return <DatasetsSection />;
-		case "members":
-			return <MembersSection username={username} graphSlug={graphSlug} />;
-		case "invitations":
-			return <InvitationsSection username={username} graphSlug={graphSlug} />;
 	}
 }

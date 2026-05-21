@@ -86,7 +86,7 @@ export function UserMenu() {
 					<DropdownMenuItem
 						onClick={() =>
 							navigate(
-								`/u/${activeMembership.owner_username}/${activeMembership.graph_slug}?settings=invitations`,
+								`/u/${activeMembership.owner_username}/${activeMembership.graph_slug}?settings=members`,
 							)
 						}
 					>
