@@ -19,6 +19,9 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
+from invana.events import actions as event_actions
+from invana.events.models import ActorType
+from invana.events.services import emit_event
 from invana.graphs.encryption import decrypt_credentials
 from invana.graphs.store import GraphModelStore
 from invana.settings import settings
@@ -150,6 +153,15 @@ class GraphConnectionManager:
 
             async with self._session_factory() as session:
                 await GraphModelStore().set_status(session, graph.id, "ACTIVE", latency_ms=latency_ms)
+                await emit_event(
+                    session,
+                    action=event_actions.SYSTEM_CONNECTION_RECONNECT,
+                    target_kind=event_actions.TARGET_CONNECTION,
+                    target_id=graph.id,
+                    graph_id=graph.graph_id,
+                    actor_type=ActorType.system,
+                    details={"ok": True, "latency_ms": latency_ms, "uri": graph.uri},
+                )
                 await session.commit()
 
                 if graph.schema_id is None:
@@ -159,6 +171,15 @@ class GraphConnectionManager:
             logger.warning("Graph %r failed to connect: %s", graph.id, exc)
             async with self._session_factory() as session:
                 await GraphModelStore().set_status(session, graph.id, "ERROR")
+                await emit_event(
+                    session,
+                    action=event_actions.SYSTEM_CONNECTION_RECONNECT,
+                    target_kind=event_actions.TARGET_CONNECTION,
+                    target_id=graph.id,
+                    graph_id=graph.graph_id,
+                    actor_type=ActorType.system,
+                    details={"ok": False, "error": str(exc), "uri": graph.uri},
+                )
                 await session.commit()
 
             existing = self._retry_tasks.pop(graph.id, None)
@@ -255,11 +276,33 @@ class GraphConnectionManager:
             await introspector.introspect(session, schema_id=schema.id, connector=connector)
 
             await GraphModelStore().set_schema(session, graph.id, schema.id)
+            await emit_event(
+                session,
+                action=event_actions.SYSTEM_INTROSPECT_COMPLETE,
+                target_kind=event_actions.TARGET_CONNECTION,
+                target_id=graph.id,
+                graph_id=graph.graph_id,
+                actor_type=ActorType.system,
+                details={"ok": True, "schema_id": schema.id},
+            )
             await session.commit()
             logger.info("Auto-introspected schema for graph %r (schema_id=%s).", graph.id, schema.id)
         except Exception as exc:
             logger.warning("Auto-introspect failed for graph %r: %s", graph.id, exc, exc_info=True)
             # Non-fatal — graph stays ACTIVE, schema stays null, user can retry via /introspect
+            try:
+                await emit_event(
+                    session,
+                    action=event_actions.SYSTEM_INTROSPECT_COMPLETE,
+                    target_kind=event_actions.TARGET_CONNECTION,
+                    target_id=graph.id,
+                    graph_id=graph.graph_id,
+                    actor_type=ActorType.system,
+                    details={"ok": False, "error": str(exc)},
+                )
+                await session.commit()
+            except Exception:  # noqa: BLE001 — best-effort, don't double-fault
+                logger.warning("Failed to emit introspect-failure event for graph %r", graph.id)
 
 
 # -----------------------------------------------------------------------

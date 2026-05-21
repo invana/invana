@@ -154,10 +154,13 @@ Append-only event log alongside the existing state tables. Every domain write pr
 - `pages/platform/PlatformEventsPage.tsx` — superuser-only platform page at `/platform/events`. Adds a graph-id filter input on top of the same row UI.
 - `UserMenu.tsx` — "Platform events" link added under the `RoleGate require="superuser"` block.
 
-**Wiring status (per RFC-018 § Implementation plan):**
+**Wiring status (per RFC-018 § Implementation plan):** ✅ all write surfaces emit.
 
-- ✅ **Skills** (3 sites: create/update/delete), **Instructions** (3), **LLM providers** (5: create/update/delete/ping/set_default), **Graph CRUD** (3: create/update/delete) + implicit `member.add` on create, **GraphConnection** (3: attach/update/delete), **Connection test** (1), **Setup wizard transitions** (1).
-- ⏳ **Auth events** (register/login/logout/refresh/password_change/username_change/login_failed), **`query.execute`** on the query route, **System events** (manager auto-reconnect, introspect completion), **Members** (add/role_change/remove via auth.services), **Invitations** (create/accept/delete). Tracked separately; will land before MVP demo.
+- **Graph-scoped writes:** Skills (3 sites: create/update/delete), Instructions (3), LLM providers (5: create/update/delete/ping/set_default), Graph CRUD (3: create/update/delete) + implicit `member.add` on create, GraphConnection (3: attach/update/delete), Connection test (1), Setup wizard transitions (1).
+- **Members + invitations:** member.add (3 paths: graph.create, invitation.accept new user, invitation.accept existing user), member.role_change (2 paths: PATCH /members + role upgrade on invitation.accept), member.remove (1), invitation.create (1), invitation.delete (1), invitation.accept (1).
+- **Auth events** (no graph_id): auth.register, auth.login (success), auth.login_failed (with subreason `unknown_or_inactive` vs `bad_password` — anonymous actor), auth.logout, auth.refresh, auth.password_change, auth.username_change.
+- **Query executions:** `query.execute` emits on success (with duration_ms + row_count + language) and on failure (with error string). `query_length` only — not the query body, to keep details bounded.
+- **System events** (`actor_type=system`): system.connection_reconnect on every connector connect/reconnect attempt (success + failure variants from `GraphConnectionManager._connect_graph`), system.introspect_complete on auto-introspect completion (success + failure variants from `_auto_introspect`).
 
 ## Removed legacy surface
 

@@ -41,6 +41,9 @@ from invana.auth.tokens import (
     revoke_all_refresh_tokens_for_user,
     revoke_refresh_token,
 )
+from invana.events import actions as event_actions
+from invana.events.models import ActorType
+from invana.events.services import current_trace_id, emit_event
 from invana.graphs.models import Graph, GraphMember, Invitation
 from invana.settings import settings
 
@@ -173,7 +176,7 @@ async def _build_auth_response(session: AsyncSession, *, user: User) -> AuthResp
 # ---------------------------------------------------------------------------
 
 
-async def register_with_invite(
+async def register_with_invite(  # noqa: PLR0915 — emit_event branches stay in-line
     session: AsyncSession, *, raw_invite_token: str, payload: RegisterRequest
 ) -> AuthResponse:
     invitation = await _find_invitation_by_raw_token(session, raw_invite_token)
@@ -214,8 +217,21 @@ async def register_with_invite(
         # we still attach the new graph membership. Submitted username is ignored.
         user = existing_user
 
+    new_user_event = existing_user is None
+    if new_user_event:
+        await emit_event(
+            session,
+            action=event_actions.AUTH_REGISTER,
+            target_kind=event_actions.TARGET_USER,
+            target_id=user.id,
+            actor_id=user.id,
+            details={"email": user.email, "username": user.username},
+            trace_id=current_trace_id(),
+        )
+
     # Attach (or upgrade) the graph membership.
     member = await _get_membership(session, graph_id=invitation.graph_id, user_id=user.id)
+    member_event: tuple[str, dict] | None
     if member is None:
         session.add(
             GraphMember(
@@ -224,11 +240,43 @@ async def register_with_invite(
                 role=invitation.role,
             )
         )
+        member_event = (
+            event_actions.MEMBER_ADD,
+            {"role": invitation.role.value, "via": "invitation.accept"},
+        )
     else:
+        before_role = member.role.value
         member.role = invitation.role
+        member_event = (
+            event_actions.MEMBER_ROLE_CHANGE,
+            {
+                "via": "invitation.accept",
+                "changed": {"role": {"before": before_role, "after": invitation.role.value}},
+            },
+        )
 
     invitation.accepted_at = datetime.now(UTC)
     await session.flush()
+    await emit_event(
+        session,
+        action=member_event[0],
+        target_kind=event_actions.TARGET_MEMBER,
+        target_id=user.id,
+        graph_id=invitation.graph_id,
+        actor_id=user.id,
+        details=member_event[1],
+        trace_id=current_trace_id(),
+    )
+    await emit_event(
+        session,
+        action=event_actions.INVITATION_ACCEPT,
+        target_kind=event_actions.TARGET_INVITATION,
+        target_id=invitation.id,
+        graph_id=invitation.graph_id,
+        actor_id=user.id,
+        details={"email": invitation.email, "role": invitation.role.value},
+        trace_id=current_trace_id(),
+    )
     return await _build_auth_response(session, user=user)
 
 
@@ -240,11 +288,41 @@ async def register_with_invite(
 async def login(session: AsyncSession, *, payload: LoginRequest) -> AuthResponse:
     user = await _find_user_by_email(session, payload.email)
     if user is None or not user.is_active:
+        # Constant-time guard against email enumeration — verify against a
+        # dummy hash so timing doesn't reveal the lookup result.
         verify_password(payload.password, "$2b$12$" + "x" * 53)
+        await emit_event(
+            session,
+            action=event_actions.AUTH_LOGIN_FAILED,
+            actor_type=ActorType.anonymous,
+            details={"email": payload.email, "reason": "unknown_or_inactive"},
+            trace_id=current_trace_id(),
+        )
+        await session.commit()  # failed-login event isn't tied to a returning state change
         raise _GENERIC_AUTH_FAILURE
     if not verify_password(payload.password, user.password_hash):
+        await emit_event(
+            session,
+            action=event_actions.AUTH_LOGIN_FAILED,
+            target_kind=event_actions.TARGET_USER,
+            target_id=user.id,
+            actor_type=ActorType.anonymous,
+            details={"email": payload.email, "reason": "bad_password"},
+            trace_id=current_trace_id(),
+        )
+        await session.commit()
         raise _GENERIC_AUTH_FAILURE
-    return await _build_auth_response(session, user=user)
+    response = await _build_auth_response(session, user=user)
+    await emit_event(
+        session,
+        action=event_actions.AUTH_LOGIN,
+        target_kind=event_actions.TARGET_USER,
+        target_id=user.id,
+        actor_id=user.id,
+        details={"email": user.email},
+        trace_id=current_trace_id(),
+    )
+    return response
 
 
 async def refresh(session: AsyncSession, *, raw_refresh: str) -> AuthResponse:
@@ -255,11 +333,31 @@ async def refresh(session: AsyncSession, *, raw_refresh: str) -> AuthResponse:
     user = await session.get(User, row.user_id)
     if user is None or not user.is_active:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token.")
-    return await _build_auth_response(session, user=user)
+    response = await _build_auth_response(session, user=user)
+    await emit_event(
+        session,
+        action=event_actions.AUTH_REFRESH,
+        target_kind=event_actions.TARGET_SESSION,
+        actor_id=user.id,
+        details={},
+        trace_id=current_trace_id(),
+    )
+    return response
 
 
 async def logout(session: AsyncSession, *, raw_refresh: str) -> None:
+    row = await find_active_refresh_token(session, raw_token=raw_refresh)
+    actor_id = row.user_id if row is not None else None
     await revoke_refresh_token(session, raw_token=raw_refresh)
+    await emit_event(
+        session,
+        action=event_actions.AUTH_LOGOUT,
+        target_kind=event_actions.TARGET_SESSION,
+        actor_id=actor_id,
+        actor_type=ActorType.user if actor_id else ActorType.anonymous,
+        details={},
+        trace_id=current_trace_id(),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -284,6 +382,7 @@ async def patch_me(session: AsyncSession, *, user: User, payload: MePatchRequest
     if "last_name" in raw:
         last = raw["last_name"]
         user.last_name = last.strip() if (last and last.strip()) else None
+    username_changed_from: str | None = None
     if "username" in raw and raw["username"] is not None:
         new_username = _validate_username_format(raw["username"])
         if new_username != user.username:
@@ -300,9 +399,24 @@ async def patch_me(session: AsyncSession, *, user: User, payload: MePatchRequest
                 raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
             if await _username_taken(session, username=new_username, exclude_user_id=user.id):
                 raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
+            username_changed_from = user.username
             user.username = new_username
             user.username_last_changed_at = datetime.now(UTC)
     await session.flush()
+    if username_changed_from is not None:
+        await emit_event(
+            session,
+            action=event_actions.AUTH_USERNAME_CHANGE,
+            target_kind=event_actions.TARGET_USER,
+            target_id=user.id,
+            actor_id=user.id,
+            details={
+                "changed": {
+                    "username": {"before": username_changed_from, "after": user.username},
+                },
+            },
+            trace_id=current_trace_id(),
+        )
     return await _user_out(session, user=user)
 
 
@@ -314,6 +428,15 @@ async def change_password(session: AsyncSession, *, user: User, payload: ChangeP
     except WeakPasswordError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)) from e
     await revoke_all_refresh_tokens_for_user(session, user_id=user.id)
+    await emit_event(
+        session,
+        action=event_actions.AUTH_PASSWORD_CHANGE,
+        target_kind=event_actions.TARGET_USER,
+        target_id=user.id,
+        actor_id=user.id,
+        details={},
+        trace_id=current_trace_id(),
+    )
 
 
 async def delete_me(session: AsyncSession, *, user: User, payload: DeleteMeRequest) -> None:

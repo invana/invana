@@ -488,6 +488,7 @@ async def update_graph_member_role(
     graph_id: str,
     target_user_id: str,
     payload: GraphMemberRoleUpdate,
+    actor_id: str,
 ) -> GraphMemberOut:
     member = await _get_membership(session, graph_id=graph_id, user_id=target_user_id)
     if member is None:
@@ -501,9 +502,23 @@ async def update_graph_member_role(
             status.HTTP_409_CONFLICT,
             detail="Cannot demote the only admin of this Graph.",
         )
+    before_role = member.role.value
     member.role = payload.role
     await session.flush()
     await session.refresh(member, ["user"])
+    await emit_event(
+        session,
+        action=actions.MEMBER_ROLE_CHANGE,
+        target_kind=actions.TARGET_MEMBER,
+        target_id=target_user_id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details={
+            "username": member.user.username,
+            "changed": {"role": {"before": before_role, "after": payload.role.value}},
+        },
+        trace_id=current_trace_id(),
+    )
     return GraphMemberOut(
         user_id=member.user_id,
         username=member.user.username,
@@ -515,7 +530,13 @@ async def update_graph_member_role(
     )
 
 
-async def remove_graph_member(session: AsyncSession, *, graph_id: str, target_user_id: str) -> None:
+async def remove_graph_member(
+    session: AsyncSession,
+    *,
+    graph_id: str,
+    target_user_id: str,
+    actor_id: str,
+) -> None:
     member = await _get_membership(session, graph_id=graph_id, user_id=target_user_id)
     if member is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Member not found.")
@@ -526,6 +547,21 @@ async def remove_graph_member(session: AsyncSession, *, graph_id: str, target_us
             status.HTTP_409_CONFLICT,
             detail="Cannot remove the only admin of this Graph.",
         )
+    # Pull the username snapshot before delete so it survives the FK SET NULL
+    # on the audit event row.
+    await session.refresh(member, ["user"])
+    username = member.user.username
+    role_at_remove = member.role.value
+    await emit_event(
+        session,
+        action=actions.MEMBER_REMOVE,
+        target_kind=actions.TARGET_MEMBER,
+        target_id=target_user_id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details={"username": username, "role": role_at_remove},
+        trace_id=current_trace_id(),
+    )
     await session.delete(member)
 
 
@@ -562,6 +598,17 @@ async def create_invitation(
     session.add(invitation)
     await session.flush()
 
+    await emit_event(
+        session,
+        action=actions.INVITATION_CREATE,
+        target_kind=actions.TARGET_INVITATION,
+        target_id=invitation.id,
+        graph_id=graph_id,
+        actor_id=invited_by.id,
+        details={"email": invitation.email, "role": invitation.role.value},
+        trace_id=current_trace_id(),
+    )
+
     return InvitationCreateResponse(
         id=invitation.id,
         email=invitation.email,
@@ -580,10 +627,27 @@ async def list_graph_invitations(session: AsyncSession, *, graph_id: str) -> lis
     return [InvitationOut.model_validate(r) for r in (await session.execute(stmt)).scalars().all()]
 
 
-async def delete_invitation(session: AsyncSession, *, graph_id: str, invitation_id: str) -> None:
+async def delete_invitation(
+    session: AsyncSession,
+    *,
+    graph_id: str,
+    invitation_id: str,
+    actor_id: str,
+) -> None:
     invitation = await session.get(Invitation, invitation_id)
     if invitation is None or invitation.graph_id != graph_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invitation not found.")
+    snapshot = {"email": invitation.email, "role": invitation.role.value}
+    await emit_event(
+        session,
+        action=actions.INVITATION_DELETE,
+        target_kind=actions.TARGET_INVITATION,
+        target_id=invitation_id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details=snapshot,
+        trace_id=current_trace_id(),
+    )
     await session.delete(invitation)
 
 

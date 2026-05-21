@@ -137,6 +137,7 @@ async def update_member_role(
     user_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    actor: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> GraphMemberOut:
     out = await services.update_graph_member_role(
@@ -144,6 +145,7 @@ async def update_member_role(
         graph_id=graph.id,
         target_user_id=user_id,
         payload=payload,
+        actor_id=actor.id,
     )
     await session.commit()
     return out
@@ -154,9 +156,10 @@ async def remove_member(
     user_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    actor: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    await services.remove_graph_member(session, graph_id=graph.id, target_user_id=user_id)
+    await services.remove_graph_member(session, graph_id=graph.id, target_user_id=user_id, actor_id=actor.id)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -198,9 +201,15 @@ async def delete_invitation(
     invitation_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    actor: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    await services.delete_invitation(session, graph_id=graph.id, invitation_id=invitation_id)
+    await services.delete_invitation(
+        session,
+        graph_id=graph.id,
+        invitation_id=invitation_id,
+        actor_id=actor.id,
+    )
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

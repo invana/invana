@@ -16,7 +16,11 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.auth.deps import get_current_user
+from invana.auth.models import User
 from invana.db import get_session
+from invana.events import actions as event_actions
+from invana.events.services import current_trace_id, emit_event
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
 from invana.graphs import services
@@ -52,6 +56,7 @@ async def run_query(
     body: QueryRequest,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(require_graph_setup_complete),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> QueryResponse:
@@ -78,12 +83,45 @@ async def run_query(
     try:
         graph_response = await connector.execute(body.query, parameters=body.parameters)
     except Exception as exc:
+        await emit_event(
+            session,
+            action=event_actions.QUERY_EXECUTE,
+            target_kind=event_actions.TARGET_QUERY,
+            graph_id=graph.id,
+            actor_id=user.id,
+            details={
+                "language": query_language.value,
+                "ok": False,
+                "error": str(exc),
+                "query_length": len(body.query),
+            },
+            trace_id=current_trace_id(),
+        )
+        await session.commit()
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail={"error": "query_execution_failed", "message": str(exc)},
         ) from exc
 
-    return _build_query_response(graph_response, query_language)
+    response = _build_query_response(graph_response, query_language)
+    await emit_event(
+        session,
+        action=event_actions.QUERY_EXECUTE,
+        target_kind=event_actions.TARGET_QUERY,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "language": query_language.value,
+            "ok": True,
+            "duration_ms": response.execution_time_ms,
+            "row_count": response.row_count,
+            "result_type": response.result_type,
+            "query_length": len(body.query),
+        },
+        trace_id=current_trace_id(),
+    )
+    await session.commit()
+    return response
 
 
 # ---------------------------------------------------------------------------

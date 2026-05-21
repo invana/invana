@@ -126,7 +126,7 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Integrations:** none
 
 ### 2.11 Domain audit events (RFC-018)
-- **Backend:** [~] `events` table append-only · `emit_event(...)` service helper · per-graph + global read APIs (keyset pagination) · SSE live tail via Postgres `LISTEN/NOTIFY` per worker · sensitive-field redaction in `emit_event`. Emission wired for skills / instructions / llm / graph CRUD / connection / setup. Remaining (auth / query / system / members / invitations) tracked as a follow-up. Retention: forever — audit logs are immutable.
+- **Backend:** [x] `events` table append-only · `emit_event(...)` service helper with sensitive-field redaction · per-graph + global read APIs (keyset pagination) · SSE live tail via Postgres `LISTEN/NOTIFY` per worker · OTel `trace_id` correlation · `?token=` SSE auth fallback. Emission wired across the platform: graph CRUD · setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add/role_change/remove) · invitations (create/accept/delete) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion). Retention: forever — audit logs are immutable.
 - **Frontend:** [x] `EventsSection` (per-graph rail icon + maximize) · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook · TanStack `useInfiniteQuery` for keyset pagination · filter bar (action prefix) · live-tail head refresh on SSE frames.
 - **Integrations:** `@tanstack/react-query` (live-tail invalidation), native browser `EventSource`. Reuses existing OTel `trace_id` for span↔event correlation.
 
@@ -520,12 +520,12 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 **Done when:** user authors a skill, sees it persisted, edits it. ✅ — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.4 + § 2.5). Markdown editor (CodeMirror reuse) deferred — plain textareas for now.
 
-### S5.5 — Domain audit events (RFC-018) — partially shipped
+### S5.5 — Domain audit events (RFC-018) — **shipped** ✅
 - **BE:** [x] `events` append-only table + indexes + Alembic 00000000000d · `emit_event` service helper + sensitive-field redaction · keyset-paginated read API + SSE companions · Postgres `pg_notify` trigger + per-worker `LISTEN events` daemon + in-process broadcaster fan-out · superuser/member auth gates · admin Audit DropDown view.
-- **BE wiring:** [x] graph-scoped writes — skills · instructions · llm · graph CRUD · graph connection (attach / update / delete / test) · setup wizard. **[ ]** remaining wiring — auth events · query.execute · system events · members + invitations mutations (tracked separately).
+- **BE wiring:** [x] every write surface emits: graph CRUD + setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add/role_change/remove) · invitations (create/accept/delete) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion).
 - **FE:** [x] `EventsSection` rail icon + section + full-page maximize · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook with TanStack-Query cache invalidation · filter-by-action-prefix bar · keyset infinite scroll · UserMenu link to platform events for superusers.
 
-**Done when:** writing a Skill produces a `skill.create` row visible in both the graph's Events section and the platform Events page within ~1 second (live tail). ✅ for skills/instructions/llm/graph/connection/setup. — design in [`mvp/rfc-018-domain-audit-events.md`](mvp/rfc-018-domain-audit-events.md).
+**Done when:** writing a Skill produces a `skill.create` row visible in both the graph's Events section and the platform Events page within ~1 second (live tail). ✅ — design in [`mvp/rfc-018-domain-audit-events.md`](mvp/rfc-018-domain-audit-events.md).
 
 > **S3, S4, S5 run as parallel tracks once S2 lands.** Different BE modules, different FE routes, no shared state.
 
