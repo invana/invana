@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { FormError } from "../../components/forms/FormError";
 import { useCreateGraphMutation } from "../../hooks/queries/useGraphs";
 
 function slugify(input: string): string {
@@ -131,6 +132,8 @@ export function GraphCreatePage() {
 							maxLength={10000}
 						/>
 					</div>
+
+					<FormError error={mutation.error} />
 
 					<div className="flex items-center gap-2 mt-2">
 						<Button type="submit" disabled={!canSubmit}>

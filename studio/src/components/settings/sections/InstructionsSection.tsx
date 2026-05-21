@@ -12,6 +12,7 @@ import type {
 	Instruction,
 	InstructionCreate,
 } from "../../../types/instructions";
+import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
@@ -222,6 +223,8 @@ function InstructionForm({
 					onChange={(e) => setContent(e.target.value)}
 				/>
 			</div>
+
+			<FormError error={create.error ?? update.error} />
 
 			<div className="flex justify-end gap-3 pt-2">
 				<Button

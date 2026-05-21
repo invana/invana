@@ -1,11 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { authApi } from "../../services/api/auth";
 import { graphsApi } from "../../services/api/graphs";
+import { useAuthStore } from "../../stores/auth.store";
 import type {
 	GraphConnectionCreate,
 	GraphCreate,
 	GraphUpdate,
 	SetupSection,
 } from "../../types/graphs";
+
+/**
+ * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in
+ * lockstep with reality whenever a membership-changing mutation runs
+ * (create graph, delete graph, accept invitation, etc.) — otherwise
+ * `rolesForGraph(...)` reads from a stale snapshot and admin-only rail
+ * sections stay hidden until the next login.
+ */
+async function refreshAuthMe(): Promise<void> {
+	try {
+		const fresh = await authApi.me();
+		useAuthStore.getState().setUser(fresh);
+	} catch {
+		// Non-fatal — store stays as-is, user can refresh manually if needed.
+	}
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Graph container hooks (RFC-017)
@@ -38,8 +56,12 @@ export function useCreateGraphMutation() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (data: GraphCreate) => graphsApi.create(data),
-		onSuccess: () => {
+		onSuccess: async () => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
+			// Refresh user.graphs so the new (admin) membership shows up
+			// immediately in the rail — otherwise the just-created graph
+			// looks like a non-member visit until logout/login.
+			await refreshAuthMe();
 		},
 	});
 }
@@ -71,8 +93,10 @@ export function useDeleteGraphMutation() {
 			graphSlug,
 		}: { username: string; graphSlug: string }) =>
 			graphsApi.remove(username, graphSlug),
-		onSuccess: () => {
+		onSuccess: async () => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
+			// Remove the dropped membership from user.graphs.
+			await refreshAuthMe();
 		},
 	});
 }

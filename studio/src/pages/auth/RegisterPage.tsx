@@ -2,6 +2,7 @@ import { Button, Input, Label } from "@invana/ui";
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { FormError } from "../../components/forms/FormError";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
 import { ApiError } from "../../services/api/client";
@@ -26,6 +27,7 @@ export function RegisterPage() {
 	const [password, setPassword] = useState("");
 	const [confirm, setConfirm] = useState("");
 	const [submitting, setSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [usernameState, setUsernameState] = useState<UsernameState>({
 		kind: "idle",
 	});
@@ -70,14 +72,18 @@ export function RegisterPage() {
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (password !== confirm) {
+			setError("Passwords don't match.");
 			toast.error("Passwords don't match.");
 			return;
 		}
 		if (!usernameOk) {
-			toast.error("Pick a valid, available username before continuing.");
+			const msg = "Pick a valid, available username before continuing.";
+			setError(msg);
+			toast.error(msg);
 			return;
 		}
 		setSubmitting(true);
+		setError(null);
 		try {
 			const res = await authApi.register(invite, {
 				first_name: firstName,
@@ -94,6 +100,7 @@ export function RegisterPage() {
 		} catch (err) {
 			const message =
 				err instanceof ApiError ? err.message : "Registration failed.";
+			setError(message);
 			toast.error(message);
 		} finally {
 			setSubmitting(false);
@@ -172,6 +179,7 @@ export function RegisterPage() {
 							onChange={(e) => setConfirm(e.target.value)}
 						/>
 					</div>
+					<FormError error={error} />
 					<Button
 						type="submit"
 						className="w-full"

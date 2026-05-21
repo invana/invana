@@ -2,6 +2,7 @@ import { Button, Input, Label } from "@invana/ui";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { FormError } from "../../components/forms/FormError";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
 import { ApiError } from "../../services/api/client";
@@ -13,12 +14,14 @@ export function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [submitting, setSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const next = params.get("next") ?? "/";
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		setSubmitting(true);
+		setError(null);
 		try {
 			const res = await authApi.login(email, password);
 			setSession({
@@ -29,6 +32,7 @@ export function LoginPage() {
 			navigate(decodeURIComponent(next), { replace: true });
 		} catch (err) {
 			const message = err instanceof ApiError ? err.message : "Sign-in failed.";
+			setError(message);
 			toast.error(message);
 		} finally {
 			setSubmitting(false);
@@ -70,6 +74,7 @@ export function LoginPage() {
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 					</div>
+					<FormError error={error} />
 					<Button type="submit" className="w-full" disabled={submitting}>
 						{submitting ? "Signing in…" : "Sign in"}
 					</Button>

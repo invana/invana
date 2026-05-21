@@ -66,6 +66,7 @@ export function ConnectionSection({ username, graphSlug, onSaved }: Props) {
 			<GraphForm
 				isEdit={!!connection}
 				isSubmitting={mutation.isPending}
+				submitError={mutation.error}
 				initialValues={
 					connection
 						? {

@@ -1,16 +1,5 @@
 import { Badge, Skeleton } from "@invana/ui";
-import {
-	CheckCircle2,
-	Circle,
-	Database,
-	Layers,
-	Lightbulb,
-	ScrollText,
-	SkipForward,
-	Sparkles,
-	Users,
-	Wand2,
-} from "lucide-react";
+import { Database, ScrollText, Sparkles, Users, Wand2 } from "lucide-react";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
@@ -18,7 +7,7 @@ import {
 import { useInstructionsQuery } from "../../../hooks/queries/useInstructions";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import { useSkillsQuery } from "../../../hooks/queries/useSkills";
-import type { SetupSectionState } from "../../../types/graphs";
+import { SetupWizard } from "./SetupWizard";
 
 interface Props {
 	username: string;
@@ -26,10 +15,12 @@ interface Props {
 }
 
 /**
- * Read-only overview of the graph — connection status, counts of every
- * graph-scoped resource (LLM providers, Skills, Instructions, Members), and
- * setup wizard progress. The actual editing surfaces live behind their own
- * rail icons (Connection, Intent, LLMs, ...).
+ * Read-only overview of the graph — header (name + intent), connection
+ * status, counts of every graph-scoped resource (LLM providers, Skills,
+ * Instructions, Members), and the full setup wizard (moved here from the
+ * Graph Overview page so progress lives with the rest of the at-a-glance
+ * info). Editing surfaces live behind their own rail icons
+ * (Connection, Intent, LLMs, Skills, …).
  */
 export function InfoSection({ username, graphSlug }: Props) {
 	const { data: graph, isLoading: graphLoading } = useGraphQuery(
@@ -123,32 +114,9 @@ export function InfoSection({ username, graphSlug }: Props) {
 				<StatCard label="Members" count={graph.member_count} icon={Users} />
 			</div>
 
-			{/* Setup state */}
-			<div className="border border-border rounded-lg p-4">
-				<h3 className="font-medium mb-2">Setup</h3>
-				<div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-					<SetupRow
-						label="Graph info"
-						state={graph.setup_state?.graph_info}
-						icon={Database}
-					/>
-					<SetupRow
-						label="Intent"
-						state={graph.setup_state?.intent}
-						icon={Lightbulb}
-					/>
-					<SetupRow
-						label="Skills"
-						state={graph.setup_state?.skills}
-						icon={Wand2}
-					/>
-					<SetupRow
-						label="Datasets"
-						state={graph.setup_state?.datasets}
-						icon={Layers}
-					/>
-				</div>
-			</div>
+			{/* Setup wizard — moved from GraphOverviewPage so the actionable
+			    progress sits with the rest of the at-a-glance info. */}
+			<SetupWizard graph={graph} />
 		</div>
 	);
 }
@@ -176,41 +144,6 @@ function StatCard({
 					{footer}
 				</p>
 			)}
-		</div>
-	);
-}
-
-function SetupRow({
-	label,
-	state,
-	icon: Icon,
-}: {
-	label: string;
-	state: SetupSectionState | undefined;
-	icon: typeof Database;
-}) {
-	const status = state?.completed_at
-		? "done"
-		: state?.skipped_at
-			? "skipped"
-			: "todo";
-	const StatusIcon =
-		status === "done"
-			? CheckCircle2
-			: status === "skipped"
-				? SkipForward
-				: Circle;
-	const color =
-		status === "done"
-			? "text-green-500"
-			: status === "skipped"
-				? "text-muted-foreground"
-				: "text-muted-foreground/60";
-	return (
-		<div className="flex items-center gap-2">
-			<Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-			<span className="flex-1 truncate">{label}</span>
-			<StatusIcon className={`w-3.5 h-3.5 ${color}`} />
 		</div>
 	);
 }

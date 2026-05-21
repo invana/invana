@@ -23,6 +23,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { ApiError } from "../../../services/api/client";
 import { graphMembershipApi } from "../../../services/api/graph-membership";
 import type { GraphRole } from "../../../types/auth";
+import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
@@ -160,10 +161,12 @@ function NewInvitationDialog({
 	const [email, setEmail] = useState("");
 	const [role, setRole] = useState<GraphRole>("developer");
 	const [submitting, setSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		setSubmitting(true);
+		setError(null);
 		try {
 			const inv = await graphMembershipApi.createInvitation(
 				username,
@@ -178,9 +181,10 @@ function NewInvitationDialog({
 			setRole("developer");
 			onCreated(inv.redeem_url);
 		} catch (err) {
-			toast.error(
-				err instanceof ApiError ? err.message : "Failed to create invitation.",
-			);
+			const message =
+				err instanceof ApiError ? err.message : "Failed to create invitation.";
+			setError(message);
+			toast.error(message);
 		} finally {
 			setSubmitting(false);
 		}
@@ -225,6 +229,7 @@ function NewInvitationDialog({
 							</Select>
 						</div>
 					</div>
+					<FormError error={error} className="mt-4" />
 					<DialogFooter>
 						<Button variant="ghost" onClick={onClose} type="button">
 							Cancel

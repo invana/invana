@@ -36,6 +36,7 @@ import {
 	type LLMProviderKind,
 	LLM_PROVIDER_OPTIONS,
 } from "../../../types/llm";
+import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
@@ -440,6 +441,8 @@ function LLMProviderForm({
 					<span>{testState.error}</span>
 				</div>
 			)}
+
+			<FormError error={create.error ?? update.error} />
 
 			{/* Actions */}
 			<div className="flex justify-between gap-3 pt-2">

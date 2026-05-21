@@ -12,6 +12,7 @@ import {
 } from "@invana/ui";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
+import { FormError } from "../../../components/forms/FormError";
 import { CONNECTOR_OPTIONS } from "../../../types/graphs";
 import type { GraphConnectionCreate } from "../../../types/graphs";
 
@@ -35,6 +36,9 @@ interface GraphFormProps {
 	initialValues?: Partial<GraphFormValues>;
 	isEdit?: boolean;
 	isSubmitting?: boolean;
+	/** Server-side error from the save mutation. Renders inline above the
+	 *  submit button so it persists after the toast fades. */
+	submitError?: Error | string | null;
 	onSubmit: (values: GraphConnectionCreate) => void;
 	onCancel: () => void;
 	/** Returns {ok, latency_ms?, error?}. Required to enable Save. */
@@ -57,6 +61,7 @@ export function GraphForm({
 	initialValues,
 	isEdit = false,
 	isSubmitting = false,
+	submitError = null,
 	onSubmit,
 	onCancel,
 	onTest,
@@ -302,6 +307,8 @@ export function GraphForm({
 					Test the connection to enable {isEdit ? "Save Changes" : "Create"}.
 				</p>
 			)}
+
+			<FormError error={submitError} />
 
 			{/* Actions */}
 			<div className="flex justify-between gap-3 pt-2">

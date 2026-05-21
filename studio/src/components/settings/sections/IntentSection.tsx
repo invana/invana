@@ -5,6 +5,7 @@ import {
 	useGraphQuery,
 	useUpdateGraphMutation,
 } from "../../../hooks/queries/useGraphs";
+import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
@@ -55,6 +56,7 @@ export function IntentSection({ username, graphSlug, onSaved }: Props) {
 				maxLength={10000}
 				placeholder="Describe the purpose of this graph…"
 			/>
+			<FormError error={mutation.error} />
 			<div className="flex gap-2">
 				<Button type="submit" disabled={mutation.isPending}>
 					{mutation.isPending ? "Saving…" : "Save Intent"}

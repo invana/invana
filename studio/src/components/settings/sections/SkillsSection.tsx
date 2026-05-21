@@ -9,6 +9,7 @@ import {
 	useUpdateSkillMutation,
 } from "../../../hooks/queries/useSkills";
 import type { Skill, SkillCreate } from "../../../types/skills";
+import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
@@ -221,6 +222,8 @@ function SkillForm({
 					onChange={(e) => setWhenToUse(e.target.value)}
 				/>
 			</div>
+
+			<FormError error={create.error ?? update.error} />
 
 			<div className="flex justify-end gap-3 pt-2">
 				<Button
