@@ -887,6 +887,25 @@ wheels = [
 ]
 
 [[package]]
+name = "invana-arcadedb"
+version = "0.0.0"
+source = { editable = "../integrations/invana-arcadedb" }
+dependencies = [
+    { name = "invana-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "invana-engine", editable = "." }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+    { name = "pytest-cov", specifier = ">=6.0" },
+    { name = "ruff", specifier = ">=0.11" },
+]
+
+[[package]]
 name = "invana-engine"
 version = "0.0.0"
 source = { editable = "." }
@@ -937,6 +956,11 @@ telemetry = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "invana-arcadedb" },
+    { name = "invana-janusgraph" },
+    { name = "invana-memgraph" },
+    { name = "invana-neo4j" },
+    { name = "invana-tinkergraph" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -972,6 +996,88 @@ requires-dist = [
     { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.34" },
 ]
 provides-extras = ["server", "telemetry", "all"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "invana-arcadedb", editable = "../integrations/invana-arcadedb" },
+    { name = "invana-janusgraph", editable = "../integrations/invana-janusgraph" },
+    { name = "invana-memgraph", editable = "../integrations/invana-memgraph" },
+    { name = "invana-neo4j", editable = "../integrations/invana-neo4j" },
+    { name = "invana-tinkergraph", editable = "../integrations/invana-tinkergraph" },
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+    { name = "pytest-cov", specifier = ">=6.0" },
+    { name = "ruff", specifier = ">=0.11" },
+]
+
+[[package]]
+name = "invana-janusgraph"
+version = "0.0.0"
+source = { editable = "../integrations/invana-janusgraph" }
+dependencies = [
+    { name = "invana-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "invana-engine", editable = "." }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+    { name = "pytest-cov", specifier = ">=6.0" },
+    { name = "ruff", specifier = ">=0.11" },
+]
+
+[[package]]
+name = "invana-memgraph"
+version = "0.0.0"
+source = { editable = "../integrations/invana-memgraph" }
+dependencies = [
+    { name = "invana-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "invana-engine", editable = "." }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+    { name = "pytest-cov", specifier = ">=6.0" },
+    { name = "ruff", specifier = ">=0.11" },
+]
+
+[[package]]
+name = "invana-neo4j"
+version = "0.0.0"
+source = { editable = "../integrations/invana-neo4j" }
+dependencies = [
+    { name = "invana-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "invana-engine", editable = "." }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.25" },
+    { name = "pytest-cov", specifier = ">=6.0" },
+    { name = "pytest-env", specifier = ">=1.1" },
+    { name = "ruff", specifier = ">=0.11" },
+]
+
+[[package]]
+name = "invana-tinkergraph"
+version = "0.0.0"
+source = { editable = "../integrations/invana-tinkergraph" }
+dependencies = [
+    { name = "invana-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "invana-engine", editable = "." }]
 
 [package.metadata.requires-dev]
 dev = [

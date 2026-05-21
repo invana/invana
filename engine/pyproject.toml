@@ -49,7 +49,22 @@ dev = [
     "pytest-asyncio>=0.25",
     "pytest-cov>=6.0",
     "ruff>=0.11",
+    # Local connector integrations — installed editable so the engine dev env
+    # can resolve any connector_class the studio offers (Connection settings).
+    # In production, deployers install only the integrations they need.
+    "invana-neo4j",
+    "invana-memgraph",
+    "invana-arcadedb",
+    "invana-janusgraph",
+    "invana-tinkergraph",
 ]
+
+[tool.uv.sources]
+invana-neo4j = { path = "../integrations/invana-neo4j", editable = true }
+invana-memgraph = { path = "../integrations/invana-memgraph", editable = true }
+invana-arcadedb = { path = "../integrations/invana-arcadedb", editable = true }
+invana-janusgraph = { path = "../integrations/invana-janusgraph", editable = true }
+invana-tinkergraph = { path = "../integrations/invana-tinkergraph", editable = true }
 
 [project.scripts]
 invana = "invana.cli.main:app"
