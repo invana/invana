@@ -25,14 +25,16 @@ from invana.auth.schemas import (
     InvitationOut,
 )
 from invana.db import get_session
+from invana.graph.connectors.base.connector import BaseConnector
+from invana.graph.types.constants import Capability
 from invana.graphs import services
 from invana.graphs.deps import (
     require_graph_admin,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
-from invana.graphs.manager import GraphConnectionManager
-from invana.graphs.models import Graph, GraphMember
+from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
+from invana.graphs.models import Graph, GraphConnection, GraphMember
 from invana.graphs.schemas import (
     GraphConnectionCreate,
     GraphConnectionRead,
@@ -43,10 +45,62 @@ from invana.graphs.schemas import (
     SetupSectionUpdate,
 )
 from invana.settings import settings
+from invana.utils import import_class_from_dotted_path
 
 
 def _get_manager(request: Request) -> GraphConnectionManager:
     return request.app.state.graph_connection_manager
+
+
+# Capabilities that Studio's query-language selector understands. Kept in
+# this fixed order so the UI gets a stable default-language choice (first
+# entry wins) regardless of set iteration order on the connector side.
+_LANGUAGE_CAPABILITIES: tuple[Capability, ...] = (Capability.CYPHER, Capability.GREMLIN)
+
+
+def _build_connection_read(
+    connection: GraphConnection,
+    manager: GraphConnectionManager,
+) -> GraphConnectionRead:
+    """Project a GraphConnection ORM row into the wire schema with capabilities.
+
+    Capabilities are static per connector class — they don't depend on the
+    live driver. Prefer the live connector when available (single source of
+    truth) but fall back to instantiating the class for capability inspection
+    when the registry doesn't have it yet (e.g. immediately after PUT, while
+    the bg connect task is still running, or for OFFLINE connections).
+    """
+    payload = GraphConnectionRead.model_validate(connection)
+    caps = _resolve_capabilities(connection, manager)
+    payload.capabilities = sorted(cap.value for cap in caps)
+    payload.query_languages = [cap.value for cap in _LANGUAGE_CAPABILITIES if cap in caps]
+    return payload
+
+
+def _resolve_capabilities(
+    connection: GraphConnection,
+    manager: GraphConnectionManager,
+) -> set[Capability]:
+    """Capabilities for a connection, with the registry as the fast path.
+
+    Returns an empty set if the connector class can't be loaded — Studio
+    treats that as "no constraints reported" and falls back to its full
+    language list.
+    """
+    try:
+        return manager.get_connector(connection.id).capabilities()
+    except GraphUnavailableError:
+        pass
+    try:
+        connector_cls = import_class_from_dotted_path(connection.connector_class)
+    except (ImportError, AttributeError):
+        return set()
+    if not isinstance(connector_cls, type) or not issubclass(connector_cls, BaseConnector):
+        return set()
+    # No `.connect()` — capabilities() is static config, the ctor doesn't
+    # touch the wire. Auth is intentionally omitted; capabilities don't
+    # depend on credentials.
+    return connector_cls(uri=connection.uri).capabilities()
 
 
 # ---------------------------------------------------------------------------
@@ -224,9 +278,10 @@ async def get_connection(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
 ) -> GraphConnectionRead | None:
     connection = await services.get_graph_connection(session, graph_id=graph.id)
-    return GraphConnectionRead.model_validate(connection) if connection else None
+    return _build_connection_read(connection, manager) if connection else None
 
 
 @graph_router.put("/connection", response_model=GraphConnectionRead)
@@ -253,7 +308,7 @@ async def put_connection(
     else:
         await manager.reconnect(connection)
 
-    return GraphConnectionRead.model_validate(connection)
+    return _build_connection_read(connection, manager)
 
 
 @graph_router.delete("/connection", status_code=status.HTTP_204_NO_CONTENT)

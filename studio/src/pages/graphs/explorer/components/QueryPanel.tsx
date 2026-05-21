@@ -4,13 +4,16 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import { Button, ScrollArea, TabbedPanel } from "@invana/ui";
 import { Clock, Play, Terminal } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { QueryLanguage } from "../../../../types/graphs";
 import type { QueryHistoryEntry } from "../../../../types/query";
 
 // ── Query language options ────────────────────────────────────────────────────
 
-const LANGUAGES = ["Gremlin", "Cypher"] as const;
-type Language = (typeof LANGUAGES)[number];
+const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
+	cypher: "Cypher",
+	gremlin: "Gremlin",
+};
 
 // ── CodeMirror dark theme ─────────────────────────────────────────────────────
 
@@ -40,8 +43,9 @@ const darkTheme = EditorView.theme(
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 export interface QueryPanelProps {
-	defaultLanguage: "cypher" | "gremlin";
-	onRun: (query: string, language: "cypher" | "gremlin") => void;
+	availableLanguages: readonly QueryLanguage[];
+	defaultLanguage: QueryLanguage;
+	onRun: (query: string, language: QueryLanguage) => void;
 	isRunning: boolean;
 	history: QueryHistoryEntry[];
 }
@@ -49,17 +53,33 @@ export interface QueryPanelProps {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function QueryPanel({
+	availableLanguages,
 	defaultLanguage,
 	onRun,
 	isRunning,
 	history,
 }: QueryPanelProps) {
 	const [activeTab, setActiveTab] = useState<"console" | "history">("console");
-	const [language, setLanguage] = useState<Language>(
-		defaultLanguage === "cypher" ? "Cypher" : "Gremlin",
-	);
+	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
+
+	// If a previously-selected language is no longer offered (connector
+	// switched, capabilities re-resolved), fall back to the new default.
+	useEffect(() => {
+		if (!availableLanguages.includes(language)) {
+			setLanguage(defaultLanguage);
+		}
+	}, [availableLanguages, language, defaultLanguage]);
+
+	const languageOptions = useMemo(
+		() =>
+			availableLanguages.map((value) => ({
+				value,
+				label: LANGUAGE_LABEL[value],
+			})),
+		[availableLanguages],
+	);
 
 	// ── Initialise CodeMirror ─────────────────────────────────────────────────
 	// biome-ignore lint/correctness/useExhaustiveDependencies: editor init runs once on mount
@@ -67,7 +87,7 @@ export function QueryPanel({
 		if (!editorContainerRef.current) return;
 
 		const defaultQuery =
-			language === "Gremlin"
+			language === "gremlin"
 				? "g.V().hasLabel('Person').limit(25)"
 				: "MATCH (n) RETURN n LIMIT 25";
 
@@ -97,7 +117,7 @@ export function QueryPanel({
 	const handleRun = () => {
 		const query = editorViewRef.current?.state.doc.toString().trim() ?? "";
 		if (!query) return;
-		onRun(query, language === "Cypher" ? "cypher" : "gremlin");
+		onRun(query, language);
 	};
 
 	const loadHistoryEntry = (entry: QueryHistoryEntry) => {
@@ -106,7 +126,9 @@ export function QueryPanel({
 		view.dispatch({
 			changes: { from: 0, to: view.state.doc.length, insert: entry.query },
 		});
-		setLanguage(entry.language === "cypher" ? "Cypher" : "Gremlin");
+		if (availableLanguages.includes(entry.language)) {
+			setLanguage(entry.language);
+		}
 		setActiveTab("console");
 	};
 
@@ -118,12 +140,13 @@ export function QueryPanel({
 			<div className="px-2 py-1.5 border-b border-border shrink-0">
 				<select
 					value={language}
-					onChange={(e) => setLanguage(e.target.value as Language)}
-					className="bg-muted border border-border rounded px-2 py-1 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary"
+					onChange={(e) => setLanguage(e.target.value as QueryLanguage)}
+					disabled={languageOptions.length <= 1}
+					className="bg-muted border border-border rounded px-2 py-1 text-foreground cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-default disabled:opacity-70"
 				>
-					{LANGUAGES.map((l) => (
-						<option key={l} value={l}>
-							{l}
+					{languageOptions.map((l) => (
+						<option key={l.value} value={l.value}>
+							{l.label}
 						</option>
 					))}
 				</select>

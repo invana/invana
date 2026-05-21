@@ -124,6 +124,14 @@ class GraphConnectionRead(BaseModel):
     updated_at: datetime
     # auth_encrypted is intentionally excluded — credentials are never returned
 
+    # Connector-reported capabilities, resolved server-side at response time
+    # from the live connector. `capabilities` is the full set (cypher,
+    # gremlin, vector_search, fulltext_index, ...); `query_languages` is the
+    # cypher/gremlin subset Studio uses to drive its language selector.
+    # Empty when the connector isn't currently registered with the manager.
+    capabilities: list[str] = Field(default_factory=list)
+    query_languages: list[str] = Field(default_factory=list)
+
 
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1)

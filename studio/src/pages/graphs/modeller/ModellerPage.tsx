@@ -2,33 +2,28 @@ import { AppLayoutV2 } from "@invana/themes";
 import { Button, ScrollArea, Skeleton } from "@invana/ui";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAppHeader } from "../../../components/header/useAppHeader";
-import { SettingsPanel } from "../../../components/settings/SettingsPanel";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
-import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
-import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
-import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
+import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
 import { SchemaCanvas } from "./components/SchemaCanvas";
 import { SchemaNav } from "./components/SchemaNav";
 
 export function ModellerPage() {
-	const { username, graphSlug } = useParams<{
-		username: string;
-		graphSlug: string;
-	}>();
-	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
+	const {
 		username,
 		graphSlug,
-	);
-	// The Modeller's introspect + active-schema path requires a connection.
-	// Gate the entire main + left content behind a banner until that's set up.
-	const connectionMissing = !graphLoading && !graph;
+		graph,
+		graphLoading,
+		connectionMissing,
+		settingsPanel,
+		leftNav,
+		withSettingsTakeover,
+	} = useGraphWorkspace({ sectionId: "modeller" });
 	const {
 		data: version,
 		isLoading: versionLoading,
@@ -36,8 +31,6 @@ export function ModellerPage() {
 	} = useActiveVersionQuery(username, graphSlug);
 	const [selected, setSelected] = useState<SelectedItem>(null);
 	const [introspecting, setIntrospecting] = useState(false);
-	const settingsPanel = useSettingsPanel();
-	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "modeller");
 
 	const handleIntrospect = async () => {
 		if (!username || !graphSlug) return;
@@ -148,12 +141,7 @@ export function ModellerPage() {
 				minSize: settingsPanel.isOpen ? "320px" : "180px",
 				maxSize: settingsPanel.isOpen ? "640px" : "480px",
 				collapsible: false,
-				content:
-					settingsPanel.isOpen && username && graphSlug ? (
-						<SettingsPanel username={username} graphSlug={graphSlug} />
-					) : (
-						leftContent
-					),
+				content: withSettingsTakeover(leftContent),
 			}}
 			mainSection={{
 				defaultSize: "600px",

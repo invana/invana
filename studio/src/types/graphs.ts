@@ -106,6 +106,11 @@ export const CONNECTOR_OPTIONS = [
 
 export type ConnectorClass = (typeof CONNECTOR_OPTIONS)[number]["value"];
 
+// "cypher" | "gremlin" — the subset of capabilities Studio's query-language
+// selector understands. Empty/missing means "no constraint reported"; UI
+// falls back to allowing all supported languages.
+export type QueryLanguage = "cypher" | "gremlin";
+
 export interface GraphConnectionRead {
 	id: string;
 	graph_id: string | null;
@@ -118,6 +123,12 @@ export interface GraphConnectionRead {
 	schema_id: string | null;
 	created_at: string;
 	updated_at: string;
+	// Connector-reported capabilities resolved server-side. `capabilities`
+	// is the full set (cypher, gremlin, vector_search, fulltext_index, …);
+	// `query_languages` is the cypher/gremlin subset used to drive the
+	// Explorer's language picker.
+	capabilities: string[];
+	query_languages: QueryLanguage[];
 }
 
 export interface GraphConnectionCreate {
