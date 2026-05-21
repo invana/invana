@@ -1,6 +1,6 @@
 # RFC-017: Graph as the Primary Container
 
-**Status**: Draft
+**Status**: Implemented (S1.5 + S2 shipped; S3 partial — schema wired, canvas stubbed)
 **Author**: Invana Team
 **Date**: 2026-05-21
 **Supersedes (partially)**: RFC-012 (Mission-Centric Architecture)
@@ -42,7 +42,7 @@ User → Graph (1:1 GraphConnection)
 
 **Nothing sits above `Graph` in MVP.** Users have memberships directly on Graphs. Org/team grouping is a post-MVP problem solved by adding a nullable `owner_org_id` later — not pre-planned now.
 
-**Users get a `username`.** Globally unique, required at registration. Graph URLs are `/u/:username/:slug` (e.g. `/u/ravi/customer-analysis`). The `/u/` prefix namespaces all user-content URLs under a single segment, so usernames cannot collide with Studio's top-level routes (`/admin`, `/settings`, `/login`, etc.) — no reserved-name list is needed beyond `u` itself. `graphs.slug` is unique per user, not globally — two users can both have a graph slugged `analysis`.
+**Users get a `username`.** Globally unique, required at registration. Graph URLs are `/u/:username/:graphSlug` (e.g. `/u/ravi/customer-analysis`). The `/u/` prefix namespaces all user-content URLs under a single segment, so usernames cannot collide with Studio's top-level routes (`/admin`, `/settings`, `/login`, etc.) — no reserved-name list is needed beyond `u` itself. `graphs.slug` is unique per user, not globally — two users can both have a graph slugged `analysis`. The URL path parameter is named `graphSlug` everywhere in routing code (router paths, `useParams`, helper signatures, hook arg keys); the underlying data field is still `Graph.slug`. The verbose param name disambiguates from generic "slug" elsewhere in the codebase.
 
 **Username is mutable.** A user can change their `username`; existing URLs under the old username 404 (no redirect table). Trade-off accepted in exchange for implementation simplicity. Implementation should rate-limit changes (e.g. once per 30 days) to discourage abuse and reduce churn on shared links.
 
@@ -62,8 +62,8 @@ User → Graph (1:1 GraphConnection)
 | `Graph` (entity, table `graphs`) — connection | `GraphConnection` (table `graph_connections`) | 1:1 child of `Graph` |
 | `GraphConnectionForm` (Studio) | unchanged | name already correct |
 | `GraphSchema` (entity) | unchanged | now naturally means "schema of the Graph" |
-| `/workspaces/:slug/...` | `/u/:username/:slug/...` | per-user namespaced |
-| `/missions/{mid}/...` | folds into `/u/:username/:slug/...` | no separate mission segment |
+| `/workspaces/:slug/...` | `/u/:username/:graphSlug/...` | per-user namespaced |
+| `/missions/{mid}/...` | folds into `/u/:username/:graphSlug/...` | no separate mission segment |
 | `personal workspace` (auto-created by `invana init`) | **removed** | `invana init` creates the root user only; user creates their first Graph manually |
 
 ---
@@ -151,22 +151,22 @@ All other entities previously scoped to `mission_id` (datasets, skills, instruct
 
 ## URL Surface
 
-All graph-scoped routes are namespaced by `:username/:slug`.
+All graph-scoped routes are namespaced by `:username/:graphSlug`.
 
 | Concern | URL |
 |---|---|
 | Username availability | `GET /api/v1/auth/username-available?username=foo` (unauthenticated; returns `{available: bool, reason?: string}`; rate-limited by IP) |
 | Create / list graphs | `POST /api/v1/graphs` · `GET /api/v1/graphs` (lists graphs the caller is a member of) |
-| Graph detail | `GET /api/v1/u/{username}/{slug}` |
-| Graph members | `GET /api/v1/u/{username}/{slug}/members` · `PATCH .../members/{user_id}` · `DELETE .../members/{user_id}` |
-| Invitations | `POST /api/v1/u/{username}/{slug}/invitations` · `GET .../invitations` · `DELETE .../invitations/{id}` |
-| Connection | `GET /api/v1/u/{username}/{slug}/connection` · `PUT .../connection` |
-| Schema (modeller) | `GET /api/v1/u/{username}/{slug}/schema` · `PUT .../schema` |
-| Query console | `POST /api/v1/u/{username}/{slug}/query` |
-| Datasets | `/api/v1/u/{username}/{slug}/datasets/...` |
-| Skills / Instructions / LLM / Agents | `/api/v1/u/{username}/{slug}/{skills,instructions,llm,agents}/...` |
+| Graph detail | `GET /api/v1/u/{username}/{graphSlug}` |
+| Graph members | `GET /api/v1/u/{username}/{graphSlug}/members` · `PATCH .../members/{user_id}` · `DELETE .../members/{user_id}` |
+| Invitations | `POST /api/v1/u/{username}/{graphSlug}/invitations` · `GET .../invitations` · `DELETE .../invitations/{id}` |
+| Connection | `GET /api/v1/u/{username}/{graphSlug}/connection` · `PUT .../connection` |
+| Schema (modeller) | `GET /api/v1/u/{username}/{graphSlug}/schema` · `PUT .../schema` |
+| Query console | `POST /api/v1/u/{username}/{graphSlug}/query` |
+| Datasets | `/api/v1/u/{username}/{graphSlug}/datasets/...` |
+| Skills / Instructions / LLM / Agents | `/api/v1/u/{username}/{graphSlug}/{skills,instructions,llm,agents}/...` |
 
-Studio routes mirror this: `/u/:username/:slug/{settings,modeller,explorer,query,datasets,agents,...}`.
+Studio routes mirror this: `/u/:username/:graphSlug/{settings,modeller,explorer,query,datasets,agents,...}`.
 
 ---
 
@@ -179,7 +179,7 @@ A Graph progresses through setup before its analytical features are usable.
 - `slug` (autogenerated from name, editable; validated unique per owner)
 - `intent` (required, markdown — short statement of what the Graph is for)
 
-After submit, the user lands on `/u/:username/:slug` and enters the setup wizard.
+After submit, the user lands on `/u/:username/:graphSlug` and enters the setup wizard.
 
 **Setup sections** (each writes to `graphs.setup_state.{section}.completed_at`):
 
@@ -242,16 +242,21 @@ Per CLAUDE.md memory: no test rewrites for this redesign — manual verification
 
 ## Implementation Plan
 
-This RFC is the design step. Implementation follows as separate work, gated by user approval:
+This RFC is the design step. Implementation followed in commits on `arch/redesign`:
 
-1. [ ] Update `docs/internal/mvp.md` — rename Workspace → Graph, delete Mission layer, fold Mission tabs into Graph settings, add Graph setup wizard, renumber slices.
-2. [ ] Update `docs/internal/mvp/layer-1-identity-access.md` to match (add username, remove auto-created personal workspace).
-3. [ ] Engine: add `users.username` column + validation + rate-limited change endpoint. Rename `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Add `graphs.setup_state`, `graphs.intent`. `UNIQUE (created_by_id, slug)`. Reset Alembic, regenerate initial migration.
-4. [ ] Engine: rename routes to `/u/:username/:slug/...`. Add username resolver dep.
-5. [ ] Engine: rename admin views; add `Username` column to Users view.
-6. [ ] CLI: `invana init` collects username; **no personal graph is created**.
-7. [ ] Studio: rename pages, routes, hooks, copy. URLs become `/u/:username/:slug/...`. Add create-graph modal (name, slug, intent) and setup wizard with gated feature routes.
-8. [ ] Manual verification of the Layer 1 flows on the renamed schema and the create-graph + wizard flow.
+1. [x] `docs/internal/mvp.md` — renamed Workspace → Graph, deleted Mission layer, folded Mission tabs into Graph settings, added Graph setup wizard, renumbered slices.
+2. [x] `docs/internal/mvp/layer-1-identity-access.md` updated (username + invitations + no auto-personal-workspace).
+3. [x] Engine: added `users.username` column + validation + rate-limited change endpoint. Renamed `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Added `graphs.setup_state`, `graphs.intent`. `UNIQUE (created_by_id, slug)`. Reset Alembic, regenerated initial migration.
+4. [x] Engine: routes renamed to `/u/:username/:graphSlug/...`. Username resolver dep landed.
+5. [x] Engine: admin views renamed; `Username` column added to Users view.
+6. [x] CLI: `invana init` collects username; **no personal graph is created**.
+7. [x] Studio: pages, routes, hooks, copy renamed. URLs are `/u/:username/:graphSlug/...`. Create-graph page (name, slug, intent), setup wizard, settings index page, context-aware nav all in.
+8. [x] Manual verification of Layer 1 flows on the renamed schema and the create-graph + wizard flow.
+
+Follow-up tasks (not part of this RFC's scope but surfaced during implementation):
+
+- [ ] `@invana/canvas` integration: the old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are unpublished; the sibling `@invana/canvas` exposes a redesigned API surface that the old plugin code can't be retargeted to mechanically. Modeller's `SchemaCanvas`, Explorer's `GraphCanvas`, and `CanvasToolbar` are currently placeholders summarising counts.
+- [ ] Tighten `graph_connections.graph_id` to `NOT NULL` once any orphan rows from the deleted standalone connection surface have been cleared.
 
 ---
 
