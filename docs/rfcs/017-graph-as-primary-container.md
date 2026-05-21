@@ -1,6 +1,6 @@
 # RFC-017: Graph as the Primary Container
 
-**Status**: Implemented (S1.5 + S2 shipped; S3 partial — schema wired, canvas stubbed)
+**Status**: Draft
 **Author**: Invana Team
 **Date**: 2026-05-21
 **Supersedes (partially)**: RFC-012 (Mission-Centric Architecture)
@@ -242,21 +242,18 @@ Per CLAUDE.md memory: no test rewrites for this redesign — manual verification
 
 ## Implementation Plan
 
-This RFC is the design step. Implementation followed in commits on `arch/redesign`:
+This RFC is the design step. Implementation follows as separate work, gated by user approval:
 
-1. [x] `docs/internal/mvp.md` — renamed Workspace → Graph, deleted Mission layer, folded Mission tabs into Graph settings, added Graph setup wizard, renumbered slices.
-2. [x] `docs/internal/mvp/layer-1-identity-access.md` updated (username + invitations + no auto-personal-workspace).
-3. [x] Engine: added `users.username` column + validation + rate-limited change endpoint. Renamed `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Added `graphs.setup_state`, `graphs.intent`. `UNIQUE (created_by_id, slug)`. Reset Alembic, regenerated initial migration.
-4. [x] Engine: routes renamed to `/u/:username/:graphSlug/...`. Username resolver dep landed.
-5. [x] Engine: admin views renamed; `Username` column added to Users view.
-6. [x] CLI: `invana init` collects username; **no personal graph is created**.
-7. [x] Studio: pages, routes, hooks, copy renamed. URLs are `/u/:username/:graphSlug/...`. Create-graph page (name, slug, intent), setup wizard, settings index page, context-aware nav all in.
-8. [x] Manual verification of Layer 1 flows on the renamed schema and the create-graph + wizard flow.
+1. [ ] Update `docs/internal/mvp.md` — rename Workspace → Graph, delete Mission layer, fold Mission tabs into Graph settings, add Graph setup wizard, renumber slices.
+2. [ ] Update `docs/internal/mvp/layer-1-identity-access.md` to match (add username, remove auto-created personal workspace).
+3. [ ] Engine: add `users.username` column + validation + rate-limited change endpoint. Rename `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Add `graphs.setup_state`, `graphs.intent`. `UNIQUE (created_by_id, slug)`. Reset Alembic, regenerate initial migration.
+4. [ ] Engine: rename routes to `/u/:username/:graphSlug/...`. Add username resolver dep.
+5. [ ] Engine: rename admin views; add `Username` column to Users view.
+6. [ ] CLI: `invana init` collects username; **no personal graph is created**.
+7. [ ] Studio: rename pages, routes, hooks, copy. URLs become `/u/:username/:graphSlug/...`. Add create-graph modal (name, slug, intent) and setup wizard with gated feature routes.
+8. [ ] Manual verification of the Layer 1 flows on the renamed schema and the create-graph + wizard flow.
 
-Follow-up tasks (not part of this RFC's scope but surfaced during implementation):
-
-- [ ] `@invana/canvas` integration: the old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are unpublished; the sibling `@invana/canvas` exposes a redesigned API surface that the old plugin code can't be retargeted to mechanically. Modeller's `SchemaCanvas`, Explorer's `GraphCanvas`, and `CanvasToolbar` are currently placeholders summarising counts.
-- [ ] Tighten `graph_connections.graph_id` to `NOT NULL` once any orphan rows from the deleted standalone connection surface have been cleared.
+(Implementation status — what's shipped, what's outstanding — lives in `docs/internal/mvp.md`. This RFC is the design record.)
 
 ---
 

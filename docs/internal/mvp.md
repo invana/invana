@@ -583,6 +583,8 @@ Scoped tokens · retrieval endpoints (query / semantic / skill-mediated) · prov
 - **Hold the line on "no source connectors in MVP."** Every "but PDFs would be easy" request is a slippery slope back into a connector framework. Users producing JSON externally is the contract.
 - **S1.5 (the rename) is mechanical but touches everywhere.** Land it before S2 starts so no new code is written against the old names.
 - **Generated TS client is the contract.** Hand-typed FE shapes will drift.
+- **Canvas integration is an open dependency on S3 + S5.5.** The old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are unpublished; the sibling `@invana/canvas` exposes a redesigned API surface that the old plugin code can't be retargeted to mechanically. Modeller's `SchemaCanvas`, Explorer's `GraphCanvas`, and `CanvasToolbar` are currently stubs that summarise counts. Wiring up the redesigned canvas is its own task — don't let it block other slices.
+- **`graph_connections.graph_id` is currently nullable** — historical artefact from the deleted standalone connection surface. Tighten to `NOT NULL` in a future migration once any orphan rows are cleared.
 
 ## Parallelization map
 
