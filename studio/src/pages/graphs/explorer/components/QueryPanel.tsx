@@ -39,11 +39,10 @@ const darkTheme = EditorView.theme(
 		"&": {
 			color: "#d4d4d4",
 			backgroundColor: "transparent",
-			// Auto-grow within bounds: starts at 200px, scrolls past 500px.
-			// Bounds match the NL textarea so toggling modes feels consistent.
-			height: "auto",
-			minHeight: "200px",
-			maxHeight: "500px",
+			// Fill the resizable wrapper; the wrapper owns the height via
+			// `resize: vertical`. CM's default `.cm-editor` is flex column +
+			// `.cm-scroller` flex:1, so clicks anywhere inside focus.
+			height: "100%",
 		},
 		".cm-scroller": {
 			overflow: "auto",
@@ -202,8 +201,10 @@ export function QueryPanel({
 	// ── Query form — selects + editor + attach/run, in that order ────────────
 	// All selects are @invana/ui's Radix-based <Select> so tab key navigates:
 	// query-type → LLM/lang → editor → (attach) → Run.
+	// Rendered as an "island" card: bg-card + border + rounded + shadow on
+	// a padded wrapper so it visually floats over the panel.
 	const queryForm = (
-		<div className="flex flex-col shrink-0 border-b border-border">
+		<div className="flex flex-col shrink-0 bg-card border border-border rounded-md shadow-sm overflow-hidden">
 			{/* 1. Inline selects: query-type + LLM/lang on the same row. */}
 			<div className="px-2 py-1.5 shrink-0 flex items-center gap-2 flex-wrap">
 				<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
@@ -236,11 +237,17 @@ export function QueryPanel({
 							</SelectContent>
 						</Select>
 					)
+				) : languageOptions.length <= 1 ? (
+					// Single-language connector — show the name as a muted pill so
+					// the user still knows what dialect to write, without offering
+					// a fake dropdown.
+					<span className="inline-flex items-center h-7 px-2 rounded bg-muted text-muted-foreground">
+						{LANGUAGE_LABEL[language]}
+					</span>
 				) : (
 					<Select
 						value={language}
 						onValueChange={(v) => setLanguage(v as QueryLanguage)}
-						disabled={languageOptions.length <= 1}
 					>
 						<SelectTrigger className="h-7 w-auto">
 							<SelectValue />
@@ -256,24 +263,59 @@ export function QueryPanel({
 				)}
 			</div>
 
-			{/* 2. Editor — auto-grow 200-500px. CodeMirror stays mounted in NL
-			    mode so editor state survives toggling. */}
-			<div className="shrink-0 border-t border-border">
+			{/* 2. Editor — `bg-background` is one notch darker than the card so
+			    the editor surface is visually distinct from the chrome. Both
+			    fields are user-resizable via the corner drag handle. The
+			    QL CodeMirror is mounted into a flex-1 child so the outer
+			    `resize-y` wrapper can grow it without breaking CM's hit-
+			    region (CM expects a parent with a resolved height). */}
+			<div className="shrink-0 border-t border-border bg-background">
 				<div
-					ref={editorContainerRef}
-					className={mode === "ql" ? "" : "hidden"}
-				/>
+					className={
+						mode === "ql"
+							? "h-50 min-h-30 resize-y overflow-hidden flex flex-col"
+							: "hidden"
+					}
+				>
+					<div ref={editorContainerRef} className="flex-1 min-h-0" />
+				</div>
 				{mode === "nl" && (
 					<textarea
 						value={nlQuery}
 						onChange={(e) => setNlQuery(e.target.value)}
 						placeholder="Ask anything about your graph…"
-						className="block w-full min-h-[200px] max-h-[500px] bg-transparent p-2 text-foreground outline-none resize-none text-base placeholder:text-muted-foreground field-sizing-content"
+						className="block w-full min-h-30 h-50 bg-transparent p-2 text-foreground outline-none resize-y text-base placeholder:text-muted-foreground"
 					/>
 				)}
 			</div>
 
-			{/* 3. Action row — Attach (NL only) + Run. Part of the form, not a
+			{/* 3a. Attachment chips (NL only) — their own row above the action
+			    row so a large list never pushes Run off-screen. Wraps + scrolls
+			    when the list overflows; each filename truncates at a fixed
+			    width. Hidden in QL mode and when the list is empty. */}
+			{mode === "nl" && attachments.length > 0 && (
+				<div className="px-2 py-1.5 border-t border-border shrink-0 max-h-24 overflow-y-auto flex items-start gap-1 flex-wrap">
+					{attachments.map((file, i) => (
+						<span
+							key={`${file.name}-${i}`}
+							className="inline-flex items-center gap-1 bg-muted border border-border rounded px-1.5 py-0.5 text-muted-foreground max-w-full"
+						>
+							<span className="truncate max-w-40" title={file.name}>
+								{file.name}
+							</span>
+							<button
+								type="button"
+								onClick={() => removeAttachment(i)}
+								className="hover:text-foreground shrink-0"
+							>
+								<X className="w-3 h-3" />
+							</button>
+						</span>
+					))}
+				</div>
+			)}
+
+			{/* 3b. Action row — Attach (NL only) + Run. Part of the form, not a
 			    separate footer, so they stay anchored to the editor. */}
 			<div className="px-2 py-1.5 border-t border-border shrink-0 flex items-center gap-2">
 				{mode === "nl" && (
@@ -294,25 +336,6 @@ export function QueryPanel({
 							<Paperclip className="w-3 h-3 mr-1" />
 							Attach
 						</Button>
-						{attachments.length > 0 && (
-							<div className="flex items-center gap-1 flex-wrap">
-								{attachments.map((file, i) => (
-									<span
-										key={`${file.name}-${i}`}
-										className="inline-flex items-center gap-1 bg-muted border border-border rounded px-1.5 py-0.5 text-muted-foreground"
-									>
-										{file.name}
-										<button
-											type="button"
-											onClick={() => removeAttachment(i)}
-											className="hover:text-foreground"
-										>
-											<X className="w-3 h-3" />
-										</button>
-									</span>
-								))}
-							</div>
-						)}
 					</>
 				)}
 				<div className="flex-1" />
@@ -330,11 +353,11 @@ export function QueryPanel({
 	);
 
 	// ── History — its own section below the form ─────────────────────────────
-	// Visual separation from the query form: thick top border on the wrapper +
-	// muted bg on the header so it reads as a distinct panel.
+	// The form floats as an island above; padding between them carries the
+	// visual separation, so the history doesn't need its own top border.
 	const historySection = (
-		<div className="flex-1 min-h-0 flex flex-col border-t-4 border-border">
-			<div className="px-3 py-2 flex items-center gap-1.5 text-muted-foreground bg-muted/40 border-b border-border shrink-0 font-medium uppercase tracking-wide">
+		<div className="flex-1 m-3 min-h-0 flex flex-col border">
+			<div className="px-3 py-2 flex items-center gap-1.5 text-muted-foreground bg-muted/40 border-y border-border shrink-0 font-medium uppercase tracking-wide">
 				<Clock className="w-3.5 h-3.5" />
 				History ({history.length})
 			</div>
@@ -378,7 +401,7 @@ export function QueryPanel({
 	// the form itself — history is a separate section below.
 	const consoleContent = (
 		<div className="flex flex-col h-full min-h-0">
-			{queryForm}
+			<div className="p-3 shrink-0">{queryForm}</div>
 			{historySection}
 		</div>
 	);
