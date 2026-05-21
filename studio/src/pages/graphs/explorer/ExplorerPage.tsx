@@ -1,8 +1,7 @@
 import { AppLayoutV2 } from "@invana/themes";
-import { Separator } from "@invana/ui";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { ThemeToggle } from "../../../components/ThemeToggle";
+import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
@@ -36,6 +35,7 @@ export function ExplorerPage() {
 	const { mutation, history } = useQueryExecution(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "explorer");
+	const header = useAppHeader({ pageLabel: "Explorer" });
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
 	const [selected, setSelected] = useState<QueryResultItem | null>(null);
@@ -95,27 +95,7 @@ export function ExplorerPage() {
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
-			header={{
-				className: "!h-[38px]",
-				left: (
-					<div className="flex items-center gap-2 px-2">
-						<span className="font-bold text-xl select-none">Invana Studio</span>
-						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground">Explorer</span>
-						{graph && (
-							<>
-								<Separator orientation="vertical" className="h-4" />
-								<span className="font-medium">{graph.name}</span>
-							</>
-						)}
-					</div>
-				),
-				right: (
-					<div className="flex items-center gap-1 px-2">
-						<ThemeToggle />
-					</div>
-				),
-			}}
+			header={header}
 			leftSection={{
 				defaultSize: settingsPanel.isOpen ? "420px" : "300px",
 				minSize: settingsPanel.isOpen ? "320px" : "240px",

@@ -1,10 +1,10 @@
 import { AppLayoutV2 } from "@invana/themes";
-import { Button, ScrollArea, Separator, Skeleton } from "@invana/ui";
+import { Button, ScrollArea, Skeleton } from "@invana/ui";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ThemeToggle } from "../../../components/ThemeToggle";
+import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
@@ -49,6 +49,35 @@ export function ModellerPage() {
 			setIntrospecting(false);
 		}
 	};
+
+	const header = useAppHeader({
+		pageLabel: "Modeller",
+		rightExtras: (
+			<>
+				<Button
+					variant="outline"
+					size="sm"
+					className="h-7"
+					onClick={() => refetch()}
+				>
+					<RefreshCw className="w-3 h-3 mr-1" />
+					Refresh
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					className="h-7"
+					onClick={handleIntrospect}
+					disabled={introspecting}
+				>
+					<RefreshCw
+						className={`w-3 h-3 mr-1 ${introspecting ? "animate-spin" : ""}`}
+					/>
+					{introspecting ? "Introspecting…" : "Introspect"}
+				</Button>
+			</>
+		),
+	});
 
 	const isLoading = graphLoading || versionLoading;
 	const nodeTypes = version?.node_types ?? [];
@@ -107,48 +136,7 @@ export function ModellerPage() {
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
-			header={{
-				className: "!h-[38px]",
-				left: (
-					<div className="flex items-center gap-2 px-2">
-						<span className="font-bold text-xl select-none">Invana Studio</span>
-						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground">Modeller</span>
-						{graph && (
-							<>
-								<Separator orientation="vertical" className="h-4" />
-								<span className="font-medium">{graph.name}</span>
-							</>
-						)}
-					</div>
-				),
-				right: (
-					<div className="flex items-center gap-1 px-2">
-						<Button
-							variant="outline"
-							size="sm"
-							className="h-7"
-							onClick={() => refetch()}
-						>
-							<RefreshCw className="w-3 h-3 mr-1" />
-							Refresh
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							className="h-7"
-							onClick={handleIntrospect}
-							disabled={introspecting}
-						>
-							<RefreshCw
-								className={`w-3 h-3 mr-1 ${introspecting ? "animate-spin" : ""}`}
-							/>
-							{introspecting ? "Introspecting…" : "Introspect"}
-						</Button>
-						<ThemeToggle />
-					</div>
-				),
-			}}
+			header={header}
 			leftSection={{
 				defaultSize: settingsPanel.isOpen ? "420px" : "260px",
 				minSize: settingsPanel.isOpen ? "320px" : "180px",

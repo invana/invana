@@ -1,5 +1,5 @@
 import { AppLayoutV2 } from "@invana/themes";
-import { Button, Separator, Skeleton } from "@invana/ui";
+import { Button, Skeleton } from "@invana/ui";
 import {
 	ArrowRight,
 	CheckCircle2,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ThemeToggle } from "../../components/ThemeToggle";
+import { useAppHeader } from "../../components/header/useAppHeader";
 import { SettingsPanel } from "../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../components/settings/useSettingsPanel";
@@ -163,6 +163,7 @@ export function GraphOverviewPage() {
 	const setupMutation = useSetupSectionMutation();
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "overview");
+	const header = useAppHeader({ pageLabel: "Overview" });
 
 	const setupComplete =
 		!!graph && REQUIRED.every((k) => graph.setup_state?.[k]?.completed_at);
@@ -335,23 +336,7 @@ export function GraphOverviewPage() {
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
-			header={{
-				className: "!h-[38px]",
-				left: (
-					<div className="flex items-center gap-2 px-2">
-						<span className="font-bold text-xl select-none">Invana Studio</span>
-						<Separator orientation="vertical" className="h-4" />
-						<span className="text-muted-foreground">
-							{graph?.name ?? "Overview"}
-						</span>
-					</div>
-				),
-				right: (
-					<div className="flex items-center gap-1 px-2">
-						<ThemeToggle />
-					</div>
-				),
-			}}
+			header={header}
 			leftSection={
 				showSettingsInLeft
 					? {
