@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ThemeToggle } from "../../../components/ThemeToggle";
-import { useLegacyGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
+import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
 import type { SelectedItem } from "./components/DetailPanel";
@@ -15,9 +15,12 @@ import { SchemaNav } from "./components/SchemaNav";
 
 export function ModellerPage() {
 	const navigate = useNavigate();
-	const { id: graphId } = useParams<{ id: string }>();
-	const { data: graph, isLoading: graphLoading } =
-		useLegacyGraphConnectionQuery(graphId ?? "");
+	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
+		username,
+		slug,
+	);
+	const graphId = graph?.id;
 	const {
 		data: version,
 		isLoading: versionLoading,
@@ -120,9 +123,10 @@ export function ModellerPage() {
 				icon: Network,
 				tooltipSide: "right" as const,
 				showSeperator: true,
-				onClick: graphId
-					? () => navigate(`/graphs/${graphId}/explorer`)
-					: undefined,
+				onClick:
+					username && slug
+						? () => navigate(`/u/${username}/${slug}/explorer`)
+						: undefined,
 			},
 			{
 				name: "Modeller",

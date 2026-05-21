@@ -1,54 +1,25 @@
-import type { Canvas } from "@invana/canvas-core";
+// TEMP: zoom/fit buttons need the canvas instance from @invana/canvas-core
+// (currently unavailable — see GraphCanvas.tsx). Rendered as no-ops until the
+// new canvas integration lands; kept as a component so the explorer layout
+// stays stable.
+
 import { Button } from "@invana/ui";
 import { Maximize, ZoomIn, ZoomOut } from "lucide-react";
 
 interface CanvasToolbarProps {
-	canvas: Canvas | null;
+	canvas: unknown;
 }
 
-export function CanvasToolbar({ canvas }: CanvasToolbarProps) {
-	const zoomIn = () => {
-		if (!canvas) return;
-		const vp = canvas.viewport;
-		if (vp) vp.zoom(vp.scaled * 1.25, true);
-	};
-
-	const zoomOut = () => {
-		if (!canvas) return;
-		const vp = canvas.viewport;
-		if (vp) vp.zoom(vp.scaled * 0.8, true);
-	};
-
-	const fitView = () => {
-		if (!canvas) return;
-		const vp = canvas.viewport;
-		if (vp) vp.fit(true);
-	};
-
+export function CanvasToolbar(_: CanvasToolbarProps) {
 	return (
 		<div className="absolute top-3 right-3 flex flex-col gap-1 z-10">
-			<Button
-				variant="outline"
-				size="icon"
-				className="h-7 w-7"
-				onClick={zoomIn}
-			>
+			<Button variant="outline" size="icon" className="h-7 w-7" disabled>
 				<ZoomIn className="w-3.5 h-3.5" />
 			</Button>
-			<Button
-				variant="outline"
-				size="icon"
-				className="h-7 w-7"
-				onClick={zoomOut}
-			>
+			<Button variant="outline" size="icon" className="h-7 w-7" disabled>
 				<ZoomOut className="w-3.5 h-3.5" />
 			</Button>
-			<Button
-				variant="outline"
-				size="icon"
-				className="h-7 w-7"
-				onClick={fitView}
-			>
+			<Button variant="outline" size="icon" className="h-7 w-7" disabled>
 				<Maximize className="w-3.5 h-3.5" />
 			</Button>
 		</div>

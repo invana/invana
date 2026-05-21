@@ -127,8 +127,9 @@ export const graphConnectionsApi = {
 			method: "POST",
 		}),
 
-	// Legacy query shim — routes back-compat /api/v1/graphs/{id}/query while
-	// the Explorer/Modeller still live at /graphs/:id/*. Retire with Task #10.
+	// Legacy query shim — Explorer/Modeller now live at /u/:username/:slug/* but
+	// still call /api/v1/graphs/{connection_id}/query under the hood. Retire
+	// once the graph-scoped /u/.../query path replaces it end-to-end.
 	query: (connectionId: string, body: QueryRequest) =>
 		request<QueryResponse>(`/api/v1/graphs/${connectionId}/query`, {
 			method: "POST",

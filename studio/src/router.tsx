@@ -15,9 +15,9 @@ import { GraphInvitationsPage } from "./pages/settings/GraphInvitationsPage";
 import { GraphMembersPage } from "./pages/settings/GraphMembersPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
 
-// Lazy-loaded — these import @invana/canvas-core which is currently broken on
-// this branch. Keeping them lazy means the auth + settings flows don't break
-// even when canvas imports can't resolve.
+// Lazy-loaded — Explorer/Modeller carry the heaviest UI (graph rendering once
+// the new canvas integration lands). Lazy keeps the auth + settings flows
+// snappy and isolates any canvas-side regressions to their own chunks.
 const ExplorerPage = lazy(() =>
 	import("./pages/graphs/explorer/ExplorerPage").then((m) => ({
 		default: m.ExplorerPage,
@@ -43,12 +43,11 @@ export const router = createBrowserRouter([
 	},
 
 	// Full-page layouts — own AppLayoutV2, not nested under App shell.
-	// Modeller + Explorer keep their legacy /graphs/:id/* URLs in this S2 pass.
-	// Re-mounting them under /u/:username/:slug/{modeller,explorer} is a follow-up
-	// that needs the FE pages to switch from connection_id-keyed APIs to the
-	// graph-scoped ones (then the legacy_query / legacy_schemas shims can go).
+	// Graph-scoped URLs (RFC-017). The pages resolve the connection via
+	// /u/:username/:slug/connection and thread connection.id into the legacy
+	// query/introspect endpoints (those still key off connection_id).
 	{
-		path: "graphs/:id/modeller",
+		path: "u/:username/:slug/modeller",
 		element: (
 			<ProtectedRoute>
 				<Suspense fallback={<LazyFallback />}>
@@ -59,7 +58,7 @@ export const router = createBrowserRouter([
 		errorElement: <ErrorPage />,
 	},
 	{
-		path: "graphs/:id/explorer",
+		path: "u/:username/:slug/explorer",
 		element: (
 			<ProtectedRoute>
 				<Suspense fallback={<LazyFallback />}>

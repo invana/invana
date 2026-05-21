@@ -41,10 +41,11 @@ export default function App() {
 	const activeMembership = urlMembership ?? fallbackMembership;
 	const activeRole = activeMembership?.role ?? null;
 
-	// Legacy GraphConnection routes (S2 will fold these into Graph-scoped pages).
-	const graphIdMatch = pathname.match(/^\/graphs\/([^/]+)/);
-	const currentGraphId = graphIdMatch ? graphIdMatch[1] : null;
-	const isGraphDetailPage = !!currentGraphId && currentGraphId !== "new";
+	// Graph-scoped nav targets (modeller/explorer) live at /u/:username/:slug/...
+	// — derive them from the active membership when on or off a graph page.
+	const graphScopedPath = activeMembership
+		? `/u/${activeMembership.owner_username}/${activeMembership.graph_slug}`
+		: null;
 
 	const initial = (user?.first_name ?? "?")[0]?.toUpperCase();
 
@@ -78,8 +79,8 @@ export default function App() {
 						name: "Modeller",
 						icon: GitGraph,
 						tooltipSide: "right",
-						onClick: isGraphDetailPage
-							? () => navigate(`/graphs/${currentGraphId}/modeller`)
+						onClick: graphScopedPath
+							? () => navigate(`${graphScopedPath}/modeller`)
 							: () => navigate("/graphs"),
 					},
 				],

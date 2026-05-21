@@ -4,7 +4,7 @@ import { Database, GitGraph, Network, Settings } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ThemeToggle } from "../../../components/ThemeToggle";
-import { useLegacyGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
+import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import type { QueryResultItem } from "../../../types/query";
 import { CanvasToolbar } from "./components/CanvasToolbar";
 import { ExplorerStatusBar } from "./components/ExplorerStatusBar";
@@ -26,10 +26,10 @@ const CONNECTOR_LANGUAGE: Record<string, "cypher" | "gremlin"> = {
 
 export function ExplorerPage() {
 	const navigate = useNavigate();
-	const { id: graphId } = useParams<{ id: string }>();
+	const { username, slug } = useParams<{ username: string; slug: string }>();
 
-	const { data: graph } = useLegacyGraphConnectionQuery(graphId ?? "");
-	const { mutation, history } = useQueryExecution(graphId ?? "");
+	const { data: graph } = useGraphConnectionQuery(username, slug);
+	const { mutation, history } = useQueryExecution(graph?.id ?? "");
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
 	const [selected, setSelected] = useState<QueryResultItem | null>(null);
@@ -85,9 +85,10 @@ export function ExplorerPage() {
 				name: "Modeller",
 				icon: GitGraph,
 				tooltipSide: "right" as const,
-				onClick: graphId
-					? () => navigate(`/graphs/${graphId}/modeller`)
-					: undefined,
+				onClick:
+					username && slug
+						? () => navigate(`/u/${username}/${slug}/modeller`)
+						: undefined,
 			},
 		],
 		bottomNavItems: [
