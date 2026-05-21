@@ -47,9 +47,6 @@ def create_app() -> FastAPI:
     from invana.graphs.routes import graph_router, graphs_collection_router
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
-    from invana.server.routes.graphs import graphs_router
-    from invana.server.routes.legacy_query import legacy_query_router
-    from invana.server.routes.legacy_schemas import legacy_schemas_router
     from invana.server.routes.query import query_router
     from invana.server.routes.schemas import schemas_router
 
@@ -89,10 +86,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(graphs_collection_router)
     app.include_router(graph_router)
-    app.include_router(graphs_router)
     app.include_router(schemas_router)
     app.include_router(query_router)
-    app.include_router(legacy_query_router)
-    app.include_router(legacy_schemas_router)
     mount_admin(app)
     return app

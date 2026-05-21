@@ -4,7 +4,7 @@
  * registerAuthAccess so the interceptors can read/refresh tokens without
  * a circular import.
  *
- * Per RFC-017 the active Graph is derived from the URL (/u/:username/:slug),
+ * Per RFC-017 the active Graph is derived from the URL (/u/:username/:graphSlug),
  * not from session state. The store therefore tracks only the user + tokens.
  */
 

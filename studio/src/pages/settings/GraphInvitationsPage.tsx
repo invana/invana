@@ -26,23 +26,29 @@ import { graphMembershipApi } from "../../services/api/graph-membership";
 import type { GraphRole } from "../../types/auth";
 
 export function GraphInvitationsPage() {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const { membershipForGraph, rolesForGraph } = useAuth();
 	const qc = useQueryClient();
 	const [open, setOpen] = useState(false);
 	const [redeemUrl, setRedeemUrl] = useState<string | null>(null);
 
-	const membership = membershipForGraph(username, slug);
-	const { isAdmin: isAdminHere } = rolesForGraph(username, slug);
+	const membership = membershipForGraph(username, graphSlug);
+	const { isAdmin: isAdminHere } = rolesForGraph(username, graphSlug);
 
 	const { data: invitations, isLoading } = useQuery({
-		queryKey: ["graph", username, slug, "invitations"],
+		queryKey: ["graph", username, graphSlug, "invitations"],
 		queryFn: () =>
-			graphMembershipApi.listInvitations(username as string, slug as string),
-		enabled: !!username && !!slug && !!isAdminHere,
+			graphMembershipApi.listInvitations(
+				username as string,
+				graphSlug as string,
+			),
+		enabled: !!username && !!graphSlug && !!isAdminHere,
 	});
 
-	if (!username || !slug) return <Navigate to="/" replace />;
+	if (!username || !graphSlug) return <Navigate to="/" replace />;
 	if (!membership) {
 		return (
 			<div className="p-8 text-muted-foreground">
@@ -62,12 +68,12 @@ export function GraphInvitationsPage() {
 		try {
 			await graphMembershipApi.deleteInvitation(
 				username as string,
-				slug as string,
+				graphSlug as string,
 				id,
 			);
 			toast.success("Invitation revoked.");
 			qc.invalidateQueries({
-				queryKey: ["graph", username, slug, "invitations"],
+				queryKey: ["graph", username, graphSlug, "invitations"],
 			});
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to revoke.");
@@ -145,7 +151,7 @@ export function GraphInvitationsPage() {
 			<NewInvitationDialog
 				open={open}
 				username={username}
-				slug={slug}
+				graphSlug={graphSlug}
 				onClose={() => setOpen(false)}
 				onCreated={(url) => setRedeemUrl(url)}
 			/>
@@ -158,13 +164,13 @@ export function GraphInvitationsPage() {
 function NewInvitationDialog({
 	open,
 	username,
-	slug,
+	graphSlug,
 	onClose,
 	onCreated,
 }: {
 	open: boolean;
 	username: string;
-	slug: string;
+	graphSlug: string;
 	onClose: () => void;
 	onCreated: (url: string) => void;
 }) {
@@ -177,12 +183,16 @@ function NewInvitationDialog({
 		e.preventDefault();
 		setSubmitting(true);
 		try {
-			const inv = await graphMembershipApi.createInvitation(username, slug, {
-				email,
-				role,
-			});
+			const inv = await graphMembershipApi.createInvitation(
+				username,
+				graphSlug,
+				{
+					email,
+					role,
+				},
+			);
 			qc.invalidateQueries({
-				queryKey: ["graph", username, slug, "invitations"],
+				queryKey: ["graph", username, graphSlug, "invitations"],
 			});
 			onClose();
 			setEmail("");

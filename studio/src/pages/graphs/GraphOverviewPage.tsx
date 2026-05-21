@@ -32,7 +32,7 @@ interface SectionMeta {
 	label: string;
 	description: string;
 	icon: typeof Database;
-	settingsPath: (username: string, slug: string) => string;
+	settingsPath: (username: string, graphSlug: string) => string;
 }
 
 const SECTIONS: SectionMeta[] = [
@@ -144,14 +144,17 @@ function WizardSection({
 }
 
 export function GraphOverviewPage() {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const navigate = useNavigate();
 	const {
 		data: graph,
 		isLoading,
 		isError,
 		error,
-	} = useGraphQuery(username, slug);
+	} = useGraphQuery(username, graphSlug);
 	const setupMutation = useSetupSectionMutation();
 
 	if (isLoading) {
@@ -196,7 +199,7 @@ export function GraphOverviewPage() {
 		setupMutation.mutate(
 			{
 				username: graph.owner_username,
-				slug: graph.slug,
+				graphSlug: graph.slug,
 				section,
 				action,
 			},

@@ -158,7 +158,7 @@ export function GraphsListPage() {
 		deleteMutation.mutate(
 			{
 				username: deleteTarget.owner_username,
-				slug: deleteTarget.slug,
+				graphSlug: deleteTarget.slug,
 			},
 			{
 				onSuccess: () => {

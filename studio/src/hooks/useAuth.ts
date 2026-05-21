@@ -10,25 +10,25 @@ export function useAuth() {
 	const setUser = useAuthStore((s) => s.setUser);
 	const clear = useAuthStore((s) => s.clear);
 
-	/** Resolve the user's membership in a specific Graph by owner + slug.
+	/** Resolve the user's membership in a specific Graph by owner + graphSlug.
 	 *  Per RFC-017 the active Graph comes from the URL — pass the URL params. */
 	function membershipForGraph(
 		username: string | undefined,
-		slug: string | undefined,
+		graphSlug: string | undefined,
 	) {
-		if (!username || !slug || !user) return null;
+		if (!username || !graphSlug || !user) return null;
 		return (
 			user.graphs.find(
-				(g) => g.owner_username === username && g.graph_slug === slug,
+				(g) => g.owner_username === username && g.graph_slug === graphSlug,
 			) ?? null
 		);
 	}
 
 	function rolesForGraph(
 		username: string | undefined,
-		slug: string | undefined,
+		graphSlug: string | undefined,
 	) {
-		const m = membershipForGraph(username, slug);
+		const m = membershipForGraph(username, graphSlug);
 		const role: GraphRole | null = m?.role ?? null;
 		return {
 			role,

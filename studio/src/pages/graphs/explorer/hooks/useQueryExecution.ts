@@ -1,9 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { graphConnectionsApi } from "../../../../services/api/graphs";
+import { graphsApi } from "../../../../services/api/graphs";
 import type { QueryHistoryEntry, QueryResponse } from "../../../../types/query";
 
-export function useQueryExecution(graphId: string) {
+export function useQueryExecution(
+	username: string | undefined,
+	graphSlug: string | undefined,
+) {
 	const [history, setHistory] = useState<QueryHistoryEntry[]>([]);
 	const [lastResult, setLastResult] = useState<QueryResponse | null>(null);
 
@@ -11,7 +14,7 @@ export function useQueryExecution(graphId: string) {
 		mutationFn: ({
 			query,
 		}: { query: string; language: "cypher" | "gremlin" }) =>
-			graphConnectionsApi.query(graphId, { query }),
+			graphsApi.query(username as string, graphSlug as string, { query }),
 		onSuccess: (data, variables) => {
 			setLastResult(data);
 			const entry: QueryHistoryEntry = {

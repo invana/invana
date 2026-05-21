@@ -303,4 +303,32 @@ async def ping_connection(
     return {"detail": "ping initiated"}
 
 
+@graph_router.post("/connection/introspect", status_code=status.HTTP_202_ACCEPTED)
+async def introspect_connection(
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+    manager: GraphConnectionManager = Depends(_get_manager),
+) -> dict:
+    """Re-run schema introspection against the live graph DB (async)."""
+    import asyncio  # noqa: PLC0415
+
+    from invana.graphs.manager import GraphUnavailableError  # noqa: PLC0415
+
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
+
+    try:
+        connector = manager.get_connector(connection.id)
+    except GraphUnavailableError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"error": "graph_not_active", "connection_id": connection.id},
+        ) from None
+
+    asyncio.create_task(manager._auto_introspect(session, connection, connector))  # type: ignore[attr-defined]
+    return {"detail": "introspection initiated"}
+
+
 __all__ = ["graph_router", "graphs_collection_router"]

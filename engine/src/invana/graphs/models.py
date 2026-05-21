@@ -142,9 +142,9 @@ class GraphConnection(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     # 1:1 link to the parent Graph. UNIQUE enforces the 1:1 at the DB level.
-    # In S1.5 the column is nullable to allow standalone GraphConnection rows
-    # for the legacy /api/v1/graph-connections/* surface; S2 will tie this to
-    # Graph creation and tighten the constraint.
+    # Nullable column is a historical artefact from the deleted standalone
+    # /api/v1/graph-connections/* surface; tightening to NOT NULL is a future
+    # migration once any orphan rows are cleared.
     graph_id: Mapped[str | None] = mapped_column(
         String(36),
         ForeignKey("graphs.id", ondelete="CASCADE"),

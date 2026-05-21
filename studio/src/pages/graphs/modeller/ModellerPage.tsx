@@ -15,30 +15,28 @@ import { SchemaNav } from "./components/SchemaNav";
 
 export function ModellerPage() {
 	const navigate = useNavigate();
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
 		username,
-		slug,
+		graphSlug,
 	);
-	const graphId = graph?.id;
 	const {
 		data: version,
 		isLoading: versionLoading,
 		refetch,
-	} = useActiveVersionQuery(graph?.schema_id);
+	} = useActiveVersionQuery(username, graphSlug);
 	const [selected, setSelected] = useState<SelectedItem>(null);
 	const [introspecting, setIntrospecting] = useState(false);
 
 	const handleIntrospect = async () => {
-		if (!graphId) return;
+		if (!username || !graphSlug) return;
 		setIntrospecting(true);
 		try {
-			await graphsApi.reconnect(graphId);
-			const res = await fetch(
-				`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200"}/api/v1/graphs/${graphId}/introspect`,
-				{ method: "POST" },
-			);
-			if (!res.ok) throw new Error("Introspection failed");
+			await graphsApi.pingConnection(username, graphSlug);
+			await graphsApi.introspectConnection(username, graphSlug);
 			toast.success("Introspection started — refresh in a few seconds.");
 			setTimeout(() => refetch(), 4000);
 		} catch (err) {
@@ -124,8 +122,8 @@ export function ModellerPage() {
 				tooltipSide: "right" as const,
 				showSeperator: true,
 				onClick:
-					username && slug
-						? () => navigate(`/u/${username}/${slug}/explorer`)
+					username && graphSlug
+						? () => navigate(`/u/${username}/${graphSlug}/explorer`)
 						: undefined,
 			},
 			{

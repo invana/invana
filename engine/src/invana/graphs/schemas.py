@@ -1,10 +1,9 @@
 """Pydantic request/response models for the Graph + GraphConnection APIs.
 
-The ``Graph*`` shapes back the new Graph-container surface introduced in S2
-(``/api/v1/graphs`` + ``/api/v1/u/{username}/{slug}``). The ``GraphConnection*``
-shapes back the legacy ``/api/v1/graph-connections/*`` surface, which will be
-removed once the studio fully migrates to graph-scoped connection routes
-under ``/u/{username}/{slug}/connection``.
+The ``Graph*`` shapes back the Graph-container surface
+(``/api/v1/graphs`` + ``/api/v1/u/{username}/{slug}``). The
+``GraphConnection*`` shapes back the graph-scoped connection sub-resource
+at ``/u/{username}/{slug}/connection``.
 """
 
 from __future__ import annotations
@@ -127,11 +126,6 @@ class GraphConnectionRead(BaseModel):
     created_at: datetime
     updated_at: datetime
     # auth_encrypted is intentionally excluded — credentials are never returned
-
-
-class GraphConnectionListResponse(BaseModel):
-    items: list[GraphConnectionRead]
-    total: int
 
 
 class QueryRequest(BaseModel):

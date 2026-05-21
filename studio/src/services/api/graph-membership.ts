@@ -1,5 +1,5 @@
 /**
- * Graph membership + invitations API. Targets `/api/v1/u/:username/:slug/...`
+ * Graph membership + invitations API. Targets `/api/v1/u/:username/:graphSlug/...`
  * per RFC-017.
  *
  * Graph container CRUD (POST /api/v1/graphs, GET /api/v1/graphs, …) lands in
@@ -14,55 +14,58 @@ import type {
 } from "../../types/auth";
 import { apiClient } from "./client";
 
-function base(username: string, slug: string): string {
-	return `/api/v1/u/${encodeURIComponent(username)}/${encodeURIComponent(slug)}`;
+function base(username: string, graphSlug: string): string {
+	return `/api/v1/u/${encodeURIComponent(username)}/${encodeURIComponent(graphSlug)}`;
 }
 
 export const graphMembershipApi = {
-	listMembers: async (username: string, slug: string) =>
-		(await apiClient.get<GraphMember[]>(`${base(username, slug)}/members`))
+	listMembers: async (username: string, graphSlug: string) =>
+		(await apiClient.get<GraphMember[]>(`${base(username, graphSlug)}/members`))
 			.data,
 
 	updateMemberRole: async (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		userId: string,
 		role: GraphRole,
 	) =>
 		(
 			await apiClient.patch<GraphMember>(
-				`${base(username, slug)}/members/${userId}`,
+				`${base(username, graphSlug)}/members/${userId}`,
 				{ role },
 			)
 		).data,
 
-	removeMember: async (username: string, slug: string, userId: string) => {
-		await apiClient.delete(`${base(username, slug)}/members/${userId}`);
+	removeMember: async (username: string, graphSlug: string, userId: string) => {
+		await apiClient.delete(`${base(username, graphSlug)}/members/${userId}`);
 	},
 
-	listInvitations: async (username: string, slug: string) =>
-		(await apiClient.get<Invitation[]>(`${base(username, slug)}/invitations`))
-			.data,
+	listInvitations: async (username: string, graphSlug: string) =>
+		(
+			await apiClient.get<Invitation[]>(
+				`${base(username, graphSlug)}/invitations`,
+			)
+		).data,
 
 	createInvitation: async (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		body: { email: string; role: GraphRole },
 	) =>
 		(
 			await apiClient.post<InvitationCreateResponse>(
-				`${base(username, slug)}/invitations`,
+				`${base(username, graphSlug)}/invitations`,
 				body,
 			)
 		).data,
 
 	deleteInvitation: async (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		invitationId: string,
 	) => {
 		await apiClient.delete(
-			`${base(username, slug)}/invitations/${invitationId}`,
+			`${base(username, graphSlug)}/invitations/${invitationId}`,
 		);
 	},
 };

@@ -15,7 +15,7 @@ interface RoleGateProps {
  * mutation buttons. Server-side dependencies still enforce the actual gate.
  *
  * Per RFC-017, "admin"/"builder"/"member" are scoped to the current Graph,
- * read from the URL params (/u/:username/:slug). "superuser" is global.
+ * read from the URL params (/u/:username/:graphSlug). "superuser" is global.
  */
 export function RoleGate({
 	require,
@@ -23,8 +23,11 @@ export function RoleGate({
 	fallback = null,
 }: RoleGateProps) {
 	const { isSuperuser, isAuthenticated, rolesForGraph } = useAuth();
-	const { username, slug } = useParams<{ username?: string; slug?: string }>();
-	const { isAdmin, isBuilder, isMember } = rolesForGraph(username, slug);
+	const { username, graphSlug } = useParams<{
+		username?: string;
+		graphSlug?: string;
+	}>();
+	const { isAdmin, isBuilder, isMember } = rolesForGraph(username, graphSlug);
 
 	const allowed =
 		(require === "superuser" && isSuperuser) ||

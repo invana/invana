@@ -12,22 +12,25 @@ import type { GraphConnectionCreate } from "../../../types/graphs";
 import { GraphForm } from "../components/GraphForm";
 
 export function GraphConnectionSettingsPage() {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const navigate = useNavigate();
 	const { data: graph, isLoading: graphLoading } = useGraphQuery(
 		username,
-		slug,
+		graphSlug,
 	);
 	const { data: connection, isLoading: connectionLoading } =
-		useGraphConnectionQuery(username, slug);
+		useGraphConnectionQuery(username, graphSlug);
 	const mutation = usePutGraphConnectionMutation();
 
 	const isLoading = graphLoading || connectionLoading;
 
 	const handleSubmit = (values: GraphConnectionCreate) => {
-		if (!username || !slug) return;
+		if (!username || !graphSlug) return;
 		mutation.mutate(
-			{ username, slug, data: values },
+			{ username, graphSlug, data: values },
 			{
 				onSuccess: () => {
 					toast.success("Connection saved");
@@ -38,7 +41,7 @@ export function GraphConnectionSettingsPage() {
 		);
 	};
 
-	const backToOverview = () => navigate(`/u/${username}/${slug}`);
+	const backToOverview = () => navigate(`/u/${username}/${graphSlug}`);
 
 	return (
 		<div className="h-full overflow-auto">
@@ -54,7 +57,7 @@ export function GraphConnectionSettingsPage() {
 
 				<div className="mb-8">
 					<p className="text-muted-foreground font-mono">
-						/u/{username}/{slug} · settings
+						/u/{username}/{graphSlug} · settings
 					</p>
 					<h1 className="text-2xl font-bold mt-1">Connection</h1>
 					<p className="text-muted-foreground mt-1">
@@ -92,7 +95,7 @@ export function GraphConnectionSettingsPage() {
 						onTest={(values) =>
 							graphsApi.testConnection(
 								username as string,
-								slug as string,
+								graphSlug as string,
 								values,
 							)
 						}

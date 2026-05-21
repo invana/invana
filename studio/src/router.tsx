@@ -43,11 +43,11 @@ export const router = createBrowserRouter([
 	},
 
 	// Full-page layouts — own AppLayoutV2, not nested under App shell.
-	// Graph-scoped URLs (RFC-017). The pages resolve the connection via
-	// /u/:username/:slug/connection and thread connection.id into the legacy
-	// query/introspect endpoints (those still key off connection_id).
+	// Graph-scoped URLs (RFC-017). Explorer/Modeller hit the graph-scoped
+	// /u/:username/:graphSlug/* surface end-to-end (connection, query, schema,
+	// introspect).
 	{
-		path: "u/:username/:slug/modeller",
+		path: "u/:username/:graphSlug/modeller",
 		element: (
 			<ProtectedRoute>
 				<Suspense fallback={<LazyFallback />}>
@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
 		errorElement: <ErrorPage />,
 	},
 	{
-		path: "u/:username/:slug/explorer",
+		path: "u/:username/:graphSlug/explorer",
 		element: (
 			<ProtectedRoute>
 				<Suspense fallback={<LazyFallback />}>
@@ -85,25 +85,25 @@ export const router = createBrowserRouter([
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
 
 			// Graph container — overview + settings.
-			{ path: "u/:username/:slug", element: <GraphOverviewPage /> },
+			{ path: "u/:username/:graphSlug", element: <GraphOverviewPage /> },
 			{
-				path: "u/:username/:slug/settings/connection",
+				path: "u/:username/:graphSlug/settings/connection",
 				element: <GraphConnectionSettingsPage />,
 			},
 			{
-				path: "u/:username/:slug/settings/intent",
+				path: "u/:username/:graphSlug/settings/intent",
 				element: <GraphIntentSettingsPage />,
 			},
 			{
-				path: "u/:username/:slug/settings/members",
+				path: "u/:username/:graphSlug/settings/members",
 				element: <GraphMembersPage />,
 			},
 			{
-				path: "u/:username/:slug/settings/invitations",
+				path: "u/:username/:graphSlug/settings/invitations",
 				element: <GraphInvitationsPage />,
 			},
 			{
-				path: "u/:username/:slug/settings/skills",
+				path: "u/:username/:graphSlug/settings/skills",
 				element: (
 					<GraphSectionPlaceholderPage
 						title="Skills"
@@ -113,7 +113,7 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "u/:username/:slug/settings/datasets",
+				path: "u/:username/:graphSlug/settings/datasets",
 				element: (
 					<GraphSectionPlaceholderPage
 						title="Datasets"

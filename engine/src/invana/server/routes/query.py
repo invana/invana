@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.db import get_session
 from invana.graph.types.constants import Capability, QueryLanguage
+from invana.graph.types.data_elements import GraphResponse
 from invana.graphs import services
 from invana.graphs.deps import require_graph_member, require_graph_setup_complete
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
@@ -75,20 +76,14 @@ async def run_query(
         _assert_read_only_query(body.query, query_language)
 
     try:
-        raw_result = await connector.execute(body.query, parameters=body.parameters)
+        graph_response = await connector.execute(body.query, parameters=body.parameters)
     except Exception as exc:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail={"error": "query_execution_failed", "message": str(exc)},
         ) from exc
 
-    result_list = raw_result if isinstance(raw_result, list) else ([raw_result] if raw_result is not None else [])
-
-    return QueryResponse(
-        result_type=_detect_result_type(result_list),
-        query_language=query_language.value,
-        data=result_list,
-    )
+    return _build_query_response(graph_response, query_language)
 
 
 # ---------------------------------------------------------------------------
@@ -124,10 +119,27 @@ def _assert_read_only_query(query: str, query_language: QueryLanguage) -> None:
                 )
 
 
-def _detect_result_type(result: list) -> str:
-    if not result:
-        return "tabular"
-    first = result[0]
-    if isinstance(first, dict) and "id" in first and ("label" in first or "type" in first):
-        return "graph"
-    return "tabular"
+def _build_query_response(graph_response: GraphResponse, query_language: QueryLanguage) -> QueryResponse:
+    """Map a connector's GraphResponse onto the wire-format QueryResponse.
+
+    Nodes/edges present → graph result (consumed by the canvas).
+    Otherwise → tabular result (records consumed by the table view).
+    """
+    has_graph = bool(graph_response.nodes or graph_response.edges)
+    if has_graph:
+        return QueryResponse(
+            result_type="graph",
+            query_language=query_language.value,
+            data=graph_response,
+            rows=None,
+            execution_time_ms=int(round(graph_response.metadata.duration_ms)),
+            row_count=len(graph_response.nodes) + len(graph_response.edges),
+        )
+    return QueryResponse(
+        result_type="tabular",
+        query_language=query_language.value,
+        data=None,
+        rows=graph_response.records,
+        execution_time_ms=int(round(graph_response.metadata.duration_ms)),
+        row_count=len(graph_response.records),
+    )

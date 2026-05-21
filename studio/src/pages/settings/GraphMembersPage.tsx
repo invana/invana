@@ -17,21 +17,24 @@ import { graphMembershipApi } from "../../services/api/graph-membership";
 import type { GraphRole } from "../../types/auth";
 
 export function GraphMembersPage() {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const { user, membershipForGraph, rolesForGraph } = useAuth();
 	const qc = useQueryClient();
 
-	const membership = membershipForGraph(username, slug);
-	const { isAdmin: isAdminHere } = rolesForGraph(username, slug);
+	const membership = membershipForGraph(username, graphSlug);
+	const { isAdmin: isAdminHere } = rolesForGraph(username, graphSlug);
 
 	const { data: members, isLoading } = useQuery({
-		queryKey: ["graph", username, slug, "members"],
+		queryKey: ["graph", username, graphSlug, "members"],
 		queryFn: () =>
-			graphMembershipApi.listMembers(username as string, slug as string),
-		enabled: !!username && !!slug && !!membership,
+			graphMembershipApi.listMembers(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug && !!membership,
 	});
 
-	if (!username || !slug) return <Navigate to="/" replace />;
+	if (!username || !graphSlug) return <Navigate to="/" replace />;
 	if (!membership) {
 		return (
 			<div className="p-8 text-muted-foreground">
@@ -44,11 +47,13 @@ export function GraphMembersPage() {
 		try {
 			await graphMembershipApi.updateMemberRole(
 				username as string,
-				slug as string,
+				graphSlug as string,
 				userId,
 				role,
 			);
-			qc.invalidateQueries({ queryKey: ["graph", username, slug, "members"] });
+			qc.invalidateQueries({
+				queryKey: ["graph", username, graphSlug, "members"],
+			});
 			toast.success("Role updated.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Update failed.");
@@ -59,10 +64,12 @@ export function GraphMembersPage() {
 		try {
 			await graphMembershipApi.removeMember(
 				username as string,
-				slug as string,
+				graphSlug as string,
 				userId,
 			);
-			qc.invalidateQueries({ queryKey: ["graph", username, slug, "members"] });
+			qc.invalidateQueries({
+				queryKey: ["graph", username, graphSlug, "members"],
+			});
 			toast.success("Member removed.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Removal failed.");

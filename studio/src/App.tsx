@@ -32,7 +32,7 @@ export default function App() {
 
 	const isActive = (prefix: string) => pathname.startsWith(prefix);
 
-	// Active Graph comes from the URL (RFC-017): /u/:username/:slug[/...].
+	// Active Graph comes from the URL (RFC-017): /u/:username/:graphSlug[/...].
 	// When off-graph (e.g. /graphs list, /settings/profile), fall back to the
 	// user's first graph so the top-right menu's graph-scoped items stay reachable.
 	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)/);

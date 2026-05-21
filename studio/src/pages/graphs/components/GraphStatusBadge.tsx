@@ -1,7 +1,10 @@
 import { Badge } from "@invana/ui";
-import type { GraphStatus } from "../../../types/graphs";
+import type { GraphConnectionStatus } from "../../../types/graphs";
 
-const STATUS_MAP: Record<GraphStatus, { label: string; className: string }> = {
+const STATUS_MAP: Record<
+	GraphConnectionStatus,
+	{ label: string; className: string }
+> = {
 	ACTIVE: {
 		label: "Active",
 		className:
@@ -22,11 +25,13 @@ const STATUS_MAP: Record<GraphStatus, { label: string; className: string }> = {
 	},
 };
 
-interface GraphStatusBadgeProps {
-	status: GraphStatus;
+interface GraphConnectionStatusBadgeProps {
+	status: GraphConnectionStatus;
 }
 
-export function GraphStatusBadge({ status }: GraphStatusBadgeProps) {
+export function GraphConnectionStatusBadge({
+	status,
+}: GraphConnectionStatusBadgeProps) {
 	const { label, className } = STATUS_MAP[status] ?? STATUS_MAP.INACTIVE;
 	return (
 		<Badge variant="outline" className={className}>

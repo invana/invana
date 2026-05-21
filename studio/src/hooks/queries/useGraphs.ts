@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { graphConnectionsApi, graphsApi } from "../../services/api/graphs";
+import { graphsApi } from "../../services/api/graphs";
 import type {
 	GraphConnectionCreate,
-	GraphConnectionUpdate,
 	GraphCreate,
 	GraphUpdate,
 	SetupSection,
@@ -13,8 +12,8 @@ import type {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GRAPHS_KEY = ["graphs"] as const;
-const graphKey = (username: string, slug: string) =>
-	[...GRAPHS_KEY, username, slug] as const;
+const graphKey = (username: string, graphSlug: string) =>
+	[...GRAPHS_KEY, username, graphSlug] as const;
 
 export function useGraphsQuery() {
 	return useQuery({
@@ -26,12 +25,12 @@ export function useGraphsQuery() {
 
 export function useGraphQuery(
 	username: string | undefined,
-	slug: string | undefined,
+	graphSlug: string | undefined,
 ) {
 	return useQuery({
-		queryKey: graphKey(username ?? "", slug ?? ""),
-		queryFn: () => graphsApi.get(username as string, slug as string),
-		enabled: !!username && !!slug,
+		queryKey: graphKey(username ?? "", graphSlug ?? ""),
+		queryFn: () => graphsApi.get(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug,
 	});
 }
 
@@ -50,16 +49,16 @@ export function useUpdateGraphMutation() {
 	return useMutation({
 		mutationFn: ({
 			username,
-			slug,
+			graphSlug,
 			data,
 		}: {
 			username: string;
-			slug: string;
+			graphSlug: string;
 			data: GraphUpdate;
-		}) => graphsApi.update(username, slug, data),
-		onSuccess: (_, { username, slug }) => {
+		}) => graphsApi.update(username, graphSlug, data),
+		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
-			qc.invalidateQueries({ queryKey: graphKey(username, slug) });
+			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
 		},
 	});
 }
@@ -67,8 +66,11 @@ export function useUpdateGraphMutation() {
 export function useDeleteGraphMutation() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: ({ username, slug }: { username: string; slug: string }) =>
-			graphsApi.remove(username, slug),
+		mutationFn: ({
+			username,
+			graphSlug,
+		}: { username: string; graphSlug: string }) =>
+			graphsApi.remove(username, graphSlug),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
 		},
@@ -80,17 +82,17 @@ export function useSetupSectionMutation() {
 	return useMutation({
 		mutationFn: ({
 			username,
-			slug,
+			graphSlug,
 			section,
 			action,
 		}: {
 			username: string;
-			slug: string;
+			graphSlug: string;
 			section: SetupSection;
 			action: "complete" | "skip" | "reset";
-		}) => graphsApi.setSetupSection(username, slug, section, action),
-		onSuccess: (_, { username, slug }) => {
-			qc.invalidateQueries({ queryKey: graphKey(username, slug) });
+		}) => graphsApi.setSetupSection(username, graphSlug, section, action),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
 		},
 	});
@@ -100,17 +102,18 @@ export function useSetupSectionMutation() {
 // Graph connection hooks (graph-scoped sub-resource)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const connectionKey = (username: string, slug: string) =>
-	[...graphKey(username, slug), "connection"] as const;
+const connectionKey = (username: string, graphSlug: string) =>
+	[...graphKey(username, graphSlug), "connection"] as const;
 
 export function useGraphConnectionQuery(
 	username: string | undefined,
-	slug: string | undefined,
+	graphSlug: string | undefined,
 ) {
 	return useQuery({
-		queryKey: connectionKey(username ?? "", slug ?? ""),
-		queryFn: () => graphsApi.getConnection(username as string, slug as string),
-		enabled: !!username && !!slug,
+		queryKey: connectionKey(username ?? "", graphSlug ?? ""),
+		queryFn: () =>
+			graphsApi.getConnection(username as string, graphSlug as string),
+		enabled: !!username && !!graphSlug,
 		refetchInterval: (query) => {
 			const status = query.state.data?.status;
 			return status === "CONNECTING" ? 5_000 : false;
@@ -123,16 +126,16 @@ export function usePutGraphConnectionMutation() {
 	return useMutation({
 		mutationFn: ({
 			username,
-			slug,
+			graphSlug,
 			data,
 		}: {
 			username: string;
-			slug: string;
+			graphSlug: string;
 			data: GraphConnectionCreate;
-		}) => graphsApi.putConnection(username, slug, data),
-		onSuccess: (_, { username, slug }) => {
-			qc.invalidateQueries({ queryKey: connectionKey(username, slug) });
-			qc.invalidateQueries({ queryKey: graphKey(username, slug) });
+		}) => graphsApi.putConnection(username, graphSlug, data),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
+			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
 		},
 	});
 }
@@ -140,11 +143,14 @@ export function usePutGraphConnectionMutation() {
 export function useDeleteGraphConnectionMutation() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: ({ username, slug }: { username: string; slug: string }) =>
-			graphsApi.deleteConnection(username, slug),
-		onSuccess: (_, { username, slug }) => {
-			qc.invalidateQueries({ queryKey: connectionKey(username, slug) });
-			qc.invalidateQueries({ queryKey: graphKey(username, slug) });
+		mutationFn: ({
+			username,
+			graphSlug,
+		}: { username: string; graphSlug: string }) =>
+			graphsApi.deleteConnection(username, graphSlug),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
+			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
 		},
 	});
 }
@@ -152,82 +158,13 @@ export function useDeleteGraphConnectionMutation() {
 export function usePingGraphConnectionMutation() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: ({ username, slug }: { username: string; slug: string }) =>
-			graphsApi.pingConnection(username, slug),
-		onSuccess: (_, { username, slug }) => {
-			qc.invalidateQueries({ queryKey: connectionKey(username, slug) });
-		},
-	});
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legacy GraphConnection hooks (/api/v1/graph-connections)
-//
-// Retire once every Studio call site moves to the graph-scoped sub-resource.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const CONNECTIONS_KEY = ["graph-connections"] as const;
-
-export function useGraphConnectionsQuery() {
-	return useQuery({
-		queryKey: CONNECTIONS_KEY,
-		queryFn: () => graphConnectionsApi.list(),
-		staleTime: 30_000,
-		refetchInterval: (query) => {
-			const items = query.state.data?.items ?? [];
-			return items.some((g) => g.status === "CONNECTING") ? 5_000 : false;
-		},
-	});
-}
-
-export function useLegacyGraphConnectionQuery(id: string) {
-	return useQuery({
-		queryKey: [...CONNECTIONS_KEY, id] as const,
-		queryFn: () => graphConnectionsApi.get(id),
-		enabled: !!id,
-	});
-}
-
-export function useCreateGraphConnectionMutation() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (data: GraphConnectionCreate) =>
-			graphConnectionsApi.create(data),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: CONNECTIONS_KEY });
-		},
-	});
-}
-
-export function useUpdateGraphConnectionMutation() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: ({ id, data }: { id: string; data: GraphConnectionUpdate }) =>
-			graphConnectionsApi.update(id, data),
-		onSuccess: (_, { id }) => {
-			qc.invalidateQueries({ queryKey: CONNECTIONS_KEY });
-			qc.invalidateQueries({ queryKey: [...CONNECTIONS_KEY, id] });
-		},
-	});
-}
-
-export function useDeleteLegacyGraphConnectionMutation() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (id: string) => graphConnectionsApi.remove(id),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: CONNECTIONS_KEY });
-		},
-	});
-}
-
-export function useReconnectGraphConnectionMutation() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (id: string) => graphConnectionsApi.reconnect(id),
-		onSuccess: (_, id) => {
-			qc.invalidateQueries({ queryKey: CONNECTIONS_KEY });
-			qc.invalidateQueries({ queryKey: [...CONNECTIONS_KEY, id] });
+		mutationFn: ({
+			username,
+			graphSlug,
+		}: { username: string; graphSlug: string }) =>
+			graphsApi.pingConnection(username, graphSlug),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
 		},
 	});
 }

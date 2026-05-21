@@ -13,9 +13,12 @@ export function GraphSectionPlaceholderPage({
 	description,
 	slice,
 }: Props) {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const navigate = useNavigate();
-	const backToOverview = () => navigate(`/u/${username}/${slug}`);
+	const backToOverview = () => navigate(`/u/${username}/${graphSlug}`);
 
 	return (
 		<div className="h-full overflow-auto">
@@ -31,7 +34,7 @@ export function GraphSectionPlaceholderPage({
 
 				<div className="mb-8">
 					<p className="text-muted-foreground font-mono">
-						/u/{username}/{slug} · settings
+						/u/{username}/{graphSlug} · settings
 					</p>
 					<h1 className="text-2xl font-bold mt-1">{title}</h1>
 					<p className="text-muted-foreground mt-1">{description}</p>

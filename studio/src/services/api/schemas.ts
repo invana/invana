@@ -2,8 +2,8 @@ import type { SchemaVersionResponse } from "../../types/schemas";
 import { request } from "./client";
 
 export const schemasApi = {
-	getActiveVersion: (schemaId: string) =>
+	getActiveVersion: (username: string, graphSlug: string) =>
 		request<SchemaVersionResponse>(
-			`/api/v1/schemas/${schemaId}/active-version`,
+			`/api/v1/u/${username}/${graphSlug}/schema/active-version`,
 		),
 };

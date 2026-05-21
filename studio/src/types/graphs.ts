@@ -71,10 +71,10 @@ export const SETUP_SKIPPABLE: readonly SetupSection[] = [
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GraphConnection types (legacy `Graph` model, renamed per RFC-017)
+// GraphConnection types
 //
 // 1:1 child of `Graph`. Carries DB binding details (URI, driver, encrypted
-// auth) and runtime health. Edited via /u/:username/:slug/connection.
+// auth) and runtime health. Edited via /u/:username/:graphSlug/connection.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type GraphConnectionStatus =
@@ -132,21 +132,3 @@ export interface GraphConnectionCreate {
 	auth: { username: string; password: string } | Record<string, never>;
 	read_only: boolean;
 }
-
-export interface GraphConnectionUpdate {
-	name?: string;
-	description?: string;
-	uri?: string;
-	auth?: { username: string; password: string };
-	read_only?: boolean;
-	// connector_class intentionally excluded — immutable after creation
-}
-
-export interface GraphConnectionListResponse {
-	items: GraphConnectionRead[];
-	total: number;
-}
-
-// Back-compat alias — to be removed once Studio fully migrates off the
-// legacy `GraphStatus` name (it refers to the connection's runtime status).
-export type GraphStatus = GraphConnectionStatus;

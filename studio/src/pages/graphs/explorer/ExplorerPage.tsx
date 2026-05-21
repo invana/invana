@@ -26,10 +26,13 @@ const CONNECTOR_LANGUAGE: Record<string, "cypher" | "gremlin"> = {
 
 export function ExplorerPage() {
 	const navigate = useNavigate();
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 
-	const { data: graph } = useGraphConnectionQuery(username, slug);
-	const { mutation, history } = useQueryExecution(graph?.id ?? "");
+	const { data: graph } = useGraphConnectionQuery(username, graphSlug);
+	const { mutation, history } = useQueryExecution(username, graphSlug);
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
 	const [selected, setSelected] = useState<QueryResultItem | null>(null);
@@ -86,8 +89,8 @@ export function ExplorerPage() {
 				icon: GitGraph,
 				tooltipSide: "right" as const,
 				onClick:
-					username && slug
-						? () => navigate(`/u/${username}/${slug}/modeller`)
+					username && graphSlug
+						? () => navigate(`/u/${username}/${graphSlug}/modeller`)
 						: undefined,
 			},
 		],

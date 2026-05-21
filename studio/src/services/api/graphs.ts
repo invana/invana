@@ -1,9 +1,7 @@
 import type {
 	Graph,
 	GraphConnectionCreate,
-	GraphConnectionListResponse,
 	GraphConnectionRead,
-	GraphConnectionUpdate,
 	GraphCreate,
 	GraphListResponse,
 	GraphUpdate,
@@ -19,8 +17,8 @@ import { request } from "./client";
 export const graphsApi = {
 	list: () => request<GraphListResponse>("/api/v1/graphs"),
 
-	get: (username: string, slug: string) =>
-		request<Graph>(`/api/v1/u/${username}/${slug}`),
+	get: (username: string, graphSlug: string) =>
+		request<Graph>(`/api/v1/u/${username}/${graphSlug}`),
 
 	create: (data: GraphCreate) =>
 		request<Graph>("/api/v1/graphs", {
@@ -28,110 +26,74 @@ export const graphsApi = {
 			body: JSON.stringify(data),
 		}),
 
-	update: (username: string, slug: string, data: GraphUpdate) =>
-		request<Graph>(`/api/v1/u/${username}/${slug}`, {
+	update: (username: string, graphSlug: string, data: GraphUpdate) =>
+		request<Graph>(`/api/v1/u/${username}/${graphSlug}`, {
 			method: "PATCH",
 			body: JSON.stringify(data),
 		}),
 
-	remove: (username: string, slug: string) =>
-		request<void>(`/api/v1/u/${username}/${slug}`, { method: "DELETE" }),
+	remove: (username: string, graphSlug: string) =>
+		request<void>(`/api/v1/u/${username}/${graphSlug}`, { method: "DELETE" }),
 
 	setSetupSection: (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		section: SetupSection,
 		action: "complete" | "skip" | "reset",
 	) =>
-		request<Graph>(`/api/v1/u/${username}/${slug}/setup/${section}`, {
+		request<Graph>(`/api/v1/u/${username}/${graphSlug}/setup/${section}`, {
 			method: "POST",
 			body: JSON.stringify({ action }),
 		}),
 
 	// Connection sub-resource — 1:1 child of the Graph.
-	getConnection: (username: string, slug: string) =>
+	getConnection: (username: string, graphSlug: string) =>
 		request<GraphConnectionRead | null>(
-			`/api/v1/u/${username}/${slug}/connection`,
+			`/api/v1/u/${username}/${graphSlug}/connection`,
 		),
 
 	putConnection: (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		data: GraphConnectionCreate,
 	) =>
-		request<GraphConnectionRead>(`/api/v1/u/${username}/${slug}/connection`, {
-			method: "PUT",
-			body: JSON.stringify(data),
-		}),
+		request<GraphConnectionRead>(
+			`/api/v1/u/${username}/${graphSlug}/connection`,
+			{
+				method: "PUT",
+				body: JSON.stringify(data),
+			},
+		),
 
-	deleteConnection: (username: string, slug: string) =>
-		request<void>(`/api/v1/u/${username}/${slug}/connection`, {
+	deleteConnection: (username: string, graphSlug: string) =>
+		request<void>(`/api/v1/u/${username}/${graphSlug}/connection`, {
 			method: "DELETE",
 		}),
 
-	pingConnection: (username: string, slug: string) =>
+	pingConnection: (username: string, graphSlug: string) =>
 		request<{ detail: string }>(
-			`/api/v1/u/${username}/${slug}/connection/ping`,
-			{
-				method: "POST",
-			},
+			`/api/v1/u/${username}/${graphSlug}/connection/ping`,
+			{ method: "POST" },
+		),
+
+	introspectConnection: (username: string, graphSlug: string) =>
+		request<{ detail: string }>(
+			`/api/v1/u/${username}/${graphSlug}/connection/introspect`,
+			{ method: "POST" },
 		),
 
 	testConnection: (
 		username: string,
-		slug: string,
+		graphSlug: string,
 		data: GraphConnectionCreate,
 	) =>
 		request<{ ok: boolean; latency_ms?: number; error?: string }>(
-			`/api/v1/u/${username}/${slug}/connection/test`,
+			`/api/v1/u/${username}/${graphSlug}/connection/test`,
 			{ method: "POST", body: JSON.stringify(data) },
 		),
 
-	// Query — graph-scoped (S2 re-prefix).
-	query: (username: string, slug: string, body: QueryRequest) =>
-		request<QueryResponse>(`/api/v1/u/${username}/${slug}/query`, {
-			method: "POST",
-			body: JSON.stringify(body),
-		}),
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GraphConnection API (legacy /api/v1/graph-connections surface)
-//
-// To be retired once every Studio call site moves to graphsApi.*Connection.
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const graphConnectionsApi = {
-	list: () => request<GraphConnectionListResponse>("/api/v1/graph-connections"),
-
-	get: (id: string) =>
-		request<GraphConnectionRead>(`/api/v1/graph-connections/${id}`),
-
-	create: (data: GraphConnectionCreate) =>
-		request<GraphConnectionRead>("/api/v1/graph-connections", {
-			method: "POST",
-			body: JSON.stringify(data),
-		}),
-
-	update: (id: string, data: GraphConnectionUpdate) =>
-		request<GraphConnectionRead>(`/api/v1/graph-connections/${id}`, {
-			method: "PATCH",
-			body: JSON.stringify(data),
-		}),
-
-	remove: (id: string) =>
-		request<void>(`/api/v1/graph-connections/${id}`, { method: "DELETE" }),
-
-	reconnect: (id: string) =>
-		request<GraphConnectionRead>(`/api/v1/graph-connections/${id}/reconnect`, {
-			method: "POST",
-		}),
-
-	// Legacy query shim — Explorer/Modeller now live at /u/:username/:slug/* but
-	// still call /api/v1/graphs/{connection_id}/query under the hood. Retire
-	// once the graph-scoped /u/.../query path replaces it end-to-end.
-	query: (connectionId: string, body: QueryRequest) =>
-		request<QueryResponse>(`/api/v1/graphs/${connectionId}/query`, {
+	query: (username: string, graphSlug: string, body: QueryRequest) =>
+		request<QueryResponse>(`/api/v1/u/${username}/${graphSlug}/query`, {
 			method: "POST",
 			body: JSON.stringify(body),
 		}),

@@ -9,9 +9,12 @@ import {
 } from "../../../hooks/queries/useGraphs";
 
 export function GraphIntentSettingsPage() {
-	const { username, slug } = useParams<{ username: string; slug: string }>();
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
 	const navigate = useNavigate();
-	const { data: graph, isLoading } = useGraphQuery(username, slug);
+	const { data: graph, isLoading } = useGraphQuery(username, graphSlug);
 	const mutation = useUpdateGraphMutation();
 
 	const [intent, setIntent] = useState("");
@@ -19,15 +22,15 @@ export function GraphIntentSettingsPage() {
 		if (graph) setIntent(graph.intent ?? "");
 	}, [graph]);
 
-	const backToOverview = () => navigate(`/u/${username}/${slug}`);
+	const backToOverview = () => navigate(`/u/${username}/${graphSlug}`);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!username || !slug) return;
+		if (!username || !graphSlug) return;
 		mutation.mutate(
 			{
 				username,
-				slug,
+				graphSlug,
 				data: { intent: intent.trim() || null },
 			},
 			{
@@ -54,7 +57,7 @@ export function GraphIntentSettingsPage() {
 
 				<div className="mb-8">
 					<p className="text-muted-foreground font-mono">
-						/u/{username}/{slug} · settings
+						/u/{username}/{graphSlug} · settings
 					</p>
 					<h1 className="text-2xl font-bold mt-1">Intent</h1>
 					<p className="text-muted-foreground mt-1">
