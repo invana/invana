@@ -43,6 +43,176 @@
         .invana-theme-toggle .icon-sun { display: none; }
         [data-bs-theme="dark"] .invana-theme-toggle .icon-sun { display: inline-block; }
         [data-bs-theme="dark"] .invana-theme-toggle .icon-moon { display: none; }
+
+        /* Mirror the @invana/styling "default" palette (used by the studio).
+           Light + dark map Tabler's CSS vars to the same HSL tokens that
+           drive shadcn/Tailwind in studio, so admin matches the product. */
+        :root,
+        [data-bs-theme="light"] {
+            --invana-bg: hsl(0 0% 97%);
+            --invana-fg: hsl(210 10% 20%);
+            --invana-card: hsl(0 0% 100%);
+            --invana-popover: hsl(0 0% 98%);
+            --invana-muted: hsl(210 6% 90%);
+            --invana-muted-fg: hsl(210 8% 45%);
+            --invana-border: hsl(210 6% 85%);
+            --invana-input: hsl(210 6% 92%);
+            --invana-primary: hsl(142 70% 43%);
+            --invana-primary-fg: hsl(0 0% 100%);
+            --invana-secondary: hsl(142 30% 95%);
+            --invana-secondary-fg: hsl(142 25% 40%);
+            --invana-destructive: hsl(0 70% 60%);
+            --invana-sidebar: hsl(0 0% 100%);
+            --invana-table-stripe: hsl(210 6% 95%);
+            --invana-table-hover: hsl(210 6% 92%);
+        }
+        [data-bs-theme="dark"] {
+            --invana-bg: hsl(210 4% 10%);
+            --invana-fg: hsl(0 0% 85%);
+            --invana-card: hsl(210 4% 14%);
+            --invana-popover: hsl(210 4% 11%);
+            --invana-muted: hsl(210 6% 18%);
+            --invana-muted-fg: hsl(210 8% 60%);
+            --invana-border: hsl(210 6% 22%);
+            --invana-input: hsl(210 6% 22%);
+            --invana-primary: hsl(142 70% 60%);
+            --invana-primary-fg: hsl(210 4% 13%);
+            --invana-secondary: hsl(210 8% 28%);
+            --invana-secondary-fg: hsl(0 0% 85%);
+            --invana-destructive: hsl(0 60% 45%);
+            --invana-sidebar: hsl(210 4% 8%);
+            --invana-table-stripe: hsl(210 4% 12%);
+            --invana-table-hover: hsl(210 4% 16%);
+        }
+
+        /* Wire the invana tokens into Tabler's variables. */
+        [data-bs-theme="light"],
+        [data-bs-theme="dark"] {
+            --tblr-body-bg: var(--invana-bg);
+            --tblr-body-color: var(--invana-fg);
+            --tblr-bg-surface: var(--invana-card);
+            --tblr-bg-surface-secondary: var(--invana-muted);
+            --tblr-bg-surface-tertiary: var(--invana-muted);
+            --tblr-border-color: var(--invana-border);
+            --tblr-border-color-translucent: var(--invana-border);
+            --tblr-card-bg: var(--invana-card);
+            --tblr-card-border-color: var(--invana-border);
+            --tblr-secondary-bg: var(--invana-muted);
+            --tblr-tertiary-bg: var(--invana-muted);
+            --tblr-primary: var(--invana-primary);
+            --tblr-primary-rgb: 78, 217, 138;
+            --tblr-link-color: var(--invana-primary);
+            --tblr-link-hover-color: var(--invana-primary);
+            --tblr-muted: var(--invana-muted-fg);
+            --tblr-secondary-color: var(--invana-muted-fg);
+        }
+
+        body { background-color: var(--invana-bg); color: var(--invana-fg); }
+
+        /* Sidebar — Tabler hard-codes data-bs-theme="dark" on it, but its
+           own variables read from our overrides above. Force the brand
+           sidebar tone explicitly to match studio's left rail. */
+        .navbar-vertical {
+            background-color: var(--invana-sidebar) !important;
+            border-right: 1px solid var(--invana-border);
+        }
+        .navbar-vertical .nav-link { color: var(--invana-fg); }
+        .navbar-vertical .nav-link:hover,
+        .navbar-vertical .nav-item.active > .nav-link {
+            color: var(--invana-primary);
+            background-color: var(--invana-muted);
+        }
+
+        /* Cards, modals, dropdowns, popovers. */
+        .card, .modal-content {
+            background-color: var(--invana-card);
+            border-color: var(--invana-border);
+            color: var(--invana-fg);
+        }
+        .dropdown-menu {
+            background-color: var(--invana-popover);
+            border-color: var(--invana-border);
+            color: var(--invana-fg);
+        }
+        .dropdown-item { color: var(--invana-fg); }
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: var(--invana-muted);
+            color: var(--invana-fg);
+        }
+
+        /* Top navbar. */
+        .navbar.navbar-light,
+        header.navbar {
+            background-color: var(--invana-bg);
+            border-bottom: 1px solid var(--invana-border);
+        }
+
+        /* Tables. */
+        .table {
+            --tblr-table-bg: transparent;
+            --tblr-table-color: var(--invana-fg);
+            --tblr-table-border-color: var(--invana-border);
+            --tblr-table-striped-bg: var(--invana-table-stripe);
+            --tblr-table-striped-color: var(--invana-fg);
+            --tblr-table-hover-bg: var(--invana-table-hover);
+            --tblr-table-hover-color: var(--invana-fg);
+            color: var(--invana-fg);
+        }
+        .table > :not(caption) > * > * { border-color: var(--invana-border); }
+
+        /* Forms. */
+        .form-control, .form-select {
+            background-color: var(--invana-input);
+            border-color: var(--invana-border);
+            color: var(--invana-fg);
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: var(--invana-input);
+            border-color: var(--invana-primary);
+            color: var(--invana-fg);
+            box-shadow: 0 0 0 0.15rem hsl(142 70% 50% / 0.25);
+        }
+        .form-control::placeholder { color: var(--invana-muted-fg); }
+        .form-check-input:checked {
+            background-color: var(--invana-primary);
+            border-color: var(--invana-primary);
+        }
+
+        /* Buttons. */
+        .btn-primary {
+            background-color: var(--invana-primary);
+            border-color: var(--invana-primary);
+            color: var(--invana-primary-fg);
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: hsl(142 70% 50%);
+            border-color: hsl(142 70% 50%);
+            color: var(--invana-primary-fg);
+        }
+        .btn-secondary {
+            background-color: var(--invana-secondary);
+            border-color: var(--invana-border);
+            color: var(--invana-secondary-fg);
+        }
+        a { color: var(--invana-primary); }
+        a:hover { color: var(--invana-primary); }
+
+        /* Pagination, badges, code. */
+        .page-link {
+            background-color: var(--invana-card);
+            border-color: var(--invana-border);
+            color: var(--invana-fg);
+        }
+        .page-item.active .page-link {
+            background-color: var(--invana-primary);
+            border-color: var(--invana-primary);
+            color: var(--invana-primary-fg);
+        }
+        code, pre {
+            background-color: var(--invana-muted);
+            color: var(--invana-fg);
+        }
     </style>
     {% block head_css %}{% endblock %}
 </head>
