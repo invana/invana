@@ -72,20 +72,22 @@ A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills 
 
 The Graph is the unit of work. It carries everything previously split across Workspace and Mission: identity (slug + owner + members), the DB binding (1:1 `GraphConnection`), intent + objectives, and the analytical bindings (Skills, Instructions, LLM providers, Agents). Membership comes from Layer 1.
 
+§ 2.1–2.3 + 2.8 shipped under S1.5 + S2. Detailed write-up: [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md).
+
 ### 2.1 Graph entity + CRUD
-- **Backend:** [x] `Graph` entity — `name`, `slug` (unique per `created_by_id`), `intent` (markdown, required at creation), `description`, `objectives`, `success_criteria`, `status` (`active` | `archived`), `setup_state` (JSONB per § 2.2), `created_by_id` · `POST /api/v1/graphs` (any authenticated user; creator becomes admin) · `GET /api/v1/graphs` (returns Graphs the caller is a member of, namespaced as `/u/:username/:graphSlug`) · `GET /api/v1/u/{username}/{graphSlug}` · `PATCH .../` (name, description, objectives, success_criteria, status) · `DELETE .../` (admin only; hard delete, cascade downward per RFC-012 cascade matrix; sole-admin self-removal blocked → 409)
-- **Frontend:** [x] `/graphs` list (Graphs the user is a member of) · "New Graph" page (name → autogen slug → intent) · `/u/:username/:graphSlug` overview page · graph header (name, status). Graph switcher in app shell deferred.
+- **Backend:** [x] `Graph` entity + CRUD at `/api/v1/graphs` and `/api/v1/u/{username}/{graphSlug}`. Hard delete cascades downward per RFC-012; sole-admin self-removal → 409.
+- **Frontend:** [x] `/graphs` list · `/graphs/new` create page · `/u/:username/:graphSlug` overview. Graph switcher in app shell deferred.
 - **Integrations:** none
 
 ### 2.2 Graph setup wizard + feature gating
-- **Backend:** [x] `setup_state` JSONB on `graphs` — keys `graph_info`, `intent`, `skills`, `datasets`, each `{completed_at, skipped_at}` · `POST /u/:username/:graphSlug/setup/{section}` (`complete` | `skip` | `reset`) · `require_graph_setup_complete` dep gates `/query`, `/schema/active-version`, `/connection/introspect` · `graph_info` auto-completes on connection save; `intent` auto-completes on non-empty intent.
-- **Frontend:** [x] `/u/:username/:graphSlug` shows wizard progress when incomplete · four sections: **Graph Info** (connection form — required), **Intent** (required), **Skills** (skippable, S5 placeholder page), **Datasets** (skippable, S6 placeholder page) · modeller / explorer / query buttons disabled until required sections are complete · navigates back to overview after each section is saved.
+- **Backend:** [x] `setup_state` JSONB · `POST /u/:username/:graphSlug/setup/{section}` · `require_graph_setup_complete` gates `/query`, `/schema/active-version`, `/connection/introspect` · `graph_info` auto-completes on connection save; `intent` on non-empty intent.
+- **Frontend:** [x] Overview wizard card with done/skipped/todo state per section; modeller / explorer / query unlock once required sections are done.
 - **Integrations:** none
 
 ### 2.3 GraphConnection (1:1 child of Graph)
-- **Backend:** [x] `GraphConnection` entity — `graph_id` UNIQUE, `connector_class` (dotted path), `uri`, `auth_encrypted` (Fernet), `read_only` · `GET /api/v1/u/{username}/{graphSlug}/connection` · `PUT .../connection` (full-replace; `connector_class` immutable after first save; empty `auth` keeps stored credentials) · `DELETE .../connection` · `POST .../connection/test` (transient connect, no persist) · `POST .../connection/ping` (force reconnect) · `POST .../connection/introspect` (re-run schema introspection, admin-only) · connectors at `engine/src/invana/graph/connectors/` for Neo4j, Memgraph, ArcadeDB, JanusGraph, Neptune, TinkerGraph (RFC-001) — query drivers, not source-ingestion connectors. **Legacy `/api/v1/graph-connections/*` surface and its `/api/v1/graphs/{connection_id}/query` + `/api/v1/schemas/{schema_id}/active-version` shims have been removed — all callers use the graph-scoped routes.**
-- **Frontend:** [x] `GraphForm` reused inside `/u/:username/:graphSlug/settings/connection` · always sends `GraphConnectionCreate` to PUT (full-replace); empty `auth` preserves stored credentials on edit · "Test Connection" button gates Save · ping result inline.
-- **Integrations:** `neo4j` (driver) · `gremlinpython` · per-driver native libs already in `integrations/invana-{db}/` · `cryptography.Fernet`
+- **Backend:** [x] `GraphConnection` entity · `/u/:username/:graphSlug/connection` (GET / PUT full-replace / DELETE) · `/connection/test` · `/connection/ping` · `/connection/introspect` · `connector_class` immutable after first save · empty `auth` keeps stored credentials. **Legacy `/api/v1/graph-connections/*` + `/api/v1/graphs/{connection_id}/query` + `/api/v1/schemas/{schema_id}/active-version` shims removed.**
+- **Frontend:** [x] `GraphForm` at `/u/:username/:graphSlug/settings/connection` · Test Connection gates Save.
+- **Integrations:** `neo4j` (driver) · `gremlinpython` · per-driver native libs in `integrations/invana-{db}/` · `cryptography.Fernet`
 - **Deferred (post-MVP):** [-] Multi-connection Graphs · [-] Source-ingestion connectors (PDF / DOCX / XLSX / CSV / TXT / Git / MySQL) — datasets are produced externally in MVP, see L3 · [-] Connector plugin interface · [-] Custom connector registration
 
 ### 2.4 Skills (graph-scoped)
@@ -110,7 +112,7 @@ The Graph is the unit of work. It carries everything previously split across Wor
 
 ### 2.8 Graph settings shell
 - **Backend:** N/A (composition of other features)
-- **Frontend:** [~] `/u/:username/:graphSlug/settings` landing page lists sub-settings as links: **Connection** · **Intent** · **Skills** (S5) · **Datasets** (S6) · **Members** · **Invitations**. Admin-only sections are hidden for non-admins via `rolesForGraph`. Each sub-page already lives at its own `/settings/<section>` route. General + LLM + Instructions + Agents tabs land with their respective MVP slices.
+- **Frontend:** [~] `/u/:username/:graphSlug/settings` landing page with sub-settings links (Connection · Intent · Skills (S5) · Datasets (S6) · Members · Invitations); admin-only sections hidden for non-admins. General + LLM + Instructions + Agents land with their slices.
 - **Integrations:** `@invana/design-kit` (links/cards)
 
 ### 2.9 Graph lifecycle (active / archived)
@@ -485,23 +487,21 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 **Done when:** `invana init` creates root user with a username; UI login lands on empty `/graphs`.
 
-### S1.5 — Workspace → Graph rename (RFC-017) — **shipped**
-- **BE:** [x] renamed `Workspace` → `Graph`, `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`. Added `users.username` + validation + rate-limited PATCH. Added `graphs.intent` + `graphs.setup_state`. `UNIQUE (created_by_id, slug)`. Re-prefixed Layer 1 routes to `/u/:username/:graphSlug/...`. Reset Alembic, regenerated initial migration. Updated admin views.
-- **FE:** [x] renamed pages, routes, hooks, copy. URLs are `/u/:username/:graphSlug/...`. Added username field to `RegisterPage` + `ProfileSettingsPage`.
+### S1.5 — Workspace → Graph rename (RFC-017) — **shipped** ✅
+- **BE:** [x] Workspace → Graph rename (+ `WorkspaceMember` → `GraphMember`, existing `Graph` → `GraphConnection`); `users.username`; `graphs.intent` + `graphs.setup_state`; routes re-prefixed to `/u/:username/:graphSlug/...`; Alembic regenerated.
+- **FE:** [x] pages, routes, hooks, copy renamed; username added to `RegisterPage` + `ProfileSettingsPage`.
 
-**Done when:** existing Layer 1 behaviors all work under the new names, and `invana init` no longer creates a default Graph. ✅
+**Done when:** existing Layer 1 behaviors work under the new names, and `invana init` no longer creates a default Graph. — detail in [`mvp/layer-1-identity-access.md`](mvp/layer-1-identity-access.md).
 
-### S2 — Graph shell + setup wizard — **shipped**
-- **BE:** [x] `Graph` CRUD · `GraphConnection` (1:1, optional until first save) · `setup_state` JSONB + `require_graph_setup_complete` dep · connection PUT/GET/DELETE + test + ping + introspect, all under `/u/:username/:graphSlug/connection/...` · `query` + `schemas` routers re-prefixed under `/u/:username/:graphSlug/...`. **Legacy `/api/v1/graph-connections/*` surface and the `/api/v1/graphs/{connection_id}/query` + `/api/v1/schemas/{schema_id}/active-version` shims have been deleted.**
-- **FE:** [x] `/graphs` list · `/graphs/new` create page (name → autogen slug → intent) · `/u/:username/:graphSlug` overview with wizard progress · Graph Info section (`GraphForm` + Test + Save) · Intent section · skippable Skills / Datasets placeholder sections · `/u/:username/:graphSlug/settings` settings index page (admin-aware) · context-aware left nav (Explorer/Modeller only inside a Graph; bottom rail shows graph-scoped Settings).
+### S2 — Graph shell + setup wizard — **shipped** ✅
+- **BE:** [x] Graph CRUD; GraphConnection sub-resource (GET/PUT/DELETE + test/ping/introspect); `setup_state` + `require_graph_setup_complete`; `query` + `schemas` routers re-prefixed. Legacy `/api/v1/graph-connections/*` + `/api/v1/graphs/{cid}/query` + `/api/v1/schemas/{sid}/active-version` shims deleted.
+- **FE:** [x] `/graphs` list · `/graphs/new` · `/u/:username/:graphSlug` overview with wizard · Connection + Intent settings pages · `/u/:username/:graphSlug/settings` index · context-aware left nav.
 
-**Done when:** user creates a Graph, completes the Graph Info section by attaching Neo4j, sees modeller / explorer / query unlock. ✅
+**Done when:** user creates a Graph, completes Graph Info via Neo4j, sees modeller / explorer / query unlock. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md).
 
 ### S3 — User graph model (reuse modeller) — partially shipped
-- **BE:** [x] `GraphSchema` is graph-scoped — `/u/:username/:graphSlug/schema/active-version` and `/connection/introspect` admin endpoint.
-- **FE:** [~] `ModellerPage` mounted at `/u/:username/:graphSlug/modeller`; Introspect/Refresh wired up. **Schema canvas rendering is stubbed** (placeholder with node-type / edge-type counts) — the old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are not published, and the sibling `@invana/canvas` is a redesigned API surface; wiring it up is its own follow-up.
-
-**Done when:** user authors ontology against the bound Graph. Currently: schema browse + introspect work; canvas re-integration tracked separately.
+- **BE:** [x] `GraphSchema` graph-scoped — `/u/:username/:graphSlug/schema/active-version` + `/connection/introspect`.
+- **FE:** [~] `ModellerPage` at `/u/:username/:graphSlug/modeller`; Introspect wired up. **Schema canvas stubbed** — canvas re-integration tracked under Risk notes.
 
 ### S4 — LLM provider (graph-scoped)
 - **BE:** `LLMProvider` entity + Fernet · CRUD under `/u/:username/:graphSlug/llm/...` · `POST .../llm/{id}/ping` round-trip
