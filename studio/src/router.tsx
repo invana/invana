@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -13,9 +13,26 @@ import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSett
 import { GraphLLMsSettingsPage } from "./pages/graphs/settings/GraphLLMsSettingsPage";
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
 import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
-import { GraphInvitationsPage } from "./pages/settings/GraphInvitationsPage";
-import { GraphMembersPage } from "./pages/settings/GraphMembersPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
+
+// Tiny redirector for legacy /settings/<section> deep-links (members +
+// invitations) that no longer have a full-page form — those sections live
+// exclusively in the docked SettingsPanel now. Preserves deep-linkability
+// by opening the panel on the graph overview with ?settings=<section>.
+function SettingsPanelRedirect({
+	section,
+}: {
+	section: "members" | "invitations";
+}) {
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
+	if (!username || !graphSlug) return <Navigate to="/" replace />;
+	return (
+		<Navigate to={`/u/${username}/${graphSlug}?settings=${section}`} replace />
+	);
+}
 
 // Lazy-loaded — Explorer/Modeller carry the heaviest UI (graph rendering once
 // the new canvas integration lands). Lazy keeps the auth + settings flows
@@ -109,13 +126,16 @@ export const router = createBrowserRouter([
 				path: "u/:username/:graphSlug/settings/intent",
 				element: <GraphIntentSettingsPage />,
 			},
+			// Members + Invitations have no full-page form anymore — they live only
+			// in the docked SettingsPanel. Keep the URLs as redirects so existing
+			// deep-links continue to work.
 			{
 				path: "u/:username/:graphSlug/settings/members",
-				element: <GraphMembersPage />,
+				element: <SettingsPanelRedirect section="members" />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/invitations",
-				element: <GraphInvitationsPage />,
+				element: <SettingsPanelRedirect section="invitations" />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/llms",

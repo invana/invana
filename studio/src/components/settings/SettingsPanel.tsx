@@ -23,7 +23,9 @@ import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 interface SectionChrome {
 	label: string;
 	icon: typeof Database;
-	maximizeSubpath: string;
+	/** Sub-path under /u/:username/:graphSlug/settings/. Null = no full-page
+	 *  form, so the maximize button is hidden (Members + Invitations). */
+	maximizeSubpath: string | null;
 }
 
 // Title, icon, and maximize destination for each section. The icon mirrors
@@ -34,12 +36,8 @@ const CHROME: Record<SettingsSection, SectionChrome> = {
 	llms: { label: "LLMs", icon: Sparkles, maximizeSubpath: "llms" },
 	skills: { label: "Skills", icon: Wand2, maximizeSubpath: "skills" },
 	datasets: { label: "Datasets", icon: Layers, maximizeSubpath: "datasets" },
-	members: { label: "Members", icon: Users, maximizeSubpath: "members" },
-	invitations: {
-		label: "Invitations",
-		icon: Mail,
-		maximizeSubpath: "invitations",
-	},
+	members: { label: "Members", icon: Users, maximizeSubpath: null },
+	invitations: { label: "Invitations", icon: Mail, maximizeSubpath: null },
 };
 
 interface Props {
@@ -67,19 +65,21 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 					<span className="font-medium truncate">{chrome.label}</span>
 				</div>
 				<div className="flex items-center gap-0.5 shrink-0">
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-6 w-6"
-						onClick={() =>
-							navigate(
-								`/u/${username}/${graphSlug}/settings/${chrome.maximizeSubpath}`,
-							)
-						}
-						title="Open as full page"
-					>
-						<Maximize2 className="w-3.5 h-3.5" />
-					</Button>
+					{chrome.maximizeSubpath && (
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-6 w-6"
+							onClick={() =>
+								navigate(
+									`/u/${username}/${graphSlug}/settings/${chrome.maximizeSubpath}`,
+								)
+							}
+							title="Open as full page"
+						>
+							<Maximize2 className="w-3.5 h-3.5" />
+						</Button>
+					)}
 					<Button
 						variant="ghost"
 						size="icon"
