@@ -43,8 +43,6 @@ class GraphConnectionStore:
     ) -> GraphConnection:
         auth_encrypted = encrypt_credentials(data.auth, encryption_key) if data.auth else None
         connection = GraphConnection(
-            name=data.name,
-            description=data.description,
             uri=data.uri,
             connector_class=data.connector_class,
             auth_encrypted=auth_encrypted,
@@ -99,10 +97,6 @@ class GraphConnectionStore:
     ) -> GraphConnection:
         connection = await self.get_or_404(session, connection_id)
 
-        if data.name is not None:
-            connection.name = data.name
-        if data.description is not None:
-            connection.description = data.description
         if data.read_only is not None:
             connection.read_only = data.read_only
 

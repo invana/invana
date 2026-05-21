@@ -222,7 +222,6 @@ async def put_graph_connection(
             graph_id=graph.id,
             actor_id=actor_id,
             details={
-                "name": connection.name,
                 "uri": connection.uri,
                 "connector_class": connection.connector_class,
                 "read_only": connection.read_only,
@@ -238,14 +237,10 @@ async def put_graph_connection(
             detail="connector_class cannot be changed once a connection is established.",
         )
     before = {
-        "name": existing.name,
-        "description": existing.description,
         "uri": existing.uri,
         "read_only": existing.read_only,
         "has_auth": existing.auth_encrypted is not None,
     }
-    existing.name = payload.name
-    existing.description = payload.description
     existing.uri = payload.uri
     existing.read_only = payload.read_only
     if payload.auth:
@@ -254,8 +249,6 @@ async def put_graph_connection(
     _mark_section(graph, "graph_info", "complete")
     await session.flush()
     after = {
-        "name": existing.name,
-        "description": existing.description,
         "uri": existing.uri,
         "read_only": existing.read_only,
         "has_auth": existing.auth_encrypted is not None,
@@ -263,7 +256,7 @@ async def put_graph_connection(
     changed = diff_changed_fields(
         before,
         after,
-        fields=["name", "description", "uri", "read_only", "has_auth"],
+        fields=["uri", "read_only", "has_auth"],
     )
     if changed:
         await emit_event(
@@ -273,7 +266,7 @@ async def put_graph_connection(
             target_id=existing.id,
             graph_id=graph.id,
             actor_id=actor_id,
-            details={"changed": changed, "name": existing.name},
+            details={"changed": changed, "uri": existing.uri},
             trace_id=current_trace_id(),
         )
     return existing, False
@@ -334,7 +327,6 @@ async def delete_graph_connection(
     if connection is None:
         return None
     snapshot = {
-        "name": connection.name,
         "uri": connection.uri,
         "connector_class": connection.connector_class,
     }

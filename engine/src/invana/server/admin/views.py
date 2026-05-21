@@ -184,6 +184,7 @@ class GraphContainerView(ModelView):
         "description",
         "intent",
         StringField("status", label="Status"),
+        "connection",
         "created_by_id",
         "created_at",
         "updated_at",
@@ -255,8 +256,6 @@ class GraphConnectionView(ModelView):
     fields = [
         "id",
         "graph_id",
-        "name",
-        "description",
         "uri",
         "connector_class",
         "read_only",
@@ -267,7 +266,7 @@ class GraphConnectionView(ModelView):
         "created_at",
         "updated_at",
     ]
-    search_fields = ["name", "uri"]
+    search_fields = ["uri"]
 
 
 class LLMProviderView(ModelView):

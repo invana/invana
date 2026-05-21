@@ -109,8 +109,6 @@ export type ConnectorClass = (typeof CONNECTOR_OPTIONS)[number]["value"];
 export interface GraphConnectionRead {
 	id: string;
 	graph_id: string | null;
-	name: string;
-	description: string;
 	uri: string;
 	connector_class: string;
 	read_only: boolean;
@@ -123,8 +121,6 @@ export interface GraphConnectionRead {
 }
 
 export interface GraphConnectionCreate {
-	name: string;
-	description?: string;
 	uri: string;
 	connector_class: string;
 	// Empty object means "keep existing credentials" on PUT-edit (server treats

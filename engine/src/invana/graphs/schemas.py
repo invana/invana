@@ -92,8 +92,9 @@ class SetupSectionUpdate(BaseModel):
 
 
 class GraphConnectionCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=255)
-    description: str = Field(default="")
+    # name/description used to live here but were redundant with the parent
+    # Graph's name/description (1:1 relationship). Dropped — humans identify
+    # the connection by the graph it belongs to, not by a separate label.
     uri: str = Field(..., min_length=1, max_length=2048)
     connector_class: str = Field(..., min_length=1, max_length=512)
     auth: dict = Field(default_factory=dict)
@@ -101,8 +102,6 @@ class GraphConnectionCreate(BaseModel):
 
 
 class GraphConnectionUpdate(BaseModel):
-    name: str | None = Field(default=None, min_length=1, max_length=255)
-    description: str | None = None
     uri: str | None = Field(default=None, min_length=1, max_length=2048)
     auth: dict | None = None  # if provided, re-encrypts and triggers reconnect
     read_only: bool | None = None
@@ -114,8 +113,6 @@ class GraphConnectionRead(BaseModel):
 
     id: str
     graph_id: str | None
-    name: str
-    description: str
     uri: str
     connector_class: str
     read_only: bool

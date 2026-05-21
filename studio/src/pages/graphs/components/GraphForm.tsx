@@ -8,7 +8,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Switch,
-	Textarea,
 } from "@invana/ui";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
@@ -17,8 +16,6 @@ import { CONNECTOR_OPTIONS } from "../../../types/graphs";
 import type { GraphConnectionCreate } from "../../../types/graphs";
 
 export interface GraphFormValues {
-	name: string;
-	description: string;
 	uri: string;
 	connector_class: string;
 	username: string;
@@ -48,8 +45,6 @@ interface GraphFormProps {
 }
 
 const DEFAULT_VALUES: GraphFormValues = {
-	name: "",
-	description: "",
 	uri: "",
 	connector_class: "",
 	username: "",
@@ -94,7 +89,6 @@ export function GraphForm({
 
 	const validate = (): boolean => {
 		const next: typeof errors = {};
-		if (!values.name.trim()) next.name = "Name is required";
 		if (!values.uri.trim()) next.uri = "URI is required";
 		if (!values.connector_class) next.connector_class = "Connector is required";
 		setErrors(next);
@@ -106,8 +100,6 @@ export function GraphForm({
 		// preserves the stored auth (its `if payload.auth:` check skips re-encrypt).
 		const credsTouched = !!values.username || !!values.password;
 		return {
-			name: values.name,
-			description: values.description || undefined,
 			uri: values.uri,
 			connector_class: values.connector_class,
 			auth:
@@ -154,34 +146,6 @@ export function GraphForm({
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-5" noValidate>
-			{/* Name */}
-			<div className="space-y-1.5">
-				<Label htmlFor="name">
-					Name <span className="text-destructive">*</span>
-				</Label>
-				<Input
-					id="name"
-					placeholder="My Neo4j Instance"
-					value={values.name}
-					onChange={(e) => set("name", e.target.value)}
-					disabled={isSubmitting}
-				/>
-				{errors.name && <p className="text-destructive">{errors.name}</p>}
-			</div>
-
-			{/* Description */}
-			<div className="space-y-1.5">
-				<Label htmlFor="description">Description</Label>
-				<Textarea
-					id="description"
-					placeholder="Optional description"
-					rows={2}
-					value={values.description}
-					onChange={(e) => set("description", e.target.value)}
-					disabled={isSubmitting}
-				/>
-			</div>
-
 			{/* Connector Class */}
 			<div className="space-y-1.5">
 				<Label htmlFor="connector_class">

@@ -153,9 +153,9 @@ class GraphConnection(Base):
         index=True,
     )
 
-    # Display + connection details
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str] = mapped_column(Text, default="")
+    # Connection details — name/description previously lived here but were
+    # redundant with the parent Graph's name/description (the connection is
+    # 1:1 with the Graph). Removed in migration 00000000000e.
     uri: Mapped[str] = mapped_column(String(2048), nullable=False)
     connector_class: Mapped[str] = mapped_column(String(512), nullable=False)
     auth_encrypted: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)

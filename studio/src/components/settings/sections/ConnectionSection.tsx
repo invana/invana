@@ -70,13 +70,11 @@ export function ConnectionSection({ username, graphSlug, onSaved }: Props) {
 				initialValues={
 					connection
 						? {
-								name: connection.name,
-								description: connection.description,
 								uri: connection.uri,
 								connector_class: connection.connector_class,
 								read_only: connection.read_only,
 							}
-						: { name: graph.name }
+						: undefined
 				}
 				onSubmit={handleSubmit}
 				onCancel={() => onSaved?.()}
