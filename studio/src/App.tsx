@@ -41,54 +41,62 @@ export default function App() {
 	const activeMembership = urlMembership ?? fallbackMembership;
 	const activeRole = activeMembership?.role ?? null;
 
-	// Graph-scoped nav targets (modeller/explorer) live at /u/:username/:slug/...
-	// — derive them from the active membership when on or off a graph page.
-	const graphScopedPath = activeMembership
-		? `/u/${activeMembership.owner_username}/${activeMembership.graph_slug}`
+	// Explorer/Modeller live under /u/:username/:graphSlug/... and only make
+	// sense while a Graph is being viewed — show those nav items only when the
+	// URL is graph-scoped. The /graphs list page just shows "Graphs".
+	const isOnGraphDetail = !!graphMatch;
+	const graphScopedPath = isOnGraphDetail
+		? `/u/${graphMatch?.[1]}/${graphMatch?.[2]}`
 		: null;
 
 	const initial = (user?.first_name ?? "?")[0]?.toUpperCase();
 
-	return (
-		<AppLayoutV2
-			leftNav={{
-				top: (
-					<div className="flex items-center justify-center w-full py-3">
-						<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-base select-none">
-							I
-						</div>
-					</div>
-				),
-				topNavItems: [
-					{
-						name: "Graphs",
-						icon: Database,
-						tooltipSide: "right",
-						className: isActive("/graphs")
-							? "bg-accent text-accent-foreground"
-							: "",
-						onClick: () => navigate("/graphs"),
-					},
+	const topNavItems = [
+		{
+			name: "Graphs",
+			icon: Database,
+			tooltipSide: "right" as const,
+			className: isActive("/graphs") ? "bg-accent text-accent-foreground" : "",
+			onClick: () => navigate("/graphs"),
+		},
+		...(graphScopedPath
+			? [
 					{
 						name: "Explorer",
 						icon: Network,
-						tooltipSide: "right",
+						tooltipSide: "right" as const,
 						showSeperator: true,
+						onClick: () => navigate(`${graphScopedPath}/explorer`),
 					},
 					{
 						name: "Modeller",
 						icon: GitGraph,
-						tooltipSide: "right",
-						onClick: graphScopedPath
-							? () => navigate(`${graphScopedPath}/modeller`)
-							: () => navigate("/graphs"),
+						tooltipSide: "right" as const,
+						onClick: () => navigate(`${graphScopedPath}/modeller`),
 					},
-				],
+				]
+			: []),
+	];
+
+	return (
+		<AppLayoutV2
+			leftNav={{
+				topNavItems,
 				bottomNavItems: [
+					...(graphScopedPath
+						? [
+								{
+									name: "Graph settings",
+									icon: Settings,
+									tooltipSide: "right" as const,
+									onClick: () => navigate(`${graphScopedPath}/settings`),
+								},
+							]
+						: []),
 					{
-						name: "Settings",
-						icon: Settings,
-						tooltipSide: "right",
+						name: "Profile",
+						icon: UserCircle,
+						tooltipSide: "right" as const,
 						onClick: () => navigate("/settings/profile"),
 					},
 				],

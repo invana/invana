@@ -11,6 +11,7 @@ import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
 import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
+import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
 import { GraphInvitationsPage } from "./pages/settings/GraphInvitationsPage";
 import { GraphMembersPage } from "./pages/settings/GraphMembersPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
@@ -86,6 +87,10 @@ export const router = createBrowserRouter([
 
 			// Graph container — overview + settings.
 			{ path: "u/:username/:graphSlug", element: <GraphOverviewPage /> },
+			{
+				path: "u/:username/:graphSlug/settings",
+				element: <GraphSettingsPage />,
+			},
 			{
 				path: "u/:username/:graphSlug/settings/connection",
 				element: <GraphConnectionSettingsPage />,

@@ -102,13 +102,6 @@ export function ModellerPage() {
 
 	// ── Shared left nav (icon rail) ───────────────────────────────────────────
 	const leftNav = {
-		top: (
-			<div className="flex items-center justify-center w-full py-3">
-				<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-base select-none">
-					I
-				</div>
-			</div>
-		),
 		topNavItems: [
 			{
 				name: "Graphs",

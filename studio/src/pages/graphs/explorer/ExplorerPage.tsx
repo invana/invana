@@ -63,13 +63,6 @@ export function ExplorerPage() {
 
 	// ── Nav ───────────────────────────────────────────────────────────────────
 	const leftNav = {
-		top: (
-			<div className="flex items-center justify-center w-full py-3">
-				<div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-base select-none">
-					I
-				</div>
-			</div>
-		),
 		topNavItems: [
 			{
 				name: "Graphs",
@@ -124,7 +117,7 @@ export function ExplorerPage() {
 	// ── Status bar ────────────────────────────────────────────────────────────
 	const footerLeft = (
 		<ExplorerStatusBar
-			graph={graph}
+			graph={graph ?? undefined}
 			nodeCount={nodeCount}
 			relationshipCount={relCount}
 			queryCount={history.length}
