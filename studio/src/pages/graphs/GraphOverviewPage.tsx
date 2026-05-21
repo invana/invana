@@ -1,4 +1,5 @@
-import { Button, Skeleton } from "@invana/ui";
+import { AppLayoutV2 } from "@invana/themes";
+import { Button, Separator, Skeleton } from "@invana/ui";
 import {
 	ArrowRight,
 	CheckCircle2,
@@ -14,6 +15,10 @@ import {
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { ThemeToggle } from "../../components/ThemeToggle";
+import { SettingsPanel } from "../../components/settings/SettingsPanel";
+import { useGraphLeftNav } from "../../components/settings/useGraphLeftNav";
+import { useSettingsPanel } from "../../components/settings/useSettingsPanel";
 import {
 	useGraphQuery,
 	useSetupSectionMutation,
@@ -156,9 +161,34 @@ export function GraphOverviewPage() {
 		error,
 	} = useGraphQuery(username, graphSlug);
 	const setupMutation = useSetupSectionMutation();
+	const settingsPanel = useSettingsPanel();
+	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "overview");
 
+	const setupComplete =
+		!!graph && REQUIRED.every((k) => graph.setup_state?.[k]?.completed_at);
+
+	const handleSectionAction = (
+		section: SetupSection,
+		action: "complete" | "skip" | "reset",
+	) => {
+		if (!graph) return;
+		setupMutation.mutate(
+			{
+				username: graph.owner_username,
+				graphSlug: graph.slug,
+				section,
+				action,
+			},
+			{
+				onError: (err) => toast.error(err.message),
+			},
+		);
+	};
+
+	// ── Main content ─────────────────────────────────────────────────────────
+	let mainContent: React.ReactNode;
 	if (isLoading) {
-		return (
+		mainContent = (
 			<div className="h-full overflow-auto">
 				<div className="max-w-3xl mx-auto px-10 py-12">
 					<Skeleton className="h-10 w-72 mb-2" />
@@ -167,10 +197,8 @@ export function GraphOverviewPage() {
 				</div>
 			</div>
 		);
-	}
-
-	if (isError || !graph) {
-		return (
+	} else if (isError || !graph) {
+		mainContent = (
 			<div className="h-full overflow-auto">
 				<div className="max-w-3xl mx-auto px-10 py-12">
 					<p className="text-destructive">
@@ -186,137 +214,165 @@ export function GraphOverviewPage() {
 				</div>
 			</div>
 		);
-	}
-
-	const setupComplete = REQUIRED.every(
-		(k) => graph.setup_state?.[k]?.completed_at,
-	);
-
-	const handleSectionAction = (
-		section: SetupSection,
-		action: "complete" | "skip" | "reset",
-	) => {
-		setupMutation.mutate(
-			{
-				username: graph.owner_username,
-				graphSlug: graph.slug,
-				section,
-				action,
-			},
-			{
-				onError: (err) => toast.error(err.message),
-			},
-		);
-	};
-
-	return (
-		<div className="h-full overflow-auto">
-			<div className="max-w-3xl mx-auto px-10 py-12">
-				{/* Header */}
-				<div className="mb-10">
-					<div className="flex items-center gap-2 text-muted-foreground font-mono mb-2">
-						<span>
-							/u/{graph.owner_username}/{graph.slug}
-						</span>
-					</div>
-					<h1 className="text-3xl font-bold">{graph.name}</h1>
-					{graph.intent ? (
-						<p className="text-muted-foreground mt-2">{graph.intent}</p>
-					) : (
-						<p className="text-muted-foreground/60 italic mt-2">
-							No intent set yet.
-						</p>
-					)}
-				</div>
-
-				{/* Setup wizard */}
-				<div className="border border-border rounded-lg p-6 mb-10">
-					<div className="flex items-center justify-between mb-2">
-						<h2 className="font-semibold">Setup</h2>
-						{setupComplete ? (
-							<span className="text-green-500 flex items-center gap-1.5">
-								<CheckCircle2 className="w-4 h-4" />
-								Ready
+	} else {
+		mainContent = (
+			<div className="h-full overflow-auto">
+				<div className="max-w-3xl mx-auto px-10 py-12">
+					{/* Header */}
+					<div className="mb-10">
+						<div className="flex items-center gap-2 text-muted-foreground font-mono mb-2">
+							<span>
+								/u/{graph.owner_username}/{graph.slug}
 							</span>
+						</div>
+						<h1 className="text-3xl font-bold">{graph.name}</h1>
+						{graph.intent ? (
+							<p className="text-muted-foreground mt-2">{graph.intent}</p>
 						) : (
-							<span className="text-muted-foreground">
-								{
-									SECTIONS.filter(
-										(s) => sectionStatus(graph.setup_state?.[s.key]) !== "todo",
-									).length
-								}{" "}
-								/ {SECTIONS.length} done
-							</span>
+							<p className="text-muted-foreground/60 italic mt-2">
+								No intent set yet.
+							</p>
 						)}
 					</div>
-					<p className="text-muted-foreground mb-4">
-						{setupComplete
-							? "Modeller, Explorer, and Query are ready to use."
-							: `Complete ${REQUIRED.map(
-									(r) => SECTIONS.find((s) => s.key === r)?.label,
-								).join(" + ")} to unlock Modeller, Explorer, and Query.`}
-					</p>
 
-					<div className="flex flex-col">
-						{SECTIONS.map((section) => (
-							<WizardSection
-								key={section.key}
-								meta={section}
-								state={graph.setup_state?.[section.key]}
-								graph={graph}
-								onSkip={() => handleSectionAction(section.key, "skip")}
-								onReset={() => handleSectionAction(section.key, "reset")}
-							/>
-						))}
+					{/* Setup wizard */}
+					<div className="border border-border rounded-lg p-6 mb-10">
+						<div className="flex items-center justify-between mb-2">
+							<h2 className="font-semibold">Setup</h2>
+							{setupComplete ? (
+								<span className="text-green-500 flex items-center gap-1.5">
+									<CheckCircle2 className="w-4 h-4" />
+									Ready
+								</span>
+							) : (
+								<span className="text-muted-foreground">
+									{
+										SECTIONS.filter(
+											(s) =>
+												sectionStatus(graph.setup_state?.[s.key]) !== "todo",
+										).length
+									}{" "}
+									/ {SECTIONS.length} done
+								</span>
+							)}
+						</div>
+						<p className="text-muted-foreground mb-4">
+							{setupComplete
+								? "Modeller, Explorer, and Query are ready to use."
+								: `Complete ${REQUIRED.map(
+										(r) => SECTIONS.find((s) => s.key === r)?.label,
+									).join(" + ")} to unlock Modeller, Explorer, and Query.`}
+						</p>
+
+						<div className="flex flex-col">
+							{SECTIONS.map((section) => (
+								<WizardSection
+									key={section.key}
+									meta={section}
+									state={graph.setup_state?.[section.key]}
+									graph={graph}
+									onSkip={() => handleSectionAction(section.key, "skip")}
+									onReset={() => handleSectionAction(section.key, "reset")}
+								/>
+							))}
+						</div>
+					</div>
+
+					{/* Quick actions */}
+					<div className="grid grid-cols-3 gap-4">
+						<Button
+							variant="outline"
+							className="h-auto flex-col items-start gap-2 p-4"
+							disabled={!setupComplete}
+							onClick={() =>
+								navigate(`/u/${graph.owner_username}/${graph.slug}/modeller`)
+							}
+						>
+							<GitGraph className="w-5 h-5 text-muted-foreground" />
+							<div className="text-left">
+								<div className="font-medium">Modeller</div>
+								<div className="text-muted-foreground">Define the ontology</div>
+							</div>
+						</Button>
+						<Button
+							variant="outline"
+							className="h-auto flex-col items-start gap-2 p-4"
+							disabled={!setupComplete}
+							onClick={() =>
+								navigate(`/u/${graph.owner_username}/${graph.slug}/explorer`)
+							}
+						>
+							<Network className="w-5 h-5 text-muted-foreground" />
+							<div className="text-left">
+								<div className="font-medium">Explorer</div>
+								<div className="text-muted-foreground">Visualise the graph</div>
+							</div>
+						</Button>
+						<Button
+							variant="outline"
+							className="h-auto flex-col items-start gap-2 p-4"
+							disabled={!setupComplete}
+							onClick={() =>
+								navigate(`/u/${graph.owner_username}/${graph.slug}/explorer`)
+							}
+						>
+							<FileText className="w-5 h-5 text-muted-foreground" />
+							<div className="text-left">
+								<div className="font-medium">Query</div>
+								<div className="text-muted-foreground">
+									Run Cypher / Gremlin
+								</div>
+							</div>
+						</Button>
 					</div>
 				</div>
-
-				{/* Quick actions */}
-				<div className="grid grid-cols-3 gap-4">
-					<Button
-						variant="outline"
-						className="h-auto flex-col items-start gap-2 p-4"
-						disabled={!setupComplete}
-						onClick={() =>
-							navigate(`/u/${graph.owner_username}/${graph.slug}/modeller`)
-						}
-					>
-						<GitGraph className="w-5 h-5 text-muted-foreground" />
-						<div className="text-left">
-							<div className="font-medium">Modeller</div>
-							<div className="text-muted-foreground">Define the ontology</div>
-						</div>
-					</Button>
-					<Button
-						variant="outline"
-						className="h-auto flex-col items-start gap-2 p-4"
-						disabled={!setupComplete}
-						onClick={() =>
-							navigate(`/u/${graph.owner_username}/${graph.slug}/explorer`)
-						}
-					>
-						<Network className="w-5 h-5 text-muted-foreground" />
-						<div className="text-left">
-							<div className="font-medium">Explorer</div>
-							<div className="text-muted-foreground">Visualise the graph</div>
-						</div>
-					</Button>
-					<Button
-						variant="outline"
-						className="h-auto flex-col items-start gap-2 p-4"
-						disabled={!setupComplete}
-						onClick={() =>
-							navigate(`/u/${graph.owner_username}/${graph.slug}/explorer`)
-						}
-					>
-						<FileText className="w-5 h-5 text-muted-foreground" />
-						<div className="text-left">
-							<div className="font-medium">Query</div>
-							<div className="text-muted-foreground">Run Cypher / Gremlin</div>
-						</div>
-					</Button>
-				</div>
 			</div>
-		</div>
+		);
+	}
+
+	const showSettingsInLeft = settingsPanel.isOpen && !!username && !!graphSlug;
+
+	return (
+		<AppLayoutV2
+			leftNav={leftNav}
+			header={{
+				className: "!h-[38px]",
+				left: (
+					<div className="flex items-center gap-2 px-2">
+						<span className="font-bold text-xl select-none">Invana Studio</span>
+						<Separator orientation="vertical" className="h-4" />
+						<span className="text-muted-foreground">
+							{graph?.name ?? "Overview"}
+						</span>
+					</div>
+				),
+				right: (
+					<div className="flex items-center gap-1 px-2">
+						<ThemeToggle />
+					</div>
+				),
+			}}
+			leftSection={
+				showSettingsInLeft
+					? {
+							defaultSize: "420px",
+							minSize: "320px",
+							maxSize: "640px",
+							collapsible: false,
+							content: (
+								<SettingsPanel
+									username={username as string}
+									graphSlug={graphSlug as string}
+								/>
+							),
+						}
+					: undefined
+			}
+			mainSection={{
+				defaultSize: "800px",
+				minSize: "400px",
+				content: mainContent,
+			}}
+		/>
 	);
 }

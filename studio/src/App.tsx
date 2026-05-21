@@ -15,7 +15,6 @@ import {
 	LogOut,
 	Mail,
 	Network,
-	Settings,
 	UserCircle,
 	UserCog,
 	Users,
@@ -83,16 +82,6 @@ export default function App() {
 			leftNav={{
 				topNavItems,
 				bottomNavItems: [
-					...(graphScopedPath
-						? [
-								{
-									name: "Graph settings",
-									icon: Settings,
-									tooltipSide: "right" as const,
-									onClick: () => navigate(`${graphScopedPath}/settings`),
-								},
-							]
-						: []),
 					{
 						name: "Profile",
 						icon: UserCircle,

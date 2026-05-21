@@ -1,10 +1,13 @@
 import { AppLayoutV2 } from "@invana/themes";
 import { Button, ScrollArea, Separator, Skeleton } from "@invana/ui";
-import { Database, GitGraph, Network, RefreshCw, Settings } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ThemeToggle } from "../../../components/ThemeToggle";
+import { SettingsPanel } from "../../../components/settings/SettingsPanel";
+import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
+import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
@@ -14,7 +17,6 @@ import { SchemaCanvas } from "./components/SchemaCanvas";
 import { SchemaNav } from "./components/SchemaNav";
 
 export function ModellerPage() {
-	const navigate = useNavigate();
 	const { username, graphSlug } = useParams<{
 		username: string;
 		graphSlug: string;
@@ -30,6 +32,8 @@ export function ModellerPage() {
 	} = useActiveVersionQuery(username, graphSlug);
 	const [selected, setSelected] = useState<SelectedItem>(null);
 	const [introspecting, setIntrospecting] = useState(false);
+	const settingsPanel = useSettingsPanel();
+	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "modeller");
 
 	const handleIntrospect = async () => {
 		if (!username || !graphSlug) return;
@@ -100,41 +104,6 @@ export function ModellerPage() {
 		</ScrollArea>
 	);
 
-	// ── Shared left nav (icon rail) ───────────────────────────────────────────
-	const leftNav = {
-		topNavItems: [
-			{
-				name: "Graphs",
-				icon: Database,
-				tooltipSide: "right" as const,
-				onClick: () => navigate("/graphs"),
-			},
-			{
-				name: "Explorer",
-				icon: Network,
-				tooltipSide: "right" as const,
-				showSeperator: true,
-				onClick:
-					username && graphSlug
-						? () => navigate(`/u/${username}/${graphSlug}/explorer`)
-						: undefined,
-			},
-			{
-				name: "Modeller",
-				icon: GitGraph,
-				tooltipSide: "right" as const,
-				className: "bg-accent text-accent-foreground",
-			},
-		],
-		bottomNavItems: [
-			{
-				name: "Settings",
-				icon: Settings,
-				tooltipSide: "right" as const,
-			},
-		],
-	};
-
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
@@ -181,11 +150,16 @@ export function ModellerPage() {
 				),
 			}}
 			leftSection={{
-				defaultSize: "260px",
-				minSize: "180px",
-				maxSize: "480px",
+				defaultSize: settingsPanel.isOpen ? "420px" : "260px",
+				minSize: settingsPanel.isOpen ? "320px" : "180px",
+				maxSize: settingsPanel.isOpen ? "640px" : "480px",
 				collapsible: false,
-				content: leftContent,
+				content:
+					settingsPanel.isOpen && username && graphSlug ? (
+						<SettingsPanel username={username} graphSlug={graphSlug} />
+					) : (
+						leftContent
+					),
 			}}
 			mainSection={{
 				defaultSize: "600px",

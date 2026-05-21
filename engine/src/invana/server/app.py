@@ -45,6 +45,7 @@ def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.auth.routes import auth_router
     from invana.graphs.routes import graph_router, graphs_collection_router
+    from invana.llm_providers.routes import llm_providers_router
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
     from invana.server.routes.query import query_router
@@ -86,6 +87,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(graphs_collection_router)
     app.include_router(graph_router)
+    app.include_router(llm_providers_router)
     app.include_router(schemas_router)
     app.include_router(query_router)
     mount_admin(app)

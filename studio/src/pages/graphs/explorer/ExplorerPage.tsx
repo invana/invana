@@ -1,9 +1,11 @@
 import { AppLayoutV2 } from "@invana/themes";
 import { Separator } from "@invana/ui";
-import { Database, GitGraph, Network, Settings } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ThemeToggle } from "../../../components/ThemeToggle";
+import { SettingsPanel } from "../../../components/settings/SettingsPanel";
+import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
+import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import type { QueryResultItem } from "../../../types/query";
 import { CanvasToolbar } from "./components/CanvasToolbar";
@@ -25,7 +27,6 @@ const CONNECTOR_LANGUAGE: Record<string, "cypher" | "gremlin"> = {
 };
 
 export function ExplorerPage() {
-	const navigate = useNavigate();
 	const { username, graphSlug } = useParams<{
 		username: string;
 		graphSlug: string;
@@ -33,6 +34,8 @@ export function ExplorerPage() {
 
 	const { data: graph } = useGraphConnectionQuery(username, graphSlug);
 	const { mutation, history } = useQueryExecution(username, graphSlug);
+	const settingsPanel = useSettingsPanel();
+	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "explorer");
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
 	const [selected, setSelected] = useState<QueryResultItem | null>(null);
@@ -59,41 +62,6 @@ export function ExplorerPage() {
 			setRelCount(edges.length);
 			setSelected(null);
 		}
-	};
-
-	// ── Nav ───────────────────────────────────────────────────────────────────
-	const leftNav = {
-		topNavItems: [
-			{
-				name: "Graphs",
-				icon: Database,
-				tooltipSide: "right" as const,
-				onClick: () => navigate("/graphs"),
-			},
-			{
-				name: "Explorer",
-				icon: Network,
-				tooltipSide: "right" as const,
-				className: "bg-accent text-accent-foreground",
-				showSeperator: true,
-			},
-			{
-				name: "Modeller",
-				icon: GitGraph,
-				tooltipSide: "right" as const,
-				onClick:
-					username && graphSlug
-						? () => navigate(`/u/${username}/${graphSlug}/modeller`)
-						: undefined,
-			},
-		],
-		bottomNavItems: [
-			{
-				name: "Settings",
-				icon: Settings,
-				tooltipSide: "right" as const,
-			},
-		],
 	};
 
 	// ── Canvas panel ──────────────────────────────────────────────────────────
@@ -149,18 +117,21 @@ export function ExplorerPage() {
 				),
 			}}
 			leftSection={{
-				defaultSize: "300px",
-				minSize: "240px",
-				maxSize: "400px",
+				defaultSize: settingsPanel.isOpen ? "420px" : "300px",
+				minSize: settingsPanel.isOpen ? "320px" : "240px",
+				maxSize: settingsPanel.isOpen ? "640px" : "400px",
 				collapsible: false,
-				content: (
-					<QueryPanel
-						defaultLanguage={defaultLanguage}
-						onRun={handleRun}
-						isRunning={mutation.isPending}
-						history={history}
-					/>
-				),
+				content:
+					settingsPanel.isOpen && username && graphSlug ? (
+						<SettingsPanel username={username} graphSlug={graphSlug} />
+					) : (
+						<QueryPanel
+							defaultLanguage={defaultLanguage}
+							onRun={handleRun}
+							isRunning={mutation.isPending}
+							history={history}
+						/>
+					),
 			}}
 			mainSection={{
 				defaultSize: "600px",

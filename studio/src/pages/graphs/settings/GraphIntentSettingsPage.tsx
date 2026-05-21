@@ -1,12 +1,6 @@
-import { Button, Skeleton, Textarea } from "@invana/ui";
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
-import {
-	useGraphQuery,
-	useUpdateGraphMutation,
-} from "../../../hooks/queries/useGraphs";
+import { IntentSection } from "../../../components/settings/sections/IntentSection";
 
 export function GraphIntentSettingsPage() {
 	const { username, graphSlug } = useParams<{
@@ -14,34 +8,9 @@ export function GraphIntentSettingsPage() {
 		graphSlug: string;
 	}>();
 	const navigate = useNavigate();
-	const { data: graph, isLoading } = useGraphQuery(username, graphSlug);
-	const mutation = useUpdateGraphMutation();
-
-	const [intent, setIntent] = useState("");
-	useEffect(() => {
-		if (graph) setIntent(graph.intent ?? "");
-	}, [graph]);
-
 	const backToOverview = () => navigate(`/u/${username}/${graphSlug}`);
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!username || !graphSlug) return;
-		mutation.mutate(
-			{
-				username,
-				graphSlug,
-				data: { intent: intent.trim() || null },
-			},
-			{
-				onSuccess: () => {
-					toast.success("Intent saved");
-					backToOverview();
-				},
-				onError: (err) => toast.error(err.message),
-			},
-		);
-	};
+	if (!username || !graphSlug) return null;
 
 	return (
 		<div className="h-full overflow-auto">
@@ -60,33 +29,13 @@ export function GraphIntentSettingsPage() {
 						/u/{username}/{graphSlug} · settings
 					</p>
 					<h1 className="text-2xl font-bold mt-1">Intent</h1>
-					<p className="text-muted-foreground mt-1">
-						A short statement of what this graph is for and what questions it
-						should answer. Used to ground agents and prompts.
-					</p>
 				</div>
 
-				{isLoading && <Skeleton className="h-32 w-full" />}
-
-				{!isLoading && graph && (
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<Textarea
-							value={intent}
-							onChange={(e) => setIntent(e.target.value)}
-							rows={8}
-							maxLength={10000}
-							placeholder="Describe the purpose of this graph…"
-						/>
-						<div className="flex gap-2">
-							<Button type="submit" disabled={mutation.isPending}>
-								{mutation.isPending ? "Saving…" : "Save Intent"}
-							</Button>
-							<Button type="button" variant="outline" onClick={backToOverview}>
-								Cancel
-							</Button>
-						</div>
-					</form>
-				)}
+				<IntentSection
+					username={username}
+					graphSlug={graphSlug}
+					onSaved={backToOverview}
+				/>
 			</div>
 		</div>
 	);

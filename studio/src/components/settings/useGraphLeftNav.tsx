@@ -1,0 +1,126 @@
+import {
+	Database,
+	GitGraph,
+	Home,
+	Layers,
+	Lightbulb,
+	Mail,
+	Network,
+	Sparkles,
+	UserCircle,
+	Users,
+	Wand2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
+
+interface SectionMeta {
+	key: SettingsSection;
+	label: string;
+	icon: typeof Database;
+	adminOnly?: boolean;
+}
+
+const SETTINGS_SECTIONS: SectionMeta[] = [
+	{ key: "info", label: "Info", icon: Database, adminOnly: true },
+	{ key: "intent", label: "Intent", icon: Lightbulb, adminOnly: true },
+	{ key: "llms", label: "LLMs", icon: Sparkles, adminOnly: true },
+	{ key: "skills", label: "Skills", icon: Wand2, adminOnly: true },
+	{ key: "datasets", label: "Datasets", icon: Layers, adminOnly: true },
+	{ key: "members", label: "Members", icon: Users },
+	{ key: "invitations", label: "Invitations", icon: Mail, adminOnly: true },
+];
+
+type ActiveTab = "overview" | "explorer" | "modeller" | null;
+
+/**
+ * Shared left-rail (icon column) config used by every graph-scoped page —
+ * Overview, Explorer, Modeller. Surfaces:
+ *
+ * - Top: Graphs (out), then the three graph views (Overview / Explorer /
+ *   Modeller), then a separator, then one icon per settings section. Clicking
+ *   a settings icon sets `?settings=<section>` on the current page so the
+ *   leftSection swaps to that section's content.
+ * - Bottom: Profile.
+ *
+ * The "active" highlight is driven by the caller's `activeTab` arg (which
+ * graph view is rendering this layout) and by `?settings` (which section is
+ * currently open).
+ */
+export function useGraphLeftNav(
+	username: string,
+	graphSlug: string,
+	activeTab: ActiveTab,
+) {
+	const navigate = useNavigate();
+	const { rolesForGraph } = useAuth();
+	const { isAdmin } = rolesForGraph(username, graphSlug);
+	const settingsPanel = useSettingsPanel();
+	const root = `/u/${username}/${graphSlug}`;
+
+	const activeClass = (active: boolean) =>
+		active ? "bg-accent text-accent-foreground" : "";
+
+	// Navigating to a view should also clear ?settings so the leftSection
+	// shows the view's own content (QueryPanel / SchemaNav / wizard).
+	const goToView = (path: string) => {
+		navigate(path);
+	};
+
+	const visibleSections = SETTINGS_SECTIONS.filter(
+		(s) => !s.adminOnly || isAdmin,
+	);
+
+	const topNavItems = [
+		{
+			name: "Graphs",
+			icon: Database,
+			tooltipSide: "right" as const,
+			onClick: () => navigate("/graphs"),
+		},
+		{
+			name: "Overview",
+			icon: Home,
+			tooltipSide: "right" as const,
+			className: activeClass(activeTab === "overview"),
+			onClick: () => goToView(root),
+			showSeperator: true,
+		},
+		{
+			name: "Explorer",
+			icon: Network,
+			tooltipSide: "right" as const,
+			className: activeClass(activeTab === "explorer"),
+			onClick: () => goToView(`${root}/explorer`),
+		},
+		{
+			name: "Modeller",
+			icon: GitGraph,
+			tooltipSide: "right" as const,
+			className: activeClass(activeTab === "modeller"),
+			onClick: () => goToView(`${root}/modeller`),
+			showSeperator: true,
+		},
+		...visibleSections.map((s) => ({
+			name: s.label,
+			icon: s.icon,
+			tooltipSide: "right" as const,
+			className: activeClass(
+				settingsPanel.isOpen && settingsPanel.section === s.key,
+			),
+			onClick: () => settingsPanel.setSection(s.key),
+		})),
+	];
+
+	const bottomNavItems = [
+		{
+			name: "Profile",
+			icon: UserCircle,
+			tooltipSide: "right" as const,
+			onClick: () => navigate("/settings/profile"),
+		},
+	];
+
+	return { topNavItems, bottomNavItems };
+}

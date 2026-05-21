@@ -1,12 +1,8 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ConnectionSection } from "../../../components/settings/sections/ConnectionSection";
+import { LLMsSection } from "../../../components/settings/sections/LLMsSection";
 
-// Full-page route reachable as the "maximize" target from the docked Settings
-// panel and via direct URL. Renders the same ConnectionSection used inside the
-// panel, just inside page chrome with a Back-to-overview link.
-
-export function GraphConnectionSettingsPage() {
+export function GraphLLMsSettingsPage() {
 	const { username, graphSlug } = useParams<{
 		username: string;
 		graphSlug: string;
@@ -18,7 +14,7 @@ export function GraphConnectionSettingsPage() {
 
 	return (
 		<div className="h-full overflow-auto">
-			<div className="max-w-2xl mx-auto px-10 py-12">
+			<div className="max-w-3xl mx-auto px-10 py-12">
 				<button
 					type="button"
 					onClick={backToOverview}
@@ -32,14 +28,10 @@ export function GraphConnectionSettingsPage() {
 					<p className="text-muted-foreground font-mono">
 						/u/{username}/{graphSlug} · settings
 					</p>
-					<h1 className="text-2xl font-bold mt-1">Connection</h1>
+					<h1 className="text-2xl font-bold mt-1">LLMs</h1>
 				</div>
 
-				<ConnectionSection
-					username={username}
-					graphSlug={graphSlug}
-					onSaved={backToOverview}
-				/>
+				<LLMsSection username={username} graphSlug={graphSlug} />
 			</div>
 		</div>
 	);

@@ -10,6 +10,7 @@ import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
 import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
+import { GraphLLMsSettingsPage } from "./pages/graphs/settings/GraphLLMsSettingsPage";
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
 import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
 import { GraphInvitationsPage } from "./pages/settings/GraphInvitationsPage";
@@ -69,6 +70,15 @@ export const router = createBrowserRouter([
 		),
 		errorElement: <ErrorPage />,
 	},
+	{
+		path: "u/:username/:graphSlug",
+		element: (
+			<ProtectedRoute>
+				<GraphOverviewPage />
+			</ProtectedRoute>
+		),
+		errorElement: <ErrorPage />,
+	},
 
 	// App shell layout — gated by ProtectedRoute.
 	{
@@ -85,8 +95,8 @@ export const router = createBrowserRouter([
 			{ path: "graphs/new", element: <GraphCreatePage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
 
-			// Graph container — overview + settings.
-			{ path: "u/:username/:graphSlug", element: <GraphOverviewPage /> },
+			// Graph container — settings full-page routes (maximize targets).
+			// The Overview itself lives at the top level so it owns AppLayoutV2.
 			{
 				path: "u/:username/:graphSlug/settings",
 				element: <GraphSettingsPage />,
@@ -106,6 +116,10 @@ export const router = createBrowserRouter([
 			{
 				path: "u/:username/:graphSlug/settings/invitations",
 				element: <GraphInvitationsPage />,
+			},
+			{
+				path: "u/:username/:graphSlug/settings/llms",
+				element: <GraphLLMsSettingsPage />,
 			},
 			{
 				path: "u/:username/:graphSlug/settings/skills",
