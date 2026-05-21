@@ -70,7 +70,10 @@ Structured knowledge graphs into interactive decision simulation environments.
 
 ## Rules
 
-1. Don't write code without complete implementation design decisions, write RFC in `docs/rfcs` first before writing code. 
+1. Don't write code without complete implementation design decisions. Write an RFC first:
+   - **MVP-scope RFCs go in `docs/internal/mvp/rfc-NNN-<topic>.md`** — alongside the per-layer detail docs. This is where everything new lives while the MVP is being built.
+   - `docs/rfcs/` is the legacy / pre-MVP / platform-architecture home (RFC-001 … RFC-017). Don't add new MVP RFCs there.
+   - Numbering continues across both directories (next RFC = the next integer after the highest existing number in either dir).
 2. Always ask when in doubt.
 3. make the development setup work across operating systems for seamless community developer contributions. 
 4. Engine and Studio are built together, distributed flexibly (one image or separate).
