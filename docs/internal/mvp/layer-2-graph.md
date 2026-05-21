@@ -127,6 +127,38 @@ The original "landing page with sub-section links" was replaced (per user feedba
 
 Mounted under `/u/:username/:graphSlug/{modeller,explorer}` and consume Layer 2 endpoints via the graph-scoped query and schema routes. Both pages share `useGraphLeftNav` so the section icons + view icons stay consistent. Canvas rendering is stubbed — see Risk notes in `mvp.md`.
 
+### 2.11 Domain audit events (RFC-018)
+
+Append-only event log alongside the existing state tables. Every domain write produces an `events` row via the `emit_event(...)` service helper; reads are paginated via keyset (`?cursor=`); live tail is SSE via Postgres `LISTEN/NOTIFY`. **Design lives in [`rfc-018-domain-audit-events.md`](rfc-018-domain-audit-events.md)** — this section only documents what shipped.
+
+**Engine surface** (under `engine/src/invana/events/`):
+
+- `models.py` — `Event` SQLAlchemy entity. `(graph_id?, actor_id?, actor_type, action, target_kind?, target_id?, details JSONB, trace_id?, created_at)`. Both FKs are `ON DELETE SET NULL` so the audit trail outlives the entities it describes. Four indexes drive the read patterns: `(graph_id, created_at DESC)`, `(created_at DESC)`, `(actor_id, created_at DESC)`, `(action, created_at DESC)`.
+- `actions.py` — module-level constants for the action vocabulary. Hierarchical dotted strings (`skill.create`, `connection.test`, …). Callers reference the constants rather than passing strings, so a typo surfaces at import time.
+- `services.py` — `emit_event(...)` + `current_trace_id()` (OTel) + `diff_changed_fields(...)` helper for update events. Sensitive keys (`*_hash`, `*_encrypted`, `password`, `api_key`, `secret`, `token`) are recursively stripped from `details` before storage.
+- `store.py` — `EventStore.add` / `list_page`. The list joins `users` so the response carries a denormalised `actor: {id, username, display_name}` ref. Keyset cursor format: `base64(json({"created_at": iso, "id": uuid}))`.
+- `notify.py` — per-worker asyncpg `LISTEN events` daemon + `EventBroadcaster` fan-out. Each subscriber gets an `asyncio.Queue[NotifyPayload]` (cap 1k); on overflow oldest events drop and a `lost` SSE sentinel is emitted so the client can refetch. Heartbeat `: keepalive\n\n` every 25s to keep reverse proxies from idling out the connection.
+- `routes.py` — `events_router` at `/api/v1/events` (superuser, all events) + `graph_events_router` at `/api/v1/u/:username/:graphSlug/events` (any graph member). Each pairs a paginated `GET /` with an SSE `GET /stream`.
+
+**Auth note for SSE.** `EventSource` can't set custom headers, so `get_current_user` in `engine/src/invana/auth/deps.py` falls back to `?token=<jwt>` as a query-param when no `Authorization: Bearer` header is present. The header takes precedence when both are present. Only `/events/stream` URLs use this fallback in practice.
+
+**Trigger** (migration `00000000000d_events.py`): an `AFTER INSERT` trigger calls `pg_notify('events', json_build_object(id, graph_id, created_at)::text)`. The SSE handler refetches the row by id (or trusts the minimal payload for the live-tail invalidation, since the per-graph view's filter is enforced server-side from `graph_id`). Postgres-only — SQLite ignores the trigger block in the migration.
+
+**Retention.** Forever. No pruning cron, no per-category TTL, no admin settings to tune. Long-term storage is a future ops concern (time-based partitioning when the table crosses ~10M rows); the indexes survive partitioning unchanged.
+
+**Studio surface:**
+
+- `studio/src/types/events.ts`, `services/api/events.ts`, `hooks/queries/useEvents.ts`, `hooks/useEventStream.ts` — types, axios-based read client, TanStack `useInfiniteQuery` hooks, and the SSE-backed live tail.
+- `components/settings/sections/EventsSection.tsx` — rail-icon section + maximize-target body. Filter bar (action prefix), expandable rows showing `event_id` + actor + target + trace + JSON payload, "Load older" for keyset pagination.
+- `pages/graphs/settings/GraphEventsSettingsPage.tsx` — full-page maximize target at `/u/:username/:graphSlug/settings/events`.
+- `pages/platform/PlatformEventsPage.tsx` — superuser-only platform page at `/platform/events`. Adds a graph-id filter input on top of the same row UI.
+- `UserMenu.tsx` — "Platform events" link added under the `RoleGate require="superuser"` block.
+
+**Wiring status (per RFC-018 § Implementation plan):**
+
+- ✅ **Skills** (3 sites: create/update/delete), **Instructions** (3), **LLM providers** (5: create/update/delete/ping/set_default), **Graph CRUD** (3: create/update/delete) + implicit `member.add` on create, **GraphConnection** (3: attach/update/delete), **Connection test** (1), **Setup wizard transitions** (1).
+- ⏳ **Auth events** (register/login/logout/refresh/password_change/username_change/login_failed), **`query.execute`** on the query route, **System events** (manager auto-reconnect, introspect completion), **Members** (add/role_change/remove via auth.services), **Invitations** (create/accept/delete). Tracked separately; will land before MVP demo.
+
 ## Removed legacy surface
 
 S2 deleted the back-compat shims that existed in earlier slices:

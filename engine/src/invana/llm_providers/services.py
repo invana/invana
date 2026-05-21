@@ -13,6 +13,8 @@ from http import HTTPStatus
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.events import actions
+from invana.events.services import current_trace_id, diff_changed_fields, emit_event
 from invana.graphs.encryption import decrypt_credentials, encrypt_credentials
 from invana.llm_providers.models import LLMProvider, LLMProviderKind
 from invana.llm_providers.schemas import LLMProviderCreate, LLMProviderUpdate
@@ -61,6 +63,7 @@ async def create_provider(
     graph_id: str,
     payload: LLMProviderCreate,
     encryption_key: str,
+    actor_id: str,
 ) -> LLMProvider:
     store = LLMProviderStore()
     if payload.is_default:
@@ -82,7 +85,24 @@ async def create_provider(
         guardrails=payload.guardrails,
         is_default=payload.is_default,
     )
-    return await store.add(session, provider)
+    await store.add(session, provider)
+    await emit_event(
+        session,
+        action=actions.LLM_CREATE,
+        target_kind=actions.TARGET_LLM,
+        target_id=provider.id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details={
+            "provider": provider.provider.value,
+            "model_id": provider.model_id,
+            "is_default": provider.is_default,
+            "has_base_url": provider.base_url is not None,
+            "has_api_key": provider.api_key_encrypted is not None,
+        },
+        trace_id=current_trace_id(),
+    )
+    return provider
 
 
 async def update_provider(
@@ -91,8 +111,16 @@ async def update_provider(
     provider: LLMProvider,
     payload: LLMProviderUpdate,
     encryption_key: str,
+    actor_id: str,
 ) -> LLMProvider:
     store = LLMProviderStore()
+    before = {
+        "model_id": provider.model_id,
+        "base_url": provider.base_url,
+        "guardrails": provider.guardrails,
+        "is_default": provider.is_default,
+        "has_api_key": provider.api_key_encrypted is not None,
+    }
 
     if payload.model_id is not None:
         provider.model_id = payload.model_id
@@ -109,18 +137,81 @@ async def update_provider(
         provider.is_default = False
 
     await session.flush()
+    after = {
+        "model_id": provider.model_id,
+        "base_url": provider.base_url,
+        "guardrails": provider.guardrails,
+        "is_default": provider.is_default,
+        "has_api_key": provider.api_key_encrypted is not None,
+    }
+    changed = diff_changed_fields(
+        before,
+        after,
+        fields=["model_id", "base_url", "guardrails", "is_default", "has_api_key"],
+    )
+    if changed:
+        await emit_event(
+            session,
+            action=actions.LLM_UPDATE,
+            target_kind=actions.TARGET_LLM,
+            target_id=provider.id,
+            graph_id=provider.graph_id,
+            actor_id=actor_id,
+            details={
+                "changed": changed,
+                "provider": provider.provider.value,
+                "model_id": provider.model_id,
+            },
+            trace_id=current_trace_id(),
+        )
     return provider
 
 
-async def delete_provider(session: AsyncSession, *, provider: LLMProvider) -> None:
+async def delete_provider(
+    session: AsyncSession,
+    *,
+    provider: LLMProvider,
+    actor_id: str,
+) -> None:
+    snapshot = {
+        "provider": provider.provider.value,
+        "model_id": provider.model_id,
+    }
+    graph_id = provider.graph_id
+    provider_id = provider.id
     await LLMProviderStore().delete(session, provider)
+    await emit_event(
+        session,
+        action=actions.LLM_DELETE,
+        target_kind=actions.TARGET_LLM,
+        target_id=provider_id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details=snapshot,
+        trace_id=current_trace_id(),
+    )
 
 
-async def set_default(session: AsyncSession, *, provider: LLMProvider) -> LLMProvider:
+async def set_default(
+    session: AsyncSession,
+    *,
+    provider: LLMProvider,
+    actor_id: str,
+) -> LLMProvider:
     store = LLMProviderStore()
     await store.clear_default(session, provider.graph_id)
     provider.is_default = True
     await session.flush()
+    await emit_event(
+        session,
+        action=actions.LLM_SET_DEFAULT,
+        target_kind=actions.TARGET_LLM,
+        target_id=provider.id,
+        graph_id=provider.graph_id,
+        actor_id=actor_id,
+        details={"provider": provider.provider.value, "model_id": provider.model_id},
+        trace_id=current_trace_id(),
+    )
     return provider
 
 
@@ -129,28 +220,57 @@ async def set_default(session: AsyncSession, *, provider: LLMProvider) -> LLMPro
 # ---------------------------------------------------------------------------
 
 
-async def ping_provider(*, provider: LLMProvider, encryption_key: str, timeout_s: float = 10.0) -> dict:
+async def ping_provider(
+    session: AsyncSession,
+    *,
+    provider: LLMProvider,
+    encryption_key: str,
+    actor_id: str | None = None,
+    timeout_s: float = 10.0,
+) -> dict:
     """Verify the provider's credentials by making a minimal call.
 
     Lazy-imports the per-provider SDK so the engine doesn't hard-depend on every
     SDK at install time. Returns ``{ok, latency_ms?, error?}``.
+
+    Emits a ``llm.ping`` event with the result (success or failure) so
+    operators can see who tested which provider when, and what came back.
     """
     api_key = (
         _decrypt_key(provider.api_key_encrypted, encryption_key) if provider.api_key_encrypted is not None else None
     )
 
+    result: dict[str, object]
     try:
         coro = _dispatch_ping(provider, api_key)
         t0 = time.monotonic()
         ok = await asyncio.wait_for(coro, timeout=timeout_s)
         latency_ms = int((time.monotonic() - t0) * 1000)
-        if ok:
-            return {"ok": True, "latency_ms": latency_ms}
-        return {"ok": False, "error": "Provider rejected the credentials."}
+        result = (
+            {"ok": True, "latency_ms": latency_ms}
+            if ok
+            else {"ok": False, "error": "Provider rejected the credentials."}
+        )
     except TimeoutError:
-        return {"ok": False, "error": f"Ping timed out after {timeout_s:.0f}s."}
+        result = {"ok": False, "error": f"Ping timed out after {timeout_s:.0f}s."}
     except Exception as exc:  # noqa: BLE001 — surface arbitrary SDK errors
-        return {"ok": False, "error": str(exc)}
+        result = {"ok": False, "error": str(exc)}
+
+    await emit_event(
+        session,
+        action=actions.LLM_PING,
+        target_kind=actions.TARGET_LLM,
+        target_id=provider.id,
+        graph_id=provider.graph_id,
+        actor_id=actor_id,
+        details={
+            "provider": provider.provider.value,
+            "model_id": provider.model_id,
+            **result,
+        },
+        trace_id=current_trace_id(),
+    )
+    return result
 
 
 async def _dispatch_ping(provider: LLMProvider, api_key: str | None) -> bool:

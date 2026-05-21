@@ -1,4 +1,5 @@
 import {
+	Activity,
 	Database,
 	GitGraph,
 	Home,
@@ -41,6 +42,9 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 	// Members + Invitations are one rail icon — Invitations renders as a tab
 	// inside the Members section content (see MembersInvitationsSection).
 	{ key: "members", label: "Members", icon: Users },
+	// Events (RFC-018) — visible to any graph member; the audit log is part
+	// of the team's shared visibility into the graph.
+	{ key: "events", label: "Events", icon: Activity },
 ];
 
 type ActiveTab = "overview" | "explorer" | "modeller" | null;

@@ -1,5 +1,6 @@
 import { Button, TabbedPanel } from "@invana/ui";
 import {
+	Activity,
 	Database,
 	Info,
 	Layers,
@@ -13,6 +14,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
+import { EventsSection } from "./sections/EventsSection";
 import { InfoSection } from "./sections/InfoSection";
 import { InstructionsSection } from "./sections/InstructionsSection";
 import { IntentSection } from "./sections/IntentSection";
@@ -120,6 +122,7 @@ const MAXIMIZE_SUBPATHS: Record<SettingsSection, string> = {
 	instructions: "instructions",
 	datasets: "datasets",
 	members: "members",
+	events: "events",
 };
 
 // Sections whose panel is a single-tab TabbedPanel. Members is handled
@@ -136,6 +139,7 @@ const SINGLE_TAB_SECTIONS: Record<
 	skills: { label: "Skills", icon: Wand2 },
 	instructions: { label: "Instructions", icon: ScrollText },
 	datasets: { label: "Datasets", icon: Layers },
+	events: { label: "Events", icon: Activity },
 };
 
 function SectionContent({
@@ -162,5 +166,7 @@ function SectionContent({
 			return <InstructionsSection username={username} graphSlug={graphSlug} />;
 		case "datasets":
 			return <DatasetsSection />;
+		case "events":
+			return <EventsSection username={username} graphSlug={graphSlug} />;
 	}
 }

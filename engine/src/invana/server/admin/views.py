@@ -8,6 +8,7 @@ from starlette_admin import DropDown, StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.auth.models import RefreshToken, User
+from invana.events.models import Event
 from invana.graphs.models import Graph, GraphConnection, GraphMember, Invitation
 from invana.instructions.models import Instruction
 from invana.llm_providers.models import LLMProvider
@@ -319,6 +320,34 @@ class InstructionView(ModelView):
     search_fields = ["name"]
 
 
+class EventView(ModelView):
+    """Audit events (RFC-018). Read + delete only — admin shouldn't be able
+    to author new events or rewrite the audit trail in-place."""
+
+    label = "Events"
+    icon = "fa fa-clock-rotate-left"
+    fields = [
+        "id",
+        "created_at",
+        "graph_id",
+        "actor_id",
+        StringField("actor_type", label="Actor"),
+        "action",
+        "target_kind",
+        "target_id",
+        "details",
+        "trace_id",
+    ]
+    search_fields = ["action", "target_id", "target_kind"]
+    sortable_fields = ["created_at", "action"]
+
+    def can_create(self, request: Request) -> bool:
+        return False
+
+    def can_edit(self, request: Request) -> bool:
+        return False
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -369,6 +398,17 @@ def mount_admin(app: FastAPI) -> None:
                 LLMProviderView(LLMProvider, label="LLM providers", icon="fa fa-sparkles"),
                 SkillView(Skill, label="Skills", icon="fa fa-wand-magic-sparkles"),
                 InstructionView(Instruction, label="Instructions", icon="fa fa-scroll"),
+            ],
+        ),
+    )
+
+    # ── Audit (RFC-018 — domain event log) ───────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Audit",
+            icon="fa fa-clock-rotate-left",
+            views=[
+                EventView(Event, label="Events", icon="fa fa-clock-rotate-left"),
             ],
         ),
     )

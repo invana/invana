@@ -36,16 +36,31 @@ async def get_current_user(
     """Verify the access token, load the user, ensure they're active.
 
     Cached per-request on ``request.state`` so role deps don't re-hit the DB.
+
+    Token source: the ``Authorization: Bearer <jwt>`` header is the default
+    and required path for normal API calls. As a narrow fallback for SSE
+    endpoints (browsers' ``EventSource`` API doesn't allow custom headers),
+    a ``?token=<jwt>`` query parameter is also accepted. The header takes
+    precedence when both are present.
     """
     cached = getattr(request.state, "current_user", None)
     if cached is not None:
         return cached
 
-    if credentials is None or credentials.scheme.lower() != "bearer":
+    raw_token: str | None = None
+    if credentials is not None and credentials.scheme.lower() == "bearer":
+        raw_token = credentials.credentials
+    else:
+        # SSE fallback — only consulted when no Authorization header was sent.
+        query_token = request.query_params.get("token")
+        if query_token:
+            raw_token = query_token
+
+    if not raw_token:
         raise _unauthorized("Missing bearer token.")
 
     try:
-        payload = decode_access_token(credentials.credentials)
+        payload = decode_access_token(raw_token)
     except InvalidTokenError as e:
         raise _unauthorized(f"Invalid token: {e}") from e
 

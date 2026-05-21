@@ -125,6 +125,11 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Frontend:** [ ] Confirmation dialog showing cascade preview (counts of children that will be removed)
 - **Integrations:** none
 
+### 2.11 Domain audit events (RFC-018)
+- **Backend:** [~] `events` table append-only · `emit_event(...)` service helper · per-graph + global read APIs (keyset pagination) · SSE live tail via Postgres `LISTEN/NOTIFY` per worker · sensitive-field redaction in `emit_event`. Emission wired for skills / instructions / llm / graph CRUD / connection / setup. Remaining (auth / query / system / members / invitations) tracked as a follow-up. Retention: forever — audit logs are immutable.
+- **Frontend:** [x] `EventsSection` (per-graph rail icon + maximize) · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook · TanStack `useInfiniteQuery` for keyset pagination · filter bar (action prefix) · live-tail head refresh on SSE frames.
+- **Integrations:** `@tanstack/react-query` (live-tail invalidation), native browser `EventSource`. Reuses existing OTel `trace_id` for span↔event correlation.
+
 ---
 
 ## Layer 3 — Ingestion (Datasets via `dataset-importer`)
@@ -514,6 +519,13 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 - **FE:** [x] Skills + Instructions sections in the rail · list + add/edit forms · full-page maximize routes.
 
 **Done when:** user authors a skill, sees it persisted, edits it. ✅ — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.4 + § 2.5). Markdown editor (CodeMirror reuse) deferred — plain textareas for now.
+
+### S5.5 — Domain audit events (RFC-018) — partially shipped
+- **BE:** [x] `events` append-only table + indexes + Alembic 00000000000d · `emit_event` service helper + sensitive-field redaction · keyset-paginated read API + SSE companions · Postgres `pg_notify` trigger + per-worker `LISTEN events` daemon + in-process broadcaster fan-out · superuser/member auth gates · admin Audit DropDown view.
+- **BE wiring:** [x] graph-scoped writes — skills · instructions · llm · graph CRUD · graph connection (attach / update / delete / test) · setup wizard. **[ ]** remaining wiring — auth events · query.execute · system events · members + invitations mutations (tracked separately).
+- **FE:** [x] `EventsSection` rail icon + section + full-page maximize · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook with TanStack-Query cache invalidation · filter-by-action-prefix bar · keyset infinite scroll · UserMenu link to platform events for superusers.
+
+**Done when:** writing a Skill produces a `skill.create` row visible in both the graph's Events section and the platform Events page within ~1 second (live tail). ✅ for skills/instructions/llm/graph/connection/setup. — design in [`mvp/rfc-018-domain-audit-events.md`](mvp/rfc-018-domain-audit-events.md).
 
 > **S3, S4, S5 run as parallel tracks once S2 lands.** Different BE modules, different FE routes, no shared state.
 

@@ -16,6 +16,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.auth.deps import get_current_user
+from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
     require_graph_admin,
@@ -70,6 +72,7 @@ async def create_llm_provider(
     payload: LLMProviderCreate,
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> LLMProviderRead:
     provider = await services.create_provider(
@@ -77,6 +80,7 @@ async def create_llm_provider(
         graph_id=graph.id,
         payload=payload,
         encryption_key=settings.encryption_key,
+        actor_id=user.id,
     )
     await session.commit()
     await session.refresh(provider)
@@ -100,6 +104,7 @@ async def update_llm_provider(
     provider_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> LLMProviderRead:
     provider = await services.get_or_404(session, provider_id=provider_id, graph_id=graph.id)
@@ -108,6 +113,7 @@ async def update_llm_provider(
         provider=provider,
         payload=payload,
         encryption_key=settings.encryption_key,
+        actor_id=user.id,
     )
     await session.commit()
     await session.refresh(updated)
@@ -119,10 +125,11 @@ async def delete_llm_provider(
     provider_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     provider = await services.get_or_404(session, provider_id=provider_id, graph_id=graph.id)
-    await services.delete_provider(session, provider=provider)
+    await services.delete_provider(session, provider=provider, actor_id=user.id)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -132,10 +139,17 @@ async def ping_llm_provider(
     provider_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> LLMPingResponse:
     provider = await services.get_or_404(session, provider_id=provider_id, graph_id=graph.id)
-    result = await services.ping_provider(provider=provider, encryption_key=settings.encryption_key)
+    result = await services.ping_provider(
+        session,
+        provider=provider,
+        encryption_key=settings.encryption_key,
+        actor_id=user.id,
+    )
+    await session.commit()
     return LLMPingResponse(**result)
 
 
@@ -144,10 +158,11 @@ async def set_default_llm_provider(
     provider_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> LLMProviderRead:
     provider = await services.get_or_404(session, provider_id=provider_id, graph_id=graph.id)
-    updated = await services.set_default(session, provider=provider)
+    updated = await services.set_default(session, provider=provider, actor_id=user.id)
     await session.commit()
     await session.refresh(updated)
     return _to_read(updated)

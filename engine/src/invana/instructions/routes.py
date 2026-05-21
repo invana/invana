@@ -5,6 +5,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.auth.deps import get_current_user
+from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
     require_graph_admin,
@@ -46,12 +48,14 @@ async def create_instruction(
     payload: InstructionCreate,
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> InstructionRead:
     instruction = await services.create_instruction(
         session,
         graph_id=graph.id,
         payload=payload,
+        actor_id=user.id,
     )
     await session.commit()
     await session.refresh(instruction)
@@ -79,6 +83,7 @@ async def update_instruction(
     instruction_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> InstructionRead:
     instruction = await services.get_or_404(
@@ -90,6 +95,7 @@ async def update_instruction(
         session,
         instruction=instruction,
         payload=payload,
+        actor_id=user.id,
     )
     await session.commit()
     await session.refresh(updated)
@@ -101,6 +107,7 @@ async def delete_instruction(
     instruction_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     instruction = await services.get_or_404(
@@ -108,6 +115,6 @@ async def delete_instruction(
         instruction_id=instruction_id,
         graph_id=graph.id,
     )
-    await services.delete_instruction(session, instruction=instruction)
+    await services.delete_instruction(session, instruction=instruction, actor_id=user.id)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

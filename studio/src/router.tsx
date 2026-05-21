@@ -9,6 +9,7 @@ import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
+import { GraphEventsSettingsPage } from "./pages/graphs/settings/GraphEventsSettingsPage";
 import { GraphInfoSettingsPage } from "./pages/graphs/settings/GraphInfoSettingsPage";
 import { GraphInstructionsSettingsPage } from "./pages/graphs/settings/GraphInstructionsSettingsPage";
 import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
@@ -17,6 +18,7 @@ import { GraphMembersSettingsPage } from "./pages/graphs/settings/GraphMembersSe
 import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
 import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
 import { GraphSkillsSettingsPage } from "./pages/graphs/settings/GraphSkillsSettingsPage";
+import { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
 
 // Legacy deep-link: /settings/invitations → /settings/members (Invitations is
@@ -109,6 +111,10 @@ export const router = createBrowserRouter([
 			{ path: "graphs", element: <GraphsListPage /> },
 			{ path: "graphs/new", element: <GraphCreatePage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
+			// Platform-admin surfaces (superuser-only — gated inside the page
+			// component via RoleGate). Lives under /platform/* to avoid the
+			// /admin namespace collision with starlette-admin.
+			{ path: "platform/events", element: <PlatformEventsPage /> },
 
 			// Graph container — settings full-page routes (maximize targets).
 			// The Overview itself lives at the top level so it owns AppLayoutV2.
@@ -160,6 +166,10 @@ export const router = createBrowserRouter([
 						slice="S6"
 					/>
 				),
+			},
+			{
+				path: "u/:username/:graphSlug/settings/events",
+				element: <GraphEventsSettingsPage />,
 			},
 
 			{ path: "*", element: <ErrorPage /> },

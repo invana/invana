@@ -97,9 +97,10 @@ async def patch_graph(
     payload: GraphUpdate,
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> GraphRead:
-    out = await services.update_graph(session, graph=graph, payload=payload)
+    out = await services.update_graph(session, graph=graph, payload=payload, actor_id=user.id)
     await session.commit()
     return out
 
@@ -108,9 +109,10 @@ async def patch_graph(
 async def delete_graph(
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    await services.delete_graph(session, graph=graph)
+    await services.delete_graph(session, graph=graph, actor_id=user.id)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -223,6 +225,7 @@ async def put_connection(
     payload: GraphConnectionCreate,
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> GraphConnectionRead:
@@ -231,6 +234,7 @@ async def put_connection(
         graph=graph,
         payload=payload,
         encryption_key=settings.encryption_key,
+        actor_id=user.id,
     )
     await session.commit()
     await session.refresh(connection)
@@ -247,10 +251,11 @@ async def put_connection(
 async def delete_connection(
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> Response:
-    connection = await services.delete_graph_connection(session, graph=graph)
+    connection = await services.delete_graph_connection(session, graph=graph, actor_id=user.id)
     await session.commit()
     if connection is not None:
         await manager.deregister(connection.id)
@@ -263,9 +268,12 @@ async def update_setup_section(
     section: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> GraphRead:
-    out = await services.update_setup_section(session, graph=graph, section=section, action=payload.action)
+    out = await services.update_setup_section(
+        session, graph=graph, section=section, action=payload.action, actor_id=user.id
+    )
     await session.commit()
     return out
 
@@ -274,7 +282,9 @@ async def update_setup_section(
 async def test_connection(
     payload: GraphConnectionCreate,
     _: GraphMember = Depends(require_graph_admin),
-    __: Graph = Depends(resolve_graph_by_username_slug),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ) -> dict:
     """Validate connection credentials without persisting them.
 
@@ -282,11 +292,29 @@ async def test_connection(
     discard. Used by the studio's "Test Connection" button to gate the
     save action.
     """
-    return await services.test_connection_credentials(
+    from invana.events import actions as event_actions  # noqa: PLC0415
+    from invana.events.services import current_trace_id, emit_event  # noqa: PLC0415
+
+    result = await services.test_connection_credentials(
         uri=payload.uri,
         connector_class=payload.connector_class,
         auth=payload.auth,
     )
+    await emit_event(
+        session,
+        action=event_actions.CONNECTION_TEST,
+        target_kind=event_actions.TARGET_CONNECTION,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "uri": payload.uri,
+            "connector_class": payload.connector_class,
+            **result,
+        },
+        trace_id=current_trace_id(),
+    )
+    await session.commit()
+    return result
 
 
 @graph_router.post("/connection/ping", status_code=status.HTTP_202_ACCEPTED)

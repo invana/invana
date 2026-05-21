@@ -26,6 +26,8 @@ from invana.auth.services import (
     new_invitation_raw_token,
     studio_redeem_url,
 )
+from invana.events import actions
+from invana.events.services import current_trace_id, diff_changed_fields, emit_event
 from invana.graphs.models import (
     Graph,
     GraphConnection,
@@ -70,6 +72,29 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
     session.add(GraphMember(graph_id=graph.id, user_id=owner.id, role=GraphRole.admin))
     await session.flush()
 
+    await emit_event(
+        session,
+        action=actions.GRAPH_CREATE,
+        target_kind=actions.TARGET_GRAPH,
+        target_id=graph.id,
+        graph_id=graph.id,
+        actor_id=owner.id,
+        details={"slug": graph.slug, "name": graph.name},
+        trace_id=current_trace_id(),
+    )
+    # Implicit member.add of the owner — surfaces as a parallel event so the
+    # graph's audit trail shows who became admin and when.
+    await emit_event(
+        session,
+        action=actions.MEMBER_ADD,
+        target_kind=actions.TARGET_MEMBER,
+        target_id=owner.id,
+        graph_id=graph.id,
+        actor_id=owner.id,
+        details={"role": GraphRole.admin.value, "via": "graph.create"},
+        trace_id=current_trace_id(),
+    )
+
     return await _serialize_graph(session, graph)
 
 
@@ -89,19 +114,73 @@ async def get_graph_detail(session: AsyncSession, *, graph: Graph) -> GraphRead:
     return await _serialize_graph(session, graph)
 
 
-async def update_graph(session: AsyncSession, *, graph: Graph, payload: GraphUpdate) -> GraphRead:
+async def update_graph(
+    session: AsyncSession,
+    *,
+    graph: Graph,
+    payload: GraphUpdate,
+    actor_id: str,
+) -> GraphRead:
     data = payload.model_dump(exclude_unset=True)
+    before = {f: getattr(graph, f) for f in data}
     for field, value in data.items():
         setattr(graph, field, value)
-    # Auto-complete the intent section when intent is set non-empty.
+    intent_completed = False
     if "intent" in data and graph.intent and graph.intent.strip():
+        already_complete = bool((graph.setup_state or {}).get("intent", {}).get("completed_at"))
         _mark_section(graph, "intent", "complete")
+        intent_completed = not already_complete
     await session.flush()
+    after = {f: getattr(graph, f) for f in data}
+    changed = diff_changed_fields(before, after, fields=list(data))
+    if changed:
+        await emit_event(
+            session,
+            action=actions.GRAPH_UPDATE,
+            target_kind=actions.TARGET_GRAPH,
+            target_id=graph.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={"changed": changed, "name": graph.name},
+            trace_id=current_trace_id(),
+        )
+    if intent_completed:
+        await emit_event(
+            session,
+            action=actions.SETUP_COMPLETE,
+            target_kind=actions.TARGET_GRAPH,
+            target_id=graph.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={"section": "intent", "via": "graph.update"},
+            trace_id=current_trace_id(),
+        )
     return await _serialize_graph(session, graph)
 
 
-async def delete_graph(session: AsyncSession, *, graph: Graph) -> None:
+async def delete_graph(
+    session: AsyncSession,
+    *,
+    graph: Graph,
+    actor_id: str,
+) -> None:
+    # Emit the event BEFORE deleting so the FK to graphs.id still resolves at
+    # insert. The cascade (events.graph_id ON DELETE SET NULL) flips graph_id
+    # to NULL on commit — fine, the per-graph view is unreachable for a
+    # deleted graph anyway. `details.slug` + `details.name` carry the human
+    # context the row lost when the FK went null.
+    await emit_event(
+        session,
+        action=actions.GRAPH_DELETE,
+        target_kind=actions.TARGET_GRAPH,
+        target_id=graph.id,
+        graph_id=graph.id,
+        actor_id=actor_id,
+        details={"slug": graph.slug, "name": graph.name},
+        trace_id=current_trace_id(),
+    )
     await session.delete(graph)
+    await session.flush()
 
 
 # ---------------------------------------------------------------------------
@@ -120,6 +199,7 @@ async def put_graph_connection(
     graph: Graph,
     payload,  # GraphConnectionCreate
     encryption_key: str,
+    actor_id: str,
 ) -> tuple[GraphConnection, bool]:
     """Create or replace the Graph's connection. Returns (connection, created)."""
     from invana.graphs.encryption import encrypt_credentials  # noqa: PLC0415
@@ -134,6 +214,21 @@ async def put_graph_connection(
         # (re-applies on every save so a prior reset is undone).
         _mark_section(graph, "graph_info", "complete")
         await session.flush()
+        await emit_event(
+            session,
+            action=actions.CONNECTION_ATTACH,
+            target_kind=actions.TARGET_CONNECTION,
+            target_id=connection.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={
+                "name": connection.name,
+                "uri": connection.uri,
+                "connector_class": connection.connector_class,
+                "read_only": connection.read_only,
+            },
+            trace_id=current_trace_id(),
+        )
         return connection, True
 
     # Replace: update all fields. connector_class is immutable once set.
@@ -142,6 +237,13 @@ async def put_graph_connection(
             status.HTTP_409_CONFLICT,
             detail="connector_class cannot be changed once a connection is established.",
         )
+    before = {
+        "name": existing.name,
+        "description": existing.description,
+        "uri": existing.uri,
+        "read_only": existing.read_only,
+        "has_auth": existing.auth_encrypted is not None,
+    }
     existing.name = payload.name
     existing.description = payload.description
     existing.uri = payload.uri
@@ -151,6 +253,29 @@ async def put_graph_connection(
     existing.status = "CONNECTING"
     _mark_section(graph, "graph_info", "complete")
     await session.flush()
+    after = {
+        "name": existing.name,
+        "description": existing.description,
+        "uri": existing.uri,
+        "read_only": existing.read_only,
+        "has_auth": existing.auth_encrypted is not None,
+    }
+    changed = diff_changed_fields(
+        before,
+        after,
+        fields=["name", "description", "uri", "read_only", "has_auth"],
+    )
+    if changed:
+        await emit_event(
+            session,
+            action=actions.CONNECTION_UPDATE,
+            target_kind=actions.TARGET_CONNECTION,
+            target_id=existing.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={"changed": changed, "name": existing.name},
+            trace_id=current_trace_id(),
+        )
     return existing, False
 
 
@@ -198,14 +323,35 @@ async def test_connection_credentials(
     return {"ok": True, "latency_ms": latency_ms}
 
 
-async def delete_graph_connection(session: AsyncSession, *, graph: Graph) -> GraphConnection | None:
+async def delete_graph_connection(
+    session: AsyncSession,
+    *,
+    graph: Graph,
+    actor_id: str,
+) -> GraphConnection | None:
     """Hard-delete the Graph's connection. Returns the removed row for manager cleanup."""
     connection = await get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         return None
+    snapshot = {
+        "name": connection.name,
+        "uri": connection.uri,
+        "connector_class": connection.connector_class,
+    }
+    conn_id = connection.id
     await session.delete(connection)
     # Removing the connection un-completes the graph_info wizard section.
     _mark_section(graph, "graph_info", "reset")
+    await emit_event(
+        session,
+        action=actions.CONNECTION_DELETE,
+        target_kind=actions.TARGET_CONNECTION,
+        target_id=conn_id,
+        graph_id=graph.id,
+        actor_id=actor_id,
+        details=snapshot,
+        trace_id=current_trace_id(),
+    )
     return connection
 
 
@@ -237,6 +383,7 @@ async def update_setup_section(
     graph: Graph,
     section: str,
     action: str,
+    actor_id: str,
 ) -> GraphRead:
     if section not in SETUP_SECTIONS:
         raise HTTPException(
@@ -250,6 +397,22 @@ async def update_setup_section(
         )
     _mark_section(graph, section, action)
     await session.flush()
+    event_action = {
+        "complete": actions.SETUP_COMPLETE,
+        "skip": actions.SETUP_SKIP,
+        "reset": actions.SETUP_RESET,
+    }.get(action)
+    if event_action is not None:
+        await emit_event(
+            session,
+            action=event_action,
+            target_kind=actions.TARGET_GRAPH,
+            target_id=graph.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={"section": section},
+            trace_id=current_trace_id(),
+        )
     return await _serialize_graph(session, graph)
 
 

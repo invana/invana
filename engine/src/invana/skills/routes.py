@@ -14,6 +14,8 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.auth.deps import get_current_user
+from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
     require_graph_admin,
@@ -51,9 +53,10 @@ async def create_skill(
     payload: SkillCreate,
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> SkillRead:
-    skill = await services.create_skill(session, graph_id=graph.id, payload=payload)
+    skill = await services.create_skill(session, graph_id=graph.id, payload=payload, actor_id=user.id)
     await session.commit()
     await session.refresh(skill)
     return SkillRead.model_validate(skill)
@@ -76,10 +79,11 @@ async def update_skill(
     skill_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> SkillRead:
     skill = await services.get_or_404(session, skill_id=skill_id, graph_id=graph.id)
-    updated = await services.update_skill(session, skill=skill, payload=payload)
+    updated = await services.update_skill(session, skill=skill, payload=payload, actor_id=user.id)
     await session.commit()
     await session.refresh(updated)
     return SkillRead.model_validate(updated)
@@ -90,9 +94,10 @@ async def delete_skill(
     skill_id: str = Path(...),
     _: GraphMember = Depends(require_graph_admin),
     graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     skill = await services.get_or_404(session, skill_id=skill_id, graph_id=graph.id)
-    await services.delete_skill(session, skill=skill)
+    await services.delete_skill(session, skill=skill, actor_id=user.id)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -46,12 +46,14 @@ There's also no UI surface for this today. The Studio shows current state only.
 ## Decision summary
 
 - **Audit-log pattern.** One `events` table; one row per domain write.
-- **Manual emission via `emit_event(...)` helper** called from service-layer functions (not auto-magic SQLAlchemy hooks). Explicit, grep-able, lets us capture context (actor, request-time before/after diff) without per-table boilerplate.
+- **Manual emission via `emit_event(...)` helper** called from service-layer functions (not auto-magic SQLAlchemy hooks). Explicit, grep-able, lets us capture context (actor, request-time changed-keys diff) without per-table boilerplate.
 - **Schema** carries `(graph_id?, actor_id?, actor_type, action, target_kind, target_id?, details JSONB, trace_id?, created_at)`. `graph_id` and `actor_id` are nullable so auth and system events fit the same row shape.
-- **Read API:** `GET /api/v1/events` (superuser only, all events, paginated) and `GET /api/v1/u/{username}/{graphSlug}/events` (any graph member, scoped to that graph).
+- **Details payload** = **changed-keys diff only** for updates: `{changed: {field: {before, after}}}`, skipping unchanged keys. Create / delete events store a `{name: ...}` snapshot for human-readable context after the entity is gone. Sensitive fields (`api_key`, `password`, `*_hash`, `*_encrypted`) are *always* omitted regardless.
+- **Read API:** `GET /api/v1/events` (superuser only, all events, paginated) and `GET /api/v1/u/{username}/{graphSlug}/events` (any graph member, scoped to that graph). Plus SSE companions for live tail (see § Live tail).
 - **Write API:** none. Events are emitted only by the engine itself.
-- **Studio:** new rail icon (Events) on every graph-scoped page; new full-page `/admin/events` (platform admin) reachable from `UserMenu`.
-- **Retention:** time-bucketed per `action` category — admin-tunable via settings, default 90 days for most events, 14 days for `query.execute`.
+- **Studio:** new rail icon (Events) on every graph-scoped page; new full-page `/platform/events` (superuser only) reachable from `UserMenu`.
+- **Retention:** **forever — audit logs are immutable.** No pruning, no TTL. Long-term storage planning (partitioning) is a separate ops concern, not in this RFC.
+- **Live tail:** SSE in v1. Server uses Postgres `LISTEN/NOTIFY` so multi-worker deployments fan out correctly without an external pub/sub.
 - **No new external dependencies.** Uses existing Postgres + SQLAlchemy + FastAPI; integrates with existing OTel via `trace_id` correlation.
 
 ---
@@ -236,7 +238,7 @@ The `actor` dict is denormalised from `users` so the UI doesn't need a second lo
 
 ### Global: Platform events page
 
-- New top-level route `/settings/platform-events` (or `/admin/events` — see Open questions; the slash chosen will be the maximize target).
+- New top-level route **`/platform/events`** (new `/platform/*` namespace for superuser surfaces — avoids the collision with `/admin` which belongs to starlette-admin, and gives a clean prefix for future platform-admin tools).
 - Reachable from `UserMenu` → "Platform events" (RoleGate gates the menu item to `superuser`).
 - Same component shape as `EventsSection` plus a `graph` filter dropdown (all graphs the platform has, since superuser).
 
@@ -244,20 +246,46 @@ The `actor` dict is denormalised from `users` so the UI doesn't need a second lo
 
 ## Retention
 
-Events grow unbounded if untouched. Strategy:
+**Events are forever.** This is an audit log; nothing in it is ever deleted. No TTL, no pruning cron, no per-category retention buckets, no admin settings to tune. The append-only invariant is the point — operators need to trust that a `member.role_change` from two years ago is still queryable.
 
-- **Default 90 days** for most actions.
-- **14 days** for `query.execute` (high volume, low individual value beyond recent debugging).
-- **Forever** for security-sensitive actions: `auth.password_change`, `auth.username_change`, `member.role_change`, `member.remove`, `graph.delete`. (Configurable, but the default is "keep forever".)
-- Implementation: a small daily cron (existing background-task setup or a simple SQL `DELETE WHERE created_at < ...` triggered from `invana.cli` per-action category) — deferred to its own slice; v1 ships without pruning.
+Consequences:
 
-Settings keys (under `invana.settings.AuditEvents`):
+- **`query.execute` is captured for every call.** Studio's Explorer + agent loops will be the dominant write source. Sized at MVP scale (low hundreds of concurrent graphs, 10s of queries/hour each), the table grows at a manageable rate; long-term partitioning is a future ops concern, not a v1 design decision.
+- **No `DELETE` paths on `/events` routes.** Read-only API; emission is engine-internal.
+- **Time-based partitioning (e.g. monthly `events_2026_05` children via `PARTITION BY RANGE (created_at)`) is the planned growth strategy** when the table crosses ~10M rows. Out of scope for v1 — but the schema deliberately uses `created_at DESC` indexes that survive partitioning unchanged.
 
-```
-INVANA_AUDIT_RETENTION_DEFAULT_DAYS   default 90
-INVANA_AUDIT_RETENTION_QUERY_DAYS     default 14
-INVANA_AUDIT_RETENTION_SECURITY_DAYS  default 0  (0 = forever)
-```
+---
+
+## Live tail (SSE)
+
+The Events views (per-graph + global) push new events to connected Studio sessions in real time via Server-Sent Events.
+
+### Endpoints
+
+- `GET /api/v1/u/{username}/{graphSlug}/events/stream` — emits new events for this graph as they're inserted. Auth: `require_graph_member`.
+- `GET /api/v1/events/stream` — global SSE for superuser. Same shape, no graph filter.
+
+Each event frame is the same `EventRead` JSON as the paginated read endpoint, one per `event:` line, terminated by a blank line.
+
+### Server implementation: Postgres `LISTEN / NOTIFY`
+
+- A trigger on `events INSERT` calls `pg_notify('events', row_to_json(NEW)::text)`. (Or — we issue `NOTIFY` from `emit_event` after the insert, before commit. Trigger is simpler + survives bypass; chose trigger.)
+- The engine maintains one dedicated asyncpg connection per worker process, in `LISTEN events` mode. Incoming notifications are fanned out to all open SSE clients of that worker.
+- Each SSE handler subscribes to an in-process channel filtered by `(graph_id == this graph)` (or unfiltered for the global stream). Filtering happens server-side after parsing the notification payload so we don't ship events the viewer isn't allowed to see.
+- Heartbeat: `: keepalive\n\n` every 25s to keep proxies (nginx, ELB) from closing idle connections.
+- Backpressure: per-client queue with a cap (e.g. 1k events); if a slow client overflows, the handler drops the oldest events and emits a `event: lost\n` sentinel so the client can request a refetch.
+
+### Why LISTEN/NOTIFY (and not in-memory pub/sub)
+
+- Works across uvicorn workers / Gunicorn processes without an external broker. In-memory pub/sub silently breaks under multi-process deployment (each worker has its own bus).
+- Native Postgres feature, asyncpg supports it natively, zero new dependencies.
+- Payload limit is 8 KiB per notification, which fits our row shape comfortably (no large JSONB diffs near this threshold; if they ever are, the trigger sends `{id}` only and the SSE handler re-fetches).
+
+### Studio: `useEventStream`
+
+- Hook around the native `EventSource` API; opens a connection scoped to the active section (`/u/.../events/stream` for the rail section; `/api/v1/events/stream` for the platform page).
+- On each frame: prepend to the TanStack Query cache for the events list (`queryClient.setQueryData(...)`). Pagination state remains intact — only the "newest" head moves.
+- Connection lifecycle: `EventSource` auto-reconnects on transient drops; we cap reconnect attempts and fall back to polling if the SSE endpoint 5xx's repeatedly.
 
 ---
 
@@ -311,26 +339,36 @@ Three slices, each independently shippable. Per the docs-split memory, each comp
 - **Done when:** each domain write produces the matching event; manual walkthrough of the studio shows the new Events section populating in real time.
 
 ### S-C — Studio Events surfaces
-- [ ] `studio/src/types/events.ts`, `services/api/events.ts`, `hooks/queries/useEvents.ts`.
+- [ ] `studio/src/types/events.ts`, `services/api/events.ts`, `hooks/queries/useEvents.ts`, `hooks/useEventStream.ts` (SSE).
 - [ ] `EventsSection` component (settings panel section + full-page maximize target `GraphEventsSettingsPage`).
 - [ ] Rail icon (Activity) added to `useGraphLeftNav`; `events` added to `SettingsSection` type.
-- [ ] `/admin/events` global page (superuser-gated via `RoleGate`); link in `UserMenu`.
-- [ ] Filter bar + keyset pagination.
-- **Done when:** rail icon opens the panel, events render newest-first with details expand; admin page shows all events with the graph-filter dropdown.
+- [ ] `/platform/events` global page (superuser-gated via `RoleGate`); link in `UserMenu`.
+- [ ] Filter bar + keyset pagination. SSE wired so the head of the list updates live; pagination state unaffected.
+- **Done when:** rail icon opens the panel, new events appear at the top of the list within a couple of seconds of being emitted; platform page shows all events with the graph-filter dropdown.
 
-Retention pruning is deferred to its own follow-up (S-D — out of MVP).
+### S-A scope additions (vs original draft)
+
+- Add the `events_insert` trigger + `LISTEN events` daemon connection per worker.
+- Add the two SSE endpoints (`.../events/stream` global + per-graph) alongside the paginated read endpoints.
+- No pruning cron — audit logs are forever (§ Retention).
 
 ---
 
 ## Open questions
 
-1. **Global page URL**: `/admin/events` (under the App shell, gated by RoleGate) vs `/settings/platform-events` (sits with the other settings routes)? Leaning `/admin/events` since it's a superuser-only surface that parallels `/admin` (starlette-admin), but that namespace currently belongs to starlette-admin itself. Could land at `/platform/events` to dodge the collision.
-2. **Event for graph creation vs first graph_id**: a `graph.create` event needs to live on the new graph. The emission happens after the row is inserted, so `graph_id = new_graph.id` works — confirming this is fine and not introducing a chicken-and-egg.
-3. **Query events sampling**: 14-day retention defends storage; do we also want per-graph sampling (`store only 1 in N`)? Probably no for MVP — re-evaluate if any graph reaches >10k queries/day.
-4. **SSE / live tail**: nice-to-have for the Events view ("new events appear as they happen"). Not in v1; polling on a 5-10s interval is fine.
-5. **Cross-graph privacy on global page**: if Graph A's events leak Graph B-member usernames via `actor.username` in a denormalised view that a superuser then shares — is that an issue? Superuser-only, low risk; flag it for ops policy.
-6. **Webhook delivery / external subscribers**: deferred — clean to add later by tailing the events table or via a small outbox pattern.
-7. **MVP scope update**: this RFC pulls in a new Layer 2.x section (Events) — `mvp.md` to add `§ 2.11 Events` + a new slice (S2.5 or insert as parallel-to-S5 track). Decision: drop in after § 2.10 as **§ 2.11 Events** and sequence the implementation slice as **S5.5** (since S5 just shipped and S6 datasets is the next big slice).
+Resolved:
+
+1. ~~Global page URL~~ — **`/platform/events`**. New `/platform/*` namespace dodges the starlette-admin collision and gives a clean prefix for future platform-admin surfaces.
+2. ~~Detail capture depth~~ — **changed-keys diff only** for updates (`{changed: {field: {before, after}}}`); create/delete events keep a `{name: ...}` snapshot; sensitive fields always omitted. See § Decision summary.
+3. ~~Query events sampling / retention~~ — **capture every query; never delete.** Events are an audit log; retention is forever. See § Retention.
+4. ~~SSE / live tail~~ — **ship in v1.** Postgres `LISTEN/NOTIFY` driven, one daemon connection per worker. See § Live tail.
+5. **Event for graph creation vs first graph_id** — confirmed not a chicken-and-egg: emission runs after the row is inserted, so `graph_id = new_graph.id` is set. Noted, no action.
+
+Remaining / deferred:
+
+6. **Cross-graph privacy on platform page**: if Graph A's events leak Graph B-member usernames via `actor.username` in a denormalised view that a superuser then shares — is that an issue? Superuser-only, low risk; flag it for ops policy.
+7. **Webhook delivery / external subscribers**: deferred — clean to add later by tailing the events table (via the SSE endpoints) or via a small outbox pattern.
+8. **MVP scope update**: this RFC pulls in a new Layer 2.x section (Events) — `mvp.md` to add `§ 2.11 Events` + a new slice (S5.5 sequenced between S5 and S6). Apply once the RFC is accepted.
 
 ---
 

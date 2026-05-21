@@ -7,7 +7,14 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@invana/ui";
-import { LogOut, Mail, UserCircle, UserCog, Users } from "lucide-react";
+import {
+	Activity,
+	LogOut,
+	Mail,
+	UserCircle,
+	UserCog,
+	Users,
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { RoleGate } from "../RoleGate";
@@ -95,6 +102,10 @@ export function UserMenu() {
 					</DropdownMenuItem>
 				)}
 				<RoleGate require="superuser">
+					<DropdownMenuItem onClick={() => navigate("/platform/events")}>
+						<Activity className="w-4 h-4 mr-2" />
+						Platform events
+					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => {
 							window.location.href = "/admin";
