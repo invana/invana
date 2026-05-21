@@ -1,4 +1,3 @@
-import { Button } from "@invana/ui";
 import {
 	ArrowRight,
 	CheckCircle2,
@@ -193,27 +192,32 @@ function WizardRow({
 				</div>
 				<p className="text-muted-foreground mt-1">{meta.description}</p>
 			</div>
-			<div className="flex items-center gap-2 shrink-0">
+			<div className="flex items-center gap-4 shrink-0">
 				{status === "todo" && isSkippable && (
-					<Button variant="ghost" size="sm" onClick={onSkip}>
+					<button
+						type="button"
+						onClick={onSkip}
+						className="text-muted-foreground hover:text-foreground hover:underline"
+					>
 						Skip
-					</Button>
+					</button>
 				)}
 				{(status === "skipped" || status === "done") && (
-					<Button variant="ghost" size="sm" onClick={onReset}>
+					<button
+						type="button"
+						onClick={onReset}
+						className="text-muted-foreground hover:text-foreground hover:underline"
+					>
 						Reset
-					</Button>
+					</button>
 				)}
-				<Button
-					variant={status === "todo" ? "default" : "outline"}
-					size="sm"
-					asChild
+				<Link
+					to={path}
+					className="flex items-center gap-1 text-primary hover:underline font-medium"
 				>
-					<Link to={path}>
-						{status === "todo" ? "Set up" : "Edit"}
-						<ArrowRight className="w-3.5 h-3.5 ml-1" />
-					</Link>
-				</Button>
+					{status === "todo" ? "Set up" : "Edit"}
+					<ArrowRight className="w-3.5 h-3.5" />
+				</Link>
 			</div>
 		</div>
 	);
