@@ -91,14 +91,14 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Deferred (post-MVP):** [-] Multi-connection Graphs · [-] Source-ingestion connectors (PDF / DOCX / XLSX / CSV / TXT / Git / MySQL) — datasets are produced externally in MVP, see L3 · [-] Connector plugin interface · [-] Custom connector registration
 
 ### 2.4 Skills (graph-scoped)
-- **Backend:** [ ] `Skill` entity — `graph_id`, `name`, `description`, `content` (markdown), `when_to_use` · CRUD under `/api/v1/u/{username}/{graphSlug}/skills/...`
-- **Frontend:** [ ] Skills tab in Graph settings · list + editor pages · markdown editor (reuse CodeMirror instance) · `useSkills` hook
-- **Integrations:** CodeMirror 6 markdown mode (reuse query console instance) · `@invana/design-kit` form components
+- **Backend:** [x] `Skill` entity (graph_id FK CASCADE, unique (graph_id, name)) — `name`, `description`, `content` (markdown), `when_to_use` (markdown) · CRUD under `/api/v1/u/{username}/{graphSlug}/skills/...` · admin-only writes · 409 on duplicate name.
+- **Frontend:** [x] Skills section in the graph rail (Wand2 icon) · list + add/edit form (name / description / content textarea / when_to_use) · maximize-to-full-page route at `/settings/skills` · plain textareas for now (markdown rendering deferred).
+- **Integrations:** none yet — markdown editor (CodeMirror reuse) deferred until the surface is exercised.
 
 ### 2.5 Instructions (graph-scoped)
-- **Backend:** [ ] `Instruction` entity — `graph_id`, `name`, `content` (markdown), `priority` · CRUD under `/api/v1/u/{username}/{graphSlug}/instructions/...`
-- **Frontend:** [ ] Instructions tab in Graph settings · markdown editor · list
-- **Integrations:** CodeMirror 6 markdown mode
+- **Backend:** [x] `Instruction` entity (graph_id FK CASCADE, unique (graph_id, name)) — `name`, `content` (markdown), `priority` (int 0–1000, default 100; higher first) · CRUD under `/api/v1/u/{username}/{graphSlug}/instructions/...` · admin-only writes · 409 on duplicate name · service-side `ORDER BY priority DESC, name ASC`.
+- **Frontend:** [x] Instructions section in the graph rail (ScrollText icon, between Skills and Datasets) · list with `p<priority>` badge · add/edit form with name + priority number input + content textarea · maximize-to-full-page route at `/settings/instructions`.
+- **Integrations:** none yet.
 
 ### 2.6 LLM providers (graph-scoped)
 - **Backend:** [x] `LLMProvider` entity (graph-scoped, CASCADE) with provider enum (anthropic / openai / google / azure / ollama / local). CRUD + `POST .../llm/{id}/ping` + `POST .../llm/{id}/set-default` under `/api/v1/u/{username}/{graphSlug}/llm/...`. Partial unique `(graph_id) WHERE is_default = true`. Reuses `invana.graphs.encryption` for Fernet on `api_key`.
@@ -509,11 +509,11 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 **Done when:** saved Anthropic key produces a 200 from `/llm/{id}/ping` for the active Graph. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.6).
 
-### S5 — Skills + Instructions (graph-scoped)
-- **BE:** Skill + Instruction CRUD under `/u/:username/:graphSlug/{skills,instructions}/...`
-- **FE:** Skills + Instructions tabs in Graph settings · CodeMirror markdown editor (reuse query console instance)
+### S5 — Skills + Instructions (graph-scoped) — **shipped** ✅
+- **BE:** [x] Skill + Instruction CRUD under `/u/:username/:graphSlug/{skills,instructions}/...`; unique (graph_id, name) on both; Instructions priority field (0–1000, sorted desc).
+- **FE:** [x] Skills + Instructions sections in the rail · list + add/edit forms · full-page maximize routes.
 
-**Done when:** user authors a skill, sees it persisted, edits it.
+**Done when:** user authors a skill, sees it persisted, edits it. ✅ — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.4 + § 2.5). Markdown editor (CodeMirror reuse) deferred — plain textareas for now.
 
 > **S3, S4, S5 run as parallel tracks once S2 lands.** Different BE modules, different FE routes, no shared state.
 

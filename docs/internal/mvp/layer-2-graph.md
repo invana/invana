@@ -1,12 +1,12 @@
 # Layer 2 — Graph (container + settings)
 
-> **Status**: S1.5 + S2 + S4 shipped · S3 partial (schema wired; canvas stubbed) · **Tracked by** [RFC-017](../../rfcs/017-graph-as-primary-container.md)
+> **Status**: S1.5 + S2 + S4 + S5 shipped · S3 partial (schema wired; canvas stubbed) · **Tracked by** [RFC-017](../../rfcs/017-graph-as-primary-container.md)
 > **Author**: Invana Team
 > **Created**: 2026-05-21
 > **Updated**: 2026-05-21
-> **Maps to MVP**: Layer 2 of `docs/internal/mvp.md`, Slices **S1.5** + **S2** + **S4** + partial **S3**
+> **Maps to MVP**: Layer 2 of `docs/internal/mvp.md`, Slices **S1.5** + **S2** + **S4** + **S5** + partial **S3**
 
-> **About this doc.** Layer 2 collapses the original Workspace + Mission split into a single `Graph` container (per RFC-017). Membership and invitations come from Layer 1; everything else — DB binding (1:1 `GraphConnection`), intent/objectives, setup wizard, settings UX, LLM providers — lives here. This doc records the shipped surface; § 2.4 (Skills), § 2.5 (Instructions), § 2.7 (Agents) are scaffolded in `mvp.md` and ship in later slices.
+> **About this doc.** Layer 2 collapses the original Workspace + Mission split into a single `Graph` container (per RFC-017). Membership and invitations come from Layer 1; everything else — DB binding (1:1 `GraphConnection`), intent/objectives, setup wizard, settings UX, LLM providers, Skills, Instructions — lives here. This doc records the shipped surface; § 2.7 (Agents) is scaffolded in `mvp.md` and ships in a later slice.
 
 ---
 
@@ -82,12 +82,38 @@ A new Graph progresses through a 4-section **setup wizard** (Graph Info / Intent
 - `api_key` on edit: omitting leaves the stored key untouched; typing a new value re-encrypts. Helper text says "leave blank to keep stored key".
 - Full-page maximize target at `/u/:username/:graphSlug/settings/llms` (`GraphLLMsSettingsPage` — thin wrapper).
 
+### 2.4 Skills (S5)
+
+**Engine** — `engine/src/invana/skills/`:
+- `Skill` entity: `graph_id` (FK CASCADE), `name`, `description`, `content` (markdown text), `when_to_use` (markdown text). Unique on `(graph_id, name)`.
+- Routes at `/api/v1/u/{username}/{graphSlug}/skills` — admin-only writes, member reads:
+  - `GET /` — list (alphabetical)
+  - `POST /` — create (409 on duplicate name via IntegrityError handler)
+  - `GET /{id}` — detail
+  - `PATCH /{id}` — partial update
+  - `DELETE /{id}` — hard delete
+
+**Studio**
+- `SkillsSection` in the settings panel (rail icon `Wand2`): list view (name + truncated description, Edit / Delete row actions) + add/edit form (name, description, content textarea, when_to_use textarea).
+- Plain `Textarea` for `content` + `when_to_use` for now — CodeMirror markdown reuse is deferred until the surface gets more usage.
+- Full-page maximize target at `/u/:username/:graphSlug/settings/skills` (`GraphSkillsSettingsPage` — thin wrapper).
+
+### 2.5 Instructions (S5)
+
+**Engine** — `engine/src/invana/instructions/`:
+- `Instruction` entity: `graph_id` (FK CASCADE), `name`, `content` (markdown text), `priority` (int 0–1000, default 100). Unique on `(graph_id, name)`. Server-side `ORDER BY priority DESC, name ASC` so the list is stable.
+- Routes at `/api/v1/u/{username}/{graphSlug}/instructions` — same CRUD shape as Skills (admin writes, member reads, 409 on duplicate name).
+
+**Studio**
+- `InstructionsSection` in the settings panel (rail icon `ScrollText`, between Skills and Datasets): list view with a `p<priority>` badge + Edit / Delete row actions; add/edit form with name + priority (number input, validated client-side 0–1000) + content textarea.
+- Full-page maximize target at `/u/:username/:graphSlug/settings/instructions` (`GraphInstructionsSettingsPage` — thin wrapper).
+
 ### 2.8 Graph settings shell (rail + swap pattern)
 
 The original "landing page with sub-section links" was replaced (per user feedback) with a docked rail-icon UX that lives across **every** graph page. No drawer, no modal.
 
 **Studio**
-- Each settings section is a top-level icon in the page's `leftNav` rail: Info · Intent · LLMs · Skills · Datasets · Members · Invitations. Defined once in `useGraphLeftNav(username, graphSlug, activeTab)` and consumed by Overview, Explorer, and Modeller — so every graph page exposes the same chrome.
+- Each settings section is a top-level icon in the page's `leftNav` rail: Info · Intent · LLMs · Skills · Instructions · Datasets · Members · Invitations. Defined once in `useGraphLeftNav(username, graphSlug, activeTab)` and consumed by Overview, Explorer, and Modeller — so every graph page exposes the same chrome.
 - Clicking a section icon calls `useSettingsPanel().setSection(section)`, which sets `?settings=<section>` on the current URL. The page's `leftSection` slot then swaps from its default content (QueryPanel on Explorer, SchemaNav on Modeller, hidden on Overview) to `<SettingsPanel/>`, which renders just that section's content plus a small header with `maximize` + `close` buttons. Closing clears the URL param; navigating to a different graph view also clears it.
 - `SettingsPanel` is a section dispatcher only — no inner sub-nav (the rail _is_ the sub-nav).
 - Standalone routes at `/u/:username/:graphSlug/settings/<section>` remain as deep-link / maximize targets, rendering the same `<XSection>` component inside page chrome with a "Back to overview" link.
@@ -150,6 +176,19 @@ is_default   bool    default false — service unsets other defaults in the same
 ```
 
 `LLMProviderRead` strips `api_key_encrypted` and surfaces `has_api_key: bool` instead, so clients can show "key set ✓" without exposing ciphertext.
+
+### `SkillCreate` / `InstructionCreate`
+
+```
+SkillCreate                       InstructionCreate
+─────────────────────────         ─────────────────────────
+name         string  required     name      string  required, 1–255
+description  string  default ""   content   string  default ""
+content      string  default ""   priority  int     default 100, 0–1000
+when_to_use  string  default ""
+```
+
+Both surface 409 on duplicate `(graph_id, name)` (server catches `IntegrityError` and translates to a clean message). `PATCH` accepts any subset.
 
 ## Notable design choices
 

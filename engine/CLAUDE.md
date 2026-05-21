@@ -38,7 +38,9 @@ src/invana/
   settings.py    pydantic-settings, env prefix INVANA_
 ```
 
-Future modules (per `docs/internal/mvp.md`): `datasets/`, `stitcher/`, `skills/`, `instructions/`, `llm_providers/`, `agents/` — all graph-scoped.
+Graph-scoped modules already shipped beyond `graphs/` itself: `llm_providers/` (S4 — RFC-017/§2.6), `skills/` + `instructions/` (S5 — §2.4/§2.5).
+
+Future modules (per `docs/internal/mvp.md`): `datasets/`, `stitcher/`, `agents/` — all graph-scoped.
 
 ## Rules that apply here
 
