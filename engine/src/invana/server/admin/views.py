@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from starlette.requests import Request
 from starlette_admin import DropDown, StringField
@@ -25,6 +27,11 @@ from invana.modeller.models import (
     ValidationRule,
 )
 from invana.skills.models import Skill
+
+# Custom templates (currently: base.html with theme switcher) live alongside
+# this module. starlette-admin's Jinja loader checks templates_dir first and
+# falls through to the package defaults for anything we don't override.
+_TEMPLATES_DIR = str(Path(__file__).parent / "templates")
 
 
 class GraphSchemaView(ModelView):
@@ -360,6 +367,7 @@ def mount_admin(app: FastAPI) -> None:
         app.state.sync_engine,
         title="Invana Admin",
         base_url="/admin",
+        templates_dir=_TEMPLATES_DIR,
         auth_provider=SuperuserAuthProvider(parent_app=app),
     )
     # ── Identity (Layer 1) ───────────────────────────────────────────────────
