@@ -6,7 +6,11 @@ import { useAppHeader } from "../../components/header/useAppHeader";
 import { SettingsPanel } from "../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../components/settings/useSettingsPanel";
-import { useGraphQuery } from "../../hooks/queries/useGraphs";
+import {
+	useGraphConnectionQuery,
+	useGraphQuery,
+} from "../../hooks/queries/useGraphs";
+import { GraphStatusBar } from "./components/GraphStatusBar";
 
 export function GraphOverviewPage() {
 	const { username, graphSlug } = useParams<{
@@ -20,6 +24,7 @@ export function GraphOverviewPage() {
 		isError,
 		error,
 	} = useGraphQuery(username, graphSlug);
+	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "overview");
 	const header = useAppHeader({ pageLabel: "Overview" });
@@ -191,6 +196,15 @@ export function GraphOverviewPage() {
 					/>
 				) : (
 					mainContent
+				),
+			}}
+			footer={{
+				className: "!h-[25px]",
+				left: <GraphStatusBar graph={connection ?? undefined} />,
+				right: (
+					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
+						<span>Overview</span>
+					</div>
 				),
 			}}
 		/>

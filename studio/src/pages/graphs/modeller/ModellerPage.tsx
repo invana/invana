@@ -7,6 +7,7 @@ import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
+import { GraphStatusBar } from "../components/GraphStatusBar";
 import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
@@ -183,31 +184,17 @@ export function ModellerPage() {
 			footer={{
 				className: "!h-[25px]",
 				left: (
-					<div className="flex items-center gap-4 px-2 text-base text-muted-foreground">
-						{graph && (
-							<>
-								<span>{graph.name}</span>
-								<span>•</span>
-								<span
-									className={
-										graph.status === "ACTIVE"
-											? "text-green-500"
-											: "text-destructive"
-									}
-								>
-									{graph.status}
-								</span>
-							</>
-						)}
-						{version && (
-							<>
-								<span>•</span>
-								<span>{nodeTypes.length} node types</span>
-								<span>•</span>
-								<span>{edgeTypes.length} edge types</span>
-							</>
-						)}
-					</div>
+					<GraphStatusBar
+						graph={graph ?? undefined}
+						metrics={
+							version ? (
+								<div className="flex items-center gap-3">
+									<span>{nodeTypes.length} node types</span>
+									<span>{edgeTypes.length} edge types</span>
+								</div>
+							) : null
+						}
+					/>
 				),
 				right: (
 					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">

@@ -11,9 +11,9 @@ import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredB
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import type { QueryLanguage } from "../../../types/graphs";
 import type { QueryResultItem } from "../../../types/query";
+import { GraphStatusBar } from "../components/GraphStatusBar";
 import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import { CanvasToolbar } from "./components/CanvasToolbar";
-import { ExplorerStatusBar } from "./components/ExplorerStatusBar";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { QueryPanel, type QueryRunPayload } from "./components/QueryPanel";
 import { useQueryExecution } from "./hooks/useQueryExecution";
@@ -123,11 +123,15 @@ export function ExplorerPage() {
 
 	// ── Status bar ────────────────────────────────────────────────────────────
 	const footerLeft = (
-		<ExplorerStatusBar
+		<GraphStatusBar
 			graph={graph ?? undefined}
-			nodeCount={nodeCount}
-			relationshipCount={relCount}
-			queryCount={history.length}
+			metrics={
+				<div className="flex items-center gap-3">
+					<span>{nodeCount} nodes</span>
+					<span>{relCount} relationships</span>
+					<span>{history.length} queries</span>
+				</div>
+			}
 		/>
 	);
 
