@@ -1,32 +1,28 @@
-import { AppLayoutV2 } from "@invana/themes";
 import { Button, ScrollArea, Skeleton } from "@invana/ui";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
+import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
-import { AppVersion } from "../components/AppVersion";
-import { GraphStatusBar } from "../components/GraphStatusBar";
-import { useGraphWorkspace } from "../shared/useGraphWorkspace";
+import { GraphDetail } from "../components/GraphDetail";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
 import { SchemaCanvas } from "./components/SchemaCanvas";
 import { SchemaNav } from "./components/SchemaNav";
 
 export function ModellerPage() {
-	const {
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
+	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
 		username,
 		graphSlug,
-		graph,
-		graphLoading,
-		connectionMissing,
-		settingsPanel,
-		leftNav,
-		withSettingsTakeover,
-		withSettingsAsMain,
-	} = useGraphWorkspace({ sectionId: "modeller" });
+	);
+	const connectionMissing = !graphLoading && !graph;
 	const {
 		data: version,
 		isLoading: versionLoading,
@@ -49,35 +45,6 @@ export function ModellerPage() {
 			setIntrospecting(false);
 		}
 	};
-
-	const header = useAppHeader({
-		pageLabel: "Modeller",
-		rightExtras: (
-			<>
-				<Button
-					variant="outline"
-					size="sm"
-					className="h-7"
-					onClick={() => refetch()}
-				>
-					<RefreshCw className="w-3 h-3 mr-1" />
-					Refresh
-				</Button>
-				<Button
-					variant="outline"
-					size="sm"
-					className="h-7"
-					onClick={handleIntrospect}
-					disabled={introspecting}
-				>
-					<RefreshCw
-						className={`w-3 h-3 mr-1 ${introspecting ? "animate-spin" : ""}`}
-					/>
-					{introspecting ? "Introspecting…" : "Introspect"}
-				</Button>
-			</>
-		),
-	});
 
 	const isLoading = graphLoading || versionLoading;
 	const nodeTypes = version?.node_types ?? [];
@@ -135,80 +102,78 @@ export function ModellerPage() {
 		</ScrollArea>
 	);
 
-	// When settings is expanded it takes over the entire content area —
-	// drop left + right sections so SchemaNav / right panel don't sandwich it.
-	const settingsExpanded = settingsPanel.isOpen && settingsPanel.expanded;
-
 	return (
-		<AppLayoutV2
-			leftNav={leftNav}
-			header={header}
-			leftSection={
-				settingsExpanded
-					? undefined
-					: {
-							defaultSize: settingsPanel.isOpen ? "420px" : "260px",
-							minSize: settingsPanel.isOpen ? "320px" : "180px",
-							// Generous max so wide schema lists (long type names, deep
-							// trees) can spread out. mainSection.minSize keeps the canvas
-							// usable.
-							maxSize: settingsPanel.isOpen ? "800px" : "900px",
-							collapsible: false,
-							content: withSettingsTakeover(leftContent),
-						}
+		<GraphDetail
+			sectionId="modeller"
+			pageLabel="Modeller"
+			headerRightExtras={
+				<>
+					<Button
+						variant="outline"
+						size="sm"
+						className="h-7"
+						onClick={() => refetch()}
+					>
+						<RefreshCw className="w-3 h-3 mr-1" />
+						Refresh
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						className="h-7"
+						onClick={handleIntrospect}
+						disabled={introspecting}
+					>
+						<RefreshCw
+							className={`w-3 h-3 mr-1 ${introspecting ? "animate-spin" : ""}`}
+						/>
+						{introspecting ? "Introspecting…" : "Introspect"}
+					</Button>
+				</>
 			}
+			leftSection={{
+				// Generous max so wide schema lists (long type names, deep trees)
+				// can spread out. mainSection.minSize keeps the canvas usable.
+				defaultSize: "260px",
+				minSize: "180px",
+				maxSize: "900px",
+				collapsible: false,
+				content: leftContent,
+			}}
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",
 				// Canvas stays in place even when the connection isn't attached
 				// — it'll render empty. The leftSection banner is the explainer.
-				content: withSettingsAsMain(
+				content: (
 					<SchemaCanvas
 						nodeTypes={nodeTypes}
 						edgeTypes={edgeTypes}
 						selected={selected}
 						onSelect={setSelected}
-					/>,
-				),
-			}}
-			rightSection={
-				settingsExpanded
-					? undefined
-					: {
-							defaultSize: "360px",
-							minSize: "240px",
-							maxSize: "600px",
-							collapsible: false,
-							content: rightContent,
-						}
-			}
-			footer={{
-				className: "!h-[25px]",
-				left: (
-					<GraphStatusBar
-						graph={graph ?? undefined}
-						metrics={
-							version ? (
-								<div className="flex items-center gap-3">
-									<span>{nodeTypes.length} node types</span>
-									<span>{edgeTypes.length} edge types</span>
-								</div>
-							) : null
-						}
 					/>
 				),
-				right: (
-					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
-						{version?.version && (
-							<span title="Active schema version">
-								schema v{version.version}
-							</span>
-						)}
-						<AppVersion />
-						<span>Modeller</span>
-					</div>
-				),
 			}}
+			rightSection={{
+				defaultSize: "360px",
+				minSize: "240px",
+				maxSize: "600px",
+				collapsible: false,
+				content: rightContent,
+			}}
+			statusMetrics={
+				version ? (
+					<div className="flex items-center gap-3">
+						<span>{nodeTypes.length} node types</span>
+						<span>{edgeTypes.length} edge types</span>
+					</div>
+				) : null
+			}
+			footerRightExtras={
+				version?.version ? (
+					<span title="Active schema version">schema v{version.version}</span>
+				) : null
+			}
 		/>
 	);
 }

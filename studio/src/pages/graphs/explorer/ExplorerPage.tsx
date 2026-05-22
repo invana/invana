@@ -1,19 +1,17 @@
-import { AppLayoutV2 } from "@invana/themes";
 import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
 	GraphCanvas,
 	type GraphCanvasEdge,
 	type GraphCanvasNode,
 } from "../../../components/canvas/GraphCanvas";
-import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
+import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import type { QueryLanguage } from "../../../types/graphs";
 import type { QueryResultItem } from "../../../types/query";
-import { AppVersion } from "../components/AppVersion";
-import { GraphStatusBar } from "../components/GraphStatusBar";
-import { useGraphWorkspace } from "../shared/useGraphWorkspace";
+import { GraphDetail } from "../components/GraphDetail";
 import { CanvasToolbar } from "./components/CanvasToolbar";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { QueryPanel, type QueryRunPayload } from "./components/QueryPanel";
@@ -28,16 +26,15 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 ];
 
 export function ExplorerPage() {
-	const {
+	const { username, graphSlug } = useParams<{
+		username: string;
+		graphSlug: string;
+	}>();
+	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
 		username,
 		graphSlug,
-		graph,
-		connectionMissing,
-		settingsPanel,
-		leftNav,
-		withSettingsTakeover,
-		withSettingsAsMain,
-	} = useGraphWorkspace({ sectionId: "explorer" });
+	);
+	const connectionMissing = !graphLoading && !graph;
 
 	const { mutation, history } = useQueryExecution(username, graphSlug);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
@@ -45,7 +42,6 @@ export function ExplorerPage() {
 		graphSlug,
 	);
 	const llmProviders = llmProvidersResponse?.items ?? [];
-	const header = useAppHeader({ pageLabel: "Explorer" });
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
 	const [selected, setSelected] = useState<QueryResultItem | null>(null);
@@ -111,7 +107,6 @@ export function ExplorerPage() {
 		}
 	};
 
-	// ── Canvas panel ──────────────────────────────────────────────────────────
 	// Selection isn't yet emitted by the shared canvas (canvas-react v0
 	// doesn't wrap ClickSelectBehaviour). `selected` stays null until that
 	// lands; InspectorPanel falls back to its empty state.
@@ -122,85 +117,54 @@ export function ExplorerPage() {
 		</div>
 	);
 
-	// ── Status bar ────────────────────────────────────────────────────────────
-	const footerLeft = (
-		<GraphStatusBar
-			graph={graph ?? undefined}
-			metrics={
+	const leftContent = connectionMissing ? (
+		<SetupRequiredBanner pageLabel="Explorer" />
+	) : (
+		<QueryPanel
+			availableLanguages={availableLanguages}
+			defaultLanguage={defaultLanguage}
+			llmProviders={llmProviders}
+			onRun={handleRun}
+			isRunning={mutation.isPending}
+			history={history}
+		/>
+	);
+
+	return (
+		<GraphDetail
+			sectionId="explorer"
+			pageLabel="Explorer"
+			leftSection={{
+				// Generous max so long Cypher/Gremlin queries can spread out.
+				// mainSection.minSize below still keeps the canvas usable when
+				// the user drags the divider far right.
+				defaultSize: "300px",
+				minSize: "240px",
+				maxSize: "900px",
+				collapsible: false,
+				content: leftContent,
+			}}
+			mainSection={{
+				defaultSize: "600px",
+				minSize: "300px",
+				// Canvas stays in place even when the connection isn't attached
+				// — it'll render empty. The leftSection banner is the explainer.
+				content: canvasContent,
+			}}
+			rightSection={{
+				defaultSize: "280px",
+				minSize: "240px",
+				maxSize: "360px",
+				collapsible: false,
+				content: <InspectorPanel selected={selected} allItems={canvasData} />,
+			}}
+			statusMetrics={
 				<div className="flex items-center gap-3">
 					<span>{nodeCount} nodes</span>
 					<span>{relCount} relationships</span>
 					<span>{history.length} queries</span>
 				</div>
 			}
-		/>
-	);
-
-	// When settings is expanded it takes over the entire content area —
-	// drop left + right sections so QueryPanel / Inspector don't sandwich it.
-	const settingsExpanded = settingsPanel.isOpen && settingsPanel.expanded;
-
-	return (
-		<AppLayoutV2
-			leftNav={leftNav}
-			header={header}
-			leftSection={
-				settingsExpanded
-					? undefined
-					: {
-							defaultSize: settingsPanel.isOpen ? "420px" : "300px",
-							minSize: settingsPanel.isOpen ? "320px" : "240px",
-							// Generous max so long Cypher/Gremlin queries can spread out.
-							// mainSection.minSize below still keeps the canvas usable when
-							// the user drags the divider far right.
-							maxSize: settingsPanel.isOpen ? "800px" : "900px",
-							collapsible: false,
-							content: withSettingsTakeover(
-								connectionMissing ? (
-									<SetupRequiredBanner pageLabel="Explorer" />
-								) : (
-									<QueryPanel
-										availableLanguages={availableLanguages}
-										defaultLanguage={defaultLanguage}
-										llmProviders={llmProviders}
-										onRun={handleRun}
-										isRunning={mutation.isPending}
-										history={history}
-									/>
-								),
-							),
-						}
-			}
-			mainSection={{
-				defaultSize: "600px",
-				minSize: "300px",
-				// Canvas stays in place even when the connection isn't attached
-				// — it'll render empty. The leftSection banner is the explainer.
-				content: withSettingsAsMain(canvasContent),
-			}}
-			rightSection={
-				settingsExpanded
-					? undefined
-					: {
-							defaultSize: "280px",
-							minSize: "240px",
-							maxSize: "360px",
-							collapsible: false,
-							content: (
-								<InspectorPanel selected={selected} allItems={canvasData} />
-							),
-						}
-			}
-			footer={{
-				className: "!h-[25px]",
-				left: footerLeft,
-				right: (
-					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
-						<AppVersion />
-						<span>Explorer</span>
-					</div>
-				),
-			}}
 		/>
 	);
 }

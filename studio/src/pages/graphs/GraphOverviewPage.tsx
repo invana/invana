@@ -1,17 +1,9 @@
-import { AppLayoutV2 } from "@invana/themes";
 import { Button, Skeleton } from "@invana/ui";
 import { ArrowRight, FileText, GitGraph, Network } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppHeader } from "../../components/header/useAppHeader";
-import { SettingsPanel } from "../../components/settings/SettingsPanel";
-import { useGraphLeftNav } from "../../components/settings/useGraphLeftNav";
 import { useSettingsPanel } from "../../components/settings/useSettingsPanel";
-import {
-	useGraphConnectionQuery,
-	useGraphQuery,
-} from "../../hooks/queries/useGraphs";
-import { AppVersion } from "./components/AppVersion";
-import { GraphStatusBar } from "./components/GraphStatusBar";
+import { useGraphQuery } from "../../hooks/queries/useGraphs";
+import { GraphDetail } from "./components/GraphDetail";
 
 export function GraphOverviewPage() {
 	const { username, graphSlug } = useParams<{
@@ -25,10 +17,7 @@ export function GraphOverviewPage() {
 		isError,
 		error,
 	} = useGraphQuery(username, graphSlug);
-	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
-	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", "overview");
-	const header = useAppHeader({ pageLabel: "Overview" });
 
 	// Required wizard sections must be completed for Modeller/Explorer/Query
 	// to function. The wizard itself lives in the Info section now; we only
@@ -163,51 +152,14 @@ export function GraphOverviewPage() {
 		);
 	}
 
-	const settingsOpen = settingsPanel.isOpen && !!username && !!graphSlug;
-	const settingsExpanded = settingsOpen && settingsPanel.expanded;
-	const showSettingsInLeft = settingsOpen && !settingsPanel.expanded;
-
 	return (
-		<AppLayoutV2
-			leftNav={leftNav}
-			header={header}
-			leftSection={
-				showSettingsInLeft
-					? {
-							defaultSize: "420px",
-							minSize: "320px",
-							maxSize: "640px",
-							collapsible: false,
-							content: (
-								<SettingsPanel
-									username={username as string}
-									graphSlug={graphSlug as string}
-								/>
-							),
-						}
-					: undefined
-			}
+		<GraphDetail
+			sectionId="overview"
+			pageLabel="Overview"
 			mainSection={{
 				defaultSize: "800px",
 				minSize: "400px",
-				content: settingsExpanded ? (
-					<SettingsPanel
-						username={username as string}
-						graphSlug={graphSlug as string}
-					/>
-				) : (
-					mainContent
-				),
-			}}
-			footer={{
-				className: "!h-[25px]",
-				left: <GraphStatusBar graph={connection ?? undefined} />,
-				right: (
-					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
-						<AppVersion />
-						<span>Overview</span>
-					</div>
-				),
+				content: mainContent,
 			}}
 		/>
 	);
