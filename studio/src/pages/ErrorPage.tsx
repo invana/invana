@@ -10,7 +10,11 @@ export function ErrorPage() {
 	const error = useRouteError();
 	const navigate = useNavigate();
 
-	const is404 = isRouteErrorResponse(error) && error.status === 404;
+	// Rendered in two ways:
+	// 1. As `errorElement` — thrown route errors land here with `error` set.
+	// 2. As the `path: "*"` catch-all element — no router error, so `error`
+	//    is null. That means no route matched the URL, i.e. 404.
+	const is404 = !error || (isRouteErrorResponse(error) && error.status === 404);
 	const title = is404 ? "404 — Page not found" : "Something went wrong";
 	const description = is404
 		? "The page you're looking for doesn't exist or has been moved."
