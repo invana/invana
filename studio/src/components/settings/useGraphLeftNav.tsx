@@ -89,12 +89,6 @@ export function useGraphLeftNav(
 
 	const topNavItems = [
 		{
-			name: "Graphs",
-			icon: Database,
-			tooltipSide: "right" as const,
-			onClick: () => navigate("/graphs"),
-		},
-		{
 			name: "Overview",
 			icon: Home,
 			tooltipSide: "right" as const,

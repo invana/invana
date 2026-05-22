@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { FullscreenToggle } from "../FullscreenToggle";
 import { ThemeToggle } from "../ThemeToggle";
 import { UserMenu } from "./UserMenu";
 
@@ -58,8 +59,9 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		),
 		center,
 		right: (
-			<div className="flex items-center gap-1 px-2">
+			<div className="flex items-center gap-2 px-2">
 				{rightExtras}
+				<FullscreenToggle />
 				<ThemeToggle />
 				<UserMenu />
 			</div>
