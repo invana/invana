@@ -7,6 +7,7 @@ import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import { graphsApi } from "../../../services/api/graphs";
+import { AppVersion } from "../components/AppVersion";
 import { GraphStatusBar } from "../components/GraphStatusBar";
 import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import type { SelectedItem } from "./components/DetailPanel";
@@ -198,7 +199,12 @@ export function ModellerPage() {
 				),
 				right: (
 					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
-						{version?.version && <span>v{version.version}</span>}
+						{version?.version && (
+							<span title="Active schema version">
+								schema v{version.version}
+							</span>
+						)}
+						<AppVersion />
 						<span>Modeller</span>
 					</div>
 				),

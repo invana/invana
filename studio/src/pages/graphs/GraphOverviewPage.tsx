@@ -10,6 +10,7 @@ import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "../../hooks/queries/useGraphs";
+import { AppVersion } from "./components/AppVersion";
 import { GraphStatusBar } from "./components/GraphStatusBar";
 
 export function GraphOverviewPage() {
@@ -203,6 +204,7 @@ export function GraphOverviewPage() {
 				left: <GraphStatusBar graph={connection ?? undefined} />,
 				right: (
 					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
+						<AppVersion />
 						<span>Overview</span>
 					</div>
 				),

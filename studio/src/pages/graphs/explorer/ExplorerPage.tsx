@@ -11,6 +11,7 @@ import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredB
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import type { QueryLanguage } from "../../../types/graphs";
 import type { QueryResultItem } from "../../../types/query";
+import { AppVersion } from "../components/AppVersion";
 import { GraphStatusBar } from "../components/GraphStatusBar";
 import { useGraphWorkspace } from "../shared/useGraphWorkspace";
 import { CanvasToolbar } from "./components/CanvasToolbar";
@@ -193,6 +194,12 @@ export function ExplorerPage() {
 			footer={{
 				className: "!h-[25px]",
 				left: footerLeft,
+				right: (
+					<div className="flex items-center gap-3 px-2 text-base text-muted-foreground">
+						<AppVersion />
+						<span>Explorer</span>
+					</div>
+				),
 			}}
 		/>
 	);
