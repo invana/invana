@@ -27,8 +27,8 @@ interface Props {
 
 /**
  * Per-graph events view. Renders the SSE-driven live tail of audit events
- * for the active graph. Used by both the SettingsPanel rail section and the
- * full-page maximize wrapper (`GraphEventsSettingsPage`).
+ * for the active graph. Rendered inside the docked SettingsPanel; the
+ * panel's expand toggle takes the section to full width in place.
  *
  * Filters (action prefix + time range) live above the list; pagination is
  * append-as-you-scroll via `useGraphEventsQuery.fetchNextPage`.

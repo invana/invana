@@ -1,9 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // LLM provider types — mirrors engine/src/invana/llm_providers/schemas.py
 //
-// Per-Graph LLM bindings (MVP § 2.6). Configured under
-// /u/:username/:graphSlug/settings (Settings panel → LLMs section) or
-// directly via the full-page /settings/llms route.
+// Per-Graph LLM bindings (MVP § 2.6). Configured via the docked
+// Settings panel (LLMs section) on the graph overview.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type LLMProviderKind =

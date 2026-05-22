@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, createBrowserRouter, useParams } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
@@ -8,30 +8,8 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
-import { GraphConnectionSettingsPage } from "./pages/graphs/settings/GraphConnectionSettingsPage";
-import { GraphEventsSettingsPage } from "./pages/graphs/settings/GraphEventsSettingsPage";
-import { GraphInstructionsSettingsPage } from "./pages/graphs/settings/GraphInstructionsSettingsPage";
-import { GraphIntentSettingsPage } from "./pages/graphs/settings/GraphIntentSettingsPage";
-import { GraphLLMsSettingsPage } from "./pages/graphs/settings/GraphLLMsSettingsPage";
-import { GraphMembersSettingsPage } from "./pages/graphs/settings/GraphMembersSettingsPage";
-import { GraphSectionPlaceholderPage } from "./pages/graphs/settings/GraphSectionPlaceholderPage";
-import { GraphSettingsPage } from "./pages/graphs/settings/GraphSettingsPage";
-import { GraphSkillsSettingsPage } from "./pages/graphs/settings/GraphSkillsSettingsPage";
 import { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
-
-// Legacy deep-link: /settings/invitations → /settings/members (Invitations is
-// now a tab inside Members).
-function InvitationsRedirect() {
-	const { username, graphSlug } = useParams<{
-		username: string;
-		graphSlug: string;
-	}>();
-	if (!username || !graphSlug) return <Navigate to="/" replace />;
-	return (
-		<Navigate to={`/u/${username}/${graphSlug}/settings/members`} replace />
-	);
-}
 
 // Lazy-loaded — Explorer/Modeller carry the heaviest UI (graph rendering once
 // the new canvas integration lands). Lazy keeps the auth + settings flows
@@ -114,58 +92,6 @@ export const router = createBrowserRouter([
 			// component via RoleGate). Lives under /platform/* to avoid the
 			// /admin namespace collision with starlette-admin.
 			{ path: "platform/events", element: <PlatformEventsPage /> },
-
-			// Graph container — settings full-page routes (maximize targets).
-			// The Overview itself lives at the top level so it owns AppLayoutV2.
-			{
-				path: "u/:username/:graphSlug/settings",
-				element: <GraphSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/connection",
-				element: <GraphConnectionSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/intent",
-				element: <GraphIntentSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/members",
-				element: <GraphMembersSettingsPage />,
-			},
-			// Invitations are now a tab inside the Members section. Preserve the
-			// legacy /settings/invitations URL by redirecting to /settings/members
-			// where the Invitations tab opens.
-			{
-				path: "u/:username/:graphSlug/settings/invitations",
-				element: <InvitationsRedirect />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/llms",
-				element: <GraphLLMsSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/skills",
-				element: <GraphSkillsSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/instructions",
-				element: <GraphInstructionsSettingsPage />,
-			},
-			{
-				path: "u/:username/:graphSlug/settings/datasets",
-				element: (
-					<GraphSectionPlaceholderPage
-						title="Datasets"
-						description="Import data into this knowledge graph."
-						slice="S6"
-					/>
-				),
-			},
-			{
-				path: "u/:username/:graphSlug/settings/events",
-				element: <GraphEventsSettingsPage />,
-			},
 
 			{ path: "*", element: <ErrorPage /> },
 		],

@@ -16,30 +16,20 @@ type HeaderActions = {
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** Render TabbedPanel's built-in close button. SettingsPanel sets this
-	 *  true with onClose; the full-page wrapper leaves it false. */
-	showClose?: boolean;
-	onClose?: () => void;
 	headerActions?: HeaderActions;
 	className?: string;
 }
 
 /**
- * Combined Members + Invitations view rendered as a `TabbedPanel`.
- * Invitations are part of the member-management flow, so they live as a tab
- * here rather than a separate rail icon. Non-admins see only the Members tab.
- *
- * Reused in two contexts:
- * - Sidebar (`SettingsPanel`) — passes showClose + onClose + maximize button
- *   in headerActions so the section's own TabbedPanel hosts the panel chrome.
- * - Full-page (`GraphMembersSettingsPage`) — embeds inside page chrome, so
- *   no close button and no headerActions.
+ * Combined Members + Invitations view rendered as a `TabbedPanel`. Invitations
+ * are part of the member-management flow, so they live as a tab here rather
+ * than a separate rail icon. Non-admins see only the Members tab. Rendered
+ * inside the docked `SettingsPanel` — chrome (expand / close) comes from
+ * `headerActions`.
  */
 export function MembersInvitationsSection({
 	username,
 	graphSlug,
-	showClose = false,
-	onClose,
 	headerActions,
 	className,
 }: Props) {
@@ -80,8 +70,6 @@ export function MembersInvitationsSection({
 			tabs={tabs}
 			activeTab={activeTab}
 			onTabChange={(v) => setActiveTab(v as "members" | "invitations")}
-			showClose={showClose}
-			onClose={onClose}
 			headerActions={headerActions}
 		/>
 	);

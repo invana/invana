@@ -34,28 +34,28 @@ const SECTIONS: SectionMeta[] = [
 		label: "Graph Info",
 		description: "Attach a graph database connection.",
 		icon: Database,
-		settingsPath: (u, s) => `/u/${u}/${s}/settings/connection`,
+		settingsPath: (u, s) => `/u/${u}/${s}?settings=connection`,
 	},
 	{
 		key: "intent",
 		label: "Intent",
 		description: "Describe what this graph is for.",
 		icon: Lightbulb,
-		settingsPath: (u, s) => `/u/${u}/${s}/settings/intent`,
+		settingsPath: (u, s) => `/u/${u}/${s}?settings=intent`,
 	},
 	{
 		key: "skills",
 		label: "Skills",
 		description: "Define what the graph's agents can do. (Optional — S5)",
 		icon: Sparkles,
-		settingsPath: (u, s) => `/u/${u}/${s}/settings/skills`,
+		settingsPath: (u, s) => `/u/${u}/${s}?settings=skills`,
 	},
 	{
 		key: "datasets",
 		label: "Datasets",
 		description: "Import data into the knowledge graph. (Optional — S6)",
 		icon: Layers,
-		settingsPath: (u, s) => `/u/${u}/${s}/settings/datasets`,
+		settingsPath: (u, s) => `/u/${u}/${s}?settings=datasets`,
 	},
 ];
 
@@ -74,8 +74,8 @@ interface Props {
 /**
  * Setup wizard card — lists every required + skippable wizard section with
  * inline "Set up" / "Edit" / "Skip" / "Reset" actions. Lives inside the
- * Info section (and its full-page maximize wrapper) so progress sits with
- * the rest of the graph overview rather than as a separate landing.
+ * Info section of the docked SettingsPanel so progress sits with the rest
+ * of the graph overview rather than as a separate landing.
  *
  * State mutation goes through `useSetupSectionMutation` → POST
  * /u/.../setup/{section}; events flow naturally through the engine's
