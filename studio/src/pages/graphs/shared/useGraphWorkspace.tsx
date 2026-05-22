@@ -27,12 +27,31 @@ export function useGraphWorkspace({ sectionId }: Options) {
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", sectionId);
 
-	const withSettingsTakeover = (leftContent: ReactNode): ReactNode =>
-		settingsPanel.isOpen && username && graphSlug ? (
-			<SettingsPanel username={username} graphSlug={graphSlug} />
-		) : (
-			leftContent
-		);
+	const withSettingsTakeover = (leftContent: ReactNode): ReactNode => {
+		// When expanded, settings goes to mainSection — keep the page's own
+		// left content (QueryPanel / SchemaNav) in the leftSection.
+		if (
+			settingsPanel.isOpen &&
+			!settingsPanel.expanded &&
+			username &&
+			graphSlug
+		) {
+			return <SettingsPanel username={username} graphSlug={graphSlug} />;
+		}
+		return leftContent;
+	};
+
+	const withSettingsAsMain = (mainContent: ReactNode): ReactNode => {
+		if (
+			settingsPanel.isOpen &&
+			settingsPanel.expanded &&
+			username &&
+			graphSlug
+		) {
+			return <SettingsPanel username={username} graphSlug={graphSlug} />;
+		}
+		return mainContent;
+	};
 
 	return {
 		username,
@@ -43,5 +62,6 @@ export function useGraphWorkspace({ sectionId }: Options) {
 		settingsPanel,
 		leftNav,
 		withSettingsTakeover,
+		withSettingsAsMain,
 	};
 }

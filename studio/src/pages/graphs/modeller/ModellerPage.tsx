@@ -23,6 +23,7 @@ export function ModellerPage() {
 		settingsPanel,
 		leftNav,
 		withSettingsTakeover,
+		withSettingsAsMain,
 	} = useGraphWorkspace({ sectionId: "modeller" });
 	const {
 		data: version,
@@ -132,41 +133,53 @@ export function ModellerPage() {
 		</ScrollArea>
 	);
 
+	// When settings is expanded it takes over the entire content area —
+	// drop left + right sections so SchemaNav / right panel don't sandwich it.
+	const settingsExpanded = settingsPanel.isOpen && settingsPanel.expanded;
+
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
 			header={header}
-			leftSection={{
-				defaultSize: settingsPanel.isOpen ? "420px" : "260px",
-				minSize: settingsPanel.isOpen ? "320px" : "180px",
-				// Generous max so wide schema lists (long type names, deep
-				// trees) can spread out. mainSection.minSize keeps the canvas
-				// usable.
-				maxSize: settingsPanel.isOpen ? "800px" : "900px",
-				collapsible: false,
-				content: withSettingsTakeover(leftContent),
-			}}
+			leftSection={
+				settingsExpanded
+					? undefined
+					: {
+							defaultSize: settingsPanel.isOpen ? "420px" : "260px",
+							minSize: settingsPanel.isOpen ? "320px" : "180px",
+							// Generous max so wide schema lists (long type names, deep
+							// trees) can spread out. mainSection.minSize keeps the canvas
+							// usable.
+							maxSize: settingsPanel.isOpen ? "800px" : "900px",
+							collapsible: false,
+							content: withSettingsTakeover(leftContent),
+						}
+			}
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",
 				// Canvas stays in place even when the connection isn't attached
 				// — it'll render empty. The leftSection banner is the explainer.
-				content: (
+				content: withSettingsAsMain(
 					<SchemaCanvas
 						nodeTypes={nodeTypes}
 						edgeTypes={edgeTypes}
 						selected={selected}
 						onSelect={setSelected}
-					/>
+					/>,
 				),
 			}}
-			rightSection={{
-				defaultSize: "360px",
-				minSize: "240px",
-				maxSize: "600px",
-				collapsible: false,
-				content: rightContent,
-			}}
+			rightSection={
+				settingsExpanded
+					? undefined
+					: {
+							defaultSize: "360px",
+							minSize: "240px",
+							maxSize: "600px",
+							collapsible: false,
+							content: rightContent,
+						}
+			}
 			footer={{
 				className: "!h-[25px]",
 				left: (

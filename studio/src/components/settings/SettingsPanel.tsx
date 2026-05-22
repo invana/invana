@@ -6,12 +6,13 @@ import {
 	Layers,
 	Lightbulb,
 	Maximize2,
+	Minimize2,
 	ScrollText,
 	Sparkles,
 	Wand2,
+	X,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
 import { EventsSection } from "./sections/EventsSection";
@@ -39,23 +40,31 @@ interface Props {
  * `useSettingsPanel().close`); the maximize button lives in `headerActions`.
  */
 export function SettingsPanel({ username, graphSlug }: Props) {
-	const navigate = useNavigate();
-	const { section, close } = useSettingsPanel();
+	const { section, expanded, toggleExpanded, close } = useSettingsPanel();
 
-	const subpath = MAXIMIZE_SUBPATHS[section];
+	const ToggleIcon = expanded ? Minimize2 : Maximize2;
 	const headerActions = {
 		right: (
-			<Button
-				variant="ghost"
-				size="icon"
-				className="h-6 w-6"
-				onClick={() =>
-					navigate(`/u/${username}/${graphSlug}/settings/${subpath}`)
-				}
-				title="Open as full page"
-			>
-				<Maximize2 className="w-3.5 h-3.5" />
-			</Button>
+			<div className="flex items-center gap-1 pr-2">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-6 w-6"
+					onClick={toggleExpanded}
+					title={expanded ? "Collapse to side panel" : "Expand to full width"}
+				>
+					<ToggleIcon className="w-3.5 h-3.5" />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-6 w-6"
+					onClick={close}
+					title="Close panel"
+				>
+					<X className="w-3.5 h-3.5" />
+				</Button>
+			</div>
 		),
 	};
 
@@ -66,8 +75,6 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 				username={username}
 				graphSlug={graphSlug}
 				className="h-full"
-				showClose
-				onClose={close}
 				headerActions={headerActions}
 			/>
 		);
@@ -104,26 +111,12 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 			onTabChange={() => {
 				/* single-tab panel — no internal switching */
 			}}
-			showClose
-			onClose={close}
 			headerActions={headerActions}
 		/>
 	);
 }
 
 // ── Section metadata ─────────────────────────────────────────────────────────
-
-const MAXIMIZE_SUBPATHS: Record<SettingsSection, string> = {
-	info: "info",
-	connection: "connection",
-	intent: "intent",
-	llms: "llms",
-	skills: "skills",
-	instructions: "instructions",
-	datasets: "datasets",
-	members: "members",
-	events: "events",
-};
 
 // Sections whose panel is a single-tab TabbedPanel. Members is handled
 // separately (above) because it has two tabs.

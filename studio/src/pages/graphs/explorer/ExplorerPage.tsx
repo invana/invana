@@ -35,6 +35,7 @@ export function ExplorerPage() {
 		settingsPanel,
 		leftNav,
 		withSettingsTakeover,
+		withSettingsAsMain,
 	} = useGraphWorkspace({ sectionId: "explorer" });
 
 	const { mutation, history } = useQueryExecution(username, graphSlug);
@@ -130,47 +131,61 @@ export function ExplorerPage() {
 		/>
 	);
 
+	// When settings is expanded it takes over the entire content area —
+	// drop left + right sections so QueryPanel / Inspector don't sandwich it.
+	const settingsExpanded = settingsPanel.isOpen && settingsPanel.expanded;
+
 	return (
 		<AppLayoutV2
 			leftNav={leftNav}
 			header={header}
-			leftSection={{
-				defaultSize: settingsPanel.isOpen ? "420px" : "300px",
-				minSize: settingsPanel.isOpen ? "320px" : "240px",
-				// Generous max so long Cypher/Gremlin queries can spread out.
-				// mainSection.minSize below still keeps the canvas usable when
-				// the user drags the divider far right.
-				maxSize: settingsPanel.isOpen ? "800px" : "900px",
-				collapsible: false,
-				content: withSettingsTakeover(
-					connectionMissing ? (
-						<SetupRequiredBanner pageLabel="Explorer" />
-					) : (
-						<QueryPanel
-							availableLanguages={availableLanguages}
-							defaultLanguage={defaultLanguage}
-							llmProviders={llmProviders}
-							onRun={handleRun}
-							isRunning={mutation.isPending}
-							history={history}
-						/>
-					),
-				),
-			}}
+			leftSection={
+				settingsExpanded
+					? undefined
+					: {
+							defaultSize: settingsPanel.isOpen ? "420px" : "300px",
+							minSize: settingsPanel.isOpen ? "320px" : "240px",
+							// Generous max so long Cypher/Gremlin queries can spread out.
+							// mainSection.minSize below still keeps the canvas usable when
+							// the user drags the divider far right.
+							maxSize: settingsPanel.isOpen ? "800px" : "900px",
+							collapsible: false,
+							content: withSettingsTakeover(
+								connectionMissing ? (
+									<SetupRequiredBanner pageLabel="Explorer" />
+								) : (
+									<QueryPanel
+										availableLanguages={availableLanguages}
+										defaultLanguage={defaultLanguage}
+										llmProviders={llmProviders}
+										onRun={handleRun}
+										isRunning={mutation.isPending}
+										history={history}
+									/>
+								),
+							),
+						}
+			}
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",
 				// Canvas stays in place even when the connection isn't attached
 				// — it'll render empty. The leftSection banner is the explainer.
-				content: canvasContent,
+				content: withSettingsAsMain(canvasContent),
 			}}
-			rightSection={{
-				defaultSize: "280px",
-				minSize: "240px",
-				maxSize: "360px",
-				collapsible: false,
-				content: <InspectorPanel selected={selected} allItems={canvasData} />,
-			}}
+			rightSection={
+				settingsExpanded
+					? undefined
+					: {
+							defaultSize: "280px",
+							minSize: "240px",
+							maxSize: "360px",
+							collapsible: false,
+							content: (
+								<InspectorPanel selected={selected} allItems={canvasData} />
+							),
+						}
+			}
 			footer={{
 				className: "!h-[25px]",
 				left: footerLeft,

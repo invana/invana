@@ -157,7 +157,9 @@ export function GraphOverviewPage() {
 		);
 	}
 
-	const showSettingsInLeft = settingsPanel.isOpen && !!username && !!graphSlug;
+	const settingsOpen = settingsPanel.isOpen && !!username && !!graphSlug;
+	const settingsExpanded = settingsOpen && settingsPanel.expanded;
+	const showSettingsInLeft = settingsOpen && !settingsPanel.expanded;
 
 	return (
 		<AppLayoutV2
@@ -182,7 +184,14 @@ export function GraphOverviewPage() {
 			mainSection={{
 				defaultSize: "800px",
 				minSize: "400px",
-				content: mainContent,
+				content: settingsExpanded ? (
+					<SettingsPanel
+						username={username as string}
+						graphSlug={graphSlug as string}
+					/>
+				) : (
+					mainContent
+				),
 			}}
 		/>
 	);
