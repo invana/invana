@@ -9,7 +9,6 @@ import {
 	Network,
 	ScrollText,
 	Sparkles,
-	UserCircle,
 	Users,
 	Wand2,
 } from "lucide-react";
@@ -53,11 +52,11 @@ type ActiveTab = "overview" | "explorer" | "modeller" | null;
  * Shared left-rail (icon column) config used by every graph-scoped page —
  * Overview, Explorer, Modeller. Surfaces:
  *
- * - Top: Graphs (out), then the three graph views (Overview / Explorer /
- *   Modeller), then a separator, then one icon per settings section. Clicking
- *   a settings icon sets `?settings=<section>` on the current page so the
+ * - Top: the three graph views (Overview / Explorer / Modeller).
+ * - Bottom: one icon per settings section (Info / Connection / Intent / LLMs
+ *   / Skills / Instructions / Datasets / Members / Events). Clicking a
+ *   settings icon sets `?settings=<section>` on the current page so the
  *   leftSection swaps to that section's content.
- * - Bottom: Profile.
  *
  * The "active" highlight is driven by the caller's `activeTab` arg (which
  * graph view is rendering this layout) and by `?settings` (which section is
@@ -94,7 +93,6 @@ export function useGraphLeftNav(
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "overview"),
 			onClick: () => goToView(root),
-			showSeperator: true,
 		},
 		{
 			name: "Explorer",
@@ -109,27 +107,18 @@ export function useGraphLeftNav(
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "modeller"),
 			onClick: () => goToView(`${root}/modeller`),
-			showSeperator: true,
 		},
-		...visibleSections.map((s) => ({
-			name: s.label,
-			icon: s.icon,
-			tooltipSide: "right" as const,
-			className: activeClass(
-				settingsPanel.isOpen && settingsPanel.section === s.key,
-			),
-			onClick: () => settingsPanel.setSection(s.key),
-		})),
 	];
 
-	const bottomNavItems = [
-		{
-			name: "Profile",
-			icon: UserCircle,
-			tooltipSide: "right" as const,
-			onClick: () => navigate("/settings/profile"),
-		},
-	];
+	const bottomNavItems = visibleSections.map((s) => ({
+		name: s.label,
+		icon: s.icon,
+		tooltipSide: "right" as const,
+		className: activeClass(
+			settingsPanel.isOpen && settingsPanel.section === s.key,
+		),
+		onClick: () => settingsPanel.setSection(s.key),
+	}));
 
 	return { topNavItems, bottomNavItems };
 }

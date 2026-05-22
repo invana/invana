@@ -1,5 +1,5 @@
 import { AppLayoutV2 } from "@invana/themes";
-import { GitGraph, Network, UserCircle } from "lucide-react";
+import { GitGraph, Network } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppHeader } from "./components/header/useAppHeader";
 
@@ -37,17 +37,7 @@ export default function App() {
 
 	return (
 		<AppLayoutV2
-			leftNav={{
-				topNavItems,
-				bottomNavItems: [
-					{
-						name: "Profile",
-						icon: UserCircle,
-						tooltipSide: "right" as const,
-						onClick: () => navigate("/settings/profile"),
-					},
-				],
-			}}
+			leftNav={{ topNavItems }}
 			header={header}
 			mainSection={{
 				content: <Outlet />,
