@@ -2,7 +2,7 @@
 
 Single migration covering:
 
-- Modeller: graph_schemas + schema_versions + node/edge/property/index/constraint defs.
+- Modeller: graph_models + graph_versions + node/edge/property/index/constraint defs.
 - Identity (Layer 1): users (with username), refresh_tokens.
 - Graph domain (Layer 2): graphs container, graph_connections (1:1), graph_members,
   invitations (graph-scoped).
@@ -57,11 +57,11 @@ def upgrade() -> None:
     _create_pg_enum_if_absent(_GRAPH_STATUS_ENUM, _GRAPH_STATUS_VALUES)
 
     # -----------------------------------------------------------------------
-    # Modeller — graph_schemas + schema_versions + type/property/constraint defs
+    # Modeller — graph_models + graph_versions + type/property/constraint defs
     # -----------------------------------------------------------------------
 
     op.create_table(
-        "graph_schemas",
+        "graph_models",
         sa.Column("id", sa.String(length=36), primary_key=True),
         sa.Column("name", sa.String(length=255), nullable=False),
         sa.Column("description", sa.Text(), nullable=False),
@@ -74,16 +74,16 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
     )
     op.create_table(
-        "schema_versions",
+        "graph_versions",
         sa.Column("id", sa.String(length=36), primary_key=True),
-        sa.Column("schema_id", sa.String(length=36), nullable=False),
+        sa.Column("model_id", sa.String(length=36), nullable=False),
         sa.Column("version", sa.String(length=32), nullable=True),
         sa.Column("status", sa.Enum("draft", "active", "archived", name="version_status_enum"), nullable=False),
         sa.Column("change_summary", sa.Text(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("activated_at", sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(["schema_id"], ["graph_schemas.id"], ondelete="CASCADE"),
-        sa.UniqueConstraint("schema_id", "version", name="uq_schema_version"),
+        sa.ForeignKeyConstraint(["model_id"], ["graph_models.id"], ondelete="CASCADE"),
+        sa.UniqueConstraint("model_id", "version", name="uq_graph_version"),
     )
     op.create_table(
         "node_type_definitions",
@@ -94,7 +94,7 @@ def upgrade() -> None:
         sa.Column("parent_type", sa.String(length=255), nullable=True),
         sa.Column("is_abstract", sa.Boolean(), nullable=False),
         sa.Column("validation_mode", sa.String(length=16), nullable=True),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("version_id", "name", name="uq_version_node_type"),
     )
     op.create_table(
@@ -110,7 +110,7 @@ def upgrade() -> None:
             sa.Enum("MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE", name="multiplicity_enum"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("version_id", "name", name="uq_version_edge_type"),
     )
     op.create_table(
@@ -125,7 +125,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("description", sa.Text(), nullable=False),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("version_id", "name", name="uq_version_property_key"),
     )
     op.create_table(
@@ -164,7 +164,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("properties", sa.JSON(), nullable=False),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("version_id", "name", name="uq_version_constraint"),
     )
     op.create_table(
@@ -181,7 +181,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("index_options", sa.JSON(), nullable=True),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("version_id", "name", name="uq_version_index"),
     )
     op.create_table(
@@ -193,7 +193,7 @@ def upgrade() -> None:
         sa.Column("operations", sa.JSON(), nullable=False),
         sa.Column("errors", sa.JSON(), nullable=False),
         sa.Column("projected_at", sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(["version_id"], ["schema_versions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["version_id"], ["graph_versions.id"], ondelete="CASCADE"),
     )
     op.create_table(
         "validation_rules",
@@ -287,13 +287,13 @@ def upgrade() -> None:
         ),
         sa.Column("last_health_check_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("latency_ms", sa.Integer(), nullable=True),
-        sa.Column("schema_id", sa.String(length=36), nullable=True),
+        sa.Column("model_id", sa.String(length=36), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["graph_id"], ["graphs.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["schema_id"], ["graph_schemas.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(["model_id"], ["graph_models.id"], ondelete="SET NULL"),
         sa.UniqueConstraint("graph_id", name="uq_graph_connections_graph_id"),
-        sa.UniqueConstraint("schema_id", name="uq_graph_connections_schema_id"),
+        sa.UniqueConstraint("model_id", name="uq_graph_connections_model_id"),
     )
     op.create_index("ix_graph_connections_graph_id", "graph_connections", ["graph_id"])
 
@@ -355,8 +355,8 @@ def downgrade() -> None:
     op.drop_table("property_key_definitions")
     op.drop_table("edge_type_definitions")
     op.drop_table("node_type_definitions")
-    op.drop_table("schema_versions")
-    op.drop_table("graph_schemas")
+    op.drop_table("graph_versions")
+    op.drop_table("graph_models")
 
     bind = op.get_bind()
     if bind.dialect.name == "postgresql":

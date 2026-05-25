@@ -2,8 +2,8 @@
 
 Tables
 ------
-- ``graph_schemas``              — top-level schema container
-- ``schema_versions``            — immutable snapshots (draft → active → archived)
+- ``graph_models``               — top-level graph model (schema) container
+- ``graph_versions``            — immutable snapshots (draft → active → archived)
 - ``property_key_definitions``   — global property keys (name + type), one per version
 - ``node_type_definitions``      — node types with inheritance and display metadata
 - ``edge_type_definitions``      — edge types with multiplicity and endpoint restrictions
@@ -51,25 +51,51 @@ class Base(DeclarativeBase):
 
 
 # ---------------------------------------------------------------------------
-# Graph Schema
+# Graph Model — a persona-scoped model of the data (RFC-019)
+#
+# A Graph owns many GraphModels (one per persona). Each is a logical
+# schema/subgraph over the one bound physical DB, with its own versioned type
+# tree. ``graph_id`` is nullable during the transition off the legacy
+# ``graph_connections.model_id`` 1:1 pointer; it will be tightened to NOT NULL
+# once creation paths populate it (RFC-019 § migration).
 # ---------------------------------------------------------------------------
 
 
-class GraphSchema(Base):
-    __tablename__ = "graph_schemas"
+class GraphModel(Base):
+    __tablename__ = "graph_models"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    # Owner — many models per Graph. CASCADE so models die with the Graph
+    # (not with the connection). Nullable for now; see header note.
+    graph_id: Mapped[str | None] = mapped_column(ForeignKey("graphs.id", ondelete="CASCADE"), nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, default="")
+    # The role this model is FROM (categorization; see RFC-019 § Vocabulary).
+    persona: Mapped[str] = mapped_column(
+        Enum("architecture", "code", "test", "business", "domain", "custom", name="model_persona_enum"),
+        default="custom",
+        nullable=False,
+    )
     validation_mode: Mapped[str] = mapped_column(
         Enum("strict", "permissive", name="validation_mode_enum"),
         default="strict",
     )
+    # Model lifecycle — distinct from GraphVersion.status (per-version state).
+    status: Mapped[str] = mapped_column(
+        Enum("draft", "active", "archived", name="model_status_enum"),
+        default="draft",
+        nullable=False,
+    )
+    # One default model per Graph (migration target for the legacy single model).
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Set ⟺ YAML-managed; NULL = authored in Studio. Single indicator of YAML
+    # ownership (no separate ``source`` column).
+    yaml_path: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
-    versions: Mapped[list[SchemaVersion]] = relationship(
-        back_populates="schema", cascade="all, delete-orphan", order_by="SchemaVersion.created_at"
+    versions: Mapped[list[GraphVersion]] = relationship(
+        back_populates="schema", cascade="all, delete-orphan", order_by="GraphVersion.created_at"
     )
 
 
@@ -78,12 +104,12 @@ class GraphSchema(Base):
 # ---------------------------------------------------------------------------
 
 
-class SchemaVersion(Base):
-    __tablename__ = "schema_versions"
-    __table_args__ = (UniqueConstraint("schema_id", "version", name="uq_schema_version"),)
+class GraphVersion(Base):
+    __tablename__ = "graph_versions"
+    __table_args__ = (UniqueConstraint("model_id", "version", name="uq_graph_version"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    schema_id: Mapped[str] = mapped_column(ForeignKey("graph_schemas.id", ondelete="CASCADE"), nullable=False)
+    model_id: Mapped[str] = mapped_column(ForeignKey("graph_models.id", ondelete="CASCADE"), nullable=False)
     version: Mapped[str | None] = mapped_column(String(32), nullable=True)
     status: Mapped[str] = mapped_column(
         Enum("draft", "active", "archived", name="version_status_enum"),
@@ -93,7 +119,7 @@ class SchemaVersion(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     activated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    schema: Mapped[GraphSchema] = relationship(back_populates="versions")
+    schema: Mapped[GraphModel] = relationship(back_populates="versions")
     property_keys: Mapped[list[PropertyKeyDefinition]] = relationship(
         back_populates="version", cascade="all, delete-orphan"
     )
@@ -118,7 +144,7 @@ class PropertyKeyDefinition(Base):
     __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_property_key"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     type: Mapped[str] = mapped_column(String(64), nullable=False, default="string")
     value_cardinality: Mapped[str] = mapped_column(
@@ -127,7 +153,7 @@ class PropertyKeyDefinition(Base):
     )
     description: Mapped[str] = mapped_column(Text, default="")
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="property_keys")
+    version: Mapped[GraphVersion] = relationship(back_populates="property_keys")
     mappings: Mapped[list[TypePropertyMapping]] = relationship(
         back_populates="property_key", cascade="all, delete-orphan"
     )
@@ -148,14 +174,14 @@ class NodeTypeDefinition(Base):
     __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_node_type"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, default="")
     parent_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_abstract: Mapped[bool] = mapped_column(Boolean, default=False)
     validation_mode: Mapped[str | None] = mapped_column(String(16), nullable=True)
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="node_types")
+    version: Mapped[GraphVersion] = relationship(back_populates="node_types")
     property_mappings: Mapped[list[TypePropertyMapping]] = relationship(
         back_populates="node_type",
         cascade="all, delete-orphan",
@@ -173,7 +199,7 @@ class EdgeTypeDefinition(Base):
     __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_edge_type"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, default="")
     source_node_types: Mapped[list | None] = mapped_column(JSON, default=list)
@@ -183,7 +209,7 @@ class EdgeTypeDefinition(Base):
         default="MULTI",
     )
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="edge_types")
+    version: Mapped[GraphVersion] = relationship(back_populates="edge_types")
     property_mappings: Mapped[list[TypePropertyMapping]] = relationship(
         back_populates="edge_type",
         cascade="all, delete-orphan",
@@ -269,7 +295,7 @@ class ConstraintDefinition(Base):
     __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_constraint"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     target_kind: Mapped[str] = mapped_column(
         Enum("node_type", "edge_type", name="constraint_target_kind_enum"), nullable=False
@@ -288,7 +314,7 @@ class ConstraintDefinition(Base):
     )
     properties: Mapped[list] = mapped_column(JSON, nullable=False)
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="constraints")
+    version: Mapped[GraphVersion] = relationship(back_populates="constraints")
 
 
 # ---------------------------------------------------------------------------
@@ -301,7 +327,7 @@ class IndexDefinition(Base):
     __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_index"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     target_kind: Mapped[str] = mapped_column(
         Enum("node_type", "edge_type", name="index_target_kind_enum"), nullable=False
@@ -314,7 +340,7 @@ class IndexDefinition(Base):
     )
     index_options: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="indexes")
+    version: Mapped[GraphVersion] = relationship(back_populates="indexes")
 
 
 # ---------------------------------------------------------------------------
@@ -326,7 +352,7 @@ class SchemaProjection(Base):
     __tablename__ = "schema_projections"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    version_id: Mapped[str] = mapped_column(ForeignKey("schema_versions.id", ondelete="CASCADE"), nullable=False)
+    version_id: Mapped[str] = mapped_column(ForeignKey("graph_versions.id", ondelete="CASCADE"), nullable=False)
     connector_id: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(
         Enum("pending", "projected", "failed", name="projection_status_enum"),
@@ -336,4 +362,4 @@ class SchemaProjection(Base):
     errors: Mapped[list] = mapped_column(JSON, default=list)
     projected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    version: Mapped[SchemaVersion] = relationship(back_populates="projections")
+    version: Mapped[GraphVersion] = relationship(back_populates="projections")

@@ -55,7 +55,7 @@ class TestVersionCRUD:
     async def test_create_version(self, session, store):
         schema = await store.create_schema(session, name="V Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         assert version.id is not None
         assert version.status == "draft"
         assert version.version is None
@@ -63,14 +63,14 @@ class TestVersionCRUD:
     async def test_only_one_draft(self, session, store):
         schema = await store.create_schema(session, name="Draft Test")
         await session.commit()
-        await store.create_version(session, schema_id=schema.id)
+        await store.create_version(session, model_id=schema.id)
         with pytest.raises(ValueError, match="draft version already exists"):
-            await store.create_version(session, schema_id=schema.id)
+            await store.create_version(session, model_id=schema.id)
 
     async def test_get_version(self, session, store):
         schema = await store.create_schema(session, name="V Get")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
         fetched = await store.get_version(session, version.id)
         assert fetched is not None
@@ -79,7 +79,7 @@ class TestVersionCRUD:
     async def test_list_versions(self, session, store):
         schema = await store.create_schema(session, name="V List")
         await session.commit()
-        await store.create_version(session, schema_id=schema.id)
+        await store.create_version(session, model_id=schema.id)
         await session.commit()
         versions = await store.list_versions(session, schema.id)
         assert len(versions) == 1
@@ -90,7 +90,7 @@ class TestPropertyKeyCRUD:
     async def test_create_property_key(self, session, store):
         schema = await store.create_schema(session, name="PK Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         pk = await store.create_property_key(
@@ -107,7 +107,7 @@ class TestPropertyKeyCRUD:
     async def test_list_property_keys(self, session, store):
         schema = await store.create_schema(session, name="PK List")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_property_key(session, version_id=version.id, name="name", type="string")
@@ -123,7 +123,7 @@ class TestNodeTypeCRUD:
     async def test_create_node_type(self, session, store):
         schema = await store.create_schema(session, name="NT Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         # Create property keys first
@@ -148,7 +148,7 @@ class TestNodeTypeCRUD:
     async def test_create_node_type_with_validation_rules(self, session, store):
         schema = await store.create_schema(session, name="Rules Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_property_key(session, version_id=version.id, name="price", type="float")
@@ -184,7 +184,7 @@ class TestNodeTypeCRUD:
     async def test_update_node_type(self, session, store):
         schema = await store.create_schema(session, name="NT Update")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
         nt = await store.create_node_type(session, version_id=version.id, name="OldName")
         await session.commit()
@@ -194,7 +194,7 @@ class TestNodeTypeCRUD:
     async def test_delete_node_type(self, session, store):
         schema = await store.create_schema(session, name="NT Delete")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
         nt = await store.create_node_type(session, version_id=version.id, name="Temp")
         await session.commit()
@@ -206,7 +206,7 @@ class TestNodeTypeCRUD:
 
         schema = await store.create_schema(session, name="Immutable Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         versioner = Versioner(store)
@@ -222,7 +222,7 @@ class TestEdgeTypeCRUD:
     async def test_create_edge_type(self, session, store):
         schema = await store.create_schema(session, name="ET Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_property_key(session, version_id=version.id, name="since", type="integer")
@@ -243,7 +243,7 @@ class TestEdgeTypeCRUD:
     async def test_edge_multiplicity(self, session, store):
         schema = await store.create_schema(session, name="Multi Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         et = await store.create_edge_type(
@@ -260,7 +260,7 @@ class TestConstraintCRUD:
     async def test_create_and_list_constraints(self, session, store):
         schema = await store.create_schema(session, name="Con Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         c = await store.create_constraint(
@@ -282,7 +282,7 @@ class TestConstraintCRUD:
     async def test_delete_constraint(self, session, store):
         schema = await store.create_schema(session, name="Con Del")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
         c = await store.create_constraint(
             session,
@@ -303,7 +303,7 @@ class TestIndexCRUD:
     async def test_create_and_list_indexes(self, session, store):
         schema = await store.create_schema(session, name="Idx Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         idx = await store.create_index(
@@ -324,7 +324,7 @@ class TestIndexCRUD:
     async def test_delete_index(self, session, store):
         schema = await store.create_schema(session, name="Idx Del")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
         idx = await store.create_index(
             session,
@@ -346,7 +346,7 @@ class TestCloneVersion:
 
         schema = await store.create_schema(session, name="Clone Test")
         await session.commit()
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_property_key(session, version_id=v1.id, name="name", type="string")
@@ -390,7 +390,7 @@ class TestCloneVersion:
         await session.commit()
 
         # Clone into v2 draft
-        v2 = await store.create_version(session, schema_id=schema.id, based_on="1.0.0")
+        v2 = await store.create_version(session, model_id=schema.id, based_on="1.0.0")
         await session.commit()
 
         v2_full = await store.get_version(session, v2.id)

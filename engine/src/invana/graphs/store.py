@@ -17,7 +17,7 @@ from sqlalchemy import select
 from invana.graphs.encryption import encrypt_credentials
 from invana.graphs.models import GraphConnection
 from invana.graphs.schemas import GraphConnectionCreate, GraphConnectionUpdate
-from invana.modeller.models import GraphSchema
+from invana.modeller.models import GraphModel
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -127,8 +127,8 @@ class GraphConnectionStore:
         connection = await self.get_or_404(session, connection_id)
         connection.status = "INACTIVE"
 
-        if connection.schema_id is not None:
-            stmt = select(GraphSchema).where(GraphSchema.id == connection.schema_id)
+        if connection.model_id is not None:
+            stmt = select(GraphModel).where(GraphModel.id == connection.model_id)
             result = await session.execute(stmt)
             schema = result.scalar_one_or_none()
             if schema is not None:
@@ -159,10 +159,10 @@ class GraphConnectionStore:
             connection.latency_ms = latency_ms
         await session.flush()
 
-    async def set_schema(self, session: AsyncSession, connection_id: str, schema_id: str) -> None:
-        """Set schema_id after auto-introspect — called once per connection."""
+    async def set_schema(self, session: AsyncSession, connection_id: str, model_id: str) -> None:
+        """Set model_id after auto-introspect — called once per connection."""
         connection = await self.get_or_404(session, connection_id)
-        connection.schema_id = schema_id
+        connection.model_id = model_id
         await session.flush()
 
 

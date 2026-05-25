@@ -117,7 +117,7 @@ class GraphConnectionRead(BaseModel):
     connector_class: str
     read_only: bool
     status: str
-    schema_id: str | None
+    model_id: str | None
     last_health_check_at: datetime | None
     latency_ms: int | None
     created_at: datetime

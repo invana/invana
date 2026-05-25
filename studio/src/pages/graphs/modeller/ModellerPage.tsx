@@ -62,7 +62,7 @@ export function ModellerPage() {
 		</div>
 	) : connectionMissing ? (
 		<SetupRequiredBanner pageLabel="Modeller" />
-	) : !graph?.schema_id ? (
+	) : !graph?.model_id ? (
 		<div className="flex flex-col items-center justify-center h-full gap-3 p-4 text-muted-foreground">
 			<p className="text-center">
 				No schema yet — run Introspect to discover your database schema.

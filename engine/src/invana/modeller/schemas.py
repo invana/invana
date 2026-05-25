@@ -232,7 +232,7 @@ class VersionActivate(BaseModel):
 
 class VersionResponse(BaseModel):
     id: str
-    schema_id: str
+    model_id: str
     version: str | None
     status: str
     change_summary: str
@@ -249,7 +249,7 @@ class VersionResponse(BaseModel):
 
 class VersionSummary(BaseModel):
     id: str
-    schema_id: str
+    model_id: str
     version: str | None
     status: str
     change_summary: str
@@ -384,7 +384,7 @@ class ReconcileRequest(BaseModel):
 
 class ReconcileResponse(BaseModel):
     connector_id: str
-    schema_id: str | None = None
+    model_id: str | None = None
     active_version: str | None = None
     status: Literal["in_sync", "projected", "draft_created", "drifted", "error"]
     drift: SchemaDrift | None = None

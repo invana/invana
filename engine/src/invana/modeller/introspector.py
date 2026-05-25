@@ -1,7 +1,7 @@
 """Introspector — reverse-engineers a schema draft from a live database.
 
 Walks the connector's ``schema_reader`` to discover labels, properties,
-indexes, and constraints, then creates a new draft ``SchemaVersion``
+indexes, and constraints, then creates a new draft ``GraphVersion``
 representing the current database state.
 """
 
@@ -43,7 +43,7 @@ class Introspector:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         connector: BaseConnector,
     ) -> dict[str, Any]:
         """Discover the database schema and create a draft version.
@@ -54,7 +54,7 @@ class Introspector:
         reader = connector.schema_reader
 
         # 1. Create a new draft version
-        version = await self._store.create_version(session, schema_id=schema_id)
+        version = await self._store.create_version(session, model_id=model_id)
         discovered: dict[str, int] = {}
 
         # 2. Discover node labels + properties

@@ -16,12 +16,12 @@ from sqlalchemy.orm import selectinload
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
-    GraphSchema,
+    GraphModel,
+    GraphVersion,
     IndexDefinition,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     SchemaProjection,
-    SchemaVersion,
     TypePropertyMapping,
     ValidationRule,
 )
@@ -40,15 +40,15 @@ _MAPPING_EAGER = (
 )
 
 _VERSION_EAGER = (
-    selectinload(SchemaVersion.property_keys).selectinload(PropertyKeyDefinition.validation_rules),
-    selectinload(SchemaVersion.node_types).selectinload(NodeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
-    selectinload(SchemaVersion.edge_types).selectinload(EdgeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
-    selectinload(SchemaVersion.constraints),
-    selectinload(SchemaVersion.indexes),
-    selectinload(SchemaVersion.projections),
+    selectinload(GraphVersion.property_keys).selectinload(PropertyKeyDefinition.validation_rules),
+    selectinload(GraphVersion.node_types).selectinload(NodeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
+    selectinload(GraphVersion.edge_types).selectinload(EdgeTypeDefinition.property_mappings).options(*_MAPPING_EAGER),
+    selectinload(GraphVersion.constraints),
+    selectinload(GraphVersion.indexes),
+    selectinload(GraphVersion.projections),
 )
 
-_SCHEMA_EAGER = (selectinload(GraphSchema.versions),)
+_SCHEMA_EAGER = (selectinload(GraphModel.versions),)
 
 
 class SchemaStore:
@@ -65,29 +65,29 @@ class SchemaStore:
         name: str,
         description: str = "",
         validation_mode: str = "strict",
-    ) -> GraphSchema:
-        schema = GraphSchema(name=name, description=description, validation_mode=validation_mode)
+    ) -> GraphModel:
+        schema = GraphModel(name=name, description=description, validation_mode=validation_mode)
         session.add(schema)
         await session.flush()
         return schema
 
-    async def get_schema(self, session: AsyncSession, schema_id: str) -> GraphSchema | None:
-        stmt = select(GraphSchema).where(GraphSchema.id == schema_id).options(*_SCHEMA_EAGER)
+    async def get_schema(self, session: AsyncSession, model_id: str) -> GraphModel | None:
+        stmt = select(GraphModel).where(GraphModel.id == model_id).options(*_SCHEMA_EAGER)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def list_schemas(self, session: AsyncSession) -> list[GraphSchema]:
-        stmt = select(GraphSchema).options(*_SCHEMA_EAGER).order_by(GraphSchema.created_at)
+    async def list_schemas(self, session: AsyncSession) -> list[GraphModel]:
+        stmt = select(GraphModel).options(*_SCHEMA_EAGER).order_by(GraphModel.created_at)
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
     async def update_schema(
         self,
         session: AsyncSession,
-        schema_id: str,
+        model_id: str,
         **fields: object,
-    ) -> GraphSchema | None:
-        schema = await self.get_schema(session, schema_id)
+    ) -> GraphModel | None:
+        schema = await self.get_schema(session, model_id)
         if schema is None:
             return None
         for key, value in fields.items():
@@ -96,8 +96,8 @@ class SchemaStore:
         await session.flush()
         return schema
 
-    async def delete_schema(self, session: AsyncSession, schema_id: str) -> bool:
-        schema = await self.get_schema(session, schema_id)
+    async def delete_schema(self, session: AsyncSession, model_id: str) -> bool:
+        schema = await self.get_schema(session, model_id)
         if schema is None:
             return False
         await session.delete(schema)
@@ -112,24 +112,24 @@ class SchemaStore:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         based_on: str | None = None,
-    ) -> SchemaVersion:
+    ) -> GraphVersion:
         # Ensure no existing draft
-        stmt = select(SchemaVersion).where(SchemaVersion.schema_id == schema_id, SchemaVersion.status == "draft")
+        stmt = select(GraphVersion).where(GraphVersion.model_id == model_id, GraphVersion.status == "draft")
         result = await session.execute(stmt)
         existing_draft = result.scalar_one_or_none()
         if existing_draft is not None:
             msg = "A draft version already exists for this schema."
             raise ValueError(msg)
 
-        version = SchemaVersion(schema_id=schema_id)
+        version = GraphVersion(model_id=model_id)
         session.add(version)
         await session.flush()
 
         # Clone from an existing version if requested
         if based_on is not None:
-            source = await self.get_version_by_semver(session, schema_id, based_on)
+            source = await self.get_version_by_semver(session, model_id, based_on)
             if source is None:
                 msg = f"Source version '{based_on}' not found."
                 raise ValueError(msg)
@@ -137,31 +137,31 @@ class SchemaStore:
 
         return version
 
-    async def get_version(self, session: AsyncSession, version_id: str) -> SchemaVersion | None:
-        stmt = select(SchemaVersion).where(SchemaVersion.id == version_id).options(*_VERSION_EAGER)
+    async def get_version(self, session: AsyncSession, version_id: str) -> GraphVersion | None:
+        stmt = select(GraphVersion).where(GraphVersion.id == version_id).options(*_VERSION_EAGER)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_version_by_semver(self, session: AsyncSession, schema_id: str, semver: str) -> SchemaVersion | None:
+    async def get_version_by_semver(self, session: AsyncSession, model_id: str, semver: str) -> GraphVersion | None:
         stmt = (
-            select(SchemaVersion)
-            .where(SchemaVersion.schema_id == schema_id, SchemaVersion.version == semver)
+            select(GraphVersion)
+            .where(GraphVersion.model_id == model_id, GraphVersion.version == semver)
             .options(*_VERSION_EAGER)
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_active_version(self, session: AsyncSession, schema_id: str) -> SchemaVersion | None:
+    async def get_active_version(self, session: AsyncSession, model_id: str) -> GraphVersion | None:
         stmt = (
-            select(SchemaVersion)
-            .where(SchemaVersion.schema_id == schema_id, SchemaVersion.status == "active")
+            select(GraphVersion)
+            .where(GraphVersion.model_id == model_id, GraphVersion.status == "active")
             .options(*_VERSION_EAGER)
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def list_versions(self, session: AsyncSession, schema_id: str) -> list[SchemaVersion]:
-        stmt = select(SchemaVersion).where(SchemaVersion.schema_id == schema_id).order_by(SchemaVersion.created_at)
+    async def list_versions(self, session: AsyncSession, model_id: str) -> list[GraphVersion]:
+        stmt = select(GraphVersion).where(GraphVersion.model_id == model_id).order_by(GraphVersion.created_at)
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
@@ -527,13 +527,13 @@ class SchemaStore:
         return proj
 
     async def get_latest_projection(
-        self, session: AsyncSession, schema_id: str, connector_id: str
+        self, session: AsyncSession, model_id: str, connector_id: str
     ) -> SchemaProjection | None:
         stmt = (
             select(SchemaProjection)
-            .join(SchemaVersion)
+            .join(GraphVersion)
             .where(
-                SchemaVersion.schema_id == schema_id,
+                GraphVersion.model_id == model_id,
                 SchemaProjection.connector_id == connector_id,
             )
             .order_by(SchemaProjection.projected_at.desc())
@@ -547,7 +547,7 @@ class SchemaStore:
     # ------------------------------------------------------------------
 
     async def _ensure_draft(self, session: AsyncSession, version_id: str) -> None:
-        stmt = select(SchemaVersion.status).where(SchemaVersion.id == version_id)
+        stmt = select(GraphVersion.status).where(GraphVersion.id == version_id)
         result = await session.execute(stmt)
         status = result.scalar_one_or_none()
         if status != "draft":
@@ -597,8 +597,8 @@ class SchemaStore:
     async def _clone_version_contents(
         self,
         session: AsyncSession,
-        source: SchemaVersion,
-        target: SchemaVersion,
+        source: GraphVersion,
+        target: GraphVersion,
     ) -> None:
         """Deep-clone property keys, node types, edge types, constraints, and indexes."""
         # Reload with eager loading

@@ -17,12 +17,12 @@ from invana.llm_providers.models import LLMProvider
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
-    GraphSchema,
+    GraphModel,
+    GraphVersion,
     IndexDefinition,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     SchemaProjection,
-    SchemaVersion,
     TypePropertyMapping,
     ValidationRule,
 )
@@ -35,22 +35,27 @@ from invana.skills.models import Skill
 _TEMPLATES_DIR = str(Path(__file__).parent / "templates")
 
 
-class GraphSchemaView(ModelView):
+class GraphModelView(ModelView):
     fields = [
         "id",
+        "graph_id",
         "name",
         "description",
+        StringField("persona", label="Persona"),
         StringField("validation_mode", label="Validation Mode"),
+        StringField("status", label="Status"),
+        "is_default",
+        "yaml_path",
         "created_at",
         "updated_at",
     ]
     search_fields = ["name"]
 
 
-class SchemaVersionView(ModelView):
+class GraphVersionView(ModelView):
     fields = [
         "id",
-        "schema_id",
+        "model_id",
         "version",
         StringField("status", label="Status"),
         "change_summary",
@@ -268,7 +273,7 @@ class GraphConnectionView(ModelView):
         "connector_class",
         "read_only",
         StringField("status", label="Status"),
-        "schema_id",
+        "model_id",
         "last_health_check_at",
         "latency_ms",
         "created_at",
@@ -425,8 +430,8 @@ def mount_admin(app: FastAPI) -> None:
             label="Modeller",
             icon="fa fa-diagram-project",
             views=[
-                GraphSchemaView(GraphSchema, label="Schemas"),
-                SchemaVersionView(SchemaVersion, label="Schema versions"),
+                GraphModelView(GraphModel, label="Graph models"),
+                GraphVersionView(GraphVersion, label="Schema versions"),
                 NodeTypeDefinitionView(NodeTypeDefinition, label="Node types"),
                 EdgeTypeDefinitionView(EdgeTypeDefinition, label="Edge types"),
                 PropertyKeyDefinitionView(PropertyKeyDefinition, label="Property keys"),

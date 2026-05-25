@@ -32,7 +32,7 @@ class TestVersioner:
         versioner = Versioner(store)
         schema = await store.create_schema(session, name="Activate Test")
         await session.commit()
-        draft = await store.create_version(session, schema_id=schema.id)
+        draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         activated = await versioner.activate(session, version_id=draft.id)
@@ -44,7 +44,7 @@ class TestVersioner:
         versioner = Versioner(store)
         schema = await store.create_schema(session, name="Override Test")
         await session.commit()
-        draft = await store.create_version(session, schema_id=schema.id)
+        draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         activated = await versioner.activate(
@@ -59,12 +59,12 @@ class TestVersioner:
         schema = await store.create_schema(session, name="Archive Test")
         await session.commit()
 
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=v1.id)
         await session.commit()
 
-        v2 = await store.create_version(session, schema_id=schema.id)
+        v2 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=v2.id)
         await session.commit()
@@ -76,7 +76,7 @@ class TestVersioner:
         versioner = Versioner(store)
         schema = await store.create_schema(session, name="Non-draft")
         await session.commit()
-        draft = await store.create_version(session, schema_id=schema.id)
+        draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=draft.id)
         await session.commit()
@@ -91,13 +91,13 @@ class TestVersioner:
         await session.commit()
 
         # v1: empty
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=v1.id)
         await session.commit()
 
         # v2: add a node type → minor
-        v2 = await store.create_version(session, schema_id=schema.id, based_on="1.0.0")
+        v2 = await store.create_version(session, model_id=schema.id, based_on="1.0.0")
         await session.commit()
         await store.create_property_key(session, version_id=v2.id, name="name", type="string")
         await session.commit()
@@ -118,7 +118,7 @@ class TestVersioner:
         schema = await store.create_schema(session, name="Major Bump")
         await session.commit()
 
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await store.create_node_type(session, version_id=v1.id, name="Person")
         await session.commit()
@@ -126,7 +126,7 @@ class TestVersioner:
         await session.commit()
 
         # v2: remove the node type → major
-        v2 = await store.create_version(session, schema_id=schema.id)
+        v2 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         activated = await versioner.activate(session, version_id=v2.id)
         assert activated.version == "2.0.0"
@@ -139,19 +139,19 @@ class TestDiff:
         schema = await store.create_schema(session, name="Diff Test")
         await session.commit()
 
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=v1.id)
         await session.commit()
 
-        v2 = await store.create_version(session, schema_id=schema.id)
+        v2 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await store.create_node_type(session, version_id=v2.id, name="Person")
         await session.commit()
         await versioner.activate(session, version_id=v2.id)
         await session.commit()
 
-        diff = await versioner.diff(session, schema_id=schema.id, from_version="1.0.0", to_version="1.1.0")
+        diff = await versioner.diff(session, model_id=schema.id, from_version="1.0.0", to_version="1.1.0")
         assert "Person" in diff.added_node_types
         assert diff.classification == "minor"
 
@@ -160,19 +160,19 @@ class TestDiff:
         schema = await store.create_schema(session, name="Diff Remove")
         await session.commit()
 
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await store.create_node_type(session, version_id=v1.id, name="Legacy")
         await session.commit()
         await versioner.activate(session, version_id=v1.id)
         await session.commit()
 
-        v2 = await store.create_version(session, schema_id=schema.id)
+        v2 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await versioner.activate(session, version_id=v2.id)
         await session.commit()
 
-        diff = await versioner.diff(session, schema_id=schema.id, from_version="1.0.0", to_version="2.0.0")
+        diff = await versioner.diff(session, model_id=schema.id, from_version="1.0.0", to_version="2.0.0")
         assert "Legacy" in diff.removed_node_types
         assert diff.classification == "major"
 
@@ -182,7 +182,7 @@ class TestDiff:
         schema = await store.create_schema(session, name="Diff Prop")
         await session.commit()
 
-        v1 = await store.create_version(session, schema_id=schema.id)
+        v1 = await store.create_version(session, model_id=schema.id)
         await session.commit()
         await store.create_property_key(session, version_id=v1.id, name="val", type="string")
         await session.commit()
@@ -196,7 +196,7 @@ class TestDiff:
         await versioner.activate(session, version_id=v1.id)
         await session.commit()
 
-        v2 = await store.create_version(session, schema_id=schema.id, based_on="1.0.0")
+        v2 = await store.create_version(session, model_id=schema.id, based_on="1.0.0")
         await session.commit()
         # Change the property key type → major
         pks = await store.list_property_keys(session, v2.id)
@@ -208,7 +208,7 @@ class TestDiff:
         await versioner.activate(session, version_id=v2.id)
         await session.commit()
 
-        diff = await versioner.diff(session, schema_id=schema.id, from_version="1.0.0", to_version="2.0.0")
+        diff = await versioner.diff(session, model_id=schema.id, from_version="1.0.0", to_version="2.0.0")
         assert len(diff.modified_property_keys) == 1
         assert diff.modified_property_keys[0].name == "val"
         assert "type" in diff.modified_property_keys[0].changes

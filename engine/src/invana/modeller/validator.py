@@ -22,8 +22,8 @@ from invana.modeller.inheritance import (
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
+    GraphVersion,
     NodeTypeDefinition,
-    SchemaVersion,
     TypePropertyMapping,
     ValidationRule,
 )
@@ -65,8 +65,8 @@ class _CachedSchema:
     subtypes: dict[str, set[str]] = field(default_factory=dict)
 
 
-def _build_cache(version: SchemaVersion, validation_mode: str = "strict") -> _CachedSchema:
-    """Build the in-memory lookup cache from a loaded SchemaVersion."""
+def _build_cache(version: GraphVersion, validation_mode: str = "strict") -> _CachedSchema:
+    """Build the in-memory lookup cache from a loaded GraphVersion."""
     nt_map = build_type_map(version.node_types)
     et_map = {et.name: et for et in version.edge_types}
 
@@ -219,7 +219,7 @@ class SchemaValidator:
     def __init__(self) -> None:
         self._cache: _CachedSchema | None = None
 
-    def load(self, version: SchemaVersion, validation_mode: str = "strict") -> None:
+    def load(self, version: GraphVersion, validation_mode: str = "strict") -> None:
         """Load and cache a schema version for validation."""
         self._cache = _build_cache(version, validation_mode)
 

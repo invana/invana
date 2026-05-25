@@ -12,7 +12,7 @@ class TestSchemaValidator:
         """Create a schema with Person, Employee (child), and KNOWS edge."""
         schema = await store.create_schema(session, name="Validate Test")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         # Create global property keys

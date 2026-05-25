@@ -16,10 +16,10 @@ from sqlalchemy import update
 from invana.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
+    GraphVersion,
     IndexDefinition,
     NodeTypeDefinition,
     PropertyKeyDefinition,
-    SchemaVersion,
 )
 from invana.modeller.schemas import (
     EdgeTypeDiff,
@@ -212,8 +212,8 @@ def _classify(diff: SchemaDiff) -> str:
     return "patch"
 
 
-def compute_diff(old: SchemaVersion, new: SchemaVersion) -> SchemaDiff:
-    """Compute the diff between two fully-loaded ``SchemaVersion`` objects."""
+def compute_diff(old: GraphVersion, new: GraphVersion) -> SchemaDiff:
+    """Compute the diff between two fully-loaded ``GraphVersion`` objects."""
     added_pk, removed_pk, modified_pk = _diff_property_keys(old.property_keys, new.property_keys)
     added_nt, removed_nt, modified_nt = _diff_node_types(old.node_types, new.node_types)
     added_et, removed_et, modified_et = _diff_edge_types(old.edge_types, new.edge_types)
@@ -282,7 +282,7 @@ class Versioner:
         version_id: str,
         override_version: str | None = None,
         change_summary: str = "",
-    ) -> SchemaVersion:
+    ) -> GraphVersion:
         """Activate a draft version.
 
         1. Compute diff against the current active version (if exists).
@@ -290,7 +290,7 @@ class Versioner:
         3. Archive the current active version.
         4. Mark the draft as active.
 
-        Returns the activated ``SchemaVersion`` with version number assigned.
+        Returns the activated ``GraphVersion`` with version number assigned.
         """
         draft = await self._store.get_version(session, version_id)
         if draft is None:
@@ -301,7 +301,7 @@ class Versioner:
             raise ValueError(msg)
 
         # Find current active version for diffing
-        current_active = await self._store.get_active_version(session, draft.schema_id)
+        current_active = await self._store.get_active_version(session, draft.model_id)
 
         if override_version is not None:
             semver = override_version
@@ -314,14 +314,14 @@ class Versioner:
         # Archive the current active version
         if current_active is not None:
             await session.execute(
-                update(SchemaVersion).where(SchemaVersion.id == current_active.id).values(status="archived")
+                update(GraphVersion).where(GraphVersion.id == current_active.id).values(status="archived")
             )
 
         # Activate the draft
         now = datetime.now(UTC)
         await session.execute(
-            update(SchemaVersion)
-            .where(SchemaVersion.id == version_id)
+            update(GraphVersion)
+            .where(GraphVersion.id == version_id)
             .values(
                 status="active",
                 version=semver,
@@ -339,16 +339,16 @@ class Versioner:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         from_version: str,
         to_version: str,
     ) -> SchemaDiff:
         """Compute the diff between two named versions."""
-        old = await self._store.get_version_by_semver(session, schema_id, from_version)
+        old = await self._store.get_version_by_semver(session, model_id, from_version)
         if old is None:
             msg = f"Version '{from_version}' not found."
             raise ValueError(msg)
-        new = await self._store.get_version_by_semver(session, schema_id, to_version)
+        new = await self._store.get_version_by_semver(session, model_id, to_version)
         if new is None:
             msg = f"Version '{to_version}' not found."
             raise ValueError(msg)

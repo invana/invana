@@ -1,11 +1,11 @@
 """JSON export/import for schema versions.
 
-``SchemaExporter`` serialises a ``SchemaVersion`` (with all contained types,
+``SchemaExporter`` serialises a ``GraphVersion`` (with all contained types,
 property keys, mappings, constraints, rules, and indexes) into a
 ``SchemaExport`` Pydantic model that round-trips cleanly to JSON.
 
 ``SchemaImporter`` takes a ``SchemaExport`` and creates a new draft
-``SchemaVersion`` inside an existing ``GraphSchema``.
+``GraphVersion`` inside an existing ``GraphModel``.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from invana.modeller.models import SchemaVersion
+from invana.modeller.models import GraphVersion
 from invana.modeller.schemas import (
     ConstraintCreate,
     EdgeTypeCreate,
@@ -37,11 +37,11 @@ if TYPE_CHECKING:
 
 
 class SchemaExporter:
-    """Serialise a loaded ``SchemaVersion`` to ``SchemaExport``."""
+    """Serialise a loaded ``GraphVersion`` to ``SchemaExport``."""
 
     @staticmethod
     def export(
-        version: SchemaVersion,
+        version: GraphVersion,
         schema_name: str,
         schema_description: str = "",
         validation_mode: str = "strict",
@@ -170,14 +170,14 @@ class SchemaImporter:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         data: SchemaExport,
     ) -> str:
         """Create a new draft version from *data*.
 
         Returns the new version ID.
         """
-        version = await self._store.create_version(session, schema_id=schema_id)
+        version = await self._store.create_version(session, model_id=model_id)
 
         # Import property keys first (node/edge types reference them by name)
         for pk_data in data.property_keys:

@@ -414,7 +414,10 @@ async def introspect_connection(
             detail={"error": "graph_not_active", "connection_id": connection.id},
         ) from None
 
-    manager._spawn(manager._auto_introspect(session, connection, connector))  # type: ignore[attr-defined]
+    # Fire-and-forget in a dedicated session — must NOT reuse `session`, which
+    # the request closes on return (races the task → asyncpg "another operation
+    # in progress"). Pass the id + in-memory connector instead.
+    manager._spawn(manager.introspect(connection.id, connector))
     return {"detail": "introspection initiated"}
 
 

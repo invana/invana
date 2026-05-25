@@ -17,7 +17,7 @@ class TestInheritance:
         """Helper — create a schema with an inheritance chain: Entity → Person → Employee."""
         schema = await store.create_schema(session, name="Inherit")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_property_key(session, version_id=version.id, name="id", type="string")
@@ -82,7 +82,7 @@ class TestInheritance:
     async def test_cycle_detection(self, session, store):
         schema = await store.create_schema(session, name="Cycle")
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         await store.create_node_type(

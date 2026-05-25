@@ -85,9 +85,9 @@ export interface IndexResponse {
 
 // ── Schema Version (full payload for Modeller) ────────────────────────────
 
-export interface SchemaVersionResponse {
+export interface GraphVersionResponse {
 	id: string;
-	schema_id: string;
+	model_id: string;
 	version: string | null;
 	status: string;
 	change_summary: string;

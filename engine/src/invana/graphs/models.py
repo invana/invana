@@ -31,7 +31,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.auth.models import User
-from invana.modeller.models import Base, GraphSchema
+from invana.modeller.models import Base, GraphModel
 
 
 def _utcnow() -> datetime:
@@ -134,7 +134,7 @@ class Graph(Base):
 class GraphConnection(Base):
     """Persisted graph-DB connection record. 1:1 with ``Graph``.
 
-    Owns one ``GraphSchema`` (1:1 via unique FK on ``schema_id``).
+    Owns one ``GraphModel`` (1:1 via unique FK on ``model_id``).
     Live connector instances are managed separately by ``GraphConnectionManager``.
     """
 
@@ -170,8 +170,8 @@ class GraphConnection(Base):
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # 1:1 link to owned schema — UNIQUE enforces the constraint at DB level
-    schema_id: Mapped[str | None] = mapped_column(
-        ForeignKey("graph_schemas.id", ondelete="SET NULL"),
+    model_id: Mapped[str | None] = mapped_column(
+        ForeignKey("graph_models.id", ondelete="SET NULL"),
         nullable=True,
         unique=True,
     )
@@ -180,9 +180,9 @@ class GraphConnection(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
     graph: Mapped[Graph | None] = relationship(back_populates="connection")
-    schema: Mapped[GraphSchema | None] = relationship(
-        "GraphSchema",
-        foreign_keys=[schema_id],
+    schema: Mapped[GraphModel | None] = relationship(
+        "GraphModel",
+        foreign_keys=[model_id],
         lazy="select",
     )
 

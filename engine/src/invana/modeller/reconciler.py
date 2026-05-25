@@ -65,7 +65,7 @@ class Reconciler:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         connector: BaseConnector,
         connector_id: str,
         mode: str = "strict",
@@ -75,19 +75,19 @@ class Reconciler:
         Returns a dict matching ``ReconcileResponse`` fields.
         """
         # 1. Get active version
-        active = await self._store.get_active_version(session, schema_id)
+        active = await self._store.get_active_version(session, model_id)
 
         if active is None:
             return await self._handle_no_active(
                 session,
-                schema_id=schema_id,
+                model_id=model_id,
                 connector=connector,
                 connector_id=connector_id,
                 mode=mode,
             )
 
         # 2. Get last projection
-        last_proj = await self._store.get_latest_projection(session, schema_id, connector_id)
+        last_proj = await self._store.get_latest_projection(session, model_id, connector_id)
 
         # 3. Get live DB state
         live_indexes = await connector.schema_reader.get_indexes()
@@ -126,7 +126,7 @@ class Reconciler:
             logger.warning(msg)
             return self._result(
                 connector_id,
-                schema_id,
+                model_id,
                 active.version,
                 status="error",
                 drift=drift,
@@ -137,7 +137,7 @@ class Reconciler:
         if not app_ahead and not db_ahead:
             return self._result(
                 connector_id,
-                schema_id,
+                model_id,
                 active.version,
                 status="in_sync",
                 message="Schema is in sync.",
@@ -147,7 +147,7 @@ class Reconciler:
         if app_ahead:
             return await self._handle_app_ahead(
                 session,
-                schema_id=schema_id,
+                model_id=model_id,
                 version=active,
                 connector=connector,
                 connector_id=connector_id,
@@ -158,7 +158,7 @@ class Reconciler:
         # DB ahead
         return await self._handle_db_ahead(
             session,
-            schema_id=schema_id,
+            model_id=model_id,
             connector=connector,
             connector_id=connector_id,
             mode=mode,
@@ -174,25 +174,25 @@ class Reconciler:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         connector: BaseConnector,
         connector_id: str,
         mode: str,
     ) -> dict[str, Any]:
         """Handle the case where no active schema version exists."""
         if mode in ("strict", "auto_project"):
-            raise SchemaNotConfiguredError(f"No active schema version for schema '{schema_id}'.")
+            raise SchemaNotConfiguredError(f"No active schema version for schema '{model_id}'.")
 
         if mode == "auto_introspect":
             logger.warning("No active schema — introspecting DB to create initial draft.")
             result = await self._introspector.introspect(
                 session,
-                schema_id=schema_id,
+                model_id=model_id,
                 connector=connector,
             )
             return self._result(
                 connector_id,
-                schema_id,
+                model_id,
                 None,
                 status="draft_created",
                 new_draft_version_id=result["version_id"],
@@ -200,10 +200,10 @@ class Reconciler:
             )
 
         # warn mode
-        logger.warning("No active schema version for schema '%s'.", schema_id)
+        logger.warning("No active schema version for schema '%s'.", model_id)
         return self._result(
             connector_id,
-            schema_id,
+            model_id,
             None,
             status="drifted",
             message="No active schema version. Configure a schema and activate it.",
@@ -213,7 +213,7 @@ class Reconciler:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         version: Any,
         connector: BaseConnector,
         connector_id: str,
@@ -234,7 +234,7 @@ class Reconciler:
             )
             return self._result(
                 connector_id,
-                schema_id,
+                model_id,
                 version.version,
                 status="projected",
                 projection=proj_result,
@@ -242,10 +242,10 @@ class Reconciler:
             )
 
         # warn mode
-        logger.warning("App schema is ahead of DB for schema '%s'.", schema_id)
+        logger.warning("App schema is ahead of DB for schema '%s'.", model_id)
         return self._result(
             connector_id,
-            schema_id,
+            model_id,
             version.version,
             status="drifted",
             drift=drift,
@@ -256,7 +256,7 @@ class Reconciler:
         self,
         session: AsyncSession,
         *,
-        schema_id: str,
+        model_id: str,
         connector: BaseConnector,
         connector_id: str,
         mode: str,
@@ -271,12 +271,12 @@ class Reconciler:
             logger.warning("DB ahead — creating draft from introspection.")
             result = await self._introspector.introspect(
                 session,
-                schema_id=schema_id,
+                model_id=model_id,
                 connector=connector,
             )
             return self._result(
                 connector_id,
-                schema_id,
+                model_id,
                 active_version,
                 status="draft_created",
                 drift=drift,
@@ -285,10 +285,10 @@ class Reconciler:
             )
 
         # warn mode
-        logger.warning("DB schema is ahead of app for schema '%s'.", schema_id)
+        logger.warning("DB schema is ahead of app for schema '%s'.", model_id)
         return self._result(
             connector_id,
-            schema_id,
+            model_id,
             active_version,
             status="drifted",
             drift=drift,
@@ -350,7 +350,7 @@ class Reconciler:
     @staticmethod
     def _result(
         connector_id: str,
-        schema_id: str | None,
+        model_id: str | None,
         active_version: str | None,
         *,
         status: str,
@@ -361,7 +361,7 @@ class Reconciler:
     ) -> dict[str, Any]:
         return {
             "connector_id": connector_id,
-            "schema_id": schema_id,
+            "model_id": model_id,
             "active_version": active_version,
             "status": status,
             "drift": drift,

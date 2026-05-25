@@ -120,7 +120,7 @@ export interface GraphConnectionRead {
 	status: GraphConnectionStatus;
 	last_health_check_at: string | null;
 	latency_ms: number | null;
-	schema_id: string | null;
+	model_id: string | null;
 	created_at: string;
 	updated_at: string;
 	// Connector-reported capabilities resolved server-side. `capabilities`

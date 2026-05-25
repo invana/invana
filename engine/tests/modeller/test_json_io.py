@@ -17,7 +17,7 @@ class TestJsonExportImport:
             description="Test schema",
         )
         await session.commit()
-        version = await store.create_version(session, schema_id=schema.id)
+        version = await store.create_version(session, model_id=schema.id)
         await session.commit()
 
         # Global property keys
@@ -122,7 +122,7 @@ class TestJsonExportImport:
         importer = SchemaImporter(store)
         new_version_id = await importer.import_schema(
             session,
-            schema_id=new_schema.id,
+            model_id=new_schema.id,
             data=export,
         )
         await session.commit()
@@ -147,7 +147,7 @@ class TestJsonExportImport:
         importer = SchemaImporter(store)
         new_version_id = await importer.import_schema(
             session,
-            schema_id=new_schema.id,
+            model_id=new_schema.id,
             data=export,
         )
         await session.commit()

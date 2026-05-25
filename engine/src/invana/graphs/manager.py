@@ -182,7 +182,7 @@ class GraphConnectionManager:
                 )
                 await session.commit()
 
-                if graph.schema_id is None:
+                if graph.model_id is None:
                     await self._auto_introspect(session, graph, connector)
 
         except Exception as exc:
@@ -274,11 +274,26 @@ class GraphConnectionManager:
                         self._retry_tasks[graph_id] = asyncio.create_task(self._backoff_retry(graph))
 
     # -----------------------------------------------------------------------
-    # Internal — auto-introspect
+    # Introspection
     # -----------------------------------------------------------------------
 
+    async def introspect(self, connection_id: str, connector: BaseConnector) -> None:
+        """Re-run introspection in a **dedicated** session (safe to fire-and-forget).
+
+        The HTTP route returns 202 immediately, so reusing the request-scoped
+        session here would race the request teardown on the same asyncpg
+        connection — "another operation is in progress". Open our own session
+        and re-load the connection inside it.
+        """
+        async with self._session_factory() as session:
+            connection = await GraphModelStore().get(session, connection_id)
+            if connection is None:
+                logger.warning("Introspect skipped — connection %r no longer exists.", connection_id)
+                return
+            await self._auto_introspect(session, connection, connector)
+
     async def _auto_introspect(self, session: AsyncSession, graph: GraphConnection, connector: BaseConnector) -> None:
-        """Seed a GraphSchema from live DB introspection on first successful connect."""
+        """Seed a GraphModel from live DB introspection on first successful connect."""
         try:
             parent = await session.get(Graph, graph.graph_id) if graph.graph_id else None
             schema_name = parent.name if parent else graph.uri
@@ -291,7 +306,7 @@ class GraphConnectionManager:
             )
 
             introspector = Introspector(schema_store)
-            await introspector.introspect(session, schema_id=schema.id, connector=connector)
+            await introspector.introspect(session, model_id=schema.id, connector=connector)
 
             await GraphModelStore().set_schema(session, graph.id, schema.id)
             await emit_event(
@@ -301,10 +316,10 @@ class GraphConnectionManager:
                 target_id=graph.id,
                 graph_id=graph.graph_id,
                 actor_type=ActorType.system,
-                details={"ok": True, "schema_id": schema.id},
+                details={"ok": True, "model_id": schema.id},
             )
             await session.commit()
-            logger.info("Auto-introspected schema for graph %r (schema_id=%s).", graph.id, schema.id)
+            logger.info("Auto-introspected schema for graph %r (model_id=%s).", graph.id, schema.id)
         except Exception as exc:
             logger.warning("Auto-introspect failed for graph %r: %s", graph.id, exc, exc_info=True)
             # Non-fatal — graph stays ACTIVE, schema stays null, user can retry via /introspect

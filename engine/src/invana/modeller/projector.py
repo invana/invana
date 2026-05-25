@@ -1,4 +1,4 @@
-"""Projector — translates an active SchemaVersion into connector DDL calls.
+"""Projector — translates an active GraphVersion into connector DDL calls.
 
 The projector is **idempotent**: it compares the desired state (from the
 schema version) against the current live state (from ``schema_reader``)
@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 from invana.graph.types.constants import Capability
 from invana.modeller.models import (
-    SchemaVersion,
+    GraphVersion,
 )
 
 if TYPE_CHECKING:
@@ -101,7 +101,7 @@ _CONSTRAINT_TYPE_CAPABILITY: dict[str, Capability] = {
 
 
 class Projector:
-    """Translates a ``SchemaVersion`` into connector DDL calls."""
+    """Translates a ``GraphVersion`` into connector DDL calls."""
 
     def __init__(self, store: SchemaStore) -> None:
         self._store = store
@@ -110,7 +110,7 @@ class Projector:
         self,
         session: AsyncSession,
         *,
-        version: SchemaVersion,
+        version: GraphVersion,
         connector: BaseConnector,
         connector_id: str,
     ) -> dict[str, Any]:
@@ -261,7 +261,7 @@ class Projector:
 
     def _compute_desired_indexes(
         self,
-        version: SchemaVersion,
+        version: GraphVersion,
         caps: set[Capability],
     ) -> list[_DesiredIndex]:
         """Derive the set of indexes that should exist from the schema version."""
@@ -280,7 +280,7 @@ class Projector:
 
     def _compute_desired_constraints(
         self,
-        version: SchemaVersion,
+        version: GraphVersion,
         caps: set[Capability],
     ) -> list[_DesiredConstraint]:
         """Derive the set of constraints from the explicit ConstraintDefinition entities."""
