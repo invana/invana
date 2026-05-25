@@ -134,7 +134,7 @@ async def _list_memberships(session: AsyncSession, *, user_id: str) -> list[Grap
     owners: dict[str, str] = {}
     if owner_ids:
         owner_rows = (await session.execute(select(User.id, User.username).where(User.id.in_(owner_ids)))).all()
-        owners = {oid: uname for oid, uname in owner_rows}
+        owners = dict(owner_rows)
 
     return [
         GraphMembershipOut(
@@ -176,7 +176,7 @@ async def _build_auth_response(session: AsyncSession, *, user: User) -> AuthResp
 # ---------------------------------------------------------------------------
 
 
-async def register_with_invite(  # noqa: PLR0915 — emit_event branches stay in-line
+async def register_with_invite(
     session: AsyncSession, *, raw_invite_token: str, payload: RegisterRequest
 ) -> AuthResponse:
     invitation = await _find_invitation_by_raw_token(session, raw_invite_token)

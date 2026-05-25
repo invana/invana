@@ -128,7 +128,7 @@ class EventBroadcaster:
                     await asyncio.sleep(3600)
             except asyncio.CancelledError:
                 raise
-            except Exception as exc:  # noqa: BLE001 — log + retry with backoff
+            except Exception as exc:
                 log.warning(
                     "EventBroadcaster: LISTEN connection dropped (%s); retry in %.1fs",
                     exc,
@@ -155,7 +155,7 @@ class EventBroadcaster:
                 graph_id=obj.get("graph_id"),
                 created_at=obj["created_at"],
             )
-        except Exception:  # noqa: BLE001 — malformed payload, drop quietly
+        except Exception:
             log.warning("EventBroadcaster: malformed NOTIFY payload, dropping")
             return
 

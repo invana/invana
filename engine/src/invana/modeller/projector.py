@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class _DesiredIndex:
-    __slots__ = ("name", "label", "properties", "index_type", "options")
+    __slots__ = ("index_type", "label", "name", "options", "properties")
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class _DesiredIndex:
 
 
 class _DesiredConstraint:
-    __slots__ = ("name", "label", "properties", "constraint_type")
+    __slots__ = ("constraint_type", "label", "name", "properties")
 
     def __init__(
         self,

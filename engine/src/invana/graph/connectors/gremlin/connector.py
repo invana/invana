@@ -91,7 +91,7 @@ class GremlinConnector(BaseConnector):
                 "g",
                 username=self._username,
                 password=self._password,
-                transport_factory=lambda: AiohttpTransport(),
+                transport_factory=AiohttpTransport,
             )
             self._g = traversal().with_(self._connection)
             return self._connection
@@ -125,8 +125,7 @@ class GremlinConnector(BaseConnector):
     async def execute_traversal(self, traversal_obj: Any) -> list[Any]:
         """Execute a Gremlin traversal and return results as a list."""
         try:
-            result = await asyncio.to_thread(traversal_obj.to_list)
-            return result
+            return await asyncio.to_thread(traversal_obj.to_list)
         except Exception as e:
             raise QueryExecutionError(f"Traversal execution failed: {e}") from e
 

@@ -54,12 +54,12 @@ def _diff_property_keys(
     removed = [n for n in old_map if n not in new_map]
 
     modified: list[PropertyKeyDiff] = []
-    for name in old_map:
+    for name, old_item in old_map.items():
         if name not in new_map:
             continue
         changes: dict[str, tuple[Any, Any]] = {}
         for field in _PROPERTY_KEY_DIFF_FIELDS:
-            old_val = getattr(old_map[name], field)
+            old_val = getattr(old_item, field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 changes[field] = (old_val, new_val)
@@ -97,13 +97,13 @@ def _diff_node_types(
     removed = [n for n in old_map if n not in new_map]
 
     modified: list[NodeTypeDiff] = []
-    for name in old_map:
+    for name, old_item in old_map.items():
         if name not in new_map:
             continue
-        added_m, removed_m = _diff_type_mappings(old_map[name], new_map[name])
+        added_m, removed_m = _diff_type_mappings(old_item, new_map[name])
         meta: dict[str, tuple[Any, Any]] = {}
         for field in _NODE_META_FIELDS:
-            old_val = getattr(old_map[name], field)
+            old_val = getattr(old_item, field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 meta[field] = (old_val, new_val)
@@ -131,13 +131,13 @@ def _diff_edge_types(
     removed = [n for n in old_map if n not in new_map]
 
     modified: list[EdgeTypeDiff] = []
-    for name in old_map:
+    for name, old_item in old_map.items():
         if name not in new_map:
             continue
-        added_m, removed_m = _diff_type_mappings(old_map[name], new_map[name])
+        added_m, removed_m = _diff_type_mappings(old_item, new_map[name])
         meta: dict[str, tuple[Any, Any]] = {}
         for field in _EDGE_META_FIELDS:
-            old_val = getattr(old_map[name], field)
+            old_val = getattr(old_item, field)
             new_val = getattr(new_map[name], field)
             if old_val != new_val:
                 meta[field] = (old_val, new_val)

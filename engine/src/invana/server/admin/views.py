@@ -26,6 +26,7 @@ from invana.modeller.models import (
     TypePropertyMapping,
     ValidationRule,
 )
+from invana.server.admin.auth import SuperuserAuthProvider
 from invana.skills.models import Skill
 
 # Custom templates (currently: base.html with theme switcher) live alongside
@@ -361,8 +362,6 @@ def mount_admin(app: FastAPI) -> None:
     can sign in. Session cookies via ``SessionMiddleware`` (added in
     ``server/app.py``).
     """
-    from invana.server.admin.auth import SuperuserAuthProvider
-
     admin = Admin(
         app.state.sync_engine,
         title="Invana Admin",

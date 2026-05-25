@@ -3,4 +3,4 @@
 from .config import DEFAULT_LOGGING_CONFIG, configure_logging
 from .filters import OtlpThirdPartyFilter, SuppressNoisyFilter
 
-__all__ = ["configure_logging", "DEFAULT_LOGGING_CONFIG", "SuppressNoisyFilter", "OtlpThirdPartyFilter"]
+__all__ = ["DEFAULT_LOGGING_CONFIG", "OtlpThirdPartyFilter", "SuppressNoisyFilter", "configure_logging"]

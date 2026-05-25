@@ -18,7 +18,7 @@ from invana.graphs.models import (  # noqa: F401
     GraphMember,
     Invitation,
 )
-from invana.modeller.models import Base  # noqa: F401
+from invana.modeller.models import Base
 from invana.settings import settings
 
 config = context.config

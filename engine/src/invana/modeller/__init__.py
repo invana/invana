@@ -37,9 +37,9 @@ from invana.modeller.validator import SchemaValidator, ValidationError
 from invana.modeller.versioner import Versioner, compute_diff
 
 __all__ = [
-    "Introspector",
     "InheritanceCycleError",
     "InheritanceDepthError",
+    "Introspector",
     "Projector",
     "Reconciler",
     "SchemaExporter",

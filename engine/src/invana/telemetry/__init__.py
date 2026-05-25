@@ -13,10 +13,10 @@ Decorators (import from invana.telemetry.decorators):
 
 from invana.telemetry.setup import instrument_app, setup_telemetry
 
-__all__ = ["setup_telemetry", "instrument_app", "TelemetryMiddleware"]
+__all__ = ["TelemetryMiddleware", "instrument_app", "setup_telemetry"]
 
 
-def __getattr__(name: str):  # noqa: N807
+def __getattr__(name: str):
     if name == "TelemetryMiddleware":
         from invana.telemetry.middleware import TelemetryMiddleware
 

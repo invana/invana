@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 _DEV_ENCRYPTION_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 # Insecure dev-only fallback for INVANA_SECRET_KEY (JWT signing). NEVER use in production.
-_DEV_SECRET_KEY = "invana-dev-insecure-secret-key-do-not-use-in-prod"  # noqa: S105
+_DEV_SECRET_KEY = "invana-dev-insecure-secret-key-do-not-use-in-prod"
 
 
 class Settings(BaseSettings):

@@ -170,7 +170,7 @@ def _build_query_response(graph_response: GraphResponse, query_language: QueryLa
             query_language=query_language.value,
             data=graph_response,
             rows=None,
-            execution_time_ms=int(round(graph_response.metadata.duration_ms)),
+            execution_time_ms=round(graph_response.metadata.duration_ms),
             row_count=len(graph_response.nodes) + len(graph_response.edges),
         )
     return QueryResponse(
@@ -178,6 +178,6 @@ def _build_query_response(graph_response: GraphResponse, query_language: QueryLa
         query_language=query_language.value,
         data=None,
         rows=graph_response.records,
-        execution_time_ms=int(round(graph_response.metadata.duration_ms)),
+        execution_time_ms=round(graph_response.metadata.duration_ms),
         row_count=len(graph_response.records),
     )

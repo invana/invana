@@ -23,11 +23,17 @@ from invana.events import actions as event_actions
 from invana.events.models import ActorType
 from invana.events.services import emit_event
 from invana.graphs.encryption import decrypt_credentials
+from invana.graphs.models import Graph
 from invana.graphs.store import GraphModelStore
+from invana.modeller.introspector import Introspector
+from invana.modeller.store import SchemaStore
 from invana.settings import settings
 from invana.utils import import_class_from_dotted_path
 
 if TYPE_CHECKING:
+    from collections.abc import Coroutine
+    from typing import Any
+
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
     from invana.graph.connectors.base.connector import BaseConnector
@@ -57,6 +63,18 @@ class GraphConnectionManager:
         self._registry: dict[str, BaseConnector] = {}  # graph_id → live connector
         self._retry_tasks: dict[str, asyncio.Task] = {}  # graph_id → backoff task
         self._health_task: asyncio.Task | None = None
+        self._background_tasks: set[asyncio.Task] = set()  # fire-and-forget connects, kept alive until done
+
+    def _spawn(self, coro: Coroutine[Any, Any, None]) -> asyncio.Task:
+        """Create a fire-and-forget task and hold a strong reference until it finishes.
+
+        Without retaining the reference the event loop may garbage-collect the
+        task mid-flight (see Ruff RUF006 / asyncio docs).
+        """
+        task = asyncio.create_task(coro)
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
+        return task
 
     # -----------------------------------------------------------------------
     # Lifecycle — called from FastAPI lifespan only
@@ -68,7 +86,7 @@ class GraphConnectionManager:
             graphs = await GraphModelStore().list_active(session)
 
         for graph in graphs:
-            asyncio.create_task(self._connect_graph(graph))
+            self._spawn(self._connect_graph(graph))
 
         self._health_task = asyncio.create_task(self._health_loop())
         logger.info("GraphConnectionManager started. Connecting %d graph(s).", len(graphs))
@@ -110,7 +128,7 @@ class GraphConnectionManager:
 
     async def register(self, graph: GraphConnection) -> None:
         """Connect a newly created graph and add it to the registry."""
-        asyncio.create_task(self._connect_graph(graph))
+        self._spawn(self._connect_graph(graph))
 
     async def deregister(self, graph_id: str) -> None:
         """Disconnect and remove a graph from the registry.
@@ -135,7 +153,7 @@ class GraphConnectionManager:
         Called on PATCH when URI/auth changes, or on POST /graphs/{id}/reconnect.
         """
         await self.deregister(graph.id)
-        asyncio.create_task(self._connect_graph(graph))
+        self._spawn(self._connect_graph(graph))
 
     # -----------------------------------------------------------------------
     # Internal — connection + retry
@@ -262,13 +280,13 @@ class GraphConnectionManager:
     async def _auto_introspect(self, session: AsyncSession, graph: GraphConnection, connector: BaseConnector) -> None:
         """Seed a GraphSchema from live DB introspection on first successful connect."""
         try:
-            from invana.modeller.introspector import Introspector
-            from invana.modeller.store import SchemaStore
+            parent = await session.get(Graph, graph.graph_id) if graph.graph_id else None
+            schema_name = parent.name if parent else graph.uri
 
             schema_store = SchemaStore()
             schema = await schema_store.create_schema(
                 session,
-                name=graph.name,
+                name=schema_name,
                 description=f"Auto-introspected from {graph.uri}",
             )
 
@@ -301,7 +319,7 @@ class GraphConnectionManager:
                     details={"ok": False, "error": str(exc)},
                 )
                 await session.commit()
-            except Exception:  # noqa: BLE001 — best-effort, don't double-fault
+            except Exception:
                 logger.warning("Failed to emit introspect-failure event for graph %r", graph.id)
 
 

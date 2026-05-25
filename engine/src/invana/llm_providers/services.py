@@ -253,7 +253,7 @@ async def ping_provider(
         )
     except TimeoutError:
         result = {"ok": False, "error": f"Ping timed out after {timeout_s:.0f}s."}
-    except Exception as exc:  # noqa: BLE001 — surface arbitrary SDK errors
+    except Exception as exc:
         result = {"ok": False, "error": str(exc)}
 
     await emit_event(
@@ -299,7 +299,7 @@ async def _dispatch_ping(provider: LLMProvider, api_key: str | None) -> bool:
 
 
 def _ping_anthropic(api_key: str, model_id: str) -> bool:
-    from anthropic import Anthropic  # noqa: PLC0415 — lazy
+    from anthropic import Anthropic
 
     client = Anthropic(api_key=api_key)
     # 1-token round-trip is the cheapest probe Anthropic exposes.
@@ -312,7 +312,7 @@ def _ping_anthropic(api_key: str, model_id: str) -> bool:
 
 
 def _ping_openai(api_key: str, model_id: str, base_url: str | None) -> bool:
-    from openai import OpenAI  # noqa: PLC0415 — lazy
+    from openai import OpenAI
 
     client = OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
     resp = client.chat.completions.create(
@@ -324,8 +324,8 @@ def _ping_openai(api_key: str, model_id: str, base_url: str | None) -> bool:
 
 
 def _ping_http(url: str) -> bool:
-    import urllib.request  # noqa: PLC0415 — lazy
+    import urllib.request
 
     req = urllib.request.Request(url, method="GET")
-    with urllib.request.urlopen(req, timeout=5) as resp:  # noqa: S310 — admin-supplied URL
+    with urllib.request.urlopen(req, timeout=5) as resp:
         return 200 <= resp.status < 500  # any non-server-error response means the host is reachable

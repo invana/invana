@@ -52,9 +52,9 @@ __all__ = [
     "PropertyDefinition",
     "PropertyInfo",
     "QueryExecutionError",
+    "QueryLanguage",
     "QueryResult",
     "ResultMetadata",
     "SerializationError",
     "Vertex",
-    "QueryLanguage",
 ]

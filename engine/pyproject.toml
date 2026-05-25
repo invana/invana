@@ -85,7 +85,47 @@ target-version = "py311"
 line-length = 120
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = [
-    "B008",  # FastAPI requires Depends() in function argument defaults
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort (import ordering)
+    "UP",     # pyupgrade (modern syntax)
+    "B",      # flake8-bugbear (likely bugs)
+    "SIM",    # flake8-simplify
+    "C4",     # flake8-comprehensions
+    "RET",    # flake8-return
+    "PIE",    # flake8-pie (misc lints)
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # ruff-specific rules
+    "TID",    # flake8-tidy-imports (ban relative imports, etc.)
+    "PL",     # Pylint (PLC/PLE/PLR/PLW) — includes PLC0415 in-function imports
 ]
+ignore = [
+    "B008",     # FastAPI requires Depends() in function argument defaults
+    "PLR2004",  # magic-value-comparison — too noisy for status strings / ints
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments (FastAPI handlers take many Depends)
+    "PLR0915",  # too-many-statements
+    "PLC0414",  # useless-import-alias — re-export style `import x as x` is intentional
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Lazy/in-function imports are intentional here:
+#   telemetry/* — gated behind the optional `telemetry` extra
+#   cli/*       — deferred to keep `invana` CLI startup fast
+#   server/app.py — lazy router + optional-server wiring at app build time
+"src/invana/telemetry/*" = ["PLC0415", "PLW0603"]  # PLW0603: idempotent one-time provider init
+"src/invana/cli/*" = ["PLC0415"]
+"src/invana/server/app.py" = ["PLC0415"]
+# Optional/heavy SDKs imported lazily so they're only required when actually used:
+#   events/services.py     — opentelemetry (telemetry extra)
+#   llm_providers/services — anthropic / openai SDKs + urllib, per-provider
+"src/invana/events/services.py" = ["PLC0415"]
+"src/invana/llm_providers/services.py" = ["PLC0415"]
+# starlette-admin ModelViews declare `fields`/`exclude_*` as plain class lists —
+# the framework's documented API. RUF012 (ClassVar) doesn't apply.
+"src/invana/server/admin/views.py" = ["RUF012"]
+# Test idioms: in-function imports (fixtures/locality) and partially-unpacked
+# tuples (`schema, _ = ...`) are fine and intentional in tests.
+"tests/**" = ["PLC0415", "RUF059"]

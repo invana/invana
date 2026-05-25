@@ -25,6 +25,8 @@ from invana.auth.schemas import (
     InvitationOut,
 )
 from invana.db import get_session
+from invana.events import actions as event_actions
+from invana.events.services import current_trace_id, emit_event
 from invana.graph.connectors.base.connector import BaseConnector
 from invana.graph.types.constants import Capability
 from invana.graphs import services
@@ -356,9 +358,6 @@ async def test_connection(
     discard. Used by the studio's "Test Connection" button to gate the
     save action.
     """
-    from invana.events import actions as event_actions  # noqa: PLC0415
-    from invana.events.services import current_trace_id, emit_event  # noqa: PLC0415
-
     result = await services.test_connection_credentials(
         uri=payload.uri,
         connector_class=payload.connector_class,
@@ -403,10 +402,6 @@ async def introspect_connection(
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> dict:
     """Re-run schema introspection against the live graph DB (async)."""
-    import asyncio  # noqa: PLC0415
-
-    from invana.graphs.manager import GraphUnavailableError  # noqa: PLC0415
-
     connection = await services.get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
@@ -419,7 +414,7 @@ async def introspect_connection(
             detail={"error": "graph_not_active", "connection_id": connection.id},
         ) from None
 
-    asyncio.create_task(manager._auto_introspect(session, connection, connector))  # type: ignore[attr-defined]
+    manager._spawn(manager._auto_introspect(session, connection, connector))  # type: ignore[attr-defined]
     return {"detail": "introspection initiated"}
 
 

@@ -137,12 +137,12 @@ def current_trace_id() -> str | None:
     Safe to call from any service — never raises.
     """
     try:
-        from opentelemetry import trace  # noqa: PLC0415 — lazy / optional
+        from opentelemetry import trace
 
         span = trace.get_current_span()
         ctx = span.get_span_context()
         if not ctx or not ctx.is_valid:
             return None
         return f"{ctx.trace_id:032x}"
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None

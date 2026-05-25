@@ -18,4 +18,4 @@ Typical usage
 from invana.telemetry.decorators.capture_metrics import MetricDomain, capture_metrics
 from invana.telemetry.decorators.track import track
 
-__all__ = ["track", "capture_metrics", "MetricDomain"]
+__all__ = ["MetricDomain", "capture_metrics", "track"]

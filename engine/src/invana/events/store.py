@@ -149,5 +149,5 @@ def _decode_cursor(cursor: str | None) -> _Keyset | None:
         raw = base64.urlsafe_b64decode(padded.encode()).decode()
         obj = json.loads(raw)
         return _Keyset(created_at=datetime.fromisoformat(obj["created_at"]), id=obj["id"])
-    except Exception:  # noqa: BLE001 — opaque cursor; reject by treating as no-cursor
+    except Exception:
         return None

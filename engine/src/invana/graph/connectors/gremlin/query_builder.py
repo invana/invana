@@ -65,11 +65,10 @@ def _build_predicate(group: FilterGroup) -> Any:
         for p in parts[1:]:
             result = __.and_(result, p)
         return result
-    else:
-        result = parts[0]
-        for p in parts[1:]:
-            result = __.or_(result, p)
-        return result
+    result = parts[0]
+    for p in parts[1:]:
+        result = __.or_(result, p)
+    return result
 
 
 _FILTER_OP_MAP: dict[FilterOp, Any] = {
@@ -88,7 +87,7 @@ def _build_expression_traversal(expr: FilterExpression) -> Any:
     """Build an anonymous traversal for a single FilterExpression."""
     if expr.op in _FILTER_OP_MAP:
         predicate_fn = _FILTER_OP_MAP[expr.op]
-        if expr.op == FilterOp.IN or expr.op == FilterOp.NOT_IN:
+        if expr.op in (FilterOp.IN, FilterOp.NOT_IN):
             return __.has(expr.property, predicate_fn(*expr.value))
         return __.has(expr.property, predicate_fn(expr.value))
 
@@ -128,8 +127,7 @@ class GremlinQueryBuilder:
             t = t.skip(offset)
         if limit is not None:
             t = t.limit(limit)
-        t = t.element_map()
-        return t
+        return t.element_map()
 
     @staticmethod
     def match_edges(
@@ -149,8 +147,7 @@ class GremlinQueryBuilder:
         t = _apply_filters(t, filters)
         if limit is not None:
             t = t.limit(limit)
-        t = _project_edge(t)
-        return t
+        return _project_edge(t)
 
     @staticmethod
     def match_vertex_by_id(g: GraphTraversalSource, vertex_id: Any) -> Any:
@@ -182,8 +179,7 @@ class GremlinQueryBuilder:
         if limit is not None:
             t = t.limit(limit)
 
-        t = _project_edge(t)
-        return t
+        return _project_edge(t)
 
     @staticmethod
     def create_vertex(g: GraphTraversalSource, label: str, properties: dict) -> Any:
@@ -191,8 +187,7 @@ class GremlinQueryBuilder:
         t = g.add_v(label)
         for key, value in properties.items():
             t = t.property(key, value)
-        t = t.element_map()
-        return t
+        return t.element_map()
 
     @staticmethod
     def create_edge(
@@ -207,8 +202,7 @@ class GremlinQueryBuilder:
         if properties:
             for key, value in properties.items():
                 t = t.property(key, value)
-        t = _project_edge(t)
-        return t
+        return _project_edge(t)
 
     @staticmethod
     def update_vertex(g: GraphTraversalSource, vertex_id: Any, properties: dict) -> Any:
@@ -216,8 +210,7 @@ class GremlinQueryBuilder:
         t = g.V(vertex_id)
         for key, value in properties.items():
             t = t.property(key, value)
-        t = t.element_map()
-        return t
+        return t.element_map()
 
     @staticmethod
     def update_edge(g: GraphTraversalSource, edge_id: Any, properties: dict) -> Any:
@@ -225,8 +218,7 @@ class GremlinQueryBuilder:
         t = g.E(edge_id)
         for key, value in properties.items():
             t = t.property(key, value)
-        t = _project_edge(t)
-        return t
+        return _project_edge(t)
 
     @staticmethod
     def delete_vertex(g: GraphTraversalSource, vertex_id: Any) -> Any:

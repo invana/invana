@@ -17,6 +17,7 @@ from sqlalchemy import select
 from invana.graphs.encryption import encrypt_credentials
 from invana.graphs.models import GraphConnection
 from invana.graphs.schemas import GraphConnectionCreate, GraphConnectionUpdate
+from invana.modeller.models import GraphSchema
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -127,8 +128,6 @@ class GraphConnectionStore:
         connection.status = "INACTIVE"
 
         if connection.schema_id is not None:
-            from invana.modeller.models import GraphSchema
-
             stmt = select(GraphSchema).where(GraphSchema.id == connection.schema_id)
             result = await session.execute(stmt)
             schema = result.scalar_one_or_none()
