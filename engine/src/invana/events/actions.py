@@ -48,6 +48,13 @@ INSTRUCTION_CREATE = "instruction.create"
 INSTRUCTION_UPDATE = "instruction.update"
 INSTRUCTION_DELETE = "instruction.delete"
 
+# ── Graph models (modeller; RFC-019) ──────────────────────────────────────────
+MODEL_CREATE = "model.create"
+MODEL_UPDATE = "model.update"
+MODEL_DELETE = "model.delete"
+MODEL_ACTIVATE = "model.activate"
+MODEL_SET_DEFAULT = "model.set_default"
+
 # ── Setup wizard ──────────────────────────────────────────────────────────────
 SETUP_COMPLETE = "setup.complete"
 SETUP_SKIP = "setup.skip"
@@ -79,6 +86,7 @@ TARGET_INVITATION = "invitation"
 TARGET_LLM = "llm_provider"
 TARGET_SKILL = "skill"
 TARGET_INSTRUCTION = "instruction"
+TARGET_MODEL = "graph_model"
 TARGET_USER = "user"
 TARGET_QUERY = "query"
 TARGET_SESSION = "session"

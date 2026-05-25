@@ -26,7 +26,7 @@ from invana.graphs.encryption import decrypt_credentials
 from invana.graphs.models import Graph
 from invana.graphs.store import GraphModelStore
 from invana.modeller.introspector import Introspector
-from invana.modeller.store import SchemaStore
+from invana.modeller.store import ModelStore
 from invana.settings import settings
 from invana.utils import import_class_from_dotted_path
 
@@ -293,19 +293,27 @@ class GraphConnectionManager:
             await self._auto_introspect(session, connection, connector)
 
     async def _auto_introspect(self, session: AsyncSession, graph: GraphConnection, connector: BaseConnector) -> None:
-        """Seed a GraphModel from live DB introspection on first successful connect."""
+        """Seed a GraphModel from live DB introspection on first successful connect.
+
+        The introspected model is the graph's **default** model (RFC-019): it is
+        owned by the Graph (``graph_id``) so it appears in ``/models``, and marked
+        ``is_default`` so authored persona models layer on top of it.
+        """
         try:
             parent = await session.get(Graph, graph.graph_id) if graph.graph_id else None
             schema_name = parent.name if parent else graph.uri
 
-            schema_store = SchemaStore()
-            schema = await schema_store.create_schema(
+            model_store = ModelStore()
+            schema = await model_store.create_graph_model(
                 session,
                 name=schema_name,
                 description=f"Auto-introspected from {graph.uri}",
+                graph_id=graph.graph_id,
+                persona="domain",
+                is_default=True,
             )
 
-            introspector = Introspector(schema_store)
+            introspector = Introspector(model_store)
             await introspector.introspect(session, model_id=schema.id, connector=connector)
 
             await GraphModelStore().set_schema(session, graph.id, schema.id)

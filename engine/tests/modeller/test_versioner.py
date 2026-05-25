@@ -30,7 +30,7 @@ class TestSemVer:
 class TestVersioner:
     async def test_activate_first_version(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Activate Test")
+        schema = await store.create_graph_model(session, name="Activate Test")
         await session.commit()
         draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
@@ -42,7 +42,7 @@ class TestVersioner:
 
     async def test_activate_with_override(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Override Test")
+        schema = await store.create_graph_model(session, name="Override Test")
         await session.commit()
         draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
@@ -56,7 +56,7 @@ class TestVersioner:
 
     async def test_activate_archives_previous(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Archive Test")
+        schema = await store.create_graph_model(session, name="Archive Test")
         await session.commit()
 
         v1 = await store.create_version(session, model_id=schema.id)
@@ -74,7 +74,7 @@ class TestVersioner:
 
     async def test_activate_non_draft_fails(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Non-draft")
+        schema = await store.create_graph_model(session, name="Non-draft")
         await session.commit()
         draft = await store.create_version(session, model_id=schema.id)
         await session.commit()
@@ -87,7 +87,7 @@ class TestVersioner:
     async def test_auto_version_bump_minor(self, session, store):
         """Adding a node type is a minor change."""
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Minor Bump")
+        schema = await store.create_graph_model(session, name="Minor Bump")
         await session.commit()
 
         # v1: empty
@@ -115,7 +115,7 @@ class TestVersioner:
     async def test_auto_version_bump_major(self, session, store):
         """Removing a node type is a major change."""
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Major Bump")
+        schema = await store.create_graph_model(session, name="Major Bump")
         await session.commit()
 
         v1 = await store.create_version(session, model_id=schema.id)
@@ -136,7 +136,7 @@ class TestVersioner:
 class TestDiff:
     async def test_diff_added_node_type(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Diff Test")
+        schema = await store.create_graph_model(session, name="Diff Test")
         await session.commit()
 
         v1 = await store.create_version(session, model_id=schema.id)
@@ -157,7 +157,7 @@ class TestDiff:
 
     async def test_diff_removed_node_type(self, session, store):
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Diff Remove")
+        schema = await store.create_graph_model(session, name="Diff Remove")
         await session.commit()
 
         v1 = await store.create_version(session, model_id=schema.id)
@@ -179,7 +179,7 @@ class TestDiff:
     async def test_diff_modified_property_key(self, session, store):
         """Changing a property key's type is a major change."""
         versioner = Versioner(store)
-        schema = await store.create_schema(session, name="Diff Prop")
+        schema = await store.create_graph_model(session, name="Diff Prop")
         await session.commit()
 
         v1 = await store.create_version(session, model_id=schema.id)

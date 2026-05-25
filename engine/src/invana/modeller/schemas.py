@@ -260,21 +260,29 @@ class VersionSummary(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Graph Schema
+# Graph Model (persona-scoped; RFC-019)
 # ---------------------------------------------------------------------------
 
+_Persona = Literal["architecture", "code", "test", "business", "domain", "custom"]
 
-class SchemaCreate(BaseModel):
+
+class GraphModelCreate(BaseModel):
     name: str
+    persona: _Persona = "custom"
     description: str = ""
     validation_mode: Literal["strict", "permissive"] = "strict"
 
 
-class SchemaResponse(BaseModel):
+class GraphModelResponse(BaseModel):
     id: str
+    graph_id: str | None
     name: str
+    persona: str
     description: str
     validation_mode: str
+    status: str
+    is_default: bool
+    yaml_path: str | None
     created_at: datetime
     updated_at: datetime
     active_version: VersionSummary | None = None
@@ -283,10 +291,26 @@ class SchemaResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class SchemaUpdate(BaseModel):
+class GraphModelSummary(BaseModel):
+    """Lightweight model row for list views (no full version tree)."""
+
+    id: str
+    graph_id: str | None
+    name: str
+    persona: str
+    status: str
+    is_default: bool
+    active_version: VersionSummary | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class GraphModelUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
+    persona: _Persona | None = None
     validation_mode: Literal["strict", "permissive"] | None = None
+    status: Literal["draft", "active", "archived"] | None = None
 
 
 # ---------------------------------------------------------------------------

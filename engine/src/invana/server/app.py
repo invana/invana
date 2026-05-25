@@ -59,6 +59,7 @@ def create_app() -> FastAPI:
     from invana.llm_providers.routes import llm_providers_router
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
+    from invana.server.routes.models import models_router
     from invana.server.routes.query import query_router
     from invana.server.routes.schemas import schemas_router
     from invana.skills.routes import skills_router
@@ -102,6 +103,7 @@ def create_app() -> FastAPI:
     app.include_router(llm_providers_router)
     app.include_router(skills_router)
     app.include_router(instructions_router)
+    app.include_router(models_router)
     app.include_router(schemas_router)
     app.include_router(query_router)
     app.include_router(events_router)

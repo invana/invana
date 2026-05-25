@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from invana.graph.connectors.base.connector import BaseConnector
     from invana.modeller.introspector import Introspector
     from invana.modeller.projector import Projector
-    from invana.modeller.store import SchemaStore
+    from invana.modeller.store import ModelStore
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class Reconciler:
 
     def __init__(
         self,
-        store: SchemaStore,
+        store: ModelStore,
         projector: Projector,
         introspector: Introspector,
     ) -> None:

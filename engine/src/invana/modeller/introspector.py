@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
     from invana.graph.connectors.base.connector import BaseConnector
-    from invana.modeller.store import SchemaStore
+    from invana.modeller.store import ModelStore
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ _INDEX_TYPE_MAP: dict[str, str] = {
 class Introspector:
     """Reverse-engineers a schema draft from a live database."""
 
-    def __init__(self, store: SchemaStore) -> None:
+    def __init__(self, store: ModelStore) -> None:
         self._store = store
 
     async def introspect(

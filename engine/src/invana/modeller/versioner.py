@@ -31,7 +31,7 @@ from invana.modeller.schemas import (
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from invana.modeller.store import SchemaStore
+    from invana.modeller.store import ModelStore
 
 
 # ---------------------------------------------------------------------------
@@ -272,7 +272,7 @@ def _bump(current: str | None, classification: str) -> str:
 class Versioner:
     """Manages the draft → active → archived version lifecycle."""
 
-    def __init__(self, store: SchemaStore) -> None:
+    def __init__(self, store: ModelStore) -> None:
         self._store = store
 
     async def activate(

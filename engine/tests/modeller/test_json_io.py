@@ -11,7 +11,7 @@ from invana.modeller.versioner import Versioner
 class TestJsonExportImport:
     async def _create_full_schema(self, session, store):
         """Create a schema with property keys, node types, edge types, constraints, indexes, and activate it."""
-        schema = await store.create_schema(
+        schema = await store.create_graph_model(
             session,
             name="Export Test",
             description="Test schema",
@@ -116,7 +116,7 @@ class TestJsonExportImport:
         export = SchemaExporter.export(version, schema.name, schema.description)
 
         # Import into a new schema
-        new_schema = await store.create_schema(session, name="Imported")
+        new_schema = await store.create_graph_model(session, name="Imported")
         await session.commit()
 
         importer = SchemaImporter(store)
@@ -141,7 +141,7 @@ class TestJsonExportImport:
         schema, version = await self._create_full_schema(session, store)
         export = SchemaExporter.export(version, schema.name, schema.description)
 
-        new_schema = await store.create_schema(session, name="Rules Import")
+        new_schema = await store.create_graph_model(session, name="Rules Import")
         await session.commit()
 
         importer = SchemaImporter(store)

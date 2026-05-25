@@ -7,7 +7,7 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from invana.modeller.models import Base
-from invana.modeller.store import SchemaStore
+from invana.modeller.store import ModelStore
 from invana.settings import settings
 
 
@@ -58,5 +58,5 @@ async def session(session_factory):
 
 @pytest.fixture
 def store():
-    """Return a SchemaStore instance."""
-    return SchemaStore()
+    """Return a ModelStore instance."""
+    return ModelStore()

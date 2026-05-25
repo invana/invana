@@ -15,7 +15,7 @@ from invana.modeller.inheritance import (
 class TestInheritance:
     async def _create_types(self, session, store):
         """Helper — create a schema with an inheritance chain: Entity → Person → Employee."""
-        schema = await store.create_schema(session, name="Inherit")
+        schema = await store.create_graph_model(session, name="Inherit")
         await session.commit()
         version = await store.create_version(session, model_id=schema.id)
         await session.commit()
@@ -80,7 +80,7 @@ class TestInheritance:
         assert subs_person == {"Employee"}
 
     async def test_cycle_detection(self, session, store):
-        schema = await store.create_schema(session, name="Cycle")
+        schema = await store.create_graph_model(session, name="Cycle")
         await session.commit()
         version = await store.create_version(session, model_id=schema.id)
         await session.commit()

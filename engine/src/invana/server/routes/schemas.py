@@ -21,7 +21,7 @@ from invana.graphs import services
 from invana.graphs.deps import require_graph_member, require_graph_setup_complete
 from invana.graphs.models import Graph, GraphMember
 from invana.modeller.schemas import VersionResponse
-from invana.modeller.store import SchemaStore
+from invana.modeller.store import ModelStore
 
 schemas_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/schema", tags=["schemas"])
 
@@ -39,7 +39,7 @@ async def get_active_version(
             detail={"error": "no_schema", "graph_id": graph.id},
         )
 
-    store = SchemaStore()
+    store = ModelStore()
     version = await store.get_active_version(session, connection.model_id)
 
     if version is None:

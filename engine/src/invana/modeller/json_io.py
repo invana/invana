@@ -28,7 +28,7 @@ from invana.modeller.schemas import (
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from invana.modeller.store import SchemaStore
+    from invana.modeller.store import ModelStore
 
 
 # ---------------------------------------------------------------------------
@@ -163,7 +163,7 @@ class SchemaExporter:
 class SchemaImporter:
     """Import a ``SchemaExport`` into an existing schema as a new draft."""
 
-    def __init__(self, store: SchemaStore) -> None:
+    def __init__(self, store: ModelStore) -> None:
         self._store = store
 
     async def import_schema(

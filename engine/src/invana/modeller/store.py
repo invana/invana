@@ -1,4 +1,4 @@
-"""SchemaStore — CRUD operations on graph schemas, versions, types, and rules.
+"""ModelStore — CRUD operations on graph schemas, versions, types, and rules.
 
 All methods accept an ``AsyncSession`` so the caller controls the transaction
 boundary. The store never commits — callers should ``await session.commit()``
@@ -48,59 +48,71 @@ _VERSION_EAGER = (
     selectinload(GraphVersion.projections),
 )
 
-_SCHEMA_EAGER = (selectinload(GraphModel.versions),)
+_MODEL_EAGER = (selectinload(GraphModel.versions),)
 
 
-class SchemaStore:
+class ModelStore:
     """CRUD operations for the graph modeller's app-state tables."""
 
     # ------------------------------------------------------------------
-    # Schema CRUD
+    # Graph model CRUD
     # ------------------------------------------------------------------
 
-    async def create_schema(
+    async def create_graph_model(
         self,
         session: AsyncSession,
         *,
         name: str,
+        graph_id: str | None = None,
+        persona: str = "custom",
+        is_default: bool = False,
         description: str = "",
         validation_mode: str = "strict",
     ) -> GraphModel:
-        schema = GraphModel(name=name, description=description, validation_mode=validation_mode)
-        session.add(schema)
+        graph_model = GraphModel(
+            name=name,
+            graph_id=graph_id,
+            persona=persona,
+            is_default=is_default,
+            description=description,
+            validation_mode=validation_mode,
+        )
+        session.add(graph_model)
         await session.flush()
-        return schema
+        return graph_model
 
-    async def get_schema(self, session: AsyncSession, model_id: str) -> GraphModel | None:
-        stmt = select(GraphModel).where(GraphModel.id == model_id).options(*_SCHEMA_EAGER)
+    async def get_graph_model(self, session: AsyncSession, model_id: str) -> GraphModel | None:
+        stmt = select(GraphModel).where(GraphModel.id == model_id).options(*_MODEL_EAGER)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def list_schemas(self, session: AsyncSession) -> list[GraphModel]:
-        stmt = select(GraphModel).options(*_SCHEMA_EAGER).order_by(GraphModel.created_at)
+    async def list_graph_models(self, session: AsyncSession, graph_id: str | None = None) -> list[GraphModel]:
+        stmt = select(GraphModel).options(*_MODEL_EAGER).order_by(GraphModel.created_at)
+        if graph_id is not None:
+            stmt = stmt.where(GraphModel.graph_id == graph_id)
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
-    async def update_schema(
+    async def update_graph_model(
         self,
         session: AsyncSession,
         model_id: str,
         **fields: object,
     ) -> GraphModel | None:
-        schema = await self.get_schema(session, model_id)
-        if schema is None:
+        graph_model = await self.get_graph_model(session, model_id)
+        if graph_model is None:
             return None
         for key, value in fields.items():
-            if value is not None and hasattr(schema, key):
-                setattr(schema, key, value)
+            if value is not None and hasattr(graph_model, key):
+                setattr(graph_model, key, value)
         await session.flush()
-        return schema
+        return graph_model
 
-    async def delete_schema(self, session: AsyncSession, model_id: str) -> bool:
-        schema = await self.get_schema(session, model_id)
-        if schema is None:
+    async def delete_graph_model(self, session: AsyncSession, model_id: str) -> bool:
+        graph_model = await self.get_graph_model(session, model_id)
+        if graph_model is None:
             return False
-        await session.delete(schema)
+        await session.delete(graph_model)
         await session.flush()
         return True
 

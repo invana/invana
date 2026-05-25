@@ -10,7 +10,7 @@ from invana.modeller.versioner import Versioner
 class TestSchemaValidator:
     async def _setup_schema(self, session, store):
         """Create a schema with Person, Employee (child), and KNOWS edge."""
-        schema = await store.create_schema(session, name="Validate Test")
+        schema = await store.create_graph_model(session, name="Validate Test")
         await session.commit()
         version = await store.create_version(session, model_id=schema.id)
         await session.commit()

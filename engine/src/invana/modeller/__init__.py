@@ -6,7 +6,7 @@ and stitches them to graph databases via connectors.
 Public API::
 
     from invana.modeller import (
-        SchemaStore,
+        ModelStore,
         Versioner,
         Projector,
         Introspector,
@@ -32,7 +32,7 @@ from invana.modeller.introspector import Introspector
 from invana.modeller.json_io import SchemaExporter, SchemaImporter
 from invana.modeller.projector import Projector
 from invana.modeller.reconciler import Reconciler, SchemaNotConfiguredError, SchemaOutOfSyncError
-from invana.modeller.store import SchemaStore
+from invana.modeller.store import ModelStore
 from invana.modeller.validator import SchemaValidator, ValidationError
 from invana.modeller.versioner import Versioner, compute_diff
 
@@ -40,13 +40,13 @@ __all__ = [
     "InheritanceCycleError",
     "InheritanceDepthError",
     "Introspector",
+    "ModelStore",
     "Projector",
     "Reconciler",
     "SchemaExporter",
     "SchemaImporter",
     "SchemaNotConfiguredError",
     "SchemaOutOfSyncError",
-    "SchemaStore",
     "SchemaValidator",
     "ValidationError",
     "Versioner",
