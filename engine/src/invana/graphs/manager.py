@@ -23,7 +23,6 @@ from invana.events import actions as event_actions
 from invana.events.models import ActorType
 from invana.events.services import emit_event
 from invana.graphs.encryption import decrypt_credentials
-from invana.graphs.models import Graph
 from invana.graphs.store import GraphModelStore
 from invana.modeller.introspector import Introspector
 from invana.modeller.store import ModelStore
@@ -293,25 +292,25 @@ class GraphConnectionManager:
             await self._auto_introspect(session, connection, connector)
 
     async def _auto_introspect(self, session: AsyncSession, graph: GraphConnection, connector: BaseConnector) -> None:
-        """Seed a GraphModel from live DB introspection on first successful connect.
+        """(Re)generate the graph's read-only **global** model from live DB introspection.
 
-        The introspected model is the graph's **default** model (RFC-019): it is
-        owned by the Graph (``graph_id``) so it appears in ``/models``, and marked
-        ``is_default`` so authored persona models layer on top of it.
+        The global model is the graph's system-managed model (RFC-021): named
+        ``global``, ``origin=introspected``, owned by the Graph (``graph_id``) so it
+        appears in ``/models``. It is **idempotent** — re-introspecting reuses the same
+        model and adds a new active version (it does not spawn duplicates), and it is
+        never hand-authored (authored models layer on top of it).
         """
         try:
-            parent = await session.get(Graph, graph.graph_id) if graph.graph_id else None
-            schema_name = parent.name if parent else graph.uri
-
             model_store = ModelStore()
-            schema = await model_store.create_graph_model(
-                session,
-                name=schema_name,
-                description=f"Auto-introspected from {graph.uri}",
-                graph_id=graph.graph_id,
-                persona="domain",
-                is_default=True,
-            )
+            schema = await model_store.get_introspected_model(session, graph.graph_id) if graph.graph_id else None
+            if schema is None:
+                schema = await model_store.create_graph_model(
+                    session,
+                    name="global",
+                    description=f"Live schema introspected from {graph.uri}",
+                    graph_id=graph.graph_id,
+                    origin="introspected",
+                )
 
             introspector = Introspector(model_store)
             await introspector.introspect(session, model_id=schema.id, connector=connector)

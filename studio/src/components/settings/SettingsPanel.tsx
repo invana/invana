@@ -158,7 +158,7 @@ function SectionContent({
 		case "instructions":
 			return <InstructionsSection username={username} graphSlug={graphSlug} />;
 		case "datasets":
-			return <DatasetsSection />;
+			return <DatasetsSection username={username} graphSlug={graphSlug} />;
 		case "events":
 			return <EventsSection username={username} graphSlug={graphSlug} />;
 	}

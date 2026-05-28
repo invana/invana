@@ -1,0 +1,9 @@
+{
+  "nodes": {
+    "Service":   { "identity": ["id"], "properties": { "name": {"type":"string","required":true}, "tier": {"type":"enum","values":["edge","core","data"]} } },
+    "Component": { "properties": { "name": {"type":"string","required":true} } }
+  },
+  "edges": {
+    "DependsOn": { "from": ["Service"], "to": ["Service"], "properties": { "kind": {"type":"enum","values":["sync","async"]} } }
+  }
+}

@@ -280,10 +280,12 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 
 ## Layer 4 — Modeling (User Graph Model · Stitcher)
 
-### 4.1 User graph model editor
-- **Backend:** [x] `GraphSchema` machinery (RFC-002) re-scoped to `graph_id` · `GET /u/{username}/{graphSlug}/schema/active-version` · `POST /u/{username}/{graphSlug}/connection/introspect` (admin) re-runs introspection against the bound DB.
-- **Frontend:** [~] `ModellerPage` at `/u/:username/:graphSlug/modeller` · schema nav + detail panel work · "Introspect" button calls ping + introspect. **Schema canvas is stubbed** — placeholder shows node-type / edge-type counts; canvas rendering against the redesigned `@invana/canvas` is a follow-up.
-- **Integrations:** existing modeller code (`engine/src/invana/modeller/`) · `@invana/canvas` (redesigned API — not yet wired)
+### 4.1 User graph model editor — **authoring** (RFC-019 multi-model · RFC-021 authoring)
+Models are **authored in the Modeller** (not derived from datasets). A Graph owns many `GraphModel`s (no persona, no default flag — distinguished by name + `origin`); each is edited on a **draft** `GraphVersion` then **Published** (immutable). A system-managed read-only `global` model (`origin=introspected`) mirrors the physical DB. Datasets bind to an authored model (§4.2+, `dataset.model_id`, many→one).
+- **Backend:** [x] Full `/u/{username}/{graphSlug}/models` CRUD — model + draft version + node/edge type create-update-delete + property-key create-**update**-delete + publish (activate); draft-only enforced (409). `connection/introspect` seeds a draft from the bound DB.
+- **Frontend:** [~] `ModellerPage` — model list (+New / rename / delete / introspect), draft→Publish lifecycle, node/edge type forms, per-type property add/edit/delete, editable Property Keys. Canvas remains read-only (interactive editing deferred).
+- **Integrations:** existing modeller code (`engine/src/invana/modeller/`) · `@invana/design-kit` forms · `@invana/canvas` (read-only render).
+- **Deferred:** [-] constraints/indexes authoring UI · interactive canvas editing · YAML round-trip of authored models.
 
 ### 4.2 Stitcher — mapping (system type → user concept)
 - **Backend:** [ ] `StitchMapping` entity (`dataset_id`, `system_type`, `user_type`, `property_map` JSONB) · CRUD routes · validation that referenced types exist in both ends
@@ -504,9 +506,10 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 **Done when:** user creates a Graph, completes Graph Info via Neo4j, sees modeller / explorer / query unlock. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md).
 
-### S3 — User graph model (reuse modeller) — partially shipped
-- **BE:** [x] `GraphSchema` graph-scoped — `/u/:username/:graphSlug/schema/active-version` + `/connection/introspect`.
-- **FE:** [~] `ModellerPage` at `/u/:username/:graphSlug/modeller`; Introspect wired up. **Schema canvas stubbed** — canvas re-integration tracked under Risk notes.
+### S3 — User graph model authoring (RFC-019 · RFC-021) — in progress
+- **BE:** [x] Multi-model graph-scoped `/u/:username/:graphSlug/models` — full CRUD + draft→Publish + node/edge/property-key authoring (draft-only, 409-guarded).
+- **FE:** [~] `ModellerPage` authoring — model CRUD, draft→Publish, node/edge type + property forms, editable Property Keys. Canvas read-only.
+- **Done when:** from a clean checkout, a user creates a model, adds node + edge types with properties, publishes it, and the published version is read-only; creating a draft makes it editable again.
 
 ### S4 — LLM provider (graph-scoped) — **shipped** ✅
 - **BE:** [x] `LLMProvider` entity + Fernet · CRUD + ping + set-default under `/u/:username/:graphSlug/llm/...` · partial unique on `is_default`.

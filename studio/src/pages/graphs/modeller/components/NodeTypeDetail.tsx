@@ -1,20 +1,38 @@
-import { Badge, Separator } from "@invana/ui";
+import { Badge, Button, Separator } from "@invana/ui";
+import { Pencil, Trash2 } from "lucide-react";
 import type {
 	ConstraintResponse,
 	IndexResponse,
 	NodeTypeResponse,
+	PropertyKeyResponse,
 } from "../../../../types/schemas";
 import { ConstraintTable } from "./ConstraintTable";
 import { IndexTable } from "./IndexTable";
+import { PropertyEditor } from "./PropertyEditor";
 import { PropertyMappingTable } from "./PropertyMappingTable";
+import type { ModelEditCtx } from "./editing";
 
 interface Props {
 	nodeType: NodeTypeResponse;
 	constraints: ConstraintResponse[];
 	indexes: IndexResponse[];
+	editable?: boolean;
+	ctx?: ModelEditCtx;
+	propertyKeys?: PropertyKeyResponse[];
+	onEdit?: () => void;
+	onDelete?: () => void;
 }
 
-export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
+export function NodeTypeDetail({
+	nodeType,
+	constraints,
+	indexes,
+	editable = false,
+	ctx,
+	propertyKeys = [],
+	onEdit,
+	onDelete,
+}: Props) {
 	const filteredConstraints = constraints.filter(
 		(c) => c.target_label === nodeType.name,
 	);
@@ -30,6 +48,17 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 					<span className="text-xl font-semibold">{nodeType.name}</span>
 					<Badge variant="secondary">node type</Badge>
 					{nodeType.is_abstract && <Badge variant="outline">abstract</Badge>}
+					{editable && (
+						<div className="ml-auto flex items-center gap-1">
+							<Button variant="ghost" size="sm" onClick={onEdit}>
+								<Pencil className="w-3.5 h-3.5 mr-1" />
+								Edit
+							</Button>
+							<Button variant="ghost" size="sm" onClick={onDelete}>
+								<Trash2 className="w-3.5 h-3.5" />
+							</Button>
+						</div>
+					)}
 				</div>
 				{nodeType.description ? (
 					<p className="text-muted-foreground">{nodeType.description}</p>
@@ -58,7 +87,17 @@ export function NodeTypeDetail({ nodeType, constraints, indexes }: Props) {
 			{/* Properties */}
 			<div>
 				<h3 className="font-semibold mb-2">Properties</h3>
-				<PropertyMappingTable mappings={nodeType.property_mappings} />
+				{editable && ctx ? (
+					<PropertyEditor
+						ctx={ctx}
+						kind="node"
+						typeId={nodeType.id}
+						mappings={nodeType.property_mappings}
+						propertyKeys={propertyKeys}
+					/>
+				) : (
+					<PropertyMappingTable mappings={nodeType.property_mappings} />
+				)}
 			</div>
 
 			<Separator />

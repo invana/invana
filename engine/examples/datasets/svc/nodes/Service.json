@@ -1,0 +1,4 @@
+[
+  {"id": "svc-payments", "properties": {"name": "Payments", "tier": "core"}},
+  {"id": "svc-gateway",  "properties": {"name": "Gateway",  "tier": "edge"}}
+]

@@ -10,6 +10,7 @@ import type {
 	NodeTypeCreate,
 	NodeTypeUpdate,
 	PropertyKeyCreate,
+	PropertyKeyUpdate,
 } from "../../types/models";
 
 const root = (u: string, g: string) => ["models", u, g] as const;
@@ -123,9 +124,6 @@ export const useUpdateModelMutation = (u: string, g: string) =>
 export const useDeleteModelMutation = (u: string, g: string) =>
 	useModelMutation(u, g, (id: string) => modelsApi.remove(u, g, id));
 
-export const useSetDefaultModelMutation = (u: string, g: string) =>
-	useModelMutation(u, g, (id: string) => modelsApi.setDefault(u, g, id));
-
 export const useCreateDraftMutation = (u: string, g: string) =>
 	useModelMutation(
 		u,
@@ -216,6 +214,19 @@ export const useCreatePropertyKeyMutation = (u: string, g: string) =>
 		g,
 		({ modelId, versionId, data }: TypeCtx & { data: PropertyKeyCreate }) =>
 			modelsApi.createPropertyKey(u, g, modelId, versionId, data),
+	);
+
+export const useUpdatePropertyKeyMutation = (u: string, g: string) =>
+	useModelMutation(
+		u,
+		g,
+		({
+			modelId,
+			versionId,
+			keyId,
+			data,
+		}: TypeCtx & { keyId: string; data: PropertyKeyUpdate }) =>
+			modelsApi.updatePropertyKey(u, g, modelId, versionId, keyId, data),
 	);
 
 export const useDeletePropertyKeyMutation = (u: string, g: string) =>

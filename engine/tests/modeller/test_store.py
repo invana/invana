@@ -49,6 +49,19 @@ class TestSchemaCRUD:
         result = await store.delete_graph_model(session, "nonexistent-id")
         assert result is False
 
+    async def test_get_introspected_model(self, session, store):
+        # Authored models default to origin="studio" and are not returned.
+        authored = await store.create_graph_model(session, name="authored")
+        assert authored.origin == "studio"
+        glob = await store.create_graph_model(session, name="global", origin="introspected")
+        await session.commit()
+
+        found = await store.get_introspected_model(session, None)
+        assert found is not None
+        assert found.id == glob.id
+        # A graph with no introspected model returns None.
+        assert await store.get_introspected_model(session, "no-such-graph") is None
+
 
 @pytest.mark.asyncio
 class TestVersionCRUD:
@@ -116,6 +129,36 @@ class TestPropertyKeyCRUD:
 
         keys = await store.list_property_keys(session, version.id)
         assert len(keys) == 2
+
+    async def test_update_property_key(self, session, store):
+        schema = await store.create_graph_model(session, name="PK Update")
+        await session.commit()
+        version = await store.create_version(session, model_id=schema.id)
+        await session.commit()
+        pk = await store.create_property_key(session, version_id=version.id, name="cost", type="string")
+        await session.commit()
+
+        updated = await store.update_property_key(session, pk.id, name="price", type="float")
+        assert updated is not None
+        assert updated.name == "price"
+        assert updated.type == "float"
+
+    async def test_update_property_key_rejected_on_active_version(self, session, store):
+        from invana.modeller.versioner import Versioner
+
+        schema = await store.create_graph_model(session, name="PK Immutable")
+        await session.commit()
+        version = await store.create_version(session, model_id=schema.id)
+        await session.commit()
+        pk = await store.create_property_key(session, version_id=version.id, name="name", type="string")
+        await session.commit()
+
+        activated = await Versioner(store).activate(session, version_id=version.id)
+        await session.commit()
+        assert activated.status == "active"
+
+        with pytest.raises(ValueError, match="not a draft"):
+            await store.update_property_key(session, pk.id, type="integer")
 
 
 @pytest.mark.asyncio
@@ -190,6 +233,32 @@ class TestNodeTypeCRUD:
         await session.commit()
         updated = await store.update_node_type(session, nt.id, name="NewName")
         assert updated.name == "NewName"
+
+    async def test_update_node_type_replaces_property_mappings(self, session, store):
+        schema = await store.create_graph_model(session, name="NT Props")
+        await session.commit()
+        version = await store.create_version(session, model_id=schema.id)
+        await session.commit()
+        await store.create_property_key(session, version_id=version.id, name="title", type="string")
+        await store.create_property_key(session, version_id=version.id, name="count", type="integer")
+        await session.commit()
+        nt = await store.create_node_type(
+            session,
+            version_id=version.id,
+            name="Doc",
+            property_mappings=[{"property_key": "title"}],
+        )
+        await session.commit()
+        assert len(nt.property_mappings) == 1
+
+        # Full-replace: swap the single mapping for a different one.
+        updated = await store.update_node_type(session, nt.id, property_mappings=[{"property_key": "count"}])
+        assert len(updated.property_mappings) == 1
+        assert updated.property_mappings[0].property_key.name == "count"
+
+        # Empty list removes all properties.
+        cleared = await store.update_node_type(session, nt.id, property_mappings=[])
+        assert len(cleared.property_mappings) == 0
 
     async def test_delete_node_type(self, session, store):
         schema = await store.create_graph_model(session, name="NT Delete")

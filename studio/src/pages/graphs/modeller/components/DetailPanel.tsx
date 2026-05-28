@@ -11,6 +11,7 @@ import { IndexTable } from "./IndexTable";
 import { NoSelectionPlaceholder } from "./NoSelectionPlaceholder";
 import { NodeTypeDetail } from "./NodeTypeDetail";
 import { PropertyKeyTable } from "./PropertyKeyTable";
+import type { ModelEditCtx } from "./editing";
 
 export type SelectedItem =
 	| { kind: "node-type"; id: string }
@@ -27,6 +28,12 @@ interface Props {
 	propertyKeys: PropertyKeyResponse[];
 	constraints: ConstraintResponse[];
 	indexes: IndexResponse[];
+	editable?: boolean;
+	ctx?: ModelEditCtx;
+	onEditNodeType?: (nodeType: NodeTypeResponse) => void;
+	onDeleteNodeType?: (id: string) => void;
+	onEditEdgeType?: (edgeType: EdgeTypeResponse) => void;
+	onDeleteEdgeType?: (id: string) => void;
 }
 
 export function DetailPanel({
@@ -36,6 +43,12 @@ export function DetailPanel({
 	propertyKeys,
 	constraints,
 	indexes,
+	editable = false,
+	ctx,
+	onEditNodeType,
+	onDeleteNodeType,
+	onEditEdgeType,
+	onDeleteEdgeType,
 }: Props) {
 	if (!selected) {
 		return <NoSelectionPlaceholder />;
@@ -49,6 +62,11 @@ export function DetailPanel({
 				nodeType={nodeType}
 				constraints={constraints}
 				indexes={indexes}
+				editable={editable}
+				ctx={ctx}
+				propertyKeys={propertyKeys}
+				onEdit={() => onEditNodeType?.(nodeType)}
+				onDelete={() => onDeleteNodeType?.(nodeType.id)}
 			/>
 		);
 	}
@@ -61,6 +79,11 @@ export function DetailPanel({
 				edgeType={edgeType}
 				constraints={constraints}
 				indexes={indexes}
+				editable={editable}
+				ctx={ctx}
+				propertyKeys={propertyKeys}
+				onEdit={() => onEditEdgeType?.(edgeType)}
+				onDelete={() => onDeleteEdgeType?.(edgeType.id)}
 			/>
 		);
 	}
@@ -73,6 +96,8 @@ export function DetailPanel({
 					propertyKeys={propertyKeys}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}
+					editable={editable}
+					ctx={ctx}
 				/>
 			</div>
 		);

@@ -6,6 +6,7 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+import invana.graphs.models  # noqa: F401 — register the graphs table so graph_models.graph_id FK resolves
 from invana.modeller.models import Base
 from invana.modeller.store import ModelStore
 from invana.settings import settings

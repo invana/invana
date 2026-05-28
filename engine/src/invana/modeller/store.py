@@ -64,22 +64,32 @@ class ModelStore:
         *,
         name: str,
         graph_id: str | None = None,
-        persona: str = "custom",
-        is_default: bool = False,
         description: str = "",
         validation_mode: str = "strict",
+        origin: str = "studio",
     ) -> GraphModel:
         graph_model = GraphModel(
             name=name,
             graph_id=graph_id,
-            persona=persona,
-            is_default=is_default,
             description=description,
             validation_mode=validation_mode,
+            origin=origin,
         )
         session.add(graph_model)
         await session.flush()
         return graph_model
+
+    async def get_introspected_model(self, session: AsyncSession, graph_id: str) -> GraphModel | None:
+        """The graph's single system-managed 'global' model (origin=introspected), if any."""
+        stmt = (
+            select(GraphModel)
+            .where(GraphModel.graph_id == graph_id, GraphModel.origin == "introspected")
+            .options(*_MODEL_EAGER)
+            .order_by(GraphModel.created_at)
+            .limit(1)
+        )
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_graph_model(self, session: AsyncSession, model_id: str) -> GraphModel | None:
         stmt = select(GraphModel).where(GraphModel.id == model_id).options(*_MODEL_EAGER)
@@ -244,6 +254,48 @@ class ModelStore:
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
+    async def update_property_key(
+        self,
+        session: AsyncSession,
+        pk_id: str,
+        **fields: object,
+    ) -> PropertyKeyDefinition | None:
+        pk = await self.get_property_key(session, pk_id)
+        if pk is None:
+            return None
+        await self._ensure_draft(session, pk.version_id)
+
+        # validation_rules is a relationship — handle as a full replace, not setattr.
+        validation_rules = fields.pop("validation_rules", None)
+
+        # Renames must stay unique within the version (uq_version_property_key).
+        new_name = fields.get("name")
+        if new_name is not None and new_name != pk.name:
+            existing = await self.get_property_key_by_name(session, pk.version_id, new_name)
+            if existing is not None and existing.id != pk.id:
+                msg = f"Property key '{new_name}' already exists in this version."
+                raise ValueError(msg)
+
+        for key, value in fields.items():
+            if value is not None and hasattr(pk, key):
+                setattr(pk, key, value)
+
+        if validation_rules is not None:
+            for rule in list(pk.validation_rules):
+                await session.delete(rule)
+            await session.flush()
+            for rule_data in validation_rules:
+                session.add(
+                    ValidationRule(
+                        property_key_id=pk.id,
+                        rule_type=rule_data["rule_type"],
+                        params=rule_data.get("params", {}),
+                    )
+                )
+
+        await session.flush()
+        return await self.get_property_key(session, pk_id)
+
     async def delete_property_key(self, session: AsyncSession, pk_id: str) -> bool:
         pk = await self.get_property_key(session, pk_id)
         if pk is None:
@@ -319,11 +371,23 @@ class ModelStore:
         if nt is None:
             return None
         await self._ensure_draft(session, nt.version_id)
+        # property_mappings is a relationship — pop it out of the scalar setattr loop
+        # and full-replace it (None = leave untouched, [] = remove all properties).
+        property_mappings = fields.pop("property_mappings", None)
         for key, value in fields.items():
             if value is not None and hasattr(nt, key):
                 setattr(nt, key, value)
+        if property_mappings is not None:
+            for mapping in list(nt.property_mappings):
+                await session.delete(mapping)
+            await session.flush()
+            for mapping_data in property_mappings:
+                await self._create_type_property_mapping(
+                    session, version_id=nt.version_id, node_type_id=nt.id, **mapping_data
+                )
+            session.expire(nt, ["property_mappings"])  # drop the stale collection so the re-fetch reloads it
         await session.flush()
-        return nt
+        return await self.get_node_type(session, node_type_id)
 
     async def delete_node_type(self, session: AsyncSession, node_type_id: str) -> bool:
         nt = await self.get_node_type(session, node_type_id)
@@ -400,11 +464,23 @@ class ModelStore:
         if et is None:
             return None
         await self._ensure_draft(session, et.version_id)
+        # property_mappings is a relationship — pop it out of the scalar setattr loop
+        # and full-replace it (None = leave untouched, [] = remove all properties).
+        property_mappings = fields.pop("property_mappings", None)
         for key, value in fields.items():
             if value is not None and hasattr(et, key):
                 setattr(et, key, value)
+        if property_mappings is not None:
+            for mapping in list(et.property_mappings):
+                await session.delete(mapping)
+            await session.flush()
+            for mapping_data in property_mappings:
+                await self._create_type_property_mapping(
+                    session, version_id=et.version_id, edge_type_id=et.id, **mapping_data
+                )
+            session.expire(et, ["property_mappings"])  # drop the stale collection so the re-fetch reloads it
         await session.flush()
-        return et
+        return await self.get_edge_type(session, edge_type_id)
 
     async def delete_edge_type(self, session: AsyncSession, edge_type_id: str) -> bool:
         et = await self.get_edge_type(session, edge_type_id)

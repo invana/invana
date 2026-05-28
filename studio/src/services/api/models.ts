@@ -10,6 +10,7 @@ import type {
 	NodeTypeCreate,
 	NodeTypeUpdate,
 	PropertyKeyCreate,
+	PropertyKeyUpdate,
 	VersionActivate,
 	VersionCreate,
 	VersionSummary,
@@ -53,8 +54,6 @@ export const modelsApi = {
 	update: (u: string, g: string, id: string, data: GraphModelUpdate) =>
 		patch(`${base(u, g)}/${id}`, data) as Promise<GraphModelResponse>,
 	remove: (u: string, g: string, id: string) => del(`${base(u, g)}/${id}`),
-	setDefault: (u: string, g: string, id: string) =>
-		post(`${base(u, g)}/${id}/set-default`, {}) as Promise<GraphModelResponse>,
 
 	// ── Versions ────────────────────────────────────────────────────────────
 	listVersions: (u: string, g: string, id: string) =>
@@ -143,6 +142,18 @@ export const modelsApi = {
 	) =>
 		post(
 			`${ver(u, g, id, vid)}/property-keys`,
+			data,
+		) as Promise<PropertyKeyResponse>,
+	updatePropertyKey: (
+		u: string,
+		g: string,
+		id: string,
+		vid: string,
+		keyId: string,
+		data: PropertyKeyUpdate,
+	) =>
+		patch(
+			`${ver(u, g, id, vid)}/property-keys/${keyId}`,
 			data,
 		) as Promise<PropertyKeyResponse>,
 	deletePropertyKey: (

@@ -1,20 +1,38 @@
-import { Badge, Separator } from "@invana/ui";
+import { Badge, Button, Separator } from "@invana/ui";
+import { Pencil, Trash2 } from "lucide-react";
 import type {
 	ConstraintResponse,
 	EdgeTypeResponse,
 	IndexResponse,
+	PropertyKeyResponse,
 } from "../../../../types/schemas";
 import { ConstraintTable } from "./ConstraintTable";
 import { IndexTable } from "./IndexTable";
+import { PropertyEditor } from "./PropertyEditor";
 import { PropertyMappingTable } from "./PropertyMappingTable";
+import type { ModelEditCtx } from "./editing";
 
 interface Props {
 	edgeType: EdgeTypeResponse;
 	constraints: ConstraintResponse[];
 	indexes: IndexResponse[];
+	editable?: boolean;
+	ctx?: ModelEditCtx;
+	propertyKeys?: PropertyKeyResponse[];
+	onEdit?: () => void;
+	onDelete?: () => void;
 }
 
-export function EdgeTypeDetail({ edgeType, constraints, indexes }: Props) {
+export function EdgeTypeDetail({
+	edgeType,
+	constraints,
+	indexes,
+	editable = false,
+	ctx,
+	propertyKeys = [],
+	onEdit,
+	onDelete,
+}: Props) {
 	const filteredConstraints = constraints.filter(
 		(c) => c.target_label === edgeType.name,
 	);
@@ -29,6 +47,17 @@ export function EdgeTypeDetail({ edgeType, constraints, indexes }: Props) {
 				<div className="flex items-center gap-2">
 					<span className="text-xl font-semibold">{edgeType.name}</span>
 					<Badge variant="secondary">edge type</Badge>
+					{editable && (
+						<div className="ml-auto flex items-center gap-1">
+							<Button variant="ghost" size="sm" onClick={onEdit}>
+								<Pencil className="w-3.5 h-3.5 mr-1" />
+								Edit
+							</Button>
+							<Button variant="ghost" size="sm" onClick={onDelete}>
+								<Trash2 className="w-3.5 h-3.5" />
+							</Button>
+						</div>
+					)}
 				</div>
 				{edgeType.description ? (
 					<p className="text-muted-foreground">{edgeType.description}</p>
@@ -74,7 +103,17 @@ export function EdgeTypeDetail({ edgeType, constraints, indexes }: Props) {
 			{/* Properties */}
 			<div>
 				<h3 className="font-semibold mb-2">Properties</h3>
-				<PropertyMappingTable mappings={edgeType.property_mappings} />
+				{editable && ctx ? (
+					<PropertyEditor
+						ctx={ctx}
+						kind="edge"
+						typeId={edgeType.id}
+						mappings={edgeType.property_mappings}
+						propertyKeys={propertyKeys}
+					/>
+				) : (
+					<PropertyMappingTable mappings={edgeType.property_mappings} />
+				)}
 			</div>
 
 			<Separator />

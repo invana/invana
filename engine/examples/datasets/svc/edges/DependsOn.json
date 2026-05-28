@@ -1,0 +1,1 @@
+[ {"id": "dep-1", "from": "svc-gateway", "to": "svc-payments", "properties": {"kind": "sync"}} ]

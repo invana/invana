@@ -10,6 +10,7 @@ from starlette_admin import DropDown, StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.auth.models import RefreshToken, User
+from invana.datasets.models import Dataset, ImportJob
 from invana.events.models import Event
 from invana.graphs.models import Graph, GraphConnection, GraphMember, Invitation
 from invana.instructions.models import Instruction
@@ -41,10 +42,8 @@ class GraphModelView(ModelView):
         "graph_id",
         "name",
         "description",
-        StringField("persona", label="Persona"),
         StringField("validation_mode", label="Validation Mode"),
         StringField("status", label="Status"),
-        "is_default",
         "yaml_path",
         "created_at",
         "updated_at",
@@ -360,6 +359,52 @@ class EventView(ModelView):
         return False
 
 
+class DatasetView(ModelView):
+    label = "Datasets"
+    icon = "fa fa-layer-group"
+    fields = [
+        "id",
+        "graph_id",
+        "model_id",
+        "name",
+        "description",
+        "storage_uri",
+        "record_counts",
+        "last_job_id",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["name"]
+
+
+class ImportJobView(ModelView):
+    label = "Import jobs"
+    icon = "fa fa-file-import"
+    fields = [
+        "id",
+        "dataset_id",
+        StringField("status", label="Status"),
+        "model_version_id",
+        "records_total",
+        "records_processed",
+        "error_count",
+        "warning_count",
+        "report",
+        "logs",
+        "started_at",
+        "finished_at",
+        "created_at",
+    ]
+    sortable_fields = ["created_at", "finished_at"]
+
+    # Jobs are produced by imports — admin is read + delete only.
+    def can_create(self, request: Request) -> bool:
+        return False
+
+    def can_edit(self, request: Request) -> bool:
+        return False
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -420,6 +465,18 @@ def mount_admin(app: FastAPI) -> None:
             icon="fa fa-clock-rotate-left",
             views=[
                 EventView(Event, label="Events", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Ingestion (datasets + import jobs — RFC-020) ─────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Ingestion",
+            icon="fa fa-file-import",
+            views=[
+                DatasetView(Dataset, label="Datasets", icon="fa fa-layer-group"),
+                ImportJobView(ImportJob, label="Import jobs", icon="fa fa-file-import"),
             ],
         ),
     )

@@ -148,6 +148,8 @@ class NodeTypeUpdate(BaseModel):
     parent_type: str | None = None
     is_abstract: bool | None = None
     validation_mode: Literal["strict", "permissive"] | None = None
+    # When provided, full-replaces the type's property mappings ([] removes all).
+    property_mappings: list[TypePropertyMappingCreate] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +184,8 @@ class EdgeTypeUpdate(BaseModel):
     source_node_types: list[str] | None = None
     target_node_types: list[str] | None = None
     multiplicity: Literal["MULTI", "SIMPLE", "ONE2MANY", "MANY2ONE", "ONE2ONE"] | None = None
+    # When provided, full-replaces the type's property mappings ([] removes all).
+    property_mappings: list[TypePropertyMappingCreate] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -260,15 +264,12 @@ class VersionSummary(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Graph Model (persona-scoped; RFC-019)
+# Graph Model (RFC-019)
 # ---------------------------------------------------------------------------
-
-_Persona = Literal["architecture", "code", "test", "business", "domain", "custom"]
 
 
 class GraphModelCreate(BaseModel):
     name: str
-    persona: _Persona = "custom"
     description: str = ""
     validation_mode: Literal["strict", "permissive"] = "strict"
 
@@ -277,11 +278,10 @@ class GraphModelResponse(BaseModel):
     id: str
     graph_id: str | None
     name: str
-    persona: str
     description: str
     validation_mode: str
     status: str
-    is_default: bool
+    origin: str
     yaml_path: str | None
     created_at: datetime
     updated_at: datetime
@@ -297,9 +297,10 @@ class GraphModelSummary(BaseModel):
     id: str
     graph_id: str | None
     name: str
-    persona: str
+    description: str
     status: str
-    is_default: bool
+    origin: str
+    updated_at: datetime
     active_version: VersionSummary | None = None
 
     model_config = {"from_attributes": True}
@@ -308,7 +309,6 @@ class GraphModelSummary(BaseModel):
 class GraphModelUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
-    persona: _Persona | None = None
     validation_mode: Literal["strict", "permissive"] | None = None
     status: Literal["draft", "active", "archived"] | None = None
 

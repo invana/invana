@@ -1,24 +1,11 @@
 // Graph models (modeller; RFC-019). Response shapes for the version tree
 // (node/edge types, property keys, constraints, indexes) live in ./schemas.
 
-export type Persona =
-	| "architecture"
-	| "code"
-	| "test"
-	| "business"
-	| "domain"
-	| "custom";
-
-export const PERSONA_OPTIONS: { value: Persona; label: string }[] = [
-	{ value: "architecture", label: "Architecture" },
-	{ value: "code", label: "Code" },
-	{ value: "test", label: "Test" },
-	{ value: "business", label: "Business" },
-	{ value: "domain", label: "Domain" },
-	{ value: "custom", label: "Custom" },
-];
-
 export type VersionStatus = "draft" | "active" | "archived";
+
+// How a model came to exist. `introspected` = the read-only system "global" model
+// mirroring the physical DB; `studio` = authored in the Modeller; `yaml` = YAML-managed.
+export type ModelOrigin = "studio" | "yaml" | "introspected";
 
 export interface VersionSummary {
 	id: string;
@@ -34,9 +21,10 @@ export interface GraphModelSummary {
 	id: string;
 	graph_id: string | null;
 	name: string;
-	persona: string;
+	description: string;
 	status: VersionStatus;
-	is_default: boolean;
+	origin: ModelOrigin;
+	updated_at: string;
 	active_version: VersionSummary | null;
 }
 
@@ -44,11 +32,10 @@ export interface GraphModelResponse {
 	id: string;
 	graph_id: string | null;
 	name: string;
-	persona: string;
 	description: string;
 	validation_mode: string;
 	status: VersionStatus;
-	is_default: boolean;
+	origin: ModelOrigin;
 	yaml_path: string | null;
 	created_at: string;
 	updated_at: string;
@@ -58,7 +45,6 @@ export interface GraphModelResponse {
 
 export interface GraphModelCreate {
 	name: string;
-	persona?: Persona;
 	description?: string;
 	validation_mode?: "strict" | "permissive";
 }
@@ -66,7 +52,6 @@ export interface GraphModelCreate {
 export interface GraphModelUpdate {
 	name?: string;
 	description?: string;
-	persona?: Persona;
 	validation_mode?: "strict" | "permissive";
 	status?: VersionStatus;
 }
@@ -114,6 +99,8 @@ export interface NodeTypeUpdate {
 	parent_type?: string | null;
 	is_abstract?: boolean;
 	validation_mode?: "strict" | "permissive" | null;
+	// When provided, full-replaces the type's property mappings ([] removes all).
+	property_mappings?: TypePropertyMappingCreate[];
 }
 
 export type Multiplicity =
@@ -138,10 +125,20 @@ export interface EdgeTypeUpdate {
 	source_node_types?: string[];
 	target_node_types?: string[];
 	multiplicity?: Multiplicity;
+	// When provided, full-replaces the type's property mappings ([] removes all).
+	property_mappings?: TypePropertyMappingCreate[];
 }
 
 export interface PropertyKeyCreate {
 	name: string;
+	type?: string;
+	value_cardinality?: "SINGLE" | "LIST" | "SET";
+	description?: string;
+	validation_rules?: ValidationRuleCreate[];
+}
+
+export interface PropertyKeyUpdate {
+	name?: string;
 	type?: string;
 	value_cardinality?: "SINGLE" | "LIST" | "SET";
 	description?: string;

@@ -1,5 +1,5 @@
 import { ScrollArea } from "@invana/ui";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import type {
 	EdgeTypeResponse,
@@ -15,6 +15,11 @@ interface Props {
 	indexCount: number;
 	selected: SelectedItem;
 	onSelect: (item: SelectedItem) => void;
+	editable?: boolean;
+	onAddNodeType?: () => void;
+	onAddEdgeType?: () => void;
+	onDeleteNodeType?: (id: string) => void;
+	onDeleteEdgeType?: (id: string) => void;
 }
 
 function SectionHeader({
@@ -22,28 +27,40 @@ function SectionHeader({
 	count,
 	open,
 	onClick,
+	onAdd,
 }: {
 	label: string;
 	count: number;
 	open: boolean;
 	onClick: () => void;
+	onAdd?: () => void;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className="flex w-full items-center justify-between px-3 py-1.5 text-base font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors"
-		>
-			<span className="flex items-center gap-1">
+		<div className="flex w-full items-center justify-between pr-2">
+			<button
+				type="button"
+				onClick={onClick}
+				className="flex flex-1 items-center gap-1 px-3 py-1.5 text-base font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors"
+			>
 				{open ? (
 					<ChevronDown className="w-3 h-3" />
 				) : (
 					<ChevronRight className="w-3 h-3" />
 				)}
 				{label}
-			</span>
-			<span>{count}</span>
-		</button>
+				<span className="ml-auto pr-2">{count}</span>
+			</button>
+			{onAdd && (
+				<button
+					type="button"
+					title={`Add ${label.toLowerCase()}`}
+					onClick={onAdd}
+					className="text-muted-foreground hover:text-foreground transition-colors"
+				>
+					<Plus className="w-3.5 h-3.5" />
+				</button>
+			)}
+		</div>
 	);
 }
 
@@ -51,23 +68,39 @@ function NavItem({
 	label,
 	active,
 	onClick,
+	onDelete,
 }: {
 	label: string;
 	active: boolean;
 	onClick: () => void;
+	onDelete?: () => void;
 }) {
 	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={`w-full text-left px-6 py-1 rounded-sm transition-colors ${
-				active
-					? "bg-accent text-accent-foreground font-medium"
-					: "hover:bg-accent/50 text-foreground"
+		<div
+			className={`group flex items-center pr-2 rounded-sm transition-colors ${
+				active ? "bg-accent" : "hover:bg-accent/50"
 			}`}
 		>
-			{label}
-		</button>
+			<button
+				type="button"
+				onClick={onClick}
+				className={`flex-1 text-left px-6 py-1 ${
+					active ? "text-accent-foreground font-medium" : "text-foreground"
+				}`}
+			>
+				{label}
+			</button>
+			{onDelete && (
+				<button
+					type="button"
+					title="Delete"
+					onClick={onDelete}
+					className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
+				>
+					<Trash2 className="w-3.5 h-3.5" />
+				</button>
+			)}
+		</div>
 	);
 }
 
@@ -106,6 +139,11 @@ export function SchemaNav({
 	indexCount,
 	selected,
 	onSelect,
+	editable = false,
+	onAddNodeType,
+	onAddEdgeType,
+	onDeleteNodeType,
+	onDeleteEdgeType,
 }: Props) {
 	const [nodeTypesOpen, setNodeTypesOpen] = useState(true);
 	const [edgeTypesOpen, setEdgeTypesOpen] = useState(true);
@@ -124,6 +162,7 @@ export function SchemaNav({
 					count={nodeTypes.length}
 					open={nodeTypesOpen}
 					onClick={() => setNodeTypesOpen((o) => !o)}
+					onAdd={editable ? onAddNodeType : undefined}
 				/>
 				{nodeTypesOpen && (
 					<div className="flex flex-col">
@@ -136,6 +175,9 @@ export function SchemaNav({
 									label={nt.name}
 									active={isNodeActive(nt.id)}
 									onClick={() => onSelect({ kind: "node-type", id: nt.id })}
+									onDelete={
+										editable ? () => onDeleteNodeType?.(nt.id) : undefined
+									}
 								/>
 							))
 						)}
@@ -148,6 +190,7 @@ export function SchemaNav({
 					count={edgeTypes.length}
 					open={edgeTypesOpen}
 					onClick={() => setEdgeTypesOpen((o) => !o)}
+					onAdd={editable ? onAddEdgeType : undefined}
 				/>
 				{edgeTypesOpen && (
 					<div className="flex flex-col">
@@ -160,6 +203,9 @@ export function SchemaNav({
 									label={et.name}
 									active={isEdgeActive(et.id)}
 									onClick={() => onSelect({ kind: "edge-type", id: et.id })}
+									onDelete={
+										editable ? () => onDeleteEdgeType?.(et.id) : undefined
+									}
 								/>
 							))
 						)}
