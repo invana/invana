@@ -16,7 +16,8 @@ import {
 import {
 	ChevronLeft,
 	ChevronRight,
-	FilePlus2,
+	Folder,
+	FolderPlus,
 	MoreHorizontal,
 	Search,
 } from "lucide-react";
@@ -75,8 +76,9 @@ function GraphRow({
 			<button
 				type="button"
 				onClick={onOpen}
-				className="flex-1 flex items-baseline gap-3 text-left min-w-0"
+				className="flex-1 flex items-center gap-2 text-left min-w-0"
 			>
+				<Folder className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
 				<span className="font-medium shrink-0 group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
 					{graph.name}
 				</span>
@@ -197,7 +199,7 @@ export function GraphsListPage() {
 								onClick={() => navigate("/graphs/new")}
 								className="flex items-center gap-2.5 py-1.5 text-left text-foreground hover:text-primary transition-colors group"
 							>
-								<FilePlus2 className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+								<FolderPlus className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
 								<span>New Graph</span>
 							</button>
 						</div>
@@ -217,27 +219,19 @@ export function GraphsListPage() {
 								<p className="text-muted-foreground">None yet</p>
 							)}
 							{!isLoading &&
-								allGraphs.slice(0, 5).map((graph) => {
-									const { done, total } = setupProgress(graph);
-									const setupDone = done === total;
-									return (
-										<button
-											key={graph.id}
-											type="button"
-											onClick={() => openGraph(graph)}
-											className="flex items-center gap-2 py-1 w-full text-left group"
-										>
-											<div
-												className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-													setupDone ? "bg-green-500" : "bg-muted-foreground/40"
-												}`}
-											/>
-											<span className="font-medium truncate group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
-												{graph.name}
-											</span>
-										</button>
-									);
-								})}
+								allGraphs.slice(0, 5).map((graph) => (
+									<button
+										key={graph.id}
+										type="button"
+										onClick={() => openGraph(graph)}
+										className="flex items-center gap-2 py-1 w-full text-left group"
+									>
+										<Folder className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+										<span className="font-medium truncate group-hover:text-primary group-hover:underline underline-offset-4 transition-colors">
+											{graph.name}
+										</span>
+									</button>
+								))}
 						</div>
 					</div>
 
