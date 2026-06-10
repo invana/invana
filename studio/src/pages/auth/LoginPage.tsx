@@ -1,4 +1,4 @@
-import { Input, Label } from "@invana/forms";
+import { Checkbox, Input, Label } from "@invana/forms";
 import {
 	Button,
 	Dialog,
@@ -8,14 +8,58 @@ import {
 	DialogTitle,
 	TabbedPanel,
 } from "@invana/ui";
-import { Container, Terminal } from "lucide-react";
+import {
+	Container,
+	FlaskConical,
+	GitBranch,
+	Network,
+	ShieldCheck,
+	Terminal,
+	Waypoints,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { ThemeToggle } from "../../components/ThemeToggle";
 import { FormError } from "../../components/forms/FormError";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
 import { ApiError } from "../../services/api/client";
+
+// Capability pillars shown on the brand panel. Phrased as what Invana *is
+// about* — no falsifiable benchmarks (the "100K+ nodes" line deliberately
+// drops the unverified fps figure that only ever lived in positioning copy).
+const PILLARS = [
+	{
+		icon: Network,
+		title: "Curated context from scattered data",
+		blurb:
+			"Connectors ingest heterogeneous sources, stitched under one shared ontology.",
+	},
+	{
+		icon: ShieldCheck,
+		title: "Explainable answers — never hallucinated",
+		blurb: "Trace every answer LLM → query → record → dataset, or it says so.",
+	},
+	{
+		icon: GitBranch,
+		title: "Graph modelling you can evolve",
+		blurb:
+			"Version the ontology over time, across Cypher and Gremlin backends.",
+	},
+	{
+		icon: Waypoints,
+		title: "Query + visualize at real scale",
+		blurb:
+			"Async Cypher + Gremlin with WebGPU — built to explore 100K+ node graphs.",
+	},
+	{
+		icon: FlaskConical,
+		title: "Simulate decisions on the graph",
+		blurb:
+			"Game theory, hypothesis testing, sweeps — ask what-if, not just what-is.",
+	},
+];
 
 export function LoginPage() {
 	const navigate = useNavigate();
@@ -23,6 +67,11 @@ export function LoginPage() {
 	const { setSession } = useAuth();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	// NOTE: cosmetic until the engine supports it. authApi.login / POST
+	// /api/v1/auth/login take no remember flag, so refresh-token lifetime is
+	// fixed server-side. Wire this through once the engine accepts a TTL/remember
+	// parameter; until then it intentionally does nothing but hold UI state.
+	const [remember, setRemember] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [helpModal, setHelpModal] = useState<"create-user" | "forgot" | null>(
@@ -53,7 +102,7 @@ export function LoginPage() {
 	}
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background px-4">
+		<div className="relative min-h-screen overflow-hidden bg-background">
 			{/* Ambient grid — fades out toward the edges via a radial mask */}
 			<div
 				aria-hidden
@@ -63,91 +112,150 @@ export function LoginPage() {
 						"linear-gradient(to right, color-mix(in srgb, var(--color-border) 55%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 55%, transparent) 1px, transparent 1px)",
 					backgroundSize: "44px 44px",
 					maskImage:
-						"radial-gradient(ellipse 75% 60% at 50% 38%, black 25%, transparent 75%)",
+						"radial-gradient(ellipse 70% 70% at 32% 45%, black 20%, transparent 78%)",
 					WebkitMaskImage:
-						"radial-gradient(ellipse 75% 60% at 50% 38%, black 25%, transparent 75%)",
+						"radial-gradient(ellipse 70% 70% at 32% 45%, black 20%, transparent 78%)",
 				}}
 			/>
-			{/* Subtle accent glow pooling behind the card */}
+			{/* Accent glow pooling behind the sign-in form */}
 			<div
 				aria-hidden
-				className="pointer-events-none absolute left-1/2 top-[38%] h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+				className="pointer-events-none absolute left-[78%] top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full"
 				style={{
 					background:
-						"radial-gradient(circle, color-mix(in srgb, var(--color-primary) 10%, transparent) 0%, transparent 70%)",
-					filter: "blur(60px)",
+						"radial-gradient(circle, color-mix(in srgb, var(--color-primary) 12%, transparent) 0%, transparent 70%)",
+					filter: "blur(70px)",
 				}}
 			/>
 
-			{/* Frosted glass card */}
-			<div
-				className="relative w-full max-w-sm rounded-lg border border-white/10 bg-card/55 p-8 backdrop-blur-xl"
-				style={{
-					boxShadow:
-						"inset 0 1px 0 color-mix(in srgb, white 6%, transparent), 0 16px 48px -24px rgba(0, 0, 0, 0.6)",
-				}}
-			>
-				<div className="space-y-2 text-center">
+			{/* Theme switcher */}
+			<div className="absolute right-6 top-6 z-10">
+				<ThemeToggle />
+			</div>
+
+			<div className="relative mx-auto flex min-h-screen max-w-[108rem] items-center gap-20 px-14 py-12">
+				{/* ── Left: brand + pillars ───────────────────────────────── */}
+				<div className="flex-1">
+					{/* Hero title + subtitle — brand-forward */}
+					<h1 className="text-4xl font-bold tracking-tight">Invana</h1>
+					<p className="mt-1 text-xl font-medium text-primary">
+						Graph Intelligence Platform
+					</p>
+
+					<p className="mt-6 max-w-3xl text-xl text-muted-foreground">
+						Messy, multi-source data into a{" "}
+						<span className="font-medium text-foreground underline decoration-primary decoration-2 underline-offset-4">
+							knowledge graph you can trust
+						</span>{" "}
+						— reason and simulate on it, with answers you can trace back to the
+						source.
+					</p>
+
+					<ul className="mt-12 max-w-3xl space-y-6">
+						{PILLARS.map((p) => (
+							<li key={p.title} className="flex gap-4">
+								<span
+									aria-hidden
+									className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary"
+								>
+									<p.icon className="h-6 w-6" strokeWidth={1.75} />
+								</span>
+								<div>
+									<p className="text-xl font-semibold">{p.title}</p>
+									<p className="mt-0.5 text-lg text-muted-foreground">
+										{p.blurb}
+									</p>
+								</div>
+							</li>
+						))}
+					</ul>
+				</div>
+
+				{/* ── Right: sign-in card ─────────────────────────────────── */}
+				<div className="w-full max-w-lg">
 					<div
-						className="w-12 h-12 rounded-md bg-primary text-primary-foreground font-bold mx-auto flex items-center justify-center"
+						className="rounded-lg border border-white/10 bg-card/55 p-8 backdrop-blur-xl"
 						style={{
 							boxShadow:
-								"0 0 18px color-mix(in srgb, var(--color-primary) 30%, transparent)",
+								"inset 0 1px 0 color-mix(in srgb, white 6%, transparent), 0 16px 48px -24px rgba(0, 0, 0, 0.6)",
 						}}
 					>
-						I
-					</div>
-					<h1 className="text-2xl font-semibold pt-2">Sign in to Invana</h1>
-				</div>
-				<form className="space-y-4 mt-8" onSubmit={handleSubmit}>
-					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
-							type="email"
-							autoComplete="email"
-							required
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
-						<Input
-							id="password"
-							type="password"
-							autoComplete="current-password"
-							required
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-						/>
-					</div>
-					<FormError error={error} />
-					<Button
-						type="submit"
-						className="w-full shadow-[0_6px_20px_-10px_var(--color-primary)] transition-shadow hover:shadow-[0_8px_28px_-8px_var(--color-primary)]"
-						disabled={submitting}
-					>
-						{submitting ? "Signing in…" : "Sign in"}
-					</Button>
-				</form>
+						<h2 className="text-2xl font-semibold">Sign in</h2>
+						<p className="mt-1 text-muted-foreground">
+							Welcome back. Enter your credentials to continue.
+						</p>
 
-				<div className="mt-6 flex items-center justify-center gap-3 text-muted-foreground">
-					<button
-						type="button"
-						className="hover:text-foreground transition-colors"
-						onClick={() => setHelpModal("create-user")}
-					>
-						Create new user
-					</button>
-					<span className="opacity-40">·</span>
-					<button
-						type="button"
-						className="hover:text-foreground transition-colors"
-						onClick={() => setHelpModal("forgot")}
-					>
-						Forgot password?
-					</button>
+						<form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+							<div className="space-y-2">
+								<Label htmlFor="email">Email</Label>
+								<Input
+									id="email"
+									type="email"
+									autoComplete="email"
+									required
+									placeholder="you@example.com"
+									// Override the design-kit Input's baked-in `md:text-sm`,
+									// which shrinks field text on md+ screens.
+									className="md:text-base"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+								/>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="password">Password</Label>
+								<Input
+									id="password"
+									type="password"
+									autoComplete="current-password"
+									required
+									placeholder="••••••••"
+									className="md:text-base"
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+								/>
+							</div>
+
+							<label
+								htmlFor="remember"
+								className="flex items-center gap-2 text-muted-foreground"
+							>
+								<Checkbox
+									id="remember"
+									checked={remember}
+									onCheckedChange={(c) => setRemember(c === true)}
+								/>
+								Remember me for 30 days
+							</label>
+
+							<FormError error={error} />
+
+							<Button
+								type="submit"
+								className="w-full shadow-[0_6px_20px_-10px_var(--color-primary)] transition-shadow hover:shadow-[0_8px_28px_-8px_var(--color-primary)]"
+								disabled={submitting}
+							>
+								{submitting ? "Signing in…" : "Sign in"}
+							</Button>
+						</form>
+
+						<div className="mt-6 flex items-center justify-center gap-3 text-muted-foreground">
+							<button
+								type="button"
+								className="transition-colors hover:text-foreground"
+								onClick={() => setHelpModal("create-user")}
+							>
+								Create new user
+							</button>
+							<span className="opacity-40">·</span>
+							<button
+								type="button"
+								className="transition-colors hover:text-foreground"
+								onClick={() => setHelpModal("forgot")}
+							>
+								Need help?
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 
