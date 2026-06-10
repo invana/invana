@@ -95,6 +95,9 @@ async def require_graph_setup_complete(
             status_code=status.HTTP_409_CONFLICT,
             detail={
                 "error": "graph_setup_incomplete",
+                "message": (
+                    f"Finish the setup wizard before running queries — incomplete section(s): {', '.join(missing)}."
+                ),
                 "missing_sections": missing,
                 "graph_id": graph.id,
             },

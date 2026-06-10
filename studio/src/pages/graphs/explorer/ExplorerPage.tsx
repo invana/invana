@@ -7,9 +7,12 @@ import {
 	type GraphCanvasNode,
 } from "../../../components/canvas/GraphCanvas";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
-import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
+import {
+	useGraphConnectionQuery,
+	useGraphQuery,
+} from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
-import type { QueryLanguage } from "../../../types/graphs";
+import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type { QueryResultItem } from "../../../types/query";
 import { GraphDetail } from "../components/GraphDetail";
 import { CanvasToolbar } from "./components/CanvasToolbar";
@@ -35,6 +38,13 @@ export function ExplorerPage() {
 		graphSlug,
 	);
 	const connectionMissing = !graphLoading && !graph;
+
+	// The query route is gated server-side by `require_graph_setup_complete`
+	// (409 graph_setup_incomplete). Mirror that here so we never let the user
+	// fire a query that's guaranteed to bounce — fetch the Graph container for
+	// its `setup_state` and gate the panel when required sections are unfinished.
+	const { data: graphContainer } = useGraphQuery(username, graphSlug);
+	const setupIncomplete = !!graphContainer && !isSetupComplete(graphContainer);
 
 	const { mutation, history } = useQueryExecution(username, graphSlug);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
@@ -77,6 +87,12 @@ export function ExplorerPage() {
 	const defaultLanguage: QueryLanguage = availableLanguages[0] ?? "cypher";
 
 	const handleRun = async (payload: QueryRunPayload) => {
+		if (setupIncomplete) {
+			toast.error(
+				"Finish the setup wizard (Graph Info + Intent) before running queries.",
+			);
+			return;
+		}
 		if (payload.mode === "nl") {
 			// NL execution isn't wired yet — the engine only exposes the QL
 			// `/query` endpoint today. Surface that clearly instead of silently
@@ -118,7 +134,9 @@ export function ExplorerPage() {
 	);
 
 	const leftContent = connectionMissing ? (
-		<SetupRequiredBanner pageLabel="Explorer" />
+		<SetupRequiredBanner pageLabel="Explorer" reason="connection" />
+	) : setupIncomplete ? (
+		<SetupRequiredBanner pageLabel="Explorer" reason="setup" />
 	) : (
 		<QueryPanel
 			availableLanguages={availableLanguages}

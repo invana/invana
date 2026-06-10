@@ -26,7 +26,10 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
-import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
+import {
+	useGraphConnectionQuery,
+	useGraphQuery,
+} from "../../../hooks/queries/useGraphs";
 import {
 	useActivateVersionMutation,
 	useCreateDraftMutation,
@@ -38,6 +41,7 @@ import {
 } from "../../../hooks/queries/useModels";
 import { ApiError } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
+import { isSetupComplete } from "../../../types/graphs";
 import type { GraphModelSummary } from "../../../types/models";
 import type {
 	EdgeTypeResponse,
@@ -71,6 +75,11 @@ export function ModellerPage() {
 		graphSlug,
 	);
 	const connectionMissing = !graphLoading && !graph;
+
+	// Same gate as the engine's `require_graph_setup_complete` (409) — block the
+	// modeller until the required setup-wizard sections are finished.
+	const { data: graphContainer } = useGraphQuery(username, graphSlug);
+	const setupIncomplete = !!graphContainer && !isSetupComplete(graphContainer);
 
 	const { data: models, isLoading: modelsLoading } = useModelsQuery(
 		username,
@@ -241,7 +250,11 @@ export function ModellerPage() {
 			</div>
 		);
 	} else if (connectionMissing) {
-		leftContent = <SetupRequiredBanner pageLabel="Modeller" />;
+		leftContent = (
+			<SetupRequiredBanner pageLabel="Modeller" reason="connection" />
+		);
+	} else if (setupIncomplete) {
+		leftContent = <SetupRequiredBanner pageLabel="Modeller" reason="setup" />;
 	} else if (!modelId || !selectedModel) {
 		leftContent = (
 			<ModelListPanel

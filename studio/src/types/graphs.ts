@@ -70,6 +70,16 @@ export const SETUP_SKIPPABLE: readonly SetupSection[] = [
 	"datasets",
 ] as const;
 
+/**
+ * Mirror of the engine's `is_setup_complete` guard (graphs/services.py): a
+ * graph is query-ready only once every REQUIRED section carries a
+ * `completed_at`. Surfaces (Explorer, Modeller) use this to gate before the
+ * engine 409s with `graph_setup_incomplete`.
+ */
+export function isSetupComplete(graph: Graph): boolean {
+	return SETUP_REQUIRED.every((s) => !!graph.setup_state?.[s]?.completed_at);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GraphConnection types
 //
