@@ -9,6 +9,7 @@ from invana.cli.commands.init import init_cmd
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.migrate import migrate_cmd
 from invana.cli.commands.start import start_cmd
+from invana.cli.commands.users import users_cmd
 from invana.logging import configure_logging
 
 
@@ -30,4 +31,5 @@ app.add_command(start_cmd)
 app.add_command(migrate_cmd)
 app.add_command(loader_cmd)
 app.add_command(init_cmd)
+app.add_command(users_cmd)
 app.add_command(datasets_cmd)

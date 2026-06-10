@@ -415,6 +415,13 @@ async def _find_user_by_email(session: AsyncSession, email: str) -> User | None:
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
+async def find_user_by_email_or_username(session: AsyncSession, *, identifier: str) -> User | None:
+    """Resolve a user by either email or username. Used by operator CLI commands."""
+    value = identifier.strip().lower()
+    stmt = select(User).where((func.lower(User.email) == value) | (User.username == value))
+    return (await session.execute(stmt)).scalar_one_or_none()
+
+
 # ---------------------------------------------------------------------------
 # Bootstrap (called by `invana init`)
 # ---------------------------------------------------------------------------
@@ -457,3 +464,75 @@ async def bootstrap_root(
 async def any_superuser_exists(session: AsyncSession) -> bool:
     stmt = select(func.count(User.id)).where(User.is_superuser.is_(True))
     return (await session.execute(stmt)).scalar_one() > 0
+
+
+# ---------------------------------------------------------------------------
+# Operator (CLI) operations — trusted shell context, no HTTP actor
+# ---------------------------------------------------------------------------
+
+
+async def provision_user(
+    session: AsyncSession,
+    *,
+    email: str,
+    password: str,
+    username: str,
+    first_name: str,
+    last_name: str | None,
+    is_superuser: bool = False,
+) -> User:
+    """Create a user from a trusted admin context (``invana users create``).
+
+    Unlike :func:`register` there is no HTTP actor — the audit event is
+    attributed to the system actor. Validates username/email uniqueness; lets
+    :class:`WeakPasswordError` propagate so the CLI can surface it verbatim.
+    """
+    normalized_username = _validate_username_format(username)
+    if normalized_username in _RESERVED_USERNAMES:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
+    if await _username_taken(session, username=normalized_username):
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
+    if await _find_user_by_email(session, email) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
+
+    password_hash = hash_password(password)
+    user = User(
+        email=email.lower(),
+        username=normalized_username,
+        password_hash=password_hash,
+        first_name=first_name.strip(),
+        last_name=(last_name.strip() if last_name else None) or None,
+        is_superuser=is_superuser,
+        is_active=True,
+    )
+    session.add(user)
+    await session.flush()
+    await emit_event(
+        session,
+        action=event_actions.AUTH_REGISTER,
+        target_kind=event_actions.TARGET_USER,
+        target_id=user.id,
+        actor_type=ActorType.system,
+        details={"email": user.email, "username": user.username, "via": "cli"},
+        trace_id=current_trace_id(),
+    )
+    return user
+
+
+async def admin_set_password(session: AsyncSession, *, user: User, new_password: str) -> None:
+    """Force-set a user's password from a trusted admin context (``invana users update-password``).
+
+    Unlike :func:`change_password` no current password is required — this is an
+    operator reset. Revokes all refresh tokens so existing sessions die.
+    """
+    user.password_hash = hash_password(new_password)
+    await revoke_all_refresh_tokens_for_user(session, user_id=user.id)
+    await emit_event(
+        session,
+        action=event_actions.AUTH_PASSWORD_CHANGE,
+        target_kind=event_actions.TARGET_USER,
+        target_id=user.id,
+        actor_type=ActorType.system,
+        details={"via": "cli"},
+        trace_id=current_trace_id(),
+    )

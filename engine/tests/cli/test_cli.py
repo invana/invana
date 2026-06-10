@@ -83,6 +83,12 @@ class TestHelpCommand:
         for flag in ("--uri", "--connector", "--batch-size", "--dry-run", "--skip-on-error"):
             assert flag in result.output
 
+    def test_users_group_lists_subcommands(self):
+        result = CliRunner().invoke(app, ["users", "--help"])
+        assert result.exit_code == 0
+        for cmd in ("create", "update-password"):
+            assert cmd in result.output
+
 
 # ---------------------------------------------------------------------------
 # invana loader — error paths
