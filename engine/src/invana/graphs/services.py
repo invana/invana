@@ -1,4 +1,4 @@
-"""Business logic for graph-scoped endpoints — Graph CRUD + members + invitations.
+"""Business logic for graph-scoped endpoints — Graph CRUD + membership.
 
 Functions flush but do not commit — the route handler commits at end-of-request.
 """
@@ -10,30 +10,14 @@ from datetime import UTC, datetime
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from invana.auth.models import User
-from invana.auth.schemas import (
-    GraphMemberOut,
-    GraphMemberRoleUpdate,
-    InvitationCreateRequest,
-    InvitationCreateResponse,
-    InvitationOut,
-)
-from invana.auth.services import (
-    invitation_token_hash,
-    make_invitation_expiry,
-    new_invitation_raw_token,
-    studio_redeem_url,
-)
 from invana.events import actions
 from invana.events.services import current_trace_id, diff_changed_fields, emit_event
 from invana.graphs.models import (
     Graph,
     GraphConnection,
     GraphMember,
-    GraphRole,
-    Invitation,
 )
 from invana.graphs.schemas import (
     SETUP_REQUIRED,
@@ -50,7 +34,7 @@ from invana.graphs.schemas import (
 
 
 async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCreate) -> GraphRead:
-    """Create a Graph and auto-assign the creator as admin."""
+    """Create a Graph and attach the creator as its member (binary access, RFC-023)."""
     slug = payload.slug.lower()
     existing = await session.execute(select(Graph).where(Graph.created_by_id == owner.id, Graph.slug == slug))
     if existing.scalar_one_or_none() is not None:
@@ -69,7 +53,7 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
     session.add(graph)
     await session.flush()
 
-    session.add(GraphMember(graph_id=graph.id, user_id=owner.id, role=GraphRole.admin))
+    session.add(GraphMember(graph_id=graph.id, user_id=owner.id))
     await session.flush()
 
     await emit_event(
@@ -83,7 +67,7 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
         trace_id=current_trace_id(),
     )
     # Implicit member.add of the owner — surfaces as a parallel event so the
-    # graph's audit trail shows who became admin and when.
+    # graph's audit trail shows who joined and when.
     await emit_event(
         session,
         action=actions.MEMBER_ADD,
@@ -91,7 +75,7 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
         target_id=owner.id,
         graph_id=graph.id,
         actor_id=owner.id,
-        details={"role": GraphRole.admin.value, "via": "graph.create"},
+        details={"via": "graph.create"},
         trace_id=current_trace_id(),
     )
 
@@ -464,211 +448,3 @@ async def _serialize_graph(session: AsyncSession, graph: Graph) -> GraphRead:
         created_at=graph.created_at,
         updated_at=graph.updated_at,
     )
-
-
-# ---------------------------------------------------------------------------
-# Members
-# ---------------------------------------------------------------------------
-
-
-async def list_graph_members(session: AsyncSession, *, graph_id: str) -> list[GraphMemberOut]:
-    stmt = (
-        select(GraphMember)
-        .where(GraphMember.graph_id == graph_id)
-        .options(selectinload(GraphMember.user))
-        .order_by(GraphMember.created_at.asc())
-    )
-    return [
-        GraphMemberOut(
-            user_id=m.user_id,
-            username=m.user.username,
-            email=m.user.email,
-            first_name=m.user.first_name,
-            last_name=m.user.last_name,
-            role=m.role,
-            created_at=m.created_at,
-        )
-        for m in (await session.execute(stmt)).scalars().all()
-    ]
-
-
-async def update_graph_member_role(
-    session: AsyncSession,
-    *,
-    graph_id: str,
-    target_user_id: str,
-    payload: GraphMemberRoleUpdate,
-    actor_id: str,
-) -> GraphMemberOut:
-    member = await _get_membership(session, graph_id=graph_id, user_id=target_user_id)
-    if member is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Member not found.")
-    if (
-        member.role is GraphRole.admin
-        and payload.role is not GraphRole.admin
-        and await _is_sole_graph_admin(session, graph_id=graph_id, user_id=target_user_id)
-    ):
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            detail="Cannot demote the only admin of this Graph.",
-        )
-    before_role = member.role.value
-    member.role = payload.role
-    await session.flush()
-    await session.refresh(member, ["user"])
-    await emit_event(
-        session,
-        action=actions.MEMBER_ROLE_CHANGE,
-        target_kind=actions.TARGET_MEMBER,
-        target_id=target_user_id,
-        graph_id=graph_id,
-        actor_id=actor_id,
-        details={
-            "username": member.user.username,
-            "changed": {"role": {"before": before_role, "after": payload.role.value}},
-        },
-        trace_id=current_trace_id(),
-    )
-    return GraphMemberOut(
-        user_id=member.user_id,
-        username=member.user.username,
-        email=member.user.email,
-        first_name=member.user.first_name,
-        last_name=member.user.last_name,
-        role=member.role,
-        created_at=member.created_at,
-    )
-
-
-async def remove_graph_member(
-    session: AsyncSession,
-    *,
-    graph_id: str,
-    target_user_id: str,
-    actor_id: str,
-) -> None:
-    member = await _get_membership(session, graph_id=graph_id, user_id=target_user_id)
-    if member is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Member not found.")
-    if member.role is GraphRole.admin and await _is_sole_graph_admin(
-        session, graph_id=graph_id, user_id=target_user_id
-    ):
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            detail="Cannot remove the only admin of this Graph.",
-        )
-    # Pull the username snapshot before delete so it survives the FK SET NULL
-    # on the audit event row.
-    await session.refresh(member, ["user"])
-    username = member.user.username
-    role_at_remove = member.role.value
-    await emit_event(
-        session,
-        action=actions.MEMBER_REMOVE,
-        target_kind=actions.TARGET_MEMBER,
-        target_id=target_user_id,
-        graph_id=graph_id,
-        actor_id=actor_id,
-        details={"username": username, "role": role_at_remove},
-        trace_id=current_trace_id(),
-    )
-    await session.delete(member)
-
-
-async def _is_sole_graph_admin(session: AsyncSession, *, graph_id: str, user_id: str) -> bool:
-    stmt = select(func.count()).where(
-        GraphMember.graph_id == graph_id,
-        GraphMember.role == GraphRole.admin,
-        GraphMember.user_id != user_id,
-    )
-    return (await session.execute(stmt)).scalar_one() == 0
-
-
-# ---------------------------------------------------------------------------
-# Invitations
-# ---------------------------------------------------------------------------
-
-
-async def create_invitation(
-    session: AsyncSession,
-    *,
-    invited_by: User,
-    graph_id: str,
-    payload: InvitationCreateRequest,
-) -> InvitationCreateResponse:
-    raw_token = new_invitation_raw_token()
-    invitation = Invitation(
-        token_hash=invitation_token_hash(raw_token),
-        email=payload.email.lower(),
-        graph_id=graph_id,
-        role=payload.role,
-        invited_by_id=invited_by.id,
-        expires_at=make_invitation_expiry(),
-    )
-    session.add(invitation)
-    await session.flush()
-
-    await emit_event(
-        session,
-        action=actions.INVITATION_CREATE,
-        target_kind=actions.TARGET_INVITATION,
-        target_id=invitation.id,
-        graph_id=graph_id,
-        actor_id=invited_by.id,
-        details={"email": invitation.email, "role": invitation.role.value},
-        trace_id=current_trace_id(),
-    )
-
-    return InvitationCreateResponse(
-        id=invitation.id,
-        email=invitation.email,
-        graph_id=invitation.graph_id,
-        role=invitation.role,
-        invited_by_id=invitation.invited_by_id,
-        expires_at=invitation.expires_at,
-        accepted_at=invitation.accepted_at,
-        created_at=invitation.created_at,
-        redeem_url=studio_redeem_url(raw_token),
-    )
-
-
-async def list_graph_invitations(session: AsyncSession, *, graph_id: str) -> list[InvitationOut]:
-    stmt = select(Invitation).where(Invitation.graph_id == graph_id).order_by(Invitation.created_at.desc())
-    return [InvitationOut.model_validate(r) for r in (await session.execute(stmt)).scalars().all()]
-
-
-async def delete_invitation(
-    session: AsyncSession,
-    *,
-    graph_id: str,
-    invitation_id: str,
-    actor_id: str,
-) -> None:
-    invitation = await session.get(Invitation, invitation_id)
-    if invitation is None or invitation.graph_id != graph_id:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invitation not found.")
-    snapshot = {"email": invitation.email, "role": invitation.role.value}
-    await emit_event(
-        session,
-        action=actions.INVITATION_DELETE,
-        target_kind=actions.TARGET_INVITATION,
-        target_id=invitation_id,
-        graph_id=graph_id,
-        actor_id=actor_id,
-        details=snapshot,
-        trace_id=current_trace_id(),
-    )
-    await session.delete(invitation)
-
-
-# ---------------------------------------------------------------------------
-# Lookups
-# ---------------------------------------------------------------------------
-
-
-async def _get_membership(session: AsyncSession, *, graph_id: str, user_id: str) -> GraphMember | None:
-    stmt = select(GraphMember).where(
-        GraphMember.graph_id == graph_id,
-        GraphMember.user_id == user_id,
-    )
-    return (await session.execute(stmt)).scalar_one_or_none()

@@ -9,7 +9,6 @@ export type SettingsSection =
 	| "skills"
 	| "instructions"
 	| "datasets"
-	| "members"
 	| "events";
 
 const DEFAULT_SECTION: SettingsSection = "info";

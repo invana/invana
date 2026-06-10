@@ -20,7 +20,6 @@ from invana.auth.deps import get_current_user
 from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
-    require_graph_admin,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
@@ -70,7 +69,7 @@ async def list_llm_providers(
 @llm_providers_router.post("", response_model=LLMProviderRead, status_code=status.HTTP_201_CREATED)
 async def create_llm_provider(
     payload: LLMProviderCreate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -102,7 +101,7 @@ async def get_llm_provider(
 async def update_llm_provider(
     payload: LLMProviderUpdate,
     provider_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -123,7 +122,7 @@ async def update_llm_provider(
 @llm_providers_router.delete("/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_llm_provider(
     provider_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -137,7 +136,7 @@ async def delete_llm_provider(
 @llm_providers_router.post("/{provider_id}/ping", response_model=LLMPingResponse)
 async def ping_llm_provider(
     provider_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -156,7 +155,7 @@ async def ping_llm_provider(
 @llm_providers_router.post("/{provider_id}/set-default", response_model=LLMProviderRead)
 async def set_default_llm_provider(
     provider_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),

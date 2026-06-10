@@ -6,8 +6,8 @@ Tables
                            membership, intent + setup state. CRUD lands in S2.
 - ``graph_connections``  — 1:1 child of Graph; the DB binding (URL, driver, encrypted auth,
                            runtime health). Renamed from the previous ``graphs`` table.
-- ``graph_members``      — (graph, user) -> role. Composite PK.
-- ``invitations``        — graph-scoped registration token. One-shot, hashed.
+- ``graph_members``      — (graph, user) access join. Composite PK. Binary membership
+                           (a row == full access); roles removed in RFC-023.
 """
 
 from __future__ import annotations
@@ -47,14 +47,6 @@ def _new_id() -> str:
 # ---------------------------------------------------------------------------
 
 
-class GraphRole(enum.StrEnum):
-    """Per-graph role. See docs/internal/mvp/layer-1-identity-access.md."""
-
-    developer = "developer"
-    analyst = "analyst"
-    admin = "admin"
-
-
 class GraphStatus(enum.StrEnum):
     active = "active"
     archived = "archived"
@@ -62,13 +54,6 @@ class GraphStatus(enum.StrEnum):
 
 # Shared Enum types — ``create_type=False`` everywhere; the migration creates the
 # PG type exactly once.
-_graph_role_enum = Enum(
-    GraphRole,
-    name="graph_role",
-    values_callable=lambda x: [m.value for m in x],
-    create_type=False,
-)
-
 _graph_status_enum = Enum(
     GraphStatus,
     name="graph_status",
@@ -87,7 +72,7 @@ class Graph(Base):
 
     1:1 with ``GraphConnection``. Carries identity (slug + owner),
     intent + objectives, setup-wizard state, and the analytical bindings
-    that hang off it (members, invitations, datasets, skills, agents…).
+    that hang off it (members, datasets, skills, agents…).
     """
 
     __tablename__ = "graphs"
@@ -203,33 +188,18 @@ class GraphConnection(Base):
 
 
 class GraphMember(Base):
+    """User↔graph access join. Binary membership (a row == full access).
+
+    Roles were removed in RFC-023; this table no longer carries a ``role``
+    column. ``get_graph_membership`` / ``require_graph_member`` gate every
+    graph-scoped route on the mere existence of a row.
+    """
+
     __tablename__ = "graph_members"
 
     graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    role: Mapped[GraphRole] = mapped_column(_graph_role_enum, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     graph: Mapped[Graph] = relationship(back_populates="members")
     user: Mapped[User] = relationship(back_populates="memberships")
-
-
-# ---------------------------------------------------------------------------
-# Invitation — graph-scoped
-# ---------------------------------------------------------------------------
-
-
-class Invitation(Base):
-    __tablename__ = "invitations"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
-    email: Mapped[str] = mapped_column(String(320), nullable=False, index=True)
-    graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False)
-    role: Mapped[GraphRole] = mapped_column(_graph_role_enum, nullable=False)
-    invited_by_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

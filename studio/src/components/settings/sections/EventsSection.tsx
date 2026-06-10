@@ -288,7 +288,6 @@ function iconForAction(action: string) {
 		case "instruction":
 			return ScrollText;
 		case "member":
-		case "invitation":
 			return Users;
 		case "auth":
 			return UserCircle;

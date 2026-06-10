@@ -4,7 +4,6 @@ import App from "./App";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
 import { LoginPage } from "./pages/auth/LoginPage";
-import { RegisterPage } from "./pages/auth/RegisterPage";
 import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
 import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
@@ -30,13 +29,10 @@ const LazyFallback = () => (
 );
 
 export const router = createBrowserRouter([
-	// Public auth pages — no shell, no protection.
+	// Public auth pages — no shell, no protection. Self-service registration was
+	// removed (RFC-023): accounts are superuser-provisioned, so there is no
+	// public /register page — only /login.
 	{ path: "/login", element: <LoginPage />, errorElement: <ErrorPage /> },
-	{
-		path: "/register",
-		element: <RegisterPage />,
-		errorElement: <ErrorPage />,
-	},
 
 	// Full-page layouts — own AppLayoutV2, not nested under App shell.
 	// Graph-scoped URLs (RFC-017). Explorer/Modeller hit the graph-scoped
@@ -89,8 +85,8 @@ export const router = createBrowserRouter([
 			{ path: "graphs/new", element: <GraphCreatePage /> },
 			{ path: "settings/profile", element: <ProfileSettingsPage /> },
 			// Platform-admin surfaces (superuser-only — gated inside the page
-			// component via RoleGate). Lives under /platform/* to avoid the
-			// /admin namespace collision with starlette-admin.
+			// component via a direct user.is_superuser check). Lives under
+			// /platform/* to avoid the /admin namespace collision with starlette-admin.
 			{ path: "platform/events", element: <PlatformEventsPage /> },
 
 			{ path: "*", element: <ErrorPage /> },

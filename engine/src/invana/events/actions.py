@@ -30,13 +30,10 @@ CONNECTION_COMPATIBILITY_DOWNGRADE = "connection.compatibility_downgrade"
 CONNECTION_VERSION_ACKNOWLEDGE = "connection.version_acknowledge"
 CONNECTION_VERSION_DECLARE = "connection.version_declare"
 
-# ── Members + Invitations ─────────────────────────────────────────────────────
+# ── Members ───────────────────────────────────────────────────────────────────
+# Membership is binary post-RFC-023; the owner is added once at graph creation.
+# Role-change / removal / invitation actions were removed with the feature.
 MEMBER_ADD = "member.add"
-MEMBER_ROLE_CHANGE = "member.role_change"
-MEMBER_REMOVE = "member.remove"
-INVITATION_CREATE = "invitation.create"
-INVITATION_DELETE = "invitation.delete"
-INVITATION_ACCEPT = "invitation.accept"
 
 # ── LLM providers (RFC-018 § 2.6) ─────────────────────────────────────────────
 LLM_CREATE = "llm.create"
@@ -89,7 +86,6 @@ SYSTEM_INTROSPECT_COMPLETE = "system.introspect_complete"
 TARGET_GRAPH = "graph"
 TARGET_CONNECTION = "connection"
 TARGET_MEMBER = "member"
-TARGET_INVITATION = "invitation"
 TARGET_LLM = "llm_provider"
 TARGET_SKILL = "skill"
 TARGET_INSTRUCTION = "instruction"

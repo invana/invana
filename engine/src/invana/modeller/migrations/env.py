@@ -16,7 +16,6 @@ from invana.graphs.models import (  # noqa: F401
     Graph,
     GraphConnection,
     GraphMember,
-    Invitation,
 )
 from invana.modeller.models import Base
 from invana.settings import settings

@@ -52,10 +52,9 @@ class Settings(BaseSettings):
     auth_min_password_length: int = 12
     auth_bcrypt_rounds: int = 12
     auth_jwt_algorithm: str = "HS256"
-    auth_token_bytes: int = 32  # bytes of entropy for opaque refresh + invite tokens
+    auth_token_bytes: int = 32  # bytes of entropy for opaque refresh tokens
     auth_access_token_ttl_minutes: int = 15
     auth_refresh_token_ttl_days: int = 7
-    auth_invitation_ttl_days: int = 7
     # Username change cooldown — RFC-017. PATCH /auth/me with a new username inside the
     # window returns 409. Set to 0 to disable the cooldown (useful in tests).
     auth_username_change_cooldown_days: int = 30
@@ -63,7 +62,7 @@ class Settings(BaseSettings):
     # whether a username is taken, so cap scraping cost. 0 disables the limit.
     auth_username_available_rate_limit_per_minute: int = 30
 
-    # URL Studio is served from — used to build invitation redeem URLs.
+    # URL Studio is served from — used to build user-facing links (e.g. login).
     studio_base_url: str = "http://localhost:8300"
 
     # Telemetry (OpenTelemetry)

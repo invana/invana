@@ -18,7 +18,6 @@ from invana.auth.deps import get_current_user
 from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
-    require_graph_admin,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
@@ -51,7 +50,7 @@ async def list_skills(
 @skills_router.post("", response_model=SkillRead, status_code=status.HTTP_201_CREATED)
 async def create_skill(
     payload: SkillCreate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -77,7 +76,7 @@ async def get_skill(
 async def update_skill(
     payload: SkillUpdate,
     skill_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -92,7 +91,7 @@ async def update_skill(
 @skills_router.delete("/{skill_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_skill(
     skill_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),

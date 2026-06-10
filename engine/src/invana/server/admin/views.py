@@ -12,7 +12,7 @@ from starlette_admin.contrib.sqla import Admin, ModelView
 from invana.auth.models import RefreshToken, User
 from invana.datasets.models import Dataset, ImportJob
 from invana.events.models import Event
-from invana.graphs.models import Graph, GraphConnection, GraphMember, Invitation
+from invana.graphs.models import Graph, GraphConnection, GraphMember
 from invana.instructions.models import Instruction
 from invana.llm_providers.models import LLMProvider
 from invana.modeller.models import (
@@ -158,8 +158,8 @@ class SchemaProjectionView(ModelView):
 # Auth views (Layer 1)
 #
 # Sensitive columns (`password_hash`, `token_hash`) are deliberately omitted
-# from `fields` so they aren't displayed or editable. User/invite creation
-# goes through the CLI / invitations API, not the admin UI.
+# from `fields` so they aren't displayed or editable. User creation goes through
+# the CLI (`invana init`) or the superuser-gated register API, not the admin UI.
 # ---------------------------------------------------------------------------
 
 
@@ -181,7 +181,7 @@ class UserView(ModelView):
     search_fields = ["email", "username", "first_name", "last_name"]
     sortable_fields = ["email", "username", "created_at", "updated_at"]
 
-    # Users come from `invana init` (root) or graph invitations — not admin UI.
+    # Users come from `invana init` (root) or the superuser register API — not admin UI.
     def can_create(self, request: Request) -> bool:
         return False
 
@@ -208,38 +208,13 @@ class GraphContainerView(ModelView):
 class GraphMemberView(ModelView):
     label = "Graph members"
     icon = "fa fa-users"
+    # Binary membership post-RFC-023 — no role column.
     fields = [
         "graph_id",
         "user_id",
-        StringField("role", label="Role"),
         "created_at",
     ]
     sortable_fields = ["created_at"]
-
-
-class InvitationView(ModelView):
-    label = "Invitations"
-    icon = "fa fa-envelope"
-    fields = [
-        "id",
-        "email",
-        "graph_id",
-        StringField("role", label="Role"),
-        "invited_by_id",
-        "expires_at",
-        "accepted_at",
-        "created_at",
-    ]
-    search_fields = ["email"]
-    sortable_fields = ["created_at", "expires_at", "accepted_at"]
-
-    # Invitations are issued through the API (token shown once); admin UI is
-    # read + revoke only.
-    def can_create(self, request: Request) -> bool:
-        return False
-
-    def can_edit(self, request: Request) -> bool:
-        return False
 
 
 class RefreshTokenView(ModelView):
@@ -444,7 +419,6 @@ def mount_admin(app: FastAPI) -> None:
                 GraphContainerView(Graph, label="Graphs", icon="fa fa-circle-nodes"),
                 GraphConnectionView(GraphConnection, label="Graph connections", icon="fa fa-plug"),
                 GraphMemberView(GraphMember, label="Graph members", icon="fa fa-users"),
-                InvitationView(Invitation, label="Invitations", icon="fa fa-envelope"),
             ],
         ),
     )

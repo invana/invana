@@ -24,22 +24,6 @@ export const authApi = {
 			})
 		).data,
 
-	register: async (
-		invite: string,
-		body: {
-			first_name: string;
-			last_name: string | null;
-			username: string;
-			password: string;
-		},
-	) =>
-		(
-			await apiClient.post<AuthResponse>(
-				`/api/v1/auth/register?invite=${encodeURIComponent(invite)}`,
-				body,
-			)
-		).data,
-
 	logout: async (refreshToken: string) => {
 		await apiClient.post("/api/v1/auth/logout", {
 			refresh_token: refreshToken,
@@ -65,5 +49,3 @@ export const authApi = {
 		await apiClient.delete("/api/v1/auth/me", { data: { password } });
 	},
 };
-
-export type { GraphRole } from "../../types/auth";

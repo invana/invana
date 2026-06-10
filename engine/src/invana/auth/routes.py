@@ -1,6 +1,6 @@
 """HTTP routes for /api/v1/auth/*.
 
-Graph-scoped routes (members, invitations, connection) live in
+Graph-scoped routes (members, connection) live in
 :mod:`invana.graphs.routes`.
 """
 
@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth import services
-from invana.auth.deps import get_current_user
+from invana.auth.deps import get_current_user, require_superuser
 from invana.auth.models import User
 from invana.auth.schemas import (
     AuthResponse,
@@ -43,15 +43,16 @@ async def username_available(
     return await services.check_username_availability(session, raw=username)
 
 
-@auth_router.post("/register", response_model=AuthResponse)
+@auth_router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def register(
     payload: RegisterRequest,
-    invite: str = Query(..., description="Raw invitation token from the redeem URL."),
+    actor: User = Depends(require_superuser),
     session: AsyncSession = Depends(get_session),
-) -> AuthResponse:
-    response = await services.register_with_invite(session, raw_invite_token=invite, payload=payload)
+) -> UserOut:
+    """Provision a new account. Superuser-only (RFC-023) — self-service signup removed."""
+    out = await services.register(session, payload=payload, actor_id=actor.id)
     await session.commit()
-    return response
+    return out
 
 
 @auth_router.post("/login", response_model=AuthResponse)

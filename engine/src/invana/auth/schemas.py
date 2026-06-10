@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field
 
-from invana.graphs.models import GraphRole
 from invana.settings import settings
 
 # ---------------------------------------------------------------------------
@@ -34,29 +33,15 @@ class UsernameAvailabilityResponse(BaseModel):
 
 
 class GraphMembershipOut(BaseModel):
-    """A user's membership in a Graph — what /auth/me returns."""
+    """A user's membership in a Graph — what /auth/me returns.
+
+    Membership is binary (RFC-023); there is no role field.
+    """
 
     graph_id: str
     graph_name: str
     graph_slug: str
     owner_username: str
-    role: GraphRole
-
-
-class GraphMemberOut(BaseModel):
-    """A row in /u/{username}/{graphSlug}/members."""
-
-    user_id: str
-    username: str
-    email: EmailStr
-    first_name: str
-    last_name: str | None
-    role: GraphRole
-    created_at: datetime
-
-
-class GraphMemberRoleUpdate(BaseModel):
-    role: GraphRole
 
 
 # ---------------------------------------------------------------------------
@@ -90,6 +75,9 @@ class AuthResponse(BaseModel):
 
 
 class RegisterRequest(BaseModel):
+    # Superuser-provisioned (RFC-023): the platform admin supplies the new
+    # account's email directly (no invitation carries it anymore).
+    email: EmailStr
     first_name: str = Field(min_length=1, max_length=120)
     last_name: str | None = Field(default=None, max_length=120)
     username: str = Field(min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=USERNAME_PATTERN)
@@ -134,32 +122,3 @@ class ChangePasswordRequest(BaseModel):
 
 class DeleteMeRequest(BaseModel):
     password: str
-
-
-# ---------------------------------------------------------------------------
-# Invitations (graph-scoped)
-# ---------------------------------------------------------------------------
-
-
-class InvitationCreateRequest(BaseModel):
-    email: EmailStr
-    role: GraphRole
-
-
-class InvitationOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    email: EmailStr
-    graph_id: str
-    role: GraphRole
-    invited_by_id: str | None
-    expires_at: datetime
-    accepted_at: datetime | None
-    created_at: datetime
-
-
-class InvitationCreateResponse(InvitationOut):
-    """Returned once at create time — includes the one-shot redeem URL."""
-
-    redeem_url: str

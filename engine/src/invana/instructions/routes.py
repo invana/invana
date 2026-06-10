@@ -9,7 +9,6 @@ from invana.auth.deps import get_current_user
 from invana.auth.models import User
 from invana.db import get_session
 from invana.graphs.deps import (
-    require_graph_admin,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
@@ -46,7 +45,7 @@ async def list_instructions(
 )
 async def create_instruction(
     payload: InstructionCreate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -81,7 +80,7 @@ async def get_instruction(
 async def update_instruction(
     payload: InstructionUpdate,
     instruction_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -105,7 +104,7 @@ async def update_instruction(
 @instructions_router.delete("/{instruction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_instruction(
     instruction_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),

@@ -89,7 +89,10 @@ async def _run_init(
     try:
         async with session_factory() as session:
             if await any_superuser_exists(session):
-                click.echo("A superuser already exists. Use the Studio invitations flow on a Graph to add more users.")
+                click.echo(
+                    "A superuser already exists. Provision more users via the "
+                    "superuser-only POST /api/v1/auth/register."
+                )
                 return
 
             if non_interactive:

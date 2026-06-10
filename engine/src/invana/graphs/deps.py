@@ -4,7 +4,10 @@ Resolution chain (per RFC-017):
 
     resolve_graph_by_username_slug(username, graphSlug)
     └─> get_graph_membership(current_user, graph)
-        └─> require_graph_{member,builder,admin}
+        └─> require_graph_member
+
+Membership is binary (RFC-023): a ``GraphMember`` row == full access. The old
+``require_graph_builder`` / ``require_graph_admin`` role tiers were removed.
 
 All graph-scoped URLs are namespaced as ``/api/v1/u/{username}/{graphSlug}/...``.
 The path-param is named ``graphSlug`` to disambiguate from the generic word
@@ -20,7 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.auth.deps import get_current_user
 from invana.auth.models import User
 from invana.db import get_session
-from invana.graphs.models import Graph, GraphMember, GraphRole
+from invana.graphs.models import Graph, GraphMember
 
 
 def _not_found(detail: str) -> HTTPException:
@@ -71,25 +74,7 @@ async def get_graph_membership(
 async def require_graph_member(
     member: GraphMember = Depends(get_graph_membership),
 ) -> GraphMember:
-    """Any active member of the Graph."""
-    return member
-
-
-async def require_graph_builder(
-    member: GraphMember = Depends(get_graph_membership),
-) -> GraphMember:
-    """admin or developer within the Graph — gates content mutations."""
-    if member.role not in (GraphRole.admin, GraphRole.developer):
-        raise _forbidden("This action requires the developer or admin role in this Graph.")
-    return member
-
-
-async def require_graph_admin(
-    member: GraphMember = Depends(get_graph_membership),
-) -> GraphMember:
-    """admin within the Graph — gates invitation / member mgmt and settings."""
-    if member.role is not GraphRole.admin:
-        raise _forbidden("This action requires the admin role in this Graph.")
+    """Any member of the Graph — the sole graph-scoped access gate (RFC-023)."""
     return member
 
 

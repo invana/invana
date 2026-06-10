@@ -3,7 +3,7 @@
 Functions return raw DTOs or raise ``HTTPException``. They flush but do not
 commit — the route handler commits once at the end of the request.
 
-Graph-scoped business logic (membership, invitations) lives in
+Graph-scoped business logic (membership) lives in
 :mod:`invana.graphs.services`.
 """
 
@@ -35,8 +35,6 @@ from invana.auth.schemas import (
 )
 from invana.auth.tokens import (
     find_active_refresh_token,
-    generate_token,
-    hash_token,
     issue_refresh_token,
     revoke_all_refresh_tokens_for_user,
     revoke_refresh_token,
@@ -44,7 +42,7 @@ from invana.auth.tokens import (
 from invana.events import actions as event_actions
 from invana.events.models import ActorType
 from invana.events.services import current_trace_id, emit_event
-from invana.graphs.models import Graph, GraphMember, Invitation
+from invana.graphs.models import Graph, GraphMember
 from invana.settings import settings
 
 _GENERIC_AUTH_FAILURE = HTTPException(
@@ -122,11 +120,7 @@ async def check_username_availability(session: AsyncSession, *, raw: str) -> Use
 
 
 async def _list_memberships(session: AsyncSession, *, user_id: str) -> list[GraphMembershipOut]:
-    stmt = (
-        select(GraphMember)
-        .where(GraphMember.user_id == user_id)
-        .options(selectinload(GraphMember.graph).selectinload(Graph.members))
-    )
+    stmt = select(GraphMember).where(GraphMember.user_id == user_id).options(selectinload(GraphMember.graph))
     rows = (await session.execute(stmt)).scalars().all()
 
     # Owner username is derived from Graph.created_by_id → users.username. Batch the lookup.
@@ -142,7 +136,6 @@ async def _list_memberships(session: AsyncSession, *, user_id: str) -> list[Grap
             graph_name=m.graph.name,
             graph_slug=m.graph.slug,
             owner_username=owners.get(m.graph.created_by_id, ""),
-            role=m.role,
         )
         for m in rows
     ]
@@ -172,112 +165,51 @@ async def _build_auth_response(session: AsyncSession, *, user: User) -> AuthResp
 
 
 # ---------------------------------------------------------------------------
-# Registration via graph-scoped invitation
+# Registration — superuser-provisioned (RFC-023)
 # ---------------------------------------------------------------------------
 
 
-async def register_with_invite(
-    session: AsyncSession, *, raw_invite_token: str, payload: RegisterRequest
-) -> AuthResponse:
-    invitation = await _find_invitation_by_raw_token(session, raw_invite_token)
-    if invitation is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invitation not found.")
-    if invitation.accepted_at is not None:
-        raise HTTPException(status.HTTP_409_CONFLICT, detail="Invitation already accepted.")
-    if invitation.expires_at <= datetime.now(UTC):
-        raise HTTPException(status.HTTP_410_GONE, detail="Invitation has expired.")
+async def register(session: AsyncSession, *, payload: RegisterRequest, actor_id: str) -> UserOut:
+    """Provision a new (non-superuser) account.
 
-    # If a user with this email already exists, accepting the invite just
-    # creates the graph membership — username and password fields are ignored.
-    existing_user = await _find_user_by_email(session, invitation.email)
-    if existing_user is None:
-        username = _validate_username_format(payload.username)
-        if username in _RESERVED_USERNAMES:
-            raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
-        if await _username_taken(session, username=username):
-            raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
-        try:
-            password_hash = hash_password(payload.password)
-        except WeakPasswordError as e:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)) from e
+    Self-service signup was removed in RFC-023 — the route is gated behind
+    ``require_superuser``, so ``actor_id`` is the platform admin creating the
+    account, not the new user. Returns the created user; no session/token is
+    issued for the new account.
+    """
+    username = _validate_username_format(payload.username)
+    if username in _RESERVED_USERNAMES:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
+    if await _username_taken(session, username=username):
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
+    if await _find_user_by_email(session, payload.email) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
+    try:
+        password_hash = hash_password(payload.password)
+    except WeakPasswordError as e:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)) from e
 
-        user = User(
-            email=invitation.email.lower(),
-            username=username,
-            password_hash=password_hash,
-            first_name=payload.first_name.strip(),
-            last_name=(payload.last_name.strip() if payload.last_name else None) or None,
-            is_superuser=False,
-            is_active=True,
-        )
-        session.add(user)
-        await session.flush()
-    else:
-        # Email already known — registration is a no-op on the user record;
-        # we still attach the new graph membership. Submitted username is ignored.
-        user = existing_user
-
-    new_user_event = existing_user is None
-    if new_user_event:
-        await emit_event(
-            session,
-            action=event_actions.AUTH_REGISTER,
-            target_kind=event_actions.TARGET_USER,
-            target_id=user.id,
-            actor_id=user.id,
-            details={"email": user.email, "username": user.username},
-            trace_id=current_trace_id(),
-        )
-
-    # Attach (or upgrade) the graph membership.
-    member = await _get_membership(session, graph_id=invitation.graph_id, user_id=user.id)
-    member_event: tuple[str, dict] | None
-    if member is None:
-        session.add(
-            GraphMember(
-                graph_id=invitation.graph_id,
-                user_id=user.id,
-                role=invitation.role,
-            )
-        )
-        member_event = (
-            event_actions.MEMBER_ADD,
-            {"role": invitation.role.value, "via": "invitation.accept"},
-        )
-    else:
-        before_role = member.role.value
-        member.role = invitation.role
-        member_event = (
-            event_actions.MEMBER_ROLE_CHANGE,
-            {
-                "via": "invitation.accept",
-                "changed": {"role": {"before": before_role, "after": invitation.role.value}},
-            },
-        )
-
-    invitation.accepted_at = datetime.now(UTC)
+    user = User(
+        email=payload.email.lower(),
+        username=username,
+        password_hash=password_hash,
+        first_name=payload.first_name.strip(),
+        last_name=(payload.last_name.strip() if payload.last_name else None) or None,
+        is_superuser=False,
+        is_active=True,
+    )
+    session.add(user)
     await session.flush()
     await emit_event(
         session,
-        action=member_event[0],
-        target_kind=event_actions.TARGET_MEMBER,
+        action=event_actions.AUTH_REGISTER,
+        target_kind=event_actions.TARGET_USER,
         target_id=user.id,
-        graph_id=invitation.graph_id,
-        actor_id=user.id,
-        details=member_event[1],
+        actor_id=actor_id,
+        details={"email": user.email, "username": user.username, "via": "superuser.provision"},
         trace_id=current_trace_id(),
     )
-    await emit_event(
-        session,
-        action=event_actions.INVITATION_ACCEPT,
-        target_kind=event_actions.TARGET_INVITATION,
-        target_id=invitation.id,
-        graph_id=invitation.graph_id,
-        actor_id=user.id,
-        details={"email": invitation.email, "role": invitation.role.value},
-        trace_id=current_trace_id(),
-    )
-    return await _build_auth_response(session, user=user)
+    return await _user_out(session, user=user)
 
 
 # ---------------------------------------------------------------------------
@@ -447,15 +379,13 @@ async def delete_me(session: AsyncSession, *, user: User, payload: DeleteMeReque
             status.HTTP_409_CONFLICT,
             detail="You are the only superuser. Promote another user before deleting this account.",
         )
-    # Guard B: refuse if user owns any Graph that has other members.
-    # The Graph.created_by_id FK is RESTRICT, so DB would error anyway — fail early with a clear message.
-    if await _owns_shared_graph(session, user_id=user.id):
+    # Guard B (RFC-023): refuse if the user owns any Graph. With roles/sharing
+    # removed, graphs are owner-only — delete them first. The Graph.created_by_id
+    # FK is RESTRICT, so the DB would error anyway; fail early with a clear message.
+    if await _owns_any_graph(session, user_id=user.id):
         raise HTTPException(
             status.HTTP_409_CONFLICT,
-            detail=(
-                "You own Graphs that have other members. Remove other members "
-                "or transfer admin before deleting this account."
-            ),
+            detail="You own one or more Graphs. Delete them before deleting this account.",
         )
     await session.delete(user)
 
@@ -469,14 +399,9 @@ async def _is_sole_active_superuser(session: AsyncSession, *, user_id: str) -> b
     return (await session.execute(stmt)).scalar_one() == 0
 
 
-async def _owns_shared_graph(session: AsyncSession, *, user_id: str) -> bool:
-    """True if the user owns any Graph with at least one OTHER member."""
-    stmt = (
-        select(func.count())
-        .select_from(Graph)
-        .join(GraphMember, GraphMember.graph_id == Graph.id)
-        .where(Graph.created_by_id == user_id, GraphMember.user_id != user_id)
-    )
+async def _owns_any_graph(session: AsyncSession, *, user_id: str) -> bool:
+    """True if the user owns any Graph (graphs are owner-only post-RFC-023)."""
+    stmt = select(func.count()).select_from(Graph).where(Graph.created_by_id == user_id)
     return (await session.execute(stmt)).scalar_one() > 0
 
 
@@ -487,19 +412,6 @@ async def _owns_shared_graph(session: AsyncSession, *, user_id: str) -> bool:
 
 async def _find_user_by_email(session: AsyncSession, email: str) -> User | None:
     stmt = select(User).where(func.lower(User.email) == email.lower())
-    return (await session.execute(stmt)).scalar_one_or_none()
-
-
-async def _get_membership(session: AsyncSession, *, graph_id: str, user_id: str) -> GraphMember | None:
-    stmt = select(GraphMember).where(
-        GraphMember.graph_id == graph_id,
-        GraphMember.user_id == user_id,
-    )
-    return (await session.execute(stmt)).scalar_one_or_none()
-
-
-async def _find_invitation_by_raw_token(session: AsyncSession, raw_token: str) -> Invitation | None:
-    stmt = select(Invitation).where(Invitation.token_hash == hash_token(raw_token))
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
@@ -545,25 +457,3 @@ async def bootstrap_root(
 async def any_superuser_exists(session: AsyncSession) -> bool:
     stmt = select(func.count(User.id)).where(User.is_superuser.is_(True))
     return (await session.execute(stmt)).scalar_one() > 0
-
-
-# ---------------------------------------------------------------------------
-# Shared invitation helpers — used by graphs/services.py for create-invitation
-# ---------------------------------------------------------------------------
-
-
-def make_invitation_expiry() -> datetime:
-    return datetime.now(UTC) + timedelta(days=settings.auth_invitation_ttl_days)
-
-
-def new_invitation_raw_token() -> str:
-    return generate_token()
-
-
-def invitation_token_hash(raw: str) -> str:
-    return hash_token(raw)
-
-
-def studio_redeem_url(raw_token: str) -> str:
-    base = settings.studio_base_url.rstrip("/")
-    return f"{base}/register?invite={raw_token}"

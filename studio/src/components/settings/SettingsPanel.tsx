@@ -20,7 +20,6 @@ import { InfoSection } from "./sections/InfoSection";
 import { InstructionsSection } from "./sections/InstructionsSection";
 import { IntentSection } from "./sections/IntentSection";
 import { LLMsSection } from "./sections/LLMsSection";
-import { MembersInvitationsSection } from "./sections/MembersInvitationsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 
@@ -32,9 +31,9 @@ interface Props {
 /**
  * Docked settings sidebar. Each rail-icon section renders as its own
  * `@invana/ui` `TabbedPanel` — most sections have a single tab (the section
- * itself) while Members hosts a two-tab nested panel (Members + Invitations)
- * via `MembersInvitationsSection`. Switching between sections is driven by
- * the rail icons via `?settings=<section>` (see `useGraphLeftNav`).
+ * itself) while Connection hosts a two-tab nested panel (Connection +
+ * Capabilities). Switching between sections is driven by the rail icons via
+ * `?settings=<section>` (see `useGraphLeftNav`).
  *
  * The TabbedPanel's built-in chrome handles the close button (wired to
  * `useSettingsPanel().close`); the maximize button lives in `headerActions`.
@@ -67,18 +66,6 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 			</div>
 		),
 	};
-
-	// Members hosts its own two-tab TabbedPanel (Members + Invitations).
-	if (section === "members") {
-		return (
-			<MembersInvitationsSection
-				username={username}
-				graphSlug={graphSlug}
-				className="h-full"
-				headerActions={headerActions}
-			/>
-		);
-	}
 
 	// Connection hosts its own two-tab TabbedPanel (Connection + Capabilities).
 	if (section === "connection") {
@@ -130,9 +117,9 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 
-// Sections whose panel is a single-tab TabbedPanel. Members and Connection are
-// handled separately (above) because they each render a two-tab TabbedPanel.
-type SingleTabSection = Exclude<SettingsSection, "members" | "connection">;
+// Sections whose panel is a single-tab TabbedPanel. Connection is handled
+// separately (above) because it renders a two-tab TabbedPanel.
+type SingleTabSection = Exclude<SettingsSection, "connection">;
 const SINGLE_TAB_SECTIONS: Record<
 	SingleTabSection,
 	{ label: string; icon: typeof Database }

@@ -1,6 +1,5 @@
 import { authApi } from "../services/api/auth";
 import { useAuthStore } from "../stores/auth.store";
-import type { GraphRole } from "../types/auth";
 
 export function useAuth() {
 	const user = useAuthStore((s) => s.user);
@@ -22,21 +21,6 @@ export function useAuth() {
 				(g) => g.owner_username === username && g.graph_slug === graphSlug,
 			) ?? null
 		);
-	}
-
-	function rolesForGraph(
-		username: string | undefined,
-		graphSlug: string | undefined,
-	) {
-		const m = membershipForGraph(username, graphSlug);
-		const role: GraphRole | null = m?.role ?? null;
-		return {
-			role,
-			isAdmin: role === "admin",
-			isBuilder: role === "admin" || role === "developer",
-			isAnalyst: role === "analyst",
-			isMember: !!m,
-		};
 	}
 
 	const isAuthenticated = !!accessToken && !!user;
@@ -65,7 +49,6 @@ export function useAuth() {
 		isSuperuser,
 		displayName,
 		membershipForGraph,
-		rolesForGraph,
 		setSession,
 		setUser,
 		clear,

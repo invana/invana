@@ -16,7 +16,7 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 
 ## Architecture summary (RFC-017)
 
-The MVP container model is **`User → Graph (1:1 GraphConnection)`**. There is no Workspace and no Mission entity — both are folded into `Graph`. `Graph` carries members, invitations, the DB connection (1:1), schema, intent/objectives, datasets, skills, instructions, LLM bindings, and agents.
+The MVP container model is **`User → Graph (1:1 GraphConnection)`**. There is no Workspace and no Mission entity — both are folded into `Graph`. `Graph` carries members (binary access — roles & invitations removed, RFC-023), the DB connection (1:1), schema, intent/objectives, datasets, skills, instructions, LLM bindings, and agents.
 
 All graph-scoped URLs are namespaced under `/u/:username/:graphSlug/...`. Users have a globally unique `username`; `graphs.slug` is unique per owner. The URL path parameter is named `graphSlug` (the data field is still `Graph.slug`) — disambiguates from generic "slug" in routing code.
 
@@ -31,8 +31,8 @@ A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills 
 > **Rename pending (RFC-017).** Behaviors below are implemented; the **Workspace → Graph** rename + **username** addition + **removal of auto-created personal workspace** from `invana init` is the active work in Slice S1.5. Items show their target post-rename shape.
 
 ### 1.1 User auth (register, login, refresh, logout, me + patch + password + delete-self)
-- **Backend:** [~] `User` model · bcrypt hashing (passlib + `bcrypt<5` pin) · `/api/v1/auth/register` (invite-gated) · `/login` · `/refresh` (rotates refresh token) · `/logout` · `/me` (GET) · `/me` (PATCH first/last name + username) · `/me/password` (revokes all this user's refresh tokens) · `/me` (DELETE with sole-superuser guard) · `GET /api/v1/auth/username-available?username=foo` (unauthenticated; returns `{available: bool, reason?: string}`) · HS256 access JWT (15m), opaque server-side refresh token (7d) · `get_current_user` dep — **add `users.username`** (globally unique, validated lowercase `[a-z0-9-]`, 2–64 chars, mutable with rate-limit; collected at registration)
-- **Frontend:** [~] `LoginPage` · `RegisterPage` (invite-redeem) — **add username field**; `ProfileSettingsPage` with tabs (Basic info · Password · Danger zone) — **add username edit in Basic info with cooldown indicator**; `stores/auth.store.ts` (Zustand, persisted) · axios interceptor (attach Bearer, single-flight refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
+- **Backend:** [~] `User` model · bcrypt hashing (passlib + `bcrypt<5` pin) · `/api/v1/auth/register` (**superuser-provisioned — gated by `require_superuser`; self-service signup removed, RFC-023**) · `/login` · `/refresh` (rotates refresh token) · `/logout` · `/me` (GET) · `/me` (PATCH first/last name + username) · `/me/password` (revokes all this user's refresh tokens) · `/me` (DELETE with sole-superuser guard + owns-any-graph guard → 409, RFC-023) · `GET /api/v1/auth/username-available?username=foo` (unauthenticated; returns `{available: bool, reason?: string}`) · HS256 access JWT (15m), opaque server-side refresh token (7d) · `get_current_user` dep — **add `users.username`** (globally unique, validated lowercase `[a-z0-9-]`, 2–64 chars, mutable with rate-limit; collected at registration)
+- **Frontend:** [~] `LoginPage` (public `RegisterPage` + `/register` removed, RFC-023 — accounts are superuser-provisioned) · `ProfileSettingsPage` with tabs (Basic info · Password · Danger zone) — **add username edit in Basic info with cooldown indicator**; `stores/auth.store.ts` (Zustand, persisted) · axios interceptor (attach Bearer, single-flight refresh on 401) · `useAuth` hook · `ProtectedRoute` wrapper
 - **Integrations:** `passlib[bcrypt]` · `bcrypt<5` (passlib 1.7.4 wrap-bug guard) · `PyJWT` · `pydantic[email]` · `itsdangerous` (SessionMiddleware) · browser `localStorage` (HttpOnly cookies deferred)
 
 ### 1.2 CLI bootstrap
@@ -40,29 +40,37 @@ A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills 
 - **Frontend:** [~] Existing `LoginPage` is the first-login surface; on first login the user lands on an empty `/graphs` list and is prompted to create their first Graph.
 - **Integrations:** `click` (existing)
 
-### 1.3 Invitations (graph-scoped)
-- **Backend:** [~] `Invitation` entity carries `graph_id` + `role` + `token_hash` (sha256) · `POST /api/v1/u/{username}/{graphSlug}/invitations` (admin only; returns one-shot `redeem_url`) · `GET .../invitations` · `DELETE .../invitations/{id}` · `POST /auth/register?invite=<token>` accept path attaches the user as a `GraphMember` with the invitation's role
-- **Frontend:** [~] `/u/:username/:graphSlug/settings/invitations` page (admin only) — issue dialog shows the redeem URL once with a copy button; per-row revoke; `RegisterPage` reads `?invite=<token>`
-- **Integrations:** email send is **deferred** for MVP — invitation URLs are copy-pasted
+### 1.3 Invitations (graph-scoped) — **REMOVED (RFC-023)**
+- The entire invitations feature (model/table, `/invitations` routes + services, the
+  `POST /auth/register?invite=<token>` accept path, and all studio Invitations UI) is **deleted**.
+  There is no in-product way to add another user to a graph; graphs are effectively owner-only until a
+  future RFC reintroduces sharing.
 
-### 1.4 Roles (graph-scoped)
-- **Role is graph-scoped, not user-scoped.** Role lives on `graph_members.role` enum (`developer` | `analyst` | `admin`). Platform-level admin is `users.is_superuser` (gates `/admin`). The same user can be `admin` of one Graph and `developer` of another. See `docs/internal/mvp/layer-1-identity-access.md` for the full role matrix.
-- **Backend:** [~] `graphs` + `graph_members` tables · `graph_role` enum · `get_graph_membership` dep · `require_graph_admin` / `require_graph_builder` / `require_graph_member` deps · `require_superuser` dep
-- **Frontend:** [~] `useAuth()` exposes `role`, `isAdmin`, `isBuilder`, `isSuperuser`, `displayName`, `activeMembership`, `membershipForGraph(username, slug)` · `RoleGate` component for conditional UI
+### 1.4 Membership & roles (graph-scoped) — **roles REMOVED, binary membership kept (RFC-023)**
+- **Access is binary.** A user is a member of a graph (full access) or not. The `graph_members.role`
+  column and `graph_role` enum (`developer` | `analyst` | `admin`) are **dropped**; `GraphMember`
+  survives as the user↔graph access join. Platform-level admin is still `users.is_superuser` (gates
+  `/admin`) and is **unchanged**.
+- **Backend:** [~] `graphs` + `graph_members` (no `role`) tables · `get_graph_membership` dep ·
+  `require_graph_member` dep · `require_superuser` dep. (`graph_role` enum, `require_graph_admin` /
+  `require_graph_builder` **removed**.)
+- **Frontend:** [~] `useAuth()` exposes `displayName`, `activeMembership`,
+  `membershipForGraph(username, slug)` (binary). (`role`, `isAdmin`, `isBuilder`, `RoleGate`
+  **removed** — superuser checks read `user.is_superuser` directly.)
 - **Integrations:** none
 
 ### 1.5 Admin UI gating
 - **Backend:** [x] `starlette-admin` mounted at `/admin`, gated by `SuperuserAuthProvider` — session-cookie auth (Starlette `SessionMiddleware`), email + password sign-in, `is_superuser=True` required (re-checked on every request, not trusted from session alone). **Distinct from the JWT Bearer flow** — `/admin` uses its own login form; API routes use Bearer tokens.
-- **Frontend:** [x] App-shell dropdown shows "Platform admin" link only to superusers (uses `RoleGate require="superuser"`)
+- **Frontend:** [x] App-shell dropdown shows "Platform admin" link only to superusers (direct `user.is_superuser` check — `RoleGate` removed per RFC-023)
 - **Integrations:** `starlette-admin` · `itsdangerous` (SessionMiddleware signing)
 
 ### 1.6 Account self-service (Profile settings)
-- **Backend:** [~] `PATCH /auth/me` (first/last name, **username** — rate-limited) · `POST /auth/me/password` (verifies current; rotates all refresh tokens on success) · `DELETE /auth/me` (verifies password; refuses if user is the sole active superuser → 409; refuses if user owns any Graph with other members → 409; otherwise hard-deletes — cascade downward)
+- **Backend:** [~] `PATCH /auth/me` (first/last name, **username** — rate-limited) · `POST /auth/me/password` (verifies current; rotates all refresh tokens on success) · `DELETE /auth/me` (verifies password; refuses if user is the sole active superuser → 409; refuses if user owns **any** Graph → 409, must delete graphs first per RFC-023; otherwise hard-deletes — cascade downward)
 - **Frontend:** [~] `/settings/profile` with three tabs: **Basic info** (email read-only · username editable with cooldown · first/last name editable), **Password** (current + new + confirm), **Danger zone** (delete account with email + password confirmation dialog and cascade preview)
 - **Integrations:** none
 
 ### 1.7 Admin model browser
-- **Backend:** [~] starlette-admin model views for `Users` (with username column) · `Graphs` · `GraphConnections` · `GraphMembers` · `Invitations` · `RefreshTokens`. Sensitive columns (`password_hash`, `token_hash`, `auth_encrypted`) deliberately excluded from `fields` so they aren't shown or editable. Tightened mutability: Users disable create; Invitations disable create + edit (delete = revoke); RefreshTokens disable create + edit (delete = manual revoke).
+- **Backend:** [~] starlette-admin model views for `Users` (with username column) · `Graphs` · `GraphConnections` · `GraphMembers` (no role column) · `RefreshTokens`. (`Invitations` view **removed** per RFC-023.) Sensitive columns (`password_hash`, `token_hash`, `auth_encrypted`) deliberately excluded from `fields` so they aren't shown or editable. Tightened mutability: Users disable create; RefreshTokens disable create + edit (delete = manual revoke).
 - **Frontend:** N/A — starlette-admin renders its own UI
 - **Integrations:** `starlette-admin` (existing)
 
@@ -126,7 +134,7 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Integrations:** none
 
 ### 2.11 Domain audit events (RFC-018)
-- **Backend:** [x] `events` table append-only · `emit_event(...)` service helper with sensitive-field redaction · per-graph + global read APIs (keyset pagination) · SSE live tail via Postgres `LISTEN/NOTIFY` per worker · OTel `trace_id` correlation · `?token=` SSE auth fallback. Emission wired across the platform: graph CRUD · setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add/role_change/remove) · invitations (create/accept/delete) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion). Retention: forever — audit logs are immutable.
+- **Backend:** [x] `events` table append-only · `emit_event(...)` service helper with sensitive-field redaction · per-graph + global read APIs (keyset pagination) · SSE live tail via Postgres `LISTEN/NOTIFY` per worker · OTel `trace_id` correlation · `?token=` SSE auth fallback. Emission wired across the platform: graph CRUD · setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion). Retention: forever — audit logs are immutable.
 - **Frontend:** [x] `EventsSection` (per-graph rail icon + maximize) · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook · TanStack `useInfiniteQuery` for keyset pagination · filter bar (action prefix) · live-tail head refresh on SSE frames.
 - **Integrations:** `@tanstack/react-query` (live-tail invalidation), native browser `EventSource`. Reuses existing OTel `trace_id` for span↔event correlation.
 
@@ -532,7 +540,7 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 ### S5.5 — Domain audit events (RFC-018) — **shipped** ✅
 - **BE:** [x] `events` append-only table + indexes + Alembic 00000000000d · `emit_event` service helper + sensitive-field redaction · keyset-paginated read API + SSE companions · Postgres `pg_notify` trigger + per-worker `LISTEN events` daemon + in-process broadcaster fan-out · superuser/member auth gates · admin Audit DropDown view.
-- **BE wiring:** [x] every write surface emits: graph CRUD + setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add/role_change/remove) · invitations (create/accept/delete) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion).
+- **BE wiring:** [x] every write surface emits: graph CRUD + setup wizard · connection (attach/update/delete/test) · llm providers (CRUD + ping + set_default) · skills · instructions · members (add) · auth (register/login/login_failed/logout/refresh/password_change/username_change) · query.execute · system events (auto-reconnect, introspect completion).
 - **FE:** [x] `EventsSection` rail icon + section + full-page maximize · `PlatformEventsPage` at `/platform/events` (superuser only) · `useEventStream` SSE hook with TanStack-Query cache invalidation · filter-by-action-prefix bar · keyset infinite scroll · UserMenu link to platform events for superusers.
 
 **Done when:** writing a Skill produces a `skill.create` row visible in both the graph's Events section and the platform Events page within ~1 second (live tail). ✅ — design in [`mvp/rfc-018-domain-audit-events.md`](mvp/rfc-018-domain-audit-events.md).

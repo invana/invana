@@ -6,8 +6,9 @@ Two routers live here:
   graphs the current user is a member of). The current user is the implicit
   owner on POST.
 - ``graph_router`` at ``/api/v1/u/{username}/{graphSlug}`` — GET / PATCH / DELETE on
-  the Graph itself, plus members + invitations. Future S2+ resources
-  (connection, llm, skills, datasets) hang off the same prefix.
+  the Graph itself plus its connection sub-resource. Future S2+ resources
+  (llm, skills, datasets) hang off the same prefix. Membership is binary
+  (RFC-023): every route gates on ``require_graph_member``.
 """
 
 from __future__ import annotations
@@ -17,13 +18,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth.deps import get_current_user
 from invana.auth.models import User
-from invana.auth.schemas import (
-    GraphMemberOut,
-    GraphMemberRoleUpdate,
-    InvitationCreateRequest,
-    InvitationCreateResponse,
-    InvitationOut,
-)
 from invana.db import get_session
 from invana.events import actions as event_actions
 from invana.events.services import current_trace_id, emit_event
@@ -36,7 +30,6 @@ from invana.graphs.compatibility import (
     resolve_capabilities,
 )
 from invana.graphs.deps import (
-    require_graph_admin,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
@@ -130,7 +123,7 @@ async def get_graph(
 @graph_router.patch("", response_model=GraphRead)
 async def patch_graph(
     payload: GraphUpdate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -142,109 +135,12 @@ async def patch_graph(
 
 @graph_router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_graph(
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     await services.delete_graph(session, graph=graph, actor_id=user.id)
-    await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-# ---------------------------------------------------------------------------
-# Members
-# ---------------------------------------------------------------------------
-
-
-@graph_router.get("/members", response_model=list[GraphMemberOut])
-async def list_members(
-    _: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    session: AsyncSession = Depends(get_session),
-) -> list[GraphMemberOut]:
-    return await services.list_graph_members(session, graph_id=graph.id)
-
-
-@graph_router.patch("/members/{user_id}", response_model=GraphMemberOut)
-async def update_member_role(
-    payload: GraphMemberRoleUpdate,
-    user_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    actor: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> GraphMemberOut:
-    out = await services.update_graph_member_role(
-        session,
-        graph_id=graph.id,
-        target_user_id=user_id,
-        payload=payload,
-        actor_id=actor.id,
-    )
-    await session.commit()
-    return out
-
-
-@graph_router.delete("/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_member(
-    user_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    actor: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> Response:
-    await services.remove_graph_member(session, graph_id=graph.id, target_user_id=user_id, actor_id=actor.id)
-    await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-# ---------------------------------------------------------------------------
-# Invitations
-# ---------------------------------------------------------------------------
-
-
-@graph_router.post("/invitations", response_model=InvitationCreateResponse, status_code=status.HTTP_201_CREATED)
-async def create_invitation(
-    payload: InvitationCreateRequest,
-    _: GraphMember = Depends(require_graph_admin),
-    user: User = Depends(get_current_user),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    session: AsyncSession = Depends(get_session),
-) -> InvitationCreateResponse:
-    out = await services.create_invitation(
-        session,
-        invited_by=user,
-        graph_id=graph.id,
-        payload=payload,
-    )
-    await session.commit()
-    return out
-
-
-@graph_router.get("/invitations", response_model=list[InvitationOut])
-async def list_invitations(
-    _: GraphMember = Depends(require_graph_admin),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    session: AsyncSession = Depends(get_session),
-) -> list[InvitationOut]:
-    return await services.list_graph_invitations(session, graph_id=graph.id)
-
-
-@graph_router.delete("/invitations/{invitation_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_invitation(
-    invitation_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    actor: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> Response:
-    await services.delete_invitation(
-        session,
-        graph_id=graph.id,
-        invitation_id=invitation_id,
-        actor_id=actor.id,
-    )
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -268,7 +164,7 @@ async def get_connection(
 @graph_router.put("/connection", response_model=GraphConnectionRead)
 async def put_connection(
     payload: GraphConnectionCreate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -294,7 +190,7 @@ async def put_connection(
 
 @graph_router.delete("/connection", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_connection(
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -309,7 +205,7 @@ async def delete_connection(
 
 @graph_router.post("/connection/acknowledge-version", response_model=GraphConnectionRead)
 async def acknowledge_connection_version(
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -341,7 +237,7 @@ async def acknowledge_connection_version(
 @graph_router.patch("/connection/version", response_model=GraphConnectionRead)
 async def declare_connection_version(
     payload: VersionDeclareRequest,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -380,7 +276,7 @@ async def declare_connection_version(
 async def update_setup_section(
     payload: SetupSectionUpdate,
     section: str = Path(...),
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -395,7 +291,7 @@ async def update_setup_section(
 @graph_router.post("/connection/test")
 async def test_connection(
     payload: GraphConnectionCreate,
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -444,7 +340,7 @@ async def ping_connection(
 
 @graph_router.post("/connection/introspect", status_code=status.HTTP_202_ACCEPTED)
 async def introspect_connection(
-    _: GraphMember = Depends(require_graph_admin),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),

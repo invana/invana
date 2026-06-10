@@ -12,9 +12,9 @@ import type {
 /**
  * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in
  * lockstep with reality whenever a membership-changing mutation runs
- * (create graph, delete graph, accept invitation, etc.) — otherwise
- * `rolesForGraph(...)` reads from a stale snapshot and admin-only rail
- * sections stay hidden until the next login.
+ * (create graph, delete graph) — otherwise `membershipForGraph(...)` reads
+ * from a stale snapshot and the just-changed graph looks wrong until the
+ * next login.
  */
 async function refreshAuthMe(): Promise<void> {
 	try {
@@ -58,9 +58,9 @@ export function useCreateGraphMutation() {
 		mutationFn: (data: GraphCreate) => graphsApi.create(data),
 		onSuccess: async () => {
 			qc.invalidateQueries({ queryKey: GRAPHS_KEY });
-			// Refresh user.graphs so the new (admin) membership shows up
-			// immediately in the rail — otherwise the just-created graph
-			// looks like a non-member visit until logout/login.
+			// Refresh user.graphs so the new membership shows up immediately
+			// in the rail — otherwise the just-created graph looks like a
+			// non-member visit until logout/login.
 			await refreshAuthMe();
 		},
 	});

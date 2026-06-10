@@ -24,7 +24,7 @@ export function PlatformEventsPage() {
 
 	useEventStream({ scope: "global" });
 
-	// Gate the page at render time — RoleGate-superuser. Non-superusers get
+	// Gate the page at render time — superuser only. Non-superusers get
 	// bounced back to /graphs rather than 403'd.
 	if (!user?.is_superuser) {
 		return <Navigate to="/graphs" replace />;

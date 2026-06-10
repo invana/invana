@@ -6,8 +6,7 @@ The package houses the Graph domain per RFC-017:
 - ``GraphConnection`` — 1:1 child of ``Graph``; the DB binding (renamed from
   the previous ``Graph`` model). Live connector instances are managed by
   ``GraphConnectionManager``.
-- ``GraphMember`` / ``GraphRole`` — graph-scoped membership.
-- ``Invitation`` — graph-scoped registration token.
+- ``GraphMember`` — graph-scoped membership (binary; roles removed in RFC-023).
 """
 
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
@@ -15,9 +14,7 @@ from invana.graphs.models import (
     Graph,
     GraphConnection,
     GraphMember,
-    GraphRole,
     GraphStatus,
-    Invitation,
 )
 from invana.graphs.store import GraphConnectionStore, GraphModelStore
 
@@ -28,8 +25,6 @@ __all__ = [
     "GraphConnectionStore",
     "GraphMember",
     "GraphModelStore",  # back-compat alias
-    "GraphRole",
     "GraphStatus",
     "GraphUnavailableError",
-    "Invitation",
 ]

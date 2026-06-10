@@ -1,8 +1,8 @@
 """SQLAlchemy async models for Layer 1 — Identity & Access.
 
-Identity (User + RefreshToken) lives here. Graph-scoped membership and
-invitations live in :mod:`invana.graphs.models` alongside the Graph
-container and GraphConnection per RFC-017.
+Identity (User + RefreshToken) lives here. Graph-scoped membership lives
+in :mod:`invana.graphs.models` alongside the Graph container and
+GraphConnection per RFC-017.
 
 - ``users``           — authenticated principal. Carries ``username`` (URL
                         identity, globally unique) plus ``email`` (login

@@ -1,13 +1,11 @@
-/** Shared auth + graph membership types. Must mirror engine schemas (RFC-017). */
-
-export type GraphRole = "developer" | "analyst" | "admin";
+/** Shared auth + graph membership types. Must mirror engine schemas (RFC-017).
+ *  Membership is binary (RFC-023) — there is no per-graph role. */
 
 export interface GraphMembership {
 	graph_id: string;
 	graph_name: string;
 	graph_slug: string;
 	owner_username: string;
-	role: GraphRole;
 }
 
 export interface AuthUser {
@@ -26,31 +24,6 @@ export interface AuthResponse {
 	access_token: string;
 	refresh_token: string;
 	token_type: string;
-}
-
-export interface GraphMember {
-	user_id: string;
-	username: string;
-	email: string;
-	first_name: string;
-	last_name: string | null;
-	role: GraphRole;
-	created_at: string;
-}
-
-export interface Invitation {
-	id: string;
-	email: string;
-	graph_id: string;
-	role: GraphRole;
-	invited_by_id: string | null;
-	expires_at: string;
-	accepted_at: string | null;
-	created_at: string;
-}
-
-export interface InvitationCreateResponse extends Invitation {
-	redeem_url: string;
 }
 
 export interface UsernameAvailabilityResponse {

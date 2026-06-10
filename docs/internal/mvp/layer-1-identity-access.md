@@ -1,5 +1,10 @@
 # Layer 1 — Identity & Access
 
+> **⚠️ Superseded in part by [RFC-023](rfc-023-remove-roles-invitations.md).** Graph roles
+> (`developer`/`analyst`/`admin`) and the invitations feature described below have been **removed**.
+> Membership is now binary (a member has full access); registration is superuser-provisioned. Treat
+> the **Invitations** and **role matrix** sections here as historical — see RFC-023 for the current model.
+
 > **Status**: Shipped (Slice S1, under prior Workspace nomenclature) · **Rename pending (Slice S1.5)** per [RFC-017](../../rfcs/017-graph-as-primary-container.md)
 > **Author**: Invana Team
 > **Created**: 2026-05-21

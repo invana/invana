@@ -39,7 +39,6 @@ from invana.events.services import emit_event
 from invana.graphs import services as graph_services
 from invana.graphs.compatibility import supported_property_type_values
 from invana.graphs.deps import (
-    require_graph_builder,
     require_graph_member,
     resolve_graph_by_username_slug,
 )
@@ -175,7 +174,7 @@ async def list_models(
 @models_router.post("", response_model=GraphModelResponse, status_code=status.HTTP_201_CREATED)
 async def create_model(
     payload: GraphModelCreate,
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -217,7 +216,7 @@ async def get_model(
 async def update_model(
     payload: GraphModelUpdate,
     model_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -241,7 +240,7 @@ async def update_model(
 @models_router.delete("/{model_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_model(
     model_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -281,7 +280,7 @@ async def list_versions(
 async def create_draft_version(
     payload: VersionCreate,
     model_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> VersionResponse:
@@ -341,7 +340,7 @@ async def activate_version(
     payload: VersionActivate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -378,7 +377,7 @@ async def create_node_type(
     payload: NodeTypeCreate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> NodeTypeResponse:
@@ -409,7 +408,7 @@ async def update_node_type(
     model_id: str = Path(...),
     version_id: str = Path(...),
     type_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> NodeTypeResponse:
@@ -432,7 +431,7 @@ async def delete_node_type(
     model_id: str = Path(...),
     version_id: str = Path(...),
     type_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
@@ -454,7 +453,7 @@ async def create_edge_type(
     payload: EdgeTypeCreate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> EdgeTypeResponse:
@@ -485,7 +484,7 @@ async def update_edge_type(
     model_id: str = Path(...),
     version_id: str = Path(...),
     type_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> EdgeTypeResponse:
@@ -508,7 +507,7 @@ async def delete_edge_type(
     model_id: str = Path(...),
     version_id: str = Path(...),
     type_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
@@ -530,7 +529,7 @@ async def create_property_key(
     payload: PropertyKeyCreate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> PropertyKeyResponse:
@@ -561,7 +560,7 @@ async def update_property_key(
     model_id: str = Path(...),
     version_id: str = Path(...),
     key_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> PropertyKeyResponse:
@@ -587,7 +586,7 @@ async def delete_property_key(
     model_id: str = Path(...),
     version_id: str = Path(...),
     key_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
@@ -609,7 +608,7 @@ async def create_constraint(
     payload: ConstraintCreate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> ConstraintResponse:
@@ -638,7 +637,7 @@ async def delete_constraint(
     model_id: str = Path(...),
     version_id: str = Path(...),
     constraint_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
@@ -660,7 +659,7 @@ async def create_index(
     payload: IndexCreate,
     model_id: str = Path(...),
     version_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> IndexResponse:
@@ -690,7 +689,7 @@ async def delete_index(
     model_id: str = Path(...),
     version_id: str = Path(...),
     index_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_builder),
+    _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
