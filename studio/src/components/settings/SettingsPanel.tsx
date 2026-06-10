@@ -1,7 +1,7 @@
 import { Button, TabbedPanel } from "@invana/ui";
 import {
 	Activity,
-	Database,
+	type Database,
 	Info,
 	Layers,
 	Lightbulb,
@@ -80,6 +80,18 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 		);
 	}
 
+	// Connection hosts its own two-tab TabbedPanel (Connection + Capabilities).
+	if (section === "connection") {
+		return (
+			<ConnectionSection
+				username={username}
+				graphSlug={graphSlug}
+				className="h-full"
+				headerActions={headerActions}
+			/>
+		);
+	}
+
 	// All other sections render as a single-tab TabbedPanel so the chrome
 	// (tab strip + close + maximize) matches Members visually.
 	const meta = SINGLE_TAB_SECTIONS[section];
@@ -118,15 +130,14 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 
 // ── Section metadata ─────────────────────────────────────────────────────────
 
-// Sections whose panel is a single-tab TabbedPanel. Members is handled
-// separately (above) because it has two tabs.
-type SingleTabSection = Exclude<SettingsSection, "members">;
+// Sections whose panel is a single-tab TabbedPanel. Members and Connection are
+// handled separately (above) because they each render a two-tab TabbedPanel.
+type SingleTabSection = Exclude<SettingsSection, "members" | "connection">;
 const SINGLE_TAB_SECTIONS: Record<
 	SingleTabSection,
 	{ label: string; icon: typeof Database }
 > = {
 	info: { label: "Info", icon: Info },
-	connection: { label: "Connection", icon: Database },
 	intent: { label: "Intent", icon: Lightbulb },
 	llms: { label: "LLMs", icon: Sparkles },
 	skills: { label: "Skills", icon: Wand2 },
@@ -147,8 +158,6 @@ function SectionContent({
 	switch (section) {
 		case "info":
 			return <InfoSection username={username} graphSlug={graphSlug} />;
-		case "connection":
-			return <ConnectionSection username={username} graphSlug={graphSlug} />;
 		case "intent":
 			return <IntentSection username={username} graphSlug={graphSlug} />;
 		case "llms":

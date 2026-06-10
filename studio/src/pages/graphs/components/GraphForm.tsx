@@ -274,7 +274,7 @@ export function GraphForm({
 					onChange={(e) => set("server_version", e.target.value)}
 					disabled={isSubmitting}
 				/>
-				<p className="text-xs text-muted-foreground">
+				<p className="text-muted-foreground">
 					Leave blank to detect from the database. Provide it manually for
 					backends Invana can't introspect (e.g. Gremlin) so property types and
 					compatibility resolve correctly.
@@ -319,7 +319,7 @@ export function GraphForm({
 			{testState.kind === "passed" &&
 				testState.compatibilityStatus &&
 				testState.compatibilityStatus !== "supported" && (
-					<p className="text-amber-600 dark:text-amber-400 text-sm">
+					<p className="text-amber-600 dark:text-amber-400">
 						{testState.compatibilityStatus === "unsupported"
 							? "This version is below Invana's supported range — the connection will be read-only."
 							: testState.compatibilityStatus === "untested"
