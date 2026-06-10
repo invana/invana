@@ -14,18 +14,7 @@
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true,
-		"baseUrl": ".",
-		"paths": {
-			"@invana/canvas-react": [
-				"../../canvas/packages/canvas-react/dist/index.d.ts"
-			],
-			"@invana/canvas": ["../../canvas/packages/canvas/dist/index.d.ts"],
-			"@invana/graph": ["../../canvas/packages/graph/dist/index.d.ts"],
-			"@invana/graph-layout-d3-force": [
-				"../../canvas/packages/graph-layout-d3-force/dist/index.d.ts"
-			]
-		}
+		"noFallthroughCasesInSwitch": true
 	},
 	"include": ["src"]
 }
