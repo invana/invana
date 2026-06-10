@@ -1,3 +1,4 @@
+import { Input, Label } from "@invana/forms";
 import {
 	Button,
 	Dialog,
@@ -6,8 +7,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	Input,
-	Label,
 	TabbedPanel,
 } from "@invana/ui";
 import { AlertTriangle, KeyRound, User } from "lucide-react";

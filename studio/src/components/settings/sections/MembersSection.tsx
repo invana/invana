@@ -1,12 +1,11 @@
 import {
-	Badge,
-	Button,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@invana/ui";
+} from "@invana/forms";
+import { Badge, Button } from "@invana/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";

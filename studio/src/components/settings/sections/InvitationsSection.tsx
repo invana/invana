@@ -1,4 +1,13 @@
 import {
+	Input,
+	Label,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@invana/forms";
+import {
 	Badge,
 	Button,
 	Dialog,
@@ -7,13 +16,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	Input,
-	Label,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 } from "@invana/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Trash2 } from "lucide-react";

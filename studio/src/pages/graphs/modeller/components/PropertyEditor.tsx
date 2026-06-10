@@ -1,10 +1,4 @@
 import {
-	Button,
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
 	Input,
 	Label,
 	Select,
@@ -12,6 +6,14 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+} from "@invana/forms";
+import {
+	Button,
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
 	Table,
 	TableBody,
 	TableCell,

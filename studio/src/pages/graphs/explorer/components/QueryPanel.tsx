@@ -5,15 +5,13 @@ import { groovy } from "@codemirror/legacy-modes/mode/groovy";
 import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import {
-	Button,
-	ScrollArea,
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-	TabbedPanel,
-} from "@invana/ui";
+} from "@invana/forms";
+import { Button, ScrollArea, TabbedPanel } from "@invana/ui";
 import { Clock, Paperclip, Play, Terminal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { QueryLanguage } from "../../../../types/graphs";

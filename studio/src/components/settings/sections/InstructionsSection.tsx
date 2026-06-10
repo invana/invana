@@ -1,4 +1,5 @@
-import { Badge, Button, Input, Label, Skeleton, Textarea } from "@invana/ui";
+import { Input, Label, Textarea } from "@invana/forms";
+import { Badge, Button, Skeleton } from "@invana/ui";
 import { Plus, ScrollText, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

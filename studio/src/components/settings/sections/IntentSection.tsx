@@ -1,4 +1,5 @@
-import { Button, Skeleton, Textarea } from "@invana/ui";
+import { Textarea } from "@invana/forms";
+import { Button, Skeleton } from "@invana/ui";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {

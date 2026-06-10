@@ -73,13 +73,17 @@ export const graphsApi = {
 	pingConnection: (username: string, graphSlug: string) =>
 		request<{ detail: string }>(
 			`/api/v1/u/${username}/${graphSlug}/connection/ping`,
-			{ method: "POST" },
+			{
+				method: "POST",
+			},
 		),
 
 	introspectConnection: (username: string, graphSlug: string) =>
 		request<{ detail: string }>(
 			`/api/v1/u/${username}/${graphSlug}/connection/introspect`,
-			{ method: "POST" },
+			{
+				method: "POST",
+			},
 		),
 
 	testConnection: (

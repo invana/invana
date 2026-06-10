@@ -1,5 +1,4 @@
 import {
-	Button,
 	Input,
 	Label,
 	Select,
@@ -8,7 +7,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Switch,
-} from "@invana/ui";
+} from "@invana/forms";
+import { Button } from "@invana/ui";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useState } from "react";
 import { FormError } from "../../../components/forms/FormError";
