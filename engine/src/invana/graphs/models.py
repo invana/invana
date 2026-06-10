@@ -169,6 +169,16 @@ class GraphConnection(Base):
     last_health_check_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
+    # Backend version compatibility (RFC-022). Populated at connect/health-check.
+    # server_version: detected (or user-declared) DB version, e.g. "5.20.0".
+    # server_version_source: "detected" | "declared".
+    # compatibility_status: cached CompatibilityStatus (supported/untested/unsupported/unknown).
+    # version_acknowledged: user accepted the risk of an UNTESTED version (lifts read-only).
+    server_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    server_version_source: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    compatibility_status: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    version_acknowledged: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
     # 1:1 link to owned schema — UNIQUE enforces the constraint at DB level
     model_id: Mapped[str | None] = mapped_column(
         ForeignKey("graph_models.id", ondelete="SET NULL"),

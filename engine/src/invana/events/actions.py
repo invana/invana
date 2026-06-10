@@ -24,6 +24,11 @@ CONNECTION_DELETE = "connection.delete"
 CONNECTION_TEST = "connection.test"
 CONNECTION_PING = "connection.ping"
 CONNECTION_INTROSPECT = "connection.introspect"
+# Backend version compatibility (RFC-022)
+CONNECTION_VERSION_DETECTED = "connection.version_detected"
+CONNECTION_COMPATIBILITY_DOWNGRADE = "connection.compatibility_downgrade"
+CONNECTION_VERSION_ACKNOWLEDGE = "connection.version_acknowledge"
+CONNECTION_VERSION_DECLARE = "connection.version_declare"
 
 # ── Members + Invitations ─────────────────────────────────────────────────────
 MEMBER_ADD = "member.add"

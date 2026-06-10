@@ -36,6 +36,8 @@ from invana.auth.models import User
 from invana.db import get_session
 from invana.events import actions as event_actions
 from invana.events.services import emit_event
+from invana.graphs import services as graph_services
+from invana.graphs.compatibility import supported_property_type_values
 from invana.graphs.deps import (
     require_graph_builder,
     require_graph_member,
@@ -120,6 +122,34 @@ async def _get_draft_version_or_404(
 
 def _conflict(exc: ValueError) -> HTTPException:
     return HTTPException(HTTPStatus.CONFLICT, detail={"error": "invalid_operation", "message": str(exc)})
+
+
+async def _enforce_supported_type(session: AsyncSession, graph: Graph, type_str: str) -> None:
+    """Reject a property type the bound backend can't store for its version (RFC-022).
+
+    No-ops when no connection is bound or the connector reports no profile (unknown
+    backend) — the modeller falls back to its full vocabulary in those cases.
+    """
+    connection = await graph_services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        return
+    supported = supported_property_type_values(connection)
+    if not supported:
+        return
+    # Canonicalise parameterised types (e.g. ``list[string]`` → ``list``).
+    base = type_str.split("[", 1)[0].strip().lower()
+    if base in supported:
+        return
+    raise HTTPException(
+        HTTPStatus.UNPROCESSABLE_ENTITY,
+        detail={
+            "error": "unsupported_property_type",
+            "type": type_str,
+            "connector_class": connection.connector_class,
+            "server_version": connection.server_version,
+            "supported": sorted(supported),
+        },
+    )
 
 
 async def _full_version(session: AsyncSession, version_id: str) -> VersionResponse:
@@ -505,6 +535,7 @@ async def create_property_key(
     session: AsyncSession = Depends(get_session),
 ) -> PropertyKeyResponse:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
+    await _enforce_supported_type(session, graph, payload.type)
     try:
         pk = await _store.create_property_key(
             session,
@@ -535,8 +566,11 @@ async def update_property_key(
     session: AsyncSession = Depends(get_session),
 ) -> PropertyKeyResponse:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
+    fields = payload.model_dump(exclude_unset=True)
+    if "type" in fields and fields["type"] is not None:
+        await _enforce_supported_type(session, graph, fields["type"])
     try:
-        pk = await _store.update_property_key(session, key_id, **payload.model_dump(exclude_unset=True))
+        pk = await _store.update_property_key(session, key_id, **fields)
     except ValueError as exc:
         raise _conflict(exc) from exc
     if pk is None:

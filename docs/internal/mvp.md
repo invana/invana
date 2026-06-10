@@ -287,6 +287,12 @@ Models are **authored in the Modeller** (not derived from datasets). A Graph own
 - **Integrations:** existing modeller code (`engine/src/invana/modeller/`) · `@invana/design-kit` forms · `@invana/canvas` (read-only render).
 - **Deferred:** [-] constraints/indexes authoring UI · interactive canvas editing · YAML round-trip of authored models.
 
+#### 4.1a Backend property-type capabilities + version compatibility (RFC-022)
+The property types the Modeller offers are **gated by the bound backend and its version** (canonical `PropertyType` vocabulary; each connector advertises a version-resolved subset). Untested/unknown DB versions degrade the connection to **read-only** until the user acknowledges the risk.
+- **Backend:** [ ] Canonical `CapabilityProfile` (property types + feature flags, version-gated) on connectors · `server_version` detection + cache on `graph_connections` · `CompatibilityStatus` (supported/untested/unsupported/unknown) + effective-read-only · `connection/acknowledge-version` · property-key type enforcement (422).
+- **Frontend:** [ ] Property-type dropdowns driven by `supported_property_types` · compatibility banner (untested → acknowledge / read-only; unknown → declare version).
+- **Integrations:** `BaseConnector` profile + `detect_version` · `CYPHER_PROFILE` / `GREMLIN_PROFILE` / `NEO4J_PROFILE`.
+
 ### 4.2 Stitcher — mapping (system type → user concept)
 - **Backend:** [ ] `StitchMapping` entity (`dataset_id`, `system_type`, `user_type`, `property_map` JSONB) · CRUD routes · validation that referenced types exist in both ends
 - **Frontend:** [ ] Mapping UI — two columns: dataset system-types (left, from L3 graph_model) · user model concepts (right) · drag-to-map · per-property mapping form
@@ -509,6 +515,7 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 ### S3 — User graph model authoring (RFC-019 · RFC-021) — in progress
 - **BE:** [x] Multi-model graph-scoped `/u/:username/:graphSlug/models` — full CRUD + draft→Publish + node/edge/property-key authoring (draft-only, 409-guarded).
 - **FE:** [~] `ModellerPage` authoring — model CRUD, draft→Publish, node/edge type + property forms, editable Property Keys. Canvas read-only.
+- **BE/FE (RFC-022):** [ ] Backend-gated property types + DB version compatibility — version-aware `CapabilityProfile`, `supported_property_types` drives the modeller dropdowns, untested/unknown versions force read-only until acknowledged.
 - **Done when:** from a clean checkout, a user creates a model, adds node + edge types with properties, publishes it, and the published version is read-only; creating a draft makes it editable again.
 
 ### S4 — LLM provider (graph-scoped) — **shipped** ✅

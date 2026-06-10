@@ -44,6 +44,7 @@ import type {
 	NodeTypeResponse,
 } from "../../../types/schemas";
 import { GraphDetail } from "../components/GraphDetail";
+import { CompatibilityBanner } from "./components/CompatibilityBanner";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
 import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
@@ -447,12 +448,23 @@ export function ModellerPage() {
 					defaultSize: "600px",
 					minSize: "300px",
 					content: (
-						<SchemaCanvas
-							nodeTypes={nodeTypes}
-							edgeTypes={edgeTypes}
-							selected={selected}
-							onSelect={setSelected}
-						/>
+						<div className="flex h-full flex-col">
+							{graph && (
+								<CompatibilityBanner
+									username={u}
+									graphSlug={g}
+									connection={graph}
+								/>
+							)}
+							<div className="min-h-0 flex-1">
+								<SchemaCanvas
+									nodeTypes={nodeTypes}
+									edgeTypes={edgeTypes}
+									selected={selected}
+									onSelect={setSelected}
+								/>
+							</div>
+						</div>
 					),
 				}}
 				rightSection={{

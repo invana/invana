@@ -129,7 +129,24 @@ export interface GraphConnectionRead {
 	// Explorer's language picker.
 	capabilities: string[];
 	query_languages: QueryLanguage[];
+	// Backend property-type capabilities + version compatibility (RFC-022).
+	// `supported_property_types` drives the modeller's property-type dropdowns;
+	// the version/compatibility fields drive the read-only safety valve + banner.
+	supported_property_types: string[];
+	server_version: string | null;
+	server_version_source: "detected" | "declared" | null;
+	compatibility_status: CompatibilityStatus;
+	version_acknowledged: boolean;
+	tested_version_range: string | null;
+	effective_read_only: boolean;
 }
+
+// How the detected/declared DB version relates to the connector's tested window.
+export type CompatibilityStatus =
+	| "supported"
+	| "untested"
+	| "unsupported"
+	| "unknown";
 
 export interface GraphConnectionCreate {
 	uri: string;
@@ -138,4 +155,8 @@ export interface GraphConnectionCreate {
 	// falsy auth as no-op). On create, send {username, password}.
 	auth: { username: string; password: string } | Record<string, never>;
 	read_only: boolean;
+	// Optional manually-declared DB version (RFC-022) — fallback when the backend
+	// can't be auto-detected. Auto-detection on connect overrides it; omit/blank
+	// to rely on detection.
+	server_version?: string | null;
 }

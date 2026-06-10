@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 from invana.events import actions as event_actions
 from invana.events.models import ActorType
 from invana.events.services import emit_event
+from invana.graph.types.capabilities import CompatibilityStatus, Version
 from invana.graphs.encryption import decrypt_credentials
 from invana.graphs.store import GraphModelStore
 from invana.modeller.introspector import Introspector
@@ -155,6 +156,66 @@ class GraphConnectionManager:
         self._spawn(self._connect_graph(graph))
 
     # -----------------------------------------------------------------------
+    # Version compatibility (RFC-022)
+    # -----------------------------------------------------------------------
+
+    async def _persist_version(
+        self,
+        session: AsyncSession,
+        connection_id: str,
+        graph_id: str | None,
+        connector: BaseConnector,
+    ) -> None:
+        """Detect + persist the backend version and compatibility status.
+
+        Prefers the live-detected version; falls back to a previously *declared*
+        version when the backend can't be introspected (e.g. Gremlin). Emits a
+        compatibility-downgrade event when the result is anything other than SUPPORTED.
+        """
+        store = GraphModelStore()
+        connection = await store.get(session, connection_id)
+        if connection is None:
+            return
+
+        detected = connector.detected_version
+        if detected is not None:
+            version_str: str | None = str(detected)
+            source = "detected"
+            basis = detected
+        elif connection.server_version_source == "declared" and connection.server_version:
+            basis = Version.parse(connection.server_version)
+            version_str = connection.server_version
+            source = "declared"
+        else:
+            version_str = None
+            source = "detected"
+            basis = None
+
+        resolved = connector.resolve_capabilities(basis)
+        await store.set_version(
+            session,
+            connection_id,
+            server_version=version_str,
+            source=source,
+            compatibility_status=resolved.status.value,
+        )
+
+        if resolved.status is not CompatibilityStatus.SUPPORTED:
+            await emit_event(
+                session,
+                action=event_actions.CONNECTION_COMPATIBILITY_DOWNGRADE,
+                target_kind=event_actions.TARGET_CONNECTION,
+                target_id=connection_id,
+                graph_id=graph_id,
+                actor_type=ActorType.system,
+                details={
+                    "status": resolved.status.value,
+                    "server_version": version_str,
+                    "source": source,
+                },
+            )
+
+    # -----------------------------------------------------------------------
     # Internal — connection + retry
     # -----------------------------------------------------------------------
 
@@ -179,6 +240,7 @@ class GraphConnectionManager:
                     actor_type=ActorType.system,
                     details={"ok": True, "latency_ms": latency_ms, "uri": graph.uri},
                 )
+                await self._persist_version(session, graph.id, graph.graph_id, connector)
                 await session.commit()
 
                 if graph.model_id is None:
@@ -250,7 +312,11 @@ class GraphConnectionManager:
                     continue
                 try:
                     t0 = time.monotonic()
-                    await connector.health_check()
+                    # health_check() returns False (not raises) on failure — treat
+                    # an unhealthy result as an error so the connection drops to
+                    # ERROR + retry instead of wrongly staying ACTIVE.
+                    if not await connector.health_check():
+                        raise RuntimeError("connection health check reported unhealthy")
                     latency_ms = int((time.monotonic() - t0) * 1000)
 
                     async with self._session_factory() as session:

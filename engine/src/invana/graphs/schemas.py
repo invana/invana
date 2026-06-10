@@ -99,6 +99,10 @@ class GraphConnectionCreate(BaseModel):
     connector_class: str = Field(..., min_length=1, max_length=512)
     auth: dict = Field(default_factory=dict)
     read_only: bool = False
+    # Optional manually-declared DB version (RFC-022) — used as a fallback when
+    # the backend can't be auto-detected (e.g. Gremlin). A successful auto-detect
+    # on connect overrides it; leave blank to rely on detection.
+    server_version: str | None = Field(default=None, max_length=32)
 
 
 class GraphConnectionUpdate(BaseModel):
@@ -131,6 +135,24 @@ class GraphConnectionRead(BaseModel):
     # Empty when the connector isn't currently registered with the manager.
     capabilities: list[str] = Field(default_factory=list)
     query_languages: list[str] = Field(default_factory=list)
+
+    # Backend property-type capabilities + version compatibility (RFC-022).
+    # `supported_property_types` drives the modeller's property-type dropdowns;
+    # the version/compatibility fields drive the read-only safety valve + banner.
+    supported_property_types: list[str] = Field(default_factory=list)
+    server_version: str | None = None
+    server_version_source: str | None = None
+    # Always set to a concrete status in the response (defaults to "unknown").
+    compatibility_status: str | None = None
+    version_acknowledged: bool = False
+    tested_version_range: str | None = None
+    effective_read_only: bool = False
+
+
+class VersionDeclareRequest(BaseModel):
+    """POST/PATCH body to declare a server version when auto-detection is unavailable."""
+
+    server_version: str = Field(..., min_length=1, max_length=32)
 
 
 class QueryRequest(BaseModel):

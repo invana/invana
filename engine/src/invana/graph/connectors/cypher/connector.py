@@ -18,7 +18,42 @@ from invana.graph.connectors.cypher.querysets.schema_reader import OpenCypherSch
 from invana.graph.connectors.cypher.querysets.schema_writer import OpenCypherSchemaWriterQuerySet
 from invana.graph.connectors.cypher.querysets.vector import OpenCypherVectorQuerySet
 from invana.graph.connectors.cypher.serializers import OpenCypherSerializer
-from invana.graph.types.constants import Capability
+from invana.graph.types.capabilities import (
+    CapabilityProfile,
+    Version,
+    always,
+    overlay,
+)
+from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
+
+# openCypher baseline capability profile (RFC-022). Covers Neo4j + Memgraph, which
+# both speak Bolt/openCypher. Vendor connectors (e.g. invana-neo4j) narrow the
+# version window and add vendor features via ``CYPHER_PROFILE.merge(...)``.
+CYPHER_PROFILE = CapabilityProfile(
+    family=QueryLanguage.CYPHER,
+    min_version=Version(4, 0),
+    tested_max=Version(5, 26),
+    property_types={
+        PropertyType.STRING: always(),
+        PropertyType.INTEGER: always(),
+        PropertyType.FLOAT: always(),
+        PropertyType.BOOLEAN: always(),
+        PropertyType.ENUM: overlay(),
+        PropertyType.UUID: overlay(),
+        PropertyType.JSON: overlay(),
+        # openCypher temporal + spatial values
+        PropertyType.DATE: always(),
+        PropertyType.TIME: always(),
+        PropertyType.DATETIME: always(),
+        PropertyType.DURATION: always(),
+        PropertyType.POINT: always(),
+        PropertyType.LIST: always(),
+    },
+    features={
+        Capability.CYPHER: always(),
+        Capability.TRANSACTIONS: always(),
+    },
+)
 
 
 class OpenCypherConnector(BaseConnector):
@@ -64,8 +99,27 @@ class OpenCypherConnector(BaseConnector):
         self.algorithms = OpenCypherAlgorithmsQuerySet(self)
         self.vector = OpenCypherVectorQuerySet(self)
 
-    def capabilities(self) -> set[Capability]:
-        return {Capability.CYPHER, Capability.TRANSACTIONS}
+    _capability_profile = CYPHER_PROFILE
+
+    async def detect_version(self) -> Version | None:
+        """Detect the server version via ``dbms.components()`` (Memgraph: ``SHOW VERSION``)."""
+        for query in (
+            "CALL dbms.components() YIELD versions RETURN versions[0] AS v",
+            "SHOW VERSION",
+        ):
+            try:
+                records = await self._execute_raw(query)
+            except Exception:
+                continue
+            if not records:
+                continue
+            values = list(records[0].values())
+            if not values:
+                continue
+            version = Version.parse(str(values[0]))
+            if version is not None:
+                return version
+        return None
 
     async def _create_driver(self) -> neo4j.AsyncDriver:
         try:

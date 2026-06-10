@@ -25,6 +25,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { FormError } from "../../../../components/forms/FormError";
+import { useGraphConnectionQuery } from "../../../../hooks/queries/useGraphs";
 import {
 	useCreatePropertyKeyMutation,
 	useUpdateEdgeTypeMutation,
@@ -38,7 +39,7 @@ import type {
 } from "../../../../types/schemas";
 import { PropertyKeyFormDialog } from "./PropertyKeyFormDialog";
 import type { ModelEditCtx } from "./editing";
-import { PROPERTY_TYPE_OPTIONS } from "./editing";
+import { propertyTypeOptions } from "./editing";
 
 const NEW_KEY = "__new__";
 
@@ -199,6 +200,12 @@ function AddPropertyDialog({
 	onAdd: (next: TypePropertyMappingCreate[]) => Promise<void>;
 }) {
 	const createKey = useCreatePropertyKeyMutation(ctx.username, ctx.graphSlug);
+	const { data: connection } = useGraphConnectionQuery(
+		ctx.username,
+		ctx.graphSlug,
+	);
+	// Only the property types the bound backend supports for its version (RFC-022).
+	const typeOptions = propertyTypeOptions(connection?.supported_property_types);
 	const [choice, setChoice] = useState<string>(NEW_KEY);
 	const [newName, setNewName] = useState("");
 	const [newType, setNewType] = useState("string");
@@ -298,7 +305,7 @@ function AddPropertyDialog({
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent>
-											{PROPERTY_TYPE_OPTIONS.map((t) => (
+											{typeOptions.map((t) => (
 												<SelectItem key={t} value={t}>
 													{t}
 												</SelectItem>

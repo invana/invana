@@ -14,6 +14,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from invana.graph.types.constants import PropertyType
 from invana.modeller.inheritance import (
     build_type_map,
     get_subtypes,
@@ -97,19 +98,34 @@ def _build_cache(version: GraphVersion, validation_mode: str = "strict") -> _Cac
 # Type checking helpers
 # ---------------------------------------------------------------------------
 
+# Keyed by canonical ``PropertyType`` values so the validator and the vocabulary
+# advertised by connectors (RFC-022) never drift. Temporal/spatial + semantic-overlay
+# values are accepted as ISO strings / json; container cardinality is handled below.
 _TYPE_VALIDATORS: dict[str, type | tuple[type, ...]] = {
-    "string": str,
-    "integer": (int,),
-    "float": (int, float),
-    "boolean": (bool,),
-    "datetime": (str,),  # Accept ISO strings
+    PropertyType.STRING.value: str,
+    PropertyType.INTEGER.value: (int,),
+    PropertyType.FLOAT.value: (int, float),
+    PropertyType.BOOLEAN.value: (bool,),
+    PropertyType.ENUM.value: (str,),
+    PropertyType.UUID.value: (str,),
+    PropertyType.JSON.value: (str, dict, list),
+    PropertyType.DATE.value: (str,),
+    PropertyType.TIME.value: (str,),
+    PropertyType.DATETIME.value: (str,),  # Accept ISO strings
+    PropertyType.DURATION.value: (str,),
+    PropertyType.POINT.value: (dict, str),
+    PropertyType.MAP.value: (dict,),
 }
+
+_CONTAINER_TYPES = {PropertyType.LIST.value, PropertyType.SET.value}
 
 
 def _check_type(value: Any, expected_type: str) -> bool:
     """Check if *value* matches the expected property type string."""
     if expected_type.startswith("list["):
         return isinstance(value, list)
+    if expected_type in _CONTAINER_TYPES:
+        return isinstance(value, (list, set))
     validator = _TYPE_VALIDATORS.get(expected_type)
     if validator is None:
         return True  # Unknown types pass validation

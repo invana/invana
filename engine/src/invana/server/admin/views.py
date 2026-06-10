@@ -275,6 +275,10 @@ class GraphConnectionView(ModelView):
         "model_id",
         "last_health_check_at",
         "latency_ms",
+        "server_version",
+        "server_version_source",
+        "compatibility_status",
+        "version_acknowledged",
         "created_at",
         "updated_at",
     ]

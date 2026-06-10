@@ -21,12 +21,19 @@ export interface GraphFormValues {
 	username: string;
 	password: string;
 	read_only: boolean;
+	/** Optional manually-declared DB version (RFC-022) — fallback when undetected. */
+	server_version: string;
 }
 
 type TestState =
 	| { kind: "untested" }
 	| { kind: "testing" }
-	| { kind: "passed"; latencyMs?: number }
+	| {
+			kind: "passed";
+			latencyMs?: number;
+			serverVersion?: string | null;
+			compatibilityStatus?: string;
+	  }
 	| { kind: "failed"; error: string };
 
 interface GraphFormProps {
@@ -38,10 +45,15 @@ interface GraphFormProps {
 	submitError?: Error | string | null;
 	onSubmit: (values: GraphConnectionCreate) => void;
 	onCancel: () => void;
-	/** Returns {ok, latency_ms?, error?}. Required to enable Save. */
-	onTest: (
-		values: GraphConnectionCreate,
-	) => Promise<{ ok: boolean; latency_ms?: number; error?: string }>;
+	/** Returns {ok, latency_ms?, error?, server_version?, compatibility_status?}.
+	 *  Required to enable Save. The version is detected from the DB (RFC-022). */
+	onTest: (values: GraphConnectionCreate) => Promise<{
+		ok: boolean;
+		latency_ms?: number;
+		error?: string;
+		server_version?: string | null;
+		compatibility_status?: string;
+	}>;
 }
 
 const DEFAULT_VALUES: GraphFormValues = {
@@ -50,6 +62,7 @@ const DEFAULT_VALUES: GraphFormValues = {
 	username: "",
 	password: "",
 	read_only: false,
+	server_version: "",
 };
 
 export function GraphForm({
@@ -107,6 +120,7 @@ export function GraphForm({
 					? {}
 					: { username: values.username, password: values.password },
 			read_only: values.read_only,
+			server_version: values.server_version.trim() || null,
 		};
 	};
 
@@ -116,7 +130,20 @@ export function GraphForm({
 		try {
 			const result = await onTest(buildCreatePayload());
 			if (result.ok) {
-				setTestState({ kind: "passed", latencyMs: result.latency_ms });
+				// Prefill the version field with what the DB reported, so the user can
+				// see/keep it; if detection failed they type it in themselves (RFC-022).
+				if (result.server_version && !values.server_version.trim()) {
+					setValues((prev) => ({
+						...prev,
+						server_version: result.server_version ?? "",
+					}));
+				}
+				setTestState({
+					kind: "passed",
+					latencyMs: result.latency_ms,
+					serverVersion: result.server_version,
+					compatibilityStatus: result.compatibility_status,
+				});
 			} else {
 				setTestState({
 					kind: "failed",
@@ -232,6 +259,28 @@ export function GraphForm({
 				</div>
 			</div>
 
+			{/* Database version (optional — auto-detected on connect when possible) */}
+			<div className="space-y-1.5">
+				<Label htmlFor="server_version">
+					Database version
+					<span className="text-muted-foreground ml-1">
+						(optional — auto-detected when possible)
+					</span>
+				</Label>
+				<Input
+					id="server_version"
+					placeholder="e.g. 5.20.0"
+					value={values.server_version}
+					onChange={(e) => set("server_version", e.target.value)}
+					disabled={isSubmitting}
+				/>
+				<p className="text-xs text-muted-foreground">
+					Leave blank to detect from the database. Provide it manually for
+					backends Invana can't introspect (e.g. Gremlin) so property types and
+					compatibility resolve correctly.
+				</p>
+			</div>
+
 			{/* Read Only */}
 			<div className="flex items-center gap-3">
 				<Switch
@@ -251,6 +300,13 @@ export function GraphForm({
 					<CheckCircle2 className="w-4 h-4" />
 					<span>
 						Connection works
+						{testState.serverVersion && (
+							<span className="text-muted-foreground">
+								{" "}
+								· detected version{" "}
+								<span className="font-mono">{testState.serverVersion}</span>
+							</span>
+						)}
 						{testState.latencyMs !== undefined && (
 							<span className="text-muted-foreground">
 								{" "}
@@ -260,6 +316,17 @@ export function GraphForm({
 					</span>
 				</div>
 			)}
+			{testState.kind === "passed" &&
+				testState.compatibilityStatus &&
+				testState.compatibilityStatus !== "supported" && (
+					<p className="text-amber-600 dark:text-amber-400 text-sm">
+						{testState.compatibilityStatus === "unsupported"
+							? "This version is below Invana's supported range — the connection will be read-only."
+							: testState.compatibilityStatus === "untested"
+								? "This version is newer than Invana's tested range — you'll be able to continue at your own risk after saving."
+								: "Invana couldn't classify this version — the connection will start read-only."}
+					</p>
+				)}
 			{testState.kind === "failed" && (
 				<div className="flex items-start gap-2 text-destructive">
 					<XCircle className="w-4 h-4 mt-0.5 shrink-0" />

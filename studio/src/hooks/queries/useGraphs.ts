@@ -192,3 +192,34 @@ export function usePingGraphConnectionMutation() {
 		},
 	});
 }
+
+// RFC-022 — accept the risk of an UNTESTED backend version (lifts read-only).
+export function useAcknowledgeConnectionVersionMutation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			username,
+			graphSlug,
+		}: { username: string; graphSlug: string }) =>
+			graphsApi.acknowledgeConnectionVersion(username, graphSlug),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
+		},
+	});
+}
+
+// RFC-022 — declare a server version when auto-detection is unavailable.
+export function useDeclareConnectionVersionMutation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			username,
+			graphSlug,
+			serverVersion,
+		}: { username: string; graphSlug: string; serverVersion: string }) =>
+			graphsApi.declareConnectionVersion(username, graphSlug, serverVersion),
+		onSuccess: (_, { username, graphSlug }) => {
+			qc.invalidateQueries({ queryKey: connectionKey(username, graphSlug) });
+		},
+	});
+}

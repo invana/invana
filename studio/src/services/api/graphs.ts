@@ -86,15 +86,43 @@ export const graphsApi = {
 			},
 		),
 
+	// RFC-022 — accept the risk of an UNTESTED backend version (lifts read-only).
+	acknowledgeConnectionVersion: (username: string, graphSlug: string) =>
+		request<GraphConnectionRead>(
+			`/api/v1/u/${username}/${graphSlug}/connection/acknowledge-version`,
+			{ method: "POST" },
+		),
+
+	// RFC-022 — declare a server version when auto-detection is unavailable.
+	declareConnectionVersion: (
+		username: string,
+		graphSlug: string,
+		serverVersion: string,
+	) =>
+		request<GraphConnectionRead>(
+			`/api/v1/u/${username}/${graphSlug}/connection/version`,
+			{
+				method: "PATCH",
+				body: JSON.stringify({ server_version: serverVersion }),
+			},
+		),
+
 	testConnection: (
 		username: string,
 		graphSlug: string,
 		data: GraphConnectionCreate,
 	) =>
-		request<{ ok: boolean; latency_ms?: number; error?: string }>(
-			`/api/v1/u/${username}/${graphSlug}/connection/test`,
-			{ method: "POST", body: JSON.stringify(data) },
-		),
+		request<{
+			ok: boolean;
+			latency_ms?: number;
+			error?: string;
+			// Auto-detected from the database at test time (RFC-022).
+			server_version?: string | null;
+			compatibility_status?: string;
+		}>(`/api/v1/u/${username}/${graphSlug}/connection/test`, {
+			method: "POST",
+			body: JSON.stringify(data),
+		}),
 
 	query: (username: string, graphSlug: string, body: QueryRequest) =>
 		request<QueryResponse>(`/api/v1/u/${username}/${graphSlug}/query`, {

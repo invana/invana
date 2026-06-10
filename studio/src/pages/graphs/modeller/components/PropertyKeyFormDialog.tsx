@@ -19,6 +19,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FormError } from "../../../../components/forms/FormError";
+import { useGraphConnectionQuery } from "../../../../hooks/queries/useGraphs";
 import {
 	useCreatePropertyKeyMutation,
 	useUpdatePropertyKeyMutation,
@@ -26,7 +27,7 @@ import {
 import { ApiError } from "../../../../services/api/client";
 import type { PropertyKeyResponse } from "../../../../types/schemas";
 import type { ModelEditCtx } from "./editing";
-import { PROPERTY_TYPE_OPTIONS } from "./editing";
+import { propertyTypeOptions } from "./editing";
 
 type Cardinality = "SINGLE" | "LIST" | "SET";
 
@@ -50,6 +51,12 @@ export function PropertyKeyFormDialog({
 	const isEdit = propertyKey !== null;
 	const create = useCreatePropertyKeyMutation(ctx.username, ctx.graphSlug);
 	const update = useUpdatePropertyKeyMutation(ctx.username, ctx.graphSlug);
+	const { data: connection } = useGraphConnectionQuery(
+		ctx.username,
+		ctx.graphSlug,
+	);
+	// Only the property types the bound backend supports for its version (RFC-022).
+	const typeOptions = propertyTypeOptions(connection?.supported_property_types);
 
 	const [name, setName] = useState("");
 	const [type, setType] = useState("string");
@@ -127,7 +134,7 @@ export function PropertyKeyFormDialog({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									{PROPERTY_TYPE_OPTIONS.map((t) => (
+									{typeOptions.map((t) => (
 										<SelectItem key={t} value={t}>
 											{t}
 										</SelectItem>

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from fastapi import HTTPException
 from sqlalchemy import select
 
+from invana.graphs.compatibility import compatibility_status_for
 from invana.graphs.encryption import encrypt_credentials
 from invana.graphs.models import GraphConnection
 from invana.graphs.schemas import GraphConnectionCreate, GraphConnectionUpdate
@@ -43,12 +44,18 @@ class GraphConnectionStore:
         encryption_key: str,
     ) -> GraphConnection:
         auth_encrypted = encrypt_credentials(data.auth, encryption_key) if data.auth else None
+        # A manually-declared version (RFC-022) is stored as a fallback; a successful
+        # auto-detect on connect overrides it (see GraphConnectionManager._persist_version).
+        declared = (data.server_version or "").strip() or None
         connection = GraphConnection(
             uri=data.uri,
             connector_class=data.connector_class,
             auth_encrypted=auth_encrypted,
             read_only=data.read_only,
             status="CONNECTING",
+            server_version=declared,
+            server_version_source="declared" if declared else None,
+            compatibility_status=(compatibility_status_for(data.connector_class, declared) if declared else None),
         )
         session.add(connection)
         await session.flush()
@@ -164,6 +171,37 @@ class GraphConnectionStore:
         connection = await self.get_or_404(session, connection_id)
         connection.model_id = model_id
         await session.flush()
+
+    async def set_version(
+        self,
+        session: AsyncSession,
+        connection_id: str,
+        *,
+        server_version: str | None,
+        source: str,
+        compatibility_status: str,
+    ) -> bool:
+        """Persist the detected/declared server version + compatibility (RFC-022).
+
+        Resets ``version_acknowledged`` whenever the version actually changes — a new
+        version must be re-acknowledged. Returns ``True`` when the version changed.
+        """
+        connection = await self.get_or_404(session, connection_id)
+        changed = connection.server_version != server_version
+        connection.server_version = server_version
+        connection.server_version_source = source
+        connection.compatibility_status = compatibility_status
+        if changed:
+            connection.version_acknowledged = False
+        await session.flush()
+        return changed
+
+    async def acknowledge_version(self, session: AsyncSession, connection_id: str) -> GraphConnection:
+        """Mark an UNTESTED version as accepted-at-risk — lifts the version read-only."""
+        connection = await self.get_or_404(session, connection_id)
+        connection.version_acknowledged = True
+        await session.flush()
+        return connection
 
 
 # Back-compat alias — old code referring to GraphModelStore continues to work.

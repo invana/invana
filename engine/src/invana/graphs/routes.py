@@ -27,9 +27,14 @@ from invana.auth.schemas import (
 from invana.db import get_session
 from invana.events import actions as event_actions
 from invana.events.services import current_trace_id, emit_event
-from invana.graph.connectors.base.connector import BaseConnector
+from invana.graph.types.capabilities import CompatibilityStatus, Version
 from invana.graph.types.constants import Capability
 from invana.graphs import services
+from invana.graphs.compatibility import (
+    effective_read_only,
+    load_profile,
+    resolve_capabilities,
+)
 from invana.graphs.deps import (
     require_graph_admin,
     require_graph_member,
@@ -45,9 +50,10 @@ from invana.graphs.schemas import (
     GraphRead,
     GraphUpdate,
     SetupSectionUpdate,
+    VersionDeclareRequest,
 )
+from invana.graphs.store import GraphConnectionStore
 from invana.settings import settings
-from invana.utils import import_class_from_dotted_path
 
 
 def _get_manager(request: Request) -> GraphConnectionManager:
@@ -60,49 +66,22 @@ def _get_manager(request: Request) -> GraphConnectionManager:
 _LANGUAGE_CAPABILITIES: tuple[Capability, ...] = (Capability.CYPHER, Capability.GREMLIN)
 
 
-def _build_connection_read(
-    connection: GraphConnection,
-    manager: GraphConnectionManager,
-) -> GraphConnectionRead:
+def _build_connection_read(connection: GraphConnection) -> GraphConnectionRead:
     """Project a GraphConnection ORM row into the wire schema with capabilities.
 
-    Capabilities are static per connector class — they don't depend on the
-    live driver. Prefer the live connector when available (single source of
-    truth) but fall back to instantiating the class for capability inspection
-    when the registry doesn't have it yet (e.g. immediately after PUT, while
-    the bg connect task is still running, or for OFFLINE connections).
+    Capabilities + supported property types are resolved server-side from the
+    connector class's profile and the connection's detected/declared version.
     """
     payload = GraphConnectionRead.model_validate(connection)
-    caps = _resolve_capabilities(connection, manager)
+    resolved, profile = resolve_capabilities(connection)
+    caps = resolved.capabilities
     payload.capabilities = sorted(cap.value for cap in caps)
     payload.query_languages = [cap.value for cap in _LANGUAGE_CAPABILITIES if cap in caps]
+    payload.supported_property_types = sorted(pt.value for pt in resolved.property_types)
+    payload.compatibility_status = resolved.status.value
+    payload.tested_version_range = profile.tested_range if profile else None
+    payload.effective_read_only = effective_read_only(connection, status=resolved.status.value)
     return payload
-
-
-def _resolve_capabilities(
-    connection: GraphConnection,
-    manager: GraphConnectionManager,
-) -> set[Capability]:
-    """Capabilities for a connection, with the registry as the fast path.
-
-    Returns an empty set if the connector class can't be loaded — Studio
-    treats that as "no constraints reported" and falls back to its full
-    language list.
-    """
-    try:
-        return manager.get_connector(connection.id).capabilities()
-    except GraphUnavailableError:
-        pass
-    try:
-        connector_cls = import_class_from_dotted_path(connection.connector_class)
-    except (ImportError, AttributeError):
-        return set()
-    if not isinstance(connector_cls, type) or not issubclass(connector_cls, BaseConnector):
-        return set()
-    # No `.connect()` — capabilities() is static config, the ctor doesn't
-    # touch the wire. Auth is intentionally omitted; capabilities don't
-    # depend on credentials.
-    return connector_cls(uri=connection.uri).capabilities()
 
 
 # ---------------------------------------------------------------------------
@@ -283,7 +262,7 @@ async def get_connection(
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> GraphConnectionRead | None:
     connection = await services.get_graph_connection(session, graph_id=graph.id)
-    return _build_connection_read(connection, manager) if connection else None
+    return _build_connection_read(connection) if connection else None
 
 
 @graph_router.put("/connection", response_model=GraphConnectionRead)
@@ -310,7 +289,7 @@ async def put_connection(
     else:
         await manager.reconnect(connection)
 
-    return _build_connection_read(connection, manager)
+    return _build_connection_read(connection)
 
 
 @graph_router.delete("/connection", status_code=status.HTTP_204_NO_CONTENT)
@@ -326,6 +305,75 @@ async def delete_connection(
     if connection is not None:
         await manager.deregister(connection.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@graph_router.post("/connection/acknowledge-version", response_model=GraphConnectionRead)
+async def acknowledge_connection_version(
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GraphConnectionRead:
+    """Accept the risk of an UNTESTED backend version — lifts the version read-only (RFC-022)."""
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
+    store = GraphConnectionStore()
+    connection = await store.acknowledge_version(session, connection.id)
+    await emit_event(
+        session,
+        action=event_actions.CONNECTION_VERSION_ACKNOWLEDGE,
+        target_kind=event_actions.TARGET_CONNECTION,
+        target_id=connection.id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "server_version": connection.server_version,
+            "compatibility_status": connection.compatibility_status,
+        },
+        trace_id=current_trace_id(),
+    )
+    await session.commit()
+    await session.refresh(connection)
+    return _build_connection_read(connection)
+
+
+@graph_router.patch("/connection/version", response_model=GraphConnectionRead)
+async def declare_connection_version(
+    payload: VersionDeclareRequest,
+    _: GraphMember = Depends(require_graph_admin),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> GraphConnectionRead:
+    """Declare a server version when auto-detection is unavailable (e.g. Gremlin) (RFC-022)."""
+    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
+    profile = load_profile(connection.connector_class)
+    version = Version.parse(payload.server_version)
+    new_status = profile.compatibility(version) if profile else CompatibilityStatus.UNKNOWN
+    store = GraphConnectionStore()
+    await store.set_version(
+        session,
+        connection.id,
+        server_version=payload.server_version,
+        source="declared",
+        compatibility_status=new_status.value,
+    )
+    await emit_event(
+        session,
+        action=event_actions.CONNECTION_VERSION_DECLARE,
+        target_kind=event_actions.TARGET_CONNECTION,
+        target_id=connection.id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={"server_version": payload.server_version, "compatibility_status": new_status.value},
+        trace_id=current_trace_id(),
+    )
+    await session.commit()
+    connection = await store.get(session, connection.id)
+    return _build_connection_read(connection)
 
 
 @graph_router.post("/setup/{section}", response_model=GraphRead)

@@ -245,6 +245,16 @@ async def put_graph_connection(
     existing.read_only = payload.read_only
     if payload.auth:
         existing.auth_encrypted = encrypt_credentials(payload.auth, encryption_key)
+    # Manually-declared version (RFC-022) — fallback for backends we can't auto-detect.
+    # A successful auto-detect on the reconnect below overrides it.
+    declared = (payload.server_version or "").strip() or None
+    if declared:
+        from invana.graphs.compatibility import compatibility_status_for  # noqa: PLC0415
+
+        existing.server_version = declared
+        existing.server_version_source = "declared"
+        existing.compatibility_status = compatibility_status_for(existing.connector_class, declared)
+        existing.version_acknowledged = False
     existing.status = "CONNECTING"
     _mark_section(graph, "graph_info", "complete")
     await session.flush()
@@ -305,6 +315,9 @@ async def test_connection_credentials(
     try:
         await asyncio.wait_for(connector.connect(), timeout=timeout_s)
         latency_ms = int((time.monotonic() - t0) * 1000)
+        # connect() already auto-detected the server version (RFC-022). Capture it
+        # here so the version is sourced from the database itself, not user input.
+        resolved = connector.resolve_capabilities()
     except TimeoutError:
         return {"ok": False, "error": f"Connect timed out after {timeout_s:.0f}s."}
     except Exception as exc:
@@ -313,7 +326,12 @@ async def test_connection_credentials(
         with contextlib.suppress(Exception):
             await connector.disconnect()
 
-    return {"ok": True, "latency_ms": latency_ms}
+    return {
+        "ok": True,
+        "latency_ms": latency_ms,
+        "server_version": str(resolved.version) if resolved.version else None,
+        "compatibility_status": resolved.status.value,
+    }
 
 
 async def delete_graph_connection(

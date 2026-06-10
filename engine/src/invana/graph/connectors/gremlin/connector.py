@@ -12,6 +12,7 @@ import contextlib
 from typing import Any
 
 from gremlin_python.driver.aiohttp.transport import AiohttpTransport
+from gremlin_python.driver.client import Client
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
@@ -27,7 +28,37 @@ from invana.graph.connectors.gremlin.querysets.schema_reader import GremlinSchem
 from invana.graph.connectors.gremlin.querysets.schema_writer import GremlinSchemaWriterQuerySet
 from invana.graph.connectors.gremlin.querysets.vector import GremlinVectorQuerySet
 from invana.graph.connectors.gremlin.serializers import GremlinSerializer
-from invana.graph.types.constants import Capability
+from invana.graph.types.capabilities import (
+    CapabilityProfile,
+    Version,
+    always,
+    overlay,
+)
+from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
+
+# TinkerPop/Gremlin baseline capability profile (RFC-022). Gremlin has no native
+# temporal/spatial property values, but `uuid` is native and properties carry a
+# cardinality (single/list/set). Vendor connectors (JanusGraph, Neptune, …) override
+# via ``GREMLIN_PROFILE.merge(...)`` when they gain real implementations.
+GREMLIN_PROFILE = CapabilityProfile(
+    family=QueryLanguage.GREMLIN,
+    min_version=Version(3, 5),
+    tested_max=Version(3, 8),
+    property_types={
+        PropertyType.STRING: always(),
+        PropertyType.INTEGER: always(),
+        PropertyType.FLOAT: always(),
+        PropertyType.BOOLEAN: always(),
+        PropertyType.UUID: always(),  # native in Gremlin
+        PropertyType.ENUM: overlay(),
+        PropertyType.JSON: overlay(),
+        PropertyType.LIST: always(),  # list cardinality
+        PropertyType.SET: always(),  # set cardinality
+    },
+    features={
+        Capability.GREMLIN: always(),
+    },
+)
 
 
 class GremlinConnector(BaseConnector):
@@ -72,8 +103,52 @@ class GremlinConnector(BaseConnector):
         self.algorithms = GremlinAlgorithmsQuerySet(self)
         self.vector = GremlinVectorQuerySet(self)
 
-    def capabilities(self) -> set[Capability]:
-        return {Capability.GREMLIN}
+    _capability_profile = GREMLIN_PROFILE
+
+    # Groovy scripts that return the TinkerPop/Gremlin version string. A bytecode
+    # traversal can't return the server version anywhere, so we submit a script.
+    # The class moved packages across TinkerPop releases — try both.
+    _VERSION_SCRIPTS = (
+        "Gremlin.version()",
+        "org.apache.tinkerpop.gremlin.util.Gremlin.version()",
+    )
+
+    async def detect_version(self) -> Version | None:
+        """Best-effort TinkerPop version via the ``Gremlin.version()`` script (RFC-022).
+
+        Works on any Gremlin Server that permits Groovy script evaluation —
+        TinkerGraph, JanusGraph, and most self-hosted servers (this is the TinkerPop
+        version the ``GREMLIN_PROFILE`` windows are keyed on). Returns ``None`` on
+        servers that disable scripting (e.g. Amazon Neptune) → the connection starts
+        read-only until the user declares a version, or a vendor connector overrides
+        this with an HTTP probe (Neptune ``GET /status``; ArcadeDB ``GET /api/v1/server``).
+        """
+
+        def _probe() -> str | None:
+            auth = {}
+            if self._username is not None:
+                auth["username"] = self._username
+            if self._password is not None:
+                auth["password"] = self._password
+            client = Client(self._uri, "g", **auth)
+            try:
+                for script in self._VERSION_SCRIPTS:
+                    try:
+                        rows = client.submit(script).all().result()
+                    except Exception:
+                        continue
+                    if rows:
+                        return str(rows[0])
+                return None
+            finally:
+                with contextlib.suppress(Exception):
+                    client.close()
+
+        try:
+            raw = await asyncio.to_thread(_probe)
+        except Exception:
+            return None
+        return Version.parse(raw)
 
     def coerce_id(self, id_value: str) -> Any:
         """Convert a string ID to the native type expected by the database.
