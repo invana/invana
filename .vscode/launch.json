@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Docs: Serve",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "NO_MKDOCS_2_WARNING=1 uv run --directory docs mkdocs serve",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Docs: Build",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "NO_MKDOCS_2_WARNING=1 uv run --directory docs mkdocs build",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Server: Start API",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "invana.server.app:create_app",
+        "--factory",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8200",
+        "--reload"
+      ],
+      "cwd": "${workspaceFolder}/engine",
+      "envFile": "${workspaceFolder}/engine/.env",
+      "jinja": true
+    },
+    {
+      "name": "Studio: Start Dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/studio"
+    }
+  ]
+}

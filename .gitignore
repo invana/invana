@@ -23,8 +23,9 @@ engine/src/invana/studio/static/*
 !engine/src/invana/studio/static/.gitkeep
 
 # ─── IDE ───
-.vscode/
+.vscode/*
 !.vscode/settings.json
+!.vscode/launch.json
 !.vscode/extensions.json
 .idea/
 *.swp

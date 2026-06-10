@@ -1,0 +1,6 @@
+{
+  // Don't auto-source the selected Python interpreter into every integrated
+  // terminal. The docs/.venv was getting injected into the Node/Vite terminal
+  // and racing with `npm run dev`, causing "Studio: Start Dev" to flakily fail.
+  "python.terminal.activateEnvironment": false
+}
