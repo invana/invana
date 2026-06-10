@@ -45,12 +45,11 @@ export function UserMenu() {
 				<Button
 					variant="ghost"
 					size="sm"
-					className="flex items-center gap-2 h-7"
+					className="flex items-center h-7 px-0"
 				>
-					<div className="w-5 h-5 rounded-full bg-primary text-primary-foreground font-bold text-base flex items-center justify-center">
+					<div className="w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold text-lg flex items-center justify-center">
 						{initial}
 					</div>
-					<span className="text-base">{displayName}</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">

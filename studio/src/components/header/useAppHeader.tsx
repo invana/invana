@@ -59,7 +59,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		),
 		center,
 		right: (
-			<div className="flex items-center gap-2 px-2">
+			<div className="flex items-center gap-4 px-2">
 				{rightExtras}
 				<FullscreenToggle />
 				<ThemeToggle />
