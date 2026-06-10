@@ -73,8 +73,10 @@ export function useGraphLeftNav(
 	const settingsPanel = useSettingsPanel();
 	const root = `/u/${username}/${graphSlug}`;
 
+	// `my-1.5` adds breathing room between rail items — the theme's own
+	// section wrapper only gives them `gap-1`, which reads as crowded.
 	const activeClass = (active: boolean) =>
-		active ? "bg-accent text-accent-foreground" : "";
+		`my-1.5 ${active ? "bg-accent text-accent-foreground" : ""}`;
 
 	// Navigating to a view should also clear ?settings so the leftSection
 	// shows the view's own content (QueryPanel / SchemaNav / wizard).
@@ -90,6 +92,7 @@ export function useGraphLeftNav(
 		{
 			name: "Overview",
 			icon: Home,
+			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "overview"),
 			onClick: () => goToView(root),
@@ -97,6 +100,7 @@ export function useGraphLeftNav(
 		{
 			name: "Explorer",
 			icon: Network,
+			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "explorer"),
 			onClick: () => goToView(`${root}/explorer`),
@@ -104,6 +108,7 @@ export function useGraphLeftNav(
 		{
 			name: "Modeller",
 			icon: Boxes,
+			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "modeller"),
 			onClick: () => goToView(`${root}/modeller`),
@@ -113,6 +118,7 @@ export function useGraphLeftNav(
 	const bottomNavItems = visibleSections.map((s) => ({
 		name: s.label,
 		icon: s.icon,
+		iconClassName: "w-5 h-5",
 		tooltipSide: "right" as const,
 		className: activeClass(
 			settingsPanel.isOpen && settingsPanel.section === s.key,
