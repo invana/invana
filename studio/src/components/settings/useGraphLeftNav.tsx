@@ -1,7 +1,7 @@
 import {
 	Activity,
+	Boxes,
 	Database,
-	GitGraph,
 	Home,
 	Info,
 	Layers,
@@ -103,7 +103,7 @@ export function useGraphLeftNav(
 		},
 		{
 			name: "Modeller",
-			icon: GitGraph,
+			icon: Boxes,
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "modeller"),
 			onClick: () => goToView(`${root}/modeller`),

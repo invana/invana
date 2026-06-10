@@ -195,7 +195,7 @@ function BasicInfoTab({
 	}
 
 	return (
-		<form className="space-y-5 pt-4" onSubmit={onSubmit}>
+		<form className="space-y-5 p-4" onSubmit={onSubmit}>
 			<div className="space-y-2">
 				<Label htmlFor="email">Email</Label>
 				<Input id="email" value={initial.email} disabled readOnly />
@@ -337,7 +337,7 @@ function PasswordTab() {
 	}
 
 	return (
-		<form className="space-y-5 pt-4 max-w-md" onSubmit={onSubmit}>
+		<form className="space-y-5 p-4 max-w-md" onSubmit={onSubmit}>
 			<div className="space-y-2">
 				<Label htmlFor="current">Current password</Label>
 				<Input
@@ -414,7 +414,7 @@ function DangerZoneTab({
 	}
 
 	return (
-		<div className="pt-4 space-y-4">
+		<div className="p-4 space-y-4">
 			<div className="border border-destructive/30 rounded-md p-4 bg-destructive/5">
 				<h3 className="font-medium text-destructive">Delete account</h3>
 				<p className="text-base text-muted-foreground mt-1">

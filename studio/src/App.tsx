@@ -1,5 +1,5 @@
 import { AppLayoutV2 } from "@invana/themes";
-import { GitGraph, Network } from "lucide-react";
+import { Boxes, Network } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppHeader } from "./components/header/useAppHeader";
 
@@ -26,7 +26,7 @@ export default function App() {
 				},
 				{
 					name: "Modeller",
-					icon: GitGraph,
+					icon: Boxes,
 					tooltipSide: "right" as const,
 					onClick: () => navigate(`${graphScopedPath}/modeller`),
 				},
