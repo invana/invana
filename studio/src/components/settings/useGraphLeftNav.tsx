@@ -1,12 +1,12 @@
 import {
 	Activity,
 	Boxes,
+	Compass,
 	Database,
 	Home,
 	Info,
 	Layers,
 	Lightbulb,
-	Network,
 	ScrollText,
 	Sparkles,
 	Wand2,
@@ -67,7 +67,7 @@ export function useGraphLeftNav(
 		`my-1.5 ${active ? "bg-accent text-accent-foreground" : ""}`;
 
 	// Navigating to a view should also clear ?settings so the leftSection
-	// shows the view's own content (QueryPanel / SchemaNav / wizard).
+	// shows the view's own content (SessionsPanel / SchemaNav / wizard).
 	const goToView = (path: string) => {
 		navigate(path);
 	};
@@ -83,7 +83,7 @@ export function useGraphLeftNav(
 		},
 		{
 			name: "Explorer",
-			icon: Network,
+			icon: Compass,
 			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(activeTab === "explorer"),

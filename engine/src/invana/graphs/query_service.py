@@ -1,66 +1,60 @@
-"""Raw query execution endpoint — graph-scoped under /u/{username}/{graphSlug}.
+"""Shared query-execution core (RFC-024).
 
-Endpoint
---------
-POST /api/v1/u/{username}/{graphSlug}/query
+The connector resolution, read-only guard, capability resolution, execution,
+and `query.execute` audit emission used to live inline in the `/query` route.
+RFC-024 removes that standalone route and makes the **sessions message
+endpoint** the only HTTP entry point — so this logic moves here as a reusable
+service both could call. ``execute_query`` does NOT commit; the caller owns the
+transaction (a session message endpoint commits the messages + the run result
+together).
 
-The query language is inferred from the connector's reported capabilities.
-Read-only connections have write operations rejected before execution.
-Graph must have completed the setup wizard's required sections.
+Failure modes:
+- **Config / availability problems** (no connection, graph not active,
+  unsupported language, read-only violation) raise ``HTTPException`` — these are
+  "you can't run this", not "your query failed".
+- **The query itself failing** raises ``QueryExecutionError`` after emitting a
+  failure ``query.execute`` event. Callers decide how to surface it (the
+  session endpoint records it as an in-thread error message).
 """
 
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.auth.deps import get_current_user
-from invana.auth.models import User
-from invana.db import get_session
 from invana.events import actions as event_actions
 from invana.events.services import current_trace_id, emit_event
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
-from invana.graphs import services
-from invana.graphs.deps import require_graph_member, require_graph_setup_complete
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
-from invana.graphs.models import Graph, GraphMember
-from invana.graphs.schemas import QueryRequest, QueryResponse
-
-query_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["query"])
-
-
-def _get_manager(request: Request) -> GraphConnectionManager:
-    return request.app.state.graph_connection_manager
+from invana.graphs.models import Graph
+from invana.graphs.schemas import QueryResponse
+from invana.graphs.services import get_graph_connection
 
 
-def _resolve_query_language(connector) -> QueryLanguage:
-    caps = connector.capabilities()
-    if Capability.CYPHER in caps:
-        return QueryLanguage.CYPHER
-    if Capability.GREMLIN in caps:
-        return QueryLanguage.GREMLIN
-    raise HTTPException(
-        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-        detail={
-            "error": "unsupported_query_language",
-            "message": "Connector reports neither CYPHER nor GREMLIN capability.",
-        },
-    )
+class QueryExecutionError(Exception):
+    """The connector rejected/failed the query itself (not a config problem)."""
 
 
-@query_router.post("/query", response_model=QueryResponse)
-async def run_query(
-    body: QueryRequest,
-    _: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(require_graph_setup_complete),
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+async def execute_query(
+    session: AsyncSession,
+    *,
+    graph: Graph,
+    manager: GraphConnectionManager,
+    query: str,
+    parameters: dict[str, Any] | None,
+    actor_id: str,
+    session_id: str | None = None,
 ) -> QueryResponse:
-    connection = await services.get_graph_connection(session, graph_id=graph.id)
+    """Run *query* against *graph*'s live connector and emit the audit event.
+
+    Does not commit. Raises ``HTTPException`` for config/availability problems,
+    ``QueryExecutionError`` if the connector fails the query.
+    """
+    connection = await get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -78,30 +72,28 @@ async def run_query(
     query_language = _resolve_query_language(connector)
 
     if connection.read_only:
-        _assert_read_only_query(body.query, query_language)
+        _assert_read_only_query(query, query_language)
+
+    base_details: dict[str, Any] = {
+        "language": query_language.value,
+        "query_length": len(query),
+    }
+    if session_id is not None:
+        base_details["session_id"] = session_id
 
     try:
-        graph_response = await connector.execute(body.query, parameters=body.parameters)
+        graph_response = await connector.execute(query, parameters=parameters)
     except Exception as exc:
         await emit_event(
             session,
             action=event_actions.QUERY_EXECUTE,
             target_kind=event_actions.TARGET_QUERY,
             graph_id=graph.id,
-            actor_id=user.id,
-            details={
-                "language": query_language.value,
-                "ok": False,
-                "error": str(exc),
-                "query_length": len(body.query),
-            },
+            actor_id=actor_id,
+            details={**base_details, "ok": False, "error": str(exc)},
             trace_id=current_trace_id(),
         )
-        await session.commit()
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={"error": "query_execution_failed", "message": str(exc)},
-        ) from exc
+        raise QueryExecutionError(str(exc)) from exc
 
     response = _build_query_response(graph_response, query_language)
     await emit_event(
@@ -109,27 +101,40 @@ async def run_query(
         action=event_actions.QUERY_EXECUTE,
         target_kind=event_actions.TARGET_QUERY,
         graph_id=graph.id,
-        actor_id=user.id,
+        actor_id=actor_id,
         details={
-            "language": query_language.value,
+            **base_details,
             "ok": True,
             "duration_ms": response.execution_time_ms,
             "row_count": response.row_count,
             "result_type": response.result_type,
-            "query_length": len(body.query),
         },
         trace_id=current_trace_id(),
     )
-    await session.commit()
     return response
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers (moved verbatim from server/routes/query.py)
 # ---------------------------------------------------------------------------
 
 _CYPHER_WRITE_PREFIXES = ("create ", "merge ", "set ", "delete ", "detach delete ", "remove ", "call {")
 _GREMLIN_WRITE_FRAGMENTS = (".addv(", ".adde(", ".property(", ".drop(")
+
+
+def _resolve_query_language(connector) -> QueryLanguage:
+    caps = connector.capabilities()
+    if Capability.CYPHER in caps:
+        return QueryLanguage.CYPHER
+    if Capability.GREMLIN in caps:
+        return QueryLanguage.GREMLIN
+    raise HTTPException(
+        status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+        detail={
+            "error": "unsupported_query_language",
+            "message": "Connector reports neither CYPHER nor GREMLIN capability.",
+        },
+    )
 
 
 def _assert_read_only_query(query: str, query_language: QueryLanguage) -> None:

@@ -58,8 +58,10 @@ Hard deletes everywhere. Cascade flows **downward only** through ownership: `Use
 ## Common commands
 
 ```bash
-# Install
-uv sync
+# Install — full dev env. `uv sync` is exact: a partial sync (missing --dev or
+# an --extra) PRUNES previously-installed packages, surfacing later as an
+# import error (fastapi / opentelemetry / httpx). See CONTRIBUTING.md → extras.
+uv sync --dev --extra all
 
 # Run dev server (also runs Alembic to head on startup)
 uv run invana start

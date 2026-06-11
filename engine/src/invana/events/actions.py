@@ -76,6 +76,10 @@ AUTH_USERNAME_CHANGE = "auth.username_change"
 # ── Query executions ──────────────────────────────────────────────────────────
 QUERY_EXECUTE = "query.execute"
 
+# ── Query sessions (RFC-024) ──────────────────────────────────────────────────
+SESSION_CREATE = "session.create"
+SESSION_DELETE = "session.delete"
+
 # ── System-emitted events (actor_type=system) ─────────────────────────────────
 SYSTEM_CONNECTION_HEALTH_CHECK = "system.connection_health_check"
 SYSTEM_CONNECTION_RECONNECT = "system.connection_reconnect"

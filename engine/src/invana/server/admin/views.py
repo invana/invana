@@ -28,6 +28,7 @@ from invana.modeller.models import (
     ValidationRule,
 )
 from invana.server.admin.auth import SuperuserAuthProvider
+from invana.sessions.models import Session, SessionMessage
 from invana.skills.models import Skill
 
 # Custom templates (currently: base.html with theme switcher) live alongside
@@ -384,6 +385,36 @@ class ImportJobView(ModelView):
         return False
 
 
+class SessionView(ModelView):
+    fields = [
+        "id",
+        "graph_id",
+        "created_by_id",
+        "title",
+        "message_count",
+        "node_count",
+        "edge_count",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["title"]
+
+
+class SessionMessageView(ModelView):
+    fields = [
+        "id",
+        "session_id",
+        "seq",
+        StringField("role", label="Role"),
+        StringField("status", label="Status"),
+        "via",
+        "query_language",
+        "row_count",
+        "execution_time_ms",
+        "created_at",
+    ]
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -475,6 +506,18 @@ def mount_admin(app: FastAPI) -> None:
                 ValidationRuleView(ValidationRule, label="Validation rules"),
                 IndexDefinitionView(IndexDefinition, label="Indexes"),
                 SchemaProjectionView(SchemaProjection, label="Projections"),
+            ],
+        ),
+    )
+
+    # ── Query sessions (RFC-024) ─────────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Sessions",
+            icon="fa fa-comments",
+            views=[
+                SessionView(Session, label="Sessions", icon="fa fa-comments"),
+                SessionMessageView(SessionMessage, label="Messages", icon="fa fa-message"),
             ],
         ),
     )

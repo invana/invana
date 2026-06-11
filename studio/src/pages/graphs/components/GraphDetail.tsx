@@ -32,7 +32,7 @@ interface GraphDetailProps {
 	sectionId: GraphDetailSection;
 	/** Last breadcrumb segment + footer right-side label. */
 	pageLabel: string;
-	/** Page-side left panel (e.g. QueryPanel in Explorer, SchemaNav in
+	/** Page-side left panel (e.g. SessionsPanel in Explorer, SchemaNav in
 	 *  Modeller). Hidden + replaced by SettingsPanel when settings is docked;
 	 *  hidden entirely when settings is expanded. Overview omits this. */
 	leftSection?: SectionConfig;

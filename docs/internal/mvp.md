@@ -326,8 +326,8 @@ The property types the Modeller offers are **gated by the bound backend and its 
 ## Layer 5 — Knowledge Graph
 
 ### 5.1 Query API
-- **Backend:** [x] `/query` route lives at `/api/v1/u/{username}/{graphSlug}/query` (Cypher + Gremlin) · graph-membership + `require_graph_setup_complete` deps · response shape: `result_type` (`graph` | `tabular`), `query_language`, `data: GraphResponse | null`, `rows: list[dict] | null`, `execution_time_ms`, `row_count`.
-- **Frontend:** [x] Query console (CodeMirror) under `/u/:username/:graphSlug/explorer`.
+- **Backend:** [x] `/query` route lives at `/api/v1/u/{username}/{graphSlug}/query` (Cypher + Gremlin) · graph-membership + `require_graph_setup_complete` deps · response shape: `result_type` (`graph` | `tabular`), `query_language`, `data: GraphResponse | null`, `rows: list[dict] | null`, `execution_time_ms`, `row_count`. **Superseded by § 5.6 (RFC-024):** the standalone `/query` route is removed; its execution core moves to a shared `execute_query` service called by the sessions message endpoint.
+- **Frontend:** [x] Query console (CodeMirror) under `/u/:username/:graphSlug/explorer`. **Redesigned into the Sessions panel (§ 5.6).**
 - **Integrations:** existing graph DB connectors
 
 ### 5.2 Semantic / vector retrieval
@@ -347,8 +347,13 @@ The property types the Modeller offers are **gated by the bound backend and its 
 
 ### 5.5 Studio Explorer (existing)
 - **Backend:** [x] No change
-- **Frontend:** [~] `ExplorerPage` mounted at `/u/:username/:graphSlug/explorer`; query console + status bar + inspector all working against the graph-scoped query endpoint. **Graph canvas rendering is stubbed** — placeholder summarises node/edge counts. Canvas re-integration against the redesigned `@invana/canvas` API surface is a follow-up (same blocker as § 4.1 Modeller).
+- **Frontend:** [~] `ExplorerPage` mounted at `/u/:username/:graphSlug/explorer`; the left panel is now the **Sessions panel** (threaded ask/answer; `SessionsPanel` + `SessionComposer`, Compass rail icon) replacing the old query console; status bar + inspector working against the graph-scoped endpoint. Sessions are **frontend-only in-memory state** until § 5.6 lands persistence. **Graph canvas rendering is stubbed** — placeholder summarises node/edge counts. Canvas re-integration against the redesigned `@invana/canvas` API surface is a follow-up (same blocker as § 4.1 Modeller).
 - **Integrations:** `@invana/canvas` (redesigned API surface — not yet wired)
+
+### 5.6 Query Sessions (persistence) — RFC-024
+- **Backend:** [ ] `sessions` + `session_messages` tables (graph-scoped, private to creator, hard-CASCADE on graph + user delete) · `execute_query` service extracted from `/query` (which is removed) · routes: `GET/POST /sessions`, `GET/PATCH/DELETE /sessions/{id}`, `POST /sessions/{id}/messages` (append + run), `POST /sessions/{id}/messages/{mid}/run` (re-execute in place, no append) · message metadata only (no result-payload snapshots) · `session.create`/`session.delete` events + `session_id` on `query.execute` · `SessionView`/`SessionMessageView` in `/admin`.
+- **Frontend:** [ ] `useSessions` repointed off `useState` onto TanStack Query (`useSessionsQuery`/`useSessionQuery`/`useSendMessage`/`useRerunMessage`) · `graphsApi.sessions.*` (and `graphsApi.query()` removed) · re-run latest message on session open to restore canvas · panel/composer UI unchanged.
+- **Integrations:** existing graph DB connectors · `@tanstack/react-query`. Detail: [`mvp/rfc-024-query-sessions.md`](mvp/rfc-024-query-sessions.md).
 
 ---
 

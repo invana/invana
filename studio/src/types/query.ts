@@ -1,9 +1,27 @@
+import type { QueryLanguage } from "./graphs";
+
 // ── Query request ─────────────────────────────────────────────────────────────
 
 export interface QueryRequest {
 	query: string;
 	parameters?: Record<string, unknown>;
 }
+
+// ── Composer payload ──────────────────────────────────────────────────────────
+// What the SessionComposer hands up when the user sends. The panel/hook
+// dispatches on `mode`: query-language runs against the engine; natural
+// language is captured but not yet wired to a backend.
+
+export type QueryMode = "nl" | "ql";
+
+export type QueryRunPayload =
+	| { mode: "ql"; query: string; language: QueryLanguage }
+	| {
+			mode: "nl";
+			query: string;
+			llmProviderId: string;
+			attachments: File[];
+	  };
 
 // ── Graph data types (mirrors engine's Vertex / Edge / GraphResponse) ─────────
 
@@ -47,15 +65,4 @@ export interface QueryResponse {
 	rows: Record<string, unknown>[] | null; // when result_type === "tabular"
 	execution_time_ms: number;
 	row_count: number;
-}
-
-// ── Session history entry ─────────────────────────────────────────────────────
-
-export interface QueryHistoryEntry {
-	id: string;
-	query: string;
-	language: "cypher" | "gremlin";
-	executedAt: Date;
-	rowCount: number;
-	executionTimeMs: number;
 }

@@ -88,7 +88,7 @@ make engine-format              # Format (ruff format)
 
 #### Installing optional extras
 
-The engine has optional dependency groups. `uv sync` is exact — running it with one `--extra` removes packages from a previously installed `--extra`. Always specify all desired extras together:
+The engine has optional dependency groups. `uv sync` is **exact** — it makes the environment match exactly what you ask for, so syncing with one `--extra` (or omitting `--dev`) **removes** packages from a previously installed set. Always specify everything you want in a single command:
 
 ```bash
 # Install a single extra
@@ -102,6 +102,22 @@ uv sync --extra all
 ```
 
 Available extras: `server`, `telemetry`, `all`.
+
+The **`dev` group** (pytest, httpx, ruff, editable connectors) is pruned the same way — `uv sync --extra all` *without* `--dev` strips it, and `uv sync --dev` *without* `--extra all` strips the extras. The canonical full developer install that keeps everything is:
+
+```bash
+uv sync --dev --extra all   # or: uv sync --dev --all-extras
+```
+
+If you sync with a missing piece, the failure shows up at **import time**, not install time, and the message points at the wrong thing:
+
+| Missing from the sync | Symptom |
+|---|---|
+| `--extra telemetry` (with `INVANA_TELEMETRY_ENABLED=true` in `.env`) | `import invana` raises `ImportError: OpenTelemetry packages are required …` |
+| `--extra server` | `ModuleNotFoundError: No module named 'fastapi'` when importing routes/app |
+| `--dev` | tests can't import `httpx` / `pytest` (collection error) |
+
+When something that worked yesterday suddenly can't import a top-level package, re-run the full `uv sync --dev --extra all` before debugging further — a partial sync from an earlier command is the usual cause.
 
 ### Studio (TypeScript/React)
 

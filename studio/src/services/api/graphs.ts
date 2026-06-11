@@ -7,7 +7,6 @@ import type {
 	GraphUpdate,
 	SetupSection,
 } from "../../types/graphs";
-import type { QueryRequest, QueryResponse } from "../../types/query";
 import { request } from "./client";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,11 +121,5 @@ export const graphsApi = {
 		}>(`/api/v1/u/${username}/${graphSlug}/connection/test`, {
 			method: "POST",
 			body: JSON.stringify(data),
-		}),
-
-	query: (username: string, graphSlug: string, body: QueryRequest) =>
-		request<QueryResponse>(`/api/v1/u/${username}/${graphSlug}/query`, {
-			method: "POST",
-			body: JSON.stringify(body),
 		}),
 };

@@ -61,8 +61,8 @@ def create_app() -> FastAPI:
     from invana.server.admin.views import mount_admin
     from invana.server.health import health_router
     from invana.server.routes.models import models_router
-    from invana.server.routes.query import query_router
     from invana.server.routes.schemas import schemas_router
+    from invana.sessions.routes import sessions_router
     from invana.skills.routes import skills_router
 
     app = FastAPI(
@@ -107,7 +107,7 @@ def create_app() -> FastAPI:
     app.include_router(datasets_router)
     app.include_router(models_router)
     app.include_router(schemas_router)
-    app.include_router(query_router)
+    app.include_router(sessions_router)
     app.include_router(events_router)
     app.include_router(graph_events_router)
     mount_admin(app)
