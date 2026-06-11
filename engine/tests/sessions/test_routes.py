@@ -108,6 +108,18 @@ class TestSessionsRoutes:
         assert resp.status_code == 200
         assert resp.json()["title"] == "renamed"
 
+    async def test_pin_and_archive_via_patch(self, client):
+        sid = (await client.post(BASE, json={})).json()["id"]
+
+        resp = await client.patch(f"{BASE}/{sid}", json={"pinned": True, "archived": True})
+        assert resp.status_code == 200
+        assert resp.json()["pinned"] is True and resp.json()["archived"] is True
+
+        # Archived sessions drop out of the default list but return when opted in.
+        assert (await client.get(BASE)).json()["total"] == 0
+        opted_in = await client.get(BASE, params={"include_archived": "true"})
+        assert opted_in.json()["total"] == 1
+
     async def test_delete_then_404(self, client):
         sid = (await client.post(BASE, json={})).json()["id"]
         assert (await client.delete(f"{BASE}/{sid}")).status_code == 204

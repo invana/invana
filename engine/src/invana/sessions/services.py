@@ -58,10 +58,20 @@ async def list_sessions(
     user_id: str,
     limit: int,
     offset: int,
+    sort: str = "updated",
+    include_archived: bool = False,
 ) -> tuple[list[Session], int]:
     store = SessionStore()
-    items = await store.list_for_user(session, graph_id=graph_id, user_id=user_id, limit=limit, offset=offset)
-    total = await store.count_for_user(session, graph_id=graph_id, user_id=user_id)
+    items = await store.list_for_user(
+        session,
+        graph_id=graph_id,
+        user_id=user_id,
+        limit=limit,
+        offset=offset,
+        sort=sort,
+        include_archived=include_archived,
+    )
+    total = await store.count_for_user(session, graph_id=graph_id, user_id=user_id, include_archived=include_archived)
     return items, total
 
 
@@ -122,6 +132,25 @@ async def create_session(
 
 async def rename_session(session: AsyncSession, *, sess: Session, title: str) -> Session:
     sess.title = title
+    await session.flush()
+    return sess
+
+
+async def update_session(
+    session: AsyncSession,
+    *,
+    sess: Session,
+    title: str | None = None,
+    pinned: bool | None = None,
+    archived: bool | None = None,
+) -> Session:
+    """Apply a partial update (only the provided fields) to a session."""
+    if title is not None:
+        sess.title = title
+    if pinned is not None:
+        sess.pinned = pinned
+    if archived is not None:
+        sess.archived = archived
     await session.flush()
     return sess
 

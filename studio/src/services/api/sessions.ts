@@ -34,6 +34,9 @@ interface ApiSummary {
 	id: string;
 	graph_id: string;
 	title: string;
+	pinned: boolean;
+	archived: boolean;
+	llm_provider_id?: string | null;
 	message_count: number;
 	node_count: number;
 	edge_count: number;
@@ -66,6 +69,24 @@ export interface SendMessageBody {
 	content: string;
 	mode: "ql" | "nl";
 	language?: QueryLanguage;
+}
+
+/** List ordering — newest by last activity (default) or by creation. */
+export type SessionSort = "updated" | "created";
+
+/** Server-side list controls (pinned always float to the top regardless). */
+export interface SessionListOptions {
+	limit?: number;
+	offset?: number;
+	sort?: SessionSort;
+	includeArchived?: boolean;
+}
+
+/** Partial update for a session — rename and/or toggle pin/archive. */
+export interface SessionUpdateBody {
+	title?: string;
+	pinned?: boolean;
+	archived?: boolean;
 }
 
 export interface SessionListResult {
@@ -103,8 +124,11 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		messages,
 		createdAt: new Date(s.created_at),
 		updatedAt: new Date(s.updated_at),
+		pinned: s.pinned,
+		archived: s.archived,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
+		llmProviderId: s.llm_provider_id ?? undefined,
 	};
 }
 
@@ -121,11 +145,13 @@ export const sessionsApi = {
 	list: async (
 		username: string,
 		graphSlug: string,
-		opts?: { limit?: number; offset?: number },
+		opts?: SessionListOptions,
 	): Promise<SessionListResult> => {
 		const params = new URLSearchParams();
 		if (opts?.limit != null) params.set("limit", String(opts.limit));
 		if (opts?.offset != null) params.set("offset", String(opts.offset));
+		if (opts?.sort != null) params.set("sort", opts.sort);
+		if (opts?.includeArchived) params.set("include_archived", "true");
 		const qs = params.toString();
 		const data = await request<ApiListResponse>(
 			`${base(username, graphSlug)}${qs ? `?${qs}` : ""}`,
@@ -152,16 +178,18 @@ export const sessionsApi = {
 			}),
 		),
 
-	rename: async (
+	// Partial update — rename and/or toggle pin/archive. The engine treats every
+	// field as optional, so callers send just the bit they're changing.
+	update: async (
 		username: string,
 		graphSlug: string,
 		id: string,
-		title: string,
+		body: SessionUpdateBody,
 	): Promise<Session> =>
 		toSession(
 			await request<ApiSummary>(`${base(username, graphSlug)}/${id}`, {
 				method: "PATCH",
-				body: JSON.stringify({ title }),
+				body: JSON.stringify(body),
 			}),
 		),
 

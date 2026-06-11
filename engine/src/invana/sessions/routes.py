@@ -7,6 +7,7 @@ removed). All routes are private to the creator and graph-scoped.
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,8 +33,8 @@ from invana.sessions.schemas import (
     SessionDetail,
     SessionListResponse,
     SessionMessageRead,
-    SessionRename,
     SessionSummary,
+    SessionUpdate,
 )
 
 sessions_router = APIRouter(
@@ -58,12 +59,22 @@ async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
 async def list_sessions(
     limit: int = Query(default=30, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    sort: Literal["updated", "created"] = Query(default="updated"),
+    include_archived: bool = Query(default=False),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> SessionListResponse:
-    items, total = await services.list_sessions(session, graph_id=graph.id, user_id=user.id, limit=limit, offset=offset)
+    items, total = await services.list_sessions(
+        session,
+        graph_id=graph.id,
+        user_id=user.id,
+        limit=limit,
+        offset=offset,
+        sort=sort,
+        include_archived=include_archived,
+    )
     return SessionListResponse(items=[SessionSummary.model_validate(s) for s in items], total=total)
 
 
@@ -104,8 +115,8 @@ async def get_session_detail(
 
 
 @sessions_router.patch("/{session_id}", response_model=SessionSummary)
-async def rename_session(
-    payload: SessionRename,
+async def update_session(
+    payload: SessionUpdate,
     session_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -113,7 +124,13 @@ async def rename_session(
     session: AsyncSession = Depends(get_session),
 ) -> SessionSummary:
     sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
-    await services.rename_session(session, sess=sess, title=payload.title)
+    await services.update_session(
+        session,
+        sess=sess,
+        title=payload.title,
+        pinned=payload.pinned,
+        archived=payload.archived,
+    )
     await session.commit()
     await session.refresh(sess)
     return SessionSummary.model_validate(sess)

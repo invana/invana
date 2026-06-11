@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
 	type SendMessageBody,
+	type SessionSort,
 	sessionsApi,
 } from "../../../../services/api/sessions";
 import type { QueryResponse, QueryRunPayload } from "../../../../types/query";
@@ -28,16 +29,24 @@ export function useSessions(
 ) {
 	const qc = useQueryClient();
 	const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+	// List controls that drive the server query (so paging/totals stay correct).
+	const [sort, setSort] = useState<SessionSort>("updated");
+	const [showArchived, setShowArchived] = useState(false);
 	const u = username ?? "";
 	const g = graphSlug ?? "";
 	const ready = !!username && !!graphSlug;
 
-	const listKey = ["sessions", u, g] as const;
+	// sort + showArchived are part of the key so the list refetches when toggled.
+	const listKey = ["sessions", u, g, sort, showArchived] as const;
+	// Prefix that matches every sort/archived variant — used for invalidation so
+	// a pin/archive/send touches all cached lists, not just the active one.
+	const listPrefix = ["sessions", u, g] as const;
 	const detailKey = (id: string) => ["session", u, g, id] as const;
 
 	const sessionsQuery = useQuery({
 		queryKey: listKey,
-		queryFn: () => sessionsApi.list(u, g),
+		queryFn: () =>
+			sessionsApi.list(u, g, { sort, includeArchived: showArchived }),
 		enabled: ready,
 	});
 
@@ -71,7 +80,7 @@ export function useSessions(
 		},
 		onSuccess: ({ id }) => {
 			setActiveSessionId(id);
-			qc.invalidateQueries({ queryKey: listKey });
+			qc.invalidateQueries({ queryKey: listPrefix });
 			qc.invalidateQueries({ queryKey: detailKey(id) });
 		},
 	});
@@ -81,7 +90,26 @@ export function useSessions(
 			sessionsApi.rerunMessage(u, g, id, messageId),
 		onSuccess: (_data, { id }) => {
 			qc.invalidateQueries({ queryKey: detailKey(id) });
-			qc.invalidateQueries({ queryKey: listKey });
+			qc.invalidateQueries({ queryKey: listPrefix });
+		},
+	});
+
+	// Pin/archive toggles — PATCH the flag, then refresh the list so ordering
+	// (pinned-first) and archived visibility re-sort. Archiving the open session
+	// drops back to the list, since it's no longer shown by default.
+	const updateMutation = useMutation({
+		mutationFn: ({
+			id,
+			body,
+		}: {
+			id: string;
+			body: { pinned?: boolean; archived?: boolean };
+		}) => sessionsApi.update(u, g, id, body),
+		onSuccess: (_data, { id, body }) => {
+			qc.invalidateQueries({ queryKey: listPrefix });
+			if (body.archived && !showArchived && activeSessionId === id) {
+				setActiveSessionId(null);
+			}
 		},
 	});
 
@@ -108,6 +136,11 @@ export function useSessions(
 		if (activeSessionId) void activeSessionQuery.refetch();
 	};
 
+	const setPinned = (id: string, pinned: boolean) =>
+		updateMutation.mutate({ id, body: { pinned } });
+	const setArchived = (id: string, archived: boolean) =>
+		updateMutation.mutate({ id, body: { archived } });
+
 	return {
 		sessions,
 		activeSession,
@@ -116,9 +149,16 @@ export function useSessions(
 		isRefreshing:
 			sessionsQuery.isFetching ||
 			(!!activeSessionId && activeSessionQuery.isFetching),
+		// List controls (drive the server query).
+		sort,
+		setSort,
+		showArchived,
+		setShowArchived,
 		send,
 		rerun,
 		refresh,
+		setPinned,
+		setArchived,
 		openSession: (id: string) => setActiveSessionId(id),
 		backToList: () => setActiveSessionId(null),
 	};

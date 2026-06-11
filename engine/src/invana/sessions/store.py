@@ -17,22 +17,38 @@ class SessionStore:
         user_id: str,
         limit: int,
         offset: int,
+        sort: str = "updated",
+        include_archived: bool = False,
     ) -> list[Session]:
+        # Pinned always float to the top; within each group, newest by the
+        # chosen field. `created` and anything else fall back to updated_at.
+        sort_col = Session.created_at if sort == "created" else Session.updated_at
         stmt = (
             select(Session)
             .where(Session.graph_id == graph_id, Session.created_by_id == user_id)
-            .order_by(Session.updated_at.desc())
+            .order_by(Session.pinned.desc(), sort_col.desc())
             .limit(limit)
             .offset(offset)
         )
+        if not include_archived:
+            stmt = stmt.where(Session.archived.is_(False))
         return list((await session.execute(stmt)).scalars().all())
 
-    async def count_for_user(self, session: AsyncSession, *, graph_id: str, user_id: str) -> int:
+    async def count_for_user(
+        self,
+        session: AsyncSession,
+        *,
+        graph_id: str,
+        user_id: str,
+        include_archived: bool = False,
+    ) -> int:
         stmt = (
             select(func.count())
             .select_from(Session)
             .where(Session.graph_id == graph_id, Session.created_by_id == user_id)
         )
+        if not include_archived:
+            stmt = stmt.where(Session.archived.is_(False))
         return int((await session.execute(stmt)).scalar_one())
 
     async def get(self, session: AsyncSession, session_id: str) -> Session | None:

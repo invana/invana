@@ -57,6 +57,40 @@ class TestSessionPersistence:
         await session.commit()
         assert sess.title == "renamed"
 
+    async def test_update_toggles_pin_and_archive(self, session, graph, user):
+        sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="t")
+        assert sess.pinned is False and sess.archived is False
+
+        await services.update_session(session, sess=sess, pinned=True, archived=True)
+        await session.commit()
+        assert sess.pinned is True and sess.archived is True
+
+        # A partial update leaves untouched fields alone.
+        await services.update_session(session, sess=sess, archived=False)
+        await session.commit()
+        assert sess.pinned is True and sess.archived is False
+
+    async def test_list_pins_first_and_hides_archived_by_default(self, session, graph, user):
+        plain = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="plain")
+        pinned = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="pinned")
+        gone = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="archived")
+        await services.update_session(session, sess=pinned, pinned=True)
+        await services.update_session(session, sess=gone, archived=True)
+        await session.commit()
+
+        # Archived hidden by default; pinned floats to the top.
+        items, total = await services.list_sessions(session, graph_id=graph.id, user_id=user.id, limit=30, offset=0)
+        assert total == 2
+        assert items[0].id == pinned.id
+        assert {s.id for s in items} == {pinned.id, plain.id}
+
+        # Opting in surfaces the archived session.
+        items, total = await services.list_sessions(
+            session, graph_id=graph.id, user_id=user.id, limit=30, offset=0, include_archived=True
+        )
+        assert total == 3
+        assert gone.id in {s.id for s in items}
+
     async def test_delete_cascades_messages(self, session, graph, user):
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)
         await services.send_message(

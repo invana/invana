@@ -38,7 +38,17 @@ export interface Session {
 	messages: SessionMessage[];
 	createdAt: Date;
 	updatedAt: Date;
+	/** Pinned sessions sort to the top of the list. */
+	pinned: boolean;
+	/** Archived sessions are hidden from the default list. */
+	archived: boolean;
 	/** Running totals across the session, for the list meta line. */
 	nodeCount: number;
 	edgeCount: number;
+	/**
+	 * Which LLM provider produced this session, when applicable. The engine
+	 * doesn't record this yet (NL queries aren't wired), so it's undefined
+	 * today — the list's "filter by LLM" control reads it forward-lookingly.
+	 */
+	llmProviderId?: string;
 }

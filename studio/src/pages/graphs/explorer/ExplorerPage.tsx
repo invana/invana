@@ -55,9 +55,15 @@ export function ExplorerPage() {
 		activeSession,
 		isRunning,
 		isRefreshing,
+		sort,
+		setSort,
+		showArchived,
+		setShowArchived,
 		send,
 		rerun,
 		refresh,
+		setPinned,
+		setArchived,
 		openSession,
 		backToList,
 	} = useSessions(username, graphSlug);
@@ -199,6 +205,12 @@ export function ExplorerPage() {
 			onRefresh={refresh}
 			isRefreshing={isRefreshing}
 			onClose={closeSessions}
+			sort={sort}
+			onSortChange={setSort}
+			showArchived={showArchived}
+			onShowArchivedChange={setShowArchived}
+			onPin={setPinned}
+			onArchive={setArchived}
 		/>
 	);
 

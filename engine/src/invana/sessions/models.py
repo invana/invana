@@ -17,6 +17,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Enum,
     ForeignKey,
@@ -85,6 +86,11 @@ class Session(Base):
     )
 
     title: Mapped[str] = mapped_column(String(255), default="", nullable=False)
+
+    # Per-user organization flags. Pinned sessions sort to the top of the list;
+    # archived sessions are hidden from the default list (revealed on demand).
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Denormalized running totals for the list meta line (Decision 4).
     message_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

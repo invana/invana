@@ -391,6 +391,8 @@ class SessionView(ModelView):
         "graph_id",
         "created_by_id",
         "title",
+        "pinned",
+        "archived",
         "message_count",
         "node_count",
         "edge_count",

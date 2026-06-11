@@ -30,8 +30,17 @@ class SessionCreate(BaseModel):
     message: SendMessage | None = None
 
 
-class SessionRename(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255)
+class SessionUpdate(BaseModel):
+    """Partial update for a session — rename and/or toggle pin/archive.
+
+    All fields optional so callers can send just the bit they're changing
+    (``{"pinned": true}`` from the row hover action, ``{"title": "..."}`` from
+    a rename). An empty body is a no-op.
+    """
+
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    pinned: bool | None = None
+    archived: bool | None = None
 
 
 # ── Reads ─────────────────────────────────────────────────────────────────────
@@ -62,6 +71,8 @@ class SessionSummary(BaseModel):
     id: str
     graph_id: str
     title: str
+    pinned: bool
+    archived: bool
     message_count: int
     node_count: int
     edge_count: int
