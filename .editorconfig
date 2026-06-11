@@ -14,5 +14,10 @@ indent_size = 4
 [*.md]
 trim_trailing_whitespace = false
 
+# Studio (TypeScript/CSS/JSON) is formatted by Biome with tabs — see
+# studio/biome.json. Keep editors in sync so tab/space don't fight.
+[studio/**.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,css}]
+indent_style = tab
+
 [Makefile]
 indent_style = tab

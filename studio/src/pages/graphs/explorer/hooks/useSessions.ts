@@ -101,13 +101,24 @@ export function useSessions(
 		return result;
 	};
 
+	// Refetch from the engine — the list always, plus the open thread when one
+	// is active. Used by the panel's header refresh control.
+	const refresh = () => {
+		void sessionsQuery.refetch();
+		if (activeSessionId) void activeSessionQuery.refetch();
+	};
+
 	return {
 		sessions,
 		activeSession,
 		activeSessionId,
 		isRunning: sendMutation.isPending || rerunMutation.isPending,
+		isRefreshing:
+			sessionsQuery.isFetching ||
+			(!!activeSessionId && activeSessionQuery.isFetching),
 		send,
 		rerun,
+		refresh,
 		openSession: (id: string) => setActiveSessionId(id),
 		backToList: () => setActiveSessionId(null),
 	};

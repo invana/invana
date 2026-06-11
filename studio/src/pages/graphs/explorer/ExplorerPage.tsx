@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
 	GraphCanvas,
@@ -54,11 +54,25 @@ export function ExplorerPage() {
 		sessions,
 		activeSession,
 		isRunning,
+		isRefreshing,
 		send,
 		rerun,
+		refresh,
 		openSession,
 		backToList,
 	} = useSessions(username, graphSlug);
+
+	// Collapsed state lives in the URL (`?sessions=closed`), mirroring the
+	// Settings panel convention. The header's collapse control sets it; the
+	// left-rail Explorer icon navigates to the bare path, which drops the
+	// param and brings the panel back.
+	const [searchParams, setSearchParams] = useSearchParams();
+	const sessionsClosed = searchParams.get("sessions") === "closed";
+	const closeSessions = useCallback(() => {
+		const next = new URLSearchParams(searchParams);
+		next.set("sessions", "closed");
+		setSearchParams(next, { replace: true });
+	}, [searchParams, setSearchParams]);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
 		username,
 		graphSlug,
@@ -182,6 +196,9 @@ export function ExplorerPage() {
 			onOpenSession={openSession}
 			onBack={backToList}
 			onRerun={handleRerun}
+			onRefresh={refresh}
+			isRefreshing={isRefreshing}
+			onClose={closeSessions}
 		/>
 	);
 
@@ -189,16 +206,20 @@ export function ExplorerPage() {
 		<GraphDetail
 			sectionId="explorer"
 			pageLabel="Explorer"
-			leftSection={{
-				// Generous max so long Cypher/Gremlin queries can spread out.
-				// mainSection.minSize below still keeps the canvas usable when
-				// the user drags the divider far right.
-				defaultSize: "300px",
-				minSize: "240px",
-				maxSize: "900px",
-				collapsible: false,
-				content: leftContent,
-			}}
+			leftSection={
+				sessionsClosed
+					? undefined
+					: {
+							// Generous max so long Cypher/Gremlin queries can spread out.
+							// mainSection.minSize below still keeps the canvas usable when
+							// the user drags the divider far right.
+							defaultSize: "300px",
+							minSize: "240px",
+							maxSize: "900px",
+							collapsible: false,
+							content: leftContent,
+						}
+			}
 			mainSection={{
 				defaultSize: "600px",
 				minSize: "300px",

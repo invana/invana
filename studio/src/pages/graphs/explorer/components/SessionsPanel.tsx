@@ -5,7 +5,15 @@ import {
 	Spinner,
 	TabbedPanel,
 } from "@invana/ui";
-import { ArrowLeft, Copy, MessageSquare, RotateCw, Search } from "lucide-react";
+import {
+	ArrowLeft,
+	Copy,
+	MessageSquare,
+	PanelLeftClose,
+	RefreshCw,
+	RotateCw,
+	Search,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { formatRelativeTime } from "../../../../lib/time";
@@ -32,6 +40,12 @@ export interface SessionsPanelProps {
 	onBack: () => void;
 	/** Re-run a past assistant message's query in place (repaints the canvas). */
 	onRerun: (messageId: string) => void;
+	/** Refetch sessions from the engine (header refresh control). */
+	onRefresh: () => void;
+	/** True while a refetch is in flight — spins the refresh icon. */
+	isRefreshing: boolean;
+	/** Collapse the panel, handing the freed width back to the canvas. */
+	onClose: () => void;
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
@@ -50,6 +64,9 @@ export function SessionsPanel({
 	onOpenSession,
 	onBack,
 	onRerun,
+	onRefresh,
+	isRefreshing,
+	onClose,
 }: SessionsPanelProps) {
 	const [searchOpen, setSearchOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -78,22 +95,37 @@ export function SessionsPanel({
 		/>
 	);
 
-	// Search only makes sense on the list; hide it inside a session.
-	const headerActions = inDetail
-		? undefined
-		: {
-				rightNavItems: [
-					{
-						key: "search",
-						name: "Search sessions",
-						icon: Search,
-						onClick: () => {
-							setSearchOpen((v) => !v);
-							setSearch("");
-						},
-					},
-				],
-			};
+	// Refresh + collapse are always available; search only makes sense on the
+	// list, so it's prepended (leftmost) when we're not inside a session.
+	const rightNavItems = [
+		{
+			key: "refresh",
+			name: "Refresh sessions",
+			icon: RefreshCw,
+			iconClassName: isRefreshing ? "animate-spin" : undefined,
+			onClick: onRefresh,
+		},
+		{
+			key: "close",
+			name: "Collapse panel",
+			icon: PanelLeftClose,
+			iconClassName: undefined,
+			onClick: onClose,
+		},
+	];
+	if (!inDetail) {
+		rightNavItems.unshift({
+			key: "search",
+			name: "Search sessions",
+			icon: Search,
+			iconClassName: undefined,
+			onClick: () => {
+				setSearchOpen((v) => !v);
+				setSearch("");
+			},
+		});
+	}
+	const headerActions = { rightNavItems };
 
 	// The composer lives inside the tab content (not TabbedPanel's
 	// `footerContent`): the panel sizes its body to `calc(100% - header)` and
