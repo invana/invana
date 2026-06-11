@@ -22,6 +22,7 @@
 		"@invana/forms": "^0.0.6",
 		"@invana/graph": "^0.0.4",
 		"@invana/graph-layout-d3-force": "^0.0.4",
+		"@invana/graph-layout-elkjs": "^0.0.4",
 		"@invana/styling": "^0.0.6",
 		"@invana/themes": "^0.0.6",
 		"@invana/ui": "^0.0.6",

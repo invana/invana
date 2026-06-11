@@ -129,6 +129,7 @@ export function SessionsPanel({
 	) : (
 		<SessionList
 			sessions={sessions}
+			sort={sort}
 			search={searchOpen ? search : ""}
 			searchOpen={searchOpen}
 			onSearchChange={setSearch}
@@ -318,6 +319,7 @@ function SessionFilterMenu({
 
 interface SessionListProps {
 	sessions: Session[];
+	sort: SessionSort;
 	search: string;
 	searchOpen: boolean;
 	onSearchChange: (value: string) => void;
@@ -329,6 +331,7 @@ interface SessionListProps {
 
 function SessionList({
 	sessions,
+	sort,
 	search,
 	searchOpen,
 	onSearchChange,
@@ -375,6 +378,7 @@ function SessionList({
 							<SessionRow
 								key={session.id}
 								session={session}
+								sort={sort}
 								onClick={() => onOpen(session.id)}
 								onPin={onPin}
 								onArchive={onArchive}
@@ -399,11 +403,13 @@ function SessionList({
 
 function SessionRow({
 	session,
+	sort,
 	onClick,
 	onPin,
 	onArchive,
 }: {
 	session: Session;
+	sort: SessionSort;
 	onClick: () => void;
 	onPin: (id: string, pinned: boolean) => void;
 	onArchive: (id: string, archived: boolean) => void;
@@ -446,7 +452,14 @@ function SessionRow({
 								<span>·</span>
 							</>
 						)}
-						<span>{formatRelativeTime(session.updatedAt)}</span>
+						{/* Show the timestamp the list is ordered by, so the visible
+					    times always match the sort (otherwise a Created-sorted list
+					    shows updated times and the order looks arbitrary). */}
+						<span title={sort === "created" ? "Created" : "Last updated"}>
+							{formatRelativeTime(
+								sort === "created" ? session.createdAt : session.updatedAt,
+							)}
+						</span>
 					</span>
 				</span>
 			</button>

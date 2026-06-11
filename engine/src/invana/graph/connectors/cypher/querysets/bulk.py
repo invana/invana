@@ -10,13 +10,13 @@ class OpenCypherBulkQuerySet(BaseBulkQuerySet):
 
     async def bulk_create_vertices(self, label: str, records: list[dict]) -> list[Vertex]:
         query, params = OpenCypherQueryBuilder.bulk_create_nodes(label, records)
-        raw = await self._connector.execute(query, params)
-        return [self._serializer.deserialize_vertex(record["n"]) for record in raw]
+        response = await self._connector.execute(query, params)
+        return response.nodes
 
     async def bulk_create_edges(self, label: str, records: list[dict]) -> list[Edge]:
         query, params = OpenCypherQueryBuilder.bulk_create_edges(label, records)
-        raw = await self._connector.execute(query, params)
-        return [self._serializer.deserialize_edge(record["r"], record["a"], record["b"]) for record in raw]
+        response = await self._connector.execute(query, params)
+        return response.edges
 
     async def bulk_delete_vertices(self, vertex_ids: list[str]) -> int:
         query, params = OpenCypherQueryBuilder.bulk_delete_nodes(vertex_ids)

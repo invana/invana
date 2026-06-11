@@ -50,6 +50,9 @@ interface GraphDetailProps {
 	/** Page-specific header right extras (e.g. Modeller's Introspect +
 	 *  Refresh buttons). */
 	headerRightExtras?: ReactNode;
+	/** Page-specific header center content (e.g. Explorer's canvas toolbar).
+	 *  Most pages won't need this. */
+	headerCenter?: ReactNode;
 }
 
 /**
@@ -73,6 +76,7 @@ export function GraphDetail({
 	statusMetrics,
 	footerRightExtras,
 	headerRightExtras,
+	headerCenter,
 }: GraphDetailProps) {
 	const { username, graphSlug } = useParams<{
 		username: string;
@@ -82,7 +86,11 @@ export function GraphDetail({
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", sectionId);
-	const header = useAppHeader({ pageLabel, rightExtras: headerRightExtras });
+	const header = useAppHeader({
+		pageLabel,
+		rightExtras: headerRightExtras,
+		center: headerCenter,
+	});
 
 	const settingsOpen = settingsPanel.isOpen && !!username && !!graphSlug;
 	const settingsExpanded = settingsOpen && settingsPanel.expanded;

@@ -1,5 +1,5 @@
 import { Button } from "@invana/ui";
-import { Home, RefreshCw } from "lucide-react";
+import { ArrowLeft, Home, RefreshCw } from "lucide-react";
 import {
 	isRouteErrorResponse,
 	useNavigate,
@@ -33,9 +33,19 @@ export function ErrorPage() {
 			</div>
 			<div className="flex items-center gap-2">
 				<Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-					<RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+					<ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
 					Go back
 				</Button>
+				{!is404 && (
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => window.location.reload()}
+					>
+						<RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+						Reload
+					</Button>
+				)}
 				<Button
 					size="sm"
 					onClick={() => navigate("/graphs", { replace: true })}

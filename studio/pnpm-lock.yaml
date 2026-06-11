@@ -38,6 +38,9 @@ importers:
       '@invana/graph-layout-d3-force':
         specifier: ^0.0.4
         version: 0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))
+      '@invana/graph-layout-elkjs':
+        specifier: ^0.0.4
+        version: 0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))
       '@invana/styling':
         specifier: ^0.0.6
         version: 0.0.6(tailwindcss@4.2.2)
@@ -477,6 +480,12 @@ packages:
 
   '@invana/graph-layout-d3-force@0.0.4':
     resolution: {integrity: sha512-aVZ8+FGdQwwnU7ceQZjaSun6RoFivpdgdgWV7x887RFobefEsAvEyxGXLisd9tUcKiNNaPnfd/QHy+Wm26Dksw==}
+    peerDependencies:
+      '@invana/canvas': 0.0.4
+      '@invana/graph': 0.0.4
+
+  '@invana/graph-layout-elkjs@0.0.4':
+    resolution: {integrity: sha512-ECTIkaXeyjcVEzYrNPVPavPh+K6ZE2210iZFNYpZ//XA4c1fJgalqXYdCKXB5rKIeMgfyn5lo05TT9gf1a7K1w==}
     peerDependencies:
       '@invana/canvas': 0.0.4
       '@invana/graph': 0.0.4
@@ -1535,6 +1544,9 @@ packages:
   electron-to-chromium@1.5.335:
     resolution: {integrity: sha512-q9n5T4BR4Xwa2cwbrwcsDJtHD/enpQ5S1xF1IAtdqf5AAgqDFmR/aakqH3ChFdqd/QXJhS3rnnXFtexU7rax6Q==}
 
+  elkjs@0.9.3:
+    resolution: {integrity: sha512-f/ZeWvW/BCXbhGEf1Ujp29EASo/lk1FDnETgNKwJrsVvGZhUWCZyg3xLJjAsxfOmt8KjswHmI5EwCQcPMpOYhQ==}
+
   embla-carousel-react@8.6.0:
     resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
     peerDependencies:
@@ -2385,6 +2397,12 @@ snapshots:
       '@invana/canvas': 0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       '@invana/graph': 0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
       d3-force: 3.0.0
+
+  '@invana/graph-layout-elkjs@0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))':
+    dependencies:
+      '@invana/canvas': 0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
+      elkjs: 0.9.3
 
   '@invana/graph@0.0.4(@invana/canvas@0.0.4(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)':
     dependencies:
@@ -3440,6 +3458,8 @@ snapshots:
   earcut@3.0.2: {}
 
   electron-to-chromium@1.5.335: {}
+
+  elkjs@0.9.3: {}
 
   embla-carousel-react@8.6.0(react@19.2.5):
     dependencies:
