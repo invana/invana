@@ -7,14 +7,19 @@
  * bounces the user to /login on next render.
  */
 
+import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
 	type AxiosRequestConfig,
 	type InternalAxiosRequestConfig,
 } from "axios";
+import { startClientSpan } from "../telemetry/tracer";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
+
+/** Carries the per-request telemetry span from request → response interceptor. */
+type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
 
 export class ApiError extends Error {
 	constructor(
@@ -55,6 +60,51 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	}
 	return config;
 });
+
+// Telemetry (RFC-025 / RFC-026): trace the outgoing request and inject W3C
+// trace-context so the engine's request span nests under it. We propagate
+// explicitly here rather than rely on auto-XHR instrumentation, whose ambient
+// context is lost crossing TanStack Query's async hops under Vite's native
+// async/await (RFC-025 D3).
+//
+// Two cases produce a span: (a) an Explorer run is in flight → nests under
+// `explorer.query.run`; (b) the request targets a session/message endpoint →
+// its own one-span distributed trace, even outside a run (RFC-026 D3). All
+// other API calls stay untraced.
+apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+	const method = (config.method ?? "get").toUpperCase();
+	// Message ops live under `…/sessions/{id}/messages…`, so `/sessions` matches
+	// both. Other routes (graphs, llm, events, …) stay untraced outside a run.
+	const standalone = (config.url ?? "").includes("/sessions");
+	const client = startClientSpan(
+		`HTTP ${method}`,
+		{
+			"http.request.method": method,
+			"url.full": `${config.baseURL ?? ""}${config.url ?? ""}`,
+		},
+		{ standalone },
+	);
+	if (client) {
+		propagation.inject(client.ctx, config.headers, {
+			set: (carrier, key, value) => carrier.set(key, value),
+		});
+		(config as TracedConfig)._otelSpan = client.span;
+	}
+	return config;
+});
+
+/** End the request's telemetry span (if any), stamping the HTTP status. */
+function endRequestSpan(
+	config: TracedConfig | undefined,
+	status?: number,
+): void {
+	const span = config?._otelSpan;
+	if (!span) return;
+	if (status) span.setAttribute("http.response.status_code", status);
+	if (!status || status >= 400) span.setStatus({ code: SpanStatusCode.ERROR });
+	span.end();
+	config._otelSpan = undefined; // a 401 retry re-runs the interceptor → fresh span
+}
 
 // Single-flight refresh: concurrent 401s coalesce onto one /auth/refresh call.
 let refreshInflight: Promise<string | null> | null = null;
@@ -114,12 +164,16 @@ function formatErrorDetail(error: AxiosError): string {
 }
 
 apiClient.interceptors.response.use(
-	(res) => res,
+	(res) => {
+		endRequestSpan(res.config as TracedConfig, res.status);
+		return res;
+	},
 	async (error: AxiosError) => {
 		const config = error.config as
 			| (InternalAxiosRequestConfig & { _retried?: boolean })
 			| undefined;
 		const status = error.response?.status;
+		endRequestSpan(config as TracedConfig | undefined, status);
 		const isAuthPath = config?.url?.includes("/api/v1/auth/");
 
 		if (status === 401 && config && !config._retried && !isAuthPath) {

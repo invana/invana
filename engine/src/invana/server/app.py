@@ -110,5 +110,14 @@ def create_app() -> FastAPI:
     app.include_router(sessions_router)
     app.include_router(events_router)
     app.include_router(graph_events_router)
+
+    # RFC-025 — proxy the studio's browser OTLP/HTTP span export to the collector.
+    # Only mounted when telemetry is on; excluded from auto-instrumentation in
+    # telemetry/setup.py so the proxy never traces itself.
+    if settings.telemetry_enabled:
+        from invana.telemetry.routes import telemetry_router
+
+        app.include_router(telemetry_router)
+
     mount_admin(app)
     return app

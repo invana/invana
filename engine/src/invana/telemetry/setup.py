@@ -107,7 +107,9 @@ def instrument_app(app, engine) -> None:
 
     FastAPIInstrumentor.instrument_app(
         app,
-        excluded_urls="health,metrics,ping",
+        # ``telemetry/traces`` is the browser-span proxy (RFC-025) — exclude it
+        # so shipping spans doesn't itself generate spans.
+        excluded_urls="health,metrics,ping,telemetry/traces",
     )
     SQLAlchemyInstrumentor().instrument(
         engine=engine.sync_engine,

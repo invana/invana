@@ -31,6 +31,11 @@
       ],
       "cwd": "${workspaceFolder}/engine",
       "envFile": "${workspaceFolder}/engine/.env",
+      "env": {
+        "INVANA_TELEMETRY_ENABLED": "true",
+        "INVANA_TELEMETRY_OTLP_ENDPOINT": "http://localhost:4317",
+        "INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT": "http://localhost:4318/v1/traces"
+      },
       "jinja": true
     },
     {
@@ -38,7 +43,12 @@
       "type": "node-terminal",
       "request": "launch",
       "command": "npm run dev",
-      "cwd": "${workspaceFolder}/studio"
+      "cwd": "${workspaceFolder}/studio",
+      "env": {
+        "VITE_API_BASE_URL": "http://localhost:8200",
+        "VITE_TELEMETRY_ENABLED": "true",
+        "VITE_TELEMETRY_DEBUG": "false"
+      }
     }
   ]
 }

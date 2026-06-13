@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True
     telemetry_otlp_endpoint: str = "http://localhost:4317"
+    # OTLP/HTTP collector endpoint the studio's browser spans are proxied to
+    # (RFC-025). Browsers can't speak OTLP gRPC, so /api/v1/telemetry/traces
+    # forwards their export here verbatim, keeping the collector off the network.
+    telemetry_otlp_http_endpoint: str = "http://localhost:4318/v1/traces"
     telemetry_service_name: str = "invana-engine"
     telemetry_environment: str = "development"
 

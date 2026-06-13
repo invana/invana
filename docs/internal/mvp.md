@@ -462,7 +462,7 @@ Single roll-up of every third-party dependency and infra service referenced abov
 - [ ] Encryption at rest — Fernet key (`INVANA_ENCRYPTION_KEY`) for `graph_connections.auth_encrypted` + `llm_providers.api_key_encrypted`
 - [ ] Object storage — MinIO in dev (`docker-compose-infra.yml`); S3-compatible client so prod can swap to AWS S3 / GCS / R2. Used for dataset files (model + nodes + edges). `INVANA_S3_*` settings.
 - [ ] Logging — RFC-006
-- [ ] Telemetry — RFC-007
+- [ ] Telemetry — RFC-007 (engine traces/metrics/logs) + RFC-025 (studio end-to-end query→render tracing) + RFC-026 (session/message tracing + FE→BE stitching fix)
 - [ ] CORS — permissive in dev, `INVANA_CORS_ALLOWED_ORIGINS` in prod
 - [ ] Alembic — reset on `arch/redesign`; single new initial migration covers full redesigned schema (RFC-012 + RFC-017)
 - [ ] Pluggable executor (RFC-016) — orchestration as a boundary; MVP ships **LocalExecutor** (in-process asyncio); distributed executors deferred

@@ -85,6 +85,11 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect } from "react";
+import {
+	type InteractionRef,
+	endInteraction,
+	startChild,
+} from "../../../../services/telemetry/tracer";
 
 // `CanvasConfig` isn't re-exported by canvas-react@0.0.4 — derive it from the
 // `<Canvas config>` prop so the option objects stay precisely typed.
@@ -503,12 +508,48 @@ function CanvasBridge({
  * registered layout's `end → camera.fitContent` (wired by `<D3ForceLayout>`)
  * then frames the result.
  */
-function AutoLayoutBridge({ data }: { data: GraphData }) {
+function AutoLayoutBridge({
+	data,
+	interactionRef,
+}: {
+	data: GraphData;
+	interactionRef?: InteractionRef;
+}) {
 	const canvas = useGraphCanvas();
 	useEffect(() => {
 		if (!canvas || data.nodes.length === 0) return;
-		void canvas.runLayout(ACTIVE_LAYOUT_ID);
-	}, [canvas, data]);
+
+		// No active query run → just lay out (e.g. theme repaint, session restore).
+		const interaction = interactionRef?.current ?? null;
+		if (!interaction) {
+			void canvas.runLayout(ACTIVE_LAYOUT_ID);
+			return;
+		}
+
+		// `explorer.layout` span (RFC-025) — d3-force settle. runLayout resolves
+		// when the layout settles; on settle we open a one-frame `explorer.render`
+		// span (first painted frame) and then close the run's root span.
+		const layoutSpan = startChild(interaction, "explorer.layout", {
+			"explorer.node_count": data.nodes.length,
+			"explorer.edge_count": data.edges.length,
+		});
+		let cancelled = false;
+		void canvas.runLayout(ACTIVE_LAYOUT_ID).finally(() => {
+			layoutSpan.end();
+			if (cancelled) return;
+			const renderSpan = startChild(interaction, "explorer.render");
+			requestAnimationFrame(() => {
+				renderSpan.end();
+				// Closes the root span and clears the ref + module-level active slot,
+				// so post-run API calls aren't parented to a finished run.
+				if (interactionRef) endInteraction(interactionRef, interaction);
+				else interaction.span.end();
+			});
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [canvas, data, interactionRef]);
 	return null;
 }
 
@@ -547,6 +588,9 @@ interface ExplorerCanvasProps {
 	onViewTargetChange: (id: string | null) => void;
 	/** On → hover lights up the node's 1st-degree neighbours; off → node only. */
 	magnet: boolean;
+	/** Telemetry root for the in-flight query run (RFC-025); layout/render spans
+	 *  attach here, and the run's root span closes after the first painted frame. */
+	interactionRef?: InteractionRef;
 }
 
 export function ExplorerCanvas({
@@ -554,6 +598,7 @@ export function ExplorerCanvas({
 	onReady,
 	onViewTargetChange,
 	magnet,
+	interactionRef,
 }: ExplorerCanvasProps) {
 	return (
 		<CanvasRoot autoResize config={APP_OPTIONS} className="w-full h-full">
@@ -580,7 +625,7 @@ export function ExplorerCanvas({
 				targetLayerId="graph"
 				options={FORCE_OPTS}
 			/>
-			<AutoLayoutBridge data={data} />
+			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
 
 			<ThemeBridge />
 

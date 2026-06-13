@@ -38,7 +38,8 @@ import logging
 import time
 
 from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
+from opentelemetry.propagate import extract
+from opentelemetry.trace import SpanKind, Status, StatusCode
 from starlette.requests import Request
 from starlette.types import ASGIApp, Receive, Scope, Send
 
@@ -109,7 +110,14 @@ class TelemetryMiddleware:
         raw_path = scope.get("path", "/")
         span_name = f"{method} {raw_path}"
 
-        with tracer.start_as_current_span(span_name) as span:
+        # Adopt the caller's W3C trace context (e.g. the studio's `traceparent`,
+        # RFC-026) so this request nests under the browser's client span as one
+        # distributed trace. Absent a header, `extract` yields an empty context
+        # and the SERVER span is a clean root. SERVER kind is the correct
+        # semantic for an inbound request (the custom middleware is the sole
+        # request-span source — FastAPIInstrumentor is a no-op here, RFC-026 D1).
+        parent_ctx = extract(dict(request.headers))
+        with tracer.start_as_current_span(span_name, context=parent_ctx, kind=SpanKind.SERVER) as span:
             _attach_request(span, request, raw_path, method, client_ip, user_agent, req_size)
             api_requests_in_flight.add(1, {"route": raw_path, "method": method})
             api_request_size.record(req_size, {"route": raw_path})

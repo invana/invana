@@ -9,6 +9,14 @@ import {
 	useGraphQuery,
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
+import {
+	type Interaction,
+	type SpanAttributes,
+	endInteraction,
+	measureSync,
+	startInteraction,
+	withInteraction,
+} from "../../../services/telemetry/tracer";
 import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type {
 	QueryResponse,
@@ -89,6 +97,12 @@ export function ExplorerPage() {
 	const [nodeCount, setNodeCount] = useState(0);
 	const [relCount, setRelCount] = useState(0);
 
+	// Root span for the in-flight query run (RFC-025). Held in a ref so the
+	// transform / adapt / layout / render stages — which span several async
+	// renders — all attach to the same trace. Set in `handleRun`, closed by the
+	// canvas's layout bridge after the first painted frame.
+	const runRef = useRef<Interaction | null>(null);
+
 	// The live canvas engine, lifted out of <Canvas> by <CanvasBridge>. Null until
 	// the graph is fully wired; gates the header toolbar that depends on it.
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
@@ -109,26 +123,32 @@ export function ExplorerPage() {
 	// label (as `type`, for colour-by-label + the Inspector's Type row) and
 	// properties (as `data`).
 	const graphData = useMemo<EngineGraphData>(() => {
-		const nodes: EngineGraphData["nodes"] = [];
-		const edges: EngineGraphData["edges"] = [];
-		for (const item of canvasData) {
-			if (item.type === "vertex") {
-				nodes.push({
-					id: String(item.id),
-					type: item.label,
-					data: item.properties,
-				});
-			} else if (item.type === "edge") {
-				edges.push({
-					id: String(item.id),
-					source: String(item.source),
-					target: String(item.target),
-					type: item.label,
-					data: item.properties,
-				});
+		// `explorer.adapt` span (RFC-025) — time mapping query results to the
+		// canvas's GraphData shape. No-ops when there's no active run.
+		return measureSync(runRef.current, "explorer.adapt", (span) => {
+			const nodes: EngineGraphData["nodes"] = [];
+			const edges: EngineGraphData["edges"] = [];
+			for (const item of canvasData) {
+				if (item.type === "vertex") {
+					nodes.push({
+						id: String(item.id),
+						type: item.label,
+						data: item.properties,
+					});
+				} else if (item.type === "edge") {
+					edges.push({
+						id: String(item.id),
+						source: String(item.source),
+						target: String(item.target),
+						type: item.label,
+						data: item.properties,
+					});
+				}
 			}
-		}
-		return { nodes, edges };
+			span?.setAttribute("explorer.node_count", nodes.length);
+			span?.setAttribute("explorer.edge_count", edges.length);
+			return { nodes, edges };
+		});
 	}, [canvasData]);
 
 	// The engine resolves capabilities from the live connector and returns
@@ -143,31 +163,74 @@ export function ExplorerPage() {
 
 	const paintCanvas = useCallback((result: QueryResponse | null) => {
 		if (result?.result_type !== "graph" || !result.data) return;
-		// Path queries (e.g. `MATCH path = (n)-[r]->() RETURN path`) repeat shared
-		// endpoints once per row, so the engine returns the same node/edge id many
-		// times. The canvas store rejects duplicate ids (GraphStore.addNode), so
-		// dedupe by id here — keeping the first occurrence — before painting.
-		const nodeMap = new Map<string, QueryResultItem>();
-		for (const n of result.data.nodes) {
-			const id = String(n.id);
-			if (!nodeMap.has(id)) nodeMap.set(id, { ...n, type: "vertex" });
-		}
-		const edgeMap = new Map<string, QueryResultItem>();
-		for (const e of result.data.edges) {
-			const id = String(e.id);
-			if (!edgeMap.has(id)) edgeMap.set(id, { ...e, type: "edge" });
-		}
-		const nodes = [...nodeMap.values()];
-		const edges = [...edgeMap.values()];
-		setCanvasData([...nodes, ...edges]);
-		setNodeCount(nodes.length);
-		setRelCount(edges.length);
-		setSelectedId(null);
+		const data = result.data;
+		// `explorer.transform` span (RFC-025) — time the dedupe of query results
+		// before they're handed to the canvas. No-ops when there's no active run.
+		measureSync(runRef.current, "explorer.transform", (span) => {
+			// Path queries (e.g. `MATCH path = (n)-[r]->() RETURN path`) repeat shared
+			// endpoints once per row, so the engine returns the same node/edge id many
+			// times. The canvas store rejects duplicate ids (GraphStore.addNode), so
+			// dedupe by id here — keeping the first occurrence — before painting.
+			const nodeMap = new Map<string, QueryResultItem>();
+			for (const n of data.nodes) {
+				const id = String(n.id);
+				if (!nodeMap.has(id)) nodeMap.set(id, { ...n, type: "vertex" });
+			}
+			const edgeMap = new Map<string, QueryResultItem>();
+			for (const e of data.edges) {
+				const id = String(e.id);
+				if (!edgeMap.has(id)) edgeMap.set(id, { ...e, type: "edge" });
+			}
+			const nodes = [...nodeMap.values()];
+			const edges = [...edgeMap.values()];
+			setCanvasData([...nodes, ...edges]);
+			setNodeCount(nodes.length);
+			setRelCount(edges.length);
+			setSelectedId(null);
+			span?.setAttribute("explorer.raw_nodes", data.nodes.length);
+			span?.setAttribute("explorer.raw_edges", data.edges.length);
+			span?.setAttribute("explorer.node_count", nodes.length);
+			span?.setAttribute("explorer.edge_count", edges.length);
+		});
 	}, []);
 
 	// Session whose canvas is already painted — skip the auto-restore effect for
 	// it (a fresh send already painted; reopening another session restores it).
 	const restoredRef = useRef<string | null>(null);
+
+	// Open one `explorer.query.run` root per user trigger (run / rerun / restore),
+	// run `work` inside its context, and paint. Graph results flow on to
+	// layout+render, where the canvas bridge closes the root after the first
+	// painted frame; everything else (errors / NL / tabular) has nothing more to
+	// paint, so we close here in `finally`. `explorer.trigger` distinguishes the
+	// three entry points in HyperDX (RFC-026 D2). Running `work` inside the
+	// interaction's context makes its API call — and, via traceparent, the whole
+	// engine subtree — children of this span.
+	const runTraced = useCallback(
+		async (
+			trigger: "run" | "rerun" | "restore",
+			attributes: SpanAttributes,
+			work: () => Promise<QueryResponse | null>,
+		) => {
+			const interaction = startInteraction("explorer.query.run", {
+				"explorer.trigger": trigger,
+				...attributes,
+			});
+			runRef.current = interaction;
+			let willRender = false;
+			try {
+				const result = await withInteraction(interaction, work);
+				willRender = result?.result_type === "graph" && !!result.data;
+				paintCanvas(result);
+			} catch (err) {
+				interaction.span.recordException(err as Error);
+				throw err;
+			} finally {
+				if (!willRender) endInteraction(runRef, interaction);
+			}
+		},
+		[paintCanvas],
+	);
 
 	const handleRun = async (payload: QueryRunPayload) => {
 		if (setupIncomplete) {
@@ -176,19 +239,29 @@ export function ExplorerPage() {
 			);
 			return;
 		}
-		// `send` threads the ask/answer into a session (creating + opening one when
-		// none is active) and runs the engine query. NL has no backend yet, so it
-		// returns null and the session shows an explanatory reply.
-		const { sessionId, result } = await send(payload);
-		restoredRef.current = sessionId;
-		paintCanvas(result);
+		await runTraced(
+			"run",
+			{
+				"explorer.mode": payload.mode,
+				"explorer.language": payload.mode === "ql" ? payload.language : "",
+			},
+			// `send` threads the ask/answer into a session (creating + opening one
+			// when none is active) and runs the engine query. NL has no backend yet,
+			// so it returns null and the session shows an explanatory reply.
+			async () => {
+				const { sessionId, result } = await send(payload);
+				restoredRef.current = sessionId;
+				return result;
+			},
+		);
 	};
 
+	// `rerun` re-issues a stored message's query — triggered by clicking a message
+	// (`rerun`) or by the session-restore effect (`restore`). Both are traced.
 	const handleRerun = useCallback(
-		async (messageId: string) => {
-			paintCanvas(await rerun(messageId));
-		},
-		[rerun, paintCanvas],
+		(messageId: string, trigger: "rerun" | "restore" = "rerun") =>
+			runTraced(trigger, {}, () => rerun(messageId)),
+		[runTraced, rerun],
 	);
 
 	// Re-run the latest query-bearing message when a session is opened, to
@@ -204,7 +277,7 @@ export function ExplorerPage() {
 			.find((m) => m.role === "assistant" && m.sourceQuery);
 		if (!latest) return;
 		restoredRef.current = activeSession.id;
-		void handleRerun(latest.id);
+		void handleRerun(latest.id, "restore");
 	}, [activeSession, handleRerun]);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
@@ -217,6 +290,7 @@ export function ExplorerPage() {
 				onReady={handleReady}
 				onViewTargetChange={setSelectedId}
 				magnet={magnet}
+				interactionRef={runRef}
 			/>
 		</div>
 	);

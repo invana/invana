@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from contextlib import nullcontext
 from typing import Any, ClassVar
 
 from invana.graph.connectors.base.exceptions import ConnectionError
@@ -21,6 +22,23 @@ from invana.graph.types.capabilities import (
 )
 from invana.graph.types.constants import Capability, PropertyType
 from invana.graph.types.data_elements import GraphResponse
+
+# OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025). Core
+# connector code must import cleanly without it, so resolve a tracer lazily and
+# fall back to no-op ``nullcontext`` spans when it isn't installed.
+try:
+    from opentelemetry import trace as _otel_trace
+
+    _tracer = _otel_trace.get_tracer("invana.graph")
+except ImportError:  # telemetry extra not installed
+    _tracer = None
+
+
+def _query_span(name: str):
+    """Start an OTel span for a query stage, or a no-op when telemetry is absent."""
+    if _tracer is None:
+        return nullcontext(None)
+    return _tracer.start_as_current_span(name)
 
 
 class BaseConnector(ABC):
@@ -83,9 +101,21 @@ class BaseConnector(ABC):
         """Execute a raw query via the vendor driver and return raw results."""
 
     async def execute(self, query: str, parameters: dict | None = None) -> GraphResponse:
-        """Execute a query and return a fully deserialised GraphResponse."""
-        raw = await self._execute_raw(query, parameters)
-        return self._serializer.deserialize_graph_response(raw)
+        """Execute a query and return a fully deserialised GraphResponse.
+
+        Split into two child spans (RFC-025) so the trace separates the raw
+        driver round-trip (``graph.query.db_execute``) from result
+        deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
+        the studio joins via W3C trace-context propagation.
+        """
+        with _query_span("graph.query.db_execute"):
+            raw = await self._execute_raw(query, parameters)
+        with _query_span("graph.query.serialize") as span:
+            response = self._serializer.deserialize_graph_response(raw)
+            if span is not None:
+                span.set_attribute("invana.graph.node_count", len(response.nodes))
+                span.set_attribute("invana.graph.edge_count", len(response.edges))
+            return response
 
     @abstractmethod
     async def health_check(self) -> bool:
