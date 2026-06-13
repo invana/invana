@@ -62,7 +62,15 @@ import type * as graph from "@invana/graph";
 import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
-import { type MenuItem, ToggleGroup, ToggleGroupItem } from "@invana/ui";
+import {
+	type MenuItem,
+	ToggleGroup,
+	ToggleGroupItem,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@invana/ui";
 import {
 	Cable,
 	CornerDownRight,
@@ -70,13 +78,17 @@ import {
 	Lasso,
 	Lock,
 	LockOpen,
+	type LucideIcon,
 	Magnet,
 	Maximize,
 	Minus,
 	MousePointer2,
+	Network,
+	Orbit,
 	Play,
 	Redo2,
 	RefreshCw,
+	Share2,
 	Spline,
 	SquareDashedMousePointer,
 	Undo2,
@@ -210,6 +222,11 @@ const LAYOUT_LABEL: Record<string, string> = {
 	"d3-force": "Force (d3)",
 	"elk-layered": "Layered (ELK)",
 	"elk-stress": "Stress (ELK)",
+};
+const LAYOUT_ICON: Record<string, LucideIcon> = {
+	"d3-force": Share2,
+	"elk-layered": Network,
+	"elk-stress": Orbit,
 };
 
 // Select-mode key → registered behaviour id. `useSelectMode` enables exactly one
@@ -788,13 +805,41 @@ function HeaderToolbarItems({
 		...history,
 		div("d1"),
 		{
-			type: "select",
+			// Layout switcher as an inline icon toggle group: every layout is
+			// visible in the header, the active one stays highlighted, and each
+			// reads its name from a hover tooltip. Default (not `outline`) variant
+			// so the items have no borders — only the active one tints its
+			// background.
+			type: "custom",
 			key: "layout",
-			label: "Layout",
-			value: layout,
-			options: layoutOptions,
-			onChange: applyLayout,
+			render: () => (
+				<TooltipProvider delayDuration={300}>
+					<ToggleGroup
+						type="single"
+						size="sm"
+						value={layout}
+						// Radix fires `""` when the active item is re-clicked; ignore that
+						// so a layout is always selected.
+						onValueChange={(v) => v && applyLayout(v)}
+					>
+						{Object.entries(layoutOptions).map(([value, label]) => {
+							const Icon = LAYOUT_ICON[value] ?? Share2;
+							return (
+								<Tooltip key={value}>
+									<TooltipTrigger asChild>
+										<ToggleGroupItem value={value} aria-label={label}>
+											<Icon className="size-4" />
+										</ToggleGroupItem>
+									</TooltipTrigger>
+									<TooltipContent>{label}</TooltipContent>
+								</Tooltip>
+							);
+						})}
+					</ToggleGroup>
+				</TooltipProvider>
+			),
 		},
+		div("d2"),
 		{
 			type: "button",
 			key: "run-layout",
