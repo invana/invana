@@ -406,6 +406,7 @@ function edgeItems(
 function backgroundItems(
 	{ canvas }: GraphBackgroundMenuContext,
 	clip: UseClipboardResult,
+	selectMode: { mode: string; setMode: (mode: string) => void },
 ): MenuItem[] {
 	const layer = canvas.layers.get<graph.GraphLayer>("graph");
 	if (!layer) return [];
@@ -413,6 +414,20 @@ function backgroundItems(
 	const select =
 		canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
 	return [
+		{
+			// Selection mode (click / brush / lasso) — moved off the header toolbar
+			// into the canvas menu. The active mode is ticked; picking one arms its
+			// drag-select behaviour and disables the others (see `useSelectMode`).
+			id: "select-mode",
+			label: "Select mode",
+			icon: SELECT_ICONS[selectMode.mode as keyof typeof SELECT_ICONS],
+			children: Object.keys(SELECT_MODE_IDS).map((key) => ({
+				id: `select-mode-${key}`,
+				label: `${SELECT_LABEL[key]}${key === selectMode.mode ? " ✓" : ""}`,
+				icon: SELECT_ICONS[key as keyof typeof SELECT_ICONS],
+				onClick: () => selectMode.setMode(key),
+			})),
+		},
 		{
 			id: "fit",
 			label: "Fit to content",
@@ -454,6 +469,13 @@ function backgroundItems(
  */
 function CanvasContextMenus() {
 	const clip = useClipboard();
+	// Selection mode lives here now (not the header) — the picker is a submenu of
+	// the background context menu. `useSelectMode` resolves the live engine from
+	// the Canvas context this component is mounted under.
+	const selectMode = useSelectMode(SELECT_MODE_IDS, {
+		labels: SELECT_LABEL,
+		initial: "click",
+	});
 	const node = useCallback(
 		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip),
 		[clip],
@@ -463,8 +485,8 @@ function CanvasContextMenus() {
 		[clip],
 	);
 	const background = useCallback(
-		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip),
-		[clip],
+		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip, selectMode),
+		[clip, selectMode],
 	);
 	return (
 		<>
@@ -642,8 +664,8 @@ export function ExplorerCanvas({
 				state="highlighted"
 			/>
 
-			{/* Selection — Shift+click selects; the header's mode picker arms
-			    exactly one of brush / lasso (both Shift+drag). */}
+			{/* Selection — Shift+click selects; the canvas menu's "Select mode"
+			    submenu arms exactly one of brush / lasso (both Shift+drag). */}
 			<ClickSelectBehaviour id="click-select" targetLayerId="graph" multiple />
 			<BrushSelectBehaviour id="brush-select" targetLayerId="graph" />
 			<LassoSelectBehaviour id="lasso-select" targetLayerId="graph" />
@@ -723,10 +745,6 @@ function HeaderToolbarItems({
 		layerId: "graph",
 		icons: EDGE_TYPE_ICONS,
 	});
-	const { mode, modeOptions, setMode } = useSelectMode(SELECT_MODE_IDS, {
-		labels: SELECT_LABEL,
-		initial: "click",
-	});
 	const { showGrid, toggleGrid } = useGrid();
 
 	const div = (key: string): ToolbarItem => ({ type: "divider", key });
@@ -755,16 +773,6 @@ function HeaderToolbarItems({
 			icon: RefreshCw,
 			label: "Re-render (re-run layout + repaint)",
 			onClick: () => void canvas.refresh(),
-		},
-		div("d2"),
-		{
-			type: "select",
-			key: "select-mode",
-			label: "Select",
-			value: mode,
-			options: modeOptions,
-			icons: SELECT_ICONS,
-			onChange: setMode,
 		},
 		div("d3"),
 		...style,
