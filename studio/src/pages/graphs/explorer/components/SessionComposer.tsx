@@ -124,7 +124,7 @@ export function SessionComposer({
 		const defaultQuery =
 			defaultLanguage === "gremlin"
 				? "g.V().hasLabel('Person').limit(25)"
-				: "MATCH (n) RETURN n LIMIT 25";
+				: "MATCH (n) WITH n LIMIT 10 MATCH (n)-[r]->(m) RETURN n, r, m";
 
 		const state = EditorState.create({
 			doc: defaultQuery,
