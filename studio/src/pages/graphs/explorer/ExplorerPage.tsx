@@ -1,4 +1,8 @@
-import { CanvasContext } from "@invana/canvas-react";
+import {
+	CanvasContext,
+	CanvasMessageBar,
+	GraphStatusBar as CanvasStatusBar,
+} from "@invana/canvas-react";
 import type { GraphData as EngineGraphData, GraphCanvas } from "@invana/graph";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -98,8 +102,6 @@ export function ExplorerPage() {
 	const llmProviders = llmProvidersResponse?.items ?? [];
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
-	const [nodeCount, setNodeCount] = useState(0);
-	const [relCount, setRelCount] = useState(0);
 
 	// Root span for the in-flight query run (RFC-025). Held in a ref so the
 	// transform / adapt / layout / render stages — which span several async
@@ -199,8 +201,6 @@ export function ExplorerPage() {
 			const nodes = [...nodeMap.values()];
 			const edges = [...edgeMap.values()];
 			setCanvasData([...nodes, ...edges]);
-			setNodeCount(nodes.length);
-			setRelCount(edges.length);
 			setSelectedId(null);
 			span?.setAttribute("explorer.raw_nodes", data.nodes.length);
 			span?.setAttribute("explorer.raw_edges", data.edges.length);
@@ -385,14 +385,14 @@ export function ExplorerPage() {
 					content: <InspectorPanel selected={selected} allItems={canvasData} />,
 				}}
 				statusMetrics={
-					<div className="flex items-center gap-3">
-						<span>{nodeCount} nodes</span>
-						<span>{relCount} relationships</span>
-						<span>
-							{sessions.length} session{sessions.length === 1 ? "" : "s"}
-						</span>
-					</div>
+					// Live engine telemetry — node/edge totals, zoom, pan, pointer world
+					// position, hovered node/edge, selection counts — self-wired off the
+					// lifted CanvasContext (same status bar as the canvas-react story).
+					canvas ? <CanvasStatusBar /> : null
 				}
+				// The shared message bar — shows whatever was last pushed via
+				// Canvas.showMessage (e.g. a layout's "Running… / ready"); empty when idle.
+				footerRightExtras={canvas ? <CanvasMessageBar /> : null}
 			/>
 		</CanvasContext.Provider>
 	);

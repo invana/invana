@@ -30,13 +30,9 @@ export function GraphStatusBar({ graph, metrics }: Props) {
 					}`}
 				/>
 				{graph ? (
-					<>
-						<span className={isActive ? "text-green-500" : "text-destructive"}>
-							{isActive ? "ACTIVE" : graph.status}
-						</span>
-						<span>•</span>
-						<span className="font-mono">{graph.uri}</span>
-					</>
+					<span className={isActive ? "text-green-500" : "text-destructive"}>
+						{isActive ? "ACTIVE" : graph.status}
+					</span>
 				) : (
 					<span>API is down — reconnecting…</span>
 				)}
