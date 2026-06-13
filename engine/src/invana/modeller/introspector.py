@@ -53,6 +53,11 @@ class Introspector:
         caps = connector.capabilities()
         reader = connector.schema_reader
 
+        # 0. The introspected "global" model is fully rebuilt on every run. Drop
+        #    any stale draft from a prior interrupted introspect so it doesn't
+        #    trip create_version's one-draft guard and block this refresh.
+        await self._store.delete_draft_versions(session, model_id)
+
         # 1. Create a new draft version
         version = await self._store.create_version(session, model_id=model_id)
         discovered: dict[str, int] = {}

@@ -159,6 +159,23 @@ class ModelStore:
 
         return version
 
+    async def delete_draft_versions(self, session: AsyncSession, model_id: str) -> int:
+        """Delete any draft versions of a model. Returns how many were removed.
+
+        Used by introspection of the system-managed ``global`` model, which is
+        fully rebuilt on every run: a stale draft left by a prior interrupted
+        introspect would otherwise trip ``create_version``'s one-draft guard and
+        block all future refreshes. ORM delete so version children cascade.
+        """
+        stmt = select(GraphVersion).where(GraphVersion.model_id == model_id, GraphVersion.status == "draft")
+        result = await session.execute(stmt)
+        drafts = list(result.scalars().all())
+        for draft in drafts:
+            await session.delete(draft)
+        if drafts:
+            await session.flush()
+        return len(drafts)
+
     async def get_version(self, session: AsyncSession, version_id: str) -> GraphVersion | None:
         stmt = select(GraphVersion).where(GraphVersion.id == version_id).options(*_VERSION_EAGER)
         result = await session.execute(stmt)
