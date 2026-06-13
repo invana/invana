@@ -62,7 +62,7 @@ import type * as graph from "@invana/graph";
 import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
-import type { MenuItem } from "@invana/ui";
+import { type MenuItem, ToggleGroup, ToggleGroupItem } from "@invana/ui";
 import {
 	Cable,
 	CornerDownRight,
@@ -94,6 +94,15 @@ import {
 // `CanvasConfig` isn't re-exported by canvas-react@0.0.4 — derive it from the
 // `<Canvas config>` prop so the option objects stay precisely typed.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
+
+// PixiJS render backend. `@invana/canvas` defaults to `"webgpu"`; we default the
+// Explorer to `"webgl"` (see ExplorerPage) because WebGPU intermittently crashes
+// in PixiJS 8 — the header switcher lets a user flip between them at runtime.
+export type CanvasBackend = "webgl" | "webgpu";
+const BACKEND_LABEL: Record<CanvasBackend, string> = {
+	webgl: "WebGL",
+	webgpu: "WebGPU",
+};
 
 // "Focus on node" zooms in to at least this scale so the focused node is
 // comfortably sized.
@@ -613,6 +622,9 @@ interface ExplorerCanvasProps {
 	/** Telemetry root for the in-flight query run (RFC-025); layout/render spans
 	 *  attach here, and the run's root span closes after the first painted frame. */
 	interactionRef?: InteractionRef;
+	/** PixiJS render backend. Switching it remounts the canvas (see `key` below),
+	 *  since the renderer is chosen once at `Application.init`. */
+	backend: CanvasBackend;
 }
 
 export function ExplorerCanvas({
@@ -621,9 +633,21 @@ export function ExplorerCanvas({
 	onViewTargetChange,
 	magnet,
 	interactionRef,
+	backend,
 }: ExplorerCanvasProps) {
 	return (
-		<CanvasRoot autoResize config={APP_OPTIONS} className="w-full h-full">
+		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
+		// flipping `preference` only takes effect on a fresh mount — keying on it
+		// tears down and rebuilds the canvas (re-feeding `data` → re-layout). The
+		// default is WebGL because WebGPU intermittently crashes in PixiJS 8's
+		// `BindGroupSystem._createBindGroup` (null `gpuProgram.layout`).
+		<CanvasRoot
+			key={backend}
+			autoResize
+			preference={backend}
+			config={APP_OPTIONS}
+			className="w-full h-full"
+		>
 			<BackgroundLayer id="background" />
 			<GraphLayer
 				id="graph"
@@ -697,6 +721,9 @@ export function ExplorerCanvas({
 interface ExplorerHeaderToolbarProps {
 	magnet: boolean;
 	onToggleMagnet: () => void;
+	/** Active render backend; the switcher select reflects + sets it. */
+	backend: CanvasBackend;
+	onBackendChange: (backend: CanvasBackend) => void;
 }
 
 /**
@@ -709,10 +736,17 @@ interface ExplorerHeaderToolbarProps {
 export function ExplorerHeaderToolbar({
 	magnet,
 	onToggleMagnet,
+	backend,
+	onBackendChange,
 }: ExplorerHeaderToolbarProps) {
 	return (
 		<GraphHistoryProvider layerId="graph">
-			<HeaderToolbarItems magnet={magnet} onToggleMagnet={onToggleMagnet} />
+			<HeaderToolbarItems
+				magnet={magnet}
+				onToggleMagnet={onToggleMagnet}
+				backend={backend}
+				onBackendChange={onBackendChange}
+			/>
 		</GraphHistoryProvider>
 	);
 }
@@ -720,6 +754,8 @@ export function ExplorerHeaderToolbar({
 function HeaderToolbarItems({
 	magnet,
 	onToggleMagnet,
+	backend,
+	onBackendChange,
 }: ExplorerHeaderToolbarProps) {
 	// Live engine — the toolbar only renders once it's live, so this is non-null.
 	const canvas = useCanvas();
@@ -788,6 +824,31 @@ function HeaderToolbarItems({
 			onToggle: toggleGrid,
 		},
 		div("d7"),
+		{
+			// Render backend switcher. Flipping it remounts the canvas (ExplorerCanvas
+			// keys on `backend`) so PixiJS re-inits with the chosen renderer. WebGL is
+			// the safe default; WebGPU is offered for users whose drivers handle it.
+			type: "custom",
+			key: "renderer",
+			render: () => (
+				<ToggleGroup
+					type="single"
+					size="sm"
+					variant="outline"
+					value={backend}
+					// Radix fires `""` when the active item is re-clicked; ignore that so
+					// a backend is always selected.
+					onValueChange={(v) => v && onBackendChange(v as CanvasBackend)}
+				>
+					{(Object.keys(BACKEND_LABEL) as CanvasBackend[]).map((b) => (
+						<ToggleGroupItem key={b} value={b} aria-label={BACKEND_LABEL[b]}>
+							{BACKEND_LABEL[b]}
+						</ToggleGroupItem>
+					))}
+				</ToggleGroup>
+			),
+		},
+		div("d8"),
 		{
 			type: "toggle",
 			key: "magnet",

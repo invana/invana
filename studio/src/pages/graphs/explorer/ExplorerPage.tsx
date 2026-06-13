@@ -25,6 +25,7 @@ import type {
 } from "../../../types/query";
 import { GraphDetail } from "../components/GraphDetail";
 import {
+	type CanvasBackend,
 	ExplorerCanvas,
 	ExplorerHeaderToolbar,
 } from "./components/ExplorerCanvas";
@@ -39,6 +40,9 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 	"cypher",
 	"gremlin",
 ];
+
+// localStorage key persisting the user's render-backend choice across reloads.
+const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
 
 export function ExplorerPage() {
 	const { username, graphSlug } = useParams<{
@@ -112,6 +116,17 @@ export function ExplorerPage() {
 	// up its 1st-degree neighbours; off: only the hovered node lights up.
 	const [magnet, setMagnet] = useState(true);
 	const toggleMagnet = useCallback(() => setMagnet((m) => !m), []);
+
+	// Render backend (PixiJS). Defaults to WebGL — WebGPU intermittently crashes in
+	// PixiJS 8's bind-group setup (null `gpuProgram.layout`). The header switcher
+	// lets a user opt into WebGPU; the choice persists across reloads.
+	const [backend, setBackendState] = useState<CanvasBackend>(() =>
+		localStorage.getItem(BACKEND_STORAGE_KEY) === "webgpu" ? "webgpu" : "webgl",
+	);
+	const setBackend = useCallback((b: CanvasBackend) => {
+		localStorage.setItem(BACKEND_STORAGE_KEY, b);
+		setBackendState(b);
+	}, []);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -291,6 +306,7 @@ export function ExplorerPage() {
 				onViewTargetChange={setSelectedId}
 				magnet={magnet}
 				interactionRef={runRef}
+				backend={backend}
 			/>
 		</div>
 	);
@@ -335,6 +351,8 @@ export function ExplorerPage() {
 						<ExplorerHeaderToolbar
 							magnet={magnet}
 							onToggleMagnet={toggleMagnet}
+							backend={backend}
+							onBackendChange={setBackend}
 						/>
 					) : undefined
 				}
