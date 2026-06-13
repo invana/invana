@@ -299,7 +299,7 @@ export function ExplorerPage() {
 	// derived `selected` (above) drives the right-side InspectorPanel. The toolbar
 	// lives in the header, so the canvas fills the main area edge-to-edge.
 	const canvasContent = (
-		<div className="relative w-full h-full">
+		<div className="relative w-full h-full overflow-hidden">
 			<ExplorerCanvas
 				data={graphData}
 				onReady={handleReady}
