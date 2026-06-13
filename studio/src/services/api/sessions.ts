@@ -40,6 +40,7 @@ interface ApiSummary {
 	message_count: number;
 	node_count: number;
 	edge_count: number;
+	last_status?: "running" | "ok" | "error" | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -128,6 +129,7 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		archived: s.archived,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
+		lastStatus: s.last_status ?? undefined,
 		llmProviderId: s.llm_provider_id ?? undefined,
 	};
 }

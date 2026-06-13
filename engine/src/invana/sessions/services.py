@@ -239,6 +239,9 @@ async def send_message(
             sess.edge_count += edges
 
     sess.message_count += 2
+    # The assistant reply is always the newest message, so its status is the
+    # session's latest status (drives the list's failed/running indicator).
+    sess.last_status = assistant_msg.status
     if not sess.title:
         sess.title = _title_from_text(payload.content)
     await session.flush()
@@ -290,5 +293,10 @@ async def rerun_message(
     message.node_count = nodes
     message.edge_count = edges
     message.content = _summary(result, nodes, edges)
+    # Seqs are contiguous (1..message_count), so the last message has
+    # seq == message_count. Re-running it clears any prior failed status on the
+    # list; re-running an older message leaves the latest status untouched.
+    if message.seq == sess.message_count:
+        sess.last_status = message.status
     await session.flush()
     return message, result

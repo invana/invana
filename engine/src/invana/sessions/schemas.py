@@ -76,6 +76,9 @@ class SessionSummary(BaseModel):
     message_count: int
     node_count: int
     edge_count: int
+    # Status of the latest assistant reply — lets the list mark a session
+    # failed/running without its messages. Null until the first reply lands.
+    last_status: SessionMessageStatus | None = None
     created_at: datetime
     updated_at: datetime
 

@@ -46,6 +46,12 @@ export interface Session {
 	nodeCount: number;
 	edgeCount: number;
 	/**
+	 * Status of the latest assistant reply, denormalized by the engine so the
+	 * list row can show failed/running without loading the session's messages
+	 * (the list summary carries no messages). Undefined until the first reply.
+	 */
+	lastStatus?: SessionMessageStatus;
+	/**
 	 * Which LLM provider produced this session, when applicable. The engine
 	 * doesn't record this yet (NL queries aren't wired), so it's undefined
 	 * today — the list's "filter by LLM" control reads it forward-lookingly.

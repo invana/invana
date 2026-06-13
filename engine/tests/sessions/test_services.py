@@ -126,6 +126,8 @@ class TestSessionPersistence:
         assert assistant_msg.status == SessionMessageStatus.ok
         assert "wired" in assistant_msg.content.lower()
         assert sess.message_count == 2
+        # The latest reply's status is denormalized onto the session for the list.
+        assert sess.last_status == SessionMessageStatus.ok
         # Title is derived from the first prompt when none was given.
         assert sess.title.startswith("who are the people")
 

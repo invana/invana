@@ -414,11 +414,15 @@ function SessionRow({
 	onPin: (id: string, pinned: boolean) => void;
 	onArchive: (id: string, archived: boolean) => void;
 }) {
-	const last = session.messages[session.messages.length - 1];
+	// List summaries carry no messages, so the status comes from the engine's
+	// denormalized `lastStatus`; fall back to the last loaded message (detail
+	// view / freshly-sent session) when it's present.
+	const status =
+		session.lastStatus ?? session.messages[session.messages.length - 1]?.status;
 	const dotClass =
-		last?.status === "error"
+		status === "error"
 			? "bg-destructive"
-			: last?.status === "running"
+			: status === "running"
 				? "bg-amber-400 animate-pulse"
 				: session.nodeCount + session.edgeCount > 0
 					? "bg-blue-400"

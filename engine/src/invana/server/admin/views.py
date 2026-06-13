@@ -396,6 +396,7 @@ class SessionView(ModelView):
         "message_count",
         "node_count",
         "edge_count",
+        "last_status",
         "created_at",
         "updated_at",
     ]

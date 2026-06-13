@@ -97,6 +97,11 @@ class Session(Base):
     node_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     edge_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    # Denormalized status of the latest assistant reply, so the list can mark a
+    # session failed/running without loading its messages. Null until the first
+    # reply lands. Maintained alongside the totals above on send/rerun.
+    last_status: Mapped[SessionMessageStatus | None] = mapped_column(_status_enum, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
