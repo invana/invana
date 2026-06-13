@@ -859,15 +859,22 @@ function HeaderToolbarItems({
 					>
 						{Object.entries(layoutOptions).map(([value, label]) => {
 							const Icon = LAYOUT_ICON[value] ?? Share2;
+							// Keep the item itself the (clean) ToggleGroup child so it
+							// keeps its `data-state="on"` highlight — wrapping it in
+							// `TooltipTrigger asChild` would clobber that with the
+							// tooltip's own `data-state`. The trigger lives on an inner
+							// span instead.
 							return (
-								<Tooltip key={value}>
-									<TooltipTrigger asChild>
-										<ToggleGroupItem value={value} aria-label={label}>
-											<Icon className="size-4" />
-										</ToggleGroupItem>
-									</TooltipTrigger>
-									<TooltipContent>{label}</TooltipContent>
-								</Tooltip>
+								<ToggleGroupItem key={value} value={value} aria-label={label}>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<span className="flex size-full items-center justify-center">
+												<Icon className="size-4" />
+											</span>
+										</TooltipTrigger>
+										<TooltipContent>{label}</TooltipContent>
+									</Tooltip>
+								</ToggleGroupItem>
 							);
 						})}
 					</ToggleGroup>
