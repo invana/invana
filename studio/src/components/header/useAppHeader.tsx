@@ -39,7 +39,11 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const segments = computeSegments(pathname, user?.username, pageLabel);
 
 	return {
-		className: "!h-[38px]",
+		// `relative` makes the header bar a positioning context so a `center`
+		// consumer can dead-center its content against the full header width
+		// (e.g. Explorer's canvas toolbar) rather than only within the leftover
+		// space between the breadcrumb and the right-side controls.
+		className: "!h-[38px] relative",
 		left: (
 			<div className="flex items-center gap-2 px-2 min-w-0">
 				<Link

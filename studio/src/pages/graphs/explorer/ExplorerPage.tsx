@@ -348,12 +348,18 @@ export function ExplorerPage() {
 				pageLabel="Explorer"
 				headerCenter={
 					canvas ? (
-						<ExplorerHeaderToolbar
-							magnet={magnet}
-							onToggleMagnet={toggleMagnet}
-							backend={backend}
-							onBackendChange={setBackend}
-						/>
+						// Dead-center the toolbar against the full header width (the header
+						// nav is `relative`; see useAppHeader). Absolute positioning lifts
+						// it out of the flex flow so its midpoint stays at the header's
+						// midpoint regardless of the breadcrumb / right-control widths.
+						<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+							<ExplorerHeaderToolbar
+								magnet={magnet}
+								onToggleMagnet={toggleMagnet}
+								backend={backend}
+								onBackendChange={setBackend}
+							/>
+						</div>
 					) : undefined
 				}
 				leftSection={
