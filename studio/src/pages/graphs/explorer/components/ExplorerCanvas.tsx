@@ -96,7 +96,7 @@ import {
 	ZoomIn,
 	ZoomOut,
 } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
 	type InteractionRef,
 	endInteraction,
@@ -567,10 +567,18 @@ function AutoLayoutBridge({
 	useEffect(() => {
 		if (!canvas || data.nodes.length === 0) return;
 
+		// Surface layout progress on the shared message channel — a sticky
+		// "Laying out…" while d3-force settles, replaced by a "ready" that
+		// auto-clears after 3s. This is what lights up <CanvasMessageBar> on every
+		// query run (the only path that emits to the channel automatically).
+		canvas.showMessage(`Laying out ${data.nodes.length} nodes…`);
+
 		// No active query run → just lay out (e.g. theme repaint, session restore).
 		const interaction = interactionRef?.current ?? null;
 		if (!interaction) {
-			void canvas.runLayout(ACTIVE_LAYOUT_ID);
+			void canvas
+				.runLayout(ACTIVE_LAYOUT_ID)
+				.finally(() => canvas.showMessage("Graph ready", 3000));
 			return;
 		}
 
@@ -585,6 +593,7 @@ function AutoLayoutBridge({
 		void canvas.runLayout(ACTIVE_LAYOUT_ID).finally(() => {
 			layoutSpan.end();
 			if (cancelled) return;
+			canvas.showMessage("Graph ready", 3000);
 			const renderSpan = startChild(interaction, "explorer.render");
 			requestAnimationFrame(() => {
 				renderSpan.end();
@@ -785,6 +794,32 @@ function HeaderToolbarItems({
 		// picker apply on demand instead of double-running on mount.
 		applyInitial: false,
 	});
+
+	// Announce a header-picker layout run on the shared message channel: a sticky
+	// "Running…" while it runs, then a "ready" that auto-clears after 3s. (Query
+	// auto-layouts are announced separately by <AutoLayoutBridge>.)
+	const wasRunning = useRef(false);
+	useEffect(() => {
+		const label = LAYOUT_LABEL[layout] ?? layout;
+		if (isRunning && !wasRunning.current)
+			canvas.showMessage(`Running ${label} layout…`);
+		else if (!isRunning && wasRunning.current)
+			canvas.showMessage(`${label} layout ready`, 3000);
+		wasRunning.current = isRunning;
+	}, [isRunning, layout, canvas]);
+
+	// Announce the magnet toggle on the message channel (skip the initial mount).
+	const firstMagnet = useRef(true);
+	useEffect(() => {
+		if (firstMagnet.current) {
+			firstMagnet.current = false;
+			return;
+		}
+		canvas.showMessage(
+			magnet ? "Hover highlights neighbours" : "Hover highlights the node only",
+			2500,
+		);
+	}, [magnet, canvas]);
 	const view = useViewSection({
 		icons: {
 			zoomIn: ZoomIn,
