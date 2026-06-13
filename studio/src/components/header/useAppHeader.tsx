@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { FullscreenToggle } from "../FullscreenToggle";
+import { GitHubStars } from "../GitHubStars";
 import { ThemeToggle } from "../ThemeToggle";
 import { UserMenu } from "./UserMenu";
 
@@ -26,7 +27,7 @@ interface AppHeaderOptions {
 /**
  * Shared AppLayoutV2 header config. Renders:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [ThemeToggle] [FullscreenToggle] [panelControls] [UserMenu]
+ *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeToggle] [FullscreenToggle] [panelControls] [UserMenu]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
  * - Graph-scoped (`/u/:username/:graphSlug[/...]`): `username / graphSlug / pageLabel`.
@@ -68,6 +69,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		right: (
 			<div className="flex items-center gap-4 px-2">
 				{rightExtras}
+				<GitHubStars />
 				<ThemeToggle />
 				<FullscreenToggle />
 				{panelControls}
