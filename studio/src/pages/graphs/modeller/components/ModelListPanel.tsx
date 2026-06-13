@@ -21,6 +21,7 @@ import {
 	Boxes,
 	ChevronRight,
 	MoreVertical,
+	PanelLeftClose,
 	Plus,
 	RefreshCw,
 } from "lucide-react";
@@ -39,6 +40,8 @@ interface Props {
 	onEditModel: (model: GraphModelSummary) => void;
 	onIntrospect: () => void;
 	introspecting: boolean;
+	/** Collapse the panel, handing the freed width back to the canvas. */
+	onClose: () => void;
 }
 
 const fmtDate = (iso: string) =>
@@ -71,6 +74,7 @@ export function ModelListPanel({
 	onEditModel,
 	onIntrospect,
 	introspecting,
+	onClose,
 }: Props) {
 	const del = useDeleteModelMutation(username, graphSlug);
 	const [deleting, setDeleting] = useState<GraphModelSummary | null>(null);
@@ -188,6 +192,12 @@ export function ModelListPanel({
 							name: "New model",
 							icon: Plus,
 							onClick: onNewModel,
+						},
+						{
+							key: "close",
+							name: "Collapse panel",
+							icon: PanelLeftClose,
+							onClick: onClose,
 						},
 					],
 				}}

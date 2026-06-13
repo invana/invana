@@ -16,14 +16,19 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	ChevronRight,
+	Info,
+	PanelLeftClose,
+	PanelLeftOpen,
+	PanelRightClose,
+	PanelRightOpen,
 	Pencil,
 	RefreshCw,
 	Save,
 	Send,
 	Workflow,
 } from "lucide-react";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import {
@@ -69,6 +74,40 @@ export function ModellerPage() {
 	const u = username ?? "";
 	const g = graphSlug ?? "";
 	const qc = useQueryClient();
+
+	// Collapsed panel state lives in the URL (`?models=closed` / `?detail=closed`),
+	// mirroring the Explorer Sessions convention. Each panel's header collapse
+	// control sets its param; a re-open button in the page header (shown only
+	// while collapsed) clears it. The left panel also re-opens via the left-rail
+	// Modeller icon, which drops the query string.
+	const [searchParams, setSearchParams] = useSearchParams();
+	const leftClosed = searchParams.get("models") === "closed";
+	const rightClosed = searchParams.get("detail") === "closed";
+	const setPanelParam = useCallback(
+		(key: string, closed: boolean) => {
+			const next = new URLSearchParams(searchParams);
+			if (closed) next.set(key, "closed");
+			else next.delete(key);
+			setSearchParams(next, { replace: true });
+		},
+		[searchParams, setSearchParams],
+	);
+	const closeLeft = useCallback(
+		() => setPanelParam("models", true),
+		[setPanelParam],
+	);
+	const openLeft = useCallback(
+		() => setPanelParam("models", false),
+		[setPanelParam],
+	);
+	const closeRight = useCallback(
+		() => setPanelParam("detail", true),
+		[setPanelParam],
+	);
+	const openRight = useCallback(
+		() => setPanelParam("detail", false),
+		[setPanelParam],
+	);
 
 	const { data: graph, isLoading: graphLoading } = useGraphConnectionQuery(
 		username,
@@ -266,6 +305,7 @@ export function ModellerPage() {
 				onEditModel={(m) => setModelForm({ open: true, model: m })}
 				onIntrospect={handleIntrospect}
 				introspecting={introspecting}
+				onClose={closeLeft}
 			/>
 		);
 	} else {
@@ -407,12 +447,22 @@ export function ModellerPage() {
 						content: detailBody,
 					},
 				]}
+				headerActions={{
+					rightNavItems: [
+						{
+							key: "close",
+							name: "Collapse panel",
+							icon: PanelLeftClose,
+							onClick: closeLeft,
+						},
+					],
+				}}
 			/>
 		);
 	}
 
 	// ── Right section ──────────────────────────────────────────────────────────
-	const rightContent =
+	const rightBody =
 		isLoading || (modelId && versionLoading) ? (
 			<div className="p-6 flex flex-col gap-3">
 				<Skeleton className="h-6 w-48" />
@@ -444,19 +494,74 @@ export function ModellerPage() {
 				</div>
 			</ScrollArea>
 		);
+	// Wrapped in a TabbedPanel (like the Explorer Inspector) so the header can
+	// host the collapse control, matching the Sessions/left-panel pattern.
+	const rightContent = (
+		<TabbedPanel
+			defaultTab="details"
+			tabs={[
+				{ value: "details", label: "Details", icon: Info, content: rightBody },
+			]}
+			headerActions={{
+				rightNavItems: [
+					{
+						key: "close",
+						name: "Collapse panel",
+						icon: PanelRightClose,
+						onClick: closeRight,
+					},
+				],
+			}}
+		/>
+	);
+
+	// Re-open controls for the page header — each appears only while its panel
+	// is collapsed.
+	const reopenControls =
+		leftClosed || rightClosed ? (
+			<div className="flex items-center gap-1">
+				{leftClosed && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						onClick={openLeft}
+						title="Show models panel"
+					>
+						<PanelLeftOpen className="w-4 h-4" />
+					</Button>
+				)}
+				{rightClosed && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						onClick={openRight}
+						title="Show details panel"
+					>
+						<PanelRightOpen className="w-4 h-4" />
+					</Button>
+				)}
+			</div>
+		) : null;
 
 	return (
 		<>
 			<GraphDetail
 				sectionId="modeller"
 				pageLabel="Modeller"
-				leftSection={{
-					defaultSize: "260px",
-					minSize: "200px",
-					maxSize: "900px",
-					collapsible: false,
-					content: leftContent,
-				}}
+				headerRightExtras={reopenControls}
+				leftSection={
+					leftClosed
+						? undefined
+						: {
+								defaultSize: "260px",
+								minSize: "200px",
+								maxSize: "900px",
+								collapsible: false,
+								content: leftContent,
+							}
+				}
 				mainSection={{
 					defaultSize: "600px",
 					minSize: "300px",
@@ -480,13 +585,17 @@ export function ModellerPage() {
 						</div>
 					),
 				}}
-				rightSection={{
-					defaultSize: "360px",
-					minSize: "240px",
-					maxSize: "600px",
-					collapsible: false,
-					content: rightContent,
-				}}
+				rightSection={
+					rightClosed
+						? undefined
+						: {
+								defaultSize: "360px",
+								minSize: "240px",
+								maxSize: "600px",
+								collapsible: false,
+								content: rightContent,
+							}
+				}
 				statusMetrics={
 					modelId && version ? (
 						<div className="flex items-center gap-3">

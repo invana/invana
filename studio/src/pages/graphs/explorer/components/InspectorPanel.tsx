@@ -1,13 +1,24 @@
 import { ScrollArea, TabbedPanel } from "@invana/ui";
-import { Network, Paintbrush, SlidersHorizontal } from "lucide-react";
+import {
+	Network,
+	Paintbrush,
+	PanelRightClose,
+	SlidersHorizontal,
+} from "lucide-react";
 import type { QueryResultItem } from "../../../../types/query";
 
 interface InspectorPanelProps {
 	selected: QueryResultItem | null;
 	allItems: QueryResultItem[];
+	/** Collapse the panel, handing the freed width back to the canvas. */
+	onClose: () => void;
 }
 
-export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
+export function InspectorPanel({
+	selected,
+	allItems,
+	onClose,
+}: InspectorPanelProps) {
 	// Resolve the full item from allItems using selected.id
 	const item = selected
 		? (allItems.find((i) => i.id === selected.id) ?? selected)
@@ -112,6 +123,16 @@ export function InspectorPanel({ selected, allItems }: InspectorPanelProps) {
 					content: designContent,
 				},
 			]}
+			headerActions={{
+				rightNavItems: [
+					{
+						key: "close",
+						name: "Collapse panel",
+						icon: PanelRightClose,
+						onClick: onClose,
+					},
+				],
+			}}
 		/>
 	);
 }

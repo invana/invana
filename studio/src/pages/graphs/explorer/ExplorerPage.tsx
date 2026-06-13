@@ -4,6 +4,8 @@ import {
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-react";
 import type { GraphData as EngineGraphData, GraphCanvas } from "@invana/graph";
+import { Button } from "@invana/ui";
+import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -84,17 +86,39 @@ export function ExplorerPage() {
 		backToList,
 	} = useSessions(username, graphSlug);
 
-	// Collapsed state lives in the URL (`?sessions=closed`), mirroring the
-	// Settings panel convention. The header's collapse control sets it; the
-	// left-rail Explorer icon navigates to the bare path, which drops the
-	// param and brings the panel back.
+	// Collapsed state lives in the URL (`?sessions=closed` for the left panel,
+	// `?inspector=closed` for the right), mirroring the Settings panel
+	// convention. Each panel's header collapse control sets its param; a re-open
+	// button in the header (shown only while collapsed) clears it. The left panel
+	// also re-opens via the left-rail Explorer icon, which drops the query string.
 	const [searchParams, setSearchParams] = useSearchParams();
 	const sessionsClosed = searchParams.get("sessions") === "closed";
-	const closeSessions = useCallback(() => {
-		const next = new URLSearchParams(searchParams);
-		next.set("sessions", "closed");
-		setSearchParams(next, { replace: true });
-	}, [searchParams, setSearchParams]);
+	const inspectorClosed = searchParams.get("inspector") === "closed";
+	const setPanelParam = useCallback(
+		(key: string, closed: boolean) => {
+			const next = new URLSearchParams(searchParams);
+			if (closed) next.set(key, "closed");
+			else next.delete(key);
+			setSearchParams(next, { replace: true });
+		},
+		[searchParams, setSearchParams],
+	);
+	const closeSessions = useCallback(
+		() => setPanelParam("sessions", true),
+		[setPanelParam],
+	);
+	const openSessions = useCallback(
+		() => setPanelParam("sessions", false),
+		[setPanelParam],
+	);
+	const closeInspector = useCallback(
+		() => setPanelParam("inspector", true),
+		[setPanelParam],
+	);
+	const openInspector = useCallback(
+		() => setPanelParam("inspector", false),
+		[setPanelParam],
+	);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
 		username,
 		graphSlug,
@@ -339,6 +363,36 @@ export function ExplorerPage() {
 		/>
 	);
 
+	// Re-open controls for the page header — each appears only while its panel
+	// is collapsed.
+	const reopenControls =
+		sessionsClosed || inspectorClosed ? (
+			<div className="flex items-center gap-1">
+				{sessionsClosed && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						onClick={openSessions}
+						title="Show sessions panel"
+					>
+						<PanelLeftOpen className="w-4 h-4" />
+					</Button>
+				)}
+				{inspectorClosed && (
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						onClick={openInspector}
+						title="Show inspector panel"
+					>
+						<PanelRightOpen className="w-4 h-4" />
+					</Button>
+				)}
+			</div>
+		) : null;
+
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
 		// in GraphDetail's header (a sibling of <Canvas>, outside its own provider).
@@ -346,6 +400,7 @@ export function ExplorerPage() {
 			<GraphDetail
 				sectionId="explorer"
 				pageLabel="Explorer"
+				headerRightExtras={reopenControls}
 				headerCenter={
 					canvas ? (
 						// Dead-center the toolbar against the full header width (the header
@@ -383,13 +438,23 @@ export function ExplorerPage() {
 					// — it'll render empty. The leftSection banner is the explainer.
 					content: canvasContent,
 				}}
-				rightSection={{
-					defaultSize: "280px",
-					minSize: "240px",
-					maxSize: "360px",
-					collapsible: false,
-					content: <InspectorPanel selected={selected} allItems={canvasData} />,
-				}}
+				rightSection={
+					inspectorClosed
+						? undefined
+						: {
+								defaultSize: "280px",
+								minSize: "240px",
+								maxSize: "360px",
+								collapsible: false,
+								content: (
+									<InspectorPanel
+										selected={selected}
+										allItems={canvasData}
+										onClose={closeInspector}
+									/>
+								),
+							}
+				}
 				statusMetrics={
 					// Live engine telemetry — node/edge totals, zoom, pan, pointer world
 					// position, hovered node/edge, selection counts — self-wired off the
