@@ -362,7 +362,12 @@ function SessionList({
 					<SearchInput value={search} onChange={onSearchChange} />
 				</div>
 			)}
-			<ScrollArea className="flex-1 min-h-0">
+			{/* Radix's viewport wraps children in a `display:table; min-width:100%`
+			    div, which sizes to the widest row and defeats `truncate` (titles
+			    spill past the panel edge instead of clipping). Forcing the wrapper
+			    back to `block` gives the rows a real width to truncate against, so
+			    they reflow as the panel is resized. */}
+			<ScrollArea className="flex-1 min-h-0 [&_[data-radix-scroll-area-viewport]>div]:!block">
 				{filtered.length === 0 ? (
 					<div className="flex flex-col items-center justify-center gap-2 text-muted-foreground px-6 py-16">
 						<MessageSquare className="w-8 h-8 opacity-20" />
@@ -441,10 +446,17 @@ function SessionRow({
 			>
 				<span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
 				<span className="min-w-0 flex-1">
-					<span className="block text-foreground truncate pr-12">
+					{/* Reserve room for the action buttons only when they're visible:
+					    on hover (both buttons), or always for a pinned row (the pin
+					    stays shown). Otherwise the title uses the full width. */}
+					<span
+						className={`block text-foreground truncate group-hover:pr-12 ${
+							session.pinned ? "pr-8" : "pr-2"
+						}`}
+					>
 						{session.title}
 					</span>
-					<span className="flex items-center gap-1.5 text-muted-foreground">
+					<span className="flex items-center gap-1.5 text-sm text-muted-foreground">
 						{hasCounts && (
 							<>
 								<span className="text-blue-400" title="nodes">
