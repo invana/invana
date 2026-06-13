@@ -50,6 +50,8 @@ interface GraphDetailProps {
 	/** Page-specific header right extras (e.g. Modeller's Introspect +
 	 *  Refresh buttons). */
 	headerRightExtras?: ReactNode;
+	/** Panel collapse/expand toggles, rendered next to the profile menu. */
+	headerPanelControls?: ReactNode;
 	/** Page-specific header center content (e.g. Explorer's canvas toolbar).
 	 *  Most pages won't need this. */
 	headerCenter?: ReactNode;
@@ -76,6 +78,7 @@ export function GraphDetail({
 	statusMetrics,
 	footerRightExtras,
 	headerRightExtras,
+	headerPanelControls,
 	headerCenter,
 }: GraphDetailProps) {
 	const { username, graphSlug } = useParams<{
@@ -89,6 +92,7 @@ export function GraphDetail({
 	const header = useAppHeader({
 		pageLabel,
 		rightExtras: headerRightExtras,
+		panelControls: headerPanelControls,
 		center: headerCenter,
 	});
 

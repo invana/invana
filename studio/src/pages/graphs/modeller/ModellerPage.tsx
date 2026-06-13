@@ -18,7 +18,6 @@ import {
 	ChevronRight,
 	Info,
 	PanelLeftClose,
-	PanelLeftOpen,
 	PanelRightClose,
 	PanelRightOpen,
 	Pencil,
@@ -94,10 +93,6 @@ export function ModellerPage() {
 	);
 	const closeLeft = useCallback(
 		() => setPanelParam("models", true),
-		[setPanelParam],
-	);
-	const openLeft = useCallback(
-		() => setPanelParam("models", false),
 		[setPanelParam],
 	);
 	const closeRight = useCallback(
@@ -515,42 +510,32 @@ export function ModellerPage() {
 		/>
 	);
 
-	// Re-open controls for the page header — each appears only while its panel
-	// is collapsed.
-	const reopenControls =
-		leftClosed || rightClosed ? (
-			<div className="flex items-center gap-1">
-				{leftClosed && (
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-7 w-7"
-						onClick={openLeft}
-						title="Show models panel"
-					>
-						<PanelLeftOpen className="w-4 h-4" />
-					</Button>
-				)}
-				{rightClosed && (
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-7 w-7"
-						onClick={openRight}
-						title="Show details panel"
-					>
-						<PanelRightOpen className="w-4 h-4" />
-					</Button>
-				)}
-			</div>
-		) : null;
+	// Right-panel (details) toggle for the page header — always shown, next to
+	// the profile menu. The left (models) panel is driven by the left nav rail.
+	// Reflects the panel's state: a collapse icon while open, an expand icon
+	// while collapsed.
+	const panelControls = (
+		<Button
+			variant="ghost"
+			size="icon"
+			className="h-7 w-7"
+			onClick={rightClosed ? openRight : closeRight}
+			title={rightClosed ? "Show details panel" : "Hide details panel"}
+		>
+			{rightClosed ? (
+				<PanelRightOpen className="w-4 h-4" />
+			) : (
+				<PanelRightClose className="w-4 h-4" />
+			)}
+		</Button>
+	);
 
 	return (
 		<>
 			<GraphDetail
 				sectionId="modeller"
 				pageLabel="Modeller"
-				headerRightExtras={reopenControls}
+				headerPanelControls={panelControls}
 				leftSection={
 					leftClosed
 						? undefined

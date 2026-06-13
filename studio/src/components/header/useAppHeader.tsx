@@ -18,12 +18,15 @@ interface AppHeaderOptions {
 	/** Extra controls rendered to the LEFT of ThemeToggle + UserMenu. Use for
 	 *  page-specific buttons (e.g. Modeller's "Introspect" + "Refresh"). */
 	rightExtras?: ReactNode;
+	/** Panel collapse/expand toggles, rendered immediately to the LEFT of the
+	 *  profile menu (e.g. Explorer/Modeller's sessions + inspector toggles). */
+	panelControls?: ReactNode;
 }
 
 /**
  * Shared AppLayoutV2 header config. Renders:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]            [center]            [rightExtras] [ThemeToggle] [UserMenu]
+ *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [ThemeToggle] [FullscreenToggle] [panelControls] [UserMenu]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
  * - Graph-scoped (`/u/:username/:graphSlug[/...]`): `username / graphSlug / pageLabel`.
@@ -32,7 +35,7 @@ interface AppHeaderOptions {
  * - If logged out, the leading user segment is dropped.
  */
 export function useAppHeader(options: AppHeaderOptions = {}) {
-	const { pageLabel, leftExtras, center, rightExtras } = options;
+	const { pageLabel, leftExtras, center, rightExtras, panelControls } = options;
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 
@@ -65,8 +68,9 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 		right: (
 			<div className="flex items-center gap-4 px-2">
 				{rightExtras}
-				<FullscreenToggle />
 				<ThemeToggle />
+				<FullscreenToggle />
+				{panelControls}
 				<UserMenu />
 			</div>
 		),

@@ -5,7 +5,7 @@ import {
 } from "@invana/canvas-react";
 import type { GraphData as EngineGraphData, GraphCanvas } from "@invana/graph";
 import { Button } from "@invana/ui";
-import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -105,10 +105,6 @@ export function ExplorerPage() {
 	);
 	const closeSessions = useCallback(
 		() => setPanelParam("sessions", true),
-		[setPanelParam],
-	);
-	const openSessions = useCallback(
-		() => setPanelParam("sessions", false),
 		[setPanelParam],
 	);
 	const closeInspector = useCallback(
@@ -363,35 +359,25 @@ export function ExplorerPage() {
 		/>
 	);
 
-	// Re-open controls for the page header — each appears only while its panel
-	// is collapsed.
-	const reopenControls =
-		sessionsClosed || inspectorClosed ? (
-			<div className="flex items-center gap-1">
-				{sessionsClosed && (
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-7 w-7"
-						onClick={openSessions}
-						title="Show sessions panel"
-					>
-						<PanelLeftOpen className="w-4 h-4" />
-					</Button>
-				)}
-				{inspectorClosed && (
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-7 w-7"
-						onClick={openInspector}
-						title="Show inspector panel"
-					>
-						<PanelRightOpen className="w-4 h-4" />
-					</Button>
-				)}
-			</div>
-		) : null;
+	// Right-panel (inspector) toggle for the page header — always shown, next to
+	// the profile menu. The left (sessions) panel is driven by the left nav rail.
+	// Reflects the panel's state: a collapse icon while open, an expand icon
+	// while collapsed.
+	const panelControls = (
+		<Button
+			variant="ghost"
+			size="icon"
+			className="h-7 w-7"
+			onClick={inspectorClosed ? openInspector : closeInspector}
+			title={inspectorClosed ? "Show inspector panel" : "Hide inspector panel"}
+		>
+			{inspectorClosed ? (
+				<PanelRightOpen className="w-4 h-4" />
+			) : (
+				<PanelRightClose className="w-4 h-4" />
+			)}
+		</Button>
+	);
 
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
@@ -400,7 +386,7 @@ export function ExplorerPage() {
 			<GraphDetail
 				sectionId="explorer"
 				pageLabel="Explorer"
-				headerRightExtras={reopenControls}
+				headerPanelControls={panelControls}
 				headerCenter={
 					canvas ? (
 						// Dead-center the toolbar against the full header width (the header
