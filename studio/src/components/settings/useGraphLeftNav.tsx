@@ -3,7 +3,6 @@ import {
 	Boxes,
 	Compass,
 	Database,
-	Home,
 	Info,
 	Layers,
 	Lightbulb,
@@ -73,14 +72,6 @@ export function useGraphLeftNav(
 	};
 
 	const topNavItems = [
-		{
-			name: "Overview",
-			icon: Home,
-			iconClassName: "w-5 h-5",
-			tooltipSide: "right" as const,
-			className: activeClass(activeTab === "overview"),
-			onClick: () => goToView(root),
-		},
 		{
 			name: "Explorer",
 			icon: Compass,

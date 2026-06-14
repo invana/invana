@@ -5,7 +5,6 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorPage } from "./pages/ErrorPage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { GraphCreatePage } from "./pages/graphs/GraphCreatePage";
-import { GraphOverviewPage } from "./pages/graphs/GraphOverviewPage";
 import { GraphsListPage } from "./pages/graphs/GraphsListPage";
 import { PlatformEventsPage } from "./pages/platform/PlatformEventsPage";
 import { ProfileSettingsPage } from "./pages/settings/ProfileSettingsPage";
@@ -61,12 +60,10 @@ export const router = createBrowserRouter([
 		errorElement: <ErrorPage />,
 	},
 	{
+		// No graph "Overview" landing page — the graph root redirects straight
+		// into the Explorer, which is the default surface for a graph.
 		path: "u/:username/:graphSlug",
-		element: (
-			<ProtectedRoute>
-				<GraphOverviewPage />
-			</ProtectedRoute>
-		),
+		element: <Navigate to="explorer" replace />,
 		errorElement: <ErrorPage />,
 	},
 

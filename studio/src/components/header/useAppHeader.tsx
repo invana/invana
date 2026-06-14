@@ -12,6 +12,10 @@ interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
 	 *  derived from the URL (Graphs, Explorer, Modeller, Settings, etc.). */
 	pageLabel?: string;
+	/** Drop the breadcrumb entirely — used when `leftExtras` already names the
+	 *  current view (e.g. the Explorer/Modeller switcher), so the label would
+	 *  just be redundant. The separator still renders before `leftExtras`. */
+	hideBreadcrumb?: boolean;
 	/** Extra content rendered to the right of the breadcrumb on the left side. */
 	leftExtras?: ReactNode;
 	/** Center content. Most pages won't need this. */
@@ -30,17 +34,26 @@ interface AppHeaderOptions {
  *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeToggle] [FullscreenToggle] [panelControls] [UserMenu]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
- * - Graph-scoped (`/u/:username/:graphSlug[/...]`): `username / graphSlug / pageLabel`.
- *   Username + graphSlug are clickable (own graph list, graph overview).
+ * - Graph-scoped (`/u/:username/:graphSlug[/...]`): just `pageLabel`
+ *   (e.g. `Explorer`). The owner + graph name are not shown.
  * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`).
  * - If logged out, the leading user segment is dropped.
  */
 export function useAppHeader(options: AppHeaderOptions = {}) {
-	const { pageLabel, leftExtras, center, rightExtras, panelControls } = options;
+	const {
+		pageLabel,
+		hideBreadcrumb,
+		leftExtras,
+		center,
+		rightExtras,
+		panelControls,
+	} = options;
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 
-	const segments = computeSegments(pathname, user?.username, pageLabel);
+	const segments = hideBreadcrumb
+		? []
+		: computeSegments(pathname, user?.username, pageLabel);
 
 	return {
 		// `relative` makes the header bar a positioning context so a `center`
@@ -56,12 +69,10 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				>
 					Invana Studio
 				</Link>
-				{segments.length > 0 && (
-					<>
-						<Separator orientation="vertical" className="h-4" />
-						<Breadcrumb segments={segments} />
-					</>
+				{(segments.length > 0 || leftExtras) && (
+					<Separator orientation="vertical" className="h-4" />
 				)}
+				{segments.length > 0 && <Breadcrumb segments={segments} />}
 				{leftExtras}
 			</div>
 		),
@@ -147,16 +158,12 @@ function computeSegments(
 	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/(.+?))?\/?$/);
 	if (graphMatch) {
 		const [, owner, graphSlug, rest] = graphMatch;
-		const segments: Segment[] = [
-			{ label: `@${owner}`, to: "/graphs" },
-			{ label: graphSlug, to: `/u/${owner}/${graphSlug}` },
-		];
+		// Graph-scoped breadcrumbs show only the page label (Explorer, Modeller,
+		// …) — the owner + graph name are intentionally dropped from the header.
 		if (override) {
-			segments.push({ label: override });
-		} else {
-			segments.push(...graphRestSegments(rest, `/u/${owner}/${graphSlug}`));
+			return [{ label: override }];
 		}
-		return segments;
+		return graphRestSegments(rest, `/u/${owner}/${graphSlug}`);
 	}
 
 	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...)
@@ -176,7 +183,8 @@ function graphRestSegments(
 	rest: string | undefined,
 	graphRoot: string,
 ): Segment[] {
-	if (!rest) return [{ label: "Overview" }];
+	// The graph root redirects into the Explorer, so a missing tail means Explorer.
+	if (!rest) return [{ label: "Explorer" }];
 	if (rest === "explorer") return [{ label: "Explorer" }];
 	if (rest === "modeller") return [{ label: "Modeller" }];
 	if (rest === "settings") return [{ label: "Settings" }];

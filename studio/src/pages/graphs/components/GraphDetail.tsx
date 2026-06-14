@@ -1,6 +1,7 @@
 import { AppLayoutV2 } from "@invana/themes";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
+import { GraphSectionSwitcher } from "../../../components/header/GraphSectionSwitcher";
 import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
@@ -89,8 +90,23 @@ export function GraphDetail({
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
 	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", sectionId);
+
+	// Explorer/Modeller get a header switcher between the two views; it names the
+	// current view, so the breadcrumb label is dropped to avoid duplication.
+	const isSwitchable =
+		(sectionId === "explorer" || sectionId === "modeller") &&
+		!!username &&
+		!!graphSlug;
 	const header = useAppHeader({
 		pageLabel,
+		hideBreadcrumb: isSwitchable,
+		leftExtras: isSwitchable ? (
+			<GraphSectionSwitcher
+				username={username as string}
+				graphSlug={graphSlug as string}
+				active={sectionId as "explorer" | "modeller"}
+			/>
+		) : undefined,
 		rightExtras: headerRightExtras,
 		panelControls: headerPanelControls,
 		center: headerCenter,
