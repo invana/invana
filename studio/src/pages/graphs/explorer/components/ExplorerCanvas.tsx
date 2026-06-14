@@ -99,6 +99,7 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { useWebGPUAvailable } from "../../../../hooks/useWebGPUAvailable";
 import {
 	type InteractionRef,
 	endInteraction,
@@ -109,9 +110,9 @@ import {
 // `<Canvas config>` prop so the option objects stay precisely typed.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
 
-// PixiJS render backend. `@invana/canvas-react` defaults to `"webgpu"`; we default the
-// Explorer to `"webgl"` (see ExplorerPage) because WebGPU intermittently crashes
-// in PixiJS 8 — the header switcher lets a user flip between them at runtime.
+// PixiJS render backend. Both `@invana/canvas-react` and the Explorer (see
+// ExplorerPage) default to `"webgpu"`, with PixiJS falling back to WebGL when
+// WebGPU is unavailable — the header switcher lets a user flip between them at runtime.
 export type CanvasBackend = "webgl" | "webgpu";
 const BACKEND_LABEL: Record<CanvasBackend, string> = {
 	webgl: "WebGL",
@@ -663,8 +664,7 @@ export function ExplorerCanvas({
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
 		// flipping `preference` only takes effect on a fresh mount — keying on it
 		// tears down and rebuilds the canvas (re-feeding `data` → re-layout). The
-		// default is WebGL because WebGPU intermittently crashes in PixiJS 8's
-		// `BindGroupSystem._createBindGroup` (null `gpuProgram.layout`).
+		// default is WebGPU (PixiJS falls back to WebGL when it's unavailable).
 		<CanvasRoot
 			key={backend}
 			autoResize
@@ -807,6 +807,10 @@ function HeaderToolbarItems({
 }: ExplorerHeaderToolbarProps) {
 	// Live engine — the toolbar only renders once it's live, so this is non-null.
 	const canvas = useCanvas();
+
+	// Gate the WebGPU switch on actual device support — if no adapter resolves,
+	// the option is disabled so users can't pick a backend that won't initialise.
+	const webgpuAvailable = useWebGPUAvailable();
 
 	// Selection mode (click / brush / lasso). Single source of truth for the
 	// canvas: picking one arms its drag-select behaviour and disables the others.
@@ -974,8 +978,8 @@ function HeaderToolbarItems({
 		div("d7"),
 		{
 			// Render backend switcher. Flipping it remounts the canvas (ExplorerCanvas
-			// keys on `backend`) so PixiJS re-inits with the chosen renderer. WebGL is
-			// the safe default; WebGPU is offered for users whose drivers handle it.
+			// keys on `backend`) so PixiJS re-inits with the chosen renderer. WebGPU is
+			// the default (auto-falling back to WebGL); WebGL can be pinned explicitly.
 			type: "custom",
 			key: "renderer",
 			render: () => (
@@ -988,11 +992,24 @@ function HeaderToolbarItems({
 					// a backend is always selected.
 					onValueChange={(v) => v && onBackendChange(v as CanvasBackend)}
 				>
-					{(Object.keys(BACKEND_LABEL) as CanvasBackend[]).map((b) => (
-						<ToggleGroupItem key={b} value={b} aria-label={BACKEND_LABEL[b]}>
-							{BACKEND_LABEL[b]}
-						</ToggleGroupItem>
-					))}
+					{(Object.keys(BACKEND_LABEL) as CanvasBackend[]).map((b) => {
+						const disabled = b === "webgpu" && !webgpuAvailable;
+						return (
+							<ToggleGroupItem
+								key={b}
+								value={b}
+								disabled={disabled}
+								aria-label={BACKEND_LABEL[b]}
+								title={
+									disabled
+										? "WebGPU isn't available on this device"
+										: BACKEND_LABEL[b]
+								}
+							>
+								{BACKEND_LABEL[b]}
+							</ToggleGroupItem>
+						);
+					})}
 				</ToggleGroup>
 			),
 		},

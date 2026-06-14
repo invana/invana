@@ -16,6 +16,10 @@ import {
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import {
+	hasWebGPUApi,
+	useWebGPUAvailable,
+} from "../../../hooks/useWebGPUAvailable";
+import {
 	type Interaction,
 	type SpanAttributes,
 	endInteraction,
@@ -139,16 +143,24 @@ export function ExplorerPage() {
 	const [magnet, setMagnet] = useState(true);
 	const toggleMagnet = useCallback(() => setMagnet((m) => !m), []);
 
-	// Render backend (PixiJS). Defaults to WebGL — WebGPU intermittently crashes in
-	// PixiJS 8's bind-group setup (null `gpuProgram.layout`). The header switcher
-	// lets a user opt into WebGPU; the choice persists across reloads.
-	const [backend, setBackendState] = useState<CanvasBackend>(() =>
-		localStorage.getItem(BACKEND_STORAGE_KEY) === "webgpu" ? "webgpu" : "webgl",
-	);
+	// Render backend (PixiJS). Defaults to WebGPU when the device supports it,
+	// else WebGL. The header switcher lets a user pin WebGL explicitly; the choice
+	// persists across reloads.
+	const webgpuAvailable = useWebGPUAvailable();
+	const [backend, setBackendState] = useState<CanvasBackend>(() => {
+		const saved = localStorage.getItem(BACKEND_STORAGE_KEY);
+		if (saved === "webgl") return "webgl";
+		return hasWebGPUApi() ? "webgpu" : "webgl";
+	});
 	const setBackend = useCallback((b: CanvasBackend) => {
 		localStorage.setItem(BACKEND_STORAGE_KEY, b);
 		setBackendState(b);
 	}, []);
+	// If WebGPU turns out to be unusable (API present but no adapter), fall back to
+	// WebGL so we never sit on a backend that can't initialise.
+	useEffect(() => {
+		if (!webgpuAvailable && backend === "webgpu") setBackendState("webgl");
+	}, [webgpuAvailable, backend]);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);

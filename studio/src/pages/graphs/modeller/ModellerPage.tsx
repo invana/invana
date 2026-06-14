@@ -52,6 +52,10 @@ import {
 	useModelsQuery,
 	useUpdateEdgeTypeMutation,
 } from "../../../hooks/queries/useModels";
+import {
+	hasWebGPUApi,
+	useWebGPUAvailable,
+} from "../../../hooks/useWebGPUAvailable";
 import { ApiError, suppressActionToast } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
 import { isSetupComplete } from "../../../types/graphs";
@@ -145,14 +149,16 @@ export function ModellerPage() {
 	const handleReady = useCallback((c: GraphCanvas | null) => setCanvas(c), []);
 
 	// Render backend (PixiJS) for the read-only explore canvas — mirrors the
-	// Explorer. Defaults to WebGL (WebGPU intermittently crashes in PixiJS 8); the
+	// Explorer. Defaults to WebGPU when the device supports it, else WebGL; the
 	// header switcher persists the choice across reloads.
+	const webgpuAvailable = useWebGPUAvailable();
 	const [backend, setBackendState] = useState<CanvasBackend>(() => {
 		const saved =
 			typeof localStorage !== "undefined"
 				? localStorage.getItem("modeller.canvas.backend")
 				: null;
-		return saved === "webgpu" || saved === "webgl" ? saved : "webgl";
+		if (saved === "webgl") return "webgl";
+		return hasWebGPUApi() ? "webgpu" : "webgl";
 	});
 	const setBackend = useCallback((b: CanvasBackend) => {
 		setBackendState(b);
@@ -162,6 +168,11 @@ export function ModellerPage() {
 			// Private-mode / disabled storage — keep the in-memory choice.
 		}
 	}, []);
+	// If WebGPU turns out to be unusable (API present but no adapter), fall back to
+	// WebGL so we never sit on a backend that can't initialise.
+	useEffect(() => {
+		if (!webgpuAvailable && backend === "webgpu") setBackendState("webgl");
+	}, [webgpuAvailable, backend]);
 
 	// Dialog + confirm state for the authoring UI.
 	const [modelForm, setModelForm] = useState<{
