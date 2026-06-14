@@ -25,13 +25,17 @@ import {
 	MiniMapLayer,
 	ParallelEdgeBehaviour,
 	PinchZoomBehaviour,
+	type ToolbarItem,
+	ToolbarItems,
 	WheelZoomBehaviour,
 	useFitContent,
 	useGraphCanvas,
 	useGraphCanvasUpdate,
+	useGrid,
 	useInspectTarget,
 	useSelectMode,
 	useTool,
+	useViewSection,
 } from "@invana/canvas-react";
 import type {
 	EdgeStyle,
@@ -48,12 +52,18 @@ import { useTheme } from "@invana/themes";
 import { Button, type MenuItem } from "@invana/ui";
 import {
 	Eraser,
+	Grid3x3,
 	Lasso,
+	Lock,
+	LockOpen,
 	type LucideIcon,
+	Maximize,
 	MousePointer2,
 	Plus,
 	Spline,
 	SquareDashedMousePointer,
+	ZoomIn,
+	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type {
@@ -275,6 +285,43 @@ export function ModellerHeaderToolbar({ editable }: { editable: boolean }) {
 					</Button>
 				);
 			})}
+		</div>
+	);
+}
+
+// View controls (zoom / fit / lock + grid) for the header, shown alongside the
+// drawing switcher on an editable draft so authoring never loses navigation. The
+// read-only model gets the same controls (and more) via the reused
+// `ExplorerHeaderToolbar`; this is the trimmed set that applies to the authoring
+// canvas (no layout switcher / re-render / render-backend — those don't map onto
+// it). Resolves the live engine off the lifted CanvasContext, like the Explorer
+// toolbar, so it's only mounted once the canvas is initialised.
+export function ModellerViewToolbar() {
+	const view = useViewSection({
+		icons: {
+			zoomIn: ZoomIn,
+			zoomOut: ZoomOut,
+			fit: Maximize,
+			locked: Lock,
+			unlocked: LockOpen,
+		},
+	});
+	const { showGrid, toggleGrid } = useGrid();
+	const items: ToolbarItem[] = [
+		...view,
+		{ type: "divider", key: "vd" },
+		{
+			type: "toggle",
+			key: "grid",
+			icon: Grid3x3,
+			label: "Toggle grid",
+			active: showGrid,
+			onToggle: toggleGrid,
+		},
+	];
+	return (
+		<div className="rounded-md border border-border bg-background p-0.5 shadow-sm">
+			<ToolbarItems items={items} orientation="horizontal" />
 		</div>
 	);
 }

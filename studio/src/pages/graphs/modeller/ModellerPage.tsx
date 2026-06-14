@@ -77,7 +77,11 @@ import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
 import { ModelFormDialog } from "./components/ModelFormDialog";
 import { ModelListPanel } from "./components/ModelListPanel";
 import { NodeTypeFormDialog } from "./components/NodeTypeFormDialog";
-import { ModellerHeaderToolbar, SchemaCanvas } from "./components/SchemaCanvas";
+import {
+	ModellerHeaderToolbar,
+	ModellerViewToolbar,
+	SchemaCanvas,
+} from "./components/SchemaCanvas";
 import { SchemaNav } from "./components/SchemaNav";
 import type { ModelEditCtx } from "./components/editing";
 
@@ -718,15 +722,20 @@ export function ModellerPage() {
 	// Header toolbar, absolute-centered against the full header width (mirroring the
 	// Explorer). On an editable draft: the Select / Add / Connect / Delete drawing
 	// switcher (engine-independent — reads the lifted GraphToolProvider, so it
-	// appears immediately). On a read-only model (global/introspected + published):
-	// the Explorer's full canvas toolbar — layout switcher, run/re-render, zoom /
-	// fit / lock, grid, render-backend — minus the magnet and undo/redo. That
-	// toolbar resolves the live engine off CanvasContext, so it's gated on `canvas`.
+	// appears immediately) PLUS a trimmed view-controls strip (zoom / fit / lock /
+	// grid) once the canvas is live, so authoring keeps its navigation. On a
+	// read-only model (global/introspected + published): the Explorer's full canvas
+	// toolbar — layout switcher, run/re-render, zoom / fit / lock, grid,
+	// render-backend — minus the magnet and undo/redo. Both view-control strips
+	// resolve the live engine off CanvasContext, so they're gated on `canvas`.
 	const headerToolbar =
 		modelId && version ? (
-			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
 				{ctx ? (
-					<ModellerHeaderToolbar editable />
+					<>
+						<ModellerHeaderToolbar editable />
+						{canvas?.isInitialised && <ModellerViewToolbar />}
+					</>
 				) : canvas?.isInitialised ? (
 					// `isInitialised` gates out an engine whose Pixi viewport is torn
 					// down — the Explorer toolbar's view-section reads `camera.scale`
