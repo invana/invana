@@ -1,12 +1,4 @@
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
 	Badge,
 	Button,
 	DropdownMenu,
@@ -26,10 +18,8 @@ import {
 	RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { useDeleteModelMutation } from "../../../../hooks/queries/useModels";
-import { ApiError } from "../../../../services/api/client";
 import type { GraphModelSummary } from "../../../../types/models";
+import { DeleteModelDialog } from "./DeleteModelDialog";
 
 interface Props {
 	models: GraphModelSummary[];
@@ -76,20 +66,7 @@ export function ModelListPanel({
 	introspecting,
 	onClose,
 }: Props) {
-	const del = useDeleteModelMutation(username, graphSlug);
 	const [deleting, setDeleting] = useState<GraphModelSummary | null>(null);
-
-	async function onConfirmDelete() {
-		if (!deleting) return;
-		try {
-			await del.mutateAsync(deleting.id);
-			toast.success("Model deleted.");
-		} catch (err) {
-			toast.error(err instanceof ApiError ? err.message : "Failed to delete.");
-		} finally {
-			setDeleting(null);
-		}
-	}
 
 	const body = (
 		<div className="flex h-full flex-col">
@@ -203,26 +180,12 @@ export function ModelListPanel({
 				}}
 			/>
 
-			<AlertDialog
-				open={deleting !== null}
-				onOpenChange={(o) => !o && setDeleting(null)}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Delete model?</AlertDialogTitle>
-						<AlertDialogDescription>
-							Delete "{deleting?.name}" and all its versions? This cannot be
-							undone.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={onConfirmDelete}>
-							Delete
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+			<DeleteModelDialog
+				model={deleting}
+				username={username}
+				graphSlug={graphSlug}
+				onClose={() => setDeleting(null)}
+			/>
 		</>
 	);
 }

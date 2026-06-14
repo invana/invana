@@ -14,12 +14,54 @@ import axios, {
 	type AxiosRequestConfig,
 	type InternalAxiosRequestConfig,
 } from "axios";
+import { toast } from "sonner";
 import { startClientSpan } from "../telemetry/tracer";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
 
 /** Carries the per-request telemetry span from request → response interceptor. */
 type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
+
+/**
+ * Standard mutation envelope (RFC-028): `{ message, data }`. The backend owns the
+ * toast copy; this client toasts `message` centrally and unwraps `data` for the
+ * caller. Detected by a string `message` alongside a `data` key — bare resources
+ * (GET responses) and other `message`-bearing bodies (e.g. session rerun, schema
+ * reconcile) lack that pairing, so they're never mistaken for an envelope.
+ */
+interface ActionEnvelope {
+	message: string;
+	data?: unknown;
+}
+
+function isActionEnvelope(body: unknown): body is ActionEnvelope {
+	return (
+		typeof body === "object" &&
+		body !== null &&
+		"data" in body &&
+		typeof (body as { message?: unknown }).message === "string"
+	);
+}
+
+// `suppressActionToast` raises this depth for the duration of a client-orchestrated
+// gesture (RFC-028 Decision #6) so its sub-requests' envelopes don't each fire a
+// toast — the gesture shows its own single summary instead.
+let toastSuppressDepth = 0;
+
+/**
+ * Run `fn` with the central action-toast suppressed. Use for a UI gesture that
+ * fans out to multiple mutations, or reuses a generic endpoint whose message is
+ * wrong-grained for the gesture (e.g. property add/remove, edge reverse, canvas
+ * erase). The caller is responsible for any summary toast of its own.
+ */
+export async function suppressActionToast<T>(fn: () => Promise<T>): Promise<T> {
+	toastSuppressDepth++;
+	try {
+		return await fn();
+	} finally {
+		toastSuppressDepth--;
+	}
+}
 
 export class ApiError extends Error {
 	constructor(
@@ -166,6 +208,18 @@ function formatErrorDetail(error: AxiosError): string {
 apiClient.interceptors.response.use(
 	(res) => {
 		endRequestSpan(res.config as TracedConfig, res.status);
+		// RFC-028: the backend owns the toast copy. Any mutation (non-GET) that
+		// returns an `ActionResponse` envelope is toasted here, centrally, so call
+		// sites never hardcode a success string. Suppressed inside a multi-request
+		// gesture (see `suppressActionToast`).
+		const method = (res.config.method ?? "get").toLowerCase();
+		if (
+			method !== "get" &&
+			toastSuppressDepth === 0 &&
+			isActionEnvelope(res.data)
+		) {
+			toast.success(res.data.message);
+		}
 		return res;
 	},
 	async (error: AxiosError) => {
@@ -207,7 +261,11 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
 		data,
 		headers: init?.headers as Record<string, string> | undefined,
 	};
-	const res = await apiClient.request<T>(config);
+	const res = await apiClient.request(config);
 	if (res.status === 204) return undefined as T;
-	return res.data;
+	// RFC-028: unwrap the `{ message, data }` mutation envelope so callers receive
+	// the resource (or `undefined` for a delete) exactly as before; the message was
+	// already toasted by the response interceptor.
+	if (isActionEnvelope(res.data)) return res.data.data as T;
+	return res.data as T;
 }

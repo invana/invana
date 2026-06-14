@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth.deps import get_current_user
@@ -69,6 +69,7 @@ from invana.modeller.schemas import (
 )
 from invana.modeller.store import ModelStore
 from invana.modeller.versioner import Versioner
+from invana.server.schemas import ActionResponse, action
 
 models_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/models", tags=["models"])
 
@@ -171,14 +172,14 @@ async def list_models(
     return [_to_summary(m) for m in models]
 
 
-@models_router.post("", response_model=GraphModelResponse, status_code=status.HTTP_201_CREATED)
+@models_router.post("", response_model=ActionResponse[GraphModelResponse], status_code=status.HTTP_201_CREATED)
 async def create_model(
     payload: GraphModelCreate,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> GraphModelResponse:
+) -> ActionResponse[GraphModelResponse]:
     model = await _store.create_graph_model(
         session,
         name=payload.name,
@@ -198,7 +199,7 @@ async def create_model(
     )
     await session.commit()
     model = await _store.get_graph_model(session, model.id)
-    return _to_response(model)
+    return action(f'Model "{model.name}" created.', _to_response(model))
 
 
 @models_router.get("/{model_id}", response_model=GraphModelResponse)
@@ -212,7 +213,7 @@ async def get_model(
     return _to_response(model)
 
 
-@models_router.patch("/{model_id}", response_model=GraphModelResponse)
+@models_router.patch("/{model_id}", response_model=ActionResponse[GraphModelResponse])
 async def update_model(
     payload: GraphModelUpdate,
     model_id: str = Path(...),
@@ -220,7 +221,7 @@ async def update_model(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> GraphModelResponse:
+) -> ActionResponse[GraphModelResponse]:
     await _get_model_or_404(session, graph.id, model_id)
     await _store.update_graph_model(session, model_id, **payload.model_dump(exclude_unset=True))
     await emit_event(
@@ -234,18 +235,19 @@ async def update_model(
     )
     await session.commit()
     model = await _store.get_graph_model(session, model_id)
-    return _to_response(model)
+    return action("Model updated.", _to_response(model))
 
 
-@models_router.delete("/{model_id}", status_code=status.HTTP_204_NO_CONTENT)
+@models_router.delete("/{model_id}", response_model=ActionResponse[None])
 async def delete_model(
     model_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> Response:
-    await _get_model_or_404(session, graph.id, model_id)
+) -> ActionResponse[None]:
+    model = await _get_model_or_404(session, graph.id, model_id)
+    name = model.name
     await _store.delete_graph_model(session, model_id)
     await emit_event(
         session,
@@ -256,7 +258,7 @@ async def delete_model(
         actor_id=user.id,
     )
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action(f'Model "{name}" deleted.')
 
 
 # ---------------------------------------------------------------------------
@@ -276,14 +278,18 @@ async def list_versions(
     return [VersionSummary.model_validate(v) for v in versions]
 
 
-@models_router.post("/{model_id}/versions", response_model=VersionResponse, status_code=status.HTTP_201_CREATED)
+@models_router.post(
+    "/{model_id}/versions",
+    response_model=ActionResponse[VersionResponse],
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_draft_version(
     payload: VersionCreate,
     model_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> VersionResponse:
+) -> ActionResponse[VersionResponse]:
     model = await _get_model_or_404(session, graph.id, model_id)
     if model.origin == "introspected":
         raise HTTPException(
@@ -300,7 +306,7 @@ async def create_draft_version(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return await _full_version(session, version.id)
+    return action("Draft created — you can now edit this model.", await _full_version(session, version.id))
 
 
 @models_router.get("/{model_id}/active-version", response_model=VersionResponse)
@@ -335,7 +341,7 @@ async def get_version(
     return VersionResponse.model_validate(version)
 
 
-@models_router.post("/{model_id}/versions/{version_id}/activate", response_model=VersionResponse)
+@models_router.post("/{model_id}/versions/{version_id}/activate", response_model=ActionResponse[VersionResponse])
 async def activate_version(
     payload: VersionActivate,
     model_id: str = Path(...),
@@ -344,7 +350,7 @@ async def activate_version(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> VersionResponse:
+) -> ActionResponse[VersionResponse]:
     await _get_model_or_404(session, graph.id, model_id)
     try:
         activated = await Versioner(_store).activate(session, version_id=version_id, override_version=payload.version)
@@ -360,7 +366,7 @@ async def activate_version(
         details={"version": activated.version},
     )
     await session.commit()
-    return await _full_version(session, activated.id)
+    return action("Model published.", await _full_version(session, activated.id))
 
 
 # ---------------------------------------------------------------------------
@@ -370,7 +376,7 @@ async def activate_version(
 
 @models_router.post(
     "/{model_id}/versions/{version_id}/node-types",
-    response_model=NodeTypeResponse,
+    response_model=ActionResponse[NodeTypeResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_node_type(
@@ -380,7 +386,7 @@ async def create_node_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> NodeTypeResponse:
+) -> ActionResponse[NodeTypeResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         node_type = await _store.create_node_type(
@@ -396,12 +402,12 @@ async def create_node_type(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return NodeTypeResponse.model_validate(node_type)
+    return action(f'Node type "{node_type.name}" created.', NodeTypeResponse.model_validate(node_type))
 
 
 @models_router.patch(
     "/{model_id}/versions/{version_id}/node-types/{type_id}",
-    response_model=NodeTypeResponse,
+    response_model=ActionResponse[NodeTypeResponse],
 )
 async def update_node_type(
     payload: NodeTypeUpdate,
@@ -411,7 +417,7 @@ async def update_node_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> NodeTypeResponse:
+) -> ActionResponse[NodeTypeResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         node_type = await _store.update_node_type(session, type_id, **payload.model_dump(exclude_unset=True))
@@ -420,12 +426,12 @@ async def update_node_type(
     if node_type is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "node_type_not_found", "id": type_id})
     await session.commit()
-    return NodeTypeResponse.model_validate(node_type)
+    return action("Node type updated.", NodeTypeResponse.model_validate(node_type))
 
 
 @models_router.delete(
     "/{model_id}/versions/{version_id}/node-types/{type_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=ActionResponse[None],
 )
 async def delete_node_type(
     model_id: str = Path(...),
@@ -434,19 +440,19 @@ async def delete_node_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Response:
+) -> ActionResponse[None]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         await _store.delete_node_type(session, type_id)
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action("Node type deleted.")
 
 
 @models_router.post(
     "/{model_id}/versions/{version_id}/edge-types",
-    response_model=EdgeTypeResponse,
+    response_model=ActionResponse[EdgeTypeResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_edge_type(
@@ -456,7 +462,7 @@ async def create_edge_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> EdgeTypeResponse:
+) -> ActionResponse[EdgeTypeResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         edge_type = await _store.create_edge_type(
@@ -472,12 +478,12 @@ async def create_edge_type(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return EdgeTypeResponse.model_validate(edge_type)
+    return action(f'Edge type "{edge_type.name}" created.', EdgeTypeResponse.model_validate(edge_type))
 
 
 @models_router.patch(
     "/{model_id}/versions/{version_id}/edge-types/{type_id}",
-    response_model=EdgeTypeResponse,
+    response_model=ActionResponse[EdgeTypeResponse],
 )
 async def update_edge_type(
     payload: EdgeTypeUpdate,
@@ -487,7 +493,7 @@ async def update_edge_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> EdgeTypeResponse:
+) -> ActionResponse[EdgeTypeResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         edge_type = await _store.update_edge_type(session, type_id, **payload.model_dump(exclude_unset=True))
@@ -496,12 +502,12 @@ async def update_edge_type(
     if edge_type is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "edge_type_not_found", "id": type_id})
     await session.commit()
-    return EdgeTypeResponse.model_validate(edge_type)
+    return action("Edge type updated.", EdgeTypeResponse.model_validate(edge_type))
 
 
 @models_router.delete(
     "/{model_id}/versions/{version_id}/edge-types/{type_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=ActionResponse[None],
 )
 async def delete_edge_type(
     model_id: str = Path(...),
@@ -510,19 +516,19 @@ async def delete_edge_type(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Response:
+) -> ActionResponse[None]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         await _store.delete_edge_type(session, type_id)
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action("Edge type deleted.")
 
 
 @models_router.post(
     "/{model_id}/versions/{version_id}/property-keys",
-    response_model=PropertyKeyResponse,
+    response_model=ActionResponse[PropertyKeyResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_property_key(
@@ -532,7 +538,7 @@ async def create_property_key(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> PropertyKeyResponse:
+) -> ActionResponse[PropertyKeyResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     await _enforce_supported_type(session, graph, payload.type)
     try:
@@ -548,12 +554,12 @@ async def create_property_key(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return PropertyKeyResponse.model_validate(pk)
+    return action(f'Property key "{pk.name}" created.', PropertyKeyResponse.model_validate(pk))
 
 
 @models_router.patch(
     "/{model_id}/versions/{version_id}/property-keys/{key_id}",
-    response_model=PropertyKeyResponse,
+    response_model=ActionResponse[PropertyKeyResponse],
 )
 async def update_property_key(
     payload: PropertyKeyUpdate,
@@ -563,7 +569,7 @@ async def update_property_key(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> PropertyKeyResponse:
+) -> ActionResponse[PropertyKeyResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     fields = payload.model_dump(exclude_unset=True)
     if "type" in fields and fields["type"] is not None:
@@ -575,12 +581,12 @@ async def update_property_key(
     if pk is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "property_key_not_found", "id": key_id})
     await session.commit()
-    return PropertyKeyResponse.model_validate(pk)
+    return action("Property key updated.", PropertyKeyResponse.model_validate(pk))
 
 
 @models_router.delete(
     "/{model_id}/versions/{version_id}/property-keys/{key_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=ActionResponse[None],
 )
 async def delete_property_key(
     model_id: str = Path(...),
@@ -589,19 +595,19 @@ async def delete_property_key(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Response:
+) -> ActionResponse[None]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         await _store.delete_property_key(session, key_id)
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action("Property key deleted.")
 
 
 @models_router.post(
     "/{model_id}/versions/{version_id}/constraints",
-    response_model=ConstraintResponse,
+    response_model=ActionResponse[ConstraintResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_constraint(
@@ -611,7 +617,7 @@ async def create_constraint(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> ConstraintResponse:
+) -> ActionResponse[ConstraintResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         constraint = await _store.create_constraint(
@@ -626,12 +632,12 @@ async def create_constraint(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return ConstraintResponse.model_validate(constraint)
+    return action(f'Constraint "{constraint.name}" created.', ConstraintResponse.model_validate(constraint))
 
 
 @models_router.delete(
     "/{model_id}/versions/{version_id}/constraints/{constraint_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=ActionResponse[None],
 )
 async def delete_constraint(
     model_id: str = Path(...),
@@ -640,19 +646,19 @@ async def delete_constraint(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Response:
+) -> ActionResponse[None]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         await _store.delete_constraint(session, constraint_id)
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action("Constraint deleted.")
 
 
 @models_router.post(
     "/{model_id}/versions/{version_id}/indexes",
-    response_model=IndexResponse,
+    response_model=ActionResponse[IndexResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_index(
@@ -662,7 +668,7 @@ async def create_index(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> IndexResponse:
+) -> ActionResponse[IndexResponse]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         index = await _store.create_index(
@@ -678,12 +684,12 @@ async def create_index(
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return IndexResponse.model_validate(index)
+    return action(f'Index "{index.name}" created.', IndexResponse.model_validate(index))
 
 
 @models_router.delete(
     "/{model_id}/versions/{version_id}/indexes/{index_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=ActionResponse[None],
 )
 async def delete_index(
     model_id: str = Path(...),
@@ -692,11 +698,11 @@ async def delete_index(
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> Response:
+) -> ActionResponse[None]:
     await _get_draft_version_or_404(session, graph.id, model_id, version_id)
     try:
         await _store.delete_index(session, index_id)
     except ValueError as exc:
         raise _conflict(exc) from exc
     await session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return action("Index deleted.")

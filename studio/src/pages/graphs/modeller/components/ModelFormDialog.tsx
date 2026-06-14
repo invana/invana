@@ -92,14 +92,12 @@ export function ModelFormDialog({
 						validation_mode: validationMode,
 					},
 				});
-				toast.success("Model updated.");
 			} else {
 				await create.mutateAsync({
 					name,
 					description,
 					validation_mode: validationMode,
 				});
-				toast.success("Model created.");
 			}
 			onClose();
 		} catch (err) {

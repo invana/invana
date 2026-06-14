@@ -25,7 +25,7 @@ import {
 	useUpdateNodeTypeMutation,
 	useUpdatePropertyKeyMutation,
 } from "../../../../hooks/queries/useModels";
-import { ApiError } from "../../../../services/api/client";
+import { ApiError, suppressActionToast } from "../../../../services/api/client";
 import type { TypePropertyMappingCreate } from "../../../../types/models";
 import type {
 	PropertyKeyResponse,
@@ -146,12 +146,20 @@ export function PropertyEditor({
 		const name = draft.name.trim();
 		if (!name) return;
 		try {
-			await updateKey.mutateAsync({
-				modelId: ctx.modelId,
-				versionId: ctx.versionId,
-				keyId,
-				data: { name, type: draft.type, value_cardinality: draft.cardinality },
-			});
+			// Property gestures are orchestrated over generic key/type endpoints, so
+			// suppress their per-request toasts and show one summary (RFC-028 Decision #6).
+			await suppressActionToast(() =>
+				updateKey.mutateAsync({
+					modelId: ctx.modelId,
+					versionId: ctx.versionId,
+					keyId,
+					data: {
+						name,
+						type: draft.type,
+						value_cardinality: draft.cardinality,
+					},
+				}),
+			);
 			toast.success("Property updated.");
 			cancel();
 		} catch (err) {
@@ -169,24 +177,29 @@ export function PropertyEditor({
 			return;
 		}
 		try {
-			// Reuse an existing key of the same name (keys are shared across types);
-			// otherwise create a new one with the chosen type + cardinality.
-			const existing = propertyKeys.find((pk) => pk.name === name);
-			if (!existing) {
-				await createKey.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					data: {
-						name,
-						type: draft.type,
-						value_cardinality: draft.cardinality,
-					},
-				});
-			}
-			await patchMappings([
-				...toCreateList(mappings),
-				{ property_key: name, sort_order: mappings.length },
-			]);
+			// Adding a property fans out to two requests (create key + patch the
+			// type's mappings); suppress both per-request toasts and show one
+			// summary (RFC-028 Decision #6).
+			await suppressActionToast(async () => {
+				// Reuse an existing key of the same name (keys are shared across types);
+				// otherwise create a new one with the chosen type + cardinality.
+				const existing = propertyKeys.find((pk) => pk.name === name);
+				if (!existing) {
+					await createKey.mutateAsync({
+						modelId: ctx.modelId,
+						versionId: ctx.versionId,
+						data: {
+							name,
+							type: draft.type,
+							value_cardinality: draft.cardinality,
+						},
+					});
+				}
+				await patchMappings([
+					...toCreateList(mappings),
+					{ property_key: name, sort_order: mappings.length },
+				]);
+			});
 			toast.success("Property added.");
 			cancel();
 		} catch (err) {
@@ -198,8 +211,10 @@ export function PropertyEditor({
 
 	async function onRemove(keyName: string) {
 		try {
-			await patchMappings(
-				toCreateList(mappings.filter((m) => m.property_key.name !== keyName)),
+			await suppressActionToast(() =>
+				patchMappings(
+					toCreateList(mappings.filter((m) => m.property_key.name !== keyName)),
+				),
 			);
 			toast.success("Property removed.");
 		} catch (err) {

@@ -75,7 +75,6 @@ export function PropertyKeyTable({
 				versionId: ctx.versionId,
 				keyId: deleting.id,
 			});
-			toast.success("Property key deleted.");
 		} catch (err) {
 			toast.error(
 				err instanceof ApiError

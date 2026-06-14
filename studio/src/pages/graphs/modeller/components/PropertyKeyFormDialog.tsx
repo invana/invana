@@ -84,14 +84,12 @@ export function PropertyKeyFormDialog({
 					keyId: propertyKey.id,
 					data: { name, type, value_cardinality: cardinality },
 				});
-				toast.success("Property key updated.");
 			} else {
 				await create.mutateAsync({
 					modelId: ctx.modelId,
 					versionId: ctx.versionId,
 					data: { name, type, value_cardinality: cardinality },
 				});
-				toast.success("Property key created.");
 			}
 			onClose();
 		} catch (err) {

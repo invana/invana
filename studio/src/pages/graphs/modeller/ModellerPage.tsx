@@ -31,6 +31,7 @@ import {
 	RefreshCw,
 	Save,
 	Send,
+	Trash2,
 	Workflow,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -51,7 +52,7 @@ import {
 	useModelsQuery,
 	useUpdateEdgeTypeMutation,
 } from "../../../hooks/queries/useModels";
-import { ApiError } from "../../../services/api/client";
+import { ApiError, suppressActionToast } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
 import { isSetupComplete } from "../../../types/graphs";
 import type { GraphModelSummary } from "../../../types/models";
@@ -65,6 +66,7 @@ import {
 	ExplorerHeaderToolbar,
 } from "../explorer/components/ExplorerCanvas";
 import { CompatibilityBanner } from "./components/CompatibilityBanner";
+import { DeleteModelDialog } from "./components/DeleteModelDialog";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
 import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
@@ -178,6 +180,10 @@ export function ModellerPage() {
 		prefill?: { source: string[]; target: string[] };
 	}>({ open: false, edgeType: null });
 	const [pendingDelete, setPendingDelete] = useState<PendingDelete>(null);
+	// Whole-model deletion (mirrors the list's per-row action). Holds the model
+	// pending confirmation; the system/global model is read-only and never set.
+	const [pendingModelDelete, setPendingModelDelete] =
+		useState<GraphModelSummary | null>(null);
 
 	// Resolve which version is on screen: prefer the editable draft, else the
 	// published (active) version, else the model's single initial draft.
@@ -284,7 +290,6 @@ export function ModellerPage() {
 				modelId,
 				basedOn: activeSummary?.version ?? null,
 			});
-			toast.success("Draft created — you can now edit this model.");
 		} catch (err) {
 			toast.error(
 				err instanceof ApiError ? err.message : "Failed to create draft.",
@@ -334,7 +339,6 @@ export function ModellerPage() {
 		if (!modelId || !draftSummary) return;
 		try {
 			await publish.mutateAsync({ modelId, versionId: draftSummary.id });
-			toast.success("Model published.");
 			setSelected(null);
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to publish.");
@@ -354,7 +358,6 @@ export function ModellerPage() {
 			if (selected && "id" in selected && selected.id === pendingDelete.id) {
 				setSelected(null);
 			}
-			toast.success("Type deleted.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to delete.");
 		} finally {
@@ -377,8 +380,12 @@ export function ModellerPage() {
 			typeId: d.id,
 		};
 		try {
-			if (d.kind === "node") await deleteNode.mutateAsync(args);
-			else await deleteEdge.mutateAsync(args);
+			// Erase deletes silently by design (the canvas already removed the
+			// element) — suppress the per-request action toast (RFC-028).
+			await suppressActionToast(async () => {
+				if (d.kind === "node") await deleteNode.mutateAsync(args);
+				else await deleteEdge.mutateAsync(args);
+			});
 			if (selected && "id" in selected && selected.id === d.id)
 				setSelected(null);
 		} catch (err) {
@@ -392,15 +399,20 @@ export function ModellerPage() {
 		const et = edgeTypes.find((e) => e.id === edgeTypeId);
 		if (!et) return;
 		try {
-			await updateEdge.mutateAsync({
-				modelId: ctx.modelId,
-				versionId: ctx.versionId,
-				typeId: edgeTypeId,
-				data: {
-					source_node_types: et.target_node_types,
-					target_node_types: et.source_node_types,
-				},
-			});
+			// Reverse reuses the generic edge-type PATCH (whose message would be
+			// "Edge type updated."), so suppress that and show the gesture's own
+			// summary instead (RFC-028 Decision #6).
+			await suppressActionToast(() =>
+				updateEdge.mutateAsync({
+					modelId: ctx.modelId,
+					versionId: ctx.versionId,
+					typeId: edgeTypeId,
+					data: {
+						source_node_types: et.target_node_types,
+						target_node_types: et.source_node_types,
+					},
+				}),
+			);
 			toast.success("Direction reversed.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to reverse.");
@@ -578,6 +590,17 @@ export function ModellerPage() {
 				]}
 				headerActions={{
 					rightNavItems: [
+						// The system "global" model mirrors the live DB — read-only, no delete.
+						...(isSystem
+							? []
+							: [
+									{
+										key: "delete",
+										name: "Delete model",
+										icon: Trash2,
+										onClick: () => setPendingModelDelete(selectedModel),
+									},
+								]),
 						{
 							key: "close",
 							name: "Collapse panel",
@@ -855,6 +878,14 @@ export function ModellerPage() {
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>
+
+				<DeleteModelDialog
+					model={pendingModelDelete}
+					username={u}
+					graphSlug={g}
+					onClose={() => setPendingModelDelete(null)}
+					onDeleted={backToList}
+				/>
 			</CanvasContext.Provider>
 		</GraphToolProvider>
 	);

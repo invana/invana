@@ -156,14 +156,12 @@ export function EdgeTypeFormDialog({
 					typeId: edgeType.id,
 					data,
 				});
-				toast.success("Edge type updated.");
 			} else {
 				await create.mutateAsync({
 					modelId: ctx.modelId,
 					versionId: ctx.versionId,
 					data,
 				});
-				toast.success("Edge type created.");
 			}
 			onClose();
 		} catch (err) {

@@ -91,14 +91,12 @@ export function NodeTypeFormDialog({
 					typeId: nodeType.id,
 					data,
 				});
-				toast.success("Node type updated.");
 			} else {
 				await create.mutateAsync({
 					modelId: ctx.modelId,
 					versionId: ctx.versionId,
 					data,
 				});
-				toast.success("Node type created.");
 			}
 			onClose();
 		} catch (err) {
