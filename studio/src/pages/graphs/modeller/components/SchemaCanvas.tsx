@@ -306,6 +306,47 @@ function CanvasBridge({
 	return null;
 }
 
+// Reflects the externally-driven `selected` (a click in the left SchemaNav list,
+// the post-draft reselect, …) back onto the canvas, so the matching node/edge
+// type paints with the `selected` visual state. The canvas→panel direction is
+// already handled by the inspect bridges; this is the panel/list→canvas one.
+// Mounted in both the authoring and explore canvases — they share the
+// `click-select` behaviour id.
+function SelectionBridge({
+	selected,
+	nodeTypes,
+	edges,
+}: {
+	selected: SelectedItem;
+	nodeTypes: NodeTypeResponse[];
+	edges: GraphEdge[];
+}) {
+	const canvas = useGraphCanvas();
+	useEffect(() => {
+		const select =
+			canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
+		if (!select) return;
+		if (selected?.kind === "node-type") {
+			// Canvas node ids ARE the type names; map the selected type id → name.
+			const name = nodeTypes.find((n) => n.id === selected.id)?.name;
+			if (name) select.select(name, "shape");
+			else select.clearSelection();
+		} else if (selected?.kind === "edge-type") {
+			// An edge type fans out to one canvas edge per (source, target) pair —
+			// select them all so every strand of the type highlights.
+			const ids = edges
+				.filter((e) => edgeTypeIdOf(e.id) === selected.id)
+				.map((e) => ({ id: e.id, type: "connector" as const }));
+			if (ids.length) select.selectMultiple(ids);
+			else select.clearSelection();
+		} else {
+			// property-keys / constraints / indexes / nothing — no canvas element.
+			select.clearSelection();
+		}
+	}, [selected, nodeTypes, edges, canvas]);
+	return null;
+}
+
 interface SchemaData {
 	data: GraphData;
 	nameToNodeId: Map<string, string>;
@@ -441,6 +482,14 @@ function AuthoringSchemaCanvas(
 					edgeTypeName={edgeTypeName}
 				/>
 
+				{/* Mirror the panel/list selection onto the canvas (mounted after
+				    ModellerTools so its `click-select` behaviour is registered). */}
+				<SelectionBridge
+					selected={props.selected}
+					nodeTypes={props.nodeTypes}
+					edges={data.edges}
+				/>
+
 				{/* Last child: publishes the live engine to the lifted CanvasContext
 				    only after everything above has registered. */}
 				<CanvasBridge onReady={onReady} />
@@ -455,7 +504,7 @@ function AuthoringSchemaCanvas(
 function ExploreSchemaCanvas(
 	props: SchemaCanvasProps & { schema: SchemaData },
 ) {
-	const { onSelect, onReady, backend, schema } = props;
+	const { onSelect, onReady, backend, schema, selected, nodeTypes } = props;
 	const { data, nameToNodeId } = schema;
 
 	return (
@@ -521,6 +570,13 @@ function ExploreSchemaCanvas(
 				<MiniMapLayer id="minimap" graphLayerId={LAYER_ID} />
 
 				<ExploreContextMenus nameToNodeId={nameToNodeId} onSelect={onSelect} />
+
+				{/* Mirror the panel/list selection onto the canvas. */}
+				<SelectionBridge
+					selected={selected}
+					nodeTypes={nodeTypes}
+					edges={data.edges}
+				/>
 
 				{/* Last child: publishes the live engine to the lifted CanvasContext. */}
 				<CanvasBridge onReady={onReady} />
