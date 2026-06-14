@@ -24,7 +24,7 @@ import {
 	useCreateNodeTypeMutation,
 	useUpdateNodeTypeMutation,
 } from "../../../../hooks/queries/useModels";
-import { ApiError } from "../../../../services/api/client";
+import { ApiError, suppressActionToast } from "../../../../services/api/client";
 import type { NodeTypeResponse } from "../../../../types/schemas";
 import type { ModelEditCtx } from "./editing";
 
@@ -84,20 +84,24 @@ export function NodeTypeFormDialog({
 					: (validationMode as "strict" | "permissive"),
 		};
 		try {
-			if (isEdit && nodeType) {
-				await update.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					typeId: nodeType.id,
-					data,
-				});
-			} else {
-				await create.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					data,
-				});
-			}
+			// Draft edits stage silently (RFC-029) — suppress the per-request toast;
+			// Publish is the single commit.
+			await suppressActionToast(async () => {
+				if (isEdit && nodeType) {
+					await update.mutateAsync({
+						modelId: ctx.modelId,
+						versionId: ctx.versionId,
+						typeId: nodeType.id,
+						data,
+					});
+				} else {
+					await create.mutateAsync({
+						modelId: ctx.modelId,
+						versionId: ctx.versionId,
+						data,
+					});
+				}
+			});
 			onClose();
 		} catch (err) {
 			const message =

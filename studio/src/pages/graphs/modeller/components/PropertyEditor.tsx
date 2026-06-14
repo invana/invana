@@ -146,8 +146,9 @@ export function PropertyEditor({
 		const name = draft.name.trim();
 		if (!name) return;
 		try {
-			// Property gestures are orchestrated over generic key/type endpoints, so
-			// suppress their per-request toasts and show one summary (RFC-028 Decision #6).
+			// Draft edits stage silently (RFC-029): suppress the per-request toast and
+			// emit no summary — the table updates off the refetched draft, and Publish
+			// is the single commit.
 			await suppressActionToast(() =>
 				updateKey.mutateAsync({
 					modelId: ctx.modelId,
@@ -160,7 +161,6 @@ export function PropertyEditor({
 					},
 				}),
 			);
-			toast.success("Property updated.");
 			cancel();
 		} catch (err) {
 			toast.error(
@@ -178,8 +178,7 @@ export function PropertyEditor({
 		}
 		try {
 			// Adding a property fans out to two requests (create key + patch the
-			// type's mappings); suppress both per-request toasts and show one
-			// summary (RFC-028 Decision #6).
+			// type's mappings); both stage silently (RFC-029).
 			await suppressActionToast(async () => {
 				// Reuse an existing key of the same name (keys are shared across types);
 				// otherwise create a new one with the chosen type + cardinality.
@@ -200,7 +199,6 @@ export function PropertyEditor({
 					{ property_key: name, sort_order: mappings.length },
 				]);
 			});
-			toast.success("Property added.");
 			cancel();
 		} catch (err) {
 			toast.error(
@@ -216,7 +214,6 @@ export function PropertyEditor({
 					toCreateList(mappings.filter((m) => m.property_key.name !== keyName)),
 				),
 			);
-			toast.success("Property removed.");
 		} catch (err) {
 			toast.error(
 				err instanceof ApiError ? err.message : "Failed to remove property.",
@@ -229,13 +226,15 @@ export function PropertyEditor({
 	return (
 		<div className="flex flex-col gap-2">
 			{showTable ? (
-				<Table>
+				// table-fixed: column widths are pinned by the header, so switching a
+				// row into edit mode (wider inputs/selects) never reflows the columns.
+				<Table className="table-fixed">
 					<TableHeader>
 						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Data type</TableHead>
-							<TableHead>Cardinality</TableHead>
-							<TableHead className="w-24 text-right">Actions</TableHead>
+							<TableHead className="w-[34%]">Name</TableHead>
+							<TableHead className="w-[24%]">Data type</TableHead>
+							<TableHead className="w-[22%]">Cardinality</TableHead>
+							<TableHead className="w-[20%] text-right">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -252,30 +251,36 @@ export function PropertyEditor({
 								/>
 							) : (
 								<TableRow key={m.id}>
-									<TableCell className="font-mono">
+									<TableCell className="truncate font-mono">
 										{m.property_key.name}
 									</TableCell>
-									<TableCell>{m.property_key.type}</TableCell>
+									<TableCell className="truncate">
+										{m.property_key.type}
+									</TableCell>
 									<TableCell>{m.property_key.value_cardinality}</TableCell>
 									<TableCell className="text-right">
-										<Button
-											variant="ghost"
-											size="sm"
-											title="Edit property"
-											disabled={busy || adding || editingId !== null}
-											onClick={() => startEdit(m)}
-										>
-											<Pencil className="w-3.5 h-3.5" />
-										</Button>
-										<Button
-											variant="ghost"
-											size="sm"
-											title="Remove from this type"
-											disabled={busy || editingId !== null}
-											onClick={() => onRemove(m.property_key.name)}
-										>
-											<Trash2 className="w-3.5 h-3.5" />
-										</Button>
+										<div className="flex items-center justify-end gap-0.5">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-7 w-7"
+												title="Edit property"
+												disabled={busy || adding || editingId !== null}
+												onClick={() => startEdit(m)}
+											>
+												<Pencil className="w-3 h-3" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-7 w-7"
+												title="Remove from this type"
+												disabled={busy || editingId !== null}
+												onClick={() => onRemove(m.property_key.name)}
+											>
+												<Trash2 className="w-3 h-3" />
+											</Button>
+										</div>
 									</TableCell>
 								</TableRow>
 							),
@@ -330,12 +335,14 @@ function EditableRow({
 	const canSave = draft.name.trim().length > 0 && !busy;
 	return (
 		<TableRow>
-			<TableCell>
+			{/* pl-0 + px-2 input: the value text lines up with the read rows' value
+			    text (a bordered input would otherwise inset it by border + padding). */}
+			<TableCell className="py-1 pl-0 pr-1">
 				<Input
 					autoFocus={autoFocus}
 					value={draft.name}
 					placeholder="property name"
-					className="h-8 font-mono"
+					className="h-7 w-full px-2 font-mono"
 					onChange={(e) => onChange({ ...draft, name: e.target.value })}
 					onKeyDown={(e) => {
 						if (e.key === "Enter" && canSave) onSave();
@@ -343,12 +350,12 @@ function EditableRow({
 					}}
 				/>
 			</TableCell>
-			<TableCell>
+			<TableCell className="py-1">
 				<Select
 					value={draft.type}
 					onValueChange={(v) => onChange({ ...draft, type: v })}
 				>
-					<SelectTrigger className="h-8">
+					<SelectTrigger className="h-7 px-2">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -360,14 +367,14 @@ function EditableRow({
 					</SelectContent>
 				</Select>
 			</TableCell>
-			<TableCell>
+			<TableCell className="py-1">
 				<Select
 					value={draft.cardinality}
 					onValueChange={(v) =>
 						onChange({ ...draft, cardinality: v as Cardinality })
 					}
 				>
-					<SelectTrigger className="h-8">
+					<SelectTrigger className="h-7 px-2">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>
@@ -379,25 +386,29 @@ function EditableRow({
 					</SelectContent>
 				</Select>
 			</TableCell>
-			<TableCell className="text-right">
-				<Button
-					variant="ghost"
-					size="sm"
-					title="Save"
-					disabled={!canSave}
-					onClick={onSave}
-				>
-					<Check className="w-3.5 h-3.5" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="sm"
-					title="Cancel"
-					disabled={busy}
-					onClick={onCancel}
-				>
-					<X className="w-3.5 h-3.5" />
-				</Button>
+			<TableCell className="py-1 text-right">
+				<div className="flex items-center justify-end gap-0.5">
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						title="Save"
+						disabled={!canSave}
+						onClick={onSave}
+					>
+						<Check className="w-3 h-3" />
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7"
+						title="Cancel"
+						disabled={busy}
+						onClick={onCancel}
+					>
+						<X className="w-3 h-3" />
+					</Button>
+				</div>
 			</TableCell>
 		</TableRow>
 	);

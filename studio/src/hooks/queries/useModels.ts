@@ -25,6 +25,19 @@ export function useModelsQuery(username?: string, graphSlug?: string) {
 	});
 }
 
+export function useModelQuery(
+	username?: string,
+	graphSlug?: string,
+	modelId?: string,
+) {
+	return useQuery({
+		queryKey: ["models", username, graphSlug, modelId, "detail"] as const,
+		queryFn: () =>
+			modelsApi.get(username as string, graphSlug as string, modelId as string),
+		enabled: !!username && !!graphSlug && !!modelId,
+	});
+}
+
 export function useModelVersionsQuery(
 	username?: string,
 	graphSlug?: string,

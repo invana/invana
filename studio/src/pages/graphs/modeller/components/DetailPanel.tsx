@@ -1,4 +1,8 @@
 import type {
+	GraphModelResponse,
+	GraphModelSummary,
+} from "../../../../types/models";
+import type {
 	ConstraintResponse,
 	EdgeTypeResponse,
 	IndexResponse,
@@ -8,6 +12,7 @@ import type {
 import { ConstraintTable } from "./ConstraintTable";
 import { EdgeTypeDetail } from "./EdgeTypeDetail";
 import { IndexTable } from "./IndexTable";
+import { ModelOverview } from "./ModelOverview";
 import { NoSelectionPlaceholder } from "./NoSelectionPlaceholder";
 import { NodeTypeDetail } from "./NodeTypeDetail";
 import { PropertyKeyTable } from "./PropertyKeyTable";
@@ -23,6 +28,11 @@ export type SelectedItem =
 
 interface Props {
 	selected: SelectedItem;
+	/** Open model — when nothing is selected, its metadata is the default view. */
+	model?: GraphModelResponse | GraphModelSummary | null;
+	/** Non-system model: the overview offers an Edit affordance. */
+	canEditModel?: boolean;
+	onEditModel?: () => void;
 	nodeTypes: NodeTypeResponse[];
 	edgeTypes: EdgeTypeResponse[];
 	propertyKeys: PropertyKeyResponse[];
@@ -44,6 +54,9 @@ interface Props {
 
 export function DetailPanel({
 	selected,
+	model,
+	canEditModel = false,
+	onEditModel,
 	nodeTypes,
 	edgeTypes,
 	propertyKeys,
@@ -60,6 +73,24 @@ export function DetailPanel({
 	onDeleteEdgeType,
 }: Props) {
 	if (!selected) {
+		// With a model open, its metadata is the default view; the generic
+		// placeholder only shows on the model list (no model open).
+		if (model) {
+			return (
+				<ModelOverview
+					model={model}
+					counts={{
+						nodeTypes: nodeTypes.length,
+						edgeTypes: edgeTypes.length,
+						propertyKeys: propertyKeys.length,
+						constraints: constraints.length,
+						indexes: indexes.length,
+					}}
+					canEdit={canEditModel}
+					onEdit={onEditModel}
+				/>
+			);
+		}
 		return <NoSelectionPlaceholder />;
 	}
 

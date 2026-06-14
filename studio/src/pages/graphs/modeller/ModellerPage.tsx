@@ -29,7 +29,6 @@ import {
 	PanelRightOpen,
 	Pencil,
 	RefreshCw,
-	Save,
 	Send,
 	Trash2,
 	Workflow,
@@ -47,6 +46,7 @@ import {
 	useCreateDraftMutation,
 	useDeleteEdgeTypeMutation,
 	useDeleteNodeTypeMutation,
+	useModelQuery,
 	useModelVersionQuery,
 	useModelVersionsQuery,
 	useModelsQuery,
@@ -184,6 +184,9 @@ export function ModellerPage() {
 	// pending confirmation; the system/global model is read-only and never set.
 	const [pendingModelDelete, setPendingModelDelete] =
 		useState<GraphModelSummary | null>(null);
+	// Confirms the single whole-model commit (Publish) — staged draft edits only
+	// reach the active version through this deliberate step (RFC-029).
+	const [publishConfirm, setPublishConfirm] = useState(false);
 
 	// Resolve which version is on screen: prefer the editable draft, else the
 	// published (active) version, else the model's single initial draft.
@@ -215,6 +218,10 @@ export function ModellerPage() {
 	const updateEdge = useUpdateEdgeTypeMutation(u, g);
 
 	const selectedModel = models?.find((m) => m.id === modelId);
+	// Full model detail (validation_mode, created_at, yaml_path) for the Details
+	// overview — the list summary lacks those fields. Falls back to the summary
+	// while it loads.
+	const { data: modelDetail } = useModelQuery(username, graphSlug, modelId);
 
 	const openModel = (id: string) => {
 		setModelId(id);
@@ -328,13 +335,6 @@ export function ModellerPage() {
 		}
 	}, [isDraft, nodeTypes, edgeTypes]);
 
-	// Edits persist to the draft as they're made; "Save" confirms and closes the
-	// editor (the model stays a draft until Publish).
-	const handleSaveDraft = () => {
-		toast.success("Draft saved.");
-		backToList();
-	};
-
 	const handlePublish = async () => {
 		if (!modelId || !draftSummary) return;
 		try {
@@ -353,8 +353,11 @@ export function ModellerPage() {
 			typeId: pendingDelete.id,
 		};
 		try {
-			if (pendingDelete.kind === "node") await deleteNode.mutateAsync(args);
-			else await deleteEdge.mutateAsync(args);
+			// Draft edits stage silently (RFC-029) — Publish is the single commit.
+			await suppressActionToast(async () => {
+				if (pendingDelete.kind === "node") await deleteNode.mutateAsync(args);
+				else await deleteEdge.mutateAsync(args);
+			});
 			if (selected && "id" in selected && selected.id === pendingDelete.id) {
 				setSelected(null);
 			}
@@ -399,9 +402,8 @@ export function ModellerPage() {
 		const et = edgeTypes.find((e) => e.id === edgeTypeId);
 		if (!et) return;
 		try {
-			// Reverse reuses the generic edge-type PATCH (whose message would be
-			// "Edge type updated."), so suppress that and show the gesture's own
-			// summary instead (RFC-028 Decision #6).
+			// Reverse reuses the generic edge-type PATCH; draft edits stage silently
+			// (RFC-029) — suppress the per-request toast and emit no summary.
 			await suppressActionToast(() =>
 				updateEdge.mutateAsync({
 					modelId: ctx.modelId,
@@ -413,7 +415,6 @@ export function ModellerPage() {
 					},
 				}),
 			);
-			toast.success("Direction reversed.");
 		} catch (err) {
 			toast.error(err instanceof ApiError ? err.message : "Failed to reverse.");
 		}
@@ -471,27 +472,16 @@ export function ModellerPage() {
 							{introspecting ? "Introspecting…" : "Refresh from DB"}
 						</Button>
 					) : isDraft ? (
-						<>
-							<Button
-								variant="outline"
-								size="sm"
-								className="h-7 flex-1"
-								onClick={handleSaveDraft}
-								title="Keep these edits as a draft (saved automatically as you go)"
-							>
-								<Save className="w-3 h-3 mr-1" />
-								Save
-							</Button>
-							<Button
-								size="sm"
-								className="h-7 flex-1"
-								onClick={handlePublish}
-								disabled={!canPublish || publish.isPending}
-							>
-								<Send className="w-3 h-3 mr-1" />
-								{publish.isPending ? "Publishing…" : "Publish"}
-							</Button>
-						</>
+						<Button
+							size="sm"
+							className="h-7 flex-1"
+							onClick={() => setPublishConfirm(true)}
+							disabled={!canPublish || publish.isPending}
+							title="Commit all staged changes — publish this draft as the active version"
+						>
+							<Send className="w-3 h-3 mr-1" />
+							{publish.isPending ? "Publishing…" : "Publish"}
+						</Button>
 					) : (
 						<Button
 							variant="outline"
@@ -510,6 +500,17 @@ export function ModellerPage() {
 						Read-only — mirrors the live database schema.
 					</p>
 				)}
+				{isDraft &&
+					(canPublish ? (
+						<p className="flex items-center gap-1.5 text-muted-foreground">
+							<span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+							Unpublished changes — staged in this draft. Publish to commit.
+						</p>
+					) : (
+						<p className="text-muted-foreground">
+							Add node types, edge types or properties, then Publish to commit.
+						</p>
+					))}
 			</div>
 		);
 		const detailBody = (
@@ -590,10 +591,17 @@ export function ModellerPage() {
 				]}
 				headerActions={{
 					rightNavItems: [
-						// The system "global" model mirrors the live DB — read-only, no delete.
+						// The system "global" model mirrors the live DB — read-only, no edit/delete.
 						...(isSystem
 							? []
 							: [
+									{
+										key: "edit",
+										name: "Edit model",
+										icon: Pencil,
+										onClick: () =>
+											setModelForm({ open: true, model: selectedModel }),
+									},
 									{
 										key: "delete",
 										name: "Delete model",
@@ -625,6 +633,12 @@ export function ModellerPage() {
 				<div className="p-6">
 					<DetailPanel
 						selected={selected}
+						model={modelDetail ?? selectedModel}
+						canEditModel={!isSystem}
+						onEditModel={() =>
+							selectedModel &&
+							setModelForm({ open: true, model: selectedModel })
+						}
 						nodeTypes={nodeTypes}
 						edgeTypes={edgeTypes}
 						propertyKeys={propertyKeys}
@@ -874,6 +888,30 @@ export function ModellerPage() {
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
 							<AlertDialogAction onClick={confirmDelete}>
 								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+
+				<AlertDialog
+					open={publishConfirm}
+					onOpenChange={(o) => !o && setPublishConfirm(false)}
+				>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Publish this model?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This commits all staged changes to the active version:{" "}
+								{nodeTypes.length} node type{nodeTypes.length === 1 ? "" : "s"},{" "}
+								{edgeTypes.length} edge type{edgeTypes.length === 1 ? "" : "s"},{" "}
+								{propertyKeys.length} property key
+								{propertyKeys.length === 1 ? "" : "s"}.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={handlePublish}>
+								Publish
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>

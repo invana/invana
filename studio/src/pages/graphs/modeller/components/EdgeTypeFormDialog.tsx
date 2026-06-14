@@ -24,7 +24,7 @@ import {
 	useCreateEdgeTypeMutation,
 	useUpdateEdgeTypeMutation,
 } from "../../../../hooks/queries/useModels";
-import { ApiError } from "../../../../services/api/client";
+import { ApiError, suppressActionToast } from "../../../../services/api/client";
 import type { Multiplicity } from "../../../../types/models";
 import type {
 	EdgeTypeResponse,
@@ -149,20 +149,24 @@ export function EdgeTypeFormDialog({
 			target_node_types: target,
 		};
 		try {
-			if (isEdit && edgeType) {
-				await update.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					typeId: edgeType.id,
-					data,
-				});
-			} else {
-				await create.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					data,
-				});
-			}
+			// Draft edits stage silently (RFC-029) — suppress the per-request toast;
+			// Publish is the single commit.
+			await suppressActionToast(async () => {
+				if (isEdit && edgeType) {
+					await update.mutateAsync({
+						modelId: ctx.modelId,
+						versionId: ctx.versionId,
+						typeId: edgeType.id,
+						data,
+					});
+				} else {
+					await create.mutateAsync({
+						modelId: ctx.modelId,
+						versionId: ctx.versionId,
+						data,
+					});
+				}
+			});
 			onClose();
 		} catch (err) {
 			const message =
