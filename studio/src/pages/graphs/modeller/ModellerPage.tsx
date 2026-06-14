@@ -723,7 +723,7 @@ export function ModellerPage() {
 						defaultSize: "600px",
 						minSize: "300px",
 						content: (
-							<div className="flex h-full flex-col">
+							<div className="flex h-full flex-col overflow-hidden">
 								{graph && (
 									<CompatibilityBanner
 										username={u}
@@ -731,7 +731,11 @@ export function ModellerPage() {
 										connection={graph}
 									/>
 								)}
-								<div className="min-h-0 flex-1">
+								{/* overflow-hidden: the PixiJS canvas autoResizes to its
+								    container and can round its element up by a pixel — without
+								    this the overflow nudges the layout wider when the right
+								    panel collapses (matches the Explorer's canvas wrapper). */}
+								<div className="min-h-0 flex-1 overflow-hidden">
 									<SchemaCanvas
 										nodeTypes={nodeTypes}
 										edgeTypes={edgeTypes}
