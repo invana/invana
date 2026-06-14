@@ -77,15 +77,19 @@ function NavItem({
 }) {
 	return (
 		<div
-			className={`group flex items-center pr-2 rounded-sm transition-colors ${
-				active ? "bg-accent" : "hover:bg-accent/50"
+			className={`group flex items-center pr-2 rounded-md ring-1 ring-transparent transition-colors ${
+				active
+					? "bg-primary/15 text-primary ring-primary/25"
+					: "hover:bg-primary/10 hover:ring-primary/25"
 			}`}
 		>
 			<button
 				type="button"
 				onClick={onClick}
 				className={`flex-1 text-left px-6 py-1 ${
-					active ? "text-accent-foreground font-medium" : "text-foreground"
+					active
+						? "text-primary font-medium"
+						: "text-foreground group-hover:text-primary"
 				}`}
 			>
 				{label}
