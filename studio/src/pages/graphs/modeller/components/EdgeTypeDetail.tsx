@@ -18,6 +18,12 @@ interface Props {
 	indexes: IndexResponse[];
 	editable?: boolean;
 	ctx?: ModelEditCtx;
+	/** Read-only published model that can be drafted to edit (not the system model). */
+	canEditViaDraft?: boolean;
+	/** A draft-creation is in flight. */
+	creatingDraft?: boolean;
+	/** Drafts the model and switches to the editable PropertyEditor for this type. */
+	onEditViaDraft?: () => void;
 	propertyKeys?: PropertyKeyResponse[];
 	onEdit?: () => void;
 	onDelete?: () => void;
@@ -29,6 +35,9 @@ export function EdgeTypeDetail({
 	indexes,
 	editable = false,
 	ctx,
+	canEditViaDraft = false,
+	creatingDraft = false,
+	onEditViaDraft,
 	propertyKeys = [],
 	onEdit,
 	onDelete,
@@ -102,7 +111,21 @@ export function EdgeTypeDetail({
 
 			{/* Properties */}
 			<div>
-				<h3 className="font-semibold mb-2">Properties</h3>
+				<div className="flex items-center justify-between mb-2">
+					<h3 className="font-semibold">Properties</h3>
+					{!editable && canEditViaDraft && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onEditViaDraft}
+							disabled={creatingDraft}
+							title="Create a draft of this model to edit its properties"
+						>
+							<Pencil className="w-3.5 h-3.5 mr-1" />
+							{creatingDraft ? "Creating draft…" : "Create draft to edit"}
+						</Button>
+					)}
+				</div>
 				{editable && ctx ? (
 					<PropertyEditor
 						ctx={ctx}

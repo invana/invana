@@ -101,7 +101,7 @@ types; docs reconciliation (this RFC + `dataset-ingestion-flow.md` + `mvp.md` §
   from `model.json`); auto-export a `model.json` snapshot per `ImportJob`; surface model-binding
   (`dataset.model_id`, many datasets → one model) in the dataset UI/CLI.
 - Constraints & Indexes authoring UI.
-- Interactive canvas editing (draw types on the `SchemaCanvas`).
+- ~~Interactive canvas editing (draw types on the `SchemaCanvas`).~~ **Superseded by [RFC-027](rfc-027-interactive-modeller-canvas.md)** — the `SchemaCanvas` is now a tool-driven editor.
 - YAML round-trip of hand-authored models (RFC-019 `*.model.yaml`).
 
 ## Verification

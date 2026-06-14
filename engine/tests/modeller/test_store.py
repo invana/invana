@@ -116,6 +116,10 @@ class TestPropertyKeyCRUD:
         assert pk.name == "name"
         assert pk.type == "string"
         assert pk.value_cardinality == "SINGLE"
+        # The route serialises PropertyKeyResponse after committing; validation_rules
+        # must be eagerly loaded or that access raises MissingGreenlet (async lazy-load).
+        await session.commit()
+        assert pk.validation_rules == []
 
     async def test_list_property_keys(self, session, store):
         schema = await store.create_graph_model(session, name="PK List")

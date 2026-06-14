@@ -1,6 +1,5 @@
 import {
 	Input,
-	Label,
 	Select,
 	SelectContent,
 	SelectItem,
@@ -9,11 +8,6 @@ import {
 } from "@invana/forms";
 import {
 	Button,
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
 	Table,
 	TableBody,
 	TableCell,
@@ -21,15 +15,15 @@ import {
 	TableHeader,
 	TableRow,
 } from "@invana/ui";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FormError } from "../../../../components/forms/FormError";
 import { useGraphConnectionQuery } from "../../../../hooks/queries/useGraphs";
 import {
 	useCreatePropertyKeyMutation,
 	useUpdateEdgeTypeMutation,
 	useUpdateNodeTypeMutation,
+	useUpdatePropertyKeyMutation,
 } from "../../../../hooks/queries/useModels";
 import { ApiError } from "../../../../services/api/client";
 import type { TypePropertyMappingCreate } from "../../../../types/models";
@@ -37,11 +31,11 @@ import type {
 	PropertyKeyResponse,
 	TypePropertyMappingResponse,
 } from "../../../../types/schemas";
-import { PropertyKeyFormDialog } from "./PropertyKeyFormDialog";
 import type { ModelEditCtx } from "./editing";
 import { propertyTypeOptions } from "./editing";
 
-const NEW_KEY = "__new__";
+type Cardinality = "SINGLE" | "LIST" | "SET";
+const CARDINALITIES: Cardinality[] = ["SINGLE", "LIST", "SET"];
 
 interface Props {
 	ctx: ModelEditCtx;
@@ -66,6 +60,25 @@ function toCreateList(
 	}));
 }
 
+interface DraftRow {
+	name: string;
+	type: string;
+	cardinality: Cardinality;
+}
+
+const EMPTY_DRAFT: DraftRow = {
+	name: "",
+	type: "string",
+	cardinality: "SINGLE",
+};
+
+/**
+ * Inline property editor — no modals. Each row edits in place (name / data type /
+ * cardinality become fields with Save / Cancel), and "Add property" reveals an
+ * inline new-property row at the bottom. Editing a property edits its shared
+ * property *key*; adding either attaches an existing key (matched by name) or
+ * creates a new one, then patches this type's mapping list.
+ */
 export function PropertyEditor({
 	ctx,
 	kind,
@@ -75,10 +88,26 @@ export function PropertyEditor({
 }: Props) {
 	const updateNode = useUpdateNodeTypeMutation(ctx.username, ctx.graphSlug);
 	const updateEdge = useUpdateEdgeTypeMutation(ctx.username, ctx.graphSlug);
-	const [adding, setAdding] = useState(false);
-	const [editingKey, setEditingKey] = useState<PropertyKeyResponse | null>(
-		null,
+	const createKey = useCreatePropertyKeyMutation(ctx.username, ctx.graphSlug);
+	const updateKey = useUpdatePropertyKeyMutation(ctx.username, ctx.graphSlug);
+	const { data: connection } = useGraphConnectionQuery(
+		ctx.username,
+		ctx.graphSlug,
 	);
+	// Only the property types the bound backend supports for its version (RFC-022).
+	const typeOptions = propertyTypeOptions(connection?.supported_property_types);
+
+	// Which existing row is in edit mode (by mapping id), the in-flight draft, and
+	// whether the inline add-row is showing. Only one row is ever editable at once.
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [adding, setAdding] = useState(false);
+	const [draft, setDraft] = useState<DraftRow>(EMPTY_DRAFT);
+
+	const busy =
+		updateNode.isPending ||
+		updateEdge.isPending ||
+		createKey.isPending ||
+		updateKey.isPending;
 
 	const patchMappings = async (next: TypePropertyMappingCreate[]) => {
 		const args = {
@@ -90,6 +119,82 @@ export function PropertyEditor({
 		if (kind === "node") await updateNode.mutateAsync(args);
 		else await updateEdge.mutateAsync(args);
 	};
+
+	function startAdd() {
+		setEditingId(null);
+		setDraft(EMPTY_DRAFT);
+		setAdding(true);
+	}
+
+	function startEdit(m: TypePropertyMappingResponse) {
+		setAdding(false);
+		setEditingId(m.id);
+		setDraft({
+			name: m.property_key.name,
+			type: m.property_key.type,
+			cardinality: m.property_key.value_cardinality as Cardinality,
+		});
+	}
+
+	function cancel() {
+		setEditingId(null);
+		setAdding(false);
+		setDraft(EMPTY_DRAFT);
+	}
+
+	async function saveEdit(keyId: string) {
+		const name = draft.name.trim();
+		if (!name) return;
+		try {
+			await updateKey.mutateAsync({
+				modelId: ctx.modelId,
+				versionId: ctx.versionId,
+				keyId,
+				data: { name, type: draft.type, value_cardinality: draft.cardinality },
+			});
+			toast.success("Property updated.");
+			cancel();
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Failed to update property.",
+			);
+		}
+	}
+
+	async function saveAdd() {
+		const name = draft.name.trim();
+		if (!name) return;
+		if (mappings.some((m) => m.property_key.name === name)) {
+			toast.error("That property is already on this type.");
+			return;
+		}
+		try {
+			// Reuse an existing key of the same name (keys are shared across types);
+			// otherwise create a new one with the chosen type + cardinality.
+			const existing = propertyKeys.find((pk) => pk.name === name);
+			if (!existing) {
+				await createKey.mutateAsync({
+					modelId: ctx.modelId,
+					versionId: ctx.versionId,
+					data: {
+						name,
+						type: draft.type,
+						value_cardinality: draft.cardinality,
+					},
+				});
+			}
+			await patchMappings([
+				...toCreateList(mappings),
+				{ property_key: name, sort_order: mappings.length },
+			]);
+			toast.success("Property added.");
+			cancel();
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Failed to add property.",
+			);
+		}
+	}
 
 	async function onRemove(keyName: string) {
 		try {
@@ -104,229 +209,181 @@ export function PropertyEditor({
 		}
 	}
 
-	// Count how many types share the key being edited (for the global-edit note).
-	const usedByCount = (keyName: string) => {
-		// We only have this type's mappings here; the table shows it, but the
-		// FormDialog note is informational — 1 is the safe minimum.
-		return mappings.some((m) => m.property_key.name === keyName) ? 1 : 0;
-	};
+	const showTable = mappings.length > 0 || adding;
 
 	return (
 		<div className="flex flex-col gap-2">
-			{mappings.length === 0 ? (
-				<p className="text-muted-foreground py-2">No properties defined.</p>
-			) : (
+			{showTable ? (
 				<Table>
 					<TableHeader>
 						<TableRow>
 							<TableHead>Name</TableHead>
 							<TableHead>Data type</TableHead>
 							<TableHead>Cardinality</TableHead>
-							<TableHead className="w-20 text-right">Actions</TableHead>
+							<TableHead className="w-24 text-right">Actions</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{mappings.map((m) => (
-							<TableRow key={m.id}>
-								<TableCell className="font-mono">
-									{m.property_key.name}
-								</TableCell>
-								<TableCell>{m.property_key.type}</TableCell>
-								<TableCell>{m.property_key.value_cardinality}</TableCell>
-								<TableCell className="text-right">
-									<Button
-										variant="ghost"
-										size="sm"
-										title="Edit property key"
-										onClick={() => setEditingKey(m.property_key)}
-									>
-										<Pencil className="w-3.5 h-3.5" />
-									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										title="Remove from this type"
-										onClick={() => onRemove(m.property_key.name)}
-									>
-										<Trash2 className="w-3.5 h-3.5" />
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
+						{mappings.map((m) =>
+							editingId === m.id ? (
+								<EditableRow
+									key={m.id}
+									draft={draft}
+									typeOptions={typeOptions}
+									busy={busy}
+									onChange={setDraft}
+									onSave={() => saveEdit(m.property_key.id)}
+									onCancel={cancel}
+								/>
+							) : (
+								<TableRow key={m.id}>
+									<TableCell className="font-mono">
+										{m.property_key.name}
+									</TableCell>
+									<TableCell>{m.property_key.type}</TableCell>
+									<TableCell>{m.property_key.value_cardinality}</TableCell>
+									<TableCell className="text-right">
+										<Button
+											variant="ghost"
+											size="sm"
+											title="Edit property"
+											disabled={busy || adding || editingId !== null}
+											onClick={() => startEdit(m)}
+										>
+											<Pencil className="w-3.5 h-3.5" />
+										</Button>
+										<Button
+											variant="ghost"
+											size="sm"
+											title="Remove from this type"
+											disabled={busy || editingId !== null}
+											onClick={() => onRemove(m.property_key.name)}
+										>
+											<Trash2 className="w-3.5 h-3.5" />
+										</Button>
+									</TableCell>
+								</TableRow>
+							),
+						)}
+						{adding && (
+							<EditableRow
+								draft={draft}
+								typeOptions={typeOptions}
+								busy={busy}
+								autoFocus
+								onChange={setDraft}
+								onSave={saveAdd}
+								onCancel={cancel}
+							/>
+						)}
 					</TableBody>
 				</Table>
+			) : (
+				<p className="text-muted-foreground py-2">No properties defined.</p>
 			)}
 
-			<div>
-				<Button variant="outline" size="sm" onClick={() => setAdding(true)}>
-					<Plus className="w-3.5 h-3.5 mr-1" />
-					Add property
-				</Button>
-			</div>
-
-			<AddPropertyDialog
-				open={adding}
-				ctx={ctx}
-				mappings={mappings}
-				propertyKeys={propertyKeys}
-				onClose={() => setAdding(false)}
-				onAdd={patchMappings}
-			/>
-
-			<PropertyKeyFormDialog
-				open={editingKey !== null}
-				ctx={ctx}
-				propertyKey={editingKey}
-				usedByCount={editingKey ? usedByCount(editingKey.name) : 0}
-				onClose={() => setEditingKey(null)}
-			/>
+			{!adding && editingId === null && (
+				<div>
+					<Button variant="outline" size="sm" onClick={startAdd}>
+						<Plus className="w-3.5 h-3.5 mr-1" />
+						Add property
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }
 
-function AddPropertyDialog({
-	open,
-	ctx,
-	mappings,
-	propertyKeys,
-	onClose,
-	onAdd,
+/** One inline-editable row: name input + type/cardinality selects + Save/Cancel. */
+function EditableRow({
+	draft,
+	typeOptions,
+	busy,
+	autoFocus = false,
+	onChange,
+	onSave,
+	onCancel,
 }: {
-	open: boolean;
-	ctx: ModelEditCtx;
-	mappings: TypePropertyMappingResponse[];
-	propertyKeys: PropertyKeyResponse[];
-	onClose: () => void;
-	onAdd: (next: TypePropertyMappingCreate[]) => Promise<void>;
+	draft: DraftRow;
+	typeOptions: string[];
+	busy: boolean;
+	autoFocus?: boolean;
+	onChange: (d: DraftRow) => void;
+	onSave: () => void;
+	onCancel: () => void;
 }) {
-	const createKey = useCreatePropertyKeyMutation(ctx.username, ctx.graphSlug);
-	const { data: connection } = useGraphConnectionQuery(
-		ctx.username,
-		ctx.graphSlug,
-	);
-	// Only the property types the bound backend supports for its version (RFC-022).
-	const typeOptions = propertyTypeOptions(connection?.supported_property_types);
-	const [choice, setChoice] = useState<string>(NEW_KEY);
-	const [newName, setNewName] = useState("");
-	const [newType, setNewType] = useState("string");
-	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
-	// Keys not already attached to this type.
-	const available = propertyKeys.filter(
-		(pk) => !mappings.some((m) => m.property_key.name === pk.name),
-	);
-
-	function reset() {
-		setChoice(available.length > 0 ? available[0].name : NEW_KEY);
-		setNewName("");
-		setNewType("string");
-		setError(null);
-	}
-
-	async function onSubmit(e: React.FormEvent) {
-		e.preventDefault();
-		setError(null);
-		setSubmitting(true);
-		try {
-			let keyName: string;
-			if (choice === NEW_KEY) {
-				await createKey.mutateAsync({
-					modelId: ctx.modelId,
-					versionId: ctx.versionId,
-					data: { name: newName, type: newType },
-				});
-				keyName = newName;
-			} else {
-				keyName = choice;
-			}
-			const next = [
-				...toCreateList(mappings),
-				{ property_key: keyName, sort_order: mappings.length },
-			];
-			await onAdd(next);
-			toast.success("Property added.");
-			onClose();
-		} catch (err) {
-			const message =
-				err instanceof ApiError ? err.message : "Failed to add property.";
-			setError(message);
-			toast.error(message);
-		} finally {
-			setSubmitting(false);
-		}
-	}
-
+	const canSave = draft.name.trim().length > 0 && !busy;
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(o) => {
-				if (o) reset();
-				else onClose();
-			}}
-		>
-			<DialogContent>
-				<form onSubmit={onSubmit}>
-					<DialogHeader>
-						<DialogTitle>Add property</DialogTitle>
-					</DialogHeader>
-					<div className="space-y-4 pt-4">
-						<div className="space-y-2">
-							<Label htmlFor="propKey">Property key</Label>
-							<Select value={choice} onValueChange={setChoice}>
-								<SelectTrigger id="propKey">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{available.map((pk) => (
-										<SelectItem key={pk.id} value={pk.name}>
-											{pk.name} · {pk.type}
-										</SelectItem>
-									))}
-									<SelectItem value={NEW_KEY}>＋ New property key…</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-						{choice === NEW_KEY && (
-							<div className="flex gap-2">
-								<div className="flex-1 space-y-2">
-									<Label htmlFor="propName">Name</Label>
-									<Input
-										id="propName"
-										required
-										value={newName}
-										onChange={(e) => setNewName(e.target.value)}
-									/>
-								</div>
-								<div className="w-40 space-y-2">
-									<Label htmlFor="propType">Data type</Label>
-									<Select value={newType} onValueChange={setNewType}>
-										<SelectTrigger id="propType">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											{typeOptions.map((t) => (
-												<SelectItem key={t} value={t}>
-													{t}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</div>
-							</div>
-						)}
-					</div>
-					<FormError error={error} className="mt-4" />
-					<DialogFooter>
-						<Button variant="ghost" onClick={onClose} type="button">
-							Cancel
-						</Button>
-						<Button type="submit" disabled={submitting}>
-							{submitting ? "Adding…" : "Add property"}
-						</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
+		<TableRow>
+			<TableCell>
+				<Input
+					autoFocus={autoFocus}
+					value={draft.name}
+					placeholder="property name"
+					className="h-8 font-mono"
+					onChange={(e) => onChange({ ...draft, name: e.target.value })}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" && canSave) onSave();
+						if (e.key === "Escape") onCancel();
+					}}
+				/>
+			</TableCell>
+			<TableCell>
+				<Select
+					value={draft.type}
+					onValueChange={(v) => onChange({ ...draft, type: v })}
+				>
+					<SelectTrigger className="h-8">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{typeOptions.map((t) => (
+							<SelectItem key={t} value={t}>
+								{t}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</TableCell>
+			<TableCell>
+				<Select
+					value={draft.cardinality}
+					onValueChange={(v) =>
+						onChange({ ...draft, cardinality: v as Cardinality })
+					}
+				>
+					<SelectTrigger className="h-8">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{CARDINALITIES.map((c) => (
+							<SelectItem key={c} value={c}>
+								{c}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</TableCell>
+			<TableCell className="text-right">
+				<Button
+					variant="ghost"
+					size="sm"
+					title="Save"
+					disabled={!canSave}
+					onClick={onSave}
+				>
+					<Check className="w-3.5 h-3.5" />
+				</Button>
+				<Button
+					variant="ghost"
+					size="sm"
+					title="Cancel"
+					disabled={busy}
+					onClick={onCancel}
+				>
+					<X className="w-3.5 h-3.5" />
+				</Button>
+			</TableCell>
+		</TableRow>
 	);
 }

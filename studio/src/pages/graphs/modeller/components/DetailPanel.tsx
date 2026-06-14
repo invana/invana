@@ -30,6 +30,12 @@ interface Props {
 	indexes: IndexResponse[];
 	editable?: boolean;
 	ctx?: ModelEditCtx;
+	/** Read-only published model that can be drafted to edit (not the system model). */
+	canEditViaDraft?: boolean;
+	/** A draft-creation is in flight (disables the affordance). */
+	creatingDraft?: boolean;
+	/** Drafts the model and switches to the editable PropertyEditor for this type. */
+	onEditViaDraft?: () => void;
 	onEditNodeType?: (nodeType: NodeTypeResponse) => void;
 	onDeleteNodeType?: (id: string) => void;
 	onEditEdgeType?: (edgeType: EdgeTypeResponse) => void;
@@ -45,6 +51,9 @@ export function DetailPanel({
 	indexes,
 	editable = false,
 	ctx,
+	canEditViaDraft = false,
+	creatingDraft = false,
+	onEditViaDraft,
 	onEditNodeType,
 	onDeleteNodeType,
 	onEditEdgeType,
@@ -64,6 +73,9 @@ export function DetailPanel({
 				indexes={indexes}
 				editable={editable}
 				ctx={ctx}
+				canEditViaDraft={canEditViaDraft}
+				creatingDraft={creatingDraft}
+				onEditViaDraft={onEditViaDraft}
 				propertyKeys={propertyKeys}
 				onEdit={() => onEditNodeType?.(nodeType)}
 				onDelete={() => onDeleteNodeType?.(nodeType.id)}
@@ -81,6 +93,9 @@ export function DetailPanel({
 				indexes={indexes}
 				editable={editable}
 				ctx={ctx}
+				canEditViaDraft={canEditViaDraft}
+				creatingDraft={creatingDraft}
+				onEditViaDraft={onEditViaDraft}
 				propertyKeys={propertyKeys}
 				onEdit={() => onEditEdgeType?.(edgeType)}
 				onDelete={() => onDeleteEdgeType?.(edgeType.id)}

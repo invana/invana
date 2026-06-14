@@ -1,4 +1,11 @@
 import {
+	CanvasContext,
+	CanvasMessageBar,
+	GraphStatusBar as CanvasStatusBar,
+	GraphToolProvider,
+} from "@invana/canvas-react";
+import type { GraphCanvas } from "@invana/graph";
+import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -26,7 +33,7 @@ import {
 	Send,
 	Workflow,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
@@ -42,6 +49,7 @@ import {
 	useModelVersionQuery,
 	useModelVersionsQuery,
 	useModelsQuery,
+	useUpdateEdgeTypeMutation,
 } from "../../../hooks/queries/useModels";
 import { ApiError } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
@@ -52,6 +60,10 @@ import type {
 	NodeTypeResponse,
 } from "../../../types/schemas";
 import { GraphDetail } from "../components/GraphDetail";
+import {
+	type CanvasBackend,
+	ExplorerHeaderToolbar,
+} from "../explorer/components/ExplorerCanvas";
 import { CompatibilityBanner } from "./components/CompatibilityBanner";
 import type { SelectedItem } from "./components/DetailPanel";
 import { DetailPanel } from "./components/DetailPanel";
@@ -59,7 +71,7 @@ import { EdgeTypeFormDialog } from "./components/EdgeTypeFormDialog";
 import { ModelFormDialog } from "./components/ModelFormDialog";
 import { ModelListPanel } from "./components/ModelListPanel";
 import { NodeTypeFormDialog } from "./components/NodeTypeFormDialog";
-import { SchemaCanvas } from "./components/SchemaCanvas";
+import { ModellerHeaderToolbar, SchemaCanvas } from "./components/SchemaCanvas";
 import { SchemaNav } from "./components/SchemaNav";
 import type { ModelEditCtx } from "./components/editing";
 
@@ -124,6 +136,31 @@ export function ModellerPage() {
 	const [selected, setSelected] = useState<SelectedItem>(null);
 	const [introspecting, setIntrospecting] = useState(false);
 
+	// The live canvas engine, lifted out of <Canvas> by <CanvasBridge> (in
+	// SchemaCanvas). Null until the graph is fully wired; gates the header toolbar
+	// + footer status bar that resolve it off the lifted CanvasContext.
+	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
+	const handleReady = useCallback((c: GraphCanvas | null) => setCanvas(c), []);
+
+	// Render backend (PixiJS) for the read-only explore canvas — mirrors the
+	// Explorer. Defaults to WebGL (WebGPU intermittently crashes in PixiJS 8); the
+	// header switcher persists the choice across reloads.
+	const [backend, setBackendState] = useState<CanvasBackend>(() => {
+		const saved =
+			typeof localStorage !== "undefined"
+				? localStorage.getItem("modeller.canvas.backend")
+				: null;
+		return saved === "webgpu" || saved === "webgl" ? saved : "webgl";
+	});
+	const setBackend = useCallback((b: CanvasBackend) => {
+		setBackendState(b);
+		try {
+			localStorage.setItem("modeller.canvas.backend", b);
+		} catch {
+			// Private-mode / disabled storage — keep the in-memory choice.
+		}
+	}, []);
+
 	// Dialog + confirm state for the authoring UI.
 	const [modelForm, setModelForm] = useState<{
 		open: boolean;
@@ -136,6 +173,9 @@ export function ModellerPage() {
 	const [edgeForm, setEdgeForm] = useState<{
 		open: boolean;
 		edgeType: EdgeTypeResponse | null;
+		// Set when the Connect-tool gesture opens the dialog — seeds the
+		// source/target checklists with the dragged endpoints' node-type names.
+		prefill?: { source: string[]; target: string[] };
 	}>({ open: false, edgeType: null });
 	const [pendingDelete, setPendingDelete] = useState<PendingDelete>(null);
 
@@ -166,6 +206,7 @@ export function ModellerPage() {
 	const publish = useActivateVersionMutation(u, g);
 	const deleteNode = useDeleteNodeTypeMutation(u, g);
 	const deleteEdge = useDeleteEdgeTypeMutation(u, g);
+	const updateEdge = useUpdateEdgeTypeMutation(u, g);
 
 	const selectedModel = models?.find((m) => m.id === modelId);
 
@@ -178,6 +219,19 @@ export function ModellerPage() {
 		setSelected(null);
 	};
 
+	// On first load, open the system "global" (introspected) model by default — it's
+	// the live DB schema and the most useful landing view. One-shot (a ref guard) so
+	// navigating back to the list with `backToList` isn't immediately overridden.
+	const defaultedRef = useRef(false);
+	useEffect(() => {
+		if (defaultedRef.current || !models) return;
+		defaultedRef.current = true;
+		if (!modelId) {
+			const globalModel = models.find((m) => m.origin === "introspected");
+			if (globalModel) setModelId(globalModel.id);
+		}
+	}, [models, modelId]);
+
 	const isDraft = version?.status === "draft";
 	// The system "global" model mirrors the physical DB — read-only, refreshed by Introspect.
 	const isSystem = selectedModel?.origin === "introspected";
@@ -186,6 +240,10 @@ export function ModellerPage() {
 		editable && modelId && version
 			? { username: u, graphSlug: g, modelId, versionId: version.id }
 			: undefined;
+	// A published (non-system) model is read-only but *draftable* — the Details
+	// panel offers a "Create draft to edit" affordance that drafts it and switches
+	// to the editable PropertyEditor. The system/global model stays fully read-only.
+	const canEditViaDraft = !isDraft && !isSystem && !!version;
 
 	const nodeTypes = version?.node_types ?? [];
 	const edgeTypes = version?.edge_types ?? [];
@@ -234,6 +292,37 @@ export function ModellerPage() {
 		}
 	};
 
+	// "Create draft to edit" from a read-only type's Details panel: a draft has new
+	// per-version type ids, so the current id-based selection would dangle. Remember
+	// the selected type by *name* and re-select it once the draft loads (effect
+	// below), so the user lands directly on the same type's editable PropertyEditor.
+	const reselectRef = useRef<{
+		kind: "node-type" | "edge-type";
+		name: string;
+	} | null>(null);
+	const handleEditViaDraft = async () => {
+		if (selected?.kind === "node-type") {
+			const nt = nodeTypes.find((n) => n.id === selected.id);
+			if (nt) reselectRef.current = { kind: "node-type", name: nt.name };
+		} else if (selected?.kind === "edge-type") {
+			const et = edgeTypes.find((e) => e.id === selected.id);
+			if (et) reselectRef.current = { kind: "edge-type", name: et.name };
+		}
+		await handleCreateDraft();
+	};
+	useEffect(() => {
+		const target = reselectRef.current;
+		if (!target || !isDraft) return;
+		const match =
+			target.kind === "node-type"
+				? nodeTypes.find((n) => n.name === target.name)
+				: edgeTypes.find((e) => e.name === target.name);
+		if (match) {
+			setSelected({ kind: target.kind, id: match.id });
+			reselectRef.current = null;
+		}
+	}, [isDraft, nodeTypes, edgeTypes]);
+
 	// Edits persist to the draft as they're made; "Save" confirms and closes the
 	// editor (the model stays a draft until Publish).
 	const handleSaveDraft = () => {
@@ -270,6 +359,51 @@ export function ModellerPage() {
 			toast.error(err instanceof ApiError ? err.message : "Failed to delete.");
 		} finally {
 			setPendingDelete(null);
+		}
+	};
+
+	// ── Canvas authoring gestures ───────────────────────────────────────────────
+	// The interactive SchemaCanvas only *requests* edits; the dialogs + mutations
+	// already live here, so each gesture maps onto the same draft-only flow the
+	// SchemaNav uses. All guarded on `ctx` (an editable draft).
+
+	// Erase tool: delete straight away (no confirm — the EraseBehaviour already
+	// removed it from the canvas store; the refetch is authoritative).
+	const handleEraseType = async (d: { kind: "node" | "edge"; id: string }) => {
+		if (!ctx) return;
+		const args = {
+			modelId: ctx.modelId,
+			versionId: ctx.versionId,
+			typeId: d.id,
+		};
+		try {
+			if (d.kind === "node") await deleteNode.mutateAsync(args);
+			else await deleteEdge.mutateAsync(args);
+			if (selected && "id" in selected && selected.id === d.id)
+				setSelected(null);
+		} catch (err) {
+			toast.error(err instanceof ApiError ? err.message : "Failed to delete.");
+		}
+	};
+
+	// Reverse an edge type's direction → swap source/target node-type names.
+	const handleReverseEdge = async (edgeTypeId: string) => {
+		if (!ctx) return;
+		const et = edgeTypes.find((e) => e.id === edgeTypeId);
+		if (!et) return;
+		try {
+			await updateEdge.mutateAsync({
+				modelId: ctx.modelId,
+				versionId: ctx.versionId,
+				typeId: edgeTypeId,
+				data: {
+					source_node_types: et.target_node_types,
+					target_node_types: et.source_node_types,
+				},
+			});
+			toast.success("Direction reversed.");
+		} catch (err) {
+			toast.error(err instanceof ApiError ? err.message : "Failed to reverse.");
 		}
 	};
 
@@ -475,6 +609,9 @@ export function ModellerPage() {
 						indexes={indexes}
 						editable={editable}
 						ctx={ctx}
+						canEditViaDraft={canEditViaDraft}
+						creatingDraft={createDraft.isPending}
+						onEditViaDraft={handleEditViaDraft}
 						onEditNodeType={(nt) => setNodeForm({ open: true, nodeType: nt })}
 						onDeleteNodeType={(id) => {
 							const nt = nodeTypes.find((n) => n.id === id);
@@ -530,129 +667,191 @@ export function ModellerPage() {
 		</Button>
 	);
 
+	// Header toolbar, absolute-centered against the full header width (mirroring the
+	// Explorer). On an editable draft: the Select / Add / Connect / Delete drawing
+	// switcher (engine-independent — reads the lifted GraphToolProvider, so it
+	// appears immediately). On a read-only model (global/introspected + published):
+	// the Explorer's full canvas toolbar — layout switcher, run/re-render, zoom /
+	// fit / lock, grid, render-backend — minus the magnet and undo/redo. That
+	// toolbar resolves the live engine off CanvasContext, so it's gated on `canvas`.
+	const headerToolbar =
+		modelId && version ? (
+			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+				{ctx ? (
+					<ModellerHeaderToolbar editable />
+				) : canvas?.isInitialised ? (
+					// `isInitialised` gates out an engine whose Pixi viewport is torn
+					// down — the Explorer toolbar's view-section reads `camera.scale`
+					// (→ `viewport.scale.x`) on mount and would crash on a dead engine
+					// (e.g. a Fast-Refresh-preserved stale instance mid-remount).
+					<ExplorerHeaderToolbar
+						showMagnet={false}
+						showHistory={false}
+						showSelectMode={false}
+						backend={backend}
+						onBackendChange={setBackend}
+					/>
+				) : null}
+			</div>
+		) : undefined;
+
 	return (
-		<>
-			<GraphDetail
-				sectionId="modeller"
-				pageLabel="Modeller"
-				headerPanelControls={panelControls}
-				leftSection={
-					leftClosed
-						? undefined
-						: {
-								defaultSize: "260px",
-								minSize: "200px",
-								maxSize: "900px",
-								collapsible: false,
-								content: leftContent,
-							}
-				}
-				mainSection={{
-					defaultSize: "600px",
-					minSize: "300px",
-					content: (
-						<div className="flex h-full flex-col">
-							{graph && (
-								<CompatibilityBanner
-									username={u}
-									graphSlug={g}
-									connection={graph}
-								/>
-							)}
-							<div className="min-h-0 flex-1">
-								<SchemaCanvas
-									nodeTypes={nodeTypes}
-									edgeTypes={edgeTypes}
-									selected={selected}
-									onSelect={setSelected}
-								/>
+		// Lifted providers reach the header toolbar (a sibling of <Canvas>, outside
+		// its own provider): the active tool via GraphToolProvider (pure state, owns
+		// no engine) and the live engine via CanvasContext (fed by <CanvasBridge> in
+		// SchemaCanvas). The footer's status bar + message bar resolve the same
+		// engine. Esc returns to the Select tool (GraphToolProvider default).
+		<GraphToolProvider defaultTool="select">
+			<CanvasContext.Provider value={canvas}>
+				<GraphDetail
+					sectionId="modeller"
+					pageLabel="Modeller"
+					headerPanelControls={panelControls}
+					headerCenter={headerToolbar}
+					leftSection={
+						leftClosed
+							? undefined
+							: {
+									defaultSize: "260px",
+									minSize: "200px",
+									maxSize: "900px",
+									collapsible: false,
+									content: leftContent,
+								}
+					}
+					mainSection={{
+						defaultSize: "600px",
+						minSize: "300px",
+						content: (
+							<div className="flex h-full flex-col">
+								{graph && (
+									<CompatibilityBanner
+										username={u}
+										graphSlug={g}
+										connection={graph}
+									/>
+								)}
+								<div className="min-h-0 flex-1">
+									<SchemaCanvas
+										nodeTypes={nodeTypes}
+										edgeTypes={edgeTypes}
+										selected={selected}
+										onSelect={setSelected}
+										ctx={ctx}
+										backend={backend}
+										onReady={handleReady}
+										onRequestAddNode={() =>
+											setNodeForm({ open: true, nodeType: null })
+										}
+										onRequestAddEdge={({ source, target }) =>
+											setEdgeForm({
+												open: true,
+												edgeType: null,
+												prefill: { source: [source], target: [target] },
+											})
+										}
+										onRequestDelete={setPendingDelete}
+										onEraseType={handleEraseType}
+										onReverseEdge={handleReverseEdge}
+									/>
+								</div>
 							</div>
-						</div>
-					),
-				}}
-				rightSection={
-					rightClosed
-						? undefined
-						: {
-								defaultSize: "360px",
-								minSize: "240px",
-								maxSize: "600px",
-								collapsible: false,
-								content: rightContent,
-							}
-				}
-				statusMetrics={
-					modelId && version ? (
-						<div className="flex items-center gap-3">
-							<span>{nodeTypes.length} node types</span>
-							<span>{edgeTypes.length} edge types</span>
-						</div>
-					) : null
-				}
-				footerRightExtras={
-					selectedModel ? (
-						<span title="Open model">
-							{selectedModel.name}
-							{isSystem
-								? " · system"
-								: isDraft
-									? " · draft"
-									: version
-										? " · published"
-										: ""}
-						</span>
-					) : null
-				}
-			/>
+						),
+					}}
+					rightSection={
+						rightClosed
+							? undefined
+							: {
+									defaultSize: "360px",
+									minSize: "240px",
+									maxSize: "600px",
+									collapsible: false,
+									content: rightContent,
+								}
+					}
+					statusMetrics={
+						// Live engine telemetry (node/edge totals, zoom, pan, pointer) once
+						// the canvas is up; the type counts otherwise (model list / no canvas).
+						// `isInitialised` guards against a torn-down engine (see header toolbar).
+						canvas?.isInitialised ? (
+							<CanvasStatusBar />
+						) : modelId && version ? (
+							<div className="flex items-center gap-3">
+								<span>{nodeTypes.length} node types</span>
+								<span>{edgeTypes.length} edge types</span>
+							</div>
+						) : null
+					}
+					footerRightExtras={
+						<>
+							{/* Per-tool hint pushed via Canvas.showMessage from <ModellerTools>. */}
+							{canvas?.isInitialised && <CanvasMessageBar />}
+							{selectedModel && (
+								<span title="Open model">
+									{selectedModel.name}
+									{isSystem
+										? " · system"
+										: isDraft
+											? " · draft"
+											: version
+												? " · published"
+												: ""}
+								</span>
+							)}
+						</>
+					}
+				/>
 
-			<ModelFormDialog
-				open={modelForm.open}
-				username={u}
-				graphSlug={g}
-				model={modelForm.model}
-				onClose={() => setModelForm({ open: false, model: null })}
-			/>
+				<ModelFormDialog
+					open={modelForm.open}
+					username={u}
+					graphSlug={g}
+					model={modelForm.model}
+					onClose={() => setModelForm({ open: false, model: null })}
+				/>
 
-			{ctx && (
-				<>
-					<NodeTypeFormDialog
-						open={nodeForm.open}
-						ctx={ctx}
-						nodeType={nodeForm.nodeType}
-						existingNodeTypes={nodeTypes}
-						onClose={() => setNodeForm({ open: false, nodeType: null })}
-					/>
-					<EdgeTypeFormDialog
-						open={edgeForm.open}
-						ctx={ctx}
-						edgeType={edgeForm.edgeType}
-						existingNodeTypes={nodeTypes}
-						onClose={() => setEdgeForm({ open: false, edgeType: null })}
-					/>
-				</>
-			)}
+				{ctx && (
+					<>
+						<NodeTypeFormDialog
+							open={nodeForm.open}
+							ctx={ctx}
+							nodeType={nodeForm.nodeType}
+							existingNodeTypes={nodeTypes}
+							onClose={() => setNodeForm({ open: false, nodeType: null })}
+						/>
+						<EdgeTypeFormDialog
+							open={edgeForm.open}
+							ctx={ctx}
+							edgeType={edgeForm.edgeType}
+							prefill={edgeForm.prefill}
+							existingNodeTypes={nodeTypes}
+							onClose={() => setEdgeForm({ open: false, edgeType: null })}
+						/>
+					</>
+				)}
 
-			<AlertDialog
-				open={pendingDelete !== null}
-				onOpenChange={(o) => !o && setPendingDelete(null)}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>
-							Delete {pendingDelete?.kind} type?
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							Delete "{pendingDelete?.name}"? This cannot be undone.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={confirmDelete}>
-							Delete
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</>
+				<AlertDialog
+					open={pendingDelete !== null}
+					onOpenChange={(o) => !o && setPendingDelete(null)}
+				>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								Delete {pendingDelete?.kind} type?
+							</AlertDialogTitle>
+							<AlertDialogDescription>
+								Delete "{pendingDelete?.name}"? This cannot be undone.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={confirmDelete}>
+								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</CanvasContext.Provider>
+		</GraphToolProvider>
 	);
 }

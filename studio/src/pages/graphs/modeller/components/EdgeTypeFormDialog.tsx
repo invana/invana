@@ -45,6 +45,11 @@ interface Props {
 	ctx: ModelEditCtx;
 	/** null → create; set → edit this edge type's metadata. */
 	edgeType: EdgeTypeResponse | null;
+	/**
+	 * When creating from a canvas Connect gesture, seeds the source/target
+	 * checklists with the dragged endpoints' node-type names. Ignored when editing.
+	 */
+	prefill?: { source: string[]; target: string[] };
 	existingNodeTypes: NodeTypeResponse[];
 	onClose: () => void;
 }
@@ -96,6 +101,7 @@ export function EdgeTypeFormDialog({
 	open,
 	ctx,
 	edgeType,
+	prefill,
 	existingNodeTypes,
 	onClose,
 }: Props) {
@@ -115,10 +121,12 @@ export function EdgeTypeFormDialog({
 		setName(edgeType?.name ?? "");
 		setDescription(edgeType?.description ?? "");
 		setMultiplicity((edgeType?.multiplicity as Multiplicity) ?? "MULTI");
-		setSource(edgeType?.source_node_types ?? []);
-		setTarget(edgeType?.target_node_types ?? []);
+		// Editing → load the edge's endpoints; creating → seed from the canvas
+		// gesture's prefill (empty when opened from the SchemaNav "+").
+		setSource(edgeType?.source_node_types ?? prefill?.source ?? []);
+		setTarget(edgeType?.target_node_types ?? prefill?.target ?? []);
 		setError(null);
-	}, [open, edgeType]);
+	}, [open, edgeType, prefill]);
 
 	const submitting = create.isPending || update.isPending;
 

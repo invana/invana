@@ -8,8 +8,8 @@
 // the shell and feeds it the live engine published by `<CanvasBridge>` (the last
 // child here). Every header / inspector control then resolves the same instance.
 //
-// Distinct from `components/canvas/GraphCanvas.tsx`, which stays a minimal shared
-// wrapper for the Modeller's schema view.
+// Distinct from the Modeller's `SchemaCanvas.tsx`, which wires the same
+// `@invana/canvas-react` bindings into a tool-driven schema editor.
 
 import {
 	BackgroundLayer,
@@ -64,6 +64,8 @@ import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
 import {
 	type MenuItem,
+	RichSelect,
+	type RichSelectOption,
 	ToggleGroup,
 	ToggleGroupItem,
 	Tooltip,
@@ -107,7 +109,7 @@ import {
 // `<Canvas config>` prop so the option objects stay precisely typed.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
 
-// PixiJS render backend. `@invana/canvas` defaults to `"webgpu"`; we default the
+// PixiJS render backend. `@invana/canvas-react` defaults to `"webgpu"`; we default the
 // Explorer to `"webgl"` (see ExplorerPage) because WebGPU intermittently crashes
 // in PixiJS 8 — the header switcher lets a user flip between them at runtime.
 export type CanvasBackend = "webgl" | "webgpu";
@@ -246,6 +248,22 @@ const SELECT_ICONS = {
 	brush: SquareDashedMousePointer,
 	lasso: Lasso,
 };
+// One-line hints shown under each mode in the header's `RichSelect` picker.
+const SELECT_DESC: Record<string, string> = {
+	click: "Click nodes to select; shift-click to add",
+	brush: "Drag a rectangle to select everything inside",
+	lasso: "Draw a freeform loop to select everything inside",
+};
+// Header select-mode picker rows, derived from the maps above (display order
+// follows `SELECT_MODE_IDS`).
+const SELECT_MODE_OPTIONS: RichSelectOption[] = Object.keys(
+	SELECT_MODE_IDS,
+).map((key) => ({
+	value: key,
+	label: SELECT_LABEL[key],
+	description: SELECT_DESC[key],
+	icon: SELECT_ICONS[key as keyof typeof SELECT_ICONS],
+}));
 
 // Property keys tried, in order, for a node's drawn label. Graph DBs hand back
 // opaque internal ids (e.g. `4:24a7…:1555`), which overlap into an unreadable
@@ -432,7 +450,6 @@ function edgeItems(
 function backgroundItems(
 	{ canvas }: GraphBackgroundMenuContext,
 	clip: UseClipboardResult,
-	selectMode: { mode: string; setMode: (mode: string) => void },
 ): MenuItem[] {
 	const layer = canvas.layers.get<graph.GraphLayer>("graph");
 	if (!layer) return [];
@@ -440,20 +457,8 @@ function backgroundItems(
 	const select =
 		canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
 	return [
-		{
-			// Selection mode (click / brush / lasso) — moved off the header toolbar
-			// into the canvas menu. The active mode is ticked; picking one arms its
-			// drag-select behaviour and disables the others (see `useSelectMode`).
-			id: "select-mode",
-			label: "Select mode",
-			icon: SELECT_ICONS[selectMode.mode as keyof typeof SELECT_ICONS],
-			children: Object.keys(SELECT_MODE_IDS).map((key) => ({
-				id: `select-mode-${key}`,
-				label: `${SELECT_LABEL[key]}${key === selectMode.mode ? " ✓" : ""}`,
-				icon: SELECT_ICONS[key as keyof typeof SELECT_ICONS],
-				onClick: () => selectMode.setMode(key),
-			})),
-		},
+		// Selection mode (click / brush / lasso) lives in the header toolbar's
+		// `RichSelect` picker — see `HeaderToolbarItems`.
 		{
 			id: "fit",
 			label: "Fit to content",
@@ -495,13 +500,6 @@ function backgroundItems(
  */
 function CanvasContextMenus() {
 	const clip = useClipboard();
-	// Selection mode lives here now (not the header) — the picker is a submenu of
-	// the background context menu. `useSelectMode` resolves the live engine from
-	// the Canvas context this component is mounted under.
-	const selectMode = useSelectMode(SELECT_MODE_IDS, {
-		labels: SELECT_LABEL,
-		initial: "click",
-	});
 	const node = useCallback(
 		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip),
 		[clip],
@@ -511,8 +509,8 @@ function CanvasContextMenus() {
 		[clip],
 	);
 	const background = useCallback(
-		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip, selectMode),
-		[clip, selectMode],
+		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip),
+		[clip],
 	);
 	return (
 		<>
@@ -745,8 +743,18 @@ export function ExplorerCanvas({
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ExplorerHeaderToolbarProps {
-	magnet: boolean;
-	onToggleMagnet: () => void;
+	magnet?: boolean;
+	onToggleMagnet?: () => void;
+	/** Show the magnet (hover-highlight-neighbours) toggle. Default true. The
+	 *  read-only Modeller reuses this toolbar without it. */
+	showMagnet?: boolean;
+	/** Show the undo/redo history controls. Default true. Read-only viewers (the
+	 *  Modeller's global/published models) have nothing to undo, so they hide it. */
+	showHistory?: boolean;
+	/** Show the click/brush/lasso select-mode picker. Default true. Read-only
+	 *  viewers (the Modeller's static canvas) don't register the drag-select
+	 *  behaviours, so they hide it. */
+	showSelectMode?: boolean;
 	/** Active render backend; the switcher select reflects + sets it. */
 	backend: CanvasBackend;
 	onBackendChange: (backend: CanvasBackend) => void;
@@ -758,18 +766,29 @@ interface ExplorerHeaderToolbarProps {
  * only renders this once the engine (and thus the `'graph'` layer) is live, so
  * the provider + hooks resolve immediately. Clipboard ops (cut/copy/paste) live
  * in the canvas context menus, not here — so no clipboard provider is needed.
+ *
+ * Reused by the Modeller's read-only canvas via `showMagnet={false}` +
+ * `showHistory={false}` (no neighbour-hover, nothing to undo on a static view).
  */
 export function ExplorerHeaderToolbar({
 	magnet,
 	onToggleMagnet,
+	showMagnet = true,
+	showHistory = true,
+	showSelectMode = true,
 	backend,
 	onBackendChange,
 }: ExplorerHeaderToolbarProps) {
 	return (
+		// The provider is always mounted (so `useHistorySection` resolves) even when
+		// the history items are hidden — keeping the hook call unconditional.
 		<GraphHistoryProvider layerId="graph">
 			<HeaderToolbarItems
 				magnet={magnet}
 				onToggleMagnet={onToggleMagnet}
+				showMagnet={showMagnet}
+				showHistory={showHistory}
+				showSelectMode={showSelectMode}
 				backend={backend}
 				onBackendChange={onBackendChange}
 			/>
@@ -780,11 +799,22 @@ export function ExplorerHeaderToolbar({
 function HeaderToolbarItems({
 	magnet,
 	onToggleMagnet,
+	showMagnet = true,
+	showHistory = true,
+	showSelectMode = true,
 	backend,
 	onBackendChange,
 }: ExplorerHeaderToolbarProps) {
 	// Live engine — the toolbar only renders once it's live, so this is non-null.
 	const canvas = useCanvas();
+
+	// Selection mode (click / brush / lasso). Single source of truth for the
+	// canvas: picking one arms its drag-select behaviour and disables the others.
+	// The hook arms `click` on mount.
+	const selectMode = useSelectMode(SELECT_MODE_IDS, {
+		labels: SELECT_LABEL,
+		initial: "click",
+	});
 
 	const history = useHistorySection({ icons: { undo: Undo2, redo: Redo2 } });
 	const { layout, layoutOptions, applyLayout, isRunning } = useLayout(LAYOUTS, {
@@ -811,6 +841,7 @@ function HeaderToolbarItems({
 	// Announce the magnet toggle on the message channel (skip the initial mount).
 	const firstMagnet = useRef(true);
 	useEffect(() => {
+		if (!showMagnet) return;
 		if (firstMagnet.current) {
 			firstMagnet.current = false;
 			return;
@@ -819,7 +850,7 @@ function HeaderToolbarItems({
 			magnet ? "Hover highlights neighbours" : "Hover highlights the node only",
 			2500,
 		);
-	}, [magnet, canvas]);
+	}, [magnet, canvas, showMagnet]);
 	const view = useViewSection({
 		icons: {
 			zoomIn: ZoomIn,
@@ -837,8 +868,38 @@ function HeaderToolbarItems({
 
 	const div = (key: string): ToolbarItem => ({ type: "divider", key });
 	const items: ToolbarItem[] = [
-		...history,
-		div("d1"),
+		...(showHistory ? [...history, div("d1")] : []),
+		...(showSelectMode
+			? [
+					{
+						// Select-mode picker: a `RichSelect` (icon + label + hint per row)
+						// whose trigger shows the active mode's icon. Mirrors the header's
+						// other pickers; the single `useSelectMode` instance keeps the
+						// canvas's drag-select behaviours in sync.
+						type: "custom" as const,
+						key: "select-mode",
+						render: () => (
+							<RichSelect
+								options={SELECT_MODE_OPTIONS}
+								value={selectMode.mode}
+								onChange={(v) => selectMode.setMode(v as string)}
+								tooltip="Selection mode"
+								renderValue={(selected) => {
+									const Icon =
+										SELECT_ICONS[selectMode.mode as keyof typeof SELECT_ICONS];
+									return (
+										<span className="flex items-center gap-2">
+											<Icon className="size-4" />
+											{selected[0]?.label ?? "Select"}
+										</span>
+									);
+								}}
+							/>
+						),
+					},
+					div("dsel"),
+				]
+			: []),
 		{
 			// Layout switcher as an inline icon toggle group: every layout is
 			// visible in the header, the active one stays highlighted, and each
@@ -935,16 +996,20 @@ function HeaderToolbarItems({
 				</ToggleGroup>
 			),
 		},
-		div("d8"),
-		{
-			type: "toggle",
-			key: "magnet",
-			icon: Magnet,
-			label: "Highlight neighbours: off",
-			activeLabel: "Highlight neighbours: on",
-			active: magnet,
-			onToggle: onToggleMagnet,
-		},
+		...(showMagnet
+			? [
+					div("d8"),
+					{
+						type: "toggle" as const,
+						key: "magnet",
+						icon: Magnet,
+						label: "Highlight neighbours: off",
+						activeLabel: "Highlight neighbours: on",
+						active: !!magnet,
+						onToggle: onToggleMagnet ?? (() => {}),
+					},
+				]
+			: []),
 	];
 
 	return <ToolbarItems items={items} orientation="horizontal" />;

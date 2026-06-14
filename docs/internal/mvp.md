@@ -263,7 +263,7 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - [ ] **Dataset detail page — four tabs:**
   - [ ] **Logs** — live SSE log stream during a run; full history when complete; filter by stage / level; copyable
   - [ ] **Files** — file tree of MinIO contents (`model.json`, `nodes/`, `edges/`); click a file to preview JSON (truncated for large files)
-  - [ ] **Model** — graph-model view: node types as cards (properties + constraints), edge types showing `from → to`; rendered as both a structured form view and as a small graph diagram via `@invana/canvas`
+  - [ ] **Model** — graph-model view: node types as cards (properties + constraints), edge types showing `from → to`; rendered as both a structured form view and as a small graph diagram via `@invana/canvas-react`
   - [ ] **Dataset** — table view of records with pagination, sortable columns, type selector (toggle between node types and edge types); columns derived from the graph model
 - [ ] Job status badge on browser + detail pages: queued / running / succeeded / failed
 - [ ] Validation report panel on failed jobs — grouped by file, expandable per error, links to the offending record in the Files tab
@@ -275,7 +275,7 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 - **sse-starlette** (FastAPI Server-Sent Events for log streaming)
 - **EventSource** browser API (FE log-stream consumer)
 - RFC-016 **executor interface** (in-house) · **LocalExecutor** asyncio impl
-- **@invana/canvas** (Model-tab diagram) · **@invana/design-kit** table + tabs
+- **@invana/canvas-react** (Model-tab diagram) · **@invana/design-kit** table + tabs
 - CLI: existing `typer`/`click` (CLI framework) — add `invana datasets import` subcommand
 
 ### Deferred (post-MVP)
@@ -291,9 +291,9 @@ Supported property types: `string` (with `min_length` / `max_length` / `pattern`
 ### 4.1 User graph model editor — **authoring** (RFC-019 multi-model · RFC-021 authoring)
 Models are **authored in the Modeller** (not derived from datasets). A Graph owns many `GraphModel`s (no persona, no default flag — distinguished by name + `origin`); each is edited on a **draft** `GraphVersion` then **Published** (immutable). A system-managed read-only `global` model (`origin=introspected`) mirrors the physical DB. Datasets bind to an authored model (§4.2+, `dataset.model_id`, many→one).
 - **Backend:** [x] Full `/u/{username}/{graphSlug}/models` CRUD — model + draft version + node/edge type create-update-delete + property-key create-**update**-delete + publish (activate); draft-only enforced (409). `connection/introspect` seeds a draft from the bound DB.
-- **Frontend:** [~] `ModellerPage` — model list (+New / rename / delete / introspect), draft→Publish lifecycle, node/edge type forms, per-type property add/edit/delete, editable Property Keys. Canvas remains read-only (interactive editing deferred).
-- **Integrations:** existing modeller code (`engine/src/invana/modeller/`) · `@invana/design-kit` forms · `@invana/canvas` (read-only render).
-- **Deferred:** [-] constraints/indexes authoring UI · interactive canvas editing · YAML round-trip of authored models.
+- **Frontend:** [~] `ModellerPage` — model list (+New / rename / delete / introspect), draft→Publish lifecycle, node/edge type forms, per-type property add/edit/delete, editable Property Keys. Canvas is **interactive** (RFC-027): on a draft, the Add/Connect/Delete tools create/connect/remove node & edge types (create opens the existing type dialogs), the Select tool inline-renames a type, and read-only/published/system versions stay pan/zoom/select-only. Positions are ephemeral (force layout).
+- **Integrations:** existing modeller code (`engine/src/invana/modeller/`) · `@invana/design-kit` forms · `@invana/canvas-react` (interactive render; RFC-027).
+- **Deferred:** [-] constraints/indexes authoring UI · YAML round-trip of authored models · persisted canvas layout positions.
 
 #### 4.1a Backend property-type capabilities + version compatibility (RFC-022)
 The property types the Modeller offers are **gated by the bound backend and its version** (canonical `PropertyType` vocabulary; each connector advertises a version-resolved subset). Untested/unknown DB versions degrade the connection to **read-only** until the user acknowledges the risk.
@@ -347,8 +347,8 @@ The property types the Modeller offers are **gated by the bound backend and its 
 
 ### 5.5 Studio Explorer (existing)
 - **Backend:** [x] No change
-- **Frontend:** [~] `ExplorerPage` mounted at `/u/:username/:graphSlug/explorer`; the left panel is now the **Sessions panel** (threaded ask/answer; `SessionsPanel` + `SessionComposer`, Compass rail icon) replacing the old query console; status bar + inspector working against the graph-scoped endpoint. Sessions are **frontend-only in-memory state** until § 5.6 lands persistence. **Graph canvas rendering is stubbed** — placeholder summarises node/edge counts. Canvas re-integration against the redesigned `@invana/canvas` API surface is a follow-up (same blocker as § 4.1 Modeller).
-- **Integrations:** `@invana/canvas` (redesigned API surface — not yet wired)
+- **Frontend:** [~] `ExplorerPage` mounted at `/u/:username/:graphSlug/explorer`; the left panel is now the **Sessions panel** (threaded ask/answer; `SessionsPanel` + `SessionComposer`, Compass rail icon) replacing the old query console; status bar + inspector working against the graph-scoped endpoint. Sessions are **frontend-only in-memory state** until § 5.6 lands persistence. **Graph canvas rendering is wired** via `@invana/canvas-react` (`ExplorerCanvas` — pan/drag/zoom/hover/select/view behaviours, header toolbar, inspector).
+- **Integrations:** `@invana/canvas-react` (React bindings over the `@invana/canvas` engine)
 
 ### 5.6 Query Sessions (persistence) — RFC-024
 - **Backend:** [ ] `sessions` + `session_messages` tables (graph-scoped, private to creator, hard-CASCADE on graph + user delete) · `execute_query` service extracted from `/query` (which is removed) · routes: `GET/POST /sessions`, `GET/PATCH/DELETE /sessions/{id}`, `POST /sessions/{id}/messages` (append + run), `POST /sessions/{id}/messages/{mid}/run` (re-execute in place, no append) · message metadata only (no result-payload snapshots) · `session.create`/`session.delete` events + `session_id` on `query.execute` · `SessionView`/`SessionMessageView` in `/admin`.
@@ -400,8 +400,8 @@ The property types the Modeller offers are **gated by the bound backend and its 
 
 ### 7.2 Studio UI shell
 - **Backend:** [ ] Optionally serve Studio static assets from FastAPI in single-image Docker mode (`/static/*` → built Studio bundle)
-- **Frontend:** [ ] Application shell — sidebar, header, Graph switcher · all Graph-scoped routes under `/u/:username/:graphSlug/...` · markdown editor reused for Skills + Instructions · design-kit components only (CLAUDE.md #9) · `@invana/canvas` for all graph rendering (CLAUDE.md #10)
-- **Integrations:** React 19 · Vite · `@invana/design-kit` · `@invana/canvas` · TanStack Query · Zustand · React Router · CodeMirror 6 · TailwindCSS 4
+- **Frontend:** [ ] Application shell — sidebar, header, Graph switcher · all Graph-scoped routes under `/u/:username/:graphSlug/...` · markdown editor reused for Skills + Instructions · design-kit components only (CLAUDE.md #9) · `@invana/canvas-react` for all graph rendering (CLAUDE.md #10 — studio imports the React bindings, never `@invana/canvas` directly)
+- **Integrations:** React 19 · Vite · `@invana/design-kit` · `@invana/canvas-react` · TanStack Query · Zustand · React Router · CodeMirror 6 · TailwindCSS 4
 
 ### 7.3 External-agent API (§4.11)
 - **Backend:** [ ] `ScopedToken` entity (`graph_id`, `scope` enum `read` | `read_write`, `created_at`, `last_used_at`, `revoked_at`) · `POST /u/{username}/{graphSlug}/tokens` (issue, returned exactly once) · token-auth dep parallel to JWT · retrieval endpoints reusing 5.x · write-back endpoints reusing 6.3 · archived-Graph read-only freeze
@@ -432,7 +432,7 @@ Single roll-up of every third-party dependency and infra service referenced abov
 - **Routing / state / data:** `react-router-dom`, `zustand`, `@tanstack/react-query`
 - **HTTP:** `axios` (interceptor for auth)
 - **UI:** `@invana/design-kit`, `tailwindcss@4`
-- **Graph rendering:** `@invana/canvas` (wraps `pixi.js@8`)
+- **Graph rendering:** `@invana/canvas-react` (React bindings over `@invana/canvas`, which wraps `pixi.js@8`)
 - **Editor:** `codemirror@6` (markdown + Cypher/Gremlin modes)
 - **Streaming:** native `EventSource` (SSE consumer) — no extra dep
 - **Lint / fmt:** `biome` (existing)
@@ -527,7 +527,7 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 ### S3 — User graph model authoring (RFC-019 · RFC-021) — in progress
 - **BE:** [x] Multi-model graph-scoped `/u/:username/:graphSlug/models` — full CRUD + draft→Publish + node/edge/property-key authoring (draft-only, 409-guarded).
-- **FE:** [~] `ModellerPage` authoring — model CRUD, draft→Publish, node/edge type + property forms, editable Property Keys. Canvas read-only.
+- **FE:** [~] `ModellerPage` authoring — model CRUD, draft→Publish, node/edge type + property forms, editable Property Keys. Canvas interactive (RFC-027): Add/Connect/Delete tools author node & edge types on a draft (create via the existing dialogs), Select inline-renames; read-only versions stay pan/zoom/select-only.
 - **BE/FE (RFC-022):** [ ] Backend-gated property types + DB version compatibility — version-aware `CapabilityProfile`, `supported_property_types` drives the modeller dropdowns, untested/unknown versions force read-only until acknowledged.
 - **Done when:** from a clean checkout, a user creates a model, adds node + edge types with properties, publishes it, and the published version is read-only; creating a draft makes it editable again.
 
@@ -618,7 +618,7 @@ Scoped tokens · retrieval endpoints (query / semantic / skill-mediated) · prov
 - **Hold the line on "no source connectors in MVP."** Every "but PDFs would be easy" request is a slippery slope back into a connector framework. Users producing JSON externally is the contract.
 - **S1.5 (the rename) is mechanical but touches everywhere.** Land it before S2 starts so no new code is written against the old names.
 - **Generated TS client is the contract.** Hand-typed FE shapes will drift.
-- **Canvas integration is an open dependency on S3 + S5.5.** The old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are unpublished; the sibling `@invana/canvas` exposes a redesigned API surface that the old plugin code can't be retargeted to mechanically. Modeller's `SchemaCanvas`, Explorer's `GraphCanvas`, and `CanvasToolbar` are currently stubs that summarise counts. Wiring up the redesigned canvas is its own task — don't let it block other slices.
+- **Canvas integration is wired** (closed). Studio renders graphs exclusively through `@invana/canvas-react` (the React bindings over the `@invana/canvas` engine) — it never imports `@invana/canvas` directly. Explorer's `ExplorerCanvas` is the read/query visualiser; the Modeller's `SchemaCanvas` is the interactive schema editor (RFC-027). The old `@invana/canvas-core` + `@invana/layouts-d3-force` plugin packages are gone.
 - **`graph_connections.graph_id` is currently nullable** — historical artefact from the deleted standalone connection surface. Tighten to `NOT NULL` in a future migration once any orphan rows are cleared.
 
 ## Parallelization map

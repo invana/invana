@@ -240,7 +240,10 @@ class ModelStore:
                 session.add(rule)
             await session.flush()
 
-        return pk
+        # Reload with eager-loaded validation_rules so the route can serialise the
+        # response after commit without triggering an async lazy-load (the relationship
+        # is otherwise unloaded for a freshly-created key — MissingGreenlet).
+        return await self.get_property_key(session, pk.id)
 
     async def get_property_key(self, session: AsyncSession, pk_id: str) -> PropertyKeyDefinition | None:
         stmt = (

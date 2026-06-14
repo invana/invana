@@ -1,0 +1,11 @@
+---
+"studio": minor
+---
+
+Modeller: make the schema canvas an interactive editor (RFC-027).
+
+The read-only schema diagram becomes a tool-driven authoring surface on an editable draft, in the app shell — matching the Explorer's layout. A **Select / Add / Connect / Delete** drawing toolbar lives in the page header (shown whenever a model is open; the authoring tools are enabled on an editable draft and disabled with a "create a draft" hint on read-only versions). The footer shows a live status bar (node/edge totals, zoom, pan, pointer) on the left and the active tool's hint on the right.
+
+Add (click empty canvas) opens the New node-type dialog; Connect (drag node→node) opens the New edge-type dialog prefilled with the dragged endpoints' node-type names; Delete erases a type; the Select tool inline-renames a clicked node/edge type (edges also get a Reverse-direction action). Right-click context menus offer edit / reverse / confirmed-delete, plus "Add node type" and "Fit to content" on empty canvas. Clicking a node or edge now drives the right-side Details panel — previously the canvas ignored selection. Canvas colours follow Studio's light/dark theme. All edits go through the existing draft-only model mutations; rich property/constraint editing stays in the Details panel.
+
+Read-only models — the system **global** (introspected) model and published versions — now open as a full Explorer-grade read-only canvas instead of a static diagram: drag/pinch/wheel zoom, click/brush/lasso select modes, a minimap, a distinct colour per node type, label level-of-detail, and right-click menus (focus, select, select neighbourhood, highlight neighbours, show details). The header carries the Explorer's full toolbar — layout switcher, run/re-render, zoom/fit/lock, grid, and the WebGL/WebGPU render-backend switcher — minus the magnet (hover-highlight) toggle and undo/redo. Nothing on a read-only model can mutate it. Node positions are ephemeral (force layout); undo/redo is intentionally omitted for drafts too (the server is the source of truth — every edit is a mutation + refetch). Studio now renders graphs exclusively through `@invana/canvas-react` — the dead read-only `GraphCanvas` wrapper is removed and no studio code imports `@invana/canvas` directly.
