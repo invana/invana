@@ -1,6 +1,7 @@
 import { AppLayoutV2 } from "@invana/themes";
 import { Boxes, Network } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { UserMenu } from "./components/header/UserMenu";
 import { useAppHeader } from "./components/header/useAppHeader";
 
 export default function App() {
@@ -37,7 +38,7 @@ export default function App() {
 
 	return (
 		<AppLayoutV2
-			leftNav={{ topNavItems }}
+			leftNav={{ topNavItems, bottom: <UserMenu /> }}
 			header={header}
 			mainSection={{
 				content: <Outlet />,

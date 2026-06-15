@@ -6,7 +6,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { FullscreenToggle } from "../FullscreenToggle";
 import { GitHubStars } from "../GitHubStars";
 import { ThemeToggle } from "../ThemeToggle";
-import { UserMenu } from "./UserMenu";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
@@ -23,15 +22,16 @@ interface AppHeaderOptions {
 	/** Extra controls rendered to the LEFT of ThemeToggle + UserMenu. Use for
 	 *  page-specific buttons (e.g. Modeller's "Introspect" + "Refresh"). */
 	rightExtras?: ReactNode;
-	/** Panel collapse/expand toggles, rendered immediately to the LEFT of the
-	 *  profile menu (e.g. Explorer/Modeller's sessions + inspector toggles). */
+	/** Panel collapse/expand toggles, rendered at the end of the right cluster
+	 *  (e.g. Explorer/Modeller's sessions + inspector toggles). The profile menu
+	 *  no longer lives here — it sits at the bottom of the left rail. */
 	panelControls?: ReactNode;
 }
 
 /**
  * Shared AppLayoutV2 header config. Renders:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeToggle] [FullscreenToggle] [panelControls] [UserMenu]
+ *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeToggle] [FullscreenToggle] [panelControls]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
  * - Graph-scoped (`/u/:username/:graphSlug[/...]`): just `pageLabel`
@@ -84,7 +84,6 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				<ThemeToggle />
 				<FullscreenToggle />
 				{panelControls}
-				<UserMenu />
 			</div>
 		),
 	};

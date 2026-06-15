@@ -12,10 +12,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 /**
- * Avatar + name dropdown shown on the right side of every AppLayoutV2 header.
- * Encapsulates: profile shortcuts, superuser admin link, sign out. Used by
- * App.tsx (shell layout) and by the standalone graph pages (Overview /
- * Explorer / Modeller) via `useAppHeader`.
+ * Avatar + name dropdown pinned to the very bottom of the left rail
+ * (NavVertical's `bottom` slot) on every AppLayoutV2 surface. Encapsulates:
+ * profile shortcuts, superuser admin link, sign out. Used by App.tsx (shell
+ * layout) and by the standalone graph pages (Explorer / Modeller) via the
+ * `useGraphLeftNav` rail. The menu pops out to the right of the rail.
  */
 export function UserMenu() {
 	const navigate = useNavigate();
@@ -31,14 +32,14 @@ export function UserMenu() {
 				<Button
 					variant="ghost"
 					size="sm"
-					className="flex items-center h-7 px-0"
+					className="flex items-center h-7 px-0 my-1.5"
 				>
 					<div className="w-7 h-7 rounded-full bg-primary text-primary-foreground font-bold text-lg flex items-center justify-center">
 						{initial}
 					</div>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-56">
+			<DropdownMenuContent side="right" align="end" className="w-56">
 				<DropdownMenuLabel>
 					<div className="flex flex-col">
 						<span>{displayName}</span>

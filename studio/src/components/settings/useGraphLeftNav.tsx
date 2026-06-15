@@ -11,6 +11,7 @@ import {
 	Wand2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { UserMenu } from "../header/UserMenu";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 
 interface SectionMeta {
@@ -46,6 +47,7 @@ type ActiveTab = "overview" | "explorer" | "modeller" | null;
  *   / Skills / Instructions / Datasets / Events). Clicking a settings icon
  *   sets `?settings=<section>` on the current page so the leftSection swaps
  *   to that section's content.
+ * - Very bottom (`bottom` slot, below a separator): the user profile menu.
  *
  * The "active" highlight is driven by the caller's `activeTab` arg (which
  * graph view is rendering this layout) and by `?settings` (which section is
@@ -93,7 +95,7 @@ export function useGraphLeftNav(
 	// Each section icon is a toggle: clicking the open section closes the panel,
 	// clicking any other opens/switches to it. Works the same on every
 	// graph-scoped page (Explorer / Modeller) since both render this rail.
-	const bottomNavItems = SETTINGS_SECTIONS.map((s) => {
+	const bottomNavItems = SETTINGS_SECTIONS.map((s, i) => {
 		const active = settingsPanel.isOpen && settingsPanel.section === s.key;
 		return {
 			name: s.label,
@@ -101,10 +103,13 @@ export function useGraphLeftNav(
 			iconClassName: "w-5 h-5",
 			tooltipSide: "right" as const,
 			className: activeClass(active),
+			// Separate the settings icons from the profile menu pinned below.
+			showSeperator: i === SETTINGS_SECTIONS.length - 1,
 			onClick: () =>
 				active ? settingsPanel.close() : settingsPanel.setSection(s.key),
 		};
 	});
 
-	return { topNavItems, bottomNavItems };
+	// Profile menu sits at the very bottom of the rail, below the separator.
+	return { topNavItems, bottomNavItems, bottom: <UserMenu /> };
 }
