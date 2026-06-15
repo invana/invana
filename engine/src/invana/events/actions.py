@@ -41,6 +41,7 @@ LLM_UPDATE = "llm.update"
 LLM_DELETE = "llm.delete"
 LLM_PING = "llm.ping"
 LLM_SET_DEFAULT = "llm.set_default"
+LLM_TRANSLATE = "llm.translate"  # NL → query mapping (RFC-030); target = session
 
 # ── Skills + Instructions ─────────────────────────────────────────────────────
 SKILL_CREATE = "skill.create"

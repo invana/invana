@@ -18,6 +18,7 @@ import {
 	Archive,
 	ArchiveRestore,
 	ArrowLeft,
+	Code,
 	Copy,
 	MessageSquare,
 	PanelLeftClose,
@@ -33,8 +34,13 @@ import { formatRelativeTime } from "../../../../lib/time";
 import type { SessionSort } from "../../../../services/api/sessions";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
-import type { QueryRunPayload } from "../../../../types/query";
+import type {
+	QueryMode,
+	QueryResponse,
+	QueryRunPayload,
+} from "../../../../types/query";
 import type { Session, SessionMessage } from "../../../../types/session";
+import { ResultBlock } from "./ResultBlock";
 import { SessionComposer } from "./SessionComposer";
 
 // How many sessions show before the "MORE" expander kicks in.
@@ -52,8 +58,12 @@ export interface SessionsPanelProps {
 	activeSession: Session | null;
 	onOpenSession: (id: string) => void;
 	onBack: () => void;
-	/** Re-run a past assistant message's query in place (repaints the canvas). */
+	/** Re-run a past assistant message's query in place (re-fetches its result). */
 	onRerun: (messageId: string) => void;
+	/** Transient per-message query results, keyed by assistant message id (RFC-033). */
+	results: Record<string, QueryResponse | null>;
+	/** Project a graph result onto the canvas. */
+	onLoadToCanvas: (result: QueryResponse) => void;
 	/** Refetch sessions from the engine (header refresh control). */
 	onRefresh: () => void;
 	/** True while a refetch is in flight — spins the refresh icon. */
@@ -88,6 +98,8 @@ export function SessionsPanel({
 	onOpenSession,
 	onBack,
 	onRerun,
+	results,
+	onLoadToCanvas,
 	onRefresh,
 	isRefreshing,
 	onClose,
@@ -125,7 +137,13 @@ export function SessionsPanel({
 	};
 
 	const body = inDetail ? (
-		<SessionThread session={activeSession} onBack={onBack} onRerun={onRerun} />
+		<SessionThread
+			session={activeSession}
+			onBack={onBack}
+			onRerun={onRerun}
+			results={results}
+			onLoadToCanvas={onLoadToCanvas}
+		/>
 	) : (
 		<SessionList
 			sessions={sessions}
@@ -140,6 +158,32 @@ export function SessionsPanel({
 		/>
 	);
 
+	// Restore the open session's mode + model from its last reply: the assistant
+	// `via` reads "<provider> · <model>" for NL (RFC-030) and "Cypher"/"Gremlin"
+	// for QL. Null until messages load / on the list — then the composer keeps
+	// the user's current selection.
+	const composerConfig = useMemo(() => {
+		if (!activeSession) return null;
+		const last = [...activeSession.messages]
+			.reverse()
+			.find((m) => m.role === "assistant" && m.via);
+		if (!last?.via) return null;
+		if (last.via.includes(" · ")) {
+			const provider = llmProviders.find(
+				(p) => `${p.provider} · ${p.model_id}` === last.via,
+			);
+			return {
+				mode: "nl" as QueryMode,
+				language: last.language,
+				llmProviderId: provider?.id,
+			};
+		}
+		return {
+			mode: "ql" as QueryMode,
+			language: last.language ?? (last.via.toLowerCase() as QueryLanguage),
+		};
+	}, [activeSession, llmProviders]);
+
 	const composer = (
 		<SessionComposer
 			availableLanguages={availableLanguages}
@@ -147,6 +191,8 @@ export function SessionsPanel({
 			llmProviders={llmProviders}
 			onRun={onRun}
 			isRunning={isRunning}
+			sessionKey={activeSession?.id ?? null}
+			initialConfig={composerConfig}
 		/>
 	);
 
@@ -530,9 +576,17 @@ interface SessionThreadProps {
 	session: Session;
 	onBack: () => void;
 	onRerun: (messageId: string) => void;
+	results: Record<string, QueryResponse | null>;
+	onLoadToCanvas: (result: QueryResponse) => void;
 }
 
-function SessionThread({ session, onBack, onRerun }: SessionThreadProps) {
+function SessionThread({
+	session,
+	onBack,
+	onRerun,
+	results,
+	onLoadToCanvas,
+}: SessionThreadProps) {
 	return (
 		<div className="flex flex-col h-full min-h-0">
 			{/* Back + title bar — the panel header keeps the persistent "Sessions"
@@ -562,6 +616,8 @@ function SessionThread({ session, onBack, onRerun }: SessionThreadProps) {
 								key={message.id}
 								message={message}
 								onRerun={onRerun}
+								result={results[message.id]}
+								onLoadToCanvas={onLoadToCanvas}
 							/>
 						),
 					)}
@@ -584,10 +640,16 @@ function UserMessage({ message }: { message: SessionMessage }) {
 function AssistantMessage({
 	message,
 	onRerun,
+	result,
+	onLoadToCanvas,
 }: {
 	message: SessionMessage;
 	onRerun: (messageId: string) => void;
+	result: QueryResponse | null | undefined;
+	onLoadToCanvas: (result: QueryResponse) => void;
 }) {
+	const [showQuery, setShowQuery] = useState(false);
+
 	const copy = () => {
 		navigator.clipboard?.writeText(message.content);
 		toast.success("Copied to clipboard");
@@ -634,6 +696,17 @@ function AssistantMessage({
 							<RotateCw className="w-3.5 h-3.5" />
 						</Button>
 					)}
+					{message.sourceQuery && (
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-6 w-6"
+							onClick={() => setShowQuery((v) => !v)}
+							title={showQuery ? "Hide query" : "View query"}
+						>
+							<Code className="w-3.5 h-3.5" />
+						</Button>
+					)}
 					<Button
 						variant="ghost"
 						size="icon"
@@ -646,6 +719,12 @@ function AssistantMessage({
 				</div>
 				{meta && <span>{meta}</span>}
 			</div>
+			{showQuery && message.sourceQuery && (
+				<pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-words rounded border border-border bg-muted/50 p-2 font-mono text-muted-foreground">
+					{message.sourceQuery}
+				</pre>
+			)}
+			<ResultBlock result={result} onLoadToCanvas={onLoadToCanvas} />
 		</div>
 	);
 }

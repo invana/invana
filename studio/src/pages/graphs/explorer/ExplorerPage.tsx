@@ -126,6 +126,16 @@ export function ExplorerPage() {
 	const llmProviders = llmProvidersResponse?.items ?? [];
 
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
+	// Per-message query results (RFC-033): transient, keyed by assistant message
+	// id, populated on send/rerun and rendered inline in the thread.
+	const [resultsByMessageId, setResultsByMessageId] = useState<
+		Record<string, QueryResponse | null>
+	>({});
+	const setResultFor = useCallback(
+		(messageId: string, result: QueryResponse | null) =>
+			setResultsByMessageId((prev) => ({ ...prev, [messageId]: result })),
+		[],
+	);
 
 	// Root span for the in-flight query run (RFC-025). Held in a ref so the
 	// transform / adapt / layout / render stages — which span several async
@@ -258,23 +268,37 @@ export function ExplorerPage() {
 			trigger: "run" | "rerun" | "restore",
 			attributes: SpanAttributes,
 			work: () => Promise<QueryResponse | null>,
-		) => {
+		): Promise<QueryResponse | null> => {
 			const interaction = startInteraction("explorer.query.run", {
 				"explorer.trigger": trigger,
 				...attributes,
 			});
 			runRef.current = interaction;
-			let willRender = false;
 			try {
-				const result = await withInteraction(interaction, work);
-				willRender = result?.result_type === "graph" && !!result.data;
-				paintCanvas(result);
+				// A query run no longer paints — its result renders inline in the
+				// thread (RFC-033). The canvas pipeline is traced separately, on Load
+				// to canvas, so the run span just covers translate + execute.
+				return await withInteraction(interaction, work);
 			} catch (err) {
 				interaction.span.recordException(err as Error);
 				throw err;
 			} finally {
-				if (!willRender) endInteraction(runRef, interaction);
+				endInteraction(runRef, interaction);
 			}
+		},
+		[],
+	);
+
+	// Explicit projection of a graph result onto the canvas (RFC-033). Opens its
+	// own canvas-render trace; the canvas bridge closes it after the painted frame
+	// (the same mechanism the old auto-paint used).
+	const handleLoadToCanvas = useCallback(
+		(result: QueryResponse) => {
+			const interaction = startInteraction("explorer.query.run", {
+				"explorer.trigger": "load",
+			});
+			runRef.current = interaction;
+			paintCanvas(result);
 		},
 		[paintCanvas],
 	);
@@ -286,29 +310,35 @@ export function ExplorerPage() {
 			);
 			return;
 		}
-		await runTraced(
+		let messageId: string | null = null;
+		const result = await runTraced(
 			"run",
 			{
 				"explorer.mode": payload.mode,
 				"explorer.language": payload.mode === "ql" ? payload.language : "",
 			},
 			// `send` threads the ask/answer into a session (creating + opening one
-			// when none is active) and runs the engine query. NL has no backend yet,
-			// so it returns null and the session shows an explanatory reply.
+			// when none is active) and runs the engine query, returning the assistant
+			// message id so its result can be keyed for inline rendering (RFC-033).
 			async () => {
-				const { sessionId, result } = await send(payload);
+				const { sessionId, messageId: mid, result } = await send(payload);
 				restoredRef.current = sessionId;
+				messageId = mid;
 				return result;
 			},
 		);
+		if (messageId) setResultFor(messageId, result);
 	};
 
 	// `rerun` re-issues a stored message's query — triggered by clicking a message
-	// (`rerun`) or by the session-restore effect (`restore`). Both are traced.
+	// (`rerun`) or by the session-restore effect (`restore`). Both are traced and
+	// store the result inline against that message.
 	const handleRerun = useCallback(
-		(messageId: string, trigger: "rerun" | "restore" = "rerun") =>
-			runTraced(trigger, {}, () => rerun(messageId)),
-		[runTraced, rerun],
+		async (messageId: string, trigger: "rerun" | "restore" = "rerun") => {
+			const result = await runTraced(trigger, {}, () => rerun(messageId));
+			setResultFor(messageId, result);
+		},
+		[runTraced, rerun, setResultFor],
 	);
 
 	// Re-run the latest query-bearing message when a session is opened, to
@@ -359,6 +389,8 @@ export function ExplorerPage() {
 			onOpenSession={openSession}
 			onBack={backToList}
 			onRerun={handleRerun}
+			results={resultsByMessageId}
+			onLoadToCanvas={handleLoadToCanvas}
 			onRefresh={refresh}
 			isRefreshing={isRefreshing}
 			onClose={closeSessions}

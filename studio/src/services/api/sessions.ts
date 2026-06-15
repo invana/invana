@@ -70,6 +70,8 @@ export interface SendMessageBody {
 	content: string;
 	mode: "ql" | "nl";
 	language?: QueryLanguage;
+	/** nl only — which LLM provider translates the prompt (RFC-030). */
+	llm_provider_id?: string;
 }
 
 /** List ordering — newest by last activity (default) or by creation. */

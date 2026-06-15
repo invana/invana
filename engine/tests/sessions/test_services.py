@@ -1,10 +1,11 @@
-"""Service-layer tests for Query Sessions (RFC-024) against a real Postgres.
+"""Service-layer tests for Query Sessions (RFC-024 / RFC-030) against a real Postgres.
 
 Covers the persistence behaviors that don't need a live graph DB connector:
-private-to-creator scoping, ordering, rename, cascade delete, and the
-natural-language path (recorded, not executed). The `ql` execution path and the
-HTTP routes are exercised via the API harness (httpx + a live graph DB), not
-here.
+private-to-creator scoping, ordering, rename, cascade delete, monotonic
+sequencing, and natural-language provider resolution (RFC-030). Both `ql` and
+`nl` now execute, so message creation through ``send_message`` is exercised via
+the API harness (httpx + a live graph DB + a real LLM); message-persistence
+properties here append rows through the store directly.
 """
 
 from __future__ import annotations
@@ -14,8 +15,13 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from invana.sessions import services
-from invana.sessions.models import SessionMessage, SessionMessageStatus
+from invana.sessions.models import (
+    SessionMessage,
+    SessionMessageRole,
+    SessionMessageStatus,
+)
 from invana.sessions.schemas import SendMessage
+from invana.sessions.store import SessionStore
 
 pytestmark = pytest.mark.asyncio
 
@@ -23,6 +29,28 @@ pytestmark = pytest.mark.asyncio
 async def _message_count(session, session_id: str) -> int:
     stmt = select(func.count()).select_from(SessionMessage).where(SessionMessage.session_id == session_id)
     return int((await session.execute(stmt)).scalar_one())
+
+
+async def _append_turn(session, sess, content: str) -> None:
+    """Append a user+assistant message pair via the store (no execution)."""
+    store = SessionStore()
+    seq = await store.next_seq(session, session_id=sess.id)
+    await store.add(
+        session,
+        SessionMessage(session_id=sess.id, seq=seq, role=SessionMessageRole.user, content=content),
+    )
+    await store.add(
+        session,
+        SessionMessage(
+            session_id=sess.id,
+            seq=seq + 1,
+            role=SessionMessageRole.assistant,
+            content="ok",
+            status=SessionMessageStatus.ok,
+        ),
+    )
+    sess.message_count += 2
+    await session.flush()
 
 
 class TestSessionPersistence:
@@ -93,14 +121,7 @@ class TestSessionPersistence:
 
     async def test_delete_cascades_messages(self, session, graph, user):
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)
-        await services.send_message(
-            session,
-            sess=sess,
-            graph=graph,
-            manager=None,  # nl path doesn't touch the connector
-            payload=SendMessage(content="hello", mode="nl"),
-            actor_id=user.id,
-        )
+        await _append_turn(session, sess, "hello")
         await session.commit()
         assert await _message_count(session, sess.id) == 2
 
@@ -108,47 +129,28 @@ class TestSessionPersistence:
         await session.commit()
         assert await _message_count(session, sess.id) == 0
 
-    async def test_nl_message_is_recorded_not_executed(self, session, graph, user):
+    async def test_nl_without_provider_is_rejected(self, session, graph, user):
+        """An nl send with no LLM provider configured fails fast (RFC-030) — the
+        422 raises before any message is written, so nothing persists."""
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)
-        user_msg, assistant_msg, result = await services.send_message(
-            session,
-            sess=sess,
-            graph=graph,
-            manager=None,
-            payload=SendMessage(content="who are the people?", mode="nl"),
-            actor_id=user.id,
-        )
-        await session.commit()
+        with pytest.raises(HTTPException) as exc:
+            await services.send_message(
+                session,
+                sess=sess,
+                graph=graph,
+                manager=None,  # provider resolution runs first, before the connector
+                payload=SendMessage(content="who are the people?", mode="nl"),
+                actor_id=user.id,
+                encryption_key="unused",
+            )
+        assert exc.value.status_code == 422
+        assert "Settings" in exc.value.detail
+        assert await _message_count(session, sess.id) == 0
 
-        assert result is None  # not executed
-        assert user_msg.seq == 1
-        assert assistant_msg.seq == 2
-        assert assistant_msg.status == SessionMessageStatus.ok
-        assert "wired" in assistant_msg.content.lower()
-        assert sess.message_count == 2
-        # The latest reply's status is denormalized onto the session for the list.
-        assert sess.last_status == SessionMessageStatus.ok
-        # Title is derived from the first prompt when none was given.
-        assert sess.title.startswith("who are the people")
-
-    async def test_seq_is_monotonic_across_sends(self, session, graph, user):
+    async def test_seq_is_monotonic_across_appends(self, session, graph, user):
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="t")
-        await services.send_message(
-            session,
-            sess=sess,
-            graph=graph,
-            manager=None,
-            payload=SendMessage(content="one", mode="nl"),
-            actor_id=user.id,
-        )
-        await services.send_message(
-            session,
-            sess=sess,
-            graph=graph,
-            manager=None,
-            payload=SendMessage(content="two", mode="nl"),
-            actor_id=user.id,
-        )
+        await _append_turn(session, sess, "one")
+        await _append_turn(session, sess, "two")
         await session.commit()
 
         seqs = sorted(m.seq for m in await services.list_messages(session, sess=sess))

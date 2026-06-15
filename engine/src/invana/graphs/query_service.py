@@ -54,21 +54,7 @@ async def execute_query(
     Does not commit. Raises ``HTTPException`` for config/availability problems,
     ``QueryExecutionError`` if the connector fails the query.
     """
-    connection = await get_graph_connection(session, graph_id=graph.id)
-    if connection is None:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail={"error": "no_connection", "graph_id": graph.id},
-        )
-
-    try:
-        connector = manager.get_connector(connection.id)
-    except GraphUnavailableError:
-        raise HTTPException(
-            status_code=HTTPStatus.SERVICE_UNAVAILABLE,
-            detail={"error": "graph_not_active", "connection_id": connection.id},
-        ) from None
-
+    connection, connector = await _resolve_connector(session, graph=graph, manager=manager)
     query_language = _resolve_query_language(connector)
 
     if connection.read_only:
@@ -135,6 +121,37 @@ def _resolve_query_language(connector) -> QueryLanguage:
             "message": "Connector reports neither CYPHER nor GREMLIN capability.",
         },
     )
+
+
+async def _resolve_connector(session: AsyncSession, *, graph: Graph, manager: GraphConnectionManager):
+    """Resolve *graph*'s live connector (registry is keyed by **connection id**).
+
+    Raises ``HTTPException`` for the config/availability cases (no connection /
+    not active). Shared by ``execute_query`` and the sessions NL path so they
+    can never drift on how the connector is found.
+    """
+    connection = await get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail={"error": "no_connection", "graph_id": graph.id},
+        )
+    try:
+        connector = manager.get_connector(connection.id)
+    except GraphUnavailableError:
+        raise HTTPException(
+            status_code=HTTPStatus.SERVICE_UNAVAILABLE,
+            detail={"error": "graph_not_active", "connection_id": connection.id},
+        ) from None
+    return connection, connector
+
+
+async def resolve_query_language(
+    session: AsyncSession, *, graph: Graph, manager: GraphConnectionManager
+) -> QueryLanguage:
+    """The graph's live query language — used to ground NL translation (RFC-030)."""
+    _, connector = await _resolve_connector(session, graph=graph, manager=manager)
+    return _resolve_query_language(connector)
 
 
 def _assert_read_only_query(query: str, query_language: QueryLanguage) -> None:

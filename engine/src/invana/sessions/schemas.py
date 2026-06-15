@@ -15,12 +15,15 @@ from invana.sessions.models import SessionMessageRole, SessionMessageStatus
 
 
 class SendMessage(BaseModel):
-    """One ask. `ql` runs against the engine; `nl` is recorded but not executed."""
+    """One ask. `ql` runs the content as a query; `nl` translates it first (RFC-030)."""
 
     content: str = Field(..., min_length=1)
     mode: Literal["ql", "nl"] = "ql"
     language: QueryLanguage | None = None
     parameters: dict | None = None
+    # nl only — which LLM provider to translate with; defaults to the graph's
+    # is_default provider when omitted (RFC-030).
+    llm_provider_id: str | None = None
 
 
 class SessionCreate(BaseModel):

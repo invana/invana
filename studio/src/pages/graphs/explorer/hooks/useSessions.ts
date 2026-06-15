@@ -12,9 +12,13 @@ function toBody(payload: QueryRunPayload): SendMessageBody {
 	if (payload.mode === "ql") {
 		return { content: payload.query, mode: "ql", language: payload.language };
 	}
-	// NL has no backend yet — the engine records the prompt and replies with the
-	// "not wired" message; llmProviderId / attachments aren't sent.
-	return { content: payload.query, mode: "nl" };
+	// NL → the engine translates the prompt into a grounded query with the
+	// chosen provider (RFC-030). Attachments aren't sent yet.
+	return {
+		content: payload.query,
+		mode: "nl",
+		llm_provider_id: payload.llmProviderId,
+	};
 }
 
 /**
@@ -76,7 +80,7 @@ export function useSessions(
 				id = created.id;
 			}
 			const resp = await sessionsApi.sendMessage(u, g, id, body);
-			return { id, result: resp.result };
+			return { id, messageId: resp.assistantMessage.id, result: resp.result };
 		},
 		onSuccess: ({ id }) => {
 			setActiveSessionId(id);
@@ -115,9 +119,15 @@ export function useSessions(
 
 	const send = async (
 		payload: QueryRunPayload,
-	): Promise<{ sessionId: string; result: QueryResponse | null }> => {
-		const { id, result } = await sendMutation.mutateAsync(toBody(payload));
-		return { sessionId: id, result };
+	): Promise<{
+		sessionId: string;
+		messageId: string;
+		result: QueryResponse | null;
+	}> => {
+		const { id, messageId, result } = await sendMutation.mutateAsync(
+			toBody(payload),
+		);
+		return { sessionId: id, messageId, result };
 	};
 
 	const rerun = async (messageId: string): Promise<QueryResponse | null> => {

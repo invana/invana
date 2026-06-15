@@ -60,12 +60,24 @@ const LANGUAGE_EXTENSION: Record<
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+/** Composer defaults restored from the open session's last reply, so reopening
+ *  an NL session keeps its model + mode without the user re-selecting. */
+export interface ComposerConfig {
+	mode: QueryMode;
+	language?: QueryLanguage;
+	llmProviderId?: string;
+}
+
 export interface SessionComposerProps {
 	availableLanguages: readonly QueryLanguage[];
 	defaultLanguage: QueryLanguage;
 	llmProviders: readonly LLMProvider[];
 	onRun: (payload: QueryRunPayload) => void;
 	isRunning: boolean;
+	/** Open session id — changing it re-applies `initialConfig` once. Null on the list. */
+	sessionKey?: string | null;
+	/** Mode/model to restore for the open session; null until derivable. */
+	initialConfig?: ComposerConfig | null;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -80,6 +92,8 @@ export function SessionComposer({
 	llmProviders,
 	onRun,
 	isRunning,
+	sessionKey,
+	initialConfig,
 }: SessionComposerProps) {
 	const [mode, setMode] = useState<QueryMode>("ql");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
@@ -91,6 +105,24 @@ export function SessionComposer({
 	const editorViewRef = useRef<EditorView | null>(null);
 	const languageCompartmentRef = useRef(new Compartment());
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	// The session we've already restored the mode/model for — guards against
+	// re-applying over the user's manual switches within the same session.
+	const appliedSessionRef = useRef<string | null>(null);
+
+	// ── Restore the open session's mode + model once on open (RFC-030) ────────
+	useEffect(() => {
+		if (!sessionKey) {
+			appliedSessionRef.current = null; // back on the list — re-apply on next open
+			return;
+		}
+		if (!initialConfig || appliedSessionRef.current === sessionKey) return;
+		appliedSessionRef.current = sessionKey;
+		setMode(initialConfig.mode);
+		if (initialConfig.language) setLanguage(initialConfig.language);
+		if (initialConfig.mode === "nl" && initialConfig.llmProviderId) {
+			setLlmProviderId(initialConfig.llmProviderId);
+		}
+	}, [sessionKey, initialConfig]);
 
 	// ── Keep selectors valid if the available lists shift ────────────────────
 	useEffect(() => {

@@ -81,13 +81,12 @@ class TestSessionsRoutes:
         sid = resp.json()["id"]
         assert resp.json()["messages"] == []
 
-        # Send a natural-language message — recorded, not executed.
+        # A natural-language send with no LLM provider configured → 422 with an
+        # actionable, backend-owned message (provider resolution; RFC-030). The
+        # failure rolls back before any message is written.
         resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "hi", "mode": "nl"})
-        assert resp.status_code == 200
-        body = resp.json()
-        assert body["result"] is None
-        assert body["user_message"]["role"] == "user"
-        assert body["assistant_message"]["role"] == "assistant"
+        assert resp.status_code == 422
+        assert "Settings" in resp.json()["detail"]
 
         # List shows the session.
         resp = await client.get(BASE)
@@ -96,11 +95,10 @@ class TestSessionsRoutes:
         assert listing["total"] == 1
         assert listing["items"][0]["id"] == sid
 
-        # Detail carries both messages, ordered.
+        # The rejected send left no messages.
         resp = await client.get(f"{BASE}/{sid}")
         assert resp.status_code == 200
-        msgs = resp.json()["messages"]
-        assert [m["seq"] for m in msgs] == [1, 2]
+        assert resp.json()["messages"] == []
 
     async def test_rename(self, client):
         sid = (await client.post(BASE, json={})).json()["id"]

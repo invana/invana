@@ -36,6 +36,7 @@ from invana.sessions.schemas import (
     SessionSummary,
     SessionUpdate,
 )
+from invana.settings import settings
 
 sessions_router = APIRouter(
     prefix="/api/v1/u/{username}/{graphSlug}/sessions",
@@ -96,6 +97,7 @@ async def create_session(
             manager=manager,
             payload=payload.message,
             actor_id=user.id,
+            encryption_key=settings.encryption_key,
         )
     await session.commit()
     await session.refresh(sess)
@@ -162,7 +164,13 @@ async def send_message(
 ) -> SendMessageResponse:
     sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
     user_msg, assistant_msg, result = await services.send_message(
-        session, sess=sess, graph=graph, manager=manager, payload=payload, actor_id=user.id
+        session,
+        sess=sess,
+        graph=graph,
+        manager=manager,
+        payload=payload,
+        actor_id=user.id,
+        encryption_key=settings.encryption_key,
     )
     await session.commit()
     await session.refresh(user_msg)

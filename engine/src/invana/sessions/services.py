@@ -16,8 +16,14 @@ from invana.events import actions
 from invana.events.services import current_trace_id, emit_event
 from invana.graphs.manager import GraphConnectionManager
 from invana.graphs.models import Graph
-from invana.graphs.query_service import QueryExecutionError, execute_query
+from invana.graphs.query_service import QueryExecutionError, execute_query, resolve_query_language
 from invana.graphs.schemas import QueryResponse
+from invana.llm import LLMError
+from invana.llm.translate import nl_to_query
+from invana.llm_providers.models import LLMProvider
+from invana.llm_providers.store import LLMProviderStore
+from invana.modeller.models import GraphVersion
+from invana.modeller.store import ModelStore
 from invana.sessions.models import (
     Session,
     SessionMessage,
@@ -28,7 +34,6 @@ from invana.sessions.schemas import SendMessage
 from invana.sessions.store import SessionStore
 
 _LANGUAGE_LABEL = {"cypher": "Cypher", "gremlin": "Gremlin"}
-_NL_NOT_WIRED = "Natural-language queries aren't wired to the engine yet — switch to Query Language to run one."
 
 
 def _title_from_text(text: str) -> str:
@@ -171,6 +176,55 @@ async def delete_session(session: AsyncSession, *, sess: Session, actor_id: str)
     )
 
 
+async def _resolve_provider(session: AsyncSession, *, graph_id: str, llm_provider_id: str | None) -> LLMProvider:
+    """Pick the provider to translate with: explicit id → graph default → 422."""
+    store = LLMProviderStore()
+    if llm_provider_id:
+        provider = await store.get(session, llm_provider_id)
+        if provider is None or provider.graph_id != graph_id:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="That LLM provider was not found for this graph.",
+            )
+        return provider
+    providers = await store.list_for_graph(session, graph_id)
+    default = next((p for p in providers if p.is_default), None)
+    if default is None:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="No LLM provider is configured for this graph — add one in Settings → LLMs.",
+        )
+    return default
+
+
+async def _grounding_version(session: AsyncSession, graph_id: str) -> GraphVersion | None:
+    """The active model version to ground against — the introspected/global model
+    first (it mirrors the live DB), else any model's active version."""
+    store = ModelStore()
+    introspected = await store.get_introspected_model(session, graph_id)
+    if introspected is not None:
+        version = await store.get_active_version(session, introspected.id)
+        if version is not None:
+            return version
+    for model in await store.list_graph_models(session, graph_id):
+        version = await store.get_active_version(session, model.id)
+        if version is not None:
+            return version
+    return None
+
+
+async def _finalize_totals(
+    session: AsyncSession, sess: Session, assistant_msg: SessionMessage, payload: SendMessage
+) -> None:
+    sess.message_count += 2
+    # The assistant reply is always the newest message, so its status is the
+    # session's latest status (drives the list's failed/running indicator).
+    sess.last_status = assistant_msg.status
+    if not sess.title:
+        sess.title = _title_from_text(payload.content)
+    await session.flush()
+
+
 async def send_message(
     session: AsyncSession,
     *,
@@ -179,15 +233,24 @@ async def send_message(
     manager: GraphConnectionManager,
     payload: SendMessage,
     actor_id: str,
+    encryption_key: str,
 ) -> tuple[SessionMessage, SessionMessage, QueryResponse | None]:
-    """Append a user message + assistant reply, running the query for `ql` mode.
+    """Append a user message + assistant reply, then run a query.
 
-    Query *config* failures (no connection / not active / read-only) raise
-    ``HTTPException`` — the caller does not commit, so nothing persists. A query
-    *execution* failure is recorded as an error assistant message (committed).
+    ``ql`` runs the content directly; ``nl`` translates it to a grounded
+    read-only query first (RFC-030) and runs that. *Config* failures (no
+    provider / no connection / read-only) raise ``HTTPException`` so the caller
+    rolls back and nothing persists; *translation* and *execution* failures are
+    recorded as an error assistant message (committed).
     """
     store = SessionStore()
     is_ql = payload.mode == "ql"
+
+    # Resolve the provider up front for nl so a missing-provider 422 rolls back
+    # before any message is written.
+    provider = (
+        None if is_ql else await _resolve_provider(session, graph_id=graph.id, llm_provider_id=payload.llm_provider_id)
+    )
 
     user_seq = await store.next_seq(session, session_id=sess.id)
     user_msg = SessionMessage(
@@ -200,51 +263,83 @@ async def send_message(
         session_id=sess.id,
         seq=user_seq + 1,
         role=SessionMessageRole.assistant,
-        content="Running query…" if is_ql else _NL_NOT_WIRED,
-        status=SessionMessageStatus.running if is_ql else SessionMessageStatus.ok,
-        via=None if is_ql else "Assistant",
-        source_query=payload.content if is_ql else None,
+        content="Running query…",
+        status=SessionMessageStatus.running,
     )
     await store.add(session, user_msg)
     await store.add(session, assistant_msg)
 
-    result: QueryResponse | None = None
-    if is_ql:
-        try:
-            # HTTPException (config/availability) intentionally bubbles → rollback.
-            result = await execute_query(
-                session,
-                graph=graph,
-                manager=manager,
-                query=payload.content,
-                parameters=payload.parameters,
-                actor_id=actor_id,
-                session_id=sess.id,
-            )
-        except QueryExecutionError as exc:
-            assistant_msg.status = SessionMessageStatus.error
-            assistant_msg.content = str(exc)
-        else:
-            nodes = len(result.data.nodes) if result.data else 0
-            edges = len(result.data.edges) if result.data else 0
-            assistant_msg.status = SessionMessageStatus.ok
-            assistant_msg.via = _LANGUAGE_LABEL.get(result.query_language, result.query_language)
-            assistant_msg.query_language = result.query_language
-            assistant_msg.row_count = result.row_count
-            assistant_msg.execution_time_ms = result.execution_time_ms
-            assistant_msg.node_count = nodes
-            assistant_msg.edge_count = edges
-            assistant_msg.content = _summary(result, nodes, edges)
-            sess.node_count += nodes
-            sess.edge_count += edges
+    # Decide what to run and how to label its origin.
+    query_to_run: str | None = payload.content if is_ql else None
+    via_label: str | None = None  # nl → model id; ql → filled from the result language
 
-    sess.message_count += 2
-    # The assistant reply is always the newest message, so its status is the
-    # session's latest status (drives the list's failed/running indicator).
-    sess.last_status = assistant_msg.status
-    if not sess.title:
-        sess.title = _title_from_text(payload.content)
-    await session.flush()
+    if not is_ql:
+        language = (await resolve_query_language(session, graph=graph, manager=manager)).value
+        try:
+            generated = await nl_to_query(
+                provider=provider,
+                prompt=payload.content,
+                language=language,
+                version=await _grounding_version(session, graph.id),
+                encryption_key=encryption_key,
+            )
+        except LLMError as exc:
+            assistant_msg.status = SessionMessageStatus.error
+            assistant_msg.content = exc.message
+            await _finalize_totals(session, sess, assistant_msg, payload)
+            return user_msg, assistant_msg, None
+        query_to_run = generated.query
+        via_label = f"{provider.provider.value} · {provider.model_id}"
+        await emit_event(
+            session,
+            action=actions.LLM_TRANSLATE,
+            target_kind=actions.TARGET_SESSION,
+            target_id=sess.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={
+                "provider": provider.provider.value,
+                "model_id": provider.model_id,
+                "language": generated.language,
+                "generated_query": generated.query,
+                "input_tokens": generated.usage.input_tokens,
+                "output_tokens": generated.usage.output_tokens,
+            },
+            trace_id=current_trace_id(),
+        )
+
+    assistant_msg.source_query = query_to_run
+
+    result: QueryResponse | None = None
+    try:
+        # HTTPException (config/availability) intentionally bubbles → rollback.
+        result = await execute_query(
+            session,
+            graph=graph,
+            manager=manager,
+            query=query_to_run,
+            parameters=payload.parameters,
+            actor_id=actor_id,
+            session_id=sess.id,
+        )
+    except QueryExecutionError as exc:
+        assistant_msg.status = SessionMessageStatus.error
+        assistant_msg.content = str(exc)
+    else:
+        nodes = len(result.data.nodes) if result.data else 0
+        edges = len(result.data.edges) if result.data else 0
+        assistant_msg.status = SessionMessageStatus.ok
+        assistant_msg.via = via_label or _LANGUAGE_LABEL.get(result.query_language, result.query_language)
+        assistant_msg.query_language = result.query_language
+        assistant_msg.row_count = result.row_count
+        assistant_msg.execution_time_ms = result.execution_time_ms
+        assistant_msg.node_count = nodes
+        assistant_msg.edge_count = edges
+        assistant_msg.content = _summary(result, nodes, edges)
+        sess.node_count += nodes
+        sess.edge_count += edges
+
+    await _finalize_totals(session, sess, assistant_msg, payload)
     return user_msg, assistant_msg, result
 
 

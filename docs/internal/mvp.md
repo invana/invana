@@ -301,6 +301,12 @@ The property types the Modeller offers are **gated by the bound backend and its 
 - **Frontend:** [ ] Property-type dropdowns driven by `supported_property_types` · compatibility banner (untested → acknowledge / read-only; unknown → declare version).
 - **Integrations:** `BaseConnector` profile + `detect_version` · `CYPHER_PROFILE` / `GREMLIN_PROFILE` / `NEO4J_PROFILE`.
 
+### 4.1b Modeller generative sessions — prompt → draft model → commit (RFC-031)
+Author a model by chat: a Modeller-surface session turns a prompt into node/edge types + property keys written into the model's **draft** (rendered live by the interactive canvas, § 4.1 / RFC-027), refined by more prompts or by hand, then **committed via the existing Publish/activate**. Model only — **no sample-data generation, no connector write** (data still enters via L3 import). Depends on § 6.0 (RFC-032 runtime) + RFC-029 (staged commit); after § 5.7 lands.
+- **Backend:** [ ] `sessions.surface` (`explorer`|`modeller`, default explorer) + `sessions.model_id` (nullable FK, SET NULL) · surface-branch in `send_message` (modeller → ensure model+draft → `propose_model` forced tool → referential-integrity validate → reconcile into the draft via `ModelStore`) · `model.generate` event · messages stay metadata-only · commit reuses `POST /models/{id}/versions/{vid}/activate` (no new route).
+- **Frontend:** [ ] Modeller Sessions panel (reuse `SessionsPanel`/`SessionComposer`, `surface=modeller`, NL only) · assistant change-summary card · "Commit" → existing activate mutation · invalidate the models query subtree after generation so tree+canvas refresh.
+- **Integrations:** § 6.0 `invana/llm` runtime · `engine/src/invana/modeller/` (`ModelStore`/`Versioner`). Detail: [`mvp/rfc-031-modeller-generative-sessions.md`](mvp/rfc-031-modeller-generative-sessions.md).
+
 ### 4.2 Stitcher — mapping (system type → user concept)
 - **Backend:** [ ] `StitchMapping` entity (`dataset_id`, `system_type`, `user_type`, `property_map` JSONB) · CRUD routes · validation that referenced types exist in both ends
 - **Frontend:** [ ] Mapping UI — two columns: dataset system-types (left, from L3 graph_model) · user model concepts (right) · drag-to-map · per-property mapping form
@@ -355,9 +361,21 @@ The property types the Modeller offers are **gated by the bound backend and its 
 - **Frontend:** [ ] `useSessions` repointed off `useState` onto TanStack Query (`useSessionsQuery`/`useSessionQuery`/`useSendMessage`/`useRerunMessage`) · `graphsApi.sessions.*` (and `graphsApi.query()` removed) · re-run latest message on session open to restore canvas · panel/composer UI unchanged.
 - **Integrations:** existing graph DB connectors · `@tanstack/react-query`. Detail: [`mvp/rfc-024-query-sessions.md`](mvp/rfc-024-query-sessions.md).
 
+### 5.7 Explorer natural-language queries — RFC-030
+Forward slice of grounded LLM (§ 6.2) on the lowest-risk surface: NL → grounded **read** query → existing `execute_query`. Depends only on § 2.6 (LLM providers, shipped) + the § 6.0 runtime. Builds on the § 5.6 sessions `nl` branch (which RFC-024 left unwired). Not the full agent loop (§ 6.1).
+- **Backend:** [ ] Replace the `mode:"nl"` branch of `send_message`: resolve provider (explicit `llm_provider_id` → graph default → 422) → `translate.nl_to_query` (grounded on the active `GraphVersion`, forced tool-use, one repair) → stamp generated query onto `source_query` + `via` → `execute_query` (read-only guard is the backstop) → return `QueryResponse`. `llm.translate` event; `input_tokens`/`output_tokens` on `session_messages` (nullable). Re-run re-executes the stored generated query (no LLM call).
+- **Frontend:** [ ] Composer sends `llm_provider_id`; NL reply shows a "view generated query" disclosure + `via` model label; 422 routes to Settings → LLMs. No canvas/re-run change.
+- **Integrations:** § 6.0 `invana/llm` runtime (RFC-032) · existing graph DB connectors. Detail: [`mvp/rfc-030-llm-translation.md`](mvp/rfc-030-llm-translation.md).
+
 ---
 
 ## Layer 6 — Intelligence (Agents · LLM grounding · Success scoring)
+
+### 6.0 LLM runtime — provider client (RFC-032)
+The provider-agnostic client every LLM consumer calls (§ 5.7 NL→query, the Modeller generative sessions, § 6.1/6.2 agent loop). Distinct from § 2.6 `llm_providers/` (config/CRUD) — this is the runtime that *uses* that config. **Dev/test without API keys = Ollama** (`ollama`/`local` providers need only a `base_url`); production = an Anthropic **API key** (a Claude Pro/Max / Claude Code subscription is **not** usable programmatically). Tests run against a real local Ollama (repo rule 7: real services, no mocks).
+- **Backend:** [ ] `invana/llm/` — `client.py` (`complete_tool(provider, …) → {input, usage}`, dispatch by provider, lazy SDK import, decrypt key at call time, run sync SDK calls in `asyncio.to_thread` — generalizes the `_dispatch_ping` pattern) · structured output via forced tool-use (Anthropic `tools`+`tool_choice` / OpenAI tool-calling) with a JSON-schema `format` fallback for Ollama/local · one repair round-trip · per-call timeout + normalized `LLMError` (backend-owned message) · default models per provider (Anthropic `claude-opus-4-8`).
+- **Frontend:** [ ] none (runtime/library; surfaced through its consumers).
+- **Integrations:** `anthropic` SDK (official) · `openai` SDK (optional) · Ollama/local HTTP (`/api/chat`, JSON-schema `format`) · reuses `graphs.encryption` (Fernet) + `LLMProvider`. Detail: [`mvp/rfc-032-llm-runtime.md`](mvp/rfc-032-llm-runtime.md).
 
 ### 6.1 Agent runtime
 - **Backend:** [ ] Agent loop service: read Graph instructions → plan with bound skills → query graph for grounded context → call bound LLM → handle result (return / write-back / fail) · `POST /u/{username}/{graphSlug}/agents/{aid}/run` (manual fire) · streaming response via SSE · fail-fast with clear error if the Graph has zero skills or zero datasets bound at run time

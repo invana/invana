@@ -127,8 +127,10 @@ ignore = [
 # Optional/heavy SDKs imported lazily so they're only required when actually used:
 #   events/services.py     — opentelemetry (telemetry extra)
 #   llm_providers/services — anthropic / openai SDKs + urllib, per-provider
+#   llm/providers/*        — anthropic SDK lazy-imported per provider (RFC-032)
 "src/invana/events/services.py" = ["PLC0415"]
 "src/invana/llm_providers/services.py" = ["PLC0415"]
+"src/invana/llm/providers/*" = ["PLC0415"]
 # starlette-admin ModelViews declare `fields`/`exclude_*` as plain class lists —
 # the framework's documented API. RUF012 (ClassVar) doesn't apply.
 "src/invana/server/admin/views.py" = ["RUF012"]
