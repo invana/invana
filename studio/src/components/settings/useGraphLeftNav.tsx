@@ -90,16 +90,21 @@ export function useGraphLeftNav(
 		},
 	];
 
-	const bottomNavItems = SETTINGS_SECTIONS.map((s) => ({
-		name: s.label,
-		icon: s.icon,
-		iconClassName: "w-5 h-5",
-		tooltipSide: "right" as const,
-		className: activeClass(
-			settingsPanel.isOpen && settingsPanel.section === s.key,
-		),
-		onClick: () => settingsPanel.setSection(s.key),
-	}));
+	// Each section icon is a toggle: clicking the open section closes the panel,
+	// clicking any other opens/switches to it. Works the same on every
+	// graph-scoped page (Explorer / Modeller) since both render this rail.
+	const bottomNavItems = SETTINGS_SECTIONS.map((s) => {
+		const active = settingsPanel.isOpen && settingsPanel.section === s.key;
+		return {
+			name: s.label,
+			icon: s.icon,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () =>
+				active ? settingsPanel.close() : settingsPanel.setSection(s.key),
+		};
+	});
 
 	return { topNavItems, bottomNavItems };
 }
