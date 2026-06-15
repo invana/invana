@@ -1,4 +1,4 @@
-import { defaultKeymap } from "@codemirror/commands";
+import { defaultKeymap, insertNewlineAndIndent } from "@codemirror/commands";
 import { StreamLanguage } from "@codemirror/language";
 import { cypher } from "@codemirror/legacy-modes/mode/cypher";
 import { groovy } from "@codemirror/legacy-modes/mode/groovy";
@@ -95,7 +95,7 @@ export function SessionComposer({
 	sessionKey,
 	initialConfig,
 }: SessionComposerProps) {
-	const [mode, setMode] = useState<QueryMode>("ql");
+	const [mode, setMode] = useState<QueryMode>("nl");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
 	const [llmProviderId, setLlmProviderId] = useState<string>("");
 	const [nlQuery, setNlQuery] = useState("");
@@ -105,6 +105,9 @@ export function SessionComposer({
 	const editorViewRef = useRef<EditorView | null>(null);
 	const languageCompartmentRef = useRef(new Compartment());
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	// Lets the CodeMirror Enter keybinding (wired once on mount) call the
+	// latest handleRun without closing over stale mode/language/query state.
+	const handleRunRef = useRef<() => void>(() => {});
 	// The session we've already restored the mode/model for — guards against
 	// re-applying over the user's manual switches within the same session.
 	const appliedSessionRef = useRef<string | null>(null);
@@ -161,6 +164,18 @@ export function SessionComposer({
 		const state = EditorState.create({
 			doc: defaultQuery,
 			extensions: [
+				// Enter submits, Shift-Enter inserts a newline — listed before
+				// defaultKeymap so it wins over CM's default Enter binding.
+				keymap.of([
+					{
+						key: "Enter",
+						run: () => {
+							handleRunRef.current();
+							return true;
+						},
+					},
+					{ key: "Shift-Enter", run: insertNewlineAndIndent },
+				]),
 				keymap.of(defaultKeymap),
 				languageCompartmentRef.current.of(LANGUAGE_EXTENSION[defaultLanguage]),
 				darkTheme,
@@ -203,6 +218,7 @@ export function SessionComposer({
 		setNlQuery("");
 		setAttachments([]);
 	};
+	handleRunRef.current = handleRun;
 
 	const handleAttachChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files;
@@ -263,7 +279,11 @@ export function SessionComposer({
 						value={nlQuery}
 						onChange={(e) => setNlQuery(e.target.value)}
 						onKeyDown={(e) => {
-							if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+							if (
+								e.key === "Enter" &&
+								!e.shiftKey &&
+								!e.nativeEvent.isComposing
+							) {
 								e.preventDefault();
 								handleRun();
 							}
