@@ -1,6 +1,5 @@
 import {
 	Button,
-	ScrollArea,
 	Table,
 	TableBody,
 	TableCell,
@@ -13,6 +12,11 @@ import { useState } from "react";
 // Inline, windowed preview of tabular query results (RFC-033). Renders only the
 // first `visible` rows so a large result never bloats the thread DOM; "Load
 // more" reveals the next page from the already-fetched rows (no extra fetch).
+//
+// The window is by row *count* (PAGE below), not pixel height — every windowed
+// row renders fully. An earlier `max-h` scroll wrapper clipped the rows to ~5
+// and (Radix hides the scrollbar until hover) made a 10-row result look like it
+// stopped at 5. The thread itself scrolls, so we only guard horizontal overflow.
 
 const PAGE = 10;
 
@@ -38,7 +42,7 @@ export function ResultsTable({ rows }: ResultsTableProps) {
 
 	return (
 		<div className="mt-1 overflow-hidden rounded border border-border">
-			<ScrollArea className="max-h-64">
+			<div className="overflow-x-auto">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -61,7 +65,7 @@ export function ResultsTable({ rows }: ResultsTableProps) {
 						))}
 					</TableBody>
 				</Table>
-			</ScrollArea>
+			</div>
 			{remaining > 0 && (
 				<div className="border-t border-border p-1.5">
 					<Button

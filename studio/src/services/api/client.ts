@@ -260,6 +260,10 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
 		method,
 		data,
 		headers: init?.headers as Record<string, string> | undefined,
+		// Forwarded so callers can cancel an in-flight request (e.g. the Explorer's
+		// "stop query" control aborts the session message run). Axios raises a
+		// `CanceledError` the caller can detect via its own `signal.aborted`.
+		signal: init?.signal ?? undefined,
 	};
 	const res = await apiClient.request(config);
 	if (res.status === 204) return undefined as T;

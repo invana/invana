@@ -414,6 +414,7 @@ class SessionMessageView(ModelView):
         "query_language",
         "row_count",
         "execution_time_ms",
+        "llm_time_ms",
         "created_at",
     ]
 

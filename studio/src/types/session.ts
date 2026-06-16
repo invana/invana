@@ -12,8 +12,10 @@ import type { QueryLanguage } from "./graphs";
 
 export type SessionMessageRole = "user" | "assistant";
 
-/** Lifecycle of an assistant reply tied to a query execution. */
-export type SessionMessageStatus = "running" | "ok" | "error";
+/** Lifecycle of an assistant reply tied to a query execution. `stopped` is
+ *  client-only — set when the user aborts an in-flight run (the engine never
+ *  returns it). */
+export type SessionMessageStatus = "running" | "ok" | "error" | "stopped";
 
 export interface SessionMessage {
 	id: string;
@@ -27,6 +29,9 @@ export interface SessionMessage {
 	/** Result metadata, present on assistant replies to a query. */
 	rowCount?: number;
 	executionTimeMs?: number;
+	/** NL only — time spent translating the prompt to a query (RFC-030). Null on
+	 *  QL and rerun, so the meta line can show LLM vs query time separately. */
+	llmTimeMs?: number;
 	language?: QueryLanguage;
 	/** The query that produced this reply, so it can be re-run. */
 	sourceQuery?: string;

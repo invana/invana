@@ -2,7 +2,7 @@ import { defaultKeymap, insertNewlineAndIndent } from "@codemirror/commands";
 import { StreamLanguage } from "@codemirror/language";
 import { cypher } from "@codemirror/legacy-modes/mode/cypher";
 import { groovy } from "@codemirror/legacy-modes/mode/groovy";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Annotation, Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
 import {
 	Select,
@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
-import { ArrowUp, Paperclip, X } from "lucide-react";
+import { ArrowUp, Paperclip, Square, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
@@ -73,7 +73,13 @@ export interface SessionComposerProps {
 	defaultLanguage: QueryLanguage;
 	llmProviders: readonly LLMProvider[];
 	onRun: (payload: QueryRunPayload) => void;
+	/** Cancel the in-flight run — wired to the stop button shown while running. */
+	onStop: () => void;
 	isRunning: boolean;
+	/** The open session's user prompts, newest first. ↑/↓ walk this like a shell
+	 *  history (↑ older, ↓ newer); navigating past the newest restores the draft
+	 *  the user was typing. */
+	promptHistory?: readonly string[];
 	/** Open session id — changing it re-applies `initialConfig` once. Null on the list. */
 	sessionKey?: string | null;
 	/** Mode/model to restore for the open session; null until derivable. */
@@ -91,9 +97,11 @@ export function SessionComposer({
 	defaultLanguage,
 	llmProviders,
 	onRun,
+	onStop,
 	isRunning,
 	sessionKey,
 	initialConfig,
+	promptHistory,
 }: SessionComposerProps) {
 	const [mode, setMode] = useState<QueryMode>("nl");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
@@ -108,6 +116,55 @@ export function SessionComposer({
 	// Lets the CodeMirror Enter keybinding (wired once on mount) call the
 	// latest handleRun without closing over stale mode/language/query state.
 	const handleRunRef = useRef<() => void>(() => {});
+
+	// ── Shell-style prompt history (↑ older / ↓ newer) ───────────────────────
+	// All in refs so the CodeMirror keybindings (wired once on mount) read live
+	// values. `historyIndex` is -1 when not navigating (a live draft); 0 is the
+	// newest prompt, higher is older. `draft` holds the text being typed before
+	// ↑ entered history, restored when ↓ walks back past the newest.
+	const historyRef = useRef<readonly string[]>([]);
+	historyRef.current = promptHistory ?? [];
+	const historyIndexRef = useRef(-1);
+	const draftRef = useRef("");
+
+	// Compute the text to show for a history step, or null to leave the editor as
+	// is (no history, already at the oldest, or not currently navigating on ↓).
+	const stepHistory = (
+		dir: "older" | "newer",
+		currentText: string,
+	): string | null => {
+		const history = historyRef.current;
+		if (history.length === 0) return null;
+		let idx = historyIndexRef.current;
+		if (dir === "older") {
+			if (idx >= history.length - 1) return null; // already at the oldest
+			if (idx === -1) draftRef.current = currentText; // entering: stash the draft
+			idx += 1;
+			historyIndexRef.current = idx;
+			return history[idx];
+		}
+		if (idx <= -1) return null; // ↓ does nothing unless we're in history
+		idx -= 1;
+		historyIndexRef.current = idx;
+		return idx === -1 ? draftRef.current : history[idx];
+	};
+
+	// Marks the CodeMirror recall dispatch so the editor's updateListener can tell
+	// a programmatic recall from a user edit (only the latter resets the cursor).
+	const recallAnnotationRef = useRef(Annotation.define<boolean>());
+
+	// Replace the QL editor's whole doc with a recalled prompt (caret to end),
+	// tagged so it doesn't read as a user edit. Returns whether anything changed
+	// — false lets the key fall through to normal cursor movement.
+	const applyRecall = (view: EditorView, text: string | null): boolean => {
+		if (text == null) return false;
+		view.dispatch({
+			changes: { from: 0, to: view.state.doc.length, insert: text },
+			selection: { anchor: text.length },
+			annotations: recallAnnotationRef.current.of(true),
+		});
+		return true;
+	};
 	// The session we've already restored the mode/model for — guards against
 	// re-applying over the user's manual switches within the same session.
 	const appliedSessionRef = useRef<string | null>(null);
@@ -126,6 +183,13 @@ export function SessionComposer({
 			setLlmProviderId(initialConfig.llmProviderId);
 		}
 	}, [sessionKey, initialConfig]);
+
+	// Switching sessions (or back to the list) starts a fresh history walk.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset is keyed on the session only
+	useEffect(() => {
+		historyIndexRef.current = -1;
+		draftRef.current = "";
+	}, [sessionKey]);
 
 	// ── Keep selectors valid if the available lists shift ────────────────────
 	useEffect(() => {
@@ -175,8 +239,39 @@ export function SessionComposer({
 						},
 					},
 					{ key: "Shift-Enter", run: insertNewlineAndIndent },
+					// ↑/↓ walk the prompt history, but only from the first/last line so
+					// they keep their normal cursor movement inside a multi-line query.
+					{
+						key: "ArrowUp",
+						run: (view) => {
+							const { doc, selection } = view.state;
+							if (doc.lineAt(selection.main.head).number !== 1) return false;
+							return applyRecall(view, stepHistory("older", doc.toString()));
+						},
+					},
+					{
+						key: "ArrowDown",
+						run: (view) => {
+							const { doc, selection } = view.state;
+							if (doc.lineAt(selection.main.head).number !== doc.lines)
+								return false;
+							return applyRecall(view, stepHistory("newer", doc.toString()));
+						},
+					},
 				]),
 				keymap.of(defaultKeymap),
+				// A user edit (any doc change that isn't our recall) drops out of the
+				// history walk so the next ↑ stashes the new text as the draft.
+				EditorView.updateListener.of((update) => {
+					if (
+						update.docChanged &&
+						!update.transactions.some((tr) =>
+							tr.annotation(recallAnnotationRef.current),
+						)
+					) {
+						historyIndexRef.current = -1;
+					}
+				}),
 				languageCompartmentRef.current.of(LANGUAGE_EXTENSION[defaultLanguage]),
 				darkTheme,
 				EditorView.lineWrapping,
@@ -206,10 +301,14 @@ export function SessionComposer({
 	// ── Handlers ──────────────────────────────────────────────────────────────
 
 	const handleRun = () => {
+		// Enter / Cmd-Enter reach here even while a run is in flight (the button is
+		// swapped to Stop, but the key bindings stay live) — ignore until it ends.
+		if (isRunning) return;
 		if (mode === "ql") {
 			const query = editorViewRef.current?.state.doc.toString().trim() ?? "";
 			if (!query) return;
 			onRun({ mode: "ql", query, language });
+			historyIndexRef.current = -1; // sent — next ↑ starts from the newest
 			return;
 		}
 		const query = nlQuery.trim();
@@ -217,6 +316,7 @@ export function SessionComposer({
 		onRun({ mode: "nl", query, llmProviderId, attachments });
 		setNlQuery("");
 		setAttachments([]);
+		historyIndexRef.current = -1;
 	};
 	handleRunRef.current = handleRun;
 
@@ -277,7 +377,10 @@ export function SessionComposer({
 				{mode === "nl" && (
 					<textarea
 						value={nlQuery}
-						onChange={(e) => setNlQuery(e.target.value)}
+						onChange={(e) => {
+							setNlQuery(e.target.value);
+							historyIndexRef.current = -1; // manual edit → live draft again
+						}}
 						onKeyDown={(e) => {
 							if (
 								e.key === "Enter" &&
@@ -286,6 +389,34 @@ export function SessionComposer({
 							) {
 								e.preventDefault();
 								handleRun();
+								return;
+							}
+							// ↑/↓ walk the prompt history, but only from the first/last line
+							// so they keep normal caret movement inside a multi-line prompt.
+							const ta = e.currentTarget;
+							const collapsed = ta.selectionStart === ta.selectionEnd;
+							if (
+								e.key === "ArrowUp" &&
+								collapsed &&
+								!ta.value.slice(0, ta.selectionStart).includes("\n")
+							) {
+								const next = stepHistory("older", nlQuery);
+								if (next != null) {
+									e.preventDefault();
+									setNlQuery(next);
+								}
+								return;
+							}
+							if (
+								e.key === "ArrowDown" &&
+								collapsed &&
+								!ta.value.slice(ta.selectionEnd).includes("\n")
+							) {
+								const next = stepHistory("newer", nlQuery);
+								if (next != null) {
+									e.preventDefault();
+									setNlQuery(next);
+								}
 							}
 						}}
 						placeholder="Ask anything about your graph…"
@@ -373,15 +504,26 @@ export function SessionComposer({
 						</>
 					)}
 
-					<Button
-						size="icon"
-						className="h-7 w-7 shrink-0 rounded-full"
-						onClick={handleRun}
-						disabled={runDisabled}
-						title="Send"
-					>
-						<ArrowUp className="w-4 h-4" />
-					</Button>
+					{isRunning ? (
+						<Button
+							size="icon"
+							className="h-7 w-7 shrink-0 rounded-full"
+							onClick={onStop}
+							title="Stop"
+						>
+							<Square className="w-3 h-3 fill-current" />
+						</Button>
+					) : (
+						<Button
+							size="icon"
+							className="h-7 w-7 shrink-0 rounded-full"
+							onClick={handleRun}
+							disabled={runDisabled}
+							title="Send"
+						>
+							<ArrowUp className="w-4 h-4" />
+						</Button>
+					)}
 				</div>
 			</div>
 		</div>

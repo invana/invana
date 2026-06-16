@@ -63,6 +63,7 @@ class SessionMessageRead(BaseModel):
     source_query: str | None = None
     row_count: int | None = None
     execution_time_ms: int | None = None
+    llm_time_ms: int | None = None
     node_count: int | None = None
     edge_count: int | None = None
     created_at: datetime

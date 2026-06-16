@@ -14,7 +14,9 @@ own those.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Awaitable, Callable
+from contextlib import nullcontext
 
 from invana.graphs.encryption import decrypt_credentials
 from invana.llm.defaults import DEFAULT_MODEL_ID
@@ -23,6 +25,25 @@ from invana.llm.providers import anthropic as anthropic_provider
 from invana.llm.providers import ollama as ollama_provider
 from invana.llm.schemas import TokenUsage, ToolResult
 from invana.llm_providers.models import LLMProvider, LLMProviderKind
+
+# OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025); the LLM
+# client must import cleanly without it. Resolve a tracer lazily and fall back to
+# no-op spans — mirrors the graph connector's pattern so the NL translate step
+# shows up in the same FE→BE trace as the query execution.
+try:
+    from opentelemetry import trace as _otel_trace
+
+    _tracer = _otel_trace.get_tracer("invana.llm")
+except ImportError:  # telemetry extra not installed
+    _tracer = None
+
+
+def _llm_span(name: str):
+    """Start an OTel span for an LLM stage, or a no-op when telemetry is absent."""
+    if _tracer is None:
+        return nullcontext(None)
+    return _tracer.start_as_current_span(name)
+
 
 _Dispatch = Callable[..., Awaitable[tuple[dict | None, TokenUsage]]]
 
@@ -63,11 +84,15 @@ async def complete_tool(
     api_key = _decrypt(provider.api_key_encrypted, encryption_key) if provider.api_key_encrypted else None
     required = list(tool_schema.get("required", []))
 
+    # Accumulate wall-clock across both the initial call and any repair retry, so
+    # the reported LLM time covers everything the turn actually spent talking to
+    # the provider — not just the last attempt.
+    start = time.perf_counter()
     obj, usage = await _invoke(
         dispatch, model_id, api_key, provider.base_url, system, messages, tool_schema, tool_name, timeout_s
     )
     if _valid(obj, required):
-        return ToolResult(input=obj, usage=usage)
+        return ToolResult(input=obj, usage=usage, duration_ms=(time.perf_counter() - start) * 1000)
 
     # One corrective round-trip, then give up (no unbounded retries).
     repair = [
@@ -86,7 +111,7 @@ async def complete_tool(
         output_tokens=usage.output_tokens + usage2.output_tokens,
     )
     if _valid(obj2, required):
-        return ToolResult(input=obj2, usage=usage)
+        return ToolResult(input=obj2, usage=usage, duration_ms=(time.perf_counter() - start) * 1000)
 
     raise LLMError("The model did not return a valid structured result.")
 
@@ -102,21 +127,28 @@ async def _invoke(
     tool_name: str,
     timeout_s: float,
 ) -> tuple[dict | None, TokenUsage]:
-    try:
-        return await dispatch(
-            model_id=model_id,
-            api_key=api_key,
-            base_url=base_url,
-            system=system,
-            messages=messages,
-            tool_schema=tool_schema,
-            tool_name=tool_name,
-            timeout_s=timeout_s,
-        )
-    except LLMError:
-        raise
-    except Exception as exc:  # normalize transport/SDK failures
-        raise LLMError(f"The LLM provider call failed: {exc}") from exc
+    with _llm_span("llm.generate") as span:
+        if span is not None:
+            span.set_attribute("invana.llm.model_id", model_id)
+        try:
+            obj, usage = await dispatch(
+                model_id=model_id,
+                api_key=api_key,
+                base_url=base_url,
+                system=system,
+                messages=messages,
+                tool_schema=tool_schema,
+                tool_name=tool_name,
+                timeout_s=timeout_s,
+            )
+        except LLMError:
+            raise
+        except Exception as exc:  # normalize transport/SDK failures
+            raise LLMError(f"The LLM provider call failed: {exc}") from exc
+        if span is not None:
+            span.set_attribute("invana.llm.input_tokens", usage.input_tokens)
+            span.set_attribute("invana.llm.output_tokens", usage.output_tokens)
+        return obj, usage
 
 
 def _decrypt(token: bytes, key: str) -> str:

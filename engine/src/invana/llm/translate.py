@@ -41,6 +41,9 @@ class GeneratedQuery:
     read_only: bool
     rationale: str
     usage: TokenUsage
+    # Wall-clock of the LLM translation step, surfaced so the sessions endpoint
+    # can report LLM time next to query time (RFC-025/030).
+    duration_ms: float = 0.0
 
 
 def _system_prompt(language: str, model_context: str) -> str:
@@ -94,4 +97,5 @@ async def nl_to_query(
         read_only=True,
         rationale=str(data.get("rationale") or ""),
         usage=result.usage,
+        duration_ms=result.duration_ms,
     )

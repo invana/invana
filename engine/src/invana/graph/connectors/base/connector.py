@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from abc import ABC, abstractmethod
 from contextlib import nullcontext
 from typing import Any, ClassVar
@@ -108,10 +109,18 @@ class BaseConnector(ABC):
         deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
         the studio joins via W3C trace-context propagation.
         """
+        # Time the driver round-trip so the result carries a real duration. The
+        # serializers don't populate it (the vendor result summary isn't uniform
+        # across drivers), so without this metadata.duration_ms stays 0.0 and the
+        # studio shows "0ms" (RFC-025). Measure the raw execute only — serialise
+        # is our own work and traced separately by the spans below.
+        start = time.perf_counter()
         with _query_span("graph.query.db_execute"):
             raw = await self._execute_raw(query, parameters)
+        duration_ms = (time.perf_counter() - start) * 1000
         with _query_span("graph.query.serialize") as span:
             response = self._serializer.deserialize_graph_response(raw)
+            response.metadata.duration_ms = duration_ms
             if span is not None:
                 span.set_attribute("invana.graph.node_count", len(response.nodes))
                 span.set_attribute("invana.graph.edge_count", len(response.edges))

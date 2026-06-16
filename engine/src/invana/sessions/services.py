@@ -290,6 +290,9 @@ async def send_message(
             return user_msg, assistant_msg, None
         query_to_run = generated.query
         via_label = f"{provider.provider.value} · {provider.model_id}"
+        # Recorded now (not in the ok branch below) so it survives even when the
+        # generated query then fails to execute — the translation still cost time.
+        assistant_msg.llm_time_ms = round(generated.duration_ms)
         await emit_event(
             session,
             action=actions.LLM_TRANSLATE,
@@ -304,6 +307,7 @@ async def send_message(
                 "generated_query": generated.query,
                 "input_tokens": generated.usage.input_tokens,
                 "output_tokens": generated.usage.output_tokens,
+                "duration_ms": round(generated.duration_ms),
             },
             trace_id=current_trace_id(),
         )

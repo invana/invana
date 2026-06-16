@@ -83,6 +83,7 @@ export function ExplorerPage() {
 		setShowArchived,
 		send,
 		rerun,
+		stop,
 		refresh,
 		setPinned,
 		setArchived,
@@ -383,6 +384,7 @@ export function ExplorerPage() {
 			defaultLanguage={defaultLanguage}
 			llmProviders={llmProviders}
 			onRun={handleRun}
+			onStop={stop}
 			isRunning={isRunning}
 			sessions={sessions}
 			activeSession={activeSession}

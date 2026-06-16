@@ -131,6 +131,10 @@ class SessionMessage(Base):
     source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
     row_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     execution_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # NL only — wall-clock of the LLM translation step that produced
+    # ``source_query`` (RFC-030). Null on QL and on rerun (no translation), so
+    # the UI can show LLM time next to query time and see which dominated.
+    llm_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     node_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     edge_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
 

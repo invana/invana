@@ -11,7 +11,6 @@ import {
 	DropdownMenuTrigger,
 	ScrollArea,
 	SearchInput,
-	Spinner,
 	TabbedPanel,
 } from "@invana/ui";
 import {
@@ -30,7 +29,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { formatRelativeTime } from "../../../../lib/time";
+import { formatDuration, formatRelativeTime } from "../../../../lib/time";
 import type { SessionSort } from "../../../../services/api/sessions";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
@@ -52,6 +51,8 @@ export interface SessionsPanelProps {
 	defaultLanguage: QueryLanguage;
 	llmProviders: readonly LLMProvider[];
 	onRun: (payload: QueryRunPayload) => void;
+	/** Cancel the in-flight run (composer stop control). */
+	onStop: () => void;
 	isRunning: boolean;
 	// Sessions
 	sessions: Session[];
@@ -92,6 +93,7 @@ export function SessionsPanel({
 	defaultLanguage,
 	llmProviders,
 	onRun,
+	onStop,
 	isRunning,
 	sessions,
 	activeSession,
@@ -184,15 +186,30 @@ export function SessionsPanel({
 		};
 	}, [activeSession, llmProviders]);
 
+	// The open session's user prompts, newest first — walked by the composer's
+	// ↑/↓ history (most recent first).
+	const promptHistory = useMemo(
+		() =>
+			activeSession
+				? activeSession.messages
+						.filter((m) => m.role === "user")
+						.map((m) => m.content)
+						.reverse()
+				: [],
+		[activeSession],
+	);
+
 	const composer = (
 		<SessionComposer
 			availableLanguages={availableLanguages}
 			defaultLanguage={defaultLanguage}
 			llmProviders={llmProviders}
 			onRun={onRun}
+			onStop={onStop}
 			isRunning={isRunning}
 			sessionKey={activeSession?.id ?? null}
 			initialConfig={composerConfig}
+			promptHistory={promptHistory}
 		/>
 	);
 
@@ -637,6 +654,17 @@ function UserMessage({ message }: { message: SessionMessage }) {
 	);
 }
 
+/** Three bouncing dots — the "query is running" affordance in the thread. */
+function RunningDots() {
+	return (
+		<span className="inline-flex items-center gap-0.5" aria-label="Running">
+			<span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
+			<span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
+			<span className="w-1 h-1 rounded-full bg-current animate-bounce" />
+		</span>
+	);
+}
+
 function AssistantMessage({
 	message,
 	onRerun,
@@ -658,18 +686,29 @@ function AssistantMessage({
 	if (message.status === "running") {
 		return (
 			<div className="flex items-center gap-2 text-muted-foreground">
-				<Spinner className="w-4 h-4" />
-				{message.content}
+				<span>{message.content}</span>
+				<RunningDots />
 			</div>
 		);
 	}
 
+	// User-aborted run (client-only status) — keep the prompt above, note the stop.
+	if (message.status === "stopped") {
+		return <p className="text-muted-foreground italic">{message.content}</p>;
+	}
+
+	// LLM time only exists for NL turns; when present, label both times so it's
+	// clear which step dominated. QL turns show the bare query time.
+	const hasLlm = message.llmTimeMs != null;
 	const meta = [
 		message.via,
 		message.rowCount != null
 			? `${message.rowCount} row${message.rowCount === 1 ? "" : "s"}`
 			: null,
-		message.executionTimeMs != null ? `${message.executionTimeMs}ms` : null,
+		hasLlm ? `LLM ${formatDuration(message.llmTimeMs as number)}` : null,
+		message.executionTimeMs != null
+			? `${hasLlm ? "query " : ""}${formatDuration(message.executionTimeMs)}`
+			: null,
 	]
 		.filter(Boolean)
 		.join(" · ");
@@ -683,38 +722,42 @@ function AssistantMessage({
 			>
 				{message.content}
 			</p>
-			<div className="flex items-center justify-between text-muted-foreground">
-				<div className="flex items-center gap-0.5">
+			{/* Actions on their own row, meta on the next line — keeping them on one
+			    row let a long meta string (model · rows · LLM · query) wrap around
+			    the icons and read as crowded. Glyphs are small; the buttons are
+			    wider than the glyph so each icon gets horizontal breathing room. */}
+			<div className="flex flex-col gap-1 text-muted-foreground">
+				<div className="flex items-center gap-1">
 					{message.sourceQuery && (
 						<Button
 							variant="ghost"
 							size="icon"
-							className="h-6 w-6"
+							className="h-6 w-7"
 							onClick={() => onRerun(message.id)}
 							title="Re-run query"
 						>
-							<RotateCw className="w-3.5 h-3.5" />
+							<RotateCw className="w-3 h-3" />
 						</Button>
 					)}
 					{message.sourceQuery && (
 						<Button
 							variant="ghost"
 							size="icon"
-							className="h-6 w-6"
+							className="h-6 w-7"
 							onClick={() => setShowQuery((v) => !v)}
 							title={showQuery ? "Hide query" : "View query"}
 						>
-							<Code className="w-3.5 h-3.5" />
+							<Code className="w-3 h-3" />
 						</Button>
 					)}
 					<Button
 						variant="ghost"
 						size="icon"
-						className="h-6 w-6"
+						className="h-6 w-7"
 						onClick={copy}
 						title="Copy"
 					>
-						<Copy className="w-3.5 h-3.5" />
+						<Copy className="w-3 h-3" />
 					</Button>
 				</div>
 				{meta && <span>{meta}</span>}

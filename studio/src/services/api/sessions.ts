@@ -25,6 +25,7 @@ interface ApiMessage {
 	source_query?: string | null;
 	row_count?: number | null;
 	execution_time_ms?: number | null;
+	llm_time_ms?: number | null;
 	node_count?: number | null;
 	edge_count?: number | null;
 	created_at: string;
@@ -115,6 +116,7 @@ function toMessage(m: ApiMessage): SessionMessage {
 		via: m.via ?? undefined,
 		rowCount: m.row_count ?? undefined,
 		executionTimeMs: m.execution_time_ms ?? undefined,
+		llmTimeMs: m.llm_time_ms ?? undefined,
 		language: (m.query_language as QueryLanguage | null) ?? undefined,
 		sourceQuery: m.source_query ?? undefined,
 	};
@@ -205,12 +207,14 @@ export const sessionsApi = {
 		graphSlug: string,
 		id: string,
 		body: SendMessageBody,
+		signal?: AbortSignal,
 	): Promise<SendMessageResult> => {
 		const data = await request<ApiSendResponse>(
 			`${base(username, graphSlug)}/${id}/messages`,
 			{
 				method: "POST",
 				body: JSON.stringify(body),
+				signal,
 			},
 		);
 		return {
@@ -225,10 +229,11 @@ export const sessionsApi = {
 		graphSlug: string,
 		id: string,
 		messageId: string,
+		signal?: AbortSignal,
 	): Promise<{ message: SessionMessage; result: QueryResponse }> => {
 		const data = await request<ApiRerunResponse>(
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/run`,
-			{ method: "POST" },
+			{ method: "POST", signal },
 		);
 		return { message: toMessage(data.message), result: data.result };
 	},
