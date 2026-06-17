@@ -54,7 +54,12 @@ class UserOut(BaseModel):
 
     id: str
     # Optional — accounts can be provisioned without an email (see User model).
-    email: EmailStr | None
+    # Plain str (not EmailStr) on purpose: this is an output DTO serializing an
+    # already-stored, already-validated value. Re-validating here would 500 on
+    # sanctioned special-use domains like the `hi@invana.local` bootstrap default,
+    # which email-validator rejects as a reserved TLD. Input is validated by
+    # RegisterRequest; the CLI/bootstrap paths trust the operator-supplied address.
+    email: str | None
     username: str
     first_name: str
     last_name: str | None
