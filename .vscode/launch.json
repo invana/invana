@@ -19,6 +19,7 @@
       "name": "Server: Start API",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/engine/.venv/bin/python",
       "module": "uvicorn",
       "args": [
         "invana.server.app:create_app",
