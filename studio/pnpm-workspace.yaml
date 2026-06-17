@@ -1,0 +1,5 @@
+minimumReleaseAgeExclude:
+  - '@invana/forms@0.0.11'
+  - '@invana/styling@0.0.11'
+  - '@invana/themes@0.0.11'
+  - '@invana/ui@0.0.11'
