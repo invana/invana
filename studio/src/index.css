@@ -1,11 +1,48 @@
 /* All @import statements must come before other at-rules */
 @import "tailwindcss";
 @import "@invana/ui/styles.css";
-/* Direct path bypasses missing "style" condition in @invana/themes exports */
-@import "../node_modules/@invana/themes/dist/styles.css";
-@import "../node_modules/@invana/styling/src/themes/default.css";
-@import "../node_modules/@invana/styling/src/themes/tailwind.css";
-@import "../node_modules/@invana/styling/src/themes/vite.css";
+@import "@invana/themes/styles.css";
+@import "@invana/styling/themes/default.css";
+@import "@invana/styling/themes/tailwind.css";
+@import "@invana/styling/themes/vite.css";
+
+/* @invana/forms ships no precompiled CSS (unlike @invana/ui), so its
+   components' utility classes only live in its dist JS. Tailwind 4 skips
+   node_modules during auto-detection, so without this its Switch/etc. state
+   classes (e.g. data-[state=checked]:translate-x-5) are never generated and
+   the controls render visually frozen. Scan the package explicitly. */
+@source "../node_modules/@invana/forms/dist";
+
+/* Register the design-kit color tokens in Tailwind's theme namespace so color
+   utilities (bg-primary, bg-input, border-border, …) actually generate.
+   @invana/styling defines these as plain --color-* CSS vars inside [data-theme]
+   selectors, which Tailwind 4 does NOT treat as theme colors — so without this
+   block none of those utilities exist. @invana/ui ships its own precompiled CSS
+   so it was unaffected, but @invana/forms relies on the host app's Tailwind and
+   rendered its controls unstyled (e.g. the Switch track never colored).
+   `inline` keeps these mapped to the runtime vars (so [data-theme] theming still
+   wins) without emitting competing :root defaults. */
+@theme inline {
+	--color-border: var(--color-border);
+	--color-input: var(--color-input);
+	--color-ring: var(--color-ring);
+	--color-background: var(--color-background);
+	--color-foreground: var(--color-foreground);
+	--color-primary: var(--color-primary);
+	--color-primary-foreground: var(--color-primary-foreground);
+	--color-secondary: var(--color-secondary);
+	--color-secondary-foreground: var(--color-secondary-foreground);
+	--color-destructive: var(--color-destructive);
+	--color-destructive-foreground: var(--color-destructive-foreground);
+	--color-muted: var(--color-muted);
+	--color-muted-foreground: var(--color-muted-foreground);
+	--color-accent: var(--color-accent);
+	--color-accent-foreground: var(--color-accent-foreground);
+	--color-popover: var(--color-popover);
+	--color-popover-foreground: var(--color-popover-foreground);
+	--color-card: var(--color-card);
+	--color-card-foreground: var(--color-card-foreground);
+}
 
 @theme {
 	/* VS Code web font scale. text-base (13px) is the default UI size.
