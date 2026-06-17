@@ -1,5 +1,14 @@
 # Infrastructure services for local development and testing.
-# Usage: docker compose -f docker-compose-infra.yml up -d
+#
+# By default only the core services start: postgres, neo4j, hyperdx.
+#   docker compose -f docker-compose-infra.yml up -d
+#
+# The extra graph databases (memgraph, janusgraph, arcadedb) are opt-in via
+# profiles. Start one, or all of them with the "extra-dbs" group profile:
+#   docker compose -f docker-compose-infra.yml --profile memgraph up -d
+#   docker compose -f docker-compose-infra.yml --profile extra-dbs up -d
+#
+# Pass the same --profile flag on down/stop to also tear those services down.
 
 services:
   postgres:
@@ -41,6 +50,7 @@ services:
   janusgraph:
     image: janusgraph/janusgraph:latest
     container_name: invana-janusgraph
+    profiles: ["janusgraph", "extra-dbs"]
     ports:
       - "8182:8182" # Gremlin WebSocket
     environment:
@@ -57,6 +67,7 @@ services:
   memgraph:
     image: memgraph/memgraph:latest
     container_name: invana-memgraph
+    profiles: ["memgraph", "extra-dbs"]
     ports:
       - "17687:7687" # Bolt protocol (prefixed to avoid conflict with Neo4j)
     environment:
@@ -73,6 +84,7 @@ services:
   arcadedb:
     image: arcadedata/arcadedb:latest
     container_name: invana-arcadedb
+    profiles: ["arcadedb", "extra-dbs"]
     ports:
       - "2480:2480" # HTTP API
       - "2424:2424" # Binary protocol
