@@ -131,6 +131,20 @@ Put them in `engine/.env`. All other auth knobs (TTLs, bcrypt rounds, min passwo
 
 Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` in `studio/.env.local` if needed.
 
+### Loading sample data
+
+To populate the local Neo4j with the bundled **air-routes** dataset, run the loader from the `engine/` directory against the `neo4j` service started by `docker-compose-infra.yml`:
+
+```bash
+uv run --directory engine invana loader ../datasets/air-routes \
+    --uri bolt://localhost:7687 \
+    --connector invana.graph.connectors.OpenCypherConnector \
+    --username neo4j \
+    --password testpassword
+```
+
+> For Gremlin-based databases (JanusGraph, Neptune, TinkerGraph), use `--connector invana.graph.connectors.GremlinConnector` with the appropriate `--uri` (e.g. `ws://localhost:8182/gremlin`) instead.
+
 ### Engine (Python)
 
 ```bash
