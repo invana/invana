@@ -26,6 +26,6 @@ def start_cmd(host: str | None, port: int | None, reload: bool) -> None:
         host=_host,
         port=_port,
         reload=reload,
-        log_level=settings.log_level,
+        log_level=settings.log_level.lower(),
         factory=True,
     )
