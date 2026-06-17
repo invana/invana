@@ -49,10 +49,10 @@ def users_cmd() -> None:
     "--non-interactive",
     is_flag=True,
     default=False,
-    help="Read all values from --username/--email/--password/--first-name flags instead of prompting.",
+    help="Read all values from --username/--password/--first-name flags instead of prompting.",
 )
 @click.option("--username", default=None, help="Username (lowercase + digits + hyphen, 2-64).")
-@click.option("--email", default=None, help="Email address.")
+@click.option("--email", default=None, help="Email address (optional).")
 @click.option("--password", default=None, help="Password.")
 @click.option("--first-name", default=None, help="First name.")
 @click.option("--last-name", default=None, help="Last name (optional).")
@@ -123,12 +123,10 @@ async def _run_create(
     try:
         async with session_factory() as session:
             if non_interactive:
-                if not (username and email and password and first_name):
-                    raise click.UsageError(
-                        "--non-interactive requires --username, --email, --password, and --first-name."
-                    )
+                if not (username and password and first_name):
+                    raise click.UsageError("--non-interactive requires --username, --password, and --first-name.")
                 _username = _validate_username_cli(username)
-                _email = email.strip().lower()
+                _email = email.strip().lower() or None if email else None
                 _password = password
                 _first_name = first_name.strip()
                 _last_name = last_name.strip() if last_name else None
@@ -137,7 +135,8 @@ async def _run_create(
                 _first_name = click.prompt("First name").strip()
                 _last_name_raw = click.prompt("Last name (optional)", default="", show_default=False)
                 _last_name = _last_name_raw.strip() or None
-                _email = click.prompt("Email").strip().lower()
+                _email_raw = click.prompt("Email (optional)", default="", show_default=False).strip()
+                _email = _email_raw.lower() or None
                 _password = click.prompt("Password", hide_input=True, confirmation_prompt="Confirm")
 
             try:
@@ -157,7 +156,7 @@ async def _run_create(
             await session.commit()
 
         kind = "superuser" if superuser else "user"
-        click.echo(f"✓ Created {kind} ({user.email}, @{user.username}).")
+        click.echo(f"✓ Created {kind} ({user.email or 'no email'}, @{user.username}).")
     finally:
         await engine.dispose()
 
@@ -195,6 +194,6 @@ async def _run_update_password(
                 raise click.ClickException(str(e)) from e
             await session.commit()
 
-        click.echo(f"✓ Password updated for {user.email} (@{user.username}). Existing sessions revoked.")
+        click.echo(f"✓ Password updated for {user.email or 'no email'} (@{user.username}). Existing sessions revoked.")
     finally:
         await engine.dispose()

@@ -38,7 +38,7 @@ and testing. By default it starts only the core trio:
 
 | Service  | What it's for                          | Port(s)         |
 |----------|----------------------------------------|-----------------|
-| postgres | App-state database                     | 35432           |
+| postgres | App-state database                     | 5432           |
 | neo4j    | Default graph database                 | 7474, 7687      |
 | hyperdx  | Observability (traces/logs/metrics) UI | 8080, 4317–4318 |
 
@@ -69,27 +69,40 @@ Pass the same `--profile` flag to `down`/`stop` to tear those services down too
 
 ### First-time bootstrap (auth)
 
-The engine and Studio both require an authenticated user to do anything beyond `/login`. On a fresh checkout — or after wiping the Postgres data volume — create the **root superuser** + their personal workspace via the CLI:
+The engine and Studio both require an authenticated user to do anything beyond `/login`. On a fresh checkout — or after wiping the Postgres data volume — create the **root superuser**. The quickest path runs migrations and bootstraps the default admin account in one step:
 
 ```bash
-# Interactive — prompts for first name, last name (optional), email, password
+make engine-init
+```
+
+This creates the standard development superuser:
+
+| Field    | Value              |
+|----------|--------------------|
+| username | `admin`            |
+| email    | `hi@invana.local`  |
+| password | `change_me_please` |
+
+**Change the password after your first sign-in** — these are well-known defaults.
+
+To pick your own values, run the CLI directly:
+
+```bash
+# Interactive — prompts for username, first/last name, email, password (all defaulted)
 uv run --directory engine invana init
 
-# Non-interactive (CI / scripted setup)
+# Non-interactive — override any field; flags default to the admin account above.
+# Email is optional: pass --email "" to create the account without one.
 uv run --directory engine invana init --non-interactive \
-  --email admin@invana.dev \
+  --username root \
+  --email you@example.com \
   --password "<at-least-12-chars>" \
-  --first-name "Root" \
-  --last-name "Admin"
+  --first-name "Root"
 ```
 
 The command is **idempotent** — if any user with `is_superuser=true` already exists, it exits without making changes. To re-bootstrap, wipe the `users` table (or the whole DB) first.
 
-What gets created:
-
-- A `users` row with `is_superuser = true` (gates `starlette-admin` at `/admin`)
-- A `workspaces` row (default slug derived from your first name)
-- A `workspace_members` row linking you as `admin` of that workspace
+> **Email is optional.** The `users.email` column is nullable, so accounts can be provisioned without one (`invana users create` and the API likewise). Login accepts **username _or_ email** (RFC-034), so an email-less account signs in by username; an account with an email can use either.
 
 From there: log into Studio (`http://localhost:8300/login`), open the user menu → **Invitations**, and issue invite URLs for additional users. Per `docs/system-design.md §4.1`, the CLI does **not** register additional users; everyone after the root is invite-gated.
 
@@ -113,7 +126,7 @@ Put them in `engine/.env`. All other auth knobs (TTLs, bcrypt rounds, min passwo
 |------------------|-------|--------------------------------------------|
 | Engine (FastAPI) | 8200  | `INVANA_PORT` / `invana start --port`      |
 | Studio (Vite)    | 8300  | `studio/vite.config.ts`                    |
-| Postgres         | 35432 | `docker-compose-infra.yml`                 |
+| Postgres         | 5432 | `docker-compose-infra.yml`                 |
 
 Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` in `studio/.env.local` if needed.
 

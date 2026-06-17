@@ -43,12 +43,22 @@ def _validate_username_cli(raw: str) -> str:
     "--non-interactive",
     is_flag=True,
     default=False,
-    help="Read all values from --username/--email/--password/--first-name flags instead of prompting.",
+    help="Use the flag values (which default to the standard admin account) instead of prompting.",
 )
-@click.option("--username", default=None, help="Root username (lowercase + digits + hyphen, 2-64).")
-@click.option("--email", default=None, help="Root email.")
-@click.option("--password", default=None, help="Root password.")
-@click.option("--first-name", default=None, help="Root first name.")
+@click.option(
+    "--username",
+    default="admin",
+    show_default=True,
+    help="Root username (lowercase + digits + hyphen, 2-64).",
+)
+@click.option(
+    "--email",
+    default="hi@invana.local",
+    show_default=True,
+    help="Root email (optional — pass an empty string to create the account without one).",
+)
+@click.option("--password", default="change_me_please", show_default=True, help="Root password.")
+@click.option("--first-name", default="Admin", show_default=True, help="Root first name.")
 @click.option("--last-name", default=None, help="Root last name.")
 def init_cmd(
     non_interactive: bool,
@@ -96,23 +106,24 @@ async def _run_init(
                 return
 
             if non_interactive:
-                if not (username and email and password and first_name):
-                    raise click.UsageError(
-                        "--non-interactive requires --username, --email, --password, and --first-name."
-                    )
+                # All flags carry defaults (the standard admin account), so a
+                # bare `invana init --non-interactive` provisions it. Email is
+                # optional — an empty string stores NULL.
                 _username = _validate_username_cli(username)
-                _email = email.strip()
+                _email = (email.strip().lower() or None) if email else None
                 _password = password
                 _first_name = first_name.strip()
                 _last_name = last_name.strip() if last_name else None
             else:
-                _username = _validate_username_cli(click.prompt("Username"))
-                _first_name = click.prompt("First name").strip()
+                _username = _validate_username_cli(click.prompt("Username", default="admin"))
+                _first_name = click.prompt("First name", default="Admin").strip()
                 _last_name_raw = click.prompt("Last name (optional)", default="", show_default=False)
                 _last_name = _last_name_raw.strip() or None
-                _email = click.prompt("Email").strip().lower()
+                _email_raw = click.prompt("Email (optional)", default="hi@invana.local").strip()
+                _email = _email_raw.lower() or None
                 _password = click.prompt(
                     "Password",
+                    default="change_me_please",
                     hide_input=True,
                     confirmation_prompt="Confirm",
                 )
@@ -132,8 +143,9 @@ async def _run_init(
                 raise click.ClickException(str(e.detail)) from e
             await session.commit()
 
-        click.echo(f"✓ Created root superuser ({user.email}, @{user.username}).")
+        click.echo(f"✓ Created root superuser ({user.email or 'no email'}, @{user.username}).")
         click.echo(f"  Log in at: {settings.studio_base_url}/login")
+        click.echo("  Change the default password after first sign-in.")
         click.echo("  You can create your first Graph after signing in.")
     finally:
         await engine.dispose()

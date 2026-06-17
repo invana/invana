@@ -218,16 +218,17 @@ async def register(session: AsyncSession, *, payload: RegisterRequest, actor_id:
 
 
 async def login(session: AsyncSession, *, payload: LoginRequest) -> AuthResponse:
-    user = await _find_user_by_email(session, payload.email)
+    # Resolve by username OR email (RFC-034); email-less accounts sign in by username.
+    user = await find_user_by_email_or_username(session, identifier=payload.identifier)
     if user is None or not user.is_active:
-        # Constant-time guard against email enumeration — verify against a
+        # Constant-time guard against account enumeration — verify against a
         # dummy hash so timing doesn't reveal the lookup result.
         verify_password(payload.password, "$2b$12$" + "x" * 53)
         await emit_event(
             session,
             action=event_actions.AUTH_LOGIN_FAILED,
             actor_type=ActorType.anonymous,
-            details={"email": payload.email, "reason": "unknown_or_inactive"},
+            details={"identifier": payload.identifier, "reason": "unknown_or_inactive"},
             trace_id=current_trace_id(),
         )
         await session.commit()  # failed-login event isn't tied to a returning state change
@@ -239,7 +240,7 @@ async def login(session: AsyncSession, *, payload: LoginRequest) -> AuthResponse
             target_kind=event_actions.TARGET_USER,
             target_id=user.id,
             actor_type=ActorType.anonymous,
-            details={"email": payload.email, "reason": "bad_password"},
+            details={"identifier": payload.identifier, "reason": "bad_password"},
             trace_id=current_trace_id(),
         )
         await session.commit()
@@ -251,7 +252,7 @@ async def login(session: AsyncSession, *, payload: LoginRequest) -> AuthResponse
         target_kind=event_actions.TARGET_USER,
         target_id=user.id,
         actor_id=user.id,
-        details={"email": user.email},
+        details={"username": user.username},
         trace_id=current_trace_id(),
     )
     return response
@@ -430,7 +431,7 @@ async def find_user_by_email_or_username(session: AsyncSession, *, identifier: s
 async def bootstrap_root(
     session: AsyncSession,
     *,
-    email: str,
+    email: str | None,
     password: str,
     username: str,
     first_name: str,
@@ -448,7 +449,7 @@ async def bootstrap_root(
 
     password_hash = hash_password(password)
     user = User(
-        email=email.lower(),
+        email=email.lower() if email else None,
         username=normalized_username,
         password_hash=password_hash,
         first_name=first_name.strip(),
@@ -474,7 +475,7 @@ async def any_superuser_exists(session: AsyncSession) -> bool:
 async def provision_user(
     session: AsyncSession,
     *,
-    email: str,
+    email: str | None,
     password: str,
     username: str,
     first_name: str,
@@ -492,12 +493,12 @@ async def provision_user(
         raise HTTPException(status.HTTP_409_CONFLICT, detail="username is reserved.")
     if await _username_taken(session, username=normalized_username):
         raise HTTPException(status.HTTP_409_CONFLICT, detail="username is taken.")
-    if await _find_user_by_email(session, email) is not None:
+    if email and await _find_user_by_email(session, email) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
 
     password_hash = hash_password(password)
     user = User(
-        email=email.lower(),
+        email=email.lower() if email else None,
         username=normalized_username,
         password_hash=password_hash,
         first_name=first_name.strip(),

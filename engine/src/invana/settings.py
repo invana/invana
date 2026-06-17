@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     log_level: str = "DEBUG"
 
     # App-state database (PostgreSQL / SQLite)
-    database_url: str = "postgresql+asyncpg://invana:invana@localhost:35432/invana"
+    database_url: str = "postgresql+asyncpg://invana_user:change_this_password@localhost:5432/invana_db"
     database_pool_size: int = 10
     database_max_overflow: int = 20
     database_echo: bool = False

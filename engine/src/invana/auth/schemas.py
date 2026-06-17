@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import AliasChoices, BaseModel, EmailStr, Field
 
 from invana.settings import settings
 
@@ -53,7 +53,8 @@ class UserOut(BaseModel):
     """Returned by /auth/login, /auth/register, /auth/refresh, /auth/me."""
 
     id: str
-    email: EmailStr
+    # Optional — accounts can be provisioned without an email (see User model).
+    email: EmailStr | None
     username: str
     first_name: str
     last_name: str | None
@@ -85,7 +86,13 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    # Username or email. `email` is accepted as a back-compat alias for clients
+    # that still post {"email": ...} (RFC-034).
+    identifier: str = Field(
+        min_length=1,
+        max_length=320,
+        validation_alias=AliasChoices("identifier", "email"),
+    )
     password: str
 
 

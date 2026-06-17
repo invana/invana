@@ -5,9 +5,9 @@ in :mod:`invana.graphs.models` alongside the Graph container and
 GraphConnection per RFC-017.
 
 - ``users``           — authenticated principal. Carries ``username`` (URL
-                        identity, globally unique) plus ``email`` (login
-                        identity). ``is_superuser`` is the platform-level
-                        flag (gates starlette-admin and DB-level ops).
+                        identity, globally unique) plus an optional ``email``
+                        (login identity when present). ``is_superuser`` is the
+                        platform-level flag (gates starlette-admin and DB-level ops).
 - ``refresh_tokens``  — opaque, hashed refresh-token store.
 """
 
@@ -34,7 +34,10 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
-    email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False, index=True)
+    # Optional login identity. NULL-able so accounts can be provisioned without an
+    # email (Postgres treats NULLs as distinct under the UNIQUE index). Login is
+    # email-based, so an account without an email cannot sign in via Studio.
+    email: Mapped[str | None] = mapped_column(String(320), unique=True, nullable=True, index=True)
     # URL identity. Lowercase + digits + hyphen, 2-64, no leading/trailing/consecutive hyphens.
     # All graph-scoped URLs live under /u/{username}/{graphSlug}, so usernames cannot collide
     # with Studio top-level routes (RFC-017). Globally unique, case-insensitive (stored lowercase).

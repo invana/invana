@@ -16,10 +16,11 @@ export const authApi = {
 			)
 		).data,
 
-	login: async (email: string, password: string) =>
+	// `identifier` is a username or an email (RFC-034).
+	login: async (identifier: string, password: string) =>
 		(
 			await apiClient.post<AuthResponse>("/api/v1/auth/login", {
-				email,
+				identifier,
 				password,
 			})
 		).data,

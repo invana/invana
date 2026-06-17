@@ -24,14 +24,16 @@ make setup
 # 2. Start the local infrastructure (postgres + neo4j + hyperdx)
 docker compose -f docker-compose-infra.yml up -d
 
-# 3. Bootstrap the root superuser + workspace
-uv run --directory engine invana init
+# 3. Run migrations + bootstrap the default root superuser
+#    (admin / hi@invana.local / change_me_please — change the password after first login)
+make engine-init
 
 # 4. Start the engine + studio dev servers
 make dev
 ```
 
 Studio runs at `http://localhost:8300`, the engine at `http://localhost:8200`.
+Log in with `hi@invana.local` / `change_me_please`.
 Run `make help` to see all available commands.
 
 The default infra brings up only the core services (postgres, neo4j, hyperdx);

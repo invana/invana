@@ -65,7 +65,8 @@ export function LoginPage() {
 	const navigate = useNavigate();
 	const [params] = useSearchParams();
 	const { setSession } = useAuth();
-	const [email, setEmail] = useState("");
+	// Username or email (RFC-034) — login accepts either.
+	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
 	// NOTE: cosmetic until the engine supports it. authApi.login / POST
 	// /api/v1/auth/login take no remember flag, so refresh-token lifetime is
@@ -85,7 +86,7 @@ export function LoginPage() {
 		setSubmitting(true);
 		setError(null);
 		try {
-			const res = await authApi.login(email, password);
+			const res = await authApi.login(identifier, password);
 			setSession({
 				user: res.user,
 				accessToken: res.access_token,
@@ -187,18 +188,18 @@ export function LoginPage() {
 
 						<form className="mt-7 space-y-5" onSubmit={handleSubmit}>
 							<div className="space-y-2">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="identifier">Email or username</Label>
 								<Input
-									id="email"
-									type="email"
-									autoComplete="email"
+									id="identifier"
+									type="text"
+									autoComplete="username"
 									required
-									placeholder="you@example.com"
+									placeholder="you@example.com or your-username"
 									// Override the design-kit Input's baked-in `md:text-sm`,
 									// which shrinks field text on md+ screens.
 									className="md:text-base"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
+									value={identifier}
+									onChange={(e) => setIdentifier(e.target.value)}
 								/>
 							</div>
 							<div className="space-y-2">

@@ -12,24 +12,26 @@
 
 services:
   postgres:
-    image: postgres:17
+    image: postgres:18
     container_name: invana-postgres
     ports:
-      - "35432:5432"
+      - "5432:5432"
     environment:
-      POSTGRES_USER: invana
-      POSTGRES_PASSWORD: invana
-      POSTGRES_DB: invana
+      POSTGRES_USER: invana_user
+      POSTGRES_PASSWORD: change_this_password
+      POSTGRES_DB: invana_db
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      # PG18+ stores the cluster in a version-specific subdir; mount the parent
+      # (not /var/lib/postgresql/data) so pg_upgrade works across major versions.
+      - postgres-data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U invana"]
+      test: ["CMD-SHELL", "pg_isready -U invana_user -d invana_db || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
-  neo4j:
+  neo4j_5:
     image: neo4j:5-community
     container_name: invana-neo4j
     ports:
