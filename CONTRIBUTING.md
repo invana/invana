@@ -91,13 +91,14 @@ To pick your own values, run the CLI directly:
 # Interactive — prompts for username, first/last name, email, password (all defaulted)
 uv run --directory engine invana init
 
-# Non-interactive — override any field; flags default to the admin account above.
-# Email is optional: pass --email "" to create the account without one.
+# Non-interactive — every flag defaults to the admin account above, so this is
+# equivalent to `make engine-init`. Override any flag to change a field; email
+# is optional (pass --email "" to create the account without one).
 uv run --directory engine invana init --non-interactive \
-  --username root \
-  --email you@example.com \
-  --password "<at-least-12-chars>" \
-  --first-name "Root"
+  --username admin \
+  --email hi@invana.local \
+  --password "change_me_please" \
+  --first-name "Admin"
 ```
 
 The command is **idempotent** — if any user with `is_superuser=true` already exists, it exits without making changes. To re-bootstrap, wipe the `users` table (or the whole DB) first.
