@@ -160,30 +160,37 @@ export function SessionsPanel({
 		/>
 	);
 
-	// Restore the open session's mode + model from its last reply: the assistant
-	// `via` reads "<provider> · <model>" for NL (RFC-030) and "Cypher"/"Gremlin"
-	// for QL. Null until messages load / on the list — then the composer keeps
-	// the user's current selection.
+	// Restore the open session's mode + model from its last assistant reply. The
+	// engine persists `mode` ("nl" | "ql") per message, so we read it directly —
+	// robust even when that reply errored or was a rerun. Older rows predate the
+	// field, so we fall back to inferring from `via` ("<provider> · <model>" for
+	// NL per RFC-030, "Cypher"/"Gremlin" for QL). Null until messages load / on
+	// the list — then the composer keeps the user's current selection.
 	const composerConfig = useMemo(() => {
 		if (!activeSession) return null;
 		const last = [...activeSession.messages]
 			.reverse()
-			.find((m) => m.role === "assistant" && m.via);
-		if (!last?.via) return null;
-		if (last.via.includes(" · ")) {
-			const provider = llmProviders.find(
-				(p) => `${p.provider} · ${p.model_id}` === last.via,
-			);
+			.find((m) => m.role === "assistant" && (m.mode || m.via));
+		if (!last) return null;
+		// Provider resolves off `via` ("<provider> · <model>") when present.
+		const provider = last.via?.includes(" · ")
+			? llmProviders.find((p) => `${p.provider} · ${p.model_id}` === last.via)
+			: undefined;
+		const mode: QueryMode =
+			last.mode ?? (last.via?.includes(" · ") ? "nl" : "ql");
+		if (mode === "nl") {
 			return {
-				mode: "nl" as QueryMode,
+				mode,
 				language: last.language,
 				llmProviderId: provider?.id,
 				timeoutS: last.timeoutS,
 			};
 		}
 		return {
-			mode: "ql" as QueryMode,
-			language: last.language ?? (last.via.toLowerCase() as QueryLanguage),
+			mode,
+			language:
+				last.language ??
+				(last.via ? (last.via.toLowerCase() as QueryLanguage) : undefined),
 			timeoutS: last.timeoutS,
 		};
 	}, [activeSession, llmProviders]);

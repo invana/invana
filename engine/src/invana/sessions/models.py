@@ -126,6 +126,11 @@ class SessionMessage(Base):
 
     # Assistant-only metadata (null on user rows).
     status: Mapped[SessionMessageStatus | None] = mapped_column(_status_enum, nullable=True)
+    # How this ask was started: "nl" (translated from natural language) or "ql"
+    # (run as a raw query). Persisted so the composer restores the original mode
+    # on reopen instead of guessing from ``via`` — which fails when the latest
+    # reply errored or was a rerun (no provider label). Null on existing rows.
+    mode: Mapped[str | None] = mapped_column(String(2), nullable=True)
     via: Mapped[str | None] = mapped_column(String(255), nullable=True)
     query_language: Mapped[str | None] = mapped_column(String(32), nullable=True)
     # The query that produced this reply, so it can be re-run (Decision 10).

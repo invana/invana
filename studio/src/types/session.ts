@@ -9,6 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { QueryLanguage } from "./graphs";
+import type { QueryMode } from "./query";
 
 export type SessionMessageRole = "user" | "assistant";
 
@@ -24,6 +25,10 @@ export interface SessionMessage {
 	content: string;
 	createdAt: Date;
 	status?: SessionMessageStatus;
+	/** How the ask was started — "nl" (translated from natural language) or "ql"
+	 *  (raw query). Persisted by the engine so the composer restores the original
+	 *  mode on reopen. Undefined on rows written before this field existed. */
+	mode?: QueryMode;
 	/** How the reply was produced — e.g. "Cypher" or the model id. */
 	via?: string;
 	/** Result metadata, present on assistant replies to a query. */

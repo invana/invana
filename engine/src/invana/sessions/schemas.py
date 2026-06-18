@@ -62,6 +62,9 @@ class SessionMessageRead(BaseModel):
     role: SessionMessageRole
     content: str
     status: SessionMessageStatus | None = None
+    # "nl" | "ql" — how the ask was started, so the composer restores the mode on
+    # reopen. Null on rows written before this field existed.
+    mode: str | None = None
     via: str | None = None
     query_language: str | None = None
     source_query: str | None = None

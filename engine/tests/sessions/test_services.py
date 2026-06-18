@@ -20,7 +20,7 @@ from invana.sessions.models import (
     SessionMessageRole,
     SessionMessageStatus,
 )
-from invana.sessions.schemas import SendMessage
+from invana.sessions.schemas import SendMessage, SessionMessageRead
 from invana.sessions.store import SessionStore
 
 pytestmark = pytest.mark.asyncio
@@ -31,7 +31,7 @@ async def _message_count(session, session_id: str) -> int:
     return int((await session.execute(stmt)).scalar_one())
 
 
-async def _append_turn(session, sess, content: str) -> None:
+async def _append_turn(session, sess, content: str, *, mode: str | None = None) -> None:
     """Append a user+assistant message pair via the store (no execution)."""
     store = SessionStore()
     seq = await store.next_seq(session, session_id=sess.id)
@@ -47,6 +47,7 @@ async def _append_turn(session, sess, content: str) -> None:
             role=SessionMessageRole.assistant,
             content="ok",
             status=SessionMessageStatus.ok,
+            mode=mode,
         ),
     )
     sess.message_count += 2
@@ -118,6 +119,18 @@ class TestSessionPersistence:
         )
         assert total == 3
         assert gone.id in {s.id for s in items}
+
+    async def test_mode_persists_and_round_trips_to_read_dto(self, session, graph, user):
+        """The originating mode ("nl"/"ql") is stored on the assistant message and
+        surfaces in the read DTO, so the composer restores it on reopen."""
+        sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)
+        await _append_turn(session, sess, "show me people", mode="nl")
+        await session.commit()
+
+        messages = await services.list_messages(session, sess=sess)
+        reads = [SessionMessageRead.model_validate(m) for m in messages]
+        assistant = next(r for r in reads if r.role == SessionMessageRole.assistant)
+        assert assistant.mode == "nl"
 
     async def test_delete_cascades_messages(self, session, graph, user):
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)

@@ -265,6 +265,9 @@ async def send_message(
         role=SessionMessageRole.assistant,
         content="Running query…",
         status=SessionMessageStatus.running,
+        # Set at creation so it survives every exit path (translation error,
+        # execution error, ok) — the composer reads it to restore the mode.
+        mode=payload.mode,
     )
     await store.add(session, user_msg)
     await store.add(session, assistant_msg)

@@ -20,6 +20,7 @@ interface ApiMessage {
 	role: "user" | "assistant";
 	content: string;
 	status?: "running" | "ok" | "error" | null;
+	mode?: "nl" | "ql" | null;
 	via?: string | null;
 	query_language?: string | null;
 	source_query?: string | null;
@@ -116,6 +117,7 @@ function toMessage(m: ApiMessage): SessionMessage {
 		content: m.content,
 		createdAt: new Date(m.created_at),
 		status: m.status ?? undefined,
+		mode: m.mode ?? undefined,
 		via: m.via ?? undefined,
 		rowCount: m.row_count ?? undefined,
 		executionTimeMs: m.execution_time_ms ?? undefined,
