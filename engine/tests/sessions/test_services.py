@@ -169,3 +169,20 @@ class TestSessionPersistence:
         seqs = sorted(m.seq for m in await services.list_messages(session, sess=sess))
         assert seqs == [1, 2, 3, 4]
         assert sess.message_count == 4
+
+
+class TestFriendlyQueryError:
+    """NL-mode failures show backend-owned guidance keyed off the connector's
+    category; QL keeps the raw driver error (asserted in the connector tests)."""
+
+    async def test_known_categories_map_to_distinct_copy(self):
+        from invana.graph.connectors.base.exceptions import QueryErrorCategory
+
+        syntax = services._friendly_query_error(QueryErrorCategory.SYNTAX)
+        timeout = services._friendly_query_error(QueryErrorCategory.TIMEOUT)
+        assert "rephrasing" in syntax
+        assert "too long" in timeout
+        assert syntax != timeout
+
+    async def test_unknown_category_falls_back_to_default(self):
+        assert services._friendly_query_error("unknown") == services._FRIENDLY_QUERY_ERROR_DEFAULT

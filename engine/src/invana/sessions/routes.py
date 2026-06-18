@@ -200,10 +200,17 @@ async def rerun_message(
         )
     except QueryExecutionError as exc:
         await session.commit()  # persist the failure audit event
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail={"error": "query_execution_failed", "message": str(exc)},
-        ) from exc
+        # NL re-runs hide the raw driver error behind backend-owned guidance, same
+        # as the original ask; QL (and legacy null-mode) re-runs keep the real
+        # error so the author can fix their own query. Raw error stays in OTel.
+        if message.mode == "nl":
+            detail = {
+                "error": "query_translation_failed",
+                "message": services._friendly_query_error(exc.category),
+            }
+        else:
+            detail = {"error": "query_execution_failed", "message": str(exc)}
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=detail) from exc
     await session.commit()
     await session.refresh(message)
     return RerunResponse(message=SessionMessageRead.model_validate(message), result=result)

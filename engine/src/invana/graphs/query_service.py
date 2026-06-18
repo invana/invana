@@ -27,6 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.events import actions as event_actions
 from invana.events.services import current_trace_id, emit_event
+from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
@@ -36,7 +37,16 @@ from invana.graphs.services import get_graph_connection
 
 
 class QueryExecutionError(Exception):
-    """The connector rejected/failed the query itself (not a config problem)."""
+    """The connector rejected/failed the query itself (not a config problem).
+
+    ``category`` carries the connector's ``QueryErrorCategory`` classification
+    (syntax / timeout / unknown) so callers can pick user-facing copy without
+    re-parsing the raw message.
+    """
+
+    def __init__(self, message: str, *, category: str = QueryErrorCategory.UNKNOWN) -> None:
+        super().__init__(message)
+        self.category = category
 
 
 async def execute_query(
@@ -73,16 +83,26 @@ async def execute_query(
     try:
         graph_response = await connector.execute(query, parameters=parameters, timeout_s=timeout_s)
     except Exception as exc:
+        # Carry the connector's classification through (it's lost once we re-wrap
+        # into the service-level error). The raw message + vendor code land in the
+        # audit event for review; the user gets backend-owned copy upstream.
+        category = getattr(exc, "category", QueryErrorCategory.UNKNOWN)
         await emit_event(
             session,
             action=event_actions.QUERY_EXECUTE,
             target_kind=event_actions.TARGET_QUERY,
             graph_id=graph.id,
             actor_id=actor_id,
-            details={**base_details, "ok": False, "error": str(exc)},
+            details={
+                **base_details,
+                "ok": False,
+                "error": str(exc),
+                "error_code": getattr(exc, "code", None),
+                "error_category": category,
+            },
             trace_id=current_trace_id(),
         )
-        raise QueryExecutionError(str(exc)) from exc
+        raise QueryExecutionError(str(exc), category=category) from exc
 
     response = _build_query_response(graph_response, query_language)
     await emit_event(

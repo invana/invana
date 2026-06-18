@@ -8,7 +8,11 @@ import neo4j
 from neo4j import AsyncGraphDatabase
 
 from invana.graph.connectors.base.connector import BaseConnector
-from invana.graph.connectors.base.exceptions import ConnectionError, QueryExecutionError
+from invana.graph.connectors.base.exceptions import (
+    ConnectionError,
+    QueryErrorCategory,
+    QueryExecutionError,
+)
 from invana.graph.connectors.base.serializers import BaseSerializer
 from invana.graph.connectors.cypher.querysets.algorithms import OpenCypherAlgorithmsQuerySet
 from invana.graph.connectors.cypher.querysets.bulk import OpenCypherBulkQuerySet
@@ -25,6 +29,24 @@ from invana.graph.types.capabilities import (
     overlay,
 )
 from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
+
+
+def _classify_neo4j_error(code: str | None) -> str:
+    """Bucket a Neo4j ``Neo.*`` status code into a ``QueryErrorCategory``.
+
+    Codes look like ``Neo.ClientError.Statement.SyntaxError`` /
+    ``Neo.ClientError.Transaction.TransactionTimedOut``. We match on the tail
+    rather than the full string so server-version wording changes don't break
+    classification. A mistranslated NL query almost always lands as a
+    ``SyntaxError``; everything we can't place stays ``unknown``.
+    """
+    code = code or ""
+    if code.endswith("SyntaxError"):
+        return QueryErrorCategory.SYNTAX
+    if "TimedOut" in code or "Timeout" in code:
+        return QueryErrorCategory.TIMEOUT
+    return QueryErrorCategory.UNKNOWN
+
 
 # openCypher baseline capability profile (RFC-022). Covers Neo4j + Memgraph, which
 # both speak Bolt/openCypher. Vendor connectors (e.g. invana-neo4j) narrow the
@@ -145,7 +167,11 @@ class OpenCypherConnector(BaseConnector):
                 result = await session.run(query, parameters or {}, timeout=timeout_s)
                 return [record async for record in result]
         except neo4j.exceptions.Neo4jError as exc:
-            raise QueryExecutionError(f"Neo4j query failed: {exc}") from exc
+            raise QueryExecutionError(
+                f"Neo4j query failed: {exc}",
+                code=exc.code,
+                category=_classify_neo4j_error(exc.code),
+            ) from exc
         except Exception as exc:
             raise QueryExecutionError(f"Query execution failed: {exc}") from exc
 

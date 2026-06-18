@@ -4,6 +4,7 @@ from invana.graph.connectors.base.exceptions import (
     ConnectionError,
     ConnectorError,
     NotSupportedError,
+    QueryErrorCategory,
     QueryExecutionError,
     SerializationError,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "ConnectionError",
     "ConnectorError",
     "NotSupportedError",
+    "QueryErrorCategory",
     "QueryExecutionError",
     "QueryLanguage",
     "SerializationError",

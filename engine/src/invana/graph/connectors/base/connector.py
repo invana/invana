@@ -29,10 +29,14 @@ from invana.graph.types.data_elements import GraphResponse
 # fall back to no-op ``nullcontext`` spans when it isn't installed.
 try:
     from opentelemetry import trace as _otel_trace
+    from opentelemetry.trace import Status as _OtelStatus
+    from opentelemetry.trace import StatusCode as _OtelStatusCode
 
     _tracer = _otel_trace.get_tracer("invana.graph")
 except ImportError:  # telemetry extra not installed
     _tracer = None
+    _OtelStatus = None
+    _OtelStatusCode = None
 
 
 def _query_span(name: str):
@@ -40,6 +44,28 @@ def _query_span(name: str):
     if _tracer is None:
         return nullcontext(None)
     return _tracer.start_as_current_span(name)
+
+
+def _record_span_exception(span: Any, exc: Exception) -> None:
+    """Mark *span* failed and attach the raw error so it's reviewable in traces.
+
+    The user only ever sees the friendly, backend-owned copy (RFC-028); the real
+    driver message, vendor code, and category land here so a failed translation
+    can be traced end-to-end in OTel. No-op when telemetry is absent.
+    """
+    if span is None:
+        return
+    span.record_exception(exc)
+    if _OtelStatus is not None:
+        span.set_status(_OtelStatus(_OtelStatusCode.ERROR, str(exc)))
+    span.set_attribute("invana.error.type", type(exc).__name__)
+    span.set_attribute("invana.error.message", str(exc))
+    code = getattr(exc, "code", None)
+    if code:
+        span.set_attribute("invana.error.code", code)
+    category = getattr(exc, "category", None)
+    if category:
+        span.set_attribute("invana.error.category", category)
 
 
 class BaseConnector(ABC):
@@ -124,8 +150,14 @@ class BaseConnector(ABC):
         # studio shows "0ms" (RFC-025). Measure the raw execute only — serialise
         # is our own work and traced separately by the spans below.
         start = time.perf_counter()
-        with _query_span("graph.query.db_execute"):
-            raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
+        with _query_span("graph.query.db_execute") as span:
+            try:
+                raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
+            except Exception as exc:
+                # The span otherwise closes "ok" even though the driver round-trip
+                # failed — record the real error here so it's visible in OTel.
+                _record_span_exception(span, exc)
+                raise
         duration_ms = (time.perf_counter() - start) * 1000
         with _query_span("graph.query.serialize") as span:
             response = self._serializer.deserialize_graph_response(raw)

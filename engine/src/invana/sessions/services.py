@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.events import actions
 from invana.events.services import current_trace_id, emit_event
+from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.graphs.manager import GraphConnectionManager
 from invana.graphs.models import Graph
 from invana.graphs.query_service import QueryExecutionError, execute_query, resolve_query_language
@@ -34,6 +35,23 @@ from invana.sessions.schemas import SendMessage
 from invana.sessions.store import SessionStore
 
 _LANGUAGE_LABEL = {"cypher": "Cypher", "gremlin": "Gremlin"}
+
+# Backend-owned copy for NL-mode failures (RFC-028). The user typed a question,
+# not a query, so the raw driver error (a Cypher/Gremlin parser message) is
+# meaningless to them — show guidance keyed off the failure category instead.
+# The real error is still captured in the audit event + OTel span for review.
+_FRIENDLY_QUERY_ERROR = {
+    QueryErrorCategory.SYNTAX: (
+        "I couldn't turn that into a query I can run. Try rephrasing, adding more detail, or narrowing your question."
+    ),
+    QueryErrorCategory.TIMEOUT: "That took too long to answer. Try narrowing it down or being more specific.",
+}
+_FRIENDLY_QUERY_ERROR_DEFAULT = "I couldn't get an answer for that. Try rephrasing or narrowing your question."
+
+
+def _friendly_query_error(category: str) -> str:
+    """User-facing copy for an NL ask whose generated query failed to execute."""
+    return _FRIENDLY_QUERY_ERROR.get(category, _FRIENDLY_QUERY_ERROR_DEFAULT)
 
 
 def _title_from_text(text: str) -> str:
@@ -337,7 +355,10 @@ async def send_message(
         )
     except QueryExecutionError as exc:
         assistant_msg.status = SessionMessageStatus.error
-        assistant_msg.content = str(exc)
+        # QL: the user wrote the query, so surface the real error to fix it.
+        # NL: they wrote a question, not Cypher — show backend-owned guidance and
+        # keep the raw error in the audit event / OTel span for review.
+        assistant_msg.content = str(exc) if is_ql else _friendly_query_error(exc.category)
     else:
         nodes = len(result.data.nodes) if result.data else 0
         edges = len(result.data.edges) if result.data else 0

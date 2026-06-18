@@ -23,6 +23,7 @@ from invana.graph.connectors.base.exceptions import (
     ConnectionError,
     ConnectorError,
     NotSupportedError,
+    QueryErrorCategory,
     QueryExecutionError,
     SerializationError,
 )
@@ -51,6 +52,7 @@ __all__ = [
     "Path",
     "PropertyDefinition",
     "PropertyInfo",
+    "QueryErrorCategory",
     "QueryExecutionError",
     "QueryLanguage",
     "QueryResult",

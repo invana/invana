@@ -18,7 +18,11 @@ from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 
 from invana.graph.connectors.base.connector import BaseConnector
-from invana.graph.connectors.base.exceptions import ConnectionError, QueryExecutionError
+from invana.graph.connectors.base.exceptions import (
+    ConnectionError,
+    QueryErrorCategory,
+    QueryExecutionError,
+)
 from invana.graph.connectors.base.serializers import BaseSerializer
 from invana.graph.connectors.gremlin.querysets.algorithms import GremlinAlgorithmsQuerySet
 from invana.graph.connectors.gremlin.querysets.bulk import GremlinBulkQuerySet
@@ -209,7 +213,10 @@ class GremlinConnector(BaseConnector):
                 return await asyncio.wait_for(coro, timeout=timeout_s)
             return await coro
         except TimeoutError as e:
-            raise QueryExecutionError(f"Traversal timed out after {timeout_s}s") from e
+            raise QueryExecutionError(
+                f"Traversal timed out after {timeout_s}s",
+                category=QueryErrorCategory.TIMEOUT,
+            ) from e
         except Exception as e:
             raise QueryExecutionError(f"Traversal execution failed: {e}") from e
 
