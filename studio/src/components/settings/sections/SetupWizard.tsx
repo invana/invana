@@ -8,7 +8,6 @@ import {
 	SkipForward,
 	Sparkles,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useSetupSectionMutation } from "../../../hooks/queries/useGraphs";
 import type {
@@ -16,6 +15,7 @@ import type {
 	SetupSection,
 	SetupSectionState,
 } from "../../../types/graphs";
+import { type SettingsSection, useSettingsPanel } from "../useSettingsPanel";
 
 const REQUIRED: SetupSection[] = ["graph_info", "intent"];
 const SKIPPABLE: SetupSection[] = ["skills", "datasets"];
@@ -25,7 +25,14 @@ interface SectionMeta {
 	label: string;
 	description: string;
 	icon: typeof Database;
-	settingsPath: (username: string, graphSlug: string) => string;
+	/**
+	 * The docked SettingsPanel section this row opens. We switch the panel in
+	 * place via `useSettingsPanel().setSection` rather than `<Link>`-ing to a
+	 * URL: the wizard lives inside the panel, and the graph root redirects
+	 * (`/u/:u/:s` → `/explorer`) drop any `?settings=` query string, which would
+	 * bounce the user to the page's empty-state instead of the form.
+	 */
+	settingsSection: SettingsSection;
 }
 
 const SECTIONS: SectionMeta[] = [
@@ -34,28 +41,28 @@ const SECTIONS: SectionMeta[] = [
 		label: "Graph Info",
 		description: "Attach a graph database connection.",
 		icon: Database,
-		settingsPath: (u, s) => `/u/${u}/${s}?settings=connection`,
+		settingsSection: "connection",
 	},
 	{
 		key: "intent",
 		label: "Intent",
 		description: "Describe what this graph is for.",
 		icon: Lightbulb,
-		settingsPath: (u, s) => `/u/${u}/${s}?settings=intent`,
+		settingsSection: "intent",
 	},
 	{
 		key: "skills",
 		label: "Skills",
 		description: "Define what the graph's agents can do. (Optional — S5)",
 		icon: Sparkles,
-		settingsPath: (u, s) => `/u/${u}/${s}?settings=skills`,
+		settingsSection: "skills",
 	},
 	{
 		key: "datasets",
 		label: "Datasets",
 		description: "Import data into the knowledge graph. (Optional — S6)",
 		icon: Layers,
-		settingsPath: (u, s) => `/u/${u}/${s}?settings=datasets`,
+		settingsSection: "datasets",
 	},
 ];
 
@@ -83,6 +90,7 @@ interface Props {
  */
 export function SetupWizard({ graph }: Props) {
 	const setupMutation = useSetupSectionMutation();
+	const { setSection } = useSettingsPanel();
 
 	const setupComplete = REQUIRED.every(
 		(k) => graph.setup_state?.[k]?.completed_at,
@@ -139,7 +147,7 @@ export function SetupWizard({ graph }: Props) {
 						key={section.key}
 						meta={section}
 						state={graph.setup_state?.[section.key]}
-						graph={graph}
+						onOpen={() => setSection(section.settingsSection)}
 						onSkip={() => handleSectionAction(section.key, "skip")}
 						onReset={() => handleSectionAction(section.key, "reset")}
 					/>
@@ -152,20 +160,19 @@ export function SetupWizard({ graph }: Props) {
 function WizardRow({
 	meta,
 	state,
-	graph,
+	onOpen,
 	onSkip,
 	onReset,
 }: {
 	meta: SectionMeta;
 	state: SetupSectionState | undefined;
-	graph: Graph;
+	onOpen: () => void;
 	onSkip: () => void;
 	onReset: () => void;
 }) {
 	const status = sectionStatus(state);
 	const Icon = meta.icon;
 	const isSkippable = SKIPPABLE.includes(meta.key);
-	const path = meta.settingsPath(graph.owner_username, graph.slug);
 
 	const statusIcon =
 		status === "done" ? (
@@ -211,13 +218,14 @@ function WizardRow({
 						Reset
 					</button>
 				)}
-				<Link
-					to={path}
+				<button
+					type="button"
+					onClick={onOpen}
 					className="flex items-center gap-1 text-primary hover:underline font-medium"
 				>
 					{status === "todo" ? "Set up" : "Edit"}
 					<ArrowRight className="w-3.5 h-3.5" />
-				</Link>
+				</button>
 			</div>
 		</div>
 	);
