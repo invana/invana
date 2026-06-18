@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "@invana/forms";
 import { Button } from "@invana/ui";
-import { ArrowUp, Paperclip, Square, X } from "lucide-react";
+import { ArrowUp, Paperclip, Square, Timer, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
@@ -47,6 +47,16 @@ const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
 	cypher: "Cypher",
 	gremlin: "Gremlin",
 };
+
+// NL-only LLM translation timeout presets (seconds). Default matches the
+// engine's translate fallback; longer options give slow local models room.
+const TIMEOUT_OPTIONS = [
+	{ value: 30, label: "30s" },
+	{ value: 60, label: "1m" },
+	{ value: 120, label: "2m" },
+	{ value: 300, label: "5m" },
+] as const;
+const DEFAULT_TIMEOUT_S = 120;
 
 // Cypher ships in CM 6 legacy-modes; Gremlin's host language is Groovy, which
 // gives the closest highlighting (strings, comments, keywords, numbers).
@@ -108,6 +118,7 @@ export function SessionComposer({
 	const [llmProviderId, setLlmProviderId] = useState<string>("");
 	const [nlQuery, setNlQuery] = useState("");
 	const [attachments, setAttachments] = useState<File[]>([]);
+	const [timeoutS, setTimeoutS] = useState<number>(DEFAULT_TIMEOUT_S);
 
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
@@ -313,7 +324,7 @@ export function SessionComposer({
 		}
 		const query = nlQuery.trim();
 		if (!query || !llmProviderId) return;
-		onRun({ mode: "nl", query, llmProviderId, attachments });
+		onRun({ mode: "nl", query, llmProviderId, attachments, timeoutS });
 		setNlQuery("");
 		setAttachments([]);
 		historyIndexRef.current = -1;
@@ -482,6 +493,28 @@ export function SessionComposer({
 							</Select>
 						)}
 					</div>
+
+					{mode === "nl" && !noLlmProviders && (
+						<Select
+							value={String(timeoutS)}
+							onValueChange={(v) => setTimeoutS(Number(v))}
+						>
+							<SelectTrigger
+								className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground"
+								title="LLM timeout"
+							>
+								<Timer className="w-3.5 h-3.5" />
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{TIMEOUT_OPTIONS.map((t) => (
+									<SelectItem key={t.value} value={String(t.value)}>
+										{t.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					)}
 
 					{mode === "nl" && (
 						<>

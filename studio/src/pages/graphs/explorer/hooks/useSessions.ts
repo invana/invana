@@ -18,6 +18,7 @@ function toBody(payload: QueryRunPayload): SendMessageBody {
 		content: payload.query,
 		mode: "nl",
 		llm_provider_id: payload.llmProviderId,
+		timeout_s: payload.timeoutS,
 	};
 }
 

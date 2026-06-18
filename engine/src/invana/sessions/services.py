@@ -282,6 +282,8 @@ async def send_message(
                 language=language,
                 version=await _grounding_version(session, graph.id),
                 encryption_key=encryption_key,
+                # None → let nl_to_query apply its own default.
+                **({"timeout_s": payload.timeout_s} if payload.timeout_s is not None else {}),
             )
         except LLMError as exc:
             assistant_msg.status = SessionMessageStatus.error

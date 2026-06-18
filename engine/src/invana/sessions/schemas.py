@@ -24,6 +24,10 @@ class SendMessage(BaseModel):
     # nl only — which LLM provider to translate with; defaults to the graph's
     # is_default provider when omitted (RFC-030).
     llm_provider_id: str | None = None
+    # nl only — how long (seconds) to wait on the LLM translation before giving
+    # up. Lets slow local models be granted more time per ask. Falls back to the
+    # translate default when omitted.
+    timeout_s: float | None = Field(default=None, gt=0, le=600)
 
 
 class SessionCreate(BaseModel):

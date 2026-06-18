@@ -21,6 +21,8 @@ export type QueryRunPayload =
 			query: string;
 			llmProviderId: string;
 			attachments: File[];
+			/** Seconds to wait on the LLM translation before giving up. */
+			timeoutS: number;
 	  };
 
 // ── Graph data types (mirrors engine's Vertex / Edge / GraphResponse) ─────────

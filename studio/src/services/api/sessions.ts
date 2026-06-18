@@ -73,6 +73,8 @@ export interface SendMessageBody {
 	language?: QueryLanguage;
 	/** nl only — which LLM provider translates the prompt (RFC-030). */
 	llm_provider_id?: string;
+	/** nl only — seconds to wait on the LLM translation before giving up. */
+	timeout_s?: number;
 }
 
 /** List ordering — newest by last activity (default) or by creation. */
