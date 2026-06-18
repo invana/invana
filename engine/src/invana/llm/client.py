@@ -23,6 +23,7 @@ from invana.llm.defaults import DEFAULT_MODEL_ID
 from invana.llm.errors import LLMError
 from invana.llm.providers import anthropic as anthropic_provider
 from invana.llm.providers import ollama as ollama_provider
+from invana.llm.providers import openai as openai_provider
 from invana.llm.schemas import TokenUsage, ToolResult
 from invana.llm_providers.models import LLMProvider, LLMProviderKind
 
@@ -47,11 +48,16 @@ def _llm_span(name: str):
 
 _Dispatch = Callable[..., Awaitable[tuple[dict | None, TokenUsage]]]
 
-# Wired today: keyless local dev (ollama) + production (anthropic). The rest
-# raise a clear error until a consumer needs them (RFC-032 § Decision 3).
+# Wired today: keyless local dev (ollama), production (anthropic), and the
+# OpenAI-compatible path (openai = first-party OpenAI; local = any
+# OpenAI-compatible server reached via base_url, e.g. LM Studio / vLLM).
+# google / azure still raise a clear error until a consumer needs them
+# (RFC-032 § Decision 3).
 _DISPATCH: dict[LLMProviderKind, _Dispatch] = {
     LLMProviderKind.ollama: ollama_provider.call,
     LLMProviderKind.anthropic: anthropic_provider.call,
+    LLMProviderKind.openai: openai_provider.call,
+    LLMProviderKind.local: openai_provider.call,
 }
 
 
