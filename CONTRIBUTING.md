@@ -22,7 +22,7 @@ cd invana
 # Install all dependencies + pre-commit hooks
 make setup
 
-# Start the local infrastructure (postgres + neo4j + hyperdx)
+# Start the local infrastructure (postgres + neo4j)
 docker compose -f docker-compose-infra.yml up -d
 
 # Start both engine and studio in dev mode
@@ -34,13 +34,12 @@ Run `make help` to see all available commands.
 ### Local infrastructure
 
 `docker-compose-infra.yml` provides the backing services for local development
-and testing. By default it starts only the core trio:
+and testing. By default it starts only the core pair:
 
 | Service  | What it's for                          | Port(s)         |
 |----------|----------------------------------------|-----------------|
 | postgres | App-state database                     | 5432           |
 | neo4j    | Default graph database                 | 7474, 7687      |
-| hyperdx  | Observability (traces/logs/metrics) UI | 8080, 4317–4318 |
 
 ```bash
 # Start the default core services
@@ -50,9 +49,10 @@ docker compose -f docker-compose-infra.yml up -d
 docker compose -f docker-compose-infra.yml down
 ```
 
-The additional graph databases (Memgraph, JanusGraph, ArcadeDB) are heavier and
-**opt-in via Compose profiles** — they don't start by default. Enable one, or
-all of them with the `extra-dbs` group profile:
+The additional graph databases (Memgraph, JanusGraph, ArcadeDB) and the
+observability stack (HyperDX — traces/logs/metrics UI on 8080, 4317–4318) are
+heavier and **opt-in via Compose profiles** — they don't start by default.
+Enable one, all databases with the `extra-dbs` group profile, or telemetry:
 
 ```bash
 # Add a single on-demand database
@@ -62,6 +62,9 @@ docker compose -f docker-compose-infra.yml --profile arcadedb up -d
 
 # Add all on-demand databases at once
 docker compose -f docker-compose-infra.yml --profile extra-dbs up -d
+
+# Add the observability stack (HyperDX)
+docker compose -f docker-compose-infra.yml --profile telemetry up -d
 ```
 
 Pass the same `--profile` flag to `down`/`stop` to tear those services down too

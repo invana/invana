@@ -1,12 +1,14 @@
 # Infrastructure services for local development and testing.
 #
-# By default only the core services start: postgres, neo4j, hyperdx.
+# By default only the core services start: postgres, neo4j.
 #   docker compose -f docker-compose-infra.yml up -d
 #
-# The extra graph databases (memgraph, janusgraph, arcadedb) are opt-in via
-# profiles. Start one, or all of them with the "extra-dbs" group profile:
+# The extra graph databases (memgraph, janusgraph, arcadedb) and observability
+# (hyperdx) are opt-in via profiles. Start one, or all DBs with the "extra-dbs"
+# group profile:
 #   docker compose -f docker-compose-infra.yml --profile memgraph up -d
 #   docker compose -f docker-compose-infra.yml --profile extra-dbs up -d
+#   docker compose -f docker-compose-infra.yml --profile telemetry up -d
 #
 # Pass the same --profile flag on down/stop to also tear those services down.
 
@@ -113,6 +115,7 @@ services:
   hyperdx:
     image: docker.hyperdx.io/hyperdx/hyperdx-local:latest
     container_name: invana-hyperdx
+    profiles: ["telemetry"]
     ports:
       - "8080:8080"   # HyperDX UI
       - "4317:4317"   # OTLP gRPC
