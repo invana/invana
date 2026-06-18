@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from invana.db import create_db_engine, create_session_factory, create_sync_engine
+from invana.server.middleware import CatchAllExceptionMiddleware
 from invana.settings import settings
 
 
@@ -88,6 +89,12 @@ def create_app() -> FastAPI:
         session_cookie="invana_admin_session",
         same_site="lax",
     )
+
+    # Catch-all sits directly beneath CORS so unhandled 500s become real
+    # responses that CORS can decorate — otherwise Starlette's outermost
+    # ServerErrorMiddleware emits the 500 above CORS, the headers are missing,
+    # and the browser reports a misleading CORS error instead of the 500.
+    app.add_middleware(CatchAllExceptionMiddleware, debug=settings.debug)
 
     app.add_middleware(
         CORSMiddleware,
