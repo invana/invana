@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  Read-only ClickHouse user for inspecting HyperDX-local telemetry.
+
+  HyperDX-local bundles ClickHouse with a password on the built-in `default`
+  user that we don't control. This adds a separate, read-only user we own so
+  tooling (and Claude) can query the otel_traces / otel_logs tables without
+  being able to modify or delete any telemetry.
+
+  Mounted into the hyperdx container at
+  /etc/clickhouse-server/users.d/invana-readonly.xml (see docker-compose-infra.yml).
+  ClickHouse hot-reloads users.d, so a `docker cp` of this file also takes
+  effect within a few seconds without a restart.
+
+  Credentials (local dev only, ClickHouse is bound to localhost):
+    user:     invana_ro
+    password: invana_ro
+-->
+<clickhouse>
+  <profiles>
+    <invana_readonly>
+      <!-- readonly=2 → SELECT + per-query SET allowed, no INSERT/DDL/DML. -->
+      <readonly>2</readonly>
+    </invana_readonly>
+  </profiles>
+
+  <users>
+    <invana_ro>
+      <password>invana_ro</password>
+      <networks>
+        <ip>::/0</ip>
+      </networks>
+      <profile>invana_readonly</profile>
+      <quota>default</quota>
+      <access_management>0</access_management>
+    </invana_ro>
+  </users>
+</clickhouse>

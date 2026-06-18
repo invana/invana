@@ -121,6 +121,11 @@ services:
       - "4317:4317"   # OTLP gRPC
       - "4318:4318"   # OTLP HTTP
       - "8123:8123"   # ClickHouse HTTP (optional, direct access)
+    volumes:
+      # Read-only ClickHouse user (invana_ro / invana_ro) for inspecting traces
+      # & logs from the host without the image's bundled `default` password.
+      # ClickHouse hot-reloads users.d, so it applies a few seconds after mount.
+      - ./docker/clickhouse/users.d/invana-readonly.xml:/etc/clickhouse-server/users.d/invana-readonly.xml:ro
     restart: unless-stopped
 
 volumes:
