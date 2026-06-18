@@ -1,0 +1,1 @@
+- [HyperDX / ClickHouse access](hyperdx-clickhouse-access.md) — query local telemetry traces/logs with the invana_ro read-only user
