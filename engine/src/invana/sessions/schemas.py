@@ -24,9 +24,9 @@ class SendMessage(BaseModel):
     # nl only — which LLM provider to translate with; defaults to the graph's
     # is_default provider when omitted (RFC-030).
     llm_provider_id: str | None = None
-    # nl only — how long (seconds) to wait on the LLM translation before giving
-    # up. Lets slow local models be granted more time per ask. Falls back to the
-    # translate default when omitted.
+    # How long (seconds) to budget this ask: the LLM translation (nl) and the
+    # query execution (nl + ql). Lets slow models/queries be granted more time.
+    # Falls back to the translate/driver defaults when omitted.
     timeout_s: float | None = Field(default=None, gt=0, le=600)
 
 
@@ -68,6 +68,7 @@ class SessionMessageRead(BaseModel):
     row_count: int | None = None
     execution_time_ms: int | None = None
     llm_time_ms: int | None = None
+    timeout_s: float | None = None
     node_count: int | None = None
     edge_count: int | None = None
     created_at: datetime

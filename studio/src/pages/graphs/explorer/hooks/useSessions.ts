@@ -10,7 +10,12 @@ import type { Session, SessionMessage } from "../../../../types/session";
 
 function toBody(payload: QueryRunPayload): SendMessageBody {
 	if (payload.mode === "ql") {
-		return { content: payload.query, mode: "ql", language: payload.language };
+		return {
+			content: payload.query,
+			mode: "ql",
+			language: payload.language,
+			timeout_s: payload.timeoutS,
+		};
 	}
 	// NL → the engine translates the prompt into a grounded query with the
 	// chosen provider (RFC-030). Attachments aren't sent yet.

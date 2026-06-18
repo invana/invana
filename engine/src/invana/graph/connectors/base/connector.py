@@ -98,11 +98,20 @@ class BaseConnector(ABC):
         """Close the vendor-specific driver."""
 
     @abstractmethod
-    async def _execute_raw(self, query: str, parameters: dict | None = None) -> Any:
-        """Execute a raw query via the vendor driver and return raw results."""
+    async def _execute_raw(self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None) -> Any:
+        """Execute a raw query via the vendor driver and return raw results.
 
-    async def execute(self, query: str, parameters: dict | None = None) -> GraphResponse:
+        ``timeout_s`` is a best-effort per-query budget the vendor driver should
+        enforce; ``None`` leaves it unbounded (the driver's own default).
+        """
+
+    async def execute(
+        self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None
+    ) -> GraphResponse:
         """Execute a query and return a fully deserialised GraphResponse.
+
+        ``timeout_s`` is forwarded to the vendor driver as a per-query timeout
+        (seconds); ``None`` leaves it unbounded.
 
         Split into two child spans (RFC-025) so the trace separates the raw
         driver round-trip (``graph.query.db_execute``) from result
@@ -116,7 +125,7 @@ class BaseConnector(ABC):
         # is our own work and traced separately by the spans below.
         start = time.perf_counter()
         with _query_span("graph.query.db_execute"):
-            raw = await self._execute_raw(query, parameters)
+            raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
         duration_ms = (time.perf_counter() - start) * 1000
         with _query_span("graph.query.serialize") as span:
             response = self._serializer.deserialize_graph_response(raw)

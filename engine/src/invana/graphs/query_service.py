@@ -48,11 +48,14 @@ async def execute_query(
     parameters: dict[str, Any] | None,
     actor_id: str,
     session_id: str | None = None,
+    timeout_s: float | None = None,
 ) -> QueryResponse:
     """Run *query* against *graph*'s live connector and emit the audit event.
 
-    Does not commit. Raises ``HTTPException`` for config/availability problems,
-    ``QueryExecutionError`` if the connector fails the query.
+    ``timeout_s`` is forwarded to the connector as a per-query budget (seconds);
+    ``None`` leaves it unbounded. Does not commit. Raises ``HTTPException`` for
+    config/availability problems, ``QueryExecutionError`` if the connector fails
+    the query.
     """
     connection, connector = await _resolve_connector(session, graph=graph, manager=manager)
     query_language = _resolve_query_language(connector)
@@ -68,7 +71,7 @@ async def execute_query(
         base_details["session_id"] = session_id
 
     try:
-        graph_response = await connector.execute(query, parameters=parameters)
+        graph_response = await connector.execute(query, parameters=parameters, timeout_s=timeout_s)
     except Exception as exc:
         await emit_event(
             session,

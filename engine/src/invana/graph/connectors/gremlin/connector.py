@@ -187,7 +187,7 @@ class GremlinConnector(BaseConnector):
             raise ConnectionError("Not connected. Call connect() first.")
         return self._g
 
-    async def _execute_raw(self, query: str, parameters: dict | None = None) -> Any:
+    async def _execute_raw(self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None) -> Any:
         """Execute a raw Gremlin script string.
 
         For traversal-based execution, use ``execute_traversal()`` instead.
@@ -197,10 +197,19 @@ class GremlinConnector(BaseConnector):
             "Raw string execution is not supported at the base level."
         )
 
-    async def execute_traversal(self, traversal_obj: Any) -> list[Any]:
-        """Execute a Gremlin traversal and return results as a list."""
+    async def execute_traversal(self, traversal_obj: Any, *, timeout_s: float | None = None) -> list[Any]:
+        """Execute a Gremlin traversal and return results as a list.
+
+        ``timeout_s`` is enforced client-side around the blocking driver call so
+        a hung traversal can't outlive its budget; ``None`` leaves it unbounded.
+        """
         try:
-            return await asyncio.to_thread(traversal_obj.to_list)
+            coro = asyncio.to_thread(traversal_obj.to_list)
+            if timeout_s is not None:
+                return await asyncio.wait_for(coro, timeout=timeout_s)
+            return await coro
+        except TimeoutError as e:
+            raise QueryExecutionError(f"Traversal timed out after {timeout_s}s") from e
         except Exception as e:
             raise QueryExecutionError(f"Traversal execution failed: {e}") from e
 

@@ -178,11 +178,13 @@ export function SessionsPanel({
 				mode: "nl" as QueryMode,
 				language: last.language,
 				llmProviderId: provider?.id,
+				timeoutS: last.timeoutS,
 			};
 		}
 		return {
 			mode: "ql" as QueryMode,
 			language: last.language ?? (last.via.toLowerCase() as QueryLanguage),
+			timeoutS: last.timeoutS,
 		};
 	}, [activeSession, llmProviders]);
 

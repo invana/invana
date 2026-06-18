@@ -135,10 +135,14 @@ class OpenCypherConnector(BaseConnector):
         if self._driver:
             await self._driver.close()
 
-    async def _execute_raw(self, query: str, parameters: dict | None = None) -> list[neo4j.Record]:
+    async def _execute_raw(
+        self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None
+    ) -> list[neo4j.Record]:
         try:
             async with self._driver.session(database=self._database) as session:
-                result = await session.run(query, parameters or {})
+                # ``timeout`` is the server-side transaction timeout (seconds);
+                # the driver omits it when None, leaving the query unbounded.
+                result = await session.run(query, parameters or {}, timeout=timeout_s)
                 return [record async for record in result]
         except neo4j.exceptions.Neo4jError as exc:
             raise QueryExecutionError(f"Neo4j query failed: {exc}") from exc

@@ -76,6 +76,8 @@ export interface ComposerConfig {
 	mode: QueryMode;
 	language?: QueryLanguage;
 	llmProviderId?: string;
+	/** NL only — the timeout (seconds) the session's last ask used. */
+	timeoutS?: number;
 }
 
 export interface SessionComposerProps {
@@ -193,6 +195,7 @@ export function SessionComposer({
 		if (initialConfig.mode === "nl" && initialConfig.llmProviderId) {
 			setLlmProviderId(initialConfig.llmProviderId);
 		}
+		if (initialConfig.timeoutS != null) setTimeoutS(initialConfig.timeoutS);
 	}, [sessionKey, initialConfig]);
 
 	// Switching sessions (or back to the list) starts a fresh history walk.
@@ -318,7 +321,7 @@ export function SessionComposer({
 		if (mode === "ql") {
 			const query = editorViewRef.current?.state.doc.toString().trim() ?? "";
 			if (!query) return;
-			onRun({ mode: "ql", query, language });
+			onRun({ mode: "ql", query, language, timeoutS });
 			historyIndexRef.current = -1; // sent — next ↑ starts from the newest
 			return;
 		}
@@ -494,14 +497,14 @@ export function SessionComposer({
 						)}
 					</div>
 
-					{mode === "nl" && !noLlmProviders && (
+					{(mode === "ql" || !noLlmProviders) && (
 						<Select
 							value={String(timeoutS)}
 							onValueChange={(v) => setTimeoutS(Number(v))}
 						>
 							<SelectTrigger
 								className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground"
-								title="LLM timeout"
+								title={mode === "nl" ? "LLM + query timeout" : "Query timeout"}
 							>
 								<Timer className="w-3.5 h-3.5" />
 								<SelectValue />

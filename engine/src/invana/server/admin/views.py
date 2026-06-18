@@ -415,6 +415,7 @@ class SessionMessageView(ModelView):
         "row_count",
         "execution_time_ms",
         "llm_time_ms",
+        "timeout_s",
         "created_at",
     ]
 

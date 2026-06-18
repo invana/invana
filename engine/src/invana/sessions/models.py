@@ -20,6 +20,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -135,6 +136,11 @@ class SessionMessage(Base):
     # ``source_query`` (RFC-030). Null on QL and on rerun (no translation), so
     # the UI can show LLM time next to query time and see which dominated.
     llm_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # The per-ask timeout (seconds) this message was sent with — budgets the LLM
+    # translation (nl) and the query execution (nl + ql), so the composer can
+    # restore the user's choice on reopen and re-run honours it (RFC-030). Null
+    # when the ask carried no timeout, and on existing rows.
+    timeout_s: Mapped[float | None] = mapped_column(Float, nullable=True)
     node_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     edge_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
 

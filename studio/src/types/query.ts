@@ -15,13 +15,19 @@ export interface QueryRequest {
 export type QueryMode = "nl" | "ql";
 
 export type QueryRunPayload =
-	| { mode: "ql"; query: string; language: QueryLanguage }
+	| {
+			mode: "ql";
+			query: string;
+			language: QueryLanguage;
+			/** Seconds to budget the query execution before giving up. */
+			timeoutS: number;
+	  }
 	| {
 			mode: "nl";
 			query: string;
 			llmProviderId: string;
 			attachments: File[];
-			/** Seconds to wait on the LLM translation before giving up. */
+			/** Seconds to budget the LLM translation + query execution. */
 			timeoutS: number;
 	  };
 

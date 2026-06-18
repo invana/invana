@@ -315,6 +315,9 @@ async def send_message(
         )
 
     assistant_msg.source_query = query_to_run
+    # Remember the timeout this ask used (LLM + query budget) so the composer can
+    # restore it and re-run honours it — applies to both nl and ql.
+    assistant_msg.timeout_s = payload.timeout_s
 
     result: QueryResponse | None = None
     try:
@@ -327,6 +330,7 @@ async def send_message(
             parameters=payload.parameters,
             actor_id=actor_id,
             session_id=sess.id,
+            timeout_s=payload.timeout_s,
         )
     except QueryExecutionError as exc:
         assistant_msg.status = SessionMessageStatus.error
@@ -378,6 +382,8 @@ async def rerun_message(
         parameters=None,
         actor_id=actor_id,
         session_id=sess.id,
+        # Honour the timeout the original ask was sent with on re-run.
+        timeout_s=message.timeout_s,
     )
     nodes = len(result.data.nodes) if result.data else 0
     edges = len(result.data.edges) if result.data else 0

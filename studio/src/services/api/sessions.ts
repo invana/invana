@@ -26,6 +26,7 @@ interface ApiMessage {
 	row_count?: number | null;
 	execution_time_ms?: number | null;
 	llm_time_ms?: number | null;
+	timeout_s?: number | null;
 	node_count?: number | null;
 	edge_count?: number | null;
 	created_at: string;
@@ -119,6 +120,7 @@ function toMessage(m: ApiMessage): SessionMessage {
 		rowCount: m.row_count ?? undefined,
 		executionTimeMs: m.execution_time_ms ?? undefined,
 		llmTimeMs: m.llm_time_ms ?? undefined,
+		timeoutS: m.timeout_s ?? undefined,
 		language: (m.query_language as QueryLanguage | null) ?? undefined,
 		sourceQuery: m.source_query ?? undefined,
 	};

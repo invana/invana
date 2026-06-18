@@ -32,6 +32,9 @@ export interface SessionMessage {
 	/** NL only — time spent translating the prompt to a query (RFC-030). Null on
 	 *  QL and rerun, so the meta line can show LLM vs query time separately. */
 	llmTimeMs?: number;
+	/** NL only — the translation timeout (seconds) this ask was sent with, so the
+	 *  composer can restore the user's choice when the session is reopened. */
+	timeoutS?: number;
 	language?: QueryLanguage;
 	/** The query that produced this reply, so it can be re-run. */
 	sourceQuery?: string;
