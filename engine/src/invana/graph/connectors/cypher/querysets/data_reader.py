@@ -6,6 +6,7 @@ from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQue
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 from invana.graph.types.data_elements import Edge, GraphResponse, Path, Vertex
 from invana.graph.types.filters import FilterGroup
+from invana.graph.types.sort import SortSpec
 
 
 class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
@@ -20,8 +21,8 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         offset: int | None = None,
     ) -> list[Vertex]:
         query, params = OpenCypherQueryBuilder.match_nodes(label, filters, limit, offset)
-        raw = await self._connector.execute(query, params)
-        return [self._serializer.deserialize_vertex(record["n"]) for record in raw]
+        response = await self._connector.execute(query, params)
+        return response.nodes
 
     async def read_edges(
         self,
@@ -33,8 +34,8 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         limit: int | None = None,
     ) -> list[Edge]:
         query, params = OpenCypherQueryBuilder.match_edges(label, source_label, target_label, filters, limit)
-        raw = await self._connector.execute(query, params)
-        return [self._serializer.deserialize_edge(record["r"], record["a"], record["b"]) for record in raw]
+        response = await self._connector.execute(query, params)
+        return response.edges
 
     async def read_neighbors(
         self,
@@ -42,21 +43,52 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         *,
         direction: Literal["in", "out", "both"] = "both",
         edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+        sort: list[SortSpec] | None = None,
         limit: int | None = None,
+        offset: int | None = None,
     ) -> GraphResponse:
-        query, params = OpenCypherQueryBuilder.match_neighbors(vertex_id, direction, edge_label, limit)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_graph_response(raw)
+        query, params = OpenCypherQueryBuilder.match_neighbors(
+            vertex_id,
+            direction,
+            edge_label=edge_label,
+            neighbor_label=neighbor_label,
+            filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+        )
+        return await self._connector.execute(query, params)
+
+    async def count_neighbors(
+        self,
+        vertex_id: str,
+        *,
+        direction: Literal["in", "out", "both"] = "both",
+        edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+    ) -> int:
+        query, params = OpenCypherQueryBuilder.count_neighbors(
+            vertex_id,
+            direction,
+            edge_label=edge_label,
+            neighbor_label=neighbor_label,
+            filters=filters,
+        )
+        response = await self._connector.execute(query, params)
+        return response.records[0]["cnt"]
 
     async def read_vertex_by_id(self, vertex_id: str) -> Vertex:
         query, params = OpenCypherQueryBuilder.match_node_by_id(vertex_id)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_vertex(raw[0]["n"])
+        response = await self._connector.execute(query, params)
+        return response.nodes[0]
 
     async def read_edge_by_id(self, edge_id: str) -> Edge:
         query, params = OpenCypherQueryBuilder.match_edge_by_id(edge_id)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_edge(raw[0]["r"], raw[0]["a"], raw[0]["b"])
+        response = await self._connector.execute(query, params)
+        return response.edges[0]
 
     async def shortest_path(
         self,
@@ -66,17 +98,17 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         max_depth: int = 10,
     ) -> Path | None:
         query, params = OpenCypherQueryBuilder.shortest_path(source_id, target_id, max_depth)
-        raw = await self._connector.execute(query, params)
-        if not raw:
+        response = await self._connector.execute(query, params)
+        if not response.records:
             return None
-        return self._serializer.deserialize_path(raw[0]["p"])
+        return Path.model_validate(response.records[0]["p"])
 
     async def count_vertices(self, label: str | None = None) -> int:
         query, params = OpenCypherQueryBuilder.count_nodes(label)
-        raw = await self._connector.execute(query, params)
-        return raw[0]["cnt"]
+        response = await self._connector.execute(query, params)
+        return response.records[0]["cnt"]
 
     async def count_edges(self, label: str | None = None) -> int:
         query, params = OpenCypherQueryBuilder.count_edges(label)
-        raw = await self._connector.execute(query, params)
-        return raw[0]["cnt"]
+        response = await self._connector.execute(query, params)
+        return response.records[0]["cnt"]

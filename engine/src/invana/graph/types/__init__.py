@@ -30,6 +30,7 @@ from invana.graph.types.schema_elements import (
     PropertyDefinition,
     PropertyInfo,
 )
+from invana.graph.types.sort import SortDirection, SortSpec
 
 __all__ = [
     "Capability",
@@ -50,5 +51,7 @@ __all__ = [
     "QueryLanguage",
     "QueryResult",
     "ResultMetadata",
+    "SortDirection",
+    "SortSpec",
     "Vertex",
 ]

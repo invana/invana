@@ -77,6 +77,9 @@ AUTH_USERNAME_CHANGE = "auth.username_change"
 # ── Query executions ──────────────────────────────────────────────────────────
 QUERY_EXECUTE = "query.execute"
 
+# ── Explorer node expand / traversal (RFC-035) ────────────────────────────────
+GRAPH_EXPAND = "graph.expand"
+
 # ── Query sessions (RFC-024) ──────────────────────────────────────────────────
 SESSION_CREATE = "session.create"
 SESSION_DELETE = "session.delete"

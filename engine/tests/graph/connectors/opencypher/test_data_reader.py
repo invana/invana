@@ -4,6 +4,7 @@ import pytest
 
 from invana.graph.connectors.base.data_types.filter_types import FilterOp
 from invana.graph.connectors.base.data_types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.sort import SortDirection, SortSpec
 
 
 @pytest.fixture
@@ -224,6 +225,92 @@ class TestReadNeighbors:
         response = await connector.data_reader.read_neighbors(isolated.id)
         assert len(response.edges) == 0
         assert len(response.nodes) == 0
+
+
+class TestExpandNeighbors:
+    """RFC-035 node-expand: by-node-type / by-edge-type, sort, pagination, counts."""
+
+    async def test_by_node_type(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        people = await connector.data_reader.read_neighbors_by_node_type(alice.id, neighbor_label="Person")
+        companies = await connector.data_reader.read_neighbors_by_node_type(alice.id, neighbor_label="Company")
+        assert len(people.edges) == 2  # Bob, Charlie
+        assert len(companies.edges) == 1  # Acme
+
+    async def test_by_edge_type_direction(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        works = await connector.data_reader.read_neighbors_by_edge_type(
+            alice.id, edge_label="WORKS_AT", direction="out"
+        )
+        assert len(works.edges) == 1
+        assert works.edges[0].label == "WORKS_AT"
+
+    async def test_sorted_asc_vs_desc(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        asc = await connector.data_reader.read_neighbors_by_edge_type(
+            alice.id, edge_label="KNOWS", sort=[SortSpec(property="name", direction=SortDirection.ASC)]
+        )
+        desc = await connector.data_reader.read_neighbors_by_edge_type(
+            alice.id, edge_label="KNOWS", sort=[SortSpec(property="name", direction=SortDirection.DESC)]
+        )
+        asc_names = [n.properties["name"] for n in asc.nodes if n.id != alice.id]
+        desc_names = [n.properties["name"] for n in desc.nodes if n.id != alice.id]
+        assert asc_names == ["Bob", "Charlie"]
+        assert desc_names == ["Charlie", "Bob"]
+
+    async def test_multi_property_sort_tiebreak(self, connector):
+        # Hub with three FOLLOWS neighbours: two share city "NYC", one is "LA".
+        # Sort by city ASC then name DESC — the secondary key breaks the tie.
+        hub = await connector.data_writer.create_vertex("Hub", {"name": "Hub"})
+        amy = await connector.data_writer.create_vertex("Person", {"name": "Amy", "city": "NYC"})
+        zoe = await connector.data_writer.create_vertex("Person", {"name": "Zoe", "city": "NYC"})
+        lee = await connector.data_writer.create_vertex("Person", {"name": "Lee", "city": "LA"})
+        for p in (amy, zoe, lee):
+            await connector.data_writer.create_edge("FOLLOWS", hub.id, p.id, {})
+        result = await connector.data_reader.read_neighbors(
+            hub.id,
+            sort=[
+                SortSpec(property="city", direction=SortDirection.ASC),
+                SortSpec(property="name", direction=SortDirection.DESC),
+            ],
+        )
+        names = [n.properties["name"] for n in result.nodes if n.id != hub.id]
+        assert names == ["Lee", "Zoe", "Amy"]  # LA first; within NYC, name DESC
+
+    async def test_pagination_disjoint(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        sort = [SortSpec(property="name", direction=SortDirection.ASC)]
+        page1 = await connector.data_reader.read_neighbors_by_edge_type(
+            alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=0
+        )
+        page2 = await connector.data_reader.read_neighbors_by_edge_type(
+            alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=1
+        )
+        p1 = [n.properties["name"] for n in page1.nodes if n.id != alice.id]
+        p2 = [n.properties["name"] for n in page2.nodes if n.id != alice.id]
+        assert p1 == ["Bob"]
+        assert p2 == ["Charlie"]
+
+    async def test_counts(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        assert await connector.data_reader.count_neighbors(alice.id) == 3
+        assert await connector.data_reader.count_neighbors_by_edge_type(alice.id, edge_label="KNOWS") == 2
+        assert await connector.data_reader.count_neighbors_by_node_type(alice.id, neighbor_label="Person") == 2
+
+    async def test_filter_narrows_count(self, connector, seeded_graph):
+        alice = seeded_graph["alice"]
+        # Of Alice's KNOWS neighbours (Bob 25, Charlie 35), only Charlie is > 30.
+        filters = FilterGroup(conditions=[FilterExpression(property="age", op=FilterOp.GT, value=30)])
+        count = await connector.data_reader.count_neighbors_by_edge_type(alice.id, edge_label="KNOWS", filters=filters)
+        result = await connector.data_reader.read_neighbors_by_edge_type(alice.id, edge_label="KNOWS", filters=filters)
+        assert count == 1
+        names = [n.properties["name"] for n in result.nodes if n.id != alice.id]
+        assert names == ["Charlie"]
+
+    async def test_unknown_vertex(self, connector, seeded_graph):
+        response = await connector.data_reader.read_neighbors("4:00000000-0000-0000-0000-000000000000:999")
+        assert len(response.edges) == 0
+        assert await connector.data_reader.count_neighbors("4:00000000-0000-0000-0000-000000000000:999") == 0
 
 
 class TestShortestPath:

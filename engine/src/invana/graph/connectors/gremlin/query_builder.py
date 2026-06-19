@@ -9,10 +9,11 @@ from __future__ import annotations
 from typing import Any
 
 from gremlin_python.process.graph_traversal import GraphTraversalSource, __
-from gremlin_python.process.traversal import P, TextP
+from gremlin_python.process.traversal import Order, P, TextP
 
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.sort import SortDirection, SortSpec
 
 
 def _project_edge(traversal: Any) -> Any:
@@ -109,6 +110,17 @@ def _build_expression_traversal(expr: FilterExpression) -> Any:
     return None
 
 
+def _apply_order(traversal: Any, sort: list[SortSpec] | None) -> Any:
+    """Apply a list of SortSpec to a Gremlin traversal via order().by(values(prop), Order)."""
+    if not sort:
+        return traversal
+    t = traversal.order()
+    for s in sort:
+        order = Order.desc if s.direction == SortDirection.DESC else Order.asc
+        t = t.by(__.values(s.property), order)
+    return t
+
+
 class GremlinQueryBuilder:
     """Builds Gremlin traversals. All methods are static and work with a GraphTraversalSource."""
 
@@ -160,14 +172,19 @@ class GremlinQueryBuilder:
         return _project_edge(g.E(edge_id))
 
     @staticmethod
-    def match_neighbors(
+    def _neighbor_traversal(
         g: GraphTraversalSource,
         vertex_id: Any,
-        direction: str = "both",
-        edge_label: str | None = None,
-        limit: int | None = None,
+        direction: str,
+        edge_label: str | None,
+        neighbor_label: str | None,
+        filters: FilterGroup | None,
     ) -> Any:
-        """Build a traversal for neighborhood exploration."""
+        """Shared traversal up to (and including) the neighbour vertex `m`.
+
+        Steps to the edge (tagged `e`) then to the other vertex (tagged `m`), so
+        neighbour-label, filters, sort and pagination all apply to the neighbour.
+        """
         t = g.V(vertex_id)
         if direction == "out":
             t = t.out_e(edge_label) if edge_label else t.out_e()
@@ -176,10 +193,45 @@ class GremlinQueryBuilder:
         else:
             t = t.both_e(edge_label) if edge_label else t.both_e()
 
+        t = t.as_("e").other_v().as_("m")
+        if neighbor_label:
+            t = t.has_label(neighbor_label)
+        return _apply_filters(t, filters)
+
+    @staticmethod
+    def match_neighbors(
+        g: GraphTraversalSource,
+        vertex_id: Any,
+        direction: str = "both",
+        edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+        sort: list[SortSpec] | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> Any:
+        """Build a traversal for neighborhood exploration."""
+        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters)
+        t = _apply_order(t, sort)
+        if offset is not None:
+            t = t.skip(offset)
         if limit is not None:
             t = t.limit(limit)
-
+        t = t.select("e")
         return _project_edge(t)
+
+    @staticmethod
+    def count_neighbors(
+        g: GraphTraversalSource,
+        vertex_id: Any,
+        direction: str = "both",
+        edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+    ) -> Any:
+        """Build a traversal that counts matching neighbours."""
+        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters)
+        return t.count()
 
     @staticmethod
     def create_vertex(g: GraphTraversalSource, label: str, properties: dict) -> Any:

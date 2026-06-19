@@ -10,8 +10,8 @@ class OpenCypherDataWriterQuerySet(BaseDataWriterQuerySet):
 
     async def create_vertex(self, label: str, properties: dict) -> Vertex:
         query, params = OpenCypherQueryBuilder.create_node(label, properties)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_vertex(raw[0]["n"])
+        response = await self._connector.execute(query, params)
+        return response.nodes[0]
 
     async def create_edge(
         self,
@@ -21,19 +21,18 @@ class OpenCypherDataWriterQuerySet(BaseDataWriterQuerySet):
         properties: dict | None = None,
     ) -> Edge:
         query, params = OpenCypherQueryBuilder.create_edge(label, source_id, target_id, properties)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_edge(raw[0]["r"], raw[0]["a"], raw[0]["b"])
+        response = await self._connector.execute(query, params)
+        return response.edges[0]
 
     async def update_vertex(self, vertex_id: str, properties: dict) -> Vertex:
         query, params = OpenCypherQueryBuilder.update_node(vertex_id, properties)
-        raw = await self._connector.execute(query, params)
-        return self._serializer.deserialize_vertex(raw[0]["n"])
+        response = await self._connector.execute(query, params)
+        return response.nodes[0]
 
     async def update_edge(self, edge_id: str, properties: dict) -> Edge:
         query, params = OpenCypherQueryBuilder.update_edge(edge_id, properties)
-        raw = await self._connector.execute(query, params)
-        # update_edge query only returns r, not a and b
-        return self._serializer.deserialize_edge(raw[0]["r"])
+        response = await self._connector.execute(query, params)
+        return response.edges[0]
 
     async def delete_vertex(self, vertex_id: str) -> None:
         query, params = OpenCypherQueryBuilder.delete_node(vertex_id)

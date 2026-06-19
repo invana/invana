@@ -15,6 +15,7 @@ import {
 	useGraphQuery,
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
+import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
 import {
 	hasWebGPUApi,
 	useWebGPUAvailable,
@@ -33,14 +34,21 @@ import type {
 	QueryResultItem,
 	QueryRunPayload,
 } from "../../../types/query";
+import type {
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "../../../types/traversal";
 import { GraphDetail } from "../components/GraphDetail";
+import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
 	type CanvasBackend,
+	type ExpandMenuSchema,
 	ExplorerCanvas,
 	ExplorerHeaderToolbar,
 } from "./components/ExplorerCanvas";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { SessionsPanel } from "./components/SessionsPanel";
+import { useExpandNode } from "./hooks/useExpandNode";
 import { useSessions } from "./hooks/useSessions";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
@@ -252,6 +260,69 @@ export function ExplorerPage() {
 		});
 	}, []);
 
+	// ── Node expand / graph traversal (RFC-035) ────────────────────────────────
+	// Merge expanded neighbours into the existing canvas (dedupe by id) rather
+	// than replacing it — expansion is additive. New `canvasData` ref flows
+	// through `graphData` → GraphLayer → the d3-force relayout.
+	const handleExpandResult = useCallback((res: NeighborExpandResponse) => {
+		setCanvasData((prev) => {
+			const byId = new Map(prev.map((i) => [String(i.id), i]));
+			for (const n of res.data.nodes) {
+				const id = String(n.id);
+				if (!byId.has(id)) byId.set(id, { ...n, type: "vertex" });
+			}
+			for (const e of res.data.edges) {
+				const id = String(e.id);
+				if (!byId.has(id)) byId.set(id, { ...e, type: "edge" });
+			}
+			return [...byId.values()];
+		});
+	}, []);
+
+	const expand = useExpandNode(username, graphSlug);
+	const runExpand = useCallback(
+		async (req: ExpandRequest): Promise<NeighborExpandResponse | null> => {
+			try {
+				const res = await expand.mutateAsync(req);
+				handleExpandResult(res);
+				if (res.returned === 0) toast.info("No more neighbours to load.");
+				return res;
+			} catch {
+				toast.error("Failed to load neighbours.");
+				return null;
+			}
+		},
+		[expand, handleExpandResult],
+	);
+
+	// Active model schema drives the expand submenus + fine-tune pickers.
+	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
+	const expandSchema = useMemo<ExpandMenuSchema | null>(() => {
+		if (!activeVersion) return null;
+		return {
+			nodeTypes: activeVersion.node_types.map((n) => n.name),
+			edgeTypes: activeVersion.edge_types.map((e) => ({
+				name: e.name,
+				source_node_types: e.source_node_types,
+				target_node_types: e.target_node_types,
+			})),
+		};
+	}, [activeVersion]);
+	const propertyKeys = useMemo(
+		() => (activeVersion?.property_keys ?? []).map((p) => p.name),
+		[activeVersion],
+	);
+
+	const [fineTuneVertex, setFineTuneVertex] = useState<string | null>(null);
+	const expandHandlers = useMemo(
+		() => ({
+			schema: expandSchema,
+			onExpand: (req: ExpandRequest) => void runExpand(req),
+			onOpenFineTune: (vertexId: string) => setFineTuneVertex(vertexId),
+		}),
+		[expandSchema, runExpand],
+	);
+
 	// Session whose canvas is already painted — skip the auto-restore effect for
 	// it (a fresh send already painted; reopening another session restores it).
 	const restoredRef = useRef<string | null>(null);
@@ -370,7 +441,18 @@ export function ExplorerPage() {
 				magnet={magnet}
 				interactionRef={runRef}
 				backend={backend}
+				expand={expandHandlers}
 			/>
+			{fineTuneVertex && (
+				<ExpandFineTunePanel
+					open
+					vertexId={fineTuneVertex}
+					schema={expandSchema}
+					propertyKeys={propertyKeys}
+					onClose={() => setFineTuneVertex(null)}
+					onExpand={runExpand}
+				/>
+			)}
 		</div>
 	);
 

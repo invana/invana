@@ -105,6 +105,24 @@ import {
 	endInteraction,
 	startChild,
 } from "../../../../services/telemetry/tracer";
+import type { ExpandRequest } from "../../../../types/traversal";
+
+/** Schema slice that drives the node-expand submenus (RFC-035). */
+export interface ExpandMenuSchema {
+	nodeTypes: string[];
+	edgeTypes: {
+		name: string;
+		source_node_types: string[];
+		target_node_types: string[];
+	}[];
+}
+
+/** Node-expand handlers threaded into the node context menu. */
+export interface ExpandMenuHandlers {
+	schema?: ExpandMenuSchema | null;
+	onExpand?: (req: ExpandRequest) => void;
+	onOpenFineTune?: (vertexId: string) => void;
+}
 
 // `CanvasConfig` isn't re-exported by canvas-react@0.0.4 — derive it from the
 // `<Canvas config>` prop so the option objects stay precisely typed.
@@ -306,9 +324,89 @@ const EDGE_TYPE_ICONS = {
 // selection, so a right-clicked element that isn't selected is selected first.
 // ─────────────────────────────────────────────────────────────────────────────
 
+function expandItems(
+	id: string,
+	nodeLabel: string | undefined,
+	expand: ExpandMenuHandlers,
+): MenuItem[] {
+	const { schema, onExpand, onOpenFineTune } = expand;
+	if (!onExpand && !onOpenFineTune) return [];
+
+	// Edge types whose endpoints touch this node's label (or all, when the label
+	// is unknown) — drives the incoming/outgoing submenus.
+	const edges = (schema?.edgeTypes ?? []).filter(
+		(et) =>
+			!nodeLabel ||
+			et.source_node_types.includes(nodeLabel) ||
+			et.target_node_types.includes(nodeLabel),
+	);
+
+	const neighborChildren: MenuItem[] = [
+		{
+			id: "exp-all",
+			label: "All neighbors",
+			onClick: () => onExpand?.({ kind: "neighbors", body: { vertex_id: id } }),
+		},
+		...(schema?.nodeTypes ?? []).map((nt) => ({
+			id: `exp-nt-${nt}`,
+			label: `Type: ${nt}`,
+			onClick: () =>
+				onExpand?.({
+					kind: "by-node-type",
+					body: { vertex_id: id, neighbor_label: nt },
+				}),
+		})),
+	];
+
+	const items: MenuItem[] = [
+		{
+			id: "expand-neighbors",
+			label: "Load neighbors",
+			children: neighborChildren,
+		},
+	];
+	if (edges.length) {
+		items.push({
+			id: "expand-out",
+			label: "Load outgoing relationships",
+			children: edges.map((et) => ({
+				id: `exp-out-${et.name}`,
+				label: et.name,
+				onClick: () =>
+					onExpand?.({
+						kind: "by-edge-type",
+						body: { vertex_id: id, edge_label: et.name, direction: "out" },
+					}),
+			})),
+		});
+		items.push({
+			id: "expand-in",
+			label: "Load incoming relationships",
+			children: edges.map((et) => ({
+				id: `exp-in-${et.name}`,
+				label: et.name,
+				onClick: () =>
+					onExpand?.({
+						kind: "by-edge-type",
+						body: { vertex_id: id, edge_label: et.name, direction: "in" },
+					}),
+			})),
+		});
+	}
+	if (onOpenFineTune) {
+		items.push({
+			id: "expand-finetune",
+			label: "Fine-tune expand…",
+			onClick: () => onOpenFineTune(id),
+		});
+	}
+	return items;
+}
+
 function nodeItems(
 	{ id, canvas }: GraphNodeMenuContext,
 	clip: UseClipboardResult,
+	expand: ExpandMenuHandlers,
 ): MenuItem[] {
 	const layer = canvas.layers.get<graph.GraphLayer>("graph");
 	if (!layer) return [];
@@ -317,7 +415,9 @@ function nodeItems(
 	const ensureSelected = () => {
 		if (!select?.isSelected(id)) select?.select(id, "shape");
 	};
+	const nodeLabel = layer.store.getNode(id)?.type as string | undefined;
 	return [
+		...expandItems(id, nodeLabel, expand),
 		{
 			id: "focus",
 			label: "Focus on node",
@@ -499,11 +599,11 @@ function backgroundItems(
  * here and threaded into each via a memoised closure. Mounted inside a
  * `<GraphClipboardProvider>` so the buffer + selection wiring resolve.
  */
-function CanvasContextMenus() {
+function CanvasContextMenus({ expand }: { expand: ExpandMenuHandlers }) {
 	const clip = useClipboard();
 	const node = useCallback(
-		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip),
-		[clip],
+		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip, expand),
+		[clip, expand],
 	);
 	const edge = useCallback(
 		(ctx: GraphEdgeMenuContext) => edgeItems(ctx, clip),
@@ -650,6 +750,8 @@ interface ExplorerCanvasProps {
 	/** PixiJS render backend. Switching it remounts the canvas (see `key` below),
 	 *  since the renderer is chosen once at `Application.init`. */
 	backend: CanvasBackend;
+	/** Node-expand handlers + schema for the right-click "Load neighbors" menu (RFC-035). */
+	expand?: ExpandMenuHandlers;
 }
 
 export function ExplorerCanvas({
@@ -659,6 +761,7 @@ export function ExplorerCanvas({
 	magnet,
 	interactionRef,
 	backend,
+	expand,
 }: ExplorerCanvasProps) {
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
@@ -728,7 +831,7 @@ export function ExplorerCanvas({
 			{/* Right-click menus — wrapped in the clipboard provider so their
 			    Cut / Copy / Paste / Delete items resolve `useClipboard`. */}
 			<GraphClipboardProvider layerId="graph">
-				<CanvasContextMenus />
+				<CanvasContextMenus expand={expand ?? {}} />
 			</GraphClipboardProvider>
 
 			<InspectorSelectionBridge onViewTargetChange={onViewTargetChange} />

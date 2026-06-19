@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.sort import SortDirection, SortSpec
 
 
 class _ParamCounter:
@@ -102,6 +103,14 @@ def _build_filter_expression(
     return ""
 
 
+def _order_clause(sort: list[SortSpec] | None, var: str) -> str:
+    """Build an ` ORDER BY var.`prop` ASC|DESC, ...` clause from a list of SortSpec."""
+    if not sort:
+        return ""
+    parts = [f"{var}.`{s.property}` {'DESC' if s.direction == SortDirection.DESC else 'ASC'}" for s in sort]
+    return " ORDER BY " + ", ".join(parts)
+
+
 class OpenCypherQueryBuilder:
     """Builds parameterized openCypher queries. All methods are static and return (query, params)."""
 
@@ -165,31 +174,83 @@ class OpenCypherQueryBuilder:
         return query, params
 
     @staticmethod
+    def _neighbor_match(
+        vertex_id: str,
+        direction: str,
+        edge_label: str | None,
+        neighbor_label: str | None,
+        filters: FilterGroup | None,
+        counter: _ParamCounter,
+        params: dict,
+    ) -> str:
+        """Shared `MATCH ... WHERE ...` prefix for neighborhood reads + counts.
+
+        Filters apply to the neighbour `m`; the anchor is `elementId(n) = $vid`.
+        """
+        edge_part = f"[r:`{edge_label}`]" if edge_label else "[r]"
+        neighbor = f"(m:`{neighbor_label}`)" if neighbor_label else "(m)"
+
+        if direction == "out":
+            pattern = f"(n)-{edge_part}->{neighbor}"
+        elif direction == "in":
+            pattern = f"(n)<-{edge_part}-{neighbor}"
+        else:
+            pattern = f"(n)-{edge_part}-{neighbor}"
+
+        query = f"MATCH {pattern} WHERE elementId(n) = $vid"
+        if filters and filters.conditions:
+            where = _build_filter_clause(filters, "m", counter, params)
+            if where:
+                query += f" AND ({where})"
+        return query
+
+    @staticmethod
     def match_neighbors(
         vertex_id: str,
         direction: str = "both",
         edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+        sort: list[SortSpec] | None = None,
         limit: int | None = None,
+        offset: int | None = None,
     ) -> tuple[str, dict]:
         params: dict = {"vid": vertex_id}
         counter = _ParamCounter()
 
-        edge_part = f"[r:`{edge_label}`]" if edge_label else "[r]"
+        query = OpenCypherQueryBuilder._neighbor_match(
+            vertex_id, direction, edge_label, neighbor_label, filters, counter, params
+        )
+        query += " RETURN n, r, m"
+        query += _order_clause(sort, "m")
 
-        if direction == "out":
-            pattern = f"(n)-{edge_part}->(m)"
-        elif direction == "in":
-            pattern = f"(n)<-{edge_part}-(m)"
-        else:
-            pattern = f"(n)-{edge_part}-(m)"
-
-        query = f"MATCH {pattern} WHERE elementId(n) = $vid RETURN n, r, m"
+        if offset is not None:
+            p = counter.next()
+            params[p] = offset
+            query += f" SKIP ${p}"
 
         if limit is not None:
             p = counter.next()
             params[p] = limit
             query += f" LIMIT ${p}"
 
+        return query, params
+
+    @staticmethod
+    def count_neighbors(
+        vertex_id: str,
+        direction: str = "both",
+        edge_label: str | None = None,
+        neighbor_label: str | None = None,
+        filters: FilterGroup | None = None,
+    ) -> tuple[str, dict]:
+        params: dict = {"vid": vertex_id}
+        counter = _ParamCounter()
+
+        query = OpenCypherQueryBuilder._neighbor_match(
+            vertex_id, direction, edge_label, neighbor_label, filters, counter, params
+        )
+        query += " RETURN count(m) AS cnt"
         return query, params
 
     @staticmethod
