@@ -3,6 +3,7 @@ import {
 	CanvasMessageBar,
 	GraphStatusBar as CanvasStatusBar,
 	GraphToolProvider,
+	canUseWebGPU,
 } from "@invana/canvas-react";
 import type { GraphCanvas } from "@invana/graph";
 import {
@@ -52,10 +53,6 @@ import {
 	useModelsQuery,
 	useUpdateEdgeTypeMutation,
 } from "../../../hooks/queries/useModels";
-import {
-	hasWebGPUApi,
-	useWebGPUAvailable,
-} from "../../../hooks/useWebGPUAvailable";
 import { ApiError, suppressActionToast } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
 import { isSetupComplete } from "../../../types/graphs";
@@ -65,6 +62,7 @@ import type {
 	NodeTypeResponse,
 } from "../../../types/schemas";
 import { GraphDetail } from "../components/GraphDetail";
+import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
 import {
 	type CanvasBackend,
 	ExplorerHeaderToolbar,
@@ -153,16 +151,17 @@ export function ModellerPage() {
 	const handleReady = useCallback((c: GraphCanvas | null) => setCanvas(c), []);
 
 	// Render backend (PixiJS) for the read-only explore canvas — mirrors the
-	// Explorer. Defaults to WebGPU when the device supports it, else WebGL; the
-	// header switcher persists the choice across reloads.
-	const webgpuAvailable = useWebGPUAvailable();
+	// Explorer. Defaults to WebGPU when the device can select it (`canUseWebGPU` —
+	// API present and not WebKit), else WebGL; the header switcher persists the
+	// choice across reloads. The engine downgrades/retries to WebGL at init if
+	// WebGPU can't actually initialise, so no runtime fallback is needed here.
 	const [backend, setBackendState] = useState<CanvasBackend>(() => {
 		const saved =
 			typeof localStorage !== "undefined"
 				? localStorage.getItem("modeller.canvas.backend")
 				: null;
 		if (saved === "webgl") return "webgl";
-		return hasWebGPUApi() ? "webgpu" : "webgl";
+		return canUseWebGPU() ? "webgpu" : "webgl";
 	});
 	const setBackend = useCallback((b: CanvasBackend) => {
 		setBackendState(b);
@@ -172,11 +171,6 @@ export function ModellerPage() {
 			// Private-mode / disabled storage — keep the in-memory choice.
 		}
 	}, []);
-	// If WebGPU turns out to be unusable (API present but no adapter), fall back to
-	// WebGL so we never sit on a backend that can't initialise.
-	useEffect(() => {
-		if (!webgpuAvailable && backend === "webgpu") setBackendState("webgl");
-	}, [webgpuAvailable, backend]);
 
 	// Dialog + confirm state for the authoring UI.
 	const [modelForm, setModelForm] = useState<{
@@ -792,7 +786,8 @@ export function ModellerPage() {
 								    container and can round its element up by a pixel — without
 								    this the overflow nudges the layout wider when the right
 								    panel collapses (matches the Explorer's canvas wrapper). */}
-								<div className="min-h-0 flex-1 overflow-hidden">
+								<div className="relative min-h-0 flex-1 overflow-hidden">
+									<RendererCapabilityBanner />
 									<SchemaCanvas
 										nodeTypes={nodeTypes}
 										edgeTypes={edgeTypes}

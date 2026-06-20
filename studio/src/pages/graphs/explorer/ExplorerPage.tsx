@@ -2,8 +2,13 @@ import {
 	CanvasContext,
 	CanvasMessageBar,
 	GraphStatusBar as CanvasStatusBar,
+	canUseWebGPU,
 } from "@invana/canvas-react";
-import type { GraphData as EngineGraphData, GraphCanvas } from "@invana/graph";
+import type {
+	GraphData as EngineGraphData,
+	GraphCanvas,
+	GraphLayer,
+} from "@invana/graph";
 import { Button } from "@invana/ui";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -16,10 +21,6 @@ import {
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
-import {
-	hasWebGPUApi,
-	useWebGPUAvailable,
-} from "../../../hooks/useWebGPUAvailable";
 import {
 	type Interaction,
 	type SpanAttributes,
@@ -39,6 +40,7 @@ import type {
 	NeighborExpandResponse,
 } from "../../../types/traversal";
 import { GraphDetail } from "../components/GraphDetail";
+import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
 import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
 	type CanvasBackend,
@@ -61,6 +63,33 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
+
+// Map query-result items (vertices / edges) to the canvas engine's GraphData
+// shape: the label rides as `type` (colour-by-label + the Inspector's Type row)
+// and the properties as `data`. Shared by the full-paint seed and the
+// incremental node-expand append (RFC-035).
+function adaptItems(items: QueryResultItem[]): EngineGraphData {
+	const nodes: EngineGraphData["nodes"] = [];
+	const edges: EngineGraphData["edges"] = [];
+	for (const item of items) {
+		if (item.type === "vertex") {
+			nodes.push({
+				id: String(item.id),
+				type: item.label,
+				data: item.properties,
+			});
+		} else if (item.type === "edge") {
+			edges.push({
+				id: String(item.id),
+				source: String(item.source),
+				target: String(item.target),
+				type: item.label,
+				data: item.properties,
+			});
+		}
+	}
+	return { nodes, edges };
+}
 
 export function ExplorerPage() {
 	const { username, graphSlug } = useParams<{
@@ -134,7 +163,28 @@ export function ExplorerPage() {
 	);
 	const llmProviders = llmProvidersResponse?.items ?? [];
 
+	// Full current canvas contents — drives the Inspector (`allItems` / `selected`)
+	// and the seed re-fed to a freshly-mounted canvas (e.g. on a backend remount).
+	// A fresh query *replaces* it; a node-expand *appends* to it (RFC-035).
 	const [canvasData, setCanvasData] = useState<QueryResultItem[]>([]);
+	// Mirror in a ref so the imperative expand path and the backend-remount reseed
+	// can read the latest contents without re-deriving the GraphLayer seed.
+	const canvasDataRef = useRef<QueryResultItem[]>([]);
+	useEffect(() => {
+		canvasDataRef.current = canvasData;
+	}, [canvasData]);
+
+	// What `<GraphLayer data>` is seeded/replaced with. Its *reference* only changes
+	// on a full repaint (fresh query / load-to-canvas / restore) or a backend
+	// remount — never on a node-expand, which appends straight to the live store
+	// (the non-destructive path) so existing node positions survive. Re-feeding the
+	// whole dataset here would call the destructive `setData`, wiping every position
+	// and re-laying the graph out from the origin on each expand.
+	const [seedData, setSeedData] = useState<EngineGraphData>({
+		nodes: [],
+		edges: [],
+	});
+
 	// Per-message query results (RFC-033): transient, keyed by assistant message
 	// id, populated on send/rerun and rendered inline in the thread.
 	const [resultsByMessageId, setResultsByMessageId] = useState<
@@ -162,62 +212,32 @@ export function ExplorerPage() {
 	const [magnet, setMagnet] = useState(true);
 	const toggleMagnet = useCallback(() => setMagnet((m) => !m), []);
 
-	// Render backend (PixiJS). Defaults to WebGPU when the device supports it,
-	// else WebGL. The header switcher lets a user pin WebGL explicitly; the choice
-	// persists across reloads.
-	const webgpuAvailable = useWebGPUAvailable();
+	// Render backend (PixiJS). Defaults to WebGPU when the device can select it
+	// (`canUseWebGPU` — API present and not WebKit), else WebGL. The header switcher
+	// lets a user pin WebGL explicitly; the choice persists across reloads. The
+	// engine itself downgrades/retries to WebGL at init if WebGPU can't actually
+	// initialise (e.g. a blocklisted adapter), so no runtime fallback is needed here.
 	const [backend, setBackendState] = useState<CanvasBackend>(() => {
 		const saved = localStorage.getItem(BACKEND_STORAGE_KEY);
 		if (saved === "webgl") return "webgl";
-		return hasWebGPUApi() ? "webgpu" : "webgl";
+		return canUseWebGPU() ? "webgpu" : "webgl";
 	});
+	// Switching the backend remounts the canvas (ExplorerCanvas keys on `backend`),
+	// which rebuilds the store from the GraphLayer seed. Reseed with the full
+	// current contents first — including node-expand additions, which were appended
+	// straight to the store and so aren't in the paint-only `seedData` — so nothing
+	// is lost across the switch.
 	const setBackend = useCallback((b: CanvasBackend) => {
 		localStorage.setItem(BACKEND_STORAGE_KEY, b);
+		setSeedData(adaptItems(canvasDataRef.current));
 		setBackendState(b);
 	}, []);
-	// If WebGPU turns out to be unusable (API present but no adapter), fall back to
-	// WebGL so we never sit on a backend that can't initialise.
-	useEffect(() => {
-		if (!webgpuAvailable && backend === "webgpu") setBackendState("webgl");
-	}, [webgpuAvailable, backend]);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const selected: QueryResultItem | null = selectedId
 		? (canvasData.find((i) => String(i.id) === selectedId) ?? null)
 		: null;
-
-	// Adapt query results to the canvas engine's GraphData shape, carrying the
-	// label (as `type`, for colour-by-label + the Inspector's Type row) and
-	// properties (as `data`).
-	const graphData = useMemo<EngineGraphData>(() => {
-		// `explorer.adapt` span (RFC-025) — time mapping query results to the
-		// canvas's GraphData shape. No-ops when there's no active run.
-		return measureSync(runRef.current, "explorer.adapt", (span) => {
-			const nodes: EngineGraphData["nodes"] = [];
-			const edges: EngineGraphData["edges"] = [];
-			for (const item of canvasData) {
-				if (item.type === "vertex") {
-					nodes.push({
-						id: String(item.id),
-						type: item.label,
-						data: item.properties,
-					});
-				} else if (item.type === "edge") {
-					edges.push({
-						id: String(item.id),
-						source: String(item.source),
-						target: String(item.target),
-						type: item.label,
-						data: item.properties,
-					});
-				}
-			}
-			span?.setAttribute("explorer.node_count", nodes.length);
-			span?.setAttribute("explorer.edge_count", edges.length);
-			return { nodes, edges };
-		});
-	}, [canvasData]);
 
 	// The engine resolves capabilities from the live connector and returns
 	// them on the connection payload. Default to the first language it
@@ -251,8 +271,19 @@ export function ExplorerPage() {
 			}
 			const nodes = [...nodeMap.values()];
 			const edges = [...edgeMap.values()];
-			setCanvasData([...nodes, ...edges]);
+			const items = [...nodes, ...edges];
+			setCanvasData(items);
 			setSelectedId(null);
+			// Replace the canvas seed (full repaint → destructive setData + relayout).
+			// `explorer.adapt` span (RFC-025) — time mapping results to GraphData.
+			setSeedData(
+				measureSync(runRef.current, "explorer.adapt", (adaptSpan) => {
+					const seed = adaptItems(items);
+					adaptSpan?.setAttribute("explorer.node_count", seed.nodes.length);
+					adaptSpan?.setAttribute("explorer.edge_count", seed.edges.length);
+					return seed;
+				}),
+			);
 			span?.setAttribute("explorer.raw_nodes", data.nodes.length);
 			span?.setAttribute("explorer.raw_edges", data.edges.length);
 			span?.setAttribute("explorer.node_count", nodes.length);
@@ -261,23 +292,47 @@ export function ExplorerPage() {
 	}, []);
 
 	// ── Node expand / graph traversal (RFC-035) ────────────────────────────────
-	// Merge expanded neighbours into the existing canvas (dedupe by id) rather
-	// than replacing it — expansion is additive. New `canvasData` ref flows
-	// through `graphData` → GraphLayer → the d3-force relayout.
-	const handleExpandResult = useCallback((res: NeighborExpandResponse) => {
-		setCanvasData((prev) => {
-			const byId = new Map(prev.map((i) => [String(i.id), i]));
+	// Append expanded neighbours straight to the live store (the non-destructive
+	// path) rather than re-feeding the whole dataset through `<GraphLayer data>`,
+	// which calls the destructive `setData` — wiping every node's position and
+	// re-laying the graph out from the origin on each expand. `store.addData`
+	// flushes once and emits `data:changed (addedNodes>0)`, which the engine's
+	// active-layout wiring projects into an *incremental* d3-force re-run seeded
+	// from current positions: placed nodes stay put, only the new neighbours fan
+	// out. (Pattern from canvas-react's streaming-demo story.) `canvasData` (the
+	// Inspector list) is merged in parallel so the right panel sees the additions.
+	const handleExpandResult = useCallback(
+		(res: NeighborExpandResponse) => {
+			const store = canvas?.layers.get<GraphLayer>("graph")?.store;
+			// Genuinely-new items only — `store.addData` uses `addNode`, which throws
+			// on a duplicate id, so drop anything already in the store (a re-returned
+			// origin node / shared neighbour) and any id repeated within this response
+			// (path-style results echo shared endpoints).
+			const seenNodes = new Set<string>();
+			const seenEdges = new Set<string>();
+			const newItems: QueryResultItem[] = [];
 			for (const n of res.data.nodes) {
 				const id = String(n.id);
-				if (!byId.has(id)) byId.set(id, { ...n, type: "vertex" });
+				if (seenNodes.has(id) || store?.hasNode(id)) continue;
+				seenNodes.add(id);
+				newItems.push({ ...n, type: "vertex" });
 			}
 			for (const e of res.data.edges) {
 				const id = String(e.id);
-				if (!byId.has(id)) byId.set(id, { ...e, type: "edge" });
+				if (seenEdges.has(id) || store?.hasEdge(id)) continue;
+				seenEdges.add(id);
+				newItems.push({ ...e, type: "edge" });
 			}
-			return [...byId.values()];
-		});
-	}, []);
+			if (newItems.length === 0) return;
+			// Inspector list — additive.
+			setCanvasData((prev) => [...prev, ...newItems]);
+			// Append to the live store → incremental relayout, positions preserved.
+			// When the canvas isn't live yet there's no store; the canvasData merge
+			// above still lands and the next paint/remount seeds it.
+			if (store) store.addData(adaptItems(newItems));
+		},
+		[canvas],
+	);
 
 	const expand = useExpandNode(username, graphSlug);
 	const runExpand = useCallback(
@@ -434,8 +489,9 @@ export function ExplorerPage() {
 	// lives in the header, so the canvas fills the main area edge-to-edge.
 	const canvasContent = (
 		<div className="relative w-full h-full overflow-hidden">
+			<RendererCapabilityBanner />
 			<ExplorerCanvas
-				data={graphData}
+				data={seedData}
 				onReady={handleReady}
 				onViewTargetChange={setSelectedId}
 				magnet={magnet}

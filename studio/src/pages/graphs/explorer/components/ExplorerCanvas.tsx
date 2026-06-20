@@ -41,6 +41,7 @@ import {
 	ToolbarItems,
 	type UseClipboardResult,
 	WheelZoomBehaviour,
+	canUseWebGPU,
 	useCanvas,
 	useClipboard,
 	useGraphCanvas,
@@ -99,7 +100,6 @@ import {
 	ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { useWebGPUAvailable } from "../../../../hooks/useWebGPUAvailable";
 import {
 	type InteractionRef,
 	endInteraction,
@@ -128,9 +128,10 @@ export interface ExpandMenuHandlers {
 // `<Canvas config>` prop so the option objects stay precisely typed.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
 
-// PixiJS render backend. Both `@invana/canvas-react` and the Explorer (see
-// ExplorerPage) default to `"webgpu"`, with PixiJS falling back to WebGL when
-// WebGPU is unavailable — the header switcher lets a user flip between them at runtime.
+// PixiJS render backend. The Explorer (see ExplorerPage) defaults to `"webgpu"`
+// when the browser can use it (`canUseWebGPU` — WebGPU API present and not
+// WebKit, where PixiJS WebGPU crashes), else `"webgl"`. The header switcher lets
+// a user flip between them at runtime; the WebGPU option is disabled when unusable.
 export type CanvasBackend = "webgl" | "webgpu";
 const BACKEND_LABEL: Record<CanvasBackend, string> = {
 	webgl: "WebGL",
@@ -911,9 +912,10 @@ function HeaderToolbarItems({
 	// Live engine — the toolbar only renders once it's live, so this is non-null.
 	const canvas = useCanvas();
 
-	// Gate the WebGPU switch on actual device support — if no adapter resolves,
-	// the option is disabled so users can't pick a backend that won't initialise.
-	const webgpuAvailable = useWebGPUAvailable();
+	// Gate the WebGPU switch on whether this browser can select WebGPU at all
+	// (`canUseWebGPU` — API present and not WebKit, where PixiJS WebGPU crashes).
+	// The engine still downgrades to WebGL at init if the adapter can't initialise.
+	const webgpuAvailable = canUseWebGPU();
 
 	// Selection mode (click / brush / lasso). Single source of truth for the
 	// canvas: picking one arms its drag-select behaviour and disables the others.
