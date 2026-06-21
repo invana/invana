@@ -43,6 +43,7 @@ import { GraphDetail } from "../components/GraphDetail";
 import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
 import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
+	ACTIVE_LAYOUT_ID,
 	type CanvasBackend,
 	type ExpandMenuSchema,
 	ExplorerCanvas,
@@ -296,11 +297,22 @@ export function ExplorerPage() {
 	// path) rather than re-feeding the whole dataset through `<GraphLayer data>`,
 	// which calls the destructive `setData` — wiping every node's position and
 	// re-laying the graph out from the origin on each expand. `store.addData`
-	// flushes once and emits `data:changed (addedNodes>0)`, which the engine's
-	// active-layout wiring projects into an *incremental* d3-force re-run seeded
-	// from current positions: placed nodes stay put, only the new neighbours fan
-	// out. (Pattern from canvas-react's streaming-demo story.) `canvasData` (the
-	// Inspector list) is merged in parallel so the right panel sees the additions.
+	// flushes once and emits `data:changed (addedNodes>0)`, which re-runs the
+	// active layout (d3-force, seeded from each node's *current* position).
+	//
+	// The catch: a brand-new node has no stored position, so it's born at the
+	// world origin (0,0). The existing graph, however, has already been laid out
+	// and framed *away* from the origin — so every new neighbour spawns in the
+	// same empty spot, and a single seeded force pass can't drag them across the
+	// canvas to their parent before it settles: they stay piled on that one point.
+	// (The canvas-react streaming-demo dodges this only because its graph lives
+	// permanently at the origin under a continuously-running live sim.)
+	//
+	// Fix: birth each new node *next to the existing node it attaches to* (an even
+	// ring around that anchor), so it spawns where it belongs. d3-force then just
+	// relaxes the ring locally — placed nodes stay put, neighbours fan out from
+	// their parent. `canvasData` (the Inspector list) is merged in parallel so the
+	// right panel sees the additions.
 	const handleExpandResult = useCallback(
 		(res: NeighborExpandResponse) => {
 			const store = canvas?.layers.get<GraphLayer>("graph")?.store;
@@ -310,11 +322,13 @@ export function ExplorerPage() {
 			// (path-style results echo shared endpoints).
 			const seenNodes = new Set<string>();
 			const seenEdges = new Set<string>();
+			const newNodeIds = new Set<string>();
 			const newItems: QueryResultItem[] = [];
 			for (const n of res.data.nodes) {
 				const id = String(n.id);
 				if (seenNodes.has(id) || store?.hasNode(id)) continue;
 				seenNodes.add(id);
+				newNodeIds.add(id);
 				newItems.push({ ...n, type: "vertex" });
 			}
 			for (const e of res.data.edges) {
@@ -326,10 +340,64 @@ export function ExplorerPage() {
 			if (newItems.length === 0) return;
 			// Inspector list — additive.
 			setCanvasData((prev) => [...prev, ...newItems]);
-			// Append to the live store → incremental relayout, positions preserved.
 			// When the canvas isn't live yet there's no store; the canvasData merge
 			// above still lands and the next paint/remount seeds it.
-			if (store) store.addData(adaptItems(newItems));
+			if (!store) return;
+
+			// Anchor each new node to the *existing* endpoint of a connecting edge —
+			// the node it was expanded from. (Edges among the new nodes themselves
+			// are ignored here; those settle under the force pass.)
+			const anchorOf = new Map<string, string>();
+			for (const e of res.data.edges) {
+				const s = String(e.source);
+				const t = String(e.target);
+				if (newNodeIds.has(t) && !anchorOf.has(t) && store.hasNode(s))
+					anchorOf.set(t, s);
+				if (newNodeIds.has(s) && !anchorOf.has(s) && store.hasNode(t))
+					anchorOf.set(s, t);
+			}
+
+			// Birth new nodes on an even ring around their anchor's current position,
+			// distributing siblings of the same anchor around the circle so they don't
+			// stack. The ring is sized to *hold* them: a hub with many neighbours gets
+			// a wider ring (circumference ≥ one node-spacing per leaf), so a dense fan
+			// starts pre-separated and the force pass just relaxes it instead of having
+			// to shove 40 overlapping nodes apart from a tight cluster. Nodes with no
+			// resolved anchor (rare — a disconnected return) keep the default origin.
+			const MIN_RING_RADIUS = 80;
+			const NODE_SPACING = 52; // ≈ 2 × collide radius; arc length wanted per leaf
+			const ringSeen = new Map<string, number>();
+			const ringTotal = new Map<string, number>();
+			for (const id of newNodeIds) {
+				const a = anchorOf.get(id);
+				if (a) ringTotal.set(a, (ringTotal.get(a) ?? 0) + 1);
+			}
+			const seed = adaptItems(newItems);
+			for (const node of seed.nodes) {
+				const anchorId = anchorOf.get(node.id);
+				if (!anchorId) continue;
+				const base = store.getPosition(anchorId);
+				if (!base) continue;
+				const total = ringTotal.get(anchorId) ?? 1;
+				const i = ringSeen.get(anchorId) ?? 0;
+				ringSeen.set(anchorId, i + 1);
+				const radius = Math.max(
+					MIN_RING_RADIUS,
+					(NODE_SPACING * total) / (2 * Math.PI),
+				);
+				const angle = (2 * Math.PI * i) / total;
+				node.position = {
+					x: base.x + radius * Math.cos(angle),
+					y: base.y + radius * Math.sin(angle),
+				};
+			}
+
+			// Append, then relax: d3-force seeds from the ring positions we just set,
+			// so existing nodes stay put and the new neighbours spread around their
+			// anchor. (`runLayout` is explicit rather than leaning on the engine's
+			// data:changed → active-layout wiring, so the re-layout is guaranteed.)
+			store.addData(seed);
+			void canvas?.runLayout(ACTIVE_LAYOUT_ID);
 		},
 		[canvas],
 	);

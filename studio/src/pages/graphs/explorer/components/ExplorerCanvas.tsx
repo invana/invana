@@ -151,20 +151,30 @@ const PALETTE = [
 ] as const;
 
 // Forces for the registered active layout (run on every query repaint by
-// `<AutoLayoutBridge>`). `animate: true` (the d3-force default) writes positions
-// back on every tick, so a fresh query's nodes fan out from the origin instead
-// of snapping into place — the settling motion reads as "the graph loading".
+// `<AutoLayoutBridge>` and on every node-expand). `animate: true` writes
+// positions back on every tick, so the simulation visibly settles — a fresh
+// query fans out and an expand's new neighbours slide into place rather than
+// snapping — which reads as the graph living/relaxing.
+//
+// Spacing is tuned for hub-and-spoke shapes (expand a node and you get N leaves
+// all tied to one parent): `collide.radius` is the hard floor on node spacing —
+// keep it well above the 8px node radius (plus the bottom label) so a dense fan
+// of neighbours can't pile on top of each other — and `link.distance` is the
+// rest length each edge relaxes to, set large enough that many leaves fit around
+// their hub instead of crushing onto a tight ring. `collide.iterations` firms up
+// the separation when many nodes contend for the same space.
 const FORCE_OPTS = {
-	animate: false,
-	charge: { strength: -300 },
-	link: { distance: 80 },
+	animate: true,
+	charge: { strength: -400 },
+	link: { distance: 120 },
 	center: { x: 0, y: 0 },
-	collide: { radius: 14 },
+	collide: { radius: 26, iterations: 2 },
 };
 
 // Id of the registered active layout — shared by the `<D3ForceLayout>` that
-// registers it and the `<AutoLayoutBridge>` that runs it on data change.
-const ACTIVE_LAYOUT_ID = "d3-force-active";
+// registers it, the `<AutoLayoutBridge>` that runs it on data change, and the
+// node-expand append in ExplorerPage, which re-runs it to lay out new neighbours.
+export const ACTIVE_LAYOUT_ID = "d3-force-active";
 
 // Theme-independent settings, keyed by instance id. Theme-driven colours live in
 // APP_LIGHT/APP_DARK and are pushed via `useGraphCanvasUpdate` by `<ThemeBridge>`.
