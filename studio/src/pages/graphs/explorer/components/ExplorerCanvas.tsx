@@ -43,6 +43,7 @@ import {
 	WheelZoomBehaviour,
 	canUseWebGPU,
 	useCanvas,
+	useCanvasEvent,
 	useClipboard,
 	useGraphCanvas,
 	useGraphCanvasUpdate,
@@ -156,19 +157,30 @@ const PALETTE = [
 // query fans out and an expand's new neighbours slide into place rather than
 // snapping — which reads as the graph living/relaxing.
 //
-// Spacing is tuned for hub-and-spoke shapes (expand a node and you get N leaves
-// all tied to one parent): `collide.radius` is the hard floor on node spacing —
-// keep it well above the 8px node radius (plus the bottom label) so a dense fan
-// of neighbours can't pile on top of each other — and `link.distance` is the
-// rest length each edge relaxes to, set large enough that many leaves fit around
-// their hub instead of crushing onto a tight ring. `collide.iterations` firms up
-// the separation when many nodes contend for the same space.
+// Tuned for hub-and-spoke shapes (expand a node → N leaves on one parent) that
+// are themselves linked into a larger graph, balancing two competing pulls:
+//   - `charge.strength` repels nodes so a hub's leaves spread out, but
+//     `charge.distanceMax` *caps that to a local radius* — without it, every
+//     node repels every other at any distance, so whole clusters shove each
+//     other to opposite corners with vast empty gaps between them. Capped, the
+//     repulsion only un-piles nearby leaves; distant clusters feel nothing and
+//     stay pulled together by their connecting edges.
+//   - `link.distance` is the edge rest length (kept short so clusters sit close)
+//     and `collide.radius` is the hard floor on node spacing — above the 8px
+//     node radius plus its bottom label so a dense fan can't overlap.
+// `alphaDecay` / `alphaMin` cool the sim quickly (~90 ticks vs. d3's ~300) so it
+// settles in a beat instead of drifting for seconds; `velocityDecay` damps
+// overshoot. Cheap because new nodes are pre-placed near their anchor (see the
+// expand handler), so the sim only has to relax locally.
 const FORCE_OPTS = {
 	animate: true,
-	charge: { strength: -400 },
-	link: { distance: 120 },
+	charge: { strength: -300, distanceMax: 260 },
+	link: { distance: 70 },
 	center: { x: 0, y: 0 },
-	collide: { radius: 26, iterations: 2 },
+	collide: { radius: 18 },
+	alphaDecay: 0.05,
+	alphaMin: 0.01,
+	velocityDecay: 0.5,
 };
 
 // Id of the registered active layout — shared by the `<D3ForceLayout>` that
@@ -720,6 +732,28 @@ function AutoLayoutBridge({
 	return null;
 }
 
+/**
+ * Freezes the active force layout the instant the pointer presses on a node or
+ * edge. With `animate: true` the simulation keeps nudging nodes for a few
+ * seconds after a query / expand, so a node can drift out from under the cursor
+ * between aiming and clicking — the right-click hit-test then misses and the node
+ * context menu (Load neighbors, …) never opens. `*:pointerdown` fires *before*
+ * `contextmenu`, so stopping the sim there pins everything where it is and the
+ * press, release and menu all resolve to the same node. The next query / expand
+ * re-runs the layout (a fresh `apply()`), so this only ends the current settle.
+ */
+function FreezeLayoutOnInteractionBridge() {
+	const canvas = useCanvas();
+	const stop = useCallback(() => {
+		(
+			canvas.layouts.get(ACTIVE_LAYOUT_ID) as { stop?: () => void } | undefined
+		)?.stop?.();
+	}, [canvas]);
+	useCanvasEvent("shape:pointerdown", stop);
+	useCanvasEvent("connector:pointerdown", stop);
+	return null;
+}
+
 /** Follows studio's theme: pushes the matching colour patch via `update()`. */
 function ThemeBridge() {
 	const { isDark } = useTheme();
@@ -810,6 +844,7 @@ export function ExplorerCanvas({
 				options={FORCE_OPTS}
 			/>
 			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
+			<FreezeLayoutOnInteractionBridge />
 
 			<ThemeBridge />
 

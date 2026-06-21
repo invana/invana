@@ -364,8 +364,8 @@ export function ExplorerPage() {
 			// starts pre-separated and the force pass just relaxes it instead of having
 			// to shove 40 overlapping nodes apart from a tight cluster. Nodes with no
 			// resolved anchor (rare — a disconnected return) keep the default origin.
-			const MIN_RING_RADIUS = 80;
-			const NODE_SPACING = 52; // ≈ 2 × collide radius; arc length wanted per leaf
+			const MIN_RING_RADIUS = 60;
+			const NODE_SPACING = 40; // ≈ 2 × collide radius; arc length wanted per leaf
 			const ringSeen = new Map<string, number>();
 			const ringTotal = new Map<string, number>();
 			for (const id of newNodeIds) {
