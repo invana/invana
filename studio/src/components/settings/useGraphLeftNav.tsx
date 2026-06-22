@@ -10,7 +10,7 @@ import {
 	Sparkles,
 	Wand2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UserMenu } from "../header/UserMenu";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 
@@ -59,6 +59,7 @@ export function useGraphLeftNav(
 	activeTab: ActiveTab,
 ) {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const settingsPanel = useSettingsPanel();
 	const root = `/u/${username}/${graphSlug}`;
 
@@ -67,10 +68,22 @@ export function useGraphLeftNav(
 	const activeClass = (active: boolean) =>
 		`my-1.5 ${active ? "bg-accent text-accent-foreground" : ""}`;
 
-	// Navigating to a view should also clear ?settings so the leftSection
-	// shows the view's own content (SessionsPanel / SchemaNav / wizard).
+	// Navigating to a view clears ?settings so the leftSection shows the view's
+	// own content (SessionsPanel / SchemaNav / wizard).
+	//
+	// Clicking the rail icon for the view you're ALREADY on re-opens its left
+	// panel — but must not disturb the right (inspector) panel. So for a same-view
+	// click, only drop `settings` + `sessions` and keep everything else (notably
+	// `inspector=closed`); a different-view click navigates fresh.
 	const goToView = (path: string) => {
-		navigate(path);
+		if (location.pathname === path) {
+			const next = new URLSearchParams(location.search);
+			next.delete("settings");
+			next.delete("sessions");
+			navigate({ pathname: path, search: next.toString() }, { replace: true });
+		} else {
+			navigate(path);
+		}
 	};
 
 	const topNavItems = [

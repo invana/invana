@@ -122,6 +122,7 @@ export function ExplorerPage() {
 		send,
 		rerun,
 		fetchContext,
+		setFeedback,
 		stop,
 		refresh,
 		setPinned,
@@ -130,33 +131,33 @@ export function ExplorerPage() {
 		backToList,
 	} = useSessions(username, graphSlug);
 
-	// Collapsed state lives in the URL (`?sessions=closed` for the left panel,
-	// `?inspector=closed` for the right), mirroring the Settings panel
-	// convention. Each panel's header collapse control sets its param; a re-open
-	// button in the header (shown only while collapsed) clears it. The left panel
-	// also re-opens via the left-rail Explorer icon, which drops the query string.
+	// Panel state lives in the URL. The left (sessions) panel defaults OPEN
+	// (`?sessions=closed` hides it). The right (inspector / property detail) panel
+	// defaults CLOSED — it's only useful with a node selected, so it stays out of
+	// the way until the user opens it (`?inspector=open`); navigating to Explorer
+	// never auto-opens it.
 	const [searchParams, setSearchParams] = useSearchParams();
 	const sessionsClosed = searchParams.get("sessions") === "closed";
-	const inspectorClosed = searchParams.get("inspector") === "closed";
+	const inspectorClosed = searchParams.get("inspector") !== "open";
 	const setPanelParam = useCallback(
-		(key: string, closed: boolean) => {
+		(key: string, value: string | null) => {
 			const next = new URLSearchParams(searchParams);
-			if (closed) next.set(key, "closed");
-			else next.delete(key);
+			if (value === null) next.delete(key);
+			else next.set(key, value);
 			setSearchParams(next, { replace: true });
 		},
 		[searchParams, setSearchParams],
 	);
 	const closeSessions = useCallback(
-		() => setPanelParam("sessions", true),
+		() => setPanelParam("sessions", "closed"),
 		[setPanelParam],
 	);
 	const closeInspector = useCallback(
-		() => setPanelParam("inspector", true),
+		() => setPanelParam("inspector", null),
 		[setPanelParam],
 	);
 	const openInspector = useCallback(
-		() => setPanelParam("inspector", false),
+		() => setPanelParam("inspector", "open"),
 		[setPanelParam],
 	);
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
@@ -235,11 +236,39 @@ export function ExplorerPage() {
 		setBackendState(b);
 	}, []);
 
+	// Collapsing/expanding the sessions panel flips AppLayoutV2's `leftSection`
+	// between present/absent, which moves the canvas to a different parent and
+	// remounts it — rebuilding the store from the GraphLayer seed and so dropping
+	// node-expand additions (those live only in the store, not in `seedData`).
+	// Reseed with the full current contents whenever the panel toggles, mirroring
+	// the backend-switch reseed above, so the remounted canvas keeps the whole
+	// graph. Skips the initial mount. (Re-open can come from outside this page —
+	// the left rail — so we key off the state, not a single handler.)
+	const sessionsToggleSeen = useRef(false);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: fire on the sessionsClosed toggle; reseed reads the latest contents from the ref
+	useEffect(() => {
+		if (!sessionsToggleSeen.current) {
+			sessionsToggleSeen.current = true;
+			return;
+		}
+		setSeedData(adaptItems(canvasDataRef.current));
+	}, [sessionsClosed]);
+
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const selected: QueryResultItem | null = selectedId
 		? (canvasData.find((i) => String(i.id) === selectedId) ?? null)
 		: null;
+
+	// "Node details" / "Edge details" context-menu items — select the element and
+	// open the (default-closed) inspector so its properties show on the right.
+	const handleShowDetail = useCallback(
+		(id: string) => {
+			setSelectedId(id);
+			openInspector();
+		},
+		[openInspector],
+	);
 
 	// The engine resolves capabilities from the live connector and returns
 	// them on the connection payload. Default to the first language it
@@ -567,6 +596,7 @@ export function ExplorerPage() {
 				interactionRef={runRef}
 				backend={backend}
 				expand={expandHandlers}
+				onShowDetail={handleShowDetail}
 			/>
 			{fineTuneVertex && (
 				<ExpandFineTunePanel
@@ -599,6 +629,7 @@ export function ExplorerPage() {
 			onBack={backToList}
 			onRerun={handleRerun}
 			onFetchContext={fetchContext}
+			onSetFeedback={setFeedback}
 			results={resultsByMessageId}
 			onLoadToCanvas={handleLoadToCanvas}
 			onRefresh={refresh}

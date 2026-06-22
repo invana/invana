@@ -244,6 +244,31 @@ export function useSessions(
 	const fetchContext = (messageId: string) =>
 		sessionsApi.getMessageContext(u, g, activeSessionId ?? "", messageId);
 
+	// Record a 👍/👎 vote on a reply (RFC-038/039). Optimistic so the thumb
+	// highlights instantly; revert by refetch on failure.
+	const setFeedback = async (
+		messageId: string,
+		value: "up" | "down" | null,
+	) => {
+		if (!activeSessionId) return;
+		const id = activeSessionId;
+		patchDetail(id, (prev) =>
+			prev
+				? {
+						...prev,
+						messages: prev.messages.map((m) =>
+							m.id === messageId ? { ...m, feedback: value ?? undefined } : m,
+						),
+					}
+				: prev,
+		);
+		try {
+			await sessionsApi.setFeedback(u, g, id, messageId, value);
+		} catch {
+			qc.invalidateQueries({ queryKey: detailKey(id) });
+		}
+	};
+
 	// Cancel the in-flight run (the composer's stop control). The send/rerun
 	// catch paths handle the resulting abort.
 	const stop = () => abortRef.current?.abort();
@@ -276,6 +301,7 @@ export function useSessions(
 		send,
 		rerun,
 		fetchContext,
+		setFeedback,
 		stop,
 		refresh,
 		setPinned,

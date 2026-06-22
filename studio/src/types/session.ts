@@ -44,6 +44,12 @@ export interface SessionMessage {
 	language?: QueryLanguage;
 	/** The query that produced this reply, so it can be re-run. */
 	sourceQuery?: string;
+	/** NL clarification only — answer options the user can pick instead of
+	 *  retyping (RFC-038). Present when the reply is a clarifying question. */
+	clarificationOptions?: string[];
+	/** 👍/👎 on this reply — a capture signal for refining understanding
+	 *  (RFC-038/039). Undefined = no vote. */
+	feedback?: "up" | "down";
 }
 
 /** One prior turn in the conversation context sent to the model (RFC-036/040) —

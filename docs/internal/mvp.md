@@ -378,6 +378,11 @@ Extension of § 5.7: NL translation replays a bounded window of the session's pr
 - **Backend:** [ ] Persist the model `rationale` on the assistant message (nullable column). `send_message` loads the last ~6 ok turns (nl + ql) and passes them as `history=` to the already-history-ready `nl_to_query`. No re-run change (re-run never calls the LLM).
 - **Frontend / Integrations:** none — engine-only. Detail: [`mvp/rfc-036-nl-conversation-context.md`](mvp/rfc-036-nl-conversation-context.md).
 
+### 5.7b Explorer NL clarification + feedback — RFC-038 / RFC-039 (forward slice)
+Pulled forward from L6: when an ask is genuinely ambiguous, the model asks a clarifying question (with selectable options — fixed, or data-driven via a read-only enumeration query) instead of guessing; and each NL reply carries 👍/👎 feedback whose downvote triggers a refinement. This is the *capture* front of the RFC-039 learning loop + the clarification half of RFC-038; the rest (memory RFC-037, tunable `user_intents`/aliases, and distil→store→apply→measure) stays deferred. Grounding now also renders authored schema descriptions and caps results (LIMIT 10 default). Detail: [`mvp/rfc-038-query-understanding.md`](mvp/rfc-038-query-understanding.md), [`mvp/rfc-039-self-improving-query-understanding.md`](mvp/rfc-039-self-improving-query-understanding.md).
+- **Backend:** [x] `action=clarify` output (question + options + `options_query`); `clarification_options` + `feedback` columns; `set_feedback`; descriptions in grounding; result cap.
+- **Frontend:** [x] selectable option buttons + "let me type"; 👍/👎 + downvote-refine; context disclosure renders clarification turns.
+
 ---
 
 ## Layer 6 — Intelligence (Agents · LLM grounding · Success scoring)

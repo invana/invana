@@ -96,6 +96,9 @@ export interface SessionComposerProps {
 	sessionKey?: string | null;
 	/** Mode/model to restore for the open session; null until derivable. */
 	initialConfig?: ComposerConfig | null;
+	/** Bump to focus the input — e.g. when the user picks "let me type instead"
+	 *  on a clarification (RFC-038). Ignored at 0 (initial). */
+	focusSignal?: number;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -114,6 +117,7 @@ export function SessionComposer({
 	sessionKey,
 	initialConfig,
 	promptHistory,
+	focusSignal,
 }: SessionComposerProps) {
 	const [mode, setMode] = useState<QueryMode>("nl");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
@@ -124,6 +128,7 @@ export function SessionComposer({
 
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
+	const nlTextareaRef = useRef<HTMLTextAreaElement>(null);
 	const languageCompartmentRef = useRef(new Compartment());
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Lets the CodeMirror Enter keybinding (wired once on mount) call the
@@ -180,6 +185,12 @@ export function SessionComposer({
 	};
 	// The session we've already restored the mode/model for — guards against
 	// re-applying over the user's manual switches within the same session.
+	// Focus the NL input when the parent bumps focusSignal (e.g. "let me type
+	// instead" on a clarification). 0 is the initial value — don't focus on mount.
+	useEffect(() => {
+		if (focusSignal) nlTextareaRef.current?.focus();
+	}, [focusSignal]);
+
 	const appliedSessionRef = useRef<string | null>(null);
 
 	// ── Restore the open session's mode + model once on open (RFC-030) ────────
@@ -390,6 +401,7 @@ export function SessionComposer({
 				</div>
 				{mode === "nl" && (
 					<textarea
+						ref={nlTextareaRef}
 						value={nlQuery}
 						onChange={(e) => {
 							setNlQuery(e.target.value);

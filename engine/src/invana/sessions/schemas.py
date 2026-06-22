@@ -37,6 +37,12 @@ class SessionCreate(BaseModel):
     message: SendMessage | None = None
 
 
+class SetFeedback(BaseModel):
+    """A 👍/👎 vote on an assistant reply (RFC-038/039). ``None`` clears it."""
+
+    value: Literal["up", "down"] | None = None
+
+
 class SessionUpdate(BaseModel):
     """Partial update for a session — rename and/or toggle pin/archive.
 
@@ -68,6 +74,10 @@ class SessionMessageRead(BaseModel):
     via: str | None = None
     query_language: str | None = None
     source_query: str | None = None
+    # NL clarification only — answer options the user can pick (RFC-038).
+    clarification_options: list[str] | None = None
+    # 👍/👎 on this reply (RFC-038/039). "up" | "down" | null.
+    feedback: str | None = None
     row_count: int | None = None
     execution_time_ms: int | None = None
     llm_time_ms: int | None = None

@@ -414,6 +414,8 @@ class SessionMessageView(ModelView):
         "via",
         "query_language",
         "rationale",
+        "clarification_options",
+        "feedback",
         "row_count",
         "execution_time_ms",
         "llm_time_ms",

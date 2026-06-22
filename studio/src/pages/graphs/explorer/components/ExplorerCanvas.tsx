@@ -174,13 +174,21 @@ const PALETTE = [
 // expand handler), so the sim only has to relax locally.
 const FORCE_OPTS = {
 	animate: true,
-	charge: { strength: -300, distanceMax: 260 },
-	link: { distance: 70 },
+	// Looser spacing so dense leaf-fans (expand a hub → hundreds of leaves) spread
+	// out and read as a graph rather than a blob: stronger repulsion over a wider
+	// radius, longer edges, and a bigger hard floor on node spacing (node is 8px +
+	// a bottom label). distanceMax still caps repulsion to a local radius so distant
+	// clusters stay pulled together by their edges instead of flying to the corners.
+	charge: { strength: -520, distanceMax: 420 },
+	link: { distance: 110 },
 	center: { x: 0, y: 0 },
-	collide: { radius: 18 },
-	alphaDecay: 0.05,
-	alphaMin: 0.01,
-	velocityDecay: 0.5,
+	collide: { radius: 28 },
+	// Cool faster + damp harder so the looser forces above still settle quickly
+	// (~45 ticks, not a long drift) — fewer ticks = fewer full repaints, which is
+	// what makes a large expanded graph feel slow while it relaxes.
+	alphaDecay: 0.09,
+	alphaMin: 0.02,
+	velocityDecay: 0.6,
 };
 
 // Id of the registered active layout — shared by the `<D3ForceLayout>` that
@@ -430,6 +438,7 @@ function nodeItems(
 	{ id, canvas }: GraphNodeMenuContext,
 	clip: UseClipboardResult,
 	expand: ExpandMenuHandlers,
+	onShowDetail?: (id: string) => void,
 ): MenuItem[] {
 	const layer = canvas.layers.get<graph.GraphLayer>("graph");
 	if (!layer) return [];
@@ -441,6 +450,15 @@ function nodeItems(
 	const nodeLabel = layer.store.getNode(id)?.type as string | undefined;
 	return [
 		...expandItems(id, nodeLabel, expand),
+		...(onShowDetail
+			? [
+					{
+						id: "detail",
+						label: "Node details",
+						onClick: () => onShowDetail(id),
+					},
+				]
+			: []),
 		{
 			id: "focus",
 			label: "Focus on node",
@@ -503,6 +521,7 @@ function nodeItems(
 function edgeItems(
 	{ id, canvas }: GraphEdgeMenuContext,
 	clip: UseClipboardResult,
+	onShowDetail?: (id: string) => void,
 ): MenuItem[] {
 	const layer = canvas.layers.get<graph.GraphLayer>("graph");
 	if (!layer) return [];
@@ -513,6 +532,15 @@ function edgeItems(
 		if (!select?.isSelected(id)) select?.select(id, "connector");
 	};
 	return [
+		...(onShowDetail
+			? [
+					{
+						id: "detail",
+						label: "Edge details",
+						onClick: () => onShowDetail(id),
+					},
+				]
+			: []),
 		{
 			id: "focus",
 			label: "Focus on edge",
@@ -622,15 +650,21 @@ function backgroundItems(
  * here and threaded into each via a memoised closure. Mounted inside a
  * `<GraphClipboardProvider>` so the buffer + selection wiring resolve.
  */
-function CanvasContextMenus({ expand }: { expand: ExpandMenuHandlers }) {
+function CanvasContextMenus({
+	expand,
+	onShowDetail,
+}: {
+	expand: ExpandMenuHandlers;
+	onShowDetail?: (id: string) => void;
+}) {
 	const clip = useClipboard();
 	const node = useCallback(
-		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip, expand),
-		[clip, expand],
+		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip, expand, onShowDetail),
+		[clip, expand, onShowDetail],
 	);
 	const edge = useCallback(
-		(ctx: GraphEdgeMenuContext) => edgeItems(ctx, clip),
-		[clip],
+		(ctx: GraphEdgeMenuContext) => edgeItems(ctx, clip, onShowDetail),
+		[clip, onShowDetail],
 	);
 	const background = useCallback(
 		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip),
@@ -797,6 +831,9 @@ interface ExplorerCanvasProps {
 	backend: CanvasBackend;
 	/** Node-expand handlers + schema for the right-click "Load neighbors" menu (RFC-035). */
 	expand?: ExpandMenuHandlers;
+	/** Open the right-side detail (Inspector) for a node/edge id — wired to the
+	 *  "Node details" / "Edge details" context-menu items. */
+	onShowDetail?: (id: string) => void;
 }
 
 export function ExplorerCanvas({
@@ -807,6 +844,7 @@ export function ExplorerCanvas({
 	interactionRef,
 	backend,
 	expand,
+	onShowDetail,
 }: ExplorerCanvasProps) {
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
@@ -877,7 +915,7 @@ export function ExplorerCanvas({
 			{/* Right-click menus — wrapped in the clipboard provider so their
 			    Cut / Copy / Paste / Delete items resolve `useClipboard`. */}
 			<GraphClipboardProvider layerId="graph">
-				<CanvasContextMenus expand={expand ?? {}} />
+				<CanvasContextMenus expand={expand ?? {}} onShowDetail={onShowDetail} />
 			</GraphClipboardProvider>
 
 			<InspectorSelectionBridge onViewTargetChange={onViewTargetChange} />

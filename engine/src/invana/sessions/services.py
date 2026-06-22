@@ -76,6 +76,23 @@ def _summary(result: QueryResponse, nodes: int, edges: int) -> str:
     return f"Returned {_plural(result.row_count, 'row')}."
 
 
+def _values_from_result(result: QueryResponse, limit: int = 10) -> list[str]:
+    """First-column values of a tabular result — the picks for a clarification.
+
+    Used to turn a clarification's ``options_query`` (e.g. DISTINCT countries)
+    into concrete options. De-duplicated, capped, order preserved.
+    """
+    out: list[str] = []
+    for row in result.rows or []:
+        value = next(iter(row.values()), None) if row else None
+        text = str(value).strip() if value is not None else ""
+        if text and text not in out:
+            out.append(text)
+        if len(out) >= limit:
+            break
+    return out
+
+
 def _context_turns(rows: list[SessionMessage]) -> list[dict]:
     """Prior successful turns as structured ``{prompt, query, rationale}`` (RFC-036).
 
@@ -184,6 +201,14 @@ async def get_message_or_404(
     if msg is None or msg.session_id != sess.id:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Message not found.")
     return msg
+
+
+async def set_feedback(session: AsyncSession, *, message: SessionMessage, value: str | None) -> SessionMessage:
+    """Record a 👍/👎 vote on an assistant reply (RFC-038/039) — the capture
+    signal the learning loop will later distil. ``None`` clears the vote."""
+    message.feedback = value
+    await session.flush()
+    return message
 
 
 async def get_message_context(session: AsyncSession, *, message: SessionMessage) -> list[dict]:
@@ -398,8 +423,30 @@ async def send_message(
             # and run nothing. No source_query marks this as a clarification turn —
             # _context_turns replays it so the model remembers what it asked when
             # the user answers next.
+            # Prefer data-driven options: run the model's read-only options_query
+            # to offer real values from the graph (e.g. countries). Fall back to
+            # the model's fixed options if it has none or the query fails.
+            options = list(generated.options)
+            if generated.options_query:
+                try:
+                    opt_result = await execute_query(
+                        session,
+                        graph=graph,
+                        manager=manager,
+                        query=generated.options_query,
+                        parameters=None,
+                        actor_id=actor_id,
+                        session_id=sess.id,
+                        timeout_s=payload.timeout_s,
+                    )
+                    fetched = _values_from_result(opt_result)
+                    if fetched:
+                        options = fetched
+                except QueryExecutionError:
+                    pass  # keep the fixed options / question-only
             assistant_msg.status = SessionMessageStatus.ok
             assistant_msg.content = generated.question
+            assistant_msg.clarification_options = options or None
             assistant_msg.via = f"{provider.provider.value} · {provider.model_id}"
             assistant_msg.llm_time_ms = round(generated.duration_ms)
             assistant_msg.timeout_s = payload.timeout_s

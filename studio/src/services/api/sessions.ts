@@ -28,6 +28,8 @@ interface ApiMessage {
 	via?: string | null;
 	query_language?: string | null;
 	source_query?: string | null;
+	clarification_options?: string[] | null;
+	feedback?: "up" | "down" | null;
 	row_count?: number | null;
 	execution_time_ms?: number | null;
 	llm_time_ms?: number | null;
@@ -129,6 +131,8 @@ function toMessage(m: ApiMessage): SessionMessage {
 		timeoutS: m.timeout_s ?? undefined,
 		language: (m.query_language as QueryLanguage | null) ?? undefined,
 		sourceQuery: m.source_query ?? undefined,
+		clarificationOptions: m.clarification_options ?? undefined,
+		feedback: m.feedback ?? undefined,
 	};
 }
 
@@ -261,4 +265,19 @@ export const sessionsApi = {
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/context`,
 			{ signal },
 		),
+
+	// Record (or clear) a 👍/👎 vote on an assistant reply (RFC-038/039).
+	setFeedback: async (
+		username: string,
+		graphSlug: string,
+		id: string,
+		messageId: string,
+		value: "up" | "down" | null,
+	): Promise<SessionMessage> => {
+		const data = await request<ApiMessage>(
+			`${base(username, graphSlug)}/${id}/messages/${messageId}/feedback`,
+			{ method: "POST", body: JSON.stringify({ value }) },
+		);
+		return toMessage(data);
+	},
 };

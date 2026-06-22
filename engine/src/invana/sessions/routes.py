@@ -36,6 +36,7 @@ from invana.sessions.schemas import (
     SessionMessageRead,
     SessionSummary,
     SessionUpdate,
+    SetFeedback,
 )
 from invana.settings import settings
 
@@ -204,6 +205,28 @@ async def message_context(
     message = await services.get_message_or_404(session, message_id=message_id, sess=sess)
     turns = await services.get_message_context(session, message=message)
     return [SessionContextTurn(**t) for t in turns]
+
+
+@sessions_router.post(
+    "/{session_id}/messages/{message_id}/feedback",
+    response_model=SessionMessageRead,
+)
+async def set_message_feedback(
+    payload: SetFeedback,
+    session_id: str = Path(...),
+    message_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SessionMessageRead:
+    """Record (or clear) a 👍/👎 vote on an assistant reply (RFC-038/039)."""
+    sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
+    message = await services.get_message_or_404(session, message_id=message_id, sess=sess)
+    message = await services.set_feedback(session, message=message, value=payload.value)
+    await session.commit()
+    await session.refresh(message)
+    return SessionMessageRead.model_validate(message)
 
 
 @sessions_router.post("/{session_id}/messages/{message_id}/run", response_model=RerunResponse)

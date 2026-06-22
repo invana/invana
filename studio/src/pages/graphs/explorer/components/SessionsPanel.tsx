@@ -22,13 +22,16 @@ import {
 	Info,
 	MessageSquare,
 	PanelLeftClose,
+	Pencil,
 	Pin,
 	RefreshCw,
 	RotateCw,
 	Search,
 	SlidersHorizontal,
+	ThumbsDown,
+	ThumbsUp,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatDuration, formatRelativeTime } from "../../../../lib/time";
 import type { SessionSort } from "../../../../services/api/sessions";
@@ -69,6 +72,8 @@ export interface SessionsPanelProps {
 	/** Fetch the conversation context the model was given for an assistant reply
 	 *  (RFC-036/040) — lazily, when its disclosure is opened. */
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
+	/** Record (or clear) a 👍/👎 vote on a reply (RFC-038/039). */
+	onSetFeedback: (messageId: string, value: "up" | "down" | null) => void;
 	/** Transient per-message query results, keyed by assistant message id (RFC-033). */
 	results: Record<string, QueryResponse | null>;
 	/** Project a graph result onto the canvas. */
@@ -109,6 +114,7 @@ export function SessionsPanel({
 	onBack,
 	onRerun,
 	onFetchContext,
+	onSetFeedback,
 	results,
 	onLoadToCanvas,
 	onRefresh,
@@ -124,6 +130,9 @@ export function SessionsPanel({
 	const [searchOpen, setSearchOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [filterOpen, setFilterOpen] = useState(false);
+	// Bumped to focus the composer when the user picks "let me type instead" on a
+	// clarification (RFC-038).
+	const [composerFocus, setComposerFocus] = useState(0);
 	// LLM providers excluded from the list (client-side). Empty = show all.
 	// Sessions don't record their provider yet, so this filters nothing today —
 	// it's wired ahead of NL queries landing (see Session.llmProviderId).
@@ -146,29 +155,6 @@ export function SessionsPanel({
 		onShowArchivedChange(false);
 		setExcludedLLMs(new Set());
 	};
-
-	const body = inDetail ? (
-		<SessionThread
-			session={activeSession}
-			onBack={onBack}
-			onRerun={onRerun}
-			onFetchContext={onFetchContext}
-			results={results}
-			onLoadToCanvas={onLoadToCanvas}
-		/>
-	) : (
-		<SessionList
-			sessions={sessions}
-			sort={sort}
-			search={searchOpen ? search : ""}
-			searchOpen={searchOpen}
-			onSearchChange={setSearch}
-			onOpen={onOpenSession}
-			excludedLLMs={excludedLLMs}
-			onPin={onPin}
-			onArchive={onArchive}
-		/>
-	);
 
 	// Restore the open session's mode + model from its last assistant reply. The
 	// engine persists `mode` ("nl" | "ql") per message, so we read it directly —
@@ -218,6 +204,65 @@ export function SessionsPanel({
 		[activeSession],
 	);
 
+	// Clicking a clarification option sends it as the next NL ask (RFC-038): it
+	// re-translates with the clarification now in context and runs. Reuses the
+	// session's resolved nl config (provider/timeout), like the composer would.
+	const handleSelectOption = (text: string) => {
+		const providerId =
+			composerConfig?.mode === "nl" ? composerConfig.llmProviderId : undefined;
+		const llmProviderId = providerId ?? llmProviders[0]?.id;
+		if (!llmProviderId) return;
+		onRun({
+			mode: "nl",
+			query: text,
+			llmProviderId,
+			attachments: [],
+			timeoutS: composerConfig?.timeoutS ?? 120,
+		});
+	};
+
+	// "Let me type instead" on a clarification — focus the composer so the user
+	// answers in their own words (RFC-038).
+	const handleTypeInstead = () => setComposerFocus((n) => n + 1);
+
+	// 👍/👎 a reply (RFC-038/039). A downvote also kicks off a refinement: it
+	// sends a follow-up NL turn so the model asks what to change (with options),
+	// re-translating with this reply now in context. Clearing a vote doesn't.
+	const handleVote = (messageId: string, value: "up" | "down" | null) => {
+		onSetFeedback(messageId, value);
+		if (value === "down") {
+			handleSelectOption(
+				"That's not what I'm looking for. What can I change to get it right? Offer a few options.",
+			);
+		}
+	};
+
+	const body = inDetail ? (
+		<SessionThread
+			session={activeSession}
+			onBack={onBack}
+			onRerun={onRerun}
+			onFetchContext={onFetchContext}
+			onSelectOption={handleSelectOption}
+			onTypeInstead={handleTypeInstead}
+			onVote={handleVote}
+			results={results}
+			onLoadToCanvas={onLoadToCanvas}
+		/>
+	) : (
+		<SessionList
+			sessions={sessions}
+			sort={sort}
+			search={searchOpen ? search : ""}
+			searchOpen={searchOpen}
+			onSearchChange={setSearch}
+			onOpen={onOpenSession}
+			excludedLLMs={excludedLLMs}
+			onPin={onPin}
+			onArchive={onArchive}
+		/>
+	);
+
 	const composer = (
 		<SessionComposer
 			availableLanguages={availableLanguages}
@@ -229,6 +274,7 @@ export function SessionsPanel({
 			sessionKey={activeSession?.id ?? null}
 			initialConfig={composerConfig}
 			promptHistory={promptHistory}
+			focusSignal={composerFocus}
 		/>
 	);
 
@@ -613,6 +659,9 @@ interface SessionThreadProps {
 	onBack: () => void;
 	onRerun: (messageId: string) => void;
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
+	onSelectOption: (text: string) => void;
+	onTypeInstead: () => void;
+	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	results: Record<string, QueryResponse | null>;
 	onLoadToCanvas: (result: QueryResponse) => void;
 }
@@ -622,9 +671,20 @@ function SessionThread({
 	onBack,
 	onRerun,
 	onFetchContext,
+	onSelectOption,
+	onTypeInstead,
+	onVote,
 	results,
 	onLoadToCanvas,
 }: SessionThreadProps) {
+	// Auto-scroll to the latest message: on open (session change) and whenever a
+	// message or its result is added/updated (new ask, running→done, result paint).
+	const endRef = useRef<HTMLDivElement>(null);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-scroll on any thread change, not just endRef
+	useEffect(() => {
+		endRef.current?.scrollIntoView({ block: "end" });
+	}, [session.id, session.messages, results]);
+
 	return (
 		<div className="flex flex-col h-full min-h-0">
 			{/* Back + title bar — the panel header keeps the persistent "Sessions"
@@ -660,11 +720,16 @@ function SessionThread({
 								prompt={prev?.role === "user" ? prev.content : undefined}
 								onRerun={onRerun}
 								onFetchContext={onFetchContext}
+								onSelectOption={onSelectOption}
+								onTypeInstead={onTypeInstead}
+								onVote={onVote}
 								result={results[message.id]}
 								onLoadToCanvas={onLoadToCanvas}
 							/>
 						);
 					})}
+					{/* Scroll anchor — kept in view so the thread sticks to the latest. */}
+					<div ref={endRef} />
 				</div>
 			</ScrollArea>
 		</div>
@@ -697,6 +762,9 @@ function AssistantMessage({
 	prompt,
 	onRerun,
 	onFetchContext,
+	onSelectOption,
+	onTypeInstead,
+	onVote,
 	result,
 	onLoadToCanvas,
 }: {
@@ -706,6 +774,9 @@ function AssistantMessage({
 	prompt?: string;
 	onRerun: (messageId: string) => void;
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
+	onSelectOption: (text: string) => void;
+	onTypeInstead: () => void;
+	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	result: QueryResponse | null | undefined;
 	onLoadToCanvas: (result: QueryResponse) => void;
 }) {
@@ -794,6 +865,34 @@ function AssistantMessage({
 			>
 				{message.content}
 			</p>
+			{/* Clarification options (RFC-038): pick one instead of retyping — it's
+			    sent as the next NL ask, which re-translates with this clarification
+			    in context and runs. */}
+			{message.clarificationOptions &&
+				message.clarificationOptions.length > 0 && (
+					<div className="flex flex-col items-start gap-1.5 py-1">
+						{message.clarificationOptions.map((option, i) => (
+							<Button
+								key={`${message.id}-opt-${i}`}
+								variant="outline"
+								size="sm"
+								className="h-auto max-w-full whitespace-normal break-words px-3 py-1.5 text-left font-normal"
+								onClick={() => onSelectOption(option)}
+							>
+								{option}
+							</Button>
+						))}
+						<Button
+							variant="outline"
+							size="sm"
+							className="h-auto max-w-full gap-1.5 border-dashed px-3 py-1.5 text-left font-normal text-muted-foreground"
+							onClick={onTypeInstead}
+						>
+							<Pencil className="w-3 h-3 shrink-0" />
+							Something else — let me type
+						</Button>
+					</div>
+				)}
 			{/* Actions on their own row, meta on the next line — keeping them on one
 			    row let a long meta string (model · rows · LLM · query) wrap around
 			    the icons and read as crowded. Glyphs are small; the buttons are
@@ -841,6 +940,37 @@ function AssistantMessage({
 						>
 							<Info className="w-3 h-3" />
 						</Button>
+					)}
+					{/* 👍/👎 on a real answer (RFC-038/039). A downvote asks the model
+					    what to change; clicking the active vote clears it. */}
+					{message.sourceQuery && (
+						<>
+							<Button
+								variant="ghost"
+								size="icon"
+								className={`h-6 w-7 ${message.feedback === "up" ? "text-foreground" : ""}`}
+								onClick={() =>
+									onVote(message.id, message.feedback === "up" ? null : "up")
+								}
+								title="Good answer"
+							>
+								<ThumbsUp className="w-3 h-3" />
+							</Button>
+							<Button
+								variant="ghost"
+								size="icon"
+								className={`h-6 w-7 ${message.feedback === "down" ? "text-foreground" : ""}`}
+								onClick={() =>
+									onVote(
+										message.id,
+										message.feedback === "down" ? null : "down",
+									)
+								}
+								title="Not what I wanted — refine"
+							>
+								<ThumbsDown className="w-3 h-3" />
+							</Button>
+						</>
 					)}
 				</div>
 				{meta && <span>{meta}</span>}

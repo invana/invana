@@ -17,6 +17,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     DateTime,
     Enum,
@@ -140,6 +141,13 @@ class SessionMessage(Base):
     # "only show 5" can refine the prior turn. Null on QL, on rerun, and on
     # existing rows.
     rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # NL clarification only — short answer options the user can pick instead of
+    # retyping (RFC-038). Set when this reply is a clarifying question (the reply
+    # has no ``source_query``); null otherwise.
+    clarification_options: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # 👍/👎 on an assistant reply — a capture signal for the learning loop
+    # (RFC-038/039). "up" | "down"; null = no vote / cleared.
+    feedback: Mapped[str | None] = mapped_column(String(4), nullable=True)
     row_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     execution_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     # NL only — wall-clock of the LLM translation step that produced
