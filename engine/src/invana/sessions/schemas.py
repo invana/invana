@@ -80,13 +80,15 @@ class SessionMessageRead(BaseModel):
 class SessionContextTurn(BaseModel):
     """One prior turn in the conversation context sent to the model (RFC-036/040).
 
-    Structured so the UI can render prompt / query / rationale with hierarchy
-    rather than one blob. Same turns ``_assemble_history`` replays to the model.
+    Structured so the UI can render with hierarchy rather than one blob. A turn is
+    either a query turn (``query`` set) or a clarification turn (``question`` set,
+    RFC-038). Same turns ``_assemble_history`` replays to the model.
     """
 
     prompt: str
-    query: str
+    query: str = ""
     rationale: str = ""
+    question: str = ""
 
 
 class SessionSummary(BaseModel):

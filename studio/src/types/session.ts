@@ -47,11 +47,13 @@ export interface SessionMessage {
 }
 
 /** One prior turn in the conversation context sent to the model (RFC-036/040) —
- *  structured so the UI can lay out prompt / query / rationale with hierarchy. */
+ *  structured so the UI can lay out with hierarchy. Either a query turn (`query`
+ *  set) or a clarification turn (`question` set — the model asked back, RFC-038). */
 export interface SessionContextTurn {
 	prompt: string;
 	query: string;
 	rationale: string;
+	question: string;
 }
 
 export interface Session {

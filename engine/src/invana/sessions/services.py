@@ -20,7 +20,7 @@ from invana.graphs.models import Graph
 from invana.graphs.query_service import QueryExecutionError, execute_query, resolve_query_language
 from invana.graphs.schemas import QueryResponse
 from invana.llm import LLMError
-from invana.llm.translate import nl_to_query
+from invana.llm.translate import Clarification, nl_to_query
 from invana.llm_providers.models import LLMProvider
 from invana.llm_providers.store import LLMProviderStore
 from invana.modeller.models import GraphVersion
@@ -93,12 +93,16 @@ def _context_turns(rows: list[SessionMessage]) -> list[dict]:
         if m.role == SessionMessageRole.user:
             pending_user = m.content
         elif (
-            m.role == SessionMessageRole.assistant
-            and m.status == SessionMessageStatus.ok
-            and m.source_query
-            and pending_user is not None
+            m.role == SessionMessageRole.assistant and m.status == SessionMessageStatus.ok and pending_user is not None
         ):
-            turns.append({"prompt": pending_user, "query": m.source_query, "rationale": m.rationale or ""})
+            if m.source_query:
+                turns.append(
+                    {"kind": "query", "prompt": pending_user, "query": m.source_query, "rationale": m.rationale or ""}
+                )
+            else:
+                # A clarification reply (RFC-038): no query ran; its content is the
+                # question. Replayed so the model remembers what it asked.
+                turns.append({"kind": "clarify", "prompt": pending_user, "question": m.content})
             pending_user = None
         else:
             pending_user = None
@@ -116,7 +120,10 @@ def _assemble_history(rows: list[SessionMessage]) -> list[dict]:
     """
     out: list[dict] = []
     for t in _context_turns(rows):
-        content = f"{t['query']}\n-- {t['rationale']}" if t["rationale"] else t["query"]
+        if t["kind"] == "query":
+            content = f"{t['query']}\n-- {t['rationale']}" if t["rationale"] else t["query"]
+        else:  # clarify — the assistant asked a question instead of querying
+            content = t["question"]
         out.append({"role": "user", "content": t["prompt"]})
         out.append({"role": "assistant", "content": content})
     return out
@@ -384,6 +391,36 @@ async def send_message(
         except LLMError as exc:
             assistant_msg.status = SessionMessageStatus.error
             assistant_msg.content = exc.message
+            await _finalize_totals(session, sess, assistant_msg, payload)
+            return user_msg, assistant_msg, None
+        if isinstance(generated, Clarification):
+            # Genuinely ambiguous ask (RFC-038): persist the question as the reply
+            # and run nothing. No source_query marks this as a clarification turn —
+            # _context_turns replays it so the model remembers what it asked when
+            # the user answers next.
+            assistant_msg.status = SessionMessageStatus.ok
+            assistant_msg.content = generated.question
+            assistant_msg.via = f"{provider.provider.value} · {provider.model_id}"
+            assistant_msg.llm_time_ms = round(generated.duration_ms)
+            assistant_msg.timeout_s = payload.timeout_s
+            await emit_event(
+                session,
+                action=actions.LLM_TRANSLATE,
+                target_kind=actions.TARGET_SESSION,
+                target_id=sess.id,
+                graph_id=graph.id,
+                actor_id=actor_id,
+                details={
+                    "provider": provider.provider.value,
+                    "model_id": provider.model_id,
+                    "action": "clarify",
+                    "question": generated.question,
+                    "input_tokens": generated.usage.input_tokens,
+                    "output_tokens": generated.usage.output_tokens,
+                    "duration_ms": round(generated.duration_ms),
+                },
+                trace_id=current_trace_id(),
+            )
             await _finalize_totals(session, sess, assistant_msg, payload)
             return user_msg, assistant_msg, None
         query_to_run = generated.query

@@ -743,11 +743,12 @@ function AssistantMessage({
 
 	// Copy the disclosed context as readable text — handy for debugging / issues.
 	const copyContext = () => {
-		const parts = (context ?? []).map(
-			(t) =>
-				`Asked: ${t.prompt}\nQuery: ${t.query}${
-					t.rationale ? `\nWhy: ${t.rationale}` : ""
-				}`,
+		const parts = (context ?? []).map((t) =>
+			t.query
+				? `Asked: ${t.prompt}\nQuery: ${t.query}${
+						t.rationale ? `\nWhy: ${t.rationale}` : ""
+					}`
+				: `Asked: ${t.prompt}\nClarified: ${t.question}`,
 		);
 		if (prompt) parts.push(`This question: ${prompt}`);
 		navigator.clipboard?.writeText(parts.join("\n\n"));
@@ -887,14 +888,25 @@ function AssistantMessage({
 												{turn.prompt}
 											</p>
 										</div>
-										<div className="flex flex-col gap-0.5">
-											<span className="text-[10px] uppercase tracking-wide text-muted-foreground/60">
-												Query
-											</span>
-											<pre className="overflow-x-auto whitespace-pre-wrap break-words rounded bg-background/70 px-2 py-1.5 font-mono text-[12px] leading-relaxed text-foreground/80">
-												{turn.query}
-											</pre>
-										</div>
+										{turn.query ? (
+											<div className="flex flex-col gap-0.5">
+												<span className="text-[10px] uppercase tracking-wide text-muted-foreground/60">
+													Query
+												</span>
+												<pre className="overflow-x-auto whitespace-pre-wrap break-words rounded bg-background/70 px-2 py-1.5 font-mono text-[12px] leading-relaxed text-foreground/80">
+													{turn.query}
+												</pre>
+											</div>
+										) : (
+											<div className="flex flex-col gap-0.5">
+												<span className="text-[10px] uppercase tracking-wide text-muted-foreground/60">
+													Clarified
+												</span>
+												<p className="whitespace-pre-wrap break-words text-foreground/80">
+													{turn.question}
+												</p>
+											</div>
+										)}
 										{turn.rationale && (
 											<p className="whitespace-pre-wrap break-words text-[12px] italic leading-relaxed text-muted-foreground/80">
 												{turn.rationale}
