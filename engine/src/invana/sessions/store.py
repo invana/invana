@@ -59,6 +59,26 @@ class SessionStore:
         stmt = select(SessionMessage).where(SessionMessage.session_id == session_id).order_by(SessionMessage.seq)
         return list((await session.execute(stmt)).scalars().all())
 
+    async def list_recent_messages(
+        self, session: AsyncSession, *, session_id: str, before_seq: int, limit: int
+    ) -> list[SessionMessage]:
+        """The most recent messages with ``seq < before_seq``, oldest-first.
+
+        Used to assemble the conversation-context window for NL translation
+        (RFC-036). ``before_seq`` is the current ask's user ``seq`` so the two
+        just-inserted rows (the user message and the running placeholder) are
+        excluded. Bounded by ``limit`` so long threads don't bloat the prompt.
+        """
+        stmt = (
+            select(SessionMessage)
+            .where(SessionMessage.session_id == session_id, SessionMessage.seq < before_seq)
+            .order_by(SessionMessage.seq.desc())
+            .limit(limit)
+        )
+        rows = list((await session.execute(stmt)).scalars().all())
+        rows.reverse()  # back to ascending seq for chronological prompt order
+        return rows
+
     async def get_message(self, session: AsyncSession, message_id: str) -> SessionMessage | None:
         stmt = select(SessionMessage).where(SessionMessage.id == message_id)
         return (await session.execute(stmt)).scalar_one_or_none()

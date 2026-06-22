@@ -29,6 +29,7 @@ from invana.sessions.schemas import (
     RerunResponse,
     SendMessage,
     SendMessageResponse,
+    SessionContextTurn,
     SessionCreate,
     SessionDetail,
     SessionListResponse,
@@ -180,6 +181,29 @@ async def send_message(
         assistant_message=SessionMessageRead.model_validate(assistant_msg),
         result=result,
     )
+
+
+@sessions_router.get(
+    "/{session_id}/messages/{message_id}/context",
+    response_model=list[SessionContextTurn],
+)
+async def message_context(
+    session_id: str = Path(...),
+    message_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> list[SessionContextTurn]:
+    """The conversation context (RFC-036) that was sent for this assistant reply.
+
+    Recomputed from the prior turns (RFC-040) — empty for a first turn or a
+    non-nl reply. Read-only; no graph connection needed.
+    """
+    sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
+    message = await services.get_message_or_404(session, message_id=message_id, sess=sess)
+    turns = await services.get_message_context(session, message=message)
+    return [SessionContextTurn(**t) for t in turns]
 
 
 @sessions_router.post("/{session_id}/messages/{message_id}/run", response_model=RerunResponse)

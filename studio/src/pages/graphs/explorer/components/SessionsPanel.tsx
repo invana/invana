@@ -19,6 +19,7 @@ import {
 	ArrowLeft,
 	Code,
 	Copy,
+	Info,
 	MessageSquare,
 	PanelLeftClose,
 	Pin,
@@ -38,7 +39,11 @@ import type {
 	QueryResponse,
 	QueryRunPayload,
 } from "../../../../types/query";
-import type { Session, SessionMessage } from "../../../../types/session";
+import type {
+	Session,
+	SessionContextTurn,
+	SessionMessage,
+} from "../../../../types/session";
 import { ResultBlock } from "./ResultBlock";
 import { SessionComposer } from "./SessionComposer";
 
@@ -61,6 +66,9 @@ export interface SessionsPanelProps {
 	onBack: () => void;
 	/** Re-run a past assistant message's query in place (re-fetches its result). */
 	onRerun: (messageId: string) => void;
+	/** Fetch the conversation context the model was given for an assistant reply
+	 *  (RFC-036/040) — lazily, when its disclosure is opened. */
+	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	/** Transient per-message query results, keyed by assistant message id (RFC-033). */
 	results: Record<string, QueryResponse | null>;
 	/** Project a graph result onto the canvas. */
@@ -100,6 +108,7 @@ export function SessionsPanel({
 	onOpenSession,
 	onBack,
 	onRerun,
+	onFetchContext,
 	results,
 	onLoadToCanvas,
 	onRefresh,
@@ -143,6 +152,7 @@ export function SessionsPanel({
 			session={activeSession}
 			onBack={onBack}
 			onRerun={onRerun}
+			onFetchContext={onFetchContext}
 			results={results}
 			onLoadToCanvas={onLoadToCanvas}
 		/>
@@ -602,6 +612,7 @@ interface SessionThreadProps {
 	session: Session;
 	onBack: () => void;
 	onRerun: (messageId: string) => void;
+	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	results: Record<string, QueryResponse | null>;
 	onLoadToCanvas: (result: QueryResponse) => void;
 }
@@ -610,6 +621,7 @@ function SessionThread({
 	session,
 	onBack,
 	onRerun,
+	onFetchContext,
 	results,
 	onLoadToCanvas,
 }: SessionThreadProps) {
@@ -634,19 +646,25 @@ function SessionThread({
 
 			<ScrollArea className="flex-1 min-h-0">
 				<div className="flex flex-col gap-4 p-3">
-					{session.messages.map((message) =>
-						message.role === "user" ? (
-							<UserMessage key={message.id} message={message} />
-						) : (
+					{session.messages.map((message, idx) => {
+						if (message.role === "user") {
+							return <UserMessage key={message.id} message={message} />;
+						}
+						// The assistant reply's own question is the preceding user
+						// message — shown in the context disclosure as "this question".
+						const prev = idx > 0 ? session.messages[idx - 1] : undefined;
+						return (
 							<AssistantMessage
 								key={message.id}
 								message={message}
+								prompt={prev?.role === "user" ? prev.content : undefined}
 								onRerun={onRerun}
+								onFetchContext={onFetchContext}
 								result={results[message.id]}
 								onLoadToCanvas={onLoadToCanvas}
 							/>
-						),
-					)}
+						);
+					})}
 				</div>
 			</ScrollArea>
 		</div>
@@ -676,20 +694,64 @@ function RunningDots() {
 
 function AssistantMessage({
 	message,
+	prompt,
 	onRerun,
+	onFetchContext,
 	result,
 	onLoadToCanvas,
 }: {
 	message: SessionMessage;
+	/** This reply's own question (the preceding user prompt) — shown in the
+	 *  context disclosure so the full exchange the model saw is self-contained. */
+	prompt?: string;
 	onRerun: (messageId: string) => void;
+	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	result: QueryResponse | null | undefined;
 	onLoadToCanvas: (result: QueryResponse) => void;
 }) {
 	const [showQuery, setShowQuery] = useState(false);
+	// Conversation context (RFC-036/040), fetched lazily the first time the
+	// disclosure is opened. `null` = not yet fetched.
+	const [showContext, setShowContext] = useState(false);
+	const [context, setContext] = useState<SessionContextTurn[] | null>(null);
+	const [contextLoading, setContextLoading] = useState(false);
+
+	// Context applies only to NL replies (ql turns send none). The icon is shown
+	// for every nl reply; the disclosure resolves to "first turn" when empty.
+	const hasContext = message.mode === "nl";
+
+	const toggleContext = async () => {
+		const next = !showContext;
+		setShowContext(next);
+		if (next && context === null && !contextLoading) {
+			setContextLoading(true);
+			try {
+				setContext(await onFetchContext(message.id));
+			} catch {
+				toast.error("Couldn't load the context for this reply.");
+				setShowContext(false);
+			} finally {
+				setContextLoading(false);
+			}
+		}
+	};
 
 	const copy = () => {
 		navigator.clipboard?.writeText(message.content);
 		toast.success("Copied to clipboard");
+	};
+
+	// Copy the disclosed context as readable text — handy for debugging / issues.
+	const copyContext = () => {
+		const parts = (context ?? []).map(
+			(t) =>
+				`Asked: ${t.prompt}\nQuery: ${t.query}${
+					t.rationale ? `\nWhy: ${t.rationale}` : ""
+				}`,
+		);
+		if (prompt) parts.push(`This question: ${prompt}`);
+		navigator.clipboard?.writeText(parts.join("\n\n"));
+		toast.success("Context copied to clipboard");
 	};
 
 	if (message.status === "running") {
@@ -768,6 +830,17 @@ function AssistantMessage({
 					>
 						<Copy className="w-3 h-3" />
 					</Button>
+					{hasContext && (
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-6 w-7"
+							onClick={toggleContext}
+							title={showContext ? "Hide context" : "View context"}
+						>
+							<Info className="w-3 h-3" />
+						</Button>
+					)}
 				</div>
 				{meta && <span>{meta}</span>}
 			</div>
@@ -775,6 +848,80 @@ function AssistantMessage({
 				<pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-words rounded border border-border bg-muted/50 p-2 font-mono text-muted-foreground">
 					{message.sourceQuery}
 				</pre>
+			)}
+			{showContext && (
+				<div className="mt-1 rounded border border-border bg-muted/40 p-2.5 text-muted-foreground">
+					{contextLoading ? (
+						<span className="text-xs">Loading context…</span>
+					) : (
+						<>
+							<div className="mb-2 flex items-center justify-between gap-2">
+								<span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
+									{context && context.length > 0
+										? `What the model saw · ${context.length} earlier turn${
+												context.length === 1 ? "" : "s"
+											} + this question`
+										: "What the model saw · this question only (no earlier turns)"}
+								</span>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-5 w-5 shrink-0"
+									onClick={copyContext}
+									title="Copy context"
+								>
+									<Copy className="w-3 h-3" />
+								</Button>
+							</div>
+							<div className="flex flex-col gap-3">
+								{context?.map((turn, i) => (
+									<div
+										key={`${message.id}-ctx-${i}`}
+										className="flex flex-col gap-1.5 border-t border-border/60 pt-3 first:border-t-0 first:pt-0"
+									>
+										<div className="flex flex-col gap-0.5">
+											<span className="text-[10px] uppercase tracking-wide text-muted-foreground/60">
+												Asked
+											</span>
+											<p className="whitespace-pre-wrap break-words text-foreground/90">
+												{turn.prompt}
+											</p>
+										</div>
+										<div className="flex flex-col gap-0.5">
+											<span className="text-[10px] uppercase tracking-wide text-muted-foreground/60">
+												Query
+											</span>
+											<pre className="overflow-x-auto whitespace-pre-wrap break-words rounded bg-background/70 px-2 py-1.5 font-mono text-[12px] leading-relaxed text-foreground/80">
+												{turn.query}
+											</pre>
+										</div>
+										{turn.rationale && (
+											<p className="whitespace-pre-wrap break-words text-[12px] italic leading-relaxed text-muted-foreground/80">
+												{turn.rationale}
+											</p>
+										)}
+									</div>
+								))}
+								{prompt && (
+									<div
+										className={`flex flex-col gap-0.5 ${
+											context && context.length > 0
+												? "border-t border-border/60 pt-3"
+												: ""
+										}`}
+									>
+										<span className="text-[10px] font-medium uppercase tracking-wide text-foreground/70">
+											This question
+										</span>
+										<p className="whitespace-pre-wrap break-words text-foreground/90">
+											{prompt}
+										</p>
+									</div>
+								)}
+							</div>
+						</>
+					)}
+				</div>
 			)}
 			<ResultBlock result={result} onLoadToCanvas={onLoadToCanvas} />
 		</div>

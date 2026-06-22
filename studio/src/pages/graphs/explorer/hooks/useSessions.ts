@@ -239,6 +239,11 @@ export function useSessions(
 		}
 	};
 
+	// The conversation context (prior turns) the model was given for an assistant
+	// reply (RFC-036/040) — recomputed server-side, fetched lazily on disclosure.
+	const fetchContext = (messageId: string) =>
+		sessionsApi.getMessageContext(u, g, activeSessionId ?? "", messageId);
+
 	// Cancel the in-flight run (the composer's stop control). The send/rerun
 	// catch paths handle the resulting abort.
 	const stop = () => abortRef.current?.abort();
@@ -270,6 +275,7 @@ export function useSessions(
 		setShowArchived,
 		send,
 		rerun,
+		fetchContext,
 		stop,
 		refresh,
 		setPinned,

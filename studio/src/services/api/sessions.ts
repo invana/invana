@@ -8,7 +8,11 @@
 
 import type { QueryLanguage } from "../../types/graphs";
 import type { QueryResponse } from "../../types/query";
-import type { Session, SessionMessage } from "../../types/session";
+import type {
+	Session,
+	SessionContextTurn,
+	SessionMessage,
+} from "../../types/session";
 import { request } from "./client";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
@@ -243,4 +247,18 @@ export const sessionsApi = {
 		);
 		return { message: toMessage(data.message), result: data.result };
 	},
+
+	// The conversation context (prior turns) the model was given for an assistant
+	// reply (RFC-036/040). Recomputed server-side; empty for a first turn.
+	getMessageContext: async (
+		username: string,
+		graphSlug: string,
+		id: string,
+		messageId: string,
+		signal?: AbortSignal,
+	): Promise<SessionContextTurn[]> =>
+		request<SessionContextTurn[]>(
+			`${base(username, graphSlug)}/${id}/messages/${messageId}/context`,
+			{ signal },
+		),
 };

@@ -373,6 +373,11 @@ Forward slice of grounded LLM (§ 6.2) on the lowest-risk surface: NL → ground
 - **Frontend:** [ ] Composer sends `llm_provider_id`; NL reply shows a "view generated query" disclosure + `via` model label; 422 routes to Settings → LLMs. No canvas/re-run change.
 - **Integrations:** § 6.0 `invana/llm` runtime (RFC-032) · existing graph DB connectors. Detail: [`mvp/rfc-030-llm-translation.md`](mvp/rfc-030-llm-translation.md).
 
+### 5.7a Explorer NL conversation context — RFC-036
+Extension of § 5.7: NL translation replays a bounded window of the session's prior successful turns (user prompt + generated query + rationale) so a follow-up like "only show 5" refines the previous query instead of being translated in isolation. The LLM stays stateless (no provider-side session) — we replay our own persisted history, the only provider-neutral design.
+- **Backend:** [ ] Persist the model `rationale` on the assistant message (nullable column). `send_message` loads the last ~6 ok turns (nl + ql) and passes them as `history=` to the already-history-ready `nl_to_query`. No re-run change (re-run never calls the LLM).
+- **Frontend / Integrations:** none — engine-only. Detail: [`mvp/rfc-036-nl-conversation-context.md`](mvp/rfc-036-nl-conversation-context.md).
+
 ---
 
 ## Layer 6 — Intelligence (Agents · LLM grounding · Success scoring)

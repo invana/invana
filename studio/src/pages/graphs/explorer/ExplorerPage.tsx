@@ -121,6 +121,7 @@ export function ExplorerPage() {
 		setShowArchived,
 		send,
 		rerun,
+		fetchContext,
 		stop,
 		refresh,
 		setPinned,
@@ -597,6 +598,7 @@ export function ExplorerPage() {
 			onOpenSession={openSession}
 			onBack={backToList}
 			onRerun={handleRerun}
+			onFetchContext={fetchContext}
 			results={resultsByMessageId}
 			onLoadToCanvas={handleLoadToCanvas}
 			onRefresh={refresh}

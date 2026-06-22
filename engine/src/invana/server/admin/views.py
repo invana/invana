@@ -413,6 +413,7 @@ class SessionMessageView(ModelView):
         StringField("mode", label="Mode"),
         "via",
         "query_language",
+        "rationale",
         "row_count",
         "execution_time_ms",
         "llm_time_ms",

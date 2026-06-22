@@ -36,6 +36,11 @@ from invana.sessions.store import SessionStore
 
 _LANGUAGE_LABEL = {"cypher": "Cypher", "gremlin": "Gremlin"}
 
+# How many prior turns to replay as conversation context for an NL ask (RFC-036),
+# so a follow-up like "only show 5" can refine the previous query. Bounded to keep
+# the prompt small; this is read-only translation, so the risk is low.
+_HISTORY_TURNS = 6
+
 # Backend-owned copy for NL-mode failures (RFC-028). The user typed a question,
 # not a query, so the raw driver error (a Cypher/Gremlin parser message) is
 # meaningless to them — show guidance keyed off the failure category instead.
@@ -69,6 +74,52 @@ def _summary(result: QueryResponse, nodes: int, edges: int) -> str:
     if result.result_type == "graph":
         return f"Returned {_plural(nodes, 'node')} and {_plural(edges, 'relationship')}."
     return f"Returned {_plural(result.row_count, 'row')}."
+
+
+def _context_turns(rows: list[SessionMessage]) -> list[dict]:
+    """Prior successful turns as structured ``{prompt, query, rationale}`` (RFC-036).
+
+    Pairs each user prompt with the assistant's generated query (and rationale,
+    when present). Only ``ok`` turns that carry a ``source_query`` contribute —
+    ``nl`` and ``ql`` alike, so a follow-up can refine a hand-typed query too.
+    Orphaned user turns (whose assistant reply failed or is still running) are
+    dropped, keeping the sequence a clean alternation. This is the single source
+    of truth for both the replayed history (``_assemble_history``) and the UI
+    disclosure (RFC-040).
+    """
+    turns: list[dict] = []
+    pending_user: str | None = None
+    for m in rows:  # ascending seq
+        if m.role == SessionMessageRole.user:
+            pending_user = m.content
+        elif (
+            m.role == SessionMessageRole.assistant
+            and m.status == SessionMessageStatus.ok
+            and m.source_query
+            and pending_user is not None
+        ):
+            turns.append({"prompt": pending_user, "query": m.source_query, "rationale": m.rationale or ""})
+            pending_user = None
+        else:
+            pending_user = None
+    return turns
+
+
+def _assemble_history(rows: list[SessionMessage]) -> list[dict]:
+    """Structured prior turns → provider-agnostic chat messages (RFC-036).
+
+    Plain text, not tool_use/tool_result blocks: those are provider-specific,
+    whereas user/assistant text serializes identically across every provider
+    ``complete_tool`` dispatches to. The current turn still emits via the forced
+    ``submit_query`` tool; the clean user/assistant alternation satisfies the
+    strictest provider (Anthropic).
+    """
+    out: list[dict] = []
+    for t in _context_turns(rows):
+        content = f"{t['query']}\n-- {t['rationale']}" if t["rationale"] else t["query"]
+        out.append({"role": "user", "content": t["prompt"]})
+        out.append({"role": "assistant", "content": content})
+    return out
 
 
 # ── Reads ─────────────────────────────────────────────────────────────────────
@@ -126,6 +177,23 @@ async def get_message_or_404(
     if msg is None or msg.session_id != sess.id:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Message not found.")
     return msg
+
+
+async def get_message_context(session: AsyncSession, *, message: SessionMessage) -> list[dict]:
+    """Recompute the conversation context (RFC-036) sent for an assistant turn.
+
+    Reuses the exact functions ``send_message`` uses, so the result is identical
+    to what was replayed to the model — see RFC-040. Empty for a user message, a
+    non-``nl`` reply (ql turns send no context), or a first turn. ``before_seq``
+    is ``message.seq - 1`` (the triggering user turn's seq), matching the window
+    ``send_message`` built.
+    """
+    if message.role != SessionMessageRole.assistant or message.mode != "nl":
+        return []
+    rows = await SessionStore().list_recent_messages(
+        session, session_id=message.session_id, before_seq=message.seq - 1, limit=_HISTORY_TURNS * 2
+    )
+    return _context_turns(rows)
 
 
 # ── Writes ────────────────────────────────────────────────────────────────────
@@ -296,6 +364,12 @@ async def send_message(
 
     if not is_ql:
         language = (await resolve_query_language(session, graph=graph, manager=manager)).value
+        # Replay a bounded window of prior turns so a follow-up ("only show 5")
+        # refines the previous query rather than translating from scratch
+        # (RFC-036). before_seq=user_seq excludes the two rows just inserted.
+        history = _assemble_history(
+            await store.list_recent_messages(session, session_id=sess.id, before_seq=user_seq, limit=_HISTORY_TURNS * 2)
+        )
         try:
             generated = await nl_to_query(
                 provider=provider,
@@ -303,6 +377,7 @@ async def send_message(
                 language=language,
                 version=await _grounding_version(session, graph.id),
                 encryption_key=encryption_key,
+                history=history,
                 # None → let nl_to_query apply its own default.
                 **({"timeout_s": payload.timeout_s} if payload.timeout_s is not None else {}),
             )
@@ -313,9 +388,11 @@ async def send_message(
             return user_msg, assistant_msg, None
         query_to_run = generated.query
         via_label = f"{provider.provider.value} · {provider.model_id}"
-        # Recorded now (not in the ok branch below) so it survives even when the
-        # generated query then fails to execute — the translation still cost time.
+        # Recorded now (not in the ok branch below) so they survive even when the
+        # generated query then fails to execute — the translation still cost time,
+        # and the rationale is part of the conversation context for later turns.
         assistant_msg.llm_time_ms = round(generated.duration_ms)
+        assistant_msg.rationale = generated.rationale or None
         await emit_event(
             session,
             action=actions.LLM_TRANSLATE,

@@ -1,11 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Session types — frontend-only for now.
+// Session types.
 //
 // A "session" is a threaded conversation against a graph: the user asks
 // (natural language or a query), the assistant answers. Each ask/answer is a
-// pair of messages. This lives entirely in Studio state today — the engine
-// still speaks the single-shot `/query` endpoint; backend naming + persistence
-// land later.
+// pair of messages. Sessions are persisted by the engine (RFC-024) and consumed
+// here via `sessionsApi` (snake_case DTOs → these camelCase shapes). NL asks are
+// translated server-side (RFC-030) with prior turns replayed as context
+// (RFC-036); only message metadata is stored, never result payloads.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { QueryLanguage } from "./graphs";
@@ -43,6 +44,14 @@ export interface SessionMessage {
 	language?: QueryLanguage;
 	/** The query that produced this reply, so it can be re-run. */
 	sourceQuery?: string;
+}
+
+/** One prior turn in the conversation context sent to the model (RFC-036/040) —
+ *  structured so the UI can lay out prompt / query / rationale with hierarchy. */
+export interface SessionContextTurn {
+	prompt: string;
+	query: string;
+	rationale: string;
 }
 
 export interface Session {

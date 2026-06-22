@@ -135,6 +135,11 @@ class SessionMessage(Base):
     query_language: Mapped[str | None] = mapped_column(String(32), nullable=True)
     # The query that produced this reply, so it can be re-run (Decision 10).
     source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # NL only — the model's one-line rationale for ``source_query`` (RFC-036).
+    # Replayed (with the query) as conversation context so a follow-up like
+    # "only show 5" can refine the prior turn. Null on QL, on rerun, and on
+    # existing rows.
+    rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
     row_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     execution_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     # NL only — wall-clock of the LLM translation step that produced

@@ -77,6 +77,18 @@ class SessionMessageRead(BaseModel):
     created_at: datetime
 
 
+class SessionContextTurn(BaseModel):
+    """One prior turn in the conversation context sent to the model (RFC-036/040).
+
+    Structured so the UI can render prompt / query / rationale with hierarchy
+    rather than one blob. Same turns ``_assemble_history`` replays to the model.
+    """
+
+    prompt: str
+    query: str
+    rationale: str = ""
+
+
 class SessionSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
