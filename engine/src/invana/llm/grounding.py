@@ -18,10 +18,11 @@ def render_model_context(version: GraphVersion | None) -> str:
     if version is None:
         return _NO_MODEL
 
-    node_lines = [f"(:{nt.name}{_props(nt.property_mappings)})" for nt in version.node_types]
+    node_lines = [f"(:{nt.name}{_props(nt.property_mappings)}){_desc(nt.description)}" for nt in version.node_types]
     edge_lines = [
         f"[:{et.name}{_props(et.property_mappings)}] "
         f"({', '.join(et.source_node_types or []) or '?'})->({', '.join(et.target_node_types or []) or '?'})"
+        f"{_desc(et.description)}"
         for et in version.edge_types
     ]
     return (
@@ -32,6 +33,22 @@ def render_model_context(version: GraphVersion | None) -> str:
     )
 
 
+def _desc(text: str | None) -> str:
+    """A trailing ``— description`` only when one is authored (RFC-038).
+
+    Descriptions teach the model what a label/property *means* so it can map the
+    user's words to the schema (e.g. "length" → ``longest``) without hand-written
+    synonyms. Empty by default, so this is a no-op until a developer fills them in.
+    """
+    text = (text or "").strip()
+    return f"  — {text}" if text else ""
+
+
 def _props(mappings: list[TypePropertyMapping]) -> str:
-    names = [f"{m.property_key.name}:{m.property_key.type}" for m in mappings if m.property_key is not None]
+    names = [
+        f"{m.property_key.name}:{m.property_key.type}"
+        + (f" ({m.property_key.description.strip()})" if (m.property_key.description or "").strip() else "")
+        for m in mappings
+        if m.property_key is not None
+    ]
     return " {" + ", ".join(names) + "}" if names else ""
