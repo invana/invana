@@ -12,6 +12,10 @@ import {
 	ScrollArea,
 	SearchInput,
 	TabbedPanel,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
 } from "@invana/ui";
 import {
 	Archive,
@@ -898,81 +902,122 @@ function AssistantMessage({
 			    the icons and read as crowded. Glyphs are small; the buttons are
 			    wider than the glyph so each icon gets horizontal breathing room. */}
 			<div className="flex flex-col gap-1 text-muted-foreground">
-				<div className="flex items-center gap-1">
-					{message.sourceQuery && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-6 w-7"
-							onClick={() => onRerun(message.id)}
-							title="Re-run query"
-						>
-							<RotateCw className="w-3 h-3" />
-						</Button>
-					)}
-					{message.sourceQuery && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-6 w-7"
-							onClick={() => setShowQuery((v) => !v)}
-							title={showQuery ? "Hide query" : "View query"}
-						>
-							<Code className="w-3 h-3" />
-						</Button>
-					)}
-					<Button
-						variant="ghost"
-						size="icon"
-						className="h-6 w-7"
-						onClick={copy}
-						title="Copy"
-					>
-						<Copy className="w-3 h-3" />
-					</Button>
-					{hasContext && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-6 w-7"
-							onClick={toggleContext}
-							title={showContext ? "Hide context" : "View context"}
-						>
-							<Info className="w-3 h-3" />
-						</Button>
-					)}
-					{/* 👍/👎 on a real answer (RFC-038/039). A downvote asks the model
+				<TooltipProvider delayDuration={300}>
+					<div className="flex items-center justify-between gap-1">
+						<div className="flex items-center gap-1">
+							{message.sourceQuery && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-6 w-7"
+											onClick={() => onRerun(message.id)}
+											aria-label="Re-run query"
+										>
+											<RotateCw className="w-3 h-3" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>Re-run query</TooltipContent>
+								</Tooltip>
+							)}
+							{message.sourceQuery && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-6 w-7"
+											onClick={() => setShowQuery((v) => !v)}
+											aria-label={showQuery ? "Hide query" : "View query"}
+										>
+											<Code className="w-3 h-3" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										{showQuery ? "Hide query" : "View query"}
+									</TooltipContent>
+								</Tooltip>
+							)}
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="h-6 w-7"
+										onClick={copy}
+										aria-label="Copy"
+									>
+										<Copy className="w-3 h-3" />
+									</Button>
+								</TooltipTrigger>
+								<TooltipContent>Copy</TooltipContent>
+							</Tooltip>
+							{hasContext && (
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-6 w-7"
+											onClick={toggleContext}
+											aria-label={showContext ? "Hide context" : "View context"}
+										>
+											<Info className="w-3 h-3" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										{showContext ? "Hide context" : "View context"}
+									</TooltipContent>
+								</Tooltip>
+							)}
+							{/* 👍/👎 on a real answer (RFC-038/039). A downvote asks the model
 					    what to change; clicking the active vote clears it. */}
-					{message.sourceQuery && (
-						<>
-							<Button
-								variant="ghost"
-								size="icon"
-								className={`h-6 w-7 ${message.feedback === "up" ? "text-foreground" : ""}`}
-								onClick={() =>
-									onVote(message.id, message.feedback === "up" ? null : "up")
-								}
-								title="Good answer"
-							>
-								<ThumbsUp className="w-3 h-3" />
-							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								className={`h-6 w-7 ${message.feedback === "down" ? "text-foreground" : ""}`}
-								onClick={() =>
-									onVote(
-										message.id,
-										message.feedback === "down" ? null : "down",
-									)
-								}
-								title="Not what I wanted — refine"
-							>
-								<ThumbsDown className="w-3 h-3" />
-							</Button>
-						</>
-					)}
-				</div>
+						</div>
+						{message.sourceQuery && (
+							<div className="flex items-center gap-1">
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className={`h-6 w-7 ${message.feedback === "up" ? "text-green-500 hover:text-green-500" : ""}`}
+											onClick={() =>
+												onVote(
+													message.id,
+													message.feedback === "up" ? null : "up",
+												)
+											}
+											aria-label="Good answer"
+										>
+											<ThumbsUp className="w-3 h-3" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>Good answer</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											className={`h-6 w-7 ${message.feedback === "down" ? "text-red-500 hover:text-red-500" : ""}`}
+											onClick={() =>
+												onVote(
+													message.id,
+													message.feedback === "down" ? null : "down",
+												)
+											}
+											aria-label="Not what I wanted — refine"
+										>
+											<ThumbsDown className="w-3 h-3" />
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>Not what I wanted — refine</TooltipContent>
+								</Tooltip>
+							</div>
+						)}
+					</div>
+				</TooltipProvider>
 				{meta && <span>{meta}</span>}
 			</div>
 			{showQuery && message.sourceQuery && (
