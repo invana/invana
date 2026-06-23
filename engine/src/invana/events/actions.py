@@ -43,13 +43,10 @@ LLM_PING = "llm.ping"
 LLM_SET_DEFAULT = "llm.set_default"
 LLM_TRANSLATE = "llm.translate"  # NL → query mapping (RFC-030); target = session
 
-# ── Skills + Instructions ─────────────────────────────────────────────────────
+# ── Skills ────────────────────────────────────────────────────────────────────
 SKILL_CREATE = "skill.create"
 SKILL_UPDATE = "skill.update"
 SKILL_DELETE = "skill.delete"
-INSTRUCTION_CREATE = "instruction.create"
-INSTRUCTION_UPDATE = "instruction.update"
-INSTRUCTION_DELETE = "instruction.delete"
 
 # ── Graph models (modeller; RFC-019) ──────────────────────────────────────────
 MODEL_CREATE = "model.create"
@@ -96,7 +93,6 @@ TARGET_CONNECTION = "connection"
 TARGET_MEMBER = "member"
 TARGET_LLM = "llm_provider"
 TARGET_SKILL = "skill"
-TARGET_INSTRUCTION = "instruction"
 TARGET_MODEL = "graph_model"
 TARGET_DATASET = "dataset"
 TARGET_USER = "user"

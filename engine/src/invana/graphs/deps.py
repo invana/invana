@@ -83,7 +83,7 @@ async def require_graph_setup_complete(
 ) -> Graph:
     """Gate routes that need the setup wizard's required sections finished.
 
-    Required sections are ``graph_info`` + ``intent`` (see
+    Required sections are ``graph_info`` + ``instructions`` (see
     ``invana.graphs.schemas.SETUP_REQUIRED``). 409s with the list of incomplete
     sections so the Studio can deep-link the user back to the wizard.
     """

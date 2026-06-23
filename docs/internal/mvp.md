@@ -16,11 +16,11 @@ Every feature is decomposed into **three columns of work** so dependencies surfa
 
 ## Architecture summary (RFC-017)
 
-The MVP container model is **`User → Graph (1:1 GraphConnection)`**. There is no Workspace and no Mission entity — both are folded into `Graph`. `Graph` carries members (binary access — roles & invitations removed, RFC-023), the DB connection (1:1), schema, intent/objectives, datasets, skills, instructions, LLM bindings, and agents.
+The MVP container model is **`User → Graph (1:1 GraphConnection)`**. There is no Workspace and no Mission entity — both are folded into `Graph`. `Graph` carries members (binary access — roles & invitations removed, RFC-023), the DB connection (1:1), schema, instructions/objectives, datasets, skills, LLM bindings, and agents.
 
 All graph-scoped URLs are namespaced under `/u/:username/:graphSlug/...`. Users have a globally unique `username`; `graphs.slug` is unique per owner. The URL path parameter is named `graphSlug` (the data field is still `Graph.slug`) — disambiguates from generic "slug" in routing code.
 
-A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills / Datasets) before all analytical features unlock — see § 2.2.
+A new Graph progresses through a **setup wizard** (Graph Info / Instructions / Skills / Datasets) before all analytical features unlock — see § 2.2.
 
 ---
 
@@ -78,7 +78,7 @@ A new Graph progresses through a **setup wizard** (Graph Info / Intent / Skills 
 
 ## Layer 2 — Graph (container + settings)
 
-The Graph is the unit of work. It carries everything previously split across Workspace and Mission: identity (slug + owner + members), the DB binding (1:1 `GraphConnection`), intent + objectives, and the analytical bindings (Skills, Instructions, LLM providers, Agents). Membership comes from Layer 1.
+The Graph is the unit of work. It carries everything previously split across Workspace and Mission: identity (slug + owner + members), the DB binding (1:1 `GraphConnection`), instructions + objectives, and the analytical bindings (Skills, LLM providers, Agents). Membership comes from Layer 1.
 
 § 2.1–2.3 + 2.8 shipped under S1.5 + S2. Detailed write-up: [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md).
 
@@ -88,7 +88,7 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Integrations:** none
 
 ### 2.2 Graph setup wizard + feature gating
-- **Backend:** [x] `setup_state` JSONB · `POST /u/:username/:graphSlug/setup/{section}` · `require_graph_setup_complete` gates `/query`, `/schema/active-version`, `/connection/introspect` · `graph_info` auto-completes on connection save; `intent` on non-empty intent.
+- **Backend:** [x] `setup_state` JSONB · `POST /u/:username/:graphSlug/setup/{section}` · `require_graph_setup_complete` gates `/query`, `/schema/active-version`, `/connection/introspect` · `graph_info` auto-completes on connection save; `instructions` on non-empty instructions.
 - **Frontend:** [x] Overview wizard card with done/skipped/todo state per section; modeller / explorer / query unlock once required sections are done.
 - **Integrations:** none
 
@@ -103,10 +103,18 @@ The Graph is the unit of work. It carries everything previously split across Wor
 - **Frontend:** [x] Skills section in the graph rail (Wand2 icon) · list + add/edit form (name / description / content textarea / when_to_use) · maximize-to-full-page route at `/settings/skills` · plain textareas for now (markdown rendering deferred).
 - **Integrations:** none yet — markdown editor (CodeMirror reuse) deferred until the surface is exercised.
 
-### 2.5 Instructions (graph-scoped)
-- **Backend:** [x] `Instruction` entity (graph_id FK CASCADE, unique (graph_id, name)) — `name`, `content` (markdown), `priority` (int 0–1000, default 100; higher first) · CRUD under `/api/v1/u/{username}/{graphSlug}/instructions/...` · admin-only writes · 409 on duplicate name · service-side `ORDER BY priority DESC, name ASC`.
-- **Frontend:** [x] Instructions section in the graph rail (ScrollText icon, between Skills and Datasets) · list with `p<priority>` badge · add/edit form with name + priority number input + content textarea · maximize-to-full-page route at `/settings/instructions`.
-- **Integrations:** none yet.
+### 2.5 Instructions (graph-scoped) — **removed / folded into `Graph.instructions` (RFC-040)**
+The standalone `instructions` table (named, prioritized directives) was never wired into any prompt or
+agent and duplicated the graph's standing-guidance field. **RFC-040** removed it and renamed the old
+`Graph.intent` mission-statement field to **`Graph.instructions`** — a single ChatGPT-/Claude-project-style
+custom-instructions block per graph, surfaced by the renamed `InstructionsSection` and the required
+setup-wizard `instructions` section. The freed word "intent" is reclaimed for NL→query `user_intents`
+(RFC-038). Detail: [`mvp/rfc-040-consolidate-graph-instructions.md`](mvp/rfc-040-consolidate-graph-instructions.md).
+- **Backend:** [x] `Graph.instructions` (Text, nullable); `instructions` table + module + routes + admin
+  view + `instruction.*` events **deleted**; migration `000000000020` (rename + JSON-key migrate + drop).
+- **Frontend:** [x] single-field `InstructionsSection` wired to `Graph.instructions`; table UI + data layer
+  removed; rail collapsed from Intent+Instructions to one **Instructions** item.
+- **Integrations:** none.
 
 ### 2.6 LLM providers (graph-scoped)
 - **Backend:** [x] `LLMProvider` entity (graph-scoped, CASCADE) with provider enum (anthropic / openai / google / azure / ollama / local). CRUD + `POST .../llm/{id}/ping` + `POST .../llm/{id}/set-default` under `/api/v1/u/{username}/{graphSlug}/llm/...`. Partial unique `(graph_id) WHERE is_default = true`. Reuses `invana.graphs.encryption` for Fernet on `api_key`.
@@ -120,7 +128,7 @@ The Graph is the unit of work. It carries everything previously split across Wor
 
 ### 2.8 Graph settings shell
 - **Backend:** N/A (composition of other features)
-- **Frontend:** [x] Rail icons (Info / Intent / LLMs / Skills / Instructions / Datasets / Members) drive `?settings=<section>`; the `leftSection` swaps to `<SettingsPanel/>`, which renders the active section inside its **own `@invana/ui` `TabbedPanel`** (tab strip + close + maximize `headerActions`). Members section hosts Invitations as a nested tab via `MembersInvitationsSection` — no separate Invitations rail icon; `/settings/invitations` 301s to `/settings/members`. Same rail across Overview / Explorer / Modeller via `useGraphLeftNav`. Each section's full-page maximize route remains at `/u/.../settings/<section>`.
+- **Frontend:** [x] Rail icons (Info / Connection / LLMs / Skills / Instructions / Datasets / Members) drive `?settings=<section>`; the `leftSection` swaps to `<SettingsPanel/>`, which renders the active section inside its **own `@invana/ui` `TabbedPanel`** (tab strip + close + maximize `headerActions`). Members section hosts Invitations as a nested tab via `MembersInvitationsSection` — no separate Invitations rail icon; `/settings/invitations` 301s to `/settings/members`. Same rail across Overview / Explorer / Modeller via `useGraphLeftNav`. Each section's full-page maximize route remains at `/u/.../settings/<section>`.
 - **Integrations:** `@invana/themes` `AppLayoutV2.leftSection` slot, `@invana/ui` `TabbedPanel`.
 
 ### 2.9 Graph lifecycle (active / archived)
@@ -555,7 +563,7 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 ### S2 — Graph shell + setup wizard — **shipped** ✅
 - **BE:** [x] Graph CRUD; GraphConnection sub-resource (GET/PUT/DELETE + test/ping/introspect); `setup_state` + `require_graph_setup_complete`; `query` + `schemas` routers re-prefixed. Legacy `/api/v1/graph-connections/*` + `/api/v1/graphs/{cid}/query` + `/api/v1/schemas/{sid}/active-version` shims deleted.
-- **FE:** [x] `/graphs` list · `/graphs/new` · `/u/:username/:graphSlug` overview with wizard · Connection + Intent settings pages · `/u/:username/:graphSlug/settings` index · context-aware left nav.
+- **FE:** [x] `/graphs` list · `/graphs/new` · `/u/:username/:graphSlug` overview with wizard · Connection + Instructions settings pages · `/u/:username/:graphSlug/settings` index · context-aware left nav.
 
 **Done when:** user creates a Graph, completes Graph Info via Neo4j, sees modeller / explorer / query unlock. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md).
 
@@ -571,9 +579,12 @@ Backend and frontend are built **together per feature**, not BE-first-then-FE. E
 
 **Done when:** saved Anthropic key produces a 200 from `/llm/{id}/ping` for the active Graph. — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.6).
 
-### S5 — Skills + Instructions (graph-scoped) — **shipped** ✅
-- **BE:** [x] Skill + Instruction CRUD under `/u/:username/:graphSlug/{skills,instructions}/...`; unique (graph_id, name) on both; Instructions priority field (0–1000, sorted desc).
-- **FE:** [x] Skills + Instructions sections in the rail · list + add/edit forms · full-page maximize routes.
+### S5 — Skills + Instructions (graph-scoped) — **shipped** ✅ (Instructions table later removed — RFC-040)
+- **BE:** [x] Skill CRUD under `/u/:username/:graphSlug/skills/...`; unique (graph_id, name). The
+  separate Instructions table shipped here but was **removed in RFC-040** (unwired + redundant) and
+  folded into the single `Graph.instructions` field — see § 2.5.
+- **FE:** [x] Skills section in the rail · list + add/edit forms · full-page maximize route. Instructions
+  is now the single-field `InstructionsSection` (RFC-040), not a list.
 
 **Done when:** user authors a skill, sees it persisted, edits it. ✅ — detail in [`mvp/layer-2-graph.md`](mvp/layer-2-graph.md) (§ 2.4 + § 2.5). Markdown editor (CodeMirror reuse) deferred — plain textareas for now.
 

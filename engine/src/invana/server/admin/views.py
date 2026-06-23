@@ -13,7 +13,6 @@ from invana.auth.models import RefreshToken, User
 from invana.datasets.models import Dataset, ImportJob
 from invana.events.models import Event
 from invana.graphs.models import Graph, GraphConnection, GraphMember
-from invana.instructions.models import Instruction
 from invana.llm_providers.models import LLMProvider
 from invana.modeller.models import (
     ConstraintDefinition,
@@ -195,7 +194,7 @@ class GraphContainerView(ModelView):
         "slug",
         "name",
         "description",
-        "intent",
+        "instructions",
         StringField("status", label="Status"),
         "connection",
         "created_by_id",
@@ -294,21 +293,6 @@ class SkillView(ModelView):
         "updated_at",
     ]
     search_fields = ["name", "description"]
-
-
-class InstructionView(ModelView):
-    label = "Instructions"
-    icon = "fa fa-scroll"
-    fields = [
-        "id",
-        "graph_id",
-        "name",
-        "content",
-        "priority",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["name"]
 
 
 class EventView(ModelView):
@@ -463,7 +447,7 @@ def mount_admin(app: FastAPI) -> None:
         ),
     )
 
-    # ── Graph-scoped bindings (LLM / Skills / Instructions) ──────────────────
+    # ── Graph-scoped bindings (LLM / Skills) ─────────────────────────────────
     admin.add_view(
         DropDown(
             label="Agent bindings",
@@ -471,7 +455,6 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 LLMProviderView(LLMProvider, label="LLM providers", icon="fa fa-sparkles"),
                 SkillView(Skill, label="Skills", icon="fa fa-wand-magic-sparkles"),
-                InstructionView(Instruction, label="Instructions", icon="fa fa-scroll"),
             ],
         ),
     )

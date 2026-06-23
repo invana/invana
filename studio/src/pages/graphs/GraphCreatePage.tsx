@@ -19,7 +19,7 @@ function slugify(input: string): string {
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
 interface CreateGraphForm {
-	graph: { name: string; slug: string; intent: string };
+	graph: { name: string; slug: string; instructions: string };
 }
 
 export function GraphCreatePage() {
@@ -27,7 +27,7 @@ export function GraphCreatePage() {
 	const mutation = useCreateGraphMutation();
 
 	const form = useForm<CreateGraphForm>({
-		defaultValues: { graph: { name: "", slug: "", intent: "" } },
+		defaultValues: { graph: { name: "", slug: "", instructions: "" } },
 	});
 
 	// ObjectField owns each field's onChange, so the name→slug auto-derivation
@@ -68,10 +68,10 @@ export function GraphCreatePage() {
 			description: `Lives at /u/<you>/${slug || "…"}`,
 		},
 		{
-			name: "intent",
+			name: "instructions",
 			type: "textarea",
 			rows: 4,
-			label: "Intent (optional)",
+			label: "Instructions (optional)",
 			placeholder: "What is this graph for? What questions should it answer?",
 		},
 	];
@@ -81,7 +81,7 @@ export function GraphCreatePage() {
 	const rowConfig = [
 		{ id: "name", fields: ["name"] },
 		{ id: "slug", fields: ["slug"] },
-		{ id: "intent", fields: ["intent"] },
+		{ id: "instructions", fields: ["instructions"] },
 	];
 
 	const canSubmit =
@@ -115,7 +115,11 @@ export function GraphCreatePage() {
 		if (invalid) return;
 
 		mutation.mutate(
-			{ name, slug: nextSlug, intent: data.graph.intent.trim() || null },
+			{
+				name,
+				slug: nextSlug,
+				instructions: data.graph.instructions.trim() || null,
+			},
 			{
 				onSuccess: (graph) => {
 					toast.success(`Graph "${graph.name}" created`);
@@ -141,8 +145,8 @@ export function GraphCreatePage() {
 				<div className="mb-8">
 					<h1 className="text-2xl font-bold">New Graph</h1>
 					<p className="text-muted-foreground mt-1">
-						Name it, give it an intent. You'll attach a database connection in
-						the next step.
+						Name it, give it instructions. You'll attach a database connection
+						in the next step.
 					</p>
 				</div>
 

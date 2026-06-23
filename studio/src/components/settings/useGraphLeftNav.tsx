@@ -5,7 +5,6 @@ import {
 	Database,
 	Info,
 	Layers,
-	Lightbulb,
 	ScrollText,
 	Sparkles,
 	Wand2,
@@ -27,7 +26,6 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 	// connection form lives under its own "Connection" icon below.
 	{ key: "info", label: "Info", icon: Info },
 	{ key: "connection", label: "Connection", icon: Database },
-	{ key: "intent", label: "Intent", icon: Lightbulb },
 	{ key: "llms", label: "LLMs", icon: Sparkles },
 	{ key: "skills", label: "Skills", icon: Wand2 },
 	{ key: "instructions", label: "Instructions", icon: ScrollText },

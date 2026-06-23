@@ -8,7 +8,7 @@ interface Props {
 	 * Why the surface is gated:
 	 * - `connection` (default): no `GraphConnection` attached yet.
 	 * - `setup`: connection exists but the required setup-wizard sections
-	 *   (graph_info + intent) aren't complete — mirrors the engine's
+	 *   (graph_info + instructions) aren't complete — mirrors the engine's
 	 *   `graph_setup_incomplete` 409 guard.
 	 */
 	reason?: "connection" | "setup";
@@ -37,7 +37,7 @@ export function SetupRequiredBanner({
 	const Icon = reason === "setup" ? ListChecks : Plug;
 	const body =
 		reason === "setup"
-			? `Finish the setup wizard (Graph Info + Intent) before you can use the ${lowerLabel}.`
+			? `Finish the setup wizard (Graph Info + Instructions) before you can use the ${lowerLabel}.`
 			: `Attach a graph database connection to this graph before you can use the ${lowerLabel}.`;
 
 	return (

@@ -13,7 +13,10 @@ export interface SetupSectionState {
 }
 
 export type SetupState = Partial<
-	Record<"graph_info" | "intent" | "skills" | "datasets", SetupSectionState>
+	Record<
+		"graph_info" | "instructions" | "skills" | "datasets",
+		SetupSectionState
+	>
 >;
 
 export interface Graph {
@@ -21,7 +24,7 @@ export interface Graph {
 	slug: string;
 	name: string;
 	description: string | null;
-	intent: string | null;
+	instructions: string | null;
 	objectives: string | null;
 	success_criteria: string | null;
 	setup_state: SetupState;
@@ -37,13 +40,13 @@ export interface Graph {
 export interface GraphCreate {
 	name: string;
 	slug: string;
-	intent?: string | null;
+	instructions?: string | null;
 }
 
 export interface GraphUpdate {
 	name?: string;
 	description?: string | null;
-	intent?: string | null;
+	instructions?: string | null;
 	objectives?: string | null;
 	success_criteria?: string | null;
 	status?: GraphContainerStatus;
@@ -54,16 +57,20 @@ export interface GraphListResponse {
 	total: number;
 }
 
-export type SetupSection = "graph_info" | "intent" | "skills" | "datasets";
+export type SetupSection =
+	| "graph_info"
+	| "instructions"
+	| "skills"
+	| "datasets";
 export const SETUP_SECTIONS: readonly SetupSection[] = [
 	"graph_info",
-	"intent",
+	"instructions",
 	"skills",
 	"datasets",
 ] as const;
 export const SETUP_REQUIRED: readonly SetupSection[] = [
 	"graph_info",
-	"intent",
+	"instructions",
 ] as const;
 export const SETUP_SKIPPABLE: readonly SetupSection[] = [
 	"skills",

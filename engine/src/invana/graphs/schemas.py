@@ -30,13 +30,13 @@ GRAPH_SLUG_MAX = 64
 class GraphCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     slug: str = Field(..., min_length=GRAPH_SLUG_MIN, max_length=GRAPH_SLUG_MAX, pattern=GRAPH_SLUG_PATTERN)
-    intent: str | None = Field(default=None, max_length=10000)
+    instructions: str | None = Field(default=None, max_length=10000)
 
 
 class GraphUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
-    intent: str | None = Field(default=None, max_length=10000)
+    instructions: str | None = Field(default=None, max_length=10000)
     objectives: str | None = None
     success_criteria: str | None = None
     status: GraphStatus | None = None
@@ -50,7 +50,7 @@ class GraphRead(BaseModel):
     slug: str
     name: str
     description: str | None
-    intent: str | None
+    instructions: str | None
     objectives: str | None
     success_criteria: str | None
     setup_state: dict
@@ -72,11 +72,11 @@ class GraphListResponse(BaseModel):
 # Setup wizard
 # ---------------------------------------------------------------------------
 
-# Sections in the order they appear in the wizard. graph_info + intent are
-# REQUIRED (gate the modeller/explorer/query routes); skills + datasets are
+# Sections in the order they appear in the wizard. graph_info + instructions
+# are REQUIRED (gate the modeller/explorer/query routes); skills + datasets are
 # SKIPPABLE.
-SETUP_SECTIONS = ("graph_info", "intent", "skills", "datasets")
-SETUP_REQUIRED = ("graph_info", "intent")
+SETUP_SECTIONS = ("graph_info", "instructions", "skills", "datasets")
+SETUP_REQUIRED = ("graph_info", "instructions")
 SETUP_SKIPPABLE = ("skills", "datasets")
 
 

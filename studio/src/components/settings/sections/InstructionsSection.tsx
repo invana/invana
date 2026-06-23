@@ -1,249 +1,83 @@
-import { Input, Label, Textarea } from "@invana/forms";
-import { Badge, Button, Skeleton } from "@invana/ui";
-import { Plus, ScrollText, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Form, FormField, TextareaField } from "@invana/forms";
+import { Button, Skeleton } from "@invana/ui";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
-	useCreateInstructionMutation,
-	useDeleteInstructionMutation,
-	useInstructionsQuery,
-	useUpdateInstructionMutation,
-} from "../../../hooks/queries/useInstructions";
-import type {
-	Instruction,
-	InstructionCreate,
-} from "../../../types/instructions";
+	useGraphQuery,
+	useUpdateGraphMutation,
+} from "../../../hooks/queries/useGraphs";
 import { FormError } from "../../forms/FormError";
 
 interface Props {
 	username: string;
 	graphSlug: string;
+	onSaved?: () => void;
 }
 
-export function InstructionsSection({ username, graphSlug }: Props) {
-	const { data, isLoading } = useInstructionsQuery(username, graphSlug);
-	const [editing, setEditing] = useState<"new" | Instruction | null>(null);
-
-	if (isLoading) {
-		return (
-			<div className="space-y-3">
-				<Skeleton className="h-12 w-full" />
-				<Skeleton className="h-12 w-full" />
-			</div>
-		);
-	}
-
-	if (editing) {
-		return (
-			<InstructionForm
-				username={username}
-				graphSlug={graphSlug}
-				existing={editing === "new" ? null : editing}
-				onDone={() => setEditing(null)}
-			/>
-		);
-	}
-
-	const items = data?.items ?? [];
-
-	return (
-		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				<p className="text-muted-foreground">
-					Operational directives the Graph's agents follow. Higher priority
-					wins.
-				</p>
-				<Button onClick={() => setEditing("new")}>
-					<Plus className="w-4 h-4 mr-1" />
-					Add instruction
-				</Button>
-			</div>
-
-			{items.length === 0 ? (
-				<div className="border border-border rounded-lg p-8 flex flex-col items-center gap-3 text-center">
-					<ScrollText className="w-8 h-8 text-muted-foreground opacity-50" />
-					<p className="text-muted-foreground">
-						No instructions yet. Add one to shape how your agents behave.
-					</p>
-				</div>
-			) : (
-				<div className="border border-border rounded-lg divide-y divide-border">
-					{items.map((i) => (
-						<InstructionRow
-							key={i.id}
-							username={username}
-							graphSlug={graphSlug}
-							instruction={i}
-							onEdit={() => setEditing(i)}
-						/>
-					))}
-				</div>
-			)}
-		</div>
-	);
+interface FormShape {
+	instructions: string;
 }
 
-function InstructionRow({
-	username,
-	graphSlug,
-	instruction,
-	onEdit,
-}: {
-	username: string;
-	graphSlug: string;
-	instruction: Instruction;
-	onEdit: () => void;
-}) {
-	const remove = useDeleteInstructionMutation(username, graphSlug);
-	return (
-		<div className="flex items-start gap-4 px-4 py-3">
-			<div className="flex-1 min-w-0">
-				<div className="flex items-center gap-2">
-					<p className="font-medium truncate">{instruction.name}</p>
-					<Badge variant="secondary" className="shrink-0">
-						p{instruction.priority}
-					</Badge>
-				</div>
-				{instruction.content && (
-					<p className="text-muted-foreground mt-0.5 line-clamp-2">
-						{instruction.content}
-					</p>
-				)}
-			</div>
-			<div className="flex items-center gap-1 shrink-0">
-				<Button variant="ghost" size="sm" onClick={onEdit}>
-					Edit
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-8 w-8"
-					disabled={remove.isPending}
-					onClick={() => {
-						if (!confirm(`Delete instruction "${instruction.name}"?`)) return;
-						remove.mutate(instruction.id, {
-							onError: (err) => toast.error(err.message),
-							onSuccess: () => toast.success("Instruction deleted"),
-						});
-					}}
-				>
-					<Trash2 className="w-4 h-4" />
-				</Button>
-			</div>
-		</div>
-	);
-}
+export function InstructionsSection({ username, graphSlug, onSaved }: Props) {
+	const { data: graph, isLoading } = useGraphQuery(username, graphSlug);
+	const mutation = useUpdateGraphMutation();
+	const form = useForm<FormShape>({ defaultValues: { instructions: "" } });
 
-function InstructionForm({
-	username,
-	graphSlug,
-	existing,
-	onDone,
-}: {
-	username: string;
-	graphSlug: string;
-	existing: Instruction | null;
-	onDone: () => void;
-}) {
-	const isEdit = !!existing;
-	const create = useCreateInstructionMutation(username, graphSlug);
-	const update = useUpdateInstructionMutation(username, graphSlug);
+	// Sync the form once the graph loads (and after it refetches post-save).
+	useEffect(() => {
+		if (graph) form.reset({ instructions: graph.instructions ?? "" });
+	}, [graph, form]);
 
-	const [name, setName] = useState(existing?.name ?? "");
-	const [content, setContent] = useState(existing?.content ?? "");
-	const [priority, setPriority] = useState(existing?.priority ?? 100);
-
-	const formValid = !!name.trim() && priority >= 0 && priority <= 1000;
-	const isSubmitting = create.isPending || update.isPending;
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!formValid) return;
-		const payload: InstructionCreate = {
-			name: name.trim(),
-			content,
-			priority,
-		};
-		if (isEdit && existing) {
-			update.mutate(
-				{ id: existing.id, data: payload },
-				{
-					onSuccess: () => {
-						toast.success("Instruction saved");
-						onDone();
-					},
-					onError: (err) => toast.error(err.message),
-				},
-			);
-		} else {
-			create.mutate(payload, {
+	const submitForm = form.handleSubmit((values) => {
+		mutation.mutate(
+			{
+				username,
+				graphSlug,
+				data: { instructions: values.instructions.trim() || null },
+			},
+			{
 				onSuccess: () => {
-					toast.success("Instruction added");
-					onDone();
+					toast.success("Instructions saved");
+					onSaved?.();
 				},
 				onError: (err) => toast.error(err.message),
-			});
-		}
-	};
+			},
+		);
+	});
 
+	if (isLoading) return <Skeleton className="h-32 w-full" />;
+	if (!graph) return <p className="text-muted-foreground">Graph not found.</p>;
+
+	// A single full-width textarea: ObjectField lays its fields out in a
+	// two-column grid (`md:grid-cols-2`), so a lone field renders at half width.
+	// Use the generator's `TextareaField` directly, wired to react-hook-form via
+	// `FormField`, so it spans the panel.
 	return (
-		<form onSubmit={handleSubmit} className="space-y-5" noValidate>
-			<div className="space-y-1.5">
-				<Label htmlFor="instr-name">
-					Name <span className="text-destructive">*</span>
-				</Label>
-				<Input
-					id="instr-name"
-					placeholder="cite-sources"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					maxLength={255}
+		<Form {...form}>
+			<form onSubmit={submitForm} className="space-y-4" noValidate>
+				<FormField
+					control={form.control}
+					name="instructions"
+					render={({ field }) => (
+						<TextareaField
+							description="Standing instructions this graph's agents follow — what it's for, what questions it should answer, and how it should behave. Used to ground prompts and agents."
+							placeholder="Describe what this graph is for and how its agents should behave…"
+							rows={8}
+							labelPosition="top"
+							size="md"
+							value={field.value}
+							onChange={field.onChange}
+						/>
+					)}
 				/>
-			</div>
-			<div className="space-y-1.5">
-				<Label htmlFor="instr-priority">
-					Priority{" "}
-					<span className="text-muted-foreground">(0–1000, default 100)</span>
-				</Label>
-				<Input
-					id="instr-priority"
-					type="number"
-					min={0}
-					max={1000}
-					value={priority}
-					onChange={(e) => setPriority(Number(e.target.value))}
-				/>
-			</div>
-			<div className="space-y-1.5">
-				<Label htmlFor="instr-content">Content (markdown)</Label>
-				<Textarea
-					id="instr-content"
-					placeholder="Always cite the source node ID when answering factual questions…"
-					rows={10}
-					value={content}
-					onChange={(e) => setContent(e.target.value)}
-				/>
-			</div>
-
-			<FormError error={create.error ?? update.error} />
-
-			<div className="flex justify-end gap-3 pt-2">
-				<Button
-					type="button"
-					variant="outline"
-					onClick={onDone}
-					disabled={isSubmitting}
-				>
-					Cancel
-				</Button>
-				<Button type="submit" disabled={!formValid || isSubmitting}>
-					{isSubmitting
-						? "Saving…"
-						: isEdit
-							? "Save changes"
-							: "Add instruction"}
-				</Button>
-			</div>
-		</form>
+				<FormError error={mutation.error} />
+				<div className="flex gap-2">
+					<Button type="submit" disabled={mutation.isPending}>
+						{mutation.isPending ? "Saving…" : "Save Instructions"}
+					</Button>
+				</div>
+			</form>
+		</Form>
 	);
 }

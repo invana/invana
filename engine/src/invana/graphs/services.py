@@ -46,7 +46,7 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
     graph = Graph(
         slug=slug,
         name=payload.name,
-        intent=payload.intent,
+        instructions=payload.instructions,
         created_by_id=owner.id,
         setup_state={},
     )
@@ -109,11 +109,11 @@ async def update_graph(
     before = {f: getattr(graph, f) for f in data}
     for field, value in data.items():
         setattr(graph, field, value)
-    intent_completed = False
-    if "intent" in data and graph.intent and graph.intent.strip():
-        already_complete = bool((graph.setup_state or {}).get("intent", {}).get("completed_at"))
-        _mark_section(graph, "intent", "complete")
-        intent_completed = not already_complete
+    instructions_completed = False
+    if "instructions" in data and graph.instructions and graph.instructions.strip():
+        already_complete = bool((graph.setup_state or {}).get("instructions", {}).get("completed_at"))
+        _mark_section(graph, "instructions", "complete")
+        instructions_completed = not already_complete
     await session.flush()
     after = {f: getattr(graph, f) for f in data}
     changed = diff_changed_fields(before, after, fields=list(data))
@@ -128,7 +128,7 @@ async def update_graph(
             details={"changed": changed, "name": graph.name},
             trace_id=current_trace_id(),
         )
-    if intent_completed:
+    if instructions_completed:
         await emit_event(
             session,
             action=actions.SETUP_COMPLETE,
@@ -136,7 +136,7 @@ async def update_graph(
             target_id=graph.id,
             graph_id=graph.id,
             actor_id=actor_id,
-            details={"section": "intent", "via": "graph.update"},
+            details={"section": "instructions", "via": "graph.update"},
             trace_id=current_trace_id(),
         )
     return await _serialize_graph(session, graph)
@@ -358,7 +358,7 @@ def _mark_section(graph: Graph, section: str, action: str) -> None:
     """Mutate graph.setup_state to record a section action.
 
     ``action`` is ``complete`` | ``skip`` | ``reset``. Required sections
-    (``graph_info``, ``intent``) cannot be skipped — caller must validate first.
+    (``graph_info``, ``instructions``) cannot be skipped — caller must validate first.
     """
     state = dict(graph.setup_state or {})
     now = datetime.now(UTC).isoformat()
@@ -436,7 +436,7 @@ async def _serialize_graph(session: AsyncSession, graph: Graph) -> GraphRead:
         slug=graph.slug,
         name=graph.name,
         description=graph.description,
-        intent=graph.intent,
+        instructions=graph.instructions,
         objectives=graph.objectives,
         success_criteria=graph.success_criteria,
         setup_state=graph.setup_state or {},

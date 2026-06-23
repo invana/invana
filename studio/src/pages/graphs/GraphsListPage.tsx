@@ -47,7 +47,12 @@ function formatRelative(iso: string): string {
 }
 
 function setupProgress(graph: Graph): { done: number; total: number } {
-	const sections = ["graph_info", "intent", "skills", "datasets"] as const;
+	const sections = [
+		"graph_info",
+		"instructions",
+		"skills",
+		"datasets",
+	] as const;
 	const done = sections.filter((s) => {
 		const entry = graph.setup_state?.[s];
 		return !!entry?.completed_at || !!entry?.skipped_at;
@@ -84,7 +89,7 @@ function GraphRow({
 				</span>
 				{/* <span className="text-muted-foreground truncate font-mono">
           /u/{graph.owner_username}/{graph.slug}
-          {graph.intent ? ` — ${graph.intent}` : ""}
+          {graph.instructions ? ` — ${graph.instructions}` : ""}
         </span> */}
 			</button>
 			{/* <span className="text-muted-foreground/60 shrink-0 tabular-nums">
@@ -135,7 +140,7 @@ export function GraphsListPage() {
 				g.name.toLowerCase().includes(q) ||
 				g.slug.toLowerCase().includes(q) ||
 				g.owner_username.toLowerCase().includes(q) ||
-				(g.intent ?? "").toLowerCase().includes(q),
+				(g.instructions ?? "").toLowerCase().includes(q),
 		);
 	}, [allGraphs, search]);
 

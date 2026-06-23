@@ -4,7 +4,7 @@ import {
 	Circle,
 	Database,
 	Layers,
-	Lightbulb,
+	ScrollText,
 	SkipForward,
 	Sparkles,
 } from "lucide-react";
@@ -17,7 +17,7 @@ import type {
 } from "../../../types/graphs";
 import { type SettingsSection, useSettingsPanel } from "../useSettingsPanel";
 
-const REQUIRED: SetupSection[] = ["graph_info", "intent"];
+const REQUIRED: SetupSection[] = ["graph_info", "instructions"];
 const SKIPPABLE: SetupSection[] = ["skills", "datasets"];
 
 interface SectionMeta {
@@ -44,11 +44,11 @@ const SECTIONS: SectionMeta[] = [
 		settingsSection: "connection",
 	},
 	{
-		key: "intent",
-		label: "Intent",
-		description: "Describe what this graph is for.",
-		icon: Lightbulb,
-		settingsSection: "intent",
+		key: "instructions",
+		label: "Instructions",
+		description: "Describe what this graph is for and how its agents behave.",
+		icon: ScrollText,
+		settingsSection: "instructions",
 	},
 	{
 		key: "skills",

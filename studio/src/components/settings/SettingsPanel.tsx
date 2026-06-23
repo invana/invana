@@ -4,7 +4,6 @@ import {
 	type Database,
 	Info,
 	Layers,
-	Lightbulb,
 	Maximize2,
 	Minimize2,
 	ScrollText,
@@ -18,7 +17,6 @@ import { DatasetsSection } from "./sections/DatasetsSection";
 import { EventsSection } from "./sections/EventsSection";
 import { InfoSection } from "./sections/InfoSection";
 import { InstructionsSection } from "./sections/InstructionsSection";
-import { IntentSection } from "./sections/IntentSection";
 import { LLMsSection } from "./sections/LLMsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
@@ -125,7 +123,6 @@ const SINGLE_TAB_SECTIONS: Record<
 	{ label: string; icon: typeof Database }
 > = {
 	info: { label: "Info", icon: Info },
-	intent: { label: "Intent", icon: Lightbulb },
 	llms: { label: "LLMs", icon: Sparkles },
 	skills: { label: "Skills", icon: Wand2 },
 	instructions: { label: "Instructions", icon: ScrollText },
@@ -145,8 +142,6 @@ function SectionContent({
 	switch (section) {
 		case "info":
 			return <InfoSection username={username} graphSlug={graphSlug} />;
-		case "intent":
-			return <IntentSection username={username} graphSlug={graphSlug} />;
 		case "llms":
 			return <LLMsSection username={username} graphSlug={graphSlug} />;
 		case "skills":

@@ -71,7 +71,7 @@ class Graph(Base):
     """The unit of work — a knowledge graph and everything that lives in it.
 
     1:1 with ``GraphConnection``. Carries identity (slug + owner),
-    intent + objectives, setup-wizard state, and the analytical bindings
+    instructions + objectives, setup-wizard state, and the analytical bindings
     that hang off it (members, datasets, skills, agents…).
     """
 
@@ -85,12 +85,13 @@ class Graph(Base):
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # Captured at creation — short statement of what the Graph is for.
-    intent: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Standing guidance the Graph's agents follow (ChatGPT-/Claude-project-style
+    # custom instructions). Authored at creation, refined via the setup wizard.
+    instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
     objectives: Mapped[str | None] = mapped_column(Text, nullable=True)
     success_criteria: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Per-section completion + skipped state for the setup wizard.
-    # Shape: {graph_info: {completed_at?, skipped_at?}, intent: {...}, skills: {...}, datasets: {...}}.
+    # Shape: {graph_info: {completed_at?, skipped_at?}, instructions: {...}, skills: {...}, datasets: {...}}.
     setup_state: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     status: Mapped[GraphStatus] = mapped_column(_graph_status_enum, nullable=False, default=GraphStatus.active)
     # RESTRICT — owner cannot be deleted while they still own a Graph.
