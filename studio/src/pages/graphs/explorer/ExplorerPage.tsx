@@ -51,6 +51,7 @@ import {
 	ExplorerHeaderToolbar,
 } from "./components/ExplorerCanvas";
 import { InspectorPanel } from "./components/InspectorPanel";
+import { SchemaBrowser } from "./components/SchemaBrowser";
 import { SessionsPanel } from "./components/SessionsPanel";
 import { useExpandNode } from "./hooks/useExpandNode";
 import { useSessions } from "./hooks/useSessions";
@@ -454,8 +455,10 @@ export function ExplorerPage() {
 		[expand, handleExpandResult],
 	);
 
-	// Active model schema drives the expand submenus + fine-tune pickers.
-	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
+	// Active model schema drives the expand submenus + fine-tune pickers, and the
+	// read-only model browser (SchemaBrowser) docked under `?settings=model`.
+	const { data: activeVersion, isLoading: activeVersionLoading } =
+		useActiveVersionQuery(username, graphSlug);
 	const expandSchema = useMemo<ExpandMenuSchema | null>(() => {
 		if (!activeVersion) return null;
 		return {
@@ -617,7 +620,9 @@ export function ExplorerPage() {
 		</div>
 	);
 
-	const leftContent = connectionMissing ? (
+	// The left rail is single-open: `?settings=model` docks the read-only model
+	// browser; otherwise the page shows its Sessions panel (or a setup banner).
+	const sessionsContent = connectionMissing ? (
 		<SetupRequiredBanner pageLabel="Explorer" reason="connection" />
 	) : setupIncomplete ? (
 		<SetupRequiredBanner pageLabel="Explorer" reason="setup" />
@@ -649,6 +654,18 @@ export function ExplorerPage() {
 			onArchive={setArchived}
 		/>
 	);
+
+	const leftContent =
+		settingsPanel.section === "model" ? (
+			<SchemaBrowser
+				version={activeVersion}
+				isLoading={activeVersionLoading}
+				backend={backend}
+				onClose={closeSessions}
+			/>
+		) : (
+			sessionsContent
+		);
 
 	// Right-panel (inspector) toggle for the page header — always shown, next to
 	// the profile menu. The left (sessions) panel is driven by the left nav rail.

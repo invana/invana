@@ -62,13 +62,17 @@ interface GraphDetailProps {
 	headerCenter?: ReactNode;
 }
 
-// The top-rail view panels keyed into the shared `?settings` param. Explorer's
-// SessionsPanel and Modeller's SchemaNav open via these instead of rendering a
-// SettingsPanel tab — so the whole rail is one single-open accordion.
-const NATIVE_SECTION: Partial<Record<GraphDetailSection, SettingsSection>> = {
-	explorer: "sessions",
-	modeller: "schema",
-};
+// The page-owned panels keyed into the shared `?settings` param. These open via
+// the page's own `leftSection` instead of rendering a SettingsPanel tab — so the
+// whole rail stays one single-open accordion. A view may own more than one:
+// Explorer has both the SessionsPanel (`sessions`) and the read-only model
+// browser (`model`); the Modeller has its SchemaNav (`schema`).
+const NATIVE_SECTIONS: Partial<Record<GraphDetailSection, SettingsSection[]>> =
+	{
+		explorer: ["sessions", "model"],
+		modeller: ["schema"],
+	};
+const ALL_NATIVE_SECTIONS: SettingsSection[] = ["sessions", "schema", "model"];
 
 /**
  * Shared shell for every graph-scoped detail page (Overview, Explorer,
@@ -128,13 +132,10 @@ export function GraphDetail({
 	// (SessionsPanel / SchemaNav) opens under its native key; every other value
 	// is a bottom-rail settings section that renders the SettingsPanel. A value
 	// belonging to the *other* view's native key shows nothing here.
-	const nativeKey = NATIVE_SECTION[sectionId];
-	const sectionIsNative =
-		settingsPanel.section === "sessions" || settingsPanel.section === "schema";
+	const nativeKeys = NATIVE_SECTIONS[sectionId] ?? [];
+	const sectionIsNative = ALL_NATIVE_SECTIONS.includes(settingsPanel.section);
 	const showNative =
-		settingsPanel.isOpen &&
-		nativeKey != null &&
-		settingsPanel.section === nativeKey;
+		settingsPanel.isOpen && nativeKeys.includes(settingsPanel.section);
 	const settingsOpen =
 		settingsPanel.isOpen && !sectionIsNative && !!username && !!graphSlug;
 	const settingsExpanded = settingsOpen && settingsPanel.expanded;

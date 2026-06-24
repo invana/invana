@@ -5,6 +5,7 @@ import {
 	Database,
 	Info,
 	Layers,
+	ListTree,
 	Settings,
 	Sparkles,
 	Wand2,
@@ -117,9 +118,26 @@ export function useGraphLeftNav(
 		};
 	};
 
+	// Explorer's second native panel: a read-only model browser (SchemaBrowser).
+	// It toggles the shared `?settings=model` key just like the view icons, so the
+	// rail stays single-open. Shown only on Explorer — the Modeller already owns
+	// the schema as its own native panel, so it doesn't need a duplicate here.
+	const modelItem = () => {
+		const active = settingsPanel.isOpen && settingsPanel.section === "model";
+		return {
+			name: "Model",
+			icon: ListTree,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () => toggleSection("model"),
+		};
+	};
+
 	const topNavItems = [
 		viewItem("explorer", "Explorer", Compass),
 		viewItem("modeller", "Modeller", Boxes),
+		...(activeTab === "explorer" ? [modelItem()] : []),
 	];
 
 	// Each section icon is a toggle: clicking the open section closes the panel,
