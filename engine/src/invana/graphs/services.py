@@ -18,6 +18,7 @@ from invana.graphs.models import (
     Graph,
     GraphConnection,
     GraphMember,
+    GraphStatus,
 )
 from invana.graphs.schemas import (
     SETUP_REQUIRED,
@@ -82,14 +83,27 @@ async def create_graph(session: AsyncSession, *, owner: User, payload: GraphCrea
     return await _serialize_graph(session, graph)
 
 
-async def list_graphs_for_user(session: AsyncSession, *, user_id: str) -> list[GraphRead]:
-    """Return all Graphs the user is a member of, most recently updated first."""
+async def list_graphs_for_user(
+    session: AsyncSession,
+    *,
+    user_id: str,
+    include_archived: bool = False,
+) -> list[GraphRead]:
+    """Return Graphs the user is a member of, most recently updated first.
+
+    Archived graphs are hidden by default — they drop out of the main list into
+    the Studio's "Archived" filter (which passes ``include_archived=True``).
+    Archiving never blocks access: an archived graph is still reachable by URL
+    and still queryable.
+    """
     stmt = (
         select(Graph)
         .join(GraphMember, GraphMember.graph_id == Graph.id)
         .where(GraphMember.user_id == user_id)
         .order_by(Graph.updated_at.desc())
     )
+    if not include_archived:
+        stmt = stmt.where(Graph.status == GraphStatus.active)
     rows = (await session.execute(stmt)).scalars().unique().all()
     return [await _serialize_graph(session, g) for g in rows]
 

@@ -5,7 +5,7 @@ import {
 	Database,
 	Info,
 	Layers,
-	ScrollText,
+	Settings,
 	Sparkles,
 	Wand2,
 } from "lucide-react";
@@ -28,10 +28,11 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 	{ key: "connection", label: "Connection", icon: Database },
 	{ key: "llms", label: "LLMs", icon: Sparkles },
 	{ key: "skills", label: "Skills", icon: Wand2 },
-	{ key: "instructions", label: "Instructions", icon: ScrollText },
 	{ key: "datasets", label: "Datasets", icon: Layers },
 	// Events (RFC-018) — the graph's audit log.
 	{ key: "events", label: "Events", icon: Activity },
+	// Settings sits at the bottom of the rail, just above the profile menu.
+	{ key: "settings", label: "Settings", icon: Settings },
 ];
 
 type ActiveTab = "overview" | "explorer" | "modeller" | null;
@@ -41,8 +42,8 @@ type ActiveTab = "overview" | "explorer" | "modeller" | null;
  * Overview, Explorer, Modeller. Surfaces:
  *
  * - Top: the three graph views (Overview / Explorer / Modeller).
- * - Bottom: one icon per settings section (Info / Connection / Intent / LLMs
- *   / Skills / Instructions / Datasets / Events). Clicking a settings icon
+ * - Bottom: one icon per settings section (Info / Connection / LLMs / Skills /
+ *   Datasets / Events / Settings). Clicking a settings icon
  *   sets `?settings=<section>` on the current page so the leftSection swaps
  *   to that section's content.
  * - Very bottom (`bottom` slot, below a separator): the user profile menu.

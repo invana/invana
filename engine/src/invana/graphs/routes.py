@@ -13,7 +13,7 @@ Two routers live here:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth.deps import get_current_user
@@ -34,7 +34,7 @@ from invana.graphs.deps import (
     resolve_graph_by_username_slug,
 )
 from invana.graphs.manager import GraphConnectionManager, GraphUnavailableError
-from invana.graphs.models import Graph, GraphConnection, GraphMember
+from invana.graphs.models import Graph, GraphConnection, GraphMember, GraphStatus
 from invana.graphs.schemas import (
     GraphConnectionCreate,
     GraphConnectionRead,
@@ -46,6 +46,7 @@ from invana.graphs.schemas import (
     VersionDeclareRequest,
 )
 from invana.graphs.store import GraphConnectionStore
+from invana.server.schemas import ActionResponse, action
 from invana.settings import settings
 
 
@@ -97,10 +98,14 @@ async def create_graph(
 
 @graphs_collection_router.get("", response_model=GraphListResponse)
 async def list_graphs(
+    include_archived: bool = Query(
+        default=False,
+        description="Include archived graphs. Default hides them from the list.",
+    ),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> GraphListResponse:
-    items = await services.list_graphs_for_user(session, user_id=user.id)
+    items = await services.list_graphs_for_user(session, user_id=user.id, include_archived=include_archived)
     return GraphListResponse(items=items, total=len(items))
 
 
@@ -120,17 +125,23 @@ async def get_graph(
     return await services.get_graph_detail(session, graph=graph)
 
 
-@graph_router.patch("", response_model=GraphRead)
+@graph_router.patch("", response_model=ActionResponse[GraphRead])
 async def patch_graph(
     payload: GraphUpdate,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-) -> GraphRead:
+) -> ActionResponse[GraphRead]:
     out = await services.update_graph(session, graph=graph, payload=payload, actor_id=user.id)
     await session.commit()
-    return out
+    # Backend owns the toast copy (RFC-028). Archiving toggles status on its own,
+    # so distinguish it from a details save for a message that matches the intent.
+    if "status" in payload.model_fields_set and payload.status is not None:
+        message = "Graph archived" if payload.status == GraphStatus.archived else "Graph unarchived"
+    else:
+        message = "Graph settings saved"
+    return action(message, out)
 
 
 @graph_router.delete("", status_code=status.HTTP_204_NO_CONTENT)

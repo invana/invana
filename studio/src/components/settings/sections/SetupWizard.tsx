@@ -48,7 +48,7 @@ const SECTIONS: SectionMeta[] = [
 		label: "Instructions",
 		description: "Describe what this graph is for and how its agents behave.",
 		icon: ScrollText,
-		settingsSection: "instructions",
+		settingsSection: "settings",
 	},
 	{
 		key: "skills",

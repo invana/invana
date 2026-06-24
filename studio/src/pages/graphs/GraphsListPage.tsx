@@ -60,6 +60,33 @@ function setupProgress(graph: Graph): { done: number; total: number } {
 	return { done, total: sections.length };
 }
 
+function ViewToggle({
+	label,
+	count,
+	active,
+	onClick,
+}: {
+	label: string;
+	count: number;
+	active: boolean;
+	onClick: () => void;
+}) {
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={`px-2.5 py-1 rounded text-sm transition-colors ${
+				active
+					? "bg-primary text-primary-foreground font-medium"
+					: "text-muted-foreground hover:text-foreground hover:bg-accent"
+			}`}
+		>
+			{label}
+			<span className="ml-1.5 tabular-nums opacity-70">{count}</span>
+		</button>
+	);
+}
+
 function GraphRow({
 	graph,
 	onOpen,
@@ -124,25 +151,37 @@ function GraphRow({
 
 export function GraphsListPage() {
 	const navigate = useNavigate();
-	const { data, isLoading, isError, error } = useGraphsQuery();
+	// Fetch active + archived in one go; the Active/Archived toggle splits them
+	// client-side. Archived graphs are hidden from the default view.
+	const { data, isLoading, isError, error } = useGraphsQuery(true);
 	const deleteMutation = useDeleteGraphMutation();
 	const [deleteTarget, setDeleteTarget] = useState<Graph | null>(null);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const [view, setView] = useState<"active" | "archived">("active");
 
 	const allGraphs = data?.items ?? [];
+	const activeGraphs = allGraphs.filter((g) => g.status === "active");
+	const archivedGraphs = allGraphs.filter((g) => g.status === "archived");
+	const viewGraphs = view === "archived" ? archivedGraphs : activeGraphs;
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
-		if (!q) return allGraphs;
-		return allGraphs.filter(
+		if (!q) return viewGraphs;
+		return viewGraphs.filter(
 			(g) =>
 				g.name.toLowerCase().includes(q) ||
 				g.slug.toLowerCase().includes(q) ||
 				g.owner_username.toLowerCase().includes(q) ||
 				(g.instructions ?? "").toLowerCase().includes(q),
 		);
-	}, [allGraphs, search]);
+	}, [viewGraphs, search]);
+
+	const selectView = (v: "active" | "archived") => {
+		setView(v);
+		setSearch("");
+		setPage(1);
+	};
 
 	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 	const safePage = Math.min(page, totalPages);
@@ -220,11 +259,11 @@ export function GraphsListPage() {
 									))}
 								</div>
 							)}
-							{!isLoading && allGraphs.length === 0 && (
+							{!isLoading && activeGraphs.length === 0 && (
 								<p className="text-muted-foreground">None yet</p>
 							)}
 							{!isLoading &&
-								allGraphs.slice(0, 5).map((graph) => (
+								activeGraphs.slice(0, 5).map((graph) => (
 									<button
 										key={graph.id}
 										type="button"
@@ -246,11 +285,29 @@ export function GraphsListPage() {
 							<p className="font-semibold uppercase tracking-widest text-muted-foreground text-base">
 								Graphs
 							</p>
-							{!isLoading && allGraphs.length > 0 && (
-								<span className="text-muted-foreground/60 tabular-nums">
-									{filtered.length} / {allGraphs.length}
-								</span>
-							)}
+							<div className="flex items-center gap-3">
+								{!isLoading && allGraphs.length > 0 && (
+									<div className="flex items-center gap-0.5 rounded-md border border-border p-0.5">
+										<ViewToggle
+											label="Active"
+											count={activeGraphs.length}
+											active={view === "active"}
+											onClick={() => selectView("active")}
+										/>
+										<ViewToggle
+											label="Archived"
+											count={archivedGraphs.length}
+											active={view === "archived"}
+											onClick={() => selectView("archived")}
+										/>
+									</div>
+								)}
+								{!isLoading && search.trim() !== "" && (
+									<span className="text-muted-foreground/60 tabular-nums">
+										{filtered.length} / {viewGraphs.length}
+									</span>
+								)}
+							</div>
 						</div>
 
 						{!isLoading && allGraphs.length > 0 && (
@@ -291,11 +348,18 @@ export function GraphsListPage() {
 						{!isLoading &&
 							!isError &&
 							filtered.length === 0 &&
-							allGraphs.length > 0 && (
+							allGraphs.length > 0 &&
+							(search ? (
 								<p className="text-muted-foreground">
 									No results for &ldquo;{search}&rdquo;
 								</p>
-							)}
+							) : (
+								<p className="text-muted-foreground">
+									{view === "archived"
+										? "No archived graphs."
+										: "No active graphs."}
+								</p>
+							))}
 
 						{!isLoading && !isError && paginatedGraphs.length > 0 && (
 							<>

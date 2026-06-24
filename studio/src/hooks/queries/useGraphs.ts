@@ -33,10 +33,13 @@ const GRAPHS_KEY = ["graphs"] as const;
 const graphKey = (username: string, graphSlug: string) =>
 	[...GRAPHS_KEY, username, graphSlug] as const;
 
-export function useGraphsQuery() {
+export function useGraphsQuery(includeArchived = false) {
 	return useQuery({
-		queryKey: GRAPHS_KEY,
-		queryFn: () => graphsApi.list(),
+		// Keyed on the flag so the archived/active views cache separately; both
+		// still share the GRAPHS_KEY prefix, so mutations that invalidate
+		// GRAPHS_KEY refresh either view.
+		queryKey: [...GRAPHS_KEY, { includeArchived }] as const,
+		queryFn: () => graphsApi.list(includeArchived),
 		staleTime: 30_000,
 	});
 }

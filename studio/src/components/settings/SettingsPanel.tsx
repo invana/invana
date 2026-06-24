@@ -6,7 +6,7 @@ import {
 	Layers,
 	Maximize2,
 	Minimize2,
-	ScrollText,
+	Settings,
 	Sparkles,
 	Wand2,
 	X,
@@ -16,8 +16,8 @@ import { ConnectionSection } from "./sections/ConnectionSection";
 import { DatasetsSection } from "./sections/DatasetsSection";
 import { EventsSection } from "./sections/EventsSection";
 import { InfoSection } from "./sections/InfoSection";
-import { InstructionsSection } from "./sections/InstructionsSection";
 import { LLMsSection } from "./sections/LLMsSection";
+import { SettingsSection as GraphSettingsSection } from "./sections/SettingsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 
@@ -123,9 +123,9 @@ const SINGLE_TAB_SECTIONS: Record<
 	{ label: string; icon: typeof Database }
 > = {
 	info: { label: "Info", icon: Info },
+	settings: { label: "Settings", icon: Settings },
 	llms: { label: "LLMs", icon: Sparkles },
 	skills: { label: "Skills", icon: Wand2 },
-	instructions: { label: "Instructions", icon: ScrollText },
 	datasets: { label: "Datasets", icon: Layers },
 	events: { label: "Events", icon: Activity },
 };
@@ -146,8 +146,8 @@ function SectionContent({
 			return <LLMsSection username={username} graphSlug={graphSlug} />;
 		case "skills":
 			return <SkillsSection username={username} graphSlug={graphSlug} />;
-		case "instructions":
-			return <InstructionsSection username={username} graphSlug={graphSlug} />;
+		case "settings":
+			return <GraphSettingsSection username={username} graphSlug={graphSlug} />;
 		case "datasets":
 			return <DatasetsSection username={username} graphSlug={graphSlug} />;
 		case "events":

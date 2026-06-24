@@ -14,7 +14,10 @@ import { request } from "./client";
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const graphsApi = {
-	list: () => request<GraphListResponse>("/api/v1/graphs"),
+	list: (includeArchived = false) =>
+		request<GraphListResponse>(
+			`/api/v1/graphs${includeArchived ? "?include_archived=true" : ""}`,
+		),
 
 	get: (username: string, graphSlug: string) =>
 		request<Graph>(`/api/v1/u/${username}/${graphSlug}`),

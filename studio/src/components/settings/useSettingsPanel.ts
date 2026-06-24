@@ -6,13 +6,27 @@ export type SettingsSection =
 	| "connection"
 	| "llms"
 	| "skills"
-	| "instructions"
+	| "settings"
 	| "datasets"
 	| "events";
 
 const DEFAULT_SECTION: SettingsSection = "info";
 
 const SETTINGS_PARAM = "settings";
+
+// Allow-list of valid sections. The `settings` search param is user-controlled
+// (and can point at removed sections from stale links/bookmarks), so anything
+// not in this set falls back to DEFAULT_SECTION rather than crashing the render
+// on an undefined section lookup.
+const KNOWN_SECTIONS: readonly SettingsSection[] = [
+	"info",
+	"connection",
+	"llms",
+	"skills",
+	"settings",
+	"datasets",
+	"events",
+];
 
 // Expanded (full-width) state is non-URL local store — shared across the
 // hook's consumers via a tiny subscribable. Survives section changes but
@@ -40,7 +54,10 @@ export function useSettingsPanel() {
 	const [params, setParams] = useSearchParams();
 	const raw = params.get(SETTINGS_PARAM);
 	const isOpen = raw !== null;
-	const section = (raw as SettingsSection | null) ?? DEFAULT_SECTION;
+	const section =
+		raw && KNOWN_SECTIONS.includes(raw as SettingsSection)
+			? (raw as SettingsSection)
+			: DEFAULT_SECTION;
 
 	const expanded = useSyncExternalStore(
 		(cb) => {
