@@ -65,6 +65,11 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 		),
 	};
 
+	// "sessions"/"schema" are the top-rail view panels — rendered by the page
+	// (GraphDetail), never as a SettingsPanel tab. Guard defensively so the
+	// exhaustive section lookup below stays sound.
+	if (section === "sessions" || section === "schema") return null;
+
 	// Connection hosts its own two-tab TabbedPanel (Connection + Capabilities).
 	if (section === "connection") {
 		return (
@@ -117,7 +122,10 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 
 // Sections whose panel is a single-tab TabbedPanel. Connection is handled
 // separately (above) because it renders a two-tab TabbedPanel.
-type SingleTabSection = Exclude<SettingsSection, "connection">;
+type SingleTabSection = Exclude<
+	SettingsSection,
+	"connection" | "sessions" | "schema"
+>;
 const SINGLE_TAB_SECTIONS: Record<
 	SingleTabSection,
 	{ label: string; icon: typeof Database }

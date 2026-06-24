@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
+import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
@@ -137,8 +138,13 @@ export function ExplorerPage() {
 	// the way until the user opens it (`?inspector=open`); navigating to Explorer
 	// never auto-opens it.
 	const [searchParams, setSearchParams] = useSearchParams();
-	const sessionsClosed = searchParams.get("sessions") === "closed";
 	const inspectorClosed = searchParams.get("inspector") !== "open";
+	// The sessions panel is just the Explorer's entry in the shared single-open
+	// left-rail param (`?settings=sessions`) — same toggle as every other icon.
+	const settingsPanel = useSettingsPanel();
+	// The left column is present whenever any rail panel is docked (sessions or a
+	// settings section) — this is what actually drives the canvas remount.
+	const leftPanelPresent = settingsPanel.isOpen && !settingsPanel.expanded;
 	const setPanelParam = useCallback(
 		(key: string, value: string | null) => {
 			const next = new URLSearchParams(searchParams);
@@ -148,10 +154,7 @@ export function ExplorerPage() {
 		},
 		[searchParams, setSearchParams],
 	);
-	const closeSessions = useCallback(
-		() => setPanelParam("sessions", "closed"),
-		[setPanelParam],
-	);
+	const closeSessions = settingsPanel.close;
 	const closeInspector = useCallback(
 		() => setPanelParam("inspector", null),
 		[setPanelParam],
@@ -236,23 +239,26 @@ export function ExplorerPage() {
 		setBackendState(b);
 	}, []);
 
-	// Collapsing/expanding the sessions panel flips AppLayoutV2's `leftSection`
-	// between present/absent, which moves the canvas to a different parent and
-	// remounts it — rebuilding the store from the GraphLayer seed and so dropping
+	// Showing/hiding the left column flips AppLayoutV2's `leftSection` between
+	// present/absent, which moves the canvas to a different parent and remounts
+	// it — rebuilding the store from the GraphLayer seed and so dropping
 	// node-expand additions (those live only in the store, not in `seedData`).
-	// Reseed with the full current contents whenever the panel toggles, mirroring
+	// Reseed with the full current contents whenever the column toggles, mirroring
 	// the backend-switch reseed above, so the remounted canvas keeps the whole
-	// graph. Skips the initial mount. (Re-open can come from outside this page —
-	// the left rail — so we key off the state, not a single handler.)
-	const sessionsToggleSeen = useRef(false);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: fire on the sessionsClosed toggle; reseed reads the latest contents from the ref
+	// graph. Key off the column's actual presence (sessions panel OR a docked
+	// settings section), not just the sessions param, so docking a settings
+	// section over an already-open sessions panel — which doesn't remount —
+	// doesn't churn the canvas. Skips the initial mount. (Re-open can come from
+	// outside this page — the left rail — so we key off state, not a handler.)
+	const leftPanelToggleSeen = useRef(false);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: fire on the left-column toggle; reseed reads the latest contents from the ref
 	useEffect(() => {
-		if (!sessionsToggleSeen.current) {
-			sessionsToggleSeen.current = true;
+		if (!leftPanelToggleSeen.current) {
+			leftPanelToggleSeen.current = true;
 			return;
 		}
 		setSeedData(adaptItems(canvasDataRef.current));
-	}, [sessionsClosed]);
+	}, [leftPanelPresent]);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -688,20 +694,18 @@ export function ExplorerPage() {
 						</div>
 					) : undefined
 				}
-				leftSection={
-					sessionsClosed
-						? undefined
-						: {
-								// Generous max so long Cypher/Gremlin queries can spread out.
-								// mainSection.minSize below still keeps the canvas usable when
-								// the user drags the divider far right.
-								defaultSize: "300px",
-								minSize: "240px",
-								maxSize: "900px",
-								collapsible: false,
-								content: leftContent,
-							}
-				}
+				// GraphDetail shows this only while `?settings=sessions` is the open
+				// rail panel; otherwise it docks a settings section or nothing.
+				leftSection={{
+					// Generous max so long Cypher/Gremlin queries can spread out.
+					// mainSection.minSize below still keeps the canvas usable when
+					// the user drags the divider far right.
+					defaultSize: "300px",
+					minSize: "240px",
+					maxSize: "900px",
+					collapsible: false,
+					content: leftContent,
+				}}
 				mainSection={{
 					defaultSize: "600px",
 					minSize: "300px",

@@ -1,6 +1,12 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { useSearchParams } from "react-router-dom";
 
+// The left panel is a single-open accordion driven by one `?settings` param.
+// Most values are the bottom-rail settings sections; "sessions" and "schema" are
+// the top-rail view panels (Explorer's SessionsPanel / Modeller's SchemaNav).
+// They share the same param so the whole rail is mutually exclusive with the
+// exact same toggle as the bottom items — the page (via GraphDetail) renders its
+// own panel for these two instead of the SettingsPanel.
 export type SettingsSection =
 	| "info"
 	| "connection"
@@ -8,7 +14,9 @@ export type SettingsSection =
 	| "skills"
 	| "settings"
 	| "datasets"
-	| "events";
+	| "events"
+	| "sessions"
+	| "schema";
 
 const DEFAULT_SECTION: SettingsSection = "info";
 
@@ -26,6 +34,8 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"settings",
 	"datasets",
 	"events",
+	"sessions",
+	"schema",
 ];
 
 // Expanded (full-width) state is non-URL local store — shared across the

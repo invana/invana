@@ -38,6 +38,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
+import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
@@ -100,8 +101,11 @@ export function ModellerPage() {
 	// while collapsed) clears it. The left panel also re-opens via the left-rail
 	// Modeller icon, which drops the query string.
 	const [searchParams, setSearchParams] = useSearchParams();
-	const leftClosed = searchParams.get("models") === "closed";
 	const rightClosed = searchParams.get("detail") === "closed";
+	// The schema panel is just the Modeller's entry in the shared single-open
+	// left-rail param (`?settings=schema`); GraphDetail decides when to show it.
+	// `close` doubles as the panel's collapse + the SchemaNav close button.
+	const settingsPanel = useSettingsPanel();
 	const setPanelParam = useCallback(
 		(key: string, closed: boolean) => {
 			const next = new URLSearchParams(searchParams);
@@ -111,10 +115,7 @@ export function ModellerPage() {
 		},
 		[searchParams, setSearchParams],
 	);
-	const closeLeft = useCallback(
-		() => setPanelParam("models", true),
-		[setPanelParam],
-	);
+	const closeLeft = settingsPanel.close;
 	const closeRight = useCallback(
 		() => setPanelParam("detail", true),
 		[setPanelParam],
@@ -759,17 +760,15 @@ export function ModellerPage() {
 					pageLabel="Modeller"
 					headerPanelControls={panelControls}
 					headerCenter={headerToolbar}
-					leftSection={
-						leftClosed
-							? undefined
-							: {
-									defaultSize: "260px",
-									minSize: "200px",
-									maxSize: "900px",
-									collapsible: false,
-									content: leftContent,
-								}
-					}
+					// GraphDetail shows this only while `?settings=schema` is the open
+					// rail panel; otherwise it docks a settings section or nothing.
+					leftSection={{
+						defaultSize: "260px",
+						minSize: "200px",
+						maxSize: "900px",
+						collapsible: false,
+						content: leftContent,
+					}}
 					mainSection={{
 						defaultSize: "600px",
 						minSize: "300px",

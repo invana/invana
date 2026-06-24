@@ -5,7 +5,10 @@ import { GraphSectionSwitcher } from "../../../components/header/GraphSectionSwi
 import { useAppHeader } from "../../../components/header/useAppHeader";
 import { SettingsPanel } from "../../../components/settings/SettingsPanel";
 import { useGraphLeftNav } from "../../../components/settings/useGraphLeftNav";
-import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
+import {
+	type SettingsSection,
+	useSettingsPanel,
+} from "../../../components/settings/useSettingsPanel";
 import { useGraphConnectionQuery } from "../../../hooks/queries/useGraphs";
 import { AppVersion } from "./AppVersion";
 import { GraphStatusBar } from "./GraphStatusBar";
@@ -34,8 +37,9 @@ interface GraphDetailProps {
 	/** Last breadcrumb segment + footer right-side label. */
 	pageLabel: string;
 	/** Page-side left panel (e.g. SessionsPanel in Explorer, SchemaNav in
-	 *  Modeller). Hidden + replaced by SettingsPanel when settings is docked;
-	 *  hidden entirely when settings is expanded. Overview omits this. */
+	 *  Modeller). Shown only while this view's native `?settings` key is open
+	 *  (`sessions` / `schema`); a settings section docks the SettingsPanel here
+	 *  instead, and nothing open means no left column. Overview omits this. */
 	leftSection?: SectionConfig;
 	/** Main content. Replaced by SettingsPanel when settings is expanded. */
 	mainSection: MainSectionConfig;
@@ -57,6 +61,14 @@ interface GraphDetailProps {
 	 *  Most pages won't need this. */
 	headerCenter?: ReactNode;
 }
+
+// The top-rail view panels keyed into the shared `?settings` param. Explorer's
+// SessionsPanel and Modeller's SchemaNav open via these instead of rendering a
+// SettingsPanel tab — so the whole rail is one single-open accordion.
+const NATIVE_SECTION: Partial<Record<GraphDetailSection, SettingsSection>> = {
+	explorer: "sessions",
+	modeller: "schema",
+};
 
 /**
  * Shared shell for every graph-scoped detail page (Overview, Explorer,
@@ -112,29 +124,44 @@ export function GraphDetail({
 		center: headerCenter,
 	});
 
-	const settingsOpen = settingsPanel.isOpen && !!username && !!graphSlug;
+	// The whole left rail shares one `?settings` param. This view's own panel
+	// (SessionsPanel / SchemaNav) opens under its native key; every other value
+	// is a bottom-rail settings section that renders the SettingsPanel. A value
+	// belonging to the *other* view's native key shows nothing here.
+	const nativeKey = NATIVE_SECTION[sectionId];
+	const sectionIsNative =
+		settingsPanel.section === "sessions" || settingsPanel.section === "schema";
+	const showNative =
+		settingsPanel.isOpen &&
+		nativeKey != null &&
+		settingsPanel.section === nativeKey;
+	const settingsOpen =
+		settingsPanel.isOpen && !sectionIsNative && !!username && !!graphSlug;
 	const settingsExpanded = settingsOpen && settingsPanel.expanded;
 	const settingsDocked = settingsOpen && !settingsPanel.expanded;
 
-	// Settings docked → render SettingsPanel in leftSection with panel-sized
-	// constraints (independent of the page's own leftSection sizing).
-	// Settings expanded → drop leftSection so the panel can own main width.
-	const effectiveLeftSection: SectionConfig | undefined = settingsExpanded
-		? undefined
-		: settingsDocked
-			? {
-					defaultSize: "420px",
-					minSize: "320px",
-					maxSize: "640px",
-					collapsible: false,
-					content: (
-						<SettingsPanel
-							username={username as string}
-							graphSlug={graphSlug as string}
-						/>
-					),
-				}
-			: leftSection;
+	// Native panel open → render the page's own leftSection. Settings docked →
+	// render SettingsPanel with panel-sized constraints (independent of the
+	// page's own sizing). Settings expanded → drop leftSection so the panel can
+	// own main width. Nothing open → no left column.
+	const effectiveLeftSection: SectionConfig | undefined = showNative
+		? leftSection
+		: settingsExpanded
+			? undefined
+			: settingsDocked
+				? {
+						defaultSize: "420px",
+						minSize: "320px",
+						maxSize: "640px",
+						collapsible: false,
+						content: (
+							<SettingsPanel
+								username={username as string}
+								graphSlug={graphSlug as string}
+							/>
+						),
+					}
+				: undefined;
 
 	const effectiveMainSection: MainSectionConfig = settingsExpanded
 		? {

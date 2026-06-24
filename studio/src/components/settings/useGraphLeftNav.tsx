@@ -9,7 +9,7 @@ import {
 	Sparkles,
 	Wand2,
 } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserMenu } from "../header/UserMenu";
 import { type SettingsSection, useSettingsPanel } from "./useSettingsPanel";
 
@@ -18,6 +18,13 @@ interface SectionMeta {
 	label: string;
 	icon: typeof Database;
 }
+
+// Each view's own left panel keyed into the shared `?settings` param, so the top
+// icons toggle through the exact same single-open mechanism as the bottom ones.
+const NATIVE_SECTION: Record<"explorer" | "modeller", SettingsSection> = {
+	explorer: "sessions",
+	modeller: "schema",
+};
 
 // Membership is binary (RFC-023) — every member sees every section; there is
 // no admin-only gating and no Members/Invitations management section.
@@ -41,16 +48,19 @@ type ActiveTab = "overview" | "explorer" | "modeller" | null;
  * Shared left-rail (icon column) config used by every graph-scoped page —
  * Overview, Explorer, Modeller. Surfaces:
  *
- * - Top: the three graph views (Overview / Explorer / Modeller).
+ * - Top: the graph views (Explorer / Modeller). On the view you're already on,
+ *   the icon toggles that view's own panel (SessionsPanel / SchemaNav) through
+ *   the SAME `?settings` param + toggle as the bottom icons — its key is just
+ *   `sessions` / `schema`. Clicking the *other* view navigates to it.
  * - Bottom: one icon per settings section (Info / Connection / LLMs / Skills /
  *   Datasets / Events / Settings). Clicking a settings icon
  *   sets `?settings=<section>` on the current page so the leftSection swaps
  *   to that section's content.
  * - Very bottom (`bottom` slot, below a separator): the user profile menu.
  *
- * The "active" highlight is driven by the caller's `activeTab` arg (which
- * graph view is rendering this layout) and by `?settings` (which section is
- * currently open).
+ * The whole rail is ONE single-open accordion: a single `?settings` value backs
+ * every icon (top and bottom), so exactly one is ever open/active — clicking any
+ * icon switches the one open panel, and clicking the open one closes it.
  */
 export function useGraphLeftNav(
 	username: string,
@@ -58,55 +68,63 @@ export function useGraphLeftNav(
 	activeTab: ActiveTab,
 ) {
 	const navigate = useNavigate();
-	const location = useLocation();
 	const settingsPanel = useSettingsPanel();
 	const root = `/u/${username}/${graphSlug}`;
 
 	// `my-1.5` adds breathing room between rail items — the theme's own
 	// section wrapper only gives them `gap-1`, which reads as crowded.
-	const activeClass = (active: boolean) =>
-		`my-1.5 ${active ? "bg-accent text-accent-foreground" : ""}`;
-
-	// Navigating to a view clears ?settings so the leftSection shows the view's
-	// own content (SessionsPanel / SchemaNav / wizard).
 	//
-	// Clicking the rail icon for the view you're ALREADY on re-opens its left
-	// panel — but must not disturb the right (inspector) panel. So for a same-view
-	// click, only drop `settings` + `sessions` and keep everything else (notably
-	// `inspector=closed`); a different-view click navigates fresh.
-	const goToView = (path: string) => {
-		if (location.pathname === path) {
-			const next = new URLSearchParams(location.search);
-			next.delete("settings");
-			next.delete("sessions");
-			navigate({ pathname: path, search: next.toString() }, { replace: true });
-		} else {
-			navigate(path);
-		}
+	// The theme's NavVertical tracks its OWN "last clicked" highlight in internal
+	// state, and renders the top and bottom groups as two *separate* NavItems —
+	// so each keeps its own active item and two icons can look lit at once. We
+	// drive the highlight from our single app state instead, forcing it with `!`
+	// to override the theme's internal one so exactly one rail icon is ever lit.
+	// Inactive items re-assert hover (also with `!`) so the override doesn't kill
+	// hover feedback.
+	const activeClass = (active: boolean) =>
+		active
+			? "my-1.5 !bg-primary/15 !text-primary !ring-primary/25"
+			: "my-1.5 !bg-transparent !text-foreground !ring-transparent hover:!bg-primary/10 hover:!text-primary hover:!ring-primary/25";
+
+	// One toggle for every icon — open the section, or close it if it's already
+	// the open one (identical to the bottom-rail behaviour below).
+	const toggleSection = (key: SettingsSection) =>
+		settingsPanel.isOpen && settingsPanel.section === key
+			? settingsPanel.close()
+			: settingsPanel.setSection(key);
+
+	// A view icon: on the view you're already on it toggles that view's own
+	// panel (same param/toggle as the bottom icons); on the other view it just
+	// navigates there.
+	const viewItem = (
+		tab: "explorer" | "modeller",
+		name: string,
+		icon: typeof Compass,
+	) => {
+		const key = NATIVE_SECTION[tab];
+		const active =
+			activeTab === tab &&
+			settingsPanel.isOpen &&
+			settingsPanel.section === key;
+		return {
+			name,
+			icon,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () =>
+				activeTab === tab ? toggleSection(key) : navigate(`${root}/${tab}`),
+		};
 	};
 
 	const topNavItems = [
-		{
-			name: "Explorer",
-			icon: Compass,
-			iconClassName: "w-5 h-5",
-			tooltipSide: "right" as const,
-			className: activeClass(activeTab === "explorer"),
-			onClick: () => goToView(`${root}/explorer`),
-		},
-		{
-			name: "Modeller",
-			icon: Boxes,
-			iconClassName: "w-5 h-5",
-			tooltipSide: "right" as const,
-			className: activeClass(activeTab === "modeller"),
-			onClick: () => goToView(`${root}/modeller`),
-		},
+		viewItem("explorer", "Explorer", Compass),
+		viewItem("modeller", "Modeller", Boxes),
 	];
 
 	// Each section icon is a toggle: clicking the open section closes the panel,
-	// clicking any other opens/switches to it. Works the same on every
-	// graph-scoped page (Explorer / Modeller) since both render this rail.
+	// clicking any other opens/switches to it — the same single `?settings` param
+	// shared with the top view icons keeps the whole rail single-open.
 	const bottomNavItems = SETTINGS_SECTIONS.map((s, i) => {
 		const active = settingsPanel.isOpen && settingsPanel.section === s.key;
 		return {
@@ -117,8 +135,7 @@ export function useGraphLeftNav(
 			className: activeClass(active),
 			// Separate the settings icons from the profile menu pinned below.
 			showSeperator: i === SETTINGS_SECTIONS.length - 1,
-			onClick: () =>
-				active ? settingsPanel.close() : settingsPanel.setSection(s.key),
+			onClick: () => toggleSection(s.key),
 		};
 	});
 
