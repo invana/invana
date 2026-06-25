@@ -6,6 +6,7 @@ import {
 	Info,
 	Layers,
 	ListTree,
+	MessagesSquare,
 	Settings,
 	Sparkles,
 	Wand2,
@@ -134,11 +135,17 @@ export function useGraphLeftNav(
 		};
 	};
 
-	const topNavItems = [
-		viewItem("explorer", "Explorer", Compass),
-		viewItem("modeller", "Modeller", Boxes),
-		...(activeTab === "explorer" ? [modelItem()] : []),
-	];
+	// On Explorer the rail shows the view's own panels — the Sessions chat
+	// ("Messages") and the read-only Model browser — and omits the Modeller icon;
+	// switching views is handled by the header GraphSectionSwitcher. Other pages
+	// keep the two view icons for navigation.
+	const topNavItems =
+		activeTab === "explorer"
+			? [viewItem("explorer", "Messages", MessagesSquare), modelItem()]
+			: [
+					viewItem("explorer", "Explorer", Compass),
+					viewItem("modeller", "Modeller", Boxes),
+				];
 
 	// Each section icon is a toggle: clicking the open section closes the panel,
 	// clicking any other opens/switches to it — the same single `?settings` param
