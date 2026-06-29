@@ -21,6 +21,9 @@ function buildParams(filters: EventListFilters | undefined): URLSearchParams {
 	if (filters.graph_id) params.set("graph_id", filters.graph_id);
 	if (filters.actor_id) params.set("actor_id", filters.actor_id);
 	if (filters.action_prefix) params.set("action_prefix", filters.action_prefix);
+	if (filters.actions) {
+		for (const action of filters.actions) params.append("action", action);
+	}
 	if (filters.since) params.set("since", filters.since);
 	if (filters.until) params.set("until", filters.until);
 	return params;

@@ -1,7 +1,13 @@
-import { Button, Skeleton } from "@invana/ui";
+import { Button, SearchInput, Skeleton } from "@invana/ui";
 import { Activity, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
+import { EventTypeFilter } from "../../components/settings/sections/EventTypeFilter";
+import { matchesEventSearch } from "../../components/settings/sections/eventSearch";
+import {
+	StatusFilter,
+	matchesStatusFilter,
+} from "../../components/settings/sections/eventStatus";
 import { useGlobalEventsQuery } from "../../hooks/queries/useEvents";
 import { useAuth } from "../../hooks/useAuth";
 import { useEventStream } from "../../hooks/useEventStream";
@@ -15,22 +21,35 @@ import type { AuditEvent } from "../../types/events";
 export function PlatformEventsPage() {
 	const { user } = useAuth();
 	const [graphIdFilter, setGraphIdFilter] = useState<string | undefined>();
-	const [actionPrefix, setActionPrefix] = useState<string | undefined>();
+	const [actions, setActions] = useState<string[]>([]);
+	const [statuses, setStatuses] = useState<string[]>([]);
+	const [search, setSearch] = useState("");
 
 	const query = useGlobalEventsQuery({
 		graph_id: graphIdFilter,
-		action_prefix: actionPrefix,
+		actions: actions.length > 0 ? actions : undefined,
 	});
 
 	useEventStream({ scope: "global" });
+
+	const all = useMemo(
+		() => query.data?.pages.flatMap((p) => p.items) ?? [],
+		[query.data],
+	);
+	const visible = useMemo(
+		() =>
+			all.filter(
+				(e) =>
+					matchesStatusFilter(e, statuses) && matchesEventSearch(e, search),
+			),
+		[all, statuses, search],
+	);
 
 	// Gate the page at render time — superuser only. Non-superusers get
 	// bounced back to /graphs rather than 403'd.
 	if (!user?.is_superuser) {
 		return <Navigate to="/graphs" replace />;
 	}
-
-	const all = query.data?.pages.flatMap((p) => p.items) ?? [];
 
 	return (
 		<div className="h-full overflow-auto">
@@ -56,20 +75,28 @@ export function PlatformEventsPage() {
 				</div>
 
 				<FilterBar
-					actionPrefix={actionPrefix}
-					onActionPrefixChange={setActionPrefix}
+					actions={actions}
+					onActionsChange={setActions}
+					statuses={statuses}
+					onStatusesChange={setStatuses}
 					graphIdFilter={graphIdFilter}
 					onGraphIdFilterChange={setGraphIdFilter}
 				/>
+
+				<div className="mt-3">
+					<SearchInput value={search} onChange={setSearch} className="w-full" />
+				</div>
 
 				<div className="mt-4">
 					{query.isLoading ? (
 						<EventsSkeleton />
 					) : all.length === 0 ? (
 						<EmptyState />
+					) : visible.length === 0 ? (
+						<NoMatches />
 					) : (
 						<ul className="space-y-1.5">
-							{all.map((e) => (
+							{visible.map((e) => (
 								<EventRow key={e.id} event={e} />
 							))}
 						</ul>
@@ -93,51 +120,26 @@ export function PlatformEventsPage() {
 	);
 }
 
-const PREFIX_OPTIONS: { label: string; value: string | undefined }[] = [
-	{ label: "All", value: undefined },
-	{ label: "Graph", value: "graph." },
-	{ label: "Connection", value: "connection." },
-	{ label: "LLMs", value: "llm." },
-	{ label: "Skills", value: "skill." },
-	{ label: "Instructions", value: "instruction." },
-	{ label: "Members", value: "member." },
-	{ label: "Setup", value: "setup." },
-	{ label: "Auth", value: "auth." },
-	{ label: "Query", value: "query." },
-	{ label: "System", value: "system." },
-];
-
 function FilterBar({
-	actionPrefix,
-	onActionPrefixChange,
+	actions,
+	onActionsChange,
+	statuses,
+	onStatusesChange,
 	graphIdFilter,
 	onGraphIdFilterChange,
 }: {
-	actionPrefix: string | undefined;
-	onActionPrefixChange: (v: string | undefined) => void;
+	actions: string[];
+	onActionsChange: (v: string[]) => void;
+	statuses: string[];
+	onStatusesChange: (v: string[]) => void;
 	graphIdFilter: string | undefined;
 	onGraphIdFilterChange: (v: string | undefined) => void;
 }) {
 	return (
 		<div className="space-y-2">
-			<div className="flex flex-wrap gap-1">
-				{PREFIX_OPTIONS.map((opt) => {
-					const isActive = opt.value === actionPrefix;
-					return (
-						<button
-							type="button"
-							key={opt.label}
-							onClick={() => onActionPrefixChange(opt.value)}
-							className={`px-2 py-1 rounded border ${
-								isActive
-									? "bg-primary text-primary-foreground border-primary"
-									: "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-							}`}
-						>
-							{opt.label}
-						</button>
-					);
-				})}
+			<div className="flex flex-wrap items-center gap-2">
+				<EventTypeFilter value={actions} onChange={onActionsChange} />
+				<StatusFilter value={statuses} onChange={onStatusesChange} />
 			</div>
 			<div className="flex items-center gap-2">
 				<label htmlFor="graph-filter" className="text-muted-foreground">
@@ -208,6 +210,18 @@ function EmptyState() {
 		<p className="text-muted-foreground py-8 text-center">
 			No events match the current filters.
 		</p>
+	);
+}
+
+function NoMatches() {
+	return (
+		<div className="text-muted-foreground py-8 text-center">
+			<p>No loaded events match the current filters.</p>
+			<p className="text-xs mt-1 opacity-70">
+				Status and search scan loaded events — use "Load older" to widen the
+				range.
+			</p>
+		</div>
 	);
 }
 

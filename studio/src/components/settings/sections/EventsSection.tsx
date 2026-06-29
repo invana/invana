@@ -1,4 +1,4 @@
-import { Badge, Button, Skeleton } from "@invana/ui";
+import { Badge, Button, SearchInput, Skeleton } from "@invana/ui";
 import {
 	Activity,
 	AlertCircle,
@@ -19,6 +19,9 @@ import { type ReactNode, useMemo, useState } from "react";
 import { useGraphEventsQuery } from "../../../hooks/queries/useEvents";
 import { useEventStream } from "../../../hooks/useEventStream";
 import type { AuditEvent } from "../../../types/events";
+import { EventTypeFilter } from "./EventTypeFilter";
+import { matchesEventSearch } from "./eventSearch";
+import { StatusFilter, matchesStatusFilter } from "./eventStatus";
 
 interface Props {
 	username: string;
@@ -30,14 +33,18 @@ interface Props {
  * for the active graph. Rendered inside the docked SettingsPanel; the
  * panel's expand toggle takes the section to full width in place.
  *
- * Filters (action prefix + time range) live above the list; pagination is
- * append-as-you-scroll via `useGraphEventsQuery.fetchNextPage`.
+ * An event-type filter (server-side) sits above the list, with a derived
+ * status filter and a free-text search bar (both client-side over the loaded
+ * buffer). Pagination is append-as-you-scroll via
+ * `useGraphEventsQuery.fetchNextPage`.
  */
 export function EventsSection({ username, graphSlug }: Props) {
-	const [actionPrefix, setActionPrefix] = useState<string | undefined>();
+	const [actions, setActions] = useState<string[]>([]);
+	const [statuses, setStatuses] = useState<string[]>([]);
+	const [search, setSearch] = useState("");
 
 	const query = useGraphEventsQuery(username, graphSlug, {
-		action_prefix: actionPrefix,
+		actions: actions.length > 0 ? actions : undefined,
 	});
 
 	// SSE live tail — invalidates the queryKey on each incoming row so the
@@ -49,17 +56,34 @@ export function EventsSection({ username, graphSlug }: Props) {
 		[query.data],
 	);
 
+	// Search + status filter the loaded buffer client-side (the read API has no
+	// full-text or status filter); the type filter above narrows server-side.
+	const visible = useMemo(
+		() =>
+			all.filter(
+				(e) =>
+					matchesStatusFilter(e, statuses) && matchesEventSearch(e, search),
+			),
+		[all, statuses, search],
+	);
+
 	return (
 		<div className="space-y-4">
-			<FilterBar value={actionPrefix} onChange={setActionPrefix} />
+			<div className="flex flex-wrap items-center gap-2">
+				<EventTypeFilter value={actions} onChange={setActions} />
+				<StatusFilter value={statuses} onChange={setStatuses} />
+			</div>
+			<SearchInput value={search} onChange={setSearch} className="w-full" />
 
 			{query.isLoading ? (
 				<EventsSkeleton />
 			) : all.length === 0 ? (
 				<EmptyState />
+			) : visible.length === 0 ? (
+				<NoMatches />
 			) : (
 				<ul className="space-y-1.5">
-					{all.map((e) => (
+					{visible.map((e) => (
 						<EventRow key={e.id} event={e} />
 					))}
 				</ul>
@@ -78,50 +102,6 @@ export function EventsSection({ username, graphSlug }: Props) {
 					</Button>
 				</div>
 			)}
-		</div>
-	);
-}
-
-// ── Filter bar ────────────────────────────────────────────────────────────────
-
-const PREFIX_OPTIONS: { label: string; value: string | undefined }[] = [
-	{ label: "All", value: undefined },
-	{ label: "Graph", value: "graph." },
-	{ label: "Connection", value: "connection." },
-	{ label: "LLMs", value: "llm." },
-	{ label: "Skills", value: "skill." },
-	{ label: "Instructions", value: "instruction." },
-	{ label: "Members", value: "member." },
-	{ label: "Setup", value: "setup." },
-	{ label: "Query", value: "query." },
-];
-
-function FilterBar({
-	value,
-	onChange,
-}: {
-	value: string | undefined;
-	onChange: (v: string | undefined) => void;
-}) {
-	return (
-		<div className="flex flex-wrap gap-1">
-			{PREFIX_OPTIONS.map((opt) => {
-				const isActive = opt.value === value;
-				return (
-					<button
-						type="button"
-						key={opt.label}
-						onClick={() => onChange(opt.value)}
-						className={`px-2 py-1 rounded border ${
-							isActive
-								? "bg-primary text-primary-foreground border-primary"
-								: "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-						}`}
-					>
-						{opt.label}
-					</button>
-				);
-			})}
 		</div>
 	);
 }
@@ -330,6 +310,18 @@ function EmptyState() {
 			<p>
 				No events yet — the audit trail starts as soon as someone changes
 				something.
+			</p>
+		</div>
+	);
+}
+
+function NoMatches() {
+	return (
+		<div className="text-center text-muted-foreground py-8">
+			<p>No loaded events match the current filters.</p>
+			<p className="text-xs mt-1 opacity-70">
+				Status and search scan loaded events — use "Load older" to widen the
+				range.
 			</p>
 		</div>
 	);

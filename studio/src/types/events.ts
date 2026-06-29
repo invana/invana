@@ -35,6 +35,8 @@ export interface EventListFilters {
 	graph_id?: string; // global endpoint only
 	actor_id?: string;
 	action_prefix?: string;
+	/** Exact event-type set from the multi-select; serialized as repeated `action` params. */
+	actions?: string[];
 	since?: string;
 	until?: string;
 }

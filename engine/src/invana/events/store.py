@@ -26,6 +26,7 @@ class EventFilter:
     graph_id: str | None = None
     actor_id: str | None = None
     action_prefix: str | None = None
+    actions: list[str] | None = None
     since: datetime | None = None
     until: datetime | None = None
 
@@ -72,6 +73,11 @@ class EventStore:
             # we treat any non-empty prefix as a startswith. Use LIKE so the
             # composite (action, created_at) index can be used.
             stmt = stmt.where(Event.action.like(f"{filters.action_prefix}%"))
+        if filters.actions:
+            # Exact-match set; the UI's multi-select sends the chosen event
+            # types here. IN keeps the composite (action, created_at) index
+            # usable. Empty list = no constraint (treated as "all").
+            stmt = stmt.where(Event.action.in_(filters.actions))
         if filters.since is not None:
             stmt = stmt.where(Event.created_at >= filters.since)
         if filters.until is not None:
