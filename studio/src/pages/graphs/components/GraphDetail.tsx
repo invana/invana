@@ -66,13 +66,19 @@ interface GraphDetailProps {
 // the page's own `leftSection` instead of rendering a SettingsPanel tab — so the
 // whole rail stays one single-open accordion. A view may own more than one:
 // Explorer has both the SessionsPanel (`sessions`) and the read-only model
-// browser (`model`); the Modeller has its SchemaNav (`schema`).
+// browser (`model`); the Modeller has its SchemaNav (`schema`) and its
+// generative SessionsPanel (`messages`, RFC-031).
 const NATIVE_SECTIONS: Partial<Record<GraphDetailSection, SettingsSection[]>> =
 	{
 		explorer: ["sessions", "model"],
-		modeller: ["schema"],
+		modeller: ["schema", "messages"],
 	};
-const ALL_NATIVE_SECTIONS: SettingsSection[] = ["sessions", "schema", "model"];
+const ALL_NATIVE_SECTIONS: SettingsSection[] = [
+	"sessions",
+	"schema",
+	"model",
+	"messages",
+];
 
 /**
  * Shared shell for every graph-scoped detail page (Overview, Explorer,

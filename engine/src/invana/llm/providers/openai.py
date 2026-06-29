@@ -1,20 +1,18 @@
 """OpenAI-compatible provider — the path for OpenAI and local OpenAI-style servers.
 
 Covers first-party OpenAI *and* any OpenAI-compatible endpoint reached via
-``base_url`` (LM Studio, vLLM, LocalAI, …). Structured output uses
-``response_format`` with a JSON Schema — the OpenAI-compatible analogue of
-Ollama's ``format`` — so ``message.content`` comes back as schema-shaped JSON we
-load directly. ``strict`` is left off: the caller's schema isn't guaranteed to
-satisfy OpenAI strict mode (``additionalProperties: false`` + every key
-required), and local engines (LM Studio) enforce the schema via their own
-grammar regardless.
+``base_url`` (LM Studio, vLLM, LocalAI, …). The call is a plain HTTP POST to
+``/chat/completions`` via ``httpx`` — the same transport the Ollama provider
+uses — so **no SDK is required**: neither the ``openai`` package nor any other
+optional dependency. Structured output uses ``response_format`` with a JSON
+Schema (the OpenAI-compatible analogue of Ollama's ``format``), so
+``message.content`` comes back as schema-shaped JSON we load directly.
+``strict`` is left off: the caller's schema isn't guaranteed to satisfy OpenAI
+strict mode (``additionalProperties: false`` + every key required), and local
+engines (LM Studio) enforce the schema via their own grammar regardless.
 
-The ``openai`` SDK is an **optional** dependency, lazy-imported here so the
-engine installs and every other provider runs without it — only selecting this
-provider for generation requires ``pip install openai``.
-
-No API key is required for local servers; LM Studio ignores it, but the SDK
-demands a non-empty string, so we fall back to a harmless placeholder.
+No API key is required for local servers; LM Studio ignores it, but some servers
+reject a missing ``Authorization`` header, so we send a harmless placeholder.
 
 Reasoning models (e.g. qwen3) served via LM Studio may emit the schema-shaped
 object on ``message.reasoning_content`` with an empty ``message.content`` — we
@@ -27,11 +25,16 @@ from __future__ import annotations
 import json
 import re
 
-from invana.llm.errors import LLMError
+import httpx
+
 from invana.llm.schemas import TokenUsage
 
-# LM Studio (and other keyless local servers) ignore the key, but AsyncOpenAI
-# refuses to construct without one. Any non-empty string works.
+# First-party OpenAI default; local/compatible servers supply their own base_url
+# (already including the ``/v1`` suffix, e.g. ``http://localhost:1234/v1``).
+_DEFAULT_BASE_URL = "https://api.openai.com/v1"
+
+# LM Studio (and other keyless local servers) ignore the key, but some servers
+# still want an Authorization header. Any non-empty string works.
 _PLACEHOLDER_KEY = "not-needed"
 
 # Reasoning models can prefix a <think>…</think> block before the JSON; strip it
@@ -50,43 +53,41 @@ async def call(
     tool_name: str,
     timeout_s: float,
 ) -> tuple[dict | None, TokenUsage]:
-    try:
-        from openai import AsyncOpenAI
-    except ImportError as exc:
-        raise LLMError(
-            "The 'openai' package is required for the openai/local provider but is not installed. "
-            "Install it in the engine environment: `uv pip install openai` (or `pip install openai`)."
-        ) from exc
-
-    client = AsyncOpenAI(api_key=api_key or _PLACEHOLDER_KEY, base_url=base_url or None, timeout=timeout_s)
-    resp = await client.chat.completions.create(
-        model=model_id,
-        temperature=0,
-        response_format={
+    url = (base_url or _DEFAULT_BASE_URL).rstrip("/") + "/chat/completions"
+    payload = {
+        "model": model_id,
+        "temperature": 0,
+        "response_format": {
             "type": "json_schema",
             "json_schema": {"name": tool_name, "schema": tool_schema},
         },
-        messages=[{"role": "system", "content": system}, *messages],
-    )
+        "messages": [{"role": "system", "content": system}, *messages],
+    }
+    headers = {"Authorization": f"Bearer {api_key or _PLACEHOLDER_KEY}"}
+    async with httpx.AsyncClient(timeout=timeout_s) as client:
+        resp = await client.post(url, json=payload, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
 
-    usage_obj = resp.usage
+    usage_obj = data.get("usage") or {}
     usage = TokenUsage(
-        input_tokens=int(getattr(usage_obj, "prompt_tokens", 0) or 0),
-        output_tokens=int(getattr(usage_obj, "completion_tokens", 0) or 0),
+        input_tokens=int(usage_obj.get("prompt_tokens") or 0),
+        output_tokens=int(usage_obj.get("completion_tokens") or 0),
     )
 
-    message = resp.choices[0].message if resp.choices else None
+    choices = data.get("choices") or []
+    message = choices[0].get("message") if choices else None
     return _parse(message), usage
 
 
-def _parse(message) -> dict | None:
+def _parse(message: dict | None) -> dict | None:
     """Pull the schema-shaped object from ``content``, or a reasoning channel."""
-    if message is None:
+    if not isinstance(message, dict):
         return None
-    raw = message.content
-    if not (raw and raw.strip()):
+    raw = message.get("content")
+    if not (isinstance(raw, str) and raw.strip()):
         # Reasoning models (qwen3 on LM Studio) put the constrained JSON here.
-        raw = getattr(message, "reasoning_content", None)
+        raw = message.get("reasoning_content")
     if not isinstance(raw, str):
         return None
 

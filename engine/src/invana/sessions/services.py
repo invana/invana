@@ -20,17 +20,20 @@ from invana.graphs.models import Graph
 from invana.graphs.query_service import QueryExecutionError, execute_query, resolve_query_language
 from invana.graphs.schemas import QueryResponse
 from invana.llm import LLMError
+from invana.llm.propose import propose_model, validate_proposal
 from invana.llm.translate import Clarification, nl_to_query
 from invana.llm_providers.models import LLMProvider
 from invana.llm_providers.store import LLMProviderStore
-from invana.modeller.models import GraphVersion
+from invana.modeller.models import GraphModel, GraphVersion
 from invana.modeller.store import ModelStore
 from invana.sessions.models import (
     Session,
     SessionMessage,
     SessionMessageRole,
     SessionMessageStatus,
+    SessionSurface,
 )
+from invana.sessions.reconcile import reconcile_proposal
 from invana.sessions.schemas import SendMessage
 from invana.sessions.store import SessionStore
 
@@ -158,6 +161,7 @@ async def list_sessions(
     offset: int,
     sort: str = "updated",
     include_archived: bool = False,
+    surface: str | None = None,
 ) -> tuple[list[Session], int]:
     store = SessionStore()
     items = await store.list_for_user(
@@ -168,8 +172,11 @@ async def list_sessions(
         offset=offset,
         sort=sort,
         include_archived=include_archived,
+        surface=surface,
     )
-    total = await store.count_for_user(session, graph_id=graph_id, user_id=user_id, include_archived=include_archived)
+    total = await store.count_for_user(
+        session, graph_id=graph_id, user_id=user_id, include_archived=include_archived, surface=surface
+    )
     return items, total
 
 
@@ -237,8 +244,26 @@ async def create_session(
     graph_id: str,
     user_id: str,
     title: str | None,
+    surface: str = "explorer",
+    model_id: str | None = None,
 ) -> Session:
-    sess = Session(graph_id=graph_id, created_by_id=user_id, title=title or "")
+    # A modeller session may bind to a model up front (RFC-031 Decision 2). Re-scope
+    # to the route's graph so a cross-graph model id 404s rather than leaks. An
+    # introspected ("global") model is read-only — never an authoring target; drop
+    # the binding and let the first generation create a fresh studio model.
+    if model_id is not None:
+        model = await ModelStore().get_graph_model(session, model_id)
+        if model is None or model.graph_id != graph_id:
+            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Model not found for this graph.")
+        if model.origin == "introspected":
+            model_id = None
+    sess = Session(
+        graph_id=graph_id,
+        created_by_id=user_id,
+        title=title or "",
+        surface=SessionSurface(surface),
+        model_id=model_id,
+    )
     await SessionStore().add(session, sess)
     await emit_event(
         session,
@@ -343,6 +368,200 @@ async def _finalize_totals(
     await session.flush()
 
 
+# ── Modeller generation (RFC-031) ──────────────────────────────────────────────
+
+
+def _model_summary(summary: str, counts: dict[str, int]) -> str:
+    """Assistant reply for a generation turn: the model's summary + what was added.
+
+    Backend-owned message (RFC-028) so the FE needs no extra fields — the counts
+    ride the existing ``content``. The "Added …" line is appended only when
+    something new was created (a pure refinement of existing types shows just the
+    summary)."""
+    parts = []
+    if counts["node_types"]:
+        parts.append(_plural(counts["node_types"], "node type"))
+    if counts["edge_types"]:
+        parts.append(_plural(counts["edge_types"], "edge type"))
+    if counts["property_keys"]:
+        parts.append(_plural(counts["property_keys"], "property key"))
+    if parts:
+        return f"{summary}\n\nAdded {', '.join(parts)}."
+    return summary
+
+
+async def _ensure_model_and_draft(
+    session: AsyncSession, *, sess: Session, graph: Graph, prompt: str
+) -> tuple[GraphModel, GraphVersion]:
+    """Resolve the model + editable draft a modeller session authors (RFC-031 D2).
+
+    Bound session → load its model + draft (creating a draft if it has none).
+    Unbound (or bound to a deleted/read-only model) → create a fresh studio model
+    + initial draft and bind the session to it. Returns the eager-loaded draft so
+    the proposal can ground + reconcile against it.
+    """
+    store = ModelStore()
+    model: GraphModel | None = None
+    if sess.model_id:
+        model = await store.get_graph_model(session, sess.model_id)
+        # Defensive: a dangling/cross-graph/read-only binding falls through to a
+        # fresh studio model rather than authoring somewhere it shouldn't.
+        if model is not None and (model.graph_id != graph.id or model.origin == "introspected"):
+            model = None
+
+    if model is None:
+        model = await store.create_graph_model(
+            session, name=_title_from_text(prompt), graph_id=graph.id, origin="studio"
+        )
+        sess.model_id = model.id
+        draft = await store.create_version(session, model_id=model.id)
+    else:
+        draft = next((v for v in model.versions if v.status == "draft"), None)
+        if draft is None:
+            draft = await store.create_version(session, model_id=model.id)
+
+    # Reload eager so node/edge types + property keys are available for grounding
+    # + the by-name reconcile diff (create_version returns an unloaded version).
+    eager = await store.get_version(session, draft.id)
+    assert eager is not None  # just created/loaded in this transaction
+    return model, eager
+
+
+async def _send_modeller_message(
+    session: AsyncSession,
+    *,
+    sess: Session,
+    graph: Graph,
+    payload: SendMessage,
+    actor_id: str,
+    encryption_key: str,
+) -> tuple[SessionMessage, SessionMessage, None]:
+    """NL prompt → proposed model → reconciled into the session's draft (RFC-031).
+
+    Mirrors the NL branch of ``send_message`` but authors a model instead of
+    running a query: resolve provider → ensure model+draft → propose → validate
+    (no mutation on failure) → reconcile into the draft → summary reply. Always
+    returns ``None`` for the result (there is nothing to render on the canvas
+    beyond the refreshed draft)."""
+    if payload.mode == "ql":
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="Modeller sessions author a model — query mode isn't available here.",
+        )
+
+    store = SessionStore()
+    # Resolve up front so a missing-provider 422 rolls back before any write.
+    provider = await _resolve_provider(session, graph_id=graph.id, llm_provider_id=payload.llm_provider_id)
+
+    user_seq = await store.next_seq(session, session_id=sess.id)
+    user_msg = SessionMessage(
+        session_id=sess.id,
+        seq=user_seq,
+        role=SessionMessageRole.user,
+        content=payload.content,
+    )
+    assistant_msg = SessionMessage(
+        session_id=sess.id,
+        seq=user_seq + 1,
+        role=SessionMessageRole.assistant,
+        content="Generating model…",
+        status=SessionMessageStatus.running,
+        mode="nl",
+    )
+    await store.add(session, user_msg)
+    await store.add(session, assistant_msg)
+
+    model, draft = await _ensure_model_and_draft(session, sess=sess, graph=graph, prompt=payload.content)
+
+    # Replay prior turns so a follow-up ("add a Company") refines the same draft.
+    history = _assemble_history(
+        await store.list_recent_messages(session, session_id=sess.id, before_seq=user_seq, limit=_HISTORY_TURNS * 2)
+    )
+
+    try:
+        proposal = await propose_model(
+            provider=provider,
+            prompt=payload.content,
+            version=draft,
+            encryption_key=encryption_key,
+            history=history,
+            **({"timeout_s": payload.timeout_s} if payload.timeout_s is not None else {}),
+        )
+    except LLMError as exc:
+        assistant_msg.status = SessionMessageStatus.error
+        assistant_msg.content = exc.message
+        await _finalize_totals(session, sess, assistant_msg, payload)
+        return user_msg, assistant_msg, None
+
+    if isinstance(proposal, Clarification):
+        assistant_msg.status = SessionMessageStatus.ok
+        assistant_msg.content = proposal.question
+        assistant_msg.clarification_options = list(proposal.options) or None
+        assistant_msg.via = f"{provider.provider.value} · {provider.model_id}"
+        assistant_msg.llm_time_ms = round(proposal.duration_ms)
+        assistant_msg.timeout_s = payload.timeout_s
+        await emit_event(
+            session,
+            action=actions.LLM_TRANSLATE,
+            target_kind=actions.TARGET_SESSION,
+            target_id=sess.id,
+            graph_id=graph.id,
+            actor_id=actor_id,
+            details={
+                "provider": provider.provider.value,
+                "model_id": provider.model_id,
+                "action": "clarify",
+                "question": proposal.question,
+                "input_tokens": proposal.usage.input_tokens,
+                "output_tokens": proposal.usage.output_tokens,
+                "duration_ms": round(proposal.duration_ms),
+            },
+            trace_id=current_trace_id(),
+        )
+        await _finalize_totals(session, sess, assistant_msg, payload)
+        return user_msg, assistant_msg, None
+
+    # Referential integrity BEFORE any draft mutation (RFC-031 Decision 9).
+    existing_names = {nt.name for nt in draft.node_types}
+    try:
+        validate_proposal(proposal, existing_node_type_names=existing_names)
+    except LLMError as exc:
+        assistant_msg.status = SessionMessageStatus.error
+        assistant_msg.content = exc.message
+        await _finalize_totals(session, sess, assistant_msg, payload)
+        return user_msg, assistant_msg, None
+
+    counts = await reconcile_proposal(session, store=ModelStore(), version=draft, proposal=proposal)
+
+    assistant_msg.status = SessionMessageStatus.ok
+    assistant_msg.via = f"{provider.provider.value} · {provider.model_id}"
+    assistant_msg.llm_time_ms = round(proposal.duration_ms)
+    assistant_msg.timeout_s = payload.timeout_s
+    assistant_msg.content = _model_summary(proposal.summary, counts)
+    await emit_event(
+        session,
+        action=actions.MODEL_GENERATE,
+        target_kind=actions.TARGET_SESSION,
+        target_id=sess.id,
+        graph_id=graph.id,
+        actor_id=actor_id,
+        details={
+            "provider": provider.provider.value,
+            "model_id": provider.model_id,
+            "model_id_target": model.id,
+            "node_type_count": counts["node_types"],
+            "edge_type_count": counts["edge_types"],
+            "property_key_count": counts["property_keys"],
+            "input_tokens": proposal.usage.input_tokens,
+            "output_tokens": proposal.usage.output_tokens,
+            "latency_ms": round(proposal.duration_ms),
+        },
+        trace_id=current_trace_id(),
+    )
+    await _finalize_totals(session, sess, assistant_msg, payload)
+    return user_msg, assistant_msg, None
+
+
 async def send_message(
     session: AsyncSession,
     *,
@@ -362,6 +581,19 @@ async def send_message(
     recorded as an error assistant message (committed).
     """
     store = SessionStore()
+
+    # A modeller session authors a model draft (RFC-031), not a query — branch off
+    # to the generation path. Query mode isn't available there.
+    if sess.surface == SessionSurface.modeller:
+        return await _send_modeller_message(
+            session,
+            sess=sess,
+            graph=graph,
+            payload=payload,
+            actor_id=actor_id,
+            encryption_key=encryption_key,
+        )
+
     is_ql = payload.mode == "ql"
 
     # Resolve the provider up front for nl so a missing-provider 422 rolls back

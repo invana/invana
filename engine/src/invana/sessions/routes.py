@@ -64,6 +64,7 @@ async def list_sessions(
     offset: int = Query(default=0, ge=0),
     sort: Literal["updated", "created"] = Query(default="updated"),
     include_archived: bool = Query(default=False),
+    surface: Literal["explorer", "modeller"] | None = Query(default=None),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
@@ -77,6 +78,7 @@ async def list_sessions(
         offset=offset,
         sort=sort,
         include_archived=include_archived,
+        surface=surface,
     )
     return SessionListResponse(items=[SessionSummary.model_validate(s) for s in items], total=total)
 
@@ -90,7 +92,14 @@ async def create_session(
     session: AsyncSession = Depends(get_session),
     manager: GraphConnectionManager = Depends(_get_manager),
 ) -> SessionDetail:
-    sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=payload.title)
+    sess = await services.create_session(
+        session,
+        graph_id=graph.id,
+        user_id=user.id,
+        title=payload.title,
+        surface=payload.surface,
+        model_id=payload.model_id,
+    )
     if payload.message is not None:
         await services.send_message(
             session,

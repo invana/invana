@@ -72,6 +72,12 @@ export interface Session {
 	pinned: boolean;
 	/** Archived sessions are hidden from the default list. */
 	archived: boolean;
+	/** RFC-031 — which Studio surface this session lives on. Modeller sessions
+	 *  author a model draft; Explorer (default) query the graph. */
+	surface?: "explorer" | "modeller";
+	/** RFC-031 — the model a modeller session authors (bound on first generation
+	 *  when absent). Lets the Modeller page sync its canvas to the bound draft. */
+	modelId?: string;
 	/** Running totals across the session, for the list meta line. */
 	nodeCount: number;
 	edgeCount: number;

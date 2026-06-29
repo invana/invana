@@ -19,6 +19,7 @@ class SessionStore:
         offset: int,
         sort: str = "updated",
         include_archived: bool = False,
+        surface: str | None = None,
     ) -> list[Session]:
         # Pinned always float to the top; within each group, newest by the
         # chosen field. `created` and anything else fall back to updated_at.
@@ -32,6 +33,8 @@ class SessionStore:
         )
         if not include_archived:
             stmt = stmt.where(Session.archived.is_(False))
+        if surface is not None:
+            stmt = stmt.where(Session.surface == surface)
         return list((await session.execute(stmt)).scalars().all())
 
     async def count_for_user(
@@ -41,6 +44,7 @@ class SessionStore:
         graph_id: str,
         user_id: str,
         include_archived: bool = False,
+        surface: str | None = None,
     ) -> int:
         stmt = (
             select(func.count())
@@ -49,6 +53,8 @@ class SessionStore:
         )
         if not include_archived:
             stmt = stmt.where(Session.archived.is_(False))
+        if surface is not None:
+            stmt = stmt.where(Session.surface == surface)
         return int((await session.execute(stmt)).scalar_one())
 
     async def get(self, session: AsyncSession, session_id: str) -> Session | None:

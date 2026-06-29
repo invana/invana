@@ -36,8 +36,12 @@ function toBody(payload: QueryRunPayload): SendMessageBody {
 export function useSessions(
 	username: string | undefined,
 	graphSlug: string | undefined,
+	opts?: { surface?: "explorer" | "modeller"; modelId?: string },
 ) {
 	const qc = useQueryClient();
+	// Default to the Explorer surface so existing callers are untouched (RFC-031).
+	const surface = opts?.surface ?? "explorer";
+	const modelId = opts?.modelId;
 	const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 	// List controls that drive the server query (so paging/totals stay correct).
 	const [sort, setSort] = useState<SessionSort>("updated");
@@ -46,17 +50,18 @@ export function useSessions(
 	const g = graphSlug ?? "";
 	const ready = !!username && !!graphSlug;
 
-	// sort + showArchived are part of the key so the list refetches when toggled.
-	const listKey = ["sessions", u, g, sort, showArchived] as const;
-	// Prefix that matches every sort/archived variant — used for invalidation so
-	// a pin/archive/send touches all cached lists, not just the active one.
-	const listPrefix = ["sessions", u, g] as const;
+	// surface scopes the list so Explorer and Modeller panels never show each
+	// other's sessions; sort + showArchived refetch the list when toggled.
+	const listKey = ["sessions", u, g, surface, sort, showArchived] as const;
+	// Prefix that matches every sort/archived variant for this surface — used for
+	// invalidation so a pin/archive/send touches all cached lists for the surface.
+	const listPrefix = ["sessions", u, g, surface] as const;
 	const detailKey = (id: string) => ["session", u, g, id] as const;
 
 	const sessionsQuery = useQuery({
 		queryKey: listKey,
 		queryFn: () =>
-			sessionsApi.list(u, g, { sort, includeArchived: showArchived }),
+			sessionsApi.list(u, g, { sort, includeArchived: showArchived, surface }),
 		enabled: ready,
 	});
 
@@ -136,7 +141,7 @@ export function useSessions(
 		const runningMsg: SessionMessage = {
 			id: crypto.randomUUID(),
 			role: "assistant",
-			content: "Running query…",
+			content: surface === "modeller" ? "Generating model…" : "Running query…",
 			createdAt: now,
 			status: "running",
 		};
@@ -145,8 +150,12 @@ export function useSessions(
 		try {
 			if (!sessionId) {
 				// No open session — create one, then drop into it right away with the
-				// optimistic pair already in place (no list→detail wait).
-				const created = await sessionsApi.create(u, g);
+				// optimistic pair already in place (no list→detail wait). A modeller
+				// session carries its surface + (optional) model binding (RFC-031).
+				const created = await sessionsApi.create(u, g, {
+					surface,
+					model_id: modelId,
+				});
 				sessionId = created.id;
 				patchDetail(sessionId, () => ({
 					...created,

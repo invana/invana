@@ -53,6 +53,7 @@ MODEL_CREATE = "model.create"
 MODEL_UPDATE = "model.update"
 MODEL_DELETE = "model.delete"
 MODEL_ACTIVATE = "model.activate"
+MODEL_GENERATE = "model.generate"  # NL → proposed model written to a draft (RFC-031); target = session
 
 # ── Datasets / ingestion (RFC-020) ────────────────────────────────────────────
 DATASET_IMPORT = "dataset.import"

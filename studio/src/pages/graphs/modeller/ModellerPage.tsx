@@ -43,6 +43,7 @@ import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "../../../hooks/queries/useGraphs";
+import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import {
 	useActivateVersionMutation,
 	useCreateDraftMutation,
@@ -58,6 +59,7 @@ import { ApiError, suppressActionToast } from "../../../services/api/client";
 import { graphsApi } from "../../../services/api/graphs";
 import { isSetupComplete } from "../../../types/graphs";
 import type { GraphModelSummary } from "../../../types/models";
+import type { QueryRunPayload } from "../../../types/query";
 import type {
 	EdgeTypeResponse,
 	NodeTypeResponse,
@@ -68,6 +70,8 @@ import {
 	type CanvasBackend,
 	ExplorerHeaderToolbar,
 } from "../explorer/components/ExplorerCanvas";
+import { SessionsPanel } from "../explorer/components/SessionsPanel";
+import { useSessions } from "../explorer/hooks/useSessions";
 import { CompatibilityBanner } from "./components/CompatibilityBanner";
 import { DeleteModelDialog } from "./components/DeleteModelDialog";
 import type { SelectedItem } from "./components/DetailPanel";
@@ -144,6 +148,45 @@ export function ModellerPage() {
 	const [modelId, setModelId] = useState<string | undefined>();
 	const [selected, setSelected] = useState<SelectedItem>(null);
 	const [introspecting, setIntrospecting] = useState(false);
+
+	// Generative sessions (RFC-031): the Modeller's "Messages" native panel mounts
+	// the same SessionsPanel as the Explorer, scoped to surface=modeller and bound
+	// to the open model. A prompt proposes node/edge types into the model's draft.
+	const sessions = useSessions(username, graphSlug, {
+		surface: "modeller",
+		modelId,
+	});
+	const { data: llmProvidersResponse } = useLLMProvidersQuery(
+		username,
+		graphSlug,
+	);
+	const llmProviders = llmProvidersResponse?.items ?? [];
+	// NL-only composer (QL hidden for modeller), so these are unused — but the
+	// SessionsPanel/composer props require them. Reuse the connection's languages.
+	const sessionLanguages = graph?.query_languages ?? ["cypher"];
+
+	// A modeller session authors one model. When a bound session is open, sync the
+	// page to its model so the canvas + tree render the draft being authored (the
+	// first generation on an unbound session binds + creates the model server-side,
+	// then this switches the canvas to it).
+	const boundModelId = sessions.activeSession?.modelId;
+	useEffect(() => {
+		if (boundModelId && boundModelId !== modelId) {
+			setModelId(boundModelId);
+			setSelected(null);
+		}
+	}, [boundModelId, modelId]);
+
+	// After a generation, refresh the model tree + canvas to the updated draft
+	// (the existing modeller invalidation root). The sessions hook already
+	// invalidates the sessions/thread caches.
+	const handleModellerRun = async (payload: QueryRunPayload) => {
+		try {
+			await sessions.send(payload);
+		} finally {
+			qc.invalidateQueries({ queryKey: ["models", u, g] });
+		}
+	};
 
 	// The live canvas engine, lifted out of <Canvas> by <CanvasBridge> (in
 	// SchemaCanvas). Null until the graph is fully wired; gates the header toolbar
@@ -446,6 +489,41 @@ export function ModellerPage() {
 		);
 	} else if (setupIncomplete) {
 		leftContent = <SetupRequiredBanner pageLabel="Modeller" reason="setup" />;
+	} else if (settingsPanel.section === "messages") {
+		// Generative sessions panel (RFC-031) — author the draft by chat. Commit
+		// reuses the Modeller's Publish (the existing confirm + activate mutation).
+		leftContent = (
+			<SessionsPanel
+				availableLanguages={sessionLanguages}
+				defaultLanguage={sessionLanguages[0] ?? "cypher"}
+				llmProviders={llmProviders}
+				onRun={handleModellerRun}
+				onStop={sessions.stop}
+				isRunning={sessions.isRunning}
+				sessions={sessions.sessions}
+				activeSession={sessions.activeSession}
+				onOpenSession={sessions.openSession}
+				onBack={sessions.backToList}
+				onRerun={sessions.rerun}
+				onFetchContext={sessions.fetchContext}
+				onSetFeedback={sessions.setFeedback}
+				results={{}}
+				onLoadToCanvas={() => {}}
+				onRefresh={sessions.refresh}
+				isRefreshing={sessions.isRefreshing}
+				onClose={closeLeft}
+				sort={sessions.sort}
+				onSortChange={sessions.setSort}
+				showArchived={sessions.showArchived}
+				onShowArchivedChange={sessions.setShowArchived}
+				onPin={sessions.setPinned}
+				onArchive={sessions.setArchived}
+				surface="modeller"
+				onCommit={() => setPublishConfirm(true)}
+				canCommit={canPublish}
+				isCommitting={publish.isPending}
+			/>
+		);
 	} else if (!modelId || !selectedModel) {
 		leftContent = (
 			<ModelListPanel

@@ -41,6 +41,18 @@ def _new_id() -> str:
     return str(uuid.uuid4())
 
 
+class SessionSurface(enum.StrEnum):
+    """Which Studio surface a session lives on (RFC-031).
+
+    ``explorer`` sessions query the graph (NL → query); ``modeller`` sessions
+    author a model's draft (NL → ``propose_model``). Existing rows and the create
+    path default to ``explorer`` so Explorer behaviour is untouched.
+    """
+
+    explorer = "explorer"
+    modeller = "modeller"
+
+
 class SessionMessageRole(enum.StrEnum):
     user = "user"
     assistant = "assistant"
@@ -54,6 +66,12 @@ class SessionMessageStatus(enum.StrEnum):
     error = "error"
 
 
+_surface_enum = Enum(
+    SessionSurface,
+    name="session_surface",
+    values_callable=lambda x: [m.value for m in x],
+    create_type=False,
+)
 _role_enum = Enum(
     SessionMessageRole,
     name="session_message_role",
@@ -84,6 +102,20 @@ class Session(Base):
         String(36),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
+        index=True,
+    )
+
+    # Which Studio surface this session lives on (RFC-031). ``explorer`` queries
+    # the graph; ``modeller`` authors a model draft. Defaults to ``explorer`` so
+    # existing rows + the create path keep working.
+    surface: Mapped[SessionSurface] = mapped_column(_surface_enum, default=SessionSurface.explorer, nullable=False)
+    # The model a ``modeller`` session authors (RFC-031 Decision 2). Bound on the
+    # first generation when absent; ON DELETE SET NULL so deleting the model
+    # un-binds the session rather than removing it. Always null for ``explorer``.
+    model_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("graph_models.id", ondelete="SET NULL"),
+        nullable=True,
         index=True,
     )
 

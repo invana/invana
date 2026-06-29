@@ -21,6 +21,7 @@ import {
 	Archive,
 	ArchiveRestore,
 	ArrowLeft,
+	Check,
 	Code,
 	Copy,
 	Info,
@@ -98,6 +99,16 @@ export interface SessionsPanelProps {
 	onPin: (id: string, pinned: boolean) => void;
 	/** Toggle a session's archived flag. */
 	onArchive: (id: string, archived: boolean) => void;
+	/** RFC-031 — which surface this panel serves. "modeller" turns the composer
+	 *  NL-only and surfaces the Commit affordance. Defaults to "explorer". */
+	surface?: "explorer" | "modeller";
+	/** RFC-031 — commit (Publish) the bound model's draft. Shown only on a
+	 *  modeller surface, inside an open session. */
+	onCommit?: () => void;
+	/** Whether the bound draft has something to publish (gates the Commit button). */
+	canCommit?: boolean;
+	/** True while a commit (activate) is in flight. */
+	isCommitting?: boolean;
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
@@ -130,7 +141,12 @@ export function SessionsPanel({
 	onShowArchivedChange,
 	onPin,
 	onArchive,
+	surface = "explorer",
+	onCommit,
+	canCommit,
+	isCommitting,
 }: SessionsPanelProps) {
+	const isModeller = surface === "modeller";
 	const [searchOpen, setSearchOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [filterOpen, setFilterOpen] = useState(false);
@@ -279,8 +295,29 @@ export function SessionsPanel({
 			initialConfig={composerConfig}
 			promptHistory={promptHistory}
 			focusSignal={composerFocus}
+			surface={surface}
 		/>
 	);
+
+	// Modeller: a Commit bar above the composer publishes the bound draft —
+	// identical to the Modeller's Publish, in the session's context (RFC-031 D7).
+	const commitBar =
+		isModeller && inDetail && onCommit ? (
+			<div className="shrink-0 border-t border-border px-3 py-2 flex items-center justify-between gap-2">
+				<span className="text-xs text-muted-foreground">
+					Generated into the model's draft — Commit to publish.
+				</span>
+				<Button
+					size="sm"
+					className="h-7"
+					onClick={onCommit}
+					disabled={!canCommit || isCommitting}
+				>
+					<Check className="w-3 h-3 mr-1" />
+					{isCommitting ? "Publishing…" : "Commit"}
+				</Button>
+			</div>
+		) : null;
 
 	// Refresh + collapse are always available; search and filter only make sense
 	// on the list, so they sit between them when we're not inside a session.
@@ -351,6 +388,7 @@ export function SessionsPanel({
 				/>
 			</DropdownMenu>
 			<div className="flex-1 min-h-0">{body}</div>
+			{commitBar}
 			<div className="shrink-0">{composer}</div>
 		</div>
 	);

@@ -99,6 +99,10 @@ export interface SessionComposerProps {
 	/** Bump to focus the input — e.g. when the user picks "let me type instead"
 	 *  on a clarification (RFC-038). Ignored at 0 (initial). */
 	focusSignal?: number;
+	/** RFC-031 — which surface the composer serves. A "modeller" composer is
+	 *  NL-only (it authors a model): the mode switch is hidden and QL is
+	 *  unreachable. Defaults to "explorer" (the full NL/QL composer). */
+	surface?: "explorer" | "modeller";
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -118,7 +122,9 @@ export function SessionComposer({
 	initialConfig,
 	promptHistory,
 	focusSignal,
+	surface = "explorer",
 }: SessionComposerProps) {
+	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
 	const [language, setLanguage] = useState<QueryLanguage>(defaultLanguage);
 	const [llmProviderId, setLlmProviderId] = useState<string>("");
@@ -201,13 +207,14 @@ export function SessionComposer({
 		}
 		if (!initialConfig || appliedSessionRef.current === sessionKey) return;
 		appliedSessionRef.current = sessionKey;
-		setMode(initialConfig.mode);
+		// Modeller sessions are NL-only — never restore a QL mode.
+		setMode(isModeller ? "nl" : initialConfig.mode);
 		if (initialConfig.language) setLanguage(initialConfig.language);
 		if (initialConfig.mode === "nl" && initialConfig.llmProviderId) {
 			setLlmProviderId(initialConfig.llmProviderId);
 		}
 		if (initialConfig.timeoutS != null) setTimeoutS(initialConfig.timeoutS);
-	}, [sessionKey, initialConfig]);
+	}, [sessionKey, initialConfig, isModeller]);
 
 	// Switching sessions (or back to the list) starts a fresh history walk.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset is keyed on the session only
@@ -445,7 +452,11 @@ export function SessionComposer({
 								}
 							}
 						}}
-						placeholder="Ask anything about your graph…"
+						placeholder={
+							isModeller
+								? "Describe the model to build…"
+								: "Ask anything about your graph…"
+						}
 						className="block w-full min-h-16 h-24 max-h-64 bg-transparent p-2 text-foreground outline-none resize-y placeholder:text-muted-foreground"
 					/>
 				)}
@@ -455,15 +466,19 @@ export function SessionComposer({
             the leftover width and truncates so a long provider name never
             shoves the send button off a narrow panel. */}
 				<div className="px-2 py-1.5 border-t border-border flex items-center gap-1.5">
-					<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
-						<SelectTrigger className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="nl">Natural Language</SelectItem>
-							<SelectItem value="ql">Query Language</SelectItem>
-						</SelectContent>
-					</Select>
+					{/* Modeller sessions author a model — NL only, so the mode switch is
+					    hidden (QL is unreachable). Explorer keeps the NL/QL toggle. */}
+					{!isModeller && (
+						<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
+							<SelectTrigger className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="nl">Natural Language</SelectItem>
+								<SelectItem value="ql">Query Language</SelectItem>
+							</SelectContent>
+						</Select>
+					)}
 
 					<div className="flex-1 min-w-0 flex items-center">
 						{mode === "nl" ? (

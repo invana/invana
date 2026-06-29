@@ -953,6 +953,7 @@ dependencies = [
     { name = "click" },
     { name = "cryptography" },
     { name = "gremlinpython" },
+    { name = "httpx" },
     { name = "neo4j" },
     { name = "passlib", extra = ["bcrypt"] },
     { name = "pydantic", extra = ["email"] },
@@ -964,7 +965,6 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "itsdangerous" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-grpc" },
@@ -984,7 +984,6 @@ server = [
     { name = "uvicorn" },
 ]
 telemetry = [
-    { name = "httpx" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-grpc" },
     { name = "opentelemetry-instrumentation-fastapi" },
@@ -1016,7 +1015,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=42" },
     { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.115" },
     { name = "gremlinpython", specifier = ">=3.8.1" },
-    { name = "httpx", marker = "extra == 'telemetry'", specifier = ">=0.27" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "invana-engine", extras = ["server"], marker = "extra == 'all'" },
     { name = "invana-engine", extras = ["telemetry"], marker = "extra == 'all'" },
     { name = "itsdangerous", marker = "extra == 'server'", specifier = ">=2.2" },

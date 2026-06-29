@@ -32,6 +32,12 @@ class SendMessage(BaseModel):
 
 class SessionCreate(BaseModel):
     title: str | None = Field(default=None, max_length=255)
+    # Which Studio surface this session lives on (RFC-031). ``modeller`` sessions
+    # author a model draft; ``explorer`` (default) query the graph.
+    surface: Literal["explorer", "modeller"] = "explorer"
+    # Optional model binding for a modeller session — the draft to author. When
+    # absent, the first generation creates + binds a model (RFC-031 Decision 2).
+    model_id: str | None = None
     # Optional first message → create-and-send in one call (the "ask from the
     # list with no active session" UX).
     message: SendMessage | None = None
@@ -106,6 +112,10 @@ class SessionSummary(BaseModel):
 
     id: str
     graph_id: str
+    # RFC-031: which surface + (modeller-only) the model this session authors, so
+    # the FE can filter Explorer/Modeller lists and sync the canvas to the draft.
+    surface: Literal["explorer", "modeller"] = "explorer"
+    model_id: str | None = None
     title: str
     pinned: bool
     archived: bool

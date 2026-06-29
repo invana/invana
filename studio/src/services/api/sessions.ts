@@ -42,6 +42,10 @@ interface ApiMessage {
 interface ApiSummary {
 	id: string;
 	graph_id: string;
+	// RFC-031 — which Studio surface this session lives on, and (modeller only)
+	// the model it authors.
+	surface?: "explorer" | "modeller" | null;
+	model_id?: string | null;
 	title: string;
 	pinned: boolean;
 	archived: boolean;
@@ -94,6 +98,16 @@ export interface SessionListOptions {
 	offset?: number;
 	sort?: SessionSort;
 	includeArchived?: boolean;
+	/** RFC-031 — list only one surface's sessions (Explorer vs Modeller). */
+	surface?: "explorer" | "modeller";
+}
+
+/** Body for creating a session — title plus (RFC-031) optional surface + model
+ *  binding. A modeller session with no model_id binds on its first generation. */
+export interface SessionCreateBody {
+	title?: string;
+	surface?: "explorer" | "modeller";
+	model_id?: string;
 }
 
 /** Partial update for a session — rename and/or toggle pin/archive. */
@@ -145,6 +159,8 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		updatedAt: new Date(s.updated_at),
 		pinned: s.pinned,
 		archived: s.archived,
+		surface: s.surface ?? undefined,
+		modelId: s.model_id ?? undefined,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
 		lastStatus: s.last_status ?? undefined,
@@ -172,6 +188,7 @@ export const sessionsApi = {
 		if (opts?.offset != null) params.set("offset", String(opts.offset));
 		if (opts?.sort != null) params.set("sort", opts.sort);
 		if (opts?.includeArchived) params.set("include_archived", "true");
+		if (opts?.surface != null) params.set("surface", opts.surface);
 		const qs = params.toString();
 		const data = await request<ApiListResponse>(
 			`${base(username, graphSlug)}${qs ? `?${qs}` : ""}`,
@@ -189,7 +206,7 @@ export const sessionsApi = {
 	create: async (
 		username: string,
 		graphSlug: string,
-		body?: { title?: string },
+		body?: SessionCreateBody,
 	): Promise<Session> =>
 		toDetail(
 			await request<ApiDetail>(base(username, graphSlug), {

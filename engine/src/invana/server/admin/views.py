@@ -374,6 +374,8 @@ class SessionView(ModelView):
         "id",
         "graph_id",
         "created_by_id",
+        StringField("surface", label="Surface"),
+        "model_id",
         "title",
         "pinned",
         "archived",

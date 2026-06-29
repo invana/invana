@@ -135,17 +135,36 @@ export function useGraphLeftNav(
 		};
 	};
 
+	// The Modeller's second native panel: a generative Sessions chat (RFC-031).
+	// Toggles the shared `?settings=messages` key just like the schema view icon,
+	// so the rail stays single-open. Shown only on the Modeller.
+	const messagesItem = () => {
+		const active = settingsPanel.isOpen && settingsPanel.section === "messages";
+		return {
+			name: "Messages",
+			icon: MessagesSquare,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () => toggleSection("messages"),
+		};
+	};
+
 	// On Explorer the rail shows the view's own panels — the Sessions chat
 	// ("Messages") and the read-only Model browser — and omits the Modeller icon;
-	// switching views is handled by the header GraphSectionSwitcher. Other pages
-	// keep the two view icons for navigation.
+	// switching views is handled by the header GraphSectionSwitcher. On the
+	// Modeller it likewise shows the view's own panels — the schema nav
+	// ("Modeller") and the generative Sessions chat ("Messages"). Other pages keep
+	// the two view icons for navigation.
 	const topNavItems =
 		activeTab === "explorer"
 			? [viewItem("explorer", "Messages", MessagesSquare), modelItem()]
-			: [
-					viewItem("explorer", "Explorer", Compass),
-					viewItem("modeller", "Modeller", Boxes),
-				];
+			: activeTab === "modeller"
+				? [viewItem("modeller", "Modeller", Boxes), messagesItem()]
+				: [
+						viewItem("explorer", "Explorer", Compass),
+						viewItem("modeller", "Modeller", Boxes),
+					];
 
 	// Each section icon is a toggle: clicking the open section closes the panel,
 	// clicking any other opens/switches to it — the same single `?settings` param
