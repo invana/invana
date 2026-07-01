@@ -26,6 +26,7 @@ from invana.llm.providers import ollama as ollama_provider
 from invana.llm.providers import openai as openai_provider
 from invana.llm.schemas import TokenUsage, ToolResult
 from invana.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.telemetry.recorders import add_llm_in_flight, record_llm_request
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025); the LLM
 # client must import cleanly without it. Resolve a tracer lazily and fall back to
@@ -70,8 +71,12 @@ async def complete_tool(
     tool_name: str,
     encryption_key: str,
     timeout_s: float = 60.0,
+    operation: str = "generate",
 ) -> ToolResult:
     """Force a schema-valid structured object from ``provider``.
+
+    ``operation`` labels the calling surface (``translate`` / ``propose``) on the
+    ``invana.llm.*`` metrics (RFC-041); it doesn't affect behaviour.
 
     Raises ``LLMError`` (user-facing message) on config, transport, or
     validation failure — nothing else escapes.
@@ -93,9 +98,20 @@ async def complete_tool(
     # Accumulate wall-clock across both the initial call and any repair retry, so
     # the reported LLM time covers everything the turn actually spent talking to
     # the provider — not just the last attempt.
+    provider_name = provider.provider.value
     start = time.perf_counter()
     obj, usage = await _invoke(
-        dispatch, model_id, api_key, provider.base_url, system, messages, tool_schema, tool_name, timeout_s
+        dispatch,
+        model_id,
+        api_key,
+        provider.base_url,
+        system,
+        messages,
+        tool_schema,
+        tool_name,
+        timeout_s,
+        provider_name=provider_name,
+        operation=operation,
     )
     if _valid(obj, required):
         return ToolResult(input=obj, usage=usage, duration_ms=(time.perf_counter() - start) * 1000)
@@ -110,7 +126,17 @@ async def complete_tool(
         },
     ]
     obj2, usage2 = await _invoke(
-        dispatch, model_id, api_key, provider.base_url, system, repair, tool_schema, tool_name, timeout_s
+        dispatch,
+        model_id,
+        api_key,
+        provider.base_url,
+        system,
+        repair,
+        tool_schema,
+        tool_name,
+        timeout_s,
+        provider_name=provider_name,
+        operation=operation,
     )
     usage = TokenUsage(
         input_tokens=usage.input_tokens + usage2.input_tokens,
@@ -132,7 +158,16 @@ async def _invoke(
     tool_schema: dict,
     tool_name: str,
     timeout_s: float,
+    *,
+    provider_name: str,
+    operation: str,
 ) -> tuple[dict | None, TokenUsage]:
+    # One provider round-trip = one span + one metric sample. The corrective
+    # retry is a second call here, so it lands as a second sample — keeping the
+    # ``invana.llm.request.duration`` histogram aligned with the ``llm.generate``
+    # span (RFC-041).
+    add_llm_in_flight(1, provider=provider_name, model_id=model_id, operation=operation)
+    start = time.perf_counter()
     with _llm_span("llm.generate") as span:
         if span is not None:
             span.set_attribute("invana.llm.model_id", model_id)
@@ -148,12 +183,39 @@ async def _invoke(
                 timeout_s=timeout_s,
             )
         except LLMError:
+            record_llm_request(
+                provider=provider_name,
+                model_id=model_id,
+                operation=operation,
+                duration_ms=(time.perf_counter() - start) * 1000,
+                status="failed",
+                error_type="LLMError",
+            )
             raise
         except Exception as exc:  # normalize transport/SDK failures
+            record_llm_request(
+                provider=provider_name,
+                model_id=model_id,
+                operation=operation,
+                duration_ms=(time.perf_counter() - start) * 1000,
+                status="failed",
+                error_type=type(exc).__name__,
+            )
             raise LLMError(f"The LLM provider call failed: {exc}") from exc
+        finally:
+            add_llm_in_flight(-1, provider=provider_name, model_id=model_id, operation=operation)
         if span is not None:
             span.set_attribute("invana.llm.input_tokens", usage.input_tokens)
             span.set_attribute("invana.llm.output_tokens", usage.output_tokens)
+        record_llm_request(
+            provider=provider_name,
+            model_id=model_id,
+            operation=operation,
+            duration_ms=(time.perf_counter() - start) * 1000,
+            status="success",
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+        )
         return obj, usage
 
 

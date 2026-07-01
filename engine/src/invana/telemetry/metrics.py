@@ -8,7 +8,10 @@ UpDownCounters  → live gauges (concurrency, connections)
 Domains
 -------
   api        invana.api.*                  HTTP requests via TelemetryMiddleware
-  gremlin    invana.query.gremlin.*        Graph query execution
+  llm        invana.llm.*                  LLM provider calls (RFC-041)
+  graph      invana.query.graph.*          Graph query execution, both languages (RFC-041)
+  message    invana.session.message.*      Session message round-trips (RFC-041)
+  gremlin    invana.query.gremlin.*        LEGACY — superseded by invana.query.graph.* (RFC-041)
   postgres   invana.query.postgres.*       App-state DB queries
   ontology   invana.ontology.operation.*   Modeller / schema operations
   method     invana.method.*               Generic method-level instrumentation
@@ -84,7 +87,103 @@ api_status_5xx = meter.create_counter(
     description="Total 5xx responses",
 )
 
-# ── Gremlin ───────────────────────────────────────────────────────────────────
+# ── LLM (RFC-041) — provider-call latency & token throughput ──────────────────
+# Labels: provider, model_id, operation (translate/propose), status, error_type.
+# Emitted inline from invana.llm.client (module-level functions can't take the
+# @capture_metrics decorator, which assumes a bound ``self``).
+
+llm_request_duration = meter.create_histogram(
+    name="invana.llm.request.duration",
+    description="LLM provider-call latency (per _invoke, incl. any corrective retry as a 2nd sample)",
+    unit="ms",
+)
+
+llm_request_count = meter.create_counter(
+    name="invana.llm.request.count",
+    description="Total LLM provider calls",
+)
+
+llm_request_errors = meter.create_counter(
+    name="invana.llm.request.errors",
+    description="Total failed LLM provider calls",
+)
+
+llm_requests_in_flight = meter.create_up_down_counter(
+    name="invana.llm.requests_in_flight",
+    description="LLM provider calls currently executing",
+)
+
+llm_tokens_input = meter.create_counter(
+    name="invana.llm.tokens.input",
+    description="Input tokens sent to the provider — rate() gives tokens/sec",
+    unit="tokens",
+)
+
+llm_tokens_output = meter.create_counter(
+    name="invana.llm.tokens.output",
+    description="Output tokens returned by the provider — rate() gives tokens/sec",
+    unit="tokens",
+)
+
+# ── Graph query (RFC-041) — unified across Cypher + Gremlin ────────────────────
+# Labels: language (cypher/gremlin), backend (connector class), status, error_type,
+# error_category. Emitted inline from the connector round-trip points.
+
+graph_query_duration = meter.create_histogram(
+    name="invana.query.graph.duration",
+    description="Graph query driver round-trip duration (both languages)",
+    unit="ms",
+)
+
+graph_query_count = meter.create_counter(
+    name="invana.query.graph.count",
+    description="Total graph queries executed",
+)
+
+graph_query_errors = meter.create_counter(
+    name="invana.query.graph.errors",
+    description="Total graph query errors",
+)
+
+graph_query_result_size = meter.create_histogram(
+    name="invana.query.graph.result_size",
+    description="Graph query result element count (nodes + edges, or traversal rows)",
+    unit="rows",
+)
+
+graph_queries_in_flight = meter.create_up_down_counter(
+    name="invana.query.graph.in_flight",
+    description="Graph queries currently executing",
+)
+
+# ── Session message (RFC-041) — end-to-end message round-trips ────────────────
+# Labels: mode (nl/ql), surface (explorer/modeller), status (ok/error/clarify).
+
+session_message_duration = meter.create_histogram(
+    name="invana.session.message.duration",
+    description="End-to-end session message latency (translate + query)",
+    unit="ms",
+)
+
+session_message_count = meter.create_counter(
+    name="invana.session.message.count",
+    description="Total session messages processed",
+)
+
+session_message_errors = meter.create_counter(
+    name="invana.session.message.errors",
+    description="Total session messages that ended in error",
+)
+
+session_messages_in_flight = meter.create_up_down_counter(
+    name="invana.session.message.in_flight",
+    description="Session messages currently being processed",
+)
+
+# ── Gremlin — LEGACY (RFC-041) ────────────────────────────────────────────────
+# Superseded by the unified invana.query.graph.* family above for the connector
+# path. Kept defined so the @capture_metrics(domain="gremlin") contract still
+# resolves; currently emitted by nothing.
 
 gremlin_query_duration = meter.create_histogram(
     name="invana.query.gremlin.duration",

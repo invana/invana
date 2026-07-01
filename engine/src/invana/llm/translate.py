@@ -158,6 +158,7 @@ async def nl_to_query(
         tool_name="submit_query",
         encryption_key=encryption_key,
         timeout_s=timeout_s,
+        operation="translate",
     )
     data = result.input
     if str(data.get("action") or "query") == "clarify":

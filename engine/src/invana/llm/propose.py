@@ -213,6 +213,7 @@ async def propose_model(
         tool_name="propose_model",
         encryption_key=encryption_key,
         timeout_s=timeout_s,
+        operation="propose",
     )
     data = result.input
     if str(data.get("action") or "propose") == "clarify":

@@ -7,6 +7,8 @@ graph-scoped; ``get_or_404`` enforces both.
 
 from __future__ import annotations
 
+import time
+from contextlib import nullcontext
 from http import HTTPStatus
 
 from fastapi import HTTPException
@@ -36,6 +38,40 @@ from invana.sessions.models import (
 from invana.sessions.reconcile import reconcile_proposal
 from invana.sessions.schemas import SendMessage
 from invana.sessions.store import SessionStore
+from invana.telemetry.recorders import add_message_in_flight, record_session_message
+
+# OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025); this
+# module must import cleanly without it. Resolve a tracer lazily and fall back to
+# no-op spans — the ``session.message`` span is the parent that ties the LLM
+# translate (``llm.generate``) and query (``graph.query.*``) child spans into one
+# end-to-end unit (RFC-041).
+try:
+    from opentelemetry import trace as _otel_trace
+
+    _tracer = _otel_trace.get_tracer("invana.sessions")
+except ImportError:  # telemetry extra not installed
+    _tracer = None
+
+
+def _message_span(name: str):
+    """Start an OTel span for a message round-trip, or a no-op without telemetry."""
+    if _tracer is None:
+        return nullcontext(None)
+    return _tracer.start_as_current_span(name)
+
+
+def _message_metric_status(msg: SessionMessage) -> str:
+    """Bucket a finished assistant message for metric labels (RFC-041).
+
+    ``error`` on failure, ``clarify`` when it asked a question instead of running,
+    else ``ok``.
+    """
+    if msg.status == SessionMessageStatus.error:
+        return "error"
+    if getattr(msg, "clarification_options", None):
+        return "clarify"
+    return "ok"
+
 
 _LANGUAGE_LABEL = {"cypher": "Cypher", "gremlin": "Gremlin"}
 
@@ -563,6 +599,53 @@ async def _send_modeller_message(
 
 
 async def send_message(
+    session: AsyncSession,
+    *,
+    sess: Session,
+    graph: Graph,
+    manager: GraphConnectionManager,
+    payload: SendMessage,
+    actor_id: str,
+    encryption_key: str,
+) -> tuple[SessionMessage, SessionMessage, QueryResponse | None]:
+    """Append a user message + assistant reply, then run a query.
+
+    Thin observability wrapper (RFC-041): opens the ``session.message`` parent
+    span and emits ``invana.session.message.*`` metrics around the orchestration
+    in :func:`_send_message_impl`, so a whole NL/QL turn is one trace and its
+    end-to-end latency is aggregatable by ``mode`` / ``surface`` / ``status``.
+    """
+    mode = payload.mode
+    surface = sess.surface.value
+    add_message_in_flight(1, mode=mode, surface=surface)
+    start = time.perf_counter()
+    status = "error"  # default so an unexpected raise is counted as an error
+    with _message_span("session.message") as span:
+        if span is not None:
+            span.set_attribute("invana.session.mode", mode)
+            span.set_attribute("invana.session.surface", surface)
+        try:
+            user_msg, assistant_msg, result = await _send_message_impl(
+                session,
+                sess=sess,
+                graph=graph,
+                manager=manager,
+                payload=payload,
+                actor_id=actor_id,
+                encryption_key=encryption_key,
+            )
+            status = _message_metric_status(assistant_msg)
+            if span is not None:
+                span.set_attribute("invana.session.status", status)
+            return user_msg, assistant_msg, result
+        finally:
+            record_session_message(
+                mode=mode, surface=surface, duration_ms=(time.perf_counter() - start) * 1000, status=status
+            )
+            add_message_in_flight(-1, mode=mode, surface=surface)
+
+
+async def _send_message_impl(
     session: AsyncSession,
     *,
     sess: Session,

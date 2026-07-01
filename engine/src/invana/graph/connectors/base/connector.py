@@ -23,6 +23,7 @@ from invana.graph.types.capabilities import (
 )
 from invana.graph.types.constants import Capability, PropertyType
 from invana.graph.types.data_elements import GraphResponse
+from invana.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025). Core
 # connector code must import cleanly without it, so resolve a tracer lazily and
@@ -131,6 +132,15 @@ class BaseConnector(ABC):
         enforce; ``None`` leaves it unbounded (the driver's own default).
         """
 
+    def _query_language_label(self) -> str:
+        """The query language of this connector for metric labels (RFC-041).
+
+        Derived from the capability profile's ``family`` (cypher / gremlin);
+        ``unknown`` when no profile is declared.
+        """
+        profile = type(self)._capability_profile
+        return profile.family.value if profile is not None else "unknown"
+
     async def execute(
         self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None
     ) -> GraphResponse:
@@ -142,30 +152,55 @@ class BaseConnector(ABC):
         Split into two child spans (RFC-025) so the trace separates the raw
         driver round-trip (``graph.query.db_execute``) from result
         deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
-        the studio joins via W3C trace-context propagation.
+        the studio joins via W3C trace-context propagation. Also emits the unified
+        ``invana.query.graph.*`` metrics (RFC-041).
         """
         # Time the driver round-trip so the result carries a real duration. The
         # serializers don't populate it (the vendor result summary isn't uniform
         # across drivers), so without this metadata.duration_ms stays 0.0 and the
         # studio shows "0ms" (RFC-025). Measure the raw execute only — serialise
         # is our own work and traced separately by the spans below.
+        language = self._query_language_label()
+        backend = type(self).__name__
+        add_graph_query_in_flight(1, language=language, backend=backend)
         start = time.perf_counter()
-        with _query_span("graph.query.db_execute") as span:
-            try:
-                raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
-            except Exception as exc:
-                # The span otherwise closes "ok" even though the driver round-trip
-                # failed — record the real error here so it's visible in OTel.
-                _record_span_exception(span, exc)
-                raise
-        duration_ms = (time.perf_counter() - start) * 1000
-        with _query_span("graph.query.serialize") as span:
-            response = self._serializer.deserialize_graph_response(raw)
-            response.metadata.duration_ms = duration_ms
-            if span is not None:
-                span.set_attribute("invana.graph.node_count", len(response.nodes))
-                span.set_attribute("invana.graph.edge_count", len(response.edges))
+        try:
+            with _query_span("graph.query.db_execute") as span:
+                try:
+                    raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
+                except Exception as exc:
+                    # The span otherwise closes "ok" even though the driver round-trip
+                    # failed — record the real error here so it's visible in OTel.
+                    _record_span_exception(span, exc)
+                    category = getattr(exc, "category", None)
+                    record_graph_query(
+                        language=language,
+                        backend=backend,
+                        duration_ms=(time.perf_counter() - start) * 1000,
+                        status="failed",
+                        error_type=type(exc).__name__,
+                        error_category=str(category) if category else None,
+                    )
+                    raise
+            duration_ms = (time.perf_counter() - start) * 1000
+            with _query_span("graph.query.serialize") as span:
+                response = self._serializer.deserialize_graph_response(raw)
+                response.metadata.duration_ms = duration_ms
+                node_count = len(response.nodes)
+                edge_count = len(response.edges)
+                if span is not None:
+                    span.set_attribute("invana.graph.node_count", node_count)
+                    span.set_attribute("invana.graph.edge_count", edge_count)
+            record_graph_query(
+                language=language,
+                backend=backend,
+                duration_ms=duration_ms,
+                status="success",
+                result_size=node_count + edge_count,
+            )
             return response
+        finally:
+            add_graph_query_in_flight(-1, language=language, backend=backend)
 
     @abstractmethod
     async def health_check(self) -> bool:
