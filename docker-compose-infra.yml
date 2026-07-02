@@ -111,7 +111,16 @@ services:
   # HyperDX Local: no auth, no backend API, config stored in browser localStorage.
   # Includes: ClickHouse + OTel Collector (no MongoDB, no HyperDX API server)
   # UI:  http://localhost:8080  (no login required)
-  # OTLP gRPC endpoint for Invana telemetry: http://localhost:4317
+  #
+  # OTLP ingest (both go to the same pipeline):
+  #   gRPC : http://localhost:4317              — backend services (Python engine, …)
+  #   HTTP : http://localhost:4318/v1/traces    — browser apps (Storybook/Studio); gRPC
+  #                                                is Node-only, so the web must use HTTP
+  # NOTE: the bundled collector returns CORS `Allow-Origin: *`. Browsers accept that only
+  # for NON-credentialed requests — so a web OTLP exporter must send via XHR/fetch, not
+  # the Beacon API (Beacon is always credentialed, and `*` + credentials is rejected). In
+  # the canvas Studio/Storybook that's handled by passing `headers` to the OTLP exporter,
+  # which forces the non-credentialed XHR transport (apps/storybook/stories/canvas-store/otel.ts).
   hyperdx:
     image: docker.hyperdx.io/hyperdx/hyperdx-local:latest
     container_name: invana-hyperdx
