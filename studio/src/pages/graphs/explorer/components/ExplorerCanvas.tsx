@@ -41,6 +41,7 @@ import {
 	ToolbarItems,
 	type UseClipboardResult,
 	WheelZoomBehaviour,
+	applyIconOverrides,
 	canUseWebGPU,
 	useCanvas,
 	useCanvasEvent,
@@ -767,14 +768,13 @@ function AutoLayoutBridge({
 }
 
 /**
- * Freezes the active force layout the instant the pointer presses on a node or
- * edge. With `animate: true` the simulation keeps nudging nodes for a few
- * seconds after a query / expand, so a node can drift out from under the cursor
- * between aiming and clicking — the right-click hit-test then misses and the node
- * context menu (Load neighbors, …) never opens. `*:pointerdown` fires *before*
- * `contextmenu`, so stopping the sim there pins everything where it is and the
- * press, release and menu all resolve to the same node. The next query / expand
- * re-runs the layout (a fresh `apply()`), so this only ends the current settle.
+ * Freezes the active force layout when the user starts dragging a node. With
+ * `animate: true` the simulation keeps nudging nodes for a few seconds after a
+ * query / expand, so a node can drift out from under the cursor while the user is
+ * manipulating it. Stopping the sim on `input:node:drag:start` pins everything
+ * where it is so the drag (and any follow-up interaction) resolves against a
+ * stable layout. The next query / expand re-runs the layout (a fresh `apply()`),
+ * so this only ends the current settle.
  */
 function FreezeLayoutOnInteractionBridge() {
 	const canvas = useCanvas();
@@ -783,8 +783,7 @@ function FreezeLayoutOnInteractionBridge() {
 			canvas.layouts.get(ACTIVE_LAYOUT_ID) as { stop?: () => void } | undefined
 		)?.stop?.();
 	}, [canvas]);
-	useCanvasEvent("shape:pointerdown", stop);
-	useCanvasEvent("connector:pointerdown", stop);
+	useCanvasEvent("input:node:drag:start", stop);
 	return null;
 }
 
@@ -1008,7 +1007,10 @@ function HeaderToolbarItems({
 		initial: "click",
 	});
 
-	const history = useHistorySection({ icons: { undo: Undo2, redo: Redo2 } });
+	const history = applyIconOverrides(useHistorySection(), {
+		undo: Undo2,
+		redo: Redo2,
+	});
 	const { layout, layoutOptions, applyLayout, isRunning } = useLayout(LAYOUTS, {
 		labels: LAYOUT_LABEL,
 		initial: "d3-force",
@@ -1043,19 +1045,19 @@ function HeaderToolbarItems({
 			2500,
 		);
 	}, [magnet, canvas, showMagnet]);
-	const view = useViewSection({
-		icons: {
-			zoomIn: ZoomIn,
-			zoomOut: ZoomOut,
-			fit: Maximize,
-			locked: Lock,
-			unlocked: LockOpen,
-		},
+	const view = applyIconOverrides(useViewSection(), {
+		zoomIn: ZoomIn,
+		zoomOut: ZoomOut,
+		fit: Maximize,
+		locked: Lock,
+		unlocked: LockOpen,
 	});
-	const style = useStyleEditorSection({
-		layerId: "graph",
-		icons: EDGE_TYPE_ICONS,
-	});
+	// `useStyleEditorSection` no longer takes per-option icons; inject them onto the
+	// returned edge-routing `select` item instead (its `icons` map drives the
+	// trigger + per-option glyphs).
+	const style = useStyleEditorSection({ layerId: "graph" }).map((item) =>
+		item.type === "select" ? { ...item, icons: EDGE_TYPE_ICONS } : item,
+	);
 	const { showGrid, toggleGrid } = useGrid();
 
 	const div = (key: string): ToolbarItem => ({ type: "divider", key });

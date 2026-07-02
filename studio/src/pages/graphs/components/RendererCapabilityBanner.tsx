@@ -1,4 +1,4 @@
-import { canUseWebGPU, hasWebGL, isWebKit } from "@invana/canvas-react";
+import { canUseWebGPU, hasWebGL, hasWebGPUApi } from "@invana/canvas-react";
 import { Alert, AlertDescription, AlertTitle, Button } from "@invana/ui";
 import { MonitorX, X, Zap } from "lucide-react";
 import { useState } from "react";
@@ -10,8 +10,8 @@ import { useState } from "react";
  * - **Neither** usable → destructive, non-dismissible: the canvas can't render at
  *   all on this browser.
  * - **No WebGPU, WebGL fine** → amber, dismissible: we fall back to WebGL (e.g.
- *   Safari/WebKit, where PixiJS WebGPU crashes — see {@link isWebKit}), and
- *   explain why the WebGPU toggle is off.
+ *   Safari/WebKit, where PixiJS WebGPU crashes — `canUseWebGPU` is false there
+ *   even though `hasWebGPUApi` is true), and explain why the WebGPU toggle is off.
  * - **Both available** → renders nothing.
  *
  * Uses the synchronous capability utils from `@invana/canvas` — `canUseWebGPU`
@@ -63,7 +63,7 @@ export function RendererCapabilityBanner() {
 				<AlertTitle>Using WebGL — WebGPU unavailable</AlertTitle>
 				<AlertDescription className="flex items-start gap-2">
 					<span>
-						{isWebKit()
+						{hasWebGPUApi()
 							? "Safari doesn't support WebGPU for this renderer yet, so the canvas is using WebGL."
 							: "WebGPU isn't available in this browser, so the canvas is using WebGL."}{" "}
 						Rendering works as normal; very large graphs may be faster with

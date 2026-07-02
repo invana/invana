@@ -28,6 +28,7 @@ import {
 	type ToolbarItem,
 	ToolbarItems,
 	WheelZoomBehaviour,
+	applyIconOverrides,
 	useFitContent,
 	useGraphCanvas,
 	useGraphCanvasUpdate,
@@ -297,14 +298,12 @@ export function ModellerHeaderToolbar({ editable }: { editable: boolean }) {
 // it). Resolves the live engine off the lifted CanvasContext, like the Explorer
 // toolbar, so it's only mounted once the canvas is initialised.
 export function ModellerViewToolbar() {
-	const view = useViewSection({
-		icons: {
-			zoomIn: ZoomIn,
-			zoomOut: ZoomOut,
-			fit: Maximize,
-			locked: Lock,
-			unlocked: LockOpen,
-		},
+	const view = applyIconOverrides(useViewSection(), {
+		zoomIn: ZoomIn,
+		zoomOut: ZoomOut,
+		fit: Maximize,
+		locked: Lock,
+		unlocked: LockOpen,
 	});
 	const { showGrid, toggleGrid } = useGrid();
 	const items: ToolbarItem[] = [
