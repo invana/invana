@@ -108,6 +108,7 @@ import {
 	startChild,
 } from "../../../../services/telemetry/tracer";
 import type { ExpandRequest } from "../../../../types/traversal";
+import { readCanvasThemeConfig } from "../../canvasTheme";
 
 /** Schema slice that drives the node-expand submenus (RFC-035). */
 export interface ExpandMenuSchema {
@@ -197,8 +198,9 @@ const FORCE_OPTS = {
 // node-expand append in ExplorerPage, which re-runs it to lay out new neighbours.
 export const ACTIVE_LAYOUT_ID = "d3-force-active";
 
-// Theme-independent settings, keyed by instance id. Theme-driven colours live in
-// APP_LIGHT/APP_DARK and are pushed via `useGraphCanvasUpdate` by `<ThemeBridge>`.
+// Theme-independent settings, keyed by instance id. Theme-driven colours are
+// read live from the active theme's CSS tokens (`readCanvasThemeConfig`) and
+// pushed via `useGraphCanvasUpdate` by `<ThemeBridge>`.
 // `activeLayout` points at the registered `<D3ForceLayout id="d3-force-active">`
 // so the header's "Re-render" (`canvas.refresh()`) re-runs it; new query results
 // are (re-)laid out by `<AutoLayoutBridge>`, which calls `runLayout` on the same
@@ -232,49 +234,6 @@ const APP_OPTIONS: CanvasConfig = {
 		"lasso-select": { enabled: false },
 		"click-view": { enabled: true },
 		"label-lod": { enabled: true },
-	},
-};
-
-// Canvas colours track studio's brand theme (`@invana/styling` "default-*"):
-// a neutral dark-grey surface (hue 210, ~4-6% sat) with a saturated green
-// primary (142 70%). The canvas library's stock dark palette is slate/navy
-// (bg #0f172a, minimap viewport #4a90d9), which reads as blue against our grey
-// chrome — so we pin every canvas colour to the matching theme token here.
-const APP_LIGHT: CanvasConfig = {
-	layers: {
-		// --background / --border (grid lines)
-		background: { backgroundColor: "#f7f7f7", color: "#dfe0e2" },
-		graph: {
-			// --foreground labels, --card (white) node ring
-			node: { style: { labelColor: 0x2e3338, bgStrokeColor: 0xffffff } },
-			edge: { style: { strokeColor: 0x838c95, arrowTargetColor: 0x838c95 } },
-		},
-		// --card panel, --border, green viewport (--primary + a deeper stroke)
-		minimap: {
-			backgroundColor: 0xffffff,
-			borderColor: 0xd6d9db,
-			viewportFill: 0x21ba59,
-			viewportStroke: 0x1d8b46,
-		},
-	},
-};
-const APP_DARK: CanvasConfig = {
-	layers: {
-		// --background (dark grey) surface, --muted grid lines
-		background: { backgroundColor: "#181a1b", color: "#2b2e31" },
-		graph: {
-			// --foreground labels, --background node ring (blends into the surface)
-			node: { style: { labelColor: 0xd9d9d9, bgStrokeColor: 0x181a1b } },
-			edge: { style: { strokeColor: 0x646b73, arrowTargetColor: 0x646b73 } },
-		},
-		// --card panel (a touch lighter than the surface), --border, green
-		// viewport (--primary fill + a deeper-saturated green stroke)
-		minimap: {
-			backgroundColor: 0x222425,
-			borderColor: 0x35383b,
-			viewportFill: 0x52e086,
-			viewportStroke: 0x2bab5a,
-		},
 	},
 };
 
@@ -809,13 +768,25 @@ function FreezeLayoutOnInteractionBridge() {
 	return null;
 }
 
-/** Follows studio's theme: pushes the matching colour patch via `update()`. */
+/**
+ * Follows studio's active theme: reads the live CSS tokens and pushes the
+ * matching colour patch via `update()`, so switching theme *or* mode retints
+ * the canvas (background, labels, edges, minimap) — not just light↔dark.
+ *
+ * `variantId` changes on any theme/mode switch; `isDark` additionally catches
+ * an OS flip under a `*-system` variant. The read is deferred one frame: this
+ * effect (a descendant) runs before the ThemeProvider's own class-applying
+ * effect (its ancestor), so by the next frame the theme class is on
+ * `document.documentElement` and the tokens resolve to the new theme.
+ */
 function ThemeBridge() {
-	const { isDark } = useTheme();
+	const { variantId, isDark } = useTheme();
 	const update = useGraphCanvasUpdate();
+	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme/mode change
 	useEffect(() => {
-		update(isDark ? APP_DARK : APP_LIGHT);
-	}, [isDark, update]);
+		const id = requestAnimationFrame(() => update(readCanvasThemeConfig()));
+		return () => cancelAnimationFrame(id);
+	}, [variantId, isDark, update]);
 	return null;
 }
 

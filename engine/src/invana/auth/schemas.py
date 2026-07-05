@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, EmailStr, Field
 
@@ -66,6 +67,9 @@ class UserOut(BaseModel):
     is_superuser: bool
     username_last_changed_at: datetime | None
     graphs: list[GraphMembershipOut]
+    # Free-form per-user UI preferences bag (RFC-044). Holds the theme selection
+    # under `theme`; studio reads `preferences.theme` to hydrate the picker.
+    preferences: dict = Field(default_factory=dict)
 
 
 class AuthResponse(BaseModel):
@@ -114,6 +118,15 @@ class LogoutRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class ThemePreference(BaseModel):
+    """The studio theme selection stored under `preferences.theme` (RFC-044)."""
+
+    theme: str = Field(max_length=64)
+    mode: Literal["light", "dark", "system"]
+    # `None` → the theme's own signature accent (no override).
+    accent: str | None = Field(default=None, max_length=64)
+
+
 class MePatchRequest(BaseModel):
     first_name: str | None = Field(default=None, min_length=1, max_length=120)
     # Explicit-null is allowed — clients can pass {"last_name": null} to clear it.
@@ -125,6 +138,8 @@ class MePatchRequest(BaseModel):
         max_length=USERNAME_MAX,
         pattern=USERNAME_PATTERN,
     )
+    # Validated theme selection; merged into the `preferences` bag under `theme`.
+    theme: ThemePreference | None = None
 
 
 class ChangePasswordRequest(BaseModel):

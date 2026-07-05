@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import { ThemeSyncBridge } from "./components/ThemeSyncBridge";
 import { router } from "./router";
 // Side-effect import: register OpenTelemetry-Web (RFC-025) before the app
 // renders, so the query→render pipeline is traced from the first interaction.
@@ -28,6 +29,9 @@ if (!container) throw new Error("Root element #root not found");
 createRoot(container).render(
 	<StrictMode>
 		<ThemeProvider defaultTheme="default" defaultMode="system">
+			{/* Reconciles the theme selection with the signed-in user's profile
+			    (RFC-044) — hydrates from /auth/me on login, PATCHes on change. */}
+			<ThemeSyncBridge />
 			<QueryClientProvider client={queryClient}>
 				<RouterProvider router={router} />
 				<Toaster richColors closeButton />

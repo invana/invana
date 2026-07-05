@@ -172,6 +172,7 @@ class UserView(ModelView):
         "username",
         "first_name",
         "last_name",
+        "preferences",
         "is_superuser",
         "is_active",
         "username_last_changed_at",

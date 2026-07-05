@@ -71,6 +71,7 @@ import type {
 	EdgeTypeResponse,
 	NodeTypeResponse,
 } from "../../../../types/schemas";
+import { readCanvasThemeConfig } from "../../canvasTheme";
 import type { CanvasBackend } from "../../explorer/components/ExplorerCanvas";
 import type { SelectedItem } from "./DetailPanel";
 import type { ModelEditCtx } from "./editing";
@@ -158,42 +159,11 @@ const EDGE_STYLE: EdgeStyle = {
 	labelColor: 0x9199a1,
 };
 
-// Canvas colours follow studio's brand theme (`@invana/styling` "default-*"):
-// a neutral dark-grey surface with a saturated green primary. See the matching
-// APP_LIGHT/APP_DARK note in ExplorerCanvas.tsx — the stock slate/navy palette
-// reads as blue against our grey chrome, so every colour is pinned to a token.
-const M_LIGHT: CanvasConfig = {
-	layers: {
-		background: { backgroundColor: "#f7f7f7", color: "#dfe0e2" },
-		graph: {
-			node: { style: { labelColor: 0x2e3338, bgStrokeColor: 0xffffff } },
-			edge: { style: { strokeColor: 0x838c95 } },
-		},
-		// Patched only on the read-only explore canvas (the authoring canvas has no
-		// minimap layer; `update()` no-ops on absent layers).
-		minimap: {
-			backgroundColor: 0xffffff,
-			borderColor: 0xd6d9db,
-			viewportFill: 0x21ba59,
-			viewportStroke: 0x1d8b46,
-		},
-	},
-};
-const M_DARK: CanvasConfig = {
-	layers: {
-		background: { backgroundColor: "#181a1b", color: "#2b2e31" },
-		graph: {
-			node: { style: { labelColor: 0xd9d9d9, bgStrokeColor: 0x181a1b } },
-			edge: { style: { strokeColor: 0x646b73 } },
-		},
-		minimap: {
-			backgroundColor: 0x222425,
-			borderColor: 0x35383b,
-			viewportFill: 0x52e086,
-			viewportStroke: 0x2bab5a,
-		},
-	},
-};
+// Canvas colours track studio's *active* theme, read live from the CSS tokens
+// by <ThemeBridge> (see `readCanvasThemeConfig`) so switching theme/mode retints
+// the canvas — the authoring canvas has no minimap layer, so `update()` no-ops
+// on that key. The `background`/edge patch merges onto NODE_STYLE (which carries
+// the shape).
 
 // ── Read-only explore mode constants ────────────────────────────────────────
 // The global (introspected) + published models render a rich, Explorer-grade
@@ -343,11 +313,15 @@ export function ModellerViewToolbar() {
 
 /** Follows studio's theme: pushes the matching colour patch via `update()`. */
 function ThemeBridge() {
-	const { isDark } = useTheme();
+	const { variantId, isDark } = useTheme();
 	const update = useGraphCanvasUpdate();
+	// Deferred one frame so the ThemeProvider's class is applied before we read
+	// tokens — see the ExplorerCanvas ThemeBridge for the ordering note.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme/mode change
 	useEffect(() => {
-		update(isDark ? M_DARK : M_LIGHT);
-	}, [isDark, update]);
+		const id = requestAnimationFrame(() => update(readCanvasThemeConfig()));
+		return () => cancelAnimationFrame(id);
+	}, [variantId, isDark, update]);
 	return null;
 }
 

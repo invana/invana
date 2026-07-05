@@ -1,4 +1,5 @@
 import { Input, Label } from "@invana/forms";
+import { ThemeSelector } from "@invana/themes";
 import {
 	Button,
 	Dialog,
@@ -9,7 +10,15 @@ import {
 	DialogTitle,
 	TabbedPanel,
 } from "@invana/ui";
-import { AlertTriangle, KeyRound, User } from "lucide-react";
+import {
+	AlertTriangle,
+	KeyRound,
+	Monitor,
+	Moon,
+	Palette,
+	Sun,
+	User,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -59,6 +68,12 @@ export function ProfileSettingsPage() {
 						),
 					},
 					{
+						value: "appearance",
+						label: "Appearance",
+						icon: Palette,
+						content: <AppearanceTab />,
+					},
+					{
 						value: "password",
 						label: "Password",
 						icon: KeyRound,
@@ -73,6 +88,36 @@ export function ProfileSettingsPage() {
 						),
 					},
 				]}
+			/>
+		</div>
+	);
+}
+
+// ─── Appearance ─────────────────────────────────────────────────────────────
+
+const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
+
+/**
+ * Theme / mode / accent picker (RFC-044). Changes apply live and are persisted
+ * to the user's profile by the app-level `<ThemeSyncBridge>` (mounted in
+ * main.tsx), so this tab is a thin wrapper around `<ThemeSelector>` — no local
+ * save wiring. The header `ThemeMenu` drives the same provider state.
+ */
+function AppearanceTab() {
+	return (
+		<div className="max-w-md space-y-6">
+			<div>
+				<h2 className="text-lg font-semibold">Appearance</h2>
+				<p className="text-muted-foreground text-base">
+					Pick a theme and a light/dark/system mode. Your choice is saved to
+					your account and follows you across devices.
+				</p>
+			</div>
+			<ThemeSelector
+				layout="form"
+				showAccent={false}
+				modeIcons={MODE_ICONS}
+				className="theme-picker"
 			/>
 		</div>
 	);

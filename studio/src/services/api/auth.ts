@@ -1,6 +1,7 @@
 import type {
 	AuthResponse,
 	AuthUser,
+	ThemeSelection,
 	UsernameAvailabilityResponse,
 } from "../../types/auth";
 import { apiClient } from "./client";
@@ -37,6 +38,9 @@ export const authApi = {
 		first_name?: string;
 		last_name?: string | null;
 		username?: string;
+		// Theme selection persisted to the profile (RFC-044); merged server-side
+		// into `preferences.theme`.
+		theme?: ThemeSelection;
 	}) => (await apiClient.patch<AuthUser>("/api/v1/auth/me", body)).data,
 
 	changePassword: async (current_password: string, new_password: string) => {

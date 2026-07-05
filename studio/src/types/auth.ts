@@ -8,6 +8,21 @@ export interface GraphMembership {
 	owner_username: string;
 }
 
+/** The studio theme selection persisted under `preferences.theme` (RFC-044).
+ *  Mirrors `@invana/themes` ThemeSelection; `accent === null` → the theme's own
+ *  signature accent. */
+export interface ThemeSelection {
+	theme: string;
+	mode: "light" | "dark" | "system";
+	accent: string | null;
+}
+
+/** Open per-user UI-preferences bag returned by the engine. */
+export interface UserPreferences {
+	theme?: ThemeSelection;
+	[key: string]: unknown;
+}
+
 export interface AuthUser {
 	id: string;
 	email: string;
@@ -17,6 +32,7 @@ export interface AuthUser {
 	is_superuser: boolean;
 	username_last_changed_at: string | null;
 	graphs: GraphMembership[];
+	preferences: UserPreferences;
 }
 
 export interface AuthResponse {

@@ -151,6 +151,7 @@ async def _user_out(session: AsyncSession, *, user: User) -> UserOut:
         is_superuser=user.is_superuser,
         username_last_changed_at=user.username_last_changed_at,
         graphs=await _list_memberships(session, user_id=user.id),
+        preferences=user.preferences or {},
     )
 
 
@@ -335,6 +336,9 @@ async def patch_me(session: AsyncSession, *, user: User, payload: MePatchRequest
             username_changed_from = user.username
             user.username = new_username
             user.username_last_changed_at = datetime.now(UTC)
+    if payload.theme is not None:
+        # Reassign a fresh dict — SQLAlchemy doesn't track in-place JSON mutation.
+        user.preferences = {**(user.preferences or {}), "theme": payload.theme.model_dump()}
     await session.flush()
     if username_changed_from is not None:
         await emit_event(

@@ -16,7 +16,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.modeller.models import Base
@@ -45,6 +45,12 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     first_name: Mapped[str] = mapped_column(String(120), nullable=False)
     last_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # Free-form per-user UI preferences (client-owned bag). Currently holds the
+    # theme selection under `theme` ({"theme", "mode", "accent"}); the studio
+    # theme picker reads/writes it via PATCH /auth/me so the choice follows the
+    # user across devices (RFC-044). Kept as an open JSON bag so future UI prefs
+    # don't need a migration each.
+    preferences: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     # Platform-level superuser flag. Gates starlette-admin. Set ONLY by
     # `invana init` for the root user. Has no bearing on graph-level roles.
     is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

@@ -5,6 +5,12 @@
 @import "@invana/styling/themes/default.css";
 @import "@invana/styling/themes/tailwind.css";
 @import "@invana/styling/themes/vite.css";
+/* Preset themes (Gold / Ocean / Forest / Rose / Minimal — light+dark+system).
+   presets-base registers the shared preset tokens in @theme; presets.css layers
+   the per-theme `[data-theme]` blocks on top, so it MUST come after the base.
+   The active theme's `[data-theme]` block always wins over the base defaults. */
+@import "@invana/styling/themes/presets-base.css";
+@import "@invana/styling/themes/presets.css";
 
 /* @invana/forms ships no precompiled CSS (unlike @invana/ui), so its
    components' utility classes only live in its dist JS. Tailwind 4 skips
@@ -71,6 +77,21 @@
 .theme-default-light {
 	--color-accent: rgb(0 0 0 / 0.05);
 	--color-accent-foreground: hsl(210 10% 20%);
+}
+
+/* @invana/themes' ThemeSelector renders its Light/Dark/System mode toggle with a
+   faint 15%-primary tint for the active button — nearly invisible on the dark
+   theme, and (unlike the theme cards) it has no checkmark badge, so you can't
+   tell which mode is active. Give the active mode a solid primary fill instead.
+   Scoped under `.theme-picker` (passed to our ThemeSelector) + the fixed mode
+   aria-labels, so the theme cards and the canvas-toolbar toggle groups are
+   untouched. (RFC-044) */
+.theme-picker [data-state="on"][aria-label="Light"],
+.theme-picker [data-state="on"][aria-label="Dark"],
+.theme-picker [data-state="on"][aria-label="System"] {
+	background-color: var(--color-primary);
+	border-color: var(--color-primary);
+	color: var(--color-primary-foreground);
 }
 
 body {

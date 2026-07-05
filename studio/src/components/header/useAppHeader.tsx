@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { FullscreenToggle } from "../FullscreenToggle";
 import { GitHubStars } from "../GitHubStars";
-import { ThemeToggle } from "../ThemeToggle";
+import { ThemeMenu } from "../ThemeMenu";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
@@ -19,7 +19,7 @@ interface AppHeaderOptions {
 	leftExtras?: ReactNode;
 	/** Center content. Most pages won't need this. */
 	center?: ReactNode;
-	/** Extra controls rendered to the LEFT of ThemeToggle + UserMenu. Use for
+	/** Extra controls rendered to the LEFT of ThemeMenu + UserMenu. Use for
 	 *  page-specific buttons (e.g. Modeller's "Introspect" + "Refresh"). */
 	rightExtras?: ReactNode;
 	/** Panel collapse/expand toggles, rendered at the end of the right cluster
@@ -31,7 +31,7 @@ interface AppHeaderOptions {
 /**
  * Shared AppLayoutV2 header config. Renders:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeToggle] [FullscreenToggle] [panelControls]
+ *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeMenu] [FullscreenToggle] [panelControls]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
  * - Graph-scoped (`/u/:username/:graphSlug[/...]`): just `pageLabel`
@@ -81,7 +81,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 			<div className="flex items-center gap-4 px-2">
 				{rightExtras}
 				<GitHubStars />
-				<ThemeToggle />
+				<ThemeMenu />
 				<FullscreenToggle />
 				{panelControls}
 			</div>
