@@ -235,24 +235,46 @@ const APP_OPTIONS: CanvasConfig = {
 	},
 };
 
+// Canvas colours track studio's brand theme (`@invana/styling` "default-*"):
+// a neutral dark-grey surface (hue 210, ~4-6% sat) with a saturated green
+// primary (142 70%). The canvas library's stock dark palette is slate/navy
+// (bg #0f172a, minimap viewport #4a90d9), which reads as blue against our grey
+// chrome — so we pin every canvas colour to the matching theme token here.
 const APP_LIGHT: CanvasConfig = {
 	layers: {
-		background: { backgroundColor: "#f8fafc", color: "#e2e8f0" },
+		// --background / --border (grid lines)
+		background: { backgroundColor: "#f7f7f7", color: "#dfe0e2" },
 		graph: {
-			node: { style: { labelColor: 0x334155, bgStrokeColor: 0xffffff } },
-			edge: { style: { strokeColor: 0x475569, arrowTargetColor: 0x475569 } },
+			// --foreground labels, --card (white) node ring
+			node: { style: { labelColor: 0x2e3338, bgStrokeColor: 0xffffff } },
+			edge: { style: { strokeColor: 0x838c95, arrowTargetColor: 0x838c95 } },
 		},
-		minimap: { backgroundColor: 0xf8fafc, borderColor: 0x94a3b8 },
+		// --card panel, --border, green viewport (--primary + a deeper stroke)
+		minimap: {
+			backgroundColor: 0xffffff,
+			borderColor: 0xd6d9db,
+			viewportFill: 0x21ba59,
+			viewportStroke: 0x1d8b46,
+		},
 	},
 };
 const APP_DARK: CanvasConfig = {
 	layers: {
-		background: { backgroundColor: "#0f172a", color: "#1e293b" },
+		// --background (dark grey) surface, --muted grid lines
+		background: { backgroundColor: "#181a1b", color: "#2b2e31" },
 		graph: {
-			node: { style: { labelColor: 0xe2e8f0, bgStrokeColor: 0x0f172a } },
-			edge: { style: { strokeColor: 0x64748b, arrowTargetColor: 0x64748b } },
+			// --foreground labels, --background node ring (blends into the surface)
+			node: { style: { labelColor: 0xd9d9d9, bgStrokeColor: 0x181a1b } },
+			edge: { style: { strokeColor: 0x646b73, arrowTargetColor: 0x646b73 } },
 		},
-		minimap: { backgroundColor: 0x0f172a, borderColor: 0x334155 },
+		// --card panel (a touch lighter than the surface), --border, green
+		// viewport (--primary fill + a deeper-saturated green stroke)
+		minimap: {
+			backgroundColor: 0x222425,
+			borderColor: 0x35383b,
+			viewportFill: 0x52e086,
+			viewportStroke: 0x2bab5a,
+		},
 	},
 };
 

@@ -136,46 +136,62 @@ const HINTS: Record<string, string> = {
 // the shape survives) and runs after the layer exists.
 const NODE_STYLE: NodeStyle = {
 	shape: { kind: "circle", radius: 14 },
-	bgFill: 0x6366f1,
+	// Brand green (--primary 142 70%) instead of the stock indigo, so the schema
+	// nodes sit on-palette with studio's grey/green theme.
+	bgFill: 0x2bab5a,
 	bgStrokeWidth: 2,
-	bgStrokeColor: 0x0f172a,
+	bgStrokeColor: 0x181a1b,
 	// The type name is the node id. Resolved at the template level so per-node
 	// data carries no `style` (which would replace the template — losing the shape).
 	labelText: (n: GraphNode) => String(n.id),
-	// Slate-400 reads on both light and dark; <ThemeBridge> refines per theme.
-	labelColor: 0x94a3b8,
+	// Neutral grey (--muted-foreground) reads on both themes; <ThemeBridge> refines.
+	labelColor: 0x9199a1,
 	labelFontSize: 13,
 	// Word-length type names overflow a centred label; place it below the circle.
 	labelPlacement: "bottom",
 	labelOffsetY: 4,
 };
 const EDGE_STYLE: EdgeStyle = {
-	strokeColor: 0x94a3b8,
+	strokeColor: 0x646b73,
 	strokeWidth: 1.5,
 	labelText: (e: GraphEdge) => (e.type ? String(e.type) : ""),
-	labelColor: 0x94a3b8,
+	labelColor: 0x9199a1,
 };
 
+// Canvas colours follow studio's brand theme (`@invana/styling` "default-*"):
+// a neutral dark-grey surface with a saturated green primary. See the matching
+// APP_LIGHT/APP_DARK note in ExplorerCanvas.tsx — the stock slate/navy palette
+// reads as blue against our grey chrome, so every colour is pinned to a token.
 const M_LIGHT: CanvasConfig = {
 	layers: {
-		background: { backgroundColor: "#f8fafc", color: "#e2e8f0" },
+		background: { backgroundColor: "#f7f7f7", color: "#dfe0e2" },
 		graph: {
-			node: { style: { labelColor: 0xf8fafc, bgStrokeColor: 0xffffff } },
-			edge: { style: { strokeColor: 0x94a3b8 } },
+			node: { style: { labelColor: 0x2e3338, bgStrokeColor: 0xffffff } },
+			edge: { style: { strokeColor: 0x838c95 } },
 		},
 		// Patched only on the read-only explore canvas (the authoring canvas has no
 		// minimap layer; `update()` no-ops on absent layers).
-		minimap: { backgroundColor: 0xf8fafc, borderColor: 0x94a3b8 },
+		minimap: {
+			backgroundColor: 0xffffff,
+			borderColor: 0xd6d9db,
+			viewportFill: 0x21ba59,
+			viewportStroke: 0x1d8b46,
+		},
 	},
 };
 const M_DARK: CanvasConfig = {
 	layers: {
-		background: { backgroundColor: "#0f172a", color: "#1e293b" },
+		background: { backgroundColor: "#181a1b", color: "#2b2e31" },
 		graph: {
-			node: { style: { labelColor: 0xf8fafc, bgStrokeColor: 0x0f172a } },
-			edge: { style: { strokeColor: 0x475569 } },
+			node: { style: { labelColor: 0xd9d9d9, bgStrokeColor: 0x181a1b } },
+			edge: { style: { strokeColor: 0x646b73 } },
 		},
-		minimap: { backgroundColor: 0x0f172a, borderColor: 0x334155 },
+		minimap: {
+			backgroundColor: 0x222425,
+			borderColor: 0x35383b,
+			viewportFill: 0x52e086,
+			viewportStroke: 0x2bab5a,
+		},
 	},
 };
 
@@ -496,8 +512,8 @@ function AuthoringSchemaCanvas(
 					type="pattern"
 					patternType="grid"
 					alpha={0.5}
-					backgroundColor="#0f172a"
-					color="#1e293b"
+					backgroundColor="#181a1b"
+					color="#2b2e31"
 				/>
 				<GraphLayer
 					id={LAYER_ID}
