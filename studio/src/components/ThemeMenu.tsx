@@ -11,6 +11,7 @@
 import { ThemeSelector } from "@invana/themes";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@invana/ui";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
+import { STUDIO_THEMES } from "./studioThemes";
 
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 
@@ -30,6 +31,7 @@ export function ThemeMenu() {
 			<PopoverContent align="end" className="w-72">
 				<ThemeSelector
 					layout="form"
+					themes={STUDIO_THEMES}
 					showAccent={false}
 					modeIcons={MODE_ICONS}
 					className="theme-picker"

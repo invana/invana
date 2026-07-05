@@ -22,6 +22,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { STUDIO_THEMES } from "../../components/studioThemes";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
 import { ApiError } from "../../services/api/client";
@@ -115,6 +116,7 @@ function AppearanceTab() {
 			</div>
 			<ThemeSelector
 				layout="form"
+				themes={STUDIO_THEMES}
 				showAccent={false}
 				modeIcons={MODE_ICONS}
 				className="theme-picker"
