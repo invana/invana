@@ -472,7 +472,7 @@ function SessionRow({
 			leading={
 				<span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
 			}
-			title={session.title}
+			title={session.title || "New session"}
 			subtitle={
 				<>
 					{hasCounts && (
@@ -588,7 +588,7 @@ function SessionThread({
 					<ArrowLeft className="w-4 h-4" />
 				</Button>
 				<span className="uppercase tracking-wide font-medium text-foreground truncate">
-					{session.title}
+					{session.title || "New session"}
 				</span>
 			</div>
 

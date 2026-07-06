@@ -8,6 +8,16 @@ import {
 import type { QueryResponse, QueryRunPayload } from "../../../../types/query";
 import type { Session, SessionMessage } from "../../../../types/session";
 
+// A session's title is seeded from its first message so it's never blank —
+// mirrors the engine's `_title_from_text` (64-char cap + ellipsis). Set at
+// create time (not on send completion) so it survives a navigate-away/abort
+// before the query finishes. The engine still fills it in as a fallback.
+function titleFromMessage(text: string): string {
+	const clean = text.split(/\s+/).filter(Boolean).join(" ");
+	if (!clean) return "New session";
+	return clean.length > 64 ? `${clean.slice(0, 64)}…` : clean;
+}
+
 function toBody(payload: QueryRunPayload): SendMessageBody {
 	if (payload.mode === "ql") {
 		return {
@@ -161,6 +171,7 @@ export function useSessions(
 				const created = await sessionsApi.create(u, g, {
 					surface,
 					model_id: modelId,
+					title: titleFromMessage(payload.query),
 				});
 				sessionId = created.id;
 				patchDetail(sessionId, () => ({
