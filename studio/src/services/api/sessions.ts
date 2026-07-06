@@ -24,6 +24,7 @@ interface ApiMessage {
 	role: "user" | "assistant";
 	content: string;
 	status?: "running" | "ok" | "error" | null;
+	operation?: "expand" | "load" | null;
 	mode?: "nl" | "ql" | null;
 	via?: string | null;
 	query_language?: string | null;
@@ -89,6 +90,18 @@ export interface SendMessageBody {
 	timeout_s?: number;
 }
 
+/** A client-driven canvas operation to log as a session turn (RFC-046). Only
+ *  "Load to canvas" today — the engine records expands itself. */
+export interface RecordOperationBody {
+	kind: "load";
+	source_query?: string;
+	query_language?: QueryLanguage;
+	row_count?: number;
+	node_count: number;
+	edge_count: number;
+	execution_time_ms?: number;
+}
+
 /** List ordering — newest by last activity (default) or by creation. */
 export type SessionSort = "updated" | "created";
 
@@ -137,6 +150,7 @@ function toMessage(m: ApiMessage): SessionMessage {
 		content: m.content,
 		createdAt: new Date(m.created_at),
 		status: m.status ?? undefined,
+		operation: m.operation ?? undefined,
 		mode: m.mode ?? undefined,
 		via: m.via ?? undefined,
 		rowCount: m.row_count ?? undefined,
@@ -282,6 +296,21 @@ export const sessionsApi = {
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/context`,
 			{ signal },
 		),
+
+	// Log a client-driven canvas operation ("Load to canvas") as a session turn
+	// (RFC-046). Returns the recorded user+assistant pair (unused by the caller,
+	// which refetches the thread).
+	recordOperation: async (
+		username: string,
+		graphSlug: string,
+		id: string,
+		body: RecordOperationBody,
+	): Promise<void> => {
+		await request<{ user_message: ApiMessage; assistant_message: ApiMessage }>(
+			`${base(username, graphSlug)}/${id}/operations`,
+			{ method: "POST", body: JSON.stringify(body) },
+		);
+	},
 
 	// Record (or clear) a 👍/👎 vote on an assistant reply (RFC-038/039).
 	setFeedback: async (

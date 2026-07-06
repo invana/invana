@@ -61,12 +61,15 @@ class ResultMetadata(BaseModel):
         edge_count: Number of edges in the result.
         record_count: Number of raw records returned.
         duration_ms: Query execution duration in milliseconds.
+        query: The executed query text, when the caller records it (RFC-046) —
+            e.g. the traversal a node-expand generated, logged into the session.
     """
 
     node_count: int = 0
     edge_count: int = 0
     record_count: int = 0
     duration_ms: float = 0.0
+    query: str | None = None
 
 
 class GraphResponse(BaseModel):

@@ -23,7 +23,9 @@ from invana.explorer.schemas import (
 from invana.graph.types.data_elements import GraphResponse
 from invana.graphs.manager import GraphConnectionManager
 from invana.graphs.models import Graph
-from invana.graphs.query_service import _resolve_connector
+from invana.graphs.query_service import _resolve_connector, _resolve_query_language
+from invana.sessions import services as session_services
+from invana.sessions.store import SessionStore
 
 
 async def expand_neighbors(
@@ -46,7 +48,16 @@ async def expand_neighbors(
         offset=req.offset,
     )
     total = await reader.count_neighbors(req.vertex_id, direction=req.direction, filters=req.filters)
-    return await _finalize(session, graph=graph, actor_id=actor_id, req=req, data=data, total=total, by={})
+    return await _finalize(
+        session,
+        graph=graph,
+        actor_id=actor_id,
+        req=req,
+        data=data,
+        total=total,
+        by={},
+        language=_resolve_query_language(connector).value,
+    )
 
 
 async def expand_by_edge_type(
@@ -80,6 +91,7 @@ async def expand_by_edge_type(
         data=data,
         total=total,
         by={"edge_label": req.edge_label},
+        language=_resolve_query_language(connector).value,
     )
 
 
@@ -114,6 +126,68 @@ async def expand_by_node_type(
         data=data,
         total=total,
         by={"neighbor_label": req.neighbor_label},
+        language=_resolve_query_language(connector).value,
+    )
+
+
+def _expand_summary(nodes: int, edges: int) -> str:
+    def plural(n: int, noun: str) -> str:
+        return f"{n} {noun}{'' if n == 1 else 's'}"
+
+    return f"Added {plural(nodes, 'node')} and {plural(edges, 'relationship')}."
+
+
+def _expand_prompt(req: Any, by: dict[str, str]) -> str:
+    """Human-readable user-turn text for an expand (RFC-046)."""
+    qualifier = ""
+    if "edge_label" in by:
+        qualifier = f'"{by["edge_label"]}" '
+    elif "neighbor_label" in by:
+        qualifier = f'"{by["neighbor_label"]}" '
+    direction = {"in": " (incoming)", "out": " (outgoing)"}.get(req.direction, "")
+    return f'Expand {qualifier}neighbours of "{req.vertex_id}"{direction}'
+
+
+async def _record_expand(
+    session: AsyncSession,
+    *,
+    graph: Graph,
+    actor_id: str,
+    req: Any,
+    data: GraphResponse,
+    by: dict[str, str],
+    language: str,
+) -> None:
+    """Log the expand as a session turn (RFC-046), when it targets a session.
+
+    Best-effort: an unknown/foreign ``session_id`` is skipped rather than fatal,
+    so a bad id never breaks the expand itself. Runs in the route's transaction,
+    so it commits atomically with the expand.
+    """
+    session_id = getattr(req, "session_id", None)
+    if not session_id:
+        return
+    sess = await SessionStore().get(session, session_id)
+    if sess is None or sess.graph_id != graph.id or sess.created_by_id != actor_id:
+        return
+    nodes = len(data.nodes)
+    edges = len(data.edges)
+    # Nothing came back (e.g. paging past the end) — don't log an empty turn.
+    if nodes == 0 and edges == 0:
+        return
+    await session_services.record_operation(
+        session,
+        sess=sess,
+        kind="expand",
+        user_content=_expand_prompt(req, by),
+        summary=_expand_summary(nodes, edges),
+        source_query=data.metadata.query,
+        query_language=language,
+        row_count=data.metadata.record_count or None,
+        execution_time_ms=round(data.metadata.duration_ms) or None,
+        node_count=nodes,
+        edge_count=edges,
+        add_to_totals=True,
     )
 
 
@@ -126,10 +200,13 @@ async def _finalize(
     data: GraphResponse,
     total: int,
     by: dict[str, str],
+    language: str,
 ) -> NeighborExpandResponse:
-    """Build the paginated response + emit the audit event (no commit)."""
+    """Build the paginated response + emit the audit event + log the session turn
+    (no commit — the route owns the transaction)."""
     returned = len(data.edges)
     has_more = req.offset + returned < total
+    await _record_expand(session, graph=graph, actor_id=actor_id, req=req, data=data, by=by, language=language)
     await emit_event(
         session,
         action=event_actions.GRAPH_EXPAND,

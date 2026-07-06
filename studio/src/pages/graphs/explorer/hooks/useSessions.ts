@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import {
+	type RecordOperationBody,
 	type SendMessageBody,
 	type SessionSort,
 	sessionsApi,
@@ -271,6 +272,19 @@ export function useSessions(
 		}
 	};
 
+	// Log an explicit "Load to canvas" as an operation turn (RFC-046), then
+	// refetch the thread + list so it shows. No-op without an active session.
+	const recordLoad = async (body: RecordOperationBody) => {
+		if (!activeSessionId) return;
+		const id = activeSessionId;
+		try {
+			await sessionsApi.recordOperation(u, g, id, body);
+		} finally {
+			qc.invalidateQueries({ queryKey: detailKey(id) });
+			qc.invalidateQueries({ queryKey: listPrefix });
+		}
+	};
+
 	// The conversation context (prior turns) the model was given for an assistant
 	// reply (RFC-036/040) — recomputed server-side, fetched lazily on disclosure.
 	const fetchContext = (messageId: string) =>
@@ -336,6 +350,7 @@ export function useSessions(
 		setShowArchived,
 		send,
 		rerun,
+		recordLoad,
 		fetchContext,
 		setFeedback,
 		stop,

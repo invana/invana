@@ -18,11 +18,13 @@ import {
 	Copy,
 	Info,
 	MessageSquare,
+	Network,
 	Pencil,
 	Pin,
 	RotateCw,
 	ThumbsDown,
 	ThumbsUp,
+	Waypoints,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -71,8 +73,9 @@ export interface SessionsPanelProps {
 	onSetFeedback: (messageId: string, value: "up" | "down" | null) => void;
 	/** Transient per-message query results, keyed by assistant message id (RFC-033). */
 	results: Record<string, QueryResponse | null>;
-	/** Project a graph result onto the canvas. */
-	onLoadToCanvas: (result: QueryResponse) => void;
+	/** Project a graph result onto the canvas (logs a `load` turn, RFC-046). The
+	 *  message is the reply the result belongs to — its query is what was loaded. */
+	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
 	/** Refetch sessions from the engine (header refresh control). */
 	onRefresh: () => void;
 	/** True while a refetch is in flight — spins the refresh icon. */
@@ -209,9 +212,12 @@ export function SessionsPanel({
 	// the list — then the composer keeps the user's current selection.
 	const composerConfig = useMemo(() => {
 		if (!activeSession) return null;
+		// Operation turns (expand/load) carry a ql mode + a language `via` but they
+		// aren't the user's composer choice — skip them so the mode/model restored
+		// is the last real query's (RFC-046).
 		const last = [...activeSession.messages]
 			.reverse()
-			.find((m) => m.role === "assistant" && (m.mode || m.via));
+			.find((m) => m.role === "assistant" && !m.operation && (m.mode || m.via));
 		if (!last) return null;
 		// Provider resolves off `via` ("<provider> · <model>") when present.
 		const provider = last.via?.includes(" · ")
@@ -242,7 +248,9 @@ export function SessionsPanel({
 		() =>
 			activeSession
 				? activeSession.messages
-						.filter((m) => m.role === "user")
+						// Skip operation prompts ("Expand …", "Load to canvas") — the ↑/↓
+						// history should walk only what the user typed (RFC-046).
+						.filter((m) => m.role === "user" && !m.operation)
 						.map((m) => m.content)
 						.reverse()
 				: [],
@@ -588,7 +596,7 @@ interface SessionThreadProps {
 	onTypeInstead: () => void;
 	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	results: Record<string, QueryResponse | null>;
-	onLoadToCanvas: (result: QueryResponse) => void;
+	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
 }
 
 function SessionThread({
@@ -651,6 +659,18 @@ function SessionThread({
 }
 
 function UserMessage({ message }: { message: SessionMessage }) {
+	// A canvas operation (expand/load) isn't a typed ask — render it as a compact,
+	// left-aligned header with an icon, not the user's right-side chat bubble
+	// (RFC-046). The assistant row below carries the query + counts.
+	if (message.operation) {
+		const Icon = message.operation === "expand" ? Waypoints : Network;
+		return (
+			<div className="-mb-2 flex items-center gap-1.5 text-muted-foreground text-xs">
+				<Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+				<span className="min-w-0 truncate">{message.content}</span>
+			</div>
+		);
+	}
 	return (
 		<div className="flex justify-end">
 			<div className="max-w-[85%] rounded-2xl rounded-br-sm bg-secondary px-3 py-2 text-secondary-foreground whitespace-pre-wrap break-words">
@@ -692,7 +712,7 @@ function AssistantMessage({
 	onTypeInstead: () => void;
 	onVote: (messageId: string, value: "up" | "down" | null) => void;
 	result: QueryResponse | null | undefined;
-	onLoadToCanvas: (result: QueryResponse) => void;
+	onLoadToCanvas: (result: QueryResponse, message: SessionMessage) => void;
 }) {
 	const [showQuery, setShowQuery] = useState(false);
 	// Conversation context (RFC-036/040), fetched lazily the first time the
@@ -884,7 +904,9 @@ function AssistantMessage({
 							{/* 👍/👎 on a real answer (RFC-038/039). A downvote asks the model
 					    what to change; clicking the active vote clears it. */}
 						</div>
-						{message.sourceQuery && (
+						{/* 👍/👎 rate a real answer — not canvas operations, which aren't
+						    the model's answer to a question (RFC-046). */}
+						{message.sourceQuery && !message.operation && (
 							<div className="flex items-center gap-1">
 								<Tooltip>
 									<TooltipTrigger asChild>
@@ -1020,7 +1042,10 @@ function AssistantMessage({
 					)}
 				</div>
 			)}
-			<ResultBlock result={result} onLoadToCanvas={onLoadToCanvas} />
+			<ResultBlock
+				result={result}
+				onLoadToCanvas={(r) => onLoadToCanvas(r, message)}
+			/>
 		</div>
 	);
 }

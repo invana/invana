@@ -26,6 +26,11 @@ export interface SessionMessage {
 	content: string;
 	createdAt: Date;
 	status?: SessionMessageStatus;
+	/** A canvas operation this turn records instead of a composer query (RFC-046):
+	 *  "expand" (node-expand / traversal) or "load" ("Load to canvas"). Set on both
+	 *  rows of the pair. Undefined on a normal NL/QL turn. The thread renders these
+	 *  as operation entries and excludes them from restore / composer / context. */
+	operation?: "expand" | "load";
 	/** How the ask was started — "nl" (translated from natural language) or "ql"
 	 *  (raw query). Persisted by the engine so the composer restores the original
 	 *  mode on reopen. Undefined on rows written before this field existed. */

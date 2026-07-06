@@ -24,6 +24,10 @@ class _ExpandBase(BaseModel):
     sort: list[SortSpec] = Field(default_factory=list)
     limit: int = Field(default=50, gt=0, le=500)
     offset: int = Field(default=0, ge=0)
+    # The session this expand belongs to (RFC-046). When set (and owned by the
+    # caller in this graph), the expand is logged as a turn in that session's
+    # thread. Optional so an expand with no active session still works.
+    session_id: str | None = None
 
 
 class ExpandNeighborsRequest(_ExpandBase):

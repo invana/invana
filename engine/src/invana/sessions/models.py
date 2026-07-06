@@ -159,6 +159,12 @@ class SessionMessage(Base):
 
     # Assistant-only metadata (null on user rows).
     status: Mapped[SessionMessageStatus | None] = mapped_column(_status_enum, nullable=True)
+    # A canvas operation this turn records, when it isn't a composer query (RFC-046):
+    # "expand" (node-expand / traversal) or "load" ("Load to canvas"). Set on BOTH
+    # rows of the pair so the UI can style the user row as an operation header and
+    # exclude these turns from NL context / restore / composer history. Null on a
+    # normal NL/QL composer turn and on existing rows.
+    operation: Mapped[str | None] = mapped_column(String(16), nullable=True)
     # How this ask was started: "nl" (translated from natural language) or "ql"
     # (run as a raw query). Persisted so the composer restores the original mode
     # on reopen instead of guessing from ``via`` — which fails when the latest

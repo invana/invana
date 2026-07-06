@@ -68,7 +68,11 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
             offset=offset,
         )
         result = await self._connector.execute_traversal(traversal)
-        return self._serializer.deserialize_graph_response(result)
+        response = self._serializer.deserialize_graph_response(result)
+        # Surface the generated traversal (its bytecode-step repr) so callers can
+        # log it (RFC-046 — the session records a node-expand's query).
+        response.metadata.query = str(traversal)
+        return response
 
     async def count_neighbors(
         self,

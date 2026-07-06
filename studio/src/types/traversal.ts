@@ -46,6 +46,9 @@ export interface ExpandBase {
 	sort?: SortSpec[];
 	limit?: number;
 	offset?: number;
+	/** The session this expand belongs to (RFC-046) — when set, the engine logs
+	 *  the expand as a turn in that session's thread. */
+	session_id?: string;
 }
 
 export type ExpandNeighborsRequest = ExpandBase;

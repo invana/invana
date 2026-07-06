@@ -36,7 +36,7 @@ from invana.sessions.models import (
     SessionSurface,
 )
 from invana.sessions.reconcile import reconcile_proposal
-from invana.sessions.schemas import SendMessage
+from invana.sessions.schemas import RecordOperation, SendMessage
 from invana.sessions.store import SessionStore
 from invana.telemetry.recorders import add_message_in_flight, record_session_message
 
@@ -146,6 +146,14 @@ def _context_turns(rows: list[SessionMessage]) -> list[dict]:
     turns: list[dict] = []
     pending_user: str | None = None
     for m in rows:  # ascending seq
+        # Canvas operations (expand/load) are not conversational turns (RFC-046) —
+        # their generated traversal must never leak into NL translation context.
+        # Skipping both rows of the pair also clears any pending user prompt, but
+        # a real query's prompt is always immediately followed by its own reply,
+        # never an operation, so nothing legitimate is dropped.
+        if m.operation is not None:
+            pending_user = None
+            continue
         if m.role == SessionMessageRole.user:
             pending_user = m.content
         elif (
@@ -402,6 +410,94 @@ async def _finalize_totals(
     if not sess.title:
         sess.title = _title_from_text(payload.content)
     await session.flush()
+
+
+async def record_operation(
+    session: AsyncSession,
+    *,
+    sess: Session,
+    kind: str,
+    user_content: str,
+    summary: str,
+    source_query: str | None = None,
+    query_language: str | None = None,
+    row_count: int | None = None,
+    execution_time_ms: int | None = None,
+    node_count: int = 0,
+    edge_count: int = 0,
+    add_to_totals: bool = False,
+) -> tuple[SessionMessage, SessionMessage]:
+    """Append a canvas-operation turn (RFC-046) — a user/assistant pair whose
+    ``operation`` marks it as an expand/load rather than a composer query.
+
+    Reuses the assistant reply's existing result fields so the thread renders it
+    like any query turn (summary + "View query" + meta). ``add_to_totals`` grows
+    the session's node/edge running totals — true for an ``expand`` (the canvas
+    genuinely grew), false for a ``load`` (those rows were counted when the query
+    first ran; re-projecting must not double-count).
+    """
+    store = SessionStore()
+    user_seq = await store.next_seq(session, session_id=sess.id)
+    user_msg = SessionMessage(
+        session_id=sess.id,
+        seq=user_seq,
+        role=SessionMessageRole.user,
+        content=user_content,
+        operation=kind,
+    )
+    assistant_msg = SessionMessage(
+        session_id=sess.id,
+        seq=user_seq + 1,
+        role=SessionMessageRole.assistant,
+        content=summary,
+        status=SessionMessageStatus.ok,
+        operation=kind,
+        mode="ql",
+        via=_LANGUAGE_LABEL.get(query_language, query_language) if query_language else None,
+        query_language=query_language,
+        source_query=source_query,
+        row_count=row_count,
+        execution_time_ms=execution_time_ms,
+        node_count=node_count,
+        edge_count=edge_count,
+    )
+    await store.add(session, user_msg)
+    await store.add(session, assistant_msg)
+    sess.message_count += 2
+    sess.last_status = assistant_msg.status
+    if add_to_totals:
+        sess.node_count += node_count
+        sess.edge_count += edge_count
+    await session.flush()
+    return user_msg, assistant_msg
+
+
+async def record_load(
+    session: AsyncSession, *, sess: Session, payload: RecordOperation
+) -> tuple[SessionMessage, SessionMessage]:
+    """Log a "Load to canvas" click as a session turn (RFC-046).
+
+    ``add_to_totals`` is false: the loaded query's rows were already counted when
+    it first ran, so re-projecting them must not double the session's totals.
+    """
+    summary = (
+        f"Loaded {_plural(payload.node_count, 'node')} and "
+        f"{_plural(payload.edge_count, 'relationship')} onto the canvas."
+    )
+    return await record_operation(
+        session,
+        sess=sess,
+        kind="load",
+        user_content="Load to canvas",
+        summary=summary,
+        source_query=payload.source_query,
+        query_language=payload.query_language.value if payload.query_language else None,
+        row_count=payload.row_count,
+        execution_time_ms=payload.execution_time_ms,
+        node_count=payload.node_count,
+        edge_count=payload.edge_count,
+        add_to_totals=False,
+    )
 
 
 # ── Modeller generation (RFC-031) ──────────────────────────────────────────────

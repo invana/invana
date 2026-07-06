@@ -59,7 +59,11 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
             limit=limit,
             offset=offset,
         )
-        return await self._connector.execute(query, params)
+        response = await self._connector.execute(query, params)
+        # Surface the generated traversal so callers can log it (RFC-046 — the
+        # session records a node-expand's query for explainability).
+        response.metadata.query = query
+        return response
 
     async def count_neighbors(
         self,

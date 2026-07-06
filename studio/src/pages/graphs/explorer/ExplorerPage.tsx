@@ -42,6 +42,7 @@ import type {
 	QueryResultItem,
 	QueryRunPayload,
 } from "../../../types/query";
+import type { SessionMessage } from "../../../types/session";
 import type {
 	ExpandRequest,
 	NeighborExpandResponse,
@@ -157,6 +158,7 @@ export function ExplorerPage() {
 		setShowArchived,
 		send,
 		rerun,
+		recordLoad,
 		fetchContext,
 		setFeedback,
 		stop,
@@ -482,9 +484,13 @@ export function ExplorerPage() {
 	// failure so tab switching never blocks.
 	const persistActiveCanvas = useCallback(async () => {
 		if (!activeCanvasId || !username || !graphSlug) return;
+		// The base query to restore the canvas from — the latest real query, never
+		// an expand/load operation turn (those don't repaint the whole canvas).
 		const src = [...(activeSession?.messages ?? [])]
 			.reverse()
-			.find((m) => m.role === "assistant" && m.sourceQuery)?.sourceQuery;
+			.find(
+				(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
+			)?.sourceQuery;
 		// Grab a downscaled screenshot of the current view for the banner (RFC-045).
 		// Only when there's something painted, so a blank canvas keeps its old banner.
 		const banner =
@@ -743,17 +749,30 @@ export function ExplorerPage() {
 	const expand = useExpandNode(username, graphSlug);
 	const runExpand = useCallback(
 		async (req: ExpandRequest): Promise<NeighborExpandResponse | null> => {
+			// Tag the expand with the active session so the engine logs it as a turn
+			// in that session's thread (RFC-046). No session → just paints, no log.
+			const tagged = activeSessionId
+				? ({
+						...req,
+						body: { ...req.body, session_id: activeSessionId },
+					} as ExpandRequest)
+				: req;
 			try {
-				const res = await expand.mutateAsync(req);
+				const res = await expand.mutateAsync(tagged);
 				handleExpandResult(res);
-				if (res.returned === 0) toast.info("No more neighbours to load.");
+				if (res.returned === 0) {
+					toast.info("No more neighbours to load.");
+				} else if (activeSessionId) {
+					// The engine recorded an expand turn — refetch the thread so it shows.
+					refresh();
+				}
 				return res;
 			} catch {
 				toast.error("Failed to load neighbours.");
 				return null;
 			}
 		},
-		[expand, handleExpandResult],
+		[expand, handleExpandResult, activeSessionId, refresh],
 	);
 
 	// Active model schema drives the expand submenus + fine-tune pickers, and the
@@ -836,6 +855,27 @@ export function ExplorerPage() {
 			paintCanvas(result);
 		},
 		[paintCanvas],
+	);
+
+	// Explicit "Load to canvas" click (RFC-046): paint, then log a `load` turn in
+	// the thread referencing the query that produced the result. Only the click
+	// logs — the automatic paints (session create / restore) call
+	// `handleLoadToCanvas` directly and stay silent.
+	const handleLoadToCanvasClick = useCallback(
+		(result: QueryResponse, message: SessionMessage) => {
+			handleLoadToCanvas(result);
+			if (result.result_type !== "graph") return;
+			void recordLoad({
+				kind: "load",
+				source_query: message.sourceQuery,
+				query_language: message.language,
+				row_count: result.row_count,
+				node_count: result.data?.nodes.length ?? 0,
+				edge_count: result.data?.edges.length ?? 0,
+				execution_time_ms: result.execution_time_ms,
+			});
+		},
+		[handleLoadToCanvas, recordLoad],
 	);
 
 	// Sessions we've already spun a canvas for, so the two triggers below (session
@@ -948,9 +988,12 @@ export function ExplorerPage() {
 			return;
 		}
 		if (restoredRef.current === activeSession.id) return;
+		// Restore from the latest real query, skipping expand/load operation turns
+		// (they don't repaint the whole canvas — re-running one would drop the base
+		// graph, RFC-046).
 		const latest = [...activeSession.messages]
 			.reverse()
-			.find((m) => m.role === "assistant" && m.sourceQuery);
+			.find((m) => m.role === "assistant" && m.sourceQuery && !m.operation);
 		if (!latest) return;
 		restoredRef.current = activeSession.id;
 		void handleRerun(latest.id, "restore");
@@ -1045,7 +1088,7 @@ export function ExplorerPage() {
 			onFetchContext={fetchContext}
 			onSetFeedback={setFeedback}
 			results={resultsByMessageId}
-			onLoadToCanvas={handleLoadToCanvas}
+			onLoadToCanvas={handleLoadToCanvasClick}
 			onRefresh={refresh}
 			isRefreshing={isRefreshing}
 			onClose={closeSessions}

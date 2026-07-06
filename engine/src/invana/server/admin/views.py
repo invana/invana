@@ -398,6 +398,7 @@ class SessionMessageView(ModelView):
         "seq",
         StringField("role", label="Role"),
         StringField("status", label="Status"),
+        StringField("operation", label="Operation"),
         StringField("mode", label="Mode"),
         "via",
         "query_language",

@@ -20,7 +20,7 @@ from invana.sessions.models import (
     SessionMessageRole,
     SessionMessageStatus,
 )
-from invana.sessions.schemas import SendMessage, SessionMessageRead
+from invana.sessions.schemas import RecordOperation, SendMessage, SessionMessageRead
 from invana.sessions.store import SessionStore
 
 pytestmark = pytest.mark.asyncio
@@ -186,3 +186,92 @@ class TestFriendlyQueryError:
 
     async def test_unknown_category_falls_back_to_default(self):
         assert services._friendly_query_error("unknown") == services._FRIENDLY_QUERY_ERROR_DEFAULT
+
+
+class TestOperationLogging:
+    """Canvas operations logged as session turns (RFC-046) — no graph DB needed:
+    these exercise persistence + the context-replay exclusion directly."""
+
+    async def test_record_expand_appends_pair_and_grows_totals(self, session, graph, user):
+        sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="s")
+        user_msg, assistant_msg = await services.record_operation(
+            session,
+            sess=sess,
+            kind="expand",
+            user_content='Expand neighbours of "n1"',
+            summary="Added 3 nodes and 2 relationships.",
+            source_query="MATCH (n)-[r]-(m) RETURN n, r, m",
+            query_language="cypher",
+            row_count=3,
+            execution_time_ms=8,
+            node_count=3,
+            edge_count=2,
+            add_to_totals=True,
+        )
+        # Both rows carry the operation marker; the assistant reply reuses the
+        # normal result fields so the thread renders it like a query turn.
+        assert user_msg.operation == "expand"
+        assert assistant_msg.operation == "expand"
+        assert assistant_msg.status == SessionMessageStatus.ok
+        assert assistant_msg.source_query == "MATCH (n)-[r]-(m) RETURN n, r, m"
+        assert assistant_msg.via == "Cypher"
+        # An expand genuinely grows the canvas → the session totals grow with it.
+        assert (sess.node_count, sess.edge_count) == (3, 2)
+        assert sess.message_count == 2
+        assert sess.last_status == SessionMessageStatus.ok
+        assert await _message_count(session, sess.id) == 2
+
+    async def test_record_load_does_not_double_count_totals(self, session, graph, user):
+        sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title="s")
+        _, assistant_msg = await services.record_load(
+            session,
+            sess=sess,
+            payload=RecordOperation(
+                kind="load",
+                source_query="MATCH (a:Airport) RETURN a",
+                query_language="cypher",
+                row_count=5,
+                node_count=5,
+                edge_count=4,
+                execution_time_ms=12,
+            ),
+        )
+        assert assistant_msg.operation == "load"
+        assert "onto the canvas" in assistant_msg.content
+        # Re-projecting an already-run query must not re-count its rows.
+        assert (sess.node_count, sess.edge_count) == (0, 0)
+        assert sess.message_count == 2
+
+    async def test_context_turns_excludes_operations(self):
+        # A real query turn followed by an expand op turn: only the query is
+        # replayed as NL context — the expand's traversal must never leak in.
+        rows = [
+            SessionMessage(session_id="s", seq=1, role=SessionMessageRole.user, content="show airports"),
+            SessionMessage(
+                session_id="s",
+                seq=2,
+                role=SessionMessageRole.assistant,
+                content="ok",
+                status=SessionMessageStatus.ok,
+                source_query="MATCH (a:Airport) RETURN a",
+            ),
+            SessionMessage(
+                session_id="s",
+                seq=3,
+                role=SessionMessageRole.user,
+                content='Expand neighbours of "n1"',
+                operation="expand",
+            ),
+            SessionMessage(
+                session_id="s",
+                seq=4,
+                role=SessionMessageRole.assistant,
+                content="Added 3 nodes and 2 relationships.",
+                status=SessionMessageStatus.ok,
+                operation="expand",
+                source_query="MATCH (n)-[r]-(m) RETURN n, r, m",
+            ),
+        ]
+        turns = services._context_turns(rows)
+        assert len(turns) == 1
+        assert turns[0]["query"] == "MATCH (a:Airport) RETURN a"

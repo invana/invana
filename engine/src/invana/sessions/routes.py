@@ -26,6 +26,8 @@ from invana.graphs.query_service import QueryExecutionError
 from invana.sessions import services
 from invana.sessions.models import Session
 from invana.sessions.schemas import (
+    OperationResponse,
+    RecordOperation,
     RerunResponse,
     SendMessage,
     SendMessageResponse,
@@ -190,6 +192,29 @@ async def send_message(
         user_message=SessionMessageRead.model_validate(user_msg),
         assistant_message=SessionMessageRead.model_validate(assistant_msg),
         result=result,
+    )
+
+
+@sessions_router.post("/{session_id}/operations", response_model=OperationResponse)
+async def record_operation(
+    payload: RecordOperation,
+    session_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> OperationResponse:
+    """Log a client-driven canvas operation (currently "Load to canvas") as a
+    session turn (RFC-046). No query runs — the client supplies the referenced
+    query + counts. Read-only w.r.t. the graph, so no connection is needed."""
+    sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
+    user_msg, assistant_msg = await services.record_load(session, sess=sess, payload=payload)
+    await session.commit()
+    await session.refresh(user_msg)
+    await session.refresh(assistant_msg)
+    return OperationResponse(
+        user_message=SessionMessageRead.model_validate(user_msg),
+        assistant_message=SessionMessageRead.model_validate(assistant_msg),
     )
 
 

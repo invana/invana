@@ -49,6 +49,23 @@ class SetFeedback(BaseModel):
     value: Literal["up", "down"] | None = None
 
 
+class RecordOperation(BaseModel):
+    """A client-driven canvas operation to log as a session turn (RFC-046).
+
+    Only ``load`` ("Load to canvas") is accepted here — no query executes, so the
+    client supplies the referenced query + counts. ``expand`` is recorded
+    server-side during the expand call, not through this endpoint.
+    """
+
+    kind: Literal["load"] = "load"
+    source_query: str | None = None
+    query_language: QueryLanguage | None = None
+    row_count: int | None = Field(default=None, ge=0)
+    node_count: int = Field(default=0, ge=0)
+    edge_count: int = Field(default=0, ge=0)
+    execution_time_ms: int | None = Field(default=None, ge=0)
+
+
 class SessionUpdate(BaseModel):
     """Partial update for a session — rename and/or toggle pin/archive.
 
@@ -74,6 +91,9 @@ class SessionMessageRead(BaseModel):
     role: SessionMessageRole
     content: str
     status: SessionMessageStatus | None = None
+    # "expand" | "load" when this turn is a canvas operation, not a composer query
+    # (RFC-046). Null on a normal NL/QL turn.
+    operation: str | None = None
     # "nl" | "ql" — how the ask was started, so the composer restores the mode on
     # reopen. Null on rows written before this field existed.
     mode: str | None = None
@@ -151,3 +171,10 @@ class SendMessageResponse(BaseModel):
 class RerunResponse(BaseModel):
     message: SessionMessageRead
     result: QueryResponse
+
+
+class OperationResponse(BaseModel):
+    """The user/assistant pair recorded for a canvas operation (RFC-046)."""
+
+    user_message: SessionMessageRead
+    assistant_message: SessionMessageRead
