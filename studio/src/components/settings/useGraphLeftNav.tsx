@@ -5,6 +5,7 @@ import {
 	Database,
 	Info,
 	Layers,
+	LayoutDashboard,
 	ListTree,
 	MessagesSquare,
 	Settings,
@@ -135,6 +136,21 @@ export function useGraphLeftNav(
 		};
 	};
 
+	// Explorer's third native panel: saved canvases (RFC-043). Toggles the shared
+	// `?settings=canvases` key like the other Explorer panels, so the rail stays
+	// single-open. Shown only on Explorer.
+	const canvasesItem = () => {
+		const active = settingsPanel.isOpen && settingsPanel.section === "canvases";
+		return {
+			name: "Canvases",
+			icon: LayoutDashboard,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () => toggleSection("canvases"),
+		};
+	};
+
 	// The Modeller's second native panel: a generative Sessions chat (RFC-031).
 	// Toggles the shared `?settings=messages` key just like the schema view icon,
 	// so the rail stays single-open. Shown only on the Modeller.
@@ -158,7 +174,11 @@ export function useGraphLeftNav(
 	// the two view icons for navigation.
 	const topNavItems =
 		activeTab === "explorer"
-			? [viewItem("explorer", "Messages", MessagesSquare), modelItem()]
+			? [
+					viewItem("explorer", "Messages", MessagesSquare),
+					modelItem(),
+					canvasesItem(),
+				]
 			: activeTab === "modeller"
 				? [viewItem("modeller", "Modeller", Boxes), messagesItem()]
 				: [

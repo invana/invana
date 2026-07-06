@@ -19,6 +19,7 @@ export type SettingsSection =
 	| "sessions"
 	| "schema"
 	| "model"
+	| "canvases"
 	| "messages";
 
 const DEFAULT_SECTION: SettingsSection = "info";
@@ -40,6 +41,7 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"sessions",
 	"schema",
 	"model",
+	"canvases",
 	"messages",
 ];
 

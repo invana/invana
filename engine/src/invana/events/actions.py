@@ -82,6 +82,11 @@ GRAPH_EXPAND = "graph.expand"
 SESSION_CREATE = "session.create"
 SESSION_DELETE = "session.delete"
 
+# ── Explorer canvases (RFC-043) ───────────────────────────────────────────────
+CANVAS_CREATE = "canvas.create"
+CANVAS_UPDATE = "canvas.update"
+CANVAS_DELETE = "canvas.delete"
+
 # ── System-emitted events (actor_type=system) ─────────────────────────────────
 SYSTEM_CONNECTION_HEALTH_CHECK = "system.connection_health_check"
 SYSTEM_CONNECTION_RECONNECT = "system.connection_reconnect"
@@ -99,3 +104,4 @@ TARGET_DATASET = "dataset"
 TARGET_USER = "user"
 TARGET_QUERY = "query"
 TARGET_SESSION = "session"
+TARGET_CANVAS = "canvas"

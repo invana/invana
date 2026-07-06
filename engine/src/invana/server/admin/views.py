@@ -10,6 +10,7 @@ from starlette_admin import DropDown, StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.auth.models import RefreshToken, User
+from invana.canvases.models import Canvas
 from invana.datasets.models import Dataset, ImportJob
 from invana.events.models import Event
 from invana.graphs.models import Graph, GraphConnection, GraphMember
@@ -411,6 +412,26 @@ class SessionMessageView(ModelView):
     ]
 
 
+class CanvasView(ModelView):
+    # Heavy render blobs (snapshot / positions / view_state / filters / settings)
+    # are excluded from the list for readability — they're JSON payloads, not
+    # browsable columns.
+    fields = [
+        "id",
+        "session_id",
+        "graph_id",
+        "created_by_id",
+        "title",
+        "instructions",
+        "source_query",
+        "pinned",
+        "archived",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["title"]
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -513,6 +534,17 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 SessionView(Session, label="Sessions", icon="fa fa-comments"),
                 SessionMessageView(SessionMessage, label="Messages", icon="fa fa-message"),
+            ],
+        ),
+    )
+
+    # ── Explorer canvases (RFC-043) ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Canvases",
+            icon="fa fa-diagram-project",
+            views=[
+                CanvasView(Canvas, label="Canvases", icon="fa fa-diagram-project"),
             ],
         ),
     )

@@ -54,6 +54,7 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     """Build and return the Invana FastAPI application."""
     from invana.auth.routes import auth_router
+    from invana.canvases.routes import canvases_router
     from invana.datasets.routes import datasets_router
     from invana.events.routes import events_router, graph_events_router
     from invana.explorer.routes import explorer_router
@@ -114,6 +115,7 @@ def create_app() -> FastAPI:
     app.include_router(models_router)
     app.include_router(schemas_router)
     app.include_router(sessions_router)
+    app.include_router(canvases_router)
     app.include_router(explorer_router)
     app.include_router(events_router)
     app.include_router(graph_events_router)

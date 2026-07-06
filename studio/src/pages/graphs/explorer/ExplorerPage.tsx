@@ -14,14 +14,22 @@ import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { ConfirmDialog } from "../../../components/ConfirmDialog";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
+import {
+	useCanvasesQuery,
+	useCreateCanvasMutation,
+} from "../../../hooks/queries/useCanvases";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
+import { canvasesApi } from "../../../services/api/canvases";
+import { ApiError } from "../../../services/api/client";
+import { sessionsApi } from "../../../services/api/sessions";
 import {
 	type Interaction,
 	type SpanAttributes,
@@ -30,6 +38,7 @@ import {
 	startInteraction,
 	withInteraction,
 } from "../../../services/telemetry/tracer";
+import type { Canvas, CanvasSummary } from "../../../types/canvas";
 import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type {
 	QueryResponse,
@@ -42,6 +51,9 @@ import type {
 } from "../../../types/traversal";
 import { GraphDetail } from "../components/GraphDetail";
 import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
+import { CanvasFormDialog } from "./components/CanvasFormDialog";
+import { CanvasTabsBar } from "./components/CanvasTabsBar";
+import { CanvasesPanel } from "./components/CanvasesPanel";
 import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
 	ACTIVE_LAYOUT_ID,
@@ -94,6 +106,24 @@ function adaptItems(items: QueryResultItem[]): EngineGraphData {
 	return { nodes, edges };
 }
 
+// Dedupe a graph query result into canvas items (vertices + edges), keeping the
+// first occurrence of each id — the same normalization `paintCanvas` does, reused
+// to seed a new canvas's snapshot. Empty for a non-graph / null result.
+function resultToItems(result: QueryResponse | null): QueryResultItem[] {
+	if (result?.result_type !== "graph" || !result.data) return [];
+	const nodeMap = new Map<string, QueryResultItem>();
+	for (const n of result.data.nodes) {
+		const id = String(n.id);
+		if (!nodeMap.has(id)) nodeMap.set(id, { ...n, type: "vertex" });
+	}
+	const edgeMap = new Map<string, QueryResultItem>();
+	for (const e of result.data.edges) {
+		const id = String(e.id);
+		if (!edgeMap.has(id)) edgeMap.set(id, { ...e, type: "edge" });
+	}
+	return [...nodeMap.values(), ...edgeMap.values()];
+}
+
 export function ExplorerPage() {
 	const { username, graphSlug } = useParams<{
 		username: string;
@@ -115,6 +145,7 @@ export function ExplorerPage() {
 	const {
 		sessions,
 		activeSession,
+		activeSessionId,
 		isRunning,
 		isRefreshing,
 		sort,
@@ -229,6 +260,7 @@ export function ExplorerPage() {
 		if (saved === "webgl") return "webgl";
 		return canUseWebGPU() ? "webgpu" : "webgl";
 	});
+
 	// Switching the backend remounts the canvas (ExplorerCanvas keys on `backend`),
 	// which rebuilds the store from the GraphLayer seed. Reseed with the full
 	// current contents first — including node-expand additions, which were appended
@@ -260,6 +292,38 @@ export function ExplorerPage() {
 		}
 		setSeedData(adaptItems(canvasDataRef.current));
 	}, [leftPanelPresent]);
+
+	// Open canvas tabs (RFC-043) — the main-section tab strip. Each tab is a
+	// canvas backed 1:1 by a session; a tab is "active" when its backing session
+	// is the active query session, so switching tabs switches the session too and
+	// new queries belong to that canvas. `activeCanvasId` is therefore derived.
+	const [openTabs, setOpenTabs] = useState<
+		{ id: string; sessionId: string; title: string }[]
+	>([]);
+	const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
+	const [closingCanvasId, setClosingCanvasId] = useState<string | null>(null);
+	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
+	// Fresh titles/purposes for the tab labels + edit dialog, kept in sync as the
+	// list is invalidated by renames/archives (broad page, archived included).
+	const { data: canvasList } = useCanvasesQuery(username, graphSlug, {
+		limit: 100,
+		includeArchived: true,
+	});
+	const canvasById = useMemo(() => {
+		const m = new Map<string, CanvasSummary>();
+		for (const c of canvasList?.items ?? []) m.set(c.id, c);
+		return m;
+	}, [canvasList]);
+	const activeCanvasId =
+		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
+	const tabItems = useMemo(
+		() =>
+			openTabs.map((t) => ({
+				id: t.id,
+				title: canvasById.get(t.id)?.title ?? t.title,
+			})),
+		[openTabs, canvasById],
+	);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -328,6 +392,219 @@ export function ExplorerPage() {
 			span?.setAttribute("explorer.edge_count", edges.length);
 		});
 	}, []);
+
+	// ── Saved canvases + tabs (RFC-043) ─────────────────────────────────────────
+	// Node positions from the live canvas store, keyed by id — captured on save so
+	// a canvas reopens to the exact layout it was left in.
+	const capturePositions = useCallback(() => {
+		const store = canvas?.layers.get<GraphLayer>("graph")?.store;
+		const positions: Record<string, { x: number; y: number }> = {};
+		if (!store) return positions;
+		for (const item of canvasDataRef.current) {
+			if (item.type !== "vertex") continue;
+			const p = store.getPosition(String(item.id));
+			if (p) positions[String(item.id)] = { x: p.x, y: p.y };
+		}
+		return positions;
+	}, [canvas]);
+
+	// Paint the Explorer canvas from a saved canvas: repaint its snapshot and seed
+	// each node at its saved position (the force layout then only relaxes),
+	// mirroring the node-expand seeding path. Also restores the magnet toggle.
+	const paintFromCanvas = useCallback((c: Canvas) => {
+		const items = c.snapshot?.items ?? [];
+		setCanvasData(items);
+		setSelectedId(null);
+		const seed = adaptItems(items);
+		for (const n of seed.nodes) {
+			const p = c.positions?.[n.id];
+			if (p) n.position = { x: p.x, y: p.y };
+		}
+		setSeedData(seed);
+		if (typeof c.settings?.magnet === "boolean") setMagnet(c.settings.magnet);
+	}, []);
+
+	// "Save on blur" — persist the current view (snapshot + positions + latest
+	// query) into the active canvas before switching/closing its tab. Non-fatal on
+	// failure so tab switching never blocks.
+	const persistActiveCanvas = useCallback(async () => {
+		if (!activeCanvasId || !username || !graphSlug) return;
+		const src = [...(activeSession?.messages ?? [])]
+			.reverse()
+			.find((m) => m.role === "assistant" && m.sourceQuery)?.sourceQuery;
+		try {
+			await canvasesApi.update(username, graphSlug, activeCanvasId, {
+				snapshot: { items: canvasDataRef.current },
+				positions: capturePositions(),
+				...(src ? { source_query: src } : {}),
+				settings: { backend, magnet },
+			});
+		} catch {
+			// Best-effort autosave — don't block the tab switch.
+		}
+	}, [
+		activeCanvasId,
+		username,
+		graphSlug,
+		activeSession,
+		capturePositions,
+		backend,
+		magnet,
+	]);
+
+	// Open a canvas as a tab: save the outgoing one, hydrate this one, add the tab,
+	// and switch the active session to its backing session (queries then belong to
+	// this canvas). Paint from the snapshot — mark the session already-restored so
+	// the restore effect doesn't re-run its query over our snapshot.
+	const openCanvasTab = useCallback(
+		async (id: string) => {
+			if (id === activeCanvasId) return;
+			await persistActiveCanvas();
+			try {
+				const c = await canvasesApi.get(
+					username as string,
+					graphSlug as string,
+					id,
+				);
+				paintFromCanvas(c);
+				setOpenTabs((tabs) =>
+					tabs.some((t) => t.id === id)
+						? tabs
+						: [...tabs, { id, sessionId: c.sessionId, title: c.title }],
+				);
+				restoredRef.current = c.sessionId;
+				openSession(c.sessionId);
+			} catch {
+				toast.error("Failed to open canvas.");
+			}
+		},
+		[
+			activeCanvasId,
+			persistActiveCanvas,
+			username,
+			graphSlug,
+			paintFromCanvas,
+			openSession,
+		],
+	);
+
+	// "+" — a blank canvas: create a fresh session + a canvas backed by it, clear
+	// the painted graph, open it as the active tab, and make its session active so
+	// the composer's next query belongs to this canvas.
+	const newCanvasTab = useCallback(async () => {
+		if (!username || !graphSlug) return;
+		await persistActiveCanvas();
+		try {
+			const session = await sessionsApi.create(username, graphSlug, {});
+			const created = await createCanvas.mutateAsync({
+				session_id: session.id,
+				snapshot: { items: [] },
+				settings: { backend, magnet },
+			});
+			setCanvasData([]);
+			setSelectedId(null);
+			setSeedData({ nodes: [], edges: [] });
+			setOpenTabs((tabs) => [
+				...tabs,
+				{ id: created.id, sessionId: session.id, title: created.title },
+			]);
+			restoredRef.current = session.id;
+			refresh();
+			openSession(session.id);
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Failed to create canvas.",
+			);
+		}
+	}, [
+		username,
+		graphSlug,
+		persistActiveCanvas,
+		createCanvas,
+		backend,
+		magnet,
+		refresh,
+		openSession,
+	]);
+
+	// Close a tab (does NOT delete the canvas). If it was active, save it and fall
+	// back to the last remaining tab, or clear the canvas when none are left.
+	const closeCanvasTab = useCallback(
+		async (id: string) => {
+			const tab = openTabs.find((t) => t.id === id);
+			if (!tab) return;
+			const wasActive = tab.sessionId === activeSessionId;
+			if (wasActive) await persistActiveCanvas();
+			const remaining = openTabs.filter((t) => t.id !== id);
+			setOpenTabs(remaining);
+			if (!wasActive) return;
+			const next = remaining[remaining.length - 1];
+			if (next) {
+				void openCanvasTab(next.id);
+			} else {
+				setCanvasData([]);
+				setSelectedId(null);
+				setSeedData({ nodes: [], edges: [] });
+				backToList();
+			}
+		},
+		[openTabs, activeSessionId, persistActiveCanvas, openCanvasTab, backToList],
+	);
+
+	// The panel's "Save view": update the active canvas in place, or (no active
+	// canvas) create one from the active session and open it as a tab.
+	const saveCurrentView = useCallback(async () => {
+		if (activeCanvasId) {
+			await persistActiveCanvas();
+			toast.success("Canvas saved.");
+			return;
+		}
+		if (!activeSession) {
+			toast.error("Open a session and run a query before saving a canvas.");
+			return;
+		}
+		const latest = [...activeSession.messages]
+			.reverse()
+			.find((m) => m.role === "assistant" && m.sourceQuery);
+		try {
+			const created = await createCanvas.mutateAsync({
+				session_id: activeSession.id,
+				snapshot: { items: canvasDataRef.current },
+				source_query: latest?.sourceQuery,
+				positions: capturePositions(),
+				settings: { backend, magnet },
+			});
+			setOpenTabs((tabs) =>
+				tabs.some((t) => t.id === created.id)
+					? tabs
+					: [
+							...tabs,
+							{
+								id: created.id,
+								sessionId: activeSession.id,
+								title: created.title,
+							},
+						],
+			);
+			restoredRef.current = activeSession.id;
+			toast.success("Canvas saved.");
+		} catch (err) {
+			toast.error(
+				err instanceof ApiError ? err.message : "Failed to save canvas.",
+			);
+		}
+	}, [
+		activeCanvasId,
+		persistActiveCanvas,
+		activeSession,
+		createCanvas,
+		capturePositions,
+		backend,
+		magnet,
+	]);
+
+	const canSaveCanvas =
+		!!activeCanvasId || (!!activeSession && canvasData.length > 0);
 
 	// ── Node expand / graph traversal (RFC-035) ────────────────────────────────
 	// Append expanded neighbours straight to the live store (the non-destructive
@@ -537,6 +814,42 @@ export function ExplorerPage() {
 		[paintCanvas],
 	);
 
+	// A newly-started session gets its own canvas (RFC-043): paint the result,
+	// create a canvas backed by that session (the engine copies its title + latest
+	// query), and open it as the active tab. This mirrors "+" (blank canvas) for
+	// the composer-driven path — starting a session starts a canvas.
+	const openCanvasForNewSession = useCallback(
+		async (sessionId: string, result: QueryResponse | null) => {
+			if (!username || !graphSlug) return;
+			if (result) handleLoadToCanvas(result);
+			if (openTabs.some((t) => t.sessionId === sessionId)) return;
+			try {
+				const created = await createCanvas.mutateAsync({
+					session_id: sessionId,
+					snapshot: { items: resultToItems(result) },
+					settings: { backend, magnet },
+				});
+				setOpenTabs((tabs) =>
+					tabs.some((t) => t.sessionId === sessionId)
+						? tabs
+						: [...tabs, { id: created.id, sessionId, title: created.title }],
+				);
+			} catch {
+				// Non-fatal — e.g. the session already has a canvas (409). The thread
+				// still renders; the user can Save view manually.
+			}
+		},
+		[
+			username,
+			graphSlug,
+			handleLoadToCanvas,
+			openTabs,
+			createCanvas,
+			backend,
+			magnet,
+		],
+	);
+
 	const handleRun = async (payload: QueryRunPayload) => {
 		if (setupIncomplete) {
 			toast.error(
@@ -545,6 +858,10 @@ export function ExplorerPage() {
 			return;
 		}
 		let messageId: string | null = null;
+		// A run with no active session creates one; detect that so we can spin up a
+		// canvas tab for the new session below.
+		const priorSessionId = activeSessionId;
+		let newSessionId: string | null = null;
 		const result = await runTraced(
 			"run",
 			{
@@ -558,10 +875,12 @@ export function ExplorerPage() {
 				const { sessionId, messageId: mid, result } = await send(payload);
 				restoredRef.current = sessionId;
 				messageId = mid;
+				if (sessionId && sessionId !== priorSessionId) newSessionId = sessionId;
 				return result;
 			},
 		);
 		if (messageId) setResultFor(messageId, result);
+		if (newSessionId) void openCanvasForNewSession(newSessionId, result);
 	};
 
 	// `rerun` re-issues a stored message's query — triggered by clicking a message
@@ -592,31 +911,63 @@ export function ExplorerPage() {
 	}, [activeSession, handleRerun]);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
-	// derived `selected` (above) drives the right-side InspectorPanel. The toolbar
-	// lives in the header, so the canvas fills the main area edge-to-edge.
+	// derived `selected` (above) drives the right-side InspectorPanel. The
+	// main-section header carries the canvas tabs (RFC-043) + the canvas toolbar;
+	// the canvas fills the area below.
 	const canvasContent = (
-		<div className="relative w-full h-full overflow-hidden">
-			<RendererCapabilityBanner />
-			<ExplorerCanvas
-				data={seedData}
-				onReady={handleReady}
-				onViewTargetChange={setSelectedId}
-				magnet={magnet}
-				interactionRef={runRef}
-				backend={backend}
-				expand={expandHandlers}
-				onShowDetail={handleShowDetail}
+		<div className="flex h-full w-full flex-col overflow-hidden">
+			<CanvasTabsBar
+				tabs={tabItems}
+				activeId={activeCanvasId}
+				onSelect={(id) => void openCanvasTab(id)}
+				onClose={(id) => setClosingCanvasId(id)}
+				onEdit={(id) => setEditingCanvasId(id)}
+				onNew={() => void newCanvasTab()}
+				isCreating={createCanvas.isPending}
 			/>
-			{fineTuneVertex && (
-				<ExpandFineTunePanel
-					open
-					vertexId={fineTuneVertex}
-					schema={expandSchema}
-					propertyKeys={propertyKeys}
-					onClose={() => setFineTuneVertex(null)}
-					onExpand={runExpand}
+			<div className="relative min-h-0 w-full flex-1 overflow-hidden">
+				<RendererCapabilityBanner />
+				<ExplorerCanvas
+					data={seedData}
+					onReady={handleReady}
+					onViewTargetChange={setSelectedId}
+					magnet={magnet}
+					interactionRef={runRef}
+					backend={backend}
+					expand={expandHandlers}
+					onShowDetail={handleShowDetail}
 				/>
-			)}
+				{fineTuneVertex && (
+					<ExpandFineTunePanel
+						open
+						vertexId={fineTuneVertex}
+						schema={expandSchema}
+						propertyKeys={propertyKeys}
+						onClose={() => setFineTuneVertex(null)}
+						onExpand={runExpand}
+					/>
+				)}
+			</div>
+			<CanvasFormDialog
+				open={editingCanvasId !== null}
+				username={username as string}
+				graphSlug={graphSlug as string}
+				canvas={
+					editingCanvasId ? (canvasById.get(editingCanvasId) ?? null) : null
+				}
+				onClose={() => setEditingCanvasId(null)}
+			/>
+			<ConfirmDialog
+				open={closingCanvasId !== null}
+				title="Close this canvas tab?"
+				description="The canvas stays saved in the Canvases list — this just closes the tab. Reopen it any time from the Canvases panel."
+				confirmLabel="Close tab"
+				onConfirm={() => {
+					if (closingCanvasId) void closeCanvasTab(closingCanvasId);
+					setClosingCanvasId(null);
+				}}
+				onOpenChange={(o) => !o && setClosingCanvasId(null)}
+			/>
 		</div>
 	);
 
@@ -663,6 +1014,17 @@ export function ExplorerPage() {
 				backend={backend}
 				onClose={closeSessions}
 			/>
+		) : settingsPanel.section === "canvases" ? (
+			<CanvasesPanel
+				username={username as string}
+				graphSlug={graphSlug as string}
+				activeCanvasId={activeCanvasId}
+				onOpen={(id) => void openCanvasTab(id)}
+				onSaveCurrent={() => void saveCurrentView()}
+				canSave={canSaveCanvas}
+				isSaving={createCanvas.isPending}
+				onClose={closeSessions}
+			/>
 		) : (
 			sessionsContent
 		);
@@ -697,10 +1059,11 @@ export function ExplorerPage() {
 				headerPanelControls={panelControls}
 				headerCenter={
 					canvas ? (
-						// Dead-center the toolbar against the full header width (the header
-						// nav is `relative`; see useAppHeader). Absolute positioning lifts
-						// it out of the flex flow so its midpoint stays at the header's
-						// midpoint regardless of the breadcrumb / right-control widths.
+						// The canvas toolbar reads the live camera; it only initialises
+						// correctly mounted in the app header (in the main-section tab bar
+						// the camera reads null and `HeaderToolbarItems` throws). It sits
+						// directly above the canvas tabs. Dead-centre it against the full
+						// header width (the header nav is `relative`; see useAppHeader).
 						<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
 							<ExplorerHeaderToolbar
 								magnet={magnet}
