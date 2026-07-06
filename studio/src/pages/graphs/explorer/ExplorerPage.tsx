@@ -9,8 +9,6 @@ import type {
 	GraphCanvas,
 	GraphLayer,
 } from "@invana/graph";
-import { Button } from "@invana/ui";
-import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -908,6 +906,8 @@ export function ExplorerPage() {
 				onEdit={(id) => setEditingCanvasId(id)}
 				onNew={() => void newCanvasTab()}
 				isCreating={createCanvas.isPending}
+				inspectorClosed={inspectorClosed}
+				onToggleInspector={inspectorClosed ? openInspector : closeInspector}
 			/>
 			<div className="relative min-h-0 w-full flex-1 overflow-hidden">
 				<RendererCapabilityBanner />
@@ -1013,26 +1013,6 @@ export function ExplorerPage() {
 			sessionsContent
 		);
 
-	// Right-panel (inspector) toggle for the page header — always shown, next to
-	// the profile menu. The left (sessions) panel is driven by the left nav rail.
-	// Reflects the panel's state: a collapse icon while open, an expand icon
-	// while collapsed.
-	const panelControls = (
-		<Button
-			variant="ghost"
-			size="icon"
-			className="h-7 w-7"
-			onClick={inspectorClosed ? openInspector : closeInspector}
-			title={inspectorClosed ? "Show inspector panel" : "Hide inspector panel"}
-		>
-			{inspectorClosed ? (
-				<PanelRightOpen className="w-4 h-4" />
-			) : (
-				<PanelRightClose className="w-4 h-4" />
-			)}
-		</Button>
-	);
-
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
 		// in GraphDetail's header (a sibling of <Canvas>, outside its own provider).
@@ -1040,7 +1020,6 @@ export function ExplorerPage() {
 			<GraphDetail
 				sectionId="explorer"
 				pageLabel="Explorer"
-				headerPanelControls={panelControls}
 				headerCenter={
 					canvas ? (
 						// The canvas toolbar reads the live camera; it only initialises
