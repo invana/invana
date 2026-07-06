@@ -9,6 +9,7 @@ import type {
 	GraphCanvas,
 	GraphLayer,
 } from "@invana/graph";
+import { Network } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -482,40 +483,49 @@ export function ExplorerPage() {
 	// "Save on blur" — persist the current view (snapshot + positions + latest
 	// query) into the active canvas before switching/closing its tab. Non-fatal on
 	// failure so tab switching never blocks.
-	const persistActiveCanvas = useCallback(async () => {
-		if (!activeCanvasId || !username || !graphSlug) return;
-		// The base query to restore the canvas from — the latest real query, never
-		// an expand/load operation turn (those don't repaint the whole canvas).
-		const src = [...(activeSession?.messages ?? [])]
-			.reverse()
-			.find(
-				(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
-			)?.sourceQuery;
-		// Grab a downscaled screenshot of the current view for the banner (RFC-045).
-		// Only when there's something painted, so a blank canvas keeps its old banner.
-		const banner =
-			canvasDataRef.current.length > 0 ? await captureBanner(canvas) : null;
-		try {
-			await canvasesApi.update(username, graphSlug, activeCanvasId, {
-				snapshot: { items: canvasDataRef.current },
-				positions: capturePositions(),
-				...(src ? { source_query: src } : {}),
-				...(banner ? { banner } : {}),
-				settings: { backend, magnet },
-			});
-		} catch {
-			// Best-effort autosave — don't block the tab switch.
-		}
-	}, [
-		activeCanvasId,
-		username,
-		graphSlug,
-		activeSession,
-		capturePositions,
-		canvas,
-		backend,
-		magnet,
-	]);
+	const persistActiveCanvas = useCallback(
+		async (opts?: { withBanner?: boolean }) => {
+			if (!activeCanvasId || !username || !graphSlug) return;
+			// Never overwrite a saved snapshot with an empty one: a reopen paints the
+			// (empty) snapshot, and a blur-save of that emptiness used to wipe the
+			// record for good, leaving canvases permanently blank. With nothing
+			// painted there's nothing worth persisting, so skip.
+			if (canvasDataRef.current.length === 0) return;
+			// The base query to restore the canvas from — the latest real query, never
+			// an expand/load operation turn (those don't repaint the whole canvas).
+			const src = [...(activeSession?.messages ?? [])]
+				.reverse()
+				.find(
+					(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
+				)?.sourceQuery;
+			// Grab a downscaled screenshot of the current view for the banner (RFC-045).
+			// The frequent autosave skips it (withBanner:false) to stay cheap; the
+			// blur-save on tab switch/close still refreshes it.
+			const banner =
+				opts?.withBanner === false ? null : await captureBanner(canvas);
+			try {
+				await canvasesApi.update(username, graphSlug, activeCanvasId, {
+					snapshot: { items: canvasDataRef.current },
+					positions: capturePositions(),
+					...(src ? { source_query: src } : {}),
+					...(banner ? { banner } : {}),
+					settings: { backend, magnet },
+				});
+			} catch {
+				// Best-effort autosave — don't block the tab switch.
+			}
+		},
+		[
+			activeCanvasId,
+			username,
+			graphSlug,
+			activeSession,
+			capturePositions,
+			canvas,
+			backend,
+			magnet,
+		],
+	);
 
 	// Open a canvas as a tab: save the outgoing one, hydrate this one, add the tab,
 	// and switch the active session to its backing session (queries then belong to
@@ -531,13 +541,31 @@ export function ExplorerPage() {
 					graphSlug as string,
 					id,
 				);
-				paintFromCanvas(c);
+				const hasSnapshot = (c.snapshot?.items?.length ?? 0) > 0;
+				if (hasSnapshot) {
+					// Painted from a real snapshot → mark restored so the restore effect
+					// doesn't re-run the query over it.
+					paintFromCanvas(c);
+					restoredRef.current = c.sessionId;
+				} else {
+					// Empty snapshot: seeding the canvas empty and then repainting from
+					// the restore re-run is a double re-seed (setData([]) → setData(full))
+					// that crashes the PixiJS WebGPU renderer. Restore selection/styling
+					// only — leave the GraphLayer seed untouched — and let the restore
+					// effect paint the base query in a single pass (heals canvases saved
+					// blank before autosave existed).
+					setSelectedId(null);
+					setCanvasData([]);
+					if (typeof c.settings?.magnet === "boolean")
+						setMagnet(c.settings.magnet);
+					setStyling(c.styling ?? {});
+					restoredRef.current = null;
+				}
 				setOpenTabs((tabs) =>
 					tabs.some((t) => t.id === id)
 						? tabs
 						: [...tabs, { id, sessionId: c.sessionId }],
 				);
-				restoredRef.current = c.sessionId;
 				openSession(c.sessionId);
 			} catch {
 				toast.error("Failed to open canvas.");
@@ -976,8 +1004,12 @@ export function ExplorerPage() {
 		async (messageId: string, trigger: "rerun" | "restore" = "rerun") => {
 			const result = await runTraced(trigger, {}, () => rerun(messageId));
 			setResultFor(messageId, result);
+			// Opening a session should show its graph: when the restore path runs
+			// because the saved snapshot was empty, paint the re-run result onto the
+			// canvas. A manual re-run still just renders inline (Load to canvas).
+			if (trigger === "restore" && result) paintCanvas(result);
 		},
-		[runTraced, rerun, setResultFor],
+		[runTraced, rerun, setResultFor, paintCanvas],
 	);
 
 	// Re-run the latest query-bearing message when a session is opened, to
@@ -998,6 +1030,40 @@ export function ExplorerPage() {
 		restoredRef.current = activeSession.id;
 		void handleRerun(latest.id, "restore");
 	}, [activeSession, handleRerun]);
+
+	// Autosave the live canvas (snapshot + positions) shortly after it changes, so
+	// a query result and every node-expand survive a reopen — the record used to
+	// be written only on tab blur, so anything built up in a single sitting was
+	// lost. Debounced to coalesce rapid expands, and banner-less to stay cheap
+	// (the blur-save on tab switch/close still refreshes the banner).
+	useEffect(() => {
+		if (!activeCanvasId || canvasData.length === 0) return;
+		const t = setTimeout(
+			() => void persistActiveCanvas({ withBanner: false }),
+			800,
+		);
+		return () => clearTimeout(t);
+	}, [canvasData, activeCanvasId, persistActiveCanvas]);
+
+	// A canvas is a session's 1:1 layer — with no session open (the list view),
+	// tear the canvas down so no graph shows there. Also drops the live engine so
+	// the header toolbar / status bar hide. Reopening a session remounts a fresh
+	// canvas, which also sidesteps the WebGPU re-seed crash.
+	useEffect(() => {
+		if (activeSessionId) return;
+		setCanvas(null);
+		setSeedData({ nodes: [], edges: [] });
+		setCanvasData([]);
+		setSelectedId(null);
+	}, [activeSessionId]);
+
+	// Returning to the list (breadcrumb) closes the thread. Flush the canvas first
+	// so the last edits before the debounced autosave aren't lost, then hand off to
+	// the list — the effect above clears the canvas once the session deselects.
+	const handleBack = useCallback(() => {
+		void persistActiveCanvas({ withBanner: false });
+		backToList();
+	}, [persistActiveCanvas, backToList]);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
 	// derived `selected` (above) drives the right-side InspectorPanel. The
@@ -1083,7 +1149,7 @@ export function ExplorerPage() {
 			sessions={sessions}
 			activeSession={activeSession}
 			onOpenSession={handleOpenSession}
-			onBack={backToList}
+			onBack={handleBack}
 			onRerun={handleRerun}
 			onFetchContext={fetchContext}
 			onSetFeedback={setFeedback}
@@ -1123,7 +1189,7 @@ export function ExplorerPage() {
 				sectionId="explorer"
 				pageLabel="Explorer"
 				headerCenter={
-					canvas ? (
+					canvas && activeSessionId ? (
 						// The canvas toolbar reads the live camera; it only initialises
 						// correctly mounted in the app header (in the main-section tab bar
 						// the camera reads null and `HeaderToolbarItems` throws). It sits
@@ -1154,9 +1220,19 @@ export function ExplorerPage() {
 				mainSection={{
 					defaultSize: "600px",
 					minSize: "300px",
-					// Canvas stays in place even when the connection isn't attached
-					// — it'll render empty. The leftSection banner is the explainer.
-					content: canvasContent,
+					// A canvas belongs to a session — on the list view (no session open)
+					// show a placeholder instead of a stray graph. Opening a session
+					// mounts its canvas fresh.
+					content: activeSessionId ? (
+						canvasContent
+					) : (
+						<div className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 text-center text-muted-foreground">
+							<Network className="h-10 w-10 opacity-20" />
+							<p className="max-w-xs text-sm">
+								Open a session or start a new one to see its canvas.
+							</p>
+						</div>
+					),
 				}}
 				rightSection={
 					inspectorClosed
@@ -1179,11 +1255,13 @@ export function ExplorerPage() {
 					// Live engine telemetry — node/edge totals, zoom, pan, pointer world
 					// position, hovered node/edge, selection counts — self-wired off the
 					// lifted CanvasContext (same status bar as the canvas-react story).
-					canvas ? <CanvasStatusBar /> : null
+					canvas && activeSessionId ? <CanvasStatusBar /> : null
 				}
 				// The shared message bar — shows whatever was last pushed via
 				// Canvas.showMessage (e.g. a layout's "Running… / ready"); empty when idle.
-				footerRightExtras={canvas ? <CanvasMessageBar /> : null}
+				footerRightExtras={
+					canvas && activeSessionId ? <CanvasMessageBar /> : null
+				}
 			/>
 		</CanvasContext.Provider>
 	);
