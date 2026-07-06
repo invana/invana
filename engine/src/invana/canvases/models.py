@@ -14,6 +14,8 @@ so any member renders it without reading the private backing thread.
 
 from __future__ import annotations
 
+import gzip
+import json
 import uuid
 from datetime import UTC, datetime
 
@@ -22,6 +24,8 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -37,6 +41,18 @@ def _utcnow() -> datetime:
 
 def _new_id() -> str:
     return str(uuid.uuid4())
+
+
+def pack_json(obj: dict | None) -> bytes:
+    """gzip a JSON object for compact at-rest storage (RFC-047 states)."""
+    return gzip.compress(json.dumps(obj or {}, separators=(",", ":")).encode())
+
+
+def unpack_json(blob: bytes | None) -> dict:
+    """Inverse of :func:`pack_json`; an empty/absent blob decodes to ``{}``."""
+    if not blob:
+        return {}
+    return json.loads(gzip.decompress(blob).decode())
 
 
 class Canvas(Base):
@@ -83,7 +99,7 @@ class Canvas(Base):
     positions: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)  # {nodeId: {x, y}}
     settings: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)  # {backend, magnet, ...}
     # Per node/edge-TYPE-NAME visual rules (RFC-045): {nodeTypes: {...}, edgeTypes: {...}}.
-    # Name-keyed (not a type FK) so styling survives schema version bumps (RFC-019).
+    # Name-keyed (not a type FK) so styling survives schema state bumps (RFC-019).
     styling: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     # Base64 PNG data URL of the downscaled canvas screenshot (RFC-045). Null
     # until first captured; excluded from the list summary (heavy).
@@ -101,4 +117,87 @@ class Canvas(Base):
     def has_banner(self) -> bool:
         """Whether a banner screenshot exists — surfaced in the list summary so
         rows can lazy-load the (heavy) image rather than shipping it inline."""
+        return bool(self.banner)
+
+
+class CanvasState(Base):
+    """An immutable, point-in-time snapshot of a canvas (RFC-047).
+
+    A state is captured **client-side** at each canvas-mutating turn — a query,
+    a node expand (RFC-035), or a load-to-canvas (RFC-033) — because the painted
+    ``snapshot``, node ``positions`` and ``banner`` thumbnail only exist in the
+    PixiJS renderer. The table is **append-only** (keep-all: no prune, no edit),
+    so it is a faithful history the user can "go back in time" through. Going back
+    **forks** a state into a fresh session + canvas (see ``services.fork_state``);
+    versions are never restored in place.
+    """
+
+    __tablename__ = "canvas_states"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+
+    # The canvas this is a state of. CASCADE — deleting the canvas drops its
+    # history with it.
+    canvas_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("canvases.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # Denormalized (mirrors Canvas) so the admin view / scoping never joins.
+    graph_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("graphs.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    created_by_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # The assistant turn that produced this state — provenance for explainability
+    # (thread ↔ state). SET NULL so pruning a message never deletes the state;
+    # provenance only, like ``Canvas.source_query`` (a member may not see the
+    # private backing thread).
+    message_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("session_messages.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    # What produced this state: "query" (composer NL/QL) | "expand" | "load".
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    # Human summary for the timeline, e.g. `Ran query — 42 nodes`.
+    label: Mapped[str] = mapped_column(String(255), default="", nullable=False)
+
+    # Self-contained frozen render state. The two big blobs are gzipped JSON
+    # (RFC-047 storage optimisation) - a canvas snapshot compresses ~5-10x, and
+    # these accumulate one row per turn. Read/written through the `snapshot` /
+    # `positions` properties below, which (de)compress transparently.
+    snapshot_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)  # gzip({items})
+    positions_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)  # gzip({nodeId: {x, y}})
+    source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    styling: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    settings: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    # Base64 PNG thumbnail — what makes the timeline visual. Excluded from the
+    # list summary (heavy), like ``Canvas.banner``.
+    banner: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    node_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    edge_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+    @property
+    def snapshot(self) -> dict:
+        return unpack_json(self.snapshot_gz)
+
+    @property
+    def positions(self) -> dict:
+        return unpack_json(self.positions_gz)
+
+    @property
+    def has_banner(self) -> bool:
         return bool(self.banner)

@@ -1,11 +1,11 @@
-"""DB access layer for ``canvases`` rows (RFC-043)."""
+"""DB access layer for ``canvases`` rows (RFC-043, RFC-047)."""
 
 from __future__ import annotations
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.canvases.models import Canvas
+from invana.canvases.models import Canvas, CanvasState
 
 
 class CanvasStore:
@@ -58,3 +58,36 @@ class CanvasStore:
 
     async def delete(self, session: AsyncSession, obj: Canvas) -> None:
         await session.delete(obj)
+
+
+class CanvasStateStore:
+    """DB access for the append-only ``canvas_states`` history (RFC-047)."""
+
+    async def list_for_canvas(
+        self,
+        session: AsyncSession,
+        *,
+        canvas_id: str,
+        limit: int,
+        offset: int,
+    ) -> list[CanvasState]:
+        # Newest first — the timeline reads top-down from the latest state.
+        stmt = (
+            select(CanvasState)
+            .where(CanvasState.canvas_id == canvas_id)
+            .order_by(CanvasState.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def count_for_canvas(self, session: AsyncSession, *, canvas_id: str) -> int:
+        stmt = select(func.count()).select_from(CanvasState).where(CanvasState.canvas_id == canvas_id)
+        return int((await session.execute(stmt)).scalar_one())
+
+    async def get(self, session: AsyncSession, state_id: str) -> CanvasState | None:
+        return (await session.execute(select(CanvasState).where(CanvasState.id == state_id))).scalar_one_or_none()
+
+    async def add(self, session: AsyncSession, obj: CanvasState) -> None:
+        session.add(obj)
+        await session.flush()

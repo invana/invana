@@ -65,3 +65,33 @@ export interface Canvas extends CanvasSummary {
 	/** Base64 PNG data URL of the canvas screenshot; undefined until captured. */
 	banner?: string;
 }
+
+// ── Canvas states — version history (RFC-047) ─────────────────────────────────
+
+/** What turn produced a saved state: a composer query, a node expand, or a load. */
+export type CanvasStateKind = "query" | "expand" | "load";
+
+/** Timeline-row shape — omits the heavy render blobs (snapshot/positions/banner). */
+export interface CanvasStateSummary {
+	id: string;
+	canvasId: string;
+	createdById: string;
+	/** The thread turn that produced this state (provenance); may be absent. */
+	messageId?: string;
+	kind: CanvasStateKind;
+	label: string;
+	nodeCount: number;
+	edgeCount: number;
+	hasBanner: boolean;
+	createdAt: Date;
+}
+
+/** A frozen, immutable point-in-time canvas state — everything a fork needs. */
+export interface CanvasState extends CanvasStateSummary {
+	snapshot: CanvasSnapshot;
+	positions: CanvasPositions;
+	sourceQuery?: string;
+	styling: CanvasStyling;
+	settings: Record<string, unknown>;
+	banner?: string;
+}

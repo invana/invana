@@ -9,6 +9,14 @@ import type { GraphCanvas } from "@invana/graph";
 const MAX_EDGE = 600;
 
 /**
+ * Longest-edge size (px) of a canvas *state* (version-history) thumbnail — much
+ * smaller than the sessions-list banner, since timeline rows are tiny. Keeping
+ * these small is the main lever on version-history storage (RFC-047): a ~288px
+ * PNG is several times lighter than the 600px banner.
+ */
+export const STATE_THUMB_MAX_EDGE = 288;
+
+/**
  * Extract the rendered graph as a PNG data URL, downscaled to ~{@link MAX_EDGE}px.
  * Returns null when the renderer isn't ready or the canvas is empty/too small.
  */
@@ -27,6 +35,18 @@ export async function captureBanner(
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Re-downscale an existing PNG data URL to a smaller longest edge. Cheap — a 2D
+ * canvas draw, no PixiJS extract — so a captured banner can be shrunk further
+ * for a state thumbnail without re-rendering the graph.
+ */
+export function downscaleDataUrl(
+	dataUrl: string,
+	maxEdge: number,
+): Promise<string | null> {
+	return downscale(dataUrl, maxEdge);
 }
 
 /** Draw a data-URL image onto an offscreen canvas scaled to fit `maxEdge`. */

@@ -12,9 +12,13 @@ from http import HTTPStatus
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.canvases.models import Canvas
-from invana.canvases.schemas import CanvasCreate, CanvasUpdate
-from invana.canvases.store import CanvasStore
+from invana.canvases.models import Canvas, CanvasState, pack_json
+from invana.canvases.schemas import (
+    CanvasCreate,
+    CanvasStateCreate,
+    CanvasUpdate,
+)
+from invana.canvases.store import CanvasStateStore, CanvasStore
 from invana.events import actions
 from invana.events.services import current_trace_id, emit_event
 from invana.sessions import services as session_services
@@ -145,3 +149,120 @@ async def delete_canvas(session: AsyncSession, *, canvas: Canvas, actor_id: str)
         details={},
         trace_id=current_trace_id(),
     )
+
+
+# ── Version history (RFC-047) ────────────────────────────────────────────────────
+
+
+async def list_states(
+    session: AsyncSession,
+    *,
+    canvas_id: str,
+    limit: int,
+    offset: int,
+) -> tuple[list[CanvasState], int]:
+    store = CanvasStateStore()
+    items = await store.list_for_canvas(session, canvas_id=canvas_id, limit=limit, offset=offset)
+    total = await store.count_for_canvas(session, canvas_id=canvas_id)
+    return items, total
+
+
+async def get_state_or_404(
+    session: AsyncSession,
+    *,
+    state_id: str,
+    canvas_id: str,
+    graph_id: str,
+) -> CanvasState:
+    state = await CanvasStateStore().get(session, state_id)
+    if state is None or state.canvas_id != canvas_id or state.graph_id != graph_id:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Canvas state not found.")
+    return state
+
+
+async def create_state(
+    session: AsyncSession,
+    *,
+    canvas: Canvas,
+    user_id: str,
+    payload: CanvasStateCreate,
+) -> CanvasState:
+    """Append an immutable snapshot to the canvas' history.
+
+    Best-effort provenance: a ``message_id`` that doesn't resolve (a message in a
+    private thread the caller can't see, or a stale id) is **dropped, not fatal**
+    — the state is still worth keeping. No audit event: versions are captured
+    per turn and would only flood the log.
+    """
+    message_id = payload.message_id
+    if message_id is not None and await SessionStore().get_message(session, message_id) is None:
+        message_id = None
+
+    state = CanvasState(
+        canvas_id=canvas.id,
+        graph_id=canvas.graph_id,
+        created_by_id=user_id,
+        message_id=message_id,
+        kind=payload.kind,
+        label=payload.label or "",
+        snapshot_gz=pack_json(payload.snapshot),
+        positions_gz=pack_json(payload.positions),
+        source_query=payload.source_query,
+        styling=payload.styling or {},
+        settings=payload.settings or {},
+        banner=payload.banner,
+        node_count=payload.node_count,
+        edge_count=payload.edge_count,
+    )
+    await CanvasStateStore().add(session, state)
+    return state
+
+
+async def fork_state(
+    session: AsyncSession,
+    *,
+    state: CanvasState,
+    graph_id: str,
+    user_id: str,
+) -> Canvas:
+    """Restore a state by forking it into a **new** session + canvas (RFC-047).
+
+    Non-destructive: the original canvas is untouched; the caller ends up with a
+    fresh, independent canvas seeded from the frozen state (its own private
+    backing session, since sessions are per-creator while versions are shared).
+    """
+    original = await CanvasStore().get(session, state.canvas_id)
+    base_title = (original.title if original else "") or "Untitled canvas"
+    forked_title = f"{base_title} (restored)"
+
+    sess = await session_services.create_session(
+        session,
+        graph_id=graph_id,
+        user_id=user_id,
+        title=forked_title,
+    )
+    canvas = Canvas(
+        session_id=sess.id,
+        graph_id=graph_id,
+        created_by_id=user_id,
+        title=forked_title,
+        instructions=(original.instructions if original else "") or "",
+        snapshot=state.snapshot or {},
+        source_query=state.source_query,
+        positions=state.positions or {},
+        settings=state.settings or {},
+        styling=state.styling or {},
+        banner=state.banner,
+    )
+    await CanvasStore().add(session, canvas)
+    await emit_event(
+        session,
+        action=actions.CANVAS_CREATE,
+        target_kind=actions.TARGET_CANVAS,
+        target_id=canvas.id,
+        graph_id=graph_id,
+        actor_id=user_id,
+        details={"session_id": sess.id, "title": canvas.title, "forked_from_state": state.id},
+        trace_id=current_trace_id(),
+    )
+    return canvas

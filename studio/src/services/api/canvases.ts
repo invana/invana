@@ -32,7 +32,7 @@ interface ApiSummary {
 	updated_at: string;
 }
 
-interface ApiDetail extends ApiSummary {
+export interface ApiDetail extends ApiSummary {
 	snapshot: CanvasSnapshot;
 	source_query: string | null;
 	view_state: Record<string, unknown>;
@@ -112,7 +112,7 @@ function toSummary(c: ApiSummary): CanvasSummary {
 	};
 }
 
-function toCanvas(d: ApiDetail): Canvas {
+export function toCanvas(d: ApiDetail): Canvas {
 	return {
 		...toSummary(d),
 		snapshot: d.snapshot ?? { items: [] },

@@ -16,6 +16,10 @@ import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import {
+	useCreateCanvasStateMutation,
+	useForkCanvasStateMutation,
+} from "../../../hooks/queries/useCanvasStates";
+import {
 	useCanvasesQuery,
 	useCreateCanvasMutation,
 } from "../../../hooks/queries/useCanvases";
@@ -36,7 +40,11 @@ import {
 	startInteraction,
 	withInteraction,
 } from "../../../services/telemetry/tracer";
-import type { Canvas, CanvasStyling } from "../../../types/canvas";
+import type {
+	Canvas,
+	CanvasStateKind,
+	CanvasStyling,
+} from "../../../types/canvas";
 import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type {
 	QueryResponse,
@@ -51,6 +59,7 @@ import type {
 import { GraphDetail } from "../components/GraphDetail";
 import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
 import { CanvasFormDialog } from "./components/CanvasFormDialog";
+import { CanvasHistoryPanel } from "./components/CanvasHistoryPanel";
 import { CanvasTabsBar } from "./components/CanvasTabsBar";
 import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
@@ -71,7 +80,11 @@ import { SessionsPanel } from "./components/SessionsPanel";
 import { type StyleTypeInfo, StylingPanel } from "./components/StylingPanel";
 import { useExpandNode } from "./hooks/useExpandNode";
 import { useSessions } from "./hooks/useSessions";
-import { captureBanner } from "./lib/captureBanner";
+import {
+	STATE_THUMB_MAX_EDGE,
+	captureBanner,
+	downscaleDataUrl,
+} from "./lib/captureBanner";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather
@@ -83,6 +96,11 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
+
+// Banner capture is expensive (PixiJS extract + downscale), so it's throttled:
+// at most one fresh capture per this window. Also the cadence of the periodic
+// autosave that keeps the sessions-list preview current (RFC-047 Part A).
+const BANNER_MIN_INTERVAL_MS = 10_000;
 
 // Map query-result items (vertices / edges) to the canvas engine's GraphData
 // shape: the label rides as `type` (colour-by-label + the Inspector's Type row)
@@ -296,6 +314,17 @@ export function ExplorerPage() {
 	);
 	const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
 	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
+	// Version history (RFC-047): capture a state after each canvas-mutating turn,
+	// and fork a chosen state into a new canvas to "go back in time".
+	const createCanvasState = useCreateCanvasStateMutation(
+		username ?? "",
+		graphSlug ?? "",
+	);
+	const forkCanvasState = useForkCanvasStateMutation(
+		username ?? "",
+		graphSlug ?? "",
+	);
+	const [historyOpen, setHistoryOpen] = useState(false);
 	// Session tutorial (RFC-045) — auto-open once on a user's first session,
 	// reopenable from the "?" in the canvas header.
 	const [tutorialOpen, setTutorialOpen] = useState(
@@ -318,6 +347,18 @@ export function ExplorerPage() {
 	});
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
+	// Mirror in a ref so the delayed state-capture (which runs after the canvas
+	// settles) reads the canvas that's active *now*, not the one closed over when
+	// the turn fired.
+	const activeCanvasIdRef = useRef<string | null>(null);
+	useEffect(() => {
+		activeCanvasIdRef.current = activeCanvasId;
+	}, [activeCanvasId]);
+	// Throttle banner capture (RFC-047 Part A): the last capture's timestamp + URL,
+	// so the periodic autosave and per-turn state-capture can reuse a fresh shot
+	// instead of re-extracting from PixiJS on every save.
+	const lastBannerAtRef = useRef(0);
+	const lastBannerUrlRef = useRef<string | null>(null);
 	// sessionId → canvasId for canvases that have a banner screenshot (RFC-045),
 	// so the Sessions list can show each session's canvas preview above its title.
 	// Only bannered canvases are mapped; their rows lazy-fetch the (heavy) image.
@@ -490,11 +531,39 @@ export function ExplorerPage() {
 		setStyling(c.styling ?? {});
 	}, []);
 
-	// "Save on blur" — persist the current view (snapshot + positions + latest
-	// query) into the active canvas before switching/closing its tab. Non-fatal on
-	// failure so tab switching never blocks.
+	// Capture a downscaled banner screenshot (RFC-045), honouring the throttle
+	// (RFC-047 Part A): "force" always captures; "throttle" reuses a shot younger
+	// than BANNER_MIN_INTERVAL_MS (else captures a fresh one); "off" never does.
+	// Successful captures update the shared last-banner refs so the per-turn state
+	// capture can reuse them instead of re-extracting from PixiJS.
+	const captureBannerThrottled = useCallback(
+		async (mode: "force" | "throttle" | "off"): Promise<string | null> => {
+			if (mode === "off") return null;
+			const now = Date.now();
+			if (
+				mode === "throttle" &&
+				lastBannerUrlRef.current &&
+				now - lastBannerAtRef.current < BANNER_MIN_INTERVAL_MS
+			) {
+				return lastBannerUrlRef.current;
+			}
+			const b = await captureBanner(canvas);
+			if (b) {
+				lastBannerAtRef.current = now;
+				lastBannerUrlRef.current = b;
+			}
+			return b;
+		},
+		[canvas],
+	);
+
+	// Persist the current view (snapshot + positions + latest query) into the
+	// active canvas. Called on blur (tab switch/close — `banner:"force"`), on the
+	// frequent change autosave (`banner:"off"`, cheap), and on the periodic
+	// autosave (`banner:"throttle"`, RFC-047). Non-fatal on failure so tab
+	// switching never blocks.
 	const persistActiveCanvas = useCallback(
-		async (opts?: { withBanner?: boolean }) => {
+		async (opts?: { banner?: "force" | "throttle" | "off" }) => {
 			if (!activeCanvasId || !username || !graphSlug) return;
 			// Never overwrite a saved snapshot with an empty one: a reopen paints the
 			// (empty) snapshot, and a blur-save of that emptiness used to wipe the
@@ -508,11 +577,7 @@ export function ExplorerPage() {
 				.find(
 					(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
 				)?.sourceQuery;
-			// Grab a downscaled screenshot of the current view for the banner (RFC-045).
-			// The frequent autosave skips it (withBanner:false) to stay cheap; the
-			// blur-save on tab switch/close still refreshes it.
-			const banner =
-				opts?.withBanner === false ? null : await captureBanner(canvas);
+			const banner = await captureBannerThrottled(opts?.banner ?? "force");
 			try {
 				await canvasesApi.update(username, graphSlug, activeCanvasId, {
 					snapshot: { items: canvasDataRef.current },
@@ -531,7 +596,73 @@ export function ExplorerPage() {
 			graphSlug,
 			activeSession,
 			capturePositions,
-			canvas,
+			captureBannerThrottled,
+			backend,
+			magnet,
+		],
+	);
+
+	// Capture a version of the canvas after a canvas-mutating turn (RFC-047). Runs
+	// on a short delay so the force layout / render settles before we snapshot the
+	// positions + banner. Best-effort: a failure never disturbs the turn. Reads
+	// the *ref* for the active canvas so a delayed capture targets the right one.
+	const captureCanvasState = useCallback(
+		(kind: CanvasStateKind, opts?: { messageId?: string }) => {
+			setTimeout(async () => {
+				const canvasId = activeCanvasIdRef.current;
+				const items = canvasDataRef.current;
+				if (!canvasId || !username || !graphSlug || items.length === 0) return;
+				const nodeCount = items.filter((i) => i.type === "vertex").length;
+				const edgeCount = items.length - nodeCount;
+				const verb =
+					kind === "query"
+						? "Ran query"
+						: kind === "expand"
+							? "Expanded neighbours"
+							: "Loaded result";
+				const label = `${verb} — ${nodeCount} nodes, ${edgeCount} edges`;
+				const src = [...(activeSession?.messages ?? [])]
+					.reverse()
+					.find(
+						(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
+					)?.sourceQuery;
+				// Reuse the throttled full-size banner but store a much smaller
+				// thumbnail for the history timeline (RFC-047 storage optimisation) —
+				// a cheap re-downscale, no extra PixiJS extract.
+				const full = await captureBannerThrottled("throttle");
+				const banner = full
+					? await downscaleDataUrl(full, STATE_THUMB_MAX_EDGE)
+					: null;
+				try {
+					await createCanvasState.mutateAsync({
+						canvasId,
+						body: {
+							kind,
+							label,
+							snapshot: { items },
+							positions: capturePositions(),
+							...(src ? { source_query: src } : {}),
+							styling,
+							settings: { backend, magnet },
+							...(banner ? { banner } : {}),
+							node_count: nodeCount,
+							edge_count: edgeCount,
+							...(opts?.messageId ? { message_id: opts.messageId } : {}),
+						},
+					});
+				} catch {
+					// Best-effort history — a failed capture just skips this state.
+				}
+			}, 1200);
+		},
+		[
+			username,
+			graphSlug,
+			activeSession,
+			capturePositions,
+			captureBannerThrottled,
+			createCanvasState,
+			styling,
 			backend,
 			magnet,
 		],
@@ -800,9 +931,13 @@ export function ExplorerPage() {
 				handleExpandResult(res);
 				if (res.returned === 0) {
 					toast.info("No more neighbours to load.");
-				} else if (activeSessionId) {
-					// The engine recorded an expand turn — refetch the thread so it shows.
-					refresh();
+				} else {
+					// The canvas grew — capture a version (RFC-047).
+					captureCanvasState("expand");
+					if (activeSessionId) {
+						// The engine recorded an expand turn — refetch the thread so it shows.
+						refresh();
+					}
 				}
 				return res;
 			} catch {
@@ -810,7 +945,7 @@ export function ExplorerPage() {
 				return null;
 			}
 		},
-		[expand, handleExpandResult, activeSessionId, refresh],
+		[expand, handleExpandResult, activeSessionId, refresh, captureCanvasState],
 	);
 
 	// Active model schema drives the expand submenus + fine-tune pickers, and the
@@ -912,8 +1047,10 @@ export function ExplorerPage() {
 				edge_count: result.data?.edges.length ?? 0,
 				execution_time_ms: result.execution_time_ms,
 			});
+			// Capture the loaded canvas as a version (RFC-047).
+			captureCanvasState("load", { messageId: message.id });
 		},
-		[handleLoadToCanvas, recordLoad],
+		[handleLoadToCanvas, recordLoad, captureCanvasState],
 	);
 
 	// Sessions we've already spun a canvas for, so the two triggers below (session
@@ -931,7 +1068,13 @@ export function ExplorerPage() {
 	const openCanvasForNewSession = useCallback(
 		async (sessionId: string, result: QueryResponse | null) => {
 			if (!username || !graphSlug) return;
-			if (result) handleLoadToCanvas(result);
+			if (result) {
+				handleLoadToCanvas(result);
+				// First paint of the new session's canvas — capture it as the opening
+				// version (RFC-047). The canvas tab registers below; the delayed
+				// capture reads the (by-then active) canvas from the ref.
+				captureCanvasState("query");
+			}
 			if (canvasedSessionsRef.current.has(sessionId)) return;
 			if (openTabs.some((t) => t.sessionId === sessionId)) return;
 			canvasedSessionsRef.current.add(sessionId);
@@ -961,6 +1104,7 @@ export function ExplorerPage() {
 			createCanvas,
 			backend,
 			magnet,
+			captureCanvasState,
 		],
 	);
 
@@ -1045,15 +1189,28 @@ export function ExplorerPage() {
 	// a query result and every node-expand survive a reopen — the record used to
 	// be written only on tab blur, so anything built up in a single sitting was
 	// lost. Debounced to coalesce rapid expands, and banner-less to stay cheap
-	// (the blur-save on tab switch/close still refreshes the banner).
+	// (the periodic + blur saves refresh the banner).
 	useEffect(() => {
 		if (!activeCanvasId || canvasData.length === 0) return;
 		const t = setTimeout(
-			() => void persistActiveCanvas({ withBanner: false }),
+			() => void persistActiveCanvas({ banner: "off" }),
 			800,
 		);
 		return () => clearTimeout(t);
 	}, [canvasData, activeCanvasId, persistActiveCanvas]);
+
+	// Periodic autosave (RFC-047 Part A): every ~10s while a canvas is open, save
+	// with a throttled banner so the sessions-list preview stays current — not
+	// only on blur. Also catches layout-only changes (node drags) the change
+	// effect above misses (it keys on `canvasData`, not live positions).
+	useEffect(() => {
+		if (!activeCanvasId) return;
+		const t = setInterval(() => {
+			if (canvasDataRef.current.length === 0) return;
+			void persistActiveCanvas({ banner: "throttle" });
+		}, BANNER_MIN_INTERVAL_MS);
+		return () => clearInterval(t);
+	}, [activeCanvasId, persistActiveCanvas]);
 
 	// A canvas is a session's 1:1 layer — with no session open (the list view),
 	// tear the canvas down so no graph shows there. Also drops the live engine so
@@ -1071,9 +1228,28 @@ export function ExplorerPage() {
 	// so the last edits before the debounced autosave aren't lost, then hand off to
 	// the list — the effect above clears the canvas once the session deselects.
 	const handleBack = useCallback(() => {
-		void persistActiveCanvas({ withBanner: false });
+		void persistActiveCanvas({ banner: "off" });
 		backToList();
 	}, [persistActiveCanvas, backToList]);
+
+	// "Go back in time" (RFC-047): fork the chosen state into a fresh session +
+	// canvas (the current one is untouched), then open it as a new tab.
+	const handleForkState = useCallback(
+		async (stateId: string) => {
+			if (!activeCanvasId) return;
+			try {
+				const created = await forkCanvasState.mutateAsync({
+					canvasId: activeCanvasId,
+					stateId,
+				});
+				setHistoryOpen(false);
+				await openCanvasTab(created.id);
+			} catch {
+				toast.error("Failed to restore this state.");
+			}
+		},
+		[activeCanvasId, forkCanvasState, openCanvasTab],
+	);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
 	// derived `selected` (above) drives the right-side InspectorPanel. The
@@ -1091,6 +1267,7 @@ export function ExplorerPage() {
 				isCreating={createCanvas.isPending}
 				onHelp={() => setTutorialOpen(true)}
 				onStyle={() => setStylingOpen((o) => !o)}
+				onHistory={() => setHistoryOpen((o) => !o)}
 				inspectorClosed={inspectorClosed}
 				onToggleInspector={inspectorClosed ? openInspector : closeInspector}
 			/>
@@ -1114,6 +1291,15 @@ export function ExplorerPage() {
 					edgeTypes={styleTypes.edgeTypes}
 					styling={styling}
 					onChange={handleStylingChange}
+				/>
+				<CanvasHistoryPanel
+					open={historyOpen}
+					onClose={() => setHistoryOpen(false)}
+					username={username}
+					graphSlug={graphSlug}
+					canvasId={activeCanvasId}
+					onFork={(stateId) => void handleForkState(stateId)}
+					isForking={forkCanvasState.isPending}
 				/>
 				{fineTuneVertex && (
 					<ExpandFineTunePanel

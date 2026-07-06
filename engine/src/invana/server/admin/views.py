@@ -10,7 +10,7 @@ from starlette_admin import DropDown, StringField
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from invana.auth.models import RefreshToken, User
-from invana.canvases.models import Canvas
+from invana.canvases.models import Canvas, CanvasState
 from invana.datasets.models import Dataset, ImportJob
 from invana.events.models import Event
 from invana.graphs.models import Graph, GraphConnection, GraphMember
@@ -433,6 +433,25 @@ class CanvasView(ModelView):
     search_fields = ["title"]
 
 
+class CanvasStateView(ModelView):
+    # Append-only history (RFC-047). Heavy render blobs (snapshot / positions /
+    # banner / styling / settings) are excluded — JSON payloads, not browsable.
+    fields = [
+        "id",
+        "canvas_id",
+        "graph_id",
+        "created_by_id",
+        "message_id",
+        StringField("kind", label="Kind"),
+        "label",
+        "node_count",
+        "edge_count",
+        "source_query",
+        "created_at",
+    ]
+    search_fields = ["label"]
+
+
 def mount_admin(app: FastAPI) -> None:
     """Create and mount the starlette-admin instance on *app*.
 
@@ -546,6 +565,7 @@ def mount_admin(app: FastAPI) -> None:
             icon="fa fa-diagram-project",
             views=[
                 CanvasView(Canvas, label="Canvases", icon="fa fa-diagram-project"),
+                CanvasStateView(CanvasState, label="Canvas versions", icon="fa fa-clock-rotate-left"),
             ],
         ),
     )

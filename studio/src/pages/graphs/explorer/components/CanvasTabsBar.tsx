@@ -6,6 +6,7 @@ import {
 } from "@invana/ui";
 import {
 	HelpCircle,
+	History,
 	PanelRightClose,
 	PanelRightOpen,
 	Pencil,
@@ -35,6 +36,8 @@ interface Props {
 	onHelp: () => void;
 	/** Toggle the per-type styling panel. */
 	onStyle: () => void;
+	/** Toggle the version-history timeline panel (RFC-047). */
+	onHistory: () => void;
 	/** Inspector panel currently collapsed? Drives the show/hide toggle. */
 	inspectorClosed: boolean;
 	/** Toggle the right-side inspector panel open/closed. */
@@ -167,6 +170,7 @@ export function CanvasTabsBar({
 	isCreating,
 	onHelp,
 	onStyle,
+	onHistory,
 	inspectorClosed,
 	onToggleInspector,
 }: Props) {
@@ -234,6 +238,12 @@ export function CanvasTabsBar({
 							name: "Styling",
 							icon: SlidersHorizontal,
 							onClick: onStyle,
+						},
+						{
+							key: "history",
+							name: "History",
+							icon: History,
+							onClick: onHistory,
 						},
 						{
 							key: "find",

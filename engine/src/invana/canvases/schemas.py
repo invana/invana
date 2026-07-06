@@ -1,8 +1,9 @@
-"""Pydantic request/response models for the Canvases API (RFC-043)."""
+"""Pydantic request/response models for the Canvases API (RFC-043, RFC-047)."""
 
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -83,4 +84,61 @@ class CanvasDetail(CanvasSummary):
 
 class CanvasListResponse(BaseModel):
     items: list[CanvasSummary]
+    total: int
+
+
+# ── Canvas versions (RFC-047) ───────────────────────────────────────────────────
+
+
+class CanvasStateCreate(BaseModel):
+    """Client-captured snapshot of the canvas at a mutating turn.
+
+    The render state (``snapshot``/``positions``/``banner``) only exists in the
+    PixiJS renderer, so the client supplies it; ``kind`` + ``label`` describe the
+    turn for the timeline; ``message_id`` links back to the producing thread turn.
+    """
+
+    kind: Literal["query", "expand", "load"]
+    label: str = Field(default="", max_length=255)
+    snapshot: dict | None = None
+    positions: dict | None = None
+    source_query: str | None = None
+    styling: dict | None = None
+    settings: dict | None = None
+    banner: str | None = None
+    node_count: int = 0
+    edge_count: int = 0
+    message_id: str | None = None
+
+
+class CanvasStateSummary(BaseModel):
+    """Timeline-row shape — omits the heavy render blobs (snapshot/positions/banner)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    canvas_id: str
+    created_by_id: str
+    message_id: str | None = None
+    kind: str
+    label: str
+    node_count: int
+    edge_count: int
+    has_banner: bool
+    created_at: datetime
+
+
+class CanvasStateDetail(CanvasStateSummary):
+    """Full state — everything needed to fork it into a new canvas."""
+
+    snapshot: dict
+    positions: dict
+    source_query: str | None = None
+    styling: dict
+    settings: dict
+    banner: str | None = None
+
+
+class CanvasStateListResponse(BaseModel):
+    items: list[CanvasStateSummary]
     total: int
