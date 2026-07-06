@@ -208,7 +208,7 @@ export const ACTIVE_LAYOUT_ID = "d3-force-active";
 const APP_OPTIONS: CanvasConfig = {
 	activeLayout: ACTIVE_LAYOUT_ID,
 	layers: {
-		background: { type: "pattern", patternType: "grid", alpha: 0.5 },
+		background: { type: "pattern", patternType: "dots", alpha: 0.5 },
 		graph: {
 			node: {
 				style: {

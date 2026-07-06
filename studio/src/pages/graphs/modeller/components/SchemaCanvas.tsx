@@ -216,7 +216,7 @@ const SELECT_ICONS: Record<string, LucideIcon> = {
 const EXPLORE_OPTIONS: CanvasConfig = {
 	activeLayout: EXPLORE_LAYOUT_ID,
 	layers: {
-		background: { type: "pattern", patternType: "grid", alpha: 0.5 },
+		background: { type: "pattern", patternType: "dots", alpha: 0.5 },
 		minimap: { position: "bottom-left", margin: { x: 20 } },
 	},
 	behaviours: {
@@ -484,7 +484,7 @@ function AuthoringSchemaCanvas(
 				<BackgroundLayer
 					id="background"
 					type="pattern"
-					patternType="grid"
+					patternType="dots"
 					alpha={0.5}
 					backgroundColor="#181a1b"
 					color="#2b2e31"
