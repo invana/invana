@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export interface Capability {
+interface Capability {
 	icon: ComponentType<{ className?: string }>;
 	title: string;
 	/** Full description — the one-time welcome modal. */
