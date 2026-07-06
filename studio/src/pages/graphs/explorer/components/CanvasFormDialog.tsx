@@ -20,21 +20,31 @@ interface Props {
 	open: boolean;
 	username: string;
 	graphSlug: string;
-	/** The canvas being edited — title + purpose (instructions). */
+	/** The canvas being edited — its purpose (instructions) + banner preview. */
 	canvas: CanvasSummary | null;
+	/**
+	 * Current title of the canvas's session. The title names the session and its
+	 * 1:1 canvas (RFC-045), so it's owned by the session, not the canvas.
+	 */
+	sessionTitle: string;
+	/** Rename the canvas's session (the shared title). */
+	onRenameSession: (id: string, title: string) => Promise<unknown>;
 	onClose: () => void;
 }
 
 /**
- * Edit a canvas's title and purpose (instructions). Opened from a tab/row
- * header. Creation is handled by "Save current view" in the panel (it needs the
- * live canvas state); this dialog only renames + re-purposes an existing canvas.
+ * Edit a session's canvas: rename the session (the shared title, RFC-045) and
+ * describe the canvas's purpose (instructions). Opened from a tab/row header.
+ * Creation is handled by "Save current view" in the panel (it needs the live
+ * canvas state); this dialog only renames + re-purposes an existing one.
  */
 export function CanvasFormDialog({
 	open,
 	username,
 	graphSlug,
 	canvas,
+	sessionTitle,
+	onRenameSession,
 	onClose,
 }: Props) {
 	const update = useUpdateCanvasMutation(username, graphSlug);
@@ -46,7 +56,7 @@ export function CanvasFormDialog({
 
 	useEffect(() => {
 		if (!open || !canvas) return;
-		setTitle(canvas.title);
+		setTitle(sessionTitle);
 		setInstructions(canvas.instructions);
 		setError(null);
 		// Fetch the full canvas for its banner preview (RFC-045) — the list summary
@@ -62,17 +72,20 @@ export function CanvasFormDialog({
 		return () => {
 			cancelled = true;
 		};
-	}, [open, canvas, username, graphSlug]);
+	}, [open, canvas, sessionTitle, username, graphSlug]);
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (!canvas) return;
 		setError(null);
 		try {
-			await update.mutateAsync({
-				id: canvas.id,
-				data: { title, instructions },
-			});
+			// The title renames the session (the shared name); the purpose stays on
+			// the canvas. Skip the rename when unchanged so a purpose-only edit
+			// doesn't touch the session.
+			if (title !== sessionTitle) {
+				await onRenameSession(canvas.sessionId, title);
+			}
+			await update.mutateAsync({ id: canvas.id, data: { instructions } });
 			onClose();
 		} catch (err) {
 			const message =
@@ -87,10 +100,10 @@ export function CanvasFormDialog({
 			<DialogContent>
 				<form onSubmit={onSubmit}>
 					<DialogHeader>
-						<DialogTitle>Edit canvas</DialogTitle>
+						<DialogTitle>Edit session</DialogTitle>
 						<DialogDescription>
-							Rename this canvas and describe its purpose — what it's for and
-							what a viewer should take from it.
+							Rename this session and describe its canvas's purpose — what it's
+							for and what a viewer should take from it.
 						</DialogDescription>
 					</DialogHeader>
 					{banner && (

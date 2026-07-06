@@ -108,10 +108,15 @@ export function useSessions(
 			body,
 		}: {
 			id: string;
-			body: { pinned?: boolean; archived?: boolean };
+			body: { pinned?: boolean; archived?: boolean; title?: string };
 		}) => sessionsApi.update(u, g, id, body),
 		onSuccess: (_data, { id, body }) => {
 			qc.invalidateQueries({ queryKey: listPrefix });
+			// A rename also changes the open thread's title (the breadcrumb + the
+			// canvas tab both read it), so refresh the detail too.
+			if (body.title !== undefined) {
+				qc.invalidateQueries({ queryKey: detailKey(id) });
+			}
 			if (body.archived && !showArchived && activeSessionId === id) {
 				setActiveSessionId(null);
 			}
@@ -311,6 +316,10 @@ export function useSessions(
 		updateMutation.mutate({ id, body: { pinned } });
 	const setArchived = (id: string, archived: boolean) =>
 		updateMutation.mutate({ id, body: { archived } });
+	// Rename a session — its title is the single name for the session and its 1:1
+	// canvas (RFC-045), shown in the breadcrumb and the canvas tab.
+	const renameSession = (id: string, title: string) =>
+		updateMutation.mutateAsync({ id, body: { title } });
 
 	return {
 		sessions,
@@ -333,6 +342,7 @@ export function useSessions(
 		refresh,
 		setPinned,
 		setArchived,
+		renameSession,
 		openSession: (id: string) => setActiveSessionId(id),
 		backToList: () => setActiveSessionId(null),
 	};

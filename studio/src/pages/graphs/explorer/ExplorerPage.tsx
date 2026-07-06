@@ -167,6 +167,7 @@ export function ExplorerPage() {
 		refresh,
 		setPinned,
 		setArchived,
+		renameSession,
 		openSession,
 		backToList,
 	} = useSessions(username, graphSlug);
@@ -288,9 +289,12 @@ export function ExplorerPage() {
 	// canvas backed 1:1 by a session; a tab is "active" when its backing session
 	// is the active query session, so switching tabs switches the session too and
 	// new queries belong to that canvas. `activeCanvasId` is therefore derived.
-	const [openTabs, setOpenTabs] = useState<
-		{ id: string; sessionId: string; title: string }[]
-	>([]);
+	// A tab is a canvas bound 1:1 to a session; its label is the session's title
+	// (RFC-045), read live from `sessionTitleById` — so the tab holds no title of
+	// its own.
+	const [openTabs, setOpenTabs] = useState<{ id: string; sessionId: string }[]>(
+		[],
+	);
 	const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
 	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
 	// Session tutorial (RFC-045) — auto-open once on a user's first session,
@@ -319,13 +323,23 @@ export function ExplorerPage() {
 	}, [canvasList]);
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
+	// A session's title is the single name for it and its 1:1 canvas (RFC-045):
+	// the breadcrumb and the canvas tab show the same session title, so there's no
+	// separate canvas name to keep in sync. `activeSession` is the freshest source
+	// for the open thread (e.g. right after a rename); the list covers the rest.
+	const sessionTitleById = useMemo(() => {
+		const m = new Map<string, string>();
+		for (const s of sessions) m.set(s.id, s.title);
+		if (activeSession) m.set(activeSession.id, activeSession.title);
+		return m;
+	}, [sessions, activeSession]);
 	const tabItems = useMemo(
 		() =>
 			openTabs.map((t) => ({
 				id: t.id,
-				title: canvasById.get(t.id)?.title ?? t.title,
+				title: sessionTitleById.get(t.sessionId) ?? "",
 			})),
-		[openTabs, canvasById],
+		[openTabs, sessionTitleById],
 	);
 
 	// Persist a styling edit onto the active canvas (RFC-045); applied live via
@@ -516,7 +530,7 @@ export function ExplorerPage() {
 				setOpenTabs((tabs) =>
 					tabs.some((t) => t.id === id)
 						? tabs
-						: [...tabs, { id, sessionId: c.sessionId, title: c.title }],
+						: [...tabs, { id, sessionId: c.sessionId }],
 				);
 				restoredRef.current = c.sessionId;
 				openSession(c.sessionId);
@@ -572,7 +586,7 @@ export function ExplorerPage() {
 			setStyling({});
 			setOpenTabs((tabs) => [
 				...tabs,
-				{ id: created.id, sessionId: session.id, title: created.title },
+				{ id: created.id, sessionId: session.id },
 			]);
 			restoredRef.current = session.id;
 			refresh();
@@ -853,7 +867,7 @@ export function ExplorerPage() {
 				setOpenTabs((tabs) =>
 					tabs.some((t) => t.sessionId === sessionId)
 						? tabs
-						: [...tabs, { id: created.id, sessionId, title: created.title }],
+						: [...tabs, { id: created.id, sessionId }],
 				);
 			} catch {
 				// Non-fatal — e.g. the session already has a canvas (409). Drop the
@@ -1001,6 +1015,14 @@ export function ExplorerPage() {
 				canvas={
 					editingCanvasId ? (canvasById.get(editingCanvasId) ?? null) : null
 				}
+				sessionTitle={
+					editingCanvasId
+						? (sessionTitleById.get(
+								canvasById.get(editingCanvasId)?.sessionId ?? "",
+							) ?? "")
+						: ""
+				}
+				onRenameSession={renameSession}
 				onClose={() => setEditingCanvasId(null)}
 			/>
 			<SessionTutorialModal open={tutorialOpen} onClose={closeTutorial} />

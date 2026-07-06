@@ -92,7 +92,9 @@ function TabLabel({
 	onEdit: () => void;
 	onClose: () => void;
 }) {
-	const label = title || "Untitled canvas";
+	// A tab shows its session's title (RFC-045). Match the breadcrumb's empty-name
+	// fallback so an unnamed session reads the same in both places.
+	const label = title || "New session";
 	return (
 		<span className="group flex items-center gap-1">
 			<span className="max-w-[160px] truncate text-left" title={label}>
