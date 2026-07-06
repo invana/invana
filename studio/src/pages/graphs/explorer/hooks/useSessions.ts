@@ -118,6 +118,12 @@ export function useSessions(
 
 	const send = async (
 		payload: QueryRunPayload,
+		hooks?: {
+			// Fired the instant a brand-new session is created (before the query
+			// returns), so the caller can spin up its canvas right away rather than
+			// waiting for the first result. Not called when reusing an open session.
+			onSessionCreated?: (session: Session) => void;
+		},
 	): Promise<{
 		sessionId: string | null;
 		messageId: string | null;
@@ -162,6 +168,7 @@ export function useSessions(
 					messages: [userMsg, runningMsg],
 				}));
 				setActiveSessionId(sessionId);
+				hooks?.onSessionCreated?.(created);
 			} else {
 				patchDetail(sessionId, (prev) =>
 					prev

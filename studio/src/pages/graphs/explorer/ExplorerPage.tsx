@@ -796,15 +796,25 @@ export function ExplorerPage() {
 		[paintCanvas],
 	);
 
-	// A newly-started session gets its own canvas (RFC-043): paint the result,
-	// create a canvas backed by that session (the engine copies its title + latest
-	// query), and open it as the active tab. This mirrors "+" (blank canvas) for
-	// the composer-driven path — starting a session starts a canvas.
+	// Sessions we've already spun a canvas for, so the two triggers below (session
+	// created, then result returned) create exactly one canvas. A ref, not state,
+	// so the guard is synchronous across a single run's two calls.
+	const canvasedSessionsRef = useRef<Set<string>>(new Set());
+
+	// A newly-started session gets its own canvas (RFC-043): create a canvas backed
+	// by that session (the engine copies its title + latest query) and open it as
+	// the active tab, then paint the result once it lands. Called first the moment
+	// the session is created — so the canvas shows up named after the session right
+	// away, before the query returns — and again when the result arrives (to paint
+	// it). Idempotent per session via `canvasedSessionsRef`. Mirrors "+" (blank
+	// canvas) for the composer-driven path — starting a session starts a canvas.
 	const openCanvasForNewSession = useCallback(
 		async (sessionId: string, result: QueryResponse | null) => {
 			if (!username || !graphSlug) return;
 			if (result) handleLoadToCanvas(result);
+			if (canvasedSessionsRef.current.has(sessionId)) return;
 			if (openTabs.some((t) => t.sessionId === sessionId)) return;
+			canvasedSessionsRef.current.add(sessionId);
 			try {
 				const created = await createCanvas.mutateAsync({
 					session_id: sessionId,
@@ -817,8 +827,10 @@ export function ExplorerPage() {
 						: [...tabs, { id: created.id, sessionId, title: created.title }],
 				);
 			} catch {
-				// Non-fatal — e.g. the session already has a canvas (409). The thread
-				// still renders; the user can Save view manually.
+				// Non-fatal — e.g. the session already has a canvas (409). Drop the
+				// guard so a later trigger can retry. The thread still renders; the
+				// user can Save view manually.
+				canvasedSessionsRef.current.delete(sessionId);
 			}
 		},
 		[
@@ -854,7 +866,15 @@ export function ExplorerPage() {
 			// when none is active) and runs the engine query, returning the assistant
 			// message id so its result can be keyed for inline rendering (RFC-033).
 			async () => {
-				const { sessionId, messageId: mid, result } = await send(payload);
+				const {
+					sessionId,
+					messageId: mid,
+					result,
+				} = await send(payload, {
+					// The session exists now — open its canvas immediately (named after
+					// the session) so it's there while the query runs, not only after.
+					onSessionCreated: (s) => void openCanvasForNewSession(s.id, null),
+				});
 				restoredRef.current = sessionId;
 				messageId = mid;
 				if (sessionId && sessionId !== priorSessionId) newSessionId = sessionId;
@@ -862,6 +882,8 @@ export function ExplorerPage() {
 			},
 		);
 		if (messageId) setResultFor(messageId, result);
+		// The canvas was created on session-create above; this second call paints the
+		// result onto it (the idempotent guard skips re-creating).
 		if (newSessionId) void openCanvasForNewSession(newSessionId, result);
 	};
 
