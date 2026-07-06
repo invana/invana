@@ -22,6 +22,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { SaturationControl } from "../../components/SaturationControl";
 import { STUDIO_THEMES } from "../../components/studioThemes";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../services/api/auth";
@@ -121,6 +122,7 @@ function AppearanceTab() {
 				modeIcons={MODE_ICONS}
 				className="theme-picker"
 			/>
+			<SaturationControl className="max-w-xs border-t border-border pt-6" />
 		</div>
 	);
 }

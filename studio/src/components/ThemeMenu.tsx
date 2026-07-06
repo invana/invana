@@ -11,6 +11,7 @@
 import { ThemeSelector } from "@invana/themes";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@invana/ui";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
+import { SaturationControl } from "./SaturationControl";
 import { STUDIO_THEMES } from "./studioThemes";
 
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
@@ -36,6 +37,7 @@ export function ThemeMenu() {
 					modeIcons={MODE_ICONS}
 					className="theme-picker"
 				/>
+				<SaturationControl className="mt-4 border-t border-border pt-4" />
 			</PopoverContent>
 		</Popover>
 	);
