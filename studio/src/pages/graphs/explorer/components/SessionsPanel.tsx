@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useCanvasBannerQuery } from "../../../../hooks/queries/useCanvases";
 import { formatDuration, formatRelativeTime } from "../../../../lib/time";
 import type { SessionSort } from "../../../../services/api/sessions";
 import type { QueryLanguage } from "../../../../types/graphs";
@@ -62,6 +63,13 @@ export interface SessionsPanelProps {
 	// Sessions
 	sessions: Session[];
 	activeSession: Session | null;
+	/** Owning graph coordinates — let bannered rows lazy-fetch their canvas
+	 *  preview (RFC-045). Undefined until the route params resolve. */
+	username?: string;
+	graphSlug?: string;
+	/** sessionId → canvasId for sessions whose 1:1 canvas has a banner
+	 *  screenshot (RFC-045). Rows in this map render the preview above the title. */
+	bannerCanvasIdBySession?: Map<string, string>;
 	onOpenSession: (id: string) => void;
 	onBack: () => void;
 	/** Re-run a past assistant message's query in place (re-fetches its result). */
@@ -118,6 +126,9 @@ export function SessionsPanel({
 	isRunning,
 	sessions,
 	activeSession,
+	username,
+	graphSlug,
+	bannerCanvasIdBySession,
 	onOpenSession,
 	onBack,
 	onRerun,
@@ -387,6 +398,9 @@ export function SessionsPanel({
 						sessions={sessions}
 						sort={sort}
 						search={search}
+						username={username}
+						graphSlug={graphSlug}
+						bannerCanvasIdBySession={bannerCanvasIdBySession}
 						onOpen={onOpenSession}
 						excludedLLMs={excludedLLMs}
 						onPin={onPin}
@@ -404,6 +418,9 @@ interface SessionListProps {
 	sessions: Session[];
 	sort: SessionSort;
 	search: string;
+	username?: string;
+	graphSlug?: string;
+	bannerCanvasIdBySession?: Map<string, string>;
 	onOpen: (id: string) => void;
 	excludedLLMs: ReadonlySet<string>;
 	onPin: (id: string, pinned: boolean) => void;
@@ -414,6 +431,9 @@ function SessionList({
 	sessions,
 	sort,
 	search,
+	username,
+	graphSlug,
+	bannerCanvasIdBySession,
 	onOpen,
 	excludedLLMs,
 	onPin,
@@ -453,11 +473,18 @@ function SessionList({
 					</div>
 				) : (
 					<div className="flex flex-col py-1">
-						{shown.map((session) => (
+						{shown.map((session, i) => (
 							<SessionRow
 								key={session.id}
 								session={session}
 								sort={sort}
+								username={username}
+								graphSlug={graphSlug}
+								// Preview only the two most-recent rows — enough to orient the
+								// eye without turning the whole list into a wall of images.
+								bannerCanvasId={
+									i < 2 ? bannerCanvasIdBySession?.get(session.id) : undefined
+								}
 								onClick={() => onOpen(session.id)}
 								onPin={onPin}
 								onArchive={onArchive}
@@ -480,15 +507,60 @@ function SessionList({
 	);
 }
 
+/**
+ * The canvas preview shown above a session row's title (RFC-045). Lazily pulls
+ * the (heavy) banner screenshot off the session's 1:1 canvas — the caller only
+ * mounts this for rows whose canvas advertised `hasBanner`. While it loads a
+ * skeleton holds the space; if it resolves empty nothing renders.
+ */
+function SessionBanner({
+	username,
+	graphSlug,
+	canvasId,
+}: {
+	username?: string;
+	graphSlug?: string;
+	canvasId: string;
+}) {
+	const { data: banner, isLoading } = useCanvasBannerQuery(
+		username,
+		graphSlug,
+		canvasId,
+	);
+
+	if (isLoading) {
+		return (
+			<div className="mb-1.5 aspect-video max-h-50 w-full animate-pulse rounded bg-muted" />
+		);
+	}
+	if (!banner) return null;
+
+	return (
+		<img
+			src={banner}
+			alt=""
+			loading="lazy"
+			className="mb-1.5 aspect-video max-h-50 w-full rounded border border-border object-cover"
+		/>
+	);
+}
+
 function SessionRow({
 	session,
 	sort,
+	username,
+	graphSlug,
+	bannerCanvasId,
 	onClick,
 	onPin,
 	onArchive,
 }: {
 	session: Session;
 	sort: SessionSort;
+	username?: string;
+	graphSlug?: string;
+	/** The session's 1:1 canvas id when that canvas has a banner (RFC-045). */
+	bannerCanvasId?: string;
 	onClick: () => void;
 	onPin: (id: string, pinned: boolean) => void;
 	onArchive: (id: string, archived: boolean) => void;
@@ -517,6 +589,15 @@ function SessionRow({
 			titlePadding={`group-hover:pr-12 ${session.pinned ? "pr-8" : "pr-2"}`}
 			leading={
 				<span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
+			}
+			banner={
+				bannerCanvasId ? (
+					<SessionBanner
+						username={username}
+						graphSlug={graphSlug}
+						canvasId={bannerCanvasId}
+					/>
+				) : undefined
 			}
 			title={session.title || "New session"}
 			subtitle={

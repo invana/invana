@@ -318,6 +318,16 @@ export function ExplorerPage() {
 	});
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
+	// sessionId → canvasId for canvases that have a banner screenshot (RFC-045),
+	// so the Sessions list can show each session's canvas preview above its title.
+	// Only bannered canvases are mapped; their rows lazy-fetch the (heavy) image.
+	const bannerCanvasIdBySession = useMemo(() => {
+		const m = new Map<string, string>();
+		for (const c of canvasList?.items ?? []) {
+			if (c.hasBanner) m.set(c.sessionId, c.id);
+		}
+		return m;
+	}, [canvasList]);
 	// A session's title is the single name for it and its 1:1 canvas (RFC-045):
 	// the breadcrumb and the canvas tab show the same session title, so there's no
 	// separate canvas name to keep in sync. `activeSession` is the freshest source
@@ -1148,6 +1158,9 @@ export function ExplorerPage() {
 			isRunning={isRunning}
 			sessions={sessions}
 			activeSession={activeSession}
+			username={username}
+			graphSlug={graphSlug}
+			bannerCanvasIdBySession={bannerCanvasIdBySession}
 			onOpenSession={handleOpenSession}
 			onBack={handleBack}
 			onRerun={handleRerun}

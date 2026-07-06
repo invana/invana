@@ -260,6 +260,8 @@ export interface ListRowProps {
 	onClick: () => void;
 	/** Leading slot before the title — a status dot, pin, etc. */
 	leading?: ReactNode;
+	/** Preview slot rendered above the title (e.g. a canvas banner thumbnail). */
+	banner?: ReactNode;
 	title: ReactNode;
 	subtitle?: ReactNode;
 	/** Hover-revealed action cluster (icon buttons). Rendered top-right; each
@@ -280,6 +282,7 @@ export function ListRow({
 	active,
 	onClick,
 	leading,
+	banner,
 	title,
 	subtitle,
 	actions,
@@ -298,6 +301,7 @@ export function ListRow({
 			>
 				{leading}
 				<span className="min-w-0 flex-1">
+					{banner}
 					<span className={`block truncate text-foreground ${titlePadding}`}>
 						{title}
 					</span>
