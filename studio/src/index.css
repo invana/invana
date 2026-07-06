@@ -4,7 +4,6 @@
 @import "@invana/themes/styles.css";
 @import "@invana/styling/themes/default.css";
 @import "@invana/styling/themes/tailwind.css";
-@import "@invana/styling/themes/vite.css";
 /* Preset themes (Gold / Ocean / Forest / Rose / Minimal — light+dark+system).
    presets-base registers the shared preset tokens in @theme; presets.css layers
    the per-theme `[data-theme]` blocks on top, so it MUST come after the base.

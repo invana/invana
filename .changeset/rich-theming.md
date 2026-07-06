@@ -4,8 +4,9 @@
 ---
 
 Rich theming (RFC-044). Studio's bare light/dark toggle is replaced with a full
-theme picker — the Invana theme plus Gold / Ocean / Forest / Rose / Minimal
-presets, a light/dark/system mode, and accent swatches — surfaced from a header
+theme picker — the Invana theme plus Dark Night, Amber, Ocean, Forest, Garnet
+and Minimal presets, a light/dark/system mode, and accent swatches — surfaced
+from a header
 popover (`ThemeMenu`) and a new **Appearance** tab in account settings. Changes
 apply live and are saved to the user's profile so the selection follows them
 across devices.
