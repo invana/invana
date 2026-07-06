@@ -659,15 +659,17 @@ function SessionThread({
 }
 
 function UserMessage({ message }: { message: SessionMessage }) {
-	// A canvas operation (expand/load) isn't a typed ask — render it as a compact,
-	// left-aligned header with an icon, not the user's right-side chat bubble
-	// (RFC-046). The assistant row below carries the query + counts.
+	// A canvas operation (expand/load) is still a user action, so it keeps the
+	// right-aligned user bubble — an inline icon is the only cue that it came from
+	// the canvas rather than being typed (RFC-046).
 	if (message.operation) {
 		const Icon = message.operation === "expand" ? Waypoints : Network;
 		return (
-			<div className="-mb-2 flex items-center gap-1.5 text-muted-foreground text-xs">
-				<Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
-				<span className="min-w-0 truncate">{message.content}</span>
+			<div className="flex justify-end">
+				<div className="flex max-w-[85%] items-center gap-1.5 rounded-2xl rounded-br-sm bg-secondary px-3 py-2 text-secondary-foreground">
+					<Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+					<span className="min-w-0 break-words">{message.content}</span>
+				</div>
 			</div>
 		);
 	}
