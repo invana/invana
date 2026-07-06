@@ -7,14 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@invana/ui";
-import {
-	MessageSquareText,
-	MousePointerClick,
-	Network,
-	Share2,
-	Workflow,
-} from "lucide-react";
-import type { ComponentType } from "react";
+import { CAPABILITIES } from "./sessionCapabilities";
 
 // localStorage flag so the tutorial auto-opens only on a user's first session
 // (RFC-045). Reopenable anytime via the "?" in the canvas header.
@@ -35,40 +28,6 @@ export function markSessionTutorialSeen(): void {
 		// ignore — private mode / blocked storage
 	}
 }
-
-interface Capability {
-	icon: ComponentType<{ className?: string }>;
-	title: string;
-	body: string;
-}
-
-const CAPABILITIES: Capability[] = [
-	{
-		icon: MessageSquareText,
-		title: "Query",
-		body: "Ask in plain language or write Cypher/Gremlin directly. Each answer is grounded in your graph and traceable back to the query that produced it.",
-	},
-	{
-		icon: Share2,
-		title: "Expand",
-		body: "Right-click any node to pull its neighbours — all of them, by node type, or along a specific relationship — and grow the picture outward, one hop at a time.",
-	},
-	{
-		icon: Network,
-		title: "Visualise",
-		body: "Results paint onto the session's canvas, laid out automatically. Style nodes and edges by type to make the structure you care about pop.",
-	},
-	{
-		icon: MousePointerClick,
-		title: "Interact",
-		body: "Pan, zoom, drag and select. Click a node to inspect its properties, or hover to light up its neighbourhood.",
-	},
-	{
-		icon: Workflow,
-		title: "Run complex logic",
-		body: "Chain queries and refine with follow-ups — each session keeps its own thread and its own canvas you can return to.",
-	},
-];
 
 interface Props {
 	open: boolean;

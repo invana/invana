@@ -15,6 +15,7 @@ import {
 	X,
 } from "lucide-react";
 import type { ComponentType, SyntheticEvent } from "react";
+import { useEffect, useRef } from "react";
 
 export interface CanvasTab {
 	id: string;
@@ -39,10 +40,6 @@ interface Props {
 	/** Toggle the right-side inspector panel open/closed. */
 	onToggleInspector: () => void;
 }
-
-// The "+" is modelled as a trailing, never-active tab; clicking it starts a
-// blank canvas instead of switching (see onTabChange).
-const NEW_TAB = "__new__";
 
 const stop = (e: SyntheticEvent) => e.stopPropagation();
 
@@ -171,40 +168,59 @@ export function CanvasTabsBar({
 	inspectorClosed,
 	onToggleInspector,
 }: Props) {
-	const tabConfigs = [
-		...tabs.map((t) => ({
-			value: t.id,
-			label: (
-				<TabLabel
-					title={t.title}
-					onEdit={() => onEdit(t.id)}
-					onClose={() => onClose(t.id)}
-				/>
-			),
-			content: null,
-		})),
-		{
-			value: NEW_TAB,
-			label: <Plus className="h-4 w-4" />,
-			content: null,
-			disabled: isCreating,
-		},
-	];
+	// The tab list scrolls horizontally (see headerClassName below). When the
+	// active canvas changes — notably when a freshly-created one is appended at
+	// the far right — bring its trigger into view so its title isn't left
+	// clipped at the edge.
+	const containerRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (!activeId) return;
+		containerRef.current
+			?.querySelector('[role="tab"][data-state="active"]')
+			?.scrollIntoView({ inline: "nearest", block: "nearest" });
+	}, [activeId]);
+
+	const tabConfigs = tabs.map((t) => ({
+		value: t.id,
+		label: (
+			<TabLabel
+				title={t.title}
+				onEdit={() => onEdit(t.id)}
+				onClose={() => onClose(t.id)}
+			/>
+		),
+		content: null,
+	}));
 
 	return (
-		<div className="h-[30px] shrink-0">
+		<div ref={containerRef} className="h-[30px] shrink-0">
 			<TabbedPanel
-				// Controlled: the "+" tab never becomes active (we never set
-				// activeTab to NEW_TAB); clicking it starts a blank canvas instead.
 				activeTab={activeId ?? undefined}
-				onTabChange={(v) => (v === NEW_TAB ? onNew() : onSelect(v))}
+				onTabChange={onSelect}
 				tabs={tabConfigs}
 				// TabbedPanel's Card is boxed; keep only its bottom border to match
 				// the old strip, and collapse the (empty) body so it's header-only.
 				className="[&>div]:border-x-0 [&>div]:border-t-0"
+				// Many open canvases would otherwise stretch the tab list and push
+				// the right-side actions off-screen. Let the tab list (role=tablist,
+				// the header's first child) shrink below its content and scroll
+				// horizontally, and pin the actions group (last child) so it never
+				// gets squeezed out.
+				headerClassName="[&>[role=tablist]]:min-w-0 [&>[role=tablist]]:overflow-x-auto [&>[role=tablist]]:overflow-y-hidden [&>div:last-child]:shrink-0"
 				bodyClassName="hidden"
 				headerActions={{
 					rightNavItems: [
+						// "+" lives in the pinned actions group (not the scrolling tab
+						// list) so it stays visible however many canvases are open. No
+						// onClick while a create is in flight makes it non-interactive.
+						{
+							key: "new-canvas",
+							name: "New canvas",
+							icon: Plus,
+							onClick: isCreating ? undefined : onNew,
+							iconClassName: isCreating ? "opacity-40" : undefined,
+							showSeperator: true,
+						},
 						{
 							key: "help",
 							name: "What can I do here?",

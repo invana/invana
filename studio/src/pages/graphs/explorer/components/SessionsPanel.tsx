@@ -43,6 +43,7 @@ import type {
 import { ListFilterMenu, ListPanelChrome, ListRow } from "./ListPanel";
 import { ResultBlock } from "./ResultBlock";
 import { SessionComposer } from "./SessionComposer";
+import { SessionThreadWelcome } from "./SessionThreadWelcome";
 
 // How many sessions show before the "MORE" expander kicks in.
 const VISIBLE_LIMIT = 8;
@@ -613,34 +614,38 @@ function SessionThread({
 			{/* The session title lives in the panel's tab header (a breadcrumb back to
 			    the list), so no back+title row here (RFC-045). */}
 
-			<ScrollArea className="flex-1 min-h-0">
-				<div className="flex flex-col gap-4 p-3">
-					{session.messages.map((message, idx) => {
-						if (message.role === "user") {
-							return <UserMessage key={message.id} message={message} />;
-						}
-						// The assistant reply's own question is the preceding user
-						// message — shown in the context disclosure as "this question".
-						const prev = idx > 0 ? session.messages[idx - 1] : undefined;
-						return (
-							<AssistantMessage
-								key={message.id}
-								message={message}
-								prompt={prev?.role === "user" ? prev.content : undefined}
-								onRerun={onRerun}
-								onFetchContext={onFetchContext}
-								onSelectOption={onSelectOption}
-								onTypeInstead={onTypeInstead}
-								onVote={onVote}
-								result={results[message.id]}
-								onLoadToCanvas={onLoadToCanvas}
-							/>
-						);
-					})}
-					{/* Scroll anchor — kept in view so the thread sticks to the latest. */}
-					<div ref={endRef} />
-				</div>
-			</ScrollArea>
+			{session.messages.length === 0 ? (
+				<SessionThreadWelcome />
+			) : (
+				<ScrollArea className="flex-1 min-h-0">
+					<div className="flex flex-col gap-4 p-3">
+						{session.messages.map((message, idx) => {
+							if (message.role === "user") {
+								return <UserMessage key={message.id} message={message} />;
+							}
+							// The assistant reply's own question is the preceding user
+							// message — shown in the context disclosure as "this question".
+							const prev = idx > 0 ? session.messages[idx - 1] : undefined;
+							return (
+								<AssistantMessage
+									key={message.id}
+									message={message}
+									prompt={prev?.role === "user" ? prev.content : undefined}
+									onRerun={onRerun}
+									onFetchContext={onFetchContext}
+									onSelectOption={onSelectOption}
+									onTypeInstead={onTypeInstead}
+									onVote={onVote}
+									result={results[message.id]}
+									onLoadToCanvas={onLoadToCanvas}
+								/>
+							);
+						})}
+						{/* Scroll anchor — keeps the thread stuck to the latest. */}
+						<div ref={endRef} />
+					</div>
+				</ScrollArea>
+			)}
 		</div>
 	);
 }
