@@ -534,6 +534,25 @@ export function ExplorerPage() {
 		],
 	);
 
+	// Opening a session from the list opens (and paints) its 1:1 canvas if it
+	// isn't already a tab, so the canvas area follows the session you pick. If the
+	// canvas is already the active tab, just focus the thread; a session with no
+	// canvas yet falls back to the plain thread (the restore effect repaints).
+	const handleOpenSession = useCallback(
+		(sessionId: string) => {
+			const existing = openTabs.find((t) => t.sessionId === sessionId);
+			if (existing) {
+				if (existing.id === activeCanvasId) openSession(sessionId);
+				else void openCanvasTab(existing.id);
+				return;
+			}
+			const canvas = canvasList?.items.find((c) => c.sessionId === sessionId);
+			if (canvas) void openCanvasTab(canvas.id);
+			else openSession(sessionId);
+		},
+		[openTabs, activeCanvasId, canvasList, openCanvasTab, openSession],
+	);
+
 	// "+" — a blank canvas: create a fresh session + a canvas backed by it, clear
 	// the painted graph, open it as the active tab, and make its session active so
 	// the composer's next query belongs to this canvas.
@@ -1004,7 +1023,7 @@ export function ExplorerPage() {
 			isRunning={isRunning}
 			sessions={sessions}
 			activeSession={activeSession}
-			onOpenSession={openSession}
+			onOpenSession={handleOpenSession}
 			onBack={backToList}
 			onRerun={handleRerun}
 			onFetchContext={fetchContext}
