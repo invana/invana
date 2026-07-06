@@ -1026,6 +1026,8 @@ export function ExplorerPage() {
 				graphSlug={graphSlug as string}
 				activeCanvasId={activeCanvasId}
 				onOpen={(id) => void openCanvasTab(id)}
+				onNewCanvas={() => void newCanvasTab()}
+				isCreating={createCanvas.isPending}
 				onSaveCurrent={() => void saveCurrentView()}
 				canSave={canSaveCanvas}
 				isSaving={createCanvas.isPending}

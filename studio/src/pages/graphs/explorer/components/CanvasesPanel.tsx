@@ -16,6 +16,7 @@ import {
 	Pin,
 	PinOff,
 	Plus,
+	Save,
 	Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -41,7 +42,11 @@ interface Props {
 	activeCanvasId: string | null;
 	/** Hydrate the Explorer canvas from this saved canvas. */
 	onOpen: (id: string) => void;
-	/** Snapshot the current view into a new canvas (backed by the active session). */
+	/** Start a fresh, empty canvas (new session + blank tab). The `+` action. */
+	onNewCanvas: () => void;
+	/** True while a new canvas is being created. */
+	isCreating: boolean;
+	/** Snapshot the current view into / over the active canvas. The save action. */
 	onSaveCurrent: () => void;
 	/** Whether there's a session + painted graph to save. Disables "Save view". */
 	canSave: boolean;
@@ -56,13 +61,16 @@ interface Props {
  * beside Sessions and Model. Shares the Sessions panel chrome ({@link
  * ListPanelChrome}): a paginated list of the graph's shared canvases, with
  * search, sort/archive filters, and per-row hover actions (edit · pin · archive
- * · delete). "Save view" snapshots the current canvas.
+ * · delete). The header carries two distinct actions: `+` starts a fresh blank
+ * canvas, and Save snapshots the current view onto the active canvas.
  */
 export function CanvasesPanel({
 	username,
 	graphSlug,
 	activeCanvasId,
 	onOpen,
+	onNewCanvas,
+	isCreating,
 	onSaveCurrent,
 	canSave,
 	isSaving,
@@ -114,11 +122,20 @@ export function CanvasesPanel({
 				onClose={onClose}
 				leadingActions={[
 					{
+						key: "new",
+						name: "New canvas",
+						icon: Plus,
+						onClick: () => {
+							if (!isCreating) onNewCanvas();
+						},
+					},
+					{
 						key: "save",
 						name: canSave
-							? "Save the current view as a canvas"
+							? "Save the current view to the active canvas"
 							: "Run a query first to have something to save",
-						icon: Plus,
+						icon: Save,
+						iconClassName: canSave ? undefined : "opacity-40",
 						onClick: () => {
 							if (canSave && !isSaving) onSaveCurrent();
 						},
