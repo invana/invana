@@ -1,17 +1,9 @@
 import {
 	Button,
-	DropdownMenu,
 	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
-	DropdownMenuTrigger,
 	ScrollArea,
-	SearchInput,
-	TabbedPanel,
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
@@ -26,13 +18,9 @@ import {
 	Copy,
 	Info,
 	MessageSquare,
-	PanelLeftClose,
 	Pencil,
 	Pin,
-	RefreshCw,
 	RotateCw,
-	Search,
-	SlidersHorizontal,
 	ThumbsDown,
 	ThumbsUp,
 } from "lucide-react";
@@ -52,6 +40,7 @@ import type {
 	SessionContextTurn,
 	SessionMessage,
 } from "../../../../types/session";
+import { ListFilterMenu, ListPanelChrome, ListRow } from "./ListPanel";
 import { ResultBlock } from "./ResultBlock";
 import { SessionComposer } from "./SessionComposer";
 
@@ -147,9 +136,6 @@ export function SessionsPanel({
 	isCommitting,
 }: SessionsPanelProps) {
 	const isModeller = surface === "modeller";
-	const [searchOpen, setSearchOpen] = useState(false);
-	const [search, setSearch] = useState("");
-	const [filterOpen, setFilterOpen] = useState(false);
 	// Bumped to focus the composer when the user picks "let me type instead" on a
 	// clarification (RFC-038).
 	const [composerFocus, setComposerFocus] = useState(0);
@@ -257,48 +243,6 @@ export function SessionsPanel({
 		}
 	};
 
-	const body = inDetail ? (
-		<SessionThread
-			session={activeSession}
-			onBack={onBack}
-			onRerun={onRerun}
-			onFetchContext={onFetchContext}
-			onSelectOption={handleSelectOption}
-			onTypeInstead={handleTypeInstead}
-			onVote={handleVote}
-			results={results}
-			onLoadToCanvas={onLoadToCanvas}
-		/>
-	) : (
-		<SessionList
-			sessions={sessions}
-			sort={sort}
-			search={searchOpen ? search : ""}
-			searchOpen={searchOpen}
-			onSearchChange={setSearch}
-			onOpen={onOpenSession}
-			excludedLLMs={excludedLLMs}
-			onPin={onPin}
-			onArchive={onArchive}
-		/>
-	);
-
-	const composer = (
-		<SessionComposer
-			availableLanguages={availableLanguages}
-			defaultLanguage={defaultLanguage}
-			llmProviders={llmProviders}
-			onRun={onRun}
-			onStop={onStop}
-			isRunning={isRunning}
-			sessionKey={activeSession?.id ?? null}
-			initialConfig={composerConfig}
-			promptHistory={promptHistory}
-			focusSignal={composerFocus}
-			surface={surface}
-		/>
-	);
-
 	// Modeller: a Commit bar above the composer publishes the bound draft —
 	// identical to the Modeller's Publish, in the session's context (RFC-031 D7).
 	const commitBar =
@@ -319,169 +263,92 @@ export function SessionsPanel({
 			</div>
 		) : null;
 
-	// Refresh + collapse are always available; search and filter only make sense
-	// on the list, so they sit between them when we're not inside a session.
-	const rightNavItems = [
-		{
-			key: "refresh",
-			name: "Refresh sessions",
-			icon: RefreshCw,
-			iconClassName: isRefreshing ? "animate-spin" : undefined,
-			onClick: onRefresh,
-		},
-	];
-	if (!inDetail) {
-		rightNavItems.push(
-			{
-				key: "search",
-				name: "Search sessions",
-				icon: Search,
-				iconClassName: undefined,
-				onClick: () => {
-					setSearchOpen((v) => !v);
-					setSearch("");
-				},
-			},
-			{
-				key: "filter",
-				name: "Sort & filter",
-				icon: SlidersHorizontal,
-				iconClassName: undefined,
-				onClick: () => setFilterOpen((v) => !v),
-			},
-		);
-	}
-	rightNavItems.push({
-		key: "close",
-		name: "Collapse panel",
-		icon: PanelLeftClose,
-		iconClassName: undefined,
-		onClick: onClose,
-	});
-	const headerActions = { rightNavItems };
+	const footer = (
+		<>
+			{commitBar}
+			<SessionComposer
+				availableLanguages={availableLanguages}
+				defaultLanguage={defaultLanguage}
+				llmProviders={llmProviders}
+				onRun={onRun}
+				onStop={onStop}
+				isRunning={isRunning}
+				sessionKey={activeSession?.id ?? null}
+				initialConfig={composerConfig}
+				promptHistory={promptHistory}
+				focusSignal={composerFocus}
+				surface={surface}
+			/>
+		</>
+	);
 
-	// The composer lives inside the tab content (not TabbedPanel's
-	// `footerContent`): the panel sizes its body to `calc(100% - header)` and
-	// stacks the footer below that, so a footer would overflow the panel. As a
-	// bottom-pinned flex child the body scrolls above and the composer stays put.
-	const content = (
-		<div className="relative flex flex-col h-full min-h-0">
-			{/* The panel header API only renders icon buttons, so the filter
-			    funnel toggles this controlled menu anchored to an invisible corner
-			    element — the menu floats just under the header's funnel icon. */}
-			<DropdownMenu open={filterOpen} onOpenChange={setFilterOpen}>
-				<DropdownMenuTrigger asChild>
-					<span
-						aria-hidden
-						className="pointer-events-none absolute right-2 top-0 h-0 w-0"
-					/>
-				</DropdownMenuTrigger>
-				<SessionFilterMenu
+	return (
+		<ListPanelChrome
+			tab={{ value: "sessions", label: "Sessions", icon: MessageSquare }}
+			onRefresh={onRefresh}
+			isRefreshing={isRefreshing}
+			refreshLabel="Refresh sessions"
+			searchable
+			searchLabel="Search sessions"
+			onClose={onClose}
+			// Search + filter only apply on the list, not inside a thread.
+			listControls={!inDetail}
+			filterMenu={
+				<ListFilterMenu
 					sort={sort}
-					onSortChange={onSortChange}
+					onSortChange={(s) => onSortChange(s as SessionSort)}
 					showArchived={showArchived}
 					onShowArchivedChange={onShowArchivedChange}
-					llmProviders={llmProviders}
-					excludedLLMs={excludedLLMs}
-					onToggleLLM={toggleLLM}
 					onReset={resetFilters}
-				/>
-			</DropdownMenu>
-			<div className="flex-1 min-h-0">{body}</div>
-			{commitBar}
-			<div className="shrink-0">{composer}</div>
-		</div>
-	);
-
-	return (
-		<TabbedPanel
-			defaultTab="sessions"
-			tabs={[
-				{
-					value: "sessions",
-					label: "Sessions",
-					icon: MessageSquare,
-					content,
-				},
-			]}
-			headerActions={headerActions}
-		/>
-	);
-}
-
-// ── Filter menu ─────────────────────────────────────────────────────────────
-
-const llmLabel = (p: LLMProvider) => p.model_id || p.provider;
-
-interface SessionFilterMenuProps {
-	sort: SessionSort;
-	onSortChange: (sort: SessionSort) => void;
-	showArchived: boolean;
-	onShowArchivedChange: (show: boolean) => void;
-	llmProviders: readonly LLMProvider[];
-	excludedLLMs: ReadonlySet<string>;
-	onToggleLLM: (id: string) => void;
-	onReset: () => void;
-}
-
-/** Sort + filter dropdown (the header funnel). Items keep the menu open on
- *  select so several filters can be adjusted in one pass. */
-function SessionFilterMenu({
-	sort,
-	onSortChange,
-	showArchived,
-	onShowArchivedChange,
-	llmProviders,
-	excludedLLMs,
-	onToggleLLM,
-	onReset,
-}: SessionFilterMenuProps) {
-	const keepOpen = (e: Event) => e.preventDefault();
-	return (
-		<DropdownMenuContent align="end" sideOffset={8} className="w-52">
-			<DropdownMenuRadioGroup
-				value={sort}
-				onValueChange={(v) => onSortChange(v as SessionSort)}
-			>
-				<DropdownMenuRadioItem value="created" onSelect={keepOpen}>
-					Sort by Created
-				</DropdownMenuRadioItem>
-				<DropdownMenuRadioItem value="updated" onSelect={keepOpen}>
-					Sort by Updated
-				</DropdownMenuRadioItem>
-			</DropdownMenuRadioGroup>
-
-			{llmProviders.length > 0 && (
-				<>
-					<DropdownMenuSeparator />
-					<DropdownMenuLabel className="text-muted-foreground">
-						LLM
-					</DropdownMenuLabel>
-					{llmProviders.map((p) => (
-						<DropdownMenuCheckboxItem
-							key={p.id}
-							checked={!excludedLLMs.has(p.id)}
-							onCheckedChange={() => onToggleLLM(p.id)}
-							onSelect={keepOpen}
-						>
-							{llmLabel(p)}
-						</DropdownMenuCheckboxItem>
-					))}
-				</>
-			)}
-
-			<DropdownMenuSeparator />
-			<DropdownMenuCheckboxItem
-				checked={showArchived}
-				onCheckedChange={onShowArchivedChange}
-				onSelect={keepOpen}
-			>
-				Show archived
-			</DropdownMenuCheckboxItem>
-
-			<DropdownMenuSeparator />
-			<DropdownMenuItem onSelect={onReset}>Reset</DropdownMenuItem>
-		</DropdownMenuContent>
+				>
+					{llmProviders.length > 0 && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel className="text-muted-foreground">
+								LLM
+							</DropdownMenuLabel>
+							{llmProviders.map((p) => (
+								<DropdownMenuCheckboxItem
+									key={p.id}
+									checked={!excludedLLMs.has(p.id)}
+									onCheckedChange={() => toggleLLM(p.id)}
+									onSelect={(e) => e.preventDefault()}
+								>
+									{p.model_id || p.provider}
+								</DropdownMenuCheckboxItem>
+							))}
+						</>
+					)}
+				</ListFilterMenu>
+			}
+			footer={footer}
+		>
+			{({ search }) =>
+				activeSession ? (
+					<SessionThread
+						session={activeSession}
+						onBack={onBack}
+						onRerun={onRerun}
+						onFetchContext={onFetchContext}
+						onSelectOption={handleSelectOption}
+						onTypeInstead={handleTypeInstead}
+						onVote={handleVote}
+						results={results}
+						onLoadToCanvas={onLoadToCanvas}
+					/>
+				) : (
+					<SessionList
+						sessions={sessions}
+						sort={sort}
+						search={search}
+						onOpen={onOpenSession}
+						excludedLLMs={excludedLLMs}
+						onPin={onPin}
+						onArchive={onArchive}
+					/>
+				)
+			}
+		</ListPanelChrome>
 	);
 }
 
@@ -491,8 +358,6 @@ interface SessionListProps {
 	sessions: Session[];
 	sort: SessionSort;
 	search: string;
-	searchOpen: boolean;
-	onSearchChange: (value: string) => void;
 	onOpen: (id: string) => void;
 	excludedLLMs: ReadonlySet<string>;
 	onPin: (id: string, pinned: boolean) => void;
@@ -503,8 +368,6 @@ function SessionList({
 	sessions,
 	sort,
 	search,
-	searchOpen,
-	onSearchChange,
 	onOpen,
 	excludedLLMs,
 	onPin,
@@ -527,11 +390,6 @@ function SessionList({
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
-			{searchOpen && (
-				<div className="p-2 border-b border-border shrink-0">
-					<SearchInput value={search} onChange={onSearchChange} />
-				</div>
-			)}
 			{/* Radix's viewport wraps children in a `display:table; min-width:100%`
 			    div, which sizes to the widest row and defeats `truncate` (titles
 			    spill past the panel edge instead of clipping). Forcing the wrapper
@@ -605,92 +463,80 @@ function SessionRow({
 
 	const hasCounts = session.nodeCount + session.edgeCount > 0;
 
-	// The main click target is a real <button>; the pin/archive actions are
-	// absolutely-positioned siblings (not nested) so the markup stays valid.
 	return (
-		<div className="group relative flex items-stretch hover:bg-accent transition-colors">
-			<button
-				type="button"
-				onClick={onClick}
-				className="flex flex-1 min-w-0 items-start gap-2.5 text-left px-4 py-2"
-			>
+		<ListRow
+			onClick={onClick}
+			// Reserve room for the action buttons only when they're visible: on
+			// hover (both buttons), or always for a pinned row (the pin stays shown).
+			titlePadding={`group-hover:pr-12 ${session.pinned ? "pr-8" : "pr-2"}`}
+			leading={
 				<span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
-				<span className="min-w-0 flex-1">
-					{/* Reserve room for the action buttons only when they're visible:
-					    on hover (both buttons), or always for a pinned row (the pin
-					    stays shown). Otherwise the title uses the full width. */}
-					<span
-						className={`block text-foreground truncate group-hover:pr-12 ${
-							session.pinned ? "pr-8" : "pr-2"
-						}`}
-					>
-						{session.title}
-					</span>
-					<span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-						{hasCounts && (
-							<>
-								<span className="text-blue-400" title="nodes">
-									{session.nodeCount}
-								</span>
-								<span className="text-purple-400" title="relationships">
-									{session.edgeCount}
-								</span>
-								<span>·</span>
-							</>
+			}
+			title={session.title}
+			subtitle={
+				<>
+					{hasCounts && (
+						<>
+							<span className="text-blue-400" title="nodes">
+								{session.nodeCount}
+							</span>
+							<span className="text-purple-400" title="relationships">
+								{session.edgeCount}
+							</span>
+							<span>·</span>
+						</>
+					)}
+					{/* Show the timestamp the list is ordered by, so the visible times
+					    always match the sort (otherwise a Created-sorted list shows
+					    updated times and the order looks arbitrary). */}
+					<span title={sort === "created" ? "Created" : "Last updated"}>
+						{formatRelativeTime(
+							sort === "created" ? session.createdAt : session.updatedAt,
 						)}
-						{/* Show the timestamp the list is ordered by, so the visible
-					    times always match the sort (otherwise a Created-sorted list
-					    shows updated times and the order looks arbitrary). */}
-						<span title={sort === "created" ? "Created" : "Last updated"}>
-							{formatRelativeTime(
-								sort === "created" ? session.createdAt : session.updatedAt,
-							)}
-						</span>
 					</span>
-				</span>
-			</button>
-
-			{/* Pinned rows always show the (filled) pin; otherwise both actions
-			    reveal on hover. Archive flips to a restore action when archived. */}
-			<div className="absolute right-2 top-1.5 flex items-center gap-0.5">
-				<Button
-					variant="ghost"
-					size="icon"
-					className={`h-6 w-6 ${
-						session.pinned
-							? "text-foreground"
-							: "text-muted-foreground opacity-0 group-hover:opacity-100"
-					}`}
-					onClick={(e) => {
-						e.stopPropagation();
-						onPin(session.id, !session.pinned);
-					}}
-					title={session.pinned ? "Unpin" : "Pin"}
-				>
-					{session.pinned ? (
-						<Pin className="w-3.5 h-3.5 fill-current" />
-					) : (
-						<Pin className="w-3.5 h-3.5" />
-					)}
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100"
-					onClick={(e) => {
-						e.stopPropagation();
-						onArchive(session.id, !session.archived);
-					}}
-					title={session.archived ? "Unarchive" : "Archive"}
-				>
-					{session.archived ? (
-						<ArchiveRestore className="w-3.5 h-3.5" />
-					) : (
-						<Archive className="w-3.5 h-3.5" />
-					)}
-				</Button>
-			</div>
-		</div>
+				</>
+			}
+			actions={
+				<>
+					{/* Pinned rows always show the (filled) pin; otherwise both actions
+					    reveal on hover. Archive flips to a restore action when archived. */}
+					<Button
+						variant="ghost"
+						size="icon"
+						className={`h-6 w-6 ${
+							session.pinned
+								? "text-foreground"
+								: "text-muted-foreground opacity-0 group-hover:opacity-100"
+						}`}
+						onClick={(e) => {
+							e.stopPropagation();
+							onPin(session.id, !session.pinned);
+						}}
+						title={session.pinned ? "Unpin" : "Pin"}
+					>
+						<Pin
+							className={`w-3.5 h-3.5 ${session.pinned ? "fill-current" : ""}`}
+						/>
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100"
+						onClick={(e) => {
+							e.stopPropagation();
+							onArchive(session.id, !session.archived);
+						}}
+						title={session.archived ? "Unarchive" : "Archive"}
+					>
+						{session.archived ? (
+							<ArchiveRestore className="w-3.5 h-3.5" />
+						) : (
+							<Archive className="w-3.5 h-3.5" />
+						)}
+					</Button>
+				</>
+			}
+		/>
 	);
 }
 
