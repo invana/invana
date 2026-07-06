@@ -174,9 +174,6 @@ export function ExplorerPage() {
 	// The sessions panel is just the Explorer's entry in the shared single-open
 	// left-rail param (`?settings=sessions`) — same toggle as every other icon.
 	const settingsPanel = useSettingsPanel();
-	// The left column is present whenever any rail panel is docked (sessions or a
-	// settings section) — this is what actually drives the canvas remount.
-	const leftPanelPresent = settingsPanel.isOpen && !settingsPanel.expanded;
 	const setPanelParam = useCallback(
 		(key: string, value: string | null) => {
 			const next = new URLSearchParams(searchParams);
@@ -272,26 +269,13 @@ export function ExplorerPage() {
 		setBackendState(b);
 	}, []);
 
-	// Showing/hiding the left column flips AppLayoutV2's `leftSection` between
-	// present/absent, which moves the canvas to a different parent and remounts
-	// it — rebuilding the store from the GraphLayer seed and so dropping
-	// node-expand additions (those live only in the store, not in `seedData`).
-	// Reseed with the full current contents whenever the column toggles, mirroring
-	// the backend-switch reseed above, so the remounted canvas keeps the whole
-	// graph. Key off the column's actual presence (sessions panel OR a docked
-	// settings section), not just the sessions param, so docking a settings
-	// section over an already-open sessions panel — which doesn't remount —
-	// doesn't churn the canvas. Skips the initial mount. (Re-open can come from
-	// outside this page — the left rail — so we key off state, not a handler.)
-	const leftPanelToggleSeen = useRef(false);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: fire on the left-column toggle; reseed reads the latest contents from the ref
-	useEffect(() => {
-		if (!leftPanelToggleSeen.current) {
-			leftPanelToggleSeen.current = true;
-			return;
-		}
-		setSeedData(adaptItems(canvasDataRef.current));
-	}, [leftPanelPresent]);
+	// Toggling the left column no longer remounts the canvas: GraphDetail keeps the
+	// main (canvas) panel mounted at a stable position and renders the sidebar as a
+	// conditional sibling, so the live store — positions and all — survives a panel
+	// open/close. No reseed is needed here (an unconditional reseed would itself
+	// re-feed `<GraphLayer data>` and force a destructive relayout on every toggle,
+	// which is exactly the jump this avoids). Only genuine remounts — the
+	// backend switch above, which keys `ExplorerCanvas` on `backend` — reseed.
 
 	// Open canvas tabs (RFC-043) — the main-section tab strip. Each tab is a
 	// canvas backed 1:1 by a session; a tab is "active" when its backing session

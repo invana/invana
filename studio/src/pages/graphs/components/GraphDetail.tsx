@@ -1,4 +1,9 @@
-import { AppLayoutV2 } from "@invana/themes";
+import { AppLayoutV1 } from "@invana/themes";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@invana/ui";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { GraphSectionSwitcher } from "../../../components/header/GraphSectionSwitcher";
@@ -185,13 +190,83 @@ export function GraphDetail({
 
 	const effectiveRightSection = settingsExpanded ? undefined : rightSection;
 
+	// We build the horizontal split ourselves on top of AppLayoutV1 (which takes a
+	// raw `main`) rather than using AppLayoutV2's `leftSection`/`mainSection` props.
+	// AppLayoutV2 renders the main content through a `leftSection ? <Group>…</Group>
+	// : <div>…</div>` ternary, so toggling the left panel swaps the *element type* at
+	// the main content's parent position — React unmounts and remounts the whole
+	// subtree, including the Explorer/Modeller canvas, which then rebuilds its store
+	// from the seed and re-runs layout from origin on every panel open/close.
+	//
+	// Here the `editor-panel` holding the main content is ALWAYS mounted at a
+	// stable position, and the sidebar is a *conditional sibling before it* — the
+	// exact pattern AppLayoutV2 itself uses for its right (auxiliary) panel, which
+	// is why toggling the inspector never remounts the canvas. React reconciles the
+	// stable-position editor panel across sidebar toggles, so the canvas survives
+	// and keeps its live positions. Structure/classNames otherwise mirror
+	// AppLayoutV2 so sizing behaviour is unchanged.
+	const mainArea = (
+		<div className="flex-1 h-full">
+			<ResizablePanelGroup orientation="horizontal" id="main-layout">
+				<ResizablePanel
+					id="left-main-area"
+					defaultSize={effectiveRightSection ? "800px" : undefined}
+					minSize={effectiveRightSection ? "400px" : undefined}
+				>
+					<ResizablePanelGroup orientation="horizontal" id="editor-horizontal">
+						{effectiveLeftSection && (
+							<>
+								<ResizablePanel
+									id="sidebar-panel"
+									defaultSize={effectiveLeftSection.defaultSize ?? "250px"}
+									minSize={effectiveLeftSection.minSize ?? "150px"}
+									maxSize={effectiveLeftSection.maxSize ?? "500px"}
+									collapsible={effectiveLeftSection.collapsible ?? true}
+									groupResizeBehavior="preserve-pixel-size"
+								>
+									<div className="h-full overflow-auto bg-card">
+										{effectiveLeftSection.content}
+									</div>
+								</ResizablePanel>
+								<ResizableHandle withHandle className="w-1" />
+							</>
+						)}
+						<ResizablePanel
+							id="editor-panel"
+							defaultSize={effectiveMainSection.defaultSize ?? "600px"}
+							minSize={effectiveMainSection.minSize ?? "400px"}
+						>
+							<div className="h-full overflow-auto">
+								{effectiveMainSection.content}
+							</div>
+						</ResizablePanel>
+					</ResizablePanelGroup>
+				</ResizablePanel>
+				{effectiveRightSection && (
+					<>
+						<ResizableHandle withHandle className="w-1" />
+						<ResizablePanel
+							id="auxiliary-panel"
+							defaultSize={effectiveRightSection.defaultSize ?? "300px"}
+							minSize={effectiveRightSection.minSize ?? "200px"}
+							maxSize={effectiveRightSection.maxSize ?? "600px"}
+							collapsible={effectiveRightSection.collapsible ?? true}
+						>
+							<div className="h-full overflow-auto bg-card">
+								{effectiveRightSection.content}
+							</div>
+						</ResizablePanel>
+					</>
+				)}
+			</ResizablePanelGroup>
+		</div>
+	);
+
 	return (
-		<AppLayoutV2
+		<AppLayoutV1
 			leftNav={leftNav}
 			header={header}
-			leftSection={effectiveLeftSection}
-			mainSection={effectiveMainSection}
-			rightSection={effectiveRightSection}
+			main={mainArea}
 			footer={{
 				className: "!h-[25px]",
 				left: (
