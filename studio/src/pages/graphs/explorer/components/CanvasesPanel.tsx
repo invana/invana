@@ -16,7 +16,6 @@ import {
 	Pin,
 	PinOff,
 	Plus,
-	Save,
 	Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -46,12 +45,6 @@ interface Props {
 	onNewCanvas: () => void;
 	/** True while a new canvas is being created. */
 	isCreating: boolean;
-	/** Snapshot the current view into / over the active canvas. The save action. */
-	onSaveCurrent: () => void;
-	/** Whether there's a session + painted graph to save. Disables "Save view". */
-	canSave: boolean;
-	/** True while a save is in flight. */
-	isSaving: boolean;
 	/** Collapse the panel, handing the freed width back to the canvas. */
 	onClose: () => void;
 }
@@ -61,8 +54,8 @@ interface Props {
  * beside Sessions and Model. Shares the Sessions panel chrome ({@link
  * ListPanelChrome}): a paginated list of the graph's shared canvases, with
  * search, sort/archive filters, and per-row hover actions (edit · pin · archive
- * · delete). The header carries two distinct actions: `+` starts a fresh blank
- * canvas, and Save snapshots the current view onto the active canvas.
+ * · delete). The header's `+` starts a fresh blank canvas; the current view is
+ * persisted automatically when its tab is switched or closed.
  */
 export function CanvasesPanel({
 	username,
@@ -71,9 +64,6 @@ export function CanvasesPanel({
 	onOpen,
 	onNewCanvas,
 	isCreating,
-	onSaveCurrent,
-	canSave,
-	isSaving,
 	onClose,
 }: Props) {
 	const [sort, setSort] = useState<CanvasSort>("updated");
@@ -127,17 +117,6 @@ export function CanvasesPanel({
 						icon: Plus,
 						onClick: () => {
 							if (!isCreating) onNewCanvas();
-						},
-					},
-					{
-						key: "save",
-						name: canSave
-							? "Save the current view to the active canvas"
-							: "Run a query first to have something to save",
-						icon: Save,
-						iconClassName: canSave ? undefined : "opacity-40",
-						onClick: () => {
-							if (canSave && !isSaving) onSaveCurrent();
 						},
 					},
 				]}

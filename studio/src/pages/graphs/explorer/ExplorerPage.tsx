@@ -531,61 +531,6 @@ export function ExplorerPage() {
 		[openTabs, activeSessionId, persistActiveCanvas, openCanvasTab, backToList],
 	);
 
-	// The panel's "Save view": update the active canvas in place, or (no active
-	// canvas) create one from the active session and open it as a tab.
-	const saveCurrentView = useCallback(async () => {
-		if (activeCanvasId) {
-			await persistActiveCanvas();
-			toast.success("Canvas saved.");
-			return;
-		}
-		if (!activeSession) {
-			toast.error("Open a session and run a query before saving a canvas.");
-			return;
-		}
-		const latest = [...activeSession.messages]
-			.reverse()
-			.find((m) => m.role === "assistant" && m.sourceQuery);
-		try {
-			const created = await createCanvas.mutateAsync({
-				session_id: activeSession.id,
-				snapshot: { items: canvasDataRef.current },
-				source_query: latest?.sourceQuery,
-				positions: capturePositions(),
-				settings: { backend, magnet },
-			});
-			setOpenTabs((tabs) =>
-				tabs.some((t) => t.id === created.id)
-					? tabs
-					: [
-							...tabs,
-							{
-								id: created.id,
-								sessionId: activeSession.id,
-								title: created.title,
-							},
-						],
-			);
-			restoredRef.current = activeSession.id;
-			toast.success("Canvas saved.");
-		} catch (err) {
-			toast.error(
-				err instanceof ApiError ? err.message : "Failed to save canvas.",
-			);
-		}
-	}, [
-		activeCanvasId,
-		persistActiveCanvas,
-		activeSession,
-		createCanvas,
-		capturePositions,
-		backend,
-		magnet,
-	]);
-
-	const canSaveCanvas =
-		!!activeCanvasId || (!!activeSession && canvasData.length > 0);
-
 	// ── Node expand / graph traversal (RFC-035) ────────────────────────────────
 	// Append expanded neighbours straight to the live store (the non-destructive
 	// path) rather than re-feeding the whole dataset through `<GraphLayer data>`,
@@ -1015,9 +960,6 @@ export function ExplorerPage() {
 				onOpen={(id) => void openCanvasTab(id)}
 				onNewCanvas={() => void newCanvasTab()}
 				isCreating={createCanvas.isPending}
-				onSaveCurrent={() => void saveCurrentView()}
-				canSave={canSaveCanvas}
-				isSaving={createCanvas.isPending}
 				onClose={closeSessions}
 			/>
 		) : (
