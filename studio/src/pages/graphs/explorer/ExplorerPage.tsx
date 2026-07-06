@@ -35,11 +35,7 @@ import {
 	startInteraction,
 	withInteraction,
 } from "../../../services/telemetry/tracer";
-import type {
-	Canvas,
-	CanvasStyling,
-	CanvasSummary,
-} from "../../../types/canvas";
+import type { Canvas, CanvasStyling } from "../../../types/canvas";
 import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type {
 	QueryResponse,
@@ -310,17 +306,13 @@ export function ExplorerPage() {
 	// edited in the StylingPanel, applied live by the renderer + persisted.
 	const [styling, setStyling] = useState<CanvasStyling>({});
 	const [stylingOpen, setStylingOpen] = useState(false);
-	// Fresh titles/purposes for the tab labels + edit dialog, kept in sync as the
-	// list is invalidated by renames/archives (broad page, archived included).
+	// Canvas list — used to resolve an existing session's canvas when opening it
+	// from the sessions list (`handleOpenSession`). Titles/purposes for the tabs
+	// and edit dialog come from the session + a direct canvas fetch, not this.
 	const { data: canvasList } = useCanvasesQuery(username, graphSlug, {
 		limit: 100,
 		includeArchived: true,
 	});
-	const canvasById = useMemo(() => {
-		const m = new Map<string, CanvasSummary>();
-		for (const c of canvasList?.items ?? []) m.set(c.id, c);
-		return m;
-	}, [canvasList]);
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
 	// A session's title is the single name for it and its 1:1 canvas (RFC-045):
@@ -341,6 +333,13 @@ export function ExplorerPage() {
 			})),
 		[openTabs, sessionTitleById],
 	);
+
+	// The session behind the tab being edited (its title is what the edit dialog
+	// renames). Read from `openTabs` — always present for an open tab, unlike the
+	// canvas list cache which can lag a freshly created canvas.
+	const editingSessionId = editingCanvasId
+		? (openTabs.find((t) => t.id === editingCanvasId)?.sessionId ?? null)
+		: null;
 
 	// Persist a styling edit onto the active canvas (RFC-045); applied live via
 	// the `styling` state passed to <ExplorerCanvas>.
@@ -1012,15 +1011,10 @@ export function ExplorerPage() {
 				open={editingCanvasId !== null}
 				username={username as string}
 				graphSlug={graphSlug as string}
-				canvas={
-					editingCanvasId ? (canvasById.get(editingCanvasId) ?? null) : null
-				}
+				canvasId={editingCanvasId}
+				sessionId={editingSessionId}
 				sessionTitle={
-					editingCanvasId
-						? (sessionTitleById.get(
-								canvasById.get(editingCanvasId)?.sessionId ?? "",
-							) ?? "")
-						: ""
+					editingSessionId ? (sessionTitleById.get(editingSessionId) ?? "") : ""
 				}
 				onRenameSession={renameSession}
 				onClose={() => setEditingCanvasId(null)}

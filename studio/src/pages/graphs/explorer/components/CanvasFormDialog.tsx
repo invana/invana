@@ -14,14 +14,15 @@ import { FormError } from "../../../../components/forms/FormError";
 import { useUpdateCanvasMutation } from "../../../../hooks/queries/useCanvases";
 import { canvasesApi } from "../../../../services/api/canvases";
 import { ApiError } from "../../../../services/api/client";
-import type { CanvasSummary } from "../../../../types/canvas";
 
 interface Props {
 	open: boolean;
 	username: string;
 	graphSlug: string;
-	/** The canvas being edited — its purpose (instructions) + banner preview. */
-	canvas: CanvasSummary | null;
+	/** The canvas being edited — its purpose (instructions) + banner live here. */
+	canvasId: string | null;
+	/** The canvas's session — the rename target. */
+	sessionId: string | null;
 	/**
 	 * Current title of the canvas's session. The title names the session and its
 	 * 1:1 canvas (RFC-045), so it's owned by the session, not the canvas.
@@ -42,7 +43,8 @@ export function CanvasFormDialog({
 	open,
 	username,
 	graphSlug,
-	canvas,
+	canvasId,
+	sessionId,
 	sessionTitle,
 	onRenameSession,
 	onClose,
@@ -55,37 +57,43 @@ export function CanvasFormDialog({
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!open || !canvas) return;
+		if (!open) return;
+		// The title is session-owned, so seed it straight from the prop — no wait on
+		// the canvas fetch, and it loads even before the canvas list cache catches
+		// a freshly created canvas.
 		setTitle(sessionTitle);
-		setInstructions(canvas.instructions);
-		setError(null);
-		// Fetch the full canvas for its banner preview (RFC-045) — the list summary
-		// omits the heavy image. Best-effort: no preview if it isn't there yet.
+		setInstructions("");
 		setBanner(null);
+		setError(null);
+		if (!canvasId) return;
+		// Fetch the full canvas for its purpose + banner preview (RFC-045); the list
+		// summary is lossy/lagging, so read the source of truth directly.
 		let cancelled = false;
-		if (canvas.hasBanner) {
-			canvasesApi
-				.get(username, graphSlug, canvas.id)
-				.then((c) => !cancelled && setBanner(c.banner ?? null))
-				.catch(() => {});
-		}
+		canvasesApi
+			.get(username, graphSlug, canvasId)
+			.then((c) => {
+				if (cancelled) return;
+				setInstructions(c.instructions ?? "");
+				setBanner(c.banner ?? null);
+			})
+			.catch(() => {});
 		return () => {
 			cancelled = true;
 		};
-	}, [open, canvas, sessionTitle, username, graphSlug]);
+	}, [open, canvasId, sessionTitle, username, graphSlug]);
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		if (!canvas) return;
+		if (!canvasId) return;
 		setError(null);
 		try {
 			// The title renames the session (the shared name); the purpose stays on
 			// the canvas. Skip the rename when unchanged so a purpose-only edit
 			// doesn't touch the session.
-			if (title !== sessionTitle) {
-				await onRenameSession(canvas.sessionId, title);
+			if (title !== sessionTitle && sessionId) {
+				await onRenameSession(sessionId, title);
 			}
-			await update.mutateAsync({ id: canvas.id, data: { instructions } });
+			await update.mutateAsync({ id: canvasId, data: { instructions } });
 			onClose();
 		} catch (err) {
 			const message =
@@ -121,6 +129,7 @@ export function CanvasFormDialog({
 							<Input
 								id="canvasTitle"
 								required
+								placeholder="New session"
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
 							/>
