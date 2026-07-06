@@ -15,7 +15,30 @@ export interface CanvasSnapshot {
 /** Node id → world position, captured from the live canvas store on save. */
 export type CanvasPositions = Record<string, { x: number; y: number }>;
 
-/** List-row shape — omits the heavy render blobs. */
+/** Visual rules for one node type (RFC-045). All optional — unset uses defaults. */
+export interface NodeTypeStyle {
+	/** Hex color, e.g. "#7c3aed". */
+	color?: string;
+	/** Property key to draw as the node's label (falls back to the default). */
+	labelProperty?: string;
+	/** Node size (px). */
+	size?: number;
+}
+
+/** Visual rules for one edge type (RFC-045). */
+export interface EdgeTypeStyle {
+	color?: string;
+	labelProperty?: string;
+	width?: number;
+}
+
+/** A canvas's per node/edge-TYPE-NAME visual rules (RFC-045). */
+export interface CanvasStyling {
+	nodeTypes?: Record<string, NodeTypeStyle>;
+	edgeTypes?: Record<string, EdgeTypeStyle>;
+}
+
+/** List-row shape — omits the heavy render blobs (snapshot/positions/banner). */
 export interface CanvasSummary {
 	id: string;
 	sessionId: string;
@@ -23,6 +46,8 @@ export interface CanvasSummary {
 	createdById: string;
 	title: string;
 	instructions: string;
+	styling: CanvasStyling;
+	hasBanner: boolean;
 	pinned: boolean;
 	archived: boolean;
 	createdAt: Date;
@@ -37,4 +62,6 @@ export interface Canvas extends CanvasSummary {
 	filters: Record<string, unknown>;
 	positions: CanvasPositions;
 	settings: Record<string, unknown>;
+	/** Base64 PNG data URL of the canvas screenshot; undefined until captured. */
+	banner?: string;
 }

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FormError } from "../../../../components/forms/FormError";
 import { useUpdateCanvasMutation } from "../../../../hooks/queries/useCanvases";
+import { canvasesApi } from "../../../../services/api/canvases";
 import { ApiError } from "../../../../services/api/client";
 import type { CanvasSummary } from "../../../../types/canvas";
 
@@ -40,6 +41,7 @@ export function CanvasFormDialog({
 
 	const [title, setTitle] = useState("");
 	const [instructions, setInstructions] = useState("");
+	const [banner, setBanner] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -47,7 +49,20 @@ export function CanvasFormDialog({
 		setTitle(canvas.title);
 		setInstructions(canvas.instructions);
 		setError(null);
-	}, [open, canvas]);
+		// Fetch the full canvas for its banner preview (RFC-045) — the list summary
+		// omits the heavy image. Best-effort: no preview if it isn't there yet.
+		setBanner(null);
+		let cancelled = false;
+		if (canvas.hasBanner) {
+			canvasesApi
+				.get(username, graphSlug, canvas.id)
+				.then((c) => !cancelled && setBanner(c.banner ?? null))
+				.catch(() => {});
+		}
+		return () => {
+			cancelled = true;
+		};
+	}, [open, canvas, username, graphSlug]);
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -78,6 +93,15 @@ export function CanvasFormDialog({
 							what a viewer should take from it.
 						</DialogDescription>
 					</DialogHeader>
+					{banner && (
+						<div className="mt-4 overflow-hidden rounded-md border border-border bg-muted/30">
+							<img
+								src={banner}
+								alt="Canvas preview"
+								className="h-32 w-full object-contain"
+							/>
+						</div>
+					)}
 					<div className="space-y-4 pt-4">
 						<div className="space-y-2">
 							<Label htmlFor="canvasTitle">Title</Label>

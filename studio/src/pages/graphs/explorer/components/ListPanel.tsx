@@ -50,7 +50,7 @@ export interface ListHeaderAction {
 
 export interface ListPanelChromeProps {
 	/** The single persistent tab (label + icon) this rail shows. */
-	tab: { value: string; label: string; icon?: ElementType };
+	tab: { value: string; label: ReactNode; icon?: ElementType };
 	/** Body renderer — receives the live search string (empty when the search
 	 *  box is closed) so the list can filter against it. */
 	children: (ctx: { search: string }) => ReactNode;

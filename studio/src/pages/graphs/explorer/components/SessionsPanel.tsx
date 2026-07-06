@@ -12,8 +12,8 @@ import {
 import {
 	Archive,
 	ArchiveRestore,
-	ArrowLeft,
 	Check,
+	ChevronRight,
 	Code,
 	Copy,
 	Info,
@@ -147,6 +147,44 @@ export function SessionsPanel({
 	);
 
 	const inDetail = activeSession !== null;
+
+	// When inside a thread, the tab header becomes a breadcrumb: "Sessions" (click
+	// to return to the list — the tab *is* the back affordance, so there's no
+	// separate back button) › the open session's title, ellipsized. On the list
+	// it's just "Sessions" (RFC-045).
+	const tabLabel =
+		inDetail && activeSession ? (
+			<span className="flex min-w-0 items-center gap-1">
+				{/* biome-ignore lint/a11y/useSemanticElements: a native <button> can't nest inside the Radix TabsTrigger <button> hosting this label. */}
+				<span
+					role="button"
+					tabIndex={0}
+					className="shrink-0 hover:underline"
+					onPointerDown={(e) => e.stopPropagation()}
+					onClick={(e) => {
+						e.stopPropagation();
+						onBack();
+					}}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" || e.key === " ") {
+							e.stopPropagation();
+							onBack();
+						}
+					}}
+				>
+					Sessions
+				</span>
+				<ChevronRight className="h-3 w-3 shrink-0 opacity-60" />
+				<span
+					className="min-w-0 truncate"
+					title={activeSession.title || "New session"}
+				>
+					{activeSession.title || "New session"}
+				</span>
+			</span>
+		) : (
+			"Sessions"
+		);
 
 	const toggleLLM = (id: string) => {
 		setExcludedLLMs((prev) => {
@@ -284,7 +322,7 @@ export function SessionsPanel({
 
 	return (
 		<ListPanelChrome
-			tab={{ value: "sessions", label: "Sessions", icon: MessageSquare }}
+			tab={{ value: "sessions", label: tabLabel, icon: MessageSquare }}
 			onRefresh={onRefresh}
 			isRefreshing={isRefreshing}
 			refreshLabel="Refresh sessions"
@@ -327,7 +365,6 @@ export function SessionsPanel({
 				activeSession ? (
 					<SessionThread
 						session={activeSession}
-						onBack={onBack}
 						onRerun={onRerun}
 						onFetchContext={onFetchContext}
 						onSelectOption={handleSelectOption}
@@ -544,7 +581,6 @@ function SessionRow({
 
 interface SessionThreadProps {
 	session: Session;
-	onBack: () => void;
 	onRerun: (messageId: string) => void;
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	onSelectOption: (text: string) => void;
@@ -556,7 +592,6 @@ interface SessionThreadProps {
 
 function SessionThread({
 	session,
-	onBack,
 	onRerun,
 	onFetchContext,
 	onSelectOption,
@@ -575,22 +610,8 @@ function SessionThread({
 
 	return (
 		<div className="flex flex-col h-full min-h-0">
-			{/* Back + title bar — the panel header keeps the persistent "Sessions"
-			    tab; this row identifies the session you're inside. */}
-			<div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-6 w-6 shrink-0"
-					onClick={onBack}
-					title="Back to sessions"
-				>
-					<ArrowLeft className="w-4 h-4" />
-				</Button>
-				<span className="uppercase tracking-wide font-medium text-foreground truncate">
-					{session.title || "New session"}
-				</span>
-			</div>
+			{/* The session title lives in the panel's tab header (a breadcrumb back to
+			    the list), so no back+title row here (RFC-045). */}
 
 			<ScrollArea className="flex-1 min-h-0">
 				<div className="flex flex-col gap-4 p-3">

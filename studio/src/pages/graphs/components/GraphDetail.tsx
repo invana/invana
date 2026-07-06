@@ -75,7 +75,7 @@ interface GraphDetailProps {
 // generative SessionsPanel (`messages`, RFC-031).
 const NATIVE_SECTIONS: Partial<Record<GraphDetailSection, SettingsSection[]>> =
 	{
-		explorer: ["sessions", "model", "canvases"],
+		explorer: ["sessions", "model"],
 		modeller: ["schema", "messages"],
 	};
 const ALL_NATIVE_SECTIONS: SettingsSection[] = [

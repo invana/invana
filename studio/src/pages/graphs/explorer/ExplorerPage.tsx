@@ -35,7 +35,11 @@ import {
 	startInteraction,
 	withInteraction,
 } from "../../../services/telemetry/tracer";
-import type { Canvas, CanvasSummary } from "../../../types/canvas";
+import type {
+	Canvas,
+	CanvasStyling,
+	CanvasSummary,
+} from "../../../types/canvas";
 import { type QueryLanguage, isSetupComplete } from "../../../types/graphs";
 import type {
 	QueryResponse,
@@ -50,7 +54,6 @@ import { GraphDetail } from "../components/GraphDetail";
 import { RendererCapabilityBanner } from "../components/RendererCapabilityBanner";
 import { CanvasFormDialog } from "./components/CanvasFormDialog";
 import { CanvasTabsBar } from "./components/CanvasTabsBar";
-import { CanvasesPanel } from "./components/CanvasesPanel";
 import { ExpandFineTunePanel } from "./components/ExpandFineTunePanel";
 import {
 	ACTIVE_LAYOUT_ID,
@@ -61,9 +64,16 @@ import {
 } from "./components/ExplorerCanvas";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { SchemaBrowser } from "./components/SchemaBrowser";
+import {
+	SessionTutorialModal,
+	hasSeenSessionTutorial,
+	markSessionTutorialSeen,
+} from "./components/SessionTutorialModal";
 import { SessionsPanel } from "./components/SessionsPanel";
+import { type StyleTypeInfo, StylingPanel } from "./components/StylingPanel";
 import { useExpandNode } from "./hooks/useExpandNode";
 import { useSessions } from "./hooks/useSessions";
+import { captureBanner } from "./lib/captureBanner";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather
@@ -283,6 +293,19 @@ export function ExplorerPage() {
 	>([]);
 	const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
 	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
+	// Session tutorial (RFC-045) — auto-open once on a user's first session,
+	// reopenable from the "?" in the canvas header.
+	const [tutorialOpen, setTutorialOpen] = useState(
+		() => !hasSeenSessionTutorial(),
+	);
+	const closeTutorial = useCallback(() => {
+		markSessionTutorialSeen();
+		setTutorialOpen(false);
+	}, []);
+	// Per-type styling (RFC-045) for the active canvas — hydrated from it on open,
+	// edited in the StylingPanel, applied live by the renderer + persisted.
+	const [styling, setStyling] = useState<CanvasStyling>({});
+	const [stylingOpen, setStylingOpen] = useState(false);
 	// Fresh titles/purposes for the tab labels + edit dialog, kept in sync as the
 	// list is invalidated by renames/archives (broad page, archived included).
 	const { data: canvasList } = useCanvasesQuery(username, graphSlug, {
@@ -304,6 +327,42 @@ export function ExplorerPage() {
 			})),
 		[openTabs, canvasById],
 	);
+
+	// Persist a styling edit onto the active canvas (RFC-045); applied live via
+	// the `styling` state passed to <ExplorerCanvas>.
+	const handleStylingChange = useCallback(
+		(next: CanvasStyling) => {
+			setStyling(next);
+			if (activeCanvasId && username && graphSlug) {
+				void canvasesApi.update(username, graphSlug, activeCanvasId, {
+					styling: next,
+				});
+			}
+		},
+		[activeCanvasId, username, graphSlug],
+	);
+
+	// Node/edge types currently on the canvas (+ their property keys) — the rows
+	// the StylingPanel offers. Derived from the painted data (RFC-045).
+	const styleTypes = useMemo(() => {
+		const nodes = new Map<string, Set<string>>();
+		const edges = new Map<string, Set<string>>();
+		for (const item of canvasData) {
+			const map =
+				item.type === "vertex" ? nodes : item.type === "edge" ? edges : null;
+			if (!map) continue;
+			const label = String(item.label ?? "");
+			if (!label) continue;
+			const set = map.get(label) ?? new Set<string>();
+			for (const k of Object.keys(item.properties ?? {})) set.add(k);
+			map.set(label, set);
+		}
+		const toArr = (m: Map<string, Set<string>>): StyleTypeInfo[] =>
+			[...m.entries()]
+				.map(([name, props]) => ({ name, properties: [...props].sort() }))
+				.sort((a, b) => a.name.localeCompare(b.name));
+		return { nodeTypes: toArr(nodes), edgeTypes: toArr(edges) };
+	}, [canvasData]);
 
 	// Clicked node/edge id, lifted from the canvas by <InspectorSelectionBridge>.
 	const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -402,6 +461,7 @@ export function ExplorerPage() {
 		}
 		setSeedData(seed);
 		if (typeof c.settings?.magnet === "boolean") setMagnet(c.settings.magnet);
+		setStyling(c.styling ?? {});
 	}, []);
 
 	// "Save on blur" — persist the current view (snapshot + positions + latest
@@ -412,11 +472,16 @@ export function ExplorerPage() {
 		const src = [...(activeSession?.messages ?? [])]
 			.reverse()
 			.find((m) => m.role === "assistant" && m.sourceQuery)?.sourceQuery;
+		// Grab a downscaled screenshot of the current view for the banner (RFC-045).
+		// Only when there's something painted, so a blank canvas keeps its old banner.
+		const banner =
+			canvasDataRef.current.length > 0 ? await captureBanner(canvas) : null;
 		try {
 			await canvasesApi.update(username, graphSlug, activeCanvasId, {
 				snapshot: { items: canvasDataRef.current },
 				positions: capturePositions(),
 				...(src ? { source_query: src } : {}),
+				...(banner ? { banner } : {}),
 				settings: { backend, magnet },
 			});
 		} catch {
@@ -428,6 +493,7 @@ export function ExplorerPage() {
 		graphSlug,
 		activeSession,
 		capturePositions,
+		canvas,
 		backend,
 		magnet,
 	]);
@@ -484,6 +550,7 @@ export function ExplorerPage() {
 			setCanvasData([]);
 			setSelectedId(null);
 			setSeedData({ nodes: [], edges: [] });
+			setStyling({});
 			setOpenTabs((tabs) => [
 				...tabs,
 				{ id: created.id, sessionId: session.id, title: created.title },
@@ -871,6 +938,8 @@ export function ExplorerPage() {
 				onEdit={(id) => setEditingCanvasId(id)}
 				onNew={() => void newCanvasTab()}
 				isCreating={createCanvas.isPending}
+				onHelp={() => setTutorialOpen(true)}
+				onStyle={() => setStylingOpen((o) => !o)}
 				inspectorClosed={inspectorClosed}
 				onToggleInspector={inspectorClosed ? openInspector : closeInspector}
 			/>
@@ -885,6 +954,15 @@ export function ExplorerPage() {
 					backend={backend}
 					expand={expandHandlers}
 					onShowDetail={handleShowDetail}
+					styling={styling}
+				/>
+				<StylingPanel
+					open={stylingOpen}
+					onClose={() => setStylingOpen(false)}
+					nodeTypes={styleTypes.nodeTypes}
+					edgeTypes={styleTypes.edgeTypes}
+					styling={styling}
+					onChange={handleStylingChange}
 				/>
 				{fineTuneVertex && (
 					<ExpandFineTunePanel
@@ -906,6 +984,7 @@ export function ExplorerPage() {
 				}
 				onClose={() => setEditingCanvasId(null)}
 			/>
+			<SessionTutorialModal open={tutorialOpen} onClose={closeTutorial} />
 		</div>
 	);
 
@@ -944,22 +1023,14 @@ export function ExplorerPage() {
 		/>
 	);
 
+	// RFC-045: Sessions is the single primary sidebar list; a session's canvas is
+	// its 1:1 visual layer (painted on open), so there's no separate Canvases panel.
 	const leftContent =
 		settingsPanel.section === "model" ? (
 			<SchemaBrowser
 				version={activeVersion}
 				isLoading={activeVersionLoading}
 				backend={backend}
-				onClose={closeSessions}
-			/>
-		) : settingsPanel.section === "canvases" ? (
-			<CanvasesPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				activeCanvasId={activeCanvasId}
-				onOpen={(id) => void openCanvasTab(id)}
-				onNewCanvas={() => void newCanvasTab()}
-				isCreating={createCanvas.isPending}
 				onClose={closeSessions}
 			/>
 		) : (

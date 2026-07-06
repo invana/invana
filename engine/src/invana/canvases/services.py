@@ -89,6 +89,7 @@ async def create_canvas(
         filters=payload.filters or {},
         positions=payload.positions or {},
         settings=payload.settings or {},
+        styling=payload.styling or {},
     )
     await CanvasStore().add(session, canvas)
     await emit_event(

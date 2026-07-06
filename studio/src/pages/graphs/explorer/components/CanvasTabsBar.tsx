@@ -5,6 +5,7 @@ import {
 	TabbedPanel,
 } from "@invana/ui";
 import {
+	HelpCircle,
 	PanelRightClose,
 	PanelRightOpen,
 	Pencil,
@@ -29,6 +30,10 @@ interface Props {
 	onNew: () => void;
 	/** True while a new-canvas create is in flight (disables "+"). */
 	isCreating: boolean;
+	/** Open the session tutorial ("what you can do"). */
+	onHelp: () => void;
+	/** Toggle the per-type styling panel. */
+	onStyle: () => void;
 	/** Inspector panel currently collapsed? Drives the show/hide toggle. */
 	inspectorClosed: boolean;
 	/** Toggle the right-side inspector panel open/closed. */
@@ -161,6 +166,8 @@ export function CanvasTabsBar({
 	onEdit,
 	onNew,
 	isCreating,
+	onHelp,
+	onStyle,
 	inspectorClosed,
 	onToggleInspector,
 }: Props) {
@@ -199,13 +206,16 @@ export function CanvasTabsBar({
 				headerActions={{
 					rightNavItems: [
 						{
+							key: "help",
+							name: "What can I do here?",
+							icon: HelpCircle,
+							onClick: onHelp,
+						},
+						{
 							key: "display",
-							name: "Display settings",
-							icon: comingSoon(
-								SlidersHorizontal,
-								"Display settings",
-								"Canvas display options are coming soon.",
-							),
+							name: "Styling",
+							icon: SlidersHorizontal,
+							onClick: onStyle,
 						},
 						{
 							key: "find",

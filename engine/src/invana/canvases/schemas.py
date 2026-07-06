@@ -26,6 +26,7 @@ class CanvasCreate(BaseModel):
     filters: dict | None = None
     positions: dict | None = None
     settings: dict | None = None
+    styling: dict | None = None
 
 
 class CanvasUpdate(BaseModel):
@@ -39,6 +40,9 @@ class CanvasUpdate(BaseModel):
     filters: dict | None = None
     positions: dict | None = None
     settings: dict | None = None
+    styling: dict | None = None
+    # Base64 PNG data URL of the canvas screenshot (RFC-045).
+    banner: str | None = None
     pinned: bool | None = None
     archived: bool | None = None
 
@@ -57,6 +61,8 @@ class CanvasSummary(BaseModel):
     created_by_id: str
     title: str
     instructions: str
+    styling: dict
+    has_banner: bool
     pinned: bool
     archived: bool
     created_at: datetime
@@ -72,6 +78,7 @@ class CanvasDetail(CanvasSummary):
     filters: dict
     positions: dict
     settings: dict
+    banner: str | None = None
 
 
 class CanvasListResponse(BaseModel):

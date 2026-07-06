@@ -82,6 +82,12 @@ class Canvas(Base):
     filters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     positions: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)  # {nodeId: {x, y}}
     settings: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)  # {backend, magnet, ...}
+    # Per node/edge-TYPE-NAME visual rules (RFC-045): {nodeTypes: {...}, edgeTypes: {...}}.
+    # Name-keyed (not a type FK) so styling survives schema version bumps (RFC-019).
+    styling: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    # Base64 PNG data URL of the downscaled canvas screenshot (RFC-045). Null
+    # until first captured; excluded from the list summary (heavy).
+    banner: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Organization flags, mirroring Session. Pinned floats to the top; archived is
     # a soft-hide excluded from the default list (Decision 9).
@@ -90,3 +96,9 @@ class Canvas(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+    @property
+    def has_banner(self) -> bool:
+        """Whether a banner screenshot exists — surfaced in the list summary so
+        rows can lazy-load the (heavy) image rather than shipping it inline."""
+        return bool(self.banner)

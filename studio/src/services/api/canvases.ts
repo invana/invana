@@ -10,6 +10,7 @@ import type {
 	Canvas,
 	CanvasPositions,
 	CanvasSnapshot,
+	CanvasStyling,
 	CanvasSummary,
 } from "../../types/canvas";
 import { request } from "./client";
@@ -23,6 +24,8 @@ interface ApiSummary {
 	created_by_id: string;
 	title: string;
 	instructions: string;
+	styling: CanvasStyling;
+	has_banner: boolean;
 	pinned: boolean;
 	archived: boolean;
 	created_at: string;
@@ -36,6 +39,7 @@ interface ApiDetail extends ApiSummary {
 	filters: Record<string, unknown>;
 	positions: CanvasPositions;
 	settings: Record<string, unknown>;
+	banner: string | null;
 }
 
 interface ApiListResponse {
@@ -65,9 +69,10 @@ export interface CanvasCreateBody {
 	filters?: Record<string, unknown>;
 	positions?: CanvasPositions;
 	settings?: Record<string, unknown>;
+	styling?: CanvasStyling;
 }
 
-/** Partial update — any subset (rename, re-snapshot, pin/archive, …). */
+/** Partial update — any subset (rename, re-snapshot, style, banner, pin/archive, …). */
 export interface CanvasUpdateBody {
 	title?: string;
 	instructions?: string;
@@ -77,6 +82,8 @@ export interface CanvasUpdateBody {
 	filters?: Record<string, unknown>;
 	positions?: CanvasPositions;
 	settings?: Record<string, unknown>;
+	styling?: CanvasStyling;
+	banner?: string;
 	pinned?: boolean;
 	archived?: boolean;
 }
@@ -96,6 +103,8 @@ function toSummary(c: ApiSummary): CanvasSummary {
 		createdById: c.created_by_id,
 		title: c.title,
 		instructions: c.instructions,
+		styling: c.styling ?? {},
+		hasBanner: c.has_banner ?? false,
 		pinned: c.pinned,
 		archived: c.archived,
 		createdAt: new Date(c.created_at),
@@ -112,6 +121,7 @@ function toCanvas(d: ApiDetail): Canvas {
 		filters: d.filters ?? {},
 		positions: d.positions ?? {},
 		settings: d.settings ?? {},
+		banner: d.banner ?? undefined,
 	};
 }
 

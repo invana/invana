@@ -18,7 +18,6 @@ import {
 	Canvas as CanvasRoot,
 	ClickSelectBehaviour,
 	ClickViewBehaviour,
-	ColorByLabelBehaviour,
 	D3ForceLayout,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -101,12 +100,13 @@ import {
 	ZoomIn,
 	ZoomOut,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
 	type InteractionRef,
 	endInteraction,
 	startChild,
 } from "../../../../services/telemetry/tracer";
+import type { CanvasStyling } from "../../../../types/canvas";
 import type { ExpandRequest } from "../../../../types/traversal";
 import { readCanvasThemeConfig } from "../../canvasTheme";
 
@@ -152,6 +152,36 @@ const PALETTE = [
 	0x9ca3af, 0xef4444, 0xf59e0b, 0xeab308, 0x10b981, 0x06b6d4, 0x3b82f6,
 	0x8b5cf6, 0xec4899, 0x14b8a6, 0xa3e635,
 ] as const;
+
+// Defaults applied only once the user has styled *some* type (so an unstyled
+// canvas keeps the theme defaults untouched).
+const DEFAULT_NODE_SIZE = 16;
+const DEFAULT_EDGE_COLOR = 0x94a3b8;
+const DEFAULT_EDGE_WIDTH = 1.5;
+
+/** "#7c3aed" / "#abc" → 0x7c3aed. Undefined for empty/invalid. */
+function hexToNum(hex?: string): number | undefined {
+	if (!hex) return undefined;
+	const h = hex.replace(/^#/, "");
+	const full =
+		h.length === 3
+			? h
+					.split("")
+					.map((c) => c + c)
+					.join("")
+			: h;
+	const n = Number.parseInt(full, 16);
+	return Number.isNaN(n) ? undefined : n;
+}
+
+// Stable palette colour per type name — the default when no explicit styling
+// colour is set (replaces ColorByLabelBehaviour, RFC-045).
+function stableColorForType(type: string | undefined): number {
+	if (!type) return PALETTE[0];
+	let h = 0;
+	for (let i = 0; i < type.length; i++) h = (h * 31 + type.charCodeAt(i)) >>> 0;
+	return PALETTE[h % PALETTE.length];
+}
 
 // Forces for the registered active layout (run on every query repaint by
 // `<AutoLayoutBridge>` and on every node-expand). `animate: true` writes
@@ -826,6 +856,9 @@ interface ExplorerCanvasProps {
 	/** Open the right-side detail (Inspector) for a node/edge id — wired to the
 	 *  "Node details" / "Edge details" context-menu items. */
 	onShowDetail?: (id: string) => void;
+	/** Per node/edge-type visual rules (RFC-045). Colour is always driven from
+	 *  here (with a palette fallback); size/label/edge rules apply once set. */
+	styling?: CanvasStyling;
 }
 
 export function ExplorerCanvas({
@@ -837,7 +870,53 @@ export function ExplorerCanvas({
 	backend,
 	expand,
 	onShowDetail,
+	styling,
 }: ExplorerCanvasProps) {
+	// Resolver-based node/edge styles derived from the canvas's per-type rules.
+	// Colour always resolves (explicit → palette fallback); size / label-property
+	// and edge colour/width apply only once the user sets them, so an unstyled
+	// canvas is visually unchanged.
+	const { nodeStyle, edgeStyle } = useMemo(() => {
+		const nt = styling?.nodeTypes ?? {};
+		const et = styling?.edgeTypes ?? {};
+		const hasNodeSize = Object.values(nt).some((s) => s?.size != null);
+		const hasEdgeColor = Object.values(et).some((s) => !!s?.color);
+		const hasEdgeWidth = Object.values(et).some((s) => s?.width != null);
+		const nodeStyle = {
+			bgFill: (n: GraphNode) =>
+				hexToNum(nt[String(n.type ?? "")]?.color) ??
+				stableColorForType(n.type ? String(n.type) : undefined),
+			labelText: (n: GraphNode) => {
+				const lp = nt[String(n.type ?? "")]?.labelProperty;
+				if (lp) {
+					const v = (n.data as Record<string, unknown> | undefined)?.[lp];
+					if (v != null && v !== "") return String(v);
+				}
+				return nodeLabelText(n);
+			},
+			...(hasNodeSize
+				? {
+						size: (n: GraphNode) =>
+							nt[String(n.type ?? "")]?.size ?? DEFAULT_NODE_SIZE,
+					}
+				: {}),
+		};
+		const edgeStyle = {
+			...(hasEdgeColor
+				? {
+						strokeColor: (e: graph.GraphEdge) =>
+							hexToNum(et[String(e.type ?? "")]?.color) ?? DEFAULT_EDGE_COLOR,
+					}
+				: {}),
+			...(hasEdgeWidth
+				? {
+						strokeWidth: (e: graph.GraphEdge) =>
+							et[String(e.type ?? "")]?.width ?? DEFAULT_EDGE_WIDTH,
+					}
+				: {}),
+		};
+		return { nodeStyle, edgeStyle };
+	}, [styling]);
 	return (
 		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
 		// flipping `preference` only takes effect on a fresh mount — keying on it
@@ -851,18 +930,13 @@ export function ExplorerCanvas({
 			className="w-full h-full"
 		>
 			<BackgroundLayer id="background" />
+			{/* Colour/label/size resolve from the canvas's per-type styling (RFC-045);
+			    colour has a stable palette fallback, replacing ColorByLabelBehaviour. */}
 			<GraphLayer
 				id="graph"
 				data={data}
-				node={{ style: { labelText: nodeLabelText } }}
-			/>
-
-			{/* Colour nodes by label (default `nodeLabel = node.type`). Edges keep
-			    their theme stroke colour. */}
-			<ColorByLabelBehaviour
-				targetLayerId="graph"
-				palette={PALETTE}
-				colorEdges={false}
+				node={{ style: nodeStyle }}
+				edge={{ style: edgeStyle }}
 			/>
 
 			{/* Registers the active layout under ACTIVE_LAYOUT_ID (config-first:
