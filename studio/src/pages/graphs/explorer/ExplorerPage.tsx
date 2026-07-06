@@ -12,7 +12,6 @@ import type {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ConfirmDialog } from "../../../components/ConfirmDialog";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
 import {
@@ -283,7 +282,6 @@ export function ExplorerPage() {
 		{ id: string; sessionId: string; title: string }[]
 	>([]);
 	const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
-	const [closingCanvasId, setClosingCanvasId] = useState<string | null>(null);
 	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
 	// Fresh titles/purposes for the tab labels + edit dialog, kept in sync as the
 	// list is invalidated by renames/archives (broad page, archived included).
@@ -924,7 +922,7 @@ export function ExplorerPage() {
 				tabs={tabItems}
 				activeId={activeCanvasId}
 				onSelect={(id) => void openCanvasTab(id)}
-				onClose={(id) => setClosingCanvasId(id)}
+				onClose={(id) => void closeCanvasTab(id)}
 				onEdit={(id) => setEditingCanvasId(id)}
 				onNew={() => void newCanvasTab()}
 				isCreating={createCanvas.isPending}
@@ -962,17 +960,6 @@ export function ExplorerPage() {
 					editingCanvasId ? (canvasById.get(editingCanvasId) ?? null) : null
 				}
 				onClose={() => setEditingCanvasId(null)}
-			/>
-			<ConfirmDialog
-				open={closingCanvasId !== null}
-				title="Close this canvas tab?"
-				description="The canvas stays saved in the Canvases list — this just closes the tab. Reopen it any time from the Canvases panel."
-				confirmLabel="Close tab"
-				onConfirm={() => {
-					if (closingCanvasId) void closeCanvasTab(closingCanvasId);
-					setClosingCanvasId(null);
-				}}
-				onOpenChange={(o) => !o && setClosingCanvasId(null)}
 			/>
 		</div>
 	);
