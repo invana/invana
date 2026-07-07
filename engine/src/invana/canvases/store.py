@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.canvases.models import Canvas, CanvasState
@@ -91,3 +91,29 @@ class CanvasStateStore:
     async def add(self, session: AsyncSession, obj: CanvasState) -> None:
         session.add(obj)
         await session.flush()
+
+    async def prune_for_canvas(self, session: AsyncSession, *, canvas_id: str, keep: int) -> int:
+        """Delete all but the newest ``keep`` states of a canvas (RFC-047 retention).
+
+        A no-op when ``keep`` <= 0 (keep-all). Returns the number deleted.
+        """
+        if keep <= 0:
+            return 0
+        # Ids to keep: the newest `keep` by created_at (id as a stable tiebreak).
+        keep_ids = (
+            select(CanvasState.id)
+            .where(CanvasState.canvas_id == canvas_id)
+            .order_by(CanvasState.created_at.desc(), CanvasState.id.desc())
+            .limit(keep)
+        )
+        result = await session.execute(
+            delete(CanvasState)
+            .where(
+                CanvasState.canvas_id == canvas_id,
+                CanvasState.id.not_in(keep_ids),
+            )
+            # Fire-and-forget bulk delete — don't try to sync in-memory ORM state
+            # (the subquery criteria isn't Python-evaluable anyway).
+            .execution_options(synchronize_session=False)
+        )
+        return int(result.rowcount or 0)

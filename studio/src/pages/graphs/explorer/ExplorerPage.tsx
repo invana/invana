@@ -15,13 +15,11 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { SetupRequiredBanner } from "../../../components/settings/SetupRequiredBanner";
 import { useSettingsPanel } from "../../../components/settings/useSettingsPanel";
-import {
-	useCreateCanvasStateMutation,
-	useForkCanvasStateMutation,
-} from "../../../hooks/queries/useCanvasStates";
+import { useCreateCanvasStateMutation } from "../../../hooks/queries/useCanvasStates";
 import {
 	useCanvasesQuery,
 	useCreateCanvasMutation,
+	useUpdateCanvasMutation,
 } from "../../../hooks/queries/useCanvases";
 import {
 	useGraphConnectionQuery,
@@ -29,6 +27,7 @@ import {
 } from "../../../hooks/queries/useGraphs";
 import { useLLMProvidersQuery } from "../../../hooks/queries/useLLMProviders";
 import { useActiveVersionQuery } from "../../../hooks/queries/useSchema";
+import { canvasStatesApi } from "../../../services/api/canvasStates";
 import { canvasesApi } from "../../../services/api/canvases";
 import { ApiError } from "../../../services/api/client";
 import { sessionsApi } from "../../../services/api/sessions";
@@ -80,11 +79,7 @@ import { SessionsPanel } from "./components/SessionsPanel";
 import { type StyleTypeInfo, StylingPanel } from "./components/StylingPanel";
 import { useExpandNode } from "./hooks/useExpandNode";
 import { useSessions } from "./hooks/useSessions";
-import {
-	STATE_THUMB_MAX_EDGE,
-	captureBanner,
-	downscaleDataUrl,
-} from "./lib/captureBanner";
+import { STATE_THUMB_MAX_EDGE, captureBanner } from "./lib/captureBanner";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather
@@ -97,9 +92,9 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
 
-// Banner capture is expensive (PixiJS extract + downscale), so it's throttled:
-// at most one fresh capture per this window. Also the cadence of the periodic
-// autosave that keeps the sessions-list preview current (RFC-047 Part A).
+// Banner capture (a GPU image export) isn't free, so it's throttled: at most one
+// fresh capture per this window. Also the cadence of the periodic autosave that
+// keeps the sessions-list preview current (RFC-047 Part A).
 const BANNER_MIN_INTERVAL_MS = 10_000;
 
 // Map query-result items (vertices / edges) to the canvas engine's GraphData
@@ -320,11 +315,12 @@ export function ExplorerPage() {
 		username ?? "",
 		graphSlug ?? "",
 	);
-	const forkCanvasState = useForkCanvasStateMutation(
-		username ?? "",
-		graphSlug ?? "",
-	);
+	// Used to refresh a canvas' sessions-list banner (and invalidate its cached
+	// preview) whenever we capture a new history state — so the banner always
+	// shows the latest image (RFC-047).
+	const updateCanvas = useUpdateCanvasMutation(username ?? "", graphSlug ?? "");
 	const [historyOpen, setHistoryOpen] = useState(false);
+	const [isRestoring, setIsRestoring] = useState(false);
 	// Session tutorial (RFC-045) — auto-open once on a user's first session,
 	// reopenable from the "?" in the canvas header.
 	const [tutorialOpen, setTutorialOpen] = useState(
@@ -506,12 +502,43 @@ export function ExplorerPage() {
 		const store = canvas?.layers.get<GraphLayer>("graph")?.store;
 		const positions: Record<string, { x: number; y: number }> = {};
 		if (!store) return positions;
-		for (const item of canvasDataRef.current) {
-			if (item.type !== "vertex") continue;
-			const p = store.getPosition(String(item.id));
-			if (p) positions[String(item.id)] = { x: p.x, y: p.y };
+		// Iterate the live store (source of truth for what's painted) rather than
+		// canvasData, which can lag/diverge across restore + backend remount.
+		for (const n of store.nodes()) {
+			const p = store.getPosition(String(n.id));
+			if (p) positions[String(n.id)] = { x: p.x, y: p.y };
 		}
 		return positions;
+	}, [canvas]);
+
+	// The items actually painted on the live canvas, reconstructed from the
+	// GraphLayer store. `adaptItems` maps a QueryResultItem's label→node.type and
+	// properties→node.data, so this is the exact inverse. Used as the source of
+	// truth for saves, because canvasData can go stale (e.g. a canvas restored by
+	// re-running its base query paints the store but leaves canvasData empty).
+	const itemsFromStore = useCallback((): QueryResultItem[] => {
+		const store = canvas?.layers.get<GraphLayer>("graph")?.store;
+		if (!store || store.nodeCount() === 0) return [];
+		const items: QueryResultItem[] = [];
+		for (const n of store.nodes()) {
+			items.push({
+				id: String(n.id),
+				type: "vertex",
+				label: typeof n.type === "string" ? n.type : "",
+				properties: (n.data as Record<string, unknown>) ?? {},
+			});
+		}
+		for (const e of store.edges()) {
+			items.push({
+				id: String(e.id),
+				type: "edge",
+				label: typeof e.type === "string" ? e.type : "",
+				source: String(e.source),
+				target: String(e.target),
+				properties: (e.data as Record<string, unknown>) ?? {},
+			});
+		}
+		return items;
 	}, [canvas]);
 
 	// Paint the Explorer canvas from a saved canvas: repaint its snapshot and seed
@@ -547,7 +574,7 @@ export function ExplorerPage() {
 			) {
 				return lastBannerUrlRef.current;
 			}
-			const b = await captureBanner(canvas);
+			const b = captureBanner(canvas);
 			if (b) {
 				lastBannerAtRef.current = now;
 				lastBannerUrlRef.current = b;
@@ -565,11 +592,16 @@ export function ExplorerPage() {
 	const persistActiveCanvas = useCallback(
 		async (opts?: { banner?: "force" | "throttle" | "off" }) => {
 			if (!activeCanvasId || !username || !graphSlug) return;
-			// Never overwrite a saved snapshot with an empty one: a reopen paints the
-			// (empty) snapshot, and a blur-save of that emptiness used to wipe the
-			// record for good, leaving canvases permanently blank. With nothing
-			// painted there's nothing worth persisting, so skip.
-			if (canvasDataRef.current.length === 0) return;
+			// Source of truth for what's painted: canvasData, falling back to the live
+			// store when they've diverged (a canvas restored by re-running its base
+			// query paints the store but leaves canvasData empty). Never overwrite a
+			// saved snapshot with an empty one — with nothing painted there's nothing
+			// worth persisting, so skip.
+			const items =
+				canvasDataRef.current.length > 0
+					? canvasDataRef.current
+					: itemsFromStore();
+			if (items.length === 0) return;
 			// The base query to restore the canvas from — the latest real query, never
 			// an expand/load operation turn (those don't repaint the whole canvas).
 			const src = [...(activeSession?.messages ?? [])]
@@ -580,7 +612,7 @@ export function ExplorerPage() {
 			const banner = await captureBannerThrottled(opts?.banner ?? "force");
 			try {
 				await canvasesApi.update(username, graphSlug, activeCanvasId, {
-					snapshot: { items: canvasDataRef.current },
+					snapshot: { items },
 					positions: capturePositions(),
 					...(src ? { source_query: src } : {}),
 					...(banner ? { banner } : {}),
@@ -597,6 +629,7 @@ export function ExplorerPage() {
 			activeSession,
 			capturePositions,
 			captureBannerThrottled,
+			itemsFromStore,
 			backend,
 			magnet,
 		],
@@ -607,66 +640,134 @@ export function ExplorerPage() {
 	// positions + banner. Best-effort: a failure never disturbs the turn. Reads
 	// the *ref* for the active canvas so a delayed capture targets the right one.
 	const captureCanvasState = useCallback(
-		(kind: CanvasStateKind, opts?: { messageId?: string }) => {
-			setTimeout(async () => {
-				const canvasId = activeCanvasIdRef.current;
-				const items = canvasDataRef.current;
-				if (!canvasId || !username || !graphSlug || items.length === 0) return;
-				const nodeCount = items.filter((i) => i.type === "vertex").length;
-				const edgeCount = items.length - nodeCount;
-				const verb =
-					kind === "query"
-						? "Ran query"
-						: kind === "expand"
-							? "Expanded neighbours"
-							: "Loaded result";
-				const label = `${verb} — ${nodeCount} nodes, ${edgeCount} edges`;
-				const src = [...(activeSession?.messages ?? [])]
-					.reverse()
-					.find(
-						(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
-					)?.sourceQuery;
-				// Reuse the throttled full-size banner but store a much smaller
-				// thumbnail for the history timeline (RFC-047 storage optimisation) —
-				// a cheap re-downscale, no extra PixiJS extract.
-				const full = await captureBannerThrottled("throttle");
-				const banner = full
-					? await downscaleDataUrl(full, STATE_THUMB_MAX_EDGE)
-					: null;
-				try {
-					await createCanvasState.mutateAsync({
-						canvasId,
-						body: {
-							kind,
-							label,
-							snapshot: { items },
-							positions: capturePositions(),
-							...(src ? { source_query: src } : {}),
-							styling,
-							settings: { backend, magnet },
-							...(banner ? { banner } : {}),
-							node_count: nodeCount,
-							edge_count: edgeCount,
-							...(opts?.messageId ? { message_id: opts.messageId } : {}),
-						},
-					});
-				} catch {
-					// Best-effort history — a failed capture just skips this state.
-				}
-			}, 1200);
+		(
+			kind: CanvasStateKind,
+			opts?: { messageId?: string; immediate?: boolean },
+		): Promise<{ ok: true } | { ok: false; reason: string }> => {
+			// Auto-captures wait for the force layout / render to settle; a manual
+			// save (immediate) fires now — the canvas is already settled.
+			const delay = opts?.immediate ? 0 : 1200;
+			return new Promise((resolve) => {
+				setTimeout(async () => {
+					const canvasId = activeCanvasIdRef.current;
+					if (!canvasId || !username || !graphSlug) {
+						return resolve({ ok: false, reason: "No active canvas." });
+					}
+					if (!canvas) {
+						return resolve({
+							ok: false,
+							reason: "Canvas isn't ready yet — try again in a moment.",
+						});
+					}
+					// Count straight from the live store — the source of truth for what's
+					// painted (canvasData can lag/diverge across restore + remount).
+					const store = canvas.layers.get<GraphLayer>("graph")?.store;
+					const nodeCount = store?.nodeCount() ?? 0;
+					const edgeCount = store?.edgeCount() ?? 0;
+					if (nodeCount === 0) {
+						return resolve({
+							ok: false,
+							reason: "Nothing painted on the canvas to save.",
+						});
+					}
+					// The faithful, engine-native snapshot (camera / styling / positions /
+					// layer data) — restored later via `canvas.importState`.
+					if (typeof canvas.exportState !== "function") {
+						return resolve({
+							ok: false,
+							reason:
+								"This canvas build can't export state (update @invana/canvas).",
+						});
+					}
+					let snapshot: Record<string, unknown>;
+					try {
+						snapshot = canvas.exportState() as unknown as Record<
+							string,
+							unknown
+						>;
+					} catch (e) {
+						console.error("[canvas-state] exportState() threw", e);
+						return resolve({
+							ok: false,
+							reason: "Couldn't snapshot the canvas — see console.",
+						});
+					}
+					const verb =
+						kind === "query"
+							? "Ran query"
+							: kind === "expand"
+								? "Expanded neighbours"
+								: kind === "load"
+									? "Loaded result"
+									: "Saved snapshot";
+					const label = `${verb} — ${nodeCount} nodes, ${edgeCount} edges`;
+					const src = [...(activeSession?.messages ?? [])]
+						.reverse()
+						.find(
+							(m) => m.role === "assistant" && m.sourceQuery && !m.operation,
+						)?.sourceQuery;
+					// A small, self-contained thumbnail for the history timeline (RFC-047
+					// storage optimisation) — the engine's export sizes it directly via
+					// maxSize, so no separate downscale step.
+					const banner = captureBanner(canvas, STATE_THUMB_MAX_EDGE);
+					try {
+						await createCanvasState.mutateAsync({
+							canvasId,
+							body: {
+								kind,
+								label,
+								// Engine-native state (positions live inside it, so no separate
+								// `positions`); restored via importState.
+								snapshot,
+								...(src ? { source_query: src } : {}),
+								styling,
+								settings: { backend, magnet },
+								...(banner ? { banner } : {}),
+								node_count: nodeCount,
+								edge_count: edgeCount,
+								...(opts?.messageId ? { message_id: opts.messageId } : {}),
+							},
+						});
+						resolve({ ok: true });
+					} catch (e) {
+						console.error("[canvas-state] save failed", e);
+						resolve({ ok: false, reason: "Failed to save — see console." });
+						return;
+					}
+					// History just changed → refresh the canvas' sessions-list banner to
+					// this same (latest) capture, and invalidate its cached preview so the
+					// list shows it immediately. Best-effort, non-blocking.
+					const listBanner = captureBanner(canvas);
+					if (listBanner) {
+						updateCanvas
+							.mutateAsync({ id: canvasId, data: { banner: listBanner } })
+							.catch(() => {});
+					}
+				}, delay);
+			});
 		},
 		[
 			username,
 			graphSlug,
 			activeSession,
-			capturePositions,
-			captureBannerThrottled,
+			canvas,
 			createCanvasState,
+			updateCanvas,
 			styling,
 			backend,
 			magnet,
 		],
 	);
+
+	// Explicit "Save current state" (RFC-047): capture the live canvas now as a
+	// `manual` state, toasting the outcome. Lets the user snapshot a good layout
+	// on demand, independent of the per-turn auto-captures.
+	const handleSaveState = useCallback(async () => {
+		if (!activeCanvasId) return;
+		const res = await captureCanvasState("manual", { immediate: true });
+		if (res.ok) toast.success("Canvas state saved to history.");
+		else toast.error(res.reason);
+	}, [activeCanvasId, captureCanvasState]);
 
 	// Open a canvas as a tab: save the outgoing one, hydrate this one, add the tab,
 	// and switch the active session to its backing session (queries then belong to
@@ -933,7 +1034,7 @@ export function ExplorerPage() {
 					toast.info("No more neighbours to load.");
 				} else {
 					// The canvas grew — capture a version (RFC-047).
-					captureCanvasState("expand");
+					void captureCanvasState("expand");
 					if (activeSessionId) {
 						// The engine recorded an expand turn — refetch the thread so it shows.
 						refresh();
@@ -1048,7 +1149,7 @@ export function ExplorerPage() {
 				execution_time_ms: result.execution_time_ms,
 			});
 			// Capture the loaded canvas as a version (RFC-047).
-			captureCanvasState("load", { messageId: message.id });
+			void captureCanvasState("load", { messageId: message.id });
 		},
 		[handleLoadToCanvas, recordLoad, captureCanvasState],
 	);
@@ -1073,7 +1174,7 @@ export function ExplorerPage() {
 				// First paint of the new session's canvas — capture it as the opening
 				// version (RFC-047). The canvas tab registers below; the delayed
 				// capture reads the (by-then active) canvas from the ref.
-				captureCanvasState("query");
+				void captureCanvasState("query");
 			}
 			if (canvasedSessionsRef.current.has(sessionId)) return;
 			if (openTabs.some((t) => t.sessionId === sessionId)) return;
@@ -1233,22 +1334,69 @@ export function ExplorerPage() {
 	}, [persistActiveCanvas, backToList]);
 
 	// "Go back in time" (RFC-047): fork the chosen state into a fresh session +
-	// canvas (the current one is untouched), then open it as a new tab.
+	// canvas (the current one is untouched). We hydrate the *live* canvas from the
+	// saved engine snapshot via `canvas.importState` (faithful — camera / styling /
+	// positions), then let the normal autosave persist it onto the new canvas row
+	// in the standard {items} shape (so it reopens through the usual path — no
+	// format drift). We deliberately don't touch `seedData` here: importState
+	// mutates the store directly, and a competing setData would double-seed the
+	// WebGPU renderer (a known crash).
 	const handleForkState = useCallback(
 		async (stateId: string) => {
-			if (!activeCanvasId) return;
+			if (!activeCanvasId || !canvas || !username || !graphSlug) return;
+			setIsRestoring(true);
 			try {
-				const created = await forkCanvasState.mutateAsync({
-					canvasId: activeCanvasId,
+				const state = await canvasStatesApi.get(
+					username,
+					graphSlug,
+					activeCanvasId,
 					stateId,
+				);
+				const session = await sessionsApi.create(username, graphSlug, {});
+				const created = await createCanvas.mutateAsync({
+					session_id: session.id,
+					snapshot: { items: [] },
+					settings: { backend, magnet },
 				});
+				// Hydrate the live canvas from the saved engine state.
+				canvas.importState(
+					state.snapshot as Parameters<typeof canvas.importState>[0],
+				);
+				// Sync the React mirrors to what importState painted, and adopt the new
+				// tab. Mark restored so the restore effect doesn't re-run a base query
+				// over the imported view. The change autosave then persists {items}.
+				setSelectedId(null);
+				setCanvasData(itemsFromStore());
+				setStyling(state.styling ?? {});
+				if (typeof state.settings?.magnet === "boolean") {
+					setMagnet(state.settings.magnet);
+				}
+				setOpenTabs((tabs) => [
+					...tabs,
+					{ id: created.id, sessionId: session.id },
+				]);
+				restoredRef.current = session.id;
+				openSession(session.id);
 				setHistoryOpen(false);
-				await openCanvasTab(created.id);
+				refresh();
 			} catch {
 				toast.error("Failed to restore this state.");
+			} finally {
+				setIsRestoring(false);
 			}
 		},
-		[activeCanvasId, forkCanvasState, openCanvasTab],
+		[
+			activeCanvasId,
+			canvas,
+			username,
+			graphSlug,
+			createCanvas,
+			backend,
+			magnet,
+			itemsFromStore,
+			openSession,
+			refresh,
+		],
 	);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
@@ -1299,7 +1447,9 @@ export function ExplorerPage() {
 					graphSlug={graphSlug}
 					canvasId={activeCanvasId}
 					onFork={(stateId) => void handleForkState(stateId)}
-					isForking={forkCanvasState.isPending}
+					isForking={isRestoring}
+					onSave={() => void handleSaveState()}
+					isSaving={createCanvasState.isPending}
 				/>
 				{fineTuneVertex && (
 					<ExpandFineTunePanel

@@ -163,23 +163,3 @@ async def get_canvas_state(
 ) -> CanvasStateDetail:
     state = await services.get_state_or_404(session, state_id=state_id, canvas_id=canvas_id, graph_id=graph.id)
     return CanvasStateDetail.model_validate(state)
-
-
-@canvases_router.post(
-    "/{canvas_id}/states/{state_id}/fork",
-    response_model=CanvasDetail,
-    status_code=status.HTTP_201_CREATED,
-)
-async def fork_canvas_state(
-    canvas_id: str = Path(...),
-    state_id: str = Path(...),
-    _: GraphMember = Depends(require_graph_member),
-    graph: Graph = Depends(resolve_graph_by_username_slug),
-    user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-) -> CanvasDetail:
-    state = await services.get_state_or_404(session, state_id=state_id, canvas_id=canvas_id, graph_id=graph.id)
-    canvas = await services.fork_state(session, state=state, graph_id=graph.id, user_id=user.id)
-    await session.commit()
-    await session.refresh(canvas)
-    return CanvasDetail.model_validate(canvas)

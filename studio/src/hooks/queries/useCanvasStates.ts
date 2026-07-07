@@ -87,25 +87,3 @@ export function useCreateCanvasStateMutation(
 		},
 	});
 }
-
-/** Restore a state by forking it into a new session + canvas. */
-export function useForkCanvasStateMutation(
-	username: string,
-	graphSlug: string,
-) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: ({
-			canvasId,
-			stateId,
-		}: {
-			canvasId: string;
-			stateId: string;
-		}) => canvasStatesApi.fork(username, graphSlug, canvasId, stateId),
-		onSuccess: () => {
-			// A fork creates a new canvas (+ backing session) — refresh both lists.
-			qc.invalidateQueries({ queryKey: ["canvases", username, graphSlug] });
-			qc.invalidateQueries({ queryKey: ["sessions", username, graphSlug] });
-		},
-	});
-}

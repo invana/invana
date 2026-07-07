@@ -68,8 +68,11 @@ export interface Canvas extends CanvasSummary {
 
 // ── Canvas states — version history (RFC-047) ─────────────────────────────────
 
-/** What turn produced a saved state: a composer query, a node expand, or a load. */
-export type CanvasStateKind = "query" | "expand" | "load";
+/**
+ * What produced a saved state: a composer query, a node expand, a load, or a
+ * `manual` "Save current state" click.
+ */
+export type CanvasStateKind = "query" | "expand" | "load" | "manual";
 
 /** Timeline-row shape — omits the heavy render blobs (snapshot/positions/banner). */
 export interface CanvasStateSummary {
@@ -86,10 +89,13 @@ export interface CanvasStateSummary {
 	createdAt: Date;
 }
 
-/** A frozen, immutable point-in-time canvas state — everything a fork needs. */
+/**
+ * A frozen, immutable point-in-time canvas state (RFC-047). `snapshot` is the
+ * engine-native `canvas.exportState()` envelope (opaque here) — restored by
+ * handing it back to `canvas.importState()`.
+ */
 export interface CanvasState extends CanvasStateSummary {
-	snapshot: CanvasSnapshot;
-	positions: CanvasPositions;
+	snapshot: Record<string, unknown>;
 	sourceQuery?: string;
 	styling: CanvasStyling;
 	settings: Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { Button, ScrollArea } from "@invana/ui";
-import { History, X } from "lucide-react";
+import { Camera, History, X } from "lucide-react";
 import {
 	useCanvasStateBannerQuery,
 	useCanvasStatesQuery,
@@ -17,6 +17,10 @@ interface Props {
 	onFork: (stateId: string) => void;
 	/** True while a fork is in flight (disables the restore buttons). */
 	isForking: boolean;
+	/** Explicitly capture the current canvas as a new state. */
+	onSave: () => void;
+	/** True while a manual save is in flight (disables the Save button). */
+	isSaving: boolean;
 }
 
 /**
@@ -34,6 +38,8 @@ export function CanvasHistoryPanel({
 	canvasId,
 	onFork,
 	isForking,
+	onSave,
+	isSaving,
 }: Props) {
 	const { data, isLoading } = useCanvasStatesQuery(
 		username,
@@ -60,6 +66,18 @@ export function CanvasHistoryPanel({
 					onClick={onClose}
 				>
 					<X className="h-4 w-4" />
+				</Button>
+			</div>
+			<div className="border-b border-border p-2">
+				<Button
+					variant="outline"
+					size="sm"
+					className="h-8 w-full gap-1.5 text-xs"
+					disabled={isSaving || !canvasId}
+					onClick={onSave}
+				>
+					<Camera className="h-3.5 w-3.5" />
+					Save current state
 				</Button>
 			</div>
 			<ScrollArea className="min-h-0 flex-1">
@@ -132,7 +150,10 @@ function HistoryRow({
 				<span className="min-w-0 truncate text-sm" title={state.label}>
 					{state.label || "Canvas state"}
 				</span>
-				<span className="shrink-0 text-muted-foreground text-xs">
+				<span
+					className="shrink-0 text-muted-foreground text-xs"
+					title={state.createdAt.toLocaleString()}
+				>
 					{formatRelativeTime(state.createdAt)}
 				</span>
 			</div>

@@ -124,12 +124,14 @@ class CanvasState(Base):
     """An immutable, point-in-time snapshot of a canvas (RFC-047).
 
     A state is captured **client-side** at each canvas-mutating turn — a query,
-    a node expand (RFC-035), or a load-to-canvas (RFC-033) — because the painted
-    ``snapshot``, node ``positions`` and ``banner`` thumbnail only exist in the
-    PixiJS renderer. The table is **append-only** (keep-all: no prune, no edit),
-    so it is a faithful history the user can "go back in time" through. Going back
-    **forks** a state into a fresh session + canvas (see ``services.fork_state``);
-    versions are never restored in place.
+    a node expand (RFC-035), a load-to-canvas (RFC-033), or a manual "Save current
+    state" — because the ``canvas.exportState()`` snapshot and ``banner`` image
+    only exist in the browser's canvas engine. Rows are immutable (never edited);
+    each canvas retains its newest ``INVANA_CANVAS_HISTORY_LIMIT`` states
+    (default 30, 0 = keep all), pruned on insert — a bounded history the user can
+    "go back in time" through. Going back **forks** a state into a fresh session +
+    canvas, hydrated client-side via ``canvas.importState`` (no server endpoint);
+    states are never restored in place.
     """
 
     __tablename__ = "canvas_states"
@@ -172,12 +174,11 @@ class CanvasState(Base):
     # Human summary for the timeline, e.g. `Ran query — 42 nodes`.
     label: Mapped[str] = mapped_column(String(255), default="", nullable=False)
 
-    # Self-contained frozen render state. The two big blobs are gzipped JSON
-    # (RFC-047 storage optimisation) - a canvas snapshot compresses ~5-10x, and
-    # these accumulate one row per turn. Read/written through the `snapshot` /
-    # `positions` properties below, which (de)compress transparently.
-    snapshot_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)  # gzip({items})
-    positions_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)  # gzip({nodeId: {x, y}})
+    # The engine-native ``canvas.exportState()`` envelope (view + layer data with
+    # positions), stored as gzipped JSON (RFC-047 storage optimisation) — it
+    # compresses ~5-10x and these accumulate one row per turn. Read/written through
+    # the `snapshot` property below, which (de)compresses transparently.
+    snapshot_gz: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)  # gzip(exportState())
     source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
     styling: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     settings: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
@@ -193,10 +194,6 @@ class CanvasState(Base):
     @property
     def snapshot(self) -> dict:
         return unpack_json(self.snapshot_gz)
-
-    @property
-    def positions(self) -> dict:
-        return unpack_json(self.positions_gz)
 
     @property
     def has_banner(self) -> bool:

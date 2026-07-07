@@ -23,6 +23,7 @@ from invana.events import actions
 from invana.events.services import current_trace_id, emit_event
 from invana.sessions import services as session_services
 from invana.sessions.store import SessionStore
+from invana.settings import settings
 
 
 async def list_canvases(
@@ -206,7 +207,6 @@ async def create_state(
         kind=payload.kind,
         label=payload.label or "",
         snapshot_gz=pack_json(payload.snapshot),
-        positions_gz=pack_json(payload.positions),
         source_query=payload.source_query,
         styling=payload.styling or {},
         settings=payload.settings or {},
@@ -214,55 +214,9 @@ async def create_state(
         node_count=payload.node_count,
         edge_count=payload.edge_count,
     )
-    await CanvasStateStore().add(session, state)
+    store = CanvasStateStore()
+    await store.add(session, state)
+    # Retention (RFC-047): keep only the newest N states per canvas so keep-all
+    # growth is bounded. Configurable via INVANA_CANVAS_HISTORY_LIMIT (0 = keep all).
+    await store.prune_for_canvas(session, canvas_id=canvas.id, keep=settings.canvas_history_limit)
     return state
-
-
-async def fork_state(
-    session: AsyncSession,
-    *,
-    state: CanvasState,
-    graph_id: str,
-    user_id: str,
-) -> Canvas:
-    """Restore a state by forking it into a **new** session + canvas (RFC-047).
-
-    Non-destructive: the original canvas is untouched; the caller ends up with a
-    fresh, independent canvas seeded from the frozen state (its own private
-    backing session, since sessions are per-creator while versions are shared).
-    """
-    original = await CanvasStore().get(session, state.canvas_id)
-    base_title = (original.title if original else "") or "Untitled canvas"
-    forked_title = f"{base_title} (restored)"
-
-    sess = await session_services.create_session(
-        session,
-        graph_id=graph_id,
-        user_id=user_id,
-        title=forked_title,
-    )
-    canvas = Canvas(
-        session_id=sess.id,
-        graph_id=graph_id,
-        created_by_id=user_id,
-        title=forked_title,
-        instructions=(original.instructions if original else "") or "",
-        snapshot=state.snapshot or {},
-        source_query=state.source_query,
-        positions=state.positions or {},
-        settings=state.settings or {},
-        styling=state.styling or {},
-        banner=state.banner,
-    )
-    await CanvasStore().add(session, canvas)
-    await emit_event(
-        session,
-        action=actions.CANVAS_CREATE,
-        target_kind=actions.TARGET_CANVAS,
-        target_id=canvas.id,
-        graph_id=graph_id,
-        actor_id=user_id,
-        details={"session_id": sess.id, "title": canvas.title, "forked_from_state": state.id},
-        trace_id=current_trace_id(),
-    )
-    return canvas

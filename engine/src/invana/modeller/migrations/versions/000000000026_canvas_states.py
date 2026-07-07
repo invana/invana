@@ -56,10 +56,9 @@ def upgrade() -> None:
         ),
         sa.Column("kind", sa.String(length=16), nullable=False),
         sa.Column("label", sa.String(length=255), nullable=False, server_default=""),
-        # gzipped JSON blobs (RFC-047 storage optimisation) - a canvas snapshot
-        # compresses ~5-10x and these accrue one row per turn.
+        # gzipped canvas.exportState() envelope (RFC-047 storage optimisation) -
+        # compresses ~5-10x and accrues one row per turn.
         sa.Column("snapshot_gz", sa.LargeBinary(), nullable=False),
-        sa.Column("positions_gz", sa.LargeBinary(), nullable=False),
         sa.Column("source_query", sa.Text(), nullable=True),
         sa.Column("styling", sa.JSON(), nullable=False, server_default="{}"),
         sa.Column("settings", sa.JSON(), nullable=False, server_default="{}"),

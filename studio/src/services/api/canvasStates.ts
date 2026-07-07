@@ -7,15 +7,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type {
-	Canvas,
-	CanvasPositions,
-	CanvasSnapshot,
 	CanvasState,
 	CanvasStateKind,
 	CanvasStateSummary,
 	CanvasStyling,
 } from "../../types/canvas";
-import { type ApiDetail, toCanvas } from "./canvases";
 import { request } from "./client";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
@@ -34,8 +30,7 @@ interface ApiStateSummary {
 }
 
 interface ApiStateDetail extends ApiStateSummary {
-	snapshot: CanvasSnapshot;
-	positions: CanvasPositions;
+	snapshot: Record<string, unknown>;
 	source_query: string | null;
 	styling: CanvasStyling;
 	settings: Record<string, unknown>;
@@ -51,8 +46,8 @@ interface ApiListResponse {
 export interface CanvasStateCreateBody {
 	kind: CanvasStateKind;
 	label?: string;
-	snapshot?: CanvasSnapshot;
-	positions?: CanvasPositions;
+	/** The engine-native `canvas.exportState()` envelope. */
+	snapshot?: Record<string, unknown>;
 	source_query?: string;
 	styling?: CanvasStyling;
 	settings?: Record<string, unknown>;
@@ -87,8 +82,7 @@ function toStateSummary(s: ApiStateSummary): CanvasStateSummary {
 function toState(d: ApiStateDetail): CanvasState {
 	return {
 		...toStateSummary(d),
-		snapshot: d.snapshot ?? { items: [] },
-		positions: d.positions ?? {},
+		snapshot: d.snapshot ?? {},
 		sourceQuery: d.source_query ?? undefined,
 		styling: d.styling ?? {},
 		settings: d.settings ?? {},
@@ -141,19 +135,5 @@ export const canvasStatesApi = {
 				method: "POST",
 				body: JSON.stringify(body),
 			}),
-		),
-
-	/** Restore a state by forking it into a brand-new session + canvas (RFC-047). */
-	fork: async (
-		username: string,
-		graphSlug: string,
-		canvasId: string,
-		stateId: string,
-	): Promise<Canvas> =>
-		toCanvas(
-			await request<ApiDetail>(
-				`${base(username, graphSlug, canvasId)}/${stateId}/fork`,
-				{ method: "POST" },
-			),
 		),
 };

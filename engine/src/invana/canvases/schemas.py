@@ -98,10 +98,10 @@ class CanvasStateCreate(BaseModel):
     turn for the timeline; ``message_id`` links back to the producing thread turn.
     """
 
-    kind: Literal["query", "expand", "load"]
+    kind: Literal["query", "expand", "load", "manual"]
     label: str = Field(default="", max_length=255)
+    # The engine-native ``canvas.exportState()`` envelope (positions live inside).
     snapshot: dict | None = None
-    positions: dict | None = None
     source_query: str | None = None
     styling: dict | None = None
     settings: dict | None = None
@@ -129,10 +129,9 @@ class CanvasStateSummary(BaseModel):
 
 
 class CanvasStateDetail(CanvasStateSummary):
-    """Full state — everything needed to fork it into a new canvas."""
+    """Full state — the engine snapshot + metadata needed to restore it."""
 
     snapshot: dict
-    positions: dict
     source_query: str | None = None
     styling: dict
     settings: dict

@@ -35,8 +35,9 @@ Decisions taken (product):
 - **Cadence — per session turn.** A version is captured on each canvas-mutating turn: an
   NL/QL query (composer), a node **expand** (RFC-035), or a **load-to-canvas** (RFC-033) —
   the same set of turns RFC-046 logs. Not on every keystroke, not on a raw timer.
-- **Retention — keep all.** Versions are append-only; nothing is pruned. Storage growth
-  (a snapshot + a thumbnail per turn) is the accepted trade-off.
+- **Retention — keep the newest N per canvas** (`INVANA_CANVAS_HISTORY_LIMIT`, default **30**;
+  `0` = keep all). Older states are pruned on insert, bounding growth. (The original decision
+  was keep-all; a bounded default was added so history can't grow without limit.)
 - **Restore — open as a new canvas.** Going "back" **forks** the chosen version into a
   brand-new session + canvas; the current canvas is left untouched. No destructive rewind.
 
@@ -68,12 +69,18 @@ route, or model change — this is a studio-only tweak to the existing PATCH aut
 
 #### Why client-driven
 
-A version must carry the **painted snapshot, node positions, and a banner** — all three are
-produced client-side by the PixiJS renderer; the engine never sees them. So versions are
+A version must carry the **rendered canvas state and a banner image** — both produced
+client-side by the canvas engine; the engine (server) never sees them. So versions are
 **created by the client**, at the same success hooks RFC-046 already uses to log turns
-(composer send success, `useExpandNode` success, `recordLoad`). The engine stores and serves
-them. (Contrast RFC-046 expands, which the engine logs atomically because it owns the *query
-text* — but not the render.)
+(composer send success, `useExpandNode` success, `recordLoad`), plus an explicit "Save current
+state" click. The engine (server) stores and serves them. (Contrast RFC-046 expands, which the
+engine logs atomically because it owns the *query text* — but not the render.)
+
+The snapshot + image are the canvas engine's **own** serialisations (`@invana/canvas`
+≥ 0.0.11): `canvas.exportState()` → a `CanvasStateSnapshot` (view + per-layer node/edge data
+with positions + camera/styling), and `canvas.exportDataURL({ area, maxSize })` → a sized PNG
+data URL. Restore hands the snapshot back to `canvas.importState()`. We no longer hand-roll a
+PixiJS `extract` + offscreen downscale, nor a bespoke `{items}` snapshot shape.
 
 #### Data model — `canvas_states`
 
@@ -86,15 +93,14 @@ New append-only table, one row per captured turn:
   produced this state, for explainability (thread ↔ version). Provenance only, like
   `canvas.source_query`; a member viewing a shared canvas may not see the private thread.
 - `kind: str` — `"query"` | `"expand"` | `"load"` (mirrors RFC-046 operations, plus `query`
-  for composer turns).
+  for composer turns) | `"manual"` (an explicit "Save current state" click).
 - `label: str` — human summary for the timeline, composed client-side: e.g. `Ran query — 42
   nodes`, `Expanded "Acme Corp"`, `Loaded 8 nodes`.
-- `snapshot_gz: bytes`, `positions_gz: bytes` — the two big blobs, stored as **gzipped JSON**
-  (see Storage below); read/written through `snapshot` / `positions` properties that
-  (de)compress transparently, so the wire + API stay plain JSON.
-- `source_query: str | None`, `styling: JSON`, `settings: JSON` — the rest of the
-  self-contained render state, same shape the canvas stores (a version is a frozen, immutable
-  canvas state).
+- `snapshot_gz: bytes` — the `canvas.exportState()` envelope (view + layer data + positions),
+  stored as **gzipped JSON** (see Storage); read through a `snapshot` property that decompresses
+  transparently, so the API stays plain JSON. (No separate `positions` — it lives inside.)
+- `source_query: str | None`, `styling: JSON`, `settings: JSON` — restore metadata (the base
+  query, the RFC-045 per-type styling, and `{backend, magnet}`).
 - `banner: str | None` — base64 PNG **thumbnail** (~288px, smaller than the 600px
   sessions-list banner — see Storage). What makes the timeline visual. Excluded from the list
   summary (heavy), like `Canvas.banner`.
@@ -110,58 +116,68 @@ excluded from `fields` — heavy, not sensitive, but not worth rendering).
 Keep-all × per-turn means these rows accumulate, so the two heavy fields are trimmed at the
 source (cheapest wins, no new infra):
 
-- **Thumbnail, not banner.** The state thumbnail is captured at ~288px (`STATE_THUMB_MAX_EDGE`),
-  several times lighter than the 600px sessions-list banner, by *re-downscaling the
-  already-captured banner* — a cheap 2D-canvas draw, no second PixiJS extract. The banner is
-  the dominant cost and (being an already-compressed PNG in base64) resists DB compression, so
-  shrinking its dimensions is the highest-value lever.
-- **Gzipped snapshot/positions.** Stored as gzipped JSON (`pack_json`/`unpack_json`) — a canvas
-  snapshot compresses ~5–10×, and this is portable (helps SQLite dev + the at-rest bytes,
-  not just Postgres TOAST).
+- **Thumbnail, not banner.** The state thumbnail is exported at ~288px (`STATE_THUMB_MAX_EDGE`)
+  directly via `canvas.exportDataURL({ maxSize })`, several times lighter than the 600px
+  sessions-list banner. The banner is the dominant cost and (being an already-compressed PNG in
+  base64) resists DB compression, so shrinking its dimensions is the highest-value lever.
+- **Gzipped snapshot.** The `exportState()` envelope is stored as gzipped JSON
+  (`pack_json`/`unpack_json`) — it compresses ~5–10×, portably (helps SQLite dev + the at-rest
+  bytes, not just Postgres TOAST).
+
+A **retention cap** bounds total growth: each canvas keeps its newest
+`INVANA_CANVAS_HISTORY_LIMIT` states (default 30), pruned on insert
+(`CanvasStateStore.prune_for_canvas`) — the highest-leverage size control, independent of
+per-row bytes.
 
 **Object storage (MinIO) was considered and deferred.** The engine has no MinIO client yet
 (it's future dataset/import-slice work); wiring it solely for states — with the two-system
 consistency + orphan-cleanup cost hard deletes bring (CASCADE won't touch objects) — is
 premature. When that shared client lands, the right shape is *metadata-in-Postgres,
 blobs-in-MinIO* (offload `snapshot`/thumbnail objects, keep the queryable rows for
-listing/scoping/cascade), with MinIO lifecycle rules doubling as retention. A retention cap
-(prune to last N) is the other lever if keep-all growth ever bites — the append-only schema
-makes adding one trivial.
+listing/scoping/cascade), with MinIO lifecycle rules doubling as retention.
 
 #### API
 
 Nested under the canvas, `require_graph_member` like the rest of `canvases/`:
 
 - `POST   …/canvases/{id}/states` — create a version. Body: `{ kind, label, snapshot,
-  positions, source_query?, styling?, settings?, banner?, node_count, edge_count,
-  message_id? }`. Returns `CanvasStateDetail`.
+  source_query?, styling?, settings?, banner?, node_count, edge_count, message_id? }`
+  (`snapshot` = the `exportState()` envelope). Returns `CanvasStateDetail`.
 - `GET    …/canvases/{id}/states` — paginated **summary** list (newest first): `id, kind,
   label, node_count, edge_count, has_banner, message_id, created_at`. No snapshot/banner.
-- `GET    …/canvases/{id}/states/{vid}` — **detail**: full snapshot + positions + banner.
-- `POST   …/canvases/{id}/states/{vid}/fork` — **restore as new canvas**. Server creates a
-  fresh session + canvas seeded from the version (`snapshot`, `positions`, `source_query`,
-  `styling`, `settings`, `banner`; title = original title + ` (restored)`), atomically, and
-  returns the new `CanvasDetail`. The original is untouched. One round trip, and the "canvas
-  is self-contained" invariant (RFC-043) is preserved server-side.
+- `GET    …/canvases/{id}/states/{vid}` — **detail**: full snapshot + styling/settings + banner.
+
+Restore has **no server endpoint** — it's client-driven (see Studio), because hydration runs
+through the live canvas engine (`importState`), which only exists in the browser.
 
 #### Studio
 
-- After each canvas-mutating turn completes and the canvas has repainted, capture the version
-  (`snapshot` from `canvasDataRef`, `positions` from `capturePositions()`, `banner` reusing
-  the most-recent throttled capture when fresh, else a new `captureBanner`) and POST it. The
-  hooks already exist from RFC-046: composer send success, `useExpandNode` success,
-  `recordLoad`. Version creation is best-effort (like the banner) — a failure never blocks
-  the turn.
+- After each canvas-mutating turn (and on "Save current state"), capture the version:
+  `snapshot` from `canvas.exportState()`, `banner` from `canvas.exportDataURL({ maxSize: 288 })`,
+  counts from the live store, plus `styling`/`settings`/`source_query`. POST it. Hooks already
+  exist from RFC-046: composer send success, `useExpandNode` success, `recordLoad`. Best-effort
+  — a failure never blocks the turn.
 - **History UI:** a `History` button in the canvas header opens a **version timeline** panel
   (design-kit `Sheet`/`ScrollArea`) — newest-first rows, each a lazy-loaded banner thumbnail
-  + `label` + relative time, mirroring the sessions-list `SessionBanner` lazy pattern
-  (`useCanvasStateBannerQuery`, cached by version id). Each row has **"Open as new canvas"**
-  → calls `fork`, opens the returned canvas as a new tab. Optionally the thread's operation
-  turns (RFC-046) link to their version via `message_id`.
+  + `label` + relative time (absolute on hover), mirroring the sessions-list `SessionBanner`
+  lazy pattern (`useCanvasStateBannerQuery`, cached by version id). Each row has **"Open as
+  new canvas"** → restore (below). Optionally the thread's operation turns (RFC-046) link to
+  their version via `message_id`.
+- **Restore (client-driven fork):** `handleForkState` fetches the state, creates a fresh
+  session + canvas, then hydrates the **live** canvas via `canvas.importState(snapshot)`
+  (faithful — camera/styling/positions). It deliberately does *not* touch `seedData` (a
+  competing `setData` would double-seed the WebGPU renderer — a known crash); the change
+  autosave then persists the hydrated view onto the new canvas row in the standard `{items}`
+  shape, so it reopens through the usual RFC-043 path (no format drift). The original canvas is
+  untouched.
+- **Manual save:** the panel header has a **"Save current state"** button that captures the
+  live canvas immediately as a `manual` state (`captureCanvasState("manual", {immediate})`,
+  toasted) — so a user can snapshot a good layout on demand, independent of the per-turn
+  auto-captures.
 - New `services/api/canvasStates.ts` + `hooks/queries/useCanvasStates.ts`
-  (`useCanvasStatesQuery` / `useCanvasStateBannerQuery` / `useForkCanvasState`). The stored
-  entity is a **`CanvasState`** (table `canvas_states`); "version history" is the user-facing
-  framing of that append-only log.
+  (`useCanvasStatesQuery` / `useCanvasStateBannerQuery` / `useCreateCanvasStateMutation`). The
+  stored entity is a **`CanvasState`** (table `canvas_states`); "version history" is the
+  user-facing framing of that append-only log.
 
 ## Alternatives considered
 

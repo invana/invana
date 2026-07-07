@@ -80,6 +80,11 @@ class Settings(BaseSettings):
     graph_health_interval_s: int = 30  # INVANA_GRAPH_HEALTH_INTERVAL_S
     graph_retry_max_interval_s: int = 60  # INVANA_GRAPH_RETRY_MAX_INTERVAL_S
 
+    # Explorer canvases — version history retention (RFC-047). Each canvas keeps
+    # at most this many saved states (newest wins); older ones are pruned when a
+    # new state is captured. 0 disables pruning (keep all).
+    canvas_history_limit: int = 30  # INVANA_CANVAS_HISTORY_LIMIT
+
     # CORS — comma-separated allowed origins; use * for development only
     cors_origins: list[str] = ["http://localhost:8300", "http://127.0.0.1:8300"]
 
