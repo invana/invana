@@ -145,6 +145,26 @@ const BACKEND_LABEL: Record<CanvasBackend, string> = {
 // comfortably sized.
 const FOCUS_ZOOM = 2;
 
+// A sticky `hidden` state overlay registered on the graph layer so a single
+// element can be shown/hidden non-destructively (the Layers panel toggles it via
+// `store.setNodeState(id, "hidden", …)` / `setEdgeState`). It just drives every
+// alpha to 0 — the element stays in the store (counts unchanged) and reappears
+// when the state clears. Not a canonical state, so focal drivers (hover /
+// selection dimming) never touch it. `HIDDEN_STATE_NAME` is re-exported for the
+// panel so the string stays in one place.
+export const HIDDEN_STATE_NAME = "hidden";
+const HIDDEN_NODE_STATE = {
+	[HIDDEN_STATE_NAME]: { bgAlpha: 0, bgStrokeAlpha: 0, labelAlpha: 0 },
+};
+const HIDDEN_EDGE_STATE = {
+	[HIDDEN_STATE_NAME]: {
+		strokeAlpha: 0,
+		arrowSourceAlpha: 0,
+		arrowTargetAlpha: 0,
+		labelAlpha: 0,
+	},
+};
+
 // Distinct colour per node label (its graph-DB type). `ColorByLabelBehaviour`
 // defaults `nodeLabel` to `node.type`, which our adapter stamps with the
 // vertex/edge label.
@@ -935,8 +955,8 @@ export function ExplorerCanvas({
 			<GraphLayer
 				id="graph"
 				data={data}
-				node={{ style: nodeStyle }}
-				edge={{ style: edgeStyle }}
+				node={{ style: nodeStyle, state: HIDDEN_NODE_STATE }}
+				edge={{ style: edgeStyle, state: HIDDEN_EDGE_STATE }}
 			/>
 
 			{/* Registers the active layout under ACTIVE_LAYOUT_ID (config-first:

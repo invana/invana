@@ -69,6 +69,7 @@ import {
 	ExplorerHeaderToolbar,
 } from "./components/ExplorerCanvas";
 import { InspectorPanel } from "./components/InspectorPanel";
+import { LayersPanel } from "./components/LayersPanel";
 import { SchemaBrowser } from "./components/SchemaBrowser";
 import {
 	SessionTutorialModal,
@@ -1526,6 +1527,8 @@ export function ExplorerPage() {
 				backend={backend}
 				onClose={closeSessions}
 			/>
+		) : settingsPanel.section === "layers" ? (
+			<LayersPanel canvas={canvas} onClose={closeSessions} />
 		) : (
 			sessionsContent
 		);

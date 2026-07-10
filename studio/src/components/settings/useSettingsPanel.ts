@@ -19,6 +19,7 @@ export type SettingsSection =
 	| "sessions"
 	| "schema"
 	| "model"
+	| "layers"
 	| "canvases"
 	| "messages";
 
@@ -41,6 +42,7 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"sessions",
 	"schema",
 	"model",
+	"layers",
 	"canvases",
 	"messages",
 ];
