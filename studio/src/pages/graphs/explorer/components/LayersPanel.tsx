@@ -394,6 +394,11 @@ function focusElement(
 	}
 }
 
+// TODO(canvas-visibility): delete this once `@invana/canvas` owns the cascade —
+// replace callers with `layer.hideNode(id)` / `showNode(id)`, and swap the
+// `hasNodeState(id, HIDDEN_STATE_NAME)` indicator for `isNodeHidden` / `isEdgeHidden`.
+// See docs/internal/mvp/canvas-element-visibility-api.md.
+//
 // Hide/show a single node by toggling the sticky `hidden` overlay (registered on
 // the layer in ExplorerCanvas). Incident edges follow so nothing dangles to an
 // invisible endpoint; on show, an edge only reappears if its other end is

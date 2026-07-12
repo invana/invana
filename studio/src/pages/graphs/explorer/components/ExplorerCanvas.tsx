@@ -145,6 +145,11 @@ const BACKEND_LABEL: Record<CanvasBackend, string> = {
 // comfortably sized.
 const FOCUS_ZOOM = 2;
 
+// TODO(canvas-visibility): remove this whole block once `@invana/canvas` ships a
+// first-class per-element hide API — see docs/internal/mvp/canvas-element-visibility-api.md.
+// Then revert the <GraphLayer> props to `node={{ style: nodeStyle }}` /
+// `edge={{ style: edgeStyle }}`.
+//
 // A sticky `hidden` state overlay registered on the graph layer so a single
 // element can be shown/hidden non-destructively (the Layers panel toggles it via
 // `store.setNodeState(id, "hidden", …)` / `setEdgeState`). It just drives every
