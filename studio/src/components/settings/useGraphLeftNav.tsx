@@ -68,6 +68,9 @@ export function useGraphLeftNav(
 	username: string,
 	graphSlug: string,
 	activeTab: ActiveTab,
+	// The Layers panel only makes sense with a live canvas, so Explorer only
+	// surfaces its rail icon while a session (its 1:1 canvas) is open.
+	showLayers = false,
 ) {
 	const navigate = useNavigate();
 	const settingsPanel = useSettingsPanel();
@@ -177,7 +180,7 @@ export function useGraphLeftNav(
 			? [
 					viewItem("explorer", "Messages", MessagesSquare),
 					modelItem(),
-					layersItem(),
+					...(showLayers ? [layersItem()] : []),
 				]
 			: activeTab === "modeller"
 				? [viewItem("modeller", "Modeller", Boxes), messagesItem()]

@@ -5,8 +5,10 @@
 Explorer canvas Layers panel — a new left-rail section (Layers icon) that lists
 every layer registered on the live canvas as a file-tree.
 
-The rail's `?settings=layers` key docks a `LayersPanel` alongside Sessions and
-the Model browser. It reads the live `GraphCanvas` and renders each layer
+The Layers rail icon appears only while a session (its 1:1 canvas) is open, since
+the panel is meaningless without a live canvas. The rail's `?settings=layers` key
+docks a `LayersPanel` alongside Sessions and the Model browser. It reads the live
+`GraphCanvas` and renders each layer
 (background / graph / minimap …) top-first via the design-kit `TreeView`. The
 Graph layer expands into its painted contents grouped by node/edge type with
 live counts; each type in turn expands into its individual nodes/edges — nodes
