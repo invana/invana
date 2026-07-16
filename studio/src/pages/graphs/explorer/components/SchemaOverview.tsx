@@ -30,9 +30,14 @@ interface Props {
 
 // Monospace badge for a property's data type — keeps the leaf rows scannable
 // like a SQL schema browser without pulling in the Modeller's table component.
-function DataTypeBadge({ type }: { type: string }) {
+function DataTypeBadge({
+	type,
+	className,
+}: { type: string; className?: string }) {
 	return (
-		<span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+		<span
+			className={`shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground${className ? ` ${className}` : ""}`}
+		>
 			{type}
 		</span>
 	);
@@ -108,16 +113,18 @@ function PropertyLeaf({
 	const pk = mapping.property_key;
 	return (
 		<LeafRow depth={depth}>
-			<span className="font-mono text-foreground">{pk.name}</span>
-			<DataTypeBadge type={pk.type} />
+			<span className="truncate font-mono text-foreground">{pk.name}</span>
 			{pk.value_cardinality !== "SINGLE" && (
-				<span className="text-xs text-muted-foreground">
+				<span className="shrink-0 text-xs text-muted-foreground">
 					{pk.value_cardinality.toLowerCase()}
 				</span>
 			)}
 			{mapping.inherited && (
-				<span className="text-xs italic text-muted-foreground">inherited</span>
+				<span className="shrink-0 text-xs italic text-muted-foreground">
+					inherited
+				</span>
 			)}
+			<DataTypeBadge type={pk.type} className="ml-auto" />
 		</LeafRow>
 	);
 }
@@ -196,6 +203,9 @@ function TypeRow({
 	constraints: ConstraintResponse[];
 }) {
 	const [open, setOpen] = useState(false);
+	const sortedProperties = [...properties].sort((a, b) =>
+		a.property_key.name.localeCompare(b.property_key.name),
+	);
 	return (
 		<>
 			<TreeRow
@@ -218,7 +228,7 @@ function TypeRow({
 					<SubSection
 						label="Properties"
 						depth={depth + 1}
-						items={properties}
+						items={sortedProperties}
 						render={(item, d) => (
 							<PropertyLeaf
 								key={item.id}
