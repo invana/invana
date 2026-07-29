@@ -65,6 +65,9 @@ interface GraphDetailProps {
 	/** Page-specific header center content (e.g. Explorer's canvas toolbar).
 	 *  Most pages won't need this. */
 	headerCenter?: ReactNode;
+	/** Surface the Explorer's Layers rail icon. Gated on a live canvas being open
+	 *  (a session), since the panel is meaningless without one. */
+	showLayersNav?: boolean;
 }
 
 // The page-owned panels keyed into the shared `?settings` param. These open via
@@ -75,13 +78,14 @@ interface GraphDetailProps {
 // generative SessionsPanel (`messages`, RFC-031).
 const NATIVE_SECTIONS: Partial<Record<GraphDetailSection, SettingsSection[]>> =
 	{
-		explorer: ["sessions", "model"],
+		explorer: ["sessions", "model", "layers"],
 		modeller: ["schema", "messages"],
 	};
 const ALL_NATIVE_SECTIONS: SettingsSection[] = [
 	"sessions",
 	"schema",
 	"model",
+	"layers",
 	"canvases",
 	"messages",
 ];
@@ -109,6 +113,7 @@ export function GraphDetail({
 	headerRightExtras,
 	headerPanelControls,
 	headerCenter,
+	showLayersNav = false,
 }: GraphDetailProps) {
 	const { username, graphSlug } = useParams<{
 		username: string;
@@ -117,7 +122,12 @@ export function GraphDetail({
 
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
 	const settingsPanel = useSettingsPanel();
-	const leftNav = useGraphLeftNav(username ?? "", graphSlug ?? "", sectionId);
+	const leftNav = useGraphLeftNav(
+		username ?? "",
+		graphSlug ?? "",
+		sectionId,
+		showLayersNav,
+	);
 
 	// Explorer/Modeller get a header switcher between the two views; it names the
 	// current view, so the breadcrumb label is dropped to avoid duplication.

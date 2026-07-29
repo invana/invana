@@ -69,6 +69,7 @@ import {
 	ExplorerHeaderToolbar,
 } from "./components/ExplorerCanvas";
 import { InspectorPanel } from "./components/InspectorPanel";
+import { LayersPanel } from "./components/LayersPanel";
 import { SchemaBrowser } from "./components/SchemaBrowser";
 import {
 	SessionTutorialModal,
@@ -204,6 +205,17 @@ export function ExplorerPage() {
 		[searchParams, setSearchParams],
 	);
 	const closeSessions = settingsPanel.close;
+
+	// Layers is a canvas-only panel: if the session (its canvas) closes while
+	// Layers is the open rail section, fall back to Sessions so we don't leave a
+	// dangling `?settings=layers` with no matching (now-hidden) rail icon.
+	const { section: settingsSection, isOpen: settingsIsOpen } = settingsPanel;
+	const setPanelSection = settingsPanel.setSection;
+	useEffect(() => {
+		if (!activeSessionId && settingsIsOpen && settingsSection === "layers") {
+			setPanelSection("sessions");
+		}
+	}, [activeSessionId, settingsIsOpen, settingsSection, setPanelSection]);
 	const closeInspector = useCallback(
 		() => setPanelParam("inspector", null),
 		[setPanelParam],
@@ -1526,6 +1538,10 @@ export function ExplorerPage() {
 				backend={backend}
 				onClose={closeSessions}
 			/>
+		) : settingsPanel.section === "layers" && activeSessionId ? (
+			// Layers is only offered while a session's canvas is open; without one
+			// the rail icon is hidden and this falls back to the Sessions list.
+			<LayersPanel canvas={canvas} onClose={closeSessions} />
 		) : (
 			sessionsContent
 		);
@@ -1537,6 +1553,8 @@ export function ExplorerPage() {
 			<GraphDetail
 				sectionId="explorer"
 				pageLabel="Explorer"
+				// Layers rail icon only while a session's canvas is open.
+				showLayersNav={!!activeSessionId}
 				headerCenter={
 					canvas && activeSessionId ? (
 						// The canvas toolbar reads the live camera; it only initialises

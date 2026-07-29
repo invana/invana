@@ -68,6 +68,9 @@ export function useGraphLeftNav(
 	username: string,
 	graphSlug: string,
 	activeTab: ActiveTab,
+	// The Layers panel only makes sense with a live canvas, so Explorer only
+	// surfaces its rail icon while a session (its 1:1 canvas) is open.
+	showLayers = false,
 ) {
 	const navigate = useNavigate();
 	const settingsPanel = useSettingsPanel();
@@ -135,6 +138,21 @@ export function useGraphLeftNav(
 		};
 	};
 
+	// Explorer's third native panel: the canvas Layers browser (a file-tree of
+	// the live canvas layers). Toggles the shared `?settings=layers` key like the
+	// other Explorer icons so the rail stays single-open. Explorer-only.
+	const layersItem = () => {
+		const active = settingsPanel.isOpen && settingsPanel.section === "layers";
+		return {
+			name: "Layers",
+			icon: Layers,
+			iconClassName: "w-5 h-5",
+			tooltipSide: "right" as const,
+			className: activeClass(active),
+			onClick: () => toggleSection("layers"),
+		};
+	};
+
 	// The Modeller's second native panel: a generative Sessions chat (RFC-031).
 	// Toggles the shared `?settings=messages` key just like the schema view icon,
 	// so the rail stays single-open. Shown only on the Modeller.
@@ -159,7 +177,11 @@ export function useGraphLeftNav(
 	// gone — a session's canvas is its 1:1 visual layer, painted on open.)
 	const topNavItems =
 		activeTab === "explorer"
-			? [viewItem("explorer", "Messages", MessagesSquare), modelItem()]
+			? [
+					viewItem("explorer", "Messages", MessagesSquare),
+					modelItem(),
+					...(showLayers ? [layersItem()] : []),
+				]
 			: activeTab === "modeller"
 				? [viewItem("modeller", "Modeller", Boxes), messagesItem()]
 				: [
