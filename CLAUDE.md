@@ -68,8 +68,37 @@ Structured knowledge graphs into interactive decision simulation environments.
 5. **Visualization** — PixiJS 8 with WebGPU, handles 100K+ nodes at 60fps
 6. **Simulation** — Game theory, hypothesis testing, parameter sweeps, rule engine
 
+## How to respond
+
+**Default to sections and tables. Prose is the exception, not the format.**
+
+| Rule | Detail |
+|---|---|
+| Structure | Answer in short sections with headings. Inside a section, prefer a table over sentences. |
+| Length | Concise. No preamble, no recap of what was asked, no restating what a table already shows. |
+| Explanations | Only when asked. Don't explain reasoning, trade-offs, or background unless the request calls for it ("why", "explain", "learn more"). |
+| Prose | Use it only where a table genuinely can't carry the meaning — a real trade-off, a risk, a decision that needs a caveat. Then keep it to a line or two. |
+| Design content | Belongs in the document, not the reply. Write it to the RFC / doc and point at it; don't paste it back in chat. |
+| Data shapes | Whenever describing entities, columns, endpoints, enums, or config — table it, so the structure is visible at a glance. |
+| Diagrams | User flows and journeys get **mermaid** diagrams in the doc, not prose walkthroughs. |
+
+**Frontend / user-flow questions: think in user journeys first.** Any question about Studio, UI, UX, a
+screen, or a flow gets reasoned about as a journey — never as a component list.
+
+| Step | What it means |
+|---|---|
+| 1. Name the actor and the goal | "As a *&lt;role&gt;*, I want *&lt;outcome&gt;*, so that *&lt;reason&gt;*" — not "add a button" |
+| 2. Map the journey | Entry point → steps → decision points → exit / success state. Include the unhappy paths: empty, loading, error, permission-denied, locked. |
+| 3. Draw it | A **mermaid** `flowchart` (or `sequenceDiagram` for client↔server timing) in the doc. The diagram is the spec. |
+| 4. Then name the surfaces | Only now: routes, pages, components, hooks, and which API each step consumes. |
+| 5. Check the seams | What does the user see *while waiting*? What survives reload? What does a member without access see? |
+
+Journeys live in `docs/internal/mvp/studio.md`, organised by user goal rather than by engine layer.
+Backend shapes (entities, endpoints) live in `docs/internal/mvp/engine.md`.
+
 ## Rules
 
+0. **Every design decision lands in a document.** RFCs and detail docs in `docs/` are the record — chat is not. If a decision was made in conversation, write it into the relevant doc in the same turn.
 1. Don't write code without complete implementation design decisions. Write an RFC first:
    - **MVP-scope RFCs go in `docs/internal/mvp/rfc-NNN-<topic>.md`** — alongside the per-layer detail docs. This is where everything new lives while the MVP is being built.
    - `docs/rfcs/` is the legacy / pre-MVP / platform-architecture home (RFC-001 … RFC-017). Don't add new MVP RFCs there.
