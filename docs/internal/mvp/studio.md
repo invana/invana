@@ -37,6 +37,8 @@ flowchart LR
     H --> I
     I --> J["Canvases<br/>keep & revisit"]
     I --> K["Thoughts<br/>how it thought"]
+    K --> L["Schedules<br/>re-ask it daily"]
+    L -.->|"each firing"| K
 ```
 
 | Journey | Goal | Entry |
@@ -46,7 +48,8 @@ flowchart LR
 | [4](#4-designing-the-model) | Design the shape of my data | `/u/:user/:atlas/modeller` |
 | [5](#5-bringing-data-in) | Load data and verify it landed | `settings/datasets` |
 | [6](#6-asking-questions) | Ask, watch it think, keep the answer | `/u/:user/:atlas/explorer` |
-| [7](#7-operating) | Tokens, thinkings, events, progress | `settings/*` · `/platform/events` |
+| [7](#7-scheduling-thoughts) | Have a question re-asked on a schedule | `/explorer` · `settings/schedules` |
+| [8](#8-operating) | Tokens, thinkings, events, progress | `settings/*` · `/platform/events` |
 
 ---
 
@@ -329,7 +332,56 @@ feels slower than a spinner even when it finishes sooner — the wait becomes vi
 
 ---
 
-## 7. Operating
+## 7. Scheduling thoughts
+
+**As an analyst, I want a question I care about re-asked on its own, so that I find out the answer
+changed without remembering to check.**
+
+A schedule is attached to a **thought I already asked** — never composed from scratch. That keeps the
+mental model small: you only schedule questions you've seen work, and every firing lands under the
+same ask so the answers stack into a timeline you can compare.
+
+```mermaid
+flowchart TD
+    DONE["A thinking finished<br/>answer looks right"] --> REP["'Repeat…' on the thinking card"]
+    REP --> BUILD["Cron builder<br/>presets · custom · timezone"]
+    BUILD --> PRE["Preview: next 5 runs"]
+    PRE --> V{"below the<br/>minimum interval?"}
+    V -->|yes| ERR["Inline 422:<br/>'at most every 15 minutes'"]
+    ERR --> BUILD
+    V -->|no| SAVE["Saved · badge on the thought"]
+    SAVE --> LIST["Schedules screen<br/>next run · last outcome"]
+    LIST --> ACT["Pause · Resume · Run now · Edit · Delete"]
+    ACT --> LIST
+    SAVE -.->|clock fires| NEWTHK["New thinking<br/>labelled 'scheduled'"]
+    NEWTHK --> TL["Thought timeline<br/>newest first"]
+    TL --> DIFF["Open two thinkings<br/>compare answers"]
+    NEWTHK -.->|"previous run still going"| SKIP["Run skipped<br/>shown in history"]
+    NEWTHK -.->|"atlas archived / read-only"| HALT["Firing paused<br/>banner on the schedule"]
+```
+
+| Surface | Route | What it shows |
+|---|---|---|
+| **Repeat action** | on the thinking card, `/explorer` | opens the cron builder for that thought |
+| **Cron builder** | dialog | presets (hourly · daily 09:00 · weekly Mon · monthly 1st) · custom cron · timezone · agent override · next-5-runs preview |
+| **Schedule badge** | thought row + thinking card | `⏱ daily 09:00` · dimmed when paused |
+| **Thought timeline** | `/thoughts/:id` | every thinking under the ask, newest first, each tagged **asked** or **scheduled** |
+| **Schedules screen** | `settings/schedules` | Atlas-wide list — thought, cadence, next run, last outcome, inline pause / run-now |
+
+| Seam | What the user sees |
+|---|---|
+| While a scheduled run is in flight | the thought row shows a live spinner; opening it tails the stream like any thinking |
+| On reload mid-run | replay from `seq=0` — no difference from an interactive thinking |
+| Run skipped (overlap) | a muted row in the schedule's run history, with the reason |
+| Run failed | the timeline entry is red; the error is the thinking's own `error` emission |
+| Atlas archived or read-only | schedules stop firing and say so; definitions are preserved, nothing is deleted |
+| Member without access | never sees the Atlas, so never sees its schedules |
+| Thought deleted | the schedule goes with it — confirmed in the delete dialog |
+
+**Empty state:** the Schedules screen with none set up points back at the Explorer — "schedule a
+question you've already asked" — rather than offering a create-from-blank form.
+
+## 8. Operating
 
 ```mermaid
 flowchart TD
@@ -358,7 +410,7 @@ flowchart TD
 
 ---
 
-## 8. Streaming (backend supports SSE — the frontend has to consume it)
+## 9. Streaming (backend supports SSE — the frontend has to consume it)
 
 Every long-running surface streams. One hook pattern, three consumers.
 
@@ -374,7 +426,7 @@ Every long-running surface streams. One hook pattern, three consumers.
 
 ---
 
-## 9. Telemetry & observability (studio side)
+## 10. Telemetry & observability (studio side)
 
 | # | Task | Detail | Status |
 |---|---|---|---|
@@ -387,7 +439,7 @@ Every long-running surface streams. One hook pattern, three consumers.
 
 ---
 
-## 10. Foundations
+## 11. Foundations
 
 | # | Task | Detail | Status |
 |---|---|---|---|

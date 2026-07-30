@@ -1,8 +1,9 @@
-# Engine — MVP backend scope (architecture, data, APIs)
+# Engine — MVP backend scope (architecture, data, guards)
 
 The backend half of [`../mvp.md`](../mvp.md). This describes the **target system on its own terms** —
-what the data looks like, what the endpoints are, and how a request becomes work. The frontend
-counterpart is [`studio.md`](studio.md); slice sequencing stays in [`../mvp.md`](../mvp.md).
+what the data looks like, how a request becomes work, and what guards it. The endpoints themselves
+live in [`api.md`](api.md). The frontend counterpart is [`studio.md`](studio.md); slice sequencing
+stays in [`../mvp.md`](../mvp.md).
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[-]` deferred post-1.0
 
@@ -165,6 +166,8 @@ erDiagram
     SESSION_MESSAGE |o--o| THOUGHT : carries
     ATLAS ||--o{ THOUGHT : "asked in"
     THOUGHT ||--o{ THINKING : "thought about, 1..n"
+    THOUGHT |o--o| THOUGHT_SCHEDULE : "re-asked on a schedule"
+    THOUGHT_SCHEDULE ||--o{ THINKING : "fires"
     AGENT ||--o{ THINKING : "thinks via"
     THINKING ||--o{ THINKING_STEP : steps
     THINKING ||--o{ THOUGHT_STREAM : emits
@@ -185,6 +188,7 @@ erDiagram
 | `Thought 1:n Thinking` | a **rethink** adds a thinking, never mutates the thought. Two agents' attempts sit side by side |
 | `Session 1:1 Canvas` | the canvas is self-contained (own snapshot + query), so a member opens it without reading a private thread |
 | `Thinking → ThoughtStream` | append-only with a cursor, so it is simultaneously the live feed, the reload replay, and the provenance chain |
+| `Thought 0:1 ThoughtSchedule` | a schedule re-asks **the same immutable ask**, so every firing is another thinking under one thought — which is what makes "what changed since yesterday?" a diff of two thinkings rather than a join across sibling thoughts |
 
 ### 2.2 What a thinking emits — the projection contract
 
@@ -224,6 +228,7 @@ thread layout stable.
 | Owner deletion | blocked while the user owns any Atlas (RESTRICT) |
 | Thought stream | newest `INVANA_THINKING_HISTORY_LIMIT` thinkings per Atlas (500); payloads dropped after `INVANA_THOUGHT_STREAM_TTL_DAYS` (30) while thinkings + steps survive |
 | Canvas history | newest `INVANA_CANVAS_HISTORY_LIMIT` states per canvas (30) |
+| Scheduled thinkings | count against the same per-Atlas thinking limit; a schedule with no surviving thinkings keeps firing regardless |
 | Events | retained forever — audit is immutable |
 | Dataset files | object storage, `atlases/<atlas_id>/datasets/<dataset_id>/…`; deletion cascades to objects |
 
@@ -307,6 +312,7 @@ flowchart TB
         SESS["Session"]
         MSG["SessionMessage"]
         THT["Thought<br/>immutable"]
+        SCHED["ThoughtSchedule<br/>cron · timezone · enabled"]
         THK["Thinking"]
         STEP["ThinkingStep"]
         STREAM["ThoughtStream<br/>append-only"]
@@ -350,6 +356,8 @@ flowchart TB
     CLIENT --> SESS --> MSG --> THT
     ATLAS --> THT
     THT -->|"1..n · a rethink adds one"| THK
+    THT -.->|"0..1"| SCHED
+    SCHED -->|"each firing opens one"| THK
     AGENT -->|"thinks via"| THK
     THK --> STEP
     THK --> STREAM
@@ -367,6 +375,7 @@ flowchart TB
     IJ -.-> EVENT
     SJ -.-> EVENT
     THK -.-> EVENT
+    SCHED -.-> EVENT
     STOK -.-> EVENT
 ```
 
@@ -383,143 +392,59 @@ Four stores, and the boundary between them is the thing to keep straight:
 
 ### 3.2 The four flows
 
-| Flow | Chain | Ends in |
-|---|---|---|
-| **Authoring** | `User → Atlas → Connection` · `GraphModel → GraphVersion → NodeType/EdgeType/PropertyKey` | a published version — the grounding schema every thinking reads |
-| **Ingestion** | `dataset dir → Dataset → ImportJob → ImportJobLog + object storage` then `StitchMapping → StitchJob` | rows in the bound graph DB, provenance-stamped |
-| **Asking** | `Session → SessionMessage → Thought → Thinking` (via `Agent` + `LLMProvider` + `Skill`) `→ ThinkingStep + ThoughtStream` | emissions the client subscribes to; optionally a `CanvasState` |
-| **Trust** | every mutating surface → `Event`; external entry via `ScopedToken` | an audit trail retained forever, and a provenance chain from answer back to source record |
+Four things a user does with an Atlas, in the order they do them. Each one ends somewhere concrete.
 
-Two properties of the shape are load-bearing:
+| # | Flow | Chain | Ends in |
+|---|---|---|---|
+| 1 | **Modelling the graph** | `User → Atlas → Connection` · `GraphModel → GraphVersion → NodeType/EdgeType/PropertyKey` | a published version — the grounding schema every thinking reads |
+| 2 | **Ingesting data into the graph** | `dataset dir → Dataset → ImportJob → ImportJobLog + object storage` then `StitchMapping → StitchJob` | rows in the bound graph DB, provenance-stamped |
+| 3 | **Asking** | `Session → SessionMessage → Thought → Thinking` (via `Agent` + `LLMProvider` + `Skill`) `→ ThinkingStep + ThoughtStream` | emissions the client subscribes to; optionally a `CanvasState` |
+| 4 | **Scheduling thoughts** | `Thought → ThoughtSchedule` → (on each firing) `Thinking → ThinkingStep + ThoughtStream` | a time series of thinkings under one unchanged ask — the same question, answered again as the graph moves |
+
+Flow 4 is flow 3 with the human taken out of the trigger. It reuses the entire asking path unchanged:
+a schedule fires exactly what a **rethink** fires, so an answer that arrived at 09:00 unattended is
+indistinguishable in shape, provenance and replayability from one a user asked for.
+
+```mermaid
+flowchart LR
+    M["1 · Model<br/>published GraphVersion"] --> I["2 · Ingest<br/>rows in the graph DB"]
+    I --> A["3 · Ask<br/>Thought → Thinking"]
+    A --> S["4 · Schedule<br/>ThoughtSchedule re-asks it"]
+    S -.->|"each firing = another Thinking<br/>on the same Thought"| A
+    I -.->|"new data changes the answer"| S
+```
+
+Three properties of the shape are load-bearing:
 
 - **Nothing analytical crosses a request boundary.** A `Thought` is recorded and a `Thinking` is
   opened; the work happens elsewhere and reports back through `ThoughtStream`. The API never holds a
-  graph query open.
+  graph query open. This is also why scheduling is cheap — the firing path and the interactive path
+  are the same path.
 - **The flow is one-way into the graph DB.** Reads are unrestricted; writes arrive only via
   `StitchJob` or write-back, both of which stamp what produced them — which is what makes the
-  provenance chain in §4.8 answerable at all.
+  provenance chain in [`api.md`](api.md) §9 answerable at all.
+- **Trust is not a fifth flow, it is a stamp on the other four.** Every mutating surface writes an
+  `Event`; external entry arrives via `ScopedToken`; every materialised node carries its source
+  record. There is no path into the system that opts out of it.
 
 ---
 
 ## 4. API surface
 
-All atlas-scoped paths are prefixed `/api/v1/u/{username}/{atlasSlug}`; guards per §1.5.
+Moved to its own document: [`api.md`](api.md) — every endpoint, grouped by area, plus the internal
+thinking surface and the Python/CLI dataset API.
 
-### 4.1 Auth
-
-| Method | Path | Purpose |
-|---|---|---|
-| `POST` | `/api/v1/auth/register` | **superuser-only** provisioning |
-| `POST` | `/api/v1/auth/login` | |
-| `POST` | `/api/v1/auth/refresh` | rotates the refresh token |
-| `POST` | `/api/v1/auth/logout` | |
-| `GET` | `/api/v1/auth/me` | |
-| `PATCH` | `/api/v1/auth/me` | first/last name · username (rate-limited) |
-| `POST` | `/api/v1/auth/me/password` | verifies current; revokes all refresh tokens |
-| `DELETE` | `/api/v1/auth/me` | 409 if sole superuser or owns any Atlas |
-| `GET` | `/api/v1/auth/username-available?username=` | unauthenticated → `{available, reason?}` |
-
-### 4.2 Atlas & settings
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` `POST` | `/api/v1/atlases` | list · create |
-| `GET` `PATCH` `DELETE` | `…/{atlasSlug}` (via `/u/{username}/{atlasSlug}`) | hard delete cascades downward |
-| `POST` | `…/setup/{section}` | wizard progress |
-| `POST` | `…/archive` · `…/unarchive` | lifecycle |
-| `GET` `PUT` `DELETE` | `…/connection` | PUT is full-replace; empty `auth` keeps stored creds |
-| `POST` | `…/connection/test` · `/ping` · `/introspect` | |
-| `POST` | `…/connection/acknowledge-version` | clears the untested-version read-only lock |
-| `GET` `POST` `PATCH` `DELETE` | `…/skills[/{id}]` | 409 on duplicate name |
-| `GET` `POST` `PATCH` `DELETE` | `…/llm[/{id}]` | |
-| `POST` | `…/llm/{id}/ping` · `…/llm/{id}/set-default` | |
-| `GET` `POST` `PATCH` `DELETE` | `…/agents[/{key}]` | train of thought + bindings + policy |
-| `GET` | `…/members` | binary membership |
-| `GET` | `…/events` · `…/events/stream` | keyset list · SSE tail (`?token=` fallback) |
-| `GET` | `/api/v1/events` · `/api/v1/events/stream` | superuser, all Atlases |
-
-### 4.3 Model
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` `POST` `PATCH` `DELETE` | `…/models[/{id}]` | model CRUD |
-| `GET` `POST` | `…/models/{id}/versions` | create a draft |
-| `POST` | `…/models/{id}/versions/{vid}/activate` | publish (also the "commit" for generative sessions) |
-| `GET` | `…/schema/active-version` | the grounding schema |
-| `POST` `PATCH` `DELETE` | `…/versions/{vid}/node-types[/{id}]` | draft-only → 409 |
-| `POST` `PATCH` `DELETE` | `…/versions/{vid}/edge-types[/{id}]` | draft-only → 409 |
-| `POST` `PATCH` `DELETE` | `…/property-keys[/{id}]` | type enforcement → 422 |
-
-### 4.4 Datasets
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` `POST` | `…/datasets` | list · register (starts an import job) |
-| `GET` `DELETE` | `…/datasets/{dsid}` | detail (model + counts + last job) · hard delete incl. objects |
-| `GET` | `…/datasets/{dsid}/jobs[/{jid}]` | job list · detail (status, progress, counts) |
-| `GET` | `…/datasets/{dsid}/jobs/{jid}/logs` | paginated |
-| `GET` | `…/datasets/{dsid}/jobs/{jid}/logs/stream` | SSE |
-| `GET` | `…/datasets/{dsid}/files[/{path}]` | object tree · fetch (signed or proxied) |
-| `GET` | `…/datasets/{dsid}/records?type=&page=&page_size=` | paginated, scoped to one type |
-
-**Python API** (for externally-prepared data): `invana.datasets.import_dataset(atlas, name, path, *,
-refresh=False, strict=False)` → `ImportJob` handle with `.wait()` / `.stream_logs()`; `atlas` accepts a
-handle or `"username/slug"`. CLI shim: `invana datasets import --atlas <u/s> --name <n> --path <dir>
-[--refresh] [--strict]`.
-
-### 4.5 Stitching
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` `POST` `PATCH` `DELETE` | `…/mappings[/{id}]` | system type → user concept |
-| `POST` | `…/stitch` | materialise into the bound connection |
-| `GET` | `…/stitch-jobs[/{id}]` | status · progress · logs (SSE like imports) |
-| `GET` | `…/provenance/{node_or_edge_id}` | source dataset · record · job |
-
-### 4.6 Sessions & canvases
-
-| Method | Path | Purpose |
-|---|---|---|
-| `GET` `POST` | `…/sessions` | `?surface=` filter |
-| `GET` `PATCH` `DELETE` | `…/sessions/{id}` | |
-| `GET` `POST` | `…/sessions/{id}/messages` | append a turn |
-| `GET` `POST` `PATCH` `DELETE` | `…/canvases[/{id}]` | paginated · `?include_archived` · shared atlas-wide |
-| `GET` `POST` | `…/canvases/{id}/states` | version list (summary) · capture |
-| `GET` | `…/canvases/{id}/states/{sid}` | full snapshot + thumbnail |
-
-### 4.7 Thoughts & thinking
-
-| Method | Path | Purpose |
-|---|---|---|
-| `POST` | `…/thoughts` | pose a thought → opens a thinking → `202 {thought_id, thinking_id, stream_url}` |
-| `GET` | `…/thoughts?session_id=` | list, each with its newest thinking |
-| `GET` | `…/thoughts/{id}` | the ask + all its thinkings |
-| `POST` | `…/thoughts/{id}/rethink` | new thinking over the same thought (`{agent?}`) |
-| `GET` | `…/thinkings/{id}` | thinking + steps |
-| `GET` | `…/thinkings/{id}/stream?after=` | **SSE** live tail |
-| `GET` | `…/thinkings/{id}/trace?after=&limit=` | thought-stream replay page |
-| `POST` | `…/thinkings/{id}/resume` | answer a clarification, carry on |
-| `POST` | `…/thinkings/{id}/cancel` | stop thinking |
-
-**Internal surface** — authenticates a *thinking*, not a user:
-
-| Method | Path | Purpose |
-|---|---|---|
-| `POST` | `/internal/thinkings/{id}/stream` | worker → engine emission ingest |
-| `POST` | `/internal/thinkings/{id}/steps` | step transitions |
-| `GET` | `/internal/thinkings/{id}/resources` | exchange the thinking token for short-lived scoped credentials |
-| `POST` | `/internal/thinkings/{id}/state` | orchestrator automation: terminal state backstop |
-
-### 4.8 Retrieval & external access
-
-| Method | Path | Purpose |
-|---|---|---|
-| `POST` | `…/search?type=semantic` | vector retrieval, similarity-scored |
-| `POST` | `…/explorer/expand/{neighbors,by-edge-type,by-node-type}` | read-only neighbour reads → `{data, total, offset, limit, returned, has_more}` |
-| `POST` `GET` `DELETE` | `…/tokens[/{id}]` | issue (returned exactly once) · list · revoke |
-
-Every retrieval response carries provenance: `nodes[]` · `edges[]` · `records[]` (with `dataset_id` +
-`record_id`) · `import_job_id`.
+| Area | See |
+|---|---|
+| Auth | [`api.md`](api.md) §1 |
+| Atlas & settings | [`api.md`](api.md) §2 |
+| Model | [`api.md`](api.md) §3 |
+| Datasets | [`api.md`](api.md) §4 |
+| Stitching | [`api.md`](api.md) §5 |
+| Sessions & canvases | [`api.md`](api.md) §6 |
+| Thoughts & thinking (+ internal surface) | [`api.md`](api.md) §7 |
+| Schedules | [`api.md`](api.md) §8 |
+| Retrieval & external access | [`api.md`](api.md) §9 |
 
 ---
 
@@ -527,7 +452,7 @@ Every retrieval response carries provenance: `nodes[]` · `edges[]` · `records[
 
 | Area | Status | Backend work |
 |---|---|---|
-| **Auth** (§4.1) | `[~]` | User + username · bcrypt · JWT access/refresh · superuser-provisioned register · `get_current_user` · account self-service with sole-superuser / owns-graph guards |
+| **Auth** ([`api.md`](api.md) §1) | `[~]` | User + username · bcrypt · JWT access/refresh · superuser-provisioned register · `get_current_user` · account self-service with sole-superuser / owns-graph guards |
 | **CLI bootstrap** | `[~]` | `invana init` (username required, idempotent, `--non-interactive`); creates no graph |
 | **Admin** | `[x]` | starlette-admin at `/admin`, `SuperuserAuthProvider` (session cookie, re-checked per request) · model views for every table with sensitive columns excluded |
 | **Atlas + wizard + connection** | `[x]` | CRUD · `setup_state` + gating dep · 1:1 connection with test/ping/introspect · immutable `connector_class` |
@@ -537,9 +462,10 @@ Every retrieval response carries provenance: `nodes[]` · `edges[]` · `records[
 | **Backend capabilities (RFC-022)** | `[ ]` | version-resolved `CapabilityProfile` per connector · `server_version` detect + cache · `CompatibilityStatus` + effective read-only · acknowledge route · property-type enforcement (422) |
 | **Model authoring** | `[x]` | full model/version/type/property CRUD · draft-only 409s · publish/activate · introspect seeds a draft |
 | **Generative model sessions** | `[x]` | modeller-surface branch: ensure model+draft → forced-tool propose → referential validate → reconcile into draft · commit reuses activate |
-| **Datasets** (§4.4) | `[ ]` | entities · model + record validators · object storage · job lifecycle + structured logs + SSE · Python API + CLI |
-| **Stitcher** (§4.5) | `[ ]` | mappings · identity resolution + conflict report · materialisation job · provenance stamping |
-| **Agents · thoughts · thinking** (§4.7) | `[ ]` | `tasks/` library + `TaskContext` · `agents/` interpreter · `runtime/` protocol + `inline` adapter + entry-point discovery · thought/thinking/step/stream tables + retention · thought & thinking API + SSE + internal surface |
+| **Datasets** ([`api.md`](api.md) §4) | `[ ]` | entities · model + record validators · object storage · job lifecycle + structured logs + SSE · Python API + CLI |
+| **Stitcher** ([`api.md`](api.md) §5) | `[ ]` | mappings · identity resolution + conflict report · materialisation job · provenance stamping |
+| **Agents · thoughts · thinking** ([`api.md`](api.md) §7) | `[ ]` | `tasks/` library + `TaskContext` · `agents/` interpreter · `runtime/` protocol + `inline` adapter + entry-point discovery · thought/thinking/step/stream tables + retention · thought & thinking API + SSE + internal surface |
+| **Scheduled thoughts** ([`api.md`](api.md) §8) | `[ ]` | `thought_schedules` + run-history table · cron parse/validate in an IANA timezone · due-scan tick that opens a thinking per firing (skip-on-overlap, no backfill) · pause/resume/run-now · `triggered_by=schedule` attribution · firings stop on archived / read-only Atlas |
 | **LLM runtime** | `[ ]` | provider-agnostic client: dispatch by provider, lazy SDK import, decrypt at call time, sync SDKs in `asyncio.to_thread` · structured output via forced tool-use with a JSON-schema fallback for Ollama/local · one repair round-trip · per-call timeout · normalised `LLMError` |
 | **Grounding** | `[ ]` | prompt assembly (instructions + skills + retrieved context) · refuse to call with empty context for grounded ops · prompt caching where supported |
 | **Groundedness / cannot-answer** | `[ ]` | detect empty context · explicit `cannot_answer` payload distinct from an empty answer · log as a defect-class event |
@@ -587,6 +513,8 @@ orchestrator.
 | `INVANA_THOUGHT_STREAM_TTL_DAYS` | stream payload retention (30) |
 | `INVANA_THINKING_STALE_AFTER` | reconciler threshold for stuck thinkings |
 | `INVANA_CANVAS_HISTORY_LIMIT` | canvas states kept per canvas (30) |
+| `INVANA_SCHEDULE_MIN_INTERVAL_MINUTES` | floor on schedule frequency (15) |
+| `INVANA_SCHEDULE_TICK_SECONDS` | due-scan interval (60) |
 | `INVANA_TELEMETRY_ENABLED` | OTel providers on/off |
 
 LLM credentials are **per `llm_providers` row, encrypted** — never environment variables.
@@ -595,3 +523,73 @@ LLM credentials are **per `llm_providers` row, encrypted** — never environment
 
 Postgres (app state) · MinIO (S3-compatible object storage) · optional graph DB containers per
 supported backend · optional Prefect server profile (only for `INVANA_RUNTIME=prefect`).
+
+---
+
+## 7. Delivery slices — engineering detail
+
+Slice *ordering* and the user-facing outcome of each slice live in [`../mvp.md`](../mvp.md) § Delivery.
+This section is what each slice actually touches on the backend, and where it can hurt.
+
+### 7.1 Cross-cutting, not owned by any one slice
+
+| Item | Detail | Status |
+|---|---|---|
+| Encryption at rest | Fernet (`INVANA_ENCRYPTION_KEY`) for `connections.auth_encrypted` + `llm_providers.api_key_encrypted` | `[ ]` |
+| Object storage | MinIO in dev; S3-compatible client so prod swaps to S3 / GCS / R2. Dataset files only. | `[ ]` |
+| Logging | Structured; correlation id carried request → task → thinking | `[ ]` |
+| Telemetry | Engine traces/metrics/logs + Studio end-to-end query→render tracing, stitched FE→BE | `[ ]` |
+| CORS | Permissive in dev, `INVANA_CORS_ALLOWED_ORIGINS` in prod | `[ ]` |
+| Alembic | Reset on `arch/redesign`; one new initial migration covers the full redesigned schema | `[ ]` |
+| Runtime seam | Orchestration behind one protocol; bundled `inline` needs no infra, `invana-prefect` ships separately | `[ ]` |
+| Changesets | Every user-facing change carries one (CLAUDE.md #8) | `[ ]` |
+| Docker | Multi-target Dockerfile → `invana/engine`, `invana/studio` | `[ ]` |
+| Docs | MkDocs Material auto-built from `docs/` | `[ ]` |
+
+### 7.2 Per-slice backend scope
+
+| Slice | Backend work | Status |
+|---|---|---|
+| **S0** | Alembic reset · `secret_key` + `INVANA_ENCRYPTION_KEY` wired · empty `auth/` + `atlases/` modules mounted · OpenAPI → TS client generator in `studio/scripts/` | `[ ]` |
+| **S1** | User (incl. username) · bcrypt · JWT access+refresh · `/auth/*` · `invana init` CLI (creates no Atlas) · `get_current_user` dep | `[ ]` |
+| **S1.5** | Container renamed to the top-level entity (+ member join; the old `Graph` model became the connection child) · `users.username` · `intent` + `setup_state` · routes re-prefixed · Alembic regenerated | `[x]` |
+| **S2** | Atlas CRUD · Connection sub-resource (GET/PUT/DELETE + test/ping/introspect) · `setup_state` + `require_atlas_setup_complete` · `query` + `schemas` routers re-prefixed · legacy `/api/v1/connections/*`, `/api/v1/atlases/{cid}/query`, `/api/v1/schemas/{sid}/active-version` shims deleted | `[x]` |
+| **S3** | Multi-model atlas-scoped `/models` — full CRUD + draft→publish + node/edge/property-key authoring, draft-only and 409-guarded | `[x]` |
+| **S3** (capabilities) | Version-resolved `CapabilityProfile` per connector · `server_version` detect + cache · `CompatibilityStatus` + effective read-only · acknowledge route · property-type enforcement (422) | `[ ]` |
+| **S4** | `LLMProvider` entity + Fernet · CRUD + ping + set-default under `/llm/...` · partial unique on `is_default` | `[x]` |
+| **S5** | Skill CRUD under `/skills/...`, unique `(atlas_id, name)`. The separate Instructions table shipped here and was later removed — folded into the single `Atlas.instructions` field. | `[x]` |
+| **S5.5** | `events` append-only table + indexes + Alembic `00000000000d` · `emit_event` + sensitive-field redaction · keyset reads + SSE · `pg_notify` trigger + per-worker `LISTEN events` daemon + in-process broadcaster · superuser/member gates · admin view. Wired across every write surface (atlas, connection, llm, skills, instructions, members, auth, `query.execute`, system). | `[x]` |
+| **S6a** | Dataset + ImportJob entities · `graph_model` JSONB · `atlas_id` FK · Pydantic schema for `model.json` + property constraints (string/int/float/bool/enum/datetime/uuid/json with required/min/max/length/pattern/enum.values) · model-driven record validator producing a structured report (file, record_index, record_id, field, rule, message) · referential integrity + node-id uniqueness | `[ ]` |
+| **S6b** | MinIO in compose · `INVANA_S3_*` · async S3 client · bucket layout `atlases/<atlas_id>/datasets/<dsid>/...` · streamed + multipart uploads · file tree + fetch endpoints | `[ ]` |
+| **S6c** | Executor interface + LocalExecutor · ImportJob stages (upload → validate model → validate records → derive system graph model → persist → done) · `import_job_logs` structured rows · SSE log stream | `[ ]` |
+| **S6d** | `invana.datasets.import_dataset(atlas, name, path, *, refresh=False, strict=False)` → `ImportJob` handle with `.wait()` / `.stream_logs()` · CLI `invana datasets import --atlas <username/slug> --name <name> --path <dir>` | `[ ]` |
+| **S7** | Mappings · identity resolution + conflict report · materialisation job · provenance stamping (`dataset_id` + `record_id` + `stitch_job_id` on every materialised node) | `[ ]` |
+| **S9a** | Layered packages (`core/ tasks/ agents/ runtime/ api/ worker/`) + import-direction lint · `translate` · `validate` · `execute` · `shape` as typed tasks with `TaskContext`. No behaviour change. | `[ ]` |
+| **S9b** | `thoughts` · `thinkings` · `thinking_steps` · `thought_stream` · `Runtime` protocol + bundled `inline` adapter · thought/thinking API + SSE · seeded deterministic `nl-query` train of thought | `[ ]` |
+| **S9c** | `integrations/invana-prefect` + `invana worker` + Prefect compose profile · state sync + stale reconciler · `clarify` suspend/resume | `[ ]` |
+| **S9d** | `plan` task drives the bounded-agency loop over the allow-list, reading Atlas instructions + bound skills | `[ ]` |
+| **S9e** | Write-back with `thinking_id` provenance · success-criteria scoring | `[ ]` |
+| **S8a** | `thought_schedules` + run-history tables · cron + IANA-timezone validation · min-interval guard (422) | `[ ]` |
+| **S8b** | Due-scan tick opens a thinking per firing · skip-on-overlap · no backfill · `triggered_by=schedule` attribution · archived / read-only Atlas halts firing | `[ ]` |
+| **S8c** | Pause · resume · run-now · Atlas-wide `…/schedules` list with `next_run_at` + last outcome | `[ ]` |
+| **S10** | Scoped tokens · token-auth dep parallel to JWT · retrieval endpoints (query / semantic / skill-mediated) · provenance in every response · archived-Atlas read-only freeze | `[ ]` |
+| **S11** | `status` enum · archived-Atlas write block on every mutating route · cascade matrix + ownership check | `[ ]` |
+
+### 7.3 Where it hurts
+
+| Risk | Mitigation |
+|---|---|
+| **S9a touches every import.** Mechanical but wide — same class as the S1.5 rename. | Land the import-direction lint rules *first* so they point at the work. One package per commit, suite green each time, no feature work interleaved. |
+| **S9b/S9c trade interactive latency for uniformity** — everything becomes a thinking, including a fast query. | Watch `submit → first emission`, not total duration. If p95 can't be held with warm workers, the fix is a per-agent fast path — a config change on the existing seam, not a redesign. **Don't pre-build it.** |
+| **S6 looks bigger than it is.** No connector framework in MVP — it's JSON validation plus storage. | Ship it small and fast. The executor boundary is what matters; Celery / Ray / K8s drop in later with no UI change. |
+| **Renames touch everywhere.** S1.5 proved it. | Land them before dependent slices start, so no new code is written against old names. |
+| **`connections.atlas_id` is nullable** — artefact of the deleted standalone connection surface. | Tighten to `NOT NULL` in a future migration once orphan rows are cleared. |
+| **Canvas integration is closed.** Studio renders exclusively through `@invana/canvas-react`, never `@invana/canvas` directly. `ExplorerCanvas` is the read/query visualiser; `SchemaCanvas` is the interactive schema editor. The old `@invana/canvas-core` + `@invana/layouts-d3-force` packages are gone. | Reopening this is a design decision, not a refactor. |
+
+### 7.4 Working pattern
+
+| Day | Work |
+|---|---|
+| 1 | Define Pydantic schemas + OpenAPI in the engine; regenerate the TS client; Studio stubs the page against the typed client |
+| 2–N | Engine implements; Studio wires real calls; both on one feature branch |
+| Gate | The slice's "Done when" sentence in [`../mvp.md`](../mvp.md) is reproducible from a clean checkout **by someone else** |
