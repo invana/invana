@@ -28,7 +28,7 @@ Everything in the MVP serves one of these. If a proposed feature doesn't, it isn
 | **1** | **Bind a domain** | Connect one graph database, define the model, load data into it. One Atlas = one bounded, curated context — not "all your data". | Journeys [3](mvp/studio.md#3-creating--configuring-an-atlas) · [4](mvp/studio.md#4-designing-the-model) · [5](mvp/studio.md#5-bringing-data-in) |
 | **2** | **Answer in plain language** | Ask in English. Invana translates to Cypher or Gremlin, runs it, and returns an answer — a subgraph, a table, a number, a chart, or prose. | Journey [6](mvp/studio.md#6-asking-questions) |
 | **3** | **Show its work** | Every answer ran a **workflow** — understand → validate → execute → project — and you watch it run, step by step. Open any answer to see the prompt, the rationale, the generated query, the records, the timings. No answer is a black box. | Journey [6](mvp/studio.md#6-asking-questions) |
-| **4** | **Refuse to hallucinate** | Answers are grounded in the Atlas's graph. Nothing else. If the graph can't answer, Invana says "I can't answer that" — visibly styled as *not* an answer. | Journey [6](mvp/studio.md#6-asking-questions) |
+| **4** | **Refuse to hallucinate** | Answers are grounded in the Atlas's graph. Nothing else. If the graph can't answer, Invana says "I can't answer that" — visibly styled as *not* an answer. **When something breaks it explains why and what to do**, grounded in the same way: a diagnosis is never guessed. | Journey [6](mvp/studio.md#6-asking-questions) |
 | **5** | **Keep working without you** | Put a question you trust on a **schedule** — it re-asks itself as the graph moves, and the answers stack into a timeline you can diff. External agents read the Atlas through a scoped API, with provenance in every response. | Journeys [7](mvp/studio.md#7-schedules) · [8](mvp/studio.md#8-operating) |
 
 ---
@@ -117,7 +117,11 @@ Product-level capabilities. Each row links to the journey that specifies it.
 | Save and revisit canvases | ✅ | Tabs, autosave, version history, fork a past state. |
 | Visible workflow per answer | ✅ | Every answer names the workflow that produced it and shows its steps live — `understand · validate · execute · project` — with per-step timings. |
 | Full reasoning trace | ✅ | Prompt → rationale → generated query → records → timings. Clickable provenance. |
-| "Cannot answer" | ✅ | A distinct, deliberately non-answer-shaped response. |
+| "Cannot answer" | ✅ | A distinct, deliberately non-answer-shaped response — and distinct again from a *failure*. |
+| Automatic retries | ✅ | Transient faults (DB timeout, LLM 429) retry with backoff and jitter. Visible while it happens — `retrying 2/3`, never a silent pause. |
+| Self-repair | ✅ | An invalid generated query goes back to the model **once**, with the validation error attached. One round-trip, in the trace, not a hidden loop. |
+| Failure diagnosis + next steps | ✅ | A failure explains itself in your terms — cause, evidence, and suggested actions you can click ("ask about Vendor instead", "add the type in the Modeller"). Derived from real evidence, never invented. |
+| Clarifying questions | ✅ | When the ask is ambiguous, Invana asks — upfront, mid-thinking, or after a failure. Options come from your schema; "let me type it" is always there. Capped at 2 rounds. |
 | Schedule a question | ✅ | Put a thought on a cron; each firing re-asks it unattended and the answers stack into a timeline you can diff. |
 | Agent skills & instructions | ✅ | Per-Atlas prose that grounds every thinking. |
 | External-agent API | ✅ | Scoped tokens; retrieval endpoints with provenance. |

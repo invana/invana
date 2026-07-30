@@ -1,7 +1,7 @@
 # RFC-051 — Workflows and Schedules
 
 **Status:** Draft
-**Supersedes:** the "Train of thought" vocabulary row in [RFC-048](rfc-048-agent-runtime-on-prefect.md) · `mvp.md` S8 "Scheduled thoughts"
+**Supersedes:** in [RFC-048](rfc-048-agent-runtime-on-prefect.md) — the "Train of thought" vocabulary row, and the `workflow_spec` shape (§ 3.1 adds per-step `args`) · `mvp.md` S8 "Scheduled thoughts"
 **Depends on:** [RFC-048](rfc-048-agent-runtime-on-prefect.md) (thoughts · thinkings · the runtime seam)
 
 ---
@@ -153,6 +153,125 @@ degenerate case, no `plan` entry:
 | Built-in workflows are data (INSERT, not deploy) | A workflow builder UI |
 | `plan`-driven bounded agency exists in the interpreter (S9d) | Branch / conditional authoring |
 
+### 3.1 Spec shape — step arguments
+
+**Supersedes** the `workflow_spec` sketch in RFC-048 § *Trains of thought*, which had no place to put
+per-step arguments. `allow` was a flat list of task keys; a step could not be configured.
+
+```jsonc
+// agents.workflow_spec_jsonb
+{
+  "params": {                                  // the workflow's own inputs
+    "prompt": { "type": "string", "required": true }
+  },
+
+  "entry": "translate_thought",
+  "allow": ["translate_thought", "validate_query",
+            "execute_graph_query", "shape_for_canvas"],
+
+  "steps": {                                   // per-step configuration
+    "translate_thought": {
+      "label": "Understand",                     // shown on the thinking card
+      "args": {
+        "prompt":  "${params.prompt}",
+        "dialect": "${atlas.query_language}"
+      }
+    },
+    "execute_graph_query": {
+      "label": "Execute",
+      "args": {
+        "query":      "${steps.translate_thought.query}",
+        "page_size":  500,
+        "timeout_ms": 30000,
+        "read_only":  true                     // pinned — the planner cannot unset it
+      }
+    },
+    "shape_for_canvas": {
+      "label": "Project",
+      "args": { "batch_size": 500 }
+    }
+  },
+
+  "require":  { "execute_graph_query": ["validate_query"] },
+  "max_steps": 8,
+  "on_error": "emit_and_stop"
+}
+```
+
+#### Named only — there are no positional args
+
+A task's signature is `(ctx: TaskContext, p: InModel)`. There is exactly one params object, so
+`args` is **a mapping keyed by the task's input-model field names** — never an `args` list plus a
+`kwargs` map.
+
+This is not a style preference. RFC-048's task contract requires typed, JSON-serialisable in and out
+so a task can be cached, retried, or moved across a process boundary. Positional arguments do not
+survive that: they cannot be validated against a schema, cannot be partially bound, and silently
+break when a field is inserted.
+
+#### Steps name themselves
+
+Each step carries a **`label`** — the human word shown on the thinking card ("Understand", not
+`translate_thought`). It lives in the spec rather than in a Studio lookup table so that a workflow
+Studio has never seen still renders properly: when workflows become authorable post-1.0, a custom
+workflow's steps name themselves. Labels are validated as present at save time.
+
+#### Where a value comes from
+
+| Source | Form | Resolved from |
+|---|---|---|
+| Literal | `500` · `true` · `"cypher"` | the spec itself |
+| Workflow param | `${params.prompt}` | the caller's params, validated against the `params` block |
+| Earlier step's output | `${steps.<task_key>.<field>}` | that step's typed **return** value |
+| Atlas context | `${atlas.query_language}` · `${atlas.id}` | the resolved container |
+| The ask | `${thought.body}` · `${thought.kind}` | the Thought |
+
+#### The grammar is path lookup, and nothing else
+
+`${...}` resolves a **dotted path into a fixed namespace**. No arithmetic, no function calls, no
+conditionals, no string interpolation into code, no `eval`. An unresolvable path is a validation
+error, never an empty string.
+
+That restriction is load-bearing, not conservatism: a spec drives task dispatch, so any expression
+language in it is an execution surface — precisely what RFC-048 **D2** exists to prevent. Bounded
+agency survives only while a spec stays inert data.
+
+#### Validated when the agent is saved, not when it runs
+
+Because tasks are typed, a spec can be checked completely at authoring time. All of these are a 422
+on save, not a 3am failure:
+
+| Check | Rejects |
+|---|---|
+| Every key in `steps` is in `allow` | configuring a task the workflow can't dispatch |
+| Every step has a `label` | a step that would render as a raw task key |
+| Every `args` key is a field on that task's input model | typos, renamed fields, stale specs |
+| Every literal matches the field's type | `"page_size": "many"` |
+| Every `${steps.X.y}` — `X` provably runs before this step | forward references and cycles |
+| …and `y` is a field on `X`'s **output** model | binding to something a task never returns |
+| Required input fields are bound or defaulted | a task that cannot start |
+
+#### Pinned args beat the planner
+
+When a `plan` task is choosing the next step (S9d), it may supply arguments **only for fields the
+spec left unbound**. Anything pinned in `steps.<task>.args` is authoritative and cannot be overridden.
+
+That turns the args map into a safety control, not just configuration: pin `"read_only": true` and no
+planning decision can unset it, whatever the model returns.
+
+#### YAML is a surface form, JSON is the storage
+
+Built-in workflows are seeded from YAML in the repo because it is diffable and commentable; the
+stored column is JSONB. **One schema, two encodings** — the YAML is parsed to exactly this shape and
+validated by the same code path. No YAML-only features (anchors, tags, multi-doc) are honoured.
+
+#### This grammar is the seam for chains
+
+`${steps.X.y}` binds one step's output to the next *within* a workflow. Binding one **Thought's**
+answer to the next — a chain of thoughts (§ 7) — is the same idea one level up, over emissions rather
+than return values. Keeping one grammar for both is why § 7.3 lists binding expressions as a new
+column rather than a new language.
+
 ## 4. Schedules
 
 Everything specified in [`studio.md`](studio.md) § 7 carries over: cron builder, next-5-runs preview,
@@ -197,6 +316,93 @@ schedules  (id, atlas_id, thought_id, agent_id?, cron, timezone, state,
 | backfill | none — a missed window is missed |
 | archived Atlas | `state → halted`, emit `schedule.halted`; definition preserved |
 | thought deleted | schedule cascades — surfaced in the delete dialog |
+| **DST — skipped hour** | a wall-clock time that does not exist that day fires at the **next valid instant** (`02:30` → `03:30`) |
+| **DST — repeated hour** | a wall-clock time that occurs twice fires **once**, on the first occurrence; the second is suppressed |
+| **Repeated failure** | the schedule **never auto-pauses** — see § 4.4 |
+
+### 4.3 How a firing works
+
+The mechanism, end to end. The short version: **the Schedule decides *when*; the Agent decides
+*how*. They never touch each other.**
+
+| Concept | Decides |
+|---|---|
+| **Thought** | *what* is asked — fixed, immutable |
+| **Agent → Workflow** | *how* it gets answered — the task allow-list |
+| **Schedule** | *when*, and *whether* this window fires at all |
+| **Runtime** | *where* the tasks run — `inline` or Prefect |
+| **Thinking** | the record of one firing |
+
+```mermaid
+sequenceDiagram
+    participant CLK as Due-scan tick
+    participant E as Engine
+    participant R as Runtime
+    participant W as Worker
+    participant G as Graph DB / LLM
+
+    Note over CLK: every INVANA_SCHEDULE_TICK_SECONDS (60)
+    CLK->>E: schedules WHERE state='active' AND next_run_at <= now()
+    E->>E: guard 1 — Atlas archived? → state='halted', emit schedule.halted
+    E->>E: guard 2 — thinking already in flight on this thought?<br/>→ emit schedule.run_skipped, advance next_run_at, stop
+    E->>E: resolve agent (schedule.agent_id ?? originating thinking's agent)
+    E->>E: open Thinking(thought_id, agent_id, triggered_by='schedule')
+    E->>R: submit(agent, params, thinking)
+    E->>E: next_run_at = cron.next(timezone)   — no backfill
+    W->>G: workflow runs: understand → validate → execute → project
+    W->>E: emissions → thought_stream
+    W->>E: thinking.done
+    Note over E: nobody is subscribed — the stream is durable.<br/>The user replays from seq=0 whenever they open it.
+```
+
+**Guards run before a Thinking is opened, never after.** A skipped window must not leave a
+half-created run behind — that is what keeps `thinkings` clean enough to be the run log (§ 4.1).
+
+| Step | Detail |
+|---|---|
+| The clock | One due-scan tick is the only timer. There is no per-schedule timer, no in-process cron, nothing to lose on restart — `next_run_at` is state in Postgres |
+| Overlap | If the previous firing is still thinking, the window is **skipped, never queued**. Queueing lets a slow thought pile up firings until the Atlas is saturated |
+| Backfill | None. A missed window (engine down, Atlas archived) is missed — a stale answer computed late is worth less than the next fresh one |
+| Drift | `next_run_at` is computed from the cron expression, not from `last_run + interval`, so firings do not drift |
+| Attribution | `triggered_by='schedule'` on the thinking; the audit event names the schedule, not a user |
+| Submission | **`Runtime.submit(agent, params, thinking)` — byte-for-byte the interactive call.** A firing is a rethink with a clock instead of a click |
+
+**The schedule never reads the workflow.** It resolves an *agent* and hands it to the runtime; the
+agent carries the workflow. That is why changing an agent's workflow changes every future firing with
+no schedule migration, and why a schedule can be repointed to a different agent without touching the
+thought.
+
+### 4.4 A failing schedule keeps firing
+
+**Decision: consecutive failures never pause a schedule.** It fires on cadence regardless of how many
+times in a row it has failed.
+
+| | Chosen — never pause | Rejected — pause after N |
+|---|---|---|
+| Graph DB down for three mornings | fires again the moment it is back; the user does nothing | schedule is paused; the user must notice and resume |
+| Permanently broken schedule | keeps consuming graph DB and LLM budget | stops cleanly |
+| Requires the user to act | no | **yes — and nothing can tell them** |
+
+The deciding factor is that **notifications are post-1.0** (§ 6). A pause that nobody is told about
+converts a transient outage into a silently dead report — the failure mode is worse than the load it
+saves, because the user believes a schedule is running when it is not. Self-healing is the safer
+default while there is no channel to say "your schedule stopped."
+
+Accepted cost, recorded honestly: a permanently broken schedule retries forever. Three existing
+mechanisms bound the damage —
+
+| Bound | Effect |
+|---|---|
+| `INVANA_SCHEDULE_MIN_INTERVAL_MINUTES` (15) | caps firing frequency |
+| Skip-on-overlap (§ 4.3) | a slow or hanging thinking cannot pile up firings |
+| Per-step retry caps ([RFC-052](rfc-052-failure-handling.md) § 3) | bounds the work inside one firing |
+
+**Make it loud instead of stopping it.** Since the system will not act, the UI must: the Schedules
+screen shows a consecutive-failure count on the row (`failed 12 times in a row`), not just the last
+outcome. That gives the user everything needed to pause it themselves — which stays a manual action.
+
+**Revisit when notifications land.** Auto-pause becomes the better default the moment there is a way
+to tell someone it happened.
 
 ## 5. Journeys
 
@@ -366,6 +572,7 @@ the number should say so.
 
 | Slice | Engine | Studio |
 |---|---|---|
+| **S9a** | workflow spec validator — `steps.args` binding, `${...}` path resolution, save-time type checks against task input/output models (§ 3.1) | none |
 | **S9.5a** | `schedules` table · cron + IANA-timezone validation · min-interval guard (422) | "Schedule…" action on a thinking → cron builder with next-5-runs preview |
 | **S9.5b** | due-scan tick opens a thinking per firing · skip-on-overlap → `schedule.run_skipped` event · no backfill · `triggered_by=schedule` · archived Atlas → `halted` | thought detail lists thinkings as a timeline, newest first, each tagged **asked** or **scheduled** |
 | **S9.5c** | pause · resume · run-now · Atlas-wide `…/schedules` list with `next_run_at` + last outcome | Schedules screen: every schedule in the Atlas, next run, last outcome, pause/run-now inline |
@@ -382,5 +589,5 @@ diffable against yesterday's, and stamped `triggered_by=schedule` in the audit t
 |---|---|---|
 | Q1 | Does `triggered_by` become an enum (`user` · `schedule` · `api` · `chain`) now, or stay two-valued until S10's external-agent API needs a third? § 7.3 argues for the enum — a chain is a fourth value. | S9.5b |
 | Q2 | Can a Schedule override the agent per firing, or always inherit the originating thinking's agent? Interacts with RFC-048 § D12. | S9.5a |
-| Q3 | Step labels: does the card show task keys (`translate_thought`) or human labels (`understand`)? Labels read better but need a display-name field on the workflow spec. | S9b |
 | Q4 | Chain steps (§ 7.5): a **new Thought per firing** with resolved params, or **one Thought** with per-run params? Recommendation is the former — it preserves immutability. Decide before chains are built, not before MVP ships. | post-1.0 |
+| Q7 | Should `${steps.X.y}` reach into a step's **emissions** as well as its return value? Emissions are the chain-of-thoughts substrate (§ 7.2), so one grammar for both is tempting — but it couples a workflow to what a task chose to emit. | S9a |

@@ -245,6 +245,8 @@ decision up front: each emission declares its own surface, and **the `kind` *is*
 | `query.proposed` | query · language · rationale · confidence | thread — query chip · trace |
 | `plan.step` | chosen task · rationale | thread — reasoning line (LLM-planned agents only) |
 | `clarification.requested` | question · options · `options_query` | thread — resume form |
+| `diagnosis` | `cause` · `summary` · `evidence` · `suggestions[]` · `retryable` | **thread — blocked state with next steps.** Derived from real evidence; the model phrases it, never invents it |
+| `cannot_answer` | why the Atlas cannot support this ask | thread — a legitimate outcome, **thinking succeeds** |
 | `log` · `error` | level · message / code · message | trace / thread |
 | `thinking.done` | counts · timings | card footer · canvas history |
 
@@ -507,6 +509,7 @@ thinking surface and the Python/CLI dataset API.
 | **LLM runtime** | `[ ]` | provider-agnostic client: dispatch by provider, lazy SDK import, decrypt at call time, sync SDKs in `asyncio.to_thread` · structured output via forced tool-use with a JSON-schema fallback for Ollama/local · one repair round-trip · per-call timeout · normalised `LLMError` |
 | **Grounding** | `[ ]` | prompt assembly (instructions + skills + retrieved context) · refuse to call with empty context for grounded ops · prompt caching where supported |
 | **Groundedness / cannot-answer** | `[ ]` | detect empty context · explicit `cannot_answer` payload distinct from an empty answer · log as a defect-class event |
+| **Failure handling** ([`rfc-052-failure-handling.md`](rfc-052-failure-handling.md)) | `[ ]` | failure classifier (`transient · repairable · ambiguous · ungroundable · blocked · defect`) mapped onto the domain errors · retry policy declared in the workflow spec, executed by the runtime, declared **once** (never both spec and Prefect decorator) · one row per attempt in `thinking_steps` · bounded single repair round-trip · grounded `diagnosis` builder with suggested actions · clarification triggers unified, capped at 2 rounds, disabled for scheduled firings |
 | **Write-back** | `[ ]` | validate proposed nodes/edges against the user model · stamp `thinking_id` + `created_by=agent` · auto-commit vs review per policy |
 | **Success scoring** | `[ ]` | each criterion is a graph query returning pass/fail · on-demand + scheduled re-eval |
 | **Semantic retrieval** | `[ ]` | vector-index mixin for capable backends · embedding pipeline |
@@ -602,13 +605,14 @@ This section is what each slice actually touches on the backend, and where it ca
 | **S6c** | Executor interface + LocalExecutor · ImportJob stages (upload → validate model → validate records → derive system graph model → persist → done) · `import_job_logs` structured rows · SSE log stream | `[ ]` |
 | **S6d** | `invana.datasets.import_dataset(atlas, name, path, *, refresh=False, strict=False)` → `ImportJob` handle with `.wait()` / `.stream_logs()` · CLI `invana datasets import --atlas <username/slug> --name <name> --path <dir>` | `[ ]` |
 | **S7** | Mappings · identity resolution + conflict report · materialisation job · provenance stamping (`dataset_id` + `record_id` + `stitch_job_id` on every materialised node) | `[ ]` |
-| **S9a** | Layered packages (`core/ tasks/ agents/ runtime/ api/ worker/`) + import-direction lint · `translate` · `validate` · `execute` · `shape` as typed tasks with `TaskContext`. No behaviour change. | `[ ]` |
-| **S9b** | `thoughts` · `thinkings` · `thinking_steps` · `thought_stream` · `Runtime` protocol + bundled `inline` adapter · thought/thinking API + SSE · seeded deterministic `nl-query` workflow | `[ ]` |
-| **S9c** | `integrations/invana-prefect` + `invana worker` + Prefect compose profile · state sync + stale reconciler · `clarify` suspend/resume | `[ ]` |
-| **S9d** | `plan` task drives the bounded-agency loop over the allow-list, reading Atlas instructions + bound skills | `[ ]` |
+| **S9a** | Layered packages (`core/ tasks/ agents/ runtime/ api/ worker/`) + import-direction lint · `translate` · `validate` · `execute` · `shape` as typed tasks with `TaskContext` · workflow spec validator (`steps.args` bindings + `steps.retry` policy). No behaviour change. | `[ ]` |
+| **S9b** | `thoughts` · `thinkings` · `thinking_steps` · `thought_stream` · `Runtime` protocol + bundled `inline` adapter · thought/thinking API + SSE · seeded deterministic `nl-query` workflow · **failure classifier · retry execution with backoff + jitter · `diagnosis` emission** | `[ ]` |
+| **S9c** | `integrations/invana-prefect` + `invana worker` + Prefect compose profile · state sync + stale reconciler · `clarify` suspend/resume · **map spec retry policy onto native Prefect retries — assert it is declared once, never twice** | `[ ]` |
+| **S9d** | `plan` task drives the bounded-agency loop over the allow-list, reading Atlas instructions + bound skills · **repair round-trip (budget 1, counts against `max_steps`)** | `[ ]` |
 | **S9e** | Write-back with `thinking_id` provenance · success-criteria scoring | `[ ]` |
+| **S9f** | Diagnosis quality — grounded `cause` + `evidence` derivation, suggestions drawn from schema/data only, `cannot_answer` kept distinct from failure · **`ungroundable` dual path: code-detected, plus model assertion validated against the live schema (unverifiable → `defect`)** | `[ ]` |
 | **S9.5a** | `schedules` table · cron + IANA-timezone validation · min-interval guard (422) | `[ ]` |
-| **S9.5b** | Due-scan tick opens a thinking per firing · skip-on-overlap → `schedule.run_skipped` event · no backfill · `triggered_by=schedule` attribution · archived Atlas → `halted` | `[ ]` |
+| **S9.5b** | Due-scan tick opens a thinking per firing · skip-on-overlap → `schedule.run_skipped` event · no backfill · `triggered_by=schedule` attribution · archived Atlas → `halted` · **DST rule (skipped hour → next valid instant; repeated hour → fire once)** · **consecutive-failure counter, no auto-pause** | `[ ]` |
 | **S9.5c** | Pause · resume · run-now · Atlas-wide `…/schedules` list with `next_run_at` + last outcome | `[ ]` |
 | **S10** | Scoped tokens · token-auth dep parallel to JWT · retrieval endpoints (query / semantic / skill-mediated) · provenance in every response · archived-Atlas read-only freeze | `[ ]` |
 | **S11** | `status` enum · archived-Atlas write block on every mutating route · cascade matrix + ownership check | `[ ]` |

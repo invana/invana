@@ -81,7 +81,7 @@ Every row is anchored to a `studio.md` task. All are domain-free per **D2**.
 
 | Component | Package | Renders | Anchors | Notes |
 |---|---|---|---|---|
-| `StepChip` / `StepChipGroup` | `ui` | Named step + state (`pending · running · done · failed`) + elapsed | 6.5 | States drive colour; `running` animates. First chip must paint immediately — see §6 UX budget. |
+| `StepChip` / `StepChipGroup` | `ui` | Named step + state (`pending · running · retrying · repairing · done · failed`) + elapsed | 6.5, 6.14a, 6.14b | States drive colour; `running` animates. `retrying` carries an attempt counter and reason — a silent pause reads as hung ([RFC-052](rfc-052-failure-handling.md) § 3.3). First chip must paint immediately — see §6 UX budget. |
 | `ProcessCard` | `ui` | Header + step chips + live counts + footer actions (stop / retry) | 6.5, 6.10 | Studio composes `ThinkingCard` from this. Card is domain-free: it knows "steps", not "thinkings". |
 | `DataTableBlock` | `tables` | Paginated table, columns derived from row payload, pages **append** | 6.7a | Thin preset over existing `DataTable` — column inference + append-page mode. Replaces `ResultsTable`. |
 | `MetricStat` | `ui` | Single KPI: value, label, optional delta + unit | 6.7b | Also reusable by RFC-042 analytics dashboard. |
@@ -90,6 +90,7 @@ Every row is anchored to a `studio.md` task. All are domain-free per **D2**.
 | `TokenChip` | `ui` | Inline code/label chip with a `via` sub-label + click action | 6.7 | Studio's query chip = `TokenChip` + query text. |
 | `SourceChip` | `ui` | Citation chip → click-through | 6.13 | |
 | `EmptyResult` | `ui` | Distinct "cannot answer" block — visually *not* an answer | 6.14 | Deliberately unlike `Alert`; the point is it must never read as a result. |
+| `DiagnosisBlock` | `ui` | Failure explanation: summary · evidence disclosure · suggestion buttons | 6.14c, 6.14d | Three visually distinct states now exist and must not be confused: **answer** · **can't answer** (`EmptyResult`) · **blocked** (`DiagnosisBlock`). See [RFC-052](rfc-052-failure-handling.md). |
 | `TraceTimeline` | `ui` | Vertical timeline: label → disclosure → payload, per step | 6.11 | |
 | `SnapshotTimeline` | `ui` | Horizontal lazy-thumbnail strip + per-item action | 6.24 | Thumbnails lazy-load; Studio supplies the images. |
 

@@ -279,7 +279,9 @@ never guesses.
 | `text.delta` | streamed markdown | **Thread** |
 | `query.proposed` | query chip + `via` label | **Thread** |
 | `clarification.requested` | options + "let me type" | **Thread** |
-| `error` | distinct "cannot answer" styling | **Thread** |
+| `diagnosis` | cause + evidence disclosure + clickable suggestions | **Thread** |
+| `cannot_answer` | distinct "can't answer" styling — an outcome, not a failure | **Thread** |
+| `error` | distinct failure styling | **Thread** |
 
 ```mermaid
 flowchart LR
@@ -291,7 +293,9 @@ flowchart LR
     K -->|text.delta| MD["Thread: markdown"]
     K -->|query.proposed| CP["Thread: query chip"]
     K -->|clarification.requested| FM["Thread: answer form"]
-    K -->|error| ER["Thread: cannot answer"]
+    K -->|cannot_answer| CA["Thread: can't answer<br/>an outcome, not a failure"]
+    K -->|diagnosis| DG["Thread: diagnosis<br/>cause · evidence · suggestions"]
+    K -->|error| ER["Thread: failure"]
 ```
 
 | # | Task | Surface | Consumes | Status |
@@ -314,7 +318,12 @@ flowchart LR
 | 6.11 | **Trace view** — prompt → rationale → proposed query → verdict → batches → counts, per step | disclosure → panel | `GET …/thinkings/{id}/trace` | `[ ]` |
 | 6.12 | **Rethink** on any past thought (same or different agent) | thread action | `POST …/thoughts/{id}/rethink` | `[ ]` |
 | 6.13 | Citation chips → click through to the source record | thread | provenance | `[ ]` |
-| 6.14 | "Cannot answer" rendered distinctly — never styled like an answer | thread | stream `error` | `[ ]` |
+| 6.14 | "Cannot answer" rendered distinctly — never styled like an answer, **and never styled like a failure** | thread | stream `cannot_answer` | `[ ]` |
+| 6.14a | **Retry visible on the step chip** — `retrying 2/3 · <reason>` with elapsed. A silent pause reads as hung | `ThinkingCard` | stream | `[ ]` |
+| 6.14b | **Repair visible on the step chip** — distinct "repairing" state, triggering error on hover | `ThinkingCard` | stream | `[ ]` |
+| 6.14c | **Diagnosis block** — summary · evidence disclosure · suggestion buttons. Styled as *blocked*, unlike an answer and unlike `cannot_answer` | `DiagnosisBlock` | stream `diagnosis` | `[ ]` |
+| 6.14d | **Suggestion actions** — one click re-asks with new wording, or routes into Modeller / Settings → LLMs / Datasets | `DiagnosisBlock` | — | `[ ]` |
+| 6.14e | **Try again** — offered only when the diagnosis says `retryable`; re-thinks the same thought | thread action | `POST …/thoughts/{id}/rethink` | `[ ]` |
 | 6.15 | 422 (no LLM provider) routes to Settings → LLMs instead of a raw error | composer | — | `[ ]` |
 | 6.16 | Expand ▶ context menu — by node type / incoming / outgoing, schema-driven | `ExplorerCanvas` menu | `POST …/explorer/expand/*` | `[ ]` |
 | 6.17 | `ExpandFineTunePanel` — page size · sort · filters · "Load next page" · "Showing X of N" · per-node pagination | panel | same | `[ ]` |
@@ -369,7 +378,7 @@ flowchart TD
 | **Cron builder** | dialog | presets (hourly · daily 09:00 · weekly Mon · monthly 1st) · custom cron · timezone · agent override · next-5-runs preview |
 | **Schedule badge** | thought row + thinking card | `⏱ daily 09:00` · dimmed when paused |
 | **Thought timeline** | `/thoughts/:id` | every thinking under the ask, newest first, each tagged **asked** or **scheduled** |
-| **Schedules screen** | `settings/schedules` | Atlas-wide list — thought, cadence, next run, last outcome, inline pause / run-now |
+| **Schedules screen** | `settings/schedules` | Atlas-wide list — thought, cadence, next run, last outcome, **consecutive-failure count**, inline pause / run-now |
 
 | Seam | What the user sees |
 |---|---|
@@ -378,6 +387,8 @@ flowchart TD
 | Run skipped (overlap) | a muted row in the schedule's history, sourced from the `schedule.run_skipped` event |
 | Run failed | the timeline entry is red; the error is the thinking's own `error` emission |
 | Atlas archived or read-only | schedules move to `halted` and say so; definitions are preserved, nothing is deleted |
+| Firings keep failing | the schedule **keeps firing** — it never auto-pauses (no notification channel exists to announce a pause). The row shows a consecutive-failure count (`failed 12 times in a row`) so the user can pause it themselves |
+| DST transition | a skipped wall-clock hour fires at the next valid instant; a repeated hour fires once. Both stated on the schedule's next-run preview |
 | Member without access | never sees the Atlas, so never sees its schedules |
 | Thought deleted | the schedule goes with it — confirmed in the delete dialog |
 
@@ -453,7 +464,7 @@ Every long-running surface streams. One hook pattern, three consumers.
 | 10.5 | Studio served as static assets in single-image Docker mode | engine serves `/static/*` | `[ ]` |
 | 10.6 | Track design-kit `latest` — Studio pins `0.0.12`, upstream is `0.0.19` (`ChatSession*`, `PanelStack`, `@invana/tables` unreachable) | [RFC-050](rfc-050-design-kit-component-plan.md) W0 — gates §6 | `[ ]` |
 | 10.7 | Adopt what design-kit already ships: `DataTable` (5 hand-rolled tables), `ChatSession*`, `PanelStack` | [RFC-050](rfc-050-design-kit-component-plan.md) W1 | `[ ]` |
-| 10.8 | Answer-surface components built in design-kit, not Studio — `StepChip` · `ProcessCard` · `DataTableBlock` · `MetricStat` · `ChartBlock` · `MarkdownBlock` · `TokenChip` · `EmptyResult` | [RFC-050](rfc-050-design-kit-component-plan.md) W2–W3 — gates 6.5, 6.7a–d, 6.14 | `[ ]` |
+| 10.8 | Answer-surface components built in design-kit, not Studio — `StepChip` (incl. **retrying / repairing** states) · `ProcessCard` · `DataTableBlock` · `MetricStat` · `ChartBlock` · `MarkdownBlock` · `TokenChip` · `EmptyResult` · **`DiagnosisBlock`** | [RFC-050](rfc-050-design-kit-component-plan.md) W2–W3 — gates 6.5, 6.7a–d, 6.14 | `[ ]` |
 | 10.9 | Promote domain-free Studio components upstream — `ConfirmDialog` · `ListPanel` · `EmptyState` · `NoticeBanner` · `StatusBadge` · `Stepper` · `FormError` | [RFC-050](rfc-050-design-kit-component-plan.md) W4 | `[ ]` |
 
 ### Dependencies (`studio/package.json`)
