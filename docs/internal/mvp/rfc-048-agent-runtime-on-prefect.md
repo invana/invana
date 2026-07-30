@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Design accepted — decisions D1–D11 taken (see *Decisions*). Not implemented. |
 | **Scope** | The engine's package layout, the thought/thinking domain, and the Studio ↔ engine contract. |
-| **Code layout** | [`agent-runtime-code-structure.md`](agent-runtime-code-structure.md) |
+| **Code layout** | [`engine.md`](engine.md) § 1.6 (package tree) · § 1.7–1.8 (CLI) · [`agent-runtime-code-structure.md`](agent-runtime-code-structure.md) (runtime specifics) |
 | **Scope docs** | [`engine.md`](engine.md) (data + APIs) · [`studio.md`](studio.md) (journeys) · slices in [`../mvp.md`](../mvp.md) → S9 |
 | **Supersedes** | RFC-016's `Executor` protocol (see *Reconciliation*) |
 | **Superseded in part** | The *train of thought* naming below — [RFC-051](rfc-051-workflows.md) renames the spec to **Workflow** and gives *Schedule* to the trigger. Everything else here stands. |

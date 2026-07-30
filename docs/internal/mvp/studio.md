@@ -181,11 +181,10 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    B["Dataset browser"] --> IMP["Import dataset"]
-    IMP --> DD["Drag-drop folder / tarball / zip"]
-    DD --> UP["Upload via signed URLs"]
-    UP --> JOB["Import job starts"]
-    JOB --> DET["Detail page"]
+    CLI["$ invana datasets import<br/>--atlas ravi/demo --path ./wiki"] --> JOB["Import job starts"]
+    B["Dataset browser<br/>read-only"] --> DET["Detail page"]
+    JOB --> DET
+    JOB -.->|"job appears in the browser"| B
     DET --> T1["Logs<br/>live SSE → history"]
     DET --> T2["Files<br/>object tree + JSON preview"]
     DET --> T3["Model<br/>type cards + diagram"]
@@ -194,13 +193,15 @@ flowchart TD
     S -->|succeeded| OK["Counts + model on the browser row"]
     S -->|failed| VR["Validation report<br/>grouped by file"]
     VR -->|click an error| T2
-    B --> RE["Re-import<br/>replaces atomically on success"]
+    CLI -.->|"--refresh"| RE["Re-import<br/>replaces atomically on success"]
+    B --> EMPTY["Empty state:<br/>shows the CLI command to copy"]
 ```
 
 | # | Task | Surface | Consumes | Status |
 |---|---|---|---|---|
-| 5.1 | Dataset browser — model summary, record counts, last job status | `settings/datasets` | `GET …/datasets` | `[ ]` |
-| 5.2 | Import form — drag-drop folder/tarball/zip, signed-URL upload | dialog | `POST …/datasets` | `[ ]` |
+| 5.1 | Dataset browser — model summary, record counts, last job status. **Read-only: no create, no import, no delete** | `settings/datasets` | `GET …/datasets` | `[ ]` |
+| 5.1a | Empty state shows the `invana datasets import` command, with a copy button — not a create form | `settings/datasets` | — | `[ ]` |
+| 5.2 | Import form — drag-drop folder/tarball/zip, signed-URL upload. **Datasets are a CLI-only surface** ([`engine.md`](engine.md) § 1.8) | — | — | `[-]` |
 | 5.3 | Job status badge (queued/running/succeeded/failed) on browser + detail | both | `GET …/jobs/{jid}` | `[ ]` |
 | 5.4 | **Logs** tab — live SSE during a run, full history after, filter by stage/level, copyable | detail tab | `…/logs`, `…/logs/stream` | `[ ]` |
 | 5.5 | **Files** tab — object tree + JSON preview (truncated for large files) | detail tab | `…/files`, `…/files/{path}` | `[ ]` |

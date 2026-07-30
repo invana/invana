@@ -50,81 +50,13 @@ Three rules, all machine-checked (`TID251`, see §7):
 
 ---
 
-## 2. Target tree
+## 2. Target tree — moved
 
-```
-engine/                                  # distribution: `invana`
-  src/invana/
-    core/                                # state + behaviour. No web, no orchestrator.
-      settings.py                        # pydantic-settings, INVANA_ prefix
-      db.py                              # async engine, session factory, run_migrations
-      errors.py                          # NotFound · Invalid · Conflict · Forbidden · Unavailable
-      utils.py
-      logging/                           # structured logging
-      telemetry/                         # OTel instrumentation: metrics, recorders, setup, decorators
-      events/                            # domain audit events + LISTEN/NOTIFY broadcaster (RFC-018)
-      auth/                              # User, RefreshToken, schemas, jwt, passwords, tokens
-      graphs/                            # Graph, Connection, AtlasMember, store, encryption,
-                                         #   compatibility, ConnectionManager (RFC-008)
-      modeller/                          # GraphSchema + version/projection tables (RFC-002)
-        migrations/                      #   Alembic env + versions
-      sessions/                          # Session, SessionMessage, store, reconcile (RFC-024)
-      canvases/                          # Canvas, CanvasState, store (RFC-043, RFC-047)
-      thoughts/                          # Thought · Thinking · ThinkingStep · ThoughtStream:
-                                         #   models · store · schemas · retention
-      skills/  datasets/  llm_providers/  explorer/     # models · store · schemas
-      llm/                               # provider-agnostic LLM runtime: client + providers (RFC-032)
-
-    tasks/                               # the moves within a thinking
-      __init__.py                        # @task decorator + registry
-      context.py                         # TaskContext · Resources · Emitter  (§5)
-      translate.py                       # translate_thought   — NL → grounded query
-      clarify.py                         # clarify             — suspends the thinking for input
-      validate.py                        # validate_query      — read-only enforcement
-      execute.py                         # execute_graph_query — streaming; emits graph.delta
-      shape.py                           # shape_for_canvas    — rows → nodes/edges + style hints
-      expand.py                          # expand_node         — neighbours, paged/filtered
-      explain.py                         # explain             — reads results, writes the answer:
-                                         #   emits text.delta · metric · chart.spec
-      plan.py                            # plan                — picks the next allowed task;
-                                         #   only needed by LLM-planned agents. Seeded trains of
-                                         #   thought are deterministic and don't use it.
-
-    agents/                              # how to think
-      spec.py                            # train-of-thought schema: allow · entry · require · max_steps
-      interpreter.py                     # the one executor of every spec; enforces the allow-list
-      registry.py                        # seeded agents: nl-query, expand  (both deterministic)
-
-    runtime/                             # the only orchestrator seam
-      protocol.py                        # Runtime: submit · cancel · resume · describe · sync
-      discovery.py                       # `invana.runtimes` entry-point resolution + INVANA_RUNTIME
-      inline.py                          # bundled adapter: asyncio, in-process, zero infra
-
-    api/                                 # the web layer — the only place FastAPI appears
-      app.py  health.py  middleware.py  schemas.py
-      deps.py                            # get_session (request-scoped)
-      errors.py                          # core domain errors → HTTP responses
-      thoughts/                          # POST /thoughts, rethink, SSE tail, /internal ingest
-      auth/  graphs/  sessions/  canvases/  skills/  datasets/  llm_providers/  explorer/
-                                         #   each: routes.py · services.py · deps.py
-      routes/                            # modeller routes (models.py, schemas.py) + events.py
-      telemetry/                         # ASGI middleware + browser-span proxy route
-      admin/                             # starlette-admin
-
-    worker/                              # task host entrypoint; holds no credentials (D8)
-    graph/                               # connector SPI — public API, see §3
-    cli/                                 # start · migrate · init · version · worker
-
-integrations/
-  invana-prefect/                        # separate distribution — own pyproject + venv
-    src/invana_prefect/
-      runtime.py                         # PrefectRuntime
-      flow.py                            # the single interpreter flow
-      deployments.py                     # sync_deployments reconciliation
-  invana-neo4j/ invana-memgraph/ …       # connectors, unchanged
-
-studio/
-```
+The package tree, the CLI command surface, and the CLI-only dataset decision now live in
+[`engine.md`](engine.md) § 1.6 – § 1.8, alongside the rest of the backend architecture. This document
+keeps what is specific to the agent runtime: the connector SPI's placement (§ 3), where the
+Thought/Thinking domain sits (§ 4), the `TaskContext` contract (§ 5), process ownership (§ 6), and
+how the layering is enforced (§ 7).
 
 ### Why two distributions, not six
 
@@ -338,6 +270,11 @@ client or test sees a difference.
 ---
 
 ## 8. Open questions
+
+| # | Question | Blocks |
+|---|---|---|
+| Q-CLI | Does the CLI stay **co-located** (direct `core/` access — needs DB + object-storage reach) or become **remote-capable** (token auth over HTTP, so an operator can import from a laptop against a Dockerised engine)? Co-located is the MVP assumption; remote is additive but brings back `POST /datasets` and upload endpoints. | S6d |
+
 
 Scoped to code that exists. Anything requiring a module that isn't written yet is out of scope here.
 

@@ -126,6 +126,201 @@ same failure means the same status everywhere.
 
 Body: `{"detail": {"error": "<code>", ...context}}`.
 
+### 1.6 Code structure — the target tree
+
+```
+engine/                                  # distribution: `invana`
+  src/invana/
+    core/                                # state + behaviour. No web, no orchestrator.
+      settings.py                        # pydantic-settings, INVANA_ prefix
+      db.py                              # async engine, session factory, run_migrations
+      errors.py                          # NotFound · Invalid · Conflict · Forbidden · Unavailable
+      utils.py
+      logging/                           # structured logging
+      telemetry/                         # OTel instrumentation: metrics, recorders, setup, decorators
+      events/                            # domain audit events + LISTEN/NOTIFY broadcaster (RFC-018)
+      auth/                              # User, RefreshToken, schemas, jwt, passwords, tokens
+      graphs/                            # Graph, Connection, AtlasMember, store, encryption,
+                                         #   compatibility, ConnectionManager (RFC-008)
+      modeller/                          # GraphSchema + version/projection tables (RFC-002)
+        migrations/                      #   Alembic env + versions
+      sessions/                          # Session, SessionMessage, store, reconcile (RFC-024)
+      canvases/                          # Canvas, CanvasState, store (RFC-043, RFC-047)
+      thoughts/                          # Thought · Thinking · ThinkingStep · ThoughtStream:
+                                         #   models · store · schemas · retention
+      skills/  datasets/  llm_providers/  explorer/     # models · store · schemas
+      llm/                               # provider-agnostic LLM runtime: client + providers (RFC-032)
+
+    tasks/                               # the moves within a thinking
+      __init__.py                        # @task decorator + registry
+      context.py                         # TaskContext · Resources · Emitter  (§ 1.4)
+      translate.py                       # translate_thought   — NL → grounded query
+      clarify.py                         # clarify             — suspends the thinking for input
+      validate.py                        # validate_query      — read-only enforcement
+      execute.py                         # execute_graph_query — streaming; emits graph.delta
+      shape.py                           # shape_for_canvas    — rows → nodes/edges + style hints
+      expand.py                          # expand_node         — neighbours, paged/filtered
+      explain.py                         # explain             — reads results, writes the answer:
+                                         #   emits text.delta · metric · chart.spec
+      plan.py                            # plan                — picks the next allowed task;
+                                         #   only needed by LLM-planned agents. Seeded trains of
+                                         #   thought are deterministic and don't use it.
+
+    agents/                              # how to think
+      spec.py                            # train-of-thought schema: allow · entry · require · max_steps
+      interpreter.py                     # the one executor of every spec; enforces the allow-list
+      registry.py                        # seeded agents: nl-query, expand  (both deterministic)
+
+    runtime/                             # the only orchestrator seam
+      protocol.py                        # Runtime: submit · cancel · resume · describe · sync
+      discovery.py                       # `invana.runtimes` entry-point resolution + INVANA_RUNTIME
+      inline.py                          # bundled adapter: asyncio, in-process, zero infra
+
+    api/                                 # the web layer — the only place FastAPI appears
+      app.py  health.py  middleware.py  schemas.py
+      deps.py                            # get_session (request-scoped)
+      errors.py                          # core domain errors → HTTP responses
+      thoughts/                          # POST /thoughts, rethink, SSE tail, /internal ingest
+      auth/  graphs/  sessions/  canvases/  skills/  datasets/  llm_providers/  explorer/
+                                         #   each: routes.py · services.py · deps.py
+      routes/                            # modeller routes (models.py, schemas.py) + events.py
+      telemetry/                         # ASGI middleware + browser-span proxy route
+      admin/                             # starlette-admin
+
+    worker/                              # task host entrypoint; holds no credentials (D8)
+    graph/                               # connector SPI — public API, see [`agent-runtime-code-structure.md`](agent-runtime-code-structure.md) § 3
+
+    cli/                                 # the OTHER adapter over core — a peer of api/, not a
+                                         #   client of it. Contains no business logic. See §2.1
+      main.py                            # click group; settings loaded once
+      output.py                          # rich tables / --json — presentation only
+      commands/
+        start.py                         # run the API server
+        worker.py                        # run a task host
+        migrate.py                       # alembic upgrade / downgrade / current
+        init.py                          # create the root user
+        version.py
+        atlas.py                         # list · show   (resolves <username>/<slug>)
+        datasets.py                      # create · import · list · show · logs · rm
+                                         #   ← the ONLY surface for creating datasets (§ 1.8)
+        thoughts.py                      # ask · list · show   (same core path as POST /thoughts)
+
+integrations/
+  invana-prefect/                        # separate distribution — own pyproject + venv
+    src/invana_prefect/
+      runtime.py                         # PrefectRuntime
+      flow.py                            # the single interpreter flow
+      deployments.py                     # sync_deployments reconciliation
+  invana-neo4j/ invana-memgraph/ …       # connectors, unchanged
+
+studio/
+```
+
+
+### 1.7 The CLI is an adapter, not a client
+
+**`core/` holds the capability. `api/` and `cli/` are two adapters over it.** Neither contains
+business logic, and neither calls the other.
+
+```
+                    ┌──────────┐        ┌──────────┐
+                    │   api/   │        │   cli/   │      two delivery mechanisms
+                    │ FastAPI  │        │  click   │
+                    └────┬─────┘        └────┬─────┘
+                         │                   │
+                         └─────────┬─────────┘
+                                   ▼
+                      core/  services · stores · db      one capability layer
+```
+
+| Rule | Consequence |
+|---|---|
+| `cli/` must not import `invana.api` | the CLI works with no server running |
+| `api/` must not import `invana.cli` | routes never shell out |
+| Logic lives in `core/`, never in a command or a route | anything one adapter can do, the other can do for free |
+| Both are lint-enforced additions to the layering table (`TID251`) | drift is caught, not discovered |
+
+**The test:** if exposing an existing capability through the other adapter takes more than a thin
+wrapper, logic leaked out of `core/`.
+
+| CLI command | Core it calls | REST equivalent |
+|---|---|---|
+| `invana init` | `core.auth.services.create_root_user` | — (bootstrap only) |
+| `invana migrate` | `core.db.run_migrations` | — |
+| `invana atlas list` | `core.graphs.store` | `GET /atlases` |
+| `invana datasets import` | `core.datasets.importer.import_dataset` | **none in MVP** (§ 1.8) |
+| `invana datasets logs` | `core.datasets.store` | `GET …/datasets/{id}/logs` |
+| `invana thoughts ask` | `core.thoughts` + `runtime.submit` | `POST /thoughts` |
+| `invana worker` | `worker.main` | — |
+| `invana start` | `api.app` | — |
+
+#### The command surface
+
+Global: `--config <path>` · `--json` (machine-readable output on every command) · `-v/--verbose` ·
+`--version`. Everything else is `INVANA_*` environment, loaded once in `main.py`.
+
+| Command | Options |
+|---|---|
+| `invana start` | `--host` `--port` `--reload` `--workers` |
+| `invana worker` | `--runtime inline\|prefect` `--concurrency N` `--queue <name>` |
+| `invana migrate` | `upgrade [rev]` · `downgrade [rev]` · `current` · `history` |
+| `invana init` | `--username` `--email` `--password` `--non-interactive` (idempotent; creates no Atlas) |
+| `invana version` | — |
+| `invana atlas list` | `--user <username>` `--archived` |
+| `invana atlas show` | `<username>/<slug>` |
+| `invana datasets import` | `--atlas <user>/<slug>` **·** `--name <name>` **·** `--path <dir>` · `--refresh` (replace atomically on success) · `--strict` (warnings become errors) · `--dry-run` (validate, upload nothing) · `--follow` (stream logs until the job ends) |
+| `invana datasets list` | `--atlas <user>/<slug>` |
+| `invana datasets show` | `--atlas` `--name` |
+| `invana datasets logs` | `--atlas` `--name` `--follow` `--stage <stage>` `--level <level>` |
+| `invana datasets rm` | `--atlas` `--name` `--yes` |
+| `invana thoughts ask` | `--atlas` `--agent <key>` `--follow` (tail the thought stream to stdout) |
+| `invana thoughts list` | `--atlas` `--limit` |
+| `invana thoughts show` | `<thought_id>` `--trace` |
+
+| Convention | Rule |
+|---|---|
+| Atlas addressing | always `<username>/<slug>` — one argument, matching the URL namespace |
+| Exit codes | `0` ok · `1` command error · `2` usage · `3` **validation failed** (a dataset with bad records is not a crash) |
+| `--json` | every command emits structured output; `output.py` is the only place that formats |
+| Destructive commands | require `--yes` or a TTY confirmation |
+| Long jobs | return immediately with a job id; `--follow` opts into streaming |
+
+### 1.8 Datasets are created from the CLI only
+
+**Decision.** Dataset creation and import are a **CLI-only** surface in MVP. Studio reads datasets;
+it never creates one.
+
+| Operation | CLI | REST | Studio |
+|---|---|---|---|
+| Create / import a dataset | ✅ `invana datasets import` | ❌ not in MVP | ❌ |
+| Re-import (replace) | ✅ `--refresh` | ❌ | ❌ |
+| Delete | ✅ `invana datasets rm` | ❌ | ❌ |
+| List · show · logs · files · records · validation report | ✅ | ✅ read-only | ✅ read-only |
+
+What this removes from MVP: `POST /datasets`, signed-URL upload endpoints, multipart browser upload,
+and the Studio drag-drop import form. Datasets are prepared on disk and imported by the operator —
+which was already the contract (`mvp.md`: *"datasets are produced externally in MVP"*). The UI form
+was the part that quietly implied otherwise.
+
+```
+$ invana datasets import --atlas ravi/demo --name wiki --path ./examples/wiki
+  validating model.json           ✓  3 node types · 2 edge types
+  validating nodes/Document.json  ✗  1 error (max_length on `title`, record 412)
+  → import failed; 1 validation error
+$ invana datasets logs --atlas ravi/demo --name wiki --follow
+```
+
+**Why this is the right default, not just a preference:** an import is an operator action against a
+bound database — it writes into the Atlas's graph. Putting it behind a CLI keeps it in the same place
+as `migrate` and `init`, where an operator already expects destructive-ish, environment-shaped
+commands to live. Adding the HTTP surface later is additive; the core function is already the thing
+both adapters would call.
+
+**Open — where does the CLI run?** MVP assumes **co-located**: the CLI runs on the engine host (or
+`docker exec`), so it reaches Postgres and object storage directly, and `--path` is a local
+directory. A remote-capable CLI (token auth over HTTP, upload from a laptop) needs `POST /datasets`
+back and is deliberately deferred — see [`agent-runtime-code-structure.md`](agent-runtime-code-structure.md) § 8.
+
 ---
 
 ## 2. Concept net
@@ -502,7 +697,7 @@ thinking surface and the Python/CLI dataset API.
 | **Backend capabilities (RFC-022)** | `[ ]` | version-resolved `CapabilityProfile` per connector · `server_version` detect + cache · `CompatibilityStatus` + effective read-only · acknowledge route · property-type enforcement (422) |
 | **Model authoring** | `[x]` | full model/version/type/property CRUD · draft-only 409s · publish/activate · introspect seeds a draft |
 | **Generative model sessions** | `[x]` | modeller-surface branch: ensure model+draft → forced-tool propose → referential validate → reconcile into draft · commit reuses activate |
-| **Datasets** ([`api.md`](api.md) §4) | `[ ]` | entities · model + record validators · object storage · job lifecycle + structured logs + SSE · Python API + CLI |
+| **Datasets** ([`api.md`](api.md) §4) | `[ ]` | entities · model + record validators · object storage · job lifecycle + structured logs + SSE · Python API + CLI. **Write path is CLI-only** — no `POST /datasets`; the HTTP surface is read-only (§ 1.8) |
 | **Stitcher** ([`api.md`](api.md) §5) | `[ ]` | mappings · identity resolution + conflict report · materialisation job · provenance stamping |
 | **Agents · thoughts · thinking** ([`api.md`](api.md) §7) | `[ ]` | `tasks/` library + `TaskContext` · `agents/` interpreter · `runtime/` protocol + `inline` adapter + entry-point discovery · thought/thinking/step/stream tables + retention · thought & thinking API + SSE + internal surface |
 | **Schedules** ([`api.md`](api.md) §8) | `[ ]` | `schedules` table (no run table — `thinkings` is the run log; skips are events) · cron parse/validate in an IANA timezone · due-scan tick that opens a thinking per firing (skip-on-overlap, no backfill) · pause/resume/run-now · `triggered_by=schedule` attribution · firings stop on archived / read-only Atlas. Design: [`rfc-051-workflows.md`](rfc-051-workflows.md) |
@@ -601,7 +796,7 @@ This section is what each slice actually touches on the backend, and where it ca
 | **S5** | Skill CRUD under `/skills/...`, unique `(atlas_id, name)`. The separate Instructions table shipped here and was later removed — folded into the single `Atlas.instructions` field. | `[x]` |
 | **S5.5** | `events` append-only table + indexes + Alembic `00000000000d` · `emit_event` + sensitive-field redaction · keyset reads + SSE · `pg_notify` trigger + per-worker `LISTEN events` daemon + in-process broadcaster · superuser/member gates · admin view. Wired across every write surface (atlas, connection, llm, skills, instructions, members, auth, `query.execute`, system). | `[x]` |
 | **S6a** | Dataset + ImportJob entities · `graph_model` JSONB · `atlas_id` FK · Pydantic schema for `model.json` + property constraints (string/int/float/bool/enum/datetime/uuid/json with required/min/max/length/pattern/enum.values) · model-driven record validator producing a structured report (file, record_index, record_id, field, rule, message) · referential integrity + node-id uniqueness | `[ ]` |
-| **S6b** | MinIO in compose · `INVANA_S3_*` · async S3 client · bucket layout `atlases/<atlas_id>/datasets/<dsid>/...` · streamed + multipart uploads · file tree + fetch endpoints | `[ ]` |
+| **S6b** | MinIO in compose · `INVANA_S3_*` · async S3 client · bucket layout `atlases/<atlas_id>/datasets/<dsid>/...` · CLI-side streamed upload · file tree + fetch endpoints (read-only). **No signed-URL or multipart browser upload** — datasets are CLI-only | `[ ]` |
 | **S6c** | Executor interface + LocalExecutor · ImportJob stages (upload → validate model → validate records → derive system graph model → persist → done) · `import_job_logs` structured rows · SSE log stream | `[ ]` |
 | **S6d** | `invana.datasets.import_dataset(atlas, name, path, *, refresh=False, strict=False)` → `ImportJob` handle with `.wait()` / `.stream_logs()` · CLI `invana datasets import --atlas <username/slug> --name <name> --path <dir>` | `[ ]` |
 | **S7** | Mappings · identity resolution + conflict report · materialisation job · provenance stamping (`dataset_id` + `record_id` + `stitch_job_id` on every materialised node) | `[ ]` |
