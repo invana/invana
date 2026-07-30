@@ -27,9 +27,9 @@ Everything in the MVP serves one of these. If a proposed feature doesn't, it isn
 |---|---|---|---|
 | **1** | **Bind a domain** | Connect one graph database, define the model, load data into it. One Atlas = one bounded, curated context — not "all your data". | Journeys [3](mvp/studio.md#3-creating--configuring-an-atlas) · [4](mvp/studio.md#4-designing-the-model) · [5](mvp/studio.md#5-bringing-data-in) |
 | **2** | **Answer in plain language** | Ask in English. Invana translates to Cypher or Gremlin, runs it, and returns an answer — a subgraph, a table, a number, a chart, or prose. | Journey [6](mvp/studio.md#6-asking-questions) |
-| **3** | **Show its work** | Every answer opens into the thinking that produced it: the prompt, the rationale, the generated query, the records, the timings. No answer is a black box. | Journey [6](mvp/studio.md#6-asking-questions) |
+| **3** | **Show its work** | Every answer ran a **workflow** — understand → validate → execute → project — and you watch it run, step by step. Open any answer to see the prompt, the rationale, the generated query, the records, the timings. No answer is a black box. | Journey [6](mvp/studio.md#6-asking-questions) |
 | **4** | **Refuse to hallucinate** | Answers are grounded in the Atlas's graph. Nothing else. If the graph can't answer, Invana says "I can't answer that" — visibly styled as *not* an answer. | Journey [6](mvp/studio.md#6-asking-questions) |
-| **5** | **Keep working without you** | A question can be put on a schedule and re-asked as the graph moves. External agents read the Atlas through a scoped API, with provenance in every response. | Journeys [7](mvp/studio.md#7-scheduling-thoughts) · [8](mvp/studio.md#8-operating) |
+| **5** | **Keep working without you** | Put a question you trust on a **schedule** — it re-asks itself as the graph moves, and the answers stack into a timeline you can diff. External agents read the Atlas through a scoped API, with provenance in every response. | Journeys [7](mvp/studio.md#7-schedules) · [8](mvp/studio.md#8-operating) |
 
 ---
 
@@ -115,9 +115,10 @@ Product-level capabilities. Each row links to the journey that specifies it.
 | Multi-modal answers | ✅ | Subgraph · table · metric · chart · prose — in one answer. |
 | Interactive graph canvas | ✅ | Pan, zoom, select, expand a node, style layers. |
 | Save and revisit canvases | ✅ | Tabs, autosave, version history, fork a past state. |
+| Visible workflow per answer | ✅ | Every answer names the workflow that produced it and shows its steps live — `understand · validate · execute · project` — with per-step timings. |
 | Full reasoning trace | ✅ | Prompt → rationale → generated query → records → timings. Clickable provenance. |
 | "Cannot answer" | ✅ | A distinct, deliberately non-answer-shaped response. |
-| Schedule a question | ✅ | Re-ask the same Thought on a cron; results diff against yesterday's. |
+| Schedule a question | ✅ | Put a thought on a cron; each firing re-asks it unattended and the answers stack into a timeline you can diff. |
 | Agent skills & instructions | ✅ | Per-Atlas prose that grounds every thinking. |
 | External-agent API | ✅ | Scoped tokens; retrieval endpoints with provenance. |
 | Audit trail | ✅ | Every write emits a domain event; live tail in the UI. |
@@ -127,7 +128,9 @@ Product-level capabilities. Each row links to the journey that specifies it.
 | Teams / orgs / roles | ❌ post-1.0 | Binary membership only. |
 | Multi-database Atlases | ❌ post-1.0 | Atlas ↔ Connection stays 1:1. |
 | Vector / semantic search | ❌ post-1.0 | Mixin exists for capable backends; not wired in MVP. |
-| Pipelines (chain, fan-out) | ❌ post-1.0 | Scheduling a Thought needs none of it. |
+| Authoring your own workflow | ❌ post-1.0 | MVP ships one built-in workflow (`nl-query`) and makes it visible. Authoring one is an execution surface and needs its own threat model. |
+| Orchestrating thoughts — *a chain of thoughts* | ❌ post-1.0 | One step's answer feeding the next. Deferred, but **deliberately kept reachable**: the MVP is shaped so building it is additive — see [`mvp/engine.md`](mvp/engine.md) § 2.1 for the six invariants that hold the door open. |
+| Event triggers (fire on data change) | ❌ post-1.0 | Cron only in MVP. |
 | Soft deletes / trash / undo | ❌ post-1.0 | |
 
 Full deferred list: [`mvp/studio.md`](mvp/studio.md) and [`mvp/engine.md`](mvp/engine.md), marked `[-]`.
@@ -153,7 +156,7 @@ seconds, the slice isn't done.
 | **S6** Dataset import | Import a dataset folder from the CLI and watch validation stream in Studio | `[ ]` |
 | **S7** Stitcher | Map dataset types onto model concepts; see nodes in Explorer with their source records | `[ ]` |
 | **S9** Thoughts & thinking | Ask a question, watch the answer build as it streams, open the trace behind it | `[ ]` |
-| **S8** Scheduled thoughts | Put a question on a daily schedule; find a new answer waiting the next morning | `[ ]` |
+| **S9.5** Schedules | Put an answer you trust on a daily cron; find a fresh one waiting the next morning | `[ ]` |
 | **S10** External-agent API | Issue a scoped token and read the Atlas from an outside agent | `[ ]` |
 | **S11** Atlas lifecycle | Archive an Atlas; every mutating route goes read-only | `[ ]` |
 
@@ -162,12 +165,13 @@ S0 → S1 → S1.5 → S2 ─┬─→ S3
                      ├─→ S4
                      ├─→ S5
                      ├─→ S11
-                     └─→ S6 → S7 → S9 → S8
+                     └─→ S6 → S7 → S9 → S9.5
                                     └→ S10
 ```
 
-**S8 depends on S9** despite the number — a schedule re-asks a Thought, so the asking path has to
-exist first.
+**A schedule is a trigger, not a second execution route** — a firing re-asks a Thought through
+exactly the path a rethink uses, so it needs no pipeline machinery. That is why S9.5 sits after S9:
+the asking path has to exist first.
 
 ### Sequencing rules
 

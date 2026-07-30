@@ -39,7 +39,7 @@ Layering is one-way and lint-enforced (`TID251`):
 |---|---|---|---|
 | `core/` | models · stores · schemas · db · settings · llm client · events · errors | — | `fastapi`, `starlette`, `prefect`, `invana.api` |
 | `tasks/` | typed units of work; deps via `TaskContext` | `core` | same |
-| `agents/` | train-of-thought specs + interpreter | `core`, `tasks` | same |
+| `agents/` | **workflow** specs + interpreter | `core`, `tasks` | same |
 | `runtime/` | `Runtime` protocol + bundled `inline` adapter | `core`, `agents` | `prefect` |
 | `api/` | FastAPI: routes, services, deps, SSE, admin | everything below | `prefect` |
 | `worker/` | task host entrypoint | everything below | `prefect` |
@@ -158,6 +158,7 @@ erDiagram
     ATLAS ||--o{ SKILL : teaches
     ATLAS ||--o{ LLM_PROVIDER : binds
     ATLAS ||--o{ AGENT : "ways of thinking"
+    AGENT ||--|| WORKFLOW : "embeds — how to think"
     AGENT }o--|| LLM_PROVIDER : uses
     AGENT }o--o{ SKILL : uses
 
@@ -166,9 +167,11 @@ erDiagram
     SESSION_MESSAGE |o--o| THOUGHT : carries
     ATLAS ||--o{ THOUGHT : "asked in"
     THOUGHT ||--o{ THINKING : "thought about, 1..n"
-    THOUGHT |o--o| THOUGHT_SCHEDULE : "re-asked on a schedule"
-    THOUGHT_SCHEDULE ||--o{ THINKING : "fires"
+    THOUGHT |o--o| SCHEDULE : "re-asked by"
+    SCHEDULE ||--o{ THINKING : "each firing opens one"
+    SCHEDULE ||--o{ EVENT : "skips + halts recorded as"
     AGENT ||--o{ THINKING : "thinks via"
+    WORKFLOW ||--o{ THINKING_STEP : "one step per task it runs"
     THINKING ||--o{ THINKING_STEP : steps
     THINKING ||--o{ THOUGHT_STREAM : emits
 
@@ -180,15 +183,50 @@ erDiagram
     ATLAS ||--o{ SCOPED_TOKEN : "opened up by"
 ```
 
+**One box is not a table.** `WORKFLOW` is `agents.workflow_spec_jsonb` — a spec document embedded in
+its agent and versioned with it. It appears on the map because it is a first-class *concept* (it is
+what the user watches run) even though it is not a first-class *row*. Everything else here is a table.
+
 ### 2.1 The relationships that matter
 
 | Relationship | Why it's shaped that way |
 |---|---|
 | `Atlas 1:1 Connection` | one Atlas, one graph database — the boundary is unambiguous |
+| `Agent 1:1 Workflow` | **the workflow belongs to the agent, not the thought.** That is what lets the same thought be re-thought by a different agent — the whole point of multi-model perspectives. A thought carries only the ask; how to answer it is the agent's |
 | `Thought 1:n Thinking` | a **rethink** adds a thinking, never mutates the thought. Two agents' attempts sit side by side |
+| `Thinking 1:n ThinkingStep` | one step per task the workflow ran, so the card's step chips and the trace are the same data at two resolutions |
 | `Session 1:1 Canvas` | the canvas is self-contained (own snapshot + query), so a member opens it without reading a private thread |
 | `Thinking → ThoughtStream` | append-only with a cursor, so it is simultaneously the live feed, the reload replay, and the provenance chain |
-| `Thought 0:1 ThoughtSchedule` | a schedule re-asks **the same immutable ask**, so every firing is another thinking under one thought — which is what makes "what changed since yesterday?" a diff of two thinkings rather than a join across sibling thoughts |
+| `Thought 0:1 Schedule` | a Schedule re-asks **the same immutable ask**, so every firing is another thinking under one thought — which is what makes "what changed since yesterday?" a diff of two thinkings rather than a join across sibling thoughts |
+| `Schedule → Thinking` **has no FK** | `thinkings` *is* the run log. A firing's thinking is found by `thought_id` + `triggered_by='schedule'`, which is unambiguous because a thought has at most one schedule. There is deliberately no `schedule_runs` table — see below |
+| `Schedule → Event` | a firing that opens **no** thinking (skipped on overlap, halted on an archived Atlas) is the one thing `thinkings` cannot record, so it goes to `events` — already append-only and already the record of things that happened |
+
+> **Definition → run is `Thought → Thinking`, without exception.** Scheduled firings are not a second
+> kind of run; they are ordinary thinkings with a different trigger. That invariant is why the
+> schedule needs no run table of its own, and why an unattended 09:00 answer is byte-for-byte the
+> same shape as one a user asked for.
+
+#### Invariants that keep chains of thoughts reachable
+
+Orchestrating several Thoughts — **a chain of thoughts**, one step's answer feeding the next — is
+post-1.0, but the MVP is shaped so that building it is *additive*: four new tables or nullable
+columns, plus one mechanical migration. Design rationale and the full seam analysis:
+[`rfc-051-workflows.md`](rfc-051-workflows.md) § 7.
+
+These six rules are what buy that. Breaking one turns a later addition into a rewrite.
+
+| # | Rule | Breaks if violated |
+|---|---|---|
+| **R1** | Definition → run is always `Thought → Thinking` — never a second run concept per trigger | "open any step" becomes three different lookups |
+| **R2** | Anything a later step could need is **`emit`ted**, not just returned. A return value is visible only to the next task *in the same workflow* | a downstream thought can't see it; the task needs rewriting |
+| **R3** | Every thinking stays self-contained and openable on its own — own stream, own trace, own provenance | a step that renders only inside its chain can't be debugged or retried |
+| **R4** | No API shape hardcodes "one schedule → one thought"; responses tolerate a step list | scheduling a chain becomes a breaking API change |
+| **R5** | Chain membership will be **explicit** (a column), never inferred from timestamps or session | inferred grouping is wrong under concurrency, retries and skipped firings |
+| **R6** | A task never depends on which thought invoked it — `TaskContext` + typed params, nothing more | hidden coupling makes the task unusable when chained |
+
+The load-bearing one is **R2**. Because every user-facing output is already a typed emission on an
+append-only stream addressable by `(thinking_id, seq, kind)`, thought B can consume thought A's answer
+without either knowing the other exists — the hard part of chaining, already paid for.
 
 ### 2.2 What a thinking emits — the projection contract
 
@@ -214,10 +252,10 @@ Two surfaces, split by data shape rather than preference: **canvas** takes `grap
 the renderer already appends incrementally); **thread** takes everything else (read top-to-bottom next
 to the ask that produced it).
 
-Which kinds appear is decided by the tasks in the train of thought — `execute` emits `graph.delta` **or**
+Which kinds appear is decided by the tasks in the workflow — `execute` emits `graph.delta` **or**
 `table.page` depending on what the query returned; `explain` emits `text.delta`, `metric`, `chart.spec`.
-A deterministic train of thought therefore has a predictable output shape, which is what keeps the
-thread layout stable.
+A deterministic workflow therefore has a predictable output shape, which is what keeps the thread
+layout stable.
 
 ### 2.3 Storage & retention
 
@@ -228,7 +266,7 @@ thread layout stable.
 | Owner deletion | blocked while the user owns any Atlas (RESTRICT) |
 | Thought stream | newest `INVANA_THINKING_HISTORY_LIMIT` thinkings per Atlas (500); payloads dropped after `INVANA_THOUGHT_STREAM_TTL_DAYS` (30) while thinkings + steps survive |
 | Canvas history | newest `INVANA_CANVAS_HISTORY_LIMIT` states per canvas (30) |
-| Scheduled thinkings | count against the same per-Atlas thinking limit; a schedule with no surviving thinkings keeps firing regardless |
+| Scheduled thinkings | count against the same per-Atlas thinking limit; a Schedule with no surviving thinkings keeps firing regardless |
 | Events | retained forever — audit is immutable |
 | Dataset files | object storage, `atlases/<atlas_id>/datasets/<dataset_id>/…`; deletion cascades to objects |
 
@@ -305,14 +343,14 @@ flowchart TB
     subgraph mind["How it thinks"]
         SKILL["Skill"]
         PROV["LLMProvider"]
-        AGENT["Agent<br/>train of thought + bindings + policy"]
+        AGENT["Agent<br/>workflow + bindings + policy"]
     end
 
     subgraph ask["The ask and the pass at it"]
         SESS["Session"]
         MSG["SessionMessage"]
         THT["Thought<br/>immutable"]
-        SCHED["ThoughtSchedule<br/>cron · timezone · enabled"]
+        SCH["Schedule<br/>cron · timezone · state"]
         THK["Thinking"]
         STEP["ThinkingStep"]
         STREAM["ThoughtStream<br/>append-only"]
@@ -356,8 +394,8 @@ flowchart TB
     CLIENT --> SESS --> MSG --> THT
     ATLAS --> THT
     THT -->|"1..n · a rethink adds one"| THK
-    THT -.->|"0..1"| SCHED
-    SCHED -->|"each firing opens one"| THK
+    THT -.->|"0..1"| SCH
+    SCH -->|"each firing opens one"| THK
     AGENT -->|"thinks via"| THK
     THK --> STEP
     THK --> STREAM
@@ -375,7 +413,7 @@ flowchart TB
     IJ -.-> EVENT
     SJ -.-> EVENT
     THK -.-> EVENT
-    SCHED -.-> EVENT
+    SCH -.-> EVENT
     STOK -.-> EVENT
 ```
 
@@ -399,17 +437,17 @@ Four things a user does with an Atlas, in the order they do them. Each one ends 
 | 1 | **Modelling the graph** | `User → Atlas → Connection` · `GraphModel → GraphVersion → NodeType/EdgeType/PropertyKey` | a published version — the grounding schema every thinking reads |
 | 2 | **Ingesting data into the graph** | `dataset dir → Dataset → ImportJob → ImportJobLog + object storage` then `StitchMapping → StitchJob` | rows in the bound graph DB, provenance-stamped |
 | 3 | **Asking** | `Session → SessionMessage → Thought → Thinking` (via `Agent` + `LLMProvider` + `Skill`) `→ ThinkingStep + ThoughtStream` | emissions the client subscribes to; optionally a `CanvasState` |
-| 4 | **Scheduling thoughts** | `Thought → ThoughtSchedule` → (on each firing) `Thinking → ThinkingStep + ThoughtStream` | a time series of thinkings under one unchanged ask — the same question, answered again as the graph moves |
+| 4 | **Schedules** | `Thought → Schedule` → (each firing) `Thinking → ThinkingStep + ThoughtStream` | a time series of thinkings under one unchanged ask — the same question, answered again as the graph moves |
 
 Flow 4 is flow 3 with the human taken out of the trigger. It reuses the entire asking path unchanged:
-a schedule fires exactly what a **rethink** fires, so an answer that arrived at 09:00 unattended is
+a firing does exactly what a **rethink** does, so an answer that arrived at 09:00 unattended is
 indistinguishable in shape, provenance and replayability from one a user asked for.
 
 ```mermaid
 flowchart LR
     M["1 · Model<br/>published GraphVersion"] --> I["2 · Ingest<br/>rows in the graph DB"]
     I --> A["3 · Ask<br/>Thought → Thinking"]
-    A --> S["4 · Schedule<br/>ThoughtSchedule re-asks it"]
+    A --> S["4 · Schedule<br/>re-asks it unattended"]
     S -.->|"each firing = another Thinking<br/>on the same Thought"| A
     I -.->|"new data changes the answer"| S
 ```
@@ -465,7 +503,7 @@ thinking surface and the Python/CLI dataset API.
 | **Datasets** ([`api.md`](api.md) §4) | `[ ]` | entities · model + record validators · object storage · job lifecycle + structured logs + SSE · Python API + CLI |
 | **Stitcher** ([`api.md`](api.md) §5) | `[ ]` | mappings · identity resolution + conflict report · materialisation job · provenance stamping |
 | **Agents · thoughts · thinking** ([`api.md`](api.md) §7) | `[ ]` | `tasks/` library + `TaskContext` · `agents/` interpreter · `runtime/` protocol + `inline` adapter + entry-point discovery · thought/thinking/step/stream tables + retention · thought & thinking API + SSE + internal surface |
-| **Scheduled thoughts** ([`api.md`](api.md) §8) | `[ ]` | `thought_schedules` + run-history table · cron parse/validate in an IANA timezone · due-scan tick that opens a thinking per firing (skip-on-overlap, no backfill) · pause/resume/run-now · `triggered_by=schedule` attribution · firings stop on archived / read-only Atlas |
+| **Schedules** ([`api.md`](api.md) §8) | `[ ]` | `schedules` table (no run table — `thinkings` is the run log; skips are events) · cron parse/validate in an IANA timezone · due-scan tick that opens a thinking per firing (skip-on-overlap, no backfill) · pause/resume/run-now · `triggered_by=schedule` attribution · firings stop on archived / read-only Atlas. Design: [`rfc-051-workflows.md`](rfc-051-workflows.md) |
 | **LLM runtime** | `[ ]` | provider-agnostic client: dispatch by provider, lazy SDK import, decrypt at call time, sync SDKs in `asyncio.to_thread` · structured output via forced tool-use with a JSON-schema fallback for Ollama/local · one repair round-trip · per-call timeout · normalised `LLMError` |
 | **Grounding** | `[ ]` | prompt assembly (instructions + skills + retrieved context) · refuse to call with empty context for grounded ops · prompt caching where supported |
 | **Groundedness / cannot-answer** | `[ ]` | detect empty context · explicit `cannot_answer` payload distinct from an empty answer · log as a defect-class event |
@@ -565,13 +603,13 @@ This section is what each slice actually touches on the backend, and where it ca
 | **S6d** | `invana.datasets.import_dataset(atlas, name, path, *, refresh=False, strict=False)` → `ImportJob` handle with `.wait()` / `.stream_logs()` · CLI `invana datasets import --atlas <username/slug> --name <name> --path <dir>` | `[ ]` |
 | **S7** | Mappings · identity resolution + conflict report · materialisation job · provenance stamping (`dataset_id` + `record_id` + `stitch_job_id` on every materialised node) | `[ ]` |
 | **S9a** | Layered packages (`core/ tasks/ agents/ runtime/ api/ worker/`) + import-direction lint · `translate` · `validate` · `execute` · `shape` as typed tasks with `TaskContext`. No behaviour change. | `[ ]` |
-| **S9b** | `thoughts` · `thinkings` · `thinking_steps` · `thought_stream` · `Runtime` protocol + bundled `inline` adapter · thought/thinking API + SSE · seeded deterministic `nl-query` train of thought | `[ ]` |
+| **S9b** | `thoughts` · `thinkings` · `thinking_steps` · `thought_stream` · `Runtime` protocol + bundled `inline` adapter · thought/thinking API + SSE · seeded deterministic `nl-query` workflow | `[ ]` |
 | **S9c** | `integrations/invana-prefect` + `invana worker` + Prefect compose profile · state sync + stale reconciler · `clarify` suspend/resume | `[ ]` |
 | **S9d** | `plan` task drives the bounded-agency loop over the allow-list, reading Atlas instructions + bound skills | `[ ]` |
 | **S9e** | Write-back with `thinking_id` provenance · success-criteria scoring | `[ ]` |
-| **S8a** | `thought_schedules` + run-history tables · cron + IANA-timezone validation · min-interval guard (422) | `[ ]` |
-| **S8b** | Due-scan tick opens a thinking per firing · skip-on-overlap · no backfill · `triggered_by=schedule` attribution · archived / read-only Atlas halts firing | `[ ]` |
-| **S8c** | Pause · resume · run-now · Atlas-wide `…/schedules` list with `next_run_at` + last outcome | `[ ]` |
+| **S9.5a** | `schedules` table · cron + IANA-timezone validation · min-interval guard (422) | `[ ]` |
+| **S9.5b** | Due-scan tick opens a thinking per firing · skip-on-overlap → `schedule.run_skipped` event · no backfill · `triggered_by=schedule` attribution · archived Atlas → `halted` | `[ ]` |
+| **S9.5c** | Pause · resume · run-now · Atlas-wide `…/schedules` list with `next_run_at` + last outcome | `[ ]` |
 | **S10** | Scoped tokens · token-auth dep parallel to JWT · retrieval endpoints (query / semantic / skill-mediated) · provenance in every response · archived-Atlas read-only freeze | `[ ]` |
 | **S11** | `status` enum · archived-Atlas write block on every mutating route · cascade matrix + ownership check | `[ ]` |
 

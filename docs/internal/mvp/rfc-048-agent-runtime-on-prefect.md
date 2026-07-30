@@ -7,6 +7,7 @@
 | **Code layout** | [`agent-runtime-code-structure.md`](agent-runtime-code-structure.md) |
 | **Scope docs** | [`engine.md`](engine.md) (data + APIs) · [`studio.md`](studio.md) (journeys) · slices in [`../mvp.md`](../mvp.md) → S9 |
 | **Supersedes** | RFC-016's `Executor` protocol (see *Reconciliation*) |
+| **Superseded in part** | The *train of thought* naming below — [RFC-051](rfc-051-workflows.md) renames the spec to **Workflow** and gives *Schedule* to the trigger. Everything else here stands. |
 | **Interacts with** | RFC-024 sessions · RFC-030/032 LLM translate + runtime · RFC-038 query understanding · RFC-043/046/047 canvases · RFC-018 events/LISTEN-NOTIFY |
 
 ---
@@ -66,7 +67,9 @@ Concretely, this RFC aims to define:
 
 **Non-goals for this RFC:** the connector/ingestion task family, the stitcher, agent write-back
 semantics, scheduled/autonomous agent firing, cross-atlas agents, and a Studio train-of-thought
-authoring UI. The LLM-driven `plan` task is deferred to last — seeded trains of thought are
+authoring UI. Scheduled firing is a non-goal *here* but not deferred out of MVP — it lands as its own
+slice ([`../mvp.md`](../mvp.md) → S9.5) on top of this design, adding a trigger rather than a second
+execution route: a firing opens a thinking through exactly the path a rethink uses. The LLM-driven `plan` task is deferred to last — seeded trains of thought are
 deterministic and need none of it.
 
 ---
@@ -112,7 +115,7 @@ API, the tables, and the UI — not a marketing skin over `job`/`run`:
 | **Thought** | The user's ask, as asked. NL prompt or QL text, bound to a graph and a session. Immutable once posed. | Replaces "query"/"prompt" as the entity. A thought can be thought about many times. |
 | **Thinking** | One pass of machines thinking a thought through. Durable, addressable, subscribable, resumable. | Replaces "Run". A thought has 1..n thinkings — a **rethink** is a new thinking over the same thought, not a mutation. |
 | **Thought stream** | The ordered, replayable trace a thinking emits as it thinks: `query.proposed`, `graph.delta`, `plan.step`, `log`, `error`, `thinking.done`. | Replaces the generic "emission log". What the canvas subscribes to, and what makes thinking explainable. |
-| **Train of thought** | The persisted spec for *how* to think: task allow-list, entry, `require`, `max_steps` (D2). Data, not code. | Replaces "workflow". One interpreter runs every train of thought. |
+| **Workflow** ~~Train of thought~~ | The persisted spec for *how* to think: task allow-list, entry, `require`, `max_steps` (D2). Data, not code. | Renamed by [RFC-051](rfc-051-workflows.md): this is the thing the word "workflow" describes, and `agents.workflow_spec_jsonb` was right all along. One interpreter runs every workflow. |
 | **Agent** | A train of thought **bound** to a graph, an LLM config, skills, and a policy — a *way of thinking* the user can pick. | Extends the Agent entity — see below. |
 | **Task** | A typed Python callable, `(ctx, InModel) -> OutModel` — one move within a thinking. | Deliberately *not* renamed: it maps 1:1 onto a Prefect task, and keeping the word makes the adapter boundary obvious. |
 | **Deployment** | The interpreter materialized on the orchestrator (Prefect deployment + work pool + limits). | Infrastructure, not domain. |

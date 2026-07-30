@@ -48,7 +48,7 @@ flowchart LR
 | [4](#4-designing-the-model) | Design the shape of my data | `/u/:user/:atlas/modeller` |
 | [5](#5-bringing-data-in) | Load data and verify it landed | `settings/datasets` |
 | [6](#6-asking-questions) | Ask, watch it think, keep the answer | `/u/:user/:atlas/explorer` |
-| [7](#7-scheduling-thoughts) | Have a question re-asked on a schedule | `/explorer` · `settings/schedules` |
+| [7](#7-schedules) | Have a question re-asked unattended, on a cron | `/explorer` · `settings/schedules` |
 | [8](#8-operating) | Tokens, thinkings, events, progress | `settings/*` · `/platform/events` |
 
 ---
@@ -300,7 +300,7 @@ flowchart LR
 | 6.2 | Canvas rendering — pan/drag/zoom/hover/select, header toolbar, inspector | `ExplorerCanvas` | — | `[x]` |
 | 6.3 | Sessions on TanStack Query (`useSessionsQuery`/`useSessionQuery`/`useSendMessage`) | `hooks/queries/useSessions` | `…/sessions*` | `[ ]` |
 | 6.4 | Composer posts a **thought**, then subscribes | `SessionComposer` | `POST …/thoughts` | `[ ]` |
-| 6.5 | **Thinking card** — step chips from `thinking_steps`, live counts, elapsed per step | `ThinkingCard` | stream + `GET …/thinkings/{id}` | `[ ]` |
+| 6.5 | **Thinking card** — names the **workflow** that is running, step chips from `thinking_steps` (`understand · validate · execute · project`), live counts, elapsed per step | `ThinkingCard` | stream + `GET …/thinkings/{id}` | `[ ]` |
 | 6.6 | `graph.delta` → **append** into the canvas store (never reassign `data`: destructive, re-seeds the renderer) | canvas store | stream | `[ ]` |
 | 6.7 | `query.proposed` → query chip + `via` model label + "view generated query" | thread | stream | `[ ]` |
 | 6.7a | `table.page` renderer — paginated table, columns from payload, pages append | thread | stream | `[ ]` |
@@ -332,18 +332,21 @@ feels slower than a spinner even when it finishes sooner — the wait becomes vi
 
 ---
 
-## 7. Scheduling thoughts
+## 7. Schedules
 
 **As an analyst, I want a question I care about re-asked on its own, so that I find out the answer
 changed without remembering to check.**
 
-A schedule is attached to a **thought I already asked** — never composed from scratch. That keeps the
-mental model small: you only schedule questions you've seen work, and every firing lands under the
-same ask so the answers stack into a timeline you can compare.
+> **A Schedule is a trigger on a Thought.** The *workflow* is what runs when it fires — see § 6.5
+> and [`rfc-051-workflows.md`](rfc-051-workflows.md).
+
+A Schedule is created from a **thought I already asked** — never composed from a blank form. That
+keeps the mental model small: you only schedule questions you've seen work, and every firing lands
+under the same ask so the answers stack into a timeline you can compare.
 
 ```mermaid
 flowchart TD
-    DONE["A thinking finished<br/>answer looks right"] --> REP["'Repeat…' on the thinking card"]
+    DONE["A thinking finished<br/>answer looks right"] --> REP["'Schedule…' on the thinking card"]
     REP --> BUILD["Cron builder<br/>presets · custom · timezone"]
     BUILD --> PRE["Preview: next 5 runs"]
     PRE --> V{"below the<br/>minimum interval?"}
@@ -353,16 +356,16 @@ flowchart TD
     SAVE --> LIST["Schedules screen<br/>next run · last outcome"]
     LIST --> ACT["Pause · Resume · Run now · Edit · Delete"]
     ACT --> LIST
-    SAVE -.->|clock fires| NEWTHK["New thinking<br/>labelled 'scheduled'"]
+    SAVE -.->|clock fires| NEWTHK["New thinking<br/>tagged 'scheduled'"]
     NEWTHK --> TL["Thought timeline<br/>newest first"]
     TL --> DIFF["Open two thinkings<br/>compare answers"]
-    NEWTHK -.->|"previous run still going"| SKIP["Run skipped<br/>shown in history"]
-    NEWTHK -.->|"atlas archived / read-only"| HALT["Firing paused<br/>banner on the schedule"]
+    NEWTHK -.->|"previous run still going"| SKIP["schedule.run_skipped event<br/>shown in history"]
+    NEWTHK -.->|"atlas archived / read-only"| HALT["state → halted<br/>banner on the schedule"]
 ```
 
 | Surface | Route | What it shows |
 |---|---|---|
-| **Repeat action** | on the thinking card, `/explorer` | opens the cron builder for that thought |
+| **Schedule…** | on the thinking card, `/explorer` | opens the cron builder for that thought |
 | **Cron builder** | dialog | presets (hourly · daily 09:00 · weekly Mon · monthly 1st) · custom cron · timezone · agent override · next-5-runs preview |
 | **Schedule badge** | thought row + thinking card | `⏱ daily 09:00` · dimmed when paused |
 | **Thought timeline** | `/thoughts/:id` | every thinking under the ask, newest first, each tagged **asked** or **scheduled** |
@@ -372,9 +375,9 @@ flowchart TD
 |---|---|
 | While a scheduled run is in flight | the thought row shows a live spinner; opening it tails the stream like any thinking |
 | On reload mid-run | replay from `seq=0` — no difference from an interactive thinking |
-| Run skipped (overlap) | a muted row in the schedule's run history, with the reason |
+| Run skipped (overlap) | a muted row in the schedule's history, sourced from the `schedule.run_skipped` event |
 | Run failed | the timeline entry is red; the error is the thinking's own `error` emission |
-| Atlas archived or read-only | schedules stop firing and say so; definitions are preserved, nothing is deleted |
+| Atlas archived or read-only | schedules move to `halted` and say so; definitions are preserved, nothing is deleted |
 | Member without access | never sees the Atlas, so never sees its schedules |
 | Thought deleted | the schedule goes with it — confirmed in the delete dialog |
 
@@ -469,5 +472,5 @@ Every long-running surface streams. One hook pattern, three consumers.
 ### Deferred (post-1.0)
 
 `[-]` HttpOnly cookie tokens · Atlas switcher in app shell · markdown *rendering* for skills/instructions ·
-modeller constraint/index authoring · train-of-thought authoring UI · source-connector config UI ·
+modeller constraint/index authoring · workflow authoring UI · source-connector config UI ·
 soft deletes / trash / undo · username-change redirects (old usernames 404).
