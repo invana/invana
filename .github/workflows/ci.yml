@@ -43,7 +43,7 @@ jobs:
             -x -q
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           file: engine/coverage.xml
           flags: engine
@@ -63,7 +63,7 @@ jobs:
           pnpm test run --coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           file: studio/coverage/coverage-final.json
           flags: studio
