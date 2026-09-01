@@ -97,54 +97,95 @@ Full dependency and configuration tables: [`mvp/engine.md`](mvp/engine.md) § 6.
 
 ---
 
-## Features
+## Features — in MVP
 
-Product-level capabilities. **Status** is the state of the whole feature — a row is `[x]` only when
-engine *and* Studio are both done. **Design** links the record where the decision was made.
+Ordered by **build order**: read top to bottom and that is the sequence things land. `Slice` ties each
+row to the [Delivery](#delivery) plan; `Design` links the record where it was decided.
 
-`[x]` done · `[~]` in progress · `[ ]` not started · `[-]` deferred post-1.0
+**Engine and Studio are tracked separately** — a feature ships only when both are ✅, and most of the
+partial rows are partial on one side only.
 
-| Capability | Status | Design | Notes |
-|---|---|---|---|
-| Connect to a graph database | `[x]` | [017](../rfcs/017-graph-as-primary-container.md) · [001](../rfcs/001-graph-connectors.md) | 1 Atlas ↔ 1 connection. Test before save. Credentials encrypted at rest. |
-| Introspect an existing database | `[x]` | [001](../rfcs/001-graph-connectors.md) · [021](mvp/rfc-021-model-authoring.md) | Seeds a draft model from what's already there. |
-| Design a graph model | `[~]` | [019](mvp/rfc-019-multi-model-perspectives.md) · [021](mvp/rfc-021-model-authoring.md) · [022](mvp/rfc-022-property-type-capabilities.md) | Engine `[x]`; Studio authoring `[~]`. Backend-gated property types not started. |
-| Visual model editor | `[~]` | [027](mvp/rfc-027-interactive-modeller-canvas.md) · [029](mvp/rfc-029-modeller-staged-commit.md) · [031](mvp/rfc-031-modeller-generative-sessions.md) | Canvas authoring works on drafts; read-only versions stay pan/zoom/select. |
-| Load data | `[ ]` | [020](mvp/rfc-020-dataset-ingestion.md) · [016](../rfcs/016-pluggable-executor.md) | Dataset folders validated record-by-record, with a failure report. **CLI only** — `invana datasets import`. |
-| Inspect what landed | `[ ]` | [020](mvp/rfc-020-dataset-ingestion.md) | Studio shows every dataset read-only: live import logs, files, derived model, paginated records, validation report. |
-| Stitch data into the graph | `[ ]` | [020](mvp/rfc-020-dataset-ingestion.md) | Map dataset types onto model concepts; every materialised node carries its source record. |
-| Ask in natural language | `[~]` | [030](mvp/rfc-030-llm-translation.md) · [032](mvp/rfc-032-llm-runtime.md) · [036](mvp/rfc-036-nl-conversation-context.md) · [038](mvp/rfc-038-query-understanding.md) | Cypher and Gremlin. Translation exists; the grounded runtime does not. |
-| Write queries directly | `[~]` | [024](mvp/rfc-024-query-sessions.md) | CodeMirror editor with the Atlas's schema in scope. |
-| Streaming answers | `[ ]` | [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Results paint as they arrive, not all at the end. |
-| Multi-modal answers | `[ ]` | [033](mvp/rfc-033-explorer-results-in-thread.md) · [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Subgraph · table · metric · chart · prose — in one answer. |
-| Interactive graph canvas | `[~]` | [035](mvp/rfc-035-explorer-node-expand.md) · [043](mvp/rfc-043-explorer-canvases.md) · [045](mvp/rfc-045-session-canvas-enhancements.md) | Pan, zoom, select, hover, style layers all ship `[x]`. **Node expand** (context menu, fine-tune panel, dedupe-merge) is `[ ]`. |
-| Save and revisit canvases | `[~]` | [043](mvp/rfc-043-explorer-canvases.md) · [047](mvp/rfc-047-canvas-version-history.md) | Tabs, autosave and the canvases rail ship; version-history timeline does not. |
-| Visible workflow per answer | `[ ]` | [051](mvp/rfc-051-workflows.md) · [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Every answer names its workflow and shows steps live — `understand · validate · execute · project` — with per-step timings. |
-| Full reasoning trace | `[ ]` | [048](mvp/rfc-048-agent-runtime-on-prefect.md) · [026](mvp/rfc-026-studio-session-tracing.md) | Prompt → rationale → generated query → records → timings. Clickable provenance. |
-| "Cannot answer" | `[ ]` | [052](mvp/rfc-052-failure-handling.md) | A deliberately non-answer-shaped response — and distinct again from a *failure*. |
-| Automatic retries | `[ ]` | [052](mvp/rfc-052-failure-handling.md) | Transient faults retry with backoff and jitter. Visible while it happens — `retrying 2/3`, never a silent pause. |
-| Self-repair | `[ ]` | [052](mvp/rfc-052-failure-handling.md) | An invalid generated query goes back to the model **once**, with the validation error attached. |
-| Failure diagnosis + next steps | `[ ]` | [052](mvp/rfc-052-failure-handling.md) | A failure explains itself in your terms, with clickable actions. Derived from real evidence, never invented. |
-| Clarifying questions | `[~]` | [038](mvp/rfc-038-query-understanding.md) · [052](mvp/rfc-052-failure-handling.md) | UI exists; not wired to a thinking. Options come from your schema; capped at 2 rounds. |
-| Schedule a question | `[ ]` | [051](mvp/rfc-051-workflows.md) | Put a thought on a cron; each firing re-asks it unattended and the answers stack into a diffable timeline. |
-| Agent skills & instructions | `[x]` | [040](mvp/rfc-040-consolidate-graph-instructions.md) | Per-Atlas prose that grounds every thinking. |
-| External-agent API | `[ ]` | — | Scoped tokens; retrieval endpoints with provenance. |
-| Audit trail | `[x]` | [018](mvp/rfc-018-domain-audit-events.md) | Every write emits a domain event; live tail in the UI. |
-| Themes / light + dark | `[x]` | [044](mvp/rfc-044-rich-theming.md) | |
-| Design system (`@invana/design-kit`) | `[~]` | [050](mvp/rfc-050-design-kit-component-plan.md) | Studio pins 7 releases behind; the answer-surface components do not exist yet. |
-| Source connectors (PDF, CSV, Git, MySQL…) | `[-]` | [020](mvp/rfc-020-dataset-ingestion.md) | Datasets are produced externally in MVP — that's the contract. |
-| Dataset import from the UI | `[-]` | [engine.md § 1.8](mvp/engine.md) | Import is an operator action against a bound database, so it lives with `migrate` and `init` in the CLI. |
-| Authoring your own workflow | `[-]` | [051 § 3](mvp/rfc-051-workflows.md) | MVP ships one built-in workflow and makes it visible. Authoring is an execution surface needing its own threat model. |
-| Orchestrating thoughts — *a chain of thoughts* | `[-]` | [051 § 7](mvp/rfc-051-workflows.md) | One step's answer feeding the next. **Deliberately kept reachable** — six invariants in [`engine.md`](mvp/engine.md) § 2.1 hold the door open. |
-| Event triggers (fire on data change) | `[-]` | [051 § 6](mvp/rfc-051-workflows.md) | Cron only in MVP. |
-| Notifications on completion | `[-]` | [052 § 6](mvp/rfc-052-failure-handling.md) | A delivery channel, not a workflow feature. Blocks schedule auto-pause. |
-| Vector / semantic search | `[-]` | [037](mvp/rfc-037-memory.md) | Mixin exists for capable backends; not wired in MVP. |
-| Teams / orgs / roles | `[-]` | [023](mvp/rfc-023-remove-roles-invitations.md) | Binary membership only. |
-| Multi-database Atlases | `[-]` | [017](../rfcs/017-graph-as-primary-container.md) | Atlas ↔ Connection stays 1:1. |
-| Simulation (game theory, parameter sweeps) | `[-]` | — | |
-| Soft deletes / trash / undo | `[-]` | — | |
+| Status | Meaning | Marker in `engine.md` / `studio.md` |
+|---|---|---|
+| ✅ | Done | `[x]` |
+| 🟡 | In progress — partially built | `[~]` |
+| 🔵 | To do — designed, not started | `[ ]` |
+| — | No work on this side | — |
 
-Full deferred list: [`mvp/studio.md`](mvp/studio.md) and [`mvp/engine.md`](mvp/engine.md), marked `[-]`.
+| # | Capability | Engine | Studio | Slice | Design | Notes |
+|---|---|---|---|---|---|---|
+| 1 | Connect to a graph database | ✅ | ✅ | S2 | [017](../rfcs/017-graph-as-primary-container.md) · [001](../rfcs/001-graph-connectors.md) | 1 Atlas ↔ 1 connection. Test before save. Credentials encrypted at rest. |
+| 2 | Introspect an existing database | ✅ | 🟡 | S2 | [001](../rfcs/001-graph-connectors.md) · [021](mvp/rfc-021-model-authoring.md) | Seeds a draft model from what's already there. |
+| 3 | Design a graph model | 🟡 | 🟡 | S3 | [019](mvp/rfc-019-multi-model-perspectives.md) · [021](mvp/rfc-021-model-authoring.md) · [022](mvp/rfc-022-property-type-capabilities.md) | Authoring CRUD ships both sides. Backend-gated property types + compatibility banner are the gap. |
+| 4 | Visual model editor | ✅ | 🟡 | S3 | [027](mvp/rfc-027-interactive-modeller-canvas.md) · [029](mvp/rfc-029-modeller-staged-commit.md) · [031](mvp/rfc-031-modeller-generative-sessions.md) | Canvas authoring works on drafts; read-only versions stay pan/zoom/select. |
+| 5 | Agent skills & instructions | ✅ | ✅ | S5 | [040](mvp/rfc-040-consolidate-graph-instructions.md) | Per-Atlas prose that grounds every thinking. |
+| 6 | Audit trail | ✅ | ✅ | S5.5 | [018](mvp/rfc-018-domain-audit-events.md) | Every write emits a domain event; live tail in the UI. |
+| 7 | Load data | 🔵 | 🔵 | S6 | [020](mvp/rfc-020-dataset-ingestion.md) · [016](../rfcs/016-pluggable-executor.md) | Validated record-by-record. **CLI only** — `invana datasets import`. |
+| 8 | Inspect what landed | 🔵 | 🔵 | S6 | [020](mvp/rfc-020-dataset-ingestion.md) | Read-only in Studio: import logs, files, derived model, records, validation report. |
+| 9 | Stitch data into the graph | 🔵 | 🔵 | S7 | [020](mvp/rfc-020-dataset-ingestion.md) | Map dataset types onto model concepts; every materialised node carries its source record. |
+| 10 | Write queries directly | ✅ | 🟡 | S9a | [024](mvp/rfc-024-query-sessions.md) | CodeMirror editor with the Atlas's schema in scope. |
+| 11 | Ask in natural language | 🟡 | 🟡 | S9b | [030](mvp/rfc-030-llm-translation.md) · [032](mvp/rfc-032-llm-runtime.md) · [036](mvp/rfc-036-nl-conversation-context.md) · [038](mvp/rfc-038-query-understanding.md) | Translation exists; the grounded LLM runtime does not. |
+| 12 | Streaming answers | 🔵 | 🔵 | S9b | [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Results paint as they arrive, not all at the end. |
+| 13 | Visible workflow per answer | 🔵 | 🔵 | S9b | [051](mvp/rfc-051-workflows.md) · [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Names its workflow, shows steps live — `understand · validate · execute · project`. |
+| 14 | Multi-modal answers | 🔵 | 🔵 | S9b | [033](mvp/rfc-033-explorer-results-in-thread.md) · [048](mvp/rfc-048-agent-runtime-on-prefect.md) | Subgraph · table · metric · chart · prose — in one answer. |
+| 15 | Interactive graph canvas | 🟡 | 🟡 | S9b | [035](mvp/rfc-035-explorer-node-expand.md) · [043](mvp/rfc-043-explorer-canvases.md) · [045](mvp/rfc-045-session-canvas-enhancements.md) | Pan, zoom, select, hover, style layers ship. **Node expand** does not, on either side. |
+| 16 | Automatic retries | 🔵 | 🔵 | S9b | [052](mvp/rfc-052-failure-handling.md) | Backoff + jitter, shown as `retrying 2/3` — never a silent pause. |
+| 17 | "Cannot answer" | 🔵 | 🔵 | S9b | [052](mvp/rfc-052-failure-handling.md) | Deliberately non-answer-shaped — and distinct again from a *failure*. |
+| 18 | Clarifying questions | 🔵 | 🟡 | S9c | [038](mvp/rfc-038-query-understanding.md) · [052](mvp/rfc-052-failure-handling.md) | Studio UI exists but is wired to the old session flow, not a thinking. |
+| 19 | Full reasoning trace | 🔵 | 🔵 | S9c | [048](mvp/rfc-048-agent-runtime-on-prefect.md) · [026](mvp/rfc-026-studio-session-tracing.md) | Prompt → rationale → generated query → records → timings. |
+| 20 | Self-repair | 🔵 | 🔵 | S9d | [052](mvp/rfc-052-failure-handling.md) | Invalid generated query goes back to the model **once**, with the validation error. |
+| 21 | Save and revisit canvases | ✅ | 🟡 | S9 | [043](mvp/rfc-043-explorer-canvases.md) · [047](mvp/rfc-047-canvas-version-history.md) | Tabs, autosave and the rail ship; the version-history timeline does not. |
+| 22 | Failure diagnosis + next steps | 🔵 | 🔵 | S9f | [052](mvp/rfc-052-failure-handling.md) | Explains itself with clickable actions. From real evidence, never invented. |
+| 23 | Schedule a question | 🔵 | 🔵 | S9.5 | [051](mvp/rfc-051-workflows.md) | Put a thought on a cron; firings stack into a diffable timeline. |
+| 24 | External-agent API | 🔵 | 🔵 | S10 | — | Scoped tokens; retrieval endpoints with provenance. |
+| 25 | Themes / light + dark | — | ✅ | — | [044](mvp/rfc-044-rich-theming.md) | Cross-cutting. |
+| 26 | Design system (`@invana/design-kit`) | — | 🟡 | — | [050](mvp/rfc-050-design-kit-component-plan.md) | Cross-cutting. Studio pins 7 releases behind; answer-surface components do not exist yet. |
+
+| | ✅ done | 🟡 in progress | 🔵 to do | — n/a |
+|---|---|---|---|---|
+| **Engine** | 7 | 3 | 14 | 2 |
+| **Studio** | 4 | 9 | 13 | 0 |
+
+Reading across the two columns:
+
+| Pattern | Rows |
+|---|---|
+| Partial on **both** sides | 3 · 11 · 15 |
+| Engine done, **waiting on Studio** | 2 · 4 · 10 · 21 · 26 |
+| **Studio ahead of Engine** — the only one | 18 (clarification UI exists with no thinking to wire it to) |
+
+**Studio is the lagging side.** Five features are engine-complete and blocked on the frontend, which
+is what [RFC-050](mvp/rfc-050-design-kit-component-plan.md) is about — the answer-surface components
+do not exist yet, and Studio is pinned seven design-kit releases behind.
+
+---
+
+## Not in MVP
+
+**Everything here is out of scope.** Not "later in the plan" — out. Nothing above depends on any of it.
+Listed with the reason, because a deferral without one gets re-litigated.
+
+| Capability | Why it's out | Design |
+|---|---|---|
+| Source connectors (PDF, CSV, Git, MySQL…) | Datasets are produced externally in MVP — that's the contract, and every "but PDFs would be easy" is a slope back into a connector framework | [020](mvp/rfc-020-dataset-ingestion.md) |
+| Dataset import from the UI | An import writes into the Atlas's bound database, so it lives with `migrate` and `init` in the CLI | [engine.md § 1.8](mvp/engine.md) |
+| Authoring your own workflow | A spec drives task dispatch, so authoring is an execution surface — needs its own threat model | [051 § 3](mvp/rfc-051-workflows.md) |
+| Orchestrating thoughts — *a chain of thoughts* | One step's answer feeding the next. **Deliberately kept reachable** — six invariants in [`engine.md`](mvp/engine.md) § 2.1 hold the door open | [051 § 7](mvp/rfc-051-workflows.md) |
+| Event triggers (fire on data change) | Needs change detection in the graph; cron only in MVP | [051 § 6](mvp/rfc-051-workflows.md) |
+| Notifications on completion | A delivery channel, not a workflow feature. **Blocks schedule auto-pause** | [052 § 6](mvp/rfc-052-failure-handling.md) |
+| Ontology · inference · reasoning | Property-graph backends ship no reasoner, so Invana would implement it — and an inferred fact needs its own provenance story before it can be trusted | — |
+| Vector / semantic search | Mixin exists for capable backends; not wired | [037](mvp/rfc-037-memory.md) |
+| Simulation (game theory, parameter sweeps) | The long-term pillar; needs the asking path to exist first | — |
+| Teams / orgs / roles | Binary membership only | [023](mvp/rfc-023-remove-roles-invitations.md) |
+| Multi-database Atlases | Atlas ↔ Connection stays 1:1 | [017](../rfcs/017-graph-as-primary-container.md) |
+| Soft deletes / trash / undo | Hard deletes, cascading through ownership | — |
+| Task/pipeline composition | Only needed once source connectors exist | [051 § 6](mvp/rfc-051-workflows.md) |
+| Username-change redirects | Old usernames 404 | — |
+| HttpOnly cookie tokens | Studio uses localStorage in v1 | — |
+| Refresh-token rotation policy | — | — |
+| Managed/hosted graph DB provisioning | You bring the connection | — |
+
+Per-task deferrals live in [`mvp/studio.md`](mvp/studio.md) and [`mvp/engine.md`](mvp/engine.md), marked `[-]`.
 
 ---
 
