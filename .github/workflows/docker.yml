@@ -31,7 +31,7 @@ jobs:
 
       # All-in-one image
       - name: Build & push invana/invana
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/Dockerfile
@@ -45,7 +45,7 @@ jobs:
 
       # Engine-only image
       - name: Build & push invana/engine
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/Dockerfile
@@ -59,7 +59,7 @@ jobs:
 
       # Studio-only image
       - name: Build & push invana/studio
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/Dockerfile
