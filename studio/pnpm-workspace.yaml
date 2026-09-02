@@ -3,6 +3,8 @@ allowBuilds:
   esbuild: set this to true or false
 minimumReleaseAge: 60
 minimumReleaseAgeExclude:
+  # First-party packages — published by us, safe to install the moment they land.
+  - '@invana/*'
   - '@invana/forms@0.0.11'
   - '@invana/styling@0.0.11'
   - '@invana/themes@0.0.11'
