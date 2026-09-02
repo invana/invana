@@ -191,4 +191,4 @@ flowchart TD
 |---|---|---|
 | Q1 | Markdown dep for `MarkdownBlock` — `react-markdown` (heavier, plugin ecosystem) vs `marked` + sanitizer (lighter, manual)? Streaming append behaviour differs. | W2 |
 | Q2 | Does `@invana/charts` warrant its own package, or fold into `ui` behind a subpath export (`@invana/ui/charts`)? **D5** assumes a package. | W3 |
-| Q3 | Is `ChatSession*` (451 ln upstream) rich enough to carry the thread, or does adopting it mean extending it first? Needs a read of the 0.0.19 source before W1 is estimated. | W1 |
+| Q3 | Is `ChatSession*` (451 ln upstream) rich enough to carry the thread, or does adopting it mean extending it first? **Resolved** — yes for the thread and the NL composer; two gaps (no input slot for a code editor, no textarea ref / keydown hook) are worked around Studio-side and listed as design-kit follow-ups in [RFC-054](rfc-054-sessions-console-transcript.md) §6. | W1 |

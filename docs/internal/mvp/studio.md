@@ -464,7 +464,7 @@ Every long-running surface streams. One hook pattern, three consumers.
 | 10.4 | Theming | `@invana/themes` `AppLayoutV2` slots | `[x]` |
 | 10.5 | Studio served as static assets in single-image Docker mode | engine serves `/static/*` | `[ ]` |
 | 10.6 | Track design-kit `latest` — Studio pins `0.0.12`, upstream is `0.0.19` (`ChatSession*`, `PanelStack`, `@invana/tables` unreachable) | [RFC-050](rfc-050-design-kit-component-plan.md) W0 — gates §6 | `[ ]` |
-| 10.7 | Adopt what design-kit already ships: `DataTable` (5 hand-rolled tables), `ChatSession*`, `PanelStack` | [RFC-050](rfc-050-design-kit-component-plan.md) W1 | `[ ]` |
+| 10.7 | Adopt what design-kit already ships: `DataTable` (5 hand-rolled tables), `ChatSession*` (done — [RFC-054](rfc-054-sessions-console-transcript.md)), `PanelStack` | [RFC-050](rfc-050-design-kit-component-plan.md) W1 | `[~]` |
 | 10.8 | Answer-surface components built in design-kit, not Studio — `StepChip` (incl. **retrying / repairing** states) · `ProcessCard` · `DataTableBlock` · `MetricStat` · `ChartBlock` · `MarkdownBlock` · `TokenChip` · `EmptyResult` · **`DiagnosisBlock`** | [RFC-050](rfc-050-design-kit-component-plan.md) W2–W3 — gates 6.5, 6.7a–d, 6.14 | `[ ]` |
 | 10.9 | Promote domain-free Studio components upstream — `ConfirmDialog` · `ListPanel` · `EmptyState` · `NoticeBanner` · `StatusBadge` · `Stepper` · `FormError` | [RFC-050](rfc-050-design-kit-component-plan.md) W4 | `[ ]` |
 

@@ -11,41 +11,54 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import { Button } from "@invana/ui";
+import { Button, ChatSessionComposer } from "@invana/ui";
 import { ArrowUp, Paperclip, Square, Timer, X } from "lucide-react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
 import type { QueryMode, QueryRunPayload } from "../../../../types/query";
+import type { Session } from "../../../../types/session";
 
-// ── CodeMirror dark theme ─────────────────────────────────────────────────────
+// ── CodeMirror theme ──────────────────────────────────────────────────────────
+// Reads the design-kit colour tokens so the QL editor follows the active theme
+// (light or dark, any preset — RFC-044) instead of a hard-coded dark palette.
 
-const darkTheme = EditorView.theme(
-	{
-		"&": {
-			color: "#d4d4d4",
-			backgroundColor: "transparent",
-			height: "100%",
-		},
-		".cm-scroller": {
-			overflow: "auto",
-			fontFamily: "monospace",
-			fontSize: "13px",
-		},
-		".cm-content": { caretColor: "#fff", padding: "8px 0" },
-		".cm-cursor": { borderLeftColor: "#fff" },
-		".cm-selectionBackground": { backgroundColor: "#264f78" },
-		"&.cm-focused .cm-selectionBackground": { backgroundColor: "#264f78" },
-		".cm-line": { padding: "0 8px" },
-		".cm-gutters": { display: "none" },
-		".cm-focused": { outline: "none" },
+const editorTheme = EditorView.theme({
+	"&": {
+		color: "var(--color-foreground)",
+		backgroundColor: "transparent",
+		height: "100%",
 	},
-	{ dark: true },
-);
+	".cm-scroller": {
+		overflow: "auto",
+		fontFamily: "monospace",
+		fontSize: "13px",
+	},
+	".cm-content": { caretColor: "var(--color-foreground)", padding: "8px 0" },
+	".cm-cursor": { borderLeftColor: "var(--color-foreground)" },
+	".cm-selectionBackground": {
+		backgroundColor:
+			"color-mix(in srgb, var(--color-primary) 30%, transparent)",
+	},
+	"&.cm-focused .cm-selectionBackground": {
+		backgroundColor:
+			"color-mix(in srgb, var(--color-primary) 35%, transparent)",
+	},
+	".cm-line": { padding: "0 8px" },
+	".cm-gutters": { display: "none" },
+	".cm-focused": { outline: "none" },
+});
 
 const LANGUAGE_LABEL: Record<QueryLanguage, string> = {
 	cypher: "Cypher",
 	gremlin: "Gremlin",
+};
+
+// Starter query shown the first time the QL editor opens for a language.
+const DEFAULT_QUERY: Record<QueryLanguage, string> = {
+	cypher: "MATCH (n) WITH n LIMIT 10 MATCH (n)-[r]->(m) RETURN n, r, m",
+	gremlin: "g.V().hasLabel('Person').limit(25)",
 };
 
 // NL-only LLM translation timeout presets (seconds). Default matches the
@@ -68,6 +81,13 @@ const LANGUAGE_EXTENSION: Record<
 	gremlin: StreamLanguage.define(groovy),
 };
 
+// Toolbar control classes — the same trigger styling the design-kit
+// AgentConsole reference uses, so Studio's selects sit flush in the composer.
+const FIXED_TRIGGER =
+	"h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent";
+const FILL_TRIGGER =
+	"h-7 w-full min-w-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground";
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 /** Composer defaults restored from the open session's last reply, so reopening
@@ -78,6 +98,47 @@ export interface ComposerConfig {
 	llmProviderId?: string;
 	/** NL only — the timeout (seconds) the session's last ask used. */
 	timeoutS?: number;
+}
+
+/**
+ * The mode + model to restore when a session is reopened (RFC-030), read from
+ * its last real assistant reply. The engine persists `mode` ("nl" | "ql") per
+ * message, so it's read directly — robust even when that reply errored or was a
+ * rerun. Older rows predate the field, so it falls back to inferring from `via`
+ * ("<provider> · <model>" for NL, "Cypher"/"Gremlin" for QL). Operation turns
+ * (expand/load, RFC-046) carry a ql mode but aren't the user's composer choice,
+ * so they're skipped. Null until messages load — the composer then keeps the
+ * user's current selection.
+ */
+export function deriveComposerConfig(
+	session: Session | null,
+	llmProviders: readonly LLMProvider[],
+): ComposerConfig | null {
+	if (!session) return null;
+	const last = [...session.messages]
+		.reverse()
+		.find((m) => m.role === "assistant" && !m.operation && (m.mode || m.via));
+	if (!last) return null;
+	const provider = last.via?.includes(" · ")
+		? llmProviders.find((p) => `${p.provider} · ${p.model_id}` === last.via)
+		: undefined;
+	const mode: QueryMode =
+		last.mode ?? (last.via?.includes(" · ") ? "nl" : "ql");
+	if (mode === "nl") {
+		return {
+			mode,
+			language: last.language,
+			llmProviderId: provider?.id,
+			timeoutS: last.timeoutS,
+		};
+	}
+	return {
+		mode,
+		language:
+			last.language ??
+			(last.via ? (last.via.toLowerCase() as QueryLanguage) : undefined),
+		timeoutS: last.timeoutS,
+	};
 }
 
 export interface SessionComposerProps {
@@ -106,10 +167,12 @@ export interface SessionComposerProps {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-// The query box, restyled as a chat-style bottom bar: a bordered card with the
-// input on top and a toolbar (mode / language / attach … send) underneath. It
-// keeps every capability of the old console — NL/QL toggle, a CodeMirror QL
-// editor, attachments — just laid out to match the Sessions UI.
+// The session's input bar (RFC-054). Natural-language mode is the design-kit
+// `ChatSessionComposer` — Studio only supplies the toolbar controls (mode,
+// model, timeout, attach) and the attachment chips. Query-language mode needs a
+// CodeMirror editor, which the design-kit composer has no slot for, so it
+// renders the same card chrome locally with the editor in the input position
+// and shares the toolbar nodes. Both keep the ↑/↓ prompt history.
 
 export function SessionComposer({
 	availableLanguages,
@@ -132,20 +195,26 @@ export function SessionComposer({
 	const [attachments, setAttachments] = useState<File[]>([]);
 	const [timeoutS, setTimeoutS] = useState<number>(DEFAULT_TIMEOUT_S);
 
+	// Wraps the NL composer so Studio can reach its textarea (focus, ↑/↓ keys)
+	// — the design-kit composer exposes neither a ref nor a keydown hook yet.
+	const rootRef = useRef<HTMLDivElement>(null);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
 	const editorViewRef = useRef<EditorView | null>(null);
-	const nlTextareaRef = useRef<HTMLTextAreaElement>(null);
+	// The QL editor unmounts while the composer is in NL mode (the design-kit
+	// composer owns the input surface), so its text lives here and is restored
+	// when the user switches back.
+	const qlDocRef = useRef<string>(DEFAULT_QUERY[defaultLanguage]);
 	const languageCompartmentRef = useRef(new Compartment());
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	// Lets the CodeMirror Enter keybinding (wired once on mount) call the
-	// latest handleRun without closing over stale mode/language/query state.
+	// Lets the CodeMirror Enter keybinding (wired when the editor mounts) call
+	// the latest handleRun without closing over stale mode/language/query state.
 	const handleRunRef = useRef<() => void>(() => {});
 
 	// ── Shell-style prompt history (↑ older / ↓ newer) ───────────────────────
-	// All in refs so the CodeMirror keybindings (wired once on mount) read live
-	// values. `historyIndex` is -1 when not navigating (a live draft); 0 is the
-	// newest prompt, higher is older. `draft` holds the text being typed before
-	// ↑ entered history, restored when ↓ walks back past the newest.
+	// All in refs so the CodeMirror keybindings read live values. `historyIndex`
+	// is -1 when not navigating (a live draft); 0 is the newest prompt, higher is
+	// older. `draft` holds the text being typed before ↑ entered history,
+	// restored when ↓ walks back past the newest.
 	const historyRef = useRef<readonly string[]>([]);
 	historyRef.current = promptHistory ?? [];
 	const historyIndexRef = useRef(-1);
@@ -189,14 +258,15 @@ export function SessionComposer({
 		});
 		return true;
 	};
-	// The session we've already restored the mode/model for — guards against
-	// re-applying over the user's manual switches within the same session.
+
 	// Focus the NL input when the parent bumps focusSignal (e.g. "let me type
 	// instead" on a clarification). 0 is the initial value — don't focus on mount.
 	useEffect(() => {
-		if (focusSignal) nlTextareaRef.current?.focus();
+		if (focusSignal) rootRef.current?.querySelector("textarea")?.focus();
 	}, [focusSignal]);
 
+	// The session we've already restored the mode/model for — guards against
+	// re-applying over the user's manual switches within the same session.
 	const appliedSessionRef = useRef<string | null>(null);
 
 	// ── Restore the open session's mode + model once on open (RFC-030) ────────
@@ -247,18 +317,16 @@ export function SessionComposer({
 		[availableLanguages],
 	);
 
-	// ── Initialise CodeMirror once (stays mounted across mode toggles) ────────
-	// biome-ignore lint/correctness/useExhaustiveDependencies: editor init runs once on mount
+	// ── Mount CodeMirror whenever the QL surface is shown ────────────────────
+	// The editor is rebuilt from `qlDocRef` each time the mode flips to QL and
+	// torn down when it flips back, so the NL composer never carries a hidden
+	// editor. Undo history doesn't survive the switch; the text does.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: (re)built only when the QL surface mounts
 	useEffect(() => {
-		if (!editorContainerRef.current) return;
-
-		const defaultQuery =
-			defaultLanguage === "gremlin"
-				? "g.V().hasLabel('Person').limit(25)"
-				: "MATCH (n) WITH n LIMIT 10 MATCH (n)-[r]->(m) RETURN n, r, m";
+		if (mode !== "ql" || !editorContainerRef.current) return;
 
 		const state = EditorState.create({
-			doc: defaultQuery,
+			doc: qlDocRef.current,
 			extensions: [
 				// Enter submits, Shift-Enter inserts a newline — listed before
 				// defaultKeymap so it wins over CM's default Enter binding.
@@ -292,11 +360,12 @@ export function SessionComposer({
 					},
 				]),
 				keymap.of(defaultKeymap),
-				// A user edit (any doc change that isn't our recall) drops out of the
-				// history walk so the next ↑ stashes the new text as the draft.
 				EditorView.updateListener.of((update) => {
+					if (!update.docChanged) return;
+					qlDocRef.current = update.state.doc.toString();
+					// A user edit (any doc change that isn't our recall) drops out of the
+					// history walk so the next ↑ stashes the new text as the draft.
 					if (
-						update.docChanged &&
 						!update.transactions.some((tr) =>
 							tr.annotation(recallAnnotationRef.current),
 						)
@@ -304,8 +373,8 @@ export function SessionComposer({
 						historyIndexRef.current = -1;
 					}
 				}),
-				languageCompartmentRef.current.of(LANGUAGE_EXTENSION[defaultLanguage]),
-				darkTheme,
+				languageCompartmentRef.current.of(LANGUAGE_EXTENSION[language]),
+				editorTheme,
 				EditorView.lineWrapping,
 			],
 		});
@@ -317,7 +386,7 @@ export function SessionComposer({
 			view.destroy();
 			editorViewRef.current = null;
 		};
-	}, []);
+	}, [mode]);
 
 	// Reconfigure the language compartment on switch — keeps doc / undo intact.
 	useEffect(() => {
@@ -352,7 +421,33 @@ export function SessionComposer({
 	};
 	handleRunRef.current = handleRun;
 
-	const handleAttachChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// ↑/↓ prompt history for the NL textarea. The design-kit composer handles
+	// Enter itself and lets other keys bubble, so this listens on the wrapper:
+	// only from the first/last line (normal caret movement inside a multi-line
+	// prompt) and only with a collapsed selection.
+	const handleNlKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+		if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+		const ta = e.target;
+		if (!(ta instanceof HTMLTextAreaElement)) return;
+		if (ta.selectionStart !== ta.selectionEnd) return;
+		if (e.key === "ArrowUp") {
+			if (ta.value.slice(0, ta.selectionStart).includes("\n")) return;
+			const next = stepHistory("older", nlQuery);
+			if (next != null) {
+				e.preventDefault();
+				setNlQuery(next);
+			}
+			return;
+		}
+		if (ta.value.slice(ta.selectionEnd).includes("\n")) return;
+		const next = stepHistory("newer", nlQuery);
+		if (next != null) {
+			e.preventDefault();
+			setNlQuery(next);
+		}
+	};
+
+	const handleAttachChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files;
 		if (!files) return;
 		setAttachments((prev) => [...prev, ...Array.from(files)]);
@@ -363,232 +458,205 @@ export function SessionComposer({
 		setAttachments((prev) => prev.filter((_, i) => i !== index));
 
 	const noLlmProviders = llmProviders.length === 0;
-	const runDisabled =
-		isRunning || (mode === "nl" && (noLlmProviders || !nlQuery.trim()));
 
-	// ── Render ──────────────────────────────────────────────────────────────────
-	return (
-		<div className="p-3">
-			<div className="rounded-md border border-border bg-card shadow-sm overflow-hidden focus-within:border-ring transition-colors">
-				{/* Attachment chips (NL only) — pinned above the input so a long
-				    list never shoves the toolbar off-screen. */}
-				{mode === "nl" && attachments.length > 0 && (
-					<div className="px-2 py-1.5 border-b border-border max-h-24 overflow-y-auto flex items-start gap-1 flex-wrap">
-						{attachments.map((file, i) => (
-							<span
-								key={`${file.name}-${i}`}
-								className="inline-flex items-center gap-1 bg-muted border border-border rounded px-1.5 py-0.5 text-muted-foreground max-w-full"
-							>
-								<span className="truncate max-w-40" title={file.name}>
-									{file.name}
-								</span>
-								<button
-									type="button"
-									onClick={() => removeAttachment(i)}
-									className="hover:text-foreground shrink-0"
-								>
-									<X className="w-3 h-3" />
-								</button>
-							</span>
-						))}
-					</div>
-				)}
+	// ── Toolbar (shared by both input surfaces) ──────────────────────────────
+	// Mode + language/LLM on the left, timeout + attach on the right. The mode
+	// select and buttons stay fixed; the second control absorbs the leftover
+	// width and truncates so a long provider name never shoves send off-panel.
 
-				{/* Input surface — QL CodeMirror or the NL textarea. The QL editor is
-				    mounted into a flex-1 child of a resize-y wrapper so CodeMirror
-				    keeps a resolved height (its hit-region needs one). */}
-				<div
-					className={
-						mode === "ql"
-							? "min-h-16 h-24 max-h-64 resize-y overflow-hidden flex flex-col"
-							: "hidden"
-					}
+	const toolbarStart = (
+		<>
+			{/* Modeller sessions author a model — NL only, so the mode switch is
+			    hidden (QL is unreachable). Explorer keeps the NL/QL toggle. */}
+			{!isModeller && (
+				<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
+					<SelectTrigger className={FIXED_TRIGGER}>
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="nl">Natural Language</SelectItem>
+						<SelectItem value="ql">Query Language</SelectItem>
+					</SelectContent>
+				</Select>
+			)}
+			{mode === "nl" ? (
+				noLlmProviders ? (
+					<span className="text-muted-foreground px-1 truncate">
+						No LLM — add one in Settings → LLMs.
+					</span>
+				) : (
+					<Select value={llmProviderId} onValueChange={setLlmProviderId}>
+						<SelectTrigger className={FILL_TRIGGER}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{llmProviders.map((p) => (
+								<SelectItem key={p.id} value={p.id}>
+									{p.provider} · {p.model_id}
+									{p.is_default ? " (default)" : ""}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				)
+			) : languageOptions.length <= 1 ? (
+				<span className="inline-flex items-center h-7 px-2 text-muted-foreground truncate">
+					{LANGUAGE_LABEL[language]}
+				</span>
+			) : (
+				<Select
+					value={language}
+					onValueChange={(v) => setLanguage(v as QueryLanguage)}
 				>
-					<div ref={editorContainerRef} className="flex-1 min-h-0" />
-				</div>
-				{mode === "nl" && (
-					<textarea
-						ref={nlTextareaRef}
-						value={nlQuery}
-						onChange={(e) => {
-							setNlQuery(e.target.value);
-							historyIndexRef.current = -1; // manual edit → live draft again
-						}}
-						onKeyDown={(e) => {
-							if (
-								e.key === "Enter" &&
-								!e.shiftKey &&
-								!e.nativeEvent.isComposing
-							) {
-								e.preventDefault();
-								handleRun();
-								return;
-							}
-							// ↑/↓ walk the prompt history, but only from the first/last line
-							// so they keep normal caret movement inside a multi-line prompt.
-							const ta = e.currentTarget;
-							const collapsed = ta.selectionStart === ta.selectionEnd;
-							if (
-								e.key === "ArrowUp" &&
-								collapsed &&
-								!ta.value.slice(0, ta.selectionStart).includes("\n")
-							) {
-								const next = stepHistory("older", nlQuery);
-								if (next != null) {
-									e.preventDefault();
-									setNlQuery(next);
-								}
-								return;
-							}
-							if (
-								e.key === "ArrowDown" &&
-								collapsed &&
-								!ta.value.slice(ta.selectionEnd).includes("\n")
-							) {
-								const next = stepHistory("newer", nlQuery);
-								if (next != null) {
-									e.preventDefault();
-									setNlQuery(next);
-								}
-							}
-						}}
-						placeholder={
-							isModeller
-								? "Describe the model to build…"
-								: "Ask anything about your graph…"
-						}
-						className="block w-full min-h-16 h-24 max-h-64 bg-transparent p-2 text-foreground outline-none resize-y placeholder:text-muted-foreground"
+					<SelectTrigger className={FILL_TRIGGER}>
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{languageOptions.map((l) => (
+							<SelectItem key={l.value} value={l.value}>
+								{l.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			)}
+		</>
+	);
+
+	const toolbarEnd = (
+		<>
+			{(mode === "ql" || !noLlmProviders) && (
+				<Select
+					value={String(timeoutS)}
+					onValueChange={(v) => setTimeoutS(Number(v))}
+				>
+					<SelectTrigger
+						className={`${FIXED_TRIGGER} text-muted-foreground`}
+						title={mode === "nl" ? "LLM + query timeout" : "Query timeout"}
+					>
+						<Timer className="w-3.5 h-3.5" />
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						{TIMEOUT_OPTIONS.map((t) => (
+							<SelectItem key={t.value} value={String(t.value)}>
+								{t.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			)}
+			{mode === "nl" && (
+				<>
+					<input
+						ref={fileInputRef}
+						type="file"
+						multiple
+						onChange={handleAttachChange}
+						className="hidden"
 					/>
-				)}
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-7 w-7 shrink-0 text-muted-foreground"
+						onClick={() => fileInputRef.current?.click()}
+						title="Attach files"
+					>
+						<Paperclip className="w-4 h-4" />
+					</Button>
+				</>
+			)}
+		</>
+	);
 
-				{/* Toolbar — mode + language/LLM on the left, attach + send right.
-            The mode select and buttons stay fixed; the second control absorbs
-            the leftover width and truncates so a long provider name never
-            shoves the send button off a narrow panel. */}
-				<div className="px-2 py-1.5 border-t border-border flex items-center gap-1.5">
-					{/* Modeller sessions author a model — NL only, so the mode switch is
-					    hidden (QL is unreachable). Explorer keeps the NL/QL toggle. */}
-					{!isModeller && (
-						<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
-							<SelectTrigger className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="nl">Natural Language</SelectItem>
-								<SelectItem value="ql">Query Language</SelectItem>
-							</SelectContent>
-						</Select>
-					)}
-
-					<div className="flex-1 min-w-0 flex items-center">
-						{mode === "nl" ? (
-							noLlmProviders ? (
-								<span className="text-muted-foreground px-1 truncate">
-									No LLM — add one in Settings → LLMs.
-								</span>
-							) : (
-								<Select value={llmProviderId} onValueChange={setLlmProviderId}>
-									<SelectTrigger className="h-7 w-full min-w-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{llmProviders.map((p) => (
-											<SelectItem key={p.id} value={p.id}>
-												{p.provider} · {p.model_id}
-												{p.is_default ? " (default)" : ""}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							)
-						) : languageOptions.length <= 1 ? (
-							<span className="inline-flex items-center h-7 px-2 text-muted-foreground truncate">
-								{LANGUAGE_LABEL[language]}
-							</span>
-						) : (
-							<Select
-								value={language}
-								onValueChange={(v) => setLanguage(v as QueryLanguage)}
+	// ── Query-language surface: CodeMirror in the design-kit card chrome ──────
+	if (mode === "ql") {
+		return (
+			<div className="p-3">
+				<div className="rounded-control border border-border bg-card shadow-sm overflow-hidden focus-within:border-ring transition-colors">
+					{/* The editor mounts into a flex-1 child of a resize-y wrapper so
+					    CodeMirror keeps a resolved height (its hit-region needs one). */}
+					<div className="min-h-16 h-24 max-h-64 resize-y overflow-hidden flex flex-col">
+						<div ref={editorContainerRef} className="flex-1 min-h-0" />
+					</div>
+					<div className="px-2 py-1.5 border-t border-border flex items-center gap-1.5">
+						<div className="flex-1 min-w-0 flex items-center gap-1.5">
+							{toolbarStart}
+						</div>
+						{toolbarEnd}
+						{isRunning ? (
+							<Button
+								size="icon"
+								className="h-7 w-7 shrink-0 rounded-control"
+								onClick={onStop}
+								title="Stop"
+								aria-label="Stop"
 							>
-								<SelectTrigger className="h-7 w-full min-w-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{languageOptions.map((l) => (
-										<SelectItem key={l.value} value={l.value}>
-											{l.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+								<Square className="w-3 h-3 fill-current" />
+							</Button>
+						) : (
+							<Button
+								size="icon"
+								className="h-7 w-7 shrink-0 rounded-control"
+								onClick={handleRun}
+								title="Send"
+								aria-label="Send"
+							>
+								<ArrowUp className="w-4 h-4" />
+							</Button>
 						)}
 					</div>
-
-					{(mode === "ql" || !noLlmProviders) && (
-						<Select
-							value={String(timeoutS)}
-							onValueChange={(v) => setTimeoutS(Number(v))}
-						>
-							<SelectTrigger
-								className="h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground"
-								title={mode === "nl" ? "LLM + query timeout" : "Query timeout"}
-							>
-								<Timer className="w-3.5 h-3.5" />
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{TIMEOUT_OPTIONS.map((t) => (
-									<SelectItem key={t.value} value={String(t.value)}>
-										{t.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					)}
-
-					{mode === "nl" && (
-						<>
-							<input
-								ref={fileInputRef}
-								type="file"
-								multiple
-								onChange={handleAttachChange}
-								className="hidden"
-							/>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-7 w-7 shrink-0 text-muted-foreground"
-								onClick={() => fileInputRef.current?.click()}
-								title="Attach files"
-							>
-								<Paperclip className="w-4 h-4" />
-							</Button>
-						</>
-					)}
-
-					{isRunning ? (
-						<Button
-							size="icon"
-							className="h-7 w-7 shrink-0 rounded-full"
-							onClick={onStop}
-							title="Stop"
-						>
-							<Square className="w-3 h-3 fill-current" />
-						</Button>
-					) : (
-						<Button
-							size="icon"
-							className="h-7 w-7 shrink-0 rounded-full"
-							onClick={handleRun}
-							disabled={runDisabled}
-							title="Send"
-						>
-							<ArrowUp className="w-4 h-4" />
-						</Button>
-					)}
 				</div>
 			</div>
+		);
+	}
+
+	// ── Natural-language surface: the design-kit composer ────────────────────
+	const attachmentChips =
+		attachments.length > 0
+			? attachments.map((file, i) => (
+					<span
+						key={`${file.name}-${i}`}
+						className="inline-flex items-center gap-1 bg-muted border border-border rounded-control px-1.5 py-0.5 text-muted-foreground max-w-full"
+					>
+						<span className="truncate max-w-40" title={file.name}>
+							{file.name}
+						</span>
+						<button
+							type="button"
+							onClick={() => removeAttachment(i)}
+							className="hover:text-foreground shrink-0"
+							aria-label={`Remove ${file.name}`}
+						>
+							<X className="w-3 h-3" />
+						</button>
+					</span>
+				))
+			: undefined;
+
+	return (
+		<div ref={rootRef} onKeyDown={handleNlKeyDown}>
+			<ChatSessionComposer
+				value={nlQuery}
+				onChange={(v) => {
+					setNlQuery(v);
+					historyIndexRef.current = -1; // manual edit → live draft again
+				}}
+				onSend={handleRun}
+				onStop={onStop}
+				isRunning={isRunning}
+				placeholder={
+					isModeller
+						? "Describe the model to build…"
+						: "Ask anything about your graph…"
+				}
+				toolbarStart={toolbarStart}
+				toolbarEnd={toolbarEnd}
+				attachments={attachmentChips}
+				sendIcon={<ArrowUp className="w-4 h-4" />}
+				stopIcon={<Square className="w-3 h-3 fill-current" />}
+				sendDisabled={noLlmProviders || !nlQuery.trim()}
+			/>
 		</div>
 	);
 }
