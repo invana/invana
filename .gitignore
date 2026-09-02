@@ -62,3 +62,5 @@ docs/site/
 .ruff_cache/
 
 .understand-anything/
+# Local MCP servers — contains auth tokens
+.mcp.json
