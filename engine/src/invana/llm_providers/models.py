@@ -1,7 +1,7 @@
 """SQLAlchemy async model for LLM providers (MVP § 2.6).
 
 One ``llm_providers`` row = one configured LLM endpoint scoped to a Graph
-(``Anthropic | OpenAI | Google | Azure | Ollama | local``). Hard delete,
+(``Anthropic | OpenAI | Google | Azure | Ollama | local | Claude Agent SDK``). Hard delete,
 cascade-from-Graph (matches RFC-012 cascade matrix). At most one row per
 Graph can be ``is_default = true`` (partial unique index in the migration).
 """
@@ -41,6 +41,8 @@ class LLMProviderKind(enum.StrEnum):
     azure = "azure"
     ollama = "ollama"
     local = "local"
+    # Claude via the Claude Agent SDK / Claude Code CLI (RFC-053). API key optional.
+    claude_agent_sdk = "claude_agent_sdk"
 
 
 _llm_provider_kind_enum = Enum(

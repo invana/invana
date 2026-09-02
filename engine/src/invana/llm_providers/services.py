@@ -69,7 +69,13 @@ async def create_provider(
     if payload.is_default:
         await store.clear_default(session, graph_id)
 
-    needs_key = payload.provider not in (LLMProviderKind.ollama, LLMProviderKind.local)
+    # claude_agent_sdk: key optional — without one the SDK uses the local Claude
+    # Code CLI's own login (RFC-053).
+    needs_key = payload.provider not in (
+        LLMProviderKind.ollama,
+        LLMProviderKind.local,
+        LLMProviderKind.claude_agent_sdk,
+    )
     if needs_key and not payload.api_key:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -283,6 +289,13 @@ async def _dispatch_ping(provider: LLMProvider, api_key: str | None) -> bool:
         if not api_key:
             return False
         return await asyncio.to_thread(_ping_openai, api_key, provider.model_id, provider.base_url)
+    if provider.provider == LLMProviderKind.claude_agent_sdk:
+        from invana.llm.providers import claude_agent_sdk as claude_agent_sdk_provider
+
+        # Natively async (subprocess harness); one single-turn call is the
+        # cheapest probe the SDK exposes. Missing package / CLI raise and are
+        # surfaced verbatim by ping_provider.
+        return await claude_agent_sdk_provider.ping(provider.model_id, api_key, timeout_s=10.0)
     # Google / Azure / Ollama / local — minimal HTTP probe of base_url, or just
     # report ok for local providers where there's nothing to verify.
     if provider.provider in (LLMProviderKind.ollama, LLMProviderKind.local):

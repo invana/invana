@@ -74,7 +74,7 @@ analytical happens inside a web request, so a long answer streams instead of blo
 | Layer | What it is | Options in MVP |
 |---|---|---|
 | **Graph database** | Where *your* data lives. Invana never hosts it — you bring the connection. | **Cypher:** Neo4j · Memgraph · ArcadeDB · **Gremlin:** JanusGraph · Amazon Neptune · TinkerGraph · ArcadeDB |
-| **LLM provider** | Translates questions to queries and shapes answers. Per-Atlas, key encrypted at rest. | Anthropic · OpenAI · Ollama / local |
+| **LLM provider** | Translates questions to queries and shapes answers. Per-Atlas, key encrypted at rest. | Anthropic · OpenAI · Ollama / local · Claude Agent SDK (Claude Code login, key optional) |
 | **Task runtime** | Executes thinkings. Swappable behind one protocol. | `inline` (bundled, zero infra) · **Prefect** (separate `invana-prefect` package, for retries/scale/observability) |
 | **App state** | Invana's own database — atlases, models, thoughts, canvases, audit events. | Postgres (prod) · SQLite (dev) |
 | **Object storage** | Uploaded dataset files. | MinIO (dev) · any S3-compatible (AWS S3 · GCS · R2) |

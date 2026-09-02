@@ -23,8 +23,8 @@ dependencies = [
     # The LLM runtime (RFC-032) calls Ollama + OpenAI-compatible servers over
     # plain HTTP — the providers import httpx at module load, and the LLM client
     # (and the sessions router) import them eagerly, so httpx is required for the
-    # engine to import at all. The optional `anthropic`/`openai` SDKs are NOT
-    # required: the keyless local/ollama paths use httpx only.
+    # engine to import at all. The optional `anthropic`/`openai`/`claude-agent-sdk`
+    # SDKs are NOT required: the keyless local/ollama paths use httpx only.
     "httpx>=0.27",
 ]
 
@@ -132,7 +132,7 @@ ignore = [
 # Optional/heavy SDKs imported lazily so they're only required when actually used:
 #   events/services.py     — opentelemetry (telemetry extra)
 #   llm_providers/services — anthropic / openai SDKs + urllib, per-provider
-#   llm/providers/*        — anthropic SDK lazy-imported per provider (RFC-032)
+#   llm/providers/*        — anthropic / claude-agent-sdk lazy-imported per provider (RFC-032/053)
 "src/invana/events/services.py" = ["PLC0415"]
 "src/invana/llm_providers/services.py" = ["PLC0415"]
 "src/invana/llm/providers/*" = ["PLC0415"]

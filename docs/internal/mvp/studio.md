@@ -126,7 +126,7 @@ flowchart TD
 | 3.2 | Setup wizard card — per-section done/skipped/todo; locks explain themselves and link to the unblocking section | overview | `POST …/setup/{section}` | `[x]` |
 | 3.3 | Connection form; Test gates Save; `connector_class` read-only after first save; blank `auth` ≠ clear | `ConnectionForm` `settings/connection` | `GET PUT DELETE …/connection`, `POST …/connection/test` | `[x]` |
 | 3.4 | Settings rail shell — `?settings=<section>` drives `leftSection` → `SettingsPanel` in a `TabbedPanel`; same rail across Overview/Explorer/Modeller; per-section full-page route | `useAtlasLeftNav` | — | `[x]` |
-| 3.5 | LLM providers — provider-driven form, masked key, **save-first → ping → green/red**, set-default, row actions | `settings/llms` | `…/llm*`, `POST …/llm/{id}/ping`, `/set-default` | `[x]` |
+| 3.5 | LLM providers — provider-driven form, masked key (optional for Claude Agent SDK — blank = local Claude Code login, RFC-053), **save-first → ping → green/red**, set-default, row actions | `settings/llms` | `…/llm*`, `POST …/llm/{id}/ping`, `/set-default` | `[x]` |
 | 3.6 | Instructions — single custom-instructions block | `InstructionsSection` | `PATCH` atlas | `[x]` |
 | 3.7 | Skills — list + form (name/description/content/when_to_use), 409 on duplicate | `settings/skills` | `…/skills*` | `[x]` |
 | 3.8 | Events section — filter by action prefix, keyset infinite scroll, live-tail head refresh | `EventsSection` | `…/events`, `…/events/stream` | `[x]` |

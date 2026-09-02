@@ -212,6 +212,7 @@ function LLMProviderForm({
 
 	const meta = LLM_PROVIDER_OPTIONS.find((o) => o.value === providerKind);
 	const requiresKey = meta?.requiresApiKey ?? false;
+	const keyOptional = meta?.apiKeyOptional ?? false;
 	const showsBaseUrl = meta?.usesBaseUrl ?? false;
 
 	// On edit, the existing api key is already stored; only require fresh entry
@@ -353,12 +354,16 @@ function LLMProviderForm({
 			</div>
 
 			{/* API key */}
-			{requiresKey && (
+			{(requiresKey || keyOptional) && (
 				<div className="space-y-1.5">
 					<Label htmlFor="api_key">
 						API key{" "}
 						{apiKeyNeeded ? (
 							<span className="text-destructive">*</span>
+						) : keyOptional && !existing?.has_api_key ? (
+							<span className="text-muted-foreground">
+								(optional — uses your Claude Code login if blank)
+							</span>
 						) : (
 							<span className="text-muted-foreground">
 								(leave blank to keep stored key)

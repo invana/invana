@@ -50,6 +50,9 @@ path** so the whole feature line is buildable and CI-testable with zero paid API
      OAuth; it is not an API credential for a third-party server, and the `anthropic` SDK Invana uses
      expects an API key (`x-api-key`) or an API-scoped token. There is **no supported path** to point the
      runtime at a consumer subscription, and the runtime will not attempt one.
+     **Revised by RFC-053 (2026-09-03):** Anthropic's own Claude Agent SDK resolves credentials through
+     the local Claude Code CLI. The `claude_agent_sdk` provider kind uses that supported front door
+     (key optional); the `anthropic` kind is unchanged and still requires an API key.
    - **Production:** an Anthropic **API key** (pay-as-you-go, console.anthropic.com — separate from any
      subscription), stored as the `anthropic` `LLMProvider.api_key` (already Fernet-encrypted).
    - **Local dev + CI + any no-key environment: Ollama** (and the generic `local`/OpenAI-compatible
@@ -144,6 +147,7 @@ async def complete_tool(
 | `ollama` | HTTP `POST {base_url}/api/chat` | `format: <JSON Schema>` (or `tools` on tool models) | **no** | `qwen2.5-coder` (tool/JSON-capable) |
 | `local` | OpenAI-compatible HTTP at `base_url` | `response_format` / `format` json_schema | no | (configured) |
 | `google` / `azure` | deferred (`base_url`/SDK probe) | provider JSON mode | varies | — (post-MVP) |
+| `claude_agent_sdk` | `claude-agent-sdk` → Claude Code CLI subprocess (RFC-053) | `output_format` json_schema | **optional** (API key, else CLI login) | `claude-opus-5` |
 
 Each row is one lazy-imported function — the runtime never hard-depends on every SDK at install time
 (matches the existing ping dispatch). Anthropic uses the official SDK per project convention; Ollama/local
@@ -157,8 +161,9 @@ use their native HTTP JSON-schema mode (not an Anthropic-shaped shim).
 | **Self-host / air-gapped** | `local` | `base_url` of an OpenAI-compatible server | No Anthropic dependency. |
 | **Production** | `anthropic` | `api_key` (Fernet-encrypted), `model_id=claude-opus-4-8` | API key from console.anthropic.com — **not** a Pro/Max subscription. |
 
-**Explicitly unsupported:** using a Claude Pro/Max / Claude Code subscription as the credential — the
-runtime has no code path for it and the config UI offers none (the `anthropic` provider takes an API key).
+**Explicitly unsupported:** using a Claude Pro/Max / Claude Code subscription as the `anthropic`
+provider's credential — that kind takes an API key only. The supported way to run on a Claude Code
+login is the `claude_agent_sdk` kind (RFC-053), which delegates credential resolution to Anthropic's SDK.
 
 ### Refactor: ping calls through the client
 

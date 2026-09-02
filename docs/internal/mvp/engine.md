@@ -724,7 +724,7 @@ thinking surface and the Python/CLI dataset API.
 | Auth / crypto | `passlib[bcrypt]` · `bcrypt<5` (passlib wrap-bug guard) · `PyJWT` · `cryptography` |
 | Validation | `pydantic v2` |
 | Object storage | `aioboto3` · `boto3-stubs[s3]` |
-| LLM SDKs (lazy) | `anthropic` · `openai` · Ollama/local over `httpx` |
+| LLM SDKs (lazy) | `anthropic` · `openai` · `claude-agent-sdk` (needs the Claude Code CLI) · Ollama/local over `httpx` |
 | Graph DB drivers | `neo4j` · `gremlinpython` · per-driver libs in `integrations/invana-{db}/` |
 | Admin | `starlette-admin` · `itsdangerous` |
 | Telemetry | `opentelemetry-*` (optional extra) |

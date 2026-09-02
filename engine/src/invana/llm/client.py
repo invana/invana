@@ -3,7 +3,8 @@
 ``complete_tool`` turns (provider config, system prompt, messages, a JSON
 schema) into a *validated structured object*, dispatching by
 ``LLMProvider.provider``. Anthropic uses forced tool use; Ollama uses native
-JSON-schema ``format``. On a schema miss it does one corrective round-trip,
+JSON-schema ``format``; the Claude Agent SDK uses its ``output_format``
+json_schema mode. On a schema miss it does one corrective round-trip,
 then raises ``LLMError``. Other providers (openai / local / google / azure) are
 not wired for generation yet and raise a clear ``LLMError``.
 
@@ -22,6 +23,7 @@ from invana.graphs.encryption import decrypt_credentials
 from invana.llm.defaults import DEFAULT_MODEL_ID
 from invana.llm.errors import LLMError
 from invana.llm.providers import anthropic as anthropic_provider
+from invana.llm.providers import claude_agent_sdk as claude_agent_sdk_provider
 from invana.llm.providers import ollama as ollama_provider
 from invana.llm.providers import openai as openai_provider
 from invana.llm.schemas import TokenUsage, ToolResult
@@ -49,9 +51,10 @@ def _llm_span(name: str):
 
 _Dispatch = Callable[..., Awaitable[tuple[dict | None, TokenUsage]]]
 
-# Wired today: keyless local dev (ollama), production (anthropic), and the
+# Wired today: keyless local dev (ollama), production (anthropic), the
 # OpenAI-compatible path (openai = first-party OpenAI; local = any
-# OpenAI-compatible server reached via base_url, e.g. LM Studio / vLLM).
+# OpenAI-compatible server reached via base_url, e.g. LM Studio / vLLM), and
+# Claude through the local Claude Code CLI (claude_agent_sdk, RFC-053).
 # google / azure still raise a clear error until a consumer needs them
 # (RFC-032 § Decision 3).
 _DISPATCH: dict[LLMProviderKind, _Dispatch] = {
@@ -59,6 +62,7 @@ _DISPATCH: dict[LLMProviderKind, _Dispatch] = {
     LLMProviderKind.anthropic: anthropic_provider.call,
     LLMProviderKind.openai: openai_provider.call,
     LLMProviderKind.local: openai_provider.call,
+    LLMProviderKind.claude_agent_sdk: claude_agent_sdk_provider.call,
 }
 
 
@@ -85,7 +89,7 @@ async def complete_tool(
     if dispatch is None:
         raise LLMError(
             f"LLM provider '{provider.provider.value}' is not wired for generation yet "
-            "— use 'ollama' (local, no key) or 'anthropic'."
+            "— use 'ollama' (local, no key), 'anthropic', or 'claude_agent_sdk'."
         )
 
     model_id = provider.model_id or DEFAULT_MODEL_ID.get(provider.provider, "")

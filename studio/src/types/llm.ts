@@ -11,12 +11,16 @@ export type LLMProviderKind =
 	| "google"
 	| "azure"
 	| "ollama"
-	| "local";
+	| "local"
+	| "claude_agent_sdk";
 
 export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 	value: LLMProviderKind;
 	label: string;
 	requiresApiKey: boolean;
+	// Key accepted but not required — the engine falls back to the local Claude
+	// Code CLI login when blank (claude_agent_sdk, RFC-053).
+	apiKeyOptional?: boolean;
 	usesBaseUrl: boolean;
 	exampleModelId: string;
 }> = [
@@ -61,6 +65,14 @@ export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 		requiresApiKey: false,
 		usesBaseUrl: true,
 		exampleModelId: "custom",
+	},
+	{
+		value: "claude_agent_sdk",
+		label: "Claude Agent SDK",
+		requiresApiKey: false,
+		apiKeyOptional: true,
+		usesBaseUrl: false,
+		exampleModelId: "claude-opus-5",
 	},
 ];
 

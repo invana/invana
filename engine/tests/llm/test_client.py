@@ -14,6 +14,7 @@ import httpx
 import pytest
 
 from invana.llm import LLMError, complete_tool
+from invana.llm.providers.claude_agent_sdk import flatten_messages
 from invana.llm_providers.models import LLMProvider, LLMProviderKind
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
@@ -74,3 +75,40 @@ async def test_complete_tool_unwired_provider_raises() -> None:
             tool_name="submit_query",
             encryption_key="unused",
         )
+
+
+# ---------------------------------------------------------------------------
+# Claude Agent SDK provider (RFC-053)
+# ---------------------------------------------------------------------------
+
+
+def test_flatten_messages_passes_single_user_turn_through_and_renders_history() -> None:
+    assert flatten_messages([{"role": "user", "content": "who works where?"}]) == "who works where?"
+    history = [
+        {"role": "user", "content": "first"},
+        {"role": "assistant", "content": "reply"},
+        {"role": "user", "content": "second"},
+    ]
+    assert flatten_messages(history) == "User: first\n\nAssistant: reply\n\nUser: second"
+
+
+@pytest.mark.skipif(
+    os.environ.get("INVANA_TEST_CLAUDE_AGENT_SDK") != "1",
+    reason="set INVANA_TEST_CLAUDE_AGENT_SDK=1 (needs claude-agent-sdk + a logged-in Claude Code CLI)",
+)
+async def test_complete_tool_claude_agent_sdk_returns_schema_valid_object() -> None:
+    provider = LLMProvider(
+        provider=LLMProviderKind.claude_agent_sdk,
+        model_id=os.environ.get("INVANA_TEST_CLAUDE_AGENT_SDK_MODEL", "claude-opus-5"),
+    )
+    result = await complete_tool(
+        provider=provider,
+        system=_SYSTEM,
+        messages=[{"role": "user", "content": "who works on which projects?"}],
+        tool_schema=_SCHEMA,
+        tool_name="submit_query",
+        encryption_key="unused-no-key-uses-cli-login",
+        timeout_s=180.0,
+    )
+    assert {"query", "language", "read_only", "rationale"} <= set(result.input)
+    assert result.input["language"] in ("cypher", "gremlin")
