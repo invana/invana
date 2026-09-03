@@ -68,6 +68,7 @@ dev = [
     "invana-arcadedb",
     "invana-janusgraph",
     "invana-tinkergraph",
+    "claude-agent-sdk>=0.2.152",
 ]
 
 [tool.uv.sources]

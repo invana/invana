@@ -238,7 +238,7 @@ Engine: `httpx` added to the `telemetry` optional extra.
 
 ## Verification
 
-1. `docker compose -f docker-compose-infra.yml up -d` (HyperDX + collector).
+1. `docker compose --profile telemetry up -d` (HyperDX + collector).
 2. Engine on :8200 with `INVANA_TELEMETRY_ENABLED=true`.
 3. Studio on :8300 with `VITE_TELEMETRY_ENABLED=true`.
 4. Run a Cypher query in the Explorer that returns nodes + edges.

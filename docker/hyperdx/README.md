@@ -1,7 +1,7 @@
 # HyperDX dashboards
 
 Local HyperDX (the `telemetry` compose profile) stores dashboards in **ephemeral
-container state** — `docker-compose-infra.yml` mounts no data volume for the
+container state** — `docker-compose.yml` mounts no data volume for the
 `hyperdx` service — so anything built in the UI is lost on `down`/recreate. The
 dashboards we care about are therefore rebuilt from code here.
 
@@ -29,7 +29,7 @@ panels read the child spans the engine emits (`llm.generate`,
 
 ```bash
 # 1. bring up the telemetry stack (once)
-docker compose -f docker-compose-infra.yml --profile telemetry up -d
+docker compose --profile telemetry up -d
 
 # 2. drive some traffic so there's data (send session messages / expand nodes in Studio)
 

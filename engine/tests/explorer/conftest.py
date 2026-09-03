@@ -4,7 +4,7 @@ Wires a live ``OpenCypherConnector`` into a real ``GraphConnectionManager``
 registry (keyed by the GraphConnection id, exactly as the routes resolve it)
 so the service runs end-to-end against a real graph DB (no mocks, rule #7).
 
-Requires: docker compose -f docker-compose-infra.yml up -d   (Neo4j + Postgres)
+Requires: docker compose up -d   (Neo4j + Postgres)
 """
 
 from __future__ import annotations

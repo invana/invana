@@ -755,7 +755,7 @@ orchestrator.
 
 LLM credentials are **per `llm_providers` row, encrypted** — never environment variables.
 
-### 6.3 Infrastructure (dev — `docker-compose-infra.yml`)
+### 6.3 Infrastructure (dev — `docker-compose.yml`)
 
 Postgres (app state) · MinIO (S3-compatible object storage) · optional graph DB containers per
 supported backend · optional Prefect server profile (only for `INVANA_RUNTIME=prefect`).

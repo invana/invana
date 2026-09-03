@@ -1,7 +1,7 @@
 """Shared fixtures for Gremlin connector integration tests.
 
 Uses ArcadeDB as the primary Gremlin test backend.
-Requires: docker compose -f docker-compose-infra.yml up -d arcadedb
+Requires: docker compose --profile arcadedb up -d
 
 Override with environment variables:
   GREMLIN_URI       (default: ws://localhost:18182/gremlin)

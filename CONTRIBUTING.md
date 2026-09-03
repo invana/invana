@@ -22,32 +22,41 @@ cd invana
 # Install all dependencies + pre-commit hooks
 make setup
 
-# Start the local infrastructure (postgres + neo4j)
-docker compose -f docker-compose-infra.yml up -d
-
-# Start both engine and studio in dev mode
-make dev
+# Start postgres, neo4j, the engine, and studio (hot-reload dev containers)
+docker compose up -d
 ```
 
 Run `make help` to see all available commands.
 
 ### Local infrastructure
 
-`docker-compose-infra.yml` provides the backing services for local development
-and testing. By default it starts only the core pair:
+`docker-compose.yml` is the full local dev environment. By default it starts:
 
 | Service  | What it's for                          | Port(s)         |
-|----------|----------------------------------------|-----------------|
-| postgres | App-state database                     | 5432           |
-| neo4j    | Default graph database                 | 7474, 7687      |
+|----------|-----------------------------------------|-----------------|
+| postgres | App-state database                      | 5432            |
+| neo4j    | Default graph database                  | 7474, 7687      |
+| engine   | FastAPI, hot-reload (bind-mounted)      | 8200            |
+| studio   | Vite dev server, hot-reload (bind-mounted) | 8300         |
 
 ```bash
 # Start the default core services
-docker compose -f docker-compose-infra.yml up -d
+docker compose up -d
 
 # Stop them
-docker compose -f docker-compose-infra.yml down
+docker compose down
 ```
+
+`engine` and `studio` run off stock `python`/`node` images: `docker-compose.yml`
+bind-mounts your working tree in and `command` installs deps then starts in
+reload mode (`uv run invana start --reload`, Vite's dev server). No dev image
+to build or maintain — the trade-off is `uv sync`/`pnpm install` re-running on
+every `up` (a fast no-op once the `engine-venv`/`studio-node-modules` named
+volumes are warm). Not used for production builds. If you'd rather run the engine and/or
+studio directly on your host (faster iteration, no image build), stop those
+two containers — or never start them — and use `make dev` (or run each side
+individually: `cd engine && uv run invana start --reload`, `cd studio && pnpm
+dev`) against the same Postgres/Neo4j containers.
 
 The additional graph databases (Memgraph, JanusGraph, ArcadeDB) and the
 observability stack (HyperDX — traces/logs/metrics UI on 8080, 4317–4318) are
@@ -56,15 +65,15 @@ Enable one, all databases with the `extra-dbs` group profile, or telemetry:
 
 ```bash
 # Add a single on-demand database
-docker compose -f docker-compose-infra.yml --profile memgraph up -d
-docker compose -f docker-compose-infra.yml --profile janusgraph up -d
-docker compose -f docker-compose-infra.yml --profile arcadedb up -d
+docker compose --profile memgraph up -d
+docker compose --profile janusgraph up -d
+docker compose --profile arcadedb up -d
 
 # Add all on-demand databases at once
-docker compose -f docker-compose-infra.yml --profile extra-dbs up -d
+docker compose --profile extra-dbs up -d
 
 # Add the observability stack (HyperDX)
-docker compose -f docker-compose-infra.yml --profile telemetry up -d
+docker compose --profile telemetry up -d
 ```
 
 Pass the same `--profile` flag to `down`/`stop` to tear those services down too
@@ -122,7 +131,7 @@ python -c 'import secrets; print(secrets.token_urlsafe(48))'
 python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
 ```
 
-Put them in `engine/.env`. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/internal/mvp/layer-1-identity-access.md`](docs/internal/mvp/layer-1-identity-access.md).
+`.env.example` (repo root) is the single template for every optional env var in the project, engine and studio included — copy it to `.env` and docker-compose.yml picks these two up automatically for the `engine` container. Running the engine directly on your host instead (`make dev`)? Put them in `engine/.env` instead — pydantic-settings loads that file relative to the engine process's own working directory, not the repo root. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/internal/mvp/layer-1-identity-access.md`](docs/internal/mvp/layer-1-identity-access.md).
 
 ### Default ports (local dev)
 
@@ -130,13 +139,13 @@ Put them in `engine/.env`. All other auth knobs (TTLs, bcrypt rounds, min passwo
 |------------------|-------|--------------------------------------------|
 | Engine (FastAPI) | 8200  | `INVANA_PORT` / `invana start --port`      |
 | Studio (Vite)    | 8300  | `studio/vite.config.ts`                    |
-| Postgres         | 5432 | `docker-compose-infra.yml`                 |
+| Postgres         | 5432 | `docker-compose.yml`                       |
 
-Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` in `studio/.env.local` if needed.
+Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_API_BASE_URL` — in root `.env` for the `studio` container, or `studio/.env.local` when running Vite directly on your host (Vite loads that relative to `studio/`, independent of the root file).
 
 ### Loading sample data
 
-To populate the local Neo4j with the bundled **air-routes** dataset, run the loader from the `engine/` directory against the `neo4j` service started by `docker-compose-infra.yml`:
+To populate the local Neo4j with the bundled **air-routes** dataset, run the loader from the `engine/` directory against the `neo4j` service started by `docker-compose.yml`:
 
 ```bash
 uv run --directory engine invana loader ../datasets/air-routes \

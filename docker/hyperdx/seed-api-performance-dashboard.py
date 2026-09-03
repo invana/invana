@@ -2,7 +2,7 @@
 """Seed the "Invana — API Performance" dashboard into local HyperDX.
 
 HyperDX-local (the ``telemetry`` compose profile) stores its app state (dashboards)
-in ephemeral container state — ``docker-compose-infra.yml`` mounts no data volume for
+in ephemeral container state — ``docker-compose.yml`` mounts no data volume for
 the ``hyperdx`` service — so a ``down``/recreate wipes any dashboard built in the UI.
 This script rebuilds it from code against the local HyperDX API.
 
@@ -10,7 +10,7 @@ It is **idempotent**: any existing dashboard with the same name is deleted first
 then recreated. Connection + trace-source IDs are discovered at runtime (they are
 seeded per-instance), so nothing is hard-coded.
 
-Usage (HyperDX must be up — ``docker compose -f docker-compose-infra.yml --profile
+Usage (HyperDX must be up — ``docker compose --profile
 telemetry up -d``):
 
     python3 docker/hyperdx/seed-api-performance-dashboard.py

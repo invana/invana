@@ -1,6 +1,6 @@
 allowBuilds:
-  '@biomejs/biome': set this to true or false
-  esbuild: set this to true or false
+  '@biomejs/biome': true
+  esbuild: true
 minimumReleaseAge: 60
 minimumReleaseAgeExclude:
   # First-party packages — published by us, safe to install the moment they land.

@@ -1,0 +1,15 @@
+# Applies to the repo-root build context (engine/Dockerfile).
+.git
+.venv
+**/.venv
+**/__pycache__
+**/*.pyc
+**/dist
+**/build
+**/*.egg-info
+.ruff_cache
+.pytest_cache
+node_modules
+studio/node_modules
+docs/site
+.DS_Store

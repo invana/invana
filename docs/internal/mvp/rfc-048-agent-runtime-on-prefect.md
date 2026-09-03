@@ -473,7 +473,7 @@ the same rule executed in-process.
 
 ### Deployment topology (Prefect)
 
-- Prefect server (or Cloud) + its Postgres, added to `docker-compose-infra.yml` as an optional
+- Prefect server (or Cloud) + its Postgres, added to `docker-compose.yml` as an optional
   profile so `make dev` stays light.
 - **One work pool** (`invana-default`) with per-atlas **concurrency-limit tags** (**D9: decided**).
   Pool-per-atlas is deferred — it multiplies worker processes per tenant for an isolation guarantee

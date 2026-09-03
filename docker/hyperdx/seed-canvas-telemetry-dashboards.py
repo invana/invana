@@ -19,7 +19,7 @@ every tile is a raw-SQL tile over the OTel ClickHouse tables.
 HyperDX-local stores dashboards in ephemeral container state, so re-run after a
 ``down``/recreate.
 
-Usage (HyperDX up — ``docker compose -f docker-compose-infra.yml --profile
+Usage (HyperDX up — ``docker compose --profile
 telemetry up -d``):
 
     python3 docker/hyperdx/seed-canvas-telemetry-dashboards.py

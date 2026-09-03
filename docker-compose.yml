@@ -1,16 +1,26 @@
-# Infrastructure services for local development and testing.
+# Local development environment: engine + studio (both hot-reload from your
+# working tree) plus backing infra.
 #
-# By default only the core services start: postgres, neo4j.
-#   docker compose -f docker-compose-infra.yml up -d
+# By default only the core services start: postgres, neo4j, engine, studio.
+#   docker compose up -d
 #
-# The extra graph databases (memgraph, janusgraph, arcadedb) and observability
-# (hyperdx) are opt-in via profiles. Start one, or all DBs with the "extra-dbs"
-# group profile:
-#   docker compose -f docker-compose-infra.yml --profile memgraph up -d
-#   docker compose -f docker-compose-infra.yml --profile extra-dbs up -d
-#   docker compose -f docker-compose-infra.yml --profile telemetry up -d
+# Neo4j is the only graph database that starts by default. The extra graph
+# databases (memgraph, janusgraph, arcadedb) and observability (hyperdx) are
+# opt-in via profiles. Start one, or all DBs with the "extra-dbs" group
+# profile:
+#   docker compose --profile memgraph up -d
+#   docker compose --profile extra-dbs up -d
+#   docker compose --profile telemetry up -d
 #
 # Pass the same --profile flag on down/stop to also tear those services down.
+#
+# `engine` and `studio` build from engine/Dockerfile and studio/Dockerfile —
+# dev images that bake deps in at build time, then bind-mount your source tree
+# over them and run in reload mode. Rebuild after changing dependencies
+# (`docker compose build engine studio`) — the image won't pick up a new
+# pyproject.toml/package.json entry on its own. Not used for production builds
+# (see docs/internal/mvp/engine.md §7.1 "Docker" — that's a separate,
+# not-yet-built image).
 
 services:
   postgres:
@@ -51,6 +61,49 @@ services:
       retries: 5
       start_period: 30s
 
+  # ── App ──────────────────────────────────────────────────────────────────
+  engine:
+    build:
+      context: .
+      dockerfile: engine/Dockerfile
+    container_name: invana-engine
+    ports:
+      - "8200:8200"
+    environment:
+      INVANA_ENV: development
+      INVANA_DATABASE_URL: postgresql+asyncpg://invana_user:change_this_password@postgres:5432/invana_db
+      INVANA_STUDIO_BASE_URL: http://localhost:8300
+      # Off by default — the OTLP collector only exists under --profile telemetry.
+      INVANA_TELEMETRY_ENABLED: "false"
+    volumes:
+      # Whole repo, not just engine/ — engine/pyproject.toml path-depends on
+      # the sibling integrations/invana-* packages (editable).
+      - .:/app
+      - engine-venv:/app/engine/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  studio:
+    build:
+      context: ./studio
+      dockerfile: Dockerfile
+    container_name: invana-studio
+    ports:
+      - "8300:8300"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8200
+      # Off by default — matches the engine's telemetry_enabled=false above;
+      # the proxy route it would export to doesn't exist without --profile
+      # telemetry, so leaving this on just spams the browser console with 404s.
+      VITE_TELEMETRY_ENABLED: "false"
+    volumes:
+      - ./studio:/app
+      - studio-node-modules:/app/node_modules
+    depends_on:
+      - engine
+
+  # ── Extra graph databases (opt-in) ──────────────────────────────────────
   janusgraph:
     image: janusgraph/janusgraph:latest
     container_name: invana-janusgraph
@@ -144,3 +197,5 @@ volumes:
   memgraph-data:
   arcadedb-data:
   hyperdx-ch-data:
+  engine-venv:
+  studio-node-modules:

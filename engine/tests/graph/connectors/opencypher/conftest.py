@@ -1,7 +1,7 @@
 """Shared fixtures for OpenCypher connector integration tests.
 
 Uses Neo4j as the test backend for standard openCypher operations.
-Requires: docker compose -f docker-compose-infra.yml up -d
+Requires: docker compose up -d
 
 Override with environment variables: NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_DATABASE
 """
