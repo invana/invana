@@ -6,7 +6,7 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from "@invana/ui";
-import { Check, ChevronRight, MessageSquare } from "lucide-react";
+import { Check, ChevronRight, HelpCircle, MessageSquare } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatCompactCount } from "../../../../lib/format";
 import type { SessionSort } from "../../../../services/api/sessions";
@@ -22,6 +22,7 @@ import type {
 import type { ThinkingView } from "../../../../types/thinking";
 import { ListFilterMenu, ListPanelChrome } from "./ListPanel";
 import { SessionComposer, deriveComposerConfig } from "./SessionComposer";
+import { SessionLegendDialog } from "./SessionLegendDialog";
 import { SessionList } from "./SessionList";
 import { SessionTasksView, stepsFor } from "./SessionTasksView";
 import { SessionThread } from "./SessionThread";
@@ -135,6 +136,8 @@ export function SessionsPanel({
 	const [composerFocus, setComposerFocus] = useState(0);
 	// Chat (the transcript) or Tasks (every step of every reply) — UC11.
 	const [view, setView] = useState<"chat" | "tasks">("chat");
+	// The "what do the dots mean" legend, opened from the header help icon.
+	const [legendOpen, setLegendOpen] = useState(false);
 	// LLM providers excluded from the list (client-side). Empty = show all.
 	// Sessions don't record their provider yet, so this filters nothing today —
 	// it's wired ahead of NL queries landing (see Session.llmProviderId).
@@ -452,78 +455,89 @@ export function SessionsPanel({
 	);
 
 	return (
-		<ListPanelChrome
-			tab={{ value: "sessions", label: tabLabel, icon: MessageSquare }}
-			onRefresh={onRefresh}
-			isRefreshing={isRefreshing}
-			refreshLabel="Refresh sessions"
-			searchable
-			searchLabel="Search sessions"
-			onClose={onClose}
-			// Search + filter only apply on the list, not inside a thread.
-			listControls={!inDetail}
-			filterMenu={
-				<ListFilterMenu
-					sort={sort}
-					onSortChange={(s) => onSortChange(s as SessionSort)}
-					showArchived={showArchived}
-					onShowArchivedChange={onShowArchivedChange}
-					onReset={resetFilters}
-				>
-					{llmProviders.length > 0 && (
-						<>
-							<DropdownMenuSeparator />
-							<DropdownMenuLabel className="text-muted-foreground">
-								LLM
-							</DropdownMenuLabel>
-							{llmProviders.map((p) => (
-								<DropdownMenuCheckboxItem
-									key={p.id}
-									checked={!excludedLLMs.has(p.id)}
-									onCheckedChange={() => toggleLLM(p.id)}
-									onSelect={(e) => e.preventDefault()}
-								>
-									{p.model_id || p.provider}
-								</DropdownMenuCheckboxItem>
-							))}
-						</>
-					)}
-				</ListFilterMenu>
-			}
-			footer={footer}
-		>
-			{({ search }) =>
-				activeSession ? (
-					view === "tasks" ? (
-						<SessionTasksView session={activeSession} onJump={jumpTo} />
+		<>
+			<ListPanelChrome
+				tab={{ value: "sessions", label: tabLabel, icon: MessageSquare }}
+				leadingActions={[
+					{
+						key: "legend",
+						name: "Status legend",
+						icon: HelpCircle,
+						onClick: () => setLegendOpen(true),
+					},
+				]}
+				onRefresh={onRefresh}
+				isRefreshing={isRefreshing}
+				refreshLabel="Refresh sessions"
+				searchable
+				searchLabel="Search sessions"
+				onClose={onClose}
+				// Search + filter only apply on the list, not inside a thread.
+				listControls={!inDetail}
+				filterMenu={
+					<ListFilterMenu
+						sort={sort}
+						onSortChange={(s) => onSortChange(s as SessionSort)}
+						showArchived={showArchived}
+						onShowArchivedChange={onShowArchivedChange}
+						onReset={resetFilters}
+					>
+						{llmProviders.length > 0 && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuLabel className="text-muted-foreground">
+									LLM
+								</DropdownMenuLabel>
+								{llmProviders.map((p) => (
+									<DropdownMenuCheckboxItem
+										key={p.id}
+										checked={!excludedLLMs.has(p.id)}
+										onCheckedChange={() => toggleLLM(p.id)}
+										onSelect={(e) => e.preventDefault()}
+									>
+										{p.model_id || p.provider}
+									</DropdownMenuCheckboxItem>
+								))}
+							</>
+						)}
+					</ListFilterMenu>
+				}
+				footer={footer}
+			>
+				{({ search }) =>
+					activeSession ? (
+						view === "tasks" ? (
+							<SessionTasksView session={activeSession} onJump={jumpTo} />
+						) : (
+							<SessionThread
+								session={activeSession}
+								isRunning={isRunning}
+								results={results}
+								onRerun={onRerun}
+								onFetchContext={onFetchContext}
+								onSelectOption={handleSelectOption}
+								onTypeInstead={handleTypeInstead}
+								onVote={handleVote}
+								onLoadToCanvas={onLoadToCanvas}
+							/>
+						)
 					) : (
-						<SessionThread
-							session={activeSession}
-							isRunning={isRunning}
-							results={results}
-							onRerun={onRerun}
-							onFetchContext={onFetchContext}
-							onSelectOption={handleSelectOption}
-							onTypeInstead={handleTypeInstead}
-							onVote={handleVote}
-							onLoadToCanvas={onLoadToCanvas}
+						<SessionList
+							sessions={sessions}
+							sort={sort}
+							search={search}
+							username={username}
+							graphSlug={graphSlug}
+							bannerCanvasIdBySession={bannerCanvasIdBySession}
+							onOpen={onOpenSession}
+							excludedLLMs={excludedLLMs}
+							onPin={onPin}
+							onArchive={onArchive}
 						/>
 					)
-				) : (
-					<SessionList
-						sessions={sessions}
-						sort={sort}
-						search={search}
-						username={username}
-						graphSlug={graphSlug}
-						bannerCanvasIdBySession={bannerCanvasIdBySession}
-						onOpen={onOpenSession}
-						excludedLLMs={excludedLLMs}
-						onPin={onPin}
-						onArchive={onArchive}
-					/>
-				)
-			}
-		</ListPanelChrome>
+				}
+			</ListPanelChrome>
+			<SessionLegendDialog open={legendOpen} onOpenChange={setLegendOpen} />
+		</>
 	);
 }
