@@ -166,6 +166,7 @@ async def _invoke(
     tool_name: str,
     timeout_s: float,
     *,
+    credential_kind: str | None,
     provider_name: str,
     operation: str,
 ) -> tuple[dict | None, TokenUsage]:
@@ -188,6 +189,7 @@ async def _invoke(
                 tool_schema=tool_schema,
                 tool_name=tool_name,
                 timeout_s=timeout_s,
+                credential_kind=credential_kind,
             )
         except LLMError:
             record_llm_request(

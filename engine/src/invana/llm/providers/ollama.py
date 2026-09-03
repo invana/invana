@@ -28,6 +28,7 @@ async def call(
     tool_schema: dict,
     tool_name: str,  # unused — structured output is via `format`, not a named tool
     timeout_s: float,
+    credential_kind: str | None = None,  # unused — RFC-056 is claude_agent_sdk-only
 ) -> tuple[dict | None, TokenUsage]:
     url = (base_url or _DEFAULT_BASE_URL).rstrip("/") + "/api/chat"
     payload = {

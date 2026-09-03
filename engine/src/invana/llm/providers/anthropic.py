@@ -55,6 +55,7 @@ async def call(
     tool_schema: dict,
     tool_name: str,
     timeout_s: float,  # SDK manages its own timeout/retries
+    credential_kind: str | None = None,  # unused — RFC-056 is claude_agent_sdk-only
 ) -> tuple[dict | None, TokenUsage]:
     if not api_key:
         raise LLMError("The Anthropic provider requires an API key.")
