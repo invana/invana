@@ -53,6 +53,24 @@ _llm_provider_kind_enum = Enum(
 )
 
 
+class LLMCredentialKind(enum.StrEnum):
+    """Disambiguates what ``api_key_encrypted`` holds for ``claude_agent_sdk`` rows (RFC-056).
+
+    Meaningless for every other provider kind, where the column is always an API key.
+    """
+
+    api_key = "api_key"
+    oauth_token = "oauth_token"
+
+
+_llm_credential_kind_enum = Enum(
+    LLMCredentialKind,
+    name="llm_credential_kind",
+    values_callable=lambda x: [m.value for m in x],
+    create_type=False,
+)
+
+
 class LLMProvider(Base):
     __tablename__ = "llm_providers"
 
@@ -68,6 +86,11 @@ class LLMProvider(Base):
     model_id: Mapped[str] = mapped_column(String(255), nullable=False)
     # Nullable: ollama / local providers don't need a key.
     api_key_encrypted: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    # Disambiguates api_key_encrypted for claude_agent_sdk rows (RFC-056): a
+    # Claude API key vs. a `claude setup-token` subscription token. NULL for
+    # every other provider kind, and for legacy claude_agent_sdk rows — where
+    # it means "api_key" semantics (RFC-053's original, only shape).
+    credential_kind: Mapped[LLMCredentialKind | None] = mapped_column(_llm_credential_kind_enum, nullable=True)
     # Used by azure (endpoint URL) and ollama (e.g. http://localhost:11434).
     base_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     # Token budgets, allowed model families, etc. (free-form).

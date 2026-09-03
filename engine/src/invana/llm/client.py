@@ -97,6 +97,7 @@ async def complete_tool(
         raise LLMError("No model is configured for this LLM provider.")
 
     api_key = _decrypt(provider.api_key_encrypted, encryption_key) if provider.api_key_encrypted else None
+    credential_kind = provider.credential_kind.value if provider.credential_kind else None
     required = list(tool_schema.get("required", []))
 
     # Accumulate wall-clock across both the initial call and any repair retry, so
@@ -114,6 +115,7 @@ async def complete_tool(
         tool_schema,
         tool_name,
         timeout_s,
+        credential_kind=credential_kind,
         provider_name=provider_name,
         operation=operation,
     )
@@ -139,6 +141,7 @@ async def complete_tool(
         tool_schema,
         tool_name,
         timeout_s,
+        credential_kind=credential_kind,
         provider_name=provider_name,
         operation=operation,
     )

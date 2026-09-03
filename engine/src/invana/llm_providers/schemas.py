@@ -6,13 +6,16 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from invana.llm_providers.models import LLMProviderKind
+from invana.llm_providers.models import LLMCredentialKind, LLMProviderKind
 
 
 class LLMProviderCreate(BaseModel):
     provider: LLMProviderKind
     model_id: str = Field(..., min_length=1, max_length=255)
     api_key: str | None = Field(default=None, min_length=1)
+    # claude_agent_sdk only (RFC-056) — disambiguates what `api_key` holds.
+    # Rejected on every other provider kind.
+    credential_kind: LLMCredentialKind | None = None
     base_url: str | None = Field(default=None, max_length=2048)
     guardrails: dict = Field(default_factory=dict)
     is_default: bool = False
@@ -22,6 +25,8 @@ class LLMProviderUpdate(BaseModel):
     model_id: str | None = Field(default=None, min_length=1, max_length=255)
     # If provided, re-encrypts; if omitted, leaves stored key untouched.
     api_key: str | None = Field(default=None, min_length=1)
+    # claude_agent_sdk only (RFC-056); see LLMProviderCreate.
+    credential_kind: LLMCredentialKind | None = None
     base_url: str | None = Field(default=None, max_length=2048)
     guardrails: dict | None = None
     is_default: bool | None = None
@@ -36,6 +41,7 @@ class LLMProviderRead(BaseModel):
     provider: LLMProviderKind
     model_id: str
     has_api_key: bool
+    credential_kind: LLMCredentialKind | None
     base_url: str | None
     guardrails: dict
     is_default: bool

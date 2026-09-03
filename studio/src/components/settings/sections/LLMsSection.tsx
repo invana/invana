@@ -29,6 +29,7 @@ import {
 } from "../../../hooks/queries/useLLMProviders";
 import { llmProvidersApi } from "../../../services/api/llm";
 import {
+	type LLMCredentialKind,
 	type LLMProvider,
 	type LLMProviderCreate,
 	type LLMProviderKind,
@@ -206,6 +207,10 @@ function LLMProviderForm({
 	);
 	const [modelId, setModelId] = useState(existing?.model_id ?? "");
 	const [apiKey, setApiKey] = useState("");
+	// claude_agent_sdk only (RFC-056) — which env var the credential becomes.
+	const [credentialKind, setCredentialKind] = useState<LLMCredentialKind>(
+		existing?.credential_kind ?? "api_key",
+	);
 	const [baseUrl, setBaseUrl] = useState(existing?.base_url ?? "");
 	const [isDefault, setIsDefault] = useState(existing?.is_default ?? false);
 	const [testState, setTestState] = useState<TestState>({ kind: "untested" });
@@ -214,10 +219,15 @@ function LLMProviderForm({
 	const requiresKey = meta?.requiresApiKey ?? false;
 	const keyOptional = meta?.apiKeyOptional ?? false;
 	const showsBaseUrl = meta?.usesBaseUrl ?? false;
+	const isClaudeAgentSdk = providerKind === "claude_agent_sdk";
+	// Selecting "Subscription token" is a commitment, not a fallback — unlike
+	// the API-key path there's no "blank means use the CLI's own login" for it.
+	const oauthTokenWanted = isClaudeAgentSdk && credentialKind === "oauth_token";
 
-	// On edit, the existing api key is already stored; only require fresh entry
-	// when no key is on file or the user explicitly types a new one.
-	const apiKeyNeeded = requiresKey && !(isEdit && existing?.has_api_key);
+	// On edit, the existing credential is already stored; only require fresh
+	// entry when nothing is on file yet, or the row requires one outright.
+	const apiKeyNeeded =
+		(requiresKey || oauthTokenWanted) && !(isEdit && existing?.has_api_key);
 	const formValid =
 		!!modelId.trim() &&
 		(!apiKeyNeeded || apiKey.length > 0) &&
@@ -230,6 +240,7 @@ function LLMProviderForm({
 		provider: providerKind,
 		model_id: modelId.trim(),
 		api_key: apiKey.length > 0 ? apiKey : undefined,
+		credential_kind: isClaudeAgentSdk ? credentialKind : undefined,
 		base_url: showsBaseUrl && baseUrl.trim() ? baseUrl.trim() : undefined,
 		is_default: isDefault,
 	});
@@ -247,6 +258,7 @@ function LLMProviderForm({
 			await llmProvidersApi.update(username, graphSlug, existing.id, {
 				model_id: payload.model_id,
 				api_key: payload.api_key,
+				credential_kind: payload.credential_kind,
 				base_url: payload.base_url,
 			});
 			return llmProvidersApi.ping(username, graphSlug, existing.id);
@@ -280,6 +292,7 @@ function LLMProviderForm({
 					data: {
 						model_id: modelId.trim(),
 						api_key: apiKey.length > 0 ? apiKey : undefined,
+						credential_kind: isClaudeAgentSdk ? credentialKind : undefined,
 						base_url:
 							showsBaseUrl && baseUrl.trim() ? baseUrl.trim() : undefined,
 						is_default: isDefault,
@@ -353,20 +366,46 @@ function LLMProviderForm({
 				/>
 			</div>
 
-			{/* API key */}
+			{/* Credential type (claude_agent_sdk only, RFC-056) */}
+			{isClaudeAgentSdk && (
+				<div className="space-y-1.5">
+					<Label htmlFor="credential_kind">Credential type</Label>
+					<Select
+						value={credentialKind}
+						onValueChange={(v) => {
+							setCredentialKind(v as LLMCredentialKind);
+							setApiKey("");
+							setTestState({ kind: "untested" });
+						}}
+					>
+						<SelectTrigger id="credential_kind">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="api_key">API key</SelectItem>
+							<SelectItem value="oauth_token">
+								Subscription token (claude setup-token)
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
+			)}
+
+			{/* API key / subscription token */}
 			{(requiresKey || keyOptional) && (
 				<div className="space-y-1.5">
 					<Label htmlFor="api_key">
-						API key{" "}
+						{oauthTokenWanted ? "Subscription token" : "API key"}{" "}
 						{apiKeyNeeded ? (
 							<span className="text-destructive">*</span>
-						) : keyOptional && !existing?.has_api_key ? (
+						) : keyOptional && !oauthTokenWanted && !existing?.has_api_key ? (
 							<span className="text-muted-foreground">
 								(optional — uses your Claude Code login if blank)
 							</span>
 						) : (
 							<span className="text-muted-foreground">
-								(leave blank to keep stored key)
+								(leave blank to keep stored {oauthTokenWanted ? "token" : "key"}
+								)
 							</span>
 						)}
 					</Label>
@@ -381,6 +420,13 @@ function LLMProviderForm({
 						}}
 						autoComplete="new-password"
 					/>
+					{oauthTokenWanted && (
+						<p className="text-muted-foreground">
+							Generate one on your machine with{" "}
+							<code className="font-mono">claude setup-token</code> (requires a
+							Claude Pro/Max/Team/Enterprise plan).
+						</p>
+					)}
 				</div>
 			)}
 

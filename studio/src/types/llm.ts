@@ -14,6 +14,10 @@ export type LLMProviderKind =
 	| "local"
 	| "claude_agent_sdk";
 
+// claude_agent_sdk only (RFC-056) — disambiguates what the credential field
+// holds: a Claude API key, or a `claude setup-token` subscription token.
+export type LLMCredentialKind = "api_key" | "oauth_token";
+
 export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 	value: LLMProviderKind;
 	label: string;
@@ -82,6 +86,7 @@ export interface LLMProvider {
 	provider: LLMProviderKind;
 	model_id: string;
 	has_api_key: boolean;
+	credential_kind: LLMCredentialKind | null;
 	base_url: string | null;
 	guardrails: Record<string, unknown>;
 	is_default: boolean;
@@ -93,6 +98,7 @@ export interface LLMProviderCreate {
 	provider: LLMProviderKind;
 	model_id: string;
 	api_key?: string;
+	credential_kind?: LLMCredentialKind;
 	base_url?: string;
 	guardrails?: Record<string, unknown>;
 	is_default?: boolean;
@@ -102,6 +108,7 @@ export interface LLMProviderUpdate {
 	model_id?: string;
 	// Send only if rotating the key; omitting leaves the stored value.
 	api_key?: string;
+	credential_kind?: LLMCredentialKind;
 	base_url?: string;
 	guardrails?: Record<string, unknown>;
 	is_default?: boolean;

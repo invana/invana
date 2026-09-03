@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.events import actions
 from invana.events.services import current_trace_id, diff_changed_fields, emit_event
 from invana.graphs.encryption import decrypt_credentials, encrypt_credentials
-from invana.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.llm_providers.models import LLMCredentialKind, LLMProvider, LLMProviderKind
 from invana.llm_providers.schemas import LLMProviderCreate, LLMProviderUpdate
 from invana.llm_providers.store import LLMProviderStore
 
@@ -39,6 +39,31 @@ def _decrypt_key(token: bytes, key: str) -> str:
             detail="Stored LLM credentials are malformed.",
         )
     return raw
+
+
+def _validate_credential_kind(
+    provider_kind: LLMProviderKind,
+    credential_kind: LLMCredentialKind | None,
+    *,
+    has_key: bool,
+) -> None:
+    """RFC-056: ``credential_kind`` only means something on ``claude_agent_sdk`` rows.
+
+    ``has_key`` is the *effective* post-write state (a fresh key in this payload,
+    or the row's already-stored one) — an ``oauth_token`` row can't end up with
+    nothing behind it, since there's no "fall through to CLI login" fallback for
+    that mode the way there is for a blank ``api_key``.
+    """
+    if credential_kind is not None and provider_kind != LLMProviderKind.claude_agent_sdk:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="credential_kind is only valid for claude_agent_sdk.",
+        )
+    if credential_kind == LLMCredentialKind.oauth_token and not has_key:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail="credential_kind=oauth_token requires api_key (paste the output of `claude setup-token`).",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -81,12 +106,14 @@ async def create_provider(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=f"{payload.provider.value} requires an api_key.",
         )
+    _validate_credential_kind(payload.provider, payload.credential_kind, has_key=bool(payload.api_key))
 
     provider = LLMProvider(
         graph_id=graph_id,
         provider=payload.provider,
         model_id=payload.model_id,
         api_key_encrypted=_encrypt_key(payload.api_key, encryption_key) if payload.api_key else None,
+        credential_kind=payload.credential_kind,
         base_url=payload.base_url,
         guardrails=payload.guardrails,
         is_default=payload.is_default,
@@ -127,6 +154,11 @@ async def update_provider(
         "is_default": provider.is_default,
         "has_api_key": provider.api_key_encrypted is not None,
     }
+    _validate_credential_kind(
+        provider.provider,
+        payload.credential_kind if payload.credential_kind is not None else provider.credential_kind,
+        has_key=(payload.api_key is not None) or (provider.api_key_encrypted is not None),
+    )
 
     if payload.model_id is not None:
         provider.model_id = payload.model_id
@@ -136,6 +168,8 @@ async def update_provider(
         provider.guardrails = payload.guardrails
     if payload.api_key is not None:
         provider.api_key_encrypted = _encrypt_key(payload.api_key, encryption_key)
+    if payload.credential_kind is not None:
+        provider.credential_kind = payload.credential_kind
     if payload.is_default is True:
         await store.clear_default(session, provider.graph_id)
         provider.is_default = True
@@ -295,7 +329,9 @@ async def _dispatch_ping(provider: LLMProvider, api_key: str | None) -> bool:
         # Natively async (subprocess harness); one single-turn call is the
         # cheapest probe the SDK exposes. Missing package / CLI raise and are
         # surfaced verbatim by ping_provider.
-        return await claude_agent_sdk_provider.ping(provider.model_id, api_key, timeout_s=10.0)
+        return await claude_agent_sdk_provider.ping(
+            provider.model_id, api_key, timeout_s=10.0, credential_kind=provider.credential_kind
+        )
     # Google / Azure / Ollama / local — minimal HTTP probe of base_url, or just
     # report ok for local providers where there's nothing to verify.
     if provider.provider in (LLMProviderKind.ollama, LLMProviderKind.local):

@@ -1,10 +1,12 @@
-"""Claude Agent SDK provider — Claude through the local Claude Code CLI (RFC-053).
+"""Claude Agent SDK provider — Claude through the local Claude Code CLI (RFC-053, RFC-056).
 
 Drives Anthropic's ``claude-agent-sdk`` (a subprocess harness around the Claude
 Code CLI) as a *generation-only* backend: no tools, no filesystem settings, one
-structured completion. Credentials are resolved by the SDK itself — an API key
-stored on the provider row is injected as ``ANTHROPIC_API_KEY``; when the row
-has no key the CLI's own login is used. Invana never touches that login.
+structured completion. Credentials are resolved by the SDK itself — a secret
+stored on the provider row is injected as ``ANTHROPIC_API_KEY`` (an API key) or
+``CLAUDE_CODE_OAUTH_TOKEN`` (a ``claude setup-token`` subscription token, per
+the row's ``credential_kind`` — RFC-056); when the row has neither, the CLI's
+own login is used. Invana never touches that login.
 
 Structured output uses the SDK's ``output_format`` json_schema mode, so the
 ``ResultMessage.structured_output`` *is* the schema-shaped result. The SDK is
@@ -44,6 +46,7 @@ def _build_options(
     *,
     model_id: str,
     api_key: str | None,
+    credential_kind: str | None = None,
     system: str,
     tool_schema: dict,
     timeout_s: float,
@@ -53,7 +56,13 @@ def _build_options(
 
     env: dict[str, str] = {"API_TIMEOUT_MS": str(int(timeout_s * 1000))}
     if api_key:
-        env["ANTHROPIC_API_KEY"] = api_key
+        # RFC-056: a row's credential is either a Claude API key or a
+        # `claude setup-token` subscription token — they're different auth
+        # mechanisms with different env vars, not interchangeable. Anything
+        # other than the explicit "oauth_token" kind keeps RFC-053's original
+        # ANTHROPIC_API_KEY behavior.
+        env_var = "CLAUDE_CODE_OAUTH_TOKEN" if credential_kind == "oauth_token" else "ANTHROPIC_API_KEY"
+        env[env_var] = api_key
     return ClaudeAgentOptions(
         model=model_id,
         system_prompt=system,
@@ -103,6 +112,7 @@ async def call(
     tool_schema: dict,
     tool_name: str,  # unused — structured output is via `output_format`, not a named tool
     timeout_s: float,
+    credential_kind: str | None = None,  # RFC-056 — "oauth_token" or None/"api_key"
 ) -> tuple[dict | None, TokenUsage]:
     try:
         from claude_agent_sdk import CLINotFoundError
@@ -112,6 +122,7 @@ async def call(
     options = _build_options(
         model_id=model_id,
         api_key=api_key,
+        credential_kind=credential_kind,
         system=system,
         tool_schema=tool_schema,
         timeout_s=timeout_s,
@@ -128,7 +139,7 @@ async def call(
     return obj, usage
 
 
-async def ping(model_id: str, api_key: str | None, timeout_s: float) -> bool:
+async def ping(model_id: str, api_key: str | None, timeout_s: float, credential_kind: str | None = None) -> bool:
     """Credential probe: one single-turn call, success = a non-error result.
 
     Raises the SDK's own exceptions (missing package / CLI) so the ping service
@@ -137,6 +148,7 @@ async def ping(model_id: str, api_key: str | None, timeout_s: float) -> bool:
     options = _build_options(
         model_id=model_id,
         api_key=api_key,
+        credential_kind=credential_kind,
         system="Reply with the single word ok.",
         tool_schema={"type": "object", "properties": {"ok": {"type": "boolean"}}, "required": ["ok"]},
         timeout_s=timeout_s,

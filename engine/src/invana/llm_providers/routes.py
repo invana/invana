@@ -47,6 +47,7 @@ def _to_read(provider) -> LLMProviderRead:
         provider=provider.provider,
         model_id=provider.model_id,
         has_api_key=provider.api_key_encrypted is not None,
+        credential_kind=provider.credential_kind,
         base_url=provider.base_url,
         guardrails=provider.guardrails,
         is_default=provider.is_default,
