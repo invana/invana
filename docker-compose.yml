@@ -70,11 +70,19 @@ services:
     ports:
       - "8200:8200"
     environment:
-      INVANA_ENV: development
+      INVANA_ENV: ${INVANA_ENV:-development}
+      # Container-network default (Postgres by service name) — deliberately
+      # NOT sourced from INVANA_DATABASE_URL in .env, whose value is for
+      # running the engine on your host instead (see .env.example).
       INVANA_DATABASE_URL: postgresql+asyncpg://invana_user:change_this_password@postgres:5432/invana_db
       INVANA_STUDIO_BASE_URL: http://localhost:8300
+      INVANA_LOG_LEVEL: ${INVANA_LOG_LEVEL:-DEBUG}
+      # Auth — required outside development; falls back to a fixed insecure
+      # dev key when unset (see engine/src/invana/settings.py).
+      INVANA_SECRET_KEY: ${INVANA_SECRET_KEY:-}
+      INVANA_ENCRYPTION_KEY: ${INVANA_ENCRYPTION_KEY:-}
       # Off by default — the OTLP collector only exists under --profile telemetry.
-      INVANA_TELEMETRY_ENABLED: "false"
+      INVANA_TELEMETRY_ENABLED: ${INVANA_TELEMETRY_ENABLED:-false}
     volumes:
       # Whole repo, not just engine/ — engine/pyproject.toml path-depends on
       # the sibling integrations/invana-* packages (editable).
@@ -92,11 +100,12 @@ services:
     ports:
       - "8300:8300"
     environment:
-      VITE_API_BASE_URL: http://localhost:8200
-      # Off by default — matches the engine's telemetry_enabled=false above;
-      # the proxy route it would export to doesn't exist without --profile
-      # telemetry, so leaving this on just spams the browser console with 404s.
-      VITE_TELEMETRY_ENABLED: "false"
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8200}
+      # Off by default — matches the engine's INVANA_TELEMETRY_ENABLED default
+      # above; the proxy route it would export to doesn't exist unless that's
+      # also on (and the telemetry profile is running), so flipping only this
+      # one to true just spams the browser console with 404s.
+      VITE_TELEMETRY_ENABLED: ${VITE_TELEMETRY_ENABLED:-false}
     volumes:
       - ./studio:/app
       - studio-node-modules:/app/node_modules
