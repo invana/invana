@@ -11,12 +11,13 @@
 
 import type { QueryLanguage } from "./graphs";
 import type { QueryMode } from "./query";
+import type { ThinkingStep } from "./thinking";
 
 export type SessionMessageRole = "user" | "assistant";
 
 /** Lifecycle of an assistant reply tied to a query execution. `stopped` is
- *  client-only — set when the user aborts an in-flight run (the engine never
- *  returns it). */
+ *  written by the engine when the user cancels the thinking behind the reply
+ *  (RFC-055 UC9). */
 export type SessionMessageStatus = "running" | "ok" | "error" | "stopped";
 
 export interface SessionMessage {
@@ -55,6 +56,12 @@ export interface SessionMessage {
 	/** 👍/👎 on this reply — a capture signal for refining understanding
 	 *  (RFC-038/039). Undefined = no vote. */
 	feedback?: "up" | "down";
+	/** The thinking that produced (or is producing) this reply (RFC-055). Its
+	 *  live state is in the thinking store while it runs; `steps` below is the
+	 *  settled trace from the record. Undefined on user rows and old replies. */
+	thinkingId?: string;
+	/** The reply's task trace — one row per attempt, from its current thinking. */
+	steps?: ThinkingStep[];
 }
 
 /** One prior turn in the conversation context sent to the model (RFC-036/040) —

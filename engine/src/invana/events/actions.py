@@ -55,6 +55,10 @@ MODEL_DELETE = "model.delete"
 MODEL_ACTIVATE = "model.activate"
 MODEL_GENERATE = "model.generate"  # NL → proposed model written to a draft (RFC-031); target = session
 
+# ── Thinkings (RFC-048 / RFC-055) — the run behind a session reply; target = session ──
+THINKING_FINISH = "thinking.finish"  # succeeded | failed, with duration
+THINKING_CANCEL = "thinking.cancel"  # stopped by the user
+
 # ── Datasets / ingestion (RFC-020) ────────────────────────────────────────────
 DATASET_IMPORT = "dataset.import"
 

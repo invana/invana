@@ -64,19 +64,24 @@ export function SessionThread({
 				// shown in the context disclosure as "this question".
 				const prev = idx > 0 ? session.messages[idx - 1] : undefined;
 				return (
-					<AssistantTurn
+					<div
 						key={message.id}
-						message={message}
-						prompt={prev?.role === "user" ? prev.content : undefined}
-						isRunning={isRunning}
-						onRerun={onRerun}
-						onFetchContext={onFetchContext}
-						onSelectOption={onSelectOption}
-						onTypeInstead={onTypeInstead}
-						onVote={onVote}
-						result={results[message.id]}
-						onLoadToCanvas={onLoadToCanvas}
-					/>
+						id={`turn-${message.id}`}
+						className="scroll-mt-3"
+					>
+						<AssistantTurn
+							message={message}
+							prompt={prev?.role === "user" ? prev.content : undefined}
+							isRunning={isRunning}
+							onRerun={onRerun}
+							onFetchContext={onFetchContext}
+							onSelectOption={onSelectOption}
+							onTypeInstead={onTypeInstead}
+							onVote={onVote}
+							result={results[message.id]}
+							onLoadToCanvas={onLoadToCanvas}
+						/>
+					</div>
 				);
 			})}
 		</ChatSession>

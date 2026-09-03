@@ -1,13 +1,15 @@
 import {
 	Button,
 	ChatSessionStatusBar,
+	ChatSessionTaskRow,
 	DropdownMenuCheckboxItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 } from "@invana/ui";
 import { Check, ChevronRight, MessageSquare } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { SessionSort } from "../../../../services/api/sessions";
+import { useThinkingStore } from "../../../../stores/thinking.store";
 import type { QueryLanguage } from "../../../../types/graphs";
 import type { LLMProvider } from "../../../../types/llm";
 import type { QueryResponse, QueryRunPayload } from "../../../../types/query";
@@ -16,9 +18,11 @@ import type {
 	SessionContextTurn,
 	SessionMessage,
 } from "../../../../types/session";
+import type { ThinkingView } from "../../../../types/thinking";
 import { ListFilterMenu, ListPanelChrome } from "./ListPanel";
 import { SessionComposer, deriveComposerConfig } from "./SessionComposer";
 import { SessionList } from "./SessionList";
+import { SessionTasksView, stepsFor } from "./SessionTasksView";
 import { SessionThread } from "./SessionThread";
 
 export interface SessionsPanelProps {
@@ -27,7 +31,7 @@ export interface SessionsPanelProps {
 	defaultLanguage: QueryLanguage;
 	llmProviders: readonly LLMProvider[];
 	onRun: (payload: QueryRunPayload) => void;
-	/** Cancel the in-flight run (composer stop control). */
+	/** Cancel the in-flight run (composer stop control, `esc`). */
 	onStop: () => void;
 	isRunning: boolean;
 	// Sessions
@@ -42,7 +46,7 @@ export interface SessionsPanelProps {
 	bannerCanvasIdBySession?: Map<string, string>;
 	onOpenSession: (id: string) => void;
 	onBack: () => void;
-	/** Re-run a past assistant message's query in place (re-fetches its result). */
+	/** Re-run a past assistant message's query in place (a new thinking). */
 	onRerun: (messageId: string) => void;
 	/** Fetch the conversation context the model was given for an assistant reply
 	 *  (RFC-036/040) — lazily, when its disclosure is opened. */
@@ -83,12 +87,13 @@ export interface SessionsPanelProps {
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
-// Two views in one rail panel (RFC-054): the list of past sessions, and the
-// console transcript of the open one. The composer + status bar are pinned to
-// the footer in both, so asking from the list opens a fresh session and drops
-// you into its thread. The list is `SessionList`, the transcript
-// `SessionThread` (design-kit `ChatSession*`), the input `SessionComposer`;
-// this file is the chrome and the glue between them.
+// Two views in one rail panel (RFC-054/055): the list of past sessions, and the
+// console transcript of the open one — with a Tasks view (every step of every
+// reply) reachable from the status bar. The composer, the pinned strip of what
+// is running and the status bar are the footer in every view, so asking from
+// the list opens a fresh session and drops you into its thread. The list is
+// `SessionList`, the transcript `SessionThread` (design-kit `ChatSession*`),
+// the input `SessionComposer`; this file is the chrome and the glue.
 
 export function SessionsPanel({
 	availableLanguages,
@@ -127,14 +132,35 @@ export function SessionsPanel({
 	// Bumped to focus the composer when the user picks "let me type instead" on a
 	// clarification (RFC-038).
 	const [composerFocus, setComposerFocus] = useState(0);
+	// Chat (the transcript) or Tasks (every step of every reply) — UC11.
+	const [view, setView] = useState<"chat" | "tasks">("chat");
 	// LLM providers excluded from the list (client-side). Empty = show all.
 	// Sessions don't record their provider yet, so this filters nothing today —
 	// it's wired ahead of NL queries landing (see Session.llmProviderId).
 	const [excludedLLMs, setExcludedLLMs] = useState<ReadonlySet<string>>(
 		() => new Set(),
 	);
+	const thinkingViews = useThinkingStore((s) => s.views);
 
 	const inDetail = activeSession !== null;
+
+	// `esc` stops the run, from anywhere on the page — like a console (UC9).
+	useEffect(() => {
+		if (!isRunning) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				e.preventDefault();
+				onStop();
+			}
+		};
+		document.addEventListener("keydown", onKey);
+		return () => document.removeEventListener("keydown", onKey);
+	}, [isRunning, onStop]);
+
+	// Leaving the thread returns the footer to the chat view.
+	useEffect(() => {
+		if (!inDetail) setView("chat");
+	}, [inDetail]);
 
 	// When inside a thread, the tab header becomes a breadcrumb: "Sessions" (click
 	// to return to the list — the tab *is* the back affordance, so there's no
@@ -209,9 +235,9 @@ export function SessionsPanel({
 		[activeSession],
 	);
 
-	// Clicking a clarification option sends it as the next NL ask (RFC-038): it
-	// re-translates with the clarification now in context and runs. Reuses the
-	// session's resolved nl config (provider/timeout), like the composer would.
+	// Clicking a clarification option sends it as the answer (RFC-038): the
+	// engine resumes the waiting thinking with it (UC7). Reuses the session's
+	// resolved nl config (provider/timeout), like the composer would.
 	const handleSelectOption = (text: string) => {
 		const providerId =
 			composerConfig?.mode === "nl" ? composerConfig.llmProviderId : undefined;
@@ -242,6 +268,139 @@ export function SessionsPanel({
 		}
 	};
 
+	// Jump from the Tasks view (or the pinned strip) to a reply in the chat.
+	const jumpTo = (messageId: string) => {
+		setView("chat");
+		window.setTimeout(() => {
+			document
+				.getElementById(`turn-${messageId}`)
+				?.scrollIntoView({ block: "start", behavior: "smooth" });
+		}, 50);
+	};
+
+	// ── Live turns: the pinned strip + status line (UC5, UC7) ────────────────
+	const liveTurns = useMemo(() => {
+		if (!activeSession)
+			return [] as { message: SessionMessage; view: ThinkingView }[];
+		const out: { message: SessionMessage; view: ThinkingView }[] = [];
+		for (const m of activeSession.messages) {
+			const v = m.thinkingId ? thinkingViews[m.thinkingId] : undefined;
+			if (
+				v &&
+				(v.status === "queued" ||
+					v.status === "thinking" ||
+					v.status === "awaiting_input")
+			) {
+				out.push({ message: m, view: v });
+			}
+		}
+		return out;
+	}, [activeSession, thinkingViews]);
+
+	const strip =
+		view === "chat" && liveTurns.length > 0 ? (
+			<div className="shrink-0 border-t border-border px-3 py-1.5 flex flex-col gap-px">
+				{liveTurns.map(({ message, view: v }) => {
+					const steps = stepsFor(message, v);
+					const current =
+						steps.find((s) => s.status === "running") ??
+						steps.find((s) => s.status === "needs_input") ??
+						steps.find((s) => s.status === "queued");
+					const tokens = steps.reduce(
+						(n, s) => n + (s.tokensIn ?? 0) + (s.tokensOut ?? 0),
+						0,
+					);
+					return (
+						<ChatSessionTaskRow
+							key={message.id}
+							status={
+								v.status === "awaiting_input"
+									? "needs-input"
+									: current?.status === "running"
+										? "running"
+										: "queued"
+							}
+							name={current?.label ?? "Planning"}
+							description={
+								v.status === "awaiting_input"
+									? `needs input · ${v.clarification?.question ?? ""}`
+									: current?.detail
+							}
+							meta={tokens > 0 ? `↑ ${formatTokens(tokens)} tokens` : undefined}
+							onClick={() => jumpTo(message.id)}
+						/>
+					);
+				})}
+			</div>
+		) : null;
+
+	const running = liveTurns.filter(
+		(t) => t.view.status === "queued" || t.view.status === "thinking",
+	).length;
+	const waiting = liveTurns.length - running;
+	const stepCount = activeSession
+		? activeSession.messages.reduce(
+				(n, m) =>
+					n +
+					(m.role === "assistant"
+						? stepsFor(
+								m,
+								m.thinkingId ? thinkingViews[m.thinkingId] : undefined,
+							).length
+						: 0),
+				0,
+			)
+		: 0;
+
+	const statusStart = inDetail ? (
+		<>
+			<button
+				type="button"
+				onClick={() => setView("chat")}
+				className={
+					view === "chat"
+						? "font-medium text-foreground"
+						: "hover:text-foreground"
+				}
+			>
+				Chat
+			</button>
+			<button
+				type="button"
+				onClick={() => setView("tasks")}
+				className={
+					view === "tasks"
+						? "font-medium text-foreground"
+						: "hover:text-foreground"
+				}
+			>
+				Tasks ({stepCount})
+			</button>
+			{running > 0 ? (
+				<span className="text-primary">{running} running</span>
+			) : waiting > 0 ? (
+				<span className="text-warning">{waiting} needs input</span>
+			) : null}
+		</>
+	) : (
+		<span>
+			{sessions.length} session{sessions.length === 1 ? "" : "s"}
+		</span>
+	);
+
+	const statusEnd = isRunning ? (
+		<>
+			<span>esc stop</span>
+			<span>↓ tasks</span>
+		</>
+	) : (
+		<>
+			<span>↵ send</span>
+			<span>⇧↵ newline</span>
+			<span>↑↓ history</span>
+		</>
+	);
+
 	// Modeller: a Commit bar above the composer publishes the bound draft —
 	// identical to the Modeller's Publish, in the session's context (RFC-031 D7).
 	const commitBar =
@@ -262,29 +421,9 @@ export function SessionsPanel({
 			</div>
 		) : null;
 
-	// Status line under the composer (RFC-054): what the session holds on the
-	// left, the composer's key bindings on the right.
-	const statusStart = isRunning ? (
-		<span className="text-primary">
-			{isModeller ? "Generating…" : "Running…"}
-		</span>
-	) : !activeSession ? (
-		`${sessions.length} session${sessions.length === 1 ? "" : "s"}`
-	) : isModeller ? (
-		(() => {
-			const prompts = activeSession.messages.filter(
-				(m) => m.role === "user",
-			).length;
-			return `${prompts} prompt${prompts === 1 ? "" : "s"}`;
-		})()
-	) : activeSession.nodeCount + activeSession.edgeCount > 0 ? (
-		`${activeSession.nodeCount} nodes · ${activeSession.edgeCount} relationships`
-	) : (
-		"No results yet"
-	);
-
 	const footer = (
 		<>
+			{strip}
 			{commitBar}
 			<SessionComposer
 				availableLanguages={availableLanguages}
@@ -301,8 +440,8 @@ export function SessionsPanel({
 			/>
 			<ChatSessionStatusBar
 				className="pt-0"
-				start={<span className="truncate">{statusStart}</span>}
-				end={<span>↵ send · ⇧↵ newline · ↑↓ history</span>}
+				start={statusStart}
+				end={statusEnd}
 			/>
 		</>
 	);
@@ -350,17 +489,21 @@ export function SessionsPanel({
 		>
 			{({ search }) =>
 				activeSession ? (
-					<SessionThread
-						session={activeSession}
-						isRunning={isRunning}
-						results={results}
-						onRerun={onRerun}
-						onFetchContext={onFetchContext}
-						onSelectOption={handleSelectOption}
-						onTypeInstead={handleTypeInstead}
-						onVote={handleVote}
-						onLoadToCanvas={onLoadToCanvas}
-					/>
+					view === "tasks" ? (
+						<SessionTasksView session={activeSession} onJump={jumpTo} />
+					) : (
+						<SessionThread
+							session={activeSession}
+							isRunning={isRunning}
+							results={results}
+							onRerun={onRerun}
+							onFetchContext={onFetchContext}
+							onSelectOption={handleSelectOption}
+							onTypeInstead={handleTypeInstead}
+							onVote={handleVote}
+							onLoadToCanvas={onLoadToCanvas}
+						/>
+					)
 				) : (
 					<SessionList
 						sessions={sessions}
@@ -378,4 +521,8 @@ export function SessionsPanel({
 			}
 		</ListPanelChrome>
 	);
+}
+
+function formatTokens(n: number): string {
+	return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }

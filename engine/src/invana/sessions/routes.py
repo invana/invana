@@ -6,10 +6,9 @@ removed). All routes are private to the creator and graph-scoped.
 
 from __future__ import annotations
 
-from http import HTTPStatus
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
+from fastapi import APIRouter, Depends, Path, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.auth.deps import get_current_user
@@ -22,7 +21,6 @@ from invana.graphs.deps import (
 )
 from invana.graphs.manager import GraphConnectionManager
 from invana.graphs.models import Graph, GraphMember
-from invana.graphs.query_service import QueryExecutionError
 from invana.sessions import services
 from invana.sessions.models import Session
 from invana.sessions.schemas import (
@@ -39,8 +37,11 @@ from invana.sessions.schemas import (
     SessionSummary,
     SessionUpdate,
     SetFeedback,
+    ThinkingStepRead,
 )
-from invana.settings import settings
+from invana.thinking import services as thinking_services
+from invana.thinking.routes import get_runtime
+from invana.thinking.runtime import ThinkingRuntime
 
 sessions_router = APIRouter(
     prefix="/api/v1/u/{username}/{graphSlug}/sessions",
@@ -54,9 +55,17 @@ def _get_manager(request: Request) -> GraphConnectionManager:
 
 async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
     messages = await services.list_messages(session, sess=sess)
+    # Each reply carries its task trace (RFC-055) — the steps of its current
+    # thinking, so a settled thread renders without a stream.
+    steps = await thinking_services.steps_for_messages(session, messages)
     return SessionDetail(
         **SessionSummary.model_validate(sess).model_dump(),
-        messages=[SessionMessageRead.model_validate(m) for m in messages],
+        messages=[
+            SessionMessageRead.model_validate(m).model_copy(
+                update={"steps": [ThinkingStepRead.model_validate(r) for r in steps.get(m.id, [])]}
+            )
+            for m in messages
+        ],
     )
 
 
@@ -92,7 +101,7 @@ async def create_session(
     graph: Graph = Depends(require_graph_setup_complete),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: ThinkingRuntime = Depends(get_runtime),
 ) -> SessionDetail:
     sess = await services.create_session(
         session,
@@ -102,18 +111,16 @@ async def create_session(
         surface=payload.surface,
         model_id=payload.model_id,
     )
+    thinking_id: str | None = None
     if payload.message is not None:
-        await services.send_message(
-            session,
-            sess=sess,
-            graph=graph,
-            manager=manager,
-            payload=payload.message,
-            actor_id=user.id,
-            encryption_key=settings.encryption_key,
+        _, _, th = await thinking_services.open_turn(
+            session, sess=sess, graph=graph, payload=payload.message, actor_id=user.id
         )
+        thinking_id = th.id
     await session.commit()
     await session.refresh(sess)
+    if thinking_id is not None:
+        runtime.submit(thinking_id)
     return await _to_detail(session, sess)
 
 
@@ -165,33 +172,45 @@ async def delete_session(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@sessions_router.post("/{session_id}/messages", response_model=SendMessageResponse)
+@sessions_router.post(
+    "/{session_id}/messages", response_model=SendMessageResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def send_message(
     payload: SendMessage,
     session_id: str = Path(...),
+    username: str = Path(...),
+    graphSlug: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(require_graph_setup_complete),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: ThinkingRuntime = Depends(get_runtime),
 ) -> SendMessageResponse:
+    """Record the ask and start thinking (RFC-055). Returns as soon as the rows
+    are committed; the reply settles over ``stream_url``. When the session's
+    newest reply is a clarifying question, the text **answers it** — the same
+    thinking resumes instead of a new one opening (UC7 "let me type")."""
     sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
-    user_msg, assistant_msg, result = await services.send_message(
-        session,
-        sess=sess,
-        graph=graph,
-        manager=manager,
-        payload=payload,
-        actor_id=user.id,
-        encryption_key=settings.encryption_key,
-    )
+    waiting = await thinking_services.awaiting_thinking(session, sess=sess)
+    if waiting is not None:
+        user_msg, assistant_msg = await thinking_services.resume_turn(
+            session, sess=sess, thinking=waiting, answer=payload.content
+        )
+        th = waiting
+    else:
+        user_msg, assistant_msg, th = await thinking_services.open_turn(
+            session, sess=sess, graph=graph, payload=payload, actor_id=user.id
+        )
     await session.commit()
     await session.refresh(user_msg)
     await session.refresh(assistant_msg)
+    runtime.submit(th.id)
     return SendMessageResponse(
         user_message=SessionMessageRead.model_validate(user_msg),
         assistant_message=SessionMessageRead.model_validate(assistant_msg),
-        result=result,
+        result=None,
+        thinking_id=th.id,
+        stream_url=thinking_services.stream_url(username, graphSlug, th.id),
     )
 
 
@@ -263,35 +282,31 @@ async def set_message_feedback(
     return SessionMessageRead.model_validate(message)
 
 
-@sessions_router.post("/{session_id}/messages/{message_id}/run", response_model=RerunResponse)
+@sessions_router.post(
+    "/{session_id}/messages/{message_id}/run", response_model=RerunResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def rerun_message(
     session_id: str = Path(...),
     message_id: str = Path(...),
+    username: str = Path(...),
+    graphSlug: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(require_graph_setup_complete),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: ThinkingRuntime = Depends(get_runtime),
 ) -> RerunResponse:
+    """Re-run a reply's query in place: a new thinking on the same thought (RFC-048 rethink).
+    The reply's step list is replaced by the new run's; the result rides its stream."""
     sess = await services.get_or_404(session, session_id=session_id, graph_id=graph.id, user_id=user.id)
     message = await services.get_message_or_404(session, message_id=message_id, sess=sess)
-    try:
-        message, result = await services.rerun_message(
-            session, sess=sess, message=message, graph=graph, manager=manager, actor_id=user.id
-        )
-    except QueryExecutionError as exc:
-        await session.commit()  # persist the failure audit event
-        # NL re-runs hide the raw driver error behind backend-owned guidance, same
-        # as the original ask; QL (and legacy null-mode) re-runs keep the real
-        # error so the author can fix their own query. Raw error stays in OTel.
-        if message.mode == "nl":
-            detail = {
-                "error": "query_translation_failed",
-                "message": services._friendly_query_error(exc.category),
-            }
-        else:
-            detail = {"error": "query_execution_failed", "message": str(exc)}
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=detail) from exc
+    th = await thinking_services.rerun_turn(session, sess=sess, graph=graph, message=message, actor_id=user.id)
     await session.commit()
     await session.refresh(message)
-    return RerunResponse(message=SessionMessageRead.model_validate(message), result=result)
+    runtime.submit(th.id)
+    return RerunResponse(
+        message=SessionMessageRead.model_validate(message),
+        result=None,
+        thinking_id=th.id,
+        stream_url=thinking_services.stream_url(username, graphSlug, th.id),
+    )

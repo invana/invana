@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from invana.graph.types.constants import QueryLanguage
 from invana.graphs.schemas import QueryResponse
 from invana.sessions.models import SessionMessageRole, SessionMessageStatus
+from invana.thinking.schemas import ThinkingStepRead
 
 # ── Requests ──────────────────────────────────────────────────────────────────
 
@@ -110,6 +111,11 @@ class SessionMessageRead(BaseModel):
     timeout_s: float | None = None
     node_count: int | None = None
     edge_count: int | None = None
+    # The thinking behind this reply and its task trace (RFC-055) — one row per
+    # attempt, from the reply's current thinking. Empty on user rows and on
+    # replies from before the runtime existed.
+    thinking_id: str | None = None
+    steps: list[ThinkingStepRead] = []
     created_at: datetime
 
 
@@ -162,15 +168,24 @@ class SessionListResponse(BaseModel):
 
 
 class SendMessageResponse(BaseModel):
+    """202 — the ask is recorded and a thinking is running (RFC-055). The reply
+    settles over the thinking's stream; ``result`` is always null now and kept
+    only so older clients keep parsing."""
+
     user_message: SessionMessageRead
     assistant_message: SessionMessageRead
-    # null for nl, or when the query failed (the error is in assistant_message).
     result: QueryResponse | None = None
+    thinking_id: str | None = None
+    stream_url: str | None = None
 
 
 class RerunResponse(BaseModel):
+    """202 — a new thinking is re-running the reply's query in place."""
+
     message: SessionMessageRead
-    result: QueryResponse
+    result: QueryResponse | None = None
+    thinking_id: str | None = None
+    stream_url: str | None = None
 
 
 class OperationResponse(BaseModel):

@@ -85,6 +85,10 @@ class Settings(BaseSettings):
     # new state is captured. 0 disables pruning (keep all).
     canvas_history_limit: int = 30  # INVANA_CANVAS_HISTORY_LIMIT
 
+    # Thinkings — each graph keeps its newest N thinkings (steps + stream), pruned
+    # when a new one opens (RFC-048 D11). 0 keeps all.
+    thinking_history_limit: int = 500  # INVANA_THINKING_HISTORY_LIMIT
+
     # CORS — comma-separated allowed origins; use * for development only
     cors_origins: list[str] = ["http://localhost:8300", "http://127.0.0.1:8300"]
 

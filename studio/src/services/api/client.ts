@@ -17,7 +17,10 @@ import axios, {
 import { toast } from "sonner";
 import { startClientSpan } from "../telemetry/tracer";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
+/** Engine origin — shared with the SSE clients, which can't go through axios. */
+export const API_BASE_URL =
+	import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
+const BASE_URL = API_BASE_URL;
 
 /** Carries the per-request telemetry span from request → response interceptor. */
 type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };

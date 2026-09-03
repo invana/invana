@@ -304,8 +304,8 @@ flowchart LR
 | 6.1 | Explorer page — sessions panel (threaded ask/answer), status bar, inspector | `ExplorerPage` | `…/sessions*` | `[~]` |
 | 6.2 | Canvas rendering — pan/drag/zoom/hover/select, header toolbar, inspector | `ExplorerCanvas` | — | `[x]` |
 | 6.3 | Sessions on TanStack Query (`useSessionsQuery`/`useSessionQuery`/`useSendMessage`) | `hooks/queries/useSessions` | `…/sessions*` | `[ ]` |
-| 6.4 | Composer posts a **thought**, then subscribes | `SessionComposer` | `POST …/thoughts` | `[ ]` |
-| 6.5 | **Thinking card** — names the **workflow** that is running, step chips from `thinking_steps` (`understand · validate · execute · project`), live counts, elapsed per step | `ThinkingCard` | stream + `GET …/thinkings/{id}` | `[ ]` |
+| 6.4 | Composer posts a **thought**, then subscribes | `SessionComposer` | `POST …/thoughts` | `[x]` — via `POST …/messages` → 202 + the thinking stream ([RFC-055](rfc-055-session-task-trace.md)) |
+| 6.5 | **Thinking card** — names the **workflow** that is running, step chips from `thinking_steps` (`understand · validate · execute · project`), live counts, elapsed per step | `ThinkingCard` | stream + `GET …/thinkings/{id}` | `[x]` — step rows under the reply, live from the stream; `StepList` (RFC-055) |
 | 6.6 | `graph.delta` → **append** into the canvas store (never reassign `data`: destructive, re-seeds the renderer) | canvas store | stream | `[ ]` |
 | 6.7 | `query.proposed` → query chip + `via` model label + "view generated query" | thread | stream | `[ ]` |
 | 6.7a | `table.page` renderer — paginated table, columns from payload, pages append | thread | stream | `[ ]` |
@@ -313,16 +313,16 @@ flowchart LR
 | 6.7c | `chart.spec` renderer — bar · line · pie · scatter | thread | stream | `[ ]` |
 | 6.7d | `text.delta` renderer — streamed markdown, appended token-wise | thread | stream | `[ ]` |
 | 6.7e | Emission router — dispatch by `kind`; an unknown kind is ignored, never fatal | `useThinkingStream` | stream | `[ ]` |
-| 6.8 | Clarification → resume the **same** thinking (options + "let me type"); card reads "needs something from you" | existing options UI | `POST …/thinkings/{id}/resume` | `[x]` UI / `[ ]` rewire |
+| 6.8 | Clarification → resume the **same** thinking (options + "let me type"); card reads "needs something from you" | existing options UI | `POST …/thinkings/{id}/resume` | `[x]` — the same thinking resumes (`POST …/thinkings/{id}/resume`; typing also resumes) |
 | 6.9 | 👍/👎 with downvote-refine, attached to the thinking | thread | feedback route | `[x]` UI / `[ ]` rewire |
-| 6.10 | **Stop thinking** | card action | `POST …/thinkings/{id}/cancel` | `[ ]` |
-| 6.11 | **Trace view** — prompt → rationale → proposed query → verdict → batches → counts, per step | disclosure → panel | `GET …/thinkings/{id}/trace` | `[ ]` |
+| 6.10 | **Stop thinking** | card action | `POST …/thinkings/{id}/cancel` | `[x]` — `esc` / stop button → `POST …/thinkings/{id}/cancel` |
+| 6.11 | **Trace view** — prompt → rationale → proposed query → verdict → batches → counts, per step | disclosure → panel | `GET …/thinkings/{id}/trace` | `[~]` — per-step trace disclosure shipped (RFC-055 UC10); the full stream-replay panel is not |
 | 6.12 | **Rethink** on any past thought (same or different agent) | thread action | `POST …/thoughts/{id}/rethink` | `[ ]` |
 | 6.13 | Citation chips → click through to the source record | thread | provenance | `[ ]` |
 | 6.14 | "Cannot answer" rendered distinctly — never styled like an answer, **and never styled like a failure** | thread | stream `cannot_answer` | `[ ]` |
-| 6.14a | **Retry visible on the step chip** — `retrying 2/3 · <reason>` with elapsed. A silent pause reads as hung | `ThinkingCard` | stream | `[ ]` |
+| 6.14a | **Retry visible on the step chip** — `retrying 2/3 · <reason>` with elapsed. A silent pause reads as hung | `ThinkingCard` | stream | `[x]` — `retrying 2/3 · <reason>` on the step row, one row per attempt |
 | 6.14b | **Repair visible on the step chip** — distinct "repairing" state, triggering error on hover | `ThinkingCard` | stream | `[ ]` |
-| 6.14c | **Diagnosis block** — summary · evidence disclosure · suggestion buttons. Styled as *blocked*, unlike an answer and unlike `cannot_answer` | `DiagnosisBlock` | stream `diagnosis` | `[ ]` |
+| 6.14c | **Diagnosis block** — summary · evidence disclosure · suggestion buttons. Styled as *blocked*, unlike an answer and unlike `cannot_answer` | `DiagnosisBlock` | stream `diagnosis` | `[~]` — `DiagnosisBlock`: summary + suggestions; the evidence disclosure is in the step trace |
 | 6.14d | **Suggestion actions** — one click re-asks with new wording, or routes into Modeller / Settings → LLMs / Datasets | `DiagnosisBlock` | — | `[ ]` |
 | 6.14e | **Try again** — offered only when the diagnosis says `retryable`; re-thinks the same thought | thread action | `POST …/thoughts/{id}/rethink` | `[ ]` |
 | 6.15 | 422 (no LLM provider) routes to Settings → LLMs instead of a raw error | composer | — | `[ ]` |

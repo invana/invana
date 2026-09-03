@@ -64,6 +64,8 @@ class SessionMessageStatus(enum.StrEnum):
     running = "running"
     ok = "ok"
     error = "error"
+    # The user stopped the thinking behind this reply (RFC-055 UC9).
+    stopped = "stopped"
 
 
 _surface_enum = Enum(
@@ -199,5 +201,9 @@ class SessionMessage(Base):
     timeout_s: Mapped[float | None] = mapped_column(Float, nullable=True)
     node_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     edge_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # The thinking that produced (or is producing) this reply (RFC-055) — its
+    # step rows are the reply's task trace. No FK: the thinking may be pruned
+    # (RFC-048 D11) while the reply stays. Null on user rows and old replies.
+    thinking_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

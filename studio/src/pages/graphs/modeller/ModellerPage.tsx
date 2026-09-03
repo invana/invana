@@ -155,6 +155,12 @@ export function ModellerPage() {
 	const sessions = useSessions(username, graphSlug, {
 		surface: "modeller",
 		modelId,
+		// A generation writes into the draft while its thinking runs (RFC-055);
+		// refresh the model tree + canvas when it settles, not when the ask is
+		// accepted.
+		onThinkingSettled: () => {
+			qc.invalidateQueries({ queryKey: ["models", u, g] });
+		},
 	});
 	const { data: llmProvidersResponse } = useLLMProvidersQuery(
 		username,
@@ -177,15 +183,9 @@ export function ModellerPage() {
 		}
 	}, [boundModelId, modelId]);
 
-	// After a generation, refresh the model tree + canvas to the updated draft
-	// (the existing modeller invalidation root). The sessions hook already
-	// invalidates the sessions/thread caches.
+	// Send the ask; the draft refresh happens on `onThinkingSettled` above.
 	const handleModellerRun = async (payload: QueryRunPayload) => {
-		try {
-			await sessions.send(payload);
-		} finally {
-			qc.invalidateQueries({ queryKey: ["models", u, g] });
-		}
+		await sessions.send(payload);
 	};
 
 	// The live canvas engine, lifted out of <Canvas> by <CanvasBridge> (in

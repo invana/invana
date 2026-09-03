@@ -1,13 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	type RecordOperationBody,
 	type SendMessageBody,
 	type SessionSort,
 	sessionsApi,
 } from "../../../../services/api/sessions";
+import {
+	type ThinkingStreamHandle,
+	messageFromEmission,
+	thinkingsApi,
+} from "../../../../services/api/thinkings";
+import { useAuthStore } from "../../../../stores/auth.store";
+import { useThinkingStore } from "../../../../stores/thinking.store";
 import type { QueryResponse, QueryRunPayload } from "../../../../types/query";
 import type { Session, SessionMessage } from "../../../../types/session";
+import {
+	type Emission,
+	LIVE_THINKING_STATUSES,
+} from "../../../../types/thinking";
 
 // A session's title is seeded from its first message so it's never blank —
 // mirrors the engine's `_title_from_text` (64-char cap + ellipsis). Set at
@@ -38,16 +49,38 @@ function toBody(payload: QueryRunPayload): SendMessageBody {
 	};
 }
 
+export interface UseSessionsOptions {
+	surface?: "explorer" | "modeller";
+	modelId?: string;
+	/** A query result landed on a thinking's stream (RFC-055) — the page paints
+	 *  it. Fires once per result, before the reply settles. */
+	onResult?: (info: {
+		sessionId: string;
+		messageId: string;
+		thinkingId: string;
+		result: QueryResponse;
+	}) => void;
+	/** A thinking reached a terminal state (done / cancelled / needs input). */
+	onThinkingSettled?: (info: {
+		sessionId: string;
+		messageId: string;
+		thinkingId: string;
+		status: string;
+	}) => void;
+}
+
 /**
- * Server-backed session state (RFC-024). Wraps the sessions API in TanStack
- * Query: a list query drives the panel's list view, a detail query the thread,
- * and `send` / `rerun` mutations run queries through the engine. Exposes the
- * same surface the panel/composer already consume.
+ * Server-backed session state (RFC-024) on the thinking runtime (RFC-055).
+ * Wraps the sessions API in TanStack Query: a list query drives the panel's
+ * list view, a detail query the thread. Sending returns as soon as the engine
+ * has recorded the ask (202) and opened a thinking; this hook then tails the
+ * thinking's SSE stream into the thinking store, so the reply's step rows move
+ * live, and refetches the thread when the run settles.
  */
 export function useSessions(
 	username: string | undefined,
 	graphSlug: string | undefined,
-	opts?: { surface?: "explorer" | "modeller"; modelId?: string },
+	opts?: UseSessionsOptions,
 ) {
 	const qc = useQueryClient();
 	// Default to the Explorer surface so existing callers are untouched (RFC-031).
@@ -60,6 +93,7 @@ export function useSessions(
 	const u = username ?? "";
 	const g = graphSlug ?? "";
 	const ready = !!username && !!graphSlug;
+	const accessToken = useAuthStore((s) => s.accessToken);
 
 	// surface scopes the list so Explorer and Modeller panels never show each
 	// other's sessions; sort + showArchived refetch the list when toggled.
@@ -67,7 +101,10 @@ export function useSessions(
 	// Prefix that matches every sort/archived variant for this surface — used for
 	// invalidation so a pin/archive/send touches all cached lists for the surface.
 	const listPrefix = ["sessions", u, g, surface] as const;
-	const detailKey = (id: string) => ["session", u, g, id] as const;
+	const detailKey = useCallback(
+		(id: string) => ["session", u, g, id] as const,
+		[u, g],
+	);
 
 	const sessionsQuery = useQuery({
 		queryKey: listKey,
@@ -92,13 +129,134 @@ export function useSessions(
 		return sessions.find((s) => s.id === activeSessionId) ?? null;
 	}, [activeSessionId, activeSessionQuery.data, sessions]);
 
-	// A run (send or rerun) is in flight. Drives the composer's send↔stop toggle
-	// and the disabled state; spans the whole gesture, including the session
-	// create that precedes a first send.
-	const [running, setRunning] = useState(false);
-	// The in-flight run's abort controller, so `stop()` can cancel it. The catch
-	// paths key off `signal.aborted` to tell a user stop from a real failure.
+	// The POST that records an ask is in flight — the composer is locked for it.
+	const [sending, setSending] = useState(false);
 	const abortRef = useRef<AbortController | null>(null);
+
+	// ── Thinking streams ──────────────────────────────────────────────────────
+	// One EventSource per live thinking, keyed by thinking id. Opened on send /
+	// rerun and for any running reply the thread loads (reload mid-run, UC12);
+	// closed on a terminal frame. Emissions fold into the thinking store.
+	const streams = useRef<Map<string, ThinkingStreamHandle>>(new Map());
+	const seed = useThinkingStore((s) => s.seed);
+	const applyEmission = useThinkingStore((s) => s.apply);
+	const views = useThinkingStore((s) => s.views);
+	// Latest callbacks, readable from stream handlers wired once.
+	const optsRef = useRef(opts);
+	optsRef.current = opts;
+
+	// Seed/append messages onto a session's cached detail. Writing fresh data
+	// keeps the just-enabled detail query from refetching over it (data is within
+	// staleTime), so the optimistic thread survives until we invalidate on done.
+	const patchDetail = useCallback(
+		(id: string, fn: (prev: Session | undefined) => Session | undefined) =>
+			qc.setQueryData(detailKey(id), fn),
+		[qc, detailKey],
+	);
+
+	const openStream = useCallback(
+		(thinkingId: string, sessionId: string, messageId: string) => {
+			if (!accessToken || streams.current.has(thinkingId)) return;
+			seed({ id: thinkingId, sessionId, messageId });
+			const after = useThinkingStore.getState().views[thinkingId]?.seq ?? 0;
+			const settle = (status: string) => {
+				streams.current.delete(thinkingId);
+				qc.invalidateQueries({ queryKey: detailKey(sessionId) });
+				qc.invalidateQueries({ queryKey: listPrefix });
+				optsRef.current?.onThinkingSettled?.({
+					sessionId,
+					messageId,
+					thinkingId,
+					status,
+				});
+			};
+			const handle = thinkingsApi.stream(u, g, thinkingId, {
+				token: accessToken,
+				after,
+				onEmission: (e: Emission) => {
+					applyEmission(thinkingId, e);
+					if (e.kind === "result") {
+						optsRef.current?.onResult?.({
+							sessionId,
+							messageId,
+							thinkingId,
+							result: e.payload.result as QueryResponse,
+						});
+					}
+					if (
+						e.kind === "thinking.done" ||
+						e.kind === "thinking.cancelled" ||
+						e.kind === "clarification.requested"
+					) {
+						// The terminal frame carries the settled reply — patch it in so
+						// the thread updates before the refetch lands.
+						const m = messageFromEmission(
+							e.payload.message as Record<string, unknown> | undefined,
+						);
+						if (m) {
+							patchDetail(sessionId, (prev) =>
+								prev
+									? {
+											...prev,
+											messages: prev.messages.map((x) =>
+												x.id === m.id ? { ...x, ...m, steps: x.steps } : x,
+											),
+										}
+									: prev,
+							);
+						}
+						settle(String(e.payload.status ?? e.kind));
+					}
+				},
+				onError: () => settle("disconnected"),
+			});
+			streams.current.set(thinkingId, handle);
+		},
+		[
+			accessToken,
+			u,
+			g,
+			qc,
+			detailKey,
+			listPrefix,
+			seed,
+			applyEmission,
+			patchDetail,
+		],
+	);
+
+	// Replies still running when a thread loads (reload mid-run) get a tail.
+	useEffect(() => {
+		if (!activeSession) return;
+		for (const m of activeSession.messages) {
+			if (m.role === "assistant" && m.status === "running" && m.thinkingId) {
+				openStream(m.thinkingId, activeSession.id, m.id);
+			}
+		}
+	}, [activeSession, openStream]);
+
+	// Close every tail on unmount.
+	useEffect(
+		() => () => {
+			for (const h of streams.current.values()) h.close();
+			streams.current.clear();
+		},
+		[],
+	);
+
+	// A run is live on the open session (its thinking is queued or thinking).
+	// Drives the composer's send↔stop toggle and the disabled state.
+	const liveThinking = useMemo(() => {
+		if (!activeSessionId) return null;
+		return (
+			Object.values(views).find(
+				(v) =>
+					v.sessionId === activeSessionId &&
+					LIVE_THINKING_STATUSES.has(v.status),
+			) ?? null
+		);
+	}, [views, activeSessionId]);
+	const running = sending || liveThinking !== null;
 
 	// Pin/archive toggles — PATCH the flag, then refresh the list so ordering
 	// (pinned-first) and archived visibility re-sort. Archiving the open session
@@ -124,14 +282,6 @@ export function useSessions(
 		},
 	});
 
-	// Seed/append messages onto a session's cached detail. Writing fresh data
-	// keeps the just-enabled detail query from refetching over it (data is within
-	// staleTime), so the optimistic thread survives until we invalidate on done.
-	const patchDetail = (
-		id: string,
-		fn: (prev: Session | undefined) => Session | undefined,
-	) => qc.setQueryData(detailKey(id), fn);
-
 	const send = async (
 		payload: QueryRunPayload,
 		hooks?: {
@@ -143,16 +293,15 @@ export function useSessions(
 	): Promise<{
 		sessionId: string | null;
 		messageId: string | null;
-		result: QueryResponse | null;
+		thinkingId: string | null;
 	}> => {
-		setRunning(true);
+		setSending(true);
 		const controller = new AbortController();
 		abortRef.current = controller;
 
 		// Optimistic pair shown the instant the user sends: their prompt + a
-		// "running" placeholder. Dropping into the thread immediately (rather than
-		// waiting for the round trip) is the whole point — the placeholder also
-		// carries the in-thread running animation.
+		// "running" placeholder. The engine's 202 replaces them with the real rows
+		// (ids, thinking id, queued steps) a round trip later.
 		const now = new Date();
 		const userMsg: SessionMessage = {
 			id: crypto.randomUUID(),
@@ -205,18 +354,35 @@ export function useSessions(
 				toBody(payload),
 				controller.signal,
 			);
-			// Server is now the truth — refetch the canonical thread + list summary,
-			// which replaces the optimistic pair with the persisted messages.
+			const sid = sessionId;
+			// Swap the optimistic pair for the recorded rows — the reply now carries
+			// its thinking id and the queued plan (UC1).
+			patchDetail(sid, (prev) =>
+				prev
+					? {
+							...prev,
+							messages: prev.messages.map((m) =>
+								m.id === userMsg.id
+									? resp.userMessage
+									: m.id === runningMsg.id
+										? resp.assistantMessage
+										: m,
+							),
+						}
+					: prev,
+			);
 			qc.invalidateQueries({ queryKey: listPrefix });
-			qc.invalidateQueries({ queryKey: detailKey(sessionId) });
+			if (resp.thinkingId) {
+				openStream(resp.thinkingId, sid, resp.assistantMessage.id);
+			}
 			return {
 				sessionId,
 				messageId: resp.assistantMessage.id,
-				result: resp.result,
+				thinkingId: resp.thinkingId,
 			};
 		} catch (err) {
-			// User stop: leave their prompt, mark the placeholder stopped. Real
-			// failure: surface it on the placeholder and rethrow for tracing.
+			// The POST itself failed (or was aborted before it returned): mark the
+			// placeholder so the thread doesn't sit on "running" forever.
 			const stopped = controller.signal.aborted;
 			if (sessionId) {
 				patchDetail(sessionId, (prev) =>
@@ -229,7 +395,7 @@ export function useSessions(
 												...m,
 												status: stopped ? "stopped" : "error",
 												content: stopped
-													? "Query stopped."
+													? "Stopped by you."
 													: ((err as Error)?.message ?? "Query failed."),
 											}
 										: m,
@@ -238,37 +404,42 @@ export function useSessions(
 						: prev,
 				);
 			}
-			if (stopped) return { sessionId, messageId: null, result: null };
+			if (stopped) return { sessionId, messageId: null, thinkingId: null };
 			throw err;
 		} finally {
 			abortRef.current = null;
-			setRunning(false);
+			setSending(false);
 		}
 	};
 
-	const rerun = async (messageId: string): Promise<QueryResponse | null> => {
+	// Re-run a reply's query: a new thinking on the same thought (RFC-048
+	// rethink). The reply's step list is replaced by the new run's; the result
+	// arrives on `onResult` like a first run.
+	const rerun = async (messageId: string): Promise<string | null> => {
 		if (!activeSessionId) return null;
 		const id = activeSessionId;
-		setRunning(true);
-		const controller = new AbortController();
-		abortRef.current = controller;
+		setSending(true);
 		try {
-			const { result } = await sessionsApi.rerunMessage(
+			const { message, thinkingId } = await sessionsApi.rerunMessage(
 				u,
 				g,
 				id,
 				messageId,
-				controller.signal,
 			);
-			qc.invalidateQueries({ queryKey: detailKey(id) });
-			qc.invalidateQueries({ queryKey: listPrefix });
-			return result;
-		} catch (err) {
-			if (controller.signal.aborted) return null;
-			throw err;
+			patchDetail(id, (prev) =>
+				prev
+					? {
+							...prev,
+							messages: prev.messages.map((m) =>
+								m.id === message.id ? { ...m, ...message } : m,
+							),
+						}
+					: prev,
+			);
+			if (thinkingId) openStream(thinkingId, id, messageId);
+			return thinkingId;
 		} finally {
-			abortRef.current = null;
-			setRunning(false);
+			setSending(false);
 		}
 	};
 
@@ -315,9 +486,13 @@ export function useSessions(
 		}
 	};
 
-	// Cancel the in-flight run (the composer's stop control). The send/rerun
-	// catch paths handle the resulting abort.
-	const stop = () => abortRef.current?.abort();
+	// Stop thinking (UC9): cancel the live thinking on the engine; the stream's
+	// `thinking.cancelled` frame settles the reply. A POST still in flight is
+	// aborted too.
+	const stop = () => {
+		abortRef.current?.abort();
+		if (liveThinking) void thinkingsApi.cancel(u, g, liveThinking.id);
+	};
 
 	// Refetch from the engine — the list always, plus the open thread when one
 	// is active. Used by the panel's header refresh control.
@@ -340,6 +515,8 @@ export function useSessions(
 		activeSession,
 		activeSessionId,
 		isRunning: running,
+		/** The thinking currently running on the open session, if any. */
+		liveThinking,
 		isRefreshing:
 			sessionsQuery.isFetching ||
 			(!!activeSessionId && activeSessionQuery.isFetching),

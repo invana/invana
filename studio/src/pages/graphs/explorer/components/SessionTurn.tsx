@@ -2,16 +2,17 @@ import {
 	Button,
 	ChatSessionActivityRow,
 	type ChatSessionActivityStatus,
+	ChatSessionActivitySubLine,
 	ChatSessionDisclosure,
 	type ChatSessionMessageAction,
 	ChatSessionMessageOptions,
-	ChatSessionProgressLine,
 	ChatSessionPromptRow,
 } from "@invana/ui";
 import {
 	Code,
 	Copy,
 	Info,
+	ListTree,
 	Network,
 	Pencil,
 	RotateCw,
@@ -19,16 +20,29 @@ import {
 	ThumbsUp,
 	Waypoints,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { formatDuration } from "../../../../lib/time";
+import { useThinkingStore } from "../../../../stores/thinking.store";
 import type { QueryResponse } from "../../../../types/query";
 import type {
 	SessionContextTurn,
 	SessionMessage,
 } from "../../../../types/session";
+import {
+	LIVE_THINKING_STATUSES,
+	type ThinkingStep,
+} from "../../../../types/thinking";
 import { ResultBlock } from "./ResultBlock";
 import { SessionContextDisclosure } from "./SessionContextDisclosure";
+import {
+	DiagnosisBlock,
+	StepList,
+	StepTrace,
+	StepsSummary,
+	useTicker,
+} from "./SessionSteps";
+import { stepsFor } from "./SessionTasksView";
 
 // ── User turn ─────────────────────────────────────────────────────────────────
 
@@ -48,6 +62,10 @@ export function PromptTurn({ message }: { message: SessionMessage }) {
 	return (
 		<ChatSessionPromptRow
 			caret={Icon ? <Icon className="h-3.5 w-3.5" /> : undefined}
+			meta={message.createdAt.toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit",
+			})}
 		>
 			{message.content}
 		</ChatSessionPromptRow>
@@ -73,42 +91,89 @@ export interface AssistantTurnProps {
 }
 
 /**
- * The assistant's turn (RFC-054). A running reply is a progress line with a
- * live elapsed counter; everything settled is an activity row whose gutter dot
- * carries the outcome — success, info (a clarifying question back), warning
- * (stopped by the user), error. The action toolbar, meta line, query and
- * context disclosures and the inline result hang off the row.
+ * The assistant's turn (RFC-055). While its thinking runs the row is a live
+ * plan: the current step with a spinner and elapsed, the step rows beneath it
+ * moving as the stream arrives, the model's reasoning under Understand. Once
+ * settled it is an activity row whose gutter dot carries the outcome —
+ * success, info (a clarifying question back), warning (stopped), error — with
+ * the step list folded to one line (`✻ Thought for …`) and reopenable.
  */
 export function AssistantTurn(props: AssistantTurnProps) {
-	if (props.message.status === "running") {
-		return <RunningTurn message={props.message} />;
-	}
-	if (props.message.status === "stopped") {
-		return (
-			<ChatSessionActivityRow status="warning">
-				{props.message.content}
-			</ChatSessionActivityRow>
-		);
+	const { message } = props;
+	const view = useThinkingStore((s) =>
+		message.thinkingId ? s.views[message.thinkingId] : undefined,
+	);
+	const live = !!view && LIVE_THINKING_STATUSES.has(view.status);
+	if (message.status === "running" || live) {
+		return <RunningTurn {...props} />;
 	}
 	return <SettledTurn {...props} />;
 }
 
-/** Seconds elapsed since `since`, ticking once a second while mounted. */
-function useElapsedSeconds(since: Date): number {
-	const [now, setNow] = useState(() => Date.now());
-	useEffect(() => {
-		const id = window.setInterval(() => setNow(Date.now()), 1000);
-		return () => window.clearInterval(id);
-	}, []);
-	return Math.max(0, Math.floor((now - since.getTime()) / 1000));
+function Spinner() {
+	return (
+		<span
+			className="h-3 w-3 shrink-0 rounded-full border-2 border-muted border-t-primary animate-spin motion-reduce:animate-none"
+			role="status"
+			aria-label="Working"
+		/>
+	);
 }
 
-function RunningTurn({ message }: { message: SessionMessage }) {
-	const elapsed = useElapsedSeconds(message.createdAt);
+function RunningTurn({ message }: AssistantTurnProps) {
+	const view = useThinkingStore((s) =>
+		message.thinkingId ? s.views[message.thinkingId] : undefined,
+	);
+	const steps = stepsFor(message, view);
+	const [openTraceId, setOpenTraceId] = useState<string | null>(null);
+	const now = useTicker(true);
+	const current = steps.find((s) => s.status === "running");
+	const startedAt =
+		steps[0]?.startedAt?.getTime() ?? message.createdAt.getTime();
+	const elapsed = formatDuration(Math.max(0, now - startedAt));
+
 	return (
-		<ChatSessionProgressLine elapsed={`${elapsed}s`}>
-			{message.content}
-		</ChatSessionProgressLine>
+		<ChatSessionActivityRow
+			status="pending"
+			footer={
+				<>
+					<StepList
+						steps={steps}
+						reasoning={view?.reasoning}
+						onOpenTrace={(s) =>
+							setOpenTraceId((id) => (id === s.id ? null : s.id))
+						}
+						openTraceId={openTraceId}
+						renderTrace={(s) => (
+							<StepTrace step={s} onClose={() => setOpenTraceId(null)} />
+						)}
+					/>
+					{/* The proposed query is viewable the moment Understand settles,
+					    not only when the reply does (UC3). */}
+					{view?.query && (
+						<ChatSessionDisclosure
+							label={view.query.language || "query"}
+							meta={view.query.via}
+							contentClassName="font-mono whitespace-pre-wrap break-words text-muted-foreground"
+						>
+							{view.query.query}
+						</ChatSessionDisclosure>
+					)}
+				</>
+			}
+		>
+			<span className="flex items-center gap-2 text-muted-foreground">
+				<Spinner />
+				<span className="min-w-0 flex-1">
+					{current
+						? `${current.label}…`
+						: steps.length
+							? "Starting…"
+							: message.content}
+				</span>
+				<span className="shrink-0 font-mono tabular-nums">{elapsed}</span>
+			</span>
+		</ChatSessionActivityRow>
 	);
 }
 
@@ -124,18 +189,36 @@ function SettledTurn({
 	result,
 	onLoadToCanvas,
 }: AssistantTurnProps) {
+	const view = useThinkingStore((s) =>
+		message.thinkingId ? s.views[message.thinkingId] : undefined,
+	);
+	const steps = stepsFor(message, view);
+	const isClarification =
+		(message.clarificationOptions?.length ?? 0) > 0 ||
+		view?.status === "awaiting_input";
+	const isStopped = message.status === "stopped";
+	// Steps stay open on a question back (the run is paused, not over) and
+	// collapse to the summary line once a reply is settled (UC6).
+	const [stepsOpen, setStepsOpen] = useState(isClarification);
+	const [openTraceId, setOpenTraceId] = useState<string | null>(null);
 	const [showQuery, setShowQuery] = useState(false);
 	const [showContext, setShowContext] = useState(false);
 
-	const isClarification = (message.clarificationOptions?.length ?? 0) > 0;
 	const status: ChatSessionActivityStatus =
-		message.status === "error" ? "error" : isClarification ? "info" : "success";
+		message.status === "error"
+			? "error"
+			: isStopped
+				? "warning"
+				: isClarification
+					? "info"
+					: "success";
 	// Context applies only to NL replies (ql turns send none). The icon is shown
 	// for every nl reply; the disclosure resolves to "this question only" when empty.
 	const hasContext = message.mode === "nl";
 	// 👍/👎 rate a real answer — not canvas operations, which aren't the model's
 	// answer to a question (RFC-046).
 	const canVote = !!message.sourceQuery && !message.operation;
+	const sourceQuery = message.sourceQuery ?? view?.query?.query;
 
 	const copy = () => {
 		navigator.clipboard?.writeText(message.content);
@@ -159,12 +242,12 @@ function SettledTurn({
 		.join(" · ");
 
 	const actions: ChatSessionMessageAction[] = [];
-	if (message.sourceQuery) {
+	if (sourceQuery) {
 		actions.push(
 			{
 				icon: <RotateCw className="h-3 w-3" />,
 				label: "Re-run query",
-				disabled: isRunning,
+				disabled: isRunning || !message.sourceQuery,
 				onClick: () => onRerun(message.id),
 			},
 			{
@@ -188,7 +271,15 @@ function SettledTurn({
 			onClick: () => setShowContext((v) => !v),
 		});
 	}
-	if (canVote) {
+	if (steps.length > 0) {
+		actions.push({
+			icon: <ListTree className="h-3 w-3" />,
+			label: stepsOpen ? "Hide steps" : "Steps",
+			active: stepsOpen,
+			onClick: () => setStepsOpen((v) => !v),
+		});
+	}
+	if (canVote && !isStopped) {
 		// A downvote asks the model what to change (handled by the panel);
 		// clicking the active vote clears it.
 		actions.push(
@@ -213,19 +304,33 @@ function SettledTurn({
 		);
 	}
 
+	const renderTrace = (s: ThinkingStep) => (
+		<StepTrace step={s} onClose={() => setOpenTraceId(null)} />
+	);
+
 	return (
 		<ChatSessionActivityRow
 			status={status}
-			actions={<ChatSessionMessageOptions actions={actions} />}
+			actions={
+				isStopped ? undefined : <ChatSessionMessageOptions actions={actions} />
+			}
 			meta={meta || undefined}
 			footer={
 				<>
+					{isStopped && (
+						<ChatSessionActivitySubLine>
+							Interrupted · ask again, or narrow the question
+						</ChatSessionActivitySubLine>
+					)}
 					{/* Clarification options (RFC-038): pick one instead of retyping —
-					    it's sent as the next NL ask, which re-translates with this
-					    clarification in context and runs. */}
+					    it's sent as the answer, and the same thinking resumes (UC7). */}
 					{isClarification && (
 						<div className="flex flex-col items-start gap-1.5 py-1">
-							{message.clarificationOptions?.map((option, i) => (
+							{(
+								message.clarificationOptions ??
+								view?.clarification?.options ??
+								[]
+							).map((option, i) => (
 								<Button
 									key={`${message.id}-opt-${i}`}
 									variant="outline"
@@ -247,14 +352,46 @@ function SettledTurn({
 							</Button>
 						</div>
 					)}
-					{showQuery && message.sourceQuery && (
+					{message.status === "error" && view?.diagnosis && (
+						<DiagnosisBlock
+							diagnosis={view.diagnosis}
+							onRetry={
+								message.sourceQuery ? () => onRerun(message.id) : onTypeInstead
+							}
+							onFocusComposer={onTypeInstead}
+						/>
+					)}
+					{steps.length > 0 &&
+						(stepsOpen ? (
+							<StepList
+								steps={steps}
+								onOpenTrace={(s) =>
+									setOpenTraceId((id) => (id === s.id ? null : s.id))
+								}
+								openTraceId={openTraceId}
+								renderTrace={renderTrace}
+							/>
+						) : (
+							<StepsSummary
+								steps={steps}
+								status={
+									message.status === "error"
+										? "error"
+										: isStopped
+											? "stopped"
+											: "ok"
+								}
+								onClick={() => setStepsOpen(true)}
+							/>
+						))}
+					{showQuery && sourceQuery && (
 						<ChatSessionDisclosure
-							label={message.language ?? "query"}
+							label={message.language ?? view?.query?.language ?? "query"}
 							open
 							onOpenChange={(open) => setShowQuery(open)}
 							contentClassName="font-mono whitespace-pre-wrap break-words text-muted-foreground"
 						>
-							{message.sourceQuery}
+							{sourceQuery}
 						</ChatSessionDisclosure>
 					)}
 					{showContext && (

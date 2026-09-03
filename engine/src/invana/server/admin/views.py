@@ -30,6 +30,7 @@ from invana.modeller.models import (
 from invana.server.admin.auth import SuperuserAuthProvider
 from invana.sessions.models import Session, SessionMessage
 from invana.skills.models import Skill
+from invana.thinking.models import Thinking, ThinkingStep, Thought, ThoughtStream
 
 # Custom templates (currently: base.html with theme switcher) live alongside
 # this module. starlette-admin's Jinja loader checks templates_dir first and
@@ -409,8 +410,59 @@ class SessionMessageView(ModelView):
         "execution_time_ms",
         "llm_time_ms",
         "timeout_s",
+        "thinking_id",
         "created_at",
     ]
+
+
+# ── Thinkings (RFC-048 / RFC-055) — the run behind a session reply ────────────
+
+
+class ThoughtView(ModelView):
+    fields = ["id", "graph_id", "session_id", "message_id", "author_id", "kind", "body", "params", "created_at"]
+    search_fields = ["body"]
+
+
+class ThinkingView(ModelView):
+    fields = [
+        "id",
+        "thought_id",
+        "graph_id",
+        "workflow_key",
+        "status",
+        "assistant_message_id",
+        "queued_at",
+        "started_at",
+        "finished_at",
+        "error",
+        "stream_seq",
+        "cursor",
+    ]
+
+
+class ThinkingStepView(ModelView):
+    fields = [
+        "id",
+        "thinking_id",
+        "message_id",
+        "seq",
+        "task_key",
+        "label",
+        "attempt",
+        "status",
+        "started_at",
+        "finished_at",
+        "detail",
+        "input",
+        "output",
+        "error",
+        "tokens_in",
+        "tokens_out",
+    ]
+
+
+class ThoughtStreamView(ModelView):
+    fields = ["id", "thinking_id", "seq", "kind", "payload", "idem_key", "created_at"]
 
 
 class CanvasView(ModelView):
@@ -554,6 +606,20 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 SessionView(Session, label="Sessions", icon="fa fa-comments"),
                 SessionMessageView(SessionMessage, label="Messages", icon="fa fa-message"),
+            ],
+        ),
+    )
+
+    # ── Thinkings (RFC-048 / RFC-055 — the run behind every reply) ───────────
+    admin.add_view(
+        DropDown(
+            label="Thinkings",
+            icon="fa fa-brain",
+            views=[
+                ThoughtView(Thought, label="Thoughts", icon="fa fa-comment"),
+                ThinkingView(Thinking, label="Thinkings", icon="fa fa-brain"),
+                ThinkingStepView(ThinkingStep, label="Thinking steps", icon="fa fa-list-check"),
+                ThoughtStreamView(ThoughtStream, label="Thought stream", icon="fa fa-stream"),
             ],
         ),
     )

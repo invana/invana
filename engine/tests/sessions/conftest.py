@@ -14,6 +14,7 @@ from invana.graphs.models import Graph
 from invana.modeller.models import Base
 from invana.sessions.models import Session, SessionMessage  # noqa: F401
 from invana.settings import settings
+from invana.thinking.models import Thinking, ThinkingStep, Thought, ThoughtStream  # noqa: F401
 
 
 @pytest_asyncio.fixture

@@ -14,6 +14,7 @@ import type {
 	SessionMessage,
 } from "../../types/session";
 import { request } from "./client";
+import { type ApiThinkingStep, toThinkingStep } from "./thinkings";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 
@@ -23,7 +24,7 @@ interface ApiMessage {
 	seq: number;
 	role: "user" | "assistant";
 	content: string;
-	status?: "running" | "ok" | "error" | null;
+	status?: "running" | "ok" | "error" | "stopped" | null;
 	operation?: "expand" | "load" | null;
 	mode?: "nl" | "ql" | null;
 	via?: string | null;
@@ -37,6 +38,8 @@ interface ApiMessage {
 	timeout_s?: number | null;
 	node_count?: number | null;
 	edge_count?: number | null;
+	thinking_id?: string | null;
+	steps?: ApiThinkingStep[] | null;
 	created_at: string;
 }
 
@@ -72,11 +75,15 @@ interface ApiSendResponse {
 	user_message: ApiMessage;
 	assistant_message: ApiMessage;
 	result: QueryResponse | null;
+	thinking_id?: string | null;
+	stream_url?: string | null;
 }
 
 interface ApiRerunResponse {
 	message: ApiMessage;
-	result: QueryResponse;
+	result: QueryResponse | null;
+	thinking_id?: string | null;
+	stream_url?: string | null;
 }
 
 /** What the composer collects, normalized for the engine. */
@@ -135,10 +142,13 @@ export interface SessionListResult {
 	total: number;
 }
 
+/** 202 — the ask is recorded and a thinking is running (RFC-055); the reply
+ *  settles over the thinking's stream. `result` is always null now. */
 export interface SendMessageResult {
 	userMessage: SessionMessage;
 	assistantMessage: SessionMessage;
 	result: QueryResponse | null;
+	thinkingId: string | null;
 }
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -161,6 +171,8 @@ function toMessage(m: ApiMessage): SessionMessage {
 		sourceQuery: m.source_query ?? undefined,
 		clarificationOptions: m.clarification_options ?? undefined,
 		feedback: m.feedback ?? undefined,
+		thinkingId: m.thinking_id ?? undefined,
+		steps: m.steps ? m.steps.map(toThinkingStep) : undefined,
 	};
 }
 
@@ -266,21 +278,27 @@ export const sessionsApi = {
 			userMessage: toMessage(data.user_message),
 			assistantMessage: toMessage(data.assistant_message),
 			result: data.result,
+			thinkingId: data.thinking_id ?? null,
 		};
 	},
 
+	// 202 — a new thinking re-runs the reply's query in place; its result rides
+	// the thinking's stream.
 	rerunMessage: async (
 		username: string,
 		graphSlug: string,
 		id: string,
 		messageId: string,
 		signal?: AbortSignal,
-	): Promise<{ message: SessionMessage; result: QueryResponse }> => {
+	): Promise<{ message: SessionMessage; thinkingId: string | null }> => {
 		const data = await request<ApiRerunResponse>(
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/run`,
 			{ method: "POST", signal },
 		);
-		return { message: toMessage(data.message), result: data.result };
+		return {
+			message: toMessage(data.message),
+			thinkingId: data.thinking_id ?? null,
+		};
 	},
 
 	// The conversation context (prior turns) the model was given for an assistant

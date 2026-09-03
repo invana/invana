@@ -43,8 +43,19 @@ async def lifespan(app: FastAPI):
     app.state.event_broadcaster = event_broadcaster
     await event_broadcaster.start()
 
+    # RFC-055 — the inline thinking runtime: one asyncio task per session ask.
+    # Startup fails whatever a previous process left mid-flight.
+    from invana.thinking.runtime import ThinkingRuntime
+
+    thinking_runtime = ThinkingRuntime(
+        session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key
+    )
+    app.state.thinking_runtime = thinking_runtime
+    await thinking_runtime.startup()
+
     yield
 
+    await thinking_runtime.shutdown()
     await event_broadcaster.stop()
     await manager.shutdown()
     await engine.dispose()
@@ -66,6 +77,7 @@ def create_app() -> FastAPI:
     from invana.server.routes.schemas import schemas_router
     from invana.sessions.routes import sessions_router
     from invana.skills.routes import skills_router
+    from invana.thinking.routes import thinkings_router
 
     app = FastAPI(
         title=settings.app_name,
@@ -115,6 +127,7 @@ def create_app() -> FastAPI:
     app.include_router(models_router)
     app.include_router(schemas_router)
     app.include_router(sessions_router)
+    app.include_router(thinkings_router)
     app.include_router(canvases_router)
     app.include_router(explorer_router)
     app.include_router(events_router)

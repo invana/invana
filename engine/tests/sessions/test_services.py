@@ -3,8 +3,8 @@
 Covers the persistence behaviors that don't need a live graph DB connector:
 private-to-creator scoping, ordering, rename, cascade delete, monotonic
 sequencing, and natural-language provider resolution (RFC-030). Both `ql` and
-`nl` now execute, so message creation through ``send_message`` is exercised via
-the API harness (httpx + a live graph DB + a real LLM); message-persistence
+`nl` execute through the thinking runtime (RFC-055) and are exercised via the
+API harness (httpx + a live graph DB + a real LLM); message-persistence
 properties here append rows through the store directly.
 """
 
@@ -22,6 +22,7 @@ from invana.sessions.models import (
 )
 from invana.sessions.schemas import RecordOperation, SendMessage, SessionMessageRead
 from invana.sessions.store import SessionStore
+from invana.thinking import services as thinking_services
 
 pytestmark = pytest.mark.asyncio
 
@@ -147,14 +148,12 @@ class TestSessionPersistence:
         422 raises before any message is written, so nothing persists."""
         sess = await services.create_session(session, graph_id=graph.id, user_id=user.id, title=None)
         with pytest.raises(HTTPException) as exc:
-            await services.send_message(
+            await thinking_services.open_turn(
                 session,
                 sess=sess,
                 graph=graph,
-                manager=None,  # provider resolution runs first, before the connector
                 payload=SendMessage(content="who are the people?", mode="nl"),
                 actor_id=user.id,
-                encryption_key="unused",
             )
         assert exc.value.status_code == 422
         assert "Settings" in exc.value.detail

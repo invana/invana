@@ -207,7 +207,7 @@ seconds, the slice isn't done.
 | **S5.5** Audit events | See every change land in a live event tail within a second | `[x]` |
 | **S6** Dataset import | Import a dataset folder from the CLI and watch validation stream into Studio's read-only browser | `[ ]` |
 | **S7** Stitcher | Map dataset types onto model concepts; see nodes in Explorer with their source records | `[ ]` |
-| **S9** Thoughts & thinking | Ask a question, watch the answer build as it streams, open the trace behind it | `[ ]` |
+| **S9** Thoughts & thinking | Ask a question, watch the answer build as it streams, open the trace behind it | `[~]` S9b started 2026-09-03 ([RFC-055](mvp/rfc-055-session-task-trace.md)) |
 | **S9.5** Schedules | Put an answer you trust on a daily cron; find a fresh one waiting the next morning | `[ ]` |
 | **S10** External-agent API | Issue a scoped token and read the Atlas from an outside agent | `[ ]` |
 | **S11** Atlas lifecycle | Archive an Atlas; every mutating route goes read-only | `[ ]` |
@@ -230,6 +230,7 @@ the asking path has to exist first.
 | Rule | Why |
 |---|---|
 | One moving target at a time | S6/S7/S9 are the genuinely new platform. Don't start S6 until S4+S5 are stable. |
+| **S9b pulled ahead of S6/S7** (decided 2026-09-03) | The session task trace ([RFC-055](mvp/rfc-055-session-task-trace.md)) needs the thinking runtime, and the sessions surface is where users are today. Scope of the pull-forward is the **inline** runtime only — `thoughts · thinkings · thinking_steps · thought_stream`, SSE, resume, cancel — no S9a package restructure and no Prefect (S9c). S6 → S7 resume after. |
 | Hold the line on "no source connectors" | Every "but PDFs would be easy" is a slope back into building a connector framework. Users producing JSON externally is the contract. |
 | The generated TS client is the contract | Hand-typed frontend shapes drift from the backend. There is no second source of truth. |
 | Studio's UI comes from design-kit | Studio must not grow a parallel component layer — gap analysis and build order in [`mvp/studio.md`](mvp/studio.md) § 10. |

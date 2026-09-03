@@ -183,7 +183,10 @@ export function ExplorerPage() {
 		renameSession,
 		openSession,
 		backToList,
-	} = useSessions(username, graphSlug);
+	} = useSessions(username, graphSlug, {
+		onResult: ({ sessionId, messageId, result }) =>
+			handleStreamResult(sessionId, messageId, result),
+	});
 
 	// Panel state lives in the URL. The left (sessions) panel defaults OPEN
 	// (`?sessions=closed` hides it). The right (inspector / property detail) panel
@@ -260,6 +263,20 @@ export function ExplorerPage() {
 	const setResultFor = useCallback(
 		(messageId: string, result: QueryResponse | null) =>
 			setResultsByMessageId((prev) => ({ ...prev, [messageId]: result })),
+		[],
+	);
+	// Sessions whose first result should open + paint their new canvas, and
+	// replies whose re-run result should repaint (the restore path). Registered
+	// when the run starts; consumed when the result lands on the stream.
+	const pendingNewSessionsRef = useRef<Set<string>>(new Set());
+	const pendingRestorePaintRef = useRef<Set<string>>(new Set());
+	// Latest handlers for the stream callback (wired once in useSessions).
+	const streamResultRef = useRef<
+		(sessionId: string, messageId: string, result: QueryResponse) => void
+	>(() => {});
+	const handleStreamResult = useCallback(
+		(sessionId: string, messageId: string, result: QueryResponse) =>
+			streamResultRef.current(sessionId, messageId, result),
 		[],
 	);
 
@@ -1228,40 +1245,46 @@ export function ExplorerPage() {
 			);
 			return;
 		}
-		let messageId: string | null = null;
-		// A run with no active session creates one; detect that so we can spin up a
-		// canvas tab for the new session below.
+		// A run with no active session creates one; detect that so the first
+		// result paints onto the new session's canvas when it lands.
 		const priorSessionId = activeSessionId;
-		let newSessionId: string | null = null;
-		const result = await runTraced(
+		await runTraced(
 			"run",
 			{
 				"explorer.mode": payload.mode,
 				"explorer.language": payload.mode === "ql" ? payload.language : "",
 			},
-			// `send` threads the ask/answer into a session (creating + opening one
-			// when none is active) and runs the engine query, returning the assistant
-			// message id so its result can be keyed for inline rendering (RFC-033).
+			// `send` records the ask into a session (creating + opening one when
+			// none is active) and opens a thinking (RFC-055). It returns as soon as
+			// the engine has accepted the ask; the result arrives on the thinking's
+			// stream and is handled by `handleStreamResult`.
 			async () => {
-				const {
-					sessionId,
-					messageId: mid,
-					result,
-				} = await send(payload, {
+				const { sessionId } = await send(payload, {
 					// The session exists now — open its canvas immediately (named after
 					// the session) so it's there while the query runs, not only after.
 					onSessionCreated: (s) => void openCanvasForNewSession(s.id, null),
 				});
 				restoredRef.current = sessionId;
-				messageId = mid;
-				if (sessionId && sessionId !== priorSessionId) newSessionId = sessionId;
-				return result;
+				if (sessionId && sessionId !== priorSessionId) {
+					pendingNewSessionsRef.current.add(sessionId);
+				}
+				return null;
 			},
 		);
-		if (messageId) setResultFor(messageId, result);
-		// The canvas was created on session-create above; this second call paints the
-		// result onto it (the idempotent guard skips re-creating).
-		if (newSessionId) void openCanvasForNewSession(newSessionId, result);
+	};
+
+	// A query result landed on a thinking's stream (RFC-055): render it inline
+	// against its reply, and paint it when the run asked for that — the first
+	// result of a new session (onto the canvas created above) or a restore.
+	streamResultRef.current = (sessionId, messageId, result) => {
+		setResultFor(messageId, result);
+		if (pendingNewSessionsRef.current.delete(sessionId)) {
+			// The canvas was created on session-create; this paints the result onto
+			// it (the idempotent guard skips re-creating).
+			void openCanvasForNewSession(sessionId, result);
+			return;
+		}
+		if (pendingRestorePaintRef.current.delete(messageId)) paintCanvas(result);
 	};
 
 	// `rerun` re-issues a stored message's query — triggered by clicking a message
@@ -1269,14 +1292,16 @@ export function ExplorerPage() {
 	// store the result inline against that message.
 	const handleRerun = useCallback(
 		async (messageId: string, trigger: "rerun" | "restore" = "rerun") => {
-			const result = await runTraced(trigger, {}, () => rerun(messageId));
-			setResultFor(messageId, result);
 			// Opening a session should show its graph: when the restore path runs
 			// because the saved snapshot was empty, paint the re-run result onto the
-			// canvas. A manual re-run still just renders inline (Load to canvas).
-			if (trigger === "restore" && result) paintCanvas(result);
+			// canvas once it lands. A manual re-run just renders inline (Load to canvas).
+			if (trigger === "restore") pendingRestorePaintRef.current.add(messageId);
+			await runTraced(trigger, {}, async () => {
+				await rerun(messageId);
+				return null;
+			});
 		},
-		[runTraced, rerun, setResultFor, paintCanvas],
+		[runTraced, rerun],
 	);
 
 	// Re-run the latest query-bearing message when a session is opened, to

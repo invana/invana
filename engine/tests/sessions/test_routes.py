@@ -26,6 +26,7 @@ from invana.graphs.deps import (
 )
 from invana.graphs.models import Graph
 from invana.server.app import create_app
+from invana.thinking.runtime import ThinkingRuntime
 
 pytestmark = pytest.mark.asyncio
 
@@ -57,6 +58,13 @@ async def client(session_factory):
 
     app = create_app()
     app.state.graph_connection_manager = object()  # never called on CRUD / nl routes
+    # Lifespan doesn't run under ASGITransport — wire what the routes read off
+    # app.state by hand. The runtime is real: a ql send runs a thinking whose
+    # execute step fails (no connector), which is exactly the path we assert.
+    app.state.db_session_factory = session_factory
+    app.state.thinking_runtime = ThinkingRuntime(
+        session_factory=session_factory, manager=app.state.graph_connection_manager, encryption_key="x"
+    )
 
     async def _override_session():
         async with session_factory() as sess:
@@ -125,3 +133,66 @@ class TestSessionsRoutes:
 
     async def test_get_missing_is_404(self, client):
         assert (await client.get(f"{BASE}/nope")).status_code == 404
+
+
+class TestThinkingRoutes:
+    async def test_send_opens_a_thinking_and_the_trace_is_on_the_record(self, client):
+        """A ql send returns 202 with a thinking; the run settles in the background
+        (the execute step fails here — no graph connection in this harness) and
+        the steps are readable on the thinking, on the session detail, and as a
+        replayed stream (RFC-055 UC1 · UC4 · UC6 · UC12)."""
+        sid = (await client.post(BASE, json={})).json()["id"]
+        resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "MATCH (n) RETURN n LIMIT 1", "mode": "ql"})
+        assert resp.status_code == 202
+        body = resp.json()
+        thinking_id = body["thinking_id"]
+        assert body["assistant_message"]["status"] == "running"
+        assert body["assistant_message"]["thinking_id"] == thinking_id
+        assert body["stream_url"].endswith(f"/thinkings/{thinking_id}/stream")
+
+        # Let the background run settle.
+        runtime = client._transport.app.state.thinking_runtime
+        task = runtime._tasks.get(thinking_id)
+        if task is not None:
+            await task
+
+        th = (await client.get(f"{BASE.replace('/sessions', '/thinkings')}/{thinking_id}")).json()
+        assert th["workflow_key"] == "ql-query"
+        assert th["status"] == "failed"
+        by_key = {s["task_key"]: s for s in th["steps"]}
+        assert by_key["validate_query"]["status"] == "succeeded"
+        assert by_key["validate_query"]["detail"].startswith("read-only")
+        assert by_key["execute_graph_query"]["status"] == "failed"
+        assert by_key["shape_for_canvas"]["status"] == "queued"
+
+        detail = (await client.get(f"{BASE}/{sid}")).json()
+        reply = detail["messages"][1]
+        assert reply["status"] == "error"
+        assert reply["thinking_id"] == thinking_id
+        assert [s["label"] for s in reply["steps"]] == ["Validate", "Execute", "Project"]
+
+        kinds: list[str] = []
+        async with client.stream("GET", body["stream_url"]) as stream:
+            async for line in stream.aiter_lines():
+                if line.startswith("event: "):
+                    kinds.append(line.removeprefix("event: "))
+                if line == "event: thinking.done":
+                    break
+        assert kinds[0] == "thinking.started"
+        assert "step.started" in kinds and "diagnosis" in kinds
+        assert kinds[-1] == "thinking.done"
+
+    async def test_send_refuses_a_write_before_running_it(self, client):
+        """Validate is a step on the record: a mutating query never reaches execute (UC4)."""
+        sid = (await client.post(BASE, json={})).json()["id"]
+        resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "MATCH (n) DELETE n", "mode": "ql"})
+        thinking_id = resp.json()["thinking_id"]
+        runtime = client._transport.app.state.thinking_runtime
+        task = runtime._tasks.get(thinking_id)
+        if task is not None:
+            await task
+        th = (await client.get(f"{BASE.replace('/sessions', '/thinkings')}/{thinking_id}")).json()
+        by_key = {s["task_key"]: s for s in th["steps"]}
+        assert by_key["validate_query"]["status"] == "failed"
+        assert by_key["validate_query"]["error"]["cause"] == "query_not_read_only"
+        assert by_key["execute_graph_query"]["status"] == "queued"
