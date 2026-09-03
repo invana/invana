@@ -6,6 +6,7 @@ import {
 	type ChatSessionTaskStatus,
 } from "@invana/ui";
 import { useEffect, useState } from "react";
+import { formatCompactCount } from "../../../../lib/format";
 import { formatDuration } from "../../../../lib/time";
 import type {
 	Diagnosis,
@@ -193,7 +194,7 @@ export function StepTrace({
 			? formatDuration(step.finishedAt.getTime() - step.startedAt.getTime())
 			: null,
 		step.tokensIn != null
-			? `${step.tokensIn} in · ${step.tokensOut ?? 0} out`
+			? `${formatCompactCount(step.tokensIn)} in · ${formatCompactCount(step.tokensOut ?? 0)} out`
 			: null,
 	]
 		.filter(Boolean)

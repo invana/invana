@@ -8,6 +8,7 @@ import {
 } from "@invana/ui";
 import { Check, ChevronRight, MessageSquare } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { formatCompactCount } from "../../../../lib/format";
 import type { SessionSort } from "../../../../services/api/sessions";
 import { useThinkingStore } from "../../../../stores/thinking.store";
 import type { QueryLanguage } from "../../../../types/graphs";
@@ -326,7 +327,11 @@ export function SessionsPanel({
 									? `needs input · ${v.clarification?.question ?? ""}`
 									: current?.detail
 							}
-							meta={tokens > 0 ? `↑ ${formatTokens(tokens)} tokens` : undefined}
+							meta={
+								tokens > 0
+									? `↑ ${formatCompactCount(tokens)} tokens`
+									: undefined
+							}
 							onClick={() => jumpTo(message.id)}
 						/>
 					);
@@ -521,8 +526,4 @@ export function SessionsPanel({
 			}
 		</ListPanelChrome>
 	);
-}
-
-function formatTokens(n: number): string {
-	return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
