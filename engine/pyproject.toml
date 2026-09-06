@@ -5,44 +5,44 @@ description = "Invana — Graph Intelligence Platform"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "pydantic[email]>=2.0",
-    "pydantic-settings>=2.13.1",
-    "click>=8.0",
+    "pydantic[email]>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "click>=8.5.0",
     "gremlinpython>=3.8.1",
-    "neo4j>=5.0",
-    "sqlalchemy[asyncio]>=2.0",
-    "asyncpg>=0.30",
-    "alembic>=1.15",
-    "cryptography>=42",
+    "neo4j>=6.3.0",
+    "sqlalchemy[asyncio]>=2.0.52",
+    "asyncpg>=0.31.0",
+    "alembic>=1.19.1",
+    "cryptography>=50.0.1",
     "passlib[bcrypt]>=1.7.4",
-    # Pin bcrypt < 5: passlib 1.7.4 trips its internal "wrap bug" check on
+    # Pin bcrypt < 6: passlib 1.7.4 trips its internal "wrap bug" check on
     # bcrypt 5.x, which now raises ValueError for >72-byte passwords during
     # passlib's library init. Upstream fix is awaited in passlib 1.8.
     "bcrypt<5",
-    "PyJWT>=2.8",
+    "PyJWT>=2.13.0",
     # The LLM runtime (RFC-032) calls Ollama + OpenAI-compatible servers over
     # plain HTTP — the providers import httpx at module load, and the LLM client
     # (and the sessions router) import them eagerly, so httpx is required for the
     # engine to import at all. The optional `anthropic`/`openai` SDKs are NOT
     # required: the keyless local/ollama paths use httpx only.
-    "httpx>=0.27",
+    "httpx>=0.28.1",
 ]
 
 [project.optional-dependencies]
 server = [
-    "fastapi>=0.115",
-    "uvicorn>=0.34",
-    "starlette-admin>=0.16",
-    "psycopg2-binary>=2.9",
+    "fastapi>=0.141.1",
+    "uvicorn>=0.52.4",
+    "starlette-admin>=1.0.1",
+    "psycopg2-binary>=2.9.12",
     "itsdangerous>=2.2",
 ]
 telemetry = [
-    "opentelemetry-api>=1.25",
-    "opentelemetry-sdk>=1.25",
-    "opentelemetry-exporter-otlp-proto-grpc>=1.25",
-    "opentelemetry-instrumentation-fastapi>=0.46b0",
-    "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
-    "opentelemetry-instrumentation-logging>=0.46b0",
+    "opentelemetry-api>=1.44.0",
+    "opentelemetry-sdk>=1.44.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.44.0",
+    "opentelemetry-instrumentation-fastapi>=0.65b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.65b0",
+    "opentelemetry-instrumentation-logging>=0.65b0",
     # Note: the browser-span proxy route (RFC-025) forwards OTLP/HTTP via httpx,
     # which is a core dependency (see [project].dependencies) — not repeated here.
 ]
@@ -53,13 +53,13 @@ all = [
 
 [dependency-groups]
 dev = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.25",
-    "pytest-cov>=6.0",
-    "ruff>=0.11",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.5",
     # ASGI test client — FastAPI/Starlette's TestClient is built on httpx, so
     # any HTTP-level route test needs it. Used by tests/**/test_*routes/api*.
-    "httpx>=0.27",
+    "httpx>=0.28.1",
     # Local connector integrations — installed editable so the engine dev env
     # can resolve any connector_class the studio offers (Connection settings).
     # In production, deployers install only the integrations they need.
