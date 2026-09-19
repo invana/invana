@@ -10,8 +10,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import Text, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from invana.runtime.models import RunStatus, TaskRun
 
@@ -133,6 +134,110 @@ class TaskRunQuerySet:
         stmt = (
             select(TaskRun)
             .where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_not(None))
+            .order_by(TaskRun.finished_at.desc().nullslast())
+            .limit(limit)
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def skill_version_counts(self, session: AsyncSession, *, graph_id: str, version_id: str) -> tuple[int, int]:
+        """How many nodes in this Graph were offered one skill version, and how
+        many reported applying it.
+
+        Counted over the whole Graph rather than a recent window: *offered 40,
+        applied 31* is presented as a total, and a total taken from a page is a
+        different number wearing the same label
+        ([US2](docs/for-developers/modules/skills/features/usage.md)).
+
+        ``skills_offered`` is a JSON array and containment operators differ
+        between Postgres and SQLite, so the match is the same quoted-substring
+        test ``core/events/querysets/event.py`` uses on ``skill_ids``. The ids
+        are UUIDs, so a substring hit is an element hit.
+        """
+        like = f'%"{version_id}"%'
+        stmt = select(
+            func.count().filter(TaskRun.skills_offered.cast(Text).like(like)),
+            func.count().filter(TaskRun.skills_applied.cast(Text).like(like)),
+        ).where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_not(None))
+        offered, applied = (await session.execute(stmt)).one()
+        return int(offered or 0), int(applied or 0)
+
+    async def skill_version_by_agent(
+        self, session: AsyncSession, *, graph_id: str, version_id: str
+    ) -> list[tuple[str | None, int, int]]:
+        """``(agent_id, offered, applied)`` for one skill version.
+
+        A step carries no ``agent_id`` of its own — the agent belongs to the run
+        that opened it — so this joins each node to its parent. An agent that was
+        offered the version and never applied it is exactly the row worth seeing,
+        which is why the join is an outer one on the parent rather than a filter.
+        """
+        like = f'%"{version_id}"%'
+        parent = aliased(TaskRun)
+        stmt = (
+            select(
+                parent.agent_id,
+                func.count().filter(TaskRun.skills_offered.cast(Text).like(like)),
+                func.count().filter(TaskRun.skills_applied.cast(Text).like(like)),
+            )
+            .join(parent, parent.id == TaskRun.parent_run_id)
+            .where(TaskRun.graph_id == graph_id, TaskRun.skills_offered.cast(Text).like(like))
+            .group_by(parent.agent_id)
+        )
+        return [(row[0], int(row[1] or 0), int(row[2] or 0)) for row in (await session.execute(stmt)).all()]
+
+    async def skill_version_by_outcome(
+        self, session: AsyncSession, *, graph_id: str, version_id: str
+    ) -> list[tuple[str | None, int, int]]:
+        """``(outcome, offered, applied)`` — *applied in runs that served, versus
+        runs that did not* (US1 C5). The outcome is the **run's**, not the step's:
+        a step can succeed inside a run that never answered.
+        """
+        like = f'%"{version_id}"%'
+        parent = aliased(TaskRun)
+        stmt = (
+            select(
+                parent.outcome,
+                func.count().filter(TaskRun.skills_offered.cast(Text).like(like)),
+                func.count().filter(TaskRun.skills_applied.cast(Text).like(like)),
+            )
+            .join(parent, parent.id == TaskRun.parent_run_id)
+            .where(TaskRun.graph_id == graph_id, TaskRun.skills_offered.cast(Text).like(like))
+            .group_by(parent.outcome)
+        )
+        return [(row[0], int(row[1] or 0), int(row[2] or 0)) for row in (await session.execute(stmt)).all()]
+
+    async def rule_citation_counts(
+        self, session: AsyncSession, *, graph_id: str, versions_by_rule: dict[str, list[str]]
+    ) -> dict[str, int]:
+        """How many steps cited any version of each rule — one query, not one per rule.
+
+        The aggregate list is as long as there are rules in the Graph, which is
+        tens; the alternative is a round trip per row of a list surface.
+        """
+        if not versions_by_rule:
+            return {}
+        columns = []
+        keys = []
+        for rule_id, version_ids in versions_by_rule.items():
+            if not version_ids:
+                continue
+            match = or_(*[TaskRun.rules_cited.cast(Text).like(f'%"{v}"%') for v in version_ids])
+            columns.append(func.count().filter(match))
+            keys.append(rule_id)
+        if not columns:
+            return {}
+        stmt = select(*columns).where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_not(None))
+        row = (await session.execute(stmt)).one()
+        return {key: int(value or 0) for key, value in zip(keys, row, strict=True)}
+
+    async def steps_citing(self, session: AsyncSession, *, graph_id: str, version_ids: list[str], limit: int):
+        """Newest finished steps that cited any of these rule versions."""
+        if not version_ids:
+            return []
+        match = or_(*[TaskRun.rules_cited.cast(Text).like(f'%"{v}"%') for v in version_ids])
+        stmt = (
+            select(TaskRun)
+            .where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_not(None), match)
             .order_by(TaskRun.finished_at.desc().nullslast())
             .limit(limit)
         )

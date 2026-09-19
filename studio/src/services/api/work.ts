@@ -70,6 +70,30 @@ export const agentsApi = {
 			method: "DELETE",
 		}),
 
+	/** Offer a skill to this agent. One skill, one agent — so a refusal names it. */
+	bindSkill: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		skillId: string,
+	) =>
+		request<Agent>(
+			`${base(username, graphSlug)}/agents/${id}/skills/${skillId}`,
+			{ method: "POST" },
+		),
+
+	/** Stop offering it. The next run is not offered it; one in flight is unaffected. */
+	unbindSkill: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		skillId: string,
+	) =>
+		request<Agent>(
+			`${base(username, graphSlug)}/agents/${id}/skills/${skillId}`,
+			{ method: "DELETE" },
+		),
+
 	pause: (username: string, graphSlug: string, id: string) =>
 		request<Agent>(`${base(username, graphSlug)}/agents/${id}/pause`, {
 			method: "POST",

@@ -95,7 +95,7 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | `skills` | `graph_id` · `name` · `current_version_id` |
-| `skill_versions` | `description` · `content` · `when_to_use` · **`plan_id` (NOT NULL, UNIQUE)** · `published_at`, immutable |
+| `skill_versions` | `skill_id` · `version` · `description` · `content` · `when_to_use` · **`plan_id` (NOT NULL, UNIQUE)** · `published_at`, immutable. `plan_id` arrives with [M8](../../../building-engine/task-model-migration.md) — the column is added `NOT NULL` there, over a backfill, never nullable first ([SK13](#decisions)) |
 | `skill_version_clarifications` | `skill_version_id` · `span` · `question` · `options` · `answer` · `answered_by` — recorded, so a redraw never re-asks |
 | Routes | `…/skills*` · `POST …/skills/{id}/versions` |
 | Events | `skill.created · published · deactivated · plan_drafted` |
@@ -121,6 +121,7 @@ On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc
 | SK1 | A skill must state when to use it. |
 | SK2 | Skills are versioned; a published version is immutable. |
 | SK3 | A step records the version it was offered. |
+| SK19 | **Every existing skill becomes its own immutable v1, and the steps that were offered it are rewritten to name it.** `published_at` is the skill's `created_at`; `task_runs.skills_offered` and `.skills_applied` are migrated from bare skill ids to that v1's id, so one id shape means one thing everywhere and no reader carries a *before versions* branch. The claim v1 makes is narrow and stated on the usage surface: *this is the text as it stands, and these steps were offered this skill* — not that the wording never changed before versions existed. |
 | SK4 | Deactivate rather than delete. |
 | SK5 | **A skill's plan hangs off the version, not the skill.** A version is immutable, so a plan can never be stale against the prose it was drawn from — there is no `stale` flag and no reconciliation job. |
 | SK6 | **It is drafted automatically and published deliberately.** The same principle as *Not building → auto-generated skills*: it proposes, a person publishes. Editing prose never silently changes what executes. |

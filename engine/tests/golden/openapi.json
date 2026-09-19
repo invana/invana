@@ -455,6 +455,14 @@
             ],
             "title": "On Behalf Of Name"
           },
+          "rules_cited": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Rules Cited",
+            "type": "array"
+          },
           "run_id": {
             "anyOf": [
               {
@@ -1051,20 +1059,6 @@
               }
             ],
             "title": "Policy"
-          },
-          "skill_ids": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Skill Ids"
           },
           "workflow_spec": {
             "anyOf": [
@@ -6807,6 +6801,337 @@
         "title": "RetireRequest",
         "type": "object"
       },
+      "RuleCitation": {
+        "description": "One step that cited this rule, and which wording it read.",
+        "properties": {
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "step_id": {
+            "title": "Step Id",
+            "type": "string"
+          },
+          "task_key": {
+            "title": "Task Key",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "step_id",
+          "label",
+          "task_key",
+          "rule_version_id",
+          "version",
+          "statement",
+          "finished_at"
+        ],
+        "title": "RuleCitation",
+        "type": "object"
+      },
+      "RuleCitationsResponse": {
+        "description": "Where a rule was cited. The count is over every version; each row says\nwhich wording it read, so deactivating or rewording never rewrites it.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleCitation"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_id",
+          "total",
+          "items"
+        ],
+        "title": "RuleCitationsResponse",
+        "type": "object"
+      },
+      "RuleCreate": {
+        "properties": {
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "statement": {
+            "minLength": 1,
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement"
+        ],
+        "title": "RuleCreate",
+        "type": "object"
+      },
+      "RuleListResponse": {
+        "properties": {
+          "inherited": {
+            "items": {
+              "$ref": "#/components/schemas/RuleRead"
+            },
+            "title": "Inherited",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "RuleListResponse",
+        "type": "object"
+      },
+      "RuleRead": {
+        "description": "The rule and the statement of its current version, flattened.\n\n``scope`` and ``kind`` are derived from ``project_id``\n([RU6](docs/for-developers/modules/skills/features/rules.md)) \u2014 both words\nare on the surface, neither is a column.",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "citations": {
+            "default": 0,
+            "title": "Citations",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version Id"
+          },
+          "graph_id": {
+            "title": "Graph Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "graph_id",
+          "project_id",
+          "scope",
+          "kind",
+          "active",
+          "order",
+          "version",
+          "current_version_id",
+          "statement",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "RuleRead",
+        "type": "object"
+      },
+      "RuleUpdate": {
+        "description": "A rewording, a reorder, or both.\n\nChanging the statement publishes the next version; ``order`` and ``active``\nare properties of the rule and are edited in place\n([RU4](docs/for-developers/modules/skills/features/rules.md)).",
+        "properties": {
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "statement": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statement"
+          }
+        },
+        "title": "RuleUpdate",
+        "type": "object"
+      },
+      "RuleVersionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RuleVersionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "RuleVersionListResponse",
+        "type": "object"
+      },
+      "RuleVersionRead": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "rule_id",
+          "version",
+          "statement",
+          "published_by_id",
+          "published_at"
+        ],
+        "title": "RuleVersionRead",
+        "type": "object"
+      },
       "RunNodeRead": {
         "description": "One node of a run, read as a row of the trace.",
         "properties": {
@@ -8123,6 +8448,7 @@
         "type": "object"
       },
       "SkillRead": {
+        "description": "The skill and the text of its current version, flattened.\n\n``description`` \u00b7 ``content`` \u00b7 ``when_to_use`` read through the head, so a\ncaller renders a skill without knowing versions exist; ``version`` and\n``current_version_id`` are what it needs to say *which* text it got.",
         "properties": {
           "content": {
             "title": "Content",
@@ -8132,6 +8458,17 @@
             "format": "date-time",
             "title": "Created At",
             "type": "string"
+          },
+          "current_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version Id"
           },
           "description": {
             "title": "Description",
@@ -8154,6 +8491,10 @@
             "title": "Updated At",
             "type": "string"
           },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
           "when_to_use": {
             "title": "When To Use",
             "type": "string"
@@ -8163,6 +8504,8 @@
           "id",
           "graph_id",
           "name",
+          "version",
+          "current_version_id",
           "description",
           "content",
           "when_to_use",
@@ -8173,6 +8516,7 @@
         "type": "object"
       },
       "SkillUpdate": {
+        "description": "A rename, a republish, or both.\n\nChanging any of the three text fields publishes the next version; changing\nonly the name does not, because the name is the skill's identity and not\nsomething a step was ever offered\n([SK2](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
         "properties": {
           "content": {
             "anyOf": [
@@ -8224,8 +8568,128 @@
         "title": "SkillUpdate",
         "type": "object"
       },
-      "SkillUsageResponse": {
+      "SkillUsageByAgent": {
+        "description": "Which agents apply it and which never do (C4).\n\nThe agent is the run's, not the step's \u2014 a step carries no agent of its own.",
         "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Name"
+          },
+          "applied": {
+            "title": "Applied",
+            "type": "integer"
+          },
+          "enough_to_read": {
+            "title": "Enough To Read",
+            "type": "boolean"
+          },
+          "gap": {
+            "title": "Gap",
+            "type": "integer"
+          },
+          "offered": {
+            "title": "Offered",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id",
+          "agent_name",
+          "offered",
+          "applied",
+          "gap",
+          "enough_to_read"
+        ],
+        "title": "SkillUsageByAgent",
+        "type": "object"
+      },
+      "SkillUsageByOutcome": {
+        "description": "Applied in runs that served, versus runs that did not (C5).\n\n``outcome`` is the **run's** \u2014 `answered` \u00b7 `cannot_answer` \u00b7 `failed` \u00b7\n`cancelled`, or null on a run that has not settled.",
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "integer"
+          },
+          "enough_to_read": {
+            "title": "Enough To Read",
+            "type": "boolean"
+          },
+          "gap": {
+            "title": "Gap",
+            "type": "integer"
+          },
+          "offered": {
+            "title": "Offered",
+            "type": "integer"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          }
+        },
+        "required": [
+          "outcome",
+          "offered",
+          "applied",
+          "gap",
+          "enough_to_read"
+        ],
+        "title": "SkillUsageByOutcome",
+        "type": "object"
+      },
+      "SkillUsageResponse": {
+        "description": "Everything the Usage tab draws, in one request.\n\n``by_agent`` and ``by_outcome`` are for the **current** version: the page\nreads one text at a time, and a breakdown summed across versions would be\nthe number US3 exists to prevent.",
+        "properties": {
+          "by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/SkillUsageByAgent"
+            },
+            "title": "By Agent",
+            "type": "array"
+          },
+          "by_outcome": {
+            "items": {
+              "$ref": "#/components/schemas/SkillUsageByOutcome"
+            },
+            "title": "By Outcome",
+            "type": "array"
+          },
+          "current_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version Id"
+          },
           "recent_steps": {
             "items": {
               "$ref": "#/components/schemas/SkillUsageStep"
@@ -8243,10 +8707,19 @@
             },
             "title": "Used By",
             "type": "array"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/SkillUsageVersion"
+            },
+            "title": "Versions",
+            "type": "array"
           }
         },
         "required": [
           "skill_id",
+          "current_version_id",
+          "versions",
           "used_by",
           "recent_steps"
         ],
@@ -8279,6 +8752,10 @@
             "title": "Run Id",
             "type": "string"
           },
+          "skill_version_id": {
+            "title": "Skill Version Id",
+            "type": "string"
+          },
           "step_id": {
             "title": "Step Id",
             "type": "string"
@@ -8286,6 +8763,10 @@
           "task_key": {
             "title": "Task Key",
             "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
           }
         },
         "required": [
@@ -8293,10 +8774,234 @@
           "step_id",
           "label",
           "task_key",
+          "skill_version_id",
+          "version",
           "reported",
           "finished_at"
         ],
         "title": "SkillUsageStep",
+        "type": "object"
+      },
+      "SkillUsageVersion": {
+        "description": "Offered, applied and the gap, for one published version.\n\nCounts are per version and never summed across them: publishing v4 starts\nits own count and v3 keeps its history\n([US3](docs/for-developers/modules/skills/features/usage.md)). ``offered``\nis a fact written by prompt assembly; ``applied`` is the model's own report,\nwhich is why the surface says so rather than implying it away (US4).",
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "integer"
+          },
+          "enough_to_read": {
+            "title": "Enough To Read",
+            "type": "boolean"
+          },
+          "gap": {
+            "title": "Gap",
+            "type": "integer"
+          },
+          "offered": {
+            "title": "Offered",
+            "type": "integer"
+          },
+          "skill_version_id": {
+            "title": "Skill Version Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skill_version_id",
+          "version",
+          "offered",
+          "applied",
+          "gap",
+          "enough_to_read"
+        ],
+        "title": "SkillUsageVersion",
+        "type": "object"
+      },
+      "SkillVersionDiff": {
+        "description": "A version against the one before it \u2014 the prose half.\n\nThe plan half arrives with M8, when a version draws one. There is no\n`stale` flag to reconcile: a version is immutable, so its plan can never\ndrift from the prose it was drawn from\n([SK5](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "properties": {
+          "against_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Against Version"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/SkillVersionFieldDiff"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skill_id",
+          "version",
+          "against_version",
+          "fields"
+        ],
+        "title": "SkillVersionDiff",
+        "type": "object"
+      },
+      "SkillVersionFieldDiff": {
+        "description": "One field's before and after, as unified-diff lines.\n\nLines rather than two blobs: the surface draws a diff, and computing one in\nthree places \u2014 the API, the CLI and Studio \u2014 is three chances to disagree\nabout what changed.",
+        "properties": {
+          "changed": {
+            "title": "Changed",
+            "type": "boolean"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "field",
+          "changed",
+          "lines"
+        ],
+        "title": "SkillVersionFieldDiff",
+        "type": "object"
+      },
+      "SkillVersionListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillVersionRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SkillVersionListResponse",
+        "type": "object"
+      },
+      "SkillVersionPublish": {
+        "description": "The next version's text. Anything omitted carries over from the head.",
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "when_to_use": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "When To Use"
+          }
+        },
+        "title": "SkillVersionPublish",
+        "type": "object"
+      },
+      "SkillVersionRead": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "published_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By Id"
+          },
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "when_to_use": {
+            "title": "When To Use",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "skill_id",
+          "version",
+          "description",
+          "content",
+          "when_to_use",
+          "published_by_id",
+          "published_at"
+        ],
+        "title": "SkillVersionRead",
         "type": "object"
       },
       "SortDirection": {
@@ -12822,6 +13527,162 @@
           }
         ],
         "summary": "Retire Agent",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/skills/{skill_id}": {
+      "delete": {
+        "description": "Stop offering a skill to this agent.\n\nThe next run is not offered it; a run already in flight has its prompt and\nis unaffected.",
+        "operationId": "unbind_skill_api_v1_u__username___graphSlug__agents__agent_id__skills__skill_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Unbind Skill",
+        "tags": [
+          "agents"
+        ]
+      },
+      "post": {
+        "description": "Offer a skill to this agent.\n\nA skill reaches a step only through a binding, and a binding names one\nskill and one agent \u2014 which is what gives a refusal something to name.\nBinding what is already bound is a 409: the caller believes it is changing\nthe roster, and it is not.",
+        "operationId": "bind_skill_api_v1_u__username___graphSlug__agents__agent_id__skills__skill_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Bind Skill",
         "tags": [
           "agents"
         ]
@@ -19631,6 +20492,718 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/projects/{key}/rules": {
+      "get": {
+        "description": "This Project's working rules, and the Graph invariants it inherits.\n\nThe inherited half is returned rather than merged: they are read-only here\nand the panel shows them above, greyed \u2014 a project that edits an invariant\nis editing the Graph, which is a different act on a different surface.",
+        "operationId": "list_working_rules_api_v1_u__username___graphSlug__projects__key__rules_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Working Rules",
+        "tags": [
+          "rules"
+        ]
+      },
+      "post": {
+        "operationId": "create_working_rule_api_v1_u__username___graphSlug__projects__key__rules_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Working Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules": {
+      "get": {
+        "description": "Every invariant on this Graph, active and inactive, in offer order.",
+        "operationId": "list_invariants_api_v1_u__username___graphSlug__rules_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Invariants",
+        "tags": [
+          "rules"
+        ]
+      },
+      "post": {
+        "operationId": "create_invariant_api_v1_u__username___graphSlug__rules_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Invariant",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/{rule_id}": {
+      "get": {
+        "operationId": "get_rule_api_v1_u__username___graphSlug__rules__rule_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Rule",
+        "tags": [
+          "rules"
+        ]
+      },
+      "patch": {
+        "description": "Reword it, reorder it, or both. A rewording publishes the next version.",
+        "operationId": "update_rule_api_v1_u__username___graphSlug__rules__rule_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/{rule_id}/activate": {
+      "post": {
+        "operationId": "activate_rule_api_v1_u__username___graphSlug__rules__rule_id__activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Activate Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/{rule_id}/citations": {
+      "get": {
+        "description": "Where this rule was cited, and which wording each step read.\n\nA citation is the model's own claim \u2014 a rule is offered and cited, never\nenforced. Each row names the version it resolved to, so a rewording or a\ndeactivation leaves every past citation reading exactly as it did.",
+        "operationId": "rule_citations_api_v1_u__username___graphSlug__rules__rule_id__citations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleCitationsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Rule Citations",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/{rule_id}/deactivate": {
+      "post": {
+        "description": "Stop offering it. There is no delete: past citations must still resolve.",
+        "operationId": "deactivate_rule_api_v1_u__username___graphSlug__rules__rule_id__deactivate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Deactivate Rule",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/rules/{rule_id}/versions": {
+      "get": {
+        "description": "Every published wording, newest first \u2014 what a citation resolves to.",
+        "operationId": "list_rule_versions_api_v1_u__username___graphSlug__rules__rule_id__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Rule Versions",
+        "tags": [
+          "rules"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/runs": {
       "get": {
         "description": "List runs as rows \u2014 the plan and its verdict, without the steps.\n\nThe route is deliberately one endpoint with filters rather than\n``/agents/{id}/plans`` and ``/workflows/candidates``: both questions are\n\"which runs match this?\", and splitting them would have given *served* two\ndefinitions to drift apart. **The journal is the same endpoint**: a load is\na run, so *what changed my graph* is ``?kind=import`` rather than a surface\nof its own (\u00a7 6.7).",
@@ -21830,6 +23403,312 @@
           }
         ],
         "summary": "Skill Usage",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/versions": {
+      "get": {
+        "description": "Every published version, newest first.\n\nA published version is immutable, so this is a history rather than a list of\ndrafts \u2014 the one at the top is what the next run is offered.",
+        "operationId": "list_skill_versions_api_v1_u__username___graphSlug__skills__skill_id__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillVersionListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Skill Versions",
+        "tags": [
+          "skills"
+        ]
+      },
+      "post": {
+        "description": "Publish the next version. Fields left out carry over from the current one.",
+        "operationId": "publish_skill_version_api_v1_u__username___graphSlug__skills__skill_id__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillVersionPublish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Publish Skill Version",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/versions/{version}": {
+      "get": {
+        "description": "One version by its number \u2014 what a step that named it was actually offered.",
+        "operationId": "get_skill_version_api_v1_u__username___graphSlug__skills__skill_id__versions__version__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillVersionRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Skill Version",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/versions/{version}/diff": {
+      "get": {
+        "description": "What this version changed against the one before it.\n\nUnified diff lines per field. `v1` diffs against nothing rather than against\nempty text \u2014 a first version did not delete anything.",
+        "operationId": "diff_skill_version_api_v1_u__username___graphSlug__skills__skill_id__versions__version__diff_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillVersionDiff"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Diff Skill Version",
         "tags": [
           "skills"
         ]

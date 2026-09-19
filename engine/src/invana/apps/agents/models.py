@@ -19,7 +19,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
 
@@ -112,10 +112,6 @@ class Agent(Base):
     llm_config_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("llm_providers.id", ondelete="SET NULL"), nullable=True
     )
-    # Skill ids as a JSON array rather than a join table: the set is small, read
-    # whole on every prompt assembly, and never queried from the skill side
-    # except by ``GET …/skills/{id}/usage``, which scans the roster.
-    skill_ids: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     # The agent's brief, layered on top of ``graph.instructions``. For a spawned
     # agent this is what its parent told it (docs/for-developers/modules/work/spec.md — the brief is all a
     # child receives; never the parent's step history).
@@ -145,7 +141,31 @@ class Agent(Base):
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
     )
 
+    #: The skills this agent is offered, through ``skill_bindings``
+    #: ([BN6](docs/for-developers/modules/skills/features/bindings.md)).
+    #: **Read-only**: binding is a write with its own refusal and its own event,
+    #: so ``SkillBindingManager`` owns it and nothing sets this.
+    # Un-annotated on purpose: ``Mapped[list]`` without a parameter reads as a
+    # scalar to declarative, and the attribute comes back ``None`` instead of an
+    # empty collection. The target is named by string, so this package still
+    # imports nothing from ``apps/skills``.
+    bound_skills = relationship(
+        "Skill",
+        secondary="skill_bindings",
+        lazy="selectin",
+        viewonly=True,
+    )
+
     # ── derived ──────────────────────────────────────────────────────────────
+
+    @property
+    def skill_ids(self) -> list[str]:
+        """What prompt assembly, delegation and the roster badge read.
+
+        Kept as a name so the readers did not all have to learn that the
+        binding moved; what changed is that nothing can assign to it.
+        """
+        return sorted(s.id for s in (self.bound_skills or []))
 
     @property
     def effective_budget(self) -> dict:

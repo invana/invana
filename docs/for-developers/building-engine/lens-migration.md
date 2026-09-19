@@ -22,7 +22,7 @@ Check this before writing anything — two columns are already there and nothing
 | `task_runs.lens_id` · `task_runs.lens_snapshot` | **exist**, migration `000000000039_a_step_is_a_run`. Never written, never read |
 | `lenses` table | does not exist |
 | Anything that resolves or freezes a lens | does not exist |
-| Latest migration | `000000000043_canvases_are_boards` — the next is `44` |
+| Latest migration | `000000000044_a_skill_is_its_versions` ([skills-pass](skills-pass.md) took `44`, which this document had reserved) — the next is `45` |
 | The catalogue | `engine/src/invana/runtime/catalogue/registry.py` |
 | The interpreter | `engine/src/invana/runtime/` |
 | Connectors | `engine/src/invana/graph/connectors/` |
@@ -60,7 +60,7 @@ Without this a selector has nothing legal to name ([GV14](../modules/govern/spec
 |---|---|
 | Changes | `engine/src/invana/apps/modeller/` — the published model version gains `axes` |
 | Shape | `{"time": {"property": "observed_at"}, "geo": {"property": "country_iso", "vocab": "iso2"}, "dims": [{"property": "channel", "type": "str"}]}` |
-| Migration | `44_a_model_declares_its_axes` |
+| Migration | `45_a_model_declares_its_axes` |
 | Studio | the model editor gains an **Axes** section — declaring one is a modelling act, not a lens one |
 | Feature file | [domain-models](../modules/connect-and-model/features/domain-models.md) — add the capability and a decision |
 

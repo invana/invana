@@ -54,6 +54,13 @@ SUBMIT_QUERY_TOOL = {
             "items": {"type": "string"},
             "description": "Names of the skills above you actually followed for this answer. [] if none.",
         },
+        # Also a self-report. A rule is cited by its statement because that is
+        # what the model was shown — ids would be one more thing to hallucinate.
+        "rules_cited": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "The exact statements of the rules above you followed for this answer. [] if none.",
+        },
     },
     # All required: a relaxed required-set makes some models omit `query`
     # entirely. Branch on `action` in code; unused fields are sent as ""/[].
@@ -67,6 +74,7 @@ SUBMIT_QUERY_TOOL = {
         "options",
         "options_query",
         "skills_applied",
+        "rules_cited",
     ],
 }
 
@@ -95,6 +103,8 @@ class GeneratedQuery:
     rationale: str
     # What the model says it followed. A self-report, labelled as one.
     skills_applied: list[str]
+    # The rule statements it says it followed. Also a self-report.
+    rules_cited: list[str]
     usage: TokenUsage
     #: The call as a reader reads it — drawn as the step dashboard's Output
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
@@ -128,7 +138,13 @@ class Clarification:
     duration_ms: float = 0.0
 
 
-def _system_prompt(language: str, model_context: str, skills: str = "", instructions: str = "") -> str:
+def _system_prompt(
+    language: str,
+    model_context: str,
+    skills: str = "",
+    instructions: str = "",
+    rules: str = "",
+) -> str:
     return (
         f"You translate a natural-language question into a single READ-ONLY {language} query "
         "against the graph described below. Use ONLY the node and edge types listed — never invent "
@@ -171,6 +187,11 @@ def _system_prompt(language: str, model_context: str, skills: str = "", instruct
         f"Target query language: {language}\n\n"
         + (f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "")
         + (f"Skills you may apply (name each one you follow in skills_applied):\n{skills}\n\n" if skills else "")
+        + (
+            f"Rules that are always true here (quote each statement you follow in rules_cited):\n{rules}\n\n"
+            if rules
+            else ""
+        )
         + f"Graph model:\n{model_context}"
     )
 
@@ -205,10 +226,11 @@ async def nl_to_query(
     encryption_key: str,
     skills: str = "",
     instructions: str = "",
+    rules: str = "",
     history: list[dict] | None = None,
     timeout_s: float = 120.0,
 ) -> GeneratedQuery | Clarification:
-    system = _system_prompt(language, render_model_context(version), skills, instructions)
+    system = _system_prompt(language, render_model_context(version), skills, instructions, rules)
     messages = [*(history or []), {"role": "user", "content": prompt}]
     result = await complete_tool(
         provider=provider,
@@ -253,6 +275,7 @@ async def nl_to_query(
         read_only=True,
         rationale=str(data.get("rationale") or ""),
         skills_applied=[str(s).strip() for s in (data.get("skills_applied") or []) if str(s).strip()],
+        rules_cited=[str(r).strip() for r in (data.get("rules_cited") or []) if str(r).strip()],
         usage=result.usage,
         exchange=result.exchange,
         duration_ms=result.duration_ms,

@@ -224,6 +224,8 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | *Modeller and Stitching* (`db0a313c-1401-49ad-965f-0727364020fa`) | [1.6 Stitch models](modules/connect-and-model/features/stitch-models.md) — 13 artboards | two | current |
 | *Agents at Work Wireframes* (`58f2e380-ef59-41cd-8c96-d3dc7ddd06e4`) | the 42 hi-fi artboards | six | current, and the oldest — it predates the shell contract |
 
+**Owed: one page.** How a plan's strip draws **nested repetition** and **approval gates** is not drawn yet — the brief is [building-studio/drawing-repetition-and-gates.md](building-studio/drawing-repetition-and-gates.md).
+
 **Where the generators live.** `.design/canvas-<name>/` — Python over the shared kit, never hand-written
 artboard HTML. `.design/` is gitignored: the canvas is the source and the generator is the build, so a
 canvas is rebuilt by re-running its scripts, never by editing a `.dc.html` by hand.

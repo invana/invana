@@ -103,9 +103,9 @@ governs.
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
 | 6.1 | [Authoring a skill](modules/skills/features/authoring-a-skill.md) | Name · description · content · when to use | ✅ | — | 🟡 | S5 |
-| 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | ✅ | — | 🟡 | S12c |
+| 6.2 | [Offer a skill to an agent](modules/skills/features/bindings.md) | Which agent may be offered which skill | 🟡 | — | 🟡 | S12c |
 | 6.3 | [Where a skill was used](modules/skills/features/usage.md) | Where a skill was offered, and where it was reported applied | ✅ | — | 🟡 | S12c |
-| 6.4 | [Rules](modules/skills/features/rules.md) | Graph invariants and project working rules, offered as statements | 🔵 | — | 🔵 | S12b |
+| 6.4 | [Rules](modules/skills/features/rules.md) | Graph invariants and project working rules, offered as statements | ✅ | — | 🔵 | S12b |
 
 ## 7 · [Workflows](modules/workflows/spec.md)
 
@@ -211,6 +211,7 @@ What has actually landed, newest first. A slice is here only when it runs from a
 
 | Slice | Landed | What |
 |---|---|---|
+| S5 · S12b · S12c (Skills) | 2026-09-19 | **Skills, all but one check.** A skill is its versions — `skill_versions` with publish-on-edit, the previous one still resolving, and the prose diff · a step records the **version** it was offered, so *offered 40, applied 31* is a claim about one text and v4 starts its own count · a binding is a row (`skill_bindings`, owned by Skills) with `POST`/`DELETE …/agents/{id}/skills/{skill_id}` and its two events, replacing the JSON array nobody could refuse one skill from · `rules` · `rule_versions` end to end: one statement, two scopes off one column, offered as discrete numbered lines in a fixed order and cited back per step, deactivated rather than deleted · usage by version, by agent and by outcome, with `enough_to_read` instead of a percentage. **[BN5](modules/skills/features/bindings.md)'s bind-time check is not in it** — the envelope half needs a skill's plan (M8) and the lens half needs an agent's lens (lens-migration), and a bind is never refused on grounds it did not check |
 | S12e | 2026-09-09 | **Agents, closed.** The Graph's ceiling: `max_concurrent_task_runs` and a policy (`queue` · `refuse`), a slot per run with delegated children counted, a person served before a schedule, a queue with a readable position, a refusal that names the bound, and `GET …/contention` behind the counts in the settings form. The **Coordinator** is seeded as the one agent that may delegate — bounded at depth 2 and three children — so the path is reachable at last, and a child's trace nests under the step that spawned it |
 | S12 (Explore) | 2026-09-09 | **Explore, closed.** The assistant: the Sessions panel moved to the right side as the `assistant` occupant of `?right=`, the canvas selection riding above the composer as a named, removable chip, and the trigger in the header's panel controls. Node expand and the canvas version-history timeline were already built; the index said otherwise |
 | S9b–S9f | 2026-09-09 | **Ask, closed.** `emissions` — an answer is a record now, so it survives a reload · five result templates shipped, `accepts` checked before render, the switcher on the emission header offering what else fits and why the rest cannot · `projection_templates` and `task_prompts` with authoring · `task_runs.outcome` (`answered · cannot_answer · failed · cancelled`) · `GET …/task_runs/{id}/trace` and the trace opening from an emission's own citation · the cannot-answer card and the diagnosis drawn as different things |
@@ -233,7 +234,7 @@ Where a 🟡 stops, so nobody re-derives it from the code.
 
 | # | Feature | Built | Missing |
 |---|---|---|---|
-| 6.3 | Usage | Offered and applied recorded per step | The usage surface and skill versions |
+| 6.2 | Offer a skill to an agent | The binding table, bind and unbind with their events, bindings at create and at spawn | [BN5](modules/skills/features/bindings.md)'s bind-time check — blocked on a skill having a plan (M8) and an agent having a lens |
 | 7.1 | The library | Library list and detail | Served rate, match counts, and the diff view |
 | 9.1 | Projects and tasks | Tables, status machine, derived plan, activity tree | The live step list on a task; `needs_input` rendering; cross-project dependencies |
 | 11.1 · 11.3 | Accounts · Sessions | Users, bcrypt, JWT access and refresh, superuser-provisioned register, `invana init` | Account self-service edge cases — sole superuser and owns-a-Graph refusals; the profile tabs |

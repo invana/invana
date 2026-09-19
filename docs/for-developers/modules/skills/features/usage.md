@@ -61,8 +61,11 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| Source | `task_runs.skills_offered` and `.skills_applied` |
+| Source | `task_runs.skills_offered` and `.skills_applied` — **`skill_version_id`s**, never bare skill ids ([US3](#decisions) · [SK19](authoring-a-skill.md#decisions)) |
 | Derivation | counted on read from the record; no separate store |
+| The counts | SQL over every step in the Graph, per version — not over the window the step list pages through. A total taken from a page is a different number wearing the same label |
+| The step list | bounded, newest first, each row naming the version it read |
+| Bindings | read from `skill_bindings` ([BN6](bindings.md#decisions)), not by scanning the roster |
 | Routes | `GET …/skills/{id}/usage` |
 
 ## Surfaces, as drawn
@@ -84,6 +87,8 @@ On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc
 | US2 | Usage is derived from the record, never accumulated in a counter. |
 | US3 | Counts are per version. |
 | US4 | Application is self-reported, and the surface says so. |
+| US6 | **The engine sends counts and says whether they are readable; it never sends a percentage.** *Offered 3, applied 1* is not 33% — it is three runs. Every bucket carries `enough_to_read`, false below a floor the engine owns, so the API, the CLI and Studio all draw *too few to read* at the same point instead of each picking a threshold. A percentage computed on the surface would put that judgement in three places. |
+| US5 | **Counts before versions existed are v1's.** The migration rewrites every historical step to name v1 ([SK19](authoring-a-skill.md#decisions)), so there is no unattributed bucket and no *before versions* row on the surface. |
 
 ## Not building
 

@@ -48,12 +48,16 @@ class AgentQuerySet:
         stmt = select(Agent).where(Agent.parent_agent_id == agent_id).order_by(Agent.created_at)
         return list((await session.execute(stmt)).scalars().all())
 
-    async def bound_to_skill(self, session: AsyncSession, *, graph_id: str, skill_id: str) -> list[Agent]:
-        """Agents carrying a skill. ``skill_ids`` is a JSON array rather than a
-        join table, so this filters in Python — the roster is tens of rows, and
-        a JSON containment operator would not work on SQLite."""
-        rows = await self.list_for_graph(session, graph_id, include_ephemeral=True, include_retired=True)
-        return [a for a in rows if skill_id in (a.skill_ids or [])]
+    async def by_ids(self, session: AsyncSession, *, graph_id: str, ids: list[str]) -> list[Agent]:
+        """The named agents in one Graph, ordered by name.
+
+        Scoped to the Graph even though the ids came from inside it: a queryset
+        that trusts its input is one refactor away from leaking a row.
+        """
+        if not ids:
+            return []
+        stmt = select(Agent).where(Agent.graph_id == graph_id, Agent.id.in_(ids)).order_by(Agent.name)
+        return list((await session.execute(stmt)).scalars().all())
 
     async def add(self, session: AsyncSession, agent: Agent) -> Agent:
         session.add(agent)

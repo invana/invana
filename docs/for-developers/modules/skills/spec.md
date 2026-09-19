@@ -52,7 +52,7 @@ be enforced is not a rule; it is an envelope bound ([Agents](../agents/spec.md))
 |---|---|
 | `skills` | `graph_id` · `name` (unique per Graph) · `current_version_id` |
 | `skill_versions` | `skill_id` · `version` · `description` · `content` · `when_to_use` · `published_at` — immutable once published |
-| `agent_skills` | `agent_id` · `skill_id` — the binding follows the current version |
+| `skill_bindings` | `skill_id` · `agent_id` · `bound_by` · `bound_at` — the binding follows the current version ([BN6](features/bindings.md#decisions)) |
 | `rules` | `scope (graph\|project)` · `owner_id` · `kind (invariant\|working)` · `active` · `order` · `current_version_id` |
 | `rule_versions` | `rule_id` · `version` · `statement` · `published_at` — immutable once published |
 | Usage | derived: every step that was offered a skill *version*, and whether it reported applying it |

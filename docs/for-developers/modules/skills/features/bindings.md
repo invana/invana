@@ -59,7 +59,8 @@ flowchart LR
 
 | Thing | Shape |
 |---|---|
-| `agent_skills` | `agent_id` · `skill_id` · `bound_by` · `bound_at` |
+| `skill_bindings` | `skill_id` · `agent_id` · `bound_by_id` · `bound_at` — unique on `(skill_id, agent_id)`. **Owned by `apps/skills/`**, which imports no agent to write one ([BN6](#decisions)) |
+| The agent's side | `Agent.bound_skills`, a **read-only** association over the same table. `agent.skill_ids` reads through it; nothing assigns to it ([BN8](#decisions)) |
 | Assembly | bound skills resolve to their current version at run time |
 | Routes | `POST DELETE …/agents/{id}/skills/{skill_id}` |
 | Events | `agent.skill_bound · skill_unbound` |
@@ -85,6 +86,9 @@ On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc
 | BN3 | Unbinding affects the next run, never one in flight. |
 | BN4 | A spawned agent's bindings are named at spawn time. |
 | BN5 | **A binding is checked against the agent's envelope *and* its lens, both at bind time.** The envelope check already refuses a skill whose plan names a `step_key` the agent may not call ([orchestration §0.7](../../../orchestration.md#07-agents-skills-and-plans--three-things-composed-at-run-time)); the same check reads the agent's lens and refuses a skill whose plan needs a participant the agent's guardrails deny — naming the rule, exactly as the envelope refusal names the bound. Binding *Escalate a late supplier* to an agent whose guardrail denies `third_party/**` must fail when someone binds it, not at 3am inside a run. **A narrower world at run time is not a binding error** — a Todo may always narrow further than the agent ([GV6](../../govern/spec.md)), and that produces *cannot answer — outside the lens*, which is recoverable by widening. |
+| BN6 | **The binding is a row in `skill_bindings`, and the table belongs to Skills.** Skills is an independent module that agents bind to, so the table is named for what it binds — not `agent_skills`, and not a JSON array on the agent. The write path is what makes [BN5](#decisions) possible: a `PATCH` replacing a whole array has no single skill to refuse, no `bound_by`, and no place to raise the event. `agents.skill_ids` is migrated into rows and dropped; prompt assembly, delegation and usage read the table. The subject is a plain `agent_id` FK — binding anything other than an agent is not a thing the product does. |
+| BN7 | **Both halves of [BN5](#decisions) wait on what they read; the write path does not wait on them.** The envelope half reads the **plan** a skill version draws, which arrives with [M8](../../../building-engine/task-model-migration.md); the lens half reads the agent's **lens**, which arrives with [lens-migration](../../../building-engine/lens-migration.md) — today a lens exists only on a run (`task_runs.lens_id` · `lens_snapshot`). So `skill_bindings` and its two routes ship first and the checks hang off them. Until each lands, a bind is **never refused on grounds it did not check**: a half-built check that says so beats one that silently passes. |
+| BN8 | **Binding is not a field of the agent.** `POST`/`DELETE …/agents/{id}/skills/{skill_id}` is the only way to change a roster; `AgentUpdate` does not take `skill_ids` and `AgentRead` carries it read-only. `AgentCreate` still takes it, because the roster an agent starts with is part of creating it — the same act as a spawned agent's bindings being named at spawn ([BN4](#decisions)) — and those bind through the same manager. In Studio the picker binds as you click rather than staging into `Save`: a refusal that arrived alongside six other edits could not say which one it was about. |
 
 ## Not building
 

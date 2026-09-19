@@ -20,7 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent
-from invana.apps.skills.models import Skill
+from invana.apps.skills.models import RuleVersion, Skill, SkillVersion
 from invana.apps.work.schemas import ActivityNode, TaskActivityResponse
 from invana.core.auth.models import User
 from invana.core.events.models import ActorKind, Event
@@ -76,6 +76,7 @@ class TreeManager:
 
         names = await _principal_names(session, events=events, runs=runs)
         skill_names = await _skill_names(session, steps=steps)
+        rule_statements = await _rule_statements(session, steps=steps)
 
         nodes: dict[str, ActivityNode] = {}
         for event in events:
@@ -112,6 +113,7 @@ class TreeManager:
                 run_id=step.parent_run_id,
                 skills_offered=[skill_names.get(s, s) for s in (step.skills_offered or [])],
                 skills_applied=[skill_names.get(s, s) for s in (step.skills_applied or [])],
+                rules_cited=[rule_statements[r] for r in (step.rules_cited or []) if r in rule_statements],
                 tokens_in=step.tokens_in,
                 tokens_out=step.tokens_out,
                 at=step.started_at,
@@ -183,12 +185,38 @@ async def _principal_names(session: AsyncSession, *, events: list[Event], runs: 
     return out
 
 
+async def _rule_statements(session: AsyncSession, *, steps: list[TaskRun]) -> dict[str, str]:
+    """``rule_version_id`` → the wording that was offered.
+
+    The version, not the rule: a citation says what the step read, so rewording
+    the rule afterwards must not rewrite the trace (RU4 · C5).
+    """
+    ids: set[str] = set()
+    for step in steps:
+        ids.update(step.rules_cited or [])
+    if not ids:
+        return {}
+    stmt = select(RuleVersion.id, RuleVersion.statement).where(RuleVersion.id.in_(list(ids)))
+    return dict((await session.execute(stmt)).all())
+
+
 async def _skill_names(session: AsyncSession, *, steps: list[TaskRun]) -> dict[str, str]:
+    """``skill_version_id`` → the skill's name, for the steps in this tree.
+
+    A step records the version it was offered (SK3), so the join goes through
+    ``skill_versions``. An id that resolves to nothing — a skill deleted since
+    the step ran — falls back to the id itself at the call site, which is what
+    it did before versions existed.
+    """
     ids: set[str] = set()
     for step in steps:
         ids.update(step.skills_offered or [])
         ids.update(step.skills_applied or [])
     if not ids:
         return {}
-    rows = (await session.execute(select(Skill.id, Skill.name).where(Skill.id.in_(list(ids))))).all()
-    return dict(rows)
+    stmt = (
+        select(SkillVersion.id, Skill.name)
+        .join(Skill, Skill.id == SkillVersion.skill_id)
+        .where(SkillVersion.id.in_(list(ids)))
+    )
+    return dict((await session.execute(stmt)).all())

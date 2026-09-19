@@ -31,11 +31,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent, AgentKind, AgentLifetime, AgentStatus
+from invana.apps.skills.managers import SkillBindingManager
+from invana.apps.skills.querysets import SkillQuerySet
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import current_trace_id, emit_event
 from invana.runtime.models import RunStatus, TaskRun, TaskStream
 from invana.runtime.querysets import TaskRunQuerySet
+
+_skills = SkillQuerySet()
+_bindings = SkillBindingManager()
 
 # How long a parent waits on one child before failing its own `delegate` step.
 DEFAULT_CHILD_TIMEOUT_S = 300.0
@@ -146,7 +151,6 @@ async def spawn(
         instructions=instructions,
         workflow_spec=narrowed["workflow_spec"],
         llm_config_id=llm_id or parent.llm_config_id,
-        skill_ids=narrowed["skill_ids"],
         budget=narrowed["budget"],
         # Bounded agency does not propagate by default: a spawned agent cannot
         # spawn unless it was deliberately given the policy.
@@ -158,6 +162,17 @@ async def spawn(
     )
     db.add(child)
     await db.flush()
+
+    # A spawned agent's bindings are named at spawn (BN4) and are rows like any
+    # other, written by the one manager that writes them. The parent is the
+    # actor: nobody typed this.
+    for skill_id in narrowed["skill_ids"]:
+        skill = await _skills.get(db, skill_id)
+        if skill is None:
+            continue
+        await _bindings.bind(db, skill=skill, agent_id=child.id, agent_name=child.name, actor_id=parent.id)
+    await db.refresh(child, ["bound_skills"])
+
     await emit_event(
         db,
         action=actions.AGENT_SPAWN,

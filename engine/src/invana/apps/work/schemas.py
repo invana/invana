@@ -107,6 +107,9 @@ class ActivityNode(BaseModel):
     status: str | None = None
     skills_offered: list[str] = []
     skills_applied: list[str] = []
+    #: The statements this step cited, resolved to the wording it was offered —
+    #: a citation must still read after the rule is reworded or deactivated.
+    rules_cited: list[str] = []
     tokens_in: int | None = None
     tokens_out: int | None = None
     at: datetime | None = None

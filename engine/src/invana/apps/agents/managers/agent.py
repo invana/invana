@@ -24,6 +24,7 @@ from invana.apps.agents.schemas import (
 )
 from invana.apps.graphs.models import Graph
 from invana.apps.llm_providers.querysets import LLMProviderQuerySet
+from invana.apps.skills.managers import SkillBindingManager, SkillManager
 from invana.apps.work.models import Task, TaskStatus
 from invana.apps.work.querysets import TaskQuerySet
 from invana.core.auth.models import User
@@ -34,7 +35,9 @@ from invana.core.events.services import current_trace_id, diff_changed_fields, e
 
 """Service layer for agents — the roster, the lifecycle, and lineage."""
 
-_UPDATABLE = ["name", "description", "instructions", "workflow_spec", "llm_config_id", "skill_ids", "budget", "policy"]
+# No ``skill_ids``: the roster is `skill_bindings`, and binding is its own write
+# with its own refusal and its own event (BN6).
+_UPDATABLE = ["name", "description", "instructions", "workflow_spec", "llm_config_id", "budget", "policy"]
 
 
 def agent_actor(agent: Agent) -> dict:
@@ -55,6 +58,10 @@ class AgentManager:
     querysets = AgentQuerySet()
     providers = LLMProviderQuerySet()
     tasks = TaskQuerySet()
+    # Binding is Skills' rule, called from here rather than reimplemented: this
+    # package writes no `skill_bindings` row of its own (BN6).
+    skills = SkillManager()
+    bindings = SkillBindingManager()
 
     async def seed_agents(self, session: AsyncSession, *, graph: Graph) -> list[Agent]:
         """Give a graph the agents it is born with, idempotently.
@@ -160,7 +167,6 @@ class AgentManager:
             kind=AgentKind.authored.value,
             workflow_spec=spec or {},
             llm_config_id=payload.llm_config_id,
-            skill_ids=list(payload.skill_ids),
             budget=payload.budget,
             policy=payload.policy,
             created_by_kind="user",
@@ -170,6 +176,21 @@ class AgentManager:
             await self.querysets.add(session, agent)
         except IntegrityError as exc:
             raise ConflictError(f"An agent named '{payload.name}' already exists in this graph.") from exc
+
+        # The roster this agent starts with, bound as part of creating it. Each
+        # one goes through the binding manager, so a skill the envelope refuses
+        # refuses the create rather than slipping in through a back door.
+        for skill_id in dict.fromkeys(payload.skill_ids):
+            skill = await self.skills.get(session, skill_id=skill_id, graph_id=graph.id)
+            await self.bindings.bind(
+                session,
+                skill=skill,
+                agent_id=agent.id,
+                agent_name=agent.name,
+                actor_id=actor.id,
+            )
+        await session.refresh(agent, ["bound_skills"])
+
         await emit_event(
             session,
             action=actions.AGENT_CREATE,

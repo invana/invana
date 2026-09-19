@@ -28,6 +28,7 @@ export interface Agent {
 	/** The envelope: allow-list · pinned args · require · templates · budgets. */
 	workflow_spec: Record<string, unknown>;
 	llm_config_id: string | null;
+	/** Read-only — the roster is `skill_bindings`; change it with bind/unbind. */
 	skill_ids: string[];
 	budget: Record<string, number>;
 	policy: Record<string, boolean>;
@@ -54,12 +55,17 @@ export interface AgentCreate {
 	envelope_from?: string;
 	workflow_spec?: Record<string, unknown>;
 	llm_config_id?: string | null;
+	/** The roster this agent starts with, bound as part of creating it. */
 	skill_ids?: string[];
 	budget?: Record<string, number>;
 	policy?: Record<string, boolean>;
 }
 
-export type AgentUpdate = Partial<Omit<AgentCreate, "envelope_from">>;
+/** No `skill_ids`: binding is its own write, so that a refusal can name the one
+ *  skill it rejected rather than a whole list. */
+export type AgentUpdate = Partial<
+	Omit<AgentCreate, "envelope_from" | "skill_ids">
+>;
 
 /** A lineage node. Heterogeneous by design — docs/for-developers/modules/agents/features/lineage.md */
 export interface AgentNode {

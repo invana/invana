@@ -25,7 +25,6 @@ class AgentView(ModelView):
         "instructions",
         "workflow_spec",
         "llm_config_id",
-        "skill_ids",
         "budget",
         "policy",
         "parent_agent_id",

@@ -35,7 +35,7 @@ from invana.apps.sessions.models import Session
 from invana.apps.sessions.transcript import (
     _assemble_history,
 )
-from invana.apps.skills.models import Skill
+from invana.apps.skills.models import Rule, Skill
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import Emitter
@@ -162,9 +162,12 @@ class RunVars:
     grounding: GraphVersion | None = None
     # The prose the agent carries into every prompt (docs/for-developers/modules/ask/features/reasoning-trace.md).
     # ``skills`` is
-    # the rows; ``skill_names`` maps a model's self-reported name back to an id
-    # so ``skills_applied`` stores ids like ``skills_offered`` does.
+    # the rows; a model's self-reported name maps back to that skill's current
+    # **version** id, so ``skills_applied`` stores what ``skills_offered`` does.
     skills: list[Skill] = field(default_factory=list)
+    #: The statements always true in this run's scope — graph invariants, then
+    #: the project's working rules, in that fixed order (skills/spec.md § 4).
+    rules: list[Rule] = field(default_factory=list)
     instructions: str = ""
     # The agent this run thinks through, and the envelope that bounds it.
     agent: Any = None
@@ -363,22 +366,49 @@ def _query_failure(exc: QueryExecutionError, *, query: str, mode: str) -> TaskFa
 # ── nl-query / ql-query ───────────────────────────────────────────────────────
 
 
-def offered_skill_ids(v: RunVars) -> list[str]:
+def offered_skill_version_ids(v: RunVars) -> list[str]:
     """What prompt assembly is about to put in front of the model.
 
     Recorded on the step **before** the call, because *offered* is a fact about
     the prompt — it stays true whether or not the model says anything about it.
+
+    The **version** is what is recorded, never the bare skill id
+    ([SK3](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
+    the prose in this prompt is one particular published text, and a count that
+    spans a rewrite is a claim about two different skills wearing one name
+    ([US3](docs/for-developers/modules/skills/features/usage.md)).
     """
-    return [s.id for s in v.skills]
+    return [s.current_version_id for s in v.skills if s.current_version_id]
+
+
+def offered_rule_version_ids(v: RunVars) -> list[str]:
+    """The rule versions this prompt carries, in the order it carries them.
+
+    A fact about the prompt, recorded before the call — the same shape and the
+    same reason as the skills above (RU7).
+    """
+    return [r.current_version_id for r in v.rules if r.current_version_id]
+
+
+def cited_rule_version_ids(v: RunVars, statements: list[str]) -> list[str]:
+    """Map the model's citations back to the versions it was offered.
+
+    The model cites a rule by its **statement**, because that is what it was
+    shown; anything that does not match one of the offered statements is
+    dropped, exactly as an unknown skill name is. A rule is offered and cited,
+    never enforced (RU5) — nothing downstream reads this as permission.
+    """
+    by_statement = {r.statement.strip().lower(): r.current_version_id for r in v.rules if r.current_version_id}
+    return [by_statement[k] for s in statements if (k := s.strip().lower()) in by_statement]
 
 
 def _report_ids(v: RunVars, names: list[str]) -> list[str]:
-    """Map the model's self-reported skill names back to ids.
+    """Map the model's self-reported skill names back to version ids.
 
     A name the graph does not have is dropped rather than stored: a report
     about a skill that was never offered is noise, not evidence.
     """
-    by_name = {s.name.lower(): s.id for s in v.skills}
+    by_name = {s.name.lower(): s.current_version_id for s in v.skills if s.current_version_id}
     return [by_name[n.lower()] for n in names if n.lower() in by_name]
 
 

@@ -23,6 +23,7 @@ from invana.apps.agents.schemas import (
     RetireRequest,
 )
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.skills.managers import SkillBindingManager, SkillManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -33,6 +34,8 @@ from invana.server.graphs.deps import require_graph_member, resolve_graph_by_use
 
 agents = AgentManager()
 lifecycle = AgentLifecycleManager()
+skills = SkillManager()
+bindings = SkillBindingManager()
 
 
 async def list_agents(
@@ -190,4 +193,46 @@ async def set_default_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=payload.agent_id, graph_id=graph.id)
     await agents.set_default_agent(session, graph=graph, agent=agent, actor=user)
+    return AgentRead.model_validate(agent)
+
+
+async def bind_skill(
+    agent_id: str = Path(...),
+    skill_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """Offer a skill to this agent.
+
+    A skill reaches a step only through a binding, and a binding names one
+    skill and one agent — which is what gives a refusal something to name.
+    Binding what is already bound is a 409: the caller believes it is changing
+    the roster, and it is not.
+    """
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    await bindings.bind(session, skill=skill, agent_id=agent.id, agent_name=agent.name, actor_id=user.id)
+    await session.refresh(agent, ["bound_skills"])
+    return AgentRead.model_validate(agent)
+
+
+async def unbind_skill(
+    agent_id: str = Path(...),
+    skill_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AgentRead:
+    """Stop offering a skill to this agent.
+
+    The next run is not offered it; a run already in flight has its prompt and
+    is unaffected.
+    """
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    await bindings.unbind(session, skill=skill, agent_id=agent.id, agent_name=agent.name, actor_id=user.id)
+    await session.refresh(agent, ["bound_skills"])
     return AgentRead.model_validate(agent)

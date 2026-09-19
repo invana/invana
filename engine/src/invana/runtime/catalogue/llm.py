@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from invana.apps.llm import LLMError, QueryNotReadOnlyError
 from invana.apps.llm.clarify import ground_options
-from invana.apps.llm.grounding import render_skills
+from invana.apps.llm.grounding import render_rules, render_skills
 from invana.apps.llm.intent import OutOfScope, understand
 from invana.apps.llm.planner import generate_plan
 from invana.apps.llm.propose import propose_model
@@ -29,7 +29,9 @@ from invana.runtime.catalogue.contract import (
     _plural,
     _provider_label,
     _report_ids,
-    offered_skill_ids,
+    cited_rule_version_ids,
+    offered_rule_version_ids,
+    offered_skill_version_ids,
     query_language_for,
 )
 from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
@@ -58,7 +60,8 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     something discovered after an empty result.
     """
     assert v.provider is not None
-    ctx.step.skills_offered = offered_skill_ids(v)
+    ctx.step.skills_offered = offered_skill_version_ids(v)
+    ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · reading the ask against the model")
     try:
         outcome = await understand(
@@ -68,6 +71,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
             encryption_key=v.encryption_key,
             instructions=v.instructions,
             skills=render_skills(v.skills),
+            rules=render_rules(v.rules),
             history=v.history,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
@@ -96,6 +100,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
 
     v.intent = outcome
     ctx.step.skills_applied = _report_ids(v, outcome.skills_applied)
+    ctx.step.rules_cited = cited_rule_version_ids(v, outcome.rules_cited)
     refs = ", ".join(outcome.refs[:4])
     return Out(
         detail=f"{outcome.kind.replace('_', ' ')}" + (f" · {refs}" if refs else ""),
@@ -149,7 +154,8 @@ async def plan_workflow(ctx: TaskContext, v: RunVars) -> Out:
             message="No LLM provider is bound to this agent, and no template fits this ask.",
             short="no provider",
         )
-    ctx.step.skills_offered = offered_skill_ids(v)
+    ctx.step.skills_offered = offered_skill_version_ids(v)
+    ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · composing a workflow")
     errors: list[str] | None = None
     # one proposal, one repair — that budget, one level up
@@ -214,7 +220,8 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     """
     assert v.provider is not None
     ask = str((ctx.step.args or {}).get("ask") or "").strip() or v.prompt
-    ctx.step.skills_offered = offered_skill_ids(v)
+    ctx.step.skills_offered = offered_skill_version_ids(v)
+    ctx.step.rules_offered = offered_rule_version_ids(v)
     turns = len(v.history) // 2
     await ctx.progress(f"{_provider_label(v.provider)} · reading {turns} prior turn{'' if turns == 1 else 's'}")
     language = await query_language_for(ctx, v, strict=True)
@@ -226,6 +233,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             version=v.grounding,
             encryption_key=v.encryption_key,
             skills=render_skills(v.skills),
+            rules=render_rules(v.rules),
             instructions=v.instructions,
             history=v.history,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
@@ -268,6 +276,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     v.query_language = generated.language
     v.rationale = generated.rationale or None
     ctx.step.skills_applied = _report_ids(v, generated.skills_applied)
+    ctx.step.rules_cited = cited_rule_version_ids(v, generated.rules_cited)
     if generated.rationale:
         await ctx.emit("reasoning", {"text": generated.rationale})
     await ctx.emit(

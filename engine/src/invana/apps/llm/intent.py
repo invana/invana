@@ -78,6 +78,12 @@ UNDERSTAND_TOOL = {
             "items": {"type": "string"},
             "description": "Names of the skills above you actually followed while reading this ask. [] if none.",
         },
+        # Also a self-report, cited by statement because that is what was shown.
+        "rules_cited": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "The exact statements of the rules above you followed while reading this ask. [] if none.",
+        },
     },
     "required": [
         "action",
@@ -91,6 +97,7 @@ UNDERSTAND_TOOL = {
         "options",
         "options_query",
         "skills_applied",
+        "rules_cited",
     ],
 }
 
@@ -111,6 +118,8 @@ class Intent:
     expects: list[str] = field(default_factory=list)
     confidence: float = 1.0
     skills_applied: list[str] = field(default_factory=list)
+    #: The rule statements it says it followed. Also a self-report.
+    rules_cited: list[str] = field(default_factory=list)
     usage: TokenUsage | None = None
     #: The call as a reader reads it — drawn as the step dashboard's Output
     #: band (SR42). Not a declared output: a plan cannot bind a raw prompt.
@@ -139,7 +148,7 @@ class OutOfScope:
     duration_ms: float = 0.0
 
 
-def _system_prompt(model_context: str, instructions: str, skills: str) -> str:
+def _system_prompt(model_context: str, instructions: str, skills: str, rules: str) -> str:
     return (
         "You classify what a question means against ONE bounded knowledge graph. You do not write "
         "queries and you do not answer the question — a later step does both.\n\n"
@@ -154,7 +163,7 @@ def _system_prompt(model_context: str, instructions: str, skills: str) -> str:
         '"refs" must contain names that appear in the model below — never invented ones. "expects" is '
         "what a good answer would look like: graph for things to see on a canvas, table for rows, "
         "metric for a single number, chart for a trend or comparison, text for an explanation.\n\n"
-        f"{instructions}{skills}"
+        f"{instructions}{skills}{rules}"
         f"Graph model:\n{model_context}"
     )
 
@@ -167,6 +176,7 @@ async def understand(
     encryption_key: str,
     instructions: str = "",
     skills: str = "",
+    rules: str = "",
     history: list[dict] | None = None,
     timeout_s: float = 60.0,
 ) -> Intent | Clarification | OutOfScope:
@@ -174,6 +184,9 @@ async def understand(
         render_model_context(version),
         f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "",
         f"Skills you may apply:\n{skills}\n\n" if skills else "",
+        f"Rules that are always true here (quote each statement you follow in rules_cited):\n{rules}\n\n"
+        if rules
+        else "",
     )
     result = await complete_tool(
         provider=provider,
@@ -220,6 +233,7 @@ async def understand(
         expects=[str(e).strip() for e in (data.get("expects") or []) if str(e).strip()],
         confidence=float(data.get("confidence") or 1.0),
         skills_applied=[str(s).strip() for s in (data.get("skills_applied") or []) if str(s).strip()],
+        rules_cited=[str(r).strip() for r in (data.get("rules_cited") or []) if str(r).strip()],
         usage=result.usage,
         exchange=result.exchange,
         duration_ms=result.duration_ms,

@@ -234,6 +234,11 @@ class TaskRun(Base):
     #: it used) — two lists because they are two certainties.
     skills_offered: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     skills_applied: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    #: The same two certainties for rules (RU7): `rule_version_id`s assembly put
+    #: in the prompt, and the ones the model says it followed. Without the first,
+    #: *never cited* cannot be told from *never offered*.
+    rules_offered: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    rules_cited: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

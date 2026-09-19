@@ -8,7 +8,6 @@ CREATE TABLE agents (
 	status VARCHAR(16) NOT NULL, 
 	workflow_spec JSON NOT NULL, 
 	llm_config_id VARCHAR(36), 
-	skill_ids JSON NOT NULL, 
 	instructions TEXT NOT NULL, 
 	lifetime VARCHAR(16) NOT NULL, 
 	parent_agent_id VARCHAR(36), 
@@ -449,6 +448,41 @@ CREATE UNIQUE INDEX ix_refresh_tokens_token_hash ON refresh_tokens (token_hash);
 
 CREATE INDEX ix_refresh_tokens_user_id ON refresh_tokens (user_id);
 
+CREATE TABLE rule_versions (
+	id VARCHAR(36) NOT NULL, 
+	rule_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	statement TEXT NOT NULL, 
+	published_by_id VARCHAR(36), 
+	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_rule_version_number UNIQUE (rule_id, version), 
+	FOREIGN KEY(rule_id) REFERENCES rules (id) ON DELETE CASCADE, 
+	FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_rule_versions_rule_id ON rule_versions (rule_id);
+
+CREATE TABLE rules (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	project_id VARCHAR(36), 
+	active BOOLEAN NOT NULL, 
+	"order" INTEGER NOT NULL, 
+	current_version_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_rules_graph_id ON rules (graph_id);
+
+CREATE INDEX ix_rules_project_id ON rules (project_id);
+
 CREATE TABLE schema_projections (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 
@@ -523,13 +557,45 @@ CREATE INDEX ix_sessions_graph_id ON sessions (graph_id);
 
 CREATE INDEX ix_sessions_model_id ON sessions (model_id);
 
+CREATE TABLE skill_bindings (
+	id VARCHAR(36) NOT NULL, 
+	skill_id VARCHAR(36) NOT NULL, 
+	agent_id VARCHAR(36) NOT NULL, 
+	bound_by_id VARCHAR(36), 
+	bound_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_skill_binding UNIQUE (skill_id, agent_id), 
+	FOREIGN KEY(skill_id) REFERENCES skills (id) ON DELETE CASCADE, 
+	FOREIGN KEY(agent_id) REFERENCES agents (id) ON DELETE CASCADE, 
+	FOREIGN KEY(bound_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_skill_bindings_agent_id ON skill_bindings (agent_id);
+
+CREATE INDEX ix_skill_bindings_skill_id ON skill_bindings (skill_id);
+
+CREATE TABLE skill_versions (
+	id VARCHAR(36) NOT NULL, 
+	skill_id VARCHAR(36) NOT NULL, 
+	version INTEGER NOT NULL, 
+	description TEXT NOT NULL, 
+	content TEXT NOT NULL, 
+	when_to_use TEXT NOT NULL, 
+	published_by_id VARCHAR(36), 
+	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_skill_version_number UNIQUE (skill_id, version), 
+	FOREIGN KEY(skill_id) REFERENCES skills (id) ON DELETE CASCADE, 
+	FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_skill_versions_skill_id ON skill_versions (skill_id);
+
 CREATE TABLE skills (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36) NOT NULL, 
 	name VARCHAR(255) NOT NULL, 
-	description TEXT NOT NULL, 
-	content TEXT NOT NULL, 
-	when_to_use TEXT NOT NULL, 
+	current_version_id VARCHAR(36), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
@@ -644,6 +710,8 @@ CREATE TABLE task_runs (
 	cost_usd FLOAT, 
 	skills_offered JSON NOT NULL, 
 	skills_applied JSON NOT NULL, 
+	rules_offered JSON NOT NULL, 
+	rules_cited JSON NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_task_run_attempt UNIQUE (parent_run_id, task_id, lane, iteration, attempt), 

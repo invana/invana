@@ -52,6 +52,24 @@ LLM_TRANSLATE = "llm.translate"
 SKILL_CREATE = "skill.create"
 SKILL_UPDATE = "skill.update"
 SKILL_DELETE = "skill.delete"
+# A new immutable version was published (docs/for-developers/modules/skills/features/authoring-a-skill.md
+# SK2). Editing the prose emits this, not ``skill.update`` — the old text still
+# exists and is still being resolved by the steps it was offered to.
+SKILL_PUBLISH = "skill.publish"
+# Who was offered what, and when the roster changed
+# (docs/for-developers/modules/skills/features/bindings.md C5). The target is the
+# agent, because the binding is a fact about the agent's context; ``details``
+# names the skill.
+AGENT_SKILL_BOUND = "agent.skill_bound"
+AGENT_SKILL_UNBOUND = "agent.skill_unbound"
+
+# ── Rules (docs/for-developers/modules/skills/features/rules.md) ──────────────
+# A statement that is always true in its scope. Offered and cited, never
+# enforced — there is no ``rule.enforce`` because a rule does not fire.
+RULE_CREATE = "rule.create"
+RULE_PUBLISH = "rule.publish"
+RULE_ACTIVATE = "rule.activate"
+RULE_DEACTIVATE = "rule.deactivate"
 # The model reported following the skill on a step (docs/for-developers/modules/work/spec.md — a
 # self-report, labelled as one; ``skill.invoke`` needs executable skills).
 SKILL_APPLY = "skill.apply"
@@ -187,6 +205,7 @@ TARGET_CONNECTION = "connection"
 TARGET_MEMBER = "member"
 TARGET_LLM = "llm_provider"
 TARGET_SKILL = "skill"
+TARGET_RULE = "rule"
 TARGET_MODEL = "graph_model"
 TARGET_MODEL_LINK = "model_link"
 TARGET_PROJECTION_TEMPLATE = "projection_template"

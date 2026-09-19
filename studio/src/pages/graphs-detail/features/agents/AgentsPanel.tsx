@@ -252,6 +252,15 @@ export function AgentsPanel({
 						onOpenTask={onOpenTask}
 						onOpenLineage={() => onOpenLineage?.(openAgent.id)}
 						onOpenEnvelope={() => onOpenEnvelope?.(openAgent.id)}
+						onBindSkill={(skillId) =>
+							mutations.bindSkill.mutate({ id: openAgent.id, skillId })
+						}
+						onUnbindSkill={(skillId) =>
+							mutations.unbindSkill.mutate({ id: openAgent.id, skillId })
+						}
+						isBinding={
+							mutations.bindSkill.isPending || mutations.unbindSkill.isPending
+						}
 					/>
 				)}
 			</ListPanelChrome>

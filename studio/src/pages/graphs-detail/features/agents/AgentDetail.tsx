@@ -114,7 +114,6 @@ interface Envelope {
 interface Draft {
 	instructions: string;
 	llm_config_id: string | null;
-	skill_ids: string[];
 	budget: Record<string, number>;
 	policy: Record<string, boolean>;
 	spec: Envelope;
@@ -123,7 +122,6 @@ interface Draft {
 const draftOf = (agent: Agent): Draft => ({
 	instructions: agent.instructions ?? "",
 	llm_config_id: agent.llm_config_id,
-	skill_ids: [...(agent.skill_ids ?? [])],
 	budget: { ...(agent.budget ?? {}) },
 	policy: { ...(agent.policy ?? {}) },
 	spec: JSON.parse(JSON.stringify(agent.workflow_spec ?? {})) as Envelope,
@@ -159,7 +157,10 @@ export function AgentDetail({
 	onOpenTask,
 	onOpenLineage,
 	onOpenEnvelope,
+	onBindSkill,
+	onUnbindSkill,
 	isSaving,
+	isBinding,
 }: {
 	username: string;
 	graphSlug: string;
@@ -174,7 +175,10 @@ export function AgentDetail({
 	onOpenTask?: (id: string) => void;
 	onOpenLineage: () => void;
 	onOpenEnvelope: () => void;
+	onBindSkill: (skillId: string) => void;
+	onUnbindSkill: (skillId: string) => void;
 	isSaving?: boolean;
+	isBinding?: boolean;
 }) {
 	const [tab, setTab] = useState<AgentTab>("agent");
 	// Keyed by agent id: selecting a different agent starts a fresh buffer rather
@@ -330,17 +334,17 @@ export function AgentDetail({
 								<div className="mb-1 text-sm text-muted-foreground">Skills</div>
 								<div className="flex flex-wrap gap-1">
 									{(skills.data?.items ?? []).map((skill) => {
-										const on = draft.skill_ids.includes(skill.id);
+										const on = (agent.skill_ids ?? []).includes(skill.id);
 										return (
 											<button
 												key={skill.id}
 												type="button"
+												/* Binding is its own write, not part of Save: a bind can
+												   be refused on its own, and a refusal that arrived with
+												   six other edits could not say which one it was about. */
+												disabled={isBinding}
 												onClick={() =>
-													patch({
-														skill_ids: on
-															? draft.skill_ids.filter((id) => id !== skill.id)
-															: [...draft.skill_ids, skill.id],
-													})
+													on ? onUnbindSkill(skill.id) : onBindSkill(skill.id)
 												}
 												title={skill.when_to_use || skill.description}
 												className={cn(
@@ -681,7 +685,6 @@ export function AgentDetail({
 						onSave({
 							instructions: draft.instructions,
 							llm_config_id: draft.llm_config_id,
-							skill_ids: draft.skill_ids,
 							budget: draft.budget,
 							policy: draft.policy,
 							workflow_spec: draft.spec as Record<string, unknown>,

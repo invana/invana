@@ -26,7 +26,7 @@ from invana.apps.modeller.models import (
     ValidationRule,
 )
 from invana.apps.sessions.models import Session, SessionMessage
-from invana.apps.skills.models import Skill
+from invana.apps.skills.models import Rule, RuleVersion, Skill, SkillBinding, SkillVersion
 from invana.apps.task_plans.models import Task as PlanTask
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
@@ -67,6 +67,7 @@ from invana.server.modeller.admin import (
     TypePropertyMappingView,
     ValidationRuleView,
 )
+from invana.server.rules.admin import RuleVersionView, RuleView
 from invana.server.runtime.admin import (
     EmissionView,
     ProjectionTemplateView,
@@ -79,7 +80,7 @@ from invana.server.sessions.admin import (
     SessionMessageView,
     SessionView,
 )
-from invana.server.skills.admin import SkillView
+from invana.server.skills.admin import SkillBindingView, SkillVersionView, SkillView
 from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
     ProjectAssignmentView,
@@ -156,6 +157,10 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 LLMProviderView(LLMProvider, label="LLM providers", icon="fa fa-sparkles"),
                 SkillView(Skill, label="Skills", icon="fa fa-wand-magic-sparkles"),
+                SkillVersionView(SkillVersion, label="Skill versions", icon="fa fa-clock-rotate-left"),
+                SkillBindingView(SkillBinding, label="Skill bindings", icon="fa fa-link"),
+                RuleView(Rule, label="Rules", icon="fa fa-scale-balanced"),
+                RuleVersionView(RuleVersion, label="Rule versions", icon="fa fa-clock-rotate-left"),
             ],
         ),
     )

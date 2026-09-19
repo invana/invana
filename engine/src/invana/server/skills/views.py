@@ -25,6 +25,10 @@ from invana.apps.skills.schemas import (
     SkillListResponse,
     SkillRead,
     SkillUpdate,
+    SkillVersionDiff,
+    SkillVersionListResponse,
+    SkillVersionPublish,
+    SkillVersionRead,
 )
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
@@ -90,6 +94,65 @@ async def delete_skill(
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     await skills.delete(session, skill=skill, actor_id=user.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+async def list_skill_versions(
+    skill_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SkillVersionListResponse:
+    """Every published version, newest first.
+
+    A published version is immutable, so this is a history rather than a list of
+    drafts — the one at the top is what the next run is offered.
+    """
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    items = await skills.list_versions(session, skill=skill)
+    reads = [SkillVersionRead.model_validate(v) for v in items]
+    return SkillVersionListResponse(items=reads, total=len(reads))
+
+
+async def publish_skill_version(
+    payload: SkillVersionPublish,
+    skill_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> SkillVersionRead:
+    """Publish the next version. Fields left out carry over from the current one."""
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    version = await skills.publish(session, skill=skill, payload=payload, actor_id=user.id)
+    return SkillVersionRead.model_validate(version)
+
+
+async def get_skill_version(
+    skill_id: str = Path(...),
+    version: int = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SkillVersionRead:
+    """One version by its number — what a step that named it was actually offered."""
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    return SkillVersionRead.model_validate(await skills.get_version(session, skill=skill, version=version))
+
+
+async def diff_skill_version(
+    skill_id: str = Path(...),
+    version: int = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SkillVersionDiff:
+    """What this version changed against the one before it.
+
+    Unified diff lines per field. `v1` diffs against nothing rather than against
+    empty text — a first version did not delete anything.
+    """
+    skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
+    return await skills.diff_version(session, skill=skill, version=version)
 
 
 async def skill_usage(

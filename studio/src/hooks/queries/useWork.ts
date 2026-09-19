@@ -115,6 +115,16 @@ export function useAgentMutations(username: string, graphSlug: string) {
 			mutationFn: (id: string) => agentsApi.remove(username, graphSlug, id),
 			onSuccess: invalidate,
 		}),
+		bindSkill: useMutation({
+			mutationFn: ({ id, skillId }: { id: string; skillId: string }) =>
+				agentsApi.bindSkill(username, graphSlug, id, skillId),
+			onSuccess: invalidate,
+		}),
+		unbindSkill: useMutation({
+			mutationFn: ({ id, skillId }: { id: string; skillId: string }) =>
+				agentsApi.unbindSkill(username, graphSlug, id, skillId),
+			onSuccess: invalidate,
+		}),
 		pause: useMutation({
 			mutationFn: (id: string) => agentsApi.pause(username, graphSlug, id),
 			onSuccess: invalidate,

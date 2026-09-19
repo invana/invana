@@ -33,5 +33,7 @@ agents_router.get("/{agent_id}/retire", response_model=RetirePreview)(views.prev
 agents_router.post("/{agent_id}/retire", response_model=AgentRead)(views.retire_agent)
 agents_router.get("/{agent_id}/lineage", response_model=AgentLineageResponse)(views.agent_lineage)
 agents_router.get("/{agent_id}/activity", response_model=EventListResponse)(views.agent_activity)
+agents_router.post("/{agent_id}/skills/{skill_id}", response_model=AgentRead)(views.bind_skill)
+agents_router.delete("/{agent_id}/skills/{skill_id}", response_model=AgentRead)(views.unbind_skill)
 
 atlas_agent_router.post("/default-agent", response_model=AgentRead)(views.set_default_agent)

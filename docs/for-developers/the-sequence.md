@@ -38,10 +38,12 @@ endpoints that already ship, and the whole stack is drawn
 
 | Part of Skills | Gated on | Do now? |
 |---|---|---|
-| The panel, the drilled-in detail, `Playbook` · `Bindings` · `Usage` tabs, versions | nothing — the API ships | **yes** |
+| The panel, the drilled-in detail, `Playbook` · `Bindings` · `Usage` tabs, versions | the engine gap is smaller than `API ✅` suggests — [skills-pass.md § 1](building-engine/skills-pass.md) | **yes** |
 | [6.4 Rules](modules/skills/features/rules.md) — `rules` · `rule_versions`, the drawer | nothing — it is new engine work with no dependency | **yes** |
 | The **`Flow` tab** — `skill_versions.plan_id NOT NULL`, the layer view | **M8**, which needs `draft_plan` (**M5**) | no — the tab renders `EmptyState` naming what unlocks it ([DS15](modules/platform/features/design-system.md)) |
 | The clarification that pauses instead of guessing | **M5** · the `ask` signal | no |
+
+**The engine plan is [building-engine/skills-pass.md](building-engine/skills-pass.md)** — five slices, and the two forks to settle before the first migration.
 
 **What this costs.** [B · the plan is the authority](#b--the-plan-is-the-authority--m11--m5) still has
 to land before a skill draws as a plan, so Skills closes in two passes rather than one. That is the

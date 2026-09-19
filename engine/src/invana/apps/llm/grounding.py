@@ -11,7 +11,7 @@ the ontology. The version is loaded with its type tree eager-loaded
 from __future__ import annotations
 
 from invana.apps.modeller.models import GraphVersion, TypePropertyMapping
-from invana.apps.skills.models import Skill
+from invana.apps.skills.models import Rule, Skill
 
 _NO_MODEL = "No graph model is available — infer labels conservatively from the question and prefer a simple query."
 
@@ -55,6 +55,23 @@ def _props(mappings: list[TypePropertyMapping]) -> str:
         if m.property_key is not None
     ]
     return " {" + ", ".join(names) + "}" if names else ""
+
+
+def render_rules(rules: list[Rule]) -> str:
+    """The statements that are always true, as the model sees them.
+
+    **Nothing is concatenated** (skills/spec.md § 4 · RU3): each rule is its own
+    numbered line so the model can cite the one it followed, and the order is
+    the one assembly fixed — graph invariants, then the project's working rules.
+
+    A rule is offered, never enforced (RU5). The prompt says *follow* and asks
+    for a citation; it does not claim the run will be refused for ignoring one,
+    because it will not be.
+    """
+    statements = [r.statement.strip() for r in rules if r.statement.strip()]
+    if not statements:
+        return ""
+    return "\n".join(f"{i}. {statement}" for i, statement in enumerate(statements, start=1))
 
 
 def render_skills(skills: list[Skill]) -> str:

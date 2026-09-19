@@ -63,9 +63,11 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| `rules` | `scope` · `owner_id` · `kind` · `active` · `order` · `current_version_id` |
-| `rule_versions` | `statement` · `published_at`, immutable |
+| `rules` | `graph_id` · `project_id?` · `active` · `order` · `current_version_id` — one axis ([RU6](#decisions)) |
+| `rule_versions` | `rule_id` · `version` · `statement` · `published_at`, immutable |
+| Derived | `scope` and `kind` are read off `project_id`, not stored |
 | Assembly | graph invariants → project working rules, each with its id |
+| Citations | `task_runs.rules_offered` · `rules_cited`, both `rule_version_id`s |
 | Routes | `…/rules*` · `…/projects/{key}/rules*` |
 | Events | `rule.created · published · activated · deactivated` |
 
@@ -89,6 +91,8 @@ On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc
 | RU3 | Rules are offered discretely with ids, never concatenated. |
 | RU4 | Rules are versioned; deactivation is not a version. |
 | RU5 | A rule is offered and cited — never enforced. |
+| RU6 | **`project_id` is the only axis; `scope` and `kind` are derived from it.** [RU2](#decisions) fixes the pairing — an invariant is a Graph's, a working rule is a Project's — so storing `scope` *and* `kind` would be two columns that can disagree, and `scope='graph', kind='working'` would be representable and meaningless. A rule always belongs to a Graph (that is its cascade); a `project_id` is what makes it a working rule. Both words stay in the API and on the surface, read off the one column. |
+| RU7 | **A step records what it was offered as well as what it cited.** `rules_offered` is a fact written by assembly; `rules_cited` is the model's own claim — the same two certainties as a skill, kept apart for the same reason. Without the first, *never cited* cannot be told from *never offered*, and the evidence loop in the journey has nothing to read. |
 
 ## Not building
 

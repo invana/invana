@@ -33,7 +33,9 @@ from invana.apps.llm_providers.querysets import LLMProviderQuerySet
 from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.transcript import _friendly_query_error, _model_summary, _title_from_text
-from invana.apps.skills.models import Skill
+from invana.apps.skills.managers import RuleManager
+from invana.apps.skills.models import Rule, Skill
+from invana.apps.work.models import Task as Todo
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
@@ -91,6 +93,8 @@ class TaskRuntime:
         # (docs/for-developers/modules/agents/features/concurrency-and-contention.md).
         # A budget bounds one agent; this bounds the Graph.
         self._slots = GraphSlots()
+        # Rules are Skills' rule, read here rather than reimplemented.
+        self._rules = RuleManager()
 
     # ── lifecycle ─────────────────────────────────────────────────────────────
 
@@ -321,6 +325,7 @@ class TaskRuntime:
             agent = await db.get(Agent, th.agent_id) if th.agent_id else None
             provider = await self._provider_for(db, agent=agent, params=params)
             skills = await self._skills_for(db, agent=agent, graph_id=graph.id)
+            rules = await self._rules_for(db, run=th, graph_id=graph.id)
             history = (
                 assemble_history(
                     await SessionMessageQuerySet().list_recent_messages(
@@ -354,6 +359,7 @@ class TaskRuntime:
                 history=history,
                 grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
                 skills=skills,
+                rules=rules,
                 instructions=graph.instructions or "",
                 agent=agent,
                 envelope=Envelope.from_spec(agent.workflow_spec, budget=agent.effective_budget) if agent else None,
@@ -426,6 +432,25 @@ class TaskRuntime:
         if agent is not None and agent.skill_ids:
             stmt = stmt.where(Skill.id.in_(list(agent.skill_ids)))
         return list((await db.execute(stmt.order_by(Skill.name))).scalars().all())
+
+    async def _rules_for(self, db: AsyncSession, *, run: TaskRun, graph_id: str) -> list[Rule]:
+        """The statements always true in this run's scope.
+
+        The order is fixed (skills/spec.md § 4): the Graph's invariants, then
+        the working rules of the Project this run's Todo belongs to. A session
+        ask belongs to no Project and is offered the invariants alone.
+
+        Only **active** rules — deactivating is how a rule stops applying, and
+        the versions and past citations stay exactly where they are (RU4).
+        """
+        invariants = await self._rules.invariants(db, graph_id=graph_id, active_only=True)
+        if not run.todo_id:
+            return invariants
+        todo = await db.get(Todo, run.todo_id)
+        if todo is None or not todo.project_id:
+            return invariants
+        working = await self._rules.working(db, project_id=todo.project_id, active_only=True)
+        return [*invariants, *working]
 
     async def _loop(
         self,

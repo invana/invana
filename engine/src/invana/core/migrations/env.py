@@ -19,7 +19,13 @@ from invana.apps.graphs.models import (  # noqa: F401
 )
 from invana.apps.llm_providers.models import LLMProvider  # noqa: F401
 from invana.apps.sessions.models import Session, SessionMessage  # noqa: F401
-from invana.apps.skills.models import Skill  # noqa: F401
+from invana.apps.skills.models import (
+    Rule,  # noqa: F401
+    RuleVersion,  # noqa: F401
+    Skill,  # noqa: F401
+    SkillBinding,  # noqa: F401
+    SkillVersion,  # noqa: F401
+)
 from invana.apps.task_plans.models import Task as PlanTask  # noqa: F401
 from invana.apps.task_plans.models import TaskPlan  # noqa: F401
 from invana.apps.work.models import (  # noqa: F401

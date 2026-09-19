@@ -17,6 +17,10 @@ class AgentCreate(BaseModel):
     envelope_from: str | None = Field(default=None, description="Seeded agent key to copy the envelope from.")
     workflow_spec: dict[str, Any] | None = None
     llm_config_id: str | None = None
+    # The roster this agent starts with, bound as part of creating it — the same
+    # shape as a spawned agent's bindings being named at spawn (BN4). Changing
+    # them afterwards goes through `POST/DELETE …/agents/{id}/skills/{skill_id}`,
+    # because a bind is a write with its own refusal (BN5 · BN6).
     skill_ids: list[str] = Field(default_factory=list)
     budget: dict[str, Any] = Field(default_factory=dict)
     policy: dict[str, Any] = Field(default_factory=dict)
@@ -28,7 +32,7 @@ class AgentUpdate(BaseModel):
     instructions: str | None = None
     workflow_spec: dict[str, Any] | None = None
     llm_config_id: str | None = None
-    skill_ids: list[str] | None = None
+    # No `skill_ids`: binding is not a field of the agent. See AgentCreate.
     budget: dict[str, Any] | None = None
     policy: dict[str, Any] | None = None
 
@@ -47,6 +51,8 @@ class AgentRead(BaseModel):
     instructions: str
     workflow_spec: dict[str, Any]
     llm_config_id: str | None
+    # Read through `skill_bindings` (BN6). Present here because the roster badge
+    # and the bindings picker both need it; not writable on this object.
     skill_ids: list[str]
     budget: dict[str, Any]
     policy: dict[str, Any]
@@ -118,13 +124,78 @@ class SkillUsageStep(BaseModel):
     step_id: str
     label: str
     task_key: str
+    # Which text this step was actually offered (SK3) — two steps naming the
+    # same skill may have read different prose.
+    skill_version_id: str
+    version: int
     # True when the model reported applying it, not merely that it was offered.
     reported: bool
     finished_at: datetime | None
 
 
+class SkillUsageVersion(BaseModel):
+    """Offered, applied and the gap, for one published version.
+
+    Counts are per version and never summed across them: publishing v4 starts
+    its own count and v3 keeps its history
+    ([US3](docs/for-developers/modules/skills/features/usage.md)). ``offered``
+    is a fact written by prompt assembly; ``applied`` is the model's own report,
+    which is why the surface says so rather than implying it away (US4).
+    """
+
+    skill_version_id: str
+    version: int
+    offered: int
+    applied: int
+    gap: int
+    #: False below the floor the engine owns, so every surface draws
+    #: *too few to read* at the same point instead of inventing a percentage
+    #: ([US6](docs/for-developers/modules/skills/features/usage.md)).
+    enough_to_read: bool
+
+
+class SkillUsageByAgent(BaseModel):
+    """Which agents apply it and which never do (C4).
+
+    The agent is the run's, not the step's — a step carries no agent of its own.
+    """
+
+    agent_id: str | None
+    agent_name: str | None
+    offered: int
+    applied: int
+    gap: int
+    enough_to_read: bool
+
+
+class SkillUsageByOutcome(BaseModel):
+    """Applied in runs that served, versus runs that did not (C5).
+
+    ``outcome`` is the **run's** — `answered` · `cannot_answer` · `failed` ·
+    `cancelled`, or null on a run that has not settled.
+    """
+
+    outcome: str | None
+    offered: int
+    applied: int
+    gap: int
+    enough_to_read: bool
+
+
 class SkillUsageResponse(BaseModel):
+    """Everything the Usage tab draws, in one request.
+
+    ``by_agent`` and ``by_outcome`` are for the **current** version: the page
+    reads one text at a time, and a breakdown summed across versions would be
+    the number US3 exists to prevent.
+    """
+
     skill_id: str
+    current_version_id: str | None
+    # Newest version first, the same order the version bar reads.
+    versions: list[SkillUsageVersion]
+    by_agent: list[SkillUsageByAgent] = Field(default_factory=list)
+    by_outcome: list[SkillUsageByOutcome] = Field(default_factory=list)
     used_by: list[AgentRead]
     recent_steps: list[SkillUsageStep]
 
