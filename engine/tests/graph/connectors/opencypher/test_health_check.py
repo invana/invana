@@ -5,8 +5,9 @@ A connection names which database on the server it reads
 Save (CD2). ``verify_connectivity()`` alone is not bound to a database, so a
 misspelt name used to pass Test, unlock Save, and fail every query afterwards.
 
-These build their own connectors and write nothing — the shared ``connector``
-fixture in this package deletes every node on teardown.
+Neo4j only: a **named** database is what CD8 is about, and Memgraph community
+has no second one to misspell. These build their own connectors and write
+nothing — the shared ``connector`` fixture deletes every node on teardown.
 """
 
 from __future__ import annotations
@@ -14,22 +15,13 @@ from __future__ import annotations
 import pytest
 
 from invana.graph.connectors.base.exceptions import ConnectionError
-from invana.graph.connectors.cypher.connector import OpenCypherConnector
+from tests.graph.connectors.backends import NEO4J
 
-from .conftest import NEO4J_DATABASE, NEO4J_PASSWORD, NEO4J_URI, NEO4J_USERNAME
-
-
-def _connector(database: str) -> OpenCypherConnector:
-    return OpenCypherConnector(
-        NEO4J_URI,
-        username=NEO4J_USERNAME,
-        password=NEO4J_PASSWORD,
-        database=database,
-    )
+pytestmark = pytest.mark.skipif(not NEO4J.is_up(), reason=f"no neo4j ({NEO4J.compose})")
 
 
 async def test_connects_to_a_database_that_exists():
-    conn = _connector(NEO4J_DATABASE)
+    conn = NEO4J.connector()
     await conn.connect()
     try:
         assert await conn.health_check() is True
@@ -38,6 +30,6 @@ async def test_connects_to_a_database_that_exists():
 
 
 async def test_a_database_that_does_not_exist_fails_the_connect():
-    conn = _connector("no-such-database")
+    conn = NEO4J.connector(database="no-such-database")
     with pytest.raises(ConnectionError, match="health check failed"):
         await conn.connect()

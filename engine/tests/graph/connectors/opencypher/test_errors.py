@@ -1,4 +1,4 @@
-"""Error-classification tests for the OpenCypher connector against a real Neo4j.
+"""Error-classification tests for the openCypher connectors, against live databases.
 
 A mistranslated NL ask reaches the driver as invalid Cypher; the connector must
 surface a ``QueryExecutionError`` carrying the vendor code and a coarse
@@ -13,13 +13,17 @@ from invana.graph.connectors.base.exceptions import QueryErrorCategory, QueryExe
 pytestmark = pytest.mark.asyncio
 
 
-async def test_invalid_cypher_is_classified_as_syntax(connector):
+async def test_invalid_cypher_is_classified_as_syntax(connector, backend):
     # "show only 5" is the kind of NL fragment a weak model leaks into Cypher.
     with pytest.raises(QueryExecutionError) as exc_info:
         await connector.execute("show only 5")
     exc = exc_info.value
+    # The bucket is the product's contract and holds for every vendor. The code
+    # is the vendor's own string — Neo4j names the failure in it, Memgraph
+    # returns one code for everything and names it in the message instead.
     assert exc.category == QueryErrorCategory.SYNTAX
-    assert exc.code == "Neo.ClientError.Statement.SyntaxError"
+    if backend.name == "neo4j":
+        assert exc.code == "Neo.ClientError.Statement.SyntaxError"
 
 
 async def test_valid_query_does_not_raise(connector):

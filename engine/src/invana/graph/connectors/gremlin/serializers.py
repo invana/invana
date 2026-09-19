@@ -10,6 +10,9 @@ from __future__ import annotations
 from typing import Any
 
 from gremlin_python.process.traversal import T
+from gremlin_python.structure.graph import Edge as GremlinEdge
+from gremlin_python.structure.graph import Path as GremlinPath
+from gremlin_python.structure.graph import Vertex as GremlinVertex
 
 from invana.graph.connectors.base.exceptions import SerializationError
 from invana.graph.connectors.base.serializers import BaseSerializer
@@ -49,7 +52,7 @@ class GremlinSerializer(BaseSerializer):
         try:
             # New project-based format from _project_edge
             if isinstance(raw, dict) and "eid" in raw:
-                element_id = str(raw["eid"])
+                element_id = str(self.coerce_element_id(raw["eid"]))
                 label = raw["elabel"]
                 properties = dict(raw.get("eprops", {}))
                 source_map = raw.get("source", source_raw)
@@ -102,68 +105,122 @@ class GremlinSerializer(BaseSerializer):
             raise SerializationError(f"Failed to deserialize path: {e}") from e
 
     def deserialize_graph_response(self, raw: Any) -> GraphResponse:
-        """Convert a list of projected edge results to a GraphResponse."""
+        """Convert Gremlin results to a GraphResponse.
+
+        Two kinds of result arrive here. The **querysets** send the projected
+        shapes they built themselves (``eid``/``source``/``target``). A **script**
+        sends whatever the person or the model asked for — reference vertices,
+        edges, paths, maps, counts, strings.
+
+        Anything that is not a vertex or an edge becomes a **record**
+        (docs/for-developers/modules/graph-connectors/features/languages.md LG8).
+        Dropping what this serializer did not recognise reported an empty answer
+        for a query that returned rows, and an empty answer is the one wrong
+        answer that reads like a right one.
+        """
         nodes: list[Vertex] = []
         edges: list[Edge] = []
+        records: list[dict[str, Any]] = []
 
         if not raw:
-            return GraphResponse(nodes=nodes, edges=edges, records=[])
+            return GraphResponse(nodes=nodes, edges=edges, records=records)
 
         seen_node_ids: set[str] = set()
 
-        for record in raw:
-            if isinstance(record, dict):
-                # New project-based format: eid, elabel, eprops, source, target
-                if "eid" in record:
-                    edge = self.deserialize_edge(record)
-                    edges.append(edge)
+        def _keep_node(vertex: Vertex) -> None:
+            if vertex.id not in seen_node_ids:
+                nodes.append(vertex)
+                seen_node_ids.add(vertex.id)
 
+        for record in raw:
+            if isinstance(record, dict) and ("eid" in record or "edge" in record):
+                if "eid" in record:
+                    edges.append(self.deserialize_edge(record))
                     source_map = record.get("source")
                     target_map = record.get("target")
                 else:
-                    # Legacy format: edge, source, target
                     edge_map = record.get("edge")
                     source_map = record.get("source")
                     target_map = record.get("target")
-
                     if edge_map:
-                        edge = self.deserialize_edge(edge_map, source_map, target_map)
-                        edges.append(edge)
-
+                        edges.append(self.deserialize_edge(edge_map, source_map, target_map))
                 if source_map:
-                    source_vertex = self.deserialize_vertex(source_map)
-                    if source_vertex.id not in seen_node_ids:
-                        nodes.append(source_vertex)
-                        seen_node_ids.add(source_vertex.id)
-
+                    _keep_node(self.deserialize_vertex(source_map))
                 if target_map:
-                    target_vertex = self.deserialize_vertex(target_map)
-                    if target_vertex.id not in seen_node_ids:
-                        nodes.append(target_vertex)
-                        seen_node_ids.add(target_vertex.id)
+                    _keep_node(self.deserialize_vertex(target_map))
+                continue
+
+            if isinstance(record, GremlinPath):
+                path = self.deserialize_path(record)
+                for vertex in path.vertices:
+                    _keep_node(vertex)
+                edges.extend(path.edges)
+                continue
+
+            if isinstance(record, GremlinEdge):
+                edges.append(
+                    Edge(
+                        id=str(self.coerce_element_id(record.id)),
+                        label=record.label,
+                        source=str(self.coerce_element_id(record.outV.id)) if record.outV else "",
+                        target=str(self.coerce_element_id(record.inV.id)) if record.inV else "",
+                        properties={},
+                    )
+                )
+                continue
+
+            if isinstance(record, GremlinVertex) or self._is_edge_map(record) or self._is_vertex_map(record):
+                if isinstance(record, GremlinVertex) or self._is_vertex_map(record):
+                    _keep_node(self.deserialize_vertex(record))
+                else:
+                    edges.append(self.deserialize_edge(record))
+                continue
+
+            records.append(self._as_record(record))
 
         metadata = ResultMetadata(
             node_count=len(nodes),
             edge_count=len(edges),
             record_count=len(raw),
         )
-        return GraphResponse(nodes=nodes, edges=edges, records=[], metadata=metadata)
+        return GraphResponse(nodes=nodes, edges=edges, records=records, metadata=metadata)
+
+    def _as_record(self, value: Any) -> dict[str, Any]:
+        """A script result that is not an element, as a row.
+
+        A map — ``valueMap()``, ``project()``, ``group()`` — is already a row and
+        keeps its own keys, stringified because Gremlin keys can be enum members.
+        Anything else is a single value, and the column is called ``value``: the
+        Gremlin protocol returns a flat list, so unlike Cypher there is no column
+        name to carry through.
+        """
+        if isinstance(value, dict):
+            return {str(k): v for k, v in value.items()}
+        return {"value": value}
 
     # -- Extraction helpers --
+
+    def coerce_element_id(self, value: Any) -> Any:
+        """The single funnel every element id passes through on the way out.
+
+        Identity here. A vendor whose id is its own type — JanusGraph's
+        ``RelationIdentifier`` — overrides this one method instead of every place
+        an id is read, so a shape that arrives by one path cannot be unwrapped
+        while the same shape arriving by another is not.
+        """
+        return value
 
     def _extract_id(self, raw: Any) -> Any:
         """Extract the element ID from a Gremlin result."""
         if isinstance(raw, dict):
             # elementMap() puts T.id as a key
             if T.id in raw:
-                return raw[T.id]
+                return self.coerce_element_id(raw[T.id])
             # Some serializers use string keys
             if "id" in raw:
-                return raw["id"]
-            if T.id in raw:
-                return raw[T.id]
+                return self.coerce_element_id(raw["id"])
         if hasattr(raw, "id"):
-            return raw.id
+            return self.coerce_element_id(raw.id)
         raise SerializationError(f"Cannot extract ID from {type(raw)}")
 
     def _extract_label(self, raw: Any) -> str:
@@ -202,16 +259,11 @@ class GremlinSerializer(BaseSerializer):
         # elementMap() stores endpoints as {Direction.IN: {T.id: ..., T.label: ...}}
         for key, value in raw.items():
             key_str = str(key)
-            if direction == "OUT" and ("OUT" in key_str):
+            if (direction == "OUT" and "OUT" in key_str) or (direction == "IN" and "IN" in key_str):
                 if isinstance(value, dict) and T.id in value:
-                    return value[T.id]
+                    return self.coerce_element_id(value[T.id])
                 if isinstance(value, dict) and "id" in value:
-                    return value["id"]
-            if direction == "IN" and ("IN" in key_str):
-                if isinstance(value, dict) and T.id in value:
-                    return value[T.id]
-                if isinstance(value, dict) and "id" in value:
-                    return value["id"]
+                    return self.coerce_element_id(value["id"])
 
         raise SerializationError(f"Cannot extract {direction} endpoint from edge")
 

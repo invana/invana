@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import re
 import time
 from typing import Any
 
@@ -26,6 +27,7 @@ from invana.graph.connectors.base.connector import (
 )
 from invana.graph.connectors.base.exceptions import (
     ConnectionError,
+    NotSupportedError,
     QueryErrorCategory,
     QueryExecutionError,
 )
@@ -72,6 +74,33 @@ GREMLIN_PROFILE = CapabilityProfile(
 )
 
 
+# Gremlin Server status codes (TinkerPop protocol). 597 is a failed script
+# evaluation — the Gremlin equivalent of a syntax error — and 598 a server-side
+# timeout. A server with scripting switched off answers 403/499 rather than
+# evaluating, which is a refusal to declare (LG7), not a query that failed.
+_SCRIPT_EVAL_ERROR = 597
+_SERVER_TIMEOUT = 598
+_SCRIPTING_DISABLED = frozenset({403, 499})
+
+
+def _gremlin_status(exc: Exception) -> int | None:
+    """The Gremlin Server status code behind a driver exception, when there is one."""
+    code = getattr(exc, "status_code", None)
+    if isinstance(code, int):
+        return code
+    match = re.search(r"\b(\d{3})\b", str(exc))
+    return int(match.group(1)) if match else None
+
+
+def _classify_gremlin_error(code: int | None) -> str:
+    """Bucket a Gremlin failure the way the Cypher side buckets a Neo4j one."""
+    if code == _SCRIPT_EVAL_ERROR:
+        return QueryErrorCategory.SYNTAX
+    if code == _SERVER_TIMEOUT:
+        return QueryErrorCategory.TIMEOUT
+    return QueryErrorCategory.UNKNOWN
+
+
 class GremlinConnector(BaseConnector):
     """Concrete Gremlin connector using gremlinpython WebSocket driver.
 
@@ -100,6 +129,7 @@ class GremlinConnector(BaseConnector):
         self._password = password
         self._connection: DriverRemoteConnection | None = None
         self._g: GraphTraversalSource | None = None
+        self._client: Client | None = None
         super().__init__(uri, pool_size=pool_size, **kwargs)
 
     def _create_serializer(self) -> BaseSerializer:
@@ -136,31 +166,35 @@ class GremlinConnector(BaseConnector):
         this with an HTTP probe (Neptune ``GET /status``; ArcadeDB ``GET /api/v1/server``).
         """
 
-        def _probe() -> str | None:
-            auth = {}
-            if self._username is not None:
-                auth["username"] = self._username
-            if self._password is not None:
-                auth["password"] = self._password
-            client = Client(self._uri, "g", **auth)
-            try:
-                for script in self._VERSION_SCRIPTS:
-                    try:
-                        rows = client.submit(script).all().result()
-                    except Exception:
-                        continue
-                    if rows:
-                        return str(rows[0])
-                return None
-            finally:
-                with contextlib.suppress(Exception):
-                    client.close()
+        def _probe(client: Client) -> str | None:
+            for script in self._VERSION_SCRIPTS:
+                try:
+                    rows = client.submit(script).all().result()
+                except Exception:
+                    continue
+                if rows:
+                    return str(rows[0])
+            return None
 
         try:
-            raw = await asyncio.to_thread(_probe)
+            client = await self._script_client()
+            raw = await asyncio.to_thread(_probe, client)
         except Exception:
             return None
         return Version.parse(raw)
+
+    def message_serializer(self) -> Any:
+        """The wire serializer for this vendor, or ``None`` for the driver's default.
+
+        GraphBinary is the driver's default and the right choice where every id is
+        a primitive. A vendor whose ids are its **own** types has to say so here:
+        gremlinpython can only decode the GraphBinary types it knows, and an
+        unknown one fails the whole response rather than one field
+        (docs/for-developers/modules/graph-connectors/features/languages.md LG9).
+        GraphSON carries an unknown ``@type`` through as a plain dict, which a
+        serializer can then read.
+        """
+        return None
 
     def coerce_id(self, id_value: str) -> Any:
         """Convert a string ID to the native type expected by the database.
@@ -173,12 +207,14 @@ class GremlinConnector(BaseConnector):
     async def _create_driver(self) -> Any:
         """Create the Gremlin remote connection."""
         try:
+            serializer = self.message_serializer()
             self._connection = DriverRemoteConnection(
                 self._uri,
                 "g",
                 username=self._username,
                 password=self._password,
                 transport_factory=AiohttpTransport,
+                **({"message_serializer": serializer} if serializer is not None else {}),
             )
             self._g = traversal().with_(self._connection)
             return self._connection
@@ -186,7 +222,11 @@ class GremlinConnector(BaseConnector):
             raise ConnectionError(f"Failed to create Gremlin connection: {e}") from e
 
     async def _close_driver(self) -> None:
-        """Close the Gremlin remote connection."""
+        """Close the Gremlin remote connection, and the script client with it."""
+        if self._client:
+            with contextlib.suppress(Exception):
+                await asyncio.to_thread(self._client.close)
+            self._client = None
         if self._connection:
             with contextlib.suppress(Exception):
                 await asyncio.to_thread(self._connection.close)
@@ -199,15 +239,72 @@ class GremlinConnector(BaseConnector):
             raise ConnectionError("Not connected. Call connect() first.")
         return self._g
 
-    async def _execute_raw(self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None) -> Any:
-        """Execute a raw Gremlin script string.
+    async def _script_client(self) -> Client:
+        """The script-submission client, created once and closed with the driver.
 
-        For traversal-based execution, use ``execute_traversal()`` instead.
+        Separate from ``DriverRemoteConnection``: that one carries bytecode, this
+        one carries text (docs/for-developers/modules/graph-connectors/features/languages.md
+        LG6). A client per query would pay a WebSocket handshake for every
+        question asked.
         """
-        raise NotImplementedError(
-            "GremlinConnector uses execute_traversal() for bytecode traversals. "
-            "Raw string execution is not supported at the base level."
-        )
+        if self._client is None:
+            auth: dict[str, Any] = {}
+            if self._username is not None:
+                auth["username"] = self._username
+            if self._password is not None:
+                auth["password"] = self._password
+            serializer = self.message_serializer()
+            if serializer is not None:
+                auth["message_serializer"] = serializer
+            try:
+                self._client = await asyncio.to_thread(lambda: Client(self._uri, "g", **auth))
+            except Exception as exc:
+                raise ConnectionError(f"Failed to open a Gremlin script client: {exc}") from exc
+        return self._client
+
+    async def _execute_raw(self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None) -> Any:
+        """Execute a raw Gremlin script and return the server's rows.
+
+        This is the one door an arbitrary query comes through — the same door
+        openCypher uses (LG5). A traversal the engine composed itself goes as
+        bytecode through :meth:`execute_traversal` instead, because it has a shape
+        to compose and a script does not (LG6).
+
+        ``parameters`` ride as Gremlin **bindings**, so a value is never spliced
+        into the script text — the same guarantee ``$p0`` gives on the Cypher side
+        ([CN7](docs/for-developers/modules/graph-connectors/spec.md)).
+
+        A server that will not evaluate scripts — Amazon Neptune accepts bytecode
+        and its own HTTP API, not Groovy — refuses here with the vendor named,
+        rather than surfacing a driver error from the wire (LG7, CN6).
+        """
+        client = await self._script_client()
+
+        def _submit() -> list[Any]:
+            options = {"evaluationTimeout": int(timeout_s * 1000)} if timeout_s else {}
+            return client.submit(query, bindings=parameters or None, request_options=options or None).all().result()
+
+        try:
+            if timeout_s is not None:
+                return await asyncio.wait_for(asyncio.to_thread(_submit), timeout=timeout_s)
+            return await asyncio.to_thread(_submit)
+        except TimeoutError as exc:
+            raise QueryExecutionError(
+                f"Query timed out after {timeout_s}s",
+                category=QueryErrorCategory.TIMEOUT,
+            ) from exc
+        except Exception as exc:
+            code = _gremlin_status(exc)
+            if code in _SCRIPTING_DISABLED:
+                raise NotSupportedError(
+                    f"{type(self).__name__} is connected to a server that does not evaluate Gremlin "
+                    "scripts, so it cannot run a written query. Neptune is the usual case."
+                ) from exc
+            raise QueryExecutionError(
+                f"Query execution failed: {exc}",
+                code=str(code) if code else None,
+                category=_classify_gremlin_error(code),
+            ) from exc
 
     async def execute_traversal(self, traversal_obj: Any, *, timeout_s: float | None = None) -> list[Any]:
         """Execute a Gremlin traversal and return results as a list.

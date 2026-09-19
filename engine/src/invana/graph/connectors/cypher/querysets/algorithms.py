@@ -29,10 +29,11 @@ class OpenCypherAlgorithmsQuerySet(BaseAlgorithmsQuerySet):
 
     async def degree_centrality(self, *, node_label: str, edge_label: str) -> list[dict[str, Any]]:
         """Degree centrality — expressible in standard Cypher."""
+        eid = self._connector.query_builder.ELEMENT_ID
         query = (
             f"MATCH (n:`{node_label}`)"
             f" OPTIONAL MATCH (n)-[r:`{edge_label}`]-()"
-            " RETURN elementId(n) AS nodeId, n AS node, count(r) AS degree"
+            f" RETURN {eid}(n) AS nodeId, n AS node, count(r) AS degree"
             " ORDER BY degree DESC"
         )
         raw = await self._connector.execute(query)
@@ -52,11 +53,12 @@ class OpenCypherAlgorithmsQuerySet(BaseAlgorithmsQuerySet):
         """Weak connected components — expressible via path traversal in Cypher."""
         # This is a simplified BFS-based approach.
         # For large graphs, vendor-native implementations are far more efficient.
+        eid = self._connector.query_builder.ELEMENT_ID
         query = (
             f"MATCH (n:`{node_label}`)"
             f" OPTIONAL MATCH path = (n)-[:`{edge_label}`*]-(m:`{node_label}`)"
             " WITH n, collect(DISTINCT m) AS component"
-            " RETURN elementId(n) AS nodeId, [x IN component | elementId(x)] AS componentMembers"
+            f" RETURN {eid}(n) AS nodeId, [x IN component | {eid}(x)] AS componentMembers"
         )
         raw = await self._connector.execute(query)
         return [{"nodeId": record["nodeId"], "component": record["componentMembers"]} for record in raw]
@@ -81,13 +83,13 @@ class OpenCypherAlgorithmsQuerySet(BaseAlgorithmsQuerySet):
 
     async def all_shortest_paths(self, *, source_id: str, target_id: str) -> list[Path]:
         """All shortest paths — standard Cypher."""
+        eid = self._connector.query_builder.ELEMENT_ID
         query = (
-            "MATCH (a), (b)"
-            " WHERE elementId(a) = $sid AND elementId(b) = $tid"
-            " MATCH p = allShortestPaths((a)-[*]-(b))"
-            " RETURN p"
+            f"MATCH (a), (b) WHERE {eid}(a) = $sid AND {eid}(b) = $tid MATCH p = allShortestPaths((a)-[*]-(b)) RETURN p"
         )
-        raw = await self._connector.execute(query, {"sid": source_id, "tid": target_id})
+        raw = await self._connector.execute(
+            query, {"sid": self._connector.coerce_id(source_id), "tid": self._connector.coerce_id(target_id)}
+        )
         return [self._serializer.deserialize_path(record["p"]) for record in raw]
 
     async def bfs(
@@ -99,14 +101,15 @@ class OpenCypherAlgorithmsQuerySet(BaseAlgorithmsQuerySet):
     ) -> list[Vertex]:
         """BFS traversal — expressible in Cypher via variable-length paths."""
         target_filter = f":`{target_label}`" if target_label else ""
+        eid = self._connector.query_builder.ELEMENT_ID
         query = (
-            "MATCH (start) WHERE elementId(start) = $sid"
+            f"MATCH (start) WHERE {eid}(start) = $sid"
             f" MATCH path = (start)-[*1..{max_depth}]-(target{target_filter})"
             " WITH target, min(length(path)) AS dist"
             " ORDER BY dist"
             " RETURN DISTINCT target"
         )
-        raw = await self._connector.execute(query, {"sid": source_id})
+        raw = await self._connector.execute(query, {"sid": self._connector.coerce_id(source_id)})
         return [self._serializer.deserialize_vertex(record["target"]) for record in raw]
 
     # -- Similarity (require vendor extensions) --

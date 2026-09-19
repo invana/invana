@@ -112,10 +112,22 @@ def _order_clause(sort: list[SortSpec] | None, var: str) -> str:
 
 
 class OpenCypherQueryBuilder:
-    """Builds parameterized openCypher queries. All methods are static and return (query, params)."""
+    """Builds parameterized openCypher queries, returning ``(query, params)``.
 
-    @staticmethod
+    Every method is a ``classmethod`` so a vendor can subclass and change one
+    name rather than one query at a time.
+    """
+
+    #: The function that yields an element's identity. ``elementId()`` is Neo4j 5's,
+    #: and is what "standard openCypher" means in this core — but it is not
+    #: universal: Memgraph has ``id()`` and no ``elementId`` at all. A vendor whose
+    #: id function differs subclasses this builder and sets this one name
+    #: (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+    ELEMENT_ID = "elementId"
+
+    @classmethod
     def match_nodes(
+        cls,
         label: str,
         filters: FilterGroup | None = None,
         limit: int | None = None,
@@ -144,8 +156,9 @@ class OpenCypherQueryBuilder:
 
         return query, params
 
-    @staticmethod
+    @classmethod
     def match_edges(
+        cls,
         label: str,
         source_label: str | None = None,
         target_label: str | None = None,
@@ -173,8 +186,9 @@ class OpenCypherQueryBuilder:
 
         return query, params
 
-    @staticmethod
+    @classmethod
     def _neighbor_match(
+        cls,
         vertex_id: str,
         direction: str,
         edge_label: str | None,
@@ -197,15 +211,16 @@ class OpenCypherQueryBuilder:
         else:
             pattern = f"(n)-{edge_part}-{neighbor}"
 
-        query = f"MATCH {pattern} WHERE elementId(n) = $vid"
+        query = f"MATCH {pattern} WHERE {cls.ELEMENT_ID}(n) = $vid"
         if filters and filters.conditions:
             where = _build_filter_clause(filters, "m", counter, params)
             if where:
                 query += f" AND ({where})"
         return query
 
-    @staticmethod
+    @classmethod
     def match_neighbors(
+        cls,
         vertex_id: str,
         direction: str = "both",
         edge_label: str | None = None,
@@ -218,9 +233,7 @@ class OpenCypherQueryBuilder:
         params: dict = {"vid": vertex_id}
         counter = _ParamCounter()
 
-        query = OpenCypherQueryBuilder._neighbor_match(
-            vertex_id, direction, edge_label, neighbor_label, filters, counter, params
-        )
+        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params)
         query += " RETURN n, r, m"
         query += _order_clause(sort, "m")
 
@@ -236,8 +249,9 @@ class OpenCypherQueryBuilder:
 
         return query, params
 
-    @staticmethod
+    @classmethod
     def count_neighbors(
+        cls,
         vertex_id: str,
         direction: str = "both",
         edge_label: str | None = None,
@@ -247,30 +261,29 @@ class OpenCypherQueryBuilder:
         params: dict = {"vid": vertex_id}
         counter = _ParamCounter()
 
-        query = OpenCypherQueryBuilder._neighbor_match(
-            vertex_id, direction, edge_label, neighbor_label, filters, counter, params
-        )
+        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params)
         query += " RETURN count(m) AS cnt"
         return query, params
 
-    @staticmethod
-    def match_node_by_id(vertex_id: str) -> tuple[str, dict]:
-        return "MATCH (n) WHERE elementId(n) = $vid RETURN n", {"vid": vertex_id}
+    @classmethod
+    def match_node_by_id(cls, vertex_id: str) -> tuple[str, dict]:
+        return f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) = $vid RETURN n", {"vid": vertex_id}
 
-    @staticmethod
-    def match_edge_by_id(edge_id: str) -> tuple[str, dict]:
+    @classmethod
+    def match_edge_by_id(cls, edge_id: str) -> tuple[str, dict]:
         return (
-            "MATCH (a)-[r]->(b) WHERE elementId(r) = $eid RETURN r, a, b",
+            f"MATCH (a)-[r]->(b) WHERE {cls.ELEMENT_ID}(r) = $eid RETURN r, a, b",
             {"eid": edge_id},
         )
 
-    @staticmethod
-    def create_node(label: str, properties: dict) -> tuple[str, dict]:
+    @classmethod
+    def create_node(cls, label: str, properties: dict) -> tuple[str, dict]:
         params = {"props": properties}
         return f"CREATE (n:`{label}` $props) RETURN n", params
 
-    @staticmethod
+    @classmethod
     def create_edge(
+        cls,
         label: str,
         source_id: str,
         target_id: str,
@@ -281,97 +294,97 @@ class OpenCypherQueryBuilder:
         if properties:
             params["props"] = properties
         return (
-            f"MATCH (a), (b) WHERE elementId(a) = $sid AND elementId(b) = $tid"
+            f"MATCH (a), (b) WHERE {cls.ELEMENT_ID}(a) = $sid AND {cls.ELEMENT_ID}(b) = $tid"
             f" CREATE (a)-[r:`{label}`{props_part}]->(b) RETURN r, a, b",
             params,
         )
 
-    @staticmethod
-    def update_node(vertex_id: str, properties: dict) -> tuple[str, dict]:
+    @classmethod
+    def update_node(cls, vertex_id: str, properties: dict) -> tuple[str, dict]:
         return (
-            "MATCH (n) WHERE elementId(n) = $vid SET n += $props RETURN n",
+            f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) = $vid SET n += $props RETURN n",
             {"vid": vertex_id, "props": properties},
         )
 
-    @staticmethod
-    def update_edge(edge_id: str, properties: dict) -> tuple[str, dict]:
+    @classmethod
+    def update_edge(cls, edge_id: str, properties: dict) -> tuple[str, dict]:
         return (
-            "MATCH ()-[r]->() WHERE elementId(r) = $eid SET r += $props RETURN r",
+            f"MATCH ()-[r]->() WHERE {cls.ELEMENT_ID}(r) = $eid SET r += $props RETURN r",
             {"eid": edge_id, "props": properties},
         )
 
-    @staticmethod
-    def delete_node(vertex_id: str) -> tuple[str, dict]:
-        return "MATCH (n) WHERE elementId(n) = $vid DETACH DELETE n", {"vid": vertex_id}
+    @classmethod
+    def delete_node(cls, vertex_id: str) -> tuple[str, dict]:
+        return f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) = $vid DETACH DELETE n", {"vid": vertex_id}
 
-    @staticmethod
-    def delete_edge(edge_id: str) -> tuple[str, dict]:
-        return "MATCH ()-[r]->() WHERE elementId(r) = $eid DELETE r", {"eid": edge_id}
+    @classmethod
+    def delete_edge(cls, edge_id: str) -> tuple[str, dict]:
+        return f"MATCH ()-[r]->() WHERE {cls.ELEMENT_ID}(r) = $eid DELETE r", {"eid": edge_id}
 
-    @staticmethod
-    def count_nodes(label: str | None = None) -> tuple[str, dict]:
+    @classmethod
+    def count_nodes(cls, label: str | None = None) -> tuple[str, dict]:
         if label:
             return f"MATCH (n:`{label}`) RETURN count(n) AS cnt", {}
         return "MATCH (n) RETURN count(n) AS cnt", {}
 
-    @staticmethod
-    def count_edges(label: str | None = None) -> tuple[str, dict]:
+    @classmethod
+    def count_edges(cls, label: str | None = None) -> tuple[str, dict]:
         if label:
             return f"MATCH ()-[r:`{label}`]->() RETURN count(r) AS cnt", {}
         return "MATCH ()-[r]->() RETURN count(r) AS cnt", {}
 
-    @staticmethod
-    def shortest_path(source_id: str, target_id: str, max_depth: int = 10) -> tuple[str, dict]:
+    @classmethod
+    def shortest_path(cls, source_id: str, target_id: str, max_depth: int = 10) -> tuple[str, dict]:
         return (
-            "MATCH (a), (b) WHERE elementId(a) = $sid AND elementId(b) = $tid"
+            f"MATCH (a), (b) WHERE {cls.ELEMENT_ID}(a) = $sid AND {cls.ELEMENT_ID}(b) = $tid"
             f" MATCH p = shortestPath((a)-[*..{max_depth}]-(b)) RETURN p",
             {"sid": source_id, "tid": target_id},
         )
 
     # -- Bulk operations --
-    @staticmethod
-    def bulk_create_nodes(label: str, records: list[dict]) -> tuple[str, dict]:
+    @classmethod
+    def bulk_create_nodes(cls, label: str, records: list[dict]) -> tuple[str, dict]:
         return (
             f"UNWIND $records AS props CREATE (n:`{label}`) SET n = props RETURN n",
             {"records": records},
         )
 
-    @staticmethod
-    def bulk_create_edges(label: str, records: list[dict]) -> tuple[str, dict]:
+    @classmethod
+    def bulk_create_edges(cls, label: str, records: list[dict]) -> tuple[str, dict]:
         return (
             "UNWIND $records AS rec"
-            " MATCH (a), (b) WHERE elementId(a) = rec.source_id AND elementId(b) = rec.target_id"
+            f" MATCH (a), (b) WHERE {cls.ELEMENT_ID}(a) = rec.source_id AND {cls.ELEMENT_ID}(b) = rec.target_id"
             f" CREATE (a)-[r:`{label}`]->(b)"
             " SET r = rec.properties"
             " RETURN r, a, b",
             {"records": records},
         )
 
-    @staticmethod
-    def bulk_delete_nodes(vertex_ids: list[str]) -> tuple[str, dict]:
+    @classmethod
+    def bulk_delete_nodes(cls, vertex_ids: list[str]) -> tuple[str, dict]:
         return (
-            "UNWIND $ids AS vid MATCH (n) WHERE elementId(n) = vid DETACH DELETE n",
+            f"UNWIND $ids AS vid MATCH (n) WHERE {cls.ELEMENT_ID}(n) = vid DETACH DELETE n",
             {"ids": vertex_ids},
         )
 
-    @staticmethod
-    def bulk_delete_edges(edge_ids: list[str]) -> tuple[str, dict]:
+    @classmethod
+    def bulk_delete_edges(cls, edge_ids: list[str]) -> tuple[str, dict]:
         return (
-            "UNWIND $ids AS eid MATCH ()-[r]->() WHERE elementId(r) = eid DELETE r",
+            f"UNWIND $ids AS eid MATCH ()-[r]->() WHERE {cls.ELEMENT_ID}(r) = eid DELETE r",
             {"ids": edge_ids},
         )
 
     # -- Schema --
-    @staticmethod
-    def get_node_labels() -> tuple[str, dict]:
+    @classmethod
+    def get_node_labels(cls) -> tuple[str, dict]:
         return "CALL db.labels() YIELD label RETURN label", {}
 
-    @staticmethod
-    def get_edge_labels() -> tuple[str, dict]:
+    @classmethod
+    def get_edge_labels(cls) -> tuple[str, dict]:
         return "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType", {}
 
-    @staticmethod
-    def get_node_label_counts() -> tuple[str, dict]:
+    @classmethod
+    def get_node_label_counts(cls) -> tuple[str, dict]:
         """Count nodes per label.
 
         ``UNWIND labels(n)`` counts a multi-labelled node once under each of its
@@ -383,16 +396,16 @@ class OpenCypherQueryBuilder:
             {},
         )
 
-    @staticmethod
-    def get_edge_label_counts() -> tuple[str, dict]:
+    @classmethod
+    def get_edge_label_counts(cls) -> tuple[str, dict]:
         """Count relationships per type."""
         return (
             "MATCH ()-[r]->() RETURN type(r) AS label, count(*) AS count ORDER BY count DESC",
             {},
         )
 
-    @staticmethod
-    def get_property_keys(label: str) -> tuple[str, dict]:
+    @classmethod
+    def get_property_keys(cls, label: str) -> tuple[str, dict]:
         return (
             f"MATCH (n:`{label}`) WITH n LIMIT 100 UNWIND keys(n) AS key RETURN DISTINCT key",
             {},

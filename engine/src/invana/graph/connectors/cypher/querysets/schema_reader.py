@@ -3,7 +3,6 @@
 from typing import Any
 
 from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReaderQuerySet
-from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
@@ -40,27 +39,27 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
     """
 
     async def get_node_labels(self) -> list[str]:
-        query, params = OpenCypherQueryBuilder.get_node_labels()
+        query, params = self._connector.query_builder.get_node_labels()
         response = await self._connector.execute(query, params)
         return [record["label"] for record in response.records]
 
     async def get_edge_labels(self) -> list[str]:
-        query, params = OpenCypherQueryBuilder.get_edge_labels()
+        query, params = self._connector.query_builder.get_edge_labels()
         response = await self._connector.execute(query, params)
         return [record["relationshipType"] for record in response.records]
 
     async def get_node_label_counts(self) -> dict[str, int]:
-        query, params = OpenCypherQueryBuilder.get_node_label_counts()
+        query, params = self._connector.query_builder.get_node_label_counts()
         response = await self._connector.execute(query, params)
         return {record["label"]: record["count"] for record in response.records}
 
     async def get_edge_label_counts(self) -> dict[str, int]:
-        query, params = OpenCypherQueryBuilder.get_edge_label_counts()
+        query, params = self._connector.query_builder.get_edge_label_counts()
         response = await self._connector.execute(query, params)
         return {record["label"]: record["count"] for record in response.records}
 
     async def get_property_keys(self, label: str) -> list[str]:
-        query, params = OpenCypherQueryBuilder.get_property_keys(label)
+        query, params = self._connector.query_builder.get_property_keys(label)
         response = await self._connector.execute(query, params)
         return [record["key"] for record in response.records]
 

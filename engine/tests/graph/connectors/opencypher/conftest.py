@@ -1,36 +1,32 @@
-"""Shared fixtures for OpenCypher connector integration tests.
+"""Shared fixtures for the openCypher conformance suite.
 
-Uses Neo4j as the test backend for standard openCypher operations.
-Requires: docker compose up -d
-
-Override with environment variables: NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, NEO4J_DATABASE
+Every test in this package runs against **each** live openCypher backend —
+Neo4j through its published `invana-neo4j` connector, Memgraph through the core
+language connector it overrides nothing of. A backend nothing is listening on
+skips, naming the compose command
+(docs/for-developers/modules/graph-connectors/features/the-connector-contract.md CC5).
 """
 
 from __future__ import annotations
 
-import os
-
 import pytest
 
-from invana.graph.connectors.cypher.connector import OpenCypherConnector
+from tests.graph.connectors.backends import CYPHER_BACKENDS
 
-NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
-NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME", "neo4j")
-NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "testpassword")
-NEO4J_DATABASE = os.environ.get("NEO4J_DATABASE", "neo4j")
+
+@pytest.fixture(params=CYPHER_BACKENDS, ids=lambda b: b.name)
+async def backend(request):
+    """The backend under test, skipped when its container is not up."""
+    if not request.param.is_up():
+        pytest.skip(f"no {request.param.name} at {request.param.host}:{request.param.port} ({request.param.compose})")
+    return request.param
 
 
 @pytest.fixture
-async def connector():
-    """Provides a connected OpenCypher connector and cleans up after each test."""
-    conn = OpenCypherConnector(
-        NEO4J_URI,
-        username=NEO4J_USERNAME,
-        password=NEO4J_PASSWORD,
-        database=NEO4J_DATABASE,
-    )
+async def connector(backend):
+    """A connected openCypher connector, with the graph emptied after each test."""
+    conn = backend.connector()
     await conn.connect()
     yield conn
-    # Clean up all test data
     await conn.execute("MATCH (n) DETACH DELETE n")
     await conn.disconnect()

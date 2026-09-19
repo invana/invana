@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import neo4j
 from neo4j import AsyncGraphDatabase
@@ -14,6 +14,7 @@ from invana.graph.connectors.base.exceptions import (
     QueryExecutionError,
 )
 from invana.graph.connectors.base.serializers import BaseSerializer
+from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 from invana.graph.connectors.cypher.querysets.algorithms import OpenCypherAlgorithmsQuerySet
 from invana.graph.connectors.cypher.querysets.bulk import OpenCypherBulkQuerySet
 from invana.graph.connectors.cypher.querysets.data_reader import OpenCypherDataReaderQuerySet
@@ -124,6 +125,33 @@ class OpenCypherConnector(BaseConnector):
 
     _capability_profile = CYPHER_PROFILE
 
+    #: The builder this connector's querysets compose with. A vendor whose dialect
+    #: differs — Memgraph's ``id()`` for ``elementId()`` — subclasses the builder and
+    #: names it here, rather than every queryset reaching for one fixed class
+    #: (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
+    query_builder: ClassVar[type[OpenCypherQueryBuilder]] = OpenCypherQueryBuilder
+
+    def classify_error(self, code: str | None, message: str) -> str:
+        """Bucket a failed query into a :class:`QueryErrorCategory`.
+
+        Neo4j says which kind of failure it was in the **code**, so that is what
+        the default reads. A vendor that does not — Memgraph returns one code for
+        everything — overrides this and reads whatever it does carry. The bucket
+        picks the user-facing copy (*the model mistranslated* vs *the question was
+        too expensive*), so a vendor that cannot be classified gets generic copy
+        rather than wrong copy.
+        """
+        return _classify_neo4j_error(code)
+
+    def coerce_id(self, id_value: str) -> Any:
+        """An element id, in the type this vendor's id function compares against.
+
+        ``elementId()`` returns a string, so the default is identity. Memgraph's
+        ``id()`` returns an **integer**, and ``id(n) = "428"`` does not fail — it
+        simply matches nothing, which is the worst way for this to be wrong.
+        """
+        return id_value
+
     async def detect_version(self) -> Version | None:
         """Detect the server version via ``dbms.components()`` (Memgraph: ``SHOW VERSION``)."""
         for query in (
@@ -171,7 +199,7 @@ class OpenCypherConnector(BaseConnector):
             raise QueryExecutionError(
                 f"Neo4j query failed: {exc}",
                 code=exc.code,
-                category=_classify_neo4j_error(exc.code),
+                category=self.classify_error(exc.code, str(exc)),
             ) from exc
         except Exception as exc:
             raise QueryExecutionError(f"Query execution failed: {exc}") from exc
