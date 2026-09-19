@@ -21,6 +21,7 @@ from invana.graph.types.data_elements import (
 )
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.lens import ComposedQuery, QueryLens, TypeBound, query_digest
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
@@ -34,6 +35,7 @@ from invana.graph.types.sort import SortDirection, SortSpec
 
 __all__ = [
     "Capability",
+    "ComposedQuery",
     "ConstraintInfo",
     "Edge",
     "EdgeSchemaInfo",
@@ -49,9 +51,12 @@ __all__ = [
     "PropertyDefinition",
     "PropertyInfo",
     "QueryLanguage",
+    "QueryLens",
     "QueryResult",
     "ResultMetadata",
     "SortDirection",
     "SortSpec",
+    "TypeBound",
     "Vertex",
+    "query_digest",
 ]
