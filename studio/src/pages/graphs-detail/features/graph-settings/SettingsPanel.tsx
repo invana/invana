@@ -122,11 +122,11 @@ type SingleTabSection = Exclude<
 	| "sessions"
 	| "schema"
 	| "model"
-	| "templates"
 	| "canvases"
 	| "messages"
 	| "projects"
-	| "tasks"
+	| "runs"
+	| "library"
 	| "agents"
 >;
 function isSingleTabSection(s: SettingsSection): s is SingleTabSection {

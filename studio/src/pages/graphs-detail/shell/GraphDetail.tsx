@@ -85,18 +85,15 @@ interface GraphDetailProps {
 const PAGE_OWNED_SECTIONS: SettingsSection[] = [
 	"explorer",
 	"model",
-	// Templates is one of the page's own panels too. Left off this list it was
-	// unreachable: the rail lit its icon, the URL carried its key, and the shell
-	// handed the column to `SettingsPanel`, which draws nothing for a key it does
-	// not know — a blank column that looked like "no data" rather than a dead
-	// surface.
-	"templates",
 	"projects",
-	// Tasks is the three-drawer stack — Runs · Plans · Catalogue (G33). `imports`
-	// and `workflows` are gone from this list because they are gone from the
-	// product: an import is a `kind` of TaskRun and a workflow is a reusable
-	// TaskPlan, each reached inside this panel (G30).
-	"tasks",
+	// **Execution and definition are two panels** (G41). `runs` is the journal as
+	// one list; `library` is the three-drawer stack — Plans · Catalogue ·
+	// Templates. `imports`, `workflows` and `templates` are gone from this list
+	// because they are gone from the product: an import is a `kind` of TaskRun, a
+	// workflow is a reusable TaskPlan, and a projection template is Library's
+	// third drawer (G30 · G38).
+	"runs",
+	"library",
 	"agents",
 	"skills",
 ];
@@ -105,11 +102,11 @@ const ALL_NATIVE_SECTIONS: SettingsSection[] = [
 	"sessions",
 	"schema",
 	"model",
-	"templates",
 	"canvases",
 	"messages",
 	"projects",
-	"tasks",
+	"runs",
+	"library",
 	"agents",
 ];
 

@@ -1,5 +1,12 @@
 /**
- * The templates page (projections.md § 5).
+ * Projection templates — the third drawer of the **Library** stack
+ * (projections.md § 5 · graph-detail-page.md G38 · G41).
+ *
+ * A projection template is to an answer what a plan is to a run: both are
+ * definitions, both are promoted from what served (projections.md C7). So it
+ * has no rail icon of its own and sits under `Plans` and `Catalogue` — the two
+ * other things a run is composed from. What this file owns is the **body**: the
+ * drawer draws the header, the count, the search and the `+` (G32).
  *
  * A projection template is what stops the model from authoring markup (P1), so
  * it is authored here by a person and versioned like anything else that decides
@@ -16,14 +23,16 @@
  *   whole reason a one-off becomes a default, so it is on the row.
  */
 
-import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
+import {
+	DetailBlock,
+	DetailStatus,
+} from "@/pages/graphs-detail/shared/DetailRows";
 import { WorkRow } from "@/pages/graphs-detail/shared/WorkRow";
 import {
 	type ProjectionTemplateRead,
 	projectionTemplatesApi,
 } from "@/services/api/runs";
 import { PanelSection } from "@/ui/PanelSection";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import {
 	Input,
 	Label,
@@ -33,9 +42,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
-import { Button, CardFooter, Spinner } from "@invana/ui";
+import {
+	Button,
+	CardFooter,
+	EmptyState,
+	PropertyRow,
+	Spinner,
+} from "@invana/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Table2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const RESULT_SURFACES = [
@@ -46,22 +61,86 @@ const RESULT_SURFACES = [
 	"markdown",
 ] as const;
 
-interface Props {
-	username: string;
-	graphSlug: string;
-	onClose?: () => void;
-}
+export const templatesKey = (username: string, graphSlug: string) =>
+	["projection-templates", username, graphSlug] as const;
 
-export function TemplatesPanel({ username, graphSlug, onClose }: Props) {
-	const [authoring, setAuthoring] = useState(false);
-	const qc = useQueryClient();
-	const key = ["projection-templates", username, graphSlug] as const;
-
-	const templates = useQuery({
-		queryKey: key,
+function useTemplatesQuery(username: string, graphSlug: string) {
+	return useQuery({
+		queryKey: templatesKey(username, graphSlug),
 		queryFn: () => projectionTemplatesApi.list(username, graphSlug),
 	});
-	const invalidate = () => qc.invalidateQueries({ queryKey: key });
+}
+
+/**
+ * The drilled-in drawer header's trail. A template's id is a uuid and says
+ * nothing, so the header carries its **name** — read from the list already in
+ * cache rather than by a second request.
+ */
+export function TemplateTrail({
+	username,
+	graphSlug,
+	id,
+}: {
+	username: string;
+	graphSlug: string;
+	id: string;
+}) {
+	const templates = useTemplatesQuery(username, graphSlug);
+	const found = templates.data?.find((t) => t.id === id);
+	return <>{found?.name ?? id.slice(0, 8)}</>;
+}
+
+/** `11 · 5 result` — what the drawer header carries beside its label. */
+export function TemplatesCount({
+	username,
+	graphSlug,
+}: {
+	username: string;
+	graphSlug: string;
+}) {
+	const templates = useTemplatesQuery(username, graphSlug);
+	const rows = templates.data ?? [];
+	if (!rows.length) return null;
+	const results = rows.filter((t) => t.kind === "result").length;
+	return <>{`${rows.length} · ${results} result`}</>;
+}
+
+interface BodyProps {
+	username: string;
+	graphSlug: string;
+	/** The live search string from the drawer header, empty when closed. */
+	search?: string;
+	/** The drawer's own filters — `kind` and `surface` (§3a). */
+	kindFilter?: string;
+	surfaceFilter?: string;
+	/** `&template=` — the template whose detail replaces this drawer's body. */
+	selectedId: string | null;
+	onSelect: (id: string | null) => void;
+	/** True while the drawer's `+` has the author form open. */
+	authoring?: boolean;
+	onAuthored?: () => void;
+}
+
+/**
+ * The drawer's body: the author form, one template read end to end, or the
+ * two-section list — `Result` over `Prompt`, which is the order a person meets
+ * them in (an answer is rendered before a question is asked back).
+ */
+export function TemplatesDrawerBody({
+	username,
+	graphSlug,
+	search = "",
+	kindFilter = "",
+	surfaceFilter = "",
+	selectedId,
+	onSelect,
+	authoring,
+	onAuthored,
+}: BodyProps) {
+	const qc = useQueryClient();
+	const templates = useTemplatesQuery(username, graphSlug);
+	const invalidate = () =>
+		qc.invalidateQueries({ queryKey: templatesKey(username, graphSlug) });
 
 	const publish = useMutation({
 		mutationFn: (id: string) =>
@@ -71,114 +150,155 @@ export function TemplatesPanel({ username, graphSlug, onClose }: Props) {
 	const remove = useMutation({
 		mutationFn: (id: string) =>
 			projectionTemplatesApi.remove(username, graphSlug, id),
-		onSuccess: invalidate,
+		onSuccess: () => {
+			invalidate();
+			// The row it was drilled into is gone, so the drawer goes back to the
+			// list rather than showing a detail for a record that no longer exists.
+			onSelect(null);
+		},
 	});
 
-	const rows = templates.data ?? [];
+	if (authoring) {
+		return (
+			<TemplateForm
+				username={username}
+				graphSlug={graphSlug}
+				onDone={() => {
+					invalidate();
+					onAuthored?.();
+				}}
+			/>
+		);
+	}
+
+	if (templates.isLoading) {
+		return (
+			<div className="p-4">
+				<Spinner />
+			</div>
+		);
+	}
+
+	const all = templates.data ?? [];
+
+	const selected = selectedId
+		? (all.find((t) => t.id === selectedId) ?? null)
+		: null;
+	if (selectedId && !selected) {
+		return (
+			<EmptyState
+				className="p-4"
+				title="That template is gone"
+				description="It was removed, or it belongs to another Graph. The list beside it is the ones this Graph can render with."
+			/>
+		);
+	}
+	if (selected) {
+		return (
+			<TemplateDetail
+				template={selected}
+				onPublish={() => publish.mutate(selected.id)}
+				onDelete={() => remove.mutate(selected.id)}
+			/>
+		);
+	}
+
+	const q = search.trim().toLowerCase();
+	const rows = all.filter(
+		(t) =>
+			(!q || `${t.name} ${t.surface} ${t.intent}`.toLowerCase().includes(q)) &&
+			(!kindFilter || t.kind === kindFilter) &&
+			(!surfaceFilter || t.surface === surfaceFilter),
+	);
+
+	const narrowed = Boolean(q || kindFilter || surfaceFilter);
+	if (!rows.length) {
+		return (
+			<EmptyState
+				className="p-4"
+				title={narrowed ? "No template matches" : "No templates yet"}
+				description={
+					narrowed
+						? "Nothing in this Graph renders under that name, surface or intent."
+						: "A template decides what an answer looks like. Author one here, or promote the one an answer already served with."
+				}
+			/>
+		);
+	}
+
 	const results = rows.filter((t) => t.kind === "result");
 	const prompts = rows.filter((t) => t.kind === "prompt");
 
 	return (
-		<ListPanelChrome
-			title="Templates"
-			icon={Table2}
-			onRefresh={() => templates.refetch()}
-			isRefreshing={templates.isFetching}
-			onClose={onClose}
-			listControls={false}
-			leadingActions={[
-				{
-					key: "new",
-					name: "Author a template",
-					icon: Plus,
-					onClick: () => setAuthoring(true),
-				},
-			]}
-		>
-			{() =>
-				authoring ? (
-					<TemplateForm
-						username={username}
-						graphSlug={graphSlug}
-						onDone={() => {
-							setAuthoring(false);
-							invalidate();
-						}}
-					/>
+		<>
+			<PanelSection title="Result" hint={`${results.length}`}>
+				{results.length === 0 ? (
+					<p className="text-sm text-muted-foreground">
+						None under this search.
+					</p>
 				) : (
-					<div className="flex h-full min-h-0 flex-col">
-						<div className="min-h-0 flex-1 overflow-y-auto">
-							{templates.isLoading ? (
-								<div className="p-4">
-									<Spinner />
-								</div>
-							) : (
-								<>
-									<PanelSection title="Result" hint={`${results.length}`}>
-										{results.map((template) => (
-											<TemplateRow
-												key={template.id}
-												template={template}
-												onPublish={() => publish.mutate(template.id)}
-												onDelete={() => remove.mutate(template.id)}
-											/>
-										))}
-									</PanelSection>
-									<PanelSection title="Prompt" hint={`${prompts.length}`}>
-										{prompts.length === 0 ? (
-											<p className="text-sm text-muted-foreground">
-												None yet. A prompt template is how a step asks a closed
-												question — choice, yes/no, or a pick from the graph — so
-												the answer is a value rather than a sentence.
-											</p>
-										) : (
-											prompts.map((template) => (
-												<TemplateRow
-													key={template.id}
-													template={template}
-													onPublish={() => publish.mutate(template.id)}
-													onDelete={() => remove.mutate(template.id)}
-												/>
-											))
-										)}
-									</PanelSection>
-								</>
-							)}
-						</div>
-						<PanelStatusBar
-							left={<StatusCrumb active>Templates ({rows.length})</StatusCrumb>}
-							middle={[
-								<StatusCount key="shipped">
-									{rows.filter((t) => t.shipped).length} shipped
-								</StatusCount>,
-							]}
-							right="the template owns the markup"
+					results.map((template) => (
+						<TemplateRow
+							key={template.id}
+							template={template}
+							active={template.id === selectedId}
+							onClick={() => onSelect(template.id)}
+							onPublish={() => publish.mutate(template.id)}
+							onDelete={() => remove.mutate(template.id)}
 						/>
-					</div>
-				)
-			}
-		</ListPanelChrome>
+					))
+				)}
+			</PanelSection>
+			<PanelSection title="Prompt" hint={`${prompts.length}`}>
+				{prompts.length === 0 ? (
+					<p className="text-sm text-muted-foreground">
+						None yet. A prompt template is how a step asks a closed question —
+						choice, yes/no, or a pick from the graph — so the answer is a value
+						rather than a sentence.
+					</p>
+				) : (
+					prompts.map((template) => (
+						<TemplateRow
+							key={template.id}
+							template={template}
+							active={template.id === selectedId}
+							onClick={() => onSelect(template.id)}
+							onPublish={() => publish.mutate(template.id)}
+							onDelete={() => remove.mutate(template.id)}
+						/>
+					))
+				)}
+			</PanelSection>
+		</>
 	);
 }
 
 function TemplateRow({
 	template,
+	active,
+	onClick,
 	onPublish,
 	onDelete,
 }: {
 	template: ProjectionTemplateRead;
+	active?: boolean;
+	onClick?: () => void;
 	onPublish: () => void;
 	onDelete: () => void;
 }) {
 	return (
 		<WorkRow
+			active={active}
+			onClick={onClick}
 			tone={template.status === "published" ? "info" : "muted"}
 			title={
 				<span className="flex items-center gap-1.5">
-					{template.name}
-					<span className="text-xs text-muted-foreground">
+					{/* The surface leads the row on the artboard — it is what the
+					    answer will look like, and the name is how it is referred to. */}
+					<span className="shrink-0 bg-muted px-1.5 py-0.5 font-mono text-meta leading-none text-muted-foreground">
 						{template.surface}
 					</span>
+					{template.name}
 					{template.shipped ? (
 						<span className="border border-border px-1.5 py-0.5 text-meta uppercase leading-none text-muted-foreground">
 							shipped
@@ -193,7 +313,8 @@ function TemplateRow({
 			}
 			subtitle={
 				<span className="truncate">
-					{template.intent || "no intent stated"} · rendered {template.used}×
+					{template.intent || "no intent stated"} · v{template.version} · used{" "}
+					{template.used}×
 				</span>
 			}
 			actions={
@@ -222,6 +343,79 @@ function TemplateRow({
 				)
 			}
 		/>
+	);
+}
+
+/**
+ * One template, read end to end — `&template=`, inside the drawer (G33).
+ *
+ * It is a **statement of fact**, not a disabled form: a published template is
+ * read-only because an answer rendered with it must not change shape after the
+ * fact, and a shipped one belongs to every Graph. The detail says which, and
+ * offers the one action that applies.
+ */
+function TemplateDetail({
+	template,
+	onPublish,
+	onDelete,
+}: {
+	template: ProjectionTemplateRead;
+	onPublish: () => void;
+	onDelete: () => void;
+}) {
+	return (
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="min-h-0 flex-1 overflow-y-auto">
+				<DetailBlock
+					className="mt-0"
+					title={template.name}
+					subtitle={template.intent || "no intent stated"}
+				>
+					<PropertyRow label="kind">{template.kind}</PropertyRow>
+					<PropertyRow label="surface">{template.surface}</PropertyRow>
+					<PropertyRow label="version">{`v${template.version}`}</PropertyRow>
+					<PropertyRow label="status">
+						<DetailStatus
+							tone={template.status === "published" ? "info" : "warning"}
+						>
+							{template.status}
+						</DetailStatus>
+					</PropertyRow>
+					<PropertyRow label="rendered">{`${template.used}×`}</PropertyRow>
+					<PropertyRow label="owner">
+						{template.shipped
+							? "ships with Invana — every Graph"
+							: "this Graph"}
+					</PropertyRow>
+				</DetailBlock>
+				<PanelSection title="Accepts" hint="what it can render">
+					{/* The shape it accepts is why selection can rank it against the
+					    shipped templates — so it is stated, not hidden. */}
+					<pre className="overflow-x-auto whitespace-pre-wrap font-mono text-meta text-muted-foreground">
+						{JSON.stringify(template.accepts, null, 2)}
+					</pre>
+				</PanelSection>
+			</div>
+			{template.shipped ? null : (
+				<CardFooter className="shrink-0 flex-wrap gap-2 border-t">
+					{template.status === "draft" ? (
+						<Button size="sm" onClick={onPublish}>
+							Publish
+						</Button>
+					) : null}
+					<span className="flex-1" />
+					<Button
+						size="sm"
+						variant="ghost"
+						onClick={onDelete}
+						title="Remove — refused while answers still cite it"
+					>
+						<Trash2 className="mr-1.5 h-3.5 w-3.5" />
+						Remove
+					</Button>
+				</CardFooter>
+			)}
+		</div>
 	);
 }
 

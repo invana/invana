@@ -9,11 +9,11 @@ import {
 	Compass,
 	type Database,
 	FolderOpen,
+	History,
 	Info,
-	ListChecks,
+	Library,
 	ListTree,
 	Settings,
-	Table2,
 	Wand2,
 } from "lucide-react";
 
@@ -57,30 +57,33 @@ const VIEW_SECTIONS: SectionMeta[] = [
 	// starts from a type you already have selected, so it lives in the Model
 	// panel, and the union it implies is a page because it belongs to no single
 	// model (stitch-models.md · Surfaces).
-	// Projection templates decide what an answer looks like
-	// (docs/for-developers/modules/ask/features/projections.md), so they sit with
-	// the other things a person authors rather than under Settings.
-	{ key: "templates", label: "Templates", icon: Table2 },
-	// **The work group is two icons: Projects and Tasks** (G30). Projects owns
-	// **Todos** — what a person wrote, under a project or the *No project*
-	// bucket (PT7). Tasks owns **execution**, and it is three drawers: Runs ·
-	// Plans · Catalogue — what ran, what can be run, and the closed vocabulary
-	// those plans are written in (G33).
+	//
+	// **The work group is three icons: Projects, Runs and Library** (G30 · G41).
+	// Projects owns **Todos** — what a person wrote, under a project or the *No
+	// project* bucket (PT7). Runs owns **execution**: the journal, and nothing
+	// else, as one list (SR1 · G33). Library owns **definition**: Plans ·
+	// Catalogue · Templates — what can be run, the closed vocabulary it is
+	// written in, and how its output renders.
 	{ key: "projects", label: "Projects", icon: FolderOpen },
-	{ key: "tasks", label: "Tasks", icon: ListChecks },
+	{ key: "runs", label: "Runs", icon: History },
+	// **Templates has no item of its own** (G38). A projection template is to an
+	// answer what a plan is to a run — both are definitions, both are promoted
+	// from what served — so it is Library's third drawer rather than a place you
+	// go. It is the same rule G14 applies to Stitches.
+	{ key: "library", label: "Library", icon: Library },
 	{ key: "agents", label: "Agents", icon: Bot },
 ];
 
 /**
  * The one left rail (icon column). Surfaces:
  *
- * - Top: Info, then the page's own panels — Explorer · Model · Templates ·
- *   Projects · Tasks · Agents. **Seven, not nine** (G30): Imports and Workflows
- *   lost their icons, because an import is a `kind` of TaskRun and a workflow is
- *   a reusable TaskPlan, so each was an icon onto a *filter* of a list that
- *   already exists — and an icon per filter is how one journal became four
- *   panels. Both are reached inside **Tasks**, which is three drawers: Runs ·
- *   Plans · Catalogue (G33).
+ * - Top: Info, then the page's own panels — Explorer · Model · Projects ·
+ *   Runs · Library · Agents. **Imports and Workflows have no icons** (G30),
+ *   because an import is a `kind` of TaskRun and a workflow is a reusable
+ *   TaskPlan, so each was an icon onto a *filter* of a list that already exists
+ *   — and an icon per filter is how one journal became four panels. An import is
+ *   reached in **Runs**, a workflow in **Library › Plans**. **Templates has no
+ *   icon either** (G38): it is Library's third drawer.
  *   Every one is a `?panel` key, so the whole rail is a single-open accordion
  *   with one mechanism. Info
  *   is the exception that proves it: it still renders through `SettingsPanel`,

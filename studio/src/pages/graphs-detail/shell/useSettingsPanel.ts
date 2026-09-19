@@ -11,11 +11,18 @@ import { useSearchParams } from "react-router-dom";
 // GraphDetail) renders its own panel for these instead of the SettingsPanel.
 //
 // With the work surfaces (docs/for-developers/modules/work/spec.md) the page-owned set is sessions ·
-// model · projects · tasks · agents — because every new
+// model · projects · runs · library · agents — because every new
 // noun opens in the left panel and paints on the canvas rather than getting a
 // page of its own. `schema` and `messages` are leftovers from the one-page decision (docs/for-developers/modules/explore/spec.md): the
 // separate Modeller page is retired, so `schema` redirects onto `model` and
 // `messages` onto `sessions`.
+//
+// **`tasks` and `templates` are gone** (graph-detail-page.md G31 · G38 · G41).
+// Execution and definition are two panels — `runs` (the journal, a list) and
+// `library` (Plans · Catalogue · Templates, a stack) — and Templates has no icon
+// of its own any more. Both old keys name surfaces that no longer exist and are
+// **deleted, not redirected**: a stale link lands on the graph page, which is
+// what an unknown `?panel` has always done.
 export type SettingsSection =
 	| "info"
 	| "explorer"
@@ -30,11 +37,11 @@ export type SettingsSection =
 	| "sessions"
 	| "schema"
 	| "model"
-	| "templates"
 	| "canvases"
 	| "messages"
 	| "projects"
-	| "tasks"
+	| "runs"
+	| "library"
 	| "agents";
 
 const DEFAULT_SECTION: SettingsSection = "info";
@@ -46,7 +53,7 @@ const DEFAULT_SECTION: SettingsSection = "info";
 //   ?right=  who holds rightSection — assistant | inspector, absent is closed
 //
 // `?settings=` was this param's first name, from when every value in it was a
-// settings section. Most are not — Model, Templates, Projects, Tasks and Agents
+// settings section. Most are not — Model, Projects, Runs, Library and Agents
 // are the page's own panels — so the param is named for the region it drives
 // rather than for the group that used to fill it. The old name is still
 // **read**, so a bookmark keeps working; it is never written.
@@ -54,24 +61,28 @@ const PANEL_PARAM = "panel";
 const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useDrawerStack): which drawer holds the height,
-// and what is drilled into inside it (G31). **Tasks** (Runs · Plans ·
-// Catalogue) and **Projects** (Projects · Todos) are the two stacks. These are
+// and what is drilled into inside it (G31 · G35). **Library** (Plans ·
+// Catalogue · Templates) and **Projects** (Projects · Todos) are the two stacks;
+// **Runs** is a list, so it carries `run` and no `drawer` (G33). These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
-// the URL under a different rail icon names a drawer that is not on screen.
+// the URL under a different rail icon names a body that is not on screen.
 const STACK_PARAMS = [
 	"drawer",
 	"run",
 	"plan",
 	"entry",
+	"template",
 	"project",
 	"todo",
 ] as const;
 
 // Which stack keys belong to which section. A write names one section, so every
-// key that is not that section's is dropped — switching from Tasks to Projects
-// must not leave `&run=` behind, and `?drawer=runs` is not a Projects drawer.
+// key that is not that section's is dropped — switching from Runs to Projects
+// must not leave `&run=` behind, and `?drawer=plans` is not a Projects drawer.
 const STACK_KEYS_OF: Partial<Record<SettingsSection, readonly string[]>> = {
-	tasks: ["drawer", "run", "plan", "entry"],
+	// Runs takes no `?drawer=` — one list, so there is nothing to choose between.
+	runs: ["run"],
+	library: ["drawer", "plan", "entry", "template"],
 	projects: ["drawer", "project", "todo"],
 };
 
@@ -98,11 +109,11 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"sessions",
 	"schema",
 	"model",
-	"templates",
 	"canvases",
 	"messages",
 	"projects",
-	"tasks",
+	"runs",
+	"library",
 	"agents",
 ];
 
@@ -110,13 +121,13 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 // the thing it named rather than on nothing. These are values of `?panel`; the
 // param's own old name is handled by LEGACY_PANEL_PARAM above.
 //
-// **`imports`, `workflows`, `datasets` and `runs` are not here, and never
-// will be.** They name surfaces that no longer exist, and the flows behind them
-// are folded into the Tasks stack in the same slice their panels are deleted —
-// so they are **deleted, not redirected** (G31). A stale link lands on the graph
-// page, which is what an unknown `?panel` has always done. No backward
-// compatibility is kept anywhere in this refactor; a redirect table is a second
-// vocabulary to maintain for links that are weeks old.
+// **`tasks`, `templates`, `imports`, `workflows` and `datasets` are not here,
+// and never will be.** They name surfaces that no longer exist, and the flows
+// behind them are folded into `runs` and `library` in the same slice their
+// panels are deleted — so they are **deleted, not redirected** (G31). A stale
+// link lands on the graph page, which is what an unknown `?panel` has always
+// done. No backward compatibility is kept anywhere in this refactor; a redirect
+// table is a second vocabulary to maintain for links that are weeks old.
 //
 // docs/for-developers/modules/explore/spec.md retired the Modeller page, so its two panel keys now name panels
 // that live on the one page.

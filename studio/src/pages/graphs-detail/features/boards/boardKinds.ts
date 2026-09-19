@@ -125,9 +125,9 @@ export const CANVAS_KINDS: Record<CanvasKind, CanvasKindSpec> = {
 		// Authoring a workflow is out of MVP; a canvas is not a loophole in a
 		// threat model (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
 		writesFromGesture: false,
-		// The library is the **Plans** drawer of the Tasks stack; a workflow is a
-		// reusable TaskPlan, not a panel of its own (G30 · G33).
-		panel: "tasks",
+		// The library is **Library › Plans**; a workflow is a reusable TaskPlan, not
+		// a panel of its own (G30 · G41).
+		panel: "library",
 		hasLayers: false,
 		footer: "LIBRARY",
 	},
@@ -222,8 +222,8 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Run",
 		icon: LayoutDashboard,
-		// `More` on a run in the Runs drawer (SR13).
-		panel: "tasks",
+		// `More` on a run in the Runs panel (SR13).
+		panel: "runs",
 		subject: "a root task_runs.id",
 	},
 	plan_runs: {
@@ -231,8 +231,8 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Plan",
 		icon: LayoutDashboard,
-		// A plan in the Plans drawer — its flow with per-task medians and its runs.
-		panel: "tasks",
+		// A plan in Library › Plans — its flow with per-task medians and its runs.
+		panel: "library",
 		subject: "a task_plans.id",
 	},
 	task_run: {
@@ -240,8 +240,8 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		renders: "dashboard",
 		label: "Step",
 		icon: SquareActivity,
-		// A task on the run dashboard's flow (SR18) — never a drawer row of its own.
-		panel: "tasks",
+		// A task on the run dashboard's flow (SR18) — never a list row of its own.
+		panel: "runs",
 		subject: "one attempt of a task — a child task_runs.id",
 	},
 };

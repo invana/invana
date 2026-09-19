@@ -178,15 +178,15 @@ Two things, and they are independent of each other.
 
 **The rail** — a reshape that touches every panel:
 
-| Move | From | To |
-|---|---|---|
-| Tasks splits | one panel, 3 drawers | `Runs` (a list) + `Library` (`Plans` · `Catalogue` · `Templates`) |
-| Templates | its own icon | Library, drawer 3 — `TemplatesPanel.tsx` moves |
-| LLMs | Graph settings tab | Agents, drawer 2 — `LLMsPanel.tsx` moves |
-| Guardrails | — | Govern, drawer 2 |
-| Skills | bottom group | top group |
-| Agents | top group | bottom group |
-| Settings | 4 tabs | `Basic` · `Graph` |
+| Move | From | To | |
+|---|---|---|---|
+| Tasks splits | one panel, 3 drawers | `Runs` (a list) + `Library` (`Plans` · `Catalogue` · `Templates`) | ✅ |
+| Templates | its own icon | Library, drawer 3 — `TemplatesDrawer` over `TemplatesPanel` | ✅ |
+| LLMs | Graph settings tab | Agents, drawer 2 — `LLMsPanel.tsx` moves | |
+| Guardrails | — | Govern, drawer 2 | |
+| Skills | bottom group | top group | |
+| Agents | top group | bottom group | |
+| Settings | 4 tabs | `Basic` · `Graph` | |
 
 **Retired keys are deleted, not redirected** — `?panel=tasks` · `imports` · `workflows` · `thoughts`
 ([G31](../building-studio/graph-detail-page.md)).

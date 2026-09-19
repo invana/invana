@@ -137,8 +137,8 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "Every answer traces back LLM \u2192 query \u2192 record \u2192 dataset. Nothing is invented to fill a gap — when the graph cannot answer, Invana says so.",
 		},
 		// A load is a TaskRun, so the step lands on the journal that lists them —
-		// the Runs drawer of the Tasks stack, not an Imports panel (SR7 · G30).
-		settingsSection: "tasks",
+		// the Runs panel, not an Imports panel (SR7 · G30 · G41).
+		settingsSection: "runs",
 		// Copied and run as-is, so it is the command's real signature: the group
 		// is `records` (a Dataset is not a container, so the group names the
 		// object), and `--name` and `--path` are required and not positional.
@@ -238,8 +238,8 @@ export const WHAT_NEXT: readonly {
 		label: "Build a plan",
 		description:
 			"Name the tasks a good answer takes, so the next one takes them too.",
-		// A workflow is a reusable TaskPlan, listed in the Plans drawer (SR5 · G30).
-		settingsSection: "tasks",
+		// A workflow is a reusable TaskPlan, listed in Library › Plans (SR5 · G41).
+		settingsSection: "library",
 	},
 	{
 		label: "Start a project",

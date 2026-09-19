@@ -1,8 +1,9 @@
-// **Plans** — the second drawer of the Tasks stack (graph-detail-page.md §3a).
+// **Plans** — the first drawer of the Library stack (graph-detail-page.md §3a ·
+// G41).
 //
-// A plan is what a run executed, so this drawer sits directly under Runs:
-// following *this run → the plan it ran* never leaves the column and never
-// closes what you came from (G33).
+// A plan is what can be run, and the two drawers under it are what it is made
+// of: the catalogue it may name, and the template that renders what it produced.
+// The journal of what actually ran is **Runs**, its own panel (SR1).
 //
 // The library lists **reusable plans only**, with origin as a badge
 // (the-library.md LB5–LB7) — a workflow is a reusable TaskPlan, not a kind
@@ -128,7 +129,12 @@ export function plansDrawerSection({
 	);
 }
 
-/** `7 reusable` — what the drawer header carries beside its label. */
+/**
+ * `6 · 3 builtin` — what the drawer header carries beside its label, as the
+ * artboard draws it. The total is *how much there is to pick from*; the builtin
+ * share is *how much of it came with Invana*, which is the one split a reader
+ * asks about before they have authored anything (LB5).
+ */
 function PlansCount({
 	username,
 	graphSlug,
@@ -137,7 +143,8 @@ function PlansCount({
 	graphSlug: string;
 }) {
 	const list = useWorkflowsQuery(username, graphSlug);
-	const n = list.data?.items?.length ?? 0;
-	if (!n) return null;
-	return <>{`${n} reusable`}</>;
+	const items = list.data?.items ?? [];
+	if (!items.length) return null;
+	const builtin = items.filter((w) => w.origin === "builtin").length;
+	return <>{builtin ? `${items.length} · ${builtin} builtin` : items.length}</>;
 }

@@ -20,7 +20,6 @@ import {
 	markSessionTutorialSeen,
 } from "@/pages/graphs-detail/features/ask/assistant/SessionTutorialModal";
 import { useSessions } from "@/pages/graphs-detail/features/ask/assistant/useSessions";
-import { TemplatesPanel } from "@/pages/graphs-detail/features/ask/projections/TemplatesPanel";
 import {
 	BOARD_KINDS,
 	CANVAS_KINDS,
@@ -56,7 +55,7 @@ import {
 import { InspectorPanel } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
 import { useExpandNode } from "@/pages/graphs-detail/features/explorer";
-import { TasksStackPanel } from "@/pages/graphs-detail/features/operate/TasksStackPanel";
+import { RunsPanel } from "@/pages/graphs-detail/features/operate/RunsPanel";
 import {
 	RunDashboardPage,
 	StepDashboardPage,
@@ -76,6 +75,7 @@ import {
 	WorkCanvasStatus,
 	type WorkCanvasTarget,
 } from "@/pages/graphs-detail/features/work/WorkCanvasChrome";
+import { LibraryStackPanel } from "@/pages/graphs-detail/features/workflows/LibraryStackPanel";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
@@ -400,7 +400,7 @@ export function GraphDetailPage() {
 	const taskMutations = useTaskMutations(username ?? "", graphSlug ?? "");
 
 	const openWorkPanel = useCallback(
-		(section: "projects" | "tasks" | "agents" | "skills") => {
+		(section: "projects" | "runs" | "library" | "agents" | "skills") => {
 			settingsPanel.setSection(section);
 		},
 		[settingsPanel],
@@ -439,8 +439,8 @@ export function GraphDetailPage() {
 			// project or one of its Todos is what was picked (PT7).
 			settingsSection === "projects" && selectedProjectKey
 				? "plan"
-				: // Tasks owns the Plans drawer, so the plan flow is its canvas (G33).
-					settingsSection === "tasks" && selectedWorkflowKey
+				: // Library owns the Plans drawer, so the plan flow is its canvas (G41).
+					settingsSection === "library" && selectedWorkflowKey
 					? "workflow"
 					: settingsSection === "agents" && selectedAgentId
 						? "lineage"
@@ -1952,10 +1952,10 @@ export function GraphDetailPage() {
 					modelName={modelName}
 					onOpenModel={() => {
 						// A node's provenance line opens the journal that holds the run
-						// that wrote it — the Runs drawer of the Tasks stack, not a
-						// panel of its own (SR7). There is no model facet to narrow to:
-						// the journal is filtered by kind, never by subject.
-						settingsPanel.setSection("tasks");
+						// that wrote it — the Runs panel, not an Imports panel of its own
+						// (SR7 · G41). There is no model facet to narrow to: the journal
+						// is filtered by kind, never by subject.
+						settingsPanel.setSection("runs");
 					}}
 				/>
 			),
@@ -1997,15 +1997,9 @@ export function GraphDetailPage() {
 				}}
 				onOpenAllModels={() => setAllModelsOpen(true)}
 			/>
-		) : settingsPanel.section === "templates" ? (
-			<TemplatesPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				onClose={closeLeftPanel}
-			/>
 		) : settingsPanel.section === "projects" ? (
 			// **Projects owns Todos** (PT7) — two drawers, `Projects` over `Todos`,
-			// the same stack shape Tasks takes. With no project drilled into, the
+			// the same stack shape Library takes. With no project drilled into, the
 			// Todos drawer is every Todo in the Graph: the *No project* bucket.
 			<ProjectsStackPanel
 				username={username as string}
@@ -2021,17 +2015,26 @@ export function GraphDetailPage() {
 					openWorkPanel("agents");
 				}}
 			/>
-		) : settingsPanel.section === "tasks" ? (
-			// **Tasks is execution** — Runs · Plans · Catalogue, stacked, with no
-			// panel header above them (G33). Todos are not here: they live under
-			// Projects, because a Todo without its project is a to-do list (PT7).
-			<TasksStackPanel
+		) : settingsPanel.section === "runs" ? (
+			// **Runs is execution** — the journal, and nothing else, as one list
+			// (G41 · SR1). Todos are not here: they live under Projects, because a
+			// Todo without its project is a to-do list (PT7).
+			<RunsPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
-				selectedStepId={selectedStepId}
+				onClose={closeLeftPanel}
 				onOpenRunDashboard={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
+			/>
+		) : settingsPanel.section === "library" ? (
+			// **Library is definition** — Plans · Catalogue · Templates, stacked,
+			// with no panel header above them (G33 · G41): what can be run, the
+			// closed vocabulary it is written in, and how its output renders.
+			<LibraryStackPanel
+				username={username as string}
+				graphSlug={graphSlug as string}
+				selectedStepId={selectedStepId}
 				onOpenPlanCanvas={(key) => {
 					setSelectedWorkflowKey(key);
 					setWorkKind("workflow");
@@ -2130,12 +2133,12 @@ export function GraphDetailPage() {
 	const canvasEmptyHint =
 		settingsSection === "model"
 			? "Pick a model to draw it — its types as nodes, its edge types as the edges between them."
-			: settingsSection === "templates"
-				? "A template decides what an answer looks like. Switching one is a control on the emission's own header — this is where they are authored."
-				: settingsSection === "projects"
-					? "Pick a project to draw its plan — todos as cards, dependencies left to right."
-					: settingsSection === "tasks"
-						? "Pick a plan to draw the flow it will run. A run reads in the drawer itself — stats, where the time went, and the log."
+			: settingsSection === "projects"
+				? "Pick a project to draw its plan — todos as cards, dependencies left to right."
+				: settingsSection === "runs"
+					? "Pick a run to read it — stats, where the time went, and the log. `More` opens its dashboard as a page."
+					: settingsSection === "library"
+						? "Pick a plan to draw the flow it will run. A template decides what its answer looks like; the catalogue is what it may name at all."
 						: settingsSection === "agents"
 							? "Pick an agent to draw who created it and what it has worked on."
 							: settingsSection === "skills"

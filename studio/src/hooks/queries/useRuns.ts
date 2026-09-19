@@ -90,6 +90,10 @@ export function useRunsJournalQuery(
 	return {
 		rows,
 		isLoading: runs.isLoading,
+		// The panel header's refresh control spins on `isFetching` and calls
+		// `refetch` — a list a person is watching needs a way to ask again.
+		isFetching: runs.isFetching,
+		refetch: runs.refetch,
 		live: rows.filter((r) => LIVE.includes(r.status)).length,
 	};
 }

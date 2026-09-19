@@ -170,5 +170,5 @@ it here yet.
 
 | | |
 |---|---|
-| Studio | `src/pages/graphs-detail/features/ask/projections/` — `TemplatesPanel`, the Templates `leftSection` |
+| Studio | `src/pages/graphs-detail/features/ask/projections/` — `TemplatesDrawer` (the section) over `TemplatesPanel` (the body). **Templates is Library's third drawer, not a `leftNav` item** ([G38](../../../building-studio/graph-detail-page.md)): a template is to an answer what a plan is to a run, so it sits beside `Plans` and `Catalogue`. The drawer owns the header — label, the `11 · 5 result` count, search, the `kind`/`surface` filter and the `+` that authors one; `&template=` drills into one, read end to end, inside the drawer |
 | The word | A **template** here is the versioned, person-authored thing this feature describes. Nothing else in Studio may take the name — see [code-shape.md](../../../building-studio/code-shape.md) §4.1b |

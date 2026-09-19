@@ -300,7 +300,7 @@ Six artboards on a fourth canvas — *Skills · and the left rail*
 | `SkillFlow` | a skill's **Flow** tab — the plan canvas, every step naming its sentence | 🟡 | 🔵 | ✅ |
 | `SkillAuthor` | authoring — the clarification that pauses instead of guessing ([§0.8](orchestration.md#08-a-skill-drawn-as-a-flow)) | 🔵 | 🔵 | ✅ |
 | `SkillBindings` | agent · skill · plan, and the bind-time refusal | 🟡 | 🔵 | ✅ |
-| `Library` | Library › Plans · Catalogue · Templates ([G41](building-studio/graph-detail-page.md)) | 🟡 | 🔵 | ✅ |
+| `Library` | Library › Plans · Catalogue · Templates ([G41](building-studio/graph-detail-page.md)) | 🟡 | ✅ | ✅ |
 | `RailMap` | the rail itself — eight top, three bottom. **A map, not a screen** | — | — | — |
 
 **`Shell ✅` on every row above, and it means something different here.** These were composed on the

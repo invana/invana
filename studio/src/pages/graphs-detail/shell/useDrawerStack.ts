@@ -5,11 +5,12 @@ import { useSearchParams } from "react-router-dom";
 // `?drawer=`, and what is drilled into through one key per record
 // (graph-detail-page.md G31 · G33).
 //
-// Two panels are stacks today — **Tasks** (Runs · Plans · Catalogue) and
+// Two panels are stacks today — **Library** (Plans · Catalogue · Templates) and
 // **Projects** (Projects · Todos) — and they share this hook rather than one
-// each, so the param vocabulary is described once. Only one panel is open at a
-// time (`?panel=` is single-open), so `?drawer=` never has two owners; the
-// per-record keys are named for the record rather than for the drawer, so a
+// each, so the param vocabulary is described once. **Runs is not one of them**:
+// it is a list, so it carries `&run=` and no `?drawer=` (G33). Only one panel is
+// open at a time (`?panel=` is single-open), so `?drawer=` never has two owners;
+// the per-record keys are named for the record rather than for the drawer, so a
 // link says what it opens.
 //
 // Every key here is dropped when `?panel=` moves to another section, in
@@ -21,7 +22,7 @@ const DRAWER_PARAM = "drawer";
 export interface DrawerStackSpec<D extends string> {
 	/** The drawers, in the order they are stacked. The first one is the default. */
 	drawers: readonly D[];
-	/** The `?` key each drawer drills in with — `runs` → `run`, `plans` → `plan`. */
+	/** The `?` key each drawer drills in with — `plans` → `plan`, `todos` → `todo`. */
 	detailParam: Record<D, string>;
 }
 

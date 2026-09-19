@@ -1,9 +1,9 @@
-// **Catalogue** — the third drawer of the Tasks stack (the-catalogue.md 7.6).
+// **Catalogue** — the second drawer of the Library stack (the-catalogue.md 7.6).
 //
 // The closed vocabulary a plan may name at all: one entry per callable, grouped
-// by the bound it spends (graph-detail-page.md §3a). It is the definition of
-// the drawer above it, the way Plans is the definition of Runs — which is why
-// the three are stacked rather than given three icons.
+// by the bound it spends (graph-detail-page.md §3a). It is the definition of the
+// drawer above it, the way a template is the rendering of what that plan
+// produced — which is why the three are stacked rather than given three icons.
 //
 // The list itself renders `runtime/catalogue/registry.py` through
 // `GET …/catalogue`, never a second copy of the declaration (CA2). That route

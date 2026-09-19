@@ -1,8 +1,9 @@
-// One drawer of the **Tasks** stack (graph-detail-page.md G32 · G33).
+// One drawer of a **stacked panel** — Library, Projects, Govern, Agents, Skills
+// (graph-detail-page.md G32 · G33).
 //
 // **A drawer owns its header; the panel owns the status bar.** Each drawer
 // draws its own title, count, search and filter, and a drill-in stays inside it
-// — the header becomes `‹ RUNS / orders.csv` while the other two drawers keep
+// — the header becomes `‹ PLANS / nl-single@4` while the other drawers keep
 // their place. What is shared is one status bar in `footer.left` and one column
 // width, so the stack has three headers and no panel chrome above them.
 //
@@ -72,7 +73,7 @@ export function useTaskDrawerUi(): TaskDrawerUi {
 export interface TaskDrawerSpec {
 	/** The drawer's key — also the `?drawer=` value it focuses. */
 	id: string;
-	/** What this drawer is, in the header. `RUNS` · `PLANS` · `CATALOGUE`. */
+	/** What this drawer is, in the header. `PLANS` · `CATALOGUE` · `TEMPLATES`. */
 	label: string;
 	/** A 14px lucide glyph before the label. */
 	icon?: ElementType;

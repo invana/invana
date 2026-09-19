@@ -350,7 +350,8 @@ features/ask/
                    ResultsTable · NotAnAnswer · TraceDialog
                    — the-answer-surface.md (3.3), with when-it-cannot-answer (3.8)
                      and reasoning-trace (3.7) rendering inside a reply
-  projections/     TemplatesPanel — projections.md (3.4)
+  projections/     TemplatesDrawer + TemplatesPanel — projections.md (3.4),
+                   Library's third drawer (G38)
 ```
 
 `projections/` is not `templates/`: **template** is already Ask's word for a versioned,
