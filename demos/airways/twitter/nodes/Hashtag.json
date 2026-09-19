@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TAG_01",
+    "properties": {
+      "tag": "RouteLaunch"
+    }
+  },
+  {
+    "id": "TAG_02",
+    "properties": {
+      "tag": "Suspension"
+    }
+  },
+  {
+    "id": "TAG_03",
+    "properties": {
+      "tag": "FleetOrder"
+    }
+  },
+  {
+    "id": "TAG_04",
+    "properties": {
+      "tag": "Strike"
+    }
+  },
+  {
+    "id": "TAG_05",
+    "properties": {
+      "tag": "Safety"
+    }
+  },
+  {
+    "id": "TAG_06",
+    "properties": {
+      "tag": "Alliance"
+    }
+  },
+  {
+    "id": "TAG_07",
+    "properties": {
+      "tag": "FuelPrices"
+    }
+  },
+  {
+    "id": "TAG_08",
+    "properties": {
+      "tag": "Expansion"
+    }
+  },
+  {
+    "id": "TAG_09",
+    "properties": {
+      "tag": "Merger"
+    }
+  },
+  {
+    "id": "TAG_10",
+    "properties": {
+      "tag": "SAF"
+    }
+  },
+  {
+    "id": "TAG_11",
+    "properties": {
+      "tag": "AvGeek"
+    }
+  },
+  {
+    "id": "TAG_12",
+    "properties": {
+      "tag": "PaxEx"
+    }
+  },
+  {
+    "id": "TAG_13",
+    "properties": {
+      "tag": "Aviation"
+    }
+  },
+  {
+    "id": "TAG_14",
+    "properties": {
+      "tag": "Airports"
+    }
+  },
+  {
+    "id": "TAG_15",
+    "properties": {
+      "tag": "FlightDelay"
+    }
+  },
+  {
+    "id": "TAG_16",
+    "properties": {
+      "tag": "Upgraded"
+    }
+  }
+]

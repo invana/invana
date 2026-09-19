@@ -1,0 +1,530 @@
+[
+  {
+    "id": "ACC_001",
+    "properties": {
+      "handle": "airindia",
+      "display_name": "Air India",
+      "followers": 1200000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "AI",
+      "country_code": "IN"
+    }
+  },
+  {
+    "id": "ACC_002",
+    "properties": {
+      "handle": "IndiGo6E",
+      "display_name": "IndiGo",
+      "followers": 980000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "6E",
+      "country_code": "IN"
+    }
+  },
+  {
+    "id": "ACC_003",
+    "properties": {
+      "handle": "emirates",
+      "display_name": "Emirates",
+      "followers": 2400000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "EK",
+      "country_code": "AE"
+    }
+  },
+  {
+    "id": "ACC_004",
+    "properties": {
+      "handle": "etihad",
+      "display_name": "Etihad Airways",
+      "followers": 720000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "EY",
+      "country_code": "AE"
+    }
+  },
+  {
+    "id": "ACC_005",
+    "properties": {
+      "handle": "qatarairways",
+      "display_name": "Qatar Airways",
+      "followers": 1900000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "QR",
+      "country_code": "QA"
+    }
+  },
+  {
+    "id": "ACC_006",
+    "properties": {
+      "handle": "SingaporeAir",
+      "display_name": "Singapore Airlines",
+      "followers": 860000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "SQ",
+      "country_code": "SG"
+    }
+  },
+  {
+    "id": "ACC_007",
+    "properties": {
+      "handle": "lufthansa",
+      "display_name": "Lufthansa",
+      "followers": 1100000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "LH",
+      "country_code": "DE"
+    }
+  },
+  {
+    "id": "ACC_008",
+    "properties": {
+      "handle": "British_Airways",
+      "display_name": "British Airways",
+      "followers": 1500000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "BA",
+      "country_code": "UK"
+    }
+  },
+  {
+    "id": "ACC_009",
+    "properties": {
+      "handle": "airfrance",
+      "display_name": "Air France",
+      "followers": 890000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "AF",
+      "country_code": "FR"
+    }
+  },
+  {
+    "id": "ACC_010",
+    "properties": {
+      "handle": "KLM",
+      "display_name": "KLM",
+      "followers": 1050000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "KL",
+      "country_code": "NL"
+    }
+  },
+  {
+    "id": "ACC_011",
+    "properties": {
+      "handle": "Delta",
+      "display_name": "Delta Air Lines",
+      "followers": 1400000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "DL",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_012",
+    "properties": {
+      "handle": "AmericanAir",
+      "display_name": "American Airlines",
+      "followers": 1700000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "AA",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_013",
+    "properties": {
+      "handle": "united",
+      "display_name": "United Airlines",
+      "followers": 1300000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "UA",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_014",
+    "properties": {
+      "handle": "TurkishAirlines",
+      "display_name": "Turkish Airlines",
+      "followers": 1600000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "TK",
+      "country_code": "TR"
+    }
+  },
+  {
+    "id": "ACC_015",
+    "properties": {
+      "handle": "Qantas",
+      "display_name": "Qantas",
+      "followers": 640000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "QF",
+      "country_code": "AU"
+    }
+  },
+  {
+    "id": "ACC_016",
+    "properties": {
+      "handle": "cathaypacific",
+      "display_name": "Cathay Pacific",
+      "followers": 520000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "CX",
+      "country_code": "HK"
+    }
+  },
+  {
+    "id": "ACC_017",
+    "properties": {
+      "handle": "JAL_Official",
+      "display_name": "Japan Airlines",
+      "followers": 410000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "JL",
+      "country_code": "JP"
+    }
+  },
+  {
+    "id": "ACC_018",
+    "properties": {
+      "handle": "AllNipponAir",
+      "display_name": "All Nippon Airways",
+      "followers": 380000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "NH",
+      "country_code": "JP"
+    }
+  },
+  {
+    "id": "ACC_019",
+    "properties": {
+      "handle": "KoreanAir_KE",
+      "display_name": "Korean Air",
+      "followers": 300000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "KE",
+      "country_code": "KR"
+    }
+  },
+  {
+    "id": "ACC_020",
+    "properties": {
+      "handle": "ThaiAirways",
+      "display_name": "Thai Airways",
+      "followers": 260000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "TG",
+      "country_code": "TH"
+    }
+  },
+  {
+    "id": "ACC_021",
+    "properties": {
+      "handle": "flyethiopian",
+      "display_name": "Ethiopian Airlines",
+      "followers": 340000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "ET",
+      "country_code": "ET"
+    }
+  },
+  {
+    "id": "ACC_022",
+    "properties": {
+      "handle": "flysaa_care",
+      "display_name": "South African Airways",
+      "followers": 120000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "SA",
+      "country_code": "ZA"
+    }
+  },
+  {
+    "id": "ACC_023",
+    "properties": {
+      "handle": "LATAM_BRA",
+      "display_name": "LATAM Brasil",
+      "followers": 480000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "JJ",
+      "country_code": "BR"
+    }
+  },
+  {
+    "id": "ACC_024",
+    "properties": {
+      "handle": "AirCanada",
+      "display_name": "Air Canada",
+      "followers": 760000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "AC",
+      "country_code": "CA"
+    }
+  },
+  {
+    "id": "ACC_025",
+    "properties": {
+      "handle": "Iberia",
+      "display_name": "Iberia",
+      "followers": 430000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "IB",
+      "country_code": "ES"
+    }
+  },
+  {
+    "id": "ACC_026",
+    "properties": {
+      "handle": "FlySWISS",
+      "display_name": "Swiss",
+      "followers": 290000,
+      "verified": true,
+      "kind": "airline",
+      "airline_iata": "LX",
+      "country_code": "CH"
+    }
+  },
+  {
+    "id": "ACC_027",
+    "properties": {
+      "handle": "Reuters",
+      "display_name": "Reuters",
+      "followers": 26000000,
+      "verified": true,
+      "kind": "news",
+      "domain": "reuters.com",
+      "country_code": "UK"
+    }
+  },
+  {
+    "id": "ACC_028",
+    "properties": {
+      "handle": "business",
+      "display_name": "Bloomberg",
+      "followers": 7400000,
+      "verified": true,
+      "kind": "news",
+      "domain": "bloomberg.com",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_029",
+    "properties": {
+      "handle": "AviationWeek",
+      "display_name": "Aviation Week",
+      "followers": 210000,
+      "verified": true,
+      "kind": "news",
+      "domain": "aviationweek.com",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_030",
+    "properties": {
+      "handle": "simple_flying",
+      "display_name": "Simple Flying",
+      "followers": 96000,
+      "verified": true,
+      "kind": "news",
+      "domain": "simpleflying.com",
+      "country_code": "UK"
+    }
+  },
+  {
+    "id": "ACC_031",
+    "properties": {
+      "handle": "businessline",
+      "display_name": "BusinessLine",
+      "followers": 540000,
+      "verified": true,
+      "kind": "news",
+      "domain": "thehindubusinessline.com",
+      "country_code": "IN"
+    }
+  },
+  {
+    "id": "ACC_032",
+    "properties": {
+      "handle": "NikkeiAsia",
+      "display_name": "Nikkei Asia",
+      "followers": 480000,
+      "verified": true,
+      "kind": "news",
+      "domain": "asia.nikkei.com",
+      "country_code": "JP"
+    }
+  },
+  {
+    "id": "ACC_033",
+    "properties": {
+      "handle": "gulf_news",
+      "display_name": "Gulf News",
+      "followers": 1100000,
+      "verified": true,
+      "kind": "news",
+      "domain": "gulfnews.com",
+      "country_code": "AE"
+    }
+  },
+  {
+    "id": "ACC_034",
+    "properties": {
+      "handle": "aeroroutes",
+      "display_name": "AeroRoutes",
+      "followers": 158000,
+      "verified": true,
+      "kind": "watcher",
+      "country_code": "SG"
+    }
+  },
+  {
+    "id": "ACC_035",
+    "properties": {
+      "handle": "AirlineRouteMap",
+      "display_name": "Airline Route Map",
+      "followers": 74000,
+      "verified": false,
+      "kind": "watcher",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_036",
+    "properties": {
+      "handle": "flightradar24",
+      "display_name": "Flightradar24",
+      "followers": 1300000,
+      "verified": true,
+      "kind": "watcher",
+      "country_code": "SE"
+    }
+  },
+  {
+    "id": "ACC_037",
+    "properties": {
+      "handle": "gate_watch",
+      "display_name": "Gate Watch",
+      "followers": 22000,
+      "verified": false,
+      "kind": "watcher",
+      "country_code": "UK"
+    }
+  },
+  {
+    "id": "ACC_038",
+    "properties": {
+      "handle": "nomad_neha",
+      "display_name": "Neha on the move",
+      "followers": 4800,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "IN"
+    }
+  },
+  {
+    "id": "ACC_039",
+    "properties": {
+      "handle": "gate_b12",
+      "display_name": "Gate B12",
+      "followers": 1900,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "US"
+    }
+  },
+  {
+    "id": "ACC_040",
+    "properties": {
+      "handle": "seat31k",
+      "display_name": "Seat 31K",
+      "followers": 12400,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "UK"
+    }
+  },
+  {
+    "id": "ACC_041",
+    "properties": {
+      "handle": "redeye_ravi",
+      "display_name": "Redeye Ravi",
+      "followers": 3100,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "IN"
+    }
+  },
+  {
+    "id": "ACC_042",
+    "properties": {
+      "handle": "miles_and_mo",
+      "display_name": "Miles and Mo",
+      "followers": 8700,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "AE"
+    }
+  },
+  {
+    "id": "ACC_043",
+    "properties": {
+      "handle": "tarmac_tales",
+      "display_name": "Tarmac Tales",
+      "followers": 5600,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "AU"
+    }
+  },
+  {
+    "id": "ACC_044",
+    "properties": {
+      "handle": "onebagonly",
+      "display_name": "One Bag Only",
+      "followers": 2400,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "DE"
+    }
+  },
+  {
+    "id": "ACC_045",
+    "properties": {
+      "handle": "jetlag_jules",
+      "display_name": "Jetlag Jules",
+      "followers": 9300,
+      "verified": false,
+      "kind": "traveller",
+      "country_code": "FR"
+    }
+  }
+]

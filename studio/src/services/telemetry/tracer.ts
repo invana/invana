@@ -1,5 +1,5 @@
 /**
- * Span helpers for the Explorer query→render pipeline (RFC-025).
+ * Span helpers for the Explorer query→render pipeline (docs/for-developers/modules/platform/features/telemetry.md).
  *
  * An "interaction" is the root span for one user action (a query run). Its OTel
  * `Context` is threaded — via a ref — across the async React renders that follow
@@ -7,7 +7,7 @@
  * trace. Each stage opens its child against the stored `interaction.ctx`
  * *explicitly* (not via ambient context), because the pipeline crosses async
  * boundaries React/TanStack Query schedule that no web context manager carries
- * reliably under Vite's native async/await (see RFC-025 D3 addendum).
+ * reliably under Vite's native async/await (see docs/for-developers/modules/platform/features/telemetry.md addendum).
  *
  * The in-flight interaction is also mirrored in a module-level slot so the API
  * client can parent its outgoing-HTTP span to the run and inject W3C
@@ -53,7 +53,7 @@ export function startInteraction(
 	name: string,
 	attributes?: SpanAttributes,
 ): Interaction {
-	// Safety net (RFC-026 D4): if a prior interaction never closed — e.g. an
+	// Safety net (docs/for-developers/modules/platform/features/telemetry.md): if a prior interaction never closed — e.g. an
 	// error path that skipped endInteraction, or a new trigger firing mid-render
 	// — end it so consecutive runs don't collapse into a single trace.
 	if (activeInteraction) {
@@ -90,7 +90,7 @@ export function startChild(
  *   `explorer.query.run`.
  * - Outside a run, it nests only when `standalone` is set — used for
  *   session/message API ops, which get their own one-span distributed trace
- *   (RFC-026 D3). Other API calls pass `standalone: false` and stay untraced.
+ *   (docs/for-developers/modules/platform/features/telemetry.md). Other API calls pass `standalone: false` and stay untraced.
  *
  * Returns null when there's nothing to trace. The caller owns `.end()` (see the
  * API client's response interceptors).

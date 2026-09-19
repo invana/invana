@@ -1,0 +1,290 @@
+[
+  {
+    "id": "E_MENTIONS_TWEET_0136_airindia",
+    "from": "TWEET_0136",
+    "to": "ACC_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0137_IndiGo6E",
+    "from": "TWEET_0137",
+    "to": "ACC_002",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0138_emirates",
+    "from": "TWEET_0138",
+    "to": "ACC_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0139_etihad",
+    "from": "TWEET_0139",
+    "to": "ACC_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0140_qatarairways",
+    "from": "TWEET_0140",
+    "to": "ACC_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0141_SingaporeAir",
+    "from": "TWEET_0141",
+    "to": "ACC_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0142_lufthansa",
+    "from": "TWEET_0142",
+    "to": "ACC_007",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0143_British_Airways",
+    "from": "TWEET_0143",
+    "to": "ACC_008",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0144_airfrance",
+    "from": "TWEET_0144",
+    "to": "ACC_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0145_KLM",
+    "from": "TWEET_0145",
+    "to": "ACC_010",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0146_Delta",
+    "from": "TWEET_0146",
+    "to": "ACC_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0147_AmericanAir",
+    "from": "TWEET_0147",
+    "to": "ACC_012",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0148_united",
+    "from": "TWEET_0148",
+    "to": "ACC_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0149_TurkishAirlines",
+    "from": "TWEET_0149",
+    "to": "ACC_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0150_Qantas",
+    "from": "TWEET_0150",
+    "to": "ACC_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0151_cathaypacific",
+    "from": "TWEET_0151",
+    "to": "ACC_016",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0152_JAL_Official",
+    "from": "TWEET_0152",
+    "to": "ACC_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0153_AllNipponAir",
+    "from": "TWEET_0153",
+    "to": "ACC_018",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0154_KoreanAir_KE",
+    "from": "TWEET_0154",
+    "to": "ACC_019",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0155_ThaiAirways",
+    "from": "TWEET_0155",
+    "to": "ACC_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0156_flyethiopian",
+    "from": "TWEET_0156",
+    "to": "ACC_021",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0157_flysaa_care",
+    "from": "TWEET_0157",
+    "to": "ACC_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0158_LATAM_BRA",
+    "from": "TWEET_0158",
+    "to": "ACC_023",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0159_AirCanada",
+    "from": "TWEET_0159",
+    "to": "ACC_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0160_Iberia",
+    "from": "TWEET_0160",
+    "to": "ACC_025",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0161_FlySWISS",
+    "from": "TWEET_0161",
+    "to": "ACC_026",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0162_airindia",
+    "from": "TWEET_0162",
+    "to": "ACC_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0163_IndiGo6E",
+    "from": "TWEET_0163",
+    "to": "ACC_002",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0164_emirates",
+    "from": "TWEET_0164",
+    "to": "ACC_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0165_etihad",
+    "from": "TWEET_0165",
+    "to": "ACC_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0166_qatarairways",
+    "from": "TWEET_0166",
+    "to": "ACC_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0167_SingaporeAir",
+    "from": "TWEET_0167",
+    "to": "ACC_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0168_lufthansa",
+    "from": "TWEET_0168",
+    "to": "ACC_007",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0169_British_Airways",
+    "from": "TWEET_0169",
+    "to": "ACC_008",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0170_airfrance",
+    "from": "TWEET_0170",
+    "to": "ACC_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0171_KLM",
+    "from": "TWEET_0171",
+    "to": "ACC_010",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0172_Delta",
+    "from": "TWEET_0172",
+    "to": "ACC_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0173_AmericanAir",
+    "from": "TWEET_0173",
+    "to": "ACC_012",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0174_united",
+    "from": "TWEET_0174",
+    "to": "ACC_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0175_TurkishAirlines",
+    "from": "TWEET_0175",
+    "to": "ACC_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0176_Qantas",
+    "from": "TWEET_0176",
+    "to": "ACC_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0177_cathaypacific",
+    "from": "TWEET_0177",
+    "to": "ACC_016",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0178_JAL_Official",
+    "from": "TWEET_0178",
+    "to": "ACC_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0179_AllNipponAir",
+    "from": "TWEET_0179",
+    "to": "ACC_018",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0180_KoreanAir_KE",
+    "from": "TWEET_0180",
+    "to": "ACC_019",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0181_ThaiAirways",
+    "from": "TWEET_0181",
+    "to": "ACC_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0182_flyethiopian",
+    "from": "TWEET_0182",
+    "to": "ACC_021",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_TWEET_0183_flysaa_care",
+    "from": "TWEET_0183",
+    "to": "ACC_022",
+    "properties": {}
+  }
+]

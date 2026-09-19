@@ -8,7 +8,8 @@ from invana_neo4j.querysets.algorithms import Neo4jAlgorithmsQuerySet
 from invana_neo4j.querysets.schema_reader import Neo4jSchemaReaderQuerySet
 from invana_neo4j.querysets.schema_writer import Neo4jSchemaWriterQuerySet
 
-# Neo4j capability profile (RFC-022) — extends the openCypher baseline with Neo4j's
+# Neo4j capability profile (docs/for-developers/modules/graph-connectors/features/capabilities.md) — extends the
+# openCypher baseline with Neo4j's
 # tested version window and vendor feature flags. Bumping ``tested_max`` is how a newly
 # validated Neo4j release stops being reported as UNTESTED.
 NEO4J_PROFILE = CYPHER_PROFILE.merge(

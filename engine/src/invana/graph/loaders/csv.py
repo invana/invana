@@ -205,7 +205,7 @@ class CSVLoader:
 
         async with Neo4jConnector(...) as conn:
             loader = CSVLoader(conn, LoaderConfig(batch_size=1000))
-            stats = await loader.load_directory("datasets/air-routes")
+            stats = await loader.load_directory("demos/airways/air-routes")
             print(stats.vertices_created, stats.edges_created)
     """
 

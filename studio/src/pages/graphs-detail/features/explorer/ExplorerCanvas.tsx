@@ -1,0 +1,1313 @@
+// Explorer graph visualiser — the read-capable canvas for query results.
+//
+// Modeled on the canvas-react `GraphVisualiserApp` story: a full set of
+// behaviours (pan / drag-node / wheel / pinch / hover / select / view) plus a
+// section-hook-driven toolbar surfaced in the app header (see
+// `ExplorerHeaderToolbar`). The header lives outside the `<Board>` subtree (in
+// GraphDetail's header), so ExplorerPage lifts a `CanvasContext.Provider` above
+// the shell and feeds it the live engine published by `<CanvasBridge>` (the last
+// child here). Every header / inspector control then resolves the same instance.
+//
+// Distinct from the Modeller's `SchemaCanvas.tsx`, which wires the same
+// `@invana/canvas-react` bindings into a tool-driven schema editor.
+
+import { readCanvasThemeConfig } from "@/pages/graphs-detail/features/explorer/canvasTheme";
+import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
+import {
+	type InteractionRef,
+	endInteraction,
+	startChild,
+} from "@/services/telemetry/tracer";
+import type { CanvasStyling } from "@/types/board";
+import type { ExpandRequest } from "@/types/traversal";
+// The root is `<GraphCanvas>`, not `<Board>`: only it provides
+// `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to
+// canvas 0.0.11 `<Board>` provided it too, so this reads like a free swap —
+// it is not. Under a plain `<Board>` those hooks throw at render, and nothing
+// at the type level says so.
+import {
+	BackgroundLayer,
+	BrushSelectBehaviour,
+	type CanvasProps,
+	ClickSelectBehaviour,
+	ClickViewBehaviour,
+	D3ForceLayout,
+	DragNodeBehaviour,
+	DragPanBehaviour,
+	GraphCanvas,
+	GraphClipboardProvider,
+	GraphHistoryProvider,
+	GraphLayer,
+	HoverActivateBehaviour,
+	LassoSelectBehaviour,
+	type LayoutFactory,
+	MiniMapLayer,
+	PinchZoomBehaviour,
+	TextResolutionLODBehaviour,
+	type UseClipboardResult,
+	WheelZoomBehaviour,
+	canUseWebGPU,
+	useCanvas,
+	useCanvasEvent,
+	useClipboard,
+	useGraphCanvas,
+	useGraphCanvasUpdate,
+	useGrid,
+	useHistorySection,
+	useLayout,
+	useSelectMode,
+	useStyleEditorSection,
+	useViewContext,
+	useViewSection,
+} from "@invana/canvas-react";
+import {
+	GraphBackgroundContextMenu,
+	type GraphBackgroundMenuContext,
+	GraphEdgeContextMenu,
+	type GraphEdgeMenuContext,
+	GraphNodeContextMenu,
+	type GraphNodeMenuContext,
+	type ToolbarItem,
+	ToolbarItems,
+	applyIconOverrides,
+} from "@invana/canvas-ui";
+import type {
+	GraphCanvas as GraphCanvasEngine,
+	GraphData,
+	GraphNode,
+} from "@invana/graph";
+import type * as graph from "@invana/graph";
+import { D3ForceLayout as D3ForceLayoutEngine } from "@invana/graph-layout-d3-force";
+import { ElkLayout } from "@invana/graph-layout-elkjs";
+import { useTheme } from "@invana/themes";
+import {
+	type MenuItem,
+	RichSelect,
+	type RichSelectOption,
+	ToggleGroup,
+	ToggleGroupItem,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@invana/ui";
+// Vite's worker idiom — see LAYOUTS below.
+import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
+import {
+	Cable,
+	CornerDownRight,
+	Grid3x3,
+	Lasso,
+	Lock,
+	LockOpen,
+	type LucideIcon,
+	Magnet,
+	Maximize,
+	Minus,
+	MousePointer2,
+	Network,
+	Orbit,
+	Play,
+	Redo2,
+	RefreshCw,
+	Share2,
+	Spline,
+	SquareDashedMousePointer,
+	Undo2,
+	Waypoints,
+	ZoomIn,
+	ZoomOut,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+
+/** Schema slice that drives the node-expand submenus (docs/for-developers/modules/explore/features/graph-canvas.md). */
+export interface ExpandMenuSchema {
+	nodeTypes: string[];
+	edgeTypes: {
+		name: string;
+		source_node_types: string[];
+		target_node_types: string[];
+	}[];
+}
+
+/** Node-expand handlers threaded into the node context menu. */
+export interface ExpandMenuHandlers {
+	schema?: ExpandMenuSchema | null;
+	onExpand?: (req: ExpandRequest) => void;
+	onOpenFineTune?: (vertexId: string) => void;
+}
+
+// `CanvasConfig` isn't re-exported by canvas-react@0.0.4 — derive it from the
+// `<Board config>` prop so the option objects stay precisely typed.
+type CanvasConfig = NonNullable<CanvasProps["config"]>;
+
+// PixiJS render backend. The Explorer (see ExplorerPage) defaults to `"webgpu"`
+// when the browser can use it (`canUseWebGPU` — WebGPU API present and not
+// WebKit, where PixiJS WebGPU crashes), else `"webgl"`. The header switcher lets
+// a user flip between them at runtime; the WebGPU option is disabled when unusable.
+export type CanvasBackend = "webgl" | "webgpu";
+const BACKEND_LABEL: Record<CanvasBackend, string> = {
+	webgl: "WebGL",
+	webgpu: "WebGPU",
+};
+
+// "Focus on node" zooms in to at least this scale so the focused node is
+// comfortably sized.
+const FOCUS_ZOOM = 2;
+
+// TODO(canvas-visibility): remove this whole block once `@invana/canvas` ships a
+// first-class per-element hide API — see docs/for-developers/modules/explore/spec.md.
+// Then revert the <GraphLayer> props to `node={{ style: nodeStyle }}` /
+// `edge={{ style: edgeStyle }}`.
+//
+// A sticky `hidden` state overlay registered on the graph layer so a single
+// element can be shown/hidden non-destructively (the Layers panel toggles it via
+// `store.setNodeState(id, "hidden", …)` / `setEdgeState`). It just drives every
+// alpha to 0 — the element stays in the store (counts unchanged) and reappears
+// when the state clears. Not a canonical state, so focal drivers (hover /
+// selection dimming) never touch it. `HIDDEN_STATE_NAME` is re-exported for the
+// panel so the string stays in one place.
+export const HIDDEN_STATE_NAME = "hidden";
+const HIDDEN_NODE_STATE = {
+	[HIDDEN_STATE_NAME]: { bgAlpha: 0, bgStrokeAlpha: 0, labelAlpha: 0 },
+};
+const HIDDEN_EDGE_STATE = {
+	[HIDDEN_STATE_NAME]: {
+		strokeAlpha: 0,
+		arrowSourceAlpha: 0,
+		arrowTargetAlpha: 0,
+		labelAlpha: 0,
+	},
+};
+
+// Defaults applied only once the user has styled *some* type (so an unstyled
+// canvas keeps the theme defaults untouched).
+const DEFAULT_NODE_SIZE = 16;
+const DEFAULT_EDGE_COLOR = 0x94a3b8;
+const DEFAULT_EDGE_WIDTH = 1.5;
+
+// Forces for the registered active layout (run on every query repaint by
+// `<AutoLayoutBridge>` and on every node-expand). `animate: true` writes
+// positions back on every tick, so the simulation visibly settles — a fresh
+// query fans out and an expand's new neighbours slide into place rather than
+// snapping — which reads as the graph living/relaxing.
+//
+// Tuned for hub-and-spoke shapes (expand a node → N leaves on one parent) that
+// are themselves linked into a larger graph, balancing two competing pulls:
+//   - `charge.strength` repels nodes so a hub's leaves spread out, but
+//     `charge.distanceMax` *caps that to a local radius* — without it, every
+//     node repels every other at any distance, so whole clusters shove each
+//     other to opposite corners with vast empty gaps between them. Capped, the
+//     repulsion only un-piles nearby leaves; distant clusters feel nothing and
+//     stay pulled together by their connecting edges.
+//   - `link.distance` is the edge rest length (kept short so clusters sit close)
+//     and `collide.radius` is the hard floor on node spacing — above the 8px
+//     node radius plus its bottom label so a dense fan can't overlap.
+// `alphaDecay` / `alphaMin` cool the sim quickly (~90 ticks vs. d3's ~300) so it
+// settles in a beat instead of drifting for seconds; `velocityDecay` damps
+// overshoot. Cheap because new nodes are pre-placed near their anchor (see the
+// expand handler), so the sim only has to relax locally.
+const FORCE_OPTS = {
+	animate: true,
+	// Looser spacing so dense leaf-fans (expand a hub → hundreds of leaves) spread
+	// out and read as a graph rather than a blob: stronger repulsion over a wider
+	// radius, longer edges, and a bigger hard floor on node spacing (node is 8px +
+	// a bottom label). distanceMax still caps repulsion to a local radius so distant
+	// clusters stay pulled together by their edges instead of flying to the corners.
+	charge: { strength: -520, distanceMax: 420 },
+	link: { distance: 110 },
+	center: { x: 0, y: 0 },
+	collide: { radius: 28 },
+	// Cool faster + damp harder so the looser forces above still settle quickly
+	// (~45 ticks, not a long drift) — fewer ticks = fewer full repaints, which is
+	// what makes a large expanded graph feel slow while it relaxes.
+	alphaDecay: 0.09,
+	alphaMin: 0.02,
+	velocityDecay: 0.6,
+};
+
+// Id of the registered active layout — shared by the `<D3ForceLayout>` that
+// registers it, the `<AutoLayoutBridge>` that runs it on data change, and the
+// node-expand append in ExplorerPage, which re-runs it to lay out new neighbours.
+export const ACTIVE_LAYOUT_ID = "d3-force-active";
+
+// Theme-independent settings, keyed by instance id. Theme-driven colours are
+// read live from the active theme's CSS tokens (`readCanvasThemeConfig`) and
+// pushed via `useGraphCanvasUpdate` by `<ThemeBridge>`.
+// `activeLayout` points at the registered `<D3ForceLayout id="d3-force-active">`
+// so the header's "Re-render" (`canvas.refresh()`) re-runs it; new query results
+// are (re-)laid out by `<AutoLayoutBridge>`, which calls `runLayout` on the same
+// id once the layer has ingested the data.
+const APP_OPTIONS: CanvasConfig = {
+	activeLayout: ACTIVE_LAYOUT_ID,
+	layers: {
+		background: { type: "pattern", patternType: "dots", alpha: 0.5 },
+		graph: {
+			node: {
+				style: {
+					shape: { kind: "circle", radius: 8 },
+					bgStrokeWidth: 1.5,
+					labelFontSize: 11,
+					labelPlacement: "bottom",
+					labelOffsetY: 4,
+				},
+			},
+			edge: { style: { strokeWidth: 1, arrowTargetShape: "none" } },
+		},
+		minimap: { position: "bottom-left", margin: { x: 20 } },
+	},
+	behaviours: {
+		pan: { enabled: true },
+		"drag-node": { enabled: true },
+		wheel: { enabled: true },
+		pinch: { enabled: true },
+		hover: { enabled: true },
+		"click-select": { enabled: true },
+		"brush-select": { enabled: false },
+		"lasso-select": { enabled: false },
+		"click-view": { enabled: true },
+		"label-lod": { enabled: true },
+	},
+};
+
+// Layout factories for the header picker — each call yields a fresh instance.
+// Module-level so the reference stays stable across renders (keeps `useLayout`'s
+// `applyLayout` stable).
+const LAYOUTS: Record<string, LayoutFactory> = {
+	"d3-force": () =>
+		new D3ForceLayoutEngine({
+			charge: { strength: -160 },
+			link: { distance: 56 },
+			collide: { radius: 14 },
+			animate: false,
+		}),
+	// **The ELK worker has to be ours** (docs/for-developers/modules/explore/features/graph-canvas.md). `ElkLayout`'s default
+	// factory resolves `elkjs/lib/elk-worker.min.js` relative to the *layout
+	// package*, which Vite does not turn into a worker asset: the Worker is
+	// constructed, never answers, and picking either ELK layout hangs silently
+	// with the graph left where it was. The synchronous fallback is broken too
+	// (`BundledELK is not a constructor`), so the `?worker` import above is the
+	// only working path.
+	"elk-layered": () =>
+		new ElkLayout({
+			algorithm: "layered",
+			direction: "RIGHT",
+			workerFactory: () => new ElkWorker(),
+		}),
+	"elk-stress": () =>
+		new ElkLayout({
+			algorithm: "stress",
+			workerFactory: () => new ElkWorker(),
+		}),
+};
+const LAYOUT_LABEL: Record<string, string> = {
+	"d3-force": "Force (d3)",
+	"elk-layered": "Layered (ELK)",
+	"elk-stress": "Stress (ELK)",
+};
+const LAYOUT_ICON: Record<string, LucideIcon> = {
+	"d3-force": Share2,
+	"elk-layered": Network,
+	"elk-stress": Orbit,
+};
+
+// Select-mode key → registered behaviour id. `useSelectMode` enables exactly one
+// entry and disables the rest; click maps to an empty id (no drag-select armed).
+const SELECT_MODE_IDS = {
+	click: "",
+	brush: "brush-select",
+	lasso: "lasso-select",
+};
+const SELECT_LABEL: Record<string, string> = {
+	click: "Click select",
+	brush: "Brush select",
+	lasso: "Lasso select",
+};
+const SELECT_ICONS = {
+	click: MousePointer2,
+	brush: SquareDashedMousePointer,
+	lasso: Lasso,
+};
+// One-line hints shown under each mode in the header's `RichSelect` picker.
+const SELECT_DESC: Record<string, string> = {
+	click: "Click nodes to select; shift-click to add",
+	brush: "Drag a rectangle to select everything inside",
+	lasso: "Draw a freeform loop to select everything inside",
+};
+// Header select-mode picker rows, derived from the maps above (display order
+// follows `SELECT_MODE_IDS`).
+const SELECT_MODE_OPTIONS: RichSelectOption[] = Object.keys(
+	SELECT_MODE_IDS,
+).map((key) => ({
+	value: key,
+	label: SELECT_LABEL[key],
+	description: SELECT_DESC[key],
+	icon: SELECT_ICONS[key as keyof typeof SELECT_ICONS],
+}));
+
+// Property keys tried, in order, for a node's drawn label. Graph DBs hand back
+// opaque internal ids (e.g. `4:24a7…:1555`), which overlap into an unreadable
+// blob — so prefer a human-friendly property, then the node's label/type, and
+// only fall back to the id. Tune the list to taste.
+const NODE_LABEL_KEYS = [
+	"name",
+	"title",
+	"label",
+	"code",
+	"desc",
+	"description",
+];
+
+function nodeLabelText(n: GraphNode): string {
+	const data = (n.data ?? {}) as Record<string, unknown>;
+	for (const key of NODE_LABEL_KEYS) {
+		const v = data[key];
+		if (v != null && v !== "") return String(v);
+	}
+	if (n.type) return String(n.type);
+	return String(n.id);
+}
+
+// Icon per edge routing type, shown on the edge-routing picker.
+const EDGE_TYPE_ICONS = {
+	straight: Minus,
+	orth: CornerDownRight,
+	bezier: Spline,
+	rounded: Waypoints,
+	smooth: Cable,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Right-click menu builders — navigation + selection + highlight + clipboard.
+// Each is a single engine method off the `canvas` handed in on `ctx`; the
+// clipboard ops (cut / copy / paste / delete) come from `useClipboard` and are
+// threaded in by `<CanvasContextMenus>`. Cut / Copy / Delete act on the current
+// selection, so a right-clicked element that isn't selected is selected first.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function expandItems(
+	id: string,
+	nodeLabel: string | undefined,
+	expand: ExpandMenuHandlers,
+): MenuItem[] {
+	const { schema, onExpand, onOpenFineTune } = expand;
+	if (!onExpand && !onOpenFineTune) return [];
+
+	// Edge types whose endpoints touch this node's label (or all, when the label
+	// is unknown) — drives the incoming/outgoing submenus.
+	const edges = (schema?.edgeTypes ?? []).filter(
+		(et) =>
+			!nodeLabel ||
+			et.source_node_types.includes(nodeLabel) ||
+			et.target_node_types.includes(nodeLabel),
+	);
+
+	const neighborChildren: MenuItem[] = [
+		{
+			id: "exp-all",
+			label: "All neighbors",
+			onClick: () => onExpand?.({ kind: "neighbors", body: { vertex_id: id } }),
+		},
+		...(schema?.nodeTypes ?? []).map((nt) => ({
+			id: `exp-nt-${nt}`,
+			label: `Type: ${nt}`,
+			onClick: () =>
+				onExpand?.({
+					kind: "by-node-type",
+					body: { vertex_id: id, neighbor_label: nt },
+				}),
+		})),
+	];
+
+	const items: MenuItem[] = [
+		{
+			id: "expand-neighbors",
+			label: "Load neighbors",
+			children: neighborChildren,
+		},
+	];
+	if (edges.length) {
+		items.push({
+			id: "expand-out",
+			label: "Load outgoing relationships",
+			children: edges.map((et) => ({
+				id: `exp-out-${et.name}`,
+				label: et.name,
+				onClick: () =>
+					onExpand?.({
+						kind: "by-edge-type",
+						body: { vertex_id: id, edge_label: et.name, direction: "out" },
+					}),
+			})),
+		});
+		items.push({
+			id: "expand-in",
+			label: "Load incoming relationships",
+			children: edges.map((et) => ({
+				id: `exp-in-${et.name}`,
+				label: et.name,
+				onClick: () =>
+					onExpand?.({
+						kind: "by-edge-type",
+						body: { vertex_id: id, edge_label: et.name, direction: "in" },
+					}),
+			})),
+		});
+	}
+	if (onOpenFineTune) {
+		items.push({
+			id: "expand-finetune",
+			label: "Fine-tune expand…",
+			onClick: () => onOpenFineTune(id),
+		});
+	}
+	return items;
+}
+
+function nodeItems(
+	{ id, canvas }: GraphNodeMenuContext,
+	clip: UseClipboardResult,
+	expand: ExpandMenuHandlers,
+	onShowDetail?: (id: string) => void,
+): MenuItem[] {
+	const layer = canvas.layers.get<graph.GraphLayer>("graph");
+	if (!layer) return [];
+	const select =
+		canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
+	const ensureSelected = () => {
+		if (!select?.isSelected(id)) select?.select(id, "shape");
+	};
+	const nodeLabel = layer.store.getNode(id)?.type as string | undefined;
+	return [
+		...expandItems(id, nodeLabel, expand),
+		...(onShowDetail
+			? [
+					{
+						id: "detail",
+						label: "Node details",
+						onClick: () => onShowDetail(id),
+					},
+				]
+			: []),
+		{
+			id: "focus",
+			label: "Focus on node",
+			onClick: () => {
+				select?.select(id, "shape");
+				layer.focusNode(id, { zoom: FOCUS_ZOOM });
+			},
+		},
+		{
+			id: "select",
+			label: "Select node",
+			onClick: () => select?.select(id, "shape"),
+		},
+		{
+			id: "select-hood",
+			label: "Select neighbourhood",
+			onClick: () => select?.selectNeighbourhood(id),
+		},
+		{
+			id: "highlight",
+			label: "Highlight neighbours",
+			onClick: () => layer.highlightNeighbourhood(id),
+		},
+		{
+			id: "cut",
+			label: "Cut",
+			shortcut: "⌘X",
+			onClick: () => {
+				ensureSelected();
+				clip.cut();
+			},
+		},
+		{
+			id: "copy",
+			label: "Copy",
+			shortcut: "⌘C",
+			onClick: () => {
+				ensureSelected();
+				clip.copy();
+			},
+		},
+		{
+			id: "paste",
+			label: "Paste",
+			shortcut: "⌘V",
+			onClick: () => clip.paste(),
+		},
+		{
+			id: "delete",
+			label: "Delete",
+			shortcut: "⌫",
+			onClick: () => {
+				ensureSelected();
+				clip.remove();
+			},
+		},
+	];
+}
+
+function edgeItems(
+	{ id, canvas }: GraphEdgeMenuContext,
+	clip: UseClipboardResult,
+	onShowDetail?: (id: string) => void,
+): MenuItem[] {
+	const layer = canvas.layers.get<graph.GraphLayer>("graph");
+	if (!layer) return [];
+	const store = layer.store;
+	const select =
+		canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
+	const ensureSelected = () => {
+		if (!select?.isSelected(id)) select?.select(id, "connector");
+	};
+	return [
+		...(onShowDetail
+			? [
+					{
+						id: "detail",
+						label: "Edge details",
+						onClick: () => onShowDetail(id),
+					},
+				]
+			: []),
+		{
+			id: "focus",
+			label: "Focus on edge",
+			onClick: () => {
+				select?.select(id, "connector");
+				layer.focusEdges([id]);
+			},
+		},
+		{
+			id: "select",
+			label: "Select edge",
+			onClick: () => select?.select(id, "connector"),
+		},
+		{
+			id: "highlight",
+			label: "Highlight edge",
+			onClick: () => {
+				// One batch → one flush → one paint.
+				store.batch(() => {
+					store.addEdgeState(id, "highlighted");
+					const ed = store.getEdge(id);
+					if (ed) {
+						store.addNodeState(ed.source, "highlighted");
+						store.addNodeState(ed.target, "highlighted");
+					}
+				});
+			},
+		},
+		{
+			id: "cut",
+			label: "Cut",
+			shortcut: "⌘X",
+			onClick: () => {
+				ensureSelected();
+				clip.cut();
+			},
+		},
+		{
+			id: "copy",
+			label: "Copy",
+			shortcut: "⌘C",
+			onClick: () => {
+				ensureSelected();
+				clip.copy();
+			},
+		},
+		{
+			id: "delete",
+			label: "Delete",
+			shortcut: "⌫",
+			onClick: () => {
+				ensureSelected();
+				clip.remove();
+			},
+		},
+	];
+}
+
+function backgroundItems(
+	{ canvas }: GraphBackgroundMenuContext,
+	clip: UseClipboardResult,
+): MenuItem[] {
+	const layer = canvas.layers.get<graph.GraphLayer>("graph");
+	if (!layer) return [];
+	const store = layer.store;
+	const select =
+		canvas.behaviours.get<graph.ClickSelectBehaviour>("click-select");
+	return [
+		// Selection mode (click / brush / lasso) lives in the header toolbar's
+		// `RichSelect` picker — see `HeaderToolbarItems`.
+		{
+			id: "fit",
+			label: "Fit to content",
+			onClick: () => canvas.camera.fitContent(layer.getBounds(), 80),
+		},
+		{
+			id: "paste",
+			label: "Paste",
+			shortcut: "⌘V",
+			onClick: () => clip.paste(),
+		},
+		{
+			id: "select-all",
+			label: "Select all",
+			shortcut: "⌘A",
+			onClick: () => select?.selectAll(),
+		},
+		{
+			id: "clear-sel",
+			label: "Clear selection",
+			onClick: () => select?.clearSelection(),
+		},
+		{
+			id: "clear-hl",
+			label: "Clear highlights",
+			onClick: () => {
+				store.clearNodeState("highlighted");
+				store.clearEdgeState("highlighted");
+			},
+		},
+	];
+}
+
+/**
+ * The three right-click menus, wrapped so they can read the clipboard. The menu
+ * `items` builders are plain functions (no hooks), so `useClipboard` is read
+ * here and threaded into each via a memoised closure. Mounted inside a
+ * `<GraphClipboardProvider>` so the buffer + selection wiring resolve.
+ */
+function CanvasContextMenus({
+	expand,
+	onShowDetail,
+}: {
+	expand: ExpandMenuHandlers;
+	onShowDetail?: (id: string) => void;
+}) {
+	const clip = useClipboard();
+	const node = useCallback(
+		(ctx: GraphNodeMenuContext) => nodeItems(ctx, clip, expand, onShowDetail),
+		[clip, expand, onShowDetail],
+	);
+	const edge = useCallback(
+		(ctx: GraphEdgeMenuContext) => edgeItems(ctx, clip, onShowDetail),
+		[clip, onShowDetail],
+	);
+	const background = useCallback(
+		(ctx: GraphBackgroundMenuContext) => backgroundItems(ctx, clip),
+		[clip],
+	);
+	return (
+		<>
+			<GraphNodeContextMenu items={node} />
+			<GraphEdgeContextMenu items={edge} />
+			<GraphBackgroundContextMenu items={background} />
+		</>
+	);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bridges (rendered inside <Board>, so the hooks resolve the live engine).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Publishes the live engine to the lifted context — must be the LAST child. */
+function CanvasBridge({
+	onReady,
+}: {
+	onReady: (canvas: GraphCanvasEngine | null) => void;
+}) {
+	const canvas = useGraphCanvas();
+	useEffect(() => {
+		onReady(canvas);
+		return () => onReady(null);
+	}, [canvas, onReady]);
+	return null;
+}
+
+/**
+ * Runs the active layout whenever the query results change.
+ *
+ * canvas-react@0.0.4's config-first `<D3ForceLayout id>` only *registers* the
+ * layout on `canvas.layouts` — it doesn't `apply()` it, and neither it nor the
+ * engine re-runs the active layout on data/topology change (only an explicit
+ * `canvas.refresh()` / `runLayout()` does). Without this, a fresh query's nodes
+ * land at the store's default origin and pile up in the centre, unlaid-out.
+ *
+ * Mounted *after* `<GraphLayer>`, so on each new `data` reference this effect
+ * fires after the layer's own `setData` effect (sibling effects run in mount
+ * order) — the store already holds the new topology when we run the layout. The
+ * registered layout's `end → camera.fitContent` (wired by `<D3ForceLayout>`)
+ * then frames the result.
+ */
+function AutoLayoutBridge({
+	data,
+	interactionRef,
+}: {
+	data: GraphData;
+	interactionRef?: InteractionRef;
+}) {
+	const canvas = useGraphCanvas();
+	useEffect(() => {
+		if (!canvas || data.nodes.length === 0) return;
+
+		// Surface layout progress on the shared message channel — a sticky
+		// "Laying out…" while d3-force settles, replaced by a "ready" that
+		// auto-clears after 3s. This is what lights up <CanvasMessageBar> on every
+		// query run (the only path that emits to the channel automatically).
+		canvas.showMessage(`Laying out ${data.nodes.length} nodes…`);
+
+		// No active query run → just lay out (e.g. theme repaint, session restore).
+		const interaction = interactionRef?.current ?? null;
+		if (!interaction) {
+			void canvas
+				.runLayout(ACTIVE_LAYOUT_ID)
+				.finally(() => canvas.showMessage("Graph ready", 3000));
+			return;
+		}
+
+		// `explorer.layout` span (docs/for-developers/modules/platform/features/telemetry.md) — d3-force settle. runLayout resolves
+		// when the layout settles; on settle we open a one-frame `explorer.render`
+		// span (first painted frame) and then close the run's root span.
+		const layoutSpan = startChild(interaction, "explorer.layout", {
+			"explorer.node_count": data.nodes.length,
+			"explorer.edge_count": data.edges.length,
+		});
+		let cancelled = false;
+		void canvas.runLayout(ACTIVE_LAYOUT_ID).finally(() => {
+			layoutSpan.end();
+			if (cancelled) return;
+			canvas.showMessage("Graph ready", 3000);
+			const renderSpan = startChild(interaction, "explorer.render");
+			requestAnimationFrame(() => {
+				renderSpan.end();
+				// Closes the root span and clears the ref + module-level active slot,
+				// so post-run API calls aren't parented to a finished run.
+				if (interactionRef) endInteraction(interactionRef, interaction);
+				else interaction.span.end();
+			});
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [canvas, data, interactionRef]);
+	return null;
+}
+
+/**
+ * Freezes the active force layout when the user starts dragging a node. With
+ * `animate: true` the simulation keeps nudging nodes for a few seconds after a
+ * query / expand, so a node can drift out from under the cursor while the user is
+ * manipulating it. Stopping the sim on `input:node:drag:start` pins everything
+ * where it is so the drag (and any follow-up interaction) resolves against a
+ * stable layout. The next query / expand re-runs the layout (a fresh `apply()`),
+ * so this only ends the current settle.
+ */
+function FreezeLayoutOnInteractionBridge() {
+	const canvas = useCanvas();
+	const stop = useCallback(() => {
+		(
+			canvas.layouts.get(ACTIVE_LAYOUT_ID) as { stop?: () => void } | undefined
+		)?.stop?.();
+	}, [canvas]);
+	useCanvasEvent("input:node:drag:start", stop);
+	return null;
+}
+
+/**
+ * Follows studio's active theme: reads the live CSS tokens and pushes the
+ * matching colour patch via `update()`, so switching theme *or* mode retints
+ * the canvas (background, labels, edges, minimap) — not just light↔dark.
+ *
+ * `variantId` changes on any theme/mode switch; `isDark` additionally catches
+ * an OS flip under a `*-system` variant. The read is deferred one frame: this
+ * effect (a descendant) runs before the ThemeProvider's own class-applying
+ * effect (its ancestor), so by the next frame the theme class is on
+ * `document.documentElement` and the tokens resolve to the new theme.
+ */
+function ThemeBridge() {
+	const { variantId, isDark } = useTheme();
+	const update = useGraphCanvasUpdate();
+	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme/mode change
+	useEffect(() => {
+		const id = requestAnimationFrame(() => update(readCanvasThemeConfig()));
+		return () => cancelAnimationFrame(id);
+	}, [variantId, isDark, update]);
+	return null;
+}
+
+/** Lifts the clicked element's id up to ExplorerPage to drive the Inspector. */
+function InspectorSelectionBridge({
+	onViewTargetChange,
+}: {
+	onViewTargetChange: (id: string | null) => void;
+}) {
+	const ctx = useViewContext();
+	useEffect(() => {
+		onViewTargetChange(ctx?.id ?? null);
+	}, [ctx?.id, onViewTargetChange]);
+	return null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Board
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ExplorerCanvasProps {
+	data: GraphData;
+	/** Receives the live engine once every layer/behaviour has registered. */
+	onReady: (canvas: GraphCanvasEngine | null) => void;
+	/** Receives the clicked node/edge id (or null) for the Inspector. */
+	onViewTargetChange: (id: string | null) => void;
+	/** On → hover lights up the node's 1st-degree neighbours; off → node only. */
+	magnet: boolean;
+	/** Telemetry root for the in-flight query run (docs/for-developers/modules/platform/features/telemetry.md); layout/render spans
+	 *  attach here, and the run's root span closes after the first painted frame. */
+	interactionRef?: InteractionRef;
+	/** PixiJS render backend. Switching it remounts the canvas (see `key` below),
+	 *  since the renderer is chosen once at `Application.init`. */
+	backend: CanvasBackend;
+	/** Node-expand handlers + schema for the right-click "Load neighbors" menu (docs/for-developers/modules/explore/features/graph-canvas.md). */
+	expand?: ExpandMenuHandlers;
+	/** Open the right-side detail (Inspector) for a node/edge id — wired to the
+	 *  "Node details" / "Edge details" context-menu items. */
+	onShowDetail?: (id: string) => void;
+	/** Per node/edge-type visual rules (docs/for-developers/modules/explore/features/graph-canvas.md). Colour is always driven from
+	 *  here (with a palette fallback); size/label/edge rules apply once set. */
+	styling?: CanvasStyling;
+}
+
+export function ExplorerCanvas({
+	data,
+	onReady,
+	onViewTargetChange,
+	magnet,
+	interactionRef,
+	backend,
+	expand,
+	onShowDetail,
+	styling,
+}: ExplorerCanvasProps) {
+	// Resolver-based node/edge styles derived from the canvas's per-type rules.
+	// Colour always resolves (explicit → palette fallback); size / label-property
+	// and edge colour/width apply only once the user sets them, so an unstyled
+	// canvas is visually unchanged.
+	const { nodeStyle, edgeStyle } = useMemo(() => {
+		const nt = styling?.nodeTypes ?? {};
+		const et = styling?.edgeTypes ?? {};
+		const hasNodeSize = Object.values(nt).some((s) => s?.size != null);
+		const hasEdgeColor = Object.values(et).some((s) => !!s?.color);
+		const hasEdgeWidth = Object.values(et).some((s) => s?.width != null);
+		const nodeStyle = {
+			// Explicit styling first, then the shared data-palette slot — the same
+			// resolution the type panel's dots use, so the legend matches the paint.
+			bgFill: (n: GraphNode) =>
+				typeColorNumber(String(n.type ?? ""), nt[String(n.type ?? "")]?.color),
+			labelText: (n: GraphNode) => {
+				const lp = nt[String(n.type ?? "")]?.labelProperty;
+				if (lp) {
+					const v = (n.data as Record<string, unknown> | undefined)?.[lp];
+					if (v != null && v !== "") return String(v);
+				}
+				return nodeLabelText(n);
+			},
+			...(hasNodeSize
+				? {
+						size: (n: GraphNode) =>
+							nt[String(n.type ?? "")]?.size ?? DEFAULT_NODE_SIZE,
+					}
+				: {}),
+		};
+		const edgeStyle = {
+			...(hasEdgeColor
+				? {
+						strokeColor: (e: graph.GraphEdge) => {
+							const set = et[String(e.type ?? "")]?.color;
+							return set
+								? typeColorNumber(String(e.type ?? ""), set)
+								: DEFAULT_EDGE_COLOR;
+						},
+					}
+				: {}),
+			...(hasEdgeWidth
+				? {
+						strokeWidth: (e: graph.GraphEdge) =>
+							et[String(e.type ?? "")]?.width ?? DEFAULT_EDGE_WIDTH,
+					}
+				: {}),
+		};
+		return { nodeStyle, edgeStyle };
+	}, [styling]);
+	return (
+		// `key={backend}`: the renderer backend is fixed at `Application.init`, so
+		// flipping `preference` only takes effect on a fresh mount — keying on it
+		// tears down and rebuilds the canvas (re-feeding `data` → re-layout). The
+		// default is WebGPU (PixiJS falls back to WebGL when it's unavailable).
+		<GraphCanvas
+			key={backend}
+			autoResize
+			preference={backend}
+			config={APP_OPTIONS}
+			className="w-full h-full"
+		>
+			<BackgroundLayer id="background" />
+			{/* Colour/label/size resolve from the canvas's per-type styling (docs/for-developers/modules/explore/features/graph-canvas.md);
+			    colour has a stable palette fallback, replacing ColorByBehaviour. */}
+			<GraphLayer
+				id="graph"
+				data={data}
+				node={{ style: nodeStyle, state: HIDDEN_NODE_STATE }}
+				edge={{ style: edgeStyle, state: HIDDEN_EDGE_STATE }}
+			/>
+
+			{/* Registers the active layout under ACTIVE_LAYOUT_ID (config-first:
+			    no auto-apply) and wires `end → fitContent`. <AutoLayoutBridge>
+			    below runs it whenever new query results land. */}
+			<D3ForceLayout
+				id={ACTIVE_LAYOUT_ID}
+				targetLayerId="graph"
+				options={FORCE_OPTS}
+			/>
+			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
+			<FreezeLayoutOnInteractionBridge />
+
+			<ThemeBridge />
+
+			{/* Camera + interaction. Enabled state comes from APP_OPTIONS; pan +
+			    node-drag are what the view section's lock disables. */}
+			<DragPanBehaviour id="pan" />
+			<DragNodeBehaviour id="drag-node" targetLayerId="graph" />
+			<WheelZoomBehaviour id="wheel" />
+			<PinchZoomBehaviour id="pinch" />
+			<HoverActivateBehaviour
+				id="hover"
+				targetLayerId="graph"
+				degree={magnet ? 1 : 0}
+				state="highlighted"
+			/>
+
+			{/* Selection — Shift+click selects; the canvas menu's "Select mode"
+			    submenu arms exactly one of brush / lasso (both Shift+drag). */}
+			<ClickSelectBehaviour id="click-select" targetLayerId="graph" multiple />
+			<BrushSelectBehaviour id="brush-select" targetLayerId="graph" />
+			<LassoSelectBehaviour id="lasso-select" targetLayerId="graph" />
+
+			{/* Click-to-view — no `panel`; the bridge feeds the right-side
+			    InspectorPanel instead of a floating viewer. */}
+			<ClickViewBehaviour id="click-view" targetLayerId="graph" />
+
+			<TextResolutionLODBehaviour id="label-lod" targetLayerId="graph" />
+			<MiniMapLayer id="minimap" graphLayerId="graph" />
+
+			{/* Right-click menus — wrapped in the clipboard provider so their
+			    Cut / Copy / Paste / Delete items resolve `useClipboard`. */}
+			<GraphClipboardProvider layerId="graph">
+				<CanvasContextMenus expand={expand ?? {}} onShowDetail={onShowDetail} />
+			</GraphClipboardProvider>
+
+			<InspectorSelectionBridge onViewTargetChange={onViewTargetChange} />
+			{/* Last child: publishes the engine only after everything registered. */}
+			<CanvasBridge onReady={onReady} />
+		</GraphCanvas>
+	);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Header toolbar
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ExplorerHeaderToolbarProps {
+	magnet?: boolean;
+	onToggleMagnet?: () => void;
+	/** Show the magnet (hover-highlight-neighbours) toggle. Default true. The
+	 *  read-only Modeller reuses this toolbar without it. */
+	showMagnet?: boolean;
+	/** Show the undo/redo history controls. Default true. Read-only viewers (the
+	 *  Modeller's global/published models) have nothing to undo, so they hide it. */
+	showHistory?: boolean;
+	/** Show the click/brush/lasso select-mode picker. Default true. Read-only
+	 *  viewers (the Modeller's static canvas) don't register the drag-select
+	 *  behaviours, so they hide it. */
+	showSelectMode?: boolean;
+	/** Active render backend; the switcher select reflects + sets it. */
+	backend: CanvasBackend;
+	onBackendChange: (backend: CanvasBackend) => void;
+}
+
+/**
+ * Board toolbar for the app header. The history section reads the history
+ * provider, so item assembly lives in a child mounted *inside* it. ExplorerPage
+ * only renders this once the engine (and thus the `'graph'` layer) is live, so
+ * the provider + hooks resolve immediately. Clipboard ops (cut/copy/paste) live
+ * in the canvas context menus, not here — so no clipboard provider is needed.
+ *
+ * Reused by the Modeller's read-only canvas via `showMagnet={false}` +
+ * `showHistory={false}` (no neighbour-hover, nothing to undo on a static view).
+ */
+export function ExplorerHeaderToolbar({
+	magnet,
+	onToggleMagnet,
+	showMagnet = true,
+	showHistory = true,
+	showSelectMode = true,
+	backend,
+	onBackendChange,
+}: ExplorerHeaderToolbarProps) {
+	return (
+		// The provider is always mounted (so `useHistorySection` resolves) even when
+		// the history items are hidden — keeping the hook call unconditional.
+		<GraphHistoryProvider layerId="graph">
+			<HeaderToolbarItems
+				magnet={magnet}
+				onToggleMagnet={onToggleMagnet}
+				showMagnet={showMagnet}
+				showHistory={showHistory}
+				showSelectMode={showSelectMode}
+				backend={backend}
+				onBackendChange={onBackendChange}
+			/>
+		</GraphHistoryProvider>
+	);
+}
+
+function HeaderToolbarItems({
+	magnet,
+	onToggleMagnet,
+	showMagnet = true,
+	showHistory = true,
+	showSelectMode = true,
+	backend,
+	onBackendChange,
+}: ExplorerHeaderToolbarProps) {
+	// Live engine — the toolbar only renders once it's live, so this is non-null.
+	const canvas = useCanvas();
+
+	// Gate the WebGPU switch on whether this browser can select WebGPU at all
+	// (`canUseWebGPU` — API present and not WebKit, where PixiJS WebGPU crashes).
+	// The engine still downgrades to WebGL at init if the adapter can't initialise.
+	const webgpuAvailable = canUseWebGPU();
+
+	// Selection mode (click / brush / lasso). Single source of truth for the
+	// canvas: picking one arms its drag-select behaviour and disables the others.
+	// The hook arms `click` on mount.
+	const selectMode = useSelectMode(SELECT_MODE_IDS, {
+		labels: SELECT_LABEL,
+		initial: "click",
+	});
+
+	const history = applyIconOverrides(useHistorySection(), {
+		undo: Undo2,
+		redo: Redo2,
+	});
+	const { layout, layoutOptions, applyLayout, isRunning } = useLayout(LAYOUTS, {
+		labels: LAYOUT_LABEL,
+		initial: "d3-force",
+		// The registered active layout already positions new data; let the user's
+		// picker apply on demand instead of double-running on mount.
+		applyInitial: false,
+	});
+
+	// Announce a header-picker layout run on the shared message channel: a sticky
+	// "Running…" while it runs, then a "ready" that auto-clears after 3s. (Query
+	// auto-layouts are announced separately by <AutoLayoutBridge>.)
+	const wasRunning = useRef(false);
+	useEffect(() => {
+		const label = LAYOUT_LABEL[layout] ?? layout;
+		if (isRunning && !wasRunning.current)
+			canvas.showMessage(`Running ${label} layout…`);
+		else if (!isRunning && wasRunning.current)
+			canvas.showMessage(`${label} layout ready`, 3000);
+		wasRunning.current = isRunning;
+	}, [isRunning, layout, canvas]);
+
+	// Announce the magnet toggle on the message channel (skip the initial mount).
+	const firstMagnet = useRef(true);
+	useEffect(() => {
+		if (!showMagnet) return;
+		if (firstMagnet.current) {
+			firstMagnet.current = false;
+			return;
+		}
+		canvas.showMessage(
+			magnet ? "Hover highlights neighbours" : "Hover highlights the node only",
+			2500,
+		);
+	}, [magnet, canvas, showMagnet]);
+	const view = applyIconOverrides(useViewSection(), {
+		zoomIn: ZoomIn,
+		zoomOut: ZoomOut,
+		fit: Maximize,
+		locked: Lock,
+		unlocked: LockOpen,
+	});
+	// `useStyleEditorSection` no longer takes per-option icons; inject them onto the
+	// returned edge-routing `select` item instead (its `icons` map drives the
+	// trigger + per-option glyphs).
+	const style = useStyleEditorSection({ layerId: "graph" }).map((item) =>
+		item.type === "select" ? { ...item, icons: EDGE_TYPE_ICONS } : item,
+	);
+	const { showGrid, toggleGrid } = useGrid();
+
+	const div = (key: string): ToolbarItem => ({ type: "divider", key });
+	const items: ToolbarItem[] = [
+		...(showHistory ? [...history, div("d1")] : []),
+		...(showSelectMode
+			? [
+					{
+						// Select-mode picker: a `RichSelect` (icon + label + hint per row)
+						// whose trigger shows the active mode's icon. Mirrors the header's
+						// other pickers; the single `useSelectMode` instance keeps the
+						// canvas's drag-select behaviours in sync.
+						type: "custom" as const,
+						key: "select-mode",
+						render: () => (
+							<RichSelect
+								options={SELECT_MODE_OPTIONS}
+								value={selectMode.mode}
+								onChange={(v) => selectMode.setMode(v as string)}
+								tooltip="Selection mode"
+								renderValue={(selected) => {
+									const Icon =
+										SELECT_ICONS[selectMode.mode as keyof typeof SELECT_ICONS];
+									return (
+										<span className="flex items-center gap-2">
+											<Icon className="size-4" />
+											{selected[0]?.label ?? "Select"}
+										</span>
+									);
+								}}
+							/>
+						),
+					},
+					div("dsel"),
+				]
+			: []),
+		{
+			// Layout switcher as an inline icon toggle group: every layout is
+			// visible in the header, the active one stays highlighted, and each
+			// reads its name from a hover tooltip. Default (not `outline`) variant
+			// so the items have no borders — only the active one tints its
+			// background.
+			type: "custom",
+			key: "layout",
+			render: () => (
+				<TooltipProvider delayDuration={300}>
+					<ToggleGroup
+						type="single"
+						size="sm"
+						value={layout}
+						// Radix fires `""` when the active item is re-clicked; ignore that
+						// so a layout is always selected.
+						onValueChange={(v) => v && applyLayout(v)}
+					>
+						{Object.entries(layoutOptions).map(([value, label]) => {
+							const Icon = LAYOUT_ICON[value] ?? Share2;
+							// Keep the item itself the (clean) ToggleGroup child so it
+							// keeps its `data-state="on"` highlight — wrapping it in
+							// `TooltipTrigger asChild` would clobber that with the
+							// tooltip's own `data-state`. The trigger lives on an inner
+							// span instead.
+							return (
+								<ToggleGroupItem key={value} value={value} aria-label={label}>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<span className="flex size-full items-center justify-center">
+												<Icon className="size-4" />
+											</span>
+										</TooltipTrigger>
+										<TooltipContent>{label}</TooltipContent>
+									</Tooltip>
+								</ToggleGroupItem>
+							);
+						})}
+					</ToggleGroup>
+				</TooltipProvider>
+			),
+		},
+		div("d2"),
+		{
+			type: "button",
+			key: "run-layout",
+			icon: Play,
+			label: "Run layout",
+			onClick: () => applyLayout(layout),
+			disabled: isRunning,
+		},
+		{
+			type: "button",
+			key: "refresh",
+			icon: RefreshCw,
+			label: "Re-render (re-run layout + repaint)",
+			onClick: () => void canvas.refresh(),
+		},
+		div("d3"),
+		...style,
+		div("d4"),
+		...view,
+		div("d5"),
+		{
+			type: "toggle",
+			key: "grid",
+			icon: Grid3x3,
+			label: "Toggle grid",
+			active: showGrid,
+			onToggle: toggleGrid,
+		},
+		div("d7"),
+		{
+			// Render backend switcher. Flipping it remounts the canvas (ExplorerCanvas
+			// keys on `backend`) so PixiJS re-inits with the chosen renderer. WebGPU is
+			// the default (auto-falling back to WebGL); WebGL can be pinned explicitly.
+			type: "custom",
+			key: "renderer",
+			render: () => (
+				<ToggleGroup
+					type="single"
+					size="sm"
+					variant="outline"
+					value={backend}
+					// Radix fires `""` when the active item is re-clicked; ignore that so
+					// a backend is always selected.
+					onValueChange={(v) => v && onBackendChange(v as CanvasBackend)}
+				>
+					{(Object.keys(BACKEND_LABEL) as CanvasBackend[]).map((b) => {
+						const disabled = b === "webgpu" && !webgpuAvailable;
+						return (
+							<ToggleGroupItem
+								key={b}
+								value={b}
+								disabled={disabled}
+								aria-label={BACKEND_LABEL[b]}
+								title={
+									disabled
+										? "WebGPU isn't available on this device"
+										: BACKEND_LABEL[b]
+								}
+							>
+								{BACKEND_LABEL[b]}
+							</ToggleGroupItem>
+						);
+					})}
+				</ToggleGroup>
+			),
+		},
+		...(showMagnet
+			? [
+					div("d8"),
+					{
+						type: "toggle" as const,
+						key: "magnet",
+						icon: Magnet,
+						label: "Highlight neighbours: off",
+						activeLabel: "Highlight neighbours: on",
+						active: !!magnet,
+						onToggle: onToggleMagnet ?? (() => {}),
+					},
+				]
+			: []),
+	];
+
+	return <ToolbarItems items={items} orientation="horizontal" />;
+}

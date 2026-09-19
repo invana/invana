@@ -2,7 +2,7 @@
 "studio": minor
 ---
 
-Modeller: make the schema canvas an interactive editor (RFC-027).
+Modeller: make the schema canvas an interactive editor (docs/for-developers/modules/connect-and-model/features/model-editor.md).
 
 The read-only schema diagram becomes a tool-driven authoring surface on an editable draft, in the app shell — matching the Explorer's layout. A **Select / Add / Connect / Delete** drawing toolbar lives in the page header (shown whenever a model is open; the authoring tools are enabled on an editable draft and disabled with a "create a draft" hint on read-only versions). The footer shows a live status bar (node/edge totals, zoom, pan, pointer) on the left and the active tool's hint on the right.
 

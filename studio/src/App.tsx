@@ -1,38 +1,16 @@
+import { UserMenu } from "@/components/header/UserMenu";
+import { useAppHeader } from "@/components/header/useAppHeader";
 import { AppLayoutV2 } from "@invana/themes";
-import { Boxes, Network } from "lucide-react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { UserMenu } from "./components/header/UserMenu";
-import { useAppHeader } from "./components/header/useAppHeader";
+import { Outlet } from "react-router-dom";
 
 export default function App() {
-	const navigate = useNavigate();
-	const { pathname } = useLocation();
-
-	// Explorer/Modeller live under /u/:username/:graphSlug/... and only make
-	// sense while a Graph is being viewed — show those nav items only when the
-	// URL is graph-scoped. On non-graph routes (/graphs list, /settings/*),
-	// the left rail is empty at the top.
-	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)/);
-	const graphScopedPath = graphMatch
-		? `/u/${graphMatch[1]}/${graphMatch[2]}`
-		: null;
-
-	const topNavItems = graphScopedPath
-		? [
-				{
-					name: "Explorer",
-					icon: Network,
-					tooltipSide: "right" as const,
-					onClick: () => navigate(`${graphScopedPath}/explorer`),
-				},
-				{
-					name: "Modeller",
-					icon: Boxes,
-					tooltipSide: "right" as const,
-					onClick: () => navigate(`${graphScopedPath}/modeller`),
-				},
-			]
-		: [];
+	// `leftNav` has no top items here. This shell hosts the graph-less routes
+	// only — the list, profile settings, platform events; every graph-scoped URL
+	// is `GraphDetailPage`, which owns its own `AppLayoutV2` and its own
+	// `leftNav` (graph-detail-page.md G1). There used to be Explorer and
+	// Modeller items behind a `/u/:username/:graphSlug` path test that no route
+	// under this shell can satisfy, so they never drew.
+	const topNavItems: never[] = [];
 
 	const header = useAppHeader();
 

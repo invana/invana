@@ -1,6 +1,6 @@
 /**
  * Keeps the active theme selection in sync with the signed-in user's profile
- * (RFC-044). The `<ThemeProvider>` already persists the selection to
+ * (docs/for-developers/modules/platform/features/theming.md). The `<ThemeProvider>` already persists the selection to
  * localStorage (per-device); this bridge makes it follow the user across
  * devices by reconciling with the engine:
  *
@@ -17,11 +17,11 @@
  * Renders nothing; mount it once inside `<ThemeProvider>`.
  */
 
+import { authApi } from "@/services/api/auth";
+import { useAuthStore } from "@/stores/auth.store";
+import type { ThemeSelection } from "@/types/auth";
 import { useTheme } from "@invana/themes";
 import { useEffect, useRef } from "react";
-import { authApi } from "../services/api/auth";
-import { useAuthStore } from "../stores/auth.store";
-import type { ThemeSelection } from "../types/auth";
 
 const keyOf = (s: ThemeSelection) => `${s.theme}|${s.mode}|${s.accent ?? ""}`;
 

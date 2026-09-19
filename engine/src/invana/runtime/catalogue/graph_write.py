@@ -1,0 +1,278 @@
+"""Bound: ``graph_write`` — the entries that write to the bound graph database
+(docs/for-developers/orchestration.md §0.6).
+
+**This is the bound that matters most to ceiling**: an agent allowed `graph_read`
+and not this one cannot change the graph, whatever plan it runs.
+
+`write_graph` and `stitch` are the keys already stored on every load's nodes and
+are not renamed (§6.4). `bulk_write` is the fast path, and it declares no
+`requires` because nothing validated what it writes.
+
+**The bodies are here, not one import away.** Loading owns no records of its own,
+so there is no app to view and nothing for an entry to be thin against
+(the-runtime-package.md § 4a). What stays in its own module is what is long
+enough to read on its own: `records.py` for validating and writing records,
+`stitching.py` for the rules between models.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from invana.graph.loaders import CSVLoader, LoaderConfig
+from invana.runtime.catalogue import stitching
+from invana.runtime.catalogue.contract import Out, RunVars, TaskContext, TaskFailure
+from invana.runtime.catalogue.records import (
+    LoadRefused,
+    _solve_active_stitches,
+    _stitch,
+    _write,
+    connector_for,
+)
+from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
+
+
+def _load(v: RunVars):
+    if v.load is None:
+        raise TaskFailure(
+            cls="blocked",
+            cause="not_a_load",
+            message="This step belongs to a load, and this run is not one.",
+            short="not a load",
+        )
+    return v.load
+
+
+def _run_id(ctx: TaskContext) -> str:
+    """The run whose name goes on every element this step writes (LD4 · §6.6).
+
+    The **root**, not this node: provenance answers *which load wrote this*, and
+    a load is the run, not the step inside it.
+    """
+    return ctx.step.parent_run_id or ctx.step.id
+
+
+async def write_graph(ctx: TaskContext, v: RunVars) -> Out:
+    """MERGE what validated, every element stamped with its origin (LD4).
+
+    Identity-keyed, which is what makes a re-run of the same file update rather
+    than duplicate (C8).
+    """
+    load = _load(v)
+    await ctx.progress("writing records")
+    try:
+        connector = await connector_for(ctx.db, ctx.step.graph_id)
+    except LoadRefused as exc:
+        raise TaskFailure(
+            cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
+        ) from exc
+
+    load.counts, load.written = await _write(
+        connector,
+        model_id=load.model_id,
+        run_id=_run_id(ctx),
+        model_json=load.model_json,
+        node_records=load.valid_nodes,
+        edge_records=load.valid_edges,
+    )
+    return Out(
+        detail=f"{load.written} of {load.total} written",
+        input={"model_id": load.model_id},
+        output={
+            "nodes": sum(load.counts["nodes"].values()),
+            "edges": sum(load.counts["edges"].values()),
+            "written": load.written,
+        },
+    )
+
+
+async def stitch(ctx: TaskContext, v: RunVars) -> Out:
+    """Resolve what this load deferred, then run the Graph's standing rules (ST47).
+
+    Two halves, and the second is why this is not just *finish the edges*: a
+    stitch is a standing rule, so the records this load wrote are run through
+    every **active** stitch in the Graph, scoped by this run's stamp.
+    """
+    load = _load(v)
+    await ctx.progress("resolving edges")
+    graph_id = ctx.step.graph_id
+    run_id = _run_id(ctx)
+    try:
+        connector = await connector_for(ctx.db, graph_id)
+    except LoadRefused as exc:
+        raise TaskFailure(
+            cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
+        ) from exc
+
+    resolved, unresolved = await _stitch(
+        connector, model_id=load.model_id, run_id=run_id, deferred=load.deferred, report=load.report
+    )
+    load.counts.setdefault("edges", {})
+    load.counts["edges"] = {**load.counts["edges"], **resolved}
+
+    stitched = await _solve_active_stitches(
+        ctx.db,
+        connector,
+        graph_id=graph_id,
+        model_id=load.model_id,
+        run_id=run_id,
+        root=Path(load.root),
+        report=load.report,
+    )
+    for edge_type, n in stitched.items():
+        load.counts["edges"][edge_type] = load.counts["edges"].get(edge_type, 0) + n
+
+    return Out(
+        detail=(f"{sum(resolved.values())} resolved · {unresolved} unresolved · {sum(stitched.values())} stitched"),
+        input={"model_id": load.model_id},
+        output={
+            "resolved": sum(resolved.values()),
+            "unresolved": unresolved,
+            "stitched": sum(stitched.values()),
+        },
+    )
+
+
+async def apply_stitches(ctx: TaskContext, v: RunVars) -> Out:
+    """Declare every rule `<root>/stitches.json` states, **staged** (ST21).
+
+    Staged means the rows exist and nothing a question can reach has changed.
+    Writing the edges is `commit_stitches`, and keeping them apart is why a
+    declaration can be reviewed before it is true.
+    """
+    root = str((ctx.step.args or {}).get("root") or (v.load.root if v.load else ""))
+    if not root:
+        raise TaskFailure(
+            cls="blocked", cause="no_source", message="No bundle folder to read rules from.", short="no source"
+        )
+    applied = await stitching.apply_bundle(ctx.db, graph_id=ctx.step.graph_id, root=Path(root))
+    return Out(
+        detail=f"{applied.declared} declared · {applied.already} already · {applied.skipped} skipped",
+        input={"root": root},
+        output={
+            "declared": applied.declared,
+            "already": applied.already,
+            "skipped": applied.skipped,
+            "passed": applied.passed,
+        },
+    )
+
+
+async def commit_stitches(ctx: TaskContext, v: RunVars) -> Out:
+    """Flip the staged set to active and run every stitch in it (ST44)."""
+    await ctx.progress("writing stitched edges")
+    try:
+        connector = await connector_for(ctx.db, ctx.step.graph_id)
+    except LoadRefused as exc:
+        raise TaskFailure(
+            cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
+        ) from exc
+    committed = await stitching.commit_stitches(ctx.db, graph_id=ctx.step.graph_id, connector=connector)
+    return Out(
+        detail=f"{committed.written} written · {committed.rejected} rejected",
+        input={},
+        output={"written": committed.written, "rejected": committed.rejected},
+    )
+
+
+async def bulk_write(ctx: TaskContext, v: RunVars) -> Out:
+    """Write a CSV folder straight through the connector, validating nothing (LD10).
+
+    **It declares no `requires`, and that is the point.** `write_graph` requires
+    `validate_records` because everything it writes was checked against a
+    published version; this writes what the files say. Reusing `write_graph`
+    here would have a bulk load claim a validation it never ran, so the fast
+    path gets its own entry rather than a relaxed version of somebody else's.
+
+    What it buys is speed, and what it costs is provenance: nothing written here
+    carries `_inv_model_id` or `_inv_record_id`, so no answer grounded on it can
+    be traced to a source record. The run says `bulk` for exactly that reason.
+    """
+    args = ctx.step.args or {}
+    root = str(args.get("root") or "")
+    if not root:
+        raise TaskFailure(cls="blocked", cause="no_source", message="No folder to load.", short="no source")
+    await ctx.progress(f"bulk loading {root}")
+    try:
+        connector = await connector_for(ctx.db, ctx.step.graph_id)
+    except LoadRefused as exc:
+        raise TaskFailure(
+            cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
+        ) from exc
+
+    config = LoaderConfig(
+        batch_size=int(args.get("batch_size") or 500),
+        skip_on_error=bool(args.get("skip_on_error")),
+        keep_source_ids=bool(args.get("keep_source_ids", True)),
+    )
+    loader = CSVLoader(connector=connector, config=config)
+    async with connector:
+        stats = await loader.load_directory(root)
+
+    nodes, edges = stats.vertices_created, stats.edges_created
+    failed = stats.vertices_failed + stats.edges_failed
+    # A load that wrote nothing is a failure with its reasons, not a success
+    # with a zero — the folder was named, so something was expected (LD10).
+    if nodes == 0 and edges == 0:
+        raise TaskFailure(
+            cls="blocked",
+            cause="nothing_written",
+            message=(stats.errors or ["Nothing was written. Check the folder has nodes/ or relationships/."])[0],
+            short="nothing written",
+            raw="\n".join(stats.errors[:20]),
+        )
+    return Out(
+        detail=f"{nodes} node(s) / {edges} edge(s) · {failed} failed",
+        input={"root": root},
+        output={"nodes": nodes, "edges": edges, "failed": failed},
+    )
+
+
+ENTRIES = build(
+    Entry(
+        key="write_graph",
+        bound=Bound.graph_write,
+        run=write_graph,
+        outputs={"nodes": Type.int_, "edges": Type.int_, "written": Type.int_},
+        requires=("validate_records",),
+    ),
+    Entry(
+        key="stitch",
+        bound=Bound.graph_write,
+        run=stitch,
+        outputs={"resolved": Type.int_, "unresolved": Type.int_, "stitched": Type.int_},
+        requires=("write_graph",),
+    ),
+    Entry(
+        key="bulk_write",
+        bound=Bound.graph_write,
+        run=bulk_write,
+        args={
+            "root": Arg(Type.str_),
+            "batch_size": Arg(Type.int_),
+            "skip_on_error": Arg(Type.bool_),
+            "keep_source_ids": Arg(Type.bool_),
+        },
+        outputs={"nodes": Type.int_, "edges": Type.int_, "failed": Type.int_},
+        # **No `requires`.** Nothing validated this, and saying otherwise here
+        # is the one thing that would make the fast path lie.
+    ),
+    Entry(
+        key="apply_stitches",
+        bound=Bound.graph_write,
+        run=apply_stitches,
+        args={"root": Arg(Type.str_)},
+        outputs={"declared": Type.int_, "already": Type.int_, "skipped": Type.int_, "passed": Type.bool_},
+    ),
+    Entry(
+        key="commit_stitches",
+        bound=Bound.graph_write,
+        run=commit_stitches,
+        outputs={"written": Type.int_, "rejected": Type.int_},
+        # You commit what was applied. Declared rather than left to the step
+        # order, because an ordering nobody stated is a guess — and this one is
+        # not: committing a set that was never staged writes edges no rule
+        # declared (ST21 · ST44).
+        requires=("apply_stitches",),
+    ),
+)

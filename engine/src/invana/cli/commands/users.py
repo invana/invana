@@ -13,13 +13,9 @@ import re
 import click
 from fastapi import HTTPException
 
-from invana.auth.passwords import WeakPasswordError
-from invana.auth.services import (
-    admin_set_password,
-    find_user_by_email_or_username,
-    provision_user,
-)
-from invana.db import create_db_engine, create_session_factory
+from invana.core.auth.managers import AuthManager
+from invana.core.auth.passwords import WeakPasswordError
+from invana.core.db import create_db_engine, create_session_factory
 
 _USERNAME_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
@@ -140,7 +136,7 @@ async def _run_create(
                 _password = click.prompt("Password", hide_input=True, confirmation_prompt="Confirm")
 
             try:
-                user = await provision_user(
+                user = await AuthManager().provision_user(
                     session,
                     email=_email,
                     password=_password,
@@ -184,12 +180,12 @@ async def _run_update_password(
                     confirmation_prompt="Confirm",
                 )
 
-            user = await find_user_by_email_or_username(session, identifier=_identifier)
+            user = await AuthManager().find_user_by_email_or_username(session, identifier=_identifier)
             if user is None:
                 raise click.ClickException(f"No user found matching '{_identifier}'.")
 
             try:
-                await admin_set_password(session, user=user, new_password=_password)
+                await AuthManager().admin_set_password(session, user=user, new_password=_password)
             except WeakPasswordError as e:
                 raise click.ClickException(str(e)) from e
             await session.commit()

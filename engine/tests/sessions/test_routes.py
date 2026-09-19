@@ -1,8 +1,8 @@
-"""HTTP route tests for the Sessions API (RFC-024) against a real Postgres.
+"""HTTP route tests for the Sessions API (docs/for-developers/modules/ask/spec.md) against a real Postgres.
 
 These exercise routing, dependency wiring, serialization, and status codes for
 the non-execution behaviors (CRUD + the natural-language path, which doesn't
-touch a graph DB). The auth / membership / setup-complete gates are overridden
+touch a graph DB). The auth / membership / setup-gate dependencies are overridden
 here — they're covered by their own tests — so this isolates the session
 routes. The `ql` execution path (`POST /messages` running real Cypher/Gremlin)
 needs a live graph DB and is covered by the integration suite.
@@ -16,17 +16,17 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
-from invana.auth.deps import get_current_user
-from invana.auth.models import User
-from invana.db import get_session
-from invana.graphs.deps import (
+from invana.apps.graphs.models import Graph
+from invana.core.auth.deps import get_current_user
+from invana.core.auth.models import User
+from invana.core.db import get_session
+from invana.runtime.interpreter import TaskRuntime
+from invana.server.app import create_app
+from invana.server.graphs.deps import (
+    require_graph_answering,
     require_graph_member,
-    require_graph_setup_complete,
     resolve_graph_by_username_slug,
 )
-from invana.graphs.models import Graph
-from invana.server.app import create_app
-from invana.thinking.runtime import ThinkingRuntime
 
 pytestmark = pytest.mark.asyncio
 
@@ -59,10 +59,10 @@ async def client(session_factory):
     app = create_app()
     app.state.graph_connection_manager = object()  # never called on CRUD / nl routes
     # Lifespan doesn't run under ASGITransport — wire what the routes read off
-    # app.state by hand. The runtime is real: a ql send runs a thinking whose
+    # app.state by hand. The runtime is real: a ql send runs a run whose
     # execute step fails (no connector), which is exactly the path we assert.
     app.state.db_session_factory = session_factory
-    app.state.thinking_runtime = ThinkingRuntime(
+    app.state.task_runtime = TaskRuntime(
         session_factory=session_factory, manager=app.state.graph_connection_manager, encryption_key="x"
     )
 
@@ -74,7 +74,7 @@ async def client(session_factory):
     app.dependency_overrides[get_current_user] = lambda: user
     app.dependency_overrides[require_graph_member] = lambda: None
     app.dependency_overrides[resolve_graph_by_username_slug] = lambda: graph
-    app.dependency_overrides[require_graph_setup_complete] = lambda: graph
+    app.dependency_overrides[require_graph_answering] = lambda: graph
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
@@ -90,7 +90,8 @@ class TestSessionsRoutes:
         assert resp.json()["messages"] == []
 
         # A natural-language send with no LLM provider configured → 422 with an
-        # actionable, backend-owned message (provider resolution; RFC-030). The
+        # actionable, backend-owned message (provider resolution;
+        # docs/for-developers/modules/ask/features/ask-in-natural-language.md). The
         # failure rolls back before any message is written.
         resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "hi", "mode": "nl"})
         assert resp.status_code == 422
@@ -135,28 +136,28 @@ class TestSessionsRoutes:
         assert (await client.get(f"{BASE}/nope")).status_code == 404
 
 
-class TestThinkingRoutes:
+class TestTaskRunRoutes:
     async def test_send_opens_a_thinking_and_the_trace_is_on_the_record(self, client):
-        """A ql send returns 202 with a thinking; the run settles in the background
+        """A ql send returns 202 with a run; the run settles in the background
         (the execute step fails here — no graph connection in this harness) and
-        the steps are readable on the thinking, on the session detail, and as a
-        replayed stream (RFC-055 UC1 · UC4 · UC6 · UC12)."""
+        the steps are readable on the run, on the session detail, and as a
+        replayed stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md · UC4 · UC6 · UC12)."""
         sid = (await client.post(BASE, json={})).json()["id"]
         resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "MATCH (n) RETURN n LIMIT 1", "mode": "ql"})
         assert resp.status_code == 202
         body = resp.json()
-        thinking_id = body["thinking_id"]
+        run_id = body["run_id"]
         assert body["assistant_message"]["status"] == "running"
-        assert body["assistant_message"]["thinking_id"] == thinking_id
-        assert body["stream_url"].endswith(f"/thinkings/{thinking_id}/stream")
+        assert body["assistant_message"]["run_id"] == run_id
+        assert body["stream_url"].endswith(f"/runs/{run_id}/stream")
 
         # Let the background run settle.
-        runtime = client._transport.app.state.thinking_runtime
-        task = runtime._tasks.get(thinking_id)
+        runtime = client._transport.app.state.task_runtime
+        task = runtime._tasks.get(run_id)
         if task is not None:
             await task
 
-        th = (await client.get(f"{BASE.replace('/sessions', '/thinkings')}/{thinking_id}")).json()
+        th = (await client.get(f"{BASE.replace('/sessions', '/runs')}/{run_id}")).json()
         assert th["workflow_key"] == "ql-query"
         assert th["status"] == "failed"
         by_key = {s["task_key"]: s for s in th["steps"]}
@@ -168,30 +169,32 @@ class TestThinkingRoutes:
         detail = (await client.get(f"{BASE}/{sid}")).json()
         reply = detail["messages"][1]
         assert reply["status"] == "error"
-        assert reply["thinking_id"] == thinking_id
-        assert [s["label"] for s in reply["steps"]] == ["Validate", "Execute", "Project"]
+        assert reply["run_id"] == run_id
+        # A QL ask through a planning agent is Plan (a template match, no LLM)
+        # then the seeded tail — docs/for-developers/modules/agents/spec.md's table for `kind = ql`.
+        assert [s["label"] for s in reply["steps"]] == ["Plan", "Validate", "Execute", "Project", "Verify"]
 
         kinds: list[str] = []
         async with client.stream("GET", body["stream_url"]) as stream:
             async for line in stream.aiter_lines():
                 if line.startswith("event: "):
                     kinds.append(line.removeprefix("event: "))
-                if line == "event: thinking.done":
+                if line == "event: run.done":
                     break
-        assert kinds[0] == "thinking.started"
+        assert kinds[0] == "run.started"
         assert "step.started" in kinds and "diagnosis" in kinds
-        assert kinds[-1] == "thinking.done"
+        assert kinds[-1] == "run.done"
 
     async def test_send_refuses_a_write_before_running_it(self, client):
         """Validate is a step on the record: a mutating query never reaches execute (UC4)."""
         sid = (await client.post(BASE, json={})).json()["id"]
         resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "MATCH (n) DELETE n", "mode": "ql"})
-        thinking_id = resp.json()["thinking_id"]
-        runtime = client._transport.app.state.thinking_runtime
-        task = runtime._tasks.get(thinking_id)
+        run_id = resp.json()["run_id"]
+        runtime = client._transport.app.state.task_runtime
+        task = runtime._tasks.get(run_id)
         if task is not None:
             await task
-        th = (await client.get(f"{BASE.replace('/sessions', '/thinkings')}/{thinking_id}")).json()
+        th = (await client.get(f"{BASE.replace('/sessions', '/runs')}/{run_id}")).json()
         by_key = {s["task_key"]: s for s in th["steps"]}
         assert by_key["validate_query"]["status"] == "failed"
         assert by_key["validate_query"]["error"]["cause"] == "query_not_read_only"

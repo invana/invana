@@ -5,155 +5,93 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI
-from starlette.requests import Request
-from starlette_admin import DropDown, StringField
-from starlette_admin.contrib.sqla import Admin, ModelView
+from starlette_admin import DropDown
+from starlette_admin.contrib.sqla import Admin
 
-from invana.auth.models import RefreshToken, User
-from invana.canvases.models import Canvas, CanvasState
-from invana.datasets.models import Dataset, ImportJob
-from invana.events.models import Event
-from invana.graphs.models import Graph, GraphConnection, GraphMember
-from invana.llm_providers.models import LLMProvider
-from invana.modeller.models import (
+from invana.apps.agents.models import Agent
+from invana.apps.boards.models import Board, BoardVersion
+from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
+from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
     GraphModel,
     GraphVersion,
     IndexDefinition,
+    ModelLink,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     SchemaProjection,
     TypePropertyMapping,
     ValidationRule,
 )
+from invana.apps.sessions.models import Session, SessionMessage
+from invana.apps.skills.models import Skill
+from invana.apps.task_plans.models import Task as PlanTask
+from invana.apps.task_plans.models import TaskPlan
+from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
+from invana.core.auth.models import PersonalAccessToken, RefreshToken, User
+from invana.core.events.models import Event
+from invana.runtime.models import (
+    Emission,
+    ProjectionTemplate,
+    TaskPrompt,
+    TaskRun,
+    TaskStream,
+)
 from invana.server.admin.auth import SuperuserAuthProvider
-from invana.sessions.models import Session, SessionMessage
-from invana.skills.models import Skill
-from invana.thinking.models import Thinking, ThinkingStep, Thought, ThoughtStream
+from invana.server.agents.admin import AgentView
+from invana.server.auth.admin import (
+    PersonalAccessTokenView,
+    RefreshTokenView,
+    UserView,
+)
+from invana.server.boards.admin import BoardVersionView, BoardView
+from invana.server.events.admin import EventView
+from invana.server.graphs.admin import (
+    GraphConnectionView,
+    GraphContainerView,
+    GraphMemberView,
+)
+from invana.server.llm_providers.admin import LLMProviderView
+from invana.server.modeller.admin import (
+    ConstraintDefinitionView,
+    EdgeTypeDefinitionView,
+    GraphModelView,
+    GraphVersionView,
+    IndexDefinitionView,
+    ModelLinkView,
+    NodeTypeDefinitionView,
+    PropertyKeyDefinitionView,
+    SchemaProjectionView,
+    TypePropertyMappingView,
+    ValidationRuleView,
+)
+from invana.server.runtime.admin import (
+    EmissionView,
+    ProjectionTemplateView,
+    RunNodeView,
+    TaskPromptView,
+    TaskRunView,
+    TaskStreamView,
+)
+from invana.server.sessions.admin import (
+    SessionMessageView,
+    SessionView,
+)
+from invana.server.skills.admin import SkillView
+from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
+from invana.server.work.admin import (
+    ProjectAssignmentView,
+    ProjectView,
+    TaskDependencyView,
+    TaskView,
+)
 
 # Custom templates (currently: base.html with theme switcher) live alongside
 # this module. starlette-admin's Jinja loader checks templates_dir first and
 # falls through to the package defaults for anything we don't override.
 _TEMPLATES_DIR = str(Path(__file__).parent / "templates")
-
-
-class GraphModelView(ModelView):
-    fields = [
-        "id",
-        "graph_id",
-        "name",
-        "description",
-        StringField("validation_mode", label="Validation Mode"),
-        StringField("status", label="Status"),
-        "yaml_path",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["name"]
-
-
-class GraphVersionView(ModelView):
-    fields = [
-        "id",
-        "model_id",
-        "version",
-        StringField("status", label="Status"),
-        "change_summary",
-        "created_at",
-        "activated_at",
-    ]
-    search_fields = ["version"]
-
-
-class NodeTypeDefinitionView(ModelView):
-    fields = ["id", "version_id", "name", "description", "parent_type", "is_abstract"]
-    search_fields = ["name"]
-
-
-class EdgeTypeDefinitionView(ModelView):
-    fields = [
-        "id",
-        "version_id",
-        "name",
-        "description",
-        "source_node_types",
-        "target_node_types",
-        StringField("multiplicity", label="Multiplicity"),
-    ]
-    search_fields = ["name"]
-
-
-class PropertyKeyDefinitionView(ModelView):
-    fields = [
-        "id",
-        "version_id",
-        "name",
-        "type",
-        StringField("value_cardinality", label="Value Cardinality"),
-        "description",
-    ]
-    search_fields = ["name"]
-
-
-class TypePropertyMappingView(ModelView):
-    fields = [
-        "id",
-        "property_key_id",
-        "node_type_id",
-        "edge_type_id",
-        "default_value",
-        "sort_order",
-    ]
-
-
-class ConstraintDefinitionView(ModelView):
-    fields = [
-        "id",
-        "version_id",
-        "name",
-        StringField("target_kind", label="Target Kind"),
-        "target_label",
-        StringField("constraint_type", label="Constraint Type"),
-        "properties",
-    ]
-    search_fields = ["name"]
-
-
-class ValidationRuleView(ModelView):
-    fields = [
-        "id",
-        "property_key_id",
-        "type_property_mapping_id",
-        StringField("rule_type", label="Rule Type"),
-        "params",
-    ]
-
-
-class IndexDefinitionView(ModelView):
-    fields = [
-        "id",
-        "version_id",
-        "name",
-        StringField("target_kind", label="Target Kind"),
-        "target_label",
-        "properties",
-        StringField("index_type", label="Index Type"),
-        "index_options",
-    ]
-    search_fields = ["name"]
-
-
-class SchemaProjectionView(ModelView):
-    fields = [
-        "id",
-        "version_id",
-        "connector_id",
-        StringField("status", label="Status"),
-        "operations",
-        "errors",
-        "projected_at",
-    ]
 
 
 # ---------------------------------------------------------------------------
@@ -165,343 +103,8 @@ class SchemaProjectionView(ModelView):
 # ---------------------------------------------------------------------------
 
 
-class UserView(ModelView):
-    label = "Users"
-    icon = "fa fa-user"
-    fields = [
-        "id",
-        "email",
-        "username",
-        "first_name",
-        "last_name",
-        "preferences",
-        "is_superuser",
-        "is_active",
-        "username_last_changed_at",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["email", "username", "first_name", "last_name"]
-    sortable_fields = ["email", "username", "created_at", "updated_at"]
-
-    # Users come from `invana init` (root) or the superuser register API — not admin UI.
-    def can_create(self, request: Request) -> bool:
-        return False
-
-
-class GraphContainerView(ModelView):
-    label = "Graphs"
-    icon = "fa fa-project-diagram"
-    fields = [
-        "id",
-        "slug",
-        "name",
-        "description",
-        "instructions",
-        StringField("status", label="Status"),
-        "connection",
-        "created_by_id",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["name", "slug"]
-    sortable_fields = ["name", "slug", "created_at"]
-
-
-class GraphMemberView(ModelView):
-    label = "Graph members"
-    icon = "fa fa-users"
-    # Binary membership post-RFC-023 — no role column.
-    fields = [
-        "graph_id",
-        "user_id",
-        "created_at",
-    ]
-    sortable_fields = ["created_at"]
-
-
-class RefreshTokenView(ModelView):
-    label = "Refresh tokens"
-    icon = "fa fa-key"
-    fields = [
-        "id",
-        "user_id",
-        "expires_at",
-        "revoked_at",
-        "created_at",
-    ]
-    sortable_fields = ["created_at", "expires_at", "revoked_at"]
-
-    # Refresh tokens are session state — view + revoke (delete) only.
-    def can_create(self, request: Request) -> bool:
-        return False
-
-    def can_edit(self, request: Request) -> bool:
-        return False
-
-
-class GraphConnectionView(ModelView):
-    label = "Graph connections"
-    icon = "fa fa-plug"
-    fields = [
-        "id",
-        "graph_id",
-        "uri",
-        "connector_class",
-        "read_only",
-        StringField("status", label="Status"),
-        "model_id",
-        "last_health_check_at",
-        "latency_ms",
-        "server_version",
-        "server_version_source",
-        "compatibility_status",
-        "version_acknowledged",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["uri"]
-
-
-class LLMProviderView(ModelView):
-    label = "LLM providers"
-    icon = "fa fa-sparkles"
-    # ``api_key_encrypted`` deliberately excluded from `fields` — ciphertext
-    # isn't useful in admin and we don't want it edited by hand.
-    fields = [
-        "id",
-        "graph_id",
-        StringField("provider", label="Provider"),
-        "model_id",
-        "base_url",
-        "guardrails",
-        "is_default",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["model_id", "base_url"]
-
-
-class SkillView(ModelView):
-    label = "Skills"
-    icon = "fa fa-wand-magic-sparkles"
-    fields = [
-        "id",
-        "graph_id",
-        "name",
-        "description",
-        "content",
-        "when_to_use",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["name", "description"]
-
-
-class EventView(ModelView):
-    """Audit events (RFC-018). Read + delete only — admin shouldn't be able
-    to author new events or rewrite the audit trail in-place."""
-
-    label = "Events"
-    icon = "fa fa-clock-rotate-left"
-    fields = [
-        "id",
-        "created_at",
-        "graph_id",
-        "actor_id",
-        StringField("actor_type", label="Actor"),
-        "action",
-        "target_kind",
-        "target_id",
-        "details",
-        "trace_id",
-    ]
-    search_fields = ["action", "target_id", "target_kind"]
-    sortable_fields = ["created_at", "action"]
-
-    def can_create(self, request: Request) -> bool:
-        return False
-
-    def can_edit(self, request: Request) -> bool:
-        return False
-
-
-class DatasetView(ModelView):
-    label = "Datasets"
-    icon = "fa fa-layer-group"
-    fields = [
-        "id",
-        "graph_id",
-        "model_id",
-        "name",
-        "description",
-        "storage_uri",
-        "record_counts",
-        "last_job_id",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["name"]
-
-
-class ImportJobView(ModelView):
-    label = "Import jobs"
-    icon = "fa fa-file-import"
-    fields = [
-        "id",
-        "dataset_id",
-        StringField("status", label="Status"),
-        "model_version_id",
-        "records_total",
-        "records_processed",
-        "error_count",
-        "warning_count",
-        "report",
-        "logs",
-        "started_at",
-        "finished_at",
-        "created_at",
-    ]
-    sortable_fields = ["created_at", "finished_at"]
-
-    # Jobs are produced by imports — admin is read + delete only.
-    def can_create(self, request: Request) -> bool:
-        return False
-
-    def can_edit(self, request: Request) -> bool:
-        return False
-
-
-class SessionView(ModelView):
-    fields = [
-        "id",
-        "graph_id",
-        "created_by_id",
-        StringField("surface", label="Surface"),
-        "model_id",
-        "title",
-        "pinned",
-        "archived",
-        "message_count",
-        "node_count",
-        "edge_count",
-        "last_status",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["title"]
-
-
-class SessionMessageView(ModelView):
-    fields = [
-        "id",
-        "session_id",
-        "seq",
-        StringField("role", label="Role"),
-        StringField("status", label="Status"),
-        StringField("operation", label="Operation"),
-        StringField("mode", label="Mode"),
-        "via",
-        "query_language",
-        "rationale",
-        "clarification_options",
-        "feedback",
-        "row_count",
-        "execution_time_ms",
-        "llm_time_ms",
-        "timeout_s",
-        "thinking_id",
-        "created_at",
-    ]
-
-
-# ── Thinkings (RFC-048 / RFC-055) — the run behind a session reply ────────────
-
-
-class ThoughtView(ModelView):
-    fields = ["id", "graph_id", "session_id", "message_id", "author_id", "kind", "body", "params", "created_at"]
-    search_fields = ["body"]
-
-
-class ThinkingView(ModelView):
-    fields = [
-        "id",
-        "thought_id",
-        "graph_id",
-        "workflow_key",
-        "status",
-        "assistant_message_id",
-        "queued_at",
-        "started_at",
-        "finished_at",
-        "error",
-        "stream_seq",
-        "cursor",
-    ]
-
-
-class ThinkingStepView(ModelView):
-    fields = [
-        "id",
-        "thinking_id",
-        "message_id",
-        "seq",
-        "task_key",
-        "label",
-        "attempt",
-        "status",
-        "started_at",
-        "finished_at",
-        "detail",
-        "input",
-        "output",
-        "error",
-        "tokens_in",
-        "tokens_out",
-    ]
-
-
-class ThoughtStreamView(ModelView):
-    fields = ["id", "thinking_id", "seq", "kind", "payload", "idem_key", "created_at"]
-
-
-class CanvasView(ModelView):
-    # Heavy render blobs (snapshot / positions / view_state / filters / settings)
-    # are excluded from the list for readability — they're JSON payloads, not
-    # browsable columns.
-    fields = [
-        "id",
-        "session_id",
-        "graph_id",
-        "created_by_id",
-        "title",
-        "instructions",
-        "source_query",
-        "pinned",
-        "archived",
-        "created_at",
-        "updated_at",
-    ]
-    search_fields = ["title"]
-
-
-class CanvasStateView(ModelView):
-    # Append-only history (RFC-047). Heavy render blobs (snapshot / positions /
-    # banner / styling / settings) are excluded — JSON payloads, not browsable.
-    fields = [
-        "id",
-        "canvas_id",
-        "graph_id",
-        "created_by_id",
-        "message_id",
-        StringField("kind", label="Kind"),
-        "label",
-        "node_count",
-        "edge_count",
-        "source_query",
-        "created_at",
-    ]
-    search_fields = ["label"]
+# ── TaskRuns (docs/for-developers/modules/ask/spec.md ·
+# docs/for-developers/modules/ask/features/streaming-and-the-workflow.md) — the run behind a session reply ────────────
 
 
 def mount_admin(app: FastAPI) -> None:
@@ -526,11 +129,13 @@ def mount_admin(app: FastAPI) -> None:
             views=[
                 UserView(User, label="Users", icon="fa fa-user"),
                 RefreshTokenView(RefreshToken, label="Refresh tokens", icon="fa fa-key"),
+                PersonalAccessTokenView(PersonalAccessToken, label="Personal access tokens", icon="fa fa-key"),
             ],
         ),
     )
 
-    # ── Graph container + membership (Layer 2 — RFC-017) ─────────────────────
+    # ── Graph container + membership (Layer 2 — docs/for-developers/modules/identity-and-access/spec.md)
+    # ─────────────────────
     admin.add_view(
         DropDown(
             label="Graphs",
@@ -555,25 +160,14 @@ def mount_admin(app: FastAPI) -> None:
         ),
     )
 
-    # ── Audit (RFC-018 — domain event log) ───────────────────────────────────
+    # ── Audit (docs/for-developers/modules/operate/features/audit-and-activity.md — domain event log)
+    # ───────────────────────────────────
     admin.add_view(
         DropDown(
             label="Audit",
             icon="fa fa-clock-rotate-left",
             views=[
                 EventView(Event, label="Events", icon="fa fa-clock-rotate-left"),
-            ],
-        ),
-    )
-
-    # ── Ingestion (datasets + import jobs — RFC-020) ─────────────────────────
-    admin.add_view(
-        DropDown(
-            label="Ingestion",
-            icon="fa fa-file-import",
-            views=[
-                DatasetView(Dataset, label="Datasets", icon="fa fa-layer-group"),
-                ImportJobView(ImportJob, label="Import jobs", icon="fa fa-file-import"),
             ],
         ),
     )
@@ -594,11 +188,12 @@ def mount_admin(app: FastAPI) -> None:
                 ValidationRuleView(ValidationRule, label="Validation rules"),
                 IndexDefinitionView(IndexDefinition, label="Indexes"),
                 SchemaProjectionView(SchemaProjection, label="Projections"),
+                ModelLinkView(ModelLink, label="Model links"),
             ],
         ),
     )
 
-    # ── Query sessions (RFC-024) ─────────────────────────────────────────────
+    # ── Query sessions (docs/for-developers/modules/ask/spec.md) ─────────────────────────────────────────────
     admin.add_view(
         DropDown(
             label="Sessions",
@@ -610,28 +205,49 @@ def mount_admin(app: FastAPI) -> None:
         ),
     )
 
-    # ── Thinkings (RFC-048 / RFC-055 — the run behind every reply) ───────────
+    # ── TaskRuns (docs/for-developers/modules/ask/spec.md ·
+    # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the run behind every reply) ───────────
     admin.add_view(
         DropDown(
-            label="Thinkings",
+            label="Runs",
             icon="fa fa-brain",
             views=[
-                ThoughtView(Thought, label="Thoughts", icon="fa fa-comment"),
-                ThinkingView(Thinking, label="Thinkings", icon="fa fa-brain"),
-                ThinkingStepView(ThinkingStep, label="Thinking steps", icon="fa fa-list-check"),
-                ThoughtStreamView(ThoughtStream, label="Thought stream", icon="fa fa-stream"),
+                TaskRunView(TaskRun, label="Runs", icon="fa fa-brain"),
+                RunNodeView(TaskRun, label="Run nodes", icon="fa fa-list-check"),
+                TaskStreamView(TaskStream, label="Run stream", icon="fa fa-stream"),
+                EmissionView(Emission, label="Emissions", icon="fa fa-square-poll-vertical"),
+                ProjectionTemplateView(ProjectionTemplate, label="Projection templates", icon="fa fa-table-cells"),
+                TaskPromptView(TaskPrompt, label="Run prompts", icon="fa fa-circle-check"),
             ],
         ),
     )
 
-    # ── Explorer canvases (RFC-043) ──────────────────────────────────────────
+    # ── Agents at work (docs/for-developers/modules/work/spec.md) ─────────────────────────────────────────────
     admin.add_view(
         DropDown(
-            label="Canvases",
+            label="Agents at work",
+            icon="fa fa-robot",
+            views=[
+                AgentView(Agent, label="Agents", icon="fa fa-robot"),
+                TaskPlanView(TaskPlan, label="Plan library", icon="fa fa-diagram-next"),
+                PlanTaskView(PlanTask, label="Plan tasks", icon="fa fa-diagram-project"),
+                ProjectView(Project, label="Projects", icon="fa fa-folder-open"),
+                ProjectAssignmentView(ProjectAssignment, label="Project staffing", icon="fa fa-user-plus"),
+                TaskView(Task, label="Tasks", icon="fa fa-list-check"),
+                TaskDependencyView(TaskDependency, label="Task dependencies", icon="fa fa-arrow-right-long"),
+            ],
+        ),
+    )
+
+    # ── Boards (docs/for-developers/building-engine/boards-migration.md)
+    # ──────────────────────────────────────────
+    admin.add_view(
+        DropDown(
+            label="Boards",
             icon="fa fa-diagram-project",
             views=[
-                CanvasView(Canvas, label="Canvases", icon="fa fa-diagram-project"),
-                CanvasStateView(CanvasState, label="Canvas versions", icon="fa fa-clock-rotate-left"),
+                BoardView(Board, label="Boards", icon="fa fa-diagram-project"),
+                BoardVersionView(BoardVersion, label="Board versions", icon="fa fa-clock-rotate-left"),
             ],
         ),
     )

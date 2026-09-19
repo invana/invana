@@ -1,11 +1,11 @@
+import { request } from "@/services/api/client";
 import type {
 	LLMPingResponse,
 	LLMProvider,
 	LLMProviderCreate,
 	LLMProviderListResponse,
 	LLMProviderUpdate,
-} from "../../types/llm";
-import { request } from "./client";
+} from "@/types/llm";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/llm`;

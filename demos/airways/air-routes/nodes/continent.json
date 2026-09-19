@@ -1,0 +1,9 @@
+[
+  {"id": "3742", "properties": {"type": "continent", "code": "EU", "desc": "Europe"}},
+  {"id": "3743", "properties": {"type": "continent", "code": "AF", "desc": "Africa"}},
+  {"id": "3744", "properties": {"type": "continent", "desc": "North America", "code": "NA"}},
+  {"id": "3745", "properties": {"type": "continent", "code": "SA", "desc": "South America"}},
+  {"id": "3746", "properties": {"type": "continent", "code": "AS", "desc": "Asia"}},
+  {"id": "3747", "properties": {"type": "continent", "code": "OC", "desc": "Oceania"}},
+  {"id": "3748", "properties": {"type": "continent", "code": "AN", "desc": "Antarctica"}}
+]

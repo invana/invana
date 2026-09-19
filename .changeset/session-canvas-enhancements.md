@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Session canvas enhancements (RFC-045): single Sessions sidebar, tutorial, per-type styling, banner screenshots.
+Session canvas enhancements (docs/for-developers/modules/explore/features/graph-canvas.md): single Sessions sidebar, tutorial, per-type styling, banner screenshots.
 
 Sessions is now the **one** primary Explorer sidebar list — the separate "Canvases"
 panel/rail is removed, since a session's canvas is its 1:1 visual layer (painted

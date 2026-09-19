@@ -15,15 +15,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette_admin.auth import AdminUser, AuthProvider
 from starlette_admin.exceptions import LoginFailed
 
-from invana.auth.models import User
-from invana.auth.passwords import verify_password
+from invana.core.auth.passwords import verify_password
+from invana.core.auth.querysets import UserQuerySet
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -51,8 +50,7 @@ class SuperuserAuthProvider(AuthProvider):
         response: Response,
     ) -> Response:
         async with self._session_factory()() as session:
-            row = await session.execute(select(User).where(User.email == (username or "").strip().lower()))
-            user = row.scalar_one_or_none()
+            user = await UserQuerySet().get_by_email(session, username)
         if user is None or not user.is_active or not user.is_superuser:
             # Even out timing between "no user" and "wrong password".
             verify_password(password, "$2b$12$" + "x" * 53)
@@ -71,7 +69,7 @@ class SuperuserAuthProvider(AuthProvider):
         if not isinstance(user_id, str):
             return False
         async with self._session_factory()() as session:
-            user = await session.get(User, user_id)
+            user = await UserQuerySet().get(session, user_id)
         if user is None or not user.is_active or not user.is_superuser:
             request.session.clear()
             return False

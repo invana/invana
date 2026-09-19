@@ -1,5 +1,5 @@
-import { authApi } from "../services/api/auth";
-import { useAuthStore } from "../stores/auth.store";
+import { authApi } from "@/services/api/auth";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function useAuth() {
 	const user = useAuthStore((s) => s.user);
@@ -10,7 +10,7 @@ export function useAuth() {
 	const clear = useAuthStore((s) => s.clear);
 
 	/** Resolve the user's membership in a specific Graph by owner + graphSlug.
-	 *  Per RFC-017 the active Graph comes from the URL — pass the URL params. */
+	 *  Per docs/for-developers/modules/identity-and-access/spec.md the active Graph comes from the URL — pass the URL params. */
 	function membershipForGraph(
 		username: string | undefined,
 		graphSlug: string | undefined,

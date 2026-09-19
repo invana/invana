@@ -20,7 +20,7 @@ dependencies = [
     # passlib's library init. Upstream fix is awaited in passlib 1.8.
     "bcrypt<5",
     "PyJWT>=2.8",
-    # The LLM runtime (RFC-032) calls Ollama + OpenAI-compatible servers over
+    # The LLM runtime (docs/for-developers/modules/agents/features/providers-and-models.md) calls Ollama + OpenAI-compatible servers over
     # plain HTTP — the providers import httpx at module load, and the LLM client
     # (and the sessions router) import them eagerly, so httpx is required for the
     # engine to import at all. The optional `anthropic`/`openai`/`claude-agent-sdk`
@@ -43,7 +43,7 @@ telemetry = [
     "opentelemetry-instrumentation-fastapi>=0.46b0",
     "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
     "opentelemetry-instrumentation-logging>=0.46b0",
-    # Note: the browser-span proxy route (RFC-025) forwards OTLP/HTTP via httpx,
+    # Note: the browser-span proxy route (docs/for-developers/modules/platform/features/telemetry.md) forwards OTLP/HTTP via httpx,
     # which is a core dependency (see [project].dependencies) — not repeated here.
 ]
 all = [
@@ -69,6 +69,7 @@ dev = [
     "invana-janusgraph",
     "invana-tinkergraph",
     "claude-agent-sdk>=0.2.152",
+    "import-linter>=2.0",
 ]
 
 [tool.uv.sources]
@@ -127,19 +128,154 @@ ignore = [
 #   telemetry/* — gated behind the optional `telemetry` extra
 #   cli/*       — deferred to keep `invana` CLI startup fast
 #   server/app.py — lazy router + optional-server wiring at app build time
-"src/invana/telemetry/*" = ["PLC0415", "PLW0603"]  # PLW0603: idempotent one-time provider init
+"src/invana/core/telemetry/*" = ["PLC0415", "PLW0603"]  # PLW0603: idempotent one-time provider init
 "src/invana/cli/*" = ["PLC0415"]
 "src/invana/server/app.py" = ["PLC0415"]
 # Optional/heavy SDKs imported lazily so they're only required when actually used:
-#   events/services.py     — opentelemetry (telemetry extra)
+#   core/events/services.py — opentelemetry (telemetry extra)
 #   llm_providers/services — anthropic / openai SDKs + urllib, per-provider
-#   llm/providers/*        — anthropic / claude-agent-sdk lazy-imported per provider (RFC-032/053)
-"src/invana/events/services.py" = ["PLC0415"]
-"src/invana/llm_providers/services.py" = ["PLC0415"]
-"src/invana/llm/providers/*" = ["PLC0415"]
+#   llm/providers/*        — anthropic / claude-agent-sdk lazy-imported per provider (docs/for-developers/modules/agents/features/providers-and-models.md · docs/for-developers/modules/agents/features/providers-and-models.md)
+"src/invana/core/events/services.py" = ["PLC0415"]
+"src/invana/core/events/managers/event.py" = ["PLC0415"]
+"src/invana/apps/llm_providers/ping.py" = ["PLC0415"]
+"src/invana/apps/llm/providers/*" = ["PLC0415"]
+# The S12 nouns are mutually recursive by design (docs/for-developers/modules/work/spec.md): a Task is worked
+# through a Thinking, a Thinking settles a Task, and an agent's lifecycle reads
+# both. The cycle is the domain's, not an accident of layering, so the imports
+# that close it are deferred to the call site — where the dependency is obvious
+# — rather than papered over with a fifth module that exists only to be imported.
+"src/invana/apps/agents/managers/agent.py" = ["PLC0415"]
+"src/invana/apps/work/managers/task.py" = ["PLC0415"]
+"src/invana/apps/sessions/managers/session.py" = ["PLC0415"]
+"src/invana/runtime/interpreter/loop.py" = ["PLC0415"]
+# The catalogue is band 3 and `delegation` / `planning` / `services` sit beside it:
+# a top-level import would close the cycle the closed set exists to prevent.
+"src/invana/runtime/catalogue/llm.py" = ["PLC0415"]
+"src/invana/runtime/catalogue/pure.py" = ["PLC0415"]
+"src/invana/runtime/catalogue/work_write.py" = ["PLC0415"]
+# Alembic revisions import the registry lazily so the seed and the runtime
+# cannot drift; a top-level import would run at Alembic discovery time.
+"src/invana/core/migrations/versions/*" = ["PLC0415"]
 # starlette-admin ModelViews declare `fields`/`exclude_*` as plain class lists —
 # the framework's documented API. RUF012 (ClassVar) doesn't apply.
 "src/invana/server/admin/views.py" = ["RUF012"]
+# Each module's own ModelView, now beside the code it describes
+# (migration-plan §4.1). Same framework API, same exemption.
+"src/invana/server/*/admin.py" = ["RUF012"]
 # Test idioms: in-function imports (fixtures/locality) and partially-unpacked
 # tuples (`schema, _ = ...`) are fine and intentional in tests.
 "tests/**" = ["PLC0415", "RUF059"]
+
+# ---------------------------------------------------------------------------
+# import-linter — the band rule (docs/for-developers/building-engine/migration-plan.md §3.2)
+#
+# Three contracts. Every allowance below is one of today's measured cycles or
+# upward edges, named, with the refactor step that closes it. Removing an
+# allowance is how a step is finished. A new allowance means the band map is
+# wrong — change migration-plan.md first.
+#
+# 32 two-package cycles were measured (migration-plan §11). 13 of them — `modeller ↔
+# {agents, auth, boards, events, graphs, llm_providers, projects,
+# sessions, skills, thinking, work, workflows}` — closed at 1.2, when `Base` and
+# the migrations moved into `core`. The remaining 19 are named below.
+#
+# `core/migrations/env.py` imports every model, because that is how alembic
+# populates the metadata it autogenerates against. It is a script, not a module
+# in the import graph — `migrations/` has no `__init__.py` — so the band rule
+# neither sees it nor needs to.
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_package = "invana"
+
+# 1 · core imports nothing from invana that is not core.
+[[tool.importlinter.contracts]]
+name = "core is independent"
+type = "forbidden"
+source_modules = [
+    "invana.core",
+]
+forbidden_modules = [
+    "invana.graph",
+    "invana.apps",
+    "invana.runtime",
+    "invana.server",
+    "invana.cli",
+]
+ignore_imports = [
+    # auth → graphs — `UserOut.graphs` embeds the caller's memberships in every
+    # auth response, so the edge is a composition, not a stray import. It closes
+    # with the `MembershipReader` protocol at migration-plan §17 step 7, not by moving
+    # a function. refactor-plan.md "Why the membership check does not come out here".
+    "invana.core.auth.managers.auth -> invana.apps.graphs.models",
+    # events → agents — `EventStore.list_page` joins `Agent` to resolve an actor's
+    # display name while paginating the audit list. It closes when the name is
+    # captured at write (10.2), which is a behaviour change plus a backfill and is
+    # deferred by migration-plan §17. refactor-plan.md "Why the event reader does not
+    # come out here".
+    "invana.core.events.querysets.event -> invana.apps.agents.models",
+]
+
+# 2 · the bands: edge → runtime → apps → graph engine → core. Downward only.
+[[tool.importlinter.contracts]]
+name = "bands"
+type = "layers"
+layers = [
+    "invana.cli : invana.server",
+    "invana.activity",
+    "invana.runtime",
+    "invana.apps",
+    "invana.graph",
+    "invana.core",
+]
+ignore_imports = [
+    # core → apps: the same two edges as contract 1.
+    "invana.core.auth.managers.auth -> invana.apps.graphs.models",
+    "invana.core.events.querysets.event -> invana.apps.agents.models",
+    # agents ↔ thinking · sessions ↔ thinking · skills ↔ thinking · work ↔ thinking ·
+    # workflows ↔ thinking — the five genuine cycles: the runtime needs the envelope
+    # and the plan; they need to open a run. RunOpener / EnvelopeCheck, refactor-plan §7.
+    "invana.apps.sessions.schemas -> invana.runtime.schemas",
+    "invana.apps.work.managers.task -> invana.runtime.services",
+    "invana.apps.work.managers.task -> invana.runtime.managers",
+    # graphs ↔ server · server ↔ thinking — the edge layer imported by domain
+    # packages, for ActionResponse. migration-plan §17 step 5.
+]
+
+# 3 · apps are acyclic. Edges between apps are allowed; a cycle is not. Stated as
+# an order, bottom to top; every upward edge is a named allowance.
+[[tool.importlinter.contracts]]
+name = "apps are acyclic"
+type = "layers"
+layers = [
+    "invana.apps.work",
+    "invana.apps.task_plans",
+    "invana.apps.explorer",
+    "invana.apps.boards",
+    "invana.apps.sessions",
+    "invana.apps.agents",
+    "invana.apps.skills",
+    "invana.apps.llm",
+    "invana.apps.llm_providers",
+    "invana.apps.graphs",
+    "invana.apps.modeller",
+]
+ignore_imports = [
+    # graphs ↔ agents · graphs ↔ llm_providers · graphs ↔ skills —
+    # graphs/services.py reaches up into three apps for the setup state.
+    "invana.apps.graphs.managers.graph -> invana.apps.agents.managers",
+    # llm ↔ llm_providers — split along the wrong seam. Folded at 2.2.
+    "invana.apps.llm_providers.ping -> invana.apps.llm.providers.claude_agent_sdk",
+    # projects ↔ work — same. Folded at 2.3.
+    # agents ↔ sessions · agents ↔ work — agents/services.py reads sessions and tasks
+    # to retire an agent safely.
+    # llm → skills — one-way upward, no cycle: grounding offers skills.
+    # The skills→agents pair closed at migration-plan §16 step 1: the routes
+    # moved to `server/skills` and the usage read to `runtime/managers`.
+    "invana.apps.llm.grounding -> invana.apps.skills.models",
+    "invana.apps.agents.managers.agent -> invana.apps.work.models",
+    "invana.apps.agents.managers.agent -> invana.apps.work.querysets",
+    # Chains that leave the apps and come back. The same allowances as contract 2:
+    # events ↔ agents (1.5), and sessions ↔ thinking, through which work and
+    # workflows are reached.
+    "invana.core.events.querysets.event -> invana.apps.agents.models",
+]

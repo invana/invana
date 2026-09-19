@@ -1,0 +1,158 @@
+[
+  {
+    "id": "E_BASED_IN_AIRLINE_01",
+    "from": "AIRLINE_01",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_02",
+    "from": "AIRLINE_02",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_03",
+    "from": "AIRLINE_03",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_04",
+    "from": "AIRLINE_04",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_05",
+    "from": "AIRLINE_05",
+    "to": "CNTRY_034",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_06",
+    "from": "AIRLINE_06",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_07",
+    "from": "AIRLINE_07",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_08",
+    "from": "AIRLINE_08",
+    "to": "CNTRY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_09",
+    "from": "AIRLINE_09",
+    "to": "CNTRY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_10",
+    "from": "AIRLINE_10",
+    "to": "CNTRY_029",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_11",
+    "from": "AIRLINE_11",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_12",
+    "from": "AIRLINE_12",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_13",
+    "from": "AIRLINE_13",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_14",
+    "from": "AIRLINE_14",
+    "to": "CNTRY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_15",
+    "from": "AIRLINE_15",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_16",
+    "from": "AIRLINE_16",
+    "to": "CNTRY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_17",
+    "from": "AIRLINE_17",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_18",
+    "from": "AIRLINE_18",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_19",
+    "from": "AIRLINE_19",
+    "to": "CNTRY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_20",
+    "from": "AIRLINE_20",
+    "to": "CNTRY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_21",
+    "from": "AIRLINE_21",
+    "to": "CNTRY_012",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_22",
+    "from": "AIRLINE_22",
+    "to": "CNTRY_044",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_23",
+    "from": "AIRLINE_23",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_24",
+    "from": "AIRLINE_24",
+    "to": "CNTRY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_25",
+    "from": "AIRLINE_25",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_BASED_IN_AIRLINE_26",
+    "from": "AIRLINE_26",
+    "to": "CNTRY_006",
+    "properties": {}
+  }
+]

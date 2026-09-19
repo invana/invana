@@ -1,6 +1,7 @@
 """Graph-model endpoints — graph-scoped under /u/{username}/{graphSlug}/models.
 
-A Graph owns many **graph models** (RFC-019). Each model has a
+A Graph owns many **graph models** (docs/for-developers/modules/connect-and-model/features/domain-models.md). Each model
+has a
 versioned type tree (node/edge types, property keys, constraints, indexes).
 This router is thin plumbing over ``ModelStore`` (which already implements all
 CRUD) + ``Versioner``.
@@ -29,22 +30,25 @@ from __future__ import annotations
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Path, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.auth.deps import get_current_user
-from invana.auth.models import User
-from invana.db import get_session
-from invana.events import actions as event_actions
-from invana.events.services import emit_event
-from invana.graphs import services as graph_services
-from invana.graphs.compatibility import supported_property_type_values
-from invana.graphs.deps import (
-    require_graph_member,
-    resolve_graph_by_username_slug,
+from invana.apps.graphs.compatibility import supported_property_type_values
+from invana.apps.graphs.managers import GraphManager
+from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.modeller import starters as starter_models
+from invana.apps.modeller.json_io import SchemaExporter
+from invana.apps.modeller.models import GraphModel, GraphVersion
+from invana.apps.modeller.portability import (
+    ImportRefused,
+    ModelArtefact,
+    build_artefact,
+    compute_content_hash,
+    import_artefact,
+    unsupported_property_types,
+    upgrade_model,
 )
-from invana.graphs.models import Graph, GraphMember
-from invana.modeller.models import GraphModel, GraphVersion
-from invana.modeller.schemas import (
+from invana.apps.modeller.schemas import (
     ConstraintCreate,
     ConstraintResponse,
     EdgeTypeCreate,
@@ -62,18 +66,108 @@ from invana.modeller.schemas import (
     PropertyKeyCreate,
     PropertyKeyResponse,
     PropertyKeyUpdate,
+    SchemaDiff,
     VersionActivate,
     VersionCreate,
     VersionResponse,
     VersionSummary,
 )
-from invana.modeller.store import ModelStore
-from invana.modeller.versioner import Versioner
+from invana.apps.modeller.staging import StagedSet, UnknownChange, collect, discard_all, discard_one
+from invana.apps.modeller.store import ModelStore
+from invana.apps.modeller.versioner import Versioner, compute_diff
+from invana.core.auth.deps import get_current_user
+from invana.core.auth.models import User
+from invana.core.db import get_session
+from invana.core.events import actions as event_actions
+from invana.core.events.services import emit_event
+from invana.server.graphs.deps import (
+    require_graph_member,
+    resolve_graph_by_username_slug,
+)
 from invana.server.schemas import ActionResponse, action
 
 models_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/models", tags=["models"])
 
 _store = ModelStore()
+
+
+# ---------------------------------------------------------------------------
+# Request and response shapes owned by this router
+#
+# They live here rather than in ``modeller.schemas`` because they are the HTTP
+# envelope around an artefact, not part of the model's own vocabulary.
+# ---------------------------------------------------------------------------
+
+
+class ModelImportRequest(BaseModel):
+    """An artefact to land, either inline or by starter slug — never both."""
+
+    artefact: ModelArtefact | None = None
+    starter: str | None = None
+    # The name is local (SM2). Given here, it is what the model is called on arrival.
+    name: str | None = None
+
+
+class ModelImportResult(BaseModel):
+    model: GraphModelResponse
+    version: VersionResponse
+    # Types this database cannot hold. The draft still landed (SM4); it just
+    # cannot publish until they are resolved.
+    unsupported_property_types: list[dict[str, str]] = []
+    publishable: bool = True
+
+
+class ModelUpgradeResult(BaseModel):
+    model: GraphModelResponse
+    version: VersionResponse
+    diff: SchemaDiff
+    unsupported_property_types: list[dict[str, str]] = []
+    publishable: bool = True
+
+
+class CommitRequest(BaseModel):
+    """Optional override of the semver the commit assigns."""
+
+    version: str | None = None
+
+
+class CommitResult(BaseModel):
+    version: VersionResponse
+    committed: int = 0
+    content_hash: str | None = None
+
+
+def _resolve_import_payload(payload: ModelImportRequest) -> tuple[ModelArtefact, str]:
+    """One artefact, from exactly one place."""
+    if (payload.artefact is None) == (payload.starter is None):
+        raise HTTPException(
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail={"error": "import_source_ambiguous", "message": "Give either an artefact or a starter, not both."},
+        )
+    if payload.starter is not None:
+        try:
+            return starter_models.get(payload.starter), "starter"
+        except KeyError as exc:
+            raise HTTPException(
+                HTTPStatus.NOT_FOUND,
+                detail={"error": "starter_not_found", "starter": payload.starter, "available": starter_models.slugs()},
+            ) from exc
+    return payload.artefact, "file"
+
+
+async def _unsupported_for_graph(session: AsyncSession, graph: Graph, artefact: ModelArtefact) -> list[dict[str, str]]:
+    """Property types the bound database cannot hold, named rather than dropped (SM4)."""
+    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
+    if connection is None:
+        return []
+    return unsupported_property_types(artefact.model, supported_property_type_values(connection))
+
+
+def _import_message(name: str, blockers: list[dict[str, str]]) -> str:
+    if not blockers:
+        return f'"{name}" imported as a draft — rename what you want, then publish.'
+    listed = ", ".join(f"{b['property_key']} ({b['type']})" for b in blockers)
+    return f'"{name}" imported as a draft, but it cannot publish here yet: this database cannot hold {listed}.'
 
 
 # ---------------------------------------------------------------------------
@@ -125,12 +219,13 @@ def _conflict(exc: ValueError) -> HTTPException:
 
 
 async def _enforce_supported_type(session: AsyncSession, graph: Graph, type_str: str) -> None:
-    """Reject a property type the bound backend can't store for its version (RFC-022).
+    """Reject a property type the bound backend can't store for its version
+    (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
     No-ops when no connection is bound or the connector reports no profile (unknown
     backend) — the modeller falls back to its full vocabulary in those cases.
     """
-    connection = await graph_services.get_graph_connection(session, graph_id=graph.id)
+    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         return
     supported = supported_property_type_values(connection)
@@ -200,6 +295,79 @@ async def create_model(
     await session.commit()
     model = await _store.get_graph_model(session, model.id)
     return action(f'Model "{model.name}" created.', _to_response(model))
+
+
+# ---------------------------------------------------------------------------
+# Portability and starters (share-a-model.md · starter-models.md)
+#
+# Declared before ``/{model_id}``: a literal path has to be registered ahead of
+# the parameterised one, or "starters" arrives as a model id.
+# ---------------------------------------------------------------------------
+
+
+@models_router.get("/starters", response_model=list[starter_models.StarterSummary])
+async def list_starters(
+    _: GraphMember = Depends(require_graph_member),
+    __: Graph = Depends(resolve_graph_by_username_slug),
+) -> list[starter_models.StarterSummary]:
+    """The starters shipped with this distribution. Ordinary artefacts (SR1)."""
+    return starter_models.summaries()
+
+
+@models_router.post(
+    "/import",
+    response_model=ActionResponse[ModelImportResult],
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_model(
+    payload: ModelImportRequest,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[ModelImportResult]:
+    """Land an artefact — a file's contents, or a starter by slug — as a draft."""
+    artefact, import_source = _resolve_import_payload(payload)
+
+    try:
+        model, version_id = await import_artefact(
+            session,
+            _store,
+            graph_id=graph.id,
+            artefact=artefact,
+            name=payload.name,
+            import_source=import_source,
+        )
+    except ImportRefused as exc:
+        raise HTTPException(HTTPStatus.CONFLICT, detail={"error": exc.error, **exc.detail}) from exc
+
+    blockers = await _unsupported_for_graph(session, graph, artefact)
+    await emit_event(
+        session,
+        action=event_actions.MODEL_IMPORT,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model.id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "name": model.name,
+            "package_id": artefact.package_id,
+            "content_hash": artefact.content_hash,
+            "source": import_source,
+            "unsupported": blockers,
+        },
+    )
+    await session.commit()
+    model = await _store.get_graph_model(session, model.id)
+    return action(
+        _import_message(model.name, blockers),
+        ModelImportResult(
+            model=_to_response(model),
+            version=await _full_version(session, version_id),
+            unsupported_property_types=blockers,
+            publishable=not blockers,
+        ),
+    )
 
 
 @models_router.get("/{model_id}", response_model=GraphModelResponse)
@@ -706,3 +874,326 @@ async def delete_index(
         raise _conflict(exc) from exc
     await session.commit()
     return action("Index deleted.")
+
+
+# ---------------------------------------------------------------------------
+# The staged set and the commit (model-editor.md)
+#
+# The draft *is* the staged set (ME2, ME4). Nothing is recorded on the side: what
+# is staged is the difference between the draft and the version it replaces, so it
+# survives a reload and reads the same to everyone who opens the model.
+# ---------------------------------------------------------------------------
+
+
+async def _draft_and_active(
+    session: AsyncSession, graph_id: str, model_id: str
+) -> tuple[GraphVersion, GraphVersion | None]:
+    await _get_model_or_404(session, graph_id, model_id)
+    versions = await _store.list_versions(session, model_id)
+    draft_summary = next((v for v in versions if v.status == "draft"), None)
+    if draft_summary is None:
+        raise HTTPException(
+            HTTPStatus.NOT_FOUND,
+            detail={"error": "no_draft", "model_id": model_id, "message": "This model has no draft to stage onto."},
+        )
+    draft = await _store.get_version(session, draft_summary.id)
+    active = await _store.get_active_version(session, model_id)
+    return draft, active
+
+
+@models_router.get("/{model_id}/draft/staged", response_model=StagedSet)
+async def get_staged_set(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> StagedSet:
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    return collect(active, draft)
+
+
+@models_router.post("/{model_id}/draft/discard", response_model=ActionResponse[StagedSet])
+async def discard_staged_set(
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[StagedSet]:
+    """Put the draft back to the published version, wholesale."""
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    if active is None:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={
+                "error": "nothing_to_discard_to",
+                "message": "This model has never published, so there is no state to return the draft to.",
+            },
+        )
+    discarded = collect(active, draft).count
+    await discard_all(session, _store, active=active, draft=draft)
+    await emit_event(
+        session,
+        action=event_actions.MODEL_DISCARD,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model_id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={"discarded": discarded, "scope": "all"},
+    )
+    await session.commit()
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    return action(f"{discarded} staged changes discarded.", collect(active, draft))
+
+
+@models_router.delete("/{model_id}/draft/staged/{change_id}", response_model=ActionResponse[StagedSet])
+async def discard_staged_change(
+    model_id: str = Path(...),
+    change_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[StagedSet]:
+    """Put one element back the way the published version has it."""
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    if active is None:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={
+                "error": "nothing_to_discard_to",
+                "message": "This model has never published, so there is no state to return the draft to.",
+            },
+        )
+    try:
+        change = await discard_one(session, _store, active=active, draft=draft, change_id=change_id)
+    except UnknownChange as exc:
+        raise HTTPException(
+            HTTPStatus.NOT_FOUND,
+            detail={"error": "unknown_staged_change", "change_id": change_id},
+        ) from exc
+    await emit_event(
+        session,
+        action=event_actions.MODEL_DISCARD,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model_id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={"discarded": 1, "scope": "one", "change": change.id},
+    )
+    await session.commit()
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    return action(f"{change.kind.replace('_', ' ')} {change.name} discarded.", collect(active, draft))
+
+
+@models_router.post("/{model_id}/commit", response_model=ActionResponse[CommitResult])
+async def commit_draft(
+    payload: CommitRequest,
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[CommitResult]:
+    """Turn the whole staged set into the next published version, in one action (ME5)."""
+    model = await _get_model_or_404(session, graph.id, model_id)
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    staged = collect(active, draft)
+    if not staged.can_commit:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={"error": "nothing_staged", "message": staged.reason},
+        )
+
+    try:
+        published = await Versioner(_store).activate(session, version_id=draft.id, override_version=payload.version)
+    except ValueError as exc:
+        raise _conflict(exc) from exc
+
+    published = await _store.get_version(session, published.id)
+    export = SchemaExporter.export(
+        published,
+        schema_name=model.name,
+        schema_description=model.description,
+        validation_mode=model.validation_mode,
+    )
+    published.content_hash = compute_content_hash(export)
+
+    await emit_event(
+        session,
+        action=event_actions.MODEL_COMMIT,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model_id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "version": published.version,
+            "committed": staged.count,
+            "content_hash": published.content_hash,
+            "changes": [c.id for c in staged.changes],
+        },
+    )
+    await session.commit()
+    return action(
+        f"{staged.count} changes committed — {model.name} {published.version} published.",
+        CommitResult(
+            version=await _full_version(session, published.id),
+            committed=staged.count,
+            content_hash=published.content_hash,
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Export and upgrade (share-a-model.md)
+# ---------------------------------------------------------------------------
+
+
+@models_router.get("/{model_id}/export", response_model=ModelArtefact)
+async def export_model(
+    model_id: str = Path(...),
+    version_id: str | None = None,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ModelArtefact:
+    """One published version as one self-contained file (C1)."""
+    model = await _get_model_or_404(session, graph.id, model_id)
+    version = (
+        await _store.get_version(session, version_id)
+        if version_id
+        else await _store.get_active_version(session, model_id)
+    )
+    if version is None or version.model_id != model_id:
+        raise HTTPException(
+            HTTPStatus.NOT_FOUND,
+            detail={"error": "no_published_version", "model_id": model_id},
+        )
+    if version.status == "draft":
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={
+                "error": "version_is_draft",
+                "message": "A draft has nothing stable to export — commit it first.",
+            },
+        )
+    artefact = build_artefact(model, version)
+    await emit_event(
+        session,
+        action=event_actions.MODEL_EXPORT,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model_id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={"version": version.version, "package_id": artefact.package_id, "content_hash": artefact.content_hash},
+    )
+    await session.commit()
+    return artefact
+
+
+@models_router.post("/{model_id}/upgrade", response_model=ActionResponse[ModelUpgradeResult])
+async def upgrade_model_route(
+    payload: ModelImportRequest,
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ActionResponse[ModelUpgradeResult]:
+    """Bring a newer version of the same package in as a draft, with the diff (C3)."""
+    model = await _get_model_or_404(session, graph.id, model_id)
+    artefact, _source = _resolve_import_payload(payload)
+
+    existing_draft = next((v for v in await _store.list_versions(session, model_id) if v.status == "draft"), None)
+    if existing_draft is not None:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={
+                "error": "draft_in_the_way",
+                "version_id": existing_draft.id,
+                "message": "This model already has a draft. Commit or discard it before upgrading — "
+                "an upgrade never silently overwrites local work.",
+            },
+        )
+
+    try:
+        version_id = await upgrade_model(session, _store, model=model, artefact=artefact)
+    except ImportRefused as exc:
+        raise HTTPException(HTTPStatus.CONFLICT, detail={"error": exc.error, **exc.detail}) from exc
+
+    blockers = await _unsupported_for_graph(session, graph, artefact)
+    active = await _store.get_active_version(session, model_id)
+    draft = await _store.get_version(session, version_id)
+    diff = compute_diff(active, draft) if active is not None else SchemaDiff()
+
+    await emit_event(
+        session,
+        action=event_actions.MODEL_UPGRADE,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model_id,
+        graph_id=graph.id,
+        actor_id=user.id,
+        details={
+            "package_id": artefact.package_id,
+            "content_hash": artefact.content_hash,
+            "from_version": active.version if active else None,
+            "classification": diff.classification,
+        },
+    )
+    await session.commit()
+    return action(
+        f"{model.name} upgraded to a draft — review the diff, then commit.",
+        ModelUpgradeResult(
+            model=_to_response(await _store.get_graph_model(session, model_id)),
+            version=await _full_version(session, version_id),
+            diff=diff,
+            unsupported_property_types=blockers,
+            publishable=not blockers,
+        ),
+    )
+
+
+@models_router.get("/{model_id}/versions/{version_id}/diff", response_model=SchemaDiff)
+async def diff_version(
+    model_id: str = Path(...),
+    version_id: str = Path(...),
+    against: str | None = None,
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SchemaDiff:
+    """What changed between two versions of this model.
+
+    The version bar states this (domain-models.md · Surfaces): a list of numbers
+    with no account of what moved between them is a list nobody can act on. With
+    no `against`, it diffs against the version immediately before this one, which
+    is the question being asked nine times in ten.
+    """
+    await _get_model_or_404(session, graph.id, model_id)
+    versions = await _store.list_versions(session, model_id)
+    ordered = [v for v in versions if v.status != "draft"]
+
+    target = await _store.get_version(session, version_id)
+    if target is None or target.model_id != model_id:
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "version_not_found", "version_id": version_id})
+
+    if against:
+        base = await _store.get_version(session, against)
+        if base is None or base.model_id != model_id:
+            raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "version_not_found", "version_id": against})
+    else:
+        index = next((i for i, v in enumerate(ordered) if v.id == version_id), None)
+        previous = ordered[index - 1] if index else None
+        # The first published version changed everything — diffing it against
+        # nothing is more honest than diffing it against itself.
+        base = await _store.get_version(session, previous.id) if previous else None
+
+    if base is None:
+        return SchemaDiff(
+            added_node_types=[nt.name for nt in target.node_types],
+            added_edge_types=[et.name for et in target.edge_types],
+            added_property_keys=[pk.name for pk in target.property_keys],
+            classification="major",
+        )
+    return compute_diff(base, target)

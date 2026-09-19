@@ -1,4 +1,4 @@
-// Studio-facing theme list for the ThemeSelector pickers (RFC-044).
+// Studio-facing theme list for the ThemeSelector pickers (docs/for-developers/modules/platform/features/theming.md).
 //
 // Starts from the catalog registered in `@invana/styling`, then hides a few
 // themes and relabels others for studio. Only the display `name`/`description`

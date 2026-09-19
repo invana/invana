@@ -1,0 +1,420 @@
+{
+  "format": "invana.model/1",
+  "package_id": "invana.dataset.twitter",
+  "content_hash": "",
+  "name": "Twitter",
+  "description": "Aviation chatter — posts, the accounts behind them and the tags they carry.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "Twitter",
+    "schema_description": "Social posts about airlines and airports, keyed so they stitch onto news coverage and onto air-routes.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "property_keys": [
+      {
+        "name": "tweet_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The post's own id.",
+        "validation_rules": []
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What was posted.",
+        "validation_rules": []
+      },
+      {
+        "name": "created_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When it was posted.",
+        "validation_rules": []
+      },
+      {
+        "name": "lang",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "BCP-47 language tag.",
+        "validation_rules": []
+      },
+      {
+        "name": "retweets",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Reposts.",
+        "validation_rules": []
+      },
+      {
+        "name": "likes",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Likes.",
+        "validation_rules": []
+      },
+      {
+        "name": "replies",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Replies.",
+        "validation_rules": []
+      },
+      {
+        "name": "sentiment",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "How the post reads.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "positive",
+                "neutral",
+                "negative"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "linked_url",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The article the post links to — the key an Article's url matches.",
+        "validation_rules": []
+      },
+      {
+        "name": "airport_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code the post was tagged at — an air-routes airport code.",
+        "validation_rules": []
+      },
+      {
+        "name": "handle",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The @name, without the @.",
+        "validation_rules": []
+      },
+      {
+        "name": "display_name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The name on the profile.",
+        "validation_rules": []
+      },
+      {
+        "name": "followers",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Follower count.",
+        "validation_rules": []
+      },
+      {
+        "name": "verified",
+        "type": "boolean",
+        "value_cardinality": "SINGLE",
+        "description": "Whether the account carries a check.",
+        "validation_rules": []
+      },
+      {
+        "name": "kind",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "What sort of account this is.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "airline",
+                "news",
+                "watcher",
+                "traveller"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "airline_iata",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "For an airline account, its IATA designator — the key an Airline's iata matches.",
+        "validation_rules": []
+      },
+      {
+        "name": "domain",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "For a news account, the outlet's domain — the key a Publisher's domain matches.",
+        "validation_rules": []
+      },
+      {
+        "name": "country_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter country code, as air-routes spells it.",
+        "validation_rules": []
+      },
+      {
+        "name": "tag",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The hashtag, without the # — a Topic's tag, cased differently.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Tweet",
+        "description": "One post.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "tweet_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "text",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "created_at",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "lang",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "retweets",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "likes",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "replies",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "sentiment",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          },
+          {
+            "property_key": "linked_url",
+            "default_value": null,
+            "sort_order": 8,
+            "validation_rules": []
+          },
+          {
+            "property_key": "airport_code",
+            "default_value": null,
+            "sort_order": 9,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Account",
+        "description": "Who posted it — a carrier, an outlet, a watcher or a passenger.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "handle",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "display_name",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "followers",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "verified",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "kind",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "airline_iata",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "domain",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_code",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Hashtag",
+        "description": "A tag carried by posts.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "tag",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "POSTED",
+        "description": "The account that wrote the post.",
+        "source_node_types": [
+          "Account"
+        ],
+        "target_node_types": [
+          "Tweet"
+        ],
+        "multiplicity": "ONE2MANY",
+        "property_mappings": []
+      },
+      {
+        "name": "TAGS",
+        "description": "A hashtag the post carries.",
+        "source_node_types": [
+          "Tweet"
+        ],
+        "target_node_types": [
+          "Hashtag"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "MENTIONS",
+        "description": "An account the post names.",
+        "source_node_types": [
+          "Tweet"
+        ],
+        "target_node_types": [
+          "Account"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "REPLIES_TO",
+        "description": "The post this one answers.",
+        "source_node_types": [
+          "Tweet"
+        ],
+        "target_node_types": [
+          "Tweet"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "RETWEETS",
+        "description": "The post this one reposts.",
+        "source_node_types": [
+          "Tweet"
+        ],
+        "target_node_types": [
+          "Tweet"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "QUOTES",
+        "description": "The post this one quotes.",
+        "source_node_types": [
+          "Tweet"
+        ],
+        "target_node_types": [
+          "Tweet"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "tweet_tweet_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Tweet",
+        "constraint_type": "unique",
+        "properties": [
+          "tweet_id"
+        ]
+      },
+      {
+        "name": "account_handle_unique",
+        "target_kind": "node_type",
+        "target_label": "Account",
+        "constraint_type": "unique",
+        "properties": [
+          "handle"
+        ]
+      },
+      {
+        "name": "hashtag_tag_unique",
+        "target_kind": "node_type",
+        "target_label": "Hashtag",
+        "constraint_type": "unique",
+        "properties": [
+          "tag"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}

@@ -1,6 +1,6 @@
 /**
  * Applies the appearance-store saturation multiplier to the active theme's
- * primary + accent colours (RFC-044 follow-up). Renders nothing; mount once
+ * primary + accent colours (docs/for-developers/modules/platform/features/theming.md follow-up). Renders nothing; mount once
  * inside `<ThemeProvider>` (main.tsx), like `<ThemeSyncBridge>`.
  *
  * How it works — the theme system (`@invana/styling` `applyTheme`) sets a
@@ -22,8 +22,8 @@
  * observer catches all of those and always re-reads the now-current base.
  */
 
+import { useAppearanceStore } from "@/stores/appearance.store";
 import { useEffect } from "react";
-import { useAppearanceStore } from "../stores/appearance.store";
 
 // Colours re-saturated: primary, its focus-ring mirror, and accent. Foregrounds
 // (near-white/near-black text-on-colour) are intentionally left alone.

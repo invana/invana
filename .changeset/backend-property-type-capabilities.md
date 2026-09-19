@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Backend property-type capabilities + DB version compatibility (RFC-022).
+Backend property-type capabilities + DB version compatibility (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
 The modeller now offers only the property types the bound graph database supports, resolved from a canonical, version-aware `CapabilityProfile` per connector (Cypher vs TinkerPop families, with vendor + version gating). The connected database's version is detected at health-check time and cached on the connection; capabilities resolve against it.
 

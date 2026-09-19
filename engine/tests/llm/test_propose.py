@@ -1,4 +1,4 @@
-"""NL → model proposal tests (RFC-031).
+"""NL → model proposal tests (docs/for-developers/modules/ask/spec.md).
 
 ``validate_proposal`` is pure (no external deps). ``propose_model`` runs against
 a real local Ollama and skips when it is not reachable (repo rule 7 — real
@@ -12,10 +12,10 @@ import os
 import httpx
 import pytest
 
-from invana.llm import LLMError
-from invana.llm.propose import ModelProposal, propose_model, validate_proposal
-from invana.llm.schemas import TokenUsage
-from invana.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm import LLMError
+from invana.apps.llm.propose import ModelProposal, propose_model, validate_proposal
+from invana.apps.llm.schemas import TokenUsage
+from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
 _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")

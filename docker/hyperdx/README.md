@@ -1,9 +1,21 @@
 # HyperDX dashboards
 
-Local HyperDX (the `telemetry` compose profile) stores dashboards in **ephemeral
-container state** — `docker-compose.yml` mounts no data volume for the
-`hyperdx` service — so anything built in the UI is lost on `down`/recreate. The
-dashboards we care about are therefore rebuilt from code here.
+Local HyperDX (the `telemetry` compose profile) keeps state in two stores, both
+on named volumes so they survive `restart`, `down` and container recreates:
+
+| Volume | Mount | Holds |
+|---|---|---|
+| `hyperdx-data` | `/var/lib/clickhouse` | traces, logs, metrics |
+| `hyperdx-mongo-data` | `/data/db` | sources, saved searches, **dashboards** |
+
+Despite the "local" name, the image bundles the HyperDX API server and its
+MongoDB — dashboards are stored server-side, not in browser localStorage. Before
+those volumes existed every recreate silently wiped them, which is why the
+dashboards we care about are rebuilt from code here. Keep it that way: a
+dashboard that only exists in one developer's container isn't reviewable.
+
+> Note: the service is behind the `telemetry` profile, so a plain
+> `docker compose up -d` does **not** start it — pass `--profile telemetry`.
 
 ## API Performance
 
@@ -23,7 +35,7 @@ dashboard covering **message and query APIs** together:
 
 Every tile is a raw-SQL tile over `otel_traces` (service `invana-engine`); the perf
 panels read the child spans the engine emits (`llm.generate`,
-`graph.query.db_execute` — RFC-025/041).
+`graph.query.db_execute` — docs/for-developers/modules/platform/features/telemetry.md · docs/for-developers/modules/operate/features/observability.md).
 
 ### Run
 

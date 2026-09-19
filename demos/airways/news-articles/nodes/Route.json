@@ -1,0 +1,420 @@
+[
+  {
+    "id": "ROUTE_001",
+    "properties": {
+      "route_id": "AI-DEL-SFO",
+      "origin_code": "DEL",
+      "destination_code": "SFO",
+      "status": "launched",
+      "starts_on": "2026-02-20",
+      "frequency_weekly": 5
+    }
+  },
+  {
+    "id": "ROUTE_002",
+    "properties": {
+      "route_id": "AI-BOM-JFK",
+      "origin_code": "BOM",
+      "destination_code": "JFK",
+      "status": "launched",
+      "starts_on": "2026-02-25",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_003",
+    "properties": {
+      "route_id": "AI-DEL-CPH",
+      "origin_code": "DEL",
+      "destination_code": "CPH",
+      "status": "planned",
+      "starts_on": "2026-03-02",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_004",
+    "properties": {
+      "route_id": "6E-DEL-IST",
+      "origin_code": "DEL",
+      "destination_code": "IST",
+      "status": "launched",
+      "starts_on": "2026-03-07",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_005",
+    "properties": {
+      "route_id": "6E-BLR-SIN",
+      "origin_code": "BLR",
+      "destination_code": "SIN",
+      "status": "launched",
+      "starts_on": "2026-03-12",
+      "frequency_weekly": 14
+    }
+  },
+  {
+    "id": "ROUTE_006",
+    "properties": {
+      "route_id": "6E-MAA-BKK",
+      "origin_code": "MAA",
+      "destination_code": "BKK",
+      "status": "planned",
+      "starts_on": "2026-03-17",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_007",
+    "properties": {
+      "route_id": "EK-DXB-BOM",
+      "origin_code": "DXB",
+      "destination_code": "BOM",
+      "status": "launched",
+      "starts_on": "2026-03-22",
+      "frequency_weekly": 35
+    }
+  },
+  {
+    "id": "ROUTE_008",
+    "properties": {
+      "route_id": "EK-DXB-GRU",
+      "origin_code": "DXB",
+      "destination_code": "GRU",
+      "status": "launched",
+      "starts_on": "2026-03-27",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_009",
+    "properties": {
+      "route_id": "EK-DXB-AKL",
+      "origin_code": "DXB",
+      "destination_code": "AKL",
+      "status": "suspended",
+      "starts_on": "2026-04-01",
+      "frequency_weekly": 0
+    }
+  },
+  {
+    "id": "ROUTE_010",
+    "properties": {
+      "route_id": "EY-AUH-BLR",
+      "origin_code": "AUH",
+      "destination_code": "BLR",
+      "status": "launched",
+      "starts_on": "2026-04-06",
+      "frequency_weekly": 14
+    }
+  },
+  {
+    "id": "ROUTE_011",
+    "properties": {
+      "route_id": "QR-DOH-HYD",
+      "origin_code": "DOH",
+      "destination_code": "HYD",
+      "status": "launched",
+      "starts_on": "2026-04-11",
+      "frequency_weekly": 14
+    }
+  },
+  {
+    "id": "ROUTE_012",
+    "properties": {
+      "route_id": "QR-DOH-ACC",
+      "origin_code": "DOH",
+      "destination_code": "ACC",
+      "status": "planned",
+      "starts_on": "2026-04-16",
+      "frequency_weekly": 4
+    }
+  },
+  {
+    "id": "ROUTE_013",
+    "properties": {
+      "route_id": "SQ-SIN-SFO",
+      "origin_code": "SIN",
+      "destination_code": "SFO",
+      "status": "launched",
+      "starts_on": "2026-04-21",
+      "frequency_weekly": 14
+    }
+  },
+  {
+    "id": "ROUTE_014",
+    "properties": {
+      "route_id": "SQ-SIN-CPH",
+      "origin_code": "SIN",
+      "destination_code": "CPH",
+      "status": "suspended",
+      "starts_on": "2026-04-26",
+      "frequency_weekly": 0
+    }
+  },
+  {
+    "id": "ROUTE_015",
+    "properties": {
+      "route_id": "LH-FRA-HYD",
+      "origin_code": "FRA",
+      "destination_code": "HYD",
+      "status": "launched",
+      "starts_on": "2026-05-01",
+      "frequency_weekly": 5
+    }
+  },
+  {
+    "id": "ROUTE_016",
+    "properties": {
+      "route_id": "LH-MUC-SEA",
+      "origin_code": "MUC",
+      "destination_code": "SEA",
+      "status": "launched",
+      "starts_on": "2026-05-06",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_017",
+    "properties": {
+      "route_id": "BA-LHR-MAA",
+      "origin_code": "LHR",
+      "destination_code": "MAA",
+      "status": "planned",
+      "starts_on": "2026-05-11",
+      "frequency_weekly": 4
+    }
+  },
+  {
+    "id": "ROUTE_018",
+    "properties": {
+      "route_id": "BA-LHR-AUH",
+      "origin_code": "LHR",
+      "destination_code": "AUH",
+      "status": "launched",
+      "starts_on": "2026-05-16",
+      "frequency_weekly": 14
+    }
+  },
+  {
+    "id": "ROUTE_019",
+    "properties": {
+      "route_id": "AF-CDG-BLR",
+      "origin_code": "CDG",
+      "destination_code": "BLR",
+      "status": "planned",
+      "starts_on": "2026-05-21",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_020",
+    "properties": {
+      "route_id": "KL-AMS-AUH",
+      "origin_code": "AMS",
+      "destination_code": "AUH",
+      "status": "launched",
+      "starts_on": "2026-05-26",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_021",
+    "properties": {
+      "route_id": "DL-ATL-CPH",
+      "origin_code": "ATL",
+      "destination_code": "CPH",
+      "status": "launched",
+      "starts_on": "2026-05-31",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_022",
+    "properties": {
+      "route_id": "DL-JFK-CDG",
+      "origin_code": "JFK",
+      "destination_code": "CDG",
+      "status": "launched",
+      "starts_on": "2026-06-05",
+      "frequency_weekly": 21
+    }
+  },
+  {
+    "id": "ROUTE_023",
+    "properties": {
+      "route_id": "AA-DFW-BCN",
+      "origin_code": "DFW",
+      "destination_code": "BCN",
+      "status": "suspended",
+      "starts_on": "2026-06-10",
+      "frequency_weekly": 0
+    }
+  },
+  {
+    "id": "ROUTE_024",
+    "properties": {
+      "route_id": "UA-ORD-DEL",
+      "origin_code": "ORD",
+      "destination_code": "DEL",
+      "status": "launched",
+      "starts_on": "2026-06-15",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_025",
+    "properties": {
+      "route_id": "UA-SFO-MNL",
+      "origin_code": "SFO",
+      "destination_code": "MNL",
+      "status": "launched",
+      "starts_on": "2026-06-20",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_026",
+    "properties": {
+      "route_id": "TK-IST-MEL",
+      "origin_code": "IST",
+      "destination_code": "MEL",
+      "status": "planned",
+      "starts_on": "2026-06-25",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_027",
+    "properties": {
+      "route_id": "QF-SYD-PER",
+      "origin_code": "SYD",
+      "destination_code": "PER",
+      "status": "launched",
+      "starts_on": "2026-06-30",
+      "frequency_weekly": 28
+    }
+  },
+  {
+    "id": "ROUTE_028",
+    "properties": {
+      "route_id": "CX-HKG-MAA",
+      "origin_code": "HKG",
+      "destination_code": "MAA",
+      "status": "planned",
+      "starts_on": "2026-07-05",
+      "frequency_weekly": 4
+    }
+  },
+  {
+    "id": "ROUTE_029",
+    "properties": {
+      "route_id": "JL-HND-SEA",
+      "origin_code": "HND",
+      "destination_code": "SEA",
+      "status": "launched",
+      "starts_on": "2026-07-10",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_030",
+    "properties": {
+      "route_id": "NH-HND-PER",
+      "origin_code": "HND",
+      "destination_code": "PER",
+      "status": "planned",
+      "starts_on": "2026-07-15",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_031",
+    "properties": {
+      "route_id": "KE-ICN-LIS",
+      "origin_code": "ICN",
+      "destination_code": "LIS",
+      "status": "planned",
+      "starts_on": "2026-07-20",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_032",
+    "properties": {
+      "route_id": "TG-BKK-OSL",
+      "origin_code": "BKK",
+      "destination_code": "OSL",
+      "status": "suspended",
+      "starts_on": "2026-07-25",
+      "frequency_weekly": 0
+    }
+  },
+  {
+    "id": "ROUTE_033",
+    "properties": {
+      "route_id": "ET-ADD-GRU",
+      "origin_code": "ADD",
+      "destination_code": "GRU",
+      "status": "launched",
+      "starts_on": "2026-07-30",
+      "frequency_weekly": 4
+    }
+  },
+  {
+    "id": "ROUTE_034",
+    "properties": {
+      "route_id": "SA-JNB-PER",
+      "origin_code": "JNB",
+      "destination_code": "PER",
+      "status": "suspended",
+      "starts_on": "2026-08-04",
+      "frequency_weekly": 0
+    }
+  },
+  {
+    "id": "ROUTE_035",
+    "properties": {
+      "route_id": "JJ-GRU-LIS",
+      "origin_code": "GRU",
+      "destination_code": "LIS",
+      "status": "launched",
+      "starts_on": "2026-08-09",
+      "frequency_weekly": 7
+    }
+  },
+  {
+    "id": "ROUTE_036",
+    "properties": {
+      "route_id": "AC-YYZ-DXB",
+      "origin_code": "YYZ",
+      "destination_code": "DXB",
+      "status": "launched",
+      "starts_on": "2026-08-14",
+      "frequency_weekly": 4
+    }
+  },
+  {
+    "id": "ROUTE_037",
+    "properties": {
+      "route_id": "IB-MAD-TPE",
+      "origin_code": "MAD",
+      "destination_code": "TPE",
+      "status": "planned",
+      "starts_on": "2026-08-19",
+      "frequency_weekly": 3
+    }
+  },
+  {
+    "id": "ROUTE_038",
+    "properties": {
+      "route_id": "LX-ZRH-SEA",
+      "origin_code": "ZRH",
+      "destination_code": "SEA",
+      "status": "launched",
+      "starts_on": "2026-08-24",
+      "frequency_weekly": 5
+    }
+  }
+]

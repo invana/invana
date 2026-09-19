@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Add saved Explorer canvases (RFC-043).
+Add saved Explorer canvases (docs/for-developers/modules/explore/features/canvases.md).
 
 A **canvas** persists a painted view of the graph — the snapshot (nodes/edges), node positions, viewport, filters and settings — plus a title and a written **purpose**. Canvases are **shared across every graph member** and each is backed **1:1 by a session** (`canvas.session_id` unique + `ON DELETE CASCADE`); the canvas is self-contained (its own snapshot + copied `source_query`) so a member renders it without reading the private backing thread.
 

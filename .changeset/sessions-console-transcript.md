@@ -2,7 +2,7 @@
 "studio": patch
 ---
 
-Sessions panel rebuilt on the design-kit `ChatSession` components (RFC-054).
+Sessions panel rebuilt on the design-kit `ChatSession` components (docs/for-developers/modules/platform/features/design-system.md).
 
 The open session now reads as a console transcript: your prompts are caret-
 prefixed rows, each reply is an activity row whose gutter dot carries the

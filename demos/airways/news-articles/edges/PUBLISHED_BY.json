@@ -1,0 +1,392 @@
+[
+  {
+    "id": "E_PUBLISHED_BY_ART_001",
+    "from": "ART_001",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_002",
+    "from": "ART_002",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_003",
+    "from": "ART_003",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_004",
+    "from": "ART_004",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_005",
+    "from": "ART_005",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_006",
+    "from": "ART_006",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_007",
+    "from": "ART_007",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_008",
+    "from": "ART_008",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_009",
+    "from": "ART_009",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_010",
+    "from": "ART_010",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_011",
+    "from": "ART_011",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_012",
+    "from": "ART_012",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_013",
+    "from": "ART_013",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_014",
+    "from": "ART_014",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_015",
+    "from": "ART_015",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_016",
+    "from": "ART_016",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_017",
+    "from": "ART_017",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_018",
+    "from": "ART_018",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_019",
+    "from": "ART_019",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_020",
+    "from": "ART_020",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_021",
+    "from": "ART_021",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_022",
+    "from": "ART_022",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_023",
+    "from": "ART_023",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_024",
+    "from": "ART_024",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_025",
+    "from": "ART_025",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_026",
+    "from": "ART_026",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_027",
+    "from": "ART_027",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_028",
+    "from": "ART_028",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_029",
+    "from": "ART_029",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_030",
+    "from": "ART_030",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_031",
+    "from": "ART_031",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_032",
+    "from": "ART_032",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_033",
+    "from": "ART_033",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_034",
+    "from": "ART_034",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_035",
+    "from": "ART_035",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_036",
+    "from": "ART_036",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_037",
+    "from": "ART_037",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_038",
+    "from": "ART_038",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_039",
+    "from": "ART_039",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_040",
+    "from": "ART_040",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_041",
+    "from": "ART_041",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_042",
+    "from": "ART_042",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_043",
+    "from": "ART_043",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_044",
+    "from": "ART_044",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_045",
+    "from": "ART_045",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_046",
+    "from": "ART_046",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_047",
+    "from": "ART_047",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_048",
+    "from": "ART_048",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_049",
+    "from": "ART_049",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_050",
+    "from": "ART_050",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_051",
+    "from": "ART_051",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_052",
+    "from": "ART_052",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_053",
+    "from": "ART_053",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_054",
+    "from": "ART_054",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_055",
+    "from": "ART_055",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_056",
+    "from": "ART_056",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_057",
+    "from": "ART_057",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_058",
+    "from": "ART_058",
+    "to": "PUB_03",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_059",
+    "from": "ART_059",
+    "to": "PUB_04",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_060",
+    "from": "ART_060",
+    "to": "PUB_05",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_061",
+    "from": "ART_061",
+    "to": "PUB_06",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_062",
+    "from": "ART_062",
+    "to": "PUB_07",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_063",
+    "from": "ART_063",
+    "to": "PUB_01",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_064",
+    "from": "ART_064",
+    "to": "PUB_02",
+    "properties": {}
+  },
+  {
+    "id": "E_PUBLISHED_BY_ART_065",
+    "from": "ART_065",
+    "to": "PUB_03",
+    "properties": {}
+  }
+]

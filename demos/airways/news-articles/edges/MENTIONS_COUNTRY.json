@@ -1,0 +1,614 @@
+[
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_001",
+    "from": "ART_001",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_001_SFO",
+    "from": "ART_001",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_002",
+    "from": "ART_002",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_002_JFK",
+    "from": "ART_002",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_003",
+    "from": "ART_003",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_003_CPH",
+    "from": "ART_003",
+    "to": "CNTRY_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_004",
+    "from": "ART_004",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_004_IST",
+    "from": "ART_004",
+    "to": "CNTRY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_005",
+    "from": "ART_005",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_005_SIN",
+    "from": "ART_005",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_006",
+    "from": "ART_006",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_006_BKK",
+    "from": "ART_006",
+    "to": "CNTRY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_007",
+    "from": "ART_007",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_007_BOM",
+    "from": "ART_007",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_008",
+    "from": "ART_008",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_008_GRU",
+    "from": "ART_008",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_009",
+    "from": "ART_009",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_009_AKL",
+    "from": "ART_009",
+    "to": "CNTRY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_010",
+    "from": "ART_010",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_010_BLR",
+    "from": "ART_010",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_011",
+    "from": "ART_011",
+    "to": "CNTRY_034",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_011_HYD",
+    "from": "ART_011",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_012",
+    "from": "ART_012",
+    "to": "CNTRY_034",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_012_ACC",
+    "from": "ART_012",
+    "to": "CNTRY_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_013",
+    "from": "ART_013",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_013_SFO",
+    "from": "ART_013",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_014",
+    "from": "ART_014",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_014_CPH",
+    "from": "ART_014",
+    "to": "CNTRY_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_015",
+    "from": "ART_015",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_015_HYD",
+    "from": "ART_015",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_016",
+    "from": "ART_016",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_016_SEA",
+    "from": "ART_016",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_017",
+    "from": "ART_017",
+    "to": "CNTRY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_017_MAA",
+    "from": "ART_017",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_018",
+    "from": "ART_018",
+    "to": "CNTRY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_018_AUH",
+    "from": "ART_018",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_019",
+    "from": "ART_019",
+    "to": "CNTRY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_019_BLR",
+    "from": "ART_019",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_020",
+    "from": "ART_020",
+    "to": "CNTRY_029",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_020_AUH",
+    "from": "ART_020",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_021",
+    "from": "ART_021",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_021_CPH",
+    "from": "ART_021",
+    "to": "CNTRY_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_022",
+    "from": "ART_022",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_022_CDG",
+    "from": "ART_022",
+    "to": "CNTRY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_023",
+    "from": "ART_023",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_023_BCN",
+    "from": "ART_023",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_024",
+    "from": "ART_024",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_024_DEL",
+    "from": "ART_024",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_025",
+    "from": "ART_025",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_025_MNL",
+    "from": "ART_025",
+    "to": "CNTRY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_026",
+    "from": "ART_026",
+    "to": "CNTRY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_026_MEL",
+    "from": "ART_026",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_027",
+    "from": "ART_027",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_028",
+    "from": "ART_028",
+    "to": "CNTRY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_028_MAA",
+    "from": "ART_028",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_029",
+    "from": "ART_029",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_029_SEA",
+    "from": "ART_029",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_030",
+    "from": "ART_030",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_030_PER",
+    "from": "ART_030",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_031",
+    "from": "ART_031",
+    "to": "CNTRY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_031_LIS",
+    "from": "ART_031",
+    "to": "CNTRY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_032",
+    "from": "ART_032",
+    "to": "CNTRY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_032_OSL",
+    "from": "ART_032",
+    "to": "CNTRY_030",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_033",
+    "from": "ART_033",
+    "to": "CNTRY_012",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_033_GRU",
+    "from": "ART_033",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_034",
+    "from": "ART_034",
+    "to": "CNTRY_044",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_034_PER",
+    "from": "ART_034",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_035",
+    "from": "ART_035",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_035_LIS",
+    "from": "ART_035",
+    "to": "CNTRY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_036",
+    "from": "ART_036",
+    "to": "CNTRY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_036_DXB",
+    "from": "ART_036",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_037",
+    "from": "ART_037",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_037_TPE",
+    "from": "ART_037",
+    "to": "CNTRY_040",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_038",
+    "from": "ART_038",
+    "to": "CNTRY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_038_SEA",
+    "from": "ART_038",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_039",
+    "from": "ART_039",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_040",
+    "from": "ART_040",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_041",
+    "from": "ART_041",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_042",
+    "from": "ART_042",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_043",
+    "from": "ART_043",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_044",
+    "from": "ART_044",
+    "to": "CNTRY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_045",
+    "from": "ART_045",
+    "to": "CNTRY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_046",
+    "from": "ART_046",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_047",
+    "from": "ART_047",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_048",
+    "from": "ART_048",
+    "to": "CNTRY_044",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_049",
+    "from": "ART_049",
+    "to": "CNTRY_034",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_050",
+    "from": "ART_050",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_051",
+    "from": "ART_051",
+    "to": "CNTRY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_052",
+    "from": "ART_052",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_053",
+    "from": "ART_053",
+    "to": "CNTRY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_054",
+    "from": "ART_054",
+    "to": "CNTRY_012",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_055",
+    "from": "ART_055",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_056",
+    "from": "ART_056",
+    "to": "CNTRY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_057",
+    "from": "ART_057",
+    "to": "CNTRY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_058",
+    "from": "ART_058",
+    "to": "CNTRY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_059",
+    "from": "ART_059",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_060",
+    "from": "ART_060",
+    "to": "CNTRY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_061",
+    "from": "ART_061",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_062",
+    "from": "ART_062",
+    "to": "CNTRY_029",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_063",
+    "from": "ART_063",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_064",
+    "from": "ART_064",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_COUNTRY_ART_065",
+    "from": "ART_065",
+    "to": "CNTRY_042",
+    "properties": {}
+  }
+]

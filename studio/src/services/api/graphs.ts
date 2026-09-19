@@ -1,16 +1,17 @@
+import { request } from "@/services/api/client";
 import type {
 	Graph,
 	GraphConnectionCreate,
 	GraphConnectionRead,
+	GraphContention,
 	GraphCreate,
 	GraphListResponse,
 	GraphUpdate,
 	SetupSection,
-} from "../../types/graphs";
-import { request } from "./client";
+} from "@/types/graphs";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Graph container API (RFC-017)
+// Graph container API (docs/for-developers/modules/identity-and-access/spec.md)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const graphsApi = {
@@ -41,7 +42,7 @@ export const graphsApi = {
 		username: string,
 		graphSlug: string,
 		section: SetupSection,
-		action: "complete" | "skip" | "reset",
+		action: "skip" | "reset",
 	) =>
 		request<Graph>(`/api/v1/u/${username}/${graphSlug}/setup/${section}`, {
 			method: "POST",
@@ -88,14 +89,14 @@ export const graphsApi = {
 			},
 		),
 
-	// RFC-022 — accept the risk of an UNTESTED backend version (lifts read-only).
+	// docs/for-developers/modules/graph-connectors/features/capabilities.md — accept the risk of an UNTESTED backend version (lifts read-only).
 	acknowledgeConnectionVersion: (username: string, graphSlug: string) =>
 		request<GraphConnectionRead>(
 			`/api/v1/u/${username}/${graphSlug}/connection/acknowledge-version`,
 			{ method: "POST" },
 		),
 
-	// RFC-022 — declare a server version when auto-detection is unavailable.
+	// docs/for-developers/modules/graph-connectors/features/capabilities.md — declare a server version when auto-detection is unavailable.
 	declareConnectionVersion: (
 		username: string,
 		graphSlug: string,
@@ -118,11 +119,15 @@ export const graphsApi = {
 			ok: boolean;
 			latency_ms?: number;
 			error?: string;
-			// Auto-detected from the database at test time (RFC-022).
+			// Auto-detected from the database at test time (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 			server_version?: string | null;
 			compatibility_status?: string;
 		}>(`/api/v1/u/${username}/${graphSlug}/connection/test`, {
 			method: "POST",
 			body: JSON.stringify(data),
 		}),
+
+	/** The Graph's ceiling, and what it is holding back right now (C8). */
+	contention: (username: string, graphSlug: string) =>
+		request<GraphContention>(`/api/v1/u/${username}/${graphSlug}/contention`),
 };

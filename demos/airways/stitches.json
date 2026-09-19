@@ -1,0 +1,92 @@
+{
+  "name": "airways",
+  "datasets": ["air-routes", "news-articles", "twitter"],
+  "stitches": [
+    {
+      "id": "A1",
+      "kind": "anchor",
+      "identity_match": "exact",
+      "source": "news-articles:Country.iso_code",
+      "target": "air-routes:country.code",
+      "description": "A country is a country in both models; the two teams spelled the key differently (W1)."
+    },
+    {
+      "id": "A2",
+      "kind": "anchor",
+      "identity_match": "case_insensitive",
+      "partial": true,
+      "source": "twitter:Hashtag.tag",
+      "target": "news-articles:Topic.tag",
+      "description": "RouteLaunch is routelaunch. Six hashtags have no topic behind them, on purpose."
+    },
+    {
+      "id": "R1",
+      "kind": "relationship",
+      "edge_type": "SERVED_BY",
+      "source": "news-articles:City.code",
+      "target": "air-routes:airport.code",
+      "description": "A city is not an airport — it is served by one."
+    },
+    {
+      "id": "R2",
+      "kind": "relationship",
+      "edge_type": "HUBS_AT",
+      "source": "news-articles:Airline.hub_code",
+      "target": "air-routes:airport.code",
+      "description": "A foreign key the records already carry (W2)."
+    },
+    {
+      "id": "R3",
+      "kind": "relationship",
+      "edge_type": "DEPARTS_FROM",
+      "source": "news-articles:Route.origin_code",
+      "target": "air-routes:airport.code"
+    },
+    {
+      "id": "R4",
+      "kind": "relationship",
+      "edge_type": "ARRIVES_AT",
+      "source": "news-articles:Route.destination_code",
+      "target": "air-routes:airport.code"
+    },
+    {
+      "id": "R5",
+      "kind": "relationship",
+      "edge_type": "SPEAKS_FOR",
+      "source": "twitter:Account.domain",
+      "target": "news-articles:Publisher.domain",
+      "description": "An account posts on behalf of an outlet; it is not the outlet."
+    },
+    {
+      "id": "R6",
+      "kind": "relationship",
+      "edge_type": "SPEAKS_FOR",
+      "source": "twitter:Account.airline_iata",
+      "target": "news-articles:Airline.iata",
+      "description": "Same relation, the other kind of organisation."
+    },
+    {
+      "id": "R7",
+      "kind": "relationship",
+      "edge_type": "POSTED_NEAR",
+      "source": "twitter:Tweet.airport_code",
+      "target": "air-routes:airport.code"
+    },
+    {
+      "id": "R8",
+      "kind": "relationship",
+      "edge_type": "LINKS_TO",
+      "source": "twitter:Tweet.linked_url",
+      "target": "news-articles:Article.url"
+    },
+    {
+      "id": "R9",
+      "kind": "relationship",
+      "edge_type": "ABOUT",
+      "rows": "ABOUT.json",
+      "source": "twitter:Tweet.tweet_id",
+      "target": "news-articles:Article.article_id",
+      "description": "Endpoints are their own fact, one row per edge (W3)."
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 /**
- * TanStack Query hooks for paginated audit-event reads (RFC-018).
+ * TanStack Query hooks for paginated audit-event reads (docs/for-developers/modules/operate/features/audit-and-activity.md).
  *
  * Keyset pagination — the `next_cursor` from the response is fed back into
  * the next query as `cursor`. We use `useInfiniteQuery` so the Studio
  * surfaces can render an append-as-you-scroll list naturally.
  */
 
+import { eventsApi } from "@/services/api/events";
+import type { EventListFilters } from "@/types/events";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { eventsApi } from "../../services/api/events";
-import type { EventListFilters } from "../../types/events";
 
 const STALE_MS = 30_000; // 30s — events are streamed live; cache rarely matters.
 

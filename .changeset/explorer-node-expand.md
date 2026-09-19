@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Explorer node expand — graph traversal from the canvas (RFC-035).
+Explorer node expand — graph traversal from the canvas (docs/for-developers/modules/explore/features/graph-canvas.md).
 
 Right-click a node to load its neighbours from the bound graph DB — all
 neighbours, by neighbour **node type**, or by **relationship type** with
@@ -22,5 +22,5 @@ type. Each expand emits a `graph.expand` audit event.
 
 Also fixes the Cypher `data_reader` / `data_writer` querysets, which still
 treated `connector.execute()` as returning raw driver records after it was
-changed to return a deserialised `GraphResponse` (RFC-025) — they now consume
+changed to return a deserialised `GraphResponse` (docs/for-developers/modules/platform/features/telemetry.md) — they now consume
 the `GraphResponse` like the schema reader does.

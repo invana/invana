@@ -1,6 +1,7 @@
 """invana init — bootstrap the root superuser.
 
-Per RFC-017, no personal Graph is auto-created. The root user lands on an
+Per docs/for-developers/modules/identity-and-access/spec.md, no personal Graph is auto-created. The root user lands on
+an
 empty ``/graphs`` list in Studio and creates their first Graph manually.
 
 Idempotent: refuses to recreate if any superuser already exists. The new
@@ -15,10 +16,10 @@ import re
 import click
 from fastapi import HTTPException
 
-from invana.auth.passwords import WeakPasswordError
-from invana.auth.services import any_superuser_exists, bootstrap_root
-from invana.db import create_db_engine, create_session_factory
-from invana.settings import settings
+from invana.core.auth.managers import AuthManager
+from invana.core.auth.passwords import WeakPasswordError
+from invana.core.db import create_db_engine, create_session_factory
+from invana.core.settings import settings
 
 _USERNAME_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 
@@ -98,7 +99,7 @@ async def _run_init(
     session_factory = create_session_factory(engine)
     try:
         async with session_factory() as session:
-            if await any_superuser_exists(session):
+            if await AuthManager().any_superuser_exists(session):
                 click.echo(
                     "A superuser already exists. Provision more users via the "
                     "superuser-only POST /api/v1/auth/register."
@@ -129,7 +130,7 @@ async def _run_init(
                 )
 
             try:
-                user = await bootstrap_root(
+                user = await AuthManager().bootstrap_root(
                     session,
                     email=_email,
                     password=_password,

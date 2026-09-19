@@ -1,0 +1,310 @@
+[
+  {
+    "id": "CNTRY_001",
+    "properties": {
+      "name": "United Arab Emirates",
+      "iso_code": "AE"
+    }
+  },
+  {
+    "id": "CNTRY_002",
+    "properties": {
+      "name": "Austria",
+      "iso_code": "AT"
+    }
+  },
+  {
+    "id": "CNTRY_003",
+    "properties": {
+      "name": "Australia",
+      "iso_code": "AU"
+    }
+  },
+  {
+    "id": "CNTRY_004",
+    "properties": {
+      "name": "Brazil",
+      "iso_code": "BR"
+    }
+  },
+  {
+    "id": "CNTRY_005",
+    "properties": {
+      "name": "Canada",
+      "iso_code": "CA"
+    }
+  },
+  {
+    "id": "CNTRY_006",
+    "properties": {
+      "name": "Switzerland",
+      "iso_code": "CH"
+    }
+  },
+  {
+    "id": "CNTRY_007",
+    "properties": {
+      "name": "China",
+      "iso_code": "CN"
+    }
+  },
+  {
+    "id": "CNTRY_008",
+    "properties": {
+      "name": "Germany",
+      "iso_code": "DE"
+    }
+  },
+  {
+    "id": "CNTRY_009",
+    "properties": {
+      "name": "Denmark",
+      "iso_code": "DK"
+    }
+  },
+  {
+    "id": "CNTRY_010",
+    "properties": {
+      "name": "Egypt",
+      "iso_code": "EG"
+    }
+  },
+  {
+    "id": "CNTRY_011",
+    "properties": {
+      "name": "Spain",
+      "iso_code": "ES"
+    }
+  },
+  {
+    "id": "CNTRY_012",
+    "properties": {
+      "name": "Ethiopia",
+      "iso_code": "ET"
+    }
+  },
+  {
+    "id": "CNTRY_013",
+    "properties": {
+      "name": "Finland",
+      "iso_code": "FI"
+    }
+  },
+  {
+    "id": "CNTRY_014",
+    "properties": {
+      "name": "France",
+      "iso_code": "FR"
+    }
+  },
+  {
+    "id": "CNTRY_015",
+    "properties": {
+      "name": "Ghana",
+      "iso_code": "GH"
+    }
+  },
+  {
+    "id": "CNTRY_016",
+    "properties": {
+      "name": "Greece",
+      "iso_code": "GR"
+    }
+  },
+  {
+    "id": "CNTRY_017",
+    "properties": {
+      "name": "Hong Kong",
+      "iso_code": "HK"
+    }
+  },
+  {
+    "id": "CNTRY_018",
+    "properties": {
+      "name": "Indonesia",
+      "iso_code": "ID"
+    }
+  },
+  {
+    "id": "CNTRY_019",
+    "properties": {
+      "name": "Israel",
+      "iso_code": "IL"
+    }
+  },
+  {
+    "id": "CNTRY_020",
+    "properties": {
+      "name": "India",
+      "iso_code": "IN"
+    }
+  },
+  {
+    "id": "CNTRY_021",
+    "properties": {
+      "name": "Italy",
+      "iso_code": "IT"
+    }
+  },
+  {
+    "id": "CNTRY_022",
+    "properties": {
+      "name": "Japan",
+      "iso_code": "JP"
+    }
+  },
+  {
+    "id": "CNTRY_023",
+    "properties": {
+      "name": "Kenya",
+      "iso_code": "KE"
+    }
+  },
+  {
+    "id": "CNTRY_024",
+    "properties": {
+      "name": "Republic of Korea",
+      "iso_code": "KR"
+    }
+  },
+  {
+    "id": "CNTRY_025",
+    "properties": {
+      "name": "Morocco",
+      "iso_code": "MA"
+    }
+  },
+  {
+    "id": "CNTRY_026",
+    "properties": {
+      "name": "Mexico",
+      "iso_code": "MX"
+    }
+  },
+  {
+    "id": "CNTRY_027",
+    "properties": {
+      "name": "Malaysia",
+      "iso_code": "MY"
+    }
+  },
+  {
+    "id": "CNTRY_028",
+    "properties": {
+      "name": "Nigeria",
+      "iso_code": "NG"
+    }
+  },
+  {
+    "id": "CNTRY_029",
+    "properties": {
+      "name": "Netherlands",
+      "iso_code": "NL"
+    }
+  },
+  {
+    "id": "CNTRY_030",
+    "properties": {
+      "name": "Norway",
+      "iso_code": "NO"
+    }
+  },
+  {
+    "id": "CNTRY_031",
+    "properties": {
+      "name": "New Zealand",
+      "iso_code": "NZ"
+    }
+  },
+  {
+    "id": "CNTRY_032",
+    "properties": {
+      "name": "Philippines",
+      "iso_code": "PH"
+    }
+  },
+  {
+    "id": "CNTRY_033",
+    "properties": {
+      "name": "Portugal",
+      "iso_code": "PT"
+    }
+  },
+  {
+    "id": "CNTRY_034",
+    "properties": {
+      "name": "Qatar",
+      "iso_code": "QA"
+    }
+  },
+  {
+    "id": "CNTRY_035",
+    "properties": {
+      "name": "Saudi Arabia",
+      "iso_code": "SA"
+    }
+  },
+  {
+    "id": "CNTRY_036",
+    "properties": {
+      "name": "Sweden",
+      "iso_code": "SE"
+    }
+  },
+  {
+    "id": "CNTRY_037",
+    "properties": {
+      "name": "Singapore",
+      "iso_code": "SG"
+    }
+  },
+  {
+    "id": "CNTRY_038",
+    "properties": {
+      "name": "Thailand",
+      "iso_code": "TH"
+    }
+  },
+  {
+    "id": "CNTRY_039",
+    "properties": {
+      "name": "Turkey",
+      "iso_code": "TR"
+    }
+  },
+  {
+    "id": "CNTRY_040",
+    "properties": {
+      "name": "Taiwan",
+      "iso_code": "TW"
+    }
+  },
+  {
+    "id": "CNTRY_041",
+    "properties": {
+      "name": "United Kingdom",
+      "iso_code": "UK"
+    }
+  },
+  {
+    "id": "CNTRY_042",
+    "properties": {
+      "name": "United States",
+      "iso_code": "US"
+    }
+  },
+  {
+    "id": "CNTRY_043",
+    "properties": {
+      "name": "Viet Nam",
+      "iso_code": "VN"
+    }
+  },
+  {
+    "id": "CNTRY_044",
+    "properties": {
+      "name": "South Africa",
+      "iso_code": "ZA"
+    }
+  }
+]

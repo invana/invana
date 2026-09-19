@@ -1,0 +1,522 @@
+[
+  {
+    "id": "E_TAGGED_ART_001",
+    "from": "ART_001",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_002",
+    "from": "ART_002",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_003",
+    "from": "ART_003",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_004",
+    "from": "ART_004",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_005",
+    "from": "ART_005",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_006",
+    "from": "ART_006",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_007",
+    "from": "ART_007",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_008",
+    "from": "ART_008",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_009",
+    "from": "ART_009",
+    "to": "TOPIC_02",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_010",
+    "from": "ART_010",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_011",
+    "from": "ART_011",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_012",
+    "from": "ART_012",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_013",
+    "from": "ART_013",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_014",
+    "from": "ART_014",
+    "to": "TOPIC_02",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_015",
+    "from": "ART_015",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_016",
+    "from": "ART_016",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_017",
+    "from": "ART_017",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_018",
+    "from": "ART_018",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_019",
+    "from": "ART_019",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_020",
+    "from": "ART_020",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_021",
+    "from": "ART_021",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_022",
+    "from": "ART_022",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_023",
+    "from": "ART_023",
+    "to": "TOPIC_02",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_024",
+    "from": "ART_024",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_025",
+    "from": "ART_025",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_026",
+    "from": "ART_026",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_027",
+    "from": "ART_027",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_028",
+    "from": "ART_028",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_029",
+    "from": "ART_029",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_030",
+    "from": "ART_030",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_031",
+    "from": "ART_031",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_032",
+    "from": "ART_032",
+    "to": "TOPIC_02",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_033",
+    "from": "ART_033",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_034",
+    "from": "ART_034",
+    "to": "TOPIC_02",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_035",
+    "from": "ART_035",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_036",
+    "from": "ART_036",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_037",
+    "from": "ART_037",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_038",
+    "from": "ART_038",
+    "to": "TOPIC_01",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_039",
+    "from": "ART_039",
+    "to": "TOPIC_03",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_040",
+    "from": "ART_040",
+    "to": "TOPIC_03",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_041",
+    "from": "ART_041",
+    "to": "TOPIC_03",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_042",
+    "from": "ART_042",
+    "to": "TOPIC_03",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_043",
+    "from": "ART_043",
+    "to": "TOPIC_04",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_044",
+    "from": "ART_044",
+    "to": "TOPIC_04",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_045",
+    "from": "ART_045",
+    "to": "TOPIC_04",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_046",
+    "from": "ART_046",
+    "to": "TOPIC_05",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_047",
+    "from": "ART_047",
+    "to": "TOPIC_05",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_048",
+    "from": "ART_048",
+    "to": "TOPIC_05",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_049",
+    "from": "ART_049",
+    "to": "TOPIC_06",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_050",
+    "from": "ART_050",
+    "to": "TOPIC_06",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_051",
+    "from": "ART_051",
+    "to": "TOPIC_06",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_052",
+    "from": "ART_052",
+    "to": "TOPIC_07",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_053",
+    "from": "ART_053",
+    "to": "TOPIC_07",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_054",
+    "from": "ART_054",
+    "to": "TOPIC_07",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_055",
+    "from": "ART_055",
+    "to": "TOPIC_08",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_056",
+    "from": "ART_056",
+    "to": "TOPIC_08",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_057",
+    "from": "ART_057",
+    "to": "TOPIC_08",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_058",
+    "from": "ART_058",
+    "to": "TOPIC_08",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_059",
+    "from": "ART_059",
+    "to": "TOPIC_09",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_060",
+    "from": "ART_060",
+    "to": "TOPIC_09",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_061",
+    "from": "ART_061",
+    "to": "TOPIC_09",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_062",
+    "from": "ART_062",
+    "to": "TOPIC_10",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_063",
+    "from": "ART_063",
+    "to": "TOPIC_10",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_064",
+    "from": "ART_064",
+    "to": "TOPIC_10",
+    "properties": {
+      "position": 0
+    }
+  },
+  {
+    "id": "E_TAGGED_ART_065",
+    "from": "ART_065",
+    "to": "TOPIC_10",
+    "properties": {
+      "position": 0
+    }
+  }
+]

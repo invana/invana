@@ -2,7 +2,7 @@
 "invana": minor
 ---
 
-Performance metrics for queries, messages, and LLM calls (RFC-041).
+Performance metrics for queries, messages, and LLM calls (docs/for-developers/modules/operate/features/observability.md).
 
 Every LLM provider call, every graph query, and every session message now emits an
 OpenTelemetry metric — not just a trace span — so latency and throughput are answerable

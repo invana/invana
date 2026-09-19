@@ -1,19 +1,26 @@
+import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { GitHubStars } from "@/components/GitHubStars";
+import { ThemeMenu } from "@/components/ThemeMenu";
+import { OnboardingCap } from "@/components/header/OnboardingCap";
+import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@invana/ui";
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { FullscreenToggle } from "../FullscreenToggle";
-import { GitHubStars } from "../GitHubStars";
-import { ThemeMenu } from "../ThemeMenu";
 
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
-	 *  derived from the URL (Graphs, Explorer, Modeller, Settings, etc.). */
+	 *  derived from the URL (Graphs, New graph, Profile, Settings). The graph
+	 *  page passes none: its URL is the graph (graph-detail-page.md G15), so
+	 *  `owner › graph` already names where you are. */
 	pageLabel?: string;
+	/** The object open on this screen — the canvas, the model, the agent. Drawn
+	 *  as the last crumb: `owner › graph › Defence theme`. Omitted when the
+	 *  screen holds nothing yet. */
+	objectLabel?: string;
 	/** Drop the breadcrumb entirely — used when `leftExtras` already names the
-	 *  current view (e.g. the Explorer/Modeller switcher), so the label would
-	 *  just be redundant. The separator still renders before `leftExtras`. */
+	 *  current view, so the label would just be redundant. The separator still
+	 *  renders before `leftExtras`. */
 	hideBreadcrumb?: boolean;
 	/** Extra content rendered to the right of the breadcrumb on the left side. */
 	leftExtras?: ReactNode;
@@ -31,17 +38,18 @@ interface AppHeaderOptions {
 /**
  * Shared AppLayoutV2 header config. Renders:
  *
- *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [ThemeMenu] [FullscreenToggle] [panelControls]
+ *   [Invana Studio] | breadcrumb [+ leftExtras]   [center]   [rightExtras] [GitHubStars] [OnboardingCap] [ThemeMenu] [FullscreenToggle] [panelControls]
  *
  * Breadcrumb behaviour (after the "Invana Studio" badge):
- * - Graph-scoped (`/u/:username/:graphSlug[/...]`): just `pageLabel`
- *   (e.g. `Explorer`). The owner + graph name are not shown.
+ * - Graph-scoped (`/u/:username/:graphSlug`): `owner › graph`, plus `› object`
+ *   when something is open on it.
  * - Otherwise: `@username / pageLabel` (e.g. `@ravi-merugu / Graphs`).
  * - If logged out, the leading user segment is dropped.
  */
 export function useAppHeader(options: AppHeaderOptions = {}) {
 	const {
 		pageLabel,
+		objectLabel,
 		hideBreadcrumb,
 		leftExtras,
 		center,
@@ -51,9 +59,17 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 
+	// The onboarding cap is graph-scoped (setup.md SU19): a Graph has onboarding,
+	// the Graphs list does not. The route is what says which graph, so the cap is
+	// read off the same match the breadcrumb uses rather than threaded through
+	// every caller.
+	const graphRoute = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/|$)/);
+
 	const segments = hideBreadcrumb
 		? []
-		: computeSegments(pathname, user?.username, pageLabel);
+		: computeSegments(pathname, user?.username, pageLabel).concat(
+				objectLabel ? [{ label: objectLabel }] : [],
+			);
 
 	return {
 		// `relative` makes the header bar a positioning context so a `center`
@@ -81,6 +97,9 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 			<div className="flex items-center gap-4 px-2">
 				{rightExtras}
 				<GitHubStars />
+				{graphRoute && (
+					<OnboardingCap username={graphRoute[1]} graphSlug={graphRoute[2]} />
+				)}
 				<ThemeMenu />
 				<FullscreenToggle />
 				{panelControls}
@@ -104,7 +123,10 @@ interface Segment {
 
 function Breadcrumb({ segments }: { segments: Segment[] }) {
 	return (
-		<nav className="flex items-center gap-1 min-w-0" aria-label="Breadcrumb">
+		<nav
+			className="flex items-center gap-1 min-w-0 font-semibold"
+			aria-label="Breadcrumb"
+		>
 			{segments.map((s, i) => {
 				const isLast = i === segments.length - 1;
 				return (
@@ -126,7 +148,7 @@ function Breadcrumb({ segments }: { segments: Segment[] }) {
 							<span
 								className={
 									isLast
-										? "text-foreground font-medium truncate"
+										? "text-foreground truncate"
 										: "text-muted-foreground truncate"
 								}
 							>
@@ -157,12 +179,20 @@ function computeSegments(
 	const graphMatch = pathname.match(/^\/u\/([^/]+)\/([^/]+)(?:\/(.+?))?\/?$/);
 	if (graphMatch) {
 		const [, owner, graphSlug, rest] = graphMatch;
-		// Graph-scoped breadcrumbs show only the page label (Explorer, Modeller,
-		// …) — the owner + graph name are intentionally dropped from the header.
-		if (override) {
-			return [{ label: override }];
-		}
-		return graphRestSegments(rest, `/u/${owner}/${graphSlug}`);
+		const graphRoot = `/u/${owner}/${graphSlug}`;
+		// `owner › graph › screen`. The owner and the graph are **not** dropped:
+		// every graph-scoped screen is inside a graph, and a header that does not
+		// name it leaves the URL as the only way to tell which one you are in.
+		// This is what the hi-fi draws (`ExplorerHiFi`), and what both shell
+		// references draw — design-kit's `Themes/AppV2 › ExplorerShell` and
+		// canvas-ui's `apps/AppLayoutV2`.
+		const trail: Segment[] = [
+			{ label: owner, to: "/graphs" },
+			{ label: graphSlug, to: graphRoot },
+		];
+		return trail.concat(
+			override ? [{ label: override }] : graphRestSegments(rest, graphRoot),
+		);
 	}
 
 	// Non-graph routes (/graphs, /graphs/new, /settings/profile, /login, ...)
@@ -182,10 +212,10 @@ function graphRestSegments(
 	rest: string | undefined,
 	graphRoot: string,
 ): Segment[] {
-	// The graph root redirects into the Explorer, so a missing tail means Explorer.
-	if (!rest) return [{ label: "Explorer" }];
-	if (rest === "explorer") return [{ label: "Explorer" }];
-	if (rest === "modeller") return [{ label: "Modeller" }];
+	// The graph's own URL *is* the page (graph-detail-page.md G15), so a missing
+	// tail adds no third crumb — `owner › graph` already names where you are.
+	// The page passes a `pageLabel` override for what is open on it.
+	if (!rest) return [];
 	if (rest === "settings") return [{ label: "Settings" }];
 	const settingsSub = rest.match(/^settings\/(.+)$/);
 	if (settingsSub) {

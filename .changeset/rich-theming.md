@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Rich theming (RFC-044). Studio's bare light/dark toggle is replaced with a full
+Rich theming (docs/for-developers/modules/platform/features/theming.md). Studio's bare light/dark toggle is replaced with a full
 theme picker — the Invana theme plus Dark Night, Amber, Ocean, Forest, Garnet
 and Minimal presets, a light/dark/system mode, and accent swatches — surfaced
 from a header

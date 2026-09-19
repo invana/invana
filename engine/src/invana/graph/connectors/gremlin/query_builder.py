@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from gremlin_python.process.graph_traversal import GraphTraversalSource, __
-from gremlin_python.process.traversal import Order, P, TextP
+from gremlin_python.process.traversal import Order, P, T, TextP
 
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
@@ -322,6 +322,16 @@ class GremlinQueryBuilder:
     def get_edge_labels(g: GraphTraversalSource) -> Any:
         """Get all edge labels."""
         return g.E().label().dedup()
+
+    @staticmethod
+    def get_node_label_counts(g: GraphTraversalSource) -> Any:
+        """Count vertices per label."""
+        return g.V().group_count().by(T.label)
+
+    @staticmethod
+    def get_edge_label_counts(g: GraphTraversalSource) -> Any:
+        """Count edges per label."""
+        return g.E().group_count().by(T.label)
 
     @staticmethod
     def get_property_keys(g: GraphTraversalSource, label: str) -> Any:

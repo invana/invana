@@ -64,3 +64,15 @@ docs/site/
 .understand-anything/
 # Local MCP servers — contains auth tokens
 .mcp.json
+
+# ─── Design canvas cache (scripts/design-pull.py) ───
+.design/
+
+# ─── pnpm's local content-addressable store (created by `pnpm add` in studio/) ───
+studio/.pnpm-store/
+
+# ─── Studio end-to-end tests ───
+studio/e2e/.auth/
+studio/test-results/
+studio/playwright-report/
+studio/blob-report/

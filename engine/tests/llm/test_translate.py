@@ -1,4 +1,4 @@
-"""NL → grounded query translation tests (RFC-030).
+"""NL → grounded query translation tests (docs/for-developers/modules/ask/features/ask-in-natural-language.md).
 
 ``render_model_context`` is a pure function (no external deps). ``nl_to_query``
 runs against a real local Ollama and skips when it is not reachable.
@@ -11,11 +11,11 @@ import os
 import httpx
 import pytest
 
-from invana.llm import LLMError
-from invana.llm.grounding import render_model_context
-from invana.llm.translate import nl_to_query
-from invana.llm_providers.models import LLMProvider, LLMProviderKind
-from invana.modeller.models import (
+from invana.apps.llm import LLMError
+from invana.apps.llm.grounding import render_model_context
+from invana.apps.llm.translate import _looks_read_only, nl_to_query
+from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.modeller.models import (
     EdgeTypeDefinition,
     GraphVersion,
     NodeTypeDefinition,
@@ -94,3 +94,47 @@ async def test_nl_to_query_rejects_a_write_request() -> None:
             encryption_key="unused",
             timeout_s=180.0,
         )
+
+
+# ── the read-only guard ──────────────────────────────────────────────────────
+#
+# A pure function, so it needs no provider. The reads below are the ones that
+# were refused in the field: `offset`, `dataset` and `asset` all end in the
+# letters `set`, a read-only `CALL { … }` subquery is not a write, and a literal
+# is text the graph never executes.
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "MATCH (a:airport) RETURN a.code ORDER BY a.code OFFSET 10 LIMIT 3",
+        "MATCH (d:Dataset) RETURN d.dataset AS name",
+        "MATCH (n) RETURN n.asset AS asset LIMIT 5",
+        "CALL { MATCH (a:airport) RETURN count(a) AS n } RETURN n",
+        "MATCH (a:Article) WHERE a.title CONTAINS 'merge ' RETURN a",
+        "MATCH (n) RETURN n.created_at ORDER BY n.created_at DESC",
+    ],
+)
+def test_reads_are_not_mistaken_for_writes(query: str) -> None:
+    assert _looks_read_only(query, "cypher") is True
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "CREATE (n:Foo)",
+        # No space after the clause — the old trailing-space markers missed these.
+        "CREATE(n:Foo)",
+        "MERGE(n:Foo)",
+        "MATCH (n) SET n.x = 1",
+        "MATCH (n) DETACH DELETE n",
+        "MATCH (n) REMOVE n:Label",
+        "DROP INDEX foo",
+        "LOAD CSV FROM 'f.csv' AS row RETURN row",
+        # A subquery that writes says so inside the braces.
+        "CALL { MATCH (n) DELETE n } RETURN 1",
+        "MATCH (n) FOREACH (x IN [1] | SET n.y = x)",
+    ],
+)
+def test_writes_are_refused(query: str) -> None:
+    assert _looks_read_only(query, "cypher") is False

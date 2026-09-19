@@ -1,5 +1,5 @@
 /**
- * Client-side appearance tweaks layered on top of the RFC-044 theme selection.
+ * Client-side appearance tweaks layered on top of the theme selection (docs/for-developers/modules/platform/features/theming.md).
  *
  * Currently just a single **saturation** multiplier applied to the active theme's
  * primary + accent colours (see `SaturationBridge`). Unlike the theme selection —

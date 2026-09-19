@@ -1,0 +1,632 @@
+[
+  {
+    "id": "CITY_001",
+    "properties": {
+      "name": "Atlanta",
+      "code": "ATL",
+      "country_code": "US",
+      "lat": 33.6366996765137,
+      "lon": -84.4281005859375
+    }
+  },
+  {
+    "id": "CITY_002",
+    "properties": {
+      "name": "Los Angeles",
+      "code": "LAX",
+      "country_code": "US",
+      "lat": 33.94250107,
+      "lon": -118.4079971
+    }
+  },
+  {
+    "id": "CITY_003",
+    "properties": {
+      "name": "Chicago",
+      "code": "ORD",
+      "country_code": "US",
+      "lat": 41.97859955,
+      "lon": -87.90480042
+    }
+  },
+  {
+    "id": "CITY_004",
+    "properties": {
+      "name": "New York",
+      "code": "JFK",
+      "country_code": "US",
+      "lat": 40.63980103,
+      "lon": -73.77890015
+    }
+  },
+  {
+    "id": "CITY_005",
+    "properties": {
+      "name": "San Francisco",
+      "code": "SFO",
+      "country_code": "US",
+      "lat": 37.6189994812012,
+      "lon": -122.375
+    }
+  },
+  {
+    "id": "CITY_006",
+    "properties": {
+      "name": "Seattle",
+      "code": "SEA",
+      "country_code": "US",
+      "lat": 47.4490013122559,
+      "lon": -122.30899810791
+    }
+  },
+  {
+    "id": "CITY_007",
+    "properties": {
+      "name": "Boston",
+      "code": "BOS",
+      "country_code": "US",
+      "lat": 42.36429977,
+      "lon": -71.00520325
+    }
+  },
+  {
+    "id": "CITY_008",
+    "properties": {
+      "name": "Miami",
+      "code": "MIA",
+      "country_code": "US",
+      "lat": 25.7931995391846,
+      "lon": -80.2906036376953
+    }
+  },
+  {
+    "id": "CITY_009",
+    "properties": {
+      "name": "Dallas",
+      "code": "DFW",
+      "country_code": "US",
+      "lat": 32.896800994873,
+      "lon": -97.0380020141602
+    }
+  },
+  {
+    "id": "CITY_010",
+    "properties": {
+      "name": "Denver",
+      "code": "DEN",
+      "country_code": "US",
+      "lat": 39.8616981506348,
+      "lon": -104.672996520996
+    }
+  },
+  {
+    "id": "CITY_011",
+    "properties": {
+      "name": "Toronto",
+      "code": "YYZ",
+      "country_code": "CA",
+      "lat": 43.6772003174,
+      "lon": -79.6305999756
+    }
+  },
+  {
+    "id": "CITY_012",
+    "properties": {
+      "name": "Mexico City",
+      "code": "MEX",
+      "country_code": "MX",
+      "lat": 19.43630027771,
+      "lon": -99.0720977783203
+    }
+  },
+  {
+    "id": "CITY_013",
+    "properties": {
+      "name": "Sao Paulo",
+      "code": "GRU",
+      "country_code": "BR",
+      "lat": -23.4355564117432,
+      "lon": -46.4730567932129
+    }
+  },
+  {
+    "id": "CITY_014",
+    "properties": {
+      "name": "London",
+      "code": "LHR",
+      "country_code": "UK",
+      "lat": 51.4706001282,
+      "lon": -0.461941003799
+    }
+  },
+  {
+    "id": "CITY_015",
+    "properties": {
+      "name": "Paris",
+      "code": "CDG",
+      "country_code": "FR",
+      "lat": 49.0127983093,
+      "lon": 2.54999995232
+    }
+  },
+  {
+    "id": "CITY_016",
+    "properties": {
+      "name": "Frankfurt",
+      "code": "FRA",
+      "country_code": "DE",
+      "lat": 50.0264015198,
+      "lon": 8.54312992096
+    }
+  },
+  {
+    "id": "CITY_017",
+    "properties": {
+      "name": "Amsterdam",
+      "code": "AMS",
+      "country_code": "NL",
+      "lat": 52.3086013794,
+      "lon": 4.76388978958
+    }
+  },
+  {
+    "id": "CITY_018",
+    "properties": {
+      "name": "Madrid",
+      "code": "MAD",
+      "country_code": "ES",
+      "lat": 40.4936,
+      "lon": -3.56676
+    }
+  },
+  {
+    "id": "CITY_019",
+    "properties": {
+      "name": "Barcelona",
+      "code": "BCN",
+      "country_code": "ES",
+      "lat": 41.2971000671387,
+      "lon": 2.07845997810364
+    }
+  },
+  {
+    "id": "CITY_020",
+    "properties": {
+      "name": "Rome",
+      "code": "FCO",
+      "country_code": "IT",
+      "lat": 41.8045005798,
+      "lon": 12.2508001328
+    }
+  },
+  {
+    "id": "CITY_021",
+    "properties": {
+      "name": "Zurich",
+      "code": "ZRH",
+      "country_code": "CH",
+      "lat": 47.4646987915039,
+      "lon": 8.54916954040527
+    }
+  },
+  {
+    "id": "CITY_022",
+    "properties": {
+      "name": "Munich",
+      "code": "MUC",
+      "country_code": "DE",
+      "lat": 48.3538017272949,
+      "lon": 11.7861003875732
+    }
+  },
+  {
+    "id": "CITY_023",
+    "properties": {
+      "name": "Vienna",
+      "code": "VIE",
+      "country_code": "AT",
+      "lat": 48.1102981567383,
+      "lon": 16.5697002410889
+    }
+  },
+  {
+    "id": "CITY_024",
+    "properties": {
+      "name": "Copenhagen",
+      "code": "CPH",
+      "country_code": "DK",
+      "lat": 55.6179008483887,
+      "lon": 12.6560001373291
+    }
+  },
+  {
+    "id": "CITY_025",
+    "properties": {
+      "name": "Stockholm",
+      "code": "ARN",
+      "country_code": "SE",
+      "lat": 59.6519012451172,
+      "lon": 17.9186000823975
+    }
+  },
+  {
+    "id": "CITY_026",
+    "properties": {
+      "name": "Oslo",
+      "code": "OSL",
+      "country_code": "NO",
+      "lat": 60.1939010620117,
+      "lon": 11.1003999710083
+    }
+  },
+  {
+    "id": "CITY_027",
+    "properties": {
+      "name": "Helsinki",
+      "code": "HEL",
+      "country_code": "FI",
+      "lat": 60.3171997070312,
+      "lon": 24.9633007049561
+    }
+  },
+  {
+    "id": "CITY_028",
+    "properties": {
+      "name": "Lisbon",
+      "code": "LIS",
+      "country_code": "PT",
+      "lat": 38.7812995911,
+      "lon": -9.13591957092
+    }
+  },
+  {
+    "id": "CITY_029",
+    "properties": {
+      "name": "Athens",
+      "code": "ATH",
+      "country_code": "GR",
+      "lat": 37.9364013672,
+      "lon": 23.9444999695
+    }
+  },
+  {
+    "id": "CITY_030",
+    "properties": {
+      "name": "Istanbul",
+      "code": "IST",
+      "country_code": "TR",
+      "lat": 41.275278,
+      "lon": 28.751944
+    }
+  },
+  {
+    "id": "CITY_031",
+    "properties": {
+      "name": "Dubai",
+      "code": "DXB",
+      "country_code": "AE",
+      "lat": 25.2527999878,
+      "lon": 55.3643989563
+    }
+  },
+  {
+    "id": "CITY_032",
+    "properties": {
+      "name": "Abu Dhabi",
+      "code": "AUH",
+      "country_code": "AE",
+      "lat": 24.4330005645752,
+      "lon": 54.6511001586914
+    }
+  },
+  {
+    "id": "CITY_033",
+    "properties": {
+      "name": "Doha",
+      "code": "DOH",
+      "country_code": "QA",
+      "lat": 25.273056,
+      "lon": 51.608056
+    }
+  },
+  {
+    "id": "CITY_034",
+    "properties": {
+      "name": "Riyadh",
+      "code": "RUH",
+      "country_code": "SA",
+      "lat": 24.9575996398926,
+      "lon": 46.6987991333008
+    }
+  },
+  {
+    "id": "CITY_035",
+    "properties": {
+      "name": "Tel Aviv",
+      "code": "TLV",
+      "country_code": "IL",
+      "lat": 32.0113983154297,
+      "lon": 34.8866996765137
+    }
+  },
+  {
+    "id": "CITY_036",
+    "properties": {
+      "name": "New Delhi",
+      "code": "DEL",
+      "country_code": "IN",
+      "lat": 28.566499710083,
+      "lon": 77.1031036376953
+    }
+  },
+  {
+    "id": "CITY_037",
+    "properties": {
+      "name": "Mumbai",
+      "code": "BOM",
+      "country_code": "IN",
+      "lat": 19.0886993408,
+      "lon": 72.8678970337
+    }
+  },
+  {
+    "id": "CITY_038",
+    "properties": {
+      "name": "Bengaluru",
+      "code": "BLR",
+      "country_code": "IN",
+      "lat": 13.1978998184,
+      "lon": 77.7062988281
+    }
+  },
+  {
+    "id": "CITY_039",
+    "properties": {
+      "name": "Chennai",
+      "code": "MAA",
+      "country_code": "IN",
+      "lat": 12.9900054931641,
+      "lon": 80.1692962646484
+    }
+  },
+  {
+    "id": "CITY_040",
+    "properties": {
+      "name": "Hyderabad",
+      "code": "HYD",
+      "country_code": "IN",
+      "lat": 17.2313175201,
+      "lon": 78.4298553467
+    }
+  },
+  {
+    "id": "CITY_041",
+    "properties": {
+      "name": "Singapore",
+      "code": "SIN",
+      "country_code": "SG",
+      "lat": 1.3501900434494,
+      "lon": 103.994003295898
+    }
+  },
+  {
+    "id": "CITY_042",
+    "properties": {
+      "name": "Kuala Lumpur",
+      "code": "KUL",
+      "country_code": "MY",
+      "lat": 2.74557995796204,
+      "lon": 101.709999084473
+    }
+  },
+  {
+    "id": "CITY_043",
+    "properties": {
+      "name": "Bangkok",
+      "code": "BKK",
+      "country_code": "TH",
+      "lat": 13.6810998916626,
+      "lon": 100.747001647949
+    }
+  },
+  {
+    "id": "CITY_044",
+    "properties": {
+      "name": "Jakarta",
+      "code": "CGK",
+      "country_code": "ID",
+      "lat": -6.1255698204,
+      "lon": 106.65599823
+    }
+  },
+  {
+    "id": "CITY_045",
+    "properties": {
+      "name": "Manila",
+      "code": "MNL",
+      "country_code": "PH",
+      "lat": 14.508600235,
+      "lon": 121.019996643
+    }
+  },
+  {
+    "id": "CITY_046",
+    "properties": {
+      "name": "Hong Kong",
+      "code": "HKG",
+      "country_code": "HK",
+      "lat": 22.3089008331,
+      "lon": 113.915000916
+    }
+  },
+  {
+    "id": "CITY_047",
+    "properties": {
+      "name": "Taipei",
+      "code": "TPE",
+      "country_code": "TW",
+      "lat": 25.0776996612549,
+      "lon": 121.233001708984
+    }
+  },
+  {
+    "id": "CITY_048",
+    "properties": {
+      "name": "Tokyo",
+      "code": "HND",
+      "country_code": "JP",
+      "lat": 35.5522994995117,
+      "lon": 139.779998779297
+    }
+  },
+  {
+    "id": "CITY_049",
+    "properties": {
+      "name": "Seoul",
+      "code": "ICN",
+      "country_code": "KR",
+      "lat": 37.4691009521484,
+      "lon": 126.450996398926
+    }
+  },
+  {
+    "id": "CITY_050",
+    "properties": {
+      "name": "Beijing",
+      "code": "PEK",
+      "country_code": "CN",
+      "lat": 40.0801010131836,
+      "lon": 116.584999084473
+    }
+  },
+  {
+    "id": "CITY_051",
+    "properties": {
+      "name": "Shanghai",
+      "code": "PVG",
+      "country_code": "CN",
+      "lat": 31.1434001922607,
+      "lon": 121.805000305176
+    }
+  },
+  {
+    "id": "CITY_052",
+    "properties": {
+      "name": "Ho Chi Minh City",
+      "code": "SGN",
+      "country_code": "VN",
+      "lat": 10.8187999725,
+      "lon": 106.652000427
+    }
+  },
+  {
+    "id": "CITY_053",
+    "properties": {
+      "name": "Sydney",
+      "code": "SYD",
+      "country_code": "AU",
+      "lat": -33.9460983276367,
+      "lon": 151.177001953125
+    }
+  },
+  {
+    "id": "CITY_054",
+    "properties": {
+      "name": "Melbourne",
+      "code": "MEL",
+      "country_code": "AU",
+      "lat": -37.6733016967773,
+      "lon": 144.843002319336
+    }
+  },
+  {
+    "id": "CITY_055",
+    "properties": {
+      "name": "Perth",
+      "code": "PER",
+      "country_code": "AU",
+      "lat": -31.940299987793,
+      "lon": 115.967002868652
+    }
+  },
+  {
+    "id": "CITY_056",
+    "properties": {
+      "name": "Auckland",
+      "code": "AKL",
+      "country_code": "NZ",
+      "lat": -37.0080986023,
+      "lon": 174.792007446
+    }
+  },
+  {
+    "id": "CITY_057",
+    "properties": {
+      "name": "Johannesburg",
+      "code": "JNB",
+      "country_code": "ZA",
+      "lat": -26.1392002106,
+      "lon": 28.2460002899
+    }
+  },
+  {
+    "id": "CITY_058",
+    "properties": {
+      "name": "Nairobi",
+      "code": "NBO",
+      "country_code": "KE",
+      "lat": -1.31923997402,
+      "lon": 36.9277992249
+    }
+  },
+  {
+    "id": "CITY_059",
+    "properties": {
+      "name": "Addis Ababa",
+      "code": "ADD",
+      "country_code": "ET",
+      "lat": 8.97789001465,
+      "lon": 38.7993011475
+    }
+  },
+  {
+    "id": "CITY_060",
+    "properties": {
+      "name": "Lagos",
+      "code": "LOS",
+      "country_code": "NG",
+      "lat": 6.57737016677856,
+      "lon": 3.32116007804871
+    }
+  },
+  {
+    "id": "CITY_061",
+    "properties": {
+      "name": "Accra",
+      "code": "ACC",
+      "country_code": "GH",
+      "lat": 5.60518980026245,
+      "lon": -0.166786000132561
+    }
+  },
+  {
+    "id": "CITY_062",
+    "properties": {
+      "name": "Cairo",
+      "code": "CAI",
+      "country_code": "EG",
+      "lat": 30.1219005584717,
+      "lon": 31.4055995941162
+    }
+  },
+  {
+    "id": "CITY_063",
+    "properties": {
+      "name": "Casablanca",
+      "code": "CMN",
+      "country_code": "MA",
+      "lat": 33.3675003051758,
+      "lon": -7.58997011184692
+    }
+  }
+]

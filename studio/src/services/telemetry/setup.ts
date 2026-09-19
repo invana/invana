@@ -1,5 +1,5 @@
 /**
- * OpenTelemetry-Web bootstrap (RFC-025).
+ * OpenTelemetry-Web bootstrap (docs/for-developers/modules/platform/features/telemetry.md).
  *
  * Registers a WebTracerProvider that ships spans — via the engine's OTLP/HTTP
  * proxy (`/api/v1/telemetry/traces`) — to the collector, and the default W3C
@@ -11,7 +11,7 @@
  * services/api/client.ts → `startClientSpan`), not via auto-XHR
  * instrumentation: the request crosses TanStack Query's async hops, and no web
  * context manager carries the active context across Vite's native async/await
- * (zone.js only patches down-levelled awaits). See RFC-025 D3.
+ * (zone.js only patches down-levelled awaits). See docs/for-developers/modules/platform/features/telemetry.md.
  *
  * Gated by `VITE_TELEMETRY_ENABLED` (on unless explicitly "false"). When off,
  * `setup()` is a no-op: no provider is registered, so the helpers in ./tracer
@@ -44,7 +44,7 @@ const DEBUG = import.meta.env.VITE_TELEMETRY_DEBUG === "true";
 /** Tracer name shared with ./tracer's span helpers. */
 export const SERVICE_NAME = "invana-studio";
 
-/** Full URL of the engine's browser-span proxy (RFC-025). */
+/** Full URL of the engine's browser-span proxy (docs/for-developers/modules/platform/features/telemetry.md). */
 const TRACES_URL = `${API_BASE_URL}/api/v1/telemetry/traces`;
 
 function setup(): void {

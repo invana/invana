@@ -8,7 +8,7 @@ import pytest
 from click.testing import CliRunner
 
 from invana.cli.main import app
-from invana.utils import import_class_from_dotted_path
+from invana.core.utils import import_class_from_dotted_path
 
 # ---------------------------------------------------------------------------
 # import_class_from_dotted_path
@@ -137,7 +137,7 @@ class TestLoaderCommandErrors:
         with (
             patch("invana.cli.commands.loader._run_loader", return_value=LoaderStats()),
             patch(
-                "invana.utils.import_class_from_dotted_path",
+                "invana.core.utils.import_class_from_dotted_path",
                 return_value=MagicMock(return_value=MagicMock()),
             ),
         ):

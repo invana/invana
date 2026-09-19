@@ -1,20 +1,20 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Sessions API client (RFC-024).
+// Sessions API client (docs/for-developers/modules/ask/spec.md).
 //
 // The engine speaks snake_case DTOs; the Studio UI consumes the camelCase
 // `Session` / `SessionMessage` shapes (with `Date`s). Mapping happens here so
 // the panel/composer/thread components stay unchanged.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { QueryLanguage } from "../../types/graphs";
-import type { QueryResponse } from "../../types/query";
+import { request } from "@/services/api/client";
+import { type ApiThinkingStep, toRunNode } from "@/services/api/runs";
+import type { QueryLanguage } from "@/types/graphs";
+import type { QueryResponse } from "@/types/query";
 import type {
 	Session,
 	SessionContextTurn,
 	SessionMessage,
-} from "../../types/session";
-import { request } from "./client";
-import { type ApiThinkingStep, toThinkingStep } from "./thinkings";
+} from "@/types/session";
 
 // ── Wire DTOs (snake_case, as the engine returns) ────────────────────────────
 
@@ -38,7 +38,7 @@ interface ApiMessage {
 	timeout_s?: number | null;
 	node_count?: number | null;
 	edge_count?: number | null;
-	thinking_id?: string | null;
+	run_id?: string | null;
 	steps?: ApiThinkingStep[] | null;
 	created_at: string;
 }
@@ -46,10 +46,15 @@ interface ApiMessage {
 interface ApiSummary {
 	id: string;
 	graph_id: string;
-	// RFC-031 — which Studio surface this session lives on, and (modeller only)
+	// docs/for-developers/modules/ask/spec.md — which Studio surface this session lives on, and (modeller only)
 	// the model it authors.
 	surface?: "explorer" | "modeller" | null;
 	model_id?: string | null;
+	// docs/for-developers/modules/agents/spec.md — the agent this session thinks through, resolved by the
+	// engine so the header names it without a second call.
+	agent_id?: string | null;
+	agent_name?: string | null;
+	agent_status?: string | null;
 	title: string;
 	pinned: boolean;
 	archived: boolean;
@@ -75,14 +80,14 @@ interface ApiSendResponse {
 	user_message: ApiMessage;
 	assistant_message: ApiMessage;
 	result: QueryResponse | null;
-	thinking_id?: string | null;
+	run_id?: string | null;
 	stream_url?: string | null;
 }
 
 interface ApiRerunResponse {
 	message: ApiMessage;
 	result: QueryResponse | null;
-	thinking_id?: string | null;
+	run_id?: string | null;
 	stream_url?: string | null;
 }
 
@@ -91,13 +96,13 @@ export interface SendMessageBody {
 	content: string;
 	mode: "ql" | "nl";
 	language?: QueryLanguage;
-	/** nl only — which LLM provider translates the prompt (RFC-030). */
+	/** nl only — which LLM provider translates the prompt (docs/for-developers/modules/ask/features/ask-in-natural-language.md). */
 	llm_provider_id?: string;
 	/** nl only — seconds to wait on the LLM translation before giving up. */
 	timeout_s?: number;
 }
 
-/** A client-driven canvas operation to log as a session turn (RFC-046). Only
+/** A client-driven canvas operation to log as a session turn (docs/for-developers/modules/explore/features/boards.md). Only
  *  "Load to canvas" today — the engine records expands itself. */
 export interface RecordOperationBody {
 	kind: "load";
@@ -118,11 +123,11 @@ export interface SessionListOptions {
 	offset?: number;
 	sort?: SessionSort;
 	includeArchived?: boolean;
-	/** RFC-031 — list only one surface's sessions (Explorer vs Modeller). */
+	/** docs/for-developers/modules/ask/spec.md — list only one surface's sessions (Explorer vs Modeller). */
 	surface?: "explorer" | "modeller";
 }
 
-/** Body for creating a session — title plus (RFC-031) optional surface + model
+/** Body for creating a session — title plus (docs/for-developers/modules/ask/spec.md) optional surface + model
  *  binding. A modeller session with no model_id binds on its first generation. */
 export interface SessionCreateBody {
 	title?: string;
@@ -142,13 +147,13 @@ export interface SessionListResult {
 	total: number;
 }
 
-/** 202 — the ask is recorded and a thinking is running (RFC-055); the reply
- *  settles over the thinking's stream. `result` is always null now. */
+/** 202 — the ask is recorded and a run is running (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md); the reply
+ *  settles over the run's stream. `result` is always null now. */
 export interface SendMessageResult {
 	userMessage: SessionMessage;
 	assistantMessage: SessionMessage;
 	result: QueryResponse | null;
-	thinkingId: string | null;
+	runId: string | null;
 }
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -171,8 +176,8 @@ function toMessage(m: ApiMessage): SessionMessage {
 		sourceQuery: m.source_query ?? undefined,
 		clarificationOptions: m.clarification_options ?? undefined,
 		feedback: m.feedback ?? undefined,
-		thinkingId: m.thinking_id ?? undefined,
-		steps: m.steps ? m.steps.map(toThinkingStep) : undefined,
+		runId: m.run_id ?? undefined,
+		steps: m.steps ? m.steps.map(toRunNode) : undefined,
 	};
 }
 
@@ -187,6 +192,9 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		archived: s.archived,
 		surface: s.surface ?? undefined,
 		modelId: s.model_id ?? undefined,
+		agentId: s.agent_id ?? undefined,
+		agentName: s.agent_name ?? undefined,
+		agentStatus: s.agent_status ?? undefined,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
 		lastStatus: s.last_status ?? undefined,
@@ -278,31 +286,31 @@ export const sessionsApi = {
 			userMessage: toMessage(data.user_message),
 			assistantMessage: toMessage(data.assistant_message),
 			result: data.result,
-			thinkingId: data.thinking_id ?? null,
+			runId: data.run_id ?? null,
 		};
 	},
 
-	// 202 — a new thinking re-runs the reply's query in place; its result rides
-	// the thinking's stream.
+	// 202 — a new run re-runs the reply's query in place; its result rides
+	// the run's stream.
 	rerunMessage: async (
 		username: string,
 		graphSlug: string,
 		id: string,
 		messageId: string,
 		signal?: AbortSignal,
-	): Promise<{ message: SessionMessage; thinkingId: string | null }> => {
+	): Promise<{ message: SessionMessage; runId: string | null }> => {
 		const data = await request<ApiRerunResponse>(
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/run`,
 			{ method: "POST", signal },
 		);
 		return {
 			message: toMessage(data.message),
-			thinkingId: data.thinking_id ?? null,
+			runId: data.run_id ?? null,
 		};
 	},
 
 	// The conversation context (prior turns) the model was given for an assistant
-	// reply (RFC-036/040). Recomputed server-side; empty for a first turn.
+	// reply (docs/for-developers/modules/ask/spec.md · docs/for-developers/modules/ask/features/reasoning-trace.md). Recomputed server-side; empty for a first turn.
 	getMessageContext: async (
 		username: string,
 		graphSlug: string,
@@ -316,7 +324,7 @@ export const sessionsApi = {
 		),
 
 	// Log a client-driven canvas operation ("Load to canvas") as a session turn
-	// (RFC-046). Returns the recorded user+assistant pair (unused by the caller,
+	// (docs/for-developers/modules/explore/features/boards.md). Returns the recorded user+assistant pair (unused by the caller,
 	// which refetches the thread).
 	recordOperation: async (
 		username: string,
@@ -330,7 +338,7 @@ export const sessionsApi = {
 		);
 	},
 
-	// Record (or clear) a 👍/👎 vote on an assistant reply (RFC-038/039).
+	// Record (or clear) a 👍/👎 vote on an assistant reply (docs/for-developers/modules/ask/features/clarifying-questions.md · docs/for-developers/modules/workflows/features/promote-a-plan.md).
 	setFeedback: async (
 		username: string,
 		graphSlug: string,

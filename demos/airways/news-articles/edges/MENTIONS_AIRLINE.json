@@ -1,0 +1,522 @@
+[
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_001",
+    "from": "ART_001",
+    "to": "AIRLINE_01",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_002",
+    "from": "ART_002",
+    "to": "AIRLINE_01",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_003",
+    "from": "ART_003",
+    "to": "AIRLINE_01",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_004",
+    "from": "ART_004",
+    "to": "AIRLINE_02",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_005",
+    "from": "ART_005",
+    "to": "AIRLINE_02",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_006",
+    "from": "ART_006",
+    "to": "AIRLINE_02",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_007",
+    "from": "ART_007",
+    "to": "AIRLINE_03",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_008",
+    "from": "ART_008",
+    "to": "AIRLINE_03",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_009",
+    "from": "ART_009",
+    "to": "AIRLINE_03",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_010",
+    "from": "ART_010",
+    "to": "AIRLINE_04",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_011",
+    "from": "ART_011",
+    "to": "AIRLINE_05",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_012",
+    "from": "ART_012",
+    "to": "AIRLINE_05",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_013",
+    "from": "ART_013",
+    "to": "AIRLINE_06",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_014",
+    "from": "ART_014",
+    "to": "AIRLINE_06",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_015",
+    "from": "ART_015",
+    "to": "AIRLINE_07",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_016",
+    "from": "ART_016",
+    "to": "AIRLINE_07",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_017",
+    "from": "ART_017",
+    "to": "AIRLINE_08",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_018",
+    "from": "ART_018",
+    "to": "AIRLINE_08",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_019",
+    "from": "ART_019",
+    "to": "AIRLINE_09",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_020",
+    "from": "ART_020",
+    "to": "AIRLINE_10",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_021",
+    "from": "ART_021",
+    "to": "AIRLINE_11",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_022",
+    "from": "ART_022",
+    "to": "AIRLINE_11",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_023",
+    "from": "ART_023",
+    "to": "AIRLINE_12",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_024",
+    "from": "ART_024",
+    "to": "AIRLINE_13",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_025",
+    "from": "ART_025",
+    "to": "AIRLINE_13",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_026",
+    "from": "ART_026",
+    "to": "AIRLINE_14",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_027",
+    "from": "ART_027",
+    "to": "AIRLINE_15",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_028",
+    "from": "ART_028",
+    "to": "AIRLINE_16",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_029",
+    "from": "ART_029",
+    "to": "AIRLINE_17",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_030",
+    "from": "ART_030",
+    "to": "AIRLINE_18",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_031",
+    "from": "ART_031",
+    "to": "AIRLINE_19",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_032",
+    "from": "ART_032",
+    "to": "AIRLINE_20",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_033",
+    "from": "ART_033",
+    "to": "AIRLINE_21",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_034",
+    "from": "ART_034",
+    "to": "AIRLINE_22",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_035",
+    "from": "ART_035",
+    "to": "AIRLINE_23",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_036",
+    "from": "ART_036",
+    "to": "AIRLINE_24",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_037",
+    "from": "ART_037",
+    "to": "AIRLINE_25",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_038",
+    "from": "ART_038",
+    "to": "AIRLINE_26",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_039",
+    "from": "ART_039",
+    "to": "AIRLINE_01",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_040",
+    "from": "ART_040",
+    "to": "AIRLINE_02",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_041",
+    "from": "ART_041",
+    "to": "AIRLINE_03",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_042",
+    "from": "ART_042",
+    "to": "AIRLINE_13",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_043",
+    "from": "ART_043",
+    "to": "AIRLINE_07",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_044",
+    "from": "ART_044",
+    "to": "AIRLINE_09",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_045",
+    "from": "ART_045",
+    "to": "AIRLINE_08",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_046",
+    "from": "ART_046",
+    "to": "AIRLINE_15",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_047",
+    "from": "ART_047",
+    "to": "AIRLINE_17",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_048",
+    "from": "ART_048",
+    "to": "AIRLINE_22",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_049",
+    "from": "ART_049",
+    "to": "AIRLINE_05",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_050",
+    "from": "ART_050",
+    "to": "AIRLINE_06",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_051",
+    "from": "ART_051",
+    "to": "AIRLINE_24",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_052",
+    "from": "ART_052",
+    "to": "AIRLINE_25",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_053",
+    "from": "ART_053",
+    "to": "AIRLINE_20",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_054",
+    "from": "ART_054",
+    "to": "AIRLINE_21",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_055",
+    "from": "ART_055",
+    "to": "AIRLINE_02",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_056",
+    "from": "ART_056",
+    "to": "AIRLINE_14",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_057",
+    "from": "ART_057",
+    "to": "AIRLINE_19",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_058",
+    "from": "ART_058",
+    "to": "AIRLINE_16",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_059",
+    "from": "ART_059",
+    "to": "AIRLINE_23",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_060",
+    "from": "ART_060",
+    "to": "AIRLINE_26",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_061",
+    "from": "ART_061",
+    "to": "AIRLINE_04",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_062",
+    "from": "ART_062",
+    "to": "AIRLINE_10",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_063",
+    "from": "ART_063",
+    "to": "AIRLINE_11",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_064",
+    "from": "ART_064",
+    "to": "AIRLINE_18",
+    "properties": {
+      "prominence": "primary"
+    }
+  },
+  {
+    "id": "E_MENTIONS_AIRLINE_ART_065",
+    "from": "ART_065",
+    "to": "AIRLINE_12",
+    "properties": {
+      "prominence": "primary"
+    }
+  }
+]

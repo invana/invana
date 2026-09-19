@@ -1,5 +1,5 @@
-import type { GraphVersionResponse } from "../../types/schemas";
-import { request } from "./client";
+import { request } from "@/services/api/client";
+import type { GraphVersionResponse } from "@/types/schemas";
 
 export const schemasApi = {
 	getActiveVersion: (username: string, graphSlug: string) =>

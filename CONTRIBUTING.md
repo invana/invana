@@ -115,9 +115,9 @@ uv run --directory engine invana init --non-interactive \
 
 The command is **idempotent** — if any user with `is_superuser=true` already exists, it exits without making changes. To re-bootstrap, wipe the `users` table (or the whole DB) first.
 
-> **Email is optional.** The `users.email` column is nullable, so accounts can be provisioned without one (`invana users create` and the API likewise). Login accepts **username _or_ email** (RFC-034), so an email-less account signs in by username; an account with an email can use either.
+> **Email is optional.** The `users.email` column is nullable, so accounts can be provisioned without one (`invana users create` and the API likewise). Login accepts **username _or_ email** (docs/for-developers/modules/identity-and-access/features/accounts.md), so an email-less account signs in by username; an account with an email can use either.
 
-From there: log into Studio (`http://localhost:8300/login`), open the user menu → **Invitations**, and issue invite URLs for additional users. Per `docs/system-design.md §4.1`, the CLI does **not** register additional users; everyone after the root is invite-gated.
+From there, additional accounts come from an operator with shell access (`invana users`) or from Studio: log into `http://localhost:8300/login`, open the user menu → **Invitations**, and issue invite URLs. See `docs/system-design.md §4.1` for the bootstrap flow.
 
 ### Required environment variables
 
@@ -131,7 +131,7 @@ python -c 'import secrets; print(secrets.token_urlsafe(48))'
 python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
 ```
 
-`.env.example` (repo root) is the single template for every optional env var in the project, engine and studio included — copy it to `.env` and docker-compose.yml picks these two up automatically for the `engine` container. Running the engine directly on your host instead (`make dev`)? Put them in `engine/.env` instead — pydantic-settings loads that file relative to the engine process's own working directory, not the repo root. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/internal/mvp/layer-1-identity-access.md`](docs/internal/mvp/layer-1-identity-access.md).
+`.env.example` (repo root) is the single template for every optional env var in the project, engine and studio included — copy it to `.env` and docker-compose.yml picks these two up automatically for the `engine` container. Running the engine directly on your host instead (`make dev`)? Put them in `engine/.env` instead — pydantic-settings loads that file relative to the engine process's own working directory, not the repo root. All other auth knobs (TTLs, bcrypt rounds, min password length, JWT algorithm) live under `INVANA_AUTH_*` and have sensible defaults — see `engine/src/invana/settings.py`. The full design is in [`docs/for-developers/modules/identity-and-access/spec.md`](docs/for-developers/modules/identity-and-access/spec.md).
 
 ### Default ports (local dev)
 
@@ -148,7 +148,7 @@ Studio's API base URL defaults to `http://localhost:8200`; override with `VITE_A
 To populate the local Neo4j with the bundled **air-routes** dataset, run the loader from the `engine/` directory against the `neo4j` service started by `docker-compose.yml`:
 
 ```bash
-uv run --directory engine invana loader ../datasets/air-routes \
+uv run --directory engine invana loader ../demos/airways/air-routes \
     --uri bolt://localhost:7687 \
     --connector invana.graph.connectors.OpenCypherConnector \
     --username neo4j \
@@ -205,6 +205,26 @@ make studio-test                # Run tests
 make studio-lint                # Lint (biome check)
 make studio-format              # Format (biome format)
 ```
+
+### Working against a local design-kit
+
+Studio's UI comes from the published `@invana/*` packages, and that is the default for everyone —
+you do not need a design-kit checkout to run Studio. To try a kit change before it is released,
+point Studio at your checkout for that run:
+
+```bash
+cd studio
+INVANA_DESIGN_KIT=../../design-kit pnpm dev     # or pnpm build
+```
+
+The path is resolved relative to `studio/`, so it works the same on macOS, Linux and Windows.
+`@invana/styling` resolves to its source; the rest resolve to their local `dist`, so run
+`pnpm build` in design-kit after editing them. Unset the variable and everything comes from npm
+again.
+
+Nothing about this is committed: a local link never enters `package.json`
+(`docs/for-developers/modules/platform/features/design-system.md` DS3/DS10). A kit change reaches
+`main` by being released and the dependency bumped — not by pointing Studio at a checkout.
 
 ### Docs
 

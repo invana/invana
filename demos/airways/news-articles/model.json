@@ -1,0 +1,113 @@
+{
+  "nodes": {
+    "Article": {
+      "identity": [
+        "article_id"
+      ]
+    },
+    "Publisher": {
+      "identity": [
+        "domain"
+      ]
+    },
+    "Airline": {
+      "identity": [
+        "iata"
+      ]
+    },
+    "City": {
+      "identity": [
+        "code"
+      ]
+    },
+    "Country": {
+      "identity": [
+        "iso_code"
+      ]
+    },
+    "Route": {
+      "identity": [
+        "route_id"
+      ]
+    },
+    "Topic": {
+      "identity": [
+        "tag"
+      ]
+    }
+  },
+  "edges": {
+    "PUBLISHED_BY": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "Publisher"
+      ]
+    },
+    "MENTIONS_AIRLINE": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "Airline"
+      ]
+    },
+    "MENTIONS_CITY": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "City"
+      ]
+    },
+    "MENTIONS_COUNTRY": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "Country"
+      ]
+    },
+    "REPORTS_ON": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "Route"
+      ]
+    },
+    "TAGGED": {
+      "from": [
+        "Article"
+      ],
+      "to": [
+        "Topic"
+      ]
+    },
+    "OPERATED_BY": {
+      "from": [
+        "Route"
+      ],
+      "to": [
+        "Airline"
+      ]
+    },
+    "BASED_IN": {
+      "from": [
+        "Airline"
+      ],
+      "to": [
+        "Country"
+      ]
+    },
+    "LOCATED_IN": {
+      "from": [
+        "City"
+      ],
+      "to": [
+        "Country"
+      ]
+    }
+  }
+}

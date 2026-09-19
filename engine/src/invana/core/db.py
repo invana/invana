@@ -1,0 +1,81 @@
+"""Shared database engine and session factories.
+
+Single place for creating async and sync SQLAlchemy engines so that
+the modeller, server, admin panel, and tests all share the same
+configuration.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from alembic import command
+from alembic.config import Config
+from fastapi import Request
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from invana.core.settings import settings
+
+_ALEMBIC_INI = str(Path(__file__).resolve().parents[3] / "alembic.ini")
+
+
+def run_migrations(url: str = settings.database_url) -> None:
+    """Run Alembic migrations to head."""
+    cfg = Config(_ALEMBIC_INI)
+    cfg.set_main_option("sqlalchemy.url", url)
+    command.upgrade(cfg, "head")
+
+
+async def create_db_engine(url: str = settings.database_url):
+    """Create an async engine. Run `invana migrate` before starting the server."""
+    return create_async_engine(
+        url,
+        echo=settings.database_echo,
+        pool_size=settings.database_pool_size,
+        max_overflow=settings.database_max_overflow,
+    )
+
+
+def create_sync_engine(url: str | None = None):
+    """Create a synchronous engine (used by starlette-admin).
+
+    Derives the sync URL from the async URL by stripping ``+asyncpg``.
+    """
+    async_url = url or settings.database_url
+    sync_url = async_url.replace("+asyncpg", "")
+    return create_engine(
+        sync_url,
+        echo=settings.database_echo,
+        pool_size=settings.database_pool_size,
+        max_overflow=settings.database_max_overflow,
+    )
+
+
+def create_session_factory(engine) -> async_sessionmaker[AsyncSession]:
+    """Return an async session factory bound to *engine*."""
+    return async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+async def get_session(request: Request):
+    """Yield one ``AsyncSession``, and **own the transaction boundary**.
+
+    The request is the unit of work: commit when the handler returns cleanly,
+    roll back when it raises. Views, CLI commands and managers therefore contain
+    no ``session.commit()`` at all — which is what lets a manager call another
+    manager without either of them nesting or double-committing
+    (migration-plan §18.1).
+
+    A handler that has already committed is unaffected: the second commit finds
+    nothing pending and is a no-op. ``expire_on_commit=False`` on the factory
+    means objects serialised before the commit stay readable after it.
+    """
+    session_factory = request.app.state.db_session_factory
+    async with session_factory() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+        else:
+            await session.commit()

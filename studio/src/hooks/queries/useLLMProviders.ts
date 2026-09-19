@@ -1,6 +1,6 @@
+import { llmProvidersApi } from "@/services/api/llm";
+import type { LLMProviderCreate, LLMProviderUpdate } from "@/types/llm";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { llmProvidersApi } from "../../services/api/llm";
-import type { LLMProviderCreate, LLMProviderUpdate } from "../../types/llm";
 
 const key = (username: string, graphSlug: string) =>
 	["llm-providers", username, graphSlug] as const;

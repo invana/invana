@@ -1,4 +1,4 @@
-"""Canonical, version-aware capability model (RFC-022).
+"""Canonical, version-aware capability model (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
 Capability is **data**, not branching code. Each connector class declares one
 :class:`CapabilityProfile` carrying two axes — supported property types and feature

@@ -1,0 +1,17 @@
+---
+"studio": minor
+---
+
+The work surfaces now match the hi-fi: one panel skeleton, and a canvas on every view.
+
+**Every work panel is the same four bands.** Projects · Tasks · Agents · Workflows · Skills were each growing their own footer, and they had drifted in height, weight and order. They now share one set of components — a filter band of `status ▾` / `assignee ▾` chips with the count on the right, the list, the selected-element detail, an action bar (one primary, then outlines, then `Archive` / `Retire…` pushed right), and a 28px status line that says where you are, what is running, and the shortcut. A work row is its own thing rather than the Explorer's session row: it answers *what is it, who has it, what is it waiting on* in one line, the status badge holds its column instead of hiding on hover, and the dot pulses **only** while something is genuinely running — a static amber dot means stuck and waiting on you, and one glyph for both hid the difference that decides who acts next.
+
+**Selecting a row opens its canvas.** The main area is always a canvas, so picking a project draws its plan, an agent its lineage, a workflow its DAG. Before this, four of the six canvas kinds were reachable only through a button most people never pressed, and the app read as a list viewer with a graph bolted on. A selection only ever *opens* a canvas — closing stays the tab's X — and Skills is deliberately exempt, because a skill hangs over the work rather than having a shape of its own. With nothing selected the main area says which row to pick, in the open panel's words.
+
+**Projects** gains the Agents and Activity tabs, the project's description above them, per-task agent chips and progress sublines, and the `Staffed` row. **Tasks** gains the `<agent> for <person>` attribution line, `Accepts when`, and a **Thoughts** tab that folds each run to `✻ Thought for 6.2s · 9 of 9 steps` — rendered through the session thread's own step list, so a step row means one thing in Studio rather than two.
+
+**An agent gets its own surface, and it is the one work panel that edits.** Behind **Open**: brief, LLM and skill bindings, budget, policy flags, and the envelope's allow-list drawn against every step the interpreter knows — because what an agent may *not* do is as much of the answer as what it may. Nothing autosaves: an envelope is a permission boundary, and one that moves while you are looking at it is one nobody can reason about, so edits buffer, the status bar reads `unsaved changes`, and one Save writes them. Spawned helpers now nest under the agent that spawned them, and the roster counts the ephemeral rows it is hiding rather than silently omitting them.
+
+**Skills becomes a work panel.** A skill used to live only in Settings, as a form — which could show what a skill *says* and nothing about what it *did*. Its page now answers the question people actually bring to one: `offered 41× · reported 29×`, then the steps behind those numbers, with the legend spelled out — *offered* is a fact about the prompt, *reported* is the model's own claim. Nothing says **used**, because there is no way to verify that a model followed prose.
+
+The canvas legends and footers now read as the mock does — `PLAN · 6 tasks · 7 dependencies · 4 waves`, `ENVELOPE · 13 steps · 4 templates`, `TRACE · 11 nodes · 9 edges` — and the lineage legend states what a click does on each of its three node kinds instead of leaving a user to find out by being navigated somewhere unexpected.

@@ -1,0 +1,230 @@
+[
+  {
+    "id": "E_REPORTS_ON_ART_001",
+    "from": "ART_001",
+    "to": "ROUTE_001",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_002",
+    "from": "ART_002",
+    "to": "ROUTE_002",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_003",
+    "from": "ART_003",
+    "to": "ROUTE_003",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_004",
+    "from": "ART_004",
+    "to": "ROUTE_004",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_005",
+    "from": "ART_005",
+    "to": "ROUTE_005",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_006",
+    "from": "ART_006",
+    "to": "ROUTE_006",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_007",
+    "from": "ART_007",
+    "to": "ROUTE_007",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_008",
+    "from": "ART_008",
+    "to": "ROUTE_008",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_009",
+    "from": "ART_009",
+    "to": "ROUTE_009",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_010",
+    "from": "ART_010",
+    "to": "ROUTE_010",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_011",
+    "from": "ART_011",
+    "to": "ROUTE_011",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_012",
+    "from": "ART_012",
+    "to": "ROUTE_012",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_013",
+    "from": "ART_013",
+    "to": "ROUTE_013",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_014",
+    "from": "ART_014",
+    "to": "ROUTE_014",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_015",
+    "from": "ART_015",
+    "to": "ROUTE_015",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_016",
+    "from": "ART_016",
+    "to": "ROUTE_016",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_017",
+    "from": "ART_017",
+    "to": "ROUTE_017",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_018",
+    "from": "ART_018",
+    "to": "ROUTE_018",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_019",
+    "from": "ART_019",
+    "to": "ROUTE_019",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_020",
+    "from": "ART_020",
+    "to": "ROUTE_020",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_021",
+    "from": "ART_021",
+    "to": "ROUTE_021",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_022",
+    "from": "ART_022",
+    "to": "ROUTE_022",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_023",
+    "from": "ART_023",
+    "to": "ROUTE_023",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_024",
+    "from": "ART_024",
+    "to": "ROUTE_024",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_025",
+    "from": "ART_025",
+    "to": "ROUTE_025",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_026",
+    "from": "ART_026",
+    "to": "ROUTE_026",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_027",
+    "from": "ART_027",
+    "to": "ROUTE_027",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_028",
+    "from": "ART_028",
+    "to": "ROUTE_028",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_029",
+    "from": "ART_029",
+    "to": "ROUTE_029",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_030",
+    "from": "ART_030",
+    "to": "ROUTE_030",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_031",
+    "from": "ART_031",
+    "to": "ROUTE_031",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_032",
+    "from": "ART_032",
+    "to": "ROUTE_032",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_033",
+    "from": "ART_033",
+    "to": "ROUTE_033",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_034",
+    "from": "ART_034",
+    "to": "ROUTE_034",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_035",
+    "from": "ART_035",
+    "to": "ROUTE_035",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_036",
+    "from": "ART_036",
+    "to": "ROUTE_036",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_037",
+    "from": "ART_037",
+    "to": "ROUTE_037",
+    "properties": {}
+  },
+  {
+    "id": "E_REPORTS_ON_ART_038",
+    "from": "ART_038",
+    "to": "ROUTE_038",
+    "properties": {}
+  }
+]

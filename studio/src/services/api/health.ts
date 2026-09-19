@@ -1,4 +1,4 @@
-import { request } from "./client";
+import { request } from "@/services/api/client";
 
 export interface HealthResponse {
 	status: "healthy" | "unhealthy";

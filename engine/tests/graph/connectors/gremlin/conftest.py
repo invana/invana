@@ -13,6 +13,8 @@ Override with environment variables:
 from __future__ import annotations
 
 import os
+import socket
+from urllib.parse import urlparse
 
 import pytest
 
@@ -24,9 +26,28 @@ GREMLIN_PASSWORD = os.environ.get("GREMLIN_PASSWORD", "testpassword")
 GREMLIN_TEST_DB = os.environ.get("GREMLIN_TEST_DB", "arcadedb")
 
 
+def _gremlin_up() -> bool:
+    """Is a Gremlin server listening? Mirrors the Ollama gate in tests/llm.
+
+    Without it the whole suite errors on a checkout that has not started
+    ArcadeDB, and a real regression is indistinguishable from a missing
+    container.
+    """
+    parsed = urlparse(GREMLIN_URI)
+    if parsed.hostname is None:
+        return False
+    try:
+        with socket.create_connection((parsed.hostname, parsed.port or 8182), timeout=2):
+            return True
+    except OSError:
+        return False
+
+
 @pytest.fixture
 async def connector():
     """Provide a connected Gremlin connector and clean up after each test."""
+    if not _gremlin_up():
+        pytest.skip(f"no Gremlin server at {GREMLIN_URI} (docker compose --profile arcadedb up -d)")
     conn = GremlinConnector(
         GREMLIN_URI,
         username=GREMLIN_USERNAME,

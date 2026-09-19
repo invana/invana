@@ -72,7 +72,7 @@ After modifying SQLAlchemy models in `engine/src/invana/modeller/models.py`, gen
 make engine-migration msg="add new column to graph_schemas"
 ```
 
-This auto-generates a migration file in `engine/src/invana/modeller/migrations/versions/`. Review the generated file before committing.
+This auto-generates a migration file in `engine/src/invana/core/migrations/versions/`. Review the generated file before committing.
 
 ### Checking Migration Status
 

@@ -1,7 +1,7 @@
-// Node-expand / graph-traversal types (RFC-035) — mirrors the engine's
+// Node-expand / graph-traversal types (docs/for-developers/modules/explore/features/graph-canvas.md) — mirrors the engine's
 // FilterGroup / SortSpec DSL and the explorer expand request/response schemas.
 
-import type { GraphData } from "./query";
+import type { GraphData } from "@/types/query";
 
 export type FilterOp =
 	| "eq"
@@ -46,7 +46,7 @@ export interface ExpandBase {
 	sort?: SortSpec[];
 	limit?: number;
 	offset?: number;
-	/** The session this expand belongs to (RFC-046) — when set, the engine logs
+	/** The session this expand belongs to (docs/for-developers/modules/explore/features/boards.md) — when set, the engine logs
 	 *  the expand as a turn in that session's thread. */
 	session_id?: string;
 }
@@ -82,4 +82,19 @@ export function expandKey(req: ExpandRequest): string {
 	const edge = req.kind === "by-edge-type" ? req.body.edge_label : "";
 	const node = req.kind === "by-node-type" ? req.body.neighbor_label : "";
 	return `${b.vertex_id}:${b.direction ?? "both"}:${edge}:${node}`;
+}
+
+/** One type and how many of it the graph holds; `count` is null when the
+ *  vendor cannot count (selection-and-the-panel.md SP8). */
+export interface TypeCount {
+	name: string;
+	count: number | null;
+}
+
+/** Every node and edge type in the graph, biggest first. */
+export interface TypeCountsResponse {
+	nodes: TypeCount[];
+	edges: TypeCount[];
+	/** False when the vendor could not count; every `count` is then null. */
+	counted: boolean;
 }

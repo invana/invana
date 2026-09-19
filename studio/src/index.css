@@ -1,5 +1,19 @@
 /* All @import statements must come before other at-rules */
 @import "tailwindcss";
+/* The kit's `@theme` block, compiled as SOURCE — this is what carries the type
+   ladder into Studio (design-system.md DS13). `@invana/ui/styles.css` below is
+   PRECOMPILED: it ships plain `:root{--text-…}` custom properties and no
+   `@theme`, and since no kit component writes `text-sm` any more, Tailwind emits
+   no `.text-sm` rule into it either. Only this import puts the ladder in Studio's
+   own build, where `text-sm` and `text-xs` resolve to the kit's two content steps
+   (1rem / 0.923rem) and `text-meta` exists at all.
+   It goes FIRST so everything below keeps the last word: the `@theme` tokens land
+   in Tailwind's theme layer either way, while the unlayered `[data-theme]` blocks
+   in the theme files still override its `:root` colour defaults.
+   New code names no size when it means body text, and `text-meta` when it means
+   subordinate. `sm`/`xs` are aliases so existing call sites are correct, not so
+   new code has options. */
+@import "@invana/styling";
 @import "@invana/ui/styles.css";
 @import "@invana/themes/styles.css";
 @import "@invana/styling/themes/default.css";
@@ -10,6 +24,17 @@
    The active theme's `[data-theme]` block always wins over the base defaults. */
 @import "@invana/styling/themes/presets-base.css";
 @import "@invana/styling/themes/presets.css";
+/* The categorical data palette (`--color-data-1…8`) — one scale for node/edge
+   type dots, chart series and legends, light and dark each selected
+   (design-kit-coverage.md D2).
+   TODO(data-palette): uncomment on the @invana/styling 0.0.21 bump. The file
+   exists in design-kit but not in the published 0.0.20, and importing an export
+   npm does not have fails the build for everyone (DS3). Until then
+   `typeColor.ts` resolves the slots to `--color-muted-foreground`, so the dots
+   are neutral rather than absent — and to see the real palette now, run against
+   a local checkout (`INVANA_DESIGN_KIT=../../design-kit pnpm dev`, DS10) with
+   this line uncommented. */
+/* @import "@invana/styling/themes/data-palette.css"; */
 
 /* @invana/forms ships no precompiled CSS (unlike @invana/ui), so its
    components' utility classes only live in its dist JS. Tailwind 4 skips
@@ -17,58 +42,31 @@
    classes (e.g. data-[state=checked]:translate-x-5) are never generated and
    the controls render visually frozen. Scan the package explicitly. */
 @source "../node_modules/@invana/forms/dist";
+/* Same for @invana/dashboard (the panel bands) and @invana/editor (the
+   code block its `code` panel renders through) — dist JS only, no CSS. */
+@source "../node_modules/@invana/dashboard/dist";
+@source "../node_modules/@invana/editor/dist";
 
-/* Register the design-kit color tokens in Tailwind's theme namespace so color
-   utilities (bg-primary, bg-input, border-border, …) actually generate.
-   @invana/styling defines these as plain --color-* CSS vars inside [data-theme]
-   selectors, which Tailwind 4 does NOT treat as theme colors — so without this
-   block none of those utilities exist. @invana/ui ships its own precompiled CSS
-   so it was unaffected, but @invana/forms relies on the host app's Tailwind and
-   rendered its controls unstyled (e.g. the Switch track never colored).
-   `inline` keeps these mapped to the runtime vars (so [data-theme] theming still
-   wins) without emitting competing :root defaults. */
-@theme inline {
-	--color-border: var(--color-border);
-	--color-input: var(--color-input);
-	--color-ring: var(--color-ring);
-	--color-background: var(--color-background);
-	--color-foreground: var(--color-foreground);
-	--color-primary: var(--color-primary);
-	--color-primary-foreground: var(--color-primary-foreground);
-	--color-secondary: var(--color-secondary);
-	--color-secondary-foreground: var(--color-secondary-foreground);
-	--color-destructive: var(--color-destructive);
-	--color-destructive-foreground: var(--color-destructive-foreground);
-	--color-muted: var(--color-muted);
-	--color-muted-foreground: var(--color-muted-foreground);
-	--color-accent: var(--color-accent);
-	--color-accent-foreground: var(--color-accent-foreground);
-	--color-popover: var(--color-popover);
-	--color-popover-foreground: var(--color-popover-foreground);
-	--color-card: var(--color-card);
-	--color-card-foreground: var(--color-card-foreground);
-	/* Status tokens — the same vocabulary the design-kit ChatSession rows use
-	   (success / warning / info dots), so Studio markup can colour with them
-	   too (e.g. the active 👍 vote, the list row's status dot). RFC-054. */
-	--color-success: var(--color-success);
-	--color-success-foreground: var(--color-success-foreground);
-	--color-warning: var(--color-warning);
-	--color-warning-foreground: var(--color-warning-foreground);
-	--color-info: var(--color-info);
-	--color-info-foreground: var(--color-info-foreground);
-}
+/* No `@theme inline` colour block here any more. It existed because Studio
+   imported only the theme files, whose `--color-*` live inside `[data-theme]`
+   selectors — which Tailwind 4 does not read as theme colours, so `bg-primary`,
+   `border-border` and the rest generated nothing and `@invana/forms` rendered
+   unstyled. `@import "@invana/styling"` above now brings the kit's own `@theme`
+   block into this build, which registers every one of those tokens. Verified: the
+   two builds differ by 617 bytes of duplication and not one effective rule.
+   The `[data-theme]` blocks still win at runtime — they are unlayered, and
+   `@theme` output sits in Tailwind's theme layer. */
 
-@theme {
-	/* VS Code web font scale. text-base (13px) is the default UI size.
-     text-xs / text-sm are defined but NOT for general use — reserve for
-     special cases like badges or status-bar elements only. */
-	--text-xs: 0.6875rem; /* 11px — reserved (do not use yet) */
-	--text-sm: 0.75rem; /* 12px — reserved (do not use yet) */
-	--text-base: 0.8125rem; /* 13px — DEFAULT UI: sidebar, tabs, menus, tree */
-	--text-lg: 0.875rem; /* 14px — editor content */
-	--text-xl: 1rem; /* 16px — section headings */
-	--text-2xl: 1.25rem; /* 20px — large titles */
-}
+/* Studio declares NO type ladder. The kit's is the ladder (D7 · DS13): two
+   content sizes as ratios of the root — `text-base` 1rem, `text-meta` 0.923rem —
+   with `lg` and up left on Tailwind's heading defaults.
+
+   What was here was a six-rung absolute scale ("VS Code web font scale"),
+   authored against a 16px root and never re-checked after `html` went to 13px.
+   Every comment in it was off by 13/16: `--text-base: 0.8125rem` is labelled
+   13px and rendered 10.6px, `--text-sm` 12px and rendered 9.8px. It also
+   overrode the kit's tokens, so importing `@invana/styling` above changed
+   nothing while it stood. */
 
 /* Accent = subtle hover/highlight token (hover:bg-accent, ghost buttons,
    menu/command selection). The design-kit default theme sets --accent equal
@@ -93,7 +91,7 @@
    tell which mode is active. Give the active mode a solid primary fill instead.
    Scoped under `.theme-picker` (passed to our ThemeSelector) + the fixed mode
    aria-labels, so the theme cards and the canvas-toolbar toggle groups are
-   untouched. (RFC-044) */
+   untouched. (docs/for-developers/modules/platform/features/theming.md) */
 .theme-picker [data-state="on"][aria-label="Light"],
 .theme-picker [data-state="on"][aria-label="Dark"],
 .theme-picker [data-state="on"][aria-label="System"] {
@@ -102,8 +100,8 @@
 	color: var(--color-primary-foreground);
 }
 
+/* No `font-size` here: body inherits the root, which is the only dial (D7). */
 body {
-	font-size: var(--text-base);
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu",
 		"Droid Sans", sans-serif;
 }

@@ -1,18 +1,18 @@
 /**
- * Header theme picker (RFC-044). A compact icon button that opens a popover with
+ * Header theme picker (docs/for-developers/modules/platform/features/theming.md). A compact icon button that opens a popover with
  * the full `<ThemeSelector>` — theme cards, light/dark/system mode, and accent
  * swatches. It drives the app `<ThemeProvider>`, and the app-level
  * `<ThemeSyncBridge>` persists any change to the user's profile.
  *
- * Replaces the old bare light/dark `ThemeToggle` in the app header. The login
- * page keeps `ThemeToggle` (pre-auth, nothing to sync).
+ * Replaces the old bare light/dark `ModeToggle` in the app header. The login
+ * page keeps `ModeToggle` (pre-auth, nothing to sync).
  */
 
+import { SaturationControl } from "@/components/SaturationControl";
+import { STUDIO_THEMES } from "@/components/studioThemes";
 import { ThemeSelector } from "@invana/themes";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@invana/ui";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
-import { SaturationControl } from "./SaturationControl";
-import { STUDIO_THEMES } from "./studioThemes";
 
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 

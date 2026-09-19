@@ -1,5 +1,5 @@
 /**
- * SSE subscription to the audit-event live tail (RFC-018 § Live tail).
+ * SSE subscription to the audit-event live tail (docs/for-developers/modules/operate/features/audit-and-activity.md § Live tail).
  *
  * Opens a native `EventSource` against `/api/v1/u/.../events/stream` (per-graph)
  * or `/api/v1/events/stream` (global). On each `event: row` frame, invalidates
@@ -12,9 +12,9 @@
  * reads that as an Authorization fallback on SSE endpoints only.
  */
 
+import { useAuthStore } from "@/stores/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useAuth } from "./useAuth";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
 
@@ -42,7 +42,9 @@ type Props = GraphProps | GlobalProps;
  */
 export function useEventStream(props: Props): void {
 	const queryClient = useQueryClient();
-	const { accessToken } = useAuth();
+	// `useAuth` deliberately does not expose the raw token; the store is where
+	// it lives, and the EventSource URL needs it directly.
+	const accessToken = useAuthStore((s) => s.accessToken);
 	const enabled = props.enabled !== false;
 
 	// Pre-destructure the scope-dependent values so the dep array doesn't

@@ -1,5 +1,5 @@
 /**
- * Audit events API client (RFC-018).
+ * Audit events API client (docs/for-developers/modules/operate/features/audit-and-activity.md).
  *
  * Two endpoint families:
  * - `/api/v1/events` — global, superuser only.
@@ -10,8 +10,8 @@
  * paginated reads.
  */
 
-import type { EventListFilters, EventListResponse } from "../../types/events";
-import { apiClient } from "./client";
+import { apiClient } from "@/services/api/client";
+import type { EventListFilters, EventListResponse } from "@/types/events";
 
 function buildParams(filters: EventListFilters | undefined): URLSearchParams {
 	const params = new URLSearchParams();

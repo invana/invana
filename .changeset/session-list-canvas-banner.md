@@ -2,7 +2,7 @@
 "studio": minor
 ---
 
-Show the canvas banner preview in the Sessions list (RFC-045).
+Show the canvas banner preview in the Sessions list (docs/for-developers/modules/explore/features/graph-canvas.md).
 
 Each session row now renders its 1:1 canvas's banner screenshot above the title
 when one has been captured. The image is pulled lazily per row (the list summary

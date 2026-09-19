@@ -1,5 +1,5 @@
-/** Shared auth + graph membership types. Must mirror engine schemas (RFC-017).
- *  Membership is binary (RFC-023) — there is no per-graph role. */
+/** Shared auth + graph membership types. Must mirror engine schemas (docs/for-developers/modules/identity-and-access/spec.md).
+ *  Membership is binary (docs/for-developers/modules/identity-and-access/features/membership.md) — there is no per-graph role. */
 
 export interface GraphMembership {
 	graph_id: string;
@@ -8,7 +8,7 @@ export interface GraphMembership {
 	owner_username: string;
 }
 
-/** The studio theme selection persisted under `preferences.theme` (RFC-044).
+/** The studio theme selection persisted under `preferences.theme` (docs/for-developers/modules/platform/features/theming.md).
  *  Mirrors `@invana/themes` ThemeSelection; `accent === null` → the theme's own
  *  signature accent. */
 export interface ThemeSelection {
@@ -45,4 +45,32 @@ export interface AuthResponse {
 export interface UsernameAvailabilityResponse {
 	available: boolean;
 	reason?: "taken" | "reserved" | "invalid_format";
+}
+
+/** A personal access token as the list shows it
+ *  (docs/for-developers/modules/identity-and-access/features/personal-access-tokens.md).
+ *  The secret is not here — it exists once, in the create response (PT2). */
+export interface PersonalAccessToken {
+	id: string;
+	name: string;
+	/** Display tail only — rendered as `invana_pat_…abcd`. */
+	last_four: string;
+	created_at: string;
+	last_used_at: string | null;
+	expires_at: string | null;
+	expired: boolean;
+}
+
+/** The list, plus what this deployment allows — the picker and the ceiling are
+ *  rendered from configuration rather than restated here (C10). */
+export interface PersonalAccessTokenList {
+	tokens: PersonalAccessToken[];
+	expiry_day_choices: number[];
+	max_tokens: number;
+}
+
+/** The one response that carries the secret. */
+export interface PersonalAccessTokenCreated {
+	token: PersonalAccessToken;
+	secret: string;
 }

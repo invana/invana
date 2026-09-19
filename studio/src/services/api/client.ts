@@ -7,6 +7,7 @@
  * bounces the user to /login on next render.
  */
 
+import { startClientSpan } from "@/services/telemetry/tracer";
 import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
@@ -15,7 +16,6 @@ import axios, {
 	type InternalAxiosRequestConfig,
 } from "axios";
 import { toast } from "sonner";
-import { startClientSpan } from "../telemetry/tracer";
 
 /** Engine origin — shared with the SSE clients, which can't go through axios. */
 export const API_BASE_URL =
@@ -26,7 +26,7 @@ const BASE_URL = API_BASE_URL;
 type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
 
 /**
- * Standard mutation envelope (RFC-028): `{ message, data }`. The backend owns the
+ * Standard mutation envelope: `{ message, data }`. The backend owns the
  * toast copy; this client toasts `message` centrally and unwraps `data` for the
  * caller. Detected by a string `message` alongside a `data` key — bare resources
  * (GET responses) and other `message`-bearing bodies (e.g. session rerun, schema
@@ -47,7 +47,7 @@ function isActionEnvelope(body: unknown): body is ActionEnvelope {
 }
 
 // `suppressActionToast` raises this depth for the duration of a client-orchestrated
-// gesture (RFC-028 Decision #6) so its sub-requests' envelopes don't each fire a
+// gesture (docs/for-developers/modules/platform/spec.md PL8) so its sub-requests' envelopes don't each fire a
 // toast — the gesture shows its own single summary instead.
 let toastSuppressDepth = 0;
 
@@ -70,6 +70,15 @@ export class ApiError extends Error {
 	constructor(
 		public readonly status: number,
 		message: string,
+		/**
+		 * The engine's own `detail` body, unflattened.
+		 *
+		 * A refusal that names what it refused — `link_already_declared` carries
+		 * the rule the existing stitch holds — can only be *shown* if the shape
+		 * survives the trip. The string message is for a toast; this is for a
+		 * surface that has something better to draw than a toast.
+		 */
+		public readonly detail?: unknown,
 	) {
 		super(message);
 		this.name = "ApiError";
@@ -106,15 +115,15 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	return config;
 });
 
-// Telemetry (RFC-025 / RFC-026): trace the outgoing request and inject W3C
+// Telemetry (docs/for-developers/modules/platform/features/telemetry.md · docs/for-developers/modules/platform/features/telemetry.md): trace the outgoing request and inject W3C
 // trace-context so the engine's request span nests under it. We propagate
 // explicitly here rather than rely on auto-XHR instrumentation, whose ambient
 // context is lost crossing TanStack Query's async hops under Vite's native
-// async/await (RFC-025 D3).
+// async/await (docs/for-developers/modules/platform/features/telemetry.md).
 //
 // Two cases produce a span: (a) an Explorer run is in flight → nests under
 // `explorer.query.run`; (b) the request targets a session/message endpoint →
-// its own one-span distributed trace, even outside a run (RFC-026 D3). All
+// its own one-span distributed trace, even outside a run (docs/for-developers/modules/platform/features/telemetry.md). All
 // other API calls stay untraced.
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	const method = (config.method ?? "get").toUpperCase();
@@ -192,6 +201,14 @@ function formatErrorDetail(error: AxiosError): string {
 	const detail = (error.response?.data as { detail?: unknown } | undefined)
 		?.detail;
 	if (typeof detail === "string") return detail;
+	// A structured refusal — `{ error, ...facts }`. Its `message`, when it has
+	// one, is already written for a person; otherwise the error code is the
+	// most honest thing to say, and the surface renders the facts itself.
+	if (detail && !Array.isArray(detail) && typeof detail === "object") {
+		const body = detail as { message?: unknown; error?: unknown };
+		if (typeof body.message === "string") return body.message;
+		if (typeof body.error === "string") return body.error.replaceAll("_", " ");
+	}
 	if (Array.isArray(detail)) {
 		return detail
 			.map((d) => {
@@ -211,7 +228,7 @@ function formatErrorDetail(error: AxiosError): string {
 apiClient.interceptors.response.use(
 	(res) => {
 		endRequestSpan(res.config as TracedConfig, res.status);
-		// RFC-028: the backend owns the toast copy. Any mutation (non-GET) that
+		// docs/for-developers/modules/platform/spec.md § 5: the backend owns the toast copy. Any mutation (non-GET) that
 		// returns an `ActionResponse` envelope is toasted here, centrally, so call
 		// sites never hardcode a success string. Suppressed inside a multi-request
 		// gesture (see `suppressActionToast`).
@@ -231,9 +248,18 @@ apiClient.interceptors.response.use(
 			| undefined;
 		const status = error.response?.status;
 		endRequestSpan(config as TracedConfig | undefined, status);
-		const isAuthPath = config?.url?.includes("/api/v1/auth/");
+		// Only the token endpoints themselves must skip the refresh-retry —
+		// refreshing on their own 401 would loop. Every other `/auth/*` route is
+		// an ordinary authenticated request: `/auth/me` in particular has to be
+		// able to rotate an expired access token, since it is what proves a
+		// resumed session on the login page (useSessionResume).
+		const isTokenPath = [
+			"/api/v1/auth/login",
+			"/api/v1/auth/refresh",
+			"/api/v1/auth/logout",
+		].some((path) => config?.url?.includes(path));
 
-		if (status === 401 && config && !config._retried && !isAuthPath) {
+		if (status === 401 && config && !config._retried && !isTokenPath) {
 			const newToken = await attemptRefresh();
 			if (newToken) {
 				config._retried = true;
@@ -242,7 +268,11 @@ apiClient.interceptors.response.use(
 			}
 		}
 
-		throw new ApiError(status ?? 0, formatErrorDetail(error));
+		throw new ApiError(
+			status ?? 0,
+			formatErrorDetail(error),
+			(error.response?.data as { detail?: unknown } | undefined)?.detail,
+		);
 	},
 );
 
@@ -270,7 +300,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
 	};
 	const res = await apiClient.request(config);
 	if (res.status === 204) return undefined as T;
-	// RFC-028: unwrap the `{ message, data }` mutation envelope so callers receive
+	// Unwrap the `{ message, data }` mutation envelope so callers receive
 	// the resource (or `undefined` for a delete) exactly as before; the message was
 	// already toasted by the response interceptor.
 	if (isActionEnvelope(res.data)) return res.data.data as T;

@@ -1,0 +1,230 @@
+[
+  {
+    "id": "E_OPERATED_BY_ROUTE_001",
+    "from": "ROUTE_001",
+    "to": "AIRLINE_01",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_002",
+    "from": "ROUTE_002",
+    "to": "AIRLINE_01",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_003",
+    "from": "ROUTE_003",
+    "to": "AIRLINE_01",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_004",
+    "from": "ROUTE_004",
+    "to": "AIRLINE_02",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_005",
+    "from": "ROUTE_005",
+    "to": "AIRLINE_02",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_006",
+    "from": "ROUTE_006",
+    "to": "AIRLINE_02",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_007",
+    "from": "ROUTE_007",
+    "to": "AIRLINE_03",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_008",
+    "from": "ROUTE_008",
+    "to": "AIRLINE_03",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_009",
+    "from": "ROUTE_009",
+    "to": "AIRLINE_03",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_010",
+    "from": "ROUTE_010",
+    "to": "AIRLINE_04",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_011",
+    "from": "ROUTE_011",
+    "to": "AIRLINE_05",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_012",
+    "from": "ROUTE_012",
+    "to": "AIRLINE_05",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_013",
+    "from": "ROUTE_013",
+    "to": "AIRLINE_06",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_014",
+    "from": "ROUTE_014",
+    "to": "AIRLINE_06",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_015",
+    "from": "ROUTE_015",
+    "to": "AIRLINE_07",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_016",
+    "from": "ROUTE_016",
+    "to": "AIRLINE_07",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_017",
+    "from": "ROUTE_017",
+    "to": "AIRLINE_08",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_018",
+    "from": "ROUTE_018",
+    "to": "AIRLINE_08",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_019",
+    "from": "ROUTE_019",
+    "to": "AIRLINE_09",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_020",
+    "from": "ROUTE_020",
+    "to": "AIRLINE_10",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_021",
+    "from": "ROUTE_021",
+    "to": "AIRLINE_11",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_022",
+    "from": "ROUTE_022",
+    "to": "AIRLINE_11",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_023",
+    "from": "ROUTE_023",
+    "to": "AIRLINE_12",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_024",
+    "from": "ROUTE_024",
+    "to": "AIRLINE_13",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_025",
+    "from": "ROUTE_025",
+    "to": "AIRLINE_13",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_026",
+    "from": "ROUTE_026",
+    "to": "AIRLINE_14",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_027",
+    "from": "ROUTE_027",
+    "to": "AIRLINE_15",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_028",
+    "from": "ROUTE_028",
+    "to": "AIRLINE_16",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_029",
+    "from": "ROUTE_029",
+    "to": "AIRLINE_17",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_030",
+    "from": "ROUTE_030",
+    "to": "AIRLINE_18",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_031",
+    "from": "ROUTE_031",
+    "to": "AIRLINE_19",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_032",
+    "from": "ROUTE_032",
+    "to": "AIRLINE_20",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_033",
+    "from": "ROUTE_033",
+    "to": "AIRLINE_21",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_034",
+    "from": "ROUTE_034",
+    "to": "AIRLINE_22",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_035",
+    "from": "ROUTE_035",
+    "to": "AIRLINE_23",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_036",
+    "from": "ROUTE_036",
+    "to": "AIRLINE_24",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_037",
+    "from": "ROUTE_037",
+    "to": "AIRLINE_25",
+    "properties": {}
+  },
+  {
+    "id": "E_OPERATED_BY_ROUTE_038",
+    "from": "ROUTE_038",
+    "to": "AIRLINE_26",
+    "properties": {}
+  }
+]

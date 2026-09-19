@@ -1,0 +1,762 @@
+{
+  "format": "invana.model/1",
+  "package_id": "invana.dataset.news-articles",
+  "content_hash": "",
+  "name": "NewsArticles",
+  "description": "Aviation coverage — articles, the outlets that ran them, and the carriers, routes, cities and countries they name.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "NewsArticles",
+    "schema_description": "News about airways and routes, keyed so it stitches onto air-routes and onto social chatter.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "property_keys": [
+      {
+        "name": "article_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Stable id of the article at its publisher.",
+        "validation_rules": []
+      },
+      {
+        "name": "headline",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What the article is called.",
+        "validation_rules": []
+      },
+      {
+        "name": "url",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Where the article lives.",
+        "validation_rules": []
+      },
+      {
+        "name": "summary",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "One line of what it says.",
+        "validation_rules": []
+      },
+      {
+        "name": "published_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When it went out.",
+        "validation_rules": []
+      },
+      {
+        "name": "sentiment",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "How the piece reads about its subject.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "positive",
+                "neutral",
+                "negative"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "word_count",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Length of the body.",
+        "validation_rules": []
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "BCP-47 language tag.",
+        "validation_rules": []
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What to call it.",
+        "validation_rules": []
+      },
+      {
+        "name": "domain",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The publisher's own domain — the key a social account shares.",
+        "validation_rules": []
+      },
+      {
+        "name": "kind",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "What sort of outlet this is.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "wire",
+                "trade",
+                "national"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "iata",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter IATA airline designator.",
+        "validation_rules": []
+      },
+      {
+        "name": "icao",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Three-letter ICAO airline designator.",
+        "validation_rules": []
+      },
+      {
+        "name": "callsign",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Radio callsign.",
+        "validation_rules": []
+      },
+      {
+        "name": "alliance",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "Global alliance membership.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "Star Alliance",
+                "oneworld",
+                "SkyTeam",
+                "none"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "fleet_size",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Aircraft in service.",
+        "validation_rules": []
+      },
+      {
+        "name": "hub_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code of the airline's main hub — an air-routes airport code.",
+        "validation_rules": []
+      },
+      {
+        "name": "country_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter country code, as air-routes spells it.",
+        "validation_rules": []
+      },
+      {
+        "name": "code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code of the city's main airport.",
+        "validation_rules": []
+      },
+      {
+        "name": "iso_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter country code. air-routes calls the same fact `code` — the W1 case.",
+        "validation_rules": []
+      },
+      {
+        "name": "lat",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Latitude.",
+        "validation_rules": []
+      },
+      {
+        "name": "lon",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Longitude.",
+        "validation_rules": []
+      },
+      {
+        "name": "route_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Airline and endpoints, as one key.",
+        "validation_rules": []
+      },
+      {
+        "name": "origin_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code the route leaves from.",
+        "validation_rules": []
+      },
+      {
+        "name": "destination_code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code the route arrives at.",
+        "validation_rules": []
+      },
+      {
+        "name": "status",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "Where the route stands.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "launched",
+                "planned",
+                "suspended"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "starts_on",
+        "type": "date",
+        "value_cardinality": "SINGLE",
+        "description": "First day of service.",
+        "validation_rules": []
+      },
+      {
+        "name": "frequency_weekly",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Departures a week.",
+        "validation_rules": []
+      },
+      {
+        "name": "tag",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Topic slug — the key a hashtag shares, case aside.",
+        "validation_rules": []
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The topic, written out.",
+        "validation_rules": []
+      },
+      {
+        "name": "prominence",
+        "type": "enum",
+        "value_cardinality": "SINGLE",
+        "description": "How central the mention is to the piece.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "primary",
+                "secondary",
+                "passing"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "position",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Order of the tag on the article.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Article",
+        "description": "One published piece of aviation coverage.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "article_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "headline",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "url",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "summary",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "published_at",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "sentiment",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "word_count",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "language",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Publisher",
+        "description": "The outlet that ran it.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "domain",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_code",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "kind",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Airline",
+        "description": "A carrier the coverage is about.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "iata",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "icao",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "callsign",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_code",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "hub_code",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "alliance",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "fleet_size",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "City",
+        "description": "A city the coverage names.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_code",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "lat",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "lon",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Country",
+        "description": "A country the coverage names.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "iso_code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Route",
+        "description": "A city pair a carrier flies, or says it will.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "route_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "origin_code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "destination_code",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "status",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "starts_on",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "frequency_weekly",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Topic",
+        "description": "What a piece is about.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "tag",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "label",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "PUBLISHED_BY",
+        "description": "The outlet that ran the article.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "Publisher"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "MENTIONS_AIRLINE",
+        "description": "A carrier named in the piece.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "Airline"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": [
+          {
+            "property_key": "prominence",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "MENTIONS_CITY",
+        "description": "A city named in the piece.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "City"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "MENTIONS_COUNTRY",
+        "description": "A country named in the piece.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "Country"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "REPORTS_ON",
+        "description": "The route the piece is about.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "Route"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "TAGGED",
+        "description": "The topic the piece was filed under.",
+        "source_node_types": [
+          "Article"
+        ],
+        "target_node_types": [
+          "Topic"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": [
+          {
+            "property_key": "position",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "OPERATED_BY",
+        "description": "The carrier flying the route.",
+        "source_node_types": [
+          "Route"
+        ],
+        "target_node_types": [
+          "Airline"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "BASED_IN",
+        "description": "Where the carrier is registered.",
+        "source_node_types": [
+          "Airline"
+        ],
+        "target_node_types": [
+          "Country"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "LOCATED_IN",
+        "description": "The country the city sits in.",
+        "source_node_types": [
+          "City"
+        ],
+        "target_node_types": [
+          "Country"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "article_article_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Article",
+        "constraint_type": "unique",
+        "properties": [
+          "article_id"
+        ]
+      },
+      {
+        "name": "publisher_domain_unique",
+        "target_kind": "node_type",
+        "target_label": "Publisher",
+        "constraint_type": "unique",
+        "properties": [
+          "domain"
+        ]
+      },
+      {
+        "name": "airline_iata_unique",
+        "target_kind": "node_type",
+        "target_label": "Airline",
+        "constraint_type": "unique",
+        "properties": [
+          "iata"
+        ]
+      },
+      {
+        "name": "city_code_unique",
+        "target_kind": "node_type",
+        "target_label": "City",
+        "constraint_type": "unique",
+        "properties": [
+          "code"
+        ]
+      },
+      {
+        "name": "country_iso_code_unique",
+        "target_kind": "node_type",
+        "target_label": "Country",
+        "constraint_type": "unique",
+        "properties": [
+          "iso_code"
+        ]
+      },
+      {
+        "name": "route_route_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Route",
+        "constraint_type": "unique",
+        "properties": [
+          "route_id"
+        ]
+      },
+      {
+        "name": "topic_tag_unique",
+        "target_kind": "node_type",
+        "target_label": "Topic",
+        "constraint_type": "unique",
+        "properties": [
+          "tag"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}

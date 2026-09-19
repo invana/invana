@@ -1,0 +1,380 @@
+[
+  {
+    "id": "E_LOCATED_IN_CITY_001",
+    "from": "CITY_001",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_002",
+    "from": "CITY_002",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_003",
+    "from": "CITY_003",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_004",
+    "from": "CITY_004",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_005",
+    "from": "CITY_005",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_006",
+    "from": "CITY_006",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_007",
+    "from": "CITY_007",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_008",
+    "from": "CITY_008",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_009",
+    "from": "CITY_009",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_010",
+    "from": "CITY_010",
+    "to": "CNTRY_042",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_011",
+    "from": "CITY_011",
+    "to": "CNTRY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_012",
+    "from": "CITY_012",
+    "to": "CNTRY_026",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_013",
+    "from": "CITY_013",
+    "to": "CNTRY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_014",
+    "from": "CITY_014",
+    "to": "CNTRY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_015",
+    "from": "CITY_015",
+    "to": "CNTRY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_016",
+    "from": "CITY_016",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_017",
+    "from": "CITY_017",
+    "to": "CNTRY_029",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_018",
+    "from": "CITY_018",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_019",
+    "from": "CITY_019",
+    "to": "CNTRY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_020",
+    "from": "CITY_020",
+    "to": "CNTRY_021",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_021",
+    "from": "CITY_021",
+    "to": "CNTRY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_022",
+    "from": "CITY_022",
+    "to": "CNTRY_008",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_023",
+    "from": "CITY_023",
+    "to": "CNTRY_002",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_024",
+    "from": "CITY_024",
+    "to": "CNTRY_009",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_025",
+    "from": "CITY_025",
+    "to": "CNTRY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_026",
+    "from": "CITY_026",
+    "to": "CNTRY_030",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_027",
+    "from": "CITY_027",
+    "to": "CNTRY_013",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_028",
+    "from": "CITY_028",
+    "to": "CNTRY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_029",
+    "from": "CITY_029",
+    "to": "CNTRY_016",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_030",
+    "from": "CITY_030",
+    "to": "CNTRY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_031",
+    "from": "CITY_031",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_032",
+    "from": "CITY_032",
+    "to": "CNTRY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_033",
+    "from": "CITY_033",
+    "to": "CNTRY_034",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_034",
+    "from": "CITY_034",
+    "to": "CNTRY_035",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_035",
+    "from": "CITY_035",
+    "to": "CNTRY_019",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_036",
+    "from": "CITY_036",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_037",
+    "from": "CITY_037",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_038",
+    "from": "CITY_038",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_039",
+    "from": "CITY_039",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_040",
+    "from": "CITY_040",
+    "to": "CNTRY_020",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_041",
+    "from": "CITY_041",
+    "to": "CNTRY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_042",
+    "from": "CITY_042",
+    "to": "CNTRY_027",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_043",
+    "from": "CITY_043",
+    "to": "CNTRY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_044",
+    "from": "CITY_044",
+    "to": "CNTRY_018",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_045",
+    "from": "CITY_045",
+    "to": "CNTRY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_046",
+    "from": "CITY_046",
+    "to": "CNTRY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_047",
+    "from": "CITY_047",
+    "to": "CNTRY_040",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_048",
+    "from": "CITY_048",
+    "to": "CNTRY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_049",
+    "from": "CITY_049",
+    "to": "CNTRY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_050",
+    "from": "CITY_050",
+    "to": "CNTRY_007",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_051",
+    "from": "CITY_051",
+    "to": "CNTRY_007",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_052",
+    "from": "CITY_052",
+    "to": "CNTRY_043",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_053",
+    "from": "CITY_053",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_054",
+    "from": "CITY_054",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_055",
+    "from": "CITY_055",
+    "to": "CNTRY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_056",
+    "from": "CITY_056",
+    "to": "CNTRY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_057",
+    "from": "CITY_057",
+    "to": "CNTRY_044",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_058",
+    "from": "CITY_058",
+    "to": "CNTRY_023",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_059",
+    "from": "CITY_059",
+    "to": "CNTRY_012",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_060",
+    "from": "CITY_060",
+    "to": "CNTRY_028",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_061",
+    "from": "CITY_061",
+    "to": "CNTRY_015",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_062",
+    "from": "CITY_062",
+    "to": "CNTRY_010",
+    "properties": {}
+  },
+  {
+    "id": "E_LOCATED_IN_CITY_063",
+    "from": "CITY_063",
+    "to": "CNTRY_025",
+    "properties": {}
+  }
+]

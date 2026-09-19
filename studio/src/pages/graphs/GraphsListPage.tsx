@@ -1,4 +1,9 @@
 import {
+	useDeleteGraphMutation,
+	useGraphsQuery,
+} from "@/hooks/queries/useGraphs";
+import { type Graph, SETUP_REQUIRED, setupSectionStatus } from "@/types/graphs";
+import {
 	Button,
 	Dialog,
 	DialogContent,
@@ -24,11 +29,6 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import {
-	useDeleteGraphMutation,
-	useGraphsQuery,
-} from "../../hooks/queries/useGraphs";
-import type { Graph } from "../../types/graphs";
 
 const PAGE_SIZE = 6;
 
@@ -46,18 +46,14 @@ function formatRelative(iso: string): string {
 	return new Date(iso).toLocaleDateString();
 }
 
+/** How far along a graph is, counted over the **required** steps only
+ *  (setup.md SU15): an optional step that drags the number down turns an offer
+ *  into a debt. */
 function setupProgress(graph: Graph): { done: number; total: number } {
-	const sections = [
-		"graph_info",
-		"instructions",
-		"skills",
-		"datasets",
-	] as const;
-	const done = sections.filter((s) => {
-		const entry = graph.setup_state?.[s];
-		return !!entry?.completed_at || !!entry?.skipped_at;
-	}).length;
-	return { done, total: sections.length };
+	const done = SETUP_REQUIRED.filter(
+		(s) => setupSectionStatus(graph.setup_state?.[s]) !== "todo",
+	).length;
+	return { done, total: SETUP_REQUIRED.length };
 }
 
 function ViewToggle({

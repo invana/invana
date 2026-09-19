@@ -1,0 +1,69 @@
+{
+  "nodes": {
+    "Tweet": {
+      "identity": [
+        "tweet_id"
+      ]
+    },
+    "Account": {
+      "identity": [
+        "handle"
+      ]
+    },
+    "Hashtag": {
+      "identity": [
+        "tag"
+      ]
+    }
+  },
+  "edges": {
+    "POSTED": {
+      "from": [
+        "Account"
+      ],
+      "to": [
+        "Tweet"
+      ]
+    },
+    "TAGS": {
+      "from": [
+        "Tweet"
+      ],
+      "to": [
+        "Hashtag"
+      ]
+    },
+    "MENTIONS": {
+      "from": [
+        "Tweet"
+      ],
+      "to": [
+        "Account"
+      ]
+    },
+    "REPLIES_TO": {
+      "from": [
+        "Tweet"
+      ],
+      "to": [
+        "Tweet"
+      ]
+    },
+    "RETWEETS": {
+      "from": [
+        "Tweet"
+      ],
+      "to": [
+        "Tweet"
+      ]
+    },
+    "QUOTES": {
+      "from": [
+        "Tweet"
+      ],
+      "to": [
+        "Tweet"
+      ]
+    }
+  }
+}

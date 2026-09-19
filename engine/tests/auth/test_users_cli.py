@@ -3,19 +3,15 @@
 from __future__ import annotations
 
 import pytest
-from fastapi import HTTPException
 
-from invana.auth.passwords import verify_password
-from invana.auth.services import (
-    admin_set_password,
-    find_user_by_email_or_username,
-    provision_user,
-)
+from invana.core.auth.managers import AuthManager
+from invana.core.auth.passwords import verify_password
+from invana.core.errors import ConflictError
 
 
 @pytest.mark.asyncio
 async def test_provision_user_creates_regular_account(session):
-    user = await provision_user(
+    user = await AuthManager().provision_user(
         session,
         email="Alice@Example.com",
         password="Sup3rSecret!pw",
@@ -32,7 +28,7 @@ async def test_provision_user_creates_regular_account(session):
 
 @pytest.mark.asyncio
 async def test_provision_user_superuser_flag(session):
-    user = await provision_user(
+    user = await AuthManager().provision_user(
         session,
         email="root@example.com",
         password="Sup3rSecret!pw",
@@ -46,7 +42,7 @@ async def test_provision_user_superuser_flag(session):
 
 @pytest.mark.asyncio
 async def test_provision_user_duplicate_username_conflicts(session):
-    await provision_user(
+    await AuthManager().provision_user(
         session,
         email="bob@example.com",
         password="Sup3rSecret!pw",
@@ -54,8 +50,8 @@ async def test_provision_user_duplicate_username_conflicts(session):
         first_name="Bob",
         last_name=None,
     )
-    with pytest.raises(HTTPException) as exc:
-        await provision_user(
+    with pytest.raises(ConflictError):
+        await AuthManager().provision_user(
             session,
             email="other@example.com",
             password="Sup3rSecret!pw",
@@ -63,12 +59,11 @@ async def test_provision_user_duplicate_username_conflicts(session):
             first_name="Bobby",
             last_name=None,
         )
-    assert exc.value.status_code == 409
 
 
 @pytest.mark.asyncio
 async def test_admin_set_password_replaces_hash(session):
-    user = await provision_user(
+    user = await AuthManager().provision_user(
         session,
         email="carol@example.com",
         password="Original!pw9",
@@ -78,7 +73,7 @@ async def test_admin_set_password_replaces_hash(session):
     )
     old_hash = user.password_hash
 
-    await admin_set_password(session, user=user, new_password="BrandN3w!pw99")
+    await AuthManager().admin_set_password(session, user=user, new_password="BrandN3w!pw99")
 
     assert user.password_hash != old_hash
     assert verify_password("BrandN3w!pw99", user.password_hash)
@@ -87,7 +82,7 @@ async def test_admin_set_password_replaces_hash(session):
 
 @pytest.mark.asyncio
 async def test_find_user_by_email_or_username(session):
-    await provision_user(
+    await AuthManager().provision_user(
         session,
         email="dave@example.com",
         password="Sup3rSecret!pw",
@@ -95,9 +90,9 @@ async def test_find_user_by_email_or_username(session):
         first_name="Dave",
         last_name=None,
     )
-    by_email = await find_user_by_email_or_username(session, identifier="DAVE@example.com")
-    by_username = await find_user_by_email_or_username(session, identifier="dave")
-    missing = await find_user_by_email_or_username(session, identifier="nobody")
+    by_email = await AuthManager().find_user_by_email_or_username(session, identifier="DAVE@example.com")
+    by_username = await AuthManager().find_user_by_email_or_username(session, identifier="dave")
+    missing = await AuthManager().find_user_by_email_or_username(session, identifier="nobody")
 
     assert by_email is not None and by_username is not None
     assert by_email.id == by_username.id

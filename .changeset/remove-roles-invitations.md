@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Remove graph roles & invitations — flatten to binary membership (RFC-023).
+Remove graph roles & invitations — flatten to binary membership (docs/for-developers/modules/identity-and-access/features/membership.md).
 
 Per-graph roles (`developer`/`analyst`/`admin`) and the entire invitation flow are removed. Access is now binary: a `GraphMember` row means full access to the graph. `GraphMember` is kept as the access join (every graph-scoped route still gates on `require_graph_member`), but its `role` column, the `graph_role` enum, and the `require_graph_admin`/`require_graph_builder` tiers are gone — all former admin/builder routes collapse to `require_graph_member`.
 

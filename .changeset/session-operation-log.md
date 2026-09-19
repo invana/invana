@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Log every canvas operation in the session thread (RFC-046).
+Log every canvas operation in the session thread (docs/for-developers/modules/explore/features/canvases.md).
 
 A session's thread now records the *operations* that change its canvas, not just
 composer queries. Node-expands (right-click → expand, and the Fine-tune panel)

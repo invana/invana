@@ -1,4 +1,4 @@
-"""Reconcile-into-draft tests (RFC-031) — real Postgres, no LLM, no mocks.
+"""Reconcile-into-draft tests (docs/for-developers/modules/ask/spec.md) — real Postgres, no LLM, no mocks.
 
 Exercises the load-bearing by-name diff + ordering of ``reconcile_proposal``
 against a real draft version, and the referential-integrity pre-check
@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import pytest
 
-from invana.llm import LLMError
-from invana.llm.propose import ModelProposal, validate_proposal
-from invana.llm.schemas import TokenUsage
-from invana.modeller.store import ModelStore
-from invana.sessions.reconcile import reconcile_proposal
+from invana.apps.llm import LLMError
+from invana.apps.llm.propose import ModelProposal, validate_proposal
+from invana.apps.llm.schemas import TokenUsage
+from invana.apps.modeller.store import ModelStore
+from invana.apps.sessions.reconcile import reconcile_proposal
 
 
 def _proposal(node_types, edge_types, summary="m") -> ModelProposal:

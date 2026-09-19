@@ -1,0 +1,847 @@
+[
+  {
+    "id": "ART_001",
+    "properties": {
+      "article_id": "art-001",
+      "headline": "Air India opens DEL–SFO with 5 flights a week",
+      "url": "https://bloomberg.com/aviation/air-india-opens-del-sfo-with-5-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-10T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_002",
+    "properties": {
+      "article_id": "art-002",
+      "headline": "Air India opens BOM–JFK with 7 flights a week",
+      "url": "https://aviationweek.com/aviation/air-india-opens-bom-jfk-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-14T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_003",
+    "properties": {
+      "article_id": "art-003",
+      "headline": "Air India opens DEL–CPH with 3 flights a week",
+      "url": "https://simpleflying.com/aviation/air-india-opens-del-cph-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-18T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_004",
+    "properties": {
+      "article_id": "art-004",
+      "headline": "IndiGo opens DEL–IST with 7 flights a week",
+      "url": "https://thehindubusinessline.com/aviation/indigo-opens-del-ist-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-22T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_005",
+    "properties": {
+      "article_id": "art-005",
+      "headline": "IndiGo opens BLR–SIN with 14 flights a week",
+      "url": "https://asia.nikkei.com/aviation/indigo-opens-blr-sin-with-14-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-26T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_006",
+    "properties": {
+      "article_id": "art-006",
+      "headline": "IndiGo opens MAA–BKK with 7 flights a week",
+      "url": "https://gulfnews.com/aviation/indigo-opens-maa-bkk-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-01-30T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_007",
+    "properties": {
+      "article_id": "art-007",
+      "headline": "Emirates opens DXB–BOM with 35 flights a week",
+      "url": "https://reuters.com/aviation/emirates-opens-dxb-bom-with-35-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-03T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_008",
+    "properties": {
+      "article_id": "art-008",
+      "headline": "Emirates opens DXB–GRU with 7 flights a week",
+      "url": "https://bloomberg.com/aviation/emirates-opens-dxb-gru-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-07T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_009",
+    "properties": {
+      "article_id": "art-009",
+      "headline": "Emirates pulls DXB–AKL off the schedule",
+      "url": "https://aviationweek.com/aviation/emirates-pulls-dxb-akl-off-the-schedule",
+      "summary": "Thin loads and crew shortages ended the service.",
+      "published_at": "2026-02-11T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_010",
+    "properties": {
+      "article_id": "art-010",
+      "headline": "Etihad Airways opens AUH–BLR with 14 flights a week",
+      "url": "https://simpleflying.com/aviation/etihad-airways-opens-auh-blr-with-14-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-15T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 970,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_011",
+    "properties": {
+      "article_id": "art-011",
+      "headline": "Qatar Airways opens DOH–HYD with 14 flights a week",
+      "url": "https://thehindubusinessline.com/aviation/qatar-airways-opens-doh-hyd-with-14-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-19T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 420,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_012",
+    "properties": {
+      "article_id": "art-012",
+      "headline": "Qatar Airways opens DOH–ACC with 4 flights a week",
+      "url": "https://asia.nikkei.com/aviation/qatar-airways-opens-doh-acc-with-4-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-23T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_013",
+    "properties": {
+      "article_id": "art-013",
+      "headline": "Singapore Airlines opens SIN–SFO with 14 flights a week",
+      "url": "https://gulfnews.com/aviation/singapore-airlines-opens-sin-sfo-with-14-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-02-27T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_014",
+    "properties": {
+      "article_id": "art-014",
+      "headline": "Singapore Airlines pulls SIN–CPH off the schedule",
+      "url": "https://reuters.com/aviation/singapore-airlines-pulls-sin-cph-off-the-schedule",
+      "summary": "Thin loads and crew shortages ended the service.",
+      "published_at": "2026-03-03T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_015",
+    "properties": {
+      "article_id": "art-015",
+      "headline": "Lufthansa opens FRA–HYD with 5 flights a week",
+      "url": "https://bloomberg.com/aviation/lufthansa-opens-fra-hyd-with-5-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-07T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_016",
+    "properties": {
+      "article_id": "art-016",
+      "headline": "Lufthansa opens MUC–SEA with 7 flights a week",
+      "url": "https://aviationweek.com/aviation/lufthansa-opens-muc-sea-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-11T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_017",
+    "properties": {
+      "article_id": "art-017",
+      "headline": "British Airways opens LHR–MAA with 4 flights a week",
+      "url": "https://simpleflying.com/aviation/british-airways-opens-lhr-maa-with-4-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-15T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_018",
+    "properties": {
+      "article_id": "art-018",
+      "headline": "British Airways opens LHR–AUH with 14 flights a week",
+      "url": "https://thehindubusinessline.com/aviation/british-airways-opens-lhr-auh-with-14-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-19T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_019",
+    "properties": {
+      "article_id": "art-019",
+      "headline": "Air France opens CDG–BLR with 3 flights a week",
+      "url": "https://asia.nikkei.com/aviation/air-france-opens-cdg-blr-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-23T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_020",
+    "properties": {
+      "article_id": "art-020",
+      "headline": "KLM opens AMS–AUH with 7 flights a week",
+      "url": "https://gulfnews.com/aviation/klm-opens-ams-auh-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-27T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_021",
+    "properties": {
+      "article_id": "art-021",
+      "headline": "Delta Air Lines opens ATL–CPH with 7 flights a week",
+      "url": "https://reuters.com/aviation/delta-air-lines-opens-atl-cph-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-03-31T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 970,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_022",
+    "properties": {
+      "article_id": "art-022",
+      "headline": "Delta Air Lines opens JFK–CDG with 21 flights a week",
+      "url": "https://bloomberg.com/aviation/delta-air-lines-opens-jfk-cdg-with-21-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-04T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 420,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_023",
+    "properties": {
+      "article_id": "art-023",
+      "headline": "American Airlines pulls DFW–BCN off the schedule",
+      "url": "https://aviationweek.com/aviation/american-airlines-pulls-dfw-bcn-off-the-schedule",
+      "summary": "Thin loads and crew shortages ended the service.",
+      "published_at": "2026-04-08T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_024",
+    "properties": {
+      "article_id": "art-024",
+      "headline": "United Airlines opens ORD–DEL with 7 flights a week",
+      "url": "https://simpleflying.com/aviation/united-airlines-opens-ord-del-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-12T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_025",
+    "properties": {
+      "article_id": "art-025",
+      "headline": "United Airlines opens SFO–MNL with 7 flights a week",
+      "url": "https://thehindubusinessline.com/aviation/united-airlines-opens-sfo-mnl-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-16T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_026",
+    "properties": {
+      "article_id": "art-026",
+      "headline": "Turkish Airlines opens IST–MEL with 3 flights a week",
+      "url": "https://asia.nikkei.com/aviation/turkish-airlines-opens-ist-mel-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-20T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_027",
+    "properties": {
+      "article_id": "art-027",
+      "headline": "Qantas opens SYD–PER with 28 flights a week",
+      "url": "https://gulfnews.com/aviation/qantas-opens-syd-per-with-28-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-24T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_028",
+    "properties": {
+      "article_id": "art-028",
+      "headline": "Cathay Pacific opens HKG–MAA with 4 flights a week",
+      "url": "https://reuters.com/aviation/cathay-pacific-opens-hkg-maa-with-4-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-04-28T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_029",
+    "properties": {
+      "article_id": "art-029",
+      "headline": "Japan Airlines opens HND–SEA with 7 flights a week",
+      "url": "https://bloomberg.com/aviation/japan-airlines-opens-hnd-sea-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-02T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_030",
+    "properties": {
+      "article_id": "art-030",
+      "headline": "All Nippon Airways opens HND–PER with 3 flights a week",
+      "url": "https://aviationweek.com/aviation/all-nippon-airways-opens-hnd-per-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-06T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_031",
+    "properties": {
+      "article_id": "art-031",
+      "headline": "Korean Air opens ICN–LIS with 3 flights a week",
+      "url": "https://simpleflying.com/aviation/korean-air-opens-icn-lis-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-10T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_032",
+    "properties": {
+      "article_id": "art-032",
+      "headline": "Thai Airways pulls BKK–OSL off the schedule",
+      "url": "https://thehindubusinessline.com/aviation/thai-airways-pulls-bkk-osl-off-the-schedule",
+      "summary": "Thin loads and crew shortages ended the service.",
+      "published_at": "2026-05-14T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 970,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_033",
+    "properties": {
+      "article_id": "art-033",
+      "headline": "Ethiopian Airlines opens ADD–GRU with 4 flights a week",
+      "url": "https://asia.nikkei.com/aviation/ethiopian-airlines-opens-add-gru-with-4-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-18T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 420,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_034",
+    "properties": {
+      "article_id": "art-034",
+      "headline": "South African Airways pulls JNB–PER off the schedule",
+      "url": "https://gulfnews.com/aviation/south-african-airways-pulls-jnb-per-off-the-schedule",
+      "summary": "Thin loads and crew shortages ended the service.",
+      "published_at": "2026-05-22T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_035",
+    "properties": {
+      "article_id": "art-035",
+      "headline": "LATAM Brasil opens GRU–LIS with 7 flights a week",
+      "url": "https://reuters.com/aviation/latam-brasil-opens-gru-lis-with-7-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-26T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_036",
+    "properties": {
+      "article_id": "art-036",
+      "headline": "Air Canada opens YYZ–DXB with 4 flights a week",
+      "url": "https://bloomberg.com/aviation/air-canada-opens-yyz-dxb-with-4-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-05-30T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_037",
+    "properties": {
+      "article_id": "art-037",
+      "headline": "Iberia opens MAD–TPE with 3 flights a week",
+      "url": "https://aviationweek.com/aviation/iberia-opens-mad-tpe-with-3-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-06-03T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_038",
+    "properties": {
+      "article_id": "art-038",
+      "headline": "Swiss opens ZRH–SEA with 5 flights a week",
+      "url": "https://simpleflying.com/aviation/swiss-opens-zrh-sea-with-5-flights-a-week",
+      "summary": "The carrier confirmed the city pair and the day service begins.",
+      "published_at": "2026-06-07T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_039",
+    "properties": {
+      "article_id": "art-039",
+      "headline": "Air India orders wide-bodies to grow its New Delhi hub",
+      "url": "https://thehindubusinessline.com/aviation/air-india-orders-wide-bodies-to-grow-its-new-delhi-hub",
+      "summary": "The order lands over the next four years and is aimed at long-haul growth.",
+      "published_at": "2026-06-11T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_040",
+    "properties": {
+      "article_id": "art-040",
+      "headline": "IndiGo orders wide-bodies to grow its Bengaluru hub",
+      "url": "https://asia.nikkei.com/aviation/indigo-orders-wide-bodies-to-grow-its-bengaluru-hub",
+      "summary": "The order lands over the next four years and is aimed at long-haul growth.",
+      "published_at": "2026-06-15T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_041",
+    "properties": {
+      "article_id": "art-041",
+      "headline": "Emirates orders wide-bodies to grow its Dubai hub",
+      "url": "https://gulfnews.com/aviation/emirates-orders-wide-bodies-to-grow-its-dubai-hub",
+      "summary": "The order lands over the next four years and is aimed at long-haul growth.",
+      "published_at": "2026-06-19T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_042",
+    "properties": {
+      "article_id": "art-042",
+      "headline": "United Airlines orders wide-bodies to grow its Chicago hub",
+      "url": "https://reuters.com/aviation/united-airlines-orders-wide-bodies-to-grow-its-chicago-hub",
+      "summary": "The order lands over the next four years and is aimed at long-haul growth.",
+      "published_at": "2026-06-23T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_043",
+    "properties": {
+      "article_id": "art-043",
+      "headline": "Cabin crew walkout grounds Lufthansa flights at Frankfurt",
+      "url": "https://bloomberg.com/aviation/cabin-crew-walkout-grounds-lufthansa-flights-at-frankfurt",
+      "summary": "Unions and the airline return to talks; departures are cancelled meanwhile.",
+      "published_at": "2026-06-27T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 970,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_044",
+    "properties": {
+      "article_id": "art-044",
+      "headline": "Cabin crew walkout grounds Air France flights at Paris",
+      "url": "https://aviationweek.com/aviation/cabin-crew-walkout-grounds-air-france-flights-at-paris",
+      "summary": "Unions and the airline return to talks; departures are cancelled meanwhile.",
+      "published_at": "2026-07-01T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 420,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_045",
+    "properties": {
+      "article_id": "art-045",
+      "headline": "Cabin crew walkout grounds British Airways flights at London",
+      "url": "https://simpleflying.com/aviation/cabin-crew-walkout-grounds-british-airways-flights-at-london",
+      "summary": "Unions and the airline return to talks; departures are cancelled meanwhile.",
+      "published_at": "2026-07-05T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_046",
+    "properties": {
+      "article_id": "art-046",
+      "headline": "Qantas diverts a Sydney departure after a technical fault",
+      "url": "https://thehindubusinessline.com/aviation/qantas-diverts-a-sydney-departure-after-a-technical-fault",
+      "summary": "Nobody was hurt; the regulator has asked for the maintenance record.",
+      "published_at": "2026-07-09T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_047",
+    "properties": {
+      "article_id": "art-047",
+      "headline": "Japan Airlines diverts a Tokyo departure after a technical fault",
+      "url": "https://asia.nikkei.com/aviation/japan-airlines-diverts-a-tokyo-departure-after-a-technical-fault",
+      "summary": "Nobody was hurt; the regulator has asked for the maintenance record.",
+      "published_at": "2026-07-13T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_048",
+    "properties": {
+      "article_id": "art-048",
+      "headline": "South African Airways diverts a Johannesburg departure after a technical fault",
+      "url": "https://gulfnews.com/aviation/south-african-airways-diverts-a-johannesburg-departure-after-a-technic",
+      "summary": "Nobody was hurt; the regulator has asked for the maintenance record.",
+      "published_at": "2026-07-17T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_049",
+    "properties": {
+      "article_id": "art-049",
+      "headline": "Qatar Airways widens its codeshare reach out of Doha",
+      "url": "https://reuters.com/aviation/qatar-airways-widens-its-codeshare-reach-out-of-doha",
+      "summary": "The agreement adds connecting itineraries without new metal.",
+      "published_at": "2026-07-21T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_050",
+    "properties": {
+      "article_id": "art-050",
+      "headline": "Singapore Airlines widens its codeshare reach out of Singapore",
+      "url": "https://bloomberg.com/aviation/singapore-airlines-widens-its-codeshare-reach-out-of-singapore",
+      "summary": "The agreement adds connecting itineraries without new metal.",
+      "published_at": "2026-07-25T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_051",
+    "properties": {
+      "article_id": "art-051",
+      "headline": "Air Canada widens its codeshare reach out of Toronto",
+      "url": "https://aviationweek.com/aviation/air-canada-widens-its-codeshare-reach-out-of-toronto",
+      "summary": "The agreement adds connecting itineraries without new metal.",
+      "published_at": "2026-07-29T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_052",
+    "properties": {
+      "article_id": "art-052",
+      "headline": "Fuel bill eats into Iberia margins at Madrid",
+      "url": "https://simpleflying.com/aviation/fuel-bill-eats-into-iberia-margins-at-madrid",
+      "summary": "A weaker currency and a firmer crude price both bit into the quarter.",
+      "published_at": "2026-08-02T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_053",
+    "properties": {
+      "article_id": "art-053",
+      "headline": "Fuel bill eats into Thai Airways margins at Bangkok",
+      "url": "https://thehindubusinessline.com/aviation/fuel-bill-eats-into-thai-airways-margins-at-bangkok",
+      "summary": "A weaker currency and a firmer crude price both bit into the quarter.",
+      "published_at": "2026-08-06T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_054",
+    "properties": {
+      "article_id": "art-054",
+      "headline": "Fuel bill eats into Ethiopian Airlines margins at Addis Ababa",
+      "url": "https://asia.nikkei.com/aviation/fuel-bill-eats-into-ethiopian-airlines-margins-at-addis-ababa",
+      "summary": "A weaker currency and a firmer crude price both bit into the quarter.",
+      "published_at": "2026-08-10T09:00:00Z",
+      "sentiment": "negative",
+      "word_count": 970,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_055",
+    "properties": {
+      "article_id": "art-055",
+      "headline": "Mumbai clears a terminal expansion as IndiGo adds capacity",
+      "url": "https://gulfnews.com/aviation/mumbai-clears-a-terminal-expansion-as-indigo-adds-capacity",
+      "summary": "The airport authority approved the build; the carrier takes the new gates.",
+      "published_at": "2026-08-14T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 420,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_056",
+    "properties": {
+      "article_id": "art-056",
+      "headline": "Istanbul clears a terminal expansion as Turkish Airlines adds capacity",
+      "url": "https://reuters.com/aviation/istanbul-clears-a-terminal-expansion-as-turkish-airlines-adds-capacity",
+      "summary": "The airport authority approved the build; the carrier takes the new gates.",
+      "published_at": "2026-08-18T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 475,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_057",
+    "properties": {
+      "article_id": "art-057",
+      "headline": "Seoul clears a terminal expansion as Korean Air adds capacity",
+      "url": "https://bloomberg.com/aviation/seoul-clears-a-terminal-expansion-as-korean-air-adds-capacity",
+      "summary": "The airport authority approved the build; the carrier takes the new gates.",
+      "published_at": "2026-08-22T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 530,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_058",
+    "properties": {
+      "article_id": "art-058",
+      "headline": "Hong Kong clears a terminal expansion as Cathay Pacific adds capacity",
+      "url": "https://aviationweek.com/aviation/hong-kong-clears-a-terminal-expansion-as-cathay-pacific-adds-capacity",
+      "summary": "The airport authority approved the build; the carrier takes the new gates.",
+      "published_at": "2026-08-26T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 585,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_059",
+    "properties": {
+      "article_id": "art-059",
+      "headline": "LATAM Brasil opens talks over a stake in a Brazil rival",
+      "url": "https://simpleflying.com/aviation/latam-brasil-opens-talks-over-a-stake-in-a-brazil-rival",
+      "summary": "Neither side has confirmed a price and no filing has been made.",
+      "published_at": "2026-08-30T09:00:00Z",
+      "sentiment": "neutral",
+      "word_count": 640,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_060",
+    "properties": {
+      "article_id": "art-060",
+      "headline": "Swiss opens talks over a stake in a Switzerland rival",
+      "url": "https://thehindubusinessline.com/aviation/swiss-opens-talks-over-a-stake-in-a-switzerland-rival",
+      "summary": "Neither side has confirmed a price and no filing has been made.",
+      "published_at": "2026-09-03T09:00:00Z",
+      "sentiment": "neutral",
+      "word_count": 695,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_061",
+    "properties": {
+      "article_id": "art-061",
+      "headline": "Etihad Airways opens talks over a stake in a United Arab Emirates rival",
+      "url": "https://asia.nikkei.com/aviation/etihad-airways-opens-talks-over-a-stake-in-a-united-arab-emirates-riva",
+      "summary": "Neither side has confirmed a price and no filing has been made.",
+      "published_at": "2026-09-07T09:00:00Z",
+      "sentiment": "neutral",
+      "word_count": 750,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_062",
+    "properties": {
+      "article_id": "art-062",
+      "headline": "KLM signs a sustainable aviation fuel supply deal at Amsterdam",
+      "url": "https://gulfnews.com/aviation/klm-signs-a-sustainable-aviation-fuel-supply-deal-at-amsterdam",
+      "summary": "The offtake agreement covers a fixed share of departures from the hub.",
+      "published_at": "2026-09-11T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 805,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_063",
+    "properties": {
+      "article_id": "art-063",
+      "headline": "Delta Air Lines signs a sustainable aviation fuel supply deal at Atlanta",
+      "url": "https://reuters.com/aviation/delta-air-lines-signs-a-sustainable-aviation-fuel-supply-deal-at-atlan",
+      "summary": "The offtake agreement covers a fixed share of departures from the hub.",
+      "published_at": "2026-09-15T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 860,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_064",
+    "properties": {
+      "article_id": "art-064",
+      "headline": "All Nippon Airways signs a sustainable aviation fuel supply deal at Tokyo",
+      "url": "https://bloomberg.com/aviation/all-nippon-airways-signs-a-sustainable-aviation-fuel-supply-deal-at-to",
+      "summary": "The offtake agreement covers a fixed share of departures from the hub.",
+      "published_at": "2026-09-19T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 915,
+      "language": "en"
+    }
+  },
+  {
+    "id": "ART_065",
+    "properties": {
+      "article_id": "art-065",
+      "headline": "American Airlines signs a sustainable aviation fuel supply deal at Dallas",
+      "url": "https://aviationweek.com/aviation/american-airlines-signs-a-sustainable-aviation-fuel-supply-deal-at-dal",
+      "summary": "The offtake agreement covers a fixed share of departures from the hub.",
+      "published_at": "2026-09-23T09:00:00Z",
+      "sentiment": "positive",
+      "word_count": 970,
+      "language": "en"
+    }
+  }
+]

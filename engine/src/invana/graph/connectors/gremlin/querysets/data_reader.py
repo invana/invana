@@ -70,7 +70,7 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
         result = await self._connector.execute_traversal(traversal)
         response = self._serializer.deserialize_graph_response(result)
         # Surface the generated traversal (its bytecode-step repr) so callers can
-        # log it (RFC-046 — the session records a node-expand's query).
+        # log it (docs/for-developers/modules/explore/features/boards.md — the session records a node-expand's query).
         response.metadata.query = str(traversal)
         return response
 

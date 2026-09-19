@@ -1,0 +1,668 @@
+[
+  {
+    "id": "E_MENTIONS_CITY_ART_001_DEL",
+    "from": "ART_001",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_001_SFO",
+    "from": "ART_001",
+    "to": "CITY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_002_BOM",
+    "from": "ART_002",
+    "to": "CITY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_002_JFK",
+    "from": "ART_002",
+    "to": "CITY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_002_DEL",
+    "from": "ART_002",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_003_DEL",
+    "from": "ART_003",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_003_CPH",
+    "from": "ART_003",
+    "to": "CITY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_004_DEL",
+    "from": "ART_004",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_004_IST",
+    "from": "ART_004",
+    "to": "CITY_030",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_005_BLR",
+    "from": "ART_005",
+    "to": "CITY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_005_SIN",
+    "from": "ART_005",
+    "to": "CITY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_005_DEL",
+    "from": "ART_005",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_006_MAA",
+    "from": "ART_006",
+    "to": "CITY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_006_BKK",
+    "from": "ART_006",
+    "to": "CITY_043",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_006_DEL",
+    "from": "ART_006",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_007_DXB",
+    "from": "ART_007",
+    "to": "CITY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_007_BOM",
+    "from": "ART_007",
+    "to": "CITY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_008_DXB",
+    "from": "ART_008",
+    "to": "CITY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_008_GRU",
+    "from": "ART_008",
+    "to": "CITY_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_009_DXB",
+    "from": "ART_009",
+    "to": "CITY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_009_AKL",
+    "from": "ART_009",
+    "to": "CITY_056",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_010_AUH",
+    "from": "ART_010",
+    "to": "CITY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_010_BLR",
+    "from": "ART_010",
+    "to": "CITY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_011_DOH",
+    "from": "ART_011",
+    "to": "CITY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_011_HYD",
+    "from": "ART_011",
+    "to": "CITY_040",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_012_DOH",
+    "from": "ART_012",
+    "to": "CITY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_012_ACC",
+    "from": "ART_012",
+    "to": "CITY_061",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_013_SIN",
+    "from": "ART_013",
+    "to": "CITY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_013_SFO",
+    "from": "ART_013",
+    "to": "CITY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_014_SIN",
+    "from": "ART_014",
+    "to": "CITY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_014_CPH",
+    "from": "ART_014",
+    "to": "CITY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_015_FRA",
+    "from": "ART_015",
+    "to": "CITY_016",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_015_HYD",
+    "from": "ART_015",
+    "to": "CITY_040",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_016_MUC",
+    "from": "ART_016",
+    "to": "CITY_022",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_016_SEA",
+    "from": "ART_016",
+    "to": "CITY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_016_FRA",
+    "from": "ART_016",
+    "to": "CITY_016",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_017_LHR",
+    "from": "ART_017",
+    "to": "CITY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_017_MAA",
+    "from": "ART_017",
+    "to": "CITY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_018_LHR",
+    "from": "ART_018",
+    "to": "CITY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_018_AUH",
+    "from": "ART_018",
+    "to": "CITY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_019_CDG",
+    "from": "ART_019",
+    "to": "CITY_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_019_BLR",
+    "from": "ART_019",
+    "to": "CITY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_020_AMS",
+    "from": "ART_020",
+    "to": "CITY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_020_AUH",
+    "from": "ART_020",
+    "to": "CITY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_021_ATL",
+    "from": "ART_021",
+    "to": "CITY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_021_CPH",
+    "from": "ART_021",
+    "to": "CITY_024",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_022_JFK",
+    "from": "ART_022",
+    "to": "CITY_004",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_022_CDG",
+    "from": "ART_022",
+    "to": "CITY_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_022_ATL",
+    "from": "ART_022",
+    "to": "CITY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_023_DFW",
+    "from": "ART_023",
+    "to": "CITY_009",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_023_BCN",
+    "from": "ART_023",
+    "to": "CITY_019",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_024_ORD",
+    "from": "ART_024",
+    "to": "CITY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_024_DEL",
+    "from": "ART_024",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_025_SFO",
+    "from": "ART_025",
+    "to": "CITY_005",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_025_MNL",
+    "from": "ART_025",
+    "to": "CITY_045",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_025_ORD",
+    "from": "ART_025",
+    "to": "CITY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_026_IST",
+    "from": "ART_026",
+    "to": "CITY_030",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_026_MEL",
+    "from": "ART_026",
+    "to": "CITY_054",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_027_SYD",
+    "from": "ART_027",
+    "to": "CITY_053",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_027_PER",
+    "from": "ART_027",
+    "to": "CITY_055",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_028_HKG",
+    "from": "ART_028",
+    "to": "CITY_046",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_028_MAA",
+    "from": "ART_028",
+    "to": "CITY_039",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_029_HND",
+    "from": "ART_029",
+    "to": "CITY_048",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_029_SEA",
+    "from": "ART_029",
+    "to": "CITY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_030_HND",
+    "from": "ART_030",
+    "to": "CITY_048",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_030_PER",
+    "from": "ART_030",
+    "to": "CITY_055",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_031_ICN",
+    "from": "ART_031",
+    "to": "CITY_049",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_031_LIS",
+    "from": "ART_031",
+    "to": "CITY_028",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_032_BKK",
+    "from": "ART_032",
+    "to": "CITY_043",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_032_OSL",
+    "from": "ART_032",
+    "to": "CITY_026",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_033_ADD",
+    "from": "ART_033",
+    "to": "CITY_059",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_033_GRU",
+    "from": "ART_033",
+    "to": "CITY_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_034_JNB",
+    "from": "ART_034",
+    "to": "CITY_057",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_034_PER",
+    "from": "ART_034",
+    "to": "CITY_055",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_035_GRU",
+    "from": "ART_035",
+    "to": "CITY_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_035_LIS",
+    "from": "ART_035",
+    "to": "CITY_028",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_036_YYZ",
+    "from": "ART_036",
+    "to": "CITY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_036_DXB",
+    "from": "ART_036",
+    "to": "CITY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_037_MAD",
+    "from": "ART_037",
+    "to": "CITY_018",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_037_TPE",
+    "from": "ART_037",
+    "to": "CITY_047",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_038_ZRH",
+    "from": "ART_038",
+    "to": "CITY_021",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_038_SEA",
+    "from": "ART_038",
+    "to": "CITY_006",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_039_DEL",
+    "from": "ART_039",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_040_BLR",
+    "from": "ART_040",
+    "to": "CITY_038",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_040_DEL",
+    "from": "ART_040",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_041_DXB",
+    "from": "ART_041",
+    "to": "CITY_031",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_042_ORD",
+    "from": "ART_042",
+    "to": "CITY_003",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_043_FRA",
+    "from": "ART_043",
+    "to": "CITY_016",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_044_CDG",
+    "from": "ART_044",
+    "to": "CITY_015",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_045_LHR",
+    "from": "ART_045",
+    "to": "CITY_014",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_046_SYD",
+    "from": "ART_046",
+    "to": "CITY_053",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_047_HND",
+    "from": "ART_047",
+    "to": "CITY_048",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_048_JNB",
+    "from": "ART_048",
+    "to": "CITY_057",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_049_DOH",
+    "from": "ART_049",
+    "to": "CITY_033",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_050_SIN",
+    "from": "ART_050",
+    "to": "CITY_041",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_051_YYZ",
+    "from": "ART_051",
+    "to": "CITY_011",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_052_MAD",
+    "from": "ART_052",
+    "to": "CITY_018",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_053_BKK",
+    "from": "ART_053",
+    "to": "CITY_043",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_054_ADD",
+    "from": "ART_054",
+    "to": "CITY_059",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_055_BOM",
+    "from": "ART_055",
+    "to": "CITY_037",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_055_DEL",
+    "from": "ART_055",
+    "to": "CITY_036",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_056_IST",
+    "from": "ART_056",
+    "to": "CITY_030",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_057_ICN",
+    "from": "ART_057",
+    "to": "CITY_049",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_058_HKG",
+    "from": "ART_058",
+    "to": "CITY_046",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_059_GRU",
+    "from": "ART_059",
+    "to": "CITY_013",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_060_ZRH",
+    "from": "ART_060",
+    "to": "CITY_021",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_061_AUH",
+    "from": "ART_061",
+    "to": "CITY_032",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_062_AMS",
+    "from": "ART_062",
+    "to": "CITY_017",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_063_ATL",
+    "from": "ART_063",
+    "to": "CITY_001",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_064_HND",
+    "from": "ART_064",
+    "to": "CITY_048",
+    "properties": {}
+  },
+  {
+    "id": "E_MENTIONS_CITY_ART_065_DFW",
+    "from": "ART_065",
+    "to": "CITY_009",
+    "properties": {}
+  }
+]

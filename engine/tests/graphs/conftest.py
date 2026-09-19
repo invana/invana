@@ -1,4 +1,4 @@
-"""Shared fixtures for graphs tests."""
+"""Shared fixtures for graphs tests — isolated Postgres schema, real DB (no mocks)."""
 
 import uuid
 
@@ -6,10 +6,24 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from invana.graphs.schemas import GraphCreate
-from invana.graphs.store import GraphModelStore
-from invana.modeller.models import Base
-from invana.settings import settings
+# Import every model whose table the FKs touch so `create_all` builds them —
+# plus the four apps `SetupManager.derive_setup_state` reads, since every Graph
+# read now derives its setup state.
+from invana.apps.agents.models import Agent  # noqa: F401
+from invana.apps.graphs.models import Graph
+from invana.apps.graphs.querysets import GraphConnectionQuerySet
+from invana.apps.graphs.schemas import GraphConnectionCreate
+from invana.apps.llm_providers.models import LLMProvider  # noqa: F401
+from invana.apps.modeller.models import GraphModel, GraphVersion, NodeTypeDefinition  # noqa: F401
+from invana.apps.sessions.models import Session  # noqa: F401 — task_runs points at it
+from invana.apps.skills.models import Skill  # noqa: F401
+from invana.apps.task_plans.models import TaskPlan  # noqa: F401
+from invana.apps.work.models import Task  # noqa: F401 — todos, which task_plans points at
+from invana.core.auth.models import User
+from invana.core.events.models import Event  # noqa: F401
+from invana.core.models import Base
+from invana.core.settings import settings
+from invana.runtime.models import TaskRun  # noqa: F401
 
 TEST_ENCRYPTION_KEY = "Ry3OxpZmI9Rv1gv3T2kD1n0jY4EeKaLZwH-cFCG9hMA="
 TEST_CONNECTOR_CLASS = "invana.graph.connectors.neo4j.connector.Neo4jConnector"
@@ -54,16 +68,31 @@ async def session(session_factory):
         await sess.rollback()
 
 
+@pytest_asyncio.fixture
+async def user(session: AsyncSession) -> User:
+    suffix = uuid.uuid4().hex[:8]
+    u = User(email=f"{suffix}@example.com", username=f"u_{suffix}", password_hash="x", first_name="T")
+    session.add(u)
+    await session.flush()
+    return u
+
+
+@pytest_asyncio.fixture
+async def graph(session: AsyncSession, user: User) -> Graph:
+    g = Graph(slug=f"g-{uuid.uuid4().hex[:6]}", name="Test Graph", created_by_id=user.id)
+    session.add(g)
+    await session.flush()
+    return g
+
+
 @pytest.fixture
 def store():
-    return GraphModelStore()
+    return GraphConnectionQuerySet()
 
 
 @pytest.fixture
-def graph_create_data() -> GraphCreate:
-    return GraphCreate(
-        name="Test Graph",
-        description="A test graph connection",
+def connection_create_data() -> GraphConnectionCreate:
+    return GraphConnectionCreate(
         uri="bolt://localhost:7687",
         connector_class=TEST_CONNECTOR_CLASS,
         auth={"username": "neo4j", "password": "password"},

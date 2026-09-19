@@ -60,7 +60,8 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
             offset=offset,
         )
         response = await self._connector.execute(query, params)
-        # Surface the generated traversal so callers can log it (RFC-046 — the
+        # Surface the generated traversal so callers can log it
+        # (docs/for-developers/modules/explore/features/boards.md — the
         # session records a node-expand's query for explainability).
         response.metadata.query = query
         return response

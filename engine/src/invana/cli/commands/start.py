@@ -16,7 +16,7 @@ def start_cmd(host: str | None, port: int | None, reload: bool) -> None:
     except ImportError as exc:
         raise click.ClickException("uvicorn is not installed. Run: pip install invana-engine[server]") from exc
 
-    from invana.settings import settings
+    from invana.core.settings import settings
 
     _host = host or settings.host
     _port = port or settings.port

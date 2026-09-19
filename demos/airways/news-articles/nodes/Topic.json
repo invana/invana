@@ -1,0 +1,72 @@
+[
+  {
+    "id": "TOPIC_01",
+    "properties": {
+      "tag": "routelaunch",
+      "label": "Route launch"
+    }
+  },
+  {
+    "id": "TOPIC_02",
+    "properties": {
+      "tag": "suspension",
+      "label": "Route suspension"
+    }
+  },
+  {
+    "id": "TOPIC_03",
+    "properties": {
+      "tag": "fleetorder",
+      "label": "Fleet order"
+    }
+  },
+  {
+    "id": "TOPIC_04",
+    "properties": {
+      "tag": "strike",
+      "label": "Industrial action"
+    }
+  },
+  {
+    "id": "TOPIC_05",
+    "properties": {
+      "tag": "safety",
+      "label": "Safety and incidents"
+    }
+  },
+  {
+    "id": "TOPIC_06",
+    "properties": {
+      "tag": "alliance",
+      "label": "Alliances and codeshares"
+    }
+  },
+  {
+    "id": "TOPIC_07",
+    "properties": {
+      "tag": "fuelprices",
+      "label": "Fuel prices"
+    }
+  },
+  {
+    "id": "TOPIC_08",
+    "properties": {
+      "tag": "expansion",
+      "label": "Airport expansion"
+    }
+  },
+  {
+    "id": "TOPIC_09",
+    "properties": {
+      "tag": "merger",
+      "label": "Mergers and acquisitions"
+    }
+  },
+  {
+    "id": "TOPIC_10",
+    "properties": {
+      "tag": "saf",
+      "label": "Sustainable aviation fuel"
+    }
+  }
+]

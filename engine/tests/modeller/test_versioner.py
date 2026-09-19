@@ -2,7 +2,7 @@
 
 import pytest
 
-from invana.modeller.versioner import Versioner, _bump, _parse_semver
+from invana.apps.modeller.versioner import Versioner, _bump, _parse_semver
 
 
 class TestSemVer:

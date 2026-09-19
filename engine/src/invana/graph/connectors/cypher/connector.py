@@ -48,7 +48,8 @@ def _classify_neo4j_error(code: str | None) -> str:
     return QueryErrorCategory.UNKNOWN
 
 
-# openCypher baseline capability profile (RFC-022). Covers Neo4j + Memgraph, which
+# openCypher baseline capability profile (docs/for-developers/modules/graph-connectors/features/capabilities.md). Covers
+# Neo4j + Memgraph, which
 # both speak Bolt/openCypher. Vendor connectors (e.g. invana-neo4j) narrow the
 # version window and add vendor features via ``CYPHER_PROFILE.merge(...)``.
 CYPHER_PROFILE = CapabilityProfile(
@@ -178,6 +179,12 @@ class OpenCypherConnector(BaseConnector):
     async def health_check(self) -> bool:
         try:
             await self._driver.verify_connectivity()
+            # ``verify_connectivity()`` proves the *server* is reachable; it is not
+            # bound to a database. A connection names the database it reads
+            # (connect-a-database.md CD8), so the check has to go through that
+            # database — otherwise a misspelt name passes Test, unlocks Save, and
+            # fails every query made afterwards.
+            await self._execute_raw("RETURN 1")
             return True
         except Exception:
             return False

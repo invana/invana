@@ -15,13 +15,13 @@ import uuid
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from invana.auth.models import User
-from invana.events.models import Event  # noqa: F401 — table needed for emit_event
+from invana.apps.graphs.models import Graph, GraphConnection
+from invana.apps.graphs.pool import GraphConnectionManager
+from invana.core.auth.models import User
+from invana.core.events.models import Event  # noqa: F401 — table needed for emit_event
+from invana.core.models import Base
+from invana.core.settings import settings
 from invana.graph.connectors.cypher.connector import OpenCypherConnector
-from invana.graphs.manager import GraphConnectionManager
-from invana.graphs.models import Graph, GraphConnection
-from invana.modeller.models import Base
-from invana.settings import settings
 
 NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME", "neo4j")

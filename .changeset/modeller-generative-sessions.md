@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Modeller generative sessions — author a graph model by chat (RFC-031).
+Modeller generative sessions — author a graph model by chat (docs/for-developers/modules/connect-and-model/features/model-editor.md).
 
 The Modeller gains a "Messages" panel: describe a model in natural language
 ("model people and the projects they work on") and the LLM proposes node/edge

@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Every reply now shows the tasks that produced it, live (RFC-055).
+Every reply now shows the tasks that produced it, live (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md).
 
 Sending a question no longer waits for the answer: the engine records the ask
 and opens a *thinking* — a run of the workflow behind the reply (Understand →

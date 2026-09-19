@@ -24,32 +24,53 @@ importers:
         specifier: ^6.41.0
         version: 6.41.0
       '@invana/canvas':
-        specifier: ^0.0.11
-        version: 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.0.14
+        version: 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
       '@invana/canvas-react':
-        specifier: ^0.0.11
-        version: 0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph-layout-d3-force@0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(pixi.js@8.18.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: ^0.0.14
+        version: 0.0.14(59ecd1072261d7e207a836724ffa67d0)
+      '@invana/canvas-ui':
+        specifier: ^0.0.14
+        version: 0.0.14(d4c8429a50d394650e75e5153eff22a0)
+      '@invana/dashboard':
+        specifier: ^0.0.28
+        version: 0.0.28(@invana/editor@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/forms@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/editor':
+        specifier: ^0.0.28
+        version: 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@invana/forms':
-        specifier: ^0.0.20
-        version: 0.0.20(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+        specifier: ^0.0.28
+        version: 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
       '@invana/graph':
-        specifier: ^0.0.11
-        version: 0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layer-d3-contour':
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
+      '@invana/graph-layer-maplibre':
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
       '@invana/graph-layout-d3-force':
-        specifier: ^0.0.9
-        version: 0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layout-d3-sankey':
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
       '@invana/graph-layout-elkjs':
-        specifier: ^0.0.9
-        version: 0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/renderer-pixijs':
+        specifier: ^0.0.14
+        version: 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/canvas-store@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       '@invana/styling':
-        specifier: ^0.0.20
-        version: 0.0.20(tailwindcss@4.2.2)
+        specifier: ^0.0.28
+        version: 0.0.28(tailwindcss@4.2.2)
       '@invana/themes':
-        specifier: ^0.0.20
-        version: 0.0.20(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^0.0.28
+        version: 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@invana/ui':
-        specifier: ^0.0.20
-        version: 0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+        specifier: ^0.0.28
+        version: 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -71,27 +92,18 @@ importers:
       axios:
         specifier: ^1.7.0
         version: 1.16.1
-      d3-force:
-        specifier: ^3.0.0
-        version: 3.0.0
       elkjs:
         specifier: ^0.9.3
         version: 0.9.3
-      immer:
-        specifier: ^11.1.8
-        version: 11.1.8
       lucide-react:
         specifier: ^0.475.0
         version: 0.475.0(react@19.2.5)
       pixi-viewport:
         specifier: ^6.0.3
-        version: 6.0.3(pixi.js@8.18.1)
+        version: 6.0.3(pixi.js@8.20.1)
       pixi.js:
-        specifier: ^8.18.1
-        version: 8.18.1
-      rbush:
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^8.20.1
+        version: 8.20.1
       react:
         specifier: ^19.2.0
         version: 19.2.5
@@ -114,12 +126,12 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.0
         version: 1.9.4
+      '@playwright/test':
+        specifier: ^1.63.0
+        version: 1.63.0
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.2.2(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0))
-      '@types/d3-force':
-        specifier: ^3.0.10
-        version: 3.0.10
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
@@ -548,77 +560,153 @@ packages:
       zod:
         optional: true
 
-  '@invana/canvas-react@0.0.11':
-    resolution: {integrity: sha512-kNd7CfuJI/vaCZTLGMgHsBbXmTcni2/nYCZiLqmcBrKzIyUQEAJKUG7zDJxdxu7ih/moSlONa6LaULKNUfdJIg==}
+  '@invana/canvas-core@0.0.14':
+    resolution: {integrity: sha512-PbsDVDo0lEfwnm91F4x/oZS/9h9AyXXPTq+cw0HfsvkMQ1vB9ngz0rJnMVoJyfIcGhm/HBfRvf6xcIJjPNDA3w==}
     peerDependencies:
-      '@invana/canvas': 0.0.11
-      '@invana/graph': 0.0.11
-      '@invana/graph-layout-d3-force': 0.0.11
-      '@invana/ui': '*'
-      pixi.js: ^8.18.1
+      typescript: '>=5.0.0'
+
+  '@invana/canvas-react@0.0.14':
+    resolution: {integrity: sha512-j2aYz99lVBwi8e81nxl7KQ0PU1cMLFNGfNuhJaKcSywkMThFN3Frb6ln9q31jKuhgkDnObWeAJgCFmrRuhOltw==}
+    peerDependencies:
+      '@invana/canvas': 0.0.14
+      '@invana/graph': 0.0.14
+      '@invana/graph-layer-d3-contour': 0.0.14
+      '@invana/graph-layer-maplibre': 0.0.14
+      '@invana/graph-layout-d3-force': 0.0.14
+      '@invana/graph-layout-d3-sankey': 0.0.14
+      '@invana/graph-layout-elkjs': 0.0.14
+      '@invana/renderer-pixijs': 0.0.14
+      pixi.js: ^8.20.1
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@invana/graph-layer-d3-contour':
+        optional: true
+      '@invana/graph-layer-maplibre':
+        optional: true
+      '@invana/graph-layout-d3-sankey':
+        optional: true
+      '@invana/graph-layout-elkjs':
+        optional: true
 
-  '@invana/canvas-store@0.0.11':
-    resolution: {integrity: sha512-b8UKY7QCoNHYgjFWQdG3BUP2K0aiK5XlD5VEeBq/T/ZQkzK7PFDJEJRtM+LHcpHsVkJDqGV5yfpNXFS1dvUQ1g==}
+  '@invana/canvas-store@0.0.14':
+    resolution: {integrity: sha512-/FVh2Droli3v8Fnaba8xORg9db5SvYh9ohNJxB4/j2X7l1aVjQKAlzBZpS3XInlvma1FZ6FL7huqDCS9S855Sw==}
     peerDependencies:
       typescript: '>=5.0.0'
 
-  '@invana/canvas@0.0.11':
-    resolution: {integrity: sha512-2CqjmhQgWWPworwNw2HSXdOvRzbr7imiZ1EJj9zzskQHnxvXm7f6uarDyEAkra81h+CqDP9Aqtk34GRoE7QyjQ==}
+  '@invana/canvas-ui@0.0.14':
+    resolution: {integrity: sha512-/2HtGId32msDlE2D6W/9ALbL9/u3pbQomYlEv/Sl8EJJ7x+BCuePJL2AqiqIFMJHHkGAitbHjLqxRNec96T2RQ==}
+    peerDependencies:
+      '@invana/canvas': 0.0.14
+      '@invana/canvas-react': 0.0.14
+      '@invana/forms': '*'
+      '@invana/graph': 0.0.14
+      '@invana/graph-layout-d3-force': 0.0.14
+      '@invana/styling': '*'
+      '@invana/themes': '*'
+      '@invana/ui': '*'
+      lucide-react: '>=0.400.0'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      react-hook-form: ^7
+
+  '@invana/canvas@0.0.14':
+    resolution: {integrity: sha512-XBpqQzSsIFeR02tJHmIJTSil0rDz91+fmSME601hbtE36P+N4ZAnbGirBvEt5kKgKqMXKKjKzEiUt+BqfCirug==}
     peerDependencies:
       typescript: '>=5.0.0'
 
-  '@invana/forms@0.0.20':
-    resolution: {integrity: sha512-eY1yVfMxi2wC1KE9NK9piAFeJWIuhiW0TjtPm4Qp82kM4wVMsmTkx6iUTsdKynkGn84KK+uGA8RTod7S7kRQQg==}
+  '@invana/dashboard@0.0.28':
+    resolution: {integrity: sha512-SDRe1JkZjm+aS7IqiytT13O0z7ZJhQ13fR7/adVoO0O4FWXR+NccxdoHTXP0D1+r6vJ4CyYwN1bWvIUKhBI5iQ==}
     peerDependencies:
-      '@invana/styling': 0.0.20
-      '@invana/ui': 0.0.20
+      '@invana/editor': 0.0.28
+      '@invana/forms': 0.0.28
+      '@invana/styling': 0.0.28
+      '@invana/ui': 0.0.28
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
+
+  '@invana/editor@0.0.28':
+    resolution: {integrity: sha512-rpw5+huZ650eI4EzNDDrzS9HKzuZpRa3hTncncHeRplzeStLY0C3NwSRyNnxJvUPgo7t5kfUFYsX2N+PvqooGQ==}
+    peerDependencies:
+      '@invana/styling': 0.0.28
+      '@invana/ui': 0.0.28
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
+
+  '@invana/forms@0.0.28':
+    resolution: {integrity: sha512-Y+hRXQu+Ecl+X+OSHhE7PatR1F2/D8+kCeTNoUiBEEdSPE2DQqyqGNzG9Wpbas5ah9szVbf3nROc8SbUzVl46A==}
+    peerDependencies:
+      '@invana/styling': 0.0.28
+      '@invana/ui': 0.0.28
       react: ^18 || ^19
       react-dom: ^18 || ^19
       react-hook-form: ^7
 
-  '@invana/graph-layout-d3-force@0.0.9':
-    resolution: {integrity: sha512-noy7Rlz9ZfaTTgmLg3gFA4WwoQe1+rMzSte0taGDKMcDGzUfRTXmb7pPYCTWzfOMMHU8ax/VwV3bHQCVBjcVEQ==}
+  '@invana/graph-layer-d3-contour@0.0.14':
+    resolution: {integrity: sha512-PfMiQ25TR94/IP/67ANNOxWKfMZImhmgW7umlIpP4k3xI4CoGs6yHonHqz37/M8YH0IIvVLeWkColC+5XJEQeg==}
     peerDependencies:
-      '@invana/canvas': 0.0.9
-      '@invana/graph': 0.0.9
+      '@invana/canvas': 0.0.14
+      '@invana/graph': 0.0.14
+      pixi.js: ^8.20.1
 
-  '@invana/graph-layout-elkjs@0.0.9':
-    resolution: {integrity: sha512-0U59dlZ5NQjjE/VHCrzS0otRsv0orD9tAAwzBKRz+80hhlRDygPmCefa1wnZwSrW0f/lbDP+eCAU10hCgix8fA==}
+  '@invana/graph-layer-maplibre@0.0.14':
+    resolution: {integrity: sha512-7m8nfF6V/HFTOfO0DgigpjZq/F8R4noD4mRx5kabeGQfvoqDe40bJoIva+DjgUfiMr0ekW/9zvPPkHSMNCRhDw==}
     peerDependencies:
-      '@invana/canvas': 0.0.9
-      '@invana/graph': 0.0.9
+      '@invana/canvas': 0.0.14
+      pixi.js: ^8.20.1
 
-  '@invana/graph@0.0.11':
-    resolution: {integrity: sha512-nEPqX9B2wnDfsG2LIqBflF6qceht1GO4OcGzZayM/MByhck5t/46YeHRL9VoyFa1qZLVqXui/bluuHY5eIqu5w==}
+  '@invana/graph-layout-d3-force@0.0.14':
+    resolution: {integrity: sha512-w6xTht0bfxusuFU6nWt7WaSYUR1UIKZJMHBASNnN50GifLGsfPFLaZYuZJuyDm8YVi8Z3d/uBbJPxi5lle+xCQ==}
     peerDependencies:
-      '@invana/canvas': 0.0.11
-      pixi.js: ^8.18.1
+      '@invana/canvas-core': 0.0.14
+      '@invana/graph': 0.0.14
 
-  '@invana/styling@0.0.20':
-    resolution: {integrity: sha512-jdy1hcMvJnBab5aigydpHEhcQNFLfToC/QsLVA4n3oQE8J3KvqFGMI0y3GobOJdxxLYPD+9NByNfUyATUxl79A==}
+  '@invana/graph-layout-d3-sankey@0.0.14':
+    resolution: {integrity: sha512-6f81f1nRPFhUKCbhiRhYrCMnq/lDJ0Lzb/XTr04t9bgKcHpK/L6i3NcGT8tRAePZgYwd5I4+lHx0d96DDi2lWw==}
+    peerDependencies:
+      '@invana/canvas-core': 0.0.14
+      '@invana/graph': 0.0.14
+
+  '@invana/graph-layout-elkjs@0.0.14':
+    resolution: {integrity: sha512-6755aSd150TImBWovkwaC+ldETHNBAq7wb1pwOC3uJHXrCVJAjLI9hE0DqyzjvV23JCmGhw7nWHCXuiWteklFw==}
+    peerDependencies:
+      '@invana/canvas-core': 0.0.14
+      '@invana/graph': 0.0.14
+
+  '@invana/graph@0.0.14':
+    resolution: {integrity: sha512-pRlJ76axTPo8uPc2+LfjW6QFlqwHEdujLJGZQrQ0ZpWwTGLV04fNfd7VYprInt/yrqZzArdDhgeSmbDNAT8Gzw==}
+    peerDependencies:
+      '@invana/canvas': 0.0.14
+
+  '@invana/renderer-pixijs@0.0.14':
+    resolution: {integrity: sha512-+6tluqNvMosBUDYE+xKY9G1H4D9f9wro7NZy3IQjAvVIReL7zVbvGP26E+IZIM29BlfRHnzojrA3mbdhzH+VMQ==}
+    peerDependencies:
+      '@invana/canvas-core': 0.0.14
+      '@invana/canvas-store': 0.0.14
+
+  '@invana/styling@0.0.28':
+    resolution: {integrity: sha512-APZPwcljprlUGO1eUZo05mqyssQzrTUUX60lg5E4Lu0D9TyU6KeM3goplCLqDBQlJSTSiUsYHs+buIktnfLS7A==}
     peerDependencies:
       tailwindcss: ^4.1.18
 
-  '@invana/themes@0.0.12':
-    resolution: {integrity: sha512-VeHMkUW+cd/7LQg7AxQ4nIpl8GrPFbz0FN2D+5gVE/twat9chrVeN+X4SyxxTT2H449W7pEoEUlS45vT4FuaKw==}
+  '@invana/themes@0.0.24':
+    resolution: {integrity: sha512-90AJkTmh7RrwMdFLAibeUlJmpbY8j7jFQiyMjFIW0Y4/ZaZTjg70W6gW+z8AZAmIcUu10hLYv2SSWlD+yOG9GQ==}
     peerDependencies:
-      '@invana/styling': 0.0.12
-      '@invana/ui': 0.0.12
+      '@invana/styling': 0.0.24
+      '@invana/ui': 0.0.24
       react: ^18 || ^19
       react-dom: ^18 || ^19
 
-  '@invana/themes@0.0.20':
-    resolution: {integrity: sha512-3XPG3EQ4diYv35GaUA3DbwXyPnufDi46l8szjE189nK+jrvxov1TtsQl8u/pSXDacaFsjg+/v9c5jxYGcGgY3Q==}
+  '@invana/themes@0.0.28':
+    resolution: {integrity: sha512-LqWlwPpKM+s48NvoEjGz86hPlalswjgiwA0394hWs1D++AYPJGXs32yg4Rpt/vpyXu+kwnYaPDIxf48I5TLNMA==}
     peerDependencies:
-      '@invana/styling': 0.0.20
-      '@invana/ui': 0.0.20
+      '@invana/styling': 0.0.28
+      '@invana/ui': 0.0.28
       react: ^18 || ^19
       react-dom: ^18 || ^19
 
-  '@invana/ui@0.0.20':
-    resolution: {integrity: sha512-JqDrzIS/XM0Oth+v7Ja76Mk9jGu4gBgWjiLeXflXtFWzS/IQcWQpX5QUV5MCWweKWL0X0LGRrJAYWPduQ0nrTQ==}
+  '@invana/ui@0.0.28':
+    resolution: {integrity: sha512-WC+2/MXauCpilC0yXIGxto7IFs11mKHIe7aabflSJr4ifl9MOeUWvpHGQ4B499+o5symfdhTW9YYYBukgn7vBQ==}
     peerDependencies:
       react: ^18 || ^19
       react-dom: ^18 || ^19
@@ -647,6 +735,34 @@ packages:
 
   '@lezer/lr@1.4.8':
     resolution: {integrity: sha512-bPWa0Pgx69ylNlMlPvBPryqeLYQjyJjqPx+Aupm5zydLIF3NE+6MMLT8Yi23Bd9cif9VS00aUebn+6fDIGBcDA==}
+
+  '@mapbox/geojson-rewind@0.5.2':
+    resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
+    hasBin: true
+
+  '@mapbox/jsonlint-lines-primitives@2.0.3':
+    resolution: {integrity: sha512-0SElaV0uMxEnxzBhhX9WTuPyUeMsAN/SS0i16tjuba4/mio63MG9khjC1a0JAiPGXAwvwm4UfHJURCN7nyudQg==}
+    engines: {node: '>= 22'}
+
+  '@mapbox/point-geometry@0.1.0':
+    resolution: {integrity: sha512-6j56HdLTwWGO0fJPlrZtdU/B13q8Uwmo18Ck2GnGgN9PCFyKTZ3UbXeEdRFh18i9XQ92eH2VdtpJHpBD3aripQ==}
+
+  '@mapbox/tiny-sdf@2.2.0':
+    resolution: {integrity: sha512-LVL4wgI9YAum5V+LNVQO6QgFBPw7/MIIY4XJPNsPDMrjEwcE+JfKk1LuIl8GnF197ejVdC9QdPaxrx5gfgdGXg==}
+
+  '@mapbox/unitbezier@0.0.1':
+    resolution: {integrity: sha512-nMkuDXFv60aBr9soUG5q+GvZYL+2KZHVvsqFCzqnkGEf46U2fvmytHaEVc1/YZbiLn8X+eR3QzX1+dwDO1lxlw==}
+
+  '@mapbox/vector-tile@1.3.1':
+    resolution: {integrity: sha512-MCEddb8u44/xfQ3oD+Srl/tNcQoqTw3goGk2oLsrFxOTc3dUp+kAnby3PvAeeBYSMSjSPD1nd1AJA6W49WnoUw==}
+
+  '@mapbox/whoots-js@3.1.0':
+    resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
+    engines: {node: '>=6.0.0'}
+
+  '@maplibre/maplibre-gl-style-spec@20.4.0':
+    resolution: {integrity: sha512-AzBy3095fTFPjDjmWpR2w6HVRAZJ6hQZUCwk5Plz6EyfnfuQW1odeW5i2Ai47Y6TBA2hQnC+azscjBSALpaWgw==}
+    hasBin: true
 
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
@@ -731,11 +847,13 @@ packages:
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
 
+  '@playwright/test@1.63.0':
+    resolution: {integrity: sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   '@radix-ui/number@1.1.3':
     resolution: {integrity: sha512-Road2bidD0uu/1BGDOWNdPI06g0lIRy6IF9GZcIrDK2KGItfor8IQwQa+yM2ERgHM1MmHxaxpTzk0/Jp42lNfA==}
-
-  '@radix-ui/primitive@1.1.3':
-    resolution: {integrity: sha512-JTF99U/6XIjCBo0wqkU5sK10glYe27MRRsfwoiq5zzOEZLHU3A3KCMa5X/azekYRCJ0HlwI0crAXS/5dEHTzDg==}
 
   '@radix-ui/primitive@1.1.7':
     resolution: {integrity: sha512-rqWnm76nYT8HoNNqEjpgJ7Pw/DrBj5iBTrmEPo6HTX5+VJyBNOqTdv4g89G63HuR5g0AaENoAcH7Is5fF2kZ8Q==}
@@ -831,26 +949,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-compose-refs@1.1.2':
-    resolution: {integrity: sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-compose-refs@1.1.5':
     resolution: {integrity: sha512-+48PbAAbq3didjJxa+OaWY2ZwgAKsNiRGyeHKszblZMQ+kcpd9pAaT11cMkGEie0vsOi3QdeTE6d5Fe3Gn61kA==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@radix-ui/react-context@1.1.2':
-    resolution: {integrity: sha512-jCi/QKUM2r1Ju5a3J64TH2A5SpKAgh0LpknyqdQ4m6DCV0xJ2HG1xARRwNGPQfi1SLdLWZ1OJz6F4OMBBNiGJA==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -865,19 +965,6 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
-        optional: true
-
-  '@radix-ui/react-dialog@1.1.15':
-    resolution: {integrity: sha512-TCglVRtzlffRNxRMEyR36DGBLJpeusFcgMVD9PZEzAKnUs1lKCgX5u9BmC2Yg+LL9MgZDugFFs1Vl+Jp4t/PGw==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-dialog@1.1.23':
@@ -900,19 +987,6 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
-        optional: true
-
-  '@radix-ui/react-dismissable-layer@1.1.11':
-    resolution: {integrity: sha512-Nqcp+t5cTB8BinFkZgXiMJniQH0PsUt2k51FUhbdfeKvc4ACcG2uQniY/8+h1Yv6Kza4Q7lD7PQV0z0oicE0Mg==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-dismissable-layer@1.1.19':
@@ -941,15 +1015,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-focus-guards@1.1.3':
-    resolution: {integrity: sha512-0rFg/Rj2Q62NCm62jZw0QX7a3sz6QCQU0LpZdNrJX8byRGaGVTqbrW9jAoIAHyMQqsNpeZ81YgSizOt5WXq0Pw==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-focus-guards@1.1.6':
     resolution: {integrity: sha512-RNOJjfZMTyBM6xYmV3IVGXkPjIhcBAuv48POevAXwrGJhkWZ9p1rFoIS1JFooPuT193AZmRsCPhpoVJxx6OPoQ==}
     peerDependencies:
@@ -972,19 +1037,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-focus-scope@1.1.7':
-    resolution: {integrity: sha512-t2ODlkXBQyn7jkl6TNaw/MtVEVvIGelJDCG41Okq/KwUsJBwQ4XVZsHAVUkK4mBv3ewiAS3PGuUWuY2BoK4ZUw==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
   '@radix-ui/react-hover-card@1.1.23':
     resolution: {integrity: sha512-H8qONfZd3ltrU3+jHCIgITbWo6e1iTKvP9DHdrvYbX48ooRM5FjEDTn16AMwdfuOGkWdZEhpl3PLL/Wk/AnHDQ==}
     peerDependencies:
@@ -996,15 +1048,6 @@ packages:
       '@types/react':
         optional: true
       '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-id@1.1.1':
-    resolution: {integrity: sha512-kGkGegYIdQsOb4XjsfM97rXsiHaBwco+hFI66oO4s9LU+PLAC5oJ7khdOVFxkhsmlbpUqDAvXw11CluXP+jkHg==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
         optional: true
 
   '@radix-ui/react-id@1.1.4':
@@ -1107,19 +1150,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-portal@1.1.9':
-    resolution: {integrity: sha512-bpIxvq03if6UNwXZ+HTK71JLh4APvnXntDc6XOX8UVq4XQOVl7lwok0AvIl+b8zgCw3fSaVTZMpAPPagXbKmHQ==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
   '@radix-ui/react-presence@1.1.10':
     resolution: {integrity: sha512-3wyzCQ6+ubRA+D4uv9m95JYLXxmOHp05qjrkjeA7uKHHtjpPggQzc6DAb0URl7j67oR0K2foO4ip27TiX037Bw==}
     peerDependencies:
@@ -1133,47 +1163,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-presence@1.1.5':
-    resolution: {integrity: sha512-/jfEwNDdQVBCNvjkGit4h6pMOzq8bHkopq458dPt2lMjx+eBQUohZNG9A7DtO/O5ukSbxuaNGXMjHicgwy6rQQ==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
   '@radix-ui/react-primitive@2.1.10':
     resolution: {integrity: sha512-MucOnzh6hR5mid6VpkbglRAMYMjKLqRnGBbjXkzjK52fuQDd1qbkx78a5P40mkcnVXJdEVxm26E9OPAiUq7nBg==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-primitive@2.1.3':
-    resolution: {integrity: sha512-m9gTwRkhy2lvCPe6QJp4d3G1TYEUHn/FzJUtq9MjH46an1wJU+GdoGC5VLof8RX8Ft/DlpshApkhswDLZzHIcQ==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-
-  '@radix-ui/react-primitive@2.1.4':
-    resolution: {integrity: sha512-9hQc4+GNVtJAIEPEqlYqW5RiYdrr8ea5XQ0ZOnD6fgru+83kqT15mq2OCcbe8KnjRZl5vF3ks69AKz3kh1jrhg==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -1276,24 +1267,6 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-slot@1.2.3':
-    resolution: {integrity: sha512-aeNmHnBxbi2St0au6VBVC7JXFlhLlOnvIIlePNniyUNAClzmtAUEY8/pBiK3iHjufOlwA+c20/8jngo7xcrg8A==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@radix-ui/react-slot@1.2.4':
-    resolution: {integrity: sha512-Jl+bCv8HxKnlTLVrcDE8zTMJ09R9/ukw4qBs/oZClOfoQk/cOTbDn+NceXfV7j09YPVQUryJPHurafcSg6EVKA==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-slot@1.3.3':
     resolution: {integrity: sha512-qx7oqnYbxnK9kYI9m317qmFmEgo6ywqWvbTogdj7cL9p3/yx4M48p7Rnw5z3H890cL/ow/EeWJsuTykeZVXP5Q==}
     peerDependencies:
@@ -1368,26 +1341,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-use-callback-ref@1.1.1':
-    resolution: {integrity: sha512-FkBMwD+qbGQeMu1cOHnuGB6x4yzPjho8ap5WtbEJ26umhgqVXbhekKUQO+hZEL1vU92a3wHwdp0HAcqAUF5iDg==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-use-callback-ref@1.1.4':
     resolution: {integrity: sha512-R6OUY2e2fA6Yn6s+VSx5KBV6Nx8LQEhu+cz7LCej18rQ1HLyg9PSC9jP/ZNx0o6FAIK9c0F1kHylzSxKsdlkrQ==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@radix-ui/react-use-controllable-state@1.2.2':
-    resolution: {integrity: sha512-BjasUjixPFdS+NKkypcyyN5Pmg83Olst0+c6vGov0diwTEo6mgdqVR6hxcEgFuh4QrAs7Rc+9KuGJ9TVCj0Zzg==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -1404,15 +1359,6 @@ packages:
       '@types/react':
         optional: true
 
-  '@radix-ui/react-use-effect-event@0.0.2':
-    resolution: {integrity: sha512-Qp8WbZOBe+blgpuUT+lw2xheLP8q0oatc9UpmiemEICxGvFLYmHm9QowVZGHtJlGbS6A6yJ3iViad/2cVjnOiA==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-use-effect-event@0.0.5':
     resolution: {integrity: sha512-7cshFL8HGS/7HEiHH+9kL9HBwp2sa9yX18Knwek6KYWmXwM7pegMgta2AXMQKI+rq3JnfSj9x8wYqFMTdG1Jgg==}
     peerDependencies:
@@ -1422,26 +1368,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@radix-ui/react-use-escape-keydown@1.1.1':
-    resolution: {integrity: sha512-Il0+boE7w/XebUHyBjroE+DbByORGR9KKmITzbR7MyQ4akpORYP/ZmbhAr0DG7RmmBqoOnZdy2QlvajJ2QA59g==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   '@radix-ui/react-use-is-hydrated@0.1.3':
     resolution: {integrity: sha512-umO/aJ+82CpOnhDZUTbILCQf7kU/g0iv+oGs/Q8jw7IkhWBzaEP4sA268PhFAJTFetbwp3ICc6ktpI4TqtxcIw==}
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@radix-ui/react-use-layout-effect@1.1.1':
-    resolution: {integrity: sha512-RbJRS4UWQFkzHTTwVymMTUv8EqYhOp8dOOviLj2ugtTiXRaRQS7GLGxZTLL1jWhMeoSCf5zmcZkqTl9IiYfXcQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -1759,17 +1687,29 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
-  '@types/d3-force@3.0.10':
-    resolution: {integrity: sha512-ZYeSaCF3p73RdOKcjj+swRlZfnYpK1EbaDiYICEEp5Q6sUiqFaFQ9qgoshp5CzIyyb/yD09kD9o2zEltCexlgw==}
-
   '@types/earcut@3.0.0':
     resolution: {integrity: sha512-k/9fOUGO39yd2sCjrbAJvGDEQvRwRnQIZlBz43roGwUZo5SHAmyVvSFyaVVZkicRVCaDXPKlbxrUcBuJoSWunQ==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+  '@types/geojson-vt@3.2.5':
+    resolution: {integrity: sha512-qDO7wqtprzlpe8FfQ//ClPV9xiuoh2nkIgiouIptON9w5jvD/fA4szvP9GBlDVdJ5dldAl0kX/sy3URbWwLx0g==}
+
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
+
+  '@types/mapbox__point-geometry@0.1.4':
+    resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
+
+  '@types/mapbox__vector-tile@1.3.4':
+    resolution: {integrity: sha512-bpd8dRn9pr6xKvuEBQup8pwQfD4VUyqO/2deGjfpe6AwC8YRlyEipvefyRJUSiCJTZuCb8Pl1ciVV5ekqJ96Bg==}
+
   '@types/node@25.6.0':
     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+
+  '@types/pbf@3.0.5':
+    resolution: {integrity: sha512-j3pOPiEcWZ34R6a6mN07mUkM4o4Lwf6hPNt8eilOeZhTFbxFXmKhvXl9Y28jotFPaI1bpPDJsbCprUoNke6OrA==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -1778,6 +1718,9 @@ packages:
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
+
+  '@types/supercluster@7.1.3':
+    resolution: {integrity: sha512-Z0pOY34GDFl3Q6hUFYf3HkTwKEE02e7QgtJppBt+beEAxnyOpJua+voGFvxINBHa06GwLFFym7gRPY2SiKIfIA==}
 
   '@vitejs/plugin-react@5.2.0':
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
@@ -1788,8 +1731,8 @@ packages:
   '@webgpu/types@0.1.70':
     resolution: {integrity: sha512-LFiNHHKMvmAEvwVew3JLJmTdShhbdwRFSImUshGhE2mGE8ybQzIo63l5uRp+YKnNx+8Qno8Kf6gN+DKMreIJCA==}
 
-  '@xmldom/xmldom@0.8.13':
-    resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
+  '@xmldom/xmldom@0.8.15':
+    resolution: {integrity: sha512-/5NV/vDALVFDXgLmfsy9TRCBlKwO2LNBFzpzvb9iIj+jR+eSc6DLYYvVOdivT/jm7MtU6TebYuRmzEOI7w40UA==}
     engines: {node: '>=10.0.0'}
 
   agent-base@6.0.2:
@@ -1853,6 +1796,17 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
+  d3-array@2.12.1:
+    resolution: {integrity: sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==}
+
+  d3-array@3.2.4:
+    resolution: {integrity: sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==}
+    engines: {node: '>=12'}
+
+  d3-contour@4.0.2:
+    resolution: {integrity: sha512-4EzFTRIikzs47RGmdxbeUvLWtGedDUNkTcmzoeyg4sP/dvCexO47AaQL7VKy/gul85TOxw+IBgA8US2xwbToNA==}
+    engines: {node: '>=12'}
+
   d3-dispatch@3.0.1:
     resolution: {integrity: sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==}
     engines: {node: '>=12'}
@@ -1861,9 +1815,18 @@ packages:
     resolution: {integrity: sha512-zxV/SsA+U4yte8051P4ECydjD/S+qeYtnaIyAs9tgHCqfguma/aAQDjo85A9Z6EKhBirHRJHXIgJUlffT4wdLg==}
     engines: {node: '>=12'}
 
+  d3-path@1.0.9:
+    resolution: {integrity: sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==}
+
   d3-quadtree@3.0.1:
     resolution: {integrity: sha512-04xDrxQTDTCFwP5H6hRhsRcb9xxv2RzkcsygFzmkSIOJy3PeRJP7sNk3VRIbKXcog561P9oU0/rVH6vDROAgUw==}
     engines: {node: '>=12'}
+
+  d3-sankey@0.12.3:
+    resolution: {integrity: sha512-nQhsBRmM19Ax5xEIPLMY9ZmJ/cDvd1BG3UVvt5h3WRxKg5zGRbvnteTyWAbzeSvlh3tW7ZEmq4VwR5mB3tutmQ==}
+
+  d3-shape@1.3.7:
+    resolution: {integrity: sha512-EUkvKjqPFUAZyOlhY5gzCxCeI0Aep04LwIRpsZ/mLFelJiUfnK56jo5JMDSE7yyP2kLSb6LtF+S5chMk7uqPqw==}
 
   d3-timer@3.0.1:
     resolution: {integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==}
@@ -1981,6 +1944,9 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
+  geojson-vt@4.0.3:
+    resolution: {integrity: sha512-jR1MwkLaZGa8Zftct9ZFruyWFrdl9ZyD2OliXNy9Qq5bBPeg5wHVpBQF9p5GjnicSDQqvBVpysxTPKmWdsfWMA==}
+
   get-intrinsic@1.3.0:
     resolution: {integrity: sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==}
     engines: {node: '>= 0.4'}
@@ -1993,8 +1959,19 @@ packages:
     resolution: {integrity: sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==}
     engines: {node: '>= 0.4'}
 
+  get-stream@6.0.1:
+    resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
+    engines: {node: '>=10'}
+
   gifuct-js@2.1.2:
     resolution: {integrity: sha512-rI2asw77u0mGgwhV3qA+OEgYqaDn5UNqgs+Bx0FGwSpuqfYn+Ir6RQY5ENNQ8SbIiG/m5gVa7CD5RriO4f4Lsg==}
+
+  gl-matrix@3.4.4:
+    resolution: {integrity: sha512-latSnyDNt/8zYUB6VIJ6PCh2jBjJX6gnDsoCZ7LyW7GkqrD51EWwa9qCoGixj8YqBtETQK/xY7OmpTF8xz1DdQ==}
+
+  global-prefix@4.0.0:
+    resolution: {integrity: sha512-w0Uf9Y9/nyHinEk5vMJKRie+wa4kR5hmDbEhGGds/kG1PwGLLHKRoNMeJOyCQjjBkANlnScqgzcFwGHgmgLkVA==}
+    engines: {node: '>=16'}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -2019,8 +1996,26 @@ packages:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
 
+  ieee754@1.2.1:
+    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+
   immer@11.1.8:
     resolution: {integrity: sha512-/tbkHMW7y10Lx6i1crLjD4/OhNkRG+Fo7byZHtah0547nIeXYcpIXaUh0IAQY6gO5459qpGGYapcEOHtFXkIuA==}
+
+  ini@4.1.3:
+    resolution: {integrity: sha512-X7rqawQBvfdjS10YU1y1YVreA3SsLrW9dX2CewP2EbBJM4ypVNLDkO5y04gejPwKIY9lR+7r9gn3rFPt/kmWFg==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  internmap@1.0.1:
+    resolution: {integrity: sha512-lDB5YccMydFBtasVtxnZ3MRBHuaoE8GKsppq+EchKL2U4nK/DmEpPHNH8MZe5HkMtpSiTSOZwfN0tzYjO/lJEw==}
+
+  internmap@2.0.3:
+    resolution: {integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==}
+    engines: {node: '>=12'}
+
+  isexe@3.1.5:
+    resolution: {integrity: sha512-6B3tLtFqtQS4ekarvLVMZ+X+VlvQekbe4taUkf/rhVO3d/h0M2rfARm/pXLcPEsjjMsFgrFgSrhQIxcSVrBz8w==}
+    engines: {node: '>=18'}
 
   ismobilejs@1.1.1:
     resolution: {integrity: sha512-VaFW53yt8QO61k2WJui0dHf4SlL8lxBofUuUmwBo0ljPk0Drz2TiuDW4jo3wDcv41qy/SxrJ+VAzJ/qYqsmzRw==}
@@ -2040,10 +2035,20 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  json-stringify-pretty-compact@4.0.0:
+    resolution: {integrity: sha512-3CNZ2DnrpByG9Nqj6Xo8vqbjT4F6N+tb4Gb28ESAZjYZ5yqvmc56J+/kuIwkaAMOyblTQhUW7PxMkUb8Q36N3Q==}
+
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  kdbush@4.1.0:
+    resolution: {integrity: sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ==}
+
+  kind-of@6.0.3:
+    resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
+    engines: {node: '>=0.10.0'}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -2140,6 +2145,10 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  maplibre-gl@4.7.1:
+    resolution: {integrity: sha512-lgL7XpIwsgICiL82ITplfS7IGwrB1OJIw/pCvprDp2dhmSSEBgmPzYRvwYYYvJGJD7fxUv1Tvpih4nZ6VrLuaA==}
+    engines: {node: '>=16.14.0', npm: '>=8.1.0'}
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -2152,8 +2161,14 @@ packages:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
+  minimist@1.2.8:
+    resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
+
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+
+  murmurhash-js@1.0.0:
+    resolution: {integrity: sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==}
 
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
@@ -2163,8 +2178,12 @@ packages:
   node-releases@2.0.37:
     resolution: {integrity: sha512-1h5gKZCF+pO/o3Iqt5Jp7wc9rH3eJJ0+nh/CIoiRwjRxde/hAHyLPXYN4V3CqKAbiZPSeJFSWHmJsbkicta0Eg==}
 
-  parse-svg-path@0.1.2:
-    resolution: {integrity: sha512-JyPSBnkTJ0AI8GGJLfMXvKq42cj5c006fnLz6fXy6zfoVjJizi8BNTpu8on8ziI1cKy9d9DGNuY17Ce7wuejpQ==}
+  parse-svg-path@0.2.0:
+    resolution: {integrity: sha512-Tf7FFIrguPKQwzD4pWnYkR2VOv3raoHeKED80Bm+BYHI3KxC8KsgsGC5+fSMzAGDA6UEk4bHvmi+RsjmL3khpg==}
+
+  pbf@3.3.0:
+    resolution: {integrity: sha512-XDF38WCH3z5OV/OVa8GKUNtLAyneuzbCisx7QUCF8Q6Nutx0WnJrQe5O+kOtBlLfRNUws98Y58Lblp+NJG5T4Q==}
+    hasBin: true
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -2178,16 +2197,35 @@ packages:
     peerDependencies:
       pixi.js: '>=8'
 
-  pixi.js@8.18.1:
-    resolution: {integrity: sha512-6LUPWYgulZhp/w4kam2XHXB0QedISZIqrJbRdHLLQ3csn5a38uzKxAp6B5j6s89QFYaIJbg95kvgTRcbgpO1ow==}
+  pixi.js@8.20.1:
+    resolution: {integrity: sha512-akLVBMLvQbaEViqsmVraK0Njer1q4Q4lm4iNKuzvBiFrV8q+6/+HluJN3sWIwO663IBeQtUUS/CaXFJZs6ffXQ==}
+
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.63.0:
+    resolution: {integrity: sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   postcss@8.5.9:
     resolution: {integrity: sha512-7a70Nsot+EMX9fFU3064K/kdHWZqGVY+BADLyXc8Dfv+mTLLVl6JzJpPaCZ2kQL9gIJvKXSLMHhqdRRjwQeFtw==}
     engines: {node: ^10 || ^12 || >=14}
 
+  potpack@2.1.0:
+    resolution: {integrity: sha512-pcaShQc1Shq0y+E7GqJqvZj8DTthWV1KeHGdi0Z6IAin2Oi3JnLCOfwnCo84qc+HAp52wT9nK9H7FAJp5a44GQ==}
+
+  protocol-buffers-schema@3.6.1:
+    resolution: {integrity: sha512-VG2K63Igkiv9p76tk1lilczEK1cT+kCjKtkdhw1dQZV3k3IXJbd3o6Ho8b9zJZaHSnT2hKe4I+ObmX9w6m5SmQ==}
+
   proxy-from-env@2.1.0:
     resolution: {integrity: sha512-cJ+oHTW1VAEa8cJslgmUZrc+sjRKgAKl3Zyse6+PV38hZe/V6Z14TbCuXcan9F9ghlz4QrFr2c92TNF82UkYHA==}
     engines: {node: '>=10'}
+
+  quickselect@2.0.0:
+    resolution: {integrity: sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==}
 
   quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
@@ -2273,10 +2311,16 @@ packages:
     resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
     engines: {node: '>=0.10.0'}
 
+  resolve-protobuf-schema@2.1.0:
+    resolution: {integrity: sha512-kI5ffTiZWmJaS/huM8wZfEMer1eRd7oJQhDuxeCLe3t7N7mX3z94CN0xPxBQxFYQTSNz9T0i+v6inKqSdK8xrQ==}
+
   rollup@4.60.1:
     resolution: {integrity: sha512-VmtB2rFU/GroZ4oL8+ZqXgSA38O6GR8KSIvWmEFv63pQ0G6KaBH9s07PO8XTXP4vI+3UJUEypOfjkGfmSBBR0w==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
+
+  rw@1.3.3:
+    resolution: {integrity: sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==}
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
@@ -2301,6 +2345,9 @@ packages:
   style-mod@4.1.3:
     resolution: {integrity: sha512-i/n8VsZydrugj3Iuzll8+x/00GH2vnYsk1eomD8QiRrSAeW6ItbCQDtfXCeJHd0iwiNagqjQkvpvREEPtW3IoQ==}
 
+  supercluster@8.0.1:
+    resolution: {integrity: sha512-IiOea5kJ9iqzD2t7QJq/cREyLHTtSmUT6gQsweojg9WH2sYJqZK9SswTu6jrscO6D1G5v5vYZ9ru/eq85lXeZQ==}
+
   tailwind-merge@3.6.0:
     resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
@@ -2323,6 +2370,9 @@ packages:
   tinyglobby@0.2.16:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
     engines: {node: '>=12.0.0'}
+
+  tinyqueue@3.0.0:
+    resolution: {integrity: sha512-gRa9gwYU3ECmQYv3lslts5hxuIa90veaEcxDYuu3QGOIAEM2mOZkVHp48ANJuu1CURtRdHKUBY5Lm1tHV+sD4g==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -2406,8 +2456,16 @@ packages:
       yaml:
         optional: true
 
+  vt-pbf@3.1.3:
+    resolution: {integrity: sha512-2LzDFzt0mZKZ9IpVF2r69G9bXaP2Q2sArJCmcCgvfTdCCZzSyz4aCLoQyUilu37Ll56tCblIZrXFIjNUpGIlmA==}
+
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
+
+  which@4.0.0:
+    resolution: {integrity: sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg==}
+    engines: {node: ^16.13.0 || >=18.0.0}
+    hasBin: true
 
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
@@ -2718,40 +2776,38 @@ snapshots:
     optionalDependencies:
       zod: 4.5.4
 
-  '@invana/canvas-react@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph-layout-d3-force@0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react@19.2.14)(pixi.js@8.18.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
+  '@invana/canvas-core@0.0.14(typescript@6.0.2)':
     dependencies:
-      '@invana/canvas': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/canvas-store': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
-      '@invana/graph-layout-d3-force': 0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))
-      '@invana/themes': 0.0.12(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@invana/ui': 0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      typescript: 6.0.2
+
+  '@invana/canvas-react@0.0.14(59ecd1072261d7e207a836724ffa67d0)':
+    dependencies:
+      '@invana/canvas': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-store': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/renderer-pixijs': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/canvas-store@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/themes': 0.0.24(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       lucide-react: 0.562.0(react@19.2.5)
-      pixi.js: 8.18.1
+      pixi.js: 8.20.1
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
+    optionalDependencies:
+      '@invana/graph-layer-d3-contour': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)
+      '@invana/graph-layer-maplibre': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)
+      '@invana/graph-layout-d3-sankey': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/graph-layout-elkjs': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
     transitivePeerDependencies:
       - '@invana/styling'
+      - '@invana/ui'
       - '@types/react'
       - typescript
       - use-sync-external-store
 
-  '@invana/canvas-store@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
+  '@invana/canvas-store@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
     dependencies:
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
       immer: 11.1.8
-      typescript: 6.0.2
-      zustand: 5.0.12(@types/react@19.2.14)(immer@11.1.8)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
-    transitivePeerDependencies:
-      - '@types/react'
-      - react
-      - use-sync-external-store
-
-  '@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
-    dependencies:
-      '@invana/canvas-store': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      immer: 11.1.8
-      pixi-viewport: 6.0.3(pixi.js@8.18.1)
-      pixi.js: 8.18.1
       rbush: 4.0.1
       typescript: 6.0.2
       zustand: 5.0.12(@types/react@19.2.14)(immer@11.1.8)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
@@ -2760,10 +2816,58 @@ snapshots:
       - react
       - use-sync-external-store
 
-  '@invana/forms@0.0.20(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)':
+  '@invana/canvas-ui@0.0.14(d4c8429a50d394650e75e5153eff22a0)':
     dependencies:
-      '@invana/styling': 0.0.20(tailwindcss@4.2.2)
-      '@invana/ui': 0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@invana/canvas': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/canvas-react': 0.0.14(59ecd1072261d7e207a836724ffa67d0)
+      '@invana/forms': 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      '@invana/graph-layout-d3-force': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/themes': 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      lucide-react: 0.475.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      react-hook-form: 7.72.1(react@19.2.5)
+
+  '@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))':
+    dependencies:
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
+      '@invana/canvas-store': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/renderer-pixijs': 0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/canvas-store@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      typescript: 6.0.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - react
+      - use-sync-external-store
+
+  '@invana/dashboard@0.0.28(@invana/editor@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@invana/forms@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5))(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@invana/editor': 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@invana/forms': 0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      lucide-react: 1.39.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+
+  '@invana/editor@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@codemirror/commands': 6.10.3
+      '@codemirror/language': 6.12.3
+      '@codemirror/legacy-modes': 6.5.3
+      '@codemirror/state': 6.6.0
+      '@codemirror/view': 6.41.0
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+
+  '@invana/forms@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-hook-form@7.72.1(react@19.2.5))(react@19.2.5)':
+    dependencies:
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       '@radix-ui/react-checkbox': 1.3.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@radix-ui/react-label': 2.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@radix-ui/react-radio-group': 1.4.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -2780,42 +2884,67 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  '@invana/graph-layout-d3-force@0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))':
+  '@invana/graph-layer-d3-contour@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))(pixi.js@8.20.1)':
     dependencies:
-      '@invana/canvas': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
+      '@invana/canvas': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      d3-contour: 4.0.2
+      pixi.js: 8.20.1
+
+  '@invana/graph-layer-maplibre@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.20.1)':
+    dependencies:
+      '@invana/canvas': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      maplibre-gl: 4.7.1
+      pixi.js: 8.20.1
+
+  '@invana/graph-layout-d3-force@0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
+    dependencies:
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       d3-force: 3.0.0
 
-  '@invana/graph-layout-elkjs@0.0.9(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1))':
+  '@invana/graph-layout-d3-sankey@0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
     dependencies:
-      '@invana/canvas': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      '@invana/graph': 0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
+      d3-sankey: 0.12.3
+
+  '@invana/graph-layout-elkjs@0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))))':
+    dependencies:
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
+      '@invana/graph': 0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))
       elkjs: 0.9.3
 
-  '@invana/graph@0.0.11(@invana/canvas@0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))(pixi.js@8.18.1)':
+  '@invana/graph@0.0.14(@invana/canvas@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
     dependencies:
-      '@invana/canvas': 0.0.11(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
-      pixi.js: 8.18.1
+      '@invana/canvas': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      rbush: 4.0.1
 
-  '@invana/styling@0.0.20(tailwindcss@4.2.2)':
+  '@invana/renderer-pixijs@0.0.14(@invana/canvas-core@0.0.14(typescript@6.0.2))(@invana/canvas-store@0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5)))':
+    dependencies:
+      '@invana/canvas-core': 0.0.14(typescript@6.0.2)
+      '@invana/canvas-store': 0.0.14(@types/react@19.2.14)(react@19.2.5)(typescript@6.0.2)(use-sync-external-store@1.6.0(react@19.2.5))
+      pixi.js: 8.20.1
+
+  '@invana/styling@0.0.28(tailwindcss@4.2.2)':
     dependencies:
       tailwindcss: 4.2.2
 
-  '@invana/themes@0.0.12(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@invana/themes@0.0.24(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@invana/styling': 0.0.20(tailwindcss@4.2.2)
-      '@invana/ui': 0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
 
-  '@invana/themes@0.0.20(@invana/styling@0.0.20(tailwindcss@4.2.2))(@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@invana/themes@0.0.28(@invana/styling@0.0.28(tailwindcss@4.2.2))(@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@invana/styling': 0.0.20(tailwindcss@4.2.2)
-      '@invana/ui': 0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
+      '@invana/styling': 0.0.28(tailwindcss@4.2.2)
+      '@invana/ui': 0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
 
-  '@invana/ui@0.0.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)':
+  '@invana/ui@0.0.28(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.2)':
     dependencies:
       '@hookform/resolvers': 5.9.1(react-hook-form@7.87.0(react@19.2.5))(zod@4.5.4)
       '@radix-ui/react-accordion': 1.2.20(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -2911,6 +3040,35 @@ snapshots:
     dependencies:
       '@lezer/common': 1.5.2
 
+  '@mapbox/geojson-rewind@0.5.2':
+    dependencies:
+      get-stream: 6.0.1
+      minimist: 1.2.8
+
+  '@mapbox/jsonlint-lines-primitives@2.0.3': {}
+
+  '@mapbox/point-geometry@0.1.0': {}
+
+  '@mapbox/tiny-sdf@2.2.0': {}
+
+  '@mapbox/unitbezier@0.0.1': {}
+
+  '@mapbox/vector-tile@1.3.1':
+    dependencies:
+      '@mapbox/point-geometry': 0.1.0
+
+  '@mapbox/whoots-js@3.1.0': {}
+
+  '@maplibre/maplibre-gl-style-spec@20.4.0':
+    dependencies:
+      '@mapbox/jsonlint-lines-primitives': 2.0.3
+      '@mapbox/unitbezier': 0.0.1
+      json-stringify-pretty-compact: 4.0.0
+      minimist: 1.2.8
+      quickselect: 2.0.0
+      rw: 1.3.3
+      tinyqueue: 3.0.0
+
   '@marijn/find-cluster-break@1.0.2': {}
 
   '@opentelemetry/api-logs@0.219.0':
@@ -2998,9 +3156,11 @@ snapshots:
 
   '@pixi/colord@2.9.6': {}
 
-  '@radix-ui/number@1.1.3': {}
+  '@playwright/test@1.63.0':
+    dependencies:
+      playwright: 1.63.0
 
-  '@radix-ui/primitive@1.1.3': {}
+  '@radix-ui/number@1.1.3': {}
 
   '@radix-ui/primitive@1.1.7': {}
 
@@ -3100,19 +3260,7 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-compose-refs@1.1.2(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-compose-refs@1.1.5(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
-  '@radix-ui/react-context@1.1.2(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       react: 19.2.5
     optionalDependencies:
@@ -3123,28 +3271,6 @@ snapshots:
       react: 19.2.5
     optionalDependencies:
       '@types/react': 19.2.14
-
-  '@radix-ui/react-dialog@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/primitive': 1.1.3
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-context': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-dismissable-layer': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-focus-guards': 1.1.3(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-focus-scope': 1.1.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-id': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-portal': 1.1.9(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-presence': 1.1.5(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.2.14)(react@19.2.5)
-      aria-hidden: 1.2.6
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-      react-remove-scroll: 2.7.2(@types/react@19.2.14)(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
   '@radix-ui/react-dialog@1.1.23(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
@@ -3175,19 +3301,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  '@radix-ui/react-dismissable-layer@1.1.11(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/primitive': 1.1.3
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-use-escape-keydown': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
   '@radix-ui/react-dismissable-layer@1.1.19(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       '@radix-ui/primitive': 1.1.7
@@ -3216,12 +3329,6 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-focus-guards@1.1.3(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-focus-guards@1.1.6(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       react: 19.2.5
@@ -3233,17 +3340,6 @@ snapshots:
       '@radix-ui/react-compose-refs': 1.1.5(@types/react@19.2.14)(react@19.2.5)
       '@radix-ui/react-primitive': 2.1.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@radix-ui/react-use-callback-ref': 1.1.4(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  '@radix-ui/react-focus-scope@1.1.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.14)(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
@@ -3266,13 +3362,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  '@radix-ui/react-id@1.1.1(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
 
   '@radix-ui/react-id@1.1.4(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
@@ -3407,16 +3496,6 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-portal@1.1.9(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
   '@radix-ui/react-presence@1.1.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       '@radix-ui/react-use-layout-effect': 1.1.4(@types/react@19.2.14)(react@19.2.5)
@@ -3426,37 +3505,9 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-presence@1.1.5(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
   '@radix-ui/react-primitive@2.1.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       '@radix-ui/react-slot': 1.3.3(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  '@radix-ui/react-primitive@2.1.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    optionalDependencies:
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
-
-  '@radix-ui/react-primitive@2.1.4(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-slot': 1.2.4(@types/react@19.2.14)(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     optionalDependencies:
@@ -3584,20 +3635,6 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-slot@1.2.3(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
-  '@radix-ui/react-slot@1.2.4(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-slot@1.3.3(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       '@radix-ui/react-compose-refs': 1.1.5(@types/react@19.2.14)(react@19.2.5)
@@ -3682,22 +3719,8 @@ snapshots:
       '@types/react': 19.2.14
       '@types/react-dom': 19.2.3(@types/react@19.2.14)
 
-  '@radix-ui/react-use-callback-ref@1.1.1(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-use-callback-ref@1.1.4(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
-  '@radix-ui/react-use-controllable-state@1.2.2(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-use-effect-event': 0.0.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.14)(react@19.2.5)
       react: 19.2.5
     optionalDependencies:
       '@types/react': 19.2.14
@@ -3711,13 +3734,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  '@radix-ui/react-use-effect-event@0.0.2(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-use-effect-event@0.0.5(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       '@radix-ui/react-use-layout-effect': 1.1.4(@types/react@19.2.14)(react@19.2.5)
@@ -3725,20 +3741,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  '@radix-ui/react-use-escape-keydown@1.1.1(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
   '@radix-ui/react-use-is-hydrated@0.1.3(@types/react@19.2.14)(react@19.2.5)':
-    dependencies:
-      react: 19.2.5
-    optionalDependencies:
-      '@types/react': 19.2.14
-
-  '@radix-ui/react-use-layout-effect@1.1.1(@types/react@19.2.14)(react@19.2.5)':
     dependencies:
       react: 19.2.5
     optionalDependencies:
@@ -3956,15 +3959,29 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.0
 
-  '@types/d3-force@3.0.10': {}
-
   '@types/earcut@3.0.0': {}
 
   '@types/estree@1.0.8': {}
 
+  '@types/geojson-vt@3.2.5':
+    dependencies:
+      '@types/geojson': 7946.0.16
+
+  '@types/geojson@7946.0.16': {}
+
+  '@types/mapbox__point-geometry@0.1.4': {}
+
+  '@types/mapbox__vector-tile@1.3.4':
+    dependencies:
+      '@types/geojson': 7946.0.16
+      '@types/mapbox__point-geometry': 0.1.4
+      '@types/pbf': 3.0.5
+
   '@types/node@25.6.0':
     dependencies:
       undici-types: 7.19.2
+
+  '@types/pbf@3.0.5': {}
 
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
@@ -3973,6 +3990,10 @@ snapshots:
   '@types/react@19.2.14':
     dependencies:
       csstype: 3.2.3
+
+  '@types/supercluster@7.1.3':
+    dependencies:
+      '@types/geojson': 7946.0.16
 
   '@vitejs/plugin-react@5.2.0(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0))':
     dependencies:
@@ -3988,7 +4009,7 @@ snapshots:
 
   '@webgpu/types@0.1.70': {}
 
-  '@xmldom/xmldom@0.8.13': {}
+  '@xmldom/xmldom@0.8.15': {}
 
   agent-base@6.0.2:
     dependencies:
@@ -4037,10 +4058,10 @@ snapshots:
 
   cmdk@1.1.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@radix-ui/react-id': 1.1.1(@types/react@19.2.14)(react@19.2.5)
-      '@radix-ui/react-primitive': 2.1.4(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@radix-ui/react-compose-refs': 1.1.5(@types/react@19.2.14)(react@19.2.5)
+      '@radix-ui/react-dialog': 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@radix-ui/react-id': 1.1.4(@types/react@19.2.14)(react@19.2.5)
+      '@radix-ui/react-primitive': 2.1.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
     transitivePeerDependencies:
@@ -4059,6 +4080,18 @@ snapshots:
 
   csstype@3.2.3: {}
 
+  d3-array@2.12.1:
+    dependencies:
+      internmap: 1.0.1
+
+  d3-array@3.2.4:
+    dependencies:
+      internmap: 2.0.3
+
+  d3-contour@4.0.2:
+    dependencies:
+      d3-array: 3.2.4
+
   d3-dispatch@3.0.1: {}
 
   d3-force@3.0.0:
@@ -4067,7 +4100,18 @@ snapshots:
       d3-quadtree: 3.0.1
       d3-timer: 3.0.1
 
+  d3-path@1.0.9: {}
+
   d3-quadtree@3.0.1: {}
+
+  d3-sankey@0.12.3:
+    dependencies:
+      d3-array: 2.12.1
+      d3-shape: 1.3.7
+
+  d3-shape@1.3.7:
+    dependencies:
+      d3-path: 1.0.9
 
   d3-timer@3.0.1: {}
 
@@ -4179,6 +4223,8 @@ snapshots:
 
   gensync@1.0.0-beta.2: {}
 
+  geojson-vt@4.0.3: {}
+
   get-intrinsic@1.3.0:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -4199,9 +4245,19 @@ snapshots:
       dunder-proto: 1.0.1
       es-object-atoms: 1.1.1
 
+  get-stream@6.0.1: {}
+
   gifuct-js@2.1.2:
     dependencies:
       js-binary-schema-parser: 2.0.3
+
+  gl-matrix@3.4.4: {}
+
+  global-prefix@4.0.0:
+    dependencies:
+      ini: 4.1.3
+      kind-of: 6.0.3
+      which: 4.0.0
 
   gopd@1.2.0: {}
 
@@ -4224,7 +4280,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  ieee754@1.2.1: {}
+
   immer@11.1.8: {}
+
+  ini@4.1.3: {}
+
+  internmap@1.0.1: {}
+
+  internmap@2.0.3: {}
+
+  isexe@3.1.5: {}
 
   ismobilejs@1.1.1: {}
 
@@ -4236,7 +4302,13 @@ snapshots:
 
   jsesc@3.1.0: {}
 
+  json-stringify-pretty-compact@4.0.0: {}
+
   json5@2.2.3: {}
+
+  kdbush@4.1.0: {}
+
+  kind-of@6.0.3: {}
 
   lightningcss-android-arm64@1.32.0:
     optional: true
@@ -4307,6 +4379,35 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  maplibre-gl@4.7.1:
+    dependencies:
+      '@mapbox/geojson-rewind': 0.5.2
+      '@mapbox/jsonlint-lines-primitives': 2.0.3
+      '@mapbox/point-geometry': 0.1.0
+      '@mapbox/tiny-sdf': 2.2.0
+      '@mapbox/unitbezier': 0.0.1
+      '@mapbox/vector-tile': 1.3.1
+      '@mapbox/whoots-js': 3.1.0
+      '@maplibre/maplibre-gl-style-spec': 20.4.0
+      '@types/geojson': 7946.0.16
+      '@types/geojson-vt': 3.2.5
+      '@types/mapbox__point-geometry': 0.1.4
+      '@types/mapbox__vector-tile': 1.3.4
+      '@types/pbf': 3.0.5
+      '@types/supercluster': 7.1.3
+      earcut: 3.0.2
+      geojson-vt: 4.0.3
+      gl-matrix: 3.4.4
+      global-prefix: 4.0.0
+      kdbush: 4.1.0
+      murmurhash-js: 1.0.0
+      pbf: 3.3.0
+      potpack: 2.1.0
+      quickselect: 3.0.0
+      supercluster: 8.0.1
+      tinyqueue: 3.0.0
+      vt-pbf: 3.1.3
+
   math-intrinsics@1.1.0: {}
 
   mime-db@1.52.0: {}
@@ -4315,34 +4416,49 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
+  minimist@1.2.8: {}
+
   ms@2.1.3: {}
+
+  murmurhash-js@1.0.0: {}
 
   nanoid@3.3.11: {}
 
   node-releases@2.0.37: {}
 
-  parse-svg-path@0.1.2: {}
+  parse-svg-path@0.2.0: {}
+
+  pbf@3.3.0:
+    dependencies:
+      ieee754: 1.2.1
+      resolve-protobuf-schema: 2.1.0
 
   picocolors@1.1.1: {}
 
   picomatch@4.0.4: {}
 
-  pixi-viewport@6.0.3(pixi.js@8.18.1):
+  pixi-viewport@6.0.3(pixi.js@8.20.1):
     dependencies:
-      pixi.js: 8.18.1
+      pixi.js: 8.20.1
 
-  pixi.js@8.18.1:
+  pixi.js@8.20.1:
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/earcut': 3.0.0
       '@webgpu/types': 0.1.70
-      '@xmldom/xmldom': 0.8.13
+      '@xmldom/xmldom': 0.8.15
       earcut: 3.0.2
       eventemitter3: 5.0.4
       gifuct-js: 2.1.2
       ismobilejs: 1.1.1
-      parse-svg-path: 0.1.2
+      parse-svg-path: 0.2.0
       tiny-lru: 11.4.7
+
+  playwright-core@1.63.0: {}
+
+  playwright@1.63.0:
+    dependencies:
+      playwright-core: 1.63.0
 
   postcss@8.5.9:
     dependencies:
@@ -4350,7 +4466,13 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  potpack@2.1.0: {}
+
+  protocol-buffers-schema@3.6.1: {}
+
   proxy-from-env@2.1.0: {}
+
+  quickselect@2.0.0: {}
 
   quickselect@3.0.0: {}
 
@@ -4421,6 +4543,10 @@ snapshots:
 
   react@19.2.5: {}
 
+  resolve-protobuf-schema@2.1.0:
+    dependencies:
+      protocol-buffers-schema: 3.6.1
+
   rollup@4.60.1:
     dependencies:
       '@types/estree': 1.0.8
@@ -4452,6 +4578,8 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.60.1
       fsevents: 2.3.3
 
+  rw@1.3.3: {}
+
   scheduler@0.27.0: {}
 
   semver@6.3.1: {}
@@ -4466,6 +4594,10 @@ snapshots:
   source-map-js@1.2.1: {}
 
   style-mod@4.1.3: {}
+
+  supercluster@8.0.1:
+    dependencies:
+      kdbush: 4.1.0
 
   tailwind-merge@3.6.0: {}
 
@@ -4483,6 +4615,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
+
+  tinyqueue@3.0.0: {}
 
   tslib@2.8.1: {}
 
@@ -4530,7 +4664,17 @@ snapshots:
       jiti: 2.6.1
       lightningcss: 1.32.0
 
+  vt-pbf@3.1.3:
+    dependencies:
+      '@mapbox/point-geometry': 0.1.0
+      '@mapbox/vector-tile': 1.3.1
+      pbf: 3.3.0
+
   w3c-keyname@2.2.8: {}
+
+  which@4.0.0:
+    dependencies:
+      isexe: 3.1.5
 
   yallist@3.1.1: {}
 

@@ -14,7 +14,7 @@ export type LLMProviderKind =
 	| "local"
 	| "claude_agent_sdk";
 
-// claude_agent_sdk only (RFC-056) — disambiguates what the credential field
+// claude_agent_sdk only (docs/for-developers/modules/agents/features/providers-and-models.md) — disambiguates what the credential field
 // holds: a Claude API key, or a `claude setup-token` subscription token.
 export type LLMCredentialKind = "api_key" | "oauth_token";
 
@@ -23,7 +23,7 @@ export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 	label: string;
 	requiresApiKey: boolean;
 	// Key accepted but not required — the engine falls back to the local Claude
-	// Code CLI login when blank (claude_agent_sdk, RFC-053).
+	// Code CLI login when blank (claude_agent_sdk, docs/for-developers/modules/agents/features/providers-and-models.md).
 	apiKeyOptional?: boolean;
 	usesBaseUrl: boolean;
 	exampleModelId: string;

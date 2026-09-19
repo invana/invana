@@ -371,6 +371,27 @@ class OpenCypherQueryBuilder:
         return "CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType", {}
 
     @staticmethod
+    def get_node_label_counts() -> tuple[str, dict]:
+        """Count nodes per label.
+
+        ``UNWIND labels(n)`` counts a multi-labelled node once under each of its
+        labels, which is what a type list means: a node that is both an
+        ``Observation`` and a ``Thesis`` belongs to both rows.
+        """
+        return (
+            "MATCH (n) UNWIND labels(n) AS label RETURN label AS label, count(*) AS count ORDER BY count DESC",
+            {},
+        )
+
+    @staticmethod
+    def get_edge_label_counts() -> tuple[str, dict]:
+        """Count relationships per type."""
+        return (
+            "MATCH ()-[r]->() RETURN type(r) AS label, count(*) AS count ORDER BY count DESC",
+            {},
+        )
+
+    @staticmethod
     def get_property_keys(label: str) -> tuple[str, dict]:
         return (
             f"MATCH (n:`{label}`) WITH n LIMIT 100 UNWIND keys(n) AS key RETURN DISTINCT key",

@@ -1,0 +1,171 @@
+/**
+ * @deprecated Unreachable — nothing imports it. The right-side details panel it filled is gone — the model canvas renders `NodeTypeDetail` / `EdgeTypeDetail` in the main column itself (ME19).
+ *
+ * Kept for now, not deleted: see *Deprecated surfaces* in
+ * docs/for-developers/modules/connect-and-model/features/model-editor.md.
+ * Do not wire it back in; a selected type reads through `ModelCanvas`.
+ */
+
+import { ConstraintTable } from "@/pages/graphs-detail/features/connect-and-model/model/components/ConstraintTable";
+import { EdgeTypeDetail } from "@/pages/graphs-detail/features/connect-and-model/model/components/EdgeTypeDetail";
+import { IndexTable } from "@/pages/graphs-detail/features/connect-and-model/model/components/IndexTable";
+import { ModelOverview } from "@/pages/graphs-detail/features/connect-and-model/model/components/ModelOverview";
+import { NoSelectionPlaceholder } from "@/pages/graphs-detail/features/connect-and-model/model/components/NoSelectionPlaceholder";
+import { NodeTypeDetail } from "@/pages/graphs-detail/features/connect-and-model/model/components/NodeTypeDetail";
+import { PropertyKeyTable } from "@/pages/graphs-detail/features/connect-and-model/model/components/PropertyKeyTable";
+import type {
+	ModelEditCtx,
+	SelectedItem,
+} from "@/pages/graphs-detail/features/connect-and-model/model/types";
+import type { GraphModelResponse, GraphModelSummary } from "@/types/models";
+import type {
+	ConstraintResponse,
+	EdgeTypeResponse,
+	IndexResponse,
+	NodeTypeResponse,
+	PropertyKeyResponse,
+} from "@/types/schemas";
+
+interface Props {
+	selected: SelectedItem;
+	/** Open model — when nothing is selected, its metadata is the default view. */
+	model?: GraphModelResponse | GraphModelSummary | null;
+	/** Non-system model: the overview offers an Edit affordance. */
+	canEditModel?: boolean;
+	onEditModel?: () => void;
+	nodeTypes: NodeTypeResponse[];
+	edgeTypes: EdgeTypeResponse[];
+	propertyKeys: PropertyKeyResponse[];
+	constraints: ConstraintResponse[];
+	indexes: IndexResponse[];
+	editable?: boolean;
+	ctx?: ModelEditCtx;
+	/** Read-only published model that can be drafted to edit (not the system model). */
+	canEditViaDraft?: boolean;
+	/** A draft-creation is in flight (disables the affordance). */
+	creatingDraft?: boolean;
+	/** Drafts the model and switches to the editable PropertyEditor for this type. */
+	onEditViaDraft?: () => void;
+	onEditNodeType?: (nodeType: NodeTypeResponse) => void;
+	onDeleteNodeType?: (id: string) => void;
+	onEditEdgeType?: (edgeType: EdgeTypeResponse) => void;
+	onDeleteEdgeType?: (id: string) => void;
+}
+
+export function DetailPanel({
+	selected,
+	model,
+	canEditModel = false,
+	onEditModel,
+	nodeTypes,
+	edgeTypes,
+	propertyKeys,
+	constraints,
+	indexes,
+	editable = false,
+	ctx,
+	canEditViaDraft = false,
+	creatingDraft = false,
+	onEditViaDraft,
+	onEditNodeType,
+	onDeleteNodeType,
+	onEditEdgeType,
+	onDeleteEdgeType,
+}: Props) {
+	if (!selected) {
+		// With a model open, its metadata is the default view; the generic
+		// placeholder only shows on the model list (no model open).
+		if (model) {
+			return (
+				<ModelOverview
+					model={model}
+					counts={{
+						nodeTypes: nodeTypes.length,
+						edgeTypes: edgeTypes.length,
+						propertyKeys: propertyKeys.length,
+						constraints: constraints.length,
+						indexes: indexes.length,
+					}}
+					canEdit={canEditModel}
+					onEdit={onEditModel}
+				/>
+			);
+		}
+		return <NoSelectionPlaceholder />;
+	}
+
+	if (selected.kind === "node-type") {
+		const nodeType = nodeTypes.find((n) => n.id === selected.id);
+		if (!nodeType) return <NoSelectionPlaceholder />;
+		return (
+			<NodeTypeDetail
+				nodeType={nodeType}
+				constraints={constraints}
+				indexes={indexes}
+				editable={editable}
+				ctx={ctx}
+				canEditViaDraft={canEditViaDraft}
+				creatingDraft={creatingDraft}
+				onEditViaDraft={onEditViaDraft}
+				propertyKeys={propertyKeys}
+				onEdit={() => onEditNodeType?.(nodeType)}
+				onDelete={() => onDeleteNodeType?.(nodeType.id)}
+			/>
+		);
+	}
+
+	if (selected.kind === "edge-type") {
+		const edgeType = edgeTypes.find((e) => e.id === selected.id);
+		if (!edgeType) return <NoSelectionPlaceholder />;
+		return (
+			<EdgeTypeDetail
+				edgeType={edgeType}
+				constraints={constraints}
+				indexes={indexes}
+				editable={editable}
+				ctx={ctx}
+				canEditViaDraft={canEditViaDraft}
+				creatingDraft={creatingDraft}
+				onEditViaDraft={onEditViaDraft}
+				propertyKeys={propertyKeys}
+				onEdit={() => onEditEdgeType?.(edgeType)}
+				onDelete={() => onDeleteEdgeType?.(edgeType.id)}
+			/>
+		);
+	}
+
+	if (selected.kind === "property-keys") {
+		return (
+			<div className="flex flex-col gap-4">
+				<h2 className="text-xl font-semibold">Property Keys</h2>
+				<PropertyKeyTable
+					propertyKeys={propertyKeys}
+					nodeTypes={nodeTypes}
+					edgeTypes={edgeTypes}
+					editable={editable}
+					ctx={ctx}
+				/>
+			</div>
+		);
+	}
+
+	if (selected.kind === "constraints") {
+		return (
+			<div className="flex flex-col gap-4">
+				<h2 className="text-xl font-semibold">Constraints</h2>
+				<ConstraintTable constraints={constraints} />
+			</div>
+		);
+	}
+
+	if (selected.kind === "indexes") {
+		return (
+			<div className="flex flex-col gap-4">
+				<h2 className="text-xl font-semibold">Indexes</h2>
+				<IndexTable indexes={indexes} />
+			</div>
+		);
+	}
+
+	return <NoSelectionPlaceholder />;
+}

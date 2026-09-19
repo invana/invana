@@ -7,11 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 # Import every model module so they register on the shared Base.metadata before
 # create_all — provision_user/admin_set_password touch users + events tables.
-import invana.auth.models
-import invana.events.models
-import invana.graphs.models  # noqa: F401
-from invana.modeller.models import Base
-from invana.settings import settings
+from invana.core.models import Base
+from invana.core.settings import settings
 
 
 @pytest_asyncio.fixture
@@ -45,3 +42,9 @@ async def session(db_engine):
     async with factory() as sess:
         yield sess
         await sess.rollback()
+
+
+@pytest_asyncio.fixture
+async def session_factory(db_engine):
+    """A factory bound to the same isolated schema — route tests open their own sessions."""
+    return async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)

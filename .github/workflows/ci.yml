@@ -21,11 +21,51 @@ jobs:
       - name: Ruff format check
         run: cd engine && uv run ruff format --check .
 
+      # docs/for-developers/building-engine/code-shape.md §4.2 — the band rule.
+      - name: Import linter
+        run: cd engine && uv run lint-imports
+
       - name: Biome check
         run: cd studio && pnpm biome check .
 
       - name: TypeScript type check
         run: cd studio && pnpm tsc --noEmit
+
+  # docs/for-developers/building-engine/refactor-plan.md §1 — the golden guards.
+  # An empty diff here is the promise that Studio cannot tell a refactor happened.
+  engine-guards:
+    name: Engine Guards
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: invana_user
+          POSTGRES_PASSWORD: change_this_password
+          POSTGRES_DB: invana_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      INVANA_TELEMETRY_ENABLED: "false"
+      INVANA_DATABASE_URL: postgresql+asyncpg://invana_user:change_this_password@localhost:5432/invana_db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: OpenAPI and schema snapshots
+        run: cd engine && uv run pytest tests/golden -q
+
+      - name: integrations import only invana.graph
+        run: |
+          found=$(grep -rhoE "invana\.[a-z_]+" integrations/ --include="*.py" | sort -u)
+          echo "$found"
+          test "$found" = "invana.graph"
 
   engine-tests:
     name: Engine Tests

@@ -1,4 +1,4 @@
-import type { QueryLanguage } from "./graphs";
+import type { QueryLanguage } from "@/types/graphs";
 
 // ── Query request ─────────────────────────────────────────────────────────────
 

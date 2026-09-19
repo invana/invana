@@ -1,270 +1,452 @@
 # Invana — System Design
 
-> **Invana is a Graph Intelligence Operating System.**
+> **Invana is an agent orchestrator over a curated knowledge graph.**
 >
-> A platform where humans and AI collaborate inside *missions*, grounded in *knowledge graphs* that are stitched together from connector-ingested data and user-authored ontology, and reasoned over by agents and LLMs against the mission's declared objectives, goals, and success criteria.
->
-> At its core, Invana does **context engineering for AI**: it turns scattered, heterogeneous data into curated, ontology-grounded, queryable context that agents and LLMs — inside or outside the platform — can reason over reliably.
+> A **Graph** is a bounded domain a team curates — one graph database, its models, its data, its
+> agents and its work. Agents work inside it; a person accepts what they produce. Every answer is
+> grounded in the Graph and traceable to the records behind it, and when the Graph cannot answer, it
+> says so.
 
-This document describes Invana in terms of **what it is, who lives in it, and how work flows through it** — not schemas, APIs, or file layout. RFCs and module docs cite this document for vocabulary and flow; technical specifics live there.
+This document is the **shared mental model**: what Invana is, what lives inside it, and how work
+flows through it. It is written in the words pinned in
+[`for-developers/terminology.md`](for-developers/terminology.md), and it describes the same product as
+[`for-developers/README.md`](for-developers/README.md) — one level up.
+
+| | |
+|---|---|
+| The record | [`for-developers/README.md`](for-developers/README.md) is authoritative for **scope and status**. If this document and a feature file disagree, the feature file wins. |
+| This document | Orientation and flow. It states no schema, no endpoint and no status. |
+| Words | [`for-developers/terminology.md`](for-developers/terminology.md). Nothing outside it is ours. |
+| Not built | Everything under [Not building](for-developers/README.md#not-building) is out of scope, and this document does not describe it. |
 
 ---
 
 ## 1. What Invana is
 
-Invana is an operating system for graph-shaped intelligence work — and, more concretely, a substrate for **context engineering**: producing the curated, grounded, queryable context that AI needs to be useful on real work.
+Three claims, and everything below is a consequence of one of them.
 
-The OS metaphor is load-bearing:
+| Claim | Means |
+|---|---|
+| **Bounded** | The Graph is the reasoning boundary. One Graph binds to exactly one graph database; an agent never crosses it. Membership in the Graph is the whole permission model. |
+| **Grounded** | Every question resolves against the **global model** — the read-time union of the Graph's published models — and every answer cites the records that produced it. What the graph does not hold, the system declines to answer rather than invent. |
+| **Governed** | An agent runs inside an **envelope** it cannot argue with, plans from a **workflow** validated before dispatch, is **offered** skills and rules rather than obeying them, and never accepts its own work. |
 
-| OS concept            | Invana concept                                                |
-|-----------------------|---------------------------------------------------------------|
-| Workspace / desktop   | The user's account — holds global registries.                 |
-| Project / window      | A **mission** — a bounded intent with its own knowledge graph.|
-| Device drivers        | **Connectors** — typed adapters to external data sources.     |
-| Filesystem            | **Graph models** — ontologies giving shape to ingested data.  |
-| Processes             | **Agents** — workers that act inside a mission.               |
-| Standard library      | **Skills** — reusable capabilities agents compose.            |
-| Shell / REPL          | **LLMs** — the conversational interface to the graph.         |
-| Application data      | The mission's **knowledge graph** — stitched, queryable.      |
+**Invana orchestrates the agents** — which one takes a task, what it may run, what it is offered, in
+what order, and who checks the result. It also **runs them itself**: one in-process runtime, one
+asyncio task per thinking, no external infrastructure. That runtime sits behind a protocol so a
+deployment could swap in a job scheduler it already operates; none has been written, and the default
+is the only one.
 
-A user opens a mission, declares what success looks like, points connectors at data, authors an ontology, and lets agents reason over the stitched knowledge graph. The mission tells the user when it has succeeded.
+### 1.1 What Invana is not
 
-### 1.1 The use-case surface
+| Not | Because |
+|---|---|
+| An extractor | Invana is a **destination**. Whatever already pulls your data — a script, a notebook, Airflow — hands it over as a **dataset** that conforms to a model. There are no source connections, cursors or mapping grammar. |
+| A workflow engine | A plan is data validated against an envelope, not a hand-authored graph of jobs. Conditionals live in task dependencies, not inside a plan. |
+| A permissions product | Membership is binary. What looks like a permission question is usually an **envelope** question (what an agent may run) or a **criterion** question (what "done" means). |
+| A model registry | Domain models export as one file. Files and git are the registry. |
+| An OS | The operating-system framing, and the word *mission* with it, is retired. The container is a **Graph**. |
 
-Because Invana is an operating system — not a vertical tool — the same primitives (missions, connectors, graph models, skills, agents, LLMs) host a wide range of AI work. None of these are special cases in the platform; they are different *compositions* of the same primitives.
+### 1.2 The use-case surface
 
-| Use case                        | How it composes in Invana                                                                                                       |
-|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| **Context engineering for AI**  | Any mix of connectors + user ontology + stitching; the resulting knowledge graph is served as curated context to external agents/LLMs (IDE assistants, chat copilots, app backends) via query and retrieval. |
-| **Coding agents**               | Git-repo connectors + code/AST skills + a code-aware LLM, reasoning over a repo-shaped knowledge graph.                          |
-| **Deep search / research**      | Document connectors (PDF/DOCX/web) + entity-extraction skills, reasoning over a citation- and concept-linked knowledge graph.    |
-| **Explainability**              | Any source + provenance-preserving stitcher + tracing skills; every answer is back-traceable to graph nodes and source records.  |
-| **Analytics & BI**              | Tabular connectors (CSV/XLSX/MySQL) + aggregation skills, reasoning over a metrics-and-dimensions knowledge graph.                |
-| **Knowledge management**        | Mixed connectors + a user-authored domain ontology; the stitcher unifies sources under shared concepts.                          |
-| **Compliance & audit**          | System-of-record connectors + policy skills + read-only Closed-mission snapshots as durable audit artifacts.                     |
-| **Decision support / simulation** | Graph + user ontology of decisions/actors/outcomes + simulation skills; agents propose and score interventions against success criteria. |
-| **Customer / domain intelligence** | CRM / product / support connectors + user ontology of *Customer*, *Account*, *Risk*; agents synthesize across silos.            |
-| **Personal AI workspace**       | File-system / notes / email connectors + user-authored personal ontology; private knowledge graph for grounding a personal LLM.   |
+The same primitives — Graph, domain models, datasets, skills, rules, agents, workflows, work — host
+different kinds of work. None of these is a special case in the product; each is a different
+composition.
 
-The list is not the platform — the primitives are. New use cases land by registering a connector, defining (or reusing) skills, binding them into a mission, and letting agents work. The OS does not need to know in advance what the mission is *about*.
+| Use case | How it composes |
+|---|---|
+| **Curated context for AI** | Datasets + domain models + declared links → a global model an external agent queries through a scoped token, with provenance on every row |
+| **Deep search / research** | A document-shaped domain model + datasets your extractor produces + recall-by-query skills |
+| **Analytics** | A metrics-and-dimensions model + projections: a closed question in, a table or chart out |
+| **Knowledge management** | Several domain models, stitched by anchors and relationship links, answered as one |
+| **Compliance and audit** | The append-only event record + criteria checked per task + provenance from every element back to its dataset record |
+| **Domain intelligence** | A domain model of the entities that matter + agents staffed on a project, working tasks against criteria |
+| **Domain memory** | The domain models its own memory as node types; a planned recall step reads and cites prior records |
+
+Simulation, parameter sweeps and game theory are **post-1.0 and not built** — see
+[Not building](for-developers/README.md#not-building).
 
 ---
 
 ## 2. Core concepts
 
-This is the canonical vocabulary used everywhere else in the system.
+The full list is [`terminology.md`](for-developers/terminology.md). This is the shape of it.
 
-- **User** — An identity that operates Invana. The first user is created via the CLI during bootstrap; all subsequent users are invited from the UI.
+### 2.1 The overloaded word
 
-- **Mission** — A bounded intent. Every piece of intelligent work in Invana happens inside a mission. A mission has an explicit lifecycle: `Open` (active, ingesting, reasoning, mutable) or `Closed` (archived, read-only, inspectable). A mission holds instructions, bindings to global registries, and owns a knowledge graph.
+**Graph** means three different things, so only one of them gets the bare word.
 
-- **Instructions** — The mission's contract with itself, declared up front and refined over time. Three parts:
-  - **Objectives** — *what the mission is for.* Prose statements of intent.
-  - **Goals** — *measurable targets* the mission is pursuing.
-  - **Success Criteria** — *how we know the mission has succeeded.* Checkable conditions.
+| Say | For |
+|---|---|
+| **Graph** | the bounded domain a user creates — connection, models, datasets, agents, work |
+| **graph database** | the Neo4j / Memgraph / JanusGraph the Graph binds to |
+| **canvas** | the rendered, pannable drawing of nodes and edges |
+| **model** | the schema: node types, edge types, property keys |
 
-- **Skill** — A reusable, named capability ("summarize a document", "extract entities", "diff two graph snapshots"). Skills are global; missions opt-in to the skills their agents may use.
+### 2.2 The container and what it holds
 
-- **Agent** — An autonomous worker that, inside a mission, composes skills + connectors + an LLM to act. Agents are defined globally and bound into missions.
+| Term | Is |
+|---|---|
+| **Graph** | The bounded domain and the reasoning boundary. One Graph, one graph database. |
+| **Member** | Someone with access to a Graph. Binary — there are no roles. |
+| **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
+| **Rule** | One statement that is always true. `invariant` on a Graph, `working` on a Project. |
+| **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |
 
-- **LLM Config** — A registered model endpoint with credentials, defaults, and guardrails. Global; missions select which LLM(s) their agents may speak to.
+### 2.3 Models and data
 
-- **Connector** — A typed data-source adapter. Built-in examples: PDF / XLSX / CSV / DOCX / TXT readers, Git repository, MySQL importer. **Custom connectors** are first-class — anyone can register one. Each connector declares its inputs, outputs, and the shape of graph model it emits.
+| Term | Is |
+|---|---|
+| **Domain model** | A model authored against a domain, not a Graph — so it exports, imports and upgrades. One published version at a time. |
+| **Anchor** | A declared link saying two types are the same entity, resolved by an identity rule. It links; it never merges. |
+| **Relationship link** | A declared cross-model edge type whose records come from a dataset. Never inferred. |
+| **Global model** | The read-time union of every published model plus its links. Derived, never stored, never edited. The grounding context for every question. |
+| **Physical** | The introspected mirror of what the database actually holds. Shows drift; never the grounding context. |
+| **Dataset** | Externally produced records, conforming to exactly one model, handed to Invana. |
+| **Import run** | One load of a dataset. It is a Thought — it inherits the runtime, trace, retries and failure vocabulary. |
 
-- **Task** — A single execution of a connector instance against a concrete target.
+### 2.4 Asking and answering
 
-- **Pipeline** — An ordered or scheduled composition of tasks (sequence, fan-out, recurrence).
+| Term | Is |
+|---|---|
+| **Thought** | A unit of intent: `ask` · `import` · `stitch`. |
+| **Thinking** | One run of a Thought. A task assignment or a question opens exactly one. |
+| **Step** | One callable inside a thinking: `understand · plan · translate · validate · execute · project · verify`. |
+| **Emission** | One thing a step produced — a subgraph, table, metric, chart or prose block. An answer is its emissions. |
+| **Cannot answer** | The graph does not hold it. Deliberately not answer-shaped, and distinct from a failure. |
+| **Diagnosis** | What a failure explains about itself, with next steps drawn from evidence — never invented. |
 
-- **Dataset** — The output of a connector run. A dataset is the named pairing of (a) the **records captured** from the source and (b) the **system graph model** describing their shape. Connectors produce datasets; the stitcher consumes them. Re-running a task refreshes its dataset rather than producing a duplicate.
+### 2.5 Actors and bounds
 
-- **Graph Model** — The ontology describing node types, edge types, and their properties. Two flavors coexist in every mission:
-  - **System Graph Model** — *derived automatically* by a connector and carried inside a **Dataset**. Reflects what was actually ingested.
-  - **User Graph Model** — *authored by the user*. A semantic overlay describing the concepts the user wants to reason about, independent of data sources.
+| Term | Is |
+|---|---|
+| **Principal** | Who acted: `user · agent · system · external · anonymous`. |
+| **Agent** | A principal that can be assigned work, carrying provider, model, skills, envelope and budget. |
+| **Envelope** | The static bounds on an agent: allowed steps, pinned arguments, budgets. Validated before dispatch. |
+| **Delegation** | An agent spawning an agent, bounded by depth, fan-out and a budget ⊆ its parent's. |
+| **Workflow** | A named, reusable plan. **Promoting** a plan that served turns it into a template. |
+| **On behalf of** | The principal a run serves, distinct from the principal that ran it. |
 
-- **Knowledge Graph** — The live, queryable graph inside a mission. Produced by **stitching** the system graph model(s) with the user graph model and binding ingested data to that stitched ontology.
+### 2.6 Work
 
-- **Stitcher** — The component that reconciles system and user models: maps system entity types to user ontology concepts, resolves identity across sources, and materializes the stitched knowledge graph.
+| Term | Is |
+|---|---|
+| **Project** | A piece of work inside a Graph — a folder of Tasks, staffed by principals. |
+| **Task** | One unit of work with an assignee and a definition of done. Sub-tasks nest three deep. |
+| **Objective** | One statement of what a Project is for. |
+| **Criterion** | One checkable statement of "done", with how it is checked: `query · agent · human`. |
+| **Review** | The one queue: questions block a thinking, proposals wait, results need accepting. |
+| **Schedule** | A cron on a question or a task. A **firing** is one occurrence. |
 
 ---
 
-## 3. Mental model — the layered OS
+## 3. Mental model — the layers
 
-Invana is organized into eight conceptual layers. Each layer consumes only the layers below it.
+Nine layers. Each consumes only the layers below it, and each maps to a module in
+[`for-developers/`](for-developers/README.md).
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│  8. Interfaces        CLI · Studio UI · API                       │
-├──────────────────────────────────────────────────────────────────┤
-│  7. Intelligence      Agents · LLM grounding · success scoring    │
-├──────────────────────────────────────────────────────────────────┤
-│  6. Knowledge Graph   Stitched, queryable graph per mission       │
-├──────────────────────────────────────────────────────────────────┤
-│  5. Modeling          User graph model · Stitcher                 │
-├──────────────────────────────────────────────────────────────────┤
-│  4. Ingestion         Tasks · Pipelines · Datasets (data + model) │
-├──────────────────────────────────────────────────────────────────┤
-│  3. Mission           Instructions · Bindings · Lifecycle         │
-├──────────────────────────────────────────────────────────────────┤
-│  2. Workspace         Global registries: Skills, Agents,          │
-│                       LLM Configs, Connectors                     │
-├──────────────────────────────────────────────────────────────────┤
-│  1. Identity & Access Bootstrap · UI auth · Invites · Roles       │
-└──────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  9. Interfaces        CLI · Studio · API                     §13      │
+├──────────────────────────────────────────────────────────────────────┤
+│  8. Operate           Events · schedules · metrics ·         §10      │
+│                       the external surface                            │
+├──────────────────────────────────────────────────────────────────────┤
+│  7. Work              Projects · tasks · objectives ·        §9       │
+│                       criteria · review                               │
+├──────────────────────────────────────────────────────────────────────┤
+│  6. Orchestration     Agents · envelopes · skills ·          §5·6·7·8 │
+│                       rules · workflows · memory                      │
+├──────────────────────────────────────────────────────────────────────┤
+│  5. Ask               Thought → thinking → steps →           §3·4     │
+│                       emissions · the canvas                          │
+├──────────────────────────────────────────────────────────────────────┤
+│  4. Data              Datasets · import runs · provenance    §2       │
+├──────────────────────────────────────────────────────────────────────┤
+│  3. Model             Domain models · links ·                §1       │
+│                       the global model                                │
+├──────────────────────────────────────────────────────────────────────┤
+│  2. Graph             The boundary · one graph database      §1·12    │
+├──────────────────────────────────────────────────────────────────────┤
+│  1. Identity          Accounts · sessions · membership       §11      │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Identity & Access** — bootstrap admin from CLI, UI authentication, invitations, role assignment.
-2. **Workspace** — the global, reusable registries. Skills, Agents, LLM Configs, and Connectors are defined here once and bound into many missions.
-3. **Mission** — where intent lives. Each mission picks what it needs from the workspace registries and declares its instructions.
-4. **Ingestion** — connector tasks and pipelines pull data in; each run yields a **Dataset** (captured records + the system graph model describing their shape).
-5. **Modeling** — the user authors a domain ontology; the stitcher reconciles it with the system models carried by the datasets.
-6. **Knowledge Graph** — the stitched, queryable graph the mission reasons over.
-7. **Intelligence** — agents, driven by an LLM and a skill set, grounded in the knowledge graph, evaluated against the mission's success criteria.
-8. **Interfaces** — CLI, Studio UI, and API are projections of the layers below.
+| # | Layer | Owns |
+|---|---|---|
+| 1 | **Identity** | An account identified by email, a username that is also a URL, a revocable session, and binary membership of a Graph. |
+| 2 | **Graph** | The bounded domain. Its 1:1 connection to a graph database, tested before it can be saved, and the graph connector package that speaks to it. |
+| 3 | **Model** | Domain models and their published versions; anchors and relationship links between them; the global model derived on read; the physical mirror that shows drift. |
+| 4 | **Data** | Datasets that arrive already conforming to a model, validated per record, written with provenance back to the record they came from. |
+| 5 | **Ask** | A question becomes a thinking; the thinking runs steps; the steps stream emissions onto a canvas or an answer surface. |
+| 6 | **Orchestration** | Which agent runs, inside what envelope, offered which skills and rules, planning from which workflow — and what carries over between runs. |
+| 7 | **Work** | What needs doing, who it is assigned to, what "done" means, and who accepts it. |
+| 8 | **Operate** | Every write as an append-only event; schedules; latency, tokens and cost derived from the record; the scoped, read-only external surface. |
+| 9 | **Interfaces** | CLI for anything scripted, Studio for anything read, API as the contract between them. |
 
 ---
 
 ## 4. Flows
 
-The system is best understood as a sequence of flows. Each flow names who triggers it, what happens, and what the user sees next.
+Each flow names who triggers it, what happens, and what the user sees next.
 
-### 4.1 Bootstrap — admin registration via CLI
+### 4.1 Bootstrap
 
-An operator has just installed Invana on a host. There are no users yet.
+An operator has just installed Invana. There are no accounts.
 
-1. Operator runs `invana init`.
-2. CLI prompts for admin credentials and basic workspace details.
-3. The system creates **the root user** and writes the initial workspace state.
-4. CLI emits a first-login token / URL.
+1. `invana migrate` applies database migrations. Nothing migrates itself on boot.
+2. `invana init` bootstraps the **root superuser**. It is idempotent and non-interactive, so a
+   container can run it.
+3. `invana start` runs the engine, and Studio when bundled.
 
-After bootstrap, the CLI **does not** register additional users. All subsequent users come in through UI-driven invitations issued by an authenticated user.
+Further accounts are created by an operator with shell access (`invana users`) or by a superuser
+through the register route. Superuser is **platform administration** — it is never a way into
+someone else's Graph.
 
-### 4.2 UI login
+### 4.2 Sign in
 
-1. The admin (or an invited user) opens Studio and authenticates.
-2. Studio fetches the workspace registries (Skills, Agents, LLM Configs, Connectors) and the user's missions.
-3. The user lands in their mission dashboard.
+1. Signing in returns a short-lived **access token** and an opaque, server-side **refresh token**.
+2. The access token carries identity and the superuser flag — not membership, and not the username,
+   because both can change while a token lives.
+3. Membership is looked up **per request**, so revoking access takes effect immediately.
+4. Refresh rotates: the old row is revoked, and a reused one is a signal rather than a convenience.
 
-### 4.3 Opening a mission
+Graph-scoped routes hang off `/u/{username}/{graphSlug}/…`; user-level routes live under `/auth/…`.
 
-1. The user clicks **New Mission** → a mission is created in `Open` state.
-2. The user gives it a name and declares its **instructions**:
-   - **Objectives** — what the mission is for.
-   - **Goals** — measurable targets.
-   - **Success Criteria** — the conditions under which the mission can be marked done.
-3. The mission now has: instructions, an empty knowledge graph, and no bindings yet.
+### 4.3 Create a Graph and connect it
 
-### 4.4 Configuring the workspace (global settings)
+```mermaid
+flowchart LR
+    A[New Graph] --> B[Name · slug]
+    B --> C[Pick a graph connector<br/>Neo4j · Memgraph · JanusGraph · …]
+    C --> D[URI + credentials]
+    D --> E{Test}
+    E -->|fails| D
+    E -->|connects| F[Saved · credentials encrypted at rest]
+    F --> G[Introspect: the physical mirror]
+    G --> H[Seed a draft model from what is there]
+```
 
-These four flows happen at the workspace level, independent of any mission. They populate the registries that missions later draw from.
+| Rule | Detail |
+|---|---|
+| One Graph, one graph database | The binding is 1:1, set once, rarely touched |
+| Test gates save | A connection that has not connected cannot be saved |
+| The connector is read-only after the first save | Changing engine mid-Graph invalidates everything modelled against it |
+| Capability is resolved, not assumed | The server version decides which property types exist; unsupported ones are refused at authoring, not at write time |
 
-- **Skills** — the user registers (or authors) skills. Each skill declares what it does and when it should be used. Skills are reusable across all missions and agents.
+### 4.4 Author a model
 
-- **LLM settings** — the user registers model providers (e.g., a hosted Claude endpoint, a self-hosted model), supplies credentials, sets defaults and guardrails (token budgets, allowed model families, etc.).
+A **domain model** is authored against a domain, not against the Graph that first holds it — which is
+what makes it exportable, importable and upgradable.
 
-- **Agents** — the user defines agents by composing:
-  - the **skills** they may use,
-  - the **LLM** they speak to,
-  - an operating policy (autonomy level, when they may fire, how they report).
+1. Authoring happens on a **draft**. Introspection can seed one; it never writes a published version.
+2. The model canvas draws node types and edge types. Edits **stage** — nothing reaches the database
+   until a commit, and the staged set is visible and reversible.
+3. Publishing makes the version **immutable**. Editing publishes the next one; imports and answers
+   that used the old version still resolve.
+4. The projector composes DDL from every active model onto the graph database; the introspector reads
+   back what is actually there. Neither writes the other's truth.
 
-- **Connectors** — the user enables built-in connectors (PDF / XLSX / CSV / DOCX / TXT readers, Git repo, MySQL importer, …) **and** registers **custom connectors** by describing each connector's:
-  - inputs (what it needs to be pointed at),
-  - outputs (what raw records it emits),
-  - the shape of the **system graph model** it produces.
+Starter models — memory, provenance — are importable shapes a Graph renames on arrival, travelling
+the same export/import path as any other model.
 
-### 4.5 Binding workspace items into a mission
+### 4.5 Stitch models
 
-Global registries are inert until a mission binds them.
+A Graph holds many domain models. They answer as one because of **declared** links.
 
-1. Inside an open mission, the user picks which Skills, Agents, LLM(s), and Connector instances the mission may use.
-2. Bindings are explicit — a mission can only see what was bound to it. This is the unit of isolation between missions.
+```mermaid
+flowchart TD
+    M1[Domain model A] --> L{Declared links}
+    M2[Domain model B] --> L
+    L -->|anchor · same entity| G[Global model<br/>derived at read time]
+    L -->|relationship · records from a dataset| G
+    G --> Q[Every question is grounded here]
+```
 
-### 4.6 Running a connector — task or pipeline
+| Rule | Detail |
+|---|---|
+| Nothing is inferred | An anchor and a relationship link are both declared. Fuzzy matching would be a decision, not a default |
+| An anchor links, it never merges | Folding two nodes is lossy and has no undo |
+| The global model is never stored | It is the union, computed on read. There is no row to edit and nothing to keep in sync |
 
-1. The user configures a bound connector instance with a concrete **target** (a folder of PDFs, a Git URL, a MySQL DSN, …).
-2. Executing it produces a **task**. Composing tasks (chain, fan-out, schedule) produces a **pipeline**.
-3. Task execution yields a **Dataset** — the named output of the run, consisting of:
-   - **Raw records** captured from the source.
-   - A **system graph model** — automatically derived, describing what was ingested (entity types, relationships, properties).
+### 4.6 Bring data in
 
-The dataset is the unit that downstream layers consume; the stitcher reads from datasets, not directly from connectors. A connector's emitted system model is its honest description of the source — the user does not have to agree with its shape; that's what the user graph model and the stitcher are for.
+Invana does not extract. Whatever already extracts your data hands over a **dataset**.
 
-Re-running the same task refreshes its dataset in place rather than producing a duplicate (idempotency, see §5).
+```mermaid
+flowchart LR
+    X[Your extractor<br/>Airflow · a script · a notebook] --> D[Dataset<br/>records + the model it binds to]
+    D --> CLI["invana records import --model &lt;name&gt;"]
+    CLI --> T[Thought · kind = import]
+    T --> V{Validate each record<br/>against the model}
+    V -->|accepted| W[Written · provenance attached]
+    V -->|rejected| R[Report: which record, which field, why]
+    W --> G[(The graph database)]
+    R --> I[Inspect what landed]
+```
 
-### 4.7 Authoring a user graph model
+| Rule | Detail |
+|---|---|
+| A dataset states its model | `model_id` is required; there is no inference path |
+| Validation is per record | One bad row does not fail a load, and is never silently dropped |
+| Every written element carries its source record | Provenance is what makes an answer traceable back to a dataset |
+| An import is a thinking | It inherits the runtime: streamed steps, retries, diagnosis, cancel |
+| Studio does not write | Import is CLI and API only; Studio reads what landed |
 
-At any point — before, during, or after ingestion — the user authors a **user graph model**: the domain ontology, the concepts the user wants to reason about (e.g., *Customer*, *Risk*, *Decision*, *Document*, *Repository*).
+### 4.7 Ask
 
-The user graph model has no data of its own initially. It is a **semantic overlay**: the user's view of the world, independent of which sources happen to feed it.
+A question becomes a run; the run becomes steps; the steps produce things a person can read.
 
-### 4.8 Stitching — datasets + user model → knowledge graph
+```
+understand → plan → translate → validate → execute → project → verify
+```
 
-The **stitcher** is what makes Invana more than a data pipeline. It takes the mission's **datasets** (each carrying its records and its system graph model) and reconciles them with the user model:
+| Step | Does | Can end the run |
+|---|---|---|
+| `understand` | Settles what is being asked; asks back when it cannot | yes — cannot answer |
+| `plan` | Selects a template by intent, or generates a plan inside the envelope | yes — refused by the envelope |
+| `translate` | Intent → query, against the global model | |
+| `validate` | The query parses and only names things the model has | yes — repaired **once**, then reported |
+| `execute` | Runs it on the graph database | yes — failure with a diagnosis |
+| `project` | Records → emissions, through a projection template | |
+| `verify` | Did this serve the intent? | records the verdict |
 
-1. **Map** — each dataset's system entity types are mapped to user ontology concepts (a PDF dataset's `pdf:Document` may map to user's `Document`; a MySQL dataset's `customers` table may map to user's `Customer`).
-2. **Resolve identity** — the same real-world entity appearing in multiple datasets is unified.
-3. **Materialize** — the stitched view becomes the mission's working knowledge graph.
+Every step streams. The user sees the step, its state and its emissions as they arrive — never a
+spinner followed by everything at once. An emission of kind subgraph draws **onto** the current data
+canvas rather than replacing it.
 
-Stitching is idempotent: refreshing a dataset and re-stitching converges; it does not duplicate. The user can review and override stitching decisions.
+### 4.8 How a run assembles
 
-### 4.9 The AI loop — interacting with the knowledge graph
+Three separately authored things meet at run time for the first time: the **agent** that runs, the
+**skills and rules** it is offered, and the **workflow** it plans from.
 
-This is what missions exist for.
+```mermaid
+flowchart TD
+    A[Agent<br/>provider · model] -->|binds| S[Skills]
+    A -->|carries| E[Envelope<br/>allowed steps · pinned args · ceilings]
+    G[Graph rules] --> CTX[Context for this thinking]
+    P[Project rules] --> CTX
+    C[Criteria in scope] --> CTX
+    S --> CTX
+    T[Task or question] --> PLAN[Plan step]
+    L[(Workflow library)] -->|selected by intent| PLAN
+    PLAN -->|nothing fits| GEN[Generate a plan]
+    PLAN --> V{Validate against<br/>the envelope}
+    GEN --> V
+    V -->|inside bounds| RUN[Dispatch steps]
+    V -->|outside| REFUSE[Refused, naming the bound]
+    CTX --> RUN
+    RUN --> VER[Verify]
+    VER -->|served the intent| PROMOTE[Candidate for the library]
+```
 
-A user asks a question, or an agent fires per the mission's policy. Either way the loop is:
+**The agent decides what is possible, the library decides what is tried, the rules and skills decide
+what it knows, and the envelope is checked before anything runs.** A refusal is a first-class
+outcome, not an error: nothing is dispatched and nothing is spent.
 
-1. The agent reads the mission's **instructions** — objectives, goals, success criteria.
-2. The agent **plans** using the skills bound to the mission.
-3. The agent **queries the knowledge graph** for grounded context.
-4. The agent **calls the bound LLM**, prompting it with that grounded context.
-5. The agent **returns an answer**, **takes an action**, or **writes back into the knowledge graph** (new entities, new relations, annotations).
-6. Outputs are scored against the mission's success criteria. The mission knows whether it is progressing.
+### 4.9 Work — a task through an agent
 
-The LLM never reasons in a vacuum — it is always grounded by the knowledge graph, which is itself shaped by both connector reality and user intent.
+```
+open ──assign──▶ assigned ──start──▶ in_progress ──result──▶ review ──accept──▶ done
+                     ▲                  │  ▲                    │
+                     │                  │  └── answer ◀── needs_input
+                     │                  ├──▶ blocked
+                     │                  └──▶ failed
+                     └──────── reject ◀───────┘
+   any ──cancel──▶ cancelled
+```
 
-### 4.10 Closing a mission
+1. A task is written, given a definition of done as **criteria**, and assigned to a person or an agent.
+2. An agent assignment opens exactly one thinking, `triggered_by = task`, on behalf of the assigner.
+3. Dependencies give a derived order: **wave**, **blocked_by**, **critical path**. Nobody maintains
+   it by hand, and a cycle is rejected with the loop named.
+4. **An agent never marks its own task done.** It posts a result → `review`; a person accepts. That
+   is the governance seam, and the signal that feeds plan verification.
 
-1. When the success criteria are met — or the user decides the mission is done — the user transitions the mission `Open → Closed`.
-2. Closed missions are **read-only**: knowledge graph, conversations, task history, and agent runs remain fully inspectable. No new tasks fire, no agents run.
-3. Reopening is an explicit action — it returns the mission to `Open` and re-enables ingestion and agents.
+### 4.10 Delegation
 
-### 4.11 Serving the graph as context to an external agent
+```mermaid
+flowchart TD
+    A[Agent mid-thinking] --> S[spawn_agent]
+    S --> B{Within depth ·<br/>fan-out · budget ⊆ parent?}
+    B -->|no| REF[Refused, naming the bound]
+    B -->|yes| C[Child agent · ephemeral by default]
+    C --> D[delegate · await_delegations]
+    D --> E[Child thinking nests on the card]
+    E --> F[Verdict returns as an emission]
+    F --> G[Child retires when the work closes]
+```
 
-Missions are not only consumed by agents *inside* Invana. The same curated knowledge graph can be served as context to external agents and LLMs — IDE assistants, chat copilots, application backends, custom pipelines.
+Cancelling the parent cascades. **Retire never deletes** — the row stays so lineage resolves.
 
-1. The mission owner issues a **scoped credential** (token or API key) authorising read-or-write access for a specific external client, bound to a specific mission.
-2. The external client calls a **retrieval surface** over the knowledge graph: structured query (Cypher/Gremlin), semantic/vector lookup, or skill-mediated retrieval that returns ranked, grounded snippets.
-3. Every response carries **provenance**: which graph nodes/edges answered the query, and through which ingested records and connector tasks they entered the graph. The external agent can cite back into the mission.
-4. The external client may optionally **write back** — new entities, annotations, conversation traces — under the same authorisation. These writes are mission-scoped and follow the same idempotency and observability rules as in-mission writes.
-5. Closing the mission freezes the external surface to read-only, in lockstep with §4.10.
+### 4.11 Review, and what carries over
 
-This is the same loop as §4.9, but inverted: the *agent* lives outside, and Invana is the curated-context layer it grounds against.
+One queue across the Graph: questions block a thinking, proposals wait, results need accepting.
+
+An agent does not remember on its own. Everything it "knows" next time is one of two things:
+
+| Path | How |
+|---|---|
+| **Recall by query** | The domain models its own memory as node types; a planned step reads prior records and cites them by id. "Nothing to recall" is stated in the trace, never skipped silently. |
+| **Consolidation** | Evidence — offered vs applied, plan served, criteria met — reaches a person, who rewrites a skill, adds a rule or a criterion, or promotes a workflow. The change has an author, a time and a reason. |
+
+Implicit memory — an agent silently carrying context forward — is **not built**: it cannot be
+audited and its recall cannot be cited. Improvement is a versioned proposal a person accepts, never
+a weight that shifts.
+
+### 4.12 Schedules
+
+| Kind | Fires | Produces |
+|---|---|---|
+| `question` | a cron | a thinking whose answers **stack into a diffable timeline**; nothing is created |
+| `task` | a cron | a new Task from a template, which a person still accepts |
+
+A firing is recorded even when it did nothing — skipped by an overlap policy is a firing with a
+stated reason. A question schedule cannot create work; the two kinds do different jobs, deliberately.
+
+### 4.13 Serving the Graph to an external agent
+
+The same curated graph is reachable from outside — an IDE assistant, a chat copilot, an application
+backend.
+
+1. A **scoped token** names what it may read. Anything else is refused, not silently filtered.
+2. Reads carry **provenance**: which records answered, and the dataset and run they entered through.
+3. The external caller appears in activity as a principal, like any other actor.
+4. **The external surface never writes.** Imports have their own contract (§4.6); a general write API
+   has none.
 
 ---
 
-## 5. Cross-cutting behaviors
+## 5. Cross-cutting behaviours
 
-- **Global registries, mission bindings.** Skills, Agents, LLM Configs, and Connectors live at the workspace level so they can be defined once, audited once, and reused everywhere. Missions are the unit of *use*; the workspace is the unit of *definition*. A mission only ever sees what it has explicitly bound — bindings are the isolation boundary between missions.
-
-- **System model vs user model.** Both must exist. The system model is the source's honest description of itself; the user model is the user's honest description of the problem. Forcing either side to compromise produces brittle pipelines. Stitching is a first-class step, not an import detail, because that's where the two truths are reconciled.
-
-- **Idempotency.** Re-running a task (refreshing its dataset), re-stitching, or re-binding should converge to the same state. Operations on the knowledge graph are designed to be safely repeatable.
-
-- **Deletes.** Hard deletes only, with downward-only cascade. Lookup/association tables must never delete their parents.
-
-- **Groundedness & explainability.** Every answer Invana surfaces is grounded in the mission's knowledge graph and traceable back to the records that produced it. The LLM reasons *over* facts; it does not invent them. When a question cannot be answered from the graph, the system says so — it does not generate plausible-sounding fillings. This is a contract, not a feature: an answer that cannot be traced through `LLM call → graph query → ingested record → originating dataset / task` is treated as a defect, not a quirk.
-
-- **Observability.** Every task run, every agent invocation, every stitch decision is inspectable from within the mission. A user can always trace an answer back through the LLM call → graph queries → ingested records → originating connector task. Observability is what *operationally* enforces groundedness — without the trace, the contract is unverifiable.
-
-- **Extensibility.** Custom connectors and custom skills are first-class citizens of the OS. The platform does not privilege built-in connectors over user-registered ones; they share the same registration, binding, and execution surface.
-
-- **Generality before verticals.** Invana is a substrate, not a product for a single use case. Coding agents, deep research, analytics, explainability, knowledge management, and decision support are all expressed as the same composition: connectors → datasets → stitched knowledge graph → skills → agents → LLM. The platform does not hard-code any vertical; vertical experiences are built *on top of* the OS by choosing which primitives to compose.
+| Behaviour | Detail |
+|---|---|
+| **The Graph is the boundary** | An agent never crosses it. There are no cross-Graph agents, canvases, skills or workflows. Membership of the Graph is the whole permission model. |
+| **Grounding is a contract** | An answer states only what the records hold. Zero rows is "the graph does not hold this", not a guess. Every emission cites its source. A cannot-answer is not answer-shaped, and a failure is not a cannot-answer. |
+| **Offered, not obeyed** | Skills and rules reach a step as discrete items with ids. Neither is enforced — the gap between *offered* and *applied* is the signal a person acts on. Enforcement is an envelope bound or a criterion. |
+| **Bounds nest** | An envelope bounds what one agent may run; a budget bounds what it may spend; delegation bounds depth and fan-out; a Graph ceiling bounds how many run at once. Each refuses with the bound named, and none is negotiable at run time. |
+| **Every write is an event** | Append-only, with the acting principal and `on_behalf_of`, and `parent_event_id` for causality. Audit, activity, evidence and observability are readings of that one record, never copies of it. |
+| **Derived, never stored** | The global model, the task plan, evidence and metrics are all computed from what already exists. A second copy of the truth would drift from the first. |
+| **Versions are immutable** | Models, skills, rules and workflows publish new versions rather than changing in place — so a run stays explainable in the terms it actually ran under. |
+| **Nothing is inferred** | Anchors, relationship links and a dataset's model are declared. Guessing produces a schema nobody chose. |
+| **Streaming is the default** | Steps and emissions paint as they arrive, for a question and for an import alike. |
+| **Hard deletes, downward cascade** | No soft deletes, no trash tier, no undo. Retention removes whole windows, never single rows. Retire and deactivate exist where history must stay resolvable. |
+| **Invana runs its own work** | One in-process runtime, one asyncio task per thinking, persisted to the app database, zero external dependencies. The protocol around it is a seam, not a shipped alternative. |
+| **Cross-platform, and split at will** | The same commands on every OS a contributor uses; engine and Studio built together and shipped as one image or two. |
 
 ---
 
 ## 6. What this document is not
 
-- **Not an API spec.** Endpoints, request/response shapes, and protocols live in their own RFCs.
-- **Not a database schema.** Tables, columns, and graph-store details live in implementation RFCs.
-- **Not an implementation plan.** Sequencing, milestones, and module boundaries live in delivery docs.
+| Not | Where it lives |
+|---|---|
+| A scope or status statement | [`for-developers/README.md`](for-developers/README.md) — the feature index, its `Slice` column and its Shipped / Partly built tables |
+| A schema | The `What this module owns` section of each [module spec](for-developers/modules/) |
+| An API spec | [`for-developers/modules/platform/spec.md`](for-developers/modules/platform/spec.md) §5, and the generated client |
+| A design record | Each feature's own file. A decision lives with the feature it governs, in present tense; there is no RFC tree and no history of what was tried |
+| A delivery plan | [`for-developers/README.md#delivery`](for-developers/README.md#delivery) |
 
-This document is the shared mental model. When an RFC or module doc uses the words *mission*, *connector*, *dataset*, *system graph model*, *user graph model*, *stitcher*, or *knowledge graph*, it means them as defined here.
+When a module spec or a feature file uses the words *Graph*, *domain model*, *global model*,
+*dataset*, *thought*, *thinking*, *emission*, *agent*, *envelope*, *skill*, *rule* or *workflow*, it
+means them as [`terminology.md`](for-developers/terminology.md) defines them — and this document uses
+them the same way.

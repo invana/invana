@@ -1,7 +1,9 @@
-"""Tests for the canonical version-aware capability model (RFC-022)."""
+"""Tests for the canonical version-aware capability model
+(docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
 
 from types import SimpleNamespace
 
+from invana.apps.graphs.compatibility import effective_read_only
 from invana.graph.connectors.cypher.connector import CYPHER_PROFILE
 from invana.graph.connectors.gremlin.connector import GREMLIN_PROFILE
 from invana.graph.types.capabilities import (
@@ -11,7 +13,6 @@ from invana.graph.types.capabilities import (
     Version,
 )
 from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
-from invana.graphs.compatibility import effective_read_only
 
 # A small profile with a version-gated feature, to exercise resolution directly.
 _PROFILE = CapabilityProfile(

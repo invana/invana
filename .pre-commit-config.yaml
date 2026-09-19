@@ -16,6 +16,26 @@ repos:
       - id: ruff-format
         files: ^(engine|integrations)/
 
+  # ─── Engine band rule (docs/for-developers/building-engine/code-shape.md §4.2) ───
+  - repo: local
+    hooks:
+      - id: lint-imports
+        name: import-linter (engine bands)
+        entry: bash -c 'cd engine && uv run lint-imports'
+        language: system
+        pass_filenames: false
+        files: ^engine/src/invana/.*\.py$
+
+      # refactor-plan.md §1: every `invana` import in integrations/ is under
+      # invana.graph. A second module name means a move reached into a
+      # separately-released connector package.
+      - id: integrations-import-invana-graph-only
+        name: integrations import only invana.graph
+        entry: bash -c '[ "$(grep -rhoE "invana\.[a-z_]+" integrations/ --include="*.py" | sort -u)" = "invana.graph" ]'
+        language: system
+        pass_filenames: false
+        files: ^(engine/src/invana|integrations)/.*\.py$
+
   # ─── TypeScript (studio) ──────────────────────────────────────
   - repo: https://github.com/biomejs/pre-commit
     rev: v2.0.0

@@ -228,7 +228,8 @@ class TestReadNeighbors:
 
 
 class TestExpandNeighbors:
-    """RFC-035 node-expand: by-node-type / by-edge-type, sort, pagination, counts."""
+    """docs/for-developers/modules/explore/features/graph-canvas.md node-expand: by-node-type / by-edge-type, sort,
+    pagination, counts."""
 
     async def test_by_node_type(self, connector, seeded_graph):
         alice = seeded_graph["alice"]

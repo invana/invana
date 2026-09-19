@@ -2,8 +2,8 @@
 
 import pytest
 
-from invana.modeller.validator import SchemaValidator
-from invana.modeller.versioner import Versioner
+from invana.apps.modeller.validator import SchemaValidator
+from invana.apps.modeller.versioner import Versioner
 
 
 @pytest.mark.asyncio

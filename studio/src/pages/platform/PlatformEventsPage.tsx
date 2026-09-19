@@ -1,20 +1,20 @@
+import { useGlobalEventsQuery } from "@/hooks/queries/useEvents";
+import { useAuth } from "@/hooks/useAuth";
+import { useEventStream } from "@/hooks/useEventStream";
+import { EventTypeFilter } from "@/pages/graphs-detail/features/operate/EventTypeFilter";
+import { matchesEventSearch } from "@/pages/graphs-detail/features/operate/eventSearch";
+import {
+	StatusFilter,
+	matchesStatusFilter,
+} from "@/pages/graphs-detail/features/operate/eventStatus";
+import type { AuditEvent } from "@/types/events";
 import { Button, SearchInput, Skeleton } from "@invana/ui";
 import { Activity, ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { EventTypeFilter } from "../../components/settings/sections/EventTypeFilter";
-import { matchesEventSearch } from "../../components/settings/sections/eventSearch";
-import {
-	StatusFilter,
-	matchesStatusFilter,
-} from "../../components/settings/sections/eventStatus";
-import { useGlobalEventsQuery } from "../../hooks/queries/useEvents";
-import { useAuth } from "../../hooks/useAuth";
-import { useEventStream } from "../../hooks/useEventStream";
-import type { AuditEvent } from "../../types/events";
 
 /**
- * Platform-wide events view (RFC-018) — superuser-only. Mirrors the per-graph
+ * Platform-wide events view (docs/for-developers/modules/operate/features/audit-and-activity.md) — superuser-only. Mirrors the per-graph
  * EventsSection layout but operates over the global `/api/v1/events`
  * endpoint and adds a graph filter dropdown.
  */
@@ -159,14 +159,18 @@ function FilterBar({
 }
 
 function EventRow({ event }: { event: AuditEvent }) {
+	// An agent row carries a null `actor` and its name in `actor_name`, so it
+	// needs its own branch — without it every agent read as `(deleted)`.
 	const actor =
-		event.actor_type === "system"
+		event.actor_kind === "system"
 			? "system"
-			: event.actor_type === "anonymous"
+			: event.actor_kind === "anonymous"
 				? "anonymous"
-				: event.actor
-					? `@${event.actor.username}`
-					: "(deleted)";
+				: event.actor_kind === "agent" || event.actor_kind === "external"
+					? (event.actor_name ?? event.actor_kind)
+					: event.actor
+						? `@${event.actor.username}`
+						: "(deleted)";
 	const time = new Date(event.created_at).toLocaleString();
 	return (
 		<li className="border border-border rounded-md p-2.5 hover:bg-muted/30 transition-colors">

@@ -1,5 +1,5 @@
+import { schemasApi } from "@/services/api/schemas";
 import { useQuery } from "@tanstack/react-query";
-import { schemasApi } from "../../services/api/schemas";
 
 export function useActiveVersionQuery(
 	username: string | undefined,

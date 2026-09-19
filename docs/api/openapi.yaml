@@ -42,16 +42,16 @@ paths:
                 $ref: "#/components/schemas/HealthResponse"
 
   # ─── Connections ───
-  # Defined in docs/api/schemas/connection.yaml (to be designed in RFC-002)
+  # Defined in docs/api/schemas/connection.yaml (designed in docs/for-developers/modules/connect-and-model/features/connect-a-database.md)
 
   # ─── Models ───
-  # Defined in docs/api/schemas/ontology.yaml (to be designed in RFC-003)
+  # Defined in docs/api/schemas/ontology.yaml (designed in docs/for-developers/modules/connect-and-model/features/domain-models.md)
 
   # ─── Queries ───
-  # Defined in docs/api/schemas/query.yaml (to be designed in RFC-004)
+  # Defined in docs/api/schemas/query.yaml (designed in docs/for-developers/modules/ask/features/write-queries.md)
 
   # ─── Simulations ───
-  # Defined in docs/api/schemas/simulation.yaml (to be designed in RFC-007)
+  # Defined in docs/api/schemas/simulation.yaml (post-1.0 — README, Not building)
 
 components:
   schemas:

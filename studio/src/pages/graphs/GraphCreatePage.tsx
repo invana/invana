@@ -1,12 +1,20 @@
-import { type FieldConfig, Form, ObjectField } from "@invana/forms";
+import { FormError } from "@/components/forms/FormError";
+import { useCreateGraphMutation } from "@/hooks/queries/useGraphs";
+import {
+	type Control,
+	type FieldConfig,
+	type FieldValues,
+	Form,
+	ObjectField,
+} from "@invana/forms";
 import { Button } from "@invana/ui";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useRef } from "react";
+// Only `useForm` — @invana/forms re-exports every form *type* Studio needs
+// but not the hook itself, so this is the one react-hook-form import left.
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FormError } from "../../components/forms/FormError";
-import { useCreateGraphMutation } from "../../hooks/queries/useGraphs";
 
 function slugify(input: string): string {
 	return input
@@ -19,7 +27,7 @@ function slugify(input: string): string {
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
 interface CreateGraphForm {
-	graph: { name: string; slug: string; instructions: string };
+	graph: { name: string; slug: string };
 }
 
 export function GraphCreatePage() {
@@ -27,7 +35,7 @@ export function GraphCreatePage() {
 	const mutation = useCreateGraphMutation();
 
 	const form = useForm<CreateGraphForm>({
-		defaultValues: { graph: { name: "", slug: "", instructions: "" } },
+		defaultValues: { graph: { name: "", slug: "" } },
 	});
 
 	// ObjectField owns each field's onChange, so the name→slug auto-derivation
@@ -67,13 +75,6 @@ export function GraphCreatePage() {
 			placeholder: "customer-analysis",
 			description: `Lives at /u/<you>/${slug || "…"}`,
 		},
-		{
-			name: "instructions",
-			type: "textarea",
-			rows: 4,
-			label: "Instructions (optional)",
-			placeholder: "What is this graph for? What questions should it answer?",
-		},
 	];
 
 	// One field per row so they stack full-width (ObjectField pairs fields into
@@ -81,7 +82,6 @@ export function GraphCreatePage() {
 	const rowConfig = [
 		{ id: "name", fields: ["name"] },
 		{ id: "slug", fields: ["slug"] },
-		{ id: "instructions", fields: ["instructions"] },
 	];
 
 	const canSubmit =
@@ -115,11 +115,7 @@ export function GraphCreatePage() {
 		if (invalid) return;
 
 		mutation.mutate(
-			{
-				name,
-				slug: nextSlug,
-				instructions: data.graph.instructions.trim() || null,
-			},
+			{ name, slug: nextSlug },
 			{
 				onSuccess: (graph) => {
 					toast.success(`Graph "${graph.name}" created`);
@@ -145,15 +141,20 @@ export function GraphCreatePage() {
 				<div className="mb-8">
 					<h1 className="text-2xl font-bold">New Graph</h1>
 					<p className="text-muted-foreground mt-1">
-						Name it, give it instructions. You'll attach a database connection
-						in the next step.
+						A name and a URL. Everything else — the database, the model, the
+						data, the provider — is the graph's setup page, which opens next.
 					</p>
 				</div>
 
 				<Form {...form}>
 					<form onSubmit={onSubmit} className="flex flex-col gap-5">
 						<ObjectField
-							control={form.control}
+							// `ObjectFieldProps.control` is `Control<any>`, and react-hook-form's
+							// `Control` is invariant in its field-values parameter — so a real
+							// `Control<CreateGraphForm>` will not assign to it. The fix belongs in
+							// `@invana/forms` (make `ObjectField` generic in `TFieldValues`);
+							// until that ships, this is the one place Studio says so (DS3).
+							control={form.control as unknown as Control<FieldValues>}
 							name="graph"
 							fields={fields}
 							rowConfig={rowConfig}

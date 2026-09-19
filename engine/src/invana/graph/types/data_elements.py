@@ -61,7 +61,8 @@ class ResultMetadata(BaseModel):
         edge_count: Number of edges in the result.
         record_count: Number of raw records returned.
         duration_ms: Query execution duration in milliseconds.
-        query: The executed query text, when the caller records it (RFC-046) —
+        query: The executed query text, when the caller records it
+        (docs/for-developers/modules/explore/features/boards.md) —
             e.g. the traversal a node-expand generated, logged into the session.
     """
 

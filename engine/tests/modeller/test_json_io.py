@@ -2,9 +2,9 @@
 
 import pytest
 
-from invana.modeller.json_io import SchemaExporter, SchemaImporter
-from invana.modeller.schemas import SchemaExport
-from invana.modeller.versioner import Versioner
+from invana.apps.modeller.json_io import SchemaExporter, SchemaImporter
+from invana.apps.modeller.schemas import SchemaExport
+from invana.apps.modeller.versioner import Versioner
 
 
 @pytest.mark.asyncio

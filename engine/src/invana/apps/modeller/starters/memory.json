@@ -1,0 +1,276 @@
+{
+  "format": "invana.model/1",
+  "package_id": "starter.memory",
+  "content_hash": "",
+  "name": "Memory",
+  "description": "An observation, a claim derived from observations, and how that claim fared. Rename everything on arrival \u2014 nothing in Invana depends on these names.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "Memory",
+    "schema_description": "A starting shape for recording what was seen, what was concluded, and whether it held.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "property_keys": [
+      {
+        "name": "key",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Stable identifier, yours to define.",
+        "validation_rules": []
+      },
+      {
+        "name": "statement",
+        "type": "text",
+        "value_cardinality": "SINGLE",
+        "description": "What was observed or claimed, in words.",
+        "validation_rules": []
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Your own vocabulary for the sort of thing this is.",
+        "validation_rules": []
+      },
+      {
+        "name": "confidence",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "How sure, 0\u20131. Drop it if you do not want a number here.",
+        "validation_rules": []
+      },
+      {
+        "name": "observed_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When the thing happened, not when the row was written.",
+        "validation_rules": []
+      },
+      {
+        "name": "recorded_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When this was written down.",
+        "validation_rules": []
+      },
+      {
+        "name": "verdict",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "How the claim fared when it was checked.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "held",
+                "failed",
+                "undecided"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "weight",
+        "type": "int",
+        "value_cardinality": "SINGLE",
+        "description": "How much this evaluation should count.",
+        "validation_rules": [
+          {
+            "rule_type": "range",
+            "params": {
+              "min": 1,
+              "max": 3
+            }
+          }
+        ]
+      },
+      {
+        "name": "reason",
+        "type": "text",
+        "value_cardinality": "SINGLE",
+        "description": "Why the verdict, in words.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Observation",
+        "description": "Something seen, with when it was seen.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "key",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "statement",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "kind",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "observed_at",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "recorded_at",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Insight",
+        "description": "A claim derived from observations. It cites them; it does not replace them.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "key",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "statement",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "confidence",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "recorded_at",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Evaluation",
+        "description": "How an insight fared when it was checked.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "verdict",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "weight",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "reason",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "recorded_at",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "DERIVED_FROM",
+        "description": "The observations an insight was drawn from.",
+        "source_node_types": [
+          "Insight"
+        ],
+        "target_node_types": [
+          "Observation"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "RATES",
+        "description": "The insight an evaluation judged.",
+        "source_node_types": [
+          "Evaluation"
+        ],
+        "target_node_types": [
+          "Insight"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "GROUNDED_IN",
+        "description": "What the evaluation checked the insight against.",
+        "source_node_types": [
+          "Evaluation"
+        ],
+        "target_node_types": [
+          "Observation"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "observation_key_unique",
+        "target_kind": "node_type",
+        "target_label": "Observation",
+        "constraint_type": "unique",
+        "properties": [
+          "key"
+        ]
+      },
+      {
+        "name": "insight_key_unique",
+        "target_kind": "node_type",
+        "target_label": "Insight",
+        "constraint_type": "unique",
+        "properties": [
+          "key"
+        ]
+      }
+    ],
+    "indexes": [
+      {
+        "name": "observation_observed_at",
+        "target_kind": "node_type",
+        "target_label": "Observation",
+        "properties": [
+          "observed_at"
+        ],
+        "index_type": "composite",
+        "index_options": null
+      }
+    ]
+  },
+  "links": []
+}

@@ -49,6 +49,16 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
         response = await self._connector.execute(query, params)
         return [record["relationshipType"] for record in response.records]
 
+    async def get_node_label_counts(self) -> dict[str, int]:
+        query, params = OpenCypherQueryBuilder.get_node_label_counts()
+        response = await self._connector.execute(query, params)
+        return {record["label"]: record["count"] for record in response.records}
+
+    async def get_edge_label_counts(self) -> dict[str, int]:
+        query, params = OpenCypherQueryBuilder.get_edge_label_counts()
+        response = await self._connector.execute(query, params)
+        return {record["label"]: record["count"] for record in response.records}
+
     async def get_property_keys(self, label: str) -> list[str]:
         query, params = OpenCypherQueryBuilder.get_property_keys(label)
         response = await self._connector.execute(query, params)

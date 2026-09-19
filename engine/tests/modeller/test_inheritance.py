@@ -2,7 +2,7 @@
 
 import pytest
 
-from invana.modeller.inheritance import (
+from invana.apps.modeller.inheritance import (
     InheritanceCycleError,
     build_hierarchy,
     build_type_map,

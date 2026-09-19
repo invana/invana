@@ -1,4 +1,4 @@
-"""LLM runtime tests (RFC-032).
+"""LLM runtime tests (docs/for-developers/modules/agents/features/providers-and-models.md).
 
 Per repo rule 7 (real services, no mocks) and to keep CI keyless, the positive
 path runs against a **real local Ollama** and skips cleanly when it is not
@@ -13,9 +13,9 @@ import os
 import httpx
 import pytest
 
-from invana.llm import LLMError, complete_tool
-from invana.llm.providers.claude_agent_sdk import flatten_messages
-from invana.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm import LLMError, complete_tool
+from invana.apps.llm.providers.claude_agent_sdk import flatten_messages
+from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
 _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")
@@ -78,7 +78,7 @@ async def test_complete_tool_unwired_provider_raises() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Claude Agent SDK provider (RFC-053)
+# Claude Agent SDK provider (docs/for-developers/modules/agents/features/providers-and-models.md)
 # ---------------------------------------------------------------------------
 
 

@@ -1,38 +1,35 @@
-"""Integration tests for the Graphs and Query REST API endpoints.
+"""HTTP route tests for the Graph container and its connection sub-resource
+(docs/for-developers/modules/identity-and-access/spec.md) against a real Postgres.
 
-These tests use FastAPI's async test client with an in-memory SQLite engine
-so they don't require a running graph database.  Graph connection is mocked
-at the GraphConnectionManager level because connecting to a real DB is tested
-separately in the integration test suite.
+Auth is overridden with a real ``User`` row; the slug resolver and the
+membership gate are left real so the URL contract ``/u/{username}/{graphSlug}``
+is exercised end to end. The connection manager is mocked — connecting to a
+graph database is covered by the integration suite.
 """
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+import uuid
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from invana.graphs.schemas import GraphCreate
-from invana.graphs.store import GraphModelStore
-from invana.modeller.models import Base
+from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.core.auth.deps import get_current_user
+from invana.core.auth.models import User
+from invana.core.db import get_session
 from invana.server.app import create_app
-from tests.graphs.conftest import TEST_CONNECTOR_CLASS, TEST_ENCRYPTION_KEY
+from tests.graphs.conftest import TEST_CONNECTOR_CLASS
 
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture(scope="module")
-def anyio_backend():
-    return "asyncio"
+pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture
 def mock_manager():
-    """Return a mock GraphConnectionManager that does nothing."""
+    """A GraphConnectionManager stand-in that records calls and does nothing."""
     manager = MagicMock()
     manager.startup = AsyncMock()
     manager.shutdown = AsyncMock()
@@ -42,128 +39,138 @@ def mock_manager():
     return manager
 
 
-@pytest.fixture
-async def app_with_db(tmp_path, mock_manager):
-    """Build app against an in-memory SQLite DB with patched connection manager."""
-    db_url = f"sqlite+aiosqlite:///{tmp_path}/test.db"
-    engine = create_async_engine(db_url, echo=False)
+@pytest_asyncio.fixture
+async def owner(session_factory) -> User:
+    async with session_factory() as s:
+        suffix = uuid.uuid4().hex[:8]
+        user = User(email=f"{suffix}@example.com", username=f"u_{suffix}", password_hash="x", first_name="T")
+        s.add(user)
+        await s.commit()
+        user_id = user.id
+    async with session_factory() as s:
+        return await s.get(User, user_id)
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
 
-    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
+@pytest_asyncio.fixture
+async def client(session_factory, owner, mock_manager):
+    """App wired to the test Postgres schema, authenticated as ``owner``."""
     app = create_app()
-
-    # Override lifespan state directly
-    app.state.db_engine = engine
+    # Lifespan doesn't run under ASGITransport — wire what the routes read off app.state.
     app.state.db_session_factory = session_factory
     app.state.graph_connection_manager = mock_manager
-
-    from invana.db import get_session
 
     async def _override_session():
         async with session_factory() as sess:
             yield sess
 
     app.dependency_overrides[get_session] = _override_session
+    app.dependency_overrides[get_current_user] = lambda: owner
 
-    yield app, session_factory, mock_manager
-
-    await engine.dispose()
-
-
-# ---------------------------------------------------------------------------
-# CRUD tests
-# ---------------------------------------------------------------------------
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
 
 
-@pytest.mark.asyncio
+async def _create_graph(client: AsyncClient, slug: str) -> dict:
+    resp = await client.post("/api/v1/graphs", json={"name": "My Graph", "slug": slug})
+    assert resp.status_code == 201, resp.text
+    return resp.json()
+
+
 class TestGraphsAPI:
-    async def test_create_graph(self, app_with_db):
-        app, _, mock_manager = app_with_db
+    async def test_create_graph_makes_owner_a_member(self, client, owner):
+        body = await _create_graph(client, "my-graph")
+        assert body["slug"] == "my-graph"
+        assert body["name"] == "My Graph"
+
+        # The creator can reach the graph through the real membership gate.
+        resp = await client.get(f"/api/v1/u/{owner.username}/my-graph")
+        assert resp.status_code == 200
+        assert resp.json()["id"] == body["id"]
+
+    async def test_create_graph_duplicate_slug_conflicts(self, client):
+        await _create_graph(client, "dup")
+        resp = await client.post("/api/v1/graphs", json={"name": "Again", "slug": "dup"})
+        assert resp.status_code == 409
+
+    async def test_list_graphs(self, client):
+        await _create_graph(client, "listed")
+        resp = await client.get("/api/v1/graphs")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["total"] >= 1
+        assert "listed" in [g["slug"] for g in body["items"]]
+
+    async def test_every_graph_read_derives_setup_state(self, client, owner, session_factory):
+        """A read serves the **derived** state, not the stored column.
+
+        The stored column only ever holds skips and the instructions stamp, so a
+        read that served it left `providers` absent — and Studio kept asking for a
+        provider that was already configured and pinged.
+        """
+        graph = await _create_graph(client, "derived")
+        async with session_factory() as s:
+            s.add(
+                LLMProvider(
+                    graph_id=graph["id"],
+                    provider=LLMProviderKind.anthropic,
+                    model_id="claude-opus-5",
+                    api_key_encrypted=b"x",
+                    is_default=True,
+                    last_ping_at=datetime.now(UTC),
+                    last_ping_ok=True,
+                )
+            )
+            await s.commit()
+
+        detail = (await client.get(f"/api/v1/u/{owner.username}/derived")).json()
+        assert detail["setup_state"]["providers"]["done"] is True
+
+        listed = (await client.get("/api/v1/graphs")).json()["items"]
+        row = next(g for g in listed if g["slug"] == "derived")
+        assert row["setup_state"]["providers"]["done"] is True
+
+        patched = (await client.patch(f"/api/v1/u/{owner.username}/derived", json={"description": "d"})).json()["data"]
+        assert patched["setup_state"]["providers"]["done"] is True
+
+    async def test_a_graph_without_a_provider_still_reports_the_section(self, client, owner):
+        """The negative half: `done` is False, and the section is *present* — a
+        missing key and a false one read the same to a client, which is how the
+        bug hid."""
+        await _create_graph(client, "bare")
+        state = (await client.get(f"/api/v1/u/{owner.username}/bare")).json()["setup_state"]
+        assert state["providers"] == {
+            "done": False,
+            "completed_at": None,
+            "skipped_at": None,
+            "required": True,
+            "gate": "answering",
+            "blocked_by": None,
+            "broken": None,
+        }
+
+    async def test_get_graph_not_found(self, client, owner):
+        resp = await client.get(f"/api/v1/u/{owner.username}/nonexistent")
+        assert resp.status_code == 404
+
+    async def test_delete_graph(self, client, owner):
+        await _create_graph(client, "del-me")
+        resp = await client.delete(f"/api/v1/u/{owner.username}/del-me")
+        assert resp.status_code == 204
+
+        resp = await client.get(f"/api/v1/u/{owner.username}/del-me")
+        assert resp.status_code == 404
+
+    async def test_put_connection_registers_with_manager(self, client, owner, mock_manager):
+        await _create_graph(client, "conn")
         payload = {
-            "name": "My Neo4j",
             "uri": "bolt://localhost:7687",
             "connector_class": TEST_CONNECTOR_CLASS,
             "auth": {"username": "neo4j", "password": "secret"},
         }
-        with patch("invana.server.routes.graphs.settings") as mock_settings:
-            mock_settings.encryption_key = TEST_ENCRYPTION_KEY
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-                resp = await client.post("/api/v1/graphs", json=payload)
-
-        assert resp.status_code == 201
+        resp = await client.put(f"/api/v1/u/{owner.username}/conn/connection", json=payload)
+        assert resp.status_code == 200, resp.text
         data = resp.json()
-        assert data["name"] == "My Neo4j"
+        assert data["connector_class"] == TEST_CONNECTOR_CLASS
         assert data["status"] == "CONNECTING"
         assert "auth_encrypted" not in data
         mock_manager.register.assert_awaited_once()
-
-    async def test_list_graphs(self, app_with_db):
-        app, session_factory, _ = app_with_db
-        async with session_factory() as session:
-            store = GraphModelStore()
-            await store.create(
-                session,
-                data=GraphCreate(name="G1", uri="bolt://h:7687", connector_class=TEST_CONNECTOR_CLASS),
-                encryption_key=TEST_ENCRYPTION_KEY,
-            )
-            await session.commit()
-
-        with patch("invana.server.routes.graphs.settings") as mock_settings:
-            mock_settings.encryption_key = TEST_ENCRYPTION_KEY
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-                resp = await client.get("/api/v1/graphs")
-
-        assert resp.status_code == 200
-        body = resp.json()
-        assert body["total"] >= 1
-
-    async def test_get_graph_not_found(self, app_with_db):
-        app, _, _ = app_with_db
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            resp = await client.get("/api/v1/graphs/nonexistent-id")
-        assert resp.status_code == 404
-
-    async def test_delete_graph(self, app_with_db):
-        app, session_factory, mock_manager = app_with_db
-        async with session_factory() as session:
-            store = GraphModelStore()
-            graph = await store.create(
-                session,
-                data=GraphCreate(name="Del Me", uri="bolt://h:7687", connector_class=TEST_CONNECTOR_CLASS),
-                encryption_key=TEST_ENCRYPTION_KEY,
-            )
-            await session.commit()
-            graph_id = graph.id
-
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            resp = await client.delete(f"/api/v1/graphs/{graph_id}")
-
-        assert resp.status_code == 204
-        mock_manager.deregister.assert_awaited()
-
-    async def test_query_graph_not_active(self, app_with_db):
-        """Query against a graph not in the manager registry should return 503."""
-        from invana.graphs.manager import GraphUnavailableError
-
-        app, session_factory, mock_manager = app_with_db
-        mock_manager.get_connector.side_effect = GraphUnavailableError("some-id")
-
-        async with session_factory() as session:
-            store = GraphModelStore()
-            graph = await store.create(
-                session,
-                data=GraphCreate(name="Q Test", uri="bolt://h:7687", connector_class=TEST_CONNECTOR_CLASS),
-                encryption_key=TEST_ENCRYPTION_KEY,
-            )
-            await session.commit()
-            graph_id = graph.id
-
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            resp = await client.post(
-                f"/api/v1/graphs/{graph_id}/query",
-                json={"query": "MATCH (n) RETURN n LIMIT 1"},
-            )
-        assert resp.status_code == 503

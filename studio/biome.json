@@ -7,7 +7,14 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["node_modules", "dist"]
+		"ignore": [
+			"node_modules",
+			"dist",
+			"e2e/.auth",
+			"test-results",
+			"playwright-report",
+			"blob-report"
+		]
 	},
 	"formatter": {
 		"enabled": true,

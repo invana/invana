@@ -55,6 +55,23 @@ class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
     ) -> EdgeSchemaInfo:
         """Infer edge endpoint patterns and property keys from existing data."""
 
+    async def get_node_label_counts(self) -> dict[str, int] | None:
+        """Return ``{label: count}`` for every node label, or ``None``.
+
+        ``None`` means *this vendor cannot count* — the Explorer's type panel
+        then lists the types without numbers rather than showing nothing
+        (selection-and-the-panel.md SP8). The base returns ``None`` so a
+        connector that has not implemented counting degrades instead of raising.
+        """
+        return None
+
+    async def get_edge_label_counts(self) -> dict[str, int] | None:
+        """Return ``{label: count}`` for every edge label, or ``None``.
+
+        See :meth:`get_node_label_counts`.
+        """
+        return None
+
     async def get_edge_multiplicity(self, label: str) -> str:
         """Return the multiplicity for an edge label.
 

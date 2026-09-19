@@ -1,0 +1,16 @@
+---
+"invana": minor
+"studio": minor
+---
+
+Agents at work — Projects · Tasks · Agents · Skills · the activity trace (docs/for-developers/modules/work/spec.md), planned workflows (docs/for-developers/modules/agents/spec.md), and one page (docs/for-developers/modules/explore/spec.md).
+
+**A session now names an agent, and the agent carries the LLM.** The composer's provider picker is gone — a session binds one agent (defaulted by surface: Explorer → the Atlas's default, Modeller → the seeded Modeller), and the agent carries the provider *and* the model. The NL / QL toggle stays, as the *kind* of the ask rather than a choice of workflow. A paused or retired agent blocks the composer and offers the picker instead of quietly answering with a different mind. Every Atlas is seeded with three agents (Explorer · Query · Modeller); `thinkings.agent_id` records what actually ran, so "which agent answered" is a single lookup.
+
+**A workflow is now planned per thinking, inside the agent's envelope.** *Understand* settles the intent — and can ask back, or say the ask is outside this Atlas, **before any query is written**. *Plan* serves that intent by matching a library template (no LLM in the common case) or generating one; whatever it proposes is validated against the envelope — allow-list, pinned args, `require` order, `${steps.X.y}` bindings, `max_steps` — before a single step is queued. *Verify* checks deterministically whether the result served the intent and emits `plan.verified`. The card's rows appear when the plan lands, so the shape of the work is on the record before it runs.
+
+**Work is assignable.** Write a Task inside a Project, hand it to a person or an **agent**, and the assignment opens exactly one thinking. An agent never marks its own task done: it posts a result → `review`, and a person accepts or rejects with a note that becomes a new round on the same task. Dependencies give a derived order — waves, blocked-by, and a critical path — drawn on a **Plan** canvas where dragging one card onto another adds a dependency; a loop comes back as a 422 that names it.
+
+**The trace answers who did what, for whom, caused by what.** `events` gains principals (`user · agent · system · external · anonymous`), `on_behalf_of_user_id` (set by the engine from the root thinking, never from task input), `parent_event_id`, and project / task / thinking / step scoping. Every step records which skills were **offered** (a fact about the prompt) and which the model **reports** applying (a self-report, badged as one). Agents can spawn agents where their envelope allows it, bounded by depth, fan-out and budget ⊆ parent — with the child's steps nested under the parent step that waits on them, and cancellation cascading.
+
+**Studio is one page.** The Explorer / Modeller toggle is retired: one route, one rail (Sessions · Model · Layers · Projects · Tasks · Agents · Workflows), and the main area is always a canvas. Canvas tabs carry a `kind` — `data · model · plan · workflow · envelope · lineage` — and the canvas law is written down: the canvas **selects and draws**, the panel **edits**, and only `model` and `plan` write from a gesture. `/modeller` redirects rather than 404ing.

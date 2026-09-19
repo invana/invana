@@ -1,6 +1,6 @@
+import { skillsApi } from "@/services/api/skills";
+import type { SkillCreate, SkillUpdate } from "@/types/skills";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { skillsApi } from "../../services/api/skills";
-import type { SkillCreate, SkillUpdate } from "../../types/skills";
 
 const key = (username: string, graphSlug: string) =>
 	["skills", username, graphSlug] as const;

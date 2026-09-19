@@ -1,18 +1,26 @@
+import { SaturationControl } from "@/components/SaturationControl";
+import { STUDIO_THEMES } from "@/components/studioThemes";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessTokensTab } from "@/pages/settings/AccessTokensTab";
+import { authApi } from "@/services/api/auth";
+import { ApiError } from "@/services/api/client";
 import { Input, Label } from "@invana/forms";
 import { ThemeSelector } from "@invana/themes";
 import {
 	Button,
+	Card,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	TabbedPanel,
+	NavVerticalItems,
 } from "@invana/ui";
 import {
 	AlertTriangle,
 	KeyRound,
+	KeySquare,
 	Monitor,
 	Moon,
 	Palette,
@@ -22,11 +30,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { SaturationControl } from "../../components/SaturationControl";
-import { STUDIO_THEMES } from "../../components/studioThemes";
-import { useAuth } from "../../hooks/useAuth";
-import { authApi } from "../../services/api/auth";
-import { ApiError } from "../../services/api/client";
 
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 const USERNAME_COOLDOWN_DAYS = 30;
@@ -37,60 +40,79 @@ type UsernameState =
 	| { kind: "available" }
 	| { kind: "unavailable"; reason: string };
 
+/**
+ * The sections, in the order the left nav lists them. Sections are a vertical
+ * strip, not a tab bar: five labels do not fit a 2xl-wide header, and Access
+ * tokens needs the width the strip was eating (AC6).
+ */
+const SECTIONS = [
+	{ key: "basic", name: "Basic info", icon: User },
+	{ key: "appearance", name: "Appearance", icon: Palette },
+	{ key: "password", name: "Password", icon: KeyRound },
+	{ key: "tokens", name: "Access tokens", icon: KeySquare },
+	{ key: "danger", name: "Danger zone", icon: AlertTriangle },
+] as const;
+
+type SectionKey = (typeof SECTIONS)[number]["key"];
+
 export function ProfileSettingsPage() {
 	const { user, setUser, clear } = useAuth();
+	const [section, setSection] = useState<SectionKey>("basic");
 	if (!user) return null;
 
 	return (
-		<div className="max-w-2xl mx-auto px-6 py-10">
+		// The kit sets a 13px root, so the named container steps top out near
+		// 830px — too narrow for the tokens table. The cap is explicit (AC6).
+		<div className="mx-auto w-full max-w-[1200px] px-6 py-10">
 			<header className="mb-8">
 				<h1 className="text-2xl font-semibold">Account settings</h1>
 				<p className="text-muted-foreground text-base">
 					Update your profile, change your password, or close your account.
 				</p>
 			</header>
-			<TabbedPanel
-				defaultTab="basic"
-				tabs={[
-					{
-						value: "basic",
-						label: "Basic info",
-						icon: User,
-						content: (
-							<BasicInfoTab
-								initial={{
-									email: user.email,
-									username: user.username,
-									first_name: user.first_name,
-									last_name: user.last_name,
-									username_last_changed_at: user.username_last_changed_at,
-								}}
-								onSaved={(updated) => setUser({ ...user, ...updated })}
-							/>
-						),
-					},
-					{
-						value: "appearance",
-						label: "Appearance",
-						icon: Palette,
-						content: <AppearanceTab />,
-					},
-					{
-						value: "password",
-						label: "Password",
-						icon: KeyRound,
-						content: <PasswordTab />,
-					},
-					{
-						value: "danger",
-						label: "Danger zone",
-						icon: AlertTriangle,
-						content: (
-							<DangerZoneTab email={user.email} onDeleted={() => clear()} />
-						),
-					},
-				]}
-			/>
+			<div className="flex flex-wrap items-start gap-6">
+				<NavVerticalItems
+					items={SECTIONS.map((s) => ({
+						key: s.key,
+						name: s.name,
+						label: s.name,
+						icon: s.icon,
+						// The strip centres its items; a settings list reads down a
+						// left edge, so each row starts at one.
+						className: "w-full justify-start px-3",
+						onClick: () => setSection(s.key),
+					}))}
+					selectionMode="tabs"
+					activeKey={section}
+					panelId={() => "account-section"}
+					iconClassName="w-4 h-4 flex-shrink-0"
+					className="w-52 shrink-0 items-stretch gap-1"
+				/>
+				<Card
+					id="account-section"
+					className="min-w-0 flex-1 p-2"
+					aria-label={SECTIONS.find((s) => s.key === section)?.name}
+				>
+					{section === "basic" && (
+						<BasicInfoTab
+							initial={{
+								email: user.email,
+								username: user.username,
+								first_name: user.first_name,
+								last_name: user.last_name,
+								username_last_changed_at: user.username_last_changed_at,
+							}}
+							onSaved={(updated) => setUser({ ...user, ...updated })}
+						/>
+					)}
+					{section === "appearance" && <AppearanceTab />}
+					{section === "password" && <PasswordTab />}
+					{section === "tokens" && <AccessTokensTab />}
+					{section === "danger" && (
+						<DangerZoneTab email={user.email} onDeleted={() => clear()} />
+					)}
+				</Card>
+			</div>
 		</div>
 	);
 }
@@ -100,14 +122,14 @@ export function ProfileSettingsPage() {
 const MODE_ICONS = { light: Sun, dark: Moon, system: Monitor };
 
 /**
- * Theme / mode / accent picker (RFC-044). Changes apply live and are persisted
+ * Theme / mode / accent picker (docs/for-developers/modules/platform/features/theming.md). Changes apply live and are persisted
  * to the user's profile by the app-level `<ThemeSyncBridge>` (mounted in
  * main.tsx), so this tab is a thin wrapper around `<ThemeSelector>` — no local
  * save wiring. The header `ThemeMenu` drives the same provider state.
  */
 function AppearanceTab() {
 	return (
-		<div className="max-w-md space-y-6">
+		<div className="max-w-md space-y-6 p-4">
 			<div>
 				<h2 className="text-lg font-semibold">Appearance</h2>
 				<p className="text-muted-foreground text-base">

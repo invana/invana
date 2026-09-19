@@ -1,13 +1,13 @@
-"""Metric-recorder tests (RFC-041).
+"""Metric-recorder tests (docs/for-developers/modules/operate/features/observability.md).
 
-Verifies the ``invana.llm.*``, ``invana.query.graph.*``, and
+Verifies the ``invana.apps.llm.*``, ``invana.query.graph.*``, and
 ``invana.session.message.*`` families emit with the right labels and the right
 success/failure branching. Uses a real in-memory OTLP metric reader — no mocks,
 no graph DB (the recorders are pure metric-emit, so no live infra is needed).
 
 The engine sets a process-global MeterProvider at import (telemetry defaults on),
 which can't be overridden — so instead of the global provider, we point the
-instruments the recorders read (``invana.telemetry.metrics.*``) at a local
+instruments the recorders read (``invana.core.telemetry.metrics.*``) at a local
 provider backed by an ``InMemoryMetricReader``. The recorders resolve those
 instruments by module attribute at call time, so the redirect is transparent and
 these still exercise the real recorder code against real SDK instruments.
@@ -19,8 +19,8 @@ import pytest
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import InMemoryMetricReader
 
-from invana.telemetry import metrics as _m
-from invana.telemetry.recorders import (
+from invana.core.telemetry import metrics as _m
+from invana.core.telemetry.recorders import (
     record_graph_query,
     record_llm_request,
     record_session_message,

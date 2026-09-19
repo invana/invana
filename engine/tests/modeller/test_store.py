@@ -148,7 +148,7 @@ class TestPropertyKeyCRUD:
         assert updated.type == "float"
 
     async def test_update_property_key_rejected_on_active_version(self, session, store):
-        from invana.modeller.versioner import Versioner
+        from invana.apps.modeller.versioner import Versioner
 
         schema = await store.create_graph_model(session, name="PK Immutable")
         await session.commit()
@@ -275,7 +275,7 @@ class TestNodeTypeCRUD:
         assert result is True
 
     async def test_cannot_modify_active_version(self, session, store):
-        from invana.modeller.versioner import Versioner
+        from invana.apps.modeller.versioner import Versioner
 
         schema = await store.create_graph_model(session, name="Immutable Test")
         await session.commit()
@@ -415,7 +415,7 @@ class TestIndexCRUD:
 @pytest.mark.asyncio
 class TestCloneVersion:
     async def test_clone_version(self, session, store):
-        from invana.modeller.versioner import Versioner
+        from invana.apps.modeller.versioner import Versioner
 
         schema = await store.create_graph_model(session, name="Clone Test")
         await session.commit()

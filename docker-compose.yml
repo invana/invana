@@ -19,7 +19,7 @@
 # over them and run in reload mode. Rebuild after changing dependencies
 # (`docker compose build engine studio`) — the image won't pick up a new
 # pyproject.toml/package.json entry on its own. Not used for production builds
-# (see docs/internal/mvp/engine.md §7.1 "Docker" — that's a separate,
+# (see docs/for-developers/modules/platform/features/command-line.md — that's a separate,
 # not-yet-built image).
 
 services:
@@ -88,6 +88,16 @@ services:
       # the sibling integrations/invana-* packages (editable).
       - .:/app
       - engine-venv:/app/engine/.venv
+    # A Graph's connection URI is stored once and read by two callers: this
+    # container, and an `invana` CLI you run on your host. A compose service
+    # name (`neo4j_5`) only resolves here; `localhost` only resolves there.
+    # `host.docker.internal` can resolve in both — Docker Desktop injects it
+    # into containers, and this line does the same on plain Linux Docker — so
+    # `bolt://host.docker.internal:7687` reaches Neo4j through its published
+    # port either way. Add `127.0.0.1 host.docker.internal` to your host's
+    # /etc/hosts to complete the other half (see demos/airways/README.md).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,6 +116,13 @@ services:
       # also on (and the telemetry profile is running), so flipping only this
       # one to true just spams the browser console with 404s.
       VITE_TELEMETRY_ENABLED: ${VITE_TELEMETRY_ENABLED:-false}
+      # `pnpm dev` re-checks deps on start and re-installs when the mounted
+      # node_modules has drifted from the bind-mounted lockfile. That install
+      # sometimes needs to purge node_modules first, which pnpm asks to confirm
+      # — and with no TTY here it aborts instead (ERR_PNPM_ABORTED_REMOVE_
+      # MODULES_DIR_NO_TTY), crash-looping the container. CI=true is pnpm's own
+      # remedy: it answers every such prompt non-interactively.
+      CI: "true"
     volumes:
       - ./studio:/app
       - studio-node-modules:/app/node_modules
@@ -170,8 +187,10 @@ services:
       start_period: 30s
 
   # ── Observability ─────────────────────────────────────────────────────────
-  # HyperDX Local: no auth, no backend API, config stored in browser localStorage.
-  # Includes: ClickHouse + OTel Collector (no MongoDB, no HyperDX API server)
+  # HyperDX Local: no auth, no login. Bundles ClickHouse + OTel Collector + the
+  # HyperDX API server and its MongoDB — so sources and dashboards are stored
+  # server-side in /data/db, NOT in browser localStorage. Both stores are on
+  # named volumes below; without them a recreate loses every dashboard.
   # UI:  http://localhost:8080  (no login required)
   #
   # OTLP ingest (both go to the same pipeline):
@@ -197,6 +216,10 @@ services:
       # & logs from the host without the image's bundled `default` password.
       # ClickHouse hot-reloads users.d, so it applies a few seconds after mount.
       - ./docker/clickhouse/users.d/invana-readonly.xml:/etc/clickhouse-server/users.d/invana-readonly.xml:ro
+      # ClickHouse storage — traces, logs and metrics.
+      - hyperdx-data:/var/lib/clickhouse
+      # HyperDX's own MongoDB — sources, saved searches and dashboards.
+      - hyperdx-mongo-data:/data/db
     restart: unless-stopped
 
 volumes:
@@ -205,6 +228,7 @@ volumes:
   janusgraph-data:
   memgraph-data:
   arcadedb-data:
-  hyperdx-ch-data:
+  hyperdx-data:
+  hyperdx-mongo-data:
   engine-venv:
   studio-node-modules:

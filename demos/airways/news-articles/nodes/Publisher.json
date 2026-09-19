@@ -1,0 +1,65 @@
+[
+  {
+    "id": "PUB_01",
+    "properties": {
+      "name": "Reuters",
+      "domain": "reuters.com",
+      "country_code": "UK",
+      "kind": "wire"
+    }
+  },
+  {
+    "id": "PUB_02",
+    "properties": {
+      "name": "Bloomberg",
+      "domain": "bloomberg.com",
+      "country_code": "US",
+      "kind": "wire"
+    }
+  },
+  {
+    "id": "PUB_03",
+    "properties": {
+      "name": "Aviation Week",
+      "domain": "aviationweek.com",
+      "country_code": "US",
+      "kind": "trade"
+    }
+  },
+  {
+    "id": "PUB_04",
+    "properties": {
+      "name": "Simple Flying",
+      "domain": "simpleflying.com",
+      "country_code": "UK",
+      "kind": "trade"
+    }
+  },
+  {
+    "id": "PUB_05",
+    "properties": {
+      "name": "BusinessLine",
+      "domain": "thehindubusinessline.com",
+      "country_code": "IN",
+      "kind": "national"
+    }
+  },
+  {
+    "id": "PUB_06",
+    "properties": {
+      "name": "Nikkei Asia",
+      "domain": "asia.nikkei.com",
+      "country_code": "JP",
+      "kind": "national"
+    }
+  },
+  {
+    "id": "PUB_07",
+    "properties": {
+      "name": "Gulf News",
+      "domain": "gulfnews.com",
+      "country_code": "AE",
+      "kind": "national"
+    }
+  }
+]

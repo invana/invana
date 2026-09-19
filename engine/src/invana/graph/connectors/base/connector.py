@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from contextlib import nullcontext
 from typing import Any, ClassVar
 
+from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 from invana.graph.connectors.base.exceptions import ConnectionError
 from invana.graph.connectors.base.querysets.algorithms import BaseAlgorithmsQuerySet
 from invana.graph.connectors.base.querysets.bulk import BaseBulkQuerySet
@@ -23,9 +24,9 @@ from invana.graph.types.capabilities import (
 )
 from invana.graph.types.constants import Capability, PropertyType
 from invana.graph.types.data_elements import GraphResponse
-from invana.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 
-# OpenTelemetry lives in the optional ``telemetry`` extra (RFC-007/025). Core
+# OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
+# docs/for-developers/modules/platform/features/telemetry.md). Core
 # connector code must import cleanly without it, so resolve a tracer lazily and
 # fall back to no-op ``nullcontext`` spans when it isn't installed.
 try:
@@ -50,7 +51,7 @@ def _query_span(name: str):
 def _record_span_exception(span: Any, exc: Exception) -> None:
     """Mark *span* failed and attach the raw error so it's reviewable in traces.
 
-    The user only ever sees the friendly, backend-owned copy (RFC-028); the real
+    The user only ever sees the friendly, backend-owned copy; the real
     driver message, vendor code, and category land here so a failed translation
     can be traced end-to-end in OTel. No-op when telemetry is absent.
     """
@@ -84,7 +85,8 @@ class BaseConnector(ABC):
     algorithms: BaseAlgorithmsQuerySet
     vector: BaseVectorQuerySet | None
 
-    # The canonical, version-aware capability model for this connector (RFC-022).
+    # The canonical, version-aware capability model for this connector
+    # (docs/for-developers/modules/graph-connectors/features/capabilities.md).
     # Family connectors set a baseline; vendors override via ``.merge()``. ``None``
     # means "no profile declared" → no capabilities/property types reported.
     _capability_profile: ClassVar[CapabilityProfile | None] = None
@@ -105,7 +107,8 @@ class BaseConnector(ABC):
 
     @property
     def detected_version(self) -> Version | None:
-        """The server version cached at ``connect()`` time, if detected (RFC-022)."""
+        """The server version cached at ``connect()`` time, if detected
+        (docs/for-developers/modules/graph-connectors/features/capabilities.md)."""
         return self._detected_version
 
     @abstractmethod
@@ -133,7 +136,8 @@ class BaseConnector(ABC):
         """
 
     def _query_language_label(self) -> str:
-        """The query language of this connector for metric labels (RFC-041).
+        """The query language of this connector for metric labels
+        (docs/for-developers/modules/operate/features/observability.md).
 
         Derived from the capability profile's ``family`` (cypher / gremlin);
         ``unknown`` when no profile is declared.
@@ -149,16 +153,18 @@ class BaseConnector(ABC):
         ``timeout_s`` is forwarded to the vendor driver as a per-query timeout
         (seconds); ``None`` leaves it unbounded.
 
-        Split into two child spans (RFC-025) so the trace separates the raw
+        Split into two child spans (docs/for-developers/modules/platform/features/telemetry.md) so the trace separates
+        the raw
         driver round-trip (``graph.query.db_execute``) from result
         deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
         the studio joins via W3C trace-context propagation. Also emits the unified
-        ``invana.query.graph.*`` metrics (RFC-041).
+        ``invana.query.graph.*`` metrics (docs/for-developers/modules/operate/features/observability.md).
         """
         # Time the driver round-trip so the result carries a real duration. The
         # serializers don't populate it (the vendor result summary isn't uniform
         # across drivers), so without this metadata.duration_ms stays 0.0 and the
-        # studio shows "0ms" (RFC-025). Measure the raw execute only — serialise
+        # studio shows "0ms" (docs/for-developers/modules/platform/features/telemetry.md). Measure the raw execute only
+        # — serialise
         # is our own work and traced separately by the spans below.
         language = self._query_language_label()
         backend = type(self).__name__
@@ -209,7 +215,8 @@ class BaseConnector(ABC):
     # --- End of integration-implemented methods ---
 
     async def detect_version(self) -> Version | None:
-        """Best-effort detection of the live server version (RFC-022).
+        """Best-effort detection of the live server version
+        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
         Family connectors override this (Cypher: ``dbms.components()``; Gremlin:
         best-effort). The default returns ``None`` → the connection is treated as
@@ -218,7 +225,8 @@ class BaseConnector(ABC):
         return None
 
     def resolve_capabilities(self, version: Version | None = None) -> ResolvedCapabilities:
-        """Resolve this connector's capabilities for a server version (RFC-022).
+        """Resolve this connector's capabilities for a server version
+        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
         Uses the explicit ``version`` if given, else the cached detected version.
         Pure — no I/O — so callers can resolve offline from the class profile.

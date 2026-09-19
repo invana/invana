@@ -1,3 +1,9 @@
+import { ModeToggle } from "@/components/ModeToggle";
+import { FormError } from "@/components/forms/FormError";
+import { useAuth } from "@/hooks/useAuth";
+import { useSessionResume } from "@/hooks/useSessionResume";
+import { authApi } from "@/services/api/auth";
+import { ApiError } from "@/services/api/client";
 import { Checkbox, Input, Label } from "@invana/forms";
 import {
 	Button,
@@ -17,14 +23,10 @@ import {
 	Terminal,
 	Waypoints,
 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ThemeToggle } from "../../components/ThemeToggle";
-import { FormError } from "../../components/forms/FormError";
-import { useAuth } from "../../hooks/useAuth";
-import { authApi } from "../../services/api/auth";
-import { ApiError } from "../../services/api/client";
 
 // Capability pillars shown on the brand panel. Phrased as what Invana *is
 // about* — no falsifiable benchmarks (the "100K+ nodes" line deliberately
@@ -61,11 +63,35 @@ const PILLARS = [
 	},
 ];
 
+/**
+ * Where sign-in lands. `?next=` is attacker-controllable (ProtectedRoute writes
+ * it, but so can any link), and a resumed session follows it with no click at
+ * all — so only an in-app absolute path is honoured. `//host`, `/\\host` and
+ * `https://…` all fall back to the app root.
+ */
+function safeNext(raw: string | null): string {
+	if (!raw) return "/";
+	let next: string;
+	try {
+		next = decodeURIComponent(raw);
+	} catch {
+		return "/";
+	}
+	if (
+		!next.startsWith("/") ||
+		next.startsWith("//") ||
+		next.startsWith("/\\")
+	) {
+		return "/";
+	}
+	return next;
+}
+
 export function LoginPage() {
 	const navigate = useNavigate();
 	const [params] = useSearchParams();
 	const { setSession } = useAuth();
-	// Username or email (RFC-034) — login accepts either.
+	// Username or email (docs/for-developers/modules/identity-and-access/features/accounts.md) — login accepts either.
 	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
 	// NOTE: cosmetic until the engine supports it. authApi.login / POST
@@ -79,7 +105,11 @@ export function LoginPage() {
 		null,
 	);
 
-	const next = params.get("next") ?? "/";
+	const next = safeNext(params.get("next"));
+	// An existing session skips the form entirely (sessions.md — the refresh
+	// token *is* the session). `resumed` covers both landing here already signed
+	// in and this page's own sign-in completing.
+	const resume = useSessionResume();
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -92,7 +122,7 @@ export function LoginPage() {
 				accessToken: res.access_token,
 				refreshToken: res.refresh_token,
 			});
-			navigate(decodeURIComponent(next), { replace: true });
+			navigate(next, { replace: true });
 		} catch (err) {
 			const message = err instanceof ApiError ? err.message : "Sign-in failed.";
 			setError(message);
@@ -100,6 +130,10 @@ export function LoginPage() {
 		} finally {
 			setSubmitting(false);
 		}
+	}
+
+	if (resume === "resumed") {
+		return <Navigate to={next} replace />;
 	}
 
 	return (
@@ -131,7 +165,7 @@ export function LoginPage() {
 
 			{/* Theme switcher */}
 			<div className="absolute right-6 top-6 z-10">
-				<ThemeToggle />
+				<ModeToggle />
 			</div>
 
 			<div className="relative mx-auto flex min-h-screen max-w-[108rem] items-center gap-20 px-14 py-12">
@@ -181,81 +215,99 @@ export function LoginPage() {
 								"inset 0 1px 0 color-mix(in srgb, white 6%, transparent), 0 16px 48px -24px rgba(0, 0, 0, 0.6)",
 						}}
 					>
-						<h2 className="text-2xl font-semibold">Sign in</h2>
-						<p className="mt-1 text-muted-foreground">
-							Welcome back. Enter your credentials to continue.
-						</p>
-
-						<form className="mt-7 space-y-5" onSubmit={handleSubmit}>
-							<div className="space-y-2">
-								<Label htmlFor="identifier">Email or username</Label>
-								<Input
-									id="identifier"
-									type="text"
-									autoComplete="username"
-									required
-									placeholder="you@example.com or your-username"
-									// Override the design-kit Input's baked-in `md:text-sm`,
-									// which shrinks field text on md+ screens.
-									className="md:text-base"
-									value={identifier}
-									onChange={(e) => setIdentifier(e.target.value)}
+						{resume === "checking" ? (
+							// A stored session is being proved against /auth/me. Showing the
+							// form here would flash a password prompt at someone who is already
+							// signed in, and could be typed into before the redirect lands.
+							<div className="flex flex-col items-center gap-3 py-10 text-center">
+								<Loader2
+									aria-hidden
+									className="h-6 w-6 animate-spin text-muted-foreground"
 								/>
+								<p className="text-lg font-medium">Restoring your session…</p>
+								<p className="text-muted-foreground">
+									You're already signed in on this browser — taking you back.
+								</p>
 							</div>
-							<div className="space-y-2">
-								<Label htmlFor="password">Password</Label>
-								<Input
-									id="password"
-									type="password"
-									autoComplete="current-password"
-									required
-									placeholder="••••••••"
-									className="md:text-base"
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-								/>
-							</div>
+						) : (
+							<>
+								<h2 className="text-2xl font-semibold">Sign in</h2>
+								<p className="mt-1 text-muted-foreground">
+									Welcome back. Enter your credentials to continue.
+								</p>
 
-							<label
-								htmlFor="remember"
-								className="flex items-center gap-2 text-muted-foreground"
-							>
-								<Checkbox
-									id="remember"
-									checked={remember}
-									onCheckedChange={(c) => setRemember(c === true)}
-								/>
-								Remember me for 30 days
-							</label>
+								<form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+									<div className="space-y-2">
+										<Label htmlFor="identifier">Email or username</Label>
+										<Input
+											id="identifier"
+											type="text"
+											autoComplete="username"
+											required
+											placeholder="you@example.com or your-username"
+											// Override the design-kit Input's baked-in `md:text-sm`,
+											// which shrinks field text on md+ screens.
+											className="md:text-base"
+											value={identifier}
+											onChange={(e) => setIdentifier(e.target.value)}
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label htmlFor="password">Password</Label>
+										<Input
+											id="password"
+											type="password"
+											autoComplete="current-password"
+											required
+											placeholder="••••••••"
+											className="md:text-base"
+											value={password}
+											onChange={(e) => setPassword(e.target.value)}
+										/>
+									</div>
 
-							<FormError error={error} />
+									<label
+										htmlFor="remember"
+										className="flex items-center gap-2 text-muted-foreground"
+									>
+										<Checkbox
+											id="remember"
+											checked={remember}
+											onCheckedChange={(c) => setRemember(c === true)}
+										/>
+										Remember me for 30 days
+									</label>
 
-							<Button
-								type="submit"
-								className="w-full shadow-[0_6px_20px_-10px_var(--color-primary)] transition-shadow hover:shadow-[0_8px_28px_-8px_var(--color-primary)]"
-								disabled={submitting}
-							>
-								{submitting ? "Signing in…" : "Sign in"}
-							</Button>
-						</form>
+									<FormError error={error} />
 
-						<div className="mt-6 flex items-center justify-center gap-3 text-muted-foreground">
-							<button
-								type="button"
-								className="transition-colors hover:text-foreground"
-								onClick={() => setHelpModal("create-user")}
-							>
-								Create new user
-							</button>
-							<span className="opacity-40">·</span>
-							<button
-								type="button"
-								className="transition-colors hover:text-foreground"
-								onClick={() => setHelpModal("forgot")}
-							>
-								Need help?
-							</button>
-						</div>
+									<Button
+										type="submit"
+										className="w-full shadow-[0_6px_20px_-10px_var(--color-primary)] transition-shadow hover:shadow-[0_8px_28px_-8px_var(--color-primary)]"
+										disabled={submitting}
+									>
+										{submitting ? "Signing in…" : "Sign in"}
+									</Button>
+								</form>
+
+								<div className="mt-6 flex items-center justify-center gap-3 text-muted-foreground">
+									<button
+										type="button"
+										className="transition-colors hover:text-foreground"
+										onClick={() => setHelpModal("create-user")}
+									>
+										Create new user
+									</button>
+									<span className="opacity-40">·</span>
+									<button
+										type="button"
+										className="transition-colors hover:text-foreground"
+										onClick={() => setHelpModal("forgot")}
+									>
+										Need help?
+									</button>
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 			</div>

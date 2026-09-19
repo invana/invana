@@ -1,13 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { authApi } from "../../services/api/auth";
-import { graphsApi } from "../../services/api/graphs";
-import { useAuthStore } from "../../stores/auth.store";
+import { authApi } from "@/services/api/auth";
+import { graphsApi } from "@/services/api/graphs";
+import { useAuthStore } from "@/stores/auth.store";
 import type {
 	GraphConnectionCreate,
 	GraphCreate,
 	GraphUpdate,
 	SetupSection,
-} from "../../types/graphs";
+} from "@/types/graphs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Re-fetch `/auth/me` and update the auth store. Keeps `user.graphs` in
@@ -26,7 +26,7 @@ async function refreshAuthMe(): Promise<void> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Graph container hooks (RFC-017)
+// Graph container hooks (docs/for-developers/modules/identity-and-access/spec.md)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GRAPHS_KEY = ["graphs"] as const;
@@ -116,7 +116,7 @@ export function useSetupSectionMutation() {
 			username: string;
 			graphSlug: string;
 			section: SetupSection;
-			action: "complete" | "skip" | "reset";
+			action: "skip" | "reset";
 		}) => graphsApi.setSetupSection(username, graphSlug, section, action),
 		onSuccess: (_, { username, graphSlug }) => {
 			qc.invalidateQueries({ queryKey: graphKey(username, graphSlug) });
@@ -196,7 +196,7 @@ export function usePingGraphConnectionMutation() {
 	});
 }
 
-// RFC-022 — accept the risk of an UNTESTED backend version (lifts read-only).
+// docs/for-developers/modules/graph-connectors/features/capabilities.md — accept the risk of an UNTESTED backend version (lifts read-only).
 export function useAcknowledgeConnectionVersionMutation() {
 	const qc = useQueryClient();
 	return useMutation({
@@ -211,7 +211,7 @@ export function useAcknowledgeConnectionVersionMutation() {
 	});
 }
 
-// RFC-022 — declare a server version when auto-detection is unavailable.
+// docs/for-developers/modules/graph-connectors/features/capabilities.md — declare a server version when auto-detection is unavailable.
 export function useDeclareConnectionVersionMutation() {
 	const qc = useQueryClient();
 	return useMutation({

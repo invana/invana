@@ -2,7 +2,7 @@
 "invana": minor
 ---
 
-Explorer canvas version history + live banner (RFC-047). The sessions-list
+Explorer canvas version history + live banner (docs/for-developers/modules/explore/features/canvases.md). The sessions-list
 canvas preview now refreshes on a ~10s throttled autosave while a canvas is
 open — not only when you switch away — so it stays current as you build. Each
 canvas-mutating turn (a query, a node expand, or a load-to-canvas) is also

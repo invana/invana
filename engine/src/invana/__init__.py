@@ -17,14 +17,14 @@ by importing invana.
 
 from __future__ import annotations
 
-from invana.logging import configure_logging
-from invana.settings import settings
+from invana.core.logging import configure_logging
+from invana.core.settings import settings
 
 configure_logging(level=settings.log_level)
 
 if settings.telemetry_enabled:
     try:
-        from invana.telemetry import setup_telemetry
+        from invana.core.telemetry import setup_telemetry
     except ImportError as exc:
         raise ImportError(
             "OpenTelemetry packages are required when INVANA_TELEMETRY_ENABLED=true. "

@@ -11,7 +11,8 @@ class QueryLanguage(StrEnum):
 
 
 class PropertyType(StrEnum):
-    """Canonical property/data types a graph model may use (RFC-022).
+    """Canonical property/data types a graph model may use
+    (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
     The superset across all backends and versions. Each connector advertises the
     subset it supports for the detected server version via its ``CapabilityProfile``;

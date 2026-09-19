@@ -1,0 +1,43 @@
+{
+  "nodes": {
+    "airport": {
+      "identity": [
+        "code"
+      ]
+    },
+    "country": {
+      "identity": [
+        "code"
+      ]
+    },
+    "continent": {
+      "identity": [
+        "code"
+      ]
+    },
+    "version": {
+      "identity": [
+        "code"
+      ]
+    }
+  },
+  "edges": {
+    "route": {
+      "from": [
+        "airport"
+      ],
+      "to": [
+        "airport"
+      ]
+    },
+    "contains": {
+      "from": [
+        "country",
+        "continent"
+      ],
+      "to": [
+        "airport"
+      ]
+    }
+  }
+}

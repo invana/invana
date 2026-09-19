@@ -1,0 +1,134 @@
+[
+  {
+    "id": "E_RETWEETS_TWEET_0067",
+    "from": "TWEET_0067",
+    "to": "TWEET_0001",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0069",
+    "from": "TWEET_0069",
+    "to": "TWEET_0004",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0071",
+    "from": "TWEET_0071",
+    "to": "TWEET_0007",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0073",
+    "from": "TWEET_0073",
+    "to": "TWEET_0010",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0075",
+    "from": "TWEET_0075",
+    "to": "TWEET_0013",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0077",
+    "from": "TWEET_0077",
+    "to": "TWEET_0016",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0079",
+    "from": "TWEET_0079",
+    "to": "TWEET_0019",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0081",
+    "from": "TWEET_0081",
+    "to": "TWEET_0022",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0083",
+    "from": "TWEET_0083",
+    "to": "TWEET_0025",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0085",
+    "from": "TWEET_0085",
+    "to": "TWEET_0028",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0087",
+    "from": "TWEET_0087",
+    "to": "TWEET_0031",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0089",
+    "from": "TWEET_0089",
+    "to": "TWEET_0034",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0091",
+    "from": "TWEET_0091",
+    "to": "TWEET_0037",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0093",
+    "from": "TWEET_0093",
+    "to": "TWEET_0040",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0095",
+    "from": "TWEET_0095",
+    "to": "TWEET_0043",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0097",
+    "from": "TWEET_0097",
+    "to": "TWEET_0046",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0099",
+    "from": "TWEET_0099",
+    "to": "TWEET_0049",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0101",
+    "from": "TWEET_0101",
+    "to": "TWEET_0052",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0103",
+    "from": "TWEET_0103",
+    "to": "TWEET_0055",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0105",
+    "from": "TWEET_0105",
+    "to": "TWEET_0058",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0107",
+    "from": "TWEET_0107",
+    "to": "TWEET_0061",
+    "properties": {}
+  },
+  {
+    "id": "E_RETWEETS_TWEET_0109",
+    "from": "TWEET_0109",
+    "to": "TWEET_0064",
+    "properties": {}
+  }
+]

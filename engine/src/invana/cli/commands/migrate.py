@@ -13,8 +13,8 @@ import click
 )
 def migrate_cmd(database_url: str | None) -> None:
     """Run database migrations to head."""
-    from invana.db import run_migrations
-    from invana.settings import settings
+    from invana.core.db import run_migrations
+    from invana.core.settings import settings
 
     url = database_url or settings.database_url
     click.echo(f"Running migrations on: {url}")

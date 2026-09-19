@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from cryptography.fernet import Fernet, InvalidToken
 
-from invana.graphs.encryption import decrypt_credentials, encrypt_credentials
+from invana.apps.graphs.encryption import decrypt_credentials, encrypt_credentials
 
 KEY = Fernet.generate_key().decode()
 

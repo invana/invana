@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Persist query sessions end-to-end (RFC-024).
+Persist query sessions end-to-end (docs/for-developers/modules/ask/spec.md).
 
 The Explorer's Sessions panel is now backed by the engine instead of browser
 memory. A new `sessions` + `session_messages` data model stores each threaded

@@ -4,14 +4,14 @@
  * registerAuthAccess so the interceptors can read/refresh tokens without
  * a circular import.
  *
- * Per RFC-017 the active Graph is derived from the URL (/u/:username/:graphSlug),
+ * Per docs/for-developers/modules/identity-and-access/spec.md the active Graph is derived from the URL (/u/:username/:graphSlug),
  * not from session state. The store therefore tracks only the user + tokens.
  */
 
+import { registerAuthAccess } from "@/services/api/client";
+import type { AuthUser } from "@/types/auth";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { registerAuthAccess } from "../services/api/client";
-import type { AuthUser } from "../types/auth";
 
 interface AuthState {
 	user: AuthUser | null;

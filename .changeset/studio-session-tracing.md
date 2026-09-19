@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-Session/message tracing + FE→BE stitching fix (RFC-026).
+Session/message tracing + FE→BE stitching fix (docs/for-developers/modules/platform/features/telemetry.md).
 
 Every way of running a query in the Explorer is now traced as one distributed
 trace, not just a fresh **Run**: clicking a stored message (`rerun`) and opening
@@ -14,7 +14,7 @@ points are distinguishable in HyperDX. Standalone session/message API ops
 even outside a run — the API client traces any `…/sessions…` request and injects
 `traceparent`.
 
-Fixes two latent bugs in the RFC-025 telemetry that meant frontend and backend
+Fixes two latent bugs in the telemetry (docs/for-developers/modules/platform/features/telemetry.md) that meant frontend and backend
 traces never actually joined:
 
 - **Engine:** `TelemetryMiddleware` now extracts the incoming W3C context and

@@ -18,6 +18,7 @@ from gremlin_python.driver.driver_remote_connection import DriverRemoteConnectio
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 
+from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 from invana.graph.connectors.base.connector import (
     BaseConnector,
     _query_span,
@@ -44,9 +45,9 @@ from invana.graph.types.capabilities import (
     overlay,
 )
 from invana.graph.types.constants import Capability, PropertyType, QueryLanguage
-from invana.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 
-# TinkerPop/Gremlin baseline capability profile (RFC-022). Gremlin has no native
+# TinkerPop/Gremlin baseline capability profile (docs/for-developers/modules/graph-connectors/features/capabilities.md).
+# Gremlin has no native
 # temporal/spatial property values, but `uuid` is native and properties carry a
 # cardinality (single/list/set). Vendor connectors (JanusGraph, Neptune, …) override
 # via ``GREMLIN_PROFILE.merge(...)`` when they gain real implementations.
@@ -124,7 +125,8 @@ class GremlinConnector(BaseConnector):
     )
 
     async def detect_version(self) -> Version | None:
-        """Best-effort TinkerPop version via the ``Gremlin.version()`` script (RFC-022).
+        """Best-effort TinkerPop version via the ``Gremlin.version()`` script
+        (docs/for-developers/modules/graph-connectors/features/capabilities.md).
 
         Works on any Gremlin Server that permits Groovy script evaluation —
         TinkerGraph, JanusGraph, and most self-hosted servers (this is the TinkerPop
@@ -213,7 +215,8 @@ class GremlinConnector(BaseConnector):
         ``timeout_s`` is enforced client-side around the blocking driver call so
         a hung traversal can't outlive its budget; ``None`` leaves it unbounded.
 
-        Instrumented (RFC-041) with the same ``graph.query.db_execute`` span and
+        Instrumented (docs/for-developers/modules/operate/features/observability.md) with the same
+        ``graph.query.db_execute`` span and
         ``invana.query.graph.*`` metrics as the Cypher path in
         ``BaseConnector.execute`` — this path previously bypassed both, so every
         Gremlin traversal was invisible in traces and metrics.

@@ -5,14 +5,14 @@
  * and the settings Appearance tab.
  */
 
-import { Slider } from "@invana/forms";
-import { Button } from "@invana/ui";
 import {
 	SATURATION_DEFAULT,
 	SATURATION_MAX,
 	SATURATION_MIN,
 	useAppearanceStore,
-} from "../stores/appearance.store";
+} from "@/stores/appearance.store";
+import { Slider } from "@invana/forms";
+import { Button } from "@invana/ui";
 
 export function SaturationControl({ className }: { className?: string }) {
 	const saturation = useAppearanceStore((s) => s.saturation);

@@ -1,4 +1,5 @@
-"""Service-layer tests for Explorer node-expand (RFC-035) against a real Neo4j."""
+"""Service-layer tests for Explorer node-expand (docs/for-developers/modules/explore/features/graph-canvas.md) against a
+real Neo4j."""
 
 from __future__ import annotations
 
@@ -6,23 +7,26 @@ import pytest
 from pydantic import ValidationError
 from sqlalchemy import func, select
 
-from invana.events import actions as event_actions
-from invana.events.models import Event
-from invana.explorer import services
-from invana.explorer.schemas import (
+from invana.apps.explorer.managers import ExploreManager
+from invana.apps.explorer.schemas import (
     ExpandByEdgeTypeRequest,
     ExpandByNodeTypeRequest,
     ExpandNeighborsRequest,
 )
+from invana.core.events import actions as event_actions
+from invana.core.events.models import Event
 from invana.graph.types.sort import SortDirection, SortSpec
 
 pytestmark = pytest.mark.asyncio
 
 
+explore = ExploreManager()
+
+
 async def test_expand_neighbors_total_and_has_more(session, graph, manager, user, seeded_graph):
     alice = seeded_graph["alice"]
     req = ExpandNeighborsRequest(vertex_id=alice.id, limit=2, offset=0)
-    result = await services.expand_neighbors(session, graph=graph, manager=manager, actor_id=user.id, req=req)
+    result = await explore.expand_neighbors(session, graph=graph, manager=manager, actor_id=user.id, req=req)
     assert result.total == 3  # Bob, Charlie, Acme
     assert result.returned == 2
     assert result.has_more is True
@@ -31,7 +35,7 @@ async def test_expand_neighbors_total_and_has_more(session, graph, manager, user
 async def test_expand_by_node_type(session, graph, manager, user, seeded_graph):
     alice = seeded_graph["alice"]
     req = ExpandByNodeTypeRequest(vertex_id=alice.id, neighbor_label="Company")
-    result = await services.expand_by_node_type(session, graph=graph, manager=manager, actor_id=user.id, req=req)
+    result = await explore.expand_by_node_type(session, graph=graph, manager=manager, actor_id=user.id, req=req)
     assert result.total == 1
     assert result.returned == 1
     assert result.has_more is False
@@ -43,11 +47,11 @@ async def test_expand_by_edge_type_paginated_and_event(session, graph, manager, 
     alice = seeded_graph["alice"]
     sort = [SortSpec(property="name", direction=SortDirection.ASC)]
     page1 = ExpandByEdgeTypeRequest(vertex_id=alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=0)
-    r1 = await services.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page1)
+    r1 = await explore.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page1)
     assert r1.total == 2
     assert r1.has_more is True
     page2 = ExpandByEdgeTypeRequest(vertex_id=alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=1)
-    r2 = await services.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page2)
+    r2 = await explore.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page2)
     assert r2.has_more is False
     n1 = [n.properties["name"] for n in r1.data.nodes if n.id != alice.id]
     n2 = [n.properties["name"] for n in r2.data.nodes if n.id != alice.id]

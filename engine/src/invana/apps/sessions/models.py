@@ -1,0 +1,226 @@
+"""SQLAlchemy async models for Query Sessions (docs/for-developers/modules/ask/spec.md).
+
+A ``Session`` is a threaded conversation against a graph: the user asks (a
+query, or natural language), the assistant answers. Each ask/answer is a pair of
+``SessionMessage`` rows. Sessions are **graph-scoped and private to their
+creator**; both FKs hard-CASCADE (graph delete or user delete removes the
+sessions — see docs/for-developers/modules/ask/spec.md).
+
+Only message *metadata* is stored here — never the result payload
+(nodes/edges/rows). The answer is a record of its own: the ``project`` step
+writes an ``emissions`` row (the-answer-surface.md AS10/AS13) and the canvas is
+a board snapshot, so a reload renders both without re-running anything.
+``source_query`` is what an explicit re-run asks, not what a refresh does.
+"""
+
+from __future__ import annotations
+
+import enum
+import uuid
+from datetime import UTC, datetime
+
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import Mapped, mapped_column
+
+from invana.core.models import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(UTC)
+
+
+def _new_id() -> str:
+    return str(uuid.uuid4())
+
+
+class SessionSurface(enum.StrEnum):
+    """Which Studio surface a session lives on (docs/for-developers/modules/ask/spec.md).
+
+    ``explorer`` sessions query the graph (NL → query); ``modeller`` sessions
+    author a model's draft (NL → ``propose_model``). Existing rows and the create
+    path default to ``explorer`` so Explorer behaviour is untouched.
+    """
+
+    explorer = "explorer"
+    modeller = "modeller"
+
+
+class SessionMessageRole(enum.StrEnum):
+    user = "user"
+    assistant = "assistant"
+
+
+class SessionMessageStatus(enum.StrEnum):
+    """Lifecycle of an assistant reply tied to a query execution."""
+
+    running = "running"
+    ok = "ok"
+    error = "error"
+    # The user stopped the run behind this reply
+    # (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md).
+    stopped = "stopped"
+
+
+_surface_enum = Enum(
+    SessionSurface,
+    name="session_surface",
+    values_callable=lambda x: [m.value for m in x],
+    create_type=False,
+)
+_role_enum = Enum(
+    SessionMessageRole,
+    name="session_message_role",
+    values_callable=lambda x: [m.value for m in x],
+    create_type=False,
+)
+_status_enum = Enum(
+    SessionMessageStatus,
+    name="session_message_status",
+    values_callable=lambda x: [m.value for m in x],
+    create_type=False,
+)
+
+
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("graphs.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # Private to the creator (docs/for-developers/modules/ask/spec.md); CASCADE on user delete
+    # (Decision 11) — sessions are private workspace, not an audit trail.
+    created_by_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    # Which Studio surface this session lives on (docs/for-developers/modules/ask/spec.md). ``explorer`` queries
+    # the graph; ``modeller`` authors a model draft. Defaults to ``explorer`` so
+    # existing rows + the create path keep working.
+    surface: Mapped[SessionSurface] = mapped_column(_surface_enum, default=SessionSurface.explorer, nullable=False)
+    # The model a ``modeller`` session authors (docs/for-developers/modules/ask/spec.md). Bound on the
+    # first generation when absent; ON DELETE SET NULL so deleting the model
+    # un-binds the session rather than removing it. Always null for ``explorer``.
+    model_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("graph_models.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
+    # The agent this thread thinks through (docs/for-developers/modules/agents/spec.md). One agent per
+    # session; the per-ask override lives on rethink, not in the composer, so
+    # "which agent answered" stays a single lookup on the run row.
+    # Nullable only for rows written before agents existed — the create path
+    # always sets it, defaulting by surface.
+    agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+
+    title: Mapped[str] = mapped_column(String(255), default="", nullable=False)
+
+    # Per-user organization flags. Pinned sessions sort to the top of the list;
+    # archived sessions are hidden from the default list (revealed on demand).
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Denormalized running totals for the list meta line (Decision 4).
+    message_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    node_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    edge_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    # Denormalized status of the latest assistant reply, so the list can mark a
+    # session failed/running without loading its messages. Null until the first
+    # reply lands. Maintained alongside the totals above on send/rerun.
+    last_status: Mapped[SessionMessageStatus | None] = mapped_column(_status_enum, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+class SessionMessage(Base):
+    __tablename__ = "session_messages"
+    __table_args__ = (UniqueConstraint("session_id", "seq", name="uq_session_message_seq"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    session_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # Monotonic per-session ordering (1, 2, 3…) — stable regardless of
+    # created_at collisions.
+    seq: Mapped[int] = mapped_column(Integer, nullable=False)
+    role: Mapped[SessionMessageRole] = mapped_column(_role_enum, nullable=False)
+    content: Mapped[str] = mapped_column(Text, default="", nullable=False)
+
+    # Assistant-only metadata (null on user rows).
+    status: Mapped[SessionMessageStatus | None] = mapped_column(_status_enum, nullable=True)
+    # A canvas operation this turn records, when it isn't a composer query
+    # (docs/for-developers/modules/explore/features/boards.md):
+    # "expand" (node-expand / traversal) or "load" ("Load to canvas"). Set on BOTH
+    # rows of the pair so the UI can style the user row as an operation header and
+    # exclude these turns from NL context / restore / composer history. Null on a
+    # normal NL/QL composer turn and on existing rows.
+    operation: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # How this ask was started: "nl" (translated from natural language) or "ql"
+    # (run as a raw query). Persisted so the composer restores the original mode
+    # on reopen instead of guessing from ``via`` — which fails when the latest
+    # reply errored or was a rerun (no provider label). Null on existing rows.
+    mode: Mapped[str | None] = mapped_column(String(2), nullable=True)
+    via: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    query_language: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # The query that produced this reply, so it can be re-run (Decision 10).
+    source_query: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # NL only — the model's one-line rationale for ``source_query`` (docs/for-developers/modules/ask/spec.md).
+    # Replayed (with the query) as conversation context so a follow-up like
+    # "only show 5" can refine the prior turn. Null on QL, on rerun, and on
+    # existing rows.
+    rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # NL clarification only — short answer options the user can pick instead of
+    # retyping (docs/for-developers/modules/ask/features/clarifying-questions.md). Set when this reply is a clarifying
+    # question (the reply
+    # has no ``source_query``); null otherwise.
+    clarification_options: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # 👍/👎 on an assistant reply — a capture signal for the learning loop
+    # (docs/for-developers/modules/ask/features/clarifying-questions.md ·
+    # docs/for-developers/modules/workflows/features/promote-a-plan.md). "up" | "down"; null = no vote / cleared.
+    feedback: Mapped[str | None] = mapped_column(String(4), nullable=True)
+    row_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    execution_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # NL only — wall-clock of the LLM translation step that produced
+    # ``source_query`` (docs/for-developers/modules/ask/features/ask-in-natural-language.md). Null on QL and on rerun
+    # (no translation), so
+    # the UI can show LLM time next to query time and see which dominated.
+    llm_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # The per-ask timeout (seconds) this message was sent with — budgets the LLM
+    # translation (nl) and the query execution (nl + ql), so the composer can
+    # restore the user's choice on reopen and re-run honours it
+    # (docs/for-developers/modules/ask/features/ask-in-natural-language.md). Null
+    # when the ask carried no timeout, and on existing rows.
+    timeout_s: Mapped[float | None] = mapped_column(Float, nullable=True)
+    node_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    edge_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # The run that produced (or is producing) this reply
+    # (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md) — its
+    # step rows are the reply's task trace. No FK: the run may be pruned
+    # (docs/for-developers/modules/ask/spec.md) while the reply stays. Null on user rows and old replies.
+    run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

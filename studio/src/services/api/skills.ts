@@ -1,10 +1,10 @@
+import { request } from "@/services/api/client";
 import type {
 	Skill,
 	SkillCreate,
 	SkillListResponse,
 	SkillUpdate,
-} from "../../types/skills";
-import { request } from "./client";
+} from "@/types/skills";
 
 function base(username: string, graphSlug: string): string {
 	return `/api/v1/u/${username}/${graphSlug}/skills`;

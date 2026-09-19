@@ -1,4 +1,4 @@
-"""Shared response envelopes for the HTTP server (RFC-028).
+"""Shared response envelopes for the HTTP server.
 
 ``ActionResponse`` is the standard body for a *mutating* endpoint that should
 surface a toast: it carries a backend-owned ``message`` plus the affected
@@ -20,7 +20,7 @@ DataT = TypeVar("DataT")
 
 
 class ActionResponse(BaseModel, Generic[DataT]):
-    """Standard envelope for a mutating endpoint (RFC-028).
+    """Standard envelope for a mutating endpoint.
 
     ``data`` is always serialised (null for deletes) so the frontend can use its
     presence — alongside a string ``message`` — to tell the envelope apart from a

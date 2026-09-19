@@ -3,7 +3,14 @@
  * (see `engine/src/invana/events/schemas.py`).
  */
 
-export type ActorType = "user" | "system" | "anonymous";
+/**
+ * Which kind of principal emitted the event — the engine's `ActorKind`.
+ *
+ * Five, not three: `agent` and `external` were missing here, and an `agent`
+ * row carries a null `actor` (the actor is not a user), so every agent's
+ * event read as a deleted user.
+ */
+export type ActorKind = "user" | "agent" | "system" | "external" | "anonymous";
 
 export interface ActorRef {
 	id: string;
@@ -15,7 +22,13 @@ export interface AuditEvent {
 	id: string;
 	graph_id: string | null;
 	actor: ActorRef | null;
-	actor_type: ActorType;
+	actor_kind: ActorKind;
+	/**
+	 * The agent's name, on the rows where `actor` is null because the actor is
+	 * not a user. From the agents table, or the event's own snapshot when the
+	 * agent is gone.
+	 */
+	actor_name: string | null;
 	action: string;
 	target_kind: string | null;
 	target_id: string | null;

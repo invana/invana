@@ -27,7 +27,8 @@ Every tile is a raw-SQL tile over the OTel ``otel_traces`` table (service
 ``invana-engine``). "Query APIs" are the endpoints that execute graph queries —
 the session message send/run endpoints and the ``explorer/expand/*`` endpoints —
 plus the ``graph.query.db_execute`` / ``llm.generate`` child spans the engine emits
-(RFC-025/041).
+(docs/for-developers/modules/platform/features/telemetry.md ·
+docs/for-developers/modules/operate/features/observability.md).
 """
 
 from __future__ import annotations

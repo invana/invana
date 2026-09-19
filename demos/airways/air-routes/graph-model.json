@@ -1,0 +1,362 @@
+{
+  "format": "invana.model/1",
+  "package_id": "invana.dataset.air-routes",
+  "content_hash": "",
+  "name": "AirRoutes",
+  "description": "Airports, the countries and continents that contain them, and the flights between them.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "AirRoutes",
+    "schema_description": "The air-routes graph, as the CSVs in this folder carry it.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "property_keys": [
+      {
+        "name": "type",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The kind of thing, as the source file spells it.",
+        "validation_rules": []
+      },
+      {
+        "name": "code",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code on an airport, two-letter code on a country or continent.",
+        "validation_rules": []
+      },
+      {
+        "name": "icao",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Four-letter ICAO airport code.",
+        "validation_rules": []
+      },
+      {
+        "name": "desc",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The long name.",
+        "validation_rules": []
+      },
+      {
+        "name": "region",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "ISO 3166-2 region.",
+        "validation_rules": []
+      },
+      {
+        "name": "runways",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Number of runways.",
+        "validation_rules": []
+      },
+      {
+        "name": "longest",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Longest runway, in feet.",
+        "validation_rules": []
+      },
+      {
+        "name": "elev",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Elevation, in feet.",
+        "validation_rules": []
+      },
+      {
+        "name": "country",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Two-letter country code the airport sits in.",
+        "validation_rules": []
+      },
+      {
+        "name": "city",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The city served.",
+        "validation_rules": []
+      },
+      {
+        "name": "lat",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Latitude.",
+        "validation_rules": []
+      },
+      {
+        "name": "lon",
+        "type": "float",
+        "value_cardinality": "SINGLE",
+        "description": "Longitude.",
+        "validation_rules": []
+      },
+      {
+        "name": "author",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Who compiled this edition of the data.",
+        "validation_rules": []
+      },
+      {
+        "name": "date",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "When the edition was generated.",
+        "validation_rules": []
+      },
+      {
+        "name": "dist",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "Great-circle distance, in miles.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "airport",
+        "description": "An airport, with its codes and where it is.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "type",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "icao",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "desc",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "region",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "runways",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "longest",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "elev",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country",
+            "default_value": null,
+            "sort_order": 8,
+            "validation_rules": []
+          },
+          {
+            "property_key": "city",
+            "default_value": null,
+            "sort_order": 9,
+            "validation_rules": []
+          },
+          {
+            "property_key": "lat",
+            "default_value": null,
+            "sort_order": 10,
+            "validation_rules": []
+          },
+          {
+            "property_key": "lon",
+            "default_value": null,
+            "sort_order": 11,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "country",
+        "description": "A country, by two-letter code.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "type",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "desc",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "continent",
+        "description": "A continent, by two-letter code.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "type",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "desc",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "version",
+        "description": "The edition of the source data this graph was built from.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "type",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "code",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "desc",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "author",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "date",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "route",
+        "description": "A flight between two airports.",
+        "source_node_types": [
+          "airport"
+        ],
+        "target_node_types": [
+          "airport"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": [
+          {
+            "property_key": "dist",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "contains",
+        "description": "The country and the continent an airport sits in.",
+        "source_node_types": [
+          "country",
+          "continent"
+        ],
+        "target_node_types": [
+          "airport"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "airport_code_unique",
+        "target_kind": "node_type",
+        "target_label": "airport",
+        "constraint_type": "unique",
+        "properties": [
+          "code"
+        ]
+      },
+      {
+        "name": "country_code_unique",
+        "target_kind": "node_type",
+        "target_label": "country",
+        "constraint_type": "unique",
+        "properties": [
+          "code"
+        ]
+      },
+      {
+        "name": "continent_code_unique",
+        "target_kind": "node_type",
+        "target_label": "continent",
+        "constraint_type": "unique",
+        "properties": [
+          "code"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}

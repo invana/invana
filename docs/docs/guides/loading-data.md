@@ -86,14 +86,14 @@ Both `--uri` and `--connector` are required. Pass the dotted import path to the 
 ### Example: loading the air-routes dataset
 
 ```
-$ invana loader ../datasets/air-routes \
+$ invana loader ../demos/airways/air-routes \
     --uri bolt://localhost:7687 \
     --connector invana.graph.connectors.OpenCypherConnector \
     --username neo4j \
     --password testpassword
-Loading ../datasets/air-routes → bolt://localhost:7687
+Loading ../demos/airways/air-routes → bolt://localhost:7687
 
-Dataset: ../datasets/air-routes
+Dataset: ../demos/airways/air-routes
   ✓ airport              3504 vertices
   ✓ continent               7 vertices
   ✓ country               237 vertices

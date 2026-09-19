@@ -3,7 +3,7 @@
 "studio": minor
 ---
 
-End-to-end query→render tracing for the Explorer (RFC-025).
+End-to-end query→render tracing for the Explorer (docs/for-developers/modules/platform/features/telemetry.md).
 
 Running a query in the Explorer now produces a **single distributed trace**
 spanning frontend → backend → frontend, viewable as one waterfall in HyperDX.

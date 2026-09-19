@@ -1,0 +1,2542 @@
+[
+  {
+    "id": "TWEET_0001",
+    "properties": {
+      "tweet_id": "tweet-0001",
+      "lang": "en",
+      "text": "Air India opens DEL–SFO with 5 flights a week #RouteLaunch",
+      "created_at": "2026-01-07T07:00:00Z",
+      "retweets": 12,
+      "likes": 40,
+      "replies": 2,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/air-india-opens-del-sfo-with-5-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0002",
+    "properties": {
+      "tweet_id": "tweet-0002",
+      "lang": "en",
+      "text": "Air India opens BOM–JFK with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-08T08:01:00Z",
+      "retweets": 19,
+      "likes": 53,
+      "replies": 5,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/air-india-opens-bom-jfk-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0003",
+    "properties": {
+      "tweet_id": "tweet-0003",
+      "lang": "en",
+      "text": "Air India opens DEL–CPH with 3 flights a week #RouteLaunch",
+      "created_at": "2026-01-09T09:02:00Z",
+      "retweets": 26,
+      "likes": 66,
+      "replies": 8,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/air-india-opens-del-cph-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0004",
+    "properties": {
+      "tweet_id": "tweet-0004",
+      "lang": "en",
+      "text": "IndiGo opens DEL–IST with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-10T10:03:00Z",
+      "retweets": 33,
+      "likes": 79,
+      "replies": 11,
+      "sentiment": "positive",
+      "linked_url": "https://thehindubusinessline.com/aviation/indigo-opens-del-ist-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0005",
+    "properties": {
+      "tweet_id": "tweet-0005",
+      "lang": "en",
+      "text": "IndiGo opens BLR–SIN with 14 flights a week #RouteLaunch",
+      "created_at": "2026-01-11T11:04:00Z",
+      "retweets": 40,
+      "likes": 92,
+      "replies": 14,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/indigo-opens-blr-sin-with-14-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0006",
+    "properties": {
+      "tweet_id": "tweet-0006",
+      "lang": "en",
+      "text": "IndiGo opens MAA–BKK with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-12T12:05:00Z",
+      "retweets": 47,
+      "likes": 105,
+      "replies": 17,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/indigo-opens-maa-bkk-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0007",
+    "properties": {
+      "tweet_id": "tweet-0007",
+      "lang": "en",
+      "text": "Emirates opens DXB–BOM with 35 flights a week #RouteLaunch",
+      "created_at": "2026-01-13T13:06:00Z",
+      "retweets": 54,
+      "likes": 118,
+      "replies": 20,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/emirates-opens-dxb-bom-with-35-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0008",
+    "properties": {
+      "tweet_id": "tweet-0008",
+      "lang": "en",
+      "text": "Emirates opens DXB–GRU with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-14T14:07:00Z",
+      "retweets": 61,
+      "likes": 131,
+      "replies": 23,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/emirates-opens-dxb-gru-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0009",
+    "properties": {
+      "tweet_id": "tweet-0009",
+      "lang": "en",
+      "text": "Emirates pulls DXB–AKL off the schedule #Suspension",
+      "created_at": "2026-01-15T15:08:00Z",
+      "retweets": 68,
+      "likes": 144,
+      "replies": 26,
+      "sentiment": "negative",
+      "linked_url": "https://aviationweek.com/aviation/emirates-pulls-dxb-akl-off-the-schedule"
+    }
+  },
+  {
+    "id": "TWEET_0010",
+    "properties": {
+      "tweet_id": "tweet-0010",
+      "lang": "en",
+      "text": "Etihad Airways opens AUH–BLR with 14 flights a week #RouteLaunch",
+      "created_at": "2026-01-16T16:09:00Z",
+      "retweets": 75,
+      "likes": 157,
+      "replies": 29,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/etihad-airways-opens-auh-blr-with-14-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0011",
+    "properties": {
+      "tweet_id": "tweet-0011",
+      "lang": "en",
+      "text": "Qatar Airways opens DOH–HYD with 14 flights a week #RouteLaunch",
+      "created_at": "2026-01-17T17:10:00Z",
+      "retweets": 82,
+      "likes": 170,
+      "replies": 32,
+      "sentiment": "positive",
+      "linked_url": "https://thehindubusinessline.com/aviation/qatar-airways-opens-doh-hyd-with-14-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0012",
+    "properties": {
+      "tweet_id": "tweet-0012",
+      "lang": "en",
+      "text": "Qatar Airways opens DOH–ACC with 4 flights a week #RouteLaunch",
+      "created_at": "2026-01-18T18:11:00Z",
+      "retweets": 89,
+      "likes": 183,
+      "replies": 35,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/qatar-airways-opens-doh-acc-with-4-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0013",
+    "properties": {
+      "tweet_id": "tweet-0013",
+      "lang": "en",
+      "text": "Singapore Airlines opens SIN–SFO with 14 flights a week #RouteLaunch",
+      "created_at": "2026-01-19T07:12:00Z",
+      "retweets": 96,
+      "likes": 196,
+      "replies": 38,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/singapore-airlines-opens-sin-sfo-with-14-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0014",
+    "properties": {
+      "tweet_id": "tweet-0014",
+      "lang": "en",
+      "text": "Singapore Airlines pulls SIN–CPH off the schedule #Suspension",
+      "created_at": "2026-01-20T08:13:00Z",
+      "retweets": 103,
+      "likes": 209,
+      "replies": 41,
+      "sentiment": "negative",
+      "linked_url": "https://reuters.com/aviation/singapore-airlines-pulls-sin-cph-off-the-schedule"
+    }
+  },
+  {
+    "id": "TWEET_0015",
+    "properties": {
+      "tweet_id": "tweet-0015",
+      "lang": "en",
+      "text": "Lufthansa opens FRA–HYD with 5 flights a week #RouteLaunch",
+      "created_at": "2026-01-21T09:14:00Z",
+      "retweets": 110,
+      "likes": 222,
+      "replies": 4,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/lufthansa-opens-fra-hyd-with-5-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0016",
+    "properties": {
+      "tweet_id": "tweet-0016",
+      "lang": "en",
+      "text": "Lufthansa opens MUC–SEA with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-22T10:15:00Z",
+      "retweets": 117,
+      "likes": 235,
+      "replies": 7,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/lufthansa-opens-muc-sea-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0017",
+    "properties": {
+      "tweet_id": "tweet-0017",
+      "lang": "en",
+      "text": "British Airways opens LHR–MAA with 4 flights a week #RouteLaunch",
+      "created_at": "2026-01-23T11:16:00Z",
+      "retweets": 124,
+      "likes": 248,
+      "replies": 10,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/british-airways-opens-lhr-maa-with-4-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0018",
+    "properties": {
+      "tweet_id": "tweet-0018",
+      "lang": "en",
+      "text": "British Airways opens LHR–AUH with 14 flights a week #RouteLaunch",
+      "created_at": "2026-01-24T12:17:00Z",
+      "retweets": 131,
+      "likes": 261,
+      "replies": 13,
+      "sentiment": "positive",
+      "linked_url": "https://thehindubusinessline.com/aviation/british-airways-opens-lhr-auh-with-14-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0019",
+    "properties": {
+      "tweet_id": "tweet-0019",
+      "lang": "en",
+      "text": "Air France opens CDG–BLR with 3 flights a week #RouteLaunch",
+      "created_at": "2026-01-25T13:18:00Z",
+      "retweets": 138,
+      "likes": 274,
+      "replies": 16,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/air-france-opens-cdg-blr-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0020",
+    "properties": {
+      "tweet_id": "tweet-0020",
+      "lang": "en",
+      "text": "KLM opens AMS–AUH with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-26T14:19:00Z",
+      "retweets": 145,
+      "likes": 287,
+      "replies": 19,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/klm-opens-ams-auh-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0021",
+    "properties": {
+      "tweet_id": "tweet-0021",
+      "lang": "en",
+      "text": "Delta Air Lines opens ATL–CPH with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-27T15:20:00Z",
+      "retweets": 152,
+      "likes": 300,
+      "replies": 22,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/delta-air-lines-opens-atl-cph-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0022",
+    "properties": {
+      "tweet_id": "tweet-0022",
+      "lang": "en",
+      "text": "Delta Air Lines opens JFK–CDG with 21 flights a week #RouteLaunch",
+      "created_at": "2026-01-28T16:21:00Z",
+      "retweets": 159,
+      "likes": 313,
+      "replies": 25,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/delta-air-lines-opens-jfk-cdg-with-21-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0023",
+    "properties": {
+      "tweet_id": "tweet-0023",
+      "lang": "en",
+      "text": "American Airlines pulls DFW–BCN off the schedule #Suspension",
+      "created_at": "2026-01-29T17:22:00Z",
+      "retweets": 166,
+      "likes": 326,
+      "replies": 28,
+      "sentiment": "negative",
+      "linked_url": "https://aviationweek.com/aviation/american-airlines-pulls-dfw-bcn-off-the-schedule"
+    }
+  },
+  {
+    "id": "TWEET_0024",
+    "properties": {
+      "tweet_id": "tweet-0024",
+      "lang": "en",
+      "text": "United Airlines opens ORD–DEL with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-30T18:23:00Z",
+      "retweets": 173,
+      "likes": 339,
+      "replies": 31,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/united-airlines-opens-ord-del-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0025",
+    "properties": {
+      "tweet_id": "tweet-0025",
+      "lang": "en",
+      "text": "United Airlines opens SFO–MNL with 7 flights a week #RouteLaunch",
+      "created_at": "2026-01-31T07:24:00Z",
+      "retweets": 180,
+      "likes": 352,
+      "replies": 34,
+      "sentiment": "positive",
+      "linked_url": "https://thehindubusinessline.com/aviation/united-airlines-opens-sfo-mnl-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0026",
+    "properties": {
+      "tweet_id": "tweet-0026",
+      "lang": "en",
+      "text": "Turkish Airlines opens IST–MEL with 3 flights a week #RouteLaunch",
+      "created_at": "2026-02-01T08:25:00Z",
+      "retweets": 187,
+      "likes": 365,
+      "replies": 37,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/turkish-airlines-opens-ist-mel-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0027",
+    "properties": {
+      "tweet_id": "tweet-0027",
+      "lang": "en",
+      "text": "Qantas opens SYD–PER with 28 flights a week #RouteLaunch",
+      "created_at": "2026-02-02T09:26:00Z",
+      "retweets": 14,
+      "likes": 378,
+      "replies": 40,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/qantas-opens-syd-per-with-28-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0028",
+    "properties": {
+      "tweet_id": "tweet-0028",
+      "lang": "en",
+      "text": "Cathay Pacific opens HKG–MAA with 4 flights a week #RouteLaunch",
+      "created_at": "2026-02-03T10:27:00Z",
+      "retweets": 21,
+      "likes": 391,
+      "replies": 3,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/cathay-pacific-opens-hkg-maa-with-4-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0029",
+    "properties": {
+      "tweet_id": "tweet-0029",
+      "lang": "en",
+      "text": "Japan Airlines opens HND–SEA with 7 flights a week #RouteLaunch",
+      "created_at": "2026-02-04T11:28:00Z",
+      "retweets": 28,
+      "likes": 404,
+      "replies": 6,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/japan-airlines-opens-hnd-sea-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0030",
+    "properties": {
+      "tweet_id": "tweet-0030",
+      "lang": "en",
+      "text": "All Nippon Airways opens HND–PER with 3 flights a week #RouteLaunch",
+      "created_at": "2026-02-05T12:29:00Z",
+      "retweets": 35,
+      "likes": 417,
+      "replies": 9,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/all-nippon-airways-opens-hnd-per-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0031",
+    "properties": {
+      "tweet_id": "tweet-0031",
+      "lang": "en",
+      "text": "Korean Air opens ICN–LIS with 3 flights a week #RouteLaunch",
+      "created_at": "2026-02-06T13:30:00Z",
+      "retweets": 42,
+      "likes": 430,
+      "replies": 12,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/korean-air-opens-icn-lis-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0032",
+    "properties": {
+      "tweet_id": "tweet-0032",
+      "lang": "en",
+      "text": "Thai Airways pulls BKK–OSL off the schedule #Suspension",
+      "created_at": "2026-02-07T14:31:00Z",
+      "retweets": 49,
+      "likes": 443,
+      "replies": 15,
+      "sentiment": "negative",
+      "linked_url": "https://thehindubusinessline.com/aviation/thai-airways-pulls-bkk-osl-off-the-schedule"
+    }
+  },
+  {
+    "id": "TWEET_0033",
+    "properties": {
+      "tweet_id": "tweet-0033",
+      "lang": "en",
+      "text": "Ethiopian Airlines opens ADD–GRU with 4 flights a week #RouteLaunch",
+      "created_at": "2026-02-08T15:32:00Z",
+      "retweets": 56,
+      "likes": 456,
+      "replies": 18,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/ethiopian-airlines-opens-add-gru-with-4-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0034",
+    "properties": {
+      "tweet_id": "tweet-0034",
+      "lang": "en",
+      "text": "South African Airways pulls JNB–PER off the schedule #Suspension",
+      "created_at": "2026-02-09T16:33:00Z",
+      "retweets": 63,
+      "likes": 469,
+      "replies": 21,
+      "sentiment": "negative",
+      "linked_url": "https://gulfnews.com/aviation/south-african-airways-pulls-jnb-per-off-the-schedule"
+    }
+  },
+  {
+    "id": "TWEET_0035",
+    "properties": {
+      "tweet_id": "tweet-0035",
+      "lang": "en",
+      "text": "LATAM Brasil opens GRU–LIS with 7 flights a week #RouteLaunch",
+      "created_at": "2026-02-10T17:34:00Z",
+      "retweets": 70,
+      "likes": 482,
+      "replies": 24,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/latam-brasil-opens-gru-lis-with-7-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0036",
+    "properties": {
+      "tweet_id": "tweet-0036",
+      "lang": "en",
+      "text": "Air Canada opens YYZ–DXB with 4 flights a week #RouteLaunch",
+      "created_at": "2026-02-11T18:35:00Z",
+      "retweets": 77,
+      "likes": 495,
+      "replies": 27,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/air-canada-opens-yyz-dxb-with-4-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0037",
+    "properties": {
+      "tweet_id": "tweet-0037",
+      "lang": "en",
+      "text": "Iberia opens MAD–TPE with 3 flights a week #RouteLaunch",
+      "created_at": "2026-02-12T07:36:00Z",
+      "retweets": 84,
+      "likes": 508,
+      "replies": 30,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/iberia-opens-mad-tpe-with-3-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0038",
+    "properties": {
+      "tweet_id": "tweet-0038",
+      "lang": "en",
+      "text": "Swiss opens ZRH–SEA with 5 flights a week #RouteLaunch",
+      "created_at": "2026-02-13T08:37:00Z",
+      "retweets": 91,
+      "likes": 521,
+      "replies": 33,
+      "sentiment": "positive",
+      "linked_url": "https://simpleflying.com/aviation/swiss-opens-zrh-sea-with-5-flights-a-week"
+    }
+  },
+  {
+    "id": "TWEET_0039",
+    "properties": {
+      "tweet_id": "tweet-0039",
+      "lang": "en",
+      "text": "Air India orders wide-bodies to grow its New Delhi hub #FleetOrder",
+      "created_at": "2026-02-14T09:38:00Z",
+      "retweets": 98,
+      "likes": 534,
+      "replies": 36,
+      "sentiment": "positive",
+      "linked_url": "https://thehindubusinessline.com/aviation/air-india-orders-wide-bodies-to-grow-its-new-delhi-hub"
+    }
+  },
+  {
+    "id": "TWEET_0040",
+    "properties": {
+      "tweet_id": "tweet-0040",
+      "lang": "en",
+      "text": "IndiGo orders wide-bodies to grow its Bengaluru hub #FleetOrder",
+      "created_at": "2026-02-15T10:39:00Z",
+      "retweets": 105,
+      "likes": 547,
+      "replies": 39,
+      "sentiment": "positive",
+      "linked_url": "https://asia.nikkei.com/aviation/indigo-orders-wide-bodies-to-grow-its-bengaluru-hub"
+    }
+  },
+  {
+    "id": "TWEET_0041",
+    "properties": {
+      "tweet_id": "tweet-0041",
+      "lang": "en",
+      "text": "Emirates orders wide-bodies to grow its Dubai hub #FleetOrder",
+      "created_at": "2026-02-16T11:40:00Z",
+      "retweets": 112,
+      "likes": 560,
+      "replies": 2,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/emirates-orders-wide-bodies-to-grow-its-dubai-hub"
+    }
+  },
+  {
+    "id": "TWEET_0042",
+    "properties": {
+      "tweet_id": "tweet-0042",
+      "lang": "en",
+      "text": "United Airlines orders wide-bodies to grow its Chicago hub #FleetOrder",
+      "created_at": "2026-02-17T12:41:00Z",
+      "retweets": 119,
+      "likes": 573,
+      "replies": 5,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/united-airlines-orders-wide-bodies-to-grow-its-chicago-hub"
+    }
+  },
+  {
+    "id": "TWEET_0043",
+    "properties": {
+      "tweet_id": "tweet-0043",
+      "lang": "en",
+      "text": "Cabin crew walkout grounds Lufthansa flights at Frankfurt #Strike",
+      "created_at": "2026-02-18T13:42:00Z",
+      "retweets": 126,
+      "likes": 586,
+      "replies": 8,
+      "sentiment": "negative",
+      "linked_url": "https://bloomberg.com/aviation/cabin-crew-walkout-grounds-lufthansa-flights-at-frankfurt"
+    }
+  },
+  {
+    "id": "TWEET_0044",
+    "properties": {
+      "tweet_id": "tweet-0044",
+      "lang": "en",
+      "text": "Cabin crew walkout grounds Air France flights at Paris #Strike",
+      "created_at": "2026-02-19T14:43:00Z",
+      "retweets": 133,
+      "likes": 599,
+      "replies": 11,
+      "sentiment": "negative",
+      "linked_url": "https://aviationweek.com/aviation/cabin-crew-walkout-grounds-air-france-flights-at-paris"
+    }
+  },
+  {
+    "id": "TWEET_0045",
+    "properties": {
+      "tweet_id": "tweet-0045",
+      "lang": "en",
+      "text": "Cabin crew walkout grounds British Airways flights at London #Strike",
+      "created_at": "2026-02-20T15:44:00Z",
+      "retweets": 140,
+      "likes": 612,
+      "replies": 14,
+      "sentiment": "negative",
+      "linked_url": "https://simpleflying.com/aviation/cabin-crew-walkout-grounds-british-airways-flights-at-london"
+    }
+  },
+  {
+    "id": "TWEET_0046",
+    "properties": {
+      "tweet_id": "tweet-0046",
+      "lang": "en",
+      "text": "Qantas diverts a Sydney departure after a technical fault #Safety",
+      "created_at": "2026-02-21T16:45:00Z",
+      "retweets": 147,
+      "likes": 625,
+      "replies": 17,
+      "sentiment": "negative",
+      "linked_url": "https://thehindubusinessline.com/aviation/qantas-diverts-a-sydney-departure-after-a-technical-fault"
+    }
+  },
+  {
+    "id": "TWEET_0047",
+    "properties": {
+      "tweet_id": "tweet-0047",
+      "lang": "en",
+      "text": "Japan Airlines diverts a Tokyo departure after a technical fault #Safety",
+      "created_at": "2026-02-22T17:46:00Z",
+      "retweets": 154,
+      "likes": 638,
+      "replies": 20,
+      "sentiment": "negative",
+      "linked_url": "https://asia.nikkei.com/aviation/japan-airlines-diverts-a-tokyo-departure-after-a-technical-fault"
+    }
+  },
+  {
+    "id": "TWEET_0048",
+    "properties": {
+      "tweet_id": "tweet-0048",
+      "lang": "en",
+      "text": "South African Airways diverts a Johannesburg departure after a technical fault #Safety",
+      "created_at": "2026-02-23T18:47:00Z",
+      "retweets": 161,
+      "likes": 651,
+      "replies": 23,
+      "sentiment": "negative",
+      "linked_url": "https://gulfnews.com/aviation/south-african-airways-diverts-a-johannesburg-departure-after-a-technic"
+    }
+  },
+  {
+    "id": "TWEET_0049",
+    "properties": {
+      "tweet_id": "tweet-0049",
+      "lang": "en",
+      "text": "Qatar Airways widens its codeshare reach out of Doha #Alliance",
+      "created_at": "2026-02-24T07:48:00Z",
+      "retweets": 168,
+      "likes": 664,
+      "replies": 26,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/qatar-airways-widens-its-codeshare-reach-out-of-doha"
+    }
+  },
+  {
+    "id": "TWEET_0050",
+    "properties": {
+      "tweet_id": "tweet-0050",
+      "lang": "en",
+      "text": "Singapore Airlines widens its codeshare reach out of Singapore #Alliance",
+      "created_at": "2026-02-25T08:49:00Z",
+      "retweets": 175,
+      "likes": 677,
+      "replies": 29,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/singapore-airlines-widens-its-codeshare-reach-out-of-singapore"
+    }
+  },
+  {
+    "id": "TWEET_0051",
+    "properties": {
+      "tweet_id": "tweet-0051",
+      "lang": "en",
+      "text": "Air Canada widens its codeshare reach out of Toronto #Alliance",
+      "created_at": "2026-02-26T09:50:00Z",
+      "retweets": 182,
+      "likes": 690,
+      "replies": 32,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/air-canada-widens-its-codeshare-reach-out-of-toronto"
+    }
+  },
+  {
+    "id": "TWEET_0052",
+    "properties": {
+      "tweet_id": "tweet-0052",
+      "lang": "en",
+      "text": "Fuel bill eats into Iberia margins at Madrid #FuelPrices",
+      "created_at": "2026-02-27T10:51:00Z",
+      "retweets": 189,
+      "likes": 703,
+      "replies": 35,
+      "sentiment": "negative",
+      "linked_url": "https://simpleflying.com/aviation/fuel-bill-eats-into-iberia-margins-at-madrid"
+    }
+  },
+  {
+    "id": "TWEET_0053",
+    "properties": {
+      "tweet_id": "tweet-0053",
+      "lang": "en",
+      "text": "Fuel bill eats into Thai Airways margins at Bangkok #FuelPrices",
+      "created_at": "2026-02-28T11:52:00Z",
+      "retweets": 16,
+      "likes": 716,
+      "replies": 38,
+      "sentiment": "negative",
+      "linked_url": "https://thehindubusinessline.com/aviation/fuel-bill-eats-into-thai-airways-margins-at-bangkok"
+    }
+  },
+  {
+    "id": "TWEET_0054",
+    "properties": {
+      "tweet_id": "tweet-0054",
+      "lang": "en",
+      "text": "Fuel bill eats into Ethiopian Airlines margins at Addis Ababa #FuelPrices",
+      "created_at": "2026-03-01T12:53:00Z",
+      "retweets": 23,
+      "likes": 729,
+      "replies": 41,
+      "sentiment": "negative",
+      "linked_url": "https://asia.nikkei.com/aviation/fuel-bill-eats-into-ethiopian-airlines-margins-at-addis-ababa"
+    }
+  },
+  {
+    "id": "TWEET_0055",
+    "properties": {
+      "tweet_id": "tweet-0055",
+      "lang": "en",
+      "text": "Mumbai clears a terminal expansion as IndiGo adds capacity #Expansion",
+      "created_at": "2026-03-02T13:54:00Z",
+      "retweets": 30,
+      "likes": 742,
+      "replies": 4,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/mumbai-clears-a-terminal-expansion-as-indigo-adds-capacity"
+    }
+  },
+  {
+    "id": "TWEET_0056",
+    "properties": {
+      "tweet_id": "tweet-0056",
+      "lang": "en",
+      "text": "Istanbul clears a terminal expansion as Turkish Airlines adds capacity #Expansion",
+      "created_at": "2026-03-03T14:55:00Z",
+      "retweets": 37,
+      "likes": 755,
+      "replies": 7,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/istanbul-clears-a-terminal-expansion-as-turkish-airlines-adds-capacity"
+    }
+  },
+  {
+    "id": "TWEET_0057",
+    "properties": {
+      "tweet_id": "tweet-0057",
+      "lang": "en",
+      "text": "Seoul clears a terminal expansion as Korean Air adds capacity #Expansion",
+      "created_at": "2026-03-04T15:56:00Z",
+      "retweets": 44,
+      "likes": 768,
+      "replies": 10,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/seoul-clears-a-terminal-expansion-as-korean-air-adds-capacity"
+    }
+  },
+  {
+    "id": "TWEET_0058",
+    "properties": {
+      "tweet_id": "tweet-0058",
+      "lang": "en",
+      "text": "Hong Kong clears a terminal expansion as Cathay Pacific adds capacity #Expansion",
+      "created_at": "2026-03-05T16:57:00Z",
+      "retweets": 51,
+      "likes": 781,
+      "replies": 13,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/hong-kong-clears-a-terminal-expansion-as-cathay-pacific-adds-capacity"
+    }
+  },
+  {
+    "id": "TWEET_0059",
+    "properties": {
+      "tweet_id": "tweet-0059",
+      "lang": "en",
+      "text": "LATAM Brasil opens talks over a stake in a Brazil rival #Merger",
+      "created_at": "2026-03-06T17:58:00Z",
+      "retweets": 58,
+      "likes": 794,
+      "replies": 16,
+      "sentiment": "neutral",
+      "linked_url": "https://simpleflying.com/aviation/latam-brasil-opens-talks-over-a-stake-in-a-brazil-rival"
+    }
+  },
+  {
+    "id": "TWEET_0060",
+    "properties": {
+      "tweet_id": "tweet-0060",
+      "lang": "en",
+      "text": "Swiss opens talks over a stake in a Switzerland rival #Merger",
+      "created_at": "2026-03-07T18:59:00Z",
+      "retweets": 65,
+      "likes": 807,
+      "replies": 19,
+      "sentiment": "neutral",
+      "linked_url": "https://thehindubusinessline.com/aviation/swiss-opens-talks-over-a-stake-in-a-switzerland-rival"
+    }
+  },
+  {
+    "id": "TWEET_0061",
+    "properties": {
+      "tweet_id": "tweet-0061",
+      "lang": "en",
+      "text": "Etihad Airways opens talks over a stake in a United Arab Emirates rival #Merger",
+      "created_at": "2026-03-08T07:00:00Z",
+      "retweets": 72,
+      "likes": 820,
+      "replies": 22,
+      "sentiment": "neutral",
+      "linked_url": "https://asia.nikkei.com/aviation/etihad-airways-opens-talks-over-a-stake-in-a-united-arab-emirates-riva"
+    }
+  },
+  {
+    "id": "TWEET_0062",
+    "properties": {
+      "tweet_id": "tweet-0062",
+      "lang": "en",
+      "text": "KLM signs a sustainable aviation fuel supply deal at Amsterdam #SAF",
+      "created_at": "2026-03-09T08:01:00Z",
+      "retweets": 79,
+      "likes": 833,
+      "replies": 25,
+      "sentiment": "positive",
+      "linked_url": "https://gulfnews.com/aviation/klm-signs-a-sustainable-aviation-fuel-supply-deal-at-amsterdam"
+    }
+  },
+  {
+    "id": "TWEET_0063",
+    "properties": {
+      "tweet_id": "tweet-0063",
+      "lang": "en",
+      "text": "Delta Air Lines signs a sustainable aviation fuel supply deal at Atlanta #SAF",
+      "created_at": "2026-03-10T09:02:00Z",
+      "retweets": 86,
+      "likes": 846,
+      "replies": 28,
+      "sentiment": "positive",
+      "linked_url": "https://reuters.com/aviation/delta-air-lines-signs-a-sustainable-aviation-fuel-supply-deal-at-atlan"
+    }
+  },
+  {
+    "id": "TWEET_0064",
+    "properties": {
+      "tweet_id": "tweet-0064",
+      "lang": "en",
+      "text": "All Nippon Airways signs a sustainable aviation fuel supply deal at Tokyo #SAF",
+      "created_at": "2026-03-11T10:03:00Z",
+      "retweets": 93,
+      "likes": 859,
+      "replies": 31,
+      "sentiment": "positive",
+      "linked_url": "https://bloomberg.com/aviation/all-nippon-airways-signs-a-sustainable-aviation-fuel-supply-deal-at-to"
+    }
+  },
+  {
+    "id": "TWEET_0065",
+    "properties": {
+      "tweet_id": "tweet-0065",
+      "lang": "en",
+      "text": "American Airlines signs a sustainable aviation fuel supply deal at Dallas #SAF",
+      "created_at": "2026-03-12T11:04:00Z",
+      "retweets": 100,
+      "likes": 872,
+      "replies": 34,
+      "sentiment": "positive",
+      "linked_url": "https://aviationweek.com/aviation/american-airlines-signs-a-sustainable-aviation-fuel-supply-deal-at-dal"
+    }
+  },
+  {
+    "id": "TWEET_0066",
+    "properties": {
+      "tweet_id": "tweet-0066",
+      "lang": "en",
+      "text": "Worth reading if you follow the DEL market.",
+      "created_at": "2026-01-08T08:01:00Z",
+      "retweets": 4,
+      "likes": 15,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "DEL"
+    }
+  },
+  {
+    "id": "TWEET_0067",
+    "properties": {
+      "tweet_id": "tweet-0067",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-09T09:02:00Z",
+      "retweets": 1,
+      "likes": 3,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0068",
+    "properties": {
+      "tweet_id": "tweet-0068",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-01-11T11:04:00Z",
+      "retweets": 19,
+      "likes": 48,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "DXB"
+    }
+  },
+  {
+    "id": "TWEET_0069",
+    "properties": {
+      "tweet_id": "tweet-0069",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-12T12:05:00Z",
+      "retweets": 4,
+      "likes": 6,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0070",
+    "properties": {
+      "tweet_id": "tweet-0070",
+      "lang": "en",
+      "text": "Filed in the latest schedule update. Note the frequency.",
+      "created_at": "2026-01-14T14:07:00Z",
+      "retweets": 34,
+      "likes": 81,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "SIN"
+    }
+  },
+  {
+    "id": "TWEET_0071",
+    "properties": {
+      "tweet_id": "tweet-0071",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-15T15:08:00Z",
+      "retweets": 7,
+      "likes": 9,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0072",
+    "properties": {
+      "tweet_id": "tweet-0072",
+      "lang": "en",
+      "text": "This has been coming for two schedule seasons.",
+      "created_at": "2026-01-17T17:10:00Z",
+      "retweets": 49,
+      "likes": 114,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "FRA"
+    }
+  },
+  {
+    "id": "TWEET_0073",
+    "properties": {
+      "tweet_id": "tweet-0073",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-18T18:11:00Z",
+      "retweets": 10,
+      "likes": 12,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0074",
+    "properties": {
+      "tweet_id": "tweet-0074",
+      "lang": "en",
+      "text": "Worth reading if you follow the JFK market.",
+      "created_at": "2026-01-20T08:13:00Z",
+      "retweets": 4,
+      "likes": 147,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "JFK"
+    }
+  },
+  {
+    "id": "TWEET_0075",
+    "properties": {
+      "tweet_id": "tweet-0075",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-21T09:14:00Z",
+      "retweets": 13,
+      "likes": 15,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0076",
+    "properties": {
+      "tweet_id": "tweet-0076",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-01-23T11:16:00Z",
+      "retweets": 19,
+      "likes": 180,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "SFO"
+    }
+  },
+  {
+    "id": "TWEET_0077",
+    "properties": {
+      "tweet_id": "tweet-0077",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-24T12:17:00Z",
+      "retweets": 16,
+      "likes": 18,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0078",
+    "properties": {
+      "tweet_id": "tweet-0078",
+      "lang": "en",
+      "text": "Filed in the latest schedule update. Note the frequency.",
+      "created_at": "2026-01-26T14:19:00Z",
+      "retweets": 34,
+      "likes": 213,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "ICN"
+    }
+  },
+  {
+    "id": "TWEET_0079",
+    "properties": {
+      "tweet_id": "tweet-0079",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-27T15:20:00Z",
+      "retweets": 19,
+      "likes": 21,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0080",
+    "properties": {
+      "tweet_id": "tweet-0080",
+      "lang": "en",
+      "text": "This has been coming for two schedule seasons.",
+      "created_at": "2026-01-29T17:22:00Z",
+      "retweets": 49,
+      "likes": 46,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "GRU"
+    }
+  },
+  {
+    "id": "TWEET_0081",
+    "properties": {
+      "tweet_id": "tweet-0081",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-01-30T18:23:00Z",
+      "retweets": 2,
+      "likes": 24,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0082",
+    "properties": {
+      "tweet_id": "tweet-0082",
+      "lang": "en",
+      "text": "Worth reading if you follow the YYZ market.",
+      "created_at": "2026-02-01T08:25:00Z",
+      "retweets": 4,
+      "likes": 79,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "YYZ"
+    }
+  },
+  {
+    "id": "TWEET_0083",
+    "properties": {
+      "tweet_id": "tweet-0083",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-02T09:26:00Z",
+      "retweets": 5,
+      "likes": 27,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0084",
+    "properties": {
+      "tweet_id": "tweet-0084",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-02-04T11:28:00Z",
+      "retweets": 19,
+      "likes": 112,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "BKK"
+    }
+  },
+  {
+    "id": "TWEET_0085",
+    "properties": {
+      "tweet_id": "tweet-0085",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-05T12:29:00Z",
+      "retweets": 8,
+      "likes": 30,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0086",
+    "properties": {
+      "tweet_id": "tweet-0086",
+      "lang": "en",
+      "text": "Filed in the latest schedule update. Note the frequency.",
+      "created_at": "2026-02-07T14:31:00Z",
+      "retweets": 34,
+      "likes": 145,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "BLR"
+    }
+  },
+  {
+    "id": "TWEET_0087",
+    "properties": {
+      "tweet_id": "tweet-0087",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-08T15:32:00Z",
+      "retweets": 11,
+      "likes": 33,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0088",
+    "properties": {
+      "tweet_id": "tweet-0088",
+      "lang": "en",
+      "text": "This has been coming for two schedule seasons.",
+      "created_at": "2026-02-10T17:34:00Z",
+      "retweets": 49,
+      "likes": 178,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "DOH"
+    }
+  },
+  {
+    "id": "TWEET_0089",
+    "properties": {
+      "tweet_id": "tweet-0089",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-11T18:35:00Z",
+      "retweets": 14,
+      "likes": 36,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0090",
+    "properties": {
+      "tweet_id": "tweet-0090",
+      "lang": "en",
+      "text": "Worth reading if you follow the CDG market.",
+      "created_at": "2026-02-13T08:37:00Z",
+      "retweets": 4,
+      "likes": 211,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "CDG"
+    }
+  },
+  {
+    "id": "TWEET_0091",
+    "properties": {
+      "tweet_id": "tweet-0091",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-14T09:38:00Z",
+      "retweets": 17,
+      "likes": 39,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0092",
+    "properties": {
+      "tweet_id": "tweet-0092",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-02-16T11:40:00Z",
+      "retweets": 19,
+      "likes": 44,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "IST"
+    }
+  },
+  {
+    "id": "TWEET_0093",
+    "properties": {
+      "tweet_id": "tweet-0093",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-17T12:41:00Z",
+      "retweets": 20,
+      "likes": 42,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0094",
+    "properties": {
+      "tweet_id": "tweet-0094",
+      "lang": "en",
+      "text": "Filed in the latest schedule update. Note the frequency.",
+      "created_at": "2026-02-19T14:43:00Z",
+      "retweets": 34,
+      "likes": 77,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "ORD"
+    }
+  },
+  {
+    "id": "TWEET_0095",
+    "properties": {
+      "tweet_id": "tweet-0095",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-20T15:44:00Z",
+      "retweets": 3,
+      "likes": 45,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0096",
+    "properties": {
+      "tweet_id": "tweet-0096",
+      "lang": "en",
+      "text": "This has been coming for two schedule seasons.",
+      "created_at": "2026-02-22T17:46:00Z",
+      "retweets": 49,
+      "likes": 110,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "HND"
+    }
+  },
+  {
+    "id": "TWEET_0097",
+    "properties": {
+      "tweet_id": "tweet-0097",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-23T18:47:00Z",
+      "retweets": 6,
+      "likes": 3,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0098",
+    "properties": {
+      "tweet_id": "tweet-0098",
+      "lang": "en",
+      "text": "Worth reading if you follow the SYD market.",
+      "created_at": "2026-02-25T08:49:00Z",
+      "retweets": 4,
+      "likes": 143,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "SYD"
+    }
+  },
+  {
+    "id": "TWEET_0099",
+    "properties": {
+      "tweet_id": "tweet-0099",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-02-26T09:50:00Z",
+      "retweets": 9,
+      "likes": 6,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0100",
+    "properties": {
+      "tweet_id": "tweet-0100",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-02-28T11:52:00Z",
+      "retweets": 19,
+      "likes": 176,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "ADD"
+    }
+  },
+  {
+    "id": "TWEET_0101",
+    "properties": {
+      "tweet_id": "tweet-0101",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-03-01T12:53:00Z",
+      "retweets": 12,
+      "likes": 9,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0102",
+    "properties": {
+      "tweet_id": "tweet-0102",
+      "lang": "en",
+      "text": "Filed in the latest schedule update. Note the frequency.",
+      "created_at": "2026-03-03T14:55:00Z",
+      "retweets": 34,
+      "likes": 209,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "ZRH"
+    }
+  },
+  {
+    "id": "TWEET_0103",
+    "properties": {
+      "tweet_id": "tweet-0103",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-03-04T15:56:00Z",
+      "retweets": 15,
+      "likes": 12,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0104",
+    "properties": {
+      "tweet_id": "tweet-0104",
+      "lang": "en",
+      "text": "This has been coming for two schedule seasons.",
+      "created_at": "2026-03-06T17:58:00Z",
+      "retweets": 49,
+      "likes": 42,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "BOM"
+    }
+  },
+  {
+    "id": "TWEET_0105",
+    "properties": {
+      "tweet_id": "tweet-0105",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-03-07T18:59:00Z",
+      "retweets": 18,
+      "likes": 15,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0106",
+    "properties": {
+      "tweet_id": "tweet-0106",
+      "lang": "en",
+      "text": "Worth reading if you follow the AUH market.",
+      "created_at": "2026-03-09T08:01:00Z",
+      "retweets": 4,
+      "likes": 75,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "AUH"
+    }
+  },
+  {
+    "id": "TWEET_0107",
+    "properties": {
+      "tweet_id": "tweet-0107",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-03-10T09:02:00Z",
+      "retweets": 1,
+      "likes": 18,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0108",
+    "properties": {
+      "tweet_id": "tweet-0108",
+      "lang": "en",
+      "text": "The interesting part is what it does to connecting traffic.",
+      "created_at": "2026-03-12T11:04:00Z",
+      "retweets": 19,
+      "likes": 108,
+      "replies": 6,
+      "sentiment": "neutral",
+      "airport_code": "LHR"
+    }
+  },
+  {
+    "id": "TWEET_0109",
+    "properties": {
+      "tweet_id": "tweet-0109",
+      "lang": "en",
+      "text": "Noted.",
+      "created_at": "2026-03-13T12:05:00Z",
+      "retweets": 4,
+      "likes": 21,
+      "replies": 0,
+      "sentiment": "neutral"
+    }
+  },
+  {
+    "id": "TWEET_0110",
+    "properties": {
+      "tweet_id": "tweet-0110",
+      "lang": "en",
+      "text": "Our new schedule out of DEL is now open for booking.",
+      "created_at": "2026-04-17T11:40:00Z",
+      "retweets": 20,
+      "likes": 90,
+      "replies": 5,
+      "sentiment": "positive",
+      "airport_code": "DEL"
+    }
+  },
+  {
+    "id": "TWEET_0111",
+    "properties": {
+      "tweet_id": "tweet-0111",
+      "lang": "en",
+      "text": "Crews at BOM are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-04-18T12:41:00Z",
+      "retweets": 29,
+      "likes": 107,
+      "replies": 9,
+      "sentiment": "positive",
+      "airport_code": "BOM"
+    }
+  },
+  {
+    "id": "TWEET_0112",
+    "properties": {
+      "tweet_id": "tweet-0112",
+      "lang": "en",
+      "text": "A quiet milestone at BLR today — one million passengers this quarter.",
+      "created_at": "2026-04-19T13:42:00Z",
+      "retweets": 38,
+      "likes": 124,
+      "replies": 13,
+      "sentiment": "positive",
+      "airport_code": "BLR"
+    }
+  },
+  {
+    "id": "TWEET_0113",
+    "properties": {
+      "tweet_id": "tweet-0113",
+      "lang": "en",
+      "text": "Winter timetable from DXB goes live at midnight.",
+      "created_at": "2026-04-20T14:43:00Z",
+      "retweets": 47,
+      "likes": 141,
+      "replies": 17,
+      "sentiment": "positive",
+      "airport_code": "DXB"
+    }
+  },
+  {
+    "id": "TWEET_0114",
+    "properties": {
+      "tweet_id": "tweet-0114",
+      "lang": "en",
+      "text": "Our new schedule out of AUH is now open for booking.",
+      "created_at": "2026-04-21T15:44:00Z",
+      "retweets": 56,
+      "likes": 158,
+      "replies": 21,
+      "sentiment": "positive",
+      "airport_code": "AUH"
+    }
+  },
+  {
+    "id": "TWEET_0115",
+    "properties": {
+      "tweet_id": "tweet-0115",
+      "lang": "en",
+      "text": "Crews at DOH are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-04-22T16:45:00Z",
+      "retweets": 65,
+      "likes": 175,
+      "replies": 25,
+      "sentiment": "positive",
+      "airport_code": "DOH"
+    }
+  },
+  {
+    "id": "TWEET_0116",
+    "properties": {
+      "tweet_id": "tweet-0116",
+      "lang": "en",
+      "text": "A quiet milestone at SIN today — one million passengers this quarter.",
+      "created_at": "2026-04-23T17:46:00Z",
+      "retweets": 74,
+      "likes": 192,
+      "replies": 29,
+      "sentiment": "positive",
+      "airport_code": "SIN"
+    }
+  },
+  {
+    "id": "TWEET_0117",
+    "properties": {
+      "tweet_id": "tweet-0117",
+      "lang": "en",
+      "text": "Winter timetable from LHR goes live at midnight.",
+      "created_at": "2026-04-24T18:47:00Z",
+      "retweets": 83,
+      "likes": 209,
+      "replies": 33,
+      "sentiment": "positive",
+      "airport_code": "LHR"
+    }
+  },
+  {
+    "id": "TWEET_0118",
+    "properties": {
+      "tweet_id": "tweet-0118",
+      "lang": "en",
+      "text": "Our new schedule out of CDG is now open for booking.",
+      "created_at": "2026-04-25T07:48:00Z",
+      "retweets": 92,
+      "likes": 226,
+      "replies": 37,
+      "sentiment": "positive",
+      "airport_code": "CDG"
+    }
+  },
+  {
+    "id": "TWEET_0119",
+    "properties": {
+      "tweet_id": "tweet-0119",
+      "lang": "en",
+      "text": "Crews at FRA are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-04-26T08:49:00Z",
+      "retweets": 101,
+      "likes": 243,
+      "replies": 41,
+      "sentiment": "positive",
+      "airport_code": "FRA"
+    }
+  },
+  {
+    "id": "TWEET_0120",
+    "properties": {
+      "tweet_id": "tweet-0120",
+      "lang": "en",
+      "text": "A quiet milestone at AMS today — one million passengers this quarter.",
+      "created_at": "2026-04-27T09:50:00Z",
+      "retweets": 110,
+      "likes": 260,
+      "replies": 45,
+      "sentiment": "positive",
+      "airport_code": "AMS"
+    }
+  },
+  {
+    "id": "TWEET_0121",
+    "properties": {
+      "tweet_id": "tweet-0121",
+      "lang": "en",
+      "text": "Winter timetable from IST goes live at midnight.",
+      "created_at": "2026-04-28T10:51:00Z",
+      "retweets": 119,
+      "likes": 277,
+      "replies": 49,
+      "sentiment": "positive",
+      "airport_code": "IST"
+    }
+  },
+  {
+    "id": "TWEET_0122",
+    "properties": {
+      "tweet_id": "tweet-0122",
+      "lang": "en",
+      "text": "Our new schedule out of JFK is now open for booking.",
+      "created_at": "2026-04-29T11:52:00Z",
+      "retweets": 128,
+      "likes": 294,
+      "replies": 53,
+      "sentiment": "positive",
+      "airport_code": "JFK"
+    }
+  },
+  {
+    "id": "TWEET_0123",
+    "properties": {
+      "tweet_id": "tweet-0123",
+      "lang": "en",
+      "text": "Crews at ATL are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-04-30T12:53:00Z",
+      "retweets": 137,
+      "likes": 311,
+      "replies": 57,
+      "sentiment": "positive",
+      "airport_code": "ATL"
+    }
+  },
+  {
+    "id": "TWEET_0124",
+    "properties": {
+      "tweet_id": "tweet-0124",
+      "lang": "en",
+      "text": "A quiet milestone at ORD today — one million passengers this quarter.",
+      "created_at": "2026-05-01T13:54:00Z",
+      "retweets": 146,
+      "likes": 328,
+      "replies": 61,
+      "sentiment": "positive",
+      "airport_code": "ORD"
+    }
+  },
+  {
+    "id": "TWEET_0125",
+    "properties": {
+      "tweet_id": "tweet-0125",
+      "lang": "en",
+      "text": "Winter timetable from SFO goes live at midnight.",
+      "created_at": "2026-05-02T14:55:00Z",
+      "retweets": 155,
+      "likes": 345,
+      "replies": 65,
+      "sentiment": "positive",
+      "airport_code": "SFO"
+    }
+  },
+  {
+    "id": "TWEET_0126",
+    "properties": {
+      "tweet_id": "tweet-0126",
+      "lang": "en",
+      "text": "Our new schedule out of SEA is now open for booking.",
+      "created_at": "2026-05-03T15:56:00Z",
+      "retweets": 164,
+      "likes": 362,
+      "replies": 69,
+      "sentiment": "positive",
+      "airport_code": "SEA"
+    }
+  },
+  {
+    "id": "TWEET_0127",
+    "properties": {
+      "tweet_id": "tweet-0127",
+      "lang": "en",
+      "text": "Crews at HND are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-05-04T16:57:00Z",
+      "retweets": 173,
+      "likes": 379,
+      "replies": 73,
+      "sentiment": "positive",
+      "airport_code": "HND"
+    }
+  },
+  {
+    "id": "TWEET_0128",
+    "properties": {
+      "tweet_id": "tweet-0128",
+      "lang": "en",
+      "text": "A quiet milestone at ICN today — one million passengers this quarter.",
+      "created_at": "2026-05-05T17:58:00Z",
+      "retweets": 182,
+      "likes": 396,
+      "replies": 7,
+      "sentiment": "positive",
+      "airport_code": "ICN"
+    }
+  },
+  {
+    "id": "TWEET_0129",
+    "properties": {
+      "tweet_id": "tweet-0129",
+      "lang": "en",
+      "text": "Winter timetable from HKG goes live at midnight.",
+      "created_at": "2026-05-06T18:59:00Z",
+      "retweets": 191,
+      "likes": 413,
+      "replies": 11,
+      "sentiment": "positive",
+      "airport_code": "HKG"
+    }
+  },
+  {
+    "id": "TWEET_0130",
+    "properties": {
+      "tweet_id": "tweet-0130",
+      "lang": "en",
+      "text": "Our new schedule out of SYD is now open for booking.",
+      "created_at": "2026-05-07T07:00:00Z",
+      "retweets": 200,
+      "likes": 430,
+      "replies": 15,
+      "sentiment": "positive",
+      "airport_code": "SYD"
+    }
+  },
+  {
+    "id": "TWEET_0131",
+    "properties": {
+      "tweet_id": "tweet-0131",
+      "lang": "en",
+      "text": "Crews at GRU are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-05-08T08:01:00Z",
+      "retweets": 209,
+      "likes": 447,
+      "replies": 19,
+      "sentiment": "positive",
+      "airport_code": "GRU"
+    }
+  },
+  {
+    "id": "TWEET_0132",
+    "properties": {
+      "tweet_id": "tweet-0132",
+      "lang": "en",
+      "text": "A quiet milestone at JNB today — one million passengers this quarter.",
+      "created_at": "2026-05-09T09:02:00Z",
+      "retweets": 218,
+      "likes": 464,
+      "replies": 23,
+      "sentiment": "positive",
+      "airport_code": "JNB"
+    }
+  },
+  {
+    "id": "TWEET_0133",
+    "properties": {
+      "tweet_id": "tweet-0133",
+      "lang": "en",
+      "text": "Winter timetable from ADD goes live at midnight.",
+      "created_at": "2026-05-10T10:03:00Z",
+      "retweets": 227,
+      "likes": 481,
+      "replies": 27,
+      "sentiment": "positive",
+      "airport_code": "ADD"
+    }
+  },
+  {
+    "id": "TWEET_0134",
+    "properties": {
+      "tweet_id": "tweet-0134",
+      "lang": "en",
+      "text": "Our new schedule out of YYZ is now open for booking.",
+      "created_at": "2026-05-11T11:04:00Z",
+      "retweets": 236,
+      "likes": 498,
+      "replies": 31,
+      "sentiment": "positive",
+      "airport_code": "YYZ"
+    }
+  },
+  {
+    "id": "TWEET_0135",
+    "properties": {
+      "tweet_id": "tweet-0135",
+      "lang": "en",
+      "text": "Crews at MAD are back to normal operations this morning. Thank you for your patience.",
+      "created_at": "2026-05-12T12:05:00Z",
+      "retweets": 245,
+      "likes": 515,
+      "replies": 35,
+      "sentiment": "positive",
+      "airport_code": "MAD"
+    }
+  },
+  {
+    "id": "TWEET_0136",
+    "properties": {
+      "tweet_id": "tweet-0136",
+      "lang": "en",
+      "text": "Boarding at DEL and the gate agent just called an equipment swap. @airindia any word?",
+      "created_at": "2026-05-27T15:20:00Z",
+      "retweets": 0,
+      "likes": 2,
+      "replies": 0,
+      "sentiment": "negative",
+      "airport_code": "DEL"
+    }
+  },
+  {
+    "id": "TWEET_0137",
+    "properties": {
+      "tweet_id": "tweet-0137",
+      "lang": "en",
+      "text": "Three hours at DOH and counting. @IndiGo6E the app still says on time.",
+      "created_at": "2026-05-28T16:21:00Z",
+      "retweets": 1,
+      "likes": 5,
+      "replies": 1,
+      "sentiment": "neutral",
+      "airport_code": "DOH"
+    }
+  },
+  {
+    "id": "TWEET_0138",
+    "properties": {
+      "tweet_id": "tweet-0138",
+      "lang": "en",
+      "text": "@emirates lounge at AMS is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-05-29T17:22:00Z",
+      "retweets": 2,
+      "likes": 8,
+      "replies": 2,
+      "sentiment": "positive",
+      "airport_code": "AMS"
+    }
+  },
+  {
+    "id": "TWEET_0139",
+    "properties": {
+      "tweet_id": "tweet-0139",
+      "lang": "en",
+      "text": "Landed at SFO. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-05-30T18:23:00Z",
+      "retweets": 3,
+      "likes": 11,
+      "replies": 3,
+      "sentiment": "negative",
+      "airport_code": "SFO"
+    }
+  },
+  {
+    "id": "TWEET_0140",
+    "properties": {
+      "tweet_id": "tweet-0140",
+      "lang": "en",
+      "text": "@qatarairways thank you for the seat change on the SYD redeye, genuinely.",
+      "created_at": "2026-05-31T07:24:00Z",
+      "retweets": 4,
+      "likes": 14,
+      "replies": 4,
+      "sentiment": "neutral",
+      "airport_code": "SYD"
+    }
+  },
+  {
+    "id": "TWEET_0141",
+    "properties": {
+      "tweet_id": "tweet-0141",
+      "lang": "en",
+      "text": "Fog at MAD again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-06-01T08:25:00Z",
+      "retweets": 5,
+      "likes": 17,
+      "replies": 0,
+      "sentiment": "positive",
+      "airport_code": "MAD"
+    }
+  },
+  {
+    "id": "TWEET_0142",
+    "properties": {
+      "tweet_id": "tweet-0142",
+      "lang": "en",
+      "text": "Boarding at BLR and the gate agent just called an equipment swap. @lufthansa any word?",
+      "created_at": "2026-06-02T09:26:00Z",
+      "retweets": 6,
+      "likes": 20,
+      "replies": 1,
+      "sentiment": "negative",
+      "airport_code": "BLR"
+    }
+  },
+  {
+    "id": "TWEET_0143",
+    "properties": {
+      "tweet_id": "tweet-0143",
+      "lang": "en",
+      "text": "Three hours at LHR and counting. @British_Airways the app still says on time.",
+      "created_at": "2026-06-03T10:27:00Z",
+      "retweets": 7,
+      "likes": 23,
+      "replies": 2,
+      "sentiment": "neutral",
+      "airport_code": "LHR"
+    }
+  },
+  {
+    "id": "TWEET_0144",
+    "properties": {
+      "tweet_id": "tweet-0144",
+      "lang": "en",
+      "text": "@airfrance lounge at JFK is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-06-04T11:28:00Z",
+      "retweets": 8,
+      "likes": 26,
+      "replies": 3,
+      "sentiment": "positive",
+      "airport_code": "JFK"
+    }
+  },
+  {
+    "id": "TWEET_0145",
+    "properties": {
+      "tweet_id": "tweet-0145",
+      "lang": "en",
+      "text": "Landed at HND. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-06-05T12:29:00Z",
+      "retweets": 0,
+      "likes": 29,
+      "replies": 4,
+      "sentiment": "negative",
+      "airport_code": "HND"
+    }
+  },
+  {
+    "id": "TWEET_0146",
+    "properties": {
+      "tweet_id": "tweet-0146",
+      "lang": "en",
+      "text": "@Delta thank you for the seat change on the JNB redeye, genuinely.",
+      "created_at": "2026-06-06T13:30:00Z",
+      "retweets": 1,
+      "likes": 32,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "JNB"
+    }
+  },
+  {
+    "id": "TWEET_0147",
+    "properties": {
+      "tweet_id": "tweet-0147",
+      "lang": "en",
+      "text": "Fog at BKK again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-06-07T14:31:00Z",
+      "retweets": 2,
+      "likes": 35,
+      "replies": 1,
+      "sentiment": "positive",
+      "airport_code": "BKK"
+    }
+  },
+  {
+    "id": "TWEET_0148",
+    "properties": {
+      "tweet_id": "tweet-0148",
+      "lang": "en",
+      "text": "Boarding at AUH and the gate agent just called an equipment swap. @united any word?",
+      "created_at": "2026-06-08T15:32:00Z",
+      "retweets": 3,
+      "likes": 38,
+      "replies": 2,
+      "sentiment": "negative",
+      "airport_code": "AUH"
+    }
+  },
+  {
+    "id": "TWEET_0149",
+    "properties": {
+      "tweet_id": "tweet-0149",
+      "lang": "en",
+      "text": "Three hours at FRA and counting. @TurkishAirlines the app still says on time.",
+      "created_at": "2026-06-09T16:33:00Z",
+      "retweets": 4,
+      "likes": 41,
+      "replies": 3,
+      "sentiment": "neutral",
+      "airport_code": "FRA"
+    }
+  },
+  {
+    "id": "TWEET_0150",
+    "properties": {
+      "tweet_id": "tweet-0150",
+      "lang": "en",
+      "text": "@Qantas lounge at ORD is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-06-10T17:34:00Z",
+      "retweets": 5,
+      "likes": 44,
+      "replies": 4,
+      "sentiment": "positive",
+      "airport_code": "ORD"
+    }
+  },
+  {
+    "id": "TWEET_0151",
+    "properties": {
+      "tweet_id": "tweet-0151",
+      "lang": "en",
+      "text": "Landed at HKG. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-06-11T18:35:00Z",
+      "retweets": 6,
+      "likes": 47,
+      "replies": 0,
+      "sentiment": "negative",
+      "airport_code": "HKG"
+    }
+  },
+  {
+    "id": "TWEET_0152",
+    "properties": {
+      "tweet_id": "tweet-0152",
+      "lang": "en",
+      "text": "@JAL_Official thank you for the seat change on the YYZ redeye, genuinely.",
+      "created_at": "2026-06-12T07:36:00Z",
+      "retweets": 7,
+      "likes": 50,
+      "replies": 1,
+      "sentiment": "neutral",
+      "airport_code": "YYZ"
+    }
+  },
+  {
+    "id": "TWEET_0153",
+    "properties": {
+      "tweet_id": "tweet-0153",
+      "lang": "en",
+      "text": "Fog at BOM again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-06-13T08:37:00Z",
+      "retweets": 8,
+      "likes": 53,
+      "replies": 2,
+      "sentiment": "positive",
+      "airport_code": "BOM"
+    }
+  },
+  {
+    "id": "TWEET_0154",
+    "properties": {
+      "tweet_id": "tweet-0154",
+      "lang": "en",
+      "text": "Boarding at SIN and the gate agent just called an equipment swap. @KoreanAir_KE any word?",
+      "created_at": "2026-06-14T09:38:00Z",
+      "retweets": 0,
+      "likes": 56,
+      "replies": 3,
+      "sentiment": "negative",
+      "airport_code": "SIN"
+    }
+  },
+  {
+    "id": "TWEET_0155",
+    "properties": {
+      "tweet_id": "tweet-0155",
+      "lang": "en",
+      "text": "Three hours at IST and counting. @ThaiAirways the app still says on time.",
+      "created_at": "2026-06-15T10:39:00Z",
+      "retweets": 1,
+      "likes": 59,
+      "replies": 4,
+      "sentiment": "neutral",
+      "airport_code": "IST"
+    }
+  },
+  {
+    "id": "TWEET_0156",
+    "properties": {
+      "tweet_id": "tweet-0156",
+      "lang": "en",
+      "text": "@flyethiopian lounge at SEA is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-06-16T11:40:00Z",
+      "retweets": 2,
+      "likes": 2,
+      "replies": 0,
+      "sentiment": "positive",
+      "airport_code": "SEA"
+    }
+  },
+  {
+    "id": "TWEET_0157",
+    "properties": {
+      "tweet_id": "tweet-0157",
+      "lang": "en",
+      "text": "Landed at GRU. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-06-17T12:41:00Z",
+      "retweets": 3,
+      "likes": 5,
+      "replies": 1,
+      "sentiment": "negative",
+      "airport_code": "GRU"
+    }
+  },
+  {
+    "id": "TWEET_0158",
+    "properties": {
+      "tweet_id": "tweet-0158",
+      "lang": "en",
+      "text": "@LATAM_BRA thank you for the seat change on the ZRH redeye, genuinely.",
+      "created_at": "2026-06-18T13:42:00Z",
+      "retweets": 4,
+      "likes": 8,
+      "replies": 2,
+      "sentiment": "neutral",
+      "airport_code": "ZRH"
+    }
+  },
+  {
+    "id": "TWEET_0159",
+    "properties": {
+      "tweet_id": "tweet-0159",
+      "lang": "en",
+      "text": "Fog at DXB again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-06-19T14:43:00Z",
+      "retweets": 5,
+      "likes": 11,
+      "replies": 3,
+      "sentiment": "positive",
+      "airport_code": "DXB"
+    }
+  },
+  {
+    "id": "TWEET_0160",
+    "properties": {
+      "tweet_id": "tweet-0160",
+      "lang": "en",
+      "text": "Boarding at CDG and the gate agent just called an equipment swap. @Iberia any word?",
+      "created_at": "2026-06-20T15:44:00Z",
+      "retweets": 6,
+      "likes": 14,
+      "replies": 4,
+      "sentiment": "negative",
+      "airport_code": "CDG"
+    }
+  },
+  {
+    "id": "TWEET_0161",
+    "properties": {
+      "tweet_id": "tweet-0161",
+      "lang": "en",
+      "text": "Three hours at ATL and counting. @FlySWISS the app still says on time.",
+      "created_at": "2026-06-21T16:45:00Z",
+      "retweets": 7,
+      "likes": 17,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "ATL"
+    }
+  },
+  {
+    "id": "TWEET_0162",
+    "properties": {
+      "tweet_id": "tweet-0162",
+      "lang": "en",
+      "text": "@airindia lounge at ICN is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-06-22T17:46:00Z",
+      "retweets": 8,
+      "likes": 20,
+      "replies": 1,
+      "sentiment": "positive",
+      "airport_code": "ICN"
+    }
+  },
+  {
+    "id": "TWEET_0163",
+    "properties": {
+      "tweet_id": "tweet-0163",
+      "lang": "en",
+      "text": "Landed at ADD. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-06-23T18:47:00Z",
+      "retweets": 0,
+      "likes": 23,
+      "replies": 2,
+      "sentiment": "negative",
+      "airport_code": "ADD"
+    }
+  },
+  {
+    "id": "TWEET_0164",
+    "properties": {
+      "tweet_id": "tweet-0164",
+      "lang": "en",
+      "text": "@emirates thank you for the seat change on the DEL redeye, genuinely.",
+      "created_at": "2026-06-24T07:48:00Z",
+      "retweets": 1,
+      "likes": 26,
+      "replies": 3,
+      "sentiment": "neutral",
+      "airport_code": "DEL"
+    }
+  },
+  {
+    "id": "TWEET_0165",
+    "properties": {
+      "tweet_id": "tweet-0165",
+      "lang": "en",
+      "text": "Fog at DOH again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-06-25T08:49:00Z",
+      "retweets": 2,
+      "likes": 29,
+      "replies": 4,
+      "sentiment": "positive",
+      "airport_code": "DOH"
+    }
+  },
+  {
+    "id": "TWEET_0166",
+    "properties": {
+      "tweet_id": "tweet-0166",
+      "lang": "en",
+      "text": "Boarding at AMS and the gate agent just called an equipment swap. @qatarairways any word?",
+      "created_at": "2026-06-26T09:50:00Z",
+      "retweets": 3,
+      "likes": 32,
+      "replies": 0,
+      "sentiment": "negative",
+      "airport_code": "AMS"
+    }
+  },
+  {
+    "id": "TWEET_0167",
+    "properties": {
+      "tweet_id": "tweet-0167",
+      "lang": "en",
+      "text": "Three hours at SFO and counting. @SingaporeAir the app still says on time.",
+      "created_at": "2026-06-27T10:51:00Z",
+      "retweets": 4,
+      "likes": 35,
+      "replies": 1,
+      "sentiment": "neutral",
+      "airport_code": "SFO"
+    }
+  },
+  {
+    "id": "TWEET_0168",
+    "properties": {
+      "tweet_id": "tweet-0168",
+      "lang": "en",
+      "text": "@lufthansa lounge at SYD is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-06-28T11:52:00Z",
+      "retweets": 5,
+      "likes": 38,
+      "replies": 2,
+      "sentiment": "positive",
+      "airport_code": "SYD"
+    }
+  },
+  {
+    "id": "TWEET_0169",
+    "properties": {
+      "tweet_id": "tweet-0169",
+      "lang": "en",
+      "text": "Landed at MAD. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-06-29T12:53:00Z",
+      "retweets": 6,
+      "likes": 41,
+      "replies": 3,
+      "sentiment": "negative",
+      "airport_code": "MAD"
+    }
+  },
+  {
+    "id": "TWEET_0170",
+    "properties": {
+      "tweet_id": "tweet-0170",
+      "lang": "en",
+      "text": "@airfrance thank you for the seat change on the BLR redeye, genuinely.",
+      "created_at": "2026-06-30T13:54:00Z",
+      "retweets": 7,
+      "likes": 44,
+      "replies": 4,
+      "sentiment": "neutral",
+      "airport_code": "BLR"
+    }
+  },
+  {
+    "id": "TWEET_0171",
+    "properties": {
+      "tweet_id": "tweet-0171",
+      "lang": "en",
+      "text": "Fog at LHR again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-07-01T14:55:00Z",
+      "retweets": 8,
+      "likes": 47,
+      "replies": 0,
+      "sentiment": "positive",
+      "airport_code": "LHR"
+    }
+  },
+  {
+    "id": "TWEET_0172",
+    "properties": {
+      "tweet_id": "tweet-0172",
+      "lang": "en",
+      "text": "Boarding at JFK and the gate agent just called an equipment swap. @Delta any word?",
+      "created_at": "2026-07-02T15:56:00Z",
+      "retweets": 0,
+      "likes": 50,
+      "replies": 1,
+      "sentiment": "negative",
+      "airport_code": "JFK"
+    }
+  },
+  {
+    "id": "TWEET_0173",
+    "properties": {
+      "tweet_id": "tweet-0173",
+      "lang": "en",
+      "text": "Three hours at HND and counting. @AmericanAir the app still says on time.",
+      "created_at": "2026-07-03T16:57:00Z",
+      "retweets": 1,
+      "likes": 53,
+      "replies": 2,
+      "sentiment": "neutral",
+      "airport_code": "HND"
+    }
+  },
+  {
+    "id": "TWEET_0174",
+    "properties": {
+      "tweet_id": "tweet-0174",
+      "lang": "en",
+      "text": "@united lounge at JNB is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-07-04T17:58:00Z",
+      "retweets": 2,
+      "likes": 56,
+      "replies": 3,
+      "sentiment": "positive",
+      "airport_code": "JNB"
+    }
+  },
+  {
+    "id": "TWEET_0175",
+    "properties": {
+      "tweet_id": "tweet-0175",
+      "lang": "en",
+      "text": "Landed at BKK. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-07-05T18:59:00Z",
+      "retweets": 3,
+      "likes": 59,
+      "replies": 4,
+      "sentiment": "negative",
+      "airport_code": "BKK"
+    }
+  },
+  {
+    "id": "TWEET_0176",
+    "properties": {
+      "tweet_id": "tweet-0176",
+      "lang": "en",
+      "text": "@Qantas thank you for the seat change on the AUH redeye, genuinely.",
+      "created_at": "2026-07-06T07:00:00Z",
+      "retweets": 4,
+      "likes": 2,
+      "replies": 0,
+      "sentiment": "neutral",
+      "airport_code": "AUH"
+    }
+  },
+  {
+    "id": "TWEET_0177",
+    "properties": {
+      "tweet_id": "tweet-0177",
+      "lang": "en",
+      "text": "Fog at FRA again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-07-07T08:01:00Z",
+      "retweets": 5,
+      "likes": 5,
+      "replies": 1,
+      "sentiment": "positive",
+      "airport_code": "FRA"
+    }
+  },
+  {
+    "id": "TWEET_0178",
+    "properties": {
+      "tweet_id": "tweet-0178",
+      "lang": "en",
+      "text": "Boarding at ORD and the gate agent just called an equipment swap. @JAL_Official any word?",
+      "created_at": "2026-07-08T09:02:00Z",
+      "retweets": 6,
+      "likes": 8,
+      "replies": 2,
+      "sentiment": "negative",
+      "airport_code": "ORD"
+    }
+  },
+  {
+    "id": "TWEET_0179",
+    "properties": {
+      "tweet_id": "tweet-0179",
+      "lang": "en",
+      "text": "Three hours at HKG and counting. @AllNipponAir the app still says on time.",
+      "created_at": "2026-07-09T10:03:00Z",
+      "retweets": 7,
+      "likes": 11,
+      "replies": 3,
+      "sentiment": "neutral",
+      "airport_code": "HKG"
+    }
+  },
+  {
+    "id": "TWEET_0180",
+    "properties": {
+      "tweet_id": "tweet-0180",
+      "lang": "en",
+      "text": "@KoreanAir_KE lounge at YYZ is packed but the crew was lovely. Wheels up soon.",
+      "created_at": "2026-07-10T11:04:00Z",
+      "retweets": 8,
+      "likes": 14,
+      "replies": 4,
+      "sentiment": "positive",
+      "airport_code": "YYZ"
+    }
+  },
+  {
+    "id": "TWEET_0181",
+    "properties": {
+      "tweet_id": "tweet-0181",
+      "lang": "en",
+      "text": "Landed at BOM. Bags out in nine minutes, which never happens.",
+      "created_at": "2026-07-11T12:05:00Z",
+      "retweets": 0,
+      "likes": 17,
+      "replies": 0,
+      "sentiment": "negative",
+      "airport_code": "BOM"
+    }
+  },
+  {
+    "id": "TWEET_0182",
+    "properties": {
+      "tweet_id": "tweet-0182",
+      "lang": "en",
+      "text": "@flyethiopian thank you for the seat change on the SIN redeye, genuinely.",
+      "created_at": "2026-07-12T13:06:00Z",
+      "retweets": 1,
+      "likes": 20,
+      "replies": 1,
+      "sentiment": "neutral",
+      "airport_code": "SIN"
+    }
+  },
+  {
+    "id": "TWEET_0183",
+    "properties": {
+      "tweet_id": "tweet-0183",
+      "lang": "en",
+      "text": "Fog at IST again. Half the board is amber and nobody is telling us anything.",
+      "created_at": "2026-07-13T14:07:00Z",
+      "retweets": 2,
+      "likes": 23,
+      "replies": 2,
+      "sentiment": "positive",
+      "airport_code": "IST"
+    }
+  }
+]

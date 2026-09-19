@@ -1,0 +1,261 @@
+{
+  "format": "invana.model/1",
+  "package_id": "starter.provenance",
+  "content_hash": "",
+  "name": "Provenance",
+  "description": "Source, record, and the run that wrote it \u2014 for domains that want where-it-came-from explicit.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "Provenance",
+    "schema_description": "A starting shape for saying where a fact came from and which run put it there.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "property_keys": [
+      {
+        "name": "key",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Stable identifier, yours to define.",
+        "validation_rules": []
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "What to call it.",
+        "validation_rules": []
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Where it came from, if it has an address.",
+        "validation_rules": []
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Your own vocabulary for the sort of source this is.",
+        "validation_rules": []
+      },
+      {
+        "name": "retrieved_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When this copy was taken.",
+        "validation_rules": []
+      },
+      {
+        "name": "checksum",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Content hash of the record, if one was taken.",
+        "validation_rules": []
+      },
+      {
+        "name": "run_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The run that wrote it.",
+        "validation_rules": []
+      },
+      {
+        "name": "started_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When the run began.",
+        "validation_rules": []
+      },
+      {
+        "name": "finished_at",
+        "type": "datetime",
+        "value_cardinality": "SINGLE",
+        "description": "When the run ended.",
+        "validation_rules": []
+      },
+      {
+        "name": "status",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "How the run ended.",
+        "validation_rules": [
+          {
+            "rule_type": "enum",
+            "params": {
+              "values": [
+                "succeeded",
+                "failed",
+                "partial"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Source",
+        "description": "Where records come from \u2014 a feed, a file, a system.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "key",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "uri",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "kind",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Record",
+        "description": "One thing that arrived from a source, as it arrived.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "key",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "checksum",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "retrieved_at",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Run",
+        "description": "The run that read a source and wrote records.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "run_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "started_at",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "finished_at",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "status",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "CAME_FROM",
+        "description": "The source a record arrived from.",
+        "source_node_types": [
+          "Record"
+        ],
+        "target_node_types": [
+          "Source"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      },
+      {
+        "name": "WROTE",
+        "description": "The records a run wrote.",
+        "source_node_types": [
+          "Run"
+        ],
+        "target_node_types": [
+          "Record"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      },
+      {
+        "name": "READ",
+        "description": "The sources a run read.",
+        "source_node_types": [
+          "Run"
+        ],
+        "target_node_types": [
+          "Source"
+        ],
+        "multiplicity": "MULTI",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "source_key_unique",
+        "target_kind": "node_type",
+        "target_label": "Source",
+        "constraint_type": "unique",
+        "properties": [
+          "key"
+        ]
+      },
+      {
+        "name": "record_key_unique",
+        "target_kind": "node_type",
+        "target_label": "Record",
+        "constraint_type": "unique",
+        "properties": [
+          "key"
+        ]
+      },
+      {
+        "name": "run_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Run",
+        "constraint_type": "unique",
+        "properties": [
+          "run_id"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}
