@@ -69,6 +69,17 @@ flowchart TD
 | Routes | `…/rules*` · `…/projects/{key}/rules*` |
 | Events | `rule.created · published · activated · deactivated` |
 
+## Surfaces, as drawn
+
+On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — reconciled into this file before any of it is built.
+
+| Surface | Shape | Artboard |
+|---|---|---|
+| The drawer | `Rules`, stacked under `Skills`: the statement itself is the row, with kind, scope and citation count under it | `RulesPanel` |
+| An inactive rule | Dimmed in place with its past citations counted — deactivating is not deleting ([RU4](#decisions)) | `RulesPanel` |
+| The page | The rule's fields, where it was cited, and **what is not a rule** — four statements, each placed where it belongs | `RulesPanel` |
+| Scope | `invariant` on a Graph · `working` on a Project, with a Project's inherited invariants read-only | `RulesPanel` |
+
 ## Decisions
 
 | # | Decision |

@@ -80,6 +80,8 @@ flowchart TD
 | EA3 | Every response carries provenance. |
 | EA4 | External calls are principals in the record. |
 | EA5 | A token carries its own ceiling. |
+| EA6 | **Tokens are a group inside Settings › Graph, not a settings tab of their own.** The tabs are `Basic · Graph · Agents` ([GV18](../../govern/spec.md)) and a token is Graph configuration in the same sense the connection is — a group in the form, the way the connection already is. A fourth tab would make a credential list look like a fourth subject. Drawn as `Tokens` on [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn). |
+| EA7 | **The secret is shown once, in place, and never stored readable.** The row afterwards carries what the token *did* — last used, and what it read — because that is what answers *was this leaked*, and a re-readable secret is one the record cannot prove was yours. |
 
 ## Not building
 

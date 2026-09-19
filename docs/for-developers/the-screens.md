@@ -205,6 +205,31 @@ The 🔵 rows are where 🖼 will appear: the screen gets built ahead of its eng
 
 ---
 
+## The design canvases
+
+**A canvas is organised one page per feature**, and a feature reaches Studio as a **stacked panel** —
+so in practice one page per panel. Every flow and variation of that feature lives on its own page:
+the primary journey, each drawer state, each drill-in, the authoring act, every refusal with the bound
+it names, the empty and unsupported states, and the seams. A reviewer reads one page and has seen the
+whole feature; a feature drawn only on its happy path is not drawn. The rules are in
+[CLAUDE.md § Design rules](../../CLAUDE.md); this is the list.
+
+| Canvas | Draws | Pages | State |
+|---|---|---|---|
+| [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) — 28 artboards | Worlds · Guardrails · the run · the roster · LLMs · Skills · Bindings · Usage · Rules · Plans | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
+| [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
+| *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
+| *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
+| *The Tasks Panel* (`9sAby5rPvkjMLb9BcdCom4`) | the Tasks panel and what it drills into — rows 34b–34q above | four | current |
+| *Modeller and Stitching* (`db0a313c-1401-49ad-965f-0727364020fa`) | [1.6 Stitch models](modules/connect-and-model/features/stitch-models.md) — 13 artboards | two | current |
+| *Agents at Work Wireframes* (`58f2e380-ef59-41cd-8c96-d3dc7ddd06e4`) | the 42 hi-fi artboards | six | current, and the oldest — it predates the shell contract |
+
+**Where the generators live.** `.design/canvas-<name>/` — Python over the shared kit, never hand-written
+artboard HTML. `.design/` is gitignored: the canvas is the source and the generator is the build, so a
+canvas is rebuilt by re-running its scripts, never by editing a `.dc.html` by hand.
+
+---
+
 ## Beyond the 42 · All models
 
 Thirteen artboards on a second canvas — *Modeller and Stitching*
@@ -271,9 +296,31 @@ compact rendering of U1, and `GraphInfoPanel` draws it today (G20 · G21).
 
 ---
 
-## Beyond the 42 · Governance
+## Beyond the 42 · Govern, Agents and Skills
 
-Seven artboards on a third canvas — *Governance · the lens in the UI*
+**Twenty-eight artboards on [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc)**, ten
+pages — one per stacked panel, each carrying that panel's whole feature. It **supersedes** the first
+governance canvas (`8591piJHezfLsUoSZXn3z8`), whose seven artboards are rebuilt here; that one is kept
+only so the D1 option comparison can be re-read. Generators: `.design/canvas-govern-agents/`.
+
+| Page | Feature | Artboards |
+|---|---|---|
+| Govern › Worlds | [14.1](modules/govern/features/worlds.md) | `Main` (the drawer, and what a world did to the question) · `GovWorld` (five layer sections, the slice, the cast) · `WorldEdit` (authoring, and the two refusals) · `WorldLadder` (naming publishes, promoting binds, the six seams) |
+| Govern › Guardrails | [14.2](modules/govern/features/guardrails.md) | `GovGuardrails` (the sibling drawer, what a save would cost, what an auditor is handed) · `GuardrailEdit` (an address, allow or deny, egress per destination) |
+| Govern › what a world did | [10.5](modules/operate/features/see-what-ran.md) · [14.1](modules/govern/features/worlds.md) | `RunLens` (six bands, what each step touched, refusals struck, *This run's lens* + Retune) · `RunLensStep` (generated vs executed, and what egress cut) · `GovCompare` (the one participant that differed) · `Cast` (innermost wins, then it is checked) |
+| Agents › the roster | [5.2](modules/agents/features/the-roster.md)–[5.7](modules/agents/features/concurrency-and-contention.md) | `AgentsRoster` · `AgentEnvelope` · `AgentLineage` · `AgentLifecycle` · `AgentConcurrency` |
+| Agents › LLMs | [5.1](modules/agents/features/providers-and-models.md) | `AgentsLlms` |
+| Library › Plans | [7.1](modules/workflows/features/the-library.md) · [7.6](modules/workflows/features/the-catalogue.md) · [7.7](modules/workflows/features/draft-a-plan.md) | `PlanLayers` (a plan in its six layers, and how it has behaved) · `PlanDraft` (the catalogue as the palette, the generated parameter form, a task refused in place) · `PlanArgs` (declared arguments, and four callers tuning them differently) |
+| Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning one argument) · `SkillVersions` (immutable, the v2→v3 diff, a hand-edit flipping `origin`) |
+| Skills › Bindings | [6.2](modules/skills/features/bindings.md) | `SkillBindings` (refused by the envelope **and** by the lens, at bind time — BN5) · `SkillOffer` (the fixed assembly order, discrete items with ids, what the step reported back) |
+| Skills › Usage | [6.3](modules/skills/features/usage.md) | `SkillUsage` (per version, by agent, by outcome — and what each reading means) |
+| Skills › Rules | [6.4](modules/skills/features/rules.md) | `RulesPanel` (one statement, two scopes, cited by 214 steps — and the four statements that are **not** rules) |
+
+Every row above is `Shell ✅` and `API` follows its feature's row in [README.md](README.md).
+
+### The first pass, superseded
+
+Seven artboards on *Governance · the lens in the UI*
 (`claude.ai/artifact/8591piJHezfLsUoSZXn3z8`) — drawing [14 · Govern](modules/govern/spec.md).
 Three more on it keep the D1 option comparison and are not screens.
 
@@ -289,6 +336,10 @@ Three more on it keep the D1 option comparison and are not screens.
 | `Main` · `OneSurface` · `TwoRecords` | — the D1 option comparison, kept as the record. **Not screens** | — | — | — |
 
 ## Beyond the 42 · Skills and the left rail
+
+> **Superseded for 6.1–6.4** by the Skills pages of
+> [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc). `Library` and `RailMap` below are still
+> the reference for [7.1](modules/workflows/features/the-library.md) and for the rail itself.
 
 Six artboards on a fourth canvas — *Skills · and the left rail*
 (`claude.ai/artifact/7c565h2z9irbFBwu1S1ebH`) — drawing [6 · Skills](modules/skills/spec.md), the
@@ -308,6 +359,34 @@ shell contract from the first line — `leftNav`, a 420px `leftSection`, stacked
 as pages, tokens only. They are the first screens in the product for which that is true, which is
 also why none of them can be compared to the 42's `Shell ❌` rows: those were drawn before the
 contract existed.
+
+## Beyond the 42 · The undrawn features
+
+Eleven artboards on a fifth canvas — *The Undrawn Features*
+(`https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn`) — drawing the features [the-sequence.md](the-sequence.md) still has to
+build and **nothing drew**. Generated from `.design/canvas-features/`, composed on the same kit as the
+governance and skills canvases, so `Shell ✅` means what it means there.
+
+| Artboard | Block | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `Main` (BundleLoad) | D | a bundle as **one run** — `check → load` (3 lanes) `→ stitch → report`, and `triage` branching on failure | 🔵 | 🔵 | ✅ |
+| `Lanes` | D | a fan-out meeting a pool — 200 lanes, 20 slots, fair share across runs, a queued lane holding nothing | 🟡 | 🔵 | ✅ |
+| `Approval` | D | the budget ceiling **pausing** the run, naming the spend, the bound and the next task's estimate | 🟡 | 🔵 | ✅ |
+| `Events` | F | every write by principal — `on_behalf_of` as its own field, the causal chain, before and after, a purged window | 🟡 | 🟡 | ✅ |
+| `Tokens` | F | a scoped read-only token as a **principal** — the secret shown once, an out-of-scope refusal naming the scope, what it read | 🔵 | 🔵 | ✅ |
+| `Evidence` | G | counts ranked by gap over a stated window, *12 runs — too few to read*, and the proposal that already cites them | 🔵 | 🔵 | ✅ |
+| `Recall` | G | recall as a **planned step**: the query in the trace, 14 read and 4 cited, and *no prior records* as a stated outcome | 🔵 | 🔵 | ✅ |
+| `Console` | J | `bottomSection` under the canvas only — Records · Query, the context bar as its last row | ✅ | 🔵 | ✅ |
+| `Capabilities` | J | a property type **refused where the author is typing**, and the banner when the database downgrades under two models | 🟡 | 🔵 | ✅ |
+| `Vector` | J | nodes with scores as records, and *unsupported* declared by vendor before anything runs | 🔵 | 🔵 | ✅ |
+| `RowShapes` | A | **G40** — a skill row (prose over sans) against a plan row (key over mono), and why they may not look alike | 🟡 | 🟡 | ✅ |
+
+**Two decisions were made in the drawing, and they are recorded in their feature files, not here:**
+Tokens is a **group inside Settings › Graph** rather than a fourth settings tab
+([10.4 EA9](modules/operate/features/external-agent-api.md)), and Evidence is a **page reached from
+the Skills drawer**, not a rail item of its own ([8.1 EV6](modules/memory/features/evidence.md)).
+
+---
 
 ## The other direction — every feature, and the screen that draws it
 
@@ -337,11 +416,14 @@ So a feature file can be opened next to the drawing that shows it.
 | 5.5 | Lifecycle | ✅ | ✅ | S12c | `AgentPausedHiFi` | 🔵 |
 | 5.6 | Lineage | ✅ | ✅ | S12c | `AgentsLineageHiFi` | ✅ |
 | 6.1 | Authoring a skill | ✅ | 🟡 | S5 | `SkillsHiFi` | 🟡 |
+| 6.2 | Bindings | ✅ | 🟡 | S12c | `SkillBindings` | 🔵 |
 | 6.3 | Usage | ✅ | 🟡 | S12c | `SkillsHiFi` | 🟡 |
 | 6.4 | Rules | 🔵 | 🔵 | S12b | `RulesHiFi` | 🔵 |
 | 7.1 | The library | 🟡 | 🟡 | S12c | `WorkflowsHiFi` | 🟡 |
 | 7.2 | Plan selection | 🟡 | 🟡 | S9d | `WorkflowStepHiFi` | 🟡 |
 | 7.5 | Run a workflow | 🔵 | 🔵 | S15 | `RunWorkflowHiFi` | 🔵 |
+| 7.6 | The catalogue | 🟡 | 🔵 | S12c | `CatalogueList` · `CatalogueDetail` (⛔ considered, not built) | 🔵 |
+| 7.7 | Draft a plan | 🔵 | 🔵 | S15 | `PlanDraftCanvas` · `PlanDraftYaml` · `PlanRetire` · `PlanStepParams` | 🔵 |
 | 8.3 | Proposals | 🔵 | 🔵 | S12c | `ReviewProposalHiFi` | 🔵 |
 | 8.4 | Consolidation | 🔵 | 🔵 | S12c | `ReviewProposalHiFi` | 🔵 |
 | 9.1 | Projects and tasks | 🟡 | 🟡 | S12b | `ProjectsHiFi` · `SwingProjectHiFi` · `ProjectPlanHiFi` · `NewTaskHiFi` · `TaskHiFi` | ✅ · 🟡 |
@@ -350,11 +432,22 @@ So a feature file can be opened next to the drawing that shows it.
 | 9.4 | Recurring tasks and conditions | 🔵 | 🔵 | S12e | `RecurringTaskHiFi` | 🔵 |
 | 10.1 | Schedules | 🔵 | 🔵 | S9.5 | `SchedulesHiFi` | 🔵 |
 | 10.3 | Observability | 🔵 | 🔵 | S11 | `AgentStatsHiFi` | 🔵 |
+| 10.5 | See what ran | 🔵 | 🔵 | S14 | `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` · `RunLens` | 🔵 · ✅ |
 | 13.3 | Command line | — | — | — | `CliHiFi` | — |
 | 13.7 | Setup | ✅ | 🟡 | S13 | `SetupPageHiFi` · `SetupBlockedHiFi` · `SetupReadyHiFi` · `SetupLocksHiFi` | 🟡 |
+| 14.1 | Worlds | 🔵 | 🔵 | S16 | `GovWorlds` · `GovWorld` · `GovCompare` | 🔵 |
+| 14.2 | Guardrails | 🔵 | 🔵 | S16 | `GovGuardrails` | 🔵 |
+| 2.3 | Load a bundle | 🔵 | 🔵 | S15 | `Main` (BundleLoad) | 🔵 |
+| 4.4 | The console | ✅ | 🔵 | S12f | `Console` | 🔵 |
+| 8.1 | Evidence | 🔵 | 🔵 | S12c | `Evidence` | 🔵 |
+| 8.2 | Recall by query | 🔵 | 🔵 | S9d | `Recall` | 🔵 |
+| 10.2 | Audit and activity | 🟡 | 🟡 | S5.5 · S12a | `Events` | 🟡 |
+| 10.4 | External-agent API | 🔵 | 🔵 | S10 | `Tokens` | 🔵 |
+| 12.3 | Capabilities | 🟡 | 🔵 | S3 | `Capabilities` | 🔵 |
+| 12.4 | Vector search | 🔵 | 🔵 | S7 | `Vector` | 🔵 |
+| 13.8 | The runtime | 🟡 | — | S15 | `Lanes` · `Approval` · `VerdictReviewHiFi` | 🔵 |
 
-**Not drawn — 32 features with no artboard.** They ship from their feature files alone. The index's
-own *Not drawn* line named four of these; it was short by 25.
+**Not drawn — 23 features with no artboard.** They ship from their feature files alone.
 
 | # | Feature | API | Studio |
 |---|---|---|---|
@@ -363,18 +456,12 @@ own *Not drawn* line named four of these; it was short by 25.
 | 1.7 | Starter models | ✅ | ✅ |
 | 3.1 | Write queries | ✅ | ✅ |
 | 3.5 | Streaming and the workflow | ✅ | ✅ |
+| 3.11 | Act as | 🔵 | 🔵 |
 | 3.7 | Reasoning trace | ✅ | ✅ |
 | 3.9 | The runtime | ✅ | — |
-| 4.5 | The console | ✅ | 🔵 |
 | 5.7 | Concurrency and contention | ✅ | ✅ |
-| 6.2 | Bindings | ✅ | 🟡 |
 | 7.3 | Envelope validation | 🟡 | 🔵 |
 | 7.4 | Promote a plan | 🟡 | 🟡 |
-| 8.1 | Evidence | 🔵 | 🔵 |
-| 8.2 | Recall by query | 🔵 | 🔵 |
-| 10.2 | Audit and activity | 🟡 | 🟡 |
-| 10.4 | External-agent API | 🔵 | 🔵 |
-| 10.5 | See what ran | 🔵 | 🔵 |
 | 11.1 | Accounts | 🟡 | 🟡 |
 | 11.2 | Usernames | ✅ | ✅ |
 | 11.3 | Sessions | ✅ | 🟡 |
@@ -382,11 +469,8 @@ own *Not drawn* line named four of these; it was short by 25.
 | 11.5 | Personal access tokens | ✅ | ✅ |
 | 12.1 | The connector contract | ✅ | — |
 | 12.2 | Languages | ✅ | 🟡 |
-| 12.3 | Capabilities | 🟡 | 🔵 |
-| 12.4 | Vector search | 🔵 | 🔵 |
 | 13.1 | Design system | — | 🟡 |
 | 13.2 | Theming | — | ✅ |
 | 13.4 | Logging | ✅ | — |
 | 13.5 | Telemetry | ✅ | — |
 | 13.6 | Admin and health | ✅ | — |
-| 13.8 | The runtime | 🟡 | — |

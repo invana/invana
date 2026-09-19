@@ -109,6 +109,30 @@ flowchart TD
 
 Every edit is an event, so the change and its effect sit in the same history.
 
+## 5a. The drawn states
+
+The module's artboards, on [Govern, Agents and Skills](%s) — pages *Skills · Bindings · Usage · Rules*.
+Each one is written into the feature file it draws before any of it is built
+([README › How a module gets built](../../README.md#how-a-module-gets-built)).
+
+| Artboard | Feature | What it shows | Settles |
+|---|---|---|---|
+| `SkillsPanel` | [6.1](features/authoring-a-skill.md) · [6.4](features/rules.md) | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
+| `SkillAuthor` | [6.1](features/authoring-a-skill.md) | the **Playbook** tab: prose with each sentence showing the step it produced, and `draft_plan` asking which of two readings sentence 4 means | C10 · SK6 — it never guesses; nothing is written until it is answered |
+| `SkillFlow` | [6.1](features/authoring-a-skill.md) | the **Flow** tab: the plan drawn in the **six layers** it will touch, `cache` dark, `third party` named | SK16 — one flow view, and it is the layer one |
+| `SkillUsesPlan` | [6.1](features/authoring-a-skill.md) · [7.1](../workflows/features/the-library.md) | a skill inlining `escalate-core@2` with `uses`, and tuning one argument for its use case | SK18 · LB18 · LB19 — create and tune here; author in the Library |
+| `SkillVersions` | [6.1](features/authoring-a-skill.md) | four versions, the v2→v3 prose-and-plan diff, a hand-edit flipping `origin` | SK2 · SK5 · SK7 |
+| `SkillBindings` | [6.2](features/bindings.md) | bound · refused · unbound, and **two refusals** — the envelope, and the lens naming the rule | BN5 — both checks are at bind time |
+| `SkillOffer` | [6.2](features/bindings.md) · § 4 | the fixed assembly order, the context as discrete items with ids, what the step reported back | § 4 — nothing is concatenated |
+| `SkillUsage` | [6.3](features/usage.md) | offered 40 / applied 31 / the gap, per version, by agent, by outcome | US1–US4 — counted, per version, self-reported |
+| `RulesPanel` | [6.4](features/rules.md) | one statement, two scopes, where it was cited, and the four statements that are **not** rules | RU1–RU5 |
+
+**Two things the drawings settled that the documents did not have:** the skill's detail lives in the
+drilled-in drawer with four tabs ([SK17](features/authoring-a-skill.md)), and the Flow tab is the layer
+view rather than a node graph ([SK16](features/authoring-a-skill.md)).
+
+---
+
 ## 6. Cross-feature decisions
 
 | # | Decision |

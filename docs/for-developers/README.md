@@ -36,6 +36,7 @@ governs.
 | Databases | openCypher — Neo4j · Memgraph · ArcadeDB. Gremlin — JanusGraph · Neptune · TinkerGraph · ArcadeDB. Adding one: [12.1](modules/graph-connectors/features/the-connector-contract.md) |
 | Engine | [building-engine/](building-engine/migration-plan.md) — the bands, the file shape inside a package, the import rule, and the migration to them. Code shape, not product scope. The **record** migration is [task-model-migration.md](building-engine/task-model-migration.md), and the two are orthogonal |
 | Screens | [the-screens.md](the-screens.md) — the 42 hi-fi artboards, one row each, with whether the screen is built and whether it is on the kit. How Studio is built to hold them: [building-studio/](building-studio/) |
+| **The sequence** | [the-sequence.md](the-sequence.md) — the **build order** of everything still open, block by block, with what gates what. This file is the scope and the `Slice` column is the ship gate; that one is the order the remaining blocks are worked in |
 | Status | ✅ done · 🟡 in progress · 🖼 screen built, wired to nothing ([DS15](modules/platform/features/design-system.md)) · 🔵 designed, not started · — not applicable |
 
 ---
@@ -274,7 +275,7 @@ replacement lands.
 | S9.5 | 6.1 | A question on a cron, with a diffable timeline |
 | S10 · S11 | 6.3 · 6.4 | External retrieval with provenance; metrics and cost |
 | S12a–S12e | 4.3 · 4.4 · 5.1–5.7 | An agent works a task and a human accepts it against criteria |
-| S12f | 4.5 | The records and the query behind a drawing are readable under it, and the Explorer drives the shell's own regions |
+| S12f | 4.4 | The records and the query behind a drawing are readable under it, and the Explorer drives the shell's own regions |
 | S13 | 13.7 | A new Graph opens on its Setup page, four derived steps close it, and the first answer needs nothing that was not named |
 | S14 | 10.5 · 2.1 · 2.2 | Every run in the Graph reads from one journal, delegated children nest under their parent, and Imports is a filter of it rather than a second implementation — `import_jobs` is gone, and a load is dispatched by the interpreter like every other run ([BD12](modules/bring-data-in/spec.md)) |
 | S15 | 13.8 · 2.3 · 7.5 | A plan is a graph, the cursor is a frontier, a step fans out into lanes, a pool stops one workflow starving the rest, and a person is asked before a gated step runs — proven by a bundle load that branches, fans out and inlines the single-dataset plan, and startable from the library without phrasing a question |

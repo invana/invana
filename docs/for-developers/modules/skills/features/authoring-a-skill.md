@@ -100,6 +100,20 @@ flowchart TD
 | Routes | `…/skills*` · `POST …/skills/{id}/versions` |
 | Events | `skill.created · published · deactivated · plan_drafted` |
 
+## Surfaces, as drawn
+
+On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — reconciled into this file before any of it is built.
+
+| Surface | Shape | Artboard |
+|---|---|---|
+| The drawer | `Skills` list: name, version, the whole `when_to_use` sentence, offered/applied, how many agents. A draft says so | `SkillsPanel` |
+| The detail | The **drilled-in drawer** ([SK17](#decisions)) — header `‹ SKILLS / <name>`, four tabs, footer `Bind to an agent` · `New version` | every `Skill*` |
+| **Playbook** tab | The prose, one sentence per line, each showing the step it produced; a sentence with no step is marked | `SkillAuthor` |
+| **Flow** tab | The plan in its six layers ([SK16](#decisions)); the drawer lists the layers it declares, which is the bind check read in advance | `SkillFlow` |
+| Composition | `uses: workflow:<key>@<v>` inlined, with the arguments this skill tunes ([SK18](#decisions)) | `SkillUsesPlan` |
+| Versions | Reached from the Playbook footer: the version list, and the prose-and-plan diff against the one before | `SkillVersions` |
+| The clarification | A card on the draft canvas quoting the sentence and offering the readings; the node it would write is a ghost until answered | `SkillAuthor` |
+
 ## Decisions
 
 | # | Decision |
@@ -113,6 +127,9 @@ flowchart TD
 | SK7 | **A hand-edit flips `origin` to `authored`.** Regenerating from prose after that is offered, never automatic, and says what it discards. |
 | SK13 | **A skill version is drawn as exactly one `TaskPlan`** — `plan_id` is `NOT NULL`. No surface branches on *does this skill have a flow*, and the Flow tab is always there. |
 | SK14 | **If it cannot be drawn as a flow, it is not a skill — it is a rule.** The 1:1 turns the Skill/Rule boundary from the author's judgement into something the product holds. |
+| SK16 | **The Flow tab draws the plan in the six layers it will touch, and that is the only flow view a skill has.** One view, not two: a node graph beside a layer strip would be two drawings of one plan to keep in step, and the layer strip answers the question the skill surface is actually asked — *what will this playbook engage?* It is the same six bands as the run dashboard ([D5](../../../governance.md)), read in the other tense: **declared** here, **touched** there. The dependency shape of the plan — branches, gates, `depends_on` — is read on the plan's own canvas in the Library ([G34](../../../building-studio/graph-detail-page.md)), which every TaskPlan already has. Drawn as `SkillFlow` on [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc). |
+| SK17 | **The skill's detail lives in the drilled-in drawer, with four tabs** — `Playbook` · `Flow` · `Bindings` · `Usage` — and `mainSection` holds what the active tab opens. It is [G33](../../../building-studio/graph-detail-page.md)'s drill-in applied unchanged: the drawer header becomes `‹ SKILLS / Escalate a late supplier` and the Rules drawer keeps its place underneath. The tabs are never a strip inside `mainSection`. |
+| SK18 | **The Flow tab creates and tunes; it does not author library plans.** What a person does here is narrow on purpose: draw the playbook from its prose, inline a standalone plan with `uses` ([LB18](../../workflows/features/the-library.md)), and **set the arguments that make it fit this skill** ([LB19](../../workflows/features/the-library.md)). Authoring a reusable plan is **Library › Plans**' surface ([7.7](../../workflows/features/draft-a-plan.md)), and it is a different act with a different audience — a skill is written for one job, a library plan for every job that resembles it. Keeping them apart is what stops the Flow tab growing into a second plan editor. |
 | SK15 | **`form: human` is the universal fallback**, which is what makes SK13 safe: anything the catalogue cannot express, a person can, so a catalogue gap never blocks publishing a playbook. |
 | SK9 | **The planner asks rather than guesses.** An ambiguous span raises a clarification and writes no plan. Drawing a guess moves a question the planner could ask into a picture a person has to decode. |
 | SK10 | **Ambiguity is a declared condition, not a feeling** — a span matching more than one catalogue entry, or none. Both are checkable, so this never becomes a planner that asks whenever it is unsure. |

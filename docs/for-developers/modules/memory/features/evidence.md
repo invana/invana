@@ -74,6 +74,8 @@ flowchart TD
 | EV3 | Windows are stated, always. |
 | EV4 | Counts, not scores — a score invites optimising the score. |
 | EV5 | Too few runs is said plainly rather than shown as a percentage. |
+| EV6 | **Evidence is a page reached from the Skills drawer, not a `leftNav` item.** It is read *about* an artefact — a skill, a rule, a plan, a criterion — so it opens from the drawer that lists them and from the artefact itself, and the same numbers appear on both. A rail item would make a reading into a place, and the rail is eleven items already ([G39](../../../building-studio/graph-detail-page.md)). Drawn as `Evidence` on [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn). |
+| EV7 | **A gap is read next to what the runs share, never alone.** The number opens the runs, and the panel beside it states what they have in common — *37 of the 40 never matched the trigger* — because the count says something is wrong and only the shared shape says what to change. |
 
 ## Not building
 

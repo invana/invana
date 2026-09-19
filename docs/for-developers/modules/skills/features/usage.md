@@ -65,6 +65,17 @@ flowchart TD
 | Derivation | counted on read from the record; no separate store |
 | Routes | `GET …/skills/{id}/usage` |
 
+## Surfaces, as drawn
+
+On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — reconciled into this file before any of it is built.
+
+| Surface | Shape | Artboard |
+|---|---|---|
+| **Usage** tab | `offered` · `applied` · the gap, for the current version, and how to read it | `SkillUsage` |
+| The page | Four tiles, then per version, by agent, and by outcome — every row opening its runs | `SkillUsage` |
+| Too few runs | Stated as *too few to read* in place of a percentage ([US3](#decisions)) | `SkillUsage` |
+| Self-reported | Said on the surface, not implied away ([US4](#decisions)) | `SkillUsage` |
+
 ## Decisions
 
 | # | Decision |

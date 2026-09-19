@@ -64,6 +64,18 @@ flowchart LR
 | Routes | `POST DELETE …/agents/{id}/skills/{skill_id}` |
 | Events | `agent.skill_bound · skill_unbound` |
 
+## Surfaces, as drawn
+
+On [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — reconciled into this file before any of it is built.
+
+| Surface | Shape | Artboard |
+|---|---|---|
+| **Bindings** tab | Three sections — bound, refused, not bound — each row naming the agent's **world**, not just its name | `SkillBindings` |
+| The page | The agents table with a checkbox per agent, and the two refusals side by side | `SkillBindings` |
+| A refusal | A card naming **which** check failed — the envelope (a `step_key` it may not call) or the lens (a participant its guardrail denies), and the rule ([BN5](#decisions)) | `SkillBindings` |
+| The layer strip | The plan's declared layers as chips, the denied one struck — so the refusal is legible before it is read | `SkillBindings` |
+| At run time | The context assembled in a fixed order as discrete items with ids, and what the step reported back | `SkillOffer` |
+
 ## Decisions
 
 | # | Decision |
