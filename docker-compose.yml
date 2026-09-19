@@ -140,8 +140,13 @@ services:
       JAVA_OPTIONS: "-Xms512m -Xmx1024m"
     volumes:
       - janusgraph-data:/var/lib/janusgraph
+    # `... || exit 0` made this unfailable: the script itself exits 1 every time, so
+    # the container reported healthy unconditionally. The Gremlin port accepting a
+    # connection is the thing worth asserting — it is what the connector suite needs
+    # before it can handshake. This image has no `nc` and serves no HTTP on 8182
+    # (WebSocket only), so the probe is a bash TCP open.
     healthcheck:
-      test: ["CMD-SHELL", "bin/gremlin.sh -e scripts/empty-sample.groovy 2>/dev/null || exit 0"]
+      test: ["CMD-SHELL", "timeout 3 bash -c '</dev/tcp/localhost/8182'"]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -179,8 +184,12 @@ services:
       arcadedb.server.plugins: "GremlinServer:com.arcadedb.server.gremlin.GremlinServerPlugin"
     volumes:
       - arcadedb-data:/home/arcadedb/databases
+    # The image ships no curl — only wget and nc. And "ready" has to mean ready for
+    # what the tests use: the Gremlin plugin on 8182, not just the HTTP API on 2480.
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:2480/api/v1/ready || exit 1"]
+      test:
+        - CMD-SHELL
+        - "wget -q -O- -T3 http://localhost:2480/api/v1/ready >/dev/null 2>&1 && nc -z localhost 8182"
       interval: 10s
       timeout: 5s
       retries: 10
