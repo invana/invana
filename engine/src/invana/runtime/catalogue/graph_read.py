@@ -50,13 +50,23 @@ async def execute_graph_query(ctx: TaskContext, v: RunVars) -> Out:
         raise _query_failure(exc, query=v.query, mode=v.mode) from exc
     v.result = result
     v.query_language = result.query_language
+    # Two digests, not one: the generated query and the one that actually ran
+    # (docs/for-developers/governance.md D3). Equal when no lens applied, so
+    # *the generated query, exactly as executed* stays true by showing both and
+    # saying which ran — rather than by hoping they are the same.
+    digests = result.composed.digests if result.composed else {"generated": _sha(v.query), "executed": _sha(v.query)}
     # One emission carrying the whole result today; ``graph.delta`` batches
     # arrive when the connector streams (docs/for-developers/modules/ask/spec.md build step 8).
     await ctx.emit("result", {"result": result.model_dump(), "message_id": v.assistant_message_id})
     rows = result.row_count
+    detail = f"{rows} row{'' if rows == 1 else 's'} · {result.execution_time_ms}ms"
+    if result.composed is not None and result.composed.rewritten:
+        # The reader is told the lens touched the query, not left to notice that
+        # two digests differ.
+        detail += " · under a lens"
     return Out(
-        detail=f"{rows} row{'' if rows == 1 else 's'} · {result.execution_time_ms}ms",
-        input={"query_sha": _sha(v.query), "timeout_s": v.timeout_s, "parameters": bool(v.parameters)},
+        detail=detail,
+        input={"query": digests, "timeout_s": v.timeout_s, "parameters": bool(v.parameters)},
         output={"rows": rows, "execution_time_ms": result.execution_time_ms, "result_type": result.result_type},
     )
 

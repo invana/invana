@@ -10,7 +10,12 @@ Against a live Gremlin server — no mocks (CLAUDE.md rule 7).
 
 import pytest
 
-from invana.graph.connectors.base.exceptions import QueryErrorCategory, QueryExecutionError
+from invana.graph.connectors.base.exceptions import (
+    LensViolationError,
+    QueryErrorCategory,
+    QueryExecutionError,
+)
+from invana.graph.types.lens import QueryLens, TypeBound
 
 
 @pytest.fixture
@@ -45,6 +50,26 @@ class TestExecuteScript:
         )
 
         assert response.records == [{"value": 30}]
+
+
+class TestALensRefuses:
+    """Gremlin has no governed path, so a lens refuses rather than not applying (CC12)."""
+
+    async def test_a_query_under_a_lens_is_refused_naming_the_language(self, connector):
+        lens = QueryLens(
+            bounds={"Person": TypeBound("Person", declared=frozenset({"name", "age"}), excluded=frozenset({"age"}))}
+        )
+        with pytest.raises(LensViolationError) as caught:
+            await connector.execute("g.V().hasLabel('Person').elementMap()", lens=lens)
+
+        assert caught.value.code == "lens_not_supported"
+        assert "Gremlin" in str(caught.value)
+
+    async def test_a_lens_that_narrows_nothing_does_not_refuse(self, connector, seeded):
+        """The widest lens is the default, and it must not break a Gremlin graph (GV7)."""
+        response = await connector.execute("g.V().hasLabel('Person').count()", lens=QueryLens())
+
+        assert response.records == [{"value": 2}]
 
 
 class TestExecuteRefuses:

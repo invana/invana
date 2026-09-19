@@ -32,6 +32,7 @@ from invana.graph.connectors.base.exceptions import (
     QueryExecutionError,
 )
 from invana.graph.connectors.base.serializers import BaseSerializer
+from invana.graph.connectors.gremlin.lens import GremlinLensCompiler
 from invana.graph.connectors.gremlin.querysets.algorithms import GremlinAlgorithmsQuerySet
 from invana.graph.connectors.gremlin.querysets.bulk import GremlinBulkQuerySet
 from invana.graph.connectors.gremlin.querysets.data_reader import GremlinDataReaderQuerySet
@@ -182,6 +183,17 @@ class GremlinConnector(BaseConnector):
         except Exception:
             return None
         return Version.parse(raw)
+
+    def lens_compiler(self) -> GremlinLensCompiler:
+        """Gremlin has no governed path, so a lens refuses rather than not applying.
+
+        A raw Gremlin query is a **script**, and a script does not parse into a
+        lens — there is no reliable way to find which variable is bound to which
+        type, so there is nothing to compose a predicate onto or project. Refusing
+        is CN6 doing its job; enforcing nothing quietly is the alternative, and it
+        is worse (CC12).
+        """
+        return GremlinLensCompiler()
 
     def message_serializer(self) -> Any:
         """The wire serializer for this vendor, or ``None`` for the driver's default.

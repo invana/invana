@@ -90,6 +90,28 @@ axis the model never declared is refused **naming the model and the axis** rathe
 comes back without it, and the trace shows both queries. **Test against a real database** — this is
 exactly the case CLAUDE.md rule 7 exists for.
 
+### The phases inside P1
+
+| | Lands | Done when | DB |
+|---|---|---|---|
+| **P1.1** ✅ | the contract — `QueryLens` · `TypeBound` · `ComposedQuery` · `LensViolationError` · the compiler seam | imports clean, bands green, nothing else changed | — |
+| **P1.2** ✅ | the Cypher **reader** — mask literals, split clauses at depth 0, bind `var → type`, carry `WITH` aliases | every out-of-subset shape refuses, naming the fragment | — |
+| **P1.3** ✅ | **reject** | an excluded property refuses from a return item, a predicate, an `ORDER BY`, a projection and the inside of an aggregate | — |
+| **P1.4** ✅ | **project** | `RETURN d` comes back a node without the excluded property | live |
+| **P1.5** ✅ | **compose** | a row outside the slice can be neither returned nor counted | live |
+| **P1.6** ✅ | wire + trace — `execute(…, lens=)` · `query_service` · `execute_graph_query` | the trace carries `query.generated` and `query.executed` | live |
+| **P1.7** ✅ | Gremlin refuses under a lens | a raw script can now reach a database, so it is turned away rather than passed ungoverned | live |
+
+**P1.2 and P1.3 are text, and that is where this is easiest to get wrong quietly** — so they are
+proved as text, and P1.4 and P1.5 are proved against Neo4j **and** Memgraph, whose identity functions
+differ. A projection written in the wrong one is a bound that fails open on exactly one vendor.
+
+**P1 has no producer, and that is not an omission.** `lens=` is wired through
+`execute` → `query_service` → `execute_graph_query`, and every caller passes `None` until the `Lens`
+record exists in P2. The enforcement is complete and reachable; what is missing is something to
+enforce. That is what *P1 gates everything* means — and it is why P1 could be finished and proved
+before a single row of `lenses` exists.
+
 ---
 
 ## P2 · The Lens record

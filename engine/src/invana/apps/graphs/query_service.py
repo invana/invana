@@ -34,6 +34,7 @@ from invana.core.events.services import current_trace_id, emit_event
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
+from invana.graph.types.lens import QueryLens
 
 
 class QueryExecutionError(Exception):
@@ -59,13 +60,23 @@ async def execute_query(
     actor_id: str,
     session_id: str | None = None,
     timeout_s: float | None = None,
+    lens: QueryLens | None = None,
 ) -> QueryResponse:
     """Run *query* against *graph*'s live connector and emit the audit event.
 
     ``timeout_s`` is forwarded to the connector as a per-query budget (seconds);
-    ``None`` leaves it unbounded. Does not commit. Raises ``HTTPException`` for
-    config/availability problems, ``QueryExecutionError`` if the connector fails
-    the query.
+    ``None`` leaves it unbounded. ``lens`` bounds what the query may see and is
+    composed into it by the connector before execution (govern/spec.md § 6);
+    ``None`` is the widest, and the query runs byte-identical.
+
+    A ``LensViolationError`` is deliberately **not** caught here. It is not a
+    query that failed — nothing ran — and flattening it into
+    ``QueryExecutionError`` would lose the property and rule that explain it, and
+    tell the reader their query was broken when their world simply does not hold
+    what they asked for.
+
+    Does not commit. Raises ``HTTPException`` for config/availability problems,
+    ``QueryExecutionError`` if the connector fails the query.
     """
     connection, connector = await _resolve_connector(session, graph=graph, manager=manager)
     query_language = _resolve_query_language(connector)
@@ -81,7 +92,7 @@ async def execute_query(
         base_details["session_id"] = session_id
 
     try:
-        graph_response = await connector.execute(query, parameters=parameters, timeout_s=timeout_s)
+        graph_response = await connector.execute(query, parameters=parameters, timeout_s=timeout_s, lens=lens)
     except Exception as exc:
         # Carry the connector's classification through (it's lost once we re-wrap
         # into the service-level error). The raw message + vendor code land in the
@@ -218,7 +229,7 @@ def _build_query_response(graph_response: GraphResponse, query_language: QueryLa
             rows=None,
             execution_time_ms=round(graph_response.metadata.duration_ms),
             row_count=len(graph_response.nodes) + len(graph_response.edges),
-        )
+        ).with_composed(graph_response.metadata.composed)
     return QueryResponse(
         result_type="tabular",
         query_language=query_language.value,
@@ -226,4 +237,4 @@ def _build_query_response(graph_response: GraphResponse, query_language: QueryLa
         rows=graph_response.records,
         execution_time_ms=round(graph_response.metadata.duration_ms),
         row_count=len(graph_response.records),
-    )
+    ).with_composed(graph_response.metadata.composed)

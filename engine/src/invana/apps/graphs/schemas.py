@@ -11,10 +11,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from invana.apps.graphs.models import GraphStatus
 from invana.graph.types.data_elements import GraphResponse
+from invana.graph.types.lens import ComposedQuery
 
 # Slug validation mirrors username: lowercase letters, digits, hyphens; no
 # leading/trailing hyphen. Per docs/for-developers/modules/identity-and-access/spec.md slug is unique per owner.
@@ -209,6 +210,23 @@ class QueryResponse(BaseModel):
     rows: list[dict] | None = None  # raw rows when result_type="tabular"
     execution_time_ms: int
     row_count: int
+
+    # What the lens did, when one applied (the-connector-contract.md CC14).
+    #
+    # It rides here rather than on the result metadata because `data` is None for
+    # a tabular result, so half of all answers would carry no record of their own
+    # rewrite. It is a **private** attribute because its reader is the trace, in
+    # process — the browser has no use for the query text, and the OpenAPI
+    # document is the frontend contract rather than a place internals leak into.
+    _composed: ComposedQuery | None = PrivateAttr(default=None)
+
+    @property
+    def composed(self) -> ComposedQuery | None:
+        return self._composed
+
+    def with_composed(self, composed: ComposedQuery | None) -> QueryResponse:
+        self._composed = composed
+        return self
 
 
 class ContentionRead(BaseModel):

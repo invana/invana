@@ -14,6 +14,7 @@ from invana.graph.connectors.base.exceptions import (
     QueryExecutionError,
 )
 from invana.graph.connectors.base.serializers import BaseSerializer
+from invana.graph.connectors.cypher.lens import CypherLensCompiler
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 from invana.graph.connectors.cypher.querysets.algorithms import OpenCypherAlgorithmsQuerySet
 from invana.graph.connectors.cypher.querysets.bulk import OpenCypherBulkQuerySet
@@ -130,6 +131,11 @@ class OpenCypherConnector(BaseConnector):
     #: names it here, rather than every queryset reaching for one fixed class
     #: (docs/for-developers/modules/graph-connectors/features/languages.md LG10).
     query_builder: ClassVar[type[OpenCypherQueryBuilder]] = OpenCypherQueryBuilder
+
+    def lens_compiler(self) -> CypherLensCompiler:
+        """Built with **this connection's** builder, so the projection it writes
+        uses the same identity function every other query here uses (LG10)."""
+        return CypherLensCompiler(self.query_builder)
 
     def classify_error(self, code: str | None, message: str) -> str:
         """Bucket a failed query into a :class:`QueryErrorCategory`.

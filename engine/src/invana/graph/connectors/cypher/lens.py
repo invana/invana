@@ -67,6 +67,8 @@ _LABEL_RE = re.compile(r":\s*(" + _IDENT + r")")
 _AS_RE = re.compile(r"\s+AS\s+(" + _IDENT + r")\s*$", re.IGNORECASE)
 _DISTINCT_RE = re.compile(r"^\s*DISTINCT\s+", re.IGNORECASE)
 _BAG_RE = re.compile(r"\b(properties|keys|elementMap)\s*\(\s*(" + _IDENT + r")\s*\)", re.IGNORECASE)
+# An explicit map projection: ``d { .name, .stage }``.
+_PROJECTION_RE = re.compile(r"\b" + _IDENT + r"\s*\{[^{}]*\}")
 
 # Functions that may take a governed element whole without leaking a property
 # value: they return an identity, a count or a type, never the property bag.
@@ -224,6 +226,10 @@ class CypherLensCompiler(LensCompiler):
         composed: list[str] = []
         pending: list[str] = []
         counter = _LensParams()
+        # Readability complaints are held until after rejection: a query naming an
+        # excluded property is refused for *that*, with the property named, rather
+        # than for the shape that also happens to be unreadable (CC16).
+        deferred: list[tuple[str, str]] = []
 
         for clause in clauses:
             if clause.keyword in _UNREADABLE_CLAUSES:
@@ -253,11 +259,13 @@ class CypherLensCompiler(LensCompiler):
                 composed.extend(composed_vars)
                 pending = []
             if clause.keyword == "WITH":
-                self._carry_aliases(masked, clause, depth, bindings)
+                self._carry_aliases(masked, clause, depth, bindings, deferred)
             elif clause.keyword == "RETURN":
-                projected.extend(self._project(masked, clause, depth, bindings, edits))
+                projected.extend(self._project(masked, clause, depth, bindings, edits, deferred))
 
         self._reject_properties(masked, bindings)
+        for why, fragment in deferred:
+            self._unreadable(why, fragment)
 
         if pending:  # pragma: no cover — a read query always reaches a RETURN
             self._unreadable("the lens narrows a type the query never returns through", ", ".join(pending))
@@ -404,6 +412,7 @@ class CypherLensCompiler(LensCompiler):
         clause: _Clause,
         depth: list[int],
         bindings: dict[str, _Binding],
+        deferred: list[tuple[str, str]],
     ) -> None:
         for start, end in _split_items(masked, clause.body_start, clause.end, depth):
             expr, alias = self._item(masked, start, end)
@@ -417,7 +426,7 @@ class CypherLensCompiler(LensCompiler):
                         is_node=bindings[var].is_node,
                     )
                 continue
-            self._assert_no_whole_element(expr, bindings, masked[start:end].strip())
+            self._check_no_whole_element(expr, bindings, masked[start:end].strip(), deferred)
 
     def _project(
         self,
@@ -426,6 +435,7 @@ class CypherLensCompiler(LensCompiler):
         depth: list[int],
         bindings: dict[str, _Binding],
         edits: list[tuple[int, int, str]],
+        deferred: list[tuple[str, str]],
     ) -> list[str]:
         body_start = clause.body_start
         stripped = _DISTINCT_RE.match(masked[body_start : clause.end])
@@ -442,7 +452,7 @@ class CypherLensCompiler(LensCompiler):
             var = expr.strip()
             binding = bindings.get(var)
             if binding is None:
-                self._assert_no_whole_element(expr, bindings, masked[start:end].strip())
+                self._check_no_whole_element(expr, bindings, masked[start:end].strip(), deferred)
                 continue
             if not binding.bound.narrows_structure:
                 continue
@@ -457,20 +467,36 @@ class CypherLensCompiler(LensCompiler):
             return text[: m.start()], m.group(1)
         return text, None
 
-    def _assert_no_whole_element(self, expr: str, bindings: dict[str, _Binding], fragment: str) -> None:
-        """A governed element may be counted or identified, never carried whole."""
-        residue = _PROP_RE.sub(" ", expr)
+    def _check_no_whole_element(
+        self,
+        expr: str,
+        bindings: dict[str, _Binding],
+        fragment: str,
+        deferred: list[tuple[str, str]],
+    ) -> None:
+        """A governed element may be counted, identified or projected — never carried whole.
+
+        The complaint is *deferred* rather than raised: a query that also names an
+        excluded property should be refused for naming it (CC16), and that check
+        needs every binding, so it cannot run until the walk is done.
+        """
+        # An explicit map projection — ``d { .name }`` — already names what it takes,
+        # and the reject pass has already checked those keys. It is not carrying `d`.
+        residue = _PROJECTION_RE.sub(" ", _PROP_RE.sub(" ", expr))
         for var in bindings:
             for m in re.finditer(r"\b" + re.escape(var) + r"\b", residue):
                 before = residue[: m.start()].rstrip()
                 fn = re.search(r"(" + _IDENT + r")\s*\(\s*(?:DISTINCT\s+)?$", before, re.IGNORECASE)
                 if fn and fn.group(1).lower() in _SCALAR_OVER_ELEMENT:
                     continue
-                self._unreadable(
-                    f"`{fragment}` carries `{var}` whole past the lens, where the properties this "
-                    "world excludes would travel with it",
-                    fragment,
+                deferred.append(
+                    (
+                        f"`{fragment}` carries `{var}` whole past the lens, where the properties this "
+                        "world excludes would travel with it",
+                        fragment,
+                    )
                 )
+                return
 
     def _element_map(self, binding: _Binding) -> str:
         """The permitted set, in the serializer's own element shape (CC13).

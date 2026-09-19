@@ -9,6 +9,7 @@ from typing import Any, ClassVar
 
 from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 from invana.graph.connectors.base.exceptions import ConnectionError
+from invana.graph.connectors.base.lens import LensCompiler, UnsupportedLensCompiler
 from invana.graph.connectors.base.querysets.algorithms import BaseAlgorithmsQuerySet
 from invana.graph.connectors.base.querysets.bulk import BaseBulkQuerySet
 from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
@@ -24,6 +25,7 @@ from invana.graph.types.capabilities import (
 )
 from invana.graph.types.constants import Capability, PropertyType
 from invana.graph.types.data_elements import GraphResponse
+from invana.graph.types.lens import ComposedQuery, QueryLens
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
 # docs/for-developers/modules/platform/features/telemetry.md). Core
@@ -145,13 +147,36 @@ class BaseConnector(ABC):
         profile = type(self)._capability_profile
         return profile.family.value if profile is not None else "unknown"
 
+    def lens_compiler(self) -> LensCompiler:
+        """The compiler that folds a lens into this connector's language.
+
+        Per **language**, never per vendor (CC9), so an integration inherits
+        enforcement and overrides nothing. The base has no language, so it
+        refuses — a lens that silently enforced nothing is the one outcome a
+        bound may not have (CN6).
+        """
+        return UnsupportedLensCompiler()
+
     async def execute(
-        self, query: str, parameters: dict | None = None, *, timeout_s: float | None = None
+        self,
+        query: str,
+        parameters: dict | None = None,
+        *,
+        timeout_s: float | None = None,
+        lens: QueryLens | None = None,
     ) -> GraphResponse:
         """Execute a query and return a fully deserialised GraphResponse.
 
         ``timeout_s`` is forwarded to the vendor driver as a per-query timeout
         (seconds); ``None`` leaves it unbounded.
+
+        ``lens`` bounds what this query may see (govern/spec.md). It is composed
+        into the query **before** execution and the projection is rewritten to
+        the permitted properties — never filtered out of the rows that came back,
+        which would leave the counts, the aggregates and the schema outside the
+        bound (CN8). Both queries ride back on ``metadata.composed`` so the
+        rewrite is visible rather than silent. ``None`` is the widest, and the
+        query executes byte-identical (GV7).
 
         Split into two child spans (docs/for-developers/modules/platform/features/telemetry.md) so the trace separates
         the raw
@@ -166,6 +191,15 @@ class BaseConnector(ABC):
         # studio shows "0ms" (docs/for-developers/modules/platform/features/telemetry.md). Measure the raw execute only
         # — serialise
         # is our own work and traced separately by the spans below.
+        # Refused here, before the wire and before anything is counted as in
+        # flight: a lens violation is not a query that failed, it is a query that
+        # never ran.
+        composed = (
+            ComposedQuery.unchanged(query, parameters)
+            if lens is None
+            else self.lens_compiler().compile(query, parameters, lens)
+        )
+
         language = self._query_language_label()
         backend = type(self).__name__
         add_graph_query_in_flight(1, language=language, backend=backend)
@@ -173,7 +207,7 @@ class BaseConnector(ABC):
         try:
             with _query_span("graph.query.db_execute") as span:
                 try:
-                    raw = await self._execute_raw(query, parameters, timeout_s=timeout_s)
+                    raw = await self._execute_raw(composed.executed, composed.parameters, timeout_s=timeout_s)
                 except Exception as exc:
                     # The span otherwise closes "ok" even though the driver round-trip
                     # failed — record the real error here so it's visible in OTel.
@@ -192,6 +226,7 @@ class BaseConnector(ABC):
             with _query_span("graph.query.serialize") as span:
                 response = self._serializer.deserialize_graph_response(raw)
                 response.metadata.duration_ms = duration_ms
+                response.metadata.composed = composed
                 node_count = len(response.nodes)
                 edge_count = len(response.edges)
                 if span is not None:

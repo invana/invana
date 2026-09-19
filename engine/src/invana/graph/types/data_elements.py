@@ -6,7 +6,9 @@ return types across every connector implementation.
 
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
+
+from invana.graph.types.lens import ComposedQuery
 
 
 class Vertex(BaseModel):
@@ -71,6 +73,25 @@ class ResultMetadata(BaseModel):
     record_count: int = 0
     duration_ms: float = 0.0
     query: str | None = None
+
+    # What the lens did to the query, when one applied — both queries and their
+    # digests, so the rewrite is visible rather than silent
+    # (the-connector-contract.md CC14). ``None`` means no lens.
+    #
+    # **Private**, because this model is serialised to the browser inside
+    # ``GraphResponse`` and the OpenAPI document is the frontend contract. The
+    # reader of these digests is the trace, in process. A lens showing up in
+    # Studio is a decision for the Govern panels to make deliberately, not one
+    # that leaks in behind a field.
+    _composed: ComposedQuery | None = PrivateAttr(default=None)
+
+    @property
+    def composed(self) -> ComposedQuery | None:
+        return self._composed
+
+    @composed.setter
+    def composed(self, value: ComposedQuery | None) -> None:
+        self._composed = value
 
 
 class GraphResponse(BaseModel):

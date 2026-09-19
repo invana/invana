@@ -95,8 +95,9 @@ outside it is refused — which is what makes a reader sufficient where a full g
 | Every variable-binding node or relationship pattern names at least one type | `MATCH (n) RETURN n` — an unbounded binding cannot be governed |
 | Every property access is literal — `d.revenue`, `d { .revenue }` | `d[$key]` — a property the compiler cannot name it cannot exclude |
 | No whole-property-bag function over a governed binding | `properties(d)` · `keys(d)` · `elementMap(d)` — the bag is the hole the projection closes |
+| A governed element may be **counted or identified** whole — `count` · `id` · `elementId` · `labels` · `type` | `collect(d)` · `avg(d)` — these carry the element, not a fact about it |
 | `RETURN` names its items | `RETURN *` — it returns bindings the compiler was never shown |
-| A `WITH` item touching a governed binding is that binding, or a bare alias of it | `WITH collect(d) AS ds` — the whole node survives inside the list |
+| A `WITH` item touching a governed binding is that binding, a bare alias of it, or an explicit projection | `WITH collect(d) AS ds` — the whole node survives inside the list |
 | An `OPTIONAL MATCH` binds nothing the lens narrows extensionally | a composed predicate would make the optional match required, which changes the answer |
 | Gremlin arrives as a traversal | a raw Gremlin script does not parse into a lens ([CC12](#decisions)) |
 
@@ -128,8 +129,11 @@ string is text and not a reference — the same treatment the read-only check al
 | Vendor hooks | `message_serializer()` · `query_builder` · `coerce_id()` · `classify_error()` · the serializer's `coerce_element_id()` — five named seams, so a vendor difference is a line, not a fork |
 | The contract | `graph/types/lens.py` — `QueryLens` · `TypeBound` · `ComposedQuery` |
 | The compilers | `graph/connectors/base/lens.py` (the seam) · `cypher/lens.py` · `gremlin/lens.py` |
+| The identity function | read from the connection's own `query_builder.ELEMENT_ID` ([LG10](languages.md)) — a hardcoded `elementId()` is invalid Cypher on Memgraph, i.e. a bound failing **open** on exactly one vendor |
 | The refusal | `graph/connectors/base/exceptions.py` — `LensViolationError(code, type, property)` |
-| Entry point | `BaseConnector.execute(query, parameters, *, timeout_s, lens=None)` |
+| Entry point | `BaseConnector.execute(query, parameters, *, timeout_s, lens=None)` — the one door ([CC18](#decisions)) |
+| The compiler per language | `BaseConnector.lens_compiler()` — `CypherLensCompiler(self.query_builder)` · `GremlinLensCompiler` (refuses) · `UnsupportedLensCompiler` at the base |
+| The trace | `execute_graph_query` records `query: {generated, executed}`; the step reads *… · under a lens* when they differ |
 | Tests | a shared conformance suite every integration runs against a live database |
 
 ### `QueryLens` — what the connector is handed
@@ -180,6 +184,11 @@ connector is its own vocabulary: a type, its properties, and a predicate over th
 | CC12 | **Gremlin enforces on the traversal, not on a script.** Bytecode composes — `.has()` and `.valueMap(keys)` are steps, not string surgery. A raw Gremlin script under a lens is refused, which costs nothing: the base Gremlin connector has no raw-script path. |
 | CC13 | **A governed node stays a node.** The rewritten projection is emitted in the serializer's own node and relationship shape — `element_id` · `labels` · `properties`, and `type` · `start_node_element_id` · `end_node_element_id` — so the canvas, the emissions and the table see what they always saw, minus the excluded keys. Returning a bare map would make every lens silently retype a graph answer as a table. |
 | CC14 | **The rewrite is recorded, never silent.** `execute` returns `query.generated` and `query.executed` as two digests and the trace carries both. *The generated query, exactly as executed* stays true by showing both and saying which ran. |
+| CC18 | **`execute(query, …, lens=None)` is the seam.** One door, the same one an ungoverned query uses — so there is no second path a caller could take to reach the database without the lens, and no caller assembling a rewrite itself. |
+| CC19 | **The digests are internal.** Both queries ride back on the result, but as a **private** attribute: the reader is the trace, in process. `ResultMetadata` is serialised to the browser inside `GraphResponse`, and the OpenAPI document is the frontend contract — a lens appearing in Studio is a decision the Govern panels make deliberately, not one that leaks in behind a field. |
+| CC20 | **A refusal is not a failed query.** `LensViolationError` is never flattened into `QueryExecutionError`: nothing ran, and the property and rule that explain it would be lost. Telling a reader their query was broken, when their world simply does not hold what they asked for, is the wrong sentence. |
+| CC16 | **A named exclusion outranks an unreadable shape.** `collect(d)` is outside the readable subset *and* may name an excluded property; the refusal says *this world does not carry Deal.revenue*, not *this shape cannot be read*. One tells the reader what to change. So readability complaints are held until the whole query has been read and rejection has had its turn. |
+| CC17 | **An explicit map projection is a projection, not the element carried whole.** `d { .name }` already names what it takes, and its keys have been checked — rewriting it again, or refusing it, would punish the one query shape that was already doing the right thing. |
 | CC15 | **The predicate is composed at a `WITH * WHERE` barrier**, inserted after the clauses that bind a governed variable. It is a clause boundary the compiler can find without a grammar, it cannot be swallowed by an existing `WHERE` expression it failed to parse the end of, and it composes with itself when several blocks bind several types. |
 
 ## Not building
