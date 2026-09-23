@@ -8,7 +8,7 @@ these. If a word is not here, it is not ours.
 **A feature is named for what a person does. A term is named for what the thing is.** Two registers,
 and the index gets the verb.
 
-`The roster` named the table an agent lands in. `Bindings` named the join row. `Envelope validation`
+`The roster` named the table an agent lands in — a word the product no longer uses at all ([AG12](modules/agents/features/author-an-agent.md)). `Bindings` named the join row. `Envelope validation`
 named the check. Every one of them had the plain words sitting right beside it in its own description
 column — *"Author an agent"*, *"Which agent may be offered which skill"* — so the index said the
 implementation and the description said the product.
@@ -17,9 +17,9 @@ implementation and the description said the product.
 |---|---|
 | The name is a **verb phrase** | *Author an agent* · *Bring data in* · *Offer a skill to an agent* · *Promote a plan*. If it reads as a noun, it is probably the table |
 | Or a **plain statement of the moment** | *When it cannot answer* · *Inspect what landed* · *How many run at once*. These are fine: they name a situation a person is in, not an object |
-| The **object keeps its noun here** | Envelope, budget, binding, lineage, roster, library, projection, emission are all real things with precise meanings. They live in this file and in the code. They are just not what the feature is *called* |
+| The **object keeps its noun here** | Envelope, budget, binding, lineage, library, projection, emission are all real things with precise meanings. They live in this file and in the code. They are just not what the feature is *called* |
 | A **defined term may keep its name** | where the noun *is* the concept and renaming it would cost precision — `Rules`, `Projections`, `Delegation`, `Stitch models`. Plainness never buys vagueness |
-| **File paths do not follow** | a rename changes display names only. `the-roster.md` still holds *Author an agent*; a slug is not read by anyone and moving it breaks every link that points at it |
+| **A path follows only when the word goes** | a rename changes display names, and the slug stays: nobody reads it, and moving it breaks every link that points at it. It moves only when the product stops using the word altogether, as *roster* did ([AG12](modules/agents/features/author-an-agent.md)) — and then every link is fixed in the same commit |
 
 ## 1. The overloaded word
 

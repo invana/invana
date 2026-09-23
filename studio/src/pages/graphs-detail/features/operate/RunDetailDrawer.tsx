@@ -1,56 +1,64 @@
 /**
- * A run, read end to end in the drawer — **version C** ([§3b](../../../../../docs/for-developers/building-studio/graph-detail-page.md)).
+ * A run, read in the drawer — **five sections and two ways out**
+ * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
- * Three bands, and nothing else is needed to read a run:
- *
- * | Band | Answers |
+ * | Section | Answers |
  * |---|---|
- * | `Stats` | *what happened* — written, reported, duration, retries, lanes, cost |
- * | `Performance` | *where did the time go* — the Gantt, one row per Task on the run's own clock |
- * | `Log` | *why* — live, tailing, filterable by task and level, taking the height that is left |
+ * | `The run` | what ran — plan, agent, lens, who opened it, how long |
+ * | `What it cost` | spend against its ceiling, tokens, and the time it spent waiting rather than working |
+ * | `What it touched` | one line per layer; a refusal struck, a layer nothing reached for dimmed |
+ * | `Bounds reached` | each bounded repetition against its ceiling |
+ * | `Refused` | every address a guardrail said no to, and why |
  *
- * **A run in flight and a run that finished are the same three bands** (SR16).
- * The Gantt grows a *now* line and an unfilled bar, Stats climb, the log tails,
- * and the foot offers `Cancel` while the run is non-terminal — there is no
- * separate live view to build or to keep honest.
- *
- * **Picking a Task filters the log to it** (SR15). A Gantt row and a log line
- * are the same Task seen twice, and they say the same word for it because the
- * engine stamps each line with the `task_key` its trace gave the step — so the
- * debugging loop (*which one was slow → what did it say*) never leaves the
- * column.
- *
- * **And it stays an overview.** The task table, the flow, the full log, what
- * landed and `result.json` are `More`, and `More` opens the **run dashboard**
- * as a page (SR13 · SR36) — a panel that tried to be the dashboard would be a
- * dashboard in 420px.
+ * **It stays an overview.** Where the time went, step by step, is the run
+ * page's `In order` and `Layers` readings (SR46) — a Gantt in 420px was a
+ * dashboard squeezed into a drawer. `Open the answer` opens that page;
+ * `Compare with the plan` draws the plan it ran in `mainSection`, beside the
+ * run, which stays open here.
  */
 
-import { formatDuration } from "@/lib/time";
-import { runsApi } from "@/services/api/runs";
-import type { RunNode } from "@/types/run";
+import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
+import { useAgentsQuery } from "@/hooks/queries/useWork";
 import {
+	isLive,
+	toneOf,
+} from "@/pages/graphs-detail/features/operate/dashboards/shared";
+import { useRunTrace } from "@/pages/graphs-detail/features/operate/dashboards/useRunTrace";
+import {
+	type SummaryRow,
+	planKeyOf,
+	runSummary,
+} from "@/pages/graphs-detail/features/operate/runSummary";
+import { LAYER_PALETTE } from "@/ui/layerPalette";
+import {
+	AddressChip,
+	Badge,
 	Button,
+	ClampedText,
 	Eyebrow,
-	MetricGrid,
-	MetricTile,
+	PropertyList,
+	PropertyRow,
+	RecordHeader,
 	Spinner,
-	TaskGantt,
-	type TaskGanttStatus,
-	type TaskGanttTask,
+	TouchStrip,
 } from "@invana/ui";
-import { useQuery } from "@tanstack/react-query";
-import { LayoutDashboard } from "lucide-react";
-import { useMemo, useState } from "react";
-
-const LIVE_STATUSES = new Set(["queued", "running"]);
+import type { ReactNode } from "react";
 
 export interface RunDetailDrawerProps {
 	username: string;
 	graphSlug: string;
 	runId: string;
-	/** `More` — opens this run's dashboard as a page (SR13). */
+	/** `Open the answer` — opens this run's page (SR13). */
 	onOpenDashboard?: (runId: string) => void;
+	/** The lens row — opens that world or guardrail in Govern, in `leftSection`. */
+	onOpenLens?: (lens: { id: string; kind: "world" | "guardrail" }) => void;
+	/** `Compare with the plan` — draws the Library plan this run ran in `mainSection`. */
+	onOpenPlan?: (planKey: string) => void;
+}
+
+/** `run:7d3184f1` — the last eight characters, as every crumb addresses a run (SR54). */
+export function runAddress(runId: string): string {
+	return `run:${runId.slice(-8)}`;
 }
 
 export function RunDetailDrawer({
@@ -58,71 +66,12 @@ export function RunDetailDrawer({
 	graphSlug,
 	runId,
 	onOpenDashboard,
+	onOpenPlan,
+	onOpenLens,
 }: RunDetailDrawerProps) {
-	// **One detail for every kind of run.** There used to be two, chosen by
-	// looking the id up in the journal, because an import job id and a run id
-	// looked alike and only the row knew which was which. There is one record
-	// now, so there is nothing to discriminate
-	// (task-model-migration.md § 6.7).
-	return (
-		<RunDetail
-			username={username}
-			graphSlug={graphSlug}
-			id={runId}
-			onOpenDashboard={onOpenDashboard}
-		/>
-	);
-}
-
-/**
- * One run — its stats and where the time went.
- *
- * **No Log band and no Reported band yet.** A run's lines go to `run_logs`
- * (LD17) and a load's rejections are `snapshot_model`'s grouped report, and
- * neither is on `/runs/{id}` — SR17's `result.json` is what exposes them, and
- * it arrives with S4. What a reader comes here for now is *which Tasks ran and
- * where the time went*, and that is the Gantt, which reads the same trace for
- * every kind of run (SR21).
- */
-function RunDetail({
-	username,
-	graphSlug,
-	id,
-	onOpenDashboard,
-}: {
-	username: string;
-	graphSlug: string;
-	id: string;
-	onOpenDashboard?: (runId: string) => void;
-}) {
-	const trace = useQuery({
-		queryKey: ["runs", username, graphSlug, id] as const,
-		queryFn: () => runsApi.get(username, graphSlug, id),
-	});
-	const [task, setTask] = useState<string | null>(null);
-	const steps = trace.data?.steps ?? [];
-	const live = LIVE_STATUSES.has(trace.data?.status ?? "");
-
-	const tasks: TaskGanttTask[] = useMemo(
-		() =>
-			steps.map((s) => ({
-				key: s.taskKey,
-				label: s.label || s.taskKey,
-				status: s.status as TaskGanttStatus,
-				startedAt: s.startedAt,
-				finishedAt: s.finishedAt,
-				log: s.detail || undefined,
-				result: s.output,
-				error: s.error
-					? {
-							code: s.error.cls,
-							message: s.error.message,
-							detail: s.error.cause,
-						}
-					: undefined,
-			})),
-		[steps],
-	);
+	const trace = useRunTrace(username, graphSlug, runId);
+	const touches = useRunTouchesQuery(username, graphSlug, runId);
+	const agents = useAgentsQuery(username, graphSlug).data?.items ?? [];
 
 	if (trace.isLoading) {
 		return (
@@ -133,112 +82,172 @@ function RunDetail({
 	}
 	if (!trace.data) {
 		return (
-			<p className="p-4 text-sm text-muted-foreground">
+			<p className="p-4 text-muted-foreground">
 				This run's trace has been pruned.
 			</p>
 		);
 	}
 
-	const done = steps.filter((s) => s.finishedAt).length;
-	const retried = steps.filter((s) => s.attempt > 1);
-	const first = steps.find((s) => s.startedAt)?.startedAt ?? null;
-	const last =
-		[...steps].reverse().find((s) => s.finishedAt)?.finishedAt ?? null;
-	const ms = durationMs(first, last);
+	const t = trace.data;
+	const agentName = agents.find((a) => a.id === t.agent_id)?.name;
+	const s = runSummary(t, touches.data, agentName);
+	const planKey = planKeyOf(t);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="shrink-0 border-b p-3">
-				<Eyebrow>Stats</Eyebrow>
-				<MetricGrid minTileWidth={110} className="mt-1.5">
-					<MetricTile
-						label="Tasks"
-						value={steps.length}
-						caption={`${done} finished`}
-					/>
-					<MetricTile
-						label="Duration"
-						value={ms == null ? "—" : formatDuration(ms)}
-						caption={trace.data.status}
-					/>
-					<MetricTile
-						label="Retries"
-						value={retried.length}
-						caption={retried.length ? retried[0].taskKey : "none"}
-					/>
-					<MetricTile
-						label="Cost"
-						value={tokensOf(steps) ? "—" : "$0.00"}
-						caption={tokensOf(steps) ? "tokens only" : "no llm"}
-					/>
-				</MetricGrid>
-			</div>
+			<RecordHeader
+				tone={toneOf(t.status)}
+				crumbs={[runAddress(t.run_id)]}
+				chips={
+					<>
+						<Badge variant="outline" tone="muted" size="sm">
+							{t.status}
+						</Badge>
+						{s.work ? (
+							<Badge variant="outline" tone="muted" size="sm">
+								{s.work}
+							</Badge>
+						) : null}
+					</>
+				}
+			/>
 
-			<div className="min-h-0 flex-1 overflow-y-auto p-3">
-				<Eyebrow aside={performanceAside(steps, task)}>Performance</Eyebrow>
-				{tasks.length ? (
-					<TaskGantt
-						className="mt-1.5"
-						tasks={tasks}
-						origin={first ?? undefined}
-						density="compact"
-						labelWidth={112}
-						nowMs={live ? Date.now() : undefined}
-						openEnded={live}
-						selectedKey={task}
-						onSelectTask={(key) => setTask((c) => (c === key ? null : key))}
-					/>
-				) : (
-					<p className="mt-1.5 text-sm text-muted-foreground">
-						No Tasks recorded for this run.
-					</p>
-				)}
-			</div>
+			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
+				<Rows title="The run" rows={s.theRun} onOpenLens={onOpenLens} />
+				{s.cost.length ? <Rows title="What it cost" rows={s.cost} /> : null}
 
-			{onOpenDashboard ? (
-				<div className="shrink-0 border-t p-2">
-					<Button
-						variant="outline"
-						size="sm"
-						className="w-full"
-						onClick={() => onOpenDashboard(id)}
+				{s.touched.length ? (
+					<Section
+						title="What it touched"
+						aside={
+							s.refusedCount ? (
+								<span className="text-destructive">
+									{s.refusedCount} refused
+								</span>
+							) : undefined
+						}
 					>
-						<LayoutDashboard className="h-4 w-4" />
-						More
-					</Button>
+						{touches.isLoading ? (
+							<Spinner />
+						) : (
+							<TouchStrip
+								orientation="column"
+								palette={LAYER_PALETTE}
+								items={s.touched}
+							/>
+						)}
+					</Section>
+				) : null}
+
+				{s.bounds.length ? (
+					<Rows
+						title="Bounds reached"
+						aside={s.boundsAside ?? undefined}
+						rows={s.bounds}
+					/>
+				) : null}
+
+				{s.refused.length ? (
+					<Section title="Refused">
+						{s.refused.map((r) => (
+							<div key={r.address} className="flex flex-col gap-1">
+								<AddressChip address={r.address} tone="refused" />
+								<p className="text-muted-foreground">{r.why}</p>
+							</div>
+						))}
+					</Section>
+				) : null}
+			</div>
+
+			{onOpenDashboard || (onOpenPlan && planKey) ? (
+				<div className="flex shrink-0 gap-2 border-t px-4 py-2.5">
+					{onOpenDashboard ? (
+						<Button onClick={() => onOpenDashboard(runId)}>
+							{isLive(t.status) ? "Follow the run" : "Open the answer"}
+						</Button>
+					) : null}
+					{onOpenPlan && planKey ? (
+						<Button variant="outline" onClick={() => onOpenPlan(planKey)}>
+							Compare with the plan
+						</Button>
+					) : null}
 				</div>
 			) : null}
 		</div>
 	);
 }
 
-function performanceAside(steps: RunNode[], selected: string | null) {
-	if (selected) {
-		const slowest = [...steps]
-			.map((t) => [t, durationMs(t.startedAt, t.finishedAt) ?? -1] as const)
-			.sort((a, b) => b[1] - a[1])[0];
-		if (!slowest || slowest[1] < 0) return undefined;
-		return `slowest ${slowest[0].taskKey} · ${formatDuration(slowest[1])}`;
+function Section({
+	title,
+	aside,
+	children,
+}: {
+	title: string;
+	aside?: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<section className="flex flex-col gap-1.5">
+			<Eyebrow aside={aside}>{title}</Eyebrow>
+			{children}
+		</section>
+	);
+}
+
+function Rows({
+	title,
+	aside,
+	rows,
+	onOpenLens,
+}: {
+	title: string;
+	aside?: ReactNode;
+	rows: SummaryRow[];
+	onOpenLens?: RunDetailDrawerProps["onOpenLens"];
+}) {
+	return (
+		<Section title={title} aside={aside}>
+			<PropertyList labelWidth={112}>
+				{rows.map((r) => (
+					<PropertyRow
+						key={r.label}
+						label={r.label}
+						mono={r.kind !== undefined || r.label !== "asked"}
+					>
+						<RowValue row={r} onOpenLens={onOpenLens} />
+					</PropertyRow>
+				))}
+			</PropertyList>
+		</Section>
+	);
+}
+
+function RowValue({
+	row,
+	onOpenLens,
+}: {
+	row: SummaryRow;
+	onOpenLens?: RunDetailDrawerProps["onOpenLens"];
+}) {
+	if (row.kind === "query") {
+		// A query is read, not skimmed — clamped to three lines, whole on `more`.
+		return (
+			<ClampedText lines={3} className="whitespace-pre-wrap break-words">
+				{row.value}
+			</ClampedText>
+		);
 	}
-	const retried = steps.filter((t) => t.attempt > 1).length;
-	const never = steps.filter((t) => t.status === "stopped").length;
-	const parts = [
-		retried ? `${retried} retried` : null,
-		never ? `${never} never ran` : null,
-	].filter(Boolean);
-	return parts.length ? parts.join(" · ") : undefined;
-}
-
-function durationMs(
-	from: string | Date | null | undefined,
-	to: string | Date | null | undefined,
-): number | null {
-	if (!from) return null;
-	const a = new Date(from).getTime();
-	const b = to ? new Date(to).getTime() : Date.now();
-	return Number.isFinite(a) && Number.isFinite(b) ? b - a : null;
-}
-
-function tokensOf(steps: RunNode[]): number {
-	return steps.reduce((n, s) => n + (s.tokensIn ?? 0) + (s.tokensOut ?? 0), 0);
+	if (row.kind === "lens" && row.lens && onOpenLens) {
+		const lens = row.lens;
+		return (
+			<Button
+				variant="link"
+				className="h-auto p-0 font-mono"
+				onClick={() => onOpenLens(lens)}
+			>
+				{row.value}
+			</Button>
+		);
+	}
+	return <>{row.value}</>;
 }

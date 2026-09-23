@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from invana.apps.modeller.models import GraphVersion
 from invana.apps.modeller.schemas import (
     ConstraintCreate,
+    DeclaredAxes,
     EdgeTypeCreate,
     IndexCreate,
     NodeTypeCreate,
@@ -147,6 +148,7 @@ class SchemaExporter:
             schema_description=schema_description,
             validation_mode=validation_mode,
             version=version.version,
+            axes=DeclaredAxes(**copy.deepcopy(version.axes or {})),
             property_keys=property_keys,
             node_types=node_types,
             edge_types=edge_types,
@@ -178,6 +180,8 @@ class SchemaImporter:
         Returns the new version ID.
         """
         version = await self._store.create_version(session, model_id=model_id)
+        _check_axes(data)
+        version.axes = data.axes.model_dump(mode="json", exclude_defaults=True)
 
         # Import property keys first (node/edge types reference them by name)
         for pk_data in data.property_keys:
@@ -261,3 +265,28 @@ class SchemaImporter:
             )
 
         return version.id
+
+
+def _check_axes(data: SchemaExport) -> None:
+    """An axis must name a property this version actually has.
+
+    A declaration that names nothing is worse than no declaration: the model
+    reads as sliceable, a world is authored against it, and the narrowing
+    silently matches no rows. Refused at import, naming the axis and the
+    property — the same shape of refusal a world gets when it asks for an axis
+    that was never declared
+    (docs/for-developers/modules/govern/spec.md GV14).
+    """
+    known = {pk.name for pk in data.property_keys}
+    if not known:
+        return
+
+    missing: list[str] = []
+    for axis in ("time", "geo"):
+        prop = getattr(data.axes, axis).get("property")
+        if prop and prop not in known:
+            missing.append(f"{axis} names {prop!r}")
+    missing.extend(f"dims names {name!r}" for name in data.axes.dims if name not in known)
+
+    if missing:
+        raise ValueError(f"{data.schema_name} declares axes over properties it does not have: {', '.join(missing)}.")

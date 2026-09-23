@@ -230,7 +230,7 @@ insert.
 
 ## 5. The kind registry
 
-**`kind` is one flat axis of nine values, and `renders` is a column of the registry, not of the
+**`kind` is one flat axis of thirteen values, and `renders` is a column of the registry, not of the
 table.** `canvasKinds.ts` already works this way — it is a table of kinds where each row declares
 its traits (`writesFromGesture`, `hasLayers`, `panel`, `footer`, what the nodes and edges stand for).
 `renders` is one more trait. The file becomes `boardKinds.ts`, the type becomes `BoardKind`, and the
@@ -247,11 +247,22 @@ six rows that exist today are unchanged.
 | `run` | `dashboard` | a root `task_runs.id` | panels, from the closed set | [Operate](../modules/operate/spec.md) |
 | `task_run` | `dashboard` | a child `task_runs.id` | panels | Operate |
 | `plan_runs` | `dashboard` | a `task_plans.id` | panels | Workflows |
+| `compare` | `dashboard` | two root `task_runs.id` joined by `:` | panels | [Govern](../modules/govern/spec.md) |
+| `skill` | `dashboard` | a `skills.id` | panels | [Skills](../modules/skills/spec.md) |
+| `skill_usage` | `dashboard` | a `skills.id` | panels | Skills |
+| `rule` | `dashboard` | a `rules.id` | panels | Skills |
+| `world` | `dashboard` | a `lenses.id` | panels | Govern |
+| `guardrail` | `dashboard` | a `lenses.id` | panels | Govern |
 
 There is no `dataset` kind — records are imported *into a model* and Dataset is a retired noun
 ([terminology.md](../terminology.md)). `plan` and `plan_runs` are the same record seen two ways — the plan **drawn** as its task graph, and
 the plan **reported on** across its runs. Two kinds, not one kind twice, which is exactly why the
-axis stays flat ([B3](#9-decisions)).
+axis stays flat ([B3](#9-decisions)). `skill` and `skill_usage` are the same pair of readings over a
+skill — what it declares, and what happened when it was offered — and they split for the same
+reason ([SD2](../building-studio/skills-dashboards.md)). `world` and `guardrail` are one `lenses` row read
+under two names ([GV1](../modules/govern/spec.md)): one composer draws both, and they are two kinds
+because a tab that read `Lens` would make the reader open it to find out which of the two bounds
+they are looking at ([WO15](../modules/govern/features/worlds.md)).
 
 ### 5.1 The registry row
 
@@ -272,7 +283,7 @@ declared kind never carries fields it has no meaning for.
 inspector, click behaviour — keeps reading `kind` exactly as it does today.
 
 **The registry is the engine's, and Studio mirrors it.** `invana.apps.boards.kinds` holds the same
-nine rows; the API rejects an unknown `kind`, `tests/golden/openapi.json` pins the enum, and Studio's
+thirteen rows; the API rejects an unknown `kind`, `tests/golden/openapi.json` pins the enum, and Studio's
 union is checked against it.
 
 ### 5.2 Live and frozen
@@ -538,11 +549,12 @@ sequenceDiagram
 | Routes | `…/canvases` · `…/canvases/{id}/states` | `…/boards` · `…/boards/{id}/versions` · `…/boards/{kind}/{subjectId}/versions` (create-or-get, § 6.3) |
 | Tests | `engine/tests/canvases/` | `engine/tests/boards/` |
 | Studio types | `studio/src/types/canvas.ts` | `studio/src/types/board.ts` |
-| Studio API | `services/api/canvases.ts` · `canvasStates.ts` | `services/api/boards.ts` · `boardVersions.ts` |
+| Studio API | `services/api/canvases.ts` · `canvasStates.ts` | `services/api/boards.ts` · `boardVersions.ts` · **`boardReports.ts`** — the declared routes, beside the drawn ones rather than folded in ([B18](#9-decisions)) |
 | Studio hooks | `useCanvases` · `useCanvasStates` | `useBoards` · `useBoardVersions` |
 | Studio feature | `features/canvases/` | `features/boards/` |
 | Studio registry | `canvasKinds.ts` · `CanvasKind` · `CANVAS_KINDS` · `specFor` | **`boardKinds.ts`** · `BoardKind` · `BOARD_KINDS` · `specFor` — same file, four rows and one `renders` field longer |
 | Studio files | `CanvasFormDialog` · `CanvasHistoryPanel` · `DataCanvasPage` | `BoardFormDialog` · `BoardHistoryPanel` · `DataBoardPage` |
+| Studio reports | *(none)* | `FrozenBoardPage` — one body for every frozen reading ([B19](#9-decisions)) · `useReport` + `DeclaredBoard` — the two acts, given to a page by the host ([B20](#9-decisions) · [B21](#9-decisions)) · `BoardHistoryCard` — one card, two bindings ([B21](#9-decisions)) |
 | Docs | `modules/explore/features/boards.md` | `modules/explore/features/boards.md` |
 
 **Not renamed:** `ExplorerCanvas` · `ModelCanvas` · `SchemaCanvas` · `captureBanner` · `canvasTheme`
@@ -558,8 +570,8 @@ sequenceDiagram
 | **B2** | Migration `000000000040_canvases_are_boards` — rename both tables, add `kind · subject_id · spec`, relax `session_id`, rename `canvas_states.kind` → `cause` | `alembic upgrade head` then `downgrade` is clean on SQLite and PostgreSQL; existing rows land as `kind='data'` |
 | **B3** | Engine — `apps/boards/` + `server/boards/`, `kinds.py`, schemas, routes, admin, settings key | `engine/tests/boards/` green; `tests/golden/openapi.json` regenerated with the nine-value enum |
 | **B4** | Studio — types, API clients, hooks, `features/boards/`, `boardKinds.ts` with `renders` | `pnpm build` · `check-types` · `lint` green; the Explorer board opens, autosaves and versions as before |
-| **B5** | Declared kinds as **pages** — `boardPageId` · `declaredPage`, the host branching on `renders`, `More` opening one | A run's `More` opens a `run` page; nothing is written; reload reopens it from `?page=` |
-| **B6** | **Reports** — `POST …/boards/{kind}/{subjectId}/versions`, create-or-get the row, the `report` cause, `kind:id@version` in the parser | Saving a report on a running run, then reopening it an hour later, shows the numbers as they were |
+| **B5** | Declared kinds as **pages** — `boardPageId` · `declaredPage`, the host branching on `renders`, `More` opening one | A run's `More` opens a `run` page; nothing is written; reload reopens it from `?page=` — **every declared kind, a step's board included**, whose run is read from the step on a cold open ([SR44](../modules/operate/features/see-what-ran.md)) |
+| **B6** | **Reports** — `POST …/boards/{kind}/{subjectId}/versions`, create-or-get the row, the `report` cause, `kind:id@version` in the parser | ✅ Saving a report on a running run, then reopening it an hour later, shows the numbers as they were — and **`Reports` on the board it is of lists it** ([B21](#9-decisions)), so getting back to one needs no kept URL |
 
 B5 lands the live reading; B6 lands the kept one. What a dashboard panel *is* stays open (§ 10).
 
@@ -585,6 +597,13 @@ B5 lands the live reading; B6 lands the kept one. What a dashboard panel *is* st
 | B14 | **A board is split by lifetime, not by structure vs data.** In a `DashboardSpec` the data *is* the structure — a panel's numbers are its `options` — so cutting the two apart needs a parallel key space and a merge that renders an empty panel when a key goes missing. The seam that pays is the one the canvas already draws: `styling` is its own column because a re-query must replace every node and keep the colours. One test for every part: *does this survive the next time the data is replaced?* ([§ 5.4](#54-what-is-stored--three-lifetimes-not-two-halves)) |
 | B15 | **Whatever the spec builder takes besides the subject is `settings`.** `runDashboardSpec(trace, {view, selectedKey})` has two arguments and they are the two lifetimes: the subject is fetched and never stored, the reading is stored and never fetched. A new *hide this panel* is one more field in that argument, not one more column — and nothing else about a live dashboard is persisted at all. |
 | B16 | **A frozen reading is stored merged and never re-merged.** Re-merging a report against today's builder gives panels the data has nothing for, and data for panels that no longer exist. A version is one blob; the `styling` and `settings` beside it on `board_versions` are a deliberate copy so a version lists and reads without its board, not a split of the blob. |
+| B17 | **The host's dashboard branch is exhaustive, and a kind with no body refuses by name.** `renders` picks the branch ([B3](#9-decisions)) and inside it the kind picks the body — so the last `return` must belong to *one* named kind, never be the fall-through for the rest. A declared kind whose body has not been built (`plan_runs`, [34o](../the-screens.md)) drew the body that happened to be last, which reads as a defect in that body's composer rather than as a kind nobody has written yet. It says what it is instead. The same rule covers the optional trace: `runId` is absent on the four kinds that bind to a record rather than to a run ([SD3](../building-studio/skills-dashboards.md)), so the two bodies that read one **check** it — a cast that is true by construction is a crash the day a fifth kind forgets. |
+
+| B18 | **The declared routes get their own client.** `boardVersions.ts` takes a `board_id`; `boardReports.ts` takes a `(kind, subject_id)` pair, because a live dashboard has **no row** until the first report creates one ([B9](#9-decisions)). One client covering both would sometimes hold an id and sometimes compute one, and every caller would have to know which — which is the question B9 exists to stop anyone asking. They share a table and a DTO, not an address. |
+| B19 | **A frozen reading has no kind to branch on, so one page renders every report.** [B16](#9-decisions) stores the merged document, so by the time a report is opened there is nothing left for a composer to do: `FrozenBoardPage` fetches the blob and hands it to the same `<Dashboard>`. Branching on `kind` here would be six paths that all end in the same call, and the day a seventh declared kind ships it would be the one that forgot to add itself. The page **says which reading it is** — a frozen board that did not would be a live dashboard that had quietly stopped updating. |
+| B20 | **The host gives a page the act; the page gives the act its document.** Which board a page is — its `kind` and `subject_id` — is the host's knowledge, and `DeclaredBoardContext` is where it is put, so `useReport(spec)` is the whole change at each of the five pages and a composer stays the pure function of one read that [§ 5.5](#55-the-rule-for-a-spec-builder) requires. `Save report` is appended to the header by the hook and is **not** part of what it saves: a report offering to save a report of itself would be a reading that is not a reading of its subject. |
+| B21 | **A declared board's History is `Reports`, an act on the dashboard's own header — not a strip control.** A drawn board's History is a strip control because a canvas has no header of its own to hang one on; a dashboard has one, and `Save report` is already there ([B20](#9-decisions)). The two are a pair — *keep this reading* and *find a kept one* — so `useReport` appends both and the `data`-only gate on `pageHeaderActions` stays exactly as narrow as it was, rather than growing the first exception that makes it wrong. The card itself is the drawn board's card: **one shell and one row shape, two bindings** — `boardVersions` by `board_id` for a canvas, `boardReports` by `(kind, subject_id)` for a dashboard ([B18](#9-decisions)). It is rendered by `DeclaredBoard`, the host's wrapper that already publishes the context, because a hook cannot draw and a composer that drew its own card would stop being the pure function of one read that [§ 5.5](#55-the-rule-for-a-spec-builder) requires. |
+| B22 | **A report row opens; it does not restore.** Restoring a drawn board's version forks it into a new canvas ([CV3](../modules/explore/features/boards.md)) because the board you are standing on is the one you would otherwise overwrite. A report has nothing to fork *into*: the live dashboard is always there, derived from its subject on every open ([B9](#9-decisions)). So the row is a link to a reading — it opens `kind:{subjectId}@{versionId}` ([B12](#9-decisions)) — and the frozen page's *Open the live board* is the way back. A `Restore` here would be a button that wrote a second copy of a document nobody can edit. |
 
 ---
 
@@ -598,6 +617,8 @@ B5 lands the live reading; B6 lands the kept one. What a dashboard panel *is* st
 | A row for every dashboard opened | B9 — a table that mirrors `task_runs` and is written before every read |
 | Autosave on a declared board | there is nothing of its own to save. A dashboard changes because its subject did; a report is saved deliberately, once |
 | A report of a report | it is already frozen. Re-saving one is the fork CV3 describes |
+| `Reports` on a frozen page | you are already inside one reading; the list belongs to the live board it is of ([B21](#9-decisions)) |
+| Deleting or renaming a report | a version is append-only above and below ([B6](#9-decisions)); a kept reading somebody linked is not tidy-up |
 | Back-compat aliases on `…/canvases*` | Studio and the engine ship together; a redirect that outlives the rename is how two names survive |
 | Folders of boards | Unchanged from [canvases](../modules/explore/features/boards.md) — a list with search |
 | Renaming `@invana/canvas*` | B5 |

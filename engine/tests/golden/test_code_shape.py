@@ -127,6 +127,11 @@ COMMIT_ALLOWED = {
     "server/routes/auth.py",
     "server/graphs/views.py",
     "server/sessions/views.py",
+    # Drawing a skill's playbook opens a `role = plan` run and then submits it,
+    # so the rows must be committed before the runtime reads them in its own
+    # session — the same shape `server/sessions/views.py` above already has
+    # (building-engine/skills-draw-as-plans.md).
+    "server/skills/views.py",
     "server/admin/auth.py",
     "runtime/catalogue/records.py",
     # A CLI command is not serving a request: it opens its own session and owns
@@ -140,6 +145,9 @@ COMMIT_ALLOWED = {
     "cli/commands/models.py",
     "cli/commands/stitches.py",
     "cli/commands/users.py",
+    # `invana govern apply` declares a Graph's guardrails and worlds from a
+    # file, in one transaction — the same shape as `stitches apply` above.
+    "cli/commands/govern.py",
     # the app factory commits during startup wiring, before any request exists
     "server/app.py",
 }
@@ -179,6 +187,9 @@ CLI_ALLOWED = {
     "cli/commands/stitches.py",
     "cli/commands/models.py",
     "cli/commands/users.py",
+    # Resolves the Graph from `<username>/<slug>` the same way every command
+    # above does. It closes with them, on one `GraphManager.get_by_ref`.
+    "cli/commands/govern.py",
     "cli/principal.py",
     # `invana migrate` and friends name models to register metadata
     "cli/main.py",

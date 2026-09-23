@@ -26,6 +26,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@invana/forms";
+import { type ColumnDef, DataTable } from "@invana/tables";
 import {
 	Badge,
 	Button,
@@ -37,15 +38,9 @@ import {
 	DialogTitle,
 	EmptyState,
 	Skeleton,
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
 } from "@invana/ui";
 import { Check, Copy, KeySquare, Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 const NEVER = "never";
@@ -76,6 +71,78 @@ export function AccessTokensTab() {
 	useEffect(() => {
 		void load();
 	}, [load]);
+
+	// One column per fact the row states. `Actions` sorts nothing — a column of
+	// buttons has no order to be in.
+	const columns = useMemo<ColumnDef<PersonalAccessToken>[]>(
+		() => [
+			{
+				accessorKey: "name",
+				header: "Name",
+				cell: ({ row }) => (
+					<span className="font-medium">
+						{row.original.name}
+						{row.original.expired ? (
+							<Badge variant="outline" className="ml-2">
+								Expired
+							</Badge>
+						) : null}
+					</span>
+				),
+			},
+			{
+				id: "token",
+				header: "Token",
+				enableSorting: false,
+				cell: ({ row }) => (
+					<span className="font-mono text-muted-foreground">
+						invana_pat_…{row.original.last_four}
+					</span>
+				),
+			},
+			{
+				accessorKey: "created_at",
+				header: "Created",
+				cell: ({ row }) => formatDate(row.original.created_at),
+			},
+			{
+				accessorKey: "last_used_at",
+				header: "Last used",
+				cell: ({ row }) =>
+					row.original.last_used_at ? (
+						formatDate(row.original.last_used_at)
+					) : (
+						<span className="text-muted-foreground">Never used</span>
+					),
+			},
+			{
+				accessorKey: "expires_at",
+				header: "Expires",
+				cell: ({ row }) =>
+					row.original.expires_at ? (
+						formatDate(row.original.expires_at)
+					) : (
+						<span className="text-muted-foreground">No expiry</span>
+					),
+			},
+			{
+				id: "actions",
+				header: "Actions",
+				enableSorting: false,
+				meta: { align: "right" },
+				cell: ({ row }) => (
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={() => setRevoking(row.original)}
+					>
+						Revoke
+					</Button>
+				),
+			},
+		],
+		[],
+	);
 
 	if (loadError) {
 		return (
@@ -133,73 +200,25 @@ export function AccessTokensTab() {
 				</p>
 			) : null}
 
-			{listing.tokens.length === 0 ? (
-				<EmptyState
-					icon={<KeySquare className="size-6" />}
-					title="No access tokens yet"
-					description="Create one and it appears here. The secret is shown once, at that moment, and never again."
-					actions={
-						<Button disabled={atCeiling} onClick={() => setCreating(true)}>
-							<Plus className="size-4" />
-							New token
-						</Button>
-					}
-				/>
-			) : (
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Token</TableHead>
-							<TableHead>Created</TableHead>
-							<TableHead>Last used</TableHead>
-							<TableHead>Expires</TableHead>
-							<TableHead className="text-right">Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{listing.tokens.map((token) => (
-							<TableRow key={token.id}>
-								<TableCell className="font-medium">
-									{token.name}
-									{token.expired ? (
-										<Badge variant="outline" className="ml-2">
-											Expired
-										</Badge>
-									) : null}
-								</TableCell>
-								<TableCell className="font-mono text-muted-foreground">
-									invana_pat_…{token.last_four}
-								</TableCell>
-								<TableCell>{formatDate(token.created_at)}</TableCell>
-								<TableCell>
-									{token.last_used_at ? (
-										formatDate(token.last_used_at)
-									) : (
-										<span className="text-muted-foreground">Never used</span>
-									)}
-								</TableCell>
-								<TableCell>
-									{token.expires_at ? (
-										formatDate(token.expires_at)
-									) : (
-										<span className="text-muted-foreground">No expiry</span>
-									)}
-								</TableCell>
-								<TableCell className="text-right">
-									<Button
-										variant="ghost"
-										size="sm"
-										onClick={() => setRevoking(token)}
-									>
-										Revoke
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			)}
+			<DataTable
+				columns={columns}
+				data={listing.tokens}
+				enableSorting
+				enablePagination={false}
+				emptyState={
+					<EmptyState
+						icon={<KeySquare className="size-6" />}
+						title="No access tokens yet"
+						description="Create one and it appears here. The secret is shown once, at that moment, and never again."
+						actions={
+							<Button disabled={atCeiling} onClick={() => setCreating(true)}>
+								<Plus className="size-4" />
+								New token
+							</Button>
+						}
+					/>
+				}
+			/>
 
 			<NewTokenDialog
 				open={creating}

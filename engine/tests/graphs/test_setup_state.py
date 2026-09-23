@@ -13,7 +13,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphConnection
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.models import LLMModel, LLMProvider, LLMProviderKind
 from invana.apps.modeller.models import GraphModel, GraphVersion, NodeTypeDefinition
 from invana.apps.setup.managers import SetupManager
 from invana.apps.skills.models import Skill
@@ -80,22 +80,41 @@ async def test_a_bare_graph_has_nothing_done(session: AsyncSession):
     assert missing == ["graph_info", "model", "datasets", "providers"]
 
 
+async def _offer(
+    session: AsyncSession,
+    graph,
+    kind: LLMProviderKind,
+    model_id: str,
+    **ping,
+) -> LLMProvider:
+    """One configured endpoint offering one model — what a provider row used to be.
+
+    There is no ``is_default``: with one model offered and no cast authored, the
+    shipped cast resolves to it, which is what the gate reads
+    ([PM16](docs/for-developers/modules/agents/features/providers-and-models.md)).
+    """
+    provider = LLMProvider(graph_id=graph.id, name=kind.value, provider=kind, guardrails={}, **ping)
+    session.add(provider)
+    await session.flush()
+    session.add(LLMModel(provider_id=provider.id, model_id=model_id, capabilities={}, pricing={}))
+    await session.flush()
+    return provider
+
+
 @pytest.mark.asyncio
 async def test_the_facts_tick_the_steps(session: AsyncSession):
-    """A connection, a published model, a succeeded run, a pinged default
-    provider — nothing told setup about any of them."""
+    """A connection, a published model, a succeeded run, and a pinged provider
+    behind the model the cast resolves — nothing told setup about any of them."""
     graph = await _graph(session, instructions="Answer only from the graph.")
     session.add(GraphConnection(graph_id=graph.id, uri="bolt://localhost:7687", connector_class=CONNECTOR))
     session.add(Skill(graph_id=graph.id, name="reconcile"))
-    session.add(
-        LLMProvider(
-            graph_id=graph.id,
-            provider=LLMProviderKind.anthropic,
-            model_id="claude-opus-5",
-            is_default=True,
-            last_ping_at=datetime.now(UTC),
-            last_ping_ok=True,
-        )
+    await _offer(
+        session,
+        graph,
+        LLMProviderKind.anthropic,
+        "claude-opus-5",
+        last_ping_at=datetime.now(UTC),
+        last_ping_ok=True,
     )
     await _publish_model(session, graph)
     await _import_run(session, graph, status="succeeded")
@@ -144,16 +163,14 @@ async def test_a_run_that_did_not_succeed_does_not_count_and_data_waits_on_a_mod
 @pytest.mark.asyncio
 async def test_a_provider_is_not_done_until_it_has_pinged(session: AsyncSession):
     """Saving stores it, the ping proves it (providers-and-models.md C3); a
-    rejected key is broken, in the provider's own words."""
+    rejected key is broken, in the provider's own words.
+
+    The gate reads the provider behind the model the cast resolves
+    ([PM16](docs/for-developers/modules/agents/features/providers-and-models.md)) —
+    with no cast authored that is the shipped cast over the one model offered,
+    which is this one."""
     graph = await _graph(session)
-    provider = LLMProvider(
-        graph_id=graph.id,
-        provider=LLMProviderKind.openai,
-        model_id="gpt-4o",
-        is_default=True,
-    )
-    session.add(provider)
-    await session.flush()
+    provider = await _offer(session, graph, LLMProviderKind.openai, "gpt-4o")
 
     state = await _setup().derive_setup_state(session, graph)
     assert state["providers"]["done"] is False

@@ -25,29 +25,29 @@ from invana.core.events.services import current_trace_id, emit_event
 class RuleManager:
     """Stateless. The session is the first argument of every method."""
 
-    querysets = RuleQuerySet()
-    versions = RuleVersionQuerySet()
+    rules_qs = RuleQuerySet()
+    versions_qs = RuleVersionQuerySet()
 
     # ── reading ──────────────────────────────────────────────────────────────
 
     async def invariants(self, session: AsyncSession, *, graph_id: str, active_only: bool = False) -> list[Rule]:
-        return await self.querysets.invariants(session, graph_id=graph_id, active_only=active_only)
+        return await self.rules_qs.invariants(session, graph_id=graph_id, active_only=active_only)
 
     async def working(self, session: AsyncSession, *, project_id: str, active_only: bool = False) -> list[Rule]:
-        return await self.querysets.working(session, project_id=project_id, active_only=active_only)
+        return await self.rules_qs.working(session, project_id=project_id, active_only=active_only)
 
     async def get(self, session: AsyncSession, *, rule_id: str, graph_id: str) -> Rule:
         """A rule in another Graph reads as absent rather than forbidden."""
-        rule = await self.querysets.get(session, rule_id)
+        rule = await self.rules_qs.get(session, rule_id)
         if rule is None or rule.graph_id != graph_id:
             raise NotFoundError("Rule not found.")
         return rule
 
     async def list_versions(self, session: AsyncSession, *, rule: Rule) -> list[RuleVersion]:
-        return await self.versions.list_for_rule(session, rule.id)
+        return await self.versions_qs.list_for_rule(session, rule.id)
 
     async def get_version(self, session: AsyncSession, *, rule: Rule, version: int) -> RuleVersion:
-        row = await self.versions.get_by_number(session, rule.id, version)
+        row = await self.versions_qs.get_by_number(session, rule.id, version)
         if row is None:
             raise NotFoundError(f"Version {version} of this rule not found.")
         return row
@@ -66,13 +66,13 @@ class RuleManager:
         """The rule and its v1, as one act."""
         order = payload.order
         if order is None:
-            order = await self.querysets.next_order(session, graph_id=graph_id, project_id=project_id)
+            order = await self.rules_qs.next_order(session, graph_id=graph_id, project_id=project_id)
 
         rule = Rule(graph_id=graph_id, project_id=project_id, order=order, created_by_id=actor_id)
-        await self.querysets.add(session, rule)
+        await self.rules_qs.add(session, rule)
 
         version = RuleVersion(rule_id=rule.id, version=1, statement=payload.statement, published_by_id=actor_id)
-        await self.versions.add(session, version)
+        await self.versions_qs.add(session, version)
         rule.current_version = version
         await session.flush()
 
@@ -90,9 +90,9 @@ class RuleManager:
 
     async def publish(self, session: AsyncSession, *, rule: Rule, statement: str, actor_id: str) -> RuleVersion:
         """Mint the next version and point the rule at it."""
-        number = await self.versions.highest_version(session, rule.id) + 1
+        number = await self.versions_qs.highest_version(session, rule.id) + 1
         version = RuleVersion(rule_id=rule.id, version=number, statement=statement, published_by_id=actor_id)
-        await self.versions.add(session, version)
+        await self.versions_qs.add(session, version)
         rule.current_version = version
         await session.flush()
 
@@ -146,9 +146,9 @@ class RuleManager:
         """Every published version id, per rule — what a citation can name."""
         out: dict[str, list[str]] = {}
         for rule in rules:
-            out[rule.id] = [v.id for v in await self.versions.list_for_rule(session, rule.id)]
+            out[rule.id] = [v.id for v in await self.versions_qs.list_for_rule(session, rule.id)]
         return out
 
     async def statements_by_version(self, session: AsyncSession, *, rule: Rule) -> dict[str, tuple[int, str]]:
         """``rule_version_id`` → ``(version, statement)``, for resolving citations."""
-        return {v.id: (v.version, v.statement) for v in await self.versions.list_for_rule(session, rule.id)}
+        return {v.id: (v.version, v.statement) for v in await self.versions_qs.list_for_rule(session, rule.id)}

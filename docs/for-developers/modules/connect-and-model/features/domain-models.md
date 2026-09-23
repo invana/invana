@@ -63,6 +63,7 @@ flowchart TD
 |---|---|
 | `models` | `graph_id` · `name` · `package_id` · `current_version_id` |
 | `model_versions` | node types, edge types, property keys, constraints; immutable once published |
+| `model_versions.axes` | **new** — `{time: {property}, geo: {property, vocab}, dims: [property, …]}`, default `{}`. What a [world](../../govern/features/worlds.md) may slice this model along ([GV14](../../govern/spec.md)) |
 | Capability resolution | server version → available property types, per connector |
 | Routes | `…/models*` · `…/models/{id}/versions*` · `POST …/models/{id}/publish` |
 | Events | `model.created · updated · published` |
@@ -76,6 +77,10 @@ flowchart TD
 | DM3 | Property types are gated by the connected database's real capability. |
 | DM4 | A Graph holds many models; they meet only through declared links. |
 | DM5 | The first published version diffs against nothing rather than against itself — it changed everything, and saying so is more honest than an empty diff. |
+| DM6 | **A published version declares its axes, and declaring one is a modelling act.** Which property carries valid time, which carries geography, and which named properties are selectable dimensions — stated here, in the model editor, and nowhere else. A world asking to slice along an axis the model never declared is **refused naming the model and the axis**, never silently ignored ([GV14](../../govern/spec.md)): a selector on an undeclared property is a query, and the product has one place to write a query. |
+| DM7 | **The default is `{}` — nothing is selectable.** A model that declares no axes can still be allowed or denied whole; it simply cannot be narrowed. Inferring an axis from a property's name or type would make *which rows did this run see* depend on a guess. |
+| DM8 | **The axes travel with the artefact, inside the content hash.** They are part of the *shape*, not a local setting: two Graphs whose models differ only in what they let a lens narrow are not running the same model. A version published from a draft carries them forward, because a published version that lost them would silently stop being sliceable and every world narrowing it would start refusing — a failure that reads as a governance bug rather than a lost column. |
+| DM9 | **An axis naming a property the version does not have is refused at import**, naming the axis and the property. A declaration that names nothing is worse than none: the model reads as sliceable, a world is authored against it, and the narrowing matches no rows. |
 
 ## Not building
 

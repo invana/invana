@@ -19,7 +19,7 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 |---|---|---|
 | C1 | One selection concept | The same object whatever the canvas draws |
 | C2 | Inspect is the default | Properties, provenance, relationships — stated, not editable |
-| C3 | Two kinds write from a gesture | `model` (add · connect · delete) and `plan` (drag card → card) |
+| C3 | Three kinds write from a gesture | `model` (add · connect · delete), `plan` (drag card → card) and `workflow` **while drafting** (drag a catalogue entry in, wire `depends_on`) — each writes an **edge or a placement**, which is the only thing a drawing says better than a form ([SP2](#decisions)) |
 | C4 | Everything else selects | The panel states the fact and offers actions, never inline editing |
 | C5 | Provenance is one click | Element → record → dataset → import run |
 | C6 | Multi-select summarises | Counts by type, and the actions that apply to all of them |
@@ -32,7 +32,7 @@ edits. One rule, six canvas kinds, no exceptions added in code.
 | `data` | properties · provenance · neighbours by type | no |
 | `model` | properties, keys, constraints of the type | **yes**, while drafting |
 | `plan` | the task: status, assignee, dependencies, criteria | **yes** — status and assignment |
-| `workflow` | the step: arguments, what it calls | no |
+| `workflow` | the task: arguments, what it calls, the contract it came from | **yes**, while drafting — in `bottomSection`, not the panel ([DP11](../../workflows/features/draft-a-plan.md#decisions)) |
 | `envelope` | the bound: allowed steps, pinned arguments, ceilings | no |
 | `lineage` | the agent: who authored or spawned it, on what run | no |
 
@@ -105,7 +105,7 @@ section a legend as well as a list.
 | # | Decision |
 |---|---|
 | SP1 | The canvas selects; the panel states or edits. Never the reverse. |
-| SP2 | Exactly two kinds write from a gesture. A third is argued in writing first. |
+| SP2 | Exactly **three** kinds write from a gesture — `model`, `plan`, and `workflow` while drafting ([DP11](../../workflows/features/draft-a-plan.md#decisions), the argument in writing this decision asked for). A fourth is argued the same way. The gesture writes where the **geometry is the datum**; every field is still a form, and on `workflow` that form is `bottomSection`, never a card over the drawing. |
 | SP3 | Inspect is the default; editing is opt-in and kind-specific. |
 | SP4 | Provenance is always one click from the element. |
 | SP5 | The selection is what the assistant receives. |

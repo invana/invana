@@ -97,6 +97,7 @@ def create_app() -> FastAPI:
     from invana.server.agents.routes import agents_router, atlas_agent_router
     from invana.server.boards.routes import boards_router
     from invana.server.explorer.routes import explorer_router
+    from invana.server.govern.routes import govern_router
     from invana.server.graphs.routes import graph_router, graphs_collection_router
     from invana.server.health import health_router
     from invana.server.llm_providers.routes import llm_providers_router
@@ -171,6 +172,7 @@ def create_app() -> FastAPI:
     app.include_router(graphs_collection_router)
     app.include_router(graph_router)
     app.include_router(llm_providers_router)
+    app.include_router(govern_router)
     app.include_router(skills_router)
     app.include_router(rules_router)
     app.include_router(agents_router)

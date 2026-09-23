@@ -1,0 +1,110 @@
+[
+  {
+    "id": "SPN_01",
+    "properties": {
+      "name": "Reuters",
+      "domain": "reuters.com",
+      "country_iso": "UK",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_02",
+    "properties": {
+      "name": "Bloomberg",
+      "domain": "bloomberg.com",
+      "country_iso": "US",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_03",
+    "properties": {
+      "name": "Aviation Week",
+      "domain": "aviationweek.com",
+      "country_iso": "US",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_04",
+    "properties": {
+      "name": "Simple Flying",
+      "domain": "simpleflying.com",
+      "country_iso": "UK",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_05",
+    "properties": {
+      "name": "BusinessLine",
+      "domain": "thehindubusinessline.com",
+      "country_iso": "IN",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_06",
+    "properties": {
+      "name": "Nikkei Asia",
+      "domain": "asia.nikkei.com",
+      "country_iso": "JP",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_07",
+    "properties": {
+      "name": "Gulf News",
+      "domain": "gulfnews.com",
+      "country_iso": "AE",
+      "sector": "media"
+    }
+  },
+  {
+    "id": "SPN_08",
+    "properties": {
+      "name": "Meridian Financial",
+      "domain": "meridianfinancial.com",
+      "country_iso": "UK",
+      "sector": "financial"
+    }
+  },
+  {
+    "id": "SPN_09",
+    "properties": {
+      "name": "Kestrel Hotels",
+      "domain": "kestrelhotels.com",
+      "country_iso": "DE",
+      "sector": "hospitality"
+    }
+  },
+  {
+    "id": "SPN_10",
+    "properties": {
+      "name": "Northwind Telecom",
+      "domain": "northwindtelecom.com",
+      "country_iso": "NL",
+      "sector": "telecom"
+    }
+  },
+  {
+    "id": "SPN_11",
+    "properties": {
+      "name": "Orbit Payments",
+      "domain": "orbitpayments.com",
+      "country_iso": "SG",
+      "sector": "financial"
+    }
+  },
+  {
+    "id": "SPN_12",
+    "properties": {
+      "name": "Verdant Energy",
+      "domain": "verdantenergy.com",
+      "country_iso": "FR",
+      "sector": "energy"
+    }
+  }
+]

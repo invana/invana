@@ -13,6 +13,7 @@ import type { Emission, EmissionKind, TemplateOffer } from "@/types/emission";
 import type { QueryResponse } from "@/types/query";
 import type { AskFrame, RunNode, RunNodeStatus, RunStatus } from "@/types/run";
 import type { SessionMessage } from "@/types/session";
+import type { OfferedRule } from "@/types/skills";
 import type { ThinkingListResponse } from "@/types/work";
 
 // ── Wire DTOs ────────────────────────────────────────────────────────────────
@@ -41,6 +42,8 @@ interface ApiThinking {
 	run_id: string;
 	graph_id: string;
 	workflow_key: string;
+	/** The run this row is a step of; null on a root (SR44). */
+	parent_run_id?: string | null;
 	status: RunStatus;
 	assistant_message_id?: string | null;
 	queued_at?: string | null;
@@ -58,6 +61,8 @@ export interface Thinking {
 	assistantMessageId?: string;
 	streamSeq: number;
 	steps: RunNode[];
+	/** The run this row is a step of; absent on a root (SR44). */
+	parentRunId?: string;
 }
 
 export function toRunNode(s: ApiThinkingStep): RunNode {
@@ -120,6 +125,10 @@ export const EMISSION_KINDS = [
 	"query.proposed",
 	"clarification.requested",
 	"result",
+	// One per engagement, carrying the whole touch — the ledger row
+	// `run_touches` projects (GV28). The boards read the projection through
+	// `…/runs/{id}/touches`; this is the live copy, and the fold ignores it.
+	"touch",
 	"diagnosis",
 	"run.done",
 	"run.cancelled",
@@ -179,6 +188,10 @@ export const runsApi = {
 			assistantMessageId: d.assistant_message_id ?? undefined,
 			streamSeq: d.stream_seq,
 			steps: d.steps.map(toRunNode),
+			// `task_runs` is one table, so this is how a **step** names the run
+			// whose trace it is in — the one read a step board opened cold makes
+			// before it reads anything else (SR44).
+			parentRunId: d.parent_run_id ?? undefined,
 		};
 	},
 
@@ -424,6 +437,27 @@ export interface TraceRead {
 	/** `authored:<id>` · `generated` · `reused:<id>` · `template:<key>@<v>`. */
 	plan_origin: string | null;
 	plan_revision: number;
+	/** What opened the run — `user` · `schedule` · `task` · `delegation`. */
+	triggered_by: string;
+	/** The person it ran for, by username; `null` when no person is on record. */
+	opened_by: string | null;
+	/** Questions asked and re-plans spent — read against `budget` (SR67). */
+	clarifications: number;
+	replans: number;
+	/**
+	 * The world this run was asked under, and its name **as frozen** (SR36).
+	 *
+	 * Both `null` reads `Everything`, which is a real world and the default one
+	 * — never a blank, which would read as *not recorded*. The name comes from
+	 * `lens_snapshot`, so renaming a world does not change what a run that
+	 * already happened says it ran under (GR3).
+	 */
+	lens_id: string | null;
+	lens_name: string | null;
+	/** The record `lens_name` was read from — what the name opens (SR67). */
+	lens_ref: { id: string; kind: "world" | "guardrail" } | null;
+	/** Whether the run froze a lens. `false` — nothing it engaged was recorded (SR68). */
+	governed: boolean;
 	started_at: string | null;
 	finished_at: string | null;
 	duration_ms: number | null;
@@ -460,6 +494,8 @@ export interface TraceStepRead {
 	args: Record<string, unknown> | null;
 	/** What it spends, from the catalogue entry its `task_key` names. */
 	bound: string | null;
+	/** The attempts this step was allowed — what `attempts 2 of 3` reads against (SR67). */
+	max_attempts: number;
 	/** The plan's own id for this node, and the lane it ran in. */
 	step_key: string | null;
 	lane: string | null;
@@ -467,6 +503,9 @@ export interface TraceStepRead {
 	result: Record<string, unknown> | null;
 	skills_offered: string[];
 	skills_applied: string[];
+	/** The statements this step was offered, and the ones it claims it cited (RU12). */
+	rules_offered: OfferedRule[];
+	rules_cited: OfferedRule[];
 	/**
 	 * The run this node delegated, if it delegated one.
 	 *
@@ -485,6 +524,9 @@ export interface TraceStepRead {
 export interface RunBudget {
 	max_tokens: number | null;
 	max_cost_usd: number | null;
+	max_cost_usd_run?: number | null;
+	max_clarifications?: number | null;
+	max_replans?: number | null;
 }
 
 // ── Projection templates (projections.md § 5 — the templates page) ──────────

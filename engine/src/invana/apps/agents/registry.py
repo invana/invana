@@ -72,6 +72,11 @@ class Template:
     kind: str = "ask"
     source: str = "seeded"
     tags: tuple[str, ...] = field(default_factory=tuple)
+    #: What this plan **offers** a caller that inlines it — `{name: {type,
+    #: default, label}}` ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).
+    #: Its own steps bind these as `${args.<name>}`; a caller tunes them, and a
+    #: name it leaves alone takes the default.
+    args_schema: dict = field(default_factory=dict)
 
     @property
     def ref(self) -> str:
@@ -88,20 +93,39 @@ class Template:
 # recorded *validate after translate* as a `sequence` guess rather than the
 # data-flow it actually is (task-model-migration M2). The value is identical —
 # `args.query` resolves to what translate left — and now the edge states why.
+# `read_only` is **declared**, not hard-coded, because it is the one thing about
+# this tail a caller legitimately differs on: a skill that answers questions
+# wants it true, and one that writes what it found does not. Declaring it is
+# what lets a skill inline this plan instead of redrawing five steps to change a
+# single boolean ([LB19 · LB20](docs/for-developers/modules/workflows/features/the-library.md)).
+# An agent whose envelope **pins** it still wins — a pin is a ceiling, and a
+# tuned argument is a request.
 _QUERY_TAIL = (
     step("translate_thought"),
     step("validate_query", query="${steps.translate_thought.query}"),
-    step("execute_graph_query", query="${steps.translate_thought.query}", read_only=True),
+    step("execute_graph_query", query="${steps.translate_thought.query}", read_only="${args.read_only}"),
     step("shape_for_canvas"),
     step("verify_result"),
 )
 
+# **@2, not an edit to @1.** A library version is immutable: a changed shape
+# mints `key@n+1` rather than rewriting the rows an install already holds
+# ([LB1](docs/for-developers/modules/workflows/features/the-library.md)). Editing
+# @1 here would have given a fresh install rows that bind `${args.read_only}`
+# and an existing one rows that hold `true`, under one name.
 NL_SINGLE = Template(
     key="nl-single",
-    version=1,
+    version=2,
     description="One question, one query: translate it, check it is read-only, run it, paint it, verify it served.",
     intents=("single_query", "exploration"),
     steps=_QUERY_TAIL,
+    args_schema={
+        "read_only": {
+            "type": "bool",
+            "default": True,
+            "label": "Refuse anything that writes",
+        }
+    },
 )
 
 QL_DIRECT = Template(

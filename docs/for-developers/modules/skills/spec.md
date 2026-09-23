@@ -51,10 +51,10 @@ be enforced is not a rule; it is an envelope bound ([Agents](../agents/spec.md))
 | Owns | Shape |
 |---|---|
 | `skills` | `graph_id` · `name` (unique per Graph) · `current_version_id` |
-| `skill_versions` | `skill_id` · `version` · `description` · `content` · `when_to_use` · `published_at` — immutable once published |
-| `skill_bindings` | `skill_id` · `agent_id` · `bound_by` · `bound_at` — the binding follows the current version ([BN6](features/bindings.md#decisions)) |
-| `rules` | `scope (graph\|project)` · `owner_id` · `kind (invariant\|working)` · `active` · `order` · `current_version_id` |
-| `rule_versions` | `rule_id` · `version` · `statement` · `published_at` — immutable once published |
+| `skill_versions` | `skill_id` · `version` · `description` · `content` · `when_to_use` · `published_by_id` · `published_at` — immutable once published. `plan_id` arrives with [M8](../../building-engine/task-model-migration.md) ([SK13](features/authoring-a-skill.md#decisions)) |
+| `skill_bindings` | `skill_id` · `agent_id` · `bound_by_id` · `bound_at` — unique on the pair; the binding follows the current version ([BN6](features/bindings.md#decisions)) |
+| `rules` | `graph_id` · `project_id?` · `active` · `order` · `current_version_id` — **one axis**: `scope` and `kind` are derived from `project_id`, never stored ([RU6](features/rules.md#decisions)) |
+| `rule_versions` | `rule_id` · `version` · `statement` · `published_by_id` · `published_at` — immutable once published |
 | Usage | derived: every step that was offered a skill *version*, and whether it reported applying it |
 
 ### Versions
@@ -111,25 +111,59 @@ Every edit is an event, so the change and its effect sit in the same history.
 
 ## 5a. The drawn states
 
-The module's artboards, on [Govern, Agents and Skills](%s) — pages *Skills · Bindings · Usage · Rules*.
-Each one is written into the feature file it draws before any of it is built
-([README › How a module gets built](../../README.md#how-a-module-gets-built)).
+The module's artboards, on [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) —
+**four pages, one per stacked panel**: *Skills · Bindings · Usage · Rules*. Each page carries the whole
+feature — the primary journey, each drill-in, the authoring act, every refusal with the bound it names,
+and the empty, too-few and permission-denied states. Each artboard is written into the feature file it
+draws before any of it is built ([README › How a module gets built](../../README.md#how-a-module-gets-built)).
 
-| Artboard | Feature | What it shows | Settles |
-|---|---|---|---|
-| `SkillsPanel` | [6.1](features/authoring-a-skill.md) · [6.4](features/rules.md) | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
-| `SkillAuthor` | [6.1](features/authoring-a-skill.md) | the **Playbook** tab: prose with each sentence showing the step it produced, and `draft_plan` asking which of two readings sentence 4 means | C10 · SK6 — it never guesses; nothing is written until it is answered |
-| `SkillFlow` | [6.1](features/authoring-a-skill.md) | the **Flow** tab: the plan drawn in the **six layers** it will touch, `cache` dark, `third party` named | SK16 — one flow view, and it is the layer one |
-| `SkillUsesPlan` | [6.1](features/authoring-a-skill.md) · [7.1](../workflows/features/the-library.md) | a skill inlining `escalate-core@2` with `uses`, and tuning one argument for its use case | SK18 · LB18 · LB19 — create and tune here; author in the Library |
-| `SkillVersions` | [6.1](features/authoring-a-skill.md) | four versions, the v2→v3 prose-and-plan diff, a hand-edit flipping `origin` | SK2 · SK5 · SK7 |
-| `SkillBindings` | [6.2](features/bindings.md) | bound · refused · unbound, and **two refusals** — the envelope, and the lens naming the rule | BN5 — both checks are at bind time |
-| `SkillOffer` | [6.2](features/bindings.md) · § 4 | the fixed assembly order, the context as discrete items with ids, what the step reported back | § 4 — nothing is concatenated |
-| `SkillUsage` | [6.3](features/usage.md) | offered 40 / applied 31 / the gap, per version, by agent, by outcome | US1–US4 — counted, per version, self-reported |
-| `RulesPanel` | [6.4](features/rules.md) | one statement, two scopes, where it was cited, and the four statements that are **not** rules | RU1–RU5 |
+### Skills — [6.1](features/authoring-a-skill.md)
+
+| Artboard | What it shows | Settles |
+|---|---|---|
+| `SkillsPanel` | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
+| `SkillAuthor` | the **Playbook** tab: each sentence showing the step it produced, and `draft_plan` asking which of two readings sentence 2 means | C10 · SK6 — it never guesses; nothing is written until it is answered |
+| `SkillFlow` | the **Flow** tab: the plan in the **six layers** it will touch | SK16 — one flow view, and it is the layer one |
+| `SkillUsesPlan` | a skill inlining the library's `nl-single@2` with `uses`, tuning the one argument it declares, and the two tunings its declaration refuses | SK18 · SK32 · SK33 · LB18 · LB19 · LB20 |
+| `SkillVersions` | seven versions, the v4→v5 prose-and-plan diff, a hand-edit flipping `origin` | SK2 · SK5 · SK7 · SK19 |
+
+### Bindings — [6.2](features/bindings.md)
+
+| Artboard | What it shows | Settles |
+|---|---|---|
+| `SkillBindings` | bound · refused · unbound, each row naming the agent's **world** | BN2 · BN5 |
+| `BindRefusals` | both checks side by side — the envelope naming its bound, the lens naming its rule — the refusal payload, and **which half is not built yet** | BN5 · BN7 |
+| `BindFromAgent` | binding from the agent's panel: the picker binds **as you click**, a spawned child's bindings, the routes and the two events | BN4 · BN6 · BN8 · C3 |
+| `SkillOffer` | the fixed assembly order, the context as discrete items with ids, and what the record holds afterwards | § 4 — nothing is concatenated |
+| `BindSeams` | a **draft** bound to an agent · bound to nobody · binding everything · unbinding mid-run · refused · read-only | C4 · BN3 · BN14 · seams |
+
+### Usage — [6.3](features/usage.md)
+
+| Artboard | What it shows | Settles |
+|---|---|---|
+| `SkillUsage` | offered 1,204 / applied 1,190 / the gap, per version, by agent, by run outcome | US1–US4 |
+| `UsageVersions` | every published version with `enough_to_read`, when each count started, and the v1 migration | US3 · US5 · SK19 |
+| `UsageReadings` | by agent, the bounded step list, and the four readings with the move each one names | C4 · C6 · C7 |
+| `UsageSeams` | too few to read · no data yet · just published · purged · self-reported · nothing has run | US4 · US6 |
+
+### Rules — [6.4](features/rules.md)
+
+| Artboard | What it shows | Settles |
+|---|---|---|
+| `RulesPanel` | the drawer of statements with one inactive, the rule's fields, where it was cited, and the four statements that are **not** rules | RU1–RU3 · RU6 |
+| `RuleAuthor` | writing one: the statement, the scope, the order — and the nudge that a long statement is two rules | RU1 · RU2 · C1 |
+| `RuleCited` | `rules_offered` against `rules_cited`, the version list, and what deactivating keeps | RU4 · RU7 |
+| `RulesProject` | a Project's working rules with its Graph's invariants read-only above, the assembled order, and the response's two lists | C3 · RU2 · RU6 |
 
 **Two things the drawings settled that the documents did not have:** the skill's detail lives in the
 drilled-in drawer with four tabs ([SK17](features/authoring-a-skill.md)), and the Flow tab is the layer
 view rather than a node graph ([SK16](features/authoring-a-skill.md)).
+
+**One canon, four pages.** Every page draws the same Graph: five skills — *Answer in natural
+language · v7* with seven versions, one that `uses` the library's `nl-single@2`, one a **draft**
+and one bound to nobody ([SK35](features/authoring-a-skill.md#decisions)) — the agents of
+[5.2](../agents/features/author-an-agent.md), four statements with one inactive, and one project. A number that appears on two artboards is the same number — `.design/canvas-govern-agents/_sk.py`
+is where it is written once.
 
 ---
 
@@ -143,6 +177,7 @@ view rather than a node graph ([SK16](features/authoring-a-skill.md)).
 | S4 | Rule scope is fixed: invariants on a Graph, working rules on a Project. Nothing else has rules. |
 | S5 | Deactivate rather than delete — usage and traces must stay resolvable. |
 | S6 | Neither skills nor rules are enforcement. Enforcement is an envelope bound or a criterion. |
+| S7 | **Every reading this module owns opens as a declared board, and the stack stays.** Three kinds — `skill` · `skill_usage` · `rule` — each bound to one record through `subject_id`, each composed as one `DashboardSpec` from the reads the drawer already makes ([CV12](../explore/features/boards.md)). The split is by tense and by record, not by screen size: a drawer answers *which one*, a board answers *what happened*. **The board reads and the drawer writes** — publishing a version, binding an agent and deactivating a rule all stay where the thing being changed is written, so a page anybody may open carries no act with a consequence to read. Panel sets, seams and the JSON: [skills-dashboards.md](../../building-studio/skills-dashboards.md). |
 
 ## 7. Deliberately absent
 

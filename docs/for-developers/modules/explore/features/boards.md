@@ -20,8 +20,8 @@ where you left it — including how it got there. A board is either **drawn** �
 | # | Capability | Notes |
 |---|---|---|
 | C1 | Named boards per Graph | Listed, searchable, reopenable |
-| C2 | A declared **kind** | One flat axis of nine — `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs`. Set at creation, never changed (CV1) |
-| C2a | Drawn or declared is **`renders`** | A property of the kind, not a second column — `canvas` for the six that are drawn, `dashboard` for the three that are declared ([B3](../../../building-engine/boards-migration.md)) |
+| C2 | A declared **kind** | One flat axis of thirteen — `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs · compare · skill · skill_usage · rule`. Set at creation, never changed (CV1) |
+| C2a | Drawn or declared is **`renders`** | A property of the kind, not a second column — `canvas` for the six that are drawn, `dashboard` for the seven that are declared ([B3](../../../building-engine/boards-migration.md)) |
 | C2b | A declared board binds to one record | `subject_id` — a run, one task run, a plan. The same board for another run is the same kind with a different subject id |
 | C3 | Tabs | Several open at once; the tab bar is the switcher |
 | C4 | Autosave | Elements, layout and settings, without a save button — drawn boards only |
@@ -76,7 +76,7 @@ flowchart TD
 | Elements | what is drawn, per board |
 | Routes | `…/boards*` · `…/boards/{id}/versions*` · `…/boards/{kind}/{subjectId}/versions*` (a declared board, addressed by what it is of). There is **no restore endpoint** — going back forks client-side through `canvas.importState()` (CV3) |
 | Events | `board.create · update · delete` |
-| Registry | `apps/boards/kinds.py` — the nine kinds and their `renders`. Studio mirrors it in `boardKinds.ts`; `tests/golden/openapi.json` pins the enum |
+| Registry | `apps/boards/kinds.py` — the thirteen kinds and their `renders`. Studio mirrors it in `boardKinds.ts`; `tests/golden/openapi.json` pins the enum |
 
 ## Decisions
 
@@ -99,10 +99,13 @@ flowchart TD
 | CV16 | **A board restores from its snapshot; a re-run is the heal path, not the restore path.** Reopening a board — from the tab bar, the boards list or a page reload — paints `snapshot` and `positions` and asks the graph nothing ([AS13](../../ask/features/the-answer-surface.md)). Only a board with no snapshot to paint falls back to re-running its session's last query, which is what heals boards saved blank before autosave existed. A board that re-queried on every open would spend against the graph for a drawing it already holds, and would silently redraw itself differently from the picture the user left. |
 | CV11 | **A version is a version, above and below.** The card is History, the rows are versions, `CanvasVersionsViewPanel` draws them, the table is `board_versions` and the route is `…/versions`. This used to be a seam — the engine said *state* because `canvas.exportState()` is its own noun — and the seam closed when dashboards arrived, because a declared board has no `exportState` ([B6](../../../building-engine/boards-migration.md)). `exportState()` / `importState()` stay the renderer's words, where they belong. |
 
-> ⚠ **The dashboard panel set is not designed yet.** CV12–CV15 fix the *shape* — a kind, a resolved
-> document, a closed set, opened from `More`, frozen as a report. Which panels exist, how one binds
-> to a record, and whether a dashboard can be authored per Graph are open, and get their own feature
-> file when they are taken up.
+> **The panel set is fixed per surface, in the feature that owns it.** CV12–CV15 fix the *shape* — a
+> kind, a resolved document, a closed set, opened from `More`, frozen as a report. **Which** panels a
+> given dashboard draws belongs to the module whose record it is of: `run` and `task_run` in
+> [see-what-ran](../../operate/features/see-what-ran.md), and `skill · skill_usage · rule` in
+> [skills-dashboards.md](../../../building-studio/skills-dashboards.md). Authoring a dashboard per
+> Graph stays out — a surface that could invent a panel could not be validated, versioned or
+> restored (CV13).
 
 ## Not building
 

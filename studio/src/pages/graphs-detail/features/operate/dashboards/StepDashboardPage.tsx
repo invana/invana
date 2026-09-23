@@ -12,6 +12,9 @@
  * from cache.
  */
 
+import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
+import { useReport } from "@/pages/graphs-detail/features/boards";
+import { StepTouchPanel } from "@/pages/graphs-detail/features/govern/StepTouchPanel";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/operate/dashboards/icons";
 import { VIEW_DASHBOARD } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import {
@@ -20,7 +23,7 @@ import {
 	stepDashboardSpec,
 } from "@/pages/graphs-detail/features/operate/dashboards/stepDashboardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/operate/dashboards/useRunTrace";
-import { Dashboard } from "@invana/dashboard";
+import { Dashboard, RUN_PANELS } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useMemo, useState } from "react";
 
@@ -43,19 +46,27 @@ export function StepDashboardPage({
 	onOpenStep,
 }: StepDashboardPageProps) {
 	const trace = useRunTrace(username, graphSlug, runId);
+	// The run's whole ledger; the composer picks out this step's rows. It is
+	// keyed on the run, so opening a second step paints from cache.
+	const touches = useRunTouchesQuery(username, graphSlug, runId);
 	const [view, setView] = useState(VIEW_DASHBOARD);
 
 	const context = useMemo(
 		() => (trace.data ? stepContext(trace.data, stepId) : null),
 		[trace.data, stepId],
 	);
+	const engaged = touches.data?.total ? touches.data : undefined;
 	const spec = useMemo(
 		() =>
 			trace.data && context
-				? stepDashboardSpec(trace.data, context, { view })
+				? stepDashboardSpec(trace.data, context, { view, touches: engaged })
 				: null,
-		[trace.data, context, view],
+		[trace.data, context, view, engaged],
 	);
+
+	// `Save report` on the header, and the act behind it (B6). The document
+	// it keeps is `spec` — this page's reading, resolved — never the subject.
+	const report = useReport(spec);
 
 	if (trace.isLoading) {
 		return (
@@ -64,7 +75,7 @@ export function StepDashboardPage({
 			</div>
 		);
 	}
-	if (!trace.data || !context || !spec) {
+	if (!trace.data || !context || !spec || !report) {
 		return (
 			<EmptyState
 				className="h-full"
@@ -79,9 +90,13 @@ export function StepDashboardPage({
 	return (
 		<Dashboard
 			className="h-full min-h-0 overflow-y-auto p-3"
-			spec={spec}
+			spec={report.spec}
+			// Govern's, not Studio's — the step dashboard *hosts* R2, it does not
+			// own what a touch means.
+			registry={{ ...RUN_PANELS, stepTouch: StepTouchPanel }}
 			icons={DASHBOARD_ICONS}
 			onAction={(id, ctx) => {
+				if (report.handle(id)) return;
 				switch (id) {
 					case STEP_ACTIONS.view:
 						if (ctx?.option) setView(ctx.option);

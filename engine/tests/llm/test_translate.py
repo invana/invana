@@ -14,7 +14,7 @@ import pytest
 from invana.apps.llm import LLMError
 from invana.apps.llm.grounding import render_model_context
 from invana.apps.llm.translate import _looks_read_only, nl_to_query
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.models import LLMProviderKind
 from invana.apps.modeller.models import (
     EdgeTypeDefinition,
     GraphVersion,
@@ -22,6 +22,7 @@ from invana.apps.modeller.models import (
     PropertyKeyDefinition,
     TypePropertyMapping,
 )
+from tests.llm.endpoints import endpoint
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
 _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")
@@ -65,7 +66,7 @@ def test_render_model_context_handles_missing_version() -> None:
 
 @pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
 async def test_nl_to_query_grounds_and_returns_read_only_cypher() -> None:
-    provider = LLMProvider(provider=LLMProviderKind.ollama, model_id=_DEV_MODEL, base_url=_OLLAMA_URL)
+    provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     generated = await nl_to_query(
         provider=provider,
         prompt="who works on which projects?",
@@ -84,7 +85,7 @@ async def test_nl_to_query_grounds_and_returns_read_only_cypher() -> None:
 
 @pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
 async def test_nl_to_query_rejects_a_write_request() -> None:
-    provider = LLMProvider(provider=LLMProviderKind.ollama, model_id=_DEV_MODEL, base_url=_OLLAMA_URL)
+    provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     with pytest.raises(LLMError):
         await nl_to_query(
             provider=provider,

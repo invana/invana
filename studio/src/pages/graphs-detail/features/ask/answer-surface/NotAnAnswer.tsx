@@ -8,8 +8,13 @@
  *
  * | Surface | Says | Looks like |
  * |---|---|---|
- * | {@link CannotAnswerCard} | the graph does not hold this | an answer's neighbour: quiet, no header, no citation strip |
- * | {@link DiagnosisCard} | something broke, and here is the evidence | a fault: a destructive rule, evidence, one next step |
+ * | {@link RunCannotAnswer} | the graph does not hold this | an answer's neighbour: quiet, dashed, no citation strip |
+ * | {@link RunDiagnosis} | something broke, and here is the evidence | a fault: a destructive rule, evidence, one next step |
+ *
+ * Both cards are the kit's (`@invana/ui` · `CannotAnswerCard`, `DiagnosisCard`),
+ * which is what guarantees the rule the kit states as DS8: a refusal and a
+ * failure are separate components, so neither is one prop away from an answer.
+ * What lives here is the mapping from Invana's `Diagnosis` onto their slots.
  *
  * Neither carries an emission header or a citation strip (CA6). That is the
  * whole point: a reader scanning a thread must be able to tell at a glance that
@@ -17,9 +22,7 @@
  */
 
 import type { Diagnosis } from "@/types/run";
-import { Button, cn } from "@invana/ui";
-import { ChevronDown, CircleSlash, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { Button, CannotAnswerCard, DiagnosisCard } from "@invana/ui";
 
 /**
  * The graph does not hold what was asked.
@@ -28,7 +31,7 @@ import { useState } from "react";
  * that — so it is drawn calmly rather than as an error. Putting it next to "the
  * graph timed out" would tell a reader those are the same kind of nothing.
  */
-export function CannotAnswerCard({
+export function RunCannotAnswer({
 	reason,
 	stage,
 	onLoadData,
@@ -42,34 +45,28 @@ export function CannotAnswerCard({
 	className?: string;
 }) {
 	return (
-		<div
+		<CannotAnswerCard
 			data-testid="cannot-answer"
-			className={cn(
-				"flex gap-2.5 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2.5",
-				className,
-			)}
-		>
-			<CircleSlash className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-			<div className="flex min-w-0 flex-col gap-1.5">
-				<p className="text-sm text-foreground">{reason}</p>
-				<p className="text-xs text-muted-foreground">
+			className={className}
+			remedy={
+				<>
 					This is what the graph does not hold — not a failure.
 					{stage ? ` Settled at ${stage}, before any query ran.` : ""}
-				</p>
-				{onLoadData ? (
-					<div>
+					{onLoadData ? (
 						<Button
 							variant="outline"
 							size="sm"
-							className="h-7 px-3 font-normal"
+							className="ml-2 h-7 px-3 font-normal"
 							onClick={onLoadData}
 						>
 							Load a dataset
 						</Button>
-					</div>
-				) : null}
-			</div>
-		</div>
+					) : null}
+				</>
+			}
+		>
+			{reason}
+		</CannotAnswerCard>
 	);
 }
 
@@ -80,7 +77,7 @@ export function CannotAnswerCard({
  * query. The next steps are the only actions on it (CA6) — there is no "try
  * again" that quietly re-asks a different question.
  */
-export function DiagnosisCard({
+export function RunDiagnosis({
 	diagnosis,
 	onRetry,
 	onFocusComposer,
@@ -93,60 +90,34 @@ export function DiagnosisCard({
 	onRoute?: (route: string) => void;
 	className?: string;
 }) {
-	const [showEvidence, setShowEvidence] = useState(false);
 	const evidence = Object.entries(diagnosis.evidence ?? {}).filter(
 		([, value]) => value !== null && value !== undefined && value !== "",
 	);
 
 	return (
-		<div
+		<DiagnosisCard
 			data-testid="diagnosis"
-			className={cn(
-				"flex gap-2.5 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5",
-				className,
-			)}
-		>
-			<TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-			<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-				<p className="text-sm text-foreground">{diagnosis.summary}</p>
-
-				{evidence.length > 0 ? (
-					<div>
-						<button
-							type="button"
-							onClick={() => setShowEvidence((v) => !v)}
-							className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-						>
-							<ChevronDown
-								className={cn(
-									"h-3 w-3 transition-transform",
-									!showEvidence && "-rotate-90",
-								)}
-							/>
-							Evidence
-						</button>
-						{showEvidence ? (
-							<dl className="mt-1 space-y-0.5">
-								{evidence.map(([key, value]) => (
-									<div key={key} className="flex gap-2 text-xs">
-										<dt className="w-28 shrink-0 text-muted-foreground">
-											{key}
-										</dt>
-										<dd className="min-w-0 flex-1 break-all font-mono text-foreground">
-											{typeof value === "object"
-												? JSON.stringify(value)
-												: String(value)}
-										</dd>
-									</div>
-								))}
-							</dl>
-						) : null}
-					</div>
-				) : null}
-
-				{diagnosis.suggestions.length > 0 ? (
-					<div className="flex flex-wrap gap-1.5">
-						{diagnosis.suggestions.map((s) => (
+			className={className}
+			code={diagnosis.cause}
+			attempted={
+				evidence.length > 0 ? (
+					<dl className="space-y-0.5">
+						{evidence.map(([key, value]) => (
+							<div key={key} className="flex gap-2">
+								<dt className="w-28 shrink-0 text-muted-foreground">{key}</dt>
+								<dd className="min-w-0 flex-1 break-all">
+									{typeof value === "object"
+										? JSON.stringify(value)
+										: String(value)}
+								</dd>
+							</div>
+						))}
+					</dl>
+				) : undefined
+			}
+			actions={
+				diagnosis.suggestions.length > 0
+					? diagnosis.suggestions.map((s) => (
 							<Button
 								key={s.label}
 								variant="outline"
@@ -160,10 +131,11 @@ export function DiagnosisCard({
 							>
 								{s.label}
 							</Button>
-						))}
-					</div>
-				) : null}
-			</div>
-		</div>
+						))
+					: undefined
+			}
+		>
+			{diagnosis.summary}
+		</DiagnosisCard>
 	);
 }

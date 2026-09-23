@@ -12,13 +12,13 @@ import { runsApi } from "@/services/api/runs";
 import {
 	agentsApi,
 	projectsApi,
-	skillUsageApi,
 	tasksApi,
 	workflowsApi,
 } from "@/services/api/work";
 import type {
 	AgentCreate,
 	AgentUpdate,
+	LifecycleAct,
 	ProjectCreate,
 	ProjectUpdate,
 	TaskCreate,
@@ -45,7 +45,7 @@ export function useAgentsQuery(
 	opts: {
 		includeEphemeral?: boolean;
 		includeRetired?: boolean;
-		/** Off for a caller that only wants the roster on some kinds. */
+		/** Off for a caller that only wants the list on some kinds. */
 		enabled?: boolean;
 	} = {},
 ) {
@@ -72,22 +72,28 @@ export function useAgentLineageQuery(
 	});
 }
 
-export function useRetirePreviewQuery(
+/**
+ * What pausing or retiring would do to this agent's open work. One hook for
+ * both acts (LC8) — the act is part of the key, so switching between them
+ * refetches rather than showing the other act's effects.
+ */
+export function useLifecyclePreviewQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
 	agentId: string | undefined,
-	enabled: boolean,
+	act: LifecycleAct | undefined,
 ) {
 	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
 	return useQuery({
-		queryKey: agentsKey(scope, ["retire-preview", agentId]),
+		queryKey: agentsKey(scope, ["lifecycle-preview", act, agentId]),
 		queryFn: () =>
-			agentsApi.retirePreview(
+			agentsApi.lifecyclePreview(
 				scope.username,
 				scope.graphSlug,
 				agentId as string,
+				act as LifecycleAct,
 			),
-		enabled: enabled && !!username && !!graphSlug && !!agentId,
+		enabled: !!username && !!graphSlug && !!agentId && !!act,
 	});
 }
 
@@ -98,6 +104,9 @@ export function useAgentMutations(username: string, graphSlug: string) {
 	const invalidate = () => {
 		qc.invalidateQueries({ queryKey: ["agents", username, graphSlug] });
 		qc.invalidateQueries({ queryKey: ["tasks", username, graphSlug] });
+		// A binding change moves rows between the skill's bound / refused / not
+		// bound sections, and those come from the skill's own read (BN10).
+		qc.invalidateQueries({ queryKey: ["skills", username, graphSlug] });
 	};
 
 	return {
@@ -362,25 +371,6 @@ export function usePromoteWorkflowMutation(
 			qc.invalidateQueries({ queryKey: ["workflows", username, graphSlug] });
 			qc.invalidateQueries({ queryKey: ["runs", username, graphSlug] });
 		},
-	});
-}
-
-// ── Skill usage ──────────────────────────────────────────────────────────────
-
-export function useSkillUsageQuery(
-	username: string | undefined,
-	graphSlug: string | undefined,
-	skillId: string | undefined,
-) {
-	return useQuery({
-		queryKey: ["skill-usage", username, graphSlug, skillId] as const,
-		queryFn: () =>
-			skillUsageApi.get(
-				username as string,
-				graphSlug as string,
-				skillId as string,
-			),
-		enabled: !!username && !!graphSlug && !!skillId,
 	});
 }
 

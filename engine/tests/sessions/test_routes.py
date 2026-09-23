@@ -95,7 +95,7 @@ class TestSessionsRoutes:
         # failure rolls back before any message is written.
         resp = await client.post(f"{BASE}/{sid}/messages", json={"content": "hi", "mode": "nl"})
         assert resp.status_code == 422
-        assert "Settings" in resp.json()["detail"]
+        assert "Agents" in resp.json()["detail"]
 
         # List shows the session.
         resp = await client.get(BASE)

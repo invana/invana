@@ -2,10 +2,10 @@ import {
 	useCanvasStateBannerQuery,
 	useCanvasStatesQuery,
 } from "@/hooks/queries/useBoardVersions";
-import { formatRelativeTime } from "@/lib/time";
+import { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
 import type { BoardVersionSummary } from "@/types/board";
-import { Button, ScrollArea } from "@invana/ui";
-import { Camera, History, X } from "lucide-react";
+import { Button } from "@invana/ui";
+import { Camera } from "lucide-react";
 
 interface Props {
 	open: boolean;
@@ -24,11 +24,16 @@ interface Props {
 }
 
 /**
- * Board version history (docs/for-developers/modules/explore/features/boards.md): the append-only timeline of a canvas'
- * states, newest first. Each row shows the state's banner thumbnail, a label,
- * and when it was captured, with "Open as new canvas" to restore it (a
- * non-destructive fork). Floats over the canvas like the styling / fine-tune
- * panels.
+ * A **drawn** board's version history (docs/for-developers/modules/explore/features/boards.md): the append-only
+ * timeline of a canvas' states, newest first. Each row shows the state's banner
+ * thumbnail, a label, and when it was captured, with "Open as new canvas" to
+ * restore it (a non-destructive fork). Floats over the canvas like the styling /
+ * fine-tune panels.
+ *
+ * The shell and the row are `BoardHistoryCard`, shared with a declared board's
+ * `Reports` ([B21](../../../../../docs/for-developers/building-engine/boards-migration.md));
+ * what belongs to *this* binding is the fetch by `board_id`, the banner, and a
+ * row that forks rather than opens ([B22](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 export function BoardHistoryPanel({
 	open,
@@ -50,80 +55,53 @@ export function BoardHistoryPanel({
 
 	if (!open) return null;
 
-	const states = data?.items ?? [];
-
 	return (
-		<div className="absolute right-3 top-3 z-20 flex max-h-[calc(100%-1.5rem)] w-80 flex-col rounded-lg border border-border bg-background shadow-lg">
-			<div className="flex items-center justify-between border-b border-border px-3 py-2">
-				<span className="flex items-center gap-1.5 font-medium text-sm">
-					<History className="h-4 w-4" />
-					History
-				</span>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-6 w-6"
-					onClick={onClose}
-				>
-					<X className="h-4 w-4" />
-				</Button>
-			</div>
-			<div className="border-b border-border p-2">
+		<BoardHistoryCard
+			title="History"
+			onClose={onClose}
+			isLoading={isLoading}
+			versions={data?.items ?? []}
+			fallbackLabel="Board state"
+			empty="No saved states yet. Run a query, expand a node, or load a result — each is captured here so you can go back to it."
+			toolbar={
 				<Button
 					variant="outline"
 					size="sm"
-					className="h-8 w-full gap-1.5 text-xs"
+					className="h-8 w-full gap-1.5 text-sm"
 					disabled={isSaving || !boardId}
 					onClick={onSave}
 				>
 					<Camera className="h-3.5 w-3.5" />
 					Save current state
 				</Button>
-			</div>
-			<ScrollArea className="min-h-0 flex-1">
-				<div className="space-y-2 p-3">
-					{isLoading && (
-						<p className="text-center text-muted-foreground text-sm">
-							Loading…
-						</p>
-					)}
-					{!isLoading && states.length === 0 && (
-						<p className="text-center text-muted-foreground text-sm">
-							No saved states yet. Run a query, expand a node, or load a result
-							— each is captured here so you can go back to it.
-						</p>
-					)}
-					{states.map((s) => (
-						<HistoryRow
-							key={s.id}
-							state={s}
-							username={username}
-							graphSlug={graphSlug}
-							boardId={boardId}
-							onFork={() => onFork(s.id)}
-							isForking={isForking}
-						/>
-					))}
-				</div>
-			</ScrollArea>
-		</div>
+			}
+			thumbnail={(state) => (
+				<Thumbnail
+					state={state}
+					username={username}
+					graphSlug={graphSlug}
+					boardId={boardId}
+				/>
+			)}
+			action={(state) => ({
+				label: "Open as new canvas",
+				disabled: isForking,
+				onClick: () => onFork(state.id),
+			})}
+		/>
 	);
 }
 
-function HistoryRow({
+function Thumbnail({
 	state,
 	username,
 	graphSlug,
 	boardId,
-	onFork,
-	isForking,
 }: {
 	state: BoardVersionSummary;
 	username?: string;
 	graphSlug?: string;
 	boardId: string | null;
-	onFork: () => void;
-	isForking: boolean;
 }) {
 	// Only fetch the (heavy) thumbnail for rows the summary says have one.
 	const { data: banner, isLoading } = useCanvasStateBannerQuery(
@@ -133,39 +111,18 @@ function HistoryRow({
 		state.hasBanner ? state.id : null,
 	);
 
+	if (!state.hasBanner) return null;
+	if (isLoading)
+		return (
+			<div className="aspect-video w-full animate-pulse rounded bg-muted" />
+		);
+	if (!banner) return null;
 	return (
-		<div className="space-y-1.5 rounded border border-border p-2">
-			{state.hasBanner &&
-				(isLoading ? (
-					<div className="aspect-video w-full animate-pulse rounded bg-muted" />
-				) : banner ? (
-					<img
-						src={banner}
-						alt=""
-						loading="lazy"
-						className="aspect-video w-full rounded border border-border object-cover"
-					/>
-				) : null)}
-			<div className="flex items-center justify-between gap-2">
-				<span className="min-w-0 truncate text-sm" title={state.label}>
-					{state.label || "Board state"}
-				</span>
-				<span
-					className="shrink-0 text-muted-foreground text-xs"
-					title={state.createdAt.toLocaleString()}
-				>
-					{formatRelativeTime(state.createdAt)}
-				</span>
-			</div>
-			<Button
-				variant="outline"
-				size="sm"
-				className="h-7 w-full text-xs"
-				disabled={isForking}
-				onClick={onFork}
-			>
-				Open as new canvas
-			</Button>
-		</div>
+		<img
+			src={banner}
+			alt=""
+			loading="lazy"
+			className="aspect-video w-full rounded border border-border object-cover"
+		/>
 	);
 }

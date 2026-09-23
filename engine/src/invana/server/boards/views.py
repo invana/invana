@@ -187,7 +187,7 @@ async def list_reports(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> BoardVersionListResponse:
-    board = await boards.querysets.get_by_subject(session, graph_id=graph.id, kind=kind, subject_id=subject_id)
+    board = await boards.boards_qs.get_by_subject(session, graph_id=graph.id, kind=kind, subject_id=subject_id)
     # No row means nothing was ever kept — an empty list, not a 404. The live
     # dashboard is still there; it simply has no reports.
     if board is None:
@@ -207,7 +207,7 @@ async def get_report(
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> BoardVersionDetail:
-    board = await boards.querysets.get_by_subject(session, graph_id=graph.id, kind=kind, subject_id=subject_id)
+    board = await boards.boards_qs.get_by_subject(session, graph_id=graph.id, kind=kind, subject_id=subject_id)
     if board is None:
         raise NotFoundError("Board version not found.")
     version = await versions.get(session, version_id=version_id, board_id=board.id, graph_id=graph.id)

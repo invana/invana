@@ -1,1 +1,1 @@
-"""The HTTP and admin surface for the agent roster."""
+"""The HTTP and admin surface for the agents list."""

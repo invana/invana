@@ -245,7 +245,7 @@ export function LoginPage() {
 											autoComplete="username"
 											required
 											placeholder="you@example.com or your-username"
-											// Override the design-kit Input's baked-in `md:text-sm`,
+											// Override the design-kit Input's baked-in `md:text-base`,
 											// which shrinks field text on md+ screens.
 											className="md:text-base"
 											value={identifier}

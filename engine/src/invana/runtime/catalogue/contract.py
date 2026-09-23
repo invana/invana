@@ -22,11 +22,17 @@ from typing import Any
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.govern.addressing import Layer
+from invana.apps.govern.catalogue import CatalogueResolver
+from invana.apps.govern.models import TouchDirection
+from invana.apps.govern.query_lens import CompiledLens, compile_lens
+from invana.apps.govern.rules import Decision, EgressClass, Verdict
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.graphs.query_service import QueryExecutionError, resolve_query_language
 from invana.apps.graphs.schemas import QueryResponse
 from invana.apps.llm.intent import Intent
+from invana.apps.llm.pricing import cost_usd
 from invana.apps.llm.propose import ModelProposal
 from invana.apps.llm_providers.models import LLMProvider
 from invana.apps.modeller.models import GraphModel, GraphVersion
@@ -37,6 +43,9 @@ from invana.apps.sessions.transcript import (
 )
 from invana.apps.skills.models import Rule, Skill
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
+from invana.graph.types.lens import QueryLens
+from invana.runtime.contention import PoolExhausted, PoolSlots
+from invana.runtime.governing import Egress, Governor
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import Emitter
 
@@ -173,6 +182,22 @@ class RunVars:
     agent: Any = None
     envelope: Any = None
     run: TaskRun | None = None
+    #: The lens this run froze, as the thing that decides and records
+    #: (docs/for-developers/modules/govern/spec.md GV26). It rides the run's
+    #: state rather than the step's so no step can reach a different lens than
+    #: the one the run opened under (GV8). ``None`` only outside the
+    #: interpreter — a run always has one, and an ungoverned Graph's is the
+    #: widest rather than absent.
+    governor: Governor | None = None
+    #: The Graph's pools, and what is in them right now
+    #: ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+    #: Process state, like the queue (CC7), so it is handed down on the run's
+    #: vars rather than reached up for. ``None`` outside the interpreter, which
+    #: reads as *unbounded* — nothing else in this file can take a pool slot
+    #: without the run that owns it.
+    pools: PoolSlots | None = None
+    #: ``llm/<provider row>/<model>``, resolved once — see :func:`model_address`.
+    model_address: str | None = None
     # understand →
     intent: Intent | None = None
     # plan →
@@ -246,6 +271,576 @@ class TaskContext:
         self.step.detail = detail[:255]
         await self.db.flush()
         await self.emitter.emit("step.progress", {"step_id": self.step.id, "detail": self.step.detail})
+
+
+# ── the lens, at the moment a step engages something ──────────────────────────
+
+_catalogue = CatalogueResolver()
+
+
+# ── the pools a crossing draws on ─────────────────────────────────────────────
+
+#: Which pool each crossing takes a slot in
+#: ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+#: Two, because two crossings exist. `heavy` is configured and has no call site
+#: — graph algorithms are the thing it is for, and nothing dispatches one yet, so
+#: naming it here would claim a bound nothing takes.
+POOL_LLM = "llm"
+POOL_GRAPHDB = "graphdb"
+
+
+def _take_pool(ctx: TaskContext, v: RunVars, *, pool: str) -> str | None:
+    """Hold a slot in ``pool`` for this crossing, or fail naming the pool.
+
+    Returns the holder key, so the matching ``close_*`` can give the slot back;
+    ``None`` when nothing is accounting — outside the interpreter, which is the
+    same *unbounded* reading an absent governor gets.
+
+    A pool that is full is a **bound**, not a query error: the question was
+    fine, the machine is busy, and *a query error* would send the reader to fix
+    a query that has nothing wrong with it (CC6 · CC8).
+    """
+    if v.pools is None or v.run is None:
+        return None
+    size = int((v.graph.pools or {}).get(pool, 0) or 0)
+    holder = PoolSlots.holder(run_id=v.run.id, step_key=ctx.step.task_key, pool=pool)
+    try:
+        v.pools.acquire(graph_id=v.graph.id, pool=pool, size=size, holder=holder)
+    except PoolExhausted as full:
+        raise TaskFailure(
+            cls="bound",
+            cause="pool_exhausted",
+            message=str(full),
+            short=f"`{full.pool}` pool full",
+            evidence={"pool": full.pool, "size": full.size},
+        ) from full
+    return holder
+
+
+def _give_pool_back(v: RunVars, *, pool: str, holder: str | None) -> None:
+    if v.pools is None or holder is None:
+        return
+    v.pools.release(graph_id=v.graph.id, pool=pool, holder=holder)
+
+
+async def model_address(ctx: TaskContext, v: RunVars) -> str:
+    """``llm/<provider row>/<model>`` — the participant a model call engages.
+
+    Resolved through the catalogue rather than built here, so the string a run
+    is checked at is the string a rule was written against; a second spelling of
+    an address is a second participant
+    (docs/for-developers/modules/govern/spec.md GV4). Cached on the run's state
+    because the provider does not change mid-run and the resolution is a query.
+
+    A model this Graph does not offer cannot be addressed, and an
+    unaddressable participant cannot be governed — so it is refused rather than
+    quietly permitted.
+    """
+    assert v.provider is not None
+    if v.model_address is None:
+        v.model_address = await _catalogue.llm_address(
+            ctx.db, graph_id=v.graph.id, model_row_id=v.provider.model_row_id
+        )
+    if v.model_address is None:
+        raise TaskFailure(
+            cls="blocked",
+            cause="unaddressable_provider",
+            message="The LLM this run would call is not one this graph configures, so nothing can govern it.",
+            short="provider not this graph's",
+        )
+    return v.model_address
+
+
+async def engage(ctx: TaskContext, v: RunVars, *, address: str) -> Verdict:
+    """Check one participant **before** the call, and record what was decided.
+
+    A refusal is written to the ledger and then ends the run in *cannot answer*
+    naming its rule, for the two layers a run cannot continue without
+    (docs/for-developers/modules/govern/spec.md GV29). The run **succeeds**:
+    a bound doing its job is not an engine failure, and the answer says what it
+    could not reach.
+
+    A run with no governor — anything driving a step outside the interpreter —
+    is the widest, which is the same reading an ungoverned Graph gets (GV7).
+    """
+    if v.governor is None:
+        return Verdict(decision=Decision.allowed, why="not narrowed")
+
+    return await engaged(ctx, v, address=address, verdict=v.governor.check(address))
+
+
+async def engaged(ctx: TaskContext, v: RunVars, *, address: str, verdict: Verdict) -> Verdict:
+    """:func:`engage`'s tail, for a caller that has already decided.
+
+    A graph read resolves the models a world named before it can say whether
+    there is anything left to read ([GV33]), so it arrives here holding a
+    verdict rather than an address to check. The recording and the refusal are
+    the same either way — and they are here, once, because two places that end
+    a run in *cannot answer* would be two places to forget the ledger.
+    """
+    if verdict.allowed:
+        return verdict
+
+    assert v.governor is not None
+    await v.governor.record(
+        ctx.db,
+        ctx.emitter,
+        address=address,
+        direction=TouchDirection.refused,
+        step_key=ctx.step.step_key,
+        verdict=verdict,
+    )
+    reason = _refusal(address, verdict)
+    await ctx.emit("cannot_answer", {"reason": reason, "stage": ctx.step.task_key, "address": address})
+    raise CannotAnswer(reason=reason)
+
+
+def _refusal(address: str, verdict: Verdict) -> str:
+    """The sentence a refused run ends on, naming what refused it.
+
+    [GR4](docs/for-developers/modules/govern/features/guardrails.md) wants a rule
+    named, and a **closed layer** has none to name: nothing matched, because the
+    layer admits only what it names ([GR15]). So the world is named instead —
+    which is the actionable half anyway, since the recourse is to widen *this*
+    world rather than to find a rule that does not exist.
+    """
+    where = f"is not in {verdict.narrowed_by}" if verdict.narrowed_by else "is not in this run's world"
+    return f"{address} {where} — {verdict.why}."
+
+
+async def touched(
+    ctx: TaskContext,
+    v: RunVars,
+    *,
+    address: str,
+    verdict: Verdict,
+    direction: TouchDirection | str = TouchDirection.out,
+    volume: dict[str, Any] | None = None,
+    applied: dict[str, Any] | None = None,
+    sent: dict[str, Any] | None = None,
+    query: dict[str, Any] | None = None,
+    cost_usd: float | None = None,
+    duration_ms: float | int | None = None,
+) -> None:
+    """Record the engagement that just happened, with what it cost.
+
+    Called **after** the call rather than beside the check, because half of what
+    a touch carries — rows, tokens, the executed digest — does not exist until
+    the participant has answered.
+    """
+    if v.governor is None:
+        return
+    await v.governor.record(
+        ctx.db,
+        ctx.emitter,
+        address=address,
+        direction=direction,
+        step_key=ctx.step.step_key,
+        verdict=verdict,
+        volume=volume,
+        applied=applied,
+        sent=sent,
+        query=query,
+        cost_usd=cost_usd,
+        duration_ms=round(duration_ms) if duration_ms is not None else None,
+    )
+
+
+def egress_for(v: RunVars, verdict: Verdict, *, carrying: tuple[str, ...]) -> Egress:
+    """What of ``carrying`` may accompany this crossing, and what may not."""
+    if v.governor is None:
+        return Egress(classes=tuple(carrying), cut=())
+    return v.governor.egress_for(verdict, carrying=carrying)
+
+
+# ── a model call, as a governed crossing ──────────────────────────────────────
+
+
+@dataclass(slots=True)
+class ModelCrossing:
+    """One governed model call: who is engaged, and what may go with the ask.
+
+    Every ``llm`` entry opens one before it builds a prompt and closes
+    one after the model answers. The two halves are separate because half of
+    what a touch carries — tokens, cost, how long it took — does not exist
+    until the model has replied
+    ([GV28](docs/for-developers/modules/govern/spec.md)).
+    """
+
+    address: str
+    verdict: Verdict
+    egress: Egress
+    #: The `llm` pool slot this crossing holds, given back by ``close_model``.
+    #: ``None`` when nothing is accounting.
+    pool_holder: str | None = None
+
+    @property
+    def may_send(self) -> frozenset[str] | None:
+        """What the prompt builders cut against — ``None`` is unbounded."""
+        return None if self.verdict.egress_unbounded else frozenset(self.egress.classes)
+
+    def history(self, history: list[dict]) -> list[dict]:
+        """The conversation, or none of it.
+
+        Prior turns carry results, and a result is property values. A world that
+        does not send them does not send the transcript that quotes them — the
+        cut is to the part, before the prompt exists ([GV31]).
+        """
+        return history if self.egress.permits(EgressClass.property_values) else []
+
+
+def _carrying(*, grounding: object | None, history: list[dict]) -> tuple[str, ...]:
+    """What *this* call would send, of what a prompt can send at all.
+
+    Only what the step actually holds: a step with no history to pass must not
+    record ``property_values`` as cut, because that claims the lens removed
+    something the run never had.
+    """
+    classes: list[str] = []
+    if grounding is not None:
+        classes += [EgressClass.type_names.value, EgressClass.property_names.value]
+    classes.append(EgressClass.the_question.value)
+    if history:
+        classes.append(EgressClass.property_values.value)
+    return tuple(classes)
+
+
+async def open_model(ctx: TaskContext, v: RunVars, *, grounding: object | None = None) -> ModelCrossing:
+    """Check the model before the prompt is built, and work out the cut.
+
+    A denied model ends the run in *cannot answer* naming its rule: there is
+    nothing left to think with, and that is the run **succeeding** with a
+    refusal rather than erroring ([GV29]).
+    """
+    address = await model_address(ctx, v)
+    verdict = await engage(ctx, v, address=address)
+    egress = egress_for(v, verdict, carrying=_carrying(grounding=grounding, history=v.history))
+    if not egress.permits(EgressClass.the_question):
+        # The one class a call cannot proceed without. Refusing here rather than
+        # sending an empty prompt: a model asked nothing answers nothing, and an
+        # answer grounded in no question is the outcome this module exists to
+        # prevent.
+        reason = f"This run's world does not let the question reach {address}, so there is nothing to ask it."
+        await touched(
+            ctx,
+            v,
+            address=address,
+            verdict=verdict,
+            direction=TouchDirection.refused,
+            sent=egress.as_sent(to=address),
+        )
+        await ctx.emit("cannot_answer", {"reason": reason, "stage": ctx.step.task_key, "address": address})
+        raise CannotAnswer(reason=reason)
+    # The pool is taken **after** the lens has spoken: a call this world refuses
+    # must not first consume a slot somebody else could have used.
+    holder = _take_pool(ctx, v, pool=POOL_LLM)
+    return ModelCrossing(address=address, verdict=verdict, egress=egress, pool_holder=holder)
+
+
+async def close_model(
+    ctx: TaskContext, v: RunVars, crossing: ModelCrossing, *, usage, duration_ms: float | None
+) -> None:
+    """Record what the call engaged, and what it cost — and give the slot back."""
+    _give_pool_back(v, pool=POOL_LLM, holder=crossing.pool_holder)
+    tokens_in = usage.input_tokens if usage else None
+    tokens_out = usage.output_tokens if usage else None
+    await touched(
+        ctx,
+        v,
+        address=crossing.address,
+        verdict=crossing.verdict,
+        volume={k: n for k, n in (("tokens_in", tokens_in), ("tokens_out", tokens_out)) if n is not None},
+        sent=crossing.egress.as_sent(to=crossing.address),
+        cost_usd=cost_usd(v.provider, tokens_in, tokens_out),
+        duration_ms=duration_ms,
+    )
+
+
+# ── a graph read, as a governed crossing ──────────────────────────────────────
+
+
+@dataclass(slots=True)
+class GraphCrossing:
+    """The version a query reads, and what this world lets it read of it."""
+
+    address: str | None = None
+    verdict: Verdict | None = None
+    #: Handed to the connector, which composes the predicate and rewrites the
+    #: projection **before** execution. ``None`` narrows nothing, and the query
+    #: then runs byte-identical ([GV7]).
+    lens: QueryLens | None = None
+    #: The authored model versions whose rules reached this read
+    #: ([GV33](docs/for-developers/modules/govern/spec.md)). Recorded on the
+    #: touch, so a run can answer *what bound me* months later without
+    #: ``lens_snapshot`` carrying a copy of the schema.
+    bound_by: tuple[str, ...] = ()
+    #: What compiling the lens decided, in the words the world was authored in —
+    #: the per-type slice and the per-type exclusions
+    #: ([WO17](docs/for-developers/modules/govern/features/worlds.md)). Kept
+    #: beside the connector's lens rather than inside it, because a connector has
+    #: no use for `time` · `geo` · `dims` and a person reading the touch has
+    #: nothing else.
+    compiled: CompiledLens | None = None
+    #: The `graphdb` pool slot this read holds, given back by ``close_graph``.
+    #: ``None`` when nothing is accounting.
+    pool_holder: str | None = None
+
+    @property
+    def governed(self) -> bool:
+        return self.address is not None and self.verdict is not None
+
+
+async def open_graph(ctx: TaskContext, v: RunVars) -> GraphCrossing:
+    """Check the version this run is grounded on, and compile what it may read.
+
+    A run with no published model version has nothing in ``graph_data`` to
+    address, and an unaddressable participant cannot be checked. That is the
+    widest reading and the honest one — **except** where the lens has *closed*
+    the layer ([GV23](docs/for-developers/modules/govern/spec.md)), which says
+    only what it names is in view: naming nothing and reading everything is the
+    one way a closed layer could fail open, so it is refused instead.
+    """
+    governor = v.governor
+    address = await _catalogue.version_address(ctx.db, version_id=v.grounding.id) if v.grounding is not None else None
+    if address is None:
+        if governor is not None and Layer.graph_data in governor.effective.closed_layers:
+            raise CannotAnswer(
+                reason=(
+                    "This run's world allow-lists graph data, and this graph publishes no model version "
+                    "to allow — so there is nothing it may read."
+                )
+            )
+        return GraphCrossing(pool_holder=_take_pool(ctx, v, pool=POOL_GRAPHDB))
+
+    assert v.grounding is not None
+    if governor is None:
+        verdict = await engage(ctx, v, address=address)
+        return GraphCrossing(address=address, verdict=verdict, pool_holder=_take_pool(ctx, v, pool=POOL_GRAPHDB))
+
+    # The authored models first: a rule naming one of them bounds the types it
+    # declares, and that is what decides whether this read has anything left
+    # ([GV33]). Compiling before deciding is the whole of the change — the
+    # grounding version's own address is often *not* what a world names.
+    bindings = await _catalogue.model_bindings(ctx.db, graph_id=v.graph.id, excluding=address)
+    own = governor.check(address)
+    compiled = compile_lens(governor.effective, version=v.grounding, verdict=own, bindings=bindings)
+    lens = compiled.query_lens
+    bound_by = tuple(b.address for b in bindings if governor.check(b.address).rule_matched is not None)
+
+    verdict = _graph_verdict(own, lens, bound_by)
+    await engaged(ctx, v, address=address, verdict=verdict)
+    return GraphCrossing(
+        address=address,
+        verdict=verdict,
+        lens=(lens if not lens.is_empty else None),
+        bound_by=bound_by,
+        compiled=compiled,
+        # Taken last: a read this world refuses must not first consume a
+        # connection somebody else could have used.
+        pool_holder=_take_pool(ctx, v, pool=POOL_GRAPHDB),
+    )
+
+
+def _graph_verdict(own: Verdict, lens: QueryLens, bound_by: tuple[str, ...]) -> Verdict:
+    """The decision for the read, once the named models have been resolved.
+
+    A world that closes ``graph_data`` and names four authored models does not
+    name the mirror the run is grounded on, so ``own`` is a refusal — and taking
+    it at face value is what made every such world answer *cannot answer*
+    ([GV33]). What the world actually said is *these types and no others*, and
+    that is a bound, not a refusal.
+
+    **Only a closed-layer refusal is rescued.** ``rule_matched`` set means a
+    rule denied the grounding version by name, and deny wins at any specificity
+    ([GV5]) — a named model must not punch through it. And a rescue needs
+    something admitted: an allow-list that admits no type is a world with
+    nothing in view, which is a refusal however it was written.
+    """
+    if own.allowed or own.rule_matched is not None:
+        return own
+    if not lens.allowed_types:
+        return own
+    count = len(bound_by)
+    named = f"{count} participant{'' if count == 1 else 's'} this world names" if count else "this world"
+    return Verdict(
+        decision=Decision.allowed,
+        rule_matched=own.rule_matched,
+        # The count, not the list: `bound_by` rides the touch, and a `why` that
+        # names seventeen addresses is a sentence nobody reads.
+        why=f"bound to {len(lens.allowed_types)} type(s) by {named}",
+    )
+
+
+async def close_graph(
+    ctx: TaskContext,
+    v: RunVars,
+    crossing: GraphCrossing,
+    *,
+    result,
+    digests: dict[str, str],
+) -> None:
+    """Record the read, both digests, and what the lens did to the query.
+
+    ``in``: the data came *to* the run, and ``rows`` is the only count there is
+    ([WO19](docs/for-developers/modules/govern/features/worlds.md)) — what the
+    unsliced query would have returned is knowable only by running it, and that
+    is a second execution on every governed read.
+    """
+    # The slot first, and before the early return: an ungoverned read still took
+    # a connection, and a pool that only ever shrinks is worse than no pool.
+    _give_pool_back(v, pool=POOL_GRAPHDB, holder=crossing.pool_holder)
+    if not crossing.governed:
+        return
+    assert crossing.address is not None and crossing.verdict is not None
+    await touched(
+        ctx,
+        v,
+        address=crossing.address,
+        verdict=crossing.verdict,
+        direction=TouchDirection.into,
+        volume={"rows": result.row_count},
+        applied=_applied(crossing.verdict, result, bound_by=crossing.bound_by, compiled=crossing.compiled),
+        query={"generated_sha256": digests["generated"], "executed_sha256": digests["executed"]},
+        duration_ms=result.execution_time_ms,
+    )
+
+
+#: The key a narrowing written against the grounding version itself is filed
+#: under, so ``applied.select`` is one shape whatever authored it ([WO17]).
+_GROUNDING = "*"
+
+
+def _applied(
+    verdict: Verdict,
+    result,
+    *,
+    bound_by: tuple[str, ...] = (),
+    compiled: CompiledLens | None = None,
+) -> dict:
+    """What the lens did to this query, as the step dashboard reads it back.
+
+    **``select`` and ``properties_excluded`` are keyed by type**
+    ([WO17](docs/for-developers/modules/govern/features/worlds.md)). A world that
+    narrows by naming authored models compiles a slice per type, and the read's
+    own verdict carries none of them — so both come off the compiled lens, which
+    is where the answer actually is. The verdict is the fallback for the one
+    shape that has no compiled lens: a rule written directly against the
+    grounding version, whose narrowing is the whole read's and is recorded under
+    that version's own name.
+
+    ``projected`` names the returns the projection rewrote and ``composed`` the
+    types a predicate was composed onto. Empty keys are dropped, so *nothing was
+    narrowed* is an empty object rather than four empty containers claiming four
+    narrowings.
+
+    ``models`` is what [GV33](docs/for-developers/modules/govern/spec.md) wants
+    kept: the authored versions whose rules reached this read. The resolution
+    happens at run open against the live catalogue, so recording the answer is
+    what lets a run say *what bound me* after one of those versions is archived.
+    """
+    out: dict = {}
+    if bound_by:
+        out["models"] = list(bound_by)
+
+    selects = dict(compiled.selects) if compiled else {}
+    excluded = {k: list(v) for k, v in compiled.excluded.items()} if compiled else {}
+    # The version's own name is the only type key an uncompiled narrowing has:
+    # the rule named the grounding version, not a type inside it.
+    if not selects and verdict.select:
+        selects = {_GROUNDING: dict(verdict.select)}
+    if not excluded and verdict.properties_excluded:
+        excluded = {_GROUNDING: list(verdict.properties_excluded)}
+
+    if selects:
+        out["select"] = {k: dict(v) for k, v in selects.items()}
+    if excluded:
+        out["properties_excluded"] = excluded
+    composed = result.composed
+    if composed is not None and composed.projected:
+        out["projected"] = list(composed.projected)
+    if composed is not None and composed.composed:
+        out["composed"] = list(composed.composed)
+    return out
+
+
+# ── a graph write, as a governed crossing ─────────────────────────────────────
+
+
+@dataclass(slots=True)
+class Writes:
+    """The model versions one step writes into — checked before, recorded after.
+
+    A write is addressed by the version it lands in, the same string a read
+    engages ([GV35](docs/for-developers/modules/govern/spec.md)), so *which runs
+    touched Deals* finds the loads beside the questions. Only ``allow`` decides:
+    a write that honoured a slice or a property exclusion would load half a
+    record and call it a load.
+
+    One per step, because a stitch writes into two models at once and a step
+    that solves ten stitches over the same pair is one touch per model, not ten.
+    """
+
+    ctx: TaskContext
+    v: RunVars
+    #: address → what the lens said, for every version this step asked about.
+    verdicts: dict[str, Verdict] = field(default_factory=dict)
+    #: version id → address, ``None`` for a version the catalogue cannot name.
+    addresses: dict[str, str | None] = field(default_factory=dict)
+    nodes: dict[str, int] = field(default_factory=dict)
+    edges: dict[str, int] = field(default_factory=dict)
+
+    async def _address(self, version_id: str) -> str | None:
+        if version_id not in self.addresses:
+            self.addresses[version_id] = await _catalogue.version_address(self.ctx.db, version_id=version_id)
+        return self.addresses[version_id]
+
+    async def admit(self, version_id: str | None, *, fatal: bool = True) -> bool:
+        """Whether this step may write into *version_id*.
+
+        ``fatal`` is the write target: refusing it ends the run in *cannot
+        answer* naming the rule, before anything is written ([GV29]). A stitch's
+        other side is not fatal — the stitch is skipped, its refusal recorded
+        once, and the step carries on with the rest.
+        """
+        address = await self._address(version_id) if version_id else None
+        if address is None or self.v.governor is None:
+            return True
+        if address in self.verdicts:
+            return self.verdicts[address].allowed
+        verdict = self.v.governor.check(address)
+        self.verdicts[address] = verdict
+        if verdict.allowed or fatal:
+            await engaged(self.ctx, self.v, address=address, verdict=verdict)
+            return True
+        await touched(self.ctx, self.v, address=address, verdict=verdict, direction=TouchDirection.refused)
+        return False
+
+    def wrote(self, version_id: str | None, *, nodes: int = 0, edges: int = 0) -> None:
+        address = self.addresses.get(version_id or "")
+        if address is None:
+            return
+        self.nodes[address] = self.nodes.get(address, 0) + nodes
+        self.edges[address] = self.edges.get(address, 0) + edges
+
+    async def close(self) -> None:
+        """One ``out`` touch per version something landed in.
+
+        Admitted is not touched: a load's `stitch` checks every active stitch,
+        and one scoped to records this load did not write merges nothing. A
+        touch there would say the run reached a model it never wrote to (ST53).
+        """
+        for address, verdict in self.verdicts.items():
+            nodes, edges = self.nodes.get(address, 0), self.edges.get(address, 0)
+            if not verdict.allowed or not nodes + edges:
+                continue
+            await touched(
+                self.ctx,
+                self.v,
+                address=address,
+                verdict=verdict,
+                direction=TouchDirection.out,
+                volume={"rows": nodes + edges, "nodes": nodes, "edges": edges},
+            )
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

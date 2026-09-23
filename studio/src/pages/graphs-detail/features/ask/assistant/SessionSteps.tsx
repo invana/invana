@@ -1,3 +1,4 @@
+import { useTicker } from "@/hooks/useTicker";
 import { formatCompactCount } from "@/lib/format";
 import { formatDuration } from "@/lib/time";
 import type { RunNode, RunNodeStatus } from "@/types/run";
@@ -7,7 +8,6 @@ import {
 	ChatSessionTaskRow,
 	type ChatSessionTaskStatus,
 } from "@invana/ui";
-import { useEffect, useState } from "react";
 
 // ── Status mapping ────────────────────────────────────────────────────────────
 
@@ -19,18 +19,6 @@ const TASK_STATUS: Record<RunNodeStatus, ChatSessionTaskStatus> = {
 	failed: "error",
 	stopped: "needs-input", // amber — interrupted, like a retry
 };
-
-/** Ticks once a second while `active`, so live durations move. */
-export function useTicker(active: boolean): number {
-	const [now, setNow] = useState(() => Date.now());
-	useEffect(() => {
-		if (!active) return;
-		setNow(Date.now());
-		const id = window.setInterval(() => setNow(Date.now()), 1000);
-		return () => window.clearInterval(id);
-	}, [active]);
-	return now;
-}
 
 function stepDuration(step: RunNode, now: number): string {
 	if (!step.startedAt) return "";
@@ -272,17 +260,17 @@ function TraceGroup({
 	if (entries.length === 0) return null;
 	return (
 		<>
-			<div className="col-span-2 mt-1.5 border-t border-border pt-1.5 text-meta uppercase tracking-wide text-muted-foreground first:mt-0 first:border-t-0 first:pt-0">
+			<div className="col-span-2 mt-1.5 border-t border-border pt-1.5 text-sm uppercase tracking-wide text-muted-foreground first:mt-0 first:border-t-0 first:pt-0">
 				{title}
 			</div>
 			{entries.map(([k, v]) => (
 				<div key={k} className="contents">
-					<dt className="pt-0.5 text-meta uppercase tracking-wide text-muted-foreground">
+					<dt className="pt-0.5 text-sm uppercase tracking-wide text-muted-foreground">
 						{k.replace(/_/g, " ")}
 					</dt>
 					<dd className="m-0 min-w-0">
 						{typeof v === "string" && v.includes("\n") ? (
-							<pre className="m-0 whitespace-pre-wrap break-words font-mono text-meta leading-relaxed text-foreground/85">
+							<pre className="m-0 whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-foreground/85">
 								{v}
 							</pre>
 						) : (
@@ -326,7 +314,7 @@ export function StepTrace({
 				if (!open) onClose();
 			}}
 		>
-			<dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0.5 text-meta">
+			<dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0.5 text-sm">
 				{step.input && <TraceGroup title="Input" data={step.input} />}
 				{step.output && <TraceGroup title="Output" data={step.output} />}
 				{step.error && (

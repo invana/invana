@@ -68,13 +68,13 @@ function NodeTypeChecklist({
 		<div className="space-y-2">
 			<Label>{label}</Label>
 			{all.length === 0 ? (
-				<p className="text-xs text-muted-foreground">
+				<p className="text-sm text-muted-foreground">
 					Create node types first to constrain endpoints.
 				</p>
 			) : (
 				<div className="flex flex-col gap-1 max-h-32 overflow-auto rounded-md border border-border p-2">
 					{all.map((n) => (
-						<div key={n.id} className="flex items-center gap-2 text-sm">
+						<div key={n.id} className="flex items-center gap-2 text-base">
 							<Checkbox
 								id={`${idPrefix}-${n.id}`}
 								checked={selected.includes(n.name)}

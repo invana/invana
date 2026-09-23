@@ -21,15 +21,15 @@ from invana.core.events.services import current_trace_id, emit_event
 
 
 class StaffingManager:
-    querysets = ProjectAssignmentQuerySet()
-    members = GraphMemberQuerySet()
+    project_assignments_qs = ProjectAssignmentQuerySet()
+    members_qs = GraphMemberQuerySet()
 
     async def list_for_project(
         self, session: AsyncSession, *, project: Project
     ) -> list[tuple[ProjectAssignment, str | None]]:
         """Each assignment with the principal's display name, or ``None`` if the
         principal is gone."""
-        rows = await self.querysets.list_for_project(session, project_id=project.id)
+        rows = await self.project_assignments_qs.list_for_project(session, project_id=project.id)
         out: list[tuple[ProjectAssignment, str | None]] = []
         for row in rows:
             if row.principal_kind == "user":
@@ -44,7 +44,7 @@ class StaffingManager:
     async def staff(
         self, session: AsyncSession, *, project: Project, payload: AssignmentCreate, actor: User
     ) -> ProjectAssignment:
-        existing = await self.querysets.find(
+        existing = await self.project_assignments_qs.find(
             session,
             project_id=project.id,
             principal_kind=payload.principal_kind,
@@ -66,7 +66,7 @@ class StaffingManager:
             assigned_by_kind="user",
             assigned_by_id=actor.id,
         )
-        await self.querysets.add(session, row)
+        await self.project_assignments_qs.add(session, row)
         await emit_event(
             session,
             action=actions.PROJECT_STAFF,
@@ -81,11 +81,11 @@ class StaffingManager:
         return row
 
     async def unstaff(self, session: AsyncSession, *, project: Project, assignment_id: str, actor: User) -> None:
-        row = await self.querysets.get(session, assignment_id)
+        row = await self.project_assignments_qs.get(session, assignment_id)
         if row is None or row.project_id != project.id:
             raise NotFoundError("Assignment not found.")
         details = {"principal_kind": row.principal_kind, "principal_id": row.principal_id}
-        await self.querysets.delete(session, row)
+        await self.project_assignments_qs.delete(session, row)
         await emit_event(
             session,
             action=actions.PROJECT_UNSTAFF,
@@ -106,6 +106,6 @@ class StaffingManager:
             if agent is None or agent.graph_id != graph_id:
                 raise NotFoundError("Agent not found in this graph.")
             return
-        member = await self.members.get(session, graph_id=graph_id, user_id=principal_id)
+        member = await self.members_qs.get(session, graph_id=graph_id, user_id=principal_id)
         if member is None:
             raise NotFoundError("That person is not a member of this graph.")

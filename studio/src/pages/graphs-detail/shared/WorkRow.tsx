@@ -89,10 +89,10 @@ export function WorkRow({
 								└
 							</span>
 						) : null}
-						<span className="truncate text-sm text-foreground">{title}</span>
+						<span className="truncate text-base text-foreground">{title}</span>
 					</span>
 					{subtitle ? (
-						<span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+						<span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-base text-muted-foreground">
 							{subtitle}
 						</span>
 					) : null}

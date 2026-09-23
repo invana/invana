@@ -76,7 +76,7 @@ export function GraphHomePage({
 					<h1 className="truncate font-semibold text-lg">
 						{graph?.name ?? graphSlug}
 					</h1>
-					<p className="flex items-center gap-2 text-meta text-muted-foreground">
+					<p className="flex items-center gap-2 text-sm text-muted-foreground">
 						<StatusDot tone={live ? "success" : "muted"} />
 						{connection ? connection.status : "NO CONNECTION"}
 						{connection ? ` · ${connection.connector_class}` : null}
@@ -93,7 +93,7 @@ export function GraphHomePage({
 					</PropertyRow>
 				</PropertyList>
 
-				<p className="text-muted-foreground text-sm">{hint}</p>
+				<p className="text-muted-foreground text-base">{hint}</p>
 			</div>
 		</div>
 	);

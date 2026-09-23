@@ -34,6 +34,13 @@ from typing import Any, Protocol
 
 # ``${steps.<step_id>.<path.to.value>}`` — the whole binding grammar.
 _BINDING = re.compile(r"^\$\{steps\.([A-Za-z0-9_]+)\.([A-Za-z0-9_.]+)\}$")
+#: The other shape an arg may take: an argument the **plan** declares, which a
+#: caller tunes when it inlines it
+#: ([LB20](docs/for-developers/modules/workflows/features/the-library.md)). It is
+#: resolved at composition, so the interpreter never sees one — but the plan
+#: that declares it is validated with its rows still holding the marker, which
+#: is why the grammar has to know the shape.
+_ARG = re.compile(r"^\$\{args\.([A-Za-z0-9_]+)\}$")
 
 
 class CatalogueEntry(Protocol):
@@ -175,6 +182,7 @@ def validate_plan(
     envelope: Envelope,
     *,
     catalogue: Mapping[str, CatalogueEntry],
+    declares: Mapping[str, Any] | None = None,
 ) -> list[PlanStep]:
     """Check a proposed plan against the envelope and the catalogue. Raises
     :class:`PlanRejected`.
@@ -188,6 +196,13 @@ def validate_plan(
     module is band 2 (building-engine/the-runtime-package.md §1). It answers the
     two questions the envelope cannot — **what must precede this step**, and
     **what may be bound out of it**.
+
+    ``declares`` is the plan's own ``args_schema`` when it has one. A
+    ``${args.N}`` is legal exactly where ``N`` is declared
+    ([LB20](docs/for-developers/modules/workflows/features/the-library.md)):
+    without it, every plan could name an argument nobody offers, and the typo
+    would surface as a literal string at 3am. Left out — the ordinary case, a
+    plan that declares nothing — any ``${args.…}`` is refused by name.
     """
     errors: list[str] = []
 
@@ -224,18 +239,34 @@ def validate_plan(
 
         pinned = envelope.pinned_args(step.task)
         for key, value in pinned.items():
-            if key in step.args and step.args[key] != value:
-                errors.append(
-                    f"step {i} '{step.id}': '{key}' is pinned to {value!r} by the envelope and cannot be rebound"
-                )
+            if key not in step.args or step.args[key] == value:
+                continue
+            if _ARG.match(str(step.args[key])):
+                # An argument this plan declares and nobody has tuned yet: there
+                # is no value to compare, and `apply_pins` overlays the pin over
+                # whatever a caller eventually asks for. A pin is a ceiling and a
+                # tuned argument is a request (LB20).
+                continue
+            errors.append(f"step {i} '{step.id}': '{key}' is pinned to {value!r} by the envelope and cannot be rebound")
 
         for key, value in step.args.items():
             if not isinstance(value, str):
                 continue
+            arg = _ARG.match(value)
+            if arg is not None:
+                name = arg.group(1)
+                if name not in (declares or {}):
+                    offered = ", ".join(sorted(declares or {})) or "none"
+                    errors.append(
+                        f"step {i} '{step.id}': '{key}' binds ${{args.{name}}}, which this plan "
+                        f"does not declare (it declares: {offered})"
+                    )
+                continue
+
             match = _BINDING.match(value)
             if match is None:
                 if value.startswith("${"):
-                    errors.append(f"step {i} '{step.id}': '{key}' is not a valid ${{steps.X.y}} binding")
+                    errors.append(f"step {i} '{step.id}': '{key}' is not a valid ${{steps.X.y}} or ${{args.N}} binding")
                 continue
             ref, path = match.group(1), match.group(2)
             if ref == step.id:

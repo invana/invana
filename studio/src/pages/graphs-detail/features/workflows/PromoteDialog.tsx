@@ -99,7 +99,7 @@ export function PromoteDialog({
 								<Spinner />
 							</div>
 						) : items.length === 0 ? (
-							<p className="p-4 text-sm text-muted-foreground">
+							<p className="p-4 text-base text-muted-foreground">
 								Nothing to promote yet. A candidate is a plan the engine
 								generated, that Verify said served, and that no entry already
 								claims.
@@ -121,10 +121,10 @@ export function PromoteDialog({
 									)}
 								>
 									<span className="min-w-0 flex-1">
-										<span className="block truncate text-sm text-foreground">
+										<span className="block truncate text-base text-foreground">
 											{item.task_title ?? item.workflow_key}
 										</span>
-										<span className="block truncate text-sm text-muted-foreground">
+										<span className="block truncate text-base text-muted-foreground">
 											generated · {item.step_count} step
 											{item.step_count === 1 ? "" : "s"}
 											{item.replans
@@ -143,32 +143,32 @@ export function PromoteDialog({
 
 					{selected ? (
 						<>
-							<label className="block text-sm text-muted-foreground">
+							<label className="block text-base text-muted-foreground">
 								Key
 								<input
 									value={key}
 									onChange={(e) => setKey(e.target.value)}
 									placeholder="supplier-exposure"
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 font-mono text-sm text-foreground"
+									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 font-mono text-base text-foreground"
 								/>
-								<span className="mt-0.5 block text-sm text-muted-foreground/80">
+								<span className="mt-0.5 block text-base text-muted-foreground/80">
 									Lower-case, digits and dashes. Reusing an existing key adds
 									the next version rather than overwriting it.
 								</span>
 							</label>
-							<label className="block text-sm text-muted-foreground">
+							<label className="block text-base text-muted-foreground">
 								Description
 								<input
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
 									placeholder="What this plan does, in one line."
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-sm text-foreground"
+									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-base text-foreground"
 								/>
 							</label>
 						</>
 					) : null}
 
-					{error ? <p className="text-sm text-destructive">{error}</p> : null}
+					{error ? <p className="text-base text-destructive">{error}</p> : null}
 				</div>
 
 				<DialogFooter>

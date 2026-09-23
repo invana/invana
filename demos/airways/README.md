@@ -1,10 +1,16 @@
 # Airways — the stitching demo
 
-Three datasets that are one story told from three angles. **air-routes** is the network
+Four datasets that are one story told from four angles. **air-routes** is the network
 airlines fly, **news-articles** is what gets written about it, **twitter** is what gets said
-about that. Load all three into one Graph and you have something real to stitch: a question
-about a tweet can reach an airport, through an article, across three models nobody authored
-together.
+about that, and **deals** is who is paying for any of it. Load all four into one Graph and
+you have something real to stitch: a question about a tweet can reach an airport, through an
+article, across four models nobody authored together.
+
+The fourth one arrived for a second reason. The first three are *observational* — none of
+them holds a number anybody would mind sharing, which makes them a poor way to demonstrate a
+**bound**. `deals` holds `revenue` and `contract_value`, so a world that excludes a property
+has something to exclude and a slice has something to narrow. See
+[Governing it](#governing-it).
 
 This folder is the whole demo — the data, the models, and the walkthrough below.
 
@@ -47,7 +53,7 @@ flowchart LR
 ```
 
 Dotted edges are **anchors** — the same entity, said twice. Solid edges are **relationship
-links**. Eleven stitches in all, and every one of them resolves against rows that exist,
+links**. Thirteen stitches in all, and every one of them resolves against rows that exist,
 because the keys were read out of the neighbouring dataset when the data was built rather
 than typed twice. Committing them writes 435 edges into the database, and the graph says of
 every one which rule made it.
@@ -95,7 +101,7 @@ make setup                                           # once — resolves engine/
 
 inv() { uv run --project engine --extra all invana "$@"; }
 DATA=demos/airways
-GRAPH=demo/airways                                   # <username>/<slug>
+GRAPH=admin/airways                                   # <username>/<slug>
 
 # 1 · a user
 inv users create --non-interactive \
@@ -119,6 +125,7 @@ done
 inv records import --graph $GRAPH --name air-routes    --model AirRoutes    --path $DATA/air-routes
 inv records import --graph $GRAPH --name news-articles --model NewsArticles --path $DATA/news-articles
 inv records import --graph $GRAPH --name twitter       --model Twitter      --path $DATA/twitter
+inv records import --graph $GRAPH --name deals         --model Deals        --path $DATA/deals
 
 # 7 · the stitches — declared from the same file step 3 checked, then committed
 inv stitches apply   --graph $GRAPH --file $DATA/stitches.json
@@ -127,10 +134,16 @@ inv stitches commit  --graph $GRAPH                    # ← this is what writes
 
 # 8 · did it cross? — counts against the live data, and what each stitch wrote
 inv stitches resolve --graph $GRAPH
+
+# 9 · the bounds — the guardrails, then four worlds checked against them
+inv govern apply --graph $GRAPH --file $DATA/govern.json
+inv govern list  --graph $GRAPH
 ```
 
-Expected at the end: **11 stitches active**, and 435 new edges in a database that had none
-crossing a model. [What stitching bought](#what-stitching-bought) is the same graph asked
+Expected at the end: **13 stitches active**, and several thousand new edges in a database
+that had none crossing a model — the eleven original rules wrote 435 between them, and
+`R10` alone writes one per deal. `inv stitches resolve` counts them against the live data
+rather than asking you to trust a number in a README. [What stitching bought](#what-stitching-bought) is the same graph asked
 the questions it could not answer before.
 
 | Where it can stop | What to do |
@@ -208,13 +221,13 @@ It exits non-zero if anything does not, so it belongs in CI as much as in a term
 same command works on any bundle that ships a `stitches.json` — nothing in it knows about
 airways.
 
-### 4 · The three models
+### 4 · The four models
 
 Each artefact is one published version in `invana.model/1` — exactly what
 `invana models export` writes. Import lands a **draft**.
 
 ```bash
-for m in air-routes news-articles twitter; do
+for m in air-routes news-articles twitter deals; do
   inv models import --graph $GRAPH --file $DATA/$m/graph-model.json
 done
 ```
@@ -235,7 +248,7 @@ changed since, the verb is `upgrade`:
 inv models upgrade --graph $GRAPH --name AirRoutes --file $DATA/air-routes/graph-model.json
 ```
 
-### 5 · Publish all three
+### 5 · Publish all four
 
 **In Studio › Models**, open each model and press **Publish**.
 
@@ -443,6 +456,53 @@ each saying *from the airways bundle (R1)*, because the CLI declared them — *A
 draws them as the only edges that cross a frame, and the **global model** page counts the
 union they imply.
 
+## Governing it
+
+Stitching answers *what can this Graph reach*. Govern answers *what may a question reach**this
+time*** — and the two are the same graph read twice.
+
+[`govern.json`](govern.json) declares the bounds this Graph runs inside and four worlds that
+narrow within them. One file, because a guardrail and a world are **one record separated by
+`kind`** ([GV1](../../docs/for-developers/modules/govern/spec.md)).
+
+```bash
+inv govern apply --graph $GRAPH --file $DATA/govern.json
+inv govern list  --graph $GRAPH
+inv govern show  --graph $GRAPH --world "EU · H1 2026"
+```
+
+Guardrails go in first and the worlds are checked against them — the same order the product
+enforces, because a world is validated **at save, not at run**
+([WO3](../../docs/for-developers/modules/govern/features/worlds.md)).
+
+### What you end up with
+
+| | Narrows | The point of it |
+|---|---|---|
+| **Airways guardrails** | no third party · egress capped at `type_names`, `property_names`, `the_question` | In force on every run, whatever world it is in. A world can never widen it |
+| *Everything* | nothing | The default. **Nothing set and nothing permitted must not look alike** ([GR6](../../docs/for-developers/modules/govern/features/guardrails.md)) — this is the widest state, and it is still inside the guardrails |
+| *EU · H1 2026* | four models **and the stitches between them** · H1 2026 · DE·FR·NL·ES·CH | **1,283 of the 4,902 deals.** A slice that composes into the query, not a filter over its results. It names `graph_data/stitch/**` as well as its four models: closing `graph_data` means only what the world names is in view ([GV23](../../docs/for-developers/modules/govern/spec.md)), and an edge that crosses two models belongs to neither of them — name the models alone and the ten crossing edge types stay out |
+| *Price-blind* | `revenue` and `contract_value` excluded | A question can still *rank* by revenue while the number never enters a prompt — used to compute, never to reason ([GV11](../../docs/for-developers/modules/govern/spec.md)) |
+| *Nothing leaves* | third party denied · the `llm` layer closed to one local model | Everything the question touches stays in the building |
+
+### The refusals it can show
+
+A feature drawn only on its happy path is not drawn, and the same is true of a demo. The
+four models declare their axes unevenly **on purpose**, so each refusal has somewhere to
+land:
+
+| Try this | What happens |
+|---|---|
+| Slice `AirRoutes` by `time` | Refused naming the model *and* the axis — reference data has no valid time, and declaring one is a modelling act ([GV14](../../docs/for-developers/modules/govern/spec.md)) |
+| Slice `Twitter` by `geo` | The same. A tweet carries no country in this dataset |
+| Allow `third_party/api/…` in a world | Refused at save, naming the guardrail's `third_party/**` — **deny wins at any specificity** ([GV5](../../docs/for-developers/modules/govern/spec.md)) |
+| Delete a world an agent carries | Refused, naming the agent |
+
+Each one is the product's own refusal, not a message this folder wrote: `govern apply`
+prints what the surface would say.
+
+---
+
 ## Starting over
 
 The demo is re-runnable as it stands: every write is a `MERGE`, so running the whole
@@ -591,6 +651,12 @@ nothing new — and a tweet that arrives next month reaches the airport it names
 | [air-routes](air-routes/) | `AirRoutes` | 3,749 | 57,645 | [README](air-routes/README.md) |
 | [news-articles](news-articles/) | `NewsArticles` | 253 | 573 | [README](news-articles/README.md) |
 | [twitter](twitter/) | `Twitter` | 244 | 525 | [README](twitter/README.md) |
+| [deals](deals/) | `Deals` | 4,914 | 4,902 | [README](deals/README.md) |
+
+Each one declares its **axes** — which property carries valid time, which carries
+geography, which are selectable dimensions — and the gaps between them are deliberate:
+`AirRoutes` has no valid time and `Twitter` no geography, so *only declared axes are
+selectable* has somewhere to bite. [deals/README](deals/README.md) has the table.
 
 ### What a dataset folder holds
 
@@ -598,8 +664,10 @@ nothing new — and a tweet that arrives next month reaches the airport it names
 |---|---|---|
 | `stitches.json` *(bundle root)* | `invana records check` · `invana stitches apply` | The rules between the datasets, in the vocabulary `POST …/model-links` uses — checked against the files, then declared against the Graph |
 | `model.json` | `invana records import` | Identity keys, so a re-import merges rather than duplicates |
-| `graph-model.json` | `invana models import --file` | The domain model, in `invana.model/1` |
+| `graph-model.json` | `invana models import --file` | The domain model, in `invana.model/1` — including its `axes`, which is what a world may narrow it along |
+| `govern.json` *(bundle root)* | `invana govern apply` | The guardrails this Graph runs inside, and the worlds that narrow within them |
 | `nodes/<Type>.json` · `edges/<EDGE>.json` | `invana records import` | The records |
+| `build.py` *(where a dataset is generated)* | a person, by hand | Rebuilds the records deterministically. The output is committed beside it, so a diff is a change of shape |
 | `stitches/<EDGE_TYPE>.json` | `invana stitches commit` · `invana records import` | Edge records whose endpoints are their own fact (W3) — loaded for a declared, active stitch of that edge type |
 
 One copy of the records, not two. The JSON above is the whole dataset — `invana loader`

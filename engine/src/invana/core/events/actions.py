@@ -44,9 +44,29 @@ LLM_CREATE = "llm.create"
 LLM_UPDATE = "llm.update"
 LLM_DELETE = "llm.delete"
 LLM_PING = "llm.ping"
-LLM_SET_DEFAULT = "llm.set_default"
+# `llm.set_default` is retired with `is_default` (PM4) — the cast is the answer.
+LLM_MODEL_ADD = "llm_model.add"
+LLM_MODEL_REMOVE = "llm_model.remove"
 # NL → query mapping (docs/for-developers/modules/ask/features/ask-in-natural-language.md); target = session
 LLM_TRANSLATE = "llm.translate"
+
+# ── Govern — the lens (docs/for-developers/modules/govern/spec.md) ───────────
+#
+# A guardrail edit is an **ordinary audited write**, here with every other one:
+# there is no separate governance log to keep in step with the real one (GR7).
+# `before` and `after` ride on the payload, so *who loosened what, when, and what
+# it was before* is a question this answers by itself.
+LENS_CREATE = "lens.create"
+LENS_UPDATE = "lens.update"
+# The write that publishes — naming a lens is what puts it in the Worlds list,
+# and it is worth telling apart from any other update (GV2).
+LENS_NAME = "lens.name"
+# A world became a guardrail. One field, never a re-authoring (GV3).
+LENS_PROMOTE = "lens.promote"
+LENS_DELETE = "lens.delete"
+# The one field-level permission in the product, granted or taken back (GV22).
+GUARDRAIL_PERMISSION_GRANT = "guardrail_permission.grant"
+GUARDRAIL_PERMISSION_REVOKE = "guardrail_permission.revoke"
 
 # ── Skills ────────────────────────────────────────────────────────────────────
 SKILL_CREATE = "skill.create"
@@ -56,7 +76,7 @@ SKILL_DELETE = "skill.delete"
 # SK2). Editing the prose emits this, not ``skill.update`` — the old text still
 # exists and is still being resolved by the steps it was offered to.
 SKILL_PUBLISH = "skill.publish"
-# Who was offered what, and when the roster changed
+# Who was offered what, and when the bindings changed
 # (docs/for-developers/modules/skills/features/bindings.md C5). The target is the
 # agent, because the binding is a fact about the agent's context; ``details``
 # names the skill.
@@ -146,6 +166,11 @@ AGENT_RETIRE = "agent.retire"
 AGENT_DELETE = "agent.delete"
 AGENT_SPAWN = "agent.spawn"  # an agent created an agent; actor_kind = agent
 AGENT_SET_DEFAULT = "agent.set_default"  # the graph's default agent
+# The third bound moved: which world this agent works in
+# ([AG2](docs/for-developers/modules/agents/features/author-an-agent.md)). Its own
+# action, because widening an agent back to *Everything* is the line of the
+# audit an auditor comes looking for.
+AGENT_LENS_SET = "agent.lens_set"
 
 # ── Workflows library (docs/for-developers/modules/agents/spec.md) ────────────────────────────────────
 WORKFLOW_PROMOTE = "workflow.promote"  # a served plan became a library entry
@@ -204,6 +229,11 @@ TARGET_GRAPH = "graph"
 TARGET_CONNECTION = "connection"
 TARGET_MEMBER = "member"
 TARGET_LLM = "llm_provider"
+TARGET_LLM_MODEL = "llm_model"
+# One kind for both a world and a guardrail — they are one row separated by
+# `kind`, and an auditor reading the history of a promoted world should not have
+# to follow it across two target kinds (GV1).
+TARGET_LENS = "lens"
 TARGET_SKILL = "skill"
 TARGET_RULE = "rule"
 TARGET_MODEL = "graph_model"

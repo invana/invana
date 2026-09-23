@@ -39,7 +39,7 @@ export function PolicyFlag({
 		</>
 	);
 	const className =
-		"inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 text-xs";
+		"inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 text-sm";
 	if (!onToggle) return <span className={className}>{body}</span>;
 	return (
 		<button

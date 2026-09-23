@@ -1,6 +1,11 @@
 {
   "name": "airways",
-  "datasets": ["air-routes", "news-articles", "twitter"],
+  "datasets": [
+    "air-routes",
+    "news-articles",
+    "twitter",
+    "deals"
+  ],
   "stitches": [
     {
       "id": "A1",
@@ -25,7 +30,7 @@
       "edge_type": "SERVED_BY",
       "source": "news-articles:City.code",
       "target": "air-routes:airport.code",
-      "description": "A city is not an airport — it is served by one."
+      "description": "A city is not an airport \u2014 it is served by one."
     },
     {
       "id": "R2",
@@ -87,6 +92,23 @@
       "source": "twitter:Tweet.tweet_id",
       "target": "news-articles:Article.article_id",
       "description": "Endpoints are their own fact, one row per edge (W3)."
+    },
+    {
+      "id": "A3",
+      "kind": "anchor",
+      "identity_match": "exact",
+      "partial": true,
+      "source": "deals:Sponsor.domain",
+      "target": "news-articles:Publisher.domain",
+      "description": "A sponsor that is also a newsroom is one company, said twice. Seven of the twelve overlap; the other five sponsor flights and write nothing, which is why this is partial."
+    },
+    {
+      "id": "R10",
+      "kind": "relationship",
+      "edge_type": "FOR_CARRIER",
+      "source": "deals:Deal.carrier_iata",
+      "target": "news-articles:Airline.iata",
+      "description": "A deal is with an airline. The commercial model knows the IATA code and nothing else about it."
     }
   ]
 }

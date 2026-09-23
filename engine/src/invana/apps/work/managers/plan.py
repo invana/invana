@@ -19,29 +19,29 @@ from invana.core.auth.querysets import UserQuerySet
 
 
 class PlanManager:
-    tasks = TaskQuerySet()
-    dependencies = TaskDependencyQuerySet()
-    projects = ProjectQuerySet()
-    agents = AgentQuerySet()
-    users = UserQuerySet()
+    tasks_qs = TaskQuerySet()
+    dependencies_qs = TaskDependencyQuerySet()
+    projects_qs = ProjectQuerySet()
+    agents_qs = AgentQuerySet()
+    users_qs = UserQuerySet()
 
     async def for_project(self, session: AsyncSession, *, graph: Graph, project: Project | None) -> ProjectPlanResponse:
-        tasks = await self.tasks.list_for_project(
+        tasks = await self.tasks_qs.list_for_project(
             session, graph_id=graph.id, project_id=project.id if project else None
         )
         ids = [t.id for t in tasks]
-        edges = await self.dependencies.edges_into(session, task_ids=ids)
+        edges = await self.dependencies_qs.edges_into(session, task_ids=ids)
 
         # A cross-project dependency is allowed within a graph, so the plan has
         # to draw the other project's task too — greyed, with its project's key.
         external_ids = {depends_on_id for depends_on_id, _ in edges if depends_on_id not in ids}
-        external = await self.tasks.by_ids(session, list(external_ids))
+        external = await self.tasks_qs.by_ids(session, list(external_ids))
 
         every = tasks + external
         derived = derive([(t.id, t.status, t.due_at, t.created_at) for t in every], edges)
         positions = derived.by_id()
 
-        keys = await self.projects.keys_by_ids(session, [t.project_id for t in every if t.project_id])
+        keys = await self.projects_qs.keys_by_ids(session, [t.project_id for t in every if t.project_id])
         names = await self._assignee_names(session, every)
 
         task_reads = [
@@ -73,6 +73,6 @@ class PlanManager:
     async def _assignee_names(self, session: AsyncSession, tasks: list[Task]) -> dict[str, str]:
         user_ids = [t.assignee_id for t in tasks if t.assignee_kind == "user" and t.assignee_id]
         agent_ids = [t.assignee_id for t in tasks if t.assignee_kind == "agent" and t.assignee_id]
-        out = await self.users.usernames_by_ids(session, list(set(user_ids)))
-        out.update(await self.agents.names_by_ids(session, list(set(agent_ids))))
+        out = await self.users_qs.usernames_by_ids(session, list(set(user_ids)))
+        out.update(await self.agents_qs.names_by_ids(session, list(set(agent_ids))))
         return out

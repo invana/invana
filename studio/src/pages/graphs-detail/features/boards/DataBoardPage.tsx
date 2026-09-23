@@ -37,7 +37,6 @@ import type {
 } from "@/pages/graphs-detail/features/explorer";
 import { ExplorerCanvas } from "@/pages/graphs-detail/features/explorer";
 import { LayersPanel } from "@/pages/graphs-detail/features/explorer";
-import { RendererCapabilityBanner } from "@/pages/graphs-detail/features/explorer";
 import {
 	type StyleTypeInfo,
 	StylingPanel,
@@ -45,6 +44,7 @@ import {
 import type { InteractionRef } from "@/services/telemetry/tracer";
 import type { CanvasStyling } from "@/types/board";
 import type { ExpandRequest, NeighborExpandResponse } from "@/types/traversal";
+import { RendererCapabilityBanner } from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,
 	GraphData,

@@ -215,7 +215,7 @@ everywhere.
 
 | Block | Artboards | Where they live | Reconciled into the module's docs |
 |---|---|---|---|
-| **A · Govern** | ✅ 7 — `GovWorlds` · `GovWorld` · `GovGuardrails` · `GovCompare` · `RunLens` · `AgentsRoster` · `AgentsLlms`, every one composed on the shell contract, **plus `RowShapes` for P6's G40** | canvas `8591piJHezfLsUoSZXn3z8` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `govern/spec.md` has no **The drawn states** section |
+| **A · Govern** | ✅ 7 — `GovWorlds` · `GovWorld` · `GovGuardrails` · `GovCompare` · `RunLens` · `AgentsList` · `AgentsLlms`, every one composed on the shell contract, **plus `RowShapes` for P6's G40** | canvas `8591piJHezfLsUoSZXn3z8` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `govern/spec.md` has no **The drawn states** section |
 | **B · Workflows** | ✅ — `WorkflowsHiFi` · `WorkflowStepHiFi` · `PlanDetail` · `PlanDash` · `PlanStepParams` · `CatalogueList` · `Library` | canvas `9sAby5rPvkjMLb9BcdCom4` + `7c565h2z9irbFBwu1S1ebH`, cached in `.design/canvas-tasks-panel/` | ❌ `workflows/spec.md` has no drawn states |
 | **C · The journal** | ✅ — `RunDetail` · `DrawerRunsList` · `DrawerRunLive` · `DrawerRunAll` · `DrawerRunDebug` · `RunDash` · `StepImport` · `StepQuery` · `StepLlm` | `.design/canvas-tasks-panel/` | ❌ `operate/spec.md` has no drawn states |
 | **D · The runtime** | ✅ 7.5 `RunWorkflowHiFi` · 7.7 `PlanDraftCanvas` · `PlanDraftYaml` · `PlanRetire`, and now **2.3 `Main` (BundleLoad)** · **13.8 `Lanes` · `Approval`** | `.design/canvas-features/` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |

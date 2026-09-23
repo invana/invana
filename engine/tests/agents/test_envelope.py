@@ -17,9 +17,9 @@ from invana.runtime.catalogue import CATALOGUE
 ENVELOPE = Envelope.from_spec(EXPLORER.workflow_spec)
 
 
-def check(plan_steps, envelope=ENVELOPE):
+def check(plan_steps, envelope=ENVELOPE, declares=None):
     """``validate_plan`` with the real catalogue handed down from band 3."""
-    return validate_plan(plan_steps, envelope, catalogue=CATALOGUE)
+    return validate_plan(plan_steps, envelope, catalogue=CATALOGUE, declares=declares)
 
 
 def step(task: str, *, id: str | None = None, **args):
@@ -28,7 +28,9 @@ def step(task: str, *, id: str | None = None, **args):
 
 class TestAccepts:
     def test_a_seeded_template_validates_against_the_seeded_envelope(self):
-        steps = check([dict(s) for s in NL_SINGLE.steps])
+        # Its own `args_schema` comes with it: a plan that binds `${args.N}` is
+        # validated against what it declares (LB20).
+        steps = check([dict(s) for s in NL_SINGLE.steps], declares=NL_SINGLE.args_schema)
         assert [s.task for s in steps] == [
             "translate_thought",
             "validate_query",
@@ -135,3 +137,36 @@ class TestModes:
         static = Envelope.from_spec({"entry": "validate_query", "steps": [step("validate_query", id="v")]})
         assert static.plans is False
         assert [s.task for s in static.steps] == ["validate_query"]
+
+
+class TestTheCeilings:
+    """`agents.budget`, read through `effective_budget`
+    ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md))."""
+
+    def test_a_row_that_sets_nothing_gets_every_ceiling(self):
+        from invana.apps.agents.models import Agent
+
+        budget = Agent(budget=None).effective_budget
+
+        assert budget["max_cost_usd_month"] == 5.0
+        assert budget["max_cost_usd_run"] == 2.0
+        assert budget["max_concurrent_runs"] == 3
+        assert budget["max_fanout"] == 200
+
+    def test_the_old_name_still_means_the_month(self):
+        """A row written before the rename carries `max_cost_usd`, and it meant
+        the month — so it wins where the new name is absent, and it is answered
+        back so a reader that has not moved sees a number (§8 #4)."""
+        from invana.apps.agents.models import Agent
+
+        budget = Agent(budget={"max_cost_usd": 12.0}).effective_budget
+
+        assert budget["max_cost_usd_month"] == 12.0
+        assert budget["max_cost_usd"] == 12.0
+
+    def test_the_new_name_wins_where_a_row_sets_both(self):
+        from invana.apps.agents.models import Agent
+
+        budget = Agent(budget={"max_cost_usd": 12.0, "max_cost_usd_month": 40.0}).effective_budget
+
+        assert budget["max_cost_usd_month"] == 40.0

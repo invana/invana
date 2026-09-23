@@ -633,8 +633,8 @@ function LayersPanelBody({ canvas, onClose }: Omit<Props, "open">) {
 				{items.length === 0 ? (
 					<div className="flex flex-col items-center justify-center gap-2 px-6 py-10 text-center text-muted-foreground">
 						<Layers className="h-6 w-6" />
-						<p className="text-sm">No canvas layers</p>
-						<p className="text-xs">Open a session to paint a canvas.</p>
+						<p className="text-base">No canvas layers</p>
+						<p className="text-sm">Open a session to paint a canvas.</p>
 					</div>
 				) : (
 					<div className="p-2" onContextMenu={handleContextMenu}>

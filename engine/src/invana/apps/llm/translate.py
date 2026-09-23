@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from invana.apps.llm import LLMError, QueryNotReadOnlyError, complete_tool
 from invana.apps.llm.grounding import render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
-from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
 
 SUBMIT_QUERY_TOOL = {
@@ -219,7 +219,7 @@ def _looks_read_only(query: str, language: str) -> bool:
 
 async def nl_to_query(
     *,
-    provider: LLMProvider,
+    provider: LLMEndpoint,
     prompt: str,
     language: str,
     version: GraphVersion | None,
@@ -229,8 +229,11 @@ async def nl_to_query(
     rules: str = "",
     history: list[dict] | None = None,
     timeout_s: float = 120.0,
+    #: What may accompany this crossing, or ``None`` for an unbounded one
+    #: (docs/for-developers/modules/govern/spec.md GV30 · GV31).
+    may_send: frozenset[str] | None = None,
 ) -> GeneratedQuery | Clarification:
-    system = _system_prompt(language, render_model_context(version), skills, instructions, rules)
+    system = _system_prompt(language, render_model_context(version, may_send=may_send), skills, instructions, rules)
     messages = [*(history or []), {"role": "user", "content": prompt}]
     result = await complete_tool(
         provider=provider,

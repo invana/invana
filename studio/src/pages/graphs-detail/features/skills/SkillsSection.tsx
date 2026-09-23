@@ -1,6 +1,6 @@
 import { FormError } from "@/components/forms/FormError";
 import {
-	useCreateSkillMutation,
+	useCreatePublishedSkillMutation,
 	useDeleteSkillMutation,
 	useSkillsQuery,
 	useUpdateSkillMutation,
@@ -137,7 +137,8 @@ function SkillForm({
 	onDone: () => void;
 }) {
 	const isEdit = !!existing;
-	const create = useCreateSkillMutation(username, graphSlug);
+	// This form has no draft step: it writes the skill and publishes v1.
+	const create = useCreatePublishedSkillMutation(username, graphSlug);
 	const update = useUpdateSkillMutation(username, graphSlug);
 
 	const [name, setName] = useState(existing?.name ?? "");

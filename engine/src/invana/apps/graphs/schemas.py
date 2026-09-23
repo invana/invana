@@ -244,3 +244,8 @@ class ContentionRead(BaseModel):
     queued: list[dict] = []
     running_count: int = 0
     queued_count: int = 0
+    #: Each configured pool, its size and what is in it right now — ``pool`` ·
+    #: ``size`` · ``in_use`` (CC8). The run ceiling says how many runs may
+    #: proceed; these say how many crossings may be in flight, and a Graph
+    #: stalled on `graphdb` with two runs going is invisible without them.
+    pools: list[dict] = []

@@ -207,7 +207,7 @@ engine/src/invana/
 │   ├── datasets/                 §2
 │   ├── sessions/                 §3
 │   ├── skills/                   §6
-│   ├── agents/                   §5 · roster, envelope, budget, delegation
+│   ├── agents/                   §5 · agents, envelope, budget, delegation
 │   ├── workflows/                §7 · the library
 │   ├── work/                     §9 · projects folds in at §7 step 6
 │   ├── projects/                 §9 · flat until that merge names the parts
@@ -416,7 +416,7 @@ roles in the package, two at the edge, and nothing else.
 | Role | File | Holds | Never holds |
 |---|---|---|---|
 | **Model** | `models.py` · `models/` | SQLAlchemy tables, declared against `core.models.Base` | a query, a rule |
-| **QuerySet** | `querysets.py` · `querysets/` | every `select()` · `update()` · `delete()` against that model. Takes a session, returns models | a decision. A queryset answers *which rows*, never *whether* |
+| **QuerySet** | `querysets.py` · `querysets/` | every `select()` · `update()` · `delete()` against that model. Takes a session, returns models. Bound as `<rows>_qs` (§5) | a decision. A queryset answers *which rows*, never *whether* |
 | **Manager** | `managers.py` · `managers/` | the rules, as a class with methods — `AgentManager.start(…)`. Composes querysets, emits events. **This is the part worth testing** | a `select()`, an HTTP type, a status code |
 | **Schema** | `schemas.py` | Pydantic request and response shapes | a rule |
 
@@ -540,9 +540,13 @@ true are [§8.1](#161-enforcement-the-same-way-the-bands-are-enforced).
 | A manager is a **class**, its methods are the capabilities | `AgentManager.start()`, not `start_agent()` |
 | A manager is **stateless**; the `AsyncSession` is the first argument of every method | matches every existing `*Store` today — do not move the session into `__init__` |
 | A manager holds its querysets as **class attributes**, not module imports at call sites | one place to swap them in a test |
+| A queryset attribute is named **`<rows>_qs`** | `agents_qs = AgentQuerySet()` · `tasks_qs = TaskQuerySet()` · `task_runs_qs = TaskRunQuerySet()`. The suffix is what tells the two roles of §4 apart at the call site: `self.agents_qs.get(…)` reads rows, `self.agents.retire_agent(…)` applies a rule |
+| **A manager's own queryset is named for its rows**, never `querysets` | `AgentManager.agents_qs`, not `AgentManager.querysets` — a name that says *which* rows survives a second queryset being added beside it |
 | A manager may call **another app's manager**, never another app's queryset or model | the cross-app read rule from §12, restated at file granularity |
 | A manager **never imports `fastapi`** | greppable. A manager that raises `HTTPException` is a view in the wrong file |
 | A queryset **never imports a manager** | one direction, inside the package too |
+
+The `_qs` suffix is not decoration. A manager's collaborators are querysets *and* other managers, and without it the two compete for the same word: `agents = AgentQuerySet()` beside `agents = AgentManager()` is a duplicate class attribute, which Python accepts silently — the second binding wins, and `self.agents.delete(…)` raises `AttributeError` at runtime with nothing in the diff to read. The suffix makes that collision unspellable.
 
 ## 6. Where the API lives
 

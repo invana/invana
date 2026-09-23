@@ -11,6 +11,46 @@ class AgentChip(BaseModel):
     status: str
 
 
+class PlanLayerRead(BaseModel):
+    """One governed band, and what a plan declares in it.
+
+    Every band is sent, touched or not
+    ([LB22](docs/for-developers/modules/workflows/features/the-library.md)) —
+    *this plan reads no graph data* is the fact a reader is checking for, and a
+    band that vanished when empty would make it indistinguishable from *nothing
+    loaded*.
+    """
+
+    #: The reader's spelling — `graph data`, never `graph_data`.
+    layer: str
+    declared: bool
+    steps: int
+    #: What the band amounts to in the reader's words, or `—` when it is empty.
+    #: Phrased here rather than in Studio, for the reason the band mapping is
+    #: (:mod:`invana.runtime.layers`).
+    summary: str
+
+
+class PlanCallerRead(BaseModel):
+    """A caller that inlined this plan, and what it tuned
+    ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
+
+    Tuning is a property of the **call**, recorded on the calling plan — so
+    this is read off ``task_plans.uses`` and never off this plan, which is
+    untouched by any of them.
+    """
+
+    #: `skill` when a skill version owns the calling plan, `plan` when nothing does.
+    kind: str
+    name: str
+    skill_id: str | None = None
+    #: The version of *this* plan the caller inlined. Below the current one
+    #: means the library has moved on since — which a surface **says** and
+    #: never acts on ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    version: int
+    args: dict = {}
+
+
 class TaskPlanRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -35,6 +75,12 @@ class TaskPlanRead(BaseModel):
     runs: int = 0
     served_rate: float | None = None
     last_run_at: str | None = None
+    #: The bands this plan touches, in the strip's order — the row's chips.
+    layers: list[str] = []
+    #: How many callers inline it ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
+    #: The row reads *used by 2 skills* where there are callers and falls back
+    #: to how often it ran where there are none.
+    caller_count: int = 0
 
 
 class TaskPlanListResponse(BaseModel):
@@ -50,6 +96,11 @@ class DagNode(BaseModel):
     task: str
     label: str
     args: dict
+    #: `callable` · `composite` · `human` — what kind of node this is, which is
+    #: what makes `4 callables, 1 human` answerable without a second read.
+    form: str = "callable"
+    #: The band this node sits in, spelled for a reader (:mod:`invana.runtime.layers`).
+    layer: str = "agent"
     # Longest path from a root — the column the canvas draws this step in.
     # Two steps at the same depth are independent, which is the whole point of
     # drawing a partial order instead of the stored list.
@@ -73,6 +124,12 @@ class DagEdge(BaseModel):
 class TaskPlanDetail(TaskPlanRead):
     nodes: list[DagNode] = []
     edges: list[DagEdge] = []
+    #: The five governed bands, each with what this plan declares in it.
+    declared_layers: list[PlanLayerRead] = []
+    #: Who inlines it, and what each tuned.
+    callers: list[PlanCallerRead] = []
+    #: `{name: {type, default, label}}` — what a caller may tune (LB20).
+    args_schema: dict = {}
 
 
 class TasksResponse(BaseModel):

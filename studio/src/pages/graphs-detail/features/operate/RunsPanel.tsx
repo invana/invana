@@ -19,25 +19,23 @@
  * which is the property SR12 was protecting when it asked for drawer adjacency.
  */
 
-import { useRunsJournalQuery } from "@/hooks/queries/useRuns";
+import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
+import { type RunsFilters, useRunsJournalQuery } from "@/hooks/queries/useRuns";
+import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { ImportsJournalBody } from "@/pages/graphs-detail/features/bring-data-in/ImportsPanel";
 import {
-	IMPORT_STATUSES,
-	ImportsJournalBody,
-} from "@/pages/graphs-detail/features/bring-data-in/ImportsPanel";
-import { RunDetailDrawer } from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
-import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
+	RunDetailDrawer,
+	runAddress,
+} from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
+import { RunsFilterBar } from "@/pages/graphs-detail/features/operate/RunsFilterBar";
+import {
+	taskDrawerSection,
+	useTaskDrawerUi,
+} from "@/pages/graphs-detail/shared/TaskDrawer";
+import { useGovernPanel } from "@/pages/graphs-detail/shell/useGovernPanel";
 import { useRunsPanel } from "@/pages/graphs-detail/shell/useRunsPanel";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-} from "@invana/ui";
-import { History } from "lucide-react";
+import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
+import { PanelStack } from "@invana/ui";
 import { useState } from "react";
 
 export interface RunsPanelProps {
@@ -46,96 +44,142 @@ export interface RunsPanelProps {
 	onClose?: () => void;
 	/** `More` on a drilled-in run — opens its dashboard as a page (SR13). */
 	onOpenRunDashboard?: (runId: string) => void;
+	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */
+	onOpenPlan?: (workflowKey: string) => void;
 }
+
+const NO_FILTERS: RunsFilters = {};
 
 export function RunsPanel({
 	username,
 	graphSlug,
-	onClose,
 	onOpenRunDashboard,
+	onOpenPlan,
 }: RunsPanelProps) {
 	const { runId, openRun } = useRunsPanel();
-	const journal = useRunsJournalQuery(username, graphSlug);
+	// A run's lens opens where it is edited: Govern, drilled into that record.
+	const { reveal } = useGovernPanel();
+	const ui = useTaskDrawerUi();
 	// A filter narrows a list, and a narrowed list is not a place — so it is
 	// in-memory, not a URL key (G31).
-	const [status, setStatus] = useState<string | null>(null);
-
-	const drilled = Boolean(runId);
-	const count = journal.rows.length;
-	const title = drilled ? (
-		<Breadcrumb>
-			<BreadcrumbList>
-				<BreadcrumbItem>
-					{/* The trail's first crumb is the way back — the drill-in replaced
-					    the panel body, so the header is the only way out (G33). */}
-					<button type="button" onClick={() => openRun(null)}>
-						Runs
-					</button>
-				</BreadcrumbItem>
-				<BreadcrumbSeparator />
-				<BreadcrumbItem>
-					<BreadcrumbPage>
-						{journal.rows.find((r) => r.id === runId)?.title ?? "…"}
-					</BreadcrumbPage>
-				</BreadcrumbItem>
-			</BreadcrumbList>
-		</Breadcrumb>
-	) : count ? (
-		`Runs (${journal.live ? `${count} · ${journal.live} running` : count})`
-	) : (
-		"Runs"
+	const [filters, setFilters] = useState<RunsFilters>(NO_FILTERS);
+	const patch = (p: Partial<RunsFilters>) =>
+		setFilters((prev) => ({ ...prev, ...p }));
+	const journal = useRunsJournalQuery(username, graphSlug, filters);
+	const agents = (useAgentsQuery(username, graphSlug).data?.items ?? []).map(
+		(a) => ({ id: a.id, name: a.name }),
 	);
 
+	// Search narrows here, beside the chips, so the status bar's `shown` counts
+	// what is actually on screen.
+	const drawerUi = ui.get("runs");
+	const needle = drawerUi.searchOpen
+		? drawerUi.search.trim().toLowerCase()
+		: "";
+	const rows = needle
+		? journal.rows.filter((r) =>
+				[r.title, r.id, r.plan].some((v) => v.toLowerCase().includes(needle)),
+			)
+		: journal.rows;
+
+	const filtered = Object.values(filters).some(Boolean);
+	const count = journal.total
+		? journal.live
+			? `${journal.total} · ${journal.live} running`
+			: `${journal.total}`
+		: undefined;
+
+	// A drilled-in run is addressed, not titled: `RUNS / run:7d3184f1` (SR54).
+	const runTitle = runId ? runAddress(runId) : undefined;
+	// Drilled in, the bar counts the run's ledger rather than the journal:
+	// `9 events · 1 refusal` (SR67). Shares the drawer's query, so no second read.
+	const touches = useRunTouchesQuery(
+		username,
+		graphSlug,
+		runId ?? undefined,
+	).data;
+	const refusals = touches?.refused.length ?? 0;
+	const runRight = touches
+		? `${touches.total} event${touches.total === 1 ? "" : "s"}${
+				refusals ? ` · ${refusals} refusal${refusals === 1 ? "" : "s"}` : ""
+			}`
+		: undefined;
+
 	return (
-		<ListPanelChrome
-			title={title}
-			icon={History}
-			onRefresh={() => journal.refetch()}
-			isRefreshing={journal.isFetching}
-			onClose={onClose}
-			// Search and filter apply to the list only, so a drilled-in panel —
-			// showing one run — offers neither: narrowing a list that is not on
-			// screen would be a control with no subject.
-			listControls={!drilled}
-			filterMenu={
-				<>
-					<DropdownMenuLabel>Status</DropdownMenuLabel>
-					<DropdownMenuRadioGroup
-						value={status ?? "all"}
-						onValueChange={(v) => setStatus(v === "all" ? null : v)}
-					>
-						<DropdownMenuRadioItem value="all">
-							all statuses
-						</DropdownMenuRadioItem>
-						{IMPORT_STATUSES.map((s) => (
-							<DropdownMenuRadioItem key={s} value={s}>
-								{s}
-							</DropdownMenuRadioItem>
-						))}
-					</DropdownMenuRadioGroup>
-				</>
-			}
-		>
-			{() =>
-				runId ? (
-					// A drill-in replaces the panel body with the run, read end to end —
-					// Stats · Performance · Log (SR12 · §3b version C).
-					<RunDetailDrawer
-						username={username}
-						graphSlug={graphSlug}
-						runId={runId}
-						onOpenDashboard={onOpenRunDashboard}
-					/>
-				) : (
-					<ImportsJournalBody
-						username={username}
-						graphSlug={graphSlug}
-						runId={runId}
-						onOpenRun={openRun}
-						status={status}
-					/>
-				)
-			}
-		</ListPanelChrome>
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="min-h-0 flex-1">
+				<PanelStack
+					className="h-full"
+					headerHeight={30}
+					sections={[
+						taskDrawerSection(
+							{
+								id: "runs",
+								label: "Runs",
+								count,
+								trail: runTitle,
+								onBack: () => openRun(null),
+								searchable: true,
+								searchPlaceholder: "Search runs",
+								filtered,
+								filterBar: (
+									<RunsFilterBar
+										filters={filters}
+										onChange={patch}
+										agents={agents}
+									/>
+								),
+								children: () =>
+									runId ? (
+										// A drill-in replaces the drawer body with the run's five
+										// sections and its two ways out (SR67).
+										<RunDetailDrawer
+											username={username}
+											graphSlug={graphSlug}
+											runId={runId}
+											onOpenDashboard={onOpenRunDashboard}
+											onOpenPlan={onOpenPlan}
+											onOpenLens={(lens) => reveal(lens.kind, lens.id)}
+										/>
+									) : (
+										<ImportsJournalBody
+											rows={rows}
+											isLoading={journal.isLoading}
+											runId={runId}
+											onOpenRun={openRun}
+											narrowed={filtered || Boolean(needle)}
+										/>
+									),
+							},
+							ui,
+						),
+					]}
+				/>
+			</div>
+			<PanelStatusBar
+				left={
+					<>
+						<StatusCrumb active={!runId}>Runs</StatusCrumb>
+						{runTitle ? <StatusCrumb active>{runTitle}</StatusCrumb> : null}
+					</>
+				}
+				middle={
+					journal.live
+						? [
+								<StatusCount key="live" tone="running">
+									{journal.live} running
+								</StatusCount>,
+							]
+						: []
+				}
+				right={
+					runId
+						? runRight
+						: journal.total
+							? `${rows.length} of ${journal.total} shown`
+							: undefined
+				}
+			/>
+		</div>
 	);
 }

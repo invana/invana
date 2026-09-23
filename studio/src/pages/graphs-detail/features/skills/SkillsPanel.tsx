@@ -1,26 +1,16 @@
 /**
- * Skills as a **work surface** (`Agents at Work` hi-fi, *Skills · hi-fi*).
+ * Skills — a **stack**, not a list (G33): `Skills` over `Rules`.
  *
- * A skill used to live only in Settings, as a form. That was the wrong shape
- * for the question people actually bring to one — *is this prose doing
- * anything?* — because a form can show what a skill **says** and nothing about
- * what it **did**. This panel answers both, and the second half is the reason
- * it exists: `offered 41× · reported 29×`, then the steps behind those numbers.
+ * The two drawers answer different questions about one subject — what a run is
+ * *given* before it runs. A skill is a playbook that may be offered; a rule is
+ * a statement that is always true. Both reach a step as discrete items with
+ * ids, and **neither is enforced** (skills/spec.md § 2).
  *
- * ## `offered` and `reported` are not the same claim
- *
- * This distinction is the whole design of the usage list, and it is a promise
- * about honesty rather than a UI nicety (docs/for-developers/modules/work/spec.md):
- *
- * | Badge | What it means | How we know |
- * |---|---|---|
- * | **offered** | this skill's prose was in the prompt | a fact the engine recorded when it built the prompt |
- * | **reported** | the model says it applied it | the model's own claim, and nothing more |
- *
- * Nothing here ever says *used*. There is no way to verify that a model
- * followed prose, so a word that implies we did would be a lie told in a badge.
- * The legend under the list says the same thing in the user's words, because a
- * distinction nobody explains is one everybody collapses.
+ * A stack has no panel header above its drawers: the first drawer header is the
+ * top of the column, and the breadcrumb already says which panel is open (G32).
+ * A drill-in replaces that drawer's body and turns its header into
+ * `‹ SKILLS / Escalate a late supplier`; the Rules drawer keeps its place
+ * underneath (SK17).
  *
  * ## The canvas keeps whatever it was showing
  *
@@ -31,33 +21,16 @@
 
 import {
 	useCreateSkillMutation,
-	useDeleteSkillMutation,
+	useRulesQuery,
 	useSkillsQuery,
-	useUpdateSkillMutation,
 } from "@/hooks/queries/useSkills";
-import { useSkillUsageQuery } from "@/hooks/queries/useWork";
-import {
-	DetailPlaceholder,
-	DetailStatus,
-} from "@/pages/graphs-detail/shared/DetailRows";
-import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
-import { WorkRow } from "@/pages/graphs-detail/shared/WorkRow";
+import { RulesDrawer } from "@/pages/graphs-detail/features/skills/RulesDrawer";
+import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
+import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
 import type { Skill } from "@/types/skills";
-import { PanelSection } from "@/ui/PanelSection";
 import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
-import { PrincipalChip } from "@/ui/PrincipalChip";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-	Button,
-	CardFooter,
-	Spinner,
-	StatusDot,
-} from "@invana/ui";
-import { Pencil, Plus, Trash2, Wand2 } from "lucide-react";
+import { Badge, PanelStack, type PanelStackSection, Spinner } from "@invana/ui";
+import { ChevronLeft, Maximize2, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -67,447 +40,281 @@ interface Props {
 	selectedSkillId: string | null;
 	onSelectSkill: (id: string | null) => void;
 	onOpenAgent?: (agentId: string) => void;
+	/**
+	 * `More` — open the drilled-in record as a declared board.
+	 *
+	 * Only ever offered **drilled in**: `More` on a list is a question about
+	 * which row, and the row is the thing being read (SK36 · RU11). The stack
+	 * stays where it is; the board opens beside it.
+	 */
+	onOpenSkillDashboard?: (skillId: string) => void;
+	/**
+	 * `More` on the **Usage** tab — the usage board, which is a different
+	 * reading of the same skill and so a different page (SD2). It lives in the
+	 * tab rather than in the panel header, because a header action that changed
+	 * meaning with the selected tab would be two actions wearing one icon.
+	 */
+	onOpenUsageDashboard?: (skillId: string) => void;
+	onOpenRuleDashboard?: (ruleId: string) => void;
 }
 
 export function SkillsPanel({
 	username,
 	graphSlug,
-	onClose,
 	selectedSkillId,
 	onSelectSkill,
 	onOpenAgent,
+	onOpenSkillDashboard,
+	onOpenUsageDashboard,
+	onOpenRuleDashboard,
 }: Props) {
-	const [editing, setEditing] = useState<"new" | string | null>(null);
+	const [editing, setEditing] = useState(false);
+	const [openRuleId, setOpenRuleId] = useState<string | null>(null);
+	const [composingRule, setComposingRule] = useState(false);
+	const rules = useRulesQuery(username, graphSlug);
+	const openRule =
+		(rules.data?.items ?? []).find((r) => r.id === openRuleId) ?? null;
 
 	const skills = useSkillsQuery(username, graphSlug);
-	const remove = useDeleteSkillMutation(username, graphSlug);
-
+	const create = useCreateSkillMutation(username, graphSlug);
 	const items = skills.data?.items ?? [];
 	const selected = items.find((s) => s.id === selectedSkillId) ?? null;
 
-	return (
-		<ListPanelChrome
-			title={
-				selected ? (
-					<Breadcrumb>
-						<BreadcrumbList className="gap-1 font-semibold sm:gap-1">
-							<BreadcrumbItem>Skills</BreadcrumbItem>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem className="min-w-0">
-								<BreadcrumbPage className="truncate font-semibold">
-									{selected.name}
-								</BreadcrumbPage>
-							</BreadcrumbItem>
-						</BreadcrumbList>
-					</Breadcrumb>
-				) : (
-					"Skills"
-				)
-			}
-			icon={Wand2}
-			onRefresh={() => skills.refetch()}
-			isRefreshing={skills.isFetching}
-			searchable
-			searchLabel="Search skills"
-			listControls={selected === null && editing === null}
-			onClose={onClose}
-			leadingActions={[
-				{
-					key: "new",
-					name: "New skill",
-					icon: Plus,
-					onClick: () => {
-						onSelectSkill(null);
-						setEditing("new");
-					},
+	/**
+	 * A new skill is a **draft** the moment it is created: the row exists, its
+	 * plan exists as one `form: human` node, and the drawer opens on it with the
+	 * prose empty (SK20 · SK22). Nothing is offered it until it is published.
+	 */
+	const newSkill = () => {
+		create.mutate(
+			{ name: `Untitled skill ${items.length + 1}` },
+			{
+				onSuccess: (skill) => {
+					onSelectSkill(skill.id);
+					setEditing(true);
 				},
-			]}
-		>
-			{({ search }) => {
-				if (editing) {
-					const existing = editing === "new" ? null : (selected ?? null);
-					return (
-						<SkillForm
-							username={username}
-							graphSlug={graphSlug}
-							existing={existing}
-							onDone={(id) => {
-								setEditing(null);
-								if (id) onSelectSkill(id);
-							}}
-						/>
-					);
-				}
+			},
+		);
+	};
 
-				if (selected) {
-					return (
-						<SkillDetail
-							username={username}
-							graphSlug={graphSlug}
-							skill={selected}
-							total={items.length}
-							onBack={() => onSelectSkill(null)}
-							onEdit={() => setEditing(selected.id)}
-							onDelete={() => {
-								remove.mutate(selected.id);
-								onSelectSkill(null);
-							}}
-							onOpenAgent={onOpenAgent}
-						/>
-					);
-				}
+	const skillsBody = () => {
+		if (selected)
+			return (
+				<SkillDetail
+					username={username}
+					graphSlug={graphSlug}
+					skill={selected}
+					editing={editing || selected.is_draft}
+					onEditing={setEditing}
+					onOpenAgent={onOpenAgent}
+					onOpenUsageDashboard={onOpenUsageDashboard}
+				/>
+			);
 
-				const rows = items.filter((s) =>
-					s.name.toLowerCase().includes(search.toLowerCase()),
-				);
-				return (
-					<div className="flex h-full min-h-0 flex-col">
-						<div className="flex-1 overflow-y-auto">
-							{skills.isLoading ? (
-								<div className="p-4">
-									<Spinner />
-								</div>
-							) : rows.length === 0 ? (
-								<p className="p-4 text-sm text-muted-foreground">
-									No skills yet. A skill is prose an agent is offered — what
-									your data means, and which path through it to prefer.
-								</p>
-							) : (
-								rows.map((skill) => (
-									<WorkRow
-										key={skill.id}
-										onClick={() => onSelectSkill(skill.id)}
-										tone={skill.content ? "info" : "muted"}
-										title={skill.name}
-										subtitle={
-											<span className="truncate">
-												{skill.description || "no description"}
-											</span>
-										}
-									/>
-								))
-							)}
-						</div>
-						<PanelStatusBar
-							left={
-								<StatusCrumb active>All skills ({items.length})</StatusCrumb>
-							}
-							right="the canvas stays as it was"
-						/>
-					</div>
-				);
-			}}
-		</ListPanelChrome>
+		if (skills.isLoading)
+			return (
+				<div className="p-4">
+					<Spinner />
+				</div>
+			);
+		if (items.length === 0)
+			return (
+				<p className="px-3 py-2 text-base text-muted-foreground">
+					No skills yet. A skill is a playbook an agent may be offered — how to
+					approach something, written once.
+				</p>
+			);
+		return (
+			<div className="pb-2.5">
+				{items.map((skill) => (
+					<SkillRow
+						key={skill.id}
+						skill={skill}
+						onClick={() => {
+							setEditing(false);
+							onSelectSkill(skill.id);
+						}}
+					/>
+				))}
+			</div>
+		);
+	};
+
+	/**
+	 * The drill-in **is** the drawer's header — `‹ SKILLS / <name>` as the
+	 * section's own title, never a second bar inside the body (G33 · SK17).
+	 */
+	const skillsTitle = selected ? (
+		<span className="flex min-w-0 items-center gap-1">
+			<span className="text-muted-foreground uppercase">Skills</span>
+			<span className="text-muted-foreground opacity-60">/</span>
+			<span className="truncate font-medium">{selected.name}</span>
+			<Badge variant="secondary" className="shrink-0">
+				{selected.is_draft ? "draft" : `v${selected.version}`}
+			</Badge>
+		</span>
+	) : (
+		<SectionTitle count={items.length}>Skills</SectionTitle>
 	);
-}
 
-function SkillDetail({
-	username,
-	graphSlug,
-	skill,
-	total,
-	onBack,
-	onEdit,
-	onDelete,
-	onOpenAgent,
-}: {
-	username: string;
-	graphSlug: string;
-	skill: Skill;
-	total: number;
-	onBack: () => void;
-	onEdit: () => void;
-	onDelete: () => void;
-	onOpenAgent?: (id: string) => void;
-}) {
-	const usage = useSkillUsageQuery(username, graphSlug, skill.id);
-	const steps = usage.data?.recent_steps ?? [];
-	const offered = steps.length;
-	const reported = steps.filter((s) => s.reported).length;
+	const sections: PanelStackSection[] = [
+		{
+			id: "skills",
+			title: skillsTitle,
+			// The header has one action area, and it carries the act the drawer
+			// is for: creating, in the list; going back, once drilled in. The
+			// trail itself is text — a PanelStack header **is** the collapse
+			// control, so an interactive crumb inside it would be a button in a
+			// button, which is invalid and steals the collapse click. `TaskDrawer`
+			// drills in the same way.
+			headerActions: selected
+				? [
+						{
+							key: "back",
+							name: "Back to skills",
+							icon: ChevronLeft,
+							onClick: () => {
+								setEditing(false);
+								onSelectSkill(null);
+							},
+						},
+						// The whole skill as a page — the drawer keeps its place,
+						// which is the point of opening one deliberately rather
+						// than growing this column (SK36 · CV14).
+						...(onOpenSkillDashboard
+							? [
+									{
+										key: "more",
+										name: "Open this skill as a page",
+										icon: Maximize2,
+										onClick: () => onOpenSkillDashboard(selected.id),
+									},
+								]
+							: []),
+					]
+				: [
+						{
+							name: "New skill",
+							icon: Plus,
+							onClick: newSkill,
+						},
+					],
+			actionsOnHover: false,
+			content: skillsBody(),
+		},
+		{
+			id: "rules",
+			// The same rule the Skills drawer follows: the drill-in **is** the
+			// header — the trail as text, and the act on the right.
+			title: openRule ? (
+				<span className="flex min-w-0 items-center gap-1">
+					<span className="text-muted-foreground uppercase">Rules</span>
+					<span className="text-muted-foreground opacity-60">/</span>
+					<Badge variant="secondary" className="shrink-0">
+						{openRule.kind} · v{openRule.version}
+					</Badge>
+				</span>
+			) : (
+				<SectionTitle count={(rules.data?.items ?? []).length}>
+					Rules
+				</SectionTitle>
+			),
+			headerActions: openRule
+				? [
+						{
+							key: "back",
+							name: "Back to rules",
+							icon: ChevronLeft,
+							onClick: () => setOpenRuleId(null),
+						},
+						...(onOpenRuleDashboard
+							? [
+									{
+										key: "more",
+										name: "Open this rule as a page",
+										icon: Maximize2,
+										onClick: () => onOpenRuleDashboard(openRule.id),
+									},
+								]
+							: []),
+					]
+				: composingRule
+					? []
+					: [
+							{
+								name: "New invariant",
+								icon: Plus,
+								onClick: () => setComposingRule(true),
+							},
+						],
+			actionsOnHover: false,
+			content: (
+				<RulesDrawer
+					username={username}
+					graphSlug={graphSlug}
+					openRuleId={openRuleId}
+					onOpenRule={setOpenRuleId}
+					composing={composingRule}
+					onComposing={setComposingRule}
+				/>
+			),
+		},
+	];
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex items-center gap-2 border-b px-3 py-1.5">
-				<button
-					type="button"
-					onClick={onBack}
-					className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
-				>
-					← Skills
-				</button>
+			<div className="min-h-0 flex-1">
+				<PanelStack sections={sections} withHandle />
 			</div>
-
-			<div className="flex shrink-0 items-center gap-2 px-4 pb-1 pt-2.5 text-sm">
-				<DetailStatus>skill</DetailStatus>
-				<span className="truncate text-muted-foreground">
-					updated {new Date(skill.updated_at).toLocaleDateString()}
-					{offered ? ` · offered ${offered}× · reported ${reported}×` : ""}
-				</span>
-			</div>
-
-			<div className="min-h-0 flex-1 overflow-y-auto">
-				<PanelSection title="Description">
-					<p className="text-sm text-foreground">
-						{skill.description || (
-							<span className="text-muted-foreground">
-								No description. This is the one line an agent sees when deciding
-								whether the skill is relevant.
-							</span>
-						)}
-					</p>
-				</PanelSection>
-
-				<PanelSection title="When to use">
-					<p className="text-sm text-foreground">
-						{skill.when_to_use || (
-							<span className="text-muted-foreground">
-								Not set — the skill is offered on every ask.
-							</span>
-						)}
-					</p>
-				</PanelSection>
-
-				<PanelSection
-					title="Content"
-					action={
-						<button
-							type="button"
-							onClick={onEdit}
-							className="text-sm text-muted-foreground hover:text-foreground"
-						>
-							edit
-						</button>
-					}
-				>
-					<pre className="max-h-52 overflow-auto whitespace-pre-wrap rounded-sm bg-muted/50 px-2.5 py-2 font-mono text-sm text-foreground">
-						{skill.content || "(empty)"}
-					</pre>
-				</PanelSection>
-
-				<PanelSection
-					title="Used by"
-					hint="an agent that binds every skill sees this one too"
-				>
-					{usage.isLoading ? (
-						<Spinner />
-					) : usage.data?.used_by.length ? (
-						<div className="flex flex-wrap gap-1.5">
-							{usage.data.used_by.map((agent) => (
-								<PrincipalChip
-									key={agent.id}
-									name={agent.name}
-									kind="agent"
-									muted={agent.status === "retired"}
-									onClick={
-										onOpenAgent ? () => onOpenAgent(agent.id) : undefined
-									}
-								/>
-							))}
-						</div>
-					) : (
-						<p className="text-sm text-muted-foreground">
-							No agent binds this skill yet.
-						</p>
-					)}
-				</PanelSection>
-
-				<PanelSection
-					title="Recent steps"
-					action={
-						<span className="flex items-center gap-1">
-							<DetailStatus>offered</DetailStatus>
-							<DetailStatus tone="success">reported</DetailStatus>
-						</span>
-					}
-				>
-					{usage.isLoading ? (
-						<Spinner />
-					) : steps.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							This skill has never been put in a prompt.
-						</p>
-					) : (
-						<div className="space-y-px">
-							{steps.map((step) => (
-								<div
-									key={`${step.run_id}:${step.step_id}`}
-									className="flex items-center gap-2 rounded-sm px-1.5 py-1 text-sm hover:bg-accent/50"
-								>
-									<StatusDot
-										tone={step.reported ? "success" : "muted"}
-										label={step.reported ? "reported" : "offered"}
-									/>
-									<span className="shrink-0 font-medium text-foreground">
-										{step.label}
-									</span>
-									<span className="min-w-0 flex-1 truncate text-muted-foreground">
-										{step.task_key}
-									</span>
-									<span className="shrink-0 text-muted-foreground">
-										{step.reported ? "reported" : "offered"}
-									</span>
-								</div>
-							))}
-						</div>
-					)}
-					{/*
-					 * The legend is not optional copy. `offered` and `reported` are two
-					 * different kinds of claim, and a reader who collapses them will
-					 * believe we verified something we cannot verify.
-					 */}
-					<p className="mt-2 text-sm text-muted-foreground">
-						<span className="font-medium text-foreground">offered</span> = in
-						the prompt (a fact) ·{" "}
-						<span className="font-medium text-foreground">reported</span> = the
-						model says it applied it
-					</p>
-				</PanelSection>
-			</div>
-
-			<CardFooter className="shrink-0 flex-wrap gap-2 border-t">
-				<Button size="sm" onClick={onEdit}>
-					<Pencil /> Edit
-				</Button>
-				<span className="flex-1" />
-				<Button size="sm" variant="ghost" onClick={onDelete}>
-					<Trash2 /> Delete
-				</Button>
-			</CardFooter>
-
 			<PanelStatusBar
-				left={
-					<>
-						<StatusCrumb active>Skill</StatusCrumb>
-						<StatusCrumb onClick={onBack}>All skills ({total})</StatusCrumb>
-					</>
-				}
+				left={<StatusCrumb active>Skills</StatusCrumb>}
+				right="offered, never obeyed — the canvas stays as it was"
 			/>
 		</div>
 	);
 }
 
 /**
- * Focus the field the moment it appears — the form only exists because the user
- * just asked for it, so putting the caret in it completes that gesture.
+ * The drawn row: the name, its version, the whole `when_to_use` sentence, and
+ * how many agents carry it. The sentence is not truncated to a word — it is the
+ * thing a reader is deciding about.
  */
-function focusOnMount(el: HTMLInputElement | null) {
-	el?.focus();
-}
-
-function SkillForm({
-	username,
-	graphSlug,
-	existing,
-	onDone,
-}: {
-	username: string;
-	graphSlug: string;
-	existing: Skill | null;
-	onDone: (id?: string) => void;
-}) {
-	const [name, setName] = useState(existing?.name ?? "");
-	const [description, setDescription] = useState(existing?.description ?? "");
-	const [whenToUse, setWhenToUse] = useState(existing?.when_to_use ?? "");
-	const [content, setContent] = useState(existing?.content ?? "");
-
-	const create = useCreateSkillMutation(username, graphSlug);
-	const update = useUpdateSkillMutation(username, graphSlug);
-	const pending = create.isPending || update.isPending;
-
-	const submit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!name.trim()) return;
-		const data = {
-			name: name.trim(),
-			description: description.trim(),
-			when_to_use: whenToUse.trim(),
-			content,
-		};
-		if (existing)
-			update.mutate(
-				{ id: existing.id, data },
-				{ onSuccess: () => onDone(existing.id) },
-			);
-		else create.mutate(data, { onSuccess: (skill) => onDone(skill.id) });
-	};
-
+function SkillRow({ skill, onClick }: { skill: Skill; onClick: () => void }) {
 	return (
-		<form onSubmit={submit} className="flex h-full min-h-0 flex-col">
-			<div className="flex items-center gap-2 border-b px-3 py-1.5">
-				<button
-					type="button"
-					onClick={() => onDone()}
-					className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
-				>
-					← Skills
-				</button>
-				<span className="truncate text-sm font-medium">
-					{existing ? existing.name : "New skill"}
-				</span>
+		<button
+			type="button"
+			onClick={onClick}
+			className="block w-full border-b px-3 py-2 text-left last:border-b-0 hover:bg-muted/50"
+		>
+			<div className="flex items-center gap-1.5">
+				<span className="truncate text-base font-medium">{skill.name}</span>
+				{skill.is_draft ? (
+					// A draft says so: nothing is offered it, and a row that looked
+					// published would be the one lie this list can tell (SK21).
+					<Badge variant="outline" className="shrink-0">
+						draft
+					</Badge>
+				) : (
+					<Badge variant="secondary" className="shrink-0">
+						v{skill.version}
+					</Badge>
+				)}
+				{skill.origin === "builtin" ? (
+					<Badge variant="outline" className="shrink-0">
+						builtin
+					</Badge>
+				) : null}
 			</div>
-
-			<div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3 py-2.5">
-				<label className="block text-sm text-muted-foreground">
-					Name
-					<input
-						ref={focusOnMount}
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						placeholder="supplier-taxonomy"
-						className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 font-mono text-sm text-foreground"
-					/>
-				</label>
-				<label className="block text-sm text-muted-foreground">
-					Description
-					<input
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						placeholder="How suppliers, parts and regions relate in this graph."
-						className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-sm text-foreground"
-					/>
-				</label>
-				<label className="block text-sm text-muted-foreground">
-					When to use
-					<input
-						value={whenToUse}
-						onChange={(e) => setWhenToUse(e.target.value)}
-						placeholder="Any question that mentions suppliers, sourcing or parts."
-						className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-sm text-foreground"
-					/>
-				</label>
-				<label className="block text-sm text-muted-foreground">
-					Content
-					<textarea
-						value={content}
-						onChange={(e) => setContent(e.target.value)}
-						rows={12}
-						placeholder={"## Supplier taxonomy\n- A Supplier SUPPLIES a Part…"}
-						className="mt-1 w-full resize-y rounded-sm border bg-background px-2 py-1.5 font-mono text-sm text-foreground"
-					/>
-				</label>
-			</div>
-
-			<div className="flex shrink-0 items-center gap-1.5 border-t px-2 py-1.5">
-				<Button
-					type="submit"
-					size="sm"
-					className="h-7 text-sm"
-					disabled={pending || !name.trim()}
-				>
-					{pending ? "Saving…" : existing ? "Save" : "Create"}
-				</Button>
-				<Button
-					type="button"
-					size="sm"
-					variant="ghost"
-					className="h-7 text-sm"
-					onClick={() => onDone()}
-				>
-					Cancel
-				</Button>
-			</div>
-		</form>
+			<p className="mt-0.5 text-base text-muted-foreground">
+				{skill.when_to_use || "no when-to-use — it is offered on every ask"}
+			</p>
+			{skill.plan ? (
+				<p className="mt-0.5 truncate text-base text-muted-foreground">
+					{skill.plan.step_count} step
+					{skill.plan.step_count === 1 ? "" : "s"} ·{" "}
+					{skill.plan.layers.join(" · ")}
+				</p>
+			) : null}
+		</button>
 	);
 }
-
-export { DetailPlaceholder };

@@ -103,7 +103,7 @@ export function ProvenanceBlock({
 						{line}
 					</span>
 					{provenance.runId ? (
-						<span className="block font-mono text-meta text-muted-foreground">
+						<span className="block font-mono text-sm text-muted-foreground">
 							run {provenance.runId.slice(0, 8)}
 						</span>
 					) : null}

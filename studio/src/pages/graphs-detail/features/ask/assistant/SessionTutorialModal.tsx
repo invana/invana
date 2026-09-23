@@ -57,8 +57,8 @@ export function SessionTutorialModal({ open, onClose }: Props) {
 								<c.icon className="h-4 w-4" />
 							</span>
 							<div className="min-w-0">
-								<p className="font-medium text-sm">{c.title}</p>
-								<p className="text-muted-foreground text-sm">{c.body}</p>
+								<p className="font-medium text-base">{c.title}</p>
+								<p className="text-muted-foreground text-base">{c.body}</p>
 							</div>
 						</li>
 					))}

@@ -553,7 +553,7 @@ function AltitudeControl() {
 		);
 
 	return (
-		<div className="absolute right-3 bottom-3 z-10 flex items-center gap-2.5 rounded-sm border bg-card px-3 py-1.5 text-meta shadow-sm">
+		<div className="absolute right-3 bottom-3 z-10 flex items-center gap-2.5 rounded-sm border bg-card px-3 py-1.5 text-sm shadow-sm">
 			<span className="font-medium text-foreground">Altitude</span>
 			<button
 				type="button"
@@ -846,7 +846,7 @@ export function AllModelsCanvas({ username, graphSlug, onOpenModel }: Props) {
 			{build.stagedCount > 0 ? (
 				<div className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-2.5 rounded-sm border bg-card py-1.5 pr-2 pl-3 shadow-sm">
 					<span className="size-1.5 rounded-full bg-warning" />
-					<span className="text-meta">
+					<span className="text-sm">
 						{build.stagedCount} staged{" "}
 						<span className="text-muted-foreground">
 							· the union is unchanged
@@ -880,7 +880,7 @@ export function AllModelsCanvas({ username, graphSlug, onOpenModel }: Props) {
 			/>
 
 			{refusal ? (
-				<div className="-translate-x-1/2 absolute top-3 left-1/2 z-10 max-w-md rounded-sm border border-destructive/40 bg-card px-3 py-1.5 text-meta shadow-sm">
+				<div className="-translate-x-1/2 absolute top-3 left-1/2 z-10 max-w-md rounded-sm border border-destructive/40 bg-card px-3 py-1.5 text-sm shadow-sm">
 					<span className="text-destructive">Not a stitch. </span>
 					<span className="text-muted-foreground">{refusal}</span>
 				</div>
@@ -1002,9 +1002,9 @@ function ThoughtOnCommit({ staged }: { staged: number }) {
 					Ask · stitch
 				</Badge>
 				<span className="flex-1" />
-				<span className="text-meta text-muted-foreground">on commit</span>
+				<span className="text-sm text-muted-foreground">on commit</span>
 			</div>
-			<p className="px-2.5 py-2 text-meta text-muted-foreground">
+			<p className="px-2.5 py-2 text-sm text-muted-foreground">
 				A commit opens <span className="font-mono">Ask(kind = stitch)</span> —
 				the same step card an answer or an import gets, with the same statuses
 				and timings. A stitch writes edges with no dataset in the picture.
@@ -1013,7 +1013,7 @@ function ThoughtOnCommit({ staged }: { staged: number }) {
 				{steps.map((step) => (
 					<div
 						key={step.id}
-						className="flex items-center gap-2 px-2.5 py-1.5 text-meta"
+						className="flex items-center gap-2 px-2.5 py-1.5 text-sm"
 					>
 						<span className="size-1.5 rounded-full bg-muted-foreground" />
 						<span className="flex-1">{step.label}</span>
@@ -1021,7 +1021,7 @@ function ThoughtOnCommit({ staged }: { staged: number }) {
 					</div>
 				))}
 			</div>
-			<div className="border-t px-2.5 py-1.5 text-meta text-muted-foreground">
+			<div className="border-t px-2.5 py-1.5 text-sm text-muted-foreground">
 				{staged} staged · nothing runs until you commit
 			</div>
 		</div>
@@ -1043,7 +1043,7 @@ function UnresolvedBanner({
 	onReview?: () => void;
 }) {
 	return (
-		<div className="-translate-x-1/2 absolute top-3 left-1/2 z-10 flex items-center gap-2 border border-warning/35 bg-warning/10 px-3 py-1.5 text-meta shadow-sm">
+		<div className="-translate-x-1/2 absolute top-3 left-1/2 z-10 flex items-center gap-2 border border-warning/35 bg-warning/10 px-3 py-1.5 text-sm shadow-sm">
 			<span className="size-1.5 rounded-full bg-warning" />
 			<span>
 				A published version moved on —{" "}

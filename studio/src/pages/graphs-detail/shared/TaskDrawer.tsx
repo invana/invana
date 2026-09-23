@@ -27,7 +27,7 @@ import {
 	SearchInput,
 	cn,
 } from "@invana/ui";
-import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Filter, Search } from "lucide-react";
 import type { ElementType, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -102,11 +102,28 @@ export interface TaskDrawerSpec {
 		icon: ElementType;
 		onClick: () => void;
 	}[];
+	/**
+	 * Actions for the **drilled-in** header, beside `‹ Back` — an act on the one
+	 * record on screen, never on the list behind it (G43). A list's own acts are
+	 * {@link TaskDrawerSpec.headerActions} and are gone while drilled in.
+	 */
+	detailActions?: {
+		key: string;
+		name: string;
+		icon: ElementType;
+		onClick: () => void;
+	}[];
 	/** Enables this drawer's own search toggle. */
 	searchable?: boolean;
 	searchPlaceholder?: string;
 	/** This drawer's own filter menu content. Omit to hide the funnel. */
 	filterMenu?: ReactNode;
+	/**
+	 * Filter **chips** instead of a menu: the funnel toggles this row under the
+	 * header, and each chip is its own dropdown. Takes precedence over
+	 * {@link TaskDrawerSpec.filterMenu}.
+	 */
+	filterBar?: ReactNode;
 	/** True while a filter is narrowing the list — lights the funnel. */
 	filtered?: boolean;
 	/** Start collapsed (header only). */
@@ -124,6 +141,7 @@ export function taskDrawerSection(
 	const state = ui.get(spec.id);
 	const drilled = spec.trail != null;
 	const showSearch = !drilled && Boolean(spec.searchable) && state.searchOpen;
+	const showFilterBar = !drilled && spec.filterBar != null && state.filterOpen;
 
 	return {
 		id: spec.id,
@@ -139,9 +157,11 @@ export function taskDrawerSection(
 		),
 		content: (
 			<div className="flex h-full min-h-0 flex-col">
+				{showFilterBar && <div className="shrink-0">{spec.filterBar}</div>}
 				{showSearch && (
 					<div className="shrink-0 border-b p-2">
 						<SearchInput
+							inputSize="sm"
 							autoFocus
 							value={state.search}
 							placeholder={spec.searchPlaceholder ?? `Search ${spec.label}`}
@@ -221,7 +241,9 @@ function DrawerTitle({
  *
  * Search and filter apply to the list only, so a drilled-in drawer — showing
  * one record — offers neither: narrowing a list that is not on screen would be
- * a control with no subject.
+ * a control with no subject. For the same reason the list's own acts go with
+ * it, and what takes their place is {@link TaskDrawerSpec.detailActions}: the
+ * acts on the record the drawer is now showing (G43).
  */
 function drawerActions(
 	spec: TaskDrawerSpec,
@@ -230,7 +252,8 @@ function drawerActions(
 ): NavHorizontalItem[] {
 	const drilled = spec.trail != null;
 	if (drilled) {
-		return spec.onBack
+		// Back first, then whatever acts on the record itself (G43).
+		const back: NavHorizontalItem[] = spec.onBack
 			? [
 					{
 						key: "back",
@@ -240,6 +263,7 @@ function drawerActions(
 					},
 				]
 			: [];
+		return [...back, ...(spec.detailActions ?? [])];
 	}
 
 	const items: NavHorizontalItem[] = (spec.headerActions ?? []).map((a) => ({
@@ -259,7 +283,19 @@ function drawerActions(
 		});
 	}
 
-	if (spec.filterMenu) {
+	if (spec.filterBar != null) {
+		// The funnel opens the chip row; the chips are the menus.
+		items.push({
+			key: "filter",
+			name: state.filterOpen ? "Hide filters" : "Filters",
+			icon: Filter,
+			iconClassName: spec.filtered
+				? "h-3.5 w-3.5 shrink-0 text-primary"
+				: undefined,
+			onClick: () => onSet({ filterOpen: !state.filterOpen }),
+			className: state.filterOpen ? "bg-muted text-foreground" : undefined,
+		});
+	} else if (spec.filterMenu) {
 		// A **static** item — no `onClick`, no `menuItems` — so the kit renders a
 		// plain `<div>` and the drawer keeps its own rich menu: labelled groups
 		// and radio rows, which `menuItems` has no way to say. The item still
@@ -280,7 +316,7 @@ function drawerActions(
 								(state.filterOpen || spec.filtered) && "text-foreground",
 							)}
 						>
-							<SlidersHorizontal
+							<Filter
 								className={cn("h-3.5 w-3.5", spec.filtered && "text-primary")}
 							/>
 						</button>

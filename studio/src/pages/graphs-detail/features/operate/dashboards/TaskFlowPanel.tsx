@@ -61,7 +61,7 @@ export function TaskFlowPanel({
 
 	if (!nodes.length) {
 		return (
-			<div className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
+			<div className="flex h-full items-center justify-center p-6 text-base text-muted-foreground">
 				No tasks recorded for this run.
 			</div>
 		);

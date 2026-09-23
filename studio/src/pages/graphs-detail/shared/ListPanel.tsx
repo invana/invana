@@ -199,7 +199,7 @@ export function ListPanelChrome({
 			)}
 			{showSearch && (
 				<div className="shrink-0 border-b border-border p-2">
-					<SearchInput value={search} onChange={setSearch} />
+					<SearchInput inputSize="sm" value={search} onChange={setSearch} />
 				</div>
 			)}
 			<div className="min-h-0 flex-1">{children({ search: activeSearch })}</div>
@@ -318,7 +318,7 @@ export function ListRow({
 						{title}
 					</span>
 					{subtitle && (
-						<span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<span className="flex items-center gap-1.5 text-base text-muted-foreground">
 							{subtitle}
 						</span>
 					)}

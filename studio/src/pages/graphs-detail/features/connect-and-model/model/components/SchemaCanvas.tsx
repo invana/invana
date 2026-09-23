@@ -723,8 +723,20 @@ function SchemaAutoLayout({
 
 	useCanvasEvent("layout:run:end", (e) => {
 		if (e.id !== layoutId || e.reason !== "settled" || !canvas) return;
-		const bounds = canvas.layers.get<graph.GraphLayer>(LAYER_ID)?.getBounds();
-		if (!bounds) return;
+		const layer = canvas.layers.get<graph.GraphLayer>(LAYER_ID);
+		const bounds = layer?.getBounds();
+		if (!layer || !bounds) return;
+		// **Redraw before framing** (ME25). A layer holds every node invisible
+		// while a declared `activeLayout` has yet to report a run — otherwise an
+		// unplaced node paints at the origin and the whole model piles up there.
+		// This sim is `animate: false`, so its solve lands in the same beat as
+		// the data it is laying out: the gate lifts against a flush that has
+		// already been and gone, and the drawing is never installed. The store
+		// has the types, `getBounds()` has the box and the minimap draws them —
+		// the viewport alone stays empty. `redraw()` is the engine's own recovery
+		// for that desync: a pure render pass over what the store already holds,
+		// no data touched.
+		layer.redraw();
 		canvas.camera.fitContent(bounds, FIT_PADDING);
 		if (canvas.camera.scale > MAX_FIT_ZOOM) canvas.camera.setZoom(MAX_FIT_ZOOM);
 	});

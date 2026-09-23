@@ -254,6 +254,7 @@ layers = [
     "invana.apps.sessions",
     "invana.apps.agents",
     "invana.apps.skills",
+    "invana.apps.govern",
     "invana.apps.llm",
     "invana.apps.llm_providers",
     "invana.apps.graphs",

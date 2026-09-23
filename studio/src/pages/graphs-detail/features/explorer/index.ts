@@ -26,7 +26,6 @@ export type {
 
 export { ExplorerTypesPanel } from "@/pages/graphs-detail/features/explorer/ExplorerTypesPanel";
 export { InspectorPanel } from "@/pages/graphs-detail/features/explorer/InspectorPanel";
-export { RendererCapabilityBanner } from "@/pages/graphs-detail/features/explorer/RendererCapabilityBanner";
 
 // The two CV6 cards whose subject is what is drawn — Layers and Styling
 // (boards.md CV8). History and Rename describe the record, so they are

@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — twenty-two entries
+### 6.1 The catalogue as it actually is — twenty-three entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -215,6 +215,7 @@ a data migration, not a declaration.
 | `plan_workflow` | `llm` | — | `source` str · `steps` list · `rationale` str | — |
 | `translate_thought` | `llm` | `ask` str | `query` str · `language` str · `rationale` str · `ask` str · `question` str · `options` list | — |
 | `propose_model` | `llm` | — | `node_types` list · `edge_types` list · `summary` str | `understand_ask` |
+| `draft_plan` | `llm` | `skill_version_id` str | `plan_id` str · `steps` int · `unmapped` list · `question` str · `span` str · `clarification_id` str · `options` list | — |
 | `validate_query` | *none* | `query` str | `verdict` str · `labels` list | — |
 | `verify_result` | *none* | — | `served` str · `evidence` list | — |
 | `shape_for_canvas` | *none* | — | `nodes` int · `edges` int · `result_type` str · `emission_id` str · `emission_kind` str · `template_id` str · `single_value` bool | `execute_graph_query` |
@@ -222,7 +223,7 @@ a data migration, not a declaration.
 | `execute_graph_query` | `graph_read` | `query` str · `read_only` bool | `rows` int · `execution_time_ms` int · `result_type` str | `validate_query` |
 | `understand_ask` | `schema_write` | — | `model_id` str · `draft_version_id` str | — |
 | `validate_proposal` | `schema_write` | — | `counts` obj · `draft_version_id` str | `propose_model` |
-| `spawn_agent` | `work_write` | `name` str · `instructions` str · `allow` list · `skill_ids` list · `budget` obj · `llm_config_id` str · `lifetime` str | `agent_id` str · `name` str · `depth` int | — |
+| `spawn_agent` | `work_write` | `name` str · `instructions` str · `allow` list · `skill_ids` list · `budget` obj · `lens_id` str · `lifetime` str | `agent_id` str · `name` str · `depth` int | — |
 | `delegate` | `work_write` | `agent_id` str · `body` str | `child_thinking_id` str · `status` str | — |
 | `create_task` | `work_write` | `title` str · `body` str | `task_id` str | — |
 | `check_bundle` | `ingest` | `root` str | `datasets` list · `findings` list · `passed` bool | — |
@@ -300,7 +301,7 @@ resolving option values and its result is never returned to the model.
 `snapshot_model`**. [§ 6.2](#62-where-todays-set-and--06s-proposed-set-differ)
 lists § 0.6's *proposed* names — `import_dataset`, `import_report` — and taking
 those would rename a column whose values are stored on 179 live nodes and read
-by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--twenty-two-entries)
+by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--twenty-three-entries)
 already settles: **a stored key is renamed by a data migration, never by a
 declaration.** So M11 declares the keys that exist.
 
@@ -462,7 +463,7 @@ Each slice is reproducible from a clean checkout before the next starts.
 | **M7** | **Lenses.** `lenses` table, `lens_snapshot` on the run, intersection of agent ∩ plan ∩ todo | a run pinned to `stitches: []` refuses a cross-model traversal with *outside the lens*, not *cannot answer* |
 | **M10** | **Replan.** `plan_revision` on every run; `plan_snapshot` becomes the revision sequence; full re-validation per revision; `max_replans` on the envelope | a `verify` that replans mid-run keeps every settled child, re-validates the whole new graph against the envelope, and a test proves a replan cannot edit a settled node or change the lens |
 | **M9** | **The budget pause.** `min(agent, plan, todo)` checked between dispatches; at the ceiling a `TaskPrompt kind=approval` naming the bound, the spend and the next node's estimate. `hard_ceiling` cancels | a run reaching its ceiling mid-fan-out finishes its in-flight lanes, parks in `awaiting_approval` holding no pool slot, and resumes from its cursor when a person extends it |
-| **M8** | **Skills draw as plans.** `plan_id NOT NULL` on `skill_versions`, clarifications, the Flow tab | publishing a skill version publishes its plan as one act, and a catalogue gap becomes a `form: human` step rather than a block |
+| **M8** | **Skills draw as plans.** `plan_id NOT NULL` on `skill_versions`, clarifications, the Flow tab — the pass is written out in [skills-draw-as-plans.md](skills-draw-as-plans.md) | publishing a skill version publishes its plan as one act, and a catalogue gap becomes a `form: human` step rather than a block |
 
 **M1–M2 were engine-only.** M3 is not: the run routes move from `…/thinkings` to `…/runs` and every read schema changes shape, so Studio ships with it. M4 is the next one that cannot be shipped without Studio.
 

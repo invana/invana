@@ -12,8 +12,6 @@ from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph
-from invana.apps.llm_providers.models import LLMProvider
-from invana.apps.llm_providers.querysets import LLMProviderQuerySet
 from invana.apps.modeller.models import GraphModel, GraphVersion
 from invana.apps.modeller.store import ModelStore
 from invana.apps.sessions.models import (
@@ -32,14 +30,14 @@ from invana.apps.sessions.transcript import (
     _plural,
     _title_from_text,
 )
-from invana.core.errors import NotFoundError, ValidationError
+from invana.core.errors import NotFoundError
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
 
 
 class SessionManager:
-    querysets = SessionQuerySet()
-    messages = SessionMessageQuerySet()
+    sessions_qs = SessionQuerySet()
+    messages_qs = SessionMessageQuerySet()
 
     async def list_sessions(
         self,
@@ -53,7 +51,7 @@ class SessionManager:
         include_archived: bool = False,
         surface: str | None = None,
     ) -> tuple[list[Session], int]:
-        items = await self.querysets.list_for_user(
+        items = await self.sessions_qs.list_for_user(
             session,
             graph_id=graph_id,
             user_id=user_id,
@@ -63,7 +61,7 @@ class SessionManager:
             include_archived=include_archived,
             surface=surface,
         )
-        total = await self.querysets.count_for_user(
+        total = await self.sessions_qs.count_for_user(
             session, graph_id=graph_id, user_id=user_id, include_archived=include_archived, surface=surface
         )
         return items, total
@@ -77,13 +75,13 @@ class SessionManager:
         user_id: str,
     ) -> Session:
         """Fetch a session, enforcing graph scope + private-to-creator visibility."""
-        sess = await self.querysets.get(session, session_id)
+        sess = await self.sessions_qs.get(session, session_id)
         if sess is None or sess.graph_id != graph_id or sess.created_by_id != user_id:
             raise NotFoundError("Session not found.")
         return sess
 
     async def list_messages(self, session: AsyncSession, *, sess: Session) -> list[SessionMessage]:
-        return await self.messages.list_messages(session, session_id=sess.id)
+        return await self.messages_qs.list_messages(session, session_id=sess.id)
 
     async def get_message_or_404(
         self,
@@ -92,7 +90,7 @@ class SessionManager:
         message_id: str,
         sess: Session,
     ) -> SessionMessage:
-        msg = await self.messages.get_message(session, message_id)
+        msg = await self.messages_qs.get_message(session, message_id)
         if msg is None or msg.session_id != sess.id:
             raise NotFoundError("Message not found.")
         return msg
@@ -119,7 +117,7 @@ class SessionManager:
         """
         if message.role != SessionMessageRole.assistant or message.mode != "nl":
             return []
-        rows = await self.messages.list_recent_messages(
+        rows = await self.messages_qs.list_recent_messages(
             session, session_id=message.session_id, before_seq=message.seq - 1, limit=_HISTORY_TURNS * 2
         )
         return _context_turns(rows)
@@ -166,7 +164,7 @@ class SessionManager:
             model_id=model_id,
             agent_id=agent.id if agent else None,
         )
-        await self.querysets.add(session, sess)
+        await self.sessions_qs.add(session, sess)
         await emit_event(
             session,
             action=actions.SESSION_CREATE,
@@ -228,7 +226,7 @@ class SessionManager:
     async def delete_session(self, session: AsyncSession, *, sess: Session, actor_id: str) -> None:
         session_id = sess.id
         graph_id = sess.graph_id
-        await self.querysets.delete(session, sess)
+        await self.sessions_qs.delete(session, sess)
         await emit_event(
             session,
             action=actions.SESSION_DELETE,
@@ -239,22 +237,6 @@ class SessionManager:
             details={},
             trace_id=current_trace_id(),
         )
-
-    async def _resolve_provider(
-        self, session: AsyncSession, *, graph_id: str, llm_provider_id: str | None
-    ) -> LLMProvider:
-        """Pick the provider to translate with: explicit id → graph default → 422."""
-        store = LLMProviderQuerySet()
-        if llm_provider_id:
-            provider = await store.get(session, llm_provider_id)
-            if provider is None or provider.graph_id != graph_id:
-                raise ValidationError("That LLM provider was not found for this graph.")
-            return provider
-        providers = await store.list_for_graph(session, graph_id)
-        default = next((p for p in providers if p.is_default), None)
-        if default is None:
-            raise ValidationError("No LLM provider is configured for this graph — add one in Settings → LLMs.")
-        return default
 
     async def _grounding_version(self, session: AsyncSession, graph_id: str) -> GraphVersion | None:
         """The active model version to ground against — the introspected/global model
@@ -298,7 +280,7 @@ class SessionManager:
         genuinely grew), false for a ``load`` (those rows were counted when the query
         first ran; re-projecting must not double-count).
         """
-        user_seq = await self.messages.next_seq(session, session_id=sess.id)
+        user_seq = await self.messages_qs.next_seq(session, session_id=sess.id)
         user_msg = SessionMessage(
             session_id=sess.id,
             seq=user_seq,
@@ -322,8 +304,8 @@ class SessionManager:
             node_count=node_count,
             edge_count=edge_count,
         )
-        await self.querysets.add(session, user_msg)
-        await self.querysets.add(session, assistant_msg)
+        await self.sessions_qs.add(session, user_msg)
+        await self.sessions_qs.add(session, assistant_msg)
         sess.message_count += 2
         sess.last_status = assistant_msg.status
         if add_to_totals:

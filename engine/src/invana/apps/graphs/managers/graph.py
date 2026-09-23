@@ -33,9 +33,9 @@ class GraphManager:
     `graphs` never imports `setup`, which is what keeps §14.1's four cycles shut.
     """
 
-    querysets = GraphQuerySet()
-    connections = GraphConnectionQuerySet()
-    members = GraphMemberQuerySet()
+    graphs_qs = GraphQuerySet()
+    connections_qs = GraphConnectionQuerySet()
+    members_qs = GraphMemberQuerySet()
 
     async def create_graph(self, session: AsyncSession, *, owner: User, payload: GraphCreate) -> Graph:
         """Create a Graph and attach the creator as its member (binary access,
@@ -46,7 +46,7 @@ class GraphManager:
         read this package cannot make.
         """
         slug = payload.slug.lower()
-        existing_graph = await self.querysets.get_by_slug(session, owner_id=owner.id, slug=slug)
+        existing_graph = await self.graphs_qs.get_by_slug(session, owner_id=owner.id, slug=slug)
         if existing_graph is not None:
             raise ConflictError(f"You already have a graph with slug '{slug}'.")
 
@@ -110,7 +110,7 @@ class GraphManager:
         Archiving never blocks access: an archived graph is still reachable by URL
         and still queryable.
         """
-        return await self.querysets.member_of(session, user_id=user_id, include_archived=include_archived)
+        return await self.graphs_qs.member_of(session, user_id=user_id, include_archived=include_archived)
 
     async def update_graph(
         self,
@@ -182,7 +182,7 @@ class GraphManager:
         await session.flush()
 
     async def get_graph_connection(self, session: AsyncSession, *, graph_id: str) -> GraphConnection | None:
-        return await self.connections.for_graph(session, graph_id)
+        return await self.connections_qs.for_graph(session, graph_id)
 
     async def put_graph_connection(
         self,
@@ -198,7 +198,7 @@ class GraphManager:
 
         existing = await self.get_graph_connection(session, graph_id=graph.id)
         if existing is None:
-            connection = await self.connections.create(session, data=payload, encryption_key=encryption_key)
+            connection = await self.connections_qs.create(session, data=payload, encryption_key=encryption_key)
             connection.graph_id = graph.id
             # Saving connection details completes the graph_info wizard section
             # (re-applies on every save so a prior reset is undone).
@@ -317,8 +317,8 @@ class GraphManager:
         a graph with a pinged provider keeps being asked for one.
         """
         owner = await session.get(User, graph.created_by_id)
-        member_count = await self.querysets.member_count(session, graph_id=graph.id)
-        has_connection = await self.connections.count_for_graph(session, graph.id) > 0
+        member_count = await self.graphs_qs.member_count(session, graph_id=graph.id)
+        has_connection = await self.connections_qs.count_for_graph(session, graph.id) > 0
 
         return GraphRead(
             id=graph.id,

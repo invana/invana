@@ -537,7 +537,10 @@ export function AssistantPanel({
 										onCheckedChange={() => toggleLLM(p.id)}
 										onSelect={(e) => e.preventDefault()}
 									>
-										{p.model_id || p.provider}
+										{/* The endpoint's own name is the address segment a
+										    refusal reads back (PM10) — a filter names what a rule
+										    names. */}
+										{p.name || p.provider}
 									</DropdownMenuCheckboxItem>
 								))}
 							</>

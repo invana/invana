@@ -1,4 +1,4 @@
-"""Agent roster rules, as classes (migration-plan §6)."""
+"""Rules for a Graph's agents, as classes (migration-plan §6)."""
 
 from invana.apps.agents.managers.agent import AgentManager, agent_actor
 

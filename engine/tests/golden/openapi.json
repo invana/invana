@@ -458,9 +458,17 @@
           "rules_cited": {
             "default": [],
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/OfferedRule"
             },
             "title": "Rules Cited",
+            "type": "array"
+          },
+          "rules_offered": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/OfferedRule"
+            },
+            "title": "Rules Offered",
             "type": "array"
           },
           "run_id": {
@@ -621,7 +629,7 @@
             "title": "Instructions",
             "type": "string"
           },
-          "llm_config_id": {
+          "lens_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -630,7 +638,7 @@
                 "type": "null"
               }
             ],
-            "title": "Llm Config Id"
+            "title": "Lens Id"
           },
           "name": {
             "maxLength": 255,
@@ -763,6 +771,13 @@
             "title": "Items",
             "type": "array"
           },
+          "spend_this_month": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Spend This Month",
+            "type": "object"
+          },
           "total": {
             "title": "Total",
             "type": "integer"
@@ -890,11 +905,7 @@
             "title": "Kind",
             "type": "string"
           },
-          "lifetime": {
-            "title": "Lifetime",
-            "type": "string"
-          },
-          "llm_config_id": {
+          "lens_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -903,7 +914,22 @@
                 "type": "null"
               }
             ],
-            "title": "Llm Config Id"
+            "title": "Lens Id"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
+          },
+          "lifetime": {
+            "title": "Lifetime",
+            "type": "string"
           },
           "name": {
             "title": "Name",
@@ -973,7 +999,6 @@
           "lifetime",
           "instructions",
           "workflow_spec",
-          "llm_config_id",
           "skill_ids",
           "budget",
           "policy",
@@ -1024,7 +1049,7 @@
             ],
             "title": "Instructions"
           },
-          "llm_config_id": {
+          "lens_id": {
             "anyOf": [
               {
                 "type": "string"
@@ -1033,7 +1058,7 @@
                 "type": "null"
               }
             ],
-            "title": "Llm Config Id"
+            "title": "Lens Id"
           },
           "name": {
             "anyOf": [
@@ -1115,6 +1140,33 @@
           "step_seq"
         ],
         "title": "AnswerPrompt",
+        "type": "object"
+      },
+      "AppliedDiffRead": {
+        "description": "How two runs narrowed the same participant differently.\n\n``differs`` names the fields of ``run_touches.applied`` that are not equal,\nand ``a`` / ``b`` carry only those fields \u2014 a reader is shown the difference,\nnot two whole documents to find it in\n([WO18](docs/for-developers/modules/govern/features/worlds.md)).",
+        "properties": {
+          "a": {
+            "additionalProperties": true,
+            "title": "A",
+            "type": "object"
+          },
+          "b": {
+            "additionalProperties": true,
+            "title": "B",
+            "type": "object"
+          },
+          "differs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Differs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "differs"
+        ],
+        "title": "AppliedDiffRead",
         "type": "object"
       },
       "ArtefactLink": {
@@ -1343,7 +1395,13 @@
               "lineage",
               "run",
               "task_run",
-              "plan_runs"
+              "plan_runs",
+              "compare",
+              "skill",
+              "skill_usage",
+              "rule",
+              "world",
+              "guardrail"
             ],
             "title": "Kind",
             "type": "string"
@@ -2199,6 +2257,104 @@
         "title": "CancelResponse",
         "type": "object"
       },
+      "CastResolutionRead": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "allowed": {
+            "title": "Allowed",
+            "type": "boolean"
+          },
+          "refusal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refusal"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "rule_matched": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Matched"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "address",
+          "allowed",
+          "source"
+        ],
+        "title": "CastResolutionRead",
+        "type": "object"
+      },
+      "CatalogueRead": {
+        "description": "What this Graph can address, and \u2014 with ``match`` \u2014 what a rule would bite.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "layers_present": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers Present",
+            "type": "array"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "layers_present"
+        ],
+        "title": "CatalogueRead",
+        "type": "object"
+      },
       "ChangePasswordRequest": {
         "properties": {
           "current_password": {
@@ -2263,6 +2419,111 @@
           "version"
         ],
         "title": "CommitResult",
+        "type": "object"
+      },
+      "CompareRead": {
+        "description": "Two runs, side by side. **The diff is the deliverable**, not the answers.\n\nNothing is simulated and no answer is synthesised from another\n([WO4](docs/for-developers/modules/govern/features/worlds.md)) \u2014 which is\nalso why comparing costs money and says so.",
+        "properties": {
+          "a": {
+            "$ref": "#/components/schemas/CompareSideRead"
+          },
+          "b": {
+            "$ref": "#/components/schemas/CompareSideRead"
+          },
+          "differed": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AppliedDiffRead"
+            },
+            "title": "Differed",
+            "type": "object"
+          },
+          "only_in_a": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Only In A",
+            "type": "array"
+          },
+          "only_in_b": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Only In B",
+            "type": "array"
+          },
+          "shared": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Shared",
+            "type": "array"
+          }
+        },
+        "required": [
+          "a",
+          "b",
+          "only_in_a",
+          "only_in_b",
+          "shared"
+        ],
+        "title": "CompareRead",
+        "type": "object"
+      },
+      "CompareSideRead": {
+        "properties": {
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "touched": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Touched",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run_id",
+          "lens_id",
+          "lens_name",
+          "touched",
+          "cost_usd"
+        ],
+        "title": "CompareSideRead",
         "type": "object"
       },
       "ConstraintCreate": {
@@ -2364,6 +2625,15 @@
             "title": "Policy",
             "type": "string"
           },
+          "pools": {
+            "default": [],
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Pools",
+            "type": "array"
+          },
           "queued": {
             "default": [],
             "items": {
@@ -2439,12 +2709,22 @@
             "title": "Depth",
             "type": "integer"
           },
+          "form": {
+            "default": "callable",
+            "title": "Form",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "string"
           },
           "label": {
             "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "default": "agent",
+            "title": "Layer",
             "type": "string"
           },
           "pinned": {
@@ -2480,6 +2760,37 @@
           "args"
         ],
         "title": "DagNode",
+        "type": "object"
+      },
+      "DeclaredAxes": {
+        "description": "Which of this version's properties may be narrowed along.\n\nA published version declares which property carries **valid time**, which\ncarries **geography**, and which named properties are selectable\n**dimensions** (docs/for-developers/modules/connect-and-model/features/domain-models.md\nDM6). A [world](../../../docs/for-developers/modules/govern/features/worlds.md)\nmay slice along these and nothing else \u2014 asking for an axis a model never\ndeclared is refused naming the model and the axis (GV14).\n\nEmpty is the default and means *nothing is selectable*: the model can still\nbe allowed or denied whole, it simply cannot be narrowed. Nothing is\ninferred from a property's name or type, because that would make *which rows\ndid this run see* depend on a guess (DM7).",
+        "properties": {
+          "dims": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Dims",
+            "type": "array"
+          },
+          "geo": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Geo",
+            "type": "object"
+          },
+          "time": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Time",
+            "type": "object"
+          }
+        },
+        "title": "DeclaredAxes",
         "type": "object"
       },
       "DefaultAgentRequest": {
@@ -4305,6 +4616,53 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "ImpactRead": {
+        "description": "*Saving this would change 2 of 4 worlds*, and what each one loses.",
+        "properties": {
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "worlds": {
+            "items": {
+              "$ref": "#/components/schemas/WorldImpactRead"
+            },
+            "title": "Worlds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "headline",
+          "worlds"
+        ],
+        "title": "ImpactRead",
+        "type": "object"
+      },
+      "ImpactRequest": {
+        "properties": {
+          "closed_layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Closed Layers",
+            "type": "array"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleIn"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "scope": {
+            "default": "graph",
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "ImpactRequest",
+        "type": "object"
+      },
       "IndexCreate": {
         "properties": {
           "index_options": {
@@ -4419,6 +4777,75 @@
         "title": "IndexResponse",
         "type": "object"
       },
+      "InlinablePlan": {
+        "description": "A library plan a skill may inline, and what it offers a caller.\n\nThe picker's one read. `args_schema` comes with the row because tuning is\nthe same act as picking \u2014 a person who inlines `nl-single@1` decides\n`read_only` in the same breath\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).",
+        "properties": {
+          "args_schema": {
+            "additionalProperties": true,
+            "title": "Args Schema",
+            "type": "object"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          },
+          "step_count": {
+            "default": 0,
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "ref",
+          "name"
+        ],
+        "title": "InlinablePlan",
+        "type": "object"
+      },
+      "InlinablePlanListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InlinablePlan"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "InlinablePlanListResponse",
+        "type": "object"
+      },
       "LLMCredentialKind": {
         "description": "Disambiguates what ``api_key_encrypted`` holds for ``claude_agent_sdk`` rows\n(docs/for-developers/modules/agents/features/providers-and-models.md).\n\nMeaningless for every other provider kind, where the column is always an API key.",
         "enum": [
@@ -4426,6 +4853,141 @@
           "oauth_token"
         ],
         "title": "LLMCredentialKind",
+        "type": "string"
+      },
+      "LLMModelCreate": {
+        "properties": {
+          "capabilities": {
+            "additionalProperties": true,
+            "title": "Capabilities",
+            "type": "object"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "model_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Model Id",
+            "type": "string"
+          },
+          "pricing": {
+            "additionalProperties": true,
+            "title": "Pricing",
+            "type": "object"
+          }
+        },
+        "required": [
+          "model_id"
+        ],
+        "title": "LLMModelCreate",
+        "type": "object"
+      },
+      "LLMModelListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LLMModelRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "LLMModelListResponse",
+        "type": "object"
+      },
+      "LLMModelRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "capabilities": {
+            "additionalProperties": true,
+            "title": "Capabilities",
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "pricing": {
+            "additionalProperties": true,
+            "title": "Pricing",
+            "type": "object"
+          },
+          "provider_id": {
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LLMModelStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider_id",
+          "model_id",
+          "display_name",
+          "capabilities",
+          "pricing",
+          "status",
+          "address",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "LLMModelRead",
+        "type": "object"
+      },
+      "LLMModelStatus": {
+        "description": "Whether this model is still offered. Removing one a cast names is refused,\nnaming the worlds ([PM11](docs/for-developers/modules/agents/features/providers-and-models.md)).",
+        "enum": [
+          "active",
+          "removed"
+        ],
+        "title": "LLMModelStatus",
         "type": "string"
       },
       "LLMPingResponse": {
@@ -4504,15 +5066,18 @@
             "title": "Guardrails",
             "type": "object"
           },
-          "is_default": {
-            "default": false,
-            "title": "Is Default",
-            "type": "boolean"
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/LLMModelCreate"
+            },
+            "title": "Models",
+            "type": "array"
           },
-          "model_id": {
-            "maxLength": 255,
+          "name": {
+            "maxLength": 64,
             "minLength": 1,
-            "title": "Model Id",
+            "pattern": "^[a-z0-9][a-z0-9_-]*$",
+            "title": "Name",
             "type": "string"
           },
           "provider": {
@@ -4520,8 +5085,8 @@
           }
         },
         "required": [
-          "provider",
-          "model_id"
+          "name",
+          "provider"
         ],
         "title": "LLMProviderCreate",
         "type": "object"
@@ -4605,12 +5170,15 @@
             "title": "Id",
             "type": "string"
           },
-          "is_default": {
-            "title": "Is Default",
-            "type": "boolean"
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/LLMModelRead"
+            },
+            "title": "Models",
+            "type": "array"
           },
-          "model_id": {
-            "title": "Model Id",
+          "name": {
+            "title": "Name",
             "type": "string"
           },
           "provider": {
@@ -4625,13 +5193,12 @@
         "required": [
           "id",
           "graph_id",
+          "name",
           "provider",
-          "model_id",
           "has_api_key",
           "credential_kind",
           "base_url",
           "guardrails",
-          "is_default",
           "created_at",
           "updated_at"
         ],
@@ -4686,32 +5253,518 @@
             ],
             "title": "Guardrails"
           },
-          "is_default": {
+          "name": {
             "anyOf": [
               {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Default"
-          },
-          "model_id": {
-            "anyOf": [
-              {
-                "maxLength": 255,
+                "maxLength": 64,
                 "minLength": 1,
+                "pattern": "^[a-z0-9][a-z0-9_-]*$",
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Model Id"
+            "title": "Name"
           }
         },
         "title": "LLMProviderUpdate",
+        "type": "object"
+      },
+      "Layer": {
+        "description": "The five governed classes of participant, plus the spine.\n\n``agent`` is the **spine** \u2014 the runtime itself, which does the\nparticipating rather than being a participant\n([govern \u00a7 1](docs/for-developers/modules/govern/spec.md)). It is addressed\nand recorded like the rest so the ledger has one shape, and it is never\ngoverned: a rule that denies it would deny the run its own dispatches.",
+        "enum": [
+          "graph_data",
+          "llm",
+          "third_party",
+          "cache",
+          "human",
+          "agent"
+        ],
+        "title": "Layer",
+        "type": "string"
+      },
+      "LensCreate": {
+        "description": "A new lens. **Unnamed by default** \u2014 naming is a separate act, because\nnaming is what shares it ([WO1]).",
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "cast": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Cast",
+            "type": "object"
+          },
+          "closed_layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Closed Layers",
+            "type": "array"
+          },
+          "created_in_run_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created In Run Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/LensKind",
+            "default": "world"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleIn"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          }
+        },
+        "title": "LensCreate",
+        "type": "object"
+      },
+      "LensKind": {
+        "description": "The only thing that tells a world from a guardrail.",
+        "enum": [
+          "world",
+          "guardrail"
+        ],
+        "title": "LensKind",
+        "type": "string"
+      },
+      "LensListResponse": {
+        "description": "The drawer's one read \u2014 and the one fact that decides what it may offer.\n\n``may_edit_guardrails`` rides on the list rather than on a permissions\nroute of its own because the drawer already asks for this exactly once, and\na second request would let the rules and the right to edit them arrive at\ndifferent moments \u2014 which is the one moment a control could flicker into\nexistence. The rules render for everyone either way\n([GR5](docs/for-developers/modules/govern/features/guardrails.md)); this\nsays whether the **authoring** controls are drawn at all.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LensRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "may_edit_guardrails": {
+            "default": false,
+            "title": "May Edit Guardrails",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "LensListResponse",
+        "type": "object"
+      },
+      "LensPromote": {
+        "description": "One field, and no re-authoring ([GV3]).",
+        "properties": {
+          "scope": {
+            "default": "graph",
+            "maxLength": 64,
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "title": "LensPromote",
+        "type": "object"
+      },
+      "LensRead": {
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "cast": {
+            "additionalProperties": true,
+            "title": "Cast",
+            "type": "object"
+          },
+          "cast_resolved": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CastResolutionRead"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cast Resolved"
+          },
+          "closed_layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Closed Layers",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_in_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created In Run Id"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "graph_id": {
+            "title": "Graph Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_named": {
+            "title": "Is Named",
+            "type": "boolean"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "rules": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LensUsageRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "graph_id",
+          "kind",
+          "key",
+          "name",
+          "display_name",
+          "scope",
+          "rules",
+          "cast",
+          "closed_layers",
+          "as_of",
+          "created_in_run_id",
+          "version",
+          "is_named",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "LensRead",
+        "type": "object"
+      },
+      "LensUpdate": {
+        "description": "Every field optional. Setting ``name`` on an unnamed lens **publishes it**.",
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "cast": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cast"
+          },
+          "closed_layers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed Layers"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "rules": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RuleIn"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rules"
+          }
+        },
+        "title": "LensUpdate",
+        "type": "object"
+      },
+      "LensUsageRead": {
+        "properties": {
+          "actor_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Actor Ids",
+            "type": "array"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "runs": {
+            "default": 0,
+            "title": "Runs",
+            "type": "integer"
+          }
+        },
+        "title": "LensUsageRead",
+        "type": "object"
+      },
+      "LifecycleAct": {
+        "description": "The two acts that disturb open work. Resume takes nothing away, so it has\nno preview ([LC10](docs/for-developers/modules/agents/features/lifecycle.md)).",
+        "enum": [
+          "pause",
+          "retire"
+        ],
+        "title": "LifecycleAct",
+        "type": "string"
+      },
+      "LifecycleEffect": {
+        "description": "What an act does to one piece of open work.\n\nA closed vocabulary, because a sentence per row is a sentence nobody can\ncompare ([LC9](docs/for-developers/modules/agents/features/lifecycle.md)).",
+        "enum": [
+          "finishes",
+          "blocked",
+          "unchanged",
+          "refused"
+        ],
+        "title": "LifecycleEffect",
+        "type": "string"
+      },
+      "LifecycleItem": {
+        "description": "One piece of open work, and what the act would do to it.",
+        "properties": {
+          "effect": {
+            "$ref": "#/components/schemas/LifecycleEffect"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "title",
+          "effect",
+          "note"
+        ],
+        "title": "LifecycleItem",
+        "type": "object"
+      },
+      "LifecyclePreview": {
+        "description": "What `Pause` or `Retire` has to name before it happens.\n\nOne shape for both acts ([LC8](docs/for-developers/modules/agents/features/lifecycle.md)):\nthe same open work, carrying the effect *this* act would have on it.",
+        "properties": {
+          "act": {
+            "$ref": "#/components/schemas/LifecycleAct"
+          },
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LifecycleItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "agent_id",
+          "act",
+          "items"
+        ],
+        "title": "LifecyclePreview",
         "type": "object"
       },
       "LinkDeclare": {
@@ -5627,6 +6680,25 @@
         "title": "NodeTypeUpdate",
         "type": "object"
       },
+      "OfferedRule": {
+        "description": "One rule as it reached a step \u2014 the wording, and the rule to open.\n\n``statement`` is the **version's** wording, resolved from the\n``rule_version_id`` the step recorded, so rewording or deactivating the rule\nnever rewrites what a past step was given\n([RU4 \u00b7 RU12](docs/for-developers/modules/skills/features/rules.md)).\n``rule_id`` rides beside it because a board is bound to the rule, not to one\nof its versions \u2014 a step row shows the statement and opens the rule\n([RU11](docs/for-developers/modules/skills/features/rules.md)).\n\nIt lives here rather than beside the step schemas that carry it: a step is a\n``runtime`` row and a rule is this app's record, and **an app may not import\nthe runtime** (migration-plan \u00a718.1.1 S1). The runtime reads down to it.",
+        "properties": {
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_id",
+          "statement"
+        ],
+        "title": "OfferedRule",
+        "type": "object"
+      },
       "OnBehalfOfRef": {
         "description": "The human an agent acted for \u2014 the *on behalf of* line under an agent row.",
         "properties": {
@@ -5666,6 +6738,56 @@
           "assistant_message"
         ],
         "title": "OperationResponse",
+        "type": "object"
+      },
+      "ParticipantRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "axes": {
+            "additionalProperties": true,
+            "title": "Axes",
+            "type": "object"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "sublayer": {
+            "title": "Sublayer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "layer",
+          "sublayer",
+          "name",
+          "label"
+        ],
+        "title": "ParticipantRead",
         "type": "object"
       },
       "PersonalAccessTokenCreateRequest": {
@@ -5804,6 +6926,47 @@
         "title": "PersonalAccessTokenOut",
         "type": "object"
       },
+      "PlanCallerRead": {
+        "description": "A caller that inlined this plan, and what it tuned\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).\n\nTuning is a property of the **call**, recorded on the calling plan \u2014 so\nthis is read off ``task_plans.uses`` and never off this plan, which is\nuntouched by any of them.",
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Args",
+            "type": "object"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "skill_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Id"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "version"
+        ],
+        "title": "PlanCallerRead",
+        "type": "object"
+      },
       "PlanEdge": {
         "properties": {
           "source": {
@@ -5820,6 +6983,35 @@
           "target"
         ],
         "title": "PlanEdge",
+        "type": "object"
+      },
+      "PlanLayerRead": {
+        "description": "One governed band, and what a plan declares in it.\n\nEvery band is sent, touched or not\n([LB22](docs/for-developers/modules/workflows/features/the-library.md)) \u2014\n*this plan reads no graph data* is the fact a reader is checking for, and a\nband that vanished when empty would make it indistinguishable from *nothing\nloaded*.",
+        "properties": {
+          "declared": {
+            "title": "Declared",
+            "type": "boolean"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "steps": {
+            "title": "Steps",
+            "type": "integer"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "layer",
+          "declared",
+          "steps",
+          "summary"
+        ],
+        "title": "PlanLayerRead",
         "type": "object"
       },
       "PlanTaskRead": {
@@ -5927,6 +7119,35 @@
           "critical"
         ],
         "title": "PlanTaskRead",
+        "type": "object"
+      },
+      "PlanUseRead": {
+        "description": "One composition: which library plan was inlined, and what it was tuned to.\n\n``latest_version`` is the newest version of that key the Graph holds, which\nis the one fact the caller cannot work out from its own rows. It is said,\nnever acted on: the copy is the point, and re-inlining is something somebody\nasks for ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "title": "Args",
+            "type": "object"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "latest_version": {
+            "title": "Latest Version",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "latest_version"
+        ],
+        "title": "PlanUseRead",
         "type": "object"
       },
       "PreviewRequest": {
@@ -6552,6 +7773,40 @@
         "title": "RefreshRequest",
         "type": "object"
       },
+      "RefusalRead": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "recourse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recourse"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "rule",
+          "message"
+        ],
+        "title": "RefusalRead",
+        "type": "object"
+      },
       "RegisterRequest": {
         "properties": {
           "email": {
@@ -6738,41 +7993,6 @@
         "title": "ResumeTaskRun",
         "type": "object"
       },
-      "RetirePreview": {
-        "description": "What `Retire` has to name before it happens \u2014 the open tasks.",
-        "properties": {
-          "agent_id": {
-            "title": "Agent Id",
-            "type": "string"
-          },
-          "open_task_ids": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Open Task Ids",
-            "type": "array"
-          },
-          "open_task_titles": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Open Task Titles",
-            "type": "array"
-          },
-          "session_count": {
-            "title": "Session Count",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "agent_id",
-          "open_task_ids",
-          "open_task_titles",
-          "session_count"
-        ],
-        "title": "RetirePreview",
-        "type": "object"
-      },
       "RetireRequest": {
         "properties": {
           "reassign_to_id": {
@@ -6866,7 +8086,7 @@
         "type": "object"
       },
       "RuleCitationsResponse": {
-        "description": "Where a rule was cited. The count is over every version; each row says\nwhich wording it read, so deactivating or rewording never rewrites it.",
+        "description": "Where a rule was offered and where it was cited.\n\n``offered`` is a fact written by assembly; ``total`` is the model's own\nclaim, and the difference between them is *never cited* \u2014 which cannot be\ntold from *never offered* unless both are sent\n([RU7](docs/for-developers/modules/skills/features/rules.md) \u00b7\n[RU9](docs/for-developers/modules/skills/features/rules.md)). Both are over\n**every** version; each row says which wording it read, so deactivating or\nrewording never rewrites it.",
         "properties": {
           "items": {
             "items": {
@@ -6875,6 +8095,11 @@
             "title": "Items",
             "type": "array"
           },
+          "offered": {
+            "default": 0,
+            "title": "Offered",
+            "type": "integer"
+          },
           "rule_id": {
             "title": "Rule Id",
             "type": "string"
@@ -6882,6 +8107,13 @@
           "total": {
             "title": "Total",
             "type": "integer"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/RuleVersionCitations"
+            },
+            "title": "Versions",
+            "type": "array"
           }
         },
         "required": [
@@ -6915,6 +8147,47 @@
           "statement"
         ],
         "title": "RuleCreate",
+        "type": "object"
+      },
+      "RuleIn": {
+        "description": "One statement. ``allow`` is the only required field beside the match.",
+        "properties": {
+          "allow": {
+            "title": "Allow",
+            "type": "boolean"
+          },
+          "egress": {
+            "additionalProperties": true,
+            "title": "Egress",
+            "type": "object"
+          },
+          "match": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Match",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": true,
+            "title": "Options",
+            "type": "object"
+          },
+          "properties": {
+            "additionalProperties": true,
+            "title": "Properties",
+            "type": "object"
+          },
+          "select": {
+            "additionalProperties": true,
+            "title": "Select",
+            "type": "object"
+          }
+        },
+        "required": [
+          "match",
+          "allow"
+        ],
+        "title": "RuleIn",
         "type": "object"
       },
       "RuleListResponse": {
@@ -7063,6 +8336,41 @@
           }
         },
         "title": "RuleUpdate",
+        "type": "object"
+      },
+      "RuleVersionCitations": {
+        "description": "One published wording, and how many steps said they followed it.\n\nCounted by the engine rather than tallied from ``items``: that list is a\nbounded, newest-first window, and a total taken from a page is a different\nnumber wearing the same label\n([RU10](docs/for-developers/modules/skills/features/rules.md)).",
+        "properties": {
+          "cited": {
+            "title": "Cited",
+            "type": "integer"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_version_id",
+          "version",
+          "statement",
+          "published_at",
+          "cited"
+        ],
+        "title": "RuleVersionCitations",
         "type": "object"
       },
       "RuleVersionListResponse": {
@@ -7445,6 +8753,14 @@
       "SchemaExport-Input": {
         "description": "Full JSON representation of a schema version for export/import.",
         "properties": {
+          "axes": {
+            "$ref": "#/components/schemas/DeclaredAxes",
+            "default": {
+              "dims": [],
+              "geo": {},
+              "time": {}
+            }
+          },
           "constraints": {
             "default": [],
             "items": {
@@ -7520,6 +8836,14 @@
       "SchemaExport-Output": {
         "description": "Full JSON representation of a schema version for export/import.",
         "properties": {
+          "axes": {
+            "$ref": "#/components/schemas/DeclaredAxes",
+            "default": {
+              "dims": [],
+              "geo": {},
+              "time": {}
+            }
+          },
           "constraints": {
             "default": [],
             "items": {
@@ -7609,6 +8933,29 @@
                 "type": "null"
               }
             ]
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "llm_model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Model Id"
           },
           "llm_provider_id": {
             "anyOf": [
@@ -8396,6 +9743,145 @@
         "title": "SetupSectionUpdate",
         "type": "object"
       },
+      "SkillAgentStanding": {
+        "description": "Where this skill stands with one agent \u2014 the Bindings tab's three sections.\n\n``refusal`` is the refusal the bind **would** raise, run as a dry run rather\nthan predicted by the surface\n([BN10](docs/for-developers/modules/skills/features/bindings.md)): a second\nreading of the same rules in TypeScript is a copy to keep in step, and the\ncopy is what goes stale. It is null for an agent already bound \u2014 a bind that\nhappened is not re-litigated by a later guardrail; unbinding is.",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "agent_name": {
+            "title": "Agent Name",
+            "type": "string"
+          },
+          "bound": {
+            "title": "Bound",
+            "type": "boolean"
+          },
+          "refusal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refusal"
+          },
+          "world": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "World"
+          }
+        },
+        "required": [
+          "agent_id",
+          "agent_name",
+          "bound"
+        ],
+        "title": "SkillAgentStanding",
+        "type": "object"
+      },
+      "SkillAgentsResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillAgentStanding"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "SkillAgentsResponse",
+        "type": "object"
+      },
+      "SkillClarificationAnswer": {
+        "description": "One of the offered readings, by its ``step_key`` \u2014 or ``none`` for *none\nof these*, which writes a `form: human` node rather than a guess.",
+        "properties": {
+          "answer": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Answer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "title": "SkillClarificationAnswer",
+        "type": "object"
+      },
+      "SkillClarificationRead": {
+        "description": "A question the planner asked about one sentence.\n\n``options`` are the readings, each naming the step it would write. Never a\nfree-text box (*Not building*).",
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "answered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "skill_version_id": {
+            "title": "Skill Version Id",
+            "type": "string"
+          },
+          "span": {
+            "title": "Span",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "skill_version_id",
+          "span",
+          "question",
+          "options",
+          "answer",
+          "answered_at"
+        ],
+        "title": "SkillClarificationRead",
+        "type": "object"
+      },
       "SkillCreate": {
         "properties": {
           "content": {
@@ -8426,6 +9912,197 @@
         "title": "SkillCreate",
         "type": "object"
       },
+      "SkillDraftRead": {
+        "description": "What the authoring surface reads: the text being written, the plan being\ndrawn, and the question waiting on an answer.",
+        "properties": {
+          "clarifications": {
+            "items": {
+              "$ref": "#/components/schemas/SkillClarificationRead"
+            },
+            "title": "Clarifications",
+            "type": "array"
+          },
+          "drawing_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drawing Run Id"
+          },
+          "open_clarification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillClarificationRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SkillPlanRead"
+          },
+          "refusal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillDrawRefusal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "$ref": "#/components/schemas/SkillVersionRead"
+          },
+          "vocabulary": {
+            "items": {
+              "$ref": "#/components/schemas/SkillStepChoice"
+            },
+            "title": "Vocabulary",
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "plan"
+        ],
+        "title": "SkillDraftRead",
+        "type": "object"
+      },
+      "SkillDraftTaskWrite": {
+        "description": "One row of a hand-edited plan.\n\nRow-level on purpose ([\u00a7 9](docs/for-developers/building-engine/skills-draw-as-plans.md)):\nthis is not a flow editor. A person says **which step**, what it is called\nand what it takes; the edges are materialised from what actually constrains\neach node \u2014 its `${steps.X.y}` bindings and the catalogue's `requires` \u2014 so\nan order nobody reviewed is never written down\n(`apps/task_plans/dag.py`).",
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "title": "Args",
+            "type": "object"
+          },
+          "form": {
+            "default": "callable",
+            "pattern": "^(callable|human|uses)$",
+            "title": "Form",
+            "type": "string"
+          },
+          "key": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key"
+          },
+          "source_span": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Span"
+          },
+          "step_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Key"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 250,
+            "title": "Title",
+            "type": "string"
+          },
+          "uses": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uses"
+          },
+          "uses_args": {
+            "additionalProperties": true,
+            "title": "Uses Args",
+            "type": "object"
+          }
+        },
+        "title": "SkillDraftTaskWrite",
+        "type": "object"
+      },
+      "SkillDraftTasksWrite": {
+        "description": "The draft's plan, replaced wholesale.\n\nThe rows go and come back rather than being patched, for the same reason a\nredraw does ([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)):\nan edit is a revision of the whole shape, and the diff a person reads is\nagainst what was there.",
+        "properties": {
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/SkillDraftTaskWrite"
+            },
+            "title": "Tasks",
+            "type": "array"
+          }
+        },
+        "title": "SkillDraftTasksWrite",
+        "type": "object"
+      },
+      "SkillDrawRefusal": {
+        "description": "Why the last draw wrote nothing.\n\nIt settles rather than fails ([SK31](docs/for-developers/modules/skills/features/authoring-a-skill.md)),\nso the author reads it where the flow would have been rather than in a run\nthat died. ``reasons`` are the validator's, verbatim \u2014 a plan that does not\nhold together is refused **on what was checked**.",
+        "properties": {
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "title": "SkillDrawRefusal",
+        "type": "object"
+      },
+      "SkillDrawStarted": {
+        "description": "The run that is drawing the draft, and where to watch it.",
+        "properties": {
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "stream_url": {
+            "title": "Stream Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "stream_url"
+        ],
+        "title": "SkillDrawStarted",
+        "type": "object"
+      },
       "SkillListResponse": {
         "properties": {
           "items": {
@@ -8445,6 +10122,178 @@
           "total"
         ],
         "title": "SkillListResponse",
+        "type": "object"
+      },
+      "SkillPlanEdge": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "kind"
+        ],
+        "title": "SkillPlanEdge",
+        "type": "object"
+      },
+      "SkillPlanNode": {
+        "description": "One node of a skill's plan, with the band it sits in and the sentence it\ncame from.",
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "title": "Args",
+            "type": "object"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "form": {
+            "default": "callable",
+            "title": "Form",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "default": "agent",
+            "title": "Layer",
+            "type": "string"
+          },
+          "source_plan_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Plan Key"
+          },
+          "source_span": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Span"
+          },
+          "task": {
+            "title": "Task",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "task",
+          "label"
+        ],
+        "title": "SkillPlanNode",
+        "type": "object"
+      },
+      "SkillPlanRead": {
+        "description": "The plan a version owns \u2014 the Flow tab, in one response.",
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/SkillPlanEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SkillPlanNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "plan_id": {
+            "title": "Plan Id",
+            "type": "string"
+          },
+          "uses": {
+            "items": {
+              "$ref": "#/components/schemas/PlanUseRead"
+            },
+            "title": "Uses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "plan_id",
+          "origin"
+        ],
+        "title": "SkillPlanRead",
+        "type": "object"
+      },
+      "SkillPlanSummary": {
+        "description": "What the drawer row and the Flow tab's badge need without a second call.",
+        "properties": {
+          "layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "plan_id": {
+            "title": "Plan Id",
+            "type": "string"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "plan_id",
+          "origin",
+          "step_count"
+        ],
+        "title": "SkillPlanSummary",
         "type": "object"
       },
       "SkillRead": {
@@ -8474,6 +10323,17 @@
             "title": "Description",
             "type": "string"
           },
+          "draft_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Version Id"
+          },
           "graph_id": {
             "title": "Graph Id",
             "type": "string"
@@ -8482,9 +10342,29 @@
             "title": "Id",
             "type": "string"
           },
+          "is_draft": {
+            "default": false,
+            "title": "Is Draft",
+            "type": "boolean"
+          },
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "origin": {
+            "default": "authored",
+            "title": "Origin",
+            "type": "string"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillPlanSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "updated_at": {
             "format": "date-time",
@@ -8513,6 +10393,42 @@
           "updated_at"
         ],
         "title": "SkillRead",
+        "type": "object"
+      },
+      "SkillStepChoice": {
+        "description": "One step a hand-edit may name.\n\nThe catalogue is what bounds authoring\n([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md)),\nso the surface that offers the choice is sent the set rather than carrying a\ncopy of it \u2014 a second list of step keys in TypeScript is a second thing to\nkeep in step with a closed set it cannot see.",
+        "properties": {
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "requires": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires",
+            "type": "array"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "label",
+          "bound",
+          "layer"
+        ],
+        "title": "SkillStepChoice",
         "type": "object"
       },
       "SkillUpdate": {
@@ -8962,10 +10878,26 @@
             "title": "Id",
             "type": "string"
           },
-          "published_at": {
-            "format": "date-time",
-            "title": "Published At",
+          "is_draft": {
+            "default": false,
+            "title": "Is Draft",
+            "type": "boolean"
+          },
+          "plan_id": {
+            "title": "Plan Id",
             "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
           },
           "published_by_id": {
             "anyOf": [
@@ -8999,7 +10931,8 @@
           "content",
           "when_to_use",
           "published_by_id",
-          "published_at"
+          "published_at",
+          "plan_id"
         ],
         "title": "SkillVersionRead",
         "type": "object"
@@ -9393,6 +11326,33 @@
       },
       "TaskPlanDetail": {
         "properties": {
+          "args_schema": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Args Schema",
+            "type": "object"
+          },
+          "caller_count": {
+            "default": 0,
+            "title": "Caller Count",
+            "type": "integer"
+          },
+          "callers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanCallerRead"
+            },
+            "title": "Callers",
+            "type": "array"
+          },
+          "declared_layers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PlanLayerRead"
+            },
+            "title": "Declared Layers",
+            "type": "array"
+          },
           "description": {
             "title": "Description",
             "type": "string"
@@ -9441,6 +11401,14 @@
               }
             ],
             "title": "Last Run At"
+          },
+          "layers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
           },
           "name": {
             "title": "Name",
@@ -9562,6 +11530,11 @@
       },
       "TaskPlanRead": {
         "properties": {
+          "caller_count": {
+            "default": 0,
+            "title": "Caller Count",
+            "type": "integer"
+          },
           "description": {
             "title": "Description",
             "type": "string"
@@ -9602,6 +11575,14 @@
               }
             ],
             "title": "Last Run At"
+          },
+          "layers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Layers",
+            "type": "array"
           },
           "name": {
             "title": "Name",
@@ -10105,6 +12086,17 @@
             ],
             "title": "Outcome"
           },
+          "parent_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Run Id"
+          },
           "queued_at": {
             "anyOf": [
               {
@@ -10250,6 +12242,11 @@
             "title": "Replans",
             "type": "integer"
           },
+          "role": {
+            "default": "execute",
+            "title": "Role",
+            "type": "string"
+          },
           "served": {
             "anyOf": [
               {
@@ -10260,6 +12257,18 @@
               }
             ],
             "title": "Served"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
           },
           "status": {
             "title": "Status",
@@ -10312,6 +12321,16 @@
               }
             ],
             "title": "Task Title"
+          },
+          "tokens_in": {
+            "default": 0,
+            "title": "Tokens In",
+            "type": "integer"
+          },
+          "tokens_out": {
+            "default": 0,
+            "title": "Tokens Out",
+            "type": "integer"
           },
           "workflow_key": {
             "title": "Workflow Key",
@@ -10700,6 +12719,191 @@
         "title": "ThemePreference",
         "type": "object"
       },
+      "TouchRead": {
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "applied": {
+            "additionalProperties": true,
+            "title": "Applied",
+            "type": "object"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "direction": {
+            "title": "Direction",
+            "type": "string"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "participant": {
+            "title": "Participant",
+            "type": "string"
+          },
+          "query": {
+            "additionalProperties": true,
+            "title": "Query",
+            "type": "object"
+          },
+          "rule_matched": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Matched"
+          },
+          "sent": {
+            "additionalProperties": true,
+            "title": "Sent",
+            "type": "object"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "step_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Key"
+          },
+          "sublayer": {
+            "title": "Sublayer",
+            "type": "string"
+          },
+          "volume": {
+            "additionalProperties": true,
+            "title": "Volume",
+            "type": "object"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "seq",
+          "step_key",
+          "address",
+          "layer",
+          "sublayer",
+          "participant",
+          "direction",
+          "rule_matched",
+          "why",
+          "volume",
+          "applied",
+          "sent",
+          "query",
+          "cost_usd",
+          "duration_ms"
+        ],
+        "title": "TouchRead",
+        "type": "object"
+      },
+      "TouchesRead": {
+        "description": "One run's ledger, and the three numbers the dashboard leads with.\n\n``allowed`` is what the frozen lens permits across the catalogue; ``touched``\nis what actually happened. The **difference between the two** is what a\nperson reads when they retune \u2014 three allowed and never touched is *narrow?*,\ntwo refused is *widen, or accept cannot answer deliberately*.",
+        "properties": {
+          "allowed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Allowed",
+            "type": "array"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TouchRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "never_touched": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Never Touched",
+            "type": "array"
+          },
+          "refused": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Refused",
+            "type": "array"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "touched": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Touched",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run_id",
+          "items",
+          "total",
+          "counts"
+        ],
+        "title": "TouchesRead",
+        "type": "object"
+      },
       "TraceRead": {
         "description": "The whole run, after the fact \u2014 part of the answer, not an admin view (RT1).",
         "properties": {
@@ -10759,6 +12963,11 @@
             ],
             "title": "Budget"
           },
+          "clarifications": {
+            "default": 0,
+            "title": "Clarifications",
+            "type": "integer"
+          },
           "cost_usd": {
             "anyOf": [
               {
@@ -10813,6 +13022,56 @@
             ],
             "title": "Finished At"
           },
+          "governed": {
+            "default": false,
+            "title": "Governed",
+            "type": "boolean"
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
+          },
+          "lens_ref": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Ref"
+          },
+          "opened_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opened By"
+          },
           "outcome": {
             "anyOf": [
               {
@@ -10838,6 +13097,11 @@
           "plan_revision": {
             "default": 0,
             "title": "Plan Revision",
+            "type": "integer"
+          },
+          "replans": {
+            "default": 0,
+            "title": "Replans",
             "type": "integer"
           },
           "result": {
@@ -10889,6 +13153,11 @@
             "default": 0,
             "title": "Tokens Out",
             "type": "integer"
+          },
+          "triggered_by": {
+            "default": "user",
+            "title": "Triggered By",
+            "type": "string"
           },
           "workflow_key": {
             "title": "Workflow Key",
@@ -11026,6 +13295,11 @@
             ],
             "title": "Lane"
           },
+          "max_attempts": {
+            "default": 1,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
           "output": {
             "anyOf": [
               {
@@ -11049,6 +13323,20 @@
               }
             ],
             "title": "Result"
+          },
+          "rules_cited": {
+            "items": {
+              "$ref": "#/components/schemas/OfferedRule"
+            },
+            "title": "Rules Cited",
+            "type": "array"
+          },
+          "rules_offered": {
+            "items": {
+              "$ref": "#/components/schemas/OfferedRule"
+            },
+            "title": "Rules Offered",
+            "type": "array"
           },
           "seq": {
             "title": "Seq",
@@ -11367,6 +13655,52 @@
         "title": "UsernameAvailabilityResponse",
         "type": "object"
       },
+      "ValidateRequest": {
+        "description": "Dry-run a draft. Same shape as a create, minus the naming.",
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "cast": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Cast",
+            "type": "object"
+          },
+          "closed_layers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Closed Layers",
+            "type": "array"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleIn"
+            },
+            "title": "Rules",
+            "type": "array"
+          }
+        },
+        "title": "ValidateRequest",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -11405,6 +13739,34 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationRead": {
+        "description": "What a save would be refused for \u2014 returned before the write.",
+        "properties": {
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "refusals": {
+            "items": {
+              "$ref": "#/components/schemas/RefusalRead"
+            },
+            "title": "Refusals",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/WarningRead"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "title": "ValidationRead",
         "type": "object"
       },
       "ValidationRuleResponse": {
@@ -11697,6 +14059,73 @@
           "label"
         ],
         "title": "Vertex",
+        "type": "object"
+      },
+      "WarningRead": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "rule",
+          "message"
+        ],
+        "title": "WarningRead",
+        "type": "object"
+      },
+      "WorldImpactRead": {
+        "properties": {
+          "cast_denied": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cast Denied",
+            "type": "array"
+          },
+          "changes": {
+            "title": "Changes",
+            "type": "boolean"
+          },
+          "lens_id": {
+            "title": "Lens Id",
+            "type": "string"
+          },
+          "loses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Loses",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lens_id",
+          "name",
+          "loses",
+          "cast_denied",
+          "changes",
+          "summary"
+        ],
+        "title": "WorldImpactRead",
         "type": "object"
       }
     },
@@ -13241,6 +15670,74 @@
       }
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/pause": {
+      "get": {
+        "description": "What pausing would do. Pausing blocks the same todos retiring blocks, so\nit names them the same way before it happens (LC10).",
+        "operationId": "preview_pause_api_v1_u__username___graphSlug__agents__agent_id__pause_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LifecyclePreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Pause",
+        "tags": [
+          "agents"
+        ]
+      },
       "post": {
         "operationId": "pause_agent_api_v1_u__username___graphSlug__agents__agent_id__pause_post",
         "parameters": [
@@ -13380,7 +15877,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/retire": {
       "get": {
-        "description": "What retiring would do. The confirm dialog **names the open tasks** \u2014\na count is not enough to decide with.",
+        "description": "What retiring would do. The confirm dialog **names the open work item by\nitem** \u2014 a count is not enough to decide with (LC6).",
         "operationId": "preview_retire_api_v1_u__username___graphSlug__agents__agent_id__retire_get",
         "parameters": [
           {
@@ -13420,7 +15917,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RetirePreview"
+                  "$ref": "#/components/schemas/LifecyclePreview"
                 }
               }
             },
@@ -13611,7 +16108,7 @@
         ]
       },
       "post": {
-        "description": "Offer a skill to this agent.\n\nA skill reaches a step only through a binding, and a binding names one\nskill and one agent \u2014 which is what gives a refusal something to name.\nBinding what is already bound is a 409: the caller believes it is changing\nthe roster, and it is not.",
+        "description": "Offer a skill to this agent.\n\nA skill reaches a step only through a binding, and a binding names one\nskill and one agent \u2014 which is what gives a refusal something to name.\nBinding what is already bound is a 409: the caller believes it is changing\nthe bindings, and it is not.\n\nA skill this agent could **never** run is refused here rather than inside a\nrun ([BN5](docs/for-developers/modules/skills/features/bindings.md)): if the\nplan its current version draws names a `step_key` the agent's envelope does\nnot allow, the 409 body names the step, its bound, and which checks ran \u2014\n`checked` and `not_checked`, because a bind is never refused on grounds it\ndid not check ([BN7](docs/for-developers/modules/skills/features/bindings.md)).",
         "operationId": "bind_skill_api_v1_u__username___graphSlug__agents__agent_id__skills__skill_id__post",
         "parameters": [
           {
@@ -13777,7 +16274,13 @@
                     "lineage",
                     "run",
                     "task_run",
-                    "plan_runs"
+                    "plan_runs",
+                    "compare",
+                    "skill",
+                    "skill_usage",
+                    "rule",
+                    "world",
+                    "guardrail"
                   ],
                   "type": "string"
                 },
@@ -14361,7 +16864,13 @@
                 "lineage",
                 "run",
                 "task_run",
-                "plan_runs"
+                "plan_runs",
+                "compare",
+                "skill",
+                "skill_usage",
+                "rule",
+                "world",
+                "guardrail"
               ],
               "title": "Kind",
               "type": "string"
@@ -14471,7 +16980,13 @@
                 "lineage",
                 "run",
                 "task_run",
-                "plan_runs"
+                "plan_runs",
+                "compare",
+                "skill",
+                "skill_usage",
+                "rule",
+                "world",
+                "guardrail"
               ],
               "title": "Kind",
               "type": "string"
@@ -14570,7 +17085,13 @@
                 "lineage",
                 "run",
                 "task_run",
-                "plan_runs"
+                "plan_runs",
+                "compare",
+                "skill",
+                "skill_usage",
+                "rule",
+                "world",
+                "guardrail"
               ],
               "title": "Kind",
               "type": "string"
@@ -16034,6 +18555,905 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/govern/compare": {
+      "get": {
+        "description": "Two runs that each happened for real, placed side by side.\n\n**Compare is two runs, not a diff engine** ([WO4]) \u2014 nothing here simulates\nanything or synthesises one answer from another. What B touched that A did\nnot is the part a person cannot reconstruct by reading both.",
+        "operationId": "compare_runs_api_v1_u__username___graphSlug__govern_compare_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "a",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "title": "A",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "title": "B",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Compare Runs",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses": {
+      "get": {
+        "description": "The Worlds drawer, or the Guardrails one.\n\nA guardrail **never appears under ``kind=world``**\n([GR1](docs/for-developers/modules/govern/features/guardrails.md)) \u2014 that is\nwhat the filter is for, and why it is not one list with a badge.",
+        "operationId": "list_lenses_api_v1_u__username___graphSlug__govern_lenses_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LensKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_unnamed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Unnamed",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Lenses",
+        "tags": [
+          "govern"
+        ]
+      },
+      "post": {
+        "operationId": "create_lens_api_v1_u__username___graphSlug__govern_lenses_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LensCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Lens",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/impact": {
+      "post": {
+        "description": "*Saving this would change 2 of 4 worlds* \u2014 and what each one loses.\n\nRead **before** the write ([GR2]): a guardrail that silently invalidates six\nworlds is one whose effect nobody saw at the moment they took\nresponsibility for it.",
+        "operationId": "guardrail_impact_api_v1_u__username___graphSlug__govern_lenses_impact_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpactRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Guardrail Impact",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/validate": {
+      "post": {
+        "description": "Dry-run a draft against the guardrails it must live inside.\n\nThe same check the save performs, offered before it \u2014 so the two refusals\nthe design draws (*a world cannot widen a guardrail*, *only declared axes\nare selectable*) land while somebody is still looking at the form.",
+        "operationId": "validate_lens_api_v1_u__username___graphSlug__govern_lenses_validate_post",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Validate Lens",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}": {
+      "delete": {
+        "description": "Refused while an agent carries it, naming the agents.\n\nThe holders are gathered here because ``agents.lens_id`` belongs to a band\nGovern may not read back into; the refusal itself is the manager's.",
+        "operationId": "delete_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lens_id",
+            "required": true,
+            "schema": {
+              "title": "Lens Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete Lens",
+        "tags": [
+          "govern"
+        ]
+      },
+      "get": {
+        "description": "One lens, and the cast it would actually get (R4).\n\nThe cast is resolved **against the guardrails composed with it**, not\nagainst the lens alone: *innermost wins, then the resolved address is\nchecked* ([GV6]) \u2014 and a role this lens casts to a model a guardrail denies\nhas to read as denied here, naming the rule, rather than as a row that\nlooks fine until a run refuses to open.",
+        "operationId": "get_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lens_id",
+            "required": true,
+            "schema": {
+              "title": "Lens Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Lens",
+        "tags": [
+          "govern"
+        ]
+      },
+      "patch": {
+        "description": "Naming it here is the write that publishes it ([WO1]).",
+        "operationId": "update_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lens_id",
+            "required": true,
+            "schema": {
+              "title": "Lens Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LensUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Lens",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/duplicate": {
+      "post": {
+        "operationId": "duplicate_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__duplicate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lens_id",
+            "required": true,
+            "schema": {
+              "title": "Lens Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Duplicate Lens",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}/promote": {
+      "post": {
+        "operationId": "promote_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__promote_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lens_id",
+            "required": true,
+            "schema": {
+              "title": "Lens Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LensPromote"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LensRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Promote Lens",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/participants": {
+      "get": {
+        "description": "What this Graph can address \u2014 and with ``match``, what a rule would bite.\n\nThe builder reads this as the pattern is typed\n([GR9](docs/for-developers/modules/govern/features/guardrails.md)). A layer\nwith nothing configured comes back empty *and says so* through\n``layers_present``, so the form can tell *nothing is set up* from *nothing\nmatched*.",
+        "operationId": "list_participants_api_v1_u__username___graphSlug__govern_participants_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "layer",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Layer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Layer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Match"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Participants",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/govern/runs/{run_id}/touches": {
+      "get": {
+        "description": "One run's ledger, in ``seq`` order, refusals struck in place.\n\n``allowed`` comes from the lens the run **froze**, not from the lens as it\nstands now: a guardrail tightened since must not rewrite what a past answer\nwas allowed to rest on ([GR3]).",
+        "operationId": "list_touches_api_v1_u__username___graphSlug__govern_runs__run_id__touches_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TouchesRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Touches",
+        "tags": [
+          "govern"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/llm": {
       "get": {
         "operationId": "list_llm_providers_api_v1_u__username___graphSlug__llm_get",
@@ -16368,6 +19788,223 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/llm/{provider_id}/models": {
+      "get": {
+        "operationId": "list_llm_models_api_v1_u__username___graphSlug__llm__provider_id__models_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMModelListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Llm Models",
+        "tags": [
+          "llm-providers"
+        ]
+      },
+      "post": {
+        "operationId": "add_llm_model_api_v1_u__username___graphSlug__llm__provider_id__models_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMModelCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMModelRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Add Llm Model",
+        "tags": [
+          "llm-providers"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/llm/{provider_id}/models/{model_row_id}": {
+      "delete": {
+        "operationId": "remove_llm_model_api_v1_u__username___graphSlug__llm__provider_id__models__model_row_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider_id",
+            "required": true,
+            "schema": {
+              "title": "Provider Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "model_row_id",
+            "required": true,
+            "schema": {
+              "title": "Model Row Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Remove Llm Model",
+        "tags": [
+          "llm-providers"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/llm/{provider_id}/ping": {
       "post": {
         "operationId": "ping_llm_provider_api_v1_u__username___graphSlug__llm__provider_id__ping_post",
@@ -16432,75 +20069,6 @@
           }
         ],
         "summary": "Ping Llm Provider",
-        "tags": [
-          "llm-providers"
-        ]
-      }
-    },
-    "/api/v1/u/{username}/{graphSlug}/llm/{provider_id}/set-default": {
-      "post": {
-        "operationId": "set_default_llm_provider_api_v1_u__username___graphSlug__llm__provider_id__set_default_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "provider_id",
-            "required": true,
-            "schema": {
-              "title": "Provider Id",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Owner username from the URL prefix.",
-            "in": "path",
-            "name": "username",
-            "required": true,
-            "schema": {
-              "description": "Owner username from the URL prefix.",
-              "title": "Username",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Graph slug, unique per owner.",
-            "in": "path",
-            "name": "graphSlug",
-            "required": true,
-            "schema": {
-              "description": "Graph slug, unique per owner.",
-              "title": "Graphslug",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LLMProviderRead"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Set Default Llm Provider",
         "tags": [
           "llm-providers"
         ]
@@ -23054,6 +26622,7 @@
         ]
       },
       "post": {
+        "description": "Create a skill. It starts as a **draft** with a one-node plan.\n\nNothing is offered a draft: a skill reaches a step through its current\nversion, and there is not one until someone publishes\n([SK21 \u00b7 SK22](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
         "operationId": "create_skill_api_v1_u__username___graphSlug__skills_post",
         "parameters": [
           {
@@ -23117,6 +26686,67 @@
           }
         ],
         "summary": "Create Skill",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/inlinable": {
+      "get": {
+        "description": "The library plans a skill may inline, each with what it offers a caller.\n\nOne read for the picker **and** the tuning, because they are one act: a\nperson who inlines `nl-single@1` decides its `read_only` in the same breath\n([LB19](docs/for-developers/modules/workflows/features/the-library.md)).",
+        "operationId": "inlinable_plans_api_v1_u__username___graphSlug__skills_inlinable_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InlinablePlanListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Inlinable Plans",
         "tags": [
           "skills"
         ]
@@ -23323,6 +26953,524 @@
           }
         ],
         "summary": "Update Skill",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/agents": {
+      "get": {
+        "description": "Where this skill stands with every agent \u2014 bound, refused, not bound.\n\nThe refusals are the bind checks run as a **dry run**, not a prediction the\nsurface makes ([BN10](docs/for-developers/modules/skills/features/bindings.md)):\nthe agents a skill cannot be offered are worth seeing before a click, and\nthe only reading of the rules that cannot go stale is the one that refuses.",
+        "operationId": "skill_agents_api_v1_u__username___graphSlug__skills__skill_id__agents_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillAgentsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Skill Agents",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft": {
+      "delete": {
+        "description": "Throw the draft away. Its plan goes with it \u2014 nothing ever resolved to it.",
+        "operationId": "discard_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Discard Skill Draft",
+        "tags": [
+          "skills"
+        ]
+      },
+      "get": {
+        "description": "The version being written \u2014 its text, its plan, and any open question.\n\nOpening a draft over a published version **copies that version's plan**, so\na redraw is a revision and the diff reads against what was drawn\n([SK12](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "operationId": "get_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillDraftRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Skill Draft",
+        "tags": [
+          "skills"
+        ]
+      },
+      "patch": {
+        "description": "Edit the draft's prose. A published version is never touched (SK2).",
+        "operationId": "update_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillVersionPublish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillDraftRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Update Skill Draft",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/clarifications/{clarification_id}": {
+      "post": {
+        "description": "Answer the question the planner stopped on.\n\nThe answer is recorded on the version, so a redraw never re-asks\n([SK11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).\n\nIt opens **no** run. The draw that asked has already settled\n([SK26](docs/for-developers/modules/skills/features/authoring-a-skill.md)) \u2014\nthere is nothing to resume \u2014 so this records and returns the draft, and the\nsurface opens the next draw with what comes back\n([SK30](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "operationId": "answer_clarification_api_v1_u__username___graphSlug__skills__skill_id__draft_clarifications__clarification_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "clarification_id",
+            "required": true,
+            "schema": {
+              "title": "Clarification Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillClarificationAnswer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillDraftRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Answer Clarification",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/draw": {
+      "post": {
+        "description": "Draw the draft's playbook as a plan.\n\nIt is an ordinary run with `role = plan`\n([SK23](docs/for-developers/modules/skills/features/authoring-a-skill.md)):\nstream it like any other, and read what it did in Runs. If a sentence\ncarries two readings the run **settles** having written nothing and\nrecorded the question against that sentence \u2014 the card in the editor is\nwhere it is answered.",
+        "operationId": "draw_skill_draft_api_v1_u__username___graphSlug__skills__skill_id__draft_draw_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillDrawStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Draw Skill Draft",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/draft/tasks": {
+      "patch": {
+        "description": "Hand-edit the draft's plan, and take ownership of it.\n\nThe rows are replaced wholesale, and `task_plans.origin` flips to\n`authored` \u2014 after which redrawing from the prose is **offered, never\nautomatic**, and says what it would discard\n([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).\n\nWhat is checked is the **catalogue**, not an agent's envelope: a skill\nbelongs to no agent, so *may this agent call this step* is checked where\nthe agent is known \u2014 at bind time\n([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md) \u00b7\n[BN5](docs/for-developers/modules/skills/features/bindings.md)).",
+        "operationId": "write_skill_draft_tasks_api_v1_u__username___graphSlug__skills__skill_id__draft_tasks_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillDraftTasksWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillDraftRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Write Skill Draft Tasks",
         "tags": [
           "skills"
         ]
@@ -23709,6 +27857,85 @@
           }
         ],
         "summary": "Diff Skill Version",
+        "tags": [
+          "skills"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/skills/{skill_id}/versions/{version}/tasks": {
+      "get": {
+        "description": "One version's plan, as nodes and edges.\n\nEach node carries the **band** it sits in and the sentence it was drawn\nfrom, so the Flow tab draws the six layers and the Playbook tab can show\neach sentence beside the step it produced\n([SK16 \u00b7 C11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).",
+        "operationId": "skill_version_plan_api_v1_u__username___graphSlug__skills__skill_id__versions__version__tasks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "skill_id",
+            "required": true,
+            "schema": {
+              "title": "Skill Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillPlanRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Skill Version Plan",
         "tags": [
           "skills"
         ]

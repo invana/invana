@@ -9,38 +9,114 @@ the cross-app read that was living in the wrong app.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent, AgentKind, AgentLifetime, AgentStatus
 from invana.apps.agents.querysets import AgentQuerySet
-from invana.apps.agents.schemas import AgentEdge, AgentLineageResponse, AgentNode, RetirePreview
+from invana.apps.agents.schemas import (
+    AgentEdge,
+    AgentLineageResponse,
+    AgentNode,
+    LifecycleAct,
+    LifecycleEffect,
+    LifecycleItem,
+    LifecyclePreview,
+)
 from invana.apps.sessions.models import Session as ChatSession
-from invana.apps.work.models import Task
+from invana.apps.work.models import Task, TaskStatus
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
 from invana.runtime.models import TaskRun
+from invana.runtime.querysets import TaskRunQuerySet
 
 
 class AgentLifecycleManager:
-    agents = AgentQuerySet()
-    roster = AgentManager()
+    agents_qs = AgentQuerySet()
+    agent_rules = AgentManager()
+    runs_qs = TaskRunQuerySet()
 
-    async def retire_preview(self, session: AsyncSession, *, agent: Agent) -> RetirePreview:
-        """What the confirm dialog has to name before anything happens."""
-        tasks = await self.roster._open_tasks(session, agent=agent)
-        sessions = (
-            (await session.execute(select(ChatSession.id).where(ChatSession.agent_id == agent.id))).scalars().all()
+    async def spend_this_month(self, session: AsyncSession, *, graph_id: str) -> dict[str, float]:
+        """``{agent_id: usd}`` since the first of the month, for the list's
+        meter ([C10](docs/for-developers/modules/agents/features/author-an-agent.md)).
+
+        It lives here rather than in ``apps/agents`` because it reads
+        ``task_runs``, which an app may not (migration-plan §18.1.1). The window
+        is the **calendar month**, the same one ``max_cost_usd_month`` names — a
+        rolling thirty days would draw a different number from the ceiling it
+        sits beside.
+        """
+        now = datetime.now(UTC)
+        since = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return await self.runs_qs.spend_by_agent(session, graph_id=graph_id, since=since)
+
+    async def preview(self, session: AsyncSession, *, agent: Agent, act: LifecycleAct) -> LifecyclePreview:
+        """The open work this act would disturb, item by item.
+
+        One shape for both acts
+        ([LC8](../../../docs/for-developers/modules/agents/features/lifecycle.md)):
+        the list is the same work either way, and what differs is the effect —
+        which is exactly what a count cannot carry (LC6). The runs are read
+        first because *nothing is killed* is the reassurance a person reaches
+        for at 3am, and a todo in ``review`` is the one row where the two acts
+        disagree.
+        """
+        items: list[LifecycleItem] = []
+
+        for run in await self.runs_qs.in_flight_for_agent(session, agent_id=agent.id):
+            items.append(
+                LifecycleItem(
+                    kind="run",
+                    id=run.id,
+                    title=run.label or run.workflow_key or "Run",
+                    effect=LifecycleEffect.finishes,
+                    note="Finishes — never killed.",
+                )
+            )
+
+        for task in await self.agent_rules._open_tasks(session, agent=agent):
+            # `_block_open_tasks` leaves a task in review alone, and retiring
+            # does not: the same row, two answers, which is the whole argument
+            # for showing the items rather than the count (LC9).
+            spared = act is LifecycleAct.pause and task.status == TaskStatus.review.value
+            items.append(
+                LifecycleItem(
+                    kind="task",
+                    id=task.id,
+                    title=task.title,
+                    effect=LifecycleEffect.unchanged if spared else LifecycleEffect.blocked,
+                    note=(
+                        "In review — a pause leaves it alone."
+                        if spared
+                        else f"Blocked, naming '{agent.name}'. It unblocks when the agent does."
+                        if act is LifecycleAct.pause
+                        else f"Blocked, naming '{agent.name}'. Reassign it to move it on."
+                    ),
+                )
+            )
+
+        threads = (
+            (await session.execute(select(ChatSession.id, ChatSession.title).where(ChatSession.agent_id == agent.id)))
+            .tuples()
+            .all()
         )
-        return RetirePreview(
-            agent_id=agent.id,
-            open_task_ids=[t.id for t in tasks],
-            open_task_titles=[t.title for t in tasks],
-            session_count=len(sessions),
-        )
+        for thread_id, title in threads:
+            items.append(
+                LifecycleItem(
+                    kind="session",
+                    id=thread_id,
+                    title=title or "Untitled thread",
+                    effect=LifecycleEffect.refused,
+                    note="Its next ask is refused, naming the state — never answered by another agent.",
+                )
+            )
+
+        return LifecyclePreview(agent_id=agent.id, act=act, items=items)
 
     async def delete_agent(self, session: AsyncSession, *, agent: Agent, actor: User) -> None:
         """Hard delete — allowed only for an agent that has never run_ask.
@@ -56,7 +132,7 @@ class AgentLifecycleManager:
         if run_ask is not None:
             raise ConflictError(f"'{agent.name}' has already run_ask; retire it instead so its trace still resolves.")
         name, graph_id, agent_id = agent.name, agent.graph_id, agent.id
-        await self.agents.delete(session, agent)
+        await self.agents_qs.delete(session, agent)
         await emit_event(
             session,
             action=actions.AGENT_DELETE,
@@ -72,7 +148,7 @@ class AgentLifecycleManager:
         """Close out the agents a task's runs spawned (docs/for-developers/modules/work/spec.md).
 
         An ephemeral agent exists for the task it was spawned for; when that task
-        closes it is retired automatically, hidden from the roster, and still fully
+        closes it is retired automatically, hidden from the list, and still fully
         present in lineage and the trace.
         """
         run_ids = (await session.execute(select(TaskRun.id).where(TaskRun.todo_id == task_id))).scalars().all()
@@ -103,7 +179,7 @@ class AgentLifecycleManager:
         drawing, which is why
         a click has to branch on the node's kind.
         """
-        store = self.agents
+        agents_qs = self.agents_qs
         nodes: dict[str, AgentNode] = {}
         edges: list[AgentEdge] = []
 
@@ -124,7 +200,7 @@ class AgentLifecycleManager:
         seen_up: set[str] = set()
         while node is not None and node.parent_agent_id and node.parent_agent_id not in seen_up:
             seen_up.add(node.parent_agent_id)
-            parent = await store.get(session, node.parent_agent_id)
+            parent = await agents_qs.get(session, node.parent_agent_id)
             if parent is None:
                 break
             add_agent(parent)
@@ -142,7 +218,7 @@ class AgentLifecycleManager:
         frontier = [agent]
         while frontier:
             current = frontier.pop()
-            for child in await store.children(session, current.id):
+            for child in await agents_qs.children(session, current.id):
                 if child.id in nodes:
                     continue
                 add_agent(child)
@@ -161,7 +237,7 @@ class AgentLifecycleManager:
         # person node is inert on the canvas — MVP has no person surface — but it
         # is what makes "who set this in motion" legible at a glance.
         for a in list(nodes.values()):
-            source_agent = await store.get(session, a.id)
+            source_agent = await agents_qs.get(session, a.id)
             if source_agent is None or source_agent.created_by_kind != "user" or not source_agent.created_by_id:
                 continue
             user = await session.get(User, source_agent.created_by_id)

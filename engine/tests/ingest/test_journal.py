@@ -111,6 +111,37 @@ class TestJournal:
         # The run still says how many steps it has — read off the row, not listed beside it.
         assert next(i for i in items if i["id"] == root.id)["step_count"] == 3
 
+    async def test_a_row_says_what_the_run_spent_and_when_it_began(self, session, journal):
+        """SR45 — the journal row's second line, without a trace fetch per row."""
+        graph, _ = journal
+        root = await _run(session, graph, kind="ask", body="Which routes?", minutes_ago=1)
+        root.started_at = datetime.now(UTC) - timedelta(seconds=40)
+        for seq, (tokens_in, tokens_out) in enumerate(((1200, 300), (4000, 900))):
+            session.add(
+                TaskRun(
+                    graph_id=graph.id,
+                    parent_run_id=root.id,
+                    seq=seq,
+                    task_key=f"step_{seq}",
+                    status="succeeded",
+                    author_kind="system",
+                    queued_at=datetime.now(UTC),
+                    tokens_in=tokens_in,
+                    tokens_out=tokens_out,
+                )
+            )
+        await session.flush()
+
+        items, _ = await services.list_runs(session, graph_id=graph.id, limit=50)
+
+        row = next(i for i in items if i["id"] == root.id)
+        assert (row["tokens_in"], row["tokens_out"]) == (5200, 1200), "summed over the run's tasks"
+        assert row["started_at"] is not None, "elapsed is measured from it"
+        # A load spends no tokens, and its row says so rather than picking up
+        # a sibling's roll-up.
+        load = next(i for i in items if i["body"] == "Import news-tv")
+        assert (load["tokens_in"], load["tokens_out"]) == (0, 0)
+
     async def test_another_graphs_run_is_not_in_this_journal(self, session, journal):
         graph, stray = journal
 

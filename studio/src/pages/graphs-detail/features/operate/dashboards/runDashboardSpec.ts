@@ -16,6 +16,11 @@
  */
 
 import { formatDuration } from "@/lib/time";
+import { layersOptions } from "@/pages/graphs-detail/features/govern/runLayers";
+import {
+	lensSummary,
+	runLensOptions,
+} from "@/pages/graphs-detail/features/govern/runLens";
 import type {
 	FlowNodeSpec,
 	WithFlow,
@@ -44,7 +49,13 @@ import {
 	usd,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import type { TraceRead, TraceStepRead } from "@/services/api/runs";
-import type { DashboardSpec, LogOptions, PanelSpec } from "@invana/dashboard";
+import type { TouchesResponse } from "@/types/govern";
+import type {
+	DashboardSpec,
+	LogOptions,
+	PanelSpec,
+	RunPanelOptions,
+} from "@invana/dashboard";
 import type { TaskGanttSegment, TaskGanttTask, TaskNodeTag } from "@invana/ui";
 
 /** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
@@ -55,6 +66,12 @@ export const RUN_ACTIONS = {
 	selectTask: "select-task",
 	/** A flow card — opens that task's own dashboard (SR36). */
 	openStep: "open-step",
+	/** A column of the layer strip — opens that step's dashboard (R1 → R2). */
+	selectTouchStep: "select-touch-step",
+	/** *This run's lens* → the Govern panel, without closing the run (SR12). */
+	retune: "retune",
+	/** Pick the second run, and open `compare:<a>:<b>` as a page (R3 · WO4). */
+	compare: "compare",
 } as const;
 
 export interface RunDashboardView {
@@ -62,20 +79,46 @@ export interface RunDashboardView {
 	view: string;
 	/** The task the log is filtered to, by group key. */
 	selectedKey: string | null;
+	/**
+	 * What the run engaged — R1's two bands
+	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+	 *
+	 * A **second** read beside the trace, because it is a projection of the
+	 * ledger rather than part of it (GV20) and a run opened before its Graph had
+	 * a lens has a trace and no touches. Absent, the two bands are **absent** —
+	 * never an empty grid, which would say the run touched nothing.
+	 */
+	touches?: TouchesResponse;
+	/** The world the run froze. Absent reads `Everything`, which is a real one. */
+	lensName?: string | null;
 }
+
+/**
+ * The panel kinds this dashboard draws beyond the built-ins.
+ *
+ * `RunPanelOptions` is the kit's own run vocabulary — `trace · touched ·
+ * attempts · artifacts · layers · lens · clarification` — registered as
+ * `RUN_PANELS`. `flow` is the one Studio still owns: a run's plan on a canvas
+ * is `@invana/canvas`, which a dashboard package does not depend on.
+ *
+ * What stays here is the **composing**: `layers` and `lens` are drawn by the
+ * kit and fed from Govern's ledger, because how a `TouchesResponse` becomes
+ * bands and sections is Studio's knowledge, not the kit's.
+ */
+export type RunPanels = WithFlow & RunPanelOptions;
 
 /** How many cards the flow lays across before it wraps. */
 const FLOW_COLUMNS = 4;
 
 export function runDashboardSpec(
 	trace: TraceRead,
-	{ view, selectedKey }: RunDashboardView,
-): DashboardSpec<WithFlow> {
+	{ view, selectedKey, touches, lensName }: RunDashboardView,
+): DashboardSpec<RunPanels> {
 	const groups = groupSteps(trace.steps);
 	const live = isLive(trace.status);
 	const selected = groups.find((g) => g.key === selectedKey) ?? null;
 
-	const header: DashboardSpec<WithFlow>["header"] = {
+	const header: DashboardSpec<RunPanels>["header"] = {
 		tone: toneOf(trace.status),
 		crumbs: [runTitle(trace)],
 		chips: omit([
@@ -92,6 +135,26 @@ export function runDashboardSpec(
 				options: [VIEW_DASHBOARD, VIEW_SPEC],
 				value: view,
 			},
+			// Comparing needs a run that has finished — two traces, placed side by
+			// side, and a live one has half of one.
+			live
+				? null
+				: {
+						id: RUN_ACTIONS.compare,
+						label: "Compare\u2026",
+						variant: "ghost" as const,
+					},
+			// Narrowing opens Govern beside the run rather than inside a band
+			// (SR12) — it acts on the next run, not on this reading of this one,
+			// which is why it sits with the page's other acts. Absent when
+			// nothing was recorded: there is no gap to act on.
+			touches
+				? {
+						id: RUN_ACTIONS.retune,
+						label: "Retune\u2026",
+						variant: "ghost" as const,
+					}
+				: null,
 			// Cancel is the one thing this surface writes (SR8), and only while
 			// there is something to stop.
 			live
@@ -104,8 +167,8 @@ export function runDashboardSpec(
 		]),
 	};
 
-	const rows = bands(trace, groups, selected, selectedKey);
-	const spec: DashboardSpec<WithFlow> = {
+	const rows = bands(trace, groups, selected, selectedKey, touches, lensName);
+	const spec: DashboardSpec<RunPanels> = {
 		title: runTitle(trace),
 		header,
 		rows,
@@ -119,18 +182,27 @@ export function runDashboardSpec(
 		: spec;
 }
 
-/** The five bands, top to bottom — the artboard's own order. */
+/** The bands, top to bottom — the artboard's own order. */
 function bands(
 	trace: TraceRead,
 	groups: TaskGroup[],
 	selected: TaskGroup | null,
 	selectedKey: string | null,
-): DashboardSpec<WithFlow>["rows"] {
+	touches: TouchesResponse | undefined,
+	lensName: string | null | undefined,
+): DashboardSpec<RunPanels>["rows"] {
 	return omit([
 		{ panels: [tiles(trace, groups)] },
 		groups.length
 			? { height: flowHeight(groups.length), panels: [flow(groups, selected)] }
 			: null,
+		// R1 · what the run engaged, and what it was allowed to. Above the
+		// performance band because *what grounded this* is read before *how long
+		// it took* — and absent entirely when nothing was recorded, so a run from
+		// before the lens does not grow two empty boxes (SR34).
+		touches ? { panels: [layerStrip(touches, trace, selectedKey)] } : null,
+		touches ? { panels: [lensTiles(touches)] } : null,
+		touches ? { panels: [runLens(touches, lensName)] } : null,
 		groups.length
 			? { panels: [performance(trace, groups, selectedKey)] }
 			: null,
@@ -139,10 +211,72 @@ function bands(
 	]);
 }
 
+/**
+ * R1 · the six bands as a gantt — time across, refusals struck in place.
+ *
+ * The trace goes in beside the ledger because a touch has no clock of its own:
+ * its bar is the window of the step it belongs to, and without that the strip
+ * falls back to the ledger's `seq` order rather than inventing timings.
+ */
+function layerStrip(
+	touches: TouchesResponse,
+	trace: TraceRead,
+	selectedKey: string | null,
+): PanelSpec<RunPanels> {
+	const options = layersOptions(touches, trace.steps, {
+		selectedItem: selectedKey,
+		selectAction: RUN_ACTIONS.selectTouchStep,
+	});
+
+	return {
+		kind: "layers",
+		title: "What each step engaged",
+		aside: `${touches.total} touch${touches.total === 1 ? "" : "es"}`,
+		flush: true,
+		// Not an empty track. *Nothing was recorded* and *nothing was touched*
+		// are different facts, and an empty axis says the second while meaning
+		// the first — so the band says which one it is (SR34).
+		// Told apart by the lens, not the count (SR68): a governed run with no
+		// touches engaged nothing, and its six bands draw muted.
+		absent: trace.governed
+			? undefined
+			: {
+					reason: "unrecorded" as const,
+					note: "This run opened before runs of its kind were governed; what it engaged was not recorded.",
+				},
+		options,
+	};
+}
+
+/** R1 · the counts the retune rests on — allowed · touched · never · refused. */
+function lensTiles(touches: TouchesResponse): PanelSpec<RunPanels> {
+	return { kind: "metrics", options: { tiles: lensSummary(touches) } };
+}
+
+/**
+ * R1 · *This run's lens* — every participant the world allowed, under its layer.
+ *
+ * `Everything` is a real world and the default one, so an unnamed lens says so
+ * on the box rather than leaving a blank, which would read as *not recorded*.
+ * The world is frozen with the plan ([SR11](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
+ * hence *as frozen at open* — never *as set*.
+ */
+function runLens(
+	touches: TouchesResponse,
+	lensName: string | null | undefined,
+): PanelSpec<RunPanels> {
+	return {
+		kind: "lens",
+		title: `This run's lens — ${lensName ?? "Everything"}`,
+		aside: "as frozen at open",
+		options: runLensOptions(touches),
+	};
+}
+
 // ── the bands ───────────────────────────────────────────────────────────────
 
 /** Tiles, bare — no `title`, so the strip sits on the surface rather than in a box. */
-function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<WithFlow> {
+function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	const done = groups.filter((g) => g.head.finished_at).length;
 	const total = groups.length;
 	const ms =
@@ -238,7 +372,7 @@ function flowHeight(nodes: number): number {
 function flow(
 	groups: TaskGroup[],
 	selected: TaskGroup | null,
-): PanelSpec<WithFlow> {
+): PanelSpec<RunPanels> {
 	const nodes: FlowNodeSpec[] = groups.map((group, i) => ({
 		id: group.head.id,
 		taskKey: group.key,
@@ -289,7 +423,7 @@ function performance(
 	trace: TraceRead,
 	groups: TaskGroup[],
 	selectedKey: string | null,
-): PanelSpec<WithFlow> {
+): PanelSpec<RunPanels> {
 	const origin = originOf(trace);
 	const live = isLive(trace.status);
 
@@ -364,7 +498,7 @@ function performanceAside(
 }
 
 /** What opened the run — the trace's own provenance, not a second record. */
-function input(trace: TraceRead): PanelSpec<WithFlow> {
+function input(trace: TraceRead): PanelSpec<RunPanels> {
 	return {
 		kind: "properties",
 		title: "Input · what opened this run",
@@ -408,7 +542,7 @@ function input(trace: TraceRead): PanelSpec<WithFlow> {
  * so this returns nothing rather than an empty document — and the Input panel
  * takes the whole row, which is the honest drawing of a run with no result.
  */
-function resultJson(trace: TraceRead): PanelSpec<WithFlow> | null {
+function resultJson(trace: TraceRead): PanelSpec<RunPanels> | null {
 	if (!trace.result) return null;
 	return {
 		kind: "json",
@@ -428,7 +562,7 @@ function resultJson(trace: TraceRead): PanelSpec<WithFlow> | null {
 function log(
 	trace: TraceRead,
 	selected: TaskGroup | null,
-): PanelSpec<WithFlow> {
+): PanelSpec<RunPanels> {
 	const steps = selected ? selected.steps : trace.steps;
 	const lines: LogOptions["lines"] = omit(
 		steps.map((step) =>

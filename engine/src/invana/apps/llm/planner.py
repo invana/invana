@@ -21,7 +21,7 @@ from typing import Any
 
 from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.schemas import Exchange, TokenUsage
-from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.llm_providers.endpoint import LLMEndpoint
 
 PLAN_TOOL = {
     "type": "object",
@@ -105,7 +105,7 @@ def _system_prompt(*, vocabulary: Sequence[Mapping[str, Any]], max_steps: int, p
 
 async def generate_plan(
     *,
-    provider: LLMProvider,
+    provider: LLMEndpoint,
     intent: dict,
     prompt: str,
     vocabulary: Sequence[Mapping[str, Any]],

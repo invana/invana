@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from datetime import datetime
 from typing import Any
 
@@ -16,14 +17,17 @@ class AgentCreate(BaseModel):
     # allow-list is an agent that can do nothing, which is never what is meant.
     envelope_from: str | None = Field(default=None, description="Seeded agent key to copy the envelope from.")
     workflow_spec: dict[str, Any] | None = None
-    llm_config_id: str | None = None
-    # The roster this agent starts with, bound as part of creating it — the same
+    # The skills this agent starts with, bound as part of creating it — the same
     # shape as a spawned agent's bindings being named at spawn (BN4). Changing
     # them afterwards goes through `POST/DELETE …/agents/{id}/skills/{skill_id}`,
     # because a bind is a write with its own refusal (BN5 · BN6).
     skill_ids: list[str] = Field(default_factory=list)
     budget: dict[str, Any] = Field(default_factory=dict)
     policy: dict[str, Any] = Field(default_factory=dict)
+    # The third bound, picked while the agent is authored (C2). Null is
+    # *Everything, inside the guardrails* (AG5), which is what a seeded agent
+    # carries.
+    lens_id: str | None = None
 
 
 class AgentUpdate(BaseModel):
@@ -31,10 +35,14 @@ class AgentUpdate(BaseModel):
     description: str | None = None
     instructions: str | None = None
     workflow_spec: dict[str, Any] | None = None
-    llm_config_id: str | None = None
     # No `skill_ids`: binding is not a field of the agent. See AgentCreate.
     budget: dict[str, Any] | None = None
     policy: dict[str, Any] | None = None
+    # **Omitted and null mean different things here**, unlike every field above:
+    # null is *put this agent back in Everything*, which is a bound somebody
+    # chose. The manager reads `model_fields_set` rather than testing for None,
+    # so a widening is always a write somebody made on purpose.
+    lens_id: str | None = None
 
 
 class AgentRead(BaseModel):
@@ -50,10 +58,14 @@ class AgentRead(BaseModel):
     lifetime: str
     instructions: str
     workflow_spec: dict[str, Any]
-    llm_config_id: str | None
-    # Read through `skill_bindings` (BN6). Present here because the roster badge
+    # Read through `skill_bindings` (BN6). Present here because the skills badge
     # and the bindings picker both need it; not writable on this object.
     skill_ids: list[str]
+    # The third bound, beside the envelope and the budget (AG2 · AG6). The name
+    # rides with the id because the list draws a chip per row and a list that
+    # has to resolve four ids to four names draws none of them.
+    lens_id: str | None = None
+    lens_name: str | None = None
     budget: dict[str, Any]
     policy: dict[str, Any]
     parent_agent_id: str | None
@@ -68,6 +80,13 @@ class AgentRead(BaseModel):
 class AgentListResponse(BaseModel):
     items: list[AgentRead]
     total: int
+    #: ``{agent_id: usd}`` since the first of the month — what the list draws
+    #: against ``max_cost_usd_month`` (C10). A **sidecar map, not a field on the
+    #: agent**: it is a grouped read over ``task_runs``, which this band may not
+    #: touch, and an agent with no priced run is absent rather than zero — a
+    #: subscription publishes no per-token rate, so *nothing spent* and *nothing
+    #: known* are different facts (OB4).
+    spend_this_month: dict[str, float] = Field(default_factory=dict)
     # The graph's default agent — what a new session binds when nothing is picked.
     default_agent_id: str | None = None
 
@@ -110,13 +129,55 @@ class RetireRequest(BaseModel):
     reassign_to_id: str | None = None
 
 
-class RetirePreview(BaseModel):
-    """What `Retire` has to name before it happens — the open tasks."""
+class LifecycleAct(enum.StrEnum):
+    """The two acts that disturb open work. Resume takes nothing away, so it has
+    no preview ([LC10](docs/for-developers/modules/agents/features/lifecycle.md))."""
+
+    pause = "pause"
+    retire = "retire"
+
+
+class LifecycleEffect(enum.StrEnum):
+    """What an act does to one piece of open work.
+
+    A closed vocabulary, because a sentence per row is a sentence nobody can
+    compare ([LC9](docs/for-developers/modules/agents/features/lifecycle.md)).
+    """
+
+    #: A run already queued or running. Neither act kills one.
+    finishes = "finishes"
+    #: An open todo, with the agent named in ``blocked_reason``.
+    blocked = "blocked"
+    #: A todo in ``review`` under a pause — the one item the two acts disagree
+    #: about, and the one a count could never show.
+    unchanged = "unchanged"
+    #: A thread bound to this agent: its next ask is a 409 naming the state,
+    #: never a silent switch to another mind.
+    refused = "refused"
+
+
+class LifecycleItem(BaseModel):
+    """One piece of open work, and what the act would do to it."""
+
+    #: ``run`` · ``task`` · ``session``
+    kind: str
+    id: str
+    title: str
+    effect: LifecycleEffect
+    #: The effect in a reader's words — short, and about *this* item.
+    note: str
+
+
+class LifecyclePreview(BaseModel):
+    """What `Pause` or `Retire` has to name before it happens.
+
+    One shape for both acts ([LC8](docs/for-developers/modules/agents/features/lifecycle.md)):
+    the same open work, carrying the effect *this* act would have on it.
+    """
 
     agent_id: str
-    open_task_ids: list[str]
-    open_task_titles: list[str]
-    session_count: int
+    act: LifecycleAct
+    items: list[LifecycleItem]
 
 
 class SkillUsageStep(BaseModel):

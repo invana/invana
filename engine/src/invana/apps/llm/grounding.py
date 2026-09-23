@@ -14,23 +14,51 @@ from invana.apps.modeller.models import GraphVersion, TypePropertyMapping
 from invana.apps.skills.models import Rule, Skill
 
 _NO_MODEL = "No graph model is available — infer labels conservatively from the question and prefer a simple query."
+#: What is said when the schema *exists* and may not cross the boundary. A
+#: different sentence from ``_NO_MODEL`` on purpose: *there is no model* and
+#: *this world does not let the model leave* are different facts about the
+#: Graph, and the model reasons differently under each.
+_NO_EGRESS = (
+    "This run's world does not permit the graph's schema to accompany the call — "
+    "infer labels conservatively from the question and prefer a simple query."
+)
 
 
-def render_model_context(version: GraphVersion | None) -> str:
+def render_model_context(version: GraphVersion | None, *, may_send: frozenset[str] | None = None) -> str:
+    """The active version as schema grounding, cut to what may cross.
+
+    ``may_send`` is the egress classes this crossing permits, or ``None`` for an
+    unbounded one ([GV30](docs/for-developers/modules/govern/spec.md)). The cut
+    is applied **to the parts being assembled**, never to the text afterwards
+    ([GV31]) — what the model saw is what it reasoned from, whatever a record
+    written later says went.
+
+    Two classes reach this block. Without ``type_names`` there is no grounding
+    at all, because a property list with no labels names nothing; without
+    ``property_names`` the labels are rendered alone, which is a real and useful
+    middle — a model that knows the types can still ask about them.
+    """
     if version is None:
         return _NO_MODEL
+    if may_send is not None and "type_names" not in may_send:
+        return _NO_EGRESS
 
-    node_lines = [f"(:{nt.name}{_props(nt.property_mappings)}){_desc(nt.description)}" for nt in version.node_types]
+    properties = may_send is None or "property_names" in may_send
+    node_lines = [
+        f"(:{nt.name}{_props(nt.property_mappings) if properties else ''}){_desc(nt.description)}"
+        for nt in version.node_types
+    ]
     edge_lines = [
-        f"[:{et.name}{_props(et.property_mappings)}] "
+        f"[:{et.name}{_props(et.property_mappings) if properties else ''}] "
         f"({', '.join(et.source_node_types or []) or '?'})->({', '.join(et.target_node_types or []) or '?'})"
         f"{_desc(et.description)}"
         for et in version.edge_types
     ]
+    label = "label and properties" if properties else "label only — this world does not send property names"
     return (
-        "Node types (label and properties):\n"
+        f"Node types ({label}):\n"
         + ("\n".join(node_lines) or "(none defined)")
-        + "\n\nEdge types (label, properties, allowed endpoints):\n"
+        + f"\n\nEdge types ({label}, allowed endpoints):\n"
         + ("\n".join(edge_lines) or "(none defined)")
     )
 

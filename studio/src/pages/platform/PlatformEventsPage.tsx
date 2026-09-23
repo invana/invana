@@ -8,7 +8,14 @@ import {
 	matchesStatusFilter,
 } from "@/pages/graphs-detail/features/operate/eventStatus";
 import type { AuditEvent } from "@/types/events";
-import { Button, SearchInput, Skeleton } from "@invana/ui";
+import { Input } from "@invana/forms";
+import {
+	Button,
+	EmptyState,
+	FilterBar,
+	SearchInput,
+	Skeleton,
+} from "@invana/ui";
 import { Activity, ArrowLeft } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
@@ -75,13 +82,19 @@ export function PlatformEventsPage() {
 				</div>
 
 				<FilterBar
-					actions={actions}
-					onActionsChange={setActions}
-					statuses={statuses}
-					onStatusesChange={setStatuses}
-					graphIdFilter={graphIdFilter}
-					onGraphIdFilterChange={setGraphIdFilter}
-				/>
+					className="mt-3 rounded-sm border"
+					summary={`${visible.length.toLocaleString()} shown`}
+				>
+					<EventTypeFilter value={actions} onChange={setActions} />
+					<StatusFilter value={statuses} onChange={setStatuses} />
+					<Input
+						aria-label="Filter by graph id"
+						placeholder="graph id"
+						value={graphIdFilter ?? ""}
+						onChange={(e) => setGraphIdFilter(e.target.value || undefined)}
+						className="h-[22px] w-48 font-mono"
+					/>
+				</FilterBar>
 
 				<div className="mt-3">
 					<SearchInput value={search} onChange={setSearch} className="w-full" />
@@ -91,9 +104,17 @@ export function PlatformEventsPage() {
 					{query.isLoading ? (
 						<EventsSkeleton />
 					) : all.length === 0 ? (
-						<EmptyState />
+						<EmptyState
+							title="No events yet"
+							description="The audit log starts as soon as someone changes something on this engine."
+						/>
 					) : visible.length === 0 ? (
-						<NoMatches />
+						<EmptyState
+							title="No loaded events match the current filters"
+							description={
+								'Status and search scan loaded events — use "Load older" to widen the range.'
+							}
+						/>
 					) : (
 						<ul className="space-y-1.5">
 							{visible.map((e) => (
@@ -115,44 +136,6 @@ export function PlatformEventsPage() {
 						</div>
 					)}
 				</div>
-			</div>
-		</div>
-	);
-}
-
-function FilterBar({
-	actions,
-	onActionsChange,
-	statuses,
-	onStatusesChange,
-	graphIdFilter,
-	onGraphIdFilterChange,
-}: {
-	actions: string[];
-	onActionsChange: (v: string[]) => void;
-	statuses: string[];
-	onStatusesChange: (v: string[]) => void;
-	graphIdFilter: string | undefined;
-	onGraphIdFilterChange: (v: string | undefined) => void;
-}) {
-	return (
-		<div className="space-y-2">
-			<div className="flex flex-wrap items-center gap-2">
-				<EventTypeFilter value={actions} onChange={onActionsChange} />
-				<StatusFilter value={statuses} onChange={onStatusesChange} />
-			</div>
-			<div className="flex items-center gap-2">
-				<label htmlFor="graph-filter" className="text-muted-foreground">
-					Filter by graph id:
-				</label>
-				<input
-					id="graph-filter"
-					type="text"
-					placeholder="(any)"
-					value={graphIdFilter ?? ""}
-					onChange={(e) => onGraphIdFilterChange(e.target.value || undefined)}
-					className="flex-1 max-w-md px-2 py-1 rounded border border-border bg-background font-mono"
-				/>
 			</div>
 		</div>
 	);
@@ -206,26 +189,6 @@ function EventRow({ event }: { event: AuditEvent }) {
 				</details>
 			)}
 		</li>
-	);
-}
-
-function EmptyState() {
-	return (
-		<p className="text-muted-foreground py-8 text-center">
-			No events match the current filters.
-		</p>
-	);
-}
-
-function NoMatches() {
-	return (
-		<div className="text-muted-foreground py-8 text-center">
-			<p>No loaded events match the current filters.</p>
-			<p className="text-xs mt-1 opacity-70">
-				Status and search scan loaded events — use "Load older" to widen the
-				range.
-			</p>
-		</div>
 	);
 }
 

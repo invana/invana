@@ -10,8 +10,9 @@ from starlette_admin.contrib.sqla import Admin
 
 from invana.apps.agents.models import Agent
 from invana.apps.boards.models import Board, BoardVersion
+from invana.apps.govern.models import Lens, RunTouch
 from invana.apps.graphs.models import Graph, GraphConnection, GraphMember
-from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.llm_providers.models import LLMModel, LLMProvider
 from invana.apps.modeller.models import (
     ConstraintDefinition,
     EdgeTypeDefinition,
@@ -26,7 +27,14 @@ from invana.apps.modeller.models import (
     ValidationRule,
 )
 from invana.apps.sessions.models import Session, SessionMessage
-from invana.apps.skills.models import Rule, RuleVersion, Skill, SkillBinding, SkillVersion
+from invana.apps.skills.models import (
+    Rule,
+    RuleVersion,
+    Skill,
+    SkillBinding,
+    SkillVersion,
+    SkillVersionClarification,
+)
 from invana.apps.task_plans.models import Task as PlanTask
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Project, ProjectAssignment, Task, TaskDependency
@@ -48,12 +56,13 @@ from invana.server.auth.admin import (
 )
 from invana.server.boards.admin import BoardVersionView, BoardView
 from invana.server.events.admin import EventView
+from invana.server.govern.admin import LensView, RunTouchView
 from invana.server.graphs.admin import (
     GraphConnectionView,
     GraphContainerView,
     GraphMemberView,
 )
-from invana.server.llm_providers.admin import LLMProviderView
+from invana.server.llm_providers.admin import LLMModelView, LLMProviderView
 from invana.server.modeller.admin import (
     ConstraintDefinitionView,
     EdgeTypeDefinitionView,
@@ -80,7 +89,12 @@ from invana.server.sessions.admin import (
     SessionMessageView,
     SessionView,
 )
-from invana.server.skills.admin import SkillBindingView, SkillVersionView, SkillView
+from invana.server.skills.admin import (
+    SkillBindingView,
+    SkillClarificationView,
+    SkillVersionView,
+    SkillView,
+)
 from invana.server.task_plans.admin import PlanTaskView, TaskPlanView
 from invana.server.work.admin import (
     ProjectAssignmentView,
@@ -156,11 +170,28 @@ def mount_admin(app: FastAPI) -> None:
             icon="fa fa-robot",
             views=[
                 LLMProviderView(LLMProvider, label="LLM providers", icon="fa fa-sparkles"),
+                LLMModelView(LLMModel, label="LLM models", icon="fa fa-cube"),
                 SkillView(Skill, label="Skills", icon="fa fa-wand-magic-sparkles"),
                 SkillVersionView(SkillVersion, label="Skill versions", icon="fa fa-clock-rotate-left"),
+                SkillClarificationView(
+                    SkillVersionClarification, label="Skill clarifications", icon="fa fa-circle-question"
+                ),
                 SkillBindingView(SkillBinding, label="Skill bindings", icon="fa fa-link"),
                 RuleView(Rule, label="Rules", icon="fa fa-scale-balanced"),
                 RuleVersionView(RuleVersion, label="Rule versions", icon="fa fa-clock-rotate-left"),
+            ],
+        ),
+    )
+
+    # ── Govern (docs/for-developers/modules/govern/spec.md — the lens, and what a run touched)
+    # ─────────────────────
+    admin.add_view(
+        DropDown(
+            label="Govern",
+            icon="fa fa-filter",
+            views=[
+                LensView(Lens, label="Lenses", icon="fa fa-filter"),
+                RunTouchView(RunTouch, label="Run touches", icon="fa fa-fingerprint"),
             ],
         ),
     )

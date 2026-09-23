@@ -1,7 +1,7 @@
 """Agent lifecycle and lineage (docs/for-developers/modules/work/spec.md, § 7) — the parts that protect the trace.
 
 Retire is not delete, a seeded agent is not deletable, and a spawned child's
-reach is its parent's reach or narrower. Those three are what keep the roster
+reach is its parent's reach or narrower. Those three are what keep the list
 honest once agents start making agents.
 """
 
@@ -11,7 +11,7 @@ import pytest
 
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent, AgentKind, AgentLifetime, AgentStatus
-from invana.apps.agents.schemas import AgentCreate
+from invana.apps.agents.schemas import AgentCreate, LifecycleAct, LifecycleEffect
 from invana.apps.work.managers import TaskManager
 from invana.apps.work.models import TaskStatus
 from invana.apps.work.schemas import TaskCreate
@@ -26,7 +26,7 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestSeeding:
-    async def test_an_atlas_is_born_with_a_roster_and_a_default(self, session, graph):
+    async def test_an_atlas_is_born_with_agents_and_a_default(self, session, graph):
         created = await AgentManager().seed_agents(session, graph=graph)
         await session.flush()
         assert {a.key for a in created} == {"explorer", "ql-query", "modeller", "coordinator"}
@@ -71,15 +71,50 @@ class TestLifecycle:
         assert agent.status == AgentStatus.retired.value
         assert await session.get(Agent, agent.id) is not None
 
-    async def test_the_retire_preview_names_the_open_tasks(self, session, graph, user, agent):
-        task = await tasks.create(
+    async def test_the_preview_names_each_piece_of_open_work_and_the_acts_differ(self, session, graph, user, agent):
+        """[LC8 · LC9] — one shape for both acts, and a todo in review is where
+        they part: a pause leaves it alone, a retire blocks it.
+
+        That divergence is the argument for items over a count — both previews
+        would read *2 open tasks* and only one of them would be true about this
+        one.
+        """
+        working = await tasks.create(
             session, graph=graph, payload=TaskCreate(title="Supplier review", body="x"), actor=user
         )
-        await tasks.assign(session, graph=graph, task=task, assignee_kind="agent", assignee_id=agent.id, actor=user)
+        await tasks.assign(session, graph=graph, task=working, assignee_kind="agent", assignee_id=agent.id, actor=user)
+        reviewing = await tasks.create(
+            session, graph=graph, payload=TaskCreate(title="Draft ready", body="x"), actor=user
+        )
+        await tasks.assign(
+            session, graph=graph, task=reviewing, assignee_kind="agent", assignee_id=agent.id, actor=user
+        )
+        # Set directly: what matters here is the state a preview reads, not the
+        # transition that put the task in it.
+        reviewing.status = TaskStatus.review.value
+        session.add(TaskRun(graph_id=graph.id, agent_id=agent.id, status="running", label="Nightly sweep"))
         await session.flush()
-        preview = await AgentLifecycleManager().retire_preview(session, agent=agent)
-        # A count is not enough to decide with.
-        assert preview.open_task_titles == ["Supplier review"]
+
+        lifecycle = AgentLifecycleManager()
+        pause = await lifecycle.preview(session, agent=agent, act=LifecycleAct.pause)
+        retire = await lifecycle.preview(session, agent=agent, act=LifecycleAct.retire)
+
+        def effect(preview, title):
+            return next(item.effect for item in preview.items if item.title == title)
+
+        assert effect(pause, "Supplier review") is LifecycleEffect.blocked
+        assert effect(retire, "Supplier review") is LifecycleEffect.blocked
+        assert effect(pause, "Draft ready") is LifecycleEffect.unchanged
+        assert effect(retire, "Draft ready") is LifecycleEffect.blocked
+        # Neither act kills a run — the reassurance a person reaches for at 3am.
+        assert effect(pause, "Nightly sweep") is LifecycleEffect.finishes
+        assert effect(retire, "Nightly sweep") is LifecycleEffect.finishes
+        assert (pause.act, retire.act) == (LifecycleAct.pause, LifecycleAct.retire)
+
+    async def test_an_agent_with_nothing_open_previews_nothing(self, session, graph, user, agent):
+        """The safe case is visibly safe — *nothing open* rather than a zero."""
+        preview = await AgentLifecycleManager().preview(session, agent=agent, act=LifecycleAct.pause)
+        assert preview.items == []
 
     async def test_a_seeded_agent_cannot_be_deleted(self, session, graph, user, agent):
         with pytest.raises(ConflictError):

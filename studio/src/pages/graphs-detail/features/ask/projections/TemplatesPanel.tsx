@@ -233,7 +233,7 @@ export function TemplatesDrawerBody({
 		<>
 			<PanelSection title="Result" hint={`${results.length}`}>
 				{results.length === 0 ? (
-					<p className="text-sm text-muted-foreground">
+					<p className="text-base text-muted-foreground">
 						None under this search.
 					</p>
 				) : (
@@ -251,7 +251,7 @@ export function TemplatesDrawerBody({
 			</PanelSection>
 			<PanelSection title="Prompt" hint={`${prompts.length}`}>
 				{prompts.length === 0 ? (
-					<p className="text-sm text-muted-foreground">
+					<p className="text-base text-muted-foreground">
 						None yet. A prompt template is how a step asks a closed question —
 						choice, yes/no, or a pick from the graph — so the answer is a value
 						rather than a sentence.
@@ -295,17 +295,17 @@ function TemplateRow({
 				<span className="flex items-center gap-1.5">
 					{/* The surface leads the row on the artboard — it is what the
 					    answer will look like, and the name is how it is referred to. */}
-					<span className="shrink-0 bg-muted px-1.5 py-0.5 font-mono text-meta leading-none text-muted-foreground">
+					<span className="shrink-0 bg-muted px-1.5 py-0.5 font-mono text-sm leading-none text-muted-foreground">
 						{template.surface}
 					</span>
 					{template.name}
 					{template.shipped ? (
-						<span className="border border-border px-1.5 py-0.5 text-meta uppercase leading-none text-muted-foreground">
+						<span className="border border-border px-1.5 py-0.5 text-sm uppercase leading-none text-muted-foreground">
 							shipped
 						</span>
 					) : null}
 					{template.status === "draft" ? (
-						<span className="border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-meta uppercase leading-none text-warning">
+						<span className="border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-sm uppercase leading-none text-warning">
 							draft
 						</span>
 					) : null}
@@ -324,7 +324,7 @@ function TemplateRow({
 							<Button
 								size="sm"
 								variant="ghost"
-								className="h-6 px-1.5 text-xs"
+								className="h-6 px-1.5 text-sm"
 								onClick={onPublish}
 							>
 								Publish
@@ -391,7 +391,7 @@ function TemplateDetail({
 				<PanelSection title="Accepts" hint="what it can render">
 					{/* The shape it accepts is why selection can rank it against the
 					    shipped templates — so it is stated, not hidden. */}
-					<pre className="overflow-x-auto whitespace-pre-wrap font-mono text-meta text-muted-foreground">
+					<pre className="overflow-x-auto whitespace-pre-wrap font-mono text-sm text-muted-foreground">
 						{JSON.stringify(template.accepts, null, 2)}
 					</pre>
 				</PanelSection>
@@ -490,7 +490,7 @@ function TemplateForm({
 						}
 						placeholder="a shape across categories"
 					/>
-					<p className="mt-1 text-xs text-muted-foreground">
+					<p className="mt-1 text-sm text-muted-foreground">
 						What it is for, so `project` can select it the way `plan` selects a
 						workflow.
 					</p>

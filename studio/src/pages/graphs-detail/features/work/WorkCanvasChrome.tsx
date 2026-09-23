@@ -143,7 +143,7 @@ export function WorkCanvasHeader({
 	const Icon = spec.icon;
 	return (
 		<div className="flex h-9 shrink-0 items-center border-b bg-card px-1.5">
-			<div className="flex h-7 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-2 text-sm">
+			<div className="flex h-7 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-2 text-base">
 				<Icon className="h-3.5 w-3.5 text-primary" />
 				<span className="font-mono">{title}</span>
 				<span className="text-muted-foreground">{spec.label}</span>
@@ -170,7 +170,7 @@ export function WorkCanvasStatus({ username, graphSlug, target }: Scope) {
 	const spec = CANVAS_KINDS[target.kind];
 	const { metrics } = useSubject({ username, graphSlug, target });
 	return (
-		<div className="flex items-center gap-2 text-sm">
+		<div className="flex items-center gap-2 text-base">
 			<span
 				className={cn(
 					"font-medium",

@@ -68,7 +68,7 @@ export function OnboardingWizard({
 					<div className="flex items-baseline justify-between gap-4">
 						<h1 className="truncate font-semibold text-lg">{graph.name}</h1>
 						<div className="flex shrink-0 items-center gap-2">
-							<p className="whitespace-nowrap text-meta text-muted-foreground">
+							<p className="whitespace-nowrap text-sm text-muted-foreground">
 								{doneRequired} of {SETUP_REQUIRED.length} required steps
 							</p>
 							{/* A ready Graph shows the identity card, not the wizard (G26),

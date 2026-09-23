@@ -18,15 +18,31 @@ class LLMProviderView(ModelView):
     fields = [
         "id",
         "graph_id",
+        "name",
         StringField("provider", label="Provider"),
-        "model_id",
         "base_url",
         "guardrails",
-        "is_default",
         "last_ping_at",
         "last_ping_ok",
         "last_ping_error",
         "created_at",
         "updated_at",
     ]
-    search_fields = ["model_id", "base_url"]
+    search_fields = ["name", "base_url"]
+
+
+class LLMModelView(ModelView):
+    label = "LLM models"
+    icon = "fa fa-cube"
+    fields = [
+        "id",
+        "provider_id",
+        "model_id",
+        "display_name",
+        "capabilities",
+        "pricing",
+        "status",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields = ["model_id", "display_name"]

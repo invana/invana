@@ -23,12 +23,12 @@ from invana.core.events.services import current_trace_id, emit_event
 
 
 class BoardManager:
-    querysets = BoardQuerySet()
+    boards_qs = BoardQuerySet()
 
     # Cross-app reach into `sessions`, for the two facts a data board needs: the
     # session it snapshots, and that session's last query.
-    _sessions = SessionQuerySet()
-    _messages = SessionMessageQuerySet()
+    _sessions_qs = SessionQuerySet()
+    _messages_qs = SessionMessageQuerySet()
 
     async def list_for_graph(
         self,
@@ -41,7 +41,7 @@ class BoardManager:
         include_archived: bool = False,
         kind: str | None = None,
     ) -> tuple[list[Board], int]:
-        items = await self.querysets.list_for_graph(
+        items = await self.boards_qs.list_for_graph(
             session,
             graph_id=graph_id,
             limit=limit,
@@ -50,13 +50,13 @@ class BoardManager:
             include_archived=include_archived,
             kind=kind,
         )
-        total = await self.querysets.count_for_graph(
+        total = await self.boards_qs.count_for_graph(
             session, graph_id=graph_id, include_archived=include_archived, kind=kind
         )
         return items, total
 
     async def get(self, session: AsyncSession, *, board_id: str, graph_id: str) -> Board:
-        board = await self.querysets.get(session, board_id)
+        board = await self.boards_qs.get(session, board_id)
         if board is None or board.graph_id != graph_id:
             raise NotFoundError("Board not found.")
         return board
@@ -76,7 +76,7 @@ class BoardManager:
             sess = await self._backing_session(
                 session, session_id=payload.session_id, graph_id=graph_id, user_id=user_id
             )
-            if await self.querysets.get_by_session(session, sess.id) is not None:
+            if await self.boards_qs.get_by_session(session, sess.id) is not None:
                 raise ConflictError("This session already has a board.")
         elif payload.kind == "data":
             # The one kind that is born from a thread.
@@ -85,7 +85,7 @@ class BoardManager:
         if spec.subject_required and not payload.subject_id:
             raise ValidationError(f"A {payload.kind} board needs a subject_id ({spec.subject}).")
         if payload.subject_id:
-            existing = await self.querysets.get_by_subject(
+            existing = await self.boards_qs.get_by_subject(
                 session, graph_id=graph_id, kind=payload.kind, subject_id=payload.subject_id
             )
             if existing is not None:
@@ -108,7 +108,7 @@ class BoardManager:
             source_query=payload.source_query
             or (await self._latest_source_query(session, session_id=sess.id) if sess else None),
         )
-        await self.querysets.add(session, board)
+        await self.boards_qs.add(session, board)
         await self._emit(session, actions.BOARD_CREATE, board, user_id, {"kind": board.kind, "title": board.title})
         return board
 
@@ -134,7 +134,7 @@ class BoardManager:
         if not is_declared(kind):
             raise ValidationError(f"{kind} is a drawn board — create it with a POST to /boards.")
 
-        board = await self.querysets.get_by_subject(session, graph_id=graph_id, kind=kind, subject_id=subject_id)
+        board = await self.boards_qs.get_by_subject(session, graph_id=graph_id, kind=kind, subject_id=subject_id)
         if board is not None:
             return board
 
@@ -145,7 +145,7 @@ class BoardManager:
             created_by_id=user_id,
             title=title or f"{kind} {subject_id[:8]}",
         )
-        await self.querysets.add(session, board)
+        await self.boards_qs.add(session, board)
         await self._emit(session, actions.BOARD_CREATE, board, user_id, {"kind": kind, "subject_id": subject_id})
         return board
 
@@ -173,7 +173,7 @@ class BoardManager:
 
     async def delete(self, session: AsyncSession, *, board: Board, actor_id: str) -> None:
         board_id, graph_id, kind = board.id, board.graph_id, board.kind
-        await self.querysets.delete(session, board)
+        await self.boards_qs.delete(session, board)
         await emit_event(
             session,
             action=actions.BOARD_DELETE,
@@ -204,14 +204,14 @@ class BoardManager:
         rule: it must exist, be in this Graph, and **belong to the caller** —
         sessions are private, so you can only snapshot your own.
         """
-        sess = await self._sessions.get(session, session_id)
+        sess = await self._sessions_qs.get(session, session_id)
         if sess is None or sess.graph_id != graph_id or sess.created_by_id != user_id:
             raise NotFoundError("Session not found.")
         return sess
 
     async def _latest_source_query(self, session: AsyncSession, *, session_id: str) -> str | None:
         """The most recent message's ``source_query`` in the backing session."""
-        messages = await self._messages.list_messages(session, session_id=session_id)
+        messages = await self._messages_qs.list_messages(session, session_id=session_id)
         for msg in reversed(messages):
             if msg.source_query:
                 return msg.source_query

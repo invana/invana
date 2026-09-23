@@ -185,6 +185,34 @@ four.
 Old param names stay **readable** so bookmarks survive, and are never written — the one-way alias
 `useSettingsPanel` already applies to `?settings=`.
 
+### A region that opens takes its width from `mainSection`
+
+Every screen is drawn at **1440**, so opening `rightSection` is a subtraction, never a widening:
+`leftNav` 45 + `leftSection` 420 + `mainSection`, and the occupant's own width comes out of
+`mainSection` alone.
+
+| `rightSection` | `mainSection` |
+|---|---|
+| absent | **974** |
+| the Assistant, or the Inspector (360) | **613** |
+
+`leftSection` never gives. It is the panel you are working *from* — a list you are picking in, a
+palette you are dragging from — and a region that narrowed when another opened would move the thing
+the cursor was already on.
+
+**`mainSection` narrowing is not a smaller drawing of the same screen.** Each part answers for
+itself, and the rules are the same wherever a board is drawn:
+
+| Part | At 613 |
+|---|---|
+| a **canvas** | **pans, never refits.** Scale is the user's and position is the app's: a refit on every panel toggle would move every node. It pans to the **selection**, because what must never end up behind the new edge is what you were working on |
+| a **table** | keeps its key columns and scrolls the rest; it does not drop one silently |
+| a **two-column region** | **stacks below 720**, in reading order, in one scroll. Nothing moves to another region |
+| a **pagehead** | keeps the record's name (truncated, never wrapped), the reading switch and the one primary act; secondary acts fold into the `⋯`, and badges the body already states go |
+
+Stated for the draft board as [DP13 · DP14](../modules/workflows/features/draft-a-plan.md#decisions),
+drawn as `library.plans.detail.flow_canvas.edit` and `…edit.assistant`.
+
 ### What is actually wired today
 
 Validated against `shell/GraphDetail.tsx` and `GraphDetailPage.tsx`, so the table above is read as

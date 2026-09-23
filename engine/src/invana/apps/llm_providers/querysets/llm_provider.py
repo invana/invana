@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.llm_providers.models import LLMProvider
@@ -17,9 +17,9 @@ class LLMProviderQuerySet:
         stmt = select(LLMProvider).where(LLMProvider.id == provider_id)
         return (await session.execute(stmt)).scalar_one_or_none()
 
-    async def get_default(self, session: AsyncSession, graph_id: str) -> LLMProvider | None:
-        """The Graph's default provider, if one is set."""
-        stmt = select(LLMProvider).where(LLMProvider.graph_id == graph_id, LLMProvider.is_default.is_(True))
+    async def get_by_name(self, session: AsyncSession, graph_id: str, name: str) -> LLMProvider | None:
+        """By the address segment — what a rule and a refusal both carry (PM10)."""
+        stmt = select(LLMProvider).where(LLMProvider.graph_id == graph_id, LLMProvider.name == name)
         return (await session.execute(stmt)).scalar_one_or_none()
 
     async def add(self, session: AsyncSession, provider: LLMProvider) -> LLMProvider:
@@ -29,12 +29,3 @@ class LLMProviderQuerySet:
 
     async def delete(self, session: AsyncSession, provider: LLMProvider) -> None:
         await session.delete(provider)
-
-    async def clear_default(self, session: AsyncSession, graph_id: str) -> None:
-        """Unset ``is_default`` on every row for this Graph."""
-        await session.execute(
-            update(LLMProvider)
-            .where(LLMProvider.graph_id == graph_id)
-            .where(LLMProvider.is_default.is_(True))
-            .values(is_default=False),
-        )

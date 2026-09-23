@@ -11,12 +11,20 @@
  *
  * - **Offered and applied stay two lists** (RT3). `offered` is a fact about the
  *   prompt; `applied` is the model's own report. Showing one number would be a
- *   claim we cannot make.
+ *   claim we cannot make. Rules carry the same pair, drawn as the statements
+ *   themselves rather than as counts — a rule is only readable as its wording
+ *   (RU12). A statement links to its rule's board, and because this is a modal
+ *   the act is **close the trace, then open the board** — a board opened behind
+ *   a dialog is a page nobody can see, and dropping the link would make the
+ *   answer surface the one place a rule cannot be reached (RU13). The trace is
+ *   one click away again on the same citation chip.
  * - **The generated query is verbatim and copyable** (RT2), so the check on the
  *   answer is running the query yourself, not trusting the prose around it.
  */
 
 import { formatDuration } from "@/lib/time";
+import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
+import { StepRules } from "@/pages/graphs-detail/features/work/StepRules";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 import { type TraceStepRead, traceApi } from "@/services/api/runs";
 import {
@@ -58,6 +66,15 @@ export function TraceDialog({
 	runId,
 }: Props) {
 	const [selectedId, setSelectedId] = useState<string | null>(null);
+	// Null outside the page host — a statement then reads as text rather than as
+	// a link that fails (RU13).
+	const openBoard = useOpenBoard();
+	const openRule = openBoard
+		? (ruleId: string) => {
+				onClose();
+				openBoard("rule", ruleId);
+			}
+		: undefined;
 	const trace = useQuery({
 		queryKey: ["trace", username, graphSlug, runId] as const,
 		queryFn: () => traceApi.get(username, graphSlug, runId),
@@ -96,7 +113,7 @@ export function TraceDialog({
 				{trace.isLoading ? (
 					<Spinner />
 				) : steps.length === 0 ? (
-					<p className="text-sm text-muted-foreground">
+					<p className="text-base text-muted-foreground">
 						This run's steps have been purged. The shape of what happened stays
 						on the record; the payloads do not.
 					</p>
@@ -109,7 +126,7 @@ export function TraceDialog({
 									type="button"
 									onClick={() => setSelectedId(step.id)}
 									className={cn(
-										"flex w-full flex-col gap-0.5 rounded-sm px-2 py-1.5 text-left text-sm",
+										"flex w-full flex-col gap-0.5 rounded-sm px-2 py-1.5 text-left text-base",
 										selected?.id === step.id
 											? "bg-accent"
 											: "hover:bg-accent/50",
@@ -119,12 +136,12 @@ export function TraceDialog({
 										<StatusDot tone={stepTone(step.status)} />
 										<span className="truncate">{step.label}</span>
 										{step.attempt > 1 ? (
-											<span className="text-xs text-warning">
+											<span className="text-sm text-warning">
 												attempt {step.attempt}
 											</span>
 										) : null}
 									</span>
-									<span className="truncate text-xs text-muted-foreground">
+									<span className="truncate text-sm text-muted-foreground">
 										{step.detail || step.task_key}
 									</span>
 								</button>
@@ -137,6 +154,7 @@ export function TraceDialog({
 									step={selected}
 									username={username}
 									graphSlug={graphSlug}
+									onOpenRule={openRule}
 								/>
 							) : null}
 						</div>
@@ -151,23 +169,26 @@ function StepDetail({
 	step,
 	username,
 	graphSlug,
+	onOpenRule,
 }: {
 	step: TraceStepRead;
 	username: string;
 	graphSlug: string;
+	/** Close the trace and open the rule's board (RU13). */
+	onOpenRule?: (ruleId: string) => void;
 }) {
 	const query =
 		(step.output?.query as string | undefined) ??
 		(step.input?.query as string | undefined);
 
 	return (
-		<div className="flex flex-col gap-3 text-sm">
+		<div className="flex flex-col gap-3 text-base">
 			<div className="flex flex-wrap items-baseline gap-2">
 				<span className="font-medium">{step.label}</span>
-				<span className="font-mono text-xs text-muted-foreground">
+				<span className="font-mono text-sm text-muted-foreground">
 					{step.task_key}
 				</span>
-				<span className="text-xs text-muted-foreground">
+				<span className="text-sm text-muted-foreground">
 					{step.duration_ms !== null ? formatDuration(step.duration_ms) : "—"}
 					{step.tokens_in != null
 						? ` · ${step.tokens_in} in · ${step.tokens_out ?? 0} out`
@@ -181,11 +202,11 @@ function StepDetail({
 			<Section title="Skills">
 				{step.skills_offered.length === 0 &&
 				step.skills_applied.length === 0 ? (
-					<p className="text-xs text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						None offered on this step.
 					</p>
 				) : (
-					<div className="space-y-1 text-xs">
+					<div className="space-y-1 text-sm">
 						<p>
 							<span className="text-muted-foreground">offered</span>{" "}
 							{step.skills_offered.length}
@@ -201,6 +222,21 @@ function StepDetail({
 							</span>
 						</p>
 					</div>
+				)}
+			</Section>
+
+			{/* The other pair, and the wording rather than a count (RU12). */}
+			<Section title="Rules">
+				{step.rules_offered.length === 0 ? (
+					<p className="text-sm text-muted-foreground">
+						None offered on this step.
+					</p>
+				) : (
+					<StepRules
+						offered={step.rules_offered}
+						cited={step.rules_cited}
+						onOpenRule={onOpenRule}
+					/>
 				)}
 			</Section>
 
@@ -263,7 +299,7 @@ function ChildTrace({
 			<button
 				type="button"
 				onClick={() => setOpen((v) => !v)}
-				className="flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs"
+				className="flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-sm"
 			>
 				<ChevronRight
 					className={cn("h-3 w-3 transition-transform", open && "rotate-90")}
@@ -282,13 +318,13 @@ function ChildTrace({
 					{child.isLoading ? (
 						<Spinner />
 					) : !child.data ? (
-						<p className="text-xs text-muted-foreground">
+						<p className="text-sm text-muted-foreground">
 							The child's trace has been pruned.
 						</p>
 					) : (
 						<ul className="space-y-0.5">
 							{child.data.steps.map((s) => (
-								<li key={s.id} className="flex items-center gap-1.5 text-xs">
+								<li key={s.id} className="flex items-center gap-1.5 text-sm">
 									<StatusDot tone={stepTone(s.status)} />
 									<span className="truncate">{s.label}</span>
 									<span className="truncate text-muted-foreground">
@@ -310,7 +346,7 @@ function QueryBlock({ query }: { query: string }) {
 	return (
 		<div className="rounded-sm border">
 			<div className="flex items-center justify-between border-b px-2 py-1">
-				<span className="text-xs text-muted-foreground">
+				<span className="text-sm text-muted-foreground">
 					the query, as executed
 				</span>
 				<Button
@@ -331,7 +367,7 @@ function QueryBlock({ query }: { query: string }) {
 					)}
 				</Button>
 			</div>
-			<pre className="overflow-x-auto px-2 py-1.5 font-mono text-xs">
+			<pre className="overflow-x-auto px-2 py-1.5 font-mono text-sm">
 				{query}
 			</pre>
 		</div>
@@ -347,7 +383,7 @@ function Section({
 }) {
 	return (
 		<div>
-			<p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
+			<p className="mb-1 text-sm uppercase tracking-wide text-muted-foreground">
 				{title}
 			</p>
 			{children}
@@ -358,10 +394,10 @@ function Section({
 function Facts({ data }: { data: Record<string, unknown> }) {
 	const rows = Object.entries(data).filter(([, v]) => v !== null && v !== "");
 	if (rows.length === 0) {
-		return <p className="text-xs text-muted-foreground">Nothing recorded.</p>;
+		return <p className="text-sm text-muted-foreground">Nothing recorded.</p>;
 	}
 	return (
-		<dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0.5 text-xs">
+		<dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-0.5 text-sm">
 			{rows.map(([key, value]) => (
 				<div key={key} className="contents">
 					<dt className="text-muted-foreground">{key}</dt>

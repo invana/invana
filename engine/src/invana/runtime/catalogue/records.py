@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -45,6 +45,7 @@ from invana.runtime.catalogue.stitching import load_stitch_rows
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+    from invana.apps.modeller.models import ModelLink
     from invana.graph.connectors.base.connector import BaseConnector
 
 _DEFAULT_IDENTITY = ["id"]
@@ -354,6 +355,8 @@ async def _solve_active_stitches(
     run_id: str,
     root: Path,
     report: list[dict],
+    admit: Callable[[ModelLink], Awaitable[bool]] | None = None,
+    on_written: Callable[[ModelLink, int], None] | None = None,
 ) -> dict[str, int]:
     """Run the Graph's active stitches against this load (ST47, ST51).
 
@@ -362,6 +365,10 @@ async def _solve_active_stitches(
     is loaded from `stitches/<EDGE_TYPE>.json` (LD19). Staged stitches are left
     alone — nothing outside the union may write to the graph — and a read-only
     connection writes nothing at all, here as everywhere.
+
+    ``admit`` is the run's lens on each stitch's two models (ST53): a stitch it
+    refuses is skipped and the rest are still solved. ``on_written`` hands each
+    stitch's count back, so the step can say which models the edges went into.
     """
     connection = await GraphManager().get_graph_connection(session, graph_id=graph_id)
     if connection is None or connection.read_only:
@@ -369,19 +376,27 @@ async def _solve_active_stitches(
     active = await list_links(session, graph_id, status="active")
     joined = [link for link in active if solvable(link)]
     supplied = [link for link in active if link.source_model_id == model_id and link.edge_type]
+    if admit is not None:
+        joined = [link for link in joined if await admit(link)]
+        supplied = [link for link in supplied if await admit(link)]
     if not joined and not supplied:
         return {}
 
+    by_id = {link.id: link for link in joined}
     written: dict[str, int] = {}
     await connector.connect()
     try:
         for solved in await solve_links(connector, joined, run_id=run_id):
             if solved.written:
                 written[solved.edge_type] = written.get(solved.edge_type, 0) + solved.written
+                if on_written:
+                    on_written(by_id[solved.link_id], solved.written)
         for link in supplied:
             loaded = await load_stitch_rows(connector, link, root=root, model_id=model_id)
             if loaded.written:
                 written[loaded.edge_type] = written.get(loaded.edge_type, 0) + loaded.written
+                if on_written:
+                    on_written(link, loaded.written)
             report.extend(loaded.report)
     finally:
         await connector.disconnect()

@@ -34,7 +34,7 @@ export function SubgraphBody({ emission }: { emission: SubgraphEmission }) {
 	const { nodes, edges } = emission.data;
 	const summary = `${nodes.length.toLocaleString()} ${nodes.length === 1 ? "node" : "nodes"} · ${edges.length.toLocaleString()} ${edges.length === 1 ? "edge" : "edges"}`;
 	return (
-		<div className="px-[9px] py-2 text-meta text-muted-foreground">
+		<div className="px-[9px] py-2 text-sm text-muted-foreground">
 			{emission.onCanvas
 				? `${summary} added to the canvas — nothing replaced`
 				: `${summary} in this answer`}
@@ -51,13 +51,13 @@ export function MetricBody({ emission }: { emission: MetricEmission }) {
 					{emission.value}
 				</span>
 				{emission.label && (
-					<span className="text-meta text-muted-foreground">
+					<span className="text-sm text-muted-foreground">
 						{emission.label}
 					</span>
 				)}
 			</div>
 			{emission.comparison && (
-				<div className="mt-1 text-meta text-muted-foreground">
+				<div className="mt-1 text-sm text-muted-foreground">
 					{emission.comparison}
 				</div>
 			)}
@@ -71,14 +71,14 @@ export function ChartBody({ emission }: { emission: ChartEmission }) {
 	return (
 		<div className="px-[9px] py-2">
 			{emission.caption && (
-				<div className="mb-1.5 text-meta text-muted-foreground">
+				<div className="mb-1.5 text-sm text-muted-foreground">
 					{emission.caption}
 				</div>
 			)}
 			<div className="flex flex-col gap-0.5">
 				{emission.series.map((point) => (
 					<div key={point.label} className="flex h-4 items-center gap-2">
-						<span className="w-20 shrink-0 truncate text-meta text-muted-foreground">
+						<span className="w-20 shrink-0 truncate text-sm text-muted-foreground">
 							{point.label}
 						</span>
 						<span className="flex h-1.5 min-w-0 flex-1 items-center">
@@ -89,7 +89,7 @@ export function ChartBody({ emission }: { emission: ChartEmission }) {
 								}}
 							/>
 						</span>
-						<span className="w-12 shrink-0 text-right text-meta tabular-nums">
+						<span className="w-12 shrink-0 text-right text-sm tabular-nums">
 							{point.display ?? point.value.toLocaleString()}
 						</span>
 					</div>
@@ -102,10 +102,10 @@ export function ChartBody({ emission }: { emission: ChartEmission }) {
 /** A statement the records support — and the records it stands on (AS4). */
 export function ProseBody({ emission }: { emission: ProseEmission }) {
 	return (
-		<div className="px-[9px] py-2 text-meta">
+		<div className="px-[9px] py-2 text-sm">
 			<p className="whitespace-pre-wrap break-words">{emission.text}</p>
 			{emission.citations && emission.citations.length > 0 && (
-				<p className="mt-1 text-meta text-muted-foreground">
+				<p className="mt-1 text-sm text-muted-foreground">
 					{emission.citations.join(" · ")}
 				</p>
 			)}
@@ -116,7 +116,7 @@ export function ProseBody({ emission }: { emission: ProseEmission }) {
 /** Zero records, worded as an answer rather than drawn as a blank table (AS7). */
 export function EmptyBody({ emission }: { emission: EmptyEmission }) {
 	return (
-		<div className="px-[9px] py-2 text-meta text-muted-foreground">
+		<div className="px-[9px] py-2 text-sm text-muted-foreground">
 			{emission.statement}
 		</div>
 	);

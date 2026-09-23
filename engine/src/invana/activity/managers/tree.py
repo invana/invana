@@ -20,10 +20,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent
-from invana.apps.skills.models import RuleVersion, Skill, SkillVersion
+from invana.apps.skills.models import Skill, SkillVersion
 from invana.apps.work.schemas import ActivityNode, TaskActivityResponse
 from invana.core.auth.models import User
 from invana.core.events.models import ActorKind, Event
+from invana.runtime.managers.rule_citations import offered_rules
 from invana.runtime.models import TaskRun
 
 # What a step's payload can no longer show once the stream has aged out
@@ -76,7 +77,7 @@ class TreeManager:
 
         names = await _principal_names(session, events=events, runs=runs)
         skill_names = await _skill_names(session, steps=steps)
-        rule_statements = await _rule_statements(session, steps=steps)
+        rules = await offered_rules(session, steps=steps)
 
         nodes: dict[str, ActivityNode] = {}
         for event in events:
@@ -113,7 +114,11 @@ class TreeManager:
                 run_id=step.parent_run_id,
                 skills_offered=[skill_names.get(s, s) for s in (step.skills_offered or [])],
                 skills_applied=[skill_names.get(s, s) for s in (step.skills_applied or [])],
-                rules_cited=[rule_statements[r] for r in (step.rules_cited or []) if r in rule_statements],
+                # Both halves, so the row says *out of these six* and not only
+                # *followed these two* (RU12). An id whose rule is gone resolves
+                # to nothing and is dropped — a row shows statements.
+                rules_offered=[rules[r] for r in (step.rules_offered or []) if r in rules],
+                rules_cited=[rules[r] for r in (step.rules_cited or []) if r in rules],
                 tokens_in=step.tokens_in,
                 tokens_out=step.tokens_out,
                 at=step.started_at,
@@ -183,21 +188,6 @@ async def _principal_names(session: AsyncSession, *, events: list[Event], runs: 
     for agent in agents:
         out[agent.id] = agent.name
     return out
-
-
-async def _rule_statements(session: AsyncSession, *, steps: list[TaskRun]) -> dict[str, str]:
-    """``rule_version_id`` → the wording that was offered.
-
-    The version, not the rule: a citation says what the step read, so rewording
-    the rule afterwards must not rewrite the trace (RU4 · C5).
-    """
-    ids: set[str] = set()
-    for step in steps:
-        ids.update(step.rules_cited or [])
-    if not ids:
-        return {}
-    stmt = select(RuleVersion.id, RuleVersion.statement).where(RuleVersion.id.in_(list(ids)))
-    return dict((await session.execute(stmt)).all())
 
 
 async def _skill_names(session: AsyncSession, *, steps: list[TaskRun]) -> dict[str, str]:

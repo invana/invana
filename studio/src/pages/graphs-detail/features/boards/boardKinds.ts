@@ -2,7 +2,7 @@
  * The board `kind` registry — one flat axis, and the law that governs a click
  * on each ([boards-migration § 5](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
- * `kind` is **one column of nine values**. Whether a board is *drawn* or
+ * `kind` is **one column of ten values**. Whether a board is *drawn* or
  * *declared* is `renders`, a trait of the row here — not a second column, which
  * would make `kind=canvas, subject=run` representable and meaningless (B3).
  * The engine mirrors this table in `apps/boards/kinds.py`, and
@@ -15,12 +15,15 @@
  * > *is* creating the relationship — and even then it hands off to the same
  * > form the panel uses.
  *
- * Exactly **two** of the six drawn kinds write from a gesture, and both write
- * the same thing: an edge, because drawing it is the only natural way to say
- * it. Everything a user would call a "setting" — a name, an arg, a budget, an
- * assignee, a colour — is edited in the panel, on every kind, with no
- * exception. A new exception is argued in the feature file, never added in
- * code. A declared kind has no gesture at all.
+ * Exactly **three** of the six drawn kinds write from a gesture — `model`,
+ * `plan`, and `workflow` while drafting — and each writes an edge or a
+ * placement, because drawing it is the only natural way to say it. Everything
+ * a user would call a "setting" — a name, an arg, a budget, an assignee, a
+ * colour — is edited in a form, on every kind, with no exception; on
+ * `workflow` that form is `bottomSection`, not the panel and never a card
+ * floating over the drawing (draft-a-plan.md DP11). A new exception is argued
+ * in the feature file, never added in code. A declared kind has no gesture at
+ * all.
  *
  * ## Why this file exists
  *
@@ -35,9 +38,15 @@ import {
 	Boxes,
 	Database,
 	GitBranch,
+	GitCompareArrows,
+	Globe,
 	LayoutDashboard,
 	ListTree,
+	Quote,
+	Scale,
+	ShieldCheck,
 	SquareActivity,
+	TrendingUp,
 	Workflow,
 } from "lucide-react";
 import type { ElementType } from "react";
@@ -168,7 +177,7 @@ export function specFor(kind: string | undefined): CanvasKindSpec {
  * Five kinds are unambiguous, because every node is the same kind of thing as
  * the rows in the open panel. `lineage` breaks that — its nodes are agents,
  * people and tasks — so it is the one kind with a per-node branch (docs/for-developers/modules/agents/features/lineage.md):
- * an *agent* selects into the roster, a *task* navigates to Tasks, a *person*
+ * an *agent* selects into the agents list, a *task* navigates to Tasks, a *person*
  * is inert because MVP has no person surface.
  */
 export function clickBehaviour(
@@ -190,7 +199,7 @@ export function clickBehaviour(
  * says which ([boards-migration § 5](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * The six above are drawn: elements at positions, a camera, layers, a layout
- * engine. These two are declared: panels from a closed set, bound to one
+ * engine. These four are declared: panels from a closed set, bound to one
  * record, laid out by the spec ([CV12](../../../../../docs/for-developers/modules/explore/features/boards.md)).
  * They share the page host, the tab strip and the id shape; they share no
  * drawing code, which is why `renders` is the **only** thing the host branches
@@ -201,7 +210,16 @@ export function clickBehaviour(
  * has no legend and no gesture. That is § 5.1's table, as a union rather than
  * as six fields nobody fills in.
  */
-export type DeclaredKind = "run" | "task_run" | "plan_runs";
+export type DeclaredKind =
+	| "run"
+	| "task_run"
+	| "plan_runs"
+	| "compare"
+	| "skill"
+	| "skill_usage"
+	| "rule"
+	| "world"
+	| "guardrail";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -243,6 +261,85 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// A task on the run dashboard's flow (SR18) — never a list row of its own.
 		panel: "runs",
 		subject: "one attempt of a task — a child task_runs.id",
+	},
+	// R3 · the same question under two worlds, and what B touched that A did not
+	// (docs/for-developers/modules/govern/features/worlds.md WO4). **The diff is
+	// the deliverable**, not the two answers — it is the only part a person
+	// cannot reconstruct by reading both runs.
+	//
+	// Its subject is a **pair**, `<runA>:<runB>`, which the id parser already
+	// handles: it splits on the *first* colon, so everything after `compare:` is
+	// the subject. Nothing is simulated and no answer is synthesised from
+	// another, so there is no record behind it to key on.
+	compare: {
+		kind: "compare",
+		renders: "dashboard",
+		label: "Compare",
+		icon: GitCompareArrows,
+		// `Compare…` in the Worlds drawer, or the run dashboard's lens band.
+		panel: "govern",
+		subject: 'two root task_runs.id joined by ":"',
+	},
+	// Skills' three readings
+	// (docs/for-developers/building-studio/skills-dashboards.md). `skill` and
+	// `skill_usage` name the same record and are **not** the same page: one is
+	// what the playbook declares and will engage, drawn from its plan; the
+	// other is what happened when it was offered, drawn from `task_runs`. The
+	// same pair the layer strip reads in two tenses (SD2).
+	skill: {
+		kind: "skill",
+		renders: "dashboard",
+		label: "Skill",
+		icon: Scale,
+		// `More` on the Skills drawer, drilled in (SK36).
+		panel: "skills",
+		subject: "a skills.id",
+	},
+	// Addressed by the skill, not by a version: one read returns every version,
+	// and the page's job is reading one count against the next — so a board per
+	// version would be seven boards each holding a seventh of one reading (SD1).
+	skill_usage: {
+		kind: "skill_usage",
+		renders: "dashboard",
+		label: "Usage",
+		icon: TrendingUp,
+		// `Usage…` on the skill board, or `More` on the drawer's Usage tab.
+		panel: "skills",
+		subject: "a skills.id",
+	},
+	rule: {
+		kind: "rule",
+		renders: "dashboard",
+		label: "Rule",
+		icon: Quote,
+		// `More` on the Rules drawer, drilled in (RU11).
+		panel: "skills",
+		subject: "a rules.id",
+	},
+	// A world and a guardrail are **one `lenses` row separated by `kind`**
+	// (GV1), and one composer draws both. They are two kinds for the reason the
+	// two names exist at all: a tab reading `Lens` would make a reader open it
+	// to find out which of the two bounds they are looking at (WO15 · GR14).
+	//
+	// Neither tab is titled by `label`, either — the host names a lens board
+	// after the lens, so a strip of four worlds reads as four worlds.
+	world: {
+		kind: "world",
+		renders: "dashboard",
+		label: "World",
+		icon: Globe,
+		// The Worlds drill-in opens it (WO15).
+		panel: "govern",
+		subject: "a lenses.id",
+	},
+	guardrail: {
+		kind: "guardrail",
+		renders: "dashboard",
+		label: "Guardrail",
+		icon: ShieldCheck,
+		// The Guardrails drill-in opens it (GR14).
+		panel: "govern",
+		subject: "a lenses.id",
 	},
 };
 

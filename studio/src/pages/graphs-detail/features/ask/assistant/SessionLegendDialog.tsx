@@ -77,10 +77,10 @@ export function SessionLegendDialog({
 								aria-hidden
 							/>
 							<span className="min-w-0">
-								<span className="block text-sm font-medium text-foreground">
+								<span className="block text-base font-medium text-foreground">
 									{entry.label}
 								</span>
-								<span className="block text-sm text-muted-foreground">
+								<span className="block text-base text-muted-foreground">
 									{entry.description}
 								</span>
 							</span>

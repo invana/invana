@@ -15,11 +15,12 @@ from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
 from invana.core.auth.models import User
-from invana.runtime.managers import SkillUsageManager
+from invana.runtime.managers import SkillDraftManager, SkillUsageManager
 from invana.runtime.managers.skill_usage import MIN_OFFERS_TO_READ
 from invana.runtime.models import TaskRun
 
 skills = SkillManager()
+drafts = SkillDraftManager()
 usage = SkillUsageManager()
 
 
@@ -48,8 +49,8 @@ async def _step(session: AsyncSession, graph: Graph, root: TaskRun, *, offered: 
 
 async def test_v1_diffs_against_nothing(session: AsyncSession, graph: Graph, user: User) -> None:
     """A first version did not delete anything, so it is not compared to empty text."""
-    skill = await skills.create(
-        session, graph_id=graph.id, payload=SkillCreate(name="First", content="hello"), actor_id=user.id
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="First", content="hello"), actor_id=user.id, publish=True
     )
 
     diff = await skills.diff_version(session, skill=skill, version=1)
@@ -60,13 +61,14 @@ async def test_v1_diffs_against_nothing(session: AsyncSession, graph: Graph, use
 
 
 async def test_a_rewrite_reports_only_the_field_that_moved(session: AsyncSession, graph: Graph, user: User) -> None:
-    skill = await skills.create(
+    skill = await drafts.create(
         session,
         graph_id=graph.id,
         payload=SkillCreate(name="Moved", description="keep", content="before"),
         actor_id=user.id,
+        publish=True,
     )
-    await skills.publish(session, skill=skill, payload=SkillVersionPublish(content="after"), actor_id=user.id)
+    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(content="after"), actor_id=user.id)
 
     diff = await skills.diff_version(session, skill=skill, version=2)
 
@@ -80,7 +82,9 @@ async def test_a_rewrite_reports_only_the_field_that_moved(session: AsyncSession
 async def test_usage_splits_the_current_version_by_agent_and_by_outcome(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Split"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Split"), actor_id=user.id, publish=True
+    )
     v1 = skill.current_version_id
     explorer = Agent(graph_id=graph.id, name="Explorer")
     session.add(explorer)
@@ -102,7 +106,9 @@ async def test_usage_splits_the_current_version_by_agent_and_by_outcome(
 
 async def test_a_handful_of_runs_is_not_enough_to_read(session: AsyncSession, graph: Graph, user: User) -> None:
     """US6 — offered 1, applied 0 is one run, not 0%."""
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Thin"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Thin"), actor_id=user.id, publish=True
+    )
     root = await _run(session, graph, agent_id=None, outcome="answered")
     await _step(session, graph, root, offered=[skill.current_version_id], applied=[])
 

@@ -71,7 +71,7 @@ function ViewToggle({
 		<button
 			type="button"
 			onClick={onClick}
-			className={`px-2.5 py-1 rounded text-sm transition-colors ${
+			className={`px-2.5 py-1 rounded text-base transition-colors ${
 				active
 					? "bg-primary text-primary-foreground font-medium"
 					: "text-muted-foreground hover:text-foreground hover:bg-accent"

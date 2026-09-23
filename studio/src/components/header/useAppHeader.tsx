@@ -3,9 +3,17 @@ import { GitHubStars } from "@/components/GitHubStars";
 import { ThemeMenu } from "@/components/ThemeMenu";
 import { OnboardingCap } from "@/components/header/OnboardingCap";
 import { useAuth } from "@/hooks/useAuth";
-import { Separator } from "@invana/ui";
-import { ChevronRight } from "lucide-react";
-import type { ReactNode } from "react";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+	Separator,
+	cn,
+} from "@invana/ui";
+import { Fragment, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 interface AppHeaderOptions {
@@ -88,7 +96,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 				{(segments.length > 0 || leftExtras) && (
 					<Separator orientation="vertical" className="h-4" />
 				)}
-				{segments.length > 0 && <Breadcrumb segments={segments} />}
+				{segments.length > 0 && <HeaderBreadcrumb segments={segments} />}
 				{leftExtras}
 			</div>
 		),
@@ -121,44 +129,38 @@ interface Segment {
 	muted?: boolean;
 }
 
-function Breadcrumb({ segments }: { segments: Segment[] }) {
+function HeaderBreadcrumb({ segments }: { segments: Segment[] }) {
 	return (
-		<nav
-			className="flex items-center gap-1 min-w-0 font-semibold"
-			aria-label="Breadcrumb"
-		>
-			{segments.map((s, i) => {
-				const isLast = i === segments.length - 1;
-				return (
-					<span
-						key={`${s.label}-${i}`}
-						className="flex items-center gap-1 min-w-0"
-					>
-						{i > 0 && (
-							<ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-						)}
-						{s.to && !isLast ? (
-							<Link
-								to={s.to}
-								className="text-muted-foreground hover:text-foreground transition-colors truncate"
-							>
-								{s.label}
-							</Link>
-						) : (
-							<span
-								className={
-									isLast
-										? "text-foreground truncate"
-										: "text-muted-foreground truncate"
-								}
-							>
-								{s.label}
-							</span>
-						)}
-					</span>
-				);
-			})}
-		</nav>
+		<Breadcrumb className="min-w-0 font-semibold">
+			<BreadcrumbList className="flex-nowrap gap-1 sm:gap-1">
+				{segments.map((s, i) => {
+					const isLast = i === segments.length - 1;
+					return (
+						<Fragment key={`${s.label}-${i}`}>
+							{i > 0 && (
+								<BreadcrumbSeparator className="shrink-0 text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5" />
+							)}
+							<BreadcrumbItem className="min-w-0">
+								{s.to && !isLast ? (
+									<BreadcrumbLink asChild className="truncate">
+										<Link to={s.to}>{s.label}</Link>
+									</BreadcrumbLink>
+								) : (
+									<BreadcrumbPage
+										className={cn(
+											"truncate",
+											!isLast && "text-muted-foreground",
+										)}
+									>
+										{s.label}
+									</BreadcrumbPage>
+								)}
+							</BreadcrumbItem>
+						</Fragment>
+					);
+				})}
+			</BreadcrumbList>
+		</Breadcrumb>
 	);
 }
 

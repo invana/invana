@@ -178,6 +178,13 @@ def _clauses(masked: str, depth: list[int]) -> list[_Clause]:
     return found
 
 
+def _rstrip_to(masked: str, start: int, end: int) -> int:
+    """``end`` moved back over trailing whitespace, never past ``start``."""
+    while end > start and masked[end - 1].isspace():
+        end -= 1
+    return end
+
+
 def _split_items(masked: str, start: int, end: int, depth: list[int]) -> list[tuple[int, int]]:
     """Top-level comma-separated spans of a RETURN/WITH body."""
     spans: list[tuple[int, int]] = []
@@ -456,7 +463,13 @@ class CypherLensCompiler(LensCompiler):
                 continue
             if not binding.bound.narrows_structure:
                 continue
-            edits.append((start, end, " " + self._element_map(binding) + f" AS {alias or var}"))
+            # The item's span runs to the **next clause's keyword**, so the last
+            # return item owns the whitespace in front of `LIMIT`/`ORDER BY`/`SKIP`.
+            # Replacing that span whole would weld the alias to the keyword —
+            # `AS dLIMIT 5` — so the edit ends where the item's own text ends and
+            # the separator is left where the author put it.
+            item_end = _rstrip_to(masked, start, end)
+            edits.append((start, item_end, " " + self._element_map(binding) + f" AS {alias or var}"))
             projected.append(f"{binding.type_name}.{var}")
         return projected
 

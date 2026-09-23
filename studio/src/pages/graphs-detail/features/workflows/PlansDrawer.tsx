@@ -26,7 +26,11 @@ import {
 	DropdownMenuSeparator,
 	type PanelStackSection,
 } from "@invana/ui";
-import { Workflow as WorkflowIcon } from "lucide-react";
+import {
+	ArrowUpFromLine,
+	Download,
+	Workflow as WorkflowIcon,
+} from "lucide-react";
 
 export interface PlansDrawerProps {
 	username: string;
@@ -36,8 +40,10 @@ export interface PlansDrawerProps {
 	planKey: string | null;
 	onOpenPlan: (key: string | null) => void;
 	selectedStepId: string | null;
-	onOpenCanvas?: (key: string) => void;
 	onOpenAgent?: (agentId: string) => void;
+	/** Promoting is the list's one write — its control is this drawer's header. */
+	promoting: boolean;
+	onPromoting: (v: boolean) => void;
 	exportUrl?: (key: string) => string;
 	kindFilter: string;
 	onKindFilter: (v: string) => void;
@@ -54,8 +60,9 @@ export function plansDrawerSection({
 	planKey,
 	onOpenPlan,
 	selectedStepId,
-	onOpenCanvas,
 	onOpenAgent,
+	promoting,
+	onPromoting,
 	exportUrl,
 	kindFilter,
 	onKindFilter,
@@ -72,6 +79,29 @@ export function plansDrawerSection({
 			count: <PlansCount username={username} graphSlug={graphSlug} />,
 			trail: planKey ?? undefined,
 			onBack: () => onOpenPlan(null),
+			// The list's one write, in the slot every drawer puts its own act in —
+			// and gone while drilled in, because it acts on the list (G43 · SK27).
+			headerActions: [
+				{
+					key: "promote",
+					name: "Promote a plan…",
+					icon: ArrowUpFromLine,
+					onClick: () => onPromoting(true),
+				},
+			],
+			// An act on the record on screen, beside `‹ Back` (G43).
+			detailActions:
+				planKey && exportUrl
+					? [
+							{
+								key: "export",
+								name: "Export YAML",
+								icon: Download,
+								onClick: () =>
+									window.open(exportUrl(planKey), "_blank", "noopener"),
+							},
+						]
+					: undefined,
 			searchable: true,
 			searchPlaceholder: "Search plans",
 			filtered: Boolean(kindFilter || sourceFilter),
@@ -115,13 +145,12 @@ export function plansDrawerSection({
 					search={search}
 					kindFilter={kindFilter}
 					sourceFilter={sourceFilter}
-					onSourceFilter={onSourceFilter}
 					selectedKey={planKey}
 					onSelectKey={onOpenPlan}
 					selectedStepId={selectedStepId}
-					onOpenCanvas={onOpenCanvas}
 					onOpenAgent={onOpenAgent}
-					exportUrl={exportUrl}
+					promoting={promoting}
+					onPromoting={onPromoting}
 				/>
 			),
 		},

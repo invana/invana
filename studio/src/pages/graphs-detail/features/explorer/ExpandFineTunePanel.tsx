@@ -333,7 +333,7 @@ export function ExpandFineTunePanel({
 							</Button>
 						</div>
 						{sorts.length > 1 && (
-							<p className="text-xs text-muted-foreground">
+							<p className="text-sm text-muted-foreground">
 								Applied in order — the first key takes priority, later keys
 								break ties.
 							</p>
@@ -387,7 +387,7 @@ export function ExpandFineTunePanel({
 						))}
 					</div>
 					{total !== null && (
-						<p className="text-sm text-muted-foreground">
+						<p className="text-base text-muted-foreground">
 							Showing {loaded.toLocaleString()} of {total.toLocaleString()}{" "}
 							neighbours
 						</p>

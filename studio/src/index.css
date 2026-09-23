@@ -3,16 +3,17 @@
 /* The kit's `@theme` block, compiled as SOURCE — this is what carries the type
    ladder into Studio (design-system.md DS13). `@invana/ui/styles.css` below is
    PRECOMPILED: it ships plain `:root{--text-…}` custom properties and no
-   `@theme`, and since no kit component writes `text-sm` any more, Tailwind emits
-   no `.text-sm` rule into it either. Only this import puts the ladder in Studio's
-   own build, where `text-sm` and `text-xs` resolve to the kit's two content steps
-   (1rem / 0.923rem) and `text-meta` exists at all.
+   `@theme`, so Tailwind emits no ladder rule into it. Only this import puts the
+   ladder in Studio's own build.
    It goes FIRST so everything below keeps the last word: the `@theme` tokens land
    in Tailwind's theme layer either way, while the unlayered `[data-theme]` blocks
    in the theme files still override its `:root` colour defaults.
-   New code names no size when it means body text, and `text-meta` when it means
-   subordinate. `sm`/`xs` are aliases so existing call sites are correct, not so
-   new code has options. */
+   **Three rungs, and the root is the only dial** — `text-base` · `text-sm` ·
+   `text-xs` = 13 / 12 / 11 at the 13px root. Default text names **no size** and
+   inherits the root; `text-sm` is deliberately subordinate — a count, a timing, a
+   row's subtitle; `text-xs` is genuinely small and rare. There is no `text-meta`:
+   it was a fourth name over a second size, and it is gone. Each rung is a ratio
+   of the root, so a 16px root moves all three and not 49 class names. */
 @import "@invana/styling";
 @import "@invana/ui/styles.css";
 @import "@invana/themes/styles.css";
@@ -27,14 +28,23 @@
 /* The categorical data palette (`--color-data-1…8`) — one scale for node/edge
    type dots, chart series and legends, light and dark each selected
    (design-kit-coverage.md D2).
-   TODO(data-palette): uncomment on the @invana/styling 0.0.21 bump. The file
-   exists in design-kit but not in the published 0.0.20, and importing an export
-   npm does not have fails the build for everyone (DS3). Until then
-   `typeColor.ts` resolves the slots to `--color-muted-foreground`, so the dots
-   are neutral rather than absent — and to see the real palette now, run against
-   a local checkout (`INVANA_DESIGN_KIT=../../design-kit pnpm dev`, DS10) with
-   this line uncommented. */
-/* @import "@invana/styling/themes/data-palette.css"; */
+   `typeColor.ts` keeps its `--color-muted-foreground` fallback for a probe taken
+   before the theme class lands; it is no longer what the dots actually resolve
+   to. **`src/ui/layerPalette.ts` needs this**: the kit ships no hues — a layer's
+   colour is Invana's decision, passed to `LayerChip`/`LayerSection`/`LayerStrip`
+   as a `palette` prop — and that file spends `data-1`, `-3`, `-6`, `-7`, `-8`.
+   Without the palette every layer's dot is transparent: six layers meant to be
+   told apart at a glance render identically, which no build gate catches. */
+@import "@invana/styling/themes/data-palette.css";
+/* The palette's light half is a `@theme` block, and Tailwind 4 emits a theme
+   variable only where it sees the utility that reads it. `src/ui/layerPalette.ts`
+   names five slots literally and Tailwind scans it, but the other three reach
+   Studio only through node/edge type dots and chart series, which name a slot by
+   index at runtime and so are never in the source graph. Naming the eight keeps
+   the whole scale, and keeps it named in one place rather than by whichever
+   component happens to use one.
+   The dark half needs nothing — it is a plain selector block, always emitted. */
+@source inline("bg-data-{1,2,3,4,5,6,7,8}");
 
 /* @invana/forms ships no precompiled CSS (unlike @invana/ui), so its
    components' utility classes only live in its dist JS. Tailwind 4 skips
@@ -46,6 +56,8 @@
    code block its `code` panel renders through) — dist JS only, no CSS. */
 @source "../node_modules/@invana/dashboard/dist";
 @source "../node_modules/@invana/editor/dist";
+/* And @invana/canvas-ui — the canvas chrome (notices, status bar, panels). */
+@source "../node_modules/@invana/canvas-ui/dist";
 
 /* No `@theme inline` colour block here any more. It existed because Studio
    imported only the theme files, whose `--color-*` live inside `[data-theme]`
@@ -57,9 +69,9 @@
    The `[data-theme]` blocks still win at runtime — they are unlayered, and
    `@theme` output sits in Tailwind's theme layer. */
 
-/* Studio declares NO type ladder. The kit's is the ladder (D7 · DS13): two
-   content sizes as ratios of the root — `text-base` 1rem, `text-meta` 0.923rem —
-   with `lg` and up left on Tailwind's heading defaults.
+/* Studio declares NO type ladder. The kit's is the ladder (D7 · DS13): three
+   content sizes as ratios of the root — `text-base` 1rem, `text-sm` 0.923rem,
+   `text-xs` 0.846rem — with `lg` and up left on Tailwind's heading defaults.
 
    What was here was a six-rung absolute scale ("VS Code web font scale"),
    authored against a 16px root and never re-checked after `html` went to 13px.

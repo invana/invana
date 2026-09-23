@@ -17,8 +17,10 @@ from invana.apps.skills.schemas import SkillCreate, SkillUpdate
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events.models import Event
+from invana.runtime.managers import SkillDraftManager
 
 skills = SkillManager()
+drafts = SkillDraftManager()
 
 
 async def _events(session: AsyncSession, action: str) -> list[Event]:
@@ -29,11 +31,12 @@ async def _events(session: AsyncSession, action: str) -> list[Event]:
 async def test_create_then_list_returns_it_and_records_the_write(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    created = await skills.create(
+    created = await drafts.create(
         session,
         graph_id=graph.id,
         payload=SkillCreate(name="Cypher basics", description="d", content="c", when_to_use="w"),
         actor_id=user.id,
+        publish=True,
     )
 
     listed = await skills.list_for_graph(session, graph_id=graph.id)
@@ -49,30 +52,35 @@ async def test_a_skill_in_another_graph_reads_as_absent(
     session: AsyncSession, graph: Graph, other_graph: Graph, user: User
 ) -> None:
     """Not 'forbidden' — the caller must not learn that the id exists."""
-    created = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Scoped"), actor_id=user.id)
+    created = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Scoped"), actor_id=user.id, publish=True
+    )
 
     with pytest.raises(NotFoundError):
         await skills.get(session, skill_id=created.id, graph_id=other_graph.id)
 
 
 async def test_a_duplicate_name_in_the_same_graph_is_refused(session: AsyncSession, graph: Graph, user: User) -> None:
-    await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Same"), actor_id=user.id)
+    await drafts.create(session, graph_id=graph.id, payload=SkillCreate(name="Same"), actor_id=user.id, publish=True)
 
     with pytest.raises(ConflictError):
-        await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Same"), actor_id=user.id)
+        await drafts.create(
+            session, graph_id=graph.id, payload=SkillCreate(name="Same"), actor_id=user.id, publish=True
+        )
 
 
 async def test_update_touches_only_the_fields_given_and_names_them(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    skill = await skills.create(
+    skill = await drafts.create(
         session,
         graph_id=graph.id,
         payload=SkillCreate(name="Before", description="keep me"),
         actor_id=user.id,
+        publish=True,
     )
 
-    await skills.update(session, skill=skill, payload=SkillUpdate(name="After"), actor_id=user.id)
+    await drafts.update(session, skill=skill, payload=SkillUpdate(name="After"), actor_id=user.id)
 
     assert skill.name == "After"
     assert skill.description == "keep me"
@@ -87,7 +95,9 @@ async def test_delete_removes_the_row_and_the_event_keeps_the_name(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
     """10.2 — the record outlives the subject it describes."""
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Doomed"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Doomed"), actor_id=user.id, publish=True
+    )
 
     await skills.delete(session, skill=skill, actor_id=user.id)
     await session.flush()

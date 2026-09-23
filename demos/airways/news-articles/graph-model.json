@@ -3,13 +3,26 @@
   "package_id": "invana.dataset.news-articles",
   "content_hash": "",
   "name": "NewsArticles",
-  "description": "Aviation coverage — articles, the outlets that ran them, and the carriers, routes, cities and countries they name.",
+  "description": "Aviation coverage \u2014 articles, the outlets that ran them, and the carriers, routes, cities and countries they name.",
   "version": "1.0.0",
   "model": {
     "schema_name": "NewsArticles",
     "schema_description": "News about airways and routes, keyed so it stitches onto air-routes and onto social chatter.",
     "validation_mode": "strict",
     "version": "1.0.0",
+    "axes": {
+      "time": {
+        "property": "published_at"
+      },
+      "geo": {
+        "property": "country_code",
+        "vocab": "iso2"
+      },
+      "dims": [
+        "language",
+        "sentiment"
+      ]
+    },
     "property_keys": [
       {
         "name": "article_id",
@@ -89,7 +102,7 @@
         "name": "domain",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The publisher's own domain — the key a social account shares.",
+        "description": "The publisher's own domain \u2014 the key a social account shares.",
         "validation_rules": []
       },
       {
@@ -161,7 +174,7 @@
         "name": "hub_code",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "IATA code of the airline's main hub — an air-routes airport code.",
+        "description": "IATA code of the airline's main hub \u2014 an air-routes airport code.",
         "validation_rules": []
       },
       {
@@ -182,7 +195,7 @@
         "name": "iso_code",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "Two-letter country code. air-routes calls the same fact `code` — the W1 case.",
+        "description": "Two-letter country code. air-routes calls the same fact `code` \u2014 the W1 case.",
         "validation_rules": []
       },
       {
@@ -256,7 +269,7 @@
         "name": "tag",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "Topic slug — the key a hashtag shares, case aside.",
+        "description": "Topic slug \u2014 the key a hashtag shares, case aside.",
         "validation_rules": []
       },
       {

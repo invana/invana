@@ -1,9 +1,9 @@
 import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
 import { type Graph, isSetupComplete } from "@/types/graphs";
-import { Eyebrow } from "@/ui/Eyebrow";
 import {
 	Button,
+	Eyebrow,
 	Item,
 	ItemActions,
 	ItemContent,

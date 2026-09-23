@@ -73,7 +73,17 @@ export interface Board extends BoardSummary {
  * What produced a saved state: a composer query, a node expand, a load, or a
  * `manual` "Save current state" click.
  */
-export type BoardVersionCause = "query" | "expand" | "load" | "manual";
+/**
+ * Why a version exists. `report` is the declared half — the act that keeps a
+ * live dashboard's numbers ([B6](../../../docs/for-developers/building-engine/boards-migration.md)) —
+ * and the other four are a drawn board autosaving.
+ */
+export type BoardVersionCause =
+	| "query"
+	| "expand"
+	| "load"
+	| "manual"
+	| "report";
 
 /** Timeline-row shape — omits the heavy render blobs (snapshot/positions/banner). */
 export interface BoardVersionSummary {

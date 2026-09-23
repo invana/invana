@@ -56,7 +56,7 @@ export function RemoveStitchDialog({
 					<>
 						<AlertDialogHeader>
 							<div className="flex items-center gap-2">
-								<AlertDialogTitle className="text-sm">
+								<AlertDialogTitle className="text-base">
 									Remove this stitch?
 								</AlertDialogTitle>
 								<span className="flex-1" />
@@ -66,7 +66,7 @@ export function RemoveStitchDialog({
 							</div>
 						</AlertDialogHeader>
 
-						<div className="flex flex-col gap-2 text-meta">
+						<div className="flex flex-col gap-2 text-sm">
 							<div className="font-mono text-foreground">
 								{stitchPair(link)}
 							</div>

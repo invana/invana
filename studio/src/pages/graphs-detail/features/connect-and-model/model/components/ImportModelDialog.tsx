@@ -130,7 +130,7 @@ export function ImportModelDialog({
 
 				<div className="space-y-4">
 					<div>
-						<p className="mb-1.5 text-sm font-medium">From a file</p>
+						<p className="mb-1.5 text-base font-medium">From a file</p>
 						<input
 							ref={fileInput}
 							type="file"
@@ -150,14 +150,14 @@ export function ImportModelDialog({
 							{artefact ? artefact.name : "Choose an artefact"}
 						</Button>
 						{artefact ? (
-							<p className="mt-1 font-mono text-xs text-muted-foreground">
+							<p className="mt-1 font-mono text-sm text-muted-foreground">
 								{artefact.package_id} · {artefact.content_hash.slice(0, 12)}
 							</p>
 						) : null}
 					</div>
 
 					<div>
-						<p className="mb-1.5 text-sm font-medium">
+						<p className="mb-1.5 text-base font-medium">
 							Or start from a starter
 						</p>
 						{starters.isLoading ? (
@@ -174,7 +174,7 @@ export function ImportModelDialog({
 											setName(s.name);
 											setError(null);
 										}}
-										className={`flex w-full items-start gap-2 rounded-sm border px-2.5 py-2 text-left text-sm ${
+										className={`flex w-full items-start gap-2 rounded-sm border px-2.5 py-2 text-left text-base ${
 											starter === s.slug
 												? "border-primary/40 bg-primary/10"
 												: "hover:bg-accent"
@@ -183,10 +183,10 @@ export function ImportModelDialog({
 										<Package className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
 										<span className="min-w-0">
 											<span className="font-medium">{s.name}</span>
-											<span className="block text-xs text-muted-foreground">
+											<span className="block text-sm text-muted-foreground">
 												{s.description}
 											</span>
-											<span className="block text-xs text-muted-foreground/80">
+											<span className="block text-sm text-muted-foreground/80">
 												{s.node_types.join(" · ")}
 											</span>
 										</span>
@@ -198,7 +198,7 @@ export function ImportModelDialog({
 
 					{chosen ? (
 						<div>
-							<p className="mb-1.5 text-sm font-medium">Call it</p>
+							<p className="mb-1.5 text-base font-medium">Call it</p>
 							<Input
 								value={name}
 								onChange={(e: { target: { value: string } }) =>
@@ -206,16 +206,16 @@ export function ImportModelDialog({
 								}
 								placeholder={chosen}
 							/>
-							<p className="mt-1 text-xs text-muted-foreground">
+							<p className="mt-1 text-sm text-muted-foreground">
 								The name is local — the package id is what an upgrade resolves
 								against, so renaming costs nothing.
 							</p>
 						</div>
 					) : null}
 
-					{error ? <p className="text-sm text-destructive">{error}</p> : null}
+					{error ? <p className="text-base text-destructive">{error}</p> : null}
 					{blockers.length ? (
-						<p className="text-sm text-warning">
+						<p className="text-base text-warning">
 							Imported, but it cannot publish here yet — this database cannot
 							hold {blockers.join(", ")}.
 						</p>

@@ -18,6 +18,16 @@ class SkillQuerySet:
         stmt = select(Skill).where(Skill.graph_id == graph_id).order_by(Skill.name)
         return list((await session.execute(stmt)).scalars().all())
 
+    async def by_name(self, session: AsyncSession, *, graph_id: str, name: str) -> Skill | None:
+        """One skill by its name, which is unique per Graph.
+
+        What the seeder matches on: a person who renamed the builtin playbook
+        has made it theirs, and a second copy beside it would be the product
+        arguing with them ([SK25](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+        """
+        stmt = select(Skill).where(Skill.graph_id == graph_id, Skill.name == name)
+        return (await session.execute(stmt)).scalar_one_or_none()
+
     async def get(self, session: AsyncSession, skill_id: str) -> Skill | None:
         stmt = select(Skill).where(Skill.id == skill_id)
         return (await session.execute(stmt)).scalar_one_or_none()

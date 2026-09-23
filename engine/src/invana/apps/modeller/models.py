@@ -123,6 +123,19 @@ class GraphVersion(Base):
     # (share-a-model.md SM2). With ``package_id`` it is the version's identity, so the
     # same content arriving under another name is recognised as an upgrade, not a copy.
     content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    # Which property carries valid time, which carries geography, and which named
+    # properties are selectable dimensions
+    # (docs/for-developers/modules/connect-and-model/features/domain-models.md DM6):
+    #
+    #     {"time": {"property": "observed_at"},
+    #      "geo":  {"property": "country_iso", "vocab": "iso2"},
+    #      "dims": ["channel", "segment"]}
+    #
+    # Empty is the default and means *nothing is selectable*: a world asking to
+    # slice along an axis this version never declared is refused naming the model
+    # and the axis, never silently ignored (GV14). Inferring one from a property's
+    # name or type would make "which rows did this run see" depend on a guess.
+    axes: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict, server_default="{}")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     activated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 

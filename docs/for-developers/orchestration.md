@@ -1011,7 +1011,7 @@ refusals included, and the difference between them is what a person reads when t
 | You want | The rule |
 |---|---|
 | **Run without stitching** | deny `graph_data/stitch/*` — the models are in view, the cross-model edges between them are not. Every query is generated against single-model types, and a question needing a link is *cannot answer*, not a wrong answer |
-| **Include certain stitches** | allow `graph_data/stitch/publisher_sponsor_anchor` and `…/article_mentions_drug`; every other declared stitch does not resolve |
+| **Include certain stitches** | allow `graph_data/stitch/publisher_sponsor` and `…/article_drug@mentions`; every other declared stitch does not resolve. An anchor is its pair of types; a relationship carries its edge type, because two links between the same two types are two participants ([GV24](modules/govern/spec.md)). `…/article_drug@*` is both of them |
 
 **And the word `stitch` means two things here.** [§4.3](#43-every-flow-in-the-product-placed) already
 flags the collision; a lens makes it load-bearing:

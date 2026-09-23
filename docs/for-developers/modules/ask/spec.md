@@ -134,7 +134,7 @@ Every step receives one context, and what goes where is fixed:
 | # | Decision |
 |---|---|
 | K1 | One question opens exactly one root run. A session is a thread of them, not a run. |
-| K2 | The agent carries provider and model; the composer offers only the ask-kind toggle. |
+| K2 | **The lens's `cast` names the model; the composer offers only the ask-kind toggle.** The agent carries a lens, not a provider ([A1](../agents/spec.md)), and the world chip in `header.right` is where a person changes what a question runs against ([WO5](../govern/features/worlds.md)). |
 | K3 | Steps stream. Nothing waits for the end of the run to appear. |
 | K4 | Validation failure is repaired **once**, with the error, then reported. |
 | K5 | A structured question gets a structured answer — a value, not prose ([projections](features/projections.md)). |

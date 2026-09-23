@@ -10,7 +10,7 @@ so this is **step 3 of the module pass: engine**.
 | Sibling to | [lens-migration.md](lens-migration.md) · [task-model-migration.md](task-model-migration.md) |
 | Drawn in | `claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc` — pages *Skills · Bindings · Usage · Rules* |
 | Reconciled in | [skills/spec.md § 5a](../modules/skills/spec.md) and each feature file's *Surfaces, as drawn* |
-| Blocked out of it | the **Flow** tab and anything needing `skill_versions.plan_id` — M8, which needs M5 |
+| Blocked out of it | the **Flow** tab and anything needing `skill_versions.plan_id` — M8, now its own pass: [skills-draw-as-plans.md](skills-draw-as-plans.md) |
 
 Read first, in this order:
 
@@ -39,7 +39,7 @@ The index marks `6.1 · 6.2 · 6.3` as `API ✅`. **That is generous.** Verify b
 | Routes | list · create · get · update · delete · `GET …/skills/{id}/usage` | `server/skills/views.py` |
 | The binding | **`agents.skill_ids`, a JSON array on the agent** — not the `agent_skills` table § 3 describes | `apps/agents/models.py:118` |
 | Offered / applied | `task_runs.skills_offered` · `skills_applied`, JSON arrays of **bare skill ids** | `runtime/models.py:235` |
-| Usage | derived by scanning the roster | `runtime/managers/skill_usage.py` |
+| Usage | derived by scanning the bindings | `runtime/managers/skill_usage.py` |
 | `skill_versions` | **does not exist** | — |
 | `rules` · `rule_versions` | **do not exist** — 6.4 is unbuilt end to end | — |
 | `skill_versions.plan_id` | **blocked on M8**, which needs M5 | [task-model-migration.md](task-model-migration.md) |

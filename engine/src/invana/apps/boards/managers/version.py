@@ -22,10 +22,10 @@ from invana.core.settings import settings
 
 
 class BoardVersionManager:
-    querysets = BoardVersionQuerySet()
+    board_versions_qs = BoardVersionQuerySet()
 
     # Cross-app reach into `sessions`, to check a message id resolves.
-    _messages = SessionMessageQuerySet()
+    _messages_qs = SessionMessageQuerySet()
 
     async def list_for_board(
         self,
@@ -35,8 +35,8 @@ class BoardVersionManager:
         limit: int,
         offset: int,
     ) -> tuple[list[BoardVersion], int]:
-        items = await self.querysets.list_for_board(session, board_id=board_id, limit=limit, offset=offset)
-        total = await self.querysets.count_for_board(session, board_id=board_id)
+        items = await self.board_versions_qs.list_for_board(session, board_id=board_id, limit=limit, offset=offset)
+        total = await self.board_versions_qs.count_for_board(session, board_id=board_id)
         return items, total
 
     async def get(
@@ -47,7 +47,7 @@ class BoardVersionManager:
         board_id: str,
         graph_id: str,
     ) -> BoardVersion:
-        version = await self.querysets.get(session, version_id)
+        version = await self.board_versions_qs.get(session, version_id)
         if version is None or version.board_id != board_id or version.graph_id != graph_id:
             raise NotFoundError("Board version not found.")
         return version
@@ -67,7 +67,7 @@ class BoardVersionManager:
         **dropped, not fatal**. The version is still worth keeping.
         """
         message_id = payload.message_id
-        if message_id is not None and await self._messages.get_message(session, message_id) is None:
+        if message_id is not None and await self._messages_qs.get_message(session, message_id) is None:
             message_id = None
 
         version = BoardVersion(
@@ -85,8 +85,8 @@ class BoardVersionManager:
             node_count=payload.node_count,
             edge_count=payload.edge_count,
         )
-        await self.querysets.add(session, version)
+        await self.board_versions_qs.add(session, version)
         # Retention: keep only the newest N per board so keep-all growth is
         # bounded. INVANA_BOARD_HISTORY_LIMIT, 0 = keep all.
-        await self.querysets.prune_for_board(session, board_id=board.id, keep=settings.board_history_limit)
+        await self.board_versions_qs.prune_for_board(session, board_id=board.id, keep=settings.board_history_limit)
         return version

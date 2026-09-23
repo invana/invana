@@ -22,16 +22,16 @@ export function SaturationControl({ className }: { className?: string }) {
 	return (
 		<div className={className}>
 			<div className="mb-2 flex items-center justify-between">
-				<span className="text-sm font-medium">Saturation</span>
+				<span className="text-base font-medium">Saturation</span>
 				<div className="flex items-center gap-2">
-					<span className="text-xs tabular-nums text-muted-foreground">
+					<span className="text-sm tabular-nums text-muted-foreground">
 						{saturation}%
 					</span>
 					{!isDefault && (
 						<Button
 							variant="ghost"
 							size="sm"
-							className="h-5 px-1.5 text-xs text-muted-foreground"
+							className="h-5 px-1.5 text-sm text-muted-foreground"
 							onClick={() => setSaturation(SATURATION_DEFAULT)}
 						>
 							Reset

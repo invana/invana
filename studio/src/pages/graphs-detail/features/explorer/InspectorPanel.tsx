@@ -56,7 +56,7 @@ export function InspectorPanel({
 					<div>
 						<div className="flex items-center gap-2 mb-1">
 							<span
-								className={`text-meta font-medium uppercase px-1.5 py-0.5 rounded ${
+								className={`text-sm font-medium uppercase px-1.5 py-0.5 rounded ${
 									item.type === "vertex"
 										? "bg-blue-500/20 text-blue-400"
 										: "bg-purple-500/20 text-purple-400"
@@ -67,14 +67,14 @@ export function InspectorPanel({
 							<span className="font-semibold">{item.label}</span>
 							{missingIds?.has(String(item.id)) ? (
 								<span
-									className="rounded bg-warning/15 px-1.5 py-0.5 text-meta font-medium uppercase text-warning"
+									className="rounded bg-warning/15 px-1.5 py-0.5 text-sm font-medium uppercase text-warning"
 									title="No longer in the graph — kept on the canvas so the exploration still reads true"
 								>
 									missing
 								</span>
 							) : null}
 						</div>
-						<p className="text-meta text-muted-foreground font-mono break-all">
+						<p className="text-sm text-muted-foreground font-mono break-all">
 							{item.id}
 						</p>
 					</div>
@@ -125,7 +125,7 @@ export function InspectorPanel({
 									.filter(([key]) => !isProvenanceKey(key))
 									.map(([key, val]) => (
 										<div key={key} className="flex flex-col gap-0.5">
-											<span className="text-meta text-muted-foreground">
+											<span className="text-sm text-muted-foreground">
 												{key}
 											</span>
 											<span className="font-mono text-foreground break-all">

@@ -19,11 +19,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.agents.envelope import PlanStep
 from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.models import Agent
+from invana.apps.govern.managers import LensManager, LLMEndpointManager, NoEndpointError
+from invana.apps.govern.managers.lens import to_effective
+from invana.apps.govern.rules import compose, from_snapshot
 from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph
-from invana.apps.llm_providers.querysets import LLMProviderQuerySet
+from invana.apps.llm_providers.endpoint import LLMEndpoint
+from invana.apps.llm_providers.managers import LLMProviderManager
 from invana.apps.modeller.store import ModelStore
-from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import (
     Session,
     SessionMessage,
@@ -41,7 +44,7 @@ from invana.core.events.models import ActorKind
 from invana.core.events.services import current_trace_id, emit_event
 from invana.core.settings import settings
 from invana.runtime.catalogue.records import LoadRefused
-from invana.runtime.models import RunStatus, TaskRun, TriggeredBy
+from invana.runtime.models import RunRole, RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import opening_for, plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.workflows import MODELLER_GENERATE, NL_QUERY, QL_QUERY, WORKFLOWS, Workflow
@@ -142,17 +145,26 @@ async def open_turn(
     # sends one; a session bound before agents existed falls back to its
     # surface's seeded agent rather than failing.
     agent = await _session_agent(db, sess=sess, graph=graph)
+    # One composition, read twice: the lens this run is frozen under is the same
+    # lens its model is cast by, so *which model answered* and *what it was
+    # allowed to see* cannot disagree ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)).
+    frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=payload.lens_id)
     needs_provider = is_modeller or payload.mode == "nl"
     provider = (
-        await _agent_provider(db, agent=agent, graph_id=graph.id, fallback_id=payload.llm_provider_id)
+        await resolve_endpoint(
+            db,
+            graph_id=graph.id,
+            snapshot=frozen["lens_snapshot"],
+            prefer_model_row_id=payload.llm_model_id,
+        )
         if needs_provider
         else None
     )
     opening = opening_for(agent, ask_kind=payload.mode) if agent is not None else None
     wf = MODELLER_GENERATE if is_modeller else (NL_QUERY if payload.mode == "nl" else QL_QUERY)
 
-    store = SessionMessageQuerySet()
-    user_seq = await store.next_seq(db, session_id=sess.id)
+    messages_qs = SessionMessageQuerySet()
+    user_seq = await messages_qs.next_seq(db, session_id=sess.id)
     user_msg = SessionMessage(session_id=sess.id, seq=user_seq, role=SessionMessageRole.user, content=payload.content)
     assistant_msg = SessionMessage(
         session_id=sess.id,
@@ -163,8 +175,8 @@ async def open_turn(
         mode="nl" if is_modeller else payload.mode,
         timeout_s=payload.timeout_s,
     )
-    await store.add(db, user_msg)
-    await store.add(db, assistant_msg)
+    await messages_qs.add(db, user_msg)
+    await messages_qs.add(db, assistant_msg)
 
     # The ask is columns on the run it opened, not a row of its own: every root
     # run had exactly one Thought, and two rows for one fact is a join every
@@ -178,7 +190,9 @@ async def open_turn(
         body=payload.content,
         params={
             "language": payload.language.value if payload.language else None,
-            "llm_provider_id": provider.id if provider else None,
+            # The `llm_models` row, because it resolves both address segments —
+            # a provider id resolves neither ([PM15]).
+            "llm_model_id": provider.model_row_id if provider else None,
             "timeout_s": payload.timeout_s,
             "parameters": payload.parameters,
         },
@@ -188,6 +202,7 @@ async def open_turn(
         agent_version=agent.version if agent else None,
         triggered_by=TriggeredBy.user.value,
         on_behalf_of_user_id=actor_id,
+        **frozen,
     )
     db.add(th)
     await db.flush()
@@ -204,6 +219,69 @@ async def open_turn(
     await _prune(db, graph.id)
     await db.flush()
     return user_msg, assistant_msg, th
+
+
+_lenses = LensManager()
+_endpoints = LLMEndpointManager()
+_agents = AgentManager()
+
+
+async def freeze_lens(
+    db: AsyncSession,
+    *,
+    graph_id: str,
+    agent_id: str | None,
+    lens_id: str | None,
+) -> dict:
+    """Resolve the lens this run is dispatched under, and **freeze it**.
+
+    ``effective = agent ∩ plan ∩ todo``
+    ([GV6](docs/for-developers/modules/govern/spec.md)), composed once at run
+    open and never recomputed
+    ([GV8](docs/for-developers/modules/govern/spec.md)) — which is what makes
+    ``lens_snapshot`` reconstructible rather than a pointer at rows that have
+    since moved. A guardrail tightened tomorrow does not rewrite what this run
+    was allowed to rest on
+    ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
+
+    The Graph's guardrails and the agent's go in whether or not a world was
+    picked, because they are in force on every run whatever world it is asked
+    under. **No world is the widest**, not the narrowest
+    ([GV7](docs/for-developers/modules/govern/spec.md)): a Graph with nothing
+    set freezes an empty lens, which permits everything.
+
+    Returns the two columns as keyword arguments, so a caller that opens a run
+    spreads it into the constructor rather than remembering two field names.
+    """
+    contributors = [await _lenses.effective_guardrails(db, graph_id=graph_id, agent_id=agent_id)]
+
+    # The agent's own world, the third of its three bounds
+    # ([AG2](docs/for-developers/modules/agents/features/author-an-agent.md)). It
+    # composes whether or not the asker picked one, for the same reason the
+    # guardrails do: it is in force on every run this agent opens, and an agent
+    # bound to a world that only narrowed the runs somebody remembered to pick
+    # it for would not be bound at all. A child carries its parent's
+    # ([DG9](docs/for-developers/modules/agents/features/delegation.md)), so the
+    # narrowing travels down the tree with no second mechanism.
+    if agent_id:
+        agent = await _agents.agents_qs.get(db, agent_id)
+        if agent is not None and agent.lens_id:
+            own = await _lenses.lenses_qs.get(db, agent.lens_id)
+            if own is not None:
+                contributors.append(to_effective(own))
+
+    world = None
+    if lens_id:
+        # A world that is not this Graph's raises, before the run is written —
+        # a run that opened under nothing while its asker believed otherwise is
+        # the one outcome the whole module exists to prevent.
+        world = await _lenses.get(db, lens_id=lens_id, graph_id=graph_id)
+        contributors.append(to_effective(world))
+
+    return {
+        "lens_id": world.id if world else None,
+        "lens_snapshot": compose(contributors).as_snapshot(),
+    }
 
 
 async def _session_agent(db: AsyncSession, *, sess: Session, graph: Graph) -> Agent | None:
@@ -223,18 +301,57 @@ async def _session_agent(db: AsyncSession, *, sess: Session, graph: Graph) -> Ag
     return agent
 
 
-async def _agent_provider(db: AsyncSession, *, agent: Agent | None, graph_id: str, fallback_id: str | None):
-    """The LLM the agent carries — provider *and* model, in one row.
+async def resolve_endpoint(
+    db: AsyncSession,
+    *,
+    graph_id: str,
+    snapshot: dict | None,
+    prefer_model_row_id: str | None = None,
+) -> LLMEndpoint:
+    """The model this run calls, resolved through the lens it was frozen under.
 
-    ``fallback_id`` covers the pre-agent request shape and an agent that has no
-    provider bound yet; the 422 it raises is the one that routes the user to
-    Settings → LLMs.
+    One path and no fallbacks
+    ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)):
+    the cast picks, the lens checks, and a Graph that casts nothing gets the
+    shipped cast over the models it offers. A Graph offering none is the 422
+    that routes a person to Agents → LLMs, raised before anything is written.
     """
-    if agent is not None and agent.llm_config_id:
-        provider = await LLMProviderQuerySet().get(db, agent.llm_config_id)
-        if provider is not None and provider.graph_id == graph_id:
-            return provider
-    return await SessionManager()._resolve_provider(db, graph_id=graph_id, llm_provider_id=fallback_id)
+    return await _endpoints.resolve(
+        db,
+        graph_id=graph_id,
+        effective=from_snapshot(snapshot) if snapshot else None,
+        prefer_model_row_id=prefer_model_row_id,
+    )
+
+
+async def endpoint_for_run(db: AsyncSession, *, th: TaskRun) -> LLMEndpoint | None:
+    """The endpoint a run recorded, else the one its frozen lens resolves.
+
+    ``params.llm_model_id`` is what a run opened after the split carries; a run
+    queued before it carries ``llm_provider_id``, which resolves to that
+    provider's first offered model for one release ([PM15]). Neither present —
+    a Task's run, a delegation — and the frozen lens answers, which is the same
+    resolution the ask took, re-read rather than re-decided.
+
+    **``None`` when the Graph offers no model**, rather than a refusal: a ``ql``
+    run calls none, and killing it over configuration it never needed would be
+    the wrong failure. The refusal for a run that *does* need one is raised at
+    open, where it can route somebody to Agents → LLMs. A cast the lens
+    **denies** still raises here — that is a governed refusal, not a gap.
+    """
+    params = th.params or {}
+    if params.get("llm_model_id"):
+        found = await _endpoints.models_qs.endpoint_by_model_row(db, params["llm_model_id"])
+        if found is not None:
+            return found
+    if params.get("llm_provider_id"):
+        legacy = await LLMProviderManager().llm_providers_qs.get(db, params["llm_provider_id"])
+        if legacy is not None and legacy.graph_id == th.graph_id:
+            return await LLMProviderManager().first_endpoint(db, provider=legacy)
+    try:
+        return await resolve_endpoint(db, graph_id=th.graph_id, snapshot=th.lens_snapshot)
+    except NoEndpointError:
+        return None
 
 
 async def open_todo_run(
@@ -278,6 +395,11 @@ async def open_todo_run(
         # both gone: they described this same edge from the other two directions.
         parent_run_id=parent_run_id,
         on_behalf_of_user_id=on_behalf_of_user_id,
+        # A Task's run is bounded like any other ([GV26]). There is no composer
+        # to pick a world from, so it freezes the guardrails and the agent's own
+        # lens — which is what *no world is the widest, not the narrowest*
+        # means for a run nobody was watching open ([GV7]).
+        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
     )
     db.add(th)
     await db.flush()
@@ -301,6 +423,78 @@ async def open_todo_run(
     return th
 
 
+async def open_draft_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    version,
+    skill_name: str,
+    agent: Agent,
+    actor_id: str,
+) -> TaskRun:
+    """The run that draws a skill's playbook — the first ``role = plan`` run.
+
+    One node, ``draft_plan``, against the draft's id. It is an ordinary run for
+    every other purpose: it takes a slot, it records its exchange, it appears in
+    Runs, and what it did is readable months later
+    ([SK23](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+
+    ``workflow_key`` names the act rather than a `WORKFLOWS` entry — the loop
+    reads its steps from the queued rows, and the three keys left in that dict
+    are what a *session* opens against (task-model-migration § 6.5).
+    """
+    th = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user",
+        ask_kind="nl",
+        role=RunRole.plan.value,
+        body=f"Draw “{skill_name}” as a plan",
+        workflow_key="skill-draft",
+        # Which draft this run is drawing, on the **root** as well as on the
+        # step's args: the authoring surface asks *is a draw in flight for this
+        # draft* on every read, and a draw has to be recognisable after a
+        # reload — the draft is a row, and so is the run drawing it (SK20).
+        params={"skill_version_id": version.id},
+        agent_id=agent.id,
+        agent_version=agent.version,
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        # A draw spends a model call, so it is bounded like every other run
+        # ([GV26]): the guardrails and the agent's lens, frozen at open.
+        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
+    )
+    db.add(th)
+    await db.flush()
+    db.add(
+        TaskRun(
+            graph_id=graph.id,
+            parent_run_id=th.id,
+            seq=0,
+            step_key="draft_plan",
+            task_key="draft_plan",
+            label="Draw",
+            args={"skill_version_id": version.id},
+            attempt=1,
+            status=RunStatus.queued.value,
+        )
+    )
+    await db.flush()
+    await emit_event(
+        db,
+        action=actions.THINKING_OPEN,
+        target_kind=actions.TARGET_THINKING,
+        target_id=th.id,
+        graph_id=graph.id,
+        run_id=th.id,
+        actor_id=actor_id,
+        details={"role": RunRole.plan.value, "skill": skill_name, "skill_version_id": version.id},
+        trace_id=current_trace_id(),
+    )
+    await db.flush()
+    return th
+
+
 async def resume_turn(
     db: AsyncSession,
     *,
@@ -316,8 +510,8 @@ async def resume_turn(
         )
     wf = _workflow(run)
     start = int((run.cursor or {}).get("step", 0))
-    store = SessionMessageQuerySet()
-    user_seq = await store.next_seq(db, session_id=sess.id)
+    messages_qs = SessionMessageQuerySet()
+    user_seq = await messages_qs.next_seq(db, session_id=sess.id)
     user_msg = SessionMessage(session_id=sess.id, seq=user_seq, role=SessionMessageRole.user, content=answer)
     prev = await db.get(SessionMessage, run.assistant_message_id) if run.assistant_message_id else None
     assistant_msg = SessionMessage(
@@ -330,8 +524,8 @@ async def resume_turn(
         timeout_s=prev.timeout_s if prev else None,
         run_id=run.id,
     )
-    await store.add(db, user_msg)
-    await store.add(db, assistant_msg)
+    await messages_qs.add(db, user_msg)
+    await messages_qs.add(db, assistant_msg)
     run.assistant_message_id = assistant_msg.id
     run.status = RunStatus.queued.value
     run.finished_at = None
@@ -376,6 +570,19 @@ async def rerun_turn(
     # (language, timeout, provider) are still the ones that answered before, or
     # the message's own for a reply older than the runtime.
     prev = await TaskRunQuerySet().get(db, message.run_id) if message.run_id else None
+    prior_lens_id = prev.lens_id if prev else None
+    if prior_lens_id is not None and await _lenses.lenses_qs.get(db, prior_lens_id) is None:
+        # Refused rather than re-run wide. A re-run whose world has been deleted
+        # since cannot honestly be a re-run: answering the same question under a
+        # broader lens is a different question, and silently widening is the one
+        # outcome [GV26] exists to prevent.
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail={
+                "error": "world_deleted",
+                "message": "The world this answer was asked under has been deleted, so it cannot be re-run under it.",
+            },
+        )
     th = TaskRun(
         graph_id=graph.id,
         session_id=sess.id,
@@ -389,6 +596,16 @@ async def rerun_turn(
         ),
         workflow_key=QL_QUERY.key,
         assistant_message_id=message.id,
+        # A re-run is a new run, so it freezes anew rather than copying a
+        # snapshot ([GV26]) — but it re-runs under the **world it was asked
+        # under**, because a re-run that quietly widened would answer a
+        # different question than the one being re-asked.
+        **await freeze_lens(
+            db,
+            graph_id=graph.id,
+            agent_id=sess.agent_id,
+            lens_id=prior_lens_id,
+        ),
     )
     db.add(th)
     await db.flush()
@@ -540,13 +757,26 @@ async def list_runs(
     steps = list(
         (
             await db.execute(
-                select(TaskRun.parent_run_id, TaskRun.task_key, TaskRun.output).where(TaskRun.parent_run_id.in_(ids))
+                select(
+                    TaskRun.parent_run_id,
+                    TaskRun.task_key,
+                    TaskRun.output,
+                    TaskRun.tokens_in,
+                    TaskRun.tokens_out,
+                ).where(TaskRun.parent_run_id.in_(ids))
             )
         ).all()
     )
     counts: dict[str, int] = {}
-    for run_id, task_key, output in steps:
+    # What each run spent, rolled up from its tasks — the journal row's second
+    # line reads it, and a per-row trace fetch would be 50 requests for a list
+    # (SR45). The same roll-up `result.json` defines (SR39).
+    tokens: dict[str, list[int]] = {}
+    for run_id, task_key, output, tokens_in, tokens_out in steps:
         counts[run_id] = counts.get(run_id, 0) + 1
+        spend = tokens.setdefault(run_id, [0, 0])
+        spend[0] += tokens_in or 0
+        spend[1] += tokens_out or 0
         if task_key == "verify_result":
             served = (output or {}).get("served")
             if isinstance(served, str):
@@ -600,9 +830,12 @@ async def list_runs(
             "plan_revision": r.plan_revision,
             "replans": r.replans,
             "agent_id": r.agent_id,
+            # What the run was *for* — the journal's `role` filter (SR10).
+            "role": r.role,
             "task_id": r.todo_id,
             "task_title": titles.get(r.todo_id or ""),
             "queued_at": r.queued_at,
+            "started_at": r.started_at,
             "finished_at": r.finished_at,
             "step_count": counts.get(r.id, 0),
             "step_label": (progress.get(r.id) or {}).get("label"),
@@ -610,6 +843,9 @@ async def list_runs(
             "steps_total": (progress.get(r.id) or {}).get("total", 0),
             "served": verdicts.get(r.id),
             "promoted": r.id in promoted,
+            # A root can spend tokens of its own as well as through its tasks.
+            "tokens_in": (r.tokens_in or 0) + tokens.get(r.id, [0, 0])[0],
+            "tokens_out": (r.tokens_out or 0) + tokens.get(r.id, [0, 0])[1],
         }
         for r in rows
     ]
@@ -739,6 +975,9 @@ async def open_load_run(
         triggered_by=TriggeredBy.user.value if actor_id else TriggeredBy.schedule.value,
         on_behalf_of_user_id=actor_id,
         status=RunStatus.queued.value,
+        # A load is governed like any other run ([GV36]): the Graph's guardrails,
+        # no agent and no world — nobody picks a world for a load.
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
     )
     db.add(run)
     await db.flush()
@@ -796,6 +1035,7 @@ async def open_bulk_run(
         triggered_by=TriggeredBy.user.value if actor_id else TriggeredBy.schedule.value,
         on_behalf_of_user_id=actor_id,
         status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
     )
     db.add(run)
     await db.flush()

@@ -27,13 +27,21 @@ function titleFromMessage(text: string): string {
 	return clean.length > 64 ? `${clean.slice(0, 64)}…` : clean;
 }
 
-function toBody(payload: QueryRunPayload): SendMessageBody {
+// The world is added by the caller, not carried in the payload: it is the
+// run's **circumstances** rather than part of the question (WO5), so the
+// composer collects one and the page supplies the other.
+function toBody(
+	payload: QueryRunPayload,
+	lensId?: string | null,
+): SendMessageBody {
+	const world = lensId ? { lens_id: lensId } : {};
 	if (payload.mode === "ql") {
 		return {
 			content: payload.query,
 			mode: "ql",
 			language: payload.language,
 			timeout_s: payload.timeoutS,
+			...world,
 		};
 	}
 	// NL → the engine translates the prompt into a grounded query with the
@@ -43,6 +51,7 @@ function toBody(payload: QueryRunPayload): SendMessageBody {
 		mode: "nl",
 		llm_provider_id: payload.llmProviderId,
 		timeout_s: payload.timeoutS,
+		...world,
 	};
 }
 
@@ -74,6 +83,14 @@ export function sessionsListKey(
 export interface UseSessionsOptions {
 	surface?: "explorer" | "modeller";
 	modelId?: string;
+	/**
+	 * The world every ask from this surface is sent under (C1 · WO5).
+	 *
+	 * An option rather than a field on the payload: the world is the run's
+	 * circumstances, not part of the question, and the page owns it because it
+	 * has to read where there is no composer.
+	 */
+	lensId?: string | null;
 	/** A query result landed on a run's stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md) — the page paints
 	 *  it. Fires once per result, before the reply settles. */
 	onResult?: (info: {
@@ -108,6 +125,9 @@ export function useSessions(
 	// Default to the Explorer surface so existing callers are untouched (docs/for-developers/modules/ask/spec.md).
 	const surface = opts?.surface ?? "explorer";
 	const modelId = opts?.modelId;
+	// The world the page has picked (WO5). `undefined` is *Everything*, which is
+	// a real world and the default one — no surface grows a required field.
+	const lensId = opts?.lensId;
 	const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 	// List controls that drive the server query (so paging/totals stay correct).
 	const [sort, setSort] = useState<SessionSort>("updated");
@@ -373,7 +393,7 @@ export function useSessions(
 				u,
 				g,
 				sessionId,
-				toBody(payload),
+				toBody(payload, lensId),
 				controller.signal,
 			);
 			const sid = sessionId;

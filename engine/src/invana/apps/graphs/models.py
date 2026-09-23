@@ -14,6 +14,7 @@ Tables
 from __future__ import annotations
 
 import enum
+import json
 import uuid
 from datetime import UTC, datetime
 
@@ -34,6 +35,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from invana.apps.modeller.models import GraphModel
 from invana.core.auth.models import User
 from invana.core.models import Base
+
+# What a Graph's pools hold when nobody has tuned them — sized for one machine
+# (docs/for-developers/modules/agents/features/concurrency-and-contention.md).
+DEFAULT_POOLS: dict[str, int] = {"llm": 20, "graphdb": 50, "heavy": 4}
+# The same value as a literal, so a row inserted outside the ORM gets it too.
+_DEFAULT_POOLS_JSON = json.dumps(DEFAULT_POOLS)
 
 
 def _utcnow() -> datetime:
@@ -110,6 +117,15 @@ class Graph(Base):
     # ``queue`` waits for a slot; ``refuse`` says so immediately. Stated on the
     # Graph rather than guessed per caller (CC2).
     concurrency_policy: Mapped[str] = mapped_column(String(8), nullable=False, default="queue", server_default="queue")
+    # The pools a run draws on while it holds its slot
+    # (docs/for-developers/modules/agents/features/concurrency-and-contention.md CC8).
+    # Three, because they are three different scarce things and one number would
+    # have to be the smallest of them: `llm` is provider concurrency (a lane takes
+    # a slot, not a step), `graphdb` is the connection pool, `heavy` is graph
+    # algorithms, which are CPU- and memory-bound. A refusal names the pool.
+    pools: Mapped[dict] = mapped_column(
+        JSON, nullable=False, default=lambda: dict(DEFAULT_POOLS), server_default=_DEFAULT_POOLS_JSON
+    )
     # RESTRICT — owner cannot be deleted while they still own a Graph.
     # Account deletion checks for this and 409s on guard B.
     created_by_id: Mapped[str] = mapped_column(
@@ -222,6 +238,13 @@ class GraphMember(Base):
 
     graph_id: Mapped[str] = mapped_column(String(36), ForeignKey("graphs.id", ondelete="CASCADE"), primary_key=True)
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    # The one field-level permission in the product
+    # (docs/for-developers/modules/govern/features/guardrails.md GR5 · GV22).
+    # Not a role: a Member stays binary, and this does not start a role system.
+    # The guardrails are *readable* by every member whatever this says — a bound
+    # nobody may read is a bound nobody can work within — and a Graph always has
+    # at least one holder, so revoking the last one is refused.
+    can_edit_guardrails: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
     graph: Mapped[Graph] = relationship(back_populates="members")

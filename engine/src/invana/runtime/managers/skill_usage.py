@@ -51,9 +51,9 @@ def _readable(offered: int) -> bool:
 
 
 class SkillUsageManager:
-    querysets = TaskRunQuerySet()
-    agents = AgentQuerySet()
-    versions = SkillVersionQuerySet()
+    task_runs_qs = TaskRunQuerySet()
+    agents_qs = AgentQuerySet()
+    versions_qs = SkillVersionQuerySet()
     bindings = SkillBindingManager()
 
     async def for_skill(
@@ -64,12 +64,12 @@ class SkillUsageManager:
         graph_id: str,
         limit: int,
     ) -> SkillUsageResponse:
-        published = await self.versions.list_for_skill(session, skill.id)
+        published = await self.versions_qs.list_for_skill(session, skill.id)
         version_of = {v.id: v.version for v in published}
 
         counts = []
         for version in published:
-            offered, applied = await self.querysets.skill_version_counts(
+            offered, applied = await self.task_runs_qs.skill_version_counts(
                 session, graph_id=graph_id, version_id=version.id
             )
             counts.append(
@@ -84,11 +84,11 @@ class SkillUsageManager:
             )
 
         bound_to = await self.bindings.agent_ids_for_skill(session, skill_id=skill.id)
-        carried = await self.agents.by_ids(session, graph_id=graph_id, ids=bound_to)
+        carried = await self.agents_qs.by_ids(session, graph_id=graph_id, ids=bound_to)
 
         by_agent, by_outcome = await self._breakdowns(session, graph_id=graph_id, version_id=skill.current_version_id)
 
-        rows = await self.querysets.recent_nodes_for_graph(session, graph_id=graph_id, limit=_SCAN)
+        rows = await self.task_runs_qs.recent_nodes_for_graph(session, graph_id=graph_id, limit=_SCAN)
         steps = []
         for row in rows:
             # The version of *this* skill the step was offered. A step carries
@@ -132,8 +132,8 @@ class SkillUsageManager:
         if version_id is None:
             return [], []
 
-        agent_rows = await self.querysets.skill_version_by_agent(session, graph_id=graph_id, version_id=version_id)
-        names = await self.agents.names_by_ids(session, [a for a, _, _ in agent_rows if a])
+        agent_rows = await self.task_runs_qs.skill_version_by_agent(session, graph_id=graph_id, version_id=version_id)
+        names = await self.agents_qs.names_by_ids(session, [a for a, _, _ in agent_rows if a])
         by_agent = [
             SkillUsageByAgent(
                 agent_id=agent_id,
@@ -146,7 +146,9 @@ class SkillUsageManager:
             for agent_id, offered, applied in agent_rows
         ]
 
-        outcome_rows = await self.querysets.skill_version_by_outcome(session, graph_id=graph_id, version_id=version_id)
+        outcome_rows = await self.task_runs_qs.skill_version_by_outcome(
+            session, graph_id=graph_id, version_id=version_id
+        )
         by_outcome = [
             SkillUsageByOutcome(
                 outcome=outcome,

@@ -22,12 +22,12 @@ from invana.runtime.models import TaskRun
 
 class TaskReadManager:
     tasks = TaskManager()
-    projects = ProjectQuerySet()
+    projects_qs = ProjectQuerySet()
 
     async def compose(self, session: AsyncSession, task: Task) -> TaskRead:
         read = TaskRead.model_validate(task)
         if task.project_id:
-            project = await self.projects.get(session, task.project_id)
+            project = await self.projects_qs.get(session, task.project_id)
             read.project_key = project.key if project else None
         if task.assignee_id:
             if task.assignee_kind == "agent":

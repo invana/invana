@@ -21,7 +21,7 @@ from invana.core.events.services import current_trace_id, emit_event
 
 
 class DependencyManager:
-    querysets = TaskDependencyQuerySet()
+    task_dependencies_qs = TaskDependencyQuerySet()
     tasks_qs = TaskQuerySet()
     tasks = TaskManager()
 
@@ -32,11 +32,11 @@ class DependencyManager:
             raise ValidationError("A task cannot wait on itself.")
         other = await self.tasks.get(session, task_id=payload.depends_on_id, graph_id=graph.id)
 
-        existing = await self.querysets.get_edge(session, task_id=task.id, depends_on_id=other.id)
+        existing = await self.task_dependencies_qs.get_edge(session, task_id=task.id, depends_on_id=other.id)
         if existing is not None:
             return existing
 
-        edges = await self.querysets.all_edges_for_graph(session, graph_id=graph.id)
+        edges = await self.task_dependencies_qs.all_edges_for_graph(session, graph_id=graph.id)
         edges.append((other.id, task.id))
         try:
             assert_acyclic(edges)
@@ -50,7 +50,7 @@ class DependencyManager:
             created_by_kind="user",
             created_by_id=actor.id,
         )
-        await self.querysets.add(session, row)
+        await self.task_dependencies_qs.add(session, row)
 
         if other.status != TaskStatus.done.value and task.status in {
             TaskStatus.assigned.value,
@@ -74,10 +74,10 @@ class DependencyManager:
         return row
 
     async def remove(self, session: AsyncSession, *, graph: Graph, task: Task, depends_on_id: str, actor: User) -> None:
-        row = await self.querysets.get_edge(session, task_id=task.id, depends_on_id=depends_on_id)
+        row = await self.task_dependencies_qs.get_edge(session, task_id=task.id, depends_on_id=depends_on_id)
         if row is None:
             raise NotFoundError("Dependency not found.")
-        await self.querysets.delete(session, row)
+        await self.task_dependencies_qs.delete(session, row)
         if task.status == TaskStatus.blocked.value:
             remaining = await self.tasks.open_dependencies(session, task)
             if not remaining:

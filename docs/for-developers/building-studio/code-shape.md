@@ -163,7 +163,7 @@ studio/src/
         ask/                  3.x — the answer surface, emissions, projections, the trace
         explorer/             4.1 · 4.3 · 4.4 — the canvas, what is selected on it, the console
         canvases/             4.2 — the page host in `mainSection`, and the canvas behind a tab
-        agents/               5.x — roster, envelope, lineage, lifecycle, stats
+        agents/               5.x — agents, envelope, lineage, lifecycle, stats
         skills/               6.x — skills, bindings, usage, rules
         workflows/            7.x — the library, plan selection, promote
         memory/               8.x — proposals, consolidation
@@ -248,7 +248,6 @@ features/
     LayersPanel.tsx              CV6 card — what is painted        (deleted in phase 4)
     StylingPanel.tsx             CV6 card — how it is painted
     ExpandFineTunePanel.tsx      expand, with filters and a sort
-    RendererCapabilityBanner.tsx WebGPU / WebGL, stated once
     useExpandNode.ts             the expand mutation
     canvasTheme.ts               theme tokens → engine colours
     typeColor.ts                 type → palette slot, so legend and drawing agree
@@ -437,7 +436,7 @@ Before writing a component for a batch, check this. Everything named is in `@inv
 | 1 · Explorer | legend, type dots, canvas chrome | `Legend` · `StatusDot` · canvas-ui |
 | 1 · Answers | emission, cannot-answer, diagnosis, clarify, projection switch, citations | `EmissionCard` · `EmissionHeader` · `CannotAnswerCard` · `DiagnosisCard` · `RepairNote` · `RetryNote` · `ClarifyCard` · `TemplatePicker` · `CitationList` |
 | 2 · Model / data | schema tables, property editor, import runs | `DataTable density="compact"` · `@invana/forms` `inputSize="sm"` · `TimelineList` |
-| 3 · Agents | roster, envelope, lineage, **the stats screen** | `Item` · `AgentChip` · `TreeView` · `MetricGrid` + `MetricTile` · `BarChartV` · `HeatStrip` · `Progress size="sm"` |
+| 3 · Agents | the agents, envelope, lineage, **the stats screen** | `Item` · `AgentChip` · `TreeView` · `MetricGrid` + `MetricTile` · `BarChartV` · `HeatStrip` · `Progress size="sm"` |
 | 4 · Work | projects, the plan, tasks, step lists | `DataTable groupBy` · `ChatSessionTaskRow` · `ChatSessionTaskGroup` · `StatusDot` |
 | 5 · Review / memory | the queue, a proposal, diffs, rating | `ProposalCard` · `DiffList` + `DiffRow` · `RatingControl` + `DotRating` |
 | 6 · Skills / rules / workflows | markdown authoring, versioned blocks, diffs | `@invana/editor` `MarkdownEditorBlock` · `CodeBlock` · `DiffList` |
@@ -487,6 +486,8 @@ A convention a community project cannot enforce is a convention it does not have
 | The type ladder | Fail on `text-[Npx]`. **30 sites today** — fix them in Phase 1, then the gate holds (D7 · DS13) |
 | No PixiJS | Fail on any `pixi` import in `src/` (rule 10). The `vite.config.ts` pin is exempt |
 | File size | Warn over 400 lines. A warning, not an error — some canvas files earn it |
+| One `TooltipProvider`, in the shell | `main.tsx` mounts it around the router with `delayDuration={300}`. A screen never declares its own — a second provider is a second delay to keep in step, and the one that wins depends on where a component happens to sit. Kit components that provide one internally are unaffected: nesting is legal, and theirs wins inside them |
+| Nothing interactive in a `PanelStack` title | A section header **is** its collapse `<button>`, so a `<button>` in the title is a button inside a button — invalid HTML, and it steals the collapse click. A drill-in's trail is text and its *back* is a `headerActions` item ([SK27](../modules/skills/features/authoring-a-skill.md#decisions)); `TaskDrawer` and `SkillsPanel` both do it that way |
 
 Each is a few dozen lines and pays for itself the first time a contributor's PR is corrected by CI
 instead of by a reviewer.

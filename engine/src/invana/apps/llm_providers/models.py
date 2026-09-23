@@ -1,9 +1,19 @@
-"""SQLAlchemy async model for LLM providers (MVP § 2.6).
+"""SQLAlchemy async models for LLM providers and the models they offer.
 
-One ``llm_providers`` row = one configured LLM endpoint scoped to a Graph
-(``Anthropic | OpenAI | Google | Azure | Ollama | local | Claude Agent SDK``). Hard delete,
-cascade-from-Graph (matches the redesign's initial schema cascade matrix). At most one row per
-Graph can be ``is_default = true`` (partial unique index in the migration).
+One ``llm_providers`` row = one **configured endpoint** scoped to a Graph: a
+name somebody chose, a vendor kind, a base URL and exactly one credential. One
+``llm_models`` row = one model that endpoint offers. Two tables and not one,
+because ``llm/anthropic-prod/claude-opus-5`` has a provider segment and a model
+segment and they are not the same thing
+([PM9](docs/for-developers/modules/agents/features/providers-and-models.md) ·
+[GV9](docs/for-developers/modules/govern/spec.md)).
+
+There is **no default provider** — the lens ``cast`` answers *which model when
+nobody said*, and a second mechanism would disagree with it
+([PM4](docs/for-developers/modules/agents/features/providers-and-models.md)).
+
+Hard delete, cascade-from-Graph (matches the redesign's initial schema cascade
+matrix); a provider's models cascade with it.
 """
 
 from __future__ import annotations
@@ -21,6 +31,7 @@ from sqlalchemy import (
     LargeBinary,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -74,8 +85,21 @@ _llm_credential_kind_enum = Enum(
 )
 
 
+class LLMModelStatus(enum.StrEnum):
+    """Whether this model is still offered. Removing one a cast names is refused,
+    naming the worlds ([PM11](docs/for-developers/modules/agents/features/providers-and-models.md))."""
+
+    active = "active"
+    removed = "removed"
+
+
 class LLMProvider(Base):
     __tablename__ = "llm_providers"
+    __table_args__ = (
+        # The address segment, so it collides per Graph and nowhere wider:
+        # two Graphs may each have an `anthropic-prod`.
+        UniqueConstraint("graph_id", "name", name="uq_llm_provider_graph_name"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
     graph_id: Mapped[str] = mapped_column(
@@ -85,8 +109,11 @@ class LLMProvider(Base):
         index=True,
     )
 
+    #: The address segment — ``llm/<name>/<model id>``. A word somebody picked
+    #: and can read back in a refusal, never the vendor and never a uuid
+    #: ([PM10](docs/for-developers/modules/agents/features/providers-and-models.md)).
+    name: Mapped[str] = mapped_column(String(64), nullable=False)
     provider: Mapped[LLMProviderKind] = mapped_column(_llm_provider_kind_enum, nullable=False)
-    model_id: Mapped[str] = mapped_column(String(255), nullable=False)
     # Nullable: ollama / local providers don't need a key.
     api_key_encrypted: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     # Disambiguates api_key_encrypted for claude_agent_sdk rows
@@ -100,9 +127,6 @@ class LLMProvider(Base):
     base_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     # Token budgets, allowed model families, etc. (free-form).
     guardrails: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    # Only one row per graph may have is_default=true (enforced by a partial
-    # unique index in the Alembic migration).
-    is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # What the last ping came back with. Saving stores a provider; the ping proves
     # it (providers-and-models.md C3), and setup's Answering gate waits on the
@@ -122,3 +146,45 @@ class LLMProvider(Base):
         """Whether a credential is stored. The ciphertext never leaves the engine, so the
         API and the audit trail carry this instead."""
         return self.api_key_encrypted is not None
+
+
+class LLMModel(Base):
+    """One model a configured endpoint offers — the address's last segment.
+
+    ``capabilities`` carries what the **shipped cast** reads and nothing it does
+    not ([PM12](docs/for-developers/modules/agents/features/providers-and-models.md)):
+    ``context_window`` · ``supports_tools`` · ``embedding`` state what the vendor
+    offers, and ``cost_rank`` · ``power_rank`` · ``local`` are the ordering
+    ``shipped_cast`` resolves *cheapest that can read* and *most capable*
+    against. Ranks are seeded at the backfill and editable per row, because a
+    Graph on a negotiated rate knows its own order.
+    """
+
+    __tablename__ = "llm_models"
+    __table_args__ = (UniqueConstraint("provider_id", "model_id", name="uq_llm_model_provider_model"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    provider_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("llm_providers.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    #: The vendor's own id — ``claude-opus-5``. The address's last segment.
+    model_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    capabilities: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    #: ``{input_per_mtok, output_per_mtok}``; falls back to ``apps/llm/pricing.py``
+    #: when empty, and an empty override is *no override* rather than free.
+    pricing: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default=LLMModelStatus.active.value, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False
+    )
+
+    @property
+    def is_active(self) -> bool:
+        return self.status == LLMModelStatus.active.value

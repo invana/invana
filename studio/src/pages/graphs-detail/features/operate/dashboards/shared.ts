@@ -13,7 +13,7 @@
  */
 
 import type { TraceRead, TraceStepRead } from "@/services/api/runs";
-import type { ChipSpec, PanelSpec, Tone } from "@invana/dashboard";
+import type { ChipSpec, Tone } from "@invana/dashboard";
 import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 
 /** A run that has not settled — the Gantt grows a now line, Cancel is offered. */
@@ -92,27 +92,25 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
 }
 
 /**
- * Drop the entries that have nothing behind them.
- *
- * The composers build every optional tile, panel and row as `x ?? null` and
- * pass the list through here, so SR34 is one filter rather than a condition
- * spelled out at each of thirty call sites.
+ * `omit` · `count` · the view switch · `specPanel` live in
+ * `shared/dashboardSpec.ts`: Skills composes declared boards too, and a second
+ * copy of `omit` is how two modules drift on what *absent* means
+ * ([code-shape §4.1](../../../../../../docs/for-developers/building-studio/code-shape.md)).
+ * They are re-exported here so this file stays the one import a run composer
+ * needs.
  */
-export function omit<T>(items: Array<T | null | undefined | false>): T[] {
-	return items.filter((item): item is T => Boolean(item));
-}
+export {
+	VIEW_ACTION,
+	VIEW_DASHBOARD,
+	VIEW_SPEC,
+	count,
+	omit,
+	specPanel,
+} from "@/pages/graphs-detail/shared/dashboardSpec";
 
-/** `1,204` — counts are read, not computed, so they carry their separators. */
-export function count(n: number): string {
-	return n.toLocaleString();
-}
-
-/** `8.2k` — a token total, which is read as a magnitude rather than a number. */
-export function compact(n: number): string {
-	if (n < 1000) return String(n);
-	if (n < 1_000_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
-	return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
-}
+/** `8.2k` — a token total, which is read as a magnitude rather than a number.
+ *  It lives in `@/lib/format` now, because the journal row reads it too (SR45). */
+export { formatCompact as compact } from "@/lib/format";
 
 /**
  * `$0.04` · `$0.0013` · `<$0.0001` — money, never rounded to nothing.
@@ -193,26 +191,6 @@ export function runTitle(trace: TraceRead): string {
 /** What a step is called: the plan's own id for the node, else the entry it names. */
 export function stepTitle(step: TraceStepRead): string {
 	return step.step_key || step.task_key || step.label || "step";
-}
-
-/** The `Dashboard ¦ spec.json` switch both surfaces carry ([SR37](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
-export const VIEW_ACTION = "view";
-export const VIEW_DASHBOARD = "Dashboard";
-export const VIEW_SPEC = "spec.json";
-
-/** The one panel `spec.json` renders — the very document being looked at. */
-export function specPanel(spec: unknown): PanelSpec {
-	return {
-		kind: "code",
-		title: "spec.json",
-		aside: "the document this page renders",
-		flush: true,
-		options: {
-			language: "json",
-			showLineNumbers: true,
-			value: JSON.stringify(spec, null, 2),
-		},
-	};
 }
 
 /** A status chip, in the words the engine uses for it. */

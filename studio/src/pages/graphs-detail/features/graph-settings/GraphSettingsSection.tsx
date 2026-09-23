@@ -6,7 +6,6 @@ import {
 } from "@/hooks/queries/useGraphs";
 import { ConcurrencyFields } from "@/pages/graphs-detail/features/graph-settings/ConcurrencyFields";
 import { ConnectionFields } from "@/pages/graphs-detail/features/graph-settings/ConnectionFields";
-import { LLMsPanel } from "@/pages/graphs-detail/features/graph-settings/LLMsPanel";
 import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
 import type { Graph, GraphUpdate } from "@/types/graphs";
 import { Form, FormField, InputField, TextareaField } from "@invana/forms";
@@ -22,20 +21,13 @@ import {
 	Skeleton,
 	TabbedPanel,
 } from "@invana/ui";
-import {
-	Archive,
-	ArchiveRestore,
-	Bot,
-	Database,
-	Info,
-	Sparkles,
-} from "lucide-react";
+import { Archive, ArchiveRestore, Bot, Database, Info } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */
-export const SETTINGS_TABS = ["basic", "graph", "llms", "agents"] as const;
+export const SETTINGS_TABS = ["basic", "graph", "agents"] as const;
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 interface Props {
@@ -94,7 +86,7 @@ export function GraphSettingsSection({
 }: Props) {
 	const { data: graph, isLoading } = useGraphQuery(username, graphSlug);
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
-	const { tab, section, setSection } = useSettingsPanel();
+	const { tab, setSection } = useSettingsPanel();
 	const mutation = useUpdateGraphMutation();
 
 	// A connection that never connected is not "saved" — the chip says which.
@@ -121,15 +113,11 @@ export function GraphSettingsSection({
 		<div className="space-y-4 p-4">{content}</div>
 	);
 
-	// `?panel=llms` predates the tab (G29) and is still written by nothing, read
-	// by every old bookmark and by the setup step that links here — it lands on
-	// the tab that now holds the providers rather than on nothing.
-	const active: SettingsTab =
-		section === "llms"
-			? "llms"
-			: SETTINGS_TABS.includes(tab as SettingsTab)
-				? (tab as SettingsTab)
-				: "basic";
+	// The providers are no longer here at all: `Agents › LLMs` holds them (PM6),
+	// and `?panel=llms` is aliased onto that panel rather than onto a tab.
+	const active: SettingsTab = SETTINGS_TABS.includes(tab as SettingsTab)
+		? (tab as SettingsTab)
+		: "basic";
 
 	const content = (render: (g: Graph) => ReactNode) =>
 		body(
@@ -189,17 +177,6 @@ export function GraphSettingsSection({
 					)),
 				},
 				{
-					value: "llms",
-					label: "LLMs",
-					icon: Sparkles,
-					// Not wrapped in `content()`: the providers panel owns its own
-					// padding, its own list → detail switching and its own status bar
-					// (PM6). The tab supplies the header and nothing else.
-					content: (
-						<LLMsPanel username={username} graphSlug={graphSlug} embedded />
-					),
-				},
-				{
 					value: "agents",
 					label: "Agents",
 					icon: Bot,
@@ -246,7 +223,7 @@ function TabRule({
 	const chip = state ? STATE_COPY[state] : null;
 
 	return (
-		<div className="flex items-start justify-between gap-3 text-xs text-muted-foreground">
+		<div className="flex items-start justify-between gap-3 text-sm text-muted-foreground">
 			<p className="min-w-0">{children}</p>
 			{chip ? (
 				<span className={`shrink-0 ${chip.tone}`}>{chip.label}</span>

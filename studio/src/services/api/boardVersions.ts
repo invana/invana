@@ -21,7 +21,8 @@ interface ApiVersionSummary {
 	board_id: string;
 	created_by_id: string;
 	message_id: string | null;
-	kind: BoardVersionCause;
+	/** `cause` on the wire — two `kind` columns in one module was the bug B7 renamed away. */
+	cause: BoardVersionCause;
 	label: string;
 	node_count: number;
 	edge_count: number;
@@ -44,7 +45,7 @@ interface ApiListResponse {
 
 /** Body the client sends when snapshotting the canvas after a turn. */
 export interface CanvasStateCreateBody {
-	kind: BoardVersionCause;
+	cause: BoardVersionCause;
 	label?: string;
 	/** The engine-native `canvas.exportState()` envelope. */
 	snapshot?: Record<string, unknown>;
@@ -70,7 +71,7 @@ function toStateSummary(s: ApiVersionSummary): BoardVersionSummary {
 		boardId: s.board_id,
 		createdById: s.created_by_id,
 		messageId: s.message_id ?? undefined,
-		kind: s.kind,
+		kind: s.cause,
 		label: s.label,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,

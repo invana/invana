@@ -32,14 +32,14 @@ def slugify(name: str) -> str:
 
 
 class ProjectManager:
-    querysets = ProjectQuerySet()
-    tasks = TaskQuerySet()
-    users = UserQuerySet()
+    projects_qs = ProjectQuerySet()
+    tasks_qs = TaskQuerySet()
+    users_qs = UserQuerySet()
 
     async def list_for_graph(self, session: AsyncSession, *, graph_id: str) -> list[ProjectRead]:
-        projects = await self.querysets.list_for_graph(session, graph_id=graph_id)
-        counts = await self.tasks.count_by_project(session, graph_id=graph_id)
-        open_counts = await self.tasks.count_by_project(session, graph_id=graph_id, open_only=True)
+        projects = await self.projects_qs.list_for_graph(session, graph_id=graph_id)
+        counts = await self.tasks_qs.count_by_project(session, graph_id=graph_id)
+        open_counts = await self.tasks_qs.count_by_project(session, graph_id=graph_id, open_only=True)
         # One lookup for the whole list. The detail reads its creator off the row
         # it was already given, so opening a project asks nothing extra.
         names = await self._creator_names(session, projects)
@@ -61,10 +61,10 @@ class ProjectManager:
 
     async def _creator_names(self, session: AsyncSession, projects: list[Project]) -> dict[str, str]:
         ids = {p.created_by_id for p in projects if p.created_by_kind == "user" and p.created_by_id}
-        return await self.users.usernames_by_ids(session, list(ids))
+        return await self.users_qs.usernames_by_ids(session, list(ids))
 
     async def get_by_key(self, session: AsyncSession, *, key: str, graph_id: str) -> Project:
-        project = await self.querysets.get_by_key(session, key=key, graph_id=graph_id)
+        project = await self.projects_qs.get_by_key(session, key=key, graph_id=graph_id)
         if project is None:
             raise NotFoundError("Project not found.")
         return project
@@ -84,7 +84,7 @@ class ProjectManager:
             created_by_id=actor.id,
         )
         try:
-            await self.querysets.add(session, project)
+            await self.projects_qs.add(session, project)
         except IntegrityError as exc:
             raise ConflictError(f"A project keyed '{project.key}' already exists in this graph.") from exc
         await emit_event(
@@ -136,7 +136,7 @@ class ProjectManager:
         someone filed them in.
         """
         key, graph_id, project_id = project.key, project.graph_id, project.id
-        await self.querysets.delete(session, project)
+        await self.projects_qs.delete(session, project)
         await emit_event(
             session,
             action=actions.PROJECT_DELETE,

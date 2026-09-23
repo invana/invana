@@ -12,8 +12,13 @@ import {
 	type SetupSection,
 	setupSectionStatus,
 } from "@/types/graphs";
-import { Eyebrow } from "@/ui/Eyebrow";
-import { Button, ButtonGroup, Terminal, TerminalLine } from "@invana/ui";
+import {
+	Button,
+	ButtonGroup,
+	Eyebrow,
+	Terminal,
+	TerminalLine,
+} from "@invana/ui";
 import { ArrowLeft, ArrowRight, Copy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -94,7 +99,7 @@ export function SetupLesson({
 						{gate ? `Unlocks ${gate.unlocks}.` : "It never holds a gate shut."}
 					</p>
 				</div>
-				<p className="shrink-0 whitespace-nowrap text-meta text-muted-foreground">
+				<p className="shrink-0 whitespace-nowrap text-sm text-muted-foreground">
 					{position}
 				</p>
 			</header>

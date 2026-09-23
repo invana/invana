@@ -30,8 +30,10 @@ from invana.runtime.catalogue.contract import (
     _provider_label,
     _report_ids,
     cited_rule_version_ids,
+    close_model,
     offered_rule_version_ids,
     offered_skill_version_ids,
+    open_model,
     query_language_for,
 )
 from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
@@ -60,6 +62,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     something discovered after an empty result.
     """
     assert v.provider is not None
+    crossing = await open_model(ctx, v, grounding=v.grounding)
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · reading the ask against the model")
@@ -72,7 +75,8 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
             instructions=v.instructions,
             skills=render_skills(v.skills),
             rules=render_rules(v.rules),
-            history=v.history,
+            history=crossing.history(v.history),
+            may_send=crossing.may_send,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except LLMError as exc:
@@ -83,6 +87,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     v.via = _provider_label(v.provider)
     v.llm_ms = (v.llm_ms or 0) + outcome.duration_ms
     usage = outcome.usage
+    await close_model(ctx, v, crossing, usage=usage, duration_ms=outcome.duration_ms)
 
     if isinstance(outcome, OutOfScope):
         # The run **succeeds** — "I can't answer that" is an outcome, not
@@ -133,6 +138,7 @@ async def plan_workflow(ctx: TaskContext, v: RunVars) -> Out:
             envelope=envelope,
             raw_steps=[dict(s) for s in selected.steps],
             source=f"template:{selected.ref}",
+            declares=selected.declares,
         )
         v.plan_steps, v.plan_origin = steps, source
         # The run records *which plan*, not only which flavour of provenance —
@@ -154,6 +160,7 @@ async def plan_workflow(ctx: TaskContext, v: RunVars) -> Out:
             message="No LLM provider is bound to this agent, and no template fits this ask.",
             short="no provider",
         )
+    crossing = await open_model(ctx, v)
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · composing a workflow")
@@ -178,6 +185,9 @@ async def plan_workflow(ctx: TaskContext, v: RunVars) -> Out:
                 cls="blocked", cause="llm_failed", message=exc.message, short="model error", raw=exc.message
             ) from exc
         v.llm_ms = (v.llm_ms or 0) + proposed.duration_ms
+        # Recorded per attempt: the repair is a second crossing and a second
+        # spend, and a ledger that counted one would understate what the run did.
+        await close_model(ctx, v, crossing, usage=proposed.usage, duration_ms=proposed.duration_ms)
         try:
             steps, source = resolve_plan(envelope=envelope, raw_steps=proposed.steps, source="generated")
         except PlanRejected as rejected:
@@ -219,6 +229,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     two rows a reader can tell apart rather than one row that did two things.
     """
     assert v.provider is not None
+    crossing = await open_model(ctx, v, grounding=v.grounding)
     ask = str((ctx.step.args or {}).get("ask") or "").strip() or v.prompt
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
@@ -235,7 +246,8 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             skills=render_skills(v.skills),
             rules=render_rules(v.rules),
             instructions=v.instructions,
-            history=v.history,
+            history=crossing.history(v.history),
+            may_send=crossing.may_send,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except QueryNotReadOnlyError as exc:
@@ -258,6 +270,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     v.via = _provider_label(v.provider)
     v.llm_ms = generated.duration_ms
     usage = generated.usage
+    await close_model(ctx, v, crossing, usage=usage, duration_ms=generated.duration_ms)
 
     if isinstance(generated, Clarification):
         options = await _options(ctx, v, generated)
@@ -327,6 +340,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
 async def propose_model_task(ctx: TaskContext, v: RunVars) -> Out:
     """Node and edge types for the described change, staged on the draft."""
     assert v.provider is not None and v.draft is not None
+    crossing = await open_model(ctx, v, grounding=v.draft)
     await ctx.progress(f"{_provider_label(v.provider)} · proposing node and edge types")
     try:
         proposal = await propose_model(
@@ -334,7 +348,8 @@ async def propose_model_task(ctx: TaskContext, v: RunVars) -> Out:
             prompt=v.prompt,
             version=v.draft,
             encryption_key=v.encryption_key,
-            history=v.history,
+            history=crossing.history(v.history),
+            may_send=crossing.may_send,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except LLMError as exc:
@@ -344,6 +359,7 @@ async def propose_model_task(ctx: TaskContext, v: RunVars) -> Out:
     v.via = _provider_label(v.provider)
     v.llm_ms = proposal.duration_ms
     usage = proposal.usage
+    await close_model(ctx, v, crossing, usage=usage, duration_ms=proposal.duration_ms)
     if isinstance(proposal, Clarification):
         await _clarify_event(ctx, v, question=proposal.question, usage=usage, duration_ms=proposal.duration_ms)
         ctx.step.tokens_in, ctx.step.tokens_out = usage.input_tokens, usage.output_tokens
@@ -362,6 +378,84 @@ async def propose_model_task(ctx: TaskContext, v: RunVars) -> Out:
         },
         tokens_in=usage.input_tokens,
         tokens_out=usage.output_tokens,
+    )
+
+
+async def draft_plan(ctx: TaskContext, v: RunVars) -> Out:
+    """Draw a skill's playbook as its plan — one sentence at a time.
+
+    **Nothing is guessed.** The model returns the candidates each sentence has,
+    and the three cases are counted rather than judged
+    ([SK24](docs/for-developers/modules/skills/features/authoring-a-skill.md)):
+    one candidate is a step, none is a `form: human` step, and two or more
+    **stops** — the question is recorded against the sentence and no plan is
+    written until it is answered.
+
+    The question is a row on the version, not a prompt on the run: it sits
+    against the sentence in the editor, which is where the person who can
+    answer it is looking, and it survives everything a reload takes with it
+    ([SK26](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+
+    The rows are written by one manager — ``SkillDraftManager``, which is where
+    skills and plans are composed. This entry does the LLM call and nothing
+    else, which is what keeps an entry to *one act*.
+    """
+    from invana.apps.llm.draft import draft_skill_plan
+    from invana.runtime.managers.skill_draft import SkillDraftManager
+    from invana.runtime.planning import resolve_plan
+
+    envelope = v.envelope
+    assert envelope is not None
+    drafts = SkillDraftManager()
+    version_id = str((ctx.step.args or {}).get("skill_version_id") or "")
+
+    subject = await drafts.drawing(ctx.db, version_id=version_id)
+    if subject is None:
+        raise TaskFailure(cls="defect", cause="no_version", message="That draft no longer exists.", short="no draft")
+    if v.provider is None:
+        raise TaskFailure(
+            cls="blocked",
+            cause="no_provider",
+            message="No LLM provider is bound to this agent, so the playbook cannot be drawn.",
+            short="no provider",
+        )
+
+    crossing = await open_model(ctx, v)
+    await ctx.progress(f"{_provider_label(v.provider)} · reading the playbook")
+    try:
+        drafted = await draft_skill_plan(
+            provider=v.provider,
+            name=subject.name,
+            when_to_use=subject.when_to_use,
+            content=subject.content,
+            vocabulary=_vocabulary(envelope),
+            answered=subject.answered,
+            encryption_key=v.encryption_key,
+            **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
+        )
+    except LLMError as exc:
+        raise TaskFailure(
+            cls="blocked", cause="llm_failed", message=exc.message, short="model error", raw=exc.message
+        ) from exc
+    v.llm_ms = (v.llm_ms or 0) + drafted.duration_ms
+    await close_model(ctx, v, crossing, usage=drafted.usage, duration_ms=drafted.duration_ms)
+
+    outcome = await drafts.apply_drawing(
+        ctx.db, version_id=version_id, drafted=drafted, envelope=envelope, validate=resolve_plan
+    )
+    usage = drafted.usage
+    # A refusal **settles**, exactly as a question does
+    # ([SK31](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    # The draw did its job: it read the prose and found that what it names does
+    # not hold together. Raising would put the reasons in a failure payload the
+    # authoring surface never reads, and leave the author with a dead run and a
+    # draft that silently drew nothing.
+    return Out(
+        detail=outcome.detail,
+        input={"skill_version_id": version_id},
+        output={**outcome.output, **_exchange(drafted)},
+        tokens_in=usage.input_tokens if usage else None,
+        tokens_out=usage.output_tokens if usage else None,
     )
 
 
@@ -457,6 +551,24 @@ ENTRIES = build(
             "rationale": Type.str_,
             "ask": Type.str_,
             "question": Type.str_,
+            "options": Type.list_,
+        },
+    ),
+    Entry(
+        key="draft_plan",
+        bound=Bound.llm,
+        run=draft_plan,
+        args={"skill_version_id": Arg(Type.str_, required=True)},
+        # `question`, `span` and `options` are declared because a surface reads
+        # them off the step row: an output a surface consumes is an API whether
+        # or not a plan binds it.
+        outputs={
+            "plan_id": Type.str_,
+            "steps": Type.int_,
+            "unmapped": Type.list_,
+            "question": Type.str_,
+            "span": Type.str_,
+            "clarification_id": Type.str_,
             "options": Type.list_,
         },
     ),

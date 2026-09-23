@@ -48,28 +48,28 @@ def blocked_by_text(blockers: list[Task]) -> str:
 
 
 class TaskManager:
-    querysets = TaskQuerySet()
-    dependencies = TaskDependencyQuerySet()
+    tasks_qs = TaskQuerySet()
+    dependencies_qs = TaskDependencyQuerySet()
     projects_qs = ProjectQuerySet()
-    members = GraphMemberQuerySet()
+    members_qs = GraphMemberQuerySet()
     projects = ProjectManager()
 
     # ── Reads ────────────────────────────────────────────────────────────────
 
     async def list_for_graph(self, session: AsyncSession, **kwargs) -> list[Task]:
-        return await self.querysets.list_for_graph(session, **kwargs)
+        return await self.tasks_qs.list_for_graph(session, **kwargs)
 
     async def get(self, session: AsyncSession, *, task_id: str, graph_id: str) -> Task:
-        task = await self.querysets.get(session, task_id)
+        task = await self.tasks_qs.get(session, task_id)
         if task is None or task.graph_id != graph_id:
             raise NotFoundError("Task not found.")
         return task
 
     async def depends_on_ids(self, session: AsyncSession, task_id: str) -> list[str]:
-        return await self.dependencies.depends_on_ids(session, task_id)
+        return await self.dependencies_qs.depends_on_ids(session, task_id)
 
     async def dependant_ids(self, session: AsyncSession, task_id: str) -> list[str]:
-        return await self.dependencies.dependant_ids(session, task_id)
+        return await self.dependencies_qs.dependant_ids(session, task_id)
 
     # ── Writes ───────────────────────────────────────────────────────────────
 
@@ -99,7 +99,7 @@ class TaskManager:
             created_by_kind="user",
             created_by_id=actor.id,
         )
-        await self.querysets.add(session, task)
+        await self.tasks_qs.add(session, task)
         create_event = await emit_event(
             session,
             action=actions.TASK_CREATE,
@@ -192,7 +192,7 @@ class TaskManager:
             if not agent.effective_policy.get("can_be_assigned", True):
                 raise ConflictError(f"'{agent.name}' does not take assignments.")
         else:
-            member = await self.members.get(session, graph_id=graph.id, user_id=assignee_id)
+            member = await self.members_qs.get(session, graph_id=graph.id, user_id=assignee_id)
             if member is None:
                 raise NotFoundError("That person is not a member of this graph.")
 
@@ -308,7 +308,7 @@ class TaskManager:
         A parent task cannot post a result while a sub-task is open: "done"
         would be a claim about work that has not happened.
         """
-        open_children = await self.querysets.open_children(session, parent_id=task.id)
+        open_children = await self.tasks_qs.open_children(session, parent_id=task.id)
         if open_children:
             raise ConflictError(f"{len(open_children)} sub-task(s) are still open.")
         task.result = {
@@ -440,8 +440,8 @@ class TaskManager:
         not just that it did. For an agent assignee the same trigger a manual
         assignment uses fires here, which is why the two read identically.
         """
-        for dependant_id in await self.dependencies.dependant_ids(session, task.id):
-            dependant = await self.querysets.get(session, dependant_id)
+        for dependant_id in await self.dependencies_qs.dependant_ids(session, task.id):
+            dependant = await self.tasks_qs.get(session, dependant_id)
             if dependant is None or dependant.status != TaskStatus.blocked.value:
                 continue
             remaining = await self.open_dependencies(session, dependant)
@@ -480,8 +480,8 @@ class TaskManager:
         started**. Ones already running keep going and show *dependency
         re-opened* — stopping live work because an upstream review turned would
         waste more than it protects."""
-        for dependant_id in await self.dependencies.dependant_ids(session, task.id):
-            dependant = await self.querysets.get(session, dependant_id)
+        for dependant_id in await self.dependencies_qs.dependant_ids(session, task.id):
+            dependant = await self.tasks_qs.get(session, dependant_id)
             if dependant is None:
                 continue
             if dependant.status in {TaskStatus.open.value, TaskStatus.assigned.value}:
@@ -491,8 +491,8 @@ class TaskManager:
                 dependant.blocked_reason = f"dependency re-opened: {task.title}"
 
     async def open_dependencies(self, session: AsyncSession, task: Task) -> list[Task]:
-        ids = await self.dependencies.depends_on_ids(session, task.id)
-        return await self.querysets.unfinished_in(session, ids=ids)
+        ids = await self.dependencies_qs.depends_on_ids(session, task.id)
+        return await self.tasks_qs.unfinished_in(session, ids=ids)
 
     # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -505,7 +505,7 @@ class TaskManager:
         depth = 0
         node = task
         while node.parent_id and depth < MAX_TASK_DEPTH + 1:
-            parent = await self.querysets.get(session, node.parent_id)
+            parent = await self.tasks_qs.get(session, node.parent_id)
             if parent is None:
                 break
             node = parent

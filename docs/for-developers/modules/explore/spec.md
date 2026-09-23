@@ -36,8 +36,9 @@ Six things get drawn, and they share every gesture — pan, zoom, select, hover,
 | `envelope` | what an agent may run | no |
 | `lineage` | who authored or spawned whom | no |
 
-**Exactly two kinds write from a gesture.** Everything else selects, and the panel states the fact. A
-new exception is argued and written down, never added in code.
+**Exactly three kinds write from a gesture** — `model`, `plan`, and `workflow` while drafting
+([DP11](../workflows/features/draft-a-plan.md#decisions)). Everything else selects, and the panel
+states the fact. A new exception is argued and written down, never added in code.
 
 ## 3. The canvas selects, the panel edits
 
@@ -85,7 +86,7 @@ flowchart LR
 | # | Decision |
 |---|---|
 | E1 | One page. The kind is a property of the board, not a mode in the header. |
-| E2 | Exactly two kinds write from a gesture — `model` and `plan`. Others select. |
+| E2 | Exactly three kinds write from a gesture — `model`, `plan`, and `workflow` while drafting ([DP11](../workflows/features/draft-a-plan.md#decisions)). Others select. |
 | E3 | The canvas selects; the panel states or edits. Never the reverse. |
 | E4 | Canvases are named, saved and versioned; autosave never overwrites history. |
 | E5 | **The assistant is not an Explore feature.** It is one surface for the whole graph page, reachable from every left panel — Explorer, Model, Projects, Tasks, Agents, Workflows — so it belongs to [Ask](../ask/features/the-assistant.md), not here. Explore's stake in it is only where it sits (E7) and what it inherits (the selection, E3). |

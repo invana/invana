@@ -10,6 +10,16 @@
     "schema_description": "The air-routes graph, as the CSVs in this folder carry it.",
     "validation_mode": "strict",
     "version": "1.0.0",
+    "axes": {
+      "geo": {
+        "property": "country",
+        "vocab": "iso2"
+      },
+      "dims": [
+        "type",
+        "region"
+      ]
+    },
     "property_keys": [
       {
         "name": "type",

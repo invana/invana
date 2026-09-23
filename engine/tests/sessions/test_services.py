@@ -161,7 +161,10 @@ class TestSessionPersistence:
                 payload=SendMessage(content="who are the people?", mode="nl"),
                 actor_id=user.id,
             )
-        assert "Settings" in exc.value.detail
+        # The copy names where the list lives now — the Agents panel's LLMs drawer, not
+        # Settings (PM6). A refusal that routes somebody to a moved screen is
+        # a refusal with no recourse.
+        assert "Agents" in exc.value.detail
         assert await _message_count(session, sess.id) == 0
 
     async def test_seq_is_monotonic_across_appends(self, session, graph, user):

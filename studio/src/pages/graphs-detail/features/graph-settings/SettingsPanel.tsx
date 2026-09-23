@@ -51,10 +51,10 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 		},
 	];
 
-	// Settings is four tabs rather than one, so it builds its own strip and takes
-	// the chrome's actions as a prop. `llms` resolves here too: the providers are
-	// one of those tabs now (G29), and the old panel key still has to land.
-	if (section === "settings" || section === "llms") {
+	// Settings is three tabs rather than one, so it builds its own strip and
+	// takes the chrome's actions as a prop. The providers are not among them —
+	// `Agents › LLMs` holds them (PM6), and `?panel=llms` is aliased there.
+	if (section === "settings") {
 		return (
 			<GraphSettingsSection
 				username={username}
@@ -116,7 +116,6 @@ export function SettingsPanel({ username, graphSlug }: Props) {
 type SingleTabSection = Exclude<
 	SettingsSection,
 	| "connection"
-	| "llms"
 	| "settings"
 	| "explorer"
 	| "sessions"
@@ -127,6 +126,7 @@ type SingleTabSection = Exclude<
 	| "projects"
 	| "runs"
 	| "library"
+	| "govern"
 	| "agents"
 >;
 function isSingleTabSection(s: SettingsSection): s is SingleTabSection {

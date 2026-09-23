@@ -19,6 +19,7 @@ import {
 	useGraphQuery,
 	useUpdateGraphMutation,
 } from "@/hooks/queries/useGraphs";
+import { PoolsTable } from "@/pages/graphs-detail/features/agents/PoolsTable";
 import { graphsApi } from "@/services/api/graphs";
 import {
 	Input,
@@ -100,24 +101,32 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 				</div>
 			</div>
 
-			<p className="text-xs text-muted-foreground">
+			<p className="text-sm text-muted-foreground">
 				A person's question is served before a scheduled run, and a delegated
 				child takes a slot like anything else. `0` means no ceiling.
 			</p>
 
 			{contention.data ? (
-				<p className="text-xs">
-					<span className="text-muted-foreground">Right now:</span>{" "}
-					<span className={contention.data.running_count ? "text-primary" : ""}>
-						{contention.data.running_count} running
-					</span>
-					{contention.data.queued_count ? (
-						<span className="text-warning">
-							{" "}
-							· {contention.data.queued_count} queued
+				<>
+					<p className="text-sm">
+						<span className="text-muted-foreground">Right now:</span>{" "}
+						<span
+							className={contention.data.running_count ? "text-primary" : ""}
+						>
+							{contention.data.running_count} running
 						</span>
-					) : null}
-				</p>
+						{contention.data.queued_count ? (
+							<span className="text-warning">
+								{" "}
+								· {contention.data.queued_count} queued
+							</span>
+						) : null}
+					</p>
+					{/* A5 — the pools, busy or quiet, where the ceiling that causes the
+					    contention is set (CC8 · C8). The running count alone cannot say
+					    a Graph is stalled on `graphdb` with two runs going. */}
+					<PoolsTable contention={contention.data} />
+				</>
 			) : null}
 
 			{dirty ? (

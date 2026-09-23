@@ -237,6 +237,9 @@ re-verified against the kit's source, not assumed.
 |---|---|---|
 | 53 | `TaskGantt` — one row per Task on a run's clock: a bar placed by start and width by duration, a red segment for a failed attempt, an outline for a task that never ran, an optional line of log under each row | **Shipped and installed — `@invana/ui@0.0.25` › `ui-extended/task-gantt`, with three stories** (`InFlight`, `Finished`, `CustomDetail`). Studio renders it in the **Runs** drawer's `Performance` band, fed from the run's own trace: `taskKey` · `status` · `startedAt` · `finishedAt` map straight onto it, `detail` is the row's line of log and `output` its `result`. It takes the trace's own shape (`task_key` · `status` · `started_at` · `finished_at` · `duration_ms`) as `startMs`/`durationMs` or as timestamps with an `origin`; `attempts` are the retry segments, `result` · `error` · `summary` · `log` fill the **hover card** (`TaskGanttDetailCard`, exported; `task.detail` replaces one row's body, `renderDetail` every row's — [SR22](../modules/operate/features/see-what-ran.md)), `density` · `labelWidth` serve the three surfaces ([SR14](../modules/operate/features/see-what-ran.md)), `nowMs` + `openEnded` are the live run, and `onSelectTask` is what filters the log ([SR15](../modules/operate/features/see-what-ran.md)) |
 | 54 | `PanelStack` — a stack of collapsible, resizable drawers, driven from outside | **Shipped — `@invana/ui` › `ui-extended/panel-stack`, with the `DrivenFromOutside` story.** `stackRef` (`expand` · `collapse` · `toggle` · `isCollapsed`) and `onCollapsedChange` were added for the Tasks and Projects stacks: a drill-in has to open its own drawer, or the detail renders into a section the reader collapsed. Deliberately **not** a `collapsed` prop — the resizable group owns the geometry, and a controlled map would fight every drag ([G35](graph-detail-page.md)) |
+| 55 | `PanelStackHandle.collapseOthers(id)` — shut every sibling of one section, **atomically** | **Owed.** The *Library › Plans* artboards draw a drilled-in record with its two siblings collapsed to their headers, and the handle cannot express it: `collapse()` hands a section's freed height to the next neighbour, so a loop over two siblings always leaves one of them open — the same hazard `PanelStack` already solves atomically for `defaultCollapsed` at mount, and its own comment says so. Until the kit has it, the Library stack keeps [G35](graph-detail-page.md)'s split and a plan's record scrolls in a 60% drawer, which is legible but is not what the board draws |
+| 57 | **Four class names, two rungs — and `text-sm` is not small.** Retire `--text-meta`; make `sm` and `xs` mean what everyone reads them to mean | **Agreed, and it costs no pixels.** Measured in the running app: `text-base` 13px · `text-sm` **13px** · `text-meta` 12px · `text-xs` **12px**. `sm` is an alias of `base` and `xs` an alias of `meta`, so the ladder reads as four choices and is two — which is the whole of *the sizes look inconsistent*. The scale becomes `base 1rem` (13px) · `sm 0.923rem` (12px) · `xs 0.846rem` (11px), and `--text-meta` is deleted. **The migration is a 1:1 rename, not a re-baseline**: `text-sm → text-base` (690 sites, both 13px), then `text-meta → text-sm` and `text-xs → text-sm` (721 sites, both 12px). Nothing moves; afterwards `xs` is a real third rung for the 10.5px band the artboards use, which the kit could not express before. It also deletes the `extendTailwindMerge` `font-size` group in `@invana/ui`'s `cn` — that exists **only** to register `meta`, and with it goes the footgun where an unregistered `text-*` size is read as a colour and silently drops the colour class before it. Counts: design-kit 433/259/180, canvas 29/8/71, Studio 228/128/75 (`sm`/`meta`/`xs`) |
+| 56 | `PropertyRow mono` — the face, or the face **and** a type step? | **Owed, as a question for the kit.** `mono` sets `font-mono text-meta`, so a property list whose values are mixed renders the mono ones a step under the plain ones and reads as two lists. `prow` on the artboards sets the mono face and leaves the size alone — the label is the subordinate half, a value is a value. The plan panel therefore writes `font-mono` on the value span and does not pass `mono`; if the kit agrees, `mono` should drop the step and the call sites that wanted both should ask for both |
 | 52 | `SubgraphPreview` — thumb · `9 nodes · 12 edges` · Show | **Build it, in Phase 6.** `exportSVG` already exists in canvas's `@invana/graph`; what is missing is the card around it. It belongs with the rest of the canvas wiring, not before it |
 | 28 | `TokenMeter` — icon + `1.2k` | **No.** It is a span with an icon and a number, it appears once (the app header), and the original audit already hedged "or app-side". A component here is machinery around a `<span>` |
 | 26 | `Badge shape="circle"` — wave/order badge, mono 18×18 | **Only if the board still draws it.** One artboard family used it; if it survives Phase 7, it is a `shape` variant and half an hour. If it does not, delete the row |
@@ -352,6 +355,53 @@ directly labels its marks, which is how it is discharged.
 | `DataTable` `groupBy` / `renderGroupHeader` | presentational grouping — deliberately *not* TanStack's aggregating model. It sorts nothing and aggregates nothing, so it cannot disagree with the order the caller chose |
 | **`useCodeMirror` rebuilt on a Compartment** | the one real defect shipped earlier. Keying the mount effect on `extensions` identity meant an inline array rebuilt the editor every render, losing cursor, selection and focus mid-keystroke. "Callers are expected to memoise" is a trap, not a contract — the view now mounts once and reconfigures in place |
 | 2 stories | |
+
+### Shipped — Govern K1–K11 (design-kit, uncommitted)
+
+Every component the Govern and Agents panels need. Table with props:
+[govern-and-agents-panels.md § 3](govern-and-agents-panels.md), where all eleven rows are now ✅.
+
+| What | Note |
+|---|---|
+| `LayerChip` (K1) | six layers, one fixed hue each, the name always present. See the palette decision below |
+| `AddressChip` (K2) | **truncates in the middle** — the last segment is *which thing* and the ones before it are *which kind*, and the kind is usually already on the `LayerChip` beside it, so the kind is what gives way. A plain `truncate` renders every model in a Graph as `graph_data/model/…`. `denied` and `refused` are separate tones: one is what the rule says, the other is what happened when a run reached for it |
+| `RuleRow` (K3) | a rule as a sentence, selectors and egress as sub-lines that hang under the match rather than becoming columns most rules leave empty. Deny takes the destructive token, because deny wins at any specificity and *what is shut* must be findable without reading every row |
+| `LayerSection` (K4) | a layer's band, with the summary line that states a **closed** layer. A band with no rules still appears — *no third parties configured* and *this lens admits none* are different facts |
+| `LensRow` (K5) | a world in the drawer: name, what it narrows as six fixed kinds of chip, and usage. Usage **never sorts the list** — a world used once may be the one that matters, and a list that reorders under you cannot be scanned twice |
+| `LensChip` (K6) | reads **`Everything`** when no lens is set — never blank, never `None`. The widest state is the default and it is a *state*, not a missing value; `None` would say nothing is in view, the opposite of what is true |
+| `CastTable` (K7) | `role → resolves to → why this one`, **all four rows always**, including the ones nothing casts — that is the state that falls to a shipped default which may name a model the Graph is not credentialed for. A denied row names the rule, because the recourse is to edit that rule |
+| `SliceSummary` (K8) | owns the slice vocabulary; the axis is always named. An **undeclared axis renders struck rather than dropped**, so the save-time refusal does not arrive from nowhere |
+| `MatchPreview` (K9) | what a pattern bites right now. **Near-misses are greyed, not filtered** — a list of hits alone cannot distinguish *precise* from *wrong*, and seeing the four models `Deals@1.0.0` passed over is what tells an author to write `Deals@*` |
+| `EgressList` (K10) | per destination, what may be sent and what was **cut**. `cut` is what makes it evidence rather than configuration: without it a rule that did work looks like a rule that never bit |
+| `LayerStrip` (K11) | **a gantt: time across, the participants it spends down** ([D20](../governance.md)). Six bands, each opening into its own `parts` — `role: decide`, `model/Orders@v2`, `third_party/app/email` — and a task is a **bar** on the row it spends, carrying its own name. `scale="seq"` reads a plan's order, `scale="elapsed"` a run's wall clock, so one component serves both tenses. **Every band with participants folds**, and its tasks come onto its own line ([D21](../governance.md)) — shut, the strip is six lines and the whole plan is one picture; `collapse all` sits in the header. **Each task carries a hover card** (`hoverDetail` · `itemDetail`) with the participant, the span and the rule that refused it, so a bar never grows a second line per fact. **Refusals struck in place** — a gap is indistinguishable from a stretch of time that never reached for that layer, and *the bound bit here* is the most important thing the drawing says. `skipped` is a third state. **A row nothing spent is muted, never dropped** ([D22](../governance.md)) — the band recedes with its chip and its note, and so does a participant row under an open band, so *declared and never reached* stays readable as a finding; a row whose only task was **refused** keeps its full weight, because the mute follows *nothing happened here* and not *something was denied here*. **A gate is a seam, never a row** ([LB28](../modules/workflows/features/the-library.md#decisions)) — `seams` draws a rule at a position on the axis, crossing every band, with its label hung off the side the cost falls on (`edge: "before"` and nothing is spent; `"after"` and the pass is already paid for). `conditional` is dashed — it lives on the envelope and resolves at dispatch — and a seam with no `at` has no position at all: it runs the whole axis on its own line. **`brackets` pack into lines**, widest on top, so a nested repetition reads as nested. DOM over a fixed track, in `ui-extended` not `canvas-ui`, per § 3 |
+| 17 stories | one exported story per file, under `stories/ui/ui-extended/`. `LayerStrip` has **seven**, because one component with two tenses, two readings, a bound and a gate is not shown by one. Three draw the component: `default` (declared), `touched` (a run) and `collapsed` (every band shut). Three draw **one run under two lenses**, off a shared `_run.ts` fixture — `run-execution` is the attended run, three `ask · clarify · read` rounds bracketed over the stretch each owns and the fourth ask struck by `human/** · max_rounds 3`; `where-the-time-went` is the same run folded, where `human` fills the middle of the axis and the machine layers are marks; `unattended` is the same plan under `may_ask: false`, refused before dispatch and answered in 47s against 9m 09s. **The pair is how the strip prices a person in the loop**: *waiting on a person* is read off the axis rather than from a total, and the cost is stated — at nine minutes of axis nothing under ~50s is measurable by eye, so the fixture is scaled for the wait and the card carries the rest. `gated` is the seventh: `settle-invoice@4` under three gates at once — an approval on the plan, an envelope gate dashed beside it, and a budget exhaustion with no position — which is the one picture that tells an approval from a verdict without a legend |
+
+**The palette decision § 3 left open.** It says `LayerChip` takes the data slots `BoundChip`
+left — but that is four free slots (`data-1 · 3 · 6 · 8`) against six layers. Two are therefore
+deliberate: `llm` takes `data-7`, the slot `BoundChip` gives the **llm bound**, because two hues
+for one idea is the confusion worth avoiding; and `agent` takes `muted-foreground`, because the
+spine is never governed and must not read as a bound somebody could set — the same token
+`BoundChip` spends on `none`, for the same reason.
+
+**Three defects only rendering found.** All three shipped green through type-check, build and
+Storybook's own build, and all three were wrong on screen — the third only once a *consumer* drew
+them, which Storybook by construction cannot catch:
+
+| Where | What was wrong |
+|---|---|
+| `AddressChip` | The head did not truncate, it **vanished** — `graph_data/stitch/route_airport@departs_from` printed as `route_airport@departs_from`, with no ellipsis and no signal anything was cut. A `truncate` head with `min-w-0` collapses to zero width once the tail fills the row, and `text-overflow` then has no room to draw its marker. The floor is now `2ch` with `shrink-[999]`: exactly one character plus the ellipsis, because at `1ch` the browser keeps the raw character and drops the marker — `groute_airport@…`, a word that was never in the address |
+| `CastTable` | A row with a resolved address still read *shipped default — nothing casts it*, which contradicts itself. The suffix now belongs only to the row that has no address **and** no shipped default — the one state that says a run may open on a model this Graph never chose |
+| `LayerChip`, **in Studio only** | Every swatch rendered transparent, so six layers whose whole point is to be told apart at a glance were six identical grey labels. Nothing was wrong with the component: its swatch is `bg-data-1`…`bg-data-8`, and Studio was not loading the data palette at all — the `@import` sat commented behind a `TODO` naming `@invana/styling` 0.0.21, and Studio has been on 0.0.28 for some time. Uncommenting it fixed five of eight slots; the other three stayed empty because the palette's light half is an `@theme` block, Tailwind 4 emits a theme variable only where it sees a utility reading it, and the `bg-data-*` classes live in `@invana/ui`'s **precompiled** CSS, which Tailwind does not scan. `@source inline("bg-data-{1,…,8}")` in `studio/src/index.css` names the whole scale in one place |
+
+Two lessons for the rest of the Govern build. A component whose contract is *what survives when
+there is not enough room* cannot be signed off by a green build. And a component whose contract
+depends on a **token the consumer must load** is not proved by its story: Storybook imports the kit's
+own CSS, so the palette was always there — the first drawing that could fail was the one in Studio.
+
+**`SliceSummary` owns the slice vocabulary, and `RuleRow` renders it.** `RuleSelect`,
+`DeclaredAxes` and `describeSlice` live in `slice-summary.tsx`; `RuleRow`'s select sub-line *is*
+`<SliceSummary variant="line">`. One description of a slice, so a rule read in the drawer and
+the same slice read on W3 cannot drift apart.
 
 ### Shipped — Phase 5 + the rest (design-kit)
 
@@ -740,7 +790,7 @@ phases 5–7.
 | # | Work | Done when |
 |---|---|---|
 | ✅ **A0** | The `^0.0.23` pin; `@import "@invana/styling"`; Studio's ladder deleted (D7 · DS13) | Studio renders at 13/12px and nothing else moved |
-| **A1 · Delete the parallel layer** | ✅ `PanelChrome` **deleted** (§6a) · `WorkRow` → `Item size="xs"` + `StatusDot` + `Badge tone` · `CanvasTabsBar` → `TabbedPanel variant="strip"` · `GraphStatusBar` → `AppStatusBar` · `emissions/EmissionCard` → `EmissionCard` + `EmissionHeader` · `NotAnAnswer` → `CannotAnswerCard` + `DiagnosisCard` + `RepairNote` + `RetryNote` · `TemplatesPanel` → `TemplatePicker` (DS17) | `grep` finds no Studio component that shadows a kit export |
+| ✅ **A1 · Delete the parallel layer** | ✅ `PanelChrome` **deleted** (§6a) · `WorkRow` → `Item size="xs"` + `StatusDot` + `Badge tone` · `CanvasTabsBar` → `TabbedPanel variant="strip"` · `GraphStatusBar` → `AppStatusBar` · `emissions/EmissionCard` → `EmissionCard` + `EmissionHeader` · `NotAnAnswer` → `CannotAnswerCard` + `DiagnosisCard` · `TemplatePicker` · and the eleven shadows §6c names (DS17) | ✅ `grep` finds no Studio component that shadows a kit export |
 | **A2 · The shell** | `GraphDetail` deletes its `ResizablePanelGroup` and drives `leftSection` · `mainSection` · `rightSection` · `bottomSection` · `footer` (DS12) | A panel toggle does not remount the canvas — the reason the workaround existed. ~90 lines of layout gone |
 | **A3 · Explorer composes to the contract** | Types panel → `TabbedPanel` + `PanelStack`; inspector → `PropertyList`; header centre → `centerNavItems`; rail one-key-one-column (DS16) | `ExplorerPage.tsx` composes; no hand-written panel chrome |
 | **A4 · The console** | `bottomSection` + `ContextBar`, per [explore 4.5](../modules/explore/features/the-console.md) | Records and query readable under the canvas; `?console=` survives reload. Closes S12f |
@@ -759,6 +809,23 @@ A gap shows up in the story as an `!`-override. Porting one into Studio makes it
 | Rail active state | `railItem`'s `!bg-primary/15 !text-primary !ring-primary/25` and the hover re-assertion | `useGraphLeftNav.tsx:107` `activeClass` — the same eight classes, copied | `NavVertical` item takes `active`; the highlight is a prop, not an override |
 | Header-only tab strip | `className="[&>div]:border-x-0 [&>div]:border-t-0"` + `bodyClassName="hidden"` on the canvas tabs | `explorer/CanvasTabsBar.tsx` | `TabbedPanel variant="strip"` — a strip that owns no body, so the canvas below stays mounted |
 | Bar heights | `header.className: '!h-[38px]'`, `footer.className: '!h-[25px]'` | `useAppHeader` · `GraphDetail` | The shell owns 38 and 25. A caller that has to say it in `!` is being told the wrong default |
+
+### A fourth gap — an icon-only control had no name
+
+`NavItems` renders `item.name` into a `TooltipContent`. A tooltip is not a label and is not in the
+tree until hover, so every icon-only control composed on it reached a screen reader as an **unnamed
+button** — `‹ Back`, `+ New skill`, `+ New invariant`, `Promote a plan…` and `Export YAML`, which is
+every `PanelStack` header action Studio ships — and a Playwright spec could only find one by
+position.
+
+| | |
+|---|---|
+| Fix | An item that renders no visible `label` gets `aria-label={item.name}` on its control (`ui-extended/nav-base.tsx`). `name` is required and is already what the tooltip shows, so nothing new is asked of a caller |
+| Reaches Studio | on the next `@invana/ui` release — **the change is made and unreleased**, and `0.0.29` is what Studio resolves |
+| What it unblocks | locating header actions by role + name instead of by position, which is what lets the Skills and Library panels be driven by a spec at all |
+
+It rides with the `lead` slot [SK27](../modules/skills/features/authoring-a-skill.md#decisions)
+already owes, since both are one release of the same package.
 
 ### A6 — the forty-two screens
 
@@ -888,6 +955,50 @@ Studio components existed at all:
 | A title that may carry a link | `PanelContent`'s title is a `<span>`; a `TabbedPanel` tab label is inside a button, so a breadcrumb there could not navigate without nesting one interactive element in another. The Model panel's `Models ›` crumb went back to the header because of this |
 | One fewer fiction | `tab={{ value, label, icon }}` became `title` + `icon`, because a name that has stopped being true is a bug (code-shape §4.1a) |
 
+## 6c. No Studio component shadows a kit export
+
+The `^0.0.30` pin brought the kit past the two components Studio was mirroring by hand, and a sweep
+of every `export function <Name>` in `studio/src` against `@invana/ui`'s export list found nine more
+shadows. All eleven are gone. The check is mechanical and is the A1 "done when": no name Studio
+declares is also a name the kit exports.
+
+| Was, in Studio | Now | Why it was there |
+|---|---|---|
+| `ui/Eyebrow.tsx` | **deleted** — `Eyebrow` | a mirror, pinned to `^0.0.24`, waiting on the release that has now happened |
+| `ui/ClampedText.tsx` | **deleted** — `ClampedText` | the same mirror, the same release |
+| `NotAnAnswer` › `CannotAnswerCard` | `RunCannotAnswer` over `CannotAnswerCard`, `children` + `remedy` | the kit takes slots, not a domain object (DS6) — the mapping is what stays |
+| `NotAnAnswer` › `DiagnosisCard` | `RunDiagnosis` over `DiagnosisCard`, `code` + `attempted` + `actions` | as above; `Diagnosis.cause` is the kit's `code` |
+| `answer-surface/EmissionCard` › `EmissionCard` | `AnswerEmission` over `EmissionCard`, in `AnswerEmission.tsx` | the header, the rule under it and the card were redrawn from the same spec the kit already ships (DS7 · DS9) |
+| `answer-surface/AnswerEmission` › `EmissionHeader` | the kit's, through `EmissionCard`'s slots | one header wherever an emission appears, or the two drift |
+| `answer-surface/AnswerEmission` › `TemplatePicker` | `TemplatePicker` in a `Popover` | the kit's picker is the list; the trigger is the header's template segment |
+| `useAppHeader` › `Breadcrumb` | `Breadcrumb` + `BreadcrumbList`/`Item`/`Link`/`Page`/`Separator` | the last crumb is a `BreadcrumbPage`, so it carries `aria-current`, which the hand-rolled one never did |
+| `DeclareStitchPanel` › `Card`/`CardHeader`/`CardFooter` | `Card` + `CardHeader` + `CardTitle` + `CardFooter` | three local names that shadowed the kit's; the card's width and elevation are two constants now |
+| `SessionTurn` › `Spinner` | `Spinner` | a hand-spun border-ring where the kit ships one |
+| `PlatformEventsPage` · `EventsSection` › `EmptyState`, `NoMatches`, `FilterBar` | `EmptyState` (`title` + `description`) · `FilterBar` (`summary`) | both pages are list surfaces, and the kit says every list surface carries one filter row and one empty state |
+| `WorkGraphCanvas` › `Legend`/`LegendItem` | `Legend` + `LegendItem` (`kind` + `color`) | the swatch was hand-drawn per key; `swatchKind`/`swatchColour` map a `LegendKey` onto the kit's |
+
+### What did not move, and why
+
+| Stayed | Reason |
+|---|---|
+| `ui/PanelSection` · `ui/PanelStatusBar` · `ui/FilterSelect` · `ui/PrincipalChip` | compositions **over** kit components, not copies of them. Still kit candidates (§6a), still tracked by G3/G4 |
+| `ui/PolicyFlag` · `ui/BindRefusalCard` | Invana rules, not markup shapes — the agent-policy tri-state and the bind refusal's two halves (DS2) |
+| `ui/layerPalette.ts` | the kit ships **no** hues; which colour means `llm` is the product's decision, passed as `palette` at every call site |
+| `RunCannotAnswer` · `RunDiagnosis` · `AnswerEmission` · `CanvasLegend` · `StitchCardHeader` · `HeaderBreadcrumb` · `TemplateSwitcher` | the renamed hosts of the substitutions above — a Studio-shaped wrapper whose body is kit components. **An adapter never takes the name of the component it wraps**: five Govern and Agents files import the kit's `CannotAnswerCard` directly, and two things called that is the drift the sweep exists to stop (code-shape §4.1a) |
+
+### Two readings that changed
+
+| Surface | Change |
+|---|---|
+| A diagnosis' evidence | was behind an `Evidence ▾` toggle; it is now always shown, in the kit's *what was tried* box. The kit's card is built from evidence, so hiding it was Studio disagreeing with the component |
+| The events filter row | was a two-row block; it is the kit's 30px `FilterBar`, with the visible count as its `summary` |
+
+### The fifth gap
+
+| # | Gap | Detail |
+|---|---|---|
+| **G5** | `TemplateOption.kind` is typed `EmissionKind` | A template's `surface` is the wider vocabulary an emission kind is drawn from — `markdown`, `confirm`, `choice` ([projections](../modules/ask/features/projections.md)) — and the picker only ever prints it. Studio casts. Widening the slot to `React.ReactNode`, or to the surface vocabulary, retires the cast |
+
 ## 6a. `PanelChrome` is gone — where its fourteen went
 
 `shared/PanelChrome.tsx` (510 lines, 14 exports, ~92 call sites across 10 panels) is deleted. The
@@ -919,6 +1030,7 @@ belongs in `@invana/ui` and this folder is its staging post, not its home.
 | ~~**G2**~~ | ~~`Tabs size="sm"` draws a **pill**, not an underline~~ | **Closed, by conceding.** Studio's underline was a fork of the kit's tab; DS1 says the kit is the only component layer, so the restyle went and the kit's pill look stands. The kit still disagrees with itself — `TabbedPanel` underlines its triggers where `Tabs size="sm"` fills them — but that is a question for design-kit, not a thing Studio patches around |
 | **G3** | `AgentChip` cannot be pressed | It is a `<span>`, so a clickable principal needs a real `<button>` around it or the keyboard cannot reach it. `asChild`, or a button render, retires `ui/PrincipalChip` |
 | **G4** | `FilterChip` has no options | It is a button with no notion of a picker, so a chip that selects needs a native `<select>` laid over it. A `FilterSelect` beside it, or an options prop, retires `ui/FilterSelect` |
+| **G5** | `TemplateOption.kind` is too narrow | Typed `EmissionKind`, but a template's `surface` is the wider vocabulary — see §6c |
 
 ## 6. Open
 
@@ -936,3 +1048,131 @@ Questions that surface during the build, to answer when they do:
 | Q4 | Which canvas-ui inventions get promoted down to `@invana/ui` (`DetailCard` → `PropertyList`, `Panel` chrome, status bar), and does canvas-ui adopt them in the same release? | Phase 2 |
 | Q9 | **`border-<colour>` utilities are not emitted.** `border-destructive` lands in the class list — twMerge correctly drops `border-input` — and still computes grey, because the build generates no such utility, while `text-destructive` in the same file works. Two files now carry the same token-inline workaround (`style={{ borderColor: "var(--color-destructive)" }}`): `TaskGantt`'s error band and `ParamRow`'s invalid value. **Fix the build, then delete both.** Every invalid/danger border in the kit is silently grey until someone does | `@invana/styling` |
 | Q10 | **`pnpm type-check` checks nothing in `forms`, `editor` and `dashboard`.** Their root `tsconfig.json` is `{"files": [], "references": [...]}`, so bare `tsc --noEmit` compiles zero files and exits `0` — a file containing `const x: number = "nope"` passes. The real invocation is `tsc -p tsconfig.lib.json --noEmit`, and it surfaces a second pre-existing problem: `@invana/ui`'s `typography/index.ts` imports with `.tsx` extensions, which every package consuming ui through the source `paths` mapping rejects (`TS5097`) because only ui's own tsconfig sets `allowImportingTsExtensions`. Both predate this work — verified by stashing. Fix the scripts, then the extensions | every package but `ui` |
+
+## 7. Operate › Runs — what the 16 artboards need
+
+Audit of `.design/canvas-govern-agents/rd.py` (the 16 `operate.runs.*` artboards, listed one by one
+in [the-screens.md](../the-screens.md#operate--runs--the-16-artboards)) against the kit at
+`0.0.23+`. The journal, the run's four readings and the step's three readings are **one dashboard
+shell over one record** ([SR46](../modules/operate/features/see-what-ran.md#decisions) ·
+[SR55](../modules/operate/features/see-what-ran.md#decisions)), so most of the page is already the
+kit's: `PanelStack` · `PanelBox` · `RecordHeader` · `MetricTile` · `PropertyList` · `LayerSection` ·
+`LensRow` · `AddressChip` · `LayerChip` · `Terminal` · `CodeBlock` · `TaskGantt` · `EmptyState` ·
+`AppStatusBar`, and `@invana/dashboard`'s `metrics · properties · json · code · table · log` panels.
+
+What follows is the gap — **11 new components, 5 extensions, 7 dashboard panel kinds and 3 canvas
+items**. Nothing here is a screen; each row is a drawing the boards repeat. The same list as a
+**queue with status**, one row per component, is [components-todo.md](components-todo.md) — this
+section is the map and the reasoning, that file is what is still owed.
+
+### 7.0 What shipped, and what the build changed about this list
+
+**30 of 31 rows are ✅** — 13 new components, 5 kit extensions, 8 dashboard panel kinds and the three
+canvas items. Four things the build settled that this section had guessed at:
+
+| Guess | What shipped |
+|---|---|
+| Seven new **built-in** dashboard kinds | They ship as **`RUN_PANELS`**, a registry a consumer merges (`<Dashboard registry={RUN_PANELS} />`). `BUILT_IN_PANELS` is eleven kinds two unrelated surfaces each need; these are one surface family's |
+| Re-point the built-in `exchange` at `ExchangeRecord` | Left alone, and the settled ask is a **new** kind, `clarification`. `exchange` draws an exchange of *documents* — a request and a response, as code; a clarification is a question, its options and who chose. Two drawings, two kinds |
+| Three new `canvas-ui` components | **All three were recipes** over primitives the canvas already ships — a gate is an `EdgeBadge`, read-only is an unmounted `DragNodeBehaviour`, and the labelled loop-back edge already existed. Proven by one story, `Designs › Run flow`, in the canvas repo |
+| Nothing about the Lens rows | They needed a thirteenth component, **`ParticipantRow`** — `LensRow` is a *world* in a drawer, and nothing drew a participant's verdict. Found by building D6 |
+
+Two defects **rendering** found that type-check and build could not, in the same voice as the three
+under *Shipped — Govern K1–K11*: `RecordHeader` truncated every crumb equally, so
+`runs › run:7d3184f1 › step:…` rendered as `ru… › run:7d3184… › step:…` and lost the kind prefix
+[SR54](../modules/operate/features/see-what-ran.md#decisions) exists to carry; and `TraceLoop`'s
+tone painted **every step name inside the loop** in the bound's colour, which said the rounds failed
+when what was being marked is that they repeated.
+
+### 7.1 New — primitive (`packages/ui/src/components/ui/`)
+
+| Component | What it is | Boards | Why not what exists |
+|---|---|---|---|
+| `SegmentedControl` | the reading switch — `In order · Layers · Flow · Lens`, `Overview · Touched · Log`, `All · Info · Warn · Error`. Single-select, bordered frame, active filled, sized by its widest option | 16 | `ToggleGroup` ships `default`/`outline` toggles with no shared frame, and `Tabs size="sm"` is a pill strip that owns a panel. A reading switch selects a *reading of one page*, so it sits in the pagehead's action slot, not over a tab body |
+
+### 7.2 New — composites (`ui-extended`)
+
+| Component | What it draws | Boards | Decision it renders |
+|---|---|---|---|
+| `TraceList` · `TraceStep` · `TraceLoop` · `TraceGate` | the `In order` reading. A row is a step: layer stripe · seq · key + description · mark · layer + role · duration + note. `depth` nests a delegated run's steps under the step that spawned it; `live · queued · dim · struck · selected` are its states. A loop is a **box around** its rounds; a gate is a **rule between** rows, its chip on the side the cost falls on | in_order · in_order.card · in_order.states | [SR47](../modules/operate/features/see-what-ran.md#decisions) · [SR48](../modules/operate/features/see-what-ran.md#decisions) |
+| `TouchStrip` | one cell per layer — dot, name, count — struck when refused, dim when allowed and never touched; header states `declared 4 · touched 4 · refused 1`. The summary question that stopped costing an axis | in_order · in_order.card · the run drawer (`orientation="column"`: one line per layer, note right) | [SR47](../modules/operate/features/see-what-ran.md#decisions) · [SR67](../modules/operate/features/see-what-ran.md#decisions) |
+| `RunRow` · `StatusIcon` | the journal row in `leftSection`: status glyph · what it was about (mono for a query) · mono id · plan · meta, `depth` for a child run, no badge | every board (the panel) · list | [SR45](../modules/operate/features/see-what-ran.md#decisions) · [SR65](../modules/operate/features/see-what-ran.md#decisions) · retires Studio's `WorkRow` in the journal (DS17) |
+| `KindChip` | `ask · import · bulk · stitch · enrich` — the one vocabulary the journal filters on | list · list.states | [SR7](../modules/operate/features/see-what-ran.md#decisions) — one journal, never a panel per kind |
+| `MarkChip` | the micro-mark a row carries: `↺ 2 of 3` · `⏸ 1 of 3` · `↳ delegates` · `live` · `no answer` · `stopped`. Mono, outlined, toned | in_order · in_order.states | a *run-time* mark, where `BoundChip` draws a **declared** bound |
+| `AttemptClock` | `queued · attempt 1 · attempt 2 · settled`, each with started · took · what happened, the timed-out attempt **struck in place**, and `elapsed against working` on the side | step · step.states · step.exchange | [SR56](../modules/operate/features/see-what-ran.md#decisions) — `RetryNote` is one line on an emission, not a step's clock |
+| `ArtifactTable` | `file · kind · size · digest · written` + `Open` · `Download`; the digest is the address, eight characters, mono; a file retention dropped is struck | step.touched · step.touched.write · step.states | [SR58](../modules/operate/features/see-what-ran.md#decisions) |
+| `AbsenceNote` | *nobody recorded one* · *purged by retention* · *the step declared `read_only: true`* — three different facts, none of them an empty table | step.touched · step.states · in_order.states | [SR34](../modules/operate/features/see-what-ran.md#decisions) · [SR59](../modules/operate/features/see-what-ran.md#decisions) · [O6](../modules/operate/spec.md) |
+| `ExchangeRecord` | the settled ask: the agent's question, the options with the chosen one marked, who answered and after how long | step.exchange | [SR55](../modules/operate/features/see-what-ran.md#decisions) — `ClarifyCard` is the **live** ask, and a settled one is a record, not a control |
+| `RecordPager` | `‹ ›` with `step 7 of 9`, in the pagehead | 5 step boards | [SR54](../modules/operate/features/see-what-ran.md#decisions) — a reader walks the run without returning to the list |
+| `RunStatusText` | `succeeded · running · cannot_answer · awaiting_approval · queued · cancelled · failed`, each on its own token, as a table cell and as a chip | list · list.states · every pagehead | the status vocabulary is the engine's; a per-call-site `<span style="color">` is how two screens disagree |
+
+### 7.3 Extend what exists
+
+| Component | Package | Change | Boards |
+|---|---|---|---|
+| `LayerStrip` | `@invana/ui` | **the forecast reading**: `p50` drawn **on** the bar with its Δ, band notes (`3 calls, all inside p95`), and a seam that has **no estimate** — dashed, stating so beside its actual. `scale="elapsed"`, frozen labels, brackets, seams and struck refusals already ship (K11) | layers · layers.forecast |
+| `DataTable` | `@invana/tables` | **indent rows** (a child run under its parent), **row selection** (accent + inset rule), and cell readings — mono · tone · struck. `density="compact"` and `groupBy` already ship. **Studio does not depend on `@invana/tables` yet** — install it | list · list.states · step · step.touched* |
+| `Legend` | `@invana/ui` | swatch kinds `stripe` (the layer bar), `bracket` (a bounded repetition), `rule` (a gate). Today: dot · line · dashed · arrow · ring | in_order · layers · layers.forecast · flow |
+| `FilterBar` / `FilterChip` | `@invana/ui` | a **closable** chip (`since: today ×`) and the bar's own summary (`interactive runs hidden`) | list · list.states · every panel |
+| `TaskNode` | `@invana/ui` | `readOnly` — a run's picked node gets the ring and **no handles**; handles belong to the draft canvas | flow · flow.step ([SR52](../modules/operate/features/see-what-ran.md#decisions)) |
+
+### 7.4 `@invana/dashboard` — the panel kinds a run page is made of
+
+A run page is `board.kind = run` ([CV12](../modules/explore/features/boards.md)), so every band above
+reaches Studio as a panel spec, not as a hand-composed page.
+
+| Kind | Renders | Note |
+|---|---|---|
+| `trace` | `TraceList` | the `In order` reading |
+| `touched` | `TouchStrip` | the summary strip, not an axis |
+| `attempts` | `AttemptClock` | |
+| `artifacts` | `ArtifactTable` | |
+| `layers` | `LayerStrip` | `gantt` stays `TaskGantt`; the two are different drawings and both are wanted |
+| `lens` | `LayerSection` + `LensRow` | already kit components; the panel kind is what is missing |
+| `exchange` | `ExchangeRecord` | **today it renders a label and a `CodeBlock`** — which is not what the board draws |
+
+A panel whose record nobody wrote **does not render**; a panel retention purged renders
+`AbsenceNote`. That is a `Dashboard` rule, not a per-panel one (SR34).
+
+### 7.5 Not design-kit — `@invana/canvas-ui`
+
+| What | Note |
+|---|---|
+| `GateMarker` | the approval mark placed on the flow, between the node it holds and the one before it | 
+| read-only flow | the run paints status onto the plan it ran: `TaskNode readOnly`, no drag, `Open the step` on the picked card (`DetailCard` already covers the card) |
+| a dashed, labelled loop-back edge | `round 2 — the loop went back once`, drawn under the row it returns to |
+
+### 7.6 Build order
+
+| # | Ships | Unlocks |
+|---|---|---|
+| 1 | `SegmentedControl` · `RunRow` · `KindChip` · `RunStatusText` · `DataTable` indent + selection · `FilterChip` closable | the journal and every pagehead — 16 boards' chrome |
+| 2 | `TraceList` family · `TouchStrip` · `MarkChip` · `Legend` swatches | `In order`, the default reading — 3 boards |
+| 3 | `LayerStrip` forecast | `Layers` and `Layers · forecast` — 2 boards |
+| 4 | `AttemptClock` · `ArtifactTable` · `AbsenceNote` · `RecordPager` · `ExchangeRecord` | the step's three readings, its two kinds and its six states — 5 boards |
+| 5 | the seven `@invana/dashboard` panel kinds | the run and step pages as specs rather than pages |
+| 6 | `GateMarker` · read-only flow · the labelled loop edge (canvas repo) | `Flow` and `Flow · step` — 2 boards |
+
+Every new component ships **with a story** in `apps/storybook/stories/ui/…`, one exported story per
+file, mirroring `packages/ui/src/components/`. A screen is not a story — the screens stay on the
+canvas.
+
+### 7.7 What Studio composes, now the kit ships the panels
+
+The kit's run panels reach Studio as **`RUN_PANELS`**, merged into three registries: the run page,
+the step page, and `shared/dashboardPanels.ts` — the last because a **frozen report** renders
+whatever document was kept and needs every renderer a document could name
+([B16](../building-engine/boards-migration.md)).
+
+| Kind | Drawn by | Composed by | Note |
+|---|---|---|---|
+| `layers` | the kit | `govern/runLayers.ts` | the composer stays in Studio: how a `TouchesResponse` and a trace become bands and bars is not something `@invana/dashboard` can know. A run with no ledger draws `absent: unrecorded`, never an empty axis ([SR34](../modules/operate/features/see-what-ran.md#decisions)) |
+| `lens` | the kit | `govern/runLens.ts` | one section per layer, a `ParticipantRow` per address ([SR53](../modules/operate/features/see-what-ran.md#decisions)). The layer is the **address's first segment**, the engine's own split, so an allowed-and-never-touched participant still bands correctly |
+| `flow` | Studio | `operate/dashboards/TaskFlowPanel.tsx` | the one kind Studio still owns — a plan on a canvas is `@invana/canvas`, which a dashboard package does not depend on |
+| `stepTouch` | Studio | `govern/StepTouchPanel.tsx` | **not** the kit's `touched`: that is `TouchStrip`, the run's summary strip. This is the step's forensic reading — generated vs executed digests, the slice composed in, what egress cut — and the kit ships no kind for it |
+| `runLens` | Studio, legacy | — | kept **only** for reports frozen before the swap. Nothing new registers it; delete the file once no stored board names the kind |
+
+Two Studio names shadowed kit exports and are gone: the `RunRow` **type** in `hooks/queries/useRuns.ts`
+is `JournalRow` (the kit's `RunRow` is the journal row *component*, which the list will draw), and
+`LayersOptions` · `RunLensOptions` are the kit's own option types now
+([DS17](../modules/platform/features/design-system.md)).

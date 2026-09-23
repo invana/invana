@@ -49,7 +49,7 @@ function TypeList({ types }: { types: GlobalType[] }) {
 							anchored
 						</Badge>
 					) : null}
-					<span className="ml-auto shrink-0 truncate text-meta text-muted-foreground">
+					<span className="ml-auto shrink-0 truncate text-sm text-muted-foreground">
 						{t.models.join(" · ")}
 					</span>
 				</div>
@@ -96,7 +96,7 @@ export function GlobalModelPage({ username, graphSlug }: Props) {
 		<div className="flex h-full w-full flex-col overflow-y-auto">
 			<div className="flex flex-col gap-1 border-b px-4 py-3">
 				<h1 className="font-semibold text-lg">Global model</h1>
-				<p className="max-w-3xl text-meta text-muted-foreground">
+				<p className="max-w-3xl text-sm text-muted-foreground">
 					The union of every published model plus its stitches, computed on
 					read. There is no row behind it and nothing here can be edited. It is
 					stated, not drawn — a global type carries no endpoints, so there is no
@@ -133,7 +133,7 @@ export function GlobalModelPage({ username, graphSlug }: Props) {
 					/>
 				</MetricGrid>
 				{derived.staged_count > 0 ? (
-					<p className="pt-2 text-meta text-warning">
+					<p className="pt-2 text-sm text-warning">
 						{derived.staged_count} staged — declared, and not in the union until
 						somebody commits.
 					</p>
@@ -157,7 +157,7 @@ export function GlobalModelPage({ username, graphSlug }: Props) {
 						// the one word on this page that does not mean what it looks
 						// like, so it is explained where it is first read.
 						actions={
-							<span className="text-meta text-muted-foreground">
+							<span className="text-sm text-muted-foreground">
 								anchored means one entity across models — not a coincidence of
 								naming
 							</span>

@@ -147,7 +147,7 @@ export function ModelCanvas({
 			<div className="flex h-full min-h-0 flex-col">
 				{/* The canvas says what it is drawing and whether it may be drawn on —
 			    a read-only version looks identical otherwise (ME3). */}
-				<div className="flex h-9 shrink-0 items-center gap-2 border-b bg-card px-2 text-sm">
+				<div className="flex h-9 shrink-0 items-center gap-2 border-b bg-card px-2 text-base">
 					<span className="flex h-7 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-2">
 						<Boxes className="h-3.5 w-3.5 text-primary" />
 						<span className="font-mono">{model?.name ?? "Model"}</span>
@@ -179,7 +179,7 @@ export function ModelCanvas({
 							>
 								<Plus className="mr-1 h-3.5 w-3.5" /> Node type
 							</Button>
-							<span className="text-xs text-muted-foreground">
+							<span className="text-sm text-muted-foreground">
 								or drag one type onto another to connect them
 							</span>
 						</span>
@@ -235,7 +235,7 @@ export function ModelCanvas({
 				{selection && (selectedNode || selectedEdge) ? (
 					<div className="max-h-[45%] shrink-0 overflow-y-auto border-t bg-background">
 						<div className="flex items-center justify-between border-b px-4 py-1.5">
-							<span className="text-xs uppercase tracking-wide text-muted-foreground">
+							<span className="text-sm uppercase tracking-wide text-muted-foreground">
 								{model?.name ?? "Model"} ·{" "}
 								{draft
 									? `v${draft.version ?? "draft"} draft`
@@ -297,7 +297,7 @@ export function ModelCanvas({
 				) : null}
 
 				{!ctx ? (
-					<div className="flex shrink-0 items-center gap-2 border-t px-4 py-1.5 text-xs text-muted-foreground">
+					<div className="flex shrink-0 items-center gap-2 border-t px-4 py-1.5 text-sm text-muted-foreground">
 						<span>
 							{active
 								? `v${active.version} is published — pan and zoom only.`

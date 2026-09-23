@@ -35,7 +35,7 @@ const absolute = (iso: string) =>
 const relative = (iso: string) => formatRelativeTime(new Date(iso));
 
 function Value({ children }: { children: ReactNode }) {
-	return <span className="text-xs text-foreground">{children}</span>;
+	return <span className="text-sm text-foreground">{children}</span>;
 }
 
 export function ModelMetaLine({
@@ -70,7 +70,7 @@ export function ModelMetaLine({
 			<div className="flex items-start gap-2">
 				<p
 					className={cn(
-						"min-w-0 flex-1 text-sm leading-5 text-muted-foreground",
+						"min-w-0 flex-1 text-base leading-5 text-muted-foreground",
 						// Collapsed is one line, always — a two-line description would
 						// move the drawers under the reader between models.
 						!open && "truncate",
@@ -82,7 +82,7 @@ export function ModelMetaLine({
 				<Button
 					variant="ghost"
 					size="sm"
-					className="h-5 shrink-0 gap-1 px-1 text-xs leading-5 text-muted-foreground"
+					className="h-5 shrink-0 gap-1 px-1 text-sm leading-5 text-muted-foreground"
 					aria-expanded={open}
 					title={
 						open

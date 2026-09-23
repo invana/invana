@@ -152,8 +152,8 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			"Point the graph at the model you pay for, and ping it — saving stores it, the ping proves it.",
 		why: "The provider plans the question; the graph answers it. Without one, Query and Explorer still work — only natural language is closed.",
 		how: [
-			"Add a provider — Anthropic, OpenAI, Bedrock, a local endpoint.",
-			"Paste the key, and pick the default model.",
+			"Add an endpoint — Anthropic, OpenAI, Bedrock, a local one. Its name is what a rule will name.",
+			"Paste the key, and say which model it offers.",
 			"Ping it — saving stores it, the ping proves it.",
 		],
 		looksRight: "The provider reads pinged, and Ask opens.",
@@ -161,7 +161,10 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			title: "Your key, your provider",
 			body: "Invana sends the question and the schema, never the database. The provider writes a query; the engine runs it against your records.",
 		},
-		settingsSection: "settings",
+		// `Agents › LLMs` — the providers left Settings when an agent stopped
+		// binding one (PM6). A stacked panel takes a drawer where a tabbed one
+		// takes a tab, and `settingsTab` names whichever that section has.
+		settingsSection: "agents",
 		settingsTab: "llms",
 	},
 	{

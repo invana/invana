@@ -15,7 +15,8 @@ import pytest
 
 from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.providers.claude_agent_sdk import flatten_messages
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.models import LLMProviderKind
+from tests.llm.endpoints import endpoint
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
 _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")
@@ -48,7 +49,7 @@ def _ollama_up() -> bool:
 
 @pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
 async def test_complete_tool_ollama_returns_schema_valid_object() -> None:
-    provider = LLMProvider(provider=LLMProviderKind.ollama, model_id=_DEV_MODEL, base_url=_OLLAMA_URL)
+    provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     result = await complete_tool(
         provider=provider,
         system=_SYSTEM,
@@ -65,7 +66,7 @@ async def test_complete_tool_ollama_returns_schema_valid_object() -> None:
 
 
 async def test_complete_tool_unwired_provider_raises() -> None:
-    provider = LLMProvider(provider=LLMProviderKind.google, model_id="whatever")
+    provider = endpoint(LLMProviderKind.google, "whatever")
     with pytest.raises(LLMError):
         await complete_tool(
             provider=provider,
@@ -97,9 +98,9 @@ def test_flatten_messages_passes_single_user_turn_through_and_renders_history() 
     reason="set INVANA_TEST_CLAUDE_AGENT_SDK=1 (needs claude-agent-sdk + a logged-in Claude Code CLI)",
 )
 async def test_complete_tool_claude_agent_sdk_returns_schema_valid_object() -> None:
-    provider = LLMProvider(
-        provider=LLMProviderKind.claude_agent_sdk,
-        model_id=os.environ.get("INVANA_TEST_CLAUDE_AGENT_SDK_MODEL", "claude-opus-5"),
+    provider = endpoint(
+        LLMProviderKind.claude_agent_sdk,
+        os.environ.get("INVANA_TEST_CLAUDE_AGENT_SDK_MODEL", "claude-opus-5"),
     )
     result = await complete_tool(
         provider=provider,

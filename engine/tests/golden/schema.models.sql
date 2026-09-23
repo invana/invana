@@ -7,13 +7,13 @@ CREATE TABLE agents (
 	kind VARCHAR(16) NOT NULL, 
 	status VARCHAR(16) NOT NULL, 
 	workflow_spec JSON NOT NULL, 
-	llm_config_id VARCHAR(36), 
 	instructions TEXT NOT NULL, 
 	lifetime VARCHAR(16) NOT NULL, 
 	parent_agent_id VARCHAR(36), 
 	spawned_in_run_id VARCHAR(36), 
 	budget JSON NOT NULL, 
 	policy JSON NOT NULL, 
+	lens_id VARCHAR(36), 
 	version INTEGER NOT NULL, 
 	created_by_kind VARCHAR(16) NOT NULL, 
 	created_by_id VARCHAR(36), 
@@ -22,13 +22,15 @@ CREATE TABLE agents (
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_agent_graph_name UNIQUE (graph_id, name), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
-	FOREIGN KEY(llm_config_id) REFERENCES llm_providers (id) ON DELETE SET NULL, 
-	FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL
+	FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
+	FOREIGN KEY(lens_id) REFERENCES lenses (id) ON DELETE RESTRICT
 );
 
 CREATE INDEX ix_agents_graph_id ON agents (graph_id);
 
 CREATE INDEX ix_agents_key ON agents (key);
+
+CREATE INDEX ix_agents_lens_id ON agents (lens_id);
 
 CREATE INDEX ix_agents_parent_agent_id ON agents (parent_agent_id);
 
@@ -211,6 +213,7 @@ CREATE UNIQUE INDEX ix_graph_connections_graph_id ON graph_connections (graph_id
 CREATE TABLE graph_members (
 	graph_id VARCHAR(36) NOT NULL, 
 	user_id VARCHAR(36) NOT NULL, 
+	can_edit_guardrails BOOLEAN DEFAULT 'false' NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (graph_id, user_id), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
@@ -245,6 +248,7 @@ CREATE TABLE graph_versions (
 	status version_status_enum NOT NULL, 
 	change_summary TEXT NOT NULL, 
 	content_hash VARCHAR(64), 
+	axes JSON DEFAULT '{}' NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	activated_at TIMESTAMP WITH TIME ZONE, 
 	PRIMARY KEY (id), 
@@ -265,6 +269,7 @@ CREATE TABLE graphs (
 	default_agent_id VARCHAR(36), 
 	max_concurrent_runs INTEGER DEFAULT '4' NOT NULL, 
 	concurrency_policy VARCHAR(8) DEFAULT 'queue' NOT NULL, 
+	pools JSON DEFAULT '{"llm": 20, "graphdb": 50, "heavy": 4}' NOT NULL, 
 	created_by_id VARCHAR(36) NOT NULL, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
@@ -289,22 +294,68 @@ CREATE TABLE index_definitions (
 	FOREIGN KEY(version_id) REFERENCES graph_versions (id) ON DELETE CASCADE
 );
 
+CREATE TABLE lenses (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	kind VARCHAR(16) NOT NULL, 
+	key VARCHAR(128), 
+	name VARCHAR(255), 
+	scope VARCHAR(64), 
+	rules JSON NOT NULL, 
+	"cast" JSON NOT NULL, 
+	closed_layers JSON NOT NULL, 
+	as_of TIMESTAMP WITH TIME ZONE, 
+	created_in_run_id VARCHAR(36), 
+	created_by_id VARCHAR(36), 
+	version INTEGER NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_lens_graph_key UNIQUE (graph_id, key), 
+	CONSTRAINT ck_lens_kind_shape CHECK ((kind = 'guardrail' AND scope IS NOT NULL AND key IS NOT NULL) OR (kind = 'world' AND scope IS NULL)), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
+	FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_lens_graph_kind ON lenses (graph_id, kind);
+
+CREATE INDEX ix_lenses_created_in_run_id ON lenses (created_in_run_id);
+
+CREATE INDEX ix_lenses_graph_id ON lenses (graph_id);
+
+CREATE TABLE llm_models (
+	id VARCHAR(36) NOT NULL, 
+	provider_id VARCHAR(36) NOT NULL, 
+	model_id VARCHAR(255) NOT NULL, 
+	display_name VARCHAR(255), 
+	capabilities JSON NOT NULL, 
+	pricing JSON NOT NULL, 
+	status VARCHAR(16) NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_llm_model_provider_model UNIQUE (provider_id, model_id), 
+	FOREIGN KEY(provider_id) REFERENCES llm_providers (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_llm_models_provider_id ON llm_models (provider_id);
+
 CREATE TABLE llm_providers (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36) NOT NULL, 
+	name VARCHAR(64) NOT NULL, 
 	provider llm_provider_kind NOT NULL, 
-	model_id VARCHAR(255) NOT NULL, 
 	api_key_encrypted BYTEA, 
 	credential_kind llm_credential_kind, 
 	base_url VARCHAR(2048), 
 	guardrails JSON NOT NULL, 
-	is_default BOOLEAN NOT NULL, 
 	last_ping_at TIMESTAMP WITH TIME ZONE, 
 	last_ping_ok BOOLEAN, 
 	last_ping_error TEXT, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
+	CONSTRAINT uq_llm_provider_graph_name UNIQUE (graph_id, name), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
 );
 
@@ -483,6 +534,41 @@ CREATE INDEX ix_rules_graph_id ON rules (graph_id);
 
 CREATE INDEX ix_rules_project_id ON rules (project_id);
 
+CREATE TABLE run_touches (
+	id VARCHAR(36) NOT NULL, 
+	run_id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	seq INTEGER NOT NULL, 
+	step_key VARCHAR(64), 
+	address VARCHAR(512) NOT NULL, 
+	layer VARCHAR(16) NOT NULL, 
+	sublayer VARCHAR(64) NOT NULL, 
+	participant VARCHAR(255) NOT NULL, 
+	direction VARCHAR(16) NOT NULL, 
+	rule_matched VARCHAR(512), 
+	why VARCHAR(255), 
+	volume JSON NOT NULL, 
+	applied JSON NOT NULL, 
+	sent JSON NOT NULL, 
+	query JSON NOT NULL, 
+	cost_usd FLOAT, 
+	duration_ms INTEGER, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_run_touch_seq UNIQUE (run_id, seq), 
+	FOREIGN KEY(run_id) REFERENCES task_runs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_run_touch_graph_address ON run_touches (graph_id, address);
+
+CREATE INDEX ix_run_touch_run_direction ON run_touches (run_id, direction);
+
+CREATE INDEX ix_run_touches_address ON run_touches (address);
+
+CREATE INDEX ix_run_touches_graph_id ON run_touches (graph_id);
+
+CREATE INDEX ix_run_touches_run_id ON run_touches (run_id);
+
 CREATE TABLE schema_projections (
 	id VARCHAR(36) NOT NULL, 
 	version_id VARCHAR(36) NOT NULL, 
@@ -574,6 +660,23 @@ CREATE INDEX ix_skill_bindings_agent_id ON skill_bindings (agent_id);
 
 CREATE INDEX ix_skill_bindings_skill_id ON skill_bindings (skill_id);
 
+CREATE TABLE skill_version_clarifications (
+	id VARCHAR(36) NOT NULL, 
+	skill_version_id VARCHAR(36) NOT NULL, 
+	span TEXT NOT NULL, 
+	question TEXT NOT NULL, 
+	options JSON NOT NULL, 
+	answer TEXT, 
+	answered_by_id VARCHAR(36), 
+	answered_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(skill_version_id) REFERENCES skill_versions (id) ON DELETE CASCADE, 
+	FOREIGN KEY(answered_by_id) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_skill_version_clarifications_skill_version_id ON skill_version_clarifications (skill_version_id);
+
 CREATE TABLE skill_versions (
 	id VARCHAR(36) NOT NULL, 
 	skill_id VARCHAR(36) NOT NULL, 
@@ -581,11 +684,15 @@ CREATE TABLE skill_versions (
 	description TEXT NOT NULL, 
 	content TEXT NOT NULL, 
 	when_to_use TEXT NOT NULL, 
+	plan_id VARCHAR(36) NOT NULL, 
 	published_by_id VARCHAR(36), 
-	published_at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	published_at TIMESTAMP WITH TIME ZONE, 
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_skill_version_number UNIQUE (skill_id, version), 
 	FOREIGN KEY(skill_id) REFERENCES skills (id) ON DELETE CASCADE, 
+	UNIQUE (plan_id), 
+	FOREIGN KEY(plan_id) REFERENCES task_plans (id) ON DELETE RESTRICT, 
 	FOREIGN KEY(published_by_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
@@ -595,6 +702,7 @@ CREATE TABLE skills (
 	id VARCHAR(36) NOT NULL, 
 	graph_id VARCHAR(36) NOT NULL, 
 	name VARCHAR(255) NOT NULL, 
+	origin VARCHAR(16) NOT NULL, 
 	current_version_id VARCHAR(36), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
@@ -617,6 +725,7 @@ CREATE TABLE task_plans (
 	intent JSON NOT NULL, 
 	todo_id VARCHAR(36), 
 	args_schema JSON NOT NULL, 
+	uses JSON NOT NULL, 
 	source_skill_version_ids JSON NOT NULL, 
 	reusable BOOLEAN NOT NULL, 
 	promoted_from_run_id VARCHAR(36), 
@@ -727,6 +836,8 @@ CREATE TABLE task_runs (
 
 CREATE INDEX ix_task_runs_agent_id ON task_runs (agent_id);
 
+CREATE INDEX ix_task_runs_agent_started ON task_runs (agent_id, started_at);
+
 CREATE INDEX ix_task_runs_assistant_message_id ON task_runs (assistant_message_id);
 
 CREATE INDEX ix_task_runs_graph_id ON task_runs (graph_id);
@@ -786,6 +897,7 @@ CREATE TABLE tasks (
 	max_parallel INTEGER, 
 	on_lane_failure VARCHAR(24), 
 	source_span TEXT, 
+	source_plan_key VARCHAR(80), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_task_plan_sibling_key UNIQUE (task_plan_id, parent_id, key), 

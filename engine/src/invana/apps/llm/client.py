@@ -2,7 +2,7 @@
 
 ``complete_tool`` turns (provider config, system prompt, messages, a JSON
 schema) into a *validated structured object*, dispatching by
-``LLMProvider.provider``. Anthropic uses forced tool use; Ollama uses native
+``LLMEndpoint.provider``. Anthropic uses forced tool use; Ollama uses native
 JSON-schema ``format``; the Claude Agent SDK uses its ``output_format``
 json_schema mode. On a schema miss it does one corrective round-trip,
 then raises ``LLMError``. Other providers (openai / local / google / azure) are
@@ -29,7 +29,8 @@ from invana.apps.llm.providers import claude_agent_sdk as claude_agent_sdk_provi
 from invana.apps.llm.providers import ollama as ollama_provider
 from invana.apps.llm.providers import openai as openai_provider
 from invana.apps.llm.schemas import Exchange, TokenUsage, ToolResult
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.endpoint import LLMEndpoint
+from invana.apps.llm_providers.models import LLMProviderKind
 from invana.core.telemetry.recorders import add_llm_in_flight, record_llm_request
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
@@ -72,7 +73,7 @@ _DISPATCH: dict[LLMProviderKind, _Dispatch] = {
 
 async def complete_tool(
     *,
-    provider: LLMProvider,
+    provider: LLMEndpoint,
     system: str,
     messages: list[dict],
     tool_schema: dict,

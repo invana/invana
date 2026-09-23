@@ -31,7 +31,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
@@ -59,9 +59,16 @@ class Skill(Base):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
+    #: ``builtin`` — seeded into every Graph and re-seeded idempotently by name
+    #: — or ``authored``. A builtin skill is the product's own playbook and is
+    #: still editable: publishing v2 over it is an ordinary act
+    #: ([SK25](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    origin: Mapped[str] = mapped_column(String(16), default="authored", nullable=False)
+
     #: The published head. Nullable in the schema only because the skill row is
     #: inserted before the version it will point at — a skill with no current
-    #: version is a half-written transaction, never a state the API returns.
+    #: version is null while a skill has only a **draft**
+    #: ([SK21](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     current_version_id: Mapped[str | None] = mapped_column(
         String(36),
         ForeignKey("skill_versions.id", ondelete="SET NULL", use_alter=True, name="fk_skills_current_version"),
@@ -89,6 +96,12 @@ class Skill(Base):
         return self.current_version.version if self.current_version is not None else 0
 
     @property
+    def is_draft(self) -> bool:
+        """Never published. Nothing is offered it, and the drawer says so
+        ([SK21](docs/for-developers/modules/skills/features/authoring-a-skill.md))."""
+        return self.current_version_id is None
+
+    @property
     def description(self) -> str:
         return self.current_version.description if self.current_version is not None else ""
 
@@ -110,9 +123,15 @@ class SkillVersion(Base):
     ([US3](docs/for-developers/modules/skills/features/usage.md)).
 
     ``plan_id`` — one version, exactly one ``TaskPlan``
-    ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)) —
-    arrives with M8, added ``NOT NULL`` over a backfill rather than nullable
-    first (task-model-migration.md).
+    ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    It landed with M8 (building-engine/skills-draw-as-plans.md), added over a
+    backfill and altered to ``NOT NULL`` in the same migration rather than left
+    nullable for a release.
+
+    **A draft is a version with no ``published_at``**
+    ([SK20](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
+    and it is the single exception to the immutability above: it is the row a
+    person is still writing, and publishing is what closes it.
     """
 
     __tablename__ = "skill_versions"
@@ -139,10 +158,67 @@ class SkillVersion(Base):
 
     #: Who published it. SET NULL, not CASCADE — a departed author does not
     #: delete the version their team is still being offered.
+    #: **One version, exactly one plan**
+    #: ([SK13](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #: `RESTRICT`, because deleting a plan out from under a published version
+    #: would break every trace that named it. A draft is written *with* its
+    #: plan — one `form: human` node — so no surface branches on *does this
+    #: have a flow* ([SK22](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #:
+    #: The column is a plain FK by table name: `apps/skills` imports nothing
+    #: from `apps/task_plans`, because `apps/task_plans` imports `apps/agents`
+    #: and `apps/agents` imports this package. The composition lives one band
+    #: up, in `runtime/managers/skill_draft.py`.
+    plan_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("task_plans.id", ondelete="RESTRICT"), nullable=False, unique=True
+    )
+
     published_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
-    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    #: **Null is the draft** — the one mutable version row there will ever be
+    #: ([SK20](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    #: Publishing stamps it, moves `skills.current_version_id`, and the row is
+    #: immutable from then on.
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    @property
+    def is_draft(self) -> bool:
+        return self.published_at is None
+
+
+class SkillVersionClarification(Base):
+    """A question the planner asked about one sentence, and the answer.
+
+    Recorded on the version so a redraw **never re-asks**, and so the answer
+    that shaped the plan is part of what published
+    ([SK11 · SK24](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    An unanswered row is the open question the surface draws against its
+    sentence; there is at most one of those at a time, because the planner
+    stops at the first ambiguity rather than collecting a queue.
+    """
+
+    __tablename__ = "skill_version_clarifications"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    skill_version_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("skill_versions.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    #: The sentence, verbatim — what the card quotes and what `Task.source_span`
+    #: carries on the node the answer writes.
+    span: Mapped[str] = mapped_column(Text, nullable=False)
+    question: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    #: `[{step_key, label, why}]` — the readings, each naming the step it would
+    #: write. Never a free-text box (*Not building*).
+    options: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    answer: Mapped[str | None] = mapped_column(Text, nullable=True)
+    answered_by_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    answered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
 
 
 class SkillBinding(Base):
@@ -158,7 +234,7 @@ class SkillBinding(Base):
     has nothing to hold on to when the request replaces a whole list
     ([BN5 · BN6](docs/for-developers/modules/skills/features/bindings.md)).
     ``bound_by_id`` and ``bound_at`` are the other half of that — who changed the
-    roster, and when.
+    bindings, and when.
     """
 
     __tablename__ = "skill_bindings"
@@ -171,7 +247,7 @@ class SkillBinding(Base):
     agent_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("agents.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    #: SET NULL — a departed author does not unbind the roster they set up.
+    #: SET NULL — a departed author does not unbind the skills they set up.
     bound_by_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

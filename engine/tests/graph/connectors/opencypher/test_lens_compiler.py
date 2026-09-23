@@ -169,6 +169,18 @@ class TestProject:
         assert "element_id: elementId(d)" in executed
         assert "labels: labels(d)" in executed
 
+    def test_a_clause_after_the_projection_keeps_its_separator(self):
+        """`RETURN d LIMIT 5` — the item's span runs to the next keyword, and an
+        edit that swallowed the space welded the alias to it: `AS dLIMIT 5`."""
+        out = compile_("MATCH (d:Deal) RETURN d LIMIT 5")
+
+        assert out.executed.endswith("AS d LIMIT 5")
+
+    def test_an_ordered_projection_is_still_ordered(self):
+        out = compile_("MATCH (d:Deal) RETURN d ORDER BY d.stage SKIP 2 LIMIT 5")
+
+        assert "AS d ORDER BY d.stage SKIP 2 LIMIT 5" in out.executed
+
     def test_an_alias_is_followed_through_with(self):
         out = compile_("MATCH (d:Deal) WITH d AS x RETURN x")
 

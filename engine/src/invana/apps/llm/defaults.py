@@ -1,8 +1,8 @@
 """Advisory default model per provider.
 
-``LLMProvider.model_id`` is required (non-null) so the configured value almost
+``LLMModel.model_id`` is required (non-null) so the configured value almost
 always wins; these are the fallback used only if a row's ``model_id`` is blank,
-and the values the dev/test setup recommends. ``qwen3-coder:30b`` is the pinned
+and the values a Graph is offered when it configures a provider of that kind. ``qwen3-coder:30b`` is the pinned
 keyless dev model (local Ollama); ``claude-opus-4-8`` is the production default;
 ``claude-opus-5`` is the Claude Agent SDK default (docs/for-developers/modules/agents/features/providers-and-models.md).
 """

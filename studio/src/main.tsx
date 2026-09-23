@@ -2,7 +2,7 @@ import { SaturationBridge } from "@/components/SaturationBridge";
 import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
 import { router } from "@/router";
 import { ThemeProvider } from "@invana/themes";
-import { Toaster } from "@invana/ui";
+import { Toaster, TooltipProvider } from "@invana/ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -37,7 +37,15 @@ createRoot(container).render(
 			    primary + accent colours. */}
 			<SaturationBridge />
 			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+				{/* One tooltip provider for the whole app. Radix needs an
+				    ancestor provider for every `Tooltip`, and a screen that
+				    mounts its own is a second delay to keep in step — so the
+				    shell owns it and no screen declares one. Kit components
+				    that provide their own internally are unaffected: nesting a
+				    provider is legal, and theirs wins inside them. */}
+				<TooltipProvider delayDuration={300}>
+					<RouterProvider router={router} />
+				</TooltipProvider>
 				<Toaster richColors closeButton />
 			</QueryClientProvider>
 		</ThemeProvider>

@@ -84,7 +84,7 @@ async def graph(session: AsyncSession, user: User) -> Graph:
 
 @pytest_asyncio.fixture
 async def agent(session: AsyncSession, graph: Graph) -> Agent:
-    """The Atlas's seeded roster, and the Explorer out of it."""
+    """The Atlas's seeded agents, and the Explorer out of it."""
     from invana.apps.agents.managers import AgentManager
     from invana.apps.agents.querysets import AgentQuerySet
 

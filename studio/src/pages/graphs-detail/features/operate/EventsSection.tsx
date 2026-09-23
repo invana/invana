@@ -12,6 +12,8 @@ import type { AuditEvent } from "@/types/events";
 import {
 	Badge,
 	Button,
+	EmptyState,
+	FilterBar,
 	SearchInput,
 	Skeleton,
 	StatusDot,
@@ -90,18 +92,35 @@ export function EventsSection({ username, graphSlug }: Props) {
 
 	return (
 		<div className="space-y-4">
-			<div className="flex flex-wrap items-center gap-2">
+			<FilterBar
+				className="rounded-sm border"
+				summary={`${visible.length.toLocaleString()} shown`}
+			>
 				<EventTypeFilter value={actions} onChange={setActions} />
 				<StatusFilter value={statuses} onChange={setStatuses} />
-			</div>
-			<SearchInput value={search} onChange={setSearch} className="w-full" />
+			</FilterBar>
+			<SearchInput
+				inputSize="sm"
+				value={search}
+				onChange={setSearch}
+				className="w-full"
+			/>
 
 			{query.isLoading ? (
 				<EventsSkeleton />
 			) : all.length === 0 ? (
-				<EmptyState />
+				<EmptyState
+					icon={<CheckCircle2 className="h-6 w-6" />}
+					title="No events yet"
+					description="The audit trail starts as soon as someone changes something."
+				/>
 			) : visible.length === 0 ? (
-				<NoMatches />
+				<EmptyState
+					title="No loaded events match the current filters"
+					description={
+						'Status and search scan loaded events — use "Load older" to widen the range.'
+					}
+				/>
 			) : (
 				<TimelineList variant="rail">
 					{visible.map((e) => (
@@ -358,30 +377,6 @@ function RelTime({ iso }: { iso: string }) {
 }
 
 // ── States ────────────────────────────────────────────────────────────────────
-
-function EmptyState() {
-	return (
-		<div className="text-center text-muted-foreground py-8">
-			<CheckCircle2 className="w-6 h-6 mx-auto mb-2 opacity-50" />
-			<p>
-				No events yet — the audit trail starts as soon as someone changes
-				something.
-			</p>
-		</div>
-	);
-}
-
-function NoMatches() {
-	return (
-		<div className="text-center text-muted-foreground py-8">
-			<p>No loaded events match the current filters.</p>
-			<p className="text-xs mt-1 opacity-70">
-				Status and search scan loaded events — use "Load older" to widen the
-				range.
-			</p>
-		</div>
-	);
-}
 
 function EventsSkeleton() {
 	return (

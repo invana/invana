@@ -59,7 +59,7 @@ Audited 2026-09-10 against `@invana/canvas-ui@0.0.14`.
 | `explorer/typeColor.ts` | 74 | `view-panels/schema` › `typeColor` | ⬇️ **Promote ours.** canvas-ui hashes into a hardcoded `TYPE_PALETTE`; ours reads `--color-data-1…8` from `@invana/styling`. CU6 |
 | `explorer/ExpandFineTunePanel.tsx` | 418 | — | ✅ **Ours.** Graph-traversal filters, sorts and limits — an engine concern, no canvas-ui analogue |
 | `explorer/ExplorerTypesPanel.tsx` | 413 | — | ✅ **Ours.** The legend-and-selection panel. Its eye rows go through `visibility.ts` today and move to the store API with CU5 |
-| `explorer/RendererCapabilityBanner.tsx` | 85 | — | ✅ **Ours.** |
+| `explorer/RendererCapabilityBanner.tsx` | 0 | **`RendererCapabilityBanner`** | ✅ **Moved down (B5).** Studio renders canvas-ui's; the probes it calls are memoised in `renderer-pixijs`, because `hasWebGL` creates a WebGL context to answer and the browser evicts the oldest live one past ~16 |
 | `canvases/{canvasKinds,captureBanner,useCanvasStates,CanvasFormDialog}` | 384 | — | ✅ **Ours.** The canvas *record* — kinds, thumbnails, contents, CRUD. canvas-ui draws canvases; it does not persist them |
 
 **Deletable today: ~1,036 lines**, plus the two hand-rolled cards.
@@ -148,7 +148,7 @@ a helper, and an `editor-panels/` form. B1–B4 are in the table above — they 
 
 | # | Component | Where | Studio gives up |
 |---|---|---|---|
-| B5 | `RendererCapabilityBanner` — silent on WebGPU, a dismissible notice on the WebGL fallback, a permanent alert when neither can draw. `capabilities` overrides the probes so every outcome is reachable | `components/` | `RendererCapabilityBanner.tsx` — 85 → 0 |
+| B5 ✅ | `RendererCapabilityBanner` — silent on WebGPU, a dismissible notice on the WebGL fallback, a permanent alert when neither can draw. `capabilities` overrides the probes so every outcome is reachable; one story per outcome | `components/` | `RendererCapabilityBanner.tsx` — 85 → 0 |
 | B6 | `renderer` + `neighbours` sections on `GraphControlsToolbar`. Neighbours self-wires through the new `useHoverNeighbours`; the renderer picker is host-owned (`{ value, onChange }`) because switching backends remounts the canvas — `GraphCanvasApp` gained `preference` to make that possible, and `ToolbarSelectItem` gained `disabledOptions` so an unavailable backend states why | `toolbars/` | ~60 of `ExplorerHeaderToolbar` |
 | B7 | `ThemeBehaviour` reads the themed document itself (`data-theme` carries family + kind), replacing `CanvasThemeSync`. **Gated on CU8**: it must not change the bundled default | `@invana/graph` | `canvasTheme.ts` + `ThemeBridge` — 91 → 0 |
 | B8 | `typeColor` to read `--color-data-1…8`, cached per document and cleared by `CanvasThemeSync` on a theme flip; the old hard-coded hues remain as the no-tokens fallback. CU6: ours moved **down**, it was not deleted | `view-panels/schema/` | `typeColor.ts` — 74 → 0 |

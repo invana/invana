@@ -34,6 +34,7 @@ import {
 	useRunsQuery,
 	useTasksQuery,
 } from "@/hooks/queries/useWork";
+import { ProjectRulesSection } from "@/pages/graphs-detail/features/skills/ProjectRulesSection";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -50,13 +51,13 @@ import type {
 	Task,
 	TaskRunSummary,
 } from "@/types/work";
-import { ClampedText } from "@/ui/ClampedText";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PrincipalChip } from "@/ui/PrincipalChip";
 import { Input, Label, Textarea } from "@invana/forms";
 import {
 	Button,
+	ClampedText,
 	FilterBar,
 	PropertyList,
 	PropertyRow,
@@ -189,9 +190,9 @@ export function ProjectsDrawerBody({
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						placeholder="Project name"
-						className="min-w-0 flex-1 rounded-sm border bg-background px-2 py-1.5 text-sm"
+						className="min-w-0 flex-1 rounded-sm border bg-background px-2 py-1.5 text-base"
 					/>
-					<Button type="submit" size="sm" className="h-7 text-sm">
+					<Button type="submit" size="sm" className="h-7 text-base">
 						Create
 					</Button>
 				</form>
@@ -199,6 +200,8 @@ export function ProjectsDrawerBody({
 
 			{selected ? (
 				<ProjectDetail
+					username={username}
+					graphSlug={graphSlug}
 					project={selected}
 					onUpdate={(data, onDone) =>
 						mutations.update.mutate(
@@ -238,7 +241,7 @@ export function ProjectsDrawerBody({
 								<Spinner />
 							</div>
 						) : items.length === 0 ? (
-							<p className="p-4 text-sm text-muted-foreground">
+							<p className="p-4 text-base text-muted-foreground">
 								No projects yet. A task can live without one — a project is how
 								related work is organised, not a requirement.
 							</p>
@@ -290,6 +293,8 @@ export function ProjectsDrawerBody({
 }
 
 function ProjectDetail({
+	username,
+	graphSlug,
 	project,
 	plan,
 	tasks,
@@ -306,6 +311,8 @@ function ProjectDetail({
 	isSaving,
 	onTabChange,
 }: {
+	username: string;
+	graphSlug: string;
 	project: Project;
 	plan:
 		| {
@@ -408,7 +415,7 @@ function ProjectDetail({
 						<DetailStatus>archived</DetailStatus>
 					) : null}
 				</div>
-				<div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+				<div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-base text-muted-foreground">
 					<span>created by</span>
 					<PrincipalChip
 						name={project.created_by_name ?? "unknown"}
@@ -422,14 +429,14 @@ function ProjectDetail({
 				    project plans from, so it sits above the tabs rather than inside
 				    one, and clamped so the Todos under it survive (PT9). */}
 				{project.description ? (
-					<ClampedText className="mt-1.5 text-sm text-foreground">
+					<ClampedText className="mt-1.5 text-base text-foreground">
 						{project.description}
 					</ClampedText>
 				) : (
 					<button
 						type="button"
 						onClick={() => setTabAndNotify("details")}
-						className="mt-1.5 text-sm text-muted-foreground underline-offset-2 hover:underline"
+						className="mt-1.5 text-base text-muted-foreground underline-offset-2 hover:underline"
 					>
 						No purpose written yet — add one
 					</button>
@@ -477,7 +484,7 @@ function ProjectDetail({
 								<Spinner />
 							</div>
 						) : visible.length === 0 ? (
-							<p className="p-4 text-sm text-muted-foreground">
+							<p className="p-4 text-base text-muted-foreground">
 								{planTasks.length
 									? "No task matches those filters."
 									: "No tasks in this project yet."}
@@ -521,7 +528,7 @@ function ProjectDetail({
 
 					{staff.length ? (
 						<div className="flex shrink-0 flex-wrap items-center gap-1.5 border-t px-4 py-2">
-							<span className="text-sm text-muted-foreground">Staffed</span>
+							<span className="text-base text-muted-foreground">Staffed</span>
 							{staff.map((s) => (
 								<PrincipalChip
 									key={s.id}
@@ -552,10 +559,10 @@ function ProjectDetail({
 					<FilterBar
 						summary={critical ? `critical path: ${critical}` : undefined}
 					>
-						<span className="inline-flex h-[22px] items-center rounded-full border border-border px-2.5 text-sm text-muted-foreground">
+						<span className="inline-flex h-[22px] items-center rounded-full border border-border px-2.5 text-base text-muted-foreground">
 							order: dependencies
 						</span>
-						<span className="text-sm text-muted-foreground/80">
+						<span className="text-base text-muted-foreground/80">
 							then due date
 						</span>
 					</FilterBar>
@@ -566,7 +573,7 @@ function ProjectDetail({
 								<Spinner />
 							</div>
 						) : planTasks.length === 0 ? (
-							<p className="p-4 text-sm text-muted-foreground">
+							<p className="p-4 text-base text-muted-foreground">
 								No tasks in this project yet.
 							</p>
 						) : (
@@ -588,14 +595,16 @@ function ProjectDetail({
 											{/* The wave number in the gutter: tasks sharing one can
 											    run in parallel, and waves run left to right. */}
 											<span
-												className="mt-px w-5 shrink-0 text-right text-sm tabular-nums text-muted-foreground"
+												className="mt-px w-5 shrink-0 text-right text-base tabular-nums text-muted-foreground"
 												title={`Wave ${task.wave}`}
 											>
 												{task.wave}
 											</span>
 											<span className="min-w-0 flex-1">
 												<span className="flex items-center gap-1.5">
-													<span className="truncate text-sm">{task.title}</span>
+													<span className="truncate text-base">
+														{task.title}
+													</span>
 													{task.critical ? (
 														<span
 															className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
@@ -603,7 +612,7 @@ function ProjectDetail({
 														/>
 													) : null}
 												</span>
-												<span className="block truncate text-sm text-muted-foreground">
+												<span className="block truncate text-base text-muted-foreground">
 													{subline(task, byId)}
 												</span>
 											</span>
@@ -630,7 +639,7 @@ function ProjectDetail({
 					 * project's story.
 					 */}
 					{planTasks.length === 0 ? (
-						<p className="p-4 text-sm text-muted-foreground">
+						<p className="p-4 text-base text-muted-foreground">
 							Nothing has happened on this project yet.
 						</p>
 					) : (
@@ -666,6 +675,8 @@ function ProjectDetail({
 				{/* ── Details ───────────────────────────────────────────────────── */}
 				<TabsContent value="details" className="min-h-0 flex-1 overflow-y-auto">
 					<ProjectDetailsTab
+						username={username}
+						graphSlug={graphSlug}
 						project={project}
 						onUpdate={onUpdate}
 						onArchive={onArchive}
@@ -750,12 +761,16 @@ function ProjectDetail({
  * meant to explain.
  */
 function ProjectDetailsTab({
+	username,
+	graphSlug,
 	project,
 	onUpdate,
 	onArchive,
 	onUnarchive,
 	isSaving,
 }: {
+	username: string;
+	graphSlug: string;
 	project: Project;
 	onUpdate: (data: ProjectUpdate, onDone?: () => void) => void;
 	onArchive: () => void;
@@ -901,6 +916,20 @@ function ProjectDetailsTab({
 					</Button>
 				)}
 			</div>
+			{/*
+			 * What is always true of this work, under what is always true of the
+			 * Graph (RU8). It is a section here rather than a fifth tab because a
+			 * rule is part of what the project *is* — and this is where the
+			 * project's own acts already live (PT13).
+			 */}
+			<div className="-mx-3 -mb-3 border-t">
+				<ProjectRulesSection
+					username={username}
+					graphSlug={graphSlug}
+					projectKey={project.key}
+					frozen={project.status === "archived"}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -1042,7 +1071,7 @@ function PlanTaskDetail({
 				<Button
 					size="sm"
 					variant="outline"
-					className="mt-2.5 h-7 text-sm"
+					className="mt-2.5 h-7 text-base"
 					onClick={() => onOpenTask(task.id)}
 				>
 					Open

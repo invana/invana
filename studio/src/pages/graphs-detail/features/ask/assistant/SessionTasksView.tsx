@@ -213,7 +213,7 @@ export function SessionTasksView({ session, onJump }: SessionTasksViewProps) {
 							<span className="min-w-0 truncate font-medium" title={t.prompt}>
 								{t.prompt}
 							</span>
-							<span className="shrink-0 font-mono text-meta font-normal text-muted-foreground">
+							<span className="shrink-0 font-mono text-sm font-normal text-muted-foreground">
 								{t.message.createdAt.toLocaleTimeString([], {
 									hour: "2-digit",
 									minute: "2-digit",

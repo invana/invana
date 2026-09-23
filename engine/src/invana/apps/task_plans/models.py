@@ -107,8 +107,17 @@ class TaskPlan(Base):
     todo_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("todos.id", ondelete="CASCADE"), nullable=True, index=True
     )
-    #: `{name: {type, required, default}}` — what a run of this plan takes.
+    #: `{name: {type, default, label}}` — the arguments this plan **offers** a
+    #: caller ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).
+    #: Its own rows bind them as `${args.<name>}`, and a caller that inlines it
+    #: tunes them; a name absent from here is refused at save. Reusable plans
+    #: only — nothing calls a one-off, so nothing tunes it.
     args_schema: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    #: `[{key, version, args}]` — what this plan **spent**: the library plans it
+    #: inlined, and the arguments it tuned on each. The rows themselves are a
+    #: copy taken at composition ([SK32](docs/for-developers/modules/skills/features/authoring-a-skill.md)),
+    #: so this records the act rather than pointing at a plan that could move.
+    uses: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     #: Provenance, N:M — the skill versions this plan was drawn from.
     source_skill_version_ids: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     reusable: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
@@ -172,4 +181,8 @@ class Task(Base):
 
     #: The prose this node was drawn from — null when hand-authored.
     source_span: Mapped[str | None] = mapped_column(Text, nullable=True)
+    #: `nl-single@1` — the library plan version this row was copied from, null
+    #: for a row somebody wrote. What the Flow tab groups by, and what a
+    #: re-inline replaces ([SK33](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+    source_plan_key: Mapped[str | None] = mapped_column(String(80), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

@@ -3,13 +3,22 @@
   "package_id": "invana.dataset.twitter",
   "content_hash": "",
   "name": "Twitter",
-  "description": "Aviation chatter — posts, the accounts behind them and the tags they carry.",
+  "description": "Aviation chatter \u2014 posts, the accounts behind them and the tags they carry.",
   "version": "1.0.0",
   "model": {
     "schema_name": "Twitter",
     "schema_description": "Social posts about airlines and airports, keyed so they stitch onto news coverage and onto air-routes.",
     "validation_mode": "strict",
     "version": "1.0.0",
+    "axes": {
+      "time": {
+        "property": "created_at"
+      },
+      "dims": [
+        "lang",
+        "sentiment"
+      ]
+    },
     "property_keys": [
       {
         "name": "tweet_id",
@@ -82,14 +91,14 @@
         "name": "linked_url",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The article the post links to — the key an Article's url matches.",
+        "description": "The article the post links to \u2014 the key an Article's url matches.",
         "validation_rules": []
       },
       {
         "name": "airport_code",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "IATA code the post was tagged at — an air-routes airport code.",
+        "description": "IATA code the post was tagged at \u2014 an air-routes airport code.",
         "validation_rules": []
       },
       {
@@ -143,14 +152,14 @@
         "name": "airline_iata",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "For an airline account, its IATA designator — the key an Airline's iata matches.",
+        "description": "For an airline account, its IATA designator \u2014 the key an Airline's iata matches.",
         "validation_rules": []
       },
       {
         "name": "domain",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "For a news account, the outlet's domain — the key a Publisher's domain matches.",
+        "description": "For a news account, the outlet's domain \u2014 the key a Publisher's domain matches.",
         "validation_rules": []
       },
       {
@@ -164,7 +173,7 @@
         "name": "tag",
         "type": "string",
         "value_cardinality": "SINGLE",
-        "description": "The hashtag, without the # — a Topic's tag, cased differently.",
+        "description": "The hashtag, without the # \u2014 a Topic's tag, cased differently.",
         "validation_rules": []
       }
     ],
@@ -240,7 +249,7 @@
       },
       {
         "name": "Account",
-        "description": "Who posted it — a carrier, an outlet, a watcher or a passenger.",
+        "description": "Who posted it \u2014 a carrier, an outlet, a watcher or a passenger.",
         "parent_type": null,
         "is_abstract": false,
         "validation_mode": null,

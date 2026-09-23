@@ -18,13 +18,14 @@ abstraction is right (docs/for-developers/modules/ask/spec.md's phrasing, one le
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.envelope import Envelope, PlanRejected, PlanStep, apply_pins, validate_plan
 from invana.apps.agents.models import Agent
 from invana.apps.agents.registry import LABELS, template_key_for
+from invana.apps.task_plans.args import resolve as resolve_args
 from invana.apps.task_plans.querysets import TaskPlanQuerySet
 from invana.apps.task_plans.yaml_export import steps_of
 from invana.core.errors import NotFoundError
@@ -64,8 +65,15 @@ class SelectedPlan:
     key: str
     version: int
     #: The authored step list rebuilt from the rows, each carrying its
-    #: ``task_id`` so the run it opens can name the node it came from.
+    #: ``task_id`` so the run it opens can name the node it came from. Any
+    #: ``${args.N}`` the plan declares is already resolved against its defaults
+    #: — a plan selected directly runs on what it declares
+    #: ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).
     steps: tuple[dict, ...]
+    #: What the plan offers a caller, kept for the record and for the one
+    #: refusal that survives resolution: an argument declared with no default
+    #: that nothing supplied.
+    declares: dict = field(default_factory=dict)
 
     @property
     def ref(self) -> str:
@@ -120,8 +128,12 @@ async def select_plan_by_key(db: AsyncSession, *, graph_id: str, key: str) -> Se
         # LB11: present is not populated, and an empty plan is not a plan.
         return None
     task_ids = {task.key: task.id for task in tasks}
-    steps = tuple({**step, "task_id": task_ids.get(step["id"])} for step in steps_of(tasks))
-    return SelectedPlan(plan_id=plan.id, key=plan.key, version=plan.version, steps=steps)
+    declared = dict(plan.args_schema or {})
+    # Resolved **here**, before anything validates or queues: a marker that
+    # reached dispatch would be run as the literal string it is.
+    resolved = resolve_args(list(steps_of(tasks)), declared=declared)
+    steps = tuple({**step, "task_id": task_ids.get(step["id"])} for step in resolved)
+    return SelectedPlan(plan_id=plan.id, key=plan.key, version=plan.version, steps=steps, declares=declared)
 
 
 def resolve_plan(
@@ -129,6 +141,7 @@ def resolve_plan(
     envelope: Envelope,
     raw_steps: list[dict],
     source: str,
+    declares: dict | None = None,
 ) -> tuple[list[PlanStep], str]:
     """Validate a proposed plan and overlay the envelope's pins.
 
@@ -139,8 +152,14 @@ def resolve_plan(
     **This is where the catalogue crosses the band.** The validator is band 2
     and the declaration is band 3, so the runtime hands its own catalogue down
     rather than the envelope reaching up for it.
+
+    ``declares`` is the plan's own ``args_schema``, for the one caller that has
+    one: a **reusable** plan whose rows bind ``${args.N}``
+    ([LB20](docs/for-developers/modules/workflows/features/the-library.md)).
+    Everything else validates with none, which is what makes an ``${args.…}``
+    in a plan that offers nothing a refusal rather than a literal.
     """
-    validated = validate_plan(raw_steps, envelope, catalogue=CATALOGUE)
+    validated = validate_plan(raw_steps, envelope, catalogue=CATALOGUE, declares=declares)
     return apply_pins(validated, envelope), source
 
 

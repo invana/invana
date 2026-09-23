@@ -15,7 +15,11 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"paths": { "@/*": ["./src/*"] }
+		"paths": {
+			"@/*": ["./src/*"],
+			"react": ["./node_modules/@types/react"],
+			"react/*": ["./node_modules/@types/react/*"]
+		}
 	},
 	"include": ["src"]
 }

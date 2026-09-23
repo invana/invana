@@ -15,7 +15,8 @@ import pytest
 from invana.apps.llm import LLMError
 from invana.apps.llm.propose import ModelProposal, propose_model, validate_proposal
 from invana.apps.llm.schemas import TokenUsage
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.models import LLMProviderKind
+from tests.llm.endpoints import endpoint
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
 _DEV_MODEL = os.environ.get("INVANA_TEST_OLLAMA_MODEL", "qwen3-coder:30b")
@@ -107,7 +108,7 @@ def test_validate_rejects_unsupported_property_type() -> None:
 
 @pytest.mark.skipif(not _ollama_up(), reason="local Ollama not reachable")
 async def test_propose_model_builds_people_and_projects() -> None:
-    provider = LLMProvider(provider=LLMProviderKind.ollama, model_id=_DEV_MODEL, base_url=_OLLAMA_URL)
+    provider = endpoint(LLMProviderKind.ollama, _DEV_MODEL, base_url=_OLLAMA_URL)
     result = await propose_model(
         provider=provider,
         prompt="build a model of people and the projects they work on, with some generic properties",

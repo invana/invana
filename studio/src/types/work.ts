@@ -9,6 +9,8 @@
 //           in code; the word *task* never means this in the UI.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { OfferedRule, PlanArg, SkillLayer } from "@/types/skills";
+
 // ── Agents ───────────────────────────────────────────────────────────────────
 
 export type AgentKind = "seeded" | "authored" | "spawned";
@@ -27,8 +29,14 @@ export interface Agent {
 	instructions: string;
 	/** The envelope: allow-list · pinned args · require · templates · budgets. */
 	workflow_spec: Record<string, unknown>;
-	llm_config_id: string | null;
-	/** Read-only — the roster is `skill_bindings`; change it with bind/unbind. */
+	/**
+	 * The third bound: the world this agent works inside (AG2). **Null reads
+	 * *Everything*, inside the guardrails** — never a blank (AG5). `lens_name`
+	 * rides with the id so a row can draw a chip without a second fetch (AG8).
+	 */
+	lens_id: string | null;
+	lens_name: string | null;
+	/** Read-only — the bindings live in `skill_bindings`; change it with bind/unbind. */
 	skill_ids: string[];
 	budget: Record<string, number>;
 	policy: Record<string, boolean>;
@@ -45,6 +53,13 @@ export interface AgentListResponse {
 	items: Agent[];
 	total: number;
 	default_agent_id: string | null;
+	/**
+	 * `{agent_id: usd}` since the first of the month — what a row draws against
+	 * `max_cost_usd_month` (C10). An agent with no **priced** run is absent, not
+	 * zero: a subscription endpoint publishes no per-token rate, so *nothing
+	 * spent* and *nothing known* are different facts (OB4).
+	 */
+	spend_this_month: Record<string, number>;
 }
 
 export interface AgentCreate {
@@ -54,8 +69,9 @@ export interface AgentCreate {
 	/** Start from a seeded agent's envelope — an empty allow-list can do nothing. */
 	envelope_from?: string;
 	workflow_spec?: Record<string, unknown>;
-	llm_config_id?: string | null;
-	/** The roster this agent starts with, bound as part of creating it. */
+	/** Null is *Everything*, chosen — on update, omitting it keeps what is set (AG9). */
+	lens_id?: string | null;
+	/** The skills this agent starts with, bound as part of creating it. */
 	skill_ids?: string[];
 	budget?: Record<string, number>;
 	policy?: Record<string, boolean>;
@@ -93,12 +109,33 @@ export interface AgentLineage {
 	edges: AgentEdge[];
 }
 
-export interface RetirePreview {
+/** The two acts that disturb open work. Resume takes nothing away (LC10). */
+export type LifecycleAct = "pause" | "retire";
+
+/**
+ * What an act does to one piece of open work — a closed vocabulary, because a
+ * sentence per row is a sentence nobody can compare (LC9).
+ */
+export type LifecycleEffect = "finishes" | "blocked" | "unchanged" | "refused";
+
+export interface LifecycleItem {
+	kind: "run" | "task" | "session";
+	id: string;
+	title: string;
+	effect: LifecycleEffect;
+	/** The effect in a reader's words, about this item. */
+	note: string;
+}
+
+/**
+ * One shape for both acts (LC8): the same open work, carrying the effect *this*
+ * act would have on it. Named, not counted — a count is not enough to decide
+ * with, and a todo in review is where the two acts part.
+ */
+export interface LifecyclePreview {
 	agent_id: string;
-	open_task_ids: string[];
-	/** Named, not counted: a count is not enough to decide with. */
-	open_task_titles: string[];
-	session_count: number;
+	act: LifecycleAct;
+	items: LifecycleItem[];
 }
 
 // ── Projects ─────────────────────────────────────────────────────────────────
@@ -260,6 +297,10 @@ export interface ActivityNode {
 	skills_offered: string[];
 	/** A self-report: the model says it followed these. The badge says *reported*. */
 	skills_applied: string[];
+	/** A fact: these statements were in the prompt (RU7). */
+	rules_offered: OfferedRule[];
+	/** A self-report: the model says it followed these. A subset of the above (RU12). */
+	rules_cited: OfferedRule[];
 	tokens_in: number | null;
 	tokens_out: number | null;
 	at: string | null;
@@ -277,6 +318,34 @@ export interface AgentChip {
 	id: string;
 	name: string;
 	status: AgentStatus;
+}
+
+/**
+ * One governed band, and what a plan declares in it — the panel's *Layers it
+ * declares* ([LB22](docs/for-developers/modules/workflows/features/the-library.md)).
+ *
+ * All five arrive, touched or not: *this plan reads no graph data* is the fact
+ * a reader is checking for, and a band that vanished when empty would be
+ * indistinguishable from one that failed to load.
+ */
+export interface TaskPlanLayer {
+	layer: SkillLayer;
+	declared: boolean;
+	steps: number;
+	/** `2 steps` · `1 crossing` · `—`. Phrased by the engine, like the band. */
+	summary: string;
+}
+
+/** A caller that inlined this plan, and what it tuned (LB19). */
+export interface TaskPlanCaller {
+	/** `skill` when a skill version owns the calling plan, `plan` when none does. */
+	kind: string;
+	name: string;
+	skill_id: string | null;
+	/** The version of *this* plan it inlined — below the current one means the
+	 *  library has moved on, which the panel says and never acts on (SK32). */
+	version: number;
+	args: Record<string, unknown>;
 }
 
 export interface TaskPlanSummary {
@@ -306,6 +375,11 @@ export interface TaskPlanSummary {
 	 * "asked and failed" are different facts. */
 	served_rate: number | null;
 	last_run_at: string | null;
+	/** The bands this plan touches, in the strip's order — the row's chips. */
+	layers: SkillLayer[];
+	/** How many callers inline it. The row reads *used by 2 skills* where there
+	 *  are callers, and falls back to how often it ran where there are none. */
+	caller_count: number;
 }
 
 export interface TaskPlanStepSpec {
@@ -316,6 +390,11 @@ export interface TaskPlanStepSpec {
 }
 
 export interface TaskPlanDagNode extends TaskPlanStepSpec {
+	/** `callable` · `composite` · `human`. */
+	form: string;
+	/** The band this node sits in — sent by the engine, never derived here,
+	 *  which would be a second copy of the catalogue's `bound`. */
+	layer: SkillLayer;
 	/**
 	 * Longest path from a root — the canvas column. Two steps at the same
 	 * depth wait on the same thing, not on each other; the stored list order
@@ -343,6 +422,12 @@ export interface TaskPlanDagEdge {
 export interface TaskPlanDetail extends TaskPlanSummary {
 	nodes: TaskPlanDagNode[];
 	edges: TaskPlanDagEdge[];
+	/** The five governed bands, each with what this plan declares in it. */
+	declared_layers: TaskPlanLayer[];
+	/** Who inlines it, and what each tuned. */
+	callers: TaskPlanCaller[];
+	/** What a caller may tune (LB20). */
+	args_schema: Record<string, PlanArg>;
 }
 
 export interface TaskPlanListResponse {
@@ -350,23 +435,6 @@ export interface TaskPlanListResponse {
 	total: number;
 	/** Rendered verbatim in the panel's status bar. Stating the deferral is the design. */
 	authoring: string;
-}
-
-// ── Skill usage ──────────────────────────────────────────────────────────────
-
-export interface SkillUsageStep {
-	run_id: string;
-	step_id: string;
-	label: string;
-	task_key: string;
-	reported: boolean;
-	finished_at: string | null;
-}
-
-export interface SkillUsage {
-	skill_id: string;
-	used_by: Agent[];
-	recent_steps: SkillUsageStep[];
 }
 
 // ── Thinkings as list rows ───────────────────────────────────────────────────
@@ -391,9 +459,13 @@ export interface TaskRunSummary {
 	plan_revision: number;
 	replans: number;
 	agent_id: string | null;
+	/** `execute` · `plan` · `evaluate` — what the run was for (SR10). */
+	role: string;
 	task_id: string | null;
 	task_title: string | null;
 	queued_at: string | null;
+	/** When it actually began — what elapsed is measured from (SR45). */
+	started_at: string | null;
 	finished_at: string | null;
 	step_count: number;
 	/** The furthest step that is not merely queued — the `Execute` in `Execute 5/7`. */
@@ -402,6 +474,9 @@ export interface TaskRunSummary {
 	steps_total: number;
 	served: "yes" | "partial" | "no" | null;
 	promoted: boolean;
+	/** What the run spent, summed over its tasks (SR45). */
+	tokens_in: number;
+	tokens_out: number;
 }
 
 export interface ThinkingListResponse {

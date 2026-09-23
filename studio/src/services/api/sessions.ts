@@ -100,6 +100,15 @@ export interface SendMessageBody {
 	llm_provider_id?: string;
 	/** nl only — seconds to wait on the LLM translation before giving up. */
 	timeout_s?: number;
+	/**
+	 * The world this question is asked under (C1 · WO5).
+	 *
+	 * Omitted is **Everything, inside the guardrails** — the default and the
+	 * widest (GV7), so no surface grows a required field. The run freezes what
+	 * this resolves to; the id alone would be a pointer at a row that can move
+	 * (GR3).
+	 */
+	lens_id?: string;
 }
 
 /** A client-driven canvas operation to log as a session turn (docs/for-developers/modules/explore/features/boards.md). Only

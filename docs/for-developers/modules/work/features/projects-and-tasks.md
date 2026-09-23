@@ -13,7 +13,7 @@ derived order — nobody maintains a plan by hand.
 | Index | [9.1](../../../README.md#9--work) · Slice **S12b** |
 | Module | [Work](../spec.md) |
 | API / CLI / Studio | 🟡 / — / 🟡 |
-| Related | [objectives-and-criteria](objectives-and-criteria.md) · [review](review.md) · [the-roster](../../agents/features/the-roster.md) |
+| Related | [objectives-and-criteria](objectives-and-criteria.md) · [review](review.md) · [author-an-agent](../../agents/features/author-an-agent.md) |
 
 > **As** someone with work to get done, **I want** to write it once and hand it to whoever should do
 > it — person or agent — **so that** the same board tracks both.

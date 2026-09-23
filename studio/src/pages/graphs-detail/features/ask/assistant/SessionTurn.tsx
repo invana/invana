@@ -1,7 +1,8 @@
+import { useTicker } from "@/hooks/useTicker";
 import { formatDuration } from "@/lib/time";
 import {
-	CannotAnswerCard,
-	DiagnosisCard,
+	RunCannotAnswer,
+	RunDiagnosis,
 } from "@/pages/graphs-detail/features/ask/answer-surface/NotAnAnswer";
 import {
 	LoadToCanvasAction,
@@ -14,7 +15,6 @@ import {
 	StepList,
 	StepTrace,
 	StepsSummary,
-	useTicker,
 } from "@/pages/graphs-detail/features/ask/assistant/SessionSteps";
 import { stepsFor } from "@/pages/graphs-detail/features/ask/assistant/SessionTasksView";
 import { useRunStore } from "@/stores/run.store";
@@ -33,6 +33,7 @@ import {
 	type ChatSessionMessageAction,
 	ChatSessionMessageOptions,
 	ChatSessionPromptRow,
+	Spinner,
 } from "@invana/ui";
 import {
 	Code,
@@ -126,16 +127,6 @@ export function AssistantTurn(props: AssistantTurnProps) {
 	return <SettledTurn {...props} />;
 }
 
-function Spinner() {
-	return (
-		<span
-			className="h-3 w-3 shrink-0 rounded-full border-2 border-muted border-t-primary animate-spin motion-reduce:animate-none"
-			role="status"
-			aria-label="Working"
-		/>
-	);
-}
-
 function RunningTurn({
 	message,
 	steps: stepsProp,
@@ -159,7 +150,9 @@ function RunningTurn({
 			// The spinner is the row's gutter marker, not a line of its own: the
 			// step list below already names the running step and ticks its
 			// elapsed, so a headline here would just say "Understand…" twice.
-			marker={<Spinner />}
+			marker={
+				<Spinner className="size-3 shrink-0 text-primary motion-reduce:animate-none" />
+			}
 			footer={
 				<>
 					<StepList
@@ -476,13 +469,13 @@ function SettledTurn({
 					    fault with its evidence (CA6). Retry and repair appear on the
 					    step rows above, never here (CA7). */}
 					{view?.cannotAnswer && (
-						<CannotAnswerCard
+						<RunCannotAnswer
 							reason={view.cannotAnswer.reason}
 							stage={view.cannotAnswer.stage}
 						/>
 					)}
 					{message.status === "error" && view?.diagnosis && (
-						<DiagnosisCard
+						<RunDiagnosis
 							diagnosis={view.diagnosis}
 							onRetry={
 								message.sourceQuery ? () => onRerun(message.id) : onTypeInstead

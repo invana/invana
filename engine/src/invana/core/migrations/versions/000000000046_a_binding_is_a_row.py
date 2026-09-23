@@ -1,6 +1,6 @@
 """A binding is a row (skills-pass.md **K3** · BN6).
 
-``agents.skill_ids`` was a JSON array: the whole roster replaced on every save,
+``agents.skill_ids`` was a JSON array: the whole bound set replaced on every save,
 with nothing to attribute and nowhere to refuse. A bind that must name **which**
 skill it rejected, and why, has nothing to hold on to when the request is a list
 ([BN5](docs/for-developers/modules/skills/features/bindings.md)).

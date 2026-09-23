@@ -39,7 +39,7 @@ from invana.core.events.services import current_trace_id, emit_event
 from invana.runtime.models import RunStatus, TaskRun, TaskStream
 from invana.runtime.querysets import TaskRunQuerySet
 
-_skills = SkillQuerySet()
+_skills_qs = SkillQuerySet()
 _bindings = SkillBindingManager()
 
 # How long a parent waits on one child before failing its own `delegate` step.
@@ -136,10 +136,6 @@ async def spawn(
         raise BoundExceeded(f"This run may spawn at most {budget.get('max_children', 3)} agents.")
 
     narrowed = narrow(parent, requested=requested)
-    # A child may only rebind its LLM when the parent's policy says so;
-    # otherwise it thinks with the same model, which is what makes a child's
-    # cost predictable from its parent's.
-    llm_id = requested.get("llm_config_id") if policy.get("can_rebind_llm", False) else None
 
     child = Agent(
         graph_id=parent.graph_id,
@@ -150,8 +146,12 @@ async def spawn(
         lifetime=lifetime,
         instructions=instructions,
         workflow_spec=narrowed["workflow_spec"],
-        llm_config_id=llm_id or parent.llm_config_id,
         budget=narrowed["budget"],
+        # **The child inherits the parent's world** (DG9). It is how *LLM ⊆ its
+        # parent's* (DG7) survives the provider split — an agent binds no model,
+        # so what it thinks with is what its lens casts — and it closes the one
+        # dimension in which a child was wider than the agent that spawned it.
+        lens_id=parent.lens_id,
         # Bounded agency does not propagate by default: a spawned agent cannot
         # spawn unless it was deliberately given the policy.
         policy={"can_spawn": False, "can_be_assigned": False},
@@ -167,7 +167,7 @@ async def spawn(
     # other, written by the one manager that writes them. The parent is the
     # actor: nobody typed this.
     for skill_id in narrowed["skill_ids"]:
-        skill = await _skills.get(db, skill_id)
+        skill = await _skills_qs.get(db, skill_id)
         if skill is None:
             continue
         await _bindings.bind(db, skill=skill, agent_id=child.id, agent_name=child.name, actor_id=parent.id)

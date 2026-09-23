@@ -5,14 +5,14 @@ import type {
 	AgentLineage,
 	AgentListResponse,
 	AgentUpdate,
+	LifecycleAct,
+	LifecyclePreview,
 	Project,
 	ProjectAssignment,
 	ProjectCreate,
 	ProjectListResponse,
 	ProjectPlan,
 	ProjectUpdate,
-	RetirePreview,
-	SkillUsage,
 	Task,
 	TaskActivity,
 	TaskCreate,
@@ -104,9 +104,19 @@ export const agentsApi = {
 			method: "POST",
 		}),
 
-	/** What retiring would do — the confirm dialog names the open tasks. */
-	retirePreview: (username: string, graphSlug: string, id: string) =>
-		request<RetirePreview>(`${base(username, graphSlug)}/agents/${id}/retire`),
+	/**
+	 * What the act would do — the confirm dialog names the open work item by
+	 * item, and the effects are what differ between the two acts (LC8).
+	 */
+	lifecyclePreview: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		act: LifecycleAct,
+	) =>
+		request<LifecyclePreview>(
+			`${base(username, graphSlug)}/agents/${id}/${act}`,
+		),
 
 	retire: (
 		username: string,
@@ -307,9 +317,4 @@ export const workflowsApi = {
 			method: "POST",
 			...json(data),
 		}),
-};
-
-export const skillUsageApi = {
-	get: (username: string, graphSlug: string, skillId: string) =>
-		request<SkillUsage>(`${base(username, graphSlug)}/skills/${skillId}/usage`),
 };

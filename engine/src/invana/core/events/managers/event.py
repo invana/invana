@@ -50,7 +50,7 @@ class AttributionError(ValueError):
 class EventManager:
     """The base. An app's subclass adds its vocabulary, never its own write path."""
 
-    querysets = EventQuerySet()
+    events_qs = EventQuerySet()
 
     async def emit(
         self,
@@ -121,4 +121,4 @@ class EventManager:
             details=safe_details,
             trace_id=trace_id,
         )
-        return await self.querysets.add(session, event)
+        return await self.events_qs.add(session, event)

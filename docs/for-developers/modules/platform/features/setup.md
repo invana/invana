@@ -8,7 +8,7 @@ step is done because the thing it asks for exists, whoever made it exist and fro
 | Index | [13.7](../../../README.md#13--platform) · Slice **S13** |
 | Module | [Platform](../spec.md) |
 | API / CLI / Studio | 🟡 / — / 🟡 |
-| Related | [Connect a database](../../connect-and-model/features/connect-a-database.md) · [Author a model](../../connect-and-model/features/domain-models.md) · [Bring data in](../../bring-data-in/features/load-data.md) · [Providers and models](../../agents/features/providers-and-models.md) · [Author an agent](../../agents/features/the-roster.md) · [Save a plan for reuse](../../workflows/features/the-library.md) · [Schedules](../../operate/features/schedules.md) · [Command line](command-line.md) |
+| Related | [Connect a database](../../connect-and-model/features/connect-a-database.md) · [Author a model](../../connect-and-model/features/domain-models.md) · [Bring data in](../../bring-data-in/features/load-data.md) · [Providers and models](../../agents/features/providers-and-models.md) · [Author an agent](../../agents/features/author-an-agent.md) · [Save a plan for reuse](../../workflows/features/the-library.md) · [Schedules](../../operate/features/schedules.md) · [Command line](command-line.md) |
 
 > **As** someone who just made a Graph, **I want** to see what still stands between me and an answer —
 > and to understand what each step is *for*, **so that** I can go and do it, or hand it to a teammate
@@ -199,7 +199,7 @@ rest is what the lesson links to when it explains why the step matters.
 
 | Sub-feature | Index | In setup |
 |---|---|---|
-| [Author an agent](../../agents/features/the-roster.md) | 5.2 | **optional step** — *Author an agent*. The seeded four do not count ([SU9](#decisions)) |
+| [Author an agent](../../agents/features/author-an-agent.md) | 5.2 | **optional step** — *Author an agent*. The seeded four do not count ([SU9](#decisions)) |
 | [Set what an agent may run](../../agents/features/envelope-and-budget.md) | 5.3 | the bound itself — what it may run, with what arguments, at what cost |
 | [Check a plan against the bound](../../workflows/features/envelope-validation.md) | 7.3 | the valve — a shared plan checked against one actor's bounds **before dispatch** |
 | [Delegation](../../agents/features/delegation.md) · [Pause, resume, retire](../../agents/features/lifecycle.md) · [Who spawned whom](../../agents/features/lineage.md) | 5.4–5.6 | bounds that nest, and the record of who spawned whom |

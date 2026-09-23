@@ -1,0 +1,153 @@
+{
+  "name": "airways",
+  "description": "The guardrails this Graph runs inside, and four worlds that narrow within them. Loaded by `invana govern apply`.",
+  "guardrails": [
+    {
+      "name": "Airways guardrails",
+      "scope": "graph",
+      "closed_layers": [],
+      "rules": [
+        {
+          "match": "third_party/**",
+          "allow": false
+        },
+        {
+          "match": "graph_data/model/Deals@*",
+          "allow": true,
+          "properties": {
+            "exclude": []
+          },
+          "egress": {
+            "may_send": [
+              "type_names",
+              "property_names",
+              "the_question"
+            ]
+          }
+        },
+        {
+          "match": "llm/**",
+          "allow": true,
+          "egress": {
+            "may_send": [
+              "type_names",
+              "the_question"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "worlds": [
+    {
+      "name": "Everything",
+      "description": "The whole global model, every configured provider. The default, and it is still inside the guardrails — which is the thing this world exists to show.",
+      "closed_layers": [],
+      "rules": [],
+      "cast": {}
+    },
+    {
+      "name": "EU · H1 2026",
+      "description": "Four models and the stitches between them, sliced to the first half of 2026 and to carriers based in Germany, France, the Netherlands, Spain and Switzerland. 1,283 of the 4,902 deals are inside it. The stitches are named as well as the models: closing `graph_data` means only what the world names is in view, and an edge that crosses two models belongs to neither of them.",
+      "closed_layers": [
+        "graph_data"
+      ],
+      "rules": [
+        {
+          "match": "graph_data/model/Deals@*",
+          "allow": true,
+          "select": {
+            "time": {
+              "axis": "signed_at",
+              "from": "2026-01-01",
+              "to": "2026-06-30"
+            },
+            "geo": {
+              "axis": "country_iso",
+              "vocab": "iso2",
+              "in": [
+                "DE",
+                "FR",
+                "NL",
+                "ES",
+                "CH"
+              ]
+            }
+          }
+        },
+        {
+          "match": "graph_data/model/NewsArticles@*",
+          "allow": true,
+          "select": {
+            "time": {
+              "axis": "published_at",
+              "from": "2026-01-01",
+              "to": "2026-06-30"
+            }
+          }
+        },
+        {
+          "match": "graph_data/model/AirRoutes@*",
+          "allow": true
+        },
+        {
+          "match": "graph_data/model/Twitter@*",
+          "allow": true,
+          "select": {
+            "time": {
+              "axis": "created_at",
+              "from": "2026-01-01",
+              "to": "2026-06-30"
+            }
+          }
+        },
+        {
+          "match": "graph_data/stitch/**",
+          "allow": true
+        }
+      ],
+      "cast": {}
+    },
+    {
+      "name": "Price-blind",
+      "description": "Every model, no slice, and the two numbers nobody needs to see. A question can still rank by revenue — the value is used to compute, never to reason (GV11).",
+      "closed_layers": [],
+      "rules": [
+        {
+          "match": "graph_data/model/Deals@*",
+          "allow": true,
+          "properties": {
+            "exclude": [
+              "revenue",
+              "contract_value"
+            ]
+          }
+        }
+      ],
+      "cast": {}
+    },
+    {
+      "name": "Nothing leaves",
+      "description": "No third party, and only a local model may be reached. Everything the question touches stays in the building.",
+      "closed_layers": [
+        "llm"
+      ],
+      "rules": [
+        {
+          "match": "third_party/**",
+          "allow": false
+        },
+        {
+          "match": "llm/ollama-local/*",
+          "allow": true,
+          "egress": {
+            "may_send": [
+              "everything"
+            ]
+          }
+        }
+      ],
+      "cast": {}
+    }
+  ]
+}

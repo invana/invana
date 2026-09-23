@@ -88,7 +88,6 @@ import {
 	ToggleGroupItem,
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger,
 } from "@invana/ui";
 // Vite's worker idiom — see LAYOUTS below.
@@ -187,10 +186,9 @@ const DEFAULT_EDGE_COLOR = 0x94a3b8;
 const DEFAULT_EDGE_WIDTH = 1.5;
 
 // Forces for the registered active layout (run on every query repaint by
-// `<AutoLayoutBridge>` and on every node-expand). `animate: true` writes
-// positions back on every tick, so the simulation visibly settles — a fresh
-// query fans out and an expand's new neighbours slide into place rather than
-// snapping — which reads as the graph living/relaxing.
+// `<AutoLayoutBridge>` and on every node-expand). `animate: false` (GC8): the
+// sim solves off-screen and the graph is drawn once, at its settled positions —
+// no per-tick repaint, and nothing drifts out from under the cursor.
 //
 // Tuned for hub-and-spoke shapes (expand a node → N leaves on one parent) that
 // are themselves linked into a larger graph, balancing two competing pulls:
@@ -208,7 +206,7 @@ const DEFAULT_EDGE_WIDTH = 1.5;
 // overshoot. Cheap because new nodes are pre-placed near their anchor (see the
 // expand handler), so the sim only has to relax locally.
 const FORCE_OPTS = {
-	animate: true,
+	animate: false,
 	// Looser spacing so dense leaf-fans (expand a hub → hundreds of leaves) spread
 	// out and read as a graph rather than a blob: stronger repulsion over a wider
 	// radius, longer edges, and a bigger hard floor on node spacing (node is 8px +
@@ -750,6 +748,15 @@ function AutoLayoutBridge({
 	interactionRef?: InteractionRef;
 }) {
 	const canvas = useGraphCanvas();
+	// **Redraw on settle.** An `animate: false` solve lands in the same beat as
+	// the data it lays out, so the layer's placement gate lifts against a flush
+	// that has already happened and no shape is installed — the store and the
+	// minimap hold the graph, the viewport stays empty. `redraw()` is a pure
+	// render pass over the store (same fix as SchemaCanvas, ME25).
+	useCanvasEvent("layout:run:end", (e) => {
+		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
+		canvas.layers.get<graph.GraphLayer>("graph")?.redraw();
+	});
 	useEffect(() => {
 		if (!canvas || data.nodes.length === 0) return;
 
@@ -793,26 +800,6 @@ function AutoLayoutBridge({
 			cancelled = true;
 		};
 	}, [canvas, data, interactionRef]);
-	return null;
-}
-
-/**
- * Freezes the active force layout when the user starts dragging a node. With
- * `animate: true` the simulation keeps nudging nodes for a few seconds after a
- * query / expand, so a node can drift out from under the cursor while the user is
- * manipulating it. Stopping the sim on `input:node:drag:start` pins everything
- * where it is so the drag (and any follow-up interaction) resolves against a
- * stable layout. The next query / expand re-runs the layout (a fresh `apply()`),
- * so this only ends the current settle.
- */
-function FreezeLayoutOnInteractionBridge() {
-	const canvas = useCanvas();
-	const stop = useCallback(() => {
-		(
-			canvas.layouts.get(ACTIVE_LAYOUT_ID) as { stop?: () => void } | undefined
-		)?.stop?.();
-	}, [canvas]);
-	useCanvasEvent("input:node:drag:start", stop);
 	return null;
 }
 
@@ -971,7 +958,6 @@ export function ExplorerCanvas({
 				options={FORCE_OPTS}
 			/>
 			<AutoLayoutBridge data={data} interactionRef={interactionRef} />
-			<FreezeLayoutOnInteractionBridge />
 
 			<ThemeBridge />
 
@@ -1192,38 +1178,38 @@ function HeaderToolbarItems({
 			// background.
 			type: "custom",
 			key: "layout",
+			// No `TooltipProvider` here: the shell mounts one for the whole app
+			// (`main.tsx`), and a second would be a second delay to keep in step.
 			render: () => (
-				<TooltipProvider delayDuration={300}>
-					<ToggleGroup
-						type="single"
-						size="sm"
-						value={layout}
-						// Radix fires `""` when the active item is re-clicked; ignore that
-						// so a layout is always selected.
-						onValueChange={(v) => v && applyLayout(v)}
-					>
-						{Object.entries(layoutOptions).map(([value, label]) => {
-							const Icon = LAYOUT_ICON[value] ?? Share2;
-							// Keep the item itself the (clean) ToggleGroup child so it
-							// keeps its `data-state="on"` highlight — wrapping it in
-							// `TooltipTrigger asChild` would clobber that with the
-							// tooltip's own `data-state`. The trigger lives on an inner
-							// span instead.
-							return (
-								<ToggleGroupItem key={value} value={value} aria-label={label}>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<span className="flex size-full items-center justify-center">
-												<Icon className="size-4" />
-											</span>
-										</TooltipTrigger>
-										<TooltipContent>{label}</TooltipContent>
-									</Tooltip>
-								</ToggleGroupItem>
-							);
-						})}
-					</ToggleGroup>
-				</TooltipProvider>
+				<ToggleGroup
+					type="single"
+					size="sm"
+					value={layout}
+					// Radix fires `""` when the active item is re-clicked; ignore that
+					// so a layout is always selected.
+					onValueChange={(v) => v && applyLayout(v)}
+				>
+					{Object.entries(layoutOptions).map(([value, label]) => {
+						const Icon = LAYOUT_ICON[value] ?? Share2;
+						// Keep the item itself the (clean) ToggleGroup child so it
+						// keeps its `data-state="on"` highlight — wrapping it in
+						// `TooltipTrigger asChild` would clobber that with the
+						// tooltip's own `data-state`. The trigger lives on an inner
+						// span instead.
+						return (
+							<ToggleGroupItem key={value} value={value} aria-label={label}>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="flex size-full items-center justify-center">
+											<Icon className="size-4" />
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>{label}</TooltipContent>
+								</Tooltip>
+							</ToggleGroupItem>
+						);
+					})}
+				</ToggleGroup>
 			),
 		},
 		div("d2"),

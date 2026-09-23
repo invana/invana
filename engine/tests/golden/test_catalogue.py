@@ -26,7 +26,7 @@ CATALOGUE_DIR = Path(__file__).resolve().parents[2] / "src" / "invana" / "runtim
 #: The closed set's size. Growth belongs in reusable TaskPlans, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
-ENTRY_COUNT = 22
+ENTRY_COUNT = 23
 
 #: Modules that declare entries, and the one bound each of them names.
 BOUND_MODULES = {
@@ -125,7 +125,15 @@ class TestBindings:
 
         for template in TEMPLATES.values():
             envelope = Envelope.from_spec({"allow": [s["task"] for s in template.steps]})
-            resolve_plan(envelope=envelope, raw_steps=[dict(s) for s in template.steps], source="test")
+            # A template that declares arguments is validated against what it
+            # declares: its rows still hold `${args.N}` here, because nothing
+            # has composed or selected it yet (LB20).
+            resolve_plan(
+                envelope=envelope,
+                raw_steps=[dict(s) for s in template.steps],
+                source="test",
+                declares=template.args_schema,
+            )
 
         for agent in SEEDED_AGENTS:
             steps = (agent.workflow_spec or {}).get("steps") or []

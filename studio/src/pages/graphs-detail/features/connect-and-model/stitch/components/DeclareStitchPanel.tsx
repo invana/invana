@@ -47,6 +47,10 @@ import {
 import {
 	Badge,
 	Button,
+	Card,
+	CardFooter,
+	CardHeader,
+	CardTitle,
 	Spinner,
 	Tabs,
 	TabsList,
@@ -247,7 +251,7 @@ export function DeclareStitchPanel({
 
 	if (models.isLoading) {
 		return (
-			<Card className={className}>
+			<Card className={cn(STITCH_CARD, className)}>
 				<div className="flex justify-center p-4">
 					<Spinner />
 				</div>
@@ -257,14 +261,14 @@ export function DeclareStitchPanel({
 
 	if (options.length < 2) {
 		return (
-			<Card className={className}>
-				<CardHeader />
-				<div className="px-2.5 py-2 text-meta text-muted-foreground">
+			<Card className={cn(STITCH_CARD, className)}>
+				<StitchCardHeader />
+				<div className="px-2.5 py-2 text-sm text-muted-foreground">
 					A stitch binds two <span className="text-foreground">published</span>{" "}
 					versions. Publish at least two models first — a draft has nothing
 					immutable to bind.
 				</div>
-				<CardFooter>
+				<CardFooter className={STITCH_FOOTER}>
 					<Button size="xs" variant="ghost" onClick={onClose}>
 						Close
 					</Button>
@@ -275,10 +279,10 @@ export function DeclareStitchPanel({
 
 	return (
 		<div className={cn("flex w-[292px] flex-col gap-3", className)}>
-			<Card>
-				<CardHeader />
+			<Card className={STITCH_CARD}>
+				<StitchCardHeader />
 
-				<div className="flex flex-col gap-2 p-2.5 text-meta">
+				<div className="flex flex-col gap-2 p-2.5 text-sm">
 					{/* One card, two kinds (ST11). */}
 					<Tabs
 						size="sm"
@@ -346,7 +350,7 @@ export function DeclareStitchPanel({
 								value={match}
 								onValueChange={(v) => setMatch(v as IdentityMatch)}
 							>
-								<SelectTrigger triggerSize="sm" className="text-meta">
+								<SelectTrigger triggerSize="sm" className="text-sm">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
@@ -362,7 +366,7 @@ export function DeclareStitchPanel({
 							<Row label="Edge">
 								<Input
 									inputSize="sm"
-									className="font-mono text-meta"
+									className="font-mono text-sm"
 									value={edgeType}
 									onChange={(e: { target: { value: string } }) =>
 										setEdgeType(e.target.value.toUpperCase())
@@ -420,7 +424,7 @@ export function DeclareStitchPanel({
 										value={sourceModelId}
 										onValueChange={setSourceModelId}
 									>
-										<SelectTrigger triggerSize="sm" className="text-meta">
+										<SelectTrigger triggerSize="sm" className="text-sm">
 											<SelectValue placeholder="Pick a model" />
 										</SelectTrigger>
 										<SelectContent>
@@ -494,7 +498,7 @@ export function DeclareStitchPanel({
 					)}
 				</div>
 
-				<CardFooter>
+				<CardFooter className={STITCH_FOOTER}>
 					<Button
 						size="xs"
 						disabled={!ready || declare.isPending}
@@ -524,35 +528,24 @@ export function DeclareStitchPanel({
 // The card's own chrome
 // ─────────────────────────────────────────────────────────────────────────────
 
-function Card({
-	className,
-	children,
-}: {
-	className?: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<div className={cn("w-[292px] border bg-card shadow-lg", className)}>
-			{children}
-		</div>
-	);
-}
+/** The card's own width and elevation — a floating panel, not a page card. */
+const STITCH_CARD = "w-[292px] rounded-none shadow-lg";
 
-function CardHeader() {
+/** The card's one title, over whichever kind is chosen inside it (ST11). */
+function StitchCardHeader() {
 	return (
-		<div className="flex items-center gap-1.5 border-b px-2.5 py-2">
-			<span className="font-medium text-sm">Declare a stitch</span>
+		<CardHeader className="flex-row items-center gap-1.5 space-y-0 border-b px-2.5 py-2">
+			<CardTitle className="font-medium text-base">Declare a stitch</CardTitle>
 			<span className="flex-1" />
 			<Badge variant="outline" size="xs">
 				preview
 			</Badge>
-		</div>
+		</CardHeader>
 	);
 }
 
-function CardFooter({ children }: { children?: React.ReactNode }) {
-	return <div className="flex gap-1.5 border-t px-2.5 py-2">{children}</div>;
-}
+/** The footer's own gap and rule; the kit's padding is a page card's. */
+const STITCH_FOOTER = "gap-1.5 border-t px-2.5 py-2";
 
 function Row({
 	label,
@@ -595,14 +588,14 @@ function SideRow({
 		return (
 			<div className="flex items-center gap-2">
 				<span className="w-16 shrink-0 text-muted-foreground">{label}</span>
-				<span className="truncate font-mono text-meta">{option.label}</span>
+				<span className="truncate font-mono text-sm">{option.label}</span>
 			</div>
 		);
 	}
 	return (
 		<Row label={label}>
 			<Select value={value} onValueChange={onChange}>
-				<SelectTrigger triggerSize="sm" className="font-mono text-meta">
+				<SelectTrigger triggerSize="sm" className="font-mono text-sm">
 					<SelectValue placeholder="Pick a published type" />
 				</SelectTrigger>
 				<SelectContent>
@@ -656,7 +649,7 @@ function KeyRow({
 					<SelectTrigger
 						triggerSize="sm"
 						className={cn(
-							"font-mono text-meta",
+							"font-mono text-sm",
 							wrong && value && "border-destructive",
 						)}
 					>
@@ -785,9 +778,11 @@ function AlreadyStitchedCard({
 		<div className="w-[292px] border border-destructive bg-card shadow-lg">
 			<div className="flex items-center gap-1.5 border-b px-2.5 py-2">
 				<HelpCircle className="size-3.5 text-destructive" />
-				<span className="font-medium text-sm">Refused — already stitched</span>
+				<span className="font-medium text-base">
+					Refused — already stitched
+				</span>
 			</div>
-			<div className="flex flex-col gap-1.5 px-2.5 py-2 text-meta">
+			<div className="flex flex-col gap-1.5 px-2.5 py-2 text-sm">
 				<div>
 					<span className="font-mono">{pair}</span> is already declared
 					{rule ? (

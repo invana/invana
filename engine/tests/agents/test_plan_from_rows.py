@@ -50,11 +50,21 @@ class TestTheRowsAreThePlan:
         )
 
         assert selected is not None
-        assert (selected.key, selected.version, selected.ref) == ("nl-single", 1, "nl-single@1")
+        assert (selected.key, selected.version, selected.ref) == ("nl-single", 2, "nl-single@2")
 
         authored = TEMPLATES["nl-single"].steps
         assert [s["task"] for s in selected.steps] == [s["task"] for s in authored]
-        assert [s["args"] for s in selected.steps] == [dict(s["args"]) for s in authored]
+        # Every `${args.N}` the plan declares is already resolved against its
+        # default — a plan selected directly runs on what it declares, and a
+        # marker that reached dispatch would be run as the literal string it is
+        # (LB20).
+        expected = [
+            {k: (True if v == "${args.read_only}" else v) for k, v in dict(s["args"]).items()} for s in authored
+        ]
+        assert [s["args"] for s in selected.steps] == expected
+        assert selected.declares == {
+            "read_only": {"type": "bool", "default": True, "label": "Refuse anything that writes"}
+        }
 
         # Every step carries the `tasks` row it was read from, and every one of
         # those rows belongs to the plan that was selected.
@@ -79,7 +89,7 @@ class TestTheRowsAreThePlan:
         steps, source = resolve_plan(
             envelope=envelope, raw_steps=[dict(s) for s in selected.steps], source=f"template:{selected.ref}"
         )
-        assert source == "template:nl-single@1"
+        assert source == "template:nl-single@2"
 
         root = await _root(session, graph)
         queued = await queue_plan_steps(session, run=root, message_id=None, steps=steps, start_seq=1)

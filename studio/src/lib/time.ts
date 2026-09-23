@@ -24,3 +24,18 @@ export function formatRelativeTime(date: Date): string {
 
 	return date.toLocaleDateString();
 }
+
+/** A whole run's clock: "840ms" / "1.4s" / "2m 5s" / "1h 12m".
+ *
+ *  Distinct from {@link formatDuration}, whose subject is one step and which
+ *  stays in seconds because a step that takes three minutes is the exception.
+ *  A run that takes three minutes is ordinary, and `185s` is not a duration a
+ *  person reads. */
+export function formatElapsed(ms: number): string {
+	if (ms < 1000) return formatDuration(ms);
+	const seconds = Math.round(ms / 1000);
+	if (seconds < 60) return formatDuration(ms);
+	const minutes = Math.floor(seconds / 60);
+	if (minutes < 60) return `${minutes}m ${seconds % 60}s`;
+	return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}

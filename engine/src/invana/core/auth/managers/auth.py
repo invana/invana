@@ -108,7 +108,7 @@ def _token_out(row: PersonalAccessToken, *, now: datetime | None = None) -> Pers
 
 
 class AuthManager:
-    users = UserQuerySet()
+    users_qs = UserQuerySet()
 
     async def _username_taken(
         self, session: AsyncSession, *, username: str, exclude_user_id: str | None = None

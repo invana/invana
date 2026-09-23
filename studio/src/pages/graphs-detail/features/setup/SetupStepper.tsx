@@ -13,8 +13,7 @@ import {
 	type SetupSection,
 	setupSectionStatus,
 } from "@/types/graphs";
-import { Eyebrow } from "@/ui/Eyebrow";
-import { cn } from "@invana/ui";
+import { Eyebrow, cn } from "@invana/ui";
 
 /**
  * The wizard's left rail: every step, grouped by the gate it opens, with the
@@ -143,7 +142,7 @@ function StepRow({
 				{label}
 			</span>
 			{isNext && !selected && (
-				<span className="ml-auto shrink-0 text-meta text-primary">next</span>
+				<span className="ml-auto shrink-0 text-sm text-primary">next</span>
 			)}
 		</button>
 	);

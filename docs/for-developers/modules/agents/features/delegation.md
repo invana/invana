@@ -87,6 +87,8 @@ flowchart TD
 | DG6 | Exactly one seeded agent may delegate — **Coordinator** — and it is not the Graph default. Delegation is the expensive shape (one question becoming four), so allowing it is a choice somebody makes, not the state everything starts in. |
 | DG7 | Its bounds ship with it: depth 2, three children per run, and every child's allow-list, skills, budget and LLM ⊆ its parent's. Enforced by the interpreter, never by the prompt. |
 | DG8 | A child's trace nests **inside the parent's**, under the step that spawned it, collapsed and loaded on open. The parent's run is the subject; the child is a detail of one of its steps. |
+| DG9 | **A child inherits its parent's lens**, and that is how *LLM ⊆ its parent's* ([DG7](#decisions)) survives the provider split. An agent binds no provider ([PM1](providers-and-models.md)), so there is no model column to copy down: what the parent thinks with is what its lens casts, and the child carries the same `lens_id`. It is also the narrowing a child was always owed — a spawned agent that inherited an envelope and a budget but not a world would have been *wider* than the agent that spawned it, in the one dimension nobody was checking. |
+| DG10 | **`can_rebind_llm` is retired.** It named a column that no longer exists. Giving a child a different model is giving it a different lens, which is the same act as every other narrowing and goes through `lens_id` — one mechanism, and one place a reviewer reads to learn what a child may think with. |
 
 ## Not building
 

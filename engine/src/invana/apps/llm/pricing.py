@@ -12,12 +12,18 @@ provider returns ``None``, the column stays ``NULL`` and the Cost tile is absent
 rather than reading ``$0.00`` (OB4). Estimating silently is the one thing this
 must not do.
 
-Two sources, narrowest first:
+Three sources, narrowest first:
 
 | Source | For |
 |---|---|
-| ``provider.guardrails["pricing"]`` | an exact contract rate, or a model this list does not carry |
+| ``llm_models.pricing`` | this model's own rate, which is where a rate belongs now the model is a row |
+| ``provider.guardrails["pricing"]`` | an exact contract rate for the whole endpoint |
 | the list below | the vendors' published list rates, matched on a model-id prefix |
+
+A rate is priced against an **endpoint**
+([PM13](docs/for-developers/modules/agents/features/providers-and-models.md)),
+not a provider: until the split the row that carried the rate was the row that
+carried the key, and those are two different facts.
 
 A local provider (``ollama`` · ``local``) is **priced at zero**, which is a fact
 and not a guess: the call spends no API dollars. What it spends is a machine,
@@ -28,7 +34,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from invana.apps.llm_providers.models import LLMCredentialKind, LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.endpoint import LLMEndpoint
+from invana.apps.llm_providers.models import LLMCredentialKind, LLMProviderKind
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,8 +78,8 @@ _FREE_KINDS = frozenset({LLMProviderKind.ollama, LLMProviderKind.local})
 _PRICED_AS = {LLMProviderKind.claude_agent_sdk: LLMProviderKind.anthropic}
 
 
-def rate_for(provider: LLMProvider) -> Rate | None:
-    """This provider's rate, or ``None`` when nobody has published one."""
+def rate_for(provider: LLMEndpoint) -> Rate | None:
+    """This endpoint's rate, or ``None`` when nobody has published one."""
     override = _override(provider)
     if override is not None:
         return override
@@ -91,7 +98,7 @@ def rate_for(provider: LLMProvider) -> Rate | None:
     return published[max(matches, key=len)]
 
 
-def cost_usd(provider: LLMProvider | None, tokens_in: int | None, tokens_out: int | None) -> float | None:
+def cost_usd(provider: LLMEndpoint | None, tokens_in: int | None, tokens_out: int | None) -> float | None:
     """What a call on ``provider`` cost, or ``None`` when the rate is unknown.
 
     A step that spent no tokens has no cost to record — ``None`` rather than
@@ -107,7 +114,7 @@ def cost_usd(provider: LLMProvider | None, tokens_in: int | None, tokens_out: in
     return round(rate.usd(tokens_in or 0, tokens_out or 0), 6)
 
 
-def _on_a_subscription(provider: LLMProvider) -> bool:
+def _on_a_subscription(provider: LLMEndpoint) -> bool:
     """A Claude Agent SDK endpoint holding an OAuth token rather than an API key.
 
     ``NULL`` on a legacy row means api-key semantics, exactly as the column
@@ -119,17 +126,19 @@ def _on_a_subscription(provider: LLMProvider) -> bool:
     )
 
 
-def _override(provider: LLMProvider) -> Rate | None:
-    """``guardrails.pricing`` — an exact rate for this endpoint.
+def _override(provider: LLMEndpoint) -> Rate | None:
+    """The model's own rate, then the endpoint's — narrowest first.
 
-    Read defensively: ``guardrails`` is a free-form column a person edits, and a
+    Read defensively: both are free-form columns a person edits, and a
     half-filled override is *no override* rather than a crash or a half-priced
-    run.
+    run. A blank model rate falls through to the endpoint's rather than
+    overriding it with nothing.
     """
-    pricing = (provider.guardrails or {}).get("pricing")
-    if not isinstance(pricing, dict):
-        return None
-    try:
-        return Rate(float(pricing["input_per_mtok"]), float(pricing["output_per_mtok"]))
-    except (KeyError, TypeError, ValueError):
-        return None
+    for pricing in (provider.pricing, (provider.guardrails or {}).get("pricing")):
+        if not isinstance(pricing, dict):
+            continue
+        try:
+            return Rate(float(pricing["input_per_mtok"]), float(pricing["output_per_mtok"]))
+        except (KeyError, TypeError, ValueError):
+            continue
+    return None

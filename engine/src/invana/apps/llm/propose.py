@@ -18,7 +18,7 @@ from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.grounding import render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
 from invana.apps.llm.translate import Clarification
-from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
 
 # Universal property types — available on every backend regardless of version
@@ -194,12 +194,15 @@ def _clean_edge_types(raw: object) -> list[dict]:
 
 async def propose_model(
     *,
-    provider: LLMProvider,
+    provider: LLMEndpoint,
     prompt: str,
     version: GraphVersion | None,
     encryption_key: str,
     history: list[dict] | None = None,
     timeout_s: float = 120.0,
+    #: What may accompany this crossing, or ``None`` for an unbounded one
+    #: (docs/for-developers/modules/govern/spec.md GV30 · GV31).
+    may_send: frozenset[str] | None = None,
 ) -> ModelProposal | Clarification:
     """Turn an NL prompt into a model proposal grounded on the model's draft.
 
@@ -207,7 +210,7 @@ async def propose_model(
     scratch). Returns a :class:`ModelProposal` to reconcile, or a
     :class:`Clarification` when the ask is genuinely ambiguous.
     """
-    system = _system_prompt(render_model_context(version))
+    system = _system_prompt(render_model_context(version, may_send=may_send))
     messages = [*(history or []), {"role": "user", "content": prompt}]
     result = await complete_tool(
         provider=provider,

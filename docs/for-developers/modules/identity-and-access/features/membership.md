@@ -46,7 +46,7 @@ flowchart TD
 | Removing the last member | Refused — a Graph without members is unreachable |
 | Removing someone with open tasks | Their tasks stay, assigned, and the list says who is gone |
 | Removed mid-session | The next request is refused; the UI says access changed |
-| An agent "member" | Not a thing — the roster is separate, and the panel says so |
+| An agent "member" | Not a thing — agents are separate, and the panel says so |
 
 ## Surfaces
 

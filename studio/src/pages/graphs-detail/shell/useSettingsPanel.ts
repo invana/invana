@@ -27,10 +27,6 @@ export type SettingsSection =
 	| "info"
 	| "explorer"
 	| "connection"
-	// Retained as a *read* key, never written: the providers are a tab of
-	// Settings now (G29), and `SettingsPanel` resolves this onto it so every old
-	// bookmark lands on the tab that holds them.
-	| "llms"
 	| "skills"
 	| "settings"
 	| "events"
@@ -42,6 +38,7 @@ export type SettingsSection =
 	| "projects"
 	| "runs"
 	| "library"
+	| "govern"
 	| "agents";
 
 const DEFAULT_SECTION: SettingsSection = "info";
@@ -57,8 +54,8 @@ const DEFAULT_SECTION: SettingsSection = "info";
 // are the page's own panels — so the param is named for the region it drives
 // rather than for the group that used to fill it. The old name is still
 // **read**, so a bookmark keeps working; it is never written.
-const PANEL_PARAM = "panel";
-const LEGACY_PANEL_PARAM = "settings";
+export const PANEL_PARAM = "panel";
+export const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useDrawerStack): which drawer holds the height,
 // and what is drilled into inside it (G31 · G35). **Library** (Plans ·
@@ -66,7 +63,7 @@ const LEGACY_PANEL_PARAM = "settings";
 // **Runs** is a list, so it carries `run` and no `drawer` (G33). These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
 // the URL under a different rail icon names a body that is not on screen.
-const STACK_PARAMS = [
+export const STACK_PARAMS = [
 	"drawer",
 	"run",
 	"plan",
@@ -74,6 +71,10 @@ const STACK_PARAMS = [
 	"template",
 	"project",
 	"todo",
+	"world",
+	"guardrail",
+	"agent",
+	"provider",
 ] as const;
 
 // Which stack keys belong to which section. A write names one section, so every
@@ -84,6 +85,15 @@ const STACK_KEYS_OF: Partial<Record<SettingsSection, readonly string[]>> = {
 	runs: ["run"],
 	library: ["drawer", "plan", "entry", "template"],
 	projects: ["drawer", "project", "todo"],
+	// **Govern** is the third stack — Worlds over Guardrails (GV17). Both keys
+	// name a `Lens` id, because a guardrail and a world are one record separated
+	// by `kind` (GV1); they are two keys because reading the ceiling is not
+	// reading the world drawn inside it.
+	govern: ["drawer", "world", "guardrail"],
+	// **Agents** is the fourth stack — Agents over the LLMs
+	// (PM6 · GV18). `agent` is an agent's own surface, `provider` one
+	// configured endpoint and the models it offers.
+	agents: ["drawer", "agent", "provider"],
 };
 
 // A panel whose content is itself tabbed says which tab through `?tab=`. Only
@@ -92,7 +102,7 @@ const STACK_KEYS_OF: Partial<Record<SettingsSection, readonly string[]>> = {
 // it is asking for rather than to the panel and a second click. It is dropped
 // whenever the section changes without naming one, so a stale tab never leaks
 // into the next panel.
-const TAB_PARAM = "tab";
+export const TAB_PARAM = "tab";
 
 // Allow-list of valid sections. The `panel` search param is user-controlled
 // (and can point at removed sections from stale links/bookmarks), so anything
@@ -102,7 +112,6 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"info",
 	"explorer",
 	"connection",
-	"llms",
 	"skills",
 	"settings",
 	"events",
@@ -114,6 +123,7 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 	"projects",
 	"runs",
 	"library",
+	"govern",
 	"agents",
 ];
 
@@ -133,6 +143,10 @@ const KNOWN_SECTIONS: readonly SettingsSection[] = [
 // that live on the one page.
 const ALIASES: Partial<Record<string, SettingsSection>> = {
 	schema: "model",
+	// The providers left Graph settings: a provider is what an agent's cast
+	// resolves against, so it is read where agents are (PM6 · GV18). The old key
+	// lands on the panel that holds them, whose LLMs drawer is one click down.
+	llms: "agents",
 	// Stitching moved into the Model panel and the union became a page
 	// (stitch-models.md · Surfaces). A bookmark lands on the panel that now
 	// holds it rather than on nothing.
@@ -200,10 +214,16 @@ export function useSettingsPanel() {
 			const next = new URLSearchParams(params);
 			next.set(PANEL_PARAM, s);
 			next.delete(LEGACY_PANEL_PARAM);
-			if (t) next.set(TAB_PARAM, t);
-			else next.delete(TAB_PARAM);
 			const keep = STACK_KEYS_OF[s] ?? [];
+			// **A stacked panel has drawers, not tabs.** The second argument names
+			// whichever that section has, so one call — `setSection("agents",
+			// "llms")` — sends the setup step to the drawer that holds the field it
+			// is asking for, exactly as it sends it to a tab of Settings.
+			const stacked = keep.includes("drawer");
+			next.delete(TAB_PARAM);
+			if (t && !stacked) next.set(TAB_PARAM, t);
 			for (const p of STACK_PARAMS) if (!keep.includes(p)) next.delete(p);
+			if (t && stacked) next.set("drawer", t);
 			setParams(next, { replace: true });
 		},
 		[params, setParams],

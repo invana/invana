@@ -18,6 +18,19 @@ The queue lives in this process, because the runtime does
 (docs/for-developers/modules/ask/features/runtime-and-adapters.md). A restart
 fails whatever was mid-flight and drops whatever was waiting — the same story the
 in-flight runs already have, rather than a second, quieter one.
+
+**Three bounds live here, and they are not the same bound.** Each refuses by
+naming itself, which is the whole of CC6:
+
+| Bound | Scope | At the ceiling |
+|---|---|---|
+| :class:`GraphSlots` | runs at once, per Graph | the Graph's `concurrency_policy` — queue with a position, or refuse |
+| :class:`AgentSlots` | runs at once, per **agent** | refuses — an agent has no policy column (CC2 · EB3) |
+| :class:`PoolSlots` | crossings at once, per pool | refuses, naming the pool — `llm` · `graphdb` · `heavy` (CC8) |
+
+A run slot says *this run may proceed*; a pool slot says *this crossing may
+happen now*. Held across one crossing rather than one run, so a run waiting on a
+model is not also holding a database connection it is not using.
 """
 
 from __future__ import annotations
@@ -53,6 +66,61 @@ class Refused(Exception):
         self.graph_id = graph_id
         self.ceiling = ceiling
         self.running = running
+
+
+class AgentAtCeiling(Exception):
+    """This **agent** is already working as many runs as its budget allows.
+
+    A different bound from :class:`Refused`, which is the Graph's
+    ([CC1](docs/for-developers/modules/agents/features/concurrency-and-contention.md)):
+    a budget bounds one agent's simultaneity, the Graph's ceiling bounds the
+    machine's. They are checked in that order, so an agent at its own ceiling is
+    told about *its* ceiling rather than queued behind the Graph's.
+
+    **It refuses and never queues.** `queue` and `refuse` are a policy stated on
+    the Graph about the Graph's ceiling (CC2); an agent has no such column, and
+    inventing a second queue with its own precedence would make *why am I
+    waiting* two answers instead of one. A refusal names the bound
+    ([EB3](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    """
+
+    def __init__(self, *, agent_id: str, ceiling: int, running: int) -> None:
+        super().__init__(f"This agent is already working {running} of {ceiling} runs.")
+        self.agent_id = agent_id
+        self.ceiling = ceiling
+        self.running = running
+
+
+class AgentSlots:
+    """How many runs each agent is working, and the ceiling it stops at.
+
+    Counting, not queueing — which is why it is a handful of lines beside
+    :class:`GraphSlots` rather than a second copy of it.
+    """
+
+    def __init__(self) -> None:
+        self._running: dict[str, set[str]] = {}
+
+    def take(self, *, agent_id: str, run_id: str, ceiling: int) -> None:
+        """Claim a slot for this agent, or raise :class:`AgentAtCeiling`.
+
+        ``ceiling <= 0`` is *unbounded*, the same reading the Graph's ceiling
+        gives it — a number nobody set does not bound anything
+        ([GV7](docs/for-developers/modules/govern/spec.md), one family over).
+        """
+        running = self._running.setdefault(agent_id, set())
+        if run_id in running or ceiling <= 0:
+            running.add(run_id)
+            return
+        if len(running) >= ceiling:
+            raise AgentAtCeiling(agent_id=agent_id, ceiling=ceiling, running=len(running))
+        running.add(run_id)
+
+    def release(self, *, agent_id: str, run_id: str) -> None:
+        self._running.setdefault(agent_id, set()).discard(run_id)
+
+    def running_count(self, agent_id: str) -> int:
+        return len(self._running.get(agent_id, ()))
 
 
 @dataclass
@@ -178,3 +246,90 @@ class GraphSlots:
                 for index, w in enumerate(queue, start=1)
             ],
         }
+
+
+class PoolExhausted(Exception):
+    """A named pool had no slot left, and the pool is what to say (CC8).
+
+    *A query error* is the sentence this class exists to prevent: a run that
+    could not get a database connection did not ask a bad question, and telling
+    it so sends the reader to fix the query. The pool and its size are the
+    actionable facts, so they ride on the exception
+    ([CC6](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+    """
+
+    def __init__(self, *, graph_id: str, pool: str, size: int) -> None:
+        super().__init__(f"The `{pool}` pool on this Graph is full — all {size} slots are in use.")
+        self.graph_id = graph_id
+        self.pool = pool
+        self.size = size
+
+
+class PoolSlots:
+    """The three pools a run draws on while it holds its slot (CC8).
+
+    A run slot says *this run may proceed*; a pool slot says *this crossing may
+    happen now*. They are different scarcities and a single number would have to
+    be the smallest of them — `llm` is a provider's concurrency, `graphdb` is a
+    connection pool, `heavy` is CPU and memory. A pool nobody configured is
+    unbounded, which is the same reading every other ceiling here gives a
+    missing number.
+
+    **Held across one crossing, not one run.** `acquire` / `release` bracket the
+    call, so a run that waits five seconds on a model is not also holding a
+    database connection it is not using.
+
+    **And released again whatever happens**, by :meth:`release_run` when the run
+    settles: a crossing that raises between its two halves would otherwise leak
+    a slot, and a pool that only ever shrinks is worse than no pool at all. The
+    holder key carries the run id so the backstop can find it, which is the
+    whole reason it is a string rather than an object.
+
+    In this process, like the queue (CC7): a restart drops the accounting along
+    with the runs it was accounting for.
+    """
+
+    def __init__(self) -> None:
+        self._held: dict[tuple[str, str], set[str]] = {}
+
+    @staticmethod
+    def holder(*, run_id: str, step_key: str | None, pool: str) -> str:
+        """The key one crossing holds a slot under.
+
+        The crossing, not the run: a run makes several, and two of them may be
+        in flight at once. Prefixed with the run so :meth:`release_run` can
+        sweep them without being told which pools were touched.
+        """
+        return f"{run_id}#{step_key or '-'}#{pool}"
+
+    def acquire(self, *, graph_id: str, pool: str, size: int, holder: str) -> None:
+        """Take a slot in ``pool``, or raise :class:`PoolExhausted`."""
+        held = self._held.setdefault((graph_id, pool), set())
+        if holder in held or size <= 0:
+            held.add(holder)
+            return
+        if len(held) >= size:
+            raise PoolExhausted(graph_id=graph_id, pool=pool, size=size)
+        held.add(holder)
+
+    def release(self, *, graph_id: str, pool: str, holder: str) -> None:
+        self._held.setdefault((graph_id, pool), set()).discard(holder)
+
+    def release_run(self, *, graph_id: str, run_id: str) -> None:
+        """Drop every slot this run still holds — the backstop, at settle."""
+        prefix = f"{run_id}#"
+        for (held_graph, _pool), holders in self._held.items():
+            if held_graph != graph_id:
+                continue
+            for holder in [h for h in holders if h.startswith(prefix)]:
+                holders.discard(holder)
+
+    def in_use(self, graph_id: str, pool: str) -> int:
+        return len(self._held.get((graph_id, pool), ()))
+
+    def snapshot(self, graph_id: str, pools: dict[str, int]) -> list[dict]:
+        """Each configured pool, its size and what is in it — what C8 draws."""
+        return [
+            {"pool": name, "size": int(size), "in_use": self.in_use(graph_id, name)}
+            for name, size in sorted(pools.items())
+        ]

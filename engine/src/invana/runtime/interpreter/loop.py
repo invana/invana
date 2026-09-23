@@ -29,7 +29,6 @@ from invana.apps.agents.models import Agent
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
-from invana.apps.llm_providers.querysets import LLMProviderQuerySet
 from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.transcript import _friendly_query_error, _model_summary, _title_from_text
@@ -50,10 +49,11 @@ from invana.runtime.catalogue import (
     assemble_history,
     load_grounding,
 )
-from invana.runtime.contention import GraphSlots, Refused
+from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.diagnosis import diagnose, internal_failure
 from invana.runtime.executor import _dispatch
+from invana.runtime.governing import Governor
 from invana.runtime.interpreter.bindings import resolve as resolve_bindings
 from invana.runtime.interpreter.payloads import (
     _HISTORY_TURNS,
@@ -69,6 +69,7 @@ from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import run_result, step_result
+from invana.runtime.services import endpoint_for_run
 from invana.runtime.stream import Emitter, broadcaster
 from invana.runtime.workflows import WORKFLOWS, Step
 
@@ -93,6 +94,11 @@ class TaskRuntime:
         # (docs/for-developers/modules/agents/features/concurrency-and-contention.md).
         # A budget bounds one agent; this bounds the Graph.
         self._slots = GraphSlots()
+        # The other two bounds in the same family (contention.py): how many runs
+        # one **agent** works at once, and how many crossings may be in flight in
+        # each of the Graph's named pools. One per process, like the queue (CC7).
+        self._agent_slots = AgentSlots()
+        self._pools = PoolSlots()
         # Rules are Skills' rule, read here rather than reimplemented.
         self._rules = RuleManager()
 
@@ -151,9 +157,59 @@ class TaskRuntime:
         self._tasks[run_id] = task
         task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
 
-    def contention(self, graph_id: str) -> dict:
-        """What is running in this Graph and what is waiting behind it (CC5, C8)."""
-        return self._slots.snapshot(graph_id)
+    def contention(self, graph_id: str, pools: dict[str, int] | None = None) -> dict:
+        """What is running in this Graph, what is waiting behind it, and how full
+        its pools are (CC5 · CC8 · C8).
+
+        ``pools`` is the Graph's configuration, handed in by the caller that
+        read the row — the runtime accounts for what is *in* a pool and has no
+        opinion about how big it is.
+        """
+        return {**self._slots.snapshot(graph_id), "pools": self._pools.snapshot(graph_id, pools or {})}
+
+    async def _agent_has_room(self, db: AsyncSession, th: TaskRun, emitter: Emitter) -> bool:
+        """The **agent's** own simultaneity ceiling, checked before the Graph's.
+
+        ``max_concurrent_runs`` on the budget bounds how many runs one agent is
+        working at once, which is a different bound from the Graph's ceiling
+        ([CC1](docs/for-developers/modules/agents/features/concurrency-and-contention.md)):
+        one bounds an actor, the other bounds the machine. Checked first so an
+        agent at its own bound is told *that*, rather than queued behind a
+        Graph ceiling it was never going to reach.
+
+        It **refuses and does not queue** — an agent has no policy column, and a
+        second queue with its own precedence would make *why am I waiting* two
+        answers instead of one. The refusal names the ceiling
+        ([EB3](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+
+        A run with no agent has no such bound, which is the widest reading and
+        the honest one.
+        """
+        if not th.agent_id:
+            return True
+        agent = await db.get(Agent, th.agent_id)
+        if agent is None:
+            return True
+        ceiling = int(agent.effective_budget.get("max_concurrent_runs") or 0)
+        try:
+            self._agent_slots.take(agent_id=th.agent_id, run_id=th.id, ceiling=ceiling)
+        except AgentAtCeiling as at:
+            await emitter.emit(
+                "run.refused_agent_ceiling",
+                {"agent_id": at.agent_id, "ceiling": at.ceiling, "running": at.running},
+            )
+            th.status = RunStatus.failed.value
+            th.outcome = "failed"
+            th.finished_at = _now()
+            th.error = {
+                "cls": "bound",
+                "cause": "agent_ceiling",
+                "message": f"{agent.name} is already working {at.running} of {at.ceiling} runs. "
+                "Try again when one finishes, or raise the agent's ceiling.",
+            }
+            await db.commit()
+            return False
+        return True
 
     async def _await_slot(self, db: AsyncSession, th: TaskRun, emitter: Emitter) -> bool:
         """Take a slot for *th*, waiting or refusing as the Graph's policy says.
@@ -164,6 +220,9 @@ class TaskRuntime:
         queries, and a poll is the version that cannot deadlock on a task that
         died without releasing.
         """
+        if not await self._agent_has_room(db, th, emitter):
+            return False
+
         graph = await db.get(Graph, th.graph_id)
         ceiling = getattr(graph, "max_concurrent_runs", 0) or 0
         policy = getattr(graph, "concurrency_policy", "queue") or "queue"
@@ -261,12 +320,16 @@ class TaskRuntime:
             broadcaster.close(run_id)
 
     async def _release_slot(self, run_id: str) -> None:
-        """Hand this run's slot to whoever is next in the Graph's queue."""
+        """Give back everything this run held — the Graph slot, its agent's, and
+        any pool slot a crossing died without closing."""
         async with self._factory() as db:
             th = await TaskRunQuerySet().get(db, run_id)
             if th is None:
                 return
             self._slots.release(graph_id=th.graph_id, run_id=run_id)
+            if th.agent_id:
+                self._agent_slots.release(agent_id=th.agent_id, run_id=run_id)
+            self._pools.release_run(graph_id=th.graph_id, run_id=run_id)
 
     async def _run_inner(self, run_id: str) -> None:
         emitter = Emitter(self._factory, run_id)
@@ -323,7 +386,7 @@ class TaskRuntime:
             )
 
             agent = await db.get(Agent, th.agent_id) if th.agent_id else None
-            provider = await self._provider_for(db, agent=agent, params=params)
+            provider = await self._provider_for(db, th=run_ask)
             skills = await self._skills_for(db, agent=agent, graph_id=graph.id)
             rules = await self._rules_for(db, run=th, graph_id=graph.id)
             history = (
@@ -364,6 +427,17 @@ class TaskRuntime:
                 agent=agent,
                 envelope=Envelope.from_spec(agent.workflow_spec, budget=agent.effective_budget) if agent else None,
                 run=th,
+                # The lens this run froze at open ([GV26]) — read, never
+                # recomposed ([GV8]). It is built once, here, so every step of
+                # the run is checked against the same document, and a guardrail
+                # tightened mid-run cannot change what this one was allowed to
+                # rest on (docs/for-developers/modules/govern/spec.md).
+                governor=Governor.for_run(th),
+                # The Graph's pools, so a crossing can take a slot in one
+                # ([CC8](docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+                # Handed down on the run's vars for the same reason the governor
+                # is: process state belongs to the thing that owns the process.
+                pools=self._pools,
                 # A load's stages hand each other records, and the plan carries
                 # only counts and ids (LD21). The prologue settled these before
                 # the run was queued, so this rebuilds the holder rather than
@@ -410,15 +484,16 @@ class TaskRuntime:
                 )
                 add_message_in_flight(-1, mode=mode, surface=surface)
 
-    async def _provider_for(self, db: AsyncSession, *, agent: Agent | None, params: dict):
-        """The agent's provider, with the run_ask's own as the pre-agent fallback."""
-        if agent is not None and agent.llm_config_id:
-            provider = await LLMProviderQuerySet().get(db, agent.llm_config_id)
-            if provider is not None:
-                return provider
-        if params.get("llm_provider_id"):
-            return await LLMProviderQuerySet().get(db, params["llm_provider_id"])
-        return None
+    async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
+        """The endpoint this run calls — what it recorded, else what its lens casts.
+
+        An agent binds no provider
+        ([PM1](docs/for-developers/modules/agents/features/providers-and-models.md)),
+        so there is nothing to read off it: every run resolves the same way, and
+        a Task's run resolves exactly as the ask that opened beside it would
+        have ([PM14]).
+        """
+        return await endpoint_for_run(db, th=th)
 
     async def _skills_for(self, db: AsyncSession, *, agent: Agent | None, graph_id: str) -> list[Skill]:
         """The prose this run's prompts carry.
@@ -428,7 +503,10 @@ class TaskRuntime:
         (docs/for-developers/modules/work/spec.md). An authored agent's empty list means *no skills*, and
         is distinguishable because seeded agents ship with none set.
         """
-        stmt = select(Skill).where(Skill.graph_id == graph_id)
+        # **Never a draft** — a skill reaches a step through its current
+        # version, and a draft has not published one
+        # ([SK21](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+        stmt = select(Skill).where(Skill.graph_id == graph_id, Skill.current_version_id.is_not(None))
         if agent is not None and agent.skill_ids:
             stmt = stmt.where(Skill.id.in_(list(agent.skill_ids)))
         return list((await db.execute(stmt.order_by(Skill.name))).scalars().all())

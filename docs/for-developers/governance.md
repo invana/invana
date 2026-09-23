@@ -661,7 +661,7 @@ touches: [
     "select": {"time": {"between": ["2026-01-01","2026-06-30"]}, "geo": {"in": ["IE","DE","FR"]}},
     "query": "sha256:9f2c…" },
 
-  { "at": "graph_data/stitch/publisher_sponsor_anchor", "dir": "refused",
+  { "at": "graph_data/stitch/publisher_sponsor", "dir": "refused",
     "why": "outside the lens - stitches denied" },
 
   { "at": "llm/anthropic/claude-opus-5", "dir": "call", "role": "decide",
@@ -827,6 +827,16 @@ source ([OB1](modules/operate/features/observability.md)).
 flow asks the reader to reconstruct the order; a flow that continues below asks them to hold two
 drawings in their head and asserts nothing about where the break falls.
 
+**Across is time; down is the participant. A task is a bar, never a column heading**
+([D20](#14-decisions-settled)). The strip *is* the Gantt: a task name written along the top cannot
+say how long anything takes, and it forces one column per task whether or not the task engages
+anything. What the axis counts is the drawing's tense —
+
+| Tense | Surface | The axis counts | A bar is |
+|---|---|---|---|
+| **declared** | a plan ([LB17](modules/workflows/features/the-library.md)), a skill's Flow tab ([SK16](modules/skills/features/authoring-a-skill.md)) | `step` — the plan's own order, one unit per Task | what the plan **will** engage, and for how many steps it holds the participant |
+| **touched** | a run ([D16](#14-decisions-settled)) | `elapsed` — the wall clock, from the run opening | what it **did** engage, drawn where it happened and as long as it took |
+
 | Surface | Width | How |
 |---|---|---|
 | Design canvas artboard | as wide as the flow needs | one row, six bands, horizontal scroll on the canvas |
@@ -850,18 +860,46 @@ They are the two bands where multiplicity is real; cache, human, third party and
 carry one participant or none, so expanding them buys a row of whitespace each. The asymmetry is
 stated rather than derived, and it is the one place the six bands do not behave alike.
 
+**The disclosure is a control, and a shut band keeps its tasks**
+([D21](#14-decisions-settled)). Folding a band takes its participant rows away and drops every task
+it spends onto the band's own line, so the shut strip is **six lines with every task still placed in
+time** — the overview a reader opens with. `collapse all` does it to every band that has
+participants to fold. Nothing is hidden either way: folding moves a task up a row, it never drops
+it, so a band's count and the bars on its line always agree.
+
+| Reading | Answers |
+|---|---|
+| folded | *what is this busy with, and when* |
+| open | *which participant each task spends* — the list a world is checked against |
+| hovering a task | both, for that one task — the participant, when it runs and for how long, and the rule that refused it |
+
+**A task carries a hover card, so a bar can stay a bar.** The participant a row
+truncates or a fold took away is one hover from any task, which is what makes folding safe rather
+than lossy; the alternative is a second line on every bar for every fact somebody might want.
+
 **A band caps its rows and shows `+ n more`.** Without a cap a 200-lane fan-out turns `graph data`
 into 200 rows and the strip stops being a drawing.
 
 The plan drawing expands to the participants the lens **permits**; the run drawing expands to the
 ones it **touched**, with refusals drawn as struck rows in place.
 
+**A row nothing spent is muted, never dropped** ([D22](#14-decisions-settled)). A band no task
+touched recedes to the muted ground with its chip and its note, and so does a participant row under
+an open band: `role: extract`, declared and never reached, reads as *this run did not get that far*
+rather than as an ordinary empty row. Dropping the row would say nothing at all — and *this plan
+never reaches for a cache* is a finding, not an absence.
+
+**Refused is not unspent.** A row whose only task was refused keeps its full weight. Being stopped
+from reaching a participant and never reaching for one are the two facts this drawing exists to
+separate, so the mute follows *nothing happened here* and never *something was denied here*.
+
 ### The strip is the run dashboard's default
 
 **The dashboard opens on the six bands**, `graph data` and `llm` expanded
-([D16](#14-decisions-settled)). The Gantt, the unrolled tree, the nesting and the sequence
-are **toggles over the same trace** — no second fetch, no second spec
-([SR30](modules/operate/features/see-what-ran.md)).
+([D16](#14-decisions-settled)). The unrolled tree, the nesting and the sequence are **toggles over
+the same trace** — no second fetch, no second spec
+([SR30](modules/operate/features/see-what-ran.md)). The Gantt is not among them: the strip is one
+([D20](#14-decisions-settled)), so there is no second drawing of duration to keep in step.
 
 Nothing is lost by demoting the Gantt here: [SR13](modules/operate/features/see-what-ran.md) already
 splits the surfaces — *the drawer is an overview, the dashboard is the detail* — and the Gantt is the
@@ -1021,6 +1059,25 @@ the spine · the address · `third party` over `internet` · `layer` over `lane`
 `graph` · a lens narrows **structurally and extensionally**, at three grains
 ([§4](#4-sub-worlds--narrowing-what-a-decision-may-rest-on)) · a named lens is the sub-world and
 `subgraph` stays an emission · modelling is a governing act, so an axis is declared on the model ·
+**D22 — a row nothing spent is muted, never dropped**
+([§9](#9-one-continuous-flow)). A band no task touched recedes with its chip and its note, and so
+does a participant row under an open band — *declared and never reached* is a finding, and a row
+that is not drawn says nothing at all. The mute follows *nothing happened here*: a row whose only
+task was **refused** keeps its full weight, because being stopped from reaching a participant and
+never reaching for one are the two facts the strip exists to separate ·
+**D21 — a band folds, and its tasks come with it onto one line**
+([§9](#9-one-continuous-flow)). The expansion in [D5](#14-decisions-settled) is a **control**, not
+only a default: every band with participants carries a disclosure and the header carries
+`collapse all`. A shut band does not hide its work — the tasks drop onto the band's line, which is
+the overview the drawing otherwise cannot give: six lines, every task still placed in time. The
+alternative, dropping the tasks with the rows, would make *folded* mean *not shown* and cost the
+reader the one thing folding is for ·
+**D20 — time is the x axis, a participant is the row, and a task is a bar**
+([§9](#9-one-continuous-flow)). Task names were the columns once and are not: a name along the top
+cannot say how long anything takes, and it forces a column per task whether or not it engages
+anything. A plan's time is its order and a run's is the wall clock, so the strip absorbs the Gantt
+toggle ([D16](#14-decisions-settled)) instead of standing beside it, and *declared versus touched*
+stays a comparison rather than two vocabularies ·
 **D19 — `is_default` is dropped from providers** and the Agents tab's provider field becomes a lens
 ([§3.2](#32-llm--providers-and-models)). *Its guardrails-as-a-settings-tab half is superseded by*
 [GV17](modules/govern/spec.md) *and* [G41](building-studio/graph-detail-page.md) *— Govern is its own

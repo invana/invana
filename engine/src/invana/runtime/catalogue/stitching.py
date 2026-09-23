@@ -31,13 +31,14 @@ declared in `graph_write.py`, which spends the bound; what they do lives here
 from __future__ import annotations
 
 import json
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from invana.apps.modeller import links as link_service
 from invana.apps.modeller.links import LinkRefused
-from invana.apps.modeller.solve import Solved, solvable, solve_links, stamp
+from invana.apps.modeller.solve import Solved, rule_of, solvable, solve_links, stamp
 from invana.apps.modeller.store import ModelStore
 from invana.runtime.catalogue.bundle import Rule, read_manifest
 from invana.runtime.querysets import TaskRunQuerySet
@@ -51,6 +52,8 @@ if TYPE_CHECKING:
 
 #: Where a folder keeps the rows of a stitch its records supply (LD19).
 FOLDER = "stitches"
+#: Why a committed stitch wrote nothing in this run (ST53).
+REFUSED = "refused by this run's lens"
 
 
 @dataclass
@@ -161,7 +164,7 @@ async def load_stitch_rows(
     return result
 
 
-_runs = TaskRunQuerySet()
+_runs_qs = TaskRunQuerySet()
 
 
 class Unresolvable(Exception):
@@ -470,28 +473,46 @@ async def _records_root(session: AsyncSession, source_model_id: str) -> Path | N
     model — so it is read back from the load, not stored a second time
     (task-model-migration § 6.7).
     """
-    root = await _runs.latest_load_root(session, model_id=source_model_id)
+    root = await _runs_qs.latest_load_root(session, model_id=source_model_id)
     return Path(root) if root else None
 
 
-async def commit_stitches(session: AsyncSession, *, graph_id: str, connector) -> Committed:
+async def commit_stitches(
+    session: AsyncSession,
+    *,
+    graph_id: str,
+    connector,
+    admit: Callable[[ModelLink], Awaitable[bool]] | None = None,
+) -> Committed:
     """Flip the staged set to active and run every stitch in it (ST21, ST44, ST51).
 
     Two kinds of run, one action: a keyed rule joins its two keys, and a rule whose
     endpoints are rows loads them from the folder whose records ship them. The Stitches
     drawer and `invana stitches commit` both come through here, so a commit cannot
     mean two different things.
+
+    ``admit`` is a run's lens on each stitch's two models (ST53). A stitch it
+    refuses is still committed — the rule is the Graph's, not the run's — but
+    this run writes none of its edges, and says so.
     """
     committed = await link_service.commit_staged(session, graph_id)
     if not committed:
         return Committed()
 
     run = Committed(links=committed)
+    refused = {link.id for link in committed if admit is not None and not await admit(link)}
+    for link in committed:
+        if link.id in refused:
+            run.solved.append(
+                Solved(link_id=link.id, edge_type=link.edge_type or "", rule=rule_of(link), skipped=REFUSED)
+            )
     await connector.connect()
     try:
-        run.solved = await solve_links(connector, [link for link in committed if solvable(link)])
+        run.solved += await solve_links(
+            connector, [link for link in committed if solvable(link) and link.id not in refused]
+        )
         for link in committed:
-            if not link.source_model_id:
+            if not link.source_model_id or link.id in refused:
                 continue
             root = await _records_root(session, link.source_model_id)
             if root is None:

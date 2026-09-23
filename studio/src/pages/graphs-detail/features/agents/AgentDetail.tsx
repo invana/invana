@@ -14,8 +14,8 @@
  * | Block | Editable | Why |
  * |---|---|---|
  * | Brief | yes | it is this agent's own prose, on top of the graph instructions |
- * | Bindings — LLM, skills | yes | which model and which prose it is offered |
- * | Budget · Policy | yes | the bounds a person sets on an agent |
+ * | Bounds — the lens, skills | yes | the world it works in, and which prose it is offered |
+ * | Ceilings · Policy | yes | the bounds a person sets on an agent — and the table says which of them anything enforces (EB7) |
  * | Workflow envelope — allow · pins · require | yes | the envelope *is* the agent |
  * | Templates | listed, not authored | a workflow is shared; authoring one is post-MVP |
  * | Recent plans | read-only | a run happened; it is a record, not a setting |
@@ -28,13 +28,14 @@
  * **Save** writes them.
  */
 
-import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
+import { useLensQuery, useLensesQuery } from "@/hooks/queries/useGovern";
 import { useSkillsQuery } from "@/hooks/queries/useSkills";
 import {
 	useAgentLineageQuery,
 	useRunsQuery,
 	useTasksQuery,
 } from "@/hooks/queries/useWork";
+import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import {
 	DetailProse,
 	DetailStatus,
@@ -47,13 +48,16 @@ import {
 	verdictLabel,
 	verdictTone,
 } from "@/pages/graphs-detail/shared/statusTone";
+import type { Skill } from "@/types/skills";
 import type { Agent, AgentUpdate, TaskRunSummary } from "@/types/work";
+import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PolicyFlag } from "@/ui/PolicyFlag";
 import {
 	Button,
 	CardFooter,
+	CastTable,
 	PropertyRow,
 	Spinner,
 	Tabs,
@@ -113,7 +117,8 @@ interface Envelope {
 /** The local edit buffer — what `Save` will send. */
 interface Draft {
 	instructions: string;
-	llm_config_id: string | null;
+	/** The third bound — the world this agent works in. Null is *Everything*. */
+	lens_id: string | null;
 	budget: Record<string, number>;
 	policy: Record<string, boolean>;
 	spec: Envelope;
@@ -121,21 +126,13 @@ interface Draft {
 
 const draftOf = (agent: Agent): Draft => ({
 	instructions: agent.instructions ?? "",
-	llm_config_id: agent.llm_config_id,
+	lens_id: agent.lens_id,
 	budget: { ...(agent.budget ?? {}) },
 	policy: { ...(agent.policy ?? {}) },
 	spec: JSON.parse(JSON.stringify(agent.workflow_spec ?? {})) as Envelope,
 });
 
 type AgentTab = "agent" | "work" | "lineage";
-
-const BUDGET_FIELDS: { key: string; label: string }[] = [
-	{ key: "max_steps", label: "steps" },
-	{ key: "max_replans", label: "replans" },
-	{ key: "max_children", label: "children" },
-	{ key: "max_depth", label: "depth" },
-	{ key: "max_usd", label: "$" },
-];
 
 const POLICY_FIELDS: { key: string; label: string }[] = [
 	{ key: "can_spawn", label: "spawn" },
@@ -159,6 +156,7 @@ export function AgentDetail({
 	onOpenEnvelope,
 	onBindSkill,
 	onUnbindSkill,
+	bindError,
 	isSaving,
 	isBinding,
 }: {
@@ -177,6 +175,8 @@ export function AgentDetail({
 	onOpenEnvelope: () => void;
 	onBindSkill: (skillId: string) => void;
 	onUnbindSkill: (skillId: string) => void;
+	/** The engine's `409`, drawn under the chip that raised it (BN11). */
+	bindError?: unknown;
 	isSaving?: boolean;
 	isBinding?: boolean;
 }) {
@@ -210,15 +210,45 @@ export function AgentDetail({
 
 	// Opening an agent opens its envelope. The tab handler below only fires on a
 	// *change*, so without this the surface mounts on `Agent` with whatever the
-	// roster had drawn still on the canvas — the panel and the canvas describing
+	// list had drawn still on the canvas — the panel and the canvas describing
 	// two different things.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: run per agent, not per handler identity
 	useEffect(() => {
 		if (tab !== "lineage") onOpenEnvelope();
 	}, [agent.id]);
 
-	const llms = useLLMProvidersQuery(username, graphSlug);
+	// The worlds this agent can be put in, and the cast the picked one resolves
+	// to. **Two reads, not one**: the record never waits on the resolution (WO12).
+	const lenses = useLensesQuery(username, graphSlug);
+	const worlds = (lenses.data?.items ?? []).filter((l) => l.kind === "world");
+	const boundLens = useLensQuery(
+		username,
+		graphSlug,
+		draft.lens_id ?? undefined,
+	);
 	const skills = useSkillsQuery(username, graphSlug);
+	// Which chip the last bind was for. A refusal floating above the picker
+	// could not say which skill it was about — the failure BN8 exists to
+	// prevent, and the one this side used to have by swallowing the 409 (BN11).
+	const [refusedFor, setRefusedFor] = useState<string | null>(null);
+	const refusal = asBindRefusal(bindError);
+	const refusedSkill =
+		refusal && refusedFor
+			? (skills.data?.items.find((s) => s.id === refusedFor) ?? null)
+			: null;
+	/**
+	 * What the bindings cost, and what is bound but offered to nothing.
+	 *
+	 * Binding everything is allowed, and the cost of it is prose in every
+	 * prompt — so the picker states it rather than leaving a bound set that grew
+	 * one chip at a time to nobody's count (BN15). It counts **characters**, a
+	 * measurement of prose already fetched; never tokens, which are the model's
+	 * tokenizer's and would be read as exact.
+	 */
+	const bindings = bindingsCost(
+		skills.data?.items ?? [],
+		agent.skill_ids ?? [],
+	);
 	const lineage = useAgentLineageQuery(username, graphSlug, agent.id);
 	const tasks = useTasksQuery(username, graphSlug, { assignee: agent.id });
 	// What this agent has actually run. A record, never a setting — so it keeps
@@ -261,7 +291,7 @@ export function AgentDetail({
 				<button
 					type="button"
 					onClick={onBack}
-					className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
+					className="shrink-0 text-base text-muted-foreground hover:text-foreground"
 				>
 					← Agents
 				</button>
@@ -270,7 +300,7 @@ export function AgentDetail({
 				</DetailStatus>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 px-4 pb-1 pt-2 text-sm">
+			<div className="flex shrink-0 items-center gap-2 px-4 pb-1 pt-2 text-base">
 				<DetailStatus>{agent.kind}</DetailStatus>
 				<span className="truncate text-muted-foreground">
 					v{agent.version}
@@ -306,32 +336,66 @@ export function AgentDetail({
 							onChange={(e) => patch({ instructions: e.target.value })}
 							rows={4}
 							placeholder="What this agent is for, and which path through the graph it should prefer."
-							className="w-full resize-y rounded-sm border bg-background px-2 py-1.5 text-sm"
+							className="w-full resize-y rounded-sm border bg-background px-2 py-1.5 text-base"
 						/>
 					</PanelSection>
 
-					<PanelSection title="Bindings">
+					<PanelSection title="Bounds">
 						<div className="space-y-2">
-							<label className="block text-sm text-muted-foreground">
-								LLM
+							{/* **An agent binds no provider** (PM1). The third bound is a
+							    world, and the world's `cast` names the model — so this picks
+							    what the agent may see, use and send, and the table below
+							    states what that resolves to. */}
+							<label className="block text-base text-muted-foreground">
+								Works in
 								<select
-									value={draft.llm_config_id ?? ""}
-									onChange={(e) =>
-										patch({ llm_config_id: e.target.value || null })
-									}
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-sm text-foreground"
+									value={draft.lens_id ?? ""}
+									onChange={(e) => patch({ lens_id: e.target.value || null })}
+									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-base text-foreground"
 								>
-									<option value="">graph default</option>
-									{(llms.data?.items ?? []).map((llm) => (
-										<option key={llm.id} value={llm.id}>
-											{llm.provider} · {llm.model_id}
+									{/* Never a blank: *nothing set* and *nothing permitted* must
+									    not look alike (AG5). */}
+									<option value="">Everything, inside the guardrails</option>
+									{worlds.map((world) => (
+										<option key={world.id} value={world.id}>
+											{world.display_name}
 										</option>
 									))}
 								</select>
 							</label>
 
 							<div>
-								<div className="mb-1 text-sm text-muted-foreground">Skills</div>
+								<div className="mb-1 text-base text-muted-foreground">
+									Its cast, resolved
+								</div>
+								{draft.lens_id ? (
+									<CastTable
+										readOnly
+										cast={boundLens.data?.cast}
+										resolved={boundLens.data?.cast_resolved?.map((row) => ({
+											role: row.role,
+											address: row.address,
+											allowed: row.allowed,
+											ruleMatched: row.rule_matched,
+											// *Which contributor won* is a fact about a run; a lens
+											// read on its own has one contributor, and `shipped` is
+											// the only source that means anything here.
+											source: row.source === "shipped" ? "shipped" : undefined,
+										}))}
+									/>
+								) : (
+									<DetailProse>
+										No world, so the shipped cast answers over whatever this
+										Graph offers — cheapest that can read, most capable to
+										decide.
+									</DetailProse>
+								)}
+							</div>
+
+							<div>
+								<div className="mb-1 text-base text-muted-foreground">
+									Skills
+								</div>
 								<div className="flex flex-wrap gap-1">
 									{(skills.data?.items ?? []).map((skill) => {
 										const on = (agent.skill_ids ?? []).includes(skill.id);
@@ -343,58 +407,71 @@ export function AgentDetail({
 												   be refused on its own, and a refusal that arrived with
 												   six other edits could not say which one it was about. */
 												disabled={isBinding}
-												onClick={() =>
-													on ? onUnbindSkill(skill.id) : onBindSkill(skill.id)
+												onClick={() => {
+													// The refusal belongs under the chip that raised it,
+													// so the click is remembered before it is sent (BN11).
+													setRefusedFor(skill.id);
+													if (on) onUnbindSkill(skill.id);
+													else onBindSkill(skill.id);
+												}}
+												title={
+													skill.is_draft
+														? "A draft — bound, and offered to nothing until it is published"
+														: skill.when_to_use || skill.description
 												}
-												title={skill.when_to_use || skill.description}
 												className={cn(
-													"rounded-sm border px-2 py-0.5 text-sm",
+													"rounded-sm border px-2 py-0.5 text-base",
 													on
 														? "border-primary/40 bg-primary/10 text-primary"
 														: "border-border text-muted-foreground hover:text-foreground",
 												)}
 											>
 												{skill.name}
+												{/* A skill has no deactivation — the thing that keeps one
+												    out of a run is not publishing it — so a bound draft is
+												    bound and offered to nothing, and the chip says which
+												    (BN14). It stays clickable: binding a draft is how a
+												    binding is prepared before the text is ready. */}
+												{skill.is_draft ? (
+													<span className="ml-1 text-muted-foreground">
+														draft
+													</span>
+												) : null}
 											</button>
 										);
 									})}
 									{skills.data?.items.length ? null : (
-										<span className="text-sm text-muted-foreground">
+										<span className="text-base text-muted-foreground">
 											No skills in this graph yet.
 										</span>
 									)}
 								</div>
+								{refusal && refusedSkill ? (
+									<BindRefusalCard
+										className="mt-1.5"
+										refusal={refusal}
+										subject={refusedSkill.name}
+									/>
+								) : null}
+								{bindings.bound > 0 ? (
+									<p className="mt-1.5 text-base text-muted-foreground">
+										{bindings.sentence}
+									</p>
+								) : null}
 							</div>
 						</div>
 					</PanelSection>
 
 					<PanelSection
-						title="Budget"
+						title="Ceilings"
 						hint="empty means the graph default applies"
 					>
-						<div className="flex flex-wrap gap-1.5">
-							{BUDGET_FIELDS.map((field) => (
-								<label
-									key={field.key}
-									className="inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 text-sm"
-								>
-									<span className="text-muted-foreground">{field.label}</span>
-									<input
-										type="number"
-										min={0}
-										value={draft.budget[field.key] ?? ""}
-										placeholder="—"
-										onChange={(e) => {
-											const next = { ...draft.budget };
-											if (e.target.value === "") delete next[field.key];
-											else next[field.key] = Number(e.target.value);
-											patch({ budget: next });
-										}}
-										className="w-14 bg-transparent text-sm font-medium text-foreground outline-none"
-									/>
-								</label>
-							))}
-						</div>
+						{/* A2 — the ten keys of `effective_budget`, each with what it
+						    bounds and whether anything enforces it (EB6 · EB7). */}
+						<CeilingsTable
+							budget={draft.budget}
+							onChange={(budget) => patch({ budget })}
+						/>
 					</PanelSection>
 
 					<PanelSection
@@ -435,14 +512,14 @@ export function AgentDetail({
 												: null,
 										);
 									}}
-									className="text-xs text-muted-foreground hover:text-foreground"
+									className="text-sm text-muted-foreground hover:text-foreground"
 								>
 									{rawSpec === null ? "edit spec" : "done"}
 								</button>
 								<button
 									type="button"
 									onClick={onOpenEnvelope}
-									className="text-xs text-muted-foreground hover:text-foreground"
+									className="text-sm text-muted-foreground hover:text-foreground"
 								>
 									draw it ▸
 								</button>
@@ -477,12 +554,12 @@ export function AgentDetail({
 									}}
 									spellCheck={false}
 									rows={14}
-									className="w-full resize-y rounded-sm border bg-background px-2 py-1.5 font-mono text-sm"
+									className="w-full resize-y rounded-sm border bg-background px-2 py-1.5 font-mono text-base"
 								/>
 								{rawError ? (
-									<p className="text-sm text-destructive">{rawError}</p>
+									<p className="text-base text-destructive">{rawError}</p>
 								) : (
-									<p className="text-sm text-muted-foreground">
+									<p className="text-base text-muted-foreground">
 										Valid — Save writes it. The fields above follow this
 										document.
 									</p>
@@ -501,7 +578,7 @@ export function AgentDetail({
 									</DetailProse>
 								</PropertyRow>
 
-								<div className="grid grid-cols-[110px_1fr] gap-2 text-sm">
+								<div className="grid grid-cols-[110px_1fr] gap-2 text-base">
 									<dt className="text-muted-foreground">allow</dt>
 									<dd className="min-w-0">
 										<div className="flex flex-wrap gap-1">
@@ -511,7 +588,7 @@ export function AgentDetail({
 													type="button"
 													onClick={() => toggleAllow(task)}
 													className={cn(
-														"rounded-sm border px-1.5 py-0.5 font-mono text-sm",
+														"rounded-sm border px-1.5 py-0.5 font-mono text-base",
 														allow.has(task)
 															? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
 															: "border-dashed border-border text-muted-foreground hover:text-foreground",
@@ -569,7 +646,7 @@ export function AgentDetail({
 								</PropertyRow>
 							</dl>
 						)}
-						<p className="mt-2 text-sm text-muted-foreground">
+						<p className="mt-2 text-base text-muted-foreground">
 							A plan is validated against this before it runs. The envelope
 							bounds what any plan may contain.
 						</p>
@@ -579,13 +656,16 @@ export function AgentDetail({
 						{plans.isLoading ? (
 							<Spinner />
 						) : !plans.data?.items.length ? (
-							<p className="text-sm text-muted-foreground">
+							<p className="text-base text-muted-foreground">
 								This agent has not run yet.
 							</p>
 						) : (
 							<ul className="space-y-1.5">
 								{plans.data.items.map((plan) => (
-									<li key={plan.id} className="flex items-start gap-2 text-sm">
+									<li
+										key={plan.id}
+										className="flex items-start gap-2 text-base"
+									>
 										<span className="min-w-0 flex-1">
 											<span className="block truncate text-foreground">
 												{plan.task_title ?? plan.workflow_key}
@@ -626,7 +706,7 @@ export function AgentDetail({
 							<Spinner />
 						</div>
 					) : myTasks.length === 0 ? (
-						<p className="p-4 text-sm text-muted-foreground">
+						<p className="p-4 text-base text-muted-foreground">
 							This agent has no tasks. Assigning one is what starts it.
 						</p>
 					) : (
@@ -653,7 +733,7 @@ export function AgentDetail({
 
 				{/* ── Lineage ───────────────────────────────────────────────────── */}
 				<TabsContent value="lineage" className="min-h-0 flex-1 overflow-y-auto">
-					<div className="px-4 py-2.5 text-sm text-muted-foreground">
+					<div className="px-4 py-2.5 text-base text-muted-foreground">
 						{children.length
 							? `${children.length} related agent${children.length === 1 ? "" : "s"} · drawn on the canvas`
 							: "Nothing was spawned from this agent."}
@@ -684,7 +764,7 @@ export function AgentDetail({
 					onClick={() =>
 						onSave({
 							instructions: draft.instructions,
-							llm_config_id: draft.llm_config_id,
+							lens_id: draft.lens_id,
 							budget: draft.budget,
 							policy: draft.policy,
 							workflow_spec: draft.spec as Record<string, unknown>,
@@ -754,4 +834,33 @@ export function AgentDetail({
 			/>
 		</div>
 	);
+}
+
+/**
+ * `2 of 3 bound skills are offered — ~4,200 characters in every ask.`
+ *
+ * A draft is bound and offered to nothing ([BN14]), so it is named apart
+ * rather than folded into the cost: counting a draft's prose would report a
+ * prompt that is never assembled.
+ */
+function bindingsCost(
+	skills: Skill[],
+	boundIds: string[],
+): { bound: number; sentence: string } {
+	const bound = skills.filter((s) => boundIds.includes(s.id));
+	const offered = bound.filter((s) => !s.is_draft);
+	const drafts = bound.length - offered.length;
+	const chars = offered.reduce(
+		(total, s) => total + s.content.length + s.when_to_use.length,
+		0,
+	);
+	const cost = offered.length
+		? `${offered.length === bound.length ? `${bound.length} bound` : `${offered.length} of ${bound.length} bound`} skill${bound.length === 1 ? " is" : "s are"} offered — ~${chars.toLocaleString()} characters in every ask.`
+		: "Nothing here is offered yet.";
+	return {
+		bound: bound.length,
+		sentence: drafts
+			? `${cost} ${drafts} ${drafts === 1 ? "is a draft" : "are drafts"}, offered to nothing until published.`
+			: cost,
+	};
 }

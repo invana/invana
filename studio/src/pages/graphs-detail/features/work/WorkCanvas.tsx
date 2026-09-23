@@ -317,7 +317,7 @@ export function LineageCanvas({
 			selectedEdgeId={selectedEdgeId}
 			onSelectNode={(id, node) => {
 				// **The per-node-kind branch** (docs/for-developers/modules/explore/features/selection-and-the-panel.md). An agent selects into
-				// the roster; a task navigates, because the Agents panel has no row
+				// the agents list; a task navigates, because the Agents panel has no row
 				// for one; a person is inert — MVP has no person surface, so there
 				// is nowhere to go and nothing to state.
 				if (node?.nodeKind === "agent") {
@@ -329,7 +329,7 @@ export function LineageCanvas({
 			}}
 			onSelectEdge={(id) => {
 				const edge = lineage.data?.edges.find((e) => e.id === id) ?? null;
-				// Selecting an edge clears the roster's selected row: an edge is
+				// Selecting an edge clears the agents list's selected row: an edge is
 				// selected, not an agent.
 				onSelectEdge(id === selectedEdgeId ? null : edge);
 				if (id && id !== selectedEdgeId) onSelectAgent(null);

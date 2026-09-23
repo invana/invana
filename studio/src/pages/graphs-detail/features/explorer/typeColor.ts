@@ -43,9 +43,33 @@ export function slotForType(type: string | undefined): number {
 	return (h % SLOTS) + 1;
 }
 
+/**
+ * Resolved colours, keyed by the root's theme stamp. The node style function
+ * asks once per node on every restyle, and each probe forces a full-document
+ * style recalc — uncached, that was most of a 60-node load and the jank on every
+ * hover and zoom. The theme lives on the root's class and inline style, so a
+ * theme or mode switch changes the stamp and the next read re-resolves.
+ */
+let cacheStamp = "";
+const cache = new Map<string, string | undefined>();
+
 /** Resolve a CSS custom property to a concrete `rgb(...)` the browser computed. */
 function resolveVar(varName: string, fallbackVar?: string): string | undefined {
 	if (typeof document === "undefined") return undefined;
+	const root = document.documentElement;
+	const stamp = `${root.className}|${root.getAttribute("style") ?? ""}`;
+	if (stamp !== cacheStamp) {
+		cacheStamp = stamp;
+		cache.clear();
+	}
+	const key = `${varName}|${fallbackVar ?? ""}`;
+	if (cache.has(key)) return cache.get(key);
+	const rgb = probeVar(varName, fallbackVar);
+	cache.set(key, rgb);
+	return rgb;
+}
+
+function probeVar(varName: string, fallbackVar?: string): string | undefined {
 	const probe = document.createElement("span");
 	probe.style.color = fallbackVar
 		? `var(${varName}, var(${fallbackVar}))`

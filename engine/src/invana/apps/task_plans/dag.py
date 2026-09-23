@@ -136,6 +136,10 @@ def dag_for(tasks: Sequence[Task]) -> tuple[list[dict], list[dict]]:
             "task": t.step_key or "",
             "label": t.title or t.key,
             "args": dict(t.args or {}),
+            # `callable · composite · human`. The band a node draws in is read
+            # off this and the step key together (:mod:`invana.runtime.layers`),
+            # and the form is the half a person is not a bound.
+            "form": t.form,
             "depth": 0,
         }
         for t in ordered

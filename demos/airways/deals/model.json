@@ -1,0 +1,24 @@
+{
+  "nodes": {
+    "Deal": {
+      "identity": [
+        "deal_id"
+      ]
+    },
+    "Sponsor": {
+      "identity": [
+        "domain"
+      ]
+    }
+  },
+  "edges": {
+    "SPONSORED_BY": {
+      "from": [
+        "Deal"
+      ],
+      "to": [
+        "Sponsor"
+      ]
+    }
+  }
+}

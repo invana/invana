@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import click
 
+from invana.cli.commands.govern import govern_cmd
 from invana.cli.commands.init import init_cmd
 from invana.cli.commands.loader import loader_cmd
 from invana.cli.commands.migrate import migrate_cmd
@@ -37,3 +38,4 @@ app.add_command(users_cmd)
 app.add_command(models_cmd)
 app.add_command(records_cmd)
 app.add_command(stitches_cmd)
+app.add_command(govern_cmd)

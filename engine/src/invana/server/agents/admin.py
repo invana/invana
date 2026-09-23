@@ -24,7 +24,6 @@ class AgentView(ModelView):
         "lifetime",
         "instructions",
         "workflow_spec",
-        "llm_config_id",
         "budget",
         "policy",
         "parent_agent_id",

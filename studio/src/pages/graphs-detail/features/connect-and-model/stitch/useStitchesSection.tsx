@@ -183,7 +183,7 @@ export function useStitchesSection({
 			<div className="px-3 pb-2.5">
 				{mine.length === 0 ? (
 					<div className="flex flex-col items-start gap-2">
-						<p className="text-sm text-muted-foreground">
+						<p className="text-base text-muted-foreground">
 							{!versionId && scope !== "graph"
 								? "A stitch binds published versions. Publish this model first (ST8)."
 								: prefilled
@@ -246,7 +246,7 @@ export function useStitchesSection({
 					<button
 						type="button"
 						onClick={onOpenGlobalModel}
-						className="mt-1 text-meta text-primary hover:underline"
+						className="mt-1 text-sm text-primary hover:underline"
 					>
 						Open the global model
 					</button>

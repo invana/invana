@@ -3,6 +3,7 @@
 // per-state banner is lazy-loaded like the sessions-list preview, and a fork
 // mutation restores a state into a brand-new canvas.
 
+import { boardReportsApi } from "@/services/api/boardReports";
 import {
 	type CanvasStateCreateBody,
 	boardVersionsApi,
@@ -85,5 +86,50 @@ export function useCreateCanvasStateMutation(
 				queryKey: canvasStatesKey(username, graphSlug, boardId),
 			});
 		},
+	});
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reports — a **declared** board's kept readings, addressed by what the board
+// is of (boards-migration.md B18 · B21).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const REPORTS_KEY = ["boardReports"] as const;
+export const boardReportsKey = (
+	username: string,
+	graphSlug: string,
+	kind: string,
+	subjectId: string,
+) => [...REPORTS_KEY, username, graphSlug, kind, subjectId] as const;
+
+/**
+ * Every report kept of one subject, newest first.
+ *
+ * An empty list is the honest answer for a board nobody ever saved a reading
+ * of — there is no row until the first report creates one (B9), and the list
+ * route says so rather than 404ing.
+ */
+export function useBoardReportsQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	kind: string | undefined,
+	subjectId: string | undefined,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: boardReportsKey(
+			username ?? "",
+			graphSlug ?? "",
+			kind ?? "",
+			subjectId ?? "",
+		),
+		queryFn: () =>
+			boardReportsApi.list(
+				username as string,
+				graphSlug as string,
+				kind as string,
+				subjectId as string,
+			),
+		enabled: enabled && !!username && !!graphSlug && !!kind && !!subjectId,
 	});
 }

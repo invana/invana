@@ -54,7 +54,7 @@ export function StylingPanel({
 	return (
 		<div className="absolute right-3 top-3 z-20 flex max-h-[calc(100%-1.5rem)] w-72 flex-col rounded-lg border border-border bg-background shadow-lg">
 			<div className="flex items-center justify-between border-b border-border px-3 py-2">
-				<span className="font-medium text-sm">Styling</span>
+				<span className="font-medium text-base">Styling</span>
 				<Button
 					variant="ghost"
 					size="icon"
@@ -67,13 +67,13 @@ export function StylingPanel({
 			<ScrollArea className="min-h-0 flex-1">
 				<div className="space-y-4 p-3">
 					{nodeTypes.length === 0 && edgeTypes.length === 0 && (
-						<p className="text-center text-muted-foreground text-sm">
+						<p className="text-center text-muted-foreground text-base">
 							Load some data, then style its node & edge types here.
 						</p>
 					)}
 					{nodeTypes.length > 0 && (
 						<section className="space-y-2">
-							<p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+							<p className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
 								Node types
 							</p>
 							{nodeTypes.map((t) => {
@@ -84,7 +84,10 @@ export function StylingPanel({
 										className="space-y-1.5 rounded border border-border p-2"
 									>
 										<div className="flex items-center justify-between gap-2">
-											<span className="min-w-0 truncate text-sm" title={t.name}>
+											<span
+												className="min-w-0 truncate text-base"
+												title={t.name}
+											>
 												{t.name}
 											</span>
 											<input
@@ -99,7 +102,7 @@ export function StylingPanel({
 										</div>
 										<div className="flex items-center gap-2">
 											<select
-												className="min-w-0 flex-1 rounded border border-border bg-background px-1.5 py-1 text-xs"
+												className="min-w-0 flex-1 rounded border border-border bg-background px-1.5 py-1 text-sm"
 												value={s.labelProperty ?? ""}
 												onChange={(e) =>
 													setNode(t.name, {
@@ -119,7 +122,7 @@ export function StylingPanel({
 												min={4}
 												max={64}
 												placeholder="size"
-												className="w-16 rounded border border-border bg-background px-1.5 py-1 text-xs"
+												className="w-16 rounded border border-border bg-background px-1.5 py-1 text-sm"
 												value={s.size ?? ""}
 												onChange={(e) =>
 													setNode(t.name, {
@@ -137,7 +140,7 @@ export function StylingPanel({
 					)}
 					{edgeTypes.length > 0 && (
 						<section className="space-y-2">
-							<p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+							<p className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
 								Edge types
 							</p>
 							{edgeTypes.map((t) => {
@@ -148,7 +151,7 @@ export function StylingPanel({
 										className="flex items-center gap-2 rounded border border-border p-2"
 									>
 										<span
-											className="min-w-0 flex-1 truncate text-sm"
+											className="min-w-0 flex-1 truncate text-base"
 											title={t.name}
 										>
 											{t.name}
@@ -159,7 +162,7 @@ export function StylingPanel({
 											max={12}
 											step={0.5}
 											placeholder="width"
-											className="w-16 rounded border border-border bg-background px-1.5 py-1 text-xs"
+											className="w-16 rounded border border-border bg-background px-1.5 py-1 text-sm"
 											value={s.width ?? ""}
 											onChange={(e) =>
 												setEdge(t.name, {

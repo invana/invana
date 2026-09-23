@@ -14,10 +14,11 @@ from invana.apps.graphs.models import Graph
 from invana.apps.skills.managers import SkillManager
 from invana.apps.skills.schemas import SkillCreate, SkillVersionPublish
 from invana.core.auth.models import User
-from invana.runtime.managers import SkillUsageManager
+from invana.runtime.managers import SkillDraftManager, SkillUsageManager
 from invana.runtime.models import TaskRun
 
 skills = SkillManager()
+drafts = SkillDraftManager()
 usage = SkillUsageManager()
 
 
@@ -54,7 +55,9 @@ async def _step(
 async def test_counts_attach_to_the_version_the_step_was_offered(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Escalate"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Escalate"), actor_id=user.id, publish=True
+    )
     v1 = skill.current_version_id
     root = await _root(session, graph)
     await _step(session, graph, root, offered=[v1], applied=[v1])
@@ -71,12 +74,14 @@ async def test_publishing_starts_a_fresh_count_and_leaves_the_old_one_standing(
     session: AsyncSession, graph: Graph, user: User
 ) -> None:
     """US3 — v4 starts its own count; v3 keeps its history."""
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Rewritten"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Rewritten"), actor_id=user.id, publish=True
+    )
     v1 = skill.current_version_id
     root = await _root(session, graph)
     await _step(session, graph, root, offered=[v1], applied=[v1])
 
-    await skills.publish(session, skill=skill, payload=SkillVersionPublish(content="better"), actor_id=user.id)
+    await drafts.publish(session, skill=skill, payload=SkillVersionPublish(content="better"), actor_id=user.id)
     v2 = skill.current_version_id
     await _step(session, graph, root, offered=[v2], applied=[])
 
@@ -87,8 +92,12 @@ async def test_publishing_starts_a_fresh_count_and_leaves_the_old_one_standing(
 
 
 async def test_a_step_row_names_the_version_it_read(session: AsyncSession, graph: Graph, user: User) -> None:
-    skill = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Named"), actor_id=user.id)
-    other = await skills.create(session, graph_id=graph.id, payload=SkillCreate(name="Ignored"), actor_id=user.id)
+    skill = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Named"), actor_id=user.id, publish=True
+    )
+    other = await drafts.create(
+        session, graph_id=graph.id, payload=SkillCreate(name="Ignored"), actor_id=user.id, publish=True
+    )
     root = await _root(session, graph)
     # The step carried two skills; only one of them is the one being read.
     await _step(

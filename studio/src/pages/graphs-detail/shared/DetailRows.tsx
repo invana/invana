@@ -39,7 +39,7 @@ export function DetailBlock({
 			<div className="mb-2">
 				<div className="text-base font-medium text-foreground">{title}</div>
 				{subtitle ? (
-					<div className="text-sm text-muted-foreground">{subtitle}</div>
+					<div className="text-base text-muted-foreground">{subtitle}</div>
 				) : null}
 			</div>
 			{/* `PropertyList` owns the label column, so every value in the block
@@ -135,7 +135,7 @@ export function AgentChipRow({
  */
 export function DetailPlaceholder({ hint }: { hint: string }) {
 	return (
-		<div className="mt-auto border-t px-3 py-3 text-sm text-muted-foreground">
+		<div className="mt-auto border-t px-3 py-3 text-base text-muted-foreground">
 			{hint}
 		</div>
 	);

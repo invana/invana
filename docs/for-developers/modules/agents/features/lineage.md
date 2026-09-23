@@ -51,9 +51,9 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Lineage canvas | `kind = lineage`; the roster's main area |
+| Lineage canvas | `kind = lineage`; the Agents drawer's main area |
 | Panel | The selected agent: bounds, status, what it ran |
-| Roster row | "spawned by X" as context on the row |
+| Agent row | "spawned by X" as context on the row |
 
 ## Engine
 
@@ -71,6 +71,8 @@ flowchart TD
 | LN2 | Retirement keeps the node; lineage must always resolve. |
 | LN3 | Spawn edges carry the run they happened in. |
 | LN4 | On-behalf-of comes from the record, so it cannot be restated wrongly. |
+| LN5 | **Lineage is drawn as the run nesting, with the depth marked on every node** — `depth 1`, `depth 2 — the floor` — and the refusal at the floor is drawn in place: *refused — a fourth level · `max_depth` 2 named, not silent*. A bound you only meet by hitting it is a bound nobody designed around. |
+| LN6 | **A child's inheritance is drawn as a table of parent ⊆ child**, bound by bound: lens, third party, envelope, budget, pools. A child cannot call a system its parent could not, nor widen a slice its parent narrowed — if inheritance were re-declaration, delegation would be the hole every other bound is drilled around. |
 
 ## Not building
 

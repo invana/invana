@@ -7,6 +7,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.apps.skills.schemas import OfferedRule
+
 
 class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
@@ -107,9 +109,12 @@ class ActivityNode(BaseModel):
     status: str | None = None
     skills_offered: list[str] = []
     skills_applied: list[str] = []
-    #: The statements this step cited, resolved to the wording it was offered —
-    #: a citation must still read after the rule is reworded or deactivated.
-    rules_cited: list[str] = []
+    #: The same pair again, for rules: offered is a fact written by assembly,
+    #: cited is the model's own claim (RU7). Each is the statement the step was
+    #: given — a citation must still read after the rule is reworded or
+    #: deactivated — beside the rule its statement belongs to (RU12).
+    rules_offered: list[OfferedRule] = []
+    rules_cited: list[OfferedRule] = []
     tokens_in: int | None = None
     tokens_out: int | None = None
     at: datetime | None = None

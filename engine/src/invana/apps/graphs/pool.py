@@ -172,8 +172,8 @@ class ConnectionPool:
         version when the backend can't be introspected (e.g. Gremlin). Emits a
         compatibility-downgrade event when the result is anything other than SUPPORTED.
         """
-        store = GraphConnectionQuerySet()
-        connection = await store.get(session, connection_id)
+        connections_qs = GraphConnectionQuerySet()
+        connection = await connections_qs.get(session, connection_id)
         if connection is None:
             return
 
@@ -192,7 +192,7 @@ class ConnectionPool:
             basis = None
 
         resolved = connector.resolve_capabilities(basis)
-        await store.set_version(
+        await connections_qs.set_version(
             session,
             connection_id,
             server_version=version_str,

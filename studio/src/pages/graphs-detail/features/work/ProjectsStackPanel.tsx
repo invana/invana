@@ -28,6 +28,8 @@ export interface ProjectsStackPanelProps {
 	username: string;
 	graphSlug: string;
 	onOpenAgent?: (agentId: string) => void;
+	/** A statement on a step row opens that rule's board (RU12). */
+	onOpenRule?: (ruleId: string) => void;
 	/** Opening the Plan tab is what draws the `plan` canvas (PT13). */
 	onOpenPlanCanvas?: (projectKey: string) => void;
 	onProjectChange?: (key: string | null) => void;
@@ -37,6 +39,7 @@ export function ProjectsStackPanel({
 	username,
 	graphSlug,
 	onOpenAgent,
+	onOpenRule,
 	onOpenPlanCanvas,
 	onProjectChange,
 }: ProjectsStackPanelProps) {
@@ -157,6 +160,7 @@ export function ProjectsStackPanel({
 								projectKey={projects.projectKey}
 								onProjectContext={onProjectChange}
 								onOpenAgent={onOpenAgent}
+								onOpenRule={onOpenRule}
 							/>
 						),
 					},

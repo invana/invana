@@ -109,7 +109,7 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 						graphsApi.testConnection(username, graphSlug, values)
 					}
 				/>
-				<p className="text-xs text-muted-foreground">
+				<p className="text-sm text-muted-foreground">
 					One Graph, one graph database. This Graph will answer only from what
 					is loaded into it.
 				</p>
@@ -120,7 +120,7 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 	return (
 		<div className="space-y-3">
 			<ConnectionStrip connection={connection} />
-			<dl className="space-y-2 text-sm">
+			<dl className="space-y-2 text-base">
 				<Row label="Connector">
 					{CONNECTOR_OPTIONS.find((o) => o.value === connection.connector_class)
 						?.label ?? connection.connector_class}
@@ -156,7 +156,7 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 				</Button>
 			</div>
 			<Capabilities connection={connection} />
-			<p className="text-xs text-muted-foreground">
+			<p className="text-sm text-muted-foreground">
 				The connector cannot change after the first save — everything modelled
 				against it would stop meaning what it means. Credentials are encrypted
 				at rest; a blank field on edit means "keep".
@@ -177,7 +177,7 @@ function ConnectionStrip({
 }) {
 	const connected = connection.status === "ACTIVE";
 	return (
-		<div className="flex flex-wrap items-center gap-1.5 text-xs">
+		<div className="flex flex-wrap items-center gap-1.5 text-sm">
 			<Badge variant={connected ? "default" : "outline"}>
 				{connected ? "connected" : connection.status.toLowerCase()}
 			</Badge>
@@ -213,7 +213,7 @@ function Capabilities({ connection }: { connection: GraphConnectionRead }) {
 			<button
 				type="button"
 				onClick={() => setOpen((v) => !v)}
-				className="flex w-full items-center gap-2 text-left text-xs"
+				className="flex w-full items-center gap-2 text-left text-sm"
 			>
 				<span className="font-medium">Capabilities</span>
 				<span className="text-muted-foreground">
@@ -226,7 +226,7 @@ function Capabilities({ connection }: { connection: GraphConnectionRead }) {
 				</span>
 			</button>
 			{open ? (
-				<div className="mt-2 space-y-2 text-xs">
+				<div className="mt-2 space-y-2 text-sm">
 					<div>
 						<p className="mb-1 font-medium">Property types</p>
 						{types.length ? (

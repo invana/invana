@@ -78,6 +78,7 @@ flowchart TD
 | GC5 | A missing element is shown as missing. |
 | GC6 | **An expansion is a TaskRun.** Expanding a node dispatches `expand_neighbours` (bound `graph_read`) through the interpreter like every other read — not a direct query from the canvas ([orchestration § 4.1a](../../../orchestration.md#41a-nothing-executes-outside-the-runtime)). What a person saw, and therefore reasoned from, is recorded; a Graph whose reads are invisible cannot explain an answer that came out of one. |
 | GC7 | **Interactive runs do not flood the journal.** An expansion carries `trigger = canvas`, is filtered out of Runs by default, and has its own retention ([§ 4.1b](../../../orchestration.md#41b-interactive-runs)). The count-before-it-draws promise of GC3 is the run's own estimate step, so the ceiling that refuses a 40,000-node expansion is the envelope's, not a number in the UI. |
+| GC8 | **The layout does not animate.** The Explorer's force layout runs with `animate: false`: the graph is drawn once, at its settled positions, on every query and expansion. A settle-animation repaints the whole graph per tick and moves nodes out from under the cursor. |
 
 ## Not building
 

@@ -426,6 +426,33 @@ class ExportRequest(BaseModel):
     format: Literal["json"] = "json"
 
 
+class DeclaredAxes(BaseModel):
+    """Which of this version's properties may be narrowed along.
+
+    A published version declares which property carries **valid time**, which
+    carries **geography**, and which named properties are selectable
+    **dimensions** (docs/for-developers/modules/connect-and-model/features/domain-models.md
+    DM6). A [world](../../../docs/for-developers/modules/govern/features/worlds.md)
+    may slice along these and nothing else — asking for an axis a model never
+    declared is refused naming the model and the axis (GV14).
+
+    Empty is the default and means *nothing is selectable*: the model can still
+    be allowed or denied whole, it simply cannot be narrowed. Nothing is
+    inferred from a property's name or type, because that would make *which rows
+    did this run see* depend on a guess (DM7).
+    """
+
+    #: ``{"property": "observed_at"}`` — the property carrying valid time.
+    time: dict[str, str] = {}
+    #: ``{"property": "country_iso", "vocab": "iso2"}`` — ``vocab`` names the
+    #: code system, so a lens saying ``IE`` and a model storing ``IRL`` is a
+    #: mismatch somebody can see rather than a slice that silently matches
+    #: nothing.
+    geo: dict[str, str] = {}
+    #: Property names that may be sliced by value — ``["channel", "segment"]``.
+    dims: list[str] = []
+
+
 class SchemaExport(BaseModel):
     """Full JSON representation of a schema version for export/import."""
 
@@ -433,6 +460,10 @@ class SchemaExport(BaseModel):
     schema_description: str = ""
     validation_mode: str = "strict"
     version: str | None = None
+    #: What a world may slice this version along. Part of the shape, so it is
+    #: inside the content hash: two Graphs whose models differ only in what they
+    #: let a lens narrow are not running the same model.
+    axes: DeclaredAxes = DeclaredAxes()
     property_keys: list[PropertyKeyCreate] = []
     node_types: list[NodeTypeCreate] = []
     edge_types: list[EdgeTypeCreate] = []

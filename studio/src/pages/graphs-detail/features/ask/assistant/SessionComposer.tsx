@@ -123,8 +123,12 @@ export function deriveComposerConfig(
 		.reverse()
 		.find((m) => m.role === "assistant" && !m.operation && (m.mode || m.via));
 	if (!last) return null;
+	// `via` reads "<vendor kind> · <model id>", and a model is a row under the
+	// endpoint that offers it (PM9) — so the restore matches through `models`.
 	const provider = last.via?.includes(" · ")
-		? llmProviders.find((p) => `${p.provider} · ${p.model_id}` === last.via)
+		? llmProviders.find((p) =>
+				p.models.some((m) => `${p.provider} · ${m.model_id}` === last.via),
+			)
 		: undefined;
 	const mode: QueryMode =
 		last.mode ?? (last.via?.includes(" · ") ? "nl" : "ql");
@@ -184,7 +188,7 @@ function AttachmentChip({
 	onRemove: () => void;
 }) {
 	return (
-		<div className="flex shrink-0 items-center gap-1.5 border-t bg-muted/40 px-3 py-1.5 text-xs">
+		<div className="flex shrink-0 items-center gap-1.5 border-t bg-muted/40 px-3 py-1.5 text-sm">
 			<span className="text-muted-foreground">Asking about</span>
 			<span className="min-w-0 flex-1 truncate font-medium">
 				{attachment.label}
@@ -381,8 +385,10 @@ export function SessionComposer({
 			return;
 		}
 		if (llmProviders.some((p) => p.id === llmProviderId)) return;
-		const preferred = llmProviders.find((p) => p.is_default) ?? llmProviders[0];
-		setLlmProviderId(preferred?.id ?? "");
+		// **Nothing here is a default.** `is_default` is gone, and the lens `cast`
+		// answers *which model when nobody said* (PM4) — this only keeps a stale
+		// id from being sent after the endpoint it named was deleted.
+		setLlmProviderId(llmProviders[0]?.id ?? "");
 	}, [llmProviders, llmProviderId]);
 
 	const languageOptions = useMemo(
@@ -534,7 +540,9 @@ export function SessionComposer({
 	const removeFile = (index: number) =>
 		setFiles((prev) => prev.filter((_, i) => i !== index));
 
-	const noLlmProviders = llmProviders.length === 0;
+	// An endpoint that offers no model answers nothing (PM9), so the gate counts
+	// models rather than rows — the same thing `endpoint_for_run` resolves.
+	const noLlmProviders = llmProviders.every((p) => p.models.length === 0);
 
 	// ── Toolbar (shared by both input surfaces) ──────────────────────────────
 	// Mode + language on the left, timeout + attach on the right. The mode
@@ -569,7 +577,7 @@ export function SessionComposer({
 			{mode === "nl" ? (
 				noLlmProviders ? (
 					<span className="text-muted-foreground px-1 truncate">
-						No LLM — add one in Settings → LLMs.
+						No model — add one in Agents › LLMs.
 					</span>
 				) : agentName ? (
 					<span

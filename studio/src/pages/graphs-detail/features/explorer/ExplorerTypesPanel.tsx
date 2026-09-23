@@ -45,11 +45,11 @@ import {
  */
 const sectionTitle = (label: string, meta: ReactNode) => (
 	<>
-		<span className="truncate text-meta font-semibold uppercase tracking-wide">
+		<span className="truncate text-sm font-semibold uppercase tracking-wide">
 			{label}
 		</span>
 		{meta ? (
-			<span className="ml-auto shrink-0 pl-2 text-xs text-muted-foreground">
+			<span className="ml-auto shrink-0 pl-2 text-sm text-muted-foreground">
 				{meta}
 			</span>
 		) : null}
@@ -124,7 +124,7 @@ export function ExplorerTypesPanel({
 			searchLabel="Search types"
 			onClose={onClose}
 			footer={
-				<div className="flex items-center justify-between gap-2 border-t px-3 py-1.5 text-xs text-muted-foreground">
+				<div className="flex items-center justify-between gap-2 border-t px-3 py-1.5 text-sm text-muted-foreground">
 					<span className="tabular-nums">
 						{shown} types · {totalNodes.toLocaleString()} nodes
 					</span>
@@ -228,7 +228,7 @@ function TypeList({
 	empty: string;
 }) {
 	if (rows.length === 0) {
-		return <p className="px-3 py-2 text-xs text-muted-foreground">{empty}</p>;
+		return <p className="px-3 py-2 text-sm text-muted-foreground">{empty}</p>;
 	}
 	return (
 		<ScrollArea className="h-full">
@@ -251,10 +251,10 @@ function TypeList({
 								opacity: isHidden ? 0.4 : 1,
 							}}
 						/>
-						<span className={cn("truncate", mono && "font-mono text-xs")}>
+						<span className={cn("truncate", mono && "font-mono text-sm")}>
 							{row.name}
 						</span>
-						<span className="ml-auto flex items-center gap-2 text-xs text-muted-foreground tabular-nums">
+						<span className="ml-auto flex items-center gap-2 text-sm text-muted-foreground tabular-nums">
 							{/* A vendor that cannot count still names its types (SP8) — the
 							    row shows a dash rather than a made-up zero. */}
 							{row.count === null ? "—" : row.count.toLocaleString()}
@@ -307,7 +307,7 @@ function SelectedBlock({
 }) {
 	if (!selected) {
 		return (
-			<p className="px-3 py-2 text-xs text-muted-foreground">
+			<p className="px-3 py-2 text-sm text-muted-foreground">
 				Click a node or edge — what it is, and where it came from, reads here.
 			</p>
 		);
@@ -323,15 +323,15 @@ function SelectedBlock({
 						className="mt-1 h-[7px] w-[7px] shrink-0 rounded-full"
 						style={{ backgroundColor: color(selected.label) }}
 					/>
-					<span className="truncate font-mono text-xs">{selected.id}</span>
+					<span className="truncate font-mono text-sm">{selected.id}</span>
 					{summary ? (
-						<span className="ml-auto shrink-0 text-xs text-muted-foreground">
+						<span className="ml-auto shrink-0 text-sm text-muted-foreground">
 							{summary}
 						</span>
 					) : null}
 				</div>
 				{provenance ? (
-					<p className="text-xs text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						From model{" "}
 						<span className="text-foreground">
 							{modelName?.(provenance.modelId) ?? provenance.modelId}
@@ -339,7 +339,7 @@ function SelectedBlock({
 						{provenance.file ? ` · ${provenance.file}` : null}
 					</p>
 				) : (
-					<p className="text-xs text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						No model recorded on this element.
 					</p>
 				)}

@@ -19,6 +19,17 @@
  * than the drawer adjacency SR12 asked for, because the two are side by side
  * rather than stacked in a 420px column.
  *
+ * **Picking a plan draws it** (G42). This panel opens no canvas of its own: the
+ * Plans drawer names what it drilled into in `&plan=`, and the page reads that.
+ *
+ * **The status bar is the panel's, and it carries no count.** Every stacked
+ * panel has one in `footer.left`, and the Library's says where you are
+ * (`Library`, then the plan you drilled into) and what the panel means. Its
+ * `middle` is empty on purpose: that slot exists for a live count a reader
+ * would otherwise have to click each row to discover, and all three drawers
+ * already print their own totals in their headers — a bar that repeated them
+ * would be the third place the same number is written.
+ *
  * **A skill's plan is not here either.** It is owned 1:1 by a skill version
  * (orchestration.md §0.8) and reached from the skill's Flow tab; the Plans
  * drawer lists `reusable: true` only, and a row says which skill owns it when
@@ -33,6 +44,7 @@ import {
 	type LibraryDrawer,
 	useLibraryPanel,
 } from "@/pages/graphs-detail/shell/useLibraryPanel";
+import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
 import { useEffect, useRef, useState } from "react";
 
@@ -41,7 +53,6 @@ export interface LibraryStackPanelProps {
 	graphSlug: string;
 	/** The step the inspector's provenance line asked for. */
 	selectedStepId: string | null;
-	onOpenPlanCanvas?: (key: string) => void;
 	onOpenAgent?: (agentId: string) => void;
 	planExportUrl?: (key: string) => string;
 }
@@ -50,7 +61,6 @@ export function LibraryStackPanel({
 	username,
 	graphSlug,
 	selectedStepId,
-	onOpenPlanCanvas,
 	onOpenAgent,
 	planExportUrl,
 }: LibraryStackPanelProps) {
@@ -67,6 +77,9 @@ export function LibraryStackPanel({
 	// Authoring a template is a body this drawer shows, not a record the URL
 	// names — so it is local, and a reload lands on the list (G3).
 	const [authoringTemplate, setAuthoringTemplate] = useState(false);
+	// Promoting is a dialog the Plans drawer opens from its header action, so
+	// the flag sits here beside the header that raises it (G43).
+	const [promotingPlan, setPromotingPlan] = useState(false);
 
 	// The drawer named by `?drawer=` opens with the height; the other two sit
 	// with a little of their list showing, which is what makes the stack read as
@@ -97,49 +110,65 @@ export function LibraryStackPanel({
 	}, [library.drawer, focused]);
 
 	return (
-		<PanelStack
-			withHandle
-			stackRef={stackRef}
-			className="h-full"
-			headerHeight={30}
-			sections={[
-				plansDrawerSection({
-					username,
-					graphSlug,
-					ui,
-					planKey: library.planKey,
-					onOpenPlan: library.openPlan,
-					selectedStepId,
-					onOpenCanvas: onOpenPlanCanvas,
-					onOpenAgent,
-					exportUrl: planExportUrl,
-					kindFilter: planKind,
-					onKindFilter: setPlanKind,
-					sourceFilter: planSource,
-					onSourceFilter: setPlanSource,
-					defaultSize: size("plans"),
-				}),
-				catalogueDrawerSection({
-					ui,
-					entryKey: library.entryKey,
-					onOpenEntry: library.openEntry,
-					defaultSize: size("catalogue"),
-				}),
-				templatesDrawerSection({
-					username,
-					graphSlug,
-					ui,
-					templateId: library.templateId,
-					onOpenTemplate: library.openTemplate,
-					authoring: authoringTemplate,
-					onAuthoring: setAuthoringTemplate,
-					kindFilter: templateKind,
-					onKindFilter: setTemplateKind,
-					surfaceFilter: templateSurface,
-					onSurfaceFilter: setTemplateSurface,
-					defaultSize: size("templates"),
-				}),
-			]}
-		/>
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="min-h-0 flex-1">
+				<PanelStack
+					withHandle
+					stackRef={stackRef}
+					className="h-full"
+					headerHeight={30}
+					sections={[
+						plansDrawerSection({
+							username,
+							graphSlug,
+							ui,
+							planKey: library.planKey,
+							onOpenPlan: library.openPlan,
+							selectedStepId,
+							onOpenAgent,
+							promoting: promotingPlan,
+							onPromoting: setPromotingPlan,
+							exportUrl: planExportUrl,
+							kindFilter: planKind,
+							onKindFilter: setPlanKind,
+							sourceFilter: planSource,
+							onSourceFilter: setPlanSource,
+							defaultSize: size("plans"),
+						}),
+						catalogueDrawerSection({
+							ui,
+							entryKey: library.entryKey,
+							onOpenEntry: library.openEntry,
+							defaultSize: size("catalogue"),
+						}),
+						templatesDrawerSection({
+							username,
+							graphSlug,
+							ui,
+							templateId: library.templateId,
+							onOpenTemplate: library.openTemplate,
+							authoring: authoringTemplate,
+							onAuthoring: setAuthoringTemplate,
+							kindFilter: templateKind,
+							onKindFilter: setTemplateKind,
+							surfaceFilter: templateSurface,
+							onSurfaceFilter: setTemplateSurface,
+							defaultSize: size("templates"),
+						}),
+					]}
+				/>
+			</div>
+			<PanelStatusBar
+				left={
+					<>
+						<StatusCrumb active={!library.planKey}>Library</StatusCrumb>
+						{library.planKey ? (
+							<StatusCrumb active>{library.planKey}</StatusCrumb>
+						) : null}
+					</>
+				}
+				right="a plan composes the catalogue; a template renders what it produced"
+			/>
+		</div>
 	);
 }

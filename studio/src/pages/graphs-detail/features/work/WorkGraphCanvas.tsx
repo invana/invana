@@ -66,7 +66,7 @@ import type {
 import type * as graph from "@invana/graph";
 import { ElkLayout } from "@invana/graph-layout-elkjs";
 import { useTheme } from "@invana/themes";
-import { cn } from "@invana/ui";
+import { Legend, LegendItem, type LegendSwatchKind, cn } from "@invana/ui";
 // Vite's worker idiom: `?worker` makes the bundler emit the ELK solver as a
 // worker asset and hand back a constructor. See {@link newElkLayout} for why
 // the layout package's own default factory cannot be used.
@@ -346,7 +346,7 @@ export function WorkGraphCanvas({
 
 	if (!nodes.length) {
 		return (
-			<div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+			<div className="flex h-full w-full items-center justify-center p-6 text-center text-base text-muted-foreground">
 				{emptyHint ?? "Nothing to draw yet."}
 			</div>
 		);
@@ -403,7 +403,7 @@ export function WorkGraphCanvas({
 			{onConnect ? (
 				<ToolSwitch connecting={connecting} onChange={setConnecting} />
 			) : null}
-			<Legend kind={kind} error={error} connecting={connecting} />
+			<CanvasLegend kind={kind} error={error} connecting={connecting} />
 		</div>
 	);
 }
@@ -691,13 +691,13 @@ const LEGENDS: Record<CanvasKind, { keys: LegendKey[]; note: string }> = {
 		// Three kinds of node live here, and a click means something different on
 		// each — so the legend says which, rather than leaving a user to find out
 		// by being navigated somewhere they did not expect.
-		note: "An agent selects into the roster. A task opens in Tasks — this panel has no row for it. A person has no surface in MVP. An edge is an event: selecting one says what happened, for whom, and why.",
+		note: "An agent selects into the agents list. A task opens in Tasks — this panel has no row for it. A person has no surface in MVP. An edge is an event: selecting one says what happened, for whom, and why.",
 	},
 	data: { keys: [], note: "" },
 	model: { keys: [], note: "" },
 };
 
-function Legend({
+function CanvasLegend({
 	kind,
 	error,
 	connecting,
@@ -711,7 +711,7 @@ function Legend({
 	return (
 		<div
 			className={cn(
-				"pointer-events-none absolute bottom-2 left-2 right-2 max-w-2xl rounded-sm border bg-card/90 px-2 py-1.5 text-sm backdrop-blur",
+				"pointer-events-none absolute bottom-2 left-2 right-2 max-w-2xl rounded-sm border bg-card/90 px-2 py-1.5 text-base backdrop-blur",
 				error ? "border-destructive/50" : "border-border",
 			)}
 		>
@@ -720,11 +720,16 @@ function Legend({
 			) : (
 				<>
 					{legend.keys.length ? (
-						<div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+						<Legend className="mb-1 text-base text-muted-foreground">
 							{legend.keys.map((key) => (
-								<LegendItem key={key.label} {...key} />
+								<LegendItem
+									key={key.label}
+									kind={swatchKind(key)}
+									color={swatchColour(key)}
+									label={key.label}
+								/>
 							))}
-						</div>
+						</Legend>
 					) : null}
 					<span className="text-muted-foreground">
 						{connecting
@@ -738,29 +743,20 @@ function Legend({
 	);
 }
 
-function LegendItem({ swatch, tone = "muted", dashed, label }: LegendKey) {
-	const colour = `#${TONE_FILL[tone].toString(16).padStart(6, "0")}`;
-	return (
-		<span className="flex items-center gap-1.5">
-			{swatch === "node" ? (
-				<span
-					className="h-2.5 w-2.5 rounded-full"
-					style={
-						dashed
-							? { border: `1.5px dashed ${colour}` }
-							: { background: colour }
-					}
-				/>
-			) : (
-				<span
-					className="h-0 w-4"
-					style={{
-						borderTop: `1.5px ${dashed ? "dashed" : "solid"} hsl(var(--muted-foreground))`,
-						opacity: 0.7,
-					}}
-				/>
-			)}
-			{label}
-		</span>
-	);
+/**
+ * The mark the canvas actually draws, in the legend's vocabulary — a node is a
+ * dot (a ring when it is drawn hollow), an edge is a line (dashed when it is).
+ * A legend that draws a dot for something rendered as a dashed line is worse
+ * than no legend.
+ */
+function swatchKind({ swatch, dashed }: LegendKey): LegendSwatchKind {
+	if (swatch === "node") return dashed ? "ring" : "dot";
+	return dashed ? "dashed" : "line";
+}
+
+/** A node wears its run tone, straight off the same table the renderer reads. */
+function swatchColour({ swatch, tone = "muted" }: LegendKey): string {
+	return swatch === "node"
+		? `#${TONE_FILL[tone].toString(16).padStart(6, "0")}`
+		: "var(--muted-foreground)";
 }

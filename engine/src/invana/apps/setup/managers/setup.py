@@ -103,7 +103,6 @@ class SetupManager:
         section, plus the instructions stamp, which is the only completion time the
         schema records.
         """
-        from invana.apps.llm_providers.models import LLMProvider  # noqa: PLC0415
         from invana.apps.modeller.models import GraphModel, GraphVersion, NodeTypeDefinition  # noqa: PLC0415
         from invana.apps.skills.models import Skill  # noqa: PLC0415
 
@@ -167,20 +166,16 @@ class SetupManager:
             )
         ).one()
 
-        # The Graph's default provider is what an agent without one of its own uses
-        # (providers-and-models.md C5), so it is the one that has to work. Save stores
-        # it; the ping proves it (C3), and until it has been proved the step is not
-        # done — the whole point is that the first question does not fail on
+        # **The endpoint the cast resolves is the one that has to work**
+        # ([PM16](docs/for-developers/modules/agents/features/providers-and-models.md)).
+        # The gate used to read a row flagged default, because the default was
+        # what an agent without one used; the cast is that now. So a Graph with
+        # three providers and a cast naming the unproven one is not ready, and a
+        # Graph with one unpinged spare is. Save stores a provider; the ping
+        # proves it (C3), and until it has been proved the step is not done —
+        # the whole point is that the first question does not fail on
         # configuration.
-        default_provider = (
-            (
-                await session.execute(
-                    select(LLMProvider).where(LLMProvider.graph_id == graph.id, LLMProvider.is_default.is_(True)),
-                )
-            )
-            .scalars()
-            .first()
-        )
+        cast_provider = await self._cast_provider(session, graph=graph)
 
         first_skill_at = (
             await session.execute(
@@ -202,10 +197,10 @@ class SetupManager:
             "model": (authored_versions > 0, _iso(first_publish_at), None),
             "datasets": (data_landed_at is not None, _iso(data_landed_at), None),
             "providers": (
-                default_provider is not None and default_provider.last_ping_ok is True,
-                _iso(default_provider.last_ping_at) if default_provider is not None else None,
-                default_provider.last_ping_error
-                if default_provider is not None and default_provider.last_ping_ok is False
+                cast_provider is not None and cast_provider.last_ping_ok is True,
+                _iso(cast_provider.last_ping_at) if cast_provider is not None else None,
+                cast_provider.last_ping_error
+                if cast_provider is not None and cast_provider.last_ping_ok is False
                 else None,
             ),
             # The schema keeps no "instructions written at"; the stored stamp is it.
@@ -230,6 +225,26 @@ class SetupManager:
                 "broken": broken if done else None,
             }
         return state
+
+    async def _cast_provider(self, session: AsyncSession, *, graph: Graph):
+        """The provider behind the model this Graph's cast resolves ``decide`` to.
+
+        The same resolution a run takes
+        ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)),
+        asked one step early — so *ready to answer* and *able to answer* cannot
+        disagree. ``None`` when the Graph offers no model, or when its cast names
+        one it does not offer: both are *not configured yet*, which is what the
+        step already says.
+        """
+        from invana.apps.govern.managers import LensManager, LLMEndpointManager  # noqa: PLC0415
+        from invana.core.errors import InvanaError  # noqa: PLC0415
+
+        try:
+            effective = await LensManager().effective_guardrails(session, graph_id=graph.id, agent_id=None)
+            endpoint = await LLMEndpointManager().resolve(session, graph_id=graph.id, effective=effective)
+        except InvanaError:
+            return None
+        return endpoint.row
 
     async def update_setup_section(
         self,

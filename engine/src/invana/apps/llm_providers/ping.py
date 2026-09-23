@@ -1,4 +1,4 @@
-"""Per-provider credential ping — pure, and it takes no session.
+"""Per-endpoint credential ping — pure, and it takes no session.
 
 Outside the `models · querysets · managers · schemas` vocabulary on purpose
 (migration-plan §4.1): an algorithm, not a role. SDK calls run in a thread so
@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import asyncio
 
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.endpoint import LLMEndpoint
+from invana.apps.llm_providers.models import LLMProviderKind
 
 
-async def _dispatch_ping(provider: LLMProvider, api_key: str | None) -> bool:
-    """Per-provider ping. SDK calls happen in a thread to keep this async-friendly."""
+async def _dispatch_ping(provider: LLMEndpoint, api_key: str | None) -> bool:
+    """Per-endpoint ping — the credential is the provider's, the probe needs a
+    model, and an :class:`LLMEndpoint` is both. SDK calls happen in a thread to
+    keep this async-friendly."""
     if provider.provider == LLMProviderKind.anthropic:
         if not api_key:
             return False

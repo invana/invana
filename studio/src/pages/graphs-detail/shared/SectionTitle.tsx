@@ -22,7 +22,7 @@ export function SectionTitle({
 }) {
 	return (
 		<span className="flex min-w-0 items-center gap-2">
-			<span className="truncate text-meta font-semibold uppercase tracking-wide">
+			<span className="truncate text-sm font-semibold uppercase tracking-wide">
 				{children}
 			</span>
 			{count != null && (

@@ -97,12 +97,14 @@ interface Props {
 	/** Prefill a new task into this project. */
 	projectKey?: string | null;
 	onOpenAgent?: (agentId: string) => void;
+	/** A statement on a step row opens that rule's board (RU12). */
+	onOpenRule?: (ruleId: string) => void;
 	/**
 	 * The selected task's project, reported up as soon as the detail loads.
 	 *
 	 * A task has no graph of its own until its run emits one, so the honest
 	 * canvas for a selected task is the plan it sits inside — and only the panel
-	 * knows which project that is, because the roster row does not carry it until
+	 * knows which project that is, because the agent row does not carry it until
 	 * the detail resolves.
 	 */
 	onProjectContext?: (projectKey: string | null) => void;
@@ -118,6 +120,7 @@ export function TodosDrawerBody({
 	onSelectTask,
 	projectKey,
 	onOpenAgent,
+	onOpenRule,
 	onProjectContext,
 }: Props) {
 	const [title, setTitle] = useState("");
@@ -194,16 +197,16 @@ export function TodosDrawerBody({
 							value={title}
 							onChange={(e) => setTitle(e.target.value)}
 							placeholder="What needs doing?"
-							className="w-full rounded-sm border bg-background px-2 py-1.5 text-sm"
+							className="w-full rounded-sm border bg-background px-2 py-1.5 text-base"
 						/>
 						<textarea
 							value={body}
 							onChange={(e) => setBody(e.target.value)}
 							placeholder="The goal, in prose — this is what an agent plans from."
 							rows={3}
-							className="w-full resize-none rounded-sm border bg-background px-2 py-1.5 text-sm"
+							className="w-full resize-none rounded-sm border bg-background px-2 py-1.5 text-base"
 						/>
-						<Button type="submit" size="sm" className="h-7 w-full text-sm">
+						<Button type="submit" size="sm" className="h-7 w-full text-base">
 							Create
 						</Button>
 					</form>
@@ -217,6 +220,7 @@ export function TodosDrawerBody({
 						agents={agents.data?.items ?? []}
 						onBack={() => onSelectTask(null)}
 						onOpenAgent={onOpenAgent}
+						onOpenRule={onOpenRule}
 						mutations={mutations}
 					/>
 				) : (
@@ -244,7 +248,7 @@ export function TodosDrawerBody({
 									<Spinner />
 								</div>
 							) : visible.length === 0 ? (
-								<p className="p-4 text-sm text-muted-foreground">
+								<p className="p-4 text-base text-muted-foreground">
 									{tasks.length
 										? "No task matches those filters."
 										: "No tasks yet. Write one down and hand it to an agent."}
@@ -323,6 +327,7 @@ function TaskDetail({
 	agents,
 	onBack,
 	onOpenAgent,
+	onOpenRule,
 	mutations,
 }: {
 	username: string;
@@ -331,6 +336,7 @@ function TaskDetail({
 	agents: { id: string; name: string; status: string }[];
 	onBack: () => void;
 	onOpenAgent?: (id: string) => void;
+	onOpenRule?: (ruleId: string) => void;
 	mutations: ReturnType<typeof useTaskMutations>;
 }) {
 	const [tab, setTab] = useState<TaskTab>("work");
@@ -358,7 +364,7 @@ function TaskDetail({
 				<button
 					type="button"
 					onClick={onBack}
-					className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
+					className="shrink-0 text-base text-muted-foreground hover:text-foreground"
 				>
 					← Tasks
 				</button>
@@ -387,14 +393,14 @@ function TaskDetail({
 							}
 						/>
 						{task.assignee_kind === "agent" ? (
-							<span className="text-sm text-muted-foreground">for</span>
+							<span className="text-base text-muted-foreground">for</span>
 						) : null}
 					</>
 				) : null}
 				{task.assignee_kind === "agent" && task.created_by_id ? (
 					<PrincipalChip name="you" kind="user" />
 				) : null}
-				<span className="ml-auto truncate text-sm text-muted-foreground">
+				<span className="ml-auto truncate text-base text-muted-foreground">
 					{[
 						task.project_key,
 						task.due_at
@@ -407,12 +413,12 @@ function TaskDetail({
 			</div>
 
 			{task.body ? (
-				<p className="shrink-0 whitespace-pre-wrap px-4 text-sm text-foreground">
+				<p className="shrink-0 whitespace-pre-wrap px-4 text-base text-foreground">
 					{task.body}
 				</p>
 			) : null}
 			{task.acceptance ? (
-				<p className="shrink-0 px-4 pt-1.5 text-sm text-muted-foreground">
+				<p className="shrink-0 px-4 pt-1.5 text-base text-muted-foreground">
 					<span className="font-medium text-foreground">Accepts when</span>{" "}
 					{task.acceptance}
 				</p>
@@ -438,7 +444,7 @@ function TaskDetail({
 					className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-2.5"
 				>
 					{task.status === "needs_input" && task.blocked_reason ? (
-						<div className="rounded-sm border border-amber-500/40 p-2 text-sm">
+						<div className="rounded-sm border border-amber-500/40 p-2 text-base">
 							<div className="font-medium text-amber-600 dark:text-amber-400">
 								Waiting on you
 							</div>
@@ -451,7 +457,7 @@ function TaskDetail({
 					{task.result?.summary ? (
 						<ResultBlock task={task} />
 					) : (
-						<p className="text-sm text-muted-foreground">
+						<p className="text-base text-muted-foreground">
 							Nothing has come back yet.
 							{task.assignee_kind === "agent"
 								? " The agent posts a result here, and it stays in review until you accept it."
@@ -462,7 +468,7 @@ function TaskDetail({
 					{/* The assignee picker. An agent assignment *is* the trigger — it
 					    opens exactly one run, and the task starts itself. */}
 					{reassigning || !task.assignee_id ? (
-						<label className="block text-sm text-muted-foreground">
+						<label className="block text-base text-muted-foreground">
 							Assignee
 							<select
 								value={task.assignee_id ?? ""}
@@ -475,7 +481,7 @@ function TaskDetail({
 									});
 									setReassigning(false);
 								}}
-								className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-sm text-foreground"
+								className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-base text-foreground"
 							>
 								<option value="">Unassigned</option>
 								{agents.map((a) => (
@@ -507,17 +513,17 @@ function TaskDetail({
 								onChange={(e) => setNote(e.target.value)}
 								rows={2}
 								placeholder="What needs to change? This becomes a new round on the same task."
-								className="w-full resize-none rounded-sm border bg-background px-2 py-1.5 text-sm"
+								className="w-full resize-none rounded-sm border bg-background px-2 py-1.5 text-base"
 							/>
 							<div className="flex gap-1.5">
-								<Button type="submit" size="sm" className="h-7 text-sm">
+								<Button type="submit" size="sm" className="h-7 text-base">
 									Send back
 								</Button>
 								<Button
 									type="button"
 									size="sm"
 									variant="ghost"
-									className="h-7 text-sm"
+									className="h-7 text-base"
 									onClick={() => setRejecting(false)}
 								>
 									Cancel
@@ -537,7 +543,10 @@ function TaskDetail({
 							<Spinner />
 						</div>
 					) : (
-						<TaskActivityTree nodes={activity.data?.nodes ?? []} />
+						<TaskActivityTree
+							nodes={activity.data?.nodes ?? []}
+							onOpenRule={onOpenRule}
+						/>
 					)}
 				</TabsContent>
 
@@ -551,7 +560,7 @@ function TaskDetail({
 							<Spinner />
 						</div>
 					) : !runs.data?.length ? (
-						<p className="text-sm text-muted-foreground">
+						<p className="text-base text-muted-foreground">
 							No run has opened on this task yet. Assigning it to an agent opens
 							exactly one.
 						</p>
@@ -686,7 +695,7 @@ function ThoughtBlock({
 			<button
 				type="button"
 				onClick={() => setOpen((v) => !v)}
-				className="flex items-center gap-2 text-left text-sm text-muted-foreground hover:text-foreground"
+				className="flex items-center gap-2 text-left text-base text-muted-foreground hover:text-foreground"
 			>
 				<span className="select-none text-border" aria-hidden>
 					✻
@@ -705,7 +714,7 @@ function ThoughtBlock({
 			{open ? (
 				<>
 					<StepList steps={steps} className="pl-3.5" />
-					<span className="pl-3.5 font-mono text-sm text-muted-foreground">
+					<span className="pl-3.5 font-mono text-base text-muted-foreground">
 						{workflowKey}
 					</span>
 				</>
@@ -724,7 +733,7 @@ function ResultBlock({ task }: { task: Task }) {
 	const kinds = [...new Set(emitted.map((e) => e.kind))];
 	return (
 		<div className="space-y-2">
-			<div className="flex items-start gap-2 text-sm">
+			<div className="flex items-start gap-2 text-base">
 				<span className="shrink-0 text-muted-foreground" aria-hidden>
 					└
 				</span>

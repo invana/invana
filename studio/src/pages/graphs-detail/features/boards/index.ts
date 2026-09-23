@@ -49,3 +49,33 @@ export type {
 	DeclaredKind,
 	DeclaredKindSpec,
 } from "@/pages/graphs-detail/features/boards/boardKinds";
+
+// A report — the act that keeps a live dashboard's numbers, and the page that
+// reads one back (boards-migration.md B6).
+export { FrozenBoardPage } from "@/pages/graphs-detail/features/boards/FrozenBoardPage";
+export {
+	DeclaredBoardContext,
+	OPEN_REPORTS_ACTION,
+	SAVE_REPORT_ACTION,
+	useReport,
+} from "@/pages/graphs-detail/features/boards/useReport";
+export type {
+	DeclaredBoardValue,
+	Report,
+} from "@/pages/graphs-detail/features/boards/useReport";
+
+// The wrapper the host mounts every declared page inside — the two acts, and
+// the card one of them opens (boards-migration.md B21).
+export { DeclaredBoard } from "@/pages/graphs-detail/features/boards/DeclaredBoard";
+export { BoardHistoryCard } from "@/pages/graphs-detail/features/boards/BoardHistoryCard";
+
+// *Open this board*, published by the host for the surfaces that draw a link
+// to one (rules.md RU13).
+export {
+	OpenBoardContext,
+	useOpenBoard,
+} from "@/pages/graphs-detail/features/boards/useOpenBoard";
+export type {
+	OpenBoardFn,
+	RecordBoardKind,
+} from "@/pages/graphs-detail/features/boards/useOpenBoard";

@@ -23,14 +23,27 @@ class SendMessage(BaseModel):
     mode: Literal["ql", "nl"] = "ql"
     language: QueryLanguage | None = None
     parameters: dict | None = None
-    # **Deprecated** (docs/for-developers/modules/agents/spec.md): the composer no longer picks a provider —
-    # the session's agent carries provider *and* model. Kept so an older client
-    # keeps working; when the session has an agent, the agent's binding wins.
+    #: **Deprecated** (docs/for-developers/modules/agents/spec.md): the composer
+    #: does not pick a model. The lens ``cast`` resolves it
+    #: ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)),
+    #: and this is ignored. Kept for one release so an older client still parses.
     llm_provider_id: str | None = None
+    #: An explicit model for this one ask — an ``llm_models`` id. It still has
+    #: to be one this Graph offers and it does **not** bypass the lens: a pick
+    #: is a resolution, not a widening ([GV6](docs/for-developers/modules/govern/spec.md)).
+    llm_model_id: str | None = None
     # How long (seconds) to budget this ask: the LLM translation (nl) and the
     # query execution (nl + ql). Lets slow models/queries be granted more time.
     # Falls back to the translate/driver defaults when omitted.
     timeout_s: float | None = Field(default=None, gt=0, le=600)
+    #: The world this question is asked under
+    #: ([C1](docs/for-developers/modules/govern/features/worlds.md)). Omitted is
+    #: **Everything, inside the guardrails** — the default and the widest
+    #: ([GV7](docs/for-developers/modules/govern/spec.md)), so no surface grows
+    #: a required field. The run freezes what it resolves to; the id alone would
+    #: be a pointer at a row that can move
+    #: ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
+    lens_id: str | None = Field(default=None, max_length=36)
 
 
 class SessionCreate(BaseModel):

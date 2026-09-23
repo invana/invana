@@ -52,6 +52,35 @@ BOARD_KINDS: dict[str, BoardKindSpec] = {
         _declared("run", "a root task_runs.id"),
         _declared("task_run", "a child task_runs.id"),
         _declared("plan_runs", "a task_plans.id"),
+        # Two runs, side by side, with what each touched diffed
+        # (docs/for-developers/modules/govern/features/worlds.md WO4). Its
+        # subject is a pair rather than a row, because **compare is two runs,
+        # not a diff engine**: there is nothing to key it on that is not the two
+        # runs themselves, and a `comparisons` table would be a record of a
+        # reading somebody can reproduce by opening the same two ids.
+        _declared("compare", 'two root task_runs.id joined by ":"'),
+        # Skills' three readings
+        # (docs/for-developers/building-studio/skills-dashboards.md). `skill`
+        # and `skill_usage` name the same record and are not the same page:
+        # one is what the playbook **declares** and will engage, drawn from its
+        # plan; the other is what **happened** when it was offered, drawn from
+        # `task_runs`. The same pair the layer strip reads in two tenses (SD2).
+        #
+        # `skill_usage` is addressed by the skill rather than by a version
+        # because one read returns every version, and the page's whole job is
+        # reading one count against the next — so a board per version would be
+        # seven boards each holding a seventh of one reading (SD1).
+        _declared("skill", "a skills.id"),
+        _declared("skill_usage", "a skills.id"),
+        _declared("rule", "a rules.id"),
+        # A world and a guardrail are **one `lenses` row separated by `kind`**
+        # (docs/for-developers/modules/govern/spec.md GV1), and they are two
+        # board kinds for the reason the two names exist at all: a tab reading
+        # `Lens` would make a reader open it to find out which of the two
+        # bounds they are looking at
+        # (docs/for-developers/modules/govern/features/worlds.md WO15).
+        _declared("world", "a lenses.id"),
+        _declared("guardrail", "a lenses.id"),
     )
 }
 
@@ -67,6 +96,12 @@ BoardKindName = Literal[
     "run",
     "task_run",
     "plan_runs",
+    "compare",
+    "skill",
+    "skill_usage",
+    "rule",
+    "world",
+    "guardrail",
 ]
 
 #: What a version records about why it was written. ``report`` is a declared

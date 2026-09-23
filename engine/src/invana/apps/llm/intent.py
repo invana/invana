@@ -22,7 +22,7 @@ from invana.apps.llm import LLMError, complete_tool
 from invana.apps.llm.grounding import render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
 from invana.apps.llm.translate import Clarification, _looks_read_only
-from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
 
 # The shapes a plan can serve. Keep in step with
@@ -170,7 +170,7 @@ def _system_prompt(model_context: str, instructions: str, skills: str, rules: st
 
 async def understand(
     *,
-    provider: LLMProvider,
+    provider: LLMEndpoint,
     prompt: str,
     version: GraphVersion | None,
     encryption_key: str,
@@ -179,9 +179,13 @@ async def understand(
     rules: str = "",
     history: list[dict] | None = None,
     timeout_s: float = 60.0,
+    #: The egress classes this crossing permits, or ``None`` for an unbounded
+    #: one (docs/for-developers/modules/govern/spec.md GV30). The cut is applied
+    #: to the parts of the prompt, before the prompt exists (GV31).
+    may_send: frozenset[str] | None = None,
 ) -> Intent | Clarification | OutOfScope:
     system = _system_prompt(
-        render_model_context(version),
+        render_model_context(version, may_send=may_send),
         f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "",
         f"Skills you may apply:\n{skills}\n\n" if skills else "",
         f"Rules that are always true here (quote each statement you follow in rules_cited):\n{rules}\n\n"

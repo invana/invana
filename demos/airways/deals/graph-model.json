@@ -1,0 +1,287 @@
+{
+  "format": "invana.model/1",
+  "package_id": "invana.dataset.deals",
+  "content_hash": "",
+  "name": "Deals",
+  "description": "Sponsorship agreements between carriers and the companies that back them.",
+  "version": "1.0.0",
+  "model": {
+    "schema_name": "Deals",
+    "schema_description": "Sponsorship agreements between carriers and the companies that back them.",
+    "validation_mode": "strict",
+    "version": "1.0.0",
+    "axes": {
+      "time": {
+        "property": "signed_at"
+      },
+      "geo": {
+        "property": "country_iso",
+        "vocab": "iso2"
+      },
+      "dims": [
+        "channel",
+        "segment",
+        "stage"
+      ]
+    },
+    "property_keys": [
+      {
+        "name": "deal_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The sponsorship agreement's own reference.",
+        "validation_rules": []
+      },
+      {
+        "name": "carrier_iata",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "IATA code of the airline the deal is with \u2014 the key FOR_CARRIER resolves on.",
+        "validation_rules": []
+      },
+      {
+        "name": "sponsor_id",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The sponsor's reference in this model.",
+        "validation_rules": []
+      },
+      {
+        "name": "country_iso",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The carrier's country, ISO 3166-1 alpha-2. The geo axis.",
+        "validation_rules": []
+      },
+      {
+        "name": "stage",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "prospect \u00b7 negotiating \u00b7 signed \u00b7 renewed \u00b7 lapsed.",
+        "validation_rules": []
+      },
+      {
+        "name": "channel",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "How it was sold \u2014 direct \u00b7 agency \u00b7 programmatic.",
+        "validation_rules": []
+      },
+      {
+        "name": "segment",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "enterprise \u00b7 mid-market \u00b7 regional.",
+        "validation_rules": []
+      },
+      {
+        "name": "contract_value",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "The whole commitment, in minor-unit-free EUR. Commercially sensitive.",
+        "validation_rules": []
+      },
+      {
+        "name": "revenue",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "What has been recognised against the contract so far. Commercially sensitive.",
+        "validation_rules": []
+      },
+      {
+        "name": "currency",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Always EUR in this dataset; kept so the number is never a bare integer.",
+        "validation_rules": []
+      },
+      {
+        "name": "signed_at",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "ISO date the agreement was signed. The valid-time axis.",
+        "validation_rules": []
+      },
+      {
+        "name": "term_months",
+        "type": "integer",
+        "value_cardinality": "SINGLE",
+        "description": "How long it runs.",
+        "validation_rules": []
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "The sponsoring company.",
+        "validation_rules": []
+      },
+      {
+        "name": "domain",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "Its web domain \u2014 the key the Publisher anchor resolves on.",
+        "validation_rules": []
+      },
+      {
+        "name": "sector",
+        "type": "string",
+        "value_cardinality": "SINGLE",
+        "description": "media \u00b7 financial \u00b7 hospitality \u00b7 telecom \u00b7 energy.",
+        "validation_rules": []
+      }
+    ],
+    "node_types": [
+      {
+        "name": "Deal",
+        "description": "One sponsorship agreement.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "deal_id",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "carrier_iata",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "sponsor_id",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_iso",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          },
+          {
+            "property_key": "stage",
+            "default_value": null,
+            "sort_order": 4,
+            "validation_rules": []
+          },
+          {
+            "property_key": "channel",
+            "default_value": null,
+            "sort_order": 5,
+            "validation_rules": []
+          },
+          {
+            "property_key": "segment",
+            "default_value": null,
+            "sort_order": 6,
+            "validation_rules": []
+          },
+          {
+            "property_key": "contract_value",
+            "default_value": null,
+            "sort_order": 7,
+            "validation_rules": []
+          },
+          {
+            "property_key": "revenue",
+            "default_value": null,
+            "sort_order": 8,
+            "validation_rules": []
+          },
+          {
+            "property_key": "currency",
+            "default_value": null,
+            "sort_order": 9,
+            "validation_rules": []
+          },
+          {
+            "property_key": "signed_at",
+            "default_value": null,
+            "sort_order": 10,
+            "validation_rules": []
+          },
+          {
+            "property_key": "term_months",
+            "default_value": null,
+            "sort_order": 11,
+            "validation_rules": []
+          }
+        ]
+      },
+      {
+        "name": "Sponsor",
+        "description": "A company backing a carrier.",
+        "parent_type": null,
+        "is_abstract": false,
+        "validation_mode": null,
+        "property_mappings": [
+          {
+            "property_key": "name",
+            "default_value": null,
+            "sort_order": 0,
+            "validation_rules": []
+          },
+          {
+            "property_key": "domain",
+            "default_value": null,
+            "sort_order": 1,
+            "validation_rules": []
+          },
+          {
+            "property_key": "country_iso",
+            "default_value": null,
+            "sort_order": 2,
+            "validation_rules": []
+          },
+          {
+            "property_key": "sector",
+            "default_value": null,
+            "sort_order": 3,
+            "validation_rules": []
+          }
+        ]
+      }
+    ],
+    "edge_types": [
+      {
+        "name": "SPONSORED_BY",
+        "description": "The company behind the agreement.",
+        "source_node_types": [
+          "Deal"
+        ],
+        "target_node_types": [
+          "Sponsor"
+        ],
+        "multiplicity": "MANY2ONE",
+        "property_mappings": []
+      }
+    ],
+    "constraints": [
+      {
+        "name": "deal_deal_id_unique",
+        "target_kind": "node_type",
+        "target_label": "Deal",
+        "constraint_type": "unique",
+        "properties": [
+          "deal_id"
+        ]
+      },
+      {
+        "name": "sponsor_domain_unique",
+        "target_kind": "node_type",
+        "target_label": "Sponsor",
+        "constraint_type": "unique",
+        "properties": [
+          "domain"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  "links": []
+}

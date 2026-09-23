@@ -74,6 +74,13 @@ export interface GraphContention {
 	}[];
 	running_count: number;
 	queued_count: number;
+	/**
+	 * Each **configured** pool, its size and what is in it right now (CC8).
+	 * Configured on the Graph, in use in the process — so a pool nobody has
+	 * touched still lists, with `in_use: 0`. The run ceiling says how many runs
+	 * may proceed; these say how many crossings may be in flight.
+	 */
+	pools: { pool: string; size: number; in_use: number }[];
 }
 
 export interface GraphCreate {

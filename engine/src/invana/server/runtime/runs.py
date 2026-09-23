@@ -23,6 +23,8 @@ from invana.core.db import get_session
 from invana.runtime import emissions, services
 from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
+from invana.runtime.interpreter.payloads import _retry_for
+from invana.runtime.managers.rule_citations import offered_rules
 from invana.runtime.models import RunStatus, TaskPrompt
 from invana.runtime.projections import (
     Shape,
@@ -46,6 +48,7 @@ from invana.runtime.schemas import (
     TraceStep,
 )
 from invana.runtime.stream import subscribe
+from invana.runtime.workflows import WORKFLOWS
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 runs_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/runs", tags=["runs"])
@@ -352,8 +355,33 @@ async def get_trace(
         agent = await AgentQuerySet().get(session, run.agent_id)
         if agent is not None:
             effective = agent.effective_budget
-            budget = {"max_tokens": effective.get("max_tokens"), "max_cost_usd": effective.get("max_cost_usd")}
+            # Every ceiling the dashboard draws, not the two it drew first:
+            # a run's spend reads against its **per-run** ceiling, and the
+            # month one belongs beside it or neither number says its window
+            # ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+            # `max_cost_usd` rides along for one release under its old name.
+            budget = {
+                key: effective.get(key)
+                for key in (
+                    "max_tokens",
+                    "max_steps",
+                    "max_cost_usd",
+                    "max_cost_usd_run",
+                    "max_cost_usd_month",
+                    "max_concurrent_runs",
+                    "max_clarifications",
+                    "max_replans",
+                    "max_fanout",
+                )
+            }
     priced = [step.cost_usd for step in steps if step.cost_usd is not None]
+    # A statement, never an id: the wording each step was given, resolved once
+    # for the whole trace (RU12).
+    rules = await offered_rules(session, steps=steps)
+    # The bound each attempt count is read against — resolved the way the
+    # interpreter resolves it, so the page and the loop cannot disagree (SR67).
+    workflow = WORKFLOWS.get(run.workflow_key)
+    opened_by = await _username(session, run.on_behalf_of_user_id or run.author_id)
 
     trace_steps = [
         TraceStep(
@@ -376,11 +404,14 @@ async def get_trace(
             # The bound belongs to the catalogue entry, not to the run — read it
             # where it is declared so the two can never disagree (SR33).
             bound=_bound_of(step.task_key),
+            max_attempts=_retry_for(workflow, step, run.plan_snapshot).max_attempts,
             step_key=step.step_key,
             lane=step.lane,
             result=step.result,
             skills_offered=step.skills_offered or [],
             skills_applied=step.skills_applied or [],
+            rules_offered=[rules[r] for r in (step.rules_offered or []) if r in rules],
+            rules_cited=[rules[r] for r in (step.rules_cited or []) if r in rules],
             child_run_id=delegated.get(step.id),
         )
         for step in steps
@@ -401,6 +432,14 @@ async def get_trace(
         agent_version=run.agent_version,
         plan_origin=run.plan_origin,
         plan_revision=run.plan_revision,
+        triggered_by=run.triggered_by,
+        opened_by=opened_by,
+        clarifications=run.clarifications,
+        replans=run.replans,
+        lens_id=run.lens_id,
+        lens_name=_lens_name(run),
+        lens_ref=_lens_ref(run),
+        governed=run.lens_snapshot is not None,
         started_at=run.started_at,
         finished_at=run.finished_at,
         duration_ms=_duration_ms(run.started_at, run.finished_at),
@@ -414,6 +453,39 @@ async def get_trace(
         emissions=[EmissionRead.model_validate(row) for row in rows],
         error=run.error,
     )
+
+
+def _lens_contributor(run) -> dict | None:
+    """The contributor a run's lens is named after — its world, else the first."""
+    contributors = (run.lens_snapshot or {}).get("contributors") or []
+    worlds = [c for c in contributors if c.get("kind") == "world"]
+    return worlds[0] if worlds else (contributors[0] if contributors else None)
+
+
+def _lens_ref(run) -> dict | None:
+    first = _lens_contributor(run)
+    if first and first.get("id") and first.get("kind"):
+        return {"id": first["id"], "kind": first["kind"]}
+    return {"id": run.lens_id, "kind": "world"} if run.lens_id else None
+
+
+def _lens_name(run) -> str | None:
+    """The world this run froze, by the name it had **then**.
+
+    Read out of ``lens_snapshot``'s contributors rather than off the row, so a
+    rename since does not rewrite what a past run says it ran under
+    ([GR3](docs/for-developers/modules/govern/features/guardrails.md)). A
+    snapshot written before names were carried falls back to the slug, and one
+    with neither leaves this ``None`` — which reads *Everything*.
+    """
+    first = _lens_contributor(run)
+    return (first.get("name") or first.get("key")) if first else None
+
+
+async def _username(session: AsyncSession, user_id: str | None) -> str | None:
+    if not user_id:
+        return None
+    return await session.scalar(select(User.username).where(User.id == user_id))
 
 
 def _duration_ms(start, end) -> int | None:

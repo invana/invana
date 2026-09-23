@@ -7,6 +7,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from invana.apps.skills.schemas import OfferedRule
+
 
 class RunNodeRead(BaseModel):
     """One node of a run, read as a row of the trace."""
@@ -37,6 +39,12 @@ class TaskRunRead(BaseModel):
     id: str
     graph_id: str
     workflow_key: str
+    #: The run this row is a step of, and ``None`` on a root
+    #: (:doc:`see-what-ran SR44 <../../../docs/for-developers/modules/operate/features/see-what-ran>`).
+    #: ``task_runs`` is one table, so this route answers for a step as well as
+    #: for a run — which is what lets a step board opened **cold** find the
+    #: trace it belongs to without carrying the run in its page id.
+    parent_run_id: str | None = None
     #: The ask this run carries, when it is a root. A node has none.
     ask_kind: str | None = None
     body: str | None = None
@@ -81,10 +89,15 @@ class TaskRunSummary(BaseModel):
     plan_revision: int = 0
     replans: int = 0
     agent_id: str | None = None
+    #: ``execute`` · ``plan`` · ``evaluate`` — what the run was for (SR10).
+    role: str = "execute"
     task_id: str | None = None
     #: The task's title, so a row reads without a second round-trip.
     task_title: str | None = None
     queued_at: datetime | None = None
+    #: When the run actually began, which is what *elapsed* is measured from —
+    #: a run that sat queued for a minute did not take a minute (SR45).
+    started_at: datetime | None = None
     finished_at: datetime | None = None
     step_count: int = 0
     #: The furthest step that is not merely queued — the row's "Execute" in
@@ -97,6 +110,10 @@ class TaskRunSummary(BaseModel):
     served: str | None = None
     #: True once some library entry records this run as its origin.
     promoted: bool = False
+    #: What the run spent, summed over its tasks — the journal row's second
+    #: line (SR45). `0` here is a run that recorded no tokens, which a load is.
+    tokens_in: int = 0
+    tokens_out: int = 0
 
 
 class TaskRunListResponse(BaseModel):
@@ -187,6 +204,10 @@ class TraceStep(BaseModel):
     #: Read from ``CATALOGUE`` rather than stored, so a bound never disagrees
     #: with the entry it belongs to.
     bound: str | None = None
+    #: How many attempts this step was allowed — the plan node's retry policy,
+    #: else the workflow's, else the task's default. The bound a run page reads
+    #: *attempts 2 of 3* against (SR67).
+    max_attempts: int = 1
     #: Where it sits — the plan's own id for this node, and the lane it ran in
     #: when its parent fanned out.
     step_key: str | None = None
@@ -198,6 +219,10 @@ class TraceStep(BaseModel):
     # the model's own report (RT3).
     skills_offered: list = Field(default_factory=list)
     skills_applied: list = Field(default_factory=list)
+    #: The same pair for rules, already resolved to the statements the step was
+    #: given — a rule is only readable as its wording, never as an id (RU12).
+    rules_offered: list[OfferedRule] = Field(default_factory=list)
+    rules_cited: list[OfferedRule] = Field(default_factory=list)
     #: The run this node delegated, if it delegated one. **Derived** — a child
     #: names its delegating node in `parent_run_id`, so the id is read from the
     #: tree rather than stored a second time where it could disagree.
@@ -219,6 +244,16 @@ class TraceRead(BaseModel):
     agent_version: int | None = None
     plan_origin: str | None = None
     plan_revision: int = 0
+    #: What opened the run — ``user`` · ``schedule`` · ``task`` · ``delegation``.
+    triggered_by: str = "user"
+    #: The person it ran for, by username — the one on whose behalf it ran, else
+    #: its author. ``None`` when no person is on the record (a schedule).
+    opened_by: str | None = None
+    #: The bounded repetitions the run spent — questions it asked and times it
+    #: re-planned — read against ``budget``'s ``max_clarifications`` and
+    #: ``max_replans`` (SR67).
+    clarifications: int = 0
+    replans: int = 0
     started_at: datetime | None = None
     finished_at: datetime | None = None
     duration_ms: int | None = None
@@ -227,12 +262,30 @@ class TraceRead(BaseModel):
     #: The run's spend — the sum of the steps that had a price. ``None`` when
     #: none of them did, so the Cost tile is absent rather than `$0.00` (SR40).
     cost_usd: float | None = None
-    #: The ceiling this run was dispatched under — the agent's effective
-    #: ``max_tokens`` and ``max_cost_usd`` (SR41). ``None`` on a run with no
-    #: agent, which has no ceiling to draw against.
+    #: The ceilings this run was dispatched under — the agent's effective
+    #: budget (SR41 · [EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    #: ``None`` on a run with no agent, which has no ceiling to draw against.
+    #: ``max_cost_usd`` is the old name for ``max_cost_usd_month`` and is sent
+    #: for one release, so a reader that has not moved yet still sees a number.
     budget: dict | None = None
     #: The run's own ``result.json`` — the roll-up of its tasks' (SR39).
     result: dict | None = None
+    #: The world this run was asked under, and its name **as frozen**
+    #: ([SR36](docs/for-developers/modules/operate/features/see-what-ran.md) ·
+    #: [GR3](docs/for-developers/modules/govern/features/guardrails.md)). Both
+    #: ``None`` reads *Everything*, which is a real world and the default one —
+    #: never a blank, which would read as *not recorded*. The name comes from
+    #: ``lens_snapshot`` rather than from the row, so renaming a world does not
+    #: change what a run that already happened says it ran under.
+    lens_id: str | None = None
+    lens_name: str | None = None
+    #: The record ``lens_name`` was read from — ``{"id", "kind"}`` with kind
+    #: ``world`` or ``guardrail`` — so the name can open it (SR67). ``None``
+    #: when the snapshot names nobody.
+    lens_ref: dict | None = None
+    #: Whether the run froze a lens at open. ``False`` means what it engaged was
+    #: never recorded — not that it engaged nothing (SR68 · GV36).
+    governed: bool = False
     steps: list[TraceStep] = []
     emissions: list[EmissionRead] = []
     error: dict | None = None

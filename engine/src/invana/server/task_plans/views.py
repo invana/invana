@@ -86,7 +86,7 @@ async def export_workflow(
     """The surface form (docs/for-developers/modules/agents/spec.md, *one schema, two encodings*)."""
     workflow = await library.get(session, graph_id=graph.id, key=key, version=version)
     return Response(
-        content=to_yaml(workflow, await library.workflows.tasks_for(session, plan_id=workflow.id)),
+        content=to_yaml(workflow, await library.workflows_qs.tasks_for(session, plan_id=workflow.id)),
         media_type="application/yaml",
         headers={"Content-Disposition": f'attachment; filename="{workflow.key}@{workflow.version}.yaml"'},
     )
@@ -127,5 +127,5 @@ async def promote(
         trace_id=current_trace_id(),
     )
     read = TaskPlanRead.model_validate(workflow)
-    read.step_count = len(await library.workflows.tasks_for(session, plan_id=workflow.id))
+    read.step_count = len(await library.workflows_qs.tasks_for(session, plan_id=workflow.id))
     return read

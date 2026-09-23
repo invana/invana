@@ -7,9 +7,9 @@ alone.
 
 | | |
 |---|---|
-| Status | **Not started.** No artboard draws a nested repetition or an approval gate |
-| Canvas | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — a new page |
-| Generators | `.design/canvas-govern-agents/` — `_ga.py` (`loop_rail` · `rep` · `strip` · `sdetail`), `nl.py`, `pl.py` |
+| Status | **Done.** Four artboards draw it; the rules are [LB20 · LB21 · LB28 · LB29 · LB30](../modules/workflows/features/the-library.md#decisions) |
+| Canvas | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) — `Library › Plans`, as variants of the flow canvas |
+| Generators | `.design/canvas-govern-agents/rg.py`, over `_gov.gantt(… brackets, seams)` |
 | Governs | [LB20 · LB21](../modules/workflows/features/the-library.md) — what exists today |
 | Sibling to | [the-shell.md](the-shell.md) · [design-kit-coverage.md](design-kit-coverage.md) |
 
@@ -41,7 +41,7 @@ the canvas is the source, the generator is the build.
 | None auto-resolves | A passed deadline is `stop(failed)` naming who was asked |
 | An agent never approves | The approver is always `principal_kind = user`; membership is the permission, and there are no roles |
 | A fanned-out step asks **once** | One approval covers every lane, and the request states the lane count |
-| Declared versus touched | A plan's strip has no `seq`, so repetition is a **bracket**; a run's strip **unrolls** — iteration 2 is further right ([LB20](../modules/workflows/features/the-library.md)) |
+| Declared versus touched | A plan's axis is `seq` rather than a clock, so repetition is a **bracket**; a run's strip **unrolls** — iteration 2 is further right ([LB20](../modules/workflows/features/the-library.md)) |
 
 ## 2. The six questions
 
@@ -56,6 +56,17 @@ one loop. It does not answer:
 | 4 | **A verdict.** It comes *after* a pass and sends the loop round again. Drawn as a loop, or as a gate on the way back in? |
 | 5 | **The bound that is not on the plan.** `requires_approval` lives on the **envelope**, and a threshold is computed at dispatch — so the same plan is gated for a junior agent and not for a senior one. Does the declared strip show it, and **whose**? |
 | 6 | **Reading the ceilings.** Five columns with four bounds each is twenty numbers. What is on the strip, and what is one click away? |
+
+## 2a. Answered
+
+| # | Answer | Where it is stated |
+|---|---|---|
+| 1 | Brackets pack into **lines**, widest on top. An attempt repeats one step and a clarification suspends one, so neither can span — which leaves lane and iteration, and at most two lines over any stretch | [LB20 · LB21](../modules/workflows/features/the-library.md#decisions) |
+| 2 | `back(id)` re-opens `id` **and everything downstream**, so the stretch is contiguous by construction and one bracket draws it | [LB20](../modules/workflows/features/the-library.md#decisions) |
+| 3 | **A seam** — a rule at a position on the axis, crossing every band. Not a column (there are none), not a bar (nothing is dispatched), not a row on `human` (no slot, no form, no participant) | [LB28](../modules/workflows/features/the-library.md#decisions) |
+| 4 | A verdict is a seam on the **trailing** edge with the `back()` bracket hanging off it; an approval is a seam on the **leading** edge. Position is the price | [LB28](../modules/workflows/features/the-library.md#decisions) |
+| 5 | The record is unchanged: an envelope gate draws **dashed**, and the header names whose reading it is. A budget exhaustion has no position and runs the axis | [LB29](../modules/workflows/features/the-library.md#decisions) |
+| 6 | A spanning bound is its bracket's label, a single-step bound rides that task's bar, and the other seventeen are in the panel | [LB30](../modules/workflows/features/the-library.md#decisions) |
 
 **Question 3 is the one the rest hangs off** — answer it before drawing anything else.
 **Question 5 may change the record, not just the drawing:** a strip that says *3 gates* would be lying

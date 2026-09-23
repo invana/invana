@@ -1,4 +1,4 @@
-import { EmissionList } from "@/pages/graphs-detail/features/ask/answer-surface/EmissionCard";
+import { EmissionList } from "@/pages/graphs-detail/features/ask/answer-surface/AnswerEmission";
 import { TraceDialog } from "@/pages/graphs-detail/features/ask/answer-surface/TraceDialog";
 import { emissionsFromResult } from "@/pages/graphs-detail/features/ask/answer-surface/emissions";
 import { emissionsApi } from "@/services/api/runs";

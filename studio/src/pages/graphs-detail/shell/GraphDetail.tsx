@@ -94,6 +94,7 @@ const PAGE_OWNED_SECTIONS: SettingsSection[] = [
 	// third drawer (G30 · G38).
 	"runs",
 	"library",
+	"govern",
 	"agents",
 	"skills",
 ];
@@ -107,6 +108,7 @@ const ALL_NATIVE_SECTIONS: SettingsSection[] = [
 	"projects",
 	"runs",
 	"library",
+	"govern",
 	"agents",
 ];
 

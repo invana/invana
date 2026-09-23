@@ -27,7 +27,7 @@ the assumptions that approach carries **visible before the answer, not buried in
 
 ### Why it is not just an agent
 
-The roster already carries persona — *"bind a provider, model and skills"*. The difference is
+An agent already carries persona — *"bind a provider, model and skills"*. The difference is
 lifetime and weight:
 
 | | Agent | Stance |

@@ -14,6 +14,10 @@
 
 import { formatDuration } from "@/lib/time";
 import {
+	type WithStepTouch,
+	touchesOfStepKey,
+} from "@/pages/graphs-detail/features/govern/StepTouchPanel";
+import {
 	type TaskGroup,
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
@@ -35,6 +39,7 @@ import {
 	usd,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import type { TraceRead, TraceStepRead } from "@/services/api/runs";
+import type { TouchesResponse } from "@/types/govern";
 import type { DashboardSpec, PanelSpec, TableOptions } from "@invana/dashboard";
 
 export const STEP_ACTIONS = {
@@ -48,6 +53,15 @@ export const STEP_ACTIONS = {
 
 export interface StepDashboardView {
 	view: string;
+	/**
+	 * What this step engaged — R2
+	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+	 *
+	 * The run's whole ledger; this composer picks out the rows for this step.
+	 * Absent, the band is **absent** — a step dashboard from before the lens
+	 * must not grow an empty box claiming the step touched nothing.
+	 */
+	touches?: TouchesResponse;
 }
 
 /** Everything the page resolved before composing: which step, and its neighbours. */
@@ -72,15 +86,18 @@ export function stepContext(
 	};
 }
 
+/** The one panel kind this dashboard registers beyond the built-ins — Govern's. */
+export type StepPanels = WithStepTouch;
+
 export function stepDashboardSpec(
 	trace: TraceRead,
 	{ group, prev, next }: StepContext,
-	{ view }: StepDashboardView,
-): DashboardSpec {
+	{ view, touches }: StepDashboardView,
+): DashboardSpec<StepPanels> {
 	const step = group.head;
 	const bound = boundOf(step);
 
-	const header: DashboardSpec["header"] = {
+	const header: DashboardSpec<StepPanels>["header"] = {
 		tone: toneOf(step.status),
 		// Two crumbs: a run, then the task inside it — which is what a child
 		// record is, and why `RecordHeader` takes a list.
@@ -111,20 +128,45 @@ export function stepDashboardSpec(
 		]),
 	};
 
-	const rows = bands(trace, group);
-	const spec: DashboardSpec = { title: stepTitle(step), header, rows };
+	const rows = bands(trace, group, touches);
+	const spec: DashboardSpec<StepPanels> = {
+		title: stepTitle(step),
+		header,
+		rows,
+	};
 	return view === VIEW_SPEC
 		? { ...spec, rows: [{ panels: [specPanel(spec)] }] }
 		: spec;
 }
 
-/** The bands, top to bottom — the same seven for every kind. */
-function bands(trace: TraceRead, group: TaskGroup): DashboardSpec["rows"] {
+/** The bands, top to bottom — the same for every kind, plus what it engaged. */
+function bands(
+	trace: TraceRead,
+	group: TaskGroup,
+	touches: TouchesResponse | undefined,
+): DashboardSpec<StepPanels>["rows"] {
 	const step = group.head;
+	const engaged = touchesOfStepKey(touches, group.key);
 	return omit([
 		{ panels: [tiles(trace, group)] },
 		{ panels: omit([input(step), resultJson(step)]) },
+		executedQuery(step) ? { panels: [executedQuery(step) as PanelSpec] } : null,
 		output(step) ? { panels: [output(step) as PanelSpec] } : null,
+		// R2 · generated vs executed, the slice that was composed in, and what
+		// egress cut — read under the output it produced, because it is the
+		// evidence for that output rather than a fact about the step's shape.
+		engaged.length
+			? {
+					panels: [
+						{
+							kind: "stepTouch" as const,
+							title: "What it engaged",
+							aside: `${engaged.length} participant${engaged.length === 1 ? "" : "s"}`,
+							options: { stepKey: group.key, touches: engaged },
+						},
+					],
+				}
+			: null,
 		{ panels: omit([log(trace, group), artifacts(step)]) },
 		{ panels: [whereItSits(trace, group)] },
 	]);
@@ -263,6 +305,40 @@ function input(step: TraceStepRead): PanelSpec | null {
 				value: scalar(value),
 				mono: true,
 			})),
+		},
+	};
+}
+
+/**
+ * The query that actually ran, shown only when the lens rewrote it.
+ *
+ * The **Input** band prints the request as the plan resolved it — which, under
+ * a world that slices, is not the query that produced the row count beside it.
+ * A reader who copies that query out gets a different answer, so when the two
+ * differ the band shows both and says which ran (GV34). Equal digests record no
+ * text and draw no band: there, the resolved request *is* what ran.
+ */
+function executedQuery(step: TraceStepRead): PanelSpec | null {
+	const recorded = step.input as Record<string, unknown> | null | undefined;
+	const executed = recorded ? stringAt(recorded, "executed_query") : null;
+	if (!executed) return null;
+	// `args` holds the query only where a plan pinned one; an ask run's carry
+	// `read_only` and nothing else, so the step records the generated text too.
+	const generated =
+		(recorded ? stringAt(recorded, "generated_query") : null) ??
+		(step.args ? stringAt(step.args, "query") : null);
+
+	return {
+		kind: "exchange",
+		title: "The query that ran",
+		aside: "the lens rewrote it — the row count above is this one's",
+		options: {
+			blocks: omit([
+				generated
+					? { label: "Generated · what the plan asked for", value: generated }
+					: null,
+				{ label: "Executed · what the graph answered", value: executed },
+			]),
 		},
 	};
 }

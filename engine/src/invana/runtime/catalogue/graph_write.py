@@ -21,7 +21,7 @@ from pathlib import Path
 
 from invana.graph.loaders import CSVLoader, LoaderConfig
 from invana.runtime.catalogue import stitching
-from invana.runtime.catalogue.contract import Out, RunVars, TaskContext, TaskFailure
+from invana.runtime.catalogue.contract import Out, RunVars, TaskContext, TaskFailure, Writes
 from invana.runtime.catalogue.records import (
     LoadRefused,
     _solve_active_stitches,
@@ -59,6 +59,10 @@ async def write_graph(ctx: TaskContext, v: RunVars) -> Out:
     than duplicate (C8).
     """
     load = _load(v)
+    # The model this load pinned (LD8), checked before a record is written: a
+    # guardrail that refuses it ends the run naming the rule (LD24 · GV35).
+    writes = Writes(ctx, v)
+    await writes.admit(load.version_id)
     await ctx.progress("writing records")
     try:
         connector = await connector_for(ctx.db, ctx.step.graph_id)
@@ -75,6 +79,12 @@ async def write_graph(ctx: TaskContext, v: RunVars) -> Out:
         node_records=load.valid_nodes,
         edge_records=load.valid_edges,
     )
+    writes.wrote(
+        load.version_id,
+        nodes=sum(load.counts["nodes"].values()),
+        edges=sum(load.counts["edges"].values()),
+    )
+    await writes.close()
     return Out(
         detail=f"{load.written} of {load.total} written",
         input={"model_id": load.model_id},
@@ -94,6 +104,24 @@ async def stitch(ctx: TaskContext, v: RunVars) -> Out:
     every **active** stitch in the Graph, scoped by this run's stamp.
     """
     load = _load(v)
+    # Every model the edges land in (ST53): this load's own, fatal like
+    # `write_graph`'s, and each stitch's two sides, which only skip that stitch.
+    writes = Writes(ctx, v)
+    await writes.admit(load.version_id)
+
+    async def admit(link) -> bool:
+        return all(
+            [
+                await writes.admit(link.source_version_id, fatal=False),
+                await writes.admit(link.target_version_id, fatal=False),
+            ]
+        )
+
+    def on_written(link, n: int) -> None:
+        writes.wrote(link.source_version_id, edges=n)
+        if link.target_version_id != link.source_version_id:
+            writes.wrote(link.target_version_id, edges=n)
+
     await ctx.progress("resolving edges")
     graph_id = ctx.step.graph_id
     run_id = _run_id(ctx)
@@ -118,7 +146,11 @@ async def stitch(ctx: TaskContext, v: RunVars) -> Out:
         run_id=run_id,
         root=Path(load.root),
         report=load.report,
+        admit=admit,
+        on_written=on_written,
     )
+    writes.wrote(load.version_id, edges=sum(resolved.values()))
+    await writes.close()
     for edge_type, n in stitched.items():
         load.counts["edges"][edge_type] = load.counts["edges"].get(edge_type, 0) + n
 
@@ -167,7 +199,25 @@ async def commit_stitches(ctx: TaskContext, v: RunVars) -> Out:
         raise TaskFailure(
             cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
         ) from exc
-    committed = await stitching.commit_stitches(ctx.db, graph_id=ctx.step.graph_id, connector=connector)
+    writes = Writes(ctx, v)
+
+    async def admit(link) -> bool:
+        return all(
+            [
+                await writes.admit(link.source_version_id, fatal=False),
+                await writes.admit(link.target_version_id, fatal=False),
+            ]
+        )
+
+    committed = await stitching.commit_stitches(ctx.db, graph_id=ctx.step.graph_id, connector=connector, admit=admit)
+    by_id = {link.id: link for link in committed.links}
+    for done in [*committed.solved, *committed.loaded]:
+        link = by_id.get(done.link_id)
+        if link is not None and done.written:
+            writes.wrote(link.source_version_id, edges=done.written)
+            if link.target_version_id != link.source_version_id:
+                writes.wrote(link.target_version_id, edges=done.written)
+    await writes.close()
     return Out(
         detail=f"{committed.written} written · {committed.rejected} rejected",
         input={},
@@ -205,6 +255,11 @@ async def bulk_write(ctx: TaskContext, v: RunVars) -> Out:
         skip_on_error=bool(args.get("skip_on_error")),
         keep_source_ids=bool(args.get("keep_source_ids", True)),
     )
+    # No model, so the grounding version — the one address that covers every
+    # label a bulk load can write (LD24 · GV35).
+    writes = Writes(ctx, v)
+    grounding = v.grounding.id if v.grounding is not None else None
+    await writes.admit(grounding)
     loader = CSVLoader(connector=connector, config=config)
     async with connector:
         stats = await loader.load_directory(root)
@@ -221,6 +276,8 @@ async def bulk_write(ctx: TaskContext, v: RunVars) -> Out:
             short="nothing written",
             raw="\n".join(stats.errors[:20]),
         )
+    writes.wrote(grounding, nodes=nodes, edges=edges)
+    await writes.close()
     return Out(
         detail=f"{nodes} node(s) / {edges} edge(s) · {failed} failed",
         input={"root": root},

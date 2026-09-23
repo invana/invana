@@ -210,8 +210,8 @@ async def acknowledge_connection_version(
     connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
     if connection is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No connection is attached to this Graph.")
-    store = GraphConnectionQuerySet()
-    connection = await store.acknowledge_version(session, connection.id)
+    connections_qs = GraphConnectionQuerySet()
+    connection = await connections_qs.acknowledge_version(session, connection.id)
     await emit_event(
         session,
         action=event_actions.CONNECTION_VERSION_ACKNOWLEDGE,
@@ -245,8 +245,8 @@ async def declare_connection_version(
     profile = load_profile(connection.connector_class)
     version = Version.parse(payload.server_version)
     new_status = profile.compatibility(version) if profile else CompatibilityStatus.UNKNOWN
-    store = GraphConnectionQuerySet()
-    await store.set_version(
+    connections_qs = GraphConnectionQuerySet()
+    await connections_qs.set_version(
         session,
         connection.id,
         server_version=payload.server_version,
@@ -264,7 +264,7 @@ async def declare_connection_version(
         trace_id=current_trace_id(),
     )
     await session.commit()
-    connection = await store.get(session, connection.id)
+    connection = await connections_qs.get(session, connection.id)
     return _build_connection_read(connection)
 
 
@@ -371,7 +371,11 @@ async def get_contention(
     same question.
     """
     runtime = getattr(request.app.state, "task_runtime", None)
-    snapshot = runtime.contention(graph.id) if runtime is not None else {"running": [], "queued": []}
+    snapshot = (
+        runtime.contention(graph.id, graph.pools or {})
+        if runtime is not None
+        else {"running": [], "queued": [], "pools": []}
+    )
     return ContentionRead(
         ceiling=graph.max_concurrent_runs,
         policy=graph.concurrency_policy,
@@ -379,4 +383,9 @@ async def get_contention(
         queued=snapshot["queued"],
         running_count=len(snapshot["running"]),
         queued_count=len(snapshot["queued"]),
+        # Configured on the Graph, in use in the process — so a pool nobody has
+        # touched still lists, with `in_use: 0`. A pool that appeared only once
+        # it was busy would make *is this Graph stalled on connections?* a
+        # question nobody could answer in the quiet case (CC8).
+        pools=snapshot.get("pools", []),
     )

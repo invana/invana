@@ -14,6 +14,7 @@ import {
 	Library,
 	ListTree,
 	Settings,
+	Shield,
 	Wand2,
 } from "lucide-react";
 
@@ -71,6 +72,13 @@ const VIEW_SECTIONS: SectionMeta[] = [
 	// from what served — so it is Library's third drawer rather than a place you
 	// go. It is the same rule G14 applies to Stitches.
 	{ key: "library", label: "Library", icon: Library },
+	// **Govern is its own item** (GV17) — worlds and guardrails, not a tab of
+	// Settings. A guardrail belongs beside the worlds it bounds, and the two are
+	// one record (GV1); putting it in Settings would file *what may participate*
+	// with the connection string. It sits immediately before Agents because an
+	// agent binds a world, so the bound is read before the thing that runs
+	// inside it.
+	{ key: "govern", label: "Govern", icon: Shield },
 	{ key: "agents", label: "Agents", icon: Bot },
 ];
 

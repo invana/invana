@@ -128,6 +128,13 @@ class GraphVersionQuerySet(VersionScopedQuerySet):
         if source is None:
             return
 
+        # The declared axes travel with the shape they describe. A published
+        # version that lost them would silently stop being sliceable, and every
+        # world narrowing it would start refusing — the failure would look like
+        # a governance bug rather than a lost column
+        # (docs/for-developers/modules/connect-and-model/features/domain-models.md DM6).
+        target.axes = dict(source.axes or {})
+
         # Clone property keys first (types and mappings depend on them)
         for pk in source.property_keys:
             await self.property_keys.create_property_key(

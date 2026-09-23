@@ -14,81 +14,108 @@
  * Nothing here writes (IW3). Loading is CLI and API only (BD6).
  */
 
-import { type RunRow, useRunsJournalQuery } from "@/hooks/queries/useRuns";
-import { formatRelativeTime } from "@/lib/time";
-import { WorkRow } from "@/pages/graphs-detail/shared/WorkRow";
-import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
-import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
-import { EmptyState, Spinner } from "@invana/ui";
-
-const STATUSES: readonly string[] = [
-	"running",
-	"succeeded",
-	"failed",
-	"cancelled",
-];
+import type { JournalRow } from "@/hooks/queries/useRuns";
+import { useTicker } from "@/hooks/useTicker";
+import { formatCompact } from "@/lib/format";
+import { formatElapsed, formatRelativeTime } from "@/lib/time";
+import { EmptyState, RunRow, Spinner } from "@invana/ui";
 
 /**
- * The journal body — everything the Runs drawer draws, minus its chrome.
+ * The journal body — the rows, and nothing else.
  *
- * It is a **drawer body**, not a panel: `Runs` is the first drawer of the Tasks
- * stack, and the drawer draws the title, the count, the search and the filter
- * above it (graph-detail-page.md G32 · G33).
+ * It is a **drawer body**, not a panel: the Runs drawer draws the title, the
+ * count, the search, the funnel and the chip row it opens above it, and the panel draws the status bar
+ * below (graph-detail-page.md G32 · G33). The rows are read once, by the panel,
+ * because the header count and the status bar read them too.
  *
  * Its drill-in is the URL's (`&run=`), because a drawer's detail replaces that
  * drawer's body and has to survive a reload like any other region (G31).
  */
 export interface ImportsJournalBodyProps {
-	username: string;
-	graphSlug: string;
+	rows: JournalRow[];
+	isLoading: boolean;
 	/** The run whose detail replaces the list, from `&run=`. */
 	runId: string | null;
 	onOpenRun: (id: string | null) => void;
-	/** The status the drawer's funnel is filtering on. */
-	status: string | null;
+	/** A chip or the search is narrowing the list — words the empty state. */
+	narrowed: boolean;
 }
 
 export function ImportsJournalBody({
-	username,
-	graphSlug,
-	status,
+	rows,
+	isLoading,
+	runId,
 	onOpenRun,
+	narrowed,
 }: ImportsJournalBodyProps) {
-	const journal = useRunsJournalQuery(username, graphSlug, { status });
 	return (
 		<Journal
-			rows={journal.rows}
-			isLoading={journal.isLoading}
-			status={status}
+			rows={rows}
+			isLoading={isLoading}
+			selectedId={runId}
+			narrowed={narrowed}
 			onOpenRun={onOpenRun}
 		/>
 	);
 }
 
 /**
- * The statuses the journal filters on, offered by the Runs drawer's funnel.
+ * The **short id** — the last eight characters, quoted the way a commit is
+ * ([SR45](docs/for-developers/modules/operate/features/see-what-ran.md)).
+ *
+ * A run is the noun every other surface names — a log line, `GET …/runs/{id}`,
+ * a support thread — so a journal nobody can quote from forces a drill-in just
+ * to copy one id.
  */
-export const IMPORT_STATUSES = STATUSES;
+function shortRunId(id: string): string {
+	return id.replace(/-/g, "").slice(-8);
+}
 
 /**
- * The line under a row: what the run has done, then when.
+ * The run's own clock, in milliseconds — `null` before it starts (SR34).
  *
- * `Execute 5/7` is the furthest step that is not merely queued, which is the
- * one fact a reader scanning a journal wants from a run still in flight. It
- * reads the same for a load, because a load is a run: `Write 2/4`.
+ * Measured from `started_at`, not from `queued_at`: a run that sat in the
+ * queue for a minute did not take a minute. A run still going is measured
+ * against `now`, which is why the journal holds a ticker.
  */
-function runLine(row: RunRow): string {
+function elapsedOf(row: JournalRow, now: number): number | null {
+	const started = row.run.started_at;
+	if (!started) return null;
+	const end = row.run.finished_at ? Date.parse(row.run.finished_at) : now;
+	return Math.max(0, end - Date.parse(started));
+}
+
+/**
+ * The line under a row, after its id: the plan, what the run spent, then when
+ * it was opened.
+ *
+ * `nl-query@5 · 2m 51s · 21.4k · 9/9 · 4 mins ago` (SR45). Each fact drops out
+ * when nobody recorded it rather than reading as zero (SR34) — a load spends
+ * no tokens, and a queued run has no elapsed.
+ *
+ * `9/9` is a **position**, not a percentage: a plan can replan, and a count
+ * that goes backwards is worse than no count. The step's *label* is not here —
+ * *which* step it is on is what the drill-in answers.
+ */
+function runLine(row: JournalRow, now: number): string {
 	const t = row.run;
-	const progress =
-		t.steps_total > 0
-			? `${t.step_label ?? "Queued"} ${t.steps_done}/${t.steps_total}`
-			: (t.step_label ?? "Queued");
-	const when = row.startedAt ? formatRelativeTime(new Date(row.startedAt)) : "";
-	const served = t.served && t.served !== "yes" ? ` · served ${t.served}` : "";
+	const parts: string[] = [row.plan];
+
+	const elapsed = elapsedOf(row, now);
+	if (elapsed !== null) parts.push(formatElapsed(elapsed));
+
+	const tokens = (t.tokens_in ?? 0) + (t.tokens_out ?? 0);
+	if (tokens > 0) parts.push(formatCompact(tokens));
+
+	if (t.steps_total > 0) parts.push(`${t.steps_done}/${t.steps_total}`);
+
+	if (t.served && t.served !== "yes") parts.push(`served ${t.served}`);
 	// A bulk load validated nothing, and the row says so rather than letting it
 	// read like a checked one (IW11).
-	const unaudited = row.kind === "bulk" ? " · bulk, unvalidated" : "";
-	return [progress + served + unaudited, when].filter(Boolean).join(" · ");
+	if (row.kind === "bulk") parts.push("bulk, unvalidated");
+
+	if (row.startedAt) parts.push(formatRelativeTime(new Date(row.startedAt)));
+	return parts.join(" · ");
 }
 
 /**
@@ -100,94 +127,82 @@ function runLine(row: RunRow): string {
 function Journal({
 	rows,
 	isLoading,
-	status,
+	selectedId,
+	narrowed,
 	onOpenRun,
 }: {
-	rows: RunRow[];
+	rows: JournalRow[];
 	isLoading: boolean;
-	/** Only to word the empty state — the control itself is the drawer's funnel (G33). */
-	status: string | null;
+	selectedId: string | null;
+	/** Only to word the empty state — the controls are the chips above (G33). */
+	narrowed: boolean;
 	onOpenRun: (id: string) => void;
 }) {
 	const live = rows.filter((row) => isLive(row.status)).length;
+	// A running run's elapsed has to move on its own — nothing refetches this
+	// list every second. No live row, no timer.
+	const now = useTicker(live > 0);
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex-1 overflow-y-auto">
-				{isLoading ? (
-					<div className="p-4">
-						<Spinner />
-					</div>
-				) : rows.length === 0 ? (
-					// Empty because nothing has run, not because something is
-					// broken — so the empty state is the command, not an apology.
-					<EmptyState
-						className="p-4"
-						title={status ? `No ${status} runs` : "Nothing has run yet"}
-						description={
-							status ? (
-								"Nothing in this Graph finished that way."
-							) : (
-								<>
-									Invana is the destination. Whatever already extracts your data
-									writes a folder, then calls{" "}
-									<code className="font-mono text-xs">
-										invana records import --model &lt;name&gt;
-									</code>
-									. A run appears here the moment it starts.
-									<span className="mt-2 block">
-										<code className="font-mono text-xs">invana loader</code> is
-										the fast path — pass{" "}
-										<code className="font-mono text-xs">
-											--graph &lt;username&gt;/&lt;slug&gt;
-										</code>{" "}
-										and its load appears here too, marked as the bulk load it
-										is.
-									</span>
-								</>
-							)
+		<div className="min-h-0 flex-1 overflow-y-auto">
+			{isLoading ? (
+				<div className="p-4">
+					<Spinner />
+				</div>
+			) : rows.length === 0 ? (
+				// Empty because nothing has run, not because something is
+				// broken — so the empty state is the command, not an apology.
+				<EmptyState
+					className="p-4"
+					title={narrowed ? "No runs match" : "Nothing has run yet"}
+					description={
+						narrowed ? (
+							"Nothing in this Graph matches these filters."
+						) : (
+							<>
+								Invana is the destination. Whatever already extracts your data
+								writes a folder, then calls{" "}
+								<code className="font-mono text-sm">
+									invana records import --model &lt;name&gt;
+								</code>
+								. A run appears here the moment it starts.
+								<span className="mt-2 block">
+									<code className="font-mono text-sm">invana loader</code> is
+									the fast path — pass{" "}
+									<code className="font-mono text-sm">
+										--graph &lt;username&gt;/&lt;slug&gt;
+									</code>{" "}
+									and its load appears here too, marked as the bulk load it is.
+								</span>
+							</>
+						)
+					}
+				/>
+			) : (
+				rows.map((row) => (
+					// The status is the glyph, not a word (SR65). A run that
+					// succeeded but served only part of an answer says so by
+					// shape as well as on line two.
+					<RunRow
+						key={row.id}
+						status={row.status}
+						state={
+							row.status === "succeeded" && row.run.served === "partial"
+								? ("alert" as const)
+								: undefined
 						}
+						title={row.title}
+						titleMono={row.isQuery}
+						address={shortRunId(row.id)}
+						meta={runLine(row, now)}
+						selected={row.id === selectedId}
+						onSelect={() => onOpenRun(row.id)}
 					/>
-				) : (
-					rows.map((row) => (
-						<WorkRow
-							key={row.id}
-							onClick={() => onOpenRun(row.id)}
-							tone={toneFor(row.status)}
-							live={isLive(row.status)}
-							title={row.title}
-							subtitle={<span className="truncate">{runLine(row)}</span>}
-							status={row.status}
-							statusTone={toneFor(row.status)}
-						/>
-					))
-				)}
-			</div>
-
-			<PanelStatusBar
-				left={<StatusCrumb active>Runs</StatusCrumb>}
-				middle={
-					live
-						? [
-								<StatusCount key="live" tone="running">
-									{live} running
-								</StatusCount>,
-							]
-						: []
-				}
-				right="loading is CLI and API"
-			/>
+				))
+			)}
 		</div>
 	);
 }
 
 const isLive = (status: string): boolean =>
 	status === "queued" || status === "running";
-
-/** A run's status, in the shared vocabulary (statusTone.ts). */
-function toneFor(status: string | null): Tone {
-	if (status === "failed") return "error";
-	if (status === "running") return "running";
-	if (status === "succeeded") return "success";
-	return "muted";
-}

@@ -53,7 +53,6 @@ async def spawn_agent(ctx: TaskContext, v: RunVars) -> Out:
                 "allow": args.get("allow"),
                 "skill_ids": args.get("skill_ids"),
                 "budget": args.get("budget"),
-                "llm_config_id": args.get("llm_config_id"),
             },
             lifetime=str(args.get("lifetime") or "ephemeral"),
         )
@@ -215,7 +214,6 @@ ENTRIES = build(
             "allow": Arg(Type.list_),
             "skill_ids": Arg(Type.list_),
             "budget": Arg(Type.obj),
-            "llm_config_id": Arg(Type.str_),
             "lifetime": Arg(Type.str_, default="ephemeral"),
         },
         outputs={"agent_id": Type.str_, "name": Type.str_, "depth": Type.int_},

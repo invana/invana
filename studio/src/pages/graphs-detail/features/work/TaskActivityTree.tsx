@@ -7,35 +7,51 @@
  * - **The `on behalf of` line under every agent row.** It is written by the
  *   engine from the root run, never from task input — so it is the one
  *   thing in the tree a prompt cannot influence.
- * - **Skills are labelled by certainty.** *offered* is a fact about the prompt;
- *   *reported* is the model's own claim, and the badge says so. Nothing here
- *   says "used" (docs/for-developers/modules/work/spec.md).
+ * - **Skills and rules are labelled by certainty.** *offered* is a fact about
+ *   the prompt; *reported* / *cited* is the model's own claim, and the badge
+ *   says so. Nothing here says "used" (docs/for-developers/modules/work/spec.md).
+ *   A rule is drawn as its statement and opens its board (RU12).
  */
 
+import { StepRules } from "@/pages/graphs-detail/features/work/StepRules";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 import type { ActivityNode } from "@/types/work";
 import { cn } from "@invana/ui";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-export function TaskActivityTree({ nodes }: { nodes: ActivityNode[] }) {
+export interface TaskActivityTreeProps {
+	nodes: ActivityNode[];
+	/** A cited statement opens its rule's board (RU11 · RU12). */
+	onOpenRule?: (ruleId: string) => void;
+}
+
+export function TaskActivityTree({ nodes, onOpenRule }: TaskActivityTreeProps) {
 	if (!nodes.length) {
 		return (
-			<p className="p-4 text-sm text-muted-foreground">
+			<p className="p-4 text-base text-muted-foreground">
 				Nothing has happened on this task yet.
 			</p>
 		);
 	}
 	return (
-		<div className="py-1 font-mono text-sm leading-relaxed">
+		<div className="py-1 font-mono text-base leading-relaxed">
 			{nodes.map((node) => (
-				<Row key={node.id} node={node} depth={0} />
+				<Row key={node.id} node={node} depth={0} onOpenRule={onOpenRule} />
 			))}
 		</div>
 	);
 }
 
-function Row({ node, depth }: { node: ActivityNode; depth: number }) {
+function Row({
+	node,
+	depth,
+	onOpenRule,
+}: {
+	node: ActivityNode;
+	depth: number;
+	onOpenRule?: (ruleId: string) => void;
+}) {
 	const [open, setOpen] = useState(true);
 	const hasChildren = node.children.length > 0;
 	const Chevron = open ? ChevronDown : ChevronRight;
@@ -91,13 +107,13 @@ function Row({ node, depth }: { node: ActivityNode; depth: number }) {
 
 					{/* The line that makes the trace worth reading. */}
 					{node.on_behalf_of_name ? (
-						<div className="text-sm text-muted-foreground">
+						<div className="text-base text-muted-foreground">
 							on behalf of {node.on_behalf_of_name}
 						</div>
 					) : null}
 
 					{node.skills_offered.length ? (
-						<div className="flex flex-wrap gap-1 text-sm">
+						<div className="flex flex-wrap gap-1 text-base">
 							{node.skills_offered.map((skill) => {
 								const reported = node.skills_applied.includes(skill);
 								return (
@@ -115,7 +131,7 @@ function Row({ node, depth }: { node: ActivityNode; depth: number }) {
 									>
 										{skill}
 										{reported ? (
-											<span className="ml-0.5 text-sm text-emerald-600 dark:text-emerald-400">
+											<span className="ml-0.5 text-base text-emerald-600 dark:text-emerald-400">
 												✓reported
 											</span>
 										) : null}
@@ -124,12 +140,24 @@ function Row({ node, depth }: { node: ActivityNode; depth: number }) {
 							})}
 						</div>
 					) : null}
+
+					{/* The other pair, and the same two certainties (RU12). */}
+					<StepRules
+						offered={node.rules_offered}
+						cited={node.rules_cited}
+						onOpenRule={onOpenRule}
+					/>
 				</div>
 			</div>
 
 			{open && hasChildren
 				? node.children.map((child) => (
-						<Row key={child.id} node={child} depth={depth + 1} />
+						<Row
+							key={child.id}
+							node={child}
+							depth={depth + 1}
+							onOpenRule={onOpenRule}
+						/>
 					))
 				: null}
 		</div>

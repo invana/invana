@@ -15,7 +15,13 @@ from invana.apps.llm_providers.models import LLMCredentialKind, LLMProviderKind
 
 
 class _Provider:
-    """The two attributes pricing reads. Not a row: no rule here touches a database."""
+    """The attributes pricing reads off an endpoint. Not a row: no rule here
+    touches a database.
+
+    ``pricing`` is the model's own rate and ``guardrails`` the whole endpoint's
+    — two sources now that the model is a row of its own
+    ([PM13](docs/for-developers/modules/agents/features/providers-and-models.md)).
+    """
 
     def __init__(
         self,
@@ -23,11 +29,13 @@ class _Provider:
         model_id: str,
         guardrails: dict | None = None,
         credential_kind: LLMCredentialKind | None = None,
+        pricing: dict | None = None,
     ) -> None:
         self.provider = kind
         self.model_id = model_id
         self.guardrails = guardrails
         self.credential_kind = credential_kind
+        self.pricing = pricing or {}
 
 
 def test_a_published_model_is_priced_on_its_family_prefix() -> None:
@@ -63,6 +71,26 @@ def test_a_providers_own_rate_wins_and_a_broken_one_is_ignored() -> None:
 
     half_filled = _Provider(LLMProviderKind.anthropic, "claude-sonnet-4", {"pricing": {"input_per_mtok": 1.0}})
     assert rate_for(half_filled).input_per_mtok == 3.0  # falls back to the published list
+
+
+def test_the_models_own_rate_is_narrower_than_the_endpoints() -> None:
+    """Narrowest first — and a blank model rate falls through rather than
+    overriding the endpoint's with nothing."""
+    negotiated = _Provider(
+        LLMProviderKind.anthropic,
+        "claude-sonnet-4",
+        guardrails={"pricing": {"input_per_mtok": 2.0, "output_per_mtok": 2.0}},
+        pricing={"input_per_mtok": 0.5, "output_per_mtok": 0.5},
+    )
+    assert cost_usd(negotiated, 1_000_000, 1_000_000) == pytest.approx(1.0)
+
+    blank_model_rate = _Provider(
+        LLMProviderKind.anthropic,
+        "claude-sonnet-4",
+        guardrails={"pricing": {"input_per_mtok": 2.0, "output_per_mtok": 2.0}},
+        pricing={},
+    )
+    assert cost_usd(blank_model_rate, 1_000_000, 1_000_000) == pytest.approx(4.0)
 
 
 def test_the_agent_sdk_prices_as_the_vendor_it_reaches_unless_it_is_a_subscription() -> None:

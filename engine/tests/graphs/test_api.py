@@ -17,7 +17,7 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
-from invana.apps.llm_providers.models import LLMProvider, LLMProviderKind
+from invana.apps.llm_providers.models import LLMModel, LLMProvider, LLMProviderKind
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
@@ -109,17 +109,20 @@ class TestGraphsAPI:
         """
         graph = await _create_graph(client, "derived")
         async with session_factory() as s:
-            s.add(
-                LLMProvider(
-                    graph_id=graph["id"],
-                    provider=LLMProviderKind.anthropic,
-                    model_id="claude-opus-5",
-                    api_key_encrypted=b"x",
-                    is_default=True,
-                    last_ping_at=datetime.now(UTC),
-                    last_ping_ok=True,
-                )
+            # One endpoint offering one model: with no cast authored, that is
+            # what the shipped cast resolves and what the gate reads (PM16).
+            provider = LLMProvider(
+                graph_id=graph["id"],
+                name="anthropic",
+                provider=LLMProviderKind.anthropic,
+                api_key_encrypted=b"x",
+                guardrails={},
+                last_ping_at=datetime.now(UTC),
+                last_ping_ok=True,
             )
+            s.add(provider)
+            await s.flush()
+            s.add(LLMModel(provider_id=provider.id, model_id="claude-opus-5", capabilities={}, pricing={}))
             await s.commit()
 
         detail = (await client.get(f"/api/v1/u/{owner.username}/derived")).json()
