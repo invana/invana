@@ -81,7 +81,7 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 
 | Thing | Shape |
 |---|---|
-| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `budget` · `policy` · **`lens_id`** |
+| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · **`soul`** · `budget` · `policy` · **`lens_id`** |
 | **Dropped** | `llm_config_id` — an agent binds no provider ([PM1](providers-and-models.md)) |
 | `lens_id` | FK `lenses` **`ON DELETE RESTRICT`**, nullable. Null = *Everything*, inside the guardrails |
 | The cast | read **through** `lens_id`, never stored on the agent. Resolution: [govern § 2](../../govern/spec.md) |
@@ -108,11 +108,12 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | AG11 | **On the meter, absent is not zero.** An agent whose runs carry no `cost_usd` is left out of `spend_this_month` entirely, and the row says nothing rather than `$0.00`: a subscription endpoint is not metered per token, so *nothing spent* and *nothing known* are different facts ([OB4](../../operate/features/observability.md)). The window is the calendar month, because that is the one `max_cost_usd_month` names — a rolling thirty days would draw a different number from the ceiling beside it. |
 | AG10 | **A guardrail is refused as an agent's bound.** It is already in force on every run this agent opens ([GR1](../../govern/features/guardrails.md)), so binding one here would read as a second bound that changes nothing. The refusal names the guardrail and says to pick a world. |
 | AG12 | **The word is *agents*, and *roster* is retired.** A drawer is named for the rows it holds, and the rows are agents — the same rule that makes `Projects` › `Projects` and `Skills` › `Skills` read straight ([G33](../../../building-studio/graph-detail-page.md)). *Roster* named the table an agent lands in, and a table's name is not what a person reads, so it is gone from the label, from the drawer id (`?drawer=agents`), from this file's own slug, and from the engine and Studio comments that carried it. An old `?drawer=roster` link still lands here: an unknown drawer falls to the first one, and this is the first one. Where *roster* meant the skills an agent carries, the word is **bindings** ([BN8](../../skills/features/bindings.md)) — one word was doing two jobs. |
+| AG13 | **An agent's `instructions` reach its prompts, after the Graph's.** Understand and Translate read `graphs.instructions` and then the agent's own, so one agent can be told *EU carriers only* without the Graph being told. Who the agent *is* is its [soul](soul.md), a separate field that never reaches Translate ([SO5](soul.md#decisions)). |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Agent personas or avatars | an agent is a bounded principal, not a character |
+| Agent avatars | an agent's character is its [soul](soul.md) — how it writes, not a face |
 | Cloning an agent with its history | authoring from the same template is the honest path |
 | Cross-Graph agents | the Graph is the reasoning boundary |

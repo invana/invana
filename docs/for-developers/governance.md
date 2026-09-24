@@ -130,7 +130,7 @@ a slug, and the slug is what appears in an address.
 |---|---|---|---|
 | graph data | `graph_data` | `model` · `stitch` · `dataset` | `graph_data/model/Observations@v2` |
 | llm | `llm` | one per **provider** | `llm/anthropic/claude-opus-5` |
-| third party | `third_party` | `api` · `app` · `db` · `agent` | `third_party/api/clearbit.com/v2/companies` |
+| third party | `third_party` | `api` · `app` · `db` · `agent` · `internet` | `third_party/api/clearbit.com/v2/companies` |
 | cache | `cache` | — | `cache/answer` |
 | human | `human` | `person` · `role` | `human/role/analyst` |
 | agent | `agent` | — the spine | none |

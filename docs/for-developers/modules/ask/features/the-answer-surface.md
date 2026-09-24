@@ -93,7 +93,7 @@ chose the rendering.
 | AS1 | An answer is a sequence of typed emissions, not a text blob. |
 | AS2 | The producing step declares the kind. |
 | AS3 | Every emission cites its query and records. |
-| AS4 | Prose may state only what a record supports. |
+| AS4 | Prose may state only what a record supports — or, where a world allows it, a third-party claim badged with its source ([BG3](beyond-the-graph.md#decisions)). The [Answer step](the-answer-in-words.md) is what writes it. |
 | AS5 | A subgraph adds to the canvas; it never replaces it. |
 | AS6 | Every emission carries a header: its kind, the template rendering it, and the link to its citation. |
 | AS7 | An empty emission is a sentence in the reading order — "the graph does not hold this" — never an empty table or a zeroed chart. |
@@ -114,7 +114,7 @@ chose the rendering.
 
 | Not building | Because |
 |---|---|
-| A summary paragraph over the emissions | it would restate without citing, which is the failure mode we are avoiding |
+| An uncited summary paragraph over the emissions | it would restate without citing; the [Answer step](the-answer-in-words.md) writes prose only claim by claim, each cited |
 | Freeform markup from the model | rendering belongs to a template |
 | Cross-answer aggregation | comparing runs is what a schedule's timeline is for |
 

@@ -174,7 +174,7 @@ flowchart TD
 |---|---|
 | Stances that carry their own tools, keys or permissions | that is an Agent ([AA1](#decisions)) |
 | A generated persona ("act as a 19th-century botanist") | a stance's value is its *declared* assumptions; one invented at ask time declares nothing and cannot be argued with |
-| Personality, tone or character settings | the register belongs to the product, not to a costume |
+| Personality, tone or character settings on a stance | a stance is a method, not a register; who is speaking is the agent's soul ([5.8](../../agents/features/soul.md)) |
 | Blended stances | [AA8](#decisions) |
 | A stance that can add a step to the plan catalogue | the catalogue is the runtime's ([3.9](runtime-and-adapters.md)); a method chooses among steps, it does not invent them |
 | Auto-applied stances by question type | it would make the method invisible again, which is the thing this feature exists to fix |

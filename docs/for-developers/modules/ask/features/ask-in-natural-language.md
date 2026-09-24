@@ -33,6 +33,7 @@ flowchart TD
     B -->|ambiguous| C[Ask back · a closed question]
     C --> B
     B -->|nothing in the graph could answer| D[Cannot answer, and why]
+    B -->|small talk · about Invana| V[Converse · a line in the agent's voice]
     B --> E[Plan · template or generated]
     E --> F[Translate against the global model]
     F --> G{Valid?}
@@ -41,7 +42,8 @@ flowchart TD
     G -->|yes| I[Execute]
     I --> J[Project · emissions through a template]
     J --> K[Verify: did it serve the intent?]
-    K --> L[Answer with citations]
+    K --> W[Answer step · cited words, in the agent's voice]
+    W --> L[Answer with citations]
 ```
 
 ## Seams
@@ -124,11 +126,12 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 | NL9 | **The grounding block is cut by the lens as well as by egress.** A type the run's `QueryLens` does not allow is not listed, a property it excludes is not listed on its type, and a stitch naming either is not listed. Telling the model about something the lens will refuse turns a clean *cannot answer* into a refused query. Descriptions travel with the thing they describe and under its class — a type's under `type_names`, a property's under `property_names` — so the closed egress set gains no class. |
 | NL10 | **Every LLM step records its exchange, whatever it concluded.** A *cannot answer* or a clarification from Understand keeps `prompt` and `completion` on `output` like an answer does ([SR42](../../operate/features/see-what-ran.md#decisions)). The prompt is the evidence for the judgement: without it, *the graph holds no runway length* cannot be told apart from *the prompt never mentioned `longest`*. |
 | NL11 | **A session's earlier turns go with every ask, and are cut by part, never whole.** A follow-up — *load them on canvas*, *only the top 5* — means nothing without the ask and the query before it, so the last 20 turns are always carried. What a turn holds is the ask, the query and its rationale; it never holds rows. So `property_values` governs only what can carry a value — a quoted literal in a query or a clarification is sent as `'…'`, and a rationale is dropped — and the ask and the query's shape still go. Dropping the whole transcript for a literal it might contain turned every governed session into a string of unrelated asks. Gremlin names its labels in quotes too, so under the cut its labels are masked with the values; the ask still carries what was meant. |
+| NL12 | **Small talk is conversed with, never refused.** *How are you*, *thanks*, *what can you do?* are not data questions, and *cannot answer · outside this graph* is the wrong outcome for them. Understand's fourth outcome, `converse`, replies in one or two lines in the agent's voice ([5.8](../../agents/features/soul.md)) and points at something this graph could answer. It runs no plan and no query, writes no emission, cites nothing and claims nothing about the data; the reply is the assistant message itself, drawn as a message and never as a cannot-answer. |
 
 ## Not building
 
 | Not building | Because |
 |---|---|
-| Answers blended with the model's own knowledge | the claim is grounding, and blending breaks it |
+| Answers blended with the model's own knowledge, unmarked | the claim is grounding; knowledge from beyond the graph comes only where a world allows it, badged third-party ([3.13](beyond-the-graph.md)) |
 | Conversational memory inside one run | context is assembled per run, from rules, skills and the graph |
 | Automatic follow-up questions | a follow-up is the user's move |

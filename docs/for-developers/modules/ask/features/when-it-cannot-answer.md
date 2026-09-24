@@ -91,6 +91,7 @@ flowchart TD
 | CA7 | Retry and repair are shown where they happened, on the step, and never as a message in the thread. |
 | CA8 | The run records `outcome` — `answered · cannot_answer · failed · cancelled` — beside its `status`. A run that finished cleanly having found nothing is *succeeded* and *cannot_answer*, and those are not the same claim. |
 | CA9 | A cannot-answer is drawn calmly: dashed border, no colour of alarm. A diagnosis is drawn as a fault, with its evidence foldable underneath. Their shapes differ before a word is read. |
+| CA10 | **A cannot-answer is written in the agent's voice.** It still names what is missing (CA3) and is still drawn calmly (CA9); the soul chooses only the words ([SO4](../../agents/features/soul.md#decisions)), and every reply ends with something the reader can ask instead. |
 
 ## Not building
 

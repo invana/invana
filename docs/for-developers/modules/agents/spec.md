@@ -24,7 +24,8 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 | Noun | Is | Is not |
 |---|---|---|
-| **Agent** | a principal that can be assigned work, carrying bindings, an envelope, a budget and a lens | a prompt, or a persona |
+| **Agent** | a principal that can be assigned work, carrying bindings, an envelope, a budget and a lens, and speaking with a soul | a prompt |
+| **Soul** | who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads ([5.8](features/soul.md)) | a permission · a stance |
 | **Provider** | a configured LLM endpoint on the Graph — a **participant**, addressed `llm/<name>/*`, holding the models it offers | the model name, and not something an agent binds |
 | **Cast** | the lens's map from a plan's **role** to a model address. It is what names the model an agent uses | a field on the agent |
 | **Envelope** | the static bounds: which callables, which pinned arguments, which ceilings | a runtime check |
@@ -56,7 +57,7 @@ each refuses with the bound named, and none of them is negotiable at run time.
 
 | Owns | Shape |
 |---|---|
-| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `budget` · `policy` · **`lens_id`** |
+| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `soul` · `budget` · `policy` · **`lens_id`** |
 | `agent_skills` | the bindings this agent carries — authored in [Skills](../skills/spec.md) |
 | Envelope · budget | on the agent: allowed callable keys, pinned arguments, cost · fan-out · clarification · replan · concurrency ceilings |
 | Lineage | `parent_agent_id` + `spawned_in_run_id` — retirement keeps the row so lineage resolves |

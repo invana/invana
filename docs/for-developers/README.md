@@ -9,7 +9,9 @@ per run, no external infrastructure. That runtime sits behind a protocol so a de
 swap in a job scheduler it already operates; none has been written, and the default is the only one.
 
 Every answer is grounded in the Graph and traceable to the records behind it; when the Graph cannot
-answer, it says so.
+answer, it says so. Anything from beyond it — the internet, another connected third-party source, or the model's own
+knowledge — comes only where a world allows it, and is badged **third-party** with the reference it
+came from.
 
 **This folder is for people building Invana.** It is the whole record of what the product does: one
 row per feature below, with the detail in [`modules/`](modules/) — a folder per module holding
@@ -77,6 +79,8 @@ governs.
 | 3.9 | [The runtime](modules/ask/features/runtime-and-adapters.md) | One asyncio task per run, in-process; a protocol so it can be swapped | ✅ | — | — | S9b |
 | 3.10 | [The assistant](modules/ask/features/the-assistant.md) | One assistant on the right of every panel, with the selection in hand | ✅ | — | ✅ | S12 |
 | 3.11 | [Act as](modules/ask/features/act-as.md) | A stance — a method and its declared assumptions — and the ledger of what the answer rests on | 🔵 | — | 🔵 | S-TBD |
+| 3.12 | [The answer, in words](modules/ask/features/the-answer-in-words.md) | A few cited sentences over the records, in the agent's voice — words first, records after | 🔵 | — | 🔵 | S-TBD |
+| 3.13 | [Beyond the graph](modules/ask/features/beyond-the-graph.md) | The internet — the first third-party source — and the model's own knowledge, where a world allows; badged third-party, with the reference | 🔵 | — | 🔵 | S-TBD |
 
 ## 4 · [Explore](modules/explore/spec.md)
 
@@ -104,6 +108,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |
 | 5.6 | [Who spawned whom](modules/agents/features/lineage.md) | Who authored whom, who spawned whom, on what run | ✅ | — | ✅ | S12c |
 | 5.7 | [How many run at once](modules/agents/features/concurrency-and-contention.md) | How many run at once in a Graph, the pools, and what happens at the ceiling | 🟡 | — | 🔵 | S12e · **S16** |
+| 5.8 | [Give an agent a soul](modules/agents/features/soul.md) | Who the agent is and how it speaks — Markdown on the agent, read only by the steps a person reads | 🔵 | — | 🔵 | S-TBD |
 
 ## 6 · [Skills](modules/skills/spec.md)
 
@@ -305,6 +310,7 @@ it governs ([Rules § 1](../../CLAUDE.md)).
 | 6 | **A retire offers no reassignment in Studio.** `RetireRequest.reassign_to_*` has been in the engine since the beginning and no surface sends it, so *reassign offered for each* is a promise nothing keeps | build the surface, or drop the promise from the Seams table | [5.5](modules/agents/features/lifecycle.md) |
 | 7 | **Nothing in the engine says `purged`.** [O6](modules/operate/spec.md) and [SR59](modules/operate/features/see-what-ran.md#decisions) both draw a retention-purged run as *purged, never empty* — and a purged row is indistinguishable from one that recorded nothing | record it (`purged_at` on `task_runs`, and the three documents answer `purged: true`), or drop the state from the drawing and say a purge deletes the row outright | [10.5](modules/operate/features/see-what-ran.md) · [Operate](modules/operate/spec.md) |
 | 8 | **`TaskArtifact` is a record the engine does not have.** [SR58](modules/operate/features/see-what-ran.md#decisions) addresses a step's files by digest and cites the record; what exists is the `artifacts` key inside `result.json`, with no table, no route and no bytes to `Open` or `Download` | build the record and a route that serves the bytes, or restate SR58 as a reading of `result.json` and drop the two actions from the band | [10.5](modules/operate/features/see-what-ran.md) · [orchestration §0](orchestration.md) |
+| 9 | **A third-party node's shape.** [BG7](modules/ask/features/beyond-the-graph.md#decisions) draws what a third-party source returns as nodes, and Keep writes them — but under which type? | a generic `Source` node (the page) linked `ABOUT` to the graph element it describes, which needs no model change · or a node of an existing model type (an `airport` the graph lacked), which needs the kept node to land in a published model version ([GV35](modules/govern/spec.md#4-cross-feature-decisions)) | [3.13](modules/ask/features/beyond-the-graph.md) · [14 Govern](modules/govern/spec.md) |
 
 **Not an open call, and previously mis-filed as one:** `cost_usd` being `null` on every LLM touch is
 [OB4](modules/operate/features/observability.md) working. The demo provider holds an OAuth token — a

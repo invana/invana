@@ -115,6 +115,7 @@ section a legend as well as a list.
 | SP10 | The Explorer panel is a `?panel` key, not the left column's resting state. No key means no left column: the canvas keeps the width, and the rail lights nothing. A panel that cannot be closed is a panel whose close control lies. |
 | SP11 | **Type counts are a run under the lens.** The panel's counts come from `count_types` (`graph_read`, trigger `canvas`): a type the lens denies is absent from the list, and every count is taken inside the slice. SP8's one-call rule holds — it is one step, not one call per label. |
 | SP9 | `SELECTED` is a section of the same stack, collapsible like the others — not a fixed detail area under them. It states the element short (id · summary · chips · provenance); the full property table is `InspectorPanel`, the right side's other occupant, which is where a reader who wants every field already is. |
+| SP10 | **A third-party element's provenance is its reference link.** Where a loaded element's provenance runs record → dataset → import run (SP4), a third-party one reads `third-party · <source>` → its reference — for the internet the link, title, source kind and when it was fetched; for any other source its locator; for the model the model and the run ([BG3](../../ask/features/beyond-the-graph.md#decisions)). Still one click. |
 
 ## Not building
 
