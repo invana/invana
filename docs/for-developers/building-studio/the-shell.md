@@ -22,11 +22,12 @@ one column:
 mainSection: {
   content: (
     <BoardPagesViewPanel
-      pages={pages}            // [{ id, title, icon, content }]
+      pages={pages}            // [{ id, title, icon, content, closable? }]
       activeId={activeId}
       onSelect={setActiveId}
       onAdd={addPage}
       pageMenuItems={[…]}      // rename · duplicate · remove, on the active tab's caret
+      onClose={closePage}      // the `×` on a closable page — a dashboard (graph-detail-page G46)
       headerActions={[…]}      // the left-panel and inspector toggles, pinned right
       className="h-full"
     />
@@ -307,7 +308,7 @@ The tab strip is what you have **open**; the URL names which one is **active**. 
 | `/u/:owner/:graph/<screen>` | the active page. Reload lands on it |
 | The open set | session state, per graph. It survives a reload the way open editors do |
 | `onSelect` | pushes a route; the router does not push a tab |
-| `pageMenuItems` remove | closes a page and routes to its neighbour |
+| `pageMenuItems` remove · `onClose` | closes a page and routes to its neighbour |
 
 A screen is therefore still addressable and still linkable — [code-shape.md §5](code-shape.md) is
 unchanged. What the strip adds is that opening a second screen does not throw the first one away.

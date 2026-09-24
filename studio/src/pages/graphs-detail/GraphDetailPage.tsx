@@ -2688,6 +2688,9 @@ export function GraphDetailPage() {
 					? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
 					: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
+			// A dashboard has nothing to rename, so its tab carries a close `×`
+			// instead of the Rename / Close menu.
+			closable: true,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
 			// `kind` and a `subjectId` they have no other use for (B6 · B21).
@@ -3111,6 +3114,7 @@ export function GraphDetailPage() {
 								// Until each canvas owns its own engine, only the active page is
 								// mounted — today's behaviour, now stated rather than emergent.
 								keepMounted={false}
+								onClose={closePage}
 								pageMenuItems={[
 									{
 										id: "rename",
