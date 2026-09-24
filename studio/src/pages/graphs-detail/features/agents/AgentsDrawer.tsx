@@ -317,11 +317,11 @@ function AgentsBody({
 
 			<div className="flex-1 overflow-y-auto">
 				{query.isLoading ? (
-					<div className="p-4">
+					<div className="px-3 py-4">
 						<Spinner />
 					</div>
 				) : rows.length === 0 ? (
-					<p className="p-4 text-base text-muted-foreground">
+					<p className="px-3 py-4 text-base text-muted-foreground">
 						{all.length
 							? "No agent matches those filters."
 							: "No agents yet. Every graph is seeded with Explorer, Query and Modeller — try refreshing."}

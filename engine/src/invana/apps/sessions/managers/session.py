@@ -314,6 +314,45 @@ class SessionManager:
         await session.flush()
         return user_msg, assistant_msg
 
+    async def open_operation(
+        self,
+        session: AsyncSession,
+        *,
+        sess: Session,
+        kind: str,
+        user_content: str,
+    ) -> tuple[SessionMessage, SessionMessage]:
+        """Open a canvas-operation turn **before** its run, still running (GC12).
+
+        The run's steps are queued under the reply, which is what lists it in
+        the session's Tasks tab; the interpreter settles the reply from the
+        run's own result when it ends — the turn *is* the run, so nothing here
+        writes an answer.
+        """
+        user_seq = await self.messages_qs.next_seq(session, session_id=sess.id)
+        user_msg = SessionMessage(
+            session_id=sess.id,
+            seq=user_seq,
+            role=SessionMessageRole.user,
+            content=user_content,
+            operation=kind,
+        )
+        assistant_msg = SessionMessage(
+            session_id=sess.id,
+            seq=user_seq + 1,
+            role=SessionMessageRole.assistant,
+            content="",
+            status=SessionMessageStatus.running,
+            operation=kind,
+            mode="ql",
+        )
+        await self.sessions_qs.add(session, user_msg)
+        await self.sessions_qs.add(session, assistant_msg)
+        sess.message_count += 2
+        sess.last_status = assistant_msg.status
+        await session.flush()
+        return user_msg, assistant_msg
+
     async def record_load(
         self, session: AsyncSession, *, sess: Session, payload: RecordOperation
     ) -> tuple[SessionMessage, SessionMessage]:

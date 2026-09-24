@@ -5,7 +5,7 @@
  * I read each world as **narrower than this** rather than as the whole bound.*
  *
  * **Not a component in the kit** ([panels.md §3](../../../../../docs/for-developers/building-studio/govern-and-agents-panels.md)):
- * it is `PanelBox` + `LayerChip` + a link, one composition used in one place.
+ * it is an `Eyebrow` + `LayerChip` + a link, closed by a rule over the list, one composition used in one place.
  *
  * **It states, and it does not offer.** Nothing here is pickable — a guardrail
  * is in force whatever world is chosen, and a row that highlighted on click
@@ -18,7 +18,7 @@
 import { ruleLayer } from "@/pages/graphs-detail/features/govern/narrowing";
 import type { Lens } from "@/types/govern";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
-import { Button, type Layer, LayerChip, PanelBox } from "@invana/ui";
+import { Button, Eyebrow, type Layer, LayerChip } from "@invana/ui";
 
 export interface GuardrailsStripProps {
 	guardrails: Lens[];
@@ -39,14 +39,16 @@ export function GuardrailsStrip({ guardrails, onRead }: GuardrailsStripProps) {
 	}
 
 	return (
-		<PanelBox
-			title="In force on every run"
-			aside={
-				guardrails.length === 1
-					? guardrails[0].display_name
-					: `${guardrails.length} guardrails`
-			}
-		>
+		<section className="flex min-w-0 flex-col gap-1 border-b border-border pb-2">
+			<Eyebrow
+				aside={
+					guardrails.length === 1
+						? guardrails[0].display_name
+						: `${guardrails.length} guardrails`
+				}
+			>
+				In force on every run
+			</Eyebrow>
 			<div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5 pt-1">
 				{counts.size ? (
 					[...counts].map(([layer, count]) => (
@@ -71,6 +73,6 @@ export function GuardrailsStrip({ guardrails, onRead }: GuardrailsStripProps) {
 					Read them
 				</Button>
 			</div>
-		</PanelBox>
+		</section>
 	);
 }

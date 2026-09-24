@@ -50,6 +50,20 @@
         "VITE_TELEMETRY_ENABLED": "true",
         "VITE_TELEMETRY_DEBUG": "false"
       }
+    },
+    {
+      "name": "Studio: Start Dev (local design-kit + canvas)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/studio",
+      "env": {
+        "VITE_API_BASE_URL": "http://localhost:8200",
+        "VITE_TELEMETRY_ENABLED": "true",
+        "VITE_TELEMETRY_DEBUG": "false",
+        "INVANA_DESIGN_KIT": "../../design-kit",
+        "INVANA_CANVAS": "../../canvas"
+      }
     }
   ]
 }

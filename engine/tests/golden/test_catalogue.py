@@ -26,7 +26,7 @@ CATALOGUE_DIR = Path(__file__).resolve().parents[2] / "src" / "invana" / "runtim
 #: The closed set's size. Growth belongs in reusable TaskPlans, not here — so
 #: changing this number is a decision, and the decision goes in
 #: `building-engine/task-model-migration.md` § 6.1 first.
-ENTRY_COUNT = 23
+ENTRY_COUNT = 28
 
 #: Modules that declare entries, and the one bound each of them names.
 BOUND_MODULES = {
@@ -81,6 +81,12 @@ class TestClosed:
             assert isinstance(entry.outputs, dict), key
             assert isinstance(entry.requires, tuple), key
             assert all(isinstance(t, Type) for t in entry.outputs.values()), key
+
+    def test_every_entry_says_what_it_does_in_one_line(self) -> None:
+        # The Catalogue drawer renders this and nothing else (the-catalogue.md CA2).
+        for key, entry in CATALOGUE.items():
+            assert entry.summary.strip(), f"{key} declares no summary"
+            assert "\n" not in entry.summary, f"{key}'s summary is not one line"
 
     def test_every_requires_names_an_entry_in_the_set(self) -> None:
         for key, entry in CATALOGUE.items():

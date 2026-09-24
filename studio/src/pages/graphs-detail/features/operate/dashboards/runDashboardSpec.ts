@@ -72,6 +72,8 @@ export const RUN_ACTIONS = {
 	retune: "retune",
 	/** Pick the second run, and open `compare:<a>:<b>` as a page (R3 · WO4). */
 	compare: "compare",
+	/** The layer strip's `Fit` switch — on fits the panel, off scrolls (SR69). */
+	layersFit: "layers-fit",
 } as const;
 
 export interface RunDashboardView {
@@ -91,6 +93,8 @@ export interface RunDashboardView {
 	touches?: TouchesResponse;
 	/** The world the run froze. Absent reads `Everything`, which is a real one. */
 	lensName?: string | null;
+	/** The layer strip fits the panel's width. Absent reads on. */
+	layersFit?: boolean;
 }
 
 /**
@@ -112,7 +116,7 @@ const FLOW_COLUMNS = 4;
 
 export function runDashboardSpec(
 	trace: TraceRead,
-	{ view, selectedKey, touches, lensName }: RunDashboardView,
+	{ view, selectedKey, touches, lensName, layersFit }: RunDashboardView,
 ): DashboardSpec<RunPanels> {
 	const groups = groupSteps(trace.steps);
 	const live = isLive(trace.status);
@@ -167,7 +171,15 @@ export function runDashboardSpec(
 		]),
 	};
 
-	const rows = bands(trace, groups, selected, selectedKey, touches, lensName);
+	const rows = bands(
+		trace,
+		groups,
+		selected,
+		selectedKey,
+		touches,
+		lensName,
+		layersFit ?? true,
+	);
 	const spec: DashboardSpec<RunPanels> = {
 		title: runTitle(trace),
 		header,
@@ -190,6 +202,7 @@ function bands(
 	selectedKey: string | null,
 	touches: TouchesResponse | undefined,
 	lensName: string | null | undefined,
+	layersFit: boolean,
 ): DashboardSpec<RunPanels>["rows"] {
 	return omit([
 		{ panels: [tiles(trace, groups)] },
@@ -200,7 +213,9 @@ function bands(
 		// performance band because *what grounded this* is read before *how long
 		// it took* — and absent entirely when nothing was recorded, so a run from
 		// before the lens does not grow two empty boxes (SR34).
-		touches ? { panels: [layerStrip(touches, trace, selectedKey)] } : null,
+		touches
+			? { panels: [layerStrip(touches, trace, selectedKey, layersFit)] }
+			: null,
 		touches ? { panels: [lensTiles(touches)] } : null,
 		touches ? { panels: [runLens(touches, lensName)] } : null,
 		groups.length
@@ -222,16 +237,23 @@ function layerStrip(
 	touches: TouchesResponse,
 	trace: TraceRead,
 	selectedKey: string | null,
+	layersFit: boolean,
 ): PanelSpec<RunPanels> {
-	const options = layersOptions(touches, trace.steps, {
-		selectedItem: selectedKey,
-		selectAction: RUN_ACTIONS.selectTouchStep,
-	});
+	const options = {
+		...layersOptions(touches, trace.steps, {
+			selectedItem: selectedKey,
+			selectAction: RUN_ACTIONS.selectTouchStep,
+		}),
+		// On, every step stays in the panel's width as it is resized; off, the
+		// bars keep a measurable width and the strip scrolls (SR69).
+		fit: layersFit,
+	};
 
 	return {
 		kind: "layers",
 		title: "What each step engaged",
 		aside: `${touches.total} touch${touches.total === 1 ? "" : "es"}`,
+		actions: [{ id: RUN_ACTIONS.layersFit, label: "Fit", pressed: layersFit }],
 		flush: true,
 		// Not an empty track. *Nothing was recorded* and *nothing was touched*
 		// are different facts, and an empty axis says the second while meaning

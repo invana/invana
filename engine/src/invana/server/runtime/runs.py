@@ -78,6 +78,10 @@ async def list_runs(
         default=False,
         description="Generated plans that served and were never promoted — the Promote picker's list.",
     ),
+    interactive: bool = Query(
+        default=False,
+        description="Include canvas and system runs — expansions, checks — which the journal hides by default.",
+    ),
     limit: int = Query(default=50, ge=1, le=200),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
@@ -99,6 +103,7 @@ async def list_runs(
         task_id=task_id,
         kind=kind,
         candidates=candidates,
+        interactive=interactive,
         limit=limit,
     )
     return TaskRunListResponse(items=items, total=total)

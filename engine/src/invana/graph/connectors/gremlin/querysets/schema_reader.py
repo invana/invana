@@ -3,6 +3,7 @@
 from invana.graph.connectors.base.decorators import not_supported_by_vendor
 from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReaderQuerySet
 from invana.graph.connectors.gremlin.query_builder import GremlinQueryBuilder
+from invana.graph.types.lens import QueryLens
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
@@ -28,6 +29,24 @@ class GremlinSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
         g = await self._connector.get_traversal_source()
         traversal = GremlinQueryBuilder.get_edge_labels(g)
         return await self._connector.execute_traversal(traversal)
+
+    async def get_node_label_counts(self) -> dict[str, int]:
+        return await self._group_counts(GremlinQueryBuilder.count_vertex_types)
+
+    async def get_edge_label_counts(self) -> dict[str, int]:
+        return await self._group_counts(GremlinQueryBuilder.count_edge_types)
+
+    async def _count_types_under(self, lens: QueryLens) -> tuple[dict[str, int], dict[str, int]]:
+        return (
+            await self._group_counts(GremlinQueryBuilder.count_vertex_types, lens),
+            await self._group_counts(GremlinQueryBuilder.count_edge_types, lens),
+        )
+
+    async def _group_counts(self, build, lens: QueryLens | None = None) -> dict[str, int]:
+        g = await self._connector.get_traversal_source()
+        result = await self._connector.execute_traversal(build(g, lens))
+        counts = result[0] if result else {}
+        return {str(label): int(n) for label, n in counts.items()}
 
     async def get_property_keys(self, label: str) -> list[str]:
         g = await self._connector.get_traversal_source()

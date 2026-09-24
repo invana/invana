@@ -25,7 +25,7 @@ export function PanelStatusBar({
 	right?: ReactNode;
 }) {
 	return (
-		<AppStatusBar end={right} className="shrink-0">
+		<AppStatusBar end={right} className="shrink-0 px-3">
 			{/* `AppStatusBar` puts everything it is given inside a single truncating
 			    span, so its own `gap-2` never reaches these. The group carries its
 			    own row and its own gap. */}

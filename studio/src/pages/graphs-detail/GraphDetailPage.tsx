@@ -12,6 +12,7 @@ import {
 import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
 import { useModelsQuery } from "@/hooks/queries/useModels";
 import { useActiveVersionQuery } from "@/hooks/queries/useSchema";
+import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
 import { useTaskMutations } from "@/hooks/queries/useWork";
 import { AgentsStackPanel } from "@/pages/graphs-detail/features/agents/AgentsStackPanel";
 import { AssistantPanel } from "@/pages/graphs-detail/features/ask/assistant/AssistantPanel";
@@ -292,6 +293,21 @@ function resultToItems(result: QueryResponse | null): QueryResultItem[] {
 		if (!edgeMap.has(id)) edgeMap.set(id, { ...e, type: "edge" });
 	}
 	return [...nodeMap.values(), ...edgeMap.values()];
+}
+
+/**
+ * What a failed expansion says. A refusal names what the world lacks, and a
+ * queued run says so — neither is "failed" (graph-canvas.md GC13).
+ */
+function expandRefusal(err: unknown): string {
+	const detail =
+		err instanceof ApiError && err.status === 409
+			? (err.detail as { error?: string; message?: string } | undefined)
+			: undefined;
+	if (detail?.error === "outside_lens" && detail.message) return detail.message;
+	if (detail?.error === "expand_queued")
+		return "This graph is busy — the expansion is queued behind other runs.";
+	return "Failed to load neighbours.";
 }
 
 export function GraphDetailPage() {
@@ -1035,47 +1051,73 @@ export function GraphDetailPage() {
 	// Paint the Explorer canvas from a saved canvas: repaint its snapshot and seed
 	// each node at its saved position (the force layout then only relaxes),
 	// mirroring the node-expand seeding path. Also restores the magnet toggle.
+	//
+	// The snapshot is checked against the graph **under the picked world** before
+	// anything is drawn (graph-canvas.md GC14). What is gone is kept and marked
+	// missing (GC5); what the world excludes comes back in neither list and is
+	// simply not drawn — the canvas is never told why. The saved snapshot is
+	// untouched, so clearing the world brings it back.
 	const paintFromCanvas = useCallback(
 		(c: Board) => {
-			const items = c.snapshot?.items ?? [];
-			setCanvasData(items);
+			const saved = c.snapshot?.items ?? [];
 			setSelectedId(null);
-			const seed = adaptItems(items);
-			for (const n of seed.nodes) {
-				const p = c.positions?.[n.id];
-				if (p) n.position = { x: p.x, y: p.y };
-			}
-			setSeedData(seed);
 			if (typeof c.settings?.magnet === "boolean") setMagnet(c.settings.magnet);
 			setStyling(c.styling ?? {});
 
-			// A canvas reopens from its own snapshot, and the graph may have moved
-			// on. What is gone is **kept and marked missing**, never dropped (GC5):
-			// a drawing that quietly loses a node is a drawing that lies about what
-			// was explored. One request for the whole canvas, on hydrate.
-			const vertexIds = items
-				.filter((i) => i.type === "vertex")
-				.map((i) => String(i.id));
-			if (!username || !graphSlug || vertexIds.length === 0) return;
-			void explorerApi
-				.resolveElements(username, graphSlug, vertexIds)
-				.then(({ missing }) => {
-					if (missing.length === 0) return;
-					setMissingIds(new Set(missing));
+			const paint = (items: QueryResultItem[], missing: string[]) => {
+				setCanvasData(items);
+				const seed = adaptItems(items);
+				for (const n of seed.nodes) {
+					const p = c.positions?.[n.id];
+					if (p) n.position = { x: p.x, y: p.y };
+				}
+				setSeedData(seed);
+				setMissingIds(new Set(missing));
+				if (missing.length > 0)
 					toast.warning(
 						`${missing.length} element${missing.length === 1 ? "" : "s"} on this canvas ${
 							missing.length === 1 ? "is" : "are"
 						} no longer in the graph — kept and marked.`,
 					);
+			};
+
+			const vertexIds = saved
+				.filter((i) => i.type === "vertex")
+				.map((i) => String(i.id));
+			if (!username || !graphSlug || vertexIds.length === 0) {
+				paint(saved, []);
+				return;
+			}
+			const lensId = activeWorld.lensId;
+			void explorerApi
+				.resolveElements(username, graphSlug, vertexIds, lensId)
+				.then(({ present, missing }) => {
+					const kept = new Set([...present, ...missing]);
+					paint(
+						saved.filter((i) =>
+							i.type === "vertex"
+								? kept.has(String(i.id))
+								: kept.has(String(i.source)) && kept.has(String(i.target)),
+						),
+						missing,
+					);
 				})
 				.catch(() => {
-					// A connection that is down is the connection's problem to report;
-					// it does not make the drawing wrong.
+					// A connection that is down does not make the drawing wrong — but
+					// under a world it cannot be checked, and an unchecked snapshot
+					// could show what the world excludes, so nothing is drawn.
+					if (lensId) {
+						paint([], []);
+						toast.error("This canvas could not be checked against the world.");
+					} else {
+						paint(saved, []);
+					}
 				});
 		},
 		[
 			username,
 			graphSlug,
+			activeWorld.lensId,
 			setCanvasData,
 			setSeedData,
 			setStyling,
@@ -1621,14 +1663,17 @@ export function GraphDetailPage() {
 	const expand = useExpandNode(username, graphSlug);
 	const runExpand = useCallback(
 		async (req: ExpandRequest): Promise<NeighborExpandResponse | null> => {
-			// Tag the expand with the active session so the engine logs it as a turn
-			// in that session's thread (docs/for-developers/modules/explore/features/boards.md). No session → just paints, no log.
-			const tagged = activeSessionId
-				? ({
-						...req,
-						body: { ...req.body, session_id: activeSessionId },
-					} as ExpandRequest)
-				: req;
+			// An expansion is a run under the canvas's lens (graph-canvas.md GC6 ·
+			// GC11): the picked world rides along exactly as it does on an ask, and
+			// the active session makes the run a turn in its thread (GC12).
+			const tagged = {
+				...req,
+				body: {
+					...req.body,
+					...(activeSessionId ? { session_id: activeSessionId } : {}),
+					...(activeWorld.lensId ? { lens_id: activeWorld.lensId } : {}),
+				},
+			} as ExpandRequest;
 			try {
 				const res = await expand.mutateAsync(tagged);
 				handleExpandResult(res);
@@ -1637,34 +1682,59 @@ export function GraphDetailPage() {
 				} else {
 					// The canvas grew — capture a version (docs/for-developers/modules/explore/features/boards.md).
 					void captureCanvasState("expand");
-					if (activeSessionId) {
-						// The engine recorded an expand turn — refetch the thread so it shows.
-						refresh();
-					}
 				}
 				return res;
-			} catch {
-				toast.error("Failed to load neighbours.");
+			} catch (err) {
+				toast.error(expandRefusal(err));
 				return null;
+			} finally {
+				// Every expansion is a turn, an empty one and a refusal included —
+				// refetch the thread so it shows.
+				if (activeSessionId) refresh();
 			}
 		},
-		[expand, handleExpandResult, activeSessionId, refresh, captureCanvasState],
+		[
+			expand,
+			handleExpandResult,
+			activeSessionId,
+			activeWorld.lensId,
+			refresh,
+			captureCanvasState,
+		],
 	);
 
-	// Active model schema drives the expand submenus and the fine-tune pickers.
-	// The Model panel loads its own version, because it may be looking at a draft.
+	// The expand submenus and the fine-tune pickers offer only what the picked
+	// world holds (graph-canvas.md GC13): node types from the world's own type
+	// counts, and edge types the world allows whose both ends it allows too. The
+	// active model supplies each edge's endpoints. The Model panel loads its own
+	// version, because it may be looking at a draft.
 	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
+	const { data: worldTypes } = useTypeCountsQuery(
+		username,
+		graphSlug,
+		activeWorld.lensId,
+	);
 	const expandSchema = useMemo<ExpandMenuSchema | null>(() => {
-		if (!activeVersion) return null;
+		if (!activeVersion || !worldTypes) return null;
+		const nodes = new Set(worldTypes.nodes.map((t) => t.name));
+		const edges = new Set(worldTypes.edges.map((t) => t.name));
 		return {
-			nodeTypes: activeVersion.node_types.map((n) => n.name),
-			edgeTypes: activeVersion.edge_types.map((e) => ({
-				name: e.name,
-				source_node_types: e.source_node_types,
-				target_node_types: e.target_node_types,
-			})),
+			nodeTypes: activeVersion.node_types
+				.map((n) => n.name)
+				.filter((n) => nodes.has(n)),
+			edgeTypes: activeVersion.edge_types
+				.filter((e) => edges.has(e.name))
+				.map((e) => ({
+					name: e.name,
+					source_node_types: e.source_node_types.filter((t) => nodes.has(t)),
+					target_node_types: e.target_node_types.filter((t) => nodes.has(t)),
+				}))
+				.filter(
+					(e) =>
+						e.source_node_types.length > 0 && e.target_node_types.length > 0,
+				),
 		};
-	}, [activeVersion]);
+	}, [activeVersion, worldTypes]);
 	const propertyKeys = useMemo(
 		() => (activeVersion?.property_keys ?? []).map((p) => p.name),
 		[activeVersion],

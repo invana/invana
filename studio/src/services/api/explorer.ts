@@ -45,24 +45,40 @@ export const explorerApi = {
 	 * (selection-and-the-panel.md SP6/SP8).
 	 *
 	 * Graph-wide, not canvas-wide: the panel answers "what does this graph hold",
-	 * the status bar answers "what am I looking at". `counted: false` means the
-	 * vendor cannot count and every `count` is null.
+	 * the status bar answers "what am I looking at". Under a world (`lensId`)
+	 * a type the world denies is absent and every count is taken inside it
+	 * (SP11). `counted: false` means the vendor cannot count and every `count`
+	 * is null.
 	 */
-	typeCounts: (username: string, graphSlug: string) =>
+	typeCounts: (username: string, graphSlug: string, lensId?: string | null) =>
 		request<TypeCountsResponse>(
-			`/api/v1/u/${username}/${graphSlug}/explorer/type-counts`,
+			`/api/v1/u/${username}/${graphSlug}/explorer/type-counts${
+				lensId ? `?lens_id=${encodeURIComponent(lensId)}` : ""
+			}`,
 		),
 
 	/**
-	 * Which of a reopened canvas's elements the graph still holds (GC5).
+	 * Which of a reopened canvas's elements the graph still holds, under the
+	 * picked world (GC5 · GC14).
 	 *
 	 * One request for the whole drawing, on hydrate. What comes back missing is
-	 * **kept and marked**, never dropped: a canvas that quietly loses a node is a
-	 * canvas that lies about what was explored.
+	 * **kept and marked**; what the world excludes is in neither list and is not
+	 * drawn.
 	 */
-	resolveElements: (username: string, graphSlug: string, vertexIds: string[]) =>
+	resolveElements: (
+		username: string,
+		graphSlug: string,
+		vertexIds: string[],
+		lensId?: string | null,
+	) =>
 		request<{ present: string[]; missing: string[]; checked: number }>(
 			`/api/v1/u/${username}/${graphSlug}/explorer/resolve`,
-			{ method: "POST", body: JSON.stringify({ vertex_ids: vertexIds }) },
+			{
+				method: "POST",
+				body: JSON.stringify({
+					vertex_ids: vertexIds,
+					...(lensId ? { lens_id: lensId } : {}),
+				}),
+			},
 		),
 };

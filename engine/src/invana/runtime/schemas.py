@@ -314,3 +314,37 @@ class TaskPromptRead(BaseModel):
     answered_by_id: str | None = None
     value: dict
     answered_at: datetime
+
+
+class CatalogueArgRead(BaseModel):
+    name: str
+    type: str
+    required: bool
+    default: object | None = None
+
+
+class CatalogueOutputRead(BaseModel):
+    name: str
+    type: str
+    #: How lanes roll up on a fan-out — ``sum`` · ``concat`` · null when the
+    #: output is per lane only (orchestration §5.1b · CA C3).
+    rollup: str | None = None
+
+
+class CatalogueEntryRead(BaseModel):
+    """One catalogue entry, rendered from its declaration (the-catalogue.md CA2)."""
+
+    step_key: str
+    bound: str
+    summary: str
+    args: list[CatalogueArgRead]
+    outputs: list[CatalogueOutputRead]
+    requires: list[str]
+    #: Reusable plans in this Graph that name the entry — distinct keys, not versions (C9).
+    used_by: int
+
+
+class CatalogueResponse(BaseModel):
+    #: Grouped by bound, in the bound's declared order, then by key (CA3).
+    items: list[CatalogueEntryRead]
+    total: int

@@ -568,9 +568,9 @@ Grouping is not cosmetic — **the group is the thing the envelope ceilings.**
 |---|---|
 | *none* — pure data | `emit_table` · `read_artefact` |
 | `network` | `fetch_source` · `test_connection` |
-| `graph_read` | `run_query` · `introspect_schema` |
-| `graph_write` | `write_records` · `write_properties` · `bulk_write` · `apply_stitches` · `commit_stitches` |
-| `schema_write` | `diff_models` · `check_capabilities` · `publish_model_version` · `snapshot_model` |
+| `graph_read` | `run_query` · `introspect_schema` · `expand_neighbours` · `count_types` · `resolve_elements` |
+| `graph_write` | `write_records` · `write_properties` · `bulk_write` · `apply_stitches` · `commit_stitches` · `withdraw_stitch` |
+| `schema_write` | `diff_models` · `check_capabilities` · `publish_model_version` · `snapshot_model` · `project_model` |
 | `ingest` | `check_bundle` · `import_dataset` · `validate_records` · `import_report` · `read_stitches` · `resolve_stitch_rule` |
 | `llm` | `understand` · `plan_queries` · `translate` · `summarise` · `enrich_properties` · `judge` |
 | `plan_write` | `draft_plan` — the only entry that writes a `TaskPlan` row |
@@ -1436,6 +1436,11 @@ audit does, and exactly what nobody wants while reading what the nightly load di
 plan — [§8.4](#84-bulk-load--the-degenerate-case) is the shape), an envelope check, a `result.json`,
 an event. Nothing is written down a shortcut because the volume is high; the volume is handled by
 **filtering and retention**, which are read-side problems, not by a second write path.
+
+In practice: the journal (`GET …/runs`) leaves out `canvas` and `system` runs unless it is asked
+for `interactive=true`, and the Graph's run-history ceiling is counted **per side** — interactive
+runs against interactive runs, everything else against everything else — so a busy afternoon on
+the canvas never prunes last night's import.
 
 ### 4.2 A session is not a Task
 

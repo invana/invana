@@ -159,7 +159,7 @@ export function taskDrawerSection(
 			<div className="flex h-full min-h-0 flex-col">
 				{showFilterBar && <div className="shrink-0">{spec.filterBar}</div>}
 				{showSearch && (
-					<div className="shrink-0 border-b p-2">
+					<div className="shrink-0 border-b px-3 py-2">
 						<SearchInput
 							inputSize="sm"
 							autoFocus
@@ -204,7 +204,7 @@ function DrawerTitle({
 		<span className="flex min-w-0 flex-1 items-center gap-1.5">
 			{drilled ? (
 				<>
-					<span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+					<span className="shrink-0 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
 						{spec.label}
 					</span>
 					<span className="shrink-0 text-muted-foreground">/</span>
@@ -215,11 +215,11 @@ function DrawerTitle({
 			) : (
 				<>
 					{Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
-					<span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide">
+					<span className="shrink-0 text-sm font-semibold uppercase tracking-wide">
 						{spec.label}
 					</span>
 					{spec.count != null && (
-						<span className="truncate text-[11px] font-normal normal-case tracking-normal text-muted-foreground">
+						<span className="truncate text-sm font-normal normal-case tracking-normal text-muted-foreground">
 							{spec.count}
 						</span>
 					)}

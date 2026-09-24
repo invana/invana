@@ -58,12 +58,14 @@ def test_no_unmeant_sequence_edge(template) -> None:
     """Every fallback edge left in a builtin is one that was reviewed.
 
     ``sequence`` is the guess: the node bound nothing and required nothing, so
-    it was joined to the open sinks. The only one we mean is *Verify*, which
-    summarises the work and therefore has to come after it. Anything else is a
+    it was joined to the open sinks. Two are meant: *Verify*, which summarises
+    the work and therefore has to come after it, and `stitch-apply`'s *Commit*,
+    which writes what *Apply* staged — a hand-off through rows, not through an
+    output, so there is no binding to declare (ST54). Anything else is a
     data-flow that should have been declared as a binding — which is exactly
     what `nl-single` was hiding before M2.
     """
-    meant = {("verify_result", "shape_for_canvas")}
+    meant = {("verify_result", "shape_for_canvas"), ("commit_stitches", "apply_stitches")}
     rows = materialise(template.steps, requires=REQUIRES)
     found = {(row["key"], dep["key"]) for row in rows for dep in row["depends_on"] if dep["kind"] == "sequence"}
     assert found <= meant, f"{template.key} carries an unreviewed sequence edge: {found - meant}"

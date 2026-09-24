@@ -87,7 +87,7 @@ export function FrozenBoardPage({
 			</div>
 			<div className="min-h-0 flex-1">
 				<Dashboard
-					className="h-full min-h-0 overflow-y-auto p-3"
+					className="h-full min-h-0"
 					spec={spec}
 					// Every registered kind, not this page's — a report has no
 					// composer to tell it which it needs (B19). All of them are

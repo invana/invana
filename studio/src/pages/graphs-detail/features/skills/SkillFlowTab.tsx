@@ -85,7 +85,7 @@ export function SkillFlowTab({
 	if (loading) return <Spinner />;
 	if (!plan)
 		return (
-			<div className="p-4">
+			<div className="px-3 py-4">
 				<EmptyState
 					icon={<Workflow className="size-6" />}
 					title={empty?.title ?? "No plan to draw"}

@@ -169,7 +169,7 @@ export function ProjectsDrawerBody({
 		<div className="flex h-full min-h-0 flex-col">
 			{creating && !selected ? (
 				<form
-					className="flex gap-1.5 border-b p-2"
+					className="flex gap-1.5 border-b px-3 py-2"
 					onSubmit={(e) => {
 						e.preventDefault();
 						if (!name.trim()) return;
@@ -237,11 +237,11 @@ export function ProjectsDrawerBody({
 				<>
 					<div className="flex-1 overflow-y-auto">
 						{projects.isLoading ? (
-							<div className="p-4">
+							<div className="px-3 py-4">
 								<Spinner />
 							</div>
 						) : items.length === 0 ? (
-							<p className="p-4 text-base text-muted-foreground">
+							<p className="px-3 py-4 text-base text-muted-foreground">
 								No projects yet. A task can live without one — a project is how
 								related work is organised, not a requirement.
 							</p>
@@ -480,11 +480,11 @@ function ProjectDetail({
 
 					<div className="min-h-0 flex-1 overflow-y-auto">
 						{isLoading ? (
-							<div className="p-4">
+							<div className="px-3 py-4">
 								<Spinner />
 							</div>
 						) : visible.length === 0 ? (
-							<p className="p-4 text-base text-muted-foreground">
+							<p className="px-3 py-4 text-base text-muted-foreground">
 								{planTasks.length
 									? "No task matches those filters."
 									: "No tasks in this project yet."}
@@ -527,7 +527,7 @@ function ProjectDetail({
 					</div>
 
 					{staff.length ? (
-						<div className="flex shrink-0 flex-wrap items-center gap-1.5 border-t px-4 py-2">
+						<div className="flex shrink-0 flex-wrap items-center gap-1.5 border-t px-3 py-2">
 							<span className="text-base text-muted-foreground">Staffed</span>
 							{staff.map((s) => (
 								<PrincipalChip
@@ -569,11 +569,11 @@ function ProjectDetail({
 
 					<div className="min-h-0 flex-1 overflow-y-auto">
 						{isLoading ? (
-							<div className="p-4">
+							<div className="px-3 py-4">
 								<Spinner />
 							</div>
 						) : planTasks.length === 0 ? (
-							<p className="p-4 text-base text-muted-foreground">
+							<p className="px-3 py-4 text-base text-muted-foreground">
 								No tasks in this project yet.
 							</p>
 						) : (
@@ -639,7 +639,7 @@ function ProjectDetail({
 					 * project's story.
 					 */}
 					{planTasks.length === 0 ? (
-						<p className="p-4 text-base text-muted-foreground">
+						<p className="px-3 py-4 text-base text-muted-foreground">
 							Nothing has happened on this project yet.
 						</p>
 					) : (

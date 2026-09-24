@@ -11,6 +11,7 @@
 import { runsApi } from "@/services/api/runs";
 import {
 	agentsApi,
+	catalogueApi,
 	projectsApi,
 	tasksApi,
 	workflowsApi,
@@ -321,6 +322,20 @@ export function useTaskMutations(username: string, graphSlug: string) {
 }
 
 // ── Workflows ────────────────────────────────────────────────────────────────
+
+/** The catalogue is engine-static; only `used_by` moves, and only when a plan is promoted. */
+export function useCatalogueQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: workflowsKey(scope, ["catalogue"]),
+		queryFn: () => catalogueApi.list(scope.username, scope.graphSlug),
+		enabled: !!username && !!graphSlug,
+		staleTime: 5 * 60_000,
+	});
+}
 
 export function useWorkflowsQuery(
 	username: string | undefined,

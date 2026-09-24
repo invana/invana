@@ -46,6 +46,12 @@ class TriggeredBy(enum.StrEnum):
     task = "task"
     # A parent node's `delegate` (docs/for-developers/modules/work/spec.md).
     delegation = "delegation"
+    # A person acting on a canvas — an expansion — who is waiting on the
+    # answer (RP31). Kept out of the journal's default view (GC7).
+    canvas = "canvas"
+    # The platform acting on a person's behalf — resolving a reopened canvas,
+    # a connection check. Also out of the default view.
+    system = "system"
 
 
 class RunStatus(enum.StrEnum):

@@ -59,6 +59,21 @@ class TaskPlanQuerySet:
         )
         return {(key, version): plan_id for key, version, plan_id in (await session.execute(stmt)).all() if key}
 
+    async def step_key_usage(self, session: AsyncSession, *, graph_id: str) -> dict[str, int]:
+        """step_key → how many reusable plans in the Graph name it, counted once per plan key."""
+        rows = await session.execute(
+            select(Task.step_key, func.count(func.distinct(TaskPlan.key)))
+            .join(TaskPlan, Task.task_plan_id == TaskPlan.id)
+            .where(
+                TaskPlan.graph_id == graph_id,
+                TaskPlan.reusable.is_(True),
+                TaskPlan.key.is_not(None),
+                Task.step_key.is_not(None),
+            )
+            .group_by(Task.step_key)
+        )
+        return {step_key: int(count) for step_key, count in rows.all()}
+
     async def latest_version(self, session: AsyncSession, *, graph_id: str, key: str) -> int | None:
         stmt = (
             select(TaskPlan.version)

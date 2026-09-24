@@ -173,12 +173,6 @@ async def solve_links(
     return [await solve_link(connector, link, run_id=run_id) for link in links]
 
 
-async def count_written(connector: BaseConnector, link: ModelLink) -> int:
-    """The edges this stitch has in the database right now (ST46)."""
-    result = await connector.execute(written_query(), {"stitch_id": link.id})
-    return _count(result, "written")
-
-
 async def withdraw_link(connector: BaseConnector, link: ModelLink) -> int:
     """Delete what one stitch wrote. Returns how many edges went (ST48)."""
     if not solvable(link):

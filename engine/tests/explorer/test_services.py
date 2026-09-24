@@ -1,68 +1,61 @@
-"""Service-layer tests for Explorer node-expand (docs/for-developers/modules/explore/features/graph-canvas.md) against a
-real Neo4j."""
+"""Explorer node-expand, as a run (docs/for-developers/modules/explore/features/graph-canvas.md
+GC6 · GC12), against a real Neo4j.
+
+Each expansion opens `expand-neighbours@1`, runs inline and answers with the
+shape the canvas draws, plus the run's id. Reading under a world is the
+connector suite's (`tests/graph/connectors/neighbour_lens.py`).
+"""
 
 from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
-from sqlalchemy import func, select
 
-from invana.apps.explorer.managers import ExploreManager
 from invana.apps.explorer.schemas import (
     ExpandByEdgeTypeRequest,
     ExpandByNodeTypeRequest,
     ExpandNeighborsRequest,
 )
-from invana.core.events import actions as event_actions
-from invana.core.events.models import Event
 from invana.graph.types.sort import SortDirection, SortSpec
+from invana.runtime import canvas
+from invana.runtime.models import RunStatus, TaskRun, TriggeredBy
 
 pytestmark = pytest.mark.asyncio
 
 
-explore = ExploreManager()
+async def _expand(session, runtime, graph, user, req):
+    return await canvas.expand(session, runtime=runtime, graph=graph, actor_id=user.id, req=req)
 
 
-async def test_expand_neighbors_total_and_has_more(session, graph, manager, user, seeded_graph):
+async def test_an_expansion_is_a_run_and_answers_with_what_it_read(session, runtime, graph, user, seeded_graph):
     alice = seeded_graph["alice"]
-    req = ExpandNeighborsRequest(vertex_id=alice.id, limit=2, offset=0)
-    result = await explore.expand_neighbors(session, graph=graph, manager=manager, actor_id=user.id, req=req)
+    result = await _expand(session, runtime, graph, user, ExpandNeighborsRequest(vertex_id=alice.id, limit=2))
+
     assert result.total == 3  # Bob, Charlie, Acme
     assert result.returned == 2
     assert result.has_more is True
+    run = await session.get(TaskRun, result.run_id)
+    assert (run.status, run.triggered_by) == (RunStatus.succeeded.value, TriggeredBy.canvas.value)
 
 
-async def test_expand_by_node_type(session, graph, manager, user, seeded_graph):
+async def test_by_node_type(session, runtime, graph, user, seeded_graph):
     alice = seeded_graph["alice"]
     req = ExpandByNodeTypeRequest(vertex_id=alice.id, neighbor_label="Company")
-    result = await explore.expand_by_node_type(session, graph=graph, manager=manager, actor_id=user.id, req=req)
-    assert result.total == 1
-    assert result.returned == 1
-    assert result.has_more is False
-    labels = {n.label for n in result.data.nodes if n.id != alice.id}
-    assert labels == {"Company"}
+    result = await _expand(session, runtime, graph, user, req)
+    assert (result.total, result.returned, result.has_more) == (1, 1, False)
+    assert {n.label for n in result.data.nodes if n.id != alice.id} == {"Company"}
 
 
-async def test_expand_by_edge_type_paginated_and_event(session, graph, manager, user, seeded_graph):
+async def test_by_edge_type_paginated(session, runtime, graph, user, seeded_graph):
     alice = seeded_graph["alice"]
     sort = [SortSpec(property="name", direction=SortDirection.ASC)]
     page1 = ExpandByEdgeTypeRequest(vertex_id=alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=0)
-    r1 = await explore.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page1)
-    assert r1.total == 2
-    assert r1.has_more is True
     page2 = ExpandByEdgeTypeRequest(vertex_id=alice.id, edge_label="KNOWS", sort=sort, limit=1, offset=1)
-    r2 = await explore.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=page2)
-    assert r2.has_more is False
-    n1 = [n.properties["name"] for n in r1.data.nodes if n.id != alice.id]
-    n2 = [n.properties["name"] for n in r2.data.nodes if n.id != alice.id]
-    assert n1 == ["Bob"]
-    assert n2 == ["Charlie"]
-
-    # A graph.expand audit event was emitted per call.
-    count = (
-        await session.execute(select(func.count()).select_from(Event).where(Event.action == event_actions.GRAPH_EXPAND))
-    ).scalar_one()
-    assert count == 2
+    r1 = await _expand(session, runtime, graph, user, page1)
+    r2 = await _expand(session, runtime, graph, user, page2)
+    assert (r1.total, r1.has_more, r2.has_more) == (2, True, False)
+    assert [n.properties["name"] for n in r1.data.nodes if n.id != alice.id] == ["Bob"]
+    assert [n.properties["name"] for n in r2.data.nodes if n.id != alice.id] == ["Charlie"]
 
 
 async def test_limit_over_max_rejected():
@@ -73,3 +66,24 @@ async def test_limit_over_max_rejected():
 async def test_edge_type_requires_label():
     with pytest.raises(ValidationError):
         ExpandByEdgeTypeRequest(vertex_id="v1", edge_label="")
+
+
+async def test_type_counts_are_a_run(session, runtime, graph, user, seeded_graph):
+    result = await canvas.count_types(session, runtime=runtime, graph=graph, actor_id=user.id, lens_id=None)
+    assert {t.name: t.count for t in result.nodes} == {"Person": 3, "Company": 1}
+    assert {t.name: t.count for t in result.edges} == {"KNOWS": 2, "WORKS_AT": 1}
+    run = await session.get(TaskRun, result.run_id)
+    assert (run.workflow_key, run.triggered_by) == ("count-types@1", TriggeredBy.canvas.value)
+
+
+async def test_a_reopened_canvas_is_resolved_by_element_id(session, runtime, graph, user, connector, seeded_graph):
+    """The canvas holds element ids — a property named `id` is not what it drew."""
+    gone = await connector.data_writer.create_vertex("Person", {"name": "Gone"})
+    await connector.data_writer.delete_vertex(gone.id)
+    ids = [seeded_graph["alice"].id, gone.id]
+
+    result = await canvas.resolve(session, runtime=runtime, graph=graph, actor_id=user.id, vertex_ids=ids, lens_id=None)
+
+    assert (result.present, result.missing) == ([seeded_graph["alice"].id], [gone.id])
+    run = await session.get(TaskRun, result.run_id)
+    assert run.triggered_by == TriggeredBy.system.value

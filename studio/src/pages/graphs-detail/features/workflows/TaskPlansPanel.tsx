@@ -148,7 +148,7 @@ export function PlansDrawerBody({
 	if (selectedKey) {
 		if (!detail.data)
 			return (
-				<div className="p-4">
+				<div className="px-3 py-4">
 					<Spinner />
 				</div>
 			);
@@ -182,11 +182,11 @@ export function PlansDrawerBody({
 					<div className="flex h-full min-h-0 flex-col">
 						<div className="flex-1 overflow-y-auto">
 							{list.isLoading ? (
-								<div className="p-4">
+								<div className="px-3 py-4">
 									<Spinner />
 								</div>
 							) : rows.length === 0 ? (
-								<p className="p-4 text-base text-muted-foreground">
+								<p className="px-3 py-4 text-base text-muted-foreground">
 									{items.length
 										? "No workflow matches those filters."
 										: "No workflows in this graph yet."}

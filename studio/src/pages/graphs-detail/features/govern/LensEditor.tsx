@@ -57,9 +57,9 @@ import {
 	Button,
 	CAST_ROLES,
 	CannotAnswerCard,
+	Eyebrow,
 	LayerChip,
 	LayerSection,
-	PanelBox,
 	RichSelect,
 	RuleRow,
 	Spinner,
@@ -165,7 +165,8 @@ export function LensEditor({
 	return (
 		<div className="flex min-w-0 flex-col gap-4">
 			{/* ── naming ────────────────────────────────────────────────────── */}
-			<PanelBox title={kind === "world" ? "Name" : "What it is called"}>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow>{kind === "world" ? "Name" : "What it is called"}</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-1 pt-1">
 					<Input
 						inputSize="sm"
@@ -184,25 +185,27 @@ export function LensEditor({
 								: "Name it to add it to Worlds. Left blank it stays attached to your run and private to you."}
 					</p>
 				</div>
-			</PanelBox>
+			</section>
 
 			{/* ── the rules, grouped by the layer each one governs ──────────── */}
-			<PanelBox
-				title="Rules"
-				aside={
-					<Button
-						variant="ghost"
-						size="sm"
-						className="h-auto p-0 text-sm"
-						onClick={() => {
-							setRule(blankRule());
-							setEditing(-1);
-						}}
-					>
-						<Plus className="size-3" /> Add
-					</Button>
-				}
-			>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow
+					aside={
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-auto p-0 text-sm"
+							onClick={() => {
+								setRule(blankRule());
+								setEditing(-1);
+							}}
+						>
+							<Plus className="size-3" /> Add
+						</Button>
+					}
+				>
+					Rules
+				</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-4 pt-1">
 					{GOVERNED_LAYERS.map((layer) => {
 						const indices = draft.rules
@@ -294,10 +297,11 @@ export function LensEditor({
 						/>
 					) : null}
 				</div>
-			</PanelBox>
+			</section>
 
 			{/* ── closing a layer is a stated field, never inferred (GV23) ──── */}
-			<PanelBox title="Closed layers" aside="what is not named is out">
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow aside="what is not named is out">Closed layers</Eyebrow>
 				<div className="flex flex-col gap-1.5 pt-1">
 					<p className="text-sm text-muted-foreground">
 						A layer ticked here admits only what its rules allow. One left
@@ -326,13 +330,13 @@ export function LensEditor({
 						))}
 					</div>
 				</div>
-			</PanelBox>
+			</section>
 
 			{/* ── the cast ──────────────────────────────────────────────────── */}
-			<PanelBox
-				title="Cast"
-				aside="role → model. Innermost wins, then it is checked"
-			>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow aside="role → model. Innermost wins, then it is checked">
+					Cast
+				</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-1.5 pt-1">
 					{CAST_ROLES.map((role) => (
 						<CastPicker
@@ -357,10 +361,11 @@ export function LensEditor({
 						</p>
 					)}
 				</div>
-			</PanelBox>
+			</section>
 
 			{/* ── transaction time (C12 · WO9) ──────────────────────────────── */}
-			<PanelBox title="As of" aside={draft.as_of ? undefined : "now"}>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow aside={draft.as_of ? undefined : "now"}>As of</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-1 pt-1">
 					<Input
 						inputSize="sm"
@@ -376,7 +381,7 @@ export function LensEditor({
 						composes with a rule's own time slice, which is valid time.
 					</p>
 				</div>
-			</PanelBox>
+			</section>
 
 			{/* ── what a save would be refused for, and what it would only warn
 			    about. Refusals already sit on their rule above; these are the ones

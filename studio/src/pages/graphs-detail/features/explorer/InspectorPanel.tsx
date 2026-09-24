@@ -52,7 +52,7 @@ export function InspectorPanel({
 					<p className="text-center">Click a node or edge to inspect it</p>
 				</div>
 			) : (
-				<div className="p-4 flex flex-col gap-4">
+				<div className="px-3 py-4 flex flex-col gap-4">
 					<div>
 						<div className="flex items-center gap-2 mb-1">
 							<span

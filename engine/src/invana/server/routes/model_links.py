@@ -25,30 +25,25 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, sta
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.graphs.pool import GraphConnectionManager, GraphUnavailableError
-from invana.apps.graphs.query_service import QueryExecutionError, execute_query
 from invana.apps.modeller import links as link_service
 from invana.apps.modeller.links import GlobalModel, LinkRefused, StitchPreview
-from invana.apps.modeller.solve import withdraw_link
 from invana.apps.modeller.store import ModelStore
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.services import emit_event
-from invana.runtime.catalogue.stitching import commit_stitches
+from invana.runtime import services as run_services
+from invana.runtime.catalogue.stitching import REFUSED
+from invana.runtime.models import RunStatus
+from invana.runtime.querysets import TaskRunQuerySet
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 from invana.server.schemas import ActionResponse, action
 
 model_links_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}", tags=["model-links"])
 
 _store = ModelStore()
-
-
-def _get_manager(request: Request) -> GraphConnectionManager:
-    return request.app.state.graph_connection_manager
 
 
 # ---------------------------------------------------------------------------
@@ -135,35 +130,6 @@ async def _decorate(session: AsyncSession, link) -> LinkResponse:
         setattr(resp, f"{side}_model", model.name if model else None)
         setattr(resp, f"{side}_version", version.version)
     return resp
-
-
-async def _writable_connector(session: AsyncSession, graph: Graph, manager: GraphConnectionManager):
-    """The Graph's live connector, refused up front when it cannot be written to.
-
-    Resolved **before** anything is flipped: a commit that marked rows active and
-    then found no database would leave a union the graph does not reflect (ST44).
-    """
-    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
-    if connection is None:
-        raise HTTPException(
-            HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail={"error": "no_connection", "graph_id": graph.id},
-        )
-    if connection.read_only:
-        raise HTTPException(
-            HTTPStatus.FORBIDDEN,
-            detail={
-                "error": "read_only_graph",
-                "message": "This connection is marked read-only, and solving a stitch writes edges.",
-            },
-        )
-    try:
-        return manager.get_connector(connection.id)
-    except GraphUnavailableError:
-        raise HTTPException(
-            HTTPStatus.SERVICE_UNAVAILABLE,
-            detail={"error": "graph_not_active", "connection_id": connection.id},
-        ) from None
 
 
 def _refused(exc: LinkRefused) -> HTTPException:
@@ -254,31 +220,44 @@ async def declare_model_link(
 
 @model_links_router.post("/model-links/commit", response_model=ActionResponse[list[LinkResponse]])
 async def commit_staged_links(
+    request: Request,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
-    manager: GraphConnectionManager = Depends(_get_manager),
     session: AsyncSession = Depends(get_session),
 ) -> ActionResponse[list[LinkResponse]]:
     """Flip every staged stitch to active — one action for the whole set (ST21).
 
-    Nothing is validated again here. A stitch was refused or accepted when it was
-    declared, and the resolve preview ran before that; a commit is the moment a
-    person says *yes, these belong in the union*, not a second gate.
+    **Committing is a run** (ST54): `stitch-commit@1`
+    under the Graph's guardrails, awaited here because the person is waiting on
+    it (RP31). A stitch whose model the guardrails deny is committed and writes
+    nothing, and its row says so (ST53).
     """
-    staged = await link_service.list_links(session, graph.id, status="staged")
-    if not staged:
+    run = await run_services.open_stitch_commit_run(session, graph=graph, actor_id=user.id)
+    run_id = run.id
+    await session.commit()
+    await request.app.state.task_runtime.run_inline(run_id)
+
+    await session.refresh(run)
+    if run.status == RunStatus.queued.value:
+        return action("The commit is queued behind other runs in this Graph; it writes when it starts.", [])
+    if run.status != RunStatus.succeeded.value:
         raise HTTPException(
             HTTPStatus.CONFLICT,
-            detail={"error": "nothing_staged", "message": "There are no staged stitches to commit."},
+            detail={
+                "error": "commit_failed",
+                "run_id": run_id,
+                "message": (run.error or {}).get("message") or f"The commit {run.status}. Open the run for the trace.",
+            },
         )
-    connector = await _writable_connector(session, graph, manager)
-    # Committing is what runs the stitch (ST44): a union the graph does not reflect
-    # is a claim nothing can traverse.
-    run = await commit_stitches(session, graph_id=graph.id, connector=connector)
-    committed = run.links
-    solved = {result.link_id: result for result in (*run.solved, *run.loaded)}
+
+    nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
+    out = next((n.output or {} for n in nodes if n.task_key == "commit_stitches"), {})
+    per_link = {row["link_id"]: row for row in out.get("links") or []}
+    committed = [link for link in await link_service.list_links(session, graph.id) if link.id in per_link]
+    responses = []
     for link in committed:
+        row = per_link[link.id]
         await emit_event(
             session,
             action=event_actions.MODEL_LINK_COMMIT,
@@ -290,22 +269,26 @@ async def commit_staged_links(
                 "kind": link.kind,
                 "source_type": link.source_type,
                 "target_type": link.target_type,
-                "edges_written": solved[link.id].written if link.id in solved else 0,
+                "edges_written": row["written"],
+                "run_id": run_id,
             },
         )
-    await session.commit()
-    noun = "stitch" if len(committed) == 1 else "stitches"
-    written = run.written
-    responses = []
-    for link in committed:
         resp = await _decorate(session, link)
-        resp.edges_written = solved[link.id].written if link.id in solved else None
+        resp.edges_written = None if row["skipped"] else row["written"]
         responses.append(resp)
+    await session.commit()
+
+    written = int(out.get("written") or 0)
+    refused = sum(1 for row in per_link.values() if row["skipped"] == REFUSED)
+    noun = "stitch" if len(committed) == 1 else "stitches"
     edges = "edge" if written == 1 else "edges"
-    rejected = f" {run.rejected:,} row(s) had an endpoint that resolved nowhere." if run.rejected else ""
+    rejected = out.get("rejected") or 0
+    tail = f" {rejected:,} row(s) had an endpoint that resolved nowhere." if rejected else ""
+    if refused:
+        tail += f" {refused} wrote nothing — the Graph's guardrails deny one of its models."
     return action(
         f"{len(committed)} {noun} committed. The global model now spans them, "
-        f"and {written:,} {edges} were written.{rejected}",
+        f"and {written:,} {edges} were written.{tail}",
         responses,
     )
 
@@ -347,35 +330,52 @@ async def discard_staged_links(
 
 @model_links_router.delete("/model-links/{link_id}", response_model=ActionResponse[None])
 async def remove_model_link(
+    request: Request,
     link_id: str = Path(...),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
-    manager: GraphConnectionManager = Depends(_get_manager),
     session: AsyncSession = Depends(get_session),
 ) -> ActionResponse[None]:
+    """Remove a stitch — and, if it is active, the edges it wrote (ST48 · ST55).
+
+    A staged stitch wrote nothing, so its row is deleted here. An active one is
+    `stitch-withdraw@1`, awaited: the Graph's guardrails are asked about both
+    its models before an edge goes, and a refusal keeps the rule and its edges.
+    """
     link = await link_service.get_link(session, graph.id, link_id)
     if link is None:
         raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
 
-    # Withdrawing the rule withdraws the edges derived from it (ST48). A staged
-    # stitch never wrote any, and a database nobody can reach is not a reason to
-    # keep a rule somebody asked to remove — the edges name the stitch either way.
     withdrawn = 0
+    run_id: str | None = None
     if link.status == "active":
-        try:
-            connector = await _writable_connector(session, graph, manager)
-            await connector.connect()
-            try:
-                withdrawn = await withdraw_link(connector, link)
-            finally:
-                await connector.disconnect()
-        except HTTPException:
-            withdrawn = -1
+        run = await run_services.open_stitch_withdraw_run(session, graph=graph, link_id=link_id, actor_id=user.id)
+        run_id = run.id
+        await session.commit()
+        await request.app.state.task_runtime.run_inline(run_id)
+        await session.refresh(run)
+        if run.status == RunStatus.queued.value:
+            return action("The removal is queued behind other runs in this Graph; it happens when it starts.", None)
+        if run.status != RunStatus.succeeded.value:
+            raise HTTPException(
+                HTTPStatus.CONFLICT,
+                detail={
+                    "error": "remove_failed",
+                    "run_id": run_id,
+                    "message": (run.error or {}).get("message")
+                    or f"The removal {run.status}; the stitch and its edges are unchanged.",
+                },
+            )
+        nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
+        withdrawn = int(
+            next((n.output or {} for n in nodes if n.task_key == "withdraw_stitch"), {}).get("withdrawn") or 0
+        )
+    else:
+        removed = await link_service.remove(session, graph.id, link_id)
+        if not removed:  # pragma: no cover — it was read a line ago
+            raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
 
-    removed = await link_service.remove(session, graph.id, link_id)
-    if not removed:  # pragma: no cover — it was read a line ago
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail={"error": "link_not_found", "link_id": link_id})
     await emit_event(
         session,
         action=event_actions.MODEL_LINK_REMOVE,
@@ -383,62 +383,59 @@ async def remove_model_link(
         target_id=link_id,
         graph_id=graph.id,
         actor_id=user.id,
-        details={"edges_withdrawn": withdrawn},
+        details={"edges_withdrawn": withdrawn, "run_id": run_id},
     )
     await session.commit()
-    if withdrawn > 0:
-        tail = f" {withdrawn:,} edge(s) it wrote went with it."
-    elif withdrawn < 0:
-        tail = " Its edges are still in the database — the connection was unreachable; they carry `_inv_stitch_id`."
-    else:
-        tail = ""
+    tail = f" {withdrawn:,} edge(s) it wrote went with it." if withdrawn else ""
     return action(f"Stitch removed. The global model no longer spans that pair.{tail}", None)
 
 
 @model_links_router.post("/model-links/preview", response_model=StitchPreview)
 async def preview_stitch(
+    request: Request,
     payload: PreviewRequest,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
-    manager: GraphConnectionManager = Depends(_get_manager),
     session: AsyncSession = Depends(get_session),
 ) -> StitchPreview:
     """How many the rule resolves — counted before anything is declared.
 
     A count of zero comes back as a verdict, not an error: the rule is wrong, not
-    the data ("nothing resolves" in the journey).
+    the data ("nothing resolves" in the journey). **Counting reads the graph, so
+    it is a run** — `stitch-preview@1` under the Graph's guardrails, awaited
+    here (RP31). A rule naming what the guardrails deny is refused naming why.
     """
-    query = link_service.stitch_preview_query(
-        source_type=payload.source_type,
-        source_property=payload.source_property,
-        target_type=payload.target_type,
-        target_property=payload.target_property,
-        case_insensitive=payload.identity_match == "case_insensitive",
+    run = await run_services.open_stitch_preview_run(
+        session, graph=graph, actor_id=user.id, rule=payload.model_dump(mode="json")
     )
-    try:
-        result = await execute_query(
-            session,
-            graph=graph,
-            manager=manager,
-            query=query,
-            parameters=None,
-            actor_id=user.id,
+    run_id = run.id
+    await session.commit()
+    await request.app.state.task_runtime.run_inline(run_id)
+
+    await session.refresh(run)
+    if run.status == RunStatus.queued.value:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            detail={"error": "preview_queued", "run_id": run_id, "message": "The preview is queued behind other runs."},
         )
-    except QueryExecutionError as exc:
+    nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
+    out = next((n.output or {} for n in nodes if n.task_key == "preview_stitches"), {})
+    row = next(iter(out.get("previews") or []), None)
+    if run.status != RunStatus.succeeded.value or row is None:
         raise HTTPException(
             HTTPStatus.BAD_GATEWAY,
-            detail={"error": "preview_failed", "message": str(exc), "category": exc.category},
-        ) from exc
-    await session.commit()
-    rows = result.rows or []
-    return link_service.read_preview(
-        rows[0] if rows else {},
-        source_type=payload.source_type,
-        source_property=payload.source_property,
-        target_type=payload.target_type,
-        target_property=payload.target_property,
-    )
+            detail={
+                "error": "preview_failed",
+                "run_id": run_id,
+                "message": (run.error or {}).get("message") or f"The preview {run.status}. Open the run for the trace.",
+            },
+        )
+    if row["refused"]:
+        raise HTTPException(
+            HTTPStatus.CONFLICT, detail={"error": "preview_refused", "run_id": run_id, "message": row["refused"]}
+        )
+    return StitchPreview.model_validate(row["preview"])
 
 
 @model_links_router.get("/global-model", response_model=GlobalModel)

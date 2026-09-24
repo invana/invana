@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from invana.graph.connectors.base.exceptions import LensViolationError
+from invana.graph.connectors.base.lens import admit_structured
 from invana.graph.connectors.base.querysets.base import BaseQuerySet
+from invana.graph.types.lens import QueryLens
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
@@ -71,6 +74,24 @@ class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
         See :meth:`get_node_label_counts`.
         """
         return None
+
+    async def count_types(self, lens: QueryLens | None = None) -> tuple[dict[str, int] | None, dict[str, int] | None]:
+        """``({node type: count}, {edge type: count})`` inside *lens* (SP11).
+
+        No lens is the vendor's own counts, ``None`` where it cannot count
+        (SP8). Under a lens a denied type is never matched and each count is
+        taken inside its slice — composed by the language's builder, never a
+        filter over the graph-wide numbers. A connector with no governed count
+        **refuses**: counting the whole graph for a narrowed world is the one
+        answer it may not give.
+        """
+        governed = admit_structured(lens)
+        if governed is None:
+            return await self.get_node_label_counts(), await self.get_edge_label_counts()
+        return await self._count_types_under(governed)
+
+    async def _count_types_under(self, lens: QueryLens) -> tuple[dict[str, int], dict[str, int]]:
+        raise LensViolationError("This connection cannot count types under a world.", code="lens_not_supported")
 
     async def get_edge_multiplicity(self, label: str) -> str:
         """Return the multiplicity for an edge label.

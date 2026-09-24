@@ -41,7 +41,7 @@ import {
 	AlertDialogTitle,
 	Button,
 	CannotAnswerCard,
-	PanelBox,
+	Eyebrow,
 } from "@invana/ui";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -96,7 +96,8 @@ export function LensActions({
 
 	if (!mayWrite) {
 		return (
-			<PanelBox title="Editing">
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow>Editing</Eyebrow>
 				{/* Absent, never disabled: a greyed button promises a screen this
 				    person cannot reach, and a bound nobody may read is a bound
 				    nobody can work within (GR5). */}
@@ -104,12 +105,13 @@ export function LensActions({
 					The rules above are in force on every run and are readable by every
 					member. Changing them is a permission somebody in this Graph holds.
 				</p>
-			</PanelBox>
+			</section>
 		);
 	}
 
 	return (
-		<PanelBox title="Editing">
+		<section className="flex min-w-0 flex-col gap-1">
+			<Eyebrow>Editing</Eyebrow>
 			<div className="flex min-w-0 flex-col gap-2 pt-1">
 				{refusal ? (
 					<CannotAnswerCard label="refused">{refusal}</CannotAnswerCard>
@@ -262,6 +264,6 @@ export function LensActions({
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</PanelBox>
+		</section>
 	);
 }

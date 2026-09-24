@@ -8,6 +8,7 @@ commits, then submits), so a subscriber that connects immediately sees the plan
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from http import HTTPStatus
 from pathlib import Path
@@ -26,6 +27,7 @@ from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.llm_providers.managers import LLMProviderManager
+from invana.apps.modeller import links as link_service
 from invana.apps.modeller.store import ModelStore
 from invana.apps.sessions.models import (
     Session,
@@ -39,6 +41,7 @@ from invana.apps.sessions.schemas import SendMessage
 from invana.apps.sessions.transcript import _title_from_text
 from invana.apps.task_plans.models import TaskPlan
 from invana.apps.work.models import Task
+from invana.core.errors import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
 from invana.core.events.services import current_trace_id, emit_event
@@ -111,14 +114,26 @@ async def _next_attempt(db: AsyncSession, run_id: str, seq: int) -> int:
     return (prior or 0) + 1
 
 
+#: The triggers a person does not read the journal for (orchestration § 4.1b).
+INTERACTIVE = (TriggeredBy.canvas.value, TriggeredBy.system.value)
+
+
 async def _prune(db: AsyncSession, graph_id: str) -> None:
-    """Keep the newest ``INVANA_RUN_HISTORY_LIMIT`` runs per graph
-    (docs/for-developers/modules/ask/spec.md)."""
+    """Keep the newest ``INVANA_RUN_HISTORY_LIMIT`` runs per graph, **per side**
+    (docs/for-developers/modules/ask/spec.md · orchestration § 4.1b).
+
+    Roots are counted, and a root's steps go with it (``ON DELETE CASCADE``).
+    Interactive runs are counted against each other, so an afternoon of canvas
+    expansions never prunes last night's import.
+    """
     limit = settings.run_history_limit
     if limit <= 0:
         return
-    keep = select(TaskRun.id).where(TaskRun.graph_id == graph_id).order_by(TaskRun.queued_at.desc()).limit(limit)
-    await db.execute(delete(TaskRun).where(TaskRun.graph_id == graph_id, TaskRun.id.not_in(keep)))
+    for interactive in (True, False):
+        side = TaskRun.triggered_by.in_(INTERACTIVE) if interactive else TaskRun.triggered_by.not_in(INTERACTIVE)
+        roots = (TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None), side)
+        keep = select(TaskRun.id).where(*roots).order_by(TaskRun.queued_at.desc()).limit(limit)
+        await db.execute(delete(TaskRun).where(*roots, TaskRun.id.not_in(keep)))
 
 
 async def open_turn(
@@ -703,6 +718,7 @@ async def list_runs(
     task_id: str | None = None,
     kind: str | None = None,
     candidates: bool = False,
+    interactive: bool = False,
     limit: int = 50,
 ) -> tuple[list[dict], int]:
     """TaskRuns as list rows, newest first (docs/for-developers/modules/agents/spec.md,
@@ -723,6 +739,9 @@ async def list_runs(
     ``kind`` is the journal's filter — *what ran* asked of one kind of work
     (task-model-migration § 6.7).
 
+    ``interactive`` turns on the runs a person does not read the journal for —
+    canvas expansions, system checks — which are off by default (§ 4.1b · GC7).
+
     ``candidates=True`` is the narrower of the two and is defined negatively on
     purpose: a candidate is a plan the engine *generated* (never one a template
     produced — that shape is already in the library), that Verify said **served**,
@@ -739,6 +758,8 @@ async def list_runs(
         stmt = stmt.where(TaskRun.todo_id == task_id)
     if kind:
         stmt = stmt.where(TaskRun.ask_kind == kind)
+    if not interactive:
+        stmt = stmt.where(TaskRun.triggered_by.not_in(INTERACTIVE))
     if candidates:
         # `generated` only: a run off a template is the library entry already.
         # And it must *have* a plan — promotion copies that document into the
@@ -857,6 +878,12 @@ async def list_runs(
 #: The builtin a load runs (BD7 · LB14). Records are imported **into a model**.
 LOAD_PLAN_KEY = "model-import"
 BULK_PLAN_KEY = "bulk-load"
+#: The builtin a stitch commit runs — the drawer's and the CLI's, one plan.
+STITCH_COMMIT_PLAN_KEY = "stitch-commit"
+#: The builtin that withdraws a removed stitch's edges (ST55).
+STITCH_WITHDRAW_PLAN_KEY = "stitch-withdraw"
+#: The builtin that counts what stitch rules resolve — a read (ST43).
+STITCH_PREVIEW_PLAN_KEY = "stitch-preview"
 
 
 _store = ModelStore()
@@ -1013,8 +1040,19 @@ async def open_bulk_run(
     selected = await select_plan_by_key(db, graph_id=graph.id, key=BULK_PLAN_KEY)
     if selected is None:
         raise RuntimeError(f"The plan library has no populated {BULK_PLAN_KEY!r}; run a migration before loading.")
-    steps = [PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps)]
     root = Path(path).resolve()
+    # `bulk_write` reads its step's args, not the run's params — the params are
+    # the journal's copy, the args are what the step is handed.
+    args = {
+        "root": str(root),
+        "batch_size": batch_size,
+        "skip_on_error": skip_on_error,
+        "keep_source_ids": keep_source_ids,
+    }
+    steps = [
+        dataclasses.replace(step, args={**step.args, **args})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
 
     run = TaskRun(
         graph_id=graph.id,
@@ -1022,13 +1060,7 @@ async def open_bulk_run(
         author_kind="user" if actor_id else "system",
         ask_kind="bulk",
         body=f"Bulk load {root.name}",
-        params={
-            "root": str(root),
-            "source": f"file://{root}",
-            "batch_size": batch_size,
-            "skip_on_error": skip_on_error,
-            "keep_source_ids": keep_source_ids,
-        },
+        params={**args, "source": f"file://{root}"},
         workflow_key=selected.ref,
         task_plan_id=selected.plan_id,
         plan_origin=f"template:{selected.ref}",
@@ -1043,3 +1075,127 @@ async def open_bulk_run(
     run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
     await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
     return run
+
+
+async def _refuse_unwritable(db: AsyncSession, *, graph: Graph, what: str) -> None:
+    """A stitch run writes edges; a Graph that cannot take them refuses before one opens."""
+    connection = await GraphManager().get_graph_connection(db, graph_id=graph.id)
+    if connection is None:
+        raise ValidationError({"error": "no_connection", "graph_id": graph.id})
+    if connection.read_only:
+        raise PermissionDeniedError(
+            {"error": "read_only_graph", "message": f"This connection is marked read-only, and {what} writes edges."}
+        )
+
+
+async def _open_stitch_run(
+    db: AsyncSession, *, graph: Graph, key: str, body: str, actor_id: str | None, args: dict | None = None
+) -> TaskRun:
+    """Open a stitch builtin as a run under the Graph's guardrails — no agent, no world (GV36)."""
+    selected = await select_plan_by_key(db, graph_id=graph.id, key=key)
+    if selected is None:
+        raise RuntimeError(f"The plan library has no populated {key!r}.")
+    steps = [
+        dataclasses.replace(step, args={**step.args, **(args or {})})
+        for step in (PlanStep.parse(dict(s), index=i) for i, s in enumerate(selected.steps))
+    ]
+
+    run = TaskRun(
+        graph_id=graph.id,
+        author_id=actor_id,
+        author_kind="user" if actor_id else "system",
+        ask_kind="stitch",
+        body=body,
+        params=dict(args or {}),
+        workflow_key=selected.ref,
+        task_plan_id=selected.plan_id,
+        plan_origin=f"template:{selected.ref}",
+        triggered_by=TriggeredBy.user.value,
+        on_behalf_of_user_id=actor_id,
+        status=RunStatus.queued.value,
+        **await freeze_lens(db, graph_id=graph.id, agent_id=None, lens_id=None),
+    )
+    db.add(run)
+    await db.flush()
+    run.plan_revision = 1
+    run.plan_snapshot = plan_payload(steps, source=run.plan_origin or "", version=1)
+    await queue_plan_steps(db, run=run, message_id=None, steps=steps, start_seq=0)
+    return run
+
+
+async def open_stitch_commit_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    actor_id: str | None = None,
+) -> TaskRun:
+    """Open the run a stitch commit runs as — the drawer's and the CLI's alike.
+
+    **Committing writes edges, so it is a run** (ST54): the
+    Graph's guardrails are frozen on it and `commit_stitches` asks them about
+    each stitch's two models before writing a single edge (ST53 · GV35). There
+    is no other path to that write.
+
+    Two refusals are this commit never starting: nothing staged, and a
+    connection it may not write to. Both are the prologue's, like a load's.
+    """
+    staged = await link_service.list_links(db, graph.id, status="staged")
+    if not staged:
+        raise ConflictError({"error": "nothing_staged", "message": "There are no staged stitches to commit."})
+    await _refuse_unwritable(db, graph=graph, what="committing a stitch")
+    noun = "stitch" if len(staged) == 1 else "stitches"
+    return await _open_stitch_run(
+        db, graph=graph, key=STITCH_COMMIT_PLAN_KEY, body=f"Commit {len(staged)} staged {noun}", actor_id=actor_id
+    )
+
+
+async def open_stitch_withdraw_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    link_id: str,
+    actor_id: str | None = None,
+) -> TaskRun:
+    """Open the run that removes one **active** stitch and the edges it wrote (ST55).
+
+    A staged stitch wrote nothing and is removed without a run — the caller's
+    to decide; this refuses one. The guardrails are asked inside the run, about
+    both of the stitch's models, before anything is deleted.
+    """
+    link = await link_service.get_link(db, graph.id, link_id)
+    if link is None:
+        raise NotFoundError({"error": "link_not_found", "link_id": link_id})
+    if link.status != "active":
+        raise ConflictError({"error": "not_active", "message": "Only an active stitch has edges to withdraw."})
+    await _refuse_unwritable(db, graph=graph, what="removing an active stitch")
+    return await _open_stitch_run(
+        db,
+        graph=graph,
+        key=STITCH_WITHDRAW_PLAN_KEY,
+        body=f"Remove stitch {link.source_type} → {link.target_type}",
+        actor_id=actor_id,
+        args={"link_id": link.id},
+    )
+
+
+async def open_stitch_preview_run(
+    db: AsyncSession,
+    *,
+    graph: Graph,
+    actor_id: str | None = None,
+    rule: dict | None = None,
+) -> TaskRun:
+    """Open the run a stitch preview is — one draft rule, or every declared stitch.
+
+    **Previewing reads the graph, so it is a run** under the Graph's
+    guardrails, like committing (ST54): the drawer's count and `invana stitches
+    resolve` go through `preview_stitches` and its lens, never the connector.
+    """
+    if rule is not None:
+        body = (
+            f"Preview {rule['source_type']}.{rule['source_property']} → {rule['target_type']}.{rule['target_property']}"
+        )
+        args: dict = {"rules": [rule]}
+    else:
+        body, args = "Resolve every stitch", {"all_links": True}
+    return await _open_stitch_run(db, graph=graph, key=STITCH_PREVIEW_PLAN_KEY, body=body, actor_id=actor_id, args=args)

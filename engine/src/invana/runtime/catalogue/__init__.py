@@ -17,9 +17,10 @@ envelope advisory (building-engine/the-runtime-package.md §1).
 | `pure` | *none* | `validate_query` · `shape_for_canvas` · `verify_result` · `await_delegations` |
 | `graph_read` | `graph_read` | `execute_graph_query` |
 | `ingest` | `ingest` | `check_bundle` · `validate_records` · `snapshot_model` |
-| `graph_write` | `graph_write` | `write_graph` · `stitch` · `apply_stitches` · `commit_stitches` |
+| `graph_write` | `graph_write` | `write_graph` · `stitch` · `bulk_write` · `apply_stitches` · `commit_stitches` · |
+| | | `withdraw_stitch` |
 | `schema_write` | `schema_write` | `understand_ask` · `validate_proposal` |
-| `llm` | `llm` | `understand_intent` · `plan_workflow` · `translate_thought` · `propose_model` |
+| `llm` | `llm` | `understand_intent` · `plan_workflow` · `translate_thought` · `draft_plan` · `propose_model` |
 | `work_write` | `work_write` | `spawn_agent` · `delegate` · `create_task` |
 
 Three modules in here declare no entry and are **bodies**: `bundle` (the

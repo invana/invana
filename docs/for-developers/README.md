@@ -123,7 +123,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | 7.3 | [Check a plan against the bound](modules/workflows/features/envelope-validation.md) | A plan is checked before dispatch, refused with the bound named | 🟡 | — | 🔵 | S9d |
 | 7.4 | [Promote a plan](modules/workflows/features/promote-a-plan.md) | A plan that served becomes a template | 🟡 | — | 🟡 | S12c |
 | 7.5 | [Run a workflow](modules/workflows/features/run-a-workflow.md) | Start a plan from the library with its arguments — the front door | 🔵 | 🔵 | 🔵 | S15 |
-| 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of callables a plan may name — bound · args · outputs · requires | 🟡 | — | 🔵 | S12c |
+| 7.6 | [Read the catalogue](modules/workflows/features/the-catalogue.md) | The closed set of callables a plan may name — bound · args · outputs · requires | 🟡 | — | 🟡 | S12c |
 | 7.7 | [Draft a plan](modules/workflows/features/draft-a-plan.md) | Fork a version into a draft, edit it on the canvas or as `manifest.yml`, publish it, retire it | 🔵 | — | 🔵 | S15 |
 
 ## 8 · [Memory](modules/memory/spec.md)

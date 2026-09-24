@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING, Any
 
 from invana.apps.modeller import links as link_service
 from invana.apps.modeller.links import LinkRefused
-from invana.apps.modeller.solve import Solved, rule_of, solvable, solve_links, stamp
+from invana.apps.modeller.solve import Solved, rule_of, solvable, solve_links, stamp, withdraw_link, written_query
 from invana.apps.modeller.store import ModelStore
 from invana.runtime.catalogue.bundle import Rule, read_manifest
 from invana.runtime.querysets import TaskRunQuerySet
@@ -202,14 +202,10 @@ class Outcome:
 
 @dataclass
 class Applied:
-    """The run: every rule's outcome, and whether the staged set was committed."""
+    """Every rule's outcome. Declaring only — committing is its own run (`stitch-commit@1`)."""
 
     name: str
     outcomes: list[Outcome] = field(default_factory=list)
-    committed: int = 0
-    #: What committing wrote, and each stitch's own result (ST44).
-    written: int = 0
-    solved: list = field(default_factory=list)
     dry_run: bool = False
 
     @property
@@ -482,7 +478,7 @@ async def commit_stitches(
     *,
     graph_id: str,
     connector,
-    admit: Callable[[ModelLink], Awaitable[bool]] | None = None,
+    admit: Callable[[ModelLink], Awaitable[bool]],
 ) -> Committed:
     """Flip the staged set to active and run every stitch in it (ST21, ST44, ST51).
 
@@ -493,14 +489,16 @@ async def commit_stitches(
 
     ``admit`` is a run's lens on each stitch's two models (ST53). A stitch it
     refuses is still committed — the rule is the Graph's, not the run's — but
-    this run writes none of its edges, and says so.
+    this run writes none of its edges, and says so. It is **required**: only the
+    `commit_stitches` step calls this, so there is no path that writes a
+    stitch's edges without asking the lens first.
     """
     committed = await link_service.commit_staged(session, graph_id)
     if not committed:
         return Committed()
 
     run = Committed(links=committed)
-    refused = {link.id for link in committed if admit is not None and not await admit(link)}
+    refused = {link.id for link in committed if not await admit(link)}
     for link in committed:
         if link.id in refused:
             run.solved.append(
@@ -528,3 +526,112 @@ async def commit_stitches(
     finally:
         await connector.disconnect()
     return run
+
+
+async def withdraw_stitch(
+    session: AsyncSession,
+    *,
+    graph_id: str,
+    link: ModelLink,
+    connector,
+    admit: Callable[[str], Awaitable[bool]],
+) -> int:
+    """Delete the edges one active stitch wrote, then the rule itself (ST48 · ST55).
+
+    ``admit`` is the run's lens on each of the stitch's two models, and it is
+    asked **before** anything is deleted — a refusal ends the run with the rule
+    and its edges both still there. The row goes last, so a database that fails
+    halfway leaves a rule that still names its edges rather than edges that name
+    nothing.
+    """
+    await admit(link.source_version_id)
+    if link.target_version_id != link.source_version_id:
+        await admit(link.target_version_id)
+    await connector.connect()
+    try:
+        withdrawn = await withdraw_link(connector, link)
+    finally:
+        await connector.disconnect()
+    await link_service.remove(session, graph_id, link.id)
+    return withdrawn
+
+
+# ── previewing a rule, under the run's lens ───────────────────────────────────
+
+#: Reads one query under the run's lens and returns its first row. Raises what
+#: the lens or the database raised — the body turns that into a refusal.
+Read = Callable[[str, dict | None], Awaitable[dict]]
+
+
+async def preview_rules(
+    session: AsyncSession,
+    *,
+    graph_id: str,
+    rules: list[dict],
+    all_links: bool,
+    read: Read,
+    refused: Callable[[Exception], str | None],
+) -> list[dict]:
+    """Count what each rule resolves — and, for a declared active stitch, what it wrote.
+
+    ``rules`` is the drawer's one undeclared rule; ``all_links`` is `invana
+    stitches resolve`, every declared stitch. Both are **reads**, and both go
+    through ``read`` — the entry's crossing, under the run's lens — so a rule
+    naming a type or key the guardrails deny is refused with that reason rather
+    than counted around it. ``refused`` says whether an exception is a refusal
+    (its message) or a failure to raise.
+    """
+    if all_links:
+        rules = [
+            {
+                "link_id": link.id,
+                "kind": link.kind,
+                "edge_type": link.edge_type,
+                "source_model_id": link.source_model_id,
+                "status": link.status,
+                "solvable": solvable(link),
+                "source_type": link.source_type,
+                "source_property": link.source_property or "",
+                "target_type": link.target_type,
+                "target_property": link.target_property or "",
+                "identity_match": link.identity_match,
+            }
+            for link in await link_service.list_links(session, graph_id)
+        ]
+    out: list[dict] = []
+    for rule in rules:
+        row: dict = {**rule, "preview": None, "written": None, "refused": None}
+        if rule.get("solvable", True):
+            query = link_service.stitch_preview_query(
+                source_type=rule["source_type"],
+                source_property=rule["source_property"],
+                target_type=rule["target_type"],
+                target_property=rule["target_property"],
+                case_insensitive=rule.get("identity_match") == "case_insensitive",
+            )
+            try:
+                counted = await read(query, None)
+            except Exception as exc:
+                reason = refused(exc)
+                if reason is None:
+                    raise
+                row["refused"] = reason
+                out.append(row)
+                continue
+            row["preview"] = link_service.read_preview(
+                counted,
+                source_type=rule["source_type"],
+                source_property=rule["source_property"],
+                target_type=rule["target_type"],
+                target_property=rule["target_property"],
+            ).model_dump(mode="json")
+        if rule.get("link_id") and rule.get("status") == "active":
+            try:
+                row["written"] = int((await read(written_query(), {"stitch_id": rule["link_id"]})).get("written") or 0)
+            except Exception as exc:
+                reason = refused(exc)
+                if reason is None:
+                    raise
+                row["refused"] = reason
+        out.append(row)
+    return out

@@ -171,7 +171,7 @@ export function TodosDrawerBody({
 			<div className="flex h-full min-h-0 flex-col">
 				{creating && !selectedTaskId ? (
 					<form
-						className="space-y-1.5 border-b p-2"
+						className="space-y-1.5 border-b px-3 py-2"
 						onSubmit={(e) => {
 							e.preventDefault();
 							if (!title.trim()) return;
@@ -244,11 +244,11 @@ export function TodosDrawerBody({
 
 						<div className="flex-1 overflow-y-auto">
 							{list.isLoading ? (
-								<div className="p-4">
+								<div className="px-3 py-4">
 									<Spinner />
 								</div>
 							) : visible.length === 0 ? (
-								<p className="p-4 text-base text-muted-foreground">
+								<p className="px-3 py-4 text-base text-muted-foreground">
 									{tasks.length
 										? "No task matches those filters."
 										: "No tasks yet. Write one down and hand it to an agent."}
@@ -375,7 +375,7 @@ function TaskDetail({
 			 * story in one row: an agent is always acting on someone's behalf, and
 			 * that someone is who Accept belongs to.
 			 */}
-			<div className="flex shrink-0 flex-wrap items-center gap-2 px-4 pb-1.5 pt-2.5">
+			<div className="flex shrink-0 flex-wrap items-center gap-2 px-3 pb-1.5 pt-2.5">
 				<DetailStatus tone={taskTone(task.status)}>
 					{humanStatus(task.status)}
 				</DetailStatus>
@@ -413,12 +413,12 @@ function TaskDetail({
 			</div>
 
 			{task.body ? (
-				<p className="shrink-0 whitespace-pre-wrap px-4 text-base text-foreground">
+				<p className="shrink-0 whitespace-pre-wrap px-3 text-base text-foreground">
 					{task.body}
 				</p>
 			) : null}
 			{task.acceptance ? (
-				<p className="shrink-0 px-4 pt-1.5 text-base text-muted-foreground">
+				<p className="shrink-0 px-3 pt-1.5 text-base text-muted-foreground">
 					<span className="font-medium text-foreground">Accepts when</span>{" "}
 					{task.acceptance}
 				</p>
@@ -441,7 +441,7 @@ function TaskDetail({
 				{/* ── Work ──────────────────────────────────────────────────────── */}
 				<TabsContent
 					value="work"
-					className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-2.5"
+					className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-2.5"
 				>
 					{task.status === "needs_input" && task.blocked_reason ? (
 						<div className="rounded-sm border border-amber-500/40 p-2 text-base">
@@ -539,7 +539,7 @@ function TaskDetail({
 					className="min-h-0 flex-1 overflow-y-auto"
 				>
 					{activity.isLoading ? (
-						<div className="p-4">
+						<div className="px-3 py-4">
 							<Spinner />
 						</div>
 					) : (
@@ -556,7 +556,7 @@ function TaskDetail({
 					className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-2.5"
 				>
 					{runs.isLoading ? (
-						<div className="p-4">
+						<div className="px-3 py-4">
 							<Spinner />
 						</div>
 					) : !runs.data?.length ? (

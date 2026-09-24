@@ -149,7 +149,7 @@ export function SessionList({
 							<button
 								type="button"
 								onClick={() => setExpanded((v) => !v)}
-								className="flex items-center justify-between px-4 py-2 text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors"
+								className="flex items-center justify-between px-3 py-2 text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors"
 							>
 								<span>{expanded ? "Less" : "More"}</span>
 								<span>{filtered.length}</span>

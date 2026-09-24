@@ -49,6 +49,9 @@ export interface ExpandBase {
 	/** The session this expand belongs to (docs/for-developers/modules/explore/features/boards.md) — when set, the engine logs
 	 *  the expand as a turn in that session's thread. */
 	session_id?: string;
+	/** The world the canvas has picked, exactly as an ask's `lens_id` — the
+	 *  expansion runs under it (graph-canvas.md GC11). */
+	lens_id?: string;
 }
 
 export type ExpandNeighborsRequest = ExpandBase;
@@ -68,6 +71,8 @@ export interface NeighborExpandResponse {
 	limit: number;
 	returned: number;
 	has_more: boolean;
+	/** The `expand-neighbours@1` run this answer came from (GC12). */
+	run_id?: string | null;
 }
 
 /** Discriminated request handed to `useExpandNode` — picks the focused endpoint. */

@@ -26,7 +26,7 @@
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 import { StatusDot, cn } from "@invana/ui";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export function WorkRow({
 	active,
@@ -66,7 +66,7 @@ export function WorkRow({
 	return (
 		<div
 			className={cn(
-				"group flex w-full items-start gap-2.5 pr-4",
+				"group flex w-full items-start gap-2.5 pr-3",
 				onClick && "hover:bg-accent/60",
 				active && "bg-accent",
 				className,
@@ -75,8 +75,16 @@ export function WorkRow({
 			<Target
 				type={onClick ? "button" : undefined}
 				onClick={onClick}
-				className="flex min-w-0 flex-1 items-start gap-2.5 py-2 pl-4 text-left"
-				style={indent ? { paddingLeft: `${16 + indent * 14}px` } : undefined}
+				// The panel's `px-3`, plus 14px a level for a nested row.
+				className={cn(
+					"flex min-w-0 flex-1 items-start gap-2.5 py-2 pl-3 text-left",
+					indent ? "ps-[calc(var(--spacing)*3+var(--row-indent))]" : null,
+				)}
+				style={
+					indent
+						? ({ "--row-indent": `${indent * 14}px` } as CSSProperties)
+						: undefined
+				}
 			>
 				{/* `running` is the kit's pulsing tone, which is the same rule this
 				    row always had: motion means "moving right now", a static amber

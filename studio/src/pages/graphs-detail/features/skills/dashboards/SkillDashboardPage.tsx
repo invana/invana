@@ -118,7 +118,7 @@ export function SkillDashboardPage({
 
 	return (
 		<Dashboard<SkillPanels>
-			className="h-full min-h-0 overflow-y-auto p-3"
+			className="h-full min-h-0"
 			spec={report.spec}
 			// Skills' own strip, mounted rather than redrawn: the drawer and the
 			// board would otherwise be two drawings of one plan (SK16).

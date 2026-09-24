@@ -2,9 +2,11 @@
 
 from typing import Literal
 
+from invana.graph.connectors.base.lens import admit_structured
 from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
 from invana.graph.types.data_elements import Edge, GraphResponse, Path, Vertex
 from invana.graph.types.filters import FilterGroup
+from invana.graph.types.lens import QueryLens
 from invana.graph.types.sort import SortSpec
 
 
@@ -47,7 +49,11 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         sort: list[SortSpec] | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        lens: QueryLens | None = None,
     ) -> GraphResponse:
+        lens = self._neighbour_lens(
+            lens, edge_label=edge_label, neighbor_label=neighbor_label, filters=filters, sort=sort
+        )
         query, params = self._connector.query_builder.match_neighbors(
             self._connector.coerce_id(vertex_id),
             direction,
@@ -57,6 +63,7 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
             sort=sort,
             limit=limit,
             offset=offset,
+            lens=lens,
         )
         response = await self._connector.execute(query, params)
         # Surface the generated traversal so callers can log it
@@ -73,16 +80,27 @@ class OpenCypherDataReaderQuerySet(BaseDataReaderQuerySet):
         edge_label: str | None = None,
         neighbor_label: str | None = None,
         filters: FilterGroup | None = None,
+        lens: QueryLens | None = None,
     ) -> int:
+        lens = self._neighbour_lens(lens, edge_label=edge_label, neighbor_label=neighbor_label, filters=filters)
         query, params = self._connector.query_builder.count_neighbors(
             self._connector.coerce_id(vertex_id),
             direction,
             edge_label=edge_label,
             neighbor_label=neighbor_label,
             filters=filters,
+            lens=lens,
         )
         response = await self._connector.execute(query, params)
         return response.records[0]["cnt"]
+
+    async def resolve_vertices(self, vertex_ids: list[str], *, lens: QueryLens | None = None) -> dict[str, bool]:
+        if not vertex_ids:
+            return {}
+        lens = admit_structured(lens)
+        ids = [self._connector.coerce_id(v) for v in vertex_ids]
+        response = await self._connector.execute(*self._connector.query_builder.resolve_nodes(ids, lens))
+        return {str(r["id"]): bool(r["in_world"]) for r in response.records}
 
     async def read_vertex_by_id(self, vertex_id: str) -> Vertex:
         query, params = self._connector.query_builder.match_node_by_id(self._connector.coerce_id(vertex_id))

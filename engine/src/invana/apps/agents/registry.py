@@ -66,7 +66,7 @@ class Template:
     # through INTENT_TEMPLATES; kept here too so the library detail can show it.
     intents: tuple[str, ...]
     steps: tuple[dict, ...]
-    #: The plan's **subject** — `ask · import · bulk · stitch · model · enrich`.
+    #: The plan's **subject** — `ask · import · bulk · stitch · model · enrich · canvas`.
     #: A plain string rather than `PlanKind`, because `apps/task_plans` already
     #: imports this module and the band contract keeps `apps` acyclic.
     kind: str = "ask"
@@ -244,6 +244,60 @@ STITCH_APPLY = Template(
     ),
 )
 
+STITCH_COMMIT = Template(
+    key="stitch-commit",
+    version=1,
+    kind="stitch",
+    description="Commit the staged stitches and write their edges, under the Graph's guardrails.",
+    intents=(),
+    steps=(step("commit_stitches", label="Commit"),),
+)
+
+STITCH_WITHDRAW = Template(
+    key="stitch-withdraw",
+    version=1,
+    kind="stitch",
+    description="Withdraw the edges a removed stitch wrote, under the Graph's guardrails.",
+    intents=(),
+    steps=(step("withdraw_stitch", label="Withdraw"),),
+)
+
+STITCH_PREVIEW = Template(
+    key="stitch-preview",
+    version=1,
+    kind="stitch",
+    description="Count what stitch rules resolve, under the Graph's guardrails (ST43).",
+    intents=(),
+    steps=(step("preview_stitches", label="Preview"),),
+)
+
+COUNT_TYPES = Template(
+    key="count-types",
+    version=1,
+    kind="canvas",
+    description="Count the types the canvas's world holds (SP11).",
+    intents=(),
+    steps=(step("count_types", label="Count types"),),
+)
+
+RESOLVE_ELEMENTS = Template(
+    key="resolve-elements",
+    version=1,
+    kind="canvas",
+    description="Check a reopened canvas against the graph, under its world (GC14).",
+    intents=(),
+    steps=(step("resolve_elements", label="Resolve"),),
+)
+
+EXPAND_NEIGHBOURS = Template(
+    key="expand-neighbours",
+    version=1,
+    kind="canvas",
+    description="Read one vertex's neighbours under the canvas session's lens (GC6 · GC9).",
+    intents=(),
+    steps=(step("expand_neighbours", label="Expand"),),
+)
+
 TEMPLATES: dict[str, Template] = {
     t.key: t
     for t in (
@@ -254,6 +308,12 @@ TEMPLATES: dict[str, Template] = {
         MODEL_IMPORT,
         BULK_LOAD,
         STITCH_APPLY,
+        STITCH_COMMIT,
+        STITCH_WITHDRAW,
+        STITCH_PREVIEW,
+        EXPAND_NEIGHBOURS,
+        COUNT_TYPES,
+        RESOLVE_ELEMENTS,
     )
 }
 

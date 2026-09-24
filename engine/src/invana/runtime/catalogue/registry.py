@@ -89,6 +89,9 @@ class Entry:
     outputs: Mapping[str, Type] = field(default_factory=dict)
     #: Step keys a plan naming this one must already order before it.
     requires: tuple[str, ...] = ()
+    #: One line a person reads in the Catalogue drawer — the declaration's own
+    #: words, so Studio never keeps a second description of an entry (CA2).
+    summary: str = ""
 
     def declares(self, output: str) -> bool:
         """Whether ``${steps.<this>.<output>}`` has anything to bind to.

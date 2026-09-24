@@ -67,6 +67,9 @@ class PlanKind(enum.StrEnum):
     stitch = "stitch"
     model = "model"
     enrich = "enrich"
+    #: A canvas act that reads the graph — an expansion, the types a world
+    #: holds, a reopened canvas's check (GC6 · SP11 · GC14).
+    canvas = "canvas"
 
 
 class TaskForm(enum.StrEnum):

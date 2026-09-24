@@ -173,7 +173,7 @@ export function TemplatesDrawerBody({
 
 	if (templates.isLoading) {
 		return (
-			<div className="p-4">
+			<div className="px-3 py-4">
 				<Spinner />
 			</div>
 		);
@@ -187,7 +187,7 @@ export function TemplatesDrawerBody({
 	if (selectedId && !selected) {
 		return (
 			<EmptyState
-				className="p-4"
+				className="px-3 py-4"
 				title="That template is gone"
 				description="It was removed, or it belongs to another Graph. The list beside it is the ones this Graph can render with."
 			/>
@@ -215,7 +215,7 @@ export function TemplatesDrawerBody({
 	if (!rows.length) {
 		return (
 			<EmptyState
-				className="p-4"
+				className="px-3 py-4"
 				title={narrowed ? "No template matches" : "No templates yet"}
 				description={
 					narrowed

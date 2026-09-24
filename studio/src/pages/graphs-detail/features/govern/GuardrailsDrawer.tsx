@@ -125,7 +125,7 @@ export function guardrailsDrawerSection({
 			children: () => {
 				if (authoring || editing) {
 					return (
-						<div className="p-2">
+						<div className="px-3 py-2">
 							<LensEditor
 								username={username}
 								graphSlug={graphSlug}
@@ -145,7 +145,7 @@ export function guardrailsDrawerSection({
 
 				if (drilled) {
 					return (
-						<div className="p-2">
+						<div className="px-3 py-2">
 							<LensDetail
 								lens={drilled}
 								username={username}

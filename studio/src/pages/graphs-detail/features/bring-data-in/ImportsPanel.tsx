@@ -146,14 +146,14 @@ function Journal({
 	return (
 		<div className="min-h-0 flex-1 overflow-y-auto">
 			{isLoading ? (
-				<div className="p-4">
+				<div className="px-3 py-4">
 					<Spinner />
 				</div>
 			) : rows.length === 0 ? (
 				// Empty because nothing has run, not because something is
 				// broken — so the empty state is the command, not an apology.
 				<EmptyState
-					className="p-4"
+					className="px-3 py-4"
 					title={narrowed ? "No runs match" : "Nothing has run yet"}
 					description={
 						narrowed ? (

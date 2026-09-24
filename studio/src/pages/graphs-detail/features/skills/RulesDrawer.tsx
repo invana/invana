@@ -75,7 +75,7 @@ export function RulesDrawer({
 			) : null}
 
 			{rules.isLoading ? (
-				<div className="p-4">
+				<div className="px-3 py-4">
 					<Spinner />
 				</div>
 			) : items.length === 0 ? (

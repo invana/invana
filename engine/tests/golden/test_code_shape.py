@@ -222,7 +222,6 @@ EMIT_ALLOWED = {
     "runtime/catalogue/records.py",
     "runtime/catalogue/stitching.py",
     "apps/graphs/pool.py",
-    "apps/explorer/managers/explore.py",
     "runtime/services.py",
     "runtime/delegation.py",
     "runtime/interpreter/loop.py",

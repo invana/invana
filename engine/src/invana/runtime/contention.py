@@ -42,7 +42,9 @@ from datetime import UTC, datetime
 
 # A person's question is served before a scheduled run (CC3). Everything else is
 # first in, first served, which the tiebreaker counter makes exact.
-_PRECEDENCE = {"user": 0, "delegation": 1, "task": 2, "schedule": 3}
+#: A canvas run waits like a user's — a person is waiting on both — and a
+#: system run like a schedule's (RP31).
+_PRECEDENCE = {"user": 0, "canvas": 0, "delegation": 1, "task": 2, "schedule": 3, "system": 3}
 
 
 @dataclass(order=True)

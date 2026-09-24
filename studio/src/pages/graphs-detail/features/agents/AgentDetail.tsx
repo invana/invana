@@ -300,7 +300,7 @@ export function AgentDetail({
 				</DetailStatus>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 px-4 pb-1 pt-2 text-base">
+			<div className="flex shrink-0 items-center gap-2 px-3 pb-1 pt-2 text-base">
 				<DetailStatus>{agent.kind}</DetailStatus>
 				<span className="truncate text-muted-foreground">
 					v{agent.version}
@@ -702,11 +702,11 @@ export function AgentDetail({
 				{/* ── Work ──────────────────────────────────────────────────────── */}
 				<TabsContent value="work" className="min-h-0 flex-1 overflow-y-auto">
 					{tasks.isLoading ? (
-						<div className="p-4">
+						<div className="px-3 py-4">
 							<Spinner />
 						</div>
 					) : myTasks.length === 0 ? (
-						<p className="p-4 text-base text-muted-foreground">
+						<p className="px-3 py-4 text-base text-muted-foreground">
 							This agent has no tasks. Assigning one is what starts it.
 						</p>
 					) : (
@@ -733,7 +733,7 @@ export function AgentDetail({
 
 				{/* ── Lineage ───────────────────────────────────────────────────── */}
 				<TabsContent value="lineage" className="min-h-0 flex-1 overflow-y-auto">
-					<div className="px-4 py-2.5 text-base text-muted-foreground">
+					<div className="px-3 py-2.5 text-base text-muted-foreground">
 						{children.length
 							? `${children.length} related agent${children.length === 1 ? "" : "s"} · drawn on the canvas`
 							: "Nothing was spawned from this agent."}

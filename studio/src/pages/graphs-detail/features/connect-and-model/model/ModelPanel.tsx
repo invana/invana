@@ -385,7 +385,7 @@ function ModelListView({
 			content: (
 				<div className="pb-2.5">
 					{searchOpen ? (
-						<div className="border-b p-2">
+						<div className="border-b px-3 py-2">
 							<SearchInput
 								inputSize="sm"
 								autoFocus
@@ -396,7 +396,7 @@ function ModelListView({
 						</div>
 					) : null}
 					{isLoading ? (
-						<div className="p-4">
+						<div className="px-3 py-4">
 							<Spinner />
 						</div>
 					) : rows.length === 0 ? (

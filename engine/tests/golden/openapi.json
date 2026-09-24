@@ -2314,6 +2314,120 @@
         "title": "CastResolutionRead",
         "type": "object"
       },
+      "CatalogueArgRead": {
+        "properties": {
+          "default": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "required"
+        ],
+        "title": "CatalogueArgRead",
+        "type": "object"
+      },
+      "CatalogueEntryRead": {
+        "description": "One catalogue entry, rendered from its declaration (the-catalogue.md CA2).",
+        "properties": {
+          "args": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueArgRead"
+            },
+            "title": "Args",
+            "type": "array"
+          },
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "outputs": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueOutputRead"
+            },
+            "title": "Outputs",
+            "type": "array"
+          },
+          "requires": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requires",
+            "type": "array"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "used_by": {
+            "title": "Used By",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "step_key",
+          "bound",
+          "summary",
+          "args",
+          "outputs",
+          "requires",
+          "used_by"
+        ],
+        "title": "CatalogueEntryRead",
+        "type": "object"
+      },
+      "CatalogueOutputRead": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rollup": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rollup"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ],
+        "title": "CatalogueOutputRead",
+        "type": "object"
+      },
       "CatalogueRead": {
         "description": "What this Graph can address, and \u2014 with ``match`` \u2014 what a rule would bite.",
         "properties": {
@@ -2353,6 +2467,27 @@
           "layers_present"
         ],
         "title": "CatalogueRead",
+        "type": "object"
+      },
+      "CatalogueResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogueEntryRead"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "CatalogueResponse",
         "type": "object"
       },
       "ChangePasswordRequest": {
@@ -3475,6 +3610,17 @@
               }
             ]
           },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
           "limit": {
             "default": 50,
             "exclusiveMinimum": 0.0,
@@ -3541,6 +3687,17 @@
                 "type": "null"
               }
             ]
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
           },
           "limit": {
             "default": 50,
@@ -3613,6 +3770,17 @@
                 "type": "null"
               }
             ]
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
           },
           "limit": {
             "default": 50,
@@ -6352,6 +6520,17 @@
             "title": "Returned",
             "type": "integer"
           },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
           "total": {
             "title": "Total",
             "type": "integer"
@@ -7901,8 +8080,19 @@
         "type": "object"
       },
       "ResolveElementsRequest": {
-        "description": "Which of these ids does the graph still hold?\n\nA canvas reopens from its own snapshot, and the graph may have moved on. An\nelement that is gone is **kept and marked missing**\n(docs/for-developers/modules/explore/features/graph-canvas.md GC5) rather than\ndropped: a drawing that quietly loses a node is a drawing that lies about what\nwas explored.",
+        "description": "Which of these ids does the graph still hold, inside the picked world?\n\nA canvas reopens from its own snapshot, and the graph may have moved on. An\nelement that is gone is **kept and marked missing**\n(docs/for-developers/modules/explore/features/graph-canvas.md GC5) rather than\ndropped: a drawing that quietly loses a node is a drawing that lies about what\nwas explored. One the world excludes is in neither list (GC14).",
         "properties": {
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
           "vertex_ids": {
             "items": {
               "type": "string"
@@ -7935,6 +8125,17 @@
             },
             "title": "Present",
             "type": "array"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
           }
         },
         "title": "ResolveElementsResponse",
@@ -13463,6 +13664,17 @@
             },
             "title": "Nodes",
             "type": "array"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
           }
         },
         "title": "TypeCountsResponse",
@@ -17171,6 +17383,66 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/catalogue": {
+      "get": {
+        "operationId": "list_catalogue_api_v1_u__username___graphSlug__catalogue_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Catalogue",
+        "tags": [
+          "catalogue"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/connection": {
       "delete": {
         "operationId": "delete_connection_api_v1_u__username___graphSlug__connection_delete",
@@ -18364,7 +18636,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/explorer/resolve": {
       "post": {
-        "description": "Which of a canvas's elements the graph still holds (GC5).\n\nRead-only, and it emits no event: a canvas asking whether its own drawing is\nstill true is not an action anybody audits.",
+        "description": "What of a reopened canvas is still in view \u2014 a `resolve-elements@1` run (GC5 \u00b7 GC14).\n\n``present`` is in the graph and the picked world, ``missing`` is gone from\nthe graph. What the world excludes is in neither, and is not drawn.",
         "operationId": "resolve_elements_api_v1_u__username___graphSlug__explorer_resolve_post",
         "parameters": [
           {
@@ -18435,7 +18707,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/explorer/type-counts": {
       "get": {
-        "description": "Node and edge types with graph-wide counts \u2014 the Explorer panel's legend.\n\nRead-only and unlogged: it states what the graph holds, which is not a\ntraversal anybody took (selection-and-the-panel.md SP6).",
+        "description": "The types the picked world holds, counted inside it \u2014 a `count-types@1` run (SP11).\n\nA type the world denies is absent, and every count is taken inside its\nslice \u2014 the Explorer panel's legend and the expand menus read this.",
         "operationId": "type_counts_api_v1_u__username___graphSlug__explorer_type_counts_get",
         "parameters": [
           {
@@ -18458,6 +18730,24 @@
               "description": "Graph slug, unique per owner.",
               "title": "Graphslug",
               "type": "string"
+            }
+          },
+          {
+            "description": "The world the canvas has picked (SP11).",
+            "in": "query",
+            "name": "lens_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The world the canvas has picked (SP11).",
+              "title": "Lens Id"
             }
           }
         ],
@@ -20229,7 +20519,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/model-links/commit": {
       "post": {
-        "description": "Flip every staged stitch to active \u2014 one action for the whole set (ST21).\n\nNothing is validated again here. A stitch was refused or accepted when it was\ndeclared, and the resolve preview ran before that; a commit is the moment a\nperson says *yes, these belong in the union*, not a second gate.",
+        "description": "Flip every staged stitch to active \u2014 one action for the whole set (ST21).\n\n**Committing is a run** (ST54): `stitch-commit@1`\nunder the Graph's guardrails, awaited here because the person is waiting on\nit (RP31). A stitch whose model the guardrails deny is committed and writes\nnothing, and its row says so (ST53).",
         "operationId": "commit_staged_links_api_v1_u__username___graphSlug__model_links_commit_post",
         "parameters": [
           {
@@ -20368,7 +20658,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/model-links/preview": {
       "post": {
-        "description": "How many the rule resolves \u2014 counted before anything is declared.\n\nA count of zero comes back as a verdict, not an error: the rule is wrong, not\nthe data (\"nothing resolves\" in the journey).",
+        "description": "How many the rule resolves \u2014 counted before anything is declared.\n\nA count of zero comes back as a verdict, not an error: the rule is wrong, not\nthe data (\"nothing resolves\" in the journey). **Counting reads the graph, so\nit is a run** \u2014 `stitch-preview@1` under the Graph's guardrails, awaited\nhere (RP31). A rule naming what the guardrails deny is refused naming why.",
         "operationId": "preview_stitch_api_v1_u__username___graphSlug__model_links_preview_post",
         "parameters": [
           {
@@ -20439,6 +20729,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/model-links/{link_id}": {
       "delete": {
+        "description": "Remove a stitch \u2014 and, if it is active, the edges it wrote (ST48 \u00b7 ST55).\n\nA staged stitch wrote nothing, so its row is deleted here. An active one is\n`stitch-withdraw@1`, awaited: the Graph's guardrails are asked about both\nits models before an edge goes, and a refusal keeps the rule and its edges.",
         "operationId": "remove_model_link_api_v1_u__username___graphSlug__model_links__link_id__delete",
         "parameters": [
           {
@@ -24862,6 +25153,18 @@
               "default": false,
               "description": "Generated plans that served and were never promoted \u2014 the Promote picker's list.",
               "title": "Candidates",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Include canvas and system runs \u2014 expansions, checks \u2014 which the journal hides by default.",
+            "in": "query",
+            "name": "interactive",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Include canvas and system runs \u2014 expansions, checks \u2014 which the journal hides by default.",
+              "title": "Interactive",
               "type": "boolean"
             }
           },

@@ -114,3 +114,12 @@ async def seeded_graph(connector):
     await connector.data_writer.create_edge("KNOWS", alice.id, charlie.id, {"since": 2018})
     await connector.data_writer.create_edge("WORKS_AT", alice.id, acme.id, {"role": "Engineer"})
     return {"alice": alice, "bob": bob, "charlie": charlie, "acme": acme}
+
+
+@pytest_asyncio.fixture
+async def runtime(db_engine, manager):
+    """The interpreter an expansion runs in (GC6), over the same schema and connector."""
+    from invana.runtime.interpreter.loop import TaskRuntime
+
+    factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
+    return TaskRuntime(session_factory=factory, manager=manager, encryption_key=settings.encryption_key)

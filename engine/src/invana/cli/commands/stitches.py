@@ -22,14 +22,12 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
+from types import SimpleNamespace
 
 import click
 
-from invana.apps.graphs.managers import GraphManager
-from invana.apps.graphs.pool import build_connector
 from invana.apps.graphs.querysets import GraphQuerySet
 from invana.apps.modeller import links as link_service
-from invana.apps.modeller.solve import count_written, solvable
 from invana.apps.modeller.store import ModelStore
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.db import create_db_engine, create_session_factory
@@ -38,7 +36,7 @@ from invana.core.events.models import ActorKind
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
 from invana.runtime.catalogue.bundle import MANIFEST, BundleError
-from invana.runtime.catalogue.stitching import Applied, apply_bundle, commit_stitches
+from invana.runtime.catalogue.stitching import Applied, apply_bundle
 
 _store = ModelStore()
 
@@ -86,32 +84,114 @@ def _actor(actor_id: str | None) -> dict:
     return {"actor_id": actor_id} if actor_id else {"actor_kind": ActorKind.system}
 
 
-async def _connector(session, graph, *, writing: bool):
-    """The Graph's connector, built from its stored connection.
-
-    Solving writes, so a read-only connection is refused before anything is
-    flipped — Invana never writes to one.
-    """
-    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
-    if connection is None:
-        raise click.ClickException("This Graph has no connection. Attach one in Studio first.")
-    if writing and connection.read_only:
-        raise click.ClickException("This connection is marked read-only, and committing a stitch writes edges.")
-    return build_connector(connection, settings.encryption_key)
-
-
-def _solved_lines(results) -> None:
+def _solved_lines(rows: list[dict]) -> None:
     """What each stitch wrote, one line each — a zero is a verdict, not a silence.
 
-    Takes both shapes a commit produces: a rule that joined, and one that loaded
-    the rows its dataset ships (ST51).
+    Reads `commit_stitches`' own `links` output, which carries both shapes a
+    commit produces: a rule that joined, and one that loaded the rows its dataset
+    ships (ST51) — and a stitch the guardrails refused (ST53).
     """
-    for result in results:
-        what = getattr(result, "rule", None) or f"rows for {result.edge_type}"
-        if result.skipped:
-            click.echo(f"  --    {what:<52} nothing run — {result.skipped}")
+    for row in rows:
+        what = row.get("rule") or f"rows for {row['edge_type']}"
+        if row.get("skipped"):
+            click.echo(f"  --    {what:<52} nothing run — {row['skipped']}")
         else:
-            click.echo(f"  {result.written:>6}  {what:<52} -[{result.edge_type}]->")
+            click.echo(f"  {row['written']:>6}  {what:<52} -[{row['edge_type']}]->")
+
+
+async def _as_run(graph_ref: str, user_ref: str | None, *, open_run, task_key: str, after=None) -> dict:
+    """Open a stitch builtin as a run, wait for it, and return its step's output.
+
+    The drawer's path, from a terminal (ST54): the Graph's guardrails are frozen
+    on the run and every read or write it makes goes through them. ``open_run``
+    is ``(services, session, graph, actor_id) -> TaskRun``; ``after`` gets the
+    settled root and output in a fresh session, for what a command records.
+    """
+    from invana.apps.graphs.pool import GraphConnectionManager
+    from invana.core.errors import InvanaError
+    from invana.runtime import services as run_services
+    from invana.runtime.interpreter import TaskRuntime
+    from invana.runtime.models import TaskRun
+    from invana.runtime.querysets import TaskRunQuerySet
+
+    username, slug = graph_ref.split("/", 1)
+    engine = await create_db_engine()
+    session_factory = create_session_factory(engine)
+    manager = GraphConnectionManager(session_factory=session_factory, encryption_key=settings.encryption_key)
+    await manager.startup()
+    runtime = TaskRuntime(session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key)
+    try:
+        async with session_factory() as session:
+            graph = await GraphQuerySet().get_by_owner_username_and_slug(session, owner_username=username, slug=slug)
+            if graph is None:
+                raise click.UsageError(f"Graph {graph_ref!r} not found.")
+            actor_id: str | None = None
+            if user_ref:
+                actor = await UserQuerySet().get_by_username_or_email(session, user_ref)
+                if actor is None:
+                    raise click.UsageError(f"No user {user_ref!r}.")
+                actor_id = actor.id
+            try:
+                run = await open_run(run_services, session, graph, actor_id)
+            except InvanaError as exc:
+                detail = exc.detail
+                raise click.ClickException(
+                    detail.get("message") or detail.get("error") if isinstance(detail, dict) else str(detail)
+                ) from exc
+            run_id, graph_id = run.id, graph.id
+            await session.commit()
+
+        click.echo(f"run {run_id}")
+        await runtime.run_inline(run_id)
+
+        async with session_factory() as session:
+            root = await session.get(TaskRun, run_id)
+            nodes = await TaskRunQuerySet().nodes_of(session, run_id=run_id)
+            out = next((n.output or {} for n in nodes if n.task_key == task_key), {})
+            if after is not None:
+                await after(session, root, out, graph_id=graph_id, actor_id=actor_id)
+            return {**out, "status": root.status, "error": (root.error or {}).get("message"), "run_id": run_id}
+    finally:
+        await manager.shutdown()
+        await engine.dispose()
+
+
+async def _commit_as_run(graph_ref: str, user_ref: str | None) -> dict:
+    """Commit the staged set as a `stitch-commit@1` run, and wait for it (ST54)."""
+
+    async def recorded(session, root, out, *, graph_id, actor_id) -> None:
+        if root.status == "succeeded" and out.get("links"):
+            await emit_event(
+                session,
+                action=event_actions.MODEL_LINK_COMMIT,
+                target_kind=event_actions.TARGET_MODEL_LINK,
+                graph_id=graph_id,
+                details={"count": len(out["links"]), "edges_written": out.get("written", 0), "run_id": root.id},
+                **_actor(actor_id),
+            )
+            await session.commit()
+
+    return await _as_run(
+        graph_ref,
+        user_ref,
+        open_run=lambda services, session, graph, actor_id: services.open_stitch_commit_run(
+            session, graph=graph, actor_id=actor_id
+        ),
+        task_key="commit_stitches",
+        after=recorded,
+    )
+
+
+def _commit_report(done: dict) -> None:
+    """Say what a commit run did, or why it did not — the same words either command uses."""
+    if done["status"] != "succeeded":
+        raise click.ClickException(done["error"] or f"The commit {done['status']}. Open run {done['run_id']}.")
+    rows = done.get("links") or []
+    _solved_lines(rows)
+    written = int(done.get("written") or 0)
+    click.echo(f"Committed {len(rows)} stitch(es) — they are in the union now, and wrote {written:,} edge(s).")
+    if done.get("rejected"):
+        click.echo(f"  {done['rejected']} row(s) had an endpoint that resolved nowhere.")
 
 
 def _bundle_root(file: str) -> Path:
@@ -153,12 +233,7 @@ def _report(run: Applied, graph_ref: str) -> None:
     click.echo(
         f"\n{len(run.outcomes)} rules — {run.declared} {verb}, {run.already} already declared, {run.skipped} skipped."
     )
-    if run.committed:
-        click.echo(
-            f"\nCommitted {run.committed} stitch(es) — they are in the union now, and wrote {run.written:,} edge(s)."
-        )
-        _solved_lines(run.solved)
-    elif run.declared and not run.dry_run:
+    if run.declared and not run.dry_run:
         click.echo("Staged — the global model is unchanged until you commit.")
 
 
@@ -185,9 +260,6 @@ def apply_cmd(graph_ref: str, file: str, do_commit: bool, dry_run: bool, user_re
     root = _bundle_root(file)
 
     async def work(session, graph, actor_id):
-        # The connector is resolved before anything is declared, so a commit that
-        # cannot write fails before it has flipped a single row (ST44).
-        connector = await _connector(session, graph, writing=True) if do_commit and not dry_run else None
         run = await apply_bundle(session, _store, graph_id=graph.id, root=root, dry_run=dry_run)
         for outcome in run.outcomes:
             if outcome.status == "declared":
@@ -200,20 +272,6 @@ def apply_cmd(graph_ref: str, file: str, do_commit: bool, dry_run: bool, user_re
                     details={"kind": outcome.rule.kind, "rule": outcome.rule.describe(), "bundle": run.name},
                     **_actor(actor_id),
                 )
-        if connector is not None:
-            done = await commit_stitches(session, graph_id=graph.id, connector=connector)
-            run.committed = len(done.links)
-            run.written = done.written
-            run.solved = [*done.solved, *done.loaded]
-            if done.links:
-                await emit_event(
-                    session,
-                    action=event_actions.MODEL_LINK_COMMIT,
-                    target_kind=event_actions.TARGET_MODEL_LINK,
-                    graph_id=graph.id,
-                    details={"count": run.committed, "edges_written": run.written, "bundle": run.name},
-                    **_actor(actor_id),
-                )
         return run
 
     try:
@@ -221,7 +279,12 @@ def apply_cmd(graph_ref: str, file: str, do_commit: bool, dry_run: bool, user_re
     except BundleError as exc:
         raise click.ClickException(str(exc)) from exc
 
+    # Declaring writes rows, not the graph; committing writes edges, so it is a
+    # run under the Graph's guardrails — the same one the drawer opens (ST54).
     _report(run, graph_ref)
+    if do_commit and not dry_run:
+        click.echo("")
+        _commit_report(asyncio.run(_commit_as_run(graph_ref, user_ref)))
     # Non-zero for a rule that could not be declared at all (ST41) — already-declared is not one.
     if not run.passed:
         raise SystemExit(1)
@@ -267,61 +330,43 @@ def resolve_cmd(graph_ref: str) -> None:
     The same question the declare card answers before a stitch exists, asked again
     after it does — a rule nobody can re-check is a rule nobody trusts. It reads and
     writes nothing. Beside the count, the edges the stitch has actually written.
+
+    **Counting reads the graph, so it is a run** — `stitch-preview@1` under the
+    Graph's guardrails, the drawer's own preview. A rule the guardrails refuse
+    says so, rather than being counted around.
     """
-
-    async def work(session, graph, _actor_id):
-        links = await link_service.list_links(session, graph.id)
-        if not links:
-            return []
-        connector = await _connector(session, graph, writing=False)
-        rows = []
-        await connector.connect()
-        try:
-            for link in links:
-                if not solvable(link):
-                    rows.append((link, None, 0))
-                    continue
-                query = link_service.stitch_preview_query(
-                    source_type=link.source_type,
-                    source_property=link.source_property or "",
-                    target_type=link.target_type,
-                    target_property=link.target_property or "",
-                    case_insensitive=link.identity_match == "case_insensitive",
-                )
-                result = await connector.execute(query)
-                raw = getattr(result, "records", None) or getattr(result, "rows", None) or []
-                preview = link_service.read_preview(
-                    raw[0] if raw else {},
-                    source_type=link.source_type,
-                    source_property=link.source_property or "",
-                    target_type=link.target_type,
-                    target_property=link.target_property or "",
-                )
-                written = await count_written(connector, link) if link.status == "active" else 0
-                rows.append((link, preview, written))
-        finally:
-            await connector.disconnect()
-        return rows
-
-    rows = asyncio.run(_with_graph(graph_ref, None, work))
+    done = asyncio.run(
+        _as_run(
+            graph_ref,
+            None,
+            open_run=lambda services, session, graph, actor_id: services.open_stitch_preview_run(
+                session, graph=graph, actor_id=actor_id
+            ),
+            task_key="preview_stitches",
+        )
+    )
+    if done["status"] != "succeeded":
+        raise click.ClickException(done["error"] or f"The preview {done['status']}. Open run {done['run_id']}.")
+    rows = done.get("previews") or []
     if not rows:
         click.echo("No stitches in this Graph yet.")
         return
 
     click.echo(f"\n{graph_ref} — {len(rows)} stitches\n")
-    for link, preview, written in rows:
-        rule = _rule_of(link)
-        if preview is None:
-            click.echo(f"  --   {rule:<52} {'its rows arrive with a dataset':>24}  {link.status}")
+    for row in rows:
+        rule = _rule_of(SimpleNamespace(**row))
+        if row["refused"]:
+            click.echo(f"  --   {rule:<52} refused — {row['refused']}")
             continue
-        counted = f"{preview.resolved}/{preview.source_total} keys" if preview.countable else "no records to count"
-        mark = "ok  " if preview.resolved else "FAIL"
-        edges = f"{written:,} edges" if link.status == "active" else "not committed"
+        preview = row["preview"]
+        if preview is None:
+            click.echo(f"  --   {rule:<52} {'its rows arrive with a dataset':>24}  {row['status']}")
+            continue
+        countable = preview["source_total"] > 0 and preview["target_total"] > 0
+        counted = f"{preview['resolved']}/{preview['source_total']} keys" if countable else "no records to count"
+        mark = "ok  " if preview["resolved"] else "FAIL"
+        edges = f"{row['written'] or 0:,} edges" if row["status"] == "active" else "not committed"
         click.echo(f"  {mark} {rule:<52} {counted:>24}  {edges}")
-    unresolved = [r for r in rows if r[1] is not None and r[1].countable and not r[1].resolved]
-    click.echo(f"\n{len(rows)} stitches, {len(rows) - len(unresolved)} resolve.")
-    if unresolved:
-        raise SystemExit(1)
 
 
 @stitches_cmd.command("commit")
@@ -330,29 +375,9 @@ def resolve_cmd(graph_ref: str) -> None:
 def commit_cmd(graph_ref: str, user_ref: str | None) -> None:
     """Flip every staged stitch to active — one action for the whole set (ST21)."""
 
-    async def work(session, graph, actor_id):
-        connector = await _connector(session, graph, writing=True)
-        done = await commit_stitches(session, graph_id=graph.id, connector=connector)
-        if done.links:
-            await emit_event(
-                session,
-                action=event_actions.MODEL_LINK_COMMIT,
-                target_kind=event_actions.TARGET_MODEL_LINK,
-                graph_id=graph.id,
-                details={"count": len(done.links), "edges_written": done.written},
-                **_actor(actor_id),
-            )
-        return done
-
-    done = asyncio.run(_with_graph(graph_ref, user_ref, work))
-    if not done.links:
-        raise click.ClickException("Nothing staged to commit.")
-    _solved_lines([*done.solved, *done.loaded])
-    click.echo(
-        f"Committed {len(done.links)} stitch(es) — they are in the union now, and wrote {done.written:,} edge(s)."
-    )
-    if done.rejected:
-        click.echo(f"  {done.rejected} row(s) had an endpoint that resolved nowhere.")
+    if "/" not in graph_ref:
+        raise click.UsageError("--graph must be <username>/<slug>.")
+    _commit_report(asyncio.run(_commit_as_run(graph_ref, user_ref)))
 
 
 @stitches_cmd.command("discard")

@@ -198,7 +198,7 @@ export function ListPanelChrome({
 				</DropdownMenu>
 			)}
 			{showSearch && (
-				<div className="shrink-0 border-b border-border p-2">
+				<div className="shrink-0 border-b border-border px-3 py-2">
 					<SearchInput inputSize="sm" value={search} onChange={setSearch} />
 				</div>
 			)}
@@ -309,7 +309,7 @@ export function ListRow({
 			<button
 				type="button"
 				onClick={onClick}
-				className="flex flex-1 min-w-0 items-start gap-2.5 text-left px-4 py-2"
+				className="flex flex-1 min-w-0 items-start gap-2.5 text-left px-3 py-2"
 			>
 				{leading}
 				<span className="min-w-0 flex-1">

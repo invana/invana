@@ -96,7 +96,7 @@ export function LensBoardPage({
 
 	return (
 		<Dashboard
-			className="h-full min-h-0 overflow-y-auto p-3"
+			className="h-full min-h-0"
 			spec={report.spec}
 			icons={DASHBOARD_ICONS}
 			onAction={(id, ctx) => {

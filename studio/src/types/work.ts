@@ -483,3 +483,37 @@ export interface ThinkingListResponse {
 	items: TaskRunSummary[];
 	total: number;
 }
+
+// ── Catalogue (the-catalogue.md 7.6) ────────────────────────────────────────
+
+export interface CatalogueArg {
+	name: string;
+	type: string;
+	required: boolean;
+	default: unknown;
+}
+
+export interface CatalogueOutput {
+	name: string;
+	type: string;
+	/** How lanes roll up on a fan-out; `null` — per lane only (C3). */
+	rollup: "sum" | "concat" | null;
+}
+
+/** One entry, rendered from `runtime/catalogue/registry.py` — never re-described (CA2). */
+export interface CatalogueEntry {
+	step_key: string;
+	bound: string;
+	summary: string;
+	args: CatalogueArg[];
+	outputs: CatalogueOutput[];
+	requires: string[];
+	/** Reusable plans in this Graph naming it (C9). */
+	used_by: number;
+}
+
+export interface CatalogueResponse {
+	/** Grouped by bound in the runtime's order, then by key (CA3). */
+	items: CatalogueEntry[];
+	total: number;
+}

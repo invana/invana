@@ -113,7 +113,7 @@ export function SkillsPanel({
 
 		if (skills.isLoading)
 			return (
-				<div className="p-4">
+				<div className="px-3 py-4">
 					<Spinner />
 				</div>
 			);

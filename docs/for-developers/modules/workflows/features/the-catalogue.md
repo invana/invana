@@ -9,7 +9,7 @@ what the system is able to do at all.
 |---|---|
 | Index | [7.6](../../../README.md#7--workflows) · Slice **S12c** |
 | Module | [Workflows](../spec.md) |
-| API / CLI / Studio | 🟡 / — / 🔵 |
+| API / CLI / Studio | 🟡 / — / 🟡 — the list, search and the contract detail ship; *Used by* plans (C5) and *granted to* (C6) do not yet |
 | Related | [the-library](the-library.md) · [envelope-validation](envelope-validation.md) · [plan-selection](plan-selection.md) · [the runtime](../../platform/features/runtime.md) · [orchestration § 0.6](../../../orchestration.md#06-the-catalogue--what-a-plan-may-name) |
 
 > **As** someone reading a plan or a refused run, **I want** the contract of the step in front of me,
@@ -86,14 +86,14 @@ flowchart TD
 
 ## Engine
 
-The declaration already exists — `runtime/catalogue/registry.py`, fourteen entries across five bounds
+The declaration already exists — `runtime/catalogue/registry.py`, twenty-four entries across seven bounds
 today. This feature is a **read route over it**, and nothing else.
 
 | Thing | Shape |
 |---|---|
 | Source | `invana.runtime.catalogue.registry` — the closed set, derived nowhere else |
 | Entries this work adds | `test_connection` (`network`) · `expand_neighbours` (`graph_read`) · `import_dataset` · `check_bundle` · `validate_records` · `import_report` (`ingest`) · `apply_stitches` · `commit_stitches` · `bulk_write` (`graph_write`). Declared in the engine, not registered by the feature that needed them ([CA1](#decisions)) — folding a flow into the runtime means *declaring its callable*, never *opening the set* |
-| `GET …/catalogue` | Every entry: `step_key · bound · summary · args · outputs · requires`. Graph-scoped only so *used by* and *granted to* can be answered |
+| `GET …/catalogue` | Every entry: `step_key · bound · summary · args · outputs (with rollup) · requires · used_by`, ordered by bound then key. Graph-scoped only so *used by* and *granted to* can be answered. `used_by` counts this Graph's reusable plan **keys**, not versions |
 | `GET …/catalogue/{step_key}` | One entry, plus `used_by` (reusable plans naming it) and `granted_to` (agents whose envelope carries its bound) |
 | Cache | The entry list is engine-static: it is versioned with the engine build and served from memory |
 
@@ -106,6 +106,7 @@ today. This feature is a **read route over it**, and nothing else.
 | CA3 | **Grouped by bound, not alphabetically.** The bound is what the envelope ceilings and what a refusal names, so the group a person scans is the group the system enforces. |
 | CA4 | **A drawer of Tasks, not an icon.** A run is an execution of a plan; a plan is a composition of catalogue entries — the catalogue is the bottom of that same sentence, and it is where *this run → the plan it ran → the callable that failed* ends ([G33](../../../building-studio/graph-detail-page.md)). |
 | CA6 | **An entry gets a drawer detail, not a page.** Fourteen entries, five or six fields each, and nothing per-entry to chart: a dashboard would be a contract with whitespace around it. The two places an entry is genuinely read are the **parameter form it generates** and the **refusal that names its bound**, and both show the contract in place. Browsing all of them is the drawer's job. |
+| CA7 | **An entry's summary is declared on the entry.** `Entry.summary` is one line in `registry.py`'s declaration, and the route serves it — not a docstring parsed at read time, and not a string in Studio. A golden test refuses an entry without one. |
 | CA5 | **Control flow is not in the catalogue.** `if` · `loop` · `map` · `retry` · `stop` are plan grammar ([§ 5](../../../orchestration.md)); they are documented with the plan, and a person looking for them here is told where they live rather than shown an entry that does not exist. |
 
 ## Not building

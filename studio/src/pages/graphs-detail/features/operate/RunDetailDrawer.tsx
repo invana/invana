@@ -75,14 +75,14 @@ export function RunDetailDrawer({
 
 	if (trace.isLoading) {
 		return (
-			<div className="p-4">
+			<div className="px-3 py-4">
 				<Spinner />
 			</div>
 		);
 	}
 	if (!trace.data) {
 		return (
-			<p className="p-4 text-muted-foreground">
+			<p className="px-3 py-4 text-muted-foreground">
 				This run's trace has been pruned.
 			</p>
 		);
@@ -112,7 +112,7 @@ export function RunDetailDrawer({
 				}
 			/>
 
-			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-3">
+			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
 				<Rows title="The run" rows={s.theRun} onOpenLens={onOpenLens} />
 				{s.cost.length ? <Rows title="What it cost" rows={s.cost} /> : null}
 
@@ -160,7 +160,7 @@ export function RunDetailDrawer({
 			</div>
 
 			{onOpenDashboard || (onOpenPlan && planKey) ? (
-				<div className="flex shrink-0 gap-2 border-t px-4 py-2.5">
+				<div className="flex shrink-0 gap-2 border-t px-3 py-2.5">
 					{onOpenDashboard ? (
 						<Button onClick={() => onOpenDashboard(runId)}>
 							{isLive(t.status) ? "Follow the run" : "Open the answer"}

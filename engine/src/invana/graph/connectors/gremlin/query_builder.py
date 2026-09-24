@@ -9,26 +9,80 @@ from __future__ import annotations
 from typing import Any
 
 from gremlin_python.process.graph_traversal import GraphTraversalSource, __
-from gremlin_python.process.traversal import Order, P, T, TextP
+from gremlin_python.process.traversal import Order, P, Pick, T, TextP
 
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.lens import QueryLens, TypeBound
 from invana.graph.types.sort import SortDirection, SortSpec
 
 
-def _project_edge(traversal: Any) -> Any:
+def _project_edge(traversal: Any, lens: QueryLens | None = None) -> Any:
     """Project edge data using primitive steps (avoids elementMap on edges).
 
     Returns a dict with keys: eid, elabel, eprops, source (elementMap), target (elementMap).
+    Under a lens that excludes properties, each element returns only what its
+    type permits (CC22) — chosen by label, in the traversal, never trimmed after.
     """
+    narrowed = _narrowed(lens)
     return (
         traversal.project("eid", "elabel", "eprops", "source", "target")
         .by(__.id_())
         .by(__.label())
-        .by(__.value_map())
-        .by(__.out_v().element_map())
-        .by(__.in_v().element_map())
+        .by(_by_label(narrowed, __.value_map, __.value_map()) if narrowed else __.value_map())
+        .by(
+            __.out_v().flat_map(_by_label(narrowed, __.element_map, __.element_map()))
+            if narrowed
+            else __.out_v().element_map()
+        )
+        .by(
+            __.in_v().flat_map(_by_label(narrowed, __.element_map, __.element_map()))
+            if narrowed
+            else __.in_v().element_map()
+        )
     )
+
+
+#: A key no element carries, so ``elementMap`` of a type that permits nothing
+#: returns its id and label alone — ``elementMap()`` with no keys means *all*.
+_NO_PROPERTY = "_inv_no_property"
+
+
+def _narrowed(lens: QueryLens | None) -> list[tuple[str, TypeBound]]:
+    if lens is None:
+        return []
+    return sorted((n, b) for n, b in lens.bounds.items() if b.narrows_structure)
+
+
+def _by_label(narrowed: list[tuple[str, TypeBound]], step: Any, otherwise: Any) -> Any:
+    """``choose(label)`` with one option per narrowed type, the element whole otherwise."""
+    t = __.choose(__.label())
+    for name, bound in narrowed:
+        t = t.option(name, step(*(bound.permitted or (_NO_PROPERTY,))))
+    return t.option(Pick.none, otherwise)
+
+
+def _apply_lens(traversal: Any, lens: QueryLens | None) -> Any:
+    """The type and records grains, on whatever element the traversal is at.
+
+    **Type**: the element's label must be allowed. **Records**: each narrowed
+    type's slice is required of an element of that type and of no other, as
+    ``where(or(not(hasLabel(T)), slice))`` — so it is part of the match.
+    """
+    if lens is None:
+        return traversal
+    # `label().is(…)`, not `hasLabel(…)`: the allow-list names node and edge
+    # types together, and ArcadeDB folds a `hasLabel` after `bothE()` into its
+    # edge iterator, where a vertex type in the list is a ClassCastException.
+    if lens.allowed_types is not None:
+        traversal = traversal.where(__.label().is_(P.within(*sorted(lens.allowed_types))))
+    for name, bound in sorted(lens.bounds.items()):
+        if not (bound.narrows_records and bound.predicates):
+            continue
+        predicate = _build_predicate(bound.predicates)
+        if predicate is not None:
+            traversal = traversal.where(__.or_(__.label().is_(P.neq(name)), predicate))
+    return traversal
 
 
 def _apply_filters(traversal: Any, filters: FilterGroup | None, element_var: str = "") -> Any:
@@ -179,13 +233,15 @@ class GremlinQueryBuilder:
         edge_label: str | None,
         neighbor_label: str | None,
         filters: FilterGroup | None,
+        lens: QueryLens | None = None,
     ) -> Any:
         """Shared traversal up to (and including) the neighbour vertex `m`.
 
         Steps to the edge (tagged `e`) then to the other vertex (tagged `m`), so
         neighbour-label, filters, sort and pagination all apply to the neighbour.
+        A lens is applied at the anchor, the edge and the neighbour (CC22).
         """
-        t = g.V(vertex_id)
+        t = _apply_lens(g.V(vertex_id), lens)
         if direction == "out":
             t = t.out_e(edge_label) if edge_label else t.out_e()
         elif direction == "in":
@@ -193,7 +249,8 @@ class GremlinQueryBuilder:
         else:
             t = t.both_e(edge_label) if edge_label else t.both_e()
 
-        t = t.as_("e").other_v().as_("m")
+        t = _apply_lens(t, lens).as_("e").other_v()
+        t = _apply_lens(t, lens).as_("m")
         if neighbor_label:
             t = t.has_label(neighbor_label)
         return _apply_filters(t, filters)
@@ -209,16 +266,17 @@ class GremlinQueryBuilder:
         sort: list[SortSpec] | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        lens: QueryLens | None = None,
     ) -> Any:
         """Build a traversal for neighborhood exploration."""
-        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters)
+        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters, lens)
         t = _apply_order(t, sort)
         if offset is not None:
             t = t.skip(offset)
         if limit is not None:
             t = t.limit(limit)
         t = t.select("e")
-        return _project_edge(t)
+        return _project_edge(t, lens)
 
     @staticmethod
     def count_neighbors(
@@ -228,9 +286,10 @@ class GremlinQueryBuilder:
         edge_label: str | None = None,
         neighbor_label: str | None = None,
         filters: FilterGroup | None = None,
+        lens: QueryLens | None = None,
     ) -> Any:
         """Build a traversal that counts matching neighbours."""
-        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters)
+        t = GremlinQueryBuilder._neighbor_traversal(g, vertex_id, direction, edge_label, neighbor_label, filters, lens)
         return t.count()
 
     @staticmethod
@@ -332,6 +391,32 @@ class GremlinQueryBuilder:
     def get_edge_label_counts(g: GraphTraversalSource) -> Any:
         """Count edges per label."""
         return g.E().group_count().by(T.label)
+
+    @staticmethod
+    def count_vertex_types(g: GraphTraversalSource, lens: QueryLens | None = None) -> Any:
+        """Vertices per label, inside *lens* — denied types never matched, slices composed (SP11)."""
+        return _apply_lens(g.V(), lens).group_count().by(T.label)
+
+    @staticmethod
+    def count_edge_types(g: GraphTraversalSource, lens: QueryLens | None = None) -> Any:
+        """Edges per label, inside *lens* — both endpoints in the world too."""
+        t = _apply_lens(g.E(), lens)
+        if lens is not None:
+            t = t.where(_apply_lens(__.out_v(), lens)).where(_apply_lens(__.in_v(), lens))
+        return t.group_count().by(T.label)
+
+    @staticmethod
+    def resolve_vertices(g: GraphTraversalSource, vertex_ids: list, lens: QueryLens | None) -> Any:
+        """Which of *vertex_ids* the graph holds, and whether each is inside *lens* (GC14).
+
+        Only the id and a boolean come back — never a property.
+        """
+        in_world = (
+            __.choose(_apply_lens(__.identity(), lens), __.constant(True), __.constant(False))
+            if lens is not None
+            else __.constant(True)
+        )
+        return g.V(*vertex_ids).project("id", "in_world").by(__.id_()).by(in_world)
 
     @staticmethod
     def get_property_keys(g: GraphTraversalSource, label: str) -> Any:

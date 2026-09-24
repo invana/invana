@@ -19,20 +19,25 @@ from invana.apps.llm.translate import Clarification, nl_to_query
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
 from invana.runtime.catalogue.contract import (
+    POOL_GRAPHDB,
     CannotAnswer,
     NeedsInput,
     Out,
     RunVars,
     TaskContext,
     TaskFailure,
+    _give_pool_back,
     _line_count,
     _plural,
     _provider_label,
     _report_ids,
+    _sha,
     cited_rule_version_ids,
+    close_graph,
     close_model,
     offered_rule_version_ids,
     offered_skill_version_ids,
+    open_graph,
     open_model,
     query_language_for,
 )
@@ -479,16 +484,40 @@ def _vocabulary(envelope) -> list[dict]:
 
 
 async def _options(ctx: TaskContext, v: RunVars, clarification: Clarification) -> list[str]:
-    return await ground_options(
+    """The choices a clarification offers, read under the run's lens (CQ11).
+
+    The options query crosses ``graph_data`` like every other read the run
+    makes: the crossing is opened around it and the touch recorded. A world
+    that refuses the read leaves the fixed options, never an ungoverned read.
+    """
+    fallback = list(clarification.options)
+    if not clarification.options_query:
+        return fallback
+    try:
+        crossing = await open_graph(ctx, v)
+    except CannotAnswer:
+        return fallback
+    language = await query_language_for(ctx, v, strict=False)
+    options, result = await ground_options(
         ctx.db,
         graph=v.graph,
         manager=ctx.manager,
         options_query=clarification.options_query,
-        fallback=list(clarification.options),
+        fallback=fallback,
         actor_id=v.actor_id,
         session_id=v.sess.id if v.sess else None,
         timeout_s=v.timeout_s,
+        language=language,
+        lens=crossing.lens,
     )
+    if result is not None:
+        query = clarification.options_query
+        digests = result.composed.digests if result.composed else {"generated": _sha(query), "executed": _sha(query)}
+        await close_graph(ctx, v, crossing, result=result, digests=digests)
+    else:
+        # Nothing was read, so there is no touch — but the slot was taken.
+        _give_pool_back(v, pool=POOL_GRAPHDB, holder=crossing.pool_holder)
+    return options
 
 
 async def _clarify_event(ctx: TaskContext, v: RunVars, *, question: str, usage, duration_ms: float) -> None:
@@ -522,6 +551,7 @@ async def _clarify_event(ctx: TaskContext, v: RunVars, *, question: str, usage, 
 ENTRIES = build(
     Entry(
         key="understand_intent",
+        summary="Work out what an ask means here, before any query is written.",
         bound=Bound.llm,
         run=understand_intent,
         outputs={
@@ -536,12 +566,14 @@ ENTRIES = build(
     ),
     Entry(
         key="plan_workflow",
+        summary="Serve the intent: match a reusable plan, or compose one.",
         bound=Bound.llm,
         run=plan_workflow,
         outputs={"source": Type.str_, "steps": Type.list_, "rationale": Type.str_},
     ),
     Entry(
         key="translate_thought",
+        summary="Translate a natural-language ask into a grounded query.",
         bound=Bound.llm,
         run=translate_thought,
         args={"ask": Arg(Type.str_)},
@@ -556,6 +588,7 @@ ENTRIES = build(
     ),
     Entry(
         key="draft_plan",
+        summary="Draw a skill's playbook as its plan, one sentence at a time.",
         bound=Bound.llm,
         run=draft_plan,
         args={"skill_version_id": Arg(Type.str_, required=True)},
@@ -574,6 +607,7 @@ ENTRIES = build(
     ),
     Entry(
         key="propose_model",
+        summary="Propose node and edge types for a described change, staged on the draft.",
         bound=Bound.llm,
         run=propose_model_task,
         outputs={"node_types": Type.list_, "edge_types": Type.list_, "summary": Type.str_},

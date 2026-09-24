@@ -136,6 +136,8 @@ export function LibraryStackPanel({
 							defaultSize: size("plans"),
 						}),
 						catalogueDrawerSection({
+							username,
+							graphSlug,
 							ui,
 							entryKey: library.entryKey,
 							onOpenEntry: library.openEntry,

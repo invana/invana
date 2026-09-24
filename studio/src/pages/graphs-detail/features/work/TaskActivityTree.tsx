@@ -18,7 +18,7 @@ import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 import type { ActivityNode } from "@/types/work";
 import { cn } from "@invana/ui";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 
 export interface TaskActivityTreeProps {
 	nodes: ActivityNode[];
@@ -29,7 +29,7 @@ export interface TaskActivityTreeProps {
 export function TaskActivityTree({ nodes, onOpenRule }: TaskActivityTreeProps) {
 	if (!nodes.length) {
 		return (
-			<p className="p-4 text-base text-muted-foreground">
+			<p className="px-3 py-4 text-base text-muted-foreground">
 				Nothing has happened on this task yet.
 			</p>
 		);
@@ -59,8 +59,16 @@ function Row({
 	return (
 		<div>
 			<div
-				className="flex items-start gap-1 px-2 hover:bg-accent/50"
-				style={{ paddingLeft: `${8 + depth * 14}px` }}
+				// The panel's `px-3`, plus 14px a level.
+				className={cn(
+					"flex items-start gap-1 px-3 hover:bg-accent/50",
+					depth > 0 && "ps-[calc(var(--spacing)*3+var(--row-indent))]",
+				)}
+				style={
+					depth > 0
+						? ({ "--row-indent": `${depth * 14}px` } as CSSProperties)
+						: undefined
+				}
 			>
 				{hasChildren ? (
 					<button

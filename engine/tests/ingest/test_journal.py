@@ -176,3 +176,15 @@ class TestBulkLoad:
         plan = TEMPLATES["bulk-load"]
         assert plan.kind == "bulk"
         assert [s["task"] for s in plan.steps] == ["bulk_write"]
+
+    async def test_the_step_is_handed_the_folder_it_loads(self, session, tmp_path):
+        """`bulk_write` reads its step's args; a folder only on the run's params is no folder."""
+        from invana.runtime.querysets import TaskRunQuerySet
+
+        graph = await _graph(session, "bulk")
+        run = await services.open_bulk_run(session, graph=graph, path=str(tmp_path), batch_size=50)
+
+        [step] = await TaskRunQuerySet().nodes_of(session, run_id=run.id)
+        assert step.task_key == "bulk_write"
+        assert step.args["root"] == str(tmp_path.resolve())
+        assert step.args["batch_size"] == 50

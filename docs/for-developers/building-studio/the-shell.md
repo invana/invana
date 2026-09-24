@@ -244,6 +244,21 @@ the compound word — `leftSection`, never a bare `section`.
 Panel toggles live on the strip's `headerActions`, not in the `header` — they belong to the thing
 they open, and they disappear with it.
 
+## The section inset
+
+Everything in a `leftSection` or a `rightSection` starts on one left edge and ends on one right
+edge: **`px-3`**, 12px from the section's border. The Ask panel's chat body, composer and status bar
+(`ChatSession`) and the Inspector's tabs already sit on it. It is the same line the `PanelStack` header's title reads against, and
+the one every row in the stack already used before it was written down.
+
+| Rule | Detail |
+|---|---|
+| Rows own it, full-bleed | A selectable row (`RunRow`, `LensRow`, `WorkRow`, `ListPanel`'s row, `SkillRow`) runs edge to edge so its hover, selection and divider reach the border, and pads **inside** itself with `px-3`. It is never wrapped in a padded container. |
+| Documents are wrapped once | A drilled-in body, an editor, a form, a filter or search bar, an empty or loading line: one wrapper with `px-3` and its own vertical padding. Nothing inside it adds a second horizontal inset. |
+| Kit headers and footers match | `SectionHeader` is `px-3`; `PanelStatusBar` passes `px-3` to `AppStatusBar`. A section's title, its content and its footer share the edge. |
+| Depth is added, never restated | A nested row keeps `px-3` and adds its indent through `--row-indent` (`ps-[calc(var(--spacing)*3+var(--row-indent))]`). No row writes `paddingLeft: 12 + …` — the base is the class, so changing the inset is one edit. |
+| What it does not govern | A control's own padding (an input, a chip, a button) and a bordered box *inside* a section. Those are components, not the section's edge. |
+
 ## The chrome type ladder
 
 Chrome is ranked by **weight and case**, not by size. There are two content sizes in

@@ -14,9 +14,11 @@ would read it three ways and disagree on the third.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable, Iterator
 from typing import Any
 
 from invana.graph.connectors.base.exceptions import LensViolationError
+from invana.graph.types.filters import FilterExpression, FilterGroup
 from invana.graph.types.lens import ComposedQuery, QueryLens
 
 
@@ -61,3 +63,61 @@ class UnsupportedLensCompiler(LensCompiler):
             "against a connection whose language composes one, or remove the lens.",
             code="lens_not_supported",
         )
+
+
+# ── a structured reader, bounded by construction (CC22) ─────────────────────────
+
+
+def filter_properties(group: FilterGroup | None) -> Iterator[str]:
+    """Every property a filter tree names, however deep."""
+    if group is None:
+        return
+    for condition in group.conditions:
+        if isinstance(condition, FilterGroup):
+            yield from filter_properties(condition)
+        elif isinstance(condition, FilterExpression):
+            yield condition.property
+
+
+def admit_structured(
+    lens: QueryLens | None,
+    *,
+    types: Iterable[str | None] = (),
+    properties: Iterable[str] = (),
+) -> QueryLens | None:
+    """Check what a structured read names against *lens*, before it is built.
+
+    A reader that writes its own query has no text to compile, so the refusals a
+    compiler makes are made here, once, for every language (CC22): a type the
+    request names that this world does not hold, a property it filters or sorts
+    on that this world does not carry, and a type that excludes properties but
+    declares none to project to. What passes is composed into the traversal by
+    the language's builder — nothing is filtered afterwards.
+
+    Returns ``None`` when there is nothing to enforce, so an ungoverned read
+    builds exactly the query it built before.
+    """
+    if lens is None or lens.is_empty:
+        return None
+    for name in types:
+        if name and not lens.allows_type(name):
+            raise LensViolationError(
+                f"This world has no {name}.", code="lens_type_denied", type_name=name, fragment=name
+            )
+    for prop in properties:
+        for bound in lens.bounds.values():
+            if prop in bound.excluded:
+                raise LensViolationError(
+                    f"This world does not carry {bound.type_name}.{prop}.",
+                    code="lens_property_excluded",
+                    type_name=bound.type_name,
+                    property_name=prop,
+                )
+    for bound in lens.bounds.values():
+        if bound.narrows_structure and not bound.is_projectable:
+            raise LensViolationError(
+                f"{bound.type_name} excludes properties but declares none, so there is nothing to return.",
+                code="lens_unprojectable",
+                type_name=bound.type_name,
+            )
+    return lens

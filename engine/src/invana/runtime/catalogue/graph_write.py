@@ -221,7 +221,56 @@ async def commit_stitches(ctx: TaskContext, v: RunVars) -> Out:
     return Out(
         detail=f"{committed.written} written · {committed.rejected} rejected",
         input={},
-        output={"written": committed.written, "rejected": committed.rejected},
+        output={
+            "written": committed.written,
+            "rejected": committed.rejected,
+            # One row per stitch, so a drawer or a terminal can say what each one
+            # wrote — a zero is a verdict, and a refusal names why (ST53).
+            "links": [
+                {
+                    "link_id": done.link_id,
+                    "rule": getattr(done, "rule", "") or "",
+                    "edge_type": done.edge_type,
+                    "written": done.written,
+                    "skipped": done.skipped,
+                }
+                for done in [*committed.solved, *committed.loaded]
+            ],
+        },
+    )
+
+
+async def withdraw_stitch(ctx: TaskContext, v: RunVars) -> Out:
+    """Withdraw the edges one active stitch wrote, then remove the rule (ST55).
+
+    Both models are the write target, so a guardrail denying either one ends
+    the run in *cannot answer* before an edge is deleted — unlike a commit,
+    where a refused stitch is committed and skipped (ST53). Keeping the edges
+    of a removed rule would leave edges naming a stitch nobody can see.
+    """
+    link_id = str((ctx.step.args or {}).get("link_id") or "")
+    link = await stitching.link_service.get_link(ctx.db, ctx.step.graph_id, link_id) if link_id else None
+    if link is None:
+        raise TaskFailure(cls="blocked", cause="not_found", message="No such stitch in this Graph.", short="no stitch")
+    await ctx.progress("withdrawing stitched edges")
+    try:
+        connector = await connector_for(ctx.db, ctx.step.graph_id)
+    except LoadRefused as exc:
+        raise TaskFailure(
+            cls="blocked", cause="cannot_write", message=str(exc), short="cannot write", raw=str(exc)
+        ) from exc
+    writes = Writes(ctx, v)
+    withdrawn = await stitching.withdraw_stitch(
+        ctx.db, graph_id=ctx.step.graph_id, link=link, connector=connector, admit=writes.admit
+    )
+    writes.wrote(link.source_version_id, edges=withdrawn)
+    if link.target_version_id != link.source_version_id:
+        writes.wrote(link.target_version_id, edges=withdrawn)
+    await writes.close()
+    return Out(
+        detail=f"{withdrawn} edge(s) withdrawn",
+        input={"link_id": link_id},
+        output={"withdrawn": withdrawn},
     )
 
 
@@ -288,6 +337,7 @@ async def bulk_write(ctx: TaskContext, v: RunVars) -> Out:
 ENTRIES = build(
     Entry(
         key="write_graph",
+        summary="Merge validated records into the graph, each stamped with its origin.",
         bound=Bound.graph_write,
         run=write_graph,
         outputs={"nodes": Type.int_, "edges": Type.int_, "written": Type.int_},
@@ -295,13 +345,23 @@ ENTRIES = build(
     ),
     Entry(
         key="stitch",
+        summary="Resolve what a load deferred, then run the graph's standing stitches.",
         bound=Bound.graph_write,
         run=stitch,
         outputs={"resolved": Type.int_, "unresolved": Type.int_, "stitched": Type.int_},
         requires=("write_graph",),
     ),
     Entry(
+        key="withdraw_stitch",
+        summary="Delete the edges one active stitch wrote, then remove the rule.",
+        bound=Bound.graph_write,
+        run=withdraw_stitch,
+        args={"link_id": Arg(Type.str_, required=True)},
+        outputs={"withdrawn": Type.int_},
+    ),
+    Entry(
         key="bulk_write",
+        summary="Write a CSV folder straight into the graph, validating nothing.",
         bound=Bound.graph_write,
         run=bulk_write,
         args={
@@ -316,6 +376,7 @@ ENTRIES = build(
     ),
     Entry(
         key="apply_stitches",
+        summary="Declare every stitch a bundle's stitches.json states, as staged.",
         bound=Bound.graph_write,
         run=apply_stitches,
         args={"root": Arg(Type.str_)},
@@ -323,13 +384,13 @@ ENTRIES = build(
     ),
     Entry(
         key="commit_stitches",
+        summary="Make the staged stitches active and write the edges they imply.",
         bound=Bound.graph_write,
         run=commit_stitches,
-        outputs={"written": Type.int_, "rejected": Type.int_},
-        # You commit what was applied. Declared rather than left to the step
-        # order, because an ordering nobody stated is a guess — and this one is
-        # not: committing a set that was never staged writes edges no rule
-        # declared (ST21 · ST44).
-        requires=("apply_stitches",),
+        outputs={"written": Type.int_, "rejected": Type.int_, "links": Type.list_},
+        # **No `requires`.** The staged set is what it commits, and staging is
+        # often a person's earlier act in the Stitches drawer rather than a step
+        # in this plan — `stitch-commit@1` is this entry alone. A run with nothing
+        # staged commits nothing; the openers refuse it before it starts.
     ),
 )

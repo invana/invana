@@ -157,6 +157,21 @@ class TaskRuntime:
         self._tasks[run_id] = task
         task.add_done_callback(lambda t: self._tasks.pop(run_id, None))
 
+    async def run_inline(self, run_id: str) -> None:
+        """Run a committed run in the caller's own request, and return when it settles.
+
+        For an act a person is waiting on (RP31): the run is
+        the same record ``submit`` would make — plan, lens, stream, trace — only
+        the caller awaits it instead of polling. Admission still happens inside
+        ``_run``, so a Graph at its ceiling queues this run like any other.
+        """
+        task = asyncio.create_task(self._run(run_id), name=f"invana.run.{run_id}")
+        self._tasks[run_id] = task
+        try:
+            await task
+        finally:
+            self._tasks.pop(run_id, None)
+
     def contention(self, graph_id: str, pools: dict[str, int] | None = None) -> dict:
         """What is running in this Graph, what is waiting behind it, and how full
         its pools are (CC5 · CC8 · C8).

@@ -26,10 +26,13 @@ class _ExpandBase(BaseModel):
     limit: int = Field(default=50, gt=0, le=500)
     offset: int = Field(default=0, ge=0)
     # The session this expand belongs to (docs/for-developers/modules/explore/features/boards.md). When set (and owned
-    # by the
-    # caller in this graph), the expand is logged as a turn in that session's
-    # thread. Optional so an expand with no active session still works.
+    # by the caller in this graph), the expansion's run is a turn in that
+    # session's thread, and the session's agent narrows its lens (GC11 · GC12).
+    # Optional so an expand with no active session still works.
     session_id: str | None = None
+    #: The world the canvas has picked, exactly as an ask's ``lens_id`` (GC11).
+    #: ``None`` is no world — the Graph's guardrails, and the agent's own world.
+    lens_id: str | None = None
 
 
 class ExpandNeighborsRequest(_ExpandBase):
@@ -57,19 +60,24 @@ class NeighborExpandResponse(BaseModel):
     limit: int
     returned: int
     has_more: bool
+    #: The ``expand-neighbours@1`` run this answer came from (GC12).
+    run_id: str | None = None
 
 
 class ResolveElementsRequest(BaseModel):
-    """Which of these ids does the graph still hold?
+    """Which of these ids does the graph still hold, inside the picked world?
 
     A canvas reopens from its own snapshot, and the graph may have moved on. An
     element that is gone is **kept and marked missing**
     (docs/for-developers/modules/explore/features/graph-canvas.md GC5) rather than
     dropped: a drawing that quietly loses a node is a drawing that lies about what
-    was explored.
+    was explored. One the world excludes is in neither list (GC14).
     """
 
     vertex_ids: list[str] = Field(default_factory=list, max_length=5000)
+    #: The world the canvas has picked. What it excludes is in neither list
+    #: and is not drawn (graph-canvas.md GC14).
+    lens_id: str | None = None
 
 
 class ResolveElementsResponse(BaseModel):
@@ -77,6 +85,8 @@ class ResolveElementsResponse(BaseModel):
     #: Asked for and not found — the ones the canvas marks missing.
     missing: list[str] = Field(default_factory=list)
     checked: int = 0
+    #: The ``resolve-elements@1`` run, when the canvas held anything to check.
+    run_id: str | None = None
 
 
 class TypeCount(BaseModel):
@@ -102,3 +112,5 @@ class TypeCountsResponse(BaseModel):
     edges: list[TypeCount] = Field(default_factory=list)
     #: False when the vendor could not count; every ``count`` is then ``None``.
     counted: bool = True
+    #: The ``count-types@1`` run these came from (SP11).
+    run_id: str | None = None

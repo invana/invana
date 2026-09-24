@@ -113,6 +113,7 @@ section a legend as well as a list.
 | SP7 | The eye on a type row is a canvas control, not a query. It hides that type on the open canvas; nothing re-runs, and the count stays graph-wide. Only the footer's totals follow it, because they count what is shown. |
 | SP8 | Counts come from one call, served by the connector's schema reader. A vendor that cannot count says so and the panel lists the types without numbers — a type list with no numbers is still the legend, and blocking on a count nobody can produce is worse. |
 | SP10 | The Explorer panel is a `?panel` key, not the left column's resting state. No key means no left column: the canvas keeps the width, and the rail lights nothing. A panel that cannot be closed is a panel whose close control lies. |
+| SP11 | **Type counts are a run under the lens.** The panel's counts come from `count_types` (`graph_read`, trigger `canvas`): a type the lens denies is absent from the list, and every count is taken inside the slice. SP8's one-call rule holds — it is one step, not one call per label. |
 | SP9 | `SELECTED` is a section of the same stack, collapsible like the others — not a fixed detail area under them. It states the element short (id · summary · chips · provenance); the full property table is `InspectorPanel`, the right side's other occupant, which is where a reader who wants every field already is. |
 
 ## Not building

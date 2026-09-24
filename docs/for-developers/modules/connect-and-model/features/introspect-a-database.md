@@ -72,6 +72,7 @@ flowchart TD
 | ID1 | Introspection seeds drafts and never writes a published version. |
 | ID2 | The physical mirror is named as such and is never the grounding context. |
 | ID3 | Unsupported types are reported, not silently dropped. |
+| ID4 | **Introspection is a run, and no lens narrows it.** `introspect_schema` (`graph_read`) runs through the runtime like every read, but it grounds the global model that every lens narrows — so it reads the whole database, and a world cannot hide a label from the thing it is defined against. |
 
 ## Not building
 

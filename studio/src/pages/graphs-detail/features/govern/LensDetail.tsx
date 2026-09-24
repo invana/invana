@@ -34,7 +34,6 @@ import {
 	CastTable,
 	Eyebrow,
 	LayerSection,
-	PanelBox,
 	RuleRow,
 } from "@invana/ui";
 
@@ -83,16 +82,18 @@ export function LensDetail({
 			    `‹ WORLDS / EU · H1 2026` — repeating the name directly under it
 			    spends the first line of a 420px column saying what the line above
 			    it said. */}
-			<PanelBox
-				title="Rules"
-				aside={
-					lens.as_of
-						? `as of ${lens.as_of}`
-						: // Null is *now*, and saying so is the point: a reader must not
-							// wonder whether a blank means "no time set" or "not loaded".
-							"as of now"
-				}
-			>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow
+					aside={
+						lens.as_of
+							? `as of ${lens.as_of}`
+							: // Null is *now*, and saying so is the point: a reader must not
+								// wonder whether a blank means "no time set" or "not loaded".
+								"as of now"
+					}
+				>
+					Rules
+				</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-4 pt-1">
 					{GOVERNED_LAYERS.map((layer) => {
 						const rules = rulesInLayer(lens, layer);
@@ -122,20 +123,23 @@ export function LensDetail({
 						);
 					})}
 				</div>
-			</PanelBox>
+			</section>
 
-			<PanelBox
-				title="Cast"
-				aside={
-					hasCast
-						? resolved
-							? "resolved, then checked"
-							: undefined
-						: "nothing cast — every role falls through"
-				}
-			>
+			<section className="flex min-w-0 flex-col gap-1">
+				<Eyebrow
+					aside={
+						hasCast
+							? resolved
+								? "resolved, then checked"
+								: undefined
+							: "nothing cast — every role falls through"
+					}
+				>
+					Cast
+				</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-2 pt-1">
 					<CastTable
+						bordered={false}
 						cast={lens.cast as Partial<Record<CastRole, string>>}
 						resolved={resolved}
 						readOnly
@@ -158,7 +162,7 @@ export function LensDetail({
 						</CannotAnswerCard>
 					))}
 				</div>
-			</PanelBox>
+			</section>
 
 			{lens.kind === "guardrail" ? (
 				<Eyebrow>

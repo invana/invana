@@ -202,6 +202,7 @@ async def await_delegations(ctx: TaskContext, v: RunVars) -> Out:
 ENTRIES = build(
     Entry(
         key="validate_query",
+        summary="Check a query is read-only and name the labels it touches, before it runs.",
         bound=Bound.none,
         run=validate_query,
         args={"query": Arg(Type.str_)},
@@ -209,6 +210,7 @@ ENTRIES = build(
     ),
     Entry(
         key="shape_for_canvas",
+        summary="Turn query records into an emission for the canvas, through a template.",
         bound=Bound.none,
         run=shape_for_canvas,
         outputs={
@@ -224,12 +226,14 @@ ENTRIES = build(
     ),
     Entry(
         key="verify_result",
+        summary="Decide whether the plan served the intent — deterministic checks first.",
         bound=Bound.none,
         run=verify_result,
         outputs={"served": Type.str_, "evidence": Type.list_},
     ),
     Entry(
         key="await_delegations",
+        summary="Wait for every child run this plan delegated, then hand on their results.",
         bound=Bound.none,
         run=await_delegations,
         args={"run_ids": Arg(Type.list_)},

@@ -20,6 +20,7 @@ import {
 	setNodeTypeHidden,
 } from "@/pages/graphs-detail/features/explorer/visibility";
 import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
+import { useActiveWorld } from "@/pages/graphs-detail/shell/useActiveWorld";
 import type { CanvasStyling } from "@/types/board";
 import type { QueryResultItem } from "@/types/query";
 import type { TypeCount } from "@/types/traversal";
@@ -83,7 +84,10 @@ export function ExplorerTypesPanel({
 	modelName,
 	onClose,
 }: Props) {
-	const counts = useTypeCountsQuery(username, graphSlug);
+	// The legend is the picked world's: denied types are absent, counts are
+	// taken inside it (selection-and-the-panel.md SP11).
+	const { lensId } = useActiveWorld();
+	const counts = useTypeCountsQuery(username, graphSlug, lensId);
 	const hidden = useHiddenTypes(canvas);
 	const store = graphStoreOf(canvas);
 

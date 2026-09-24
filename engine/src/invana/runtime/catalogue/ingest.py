@@ -187,6 +187,7 @@ async def snapshot_model(ctx: TaskContext, v: RunVars) -> Out:
 ENTRIES = build(
     Entry(
         key="check_bundle",
+        summary="Resolve a bundle's manifest against its files, before anything is written.",
         bound=Bound.ingest,
         run=check_bundle,
         args={"root": Arg(Type.str_)},
@@ -194,6 +195,7 @@ ENTRIES = build(
     ),
     Entry(
         key="snapshot_model",
+        summary="Record the model version a load was checked against, and what landed.",
         bound=Bound.ingest,
         run=snapshot_model,
         args={"model": Arg(Type.str_)},
@@ -212,6 +214,7 @@ ENTRIES = build(
     ),
     Entry(
         key="validate_records",
+        summary="Check every record against the model's published version.",
         bound=Bound.ingest,
         run=validate_records,
         args={"root": Arg(Type.str_), "model": Arg(Type.str_)},

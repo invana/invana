@@ -82,6 +82,7 @@ flowchart TD
 | CD7 | After a passing test the strip states connector, server version, label count and read-write, in that order. |
 | CD8 | The database name is a column on `graph_connections`, not a key inside the encrypted `auth` blob. It is not a secret, so it is returned by `GET …/connection`, shown beside the URI, and editable — a blank credential means "unchanged", and the database name must never inherit that rule. Blank means "the connector's default", and it is passed to the connector only when set. |
 | CD9 | Changing the database re-tests, exactly as changing the URI does. It is not frozen like `connector_class` (CD3) — pointing a Graph at a restored copy of the same database is a move people make, and the model it was built against still holds. |
+| CD10 | **Testing a connection is a run.** `test_connection` (bound `network`) proves the connection through the runtime — trigger `user` from the form, `system` from a ping — because *who proved this worked, and when* is an audit question ([orchestration § 4.1](../../../orchestration.md#41-what-is-a-task--and-what-is-not)). The provider row it proves stays configuration. |
 
 ## Not building
 

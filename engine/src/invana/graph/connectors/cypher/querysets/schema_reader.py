@@ -3,6 +3,7 @@
 from typing import Any
 
 from invana.graph.connectors.base.querysets.schema_reader import BaseSchemaReaderQuerySet
+from invana.graph.types.lens import QueryLens
 from invana.graph.types.schema_elements import (
     ConstraintInfo,
     EdgeSchemaInfo,
@@ -57,6 +58,15 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
         query, params = self._connector.query_builder.get_edge_label_counts()
         response = await self._connector.execute(query, params)
         return {record["label"]: record["count"] for record in response.records}
+
+    async def _count_types_under(self, lens: QueryLens) -> tuple[dict[str, int], dict[str, int]]:
+        builder = self._connector.query_builder
+        nodes = await self._connector.execute(*builder.count_node_types(lens))
+        edges = await self._connector.execute(*builder.count_edge_types(lens))
+        return (
+            {r["label"]: int(r["count"]) for r in nodes.records},
+            {r["label"]: int(r["count"]) for r in edges.records},
+        )
 
     async def get_property_keys(self, label: str) -> list[str]:
         query, params = self._connector.query_builder.get_property_keys(label)

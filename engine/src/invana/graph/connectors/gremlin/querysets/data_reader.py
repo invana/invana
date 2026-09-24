@@ -2,10 +2,12 @@
 
 from typing import Literal
 
+from invana.graph.connectors.base.lens import admit_structured
 from invana.graph.connectors.base.querysets.data_reader import BaseDataReaderQuerySet
 from invana.graph.connectors.gremlin.query_builder import GremlinQueryBuilder
 from invana.graph.types.data_elements import Edge, GraphResponse, Path, Vertex
 from invana.graph.types.filters import FilterGroup
+from invana.graph.types.lens import QueryLens
 from invana.graph.types.sort import SortSpec
 
 
@@ -52,8 +54,12 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
         sort: list[SortSpec] | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        lens: QueryLens | None = None,
     ) -> GraphResponse:
         """Retrieve the neighborhood of a vertex, optionally sorted/filtered/paginated."""
+        lens = self._neighbour_lens(
+            lens, edge_label=edge_label, neighbor_label=neighbor_label, filters=filters, sort=sort
+        )
         g = await self._connector.get_traversal_source()
         vid = self._connector.coerce_id(vertex_id)
         traversal = GremlinQueryBuilder.match_neighbors(
@@ -66,6 +72,7 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
             sort=sort,
             limit=limit,
             offset=offset,
+            lens=lens,
         )
         result = await self._connector.execute_traversal(traversal)
         response = self._serializer.deserialize_graph_response(result)
@@ -82,8 +89,10 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
         edge_label: str | None = None,
         neighbor_label: str | None = None,
         filters: FilterGroup | None = None,
+        lens: QueryLens | None = None,
     ) -> int:
         """Count the neighbours of a vertex."""
+        lens = self._neighbour_lens(lens, edge_label=edge_label, neighbor_label=neighbor_label, filters=filters)
         g = await self._connector.get_traversal_source()
         vid = self._connector.coerce_id(vertex_id)
         traversal = GremlinQueryBuilder.count_neighbors(
@@ -93,9 +102,19 @@ class GremlinDataReaderQuerySet(BaseDataReaderQuerySet):
             edge_label=edge_label,
             neighbor_label=neighbor_label,
             filters=filters,
+            lens=lens,
         )
         result = await self._connector.execute_traversal(traversal)
         return result[0]
+
+    async def resolve_vertices(self, vertex_ids: list[str], *, lens: QueryLens | None = None) -> dict[str, bool]:
+        if not vertex_ids:
+            return {}
+        lens = admit_structured(lens)
+        g = await self._connector.get_traversal_source()
+        ids = [self._connector.coerce_id(v) for v in vertex_ids]
+        rows = await self._connector.execute_traversal(GremlinQueryBuilder.resolve_vertices(g, ids, lens))
+        return {str(self._serializer.coerce_element_id(r["id"])): bool(r["in_world"]) for r in rows}
 
     async def read_vertex_by_id(self, vertex_id: str) -> Vertex:
         """Retrieve a single vertex by its element ID."""

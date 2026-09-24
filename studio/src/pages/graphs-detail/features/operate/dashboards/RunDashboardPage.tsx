@@ -72,6 +72,9 @@ export function RunDashboardPage({
 	// of this page, not a place a link carries (G31).
 	const [selectedKey, setSelectedKey] = useState<string | null>(null);
 	const [comparing, setComparing] = useState(false);
+	// The layer strip's `Fit`. In-memory, like the log filter: a view of this
+	// page, not a place a link carries (SR69).
+	const [layersFit, setLayersFit] = useState(true);
 
 	const engaged = touches.data?.total ? touches.data : undefined;
 	const spec = useMemo(
@@ -82,9 +85,10 @@ export function RunDashboardPage({
 						selectedKey,
 						touches: engaged,
 						lensName: trace.data.lens_name ?? null,
+						layersFit,
 					})
 				: null,
-		[trace.data, view, selectedKey, engaged],
+		[trace.data, view, selectedKey, engaged, layersFit],
 	);
 
 	// `Save report` on the header, and the act behind it (B6). The document
@@ -113,7 +117,7 @@ export function RunDashboardPage({
 	return (
 		<>
 			<Dashboard
-				className="h-full min-h-0 overflow-y-auto p-3"
+				className="h-full min-h-0"
 				spec={report.spec}
 				registry={{ ...RUN_PANELS, flow: TaskFlowPanel }}
 				icons={DASHBOARD_ICONS}
@@ -140,6 +144,9 @@ export function RunDashboardPage({
 							setSelectedKey((current) =>
 								current === ctx?.itemId ? null : (ctx?.itemId ?? null),
 							);
+							return;
+						case RUN_ACTIONS.layersFit:
+							setLayersFit(ctx?.pressed ?? true);
 							return;
 						case RUN_ACTIONS.retune:
 							onRetune?.();

@@ -202,7 +202,7 @@ Grouped by the bound it spends, because **the group is what the envelope ceiling
 Roughly twenty-five entries, and the count is meant to stay near it — growth belongs in reusable
 TaskPlans, not in new callables.
 
-### 6.1 The catalogue as it actually is — twenty-three entries
+### 6.1 The catalogue as it actually is — twenty-eight entries
 
 `runtime/catalogue/registry.py` is the declaration; one module per bound holds the callables. **The
 keys do not change in M1.** They are stored in `thinking_steps.task_key` and read by Studio, so
@@ -221,6 +221,10 @@ a data migration, not a declaration.
 | `shape_for_canvas` | *none* | — | `nodes` int · `edges` int · `result_type` str · `emission_id` str · `emission_kind` str · `template_id` str · `single_value` bool | `execute_graph_query` |
 | `await_delegations` | *none* | `thinking_ids` list | `children` list | — |
 | `execute_graph_query` | `graph_read` | `query` str · `read_only` bool | `rows` int · `execution_time_ms` int · `result_type` str | `validate_query` |
+| `preview_stitches` | `graph_read` | `rules` list · `all_links` bool | `previews` list | — |
+| `count_types` | `graph_read` | — | `node_types` list · `edge_types` list · `counted` bool | — |
+| `resolve_elements` | `graph_read` | `vertex_ids` list | `present` list · `missing` list | — |
+| `expand_neighbours` | `graph_read` | `vertex_id` str · `direction` str · `edge_label` str · `neighbor_label` str · `filters` obj · `sort` list · `limit` int · `offset` int | `nodes` list · `edges` list · `metadata` obj · `total` int · `has_more` bool | — |
 | `understand_ask` | `schema_write` | — | `model_id` str · `draft_version_id` str | — |
 | `validate_proposal` | `schema_write` | — | `counts` obj · `draft_version_id` str | `propose_model` |
 | `spawn_agent` | `work_write` | `name` str · `instructions` str · `allow` list · `skill_ids` list · `budget` obj · `lens_id` str · `lifetime` str | `agent_id` str · `name` str · `depth` int | — |
@@ -232,7 +236,8 @@ a data migration, not a declaration.
 | `write_graph` | `graph_write` | — | `nodes` int · `edges` int · `written` int | `validate_records` |
 | `stitch` | `graph_write` | — | `resolved` int · `unresolved` int · `stitched` int | `write_graph` |
 | `apply_stitches` | `graph_write` | `root` str | `declared` int · `already` int · `skipped` int · `passed` bool | — |
-| `commit_stitches` | `graph_write` | — | `written` int · `rejected` int | — |
+| `commit_stitches` | `graph_write` | — | `written` int · `rejected` int · `links` list | — |
+| `withdraw_stitch` | `graph_write` | `link_id` str | `withdrawn` int | — |
 | `bulk_write` | `graph_write` | `root` str · `batch_size` int · `skip_on_error` bool · `keep_source_ids` bool | `nodes` int · `edges` int · `failed` int | **—** |
 
 **`snapshot_model` spends `ingest`, not `schema_write`.** It writes no schema: it pins the version the load
@@ -248,6 +253,30 @@ writes what the files say. Borrowing `write_graph` would have a bulk load claim 
 ran, and a plan naming `write_graph` without `validate_records` is refused by the validator — correctly.
 So the fast path gets its own entry rather than a relaxed version of somebody else's, and `bulk-load@1`
 is seeded once that entry exists ([LB14](../modules/workflows/features/the-library.md)).
+
+**`withdraw_stitch` is the twenty-fourth entry, and it is a write.** Removing an active stitch deletes the
+edges it wrote (ST48), which is a graph write like any other, so it runs as `stitch-withdraw@1` under the
+Graph's guardrails rather than from the route ([ST55](../modules/connect-and-model/features/stitch-models.md)).
+It is not folded into `commit_stitches`: one takes the staged set and writes, the other takes one rule and
+deletes, and an entry parameterised into its opposite would have two failure modes behind one key.
+
+**`expand_neighbours` is the twenty-fifth entry, and the first canvas act.** A canvas expansion reads
+the graph, so it runs as `expand-neighbours@1` under the canvas session's lens rather than from the route
+([GC6 · GC9](../modules/explore/features/graph-canvas.md)). Expand-all, by edge type and by node type are
+one entry — one bound, one failure mode — with `edge_label` / `neighbor_label` as args. It requires
+nothing: the traversal is built by the connector from structured args, so there is no query text for
+`validate_query` to check, and the lens is composed into the traversal itself (CC22).
+
+**`preview_stitches` is the twenty-sixth, and a read.** Counting what a rule resolves reads the graph, so
+the drawer's preview and `invana stitches resolve` run `stitch-preview@1` under the Graph's guardrails
+([ST56](../modules/connect-and-model/features/stitch-models.md)). One entry for one draft rule or every
+declared one: the same query, the same bound, the same refusal.
+
+**`count_types` and `resolve_elements` are the twenty-seventh and twenty-eighth.** The Explorer's type
+list and a reopened canvas's check both read the graph, so both run under the picked world
+([SP11](../modules/explore/features/selection-and-the-panel.md) ·
+[GC14](../modules/explore/features/graph-canvas.md)). They are not folded into one: one counts the
+graph, the other checks a list of ids, and their outputs share nothing.
 
 The write loop itself never needed moving: it is `CSVLoader` in `invana/graph/loaders/`, band 1, and
 `cli/commands/loader.py` only assembled its config. The entry calls the same loader the CLI did.
@@ -301,7 +330,7 @@ resolving option values and its result is never returned to the model.
 `snapshot_model`**. [§ 6.2](#62-where-todays-set-and--06s-proposed-set-differ)
 lists § 0.6's *proposed* names — `import_dataset`, `import_report` — and taking
 those would rename a column whose values are stored on 179 live nodes and read
-by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--twenty-three-entries)
+by Studio, which [§ 6.1](#61-the-catalogue-as-it-actually-is--twenty-four-entries)
 already settles: **a stored key is renamed by a data migration, never by a
 declaration.** So M11 declares the keys that exist.
 

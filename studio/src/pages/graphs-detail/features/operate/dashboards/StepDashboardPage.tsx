@@ -89,7 +89,7 @@ export function StepDashboardPage({
 
 	return (
 		<Dashboard
-			className="h-full min-h-0 overflow-y-auto p-3"
+			className="h-full min-h-0"
 			spec={report.spec}
 			// Govern's, not Studio's — the step dashboard *hosts* R2, it does not
 			// own what a touch means.

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from invana.graph.types.filter_types import FilterOp
 from invana.graph.types.filters import FilterExpression, FilterGroup, LogicalOp
+from invana.graph.types.lens import QueryLens, TypeBound
 from invana.graph.types.sort import SortDirection, SortSpec
 
 
@@ -111,6 +112,11 @@ def _order_clause(sort: list[SortSpec] | None, var: str) -> str:
     return " ORDER BY " + ", ".join(parts)
 
 
+def _name(identifier: str) -> str:
+    """A label, type or property key as a quoted identifier — a backtick in it is doubled."""
+    return "`" + identifier.replace("`", "``") + "`"
+
+
 class OpenCypherQueryBuilder:
     """Builds parameterized openCypher queries, returning ``(query, params)``.
 
@@ -196,13 +202,15 @@ class OpenCypherQueryBuilder:
         filters: FilterGroup | None,
         counter: _ParamCounter,
         params: dict,
+        lens: QueryLens | None = None,
     ) -> str:
         """Shared `MATCH ... WHERE ...` prefix for neighborhood reads + counts.
 
         Filters apply to the neighbour `m`; the anchor is `elementId(n) = $vid`.
+        A lens adds its type and records grains to the same `WHERE` (CC22).
         """
-        edge_part = f"[r:`{edge_label}`]" if edge_label else "[r]"
-        neighbor = f"(m:`{neighbor_label}`)" if neighbor_label else "(m)"
+        edge_part = f"[r:{_name(edge_label)}]" if edge_label else "[r]"
+        neighbor = f"(m:{_name(neighbor_label)})" if neighbor_label else "(m)"
 
         if direction == "out":
             pattern = f"(n)-{edge_part}->{neighbor}"
@@ -216,7 +224,121 @@ class OpenCypherQueryBuilder:
             where = _build_filter_clause(filters, "m", counter, params)
             if where:
                 query += f" AND ({where})"
+        if lens is not None:
+            for clause in cls._lens_where(lens, counter, params):
+                query += f" AND {clause}"
         return query
+
+    @classmethod
+    def _lens_where(
+        cls,
+        lens: QueryLens,
+        counter: _ParamCounter,
+        params: dict,
+        *,
+        nodes: tuple[str, ...] = ("n", "m"),
+        rels: tuple[str, ...] = ("r",),
+    ) -> list[str]:
+        """The type and records grains, as conditions on the named node and relationship variables.
+
+        **Type**: every label of each node and each relationship's type must be
+        allowed — a node carrying one denied label is a node of that type.
+        **Records**: each type's slice is required of whatever carries that
+        type, as `(NOT m:T OR <slice>)`, so elements of other types pass
+        untouched and a narrowed type is matched only inside its slice.
+        """
+        clauses: list[str] = []
+        if lens.allowed_types is not None:
+            p = counter.next()
+            params[p] = sorted(lens.allowed_types)
+            clauses.extend(f"type({var}) IN ${p}" for var in rels)
+            clauses.extend(f"ALL(l IN labels({var}) WHERE l IN ${p})" for var in nodes)
+        for name, bound in sorted(lens.bounds.items()):
+            if not (bound.narrows_records and bound.predicates):
+                continue
+            for var in nodes:
+                slice_ = _build_filter_clause(bound.predicates, var, counter, params)
+                clauses.append(f"(NOT {var}:{_name(name)} OR ({slice_}))")
+            if rels:
+                p = counter.next()
+                params[p] = name
+            for var in rels:
+                slice_ = _build_filter_clause(bound.predicates, var, counter, params)
+                clauses.append(f"(type({var}) <> ${p} OR ({slice_}))")
+        return clauses
+
+    @classmethod
+    def count_node_types(cls, lens: QueryLens) -> tuple[str, dict]:
+        """Nodes per label, inside *lens* — denied types never matched, slices composed (SP11)."""
+        params: dict = {}
+        clauses = cls._lens_where(lens, _ParamCounter(), params, nodes=("n",), rels=())
+        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+        return f"MATCH (n){where} UNWIND labels(n) AS label RETURN label AS label, count(*) AS count", params
+
+    @classmethod
+    def count_edge_types(cls, lens: QueryLens) -> tuple[str, dict]:
+        """Relationships per type, inside *lens* — both endpoints in the world too.
+
+        An edge whose end the world excludes is one an expansion could never
+        reach, so it is not counted as part of what this world holds.
+        """
+        params: dict = {}
+        clauses = cls._lens_where(lens, _ParamCounter(), params, nodes=("a", "b"), rels=("r",))
+        where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+        return f"MATCH (a)-[r]->(b){where} RETURN type(r) AS label, count(*) AS count", params
+
+    @classmethod
+    def resolve_nodes(cls, vertex_ids: list, lens: QueryLens | None) -> tuple[str, dict]:
+        """Which of *vertex_ids* the graph holds, and whether each is inside *lens* (GC14).
+
+        One query for the whole canvas. Only the id and a boolean come back —
+        never a property — so what the world excludes is not read, only placed.
+        """
+        params: dict = {"ids": vertex_ids}
+        clauses = cls._lens_where(lens, _ParamCounter(), params, nodes=("n",), rels=()) if lens else []
+        in_world = " AND ".join(clauses) if clauses else "true"
+        return (
+            f"MATCH (n) WHERE {cls.ELEMENT_ID}(n) IN $ids RETURN {cls.ELEMENT_ID}(n) AS id, ({in_world}) AS in_world",
+            params,
+        )
+
+    @classmethod
+    def _lens_return(cls, lens: QueryLens | None, counter: _ParamCounter, params: dict) -> str | None:
+        """The property grain: `n`, `r` and `m` projected to what each type permits.
+
+        ``None`` when no type excludes anything, so the elements travel whole. The
+        projection is the serializer's own element shape — the same one the lens
+        compiler writes (CC13) — so a governed neighbour is still a node.
+        """
+        if lens is None:
+            return None
+        narrowed = sorted((n, b) for n, b in lens.bounds.items() if b.narrows_structure)
+        if not narrowed:
+            return None
+        eid = cls.ELEMENT_ID
+
+        def props(var: str, bound: TypeBound) -> str:
+            permitted = bound.permitted
+            return f"{var} {{ {', '.join('.' + _name(k) for k in permitted)} }}" if permitted else "{}"
+
+        def node(var: str) -> str:
+            cases = " ".join(f"WHEN {var}:{_name(n)} THEN {props(var, b)}" for n, b in narrowed)
+            return (
+                f"{{ element_id: {eid}({var}), labels: labels({var}), "
+                f"properties: CASE {cases} ELSE properties({var}) END }} AS {var}"
+            )
+
+        whens = []
+        for n, b in narrowed:
+            p = counter.next()
+            params[p] = n
+            whens.append(f"WHEN ${p} THEN {props('r', b)}")
+        rel = (
+            f"{{ element_id: {eid}(r), type: type(r), "
+            f"start_node_element_id: {eid}(startNode(r)), end_node_element_id: {eid}(endNode(r)), "
+            f"properties: CASE type(r) {' '.join(whens)} ELSE properties(r) END }} AS r"
+        )
+        return f"{node('n')}, {rel}, {node('m')}"
 
     @classmethod
     def match_neighbors(
@@ -229,12 +351,16 @@ class OpenCypherQueryBuilder:
         sort: list[SortSpec] | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        lens: QueryLens | None = None,
     ) -> tuple[str, dict]:
         params: dict = {"vid": vertex_id}
         counter = _ParamCounter()
 
-        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params)
-        query += " RETURN n, r, m"
+        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params, lens)
+        projected = cls._lens_return(lens, counter, params)
+        # A projected `m` is a map, so ordering and paging happen on the
+        # elements, before the projection, where `m.prop` still means the node.
+        query += " WITH n, r, m" if projected else " RETURN n, r, m"
         query += _order_clause(sort, "m")
 
         if offset is not None:
@@ -247,6 +373,8 @@ class OpenCypherQueryBuilder:
             params[p] = limit
             query += f" LIMIT ${p}"
 
+        if projected:
+            query += f" RETURN {projected}"
         return query, params
 
     @classmethod
@@ -257,11 +385,12 @@ class OpenCypherQueryBuilder:
         edge_label: str | None = None,
         neighbor_label: str | None = None,
         filters: FilterGroup | None = None,
+        lens: QueryLens | None = None,
     ) -> tuple[str, dict]:
         params: dict = {"vid": vertex_id}
         counter = _ParamCounter()
 
-        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params)
+        query = cls._neighbor_match(vertex_id, direction, edge_label, neighbor_label, filters, counter, params, lens)
         query += " RETURN count(m) AS cnt"
         return query, params
 

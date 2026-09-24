@@ -5,6 +5,7 @@ import type {
 	AgentLineage,
 	AgentListResponse,
 	AgentUpdate,
+	CatalogueResponse,
 	LifecycleAct,
 	LifecyclePreview,
 	Project,
@@ -289,6 +290,12 @@ export const tasksApi = {
 
 	activity: (username: string, graphSlug: string, id: string) =>
 		request<TaskActivity>(`${base(username, graphSlug)}/tasks/${id}/activity`),
+};
+
+/** The catalogue — the closed set a plan may name, read-only (7.6 · CA1). */
+export const catalogueApi = {
+	list: (username: string, graphSlug: string) =>
+		request<CatalogueResponse>(`${base(username, graphSlug)}/catalogue`),
 };
 
 /** The plan library — `task_plans` where `reusable` (SR5 · LB5). */

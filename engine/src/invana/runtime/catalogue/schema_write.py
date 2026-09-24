@@ -94,12 +94,14 @@ async def validate_proposal_task(ctx: TaskContext, v: RunVars) -> Out:
 ENTRIES = build(
     Entry(
         key="understand_ask",
+        summary="Resolve the modeller draft and the turns to replay.",
         bound=Bound.schema_write,
         run=understand_ask,
         outputs={"model_id": Type.str_, "draft_version_id": Type.str_},
     ),
     Entry(
         key="validate_proposal",
+        summary="Check a proposed model change for referential integrity, then stage it.",
         bound=Bound.schema_write,
         run=validate_proposal_task,
         outputs={"counts": Type.obj, "draft_version_id": Type.str_},

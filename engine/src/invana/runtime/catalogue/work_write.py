@@ -206,6 +206,7 @@ async def _depth(db: AsyncSession, agent) -> int:
 ENTRIES = build(
     Entry(
         key="spawn_agent",
+        summary="Create a helper agent under this agent's ceiling.",
         bound=Bound.work_write,
         run=spawn_agent,
         args={
@@ -220,6 +221,7 @@ ENTRIES = build(
     ),
     Entry(
         key="delegate",
+        summary="Open a run under a child agent and wait for it.",
         bound=Bound.work_write,
         run=delegate,
         args={"agent_id": Arg(Type.str_), "body": Arg(Type.str_)},
@@ -227,6 +229,7 @@ ENTRIES = build(
     ),
     Entry(
         key="create_task",
+        summary="Write down work for a child agent or a person.",
         bound=Bound.work_write,
         run=create_task,
         args={"title": Arg(Type.str_), "body": Arg(Type.str_)},

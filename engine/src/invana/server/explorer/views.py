@@ -1,15 +1,16 @@
 """HTTP views for the Explorer.
 
-Parse, call one manager, serialise (migration-plan §4.1). The connector pool is
-an app-state dependency, handed to the manager rather than reached for.
+Parse, call one launcher, serialise (migration-plan §4.1). Every read the canvas
+makes is a run (GC6 · SP11 · GC14): each view launches its builtin through
+`invana.runtime.canvas` and answers with what that run read. The task runtime is
+an app-state dependency, handed down rather than reached for.
 """
 
 from __future__ import annotations
 
-from fastapi import Depends, Request
+from fastapi import Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.explorer.managers import ExploreManager
 from invana.apps.explorer.schemas import (
     ExpandByEdgeTypeRequest,
     ExpandByNodeTypeRequest,
@@ -17,21 +18,19 @@ from invana.apps.explorer.schemas import (
     NeighborExpandResponse,
     ResolveElementsRequest,
     ResolveElementsResponse,
-    TypeCount,
     TypeCountsResponse,
 )
 from invana.apps.graphs.models import Graph, GraphMember
-from invana.apps.graphs.pool import GraphConnectionManager
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.runtime import canvas
+from invana.runtime.interpreter.loop import TaskRuntime
 from invana.server.graphs.deps import require_graph_connected, require_graph_member
 
-explore = ExploreManager()
 
-
-def _get_manager(request: Request) -> GraphConnectionManager:
-    return request.app.state.graph_connection_manager
+def _get_runtime(request: Request) -> TaskRuntime:
+    return request.app.state.task_runtime
 
 
 async def expand_neighbors(
@@ -40,9 +39,9 @@ async def expand_neighbors(
     graph: Graph = Depends(require_graph_connected),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: TaskRuntime = Depends(_get_runtime),
 ) -> NeighborExpandResponse:
-    return await explore.expand_neighbors(session, graph=graph, manager=manager, actor_id=user.id, req=payload)
+    return await canvas.expand(session, runtime=runtime, graph=graph, actor_id=user.id, req=payload)
 
 
 async def expand_by_edge_type(
@@ -51,9 +50,9 @@ async def expand_by_edge_type(
     graph: Graph = Depends(require_graph_connected),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: TaskRuntime = Depends(_get_runtime),
 ) -> NeighborExpandResponse:
-    return await explore.expand_by_edge_type(session, graph=graph, manager=manager, actor_id=user.id, req=payload)
+    return await canvas.expand(session, runtime=runtime, graph=graph, actor_id=user.id, req=payload)
 
 
 async def expand_by_node_type(
@@ -62,43 +61,45 @@ async def expand_by_node_type(
     graph: Graph = Depends(require_graph_connected),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: TaskRuntime = Depends(_get_runtime),
 ) -> NeighborExpandResponse:
-    return await explore.expand_by_node_type(session, graph=graph, manager=manager, actor_id=user.id, req=payload)
+    return await canvas.expand(session, runtime=runtime, graph=graph, actor_id=user.id, req=payload)
 
 
 async def resolve_elements(
     payload: ResolveElementsRequest,
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(require_graph_connected),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
+    runtime: TaskRuntime = Depends(_get_runtime),
 ) -> ResolveElementsResponse:
-    """Which of a canvas's elements the graph still holds (GC5).
+    """What of a reopened canvas is still in view — a `resolve-elements@1` run (GC5 · GC14).
 
-    Read-only, and it emits no event: a canvas asking whether its own drawing is
-    still true is not an action anybody audits.
+    ``present`` is in the graph and the picked world, ``missing`` is gone from
+    the graph. What the world excludes is in neither, and is not drawn.
     """
-    present, missing = await explore.resolve_elements(
-        session, graph=graph, manager=manager, vertex_ids=payload.vertex_ids
+    return await canvas.resolve(
+        session,
+        runtime=runtime,
+        graph=graph,
+        actor_id=user.id,
+        vertex_ids=payload.vertex_ids,
+        lens_id=payload.lens_id,
     )
-    return ResolveElementsResponse(present=present, missing=missing, checked=len(payload.vertex_ids))
 
 
 async def type_counts(
+    lens_id: str | None = Query(default=None, description="The world the canvas has picked (SP11)."),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(require_graph_connected),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
-    manager: GraphConnectionManager = Depends(_get_manager),
+    runtime: TaskRuntime = Depends(_get_runtime),
 ) -> TypeCountsResponse:
-    """Node and edge types with graph-wide counts — the Explorer panel's legend.
+    """The types the picked world holds, counted inside it — a `count-types@1` run (SP11).
 
-    Read-only and unlogged: it states what the graph holds, which is not a
-    traversal anybody took (selection-and-the-panel.md SP6).
+    A type the world denies is absent, and every count is taken inside its
+    slice — the Explorer panel's legend and the expand menus read this.
     """
-    nodes, edges, counted = await explore.type_counts(session, graph=graph, manager=manager)
-    return TypeCountsResponse(
-        nodes=[TypeCount(name=name, count=count) for name, count in nodes],
-        edges=[TypeCount(name=name, count=count) for name, count in edges],
-        counted=counted,
-    )
+    return await canvas.count_types(session, runtime=runtime, graph=graph, actor_id=user.id, lens_id=lens_id)
