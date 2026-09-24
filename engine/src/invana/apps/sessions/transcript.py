@@ -6,6 +6,8 @@ The history window is what NL translation reads back as conversation context.
 
 from __future__ import annotations
 
+import re
+
 from invana.apps.sessions.models import SessionMessage, SessionMessageRole, SessionMessageStatus
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
 
@@ -21,10 +23,14 @@ validate, execute, project — is the run runtime's job
 
 _LANGUAGE_LABEL = {"cypher": "Cypher", "gremlin": "Gremlin"}
 
-# How many prior turns to replay as conversation context for an NL ask (docs/for-developers/modules/ask/spec.md),
-# so a follow-up like "only show 5" can refine the previous query. Bounded to keep
-# the prompt small; this is read-only translation, so the risk is low.
-_HISTORY_TURNS = 6
+# How many prior turns to replay as conversation context for an NL ask
+# (docs/for-developers/modules/ask/features/ask-in-natural-language.md NL11), so a
+# follow-up like "load them" or "only show 5" can refine the previous query.
+# Bounded so a long session does not grow the cost of every ask.
+_HISTORY_TURNS = 20
+
+# A quoted literal — the one place a value can sit in a query or a question.
+_LITERAL = re.compile(r"'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"")
 
 # Backend-owned copy for NL-mode failures. The user typed a question,
 # not a query, so the raw driver error (a Cypher/Gremlin parser message) is
@@ -99,7 +105,7 @@ def _context_turns(rows: list[SessionMessage]) -> list[dict]:
     return turns
 
 
-def _assemble_history(rows: list[SessionMessage]) -> list[dict]:
+def _assemble_history(turns: list[dict], *, values: bool = True) -> list[dict]:
     """Structured prior turns → provider-agnostic chat messages (docs/for-developers/modules/ask/spec.md).
 
     Plain text, not tool_use/tool_result blocks: those are provider-specific,
@@ -107,16 +113,25 @@ def _assemble_history(rows: list[SessionMessage]) -> list[dict]:
     ``complete_tool`` dispatches to. The current turn still emits via the forced
     ``submit_query`` tool; the clean user/assistant alternation satisfies the
     strictest provider (Anthropic).
+
+    ``values=False`` is the ``property_values`` cut (NL11): each quoted literal
+    is sent as ``'…'`` and the rationale is dropped, while the ask and the
+    query's shape still go — a follow-up needs those, not the values.
     """
     out: list[dict] = []
-    for t in _context_turns(rows):
+    for t in turns:
         if t["kind"] == "query":
-            content = f"{t['query']}\n-- {t['rationale']}" if t["rationale"] else t["query"]
+            query = t["query"] if values else _mask(t["query"])
+            content = f"{query}\n-- {t['rationale']}" if t["rationale"] and values else query
         else:  # clarify — the assistant asked a question instead of querying
-            content = t["question"]
+            content = t["question"] if values else _mask(t["question"])
         out.append({"role": "user", "content": t["prompt"]})
         out.append({"role": "assistant", "content": content})
     return out
+
+
+def _mask(text: str) -> str:
+    return _LITERAL.sub("'…'", text)
 
 
 def _model_summary(summary: str, counts: dict[str, int]) -> str:

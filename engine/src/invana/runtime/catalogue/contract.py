@@ -43,6 +43,7 @@ from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import Session
 from invana.apps.sessions.transcript import (
     _assemble_history,
+    _context_turns,
 )
 from invana.apps.skills.models import Rule, Skill
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
@@ -173,6 +174,8 @@ class RunVars:
     timeout_s: float | None = None
     parameters: dict | None = None
     provider: LLMProvider | None = None
+    #: The session's earlier turns, structured (``_context_turns``). Assembled
+    #: into messages only at the crossing, where each part is cut (NL11).
     history: list[dict] = field(default_factory=list)
     grounding: GraphVersion | None = None
     #: What an LLM step describes — the global model, or the mirror standing in
@@ -488,14 +491,16 @@ class ModelCrossing:
         """What the prompt builders cut against — ``None`` is unbounded."""
         return None if self.verdict.egress_unbounded else frozenset(self.egress.classes)
 
-    def history(self, history: list[dict]) -> list[dict]:
-        """The conversation, or none of it.
+    def history(self, turns: list[dict]) -> list[dict]:
+        """The session's earlier turns as messages, cut by part (NL11).
 
-        Prior turns carry results, and a result is property values. A world that
-        does not send them does not send the transcript that quotes them — the
-        cut is to the part, before the prompt exists ([GV31]).
+        A turn holds the ask, the query and its rationale — never rows. So a
+        world that does not send ``property_values`` still sends the asks and
+        the queries' shape, with each quoted literal as ``'…'`` and no
+        rationale; a follow-up needs what came before, not its values. The cut
+        is to the parts, before the prompt exists ([GV31]).
         """
-        return history if self.egress.permits(EgressClass.property_values) else []
+        return _assemble_history(turns, values=self.egress.permits(EgressClass.property_values))
 
 
 def _carrying(*, grounding: object | None, history: list[dict]) -> tuple[str, ...]:
@@ -1077,5 +1082,6 @@ async def load_global_model(db: AsyncSession, graph_id: str) -> Grounding | None
     return Grounding(versions=(mirror,), described=False) if mirror is not None else None
 
 
-def assemble_history(rows) -> list[dict]:
-    return _assemble_history(rows)
+def context_turns(rows) -> list[dict]:
+    """The session's earlier turns, structured — assembled into messages only at the crossing (NL11)."""
+    return _context_turns(rows)

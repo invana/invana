@@ -283,3 +283,20 @@ class TestOperationLogging:
         turns = transcript._context_turns(rows)
         assert len(turns) == 1
         assert turns[0]["query"] == "MATCH (a:Airport) RETURN a"
+
+    def test_history_under_a_values_cut_keeps_the_ask_and_masks_literals(self):
+        """A follow-up needs what came before, not its values (NL11)."""
+        turns = [
+            {
+                "kind": "query",
+                "prompt": "the longest airport",
+                "rationale": "Ranks by LHR's runway.",
+                "query": "MATCH (a:airport) WHERE a.code <> 'LHR' RETURN a ORDER BY a.longest DESC LIMIT 10",
+            },
+        ]
+        whole = transcript._assemble_history(turns)
+        cut = transcript._assemble_history(turns, values=False)
+
+        assert "'LHR'" in whole[1]["content"] and "Ranks by" in whole[1]["content"]
+        assert cut[0] == {"role": "user", "content": "the longest airport"}
+        assert cut[1]["content"] == "MATCH (a:airport) WHERE a.code <> '…' RETURN a ORDER BY a.longest DESC LIMIT 10"

@@ -53,6 +53,7 @@ flowchart TD
 | Question spans models with no link | Says which two, and that a link is not declared |
 | Repair fails twice | Stops, showing both attempts and the errors |
 | Cancelled mid-run | Steps completed stay in the thread; nothing partial is presented as an answer |
+| The world does not send property values | Follow-ups still resolve (*load them on canvas*): the earlier asks and queries go, with each quoted literal sent as `'…'` and no rationale |
 | The world does not send property names | The ask is read against labels and stitches alone; the step's touch names `property_names` as cut, so a cannot-answer caused by the cut is traceable to it |
 
 ## Surfaces
@@ -95,6 +96,19 @@ and a type or property the run's lens excludes is never described.
 | Nothing at all | `No graph model is available — …` |
 | `type_names` cut | `This run's world does not permit the graph's schema to accompany the call — …` |
 
+### The session history
+
+What an LLM step is told about the session's earlier turns ([NL11](#decisions)). The last 20 turns,
+assembled at the crossing from structured turns, so each part is cut by its own class.
+
+| Part of an earlier turn | Sent as | Crosses with | When `property_values` is cut |
+|---|---|---|---|
+| The ask | `user` message | `the_question` | sent |
+| The query that answered it | `assistant` message | `type_names` · `property_names` | sent, each quoted literal as `'…'` |
+| The query's rationale | `-- …` after the query | `property_values` | dropped |
+| A clarification question | `assistant` message | `the_question` | sent, each quoted literal as `'…'` |
+| The rows it returned | never | — | — |
+
 ## Decisions
 
 | # | Decision |
@@ -109,6 +123,7 @@ and a type or property the run's lens excludes is never described.
 | NL8 | **The prompt describes the global model, not the mirror.** The grounding block is built from the authored models' active versions plus the active stitches ([CM3](../../connect-and-model/spec.md#6-cross-feature-decisions)) — that is where a type's description, a property's description and a stitch are authored, and they are what let the model map *length* to `longest` or read *which country* across two models. The introspected mirror carries none of them, and its `_inv_*` bookkeeping properties are not the domain. The mirror is still the version a run **engages** and the `QueryLens` is built from ([GV33](../../govern/spec.md#4-cross-feature-decisions)): what the model is told and what the lens bounds are different roles, and neither is traded for the other. A Graph with no authored model is grounded on the mirror, headed as undescribed, because labels alone beat no grounding. |
 | NL9 | **The grounding block is cut by the lens as well as by egress.** A type the run's `QueryLens` does not allow is not listed, a property it excludes is not listed on its type, and a stitch naming either is not listed. Telling the model about something the lens will refuse turns a clean *cannot answer* into a refused query. Descriptions travel with the thing they describe and under its class — a type's under `type_names`, a property's under `property_names` — so the closed egress set gains no class. |
 | NL10 | **Every LLM step records its exchange, whatever it concluded.** A *cannot answer* or a clarification from Understand keeps `prompt` and `completion` on `output` like an answer does ([SR42](../../operate/features/see-what-ran.md#decisions)). The prompt is the evidence for the judgement: without it, *the graph holds no runway length* cannot be told apart from *the prompt never mentioned `longest`*. |
+| NL11 | **A session's earlier turns go with every ask, and are cut by part, never whole.** A follow-up — *load them on canvas*, *only the top 5* — means nothing without the ask and the query before it, so the last 20 turns are always carried. What a turn holds is the ask, the query and its rationale; it never holds rows. So `property_values` governs only what can carry a value — a quoted literal in a query or a clarification is sent as `'…'`, and a rationale is dropped — and the ask and the query's shape still go. Dropping the whole transcript for a literal it might contain turned every governed session into a string of unrelated asks. Gremlin names its labels in quotes too, so under the cut its labels are masked with the values; the ask still carries what was meant. |
 
 ## Not building
 

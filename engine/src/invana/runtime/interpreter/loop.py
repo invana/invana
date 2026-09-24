@@ -31,7 +31,12 @@ from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
 from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
 from invana.apps.sessions.querysets import SessionMessageQuerySet
-from invana.apps.sessions.transcript import _friendly_query_error, _model_summary, _title_from_text
+from invana.apps.sessions.transcript import (
+    _HISTORY_TURNS,
+    _friendly_query_error,
+    _model_summary,
+    _title_from_text,
+)
 from invana.apps.skills.managers import RuleManager
 from invana.apps.skills.models import Rule, Skill
 from invana.apps.work.models import Task as Todo
@@ -46,7 +51,7 @@ from invana.runtime.catalogue import (
     RunVars,
     TaskContext,
     TaskFailure,
-    assemble_history,
+    context_turns,
     load_global_model,
     load_grounding,
 )
@@ -57,7 +62,6 @@ from invana.runtime.executor import _dispatch
 from invana.runtime.governing import Governor
 from invana.runtime.interpreter.bindings import resolve as resolve_bindings
 from invana.runtime.interpreter.payloads import (
-    _HISTORY_TURNS,
     _OUTCOME_BY_STATUS,
     _awaiting_detail,
     _ms,
@@ -406,7 +410,7 @@ class TaskRuntime:
             skills = await self._skills_for(db, agent=agent, graph_id=graph.id)
             rules = await self._rules_for(db, run=th, graph_id=graph.id)
             history = (
-                assemble_history(
+                context_turns(
                     await SessionMessageQuerySet().list_recent_messages(
                         db, session_id=sess.id, before_seq=user_msg.seq, limit=_HISTORY_TURNS * 2
                     )

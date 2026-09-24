@@ -242,7 +242,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     ask = str((ctx.step.args or {}).get("ask") or "").strip() or v.prompt
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
-    turns = len(v.history) // 2
+    turns = len(v.history)
     await ctx.progress(f"{_provider_label(v.provider)} · reading {turns} prior turn{'' if turns == 1 else 's'}")
     language = await query_language_for(ctx, v, strict=True)
     try:

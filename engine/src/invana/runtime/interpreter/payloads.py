@@ -18,9 +18,6 @@ from invana.runtime.workflows import Retry
 log = logging.getLogger(__name__)
 
 
-_HISTORY_TURNS = 6
-
-
 def _now() -> datetime:
     return datetime.now(UTC)
 
