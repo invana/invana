@@ -70,7 +70,7 @@ flowchart TD
 |---|---|
 | Entry | `answer_in_words`, bound `llm`, after `verify_result` in every `nl-*` plan |
 | Inputs | the ask · the intent summary · up to 50 rows with their record ids · the soul |
-| Tool output | `claims: [{text, cites: [record_id…]} \| {text, third_party: {kind, source}}]` |
+| Tool output | `claims: [{text, cites: [record_id…]} \| {text, third_party: {source, reference, …}}]` — the third-party shape is [3.13](beyond-the-graph.md#engine)'s |
 | Emission | `prose` · payload `{claims}` · citation = union of cited record ids |
 | Egress | `the_question` + `property_values`; without `property_values` the step is skipped, not failed |
 | Order | the prose emission's `seq` precedes the emissions it cites |
@@ -80,10 +80,10 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| AW1 | **The Answer step is how a `prose` emission is made.** It is one more step in every natural-language plan, after Verify, bound `llm`; nothing else writes prose. |
+| AW1 | **The Answer step is how a `prose` emission is made.** It is one more step in every natural-language plan, after Verify, bound `llm`; nothing else writes prose. Adding it is a new version of each seeded `nl-*` plan, and seeding upgrades a Graph that holds the old one — a plan is versioned, so the step reaches existing Graphs as a version, never as an edit in place. |
 | AW2 | **A claim ships only with a citation.** Each claim names the records it rests on, or is a third-party claim with its source ([BG3](beyond-the-graph.md#decisions)); any other claim is dropped before the emission is written, and the step counts what it dropped. The model's words are never trusted to be grounded — the structure is. |
-| AW3 | **The Answer step fails soft.** It adds words to an answer that already exists; a model error, a timeout, a cut or zero kept claims leaves the records as the answer and marks the step, never the run. |
-| AW4 | **Words lead.** The prose emission is first in the reading order and the records it cites follow, because a person reads the sentence and checks the table, not the other way round. |
+| AW3 | **The Answer step fails soft.** It adds words to an answer that already exists; a model error, a timeout, a cut or zero kept claims leaves the records as the answer and marks the step, never the run. The mechanism is `optional` on the plan step: an optional step that fails is recorded failed and the interpreter goes on, which is the only step kind that may. |
+| AW4 | **Words lead.** The prose emission is first in the reading order and the records it cites follow, because a person reads the sentence and checks the table, not the other way round. Reading order is `seq`, so Project reserves the first `seq` for the prose it precedes; when no prose is written the gap stays, and a gap orders nothing wrongly. |
 | AW5 | **It reads a sample, and says so.** Past 50 rows the step reads the first 50 and the prose states it spoke from a sample; a sentence about *all* the rows from part of them is a claim nobody can check. |
 
 ## Not building

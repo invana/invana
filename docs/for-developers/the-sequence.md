@@ -79,6 +79,7 @@ flowchart TD
     F --> I
     J["J · loose ends<br/>4.4 · 11.1 · 11.3 · 12.2–12.4 · 13.3 · 13.7"]
     S["Studio track · the shell, then the screens<br/>refactor phases 1–7 · batches 3–7"]
+    A --> K["K · the assistant speaks<br/>5.8 · NL12 · 3.12 · 3.13"]
 ```
 
 **J and the Studio track are not downstream of anything.** They are the parallel work — J because
@@ -191,6 +192,24 @@ as an `EmptyState` naming M8.
 | [13.3 Command line](modules/platform/features/command-line.md) | `start · migrate · version` as documented | — |
 | [13.7 Setup](modules/platform/features/setup.md) | locks on Explorer, Model and Imports; the four artboards | S13 |
 
+### K · The assistant speaks — 5.8 · 3.12 · 3.13
+
+Three branches, each off `main`, each shipping docs · engine · Studio · tests · changeset together.
+In order, because each needs the one before: the Answer step speaks in the soul's voice, and a
+third-party claim is something the Answer step writes.
+
+| Phase | Ships | Engine | Studio | Done when |
+|---|---|---|---|---|
+| **K1 · Soul and converse** — `feat/agent-soul` · M | [5.8 Soul](modules/agents/features/soul.md) · [NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [CA10](modules/ask/features/when-it-cannot-answer.md#decisions) · [AG13](modules/agents/features/author-an-agent.md#decisions) | migration `agents.soul`; `AgentRead/Update.soul` by set-ness; `agent.soul_set`; `apps/llm/voice.py` `DEFAULT_VOICE`; `RunVars.soul` read at run open; agent `instructions` after the Graph's; Understand prompt carries the voice, Translate has no parameter for it; `converse` action → outcome `conversed`; `POST …/agents/{id}/soul/preview` | **Soul** tab in `AgentDetail` (Markdown editor from the kit — built there with a story if missing), preview; a `conversed` reply drawn as a message | *how are you* gets a line in the agent's voice; the Translate prompt never contains the soul (test) |
+| **K2 · The answer, in words** — `feat/answer-in-words` · M | [3.12](modules/ask/features/the-answer-in-words.md) | `apps/llm/answer.py` claims schema and citation check; entry `answer_in_words`, bound `llm`, an **optional** step; added after `verify_result` in the `nl-*` plans at a new version, seeded Graphs upgraded; `seq` reserved first by Project | `ProseBody` renders claims with citation chips; *Writing the answer…* while it streams | *the longest airport runway* answers in a sentence that cites its row; an uncited claim is dropped; under the `property_values` cut the run still answers (tests) |
+| **K3 · Beyond the graph** — `feat/third-party-internet` · L, may split engine/Studio | [3.13](modules/ask/features/beyond-the-graph.md) · [GV38](modules/govern/spec.md#4-cross-feature-decisions) · [SP10](modules/explore/features/selection-and-the-panel.md#decisions) · [GC15](modules/explore/features/graph-canvas.md#decisions) | `internet` sublayer; `own_knowledge` on `llm` rules; `apps/search_providers` (Brave · Tavily · SearXNG, ping); entries `search_web` · `fetch_source`, bound `third_party`, off every seeded envelope; `needs_outside` → Plan adds them; third-party claims in the Answer step; **Keep** writes a `Source` node `ABOUT` its element with `_inv_*` provenance | `ThirdPartyBadge` in design-kit `ui-extended` with a story; canvas node badge (`canvas-core` badge spec); panel provenance; **Keep** in the canvas-ui toolbar; Settings › Search providers | a search answer carries `third-party · internet` with its link, on the prose, the node and the panel; a denied domain is named and skipped; SearXNG in docker-compose, tests against it — no mocks |
+
+| Before K's code | |
+|---|---|
+| Drawn | 17 artboards on [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) — listed in [the-screens](the-screens.md#beyond-the-42--the-assistant-speaks) |
+| Guards per commit | ruff · import-linter · golden files (revert what is not K's) · the touched suites; flip the index row as each column ships |
+| Risk | K3 spans three repos — design-kit → canvas → invana — and adds an app, so it goes last and may ship as two PRs |
+
 ### The Studio track — the shell, then the screens
 
 | Phase | What | Gate |
@@ -224,6 +243,7 @@ everywhere.
 | **G · Memory** | ✅ 8.3 · 8.4 share `ReviewProposalHiFi`, and now **8.1 `Evidence`** · **8.2 `Recall`** | `hi-fi-finance` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `memory/spec.md` has no drawn states |
 | **H · Skills** | ✅ — `Main` (SkillsPanel) · `SkillFlow` · `SkillAuthor` · `SkillBindings`, all on the shell contract | canvas `7c565h2z9irbFBwu1S1ebH`, cached in `.design/canvas-govern/` | ❌ |
 | **I · Recurring** | ✅ `RecurringTaskHiFi` | `hi-fi-finance` | ❌ |
+| **K · The assistant speaks** | ✅ 17 — soul · converse · the answer in words · beyond the graph ([the-screens](the-screens.md#beyond-the-42--the-assistant-speaks)) | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J), generated from `.design/canvas-assistant-speaks/` | ❌ reconcile open |
 | **J · Loose ends** | ⚠️ **4.4 `Console`** · **12.3 `Capabilities`** · **12.4 `Vector`** are drawn now. Module 11 and 13.3 stay deliberately undrawn; 13.7's four `Setup*HiFi` are still **owed** — those screens shipped before their drawings | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
 
 | Reading | |

@@ -89,7 +89,7 @@ flowchart TD
 | CA5 | Nothing partial is presented as an answer. |
 | CA6 | A diagnosis is drawn unlike an answer — no emission header, no citation strip — and carries its next step as its only action. |
 | CA7 | Retry and repair are shown where they happened, on the step, and never as a message in the thread. |
-| CA8 | The run records `outcome` — `answered · cannot_answer · failed · cancelled` — beside its `status`. A run that finished cleanly having found nothing is *succeeded* and *cannot_answer*, and those are not the same claim. |
+| CA8 | The run records `outcome` — `answered · conversed · cannot_answer · failed · cancelled` — beside its `status`. A run that finished cleanly having found nothing is *succeeded* and *cannot_answer*, and those are not the same claim. A run that replied to small talk is *conversed* ([NL12](ask-in-natural-language.md#decisions)) — it answered nothing, so calling it *answered* would claim a grounding it never had. |
 | CA9 | A cannot-answer is drawn calmly: dashed border, no colour of alarm. A diagnosis is drawn as a fault, with its evidence foldable underneath. Their shapes differ before a word is read. |
 | CA10 | **A cannot-answer is written in the agent's voice.** It still names what is missing (CA3) and is still drawn calmly (CA9); the soul chooses only the words ([SO4](../../agents/features/soul.md#decisions)), and every reply ends with something the reader can ask instead. |
 

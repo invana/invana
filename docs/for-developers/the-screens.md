@@ -236,6 +236,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | Canvas | Draws | Pages | State |
 |---|---|---|---|
 | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) · [10.5 Runs](modules/operate/features/see-what-ran.md) · [4.2 Boards](modules/explore/features/boards.md) — 90 artboards | Worlds · Guardrails · the run · the agents · LLMs · Skills · Bindings · Usage · Rules · Plans · Boards · **Runs** | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
+| [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 17 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
@@ -541,6 +542,34 @@ governance and skills canvases, so `Shell ✅` means what it means there.
 Tokens is a **group inside Settings › Graph** rather than a fourth settings tab
 ([10.4 EA9](modules/operate/features/external-agent-api.md)), and Evidence is a **page reached from
 the Skills drawer**, not a rail item of its own ([8.1 EV6](modules/memory/features/evidence.md)).
+
+---
+
+## Beyond the 42 · The Assistant speaks
+
+Seventeen artboards on their own canvas — *The Assistant Speaks* (`https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`) — for [sequence](the-sequence.md)
+block K. Generated from `.design/canvas-assistant-speaks/` on the govern-agents kit, with the Assistant
+and the Inspector drawn in `rightSection`. The name is the file, the frame title and this row.
+
+| Artboard | Feature | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `agents.agents.detail.soul` | 5.8 | An agent’s soul, written in Markdown on the agent | 🔵 | 🔵 | ✅ |
+| `agents.agents.detail.soul.default` | 5.8 | No soul yet — the agent speaks in the default voice | 🔵 | 🔵 | ✅ |
+| `agents.agents.detail.soul.preview` | 5.8 | One ask, answered in the current voice and in the draft | 🔵 | 🔵 | ✅ |
+| `agents.agents.detail.soul.read_only` | 5.8 | A member without edit rights reads the soul | 🔵 | 🔵 | ✅ |
+| `ask.converse` | 3.2 | Small talk gets a line in the agent’s voice, not a refusal | 🔵 | 🔵 | ✅ |
+| `ask.cannot_answer.voiced` | 3.8 | A refusal in the agent’s voice still names what the graph is missing | 🔵 | 🔵 | ✅ |
+| `ask.answer.prose` | 3.12 | The answer in words, first — every claim cites a row | 🔵 | 🔵 | ✅ |
+| `ask.answer.prose.writing` | 3.12 | The table paints first; the words stream in above it | 🔵 | 🔵 | ✅ |
+| `ask.answer.prose.skipped` | 3.12 | A world that does not send record values gets the records alone | 🔵 | 🔵 | ✅ |
+| `ask.answer.prose.failed_soft` | 3.12 | No claim could be cited — the step fails, the answer stands | 🔵 | 🔵 | ✅ |
+| `ask.answer.third_party` | 3.13 | Graph claims cite rows; third-party claims carry a badge and their source | 🔵 | 🔵 | ✅ |
+| `ask.answer.third_party.refused` | 3.13 | A search the guardrail denies is refused, and the answer says so | 🔵 | 🔵 | ✅ |
+| `explore.canvas.third_party_node` | 3.13 | A third-party node is drawn, badged, and not in the graph until kept | 🔵 | 🔵 | ✅ |
+| `explore.canvas.third_party_node.kept` | 3.13 | Kept — written with its provenance, still badged after reload | 🔵 | 🔵 | ✅ |
+| `explore.canvas.third_party_node.read_only` | 3.13 | A member who may not write sees Keep, and why it is off | 🔵 | 🔵 | ✅ |
+| `settings.search_providers.list` | 3.13 | The Graph’s search providers — each an address a rule can name | 🔵 | 🔵 | ✅ |
+| `settings.search_providers.list.empty` | 3.13 | No provider yet — add one, and it is pinged before it is saved | 🔵 | 🔵 | ✅ |
 
 ---
 

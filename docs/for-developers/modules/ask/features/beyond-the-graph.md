@@ -85,7 +85,7 @@ flowchart TD
 | Prose claim | Inline `third-party · <source>` badge with its reference — the link for `internet`, the model for `model` | `ThirdPartyBadge` (new, `ui-extended`) |
 | Canvas node | Badge on the node; the reference in its tooltip | `@invana/canvas` node badge |
 | Panel › provenance | *Third-party · <source>* → the reference (a link opens in a new tab), title, kind, fetched at, run | `PropertyList` · `ThirdPartyBadge` |
-| Board toolbar | **Keep** on a selection that holds third-party nodes | `@invana/canvas-ui` toolbar action |
+| Keep | On the canvas toolbar for a selection holding third-party nodes, and in the Inspector's footer for one; shown disabled with its reason to a member who may not write | `@invana/canvas-ui` toolbar action · Inspector footer |
 | Settings › Search providers | One row per provider, ping it | the providers pattern ([5.1](../../agents/features/providers-and-models.md)) |
 | Guardrails / Worlds | Rules on `third_party/internet/**` and `own_knowledge` on `llm/**` rules | existing rule editor |
 
@@ -97,7 +97,7 @@ flowchart TD
 | Entries | `search_web` and `fetch_source`, bound `third_party`; an agent uses them only if its envelope lists them |
 | Intent | `Intent.needs_outside: bool` from Understand |
 | A third-party claim | `{text, third_party: {source: internet \| api \| app \| db \| agent \| model, reference, title?, source_kind?, domain?, fetched_at?, model?, run_id}}` — `reference` is the link or locator |
-| A third-party node | drawn with the same provenance object; not in the graph until kept |
+| A third-party node | a `Source` drawn with the provenance object and an `ABOUT` edge to its element; not in the graph until kept ([BG10](#decisions)) |
 | Kept provenance | `_inv_origin = "third_party"` · `_inv_source` (the sublayer, or `model`) · `_inv_reference` (link or locator) · `_inv_source_title` · `_inv_source_kind` · `_inv_fetched_at` · `_inv_model` · `_inv_run_id` |
 | Govern option | `own_knowledge: bool` on an `llm/…` rule, default `false` |
 | Egress | search terms from the ask are `the_question`; terms carrying record values are `property_values` |
@@ -116,6 +116,7 @@ flowchart TD
 | BG7 | **A third-party node is drawn first and written only on Keep.** The board shows it, badged; **Keep** is a governed write ([GV35](../../govern/spec.md#4-cross-feature-decisions)) that stores the provenance on the element, so the badge survives reload and a query can tell kept third-party data from loaded data. |
 | BG8 | **Search providers are configured rows, never a model vendor's built-in search.** The same search works with every model, and the provider is an addressable participant a rule can name. |
 | BG9 | **The internet is one third-party source, not a special one.** It sits beside `api · app · db · agent` in the third-party layer ([GV38](../../govern/spec.md#4-cross-feature-decisions)), and any source the Graph connects later reaches a run through the same three things: an address a rule can name, a badge, and a reference. A source that cannot give a reference for what it returns is not connected. |
+| BG10 | **A kept third-party node is a `Source`, linked `ABOUT` what it describes.** The node is the page, document, file or record it came from — `Source {reference, title, source, source_kind, fetched_at}` — and an `ABOUT` edge to the graph element the fact concerns. It needs no model change and lands in no authored type, so Keep can never put outside data into a curated model by the back door; a fact that belongs in a model is brought across as a dataset. |
 
 ## Not building
 
