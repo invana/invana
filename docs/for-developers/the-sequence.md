@@ -243,7 +243,7 @@ everywhere.
 | **G · Memory** | ✅ 8.3 · 8.4 share `ReviewProposalHiFi`, and now **8.1 `Evidence`** · **8.2 `Recall`** | `hi-fi-finance` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `memory/spec.md` has no drawn states |
 | **H · Skills** | ✅ — `Main` (SkillsPanel) · `SkillFlow` · `SkillAuthor` · `SkillBindings`, all on the shell contract | canvas `7c565h2z9irbFBwu1S1ebH`, cached in `.design/canvas-govern/` | ❌ |
 | **I · Recurring** | ✅ `RecurringTaskHiFi` | `hi-fi-finance` | ❌ |
-| **K · The assistant speaks** | ✅ 17 — soul · converse · the answer in words · beyond the graph ([the-screens](the-screens.md#beyond-the-42--the-assistant-speaks)) | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J), generated from `.design/canvas-assistant-speaks/` | ❌ reconcile open |
+| **K · The assistant speaks** | ✅ 17 — soul · converse · the answer in words · beyond the graph ([the-screens](the-screens.md#beyond-the-42--the-assistant-speaks)) | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J), generated from `.design/canvas-assistant-speaks/` | ✅ `agents/spec.md` §5a · `ask/spec.md` §7a · `explore/spec.md` §6a |
 | **J · Loose ends** | ⚠️ **4.4 `Console`** · **12.3 `Capabilities`** · **12.4 `Vector`** are drawn now. Module 11 and 13.3 stay deliberately undrawn; 13.7's four `Setup*HiFi` are still **owed** — those screens shipped before their drawings | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
 
 | Reading | |
@@ -262,7 +262,7 @@ from a wrong map.
 
 | Where | Says | Is |
 |---|---|---|
-| Six module specs the sequence has to build | — | no **The drawn states** section although their artboards exist: `govern` · `workflows` · `operate` · `work` · `skills` · `memory`. **This is the gate on those blocks' step 3** ([§5](#5-is-it-drawn--design-readiness-per-block)). `agents` · `graph-connectors` · `identity-and-access` also lack one, and for them it is correct — they have no artboards |
+| Six module specs the sequence has to build | — | no **The drawn states** section although their artboards exist: `govern` · `workflows` · `operate` · `work` · `skills` · `memory`. **This is the gate on those blocks' step 3** ([§5](#5-is-it-drawn--design-readiness-per-block)). `graph-connectors` · `identity-and-access` also lack one, and for them it is correct — they have no artboards. `agents` has one now, for [5.8](modules/agents/features/soul.md) |
 | [task-model-migration.md](building-engine/task-model-migration.md) slice table | only M3 is ✅ | M1 and M2 have landed (the catalogue declares its four fields; `task_plans` and `tasks` are rows, migration 38) |
 | [task-model-migration.md](building-engine/task-model-migration.md) M11 | `import_jobs` is deleted **by** M11 | the table is already gone (migration 41). What M11 still owns is the plan source and the seeded builtins |
 | [code-shape.md §5.2](building-studio/code-shape.md) | the query string wins — then, four lines later, *"the rail switches routes, not a param"* | one of the two. **Settle before the Studio track's phase 7** |

@@ -102,7 +102,7 @@ flowchart LR
 Hi-fi, at 1440×900, on the *Agents at Work Wireframes* canvas —
 `claude.ai/code/artifact/58f2e380-ef59-41cd-8c96-d3dc7ddd06e4`. The Explorer's own
 screens sit on the **Hi-fi · finance** page; the assistant's four are on **Wireframes**,
-where the decision was argued.
+where the decision was argued. The three `explore.canvas.third_party_node*` rows are on *The Assistant Speaks* canvas — `https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`.
 
 | Artboard | Feature | Shows |
 |---|---|---|
@@ -110,6 +110,9 @@ where the decision was argued.
 | Canvas · layers | [graph-canvas](features/graph-canvas.md) | node and relationship types with counts and visibility |
 | Assistant · the shell | [the-assistant](../ask/features/the-assistant.md) | the assistant *is* today's Sessions panel, moved; the trigger in the header's panel controls, after fullscreen; one stable label, and the agent stays named on the composer |
 | Assistant · decided | [the-assistant](../ask/features/the-assistant.md) | the assistant taking the right side, and the selection riding above the composer as a chip |
+| `explore.canvas.third_party_node` | [graph-canvas](features/graph-canvas.md) GC15 · [selection-and-the-panel](features/selection-and-the-panel.md) SP10 | a Source node, dashed and badged `third-party · internet`, linked `ABOUT` its airport; the Inspector showing its reference, what it says, and **Keep** |
+| `explore.canvas.third_party_node.kept` | GC15 · SP10 | kept: still badged after reload, the Inspector naming who kept it and when |
+| `explore.canvas.third_party_node.read_only` | GC15 · SP10 | **Keep** disabled for a member who may only read, with the reason under it |
 
 The last artboard also names a cost, and it is worth stating rather than
 discovering: the inspector's *editing* job would have to move into the left

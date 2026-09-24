@@ -146,7 +146,7 @@ Every step receives one context, and what goes where is fixed:
 ## 7a. The drawn states
 
 Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wireframes* canvas —
-`claude.ai/code/artifact/58f2e380-ef59-41cd-8c96-d3dc7ddd06e4`.
+`claude.ai/code/artifact/58f2e380-ef59-41cd-8c96-d3dc7ddd06e4`; the rows named `ask.*` and `settings.*` are on *The Assistant Speaks* canvas — `https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`.
 
 | Artboard | Feature | Shows |
 |---|---|---|
@@ -154,6 +154,16 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | Explorer · the same records, another projection | [projections](features/projections.md) | the template picker on the emission header; incompatible templates refused with the reason |
 | Explorer · Understand asks back | [clarifying-questions](features/clarifying-questions.md) | the closed question in the thread, the parked run, the same run resuming |
 | Four ways a run ends · states sheet | [when-it-cannot-answer](features/when-it-cannot-answer.md) | retry · repair · cannot-answer · diagnosis, four surfaces that never share a shape |
+| `ask.converse` | [ask-in-natural-language](features/ask-in-natural-language.md) NL12 | small talk answered as a message in the agent's voice, pointing at something to ask — no emission, no refusal |
+| `ask.cannot_answer.voiced` | [when-it-cannot-answer](features/when-it-cannot-answer.md) CA10 | a cannot-answer in the agent's voice that still names what the graph is missing and offers what it holds |
+| `ask.answer.prose` | [the-answer-in-words](features/the-answer-in-words.md) | the prose emission first, each claim with its citation chip; a clicked citation highlights its row in the table below |
+| `ask.answer.prose.writing` | [the-answer-in-words](features/the-answer-in-words.md) | the table painted, the Answer step running, *Writing the answer…* above it |
+| `ask.answer.prose.skipped` | [the-answer-in-words](features/the-answer-in-words.md) | the world cuts record values: the Answer step dimmed and named, the table alone |
+| `ask.answer.prose.failed_soft` | [the-answer-in-words](features/the-answer-in-words.md) | *0 of 3 claims could be cited*: the step failed, the answer stands |
+| `ask.answer.third_party` | [beyond-the-graph](features/beyond-the-graph.md) | `nl-outside` run with Search and Fetch; a graph claim cited, an internet claim badged with its link, a model claim badged with its model |
+| `ask.answer.third_party.refused` | [beyond-the-graph](features/beyond-the-graph.md) | Search struck through with the guardrail rule named, Fetch not reached, the prose saying it could not look |
+| `settings.search_providers.list` | [beyond-the-graph](features/beyond-the-graph.md) | Settings › Search providers: rows with ping state, the provider's address, and the rules that name it |
+| `settings.search_providers.list.empty` | [beyond-the-graph](features/beyond-the-graph.md) | no provider: the empty state and the add form, pinged before it saves |
 
 ### 7b. A session executes through plans, always
 

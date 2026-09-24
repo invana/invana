@@ -40,7 +40,7 @@ do; the soul is why it does not sound like a robot while doing it.
 
 ```mermaid
 flowchart TD
-    A[Agent panel] --> B[Soul tab]
+    A[The agent's page] --> B[Soul tab]
     B --> C{Has a soul?}
     C -->|no| D[Editor shows the default voice as placeholder]
     C -->|yes| E[Editor shows the soul]
@@ -71,8 +71,8 @@ flowchart TD
 
 | Surface | Shape | Components |
 |---|---|---|
-| Agent panel › **Soul** tab | Markdown editor, default voice as placeholder, character count | `@invana/ui` Markdown editor · `SectionHeader` · `Eyebrow` |
-| Preview | Two replies side by side to one sample ask | `EmissionCard` with a `prose` body, twice |
+| The agent's page › **Soul** tab | A tab beside Overview · Envelope · Lineage: Markdown editor, default voice as placeholder, character count, *version · edited by* under it; Discard · Preview · Save soul in the page header | `@invana/ui` Markdown editor · `SectionHeader` · `Eyebrow` |
+| Preview | The draft beside an editable sample ask, answered twice — current voice above, draft below | `EmissionCard` with a `prose` body, twice |
 | Agents drawer row | Nothing new — a soul is not a status | — |
 
 ## Engine
@@ -84,7 +84,7 @@ flowchart TD
 | Prompt assembly | `soul or DEFAULT_VOICE` is prepended to the system prompt of every step in *What reads the soul*; `RunVars.soul` carries it; Translate has no parameter for it |
 | Agent instructions | `agents.instructions` layered after `graphs.instructions` into Understand and Translate |
 | Versioning | An edit bumps `agents.version`; `task_runs.agent_version` records which soul a run spoke with |
-| Routes | `AgentRead.soul` · `AgentUpdate.soul` (read by set-ness) · `POST …/agents/{id}/soul/preview` |
+| Routes | `AgentRead.soul` · `AgentUpdate.soul` (read by set-ness) · `POST …/agents/{id}/soul/preview` with `{soul, ask}` → the reply in the current and the draft voice |
 | Events | `agent.soul_set` |
 
 ## Decisions
@@ -97,6 +97,7 @@ flowchart TD
 | SO4 | **A soul never changes what is true.** A refusal still refuses and names what is missing, a citation still cites, a third-party fact is still badged ([BG3](../../ask/features/beyond-the-graph.md#decisions)). The soul chooses the words around them. |
 | SO5 | **`instructions` and `soul` are two fields because they reach different steps.** Instructions say what to do and reach Understand and Translate, layered after the Graph's own; the soul says who is speaking and reaches only prose. One field would carry a character into query writing. |
 | SO6 | **A run speaks with the soul it opened with.** The soul is read at run open, like the lens ([GV26](../../govern/spec.md#4-cross-feature-decisions)); `agent_version` on the run says which. |
+| SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Envelope · Lineage because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |
 
 ## Not building
 

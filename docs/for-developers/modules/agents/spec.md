@@ -119,6 +119,17 @@ agents are read, not in a settings tab reached from elsewhere.
 Components, routes and build order:
 [building-studio/govern-and-agents-panels.md](../../building-studio/govern-and-agents-panels.md).
 
+## 5a. The drawn states
+
+Hi-fi, at 1440×900, on the **Agents › Soul — 5.8** page of *The Assistant Speaks* canvas — `https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`.
+
+| Artboard | Feature | Shows |
+|---|---|---|
+| `agents.agents.detail.soul` | [soul](features/soul.md) | the Soul tab on the agent's page: a Markdown editor, the character cost in every ask, Discard · Preview · Save soul |
+| `agents.agents.detail.soul.default` | [soul](features/soul.md) | no soul yet: *Speaking in Invana's default voice*, the default voice as placeholder |
+| `agents.agents.detail.soul.preview` | [soul](features/soul.md) | the draft beside one sample ask answered twice — in the current voice and in the draft |
+| `agents.agents.detail.soul.read_only` | [soul](features/soul.md) | the soul rendered, no editor, and why: editing needs edit rights on the agent |
+
 ## 6. Cross-feature decisions
 
 | # | Decision |
