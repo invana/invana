@@ -39,6 +39,7 @@ from invana.runtime.catalogue.contract import (
     offered_skill_version_ids,
     open_graph,
     open_model,
+    prompt_lens,
     query_language_for,
 )
 from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
@@ -67,7 +68,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     something discovered after an empty result.
     """
     assert v.provider is not None
-    crossing = await open_model(ctx, v, grounding=v.grounding)
+    crossing = await open_model(ctx, v, grounding=v.global_model)
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · reading the ask against the model")
@@ -75,13 +76,14 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
         outcome = await understand(
             provider=v.provider,
             prompt=v.prompt,
-            version=v.grounding,
+            version=v.global_model,
             encryption_key=v.encryption_key,
             instructions=v.instructions,
             skills=render_skills(v.skills),
             rules=render_rules(v.rules),
             history=crossing.history(v.history),
             may_send=crossing.may_send,
+            lens=await prompt_lens(ctx, v),
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except LLMError as exc:
@@ -99,7 +101,9 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
         # a failure (promise #4). The plan never happens, and the trace says why.
         v.summary = outcome.reason
         await ctx.emit("cannot_answer", {"reason": outcome.reason, "stage": "understand"})
-        raise CannotAnswer(reason=outcome.reason)
+        ctx.step.tokens_in = usage.input_tokens if usage else None
+        ctx.step.tokens_out = usage.output_tokens if usage else None
+        raise CannotAnswer(reason=outcome.reason, exchange=_exchange(outcome))
 
     if isinstance(outcome, Clarification):
         options = await _options(ctx, v, outcome)
@@ -234,7 +238,7 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
     two rows a reader can tell apart rather than one row that did two things.
     """
     assert v.provider is not None
-    crossing = await open_model(ctx, v, grounding=v.grounding)
+    crossing = await open_model(ctx, v, grounding=v.global_model)
     ask = str((ctx.step.args or {}).get("ask") or "").strip() or v.prompt
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
@@ -246,13 +250,14 @@ async def translate_thought(ctx: TaskContext, v: RunVars) -> Out:
             provider=v.provider,
             prompt=ask,
             language=language,
-            version=v.grounding,
+            version=v.global_model,
             encryption_key=v.encryption_key,
             skills=render_skills(v.skills),
             rules=render_rules(v.rules),
             instructions=v.instructions,
             history=crossing.history(v.history),
             may_send=crossing.may_send,
+            lens=await prompt_lens(ctx, v),
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except QueryNotReadOnlyError as exc:

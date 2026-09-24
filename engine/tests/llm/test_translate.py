@@ -12,16 +12,18 @@ import httpx
 import pytest
 
 from invana.apps.llm import LLMError
-from invana.apps.llm.grounding import render_model_context
+from invana.apps.llm.grounding import Grounding, render_model_context
 from invana.apps.llm.translate import _looks_read_only, nl_to_query
 from invana.apps.llm_providers.models import LLMProviderKind
 from invana.apps.modeller.models import (
     EdgeTypeDefinition,
     GraphVersion,
+    ModelLink,
     NodeTypeDefinition,
     PropertyKeyDefinition,
     TypePropertyMapping,
 )
+from invana.graph.types.lens import QueryLens, TypeBound
 from tests.llm.endpoints import endpoint
 
 _OLLAMA_URL = os.environ.get("INVANA_TEST_OLLAMA_URL", "http://localhost:11434")
@@ -58,6 +60,80 @@ def test_render_model_context_lists_types_and_props() -> None:
     assert "(:Person {name:string})" in text
     assert "(:Project {title:string})" in text
     assert "[:WORKS_ON] (Person)->(Project)" in text
+
+
+def _airways() -> Grounding:
+    """Two authored models, described, and the two stitches between them (NL8)."""
+
+    def node(name: str, description: str, *keys: PropertyKeyDefinition) -> NodeTypeDefinition:
+        nt = NodeTypeDefinition(name=name, description=description)
+        nt.property_mappings = [TypePropertyMapping(property_key=k) for k in keys]
+        return nt
+
+    def version(*nodes: NodeTypeDefinition) -> GraphVersion:
+        v = GraphVersion()
+        v.node_types, v.edge_types = list(nodes), []
+        return v
+
+    code = PropertyKeyDefinition(name="code", type="string", description="IATA code.")
+    longest = PropertyKeyDefinition(name="longest", type="integer", description="Longest runway, in feet.")
+    bookkeeping = PropertyKeyDefinition(name="_inv_run_id", type="string")
+    iso = PropertyKeyDefinition(name="iso_code", type="string")
+    dest = PropertyKeyDefinition(name="destination_code", type="string")
+    routes = version(
+        node("airport", "An airport, with its codes.", code, longest, bookkeeping),
+        node("country", "A country.", code),
+    )
+    news = version(node("Country", "A country in the news.", iso), node("Route", "A route in the news.", dest))
+    links = (
+        ModelLink(
+            kind="anchor",
+            source_type="Country",
+            source_property="iso_code",
+            target_type="country",
+            target_property="code",
+            description="",
+        ),
+        ModelLink(
+            kind="relationship",
+            source_type="Route",
+            source_property="destination_code",
+            target_type="airport",
+            target_property="code",
+            edge_type="ARRIVES_AT",
+            description="",
+        ),
+    )
+    return Grounding(versions=(routes, news), links=links)
+
+
+def test_the_grounding_block_carries_descriptions_and_stitches() -> None:
+    """What lets *length* map to ``longest`` (NL8)."""
+    text = render_model_context(_airways())
+    assert "(:airport {code:string (IATA code.), longest:integer (Longest runway, in feet.)})" in text
+    assert "— An airport, with its codes." in text
+    assert "_inv_run_id" not in text
+    assert "Country.iso_code ≡ country.code" in text
+    assert "(Route)-[:ARRIVES_AT]->(airport) where Route.destination_code = airport.code" in text
+
+
+def test_the_grounding_block_is_cut_by_egress_and_by_the_lens() -> None:
+    """A cut class drops the join keys; a type or property the lens hides is never described (NL9)."""
+    labels_only = render_model_context(_airways(), may_send=frozenset({"type_names", "the_question"}))
+    assert "longest" not in labels_only and "Country ≡ country" in labels_only
+    assert "where" not in labels_only
+
+    lens = QueryLens(
+        allowed_types=frozenset({"airport", "country", "Country"}),
+        bounds={
+            "airport": TypeBound(
+                type_name="airport", declared=frozenset({"code", "longest"}), excluded=frozenset({"longest"})
+            )
+        },
+    )
+    bounded = render_model_context(_airways(), lens=lens)
+    assert "longest" not in bounded and "(:Route" not in bounded and "ARRIVES_AT" not in bounded
+    assert "Country.iso_code ≡ country.code" in bounded
 
 
 def test_render_model_context_handles_missing_version() -> None:

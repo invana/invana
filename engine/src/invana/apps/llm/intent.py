@@ -19,11 +19,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from invana.apps.llm import LLMError, complete_tool
-from invana.apps.llm.grounding import render_model_context
+from invana.apps.llm.grounding import Grounding, render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
 from invana.apps.llm.translate import Clarification, _looks_read_only
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
+from invana.graph.types.lens import QueryLens
 
 # The shapes a plan can serve. Keep in step with
 # ``invana.apps.agents.registry.INTENT_TEMPLATES`` — an intent kind with no template
@@ -172,7 +173,7 @@ async def understand(
     *,
     provider: LLMEndpoint,
     prompt: str,
-    version: GraphVersion | None,
+    version: Grounding | GraphVersion | None,
     encryption_key: str,
     instructions: str = "",
     skills: str = "",
@@ -183,9 +184,11 @@ async def understand(
     #: one (docs/for-developers/modules/govern/spec.md GV30). The cut is applied
     #: to the parts of the prompt, before the prompt exists (GV31).
     may_send: frozenset[str] | None = None,
+    #: The run's lens: what it does not let a query read is not described (NL9).
+    lens: QueryLens | None = None,
 ) -> Intent | Clarification | OutOfScope:
     system = _system_prompt(
-        render_model_context(version, may_send=may_send),
+        render_model_context(version, may_send=may_send, lens=lens),
         f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "",
         f"Skills you may apply:\n{skills}\n\n" if skills else "",
         f"Rules that are always true here (quote each statement you follow in rules_cited):\n{rules}\n\n"

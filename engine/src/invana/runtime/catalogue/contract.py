@@ -31,11 +31,14 @@ from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.graphs.query_service import QueryExecutionError, resolve_query_language
 from invana.apps.graphs.schemas import QueryResponse
+from invana.apps.llm.grounding import Grounding
 from invana.apps.llm.intent import Intent
 from invana.apps.llm.pricing import cost_usd
 from invana.apps.llm.propose import ModelProposal
 from invana.apps.llm_providers.models import LLMProvider
+from invana.apps.modeller.links import list_links
 from invana.apps.modeller.models import GraphModel, GraphVersion
+from invana.apps.modeller.store import ModelStore
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import Session
 from invana.apps.sessions.transcript import (
@@ -97,9 +100,12 @@ class CannotAnswer(Exception):
     *Understand*, so the judgement lands before any query is written.
     """
 
-    def __init__(self, *, reason: str) -> None:
+    def __init__(self, *, reason: str, exchange: dict | None = None) -> None:
         super().__init__(reason)
         self.reason = reason
+        #: The prompt and completion that reached the judgement — the evidence
+        #: for it, kept on the step like an answer's is (NL10 · SR42).
+        self.exchange = exchange or {}
 
 
 @dataclass(slots=True)
@@ -169,6 +175,9 @@ class RunVars:
     provider: LLMProvider | None = None
     history: list[dict] = field(default_factory=list)
     grounding: GraphVersion | None = None
+    #: What an LLM step describes — the global model, or the mirror standing in
+    #: for it (NL8). ``grounding`` stays the version the run engages ([GV33]).
+    global_model: Grounding | None = None
     # The prose the agent carries into every prompt (docs/for-developers/modules/ask/features/reasoning-trace.md).
     # ``skills`` is
     # the rows; a model's self-reported name maps back to that skill's current
@@ -621,9 +630,7 @@ async def open_graph(ctx: TaskContext, v: RunVars) -> GraphCrossing:
     # declares, and that is what decides whether this read has anything left
     # ([GV33]). Compiling before deciding is the whole of the change — the
     # grounding version's own address is often *not* what a world names.
-    bindings = await _catalogue.model_bindings(ctx.db, graph_id=v.graph.id, excluding=address)
-    own = governor.check(address)
-    compiled = compile_lens(governor.effective, version=v.grounding, verdict=own, bindings=bindings)
+    own, compiled, bindings = await _compile(ctx, v, governor, address)
     lens = compiled.query_lens
     bound_by = tuple(b.address for b in bindings if governor.check(b.address).rule_matched is not None)
 
@@ -639,6 +646,33 @@ async def open_graph(ctx: TaskContext, v: RunVars) -> GraphCrossing:
         # connection somebody else could have used.
         pool_holder=_take_pool(ctx, v, pool=POOL_GRAPHDB),
     )
+
+
+async def _compile(ctx: TaskContext, v: RunVars, governor: Governor, address: str):
+    """Check the grounding version and compile what this lens lets a query on it read."""
+    assert v.grounding is not None
+    bindings = await _catalogue.model_bindings(ctx.db, graph_id=v.graph.id, excluding=address)
+    own = governor.check(address)
+    return own, compile_lens(governor.effective, version=v.grounding, verdict=own, bindings=bindings), bindings
+
+
+async def prompt_lens(ctx: TaskContext, v: RunVars) -> QueryLens | None:
+    """The lens a query of this run would be read through — for describing the graph, not reading it.
+
+    Compiled exactly as :func:`open_graph` compiles it, so what the model is told
+    and what the connector enforces cannot disagree
+    ([NL9](docs/for-developers/modules/ask/features/ask-in-natural-language.md)).
+    No touch is written: nothing is read here, and the read that follows
+    engages the version and records it.
+    """
+    governor = v.governor
+    if governor is None or v.grounding is None:
+        return None
+    address = await _catalogue.version_address(ctx.db, version_id=v.grounding.id)
+    if address is None:
+        return None
+    _own, compiled, _bindings = await _compile(ctx, v, governor, address)
+    return None if compiled.query_lens.is_empty else compiled.query_lens
 
 
 def _graph_verdict(own: Verdict, lens: QueryLens, bound_by: tuple[str, ...]) -> Verdict:
@@ -1017,6 +1051,30 @@ def _sha(text: str) -> str:
 
 async def load_grounding(db: AsyncSession, graph_id: str) -> GraphVersion | None:
     return await SessionManager()._grounding_version(db, graph_id)
+
+
+async def load_global_model(db: AsyncSession, graph_id: str) -> Grounding | None:
+    """What an LLM step describes: the authored models' active versions and the active stitches.
+
+    The mirror ``load_grounding`` returns is what a run **engages** and its lens
+    is built from ([GV33](docs/for-developers/modules/govern/spec.md)); it is not
+    what the prompt describes, because it carries no description and no stitch
+    ([NL8](docs/for-developers/modules/ask/features/ask-in-natural-language.md)).
+    A Graph with no authored model is described by its mirror, marked so.
+    """
+    store = ModelStore()
+    versions = []
+    for model in await store.list_graph_models(db, graph_id):
+        if model.origin == "introspected":
+            continue
+        version = await store.get_active_version(db, model.id)
+        if version is not None:
+            versions.append(version)
+    if versions:
+        links = await list_links(db, graph_id, status="active")
+        return Grounding(versions=tuple(versions), links=tuple(links))
+    mirror = await load_grounding(db, graph_id)
+    return Grounding(versions=(mirror,), described=False) if mirror is not None else None
 
 
 def assemble_history(rows) -> list[dict]:

@@ -116,7 +116,7 @@ arrival.
 |---|---|
 | CM1 | A Graph binds to exactly one graph database, and the connector cannot change after the first save. |
 | CM2 | Models are authored per domain and are portable; a Graph holds many. |
-| CM3 | The global model is derived at read time and is the grounding context for every question. |
+| CM3 | The global model is derived at read time and is the grounding context for every question — its types, properties, their descriptions and its active stitches are what an LLM step is told ([NL8](../ask/features/ask-in-natural-language.md#decisions)). The mirror is what a run's lens bounds ([GV33](../govern/spec.md#4-cross-feature-decisions)), never what the prompt describes. |
 | CM4 | Links are declared, never inferred; an anchor links and never merges. |
 | CM5 | A published version is immutable; changes publish a new one. |
 | CM6 | Introspection seeds a draft. It never writes a published version. |

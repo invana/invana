@@ -14,10 +14,11 @@ import re
 from dataclasses import dataclass, field
 
 from invana.apps.llm import LLMError, QueryNotReadOnlyError, complete_tool
-from invana.apps.llm.grounding import render_model_context
+from invana.apps.llm.grounding import Grounding, render_model_context
 from invana.apps.llm.schemas import Exchange, TokenUsage
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.modeller.models import GraphVersion
+from invana.graph.types.lens import QueryLens
 
 SUBMIT_QUERY_TOOL = {
     "type": "object",
@@ -222,7 +223,7 @@ async def nl_to_query(
     provider: LLMEndpoint,
     prompt: str,
     language: str,
-    version: GraphVersion | None,
+    version: Grounding | GraphVersion | None,
     encryption_key: str,
     skills: str = "",
     instructions: str = "",
@@ -232,8 +233,11 @@ async def nl_to_query(
     #: What may accompany this crossing, or ``None`` for an unbounded one
     #: (docs/for-developers/modules/govern/spec.md GV30 · GV31).
     may_send: frozenset[str] | None = None,
+    #: The run's lens: what it does not let a query read is not described (NL9).
+    lens: QueryLens | None = None,
 ) -> GeneratedQuery | Clarification:
-    system = _system_prompt(language, render_model_context(version, may_send=may_send), skills, instructions, rules)
+    model_context = render_model_context(version, may_send=may_send, lens=lens)
+    system = _system_prompt(language, model_context, skills, instructions, rules)
     messages = [*(history or []), {"role": "user", "content": prompt}]
     result = await complete_tool(
         provider=provider,

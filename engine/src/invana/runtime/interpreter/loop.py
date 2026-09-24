@@ -47,6 +47,7 @@ from invana.runtime.catalogue import (
     TaskContext,
     TaskFailure,
     assemble_history,
+    load_global_model,
     load_grounding,
 )
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
@@ -436,6 +437,7 @@ class TaskRuntime:
                 provider=provider,
                 history=history,
                 grounding=await load_grounding(db, graph.id) if th.workflow_key != "modeller-generate" else None,
+                global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
                 skills=skills,
                 rules=rules,
                 instructions=graph.instructions or "",
@@ -591,7 +593,7 @@ class TaskRuntime:
                     row.status = RunStatus.succeeded.value
                     row.finished_at = _now()
                     row.detail = "cannot answer · outside this graph"
-                    row.output = {"cannot_answer": cannot.reason}
+                    row.output = {"cannot_answer": cannot.reason, **cannot.exchange}
                     self._record(row, ctx, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()
@@ -616,7 +618,9 @@ class TaskRuntime:
                         row.status = RunStatus.succeeded.value
                         row.finished_at = _now()
                         row.detail = "cannot answer · unanswered question"
-                        row.output = {"cannot_answer": reason, "question": ni.question}
+                        # Keep the exchange the step recorded (NL10): the
+                        # prompt is the evidence for the question it asked.
+                        row.output = {**(row.output or {}), "cannot_answer": reason, "question": ni.question}
                         self._record(row, ctx, v)
                         await self._drop_pending(db, th, message_id)
                         await db.commit()
