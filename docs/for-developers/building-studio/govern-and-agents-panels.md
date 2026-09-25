@@ -58,7 +58,7 @@ flowchart LR
 | `?panel=govern&drawer=guardrails` | the guardrails in force | G1 |
 | `?panel=govern&drawer=guardrails&guardrail=<id>` | that guardrail's rules, grouped by layer, **and the board `guardrail:<id>`** | G1 |
 | `?panel=govern&drawer=guardrails&guardrail=new` | the same editor, with the rule builder and its live match preview | G2 |
-| `header.right` chip, `?lens=<id>` | which world the next question is asked under | W1 |
+| the composer's world chip, `sessions.lens_id` | which world the session's next question is asked under | W1 |
 | `?panel=agents&drawer=agents` | the agents, the LLMs drawer beneath it | A1 |
 | `?panel=agents&drawer=agents&agent=<id>` | the agent, its three bounds, its cast, its ceilings | A1 · A2 · A4 |
 | `?panel=agents&drawer=llms` | the endpoints, each a group over the models it offers | A6 |
@@ -71,10 +71,9 @@ flowchart LR
 | page `lineage` | who spawned whom, on what run | A3 |
 | page `concurrency` (or the drawer's footer) | running · queued · every ceiling | A5 |
 
-**The world chip is not in either panel.** It lives in `header.right`, beside the nodes-in-view
-readout ([WO5](../modules/govern/features/worlds.md)) — a run opened from a schedule has no composer
-to carry it. Its param is **`?lens=`**, not `?world=`: the drill-in key is dropped whenever `?panel=`
-moves, and what a question is asked under must not be ([WO11](../modules/govern/features/worlds.md)).
+**The world chip is not in either panel.** It lives in the session's composer, beside the ask kind
+([WO5](../modules/govern/features/worlds.md#decisions)), and what it picks is stored on the session, not in
+the URL ([WO11](../modules/govern/features/worlds.md#decisions)).
 
 **There is no `?rule=` param.** A rule is an element of `rules[]`, never a record
 ([govern § 6](../modules/govern/spec.md)), so G2 is the guardrail's own editor with the builder
@@ -127,7 +126,7 @@ Eleven components. All are **Invana-domain compositions of primitives**, so they
 | K3 | ✅ `RuleRow` | a match, allow or deny, and its selectors and egress as sub-lines | `match` · `allow` · `properties?` · `select?` · `egress?` · `readOnly?` | W2 G1 G2 |
 | K4 | ✅ `LayerSection` | a titled band of `RuleRow`s for one layer, with the layer's own summary line | `layer` · `summary` · `children` | W2 G1 |
 | K5 | ✅ `LensRow` | a world in a list: name · the chips it narrows by · `used in 34 runs · last 2h ago` | `name` · `narrows: Narrowing[]` · `usage?` · `selected?` | W1 W4 R3 |
-| K6 | ✅ `LensChip` | the `header.right` chip and the agent-row chip; reads **`Everything`** when null | `lens?` · `onPick?` | W1 A1 |
+| K6 | ✅ `LensChip` | the composer's world chip; reads **`Everything`** when null | `lens?` · `onPick?` | W1 |
 | K7 | ✅ `CastTable` | `role → resolves to → why this one`, four fixed rows | `cast` · `resolved?` · `readOnly?` | W2 A1 R4 |
 | K8 | ✅ `SliceSummary` | `time 2026-01-01 → 06-30 · axis observed_at` — **the axis is always named** | `select` · `declaredAxes` · `variant: "line" \| "block"` | W2 W3 R2 |
 | K9 | ✅ `MatchPreview` | what an address pattern matches **right now**, resolved against the catalogue | `pattern` · `matches: {address, matched: boolean}[]` · `loading` | G2 W3 |
@@ -165,7 +164,7 @@ Feature modules under `studio/src/pages/graphs-detail/features/`, following
 | W2 A world | `govern/LensDetail.tsx` ✅ — **one body for both kinds** (GV1), so a guardrail and a world are never two layouts | `PanelBox` · `LayerSection` · `RuleRow` · `CastTable` | the row already in the list; no second fetch |
 | W3 Authoring | `govern/LensEditor.tsx` ✅ — **one editor for both kinds** ([WO10](../modules/govern/features/worlds.md)), with `govern/RuleBuilder.tsx` as the control set and `govern/addressing.ts` composing the three picks into one pattern | `Input` · `Checkbox` · `RichSelect` · `SliceSummary` · `CannotAnswerCard` | `useParticipantsQuery()` · `useValidateLensMutation()` |
 | W4 The ladder | The locked strip is `govern/GuardrailsStrip.tsx` ✅; the rungs are `govern/LensActions.tsx` ✅ — name · rename · duplicate · promote · delete, each refusal naming what holds it | `PanelBox` · `LayerChip` · `AlertDialog` · `CannotAnswerCard` | `useUpdateLensMutation` · `usePromoteLensMutation` · `useDuplicateLensMutation` · `useDeleteLensMutation` |
-| The chip | `govern/WorldChip.tsx` ✅ — `header.right`, `?lens=` ([WO11](../modules/govern/features/worlds.md)). Reads `Everything` when none is set, and refuses a world naming an unpublished version ([GR13](../modules/govern/features/guardrails.md)) | `LensChip` · `DropdownMenu` | `useLensesQuery` · `useParticipantsQuery` |
+| The chip | `govern/WorldChip.tsx` — moves from `headerRightExtras` into the composer as a `ComposerPicker` ([AD18](../modules/ask/features/the-assistant.md#decisions)), bound to the open session's `lens_id` ([WO5](../modules/govern/features/worlds.md#decisions) · [WO11](../modules/govern/features/worlds.md#decisions)). Reads `Everything` when none is set, and refuses a world naming an unpublished version |
 | G1 Guardrails | `govern/GuardrailsDrawer.tsx` ✅ — readable by everyone, authoring absent without the permission ([GR12](../modules/govern/features/guardrails.md)). The impact confirm is `govern/ImpactDialog.tsx` ✅, owned by the panel because it stands in front of the save | `LensList` · `LensDetail` · `AlertDialog` · `DiffList` | the same one query, which also carries `may_edit_guardrails` ([GR11](../modules/govern/features/guardrails.md)) · `useGuardrailImpactMutation` |
 | G2 Add rule | `govern/RuleBuilder.tsx` ✅ — **the same builder W3 uses** (GR8: one grammar over five layers) | `Select` · `RadioGroup` · `MatchPreview` · `SliceSummary` · `EgressList` | `useParticipantsQuery()`, matched locally so the preview answers per pick |
 | R1 The run's layers | `govern/runLayers.ts` ✅ — a **composer, not a panel**: the kit's `layers` panel draws it (`RUN_PANELS`), and this file is the one thing the kit cannot know — how a `TouchesResponse` and a trace become bands and bars. Govern owns what a touch means; Operate hosts the band; neither draws a strip of its own | the kit's `layers` panel → `LayerStrip` | `useRunTouchesQuery(runId)`, read by `RunDashboardPage` |
@@ -330,5 +329,5 @@ rather than at the save. A control that exposes an address is a bound to check, 
 | A Govern page kind other than `compare:` | a world is read in its drawer and applied to a question, never opened as a page ([govern spec §5](../modules/govern/spec.md)) |
 | A fifth rail icon for the run's lens | *this run → its world → retune → run again* stays in one column ([SR12](../modules/operate/features/see-what-ran.md)) |
 | A Studio copy of any of K1–K11 | rule 9 — the kit owns them, with stories |
-| A world picker in the composer | the chip is in `header.right` ([WO5](../modules/govern/features/worlds.md)) |
+| A world picker in the page header | the world is the session's, so it is picked in the session's composer ([WO5](../modules/govern/features/worlds.md#decisions)) |
 | A guardrail control anywhere in Graph settings | Govern is its own `leftNav` item ([GV17](../modules/govern/spec.md)) |

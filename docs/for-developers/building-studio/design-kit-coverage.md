@@ -625,6 +625,7 @@ folder named in the last column (design-kit convention: one story per file).
 | ~~`DiffList`~~ | ✅ shipped — with `DiffRow` | 3 | `ui/ui-extended/diff-list/` |
 | ~~`TimelineList`~~ | ✅ shipped — with `TimelineEntry` | 3 | `ui/ui-extended/timeline-list/` |
 | ~~`Terminal`~~ | ✅ shipped — with `TerminalLine` and a shared column grid | 1 | `ui/ui-extended/terminal/` |
+| **`ComposerPicker`** | **Owed.** One picker for every composer control ([AD18](../modules/ask/features/the-assistant.md#decisions)) — a compact trigger (value · chevron · optional icon · optional tag), a `DropdownMenu` holding a radio group (label · description · disabled reason) and optional checkbox and action items. Replaces `SessionComposer`'s three `Select`s and `WorldChip`'s own `DropdownMenu`. Reads `--control-h*` | `ask.assistant.world*` | `ui/ui-extended/composer-picker/` |
 
 ### 3.4 New — the answer surface (`ui-extended`)
 

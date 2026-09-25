@@ -184,7 +184,7 @@ sequenceDiagram
 | A world's detail | inside its own drawer, header `‹ WORLDS / EU · H1 2026` ([G36](../../building-studio/graph-detail-page.md)) | the drill-in, `&world=<id>` | this module |
 | A guardrail's rules | inside the Guardrails drawer, same header shape | the drill-in, `&guardrail=<id>` | this module |
 | The guardrails strip | locked at the top of the **Worlds** drawer | always, while the Graph has a guardrail | this module |
-| The world chip | `header.right`, beside the nodes-in-view readout | always visible while a Graph can be asked | this module |
+| The world chip | the session's composer, beside the ask kind | whenever a session can ask | this module, on Ask's surface |
 | A world's board | a page in `mainSection`, `world:<lens_id>`, titled with the world's name | opens with the drill-in ([WO15](features/worlds.md)) | this module |
 | A guardrail's board | the same page, `guardrail:<lens_id>` ([GR14](features/guardrails.md)) | opens with the drill-in | this module |
 | **This run's lens** band | the run dashboard page `run:<run_id>` ([SR36](../operate/features/see-what-ran.md)) | `Retune` opens the Govern panel | [Operate](../operate/spec.md) |

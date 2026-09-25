@@ -18,7 +18,7 @@ may leave. Run the same question in two and read the difference.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Pick a world before asking | A chip in `header.right`; the default is *Everything*, inside the guardrails |
+| C1 | Pick a world before asking | A chip in the session's composer, beside the ask kind; the default is *Everything*, inside the guardrails ([AD15](../../ask/features/the-assistant.md#decisions)) |
 | C2 | Narrow along five layers | graph data · llm · third party · cache · human |
 | C3 | Slice a model | `time` · `geo` · `dims`, on axes the model declared |
 | C4 | Exclude a property | *decide without seeing price* — structural, not an instruction |
@@ -50,7 +50,7 @@ sequenceDiagram
     W-->>P: guardrails strip (locked) + the worlds list
     P->>W: pick "EU · H1 2026"
     W->>A: set the active world
-    A-->>P: chip in header.right
+    A-->>P: chip in the composer, stored on the session
     P->>A: "which carriers grew fastest last half?"
     A->>E: POST open run · lens_id
     E->>E: effective = agent ∩ plan ∩ todo
@@ -184,7 +184,7 @@ the answers differ, and it is the only part a person cannot reconstruct by readi
 | A world's detail | The drill-in — header `‹ WORLDS / EU · H1 2026`; a summary band (*narrows · used · validated*), then five sections one per layer, then the cast, then `as_of`; `Compare` · `Promote` · `Duplicate` | `RecordHeader` · **`LayerSection`** · **`RuleRow`** · **`SliceSummary`** · **`CastTable`** |
 | A world's board | A page in `BoardPagesViewPanel`, id `world:<lens_id>`, **titled with the world's name**. The auditor's document: what it narrows, how it has been used, every rule as an addressable row, the cast resolved against the guardrails, and `spec.json`. Opens with the drill-in ([WO15](#decisions)) | `Dashboard` — `properties` · `metrics` · `table` · `text` |
 | Authoring | Picking, never free text — every control is a choice over what the Graph already declares ([WO7](#decisions)) | `Field` · `Checkbox` · `RichSelect` · **`CannotAnswerCard`** for each refusal |
-| The chip | `header.right`, beside the nodes-in-view readout. Opens the picker. Reads **`Everything`** when none is set | **`LensChip`** |
+| The chip | In the session's composer, between the ask kind and the agent. Opens the picker upward. Reads **`Everything`** when none is set | **`LensChip`** |
 | Compare | A page in `BoardPagesViewPanel`, id `compare:<runA>:<runB>` | `DiffList` · **`AddressChip`** · `MetricTile` |
 | Retune | A control on the run dashboard's *This run's lens* band | |
 
@@ -219,13 +219,13 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | WO2 | **The name field says what it does.** `Name it to add it to Worlds`, never a bare input — someone labelling a past run for their own memory must not publish it without being told. |
 | WO3 | **A world is validated against the guardrails at save, not at run.** A world that cannot legally run is a world nobody should be able to save and then wonder about. |
 | WO4 | **Compare is two runs, not a diff engine.** The same question under two lenses, run properly, with their traces placed side by side. Nothing is simulated and no answer is synthesised from another. |
-| WO5 | **The world chip lives in `header.right`, not in the composer.** It is the run's circumstances, not part of the question — and it must be visible on a surface that is not the composer, because a run opened from a schedule has no composer. |
+| WO5 | **The world chip lives in the session's composer.** The world is the session's ([AS5](../../ask/spec.md#7b-a-session-executes-through-plans-always)), so it is set where that session asks, beside the ask kind. A run that no composer opened reads its world on the record that opened it — a schedule's or a Todo's lens — and on the run itself. |
 | WO6 | **Deleting a world a schedule uses is refused.** A cron firing into a missing lens would silently fall back to the widest, which is the opposite of what the lens was for. The same refusal covers a world an **agent** carries — `agents.lens_id` is `ON DELETE RESTRICT`. |
 | WO7 | **Narrowing is picking, not writing.** Every control in the authoring form is a choice over what the Graph already declares — published model versions, the axes they declared, the providers configured, the caches that exist. Nothing is free text, so nothing can name something that is not there, and a typo cannot become a rule that silently matches nothing. |
 | WO8 | **The drill-in is the record, in its order:** a summary band, then one section per layer, then the cast, then `as_of`. A world is read as one object because that is what an auditor is handed ([GV1](../spec.md)) — a tabbed world would make *what may this run see* a thing you assemble from four tabs. |
 | WO9 | **`as_of` is a field on the world, not a control on the question.** It resolves which model versions and stitches are in view, so two people picking the same world see the same graph. Putting it beside the composer would make the same world mean different things to different askers. |
 | WO10 | **One editor authors both kinds.** A guardrail and a world are one record separated by `kind` ([GV1](../spec.md)), so they are one form — `LensEditor` — and `kind` changes four things and nothing else: the word on the header, whether the name field publishes, whether the save asks for its impact first, and whether the cast section is drawn. Two forms would be two places for the grammar to drift, and the two screens would start disagreeing about what `**` means. |
-| WO11 | **`?lens=` is the run's circumstances; `?world=` is what you are reading.** They are two params because they answer two questions and have two lifetimes: the drill-in is dropped the moment `?panel=` moves, which is right for *what am I looking at* and exactly wrong for *what am I asking under*. `?lens=` survives every panel change and every reload, so a shared link reproduces the bound as well as the question. Absent is *Everything, inside the guardrails* — the default and the widest ([GV7](../spec.md)). |
+| WO11 | **The world a session asks in is stored on the session, never in the URL.** `sessions.lens_id` is what a reload, a second tab and a reopened thread all read, so a link cannot quietly change the circumstances of the next question. `?world=` stays the Govern drill-in — what you are reading. |
 | WO12 | **The drill-in renders from the row the list already holds; the resolved cast arrives after.** *Innermost wins, then the address is checked against the effective rules* ([GV6](../spec.md)) is a composition against the guardrails that only the server can do, so it is a second read — and the record never waits on it. A cast table without it still reads correctly: it says what this lens **casts**, rather than what a run would **get**. |
 | WO13 | **Compare is reached from a run, not from the Worlds drawer.** Compare is two runs that each happened ([WO4](#decisions)), so the gesture belongs where a real run is on screen: the run dashboard offers `Compare…`, lists the Graph's other finished runs with the ones that asked the same question first, and opens `compare:<a>:<b>` as a page. A `Compare…` in the drawer would have to collect a question and launch two runs, which is the composer's job wearing a bound's clothes. |
 | WO14 | **Narrowing is picked, and so are the wildcards.** The three address controls offer `**`, `*` and — for anything carrying an `@` discriminator — the `@*` form beside the exact version. Offering `Deals@*` next to `Deals@1.0.1` is what makes the version-proof rule as easy to write as the brittle one ([GV4](../spec.md)); leaving it to a keystroke makes the brittle one the default. |

@@ -179,8 +179,8 @@ is cut before it leaves.
 | URL | `?panel=govern&drawer=worlds\|guardrails`, drill-in `&world=` ([G31](../building-studio/graph-detail-page.md)) |
 | Artboards | `GovWorlds` · `GovWorld` · `GovGuardrails` · `GovCompare` |
 
-**The world chip goes in `header.right`**, not the composer — a run opened from a schedule has no
-composer ([WO5](../modules/govern/features/worlds.md)).
+**The world chip goes in the session's composer**, and the world is stored on the session; a run
+opened from a schedule reads its world on the schedule ([WO5](../modules/govern/features/worlds.md#decisions)).
 
 ---
 

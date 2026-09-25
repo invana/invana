@@ -237,7 +237,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 |---|---|---|---|
 | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) · [10.5 Runs](modules/operate/features/see-what-ran.md) · [4.2 Boards](modules/explore/features/boards.md) — 90 artboards | Worlds · Guardrails · the run · the agents · LLMs · Skills · Bindings · Usage · Rules · Plans · Boards · **Runs** | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
 | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 17 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
-| [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab — 5 artboards | Agents › Agent | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
+| [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
@@ -554,11 +554,21 @@ agent's page ([AG23](modules/agents/features/author-an-agent.md#decisions)). Gen
 
 | Artboard | Feature | Draws | API | Studio | Shell |
 |---|---|---|---|---|---|
-| `agents.agents.detail.overview` | 5.2 | The agent at a glance — who, focus, thinking, skills, what is always in force, its limits | 🟡 | 🔵 | ✅ |
+| `agents.agents.detail.overview` | 5.2 | The agent at a glance — who, focus, thinking, skills, what is in force, its limits | 🟡 | 🔵 | ✅ |
 | `agents.agents.detail.skills` | 5.2 · 6.2 | Skills and callables — two tables that name each other | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.thinking` | 5.2 · 5.3 | Thinking — focus, effort and a default stance | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.soul.dials` | 5.8 | Soul — the voice dials beside the Markdown | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.activity` | 5.3 · 5.5 · 5.6 · 5.7 | Activity — the meters, the limits that cap them, runs, sessions and lineage | 🟡 | 🟡 | ✅ |
+
+A second page, *Ask › The session’s world — 3.10*, draws where the world now comes from ([AS5](modules/ask/spec.md#7b-a-session-executes-through-plans-always) · [AD15–AD17](modules/ask/features/the-assistant.md#decisions)). Generated from `.design/canvas-agent-page/session.py`.
+
+| Artboard | Feature | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `ask.assistant.world` | 3.10 | The world chip in the composer reads the open session; each turn says what it ran in | 🔵 | 🔵 | ✅ |
+| `ask.assistant.world.menu` | 3.10 | The world picker opens upward — the same ComposerPicker as the ask kind, with Next ask only | 🔵 | 🔵 | ✅ |
+| `ask.assistant.world.next_ask` | 3.10 | Next ask only — the chip is marked, and returns to the session’s world after | 🔵 | 🔵 | ✅ |
+| `ask.assistant.world.refused` | 3.10 · 5.2 | Refused before it runs — the agent’s own guardrail forbids what the world casts | 🔵 | 🔵 | ✅ |
+| `ask.assistant.session_settings` | 3.10 | Session settings — the spend per run, beside the agent’s cap | 🔵 | 🔵 | ✅ |
 
 ---
 

@@ -17,7 +17,7 @@ model, validated, executed, projected — and answered only from what the graph 
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Ask in plain language | The composer offers only the ask-kind toggle; the **world chip** in `header.right` carries the circumstances, and its cast names the model |
+| C1 | Ask in plain language | The composer offers the ask kind and the **world chip**; the world carries the circumstances, and its cast names the model |
 | C2 | Grounded in the global model | Translation names only types the model has |
 | C3 | Every answer cites | The query that produced it and the records behind it |
 | C4 | It asks back rather than guessing | An ambiguous question becomes a closed question, not an assumption |
@@ -116,7 +116,7 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 | # | Decision |
 |---|---|
 | NL1 | One question, one run. |
-| NL2 | **The lens names the model, not the agent and never the composer.** A plan names a role, the lens's `cast` resolves it to a model address, and the address names the configured provider whose credential is used ([GV10](../../govern/spec.md) · [PM1](../../agents/features/providers-and-models.md)). What the composer offers is the ask-kind toggle; what carries the circumstances is the world chip in `header.right` ([WO5](../../govern/features/worlds.md)). |
+| NL2 | **The lens names the model, not the agent and never a picker in the composer.** A plan names a role, the lens's `cast` resolves it to a model address, and the address names the configured provider whose credential is used ([GV10](../../govern/spec.md) · [PM1](../../agents/features/providers-and-models.md)). The composer offers the ask kind and the world chip; it never offers a model — the world's cast names it ([WO5](../../govern/features/worlds.md#decisions)). |
 | NL3 | Translation is grounded in the global model, and validation enforces it. |
 | NL4 | Ambiguity produces a question, not an assumption. |
 | NL5 | Every answer carries its query and its records. |
