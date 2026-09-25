@@ -102,7 +102,7 @@ provider row and its models, and reopens four rows below. The shapes:
 | # | Feature | What it does | API | CLI | Studio | Slice |
 |---|---|---|---|---|---|---|
 | 5.1 | [Providers and models](modules/agents/features/providers-and-models.md) | A provider row per Graph, holding its models; ping it. **No default — the cast picks** | 🟡 | — | 🟡 | S5 · **S16** |
-| 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it a lens, a budget and skills | 🟡 | — | 🟡 | S12c · **S16** |
+| 5.2 | [Author an agent](modules/agents/features/author-an-agent.md) | Author an agent; give it a lens, a budget, skills and the callables they need, and a voice | 🟡 | — | 🟡 | S12c · **S16** |
 | 5.3 | [Set what an agent may run](modules/agents/features/envelope-and-budget.md) | What an agent may run, with what arguments, at what cost | 🟡 | — | 🟡 | S12c · **S16** |
 | 5.4 | [Delegation](modules/agents/features/delegation.md) | Agents that spawn agents, bounded by the parent | ✅ | — | ✅ | S12d |
 | 5.5 | [Pause, resume, retire](modules/agents/features/lifecycle.md) | Pause · resume · retire; the row stays so lineage resolves | ✅ | — | 🟡 | S12c |

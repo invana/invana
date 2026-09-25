@@ -107,7 +107,7 @@ being made, written down where it can be argued with.
 
 ```mermaid
 flowchart TD
-    Q[A question] --> S{Act as?}
+    Q[A question] --> S{Act as?<br/>preselected: the agent's default}
     S -->|no stance| U0[understand · plan — as today]
     S -->|a stance| L["The stance's assumptions are shown<br/>BEFORE the run, editable"]
     L --> U[understand · plan, with the method]
@@ -138,7 +138,7 @@ flowchart TD
 
 | Surface | Where | Shape |
 |---|---|---|
-| **The picker** | the composer, beside the ask mode | *Act as* — a `RichSelect` of stances, none by default |
+| **The picker** | the composer, beside the ask mode | *Act as* — a `RichSelect` of stances; preselected with the agent's default stance when it has one, otherwise none ([AA9](#decisions)) |
 | **The pre-run card** | above the composer once a stance is chosen | its assumptions, each one removable before asking. This is the feature's whole point: they are read **before** the answer exists |
 | **The ledger** | an emission in the answer ([3.3](the-answer-surface.md)) | a table — claim · source · checked · without_it — with *drop and re-run* per row |
 | **Authoring** | `?panel=skills` | beside skills and rules: the same shape of thing, authored the same way ([AA2](#decisions)) |
@@ -165,7 +165,8 @@ flowchart TD
 | AA4 | **A declared assumption is the cure for the one C1 forbids.** C1 bans an assumption the model invents about *what the question means*. A stance declares the premises of a *method*, in writing, before the run, each one droppable. Ambiguity still produces a clarifying question |
 | AA5 | **A stance that changes only the prose has not been applied.** Its effect must be observable in the plan and in the ledger. This is assertable: swap the stance on a fixed question and fixed data, and the plan or the ledger must differ, or the stance is theatre |
 | AA6 | **A stance never softens cannot-answer.** If the method needs what the graph does not hold, the answer is a refusal with a diagnosis — never an estimate in a confident register. Personas are where grounded products go to start hallucinating politely |
-| AA7 | **No stance is the default.** Opt-in, and the un-stanced path is exactly today's path with no ledger. A product that always answers "as" someone has a voice it never chose |
+| AA7 | **The product has no default stance.** Opt-in, and the un-stanced path is exactly today's path with no ledger. A product that always answers "as" someone has a voice it never chose. An agent's author may choose one for that agent ([AA9](#decisions)) — a choice somebody made and the agent page names |
+| AA9 | **An agent may carry a default stance, and the asker overrides it per run.** The picker opens on it; choosing another, or none, applies to that run only. AA8 still holds — the override replaces, it never blends ([AG20](../../agents/features/author-an-agent.md#decisions)) |
 | AA8 | **One run, one stance.** Blending two has no statable assumption set, and the assumption set is the deliverable |
 
 ## Not building

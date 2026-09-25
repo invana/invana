@@ -14,7 +14,7 @@ the bounds; **the composition happens at run time and is drawn in [Ask](../ask/s
 | | |
 |---|---|
 | Index | [§5 · Agents](../../README.md#5--agents) |
-| Features | [providers-and-models](features/providers-and-models.md) · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · [concurrency-and-contention](features/concurrency-and-contention.md) |
+| Features | [providers-and-models](features/providers-and-models.md) · [author-an-agent](features/author-an-agent.md) · [envelope-and-budget](features/envelope-and-budget.md) · [delegation](features/delegation.md) · [lifecycle](features/lifecycle.md) · [lineage](features/lineage.md) · [concurrency-and-contention](features/concurrency-and-contention.md) · [soul](features/soul.md) |
 | Depends on | [Skills](../skills/spec.md) (what it may be offered) · [Workflows](../workflows/spec.md) (what it may run) · Ask (an agent runs a run) |
 | Depended on by | [Work](../work/spec.md) (an agent is an assignee) · Ask (a session asks through an agent) |
 
@@ -26,9 +26,12 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 |---|---|---|
 | **Agent** | a principal that can be assigned work, carrying bindings, an envelope, a budget and a lens, and speaking with a soul | a prompt |
 | **Soul** | who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads ([5.8](features/soul.md)) | a permission · a stance |
+| **Voice dials** | the soul in structured form — `humour` · `formality` · `emoji` · `greeting`, picked rather than written ([AG16](features/author-an-agent.md#decisions)) | a persona · a length setting |
+| **Callable** | one catalogue entry an agent's envelope allows it to run — `run_query` · `search_web` · `fetch_source` ([AG14](features/author-an-agent.md#decisions)) | a *capability* — that word names a feature file's section |
 | **Provider** | a configured LLM endpoint on the Graph — a **participant**, addressed `llm/<name>/*`, holding the models it offers | the model name, and not something an agent binds |
 | **Cast** | the lens's map from a plan's **role** to a model address. It is what names the model an agent uses | a field on the agent |
 | **Envelope** | the static bounds: which callables, which pinned arguments, which ceilings | a runtime check |
+| **Effort** | how hard an agent tries before it stops — steps, replans, clarifications. Enforced like a ceiling ([EB9](features/envelope-and-budget.md#decisions)) | character · budget |
 | **Budget** | the cost ceiling a run may spend. **At the ceiling a run pauses and asks** — it does not fail ([orchestration § 0.10](../../orchestration.md#010-budget--the-ceiling-that-pauses-instead-of-failing)) | a quota · a hard stop |
 | **Lifetime** | `persistent` or `ephemeral` — whether the agent outlives the work it was spawned for | status |
 | **Lineage** | who authored whom, who spawned whom, on what run | an org chart |
@@ -57,9 +60,9 @@ each refuses with the bound named, and none of them is negotiable at run time.
 
 | Owns | Shape |
 |---|---|
-| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `soul` · `budget` · `policy` · **`lens_id`** |
+| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `soul` · `soul_traits` · `budget` · `effort` · `stance_id` · `policy` · **`lens_id`** |
 | `agent_skills` | the bindings this agent carries — authored in [Skills](../skills/spec.md) |
-| Envelope · budget | on the agent: allowed callable keys, pinned arguments, cost · fan-out · clarification · replan · concurrency ceilings |
+| Envelope · budget · effort | on the agent: allowed callable keys and pinned arguments · cost, fan-out and concurrency ceilings · steps, replans and clarifications |
 | Lineage | `parent_agent_id` + `spawned_in_run_id` — retirement keeps the row so lineage resolves |
 | `llm_providers` + `llm_models` | one configured endpoint holding many models — the two segments of `llm/<provider>/<model>` ([PM9](features/providers-and-models.md)) |
 | **Not owned** | the lens itself, and the cast in it — those are [Govern](../govern/spec.md)'s. This module owns the *pointer* |
@@ -67,6 +70,136 @@ each refuses with the bound named, and none of them is negotiable at run time.
 
 Schema, ER diagram and migration order:
 [building-engine/govern-and-agents-data-model.md](../../building-engine/govern-and-agents-data-model.md).
+
+## 3a. How an agent is composed
+
+An agent is five groups of settings, and only two of them are tables of their own — the rest is
+columns on `agents` or a pointer to something another module owns.
+
+| Group | Is | Stored as | Owned by |
+|---|---|---|---|
+| **Who** | how it sounds | `soul` · `soul_traits` | this module ([5.8](features/soul.md)) |
+| **Focus** | what it works on | `instructions` | this module ([AG13](features/author-an-agent.md#decisions)) |
+| **Thinking** | how much it tries, and which way | `effort` · `stance_id` | this module · the stance is [Ask](../ask/features/act-as.md)'s |
+| **Can do** | how it approaches work, and what it may run | `skill_bindings` · `envelope.allow` · `pins` · `plans` | [Skills](../skills/spec.md) · this module |
+| **Bounds** | what it may see, reach and spend | `lens_id` · `budget` · `policy` | [Govern](../govern/spec.md) · this module |
+
+Solid lines are foreign keys; dashed lines are references held in JSON or derived — the catalogue is
+code, not a table, and the envelope names it by `step_key`.
+
+```mermaid
+erDiagram
+    AGENT         ||--o{ SKILL_BINDING   : "is offered"
+    SKILL         ||--o{ SKILL_BINDING   : "bound as"
+    SKILL         ||--o{ SKILL_VERSION   : "versioned as"
+    SKILL_VERSION ||--|| TASKPLAN        : "drawn as exactly one"
+    TASKPLAN      ||--o{ TASK            : "made of"
+    TASK          }o..|| CATALOGUE_ENTRY : "step_key - callable form"
+
+    AGENT         }o..o{ CATALOGUE_ENTRY : "envelope.allow + pins"
+    AGENT         }o..o{ TASKPLAN        : "envelope.plans - reusable"
+    AGENT         }o--o| STANCE          : "stance_id - default thinking"
+    AGENT         }o--o| LENS            : "lens_id - null = Everything"
+    AGENT         }o--o| AGENT           : "parent_agent_id"
+
+    LENS          }o..o{ LLM_MODEL       : "cast - role to llm/provider/model"
+    LLM_PROVIDER  ||--o{ LLM_MODEL       : holds
+    RULE          ||--o{ RULE_VERSION    : "versioned as"
+
+    AGENT         ||--o{ TASKRUN         : "ran it - agent_version"
+    TASKPLAN      ||--o{ TASKRUN         : "run as"
+    LENS          ||--o{ TASKRUN         : "frozen at open"
+    STANCE        ||--o{ TASKRUN         : "stance_id + version"
+    SKILL_VERSION }o..o{ TASKRUN         : "offered / applied per step"
+    RULE_VERSION  }o..o{ TASKRUN         : "offered / cited per step"
+
+    AGENT {
+        string id           PK
+        string graph_id     FK
+        string name         UK "unique per Graph"
+        text   instructions    "focus - reaches Understand and Translate"
+        text   soul            "voice - Markdown, prose steps only"
+        json   soul_traits     "voice dials - humour formality emoji greeting"
+        json   envelope        "allow + pins + plans - stored as workflow_spec today"
+        json   effort          "max_steps max_replans max_clarifications"
+        json   budget          "cost + reach ceilings"
+        string stance_id    FK "default stance - null = none"
+        string lens_id      FK "the world - null = Everything"
+        json   policy          "can_be_assigned unattended"
+        int    version
+    }
+    SKILL_BINDING {
+        string skill_id     FK
+        string agent_id     FK
+        string bound_by_id
+    }
+    SKILL {
+        string id                 PK
+        string name               UK
+        string current_version_id FK
+    }
+    SKILL_VERSION {
+        string id          PK
+        string skill_id    FK
+        int    version
+        text   content        "the playbook prose"
+        text   when_to_use
+        string plan_id     FK "NOT NULL"
+    }
+    TASKPLAN {
+        string id       PK
+        string key      UK "reusable plans only"
+        string origin      "authored generated promoted"
+        bool   reusable
+    }
+    TASK {
+        string id           PK
+        string task_plan_id FK
+        string form            "callable composite human"
+        string step_key        "callable only"
+        string role            "llm callables - resolved by the cast"
+    }
+    CATALOGUE_ENTRY {
+        string step_key PK "code, not a table"
+        string bound       "the one bound it spends"
+        list   requires
+        json   args
+        json   outputs
+    }
+    STANCE {
+        string id           PK
+        text   method
+        json   assumptions
+        string output_shape
+    }
+    LENS {
+        string id    PK
+        string kind     "world guardrail"
+        json   rules
+        json   cast     "role to model address"
+    }
+    LLM_MODEL {
+        string id          PK
+        string provider_id FK
+        string model_id
+    }
+    RULE_VERSION {
+        string id        PK
+        text   statement
+    }
+    TASKRUN {
+        string id             PK
+        string agent_id       FK
+        int    agent_version
+        string task_plan_id   FK
+        string lens_id        FK
+        string stance_id      FK
+    }
+```
+
+**The one derived check.** A skill's *needs* are the `step_key`s of the tasks in its current
+version's plan; they must sit inside the agent's `envelope.allow`, or the bind is refused naming the
+callable ([BN5](../skills/features/bindings.md#decisions) · [AG15](features/author-an-agent.md#decisions)).
 
 ## 4. Flows
 
@@ -111,7 +244,7 @@ agents are read, not in a settings tab reached from elsewhere.
 | Surface | Region | Shape |
 |---|---|---|
 | Agents | first drawer of the **Agents** stack | one list; `+ New agent` in the header; a row carries its kind, its **lens chip** and its **spend meter** |
-| Agent panel | the drill-in | *the three bounds* — envelope · budget · lens — then the cast resolved from the lens, then *bounds nest*, then *where this agent has been* |
+| Agent panel | the drill-in | *the three bounds* — envelope · budget · lens — then the cast resolved from the lens, then *bounds nest*, then *what this agent can do* (skills and callables, linked), then *where this agent has been* |
 | `LLMs` | second drawer of the same stack | the providers, the models under each, and the cast role that names each one |
 | Lineage | a page | who authored whom, who spawned whom, on what run — with the depth marked and the floor's refusal drawn |
 | Concurrency | a page, or the drawer's footer | running · queued with positions and reasons · every ceiling in force |

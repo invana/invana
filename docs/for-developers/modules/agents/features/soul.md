@@ -25,6 +25,7 @@ do; the soul is why it does not sound like a robot while doing it.
 | C4 | Versioned with the agent | Editing the soul is an agent edit: a new version, in the audit |
 | C5 | Preview before saving | One sample reply in the draft voice, to the same ask, beside the current one |
 | C6 | Instructions stay separate | `instructions` say *what* to do and reach Understand and Translate; the soul says *who* and never reaches Translate |
+| C7 | Voice dials | Humour · formality · emoji · greeting as structured `soul_traits`, read before the Markdown — [author-an-agent § Voice dials](author-an-agent.md#voice-dials) |
 
 ## What reads the soul
 
@@ -84,7 +85,7 @@ flowchart TD
 | Prompt assembly | `soul or DEFAULT_VOICE` is prepended to the system prompt of every step in *What reads the soul*; `RunVars.soul` carries it; Translate has no parameter for it |
 | Agent instructions | `agents.instructions` layered after `graphs.instructions` into Understand and Translate |
 | Versioning | An edit bumps `agents.version`; `task_runs.agent_version` records which soul a run spoke with |
-| Routes | `AgentRead.soul` · `AgentUpdate.soul` (read by set-ness) · `POST …/agents/{id}/soul/preview` with `{soul, ask}` → the reply in the current and the draft voice |
+| Routes | `AgentRead.soul` · `AgentUpdate.soul` (read by set-ness) · `POST …/agents/{id}/soul/preview` with `{soul, soul_traits, ask}` → the reply in the current and the draft voice |
 | Events | `agent.soul_set` |
 
 ## Decisions

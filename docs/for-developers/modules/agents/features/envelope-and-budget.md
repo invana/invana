@@ -20,6 +20,7 @@ anything is dispatched — so a plan outside the bounds costs nothing.
 | C1 | Allowed steps | An explicit set; anything else is refused |
 | C2 | Pinned arguments | A step may be allowed only with certain arguments fixed |
 | C3 | Cost ceiling | Per run, and per window |
+| C3a | **Effort** | How hard it tries before it stops — steps, replans, clarifications. A bound of its own, not money and not character ([EB9](#decisions)) |
 | C4 | Depth and fan-out | How deep delegation may go and how wide |
 | C5 | Policy at the ceiling | Stop · ask · block — stated, not implicit |
 | C6 | Envelopes come from templates | Authoring picks one; editing is deliberate |
@@ -59,7 +60,7 @@ flowchart TD
 |---|---|---|
 | Agent panel → Envelope | `6 of 25 callables`, each with its bound and its pinned arguments; then the ceilings | `DataTable` · `BoundChip` |
 | The picker | Grouped by bound, with what is already allowed checked | `DataTable` · `Checkbox` · `BoundChip` |
-| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as a table, not a form of ten inputs. `agents/CeilingsTable.tsx`, in the agent panel's *Ceilings* section — empty is *the Graph's default applies*, never zero | `DataTable` |
+| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as a table in three groups — Budget · Effort · Reach — not a form of ten inputs. `agents/CeilingsTable.tsx`, in the agent panel's *Ceilings* section — empty is *the Graph's default applies*, never zero | `DataTable` |
 | Budget strip | Spend against ceiling, per window | `MetricTile` with `meter` |
 | A refused plan | *`nl-sweep@2` names `delegate`, which Analyst's envelope does not carry* — with `Open the plan` and `Hand to Coordinator` | `CannotAnswerCard` |
 
@@ -67,25 +68,41 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| Envelope | on the agent: allowed callable keys, pinned arguments, ceilings, depth, fan-out. Versioned with the agent, never a table |
+| Envelope | `agents.envelope` JSON: `allow` (callable keys) · `pins` · `plans` (the reusable plans a Plan step may pick) · `entry` · `steps` for a fixed-step agent. Versioned with the agent, never a table. The ceilings are not in it — they are `budget` and `effort` |
 | Budget | per-run and per-window ceilings, with the policy at each |
+| Effort | `agents.effort` JSON — `max_steps` · `max_replans` · `max_clarifications`; a missing key is the Graph's default. Moved out of both `workflow_spec` and `budget`, each read as a fallback for one release |
 | Validation | performed by [envelope-validation](../../workflows/features/envelope-validation.md) before dispatch |
-| Events | `agent.envelope_updated · budget_updated · budget_exhausted` |
+| Events | `agent.envelope_updated · budget_updated · effort_updated · budget_exhausted` |
 
 ### The ceilings, in full
 
-`agents.budget` JSON. [Data model § 5.1](../../../building-engine/govern-and-agents-data-model.md).
+Three groups, by what a number limits: **Budget** — what it may spend · **Effort** — how hard it tries
+before it stops · **Reach** — how wide it may spread. Budget and Reach are `agents.budget` JSON; Effort
+is `agents.effort` JSON ([EB9](#decisions)). [Data model § 5.1](../../../building-engine/govern-and-agents-data-model.md).
+
+**Budget** — `agents.budget`
 
 | Key | Value | What it bounds | Enforced |
 |---|---|---|---|
 | `max_cost_usd_month` | `$40.00` | the agent's own spend ceiling. **Renamed from `max_cost_usd`**; both read for one release ([EB8](#decisions)) | declared · drawn against |
 | `max_cost_usd_run` | `$2.00` | per run. A plan may set less, never more | declared · drawn against ([EB7](#decisions)) |
+| `max_tokens` | | per run | unchanged |
+
+**Effort** — `agents.effort`
+
+| Key | Value | What it bounds | Enforced |
+|---|---|---|---|
+| `max_steps` | `16` | steps in one plan | ✅ at validation |
+| `max_replans` | `1` | a `verify` cannot loop forever | ✅ the interpreter |
+| `max_clarifications` | `3` | per run — `understand` stops asking. **`0` means it never asks**: an ambiguity is resolved by a declared assumption, never a silent one ([AA4](../../ask/features/act-as.md#decisions)) | ✅ `understand` |
+
+**Reach** — `agents.budget`
+
+| Key | Value | What it bounds | Enforced |
+|---|---|---|---|
 | `max_fanout` | `200` lanes | a `map_over` beyond it is refused **at validation**, not mid-run | declared — nothing dispatches a fanned-out node yet |
-| `max_clarifications` | `3` | per run — `understand` stops asking | ✅ `understand` |
-| `max_replans` | `2` | a `verify` cannot loop forever | ✅ the interpreter |
 | `max_concurrent_runs` | `3` | across every run this agent is working. The **Graph's** ceiling is separate ([concurrency](concurrency-and-contention.md)) | ✅ at admission, refused by name ([CC11](concurrency-and-contention.md)) |
 | `max_children` · `max_depth` | `3` · `2` | delegation ([delegation](delegation.md)) | ✅ |
-| `max_steps` · `max_tokens` | | unchanged | ✅ `max_steps` at validation |
 
 ### A pinned argument
 
@@ -109,6 +126,8 @@ opening a row.
 | EB5 | An agent may propose tightening its own bounds, never loosening them. |
 | EB6 | **A ceiling the wire does not carry is one no screen can draw.** Every key of `effective_budget` rides `GET …/runs/{id}/trace`, not the two the first dashboard happened to need. |
 | EB7 | **Declared is not the same as enforced, and the table says which.** `max_concurrent_runs` is enforced at admission and refuses naming the agent ([CC11](concurrency-and-contention.md)). `max_cost_usd_run` and `max_cost_usd_month` are declared and drawn against — stopping on a spend ceiling is EB2's *never during* and [orchestration § 0.10](../../../orchestration.md)'s budget approval. `max_fanout` is declared and unread until something dispatches a `map_over`. |
+| EB10 | **The column is `envelope`, and its plan list is `plans`.** `workflow_spec` named a workflow where the thing is a bound, and `templates` named library plans with a word the product uses for projection templates. Both old names are read for one release, and the API answers both, so a reader that has not moved keeps working. |
+| EB9 | **Effort is its own bound, neither budget nor character.** Steps, replans and clarifications are not money, so they do not sit under a word that means money; and they decide what runs, so they cannot sit in the [soul](soul.md), which only chooses words ([SO2](soul.md#decisions)). They read like temperament and are enforced like a ceiling — a soul can make an agent *sound* persistent, only Effort makes it retry. No preset: three numbers set once, read on the Ceilings table. |
 | EB8 | **`max_cost_usd` is read as `max_cost_usd_month` for one release**, and answered back under its old name, so neither a row configured today nor a reader that has not moved yet loses its number on the rename. The release after this one drops both lines. |
 
 ## Not building

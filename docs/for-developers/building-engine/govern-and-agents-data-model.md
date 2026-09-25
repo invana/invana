@@ -555,6 +555,12 @@ Migration `000000000049` (the lens) and `000000000053` (the provider).
 | **add** | `lens_id` `String(36)` FK `lenses` **ON DELETE RESTRICT**, nullable | The third bound (A1). Null = *Everything*, inside the guardrails. RESTRICT, because deleting a world an agent carries is the same seam as deleting one a schedule uses ([WO6](../modules/govern/features/worlds.md)) |
 | **drop** | `llm_config_id` | [PM1](../modules/agents/features/providers-and-models.md) — an agent binds no provider. The cast names the model and the Graph resolves the credential |
 | **extend** | `budget` JSON | three new keys, below |
+| **add** · 🔵 | `soul` `Text`, default `""` | Who the agent is and how it speaks; empty is the default voice ([SO1](../modules/agents/features/soul.md#decisions)). Not in `49`–`53` — it lands with 5.8 |
+| **rename** · 🔵 | `workflow_spec` → `envelope`, and its `templates` key → `plans` | [EB10](../modules/agents/features/envelope-and-budget.md#decisions). Both names read and answered for one release |
+| **reshape** · 🔵 | `policy`: drop `can_spawn` · `can_spawn_persistent` | [DG11](../modules/agents/features/delegation.md#decisions) — `spawn_agent` in `envelope.allow` is the permission; persistent children become a pin on `spawn_agent`. `policy` keeps `can_be_assigned` · `unattended` |
+| **add** · 🔵 | `effort` `JSON`, default `{}` | `max_steps` · `max_replans` · `max_clarifications`, moved out of both `workflow_spec` and `budget`; the migration copies each from wherever it was set, and both old places are read as a fallback for one release ([EB9](../modules/agents/features/envelope-and-budget.md#decisions)) |
+| **add** · 🔵 | `stance_id` `String(36)` FK `stances` **ON DELETE RESTRICT**, nullable | The agent's default stance ([AG20](../modules/agents/features/author-an-agent.md#decisions)). Lands with `stances` (3.11), not before |
+| **add** · 🔵 | `soul_traits` `JSON`, default `{}` | The voice dials — `humour` · `formality` · `emoji` · `greeting`; a missing key is its default, an unknown key or value refused at write ([AG16](../modules/agents/features/author-an-agent.md#decisions)). Same migration as `soul` |
 | **index** | `task_runs (agent_id, started_at)` | *$1.84 of $40.00 this month* is a windowed `SUM(cost_usd)`, not a counter column. Built in `53` — `ix_task_runs_agent_id` alone made the window a scan of every run the agent has ever done |
 
 `DEFAULT_BUDGET` gains three keys and keeps the five it has:
@@ -564,11 +570,11 @@ Migration `000000000049` (the lens) and `000000000053` (the provider).
 | `max_cost_usd` | `5.0` | A1 `$40.00` | per **month** — rename to `max_cost_usd_month` |
 | `max_cost_usd_run` | `2.0` | A2 | per run. A plan may set less, never more |
 | `max_fanout` | `200` | A2 | a `map_over` beyond it is refused at validation |
-| `max_clarifications` | `3` | A2 | `understand` stops asking |
-| `max_replans` | `1` | A2 shows `2` | a `verify` cannot loop forever |
+| `max_clarifications` | `3` | A2 | `understand` stops asking — **moves to `effort`** (EB9) |
+| `max_replans` | `1` | A2 shows `2` | a `verify` cannot loop forever — **moves to `effort`** (EB9) |
 | `max_concurrent_runs` | `3` | A2 · A5 | per agent, across every run it is working |
 | `max_children` · `max_depth` | `3` · `2` | A3 | delegation, unchanged |
-| `max_steps` · `max_tokens` | unchanged | | |
+| `max_steps` · `max_tokens` | unchanged | | `max_steps` **moves to `effort`** (EB9); `max_tokens` stays |
 
 Renaming `max_cost_usd` → `max_cost_usd_month` is a JSON key change in `DEFAULT_BUDGET`, and
 `effective_budget` reads both for one release so old rows keep their ceiling.
@@ -721,6 +727,8 @@ Never in Studio, and never as a filter over results that came back.
 | `GET` `POST` `DELETE` | `…/llm-providers/{id}/models` | A6 |
 | `POST` | `…/llm-providers/{id}/ping` | unchanged — still a TaskRun ([PM3](../modules/agents/features/providers-and-models.md)) |
 | `GET` | `…/graphs/{gid}/concurrency` | A5, live from the runtime |
+| `GET` · 🔵 | `…/agents/{id}/skills-and-callables` | the agent panel's *What this agent can do* — bound skills with the callables their plan needs, and the envelope's callables with the skills that need them ([C12](../modules/agents/features/author-an-agent.md)) |
+| `POST` · 🔵 | `…/agents/{id}/soul/preview` | `{soul, soul_traits, ask}` → the reply in the current and the draft voice ([SO7](../modules/agents/features/soul.md#decisions)) |
 | `PATCH` | `…/graphs/{gid}/members/{uid}/guardrail-permission` | grant · revoke, refusing the last revoke |
 
 | Event | Payload carries |
@@ -731,6 +739,7 @@ Never in Studio, and never as a filter over results that came back.
 | `llm_provider.created` · `updated` · `pinged` · `deleted` | **`default_set` is retired** |
 | `llm_model.added` · `removed` | the worlds that named it, on a removal |
 | `agent.lens_set` | from and to |
+| `agent.soul_set` · 🔵 | before and after of `soul` and `soul_traits` together — a dial is a soul edit |
 | `graph.guardrail_permission_granted` · `revoked` | |
 
 ---
@@ -760,6 +769,7 @@ six months out needs.
 | `51` | `graph_versions.axes` · `graphs.pools` | ✅ built |
 | `52` | `task_plans.uses` · `tasks.source_plan_key` | ✅ built — Skills' work, not this pass's. The slot was taken while the split waited on its sign-offs |
 | `53` | `llm_providers.name` · `llm_models` · backfill · seeded cast · **drop** `model_id` · `is_default` · `agents.llm_config_id` | ✅ built. Both directions are exercised against a scratch database by `tests/golden/test_provider_split.py` |
+| `54` | `agents.soul` · `soul_traits` · `effort` · rename `workflow_spec` → `envelope` · `templates` → `plans` · `policy` spawn keys → a pin | 🔵 — 5.8 · EB9 · EB10 · DG11. `effort` is backfilled from `workflow_spec` then `budget`; the down path copies every key back |
 
 **The provider split moved from `50` to `53`, and that is the point.** It is the one irreversible
 step, so everything additive lands first and Govern ships without touching Agents at all. Until it
