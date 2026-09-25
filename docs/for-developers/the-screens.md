@@ -565,7 +565,7 @@ A second page, *Ask › The session’s world — 3.10*, draws where the world n
 | Artboard | Feature | Draws | API | Studio | Shell |
 |---|---|---|---|---|---|
 | `ask.assistant.world` | 3.10 | The world chip in the composer reads the open session; each turn says what it ran in | 🔵 | 🔵 | ✅ |
-| `ask.assistant.world.menu` | 3.10 | The world picker opens upward — the same ComposerPicker as the ask kind, with Next ask only | 🔵 | 🔵 | ✅ |
+| `ask.assistant.world.menu` | 3.10 | The world picker opens upward — the same RichSelect as the ask kind, with Next ask only | 🔵 | 🔵 | ✅ |
 | `ask.assistant.world.next_ask` | 3.10 | Next ask only — the chip is marked, and returns to the session’s world after | 🔵 | 🔵 | ✅ |
 | `ask.assistant.world.refused` | 3.10 · 5.2 | Refused before it runs — the agent’s own guardrail forbids what the world casts | 🔵 | 🔵 | ✅ |
 | `ask.assistant.session_settings` | 3.10 | Session settings — the spend per run, beside the agent’s cap | 🔵 | 🔵 | ✅ |

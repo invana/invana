@@ -93,7 +93,7 @@ flowchart TD
 | Header | `Ask Assistant` on the list; `Ask Assistant › <session title>` inside a thread, the first crumb being the way back (AD14) |
 | Attachment chip | What is attached, with a remove — **in the composer**, directly above the input (AD10) |
 | Thread | Question · steps · emissions, exactly as the main ask surface; each turn carries a small world tag |
-| World picker | In the composer, between the ask kind and the agent ([WO5](../../govern/features/worlds.md#decisions)) — a **`ComposerPicker`** like every other composer control ([AD18](#decisions)). Opens upward: *Ask in* · Everything and each world with its description, a stale one disabled with its reason · ☐ *Next ask only* · *Manage worlds…* |
+| World picker | In the composer, between the ask kind and the agent ([WO5](../../govern/features/worlds.md#decisions)) — an inline **`RichSelect`** like every other composer control ([AD18](#decisions)). Opens upward: *Ask in* · Everything and each world with its description, a stale one disabled with its reason · ☐ *Next ask only* · *Manage worlds…* |
 | Session settings | A popover from the thread header's settings button: the spend per run, with the agent's cap beside it | `Popover` · `Field` |
 
 ## Engine
@@ -125,7 +125,7 @@ flowchart TD
 | AD15 | **The world chip sits in the composer, between the ask kind and the agent.** The world belongs to the session, so it is set where that session asks; the header belongs to the page, and a chip there would show a world nothing is asking in whenever the assistant is closed or on another thread. The agent stays last — it is who answers; the world is where it looks. |
 | AD16 | **Next ask only is a checkbox in the world picker, not a second chip.** One control sets the world; the checkbox scopes it to one ask and the trigger carries a *next ask only* tag until that ask is sent. Two chips would make *which one applies* a question the reader has to answer. |
 | AD17 | **A turn is tagged with the world it ran in**, read from `task_runs.lens_id`. A thread may move between worlds, and a reader scrolling back must not assume the chip's current value applied to every answer above it. |
-| AD18 | **Every composer control is one component: `ComposerPicker`.** Ask kind, query language, world and timeout share one trigger and one menu — a radio group of items with an optional description and disabled reason, then optional checkbox and action items. It is built on `DropdownMenu`, not `Select`, because the world menu carries a checkbox and an action, which a form control cannot hold. A number input belongs in no dropdown, so the spend per run lives in the session's settings. |
+| AD18 | **Every composer control is one component: `RichSelect`, inline.** Ask kind, query language, world and timeout share one trigger and one menu — a radio group of items with an optional description and disabled reason, then optional checkbox and action items. It is the kit's `RichSelect` with `appearance="inline"` — already a `DropdownMenu`, extended with toggles and actions rather than duplicated — not `Select`, because the world menu carries a checkbox and an action, which a form control cannot hold. A number input belongs in no dropdown, so the spend per run lives in the session's settings. |
 
 ## Not building
 
