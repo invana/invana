@@ -1,10 +1,11 @@
 /**
  * Overview — the agent read whole (AG23): who it is, its focus, how it thinks,
  * what it can do, what is always in force, its limits, and the two policy
- * switches. Each summary names the tab that edits it.
+ * switches. Each summary names the tab that edits it. Two columns of cards as
+ * drawn, stacking below 760px (AG38).
  */
 
-import { useLensQuery, useLensesQuery } from "@/hooks/queries/useGovern";
+import { useLensesQuery } from "@/hooks/queries/useGovern";
 import {
 	useAgentMetersQuery,
 	useAgentSkillsAndCallablesQuery,
@@ -18,8 +19,10 @@ import {
 } from "@/pages/graphs-detail/features/agents/agentDraft";
 import type { Agent } from "@/types/work";
 import { PanelSection } from "@/ui/PanelSection";
-import { PolicyFlag } from "@/ui/PolicyFlag";
-import { Button, CastTable, PropertyList, PropertyRow } from "@invana/ui";
+import { Switch } from "@invana/forms";
+import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";
+import { Shield } from "lucide-react";
+import type { ReactNode } from "react";
 
 /** The two switches the Overview carries (AG23). Keys are the engine's. */
 export const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
@@ -54,13 +57,6 @@ export function AgentOverviewTab({
 	onPatch: (next: Partial<AgentDraft>) => void;
 	onGoTo: (tab: AgentTab) => void;
 }) {
-	// The agent's own guardrail and the cast it resolves to — an agent binds no
-	// world (AG26). The record never waits on the resolution (WO12).
-	const ownGuardrail = useLensQuery(
-		username,
-		graphSlug,
-		agent.guardrail_id ?? undefined,
-	);
 	// Every guardrail that holds on this agent's runs: the Graph's, and its own
 	// (AG7). Worlds are not here — a world comes with the work (AG24).
 	const guardrails = useLensesQuery(username, graphSlug, { kind: "guardrail" });
@@ -75,174 +71,223 @@ export function AgentOverviewTab({
 	const applied = skills.reduce((n, s) => n + s.applied, 0);
 	const needAttention = skills.filter((s) => s.missing.length).length;
 	const m = meters.data;
+	const spendShare =
+		m?.max_cost_usd_month && m.spend_this_month != null
+			? (m.spend_this_month / m.max_cost_usd_month) * 100
+			: 0;
 
 	return (
-		<>
-			<PanelSection
-				title="Who"
-				action={<GoTo label="Soul" onClick={() => onGoTo("soul")} />}
-			>
-				<PropertyList>
-					<PropertyRow label="description">
-						{agent.description || (
-							<span className="text-muted-foreground">none</span>
-						)}
-					</PropertyRow>
-					<PropertyRow label="soul">
-						{agent.soul ? (
-							`written · ${agent.soul.length.toLocaleString()} characters`
-						) : (
-							<span className="text-muted-foreground">
-								Invana's default voice
-							</span>
-						)}
-					</PropertyRow>
-					<PropertyRow label="voice">
-						{voiceSummary(agent.soul_traits)}
-					</PropertyRow>
-				</PropertyList>
-			</PanelSection>
-
-			<PanelSection
-				title="Focus"
-				hint="after the Graph's instructions"
-				action={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
-			>
-				<p className={agent.instructions ? undefined : "text-muted-foreground"}>
-					{agent.instructions ||
-						"No focus of its own — the Graph's instructions alone."}
-				</p>
-			</PanelSection>
-
-			<PanelSection
-				title="Thinking"
-				action={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
-			>
-				<PropertyList>
-					<PropertyRow label="effort">
-						{effortSummary(agent.effective_effort)}
-					</PropertyRow>
-				</PropertyList>
-			</PanelSection>
-
-			<PanelSection
-				title="Skills"
-				action={
-					<GoTo label="Skills & callables" onClick={() => onGoTo("skills")} />
-				}
-			>
-				<PropertyList>
-					<PropertyRow label="bound">
-						{skills.length
-							? `${skills.length} skill${skills.length === 1 ? "" : "s"}`
-							: "none — the Graph's base plans alone"}
-					</PropertyRow>
-					{skills.length ? (
-						<PropertyRow label="offered">
-							{offered.toLocaleString()} · applied {applied.toLocaleString()}
+		<div className="grid items-start gap-2.5 p-3.5 @[760px]:grid-cols-2">
+			<div className="flex min-w-0 flex-col gap-2.5">
+				<PanelSection
+					card
+					title="Who"
+					action={<GoTo label="Soul" onClick={() => onGoTo("soul")} />}
+				>
+					<PropertyList>
+						<PropertyRow label="description">
+							{agent.description || (
+								<span className="text-muted-foreground">none</span>
+							)}
 						</PropertyRow>
-					) : null}
-					{needAttention ? (
-						<PropertyRow label="needs attention">
-							<span className="text-warning">
-								{needAttention} skill{needAttention === 1 ? "" : "s"} need
-								{needAttention === 1 ? "s" : ""} a callable the envelope lacks
-							</span>
+						<PropertyRow label="soul">
+							{agent.soul ? (
+								`written · ${agent.soul.length.toLocaleString()} characters`
+							) : (
+								<span className="text-muted-foreground">
+									Invana's default voice
+								</span>
+							)}
 						</PropertyRow>
-					) : null}
-				</PropertyList>
-			</PanelSection>
-
-			<PanelSection title="Always in force" hint="whoever asks">
-				{/* **An agent binds no provider and no world** (PM1 · AG24). What
-				    holds whoever asks is the Graph's guardrails and its own (AG7 ·
-				    AG10), edited in Govern › Guardrails. */}
-				{inForce.length ? (
-					<PropertyList labelWidth={96}>
-						{inForce.map((g) => (
-							<PropertyRow
-								key={g.id}
-								label={g.scope === "graph" ? "the Graph" : "this agent"}
-							>
-								{g.display_name}
-							</PropertyRow>
-						))}
+						<PropertyRow label="voice">
+							{voiceSummary(agent.soul_traits)}
+						</PropertyRow>
 					</PropertyList>
-				) : (
-					<p className="text-muted-foreground">
-						No guardrails — the Graph has none, and neither does this agent.
-					</p>
-				)}
-				{agent.guardrail_id ? (
-					<CastTable
-						className="mt-2"
-						readOnly
-						cast={ownGuardrail.data?.cast}
-						resolved={ownGuardrail.data?.cast_resolved?.map((row) => ({
-							role: row.role,
-							address: row.address,
-							allowed: row.allowed,
-							ruleMatched: row.rule_matched,
-							// *Which contributor won* is a fact about a run; a lens read
-							// on its own has one contributor, and `shipped` is the only
-							// source that means anything here.
-							source: row.source === "shipped" ? "shipped" : undefined,
-						}))}
-					/>
-				) : (
-					<p className="mt-1.5 text-sm text-muted-foreground">
-						No guardrail of its own. Each run is bounded by the world its
-						session or Todo brings, inside the Graph's guardrails.
-					</p>
-				)}
-			</PanelSection>
+				</PanelSection>
 
-			<PanelSection title="Limits" hint="whoever asks">
-				<PropertyList>
-					<PropertyRow label="may run">
-						{can.data
-							? `${can.data.callables.length} callables · ${can.data.plans.length} plan${can.data.plans.length === 1 ? "" : "s"}`
-							: "…"}
-					</PropertyRow>
-					<PropertyRow label="effort">
-						{effortSummary(agent.effective_effort)}
-					</PropertyRow>
-					<PropertyRow label="spend">
-						{m?.max_cost_usd_month == null
-							? "no monthly ceiling"
-							: m.spend_this_month == null
-								? `nothing priced · of ${usd(m.max_cost_usd_month)} this month`
-								: `${usd(m.spend_this_month)} of ${usd(m.max_cost_usd_month)} this month`}
-					</PropertyRow>
-					<PropertyRow label="at once">
-						{m ? `${m.running} of ${m.max_concurrent_runs ?? "∞"} runs` : "…"}
-					</PropertyRow>
-				</PropertyList>
-			</PanelSection>
+				<PanelSection
+					card
+					title="Focus"
+					action={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
+				>
+					<p
+						className={
+							agent.instructions ? "leading-relaxed" : "text-muted-foreground"
+						}
+					>
+						{agent.instructions ||
+							"No focus of its own — the Graph's instructions alone."}
+					</p>
+				</PanelSection>
 
-			<PanelSection
-				title="Policy"
-				hint="a dash means the Graph default applies"
-			>
-				<PropertyList labelWidth={120}>
-					{POLICY_FIELDS.map((field) => (
-						<PropertyRow key={field.key} label={field.label}>
-							<PolicyFlag
-								label={field.hint}
-								on={draft.policy[field.key]}
-								onToggle={(next) => {
-									const policy = { ...draft.policy };
-									// Clearing *removes* the key — writing `false` would turn
-									// "the Graph decides" into a denial nobody chose.
-									if (next === undefined) delete policy[field.key];
-									else policy[field.key] = next;
-									onPatch({ policy });
-								}}
-							/>
+				<PanelSection
+					card
+					title="Thinking"
+					action={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
+				>
+					<PropertyList>
+						<PropertyRow label="effort">
+							{effortSummary(agent.effective_effort)}
 						</PropertyRow>
-					))}
-				</PropertyList>
-			</PanelSection>
-		</>
+					</PropertyList>
+				</PanelSection>
+
+				<PanelSection
+					card
+					title="Skills"
+					action={
+						<GoTo label="Skills & callables" onClick={() => onGoTo("skills")} />
+					}
+				>
+					<PropertyList>
+						<PropertyRow label="bound">
+							{skills.length
+								? `${skills.length} skill${skills.length === 1 ? "" : "s"}`
+								: "none — the Graph's base plans alone"}
+						</PropertyRow>
+						{skills.length ? (
+							<PropertyRow label="offered">
+								{offered.toLocaleString()} · applied {applied.toLocaleString()}
+							</PropertyRow>
+						) : null}
+						{needAttention ? (
+							<PropertyRow label="needs attention">
+								<span className="text-warning">
+									{needAttention} skill{needAttention === 1 ? "" : "s"} need
+									{needAttention === 1 ? "s" : ""} a callable the envelope lacks
+								</span>
+							</PropertyRow>
+						) : null}
+					</PropertyList>
+				</PanelSection>
+			</div>
+
+			<div className="flex min-w-0 flex-col gap-2.5">
+				<PanelSection card title="Always in force">
+					{/* An agent binds no provider and no world (PM1 · AG24): what
+					    holds whoever asks is the Graph's guardrails and its own (AG7 ·
+					    AG10), edited in Govern › Guardrails. */}
+					{inForce.length ? (
+						<ul className="divide-y">
+							{inForce.map((g) => (
+								<li key={g.id} className="flex items-center gap-2 py-1.5">
+									<Shield className="size-3.5 shrink-0 text-muted-foreground" />
+									<span className="min-w-0 flex-1 truncate">
+										{g.display_name}
+									</span>
+									<span className="shrink-0 text-muted-foreground">
+										{g.scope === "graph" ? "the Graph" : "this agent"}
+									</span>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-muted-foreground">
+							No guardrails — the Graph has none, and neither does this agent.
+						</p>
+					)}
+				</PanelSection>
+
+				<PanelSection card title="Limits" hint="whoever asks">
+					<PropertyList>
+						<LimitRow
+							label="may run"
+							to={
+								<GoTo
+									label="Skills & callables"
+									onClick={() => onGoTo("skills")}
+								/>
+							}
+						>
+							{can.data
+								? `${can.data.callables.length} callables · ${can.data.plans.length} plan${can.data.plans.length === 1 ? "" : "s"}`
+								: "…"}
+						</LimitRow>
+						<LimitRow
+							label="effort"
+							to={<GoTo label="Thinking" onClick={() => onGoTo("thinking")} />}
+						>
+							{effortSummary(agent.effective_effort)}
+						</LimitRow>
+						<LimitRow
+							label="spend"
+							to={<GoTo label="Activity" onClick={() => onGoTo("activity")} />}
+						>
+							{m?.max_cost_usd_month == null ? (
+								"no monthly ceiling"
+							) : (
+								<span className="flex items-center gap-2">
+									<Progress value={spendShare} className="h-1 w-16" />
+									{m.spend_this_month == null
+										? `nothing priced · of ${usd(m.max_cost_usd_month)} this month`
+										: `${usd(m.spend_this_month)} of ${usd(m.max_cost_usd_month)} this month`}
+								</span>
+							)}
+						</LimitRow>
+						<LimitRow
+							label="at once"
+							to={<GoTo label="Activity" onClick={() => onGoTo("activity")} />}
+						>
+							{m ? `${m.running} of ${m.max_concurrent_runs ?? "∞"} runs` : "…"}
+						</LimitRow>
+					</PropertyList>
+				</PanelSection>
+
+				<PanelSection card title="Policy">
+					<PropertyList labelWidth={120}>
+						{POLICY_FIELDS.map((field) => {
+							const on = draft.policy[field.key];
+							const setTo = (next: boolean | undefined) => {
+								const policy = { ...draft.policy };
+								// Clearing *removes* the key — writing `false` would turn
+								// "the Graph decides" into a denial nobody chose.
+								if (next === undefined) delete policy[field.key];
+								else policy[field.key] = next;
+								onPatch({ policy });
+							};
+							return (
+								<PropertyRow key={field.key} label={field.label}>
+									<span className="flex min-w-0 items-center gap-3">
+										<Switch
+											aria-label={field.label}
+											checked={on === true}
+											onCheckedChange={(next) => setTo(next)}
+										/>
+										{/* Unset is its own state: the Graph decides (AG38). */}
+										<span className="min-w-0 flex-1 truncate text-muted-foreground">
+											{field.hint}
+											{on === undefined ? " · Graph default" : ""}
+										</span>
+										{on === undefined ? null : (
+											<GoTo label="Reset" onClick={() => setTo(undefined)} />
+										)}
+									</span>
+								</PropertyRow>
+							);
+						})}
+					</PropertyList>
+				</PanelSection>
+			</div>
+		</div>
+	);
+}
+
+/** A limit, and the tab that sets it. */
+function LimitRow({
+	label,
+	to,
+	children,
+}: {
+	label: string;
+	to: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<PropertyRow label={label}>
+			<span className="flex items-center gap-3">
+				<span className="min-w-0 flex-1">{children}</span>
+				<span className="shrink-0">{to}</span>
+			</span>
+		</PropertyRow>
 	);
 }

@@ -108,6 +108,9 @@ class TaskRunSummary(BaseModel):
     #: *Verify*'s verdict — ``yes`` · ``partial`` · ``no``. ``None`` means the
     #: run never reached Verify, which is **not** the same as "did not serve".
     served: str | None = None
+    #: How the run ended, once it has — `answered` · `conversed` ·
+    #: `cannot_answer` · `failed` · `cancelled` (CA8). ``None`` while it runs.
+    outcome: str | None = None
     #: True once some library entry records this run as its origin.
     promoted: bool = False
     #: What the run spent, summed over its tasks — the journal row's second

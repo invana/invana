@@ -38,23 +38,8 @@ import {
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
 import type { Agent, AgentUpdate } from "@/types/work";
-import {
-	Button,
-	RecordHeader,
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "@invana/ui";
-import {
-	Archive,
-	MessageSquareText,
-	Pause,
-	Play,
-	Save,
-	Star,
-	Undo2,
-} from "lucide-react";
+import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
+import { Eye, Lock, Play, Save, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 
 /**
@@ -144,11 +129,11 @@ export function AgentDetail({
 		tab === "soul" ? (
 			<Button
 				size="sm"
-				variant="ghost"
+				variant="outline"
 				disabled={soulPreview.preview.isPending}
 				onClick={soulPreview.run}
 			>
-				<MessageSquareText />
+				<Eye />
 				{soulPreview.preview.isPending ? "Asking…" : "Preview"}
 			</Button>
 		) : null;
@@ -163,7 +148,6 @@ export function AgentDetail({
 		// grows to its content and the header and tabs scroll away with it.
 		<div className="flex h-full min-h-0 flex-col">
 			<RecordHeader
-				tone={agentTone(agent.status)}
 				crumbs={[agent.name]}
 				chips={
 					<>
@@ -172,10 +156,9 @@ export function AgentDetail({
 							{humanStatus(agent.status)}
 						</DetailStatus>
 						{isDefault ? <DetailStatus>Graph default</DetailStatus> : null}
-						<span className="text-sm text-muted-foreground">
-							v{agent.version}
-							{agent.lifetime === "ephemeral" ? " · ephemeral" : ""}
-						</span>
+						{agent.lifetime === "ephemeral" ? (
+							<DetailStatus>ephemeral</DetailStatus>
+						) : null}
 					</>
 				}
 				actions={
@@ -191,7 +174,7 @@ export function AgentDetail({
 									setSpecError(null);
 								}}
 							>
-								<Undo2 /> Discard
+								Discard
 							</Button>
 							{/* A spec that does not parse must not be savable: the
 							    structured fields still hold the last valid document, so
@@ -201,7 +184,8 @@ export function AgentDetail({
 								disabled={isSaving || specError !== null}
 								onClick={() => onSave(changes)}
 							>
-								<Save /> {isSaving ? "Saving…" : "Save"}
+								<Save />{" "}
+								{isSaving ? "Saving…" : tab === "soul" ? "Save soul" : "Save"}
 							</Button>
 						</>
 					) : (
@@ -219,11 +203,11 @@ export function AgentDetail({
 										variant="ghost"
 										onClick={agent.status === "paused" ? onResume : onPause}
 									>
-										{agent.status === "paused" ? <Play /> : <Pause />}
+										{agent.status === "paused" ? <Play /> : <Lock />}
 										{agent.status === "paused" ? "Resume" : "Pause"}
 									</Button>
 									<Button size="sm" variant="ghost" onClick={onRetire}>
-										<Archive /> Retire
+										Retire
 									</Button>
 								</>
 							)}
@@ -240,83 +224,83 @@ export function AgentDetail({
 				</p>
 			) : null}
 
-			<Tabs
-				size="sm"
-				value={tab}
-				onValueChange={(v) => setTab(v as AgentTab)}
-				className="flex min-h-0 flex-1 flex-col"
-			>
-				<TabsList className="w-full justify-start gap-1 px-4">
-					<TabsTrigger value="overview">Overview</TabsTrigger>
-					<TabsTrigger value="skills">Skills & callables</TabsTrigger>
-					<TabsTrigger value="thinking">Thinking</TabsTrigger>
-					<TabsTrigger value="soul">Soul</TabsTrigger>
-					<TabsTrigger value="activity">Activity</TabsTrigger>
-				</TabsList>
-
-				<TabsContent
-					value="overview"
-					className="@container min-h-0 flex-1 overflow-y-auto"
-				>
-					<AgentOverviewTab
-						username={username}
-						graphSlug={graphSlug}
-						agent={agent}
-						draft={draft}
-						onPatch={patch}
-						onGoTo={setTab}
-					/>
-				</TabsContent>
-				<TabsContent
-					value="skills"
-					className="@container min-h-0 flex-1 overflow-y-auto"
-				>
-					<AgentSkillsTab
-						username={username}
-						graphSlug={graphSlug}
-						agent={agent}
-						draft={draft}
-						onPatch={patch}
-						specError={specError}
-						onSpecError={setSpecError}
-						onOpenEnvelope={onOpenEnvelope}
-						onBindSkill={onBindSkill}
-						onUnbindSkill={onUnbindSkill}
-						bindError={bindError}
-						isBinding={isBinding}
-					/>
-				</TabsContent>
-				<TabsContent
-					value="thinking"
-					className="@container min-h-0 flex-1 overflow-y-auto"
-				>
-					<AgentThinkingTab agent={agent} draft={draft} onPatch={patch} />
-				</TabsContent>
-				<TabsContent
-					value="soul"
-					className="@container min-h-0 flex-1 overflow-y-auto"
-				>
-					<AgentSoulTab
-						agent={agent}
-						draft={draft}
-						onPatch={patch}
-						soulPreview={soulPreview}
-					/>
-				</TabsContent>
-				<TabsContent
-					value="activity"
-					className="@container min-h-0 flex-1 overflow-y-auto"
-				>
-					<AgentActivityTab
-						username={username}
-						graphSlug={graphSlug}
-						agent={agent}
-						draft={draft}
-						onPatch={patch}
-						onOpenLineage={onOpenLineage}
-					/>
-				</TabsContent>
-			</Tabs>
+			{/* The kit's underline tab strip, as drawn (AG38). Its card border is
+			    the page's own, so it is dropped here. */}
+			<TabbedPanel
+				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
+				bodyClassName="@container"
+				activeTab={tab}
+				onTabChange={(v) => setTab(v as AgentTab)}
+				tabs={[
+					{
+						value: "overview",
+						label: "Overview",
+						content: (
+							<AgentOverviewTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
+								draft={draft}
+								onPatch={patch}
+								onGoTo={setTab}
+							/>
+						),
+					},
+					{
+						value: "skills",
+						label: "Skills & callables",
+						content: (
+							<AgentSkillsTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
+								draft={draft}
+								onPatch={patch}
+								specError={specError}
+								onSpecError={setSpecError}
+								onOpenEnvelope={onOpenEnvelope}
+								onBindSkill={onBindSkill}
+								onUnbindSkill={onUnbindSkill}
+								bindError={bindError}
+								isBinding={isBinding}
+							/>
+						),
+					},
+					{
+						value: "thinking",
+						label: "Thinking",
+						content: (
+							<AgentThinkingTab agent={agent} draft={draft} onPatch={patch} />
+						),
+					},
+					{
+						value: "soul",
+						label: "Soul",
+						content: (
+							<AgentSoulTab
+								agent={agent}
+								draft={draft}
+								onPatch={patch}
+								soulPreview={soulPreview}
+							/>
+						),
+					},
+					{
+						value: "activity",
+						label: "Activity",
+						content: (
+							<AgentActivityTab
+								username={username}
+								graphSlug={graphSlug}
+								agent={agent}
+								draft={draft}
+								onPatch={patch}
+								onOpenLineage={onOpenLineage}
+							/>
+						),
+					},
+				]}
+			/>
 		</div>
 	);
 }

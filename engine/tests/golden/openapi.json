@@ -12960,6 +12960,17 @@
             ],
             "title": "Kind"
           },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
           "plan_origin": {
             "anyOf": [
               {

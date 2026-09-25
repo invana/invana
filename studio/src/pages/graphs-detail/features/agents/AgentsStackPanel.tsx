@@ -22,7 +22,13 @@
 
 import { useLensesQuery } from "@/hooks/queries/useGovern";
 import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
-import { agentsDrawerSection } from "@/pages/graphs-detail/features/agents/AgentsDrawer";
+import { useAgentsQuery } from "@/hooks/queries/useWork";
+import {
+	type AgentFilters,
+	NO_AGENT_FILTERS,
+	agentsDrawerSection,
+	visibleAgents,
+} from "@/pages/graphs-detail/features/agents/AgentsDrawer";
 import { llmsDrawerSection } from "@/pages/graphs-detail/features/agents/LlmsDrawer";
 import { useTaskDrawerUi } from "@/pages/graphs-detail/shared/TaskDrawer";
 import {
@@ -31,7 +37,7 @@ import {
 } from "@/pages/graphs-detail/shell/useAgentsPanel";
 import type { AgentEdge } from "@/types/work";
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface AgentsStackPanelProps {
 	username: string;
@@ -62,6 +68,17 @@ export function AgentsStackPanel({
 	const ui = useTaskDrawerUi();
 	const providers = useLLMProvidersQuery(username, graphSlug);
 	const lenses = useLensesQuery(username, graphSlug);
+	// Held here, not in the list: the funnel in the drawer's header and the
+	// rows under it read the same filters, and the count beside the title is
+	// the rows they leave (AG36).
+	const [filters, setFilters] = useState<AgentFilters>(NO_AGENT_FILTERS);
+	const agentList = useAgentsQuery(username, graphSlug, {
+		includeEphemeral: true,
+		includeRetired: true,
+	});
+	const count = agentList.data
+		? visibleAgents(agentList.data.items, filters).length
+		: undefined;
 
 	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
 	// only (G35) — after that it is the reader's. **A Graph has many agents and
@@ -121,6 +138,9 @@ export function AgentsStackPanel({
 			sections={[
 				agentsDrawerSection({
 					ui,
+					filters,
+					onFilters: setFilters,
+					count,
 					username,
 					graphSlug,
 					onOpenAgentPage,

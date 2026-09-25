@@ -943,6 +943,9 @@ async def list_runs(
             "steps_done": (progress.get(r.id) or {}).get("done", 0),
             "steps_total": (progress.get(r.id) or {}).get("total", 0),
             "served": verdicts.get(r.id),
+            # How a reader would say it ended — `answered` · `conversed` ·
+            # `cannot_answer` · `failed` · `cancelled` — once it has (CA8).
+            "outcome": r.outcome,
             "promoted": r.id in promoted,
             # A root can spend tokens of its own as well as through its tasks.
             "tokens_in": (r.tokens_in or 0) + tokens.get(r.id, [0, 0])[0],

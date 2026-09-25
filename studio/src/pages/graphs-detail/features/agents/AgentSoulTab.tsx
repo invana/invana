@@ -30,7 +30,7 @@ import { useState } from "react";
 
 /** Two columns at 760px of page, one below — a container query, not the viewport. */
 export const TWO_COLUMNS =
-	"grid @min-[760px]:grid-cols-[340px_minmax(0,1fr)] @min-[760px]:divide-x divide-border";
+	"grid items-start gap-2.5 @min-[760px]:grid-cols-[340px_minmax(0,1fr)]";
 
 /** A question most agents get — the author changes it to one this agent gets. */
 const SAMPLE_ASK = "What can you tell me about this graph?";
@@ -84,11 +84,15 @@ export function AgentSoulTab({
 	const chars = draft.soul.trim().length;
 
 	return (
-		<>
+		<div className="flex flex-col gap-2.5 p-3.5">
 			{/* The dials beside the Markdown, as drawn, when the page is wide
 			    enough for both; stacked when `rightSection` takes the room. */}
 			<div className={TWO_COLUMNS}>
-				<PanelSection title="Voice" hint="humour is always off in a refusal">
+				<PanelSection
+					card
+					title="Voice"
+					hint="humour is always off in a refusal"
+				>
 					<PropertyList labelWidth={84}>
 						{DIALS.map((dial) => (
 							<PropertyRow key={dial.key} label={dial.label}>
@@ -108,6 +112,7 @@ export function AgentSoulTab({
 				</PanelSection>
 
 				<PanelSection
+					card
 					title="Soul"
 					hint={
 						chars
@@ -130,7 +135,11 @@ export function AgentSoulTab({
 				</PanelSection>
 			</div>
 
-			<PanelSection title="Preview" hint="one ask, current voice and the draft">
+			<PanelSection
+				card
+				title="Preview"
+				hint="one ask, current voice and the draft"
+			>
 				<Input
 					aria-label="Sample ask"
 					value={ask}
@@ -169,6 +178,6 @@ export function AgentSoulTab({
 					</div>
 				) : null}
 			</PanelSection>
-		</>
+		</div>
 	);
 }

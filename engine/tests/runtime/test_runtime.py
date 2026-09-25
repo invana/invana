@@ -202,6 +202,9 @@ class TestRuntime:
         assert reply.status.value == "ok" and reply.content == "Doing well."
         kinds = [e.kind for e in await replay(session, run_id=th.id, after=0)]
         assert "cannot_answer" not in kinds and kinds[-1] == "run.done"
+        # The run list says how it ended, beside its status (CA8 · AG38).
+        listed, _ = await run_services.list_runs(session, graph_id=graph.id, interactive=True)
+        assert {i["id"]: i["outcome"] for i in listed}[th.id] == "conversed"
 
     async def test_a_cannot_answer_is_still_a_cannot_answer(self, session, session_factory, graph, user, stub_tasks):
         runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")

@@ -1,4 +1,4 @@
-import { SectionHeader } from "@invana/ui";
+import { Card, Eyebrow, SectionHeader } from "@invana/ui";
 import type { ReactNode } from "react";
 
 /**
@@ -18,13 +18,37 @@ export function PanelSection({
 	title,
 	hint,
 	action,
+	card,
 	children,
 }: {
 	title: ReactNode;
 	hint?: ReactNode;
 	action?: ReactNode;
+	/** A bordered card with an eyebrow title, as a page draws its sections —
+	 *  the agent's page (AG38). Without it, a band in a scrolling panel. */
+	card?: boolean;
 	children: ReactNode;
 }) {
+	if (card) {
+		return (
+			<Card className="rounded-none shadow-none">
+				<SectionHeader
+					title={
+						<span className="flex min-w-0 items-baseline gap-2">
+							<Eyebrow className="shrink-0">{title}</Eyebrow>
+							{hint != null ? (
+								<span className="min-w-0 truncate font-normal text-sm text-muted-foreground">
+									{hint}
+								</span>
+							) : null}
+						</span>
+					}
+					actions={action}
+				/>
+				<div className="px-3 py-2">{children}</div>
+			</Card>
+		);
+	}
 	return (
 		<section className="border-b last:border-b-0">
 			<SectionHeader

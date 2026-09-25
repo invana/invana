@@ -21,9 +21,11 @@ export function AgentThinkingTab({
 	draft: AgentDraft;
 	onPatch: (next: Partial<AgentDraft>) => void;
 }) {
+	// Focus beside effort, as drawn; the stance takes the second column when
+	// stances ship (AG27 · AG38).
 	return (
-		<>
-			<PanelSection title="Focus" hint="after the Graph's instructions">
+		<div className="grid items-start gap-2.5 p-3.5 @[760px]:grid-cols-2">
+			<PanelSection card title="Focus" hint="after the Graph's instructions">
 				<Textarea
 					aria-label="Focus"
 					value={draft.instructions}
@@ -33,7 +35,7 @@ export function AgentThinkingTab({
 				/>
 			</PanelSection>
 
-			<PanelSection title="Effort" hint="empty means the default applies">
+			<PanelSection card title="Effort">
 				{/* The placeholder is what a run reads where this agent is silent —
 				    the default, or a number still carried on the old columns (EB11). */}
 				<CeilingsTable
@@ -43,6 +45,6 @@ export function AgentThinkingTab({
 					onChange={(effort) => onPatch({ effort })}
 				/>
 			</PanelSection>
-		</>
+		</div>
 	);
 }

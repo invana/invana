@@ -9,7 +9,6 @@
  */
 
 import {
-	useAgentActivityQuery,
 	useAgentLineageQuery,
 	useAgentMetersQuery,
 	useAgentSessionsQuery,
@@ -21,11 +20,7 @@ import {
 	type AgentDraft,
 	usd,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
-import {
-	verdictLabel,
-	verdictTone,
-} from "@/pages/graphs-detail/shared/statusTone";
+import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
 import type { Agent, AgentMeters, TaskRunSummary } from "@/types/work";
 import { PanelSection } from "@/ui/PanelSection";
 import {
@@ -36,20 +31,34 @@ import {
 	PropertyList,
 	PropertyRow,
 	Spinner,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from "@invana/ui";
+import { useState } from "react";
 
-/** `template nl-compare@3 · 7 steps · 1 replan` — where the plan came from. */
-function planProvenance(plan: TaskRunSummary): string {
-	const source = plan.plan_origin ?? "no plan recorded";
-	const bits = [
-		source.startsWith("template:")
-			? `template ${source.slice("template:".length)}`
-			: source,
-		`${plan.step_count} step${plan.step_count === 1 ? "" : "s"}`,
-	];
-	if (plan.replans)
-		bits.push(`${plan.replans} replan${plan.replans === 1 ? "" : "s"}`);
-	return bits.join(" · ");
+/** How a run ended, in the reader's words and tone (CA8). */
+function outcomeOf(run: TaskRunSummary): { text: string; tone: string } {
+	if (!run.finished_at && run.status !== "failed" && run.status !== "cancelled")
+		return {
+			text: run.status === "queued" ? "queued" : "running",
+			tone: "text-info",
+		};
+	switch (run.outcome) {
+		case "answered":
+			return { text: "answered", tone: "text-success" };
+		case "conversed":
+			return { text: "small talk", tone: "text-muted-foreground" };
+		case "cannot_answer":
+			return { text: "cannot answer", tone: "text-warning" };
+		case "failed":
+			return { text: "failed", tone: "text-destructive" };
+		default:
+			return { text: run.outcome ?? run.status, tone: "text-muted-foreground" };
+	}
 }
 
 const share = (used: number, cap?: number | null) =>
@@ -127,25 +136,46 @@ export function AgentActivityTab({
 	});
 	const sessions = useAgentSessionsQuery(username, graphSlug, agent.id);
 	const lineage = useAgentLineageQuery(username, graphSlug, agent.id);
-	const events = useAgentActivityQuery(username, graphSlug, agent.id);
+	const runsPanel = useSettingsPanel();
+	// Limits read as text until Edit, as drawn (AG38).
+	const [editingLimits, setEditingLimits] = useState(false);
 	const m = meters.data;
 	const children = (lineage.data?.nodes ?? []).filter(
 		(n) => n.kind === "agent" && n.id !== agent.id,
 	);
 	const mine = sessions.data?.items ?? [];
+	// What a run reads where the agent is silent: the meters carry every
+	// effective ceiling (AG31), so the page shows the Graph's number, not a dash.
+	const ceilings = m
+		? Object.fromEntries(
+				Object.entries(m).filter(
+					(e): e is [string, number] =>
+						e[0].startsWith("max_") && typeof e[1] === "number",
+				),
+			)
+		: undefined;
 
 	return (
-		<>
-			<PanelSection title="Now" hint="each beside the limit that caps it">
-				{m ? <Meters m={m} /> : <Spinner />}
-			</PanelSection>
+		<div className="flex flex-col gap-2.5 p-3.5">
+			{m ? <Meters m={m} /> : <Spinner />}
 
-			{/* The artboard's two columns when the page is wide enough: what it
-			    did on the left, what caps it and who asks through it on the
-			    right. One column when `rightSection` takes the room. */}
-			<div className="grid @min-[760px]:grid-cols-2 @min-[760px]:divide-x divide-border">
-				<div className="min-w-0">
-					<PanelSection title="Runs" hint="what this agent has run">
+			{/* What it did on the left, what caps it and who asks through it on
+			    the right; one column when `rightSection` takes the room. */}
+			<div className="grid items-start gap-2.5 @[760px]:grid-cols-[5fr_4fr]">
+				<div className="flex min-w-0 flex-col gap-2.5">
+					<PanelSection
+						card
+						title="Runs"
+						action={
+							<Button
+								size="sm"
+								variant="ghost"
+								onClick={() => runsPanel.setSection("runs")}
+							>
+								Open in Runs
+							</Button>
+						}
+					>
 						{runs.isLoading ? (
 							<Spinner />
 						) : !runs.data?.items.length ? (
@@ -153,53 +183,53 @@ export function AgentActivityTab({
 								This agent has not run yet.
 							</p>
 						) : (
-							<ul className="space-y-1.5">
-								{runs.data.items.map((plan) => (
-									<li key={plan.id} className="flex items-start gap-2">
-										<span className="min-w-0 flex-1">
-											<span className="block truncate">
-												{plan.body ?? plan.task_title ?? plan.workflow_key}
-											</span>
-											<span className="block truncate text-sm text-muted-foreground">
-												<span className="font-mono">{plan.id.slice(0, 4)}</span>{" "}
-												· {planProvenance(plan)}
-												{plan.cost_usd != null
-													? ` · ${usd(plan.cost_usd)}`
-													: ""}
-												{plan.queued_at
-													? ` · ${formatRelativeTime(new Date(plan.queued_at))}`
-													: ""}
-											</span>
-										</span>
-										{/* Absent `served` means the run never reached Verify —
-									    drawn as the status, because "nobody asked" and "asked
-									    and failed" are different facts. */}
-										<DetailStatus
-											tone={
-												plan.served
-													? verdictTone(plan.served)
-													: plan.status === "failed"
-														? "error"
-														: "muted"
-											}
-										>
-											{plan.served ? verdictLabel(plan.served) : plan.status}
-										</DetailStatus>
-									</li>
-								))}
-							</ul>
+							<Table bordered={false} density="compact">
+								<TableHeader>
+									<TableRow>
+										<TableHead>Run</TableHead>
+										<TableHead>Ask</TableHead>
+										<TableHead>Outcome</TableHead>
+										<TableHead>Cost</TableHead>
+										<TableHead>When</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{runs.data.items.map((run) => {
+										const outcome = outcomeOf(run);
+										return (
+											<TableRow key={run.id}>
+												<TableCell className="font-mono">
+													{run.id.slice(0, 4)}
+												</TableCell>
+												<TableCell className="w-full max-w-0 truncate">
+													{run.body ?? run.task_title ?? run.workflow_key}
+												</TableCell>
+												<TableCell
+													className={`whitespace-nowrap ${outcome.tone}`}
+												>
+													{outcome.text}
+												</TableCell>
+												<TableCell className="font-mono">
+													{run.cost_usd != null ? usd(run.cost_usd) : "—"}
+												</TableCell>
+												<TableCell className="whitespace-nowrap text-muted-foreground">
+													{run.queued_at
+														? formatRelativeTime(new Date(run.queued_at))
+														: "—"}
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
 						)}
 					</PanelSection>
 
 					<PanelSection
+						card
 						title="Lineage"
 						action={
-							<Button
-								variant="link"
-								size="sm"
-								className="h-auto p-0"
-								onClick={onOpenLineage}
-							>
+							<Button size="sm" variant="ghost" onClick={onOpenLineage}>
 								Open lineage
 							</Button>
 						}
@@ -232,54 +262,42 @@ export function AgentActivityTab({
 							</PropertyRow>
 						</PropertyList>
 					</PanelSection>
-
-					<PanelSection title="Events" hint="newest first">
-						{events.isLoading ? (
-							<Spinner />
-						) : events.data?.items.length ? (
-							<ul className="space-y-1">
-								{events.data.items.slice(0, 20).map((e) => (
-									<li key={e.id} className="flex items-baseline gap-2">
-										<span className="min-w-0 flex-1 truncate font-mono text-sm">
-											{e.action}
-											{e.target_kind ? (
-												<span className="text-muted-foreground">
-													{" "}
-													· {e.target_kind}
-												</span>
-											) : null}
-										</span>
-										<span className="shrink-0 text-sm text-muted-foreground">
-											{formatRelativeTime(new Date(e.created_at))}
-										</span>
-									</li>
-								))}
-							</ul>
-						) : (
-							<p className="text-muted-foreground">Nothing recorded yet.</p>
-						)}
-					</PanelSection>
 				</div>
-				<div className="min-w-0">
+
+				<div className="flex min-w-0 flex-col gap-2.5">
 					<PanelSection
+						card
 						title="Limits"
-						hint="empty means the Graph default applies"
+						action={
+							<Button
+								size="sm"
+								variant="ghost"
+								onClick={() => setEditingLimits(!editingLimits)}
+							>
+								{editingLimits ? "Done" : "Edit"}
+							</Button>
+						}
 					>
 						<Eyebrow>Spend</Eyebrow>
 						<CeilingsTable
 							group="budget"
 							values={draft.budget}
+							effective={ceilings}
+							readOnly={!editingLimits}
 							onChange={(budget) => onPatch({ budget })}
 						/>
 						<Eyebrow className="mt-2">Reach</Eyebrow>
 						<CeilingsTable
 							group="reach"
 							values={draft.budget}
+							effective={ceilings}
+							readOnly={!editingLimits}
 							onChange={(budget) => onPatch({ budget })}
 						/>
 					</PanelSection>
 
 					<PanelSection
+						card
 						title="Sessions"
 						hint={
 							m
@@ -312,6 +330,6 @@ export function AgentActivityTab({
 					</PanelSection>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

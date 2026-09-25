@@ -548,8 +548,8 @@ the Skills drawer**, not a rail item of its own ([8.1 EV6](modules/memory/featur
 
 ## Beyond the 42 · The Agent Page
 
-Five artboards on their own canvas — *The Agent Page* (`https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza`) — one per tab of the
-agent's page ([AG23](modules/agents/features/author-an-agent.md#decisions)). Generated from
+Six artboards on their own canvas — *The Agent Page* (`https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza`) — one per tab of the
+agent's page ([AG23](modules/agents/features/author-an-agent.md#decisions)), and the list's quick look ([AG36](modules/agents/features/author-an-agent.md#decisions)). Generated from
 `.design/canvas-agent-page/agent.py` on the assistant-speaks kit. The name is the file, the frame title and this row.
 
 | Artboard | Feature | Draws | API | Studio | Shell |
@@ -559,6 +559,7 @@ agent's page ([AG23](modules/agents/features/author-an-agent.md#decisions)). Gen
 | `agents.agents.detail.thinking` | 5.2 · 5.3 | Thinking — focus, effort and a default stance | 🟡 | ✅ | ✅ |
 | `agents.agents.detail.soul.dials` | 5.8 | Soul — the voice dials beside the Markdown | ✅ | ✅ | ✅ |
 | `agents.agents.detail.activity` | 5.3 · 5.5 · 5.6 · 5.7 | Activity — the meters, the limits that cap them, runs, sessions and lineage | ✅ | ✅ | ✅ |
+| `agents.agents.list.selected` | 5.2 | The list, one agent selected — a quick look under it, and Open | ✅ | ✅ | ✅ |
 
 **Studio** opens the page as `agent:<id>` in `mainSection` beside the list, as drawn ([AG34](modules/agents/features/author-an-agent.md#decisions)). Soul and Activity take the artboards' two columns when the page is at least 760px wide, and stack when `rightSection` takes the room. Thinking has no default stance until stances ship ([AG27](modules/agents/features/author-an-agent.md#decisions)) — by decision, so its Studio is ✅ and its API 🟡.
 

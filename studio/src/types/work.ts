@@ -570,6 +570,8 @@ export interface TaskRunSummary {
 	steps_done: number;
 	steps_total: number;
 	served: "yes" | "partial" | "no" | null;
+	/** How it ended, once it has — answered · conversed · cannot_answer · failed · cancelled. */
+	outcome?: string | null;
 	promoted: boolean;
 	/** What the run spent, summed over its tasks (SR45). */
 	tokens_in: number;

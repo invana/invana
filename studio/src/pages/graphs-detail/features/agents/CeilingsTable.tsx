@@ -15,9 +15,11 @@
  * something dispatches a `map_over`. A table that printed all ten the same way
  * would be telling the reader that ten numbers protect them when four do.
  *
- * **A table, not a form of ten inputs.** The value is editable in place — a
- * ceiling is a number somebody sets — but the row's other two columns are what
- * makes the number mean anything, and a row of bare inputs carries neither.
+ * **Drawn as the page draws it (AG38):** each row is the key a reader will meet
+ * in a plan's refusal (`max_steps`), the number, and what it bounds. A ceiling
+ * that is only drawn against, or that nothing reads yet, says so after what it
+ * bounds — the one column the page does not draw is folded into the words.
+ * The number is text until the section is edited, then an input.
  *
  * Empty is *the default applies*, never zero: a blank ceiling is the Graph's,
  * and `0` would be an agent that may not take a step.
@@ -28,8 +30,7 @@
  */
 
 import { Input } from "@invana/forms";
-import { type ColumnDef, DataTable } from "@invana/tables";
-import { useMemo } from "react";
+import { Table, TableBody, TableCell, TableRow } from "@invana/ui";
 
 /** How a ceiling is held, in the reader's words. */
 type Enforcement = "admission" | "validation" | "drawn" | "unread";
@@ -40,96 +41,87 @@ export type CeilingGroup = "effort" | "budget" | "reach";
 interface Ceiling {
 	key: string;
 	group: CeilingGroup;
-	label: string;
 	/** What the number bounds — one short phrase, not a sentence. */
 	bounds: string;
 	enforcement: Enforcement;
+	/** Money reads as money. */
+	usd?: boolean;
 }
 
 /**
- * Every key of `effective_budget`, in the order a run spends them: the shape of
- * one run, then what it may spawn, then what it may spend, then what it may
- * hold at once. A ceiling the record carries and the screen does not draw is
- * one nobody can work within (EB6).
+ * Every key of `effective_budget` and `effective_effort`, each group in the
+ * order the page lists it. A ceiling the record carries and the screen does not
+ * draw is one nobody can work within (EB6).
  */
 const CEILINGS: readonly Ceiling[] = [
 	{
 		key: "max_steps",
 		group: "effort",
-		label: "steps",
-		bounds: "nodes one run may execute",
+		bounds: "steps in one plan",
 		enforcement: "validation",
 	},
 	{
 		key: "max_replans",
 		group: "effort",
-		label: "replans",
-		bounds: "times a plan may be rewritten mid-run",
+		bounds: "times it may re-plan after verify",
 		enforcement: "validation",
 	},
 	{
 		key: "max_clarifications",
 		group: "effort",
-		label: "clarifications",
 		bounds: "questions per run · 0 = never asks",
 		enforcement: "validation",
 	},
 	{
+		key: "max_cost_usd_month",
+		group: "budget",
+		bounds: "a calendar month",
+		enforcement: "drawn",
+		usd: true,
+	},
+	{
+		key: "max_cost_usd_run",
+		group: "budget",
+		bounds: "the most the work may set",
+		enforcement: "drawn",
+		usd: true,
+	},
+	{
+		key: "max_tokens",
+		group: "budget",
+		bounds: "one run",
+		enforcement: "drawn",
+	},
+	{
+		key: "max_concurrent_runs",
+		group: "reach",
+		bounds: "runs at once",
+		enforcement: "admission",
+	},
+	{
+		key: "max_fanout",
+		group: "reach",
+		bounds: "lanes in one map",
+		enforcement: "unread",
+	},
+	{
 		key: "max_children",
 		group: "reach",
-		label: "children",
-		bounds: "agents this one may spawn",
+		bounds: "agents spawned per run",
 		enforcement: "validation",
 	},
 	{
 		key: "max_depth",
 		group: "reach",
-		label: "depth",
-		bounds: "how far delegation may nest",
+		bounds: "levels of delegation",
 		enforcement: "validation",
-	},
-	{
-		key: "max_tokens",
-		group: "budget",
-		label: "tokens",
-		bounds: "in + out across the run",
-		enforcement: "drawn",
-	},
-	{
-		key: "max_cost_usd_run",
-		group: "budget",
-		label: "$ per run",
-		bounds: "one run's spend",
-		enforcement: "drawn",
-	},
-	{
-		key: "max_cost_usd_month",
-		group: "budget",
-		label: "$ this month",
-		bounds: "spend across the month",
-		enforcement: "drawn",
-	},
-	{
-		key: "max_fanout",
-		group: "reach",
-		label: "fan-out",
-		bounds: "lanes one map_over may open",
-		enforcement: "unread",
-	},
-	{
-		key: "max_concurrent_runs",
-		group: "reach",
-		label: "concurrent runs",
-		bounds: "runs this agent may hold at once",
-		enforcement: "admission",
 	},
 ];
 
-const ENFORCEMENT_WORDS: Record<Enforcement, string> = {
-	admission: "at admission",
-	validation: "before dispatch",
-	drawn: "declared · drawn against",
-	unread: "declared · nothing reads it yet",
+/** Said only where the number does not stop a run by itself (EB7). */
+const NOT_ENFORCED: Partial<Record<Enforcement, string>> = {
+	drawn: "drawn against",
+	unread: "nothing reads it yet",
 };
 
 export interface CeilingsTableProps {
@@ -137,94 +129,84 @@ export interface CeilingsTableProps {
 	/** The agent's own `effort` or `budget` — the keys somebody set, not the defaults. */
 	values: Record<string, number>;
 	onChange: (values: Record<string, number>) => void;
-	/** What a run reads where `values` is silent — drawn as the placeholder. */
+	/** What a run reads where `values` is silent — drawn in its place. */
 	effective?: Record<string, number>;
+	/** Text, not inputs — the section is not being edited. */
 	readOnly?: boolean;
+}
+
+function show(c: Ceiling, v: number | undefined): string {
+	if (v == null) return "—";
+	if (c.usd) return `$${v.toFixed(2)}`;
+	return v >= 1000 && v % 1000 === 0 ? `${v / 1000}k` : String(v);
 }
 
 export function CeilingsTable({
 	group,
-	values: budget,
+	values,
 	onChange,
 	effective,
 	readOnly,
 }: CeilingsTableProps) {
-	const columns = useMemo<ColumnDef<Ceiling>[]>(
-		() => [
-			{
-				id: "ceiling",
-				header: "Ceiling",
-				enableSorting: false,
-				cell: ({ row }) => (
-					<span className="flex min-w-0 flex-col">
-						<span className="font-medium">{row.original.label}</span>
-						<span className="truncate text-sm text-muted-foreground">
-							{row.original.bounds}
-						</span>
-					</span>
-				),
-			},
-			{
-				id: "value",
-				header: "Value",
-				enableSorting: false,
-				cell: ({ row }) => (
-					<Input
-						type="number"
-						min={0}
-						aria-label={row.original.label}
-						// Empty is *the Graph's default applies* — clearing removes the
-						// key rather than writing a zero nobody chose.
-						value={budget[row.original.key] ?? ""}
-						placeholder={
-							effective?.[row.original.key] != null
-								? String(effective[row.original.key])
-								: "—"
-						}
-						disabled={readOnly}
-						className="h-7 w-20"
-						onChange={(e) => {
-							const next = { ...budget };
-							if (e.target.value === "") delete next[row.original.key];
-							else next[row.original.key] = Number(e.target.value);
-							onChange(next);
-						}}
-					/>
-				),
-			},
-			{
-				id: "enforced",
-				header: "Enforced",
-				enableSorting: false,
-				cell: ({ row }) => (
-					<span
-						className={
-							row.original.enforcement === "unread"
-								? "text-sm text-warning"
-								: "text-sm text-muted-foreground"
-						}
-					>
-						{ENFORCEMENT_WORDS[row.original.enforcement]}
-					</span>
-				),
-			},
-		],
-		[budget, onChange, effective, readOnly],
-	);
-	const rows = useMemo(
-		() => CEILINGS.filter((c) => c.group === group),
-		[group],
-	);
-
+	const rows = CEILINGS.filter((c) => c.group === group);
 	return (
-		<DataTable
-			columns={columns}
-			data={rows}
-			enableSorting={false}
-			enablePagination={false}
-			// A 420px drawer has no room for a column chooser over ten rows the
-			// reader did not choose the shape of.
-			enableColumnVisibility={false}
-		/>
+		<Table bordered={false} density="compact">
+			<TableBody>
+				{rows.map((c) => {
+					const own = values[c.key];
+					const runs = own ?? effective?.[c.key];
+					return (
+						<TableRow key={c.key}>
+							<TableCell className="w-0 whitespace-nowrap font-mono">
+								{c.key}
+							</TableCell>
+							<TableCell className="w-0 whitespace-nowrap font-mono">
+								{readOnly ? (
+									<span
+										className={
+											own == null ? "text-muted-foreground" : undefined
+										}
+									>
+										{show(c, runs)}
+									</span>
+								) : (
+									<Input
+										type="number"
+										min={0}
+										aria-label={c.key}
+										// Empty is *the default applies* — clearing removes the key
+										// rather than writing a zero nobody chose.
+										value={own ?? ""}
+										placeholder={runs != null ? String(runs) : "—"}
+										className="h-7 w-20 text-right"
+										onChange={(e) => {
+											const next = { ...values };
+											if (e.target.value === "") delete next[c.key];
+											else next[c.key] = Number(e.target.value);
+											onChange(next);
+										}}
+									/>
+								)}
+							</TableCell>
+							<TableCell>
+								{c.bounds}
+								{NOT_ENFORCED[c.enforcement] ? (
+									<span
+										className={
+											c.enforcement === "unread"
+												? "text-warning"
+												: "text-muted-foreground"
+										}
+									>
+										{" "}
+										· {NOT_ENFORCED[c.enforcement]}
+									</span>
+								) : null}
+							</TableCell>
+						</TableRow>
+					);
+				})}
+			</TableBody>
+		</Table>
 	);
 }

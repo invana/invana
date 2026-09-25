@@ -25,6 +25,8 @@ import { PanelSection } from "@/ui/PanelSection";
 import { Textarea } from "@invana/forms";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {
+	Alert,
+	Badge,
 	BoundChip,
 	Button,
 	DropdownMenu,
@@ -34,8 +36,11 @@ import {
 	Spinner,
 	cn,
 } from "@invana/ui";
-import { Plus } from "lucide-react";
+import { Ban, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+
+/** Chips a Needs cell draws before folding the rest into `+N`. */
+const NEEDS_SHOWN = 3;
 
 export function AgentSkillsTab({
 	username,
@@ -118,11 +123,11 @@ export function AgentSkillsTab({
 				header: "Skill",
 				enableSorting: false,
 				cell: ({ row }) => (
-					<span className="flex min-w-0 flex-col">
-						<span className="truncate font-medium">{row.original.name}</span>
-						<span className="truncate text-sm text-muted-foreground">
-							{row.original.when_to_use}
-						</span>
+					<span
+						className="truncate font-medium"
+						title={row.original.when_to_use || undefined}
+					>
+						{row.original.name}
 					</span>
 				),
 			},
@@ -143,17 +148,29 @@ export function AgentSkillsTab({
 				enableSorting: false,
 				cell: ({ row }) => {
 					const missing = new Set(row.original.missing);
-					return (
-						<span className="flex flex-wrap gap-x-1.5 font-mono text-sm">
-							{row.original.uses.map((u) => (
-								<span key={u} className="text-muted-foreground">
-									uses {u}
-								</span>
-							))}
-							{row.original.needs.map((n) => (
-								<span
+					// What it lacks first, so the chips that matter never fold
+					// into the `+N` (AG38).
+					const needs = [
+						...row.original.needs.filter((n) => missing.has(n)),
+						...row.original.needs.filter((n) => !missing.has(n)),
+					];
+					const chips = [
+						...row.original.uses.map((u) => `uses ${u}`),
+						...needs,
+					];
+					const shown = chips.slice(0, NEEDS_SHOWN);
+					return chips.length ? (
+						<span className="flex flex-wrap gap-1">
+							{shown.map((n) => (
+								<Badge
 									key={n}
-									className={missing.has(n) ? "text-destructive" : undefined}
+									variant="outline"
+									tone="muted"
+									size="xs"
+									className={cn(
+										"font-mono font-normal",
+										missing.has(n) && "border-destructive/50 text-destructive",
+									)}
 									title={
 										missing.has(n)
 											? "This envelope does not allow it"
@@ -161,12 +178,22 @@ export function AgentSkillsTab({
 									}
 								>
 									{n}
-								</span>
+								</Badge>
 							))}
-							{row.original.needs.length ? null : (
-								<span className="text-muted-foreground">—</span>
-							)}
+							{chips.length > shown.length ? (
+								<Badge
+									variant="outline"
+									tone="muted"
+									size="xs"
+									className="font-mono font-normal"
+									title={chips.slice(NEEDS_SHOWN).join(" · ")}
+								>
+									+{chips.length - shown.length}
+								</Badge>
+							) : null}
 						</span>
+					) : (
+						<span className="text-muted-foreground">—</span>
 					);
 				},
 			},
@@ -175,32 +202,36 @@ export function AgentSkillsTab({
 				header: "Offered / applied",
 				enableSorting: false,
 				cell: ({ row }) =>
-					row.original.enough_to_read ? (
+					row.original.missing.length && !row.original.offered ? (
+						<span className="text-destructive">not offered</span>
+					) : row.original.enough_to_read ? (
 						<span className="font-mono">
 							{row.original.offered.toLocaleString()} /{" "}
 							{row.original.applied.toLocaleString()}
 						</span>
 					) : (
-						<span className="text-muted-foreground">too few to read</span>
+						<span className="text-muted-foreground">no data yet</span>
 					),
 			},
 			{
 				id: "unbind",
 				header: "",
 				enableSorting: false,
-				cell: ({ row }) => (
-					<Button
-						size="sm"
-						variant="ghost"
-						disabled={isBinding}
-						onClick={() => {
-							setRefusedFor(row.original.skill_id);
-							onUnbindSkill(row.original.skill_id);
-						}}
-					>
-						Unbind
-					</Button>
-				),
+				// A skill that lacks a callable is unbound from its band below.
+				cell: ({ row }) =>
+					row.original.missing.length ? null : (
+						<Button
+							size="sm"
+							variant="ghost"
+							disabled={isBinding}
+							onClick={() => {
+								setRefusedFor(row.original.skill_id);
+								onUnbindSkill(row.original.skill_id);
+							}}
+						>
+							Unbind
+						</Button>
+					),
 			},
 		],
 		[isBinding, onUnbindSkill],
@@ -243,16 +274,14 @@ export function AgentSkillsTab({
 				enableSorting: false,
 				cell: ({ row }) =>
 					row.original.needed_by.length ? (
-						<span className="flex flex-wrap gap-x-2 text-sm">
-							{row.original.needed_by.map((ref) => (
-								<span key={ref} className="whitespace-nowrap">
-									{nameOf.get(ref) ?? ref}
-								</span>
-							))}
+						<span>
+							{row.original.needed_by
+								.map((ref) => nameOf.get(ref) ?? ref)
+								.join(" · ")}
 						</span>
 					) : (
 						// Allowed, and a candidate for tightening (EB5).
-						<span className="text-muted-foreground">nothing bound</span>
+						<span className="text-warning">nothing bound</span>
 					),
 			},
 		],
@@ -263,10 +292,10 @@ export function AgentSkillsTab({
 	const lacking = skills.filter((s) => s.missing.length);
 
 	return (
-		<>
+		<div className="flex flex-col gap-2.5 p-3.5">
 			<PanelSection
+				card
 				title="Skills"
-				hint="how it approaches work"
 				action={
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
@@ -312,6 +341,8 @@ export function AgentSkillsTab({
 						enableSorting={false}
 						enablePagination={false}
 						enableColumnVisibility={false}
+						bordered={false}
+						density="compact"
 					/>
 				) : (
 					<p className="text-muted-foreground">
@@ -319,19 +350,36 @@ export function AgentSkillsTab({
 					</p>
 				)}
 				{lacking.map((s) => (
-					<p key={s.skill_id} className="mt-1.5 text-sm text-destructive">
-						{s.name} needs{" "}
-						<span className="font-mono">{s.missing.join(" and ")}</span>, which
-						this envelope does not allow.{" "}
+					<Alert
+						key={s.skill_id}
+						variant="destructive"
+						className="mt-1.5 flex items-center gap-2 rounded-none bg-destructive/5 px-3 py-2"
+					>
+						<Ban className="size-3.5 shrink-0" />
+						<span className="min-w-0 flex-1 text-foreground">
+							<span className="font-medium">{s.name}</span> needs{" "}
+							<span className="font-mono">{s.missing.join(" and ")}</span>,
+							which this envelope does not allow
+						</span>
 						<Button
-							variant="link"
 							size="sm"
-							className="h-auto p-0"
+							variant="outline"
 							onClick={() => setEditing(true)}
 						>
 							Edit envelope
 						</Button>
-					</p>
+						<Button
+							size="sm"
+							variant="ghost"
+							disabled={isBinding}
+							onClick={() => {
+								setRefusedFor(s.skill_id);
+								onUnbindSkill(s.skill_id);
+							}}
+						>
+							Unbind
+						</Button>
+					</Alert>
 				))}
 				{refusal && refusedSkill ? (
 					<BindRefusalCard
@@ -348,10 +396,13 @@ export function AgentSkillsTab({
 			</PanelSection>
 
 			<PanelSection
+				card
 				title="Callables"
-				hint={`${allow.size} of ${allKeys.length} · what its envelope lets it run`}
 				action={
 					<span className="flex items-center gap-1">
+						<span className="text-sm text-muted-foreground">
+							{allow.size} of {allKeys.length}
+						</span>
 						<Button size="sm" variant="ghost" onClick={onOpenEnvelope}>
 							Draw it
 						</Button>
@@ -450,25 +501,40 @@ export function AgentSkillsTab({
 						enableSorting={false}
 						enablePagination={false}
 						enableColumnVisibility={false}
+						bordered={false}
+						density="compact"
 					/>
 				)}
 			</PanelSection>
 
 			<PanelSection
+				card
 				title="Plans it may pick"
-				hint="the base plans a Plan step may use"
+				action={
+					<Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+						Edit
+					</Button>
+				}
 			>
 				{can.data?.plans.length ? (
-					<p className="flex flex-wrap gap-x-2 font-mono text-sm">
+					<p className="flex flex-wrap gap-1">
 						{can.data.plans.map((p) => (
-							<span key={p}>{p}</span>
+							<Badge
+								key={p}
+								variant="outline"
+								tone="muted"
+								size="xs"
+								className="font-mono font-normal"
+							>
+								{p}
+							</Badge>
 						))}
 					</p>
 				) : (
 					<p className="text-muted-foreground">Any plan the library offers.</p>
 				)}
 			</PanelSection>
-		</>
+		</div>
 	);
 }
 
