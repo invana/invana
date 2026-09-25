@@ -68,7 +68,7 @@ export interface StepClarification {
  * They exist only while the question is open; once answered the step keeps the
  * question and the answer, and the full option set lives in its trace.
  */
-function OptionRow({
+export function OptionRow({
 	glyph,
 	label,
 	onSelect,

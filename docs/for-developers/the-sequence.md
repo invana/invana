@@ -206,7 +206,7 @@ third-party claim is something the Answer step writes.
 
 | Before K's code | |
 |---|---|
-| Drawn | 17 artboards on [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) — listed in [the-screens](the-screens.md#beyond-the-42--the-assistant-speaks) |
+| Drawn | 18 artboards on [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) — listed in [the-screens](the-screens.md#beyond-the-42--the-assistant-speaks) |
 | Guards per commit | ruff · import-linter · golden files (revert what is not K's) · the touched suites; flip the index row as each column ships |
 | Risk | K3 spans three repos — design-kit → canvas → invana — and adds an app, so it goes last and may ship as two PRs |
 
@@ -243,7 +243,7 @@ everywhere.
 | **G · Memory** | ✅ 8.3 · 8.4 share `ReviewProposalHiFi`, and now **8.1 `Evidence`** · **8.2 `Recall`** | `hi-fi-finance` · [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ `memory/spec.md` has no drawn states |
 | **H · Skills** | ✅ — `Main` (SkillsPanel) · `SkillFlow` · `SkillAuthor` · `SkillBindings`, all on the shell contract | canvas `7c565h2z9irbFBwu1S1ebH`, cached in `.design/canvas-govern/` | ❌ |
 | **I · Recurring** | ✅ `RecurringTaskHiFi` | `hi-fi-finance` | ❌ |
-| **K · The assistant speaks** | ✅ 17 — soul · converse · the answer in words · beyond the graph ([the-screens](the-screens.md#beyond-the-42--the-assistant-speaks)) | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J), generated from `.design/canvas-assistant-speaks/` | ✅ `agents/spec.md` §5a · `ask/spec.md` §7a · `explore/spec.md` §6a |
+| **K · The assistant speaks** | ✅ 18 — soul · converse · the answer in words · beyond the graph ([the-screens](the-screens.md#beyond-the-42--the-assistant-speaks)) | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J), generated from `.design/canvas-assistant-speaks/` | ✅ `agents/spec.md` §5a · `ask/spec.md` §7a · `explore/spec.md` §6a |
 | **J · Loose ends** | ⚠️ **4.4 `Console`** · **12.3 `Capabilities`** · **12.4 `Vector`** are drawn now. Module 11 and 13.3 stay deliberately undrawn; 13.7's four `Setup*HiFi` are still **owed** — those screens shipped before their drawings | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | ❌ reconcile open |
 
 | Reading | |

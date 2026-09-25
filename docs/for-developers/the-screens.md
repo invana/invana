@@ -236,7 +236,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | Canvas | Draws | Pages | State |
 |---|---|---|---|
 | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) · [10.5 Runs](modules/operate/features/see-what-ran.md) · [4.2 Boards](modules/explore/features/boards.md) — 90 artboards | Worlds · Guardrails · the run · the agents · LLMs · Skills · Bindings · Usage · Rules · Plans · Boards · **Runs** | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
-| [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 17 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
+| [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 18 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
 | [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
@@ -576,7 +576,7 @@ A second page, *Ask › The session’s world — 3.10*, draws where the world n
 
 ## Beyond the 42 · The Assistant speaks
 
-Seventeen artboards on their own canvas — *The Assistant Speaks* (`https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`) — for [sequence](the-sequence.md)
+Eighteen artboards on their own canvas — *The Assistant Speaks* (`https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J`) — for [sequence](the-sequence.md)
 block K. Generated from `.design/canvas-assistant-speaks/` on the govern-agents kit, with the Assistant
 and the Inspector drawn in `rightSection`. The name is the file, the frame title and this row.
 
@@ -586,7 +586,8 @@ and the Inspector drawn in `rightSection`. The name is the file, the frame title
 | `agents.agents.detail.soul.default` | 5.8 | No soul yet — the agent speaks in the default voice | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.soul.preview` | 5.8 | One ask, answered in the current voice and in the draft | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.soul.read_only` | 5.8 | A member without edit rights reads the soul | 🔵 | 🔵 | ✅ |
-| `ask.converse` | 3.2 | Small talk gets a line in the agent’s voice, not a refusal | ✅ | ✅ | ✅ |
+| `ask.converse` | 3.2 | Small talk gets a line in the agent’s voice, and questions it could answer | ✅ | ✅ | ✅ |
+| `ask.converse.no_choices` | 3.2 | A thanks, or a world that shuts the graph, gets the reply alone | ✅ | ✅ | ✅ |
 | `ask.cannot_answer.voiced` | 3.8 | A refusal in the agent’s voice still names what the graph is missing | 🔵 | 🔵 | ✅ |
 | `ask.answer.prose` | 3.12 | The answer in words, first — every claim cites a row | 🔵 | 🔵 | ✅ |
 | `ask.answer.prose.writing` | 3.12 | The table paints first; the words stream in above it | 🔵 | 🔵 | ✅ |

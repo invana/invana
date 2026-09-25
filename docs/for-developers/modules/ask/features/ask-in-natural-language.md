@@ -55,6 +55,7 @@ flowchart TD
 | Question spans models with no link | Says which two, and that a link is not declared |
 | Repair fails twice | Stops, showing both attempts and the errors |
 | Cancelled mid-run | Steps completed stay in the thread; nothing partial is presented as an answer |
+| Small talk under a world that shuts the graph | The reply alone, with no choices — nothing it could offer would run ([NL14](#decisions)) |
 | The world does not send property values | Follow-ups still resolve (*load them on canvas*): the earlier asks and queries go, with each quoted literal sent as `'…'` and no rationale |
 | The world does not send property names | The ask is read against labels and stitches alone; the step's touch names `property_names` as cut, so a cannot-answer caused by the cut is traceable to it |
 
@@ -75,7 +76,7 @@ flowchart TD
 | Grounding block | `render_model_context(global_model, lens, may_send)` — one block, used unchanged by Understand, Translate and Propose |
 | Routes | `POST …/runs` · `GET …/task_runs/{id}` (stream) |
 | Events | `todo.created` · `run.*` · `query.executed` |
-| Understand's outcomes | `understood` · `clarify` · `cannot_answer` · `converse`. `converse` carries `reply` and returns `Conversed`; the step raises `Converse`, its row reads `small talk` with `output.reply`, the queued steps are dropped, the message content is the reply, and the run settles `succeeded` · `conversed` with no emission and no `cannot_answer` event ([NL12](#decisions) · [NL13](#decisions)) |
+| Understand's outcomes | `understood` · `clarify` · `cannot_answer` · `converse`. `converse` carries `reply` and `choices` `[{ask, refs}]` and returns `Conversed`; the step keeps the choices it could answer ([NL14](#decisions)) and raises `Converse`, its row reads `small talk` with `output.reply` · `output.options`, the queued steps are dropped, the message content is the reply, and the run settles `succeeded` · `conversed` with no emission and no `cannot_answer` event ([NL12](#decisions) · [NL13](#decisions)) |
 
 ### The grounding block
 
@@ -129,6 +130,7 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 | NL11 | **A session's earlier turns go with every ask, and are cut by part, never whole.** A follow-up — *load them on canvas*, *only the top 5* — means nothing without the ask and the query before it, so the last 20 turns are always carried. What a turn holds is the ask, the query and its rationale; it never holds rows. So `property_values` governs only what can carry a value — a quoted literal in a query or a clarification is sent as `'…'`, and a rationale is dropped — and the ask and the query's shape still go. Dropping the whole transcript for a literal it might contain turned every governed session into a string of unrelated asks. Gremlin names its labels in quotes too, so under the cut its labels are masked with the values; the ask still carries what was meant. |
 | NL12 | **Small talk is conversed with, never refused.** *How are you*, *thanks*, *what can you do?* are not data questions, and *cannot answer · outside this graph* is the wrong outcome for them. Understand's fourth outcome, `converse`, replies in one or two lines in the agent's voice ([5.8](../../agents/features/soul.md)) and points at something this graph could answer. It runs no plan and no query, writes no emission, cites nothing and claims nothing about the data; the reply is the assistant message itself, drawn as a message and never as a cannot-answer, and the run's outcome is `conversed` ([CA8](when-it-cannot-answer.md#decisions)). |
 | NL13 | **A converse with no reply is a model error, never an empty message.** Understand refuses it the way it refuses a `cannot_answer` with no reason: the step fails as `llm_failed`, so a run never settles as `conversed` with nothing said. The reply names what the graph holds by its types and never quotes a number or a fact from it — nothing has been read, and a count in small talk would be a claim with no citation. |
+| NL14 | **Small talk may offer up to three next questions, and only ones this run could answer.** Where the message invites a next step — a greeting, *what can you do?* — Understand offers choices, each a question with the types it reads; a thanks or a goodbye gets the reply alone. A choice is kept only when every type it reads is one the grounding block lists — the same cut by the run's lens and egress ([NL9](#decisions)) — and only while the agent's envelope allows `execute_graph_query` and the world lets the run read the graph at all. None left is a plain reply, which is the honest answer under a world that shuts everything. The choices are drawn with the choice template under the reply and ride the step's output, so a reload keeps them; a tap is a **new ask**, not an answer to the settled run, and only the latest turn's choices can be tapped. |
 
 ## Not building
 

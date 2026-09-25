@@ -120,6 +120,29 @@ def render_model_context(
     return block
 
 
+def listed_types(
+    grounding: Grounding | GraphVersion | None,
+    *,
+    may_send: frozenset[str] | None = None,
+    lens: QueryLens | None = None,
+) -> frozenset[str]:
+    """The type names :func:`render_model_context` describes — node and edge alike.
+
+    Cut exactly as the block is, so a name in this set is one the model was
+    told of and one the run's lens reads. Empty when there is no model or the
+    crossing may not send type names: nothing was named, so nothing may be
+    offered as askable (NL14).
+    """
+    if isinstance(grounding, GraphVersion):
+        grounding = Grounding(versions=(grounding,))
+    if grounding is None or not grounding.versions:
+        return frozenset()
+    if may_send is not None and "type_names" not in may_send:
+        return frozenset()
+    nodes, edges = _union(grounding.versions, lens)
+    return frozenset(t.name for t in (*nodes, *edges))
+
+
 def _union(versions: tuple[GraphVersion, ...], lens: QueryLens | None):
     """Every type across the versions, once by name, and only those the lens reads.
 

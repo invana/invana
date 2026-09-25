@@ -159,6 +159,7 @@ export function SessionThread({
 							steps={steps}
 							clarifications={clarifications}
 							loadedToCanvas={loadedReplyIds.has(message.id)}
+							isLatest={idx === session.messages.length - 1}
 							isRunning={isRunning}
 							onRerun={onRerun}
 							onFetchContext={onFetchContext}

@@ -117,9 +117,12 @@ class Converse(Exception):
     (CA8). Raised by *Understand*, so no plan is made.
     """
 
-    def __init__(self, *, reply: str, exchange: dict | None = None) -> None:
+    def __init__(self, *, reply: str, options: list[str] | None = None, exchange: dict | None = None) -> None:
         super().__init__(reply)
         self.reply = reply
+        #: Questions to ask next, each one this run could answer (NL14). Empty
+        #: is a plain reply.
+        self.options = options or []
         #: The prompt and completion behind the reply, kept on the step (NL10).
         self.exchange = exchange or {}
 
@@ -698,6 +701,24 @@ async def prompt_lens(ctx: TaskContext, v: RunVars) -> QueryLens | None:
         return None
     _own, compiled, _bindings = await _compile(ctx, v, governor, address)
     return None if compiled.query_lens.is_empty else compiled.query_lens
+
+
+async def graph_readable(ctx: TaskContext, v: RunVars) -> bool:
+    """Whether a query of this run could read the graph at all — decided as :func:`open_graph` decides it.
+
+    For offering asks, not making them (NL14): nothing is engaged, no touch is
+    written and no connection is taken. A world that refuses the read, or closes
+    ``graph_data`` over a graph with no model version, offers nothing.
+    """
+    governor = v.governor
+    if governor is None:
+        return True
+    address = await _catalogue.version_address(ctx.db, version_id=v.grounding.id) if v.grounding is not None else None
+    if address is None:
+        return Layer.graph_data not in governor.effective.closed_layers
+    own, compiled, bindings = await _compile(ctx, v, governor, address)
+    bound_by = tuple(b.address for b in bindings if governor.check(b.address).rule_matched is not None)
+    return _graph_verdict(own, compiled.query_lens, bound_by).allowed
 
 
 def _graph_verdict(own: Verdict, lens: QueryLens, bound_by: tuple[str, ...]) -> Verdict:

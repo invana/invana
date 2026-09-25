@@ -74,8 +74,27 @@ UNDERSTAND_TOOL = {
         "question": {"type": "string", "description": 'When clarify: one short question. Else "".'},
         "reply": {
             "type": "string",
-            "description": "When converse: one or two lines to the person, pointing at something this graph "
-            'could answer. Else "".',
+            "description": 'When converse: one or two lines to the person. Else "".',
+        },
+        "choices": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ask": {
+                        "type": "string",
+                        "description": "A question this graph can answer, as the person would ask it.",
+                    },
+                    "refs": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Node/edge type names from the model the question reads.",
+                    },
+                },
+                "required": ["ask", "refs"],
+            },
+            "description": "When converse: up to three questions the person could ask next, or [] when the "
+            "message does not call for them. Else [].",
         },
         "options": {"type": "array", "items": {"type": "string"}, "description": "Fixed answer options, or []."},
         "options_query": {
@@ -105,6 +124,7 @@ UNDERSTAND_TOOL = {
         "reason",
         "question",
         "reply",
+        "choices",
         "options",
         "options_query",
         "skills_applied",
@@ -159,6 +179,14 @@ class OutOfScope:
     duration_ms: float = 0.0
 
 
+@dataclass(slots=True, frozen=True)
+class Choice:
+    """A question offered after small talk, and the types it would read (NL14)."""
+
+    ask: str
+    refs: tuple[str, ...]
+
+
 @dataclass(slots=True)
 class Conversed:
     """Small talk, replied to rather than refused (NL12).
@@ -168,6 +196,9 @@ class Conversed:
     """
 
     reply: str
+    #: As the model offered them — the step keeps only those this run could
+    #: answer (NL14).
+    choices: list[Choice] = field(default_factory=list)
     usage: TokenUsage | None = None
     #: The call as a reader reads it — drawn as the step dashboard's Output
     #: band (SR42).
@@ -189,10 +220,12 @@ def _system_prompt(model_context: str, instructions: str, skills: str, rules: st
         'about — a type or a fact that is not there. Say what is missing in "reason". A hard question '
         "the graph CAN answer is not out of scope.\n\n"
         'Set action="converse" when the message is not a question about the data at all — a greeting, '
-        'thanks, how are you, what can you do. Put one or two lines in "reply", spoken to the person, '
-        "that end by pointing at one thing this graph could answer. Name what the graph holds by its "
-        "types, never by a number or a fact from the data — nothing has been read. Anything that asks "
-        "about the data, however casually, is not converse.\n\n"
+        'thanks, how are you, what can you do. Put one or two lines in "reply", spoken to the person. '
+        "Name what the graph holds by its types, never by a number or a fact from the data — nothing "
+        "has been read. Where the message invites a next step (a greeting, what can you do) offer up to "
+        'three "choices": each a short question the graph below can answer, with "refs" naming the types '
+        "it reads. A thanks or a goodbye needs no choices, and when the model below lists no types offer "
+        "none. Anything that asks about the data, however casually, is not converse.\n\n"
         '"refs" must contain names that appear in the model below — never invented ones. "expects" is '
         "what a good answer would look like: graph for things to see on a canvas, table for rows, "
         "metric for a single number, chart for a trend or comparison, text for an explanation.\n\n"
@@ -260,7 +293,18 @@ async def understand(
         reply = str(data.get("reply") or "").strip()
         if not reply:
             raise LLMError("The model said it was small talk but gave no reply.")
-        return Conversed(reply=reply, usage=result.usage, exchange=result.exchange, duration_ms=result.duration_ms)
+        choices = [
+            Choice(ask=ask, refs=tuple(str(r).strip() for r in (c.get("refs") or []) if str(r).strip()))
+            for c in (data.get("choices") or [])
+            if isinstance(c, dict) and (ask := str(c.get("ask") or "").strip())
+        ]
+        return Conversed(
+            reply=reply,
+            choices=choices,
+            usage=result.usage,
+            exchange=result.exchange,
+            duration_ms=result.duration_ms,
+        )
 
     if action == "clarify":
         question = str(data.get("question") or "").strip()

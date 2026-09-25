@@ -12,6 +12,7 @@ import {
 import { CastRefusalCard } from "@/pages/graphs-detail/features/ask/assistant/CastRefusal";
 import { SessionContextDisclosure } from "@/pages/graphs-detail/features/ask/assistant/SessionContextDisclosure";
 import {
+	OptionRow,
 	type StepClarification,
 	StepList,
 	StepTrace,
@@ -112,6 +113,9 @@ export interface AssistantTurnProps {
 	/** This reply's graph result is already on the canvas — the thread saw a
 	 *  `load` operation turn for it (docs/for-developers/modules/explore/features/boards.md), so the offer is spent. */
 	loadedToCanvas?: boolean;
+	/** The thread's last turn. Only its choices after small talk can be tapped:
+	 *  once something else is asked, the offer is spent (NL14). */
+	isLatest?: boolean;
 	onRerun: (messageId: string) => void;
 	onFetchContext: (messageId: string) => Promise<SessionContextTurn[]>;
 	onSelectOption: (text: string) => void;
@@ -223,6 +227,7 @@ function SettledTurn({
 	result,
 	onLoadToCanvas,
 	loadedToCanvas,
+	isLatest,
 }: AssistantTurnProps) {
 	const view = useRunStore((s) =>
 		message.runId ? s.views[message.runId] : undefined,
@@ -279,6 +284,7 @@ function SettledTurn({
 	// hang from (a bare QL turn, a canvas operation log) an elbow-prefixed line
 	// would dangle from nothing — then it is the row's own body instead.
 	const hasSteps = steps.length > 0;
+	const choices = conversedChoices(steps);
 	// A graph result is an offer the reply makes on its own line — "Returned 10
 	// nodes and 0 relationships. [Load to canvas]" — answered by clicking, and
 	// the answer is recorded underneath. The click state is page-local (like the
@@ -473,6 +479,24 @@ function SettledTurn({
 							{replyBody}
 						</ChatSessionActivitySubLine>
 					)}
+					{/* After small talk, what the person could ask next — each one
+					    this run's world lets it answer. A tap is a new ask, not an
+					    answer to this run, which has already settled (NL14). */}
+					{choices.length > 0 && (
+						<div className="flex flex-col items-start gap-px pl-5">
+							{choices.map((choice) => (
+								<OptionRow
+									key={choice}
+									label={choice}
+									onSelect={
+										isLatest && !isRunning
+											? () => onSelectOption(choice)
+											: undefined
+									}
+								/>
+							))}
+						</div>
+					)}
 					{isStopped && (
 						<ChatSessionActivitySubLine className="pl-5">
 							Interrupted · ask again, or narrow the question
@@ -529,4 +553,16 @@ function SettledTurn({
 			{!hasSteps && !echoed ? replyBody : undefined}
 		</ChatSessionActivityRow>
 	);
+}
+
+/** The questions a conversed Understand step offered (NL14), or none. */
+function conversedChoices(steps: RunNode[]): string[] {
+	const out = steps.find(
+		(s) =>
+			s.taskKey === "understand_intent" && typeof s.output?.reply === "string",
+	)?.output;
+	const options = out?.options;
+	return Array.isArray(options)
+		? options.filter((o): o is string => typeof o === "string")
+		: [];
 }

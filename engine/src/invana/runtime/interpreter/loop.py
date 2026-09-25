@@ -616,7 +616,7 @@ class TaskRuntime:
                     row.status = RunStatus.succeeded.value
                     row.finished_at = _now()
                     row.detail = "small talk"
-                    row.output = {"reply": conv.reply, **conv.exchange}
+                    row.output = {"reply": conv.reply, "options": conv.options, **conv.exchange}
                     self._record(row, ctx, v)
                     await self._drop_pending(db, th, message_id)
                     await db.commit()

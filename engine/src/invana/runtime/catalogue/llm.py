@@ -11,8 +11,8 @@ from __future__ import annotations
 
 from invana.apps.llm import LLMError, QueryNotReadOnlyError
 from invana.apps.llm.clarify import ground_options
-from invana.apps.llm.grounding import render_rules, render_skills
-from invana.apps.llm.intent import Conversed, OutOfScope, understand
+from invana.apps.llm.grounding import listed_types, render_rules, render_skills
+from invana.apps.llm.intent import Choice, Conversed, OutOfScope, understand
 from invana.apps.llm.planner import generate_plan
 from invana.apps.llm.propose import propose_model
 from invana.apps.llm.translate import Clarification, nl_to_query
@@ -36,6 +36,7 @@ from invana.runtime.catalogue.contract import (
     cited_rule_version_ids,
     close_graph,
     close_model,
+    graph_readable,
     offered_rule_version_ids,
     offered_skill_version_ids,
     open_graph,
@@ -74,6 +75,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     ctx.step.skills_offered = offered_skill_version_ids(v)
     ctx.step.rules_offered = offered_rule_version_ids(v)
     await ctx.progress(f"{_provider_label(v.provider)} · reading the ask against the model")
+    lens = await prompt_lens(ctx, v)
     try:
         outcome = await understand(
             provider=v.provider,
@@ -89,7 +91,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
             rules=render_rules(v.rules),
             history=crossing.history(v.history),
             may_send=crossing.may_send,
-            lens=await prompt_lens(ctx, v),
+            lens=lens,
             **({"timeout_s": v.timeout_s} if v.timeout_s is not None else {}),
         )
     except LLMError as exc:
@@ -118,7 +120,9 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
         v.summary = outcome.reply
         ctx.step.tokens_in = usage.input_tokens if usage else None
         ctx.step.tokens_out = usage.output_tokens if usage else None
-        raise Converse(reply=outcome.reply, exchange=_exchange(outcome))
+        listed = listed_types(v.global_model, may_send=crossing.may_send, lens=lens)
+        options = await _askable(ctx, v, outcome.choices, listed)
+        raise Converse(reply=outcome.reply, options=options, exchange=_exchange(outcome))
 
     if isinstance(outcome, Clarification):
         options = await _options(ctx, v, outcome)
@@ -501,6 +505,32 @@ def _vocabulary(envelope) -> list[dict]:
 
 
 # ── Shared by the two entries that may ask back ──────────────────────────────
+
+
+#: The step every data question ends in: an agent whose envelope lacks it can
+#: answer nothing, so it is offered nothing to ask (NL14).
+_READS_THE_GRAPH = "execute_graph_query"
+_MAX_CHOICES = 3
+
+
+async def _askable(ctx: TaskContext, v: RunVars, choices: list[Choice], listed: frozenset[str]) -> list[str]:
+    """The choices after small talk that this run could actually answer (NL14).
+
+    A choice stays only when every type it reads is one the run's world lets it
+    read and the model was told of — the same cut the grounding block makes —
+    and only while this agent may run a query and this world lets it read the
+    graph at all. Anything else is dropped rather than offered and refused:
+    none left is a plain reply, which is the honest answer under a world that
+    shuts everything.
+    """
+    if not choices or not listed:
+        return []
+    if v.envelope is not None and _READS_THE_GRAPH not in v.envelope.allow:
+        return []
+    if not await graph_readable(ctx, v):
+        return []
+    kept = [c.ask for c in choices if c.refs and set(c.refs) <= listed]
+    return list(dict.fromkeys(kept))[:_MAX_CHOICES]
 
 
 async def _options(ctx: TaskContext, v: RunVars, clarification: Clarification) -> list[str]:

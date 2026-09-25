@@ -6,12 +6,15 @@ resume, cancel — are what's under test, not the connectors."""
 from __future__ import annotations
 
 import asyncio
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
 from sqlalchemy import select
 
+from invana.apps.agents.envelope import Envelope
 from invana.apps.graphs.schemas import QueryResponse
+from invana.apps.llm.intent import Choice
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import SessionMessage
 from invana.apps.sessions.schemas import SendMessage
@@ -19,6 +22,7 @@ from invana.runtime import catalogue as task_registry
 from invana.runtime import services as run_services
 from invana.runtime import workflows
 from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, Out, TaskFailure
+from invana.runtime.catalogue.llm import _askable
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import replay
@@ -85,7 +89,7 @@ def stub_tasks(monkeypatch):
         raise HTTPException(status_code=503, detail={"error": "graph_not_active", "connection_id": "c1"})
 
     async def converse(ctx, v):
-        raise Converse(reply="Doing well. Want the busiest airport?")
+        raise Converse(reply="Doing well.", options=["Which airport has the most routes?"])
 
     async def cannot(ctx, v):
         raise CannotAnswer(reason="This graph holds no weather.")
@@ -190,10 +194,12 @@ class TestRuntime:
 
         steps = await _steps(session, th.id)
         assert [(s.label, s.status, s.detail) for s in steps] == [("Understand", "succeeded", "small talk")]
+        # The choices ride the step, so a reload draws them again (NL14).
+        assert steps[0].output["options"] == ["Which airport has the most routes?"]
         run = await _fresh(session, TaskRun, th.id)
         assert (run.status, run.outcome) == ("succeeded", "conversed")
         reply = await _fresh(session, SessionMessage, assistant.id)
-        assert reply.status.value == "ok" and reply.content == "Doing well. Want the busiest airport?"
+        assert reply.status.value == "ok" and reply.content == "Doing well."
         kinds = [e.kind for e in await replay(session, run_id=th.id, after=0)]
         assert "cannot_answer" not in kinds and kinds[-1] == "run.done"
 
@@ -377,3 +383,32 @@ class TestRuntime:
         [diagnosis] = [e for e in await replay(session, run_id=th.id, after=0) if e.kind == "diagnosis"]
         assert diagnosis.payload["cause"] == "db_unreachable"
         assert {s["route"] for s in diagnosis.payload["suggestions"] if "route" in s} == {"settings/connection"}
+
+
+async def test_choices_are_kept_only_where_the_run_could_answer_them():
+    """NL14: a choice reads only types the world lets this run read; the rest are dropped."""
+    v = SimpleNamespace(governor=None, envelope=None)
+    listed = frozenset({"airport", "route"})
+    offered = [
+        Choice("Which airport has the most routes?", ("airport", "route")),
+        Choice("Which airport has the most routes?", ("airport", "route")),
+        Choice("Who owns each airline?", ("airline",)),
+        Choice("Say something nice", ()),
+        Choice("What is the longest runway?", ("airport",)),
+        Choice("Which routes cross the equator?", ("route",)),
+        Choice("How many airports?", ("airport",)),
+    ]
+    assert await _askable(None, v, offered, listed) == [
+        "Which airport has the most routes?",
+        "What is the longest runway?",
+        "Which routes cross the equator?",
+    ]
+
+
+async def test_no_choices_when_nothing_can_be_read():
+    """A world that names no types, or an agent that may not query, is offered nothing (NL14)."""
+    offered = [Choice("What is the longest runway?", ("airport",))]
+    assert await _askable(None, SimpleNamespace(governor=None, envelope=None), offered, frozenset()) == []
+    no_query = Envelope.from_spec({"allow": ["understand_intent"]})
+    v = SimpleNamespace(governor=None, envelope=no_query)
+    assert await _askable(None, v, offered, frozenset({"airport"})) == []
