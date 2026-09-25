@@ -1,13 +1,14 @@
 # Author an agent
 
 Every agent in the Graph, what it carries, and what it is doing right now. Authoring one is picking a
-template, picking the lens it works in, offering it skills, setting what it may spend, and — if
-anyone wants to — turning its voice dials.
+template, offering it skills, setting its standing limits, and — if anyone wants to — its thinking
+and its voice.
 
-**An agent binds no provider.** It carries three bounds — an **envelope** (what it may do), a
-**budget** (what it may spend) and a **lens** (what it may see, use and send). The lens's `cast`
-names the model and the Graph resolves the credential from the provider row the address names
-([PM1](providers-and-models.md) · [GV10](../../govern/spec.md)).
+**An agent binds no provider and no world.** It carries **standing limits** — an **envelope** (what it
+may run), **effort**, a **budget** and **reach** — and optionally a **guardrail** of its own. The world
+— what a piece of work may see, use and send, whose `cast` names the model — comes with the work: the
+session, the Todo, the schedule ([AG24](#decisions) · [PM1](providers-and-models.md) ·
+[GV10](../../govern/spec.md)).
 
 | | |
 |---|---|
@@ -24,14 +25,14 @@ names the model and the Graph resolves the credential from the provider row the 
 | # | Capability | Notes |
 |---|---|---|
 | C1 | Author an agent from a template | The template brings an envelope; there is no unbounded agent |
-| C2 | Pick the lens it works in | The third bound. Null reads *Everything*, inside the guardrails — never a blank |
+| C2 | Give it a guardrail of its own | Optional. A restriction that holds whoever asks — *nothing leaves*. A guardrail scoped `agent:<id>` ([AG10](#decisions)) |
 | C3 | Offer it skills | From the Graph's set, by binding |
 | C4 | Set budget and policy | What it may spend, and what happens at the ceiling |
 | C5 | One Graph default | The agent a session or a task uses when none is named |
 | C6 | Kinds are visible | Authored · seeded · spawned, each with its own row treatment |
 | C7 | Current state at a glance | Active · paused · retired, with what it is running |
 | C8 | Filter by kind, status, ephemeral | The list stays readable as it grows |
-| C9 | Read its cast, resolved | `role → model address → why this one`, read **through** the lens, not stored on the agent |
+| C9 | Read the cast a run would use | `role → model address → why this one`, resolved from the work's world, the guardrails' casts and the shipped default — never stored on the agent |
 | C10 | Spend against its ceiling, on the row | `$1.84 of $40.00 this month` — before the ceiling is reached, not after |
 | C11 | See how the bounds nest | `effective = agent ∩ plan ∩ todo`, stated on the panel so a refusal is predictable |
 | C12 | **What this agent can do, as two linked tables** | Its **skills** (how it approaches work) and its **callables** (what its envelope lets it run), each row naming the other — [below](#what-this-agent-can-do) |
@@ -44,8 +45,8 @@ names the model and the Graph resolves the credential from the provider row the 
 flowchart TD
     A[New agent] --> B[Pick a template]
     B --> C[Envelope comes with it]
-    C --> D[Pick a lens · default Everything]
-    D --> E{Does its cast resolve?}
+    C --> D[Guardrail of its own · optional]
+    D --> E{Any models configured?}
     E -->|no models configured| F[Says so, links to Agents › LLMs]
     E -->|yes| G[Bind skills]
     G --> H[Budget · policy]
@@ -142,8 +143,8 @@ the soul's Markdown, which is read after the dials and wins where they disagree 
 | Seam | What the user sees |
 |---|---|
 | No provider configured at all | Named, with the link to `Agents › LLMs`; the agent saves and says its cast resolves to nothing |
-| Its lens's cast names a deleted model | Blocked **before the run starts**, naming the model and the world |
-| Its lens is deleted | Refused — `agents.lens_id` is `ON DELETE RESTRICT`, the same seam as a schedule's ([WO6](../../govern/features/worlds.md)) |
+| A run's cast names a deleted model | Blocked **before the run starts**, naming the model and the world or guardrail that cast it |
+| Its guardrail is deleted | The restriction lifts from the next run; deleting a guardrail needs the guardrail permission ([GR5](../../govern/features/guardrails.md)) |
 | A bound skill deleted | The binding drops; the agent keeps working |
 | Retiring the Graph default | Refused until another is made default |
 | A spawned agent in the list | Nested under its parent, marked ephemeral |
@@ -160,11 +161,11 @@ the soul's Markdown, which is read after the dials and wins where they disagree 
 
 | Surface | Shape | Components |
 |---|---|---|
-| `Agents` drawer | One list; `+` in the header; each row's actions on the row. A row carries its kind, its **lens chip** and its **spend meter** | `Item` · `AgentChip` · **`LensChip`** · `MetricTile` with `meter` |
-| Agent panel | *The three bounds* — envelope · budget · lens — then the cast, then *where this agent has been*; actions in the content | `SectionHeader` · `PropertyList` · **`CastTable`** · **`BoundChip`** |
-| *Bounds nest* | `agent ∩ plan ∩ todo` stated as three rows, so a refusal is predictable before it happens | `PropertyList` |
-| *What this agent can do* | The two tables, skills above callables, in the agent panel after the three bounds | `SectionHeader` · `DataTable` · `BoundChip` |
-| *Thinking* | The effort numbers and the default stance, together in the agent panel after the three bounds — the stance by name, with its assumptions one click away | `PropertyList` · `RichSelect` |
+| `Agents` drawer | One list; `+` in the header; each row's actions on the row. A row carries its kind, a shield when it has a guardrail of its own, and its **spend meter** | `Item` · `AgentChip` · `MetricTile` with `meter` |
+| Agent page | One page, five tabs ([AG23](#decisions)): **Overview** (who · focus · thinking · always in force · policy · skills) · **Skills & callables** · **Thinking** · **Soul** · **Activity** (meters with the limits that cap them). Pause and Retire in the header; a tab that edits puts Discard · Save there | `Tabs` · `SectionHeader` · `PropertyList` · **`CastTable`** · **`BoundChip`** |
+| *Bounds nest* | `agent ∩ work ∩ guardrails` stated as three rows, so a refusal is predictable before it happens | `PropertyList` |
+| *What this agent can do* | The two tables, skills above callables, on the *Skills & callables* tab | `SectionHeader` · `DataTable` · `BoundChip` |
+| *Thinking* | The effort numbers and the default stance, together on the *Thinking* tab — the stance by name, with its assumptions one click away | `PropertyList` · `RichSelect` |
 | Voice dials | A row of four controls above the soul editor, on the **Soul** tab; a change redraws the preview ([SO7](soul.md#decisions)) | `SegmentedControl` · `PropertyList` |
 | Assignee picker | Staffed agents first, then the rest | `RichSelect` |
 
@@ -177,36 +178,34 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 
 | Thing | Shape |
 |---|---|
-| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · **`soul`** · **`soul_traits`** · `budget` · **`effort`** · **`stance_id`** · `policy` · **`lens_id`** |
+| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · **`soul`** · **`soul_traits`** · `budget` · **`effort`** · **`stance_id`** · `policy` |
 | `stance_id` | FK `stances` **`ON DELETE RESTRICT`**, nullable. Null = no default stance. Read at run open like the lens; the run records `task_runs.stance_id` · `stance_version` whichever way it was chosen |
 | `soul_traits` | `JSON`, default `{}`. Keys `humour` · `formality` · `emoji` · `greeting`, each one of the values above; a missing key is its default. An unknown key or value is refused at write, naming it |
 | Voice in the prompt | `render_traits(soul_traits)` then `soul or DEFAULT_VOICE`, prepended to the same steps as the soul ([soul § Engine](soul.md#engine)); `RunVars.soul` carries both |
 | What it can do, over HTTP | `GET …/agents/{id}/skills-and-callables` → `{skills: [{skill_id, version, when_to_use, needs: [step_key], offered, applied}], callables: [{step_key, bound, pinned, needed_by: [skill_id \| plan_ref]}]}` — one read for both tables |
 | **Dropped** | `llm_config_id` — an agent binds no provider ([PM1](providers-and-models.md)) |
-| `lens_id` | FK `lenses` **`ON DELETE RESTRICT`**, nullable. Null = *Everything*, inside the guardrails |
-| The cast | read **through** `lens_id`, never stored on the agent. Resolution: [govern § 2](../../govern/spec.md) |
+| Its guardrail | a `lenses` row, `kind = guardrail`, `scope = agent:<id>` — Govern's table, Govern's routes ([GR5](../../govern/features/guardrails.md)). The agent holds no pointer to it |
+| The cast | resolved per run from the effective lens — the work's world, then the guardrails' casts, then the shipped default. Resolution: [govern § 2](../../govern/spec.md) |
 | Spend this month | `SUM(task_runs.cost_usd)` over the **calendar month**, on `ix_task_runs_agent_started` — not a counter column. It reads as `AgentListResponse.spend_this_month`, a `{agent_id: usd}` sidecar: one grouped read for the whole list, and an agent with no **priced** run is absent rather than zero ([AG11](#decisions)) |
 | Default | one per Graph, enforced |
 | Routes | `…/agents*` · `POST …/graphs/{id}/default-agent` |
-| The bound, over HTTP | `AgentRead.lens_id` + **`lens_name`**; `AgentCreate.lens_id`; `AgentUpdate.lens_id`, read by *set-ness* — null is *Everything*, chosen |
-| In force | the agent's world is a contributor to `freeze_lens` on every run it opens, beside the guardrails ([GV6](../../govern/spec.md)) |
-| Events | `agent.create` · `agent.update` · `agent.set_default` · **`agent.lens_set`** · `agent.soul_set` (the dials included) · `agent.stance_set` |
+| Over HTTP | `AgentRead.guardrail_id` + `guardrail_name`, read from `lenses` by scope, so the row draws its shield without a second fetch |
+| In force | the agent's guardrail is a contributor to `freeze_lens` on every run it opens, beside the Graph's ([AG7](#decisions) · [GV6](../../govern/spec.md)) |
+| Events | `agent.create` · `agent.update` · `agent.set_default` · `agent.soul_set` (the dials included) · `agent.stance_set` |
 
 ## Decisions
 
 | # | Decision |
 |---|---|
 | AG1 | Every agent is authored from a template, and every template carries an envelope. |
-| AG2 | **An agent carries three bounds and no provider: an envelope, a budget and a lens.** The lens's `cast` names the model; the Graph resolves the credential from the provider row the address names. What an agent may call is a **lens rule**, like every other layer — not a foreign key on the agent ([PM1](providers-and-models.md) · [GV10](../../govern/spec.md)). |
+| AG2 | **An agent binds no provider and no world.** It carries **standing limits** — an envelope, effort, a budget, reach — and optionally a guardrail of its own. What a run may see, use and send, and the `cast` that names its models, come with the work that starts it ([AG24](#decisions) · [PM1](providers-and-models.md) · [GV10](../../govern/spec.md)). |
 | AG3 | One default agent per Graph, always set. |
 | AG4 | Skills reach an agent only through a binding. |
-| AG5 | **A missing lens reads *Everything*, never blank.** *Nothing set* and *nothing permitted* must never look alike ([GR6](../../govern/features/guardrails.md)), and the widest state is still inside the Graph's guardrails. |
-| AG6 | **The three bounds are read together, on one panel.** They are what a refusal will name, so reading them apart is reading two-thirds of the reason a run was turned away. |
-| AG7 | **A bound that is not composed is not a bound.** The agent's world goes into the effective lens of every run it opens, whether or not the asker picked one — for the same reason the guardrails do. A world that held only on the runs somebody remembered to pick it for would narrow nothing, and a child inherits it ([DG9](delegation.md)), so the narrowing travels down the tree with no second mechanism. |
-| AG8 | **The name rides with the id.** `AgentRead` carries `lens_name` beside `lens_id`, because the row draws a chip and a list that has to resolve four ids to four names draws none of them. |
-| AG9 | **On update, omitted and null are different things.** Null is *put this agent back in Everything* — a bound somebody chose — so the write is read by set-ness, and an edit to a description can never widen an agent on the way past. Moving it emits `agent.lens_set` of its own: widening is the line of the audit somebody comes looking for. |
+| AG5 | **Work that names no world runs in *Everything*, never in a blank.** *Nothing set* and *nothing permitted* must never look alike ([GR6](../../govern/features/guardrails.md)), and the widest state is still inside the guardrails — the Graph's and the agent's own. |
+| AG6 | **A refusal names which side bound it** — the agent's standing limits, the work's world, or a guardrail. Effective bounds are the three intersected, so a refusal that named only the result would not say whom to ask. |
+| AG7 | **A standing restriction is composed into every run the agent opens, whoever starts it.** The agent's guardrail joins the Graph's in `freeze_lens` on a session's ask, a Todo, a schedule and a delegated child alike — a restriction that held only when somebody remembered it would restrict nothing. |
 | AG11 | **On the meter, absent is not zero.** An agent whose runs carry no `cost_usd` is left out of `spend_this_month` entirely, and the row says nothing rather than `$0.00`: a subscription endpoint is not metered per token, so *nothing spent* and *nothing known* are different facts ([OB4](../../operate/features/observability.md)). The window is the calendar month, because that is the one `max_cost_usd_month` names — a rolling thirty days would draw a different number from the ceiling beside it. |
-| AG10 | **A guardrail is refused as an agent's bound.** It is already in force on every run this agent opens ([GR1](../../govern/features/guardrails.md)), so binding one here would read as a second bound that changes nothing. The refusal names the guardrail and says to pick a world. |
+| AG10 | **An agent's own restriction is a guardrail scoped to it, never a world.** `lenses.kind = guardrail`, `scope = agent:<id>`, edited on the agent's Overview by a member who may edit guardrails ([GR5](../../govern/features/guardrails.md)). A world is picked by the work, and binding one to an agent would make the same Analyst unable to look at the US for the next question. |
 | AG12 | **The word is *agents*, and *roster* is retired.** A drawer is named for the rows it holds, and the rows are agents — the same rule that makes `Projects` › `Projects` and `Skills` › `Skills` read straight ([G33](../../../building-studio/graph-detail-page.md)). *Roster* named the table an agent lands in, and a table's name is not what a person reads, so it is gone from the label, from the drawer id (`?drawer=agents`), from this file's own slug, and from the engine and Studio comments that carried it. An old `?drawer=roster` link still lands here: an unknown drawer falls to the first one, and this is the first one. Where *roster* meant the skills an agent carries, the word is **bindings** ([BN8](../../skills/features/bindings.md)) — one word was doing two jobs. |
 | AG13 | **An agent's `instructions` reach its prompts, after the Graph's.** Understand and Translate read `graphs.instructions` and then the agent's own, so one agent can be told *EU carriers only* without the Graph being told. Who the agent *is* is its [soul](soul.md), a separate field that never reaches Translate ([SO5](soul.md#decisions)). |
 
@@ -218,6 +217,10 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | AG19 | **A template brings an envelope and suggests skills; it binds none.** A template that bound skills would have to track their versions and would bind them without the bind-time check. Its suggested skills are offered in the bind picker, first. |
 | AG20 | **An agent may carry a default stance.** Its author picks it; the asker can swap it or clear it for one run. The stance stays a method with declared assumptions — carried by an agent, it acquires none of the agent's bounds ([AA1](../../ask/features/act-as.md#decisions)). |
 | AG21 | **Effort and stance are two settings, because they vary independently.** Effort is how much, enforced; a stance is which way, visible in the plan and the ledger. Collapsing them into one low / medium / high knob would lose the four cells of the table above. |
+| AG23 | **The agent is one page with five tabs: Overview · Skills & callables · Thinking · Soul · Activity.** *Overview* reads the agent whole and carries its guardrail and its two policy switches; *Skills & callables* is what it can do; *Thinking* is focus, effort and the default stance; *Soul* is its voice; *Activity* is what it has done, with the spend, concurrency and delegation limits set beside the meters they cap. There is no Bounds tab — the world comes with the work ([AG24](#decisions)), and every standing limit sits where it is read. Lineage is a section of Activity. Drawn on [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza). |
+| AG24 | **Bounds come in two kinds: standing, on the agent, and situational, on the work.** Standing limits answer *what may this agent ever do, whoever asks* — callables, effort, spend per month, runs at once, delegation, its own guardrail. Situational bounds answer *what may this piece of work see and spend* — the world and the spend per run — and come from what opens the run: a session, a Todo, a schedule, a parent run. Standing limits stay on the agent because much of the work has no person in it; a schedule at 02:00 and a Coordinator's child still run inside them ([EB1](envelope-and-budget.md#decisions)). |
+| AG25 | **The run freezes the bounds, and its tasks read the frozen copy.** At open, `freeze_lens` composes the work's world, the agent's standing limits and every guardrail into one effective lens and budget on the run; each task reads that, never the session live, and a delegated child inherits it and may only narrow. Changing a session's world mid-run changes the next run, not this one. |
+| AG26 | **An agent has no world column; its narrowing is its guardrail.** The migration gives each agent that carried a world an agent-scoped guardrail with that world's rules and cast, so nothing an agent could reach widens on the way. |
 | AG22 | **There is no persona section in `instructions`.** Instructions reach Understand and Translate and miss Plan and Verify, so a thinking style written there shapes the query and not the method, and nothing checks it did anything. Thinking is effort plus a stance; voice is the soul; focus is instructions. |
 
 ## Not building

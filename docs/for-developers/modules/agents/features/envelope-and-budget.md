@@ -60,7 +60,7 @@ flowchart TD
 |---|---|---|
 | Agent panel → Envelope | `6 of 25 callables`, each with its bound and its pinned arguments; then the ceilings | `DataTable` · `BoundChip` |
 | The picker | Grouped by bound, with what is already allowed checked | `DataTable` · `Checkbox` · `BoundChip` |
-| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as a table in three groups — Budget · Effort · Reach — not a form of ten inputs. `agents/CeilingsTable.tsx`, in the agent panel's *Ceilings* section — empty is *the Graph's default applies*, never zero | `DataTable` |
+| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as tables by group — Budget and Reach on the agent's *Activity* tab beside the meters they cap, Effort on its *Thinking* tab ([AG23](author-an-agent.md#decisions)) — not a form of ten inputs. `agents/CeilingsTable.tsx`, in the agent panel's *Ceilings* section — empty is *the Graph's default applies*, never zero | `DataTable` |
 | Budget strip | Spend against ceiling, per window | `MetricTile` with `meter` |
 | A refused plan | *`nl-sweep@2` names `delegate`, which Analyst's envelope does not carry* — with `Open the plan` and `Hand to Coordinator` | `CannotAnswerCard` |
 

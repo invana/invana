@@ -553,6 +553,7 @@ Migration `000000000049` (the lens) and `000000000053` (the provider).
 | Change | Column | Why |
 |---|---|---|
 | **add** | `lens_id` `String(36)` FK `lenses` **ON DELETE RESTRICT**, nullable | The third bound (A1). Null = *Everything*, inside the guardrails. RESTRICT, because deleting a world an agent carries is the same seam as deleting one a schedule uses ([WO6](../modules/govern/features/worlds.md)) |
+| **drop** · 🔵 | `lens_id` | [AG26](../modules/agents/features/author-an-agent.md#decisions) — an agent binds no world. `54` turns each non-null `lens_id` into an agent-scoped guardrail (`kind = guardrail`, `scope = agent:<id>`) carrying that world's rules and cast, then drops the column. The world comes with the work: `sessions.lens_id`, a Todo's lens, a schedule's lens |
 | **drop** | `llm_config_id` | [PM1](../modules/agents/features/providers-and-models.md) — an agent binds no provider. The cast names the model and the Graph resolves the credential |
 | **extend** | `budget` JSON | three new keys, below |
 | **add** · 🔵 | `soul` `Text`, default `""` | Who the agent is and how it speaks; empty is the default voice ([SO1](../modules/agents/features/soul.md#decisions)). Not in `49`–`53` — it lands with 5.8 |
@@ -769,7 +770,7 @@ six months out needs.
 | `51` | `graph_versions.axes` · `graphs.pools` | ✅ built |
 | `52` | `task_plans.uses` · `tasks.source_plan_key` | ✅ built — Skills' work, not this pass's. The slot was taken while the split waited on its sign-offs |
 | `53` | `llm_providers.name` · `llm_models` · backfill · seeded cast · **drop** `model_id` · `is_default` · `agents.llm_config_id` | ✅ built. Both directions are exercised against a scratch database by `tests/golden/test_provider_split.py` |
-| `54` | `agents.soul` · `soul_traits` · `effort` · rename `workflow_spec` → `envelope` · `templates` → `plans` · `policy` spawn keys → a pin | 🔵 — 5.8 · EB9 · EB10 · DG11. `effort` is backfilled from `workflow_spec` then `budget`; the down path copies every key back |
+| `54` | `agents.soul` · `soul_traits` · `effort` · `agents.lens_id` → an agent guardrail, then dropped · `sessions.lens_id` · `sessions.max_cost_usd_run` · rename `workflow_spec` → `envelope` · `templates` → `plans` · `policy` spawn keys → a pin | 🔵 — 5.8 · EB9 · EB10 · DG11. `effort` is backfilled from `workflow_spec` then `budget`; the down path copies every key back |
 
 **The provider split moved from `50` to `53`, and that is the point.** It is the one irreversible
 step, so everything additive lands first and Govern ships without touching Agents at all. Until it

@@ -91,6 +91,7 @@ what it knows, and the envelope is checked before anything runs.**
 | `todos` | `kind (nl\|ql\|import\|stitch\|enrich)` — `nl` and `ql` are both *ask* to a reader · the intent · who asked · on behalf of whom |
 | `task_runs` | one run of a todo · `triggered_by (user\|task\|schedule\|delegation)` · `parent_run_id?` · `task_id?` · agent · plan · status · outcome |
 | `task_runs` | step key · state · timings · tokens · skills offered / reported · rules cited |
+| `sessions` | `agent_id` · **`lens_id?`** — the default world · **`max_cost_usd_run?`** — the default spend per run ([AS5](#7b-a-session-executes-through-plans-always)) · title · surface |
 | `emissions` | `run_id` · `seq` · `kind` · payload · `template_id?` · source citation |
 | `projection_templates` · `task_prompts` | [projections](features/projections.md) |
 
@@ -173,6 +174,7 @@ Hi-fi, at 1440×900, on the **Hi-fi · finance** page of the *Agents at Work Wir
 | AS2 | **Selection order is: a matched reusable plan · an expert plan authored for chat · a generated plan.** All three are `TaskPlan` rows; `plan_origin` says which served. An expert plan is an ordinary authored plan with an `intent` that matches ([7.2](../workflows/features/plan-selection.md) · [7.7](../workflows/features/draft-a-plan.md)) — writing one is how a badly-answered question gets answered well, permanently. |
 | AS3 | **Understanding is a bounded loop** ([clarifying-questions](features/clarifying-questions.md) CQ8–CQ10): several rounds of clarification are iterations of one run, and the thread shows one exchange. |
 | AS4 | **The session is not the unit of governance; the run is.** Budget, lens, envelope and approval all attach to the run — so two asks in one thread can be grounded differently and billed separately, and neither inherits the other's spend. |
+| AS5 | **A session carries the default bounds for its asks; the run still freezes them.** `sessions.lens_id` is the world every ask in the thread starts in (null = *Everything*, inside the guardrails) and `sessions.max_cost_usd_run` its spend per run, capped by the agent's own. One ask may narrow either for itself. At open, `freeze_lens` composes the ask's world — else the session's — with the agent's standing limits and every guardrail, and the tasks read only that frozen copy, so AS4 holds: two asks in one thread can still be grounded differently ([AG24](../agents/features/author-an-agent.md#decisions) · [AG25](../agents/features/author-an-agent.md#decisions)). |
 
 ## 8. Deliberately absent
 

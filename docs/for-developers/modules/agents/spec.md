@@ -1,10 +1,12 @@
 # Agents — module spec
 
 What an agent is and what bounds it. An agent is the principal that runs work: it binds
-[skills](../skills/spec.md), runs [workflows](../workflows/spec.md), and is held inside three bounds
-— an **envelope** (what it may do), a **budget** (what it may spend) and a **lens** (what it may see,
-use and send). Those are authored separately and reused separately — this spec owns the agent and
-the bounds; **the composition happens at run time and is drawn in [Ask](../ask/spec.md)**.
+[skills](../skills/spec.md), runs [workflows](../workflows/spec.md), and carries **standing limits**
+— an **envelope** (what it may run), **effort**, a **budget** and **reach** — and optionally a
+**guardrail** of its own. The **world** (what a run may see, use and send) is not the agent's: it comes
+with the work that opens the run — a session, a Todo, a schedule, a parent run
+([AG24](features/author-an-agent.md#decisions)). This spec owns the agent and its limits; **the
+composition happens at run open and is drawn in [Ask](../ask/spec.md)**.
 
 > ⚠ **Rewritten for [orchestration § 0](../../orchestration.md#0-the-records)** — `Todo` · `TaskPlan` ·
 > `Task` · `TaskRun` · `Lens`. The words *Thought*, *Thinking* and *Step-as-a-record* are retired, and
@@ -24,12 +26,13 @@ Product-wide words: [terminology.md](../../terminology.md). What this module add
 
 | Noun | Is | Is not |
 |---|---|---|
-| **Agent** | a principal that can be assigned work, carrying bindings, an envelope, a budget and a lens, and speaking with a soul | a prompt |
+| **Agent** | a principal that can be assigned work, carrying bindings and standing limits, thinking with effort and a stance, and speaking with a soul | a prompt · a world |
 | **Soul** | who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads ([5.8](features/soul.md)) | a permission · a stance |
 | **Voice dials** | the soul in structured form — `humour` · `formality` · `emoji` · `greeting`, picked rather than written ([AG16](features/author-an-agent.md#decisions)) | a persona · a length setting |
 | **Callable** | one catalogue entry an agent's envelope allows it to run — `run_query` · `search_web` · `fetch_source` ([AG14](features/author-an-agent.md#decisions)) | a *capability* — that word names a feature file's section |
 | **Provider** | a configured LLM endpoint on the Graph — a **participant**, addressed `llm/<name>/*`, holding the models it offers | the model name, and not something an agent binds |
-| **Cast** | the lens's map from a plan's **role** to a model address. It is what names the model an agent uses | a field on the agent |
+| **Standing limits** | what an agent may ever do, whoever asks — envelope, effort, budget, reach, its own guardrail | the world a run works in, which comes with the work |
+| **Cast** | the lens's map from a plan's **role** to a model address. It is what names the model a run uses | a field on the agent |
 | **Envelope** | the static bounds: which callables, which pinned arguments, which ceilings | a runtime check |
 | **Effort** | how hard an agent tries before it stops — steps, replans, clarifications. Enforced like a ceiling ([EB9](features/envelope-and-budget.md#decisions)) | character · budget |
 | **Budget** | the cost ceiling a run may spend. **At the ceiling a run pauses and asks** — it does not fail ([orchestration § 0.10](../../orchestration.md#010-budget--the-ceiling-that-pauses-instead-of-failing)) | a quota · a hard stop |
@@ -52,7 +55,7 @@ An agent is authored here; what it may be offered is [Skills](../skills/spec.md)
 This module is where the orchestration lives: [Work](../work/spec.md) says what needs doing, and the
 agent an assignment names is what turns it into a run.
 
-**Bounds nest.** An envelope bounds what one agent may run; a **lens** bounds what it may see; a budget bounds what it may spend;
+**Bounds nest.** An envelope bounds what one agent may run; the **work's world** and the **guardrails** bound what a run may see; a budget bounds what it may spend;
 delegation bounds depth and fan-out; and a Graph ceiling bounds how many run at once. Each is stated,
 each refuses with the bound named, and none of them is negotiable at run time.
 
@@ -60,12 +63,12 @@ each refuses with the bound named, and none of them is negotiable at run time.
 
 | Owns | Shape |
 |---|---|
-| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `soul` · `soul_traits` · `budget` · `effort` · `stance_id` · `policy` · **`lens_id`** |
+| `agents` | `graph_id` · `name` · `description` · `kind` · `status` · `lifetime` · `parent_agent_id?` · `spawned_in_run_id?` · `instructions` · `soul` · `soul_traits` · `budget` · `effort` · `stance_id` · `policy` |
 | `agent_skills` | the bindings this agent carries — authored in [Skills](../skills/spec.md) |
 | Envelope · budget · effort | on the agent: allowed callable keys and pinned arguments · cost, fan-out and concurrency ceilings · steps, replans and clarifications |
 | Lineage | `parent_agent_id` + `spawned_in_run_id` — retirement keeps the row so lineage resolves |
 | `llm_providers` + `llm_models` | one configured endpoint holding many models — the two segments of `llm/<provider>/<model>` ([PM9](features/providers-and-models.md)) |
-| **Not owned** | the lens itself, and the cast in it — those are [Govern](../govern/spec.md)'s. This module owns the *pointer* |
+| **Not owned** | worlds, guardrails and their casts — [Govern](../govern/spec.md)'s. An agent's own guardrail is a `lenses` row scoped `agent:<id>`; the agent holds no pointer ([AG10](features/author-an-agent.md#decisions)) |
 | **Dropped** | `agents.llm_config_id` · `llm_providers.is_default` · `llm_providers.model_id` — all three gone in migration `000000000053` |
 
 Schema, ER diagram and migration order:
@@ -82,7 +85,8 @@ columns on `agents` or a pointer to something another module owns.
 | **Focus** | what it works on | `instructions` | this module ([AG13](features/author-an-agent.md#decisions)) |
 | **Thinking** | how much it tries, and which way | `effort` · `stance_id` | this module · the stance is [Ask](../ask/features/act-as.md)'s |
 | **Can do** | how it approaches work, and what it may run | `skill_bindings` · `envelope.allow` · `pins` · `plans` | [Skills](../skills/spec.md) · this module |
-| **Bounds** | what it may see, reach and spend | `lens_id` · `budget` · `policy` | [Govern](../govern/spec.md) · this module |
+| **Limits** | what it may ever spend and reach, and never see | `budget` · `policy` · its guardrail | this module · [Govern](../govern/spec.md) |
+| *The work* | what one run may see and spend | the session's, Todo's or schedule's world · spend per run | [Ask](../ask/spec.md) · [Work](../work/spec.md) · [Govern](../govern/spec.md) |
 
 Solid lines are foreign keys; dashed lines are references held in JSON or derived — the catalogue is
 code, not a table, and the envelope names it by `step_key`.
@@ -99,7 +103,10 @@ erDiagram
     AGENT         }o..o{ CATALOGUE_ENTRY : "envelope.allow + pins"
     AGENT         }o..o{ TASKPLAN        : "envelope.plans - reusable"
     AGENT         }o--o| STANCE          : "stance_id - default thinking"
-    AGENT         }o--o| LENS            : "lens_id - null = Everything"
+    LENS          }o--o| AGENT           : "guardrail scope agent:id"
+    SESSION       }o--o| LENS            : "lens_id - the default world"
+    SESSION       }o--|| AGENT           : "agent_id"
+    SESSION       ||--o{ TASKRUN         : "opens, per ask"
     AGENT         }o--o| AGENT           : "parent_agent_id"
 
     LENS          }o..o{ LLM_MODEL       : "cast - role to llm/provider/model"
@@ -124,7 +131,6 @@ erDiagram
         json   effort          "max_steps max_replans max_clarifications"
         json   budget          "cost + reach ceilings"
         string stance_id    FK "default stance - null = none"
-        string lens_id      FK "the world - null = Everything"
         json   policy          "can_be_assigned unattended"
         int    version
     }
@@ -187,6 +193,12 @@ erDiagram
         string id        PK
         text   statement
     }
+    SESSION {
+        string id               PK
+        string agent_id         FK "one agent per session"
+        string lens_id          FK "default world - null = Everything"
+        float  max_cost_usd_run    "capped by the agent's own"
+    }
     TASKRUN {
         string id             PK
         string agent_id       FK
@@ -208,14 +220,14 @@ callable ([BN5](../skills/features/bindings.md#decisions) · [AG15](features/aut
 ```mermaid
 flowchart LR
     A[New agent] --> B[Pick a template<br/>envelope comes with it]
-    B --> C[Pick a lens<br/>default: Everything]
+    B --> C[Guardrail of its own<br/>optional]
     C --> D[Offer skills<br/>from the Graph's set]
     D --> E[Set budget and policy]
     E --> F[Active · appears in assignee pickers]
 ```
 
-Seams: no provider configured at all → the form says so and links to `Agents › LLMs` · the lens's
-cast names a deleted model → blocked before a run starts, naming the model and the world · a skill
+Seams: no provider configured at all → the form says so and links to `Agents › LLMs` · a run's
+cast names a deleted model → blocked before the run starts, naming the model and the world or guardrail that cast it · a skill
 bound then deleted → the binding drops and the agent keeps working · no default agent on the Graph →
 the first authored agent is offered as one.
 
@@ -243,8 +255,8 @@ agents are read, not in a settings tab reached from elsewhere.
 
 | Surface | Region | Shape |
 |---|---|---|
-| Agents | first drawer of the **Agents** stack | one list; `+ New agent` in the header; a row carries its kind, its **lens chip** and its **spend meter** |
-| Agent panel | the drill-in | *the three bounds* — envelope · budget · lens — then the cast resolved from the lens, then *bounds nest*, then *what this agent can do* (skills and callables, linked), then *where this agent has been* |
+| Agents | first drawer of the **Agents** stack | one list; `+ New agent` in the header; a row carries its kind, a shield when it has a guardrail of its own, and its **spend meter** |
+| Agent page | the drill-in | five tabs — Overview · Skills & callables · Thinking · Soul · Activity ([AG23](features/author-an-agent.md#decisions)) |
 | `LLMs` | second drawer of the same stack | the providers, the models under each, and the cast role that names each one |
 | Lineage | a page | who authored whom, who spawned whom, on what run — with the depth marked and the floor's refusal drawn |
 | Concurrency | a page, or the drawer's footer | running · queued with positions and reasons · every ceiling in force |
@@ -267,11 +279,11 @@ Hi-fi, at 1440×900, on the **Agents › Soul — 5.8** page of *The Assistant S
 
 | # | Decision |
 |---|---|
-| A1 | **An agent binds no provider.** It carries three bounds — envelope, budget and **lens** — and the lens's `cast` names the model, which the Graph resolves to a configured provider row and its credential. The composer never picks one, and neither does the agent ([PM1](features/providers-and-models.md) · [GV10](../govern/spec.md)). |
+| A1 | **An agent binds no provider and no world.** It carries standing limits; the world comes with the work, and the effective lens's `cast` names the model, which the Graph resolves to a configured provider row and its credential. The composer never picks a model, and neither does the agent ([AG24](features/author-an-agent.md#decisions) · [PM1](features/providers-and-models.md) · [GV10](../govern/spec.md)). |
 | A2 | Every agent has an envelope. There is no unbounded agent. |
 | A3 | A spawned agent's budget is a subset of its parent's, and it is ephemeral by default. |
 | A4 | Retire never deletes — lineage must stay resolvable, and the name is never freed. |
-| A5 | **The three bounds are read together.** They are what a refusal names, so a panel that shows two of them explains two-thirds of why a run was turned away. |
+| A5 | **A refusal names which side bound it** — the agent's standing limits, the work's world, or a guardrail ([AG6](features/author-an-agent.md#decisions)). |
 | A6 | **Ceilings are stated as a table of value → what it bounds, not a form of eight inputs.** Six of them are numbers a person sets once and reads often; the reading is the common case. |
 
 ## 7. Deliberately absent
