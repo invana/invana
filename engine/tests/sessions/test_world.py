@@ -6,6 +6,7 @@ from __future__ import annotations
 import pytest
 
 from invana.apps.govern.models import Lens, LensKind
+from invana.apps.llm_providers.models import LLMModel, LLMProvider, LLMProviderKind
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.schemas import SendMessage
 from invana.core.errors import ValidationError
@@ -68,3 +69,32 @@ async def test_a_guardrail_is_refused_and_the_spend_is_clamped_to_the_agents(ses
     assert sess.max_cost_usd_run == 2.0  # the seeded agent's DEFAULT_BUDGET cap
     th = await _ask(session, sess, graph, user)
     assert th.params["max_cost_usd_run"] == 2.0
+
+
+async def test_an_ask_a_guardrail_refuses_names_its_world_role_address_and_bound(session, graph, user):
+    """AG35 — the 422 carries the facts the reply draws *this ask was not run*
+    from: the world the ask was in, the role, the address it cast, and whose
+    rule denied it (AG6)."""
+    provider = LLMProvider(graph_id=graph.id, name="anthropic-prod", provider=LLMProviderKind.anthropic, guardrails={})
+    session.add(provider)
+    await session.flush()
+    session.add(LLMModel(provider_id=provider.id, model_id="claude-opus-5", capabilities={}, pricing={}))
+    rail = await _lens(session, graph, kind=LensKind.guardrail.value, name="Nothing leaves")
+    rail.rules = [{"match": "llm/anthropic-prod/**", "allow": False}]
+    world = await _lens(session, graph, name="EU")
+    world.cast = {"decide": "llm/anthropic-prod/claude-opus-5"}
+    await session.flush()
+    sess = await sessions.create_session(session, graph=graph, user_id=user.id, title="t")
+
+    with pytest.raises(ValidationError) as exc:
+        await run_services.open_turn(
+            session,
+            sess=sess,
+            graph=graph,
+            payload=SendMessage(content="who flies BER-LIS?", mode="nl", lens_id=world.id),
+            actor_id=user.id,
+        )
+    detail = exc.value.detail
+    assert detail["error"] == "cast_refused"
+    assert (detail["world"], detail["role"], detail["address"]) == ("EU", "decide", "llm/anthropic-prod/claude-opus-5")
+    assert detail["denied_in"] == "the Graph's guardrail 'Nothing leaves'"

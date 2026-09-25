@@ -20,6 +20,23 @@ export type SessionMessageRole = "user" | "assistant";
  *  (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md). */
 export type SessionMessageStatus = "running" | "ok" | "error" | "stopped";
 
+/**
+ * A send refused before its run opened — the cast the ask's world picked is
+ * one a guardrail denies (AG6 · AG35). The engine's `422` body, as sent.
+ */
+export interface CastRefusal {
+	error: "cast_refused";
+	message: string;
+	role: string;
+	address: string | null;
+	/** The rule's match pattern — `llm/anthropic-prod/**`. */
+	rule: string | null;
+	/** Whose rule — `the agent's own guardrail 'Nothing leaves'`. */
+	denied_in: string | null;
+	/** The world the ask was in — a name, or `Everything`. */
+	world?: string;
+}
+
 export interface SessionMessage {
 	id: string;
 	role: SessionMessageRole;
@@ -27,6 +44,9 @@ export interface SessionMessage {
 	content: string;
 	createdAt: Date;
 	status?: SessionMessageStatus;
+	/** Set on a reply whose send a bound refused before it ran. Page-local: a
+	 *  refused ask writes no rows, so a reload does not bring it back. */
+	refusal?: CastRefusal;
 	/** A canvas operation this turn records instead of a composer query (docs/for-developers/modules/explore/features/boards.md):
 	 *  "expand" (node-expand / traversal) or "load" ("Load to canvas"). Set on both
 	 *  rows of the pair. Undefined on a normal NL/QL turn. The thread renders these

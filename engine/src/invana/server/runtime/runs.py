@@ -8,12 +8,14 @@ these address the run in its own right.
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Path, Query, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.agents.models import Agent
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.sessions.schemas import SendMessageResponse, SessionMessageRead
@@ -25,7 +27,7 @@ from invana.runtime.catalogue import CATALOGUE
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.interpreter.payloads import _retry_for
 from invana.runtime.managers.rule_citations import offered_rules
-from invana.runtime.models import RunStatus, TaskPrompt
+from invana.runtime.models import RunStatus, TaskPrompt, TaskRun
 from invana.runtime.projections import (
     Shape,
     accepts_reason,
@@ -327,6 +329,40 @@ async def switch_emission_template(
 # ---------------------------------------------------------------------------
 
 
+_CEILINGS = (
+    "max_tokens",
+    "max_steps",
+    "max_cost_usd",
+    "max_cost_usd_run",
+    "max_cost_usd_month",
+    "max_concurrent_runs",
+    "max_clarifications",
+    "max_replans",
+    "max_fanout",
+)
+
+
+def run_ceilings(run: TaskRun, agent: Agent) -> dict[str, Any]:
+    """Every ceiling the run dashboard draws a spend or a count against.
+
+    Effort is its own column (EB9) and is read beside the spend ceilings. Every
+    ceiling, not the two the dashboard drew first: a run's spend reads against
+    its **per-run** ceiling, and the month one belongs beside it or neither
+    number says its window ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+    `max_cost_usd` rides along for one release under its old name.
+
+    **The per-run ceiling is the one this run froze** — the session's spend per
+    run, already clamped to the agent's cap — never the agent's cap as it reads
+    today. A run is drawn against the bound it opened with (AG25 · EB13).
+    """
+    effective = {**agent.effective_budget, **agent.effective_effort}
+    ceilings = {key: effective.get(key) for key in _CEILINGS}
+    frozen = (run.params or {}).get("max_cost_usd_run")
+    if frozen is not None:
+        ceilings["max_cost_usd_run"] = frozen
+    return ceilings
+
+
 @runs_router.get("/{run_id}/trace", response_model=TraceRead)
 async def get_trace(
     run_id: str = Path(...),
@@ -359,28 +395,7 @@ async def get_trace(
     if run.agent_id:
         agent = await AgentQuerySet().get(session, run.agent_id)
         if agent is not None:
-            # Effort is its own column now (EB9); the dashboard still draws it
-            # beside the spend ceilings, so the two are read together.
-            effective = {**agent.effective_budget, **agent.effective_effort}
-            # Every ceiling the dashboard draws, not the two it drew first:
-            # a run's spend reads against its **per-run** ceiling, and the
-            # month one belongs beside it or neither number says its window
-            # ([EB1](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
-            # `max_cost_usd` rides along for one release under its old name.
-            budget = {
-                key: effective.get(key)
-                for key in (
-                    "max_tokens",
-                    "max_steps",
-                    "max_cost_usd",
-                    "max_cost_usd_run",
-                    "max_cost_usd_month",
-                    "max_concurrent_runs",
-                    "max_clarifications",
-                    "max_replans",
-                    "max_fanout",
-                )
-            }
+            budget = run_ceilings(run, agent)
     priced = [step.cost_usd for step in steps if step.cost_usd is not None]
     # A statement, never an id: the wording each step was given, resolved once
     # for the whole trace (RU12).

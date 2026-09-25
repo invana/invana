@@ -114,6 +114,9 @@ class TaskRunSummary(BaseModel):
     #: line (SR45). `0` here is a run that recorded no tokens, which a load is.
     tokens_in: int = 0
     tokens_out: int = 0
+    #: What the run spent, summed over its priced steps. ``None`` when none had
+    #: a published rate — *unknown*, never `0` (SR40).
+    cost_usd: float | None = None
 
 
 class TaskRunListResponse(BaseModel):

@@ -643,6 +643,7 @@ means one version, one import, one story tree.
 | ~~`EmissionCard`~~ | ✅ shipped — with `EmissionHeader` (DS7) and `CitationMarker` | 12 | `ui/ui-extended/emission-card/` |
 | ~~`CannotAnswerCard`~~ | ✅ shipped | 3 | `ui/ui-extended/run-outcomes/` |
 | ~~`DiagnosisCard`~~ | ✅ shipped. Plus `RepairNote` + `RetryNote` — DS8's four outcomes are four components | 2 | `ui/ui-extended/run-outcomes/` |
+| ~~`RefusalCard`~~ | ✅ shipped — a bound refused the work **before it ran**: neither a cannot-answer (nothing was read) nor a failure (nothing broke), so its own component, never a `CannotAnswerCard` label ([AG35](../modules/agents/features/author-an-agent.md#decisions)). Studio's `CastRefusalCard` maps the `cast_refused` body onto its slots | 1 | `ui/ui-extended/refusal-card/` |
 | ~~`ClarifyCard`~~ | ✅ shipped | 2 | `ui/ui-extended/clarify-card/` |
 | ~~`TemplatePicker`~~ | ✅ shipped | 1 | `ui/ui-extended/template-picker/` |
 | ~~`ProposalCard`~~ | ✅ shipped | 2 | `ui/ui-extended/proposal-card/` |

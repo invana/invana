@@ -123,8 +123,20 @@ class LLMEndpointManager:
         resolution = resolve_role(effective, role=role, shipped=shipped)
         if not resolution.allowed or resolution.address is None:
             # A denied cast is the lens refusing this run, and it already carries
-            # the sentence that names its bound.
-            raise ValidationError(resolution.refusal or "This run cannot open.")
+            # the sentence that names its bound. The facts ride beside the
+            # sentence so the reply can be drawn as *this ask was not run*,
+            # naming the role, the address and the bound (AG6 · AG35), rather
+            # than as one line of error text.
+            raise ValidationError(
+                {
+                    "error": "cast_refused",
+                    "message": resolution.refusal or "This run cannot open.",
+                    "role": resolution.role.value,
+                    "address": resolution.address,
+                    "rule": resolution.rule_matched,
+                    "denied_in": resolution.denied_in,
+                }
+            )
         return resolution.address
 
     # ── offering one more ────────────────────────────────────────────────────

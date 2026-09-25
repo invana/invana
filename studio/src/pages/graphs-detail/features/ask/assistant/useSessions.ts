@@ -1,3 +1,4 @@
+import { asCastRefusal } from "@/pages/graphs-detail/features/ask/assistant/CastRefusal";
 import {
 	type ThinkingStreamHandle,
 	messageFromFrame,
@@ -447,6 +448,11 @@ export function useSessions(
 												content: stopped
 													? "Stopped by you."
 													: ((err as Error)?.message ?? "Query failed."),
+												// A bound said no before anything ran — drawn as its
+												// own card, not as error text (AG35).
+												refusal: stopped
+													? undefined
+													: (asCastRefusal(err) ?? undefined),
 											}
 										: m,
 								),

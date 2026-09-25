@@ -170,16 +170,25 @@ async def open_turn(
     lens_id = payload.lens_id if "lens_id" in payload.model_fields_set else await session_world(db, sess=sess)
     frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=lens_id)
     needs_provider = is_modeller or payload.mode == "nl"
-    provider = (
-        await resolve_endpoint(
-            db,
-            graph_id=graph.id,
-            snapshot=frozen["lens_snapshot"],
-            prefer_model_row_id=payload.llm_model_id,
+    try:
+        provider = (
+            await resolve_endpoint(
+                db,
+                graph_id=graph.id,
+                snapshot=frozen["lens_snapshot"],
+                prefer_model_row_id=payload.llm_model_id,
+            )
+            if needs_provider
+            else None
         )
-        if needs_provider
-        else None
-    )
+    except ValidationError as exc:
+        # A refused cast names the world the ask was in, so the reply can say
+        # *in Everything, decide is cast to …* — the one fact the resolver
+        # cannot know (AG35).
+        if isinstance(exc.detail, dict) and exc.detail.get("error") == "cast_refused":
+            world = await _lenses.lenses_qs.get(db, lens_id) if lens_id else None
+            exc.detail["world"] = world.display_name if world is not None else "Everything"
+        raise
     opening = opening_for(agent, ask_kind=payload.mode) if agent is not None else None
     wf = MODELLER_GENERATE if is_modeller else (NL_QUERY if payload.mode == "nl" else QL_QUERY)
 
@@ -849,6 +858,7 @@ async def list_runs(
                     TaskRun.output,
                     TaskRun.tokens_in,
                     TaskRun.tokens_out,
+                    TaskRun.cost_usd,
                 ).where(TaskRun.parent_run_id.in_(ids))
             )
         ).all()
@@ -858,11 +868,16 @@ async def list_runs(
     # line reads it, and a per-row trace fetch would be 50 requests for a list
     # (SR45). The same roll-up `result.json` defines (SR39).
     tokens: dict[str, list[int]] = {}
-    for run_id, task_key, output, tokens_in, tokens_out in steps:
+    # Dollars only where a step was priced: a run none of whose steps had a
+    # published rate is absent here, never `$0.00` (SR40 · AG11).
+    cost: dict[str, float] = {}
+    for run_id, task_key, output, tokens_in, tokens_out, step_cost in steps:
         counts[run_id] = counts.get(run_id, 0) + 1
         spend = tokens.setdefault(run_id, [0, 0])
         spend[0] += tokens_in or 0
         spend[1] += tokens_out or 0
+        if step_cost is not None:
+            cost[run_id] = cost.get(run_id, 0.0) + step_cost
         if task_key == "verify_result":
             served = (output or {}).get("served")
             if isinstance(served, str):
@@ -932,6 +947,9 @@ async def list_runs(
             # A root can spend tokens of its own as well as through its tasks.
             "tokens_in": (r.tokens_in or 0) + tokens.get(r.id, [0, 0])[0],
             "tokens_out": (r.tokens_out or 0) + tokens.get(r.id, [0, 0])[1],
+            "cost_usd": (
+                None if r.cost_usd is None and r.id not in cost else (r.cost_usd or 0.0) + cost.get(r.id, 0.0)
+            ),
         }
         for r in rows
     ]

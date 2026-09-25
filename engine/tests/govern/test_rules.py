@@ -12,6 +12,7 @@ import pytest
 
 from invana.apps.govern.addressing import AddressError, Layer, matches, parse_address, validate_pattern
 from invana.apps.govern.cast import CastError, require, resolve, shipped_cast
+from invana.apps.govern.managers.endpoint import LLMEndpointManager
 from invana.apps.govern.rules import (
     Decision,
     Effective,
@@ -22,6 +23,7 @@ from invana.apps.govern.rules import (
     from_snapshot,
     validate_rule,
 )
+from invana.core.errors import ValidationError
 
 # ── addressing ───────────────────────────────────────────────────────────────
 
@@ -226,6 +228,22 @@ def test_a_refusal_names_the_bound_its_rule_came_from() -> None:
     )
     refusal = resolve(effective, role=Role.decide).refusal or ""
     assert "llm/anthropic-prod/** in the agent's own guardrail 'Nothing leaves' denies it" in refusal
+
+
+def test_a_refused_cast_carries_its_facts_beside_the_sentence() -> None:
+    """AG35 — the reply draws *this ask was not run* from these fields, not from
+    one line of error text."""
+    effective = Effective(
+        rules=[Rule(match="llm/anthropic-prod/**", allow=False, by="the agent's own guardrail 'Nothing leaves'")],
+        cast={"decide": "llm/anthropic-prod/claude-opus-5"},
+    )
+    with pytest.raises(ValidationError) as exc:
+        LLMEndpointManager()._cast_address([], effective=effective, role="decide")
+    detail = exc.value.detail
+    assert detail["error"] == "cast_refused"
+    assert (detail["role"], detail["address"]) == ("decide", "llm/anthropic-prod/claude-opus-5")
+    assert detail["denied_in"] == "the agent's own guardrail 'Nothing leaves'"
+    assert "denies it" in detail["message"]
 
 
 def test_the_shipped_cast_reads_cheap_decides_capable_and_judges_locally() -> None:

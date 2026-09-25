@@ -140,162 +140,178 @@ export function AgentActivityTab({
 				{m ? <Meters m={m} /> : <Spinner />}
 			</PanelSection>
 
-			<PanelSection title="Limits" hint="empty means the Graph default applies">
-				<Eyebrow>Spend</Eyebrow>
-				<CeilingsTable
-					group="budget"
-					values={draft.budget}
-					onChange={(budget) => onPatch({ budget })}
-				/>
-				<Eyebrow className="mt-2">Reach</Eyebrow>
-				<CeilingsTable
-					group="reach"
-					values={draft.budget}
-					onChange={(budget) => onPatch({ budget })}
-				/>
-			</PanelSection>
-
-			<PanelSection title="Runs" hint="what this agent has run">
-				{runs.isLoading ? (
-					<Spinner />
-				) : !runs.data?.items.length ? (
-					<p className="text-muted-foreground">This agent has not run yet.</p>
-				) : (
-					<ul className="space-y-1.5">
-						{runs.data.items.map((plan) => (
-							<li key={plan.id} className="flex items-start gap-2">
-								<span className="min-w-0 flex-1">
-									<span className="block truncate">
-										{plan.body ?? plan.task_title ?? plan.workflow_key}
-									</span>
-									<span className="block truncate text-sm text-muted-foreground">
-										<span className="font-mono">{plan.id.slice(0, 4)}</span> ·{" "}
-										{planProvenance(plan)}
-										{plan.queued_at
-											? ` · ${formatRelativeTime(new Date(plan.queued_at))}`
-											: ""}
-									</span>
-								</span>
-								{/* Absent `served` means the run never reached Verify —
-								    drawn as the status, because "nobody asked" and "asked
-								    and failed" are different facts. */}
-								<DetailStatus
-									tone={
-										plan.served
-											? verdictTone(plan.served)
-											: plan.status === "failed"
-												? "error"
-												: "muted"
-									}
-								>
-									{plan.served ? verdictLabel(plan.served) : plan.status}
-								</DetailStatus>
-							</li>
-						))}
-					</ul>
-				)}
-			</PanelSection>
-
-			<PanelSection
-				title="Sessions"
-				hint={
-					m
-						? `${m.sessions} asking through ${agent.name}, in the Graph`
-						: undefined
-				}
-			>
-				<Eyebrow aside={mine.length || undefined}>Yours</Eyebrow>
-				{sessions.isLoading ? (
-					<Spinner />
-				) : mine.length ? (
-					<ul className="space-y-1">
-						{mine.map((s) => (
-							<li key={s.id} className="flex items-baseline gap-2">
-								<span className="min-w-0 flex-1 truncate">
-									{s.title || "Untitled session"}
-								</span>
-								<span className="shrink-0 text-sm text-muted-foreground">
-									{formatRelativeTime(s.updatedAt)}
-								</span>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p className="text-muted-foreground">
-						You have no sessions with this agent. Others' sessions are theirs —
-						only their count is shown.
-					</p>
-				)}
-			</PanelSection>
-
-			<PanelSection
-				title="Lineage"
-				action={
-					<Button
-						variant="link"
-						size="sm"
-						className="h-auto p-0"
-						onClick={onOpenLineage}
-					>
-						Open lineage
-					</Button>
-				}
-			>
-				<PropertyList labelWidth={96}>
-					<PropertyRow label="created">
-						{agent.kind} by {agent.created_by_kind} ·{" "}
-						{new Date(agent.created_at).toLocaleDateString()}
-					</PropertyRow>
-					<PropertyRow label="spawned">
-						{m
-							? m.spawned_this_month
-								? `${m.spawned_this_month} this month${m.max_children != null ? ` · up to ${m.max_children} per run` : ""}`
-								: agent.policy.can_spawn
-									? "none this month"
-									: "none — it may not spawn"
-							: "…"}
-					</PropertyRow>
-					<PropertyRow label="depth">
-						{m
-							? m.depth
-								? `${m.depth} — a child${m.max_depth != null ? `, of at most ${m.max_depth}` : ""}`
-								: "0 — a root agent"
-							: "…"}
-					</PropertyRow>
-					<PropertyRow label="related">
-						{children.length
-							? children.map((n) => n.label).join(" · ")
-							: "none"}
-					</PropertyRow>
-				</PropertyList>
-			</PanelSection>
-
-			<PanelSection title="Events" hint="newest first">
-				{events.isLoading ? (
-					<Spinner />
-				) : events.data?.items.length ? (
-					<ul className="space-y-1">
-						{events.data.items.slice(0, 20).map((e) => (
-							<li key={e.id} className="flex items-baseline gap-2">
-								<span className="min-w-0 flex-1 truncate font-mono text-sm">
-									{e.action}
-									{e.target_kind ? (
-										<span className="text-muted-foreground">
-											{" "}
-											· {e.target_kind}
+			{/* The artboard's two columns when the page is wide enough: what it
+			    did on the left, what caps it and who asks through it on the
+			    right. One column when `rightSection` takes the room. */}
+			<div className="grid @min-[760px]:grid-cols-2 @min-[760px]:divide-x divide-border">
+				<div className="min-w-0">
+					<PanelSection title="Runs" hint="what this agent has run">
+						{runs.isLoading ? (
+							<Spinner />
+						) : !runs.data?.items.length ? (
+							<p className="text-muted-foreground">
+								This agent has not run yet.
+							</p>
+						) : (
+							<ul className="space-y-1.5">
+								{runs.data.items.map((plan) => (
+									<li key={plan.id} className="flex items-start gap-2">
+										<span className="min-w-0 flex-1">
+											<span className="block truncate">
+												{plan.body ?? plan.task_title ?? plan.workflow_key}
+											</span>
+											<span className="block truncate text-sm text-muted-foreground">
+												<span className="font-mono">{plan.id.slice(0, 4)}</span>{" "}
+												· {planProvenance(plan)}
+												{plan.cost_usd != null
+													? ` · ${usd(plan.cost_usd)}`
+													: ""}
+												{plan.queued_at
+													? ` · ${formatRelativeTime(new Date(plan.queued_at))}`
+													: ""}
+											</span>
 										</span>
-									) : null}
-								</span>
-								<span className="shrink-0 text-sm text-muted-foreground">
-									{formatRelativeTime(new Date(e.created_at))}
-								</span>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p className="text-muted-foreground">Nothing recorded yet.</p>
-				)}
-			</PanelSection>
+										{/* Absent `served` means the run never reached Verify —
+									    drawn as the status, because "nobody asked" and "asked
+									    and failed" are different facts. */}
+										<DetailStatus
+											tone={
+												plan.served
+													? verdictTone(plan.served)
+													: plan.status === "failed"
+														? "error"
+														: "muted"
+											}
+										>
+											{plan.served ? verdictLabel(plan.served) : plan.status}
+										</DetailStatus>
+									</li>
+								))}
+							</ul>
+						)}
+					</PanelSection>
+
+					<PanelSection
+						title="Lineage"
+						action={
+							<Button
+								variant="link"
+								size="sm"
+								className="h-auto p-0"
+								onClick={onOpenLineage}
+							>
+								Open lineage
+							</Button>
+						}
+					>
+						<PropertyList labelWidth={96}>
+							<PropertyRow label="created">
+								{agent.kind} by {agent.created_by_kind} ·{" "}
+								{new Date(agent.created_at).toLocaleDateString()}
+							</PropertyRow>
+							<PropertyRow label="spawned">
+								{m
+									? m.spawned_this_month
+										? `${m.spawned_this_month} this month${m.max_children != null ? ` · up to ${m.max_children} per run` : ""}`
+										: agent.policy.can_spawn
+											? "none this month"
+											: "none — it may not spawn"
+									: "…"}
+							</PropertyRow>
+							<PropertyRow label="depth">
+								{m
+									? m.depth
+										? `${m.depth} — a child${m.max_depth != null ? `, of at most ${m.max_depth}` : ""}`
+										: "0 — a root agent"
+									: "…"}
+							</PropertyRow>
+							<PropertyRow label="related">
+								{children.length
+									? children.map((n) => n.label).join(" · ")
+									: "none"}
+							</PropertyRow>
+						</PropertyList>
+					</PanelSection>
+
+					<PanelSection title="Events" hint="newest first">
+						{events.isLoading ? (
+							<Spinner />
+						) : events.data?.items.length ? (
+							<ul className="space-y-1">
+								{events.data.items.slice(0, 20).map((e) => (
+									<li key={e.id} className="flex items-baseline gap-2">
+										<span className="min-w-0 flex-1 truncate font-mono text-sm">
+											{e.action}
+											{e.target_kind ? (
+												<span className="text-muted-foreground">
+													{" "}
+													· {e.target_kind}
+												</span>
+											) : null}
+										</span>
+										<span className="shrink-0 text-sm text-muted-foreground">
+											{formatRelativeTime(new Date(e.created_at))}
+										</span>
+									</li>
+								))}
+							</ul>
+						) : (
+							<p className="text-muted-foreground">Nothing recorded yet.</p>
+						)}
+					</PanelSection>
+				</div>
+				<div className="min-w-0">
+					<PanelSection
+						title="Limits"
+						hint="empty means the Graph default applies"
+					>
+						<Eyebrow>Spend</Eyebrow>
+						<CeilingsTable
+							group="budget"
+							values={draft.budget}
+							onChange={(budget) => onPatch({ budget })}
+						/>
+						<Eyebrow className="mt-2">Reach</Eyebrow>
+						<CeilingsTable
+							group="reach"
+							values={draft.budget}
+							onChange={(budget) => onPatch({ budget })}
+						/>
+					</PanelSection>
+
+					<PanelSection
+						title="Sessions"
+						hint={
+							m
+								? `${m.sessions} asking through ${agent.name}, in the Graph`
+								: undefined
+						}
+					>
+						<Eyebrow aside={mine.length || undefined}>Yours</Eyebrow>
+						{sessions.isLoading ? (
+							<Spinner />
+						) : mine.length ? (
+							<ul className="space-y-1">
+								{mine.map((s) => (
+									<li key={s.id} className="flex items-baseline gap-2">
+										<span className="min-w-0 flex-1 truncate">
+											{s.title || "Untitled session"}
+										</span>
+										<span className="shrink-0 text-sm text-muted-foreground">
+											{formatRelativeTime(s.updatedAt)}
+										</span>
+									</li>
+								))}
+							</ul>
+						) : (
+							<p className="text-muted-foreground">
+								You have no sessions with this agent. Others' sessions are
+								theirs — only their count is shown.
+							</p>
+						)}
+					</PanelSection>
+				</div>
+			</div>
 		</>
 	);
 }

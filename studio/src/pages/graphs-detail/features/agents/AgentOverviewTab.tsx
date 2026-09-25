@@ -4,7 +4,7 @@
  * switches. Each summary names the tab that edits it.
  */
 
-import { useLensQuery } from "@/hooks/queries/useGovern";
+import { useLensQuery, useLensesQuery } from "@/hooks/queries/useGovern";
 import {
 	useAgentMetersQuery,
 	useAgentSkillsAndCallablesQuery,
@@ -60,6 +60,12 @@ export function AgentOverviewTab({
 		username,
 		graphSlug,
 		agent.guardrail_id ?? undefined,
+	);
+	// Every guardrail that holds on this agent's runs: the Graph's, and its own
+	// (AG7). Worlds are not here — a world comes with the work (AG24).
+	const guardrails = useLensesQuery(username, graphSlug, { kind: "guardrail" });
+	const inForce = (guardrails.data?.items ?? []).filter(
+		(g) => g.scope === "graph" || g.scope === `agent:${agent.id}`,
 	);
 	const can = useAgentSkillsAndCallablesQuery(username, graphSlug, agent.id);
 	const meters = useAgentMetersQuery(username, graphSlug, agent.id);
@@ -147,15 +153,29 @@ export function AgentOverviewTab({
 				</PropertyList>
 			</PanelSection>
 
-			<PanelSection
-				title="Always in force"
-				hint={agent.guardrail_name ?? "whoever asks"}
-			>
+			<PanelSection title="Always in force" hint="whoever asks">
 				{/* **An agent binds no provider and no world** (PM1 · AG24). What
-				    holds whoever asks is its own guardrail (AG10), edited in
-				    Govern › Guardrails. */}
+				    holds whoever asks is the Graph's guardrails and its own (AG7 ·
+				    AG10), edited in Govern › Guardrails. */}
+				{inForce.length ? (
+					<PropertyList labelWidth={96}>
+						{inForce.map((g) => (
+							<PropertyRow
+								key={g.id}
+								label={g.scope === "graph" ? "the Graph" : "this agent"}
+							>
+								{g.display_name}
+							</PropertyRow>
+						))}
+					</PropertyList>
+				) : (
+					<p className="text-muted-foreground">
+						No guardrails — the Graph has none, and neither does this agent.
+					</p>
+				)}
 				{agent.guardrail_id ? (
 					<CastTable
+						className="mt-2"
 						readOnly
 						cast={ownGuardrail.data?.cast}
 						resolved={ownGuardrail.data?.cast_resolved?.map((row) => ({
@@ -170,7 +190,7 @@ export function AgentOverviewTab({
 						}))}
 					/>
 				) : (
-					<p className="text-muted-foreground">
+					<p className="mt-1.5 text-sm text-muted-foreground">
 						No guardrail of its own. Each run is bounded by the world its
 						session or Todo brings, inside the Graph's guardrails.
 					</p>

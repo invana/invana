@@ -22,7 +22,10 @@
 import { AgentActivityTab } from "@/pages/graphs-detail/features/agents/AgentActivityTab";
 import { AgentOverviewTab } from "@/pages/graphs-detail/features/agents/AgentOverviewTab";
 import { AgentSkillsTab } from "@/pages/graphs-detail/features/agents/AgentSkillsTab";
-import { AgentSoulTab } from "@/pages/graphs-detail/features/agents/AgentSoulTab";
+import {
+	AgentSoulTab,
+	useSoulPreview,
+} from "@/pages/graphs-detail/features/agents/AgentSoulTab";
 import { AgentThinkingTab } from "@/pages/graphs-detail/features/agents/AgentThinkingTab";
 import {
 	type AgentDraft,
@@ -43,7 +46,15 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@invana/ui";
-import { Archive, Pause, Play, Save, Star, Undo2 } from "lucide-react";
+import {
+	Archive,
+	MessageSquareText,
+	Pause,
+	Play,
+	Save,
+	Star,
+	Undo2,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 /**
@@ -126,6 +137,22 @@ export function AgentDetail({
 	/** The raw envelope editor's parse error; a spec that does not parse cannot be saved. */
 	const [specError, setSpecError] = useState<string | null>(null);
 
+	const soulPreview = useSoulPreview(username, graphSlug, agent.id, draft);
+	// The soul's **Preview** belongs to the Soul tab's header actions, beside
+	// Discard · Save, as drawn — it answers the tab's sample ask in both voices.
+	const previewButton =
+		tab === "soul" ? (
+			<Button
+				size="sm"
+				variant="ghost"
+				disabled={soulPreview.preview.isPending}
+				onClick={soulPreview.run}
+			>
+				<MessageSquareText />
+				{soulPreview.preview.isPending ? "Asking…" : "Preview"}
+			</Button>
+		) : null;
+
 	const changes = useMemo(() => changesOf(agent, draft), [agent, draft]);
 	const dirty = Object.keys(changes).length > 0;
 	const patch = (next: Partial<AgentDraft>) =>
@@ -154,6 +181,7 @@ export function AgentDetail({
 				actions={
 					dirty ? (
 						<>
+							{previewButton}
 							<Button
 								size="sm"
 								variant="ghost"
@@ -178,6 +206,7 @@ export function AgentDetail({
 						</>
 					) : (
 						<>
+							{previewButton}
 							{!isDefault && agent.status === "active" ? (
 								<Button size="sm" variant="ghost" onClick={onSetDefault}>
 									<Star /> Make default
@@ -227,7 +256,7 @@ export function AgentDetail({
 
 				<TabsContent
 					value="overview"
-					className="min-h-0 flex-1 overflow-y-auto"
+					className="@container min-h-0 flex-1 overflow-y-auto"
 				>
 					<AgentOverviewTab
 						username={username}
@@ -238,7 +267,10 @@ export function AgentDetail({
 						onGoTo={setTab}
 					/>
 				</TabsContent>
-				<TabsContent value="skills" className="min-h-0 flex-1 overflow-y-auto">
+				<TabsContent
+					value="skills"
+					className="@container min-h-0 flex-1 overflow-y-auto"
+				>
 					<AgentSkillsTab
 						username={username}
 						graphSlug={graphSlug}
@@ -256,22 +288,24 @@ export function AgentDetail({
 				</TabsContent>
 				<TabsContent
 					value="thinking"
-					className="min-h-0 flex-1 overflow-y-auto"
+					className="@container min-h-0 flex-1 overflow-y-auto"
 				>
 					<AgentThinkingTab agent={agent} draft={draft} onPatch={patch} />
 				</TabsContent>
-				<TabsContent value="soul" className="min-h-0 flex-1 overflow-y-auto">
+				<TabsContent
+					value="soul"
+					className="@container min-h-0 flex-1 overflow-y-auto"
+				>
 					<AgentSoulTab
-						username={username}
-						graphSlug={graphSlug}
 						agent={agent}
 						draft={draft}
 						onPatch={patch}
+						soulPreview={soulPreview}
 					/>
 				</TabsContent>
 				<TabsContent
 					value="activity"
-					className="min-h-0 flex-1 overflow-y-auto"
+					className="@container min-h-0 flex-1 overflow-y-auto"
 				>
 					<AgentActivityTab
 						username={username}

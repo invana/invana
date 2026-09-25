@@ -9,6 +9,7 @@ import {
 	ResultBlock,
 	loadableGraph,
 } from "@/pages/graphs-detail/features/ask/answer-surface/ResultBlock";
+import { CastRefusalCard } from "@/pages/graphs-detail/features/ask/assistant/CastRefusal";
 import { SessionContextDisclosure } from "@/pages/graphs-detail/features/ask/assistant/SessionContextDisclosure";
 import {
 	type StepClarification,
@@ -288,7 +289,7 @@ function SettledTurn({
 	const [clicked, setClicked] = useState(false);
 	const loaded = clicked || !!loadedToCanvas;
 	const textClass =
-		message.status === "error"
+		message.status === "error" && !message.refusal
 			? "text-destructive"
 			: isStopped
 				? "text-warning"
@@ -398,20 +399,21 @@ function SettledTurn({
 		<StepTrace step={s} onClose={() => setOpenTraceId(null)} />
 	);
 
-	const replyBody =
-		graph && !loaded ? (
-			<span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-				{!sentenceEchoed && <span className="min-w-0">{message.content}</span>}
-				<LoadToCanvasAction
-					onLoad={() => {
-						onLoadToCanvas(graph, message);
-						setClicked(true);
-					}}
-				/>
-			</span>
-		) : sentenceEchoed ? null : (
-			message.content
-		);
+	const replyBody = message.refusal ? (
+		<CastRefusalCard refusal={message.refusal} />
+	) : graph && !loaded ? (
+		<span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+			{!sentenceEchoed && <span className="min-w-0">{message.content}</span>}
+			<LoadToCanvasAction
+				onLoad={() => {
+					onLoadToCanvas(graph, message);
+					setClicked(true);
+				}}
+			/>
+		</span>
+	) : sentenceEchoed ? null : (
+		message.content
+	);
 
 	const toolbar = isStopped ? undefined : (
 		<ChatSessionMessageOptions actions={actions} />

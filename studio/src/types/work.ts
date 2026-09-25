@@ -574,6 +574,8 @@ export interface TaskRunSummary {
 	/** What the run spent, summed over its tasks (SR45). */
 	tokens_in: number;
 	tokens_out: number;
+	/** Dollars over its priced steps; absent is *unknown*, never `$0.00` (SR40). */
+	cost_usd?: number | null;
 }
 
 export interface ThinkingListResponse {

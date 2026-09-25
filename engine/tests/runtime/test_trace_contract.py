@@ -16,7 +16,10 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from invana.apps.agents.models import Agent
+from invana.runtime.models import TaskRun
 from invana.runtime.schemas import TraceRead, TraceStep
+from invana.server.runtime.runs import run_ceilings
 
 _ROUTE = Path(__file__).resolve().parents[2] / "src" / "invana" / "server" / "runtime" / "runs.py"
 
@@ -56,3 +59,13 @@ def test_the_trace_carries_a_spend_and_the_ceiling_it_is_drawn_against() -> None
     """SR41 — a spend without its ceiling is a number nobody can act on (SR20)."""
     assert "cost_usd" in TraceStep.model_fields
     assert {"cost_usd", "budget"} <= set(TraceRead.model_fields)
+
+
+def test_a_run_is_drawn_against_the_per_run_ceiling_it_froze() -> None:
+    """EB13 — the session narrowed the spend per run below the agent's cap, and
+    the run froze that; the dashboard reads the frozen one, not today's cap."""
+    agent = Agent(name="Analyst", budget={"max_cost_usd_run": 2.0}, effort={}, workflow_spec={})
+    narrowed = run_ceilings(TaskRun(params={"max_cost_usd_run": 0.5}), agent)
+    assert narrowed["max_cost_usd_run"] == 0.5
+    # A run opened before the column existed reads the agent's cap.
+    assert run_ceilings(TaskRun(params={}), agent)["max_cost_usd_run"] == 2.0

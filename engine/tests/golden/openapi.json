@@ -12922,6 +12922,17 @@
             ],
             "title": "Body"
           },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
           "finished_at": {
             "anyOf": [
               {
