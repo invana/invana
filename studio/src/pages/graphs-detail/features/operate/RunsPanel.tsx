@@ -20,7 +20,7 @@
  */
 
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
-import { type RunsFilters, useRunsJournalQuery } from "@/hooks/queries/useRuns";
+import { useRunsJournalQuery } from "@/hooks/queries/useRuns";
 import { useAgentsQuery } from "@/hooks/queries/useWork";
 import { ImportsJournalBody } from "@/pages/graphs-detail/features/bring-data-in/ImportsPanel";
 import {
@@ -28,6 +28,7 @@ import {
 	runAddress,
 } from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/operate/RunsFilterBar";
+import { useRunsFilters } from "@/pages/graphs-detail/features/operate/useRunsFilters";
 import {
 	taskDrawerSection,
 	useTaskDrawerUi,
@@ -36,7 +37,8 @@ import { useGovernPanel } from "@/pages/graphs-detail/shell/useGovernPanel";
 import { useRunsPanel } from "@/pages/graphs-detail/shell/useRunsPanel";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PanelStack } from "@invana/ui";
-import { useState } from "react";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { LayoutDashboard, RefreshCw } from "lucide-react";
 
 export interface RunsPanelProps {
 	username: string;
@@ -44,27 +46,25 @@ export interface RunsPanelProps {
 	onClose?: () => void;
 	/** `More` on a drilled-in run — opens its dashboard as a page (SR13). */
 	onOpenRunDashboard?: (runId: string) => void;
+	/** `Dashboard` on the header — the journal drawn wide, as a page (SR70). */
+	onOpenJournal?: () => void;
 	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */
 	onOpenPlan?: (workflowKey: string) => void;
 }
-
-const NO_FILTERS: RunsFilters = {};
 
 export function RunsPanel({
 	username,
 	graphSlug,
 	onOpenRunDashboard,
+	onOpenJournal,
 	onOpenPlan,
 }: RunsPanelProps) {
 	const { runId, openRun } = useRunsPanel();
 	// A run's lens opens where it is edited: Govern, drilled into that record.
 	const { reveal } = useGovernPanel();
 	const ui = useTaskDrawerUi();
-	// A filter narrows a list, and a narrowed list is not a place — so it is
-	// in-memory, not a URL key (G31).
-	const [filters, setFilters] = useState<RunsFilters>(NO_FILTERS);
-	const patch = (p: Partial<RunsFilters>) =>
-		setFilters((prev) => ({ ...prev, ...p }));
+	// Shared with the Runs page, so the two read one journal (SR70).
+	const { filters, patch } = useRunsFilters();
 	const journal = useRunsJournalQuery(username, graphSlug, filters);
 	const agents = (useAgentsQuery(username, graphSlug).data?.items ?? []).map(
 		(a) => ({ id: a.id, name: a.name }),
@@ -93,11 +93,21 @@ export function RunsPanel({
 	const runTitle = runId ? runAddress(runId) : undefined;
 	// Drilled in, the bar counts the run's ledger rather than the journal:
 	// `9 events · 1 refusal` (SR67). Shares the drawer's query, so no second read.
-	const touches = useRunTouchesQuery(
+	const touchesQuery = useRunTouchesQuery(
 		username,
 		graphSlug,
 		runId ?? undefined,
-	).data;
+	);
+	const touches = touchesQuery.data;
+	// Drilled in, `Refresh` reads the run again — its trace and its ledger,
+	// the two things the drawer is drawn from.
+	const qc = useQueryClient();
+	const traceKey = ["runs", username, graphSlug, runId, "trace"];
+	const traceFetching = useIsFetching({ queryKey: traceKey }) > 0;
+	const refreshRun = () => {
+		void qc.invalidateQueries({ queryKey: traceKey });
+		void touchesQuery.refetch();
+	};
 	const refusals = touches?.refused.length ?? 0;
 	const runRight = touches
 		? `${touches.total} event${touches.total === 1 ? "" : "s"}${
@@ -119,6 +129,39 @@ export function RunsPanel({
 								count,
 								trail: runTitle,
 								onBack: () => openRun(null),
+								headerActions: [
+									{
+										key: "refresh",
+										name: "Refresh",
+										icon: RefreshCw,
+										iconClassName: journal.isFetching
+											? "animate-spin"
+											: undefined,
+										onClick: () => void journal.refetch(),
+									},
+									...(onOpenJournal
+										? [
+												{
+													key: "dashboard",
+													name: "Dashboard",
+													icon: LayoutDashboard,
+													onClick: onOpenJournal,
+												},
+											]
+										: []),
+								],
+								detailActions: [
+									{
+										key: "refresh",
+										name: "Refresh",
+										icon: RefreshCw,
+										iconClassName:
+											touchesQuery.isFetching || traceFetching
+												? "animate-spin"
+												: undefined,
+										onClick: refreshRun,
+									},
+								],
 								searchable: true,
 								searchPlaceholder: "Search runs",
 								filtered,

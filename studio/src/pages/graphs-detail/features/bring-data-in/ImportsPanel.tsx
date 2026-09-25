@@ -67,7 +67,7 @@ export function ImportsJournalBody({
  * a support thread — so a journal nobody can quote from forces a drill-in just
  * to copy one id.
  */
-function shortRunId(id: string): string {
+export function shortRunId(id: string): string {
 	return id.replace(/-/g, "").slice(-8);
 }
 
@@ -78,7 +78,7 @@ function shortRunId(id: string): string {
  * queue for a minute did not take a minute. A run still going is measured
  * against `now`, which is why the journal holds a ticker.
  */
-function elapsedOf(row: JournalRow, now: number): number | null {
+export function elapsedOf(row: JournalRow, now: number): number | null {
 	const started = row.run.started_at;
 	if (!started) return null;
 	const end = row.run.finished_at ? Date.parse(row.run.finished_at) : now;

@@ -211,6 +211,7 @@ export function clickBehaviour(
  * as six fields nobody fills in.
  */
 export type DeclaredKind =
+	| "runs"
 	| "run"
 	| "task_run"
 	| "plan_runs"
@@ -236,6 +237,17 @@ export interface DeclaredKindSpec {
 }
 
 export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
+	// The journal drawn wide (SR70). Studio-only, like `agent`: it binds to
+	// the Graph rather than to a record, so it offers no `Save report`.
+	runs: {
+		kind: "runs",
+		renders: "dashboard",
+		label: "Runs",
+		icon: LayoutDashboard,
+		// `Dashboard` on the Runs panel's header.
+		panel: "runs",
+		subject: "the graph's slug",
+	},
 	run: {
 		kind: "run",
 		renders: "dashboard",

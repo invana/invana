@@ -100,6 +100,8 @@ export interface TaskDrawerSpec {
 		key: string;
 		name: string;
 		icon: ElementType;
+		/** `animate-spin` on a refresh while it fetches. */
+		iconClassName?: string;
 		onClick: () => void;
 	}[];
 	/**
@@ -111,6 +113,8 @@ export interface TaskDrawerSpec {
 		key: string;
 		name: string;
 		icon: ElementType;
+		/** `animate-spin` on a refresh while it fetches. */
+		iconClassName?: string;
 		onClick: () => void;
 	}[];
 	/** Enables this drawer's own search toggle. */
@@ -270,6 +274,7 @@ function drawerActions(
 		key: a.key,
 		name: a.name,
 		icon: a.icon,
+		iconClassName: a.iconClassName,
 		onClick: a.onClick,
 	}));
 

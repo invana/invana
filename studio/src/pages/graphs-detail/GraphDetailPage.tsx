@@ -72,6 +72,7 @@ import {
 	LensBoardPage,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/govern";
+import { RunsJournalPage } from "@/pages/graphs-detail/features/operate/RunsJournalPage";
 import { RunsPanel } from "@/pages/graphs-detail/features/operate/RunsPanel";
 import {
 	RunDashboardPage,
@@ -2372,6 +2373,10 @@ export function GraphDetailPage() {
 				onOpenRunDashboard={(runId) =>
 					openBoard({ kind: "run", subjectId: runId, runId })
 				}
+				// The journal drawn wide, beside the list (SR70).
+				onOpenJournal={() =>
+					openBoard({ kind: "runs", subjectId: graphSlug as string })
+				}
 				// The run stays in the drawer; the plan it ran is drawn beside it.
 				onOpenPlan={(key) => {
 					setSelectedWorkflowKey(key);
@@ -2914,6 +2919,17 @@ export function GraphDetailPage() {
 
 		// The agent's page (AG23 · AG34) — the one declared page that edits. It
 		// reads no trace, so it takes no `board.runId` (SD3).
+		// The journal drawn wide (SR70). It binds to the Graph, not to a run,
+		// so it takes no `board.runId`.
+		if (board.kind === "runs") {
+			return (
+				<RunsJournalPage
+					username={username as string}
+					graphSlug={graphSlug as string}
+				/>
+			);
+		}
+
 		if (board.kind === "agent") {
 			return (
 				<AgentBoardPage
