@@ -5,13 +5,9 @@
  * `@invana/dashboard` states about `canvas`: the package carries **strings** in
  * the spec and takes renderers as a prop, so a panel that needs a component the
  * package has never heard of arrives from the consumer. Here the component is
- * Skills' own `SkillFlowTab` — the board **hosts** the layer strip, it does not
- * own what a band means
+ * Skills' own `SkillFlowTab`, so the drawer and the board draw one plan with
+ * one `TaskFlowCanvas`
  * ([SK16](../../../../../../docs/for-developers/modules/skills/features/authoring-a-skill.md)).
- *
- * Reusing the tab rather than drawing a second strip is the whole point: the
- * drawer and the board would otherwise be two drawings of one plan to keep in
- * step, which is the argument SK16 already made against a node graph.
  */
 
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";

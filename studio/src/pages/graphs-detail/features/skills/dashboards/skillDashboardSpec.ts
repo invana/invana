@@ -193,15 +193,14 @@ function bands({
 			: null,
 		// SK13 — a version owns exactly one plan, so this band is never absent
 		// and no surface branches on *does this skill have a flow*.
-		// No pinned height: the strip is content-height, and the dashboard owns
-		// the one scroller — a band that fixed its own would clip a plan with
-		// six bands to make room for one with two.
+		// No pinned height: the canvas takes its own minimum, and the dashboard
+		// owns the one scroller.
 		{
 			panels: [
 				{
 					kind: "skillFlow",
 					title: "The flow",
-					aside: "declared, not touched — the six bands it will engage",
+					aside: "declared, not touched — the plan this skill runs",
 					options: {
 						plan: plan ?? null,
 						loading: planLoading,

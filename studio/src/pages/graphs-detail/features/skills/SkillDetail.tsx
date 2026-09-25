@@ -117,7 +117,7 @@ export function SkillDetail({
 							skill={skill}
 						/>
 					</TabsContent>
-					<TabsContent value="flow">
+					<TabsContent value="flow" className="h-full">
 						<SkillFlowTab plan={plan.data} loading={plan.isLoading} />
 					</TabsContent>
 					<TabsContent value="bindings">

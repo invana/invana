@@ -21,16 +21,12 @@ import {
 	lensSummary,
 	runLensOptions,
 } from "@/pages/graphs-detail/features/govern/runLens";
-import type {
-	FlowNodeSpec,
-	WithFlow,
-} from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
+import type { WithFlow } from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
 import {
 	type TaskGroup,
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
 	VIEW_SPEC,
-	boundOf,
 	compact,
 	count,
 	durationMs,
@@ -49,6 +45,7 @@ import {
 	toneOf,
 	usd,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
+import { taskFlowFromRun } from "@/pages/graphs-detail/features/operate/dashboards/taskFlowFromRun";
 import { runSummary } from "@/pages/graphs-detail/features/operate/runSummary";
 import type { TraceRead, TraceStepRead } from "@/services/api/runs";
 import type { TouchesResponse } from "@/types/govern";
@@ -60,7 +57,7 @@ import type {
 	RunPanelOptions,
 	TabSpec,
 } from "@invana/dashboard";
-import type { TaskGanttSegment, TaskGanttTask, TaskNodeTag } from "@invana/ui";
+import type { TaskGanttSegment, TaskGanttTask } from "@invana/ui";
 
 /** Action ids the page answers. The spec carries the string; the page carries the behaviour. */
 export const RUN_ACTIONS = {
@@ -124,7 +121,8 @@ export interface RunDashboardView {
 export type RunPanels = WithFlow & RunPanelOptions;
 
 /** How many cards the flow lays across before it wraps. */
-const FLOW_COLUMNS = 4;
+/** The canvas pans and zooms, so its height is the page's, not the plan's. */
+const FLOW_HEIGHT = 560;
 
 export function runDashboardSpec(
 	trace: TraceRead,
@@ -274,12 +272,7 @@ function runTabs(
 			id: "flow",
 			label: "Flow",
 			rows: groups.length
-				? [
-						{
-							height: flowHeight(groups.length),
-							panels: [flow(groups, selected)],
-						},
-					]
+				? [{ panels: [flow(groups, selected)] }]
 				: [{ panels: [notRecorded("The flow")] }],
 		},
 		{
@@ -467,59 +460,22 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 	};
 }
 
-function flowHeight(nodes: number): number {
-	// A card is ~96px on a 4-up grid; two rows is the artboard's own height.
-	return Math.min(348, 84 + Math.ceil(nodes / FLOW_COLUMNS) * 108);
-}
-
 function flow(
 	groups: TaskGroup[],
 	selected: TaskGroup | null,
 ): PanelSpec<RunPanels> {
-	const nodes: FlowNodeSpec[] = groups.map((group, i) => ({
-		id: group.head.id,
-		taskKey: group.key,
-		bound: boundOf(group.head) ?? "none",
-		// A task that never ran has no status of its own, and draws dim.
-		status:
-			group.head.status === "stopped" ? undefined : toneOf(group.head.status),
-		dim: group.head.status === "stopped" || group.head.status === "queued",
-		tags: omit<TaskNodeTag>([
-			group.lanes > 1 ? { label: `${group.lanes} lanes` } : null,
-			group.attempts > 1
-				? { label: `attempt ${group.attempts}`, tone: "warning" as const }
-				: null,
-		]),
-		meta: metaOf(group),
-		gate: group.head.status === "needs_input",
-		col: (i % FLOW_COLUMNS) + 1,
-		row: Math.floor(i / FLOW_COLUMNS) + 1,
-	}));
-
 	return {
 		kind: "flow",
 		title: "The flow · status as it ran",
 		aside: "click a task for its step detail ›",
 		flush: true,
 		options: {
-			nodes,
-			columns: FLOW_COLUMNS,
+			data: taskFlowFromRun(groups),
 			selectedId: selected?.head.id ?? null,
 			openAction: RUN_ACTIONS.openStep,
+			height: FLOW_HEIGHT,
 		},
 	};
-}
-
-/** The one line under a card: what it did, and how long it took doing it. */
-function metaOf(group: TaskGroup): string | undefined {
-	const ms =
-		group.head.duration_ms ??
-		durationMs(group.head.started_at, group.head.finished_at);
-	const parts = omit([
-		group.head.detail || null,
-		ms == null ? null : formatDuration(ms),
-	]);
-	return parts.length ? parts.join(" · ") : undefined;
 }
 
 /**

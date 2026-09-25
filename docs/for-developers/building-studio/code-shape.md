@@ -170,6 +170,8 @@ studio/src/
         work/                 9.x — projects, tasks, the plan, review
         operate/              10.x — schedules, audit and activity, observability
         graph-settings/       the Graph's own configuration — Info, Connection, LLMs
+  canvases/                   canvases more than one module renders — data, settings, templates in by props
+    taskflow/                 TaskFlowCanvas · settings.json · templates.json (task-flow-canvas.md)
   shared/
     api/                      the HTTP client and one file per engine resource
     hooks/  lib/  stores/  types/  telemetry/

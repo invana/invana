@@ -1,0 +1,248 @@
+{
+	"activeLayout": "elk",
+	"fitOnLoad": false,
+	"layers": {
+		"background": {
+			"type": "pattern",
+			"patternType": "dots",
+			"size": 1.5,
+			"spacing": 24,
+			"alpha": 0.7
+		},
+		"graph": {
+			"nodeStructureTemplates": {
+				"taskDot": {
+					"name": "taskDot",
+					"kind": "freeform",
+					"width": 60,
+					"height": 60,
+					"frame": {
+						"kind": "ellipse"
+					},
+					"bgRole": "cardBg",
+					"strokeLookup": {
+						"bind": "data.bound",
+						"map": {
+							"llm": 9133302,
+							"graph_read": 959977,
+							"none": 6583435
+						}
+					},
+					"strokeWidth": 3,
+					"elements": [
+						{
+							"id": "icon",
+							"type": "icon",
+							"x": 16,
+							"y": 16,
+							"size": 28,
+							"bind": "data.icon",
+							"colorLookup": {
+								"bind": "data.bound",
+								"map": {
+									"llm": 9133302,
+									"graph_read": 959977,
+									"none": 6583435
+								}
+							},
+							"strokeWidth": 2
+						},
+						{
+							"id": "title",
+							"type": "text",
+							"x": 30.0,
+							"y": 54,
+							"bind": "data.title",
+							"anchor": "center",
+							"fontSize": 12,
+							"fontWeight": 600,
+							"colorRole": "heading",
+							"maxWidth": 140
+						}
+					]
+				},
+				"taskCard": {
+					"name": "taskCard",
+					"kind": "freeform",
+					"width": 264,
+					"height": 116,
+					"cornerRadius": 10,
+					"bgRole": "cardBg",
+					"strokeRole": "stroke",
+					"strokeWidth": 1,
+					"elements": [
+						{
+							"id": "tile",
+							"type": "rect",
+							"x": 14,
+							"y": 14,
+							"width": 36,
+							"height": 36,
+							"cornerRadius": 8,
+							"fillLookup": {
+								"bind": "data.bound",
+								"map": {
+									"llm": 9133302,
+									"graph_read": 959977,
+									"none": 6583435
+								}
+							},
+							"fillAlpha": 0.16
+						},
+						{
+							"id": "icon",
+							"type": "icon",
+							"x": 22,
+							"y": 22,
+							"size": 20,
+							"bind": "data.icon",
+							"colorLookup": {
+								"bind": "data.bound",
+								"map": {
+									"llm": 9133302,
+									"graph_read": 959977,
+									"none": 6583435
+								}
+							},
+							"strokeWidth": 2
+						},
+						{
+							"id": "title",
+							"type": "text",
+							"x": 60,
+							"y": 0,
+							"bind": "data.title",
+							"fontSize": 15,
+							"fontWeight": 700,
+							"colorRole": "heading",
+							"maxWidth": 190
+						},
+						{
+							"id": "bound",
+							"type": "text",
+							"x": 60,
+							"y": 26,
+							"bind": "data.bound",
+							"fontSize": 10,
+							"fontWeight": 600,
+							"uppercase": true,
+							"colorLookup": {
+								"bind": "data.bound",
+								"map": {
+									"llm": 9133302,
+									"graph_read": 959977,
+									"none": 6583435
+								}
+							},
+							"maxWidth": 190
+						},
+						{
+							"id": "summary",
+							"type": "text",
+							"x": 14,
+							"y": 51,
+							"bind": "data.summary",
+							"fontSize": 11,
+							"colorRole": "foreground",
+							"maxWidth": 236,
+							"maxLines": 2,
+							"lineHeight": 15
+						},
+						{
+							"id": "footer",
+							"type": "text",
+							"x": 14,
+							"y": 87,
+							"text": "{data.stepKey} \u00b7 #{data.ordinal}",
+							"fontSize": 10,
+							"colorRole": "muted",
+							"maxWidth": 236
+						}
+					]
+				}
+			},
+			"nodeStylingTemplates": {
+				"label": {
+					"name": "label"
+				}
+			},
+			"nodeTypes": {
+				"task.llm": {
+					"structure": "taskDot",
+					"styling": "label",
+					"bindings": {}
+				},
+				"task.graph_read": {
+					"structure": "taskDot",
+					"styling": "label",
+					"bindings": {}
+				},
+				"task.none": {
+					"structure": "taskDot",
+					"styling": "label",
+					"bindings": {}
+				}
+			},
+			"edge": {
+				"style": {
+					"strokeWidth": 1.5,
+					"strokeAlpha": 0.85,
+					"arrowTargetShape": "triangle",
+					"arrowTargetSize": 6
+				}
+			}
+		}
+	},
+	"layouts": {
+		"elk": {
+			"algorithm": "layered",
+			"direction": "RIGHT",
+			"padding": 40,
+			"defaultNodeSize": {
+				"width": 60,
+				"height": 84
+			},
+			"nodeSpacing": 60,
+			"layerSpacing": 100,
+			"layoutOptions": {
+				"elk.layered.mergeEdges": "true",
+				"elk.spacing.edgeNode": "180",
+				"elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED"
+			}
+		}
+	},
+	"behaviours": {
+		"hover": {
+			"enabled": true,
+			"state": "highlighted",
+			"degree": 1,
+			"direction": "both"
+		},
+		"pan": {
+			"enabled": true
+		},
+		"wheel": {
+			"enabled": true
+		},
+		"drag-node": {
+			"enabled": true
+		},
+		"click-select": {
+			"enabled": true,
+			"multiple": true
+		},
+		"label-resolution": {
+			"enabled": true
+		},
+		"text-lod": {
+			"enabled": true,
+			"minZoom": 0.3
+		},
+		"theme": {
+			"enabled": true,
+			"mode": "system",
+			"active": "default",
+			"accent": "css-var"
+		}
+	}
+}

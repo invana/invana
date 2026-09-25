@@ -4,50 +4,27 @@
  * The package leaves `canvas`/`flow` out on purpose: a renderer that needed
  * `@invana/canvas` would put PixiJS in the bundle of every consumer that only
  * wanted tiles and a log, so it arrives as a **registry entry** instead. This
- * is Studio's, registered as `flow`, and it is the same seam the kit's own
- * `Dashboard/D1 Run` story uses.
- *
- * **It lays cards out in `seq` order, not as a graph** ([SR32](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
- * a `TaskRun` records order and a `lane`, not dependencies, so a drawn branch
- * would be invented. Steps that fanned out share a row with their lane
- * siblings; everything else wraps. When `plan_snapshot` reaches the trace this
- * panel reads the plan's real edges — and if that wants a pannable surface it
- * becomes an `@invana/canvas` layer registered at the same key, which is the
- * whole point of the kind being a registry entry.
+ * is Studio's, registered as `flow`, and it renders `TaskFlowCanvas` with the
+ * data `taskFlowFromRun` built
+ * ([SR32](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
-import type { PanelRendererProps } from "@invana/dashboard";
 import {
-	type Bound,
-	type StatusDotProps,
-	TaskNode,
-	type TaskNodeTag,
-} from "@invana/ui";
-
-export interface FlowNodeSpec {
-	/** The step run's id — what `openAction` hands back. */
-	id: string;
-	taskKey: string;
-	bound: Bound;
-	status?: StatusDotProps["tone"];
-	tags?: TaskNodeTag[];
-	meta?: string;
-	/** Present in the plan, absent from this pass. */
-	dim?: boolean;
-	/** Waits for an approval before it writes. */
-	gate?: boolean;
-	/** 1-based grid position, decided by the composer. */
-	col: number;
-	row: number;
-}
+	TaskFlowCanvas,
+	type TaskFlowData,
+	taskFlowSettings,
+	taskFlowTemplates,
+} from "@/canvases/taskflow";
+import type { PanelRendererProps } from "@invana/dashboard";
+import { useCallback } from "react";
 
 export interface FlowOptions {
-	nodes: FlowNodeSpec[];
-	/** How many columns the composer laid the nodes into. */
-	columns?: number;
+	data: TaskFlowData;
 	selectedId?: string | null;
-	/** Emitted with `{ itemId }` when a card is picked — opens its step dashboard. */
+	/** Emitted with `{ itemId }` when a node is picked — opens its step. */
 	openAction?: string;
+	/** The canvas's height: a dashboard panel body is content-height. */
+	height: number;
 }
 
 /** The registry type argument both composers are parametrised by. */
@@ -57,9 +34,15 @@ export function TaskFlowPanel({
 	options,
 	onAction,
 }: PanelRendererProps<FlowOptions>) {
-	const { nodes, columns = 4, selectedId, openAction } = options;
+	const { data, selectedId, openAction, height } = options;
+	const onOpenNode = useCallback(
+		(id: string) => {
+			if (openAction) onAction(openAction, { itemId: id });
+		},
+		[onAction, openAction],
+	);
 
-	if (!nodes.length) {
+	if (!data.nodes.length) {
 		return (
 			<div className="flex h-full items-center justify-center p-6 text-base text-muted-foreground">
 				No tasks recorded for this run.
@@ -68,47 +51,13 @@ export function TaskFlowPanel({
 	}
 
 	return (
-		<div
-			className="grid h-full content-start gap-x-3 gap-y-4 overflow-auto bg-background p-3
-				[background-image:linear-gradient(var(--color-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-border)_1px,transparent_1px)]
-				[background-size:28px_28px]"
-			style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-		>
-			{nodes.map((node) => (
-				<div key={node.id} style={{ gridColumn: node.col, gridRow: node.row }}>
-					<TaskNode
-						taskKey={node.taskKey}
-						bound={node.bound}
-						status={node.status}
-						tags={node.tags}
-						meta={node.meta}
-						dim={node.dim}
-						gate={node.gate}
-						selected={node.id === selectedId}
-						// A card is how a task's own dashboard is reached (SR36); the
-						// card itself is the kit's, so the affordance is here.
-						role={openAction ? "button" : undefined}
-						tabIndex={openAction ? 0 : undefined}
-						// The card fills its column: the flow takes the width it is given (SR73).
-						className={openAction ? "w-full cursor-pointer" : "w-full"}
-						onClick={
-							openAction
-								? () => onAction(openAction, { itemId: node.id })
-								: undefined
-						}
-						onKeyDown={
-							openAction
-								? (event) => {
-										if (event.key === "Enter" || event.key === " ") {
-											event.preventDefault();
-											onAction(openAction, { itemId: node.id });
-										}
-									}
-								: undefined
-						}
-					/>
-				</div>
-			))}
-		</div>
+		<TaskFlowCanvas
+			data={data}
+			settings={taskFlowSettings}
+			templates={taskFlowTemplates}
+			selectedId={selectedId}
+			height={height}
+			onOpenNode={openAction ? onOpenNode : undefined}
+		/>
 	);
 }
