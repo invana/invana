@@ -132,6 +132,14 @@ class Session(Base):
     # always sets it, defaulting by surface.
     agent_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
 
+    # The bounds the work brings (docs/for-developers/modules/ask/spec.md AS5):
+    # the world every ask in the thread starts in — null is *Everything* — and
+    # its spend per run, capped by the agent's own. **No FK on the world**: a
+    # deleted world leaves its id so the chip can say it is gone, rather than
+    # reading *Everything* as if nobody had picked one.
+    lens_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    max_cost_usd_run: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     title: Mapped[str] = mapped_column(String(255), default="", nullable=False)
 
     # Per-user organization flags. Pinned sessions sort to the top of the list;

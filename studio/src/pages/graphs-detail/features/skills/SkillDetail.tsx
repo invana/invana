@@ -318,13 +318,6 @@ function BindingsTab({
 					className="min-w-0 flex-1 truncate text-left hover:text-primary"
 				>
 					{agent.agent_name}
-					{/* The world the agent carries — which changes *which model
-					    decides*, so the row says it rather than asking the reader
-					    to hold the mapping. Context beside the refusal, never
-					    inside one (BN12). */}
-					{agent.world ? (
-						<span className="ml-1.5 text-muted-foreground">{agent.world}</span>
-					) : null}
 				</button>
 				<Button
 					size="sm"

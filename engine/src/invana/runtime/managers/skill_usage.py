@@ -20,9 +20,9 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.agents.schemas import (
-    AgentRead,
     SkillUsageByAgent,
     SkillUsageByOutcome,
     SkillUsageResponse,
@@ -117,7 +117,7 @@ class SkillUsageManager:
             versions=counts,
             by_agent=by_agent,
             by_outcome=by_outcome,
-            used_by=[AgentRead.model_validate(a) for a in carried],
+            used_by=await AgentManager().reads(session, list(carried)),
             recent_steps=steps,
         )
 

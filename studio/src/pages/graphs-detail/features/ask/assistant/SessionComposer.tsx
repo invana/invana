@@ -12,16 +12,9 @@ import { cypher } from "@codemirror/legacy-modes/mode/cypher";
 import { groovy } from "@codemirror/legacy-modes/mode/groovy";
 import { Annotation, Compartment, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@invana/forms";
-import { Button, ChatSessionComposer } from "@invana/ui";
+import { Button, ChatSessionComposer, RichSelect } from "@invana/ui";
 import { ArrowUp, Bot, Paperclip, Square, Timer, X } from "lucide-react";
-import type { ChangeEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 // ── CodeMirror theme ──────────────────────────────────────────────────────────
@@ -85,12 +78,10 @@ const LANGUAGE_EXTENSION: Record<
 	gremlin: StreamLanguage.define(groovy),
 };
 
-// Toolbar control classes — the same trigger styling the design-kit
-// AgentConsole reference uses, so Studio's selects sit flush in the composer.
-const FIXED_TRIGGER =
-	"h-7 w-auto shrink-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent";
-const FILL_TRIGGER =
-	"h-7 w-full min-w-0 border-0 bg-transparent gap-1 px-2 hover:bg-accent text-muted-foreground";
+const ASK_KIND_OPTIONS = [
+	{ value: "nl", label: "Natural language" },
+	{ value: "ql", label: "Query language" },
+];
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -239,6 +230,8 @@ export interface SessionComposerProps {
 	attachment?: AssistantAttachment | null;
 	/** Take the attachment off — the next ask goes without it. */
 	onRemoveAttachment?: () => void;
+	/** The world picker (AD15) — placed between the ask kind and the agent. */
+	worldControl?: ReactNode;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -265,6 +258,7 @@ export function SessionComposer({
 	agentStatus,
 	attachment,
 	onRemoveAttachment,
+	worldControl,
 }: SessionComposerProps) {
 	const isModeller = surface === "modeller";
 	const [mode, setMode] = useState<QueryMode>("nl");
@@ -556,24 +550,25 @@ export function SessionComposer({
 	// header names the agent; a paused or retired one blocks the composer and
 	// offers the picker instead of quietly answering with a different mind.
 
+	// Every control is the kit's inline `RichSelect`, opening upward (AD18):
+	// ask kind · world · (agent | query language) — the agent last, because it
+	// is who answers, and the world is where it looks (AD15).
 	const toolbarStart = (
 		<>
-			{/* Modeller sessions author a model — NL only, so the mode switch is
-			    hidden (QL is unreachable). Explorer keeps the NL/QL toggle. */}
+			{/* Modeller sessions author a model — NL only, so the kind is hidden
+			    (QL is unreachable). */}
 			{!isModeller && (
-				<Select value={mode} onValueChange={(v) => setMode(v as QueryMode)}>
-					{/* Named for the same reason the timeout select is: a control with
-					    only its current value as text is unreadable to a screen reader,
-					    and unaddressable to a test. */}
-					<SelectTrigger aria-label="Ask mode" className={FIXED_TRIGGER}>
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="nl">Natural Language</SelectItem>
-						<SelectItem value="ql">Query Language</SelectItem>
-					</SelectContent>
-				</Select>
+				<RichSelect
+					appearance="inline"
+					side="top"
+					triggerAriaLabel="Ask mode"
+					triggerClassName="shrink-0"
+					value={mode}
+					onChange={(v) => setMode(v as QueryMode)}
+					options={ASK_KIND_OPTIONS}
+				/>
 			)}
+			{worldControl}
 			{mode === "nl" ? (
 				noLlmProviders ? (
 					<span className="text-muted-foreground px-1 truncate">
@@ -606,21 +601,14 @@ export function SessionComposer({
 					{LANGUAGE_LABEL[language]}
 				</span>
 			) : (
-				<Select
+				<RichSelect
+					appearance="inline"
+					side="top"
+					triggerAriaLabel="Query language"
 					value={language}
-					onValueChange={(v) => setLanguage(v as QueryLanguage)}
-				>
-					<SelectTrigger className={FILL_TRIGGER}>
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						{languageOptions.map((l) => (
-							<SelectItem key={l.value} value={l.value}>
-								{l.label}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+					onChange={(v) => setLanguage(v as QueryLanguage)}
+					options={languageOptions}
+				/>
 			)}
 		</>
 	);
@@ -628,25 +616,21 @@ export function SessionComposer({
 	const toolbarEnd = (
 		<>
 			{(mode === "ql" || !noLlmProviders) && (
-				<Select
+				<RichSelect
+					appearance="inline"
+					side="top"
+					align="end"
+					triggerAriaLabel={
+						mode === "nl" ? "LLM + query timeout" : "Query timeout"
+					}
+					triggerIcon={Timer}
 					value={String(timeoutS)}
-					onValueChange={(v) => setTimeoutS(Number(v))}
-				>
-					<SelectTrigger
-						className={`${FIXED_TRIGGER} text-muted-foreground`}
-						title={mode === "nl" ? "LLM + query timeout" : "Query timeout"}
-					>
-						<Timer className="w-3.5 h-3.5" />
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						{TIMEOUT_OPTIONS.map((t) => (
-							<SelectItem key={t.value} value={String(t.value)}>
-								{t.label}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+					onChange={(v) => setTimeoutS(Number(v))}
+					options={TIMEOUT_OPTIONS.map((t) => ({
+						value: String(t.value),
+						label: t.label,
+					}))}
+				/>
 			)}
 			{mode === "nl" && (
 				<>

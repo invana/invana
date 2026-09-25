@@ -13,7 +13,6 @@ from __future__ import annotations
 from fastapi import Depends, Path, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.govern.addressing import Layer
 from invana.apps.govern.cast import resolve_all
 from invana.apps.govern.catalogue import CatalogueResolver
@@ -56,7 +55,6 @@ from invana.server.graphs.deps import require_graph_member, resolve_graph_by_use
 lenses = LensManager()
 touches = TouchManager()
 catalogue_resolver = CatalogueResolver()
-agents_qs = AgentQuerySet()
 task_runs_qs = TaskRunQuerySet()
 
 
@@ -239,17 +237,11 @@ async def delete_lens(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    """Refused while an agent carries it, naming the agents.
-
-    The holders are gathered here because ``agents.lens_id`` belongs to a band
-    Govern may not read back into; the refusal itself is the manager's.
-    """
     lens = await lenses.get(session, lens_id=lens_id, graph_id=graph.id)
     await lenses.delete(
         session,
         lens=lens,
         actor_id=user.id,
-        held_by=await agents_qs.names_using_lens(session, lens.id),
         may_edit_guardrails=member.can_edit_guardrails,
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

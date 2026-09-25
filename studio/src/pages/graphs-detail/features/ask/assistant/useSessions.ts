@@ -7,6 +7,7 @@ import {
 	type RecordOperationBody,
 	type SendMessageBody,
 	type SessionSort,
+	type SessionUpdateBody,
 	sessionsApi,
 } from "@/services/api/sessions";
 import { useAuthStore } from "@/stores/auth.store";
@@ -27,14 +28,14 @@ function titleFromMessage(text: string): string {
 	return clean.length > 64 ? `${clean.slice(0, 64)}…` : clean;
 }
 
-// The world is added by the caller, not carried in the payload: it is the
-// run's **circumstances** rather than part of the question (WO5), so the
-// composer collects one and the page supplies the other.
+// The world is not part of the question: an ask runs in its session's world
+// (AS5), and only *Next ask only* sends one — null included, which is
+// *Everything* for that ask (AD16 · AD19). Undefined leaves `lens_id` out.
 function toBody(
 	payload: QueryRunPayload,
 	lensId?: string | null,
 ): SendMessageBody {
-	const world = lensId ? { lens_id: lensId } : {};
+	const world = lensId !== undefined ? { lens_id: lensId } : {};
 	if (payload.mode === "ql") {
 		return {
 			content: payload.query,
@@ -83,14 +84,6 @@ export function sessionsListKey(
 export interface UseSessionsOptions {
 	surface?: "explorer" | "modeller";
 	modelId?: string;
-	/**
-	 * The world every ask from this surface is sent under (C1 · WO5).
-	 *
-	 * An option rather than a field on the payload: the world is the run's
-	 * circumstances, not part of the question, and the page owns it because it
-	 * has to read where there is no composer.
-	 */
-	lensId?: string | null;
 	/** A query result landed on a run's stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md) — the page paints
 	 *  it. Fires once per result, before the reply settles. */
 	onResult?: (info: {
@@ -125,10 +118,15 @@ export function useSessions(
 	// Default to the Explorer surface so existing callers are untouched (docs/for-developers/modules/ask/spec.md).
 	const surface = opts?.surface ?? "explorer";
 	const modelId = opts?.modelId;
-	// The world the page has picked (WO5). `undefined` is *Everything*, which is
-	// a real world and the default one — no surface grows a required field.
-	const lensId = opts?.lensId;
 	const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+	// The world picked before a thread exists — it becomes the new session's
+	// world on the first ask, and nothing else inherits it (AS5).
+	const [draftWorldId, setDraftWorldId] = useState<string | null>(null);
+	// *Next ask only* (AD16): armed by the toggle, holding the world picked
+	// while armed. `undefined` is armed with no pick yet.
+	const [nextAsk, setNextAsk] = useState<{ lensId?: string | null } | null>(
+		null,
+	);
 	// List controls that drive the server query (so paging/totals stay correct).
 	const [sort, setSort] = useState<SessionSort>("updated");
 	const [showArchived, setShowArchived] = useState(false);
@@ -309,13 +307,18 @@ export function useSessions(
 			body,
 		}: {
 			id: string;
-			body: { pinned?: boolean; archived?: boolean; title?: string };
+			body: SessionUpdateBody;
 		}) => sessionsApi.update(u, g, id, body),
 		onSuccess: (_data, { id, body }) => {
 			qc.invalidateQueries({ queryKey: listPrefix });
 			// A rename also changes the open thread's title (the breadcrumb + the
-			// canvas tab both read it), so refresh the detail too.
-			if (body.title !== undefined) {
+			// canvas tab both read it), and the bounds change what the chip and the
+			// settings read, so refresh the detail too.
+			if (
+				body.title !== undefined ||
+				"lens_id" in body ||
+				"max_cost_usd_run" in body
+			) {
 				qc.invalidateQueries({ queryKey: detailKey(id) });
 			}
 			if (body.archived && !showArchived && activeSessionId === id) {
@@ -369,7 +372,9 @@ export function useSessions(
 					surface,
 					model_id: modelId,
 					title: titleFromMessage(payload.query),
+					...(draftWorldId ? { lens_id: draftWorldId } : {}),
 				});
+				setDraftWorldId(null);
 				sessionId = created.id;
 				patchDetail(sessionId, () => ({
 					...created,
@@ -389,11 +394,14 @@ export function useSessions(
 				);
 			}
 
+			// *Next ask only* is spent by this ask, whatever it answers.
+			const override = nextAsk?.lensId;
+			setNextAsk(null);
 			const resp = await sessionsApi.sendMessage(
 				u,
 				g,
 				sessionId,
-				toBody(payload, lensId),
+				toBody(payload, override),
 				controller.signal,
 			);
 			const sid = sessionId;
@@ -552,6 +560,45 @@ export function useSessions(
 	const renameSession = (id: string, title: string) =>
 		updateMutation.mutateAsync({ id, body: { title } });
 
+	// ── The session's bounds (AS5) ────────────────────────────────────────────
+	// The thread's world: the open session's, or the one picked before a thread
+	// exists. A world deleted since reads *Everything* (AD20).
+	const threadWorldId = activeSession
+		? activeSession.lensMissing
+			? null
+			: (activeSession.lensId ?? null)
+		: draftWorldId;
+	const world = {
+		/** What the chip shows — the next-ask pick while one is armed. */
+		lensId:
+			nextAsk && nextAsk.lensId !== undefined ? nextAsk.lensId : threadWorldId,
+		threadLensId: threadWorldId,
+		missing: !!activeSession?.lensMissing,
+		nextAskOnly: nextAsk !== null,
+		pick: (lensId: string | null) => {
+			if (nextAsk !== null) {
+				setNextAsk({ lensId });
+			} else if (activeSessionId) {
+				updateMutation.mutate({
+					id: activeSessionId,
+					body: { lens_id: lensId },
+				});
+			} else {
+				setDraftWorldId(lensId);
+			}
+		},
+		setNextAskOnly: (on: boolean) => setNextAsk(on ? {} : null),
+	};
+	const setSpendPerRun = (id: string, usd: number | null) =>
+		updateMutation.mutateAsync({ id, body: { max_cost_usd_run: usd } });
+	// A thread's world and *Next ask only* belong to that thread: switching
+	// resets both, and a new thread starts in *Everything* (AS5).
+	const switchTo = (id: string | null) => {
+		setActiveSessionId(id);
+		setDraftWorldId(null);
+		setNextAsk(null);
+	};
+
 	return {
 		sessions,
 		activeSession,
@@ -577,7 +624,9 @@ export function useSessions(
 		setPinned,
 		setArchived,
 		renameSession,
-		openSession: (id: string) => setActiveSessionId(id),
-		backToList: () => setActiveSessionId(null),
+		world,
+		setSpendPerRun,
+		openSession: (id: string) => switchTo(id),
+		backToList: () => switchTo(null),
 	};
 }

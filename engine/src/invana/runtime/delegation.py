@@ -147,11 +147,6 @@ async def spawn(
         instructions=instructions,
         workflow_spec=narrowed["workflow_spec"],
         budget=narrowed["budget"],
-        # **The child inherits the parent's world** (DG9). It is how *LLM ⊆ its
-        # parent's* (DG7) survives the provider split — an agent binds no model,
-        # so what it thinks with is what its lens casts — and it closes the one
-        # dimension in which a child was wider than the agent that spawned it.
-        lens_id=parent.lens_id,
         # Bounded agency does not propagate by default: a spawned agent cannot
         # spawn unless it was deliberately given the policy.
         policy={"can_spawn": False, "can_be_assigned": False},

@@ -241,12 +241,6 @@ export interface SkillDraft {
 export interface SkillAgentStanding {
 	agent_id: string;
 	agent_name: string;
-	/**
-	 * The world the agent carries by default. **Context on the row, never a
-	 * ground for a refusal** — the check reads guardrails and never worlds
-	 * (BN12 · BN10) — and absent when the agent carries none.
-	 */
-	world: string | null;
 	bound: boolean;
 	refusal: BindRefusal | null;
 }

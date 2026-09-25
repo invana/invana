@@ -310,12 +310,6 @@ class SkillAgentStanding(BaseModel):
 
     agent_id: str
     agent_name: str
-    #: The world the agent carries by default — the name of the lens in
-    #: ``agents.lens_id``, absent when it carries none or the lens is unnamed.
-    #: **Context on the row, never a ground for a refusal**: the check reads
-    #: guardrails and never worlds
-    #: ([BN12](docs/for-developers/modules/skills/features/bindings.md)).
-    world: str | None = None
     bound: bool
     refusal: dict | None = None
 

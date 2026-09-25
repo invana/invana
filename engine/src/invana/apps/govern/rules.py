@@ -114,6 +114,12 @@ class Rule:
     #: Layer-specific limits that are not selectors — ``max_age_s`` on a cache
     #: rule, ``max_rounds`` on a human one ([GR10]).
     options: dict[str, Any] = field(default_factory=dict)
+    #: The bound this rule came from — *the agent's own guardrail “No egress”* —
+    #: stamped when a lens is composed and frozen with the snapshot, so a
+    #: refusal names which side bound it
+    #: ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md)).
+    #: Never authored.
+    by: str | None = None
 
     @property
     def layer(self) -> Layer:
@@ -121,7 +127,7 @@ class Rule:
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"match": self.match, "allow": self.allow}
-        for key in ("properties", "select", "egress", "options"):
+        for key in ("properties", "select", "egress", "options", "by"):
             value = getattr(self, key)
             if value:
                 out[key] = value
@@ -131,7 +137,7 @@ class Rule:
     def from_dict(cls, raw: dict[str, Any]) -> Rule:
         if not isinstance(raw, dict):
             raise RuleError("A rule is an object with a match and an allow.")
-        unknown = set(raw) - {"match", "allow", "properties", "select", "egress", "options"}
+        unknown = set(raw) - {"match", "allow", "properties", "select", "egress", "options", "by"}
         if unknown:
             raise RuleError(f"A rule carries no {', '.join(sorted(unknown))}.")
         match = raw.get("match")
@@ -147,6 +153,7 @@ class Rule:
             select=dict(raw.get("select") or {}),
             egress=dict(raw.get("egress") or {}),
             options=dict(raw.get("options") or {}),
+            by=raw.get("by") if isinstance(raw.get("by"), str) else None,
         )
 
 
@@ -250,6 +257,8 @@ class Verdict:
     #: ([GR15](docs/for-developers/modules/govern/features/guardrails.md)). The
     #: two are never both set: a rule that denied is the more specific answer.
     narrowed_by: str | None = None
+    #: The bound the denying rule came from — :attr:`Rule.by` ([AG6]).
+    denied_in: str | None = None
     why: str | None = None
     #: The merged narrowing that applies, once the address is allowed.
     properties_excluded: list[str] = field(default_factory=list)
@@ -361,6 +370,7 @@ class Effective:
             return Verdict(
                 decision=Decision.denied,
                 rule_matched=rule.match,
+                denied_in=rule.by,
                 why=f"denied by {rule.match}",
             )
 

@@ -37,6 +37,9 @@ class CastResolution:
     rule_matched: str | None = None
     #: Where the address came from: ``todo`` · ``plan`` · ``agent`` · ``shipped``.
     source: str = "shipped"
+    #: The bound the denying rule came from, so the refusal says whom to ask
+    #: ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md)).
+    denied_in: str | None = None
 
     @property
     def refusal(self) -> str | None:
@@ -44,9 +47,10 @@ class CastResolution:
             return None
         if self.address is None:
             return f"Nothing casts {self.role.value}, and no shipped default resolves it."
+        where = f" in {self.denied_in}" if self.denied_in and self.rule_matched else ""
         return (
             f"{self.role.value} casts to {self.address}, and "
-            f"{self.rule_matched or 'this world'} denies it. "
+            f"{self.rule_matched or 'this world'}{where} denies it. "
             "A cast is a resolution, not a bound — it picks within the rules, it does not widen them."
         )
 
@@ -93,6 +97,7 @@ def resolve(
         allowed=verdict.decision is Decision.allowed,
         rule_matched=verdict.rule_matched,
         source=source,
+        denied_in=verdict.denied_in,
     )
 
 

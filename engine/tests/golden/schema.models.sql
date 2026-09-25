@@ -13,7 +13,6 @@ CREATE TABLE agents (
 	spawned_in_run_id VARCHAR(36), 
 	budget JSON NOT NULL, 
 	policy JSON NOT NULL, 
-	lens_id VARCHAR(36), 
 	version INTEGER NOT NULL, 
 	created_by_kind VARCHAR(16) NOT NULL, 
 	created_by_id VARCHAR(36), 
@@ -22,15 +21,12 @@ CREATE TABLE agents (
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_agent_graph_name UNIQUE (graph_id, name), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
-	FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
-	FOREIGN KEY(lens_id) REFERENCES lenses (id) ON DELETE RESTRICT
+	FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL
 );
 
 CREATE INDEX ix_agents_graph_id ON agents (graph_id);
 
 CREATE INDEX ix_agents_key ON agents (key);
-
-CREATE INDEX ix_agents_lens_id ON agents (lens_id);
 
 CREATE INDEX ix_agents_parent_agent_id ON agents (parent_agent_id);
 
@@ -620,6 +616,8 @@ CREATE TABLE sessions (
 	surface session_surface NOT NULL, 
 	model_id VARCHAR(36), 
 	agent_id VARCHAR(36), 
+	lens_id VARCHAR(36), 
+	max_cost_usd_run FLOAT, 
 	title VARCHAR(255) NOT NULL, 
 	pinned BOOLEAN NOT NULL, 
 	archived BOOLEAN NOT NULL, 

@@ -41,7 +41,7 @@ from invana.graph.types.data_elements import Edge, GraphResponse, ResultMetadata
 from invana.runtime.models import RunStatus, TaskRun, TriggeredBy
 from invana.runtime.planning import plan_payload, queue_plan_steps, select_plan_by_key
 from invana.runtime.querysets import TaskRunQuerySet
-from invana.runtime.services import _prune, freeze_lens
+from invana.runtime.services import _prune, freeze_lens, session_world
 
 if TYPE_CHECKING:
     from invana.apps.explorer.schemas import _ExpandBase
@@ -75,7 +75,8 @@ async def _open(
     """Open one canvas builtin as a run under the canvas's lens (GC11).
 
     The lens is the session's agent (when there is a session), the picked
-    world and the Graph's guardrails. The agent narrows it but is not the
+    world — else the session's ([AS5](docs/for-developers/modules/ask/spec.md)) —
+    and the Graph's guardrails. The agent narrows it but is not the
     performer: ``agent_id`` stays null, so a canvas act spends no agent budget
     and never waits on the agent's own ceiling.
     """
@@ -102,7 +103,12 @@ async def _open(
         triggered_by=trigger.value,
         on_behalf_of_user_id=actor_id,
         status=RunStatus.queued.value,
-        **await freeze_lens(db, graph_id=graph.id, agent_id=sess.agent_id if sess else None, lens_id=lens_id),
+        **await freeze_lens(
+            db,
+            graph_id=graph.id,
+            agent_id=sess.agent_id if sess else None,
+            lens_id=lens_id or (await session_world(db, sess=sess) if sess else None),
+        ),
     )
     db.add(run)
     await db.flush()

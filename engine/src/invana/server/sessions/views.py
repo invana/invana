@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent
+from invana.apps.govern.querysets import LensQuerySet
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.sessions.managers import SessionManager
@@ -47,6 +48,7 @@ from invana.server.graphs.deps import (
 from invana.server.runtime.runs import get_runtime
 
 sessions = SessionManager()
+lenses_qs = LensQuerySet()
 
 
 def _get_manager(request: Request) -> GraphConnectionManager:
@@ -59,13 +61,29 @@ async def _summary(session: AsyncSession, sess: Session) -> SessionSummary:
     ``agent_status`` is what lets the composer block on a paused or retired
     agent and offer the picker, rather than answering with a different mind.
     """
-    summary = SessionSummary.model_validate(sess)
-    if sess.agent_id:
-        agent = await session.get(Agent, sess.agent_id)
+    agent = await session.get(Agent, sess.agent_id) if sess.agent_id else None
+    return (await _with_bounds(session, [(SessionSummary.model_validate(sess), agent)]))[0]
+
+
+async def _with_bounds(session: AsyncSession, rows: list[tuple[SessionSummary, Agent | None]]) -> list[SessionSummary]:
+    """Name the agent, the thread's world and the agent's spend cap on each row.
+
+    One read of the worlds for the whole list. A world id with no row behind it
+    was deleted since: the chip reads *Everything* and says the world is gone
+    ([AS5](docs/for-developers/modules/ask/spec.md)).
+    """
+    names = await lenses_qs.names_by_id(session, list({s.lens_id for s, _ in rows if s.lens_id}))
+    for summary, agent in rows:
         if agent is not None:
             summary.agent_name = agent.name
             summary.agent_status = agent.status
-    return summary
+            summary.agent_max_cost_usd_run = agent.effective_budget.get("max_cost_usd_run")
+        if summary.lens_id:
+            if summary.lens_id in names:
+                summary.lens_name = names[summary.lens_id]
+            else:
+                summary.lens_missing = True
+    return [summary for summary, _ in rows]
 
 
 async def _summaries(session: AsyncSession, items: list[Session]) -> list[SessionSummary]:
@@ -75,15 +93,18 @@ async def _summaries(session: AsyncSession, items: list[Session]) -> list[Sessio
         if ids
         else {}
     )
-    out: list[SessionSummary] = []
-    for sess in items:
-        summary = SessionSummary.model_validate(sess)
-        agent = agents.get(sess.agent_id or "")
-        if agent is not None:
-            summary.agent_name = agent.name
-            summary.agent_status = agent.status
-        out.append(summary)
-    return out
+    return await _with_bounds(
+        session, [(SessionSummary.model_validate(sess), agents.get(sess.agent_id or "")) for sess in items]
+    )
+
+
+async def _tagged(session: AsyncSession, message) -> SessionMessageRead:
+    """One reply, tagged with the world its run was frozen with (AD17)."""
+    read = SessionMessageRead.model_validate(message)
+    world = (await run_services.worlds_for_messages(session, [message])).get(message.id)
+    if world is not None:
+        read.lens_id, read.lens_name = world
+    return read
 
 
 async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
@@ -92,11 +113,16 @@ async def _to_detail(session: AsyncSession, sess: Session) -> SessionDetail:
     # steps of its current
     # run, so a settled thread renders without a stream.
     steps = await run_services.steps_for_messages(session, messages)
+    worlds = await run_services.worlds_for_messages(session, messages)
     return SessionDetail(
         **(await _summary(session, sess)).model_dump(),
         messages=[
             SessionMessageRead.model_validate(m).model_copy(
-                update={"steps": [RunNodeRead.model_validate(r) for r in steps.get(m.id, [])]}
+                update={
+                    "steps": [RunNodeRead.model_validate(r) for r in steps.get(m.id, [])],
+                    "lens_id": worlds[m.id][0] if m.id in worlds else None,
+                    "lens_name": worlds[m.id][1] if m.id in worlds else None,
+                }
             )
             for m in messages
         ],
@@ -144,6 +170,8 @@ async def create_session(
         model_id=payload.model_id,
         agent_id=payload.agent_id,
     )
+    if payload.lens_id:
+        await sessions.update_session(session, sess=sess, bounds={"lens_id": payload.lens_id}, actor_id=user.id)
     run_id: str | None = None
     if payload.message is not None:
         _, _, th = await run_services.open_turn(
@@ -185,6 +213,7 @@ async def update_session(
         archived=payload.archived,
         agent_id=payload.agent_id,
         actor_id=user.id,
+        bounds=payload.model_dump(include={"lens_id", "max_cost_usd_run"} & payload.model_fields_set),
     )
     await session.commit()
     await session.refresh(sess)
@@ -237,7 +266,7 @@ async def send_message(
     runtime.submit(th.id)
     return SendMessageResponse(
         user_message=SessionMessageRead.model_validate(user_msg),
-        assistant_message=SessionMessageRead.model_validate(assistant_msg),
+        assistant_message=await _tagged(session, assistant_msg),
         result=None,
         run_id=th.id,
         stream_url=run_services.stream_url(username, graphSlug, th.id),
@@ -328,7 +357,7 @@ async def rerun_message(
     await session.refresh(message)
     runtime.submit(th.id)
     return RerunResponse(
-        message=SessionMessageRead.model_validate(message),
+        message=await _tagged(session, message),
         result=None,
         run_id=th.id,
         stream_url=run_services.stream_url(username, graphSlug, th.id),

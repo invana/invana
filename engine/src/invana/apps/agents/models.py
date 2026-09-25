@@ -6,13 +6,12 @@ One row = one named actor in a graph. The columns split into four groups:
 *identity* (``name`` · ``description`` · ``kind`` · ``status``) — what the trace
 prints; *bindings* (``skill_ids`` · ``workflow_spec``) — how it thinks;
 *lineage* (``lifetime`` · ``parent_agent_id`` · ``spawned_in_run_id``) — why it
-exists; and *bounds* (``workflow_spec`` · ``budget`` · ``lens_id``) —
-what it may do, what it may spend, and what it may see.
+exists; and *standing limits* (``workflow_spec`` · ``budget``) — what it may do
+and what it may spend, whoever asks.
 
-Those last three are **the three bounds** the list reads together
-(docs/for-developers/modules/agents/features/author-an-agent.md AG2 · AG6): they are
-what a refusal names, so a surface showing two of them explains two-thirds of
-why a run was turned away.
+There is no world column: what a run may see comes with the work that opens it,
+and an agent's own narrowing is a guardrail scoped ``agent:<id>``
+(docs/for-developers/modules/agents/features/author-an-agent.md AG24 · AG26).
 
 Every JSON column is ``sqlalchemy.JSON`` (never JSONB) so SQLite dev keeps
 working; ids are ``String(36)`` UUIDs like every other table.
@@ -28,9 +27,6 @@ from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Unique
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
-
-# ``agents.lens_id`` FKs ``lenses``; imported for the same reason.
-from invana.apps.govern.models import Lens  # noqa: F401  isort: skip
 
 
 def _utcnow() -> datetime:
@@ -133,8 +129,8 @@ class Agent(Base):
     workflow_spec: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     # There is no `llm_config_id`: an agent binds no provider
     # ([PM1](docs/for-developers/modules/agents/features/providers-and-models.md)).
-    # A plan names a role, `lens_id`'s cast maps the role to an address, and the
-    # address names the configured row whose credential it is.
+    # A plan names a role, the run's frozen cast maps the role to an address,
+    # and the address names the configured row whose credential it is.
     # The agent's brief, layered on top of ``graph.instructions``. For a spawned
     # agent this is what its parent told it (docs/for-developers/modules/work/spec.md — the brief is all a
     # child receives; never the parent's step history).
@@ -152,19 +148,6 @@ class Agent(Base):
     # ── bounds ───────────────────────────────────────────────────────────────
     budget: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     policy: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
-    # The third bound, beside the envelope and the budget: what this agent may
-    # see, use and send (docs/for-developers/modules/agents/features/author-an-agent.md AG2).
-    # NULL reads *Everything*, inside the Graph's guardrails — never blank, because
-    # "nothing set" and "nothing permitted" must not look alike (AG5).
-    #
-    # RESTRICT, not SET NULL: silently widening an agent because somebody deleted
-    # the world it worked in is the opposite of what a bound is for. Deleting a
-    # lens an agent carries is refused and names the agent, the same seam a
-    # schedule's lens already has (WO6).
-    lens_id: Mapped[str | None] = mapped_column(
-        String(36), ForeignKey("lenses.id", ondelete="RESTRICT"), nullable=True, index=True
-    )
-
     # Bumped on every envelope / binding change so a run can record which
     # version of the agent it ran under (``runs.agent_version``).
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
@@ -191,14 +174,6 @@ class Agent(Base):
         viewonly=True,
     )
 
-    #: The world named by ``lens_id``, eager for the same reason
-    #: ``bound_skills`` is: the list reads the three bounds together
-    #: ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md)), and a
-    #: bound that costs a second round trip is one a list quietly leaves out.
-    #: **Read-only**: the bound is set by writing ``lens_id``, which is where the
-    #: refusal and the event live.
-    lens = relationship("Lens", lazy="selectin", viewonly=True)
-
     # ── derived ──────────────────────────────────────────────────────────────
 
     @property
@@ -209,17 +184,6 @@ class Agent(Base):
         binding moved; what changed is that nothing can assign to it.
         """
         return sorted(s.id for s in (self.bound_skills or []))
-
-    @property
-    def lens_name(self) -> str | None:
-        """The world's name, for the row that draws the third bound.
-
-        ``None`` is *Everything, inside the guardrails*
-        ([AG5](docs/for-developers/modules/agents/features/author-an-agent.md)) — a
-        reader that renders it blank is reading *nothing permitted* into
-        *nothing set*, which is the one confusion the bound exists to prevent.
-        """
-        return self.lens.name if self.lens is not None else None
 
     @property
     def effective_budget(self) -> dict:

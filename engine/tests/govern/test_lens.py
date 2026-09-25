@@ -9,8 +9,6 @@ from __future__ import annotations
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.models import Agent
-from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.govern.addressing import Layer
 from invana.apps.govern.catalogue import Catalogue, Participant
 from invana.apps.govern.managers import LensManager
@@ -21,7 +19,6 @@ from invana.core.auth.models import User
 from invana.core.errors import ConflictError, PermissionDeniedError, ValidationError
 
 lenses = LensManager()
-agents_q = AgentQuerySet()
 
 
 def _catalogue() -> Catalogue:
@@ -326,29 +323,11 @@ async def test_the_owner_holds_the_permission(session: AsyncSession, member: Gra
 
 
 @pytest.mark.asyncio
-async def test_deleting_a_world_an_agent_carries_is_refused_naming_it(
-    session: AsyncSession, graph: Graph, user: User
-) -> None:
-    """WO6 — widening an agent by deleting its world is the opposite of a bound."""
-    world = await lenses.create(
-        session, graph_id=graph.id, payload=LensCreate(name="EU · H1 2026"), actor_id=user.id, catalogue=_catalogue()
-    )
-    session.add(Agent(graph_id=graph.id, name="Analyst", lens_id=world.id))
-    await session.flush()
-
-    held_by = await agents_q.names_using_lens(session, world.id)
-    assert held_by == ["Analyst"]
-
-    with pytest.raises(ConflictError, match="Analyst"):
-        await lenses.delete(session, lens=world, actor_id=user.id, held_by=held_by)
-
-
-@pytest.mark.asyncio
 async def test_a_world_nothing_carries_deletes(session: AsyncSession, graph: Graph, user: User) -> None:
     world = await lenses.create(
         session, graph_id=graph.id, payload=LensCreate(name="Scratch"), actor_id=user.id, catalogue=_catalogue()
     )
-    await lenses.delete(session, lens=world, actor_id=user.id, held_by=[])
+    await lenses.delete(session, lens=world, actor_id=user.id)
     assert await lenses.list_for_graph(session, graph_id=graph.id) == []
 
 

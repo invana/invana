@@ -19,6 +19,7 @@ from invana.apps.govern.rules import (
     Rule,
     RuleError,
     compose,
+    from_snapshot,
     validate_rule,
 )
 
@@ -213,6 +214,18 @@ def test_a_denied_cast_refuses_the_run_before_anything_is_spent() -> None:
     with pytest.raises(CastError) as exc:
         require(effective, role=Role.decide)
     assert exc.value.resolution.rule_matched == "llm/ollama-local/**"
+
+
+def test_a_refusal_names_the_bound_its_rule_came_from() -> None:
+    """AG6 — the agent's own guardrail says it is the agent's, and survives the snapshot."""
+    effective = from_snapshot(
+        Effective(
+            rules=[Rule(match="llm/anthropic-prod/**", allow=False, by="the agent's own guardrail 'Nothing leaves'")],
+            cast={"decide": "llm/anthropic-prod/claude-opus-5"},
+        ).as_snapshot()
+    )
+    refusal = resolve(effective, role=Role.decide).refusal or ""
+    assert "llm/anthropic-prod/** in the agent's own guardrail 'Nothing leaves' denies it" in refusal
 
 
 def test_the_shipped_cast_reads_cheap_decides_capable_and_judges_locally() -> None:

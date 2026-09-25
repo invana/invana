@@ -163,7 +163,12 @@ async def open_turn(
     # One composition, read twice: the lens this run is frozen under is the same
     # lens its model is cast by, so *which model answered* and *what it was
     # allowed to see* cannot disagree ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)).
-    frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=payload.lens_id)
+    #
+    # The ask's world, else the session's ([AS5](docs/for-developers/modules/ask/spec.md)):
+    # an ask that sends `lens_id` — null included, which is *Everything for this
+    # ask only* — narrows for itself; one that omits it runs in the thread's.
+    lens_id = payload.lens_id if "lens_id" in payload.model_fields_set else await session_world(db, sess=sess)
+    frozen = await freeze_lens(db, graph_id=graph.id, agent_id=agent.id if agent else None, lens_id=lens_id)
     needs_provider = is_modeller or payload.mode == "nl"
     provider = (
         await resolve_endpoint(
@@ -210,6 +215,9 @@ async def open_turn(
             "llm_model_id": provider.model_row_id if provider else None,
             "timeout_s": payload.timeout_s,
             "parameters": payload.parameters,
+            # The thread's spend per run, frozen under the agent's own cap
+            # ([AS5](docs/for-developers/modules/ask/spec.md) · AG25).
+            "max_cost_usd_run": spend_per_run(sess, agent),
         },
         workflow_key=wf.key,
         assistant_message_id=assistant_msg.id,
@@ -247,6 +255,7 @@ async def freeze_lens(
     graph_id: str,
     agent_id: str | None,
     lens_id: str | None,
+    within: TaskRun | None = None,
 ) -> dict:
     """Resolve the lens this run is dispatched under, and **freeze it**.
 
@@ -261,29 +270,25 @@ async def freeze_lens(
 
     The Graph's guardrails and the agent's go in whether or not a world was
     picked, because they are in force on every run whatever world it is asked
-    under. **No world is the widest**, not the narrowest
-    ([GV7](docs/for-developers/modules/govern/spec.md)): a Graph with nothing
-    set freezes an empty lens, which permits everything.
+    under. The agent carries no world of its own — its narrowing *is* its
+    guardrail ([AG26](docs/for-developers/modules/agents/features/author-an-agent.md)) —
+    so the only world here is the one the work brought. **No world is the
+    widest**, not the narrowest ([GV7](docs/for-developers/modules/govern/spec.md)):
+    a Graph with nothing set freezes an empty lens, which permits everything.
+
+    ``within`` is the run a delegated child opens inside: its frozen lens
+    composes in whole, so the child can only narrow it and keeps its world
+    ([DG9](docs/for-developers/modules/agents/features/delegation.md) · AG25).
 
     Returns the two columns as keyword arguments, so a caller that opens a run
     spreads it into the constructor rather than remembering two field names.
     """
     contributors = [await _lenses.effective_guardrails(db, graph_id=graph_id, agent_id=agent_id)]
-
-    # The agent's own world, the third of its three bounds
-    # ([AG2](docs/for-developers/modules/agents/features/author-an-agent.md)). It
-    # composes whether or not the asker picked one, for the same reason the
-    # guardrails do: it is in force on every run this agent opens, and an agent
-    # bound to a world that only narrowed the runs somebody remembered to pick
-    # it for would not be bound at all. A child carries its parent's
-    # ([DG9](docs/for-developers/modules/agents/features/delegation.md)), so the
-    # narrowing travels down the tree with no second mechanism.
-    if agent_id:
-        agent = await _agents.agents_qs.get(db, agent_id)
-        if agent is not None and agent.lens_id:
-            own = await _lenses.lenses_qs.get(db, agent.lens_id)
-            if own is not None:
-                contributors.append(to_effective(own))
+    # The parent's world is already inside its snapshot, so it is composed from
+    # there rather than re-read — a world deleted since cannot widen the child.
+    inherited = within.lens_id if within is not None else None
+    if within is not None and within.lens_snapshot:
+        contributors.append(from_snapshot(within.lens_snapshot))
 
     world = None
     if lens_id:
@@ -294,9 +299,39 @@ async def freeze_lens(
         contributors.append(to_effective(world))
 
     return {
-        "lens_id": world.id if world else None,
+        "lens_id": world.id if world else inherited,
         "lens_snapshot": compose(contributors).as_snapshot(),
     }
+
+
+async def _frozen_root(db: AsyncSession, run_id: str) -> TaskRun | None:
+    """The run whose frozen lens a node dispatches under — itself, or its root."""
+    run = await TaskRunQuerySet().get(db, run_id)
+    if run is not None and not run.lens_snapshot and run.parent_run_id:
+        return await TaskRunQuerySet().get(db, run.parent_run_id)
+    return run
+
+
+async def session_world(db: AsyncSession, *, sess: Session) -> str | None:
+    """The world the thread asks in, or ``None`` for *Everything*.
+
+    ``sessions.lens_id`` has no FK, so a deleted world leaves its id behind; it
+    reads as *Everything* here and as *gone* on the chip
+    ([AS5](docs/for-developers/modules/ask/spec.md)).
+    """
+    if not sess.lens_id:
+        return None
+    lens = await _lenses.lenses_qs.get(db, sess.lens_id)
+    return lens.id if lens is not None and lens.graph_id == sess.graph_id else None
+
+
+def spend_per_run(sess: Session | None, agent: Agent | None) -> float | None:
+    """The thread's spend per run, never above the agent's standing cap (AG24)."""
+    cap = agent.effective_budget.get("max_cost_usd_run") if agent is not None else None
+    own = sess.max_cost_usd_run if sess is not None else None
+    if own is None:
+        return cap
+    return own if cap is None else min(own, cap)
 
 
 async def _session_agent(db: AsyncSession, *, sess: Session, graph: Graph) -> Agent | None:
@@ -412,9 +447,16 @@ async def open_todo_run(
         on_behalf_of_user_id=on_behalf_of_user_id,
         # A Task's run is bounded like any other ([GV26]). There is no composer
         # to pick a world from, so it freezes the guardrails and the agent's own
-        # lens — which is what *no world is the widest, not the narrowest*
-        # means for a run nobody was watching open ([GV7]).
-        **await freeze_lens(db, graph_id=graph.id, agent_id=agent.id, lens_id=None),
+        # — which is what *no world is the widest, not the narrowest* means for
+        # a run nobody was watching open ([GV7]). A delegation opens inside the
+        # run that spawned it (DG9).
+        **await freeze_lens(
+            db,
+            graph_id=graph.id,
+            agent_id=agent.id,
+            lens_id=None,
+            within=await _frozen_root(db, parent_run_id) if parent_run_id else None,
+        ),
     )
     db.add(th)
     await db.flush()
@@ -698,6 +740,29 @@ async def steps_for_messages(db: AsyncSession, messages: list[SessionMessage]) -
     for r in rows:
         if r.message_id and wanted.get(r.message_id) == r.parent_run_id:
             out.setdefault(r.message_id, []).append(r)
+    return out
+
+
+async def worlds_for_messages(db: AsyncSession, messages: list[SessionMessage]) -> dict[str, tuple[str, str]]:
+    """The world each reply's run was frozen with, as ``{message_id: (lens_id, name)}``.
+
+    The name is read from the snapshot's contributors, not the live row, so a
+    rename or a delete since never changes what a past turn says it ran in
+    ([AD17](docs/for-developers/modules/ask/features/the-assistant.md)). A
+    reply that ran in *Everything* is absent.
+    """
+    wanted = {m.run_id: m.id for m in messages if m.run_id}
+    if not wanted:
+        return {}
+    rows = await db.execute(
+        select(TaskRun.id, TaskRun.lens_id, TaskRun.lens_snapshot).where(
+            TaskRun.id.in_(list(wanted)), TaskRun.lens_id.is_not(None)
+        )
+    )
+    out: dict[str, tuple[str, str]] = {}
+    for run_id, lens_id, snapshot in rows:
+        named = [c for c in (snapshot or {}).get("contributors") or [] if c.get("id") == lens_id]
+        out[wanted[run_id]] = (lens_id, str(named[0].get("name")) if named else "a world")
     return out
 
 

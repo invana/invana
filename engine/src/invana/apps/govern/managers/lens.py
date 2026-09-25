@@ -14,6 +14,7 @@ what it was before* is answerable from ``core/events`` like everything else
 
 from __future__ import annotations
 
+import dataclasses
 import re
 import unicodedata
 
@@ -63,6 +64,15 @@ def to_rules(rules: list[RuleIn] | list[dict]) -> list[Rule]:
     return out
 
 
+def bound_label(lens: Lens) -> str:
+    """Which side a lens bounds from, as a refusal says it
+    ([AG6](docs/for-developers/modules/agents/features/author-an-agent.md))."""
+    if lens.kind == LensKind.guardrail.value:
+        owner = "the agent's own guardrail" if lens.agent_scope_id else "the Graph's guardrail"
+        return f"{owner} '{lens.display_name}'"
+    return f"the world '{lens.display_name}'"
+
+
 def to_effective(lens: Lens) -> Effective:
     """One stored lens as a thing that can decide about an address.
 
@@ -70,7 +80,8 @@ def to_effective(lens: Lens) -> Effective:
     a guardrail cannot satisfy its allow-list with somebody else's broader allow
     ([GV23](docs/for-developers/modules/govern/spec.md)).
     """
-    rules = [Rule.from_dict(raw) for raw in (lens.rules or [])]
+    by = bound_label(lens)
+    rules = [dataclasses.replace(Rule.from_dict(raw), by=by) for raw in (lens.rules or [])]
     closed = {Layer(value) for value in (lens.closed_layers or [])}
     return Effective(
         rules=rules,
@@ -343,24 +354,14 @@ class LensManager:
         *,
         lens: Lens,
         actor_id: str,
-        held_by: list[str],
         may_edit_guardrails: bool = False,
     ) -> None:
-        """Refused while anything carries it, **naming what does**.
-
-        ``held_by`` is the evidence — agent and schedule names — gathered by the
-        edge, because those rows live above this band. A cron firing into a
-        missing lens would silently fall back to the widest, which is the
-        opposite of what the lens was for
-        ([WO6](docs/for-developers/modules/govern/features/worlds.md)).
+        """Delete a lens. No agent carries a world (AG26), and a session that
+        started in this one reads *Everything* after, saying the world is gone
+        ([AS5](docs/for-developers/modules/ask/spec.md)).
         """
         if lens.kind == LensKind.guardrail.value:
             self._require_guardrail_permission(may_edit_guardrails)
-        if held_by:
-            raise ConflictError(
-                f"{lens.display_name} is still carried by {', '.join(sorted(held_by))}. "
-                "Point them somewhere else first."
-            )
 
         await self.lenses_qs.delete(session, lens)
         await emit_event(

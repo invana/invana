@@ -21,6 +21,7 @@ import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
 } from "@/pages/graphs-detail/features/ask/assistant/SessionTutorialModal";
+import { WorldPicker } from "@/pages/graphs-detail/features/ask/assistant/WorldPicker";
 import { useSessions } from "@/pages/graphs-detail/features/ask/assistant/useSessions";
 import {
 	BOARD_KINDS,
@@ -68,7 +69,6 @@ import {
 	ComparePage,
 	GovernStackPanel,
 	LensBoardPage,
-	WorldChip,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/govern";
 import { RunsPanel } from "@/pages/graphs-detail/features/operate/RunsPanel";
@@ -99,7 +99,6 @@ import {
 import { LibraryStackPanel } from "@/pages/graphs-detail/features/workflows/LibraryStackPanel";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
-import { useActiveWorld } from "@/pages/graphs-detail/shell/useActiveWorld";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useGovernPanel } from "@/pages/graphs-detail/shell/useGovernPanel";
 import { useLibraryPanel } from "@/pages/graphs-detail/shell/useLibraryPanel";
@@ -335,11 +334,6 @@ export function GraphDetailPage() {
 	// belongs to.
 	const setupOutstanding = hasOutstandingSetup(graphContainer);
 
-	// The world the next question is asked under — `?lens=`, which survives a
-	// panel change and a reload because it is the run's circumstances, not part
-	// of the question (WO5).
-	const activeWorld = useActiveWorld();
-
 	// The Govern panel's own URL keys — `Edit` on a lens board puts the drawer
 	// back on that lens in one write (WO16).
 	const governPanel = useGovernPanel();
@@ -375,14 +369,18 @@ export function GraphDetailPage() {
 		setPinned,
 		setArchived,
 		renameSession,
+		world,
+		setSpendPerRun,
 		openSession,
 		backToList,
 	} = useSessions(username, graphSlug, {
 		onResult: ({ sessionId, messageId, result }) =>
 			handleStreamResult(sessionId, messageId, result),
-		// Every ask from this surface goes under the world the chip names (WO5).
-		lensId: activeWorld.lensId,
 	});
+	// The canvas works in the open thread's world (AS5 · AD15): its restore
+	// check, its expansions and its legend read what the thread asks in. No
+	// thread open is *Everything*.
+	const threadWorldId = world.threadLensId;
 
 	// Page state lives in the URL, one param per region (graph-detail-page.md
 	// G16). `setSearchParams` is here for the one-write legacy migration below;
@@ -1088,7 +1086,7 @@ export function GraphDetailPage() {
 				paint(saved, []);
 				return;
 			}
-			const lensId = activeWorld.lensId;
+			const lensId = threadWorldId;
 			void explorerApi
 				.resolveElements(username, graphSlug, vertexIds, lensId)
 				.then(({ present, missing }) => {
@@ -1117,7 +1115,7 @@ export function GraphDetailPage() {
 		[
 			username,
 			graphSlug,
-			activeWorld.lensId,
+			threadWorldId,
 			setCanvasData,
 			setSeedData,
 			setStyling,
@@ -1671,7 +1669,7 @@ export function GraphDetailPage() {
 				body: {
 					...req.body,
 					...(activeSessionId ? { session_id: activeSessionId } : {}),
-					...(activeWorld.lensId ? { lens_id: activeWorld.lensId } : {}),
+					...(threadWorldId ? { lens_id: threadWorldId } : {}),
 				},
 			} as ExpandRequest;
 			try {
@@ -1697,7 +1695,7 @@ export function GraphDetailPage() {
 			expand,
 			handleExpandResult,
 			activeSessionId,
-			activeWorld.lensId,
+			threadWorldId,
 			refresh,
 			captureCanvasState,
 		],
@@ -1712,7 +1710,7 @@ export function GraphDetailPage() {
 	const { data: worldTypes } = useTypeCountsQuery(
 		username,
 		graphSlug,
-		activeWorld.lensId,
+		threadWorldId,
 	);
 	const expandSchema = useMemo<ExpandMenuSchema | null>(() => {
 		if (!activeVersion || !worldTypes) return null;
@@ -2213,6 +2211,20 @@ export function GraphDetailPage() {
 			onShowArchivedChange={setShowArchived}
 			onPin={setPinned}
 			onArchive={setArchived}
+			// C8 · AD15 — the world is the thread's, set where it asks.
+			worldControl={
+				<WorldPicker
+					username={username}
+					graphSlug={graphSlug}
+					lensId={world.lensId}
+					missing={world.missing}
+					nextAskOnly={world.nextAskOnly}
+					onPick={world.pick}
+					onNextAskOnly={world.setNextAskOnly}
+					onManage={() => settingsPanel.setSection("govern")}
+				/>
+			}
+			onSetSpendPerRun={setSpendPerRun}
 		/>
 	);
 
@@ -2431,6 +2443,7 @@ export function GraphDetailPage() {
 				canvas={canvas}
 				selected={selected}
 				styling={styling}
+				lensId={threadWorldId}
 				canvasName={
 					activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
 				}
@@ -3024,19 +3037,6 @@ export function GraphDetailPage() {
 			    need a `runId` this signature cannot carry (SD3 · B17). */}
 			<OpenBoardContext.Provider value={openRecordBoard}>
 				<GraphDetail
-					// C1 · WO5 — the world the next question is asked under, in
-					// `header.right` rather than in the composer: it is the run's
-					// circumstances, and it has to read on a surface that has no
-					// composer at all.
-					headerRightExtras={
-						<WorldChip
-							username={username}
-							graphSlug={graphSlug}
-							lensId={activeWorld.lensId}
-							onPick={activeWorld.setWorld}
-							onManage={() => settingsPanel.setSection("govern")}
-						/>
-					}
 					// The last crumb is what is open — the canvas you are looking at,
 					// named by its session: `ravi › finance › Defence theme — Sep 2026`.
 					// There is no screen crumb before it. `Explorer` used to sit there,

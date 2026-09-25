@@ -9,7 +9,6 @@ export { GovernStackPanel } from "@/pages/graphs-detail/features/govern/GovernSt
 export { LensBoardPage } from "@/pages/graphs-detail/features/govern/dashboards";
 export { LensDetail } from "@/pages/graphs-detail/features/govern/LensDetail";
 export { LensEditor } from "@/pages/graphs-detail/features/govern/LensEditor";
-export { WorldChip } from "@/pages/graphs-detail/features/govern/WorldChip";
 export {
 	ComparePage,
 	parseComparePair,

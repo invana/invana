@@ -57,7 +57,15 @@ import { toast } from "sonner";
  * a user action, so it keeps the same row — the operation's glyph replaces the
  * caret as the only cue that it came from the canvas rather than being typed.
  */
-export function PromptTurn({ message }: { message: SessionMessage }) {
+export function PromptTurn({
+	message,
+	ranIn,
+}: {
+	message: SessionMessage;
+	/** The world this ask's run was frozen with (AD17) — *Everything* when it
+	 *  ran in none; undefined when no run answered it. */
+	ranIn?: string;
+}) {
 	const Icon =
 		message.operation === "expand"
 			? Waypoints
@@ -67,10 +75,15 @@ export function PromptTurn({ message }: { message: SessionMessage }) {
 	return (
 		<ChatSessionPromptRow
 			caret={Icon ? <Icon className="h-3.5 w-3.5" /> : undefined}
-			meta={message.createdAt.toLocaleTimeString([], {
-				hour: "2-digit",
-				minute: "2-digit",
-			})}
+			meta={
+				<>
+					{message.createdAt.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					})}
+					{ranIn ? ` · ran in ${ranIn}` : null}
+				</>
+			}
 		>
 			{message.content}
 		</ChatSessionPromptRow>

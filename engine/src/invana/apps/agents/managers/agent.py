@@ -20,6 +20,7 @@ from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.agents.registry import SEEDED_AGENTS, SURFACE_DEFAULT_AGENT
 from invana.apps.agents.schemas import (
     AgentCreate,
+    AgentRead,
     AgentUpdate,
 )
 from invana.apps.govern.managers import LensManager
@@ -62,9 +63,36 @@ class AgentManager:
     # package writes no `skill_bindings` row of its own (BN6).
     skills = SkillManager()
     bindings = SkillBindingManager()
-    # The third bound is a `lenses` row, so the refusal that a world is not this
-    # Graph's — or is a guardrail, which nobody picks — is Govern's to raise.
+    # An agent's own narrowing is a guardrail scoped to it (AG10 · AG26), and
+    # guardrails are Govern's rows.
     lenses = LensManager()
+
+    async def reads(self, session: AsyncSession, items: list[Agent]) -> list[AgentRead]:
+        """Agents as the API answers them, each with its own guardrail named.
+
+        One read of the Graph's agent-scoped guardrails for the whole list, not
+        one per row (AG10 · AG26).
+        """
+        if not items:
+            return []
+        own: dict[str, Lens] = {}
+        for lens in await self.lenses.lenses_qs.list_for_graph(
+            session, items[0].graph_id, kind=LensKind.guardrail.value
+        ):
+            if lens.agent_scope_id and lens.agent_scope_id not in own:
+                own[lens.agent_scope_id] = lens
+        out: list[AgentRead] = []
+        for agent in items:
+            read = AgentRead.model_validate(agent)
+            guardrail = own.get(agent.id)
+            if guardrail is not None:
+                read.guardrail_id = guardrail.id
+                read.guardrail_name = guardrail.display_name
+            out.append(read)
+        return out
+
+    async def read(self, session: AsyncSession, agent: Agent) -> AgentRead:
+        return (await self.reads(session, [agent]))[0]
 
     async def seed_agents(self, session: AsyncSession, *, graph: Graph) -> list[Agent]:
         """Give a graph the agents it is born with, idempotently.
@@ -151,23 +179,6 @@ class AgentManager:
             raise ConflictError(f"'{agent.name}' is {agent.status}. Pick another agent, or resume this one.")
         return agent
 
-    async def resolve_lens(self, session: AsyncSession, *, graph_id: str, lens_id: str | None) -> Lens | None:
-        """The world an agent is being put in, or ``None`` for *Everything*.
-
-        A guardrail is refused rather than accepted quietly: a guardrail is
-        already in force on every run this agent opens
-        ([GR1](docs/for-developers/modules/govern/features/guardrails.md)), so
-        binding one here would read as a second bound that changes nothing.
-        """
-        if lens_id is None:
-            return None
-        lens = await self.lenses.get(session, lens_id=lens_id, graph_id=graph_id)
-        if lens.kind != LensKind.world.value:
-            raise ValidationError(
-                f"'{lens.name}' is a guardrail, and a guardrail is already in force on every run. Pick a world."
-            )
-        return lens
-
     async def create_agent(
         self,
         session: AsyncSession,
@@ -184,8 +195,6 @@ class AgentManager:
                 raise ValidationError(f"No seeded agent named '{payload.envelope_from}' to copy an envelope from.")
             spec = copy.deepcopy(seeded.workflow_spec)
 
-        lens = await self.resolve_lens(session, graph_id=graph.id, lens_id=payload.lens_id)
-
         agent = Agent(
             graph_id=graph.id,
             name=payload.name,
@@ -195,7 +204,6 @@ class AgentManager:
             workflow_spec=spec or {},
             budget=payload.budget,
             policy=payload.policy,
-            lens_id=lens.id if lens else None,
             created_by_kind="user",
             created_by_id=actor.id,
         )
@@ -247,15 +255,6 @@ class AgentManager:
         after = {f: getattr(agent, f) for f in _UPDATABLE}
         changed = diff_changed_fields(before, after, fields=_UPDATABLE)
 
-        # The bound moves on its own event, because *which world this agent
-        # works in* is the one field on this object an auditor reads by itself
-        # (AG6). Set-ness, not None-ness: null here is `Everything`, chosen.
-        lens_moved = "lens_id" in payload.model_fields_set and payload.lens_id != agent.lens_id
-        if lens_moved:
-            lens = await self.resolve_lens(session, graph_id=agent.graph_id, lens_id=payload.lens_id)
-            agent.lens_id = lens.id if lens else None
-            changed = [*changed, "lens_id"]
-
         if changed:
             # The version is what a run records, so it has to move whenever
             # anything about *how this agent thinks* moves.
@@ -272,20 +271,6 @@ class AgentManager:
                 graph_id=agent.graph_id,
                 actor_id=actor.id,
                 details={"name": agent.name, "changed": changed, "version": agent.version},
-                trace_id=current_trace_id(),
-            )
-        if lens_moved:
-            # `lens` is view-only and was loaded before the write, so the name
-            # the response reads back would otherwise be the world it left.
-            await session.refresh(agent, ["lens"])
-            await emit_event(
-                session,
-                action=actions.AGENT_LENS_SET,
-                target_kind=actions.TARGET_AGENT,
-                target_id=agent.id,
-                graph_id=agent.graph_id,
-                actor_id=actor.id,
-                details={"name": agent.name, "lens_id": agent.lens_id, "lens_name": agent.lens_name},
                 trace_id=current_trace_id(),
             )
         return agent

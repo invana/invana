@@ -42,6 +42,12 @@ class LensQuerySet:
     async def get(self, session: AsyncSession, lens_id: str) -> Lens | None:
         return (await session.execute(select(Lens).where(Lens.id == lens_id))).scalar_one_or_none()
 
+    async def names_by_id(self, session: AsyncSession, ids: list[str]) -> dict[str, str | None]:
+        """``{id: name}`` for the lenses that still exist — absent is deleted."""
+        if not ids:
+            return {}
+        return dict((await session.execute(select(Lens.id, Lens.name).where(Lens.id.in_(ids)))).all())
+
     async def get_by_key(self, session: AsyncSession, graph_id: str, key: str) -> Lens | None:
         stmt = select(Lens).where(Lens.graph_id == graph_id, Lens.key == key)
         return (await session.execute(stmt)).scalar_one_or_none()

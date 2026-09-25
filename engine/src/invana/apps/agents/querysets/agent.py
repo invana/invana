@@ -59,19 +59,6 @@ class AgentQuerySet:
         stmt = select(Agent).where(Agent.graph_id == graph_id, Agent.id.in_(ids)).order_by(Agent.name)
         return list((await session.execute(stmt)).scalars().all())
 
-    async def names_using_lens(self, session: AsyncSession, lens_id: str) -> list[str]:
-        """Who carries this lens as a bound.
-
-        The evidence behind the delete refusal: it names the agents rather than
-        saying the row is in use, the same way every other refusal in Govern
-        names what it is protecting
-        (docs/for-developers/modules/govern/features/worlds.md WO6). Govern
-        cannot ask this itself — `agents` owns `lens_id` and already imports
-        Govern, so the edge composes the two.
-        """
-        stmt = select(Agent.name).where(Agent.lens_id == lens_id).order_by(Agent.name)
-        return list((await session.execute(stmt)).scalars().all())
-
     async def add(self, session: AsyncSession, agent: Agent) -> Agent:
         session.add(agent)
         await session.flush()

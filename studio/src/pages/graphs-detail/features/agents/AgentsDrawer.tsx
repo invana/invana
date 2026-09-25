@@ -7,10 +7,10 @@
  * invisible and a refusal is predictable before it happens.*
  *
  * **An agent binds no provider** ([PM1](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
- * It carries three bounds — an envelope, a budget and a **lens** — and the
- * lens's `cast` names the model. So the row draws the world it works in, not a
- * model id: `llm_config_id` is gone, and a list that still printed a model
- * would be printing the one thing an agent no longer decides.
+ * It carries standing limits — an envelope, a budget — and optionally a
+ * guardrail of its own; the world, whose `cast` names the model, comes with
+ * the work (AG24). So the row draws its guardrail, not a model id: a list that
+ * printed a model would be printing the one thing an agent no longer decides.
  *
  * Three things this drawer is careful about:
  *
@@ -353,15 +353,13 @@ function AgentsBody({
 							statusTone={agentTone(agent.status)}
 							subtitle={
 								<span className="flex min-w-0 items-center gap-1.5">
-									{/* The bound, on the row. `undefined` reads *Everything*,
-									    which is a state and not a blank (AG5). */}
-									<LensChip
-										lens={
-											agent.lens_name
-												? { name: agent.lens_name, kind: "world" }
-												: undefined
-										}
-									/>
+									{/* Its own guardrail, when it has one (AG10). An agent
+									    binds no world — that comes with the work (AG24). */}
+									{agent.guardrail_name ? (
+										<LensChip
+											lens={{ name: agent.guardrail_name, kind: "guardrail" }}
+										/>
+									) : null}
 									<span className="truncate">
 										{agentSubline(
 											agent,
@@ -629,15 +627,13 @@ function AgentSummary({
 					<DetailProse>the graph default for new sessions</DetailProse>
 				) : null}
 			</PropertyRow>
-			<PropertyRow label="works in">
-				{/* The third bound, stated where the other two are read (AG6). */}
-				<LensChip
-					lens={
-						agent.lens_name
-							? { name: agent.lens_name, kind: "world" }
-							: undefined
-					}
-				/>
+			<PropertyRow label="guardrail">
+				{/* Its own restriction, whoever asks (AG10 · AG26). */}
+				{agent.guardrail_name ? (
+					<LensChip lens={{ name: agent.guardrail_name, kind: "guardrail" }} />
+				) : (
+					<DetailProse>none of its own</DetailProse>
+				)}
 			</PropertyRow>
 			<PropertyRow label="spend">
 				{/* The meter is only drawn against a **real ceiling** — without one

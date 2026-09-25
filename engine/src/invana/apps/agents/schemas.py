@@ -24,10 +24,6 @@ class AgentCreate(BaseModel):
     skill_ids: list[str] = Field(default_factory=list)
     budget: dict[str, Any] = Field(default_factory=dict)
     policy: dict[str, Any] = Field(default_factory=dict)
-    # The third bound, picked while the agent is authored (C2). Null is
-    # *Everything, inside the guardrails* (AG5), which is what a seeded agent
-    # carries.
-    lens_id: str | None = None
 
 
 class AgentUpdate(BaseModel):
@@ -38,11 +34,6 @@ class AgentUpdate(BaseModel):
     # No `skill_ids`: binding is not a field of the agent. See AgentCreate.
     budget: dict[str, Any] | None = None
     policy: dict[str, Any] | None = None
-    # **Omitted and null mean different things here**, unlike every field above:
-    # null is *put this agent back in Everything*, which is a bound somebody
-    # chose. The manager reads `model_fields_set` rather than testing for None,
-    # so a widening is always a write somebody made on purpose.
-    lens_id: str | None = None
 
 
 class AgentRead(BaseModel):
@@ -61,11 +52,11 @@ class AgentRead(BaseModel):
     # Read through `skill_bindings` (BN6). Present here because the skills badge
     # and the bindings picker both need it; not writable on this object.
     skill_ids: list[str]
-    # The third bound, beside the envelope and the budget (AG2 · AG6). The name
-    # rides with the id because the list draws a chip per row and a list that
-    # has to resolve four ids to four names draws none of them.
-    lens_id: str | None = None
-    lens_name: str | None = None
+    # The agent's own guardrail, scoped `agent:<id>` (AG10 · AG26). The name
+    # rides with the id because the Overview draws it and a list that has to
+    # resolve ids to names draws none of them. Null is *none of its own*.
+    guardrail_id: str | None = None
+    guardrail_name: str | None = None
     budget: dict[str, Any]
     policy: dict[str, Any]
     parent_agent_id: str | None

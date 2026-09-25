@@ -30,7 +30,7 @@ from invana.apps.sessions.transcript import (
     _plural,
     _title_from_text,
 )
-from invana.core.errors import NotFoundError
+from invana.core.errors import NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
 
@@ -192,8 +192,13 @@ class SessionManager:
         archived: bool | None = None,
         agent_id: str | None = None,
         actor_id: str | None = None,
+        bounds: dict | None = None,
     ) -> Session:
         """Apply a partial update (only the provided fields) to a session.
+
+        ``bounds`` carries ``lens_id`` and ``max_cost_usd_run`` only when they
+        were sent, because null is a value for both: *Everything*, and *the
+        agent's cap* ([AS5](docs/for-developers/modules/ask/spec.md)).
 
         Changing the agent takes effect on the **next** run_ask — earlier runs
         keep the agent they ran under, because ``runs.agent_id`` is the record
@@ -220,8 +225,53 @@ class SessionManager:
                 actor_id=actor_id,
                 details={"changed": {"agent_id": {"before": before, "after": agent.id}}, "agent_name": agent.name},
             )
+        if bounds:
+            await self._set_bounds(session, sess=sess, bounds=bounds, actor_id=actor_id)
         await session.flush()
         return sess
+
+    async def _set_bounds(self, session: AsyncSession, *, sess: Session, bounds: dict, actor_id: str | None) -> None:
+        """The thread's world and spend per run — what the next ask starts in.
+
+        A guardrail is refused: it is in force on every run already, so picking
+        one would read as a bound that changes nothing. A spend above the
+        agent's own cap is clamped to it, never refused (AS5).
+        """
+        from invana.apps.agents.managers import AgentManager
+        from invana.apps.govern.managers import LensManager
+        from invana.apps.govern.models import LensKind
+
+        changed: dict = {}
+        if "lens_id" in bounds and bounds["lens_id"] != sess.lens_id:
+            lens_id = bounds["lens_id"]
+            if lens_id is not None:
+                lens = await LensManager().get(session, lens_id=lens_id, graph_id=sess.graph_id)
+                if lens.kind != LensKind.world.value:
+                    raise ValidationError(
+                        f"'{lens.display_name}' is a guardrail, and a guardrail is already in force. Pick a world."
+                    )
+            changed["lens_id"] = {"before": sess.lens_id, "after": lens_id}
+            sess.lens_id = lens_id
+        if "max_cost_usd_run" in bounds:
+            spend = bounds["max_cost_usd_run"]
+            if spend is not None and sess.agent_id:
+                agent = await AgentManager().agents_qs.get(session, sess.agent_id)
+                cap = agent.effective_budget.get("max_cost_usd_run") if agent is not None else None
+                if cap is not None:
+                    spend = min(float(spend), float(cap))
+            if spend != sess.max_cost_usd_run:
+                changed["max_cost_usd_run"] = {"before": sess.max_cost_usd_run, "after": spend}
+                sess.max_cost_usd_run = spend
+        if changed:
+            await emit_event(
+                session,
+                action=actions.SESSION_UPDATE,
+                target_kind=actions.TARGET_SESSION,
+                target_id=sess.id,
+                graph_id=sess.graph_id,
+                actor_id=actor_id,
+                details={"changed": changed},
+            )
 
     async def delete_session(self, session: AsyncSession, *, sess: Session, actor_id: str) -> None:
         session_id = sess.id

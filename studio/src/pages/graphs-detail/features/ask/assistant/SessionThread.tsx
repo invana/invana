@@ -125,7 +125,16 @@ export function SessionThread({
 				if (hiddenLoadIds.has(message.id)) return null;
 				const prev = idx > 0 ? session.messages[idx - 1] : undefined;
 				if (message.role === "user") {
-					return <PromptTurn key={message.id} message={message} />;
+					// A turn says what it ran in (AD17): the reply's frozen world,
+					// so a thread that moved between worlds reads honestly.
+					const reply = session.messages[idx + 1];
+					const ranIn =
+						reply?.role === "assistant" && reply.runId
+							? (reply.lensName ?? "Everything")
+							: undefined;
+					return (
+						<PromptTurn key={message.id} message={message} ranIn={ranIn} />
+					);
 				}
 				// The full auditable timeline for this run (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): steps
 				// merged across a clarification pause/resume, with the question

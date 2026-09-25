@@ -17,9 +17,10 @@ from invana.apps.agents.managers import AgentManager
 from invana.apps.agents.schemas import AgentCreate
 from invana.apps.govern.catalogue import Catalogue
 from invana.apps.govern.managers import LensManager
-from invana.apps.govern.models import LensKind
+from invana.apps.govern.models import Lens, LensKind
 from invana.apps.govern.schemas import LensCreate, LensUpdate, RuleIn
 from invana.core.errors import NotFoundError
+from invana.runtime.models import TaskRun
 from invana.runtime.services import freeze_lens
 
 pytestmark = pytest.mark.asyncio
@@ -116,34 +117,40 @@ class TestFreezingTheLens:
         with pytest.raises(NotFoundError):
             await freeze_lens(session, graph_id=graph.id, agent_id=None, lens_id="00000000-0000-0000-0000-000000000000")
 
-    async def test_the_agents_own_world_composes_even_when_nobody_picked_one(self, session, graph, user, member):
-        """The third bound is in force on every run this agent opens (AG2).
-
-        A world that only narrowed the runs somebody remembered to pick it for
-        would not be a bound — and a child carries its parent's (DG9), so this
-        is also how the narrowing travels down the tree.
-        """
-        own = await lenses.create(
-            session,
-            graph_id=graph.id,
-            payload=LensCreate(
+    async def test_the_agents_own_guardrail_composes_and_is_named_as_the_agents(self, session, graph, user, member):
+        """An agent carries no world; its narrowing is its guardrail, in force on
+        every run it opens (AG26), and a rule from it says whose it is (AG6)."""
+        agent = await AgentManager().create_agent(session, graph=graph, payload=AgentCreate(name="Analyst"), actor=user)
+        session.add(
+            Lens(
+                graph_id=graph.id,
+                kind=LensKind.guardrail.value,
+                key="analyst-own",
                 name="Price-blind",
-                rules=[RuleIn(match="graph_data/model/Deal@*", allow=True)],
-            ),
-            actor_id=user.id,
-            catalogue=EMPTY,
-            may_edit_guardrails=True,
+                scope=f"agent:{agent.id}",
+                rules=[{"match": "graph_data/model/Deal@*", "allow": True}],
+            )
         )
-        agent = await AgentManager().create_agent(
-            session,
-            graph=graph,
-            payload=AgentCreate(name="Analyst", lens_id=own.id),
-            actor=user,
-        )
+        await session.flush()
 
         frozen = await freeze_lens(session, graph_id=graph.id, agent_id=agent.id, lens_id=None)
 
         # `lens_id` still reads the world the *asker* picked, which is none.
         assert frozen["lens_id"] is None
-        assert [r["match"] for r in frozen["lens_snapshot"]["rules"]] == ["graph_data/model/Deal@*"]
-        assert {c["name"] for c in frozen["lens_snapshot"]["contributors"]} == {"Price-blind"}
+        [rule] = frozen["lens_snapshot"]["rules"]
+        assert rule["match"] == "graph_data/model/Deal@*"
+        assert rule["by"] == "the agent's own guardrail 'Price-blind'"
+
+    async def test_a_delegated_child_opens_inside_its_parents_frozen_lens(self, session, graph, user, member):
+        """DG9 — a child can never be wider than the run that spawned it, and it
+        keeps the world that run was asked in."""
+        parent = TaskRun(
+            graph_id=graph.id,
+            lens_id="world-1",
+            lens_snapshot={"rules": [{"match": "llm/anthropic-prod/**", "allow": False}], "contributors": []},
+        )
+
+        frozen = await freeze_lens(session, graph_id=graph.id, agent_id=None, lens_id=None, within=parent)
+
+        assert frozen["lens_id"] == "world-1"
+        assert [r["match"] for r in frozen["lens_snapshot"]["rules"]] == ["llm/anthropic-prod/**"]

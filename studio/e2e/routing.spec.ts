@@ -64,7 +64,7 @@ test("?right= names who holds the right side", async ({ page }) => {
 	// The value is the occupant, so the URL says which of the two is on screen
 	// (G16) — and it still says so after a reload.
 	await page.goto(`${GRAPH}?right=assistant`);
-	const composer = page.getByRole("combobox", { name: "Ask mode" });
+	const composer = page.getByRole("button", { name: "Ask mode" });
 	await expect(composer).toBeVisible({ timeout: 30_000 });
 
 	await page.reload();
@@ -75,7 +75,7 @@ test("a legacy ?ai link opens the assistant", async ({ page }) => {
 	// `?ai=1` is read once and normalised onto `?right=assistant`, the same
 	// one-way alias `?settings=` gets.
 	await page.goto(`${GRAPH}?ai=1`);
-	await expect(page.getByRole("combobox", { name: "Ask mode" })).toBeVisible({
+	await expect(page.getByRole("button", { name: "Ask mode" })).toBeVisible({
 		timeout: 30_000,
 	});
 });
@@ -88,5 +88,5 @@ test("opening the assistant does not cost the open panel", async ({ page }) => {
 	await expect(crumbs.getByText("model", { exact: true })).toBeVisible({
 		timeout: 30_000,
 	});
-	await expect(page.getByRole("combobox", { name: "Ask mode" })).toBeVisible();
+	await expect(page.getByRole("button", { name: "Ask mode" })).toBeVisible();
 });

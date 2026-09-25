@@ -28,7 +28,7 @@
  * **Save** writes them.
  */
 
-import { useLensQuery, useLensesQuery } from "@/hooks/queries/useGovern";
+import { useLensQuery } from "@/hooks/queries/useGovern";
 import { useSkillsQuery } from "@/hooks/queries/useSkills";
 import {
 	useAgentLineageQuery,
@@ -117,8 +117,6 @@ interface Envelope {
 /** The local edit buffer — what `Save` will send. */
 interface Draft {
 	instructions: string;
-	/** The third bound — the world this agent works in. Null is *Everything*. */
-	lens_id: string | null;
 	budget: Record<string, number>;
 	policy: Record<string, boolean>;
 	spec: Envelope;
@@ -126,7 +124,6 @@ interface Draft {
 
 const draftOf = (agent: Agent): Draft => ({
 	instructions: agent.instructions ?? "",
-	lens_id: agent.lens_id,
 	budget: { ...(agent.budget ?? {}) },
 	policy: { ...(agent.policy ?? {}) },
 	spec: JSON.parse(JSON.stringify(agent.workflow_spec ?? {})) as Envelope,
@@ -217,14 +214,13 @@ export function AgentDetail({
 		if (tab !== "lineage") onOpenEnvelope();
 	}, [agent.id]);
 
-	// The worlds this agent can be put in, and the cast the picked one resolves
-	// to. **Two reads, not one**: the record never waits on the resolution (WO12).
-	const lenses = useLensesQuery(username, graphSlug);
-	const worlds = (lenses.data?.items ?? []).filter((l) => l.kind === "world");
-	const boundLens = useLensQuery(
+	// The agent's own guardrail and the cast it resolves to — an agent binds no
+	// world (AG26). **Two reads, not one**: the record never waits on the
+	// resolution (WO12).
+	const ownGuardrail = useLensQuery(
 		username,
 		graphSlug,
-		draft.lens_id ?? undefined,
+		agent.guardrail_id ?? undefined,
 	);
 	const skills = useSkillsQuery(username, graphSlug);
 	// Which chip the last bind was for. A refusal floating above the picker
@@ -342,37 +338,19 @@ export function AgentDetail({
 
 					<PanelSection title="Bounds">
 						<div className="space-y-2">
-							{/* **An agent binds no provider** (PM1). The third bound is a
-							    world, and the world's `cast` names the model — so this picks
-							    what the agent may see, use and send, and the table below
-							    states what that resolves to. */}
-							<label className="block text-base text-muted-foreground">
-								Works in
-								<select
-									value={draft.lens_id ?? ""}
-									onChange={(e) => patch({ lens_id: e.target.value || null })}
-									className="mt-1 w-full rounded-sm border bg-background px-2 py-1.5 text-base text-foreground"
-								>
-									{/* Never a blank: *nothing set* and *nothing permitted* must
-									    not look alike (AG5). */}
-									<option value="">Everything, inside the guardrails</option>
-									{worlds.map((world) => (
-										<option key={world.id} value={world.id}>
-											{world.display_name}
-										</option>
-									))}
-								</select>
-							</label>
-
+							{/* **An agent binds no provider and no world** (PM1 · AG24).
+							    What it may see comes with the work; what holds whoever asks
+							    is its own guardrail (AG10), edited in Govern › Guardrails. */}
 							<div>
 								<div className="mb-1 text-base text-muted-foreground">
-									Its cast, resolved
+									Its own guardrail
+									{agent.guardrail_name ? ` — ${agent.guardrail_name}` : ""}
 								</div>
-								{draft.lens_id ? (
+								{agent.guardrail_id ? (
 									<CastTable
 										readOnly
-										cast={boundLens.data?.cast}
-										resolved={boundLens.data?.cast_resolved?.map((row) => ({
+										cast={ownGuardrail.data?.cast}
+										resolved={ownGuardrail.data?.cast_resolved?.map((row) => ({
 											role: row.role,
 											address: row.address,
 											allowed: row.allowed,
@@ -385,9 +363,8 @@ export function AgentDetail({
 									/>
 								) : (
 									<DetailProse>
-										No world, so the shipped cast answers over whatever this
-										Graph offers — cheapest that can read, most capable to
-										decide.
+										None of its own. Each run is bounded by the world its
+										session or Todo brings, inside the Graph's guardrails.
 									</DetailProse>
 								)}
 							</div>
@@ -764,7 +741,6 @@ export function AgentDetail({
 					onClick={() =>
 						onSave({
 							instructions: draft.instructions,
-							lens_id: draft.lens_id,
 							budget: draft.budget,
 							policy: draft.policy,
 							workflow_spec: draft.spec as Record<string, unknown>,

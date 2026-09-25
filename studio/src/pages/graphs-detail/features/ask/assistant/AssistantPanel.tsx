@@ -6,6 +6,7 @@ import {
 import type { AssistantAttachment } from "@/pages/graphs-detail/features/ask/assistant/SessionComposer";
 import { SessionLegendDialog } from "@/pages/graphs-detail/features/ask/assistant/SessionLegendDialog";
 import { SessionList } from "@/pages/graphs-detail/features/ask/assistant/SessionList";
+import { SessionSettings } from "@/pages/graphs-detail/features/ask/assistant/SessionSettings";
 import {
 	SessionTasksView,
 	stepsFor,
@@ -39,8 +40,10 @@ import {
 	ChevronRight,
 	HelpCircle,
 	MessageSquare,
+	Settings2,
 	X,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 export interface AssistantPanelProps {
@@ -108,6 +111,13 @@ export interface AssistantPanelProps {
 	attachment?: AssistantAttachment | null;
 	/** Take the attachment off; the next ask goes without it. */
 	onRemoveAttachment?: () => void;
+	/** The world picker, placed in the composer (AD15). */
+	worldControl?: ReactNode;
+	/** Set the open thread's spend per run (C10); null is the agent's cap. */
+	onSetSpendPerRun?: (
+		sessionId: string,
+		usd: number | null,
+	) => Promise<unknown>;
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
@@ -156,6 +166,8 @@ export function AssistantPanel({
 	isCommitting,
 	attachment,
 	onRemoveAttachment,
+	worldControl,
+	onSetSpendPerRun,
 }: AssistantPanelProps) {
 	const isModeller = surface === "modeller";
 	// Bumped to focus the composer when the user picks "let me type instead" on a
@@ -165,6 +177,8 @@ export function AssistantPanel({
 	const [view, setView] = useState<"chat" | "tasks">("chat");
 	// The "what do the dots mean" legend, opened from the header help icon.
 	const [legendOpen, setLegendOpen] = useState(false);
+	// The thread's settings — its spend per run (C10), from the header.
+	const [settingsOpen, setSettingsOpen] = useState(false);
 	// LLM providers excluded from the list (client-side). Empty = show all.
 	// Sessions don't record their provider yet, so this filters nothing today —
 	// it's wired ahead of NL queries landing (see Session.llmProviderId).
@@ -481,6 +495,7 @@ export function AssistantPanel({
 				agentStatus={activeSession?.agentStatus ?? null}
 				attachment={attachment}
 				onRemoveAttachment={onRemoveAttachment}
+				worldControl={worldControl}
 			/>
 			<ChatSessionStatusBar
 				className="pt-0"
@@ -502,6 +517,16 @@ export function AssistantPanel({
 						icon: HelpCircle,
 						onClick: () => setLegendOpen(true),
 					},
+					...(inDetail && activeSession && onSetSpendPerRun
+						? [
+								{
+									key: "settings",
+									name: "Session settings",
+									icon: Settings2,
+									onClick: () => setSettingsOpen((v) => !v),
+								},
+							]
+						: []),
 				]}
 				onRefresh={onRefresh}
 				isRefreshing={isRefreshing}
@@ -551,21 +576,31 @@ export function AssistantPanel({
 			>
 				{({ search }) =>
 					activeSession ? (
-						view === "tasks" ? (
-							<SessionTasksView session={activeSession} onJump={jumpTo} />
-						) : (
-							<SessionThread
-								session={activeSession}
-								isRunning={isRunning}
-								results={results}
-								onRerun={onRerun}
-								onFetchContext={onFetchContext}
-								onSelectOption={handleSelectOption}
-								onTypeInstead={handleTypeInstead}
-								onVote={handleVote}
-								onLoadToCanvas={onLoadToCanvas}
-							/>
-						)
+						<>
+							{onSetSpendPerRun && (
+								<SessionSettings
+									session={activeSession}
+									open={settingsOpen}
+									onOpenChange={setSettingsOpen}
+									onSave={(usd) => onSetSpendPerRun(activeSession.id, usd)}
+								/>
+							)}
+							{view === "tasks" ? (
+								<SessionTasksView session={activeSession} onJump={jumpTo} />
+							) : (
+								<SessionThread
+									session={activeSession}
+									isRunning={isRunning}
+									results={results}
+									onRerun={onRerun}
+									onFetchContext={onFetchContext}
+									onSelectOption={handleSelectOption}
+									onTypeInstead={handleTypeInstead}
+									onVote={handleVote}
+									onLoadToCanvas={onLoadToCanvas}
+								/>
+							)}
+						</>
 					) : (
 						<SessionList
 							sessions={sessions}

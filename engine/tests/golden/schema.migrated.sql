@@ -18,19 +18,15 @@ CREATE TABLE agents (
 	created_by_id VARCHAR(36), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL, 
-	lens_id VARCHAR(36), 
 	CONSTRAINT agents_pkey PRIMARY KEY (id), 
 	CONSTRAINT agents_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE, 
 	CONSTRAINT agents_parent_agent_id_fkey FOREIGN KEY(parent_agent_id) REFERENCES agents (id) ON DELETE SET NULL, 
-	CONSTRAINT fk_agents_lens_id FOREIGN KEY(lens_id) REFERENCES lenses (id) ON DELETE RESTRICT, 
 	CONSTRAINT uq_agent_graph_name UNIQUE NULLS DISTINCT (graph_id, name)
 );
 
 CREATE INDEX ix_agents_graph_id ON agents (graph_id);
 
 CREATE INDEX ix_agents_key ON agents (key);
-
-CREATE INDEX ix_agents_lens_id ON agents (lens_id);
 
 CREATE INDEX ix_agents_parent_agent_id ON agents (parent_agent_id);
 
@@ -637,6 +633,8 @@ CREATE TABLE sessions (
 	surface session_surface NOT NULL, 
 	model_id VARCHAR(36), 
 	agent_id VARCHAR(36), 
+	lens_id VARCHAR(36), 
+	max_cost_usd_run DOUBLE PRECISION, 
 	CONSTRAINT sessions_pkey PRIMARY KEY (id), 
 	CONSTRAINT fk_sessions_model_id FOREIGN KEY(model_id) REFERENCES graph_models (id) ON DELETE SET NULL, 
 	CONSTRAINT sessions_created_by_id_fkey FOREIGN KEY(created_by_id) REFERENCES users (id) ON DELETE CASCADE, 

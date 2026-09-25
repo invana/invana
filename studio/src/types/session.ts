@@ -65,6 +65,10 @@ export interface SessionMessage {
 	runId?: string;
 	/** The reply's task trace — one row per attempt, from its current run. */
 	steps?: RunNode[];
+	/** The world this turn's run was frozen with, named as it was then (AD17).
+	 *  Undefined is *Everything*. */
+	lensId?: string;
+	lensName?: string;
 }
 
 /**
@@ -112,6 +116,14 @@ export interface Session {
 	/** `paused` / `retired` blocks the composer and offers the picker instead of
 	 *  answering with a different mind. */
 	agentStatus?: string;
+	/** The world every ask in the thread starts in (AS5). Undefined is
+	 *  *Everything*; `lensMissing` is a world deleted since (AD20). */
+	lensId?: string;
+	lensName?: string;
+	lensMissing?: boolean;
+	/** The thread's spend per run, and the agent's cap it is held under. */
+	maxCostUsdRun?: number;
+	agentMaxCostUsdRun?: number;
 	/** Running totals across the session, for the list meta line. */
 	nodeCount: number;
 	edgeCount: number;

@@ -54,7 +54,7 @@ async def list_agents(
         session, graph=graph, include_ephemeral=include_ephemeral, include_retired=include_retired
     )
     # The read seeds on first touch, so it commits.
-    reads = [AgentRead.model_validate(a) for a in items]
+    reads = await agents.reads(session, items)
     return AgentListResponse(
         items=reads,
         total=len(reads),
@@ -74,7 +74,7 @@ async def create_agent(
     session: AsyncSession = Depends(get_session),
 ) -> AgentRead:
     agent = await agents.create_agent(session, graph=graph, payload=payload, actor=user, bind_check=binds.check)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def get_agent(
@@ -84,7 +84,7 @@ async def get_agent(
     session: AsyncSession = Depends(get_session),
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def update_agent(
@@ -97,7 +97,7 @@ async def update_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     agent = await agents.update_agent(session, agent=agent, payload=payload, actor=user)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def delete_agent(
@@ -121,7 +121,7 @@ async def pause_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     agent = await agents.set_status(session, agent=agent, status=AgentStatus.paused, actor=user)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def resume_agent(
@@ -133,7 +133,7 @@ async def resume_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
     agent = await agents.set_status(session, agent=agent, status=AgentStatus.active, actor=user)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def preview_pause(
@@ -177,7 +177,7 @@ async def retire_agent(
         reassign_to_kind=payload.reassign_to_kind,
         reassign_to_id=payload.reassign_to_id,
     )
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def agent_lineage(
@@ -218,7 +218,7 @@ async def set_default_agent(
 ) -> AgentRead:
     agent = await agents.get_or_404(session, agent_id=payload.agent_id, graph_id=graph.id)
     await agents.set_default_agent(session, graph=graph, agent=agent, actor=user)
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def bind_skill(
@@ -254,7 +254,7 @@ async def bind_skill(
         check=binds.check,
     )
     await session.refresh(agent, ["bound_skills"])
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)
 
 
 async def unbind_skill(
@@ -274,4 +274,4 @@ async def unbind_skill(
     skill = await skills.get(session, skill_id=skill_id, graph_id=graph.id)
     await bindings.unbind(session, skill=skill, agent_id=agent.id, agent_name=agent.name, actor_id=user.id)
     await session.refresh(agent, ["bound_skills"])
-    return AgentRead.model_validate(agent)
+    return await agents.read(session, agent)

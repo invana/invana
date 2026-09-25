@@ -20,7 +20,6 @@ import {
 	setNodeTypeHidden,
 } from "@/pages/graphs-detail/features/explorer/visibility";
 import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
-import { useActiveWorld } from "@/pages/graphs-detail/shell/useActiveWorld";
 import type { CanvasStyling } from "@/types/board";
 import type { QueryResultItem } from "@/types/query";
 import type { TypeCount } from "@/types/traversal";
@@ -66,6 +65,8 @@ interface Props {
 	selected: QueryResultItem | null;
 	/** Per-type colours the canvas was styled with; the dots follow them. */
 	styling?: CanvasStyling;
+	/** The open thread's world (AS5); null is *Everything*. */
+	lensId: string | null;
 	/** The open canvas's name, stated in the footer beside the totals. */
 	canvasName?: string;
 	/** Resolves a dataset id to its name for the provenance line. */
@@ -80,13 +81,13 @@ export function ExplorerTypesPanel({
 	canvas,
 	selected,
 	styling,
+	lensId,
 	canvasName,
 	modelName,
 	onClose,
 }: Props) {
-	// The legend is the picked world's: denied types are absent, counts are
+	// The legend is the thread's world's: denied types are absent, counts are
 	// taken inside it (selection-and-the-panel.md SP11).
-	const { lensId } = useActiveWorld();
 	const counts = useTypeCountsQuery(username, graphSlug, lensId);
 	const hidden = useHiddenTypes(canvas);
 	const store = graphStoreOf(canvas);

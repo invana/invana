@@ -19,11 +19,11 @@ export async function openExplorer(page: Page) {
 
 	// The mode is remembered between visits, so switch only when it is not
 	// already where these specs need it.
-	const mode = page.getByRole("combobox", { name: "Ask mode" });
+	const mode = page.getByRole("button", { name: "Ask mode" });
 	await expect(mode).toBeVisible({ timeout: 30_000 });
 	if ((await mode.textContent())?.includes("Natural")) {
 		await mode.click();
-		await page.getByRole("option", { name: "Query Language" }).click();
+		await page.getByRole("menuitemradio", { name: "Query language" }).click();
 	}
 
 	// The composer is a contenteditable, not an <input> — it has no placeholder

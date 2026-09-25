@@ -40,6 +40,8 @@ interface ApiMessage {
 	edge_count?: number | null;
 	run_id?: string | null;
 	steps?: ApiThinkingStep[] | null;
+	lens_id?: string | null;
+	lens_name?: string | null;
 	created_at: string;
 }
 
@@ -55,6 +57,11 @@ interface ApiSummary {
 	agent_id?: string | null;
 	agent_name?: string | null;
 	agent_status?: string | null;
+	lens_id?: string | null;
+	lens_name?: string | null;
+	lens_missing?: boolean;
+	max_cost_usd_run?: number | null;
+	agent_max_cost_usd_run?: number | null;
 	title: string;
 	pinned: boolean;
 	archived: boolean;
@@ -101,14 +108,12 @@ export interface SendMessageBody {
 	/** nl only — seconds to wait on the LLM translation before giving up. */
 	timeout_s?: number;
 	/**
-	 * The world this question is asked under (C1 · WO5).
+	 * The world this one ask runs in — *Next ask only* (AD16).
 	 *
-	 * Omitted is **Everything, inside the guardrails** — the default and the
-	 * widest (GV7), so no surface grows a required field. The run freezes what
-	 * this resolves to; the id alone would be a pointer at a row that can move
-	 * (GR3).
+	 * **Omitted and null differ** (AD19): omitted is the session's world, null
+	 * is *Everything* for this ask only. The run freezes what this resolves to.
 	 */
-	lens_id?: string;
+	lens_id?: string | null;
 }
 
 /** A client-driven canvas operation to log as a session turn (docs/for-developers/modules/explore/features/boards.md). Only
@@ -142,13 +147,20 @@ export interface SessionCreateBody {
 	title?: string;
 	surface?: "explorer" | "modeller";
 	model_id?: string;
+	/** The world a new thread starts in, when one was picked before its first
+	 *  ask (AS5). Omitted is *Everything*. */
+	lens_id?: string;
 }
 
-/** Partial update for a session — rename and/or toggle pin/archive. */
+/** Partial update for a session — rename, pin/archive, or its bounds (AS5).
+ *  For `lens_id` and `max_cost_usd_run`, null is a value: *Everything*, and
+ *  *the agent's cap*. */
 export interface SessionUpdateBody {
 	title?: string;
 	pinned?: boolean;
 	archived?: boolean;
+	lens_id?: string | null;
+	max_cost_usd_run?: number | null;
 }
 
 export interface SessionListResult {
@@ -187,6 +199,8 @@ function toMessage(m: ApiMessage): SessionMessage {
 		feedback: m.feedback ?? undefined,
 		runId: m.run_id ?? undefined,
 		steps: m.steps ? m.steps.map(toRunNode) : undefined,
+		lensId: m.lens_id ?? undefined,
+		lensName: m.lens_name ?? undefined,
 	};
 }
 
@@ -204,6 +218,11 @@ function toSession(s: ApiSummary, messages: SessionMessage[] = []): Session {
 		agentId: s.agent_id ?? undefined,
 		agentName: s.agent_name ?? undefined,
 		agentStatus: s.agent_status ?? undefined,
+		lensId: s.lens_id ?? undefined,
+		lensName: s.lens_name ?? undefined,
+		lensMissing: s.lens_missing ?? false,
+		maxCostUsdRun: s.max_cost_usd_run ?? undefined,
+		agentMaxCostUsdRun: s.agent_max_cost_usd_run ?? undefined,
 		nodeCount: s.node_count,
 		edgeCount: s.edge_count,
 		lastStatus: s.last_status ?? undefined,

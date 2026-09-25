@@ -166,11 +166,6 @@ AGENT_RETIRE = "agent.retire"
 AGENT_DELETE = "agent.delete"
 AGENT_SPAWN = "agent.spawn"  # an agent created an agent; actor_kind = agent
 AGENT_SET_DEFAULT = "agent.set_default"  # the graph's default agent
-# The third bound moved: which world this agent works in
-# ([AG2](docs/for-developers/modules/agents/features/author-an-agent.md)). Its own
-# action, because widening an agent back to *Everything* is the line of the
-# audit an auditor comes looking for.
-AGENT_LENS_SET = "agent.lens_set"
 
 # ── Workflows library (docs/for-developers/modules/agents/spec.md) ────────────────────────────────────
 WORKFLOW_PROMOTE = "workflow.promote"  # a served plan became a library entry

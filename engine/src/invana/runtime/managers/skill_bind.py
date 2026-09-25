@@ -28,8 +28,8 @@ What is deliberately **not** checked here:
 * **A narrower world at run time.** A Todo may always narrow further than its
   agent ([GV6](docs/for-developers/modules/govern/spec.md)); that is *cannot
   answer — outside the lens*, and widening recovers it. Which is also why the
-  lens half reads **guardrails** and not worlds — including the world an agent
-  carries by default in ``agents.lens_id`` ([BN10]).
+  lens half reads **guardrails** and not worlds ([BN10]) — an agent carries no
+  world at all (AG26); its own narrowing is its guardrail, and that is read.
 * **Which participant a run will pick.** A plan says *this step touches graph
   data*; which model it reads is decided inside the run. Refusing because one
   of the band's participants is denied would refuse on grounds the check cannot
@@ -282,22 +282,11 @@ class SkillBindManager:
         catalogue = await self.catalogue.resolve(session, graph_id=skill.graph_id) if tasks else None
         agents = await self.agents_qs.list_for_graph(session, skill.graph_id)
         bound_ids = set(await self.bindings.agent_ids_for_skill(session, skill_id=skill.id))
-        # One read for the whole list, the same way the plan and the
-        # catalogue are read once. The world is **context** on the row and never
-        # a ground for a refusal — the check reads guardrails and never worlds
-        # (BN12 · BN10) — so an agent whose lens has no name carries none.
-        worlds = {
-            lens.id: lens.name
-            for lens in await self.lenses.list_for_graph(session, graph_id=skill.graph_id, include_unnamed=True)
-            if lens.name
-        }
-
         out: list[dict] = []
         for agent in agents:
             standing: dict = {
                 "agent_id": agent.id,
                 "agent_name": agent.name,
-                "world": worlds.get(agent.lens_id) if agent.lens_id else None,
                 "bound": agent.id in bound_ids,
                 "refusal": None,
             }

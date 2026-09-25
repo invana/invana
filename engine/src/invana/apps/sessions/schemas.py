@@ -36,13 +36,13 @@ class SendMessage(BaseModel):
     # query execution (nl + ql). Lets slow models/queries be granted more time.
     # Falls back to the translate/driver defaults when omitted.
     timeout_s: float | None = Field(default=None, gt=0, le=600)
-    #: The world this question is asked under
-    #: ([C1](docs/for-developers/modules/govern/features/worlds.md)). Omitted is
-    #: **Everything, inside the guardrails** — the default and the widest
-    #: ([GV7](docs/for-developers/modules/govern/spec.md)), so no surface grows
-    #: a required field. The run freezes what it resolves to; the id alone would
-    #: be a pointer at a row that can move
-    #: ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
+    #: The world this one ask runs in — *Next ask only*
+    #: ([AD16](docs/for-developers/modules/ask/features/the-assistant.md)).
+    #: **Omitted and null mean different things**: omitted is the session's
+    #: world ([AS5](docs/for-developers/modules/ask/spec.md)); null is
+    #: *Everything, inside the guardrails*, for this ask only. The run freezes
+    #: what it resolves to; the id alone would be a pointer at a row that can
+    #: move ([GR3](docs/for-developers/modules/govern/features/guardrails.md)).
     lens_id: str | None = Field(default=None, max_length=36)
 
 
@@ -58,6 +58,10 @@ class SessionCreate(BaseModel):
     # Optional model binding for a modeller session — the draft to author. When
     # absent, the first generation creates + binds a model (docs/for-developers/modules/ask/spec.md).
     model_id: str | None = None
+    #: The world the new thread starts in, when one was picked before its first
+    #: ask. Omitted is *Everything* — a new session never inherits the last
+    #: thread's world ([AS5](docs/for-developers/modules/ask/spec.md)).
+    lens_id: str | None = Field(default=None, max_length=36)
     # Optional first message → create-and-send in one call (the "ask from the
     # list with no active session" UX).
     message: SendMessage | None = None
@@ -102,6 +106,13 @@ class SessionUpdate(BaseModel):
     # Takes effect on the **next** run_ask; earlier runs keep the agent
     # they ran under, because the run row is the record (docs/for-developers/modules/agents/spec.md).
     agent_id: str | None = None
+    #: The world every ask in the thread starts in
+    #: ([AS5](docs/for-developers/modules/ask/spec.md)). **Omitted and null
+    #: differ**: null puts the thread back in *Everything*.
+    lens_id: str | None = Field(default=None, max_length=36)
+    #: The thread's spend per run, clamped to the agent's `max_cost_usd_run` on
+    #: write. **Omitted and null differ**: null falls back to the agent's cap.
+    max_cost_usd_run: float | None = Field(default=None, gt=0)
 
 
 # ── Reads ─────────────────────────────────────────────────────────────────────
@@ -143,6 +154,12 @@ class SessionMessageRead(BaseModel):
     # replies from before the runtime existed.
     run_id: str | None = None
     steps: list[RunNodeRead] = []
+    #: The world this turn's run was frozen with, and its name as frozen — so a
+    #: rename or a delete since never changes what a past turn says
+    #: ([AD17](docs/for-developers/modules/ask/features/the-assistant.md)).
+    #: Both null is *Everything*.
+    lens_id: str | None = None
+    lens_name: str | None = None
     created_at: datetime
 
 
@@ -178,6 +195,15 @@ class SessionSummary(BaseModel):
     # offers the picker rather than silently answering with another mind.
     agent_status: str | None = None
     model_id: str | None = None
+    #: The thread's world ([AS5](docs/for-developers/modules/ask/spec.md)).
+    #: ``lens_missing`` is a world that was deleted since: the chip reads
+    #: *Everything* and says so.
+    lens_id: str | None = None
+    lens_name: str | None = None
+    lens_missing: bool = False
+    #: The thread's spend per run, and the agent's cap it is held under.
+    max_cost_usd_run: float | None = None
+    agent_max_cost_usd_run: float | None = None
     title: str
     pinned: bool
     archived: bool

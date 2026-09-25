@@ -30,12 +30,12 @@ export interface Agent {
 	/** The envelope: allow-list · pinned args · require · templates · budgets. */
 	workflow_spec: Record<string, unknown>;
 	/**
-	 * The third bound: the world this agent works inside (AG2). **Null reads
-	 * *Everything*, inside the guardrails** — never a blank (AG5). `lens_name`
-	 * rides with the id so a row can draw a chip without a second fetch (AG8).
+	 * The agent's own guardrail, scoped `agent:<id>` (AG10 · AG26). An agent
+	 * binds no world — the world comes with the work (AG24). Null is *none of
+	 * its own*; the name rides with the id so a row draws it without a fetch.
 	 */
-	lens_id: string | null;
-	lens_name: string | null;
+	guardrail_id: string | null;
+	guardrail_name: string | null;
 	/** Read-only — the bindings live in `skill_bindings`; change it with bind/unbind. */
 	skill_ids: string[];
 	budget: Record<string, number>;
@@ -69,8 +69,6 @@ export interface AgentCreate {
 	/** Start from a seeded agent's envelope — an empty allow-list can do nothing. */
 	envelope_from?: string;
 	workflow_spec?: Record<string, unknown>;
-	/** Null is *Everything*, chosen — on update, omitting it keeps what is set (AG9). */
-	lens_id?: string | null;
 	/** The skills this agent starts with, bound as part of creating it. */
 	skill_ids?: string[];
 	budget?: Record<string, number>;

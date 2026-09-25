@@ -629,17 +629,6 @@
             "title": "Instructions",
             "type": "string"
           },
-          "lens_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lens Id"
-          },
           "name": {
             "maxLength": 255,
             "minLength": 1,
@@ -882,6 +871,28 @@
             "title": "Graph Id",
             "type": "string"
           },
+          "guardrail_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guardrail Id"
+          },
+          "guardrail_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guardrail Name"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -904,28 +915,6 @@
           "kind": {
             "title": "Kind",
             "type": "string"
-          },
-          "lens_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lens Id"
-          },
-          "lens_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lens Name"
           },
           "lifetime": {
             "title": "Lifetime",
@@ -1048,17 +1037,6 @@
               }
             ],
             "title": "Instructions"
-          },
-          "lens_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Lens Id"
           },
           "name": {
             "anyOf": [
@@ -9301,6 +9279,18 @@
             ],
             "title": "Agent Id"
           },
+          "lens_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
           "message": {
             "anyOf": [
               {
@@ -9360,6 +9350,17 @@
             ],
             "title": "Agent Id"
           },
+          "agent_max_cost_usd_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Max Cost Usd Run"
+          },
           "agent_name": {
             "anyOf": [
               {
@@ -9412,6 +9413,44 @@
                 "type": "null"
               }
             ]
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "lens_missing": {
+            "default": false,
+            "title": "Lens Missing",
+            "type": "boolean"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
+          },
+          "max_cost_usd_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Cost Usd Run"
           },
           "message_count": {
             "title": "Message Count",
@@ -9560,6 +9599,28 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
           },
           "llm_time_ms": {
             "anyOf": [
@@ -9744,6 +9805,17 @@
             ],
             "title": "Agent Id"
           },
+          "agent_max_cost_usd_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Max Cost Usd Run"
+          },
           "agent_name": {
             "anyOf": [
               {
@@ -9796,6 +9868,44 @@
                 "type": "null"
               }
             ]
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "lens_missing": {
+            "default": false,
+            "title": "Lens Missing",
+            "type": "boolean"
+          },
+          "lens_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Name"
+          },
+          "max_cost_usd_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Cost Usd Run"
           },
           "message_count": {
             "title": "Message Count",
@@ -9878,6 +9988,30 @@
               }
             ],
             "title": "Archived"
+          },
+          "lens_id": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens Id"
+          },
+          "max_cost_usd_run": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Cost Usd Run"
           },
           "pinned": {
             "anyOf": [
@@ -9970,17 +10104,6 @@
               }
             ],
             "title": "Refusal"
-          },
-          "world": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "World"
           }
         },
         "required": [
@@ -19225,7 +19348,6 @@
     },
     "/api/v1/u/{username}/{graphSlug}/govern/lenses/{lens_id}": {
       "delete": {
-        "description": "Refused while an agent carries it, naming the agents.\n\nThe holders are gathered here because ``agents.lens_id`` belongs to a band\nGovern may not read back into; the refusal itself is the manager's.",
         "operationId": "delete_lens_api_v1_u__username___graphSlug__govern_lenses__lens_id__delete",
         "parameters": [
           {
