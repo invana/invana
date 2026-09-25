@@ -75,6 +75,7 @@ flowchart TD
 | Grounding block | `render_model_context(global_model, lens, may_send)` — one block, used unchanged by Understand, Translate and Propose |
 | Routes | `POST …/runs` · `GET …/task_runs/{id}` (stream) |
 | Events | `todo.created` · `run.*` · `query.executed` |
+| Understand's outcomes | `understood` · `clarify` · `cannot_answer` · `converse`. `converse` carries `reply` and returns `Conversed`; the step raises `Converse`, its row reads `small talk` with `output.reply`, the queued steps are dropped, the message content is the reply, and the run settles `succeeded` · `conversed` with no emission and no `cannot_answer` event ([NL12](#decisions) · [NL13](#decisions)) |
 
 ### The grounding block
 
@@ -127,6 +128,7 @@ assembled at the crossing from structured turns, so each part is cut by its own 
 | NL10 | **Every LLM step records its exchange, whatever it concluded.** A *cannot answer* or a clarification from Understand keeps `prompt` and `completion` on `output` like an answer does ([SR42](../../operate/features/see-what-ran.md#decisions)). The prompt is the evidence for the judgement: without it, *the graph holds no runway length* cannot be told apart from *the prompt never mentioned `longest`*. |
 | NL11 | **A session's earlier turns go with every ask, and are cut by part, never whole.** A follow-up — *load them on canvas*, *only the top 5* — means nothing without the ask and the query before it, so the last 20 turns are always carried. What a turn holds is the ask, the query and its rationale; it never holds rows. So `property_values` governs only what can carry a value — a quoted literal in a query or a clarification is sent as `'…'`, and a rationale is dropped — and the ask and the query's shape still go. Dropping the whole transcript for a literal it might contain turned every governed session into a string of unrelated asks. Gremlin names its labels in quotes too, so under the cut its labels are masked with the values; the ask still carries what was meant. |
 | NL12 | **Small talk is conversed with, never refused.** *How are you*, *thanks*, *what can you do?* are not data questions, and *cannot answer · outside this graph* is the wrong outcome for them. Understand's fourth outcome, `converse`, replies in one or two lines in the agent's voice ([5.8](../../agents/features/soul.md)) and points at something this graph could answer. It runs no plan and no query, writes no emission, cites nothing and claims nothing about the data; the reply is the assistant message itself, drawn as a message and never as a cannot-answer, and the run's outcome is `conversed` ([CA8](when-it-cannot-answer.md#decisions)). |
+| NL13 | **A converse with no reply is a model error, never an empty message.** Understand refuses it the way it refuses a `cannot_answer` with no reason: the step fails as `llm_failed`, so a run never settles as `conversed` with nothing said. The reply names what the graph holds by its types and never quotes a number or a fact from it — nothing has been read, and a count in small talk would be a claim with no citation. |
 
 ## Not building
 

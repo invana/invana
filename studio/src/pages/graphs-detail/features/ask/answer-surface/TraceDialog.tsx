@@ -53,6 +53,7 @@ interface Props {
 
 const OUTCOME_COPY: Record<string, string> = {
 	answered: "answered",
+	conversed: "small talk, nothing answered",
 	cannot_answer: "the graph does not hold this",
 	failed: "failed",
 	cancelled: "cancelled",

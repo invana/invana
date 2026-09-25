@@ -9,6 +9,9 @@ answers three questions and nothing else:
   written, which is what turns promise #4 from a post-hoc apology into a
   judgement about the boundary.
 
+Small talk is none of these: it is replied to in the agent's voice and never
+refused (NL12), and that reply is the only prose this step writes.
+
 Splitting this out of translation is what lets a clarification settle before a
 plan exists, and lets *Plan* be reused by asks that have no NL to understand —
 a QL ask, a rethink, a scheduled firing, a task handed to an agent.
@@ -43,9 +46,10 @@ UNDERSTAND_TOOL = {
     "properties": {
         "action": {
             "type": "string",
-            "enum": ["understood", "clarify", "cannot_answer"],
+            "enum": ["understood", "clarify", "cannot_answer", "converse"],
             "description": "understood = the intent is settled; clarify = ask one question; "
-            "cannot_answer = this graph cannot answer it at all.",
+            "cannot_answer = this graph cannot answer it at all; converse = small talk, not a question "
+            "about the data.",
         },
         "kind": {
             "type": "string",
@@ -68,6 +72,11 @@ UNDERSTAND_TOOL = {
         "confidence": {"type": "number", "description": "0-1. Below 0.5, prefer clarify."},
         "reason": {"type": "string", "description": 'When cannot_answer: what the graph does not hold. Else "".'},
         "question": {"type": "string", "description": 'When clarify: one short question. Else "".'},
+        "reply": {
+            "type": "string",
+            "description": "When converse: one or two lines to the person, pointing at something this graph "
+            'could answer. Else "".',
+        },
         "options": {"type": "array", "items": {"type": "string"}, "description": "Fixed answer options, or []."},
         "options_query": {
             "type": "string",
@@ -95,6 +104,7 @@ UNDERSTAND_TOOL = {
         "confidence",
         "reason",
         "question",
+        "reply",
         "options",
         "options_query",
         "skills_applied",
@@ -149,6 +159,22 @@ class OutOfScope:
     duration_ms: float = 0.0
 
 
+@dataclass(slots=True)
+class Conversed:
+    """Small talk, replied to rather than refused (NL12).
+
+    ``reply`` is the assistant message itself. It ran no query, so it may name
+    what the graph holds but never a number or a fact from it.
+    """
+
+    reply: str
+    usage: TokenUsage | None = None
+    #: The call as a reader reads it — drawn as the step dashboard's Output
+    #: band (SR42).
+    exchange: Exchange = field(default_factory=Exchange)
+    duration_ms: float = 0.0
+
+
 def _system_prompt(model_context: str, instructions: str, skills: str, rules: str, voice: str = "") -> str:
     return (
         f"{voice}"
@@ -162,6 +188,11 @@ def _system_prompt(model_context: str, instructions: str, skills: str, rules: st
         'Set action="cannot_answer" ONLY when the graph below simply does not hold what is being asked '
         'about — a type or a fact that is not there. Say what is missing in "reason". A hard question '
         "the graph CAN answer is not out of scope.\n\n"
+        'Set action="converse" when the message is not a question about the data at all — a greeting, '
+        'thanks, how are you, what can you do. Put one or two lines in "reply", spoken to the person, '
+        "that end by pointing at one thing this graph could answer. Name what the graph holds by its "
+        "types, never by a number or a fact from the data — nothing has been read. Anything that asks "
+        "about the data, however casually, is not converse.\n\n"
         '"refs" must contain names that appear in the model below — never invented ones. "expects" is '
         "what a good answer would look like: graph for things to see on a canvas, table for rows, "
         "metric for a single number, chart for a trend or comparison, text for an explanation.\n\n"
@@ -178,7 +209,8 @@ async def understand(
     encryption_key: str,
     instructions: str = "",
     #: ``RunVars.soul``. Worded to shape only what a person reads — the
-    #: ``question`` and the ``reason`` — and never the classification (SO2).
+    #: ``question``, the ``reason`` and the ``reply`` — and never the
+    #: classification (SO2).
     voice: str = "",
     skills: str = "",
     rules: str = "",
@@ -190,7 +222,7 @@ async def understand(
     may_send: frozenset[str] | None = None,
     #: The run's lens: what it does not let a query read is not described (NL9).
     lens: QueryLens | None = None,
-) -> Intent | Clarification | OutOfScope:
+) -> Intent | Clarification | OutOfScope | Conversed:
     system = _system_prompt(
         render_model_context(version, may_send=may_send, lens=lens),
         f"Standing instructions for this graph:\n{instructions}\n\n" if instructions else "",
@@ -199,7 +231,7 @@ async def understand(
         if rules
         else "",
         (
-            'How you speak — this shapes the wording of "question" and "reason" only, never which '
+            'How you speak — this shapes the wording of "question", "reason" and "reply" only, never which '
             f"action you choose or what you classify:\n{voice}\n\n"
         )
         if voice
@@ -223,6 +255,12 @@ async def understand(
         if not reason:
             raise LLMError("The model said it cannot answer but gave no reason.")
         return OutOfScope(reason=reason, usage=result.usage, exchange=result.exchange, duration_ms=result.duration_ms)
+
+    if action == "converse":
+        reply = str(data.get("reply") or "").strip()
+        if not reply:
+            raise LLMError("The model said it was small talk but gave no reply.")
+        return Conversed(reply=reply, usage=result.usage, exchange=result.exchange, duration_ms=result.duration_ms)
 
     if action == "clarify":
         question = str(data.get("question") or "").strip()

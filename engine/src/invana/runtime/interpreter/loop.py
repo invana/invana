@@ -47,6 +47,7 @@ from invana.core.events.services import emit_event
 from invana.core.telemetry.recorders import add_message_in_flight, record_session_message
 from invana.runtime.catalogue import (
     CannotAnswer,
+    Converse,
     LoadVars,
     NeedsInput,
     RunVars,
@@ -566,7 +567,7 @@ class TaskRuntime:
         assistant: SessionMessage | None,
         start_index: int,
     ) -> str:
-        """Returns the metric status label: ok · clarify · cannot_answer · error.
+        """Returns the metric status label: ok · clarify · cannot_answer · conversed · error.
 
         The list of steps is read from ``run_nodes`` each pass rather than
         from a static workflow, because a *Plan* step appends to it mid-run.
@@ -609,6 +610,19 @@ class TaskRuntime:
                     await emitter.emit("step.finished", _step_payload(row))
                     await self._finish_cannot_answer(db, emitter, th, v, assistant, cannot.reason)
                     return "cannot_answer"
+                except Converse as conv:
+                    # Small talk: the reply is the message, the run succeeds
+                    # as *conversed*, and nothing planned after it runs (NL12).
+                    row.status = RunStatus.succeeded.value
+                    row.finished_at = _now()
+                    row.detail = "small talk"
+                    row.output = {"reply": conv.reply, **conv.exchange}
+                    self._record(row, ctx, v)
+                    await self._drop_pending(db, th, message_id)
+                    await db.commit()
+                    await emitter.emit("step.finished", _step_payload(row))
+                    await self._finish_conversed(db, emitter, th, v, assistant, conv.reply)
+                    return "conversed"
                 except NeedsInput as ni:
                     # Rounds are bounded (docs/for-developers/modules/agents/spec.md): past `max_clarifications`
                     # the step must decide rather than ask again. Never a
@@ -846,6 +860,29 @@ class TaskRuntime:
             m.timeout_s = v.timeout_s
         v.summary = reason
         await self._settle(db, emitter, th, v, m, RunStatus.succeeded, outcome="cannot_answer")
+
+    async def _finish_conversed(
+        self,
+        db: AsyncSession,
+        emitter: Emitter,
+        th: TaskRun,
+        v: RunVars,
+        m: SessionMessage | None,
+        reply: str,
+    ) -> None:
+        """Small talk settles as a message, and as neither an answer nor a refusal.
+
+        The outcome is ``conversed`` (CA8): calling it *answered* would claim a
+        grounding it never had, and *cannot answer* is the refusal NL12 rules out.
+        """
+        if m is not None:
+            m.status = SessionMessageStatus.ok
+            m.content = reply
+            m.via = v.via
+            m.llm_time_ms = round(v.llm_ms) if v.llm_ms is not None else None
+            m.timeout_s = v.timeout_s
+        v.summary = reply
+        await self._settle(db, emitter, th, v, m, RunStatus.succeeded, outcome="conversed")
 
     async def _finish_needs_input(self, db: AsyncSession, v: RunVars, m: SessionMessage | None, ni: NeedsInput) -> None:
         if m is None or v.sess is None:

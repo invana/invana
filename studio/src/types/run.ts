@@ -106,7 +106,7 @@ export interface RunView {
 	 * starts rather than at the end (SW1).
 	 */
 	emissions?: Emission[];
-	/** How the run ended, once it has: answered · cannot_answer · failed · cancelled. */
+	/** How the run ended, once it has: answered · conversed · cannot_answer · failed · cancelled. */
 	outcome?: string;
 	/** Last stream seq applied — the reconnect cursor. */
 	seq: number;

@@ -39,6 +39,7 @@ from __future__ import annotations
 from invana.runtime.catalogue import graph_read, graph_write, ingest, llm, pure, schema_write, work_write
 from invana.runtime.catalogue.contract import (
     CannotAnswer,
+    Converse,
     LoadVars,
     NeedsInput,
     Out,
@@ -99,6 +100,7 @@ __all__ = [
     "Arg",
     "Bound",
     "CannotAnswer",
+    "Converse",
     "Entry",
     "LoadVars",
     "NeedsInput",

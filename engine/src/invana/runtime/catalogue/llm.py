@@ -12,7 +12,7 @@ from __future__ import annotations
 from invana.apps.llm import LLMError, QueryNotReadOnlyError
 from invana.apps.llm.clarify import ground_options
 from invana.apps.llm.grounding import render_rules, render_skills
-from invana.apps.llm.intent import OutOfScope, understand
+from invana.apps.llm.intent import Conversed, OutOfScope, understand
 from invana.apps.llm.planner import generate_plan
 from invana.apps.llm.propose import propose_model
 from invana.apps.llm.translate import Clarification, nl_to_query
@@ -21,6 +21,7 @@ from invana.core.events.services import current_trace_id, emit_event
 from invana.runtime.catalogue.contract import (
     POOL_GRAPHDB,
     CannotAnswer,
+    Converse,
     NeedsInput,
     Out,
     RunVars,
@@ -66,6 +67,7 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
     step existing: a clarification settles *before* a plan is made, and
     *cannot answer* becomes a judgement about the graph's boundary rather than
     something discovered after an empty result.
+    Small talk is a fourth: it is conversed with, never refused (NL12).
     """
     assert v.provider is not None
     crossing = await open_model(ctx, v, grounding=v.global_model)
@@ -108,6 +110,15 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
         ctx.step.tokens_in = usage.input_tokens if usage else None
         ctx.step.tokens_out = usage.output_tokens if usage else None
         raise CannotAnswer(reason=outcome.reason, exchange=_exchange(outcome))
+
+    if isinstance(outcome, Conversed):
+        # Small talk — replied to in the agent's voice, never refused (NL12).
+        # Like a cannot-answer the run succeeds and no plan is made; unlike
+        # one it claims nothing about the graph, so it emits nothing.
+        v.summary = outcome.reply
+        ctx.step.tokens_in = usage.input_tokens if usage else None
+        ctx.step.tokens_out = usage.output_tokens if usage else None
+        raise Converse(reply=outcome.reply, exchange=_exchange(outcome))
 
     if isinstance(outcome, Clarification):
         options = await _options(ctx, v, outcome)

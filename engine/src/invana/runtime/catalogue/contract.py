@@ -109,6 +109,21 @@ class CannotAnswer(Exception):
         self.exchange = exchange or {}
 
 
+class Converse(Exception):
+    """The ask was small talk — replied to, not answered (NL12).
+
+    The run **succeeds** with outcome ``conversed``: it ran no query and claims
+    nothing about the data, so it is neither *answered* nor *cannot answer*
+    (CA8). Raised by *Understand*, so no plan is made.
+    """
+
+    def __init__(self, *, reply: str, exchange: dict | None = None) -> None:
+        super().__init__(reply)
+        self.reply = reply
+        #: The prompt and completion behind the reply, kept on the step (NL10).
+        self.exchange = exchange or {}
+
+
 @dataclass(slots=True)
 class LoadVars:
     """One load's working state. Populated for ``ask_kind = "import"``.

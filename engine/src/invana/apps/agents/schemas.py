@@ -239,8 +239,8 @@ class SkillUsageByAgent(BaseModel):
 class SkillUsageByOutcome(BaseModel):
     """Applied in runs that served, versus runs that did not (C5).
 
-    ``outcome`` is the **run's** — `answered` · `cannot_answer` · `failed` ·
-    `cancelled`, or null on a run that has not settled.
+    ``outcome`` is the **run's** — `answered` · `conversed` · `cannot_answer` ·
+    `failed` · `cancelled`, or null on a run that has not settled.
     """
 
     outcome: str | None

@@ -586,7 +586,7 @@ and the Inspector drawn in `rightSection`. The name is the file, the frame title
 | `agents.agents.detail.soul.default` | 5.8 | No soul yet — the agent speaks in the default voice | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.soul.preview` | 5.8 | One ask, answered in the current voice and in the draft | 🔵 | 🔵 | ✅ |
 | `agents.agents.detail.soul.read_only` | 5.8 | A member without edit rights reads the soul | 🔵 | 🔵 | ✅ |
-| `ask.converse` | 3.2 | Small talk gets a line in the agent’s voice, not a refusal | 🔵 | 🔵 | ✅ |
+| `ask.converse` | 3.2 | Small talk gets a line in the agent’s voice, not a refusal | ✅ | ✅ | ✅ |
 | `ask.cannot_answer.voiced` | 3.8 | A refusal in the agent’s voice still names what the graph is missing | 🔵 | 🔵 | ✅ |
 | `ask.answer.prose` | 3.12 | The answer in words, first — every claim cites a row | 🔵 | 🔵 | ✅ |
 | `ask.answer.prose.writing` | 3.12 | The table paints first; the words stream in above it | 🔵 | 🔵 | ✅ |

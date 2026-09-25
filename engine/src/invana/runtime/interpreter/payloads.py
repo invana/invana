@@ -141,7 +141,8 @@ def message_payload(m: SessionMessage) -> dict:
 
 # What a run *ended as*, said the way a reader would say it
 # (docs/for-developers/modules/ask/features/when-it-cannot-answer.md CA1). Only
-# `cannot_answer` is not derivable from the status, so it is passed explicitly.
+# `cannot_answer` and `conversed` are not derivable from the status, so they are
+# passed explicitly.
 _OUTCOME_BY_STATUS = {
     "succeeded": "answered",
     "failed": "failed",

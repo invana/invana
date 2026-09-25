@@ -11220,7 +11220,7 @@
         "type": "object"
       },
       "SkillUsageByOutcome": {
-        "description": "Applied in runs that served, versus runs that did not (C5).\n\n``outcome`` is the **run's** \u2014 `answered` \u00b7 `cannot_answer` \u00b7 `failed` \u00b7\n`cancelled`, or null on a run that has not settled.",
+        "description": "Applied in runs that served, versus runs that did not (C5).\n\n``outcome`` is the **run's** \u2014 `answered` \u00b7 `conversed` \u00b7 `cannot_answer` \u00b7\n`failed` \u00b7 `cancelled`, or null on a run that has not settled.",
         "properties": {
           "applied": {
             "title": "Applied",

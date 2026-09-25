@@ -18,7 +18,7 @@ from invana.apps.sessions.schemas import SendMessage
 from invana.runtime import catalogue as task_registry
 from invana.runtime import services as run_services
 from invana.runtime import workflows
-from invana.runtime.catalogue import NeedsInput, Out, TaskFailure
+from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, Out, TaskFailure
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.models import TaskRun
 from invana.runtime.stream import replay
@@ -84,6 +84,14 @@ def stub_tasks(monkeypatch):
         """Exactly what ``query_service`` raises when the connection isn't live."""
         raise HTTPException(status_code=503, detail={"error": "graph_not_active", "connection_id": "c1"})
 
+    async def converse(ctx, v):
+        raise Converse(reply="Doing well. Want the busiest airport?")
+
+    async def cannot(ctx, v):
+        raise CannotAnswer(reason="This graph holds no weather.")
+
+    monkeypatch.setitem(task_registry.TASKS, "stub_converse", converse)
+    monkeypatch.setitem(task_registry.TASKS, "stub_cannot", cannot)
     monkeypatch.setitem(task_registry.TASKS, "stub_ok", ok)
     monkeypatch.setitem(task_registry.TASKS, "stub_flaky", flaky)
     monkeypatch.setitem(task_registry.TASKS, "stub_ask", ask)
@@ -94,6 +102,8 @@ def stub_tasks(monkeypatch):
     project = Step("shape_for_canvas", "Project")
     for wf in (
         Workflow("stub-ok", (Step("stub_ok", "Understand"), project)),
+        Workflow("stub-converse", (Step("stub_converse", "Understand"), project)),
+        Workflow("stub-cannot", (Step("stub_cannot", "Understand"), project)),
         Workflow(
             "stub-flaky",
             (
@@ -169,6 +179,32 @@ class TestRuntime:
         kinds = [e.kind for e in await replay(session, run_id=th.id, after=0)]
         assert kinds[0] == "run.started" and kinds[-1] == "run.done"
         assert kinds.count("step.finished") == 2
+
+    async def test_small_talk_is_conversed_with_and_runs_nothing_after(
+        self, session, session_factory, graph, user, stub_tasks
+    ):
+        """NL12 · CA8: the reply is the message, the run is *conversed*, not answered."""
+        runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
+        _, assistant, th = await _open(session, graph, user, "stub-converse")
+        await _run(runtime, th.id)
+
+        steps = await _steps(session, th.id)
+        assert [(s.label, s.status, s.detail) for s in steps] == [("Understand", "succeeded", "small talk")]
+        run = await _fresh(session, TaskRun, th.id)
+        assert (run.status, run.outcome) == ("succeeded", "conversed")
+        reply = await _fresh(session, SessionMessage, assistant.id)
+        assert reply.status.value == "ok" and reply.content == "Doing well. Want the busiest airport?"
+        kinds = [e.kind for e in await replay(session, run_id=th.id, after=0)]
+        assert "cannot_answer" not in kinds and kinds[-1] == "run.done"
+
+    async def test_a_cannot_answer_is_still_a_cannot_answer(self, session, session_factory, graph, user, stub_tasks):
+        runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
+        _, assistant, th = await _open(session, graph, user, "stub-cannot")
+        await _run(runtime, th.id)
+
+        run = await _fresh(session, TaskRun, th.id)
+        assert (run.status, run.outcome) == ("succeeded", "cannot_answer")
+        assert (await _fresh(session, SessionMessage, assistant.id)).content == "This graph holds no weather."
 
     async def test_every_settled_row_records_a_result_json(self, session, session_factory, graph, user, stub_tasks):
         """SR38 · SR39 — the interpreter writes the document; no task does.
