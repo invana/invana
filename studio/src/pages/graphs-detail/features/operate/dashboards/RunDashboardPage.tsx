@@ -1,14 +1,15 @@
 /**
- * The run dashboard, as a page — artboard **D1**, and what `More` opens
- * ([SR13](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
- * [CV14](../../../../../../docs/for-developers/modules/explore/features/boards.md)).
+ * The run page — a report header over tabs, and a step opened **inside** it
+ * ([SR71 · SR72](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  *
- * The drawer stays the light overview; this is the detail, and it is a **page**
- * in `BoardPagesViewPanel` rather than a longer panel — a panel that tried to
- * be the dashboard would be a dashboard in 420px.
+ * One page in `BoardPagesViewPanel`, `run:<id>`. Without a step it reads the
+ * run: `Overview · Layers · Flow · Touched`. With `?step=` it keeps the run's
+ * header, puts the step in its crumb and swaps the tab strip for the step's
+ * own: `Overview · Touched · Log`. The `run:` crumb is the way back, and the
+ * run's tab is where it was left.
  *
  * The page fetches and answers actions. It composes nothing and renders no
- * panel: `runDashboardSpec` builds the document, `@invana/dashboard` draws it,
+ * panel: the two composers build the document, `@invana/dashboard` draws it,
  * and everything a person can do arrives back here as one `onAction(id, ctx)`
  * because a function is not JSON ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
@@ -16,20 +17,29 @@
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { CompareDialog } from "@/pages/graphs-detail/features/govern/CompareDialog";
+import { StepTouchPanel } from "@/pages/graphs-detail/features/govern/StepTouchPanel";
 import { TaskFlowPanel } from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/operate/dashboards/icons";
 import {
 	RUN_ACTIONS,
+	type RunPanels,
+	type RunTab,
 	runDashboardSpec,
 } from "@/pages/graphs-detail/features/operate/dashboards/runDashboardSpec";
 import {
 	VIEW_DASHBOARD,
-	groupOf,
 	groupSteps,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
+import {
+	STEP_ACTIONS,
+	type StepPanels,
+	type StepTab,
+	stepContext,
+	stepDashboardSpec,
+} from "@/pages/graphs-detail/features/operate/dashboards/stepDashboardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/operate/dashboards/useRunTrace";
 import { runsApi } from "@/services/api/runs";
-import { Dashboard, RUN_PANELS } from "@invana/dashboard";
+import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -39,23 +49,33 @@ export interface RunDashboardPageProps {
 	username: string;
 	graphSlug: string;
 	runId: string;
-	/** A task on the flow opens its own dashboard, breadcrumbed under this one. */
-	onOpenStep: (stepId: string) => void;
+	/** The step open inside the run, from `?step=`, or `null` for the run. */
+	stepId: string | null;
+	/** Open a task inside this run — `null` returns to the run (SR72). */
+	onOpenStep: (stepId: string | null) => void;
 	/**
 	 * `Retune` — open Govern beside the run, without closing it
 	 * ([SR12](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
-	 * The drawer is a stack, so narrowing happens next to the thing that
-	 * prompted it.
 	 */
 	onRetune?: () => void;
 	/** Open `compare:<this>:<that>` as a page once the second run is picked. */
 	onCompare?: (otherRunId: string) => void;
 }
 
+/** A run's panel kinds, and a step's — one page draws both. */
+type PagePanels = RunPanels & StepPanels;
+
+const REGISTRY = {
+	...RUN_PANELS,
+	flow: TaskFlowPanel,
+	stepTouch: StepTouchPanel,
+};
+
 export function RunDashboardPage({
 	username,
 	graphSlug,
 	runId,
+	stepId,
 	onOpenStep,
 	onRetune,
 	onCompare,
@@ -63,36 +83,49 @@ export function RunDashboardPage({
 	const trace = useRunTrace(username, graphSlug, runId);
 	// A **second** read beside the trace. `run_touches` is a projection of the
 	// ledger rather than part of it (GV20), and a run that opened before its
-	// Graph had a lens has a trace and no touches — so the two Govern bands are
-	// absent rather than empty when this answers with nothing.
+	// Graph had a lens has a trace and no touches.
 	const touches = useRunTouchesQuery(username, graphSlug, runId);
 	const client = useQueryClient();
 	const [view, setView] = useState(VIEW_DASHBOARD);
-	// Which task the log is filtered to. In-memory: a narrowed log is a reading
-	// of this page, not a place a link carries (G31).
-	const [selectedKey, setSelectedKey] = useState<string | null>(null);
+	// Both tabs are held here, so the run's is where it was left when a step
+	// closes, and a step's is kept as the reader walks from one to the next.
+	const [runTab, setRunTab] = useState<RunTab>("overview");
+	const [stepTab, setStepTab] = useState<StepTab>("overview");
 	const [comparing, setComparing] = useState(false);
-	// The layer strip's `Fit`. In-memory, like the log filter: a view of this
-	// page, not a place a link carries (SR69).
+	// The layer strip's `Fit` — a view of this page, not a place a link carries (SR69).
 	const [layersFit, setLayersFit] = useState(true);
 
 	const engaged = touches.data?.total ? touches.data : undefined;
-	const spec = useMemo(
-		() =>
-			trace.data
-				? runDashboardSpec(trace.data, {
-						view,
-						selectedKey,
-						touches: engaged,
-						lensName: trace.data.lens_name ?? null,
-						layersFit,
-					})
-				: null,
-		[trace.data, view, selectedKey, engaged, layersFit],
+	// A step from another run — a `?step=` left behind as the reader moved to
+	// another page — is not this run's, so the run reads as itself.
+	const context = useMemo(
+		() => (trace.data && stepId ? stepContext(trace.data, stepId) : null),
+		[trace.data, stepId],
 	);
+	const spec = useMemo((): DashboardSpec<PagePanels> | null => {
+		if (!trace.data) return null;
+		// Each composer types its own panel kinds; the page's registry holds both,
+		// so either document widens to the pair. The spec type is not covariant
+		// in its kinds (a panel's options are keyed by them), hence the cast.
+		const composed = context
+			? stepDashboardSpec(trace.data, context, {
+					view,
+					tab: stepTab,
+					touches: engaged,
+				})
+			: runDashboardSpec(trace.data, {
+					view,
+					tab: runTab,
+					selectedKey: null,
+					touches: engaged,
+					lensName: trace.data.lens_name ?? null,
+					layersFit,
+				});
+		return composed as unknown as DashboardSpec<PagePanels>;
+	}, [trace.data, context, view, stepTab, runTab, engaged, layersFit]);
 
 	// `Save report` on the header, and the act behind it (B6). The document
-	// it keeps is `spec` — this page's reading, resolved — never the subject.
+	// it keeps is `spec` — this page's reading, resolved, every tab included.
 	const report = useReport(spec);
 
 	if (trace.isLoading) {
@@ -113,37 +146,63 @@ export function RunDashboardPage({
 	}
 
 	const data = trace.data;
+	// A waterfall row and a strip column name a task by its group key; the
+	// page opens its latest attempt.
+	const openTask = (key?: string) => {
+		const group = groupSteps(data.steps).find((g) => g.key === key);
+		if (group) onOpenStep(group.head.id);
+	};
 
 	return (
 		<>
 			<Dashboard
 				className="h-full min-h-0"
 				spec={report.spec}
-				registry={{ ...RUN_PANELS, flow: TaskFlowPanel }}
+				registry={REGISTRY}
 				icons={DASHBOARD_ICONS}
 				onAction={(id, ctx) => {
 					if (report.handle(id)) return;
+					if (context) {
+						switch (id) {
+							case STEP_ACTIONS.tab:
+								if (ctx?.option) setStepTab(ctx.option as StepTab);
+								return;
+							case STEP_ACTIONS.view:
+								if (ctx?.option) setView(ctx.option);
+								return;
+							case STEP_ACTIONS.openRun:
+								onOpenStep(null);
+								return;
+							case STEP_ACTIONS.openStep:
+								if (ctx?.itemId) onOpenStep(ctx.itemId);
+								return;
+							case STEP_ACTIONS.prev:
+								if (context.prev) onOpenStep(context.prev.head.id);
+								return;
+							case STEP_ACTIONS.next:
+								if (context.next) onOpenStep(context.next.head.id);
+								return;
+							default:
+								// `open-artifact` has nowhere to go until artifacts are
+								// stored (SR34); the row is still listed.
+								return;
+						}
+					}
 					switch (id) {
+						case RUN_ACTIONS.tab:
+							if (ctx?.option) setRunTab(ctx.option as RunTab);
+							return;
 						case RUN_ACTIONS.view:
 							if (ctx?.option) setView(ctx.option);
 							return;
 						case RUN_ACTIONS.selectTask:
-							// Picking the same row again clears the filter — the chip is the
-							// Gantt row itself (SR15).
-							setSelectedKey((current) =>
-								current === ctx?.taskKey ? null : (ctx?.taskKey ?? null),
-							);
+							openTask(ctx?.taskKey);
+							return;
+						case RUN_ACTIONS.selectTouchStep:
+							openTask(ctx?.itemId);
 							return;
 						case RUN_ACTIONS.openStep:
 							if (ctx?.itemId) onOpenStep(ctx.itemId);
-							return;
-						case RUN_ACTIONS.selectTouchStep:
-							// A column of the layer strip filters the log to that task, the
-							// same gesture a Gantt row is (SR15) — the strip and the Gantt
-							// are two readings of one `seq` axis, so they share a selection.
-							setSelectedKey((current) =>
-								current === ctx?.itemId ? null : (ctx?.itemId ?? null),
-							);
 							return;
 						case RUN_ACTIONS.layersFit:
 							setLayersFit(ctx?.pressed ?? true);
@@ -166,9 +225,9 @@ export function RunDashboardPage({
 								.catch(() => toast.error("Could not cancel this run"));
 							return;
 						default:
-							// A spec can only emit an id it carries, and every id it carries
-							// is answered above. Nothing to do is not an error.
-							void data;
+							// A spec can only emit an id it carries, and every id it
+							// carries is answered above.
+							return;
 					}
 				}}
 			/>
@@ -186,28 +245,4 @@ export function RunDashboardPage({
 			/>
 		</>
 	);
-}
-
-/** The tab's title: what a run is called, read without opening the page. */
-export function useRunPageTitle(
-	username: string,
-	graphSlug: string,
-	runId: string,
-): string {
-	const trace = useRunTrace(username, graphSlug, runId);
-	return trace.data?.body?.trim() || trace.data?.workflow_key || "Run";
-}
-
-/** The task a step id belongs to, for the step page's own tab title. */
-export function useStepPageTitle(
-	username: string,
-	graphSlug: string,
-	runId: string,
-	stepId: string,
-): string {
-	const trace = useRunTrace(username, graphSlug, runId);
-	const group = trace.data
-		? groupOf(groupSteps(trace.data.steps), stepId)
-		: undefined;
-	return group?.key ?? "Step";
 }

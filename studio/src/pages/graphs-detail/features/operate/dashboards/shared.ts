@@ -184,6 +184,16 @@ export function offsetOf(
 }
 
 /** What a run is called: the words its opener wrote, else the plan that ran. */
+/** `run:7d3184f1` — the last eight characters, as every crumb addresses a run (SR54). */
+export function runAddress(runId: string): string {
+	return `run:${runId.slice(-8)}`;
+}
+
+/** `step:9b1c40e2` — a step's address, the same eight characters off its id. */
+export function stepAddress(stepId: string): string {
+	return `step:${stepId.replace(/-/g, "").slice(-8)}`;
+}
+
 export function runTitle(trace: TraceRead): string {
 	return trace.body?.trim() || trace.workflow_key || "Run";
 }

@@ -72,11 +72,12 @@ import {
 	LensBoardPage,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/govern";
+import { runAddress } from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
 import { RunsJournalPage } from "@/pages/graphs-detail/features/operate/RunsJournalPage";
 import { RunsPanel } from "@/pages/graphs-detail/features/operate/RunsPanel";
 import {
 	RunDashboardPage,
-	StepDashboardPage,
+	useRunStep,
 } from "@/pages/graphs-detail/features/operate/dashboards";
 import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
@@ -210,6 +211,8 @@ interface OpenBoard {
 	 * that is not true yet.
 	 */
 	resolvingRun?: boolean;
+	/** Open the run with this step inside it (SR72) — written as `&step=`. */
+	stepId?: string;
 }
 
 /** The derived union (stitch-models.md ST3) — a page, owned by no model. */
@@ -453,6 +456,8 @@ export function GraphDetailPage() {
 	// closes, and B6's criterion is *reopening it an hour later*.
 	const boardPage = useBoardPage();
 	const { setPageId } = boardPage;
+	// `&step=` — the task open inside the focused run page (SR72).
+	const runStep = useRunStep().stepId;
 
 	// Reopen what the URL names, once, on the way in. `openBoard` below is what
 	// writes the key, so this only ever runs for a page nothing has opened yet —
@@ -492,17 +497,25 @@ export function GraphDetailPage() {
 		setActiveBoardId(id);
 		if (!coldStep) return;
 		// `task_runs` is one table, so the step's own row answers this (SR44).
+		// A step is not a page any more (SR72): once its run is known, the tab
+		// becomes the run's and the step opens inside it, in one URL write.
 		void runsApi
 			.get(username as string, graphSlug as string, page.id)
-			.then((step) =>
-				setBoards((open) =>
-					open.map((b) =>
-						b.kind === "task_run" && b.subjectId === page.id
-							? { ...b, runId: step.parentRunId, resolvingRun: false }
-							: b,
+			.then((step) => {
+				const runId = step.parentRunId;
+				if (!runId) throw new Error("no run");
+				const runPage = boardPageId("run", runId);
+				setBoards((open) => [
+					...open.filter(
+						(b) =>
+							!(b.kind === "task_run" && b.subjectId === page.id) &&
+							!(b.kind === "run" && b.subjectId === runId),
 					),
-				),
-			)
+					{ kind: "run", subjectId: runId, runId },
+				]);
+				setActiveBoardId(runPage);
+				setPageId(runPage, { step: page.id });
+			})
 			.catch(() =>
 				// The step is gone, or its run is. Clearing the flag hands the page
 				// back to B17's refusal, which is what "no run to read" looks like.
@@ -514,7 +527,7 @@ export function GraphDetailPage() {
 					),
 				),
 			);
-	}, [boardPage.pageId, username, graphSlug]);
+	}, [boardPage.pageId, username, graphSlug, setPageId]);
 
 	// Opening a board focuses it, the way opening a canvas focuses that tab.
 	//
@@ -540,8 +553,9 @@ export function GraphDetailPage() {
 			);
 			setActiveBoardId(id);
 			// The focused page is what the URL names, so a report saved now is a
-			// link that still opens it later (B12).
-			setPageId(id);
+			// link that still opens it later (B12). A step rides with its run
+			// page, and opening any other page closes it (SR72).
+			setPageId(id, { step: board.stepId ?? null });
 		},
 		[setPageId],
 	);
@@ -2370,8 +2384,8 @@ export function GraphDetailPage() {
 				username={username as string}
 				graphSlug={graphSlug as string}
 				onClose={closeLeftPanel}
-				onOpenRunDashboard={(runId) =>
-					openBoard({ kind: "run", subjectId: runId, runId })
+				onOpenRunDashboard={(runId, stepId) =>
+					openBoard({ kind: "run", subjectId: runId, runId, stepId })
 				}
 				// The journal drawn wide, beside the list (SR70).
 				onOpenJournal={() =>
@@ -2720,16 +2734,19 @@ export function GraphDetailPage() {
 		// title and the close are the same as every other page's.
 		...boards.map((board) => ({
 			id: boardPageId(board.kind, board.subjectId, board.versionId),
-			// Every other declared kind is titled by its kind — one run board,
-			// one skill board, and the crumb inside says which record. A lens is
-			// the exception the strip forced (WO15).
+			// Every other declared kind is titled by its kind — one skill board,
+			// and the crumb inside says which record. A lens and an agent are
+			// titled by name (WO15), and a run by its address, `run:3c414b9f`,
+			// so two open runs are two readable tabs (SR54).
 			title:
 				board.kind === "world" || board.kind === "guardrail"
 					? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
 					: board.kind === "agent"
 						? (agentNameById.get(board.subjectId) ??
 							BOARD_KINDS[board.kind].label)
-						: BOARD_KINDS[board.kind].label,
+						: board.kind === "run"
+							? runAddress(board.subjectId)
+							: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2774,8 +2791,9 @@ export function GraphDetailPage() {
 	// and inside `dashboard` the kind picks the body. Hoisted out of the page
 	// list so the branch reads as one place rather than as a nested ternary.
 	function declaredBoardContent(board: OpenBoard) {
-		const openStep = (stepId: string) =>
-			openBoard({ kind: "task_run", subjectId: stepId, runId: board.runId });
+		// A task opens inside its run (SR72): the page stays, `&step=` moves.
+		const openStep = (stepId: string | null) =>
+			setPageId(boardPageId(board.kind, board.subjectId), { step: stepId });
 
 		// **A frozen reading branches before the kind does** (B16). The stored
 		// blob is the document, so there is nothing for a composer to do and no
@@ -2817,12 +2835,25 @@ export function GraphDetailPage() {
 					/>
 				);
 			}
-			return board.kind === "run" ? (
+			return (
 				<RunDashboardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					runId={runId}
-					onOpenStep={openStep}
+					// A live `task_run` board only exists for the moment a cold link
+					// takes to resolve; if it is drawn, it draws its step inside.
+					stepId={board.kind === "task_run" ? board.subjectId : runStep}
+					onOpenStep={
+						board.kind === "task_run"
+							? (id) =>
+									openBoard({
+										kind: "run",
+										subjectId: runId,
+										runId,
+										stepId: id ?? undefined,
+									})
+							: openStep
+					}
 					// `Retune` — the run stays in `mainSection` while Govern opens
 					// beside it, which is the whole reason the drawer is a stack
 					// (SR12 · worlds.md Journey 2).
@@ -2836,14 +2867,6 @@ export function GraphDetailPage() {
 							runId,
 						})
 					}
-				/>
-			) : (
-				<StepDashboardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					runId={runId}
-					stepId={board.subjectId}
-					onOpenStep={openStep}
 				/>
 			);
 		}
@@ -2978,11 +3001,11 @@ export function GraphDetailPage() {
 		// behind it to put back, which is what `subject_id` buys.
 		if (declaredPage(id)) {
 			setActiveBoardId(id);
-			boardPage.setPageId(id);
+			boardPage.setPageId(id, { step: null });
 			return;
 		}
 		setActiveBoardId(null);
-		boardPage.setPageId(null);
+		boardPage.setPageId(null, { step: null });
 		if (id === GRAPH_PAGE_ID) {
 			setWorkKind(null);
 			setGlobalModelOpen(false);
@@ -3026,7 +3049,7 @@ export function GraphDetailPage() {
 			// Closing the focused board hands the strip back to whatever was
 			// behind it, rather than to the board's own neighbour.
 			setActiveBoardId((current) => (current === id ? null : current));
-			if (boardPage.pageId === id) boardPage.setPageId(null);
+			if (boardPage.pageId === id) boardPage.setPageId(null, { step: null });
 			return;
 		}
 		const page = parseBoardPageId(id);

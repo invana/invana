@@ -44,8 +44,11 @@ export interface RunsPanelProps {
 	username: string;
 	graphSlug: string;
 	onClose?: () => void;
-	/** `More` on a drilled-in run — opens its dashboard as a page (SR13). */
-	onOpenRunDashboard?: (runId: string) => void;
+	/**
+	 * `Open the answer` on a drilled-in run — opens its page (SR13); with a
+	 * step, that task inside it (SR72).
+	 */
+	onOpenRunDashboard?: (runId: string, stepId?: string) => void;
 	/** `Dashboard` on the header — the journal drawn wide, as a page (SR70). */
 	onOpenJournal?: () => void;
 	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */

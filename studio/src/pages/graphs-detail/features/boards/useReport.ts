@@ -114,7 +114,9 @@ export function useReport<X extends ExtraPanels>(
 				return true;
 			}
 			if (actionId !== SAVE_REPORT_ACTION) return false;
-			if (spec) save.mutate(spec);
+			// A kept reading keeps every tab, and switches them itself: the page
+			// that answered `tabAction` is not there to answer it (SR71).
+			if (spec) save.mutate({ ...spec, tabAction: undefined });
 			return true;
 		},
 		[spec, save.mutate, board],

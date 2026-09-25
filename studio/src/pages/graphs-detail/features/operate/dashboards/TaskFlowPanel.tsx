@@ -72,7 +72,7 @@ export function TaskFlowPanel({
 			className="grid h-full content-start gap-x-3 gap-y-4 overflow-auto bg-background p-3
 				[background-image:linear-gradient(var(--color-border)_1px,transparent_1px),linear-gradient(90deg,var(--color-border)_1px,transparent_1px)]
 				[background-size:28px_28px]"
-			style={{ gridTemplateColumns: `repeat(${columns}, 146px)` }}
+			style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
 		>
 			{nodes.map((node) => (
 				<div key={node.id} style={{ gridColumn: node.col, gridRow: node.row }}>
@@ -89,7 +89,8 @@ export function TaskFlowPanel({
 						// card itself is the kit's, so the affordance is here.
 						role={openAction ? "button" : undefined}
 						tabIndex={openAction ? 0 : undefined}
-						className={openAction ? "cursor-pointer" : undefined}
+						// The card fills its column: the flow takes the width it is given (SR73).
+						className={openAction ? "w-full cursor-pointer" : "w-full"}
 						onClick={
 							openAction
 								? () => onAction(openAction, { itemId: node.id })

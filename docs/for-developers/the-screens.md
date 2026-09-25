@@ -238,6 +238,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | [Govern, Agents and Skills](https://claude.ai/artifact/VrdrR5iKGfqsjhCouQDTbc) | [14 Govern](modules/govern/spec.md) · [5 Agents](modules/agents/spec.md) · [6 Skills](modules/skills/spec.md) · [7 Workflows](modules/workflows/spec.md) · [10.5 Runs](modules/operate/features/see-what-ran.md) · [4.2 Boards](modules/explore/features/boards.md) — 90 artboards | Worlds · Guardrails · the run · the agents · LLMs · Skills · Bindings · Usage · Rules · Plans · Boards · **Runs** | **current.** Supersedes the governance canvas, and the skills canvas for 6.1–6.4 |
 | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 18 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
 | [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
+| [The Run Page](https://claude.ai/artifact/QRDPZ2GHR7KKwS68vbScWR) | [10.5 See what ran](modules/operate/features/see-what-ran.md) — the run page as a report header over tabs, and a step inside its run — 8 artboards (a waterfall on the Overview and in the left panel; In order and Lens folded away) | Operate › Runs › The run page | **current.** Reframes `operate.runs.detail.*` and `operate.runs.step.*` on Govern, Agents and Skills; the bodies are theirs, captured, not redrawn |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
@@ -545,6 +546,21 @@ Tokens is a **group inside Settings › Graph** rather than a fourth settings ta
 the Skills drawer**, not a rail item of its own ([8.1 EV6](modules/memory/features/evidence.md)).
 
 ---
+
+## Beyond the 42 · The Run Page
+
+Eight artboards on their own canvas — *The Run Page* (`https://claude.ai/artifact/QRDPZ2GHR7KKwS68vbScWR`) — the run page read the way the agent page is: a report header naming the record, a tab strip under it, the tab's body under that. Overview · Layers · Flow · Touched: In order is folded into the Overview's waterfall (the loop bracketed, the gate a rule across it), Lens into Touched, and the left panel carries a compact waterfall. A step opens **inside** its run, the run's header kept and the step joining its crumb. Generated from `.design/canvas-run-page/run.py`, which captures its bodies from `canvas-govern-agents/rd.py`. The name is the file, the frame title and this row. **Studio** draws every board; the Overview is 🟡 because the waterfall's loop bracket and gate seam wait on the trace recording them (SR73).
+
+| Artboard | Feature | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `operate.runs.detail.overview` | 10.5 | The run at a glance — tiles, the waterfall, what it touched, bounds, refusals | ✅ | 🟡 | ✅ |
+| `operate.runs.detail.layers` | 10.5 | Layers — the run on its own clock, one row per participant | ✅ | ✅ | ✅ |
+| `operate.runs.detail.flow` | 10.5 | Flow — the plan that ran, with status painted on it | ✅ | ✅ | ✅ |
+| `operate.runs.detail.touched` | 10.5 | Touched — every participant it could spend, touched or not, and the files it left | ✅ | ✅ | ✅ |
+| `operate.runs.detail.step.overview` | 10.5 | A step inside its run — the run’s header, the step in its crumb | ✅ | ✅ | ✅ |
+| `operate.runs.detail.step.overview.switch` | 10.5 | Another step — the crumb lists every step, with its status and time | ✅ | ✅ | ✅ |
+| `operate.runs.detail.step.touched` | 10.5 | A step inside its run, Touched — what it read, wrote, was refused and left | ✅ | ✅ | ✅ |
+| `operate.runs.detail.step.log` | 10.5 | A step inside its run, Log — its slice of the run’s stream | ✅ | ✅ | ✅ |
 
 ## Beyond the 42 · The Agent Page
 

@@ -26,13 +26,21 @@ export function useBoardPage() {
 
 	// The functional form, so the writer is stable across renders — it is handed
 	// to the page host, and an unstable one re-fires every effect that has it.
+	//
+	// `extra` writes other keys in the same update — `step` beside a run page
+	// (SR72). Two writes in one tick do not compose, so a key that moves with
+	// the page moves in this call or not at all.
 	const setPageId = useCallback(
-		(id: string | null) => {
+		(id: string | null, extra?: Record<string, string | null>) => {
 			setParams(
 				(prev) => {
 					const next = new URLSearchParams(prev);
 					if (id) next.set(PAGE_PARAM, id);
 					else next.delete(PAGE_PARAM);
+					for (const [key, value] of Object.entries(extra ?? {})) {
+						if (value) next.set(key, value);
+						else next.delete(key);
+					}
 					return next;
 				},
 				{ replace: true },

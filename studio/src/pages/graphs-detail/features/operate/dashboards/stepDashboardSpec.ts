@@ -30,9 +30,11 @@ import {
 	isLive,
 	offsetOf,
 	omit,
+	runAddress,
 	runTitle,
 	specPanel,
 	statusChip,
+	stepAddress,
 	stepTitle,
 	tileToneOf,
 	toneOf,
@@ -40,7 +42,12 @@ import {
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import type { TraceRead, TraceStepRead } from "@/services/api/runs";
 import type { TouchesResponse } from "@/types/govern";
-import type { DashboardSpec, PanelSpec, TableOptions } from "@invana/dashboard";
+import type {
+	DashboardSpec,
+	PanelSpec,
+	TabSpec,
+	TableOptions,
+} from "@invana/dashboard";
 
 export const STEP_ACTIONS = {
 	view: VIEW_ACTION,
@@ -49,10 +56,20 @@ export const STEP_ACTIONS = {
 	/** The run this step sits in — the first crumb. */
 	openRun: "open-run",
 	openArtifact: "open-artifact",
+	/** The step crumb's picker — another task of the same run, by step id. */
+	openStep: "open-step",
+	/** The tab strip under the header (SR55). */
+	tab: "tab",
 } as const;
+
+/** A step's tabs, in order (SR55). */
+export const STEP_TABS = ["overview", "touched", "log"] as const;
+export type StepTab = (typeof STEP_TABS)[number];
 
 export interface StepDashboardView {
 	view: string;
+	/** The active tab — kept as the reader walks from one step to the next. */
+	tab: StepTab;
 	/**
 	 * What this step engaged — R2
 	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
@@ -69,6 +86,8 @@ export interface StepContext {
 	group: TaskGroup;
 	prev: TaskGroup | null;
 	next: TaskGroup | null;
+	/** Every task of the run, in order — what the step crumb's picker lists. */
+	groups: TaskGroup[];
 }
 
 /** Locate a step run in its trace, with the task before and after it. */
@@ -83,6 +102,7 @@ export function stepContext(
 		group: groups[index],
 		prev: groups[index - 1] ?? null,
 		next: groups[index + 1] ?? null,
+		groups,
 	};
 }
 
@@ -91,21 +111,40 @@ export type StepPanels = WithStepTouch;
 
 export function stepDashboardSpec(
 	trace: TraceRead,
-	{ group, prev, next }: StepContext,
-	{ view, touches }: StepDashboardView,
+	{ group, prev, next, groups }: StepContext,
+	{ view, tab, touches }: StepDashboardView,
 ): DashboardSpec<StepPanels> {
 	const step = group.head;
 	const bound = boundOf(step);
 
 	const header: DashboardSpec<StepPanels>["header"] = {
 		tone: toneOf(step.status),
-		// Two crumbs: a run, then the task inside it — which is what a child
-		// record is, and why `RecordHeader` takes a list.
-		crumbs: [runTitle(trace), stepTitle(step)],
+		// The run's header, kept: the step is one crumb deeper (SR72). The run
+		// crumb is the way back; the step crumb opens every task of the run.
+		crumbs: [
+			runAddress(trace.run_id),
+			`${stepAddress(step.id)} ${stepTitle(step)}`,
+		],
+		crumbActions: [STEP_ACTIONS.openRun],
+		crumbMenu: {
+			action: STEP_ACTIONS.openStep,
+			placeholder: "Jump to a step",
+			selected: group.head.id,
+			items: groups.map((g) => {
+				const ms =
+					g.head.duration_ms ??
+					durationMs(g.head.started_at, g.head.finished_at);
+				return {
+					id: g.head.id,
+					label: stepTitle(g.head),
+					aside: ms == null ? undefined : formatDuration(ms),
+					tone: toneOf(g.head.status),
+				};
+			}),
+		},
 		chips: omit([
 			bound ? { bound, label: bound } : null,
 			statusChip(step.status),
-			{ label: "step dashboard" },
 		]),
 		actions: omit([
 			{
@@ -128,48 +167,79 @@ export function stepDashboardSpec(
 		]),
 	};
 
-	const rows = bands(trace, group, touches);
 	const spec: DashboardSpec<StepPanels> = {
 		title: stepTitle(step),
 		header,
-		rows,
+		rows: [],
+		tab,
+		tabAction: STEP_ACTIONS.tab,
+		tabs: stepTabs(trace, group, touches),
 	};
 	return view === VIEW_SPEC
-		? { ...spec, rows: [{ panels: [specPanel(spec)] }] }
+		? { ...spec, tabs: undefined, rows: [{ panels: [specPanel(spec)] }] }
 		: spec;
 }
 
-/** The bands, top to bottom — the same for every kind, plus what it engaged. */
-function bands(
+/**
+ * The three tabs (SR55). **Overview** — what it was asked after binding, what
+ * it returned, its clock, where it sits; **Touched** — what it engaged and the
+ * files it left; **Log** — its slice of the stream.
+ */
+function stepTabs(
 	trace: TraceRead,
 	group: TaskGroup,
 	touches: TouchesResponse | undefined,
-): DashboardSpec<StepPanels>["rows"] {
+): TabSpec<StepPanels>[] {
 	const step = group.head;
 	const engaged = touchesOfStepKey(touches, group.key);
-	return omit([
-		{ panels: [tiles(trace, group)] },
-		{ panels: omit([input(step), resultJson(step)]) },
-		executedQuery(step) ? { panels: [executedQuery(step) as PanelSpec] } : null,
-		output(step) ? { panels: [output(step) as PanelSpec] } : null,
-		// R2 · generated vs executed, the slice that was composed in, and what
-		// egress cut — read under the output it produced, because it is the
-		// evidence for that output rather than a fact about the step's shape.
-		engaged.length
-			? {
-					panels: [
-						{
-							kind: "stepTouch" as const,
-							title: "What it engaged",
-							aside: `${engaged.length} participant${engaged.length === 1 ? "" : "s"}`,
-							options: { stepKey: group.key, touches: engaged },
+	return [
+		{
+			id: "overview",
+			label: "Overview",
+			rows: omit([
+				{ panels: [tiles(trace, group)] },
+				{ panels: omit([input(step), resultJson(step)]) },
+				executedQuery(step)
+					? { panels: [executedQuery(step) as PanelSpec] }
+					: null,
+				output(step) ? { panels: [output(step) as PanelSpec] } : null,
+				{ panels: [whereItSits(trace, group)] },
+			]),
+		},
+		{
+			id: "touched",
+			label: "Touched",
+			rows: omit([
+				// R2 · generated vs executed, the slice that was composed in, and
+				// what egress cut — the evidence for the output, read on its own.
+				engaged.length
+					? {
+							panels: [
+								{
+									kind: "stepTouch" as const,
+									title: "What it engaged",
+									aside: `${engaged.length} participant${engaged.length === 1 ? "" : "s"}`,
+									options: { stepKey: group.key, touches: engaged },
+								},
+							],
+						}
+					: {
+							panels: [
+								{
+									kind: "text" as const,
+									title: "What it engaged",
+									options: {
+										text: "Nothing was recorded for this step.",
+										tone: "muted" as const,
+									},
+								},
+							],
 						},
-					],
-				}
-			: null,
-		{ panels: omit([log(trace, group), artifacts(step)]) },
-		{ panels: [whereItSits(trace, group)] },
-	]);
+				artifacts(step) ? { panels: [artifacts(step) as PanelSpec] } : null,
+			]),
+		},
+		{ id: "log", label: "Log", rows: [{ panels: [log(trace, group)] }] },
+	];
 }
 
 // ── tiles ───────────────────────────────────────────────────────────────────
@@ -349,7 +419,6 @@ function resultJson(step: TraceStepRead): PanelSpec | null {
 		kind: "json",
 		title: "result.json",
 		aside: "what this task recorded",
-		width: 340,
 		flush: true,
 		options: { maxHeight: 232, value: step.result },
 	};
@@ -536,7 +605,6 @@ function artifacts(step: TraceStepRead): PanelSpec | null {
 		kind: "list",
 		title: "Artifacts",
 		aside: String(listed.length),
-		width: 340,
 		options: {
 			items: listed.map((entry, i) => {
 				const row = isRecord(entry) ? entry : { name: scalar(entry) };
@@ -562,7 +630,6 @@ function whereItSits(trace: TraceRead, group: TaskGroup): PanelSpec {
 	return {
 		kind: "properties",
 		title: "Where it sits",
-		width: 340,
 		options: {
 			rows: omit([
 				{ label: "run", value: runTitle(trace) },

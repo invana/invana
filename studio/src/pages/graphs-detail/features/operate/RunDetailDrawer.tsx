@@ -1,26 +1,31 @@
 /**
- * A run, read in the drawer — **five sections and two ways out**
- * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
+ * A run, read in the drawer — **six sections and two ways out**
+ * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions) ·
+ * [SR73](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
  * | Section | Answers |
  * |---|---|
  * | `The run` | what ran — plan, agent, lens, who opened it, how long |
  * | `What it cost` | spend against its ceiling, tokens, and the time it spent waiting rather than working |
+ * | `Waterfall` | where the time went, one row per task — a row opens that task inside the run page |
  * | `What it touched` | one line per layer; a refusal struck, a layer nothing reached for dimmed |
  * | `Bounds reached` | each bounded repetition against its ceiling |
  * | `Refused` | every address a guardrail said no to, and why |
  *
- * **It stays an overview.** Where the time went, step by step, is the run
- * page's `In order` and `Layers` readings (SR46) — a Gantt in 420px was a
- * dashboard squeezed into a drawer. `Open the answer` opens that page;
- * `Compare with the plan` draws the plan it ran in `mainSection`, beside the
- * run, which stays open here.
+ * **It stays an overview.** The waterfall here is the compact form of the
+ * run page's (SR73) — rows and bars, no card; a row is the way into that
+ * task. `Open the answer` opens the page; `Compare with the plan` draws the
+ * plan it ran in `mainSection`, beside the run, which stays open here.
  */
 
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
 import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { waterfallTasks } from "@/pages/graphs-detail/features/operate/dashboards/runDashboardSpec";
 import {
+	groupSteps,
 	isLive,
+	originOf,
+	runAddress,
 	toneOf,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import { useRunTrace } from "@/pages/graphs-detail/features/operate/dashboards/useRunTrace";
@@ -40,6 +45,7 @@ import {
 	PropertyRow,
 	RecordHeader,
 	Spinner,
+	TaskGantt,
 	TouchStrip,
 } from "@invana/ui";
 import type { ReactNode } from "react";
@@ -48,18 +54,20 @@ export interface RunDetailDrawerProps {
 	username: string;
 	graphSlug: string;
 	runId: string;
-	/** `Open the answer` — opens this run's page (SR13). */
-	onOpenDashboard?: (runId: string) => void;
+	/**
+	 * `Open the answer` — opens this run's page (SR13); with a step, that task
+	 * open inside it (SR72), which is what a waterfall row asks for.
+	 */
+	onOpenDashboard?: (runId: string, stepId?: string) => void;
 	/** The lens row — opens that world or guardrail in Govern, in `leftSection`. */
 	onOpenLens?: (lens: { id: string; kind: "world" | "guardrail" }) => void;
 	/** `Compare with the plan` — draws the Library plan this run ran in `mainSection`. */
 	onOpenPlan?: (planKey: string) => void;
 }
 
-/** `run:7d3184f1` — the last eight characters, as every crumb addresses a run (SR54). */
-export function runAddress(runId: string): string {
-	return `run:${runId.slice(-8)}`;
-}
+// The address every crumb uses (SR54) — defined beside the dashboards that
+// share it, re-exported here for the callers that already import it from here.
+export { runAddress };
 
 export function RunDetailDrawer({
 	username,
@@ -92,6 +100,7 @@ export function RunDetailDrawer({
 	const agentName = agents.find((a) => a.id === t.agent_id)?.name;
 	const s = runSummary(t, touches.data, agentName);
 	const planKey = planKeyOf(t);
+	const groups = groupSteps(t.steps);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
@@ -115,6 +124,28 @@ export function RunDetailDrawer({
 			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
 				<Rows title="The run" rows={s.theRun} onOpenLens={onOpenLens} />
 				{s.cost.length ? <Rows title="What it cost" rows={s.cost} /> : null}
+
+				{groups.length ? (
+					<Section
+						title="Waterfall"
+						aside={onOpenDashboard ? "click a task ›" : undefined}
+					>
+						<TaskGantt
+							tasks={waterfallTasks(groups)}
+							origin={originOf(t) ?? undefined}
+							density="compact"
+							showDetail={false}
+							onSelectTask={
+								onOpenDashboard
+									? (key) => {
+											const group = groups.find((g) => g.key === key);
+											if (group) onOpenDashboard(runId, group.head.id);
+										}
+									: undefined
+							}
+						/>
+					</Section>
+				) : null}
 
 				{s.touched.length ? (
 					<Section
