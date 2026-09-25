@@ -13,7 +13,8 @@ import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
 import { useModelsQuery } from "@/hooks/queries/useModels";
 import { useActiveVersionQuery } from "@/hooks/queries/useSchema";
 import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
-import { useTaskMutations } from "@/hooks/queries/useWork";
+import { useAgentsQuery, useTaskMutations } from "@/hooks/queries/useWork";
+import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
 import { AgentsStackPanel } from "@/pages/graphs-detail/features/agents/AgentsStackPanel";
 import { AssistantPanel } from "@/pages/graphs-detail/features/ask/assistant/AssistantPanel";
 import { attachmentFor } from "@/pages/graphs-detail/features/ask/assistant/SessionComposer";
@@ -348,6 +349,15 @@ export function GraphDetailPage() {
 			new Map((lenses.data?.items ?? []).map((l) => [l.id, l.display_name])),
 		[lenses.data],
 	);
+	// An agent's page is named for the agent, for the same reason (AG34).
+	const agentsList = useAgentsQuery(username, graphSlug, {
+		includeEphemeral: true,
+		includeRetired: true,
+	});
+	const agentNameById = useMemo(
+		() => new Map((agentsList.data?.items ?? []).map((a) => [a.id, a.name])),
+		[agentsList.data],
+	);
 
 	const {
 		sessions,
@@ -605,6 +615,27 @@ export function GraphDetailPage() {
 		},
 		[settingsPanel],
 	);
+
+	// The agent's page is a declared board in `mainSection` (AG34); the Agents
+	// list stays in `leftSection` with the agent selected beside it. **Stable**:
+	// the Agents panel calls it from an effect when an old `&agent=` link lands.
+	const openAgentPage = useCallback(
+		(id: string) => {
+			setSelectedAgentId(id);
+			openBoard({ kind: "agent", subjectId: id });
+		},
+		[openBoard],
+	);
+	// An agent's two canvases — its envelope and its lineage. Asked for from the
+	// agent's page or the list, they have to come in front of a focused board,
+	// or the click would draw behind the page it was made on.
+	const showAgentCanvas = (kind: "envelope" | "lineage", id: string) => {
+		setSelectedAgentId(id);
+		if (kind === "envelope") setSelectedStepId(null);
+		setActiveBoardId(null);
+		boardPage.setPageId(null);
+		setWorkKind(kind);
+	};
 
 	// The open `?panel` key, read in several places below (which canvas kind the
 	// panel owns, which panel the left column draws).
@@ -2356,9 +2387,8 @@ export function GraphDetailPage() {
 				graphSlug={graphSlug as string}
 				selectedStepId={selectedStepId}
 				onOpenAgent={(id) => {
-					setSelectedAgentId(id);
-					setWorkKind("envelope");
 					openWorkPanel("agents");
+					openAgentPage(id);
 				}}
 				planExportUrl={(key) =>
 					workflowsApi.exportUrl(username as string, graphSlug as string, key)
@@ -2374,9 +2404,8 @@ export function GraphDetailPage() {
 				selectedSkillId={selectedSkillId}
 				onSelectSkill={setSelectedSkillId}
 				onOpenAgent={(id) => {
-					setSelectedAgentId(id);
-					setWorkKind("envelope");
 					openWorkPanel("agents");
+					openAgentPage(id);
 				}}
 				// `More`, drilled in — the reading opens as a page and the stack
 				// stays (SK36 · RU11 · CV14).
@@ -2415,16 +2444,9 @@ export function GraphDetailPage() {
 					setSelectedAgentId(id);
 					setSelectedLineageEdge(null);
 				}}
+				onOpenAgentPage={openAgentPage}
 				selectedEdge={selectedLineageEdge}
-				onOpenLineage={(id) => {
-					setSelectedAgentId(id);
-					setWorkKind("lineage");
-				}}
-				onOpenEnvelope={(id) => {
-					setSelectedAgentId(id);
-					setSelectedStepId(null);
-					setWorkKind("envelope");
-				}}
+				onOpenLineage={(id) => showAgentCanvas("lineage", id)}
 				onOpenTask={(id) => {
 					// A Todo lives under Projects (PT7); the rail's Tasks icon is
 					// execution only.
@@ -2699,7 +2721,10 @@ export function GraphDetailPage() {
 			title:
 				board.kind === "world" || board.kind === "guardrail"
 					? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
-					: BOARD_KINDS[board.kind].label,
+					: board.kind === "agent"
+						? (agentNameById.get(board.subjectId) ??
+							BOARD_KINDS[board.kind].label)
+						: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2831,9 +2856,8 @@ export function GraphDetailPage() {
 						openBoard({ kind: "skill_usage", subjectId: id })
 					}
 					onOpenAgent={(id) => {
-						setSelectedAgentId(id);
-						setWorkKind("envelope");
 						openWorkPanel("agents");
+						openAgentPage(id);
 					}}
 					onEdit={(id) => {
 						setSelectedSkillId(id);
@@ -2884,6 +2908,20 @@ export function GraphDetailPage() {
 					// `Edit` puts the Govern panel back on this lens, drilled in —
 					// the board reads and the acts stay in the drawer (WO16).
 					onEdit={(kind, lensId) => governPanel.reveal(kind, lensId)}
+				/>
+			);
+		}
+
+		// The agent's page (AG23 · AG34) — the one declared page that edits. It
+		// reads no trace, so it takes no `board.runId` (SD3).
+		if (board.kind === "agent") {
+			return (
+				<AgentBoardPage
+					username={username as string}
+					graphSlug={graphSlug as string}
+					agentId={board.subjectId}
+					onOpenLineage={(id) => showAgentCanvas("lineage", id)}
+					onOpenEnvelope={(id) => showAgentCanvas("envelope", id)}
 				/>
 			);
 		}

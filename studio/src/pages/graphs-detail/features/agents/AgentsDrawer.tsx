@@ -23,9 +23,9 @@
  * - **Retire names the open tasks before it happens.** A count is not enough to
  *   decide with, so the confirm lists them.
  *
- * Selecting a row states the agent beside the list; **Open** drills in to
- * {@link AgentDetail} through `&agent=`, which is the gesture that survives a
- * reload.
+ * Selecting a row states the agent beside the list; **Open** opens the
+ * agent's page in `mainSection` (`agent:<id>`, AG34), and the list stays here
+ * beside it.
  */
 
 import {
@@ -35,7 +35,6 @@ import {
 	useLifecyclePreviewQuery,
 	useTasksQuery,
 } from "@/hooks/queries/useWork";
-import { AgentDetail } from "@/pages/graphs-detail/features/agents/AgentDetail";
 import { LifecycleDialog } from "@/pages/graphs-detail/features/agents/LifecycleDialog";
 import {
 	AgentChipRow,
@@ -53,7 +52,7 @@ import {
 	agentTone,
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
-import type { Agent, AgentEdge, AgentUpdate, LifecycleAct } from "@/types/work";
+import type { Agent, AgentEdge, LifecycleAct } from "@/types/work";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import {
@@ -91,16 +90,14 @@ export interface AgentsDrawerProps {
 	ui: TaskDrawerUi;
 	username: string;
 	graphSlug: string;
-	/** The drilled-in agent — `&agent=`, the one surface that edits. */
-	agentId: string | null;
-	onOpenAgent: (id: string | null) => void;
+	/** Opens the agent's page in `mainSection` — the one surface that edits. */
+	onOpenAgentPage: (id: string) => void;
 	/** The agent the canvas is drawing, and the one the summary states. */
 	selectedAgentId: string | null;
 	onSelectAgent: (id: string | null) => void;
 	/** An edge selected on the lineage canvas — an *event*, not an agent (D7). */
 	selectedEdge?: AgentEdge | null;
 	onOpenLineage?: (agentId: string) => void;
-	onOpenEnvelope?: (agentId: string) => void;
 	onOpenTask?: (taskId: string) => void;
 	onNewAgent?: () => void;
 	defaultSize?: number | string;
@@ -109,15 +106,13 @@ export interface AgentsDrawerProps {
 export function agentsDrawerSection(
 	props: AgentsDrawerProps,
 ): PanelStackSection {
-	const { ui, agentId, onOpenAgent, onNewAgent, defaultSize } = props;
+	const { ui, onNewAgent, defaultSize } = props;
 
 	return taskDrawerSection(
 		{
 			id: "agents",
 			label: "Agents",
 			icon: Bot,
-			trail: agentId ? <AgentsTrail {...props} /> : undefined,
-			onBack: () => onOpenAgent(null),
 			searchable: true,
 			searchPlaceholder: "Search agents",
 			headerActions: onNewAgent
@@ -130,26 +125,14 @@ export function agentsDrawerSection(
 	);
 }
 
-/** The drilled-in agent's name, resolved off the same list the drawer reads. */
-function AgentsTrail({ username, graphSlug, agentId }: AgentsDrawerProps) {
-	const query = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
-	const agent = (query.data?.items ?? []).find((a) => a.id === agentId);
-	return <>{agent?.name ?? "Agent"}</>;
-}
-
 function AgentsBody({
 	username,
 	graphSlug,
-	agentId,
-	onOpenAgent,
+	onOpenAgentPage,
 	selectedAgentId,
 	onSelectAgent,
 	selectedEdge,
 	onOpenLineage,
-	onOpenEnvelope,
 	onOpenTask,
 	onNewAgent,
 	search,
@@ -212,9 +195,6 @@ function AgentsBody({
 	// One grouped read for the whole list, on the list response (C10).
 	const spend = query.data?.spend_this_month ?? {};
 	const selected = all.find((a) => a.id === selectedAgentId) ?? null;
-	const openAgent = agentId
-		? (all.find((a) => a.id === agentId) ?? null)
-		: null;
 
 	const byId = useMemo(() => new Map(all.map((a) => [a.id, a])), [all]);
 	const ephemeralHidden = showEphemeral
@@ -246,45 +226,6 @@ function AgentsBody({
 		for (const root of roots) walk(root, 0);
 		return out;
 	}, [all, showEphemeral, kindFilter, statusFilter]);
-
-	// The drilled-in agent replaces the list inside this drawer — the envelope
-	// needs the room, and the LLMs drawer below keeps its place (G33).
-	if (openAgent) {
-		return (
-			<AgentDetail
-				username={username}
-				graphSlug={graphSlug}
-				agent={openAgent}
-				isDefault={openAgent.id === defaultId}
-				isSaving={mutations.update.isPending}
-				onBack={() => onOpenAgent(null)}
-				onSave={(data: AgentUpdate) =>
-					mutations.update.mutate({ id: openAgent.id, data })
-				}
-				onPause={() => setConfirming({ agent: openAgent, act: "pause" })}
-				onResume={() => mutations.resume.mutate(openAgent.id)}
-				onRetire={() => setConfirming({ agent: openAgent, act: "retire" })}
-				onSetDefault={() => mutations.setDefault.mutate(openAgent.id)}
-				saveError={mutations.update.error}
-				onOpenLineage={() => onOpenLineage?.(openAgent.id)}
-				onOpenEnvelope={() => onOpenEnvelope?.(openAgent.id)}
-				onBindSkill={(skillId) => {
-					// Cleared first, so the card under the chip is this click's
-					// refusal and never the last one's (BN11).
-					mutations.bindSkill.reset();
-					mutations.bindSkill.mutate({ id: openAgent.id, skillId });
-				}}
-				onUnbindSkill={(skillId) => {
-					mutations.bindSkill.reset();
-					mutations.unbindSkill.mutate({ id: openAgent.id, skillId });
-				}}
-				bindError={mutations.bindSkill.error}
-				isBinding={
-					mutations.bindSkill.isPending || mutations.unbindSkill.isPending
-				}
-			/>
-		);
-	}
 
 	const rows = ordered.filter(({ agent }) =>
 		agent.name.toLowerCase().includes(search.toLowerCase()),
@@ -441,7 +382,7 @@ function AgentsBody({
 						<Button
 							size="sm"
 							variant="outline"
-							onClick={() => onOpenAgent(selected.id)}
+							onClick={() => onOpenAgentPage(selected.id)}
 						>
 							<SquareArrowOutUpRight /> Open
 						</Button>

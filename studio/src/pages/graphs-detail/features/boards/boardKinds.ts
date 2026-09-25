@@ -219,7 +219,8 @@ export type DeclaredKind =
 	| "skill_usage"
 	| "rule"
 	| "world"
-	| "guardrail";
+	| "guardrail"
+	| "agent";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -340,6 +341,18 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// The Guardrails drill-in opens it (GR14).
 		panel: "govern",
 		subject: "a lenses.id",
+	},
+	// The agent's one page — five tabs, the one declared page that edits
+	// (AG23 · AG34). Titled with the agent's name, like a lens board, because a
+	// strip of three tabs all reading `Agent` has to be clicked through to read.
+	agent: {
+		kind: "agent",
+		renders: "dashboard",
+		label: "Agent",
+		icon: Bot,
+		// `Open` on the Agents drawer; the list stays beside it.
+		panel: "agents",
+		subject: "an agents.id",
 	},
 };
 

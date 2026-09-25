@@ -16,8 +16,9 @@ export type AgentsDrawer = "agents" | "llms";
 export const AGENTS_DRAWERS: readonly AgentsDrawer[] = ["agents", "llms"];
 
 // One key per drawer, named for the record rather than for the drawer, so a
-// link says what it opens. `agent` is the agent's own surface — its three
-// bounds — and `provider` is one configured endpoint and the models it offers.
+// link says what it opens. `agent` is read only — an old link to the drill-in
+// the agent's page used to be; the page is `?page=agent:<id>` now (AG34) — and
+// `provider` is one configured endpoint and the models it offers.
 const AGENTS_DETAIL_PARAM: Record<AgentsDrawer, string> = {
 	agents: "agent",
 	llms: "provider",

@@ -35,9 +35,16 @@ import {
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
 import type { Agent, AgentUpdate } from "@/types/work";
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@invana/ui";
+import {
+	Button,
+	RecordHeader,
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "@invana/ui";
 import { Archive, Pause, Play, Save, Star, Undo2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 /**
  * Every step the interpreter knows. The allow-list is drawn against this whole
@@ -68,7 +75,6 @@ export function AgentDetail({
 	graphSlug,
 	agent,
 	isDefault,
-	onBack,
 	onSave,
 	onPause,
 	onResume,
@@ -87,7 +93,6 @@ export function AgentDetail({
 	graphSlug: string;
 	agent: Agent;
 	isDefault: boolean;
-	onBack: () => void;
 	onSave: (data: AgentUpdate) => void;
 	onPause: () => void;
 	onResume: () => void;
@@ -121,95 +126,84 @@ export function AgentDetail({
 	/** The raw envelope editor's parse error; a spec that does not parse cannot be saved. */
 	const [specError, setSpecError] = useState<string | null>(null);
 
-	// Opening an agent draws its envelope on the canvas; the Lineage section's
-	// `Open lineage` is the one gesture that draws something else.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: run per agent, not per handler identity
-	useEffect(() => {
-		onOpenEnvelope();
-	}, [agent.id]);
-
 	const changes = useMemo(() => changesOf(agent, draft), [agent, draft]);
 	const dirty = Object.keys(changes).length > 0;
 	const patch = (next: Partial<AgentDraft>) =>
 		setDraft((d) => ({ ...d, ...next }));
 
 	return (
-		// `h-full`: the drawer body is not a flex column, so without it the page
+		// `h-full`: the page host is not a flex column, so without it the page
 		// grows to its content and the header and tabs scroll away with it.
 		<div className="flex h-full min-h-0 flex-col">
-			<div className="flex items-center gap-2 border-b px-3 py-1.5">
-				<button
-					type="button"
-					onClick={onBack}
-					className="shrink-0 text-muted-foreground hover:text-foreground"
-				>
-					← Agents
-				</button>
-				<span className="min-w-0 flex-1 truncate font-medium">
-					{agent.name}
-				</span>
-				<DetailStatus tone={agentTone(agent.status)}>
-					{humanStatus(agent.status)}
-				</DetailStatus>
-			</div>
-
-			<div className="flex shrink-0 flex-wrap items-center gap-1.5 px-3 pb-1 pt-2">
-				<span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
-					{agent.kind} · v{agent.version}
-					{agent.lifetime === "ephemeral" ? " · ephemeral" : ""}
-					{isDefault ? " · Graph default" : ""}
-				</span>
-				{dirty ? (
+			<RecordHeader
+				tone={agentTone(agent.status)}
+				crumbs={[agent.name]}
+				chips={
 					<>
-						<Button
-							size="sm"
-							variant="ghost"
-							disabled={isSaving}
-							onClick={() => {
-								setDraft(draftOf(agent));
-								setSpecError(null);
-							}}
-						>
-							<Undo2 /> Discard
-						</Button>
-						{/* A spec that does not parse must not be savable: the
-						    structured fields still hold the last valid document, so
-						    Save would write something the editor is not showing. */}
-						<Button
-							size="sm"
-							disabled={isSaving || specError !== null}
-							onClick={() => onSave(changes)}
-						>
-							<Save /> {isSaving ? "Saving…" : "Save"}
-						</Button>
+						<DetailStatus>{agent.kind}</DetailStatus>
+						<DetailStatus tone={agentTone(agent.status)}>
+							{humanStatus(agent.status)}
+						</DetailStatus>
+						{isDefault ? <DetailStatus>Graph default</DetailStatus> : null}
+						<span className="text-sm text-muted-foreground">
+							v{agent.version}
+							{agent.lifetime === "ephemeral" ? " · ephemeral" : ""}
+						</span>
 					</>
-				) : (
-					<>
-						{!isDefault && agent.status === "active" ? (
-							<Button size="sm" variant="ghost" onClick={onSetDefault}>
-								<Star /> Make default
+				}
+				actions={
+					dirty ? (
+						<>
+							<Button
+								size="sm"
+								variant="ghost"
+								disabled={isSaving}
+								onClick={() => {
+									setDraft(draftOf(agent));
+									setSpecError(null);
+								}}
+							>
+								<Undo2 /> Discard
 							</Button>
-						) : null}
-						{agent.status === "retired" ? null : (
-							<>
-								<Button
-									size="sm"
-									variant="outline"
-									onClick={agent.status === "paused" ? onResume : onPause}
-								>
-									{agent.status === "paused" ? <Play /> : <Pause />}
-									{agent.status === "paused" ? "Resume" : "Pause"}
+							{/* A spec that does not parse must not be savable: the
+							    structured fields still hold the last valid document, so
+							    Save would write something the editor is not showing. */}
+							<Button
+								size="sm"
+								disabled={isSaving || specError !== null}
+								onClick={() => onSave(changes)}
+							>
+								<Save /> {isSaving ? "Saving…" : "Save"}
+							</Button>
+						</>
+					) : (
+						<>
+							{!isDefault && agent.status === "active" ? (
+								<Button size="sm" variant="ghost" onClick={onSetDefault}>
+									<Star /> Make default
 								</Button>
-								<Button size="sm" variant="ghost" onClick={onRetire}>
-									<Archive /> Retire
-								</Button>
-							</>
-						)}
-					</>
-				)}
-			</div>
+							) : null}
+							{agent.status === "retired" ? null : (
+								<>
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={agent.status === "paused" ? onResume : onPause}
+									>
+										{agent.status === "paused" ? <Play /> : <Pause />}
+										{agent.status === "paused" ? "Resume" : "Pause"}
+									</Button>
+									<Button size="sm" variant="ghost" onClick={onRetire}>
+										<Archive /> Retire
+									</Button>
+								</>
+							)}
+						</>
+					)
+				}
+			/>
 			{dirty && saveError ? (
-				<p role="alert" className="px-3 pb-1 text-sm text-destructive">
+				<p role="alert" className="px-4 py-1 text-sm text-destructive">
 					Not saved —{" "}
 					{saveError instanceof Error
 						? saveError.message
@@ -223,7 +217,7 @@ export function AgentDetail({
 				onValueChange={(v) => setTab(v as AgentTab)}
 				className="flex min-h-0 flex-1 flex-col"
 			>
-				<TabsList className="w-full justify-start gap-1 px-3">
+				<TabsList className="w-full justify-start gap-1 px-4">
 					<TabsTrigger value="overview">Overview</TabsTrigger>
 					<TabsTrigger value="skills">Skills & callables</TabsTrigger>
 					<TabsTrigger value="thinking">Thinking</TabsTrigger>
@@ -253,6 +247,7 @@ export function AgentDetail({
 						onPatch={patch}
 						specError={specError}
 						onSpecError={setSpecError}
+						onOpenEnvelope={onOpenEnvelope}
 						onBindSkill={onBindSkill}
 						onUnbindSkill={onUnbindSkill}
 						bindError={bindError}

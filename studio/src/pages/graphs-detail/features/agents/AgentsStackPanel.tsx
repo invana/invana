@@ -39,9 +39,10 @@ export interface AgentsStackPanelProps {
 	/** The agent the canvas is drawing. Selection, not the drill-in. */
 	selectedAgentId: string | null;
 	onSelectAgent: (id: string | null) => void;
+	/** Opens the agent's page in `mainSection` (AG34). */
+	onOpenAgentPage: (id: string) => void;
 	selectedEdge?: AgentEdge | null;
 	onOpenLineage?: (agentId: string) => void;
-	onOpenEnvelope?: (agentId: string) => void;
 	onOpenTask?: (taskId: string) => void;
 	onNewAgent?: () => void;
 }
@@ -51,9 +52,9 @@ export function AgentsStackPanel({
 	graphSlug,
 	selectedAgentId,
 	onSelectAgent,
+	onOpenAgentPage,
 	selectedEdge,
 	onOpenLineage,
-	onOpenEnvelope,
 	onOpenTask,
 	onNewAgent,
 }: AgentsStackPanelProps) {
@@ -87,6 +88,30 @@ export function AgentsStackPanel({
 		stackRef.current?.expand(agents.drawer);
 	}, [agents.drawer, focused]);
 
+	// `&agent=` was the drill-in when the page lived in this drawer. A link that
+	// still carries it opens the page, and the key is dropped — read, never
+	// written (AG34).
+	//
+	// **Two writes, one after the other.** Dropping `&agent=` and opening the
+	// page (`?page=`) are two writers of one query string; in one tick the
+	// second is composed against the string as it was before the first, and
+	// `?page=` is lost. So the key is dropped first, and the page opens once that
+	// write has landed — the same order Govern's drill-in keeps (WO15).
+	const legacyAgentId = agents.agentId;
+	const { openAgent } = agents;
+	const pendingPage = useRef<string | null>(null);
+	useEffect(() => {
+		if (legacyAgentId) {
+			pendingPage.current = legacyAgentId;
+			openAgent(null);
+			return;
+		}
+		if (!pendingPage.current) return;
+		const id = pendingPage.current;
+		pendingPage.current = null;
+		onOpenAgentPage(id);
+	}, [legacyAgentId, onOpenAgentPage, openAgent]);
+
 	return (
 		<PanelStack
 			withHandle
@@ -98,13 +123,11 @@ export function AgentsStackPanel({
 					ui,
 					username,
 					graphSlug,
-					agentId: agents.agentId,
-					onOpenAgent: agents.openAgent,
+					onOpenAgentPage,
 					selectedAgentId,
 					onSelectAgent,
 					selectedEdge,
 					onOpenLineage,
-					onOpenEnvelope,
 					onOpenTask,
 					onNewAgent,
 					defaultSize: size("agents"),

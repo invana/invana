@@ -253,6 +253,7 @@ six rows that exist today are unchanged.
 | `rule` | `dashboard` | a `rules.id` | panels | Skills |
 | `world` | `dashboard` | a `lenses.id` | panels | Govern |
 | `guardrail` | `dashboard` | a `lenses.id` | panels | Govern |
+| `agent` | `dashboard` | an `agents.id` | the agent's page — five tabs, the one declared page that edits ([AG34](../modules/agents/features/author-an-agent.md#decisions)) | Agents |
 
 There is no `dataset` kind — records are imported *into a model* and Dataset is a retired noun
 ([terminology.md](../terminology.md)). `plan` and `plan_runs` are the same record seen two ways — the plan **drawn** as its task graph, and

@@ -60,7 +60,7 @@ flowchart LR
 | `?panel=govern&drawer=guardrails&guardrail=new` | the same editor, with the rule builder and its live match preview | G2 |
 | the composer's world chip, `sessions.lens_id` | which world the session's next question is asked under | W1 |
 | `?panel=agents&drawer=agents` | the agents, the LLMs drawer beneath it | A1 |
-| `?panel=agents&drawer=agents&agent=<id>` | the agent, its three bounds, its cast, its ceilings | A1 · A2 · A4 |
+| `?panel=agents&drawer=agents&page=agent:<id>` | the list with the agent selected, **and the page `agent:<id>` in `mainSection`** — five tabs ([AG23](../modules/agents/features/author-an-agent.md#decisions) · [AG34](../modules/agents/features/author-an-agent.md#decisions)). An old `&agent=<id>` link opens the same page and drops the key | A1 · A2 · A4 |
 | `?panel=agents&drawer=llms` | the endpoints, each a group over the models it offers | A6 |
 | `?panel=agents&drawer=llms&provider=<id>` | one endpoint: its fields, its ping, its models | A6 |
 | `?panel=agents&drawer=llms&provider=new` | configuring one — the same drill-in a world's `new` is | A6 |

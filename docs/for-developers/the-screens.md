@@ -555,12 +555,12 @@ agent's page ([AG23](modules/agents/features/author-an-agent.md#decisions)). Gen
 | Artboard | Feature | Draws | API | Studio | Shell |
 |---|---|---|---|---|---|
 | `agents.agents.detail.overview` | 5.2 | The agent at a glance — who, focus, thinking, skills, what is in force, its limits | ✅ | 🟡 | ✅ |
-| `agents.agents.detail.skills` | 5.2 · 6.2 | Skills and callables — two tables that name each other | ✅ | 🟡 | ✅ |
-| `agents.agents.detail.thinking` | 5.2 · 5.3 | Thinking — focus, effort and a default stance | 🟡 | 🟡 | ✅ |
+| `agents.agents.detail.skills` | 5.2 · 6.2 | Skills and callables — two tables that name each other | ✅ | ✅ | ✅ |
+| `agents.agents.detail.thinking` | 5.2 · 5.3 | Thinking — focus, effort and a default stance | 🟡 | ✅ | ✅ |
 | `agents.agents.detail.soul.dials` | 5.8 | Soul — the voice dials beside the Markdown | ✅ | 🟡 | ✅ |
 | `agents.agents.detail.activity` | 5.3 · 5.5 · 5.6 · 5.7 | Activity — the meters, the limits that cap them, runs, sessions and lineage | ✅ | 🟡 | ✅ |
 
-**Studio is 🟡 on all five for one reason:** the page opens inside the Agents drawer (`leftSection`), replacing the list, where the artboards draw it in `mainSection` beside the list. Beyond that — Thinking has no default stance until stances ship ([AG27](modules/agents/features/author-an-agent.md#decisions)), which is also why its API is 🟡; Overview's *Always in force* lists the agent's own guardrail, not the Graph's; Activity's runs carry no cost column, since the runs list has no `cost_usd`.
+**Studio** opens the page as `agent:<id>` in `mainSection` beside the list, as drawn ([AG34](modules/agents/features/author-an-agent.md#decisions)). What keeps three rows 🟡: Overview's *Always in force* lists the agent's own guardrail, not the Graph's; Soul stacks the dials above the editor rather than beside it, and its Preview sits in the tab rather than the header; Activity is one column, and its runs carry no cost, since the runs list has no `cost_usd`. Thinking has no default stance until stances ship ([AG27](modules/agents/features/author-an-agent.md#decisions)) — by decision, so its Studio is ✅ and its API 🟡.
 
 A second page, *Ask › The session’s world — 3.10*, draws where the world now comes from ([AS5](modules/ask/spec.md#7b-a-session-executes-through-plans-always) · [AD15–AD17](modules/ask/features/the-assistant.md#decisions)). Generated from `.design/canvas-agent-page/session.py`.
 

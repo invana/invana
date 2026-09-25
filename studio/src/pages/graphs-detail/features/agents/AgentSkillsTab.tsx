@@ -45,6 +45,7 @@ export function AgentSkillsTab({
 	onPatch,
 	specError,
 	onSpecError,
+	onOpenEnvelope,
 	onBindSkill,
 	onUnbindSkill,
 	bindError,
@@ -57,6 +58,8 @@ export function AgentSkillsTab({
 	onPatch: (next: Partial<AgentDraft>) => void;
 	specError: string | null;
 	onSpecError: (error: string | null) => void;
+	/** Draws the envelope as a canvas page beside this one. */
+	onOpenEnvelope: () => void;
 	onBindSkill: (skillId: string) => void;
 	onUnbindSkill: (skillId: string) => void;
 	bindError?: unknown;
@@ -348,16 +351,21 @@ export function AgentSkillsTab({
 				title="Callables"
 				hint={`${allow.size} of ${allKeys.length} · what its envelope lets it run`}
 				action={
-					<Button
-						size="sm"
-						variant="ghost"
-						onClick={() => {
-							setEditing(!editing);
-							setRawSpec(null);
-						}}
-					>
-						{editing ? "Done" : "Edit envelope"}
-					</Button>
+					<span className="flex items-center gap-1">
+						<Button size="sm" variant="ghost" onClick={onOpenEnvelope}>
+							Draw it
+						</Button>
+						<Button
+							size="sm"
+							variant="ghost"
+							onClick={() => {
+								setEditing(!editing);
+								setRawSpec(null);
+							}}
+						>
+							{editing ? "Done" : "Edit envelope"}
+						</Button>
+					</span>
 				}
 			>
 				{editing ? (
