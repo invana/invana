@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.managers import AgentManager
-from invana.apps.agents.models import Agent
+from invana.apps.agents.models import Agent, layered_instructions
 from invana.apps.agents.schemas import AgentCreate, AgentUpdate
 from invana.apps.graphs.models import Graph
 from invana.apps.llm.voice import DEFAULT_VOICE, render_traits, voice_for
@@ -95,6 +95,15 @@ async def test_the_voice_is_the_dials_then_the_soul_and_humour_is_off_when_it_we
     assert render_traits({"humour": "playful"}, went_wrong=True).startswith("Do not joke.")
     # Where the caller cannot know yet, the rule is stated to the model instead.
     assert "use no humour" in render_traits({"humour": "playful"})
+
+
+async def test_an_agents_focus_is_read_after_the_graphs_instructions():
+    """AG13 — the Graph's instructions first, then the agent's own; either alone
+    stands alone."""
+    both = layered_instructions("Answer only from this graph.", "EU carriers only.")
+    assert both.index("Answer only from this graph.") < both.index("EU carriers only.")
+    assert layered_instructions("Answer only from this graph.", "  ") == "Answer only from this graph."
+    assert layered_instructions(None, "EU carriers only.") == "EU carriers only."
 
 
 async def test_a_skill_needing_a_callable_the_envelope_lacks_is_marked_on_both_tables(

@@ -112,6 +112,22 @@ DEFAULT_POLICY: dict[str, bool] = {
 }
 
 
+def layered_instructions(graph_text: str | None, agent_text: str | None) -> str:
+    """The Graph's standing instructions, then the agent's own focus (AG13).
+
+    One block, in that fixed order, for the two steps that take instructions —
+    Understand and Translate. The agent's text comes second so it can narrow
+    what the Graph says (*EU carriers only*) without the Graph being told. Who
+    the agent *is* is its soul, which never reaches Translate (SO5).
+    """
+    graph_text = (graph_text or "").strip()
+    agent_text = (agent_text or "").strip()
+    if not agent_text:
+        return graph_text
+    own = f"This agent's own focus, read after the above:\n{agent_text}" if graph_text else agent_text
+    return f"{graph_text}\n\n{own}" if graph_text else own
+
+
 class Agent(Base):
     """A named actor in a graph."""
 

@@ -25,7 +25,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from invana.apps.agents.envelope import Envelope
-from invana.apps.agents.models import Agent
+from invana.apps.agents.models import Agent, layered_instructions
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
@@ -445,7 +445,8 @@ class TaskRuntime:
                 global_model=await load_global_model(db, graph.id) if th.workflow_key != "modeller-generate" else None,
                 skills=skills,
                 rules=rules,
-                instructions=graph.instructions or "",
+                # The Graph's, then the agent's own focus (AG13).
+                instructions=layered_instructions(graph.instructions, agent.instructions if agent else ""),
                 # The voice this run speaks with, fixed at open like the lens
                 # (SO6). No agent is still a voice — the default one (SO3).
                 soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
