@@ -1,9 +1,12 @@
 import { request } from "@/services/api/client";
+import type { EventListResponse } from "@/types/events";
 import type {
 	Agent,
 	AgentCreate,
 	AgentLineage,
 	AgentListResponse,
+	AgentMeters,
+	AgentSkillsAndCallables,
 	AgentUpdate,
 	CatalogueResponse,
 	LifecycleAct,
@@ -14,6 +17,8 @@ import type {
 	ProjectListResponse,
 	ProjectPlan,
 	ProjectUpdate,
+	SoulPreview,
+	SoulPreviewRequest,
 	Task,
 	TaskActivity,
 	TaskCreate,
@@ -132,6 +137,34 @@ export const agentsApi = {
 
 	lineage: (username: string, graphSlug: string, id: string) =>
 		request<AgentLineage>(`${base(username, graphSlug)}/agents/${id}/lineage`),
+
+	/** Both tables of *What this agent can do*, in one read (AG30). */
+	skillsAndCallables: (username: string, graphSlug: string, id: string) =>
+		request<AgentSkillsAndCallables>(
+			`${base(username, graphSlug)}/agents/${id}/skills-and-callables`,
+		),
+
+	/** What it is using now, beside the limits that cap it (AG31). */
+	meters: (username: string, graphSlug: string, id: string) =>
+		request<AgentMeters>(`${base(username, graphSlug)}/agents/${id}/meters`),
+
+	/** Everything this agent did, newest first. */
+	activity: (username: string, graphSlug: string, id: string) =>
+		request<EventListResponse>(
+			`${base(username, graphSlug)}/agents/${id}/activity`,
+		),
+
+	/** One ask in the current voice and the draft's — not a run (SO8). */
+	previewSoul: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		data: SoulPreviewRequest,
+	) =>
+		request<SoulPreview>(
+			`${base(username, graphSlug)}/agents/${id}/soul/preview`,
+			{ method: "POST", ...json(data) },
+		),
 
 	setDefault: (username: string, graphSlug: string, agentId: string) =>
 		request<Agent>(`${base(username, graphSlug)}/default-agent`, {

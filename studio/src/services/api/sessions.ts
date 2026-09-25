@@ -139,6 +139,8 @@ export interface SessionListOptions {
 	includeArchived?: boolean;
 	/** docs/for-developers/modules/ask/spec.md — list only one surface's sessions (Explorer vs Modeller). */
 	surface?: "explorer" | "modeller";
+	/** Only the caller's own sessions bound to this agent. */
+	agentId?: string;
 }
 
 /** Body for creating a session — title plus (docs/for-developers/modules/ask/spec.md) optional surface + model
@@ -251,6 +253,7 @@ export const sessionsApi = {
 		if (opts?.sort != null) params.set("sort", opts.sort);
 		if (opts?.includeArchived) params.set("include_archived", "true");
 		if (opts?.surface != null) params.set("surface", opts.surface);
+		if (opts?.agentId != null) params.set("agent_id", opts.agentId);
 		const qs = params.toString();
 		const data = await request<ApiListResponse>(
 			`${base(username, graphSlug)}${qs ? `?${qs}` : ""}`,

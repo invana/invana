@@ -39,7 +39,18 @@ export interface Agent {
 	/** Read-only — the bindings live in `skill_bindings`; change it with bind/unbind. */
 	skill_ids: string[];
 	budget: Record<string, number>;
+	/**
+	 * How hard it tries — `max_steps` · `max_replans` · `max_clarifications` —
+	 * as stored; a missing key is the default (EB9). `effective_effort` is what
+	 * a run reads, defaults and the one-release fallbacks filled in (EB11).
+	 */
+	effort: Partial<Record<EffortKey, number>>;
+	effective_effort: Record<EffortKey, number>;
 	policy: Record<string, boolean>;
+	/** Markdown. Empty is Invana's default voice, never no voice (SO3). */
+	soul: string;
+	/** The voice dials; a missing key is its default (AG16). */
+	soul_traits: SoulTraits;
 	parent_agent_id: string | null;
 	spawned_in_run_id: string | null;
 	version: number;
@@ -72,7 +83,11 @@ export interface AgentCreate {
 	/** The skills this agent starts with, bound as part of creating it. */
 	skill_ids?: string[];
 	budget?: Record<string, number>;
+	effort?: Partial<Record<EffortKey, number>>;
 	policy?: Record<string, boolean>;
+	/** `""` clears it back to the default voice. */
+	soul?: string;
+	soul_traits?: SoulTraits;
 }
 
 /** No `skill_ids`: binding is its own write, so that a refusal can name the one
@@ -80,6 +95,90 @@ export interface AgentCreate {
 export type AgentUpdate = Partial<
 	Omit<AgentCreate, "envelope_from" | "skill_ids">
 >;
+
+export type EffortKey = "max_steps" | "max_replans" | "max_clarifications";
+
+/** The four voice dials (author-an-agent § Voice dials). */
+export interface SoulTraits {
+	humour?: "off" | "light" | "playful";
+	formality?: "casual" | "neutral" | "formal";
+	emoji?: "off" | "on";
+	greeting?: "off" | "on";
+}
+
+/** One bound skill, and the callables its current plan names (C12 · AG30). */
+export interface AgentSkillRow {
+	skill_id: string;
+	name: string;
+	/** Null for a skill with no published version — offered nothing yet. */
+	version: number | null;
+	when_to_use: string;
+	/** Derived from the plan, `uses` inlined, in plan order (AG15). */
+	needs: string[];
+	/** The library plans it inlined, `key@version`. */
+	uses: string[];
+	/** The needs the envelope does not allow. */
+	missing: string[];
+	offered: number;
+	applied: number;
+	enough_to_read: boolean;
+}
+
+/** One callable the envelope allows (C12). */
+export interface AgentCallableRow {
+	step_key: string;
+	/** `graph_read` · `llm` · `none` … or `unknown` for a retired key. */
+	bound: string;
+	pinned: Record<string, unknown>;
+	/** Skill ids and base plans (`key@version`). Empty is *nothing bound*. */
+	needed_by: string[];
+}
+
+export interface AgentSkillsAndCallables {
+	agent_id: string;
+	skills: AgentSkillRow[];
+	callables: AgentCallableRow[];
+	/** The base plans a Plan step may pick, `key@version`. */
+	plans: string[];
+}
+
+/**
+ * What the agent is using now, each beside the limit that caps it (AG31).
+ * `spend_this_month` absent is *nothing priced*, never zero (AG11).
+ */
+export interface AgentMeters {
+	agent_id: string;
+	spend_this_month?: number | null;
+	max_cost_usd_month?: number | null;
+	max_cost_usd_run?: number | null;
+	running: number;
+	queued: number;
+	max_concurrent_runs?: number | null;
+	runs_this_month: number;
+	/** Every session bound to the agent, whoever opened it — a count only. */
+	sessions: number;
+	spawned_this_month: number;
+	depth: number;
+	max_children?: number | null;
+	max_depth?: number | null;
+	max_fanout?: number | null;
+	max_tokens?: number | null;
+}
+
+export interface SoulPreviewRequest {
+	ask: string;
+	soul: string;
+	soul_traits: SoulTraits;
+}
+
+/** One ask, answered twice; neither reply read the graph (SO8). */
+export interface SoulPreview {
+	ask: string;
+	current: string;
+	draft: string;
+	/** `llm/<provider>/<model>` — what spoke. */
+	model: string | null;
+}
 
 /** A lineage node. Heterogeneous by design — docs/for-developers/modules/agents/features/lineage.md */
 export interface AgentNode {

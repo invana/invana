@@ -265,7 +265,7 @@ function AgentsBody({
 				onResume={() => mutations.resume.mutate(openAgent.id)}
 				onRetire={() => setConfirming({ agent: openAgent, act: "retire" })}
 				onSetDefault={() => mutations.setDefault.mutate(openAgent.id)}
-				onOpenTask={onOpenTask}
+				saveError={mutations.update.error}
 				onOpenLineage={() => onOpenLineage?.(openAgent.id)}
 				onOpenEnvelope={() => onOpenEnvelope?.(openAgent.id)}
 				onBindSkill={(skillId) => {
@@ -427,7 +427,7 @@ function AgentsBody({
 					onOpenTask={onOpenTask}
 				/>
 			) : (
-				<DetailPlaceholder hint="Pick an agent to see its brief, its three bounds and its work — or open its lineage on the canvas." />
+				<DetailPlaceholder hint="Pick an agent to see who it is, what it can do and what it has done — or open its lineage on the canvas." />
 			)}
 
 			<CardFooter className="shrink-0 flex-wrap gap-2 border-t">

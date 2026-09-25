@@ -7,7 +7,7 @@ anything is dispatched — so a plan outside the bounds costs nothing.
 |---|---|
 | Index | [5.3](../../../README.md#5--agents) · Slice **S12c** |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | ✅ / — / ✅ |
+| API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-validation](../../workflows/features/envelope-validation.md) (the check) · [delegation](delegation.md) |
 
 > **As** someone letting an agent act, **I want** hard limits it cannot argue with, **so that** I can
@@ -58,9 +58,9 @@ flowchart TD
 
 | Surface | Shape | Components |
 |---|---|---|
-| Agent panel → Envelope | `6 of 25 callables`, each with its bound and its pinned arguments; then the ceilings | `DataTable` · `BoundChip` |
+| Agent page › *Skills & callables* › Callables | `6 of 25 callables`, each with its bound, its pinned arguments and what needs it; *Edit envelope* opens the allow-list against the whole catalogue, and pins, order and plans as JSON | `DataTable` · `BoundChip` |
 | The picker | Grouped by bound, with what is already allowed checked | `DataTable` · `Checkbox` · `BoundChip` |
-| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as tables by group — Budget and Reach on the agent's *Activity* tab beside the meters they cap, Effort on its *Thinking* tab ([AG23](author-an-agent.md#decisions)) — not a form of ten inputs. `agents/CeilingsTable.tsx`, in the agent panel's *Ceilings* section — empty is *the Graph's default applies*, never zero | `DataTable` |
+| Ceilings | value · what it bounds · **whether anything enforces it** (EB7), as tables by group — Budget and Reach on the agent's *Activity* tab beside the meters they cap, Effort on its *Thinking* tab ([AG23](author-an-agent.md#decisions)) — not a form of ten inputs. `agents/CeilingsTable.tsx`, one table per group — empty is *the default applies*, never zero, and an empty Effort cell shows the number a run reads ([EB12](#decisions)) | `DataTable` |
 | Budget strip | Spend against ceiling, per window | `MetricTile` with `meter` |
 | A refused plan | *`nl-sweep@2` names `delegate`, which Analyst's envelope does not carry* — with `Open the plan` and `Hand to Coordinator` | `CannotAnswerCard` |
 
@@ -129,6 +129,7 @@ opening a row.
 | EB10 | **The column is `envelope`, and its plan list is `plans`.** `workflow_spec` named a workflow where the thing is a bound, and `templates` named library plans with a word the product uses for projection templates. Both old names are read for one release, and the API answers both, so a reader that has not moved keeps working. |
 | EB9 | **Effort is its own bound, neither budget nor character.** Steps, replans and clarifications are not money, so they do not sit under a word that means money; and they decide what runs, so they cannot sit in the [soul](soul.md), which only chooses words ([SO2](soul.md#decisions)). They read like temperament and are enforced like a ceiling — a soul can make an agent *sound* persistent, only Effort makes it retry. No preset: three numbers set once, read on the Ceilings table. |
 | EB11 | **Effort is read by presence, from `effort` first, then `workflow_spec`, then `budget`.** `max_clarifications: 0` is an agent that never asks, never a fall-through to the default three. The migration copies each agent's numbers into `effort` without removing them, the seeded agents carry `effort` of their own, and a delegated child's effort is its parent's, narrowed key by key like its budget. |
+| EB12 | **An empty effort cell shows what a run reads.** Its placeholder is `effective_effort` — the default, or a number still carried on `workflow_spec` or `budget` (EB11) — never a dash, so an agent that inherits `max_clarifications 3` does not read as unbounded and one that never asks reads `0`. |
 | EB8 | **`max_cost_usd` is read as `max_cost_usd_month` for one release**, and answered back under its old name, so neither a row configured today nor a reader that has not moved yet loses its number on the rename. The release after this one drops both lines. |
 
 ## Not building

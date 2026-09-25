@@ -8,7 +8,7 @@ do; the soul is why it does not sound like a robot while doing it.
 |---|---|
 | Index | [5.8](../../../README.md#5--agents) · Slice **S-TBD** |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | 🔵 / — / 🔵 |
+| API / CLI / Studio | 🟡 / — / ✅ |
 | Related | [author-an-agent](author-an-agent.md) · [the answer, in words](../../ask/features/the-answer-in-words.md) · [ask in natural language](../../ask/features/ask-in-natural-language.md) · [act as](../../ask/features/act-as.md) |
 
 > **As** someone who works with an agent every day, **I want** it to have a character — warm, curious,
@@ -72,8 +72,8 @@ flowchart TD
 
 | Surface | Shape | Components |
 |---|---|---|
-| The agent's page › **Soul** tab | A tab beside Overview · Envelope · Lineage: Markdown editor, default voice as placeholder, character count, *version · edited by* under it; Discard · Preview · Save soul in the page header | `@invana/ui` Markdown editor · `SectionHeader` · `Eyebrow` |
-| Preview | The draft beside an editable sample ask, answered twice — current voice above, draft below | `EmissionCard` with a `prose` body, twice |
+| The agent's page › **Soul** tab | One of five tabs, beside Overview · Skills & callables · Thinking · Activity ([AG23](author-an-agent.md#decisions)): the four dials, then the Markdown editor with the default voice as its placeholder, the character count, *version · edited* under it; Discard · Save in the page header while the tab has edits | `@invana/editor` `MarkdownEditorBlock` · `SegmentedControl` · `PropertyList` |
+| Preview | An editable sample ask and **Preview** on the tab, answered twice — current voice above, draft below | `EmissionCard` with a `prose` body, twice |
 | Agents drawer row | Nothing new — a soul is not a status | — |
 
 ## Engine
@@ -100,8 +100,9 @@ flowchart TD
 | SO4 | **A soul never changes what is true.** A refusal still refuses and names what is missing, a citation still cites, a third-party fact is still badged ([BG3](../../ask/features/beyond-the-graph.md#decisions)). The soul chooses the words around them. |
 | SO5 | **`instructions` and `soul` are two fields because they reach different steps.** Instructions say what to do and reach Understand and Translate, layered after the Graph's own; the soul says who is speaking and reaches only prose. One field would carry a character into query writing. |
 | SO6 | **A run speaks with the soul it opened with.** The soul is read at run open, like the lens ([GV26](../../govern/spec.md#4-cross-feature-decisions)); `agent_version` on the run says which. |
-| SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Envelope · Lineage because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |
+| SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Skills & callables · Thinking · Activity because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |
 
+| SO9 | **The empty editor shows the default voice, and never stores it.** The placeholder is Studio's copy of `DEFAULT_VOICE` in `apps/llm/voice.py`, the two changed together; the engine's is the one a run reads. Saving an empty soul saves `""`, so a later change to the default voice reaches every agent that never wrote its own. |
 | SO8 | **The preview is not a run, and it reads no graph.** It is two model calls to the same ask, one per voice, told to state no fact from the data — a voice is being judged, not an answer, and a preview that invented a number would be the hallucination the product promises against. It calls the model the agent's guardrails — the Graph's and its own — would cast, so a preview cannot reach a model a guardrail denies. Nothing is recorded and nothing is drawn against the agent's month. |
 
 ## Not building

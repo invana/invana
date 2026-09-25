@@ -14,7 +14,7 @@ session, the Todo, the schedule ([AG24](#decisions) · [PM1](providers-and-model
 |---|---|
 | Index | [5.2](../../../README.md#5--agents) · Slice **S12c** |
 | Module | [Agents](../spec.md) |
-| API / CLI / Studio | ✅ / — / ✅ |
+| API / CLI / Studio | 🟡 / — / 🟡 |
 | Related | [envelope-and-budget](envelope-and-budget.md) · [lifecycle](lifecycle.md) · [bindings](../../skills/features/bindings.md) |
 
 > **As** someone running work through agents, **I want** to see them all with what each can do, **so
@@ -229,6 +229,8 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 | AG29 | **Humour is switched off by the caller when it knows, and by a stated rule when it does not.** `render_traits(traits, went_wrong=True)` renders `humour: off` for a reply already known to be a refusal, an error or a pause. Understand decides *in the same call* whether it cannot answer, so there is no second call to switch the dial for; its prompt carries the rule as a sentence instead — *when you refuse, cannot answer, or report an error or a pause, use no humour* ([AG17](#decisions)). |
 | AG30 | **What this agent can do is read, never stored.** A skill's `needs` are the distinct callables of its current version's plan in plan order — `uses` is already inlined into those rows, and is listed beside them as `key@version`; `missing` is the needs its envelope does not allow; offered and applied are **this agent's** runs of the current version, with the Graph-wide floor for *too few to read*. A callable's `needed_by` is the same reading turned round, plus the base plans in the envelope's `templates`, each at its newest version. |
 | AG31 | **The meters are derived on every read, and the sessions meter is a count.** Spend is the calendar month's priced runs, absent when none was priced ([AG11](#decisions)); running and queued are the agent's in-flight roots; runs are roots queued this month; spawned is agents it created this month, and depth is its own place in the lineage. `sessions` counts every session bound to the agent, whoever opened it — a number names no thread — while the list behind it stays each person's own. |
+| AG32 | **Activity's sessions are a count and the reader's own list.** The tab draws `meters.sessions` — every session bound to the agent, whoever opened it — as one number, and under it only the reader's own sessions with the agent (`GET …/sessions?agent_id=`). Another member's sessions are neither listed nor counted per person: a session is private to whoever opened it, and a per-person count would say whose threads exist. |
+| AG33 | **The page keeps one edit buffer across its tabs, and Save sends only what moved.** A focus typed on Thinking and a dial set on Soul are one Save, one version (AG28); the `PATCH` carries only the fields that differ from the saved agent, so saving an effort never re-sends the soul and never emits an `agent.soul_set` nobody made. Binding a skill stays its own write, so a refusal names the one skill ([BN11](../../skills/features/bindings.md#decisions)). |
 | AG22 | **There is no persona section in `instructions`.** Instructions reach Understand and Translate and miss Plan and Verify, so a thinking style written there shapes the query and not the method, and nothing checks it did anything. Thinking is effort plus a stance; voice is the soul; focus is instructions. |
 
 ## Not building
