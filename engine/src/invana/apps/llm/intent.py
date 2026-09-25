@@ -149,8 +149,9 @@ class OutOfScope:
     duration_ms: float = 0.0
 
 
-def _system_prompt(model_context: str, instructions: str, skills: str, rules: str) -> str:
+def _system_prompt(model_context: str, instructions: str, skills: str, rules: str, voice: str = "") -> str:
     return (
+        f"{voice}"
         "You classify what a question means against ONE bounded knowledge graph. You do not write "
         "queries and you do not answer the question — a later step does both.\n\n"
         'Set action="understood" and fill "kind", "summary", "refs" and "expects" whenever the ask is '
@@ -176,6 +177,9 @@ async def understand(
     version: Grounding | GraphVersion | None,
     encryption_key: str,
     instructions: str = "",
+    #: ``RunVars.soul``. Worded to shape only what a person reads — the
+    #: ``question`` and the ``reason`` — and never the classification (SO2).
+    voice: str = "",
     skills: str = "",
     rules: str = "",
     history: list[dict] | None = None,
@@ -193,6 +197,12 @@ async def understand(
         f"Skills you may apply:\n{skills}\n\n" if skills else "",
         f"Rules that are always true here (quote each statement you follow in rules_cited):\n{rules}\n\n"
         if rules
+        else "",
+        (
+            'How you speak — this shapes the wording of "question" and "reason" only, never which '
+            f"action you choose or what you classify:\n{voice}\n\n"
+        )
+        if voice
         else "",
     )
     result = await complete_tool(

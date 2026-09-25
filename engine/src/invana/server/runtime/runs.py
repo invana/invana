@@ -359,7 +359,9 @@ async def get_trace(
     if run.agent_id:
         agent = await AgentQuerySet().get(session, run.agent_id)
         if agent is not None:
-            effective = agent.effective_budget
+            # Effort is its own column now (EB9); the dashboard still draws it
+            # beside the spend ceilings, so the two are read together.
+            effective = {**agent.effective_budget, **agent.effective_effort}
             # Every ceiling the dashboard draws, not the two it drew first:
             # a run's spend reads against its **per-run** ceiling, and the
             # month one belongs beside it or neither number says its window

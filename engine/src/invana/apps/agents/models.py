@@ -6,8 +6,10 @@ One row = one named actor in a graph. The columns split into four groups:
 *identity* (``name`` · ``description`` · ``kind`` · ``status``) — what the trace
 prints; *bindings* (``skill_ids`` · ``workflow_spec``) — how it thinks;
 *lineage* (``lifetime`` · ``parent_agent_id`` · ``spawned_in_run_id``) — why it
-exists; and *standing limits* (``workflow_spec`` · ``budget``) — what it may do
-and what it may spend, whoever asks.
+exists; *standing limits* (``workflow_spec`` · ``effort`` · ``budget``) — what it
+may do, how hard it tries and what it may spend, whoever asks; and *voice*
+(``soul`` · ``soul_traits``) — how it speaks, and nothing else
+(docs/for-developers/modules/agents/features/soul.md SO2).
 
 There is no world column: what a run may see comes with the work that opens it,
 and an agent's own narrowing is a guardrail scoped ``agent:<id>``
@@ -66,9 +68,8 @@ class AgentLifetime(enum.StrEnum):
 # Defaults live here rather than in the column so a missing key in an older row
 # reads the same as an explicit one (``effective_budget`` merges over these).
 DEFAULT_BUDGET: dict[str, int | float] = {
-    "max_steps": 24,
-    "max_replans": 1,
-    "max_clarifications": 3,
+    # No steps, replans or clarifications: those are effort, not money
+    # (``DEFAULT_EFFORT`` · EB9).
     "max_children": 3,
     "max_depth": 2,
     "max_tokens": 200_000,
@@ -93,6 +94,15 @@ DEFAULT_BUDGET: dict[str, int | float] = {
 #: Read for one release, so a row configured today keeps its ceiling across the
 #: rename (data-model § 8 #4).
 _LEGACY_MONTH_KEY = "max_cost_usd"
+
+#: How hard an agent tries before it stops
+#: ([EB9](docs/for-developers/modules/agents/features/envelope-and-budget.md)).
+#: Not money, so not ``budget``; it decides what runs, so not the soul.
+DEFAULT_EFFORT: dict[str, int] = {
+    "max_steps": 24,
+    "max_replans": 1,
+    "max_clarifications": 3,
+}
 
 DEFAULT_POLICY: dict[str, bool] = {
     "can_spawn": False,
@@ -136,6 +146,16 @@ class Agent(Base):
     # child receives; never the parent's step history).
     instructions: Mapped[str] = mapped_column(Text, default="", nullable=False)
 
+    # ── voice ────────────────────────────────────────────────────────────────
+    # Who the agent is, as Markdown. Empty is Invana's default voice (SO3). It
+    # reaches only the steps whose words a person reads — never a query, a plan
+    # or a lens (SO2).
+    soul: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    # The voice dials — the soul in structured form, read before the Markdown
+    # (AG16). A missing key is its default; ``invana.apps.llm.voice`` owns the
+    # vocabulary and refuses anything outside it.
+    soul_traits: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+
     # ── lineage ──────────────────────────────────────────────────────────────
     lifetime: Mapped[str] = mapped_column(String(16), default=AgentLifetime.persistent.value, nullable=False)
     parent_agent_id: Mapped[str | None] = mapped_column(
@@ -147,6 +167,10 @@ class Agent(Base):
 
     # ── bounds ───────────────────────────────────────────────────────────────
     budget: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    # ``max_steps`` · ``max_replans`` · ``max_clarifications`` (EB9). Read
+    # through ``effective_effort``, which falls back to ``workflow_spec`` and
+    # then ``budget`` for one release — where these numbers lived before.
+    effort: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     policy: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     # Bumped on every envelope / binding change so a run can record which
     # version of the agent it ran under (``runs.agent_version``).
@@ -202,6 +226,30 @@ class Agent(Base):
             budget["max_cost_usd_month"] = own[_LEGACY_MONTH_KEY]
         budget.setdefault(_LEGACY_MONTH_KEY, budget["max_cost_usd_month"])
         return budget
+
+    @property
+    def effective_effort(self) -> dict[str, int]:
+        """Steps, replans and clarifications, defaults filled in.
+
+        ``effort`` is the source. **``workflow_spec`` and then ``budget`` are
+        read where it is silent, for one release** — a row written before the
+        column existed carries its numbers there, and the migration's backfill
+        does not reach an agent spawned from an older parent mid-release. The
+        release after this one drops both fallbacks (EB9).
+
+        Presence, never truthiness: ``max_clarifications: 0`` is an agent that
+        never asks, not one that asks the default three times.
+        """
+        own, spec, budget = self.effort or {}, self.workflow_spec or {}, self.budget or {}
+        out: dict[str, int] = {}
+        for key, default in DEFAULT_EFFORT.items():
+            for source in (own, spec, budget):
+                if source.get(key) is not None:
+                    out[key] = int(source[key])
+                    break
+            else:
+                out[key] = default
+        return out
 
     @property
     def effective_policy(self) -> dict:

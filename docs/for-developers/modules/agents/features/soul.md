@@ -82,10 +82,12 @@ flowchart TD
 |---|---|
 | `agents.soul` | `Text`, default `""`. Empty means the default voice |
 | Default voice | One constant in `apps/llm/voice.py`, owned by the product |
-| Prompt assembly | `soul or DEFAULT_VOICE` is prepended to the system prompt of every step in *What reads the soul*; `RunVars.soul` carries it; Translate has no parameter for it |
+| Prompt assembly | `voice_for(soul, soul_traits)` — `render_traits(soul_traits)` then `soul or DEFAULT_VOICE` — is prepended to the system prompt of every step in *What reads the soul*; `RunVars.soul` carries it, read once at run open. Understand is the one such step the runtime runs today; Answer takes it when [3.12](../../ask/features/the-answer-in-words.md) ships. Translate, Plan, Validate and Execute have no parameter for it |
+| The dials | `apps/llm/voice.py` owns their vocabulary; `check_traits` refuses an unknown key or value at write, naming it |
 | Agent instructions | `agents.instructions` layered after `graphs.instructions` into Understand and Translate |
 | Versioning | An edit bumps `agents.version`; `task_runs.agent_version` records which soul a run spoke with |
-| Routes | `AgentRead.soul` · `AgentUpdate.soul` (read by set-ness) · `POST …/agents/{id}/soul/preview` with `{soul, soul_traits, ask}` → the reply in the current and the draft voice |
+| Routes | `AgentRead.soul` · `soul_traits` · `AgentUpdate.soul` (read by set-ness; `""` clears to the default voice) · `POST …/agents/{id}/soul/preview` with `{ask, soul, soul_traits}` → `{ask, current, draft, model}` ([SO8](#decisions)) |
+| A spawned child | `soul` and `soul_traits` copied from its parent at spawn |
 | Events | `agent.soul_set` |
 
 ## Decisions
@@ -99,6 +101,8 @@ flowchart TD
 | SO5 | **`instructions` and `soul` are two fields because they reach different steps.** Instructions say what to do and reach Understand and Translate, layered after the Graph's own; the soul says who is speaking and reaches only prose. One field would carry a character into query writing. |
 | SO6 | **A run speaks with the soul it opened with.** The soul is read at run open, like the lens ([GV26](../../govern/spec.md#4-cross-feature-decisions)); `agent_version` on the run says which. |
 | SO7 | **The soul is a tab on the agent's page, not a field on its form.** It sits beside Overview · Envelope · Lineage because it is authored and versioned on its own, and a paragraph of Markdown does not fit a form row. The preview answers a sample ask the author can change, since a voice is judged on the questions this agent actually gets. |
+
+| SO8 | **The preview is not a run, and it reads no graph.** It is two model calls to the same ask, one per voice, told to state no fact from the data — a voice is being judged, not an answer, and a preview that invented a number would be the hallucination the product promises against. It calls the model the agent's guardrails — the Graph's and its own — would cast, so a preview cannot reach a model a guardrail denies. Nothing is recorded and nothing is drawn against the agent's month. |
 
 ## Not building
 

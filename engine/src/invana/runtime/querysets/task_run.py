@@ -49,6 +49,30 @@ class TaskRunQuerySet:
         )
         return {agent_id: float(total) for agent_id, total in rows.all() if agent_id and total is not None}
 
+    async def spend_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> float | None:
+        """One agent's :meth:`spend_by_agent` — ``None`` when no run in the
+        window was priced, for the same reason the list leaves it out (OB4)."""
+        total = (
+            await session.execute(
+                select(func.sum(TaskRun.cost_usd)).where(
+                    TaskRun.agent_id == agent_id,
+                    TaskRun.started_at >= since,
+                    TaskRun.cost_usd.is_not(None),
+                )
+            )
+        ).scalar_one()
+        return float(total) if total is not None else None
+
+    async def root_count_for_agent(self, session: AsyncSession, *, agent_id: str, since: datetime) -> int:
+        """Runs this agent opened since ``since`` — roots only, by when they
+        queued, so a run still waiting for a slot is counted."""
+        stmt = (
+            select(func.count())
+            .select_from(TaskRun)
+            .where(TaskRun.agent_id == agent_id, TaskRun.parent_run_id.is_(None), TaskRun.queued_at >= since)
+        )
+        return int((await session.execute(stmt)).scalar_one())
+
     # ── what a world was used for ────────────────────────────────────────────
     async def lens_usage(self, session: AsyncSession, lens_id: str) -> tuple[int, datetime | None, list[str]]:
         """``(runs, last used, who)`` for one lens.

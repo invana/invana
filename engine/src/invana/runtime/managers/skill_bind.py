@@ -231,7 +231,7 @@ class SkillBindManager:
         agent = await self.agents_qs.get(session, agent_id)
         if agent is None or not agent.workflow_spec:
             return
-        envelope = Envelope.from_spec(agent.workflow_spec, budget=agent.effective_budget)
+        envelope = Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort)
         if not envelope.allow:
             return
 

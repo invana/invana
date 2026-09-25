@@ -250,7 +250,7 @@ class TraceRead(BaseModel):
     #: its author. ``None`` when no person is on the record (a schedule).
     opened_by: str | None = None
     #: The bounded repetitions the run spent — questions it asked and times it
-    #: re-planned — read against ``budget``'s ``max_clarifications`` and
+    #: re-planned — read against ``effort``'s ``max_clarifications`` and
     #: ``max_replans`` (SR67).
     clarifications: int = 0
     replans: int = 0

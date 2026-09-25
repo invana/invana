@@ -15,7 +15,7 @@ import copy
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.models import Agent, AgentKind, AgentStatus
+from invana.apps.agents.models import DEFAULT_EFFORT, Agent, AgentKind, AgentStatus
 from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.agents.registry import SEEDED_AGENTS, SURFACE_DEFAULT_AGENT
 from invana.apps.agents.schemas import (
@@ -26,6 +26,7 @@ from invana.apps.agents.schemas import (
 from invana.apps.govern.managers import LensManager
 from invana.apps.govern.models import Lens, LensKind
 from invana.apps.graphs.models import Graph
+from invana.apps.llm.voice import check_traits
 from invana.apps.skills.managers import BindCheck, SkillBindingManager, SkillManager
 from invana.apps.work.models import Task, TaskStatus
 from invana.apps.work.querysets import TaskQuerySet
@@ -39,7 +40,39 @@ from invana.core.events.services import current_trace_id, diff_changed_fields, e
 
 # No ``skill_ids``: the bindings live in `skill_bindings`, and binding is its own write
 # with its own refusal and its own event (BN6).
-_UPDATABLE = ["name", "description", "instructions", "workflow_spec", "budget", "policy"]
+_UPDATABLE = [
+    "name",
+    "description",
+    "instructions",
+    "workflow_spec",
+    "budget",
+    "effort",
+    "policy",
+    "soul",
+    "soul_traits",
+]
+#: The fields that are the agent's voice. A change to one is `agent.soul_set`
+#: rather than `agent.update`, because it changes how the agent speaks and
+#: nothing it may do (SO2 · AG16).
+_VOICE = ("soul", "soul_traits")
+
+
+def check_effort(effort: dict | None) -> dict[str, int]:
+    """Effort as stored, or a refusal naming what is wrong with it (EB9).
+
+    ``0`` is a value, not an absence: ``max_clarifications: 0`` is an agent
+    that never asks.
+    """
+    out: dict[str, int] = {}
+    for key, value in (effort or {}).items():
+        if key not in DEFAULT_EFFORT:
+            raise ValidationError(f"'{key}' is not an effort setting. They are: {', '.join(DEFAULT_EFFORT)}.")
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ValidationError(f"'{key}' must be a whole number, 0 or more.")
+        if key == "max_steps" and value < 1:
+            raise ValidationError("'max_steps' must be at least 1 — a plan with no steps answers nothing.")
+        out[key] = value
+    return out
 
 
 def agent_actor(agent: Agent) -> dict:
@@ -117,6 +150,7 @@ class AgentManager:
                 # Delegation's bounds — depth, fan-out — travel with the agent that
                 # may delegate, and the interpreter reads them from here (DG2).
                 budget=copy.deepcopy(seeded.budget),
+                effort=copy.deepcopy(seeded.effort),
                 # No model is bound here, and there is nothing to keep fresh:
                 # a seeded agent carries no lens, so *Everything, inside the
                 # guardrails* resolves through the shipped cast over whatever
@@ -194,6 +228,9 @@ class AgentManager:
             if seeded is None:
                 raise ValidationError(f"No seeded agent named '{payload.envelope_from}' to copy an envelope from.")
             spec = copy.deepcopy(seeded.workflow_spec)
+            # The template brings its effort with its envelope (AG1); a number
+            # the author typed still wins, key by key.
+            payload.effort = {**seeded.effort, **payload.effort}
 
         agent = Agent(
             graph_id=graph.id,
@@ -203,7 +240,10 @@ class AgentManager:
             kind=AgentKind.authored.value,
             workflow_spec=spec or {},
             budget=payload.budget,
+            effort=check_effort(payload.effort),
             policy=payload.policy,
+            soul=payload.soul,
+            soul_traits=check_traits(payload.soul_traits),
             created_by_kind="user",
             created_by_id=actor.id,
         )
@@ -247,7 +287,13 @@ class AgentManager:
             # graphes. Everything else about a seeded agent is editable.
             raise ConflictError("A seeded agent cannot be renamed.")
 
-        before = {f: getattr(agent, f) for f in _UPDATABLE}
+        # Refused before anything is set, so a bad dial never half-applies an edit.
+        if payload.soul_traits is not None:
+            payload.soul_traits = check_traits(payload.soul_traits)
+        if payload.effort is not None:
+            payload.effort = check_effort(payload.effort)
+
+        before = {f: copy.deepcopy(getattr(agent, f)) for f in _UPDATABLE}
         for field in _UPDATABLE:
             value = getattr(payload, field)
             if value is not None:
@@ -257,22 +303,47 @@ class AgentManager:
 
         if changed:
             # The version is what a run records, so it has to move whenever
-            # anything about *how this agent thinks* moves.
+            # anything about *how this agent thinks* moves — or how it speaks:
+            # `task_runs.agent_version` is how a run says which soul it spoke
+            # with (SO6). One bump per edit, however many fields moved.
             agent.version += 1
             try:
                 await session.flush()
             except IntegrityError as exc:
                 raise ConflictError(f"An agent named '{agent.name}' already exists in this graph.") from exc
-            await emit_event(
-                session,
-                action=actions.AGENT_UPDATE,
-                target_kind=actions.TARGET_AGENT,
-                target_id=agent.id,
-                graph_id=agent.graph_id,
-                actor_id=actor.id,
-                details={"name": agent.name, "changed": changed, "version": agent.version},
-                trace_id=current_trace_id(),
-            )
+            voice = [f for f in changed if f in _VOICE]
+            rest = [f for f in changed if f not in _VOICE]
+            if rest:
+                await emit_event(
+                    session,
+                    action=actions.AGENT_UPDATE,
+                    target_kind=actions.TARGET_AGENT,
+                    target_id=agent.id,
+                    graph_id=agent.graph_id,
+                    actor_id=actor.id,
+                    details={"name": agent.name, "changed": rest, "version": agent.version},
+                    trace_id=current_trace_id(),
+                )
+            if voice:
+                await emit_event(
+                    session,
+                    action=actions.AGENT_SOUL_SET,
+                    target_kind=actions.TARGET_AGENT,
+                    target_id=agent.id,
+                    graph_id=agent.graph_id,
+                    actor_id=actor.id,
+                    # The dials are small and closed, so they ride in full; the
+                    # soul is a document, so the event says its size and the
+                    # agent version holds the text.
+                    details={
+                        "name": agent.name,
+                        "changed": voice,
+                        "version": agent.version,
+                        "soul_traits": agent.soul_traits,
+                        "soul_chars": len(agent.soul or ""),
+                    },
+                    trace_id=current_trace_id(),
+                )
         return agent
 
     async def set_status(self, session: AsyncSession, *, agent: Agent, status: AgentStatus, actor: User) -> Agent:

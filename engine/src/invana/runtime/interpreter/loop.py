@@ -29,6 +29,7 @@ from invana.apps.agents.models import Agent
 from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
+from invana.apps.llm.voice import voice_for
 from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.transcript import (
@@ -445,8 +446,11 @@ class TaskRuntime:
                 skills=skills,
                 rules=rules,
                 instructions=graph.instructions or "",
+                # The voice this run speaks with, fixed at open like the lens
+                # (SO6). No agent is still a voice — the default one (SO3).
+                soul=voice_for(agent.soul if agent else "", agent.soul_traits if agent else {}),
                 agent=agent,
-                envelope=Envelope.from_spec(agent.workflow_spec, budget=agent.effective_budget) if agent else None,
+                envelope=Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort) if agent else None,
                 run=th,
                 # The lens this run froze at open ([GV26]) — read, never
                 # recomposed ([GV8]). It is built once, here, so every step of

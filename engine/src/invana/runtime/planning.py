@@ -50,7 +50,7 @@ class Opening:
 
 
 def opening_for(agent: Agent, *, ask_kind: str) -> Opening:
-    envelope = Envelope.from_spec(agent.workflow_spec, budget=agent.effective_budget)
+    envelope = Envelope.from_spec(agent.workflow_spec, effort=agent.effective_effort)
     if not envelope.plans:
         return Opening(steps=envelope.steps, envelope=envelope, plans=False)
     head = (PLAN_STEP,) if ask_kind == "ql" else (UNDERSTAND_STEP, PLAN_STEP)

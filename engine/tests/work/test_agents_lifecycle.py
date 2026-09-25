@@ -162,8 +162,9 @@ class TestDelegationBounds:
         assert narrowed["budget"]["max_depth"] == agent.effective_budget["max_depth"] - 1
 
     async def test_a_child_budget_is_capped_at_its_parents(self, agent):
-        narrowed = narrow(agent, requested={"budget": {"max_steps": 9_999}})
-        assert narrowed["budget"]["max_steps"] == agent.effective_budget["max_steps"]
+        narrowed = narrow(agent, requested={"budget": {"max_tokens": 10**9}, "effort": {"max_steps": 9_999}})
+        assert narrowed["budget"]["max_tokens"] == agent.effective_budget["max_tokens"]
+        assert narrowed["effort"]["max_steps"] == agent.effective_effort["max_steps"]
 
     async def test_an_agent_without_can_spawn_may_not_spawn(self, session, graph, user, agent):
         task = await tasks.create(session, graph=graph, payload=TaskCreate(title="t", body="b"), actor=user)

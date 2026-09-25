@@ -135,6 +135,7 @@ async def list_sessions(
     sort: Literal["updated", "created"] = Query(default="updated"),
     include_archived: bool = Query(default=False),
     surface: Literal["explorer", "modeller"] | None = Query(default=None),
+    agent_id: str | None = Query(default=None, description="Only the sessions bound to this agent."),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     user: User = Depends(get_current_user),
@@ -149,6 +150,7 @@ async def list_sessions(
         sort=sort,
         include_archived=include_archived,
         surface=surface,
+        agent_id=agent_id,
     )
     return SessionListResponse(items=await _summaries(session, items), total=total)
 

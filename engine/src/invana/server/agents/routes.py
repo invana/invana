@@ -13,8 +13,11 @@ from fastapi import APIRouter, status
 from invana.apps.agents.schemas import (
     AgentLineageResponse,
     AgentListResponse,
+    AgentMeters,
     AgentRead,
+    AgentSkillsAndCallables,
     LifecyclePreview,
+    SoulPreviewResponse,
 )
 from invana.core.events.schemas import EventListResponse
 from invana.server.agents import views
@@ -36,6 +39,11 @@ agents_router.get("/{agent_id}/retire", response_model=LifecyclePreview)(views.p
 agents_router.post("/{agent_id}/retire", response_model=AgentRead)(views.retire_agent)
 agents_router.get("/{agent_id}/lineage", response_model=AgentLineageResponse)(views.agent_lineage)
 agents_router.get("/{agent_id}/activity", response_model=EventListResponse)(views.agent_activity)
+agents_router.get("/{agent_id}/meters", response_model=AgentMeters)(views.agent_meters)
+agents_router.get("/{agent_id}/skills-and-callables", response_model=AgentSkillsAndCallables)(
+    views.skills_and_callables
+)
+agents_router.post("/{agent_id}/soul/preview", response_model=SoulPreviewResponse)(views.preview_soul)
 agents_router.post("/{agent_id}/skills/{skill_id}", response_model=AgentRead)(views.bind_skill)
 agents_router.delete("/{agent_id}/skills/{skill_id}", response_model=AgentRead)(views.unbind_skill)
 

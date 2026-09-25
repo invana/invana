@@ -190,6 +190,11 @@ class RunVars:
     #: the project's working rules, in that fixed order (skills/spec.md § 4).
     rules: list[Rule] = field(default_factory=list)
     instructions: str = ""
+    #: How the agent speaks — ``render_traits(soul_traits)`` then ``soul or
+    #: DEFAULT_VOICE``, read once at run open (SO6). Only the steps whose words a
+    #: person reads take it; Plan, Translate, Validate and Execute have no
+    #: parameter for it (SO2).
+    soul: str = ""
     # The agent this run thinks through, and the envelope that bounds it.
     agent: Any = None
     envelope: Any = None

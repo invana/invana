@@ -23,7 +23,12 @@ class AgentCreate(BaseModel):
     # because a bind is a write with its own refusal (BN5 · BN6).
     skill_ids: list[str] = Field(default_factory=list)
     budget: dict[str, Any] = Field(default_factory=dict)
+    effort: dict[str, int] = Field(default_factory=dict)
     policy: dict[str, Any] = Field(default_factory=dict)
+    # Empty is Invana's default voice (SO3). The dials are checked against their
+    # vocabulary by the manager, which names what it refused (AG16).
+    soul: str = Field(default="")
+    soul_traits: dict[str, str] = Field(default_factory=dict)
 
 
 class AgentUpdate(BaseModel):
@@ -33,7 +38,12 @@ class AgentUpdate(BaseModel):
     workflow_spec: dict[str, Any] | None = None
     # No `skill_ids`: binding is not a field of the agent. See AgentCreate.
     budget: dict[str, Any] | None = None
+    effort: dict[str, int] | None = None
     policy: dict[str, Any] | None = None
+    # Read by set-ness: `""` clears the soul back to the default voice, `None`
+    # leaves it alone.
+    soul: str | None = None
+    soul_traits: dict[str, str] | None = None
 
 
 class AgentRead(BaseModel):
@@ -58,7 +68,13 @@ class AgentRead(BaseModel):
     guardrail_id: str | None = None
     guardrail_name: str | None = None
     budget: dict[str, Any]
+    #: As stored — a missing key is the default. ``effective_effort`` is what a
+    #: run reads, with the one-release fallbacks filled in (EB9).
+    effort: dict[str, Any]
+    effective_effort: dict[str, int]
     policy: dict[str, Any]
+    soul: str
+    soul_traits: dict[str, str]
     parent_agent_id: str | None
     spawned_in_run_id: str | None
     version: int
@@ -250,6 +266,99 @@ class SkillUsageResponse(BaseModel):
     by_outcome: list[SkillUsageByOutcome] = Field(default_factory=list)
     used_by: list[AgentRead]
     recent_steps: list[SkillUsageStep]
+
+
+class AgentSkillRow(BaseModel):
+    """One bound skill, and the callables its current plan names (C12)."""
+
+    skill_id: str
+    name: str
+    #: The current version's number — a binding does not pin (BN6). Null for a
+    #: skill with no published version, which is offered nothing yet.
+    version: int | None
+    when_to_use: str
+    #: Derived from the current version's plan, `uses` already inlined — never
+    #: typed (AG15). In plan order, each once.
+    needs: list[str]
+    #: The library plans that plan inlined, as `key@version`.
+    uses: list[str] = Field(default_factory=list)
+    #: The `needs` this agent's envelope does not allow — the row marks them
+    #: before any run is refused.
+    missing: list[str] = Field(default_factory=list)
+    #: This agent's runs only, for the current version (US3).
+    offered: int = 0
+    applied: int = 0
+    enough_to_read: bool = False
+
+
+class AgentCallableRow(BaseModel):
+    """One callable the envelope allows (C12)."""
+
+    step_key: str
+    #: The one bound it spends — `graph_read` · `llm` · `none` … — or `unknown`
+    #: for a key the catalogue no longer has.
+    bound: str
+    #: The arguments fixed for this agent, or empty.
+    pinned: dict[str, Any] = Field(default_factory=dict)
+    #: Skill ids and base-plan refs (`key@version`) whose plan names it. Empty is
+    #: *nothing bound* — allowed, and a candidate for tightening (EB5).
+    needed_by: list[str] = Field(default_factory=list)
+
+
+class AgentSkillsAndCallables(BaseModel):
+    """Both tables of *What this agent can do*, in one read."""
+
+    agent_id: str
+    skills: list[AgentSkillRow]
+    callables: list[AgentCallableRow]
+    #: The base plans a Plan step may pick, as `key@version` — the envelope's
+    #: `templates`, resolved to the newest version the Graph holds.
+    plans: list[str] = Field(default_factory=list)
+
+
+class SoulPreviewRequest(BaseModel):
+    """The draft voice, and the ask to hear it on (SO7)."""
+
+    ask: str = Field(..., min_length=1, max_length=2000)
+    soul: str = Field(default="")
+    soul_traits: dict[str, str] = Field(default_factory=dict)
+
+
+class SoulPreviewResponse(BaseModel):
+    """One ask, answered twice. Neither reply read the graph — a voice is being
+    judged, not an answer."""
+
+    ask: str
+    current: str
+    draft: str
+    #: `llm/<provider>/<model>` — what spoke, so the preview is not anonymous.
+    model: str | None = None
+
+
+class AgentMeters(BaseModel):
+    """What the agent is using now, each beside the limit that caps it (AG23).
+
+    Spend is absent — not zero — when no run this month was priced (AG11).
+    """
+
+    agent_id: str
+    spend_this_month: float | None = None
+    max_cost_usd_month: float | None = None
+    max_cost_usd_run: float | None = None
+    running: int = 0
+    queued: int = 0
+    max_concurrent_runs: int | None = None
+    runs_this_month: int = 0
+    #: Sessions bound to this agent, the Graph's — a count, not the sessions,
+    #: which stay private to whoever opened them.
+    sessions: int = 0
+    #: Agents it has spawned this month, and how deep it sits itself.
+    spawned_this_month: int = 0
+    depth: int = 0
+    max_children: int | None = None
+    max_depth: int | None = None
+    max_fanout: int | None = None
+    max_tokens: int | None = None
 
 
 class DefaultAgentRequest(BaseModel):

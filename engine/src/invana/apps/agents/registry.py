@@ -368,6 +368,9 @@ class SeededAgent:
     # (docs/for-developers/modules/agents/features/delegation.md DG2). Empty on an
     # agent that does not delegate, which is all of them but one.
     budget: dict = field(default_factory=dict)
+    # Steps, replans, clarifications — how hard it tries (EB9). Its own column,
+    # neither the envelope nor the budget.
+    effort: dict = field(default_factory=dict)
 
 
 _PLANNING_ALLOW = [
@@ -396,10 +399,8 @@ EXPLORER = SeededAgent(
         # cannot unset it; the validator rejects a plan that tries.
         "pins": {"execute_graph_query": {"read_only": True}},
         "templates": ["nl-single", "nl-compare", "ql-direct"],
-        "max_steps": 16,
-        "max_replans": 1,
-        "max_clarifications": 3,
     },
+    effort={"max_steps": 16, "max_replans": 1, "max_clarifications": 3},
 )
 
 QL_AGENT = SeededAgent(
@@ -412,8 +413,8 @@ QL_AGENT = SeededAgent(
         "allow": ["validate_query", "execute_graph_query", "shape_for_canvas", "verify_result"],
         "pins": {"execute_graph_query": {"read_only": True}},
         "steps": list(QL_DIRECT.steps),
-        "max_steps": 8,
     },
+    effort={"max_steps": 8},
 )
 
 MODELLER = SeededAgent(
@@ -429,8 +430,8 @@ MODELLER = SeededAgent(
         "entry": "understand_ask",
         "allow": ["understand_ask", "propose_model", "validate_proposal"],
         "steps": list(MODELLER_PROPOSE.steps),
-        "max_steps": 6,
     },
+    effort={"max_steps": 6},
 )
 
 # The one seeded agent that may delegate
@@ -458,10 +459,8 @@ COORDINATOR = SeededAgent(
         "allow": [*_PLANNING_ALLOW, "spawn_agent", "delegate", "await_delegations"],
         "pins": {"execute_graph_query": {"read_only": True}},
         "templates": ["nl-single", "nl-compare", "ql-direct"],
-        "max_steps": 24,
-        "max_replans": 1,
-        "max_clarifications": 3,
     },
+    effort={"max_steps": 24, "max_replans": 1, "max_clarifications": 3},
     budget={"max_depth": 2, "max_children": 3},
 )
 

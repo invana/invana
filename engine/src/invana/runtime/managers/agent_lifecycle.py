@@ -20,6 +20,7 @@ from invana.apps.agents.querysets import AgentQuerySet
 from invana.apps.agents.schemas import (
     AgentEdge,
     AgentLineageResponse,
+    AgentMeters,
     AgentNode,
     LifecycleAct,
     LifecycleEffect,
@@ -27,19 +28,28 @@ from invana.apps.agents.schemas import (
     LifecyclePreview,
 )
 from invana.apps.sessions.models import Session as ChatSession
+from invana.apps.sessions.querysets import SessionQuerySet
 from invana.apps.work.models import Task, TaskStatus
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
-from invana.runtime.models import TaskRun
+from invana.runtime.delegation import depth_of
+from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.querysets import TaskRunQuerySet
+
+
+def _month_start() -> datetime:
+    """The first of this calendar month — the window ``max_cost_usd_month``
+    names (AG11)."""
+    return datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
 class AgentLifecycleManager:
     agents_qs = AgentQuerySet()
     agent_rules = AgentManager()
     runs_qs = TaskRunQuerySet()
+    sessions_qs = SessionQuerySet()
 
     async def spend_this_month(self, session: AsyncSession, *, graph_id: str) -> dict[str, float]:
         """``{agent_id: usd}`` since the first of the month, for the list's
@@ -51,9 +61,35 @@ class AgentLifecycleManager:
         rolling thirty days would draw a different number from the ceiling it
         sits beside.
         """
-        now = datetime.now(UTC)
-        since = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        return await self.runs_qs.spend_by_agent(session, graph_id=graph_id, since=since)
+        return await self.runs_qs.spend_by_agent(session, graph_id=graph_id, since=_month_start())
+
+    async def meters(self, session: AsyncSession, *, agent: Agent) -> AgentMeters:
+        """What the agent is using now, each beside the limit that caps it — the
+        Activity tab's strip ([AG23](docs/for-developers/modules/agents/features/author-an-agent.md)).
+
+        Every number is derived from the record on read; none is a counter.
+        Spend is ``None`` when nothing this month was priced (AG11).
+        """
+        since = _month_start()
+        budget = agent.effective_budget
+        in_flight = await self.runs_qs.in_flight_for_agent(session, agent_id=agent.id)
+        return AgentMeters(
+            agent_id=agent.id,
+            spend_this_month=await self.runs_qs.spend_for_agent(session, agent_id=agent.id, since=since),
+            max_cost_usd_month=budget.get("max_cost_usd_month"),
+            max_cost_usd_run=budget.get("max_cost_usd_run"),
+            running=sum(1 for run in in_flight if run.status == RunStatus.running.value),
+            queued=sum(1 for run in in_flight if run.status == RunStatus.queued.value),
+            max_concurrent_runs=budget.get("max_concurrent_runs"),
+            runs_this_month=await self.runs_qs.root_count_for_agent(session, agent_id=agent.id, since=since),
+            sessions=await self.sessions_qs.count_for_agent(session, graph_id=agent.graph_id, agent_id=agent.id),
+            spawned_this_month=await self.agents_qs.spawned_since(session, parent_id=agent.id, since=since),
+            depth=await depth_of(session, agent),
+            max_children=budget.get("max_children"),
+            max_depth=budget.get("max_depth"),
+            max_fanout=budget.get("max_fanout"),
+            max_tokens=budget.get("max_tokens"),
+        )
 
     async def preview(self, session: AsyncSession, *, agent: Agent, act: LifecycleAct) -> LifecyclePreview:
         """The open work this act would disturb, item by item.

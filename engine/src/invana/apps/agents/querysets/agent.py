@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from sqlalchemy import select
+from datetime import datetime
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.agents.models import Agent, AgentLifetime, AgentStatus
@@ -47,6 +49,14 @@ class AgentQuerySet:
     async def children(self, session: AsyncSession, agent_id: str) -> list[Agent]:
         stmt = select(Agent).where(Agent.parent_agent_id == agent_id).order_by(Agent.created_at)
         return list((await session.execute(stmt)).scalars().all())
+
+    async def spawned_since(self, session: AsyncSession, *, parent_id: str, since: datetime) -> int:
+        """Agents this one has spawned since ``since`` — the meter beside
+        ``max_children`` on the Activity tab."""
+        stmt = (
+            select(func.count()).select_from(Agent).where(Agent.parent_agent_id == parent_id, Agent.created_at >= since)
+        )
+        return int((await session.execute(stmt)).scalar_one())
 
     async def by_ids(self, session: AsyncSession, *, graph_id: str, ids: list[str]) -> list[Agent]:
         """The named agents in one Graph, ordered by name.

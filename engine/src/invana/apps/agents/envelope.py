@@ -9,9 +9,9 @@ Two documents, one grammar:
 
 ``Envelope``
     ``agents.workflow_spec`` — set by the agent's author. Names the tasks any
-    plan may contain (``allow``), the args no plan may rebind (``pins``), the
-    library workflows a *Plan* step may select (``templates``), and the budget
-    ceilings. **It does not name preconditions**: a step's ``requires`` is
+    plan may contain (``allow``), the args no plan may rebind (``pins``) and the
+    library workflows a *Plan* step may select (``templates``). The effort
+    ceilings are ``agents.effort``, handed in. **It does not name preconditions**: a step's ``requires`` is
     declared on its catalogue entry, so the planner reads it while drafting
     instead of being refused and redrafting
     (docs/for-developers/orchestration.md §0.6).
@@ -147,9 +147,13 @@ class Envelope:
     max_clarifications: int
 
     @classmethod
-    def from_spec(cls, spec: dict | None, *, budget: dict | None = None) -> Envelope:
+    def from_spec(cls, spec: dict | None, *, effort: dict | None = None) -> Envelope:
+        """``effort`` is the agent's ``effective_effort``, fallbacks already
+        applied (EB9). Left out — a draft checked against the whole catalogue —
+        the spec's own numbers are read, then the defaults.
+        """
         spec = spec or {}
-        budget = budget or {}
+        effort = effort or {}
         raw_steps = spec.get("steps") or []
         steps = tuple(PlanStep.parse(s, index=i) for i, s in enumerate(raw_steps))
         pins = {k: v for k, v in (spec.get("pins") or {}).items() if isinstance(v, dict)}
@@ -163,9 +167,9 @@ class Envelope:
             templates=frozenset(spec.get("templates") or []),
             entry=spec.get("entry"),
             steps=steps,
-            max_steps=int(spec.get("max_steps") or budget.get("max_steps") or 24),
-            max_replans=int(spec.get("max_replans") or budget.get("max_replans") or 1),
-            max_clarifications=int(spec.get("max_clarifications") or budget.get("max_clarifications") or 3),
+            max_steps=_effort(effort, spec, "max_steps", 24),
+            max_replans=_effort(effort, spec, "max_replans", 1),
+            max_clarifications=_effort(effort, spec, "max_clarifications", 3),
         )
 
     @property
@@ -175,6 +179,14 @@ class Envelope:
 
     def pinned_args(self, task: str) -> dict[str, Any]:
         return dict(self.pins.get(task) or {})
+
+
+def _effort(effort: dict, spec: dict, key: str, default: int) -> int:
+    """By presence, not truthiness — ``max_clarifications: 0`` never asks."""
+    for source in (effort, spec):
+        if source.get(key) is not None:
+            return int(source[key])
+    return default
 
 
 def validate_plan(

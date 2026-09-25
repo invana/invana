@@ -50,6 +50,7 @@ class SessionManager:
         sort: str = "updated",
         include_archived: bool = False,
         surface: str | None = None,
+        agent_id: str | None = None,
     ) -> tuple[list[Session], int]:
         items = await self.sessions_qs.list_for_user(
             session,
@@ -60,9 +61,15 @@ class SessionManager:
             sort=sort,
             include_archived=include_archived,
             surface=surface,
+            agent_id=agent_id,
         )
         total = await self.sessions_qs.count_for_user(
-            session, graph_id=graph_id, user_id=user_id, include_archived=include_archived, surface=surface
+            session,
+            graph_id=graph_id,
+            user_id=user_id,
+            include_archived=include_archived,
+            surface=surface,
+            agent_id=agent_id,
         )
         return items, total
 

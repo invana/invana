@@ -27,7 +27,7 @@ pytestmark = pytest.mark.asyncio
 
 
 def _envelope(**overrides) -> Envelope:
-    return Envelope.from_spec({**EXPLORER.workflow_spec, **overrides}, budget={})
+    return Envelope.from_spec({**EXPLORER.workflow_spec, **overrides}, effort=EXPLORER.effort)
 
 
 async def _root(session: AsyncSession, graph: Graph) -> TaskRun:

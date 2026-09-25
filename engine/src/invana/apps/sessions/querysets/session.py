@@ -24,6 +24,7 @@ class SessionQuerySet:
         sort: str = "updated",
         include_archived: bool = False,
         surface: str | None = None,
+        agent_id: str | None = None,
     ) -> list[Session]:
         # Pinned always float to the top; within each group, newest by the
         # chosen field. `created` and anything else fall back to updated_at.
@@ -39,6 +40,8 @@ class SessionQuerySet:
             stmt = stmt.where(Session.archived.is_(False))
         if surface is not None:
             stmt = stmt.where(Session.surface == surface)
+        if agent_id is not None:
+            stmt = stmt.where(Session.agent_id == agent_id)
         return list((await session.execute(stmt)).scalars().all())
 
     async def count_for_user(
@@ -49,6 +52,7 @@ class SessionQuerySet:
         user_id: str,
         include_archived: bool = False,
         surface: str | None = None,
+        agent_id: str | None = None,
     ) -> int:
         stmt = (
             select(func.count())
@@ -59,6 +63,19 @@ class SessionQuerySet:
             stmt = stmt.where(Session.archived.is_(False))
         if surface is not None:
             stmt = stmt.where(Session.surface == surface)
+        if agent_id is not None:
+            stmt = stmt.where(Session.agent_id == agent_id)
+        return int((await session.execute(stmt)).scalar_one())
+
+    async def count_for_agent(self, session: AsyncSession, *, graph_id: str, agent_id: str) -> int:
+        """Every session bound to one agent, whoever opened it — a **count**,
+        never the rows, which stay private to their creator. The one read here
+        not scoped by ``created_by_id``, because a number names no thread."""
+        stmt = (
+            select(func.count())
+            .select_from(Session)
+            .where(Session.graph_id == graph_id, Session.agent_id == agent_id, Session.archived.is_(False))
+        )
         return int((await session.execute(stmt)).scalar_one())
 
     async def get(self, session: AsyncSession, session_id: str) -> Session | None:

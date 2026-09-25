@@ -160,6 +160,7 @@ TASK_DELETE = "task.delete"
 # ── Agents as principals (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────
 AGENT_CREATE = "agent.create"
 AGENT_UPDATE = "agent.update"
+AGENT_SOUL_SET = "agent.soul_set"  # the soul or its voice dials (SO C4 · AG16)
 AGENT_PAUSE = "agent.pause"
 AGENT_RESUME = "agent.resume"
 AGENT_RETIRE = "agent.retire"

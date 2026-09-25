@@ -87,12 +87,23 @@ def narrow(parent: Agent, *, requested: dict) -> dict:
     # otherwise `max_depth` would only ever bound the first hop.
     budget["max_depth"] = max(0, int(parent_budget.get("max_depth", 2)) - 1)
 
+    # Effort narrows the same way (EB9). A request that still names these under
+    # `budget` — where they lived before — is read for one release.
+    wanted_effort = {**(requested.get("budget") or {}), **(requested.get("effort") or {})}
+    effort: dict = {}
+    for key, parent_value in parent.effective_effort.items():
+        wanted = wanted_effort.get(key, parent_value)
+        try:
+            effort[key] = min(int(wanted), parent_value)
+        except (TypeError, ValueError):
+            effort[key] = parent_value
+
     spec = copy.deepcopy(parent_spec)
     spec["allow"] = allow
     # A child never spawns unless its parent's policy says the line continues.
     spec.pop("steps", None)
     spec["entry"] = requested.get("entry") or "understand"
-    return {"allow": allow, "skill_ids": skills, "budget": budget, "workflow_spec": spec}
+    return {"allow": allow, "skill_ids": skills, "budget": budget, "effort": effort, "workflow_spec": spec}
 
 
 async def depth_of(db: AsyncSession, agent: Agent) -> int:
@@ -147,6 +158,11 @@ async def spawn(
         instructions=instructions,
         workflow_spec=narrowed["workflow_spec"],
         budget=narrowed["budget"],
+        effort=narrowed["effort"],
+        # A child speaks as its parent does — the spawn names no other voice
+        # (soul.md § Seams). Words only, so inheriting it widens nothing.
+        soul=parent.soul,
+        soul_traits=dict(parent.soul_traits or {}),
         # Bounded agency does not propagate by default: a spawned agent cannot
         # spawn unless it was deliberately given the policy.
         policy={"can_spawn": False, "can_be_assigned": False},

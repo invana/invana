@@ -577,6 +577,37 @@
         "title": "ActorRef",
         "type": "object"
       },
+      "AgentCallableRow": {
+        "description": "One callable the envelope allows (C12).",
+        "properties": {
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "needed_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needed By",
+            "type": "array"
+          },
+          "pinned": {
+            "additionalProperties": true,
+            "title": "Pinned",
+            "type": "object"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "bound"
+        ],
+        "title": "AgentCallableRow",
+        "type": "object"
+      },
       "AgentChip": {
         "properties": {
           "id": {
@@ -612,6 +643,13 @@
             "title": "Description",
             "type": "string"
           },
+          "effort": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Effort",
+            "type": "object"
+          },
           "envelope_from": {
             "anyOf": [
               {
@@ -646,6 +684,18 @@
             },
             "title": "Skill Ids",
             "type": "array"
+          },
+          "soul": {
+            "default": "",
+            "title": "Soul",
+            "type": "string"
+          },
+          "soul_traits": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Soul Traits",
+            "type": "object"
           },
           "workflow_spec": {
             "anyOf": [
@@ -779,6 +829,138 @@
         "title": "AgentListResponse",
         "type": "object"
       },
+      "AgentMeters": {
+        "description": "What the agent is using now, each beside the limit that caps it (AG23).\n\nSpend is absent \u2014 not zero \u2014 when no run this month was priced (AG11).",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "depth": {
+            "default": 0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "max_children": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Children"
+          },
+          "max_concurrent_runs": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Concurrent Runs"
+          },
+          "max_cost_usd_month": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Cost Usd Month"
+          },
+          "max_cost_usd_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Cost Usd Run"
+          },
+          "max_depth": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Depth"
+          },
+          "max_fanout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Fanout"
+          },
+          "max_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens"
+          },
+          "queued": {
+            "default": 0,
+            "title": "Queued",
+            "type": "integer"
+          },
+          "running": {
+            "default": 0,
+            "title": "Running",
+            "type": "integer"
+          },
+          "runs_this_month": {
+            "default": 0,
+            "title": "Runs This Month",
+            "type": "integer"
+          },
+          "sessions": {
+            "default": 0,
+            "title": "Sessions",
+            "type": "integer"
+          },
+          "spawned_this_month": {
+            "default": 0,
+            "title": "Spawned This Month",
+            "type": "integer"
+          },
+          "spend_this_month": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spend This Month"
+          }
+        },
+        "required": [
+          "agent_id"
+        ],
+        "title": "AgentMeters",
+        "type": "object"
+      },
       "AgentNode": {
         "description": "One node on the lineage canvas. Heterogeneous by design\n(docs/for-developers/modules/agents/features/lineage.md).",
         "properties": {
@@ -867,6 +1049,18 @@
             "title": "Description",
             "type": "string"
           },
+          "effective_effort": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Effective Effort",
+            "type": "object"
+          },
+          "effort": {
+            "additionalProperties": true,
+            "title": "Effort",
+            "type": "object"
+          },
           "graph_id": {
             "title": "Graph Id",
             "type": "string"
@@ -947,6 +1141,17 @@
             "title": "Skill Ids",
             "type": "array"
           },
+          "soul": {
+            "title": "Soul",
+            "type": "string"
+          },
+          "soul_traits": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Soul Traits",
+            "type": "object"
+          },
           "spawned_in_run_id": {
             "anyOf": [
               {
@@ -990,7 +1195,11 @@
           "workflow_spec",
           "skill_ids",
           "budget",
+          "effort",
+          "effective_effort",
           "policy",
+          "soul",
+          "soul_traits",
           "parent_agent_id",
           "spawned_in_run_id",
           "version",
@@ -1000,6 +1209,116 @@
           "updated_at"
         ],
         "title": "AgentRead",
+        "type": "object"
+      },
+      "AgentSkillRow": {
+        "description": "One bound skill, and the callables its current plan names (C12).",
+        "properties": {
+          "applied": {
+            "default": 0,
+            "title": "Applied",
+            "type": "integer"
+          },
+          "enough_to_read": {
+            "default": false,
+            "title": "Enough To Read",
+            "type": "boolean"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needs",
+            "type": "array"
+          },
+          "offered": {
+            "default": 0,
+            "title": "Offered",
+            "type": "integer"
+          },
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "uses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Uses",
+            "type": "array"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "when_to_use": {
+            "title": "When To Use",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill_id",
+          "name",
+          "version",
+          "when_to_use",
+          "needs"
+        ],
+        "title": "AgentSkillRow",
+        "type": "object"
+      },
+      "AgentSkillsAndCallables": {
+        "description": "Both tables of *What this agent can do*, in one read.",
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "callables": {
+            "items": {
+              "$ref": "#/components/schemas/AgentCallableRow"
+            },
+            "title": "Callables",
+            "type": "array"
+          },
+          "plans": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/AgentSkillRow"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "agent_id",
+          "skills",
+          "callables"
+        ],
+        "title": "AgentSkillsAndCallables",
         "type": "object"
       },
       "AgentUpdate": {
@@ -1026,6 +1345,20 @@
               }
             ],
             "title": "Description"
+          },
+          "effort": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effort"
           },
           "instructions": {
             "anyOf": [
@@ -1062,6 +1395,31 @@
               }
             ],
             "title": "Policy"
+          },
+          "soul": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soul"
+          },
+          "soul_traits": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soul Traits"
           },
           "workflow_spec": {
             "anyOf": [
@@ -11288,6 +11646,69 @@
         "title": "SortSpec",
         "type": "object"
       },
+      "SoulPreviewRequest": {
+        "description": "The draft voice, and the ask to hear it on (SO7).",
+        "properties": {
+          "ask": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Ask",
+            "type": "string"
+          },
+          "soul": {
+            "default": "",
+            "title": "Soul",
+            "type": "string"
+          },
+          "soul_traits": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Soul Traits",
+            "type": "object"
+          }
+        },
+        "required": [
+          "ask"
+        ],
+        "title": "SoulPreviewRequest",
+        "type": "object"
+      },
+      "SoulPreviewResponse": {
+        "description": "One ask, answered twice. Neither reply read the graph \u2014 a voice is being\njudged, not an answer.",
+        "properties": {
+          "ask": {
+            "title": "Ask",
+            "type": "string"
+          },
+          "current": {
+            "title": "Current",
+            "type": "string"
+          },
+          "draft": {
+            "title": "Draft",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "required": [
+          "ask",
+          "current",
+          "draft"
+        ],
+        "title": "SoulPreviewResponse",
+        "type": "object"
+      },
       "StagedChange": {
         "description": "One difference between the draft and the version it replaces.",
         "properties": {
@@ -16004,6 +16425,76 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/meters": {
+      "get": {
+        "description": "What the agent is using now, beside the limits that cap it (AG23).",
+        "operationId": "agent_meters_api_v1_u__username___graphSlug__agents__agent_id__meters_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMeters"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Agent Meters",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/pause": {
       "get": {
         "description": "What pausing would do. Pausing blocks the same todos retiring blocks, so\nit names them the same way before it happens (LC10).",
@@ -16364,6 +16855,76 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/skills-and-callables": {
+      "get": {
+        "description": "Both tables of *What this agent can do*, each naming the other (C12).",
+        "operationId": "skills_and_callables_api_v1_u__username___graphSlug__agents__agent_id__skills_and_callables_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSkillsAndCallables"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Skills And Callables",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/skills/{skill_id}": {
       "delete": {
         "description": "Stop offering a skill to this agent.\n\nThe next run is not offered it; a run already in flight has its prompt and\nis unaffected.",
@@ -16515,6 +17076,86 @@
           }
         ],
         "summary": "Bind Skill",
+        "tags": [
+          "agents"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/agents/{agent_id}/soul/preview": {
+      "post": {
+        "description": "One ask, in the current voice and in the draft (SO7). Saves nothing.",
+        "operationId": "preview_soul_api_v1_u__username___graphSlug__agents__agent_id__soul_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_id",
+            "required": true,
+            "schema": {
+              "title": "Agent Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SoulPreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoulPreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Preview Soul",
         "tags": [
           "agents"
         ]
@@ -26187,6 +26828,24 @@
                 }
               ],
               "title": "Surface"
+            }
+          },
+          {
+            "description": "Only the sessions bound to this agent.",
+            "in": "query",
+            "name": "agent_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only the sessions bound to this agent.",
+              "title": "Agent Id"
             }
           }
         ],

@@ -79,6 +79,10 @@ async def understand_intent(ctx: TaskContext, v: RunVars) -> Out:
             version=v.global_model,
             encryption_key=v.encryption_key,
             instructions=v.instructions,
+            # Understand is a step whose words a person reads — its question
+            # and its reason — so it takes the voice (soul.md § What reads the
+            # soul). Translate, beside it, takes no such argument (SO2).
+            voice=v.soul,
             skills=render_skills(v.skills),
             rules=render_rules(v.rules),
             history=crossing.history(v.history),

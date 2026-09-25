@@ -10,18 +10,22 @@ from __future__ import annotations
 from fastapi import Depends, Path, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from invana.apps.agents.managers import AgentManager
+from invana.apps.agents.managers import AgentManager, SoulManager
 from invana.apps.agents.models import AgentStatus
 from invana.apps.agents.schemas import (
     AgentCreate,
     AgentLineageResponse,
     AgentListResponse,
+    AgentMeters,
     AgentRead,
+    AgentSkillsAndCallables,
     AgentUpdate,
     DefaultAgentRequest,
     LifecycleAct,
     LifecyclePreview,
     RetireRequest,
+    SoulPreviewRequest,
+    SoulPreviewResponse,
 )
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.skills.managers import SkillBindingManager, SkillManager
@@ -30,11 +34,13 @@ from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events.schemas import EventListResponse
 from invana.core.events.store import EventFilter, EventStore
-from invana.runtime.managers import AgentLifecycleManager, SkillBindManager
+from invana.runtime.managers import AgentCapabilitiesManager, AgentLifecycleManager, SkillBindManager
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 agents = AgentManager()
 lifecycle = AgentLifecycleManager()
+capabilities = AgentCapabilitiesManager()
+souls = SoulManager()
 skills = SkillManager()
 bindings = SkillBindingManager()
 #: The bind-time checks. Skills and plans are two apps, so the check that reads
@@ -207,6 +213,40 @@ async def agent_activity(
         cursor=cursor,
         page_size=page_size,
     )
+
+
+async def agent_meters(
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> AgentMeters:
+    """What the agent is using now, beside the limits that cap it (AG23)."""
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    return await lifecycle.meters(session, agent=agent)
+
+
+async def skills_and_callables(
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> AgentSkillsAndCallables:
+    """Both tables of *What this agent can do*, each naming the other (C12)."""
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    return await capabilities.read(session, agent=agent)
+
+
+async def preview_soul(
+    payload: SoulPreviewRequest,
+    agent_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> SoulPreviewResponse:
+    """One ask, in the current voice and in the draft (SO7). Saves nothing."""
+    agent = await agents.get_or_404(session, agent_id=agent_id, graph_id=graph.id)
+    return await souls.preview(session, agent=agent, payload=payload)
 
 
 async def set_default_agent(
