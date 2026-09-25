@@ -35,6 +35,7 @@ import {
 	type ChatSessionMessageAction,
 	ChatSessionMessageOptions,
 	ChatSessionPromptRow,
+	Eyebrow,
 	Spinner,
 } from "@invana/ui";
 import {
@@ -481,12 +482,16 @@ function SettledTurn({
 					)}
 					{/* After small talk, what the person could ask next — each one
 					    this run's world lets it answer. A tap is a new ask, not an
-					    answer to this run, which has already settled (NL14). */}
+					    answer to this run, which has already settled, so it wears
+					    the prompt's caret under "Try asking", never a clarifying
+					    question's ○ (NL14). */}
 					{choices.length > 0 && (
 						<div className="flex flex-col items-start gap-px pl-5">
+							<Eyebrow className="px-1">Try asking</Eyebrow>
 							{choices.map((choice) => (
 								<OptionRow
 									key={choice}
+									glyph="❯"
 									label={choice}
 									onSelect={
 										isLatest && !isRunning
