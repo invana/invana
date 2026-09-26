@@ -2671,6 +2671,7 @@ export function GraphDetailPage() {
 							<AllModelsCanvas
 								username={username as string}
 								graphSlug={graphSlug as string}
+								backend={backend}
 								onOpenModel={(id) => {
 									setAllModelsOpen(false);
 									setSelectedModelId(id);

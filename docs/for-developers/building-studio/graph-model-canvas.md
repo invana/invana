@@ -55,6 +55,7 @@ It takes **no children**: a host adds nothing to the canvas but its opt-in stitc
 | `onSelect` | `(selection) => void` | — | one node or edge clicked, or `null` on an empty click |
 | `height` | `number` | — | for a host that gives no height of its own |
 | `stitching` | `{ onStitch, panel, onClosePanel }` | — | turns on the stitch gesture (GM12). Left out, there is no Stitch tool |
+| `backend` | `'webgpu' \| 'webgl'` | auto | the page's render backend (GM13); a change remounts the canvas |
 
 `stitching`:
 
@@ -138,6 +139,7 @@ flowchart LR
 | GM10 | **Every run fits the camera, gliding with the nodes.** As the story: `fitCamera` on each run the canvas starts. The canvas starts a run on new data, a Detail or Layout switch, and a theme change |
 | GM11 | **The theme toggle is the story's.** It switches Studio's own theme, which `CanvasThemeSync` carries back into the canvas, so the canvas and the page never disagree |
 | GM12 | **Stitching is the canvas's own gesture, switched on by the host.** A stitch is the one edge this canvas exists to show crossing a frame, so declaring one belongs on it — without taking the story's drag away. A plain drag moves a type, exactly as in the story; **Shift**-drag from one type onto another draws a stitch (`DrawEdgeBehaviour` armed, node drag off, both start on pointer-down), and the **Stitch mode** toggle — the header's one link icon — keeps that on without Shift. `settings.json` keeps the story's `drag-node: { enabled: true }`, so the canvas re-asserts node drag's on/off after the config lands. A drag from one type onto another asks the host, and the host either refuses in words (the message bar) or hands back the declare card, which docks on the right. The dock has no header toggle of its own: it opens on an accepted drag and closes when the card does (staged or cancelled). The drag never adds an edge to the store; a stitch is a declared row that returns as data, dashed and staged. Docked, not modal, because the two frames the stitch is about stay in view while the keys are named (ST34) |
+| GM13 | **The canvas starts on the page's render backend.** Both hosts pass the graph page's `backend` through, the one Explorer draws on, so a user who pins WebGL gets it here too. The backend is fixed at init, so the canvas is keyed on it |
 | GM14 | **The mount config is handed to the live instances once the canvas is ready.** Under React StrictMode (Studio's root; the Storybook has none) the engine is created, destroyed and created again, and on the second one the behaviours register after the root applied `config` — so they keep their constructor defaults: `collapse-expand` loses `relayoutOnToggle` and `countBadge` (a collapsed frame leaves a hole instead of the graph re-flowing), `hover` its degree, `text-lod` its band. The canvas's definition holds the right config; `GraphModelCanvas` calls `canvas.update(config)` when it gets a canvas, which is what makes it behave as the story does. The root cause sits in `@invana/canvas-react`'s root and is fixed there in time; until then this is one idempotent call |
 
 ## Not building

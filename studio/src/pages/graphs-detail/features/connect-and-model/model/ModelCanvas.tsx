@@ -53,7 +53,7 @@ interface Props {
 	username: string;
 	graphSlug: string;
 	modelId: string;
-	/** Accepted from the page host; the drawing does not read the connector (ME26). */
+	/** The page's render backend — the canvas starts on it (GM13). */
 	backend?: CanvasBackend;
 	/** The type the panel has selected; its form spans the column below. */
 	selection: ModelSelection | null;
@@ -66,6 +66,7 @@ export function ModelCanvas({
 	username,
 	graphSlug,
 	modelId,
+	backend,
 	selection,
 	onSelect,
 	onClose,
@@ -255,6 +256,7 @@ export function ModelCanvas({
 					message="Hover a type for its properties, an edge for what it connects"
 					selected={canvasSelection}
 					onSelect={onCanvasSelect}
+					backend={backend}
 				/>
 			</div>
 

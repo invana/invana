@@ -28,6 +28,7 @@ import {
 } from "@/pages/graphs-detail/features/connect-and-model/stitch/allModels";
 import { DeclareStitchPanel } from "@/pages/graphs-detail/features/connect-and-model/stitch/components/DeclareStitchPanel";
 import { useAllModels } from "@/pages/graphs-detail/features/connect-and-model/stitch/useAllModels";
+import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import type { LinkKind } from "@/types/models";
 import { Button, EmptyState, Spinner } from "@invana/ui";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
@@ -41,9 +42,11 @@ interface Props {
 	 * model (ST57) — the Models panel's list does.
 	 */
 	onOpenModel?: (modelId: string) => void;
+	/** The page's render backend — the canvas starts on it (GM13). */
+	backend?: CanvasBackend;
 }
 
-export function AllModelsCanvas({ username, graphSlug }: Props) {
+export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 	const { frames, links, isLoading, isError, error } = useAllModels(
 		username,
 		graphSlug,
@@ -181,6 +184,7 @@ export function AllModelsCanvas({ username, graphSlug }: Props) {
 					settings={graphModelSettings}
 					templates={graphModelTemplates}
 					title="All models"
+					backend={backend}
 					stitching={{
 						onStitch,
 						onClosePanel: () => setDeclaring(null),

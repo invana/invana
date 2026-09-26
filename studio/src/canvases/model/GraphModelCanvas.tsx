@@ -41,6 +41,7 @@ import {
 	GraphLayer,
 	HoverActivateBehaviour,
 	HoverElementPreviewBehaviour,
+	type RenderPreference,
 	TextLODBehaviour,
 	TextResolutionLODBehaviour,
 	ThemeBehaviour,
@@ -92,6 +93,11 @@ export interface GraphModelCanvasProps {
 	height?: number;
 	/** Declare a stitch by dragging a type onto another (GM12). Left out, the canvas has no Stitch tool. */
 	stitching?: GraphModelStitching;
+	/**
+	 * The page's render backend (GM13). Fixed at init, so a change remounts the
+	 * canvas. Left out, the canvas picks WebGPU where it can.
+	 */
+	backend?: RenderPreference;
 }
 
 /**
@@ -145,6 +151,7 @@ export function GraphModelCanvas({
 	onSelect,
 	height,
 	stitching,
+	backend,
 }: GraphModelCanvasProps) {
 	// `select` drags a type; `stitch` drags a crossing. Both start on node
 	// pointer-down, so only one is ever on. A drag moves a type, as in the story;
@@ -360,6 +367,8 @@ export function GraphModelCanvas({
 			config={config}
 			onReady={onReady}
 			bundle={false}
+			preference={backend}
+			instanceKey={backend}
 			height={height}
 			header={{
 				title,
