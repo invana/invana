@@ -8,9 +8,9 @@
  *
  * A stack has no panel header above its drawers: the first drawer header is the
  * top of the column, and the breadcrumb already says which panel is open (G32).
- * A drill-in replaces that drawer's body and turns its header into
- * `‹ SKILLS / Escalate a late supplier`; the Rules drawer keeps its place
- * underneath (SK17).
+ * The Skills drawer is its list: selecting a row gives a quick look under it,
+ * and **Open** gives the skill's page in `mainSection` (SK17 · SK37). The Rules
+ * drawer keeps its place underneath.
  *
  * ## The canvas keeps whatever it was showing
  *
@@ -22,15 +22,26 @@
 import {
 	useCreateSkillMutation,
 	useRulesQuery,
+	useSkillAgentsQuery,
+	useSkillUsageQuery,
 	useSkillsQuery,
 } from "@/hooks/queries/useSkills";
 import { RulesDrawer } from "@/pages/graphs-detail/features/skills/RulesDrawer";
-import { SkillDetail } from "@/pages/graphs-detail/features/skills/SkillDetail";
+import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
 import type { Skill } from "@/types/skills";
 import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
-import { Badge, PanelStack, type PanelStackSection, Spinner } from "@invana/ui";
-import { ChevronLeft, Maximize2, Plus } from "lucide-react";
+import {
+	Badge,
+	Button,
+	CardFooter,
+	PanelStack,
+	type PanelStackSection,
+	PropertyList,
+	PropertyRow,
+	Spinner,
+} from "@invana/ui";
+import { ChevronLeft, ChevronRight, Maximize2, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -39,22 +50,11 @@ interface Props {
 	onClose?: () => void;
 	selectedSkillId: string | null;
 	onSelectSkill: (id: string | null) => void;
-	onOpenAgent?: (agentId: string) => void;
 	/**
-	 * `More` — open the drilled-in record as a declared board.
-	 *
-	 * Only ever offered **drilled in**: `More` on a list is a question about
-	 * which row, and the row is the thing being read (SK36 · RU11). The stack
-	 * stays where it is; the board opens beside it.
+	 * **Open** — the skill's page in `mainSection` (SK17 · SK37). The stack
+	 * stays where it is; the page opens beside it.
 	 */
-	onOpenSkillDashboard?: (skillId: string) => void;
-	/**
-	 * `More` on the **Usage** tab — the usage board, which is a different
-	 * reading of the same skill and so a different page (SD2). It lives in the
-	 * tab rather than in the panel header, because a header action that changed
-	 * meaning with the selected tab would be two actions wearing one icon.
-	 */
-	onOpenUsageDashboard?: (skillId: string) => void;
+	onOpenSkillPage: (skillId: string) => void;
 	onOpenRuleDashboard?: (ruleId: string) => void;
 }
 
@@ -63,12 +63,9 @@ export function SkillsPanel({
 	graphSlug,
 	selectedSkillId,
 	onSelectSkill,
-	onOpenAgent,
-	onOpenSkillDashboard,
-	onOpenUsageDashboard,
+	onOpenSkillPage,
 	onOpenRuleDashboard,
 }: Props) {
-	const [editing, setEditing] = useState(false);
 	const [openRuleId, setOpenRuleId] = useState<string | null>(null);
 	const [composingRule, setComposingRule] = useState(false);
 	const rules = useRulesQuery(username, graphSlug);
@@ -82,8 +79,9 @@ export function SkillsPanel({
 
 	/**
 	 * A new skill is a **draft** the moment it is created: the row exists, its
-	 * plan exists as one `form: human` node, and the drawer opens on it with the
-	 * prose empty (SK20 · SK22). Nothing is offered it until it is published.
+	 * plan exists as one `form: human` node, and its page opens on Playbook with
+	 * the prose empty (SK20 · SK22 · SK37). Nothing is offered it until it is
+	 * published.
 	 */
 	const newSkill = () => {
 		create.mutate(
@@ -91,26 +89,13 @@ export function SkillsPanel({
 			{
 				onSuccess: (skill) => {
 					onSelectSkill(skill.id);
-					setEditing(true);
+					onOpenSkillPage(skill.id);
 				},
 			},
 		);
 	};
 
 	const skillsBody = () => {
-		if (selected)
-			return (
-				<SkillDetail
-					username={username}
-					graphSlug={graphSlug}
-					skill={selected}
-					editing={editing || selected.is_draft}
-					onEditing={setEditing}
-					onOpenAgent={onOpenAgent}
-					onOpenUsageDashboard={onOpenUsageDashboard}
-				/>
-			);
-
 		if (skills.isLoading)
 			return (
 				<div className="px-3 py-4">
@@ -125,87 +110,61 @@ export function SkillsPanel({
 				</p>
 			);
 		return (
-			<div className="pb-2.5">
-				{items.map((skill) => (
-					<SkillRow
-						key={skill.id}
-						skill={skill}
-						onClick={() => {
-							setEditing(false);
-							onSelectSkill(skill.id);
-						}}
-					/>
-				))}
+			<div className="flex h-full min-h-0 flex-col">
+				<div className="min-h-0 flex-1 overflow-y-auto">
+					{items.map((skill) => (
+						<SkillRow
+							key={skill.id}
+							skill={skill}
+							active={skill.id === selected?.id}
+							onClick={() =>
+								onSelectSkill(skill.id === selected?.id ? null : skill.id)
+							}
+						/>
+					))}
+				</div>
+				{selected ? (
+					<>
+						<SkillQuickLook
+							username={username}
+							graphSlug={graphSlug}
+							skill={selected}
+						/>
+						<CardFooter className="shrink-0 gap-2 border-t">
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => onOpenSkillPage(selected.id)}
+							>
+								<ChevronRight /> Open
+							</Button>
+						</CardFooter>
+					</>
+				) : null}
 			</div>
 		);
 	};
 
-	/**
-	 * The drill-in **is** the drawer's header — `‹ SKILLS / <name>` as the
-	 * section's own title, never a second bar inside the body (G33 · SK17).
-	 */
-	const skillsTitle = selected ? (
-		<span className="flex min-w-0 items-center gap-1">
-			<span className="text-muted-foreground uppercase">Skills</span>
-			<span className="text-muted-foreground opacity-60">/</span>
-			<span className="truncate font-medium">{selected.name}</span>
-			<Badge variant="secondary" className="shrink-0">
-				{selected.is_draft ? "draft" : `v${selected.version}`}
-			</Badge>
-		</span>
-	) : (
-		<SectionTitle count={items.length}>Skills</SectionTitle>
-	);
-
 	const sections: PanelStackSection[] = [
 		{
 			id: "skills",
-			title: skillsTitle,
-			// The header has one action area, and it carries the act the drawer
-			// is for: creating, in the list; going back, once drilled in. The
-			// trail itself is text — a PanelStack header **is** the collapse
-			// control, so an interactive crumb inside it would be a button in a
-			// button, which is invalid and steals the collapse click. `TaskDrawer`
-			// drills in the same way.
-			headerActions: selected
-				? [
-						{
-							key: "back",
-							name: "Back to skills",
-							icon: ChevronLeft,
-							onClick: () => {
-								setEditing(false);
-								onSelectSkill(null);
-							},
-						},
-						// The whole skill as a page — the drawer keeps its place,
-						// which is the point of opening one deliberately rather
-						// than growing this column (SK36 · CV14).
-						...(onOpenSkillDashboard
-							? [
-									{
-										key: "more",
-										name: "Open this skill as a page",
-										icon: Maximize2,
-										onClick: () => onOpenSkillDashboard(selected.id),
-									},
-								]
-							: []),
-					]
-				: [
-						{
-							name: "New skill",
-							icon: Plus,
-							onClick: newSkill,
-						},
-					],
+			title: <SectionTitle count={items.length}>Skills</SectionTitle>,
+			// The header's one action area carries the act the drawer is for
+			// (SK27). The drawer does not drill in — the detail is the page.
+			headerActions: [
+				{
+					name: "New skill",
+					icon: Plus,
+					onClick: newSkill,
+				},
+			],
 			actionsOnHover: false,
 			content: skillsBody(),
 		},
 		{
 			id: "rules",
-			// The same rule the Skills drawer follows: the drill-in **is** the
-			// header — the trail as text, and the act on the right.
+			// The drill-in **is** the header — the trail as text, and the act on
+			// the right (SK27).
 			title: openRule ? (
 				<span className="flex min-w-0 items-center gap-1">
 					<span className="text-muted-foreground uppercase">Rules</span>
@@ -279,12 +238,23 @@ export function SkillsPanel({
  * how many agents carry it. The sentence is not truncated to a word — it is the
  * thing a reader is deciding about.
  */
-function SkillRow({ skill, onClick }: { skill: Skill; onClick: () => void }) {
+function SkillRow({
+	skill,
+	active,
+	onClick,
+}: {
+	skill: Skill;
+	active: boolean;
+	onClick: () => void;
+}) {
 	return (
 		<button
 			type="button"
 			onClick={onClick}
-			className="block w-full border-b px-3 py-2 text-left last:border-b-0 hover:bg-muted/50"
+			aria-pressed={active}
+			className={`block w-full border-b px-3 py-2 text-left last:border-b-0 hover:bg-muted/50 ${
+				active ? "bg-muted" : ""
+			}`}
 		>
 			<div className="flex items-center gap-1.5">
 				<span className="truncate text-base font-medium">{skill.name}</span>
@@ -316,5 +286,58 @@ function SkillRow({ skill, onClick }: { skill: Skill; onClick: () => void }) {
 				</p>
 			) : null}
 		</button>
+	);
+}
+
+/**
+ * The selected row's quick look (SK37): which one is this, and is it used.
+ * Everything else is on the page, one click on by **Open**.
+ */
+function SkillQuickLook({
+	username,
+	graphSlug,
+	skill,
+}: {
+	username: string;
+	graphSlug: string;
+	skill: Skill;
+}) {
+	const usage = useSkillUsageQuery(username, graphSlug, skill.id);
+	const agents = useSkillAgentsQuery(username, graphSlug, skill.id);
+	const current =
+		usage.data?.versions.find(
+			(v) => v.skill_version_id === usage.data?.current_version_id,
+		) ?? null;
+	const bound = (agents.data?.items ?? []).filter((a) => a.bound).length;
+	return (
+		<div className="shrink-0 border-t">
+			<div className="flex items-center gap-2 border-b border-border/60 px-3 py-2">
+				<span className="min-w-0 flex-1 truncate font-semibold">
+					{skill.name}
+				</span>
+				<DetailStatus>
+					{skill.is_draft ? "draft" : `v${skill.version}`}
+				</DetailStatus>
+			</div>
+			<div className="px-3 py-2">
+				<p className="line-clamp-2 pb-1 text-muted-foreground">
+					{skill.when_to_use || "no when-to-use — it is offered on every ask"}
+				</p>
+				<PropertyList labelWidth={84}>
+					<PropertyRow label="usage">
+						{skill.is_draft
+							? "nothing published yet"
+							: current
+								? `offered ${current.offered} · applied ${current.applied}`
+								: usage.isLoading
+									? "…"
+									: "no data yet"}
+					</PropertyRow>
+					<PropertyRow label="agents">
+						{agents.data ? `${bound} bound` : "…"}
+					</PropertyRow>
+				</PropertyList>
+			</div>
+		</div>
 	);
 }

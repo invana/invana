@@ -12,6 +12,7 @@ import {
 import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
 import { useModelsQuery } from "@/hooks/queries/useModels";
 import { useActiveVersionQuery } from "@/hooks/queries/useSchema";
+import { useSkillsQuery } from "@/hooks/queries/useSkills";
 import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
 import { useAgentsQuery, useTaskMutations } from "@/hooks/queries/useWork";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
@@ -81,10 +82,10 @@ import {
 } from "@/pages/graphs-detail/features/operate/dashboards";
 import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
+import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 import { SkillsPanel } from "@/pages/graphs-detail/features/skills/SkillsPanel";
 import {
 	RuleDashboardPage,
-	SkillDashboardPage,
 	UsageDashboardPage,
 } from "@/pages/graphs-detail/features/skills/dashboards";
 import { ProjectsStackPanel } from "@/pages/graphs-detail/features/work/ProjectsStackPanel";
@@ -361,6 +362,12 @@ export function GraphDetailPage() {
 	const agentNameById = useMemo(
 		() => new Map((agentsList.data?.items ?? []).map((a) => [a.id, a.name])),
 		[agentsList.data],
+	);
+	// And a skill's page for the skill (SK17).
+	const skillsList = useSkillsQuery(username, graphSlug);
+	const skillNameById = useMemo(
+		() => new Map((skillsList.data?.items ?? []).map((s) => [s.id, s.name])),
+		[skillsList.data],
 	);
 
 	const {
@@ -2422,20 +2429,8 @@ export function GraphDetailPage() {
 				onClose={closeLeftPanel}
 				selectedSkillId={selectedSkillId}
 				onSelectSkill={setSelectedSkillId}
-				onOpenAgent={(id) => {
-					openWorkPanel("agents");
-					openAgentPage(id);
-				}}
-				// `More`, drilled in — the reading opens as a page and the stack
-				// stays (SK36 · RU11 · CV14).
-				onOpenSkillDashboard={(id) =>
-					openBoard({ kind: "skill", subjectId: id })
-				}
-				// The Usage tab's own `More` — the same page `Usage…` opens from
-				// the skill board, because the two are one reading (SD2).
-				onOpenUsageDashboard={(id) =>
-					openBoard({ kind: "skill_usage", subjectId: id })
-				}
+				// `Open` — the skill's page, and the stack stays (SK17 · SK37).
+				onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
 				onOpenRuleDashboard={(id) => openBoard({ kind: "rule", subjectId: id })}
 			/>
 		) : settingsPanel.section === "govern" ? (
@@ -2744,9 +2739,12 @@ export function GraphDetailPage() {
 					: board.kind === "agent"
 						? (agentNameById.get(board.subjectId) ??
 							BOARD_KINDS[board.kind].label)
-						: board.kind === "run"
-							? runAddress(board.subjectId)
-							: BOARD_KINDS[board.kind].label,
+						: board.kind === "skill"
+							? (skillNameById.get(board.subjectId) ??
+								BOARD_KINDS[board.kind].label)
+							: board.kind === "run"
+								? runAddress(board.subjectId)
+								: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2871,26 +2869,22 @@ export function GraphDetailPage() {
 			);
 		}
 
-		// Skills' three readings. Each binds to its own record and none of them
-		// reads a trace, so none takes `board.runId` (SD3). Opening one leaves
-		// the Skills stack exactly where it was (SK36 · RU11).
+		// The skill's page (SK17 · SK36) — it authors, like the agent's, and
+		// reads no trace, so it takes no `board.runId` (SD3). Its usage and a
+		// rule are readings, and stay boards.
 		if (board.kind === "skill") {
 			return (
-				<SkillDashboardPage
+				<SkillBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					skillId={board.subjectId}
-					onOpenUsage={(id) =>
-						openBoard({ kind: "skill_usage", subjectId: id })
-					}
 					onOpenAgent={(id) => {
 						openWorkPanel("agents");
 						openAgentPage(id);
 					}}
-					onEdit={(id) => {
-						setSelectedSkillId(id);
-						settingsPanel.setSection("skills");
-					}}
+					onOpenUsageDashboard={(id) =>
+						openBoard({ kind: "skill_usage", subjectId: id })
+					}
 				/>
 			);
 		}

@@ -64,7 +64,7 @@ export interface Report<X extends ExtraPanels = Record<never, never>> {
 
 /**
  * Generic over the page's own panels, because a board that registers one —
- * the skill board's `skillFlow` — must keep it through here. Widening to the
+ * the run board's `flow` — must keep it through here. Widening to the
  * built-ins would make `Save report` the thing that erased a page's own panel.
  */
 export function useReport<X extends ExtraPanels>(

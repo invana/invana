@@ -1,13 +1,8 @@
 /**
- * The skill board's flow band — the Flow tab, mounted as a dashboard panel.
- *
- * A registry entry rather than a built-in kind, for the reason
- * `@invana/dashboard` states about `canvas`: the package carries **strings** in
- * the spec and takes renderers as a prop, so a panel that needs a component the
- * package has never heard of arrives from the consumer. Here the component is
- * Skills' own `SkillFlowTab`, so the drawer and the board draw one plan with
- * one `TaskFlowCanvas`
- * ([SK16](../../../../../../docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * The `skillFlow` panel kind — kept for **reports**. `skill:<id>` is now the
+ * skill's page, not a board (SK36), so nothing live composes this panel; a
+ * reading saved from the retired skill board still names it, and a frozen
+ * document renders whatever it names ([B16](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";

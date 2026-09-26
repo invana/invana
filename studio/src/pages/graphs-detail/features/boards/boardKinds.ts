@@ -293,18 +293,16 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		panel: "govern",
 		subject: 'two root task_runs.id joined by ":"',
 	},
-	// Skills' three readings
-	// (docs/for-developers/building-studio/skills-dashboards.md). `skill` and
-	// `skill_usage` name the same record and are **not** the same page: one is
-	// what the playbook declares and will engage, drawn from its plan; the
-	// other is what happened when it was offered, drawn from `task_runs`. The
-	// same pair the layer strip reads in two tenses (SD2).
+	// Skills (docs/for-developers/building-studio/skills-dashboards.md).
+	// `skill` is the skill's page — it authors, like `agent` (SK36). `skill_usage`
+	// names the same record and is **not** the same page: it is what happened
+	// when the skill was offered, drawn from `task_runs` (SD2).
 	skill: {
 		kind: "skill",
 		renders: "dashboard",
 		label: "Skill",
 		icon: Scale,
-		// `More` on the Skills drawer, drilled in (SK36).
+		// `Open` on the Skills drawer's selected row (SK37).
 		panel: "skills",
 		subject: "a skills.id",
 	},

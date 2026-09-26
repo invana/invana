@@ -51,7 +51,7 @@ studio/src/canvases/
 | `initialDetail` | `Detail` | — | `circles` by default, which is what `settings.json` starts on |
 | `selectedId` | `string \| null` | — | the node drawn selected (a ring, no drag handles — [SR52](../modules/operate/features/see-what-ran.md#decisions)) |
 | `onOpenNode` | `(id: string) => void` | — | click on a node. Leave it out and a click only selects |
-| `height` | `number` | — | for a host that gives no height of its own — a dashboard panel body is content-height. Left out, the canvas fills its parent |
+| `height` | `number` | — | for a host that gives no height of its own — a dashboard panel body is content-height. Left out, the canvas fills its parent. The run's `TaskFlowPanel` measures the room left in the dashboard's scroller and passes that, never less than 360px, so the Flow tab takes the whole page |
 
 `Detail` is `'circles' | 'cards'`.
 
@@ -87,7 +87,7 @@ studio/src/canvases/
 | Header right: the theme toggle | ✅ | ❌. Studio's theme drives the canvas through `CanvasThemeSync` |
 | Footer: `GraphStatusBar` · `CanvasMessageBar` | ✅ | ✅ |
 
-The canvas runs ELK itself whenever its data changes, and redraws the layer on `layout:run:end` (`activeLayout` alone does not lay out a graph seeded before the layout registers). elkjs' worker comes from Vite's `?worker` import, as in `AllModelsCanvas`.
+The canvas runs ELK itself whenever its data changes, and redraws the layer on `layout:run:end` (`activeLayout` alone does not lay out a graph seeded before the layout registers). elkjs' worker comes from Vite's `?worker` import, as in `AllModelsCanvas`. After a run the camera never stays past 100%: a fit would frame a five-step plan at 2x on a wide page.
 
 When the Detail select changes: `stopLayout` → `update(templates[detail])` → `runLayout('elk', { fitCamera: { padding: 60 } })`. A new node size needs new positions.
 

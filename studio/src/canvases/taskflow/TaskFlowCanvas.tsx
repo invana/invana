@@ -129,8 +129,13 @@ export function TaskFlowCanvas({
 	useEffect(() => {
 		if (!canvas) return;
 		return canvas.events.on("layout:run:end", (e) => {
-			if (e.id === LAYOUT)
-				canvas.layers.get<GraphLayerEngine>("graph")?.redraw();
+			if (e.id !== LAYOUT) return;
+			canvas.layers.get<GraphLayerEngine>("graph")?.redraw();
+			// A fit frames a five-step plan at 2x on a wide page; nothing reads
+			// better larger than it was drawn, so the fit never zooms past 100%.
+			requestAnimationFrame(() => {
+				if (canvas.camera.scale > 1) canvas.camera.setZoom(1);
+			});
 		});
 	}, [canvas]);
 

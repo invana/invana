@@ -25,8 +25,8 @@ dashboard in a column.
 | Question | Where it is answered |
 |---|---|
 | Which skill? What does it say? | the drawer — unchanged |
-| What will this playbook engage? | the drawer's **Flow** tab — unchanged ([SK16](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| What is this skill, whole — prose, flow, versions, bindings, headline usage | **`skill`** dashboard |
+| What will this playbook engage? | the page's **Flow** tab ([SK16](../modules/skills/features/authoring-a-skill.md#decisions)) |
+| What is this skill, whole — prose, flow, versions, bindings, headline usage | the skill's **page**, `skill:<id>` ([SK17 · SK36](../modules/skills/features/authoring-a-skill.md#decisions)) — not a dashboard |
 | Is it applied, by whom, in which outcomes, and what does the gap mean | **`skill_usage`** dashboard |
 | Was this statement offered, cited, and where | **`rule`** dashboard |
 
@@ -72,39 +72,13 @@ three trace-reading kinds are the only ones that set it — which is what `subje
 
 ---
 
-## 3. `skill` — the panel set
+## 3. `skill` — a page, not a panel set
 
-One row per band, in the order the drawer's tabs are read. Every panel with nothing behind it is
-**absent, not empty** ([SR34](../modules/operate/features/see-what-ran.md)).
-
-| # | Band | Kind | Carries | Absent when |
-|---|---|---|---|---|
-| 1 | tiles | `metrics` | `Offered` · `Applied` · `The gap` · `Bound to` · `Tasks` | a draft — nothing has been offered a draft ([SK21](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| 2 | **When to use** | `text` | the trigger sentence, verbatim | never — a published skill with none says *offered on every ask*; a draft says it is published to nobody ([SD10](#sd10--a-draft-has-no-published-text-and-every-band-that-reads-one-says-so)) |
-| 3 | **The playbook** | `code` (`plain`) | `content`, as written | the prose is empty |
-| 4 | **The flow** | `skillFlow` (registered) | `SkillFlowTab` — the plan in its six bands | never ([SK13](../modules/skills/features/authoring-a-skill.md#decisions)); a draft draws the band and says nothing is published ([SD10](#sd10--a-draft-has-no-published-text-and-every-band-that-reads-one-says-so)) |
-| 5 | **Composed** | `list` | one row per `plan.uses`: `nl-single@2` · the rows it wrote · *a newer version exists* | the plan inlines nothing ([SK34](../modules/skills/features/authoring-a-skill.md#decisions)) |
-| 6 | **Bindings** | `table` | agent · standing · the refusal's reason | nothing is bound |
-| 7 | **Versions** | `table` | version · what changed · origin · offered / applied | a skill with one version still draws it |
-
-**The tiles are the headline and nothing more.** `Offered` and `Applied` come from the usage read's
-current-version row; the breakdowns do not appear here at all — `Usage…` opens the board that is
-for them. A skill dashboard that grew a by-agent table would be the usage board with a playbook on
-top of it.
-
-### The actions
-
-| Id | Label | What the page does |
-|---|---|---|
-| `view` | `Dashboard ¦ spec.json` | the same switch every dashboard carries ([SR37](../modules/operate/features/see-what-ran.md)) |
-| `open-usage` | `Usage…` | opens `skill_usage:<id>` |
-| `open-agent` | a Bindings row | opens the agent in the Agents panel |
-| `open-version` | a Versions row | selects that version — the flow and the playbook redraw |
-| `edit` | `Edit` | puts the drawer back on this skill, drilled in; the board stays open |
-
-`New version` is **not** here. Publishing is an authoring act with a diff to read, and it lives in
-the Playbook tab where the prose being published is ([SK6](../modules/skills/features/authoring-a-skill.md#decisions)).
-A dashboard that published would be a reading surface with the one write that matters most on it.
+`skill:<id>` renders the skill's page — a record header over `Playbook · Flow · Bindings · Usage ·
+Versions` ([SK17 · SK36](../modules/skills/features/authoring-a-skill.md#decisions)) — and no
+`DashboardSpec` composes it. The tiles, the trigger, the playbook, the flow, what it composed, the
+bindings and the versions each live on a tab, where they can also be edited. `Usage…` is the Usage
+tab's `More`, and it opens `skill_usage:<id>`.
 
 ---
 

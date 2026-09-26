@@ -1,14 +1,12 @@
 /**
- * The three declared boards Skills owns — a skill, its usage, and a rule
+ * The two declared boards Skills owns — a skill's usage, and a rule
  * ([skills-dashboards.md](../../../../../../docs/for-developers/building-studio/skills-dashboards.md)).
  *
  * This file is the border ([code-shape §4.1](../../../../../../docs/for-developers/building-studio/code-shape.md)):
- * the page host imports the three page bodies and nothing else from here, and
- * the composers, the flow panel and the shared vocabulary stay inside.
+ * the page host imports the page bodies and nothing else from here, and the
+ * composers and the shared vocabulary stay inside. `skill:<id>` is the skill's
+ * page, not a board (SK36) — `SkillBoardPage`, beside the drawer.
  */
-
-export { SkillDashboardPage } from "@/pages/graphs-detail/features/skills/dashboards/SkillDashboardPage";
-export type { SkillDashboardPageProps } from "@/pages/graphs-detail/features/skills/dashboards/SkillDashboardPage";
 
 export { UsageDashboardPage } from "@/pages/graphs-detail/features/skills/dashboards/UsageDashboardPage";
 export type { UsageDashboardPageProps } from "@/pages/graphs-detail/features/skills/dashboards/UsageDashboardPage";

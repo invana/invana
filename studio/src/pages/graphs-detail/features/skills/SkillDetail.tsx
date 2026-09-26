@@ -1,12 +1,15 @@
 /**
- * A skill, drilled into — the drawer's body, not a page
- * ([SK17](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * A skill's page — `skill:<id>` in `mainSection`, the Skills list beside it
+ * ([SK17 · SK36](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  *
- * The drawer's **own header** becomes `‹ SKILLS / Escalate a late supplier` —
- * it is the stack section's title, not a second bar inside the body — and four
- * tabs carry the whole feature: `Playbook · Flow · Bindings · Usage`. The Rules
- * drawer keeps its place underneath, which is what makes this a stack rather
- * than a page (G33).
+ * *As someone writing playbooks, I want one skill in full width — its prose,
+ * its flow, who carries it, whether it is applied and what it used to say — so
+ * that I can author and judge it without a 420px column cutting each answer
+ * into a scroll.*
+ *
+ * A record header over five tabs, the agent page's shape (AG38):
+ * `Playbook · Flow · Bindings · Usage · Versions`. It authors — edit and
+ * publish on Playbook, bind and unbind on Bindings.
  *
  * ## Two words that are never the same claim
  *
@@ -22,6 +25,7 @@
 import {
 	useSkillAgentsQuery,
 	useSkillDiffQuery,
+	useSkillDraftQuery,
 	useSkillPlanQuery,
 	useSkillUsageQuery,
 	useSkillVersionsQuery,
@@ -29,6 +33,7 @@ import {
 import { useAgentMutations } from "@/hooks/queries/useWork";
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
 import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
+import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import type {
 	BindRefusal,
 	Skill,
@@ -37,19 +42,11 @@ import type {
 } from "@/types/skills";
 import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
-import {
-	Badge,
-	Button,
-	Spinner,
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "@invana/ui";
-import { GitBranch } from "lucide-react";
+import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
+import { BarChart3, GitBranch } from "lucide-react";
 import { useState } from "react";
 
-type SkillTab = "playbook" | "flow" | "bindings" | "usage";
+export type SkillTab = "playbook" | "flow" | "bindings" | "usage" | "versions";
 
 export function SkillDetail({
 	username,
@@ -66,86 +63,122 @@ export function SkillDetail({
 	editing: boolean;
 	onEditing: (editing: boolean) => void;
 	onOpenAgent?: (id: string) => void;
-	/** `More` on the Usage tab — opens `skill_usage:<id>` beside the stack. */
+	/** `Usage…` — opens `skill_usage:<id>` beside this page (SD2). */
 	onOpenUsageDashboard?: (skillId: string) => void;
 }) {
 	const [tab, setTab] = useState<SkillTab>("playbook");
-	// The **current** version's plan: what a step is offered today. A draft's
-	// own drawing is read inside the Playbook tab, beside the prose it came
-	// from (SK5 — a plan hangs off the version, never off the skill).
+	// The **current** version's plan: what a step is offered today (SK5 — a
+	// plan hangs off the version, never off the skill).
 	const plan = useSkillPlanQuery(
 		username,
 		graphSlug,
 		skill.id,
 		skill.is_draft ? null : skill.version,
 	);
+	// A draft has no published plan, so its Flow tab draws the draft's own.
+	// Read only for a draft: `GET …/draft` opens one when none is open (SK20).
+	const draft = useSkillDraftQuery(username, graphSlug, skill.id, {
+		enabled: skill.is_draft,
+	});
+	const flowPlan = skill.is_draft ? draft.data?.plan : plan.data;
+	const flowLoading = skill.is_draft ? draft.isLoading : plan.isLoading;
 
 	return (
+		// `h-full`: the page host is not a flex column, so without it the page
+		// grows to its content and the header and tabs scroll away with it.
 		<div className="flex h-full min-h-0 flex-col">
-			<Tabs
-				value={tab}
-				onValueChange={(v) => setTab(v as SkillTab)}
-				className="flex min-h-0 flex-1 flex-col"
-			>
-				<TabsList className="w-full justify-start gap-1 px-3">
-					<TabsTrigger value="playbook">Playbook</TabsTrigger>
-					<TabsTrigger value="flow">
-						Flow
-						{skill.plan ? (
-							<Badge variant="secondary" className="ml-1">
-								{skill.plan.step_count}
-							</Badge>
-						) : null}
-					</TabsTrigger>
-					<TabsTrigger value="bindings">Bindings</TabsTrigger>
-					<TabsTrigger value="usage">Usage</TabsTrigger>
-				</TabsList>
+			<RecordHeader
+				crumbs={[skill.name]}
+				chips={
+					<>
+						<DetailStatus>
+							{skill.is_draft ? "draft" : `v${skill.version}`}
+						</DetailStatus>
+						<DetailStatus>{skill.origin}</DetailStatus>
+					</>
+				}
+				actions={
+					onOpenUsageDashboard && !skill.is_draft ? (
+						<Button
+							size="sm"
+							variant="ghost"
+							onClick={() => onOpenUsageDashboard(skill.id)}
+						>
+							<BarChart3 /> Usage…
+						</Button>
+					) : null
+				}
+			/>
 
-				<div className="min-h-0 flex-1 overflow-y-auto">
-					<TabsContent value="playbook">
-						<SkillPlaybookTab
-							username={username}
-							graphSlug={graphSlug}
-							skill={skill}
-							plan={plan.data}
-							editing={editing}
-							onEditing={onEditing}
-						/>
-						<VersionsSection
-							username={username}
-							graphSlug={graphSlug}
-							skill={skill}
-						/>
-					</TabsContent>
-					<TabsContent value="flow" className="h-full">
-						<SkillFlowTab plan={plan.data} loading={plan.isLoading} />
-					</TabsContent>
-					<TabsContent value="bindings">
-						<BindingsTab
-							username={username}
-							graphSlug={graphSlug}
-							skill={skill}
-							onOpenAgent={onOpenAgent}
-						/>
-					</TabsContent>
-					<TabsContent value="usage">
-						<UsageTab
-							username={username}
-							graphSlug={graphSlug}
-							skill={skill}
-							onOpenDashboard={onOpenUsageDashboard}
-						/>
-					</TabsContent>
-				</div>
-			</Tabs>
+			<TabbedPanel
+				className="min-h-0 flex-1 border-0 bg-transparent shadow-none"
+				activeTab={tab}
+				onTabChange={(v) => setTab(v as SkillTab)}
+				tabs={[
+					{
+						value: "playbook",
+						label: "Playbook",
+						content: (
+							<SkillPlaybookTab
+								username={username}
+								graphSlug={graphSlug}
+								skill={skill}
+								plan={plan.data}
+								editing={editing}
+								onEditing={onEditing}
+							/>
+						),
+					},
+					{
+						value: "flow",
+						label: skill.plan ? `Flow · ${skill.plan.step_count}` : "Flow",
+						content: <SkillFlowTab plan={flowPlan} loading={flowLoading} />,
+					},
+					{
+						value: "bindings",
+						label: "Bindings",
+						content: (
+							<BindingsTab
+								username={username}
+								graphSlug={graphSlug}
+								skill={skill}
+								onOpenAgent={onOpenAgent}
+							/>
+						),
+					},
+					{
+						value: "usage",
+						label: "Usage",
+						content: (
+							<UsageTab
+								username={username}
+								graphSlug={graphSlug}
+								skill={skill}
+								onOpenDashboard={onOpenUsageDashboard}
+							/>
+						),
+					},
+					{
+						value: "versions",
+						label: "Versions",
+						content: (
+							<VersionsSection
+								username={username}
+								graphSlug={graphSlug}
+								skill={skill}
+							/>
+						),
+					},
+				]}
+			/>
 		</div>
 	);
 }
 
 /**
- * The versions this playbook has been through, reached from the Playbook tab's
- * foot. A published version is immutable, so this is a history rather than a
- * list of things to edit — the one editable row is the draft, and it is above.
+ * The versions this playbook has been through — the Versions tab (SK38). A
+ * published version is immutable, so this is a history rather than a list of
+ * things to edit — the one editable row is the draft, on Playbook.
  */
 function VersionsSection({
 	username,
@@ -160,7 +193,12 @@ function VersionsSection({
 	const [diffOf, setDiffOf] = useState<number | null>(null);
 	const items = versions.data?.items ?? [];
 
-	if (items.length === 0) return null;
+	if (items.length === 0 && !versions.isLoading)
+		return (
+			<p className="px-3 py-4 text-base text-muted-foreground">
+				Nothing is published yet — the draft becomes v1 when it is published.
+			</p>
+		);
 
 	return (
 		<PanelSection
