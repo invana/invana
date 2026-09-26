@@ -44,6 +44,7 @@ export function renderModelEdge(edge: GraphEdge) {
 		},
 		...(d.staged ? [{ label: "status", value: "staged" }] : []),
 		...(d.rule ? [{ label: "rule", value: d.rule, mono: true }] : []),
+		...(d.match ? [{ label: "match", value: d.match }] : []),
 	];
 	return (
 		<EdgePreviewCard

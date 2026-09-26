@@ -279,6 +279,10 @@ export function buildAllModelsData(
 			staged: isStaged,
 			description: l.description,
 			rule: stitchRule(l, sourceModel ?? src.name),
+			// How the two keys compare — an anchor's, and a keyed relationship's.
+			...(l.source_property && l.target_property
+				? { match: l.identity_match }
+				: {}),
 		};
 		edges.push({
 			id: `stitch:${l.id}`,

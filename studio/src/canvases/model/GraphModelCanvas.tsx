@@ -3,12 +3,13 @@
  * ([graph-model-canvas.md](../../../../docs/for-developers/building-studio/graph-model-canvas.md)).
  *
  * The canvas Storybook's `usecases/by-casestudies/global-model/GlobalModel`,
- * copied: the same behaviours, header, footer, Detail and Layout switchers,
- * settings and templates (GM1). Two things are Studio's own: the JSON names no
- * model and no type, so it is filled in against the data and the live theme
- * (GM5–GM7); and a stitch is dashed (GM9) and, where the host asks for it,
- * declared by a drag (GM12). A host reads and drives the selection, and adds
- * nothing else.
+ * copied: the same behaviours, layouts, header, footer, Detail and Layout
+ * switchers, settings and templates (GM1). What is Studio's own: the JSON names
+ * no model and no type, so it is filled in against the data and the live theme
+ * (GM5–GM7); the colours are Studio's palette, and a frame wears its model's
+ * hue (GM8); a stitch is dashed (GM9) and, where the host asks for it, declared
+ * by a drag (GM12). A host reads and drives the selection, and adds nothing
+ * else.
  */
 
 import {
@@ -60,7 +61,6 @@ import type {
 	GraphLayer as GraphLayerEngine,
 } from "@invana/graph";
 import { useTheme } from "@invana/themes";
-import { EmptyState } from "@invana/ui";
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
 import { Link2, Moon, Settings, Sun } from "lucide-react";
 import {
@@ -147,8 +147,25 @@ export function GraphModelCanvas({
 	stitching,
 }: GraphModelCanvasProps) {
 	// `select` drags a type; `stitch` drags a crossing. Both start on node
-	// pointer-down, so only one is ever on.
+	// pointer-down, so only one is ever on. A drag moves a type, as in the story;
+	// **Shift**-drag stitches, and the Stitch toggle makes that sticky (GM12).
 	const [tool, setTool] = useState<"select" | "stitch">("select");
+	const [shift, setShift] = useState(false);
+	useEffect(() => {
+		if (!stitching) return;
+		const down = (e: KeyboardEvent) => e.key === "Shift" && setShift(true);
+		const up = (e: KeyboardEvent) => e.key === "Shift" && setShift(false);
+		const blur = () => setShift(false);
+		window.addEventListener("keydown", down);
+		window.addEventListener("keyup", up);
+		window.addEventListener("blur", blur);
+		return () => {
+			window.removeEventListener("keydown", down);
+			window.removeEventListener("keyup", up);
+			window.removeEventListener("blur", blur);
+		};
+	}, [stitching]);
+	const stitchingNow = !!stitching && (tool === "stitch" || shift);
 	const stitchRef = useRef(stitching);
 	stitchRef.current = stitching;
 	const [detail, setDetail] = useState<Detail>(initialDetail);
@@ -199,14 +216,9 @@ export function GraphModelCanvas({
 							id: STITCH_PANEL,
 							icon: Link2,
 							label: "Declare a stitch",
-							render: () =>
-								stitchRef.current?.panel ?? (
-									<EmptyState
-										icon={<Link2 />}
-										title="Nothing being declared"
-										description="Turn on the Stitch tool, then drag a type onto a type in another model."
-									/>
-								),
+							// Opened by an accepted drag only — its toggle is kept out of the
+							// header, so the Stitch tool is the one link icon (GM12).
+							render: () => stitchRef.current?.panel ?? null,
 						},
 					]
 				: []),
@@ -255,6 +267,16 @@ export function GraphModelCanvas({
 		[message],
 	);
 
+	// The mount config again, once the canvas is ready. Under React StrictMode
+	// the engine is created, destroyed and created again, and on the second one
+	// the behaviours register after the root applied `config` — they keep their
+	// constructor defaults, so `collapse-expand` never re-lays out, `hover`
+	// loses its degree and `text-lod` its band. The definition holds the right
+	// config; this hands it to the live instances (GM14).
+	useEffect(() => {
+		if (canvas) canvas.update(config);
+	}, [canvas, config]);
+
 	// Redraw on settle: a solve that lands in the same beat as the data flush
 	// leaves the viewport empty while the store holds the graph (ME25).
 	useEffect(() => {
@@ -264,6 +286,22 @@ export function GraphModelCanvas({
 				canvas.layers.get<GraphLayerEngine>(MODEL_LAYER_ID)?.redraw();
 		});
 	}, [canvas]);
+
+	// A theme change writes the palette's card and divider colours over every
+	// group node's own style (`GraphLayer.applyTheme`), which would leave each
+	// frame white. Its hue goes back on after the layer's pass — this listener
+	// subscribes after the layer's, so it runs second (GM8).
+	useEffect(() => {
+		if (!canvas) return;
+		const rehue = () => {
+			const store = canvas.layers.get<GraphLayerEngine>(MODEL_LAYER_ID)?.store;
+			if (!store) return;
+			for (const n of drawn.nodes)
+				if (n.style) store.updateNode(n.id, { style: n.style });
+		};
+		rehue();
+		return canvas.events.on("theme:change", rehue);
+	}, [canvas, drawn]);
 
 	// New data, a switch, or a new theme: patch the template and the active
 	// layout, then re-run it — a new node size needs new positions. `fitCamera`
@@ -277,6 +315,16 @@ export function GraphModelCanvas({
 		});
 		void canvas.runLayout(layout, FIT);
 	}, [canvas, drawn, model, detail, layout, settings, templates, colors.hues]);
+
+	// `settings.json` switches node drag on, as the story's does — so the tool
+	// re-asserts itself after the config lands: while stitching a drag draws, it
+	// never moves the type (GM12).
+	useEffect(() => {
+		const drag = canvas?.behaviours.get("drag-node");
+		if (!drag) return;
+		if (stitchingNow) drag.disable();
+		else drag.enable();
+	}, [canvas, stitchingNow]);
 
 	// One element clicked is one element selected; an empty click clears it.
 	useEffect(() => {
@@ -326,8 +374,8 @@ export function GraphModelCanvas({
 											type: "toggle",
 											icon: Link2,
 											label:
-												"Stitch — drag a type onto a type in another model",
-											active: tool === "stitch",
+												"Stitch mode — drag a type onto a type in another model (or hold Shift)",
+											active: stitchingNow,
 											onToggle: () =>
 												setTool((t) => (t === "stitch" ? "select" : "stitch")),
 										},
@@ -360,7 +408,7 @@ export function GraphModelCanvas({
 								options: { elk: "ELK — layered", force: "Force — d3" },
 								onChange: (v) => setLayout(v as LayoutId),
 							},
-							...dock.items,
+							...dock.items.filter((item) => item.key !== STITCH_PANEL),
 							{
 								type: "toggle",
 								key: "theme",
@@ -387,13 +435,13 @@ export function GraphModelCanvas({
 			<DragNodeBehaviour
 				id="drag-node"
 				targetLayerId={MODEL_LAYER_ID}
-				enabled={tool === "select"}
+				enabled={!stitchingNow}
 			/>
 			{stitching ? (
 				<DrawEdgeBehaviour
 					id="draw-edge"
 					targetLayerId={MODEL_LAYER_ID}
-					enabled={tool === "stitch"}
+					enabled={stitchingNow}
 					createEdge={createEdge}
 				/>
 			) : null}

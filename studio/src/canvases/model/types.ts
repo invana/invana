@@ -72,6 +72,8 @@ export interface ModelEdgeData {
 	description?: string;
 	/** Stitch only — the rule, for the hover card. */
 	rule?: string;
+	/** Stitch only — how the two keys compare (`exact`, `case_insensitive`). */
+	match?: string;
 }
 
 export interface ModelFrameNode {
