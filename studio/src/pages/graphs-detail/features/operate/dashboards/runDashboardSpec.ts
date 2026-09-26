@@ -121,8 +121,8 @@ export interface RunDashboardView {
 export type RunPanels = WithFlow & RunPanelOptions;
 
 /** How many cards the flow lays across before it wraps. */
-/** The canvas pans and zooms, so its height is the page's, not the plan's. */
-const FLOW_HEIGHT = 560;
+/** The least the flow is drawn at; the panel grows into the rest of the page. */
+const FLOW_HEIGHT = 360;
 
 export function runDashboardSpec(
 	trace: TraceRead,
@@ -465,15 +465,15 @@ function flow(
 	selected: TaskGroup | null,
 ): PanelSpec<RunPanels> {
 	return {
+		// No title, so no box: the flow is the whole tab, edge to edge.
 		kind: "flow",
-		title: "The flow · status as it ran",
-		aside: "click a task for its step detail ›",
-		flush: true,
 		options: {
 			data: taskFlowFromRun(groups),
 			selectedId: selected?.head.id ?? null,
 			openAction: RUN_ACTIONS.openStep,
 			height: FLOW_HEIGHT,
+			bleed: true,
+			message: "Status as it ran — click a task for its step detail",
 		},
 	};
 }
