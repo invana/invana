@@ -172,6 +172,7 @@ studio/src/
         graph-settings/       the Graph's own configuration — Info, Connection, LLMs
   canvases/                   canvases more than one module renders — data, settings, templates in by props
     taskflow/                 TaskFlowCanvas · settings.json · templates.json (task-flow-canvas.md)
+    model/                    GraphModelCanvas · settings.json · templates.json (graph-model-canvas.md)
   shared/
     api/                      the HTTP client and one file per engine resource
     hooks/  lib/  stores/  types/  telemetry/

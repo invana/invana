@@ -197,7 +197,7 @@ const NODE_STYLE: ResolvableNodeStyle<GraphNode> = {
 	shape: { kind: "circle", radius: NODE_RADIUS },
 	// Every field resolves from the node's own datum at the *template* level.
 	// A per-instance `style` would REPLACE this template — the node would keep
-	// its label and lose its shape, which is the trap `SchemaCanvas` documents.
+	// its label and lose its shape.
 	bgFill: (n: GraphNode) => TONE_FILL[(n.data as NodeDatum)?.tone ?? "muted"],
 	bgAlpha: (n: GraphNode) => ((n.data as NodeDatum)?.disabled ? 0.25 : 1),
 	bgStrokeWidth: 2,

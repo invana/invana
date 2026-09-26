@@ -1,0 +1,170 @@
+{
+	"high": {
+		"layers": {
+			"graph": {
+				"nodeStylingTemplates": {
+					"modelFrame": {
+						"name": "modelFrame",
+						"group": {
+							"autoFit": true,
+							"padding": 28,
+							"headerHeight": 28,
+							"tabSkew": 12,
+							"showToggle": false
+						},
+						"fillRole": "muted",
+						"fillAlpha": 0.08,
+						"strokeRole": "stroke",
+						"strokeWidth": 1.5,
+						"label": {
+							"fontSize": 13,
+							"fontWeight": 700,
+							"colorRole": "heading",
+							"placement": "inside-center"
+						}
+					}
+				},
+				"nodeTypes": {
+					"model.type": {
+						"structure": "labelDot",
+						"styling": "label",
+						"bindings": {}
+					}
+				}
+			}
+		},
+		"layouts": {
+			"elk": {
+				"defaultNodeSize": {
+					"width": 60,
+					"height": 84
+				},
+				"nodeSpacing": 80,
+				"layerSpacing": 120
+			},
+			"force": {
+				"link": {
+					"distance": 140
+				},
+				"charge": {
+					"strength": -1400
+				},
+				"collide": {
+					"radius": 64
+				}
+			}
+		}
+	},
+	"medium": {
+		"layers": {
+			"graph": {
+				"nodeStylingTemplates": {
+					"modelFrame": {
+						"name": "modelFrame",
+						"group": {
+							"autoFit": true,
+							"padding": 30,
+							"headerHeight": 28,
+							"tabSkew": 12,
+							"showToggle": false
+						},
+						"fillRole": "muted",
+						"fillAlpha": 0.08,
+						"strokeRole": "stroke",
+						"strokeWidth": 1.5,
+						"label": {
+							"fontSize": 13,
+							"fontWeight": 700,
+							"colorRole": "heading",
+							"placement": "inside-center"
+						}
+					}
+				},
+				"nodeTypes": {
+					"model.type": {
+						"structure": "labelCard",
+						"styling": "label",
+						"bindings": {}
+					}
+				}
+			}
+		},
+		"layouts": {
+			"elk": {
+				"defaultNodeSize": {
+					"width": 264,
+					"height": 116
+				},
+				"nodeSpacing": 90,
+				"layerSpacing": 200
+			},
+			"force": {
+				"link": {
+					"distance": 300
+				},
+				"charge": {
+					"strength": -2600
+				},
+				"collide": {
+					"radius": 160
+				}
+			}
+		}
+	},
+	"low": {
+		"layers": {
+			"graph": {
+				"nodeStylingTemplates": {
+					"modelFrame": {
+						"name": "modelFrame",
+						"group": {
+							"autoFit": true,
+							"padding": 32,
+							"headerHeight": 28,
+							"tabSkew": 12,
+							"showToggle": false
+						},
+						"fillRole": "muted",
+						"fillAlpha": 0.08,
+						"strokeRole": "stroke",
+						"strokeWidth": 1.5,
+						"label": {
+							"fontSize": 13,
+							"fontWeight": 700,
+							"colorRole": "heading",
+							"placement": "inside-center"
+						}
+					}
+				},
+				"nodeTypes": {
+					"model.type": {
+						"structure": "schema:*",
+						"styling": "label",
+						"bindings": {}
+					}
+				}
+			}
+		},
+		"layouts": {
+			"elk": {
+				"defaultNodeSize": {
+					"width": 300,
+					"height": 240
+				},
+				"nodeSpacing": 110,
+				"layerSpacing": 240
+			},
+			"force": {
+				"link": {
+					"distance": 420
+				},
+				"charge": {
+					"strength": -4200
+				},
+				"collide": {
+					"radius": 220
+				}
+			}
+		}
+	}
+}

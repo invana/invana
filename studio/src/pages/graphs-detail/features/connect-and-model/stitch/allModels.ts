@@ -1,8 +1,9 @@
 /**
  * The all models data build — every published model on one canvas.
  *
- * A model is a **group frame** (stitch-models.md ST14): a node carrying
- * `style.group`, with its node types pointing at it through `parentId`. That is
+ * A model is a **group frame** (stitch-models.md ST14): a `model` node that
+ * `GraphModelCanvas` styles as a group, with its node types pointing at it
+ * through `parentId`. That is
  * `@invana/graph`'s own group concept, not a drawing convention, which is what
  * buys the rest of it — ELK packs members inside the frame (ST20), and a
  * collapsed frame renders as one node with every stitch re-routed onto it, so
@@ -12,14 +13,23 @@
  * such: an edge whose endpoints sit in two different groups is a stitch by
  * construction, and one inside a frame is that model's own edge type.
  *
- * This module is pure — queries live in `useAllModels`, the canvas in
- * `AllModelsCanvas`. It reads versions and links, never `…/global-model`
+ * This module is pure — queries live in `useAllModels`, the drawing in
+ * `@/canvases/model`, the page in `AllModelsCanvas`. It reads versions and links, never `…/global-model`
  * (ST16), so the global-model page stays stated rather than drawn (ST6).
  */
 
+import {
+	MODEL_EMPTY_TYPE,
+	MODEL_FRAME_TYPE,
+	type ModelEdgeData,
+	type ModelFrameNode,
+	type ModelGraphData,
+	type ModelGraphEdge,
+	type ModelProperty,
+	type ModelTypeNode,
+} from "@/canvases/model";
 import type { ModelLink } from "@/types/models";
 import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
-import type { GraphData, GraphEdge, GraphNode } from "@invana/graph";
 
 /** One model, with the published version that is drawn. */
 export interface ModelFrame {
@@ -29,41 +39,14 @@ export interface ModelFrame {
 	/** The published version drawn. `null` ⇒ nothing published yet (ST18). */
 	versionId: string | null;
 	versionLabel: string | null;
-	/** `--color-data-N`, as the renderer wants it (ST17). */
+	/** `1`–`8`, the `--color-data-N` slot (ST17). */
 	hue: number;
 	nodeTypes: NodeTypeResponse[];
 	edgeTypes: EdgeTypeResponse[];
 }
 
-/** `node.type` tags — the canvas branches its template on these, nothing else. */
-export const FRAME_TYPE = "model-frame";
-export const MEMBER_TYPE = "node-type";
-
-/** `edge.type` tags. A stitch is not a kind of edge type; it is a crossing. */
-export const STITCH_ANCHOR = "stitch-anchor";
-export const STITCH_RELATIONSHIP = "stitch-relationship";
-
-/** What each canvas node carries for the layer template to read. */
-export interface FrameNodeData {
-	kind: "frame" | "member";
-	modelId: string;
-	modelName: string;
-	hue: number;
-	/** Member only — the node type's own id, so selection maps back. */
-	typeId?: string;
-	typeName?: string;
-	/** Member only — how many properties the type carries. */
-	props?: number;
-	/** Frame only — what the tab says under the name. */
-	caption?: string;
-	/**
-	 * Frame only — the model has no drawn types, so the frame is a plain sized
-	 * box rather than a group. ELK sizes a group from its members and reserves
-	 * nothing for one that has none, which is how empty frames ended up lying on
-	 * top of their neighbours (ST29).
-	 */
-	empty?: boolean;
-}
+/** A type with no icon of its own — the API carries none yet. */
+const TYPE_ICON = "lucide/box";
 
 /**
  * What a stitch *says*, in one line — the pair, as the design writes it.
@@ -102,70 +85,6 @@ export const stitchRule = (link: ModelLink, sourceModel?: string): string => {
 		: "rows that ship with its records";
 };
 
-/**
- * The label the crossing carries on the canvas — two of them, one per altitude.
- *
- * **Types** (frames open) gets the rule: `Company.ticker ≡ Stock.nse_symbol`,
- * `FOR · Order.instrument_isin = Stock.isin`. It says what a reader would
- * otherwise have to open the stitch to learn, and the point of drawing the
- * crossing is that they do not have to.
- *
- * **Models** (frames closed) gets the mark: `≡`, or the bare edge type. Up there
- * a frame is a tab a few characters wide, and a rule printed across five of them
- * is a rule nobody reads and four names nobody can (ST15, ST32).
- */
-const stitchLabels = (link: ModelLink): { label: string; short: string } => {
-	const keyed = link.source_property && link.target_property;
-	if (link.kind === "anchor") {
-		return {
-			label: keyed
-				? `${link.source_type}.${link.source_property} ≡ ${link.target_type}.${link.target_property}`
-				: "≡",
-			short: "≡",
-		};
-	}
-	const edge = link.edge_type ?? "relationship";
-	return {
-		label: keyed
-			? `${edge} · ${link.source_type}.${link.source_property} = ${link.target_type}.${link.target_property}`
-			: edge,
-		short: edge,
-	};
-};
-
-export interface FrameEdgeData {
-	kind: "edge-type" | "stitch";
-	/** Stitch only. */
-	linkId?: string;
-	/** Stitch only — declared but not committed, so the union does not span it yet (ST21). */
-	staged?: boolean;
-	/** What it says at the types altitude — the rule. */
-	label: string;
-	/** What it says at the models altitude — the mark. */
-	short: string;
-}
-
-/**
- * The categorical data palette, as numbers. Same eight hues, same order, as
- * `@invana/styling`'s `--color-data-1…8` — a model keeps its slot so the
- * legend, the frame and every type inside it agree (ST17).
- */
-export const MODEL_HUES = [
-	0x2a78d6, 0xeb6834, 0x1baf7a, 0xeda100, 0xe87ba4, 0x008300, 0x4a3aa7,
-	0xe34948,
-] as const;
-
-export const hueForIndex = (i: number): number =>
-	MODEL_HUES[i % MODEL_HUES.length] as number;
-
-/**
- * The same slot, as the CSS token the kit's `Legend` wants. The canvas needs a
- * number and the legend needs a token; they must never drift, so both come from
- * the index rather than from each other.
- */
-export const hueTokenForIndex = (i: number): string =>
-	`var(--color-data-${(i % MODEL_HUES.length) + 1})`;
-
 export const frameIdOf = (modelId: string): string => `model:${modelId}`;
 export const memberIdOf = (modelId: string, typeName: string): string =>
 	`${modelId}::${typeName}`;
@@ -179,12 +98,8 @@ export const parseMemberId = (
 	return { modelId: nodeId.slice(0, at), typeName: nodeId.slice(at + 2) };
 };
 
-/** Recover the model from a frame id — the inverse of {@link frameIdOf}. */
-export const modelIdOfFrame = (nodeId: string): string | null =>
-	nodeId.startsWith("model:") ? nodeId.slice("model:".length) : null;
-
 export interface AllModelsBuild {
-	data: GraphData;
+	data: ModelGraphData;
 	/** Declared but not committed — drawn, and counted beside the union (ST21). */
 	stagedCount: number;
 	/** Stitches whose endpoint version is not the one drawn — stated, not dropped silently. */
@@ -193,20 +108,28 @@ export interface AllModelsBuild {
 	memberCount: number;
 }
 
+/** What the stitches say about one type — its keys, its count, whether it is anchored. */
+interface TypeStitches {
+	keys: Map<string, string[]>;
+	count: number;
+	anchored: boolean;
+}
+
 /**
- * Build the canvas payload.
+ * Build the canvas payload — `GraphModelCanvas`'s `ModelGraphData`.
  *
  * Ids are namespaced by model because two domains may both own a `Company` and
  * they are different types until an anchor says otherwise (domain-models.md
  * DM4) — collapsing them onto one node here would draw the merge the product
- * refuses to perform (ST2).
+ * refuses to perform (ST2). A member's `type` is `Model.Type`, the key the
+ * canvas binds its look under.
  */
 export function buildAllModelsData(
 	frames: readonly ModelFrame[],
 	links: readonly ModelLink[],
 ): AllModelsBuild {
-	const nodes: GraphNode<FrameNodeData>[] = [];
-	const edges: GraphEdge<FrameEdgeData>[] = [];
+	const nodes: (ModelFrameNode | ModelTypeNode)[] = [];
+	const edges: ModelGraphEdge[] = [];
 
 	// versionId → model, and name → model. A link binds a *version*; the canvas
 	// draws the *active* one, and those are the same row almost always and not
@@ -217,40 +140,105 @@ export function buildAllModelsData(
 		if (t.versionId) byVersion.set(t.versionId, t);
 		byName.set(t.name, t);
 	}
+	const present = new Set<string>();
+	for (const t of frames)
+		for (const n of t.nodeTypes) present.add(memberIdOf(t.modelId, n.name));
+
+	// Resolve every link first: a type's card states the keys stitches use on
+	// it, so the members cannot be built until the stitches are known.
+	const resolved: {
+		link: ModelLink;
+		from: string;
+		to: string;
+		src: ModelFrame;
+		tgt: ModelFrame;
+	}[] = [];
+	let unresolved = 0;
+	for (const l of links) {
+		const src =
+			byVersion.get(l.source_version_id) ??
+			(l.source_model ? byName.get(l.source_model) : undefined);
+		const tgt =
+			byVersion.get(l.target_version_id) ??
+			(l.target_model ? byName.get(l.target_model) : undefined);
+		const from = src ? memberIdOf(src.modelId, l.source_type) : "";
+		const to = tgt ? memberIdOf(tgt.modelId, l.target_type) : "";
+		// The link names a type the drawn version no longer carries. Saying so is
+		// the point of the count — a stitch nobody can see is a stitch nobody
+		// reviews when the version it binds is republished.
+		if (!src || !tgt || !present.has(from) || !present.has(to)) {
+			unresolved += 1;
+			continue;
+		}
+		resolved.push({ link: l, from, to, src, tgt });
+	}
+
+	const stitchesOf = new Map<string, TypeStitches>();
+	const note = (
+		id: string,
+		prop: string | null,
+		pair: string,
+		anchor: boolean,
+	) => {
+		const s = stitchesOf.get(id) ?? {
+			keys: new Map(),
+			count: 0,
+			anchored: false,
+		};
+		s.count += 1;
+		s.anchored ||= anchor;
+		if (prop) s.keys.set(prop, [...(s.keys.get(prop) ?? []), pair]);
+		stitchesOf.set(id, s);
+	};
+	for (const { link, from, to } of resolved) {
+		const pair = stitchPair(link);
+		const anchor = link.kind === "anchor";
+		note(from, link.source_property, pair, anchor);
+		note(to, link.target_property, pair, anchor);
+	}
 
 	for (const t of frames) {
-		// What the tab says under the name. The version matters most: the canvas
-		// draws published versions, and which one is not guessable (ST16, ST18).
-		const caption = t.versionId
-			? (t.versionLabel ?? "published")
-			: "nothing published yet";
+		// A model with nothing drawn is a sized frame, not a group (ST29).
 		nodes.push({
 			id: frameIdOf(t.modelId),
-			type: FRAME_TYPE,
+			type: t.nodeTypes.length === 0 ? MODEL_EMPTY_TYPE : MODEL_FRAME_TYPE,
 			data: {
-				kind: "frame",
-				modelId: t.modelId,
-				modelName: t.name,
+				name: t.name,
+				description: t.description,
+				version: t.versionLabel,
 				hue: t.hue,
-				caption,
-				empty: t.nodeTypes.length === 0,
 			},
 		});
 
 		const own = new Set(t.nodeTypes.map((n) => n.name));
 		for (const n of t.nodeTypes) {
+			const id = memberIdOf(t.modelId, n.name);
+			const stitched = stitchesOf.get(id);
+			const properties: ModelProperty[] = [...(n.property_mappings ?? [])]
+				.sort((a, b) => a.sort_order - b.sort_order)
+				.map((m) => {
+					const pairs = stitched?.keys.get(m.property_key.name);
+					return {
+						name: m.property_key.name,
+						type: m.property_key.type,
+						...(pairs ? { identity: true, stitches: pairs } : {}),
+					};
+				});
 			nodes.push({
-				id: memberIdOf(t.modelId, n.name),
-				type: MEMBER_TYPE,
+				id,
+				type: `${t.name}.${n.name}`,
 				parentId: frameIdOf(t.modelId),
 				data: {
-					kind: "member",
-					modelId: t.modelId,
-					modelName: t.name,
+					label: n.name,
+					model: t.name,
 					hue: t.hue,
-					typeId: n.id,
-					typeName: n.name,
-					props: (n.property_mappings ?? []).length,
+					description: n.description ?? "",
+					icon: TYPE_ICON,
+					propertyCount: properties.length,
+					stitchCount: stitched?.count ?? 0,
+					identity: properties.find((p) => p.identity)?.name,
+					anchored: stitched?.anchored ?? false,
+					properties,
 				},
 			});
 		}
@@ -266,59 +254,45 @@ export function buildAllModelsData(
 						source: memberIdOf(t.modelId, src),
 						target: memberIdOf(t.modelId, tgt),
 						type: e.name,
-						data: { kind: "edge-type", label: e.name, short: e.name },
+						data: {
+							kind: "edge",
+							title: `${t.name}.${src} -[${e.name}]-> ${t.name}.${tgt}`,
+							model: t.name,
+							description: e.description,
+						},
 					});
 				}
 			}
 		}
 	}
 
-	const present = new Set(nodes.map((n) => n.id));
-	let unresolved = 0;
-	let stitches = 0;
 	let staged = 0;
-
-	for (const l of links) {
-		const src =
-			byVersion.get(l.source_version_id) ??
-			(l.source_model ? byName.get(l.source_model) : undefined);
-		const tgt =
-			byVersion.get(l.target_version_id) ??
-			(l.target_model ? byName.get(l.target_model) : undefined);
-		if (!src || !tgt) {
-			unresolved += 1;
-			continue;
-		}
-		const from = memberIdOf(src.modelId, l.source_type);
-		const to = memberIdOf(tgt.modelId, l.target_type);
-		// The link names a type the drawn version no longer carries. Saying so is
-		// the point of the count — a stitch nobody can see is a stitch nobody
-		// reviews when the version it binds is republished.
-		if (!present.has(from) || !present.has(to)) {
-			unresolved += 1;
-			continue;
-		}
-		stitches += 1;
+	for (const { link: l, from, to, src } of resolved) {
 		const isStaged = l.status === "staged";
 		if (isStaged) staged += 1;
+		const sourceModel = l.source_model_id
+			? frames.find((f) => f.modelId === l.source_model_id)?.name
+			: undefined;
+		const data: ModelEdgeData = {
+			kind: l.kind === "anchor" ? "anchor" : "relationship",
+			title: stitchPair(l),
+			staged: isStaged,
+			description: l.description,
+			rule: stitchRule(l, sourceModel ?? src.name),
+		};
 		edges.push({
 			id: `stitch:${l.id}`,
 			source: from,
 			target: to,
-			type: l.kind === "anchor" ? STITCH_ANCHOR : STITCH_RELATIONSHIP,
-			data: {
-				kind: "stitch",
-				linkId: l.id,
-				staged: isStaged,
-				...stitchLabels(l),
-			},
+			type: l.kind === "anchor" ? "SAME_AS" : (l.edge_type ?? "relationship"),
+			data,
 		});
 	}
 
 	return {
-		data: { nodes, edges } as GraphData,
+		data: { nodes, edges },
 		unresolvedStitches: unresolved,
-		stitchCount: stitches,
+		stitchCount: resolved.length,
 		stagedCount: staged,
 		memberCount: nodes.length - frames.length,
 	};

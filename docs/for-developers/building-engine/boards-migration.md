@@ -558,7 +558,7 @@ sequenceDiagram
 | Studio reports | *(none)* | `FrozenBoardPage` — one body for every frozen reading ([B19](#9-decisions)) · `useReport` + `DeclaredBoard` — the two acts, given to a page by the host ([B20](#9-decisions) · [B21](#9-decisions)) · `BoardHistoryCard` — one card, two bindings ([B21](#9-decisions)) |
 | Docs | `modules/explore/features/boards.md` | `modules/explore/features/boards.md` |
 
-**Not renamed:** `ExplorerCanvas` · `ModelCanvas` · `SchemaCanvas` · `captureBanner` · `canvasTheme`
+**Not renamed:** `ExplorerCanvas` · `ModelCanvas` · `captureBanner` · `canvasTheme`
 — they name the *drawing surface*, which keeps its word.
 
 ---

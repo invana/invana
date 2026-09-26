@@ -1,7 +1,7 @@
 # Model editor
 
-Draw the model. The canvas writes — one of only two kinds that do — and every change stages until it
-is committed together.
+Draw the model. The canvas draws it; the bar over the canvas writes it, and every change stages until
+it is committed together.
 
 | | |
 |---|---|
@@ -17,8 +17,8 @@ is committed together.
 
 | # | Capability | Notes |
 |---|---|---|
-| C1 | Add a node type on the canvas | A gesture writes — this is one of the two kinds that may |
-| C2 | Connect two types into an edge type | Drag from one to the other; endpoints come from the drag |
+| C1 | Add a node type from the canvas | **Node type** on the bar over the canvas, or the drawer's `+` — one form (ME8) |
+| C2 | Connect two types into an edge type | **Edge type** on the bar; the form names the source and target |
 | C3 | Delete, staged | Nothing leaves until the commit |
 | C4 | Every change stages | The staged set is listed, counted and reversible before it lands |
 | C5 | Commit publishes | One action turns the staged set into the next version |
@@ -29,7 +29,7 @@ is committed together.
 
 ```mermaid
 flowchart TD
-    A[Open a draft] --> B[Add · connect · delete on the canvas]
+    A[Open a draft] --> B[Node type · Edge type · Delete from the bar and the form]
     B --> C[Each change joins the staged set]
     C --> D[Staged bar: 6 staged · what they are]
     D --> E{Commit?}
@@ -58,7 +58,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Canvas (`kind = model`) | The types and their edges; palette floating on it |
+| Canvas (`kind = model`) | [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md) — the model as one frame, its types inside, its edge types between them. Detail, Layout, Settings and the theme toggle ride its header (ME26) |
 | Panel | Two views (ME17). The **list** of models, or one model's **detail**: a `PanelStack` of four drawers — Node types · Edge types · Stitches · Staged (ME13), under a `Models › <name>` crumb row carrying the version readout, over the staged bar. Neither row scrolls |
 | Staged bar | Count, the list, discard-one, discard-all, commit — `⌘↵` commits |
 | Type detail | In the **main column**, beneath the canvas: the selected type's properties, with add and remove while drafting, and its constraints (ME19) |
@@ -79,22 +79,23 @@ flowchart TD
 
 | # | Decision |
 |---|---|
-| ME1 | The model canvas writes from a gesture. Adding, connecting and deleting are the only three. |
+| ME1 | **The model canvas draws; the bar over it writes.** Adding a node type, adding an edge type and deleting are the only three writes, and none of them is a canvas gesture — the canvas is the shared model canvas and carries only its own behaviours (ME26). |
 | ME2 | Everything stages; nothing reaches a version until a commit. |
 | ME3 | A published version's canvas is read-only. |
 | ME4 | The staged set lives with the draft, so it survives a reload and is visible to anyone opening it. |
 | ME5 | Staged rows sort first in every type list, each carrying a `staged` chip, so what is about to land reads before what already has. |
 | ME6 | The selected type is edited in a form that spans the main column beneath the canvas — never in a modal over the drawing. |
 | ME7 | A run stages onto the same draft as a gesture does. There is one staged set and one commit, whoever wrote it. |
-| ME8 | A type is added from **either** side — the section's `add` in the panel, or the gesture on the canvas — and both open the same form. Two affordances, one path. |
+| ME8 | A type is added from **either** side — the section's `add` in the panel, or **Node type** on the bar over the canvas — and both open the same form. Two affordances, one path. |
 | ME9 | A delete is confirmed as *staging* a delete, not as deleting. "Gone" and "gone when you commit" are different promises, and the confirm makes which one it is unmistakable. |
 | ME10 | The compatibility banner lives on the model panel, because that is the surface whose saves the server would refuse. A warning shown where nothing is being written is a warning nobody reads. |
-| ME11 | Canvas → panel selection is one-way and idempotent. The canvas announces its inspect target through a ref, never through a dependency on the handler, and the page drops a write that names the selection it already holds. A canvas that re-announces on every render and a handler that answers with a fresh object would otherwise close a render loop. |
-| ME12 | The model canvas settles before it is looked at. Its force layout runs to completion rather than animating (`animate: false`, as the read-only canvas already does) and the camera fits once, at the end. A simulation that drifts for ten seconds after the drawing appears reads as a page that is still loading. |
-| ME22 | **The drawing is laid out for its labels, not for its circles.** A type is a 14px circle carrying its name *underneath* it and, between two of them, an edge type's name: what has to be kept apart is the label, so the sim separates joined types by 260px, pushes unjoined ones apart at −1500, and collides on an 80px radius — the label's footprint, not the circle's. The edge type's own name is set smaller than the type names it runs between, because it is read second. At the old 90px every name landed on its neighbour. |
-| ME23 | **The fit has a ceiling: the camera never zooms past 1:1 to frame a model.** A four-type model is a few hundred pixels of drawing, and a plain `fitContent` answers that by scaling it to fill the viewport — circles the size of a fist, colliding labels, and the last type off the bottom edge. Fitting *out* is always right; fitting *in* is not. |
-| ME24 | **The camera follows the *settled* solve.** Both canvases register their sim by id and run it through one bridge, which frames the result on `layout:run:end` with `reason: settled` — never on the promise. A run the engine stops (a re-registration, a topology change landing mid-solve) resolves like any other with every node still on the origin, and fitting that framed a single point and called it a model. The bridge is mounted **before** the layout for the same reason: registering a layout stops whatever that id was running, so a run started beside the registration dies, and `scene:layout:add` is the one trigger that cannot be missed. |
-| ME25 | **The drawing is redrawn when the solve settles, then framed.** A layer holds every node invisible while a declared `activeLayout` has yet to report a run — without that gate an unplaced node paints at the origin and the whole model piles up there. This sim is `animate: false` (ME12), so its solve lands in the same beat as the data it is laying out: the gate lifts against a flush that has already been and gone, and the drawing is never installed. The store holds the types, `getBounds()` returns the box and the minimap draws them; the viewport alone stays empty. The bridge that frames the settled solve (ME24) therefore calls the layer's `redraw()` first — a pure render pass over what the store already holds, no data touched. |
+| ME11 | **Selection is idempotent both ways.** A click announces `{ kind, id }` from `ClickSelectBehaviour`'s `selection:change`, and the canvas drops an announcement naming the selection it already draws; the page drops a write naming the selection it already holds. The panel selects by name and the canvas by id, and `ModelCanvas` maps one to the other. |
+| ME12 | **The model canvas lays out as the global model does.** ELK by default, d3-force from the Layout switch, and each run glides the camera with the nodes (`fitCamera`) — one behaviour for both modeller canvases ([GM10](../../../building-studio/graph-model-canvas.md#decisions)). |
+| ME22 | **The drawing is spaced for the Detail level it is drawn at.** Each level's template carries the ELK spacing and force distances its node size needs — circles, cards or schema cards — so switching Detail re-runs the layout with room for what is now drawn ([GM4](../../../building-studio/graph-model-canvas.md#decisions)). |
+| ME23 | **The camera fits every run, gliding with the nodes.** A model opens framed, and a Detail or Layout switch reframes it; the reader's zoom holds between runs. |
+| ME24 | **Every run is started by the canvas, not by the engine's auto-run.** `activeLayout` alone does not lay out a graph seeded before the layout registers, so `GraphModelCanvas` runs the active layout itself whenever its data, Detail, Layout or theme changes. |
+| ME25 | **The drawing is redrawn when a solve ends.** A solve that lands in the same beat as the data flush leaves the viewport empty while the store holds the types, so `layout:run:end` calls the layer's `redraw()` — a pure render pass over what the store already holds. |
+| ME26 | **The model canvas is the global model canvas, with one model in it.** `ModelCanvas` builds its version (the draft while one is open) with `buildAllModelsData` — one frame, its types, its edge types — and draws it on [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md), the same component *All models* uses. No behaviour is added for authoring; the old tool-driven schema canvas is gone. Two modeller canvases that drew one model two ways were two things to learn. |
 | ME26 | **A model's board is named for the model.** The tab reads `AirRoutes`, never `Model` — the rule a lens board already follows (WO15). Two models open side by side put two tabs on the strip, and a strip reading `Model · Model` is one a reader has to click through. The name comes off the models list the panel has already read, so it costs no request; until it lands the tab falls back to the kind's label rather than to an empty one. Drilling into a model in the panel is what opens the board, so the detail and the drawing arrive together. |
 | ME13 | The panel is a **stack of drawers**, not a scroll of sections. Every section's header stays on screen — `Models / <name>`, Node types, Edge types, Stitches, Staged — each collapsing to its header on its own, the open ones sharing the column with draggable dividers (`PanelStack`). The header is the thing that is always readable, and the count sits in it, so a thirty-type model never buries Edge types, Stitches or Staged below one shared fold. |
 | ME14 | **Every drawer is always present.** A section with nothing in it says so in its body rather than disappearing — `Staged 0`, *Select a type on the canvas*. A stack whose sections come and go re-lays-out under the reader and discards the sizes they dragged, and a header that vanishes when its subject empties is a header nobody can learn the position of. |
@@ -119,15 +120,6 @@ not wire them back in.
 | `PropertyKeyTable.tsx` | with `DetailPanel` | `PropertyEditor`, on the type that carries the key (ME20) |
 | `PropertyKeyFormDialog.tsx` | with `PropertyKeyTable` | `PropertyEditor` creates the key inline (ME20) |
 
-`SchemaCanvas.tsx` is live, but five of its comments still describe driving "the right-side
-DetailPanel". They are stale, not load-bearing; the clean-up pass takes them too.
-
-## Known broken
-
-| What | Why it is not fixed here |
-|---|---|
-| Right-click on an **edge** or on empty canvas does nothing | `edge-context-menu` and `background-context-menu` both claim `pointer+rclick` and lose it to `node-context-menu`, which is declared first. Three menus on one gesture needs `@invana/canvas`'s intended dispatch, not a guess from this side. Reverse-edge and delete-from-menu are unreachable until then; the panel and the type form both still do it |
-
 ## Not building
 
 | Not building | Because |
@@ -135,4 +127,4 @@ DetailPanel". They are stale, not load-bearing; the clean-up pass takes them too
 | Freehand layout saved per type | layout is a view, not part of the model |
 | Multi-user live editing | single editor with a visible holder is honest at this scale |
 | Auto-layout that rewrites positions on open | a model you arranged should stay arranged |
-| A fit that scales a small model up | ME23. Fitting out is right; fitting in draws a four-type model at 3× |
+| Writing from a canvas gesture — drag-to-connect, add on the canvas, a context menu | ME1 · ME26. The canvas is the global model canvas; the bar over it and the type form write |

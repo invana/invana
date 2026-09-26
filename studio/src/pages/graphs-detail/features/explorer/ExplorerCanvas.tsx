@@ -8,8 +8,8 @@
 // the shell and feeds it the live engine published by `<CanvasBridge>` (the last
 // child here). Every header / inspector control then resolves the same instance.
 //
-// Distinct from the Modeller's `SchemaCanvas.tsx`, which wires the same
-// `@invana/canvas-react` bindings into a tool-driven schema editor.
+// Distinct from the Modeller's `GraphModelCanvas` (`@/canvases/model`), which
+// draws models as frames of types.
 
 import { readCanvasThemeConfig } from "@/pages/graphs-detail/features/explorer/canvasTheme";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
@@ -752,7 +752,7 @@ function AutoLayoutBridge({
 	// the data it lays out, so the layer's placement gate lifts against a flush
 	// that has already happened and no shape is installed — the store and the
 	// minimap hold the graph, the viewport stays empty. `redraw()` is a pure
-	// render pass over the store (same fix as SchemaCanvas, ME25).
+	// render pass over the store (same fix as GraphModelCanvas, ME25).
 	useCanvasEvent("layout:run:end", (e) => {
 		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
 		canvas.layers.get<graph.GraphLayer>("graph")?.redraw();

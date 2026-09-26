@@ -8,7 +8,7 @@
 // grey. Every studio theme (`default` / `tailwind` / `vite` and the presets)
 // defines this standard token set, so the mapping works uniformly.
 //
-// `<ThemeBridge>` in ExplorerCanvas/SchemaCanvas calls `readCanvasThemeConfig()`
+// `<ThemeBridge>` in ExplorerCanvas calls `readCanvasThemeConfig()`
 // whenever the theme variant changes and feeds the result to `update()`.
 
 import type { CanvasProps } from "@invana/canvas-react";
@@ -46,19 +46,6 @@ function resolveVar(varName: string): string | undefined {
 
 function num(varName: string, fallback: number): number {
 	return cssColorToNumber(resolveVar(varName)) ?? fallback;
-}
-
-/**
- * The active theme's text colour, as a canvas colour.
- *
- * `readCanvasThemeConfig()` patches the *layer template*, which is enough for a
- * node that wears it — but a node with its own `style` **replaces** that
- * template, so a per-node label colour has to be resolved here instead. That is
- * every frame on *All models*: their titles were hardcoded dark and vanished
- * into the dark theme (stitch-models.md ST33).
- */
-export function readCanvasForeground(): number {
-	return num("--color-foreground", FALLBACK.foreground);
 }
 
 /**

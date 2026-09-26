@@ -13,11 +13,9 @@
  * the models would put a territory on the canvas nobody can stitch (spec.md §2).
  */
 
+import { hueSlotForIndex } from "@/canvases/model";
 import { useModelLinksQuery, useModelsQuery } from "@/hooks/queries/useModels";
-import {
-	type ModelFrame,
-	hueForIndex,
-} from "@/pages/graphs-detail/features/connect-and-model/stitch/allModels";
+import type { ModelFrame } from "@/pages/graphs-detail/features/connect-and-model/stitch/allModels";
 import { modelsApi } from "@/services/api/models";
 import type { ModelLink } from "@/types/models";
 import { useQueries } from "@tanstack/react-query";
@@ -37,7 +35,7 @@ export interface AllModelsResult {
  * `?? []` hands back a *new* array on every render, and the canvas keys its data
  * build on this reference — `<GraphLayer data>` replaces the drawing when it
  * flips, and the engine re-runs the layout when the drawing changes. One frozen
- * empty instead, as `SchemaCanvas` does for the same reason.
+ * empty instead.
  */
 const NO_LINKS: ModelLink[] = [];
 
@@ -88,7 +86,7 @@ export function useAllModels(
 	const frames = useMemo(() => {
 		let cursor = 0;
 		return domains.map((model, i): ModelFrame => {
-			const hue = hueForIndex(i);
+			const hue = hueSlotForIndex(i);
 			if (!model.active_version) {
 				return {
 					modelId: model.id,
