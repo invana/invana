@@ -296,7 +296,15 @@ class ConnectionPool:
     # Internal — connection + retry
     # -----------------------------------------------------------------------
 
-    async def _connect_graph(self, graph: GraphConnection) -> None:
+    async def _connect_graph(self, graph: GraphConnection, *, retry: bool = True) -> None:
+        """Connect *graph* and register it, or record the failure and start retrying.
+
+        A failure never raises: the row goes ``ERROR``, a reconnect event is
+        written, and — with ``retry`` — a backoff task replaces any running one.
+        The backoff task passes ``retry=False`` for its own attempts, so a failed
+        attempt does not cancel the task making it and start a fresh one at the
+        shortest delay; the task itself waits longer each time.
+        """
         connector = build_connector(graph, self._encryption_key)
         try:
             t0 = time.monotonic()
@@ -338,6 +346,8 @@ class ConnectionPool:
                 )
                 await session.commit()
 
+            if not retry:
+                return
             existing = self._retry_tasks.pop(graph.id, None)
             if existing:
                 existing.cancel()
@@ -379,7 +389,7 @@ class ConnectionPool:
 
                 set_current(**{"invana.graph_id": fresh_graph.graph_id or graph.graph_id})
                 try:
-                    await self._connect_graph(fresh_graph)
+                    await self._connect_graph(fresh_graph, retry=False)
                     # _connect_graph records a failure itself rather than raising.
                     if fresh_graph.id not in self._registry:
                         raise RuntimeError("connection attempt failed")

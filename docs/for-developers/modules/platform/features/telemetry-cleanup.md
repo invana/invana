@@ -13,7 +13,7 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 3 | Telemetry back off in the dev containers | `docker compose up -d engine studio` | 🟡 | S | engine and studio run with telemetry on; HyperDX up |
 | 4 | Merge and release design-kit `feat/error-boundary-reports` | `../design-kit` | 🟡 | S | `ErrorBoundary` `onError` + `fallback`; Studio uses the local kit until then |
 | 5 | Push and open PRs | invana · design-kit | 🟡 | S | owner's call |
-| 6 | Pool reconnect backoff never doubles | `engine/src/invana/apps/graphs/pool.py` (`_connect_graph`) | 🟡 | S | a retry restarts at 1s; its own `fix/` commit |
+| 6 | Pool reconnect backoff never doubles | `engine/src/invana/apps/graphs/pool.py` (`_connect_graph`) | ✅ | S | a failed attempt cancelled its own retry task and started a new one at 1s; the retry loop now connects with `retry=False`, so delays go 1 → 2 → 4 … |
 | 7 | CLI exit takes ~19s with the collector down | OpenTelemetry SDK shutdown at process exit | 🟡 | S | the CLI's own flush is capped at 5s; bound the SDK shutdown or accept it |
 | 8 | Dev DB run `f4a26cc5-…` left crashed | dev database | 🟡 | S | ask before touching it |
 | 9 | Graph-connector metric label is the class name; `operation` is always `query` | `engine/src/invana/graph/connectors/base/connector.py` | 🟡 | S | only if a dashboard needs `neo4j` rather than `Neo4jConnector` |
@@ -28,3 +28,4 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 18 | Studio metrics lost when a Playwright context closes before `pagehide` | `studio/src/services/telemetry/setup.ts` | ❌ | — | test-harness only; a real tab close flushes |
 | 19 | Stray asyncio mark on a sync test | `engine/tests/sessions/test_services.py:339` | 🟡 | S | fold into any cleanup commit |
 | 20 | Broken `guides/running-*.md` links in the public docs | `docs/docs` | ⏸ | S | unrelated to telemetry |
+| 21 | `TEST_CONNECTOR_CLASS` in the graphs test fixtures names a module that no longer exists | `engine/tests/graphs/conftest.py` | ⏸ | S | harmless while no test there connects; the backoff test names `invana_neo4j.connector.Neo4jConnector` itself |
