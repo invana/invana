@@ -9,7 +9,7 @@ the engine behave identically.
 |---|---|
 | Index | [13.5](../../../README.md#13--platform) · Slice **S1** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | 🟡 / 🟡 / 🟡 |
+| API / CLI / Studio | ✅ / ✅ / ✅ |
 | Related | [logging](logging.md) · [observability](../../operate/features/observability.md) · [audit-and-activity](../../operate/features/audit-and-activity.md) · [runtime](runtime.md) · [cleanup tracker](telemetry-cleanup.md) |
 
 > **As** whoever operates this, **I want** one trace to follow a person's action from Studio through

@@ -8,15 +8,15 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 
 | # | Item | Where | Status | Size | Note |
 |---|---|---|---|---|---|
-| 1 | Flip index 13.5 (API · CLI · Studio) to ✅ | `docs/for-developers/README.md` | 🟡 | S | T1–T8 done |
-| 2 | Flip index 13.4 Logging (API) to ✅ | `docs/for-developers/README.md` | 🟡 | S | C1–C10 built in T7 |
-| 3 | Telemetry back off in the dev containers | `docker compose up -d engine studio` | 🟡 | S | engine and studio run with telemetry on; HyperDX up |
-| 4 | Merge and release design-kit `feat/error-boundary-reports` | `../design-kit` | 🟡 | S | `ErrorBoundary` `onError` + `fallback`; Studio uses the local kit until then |
-| 5 | Push and open PRs | invana · design-kit | 🟡 | S | owner's call |
+| 1 | Flip index 13.5 (API · CLI · Studio) to ✅ | `docs/for-developers/README.md` | ✅ | S | T1–T8 done; the feature file's header too |
+| 2 | Flip index 13.4 Logging (API) to ✅ | `docs/for-developers/README.md` | ✅ | S | C1–C10 built in T7; the CLI column stays 🔵 |
+| 3 | Telemetry back off in the dev containers | `docker compose up -d engine studio` | ✅ | S | both recreated with telemetry off; HyperDX left running with its data |
+| 4 | Merge and release design-kit `feat/error-boundary-reports` | `../design-kit` | ⏸ | S | owner's call; `ErrorBoundary` `onError` + `fallback`; Studio uses the local kit until then |
+| 5 | Push and open PRs | invana · design-kit | ⏸ | S | owner's call |
 | 6 | Pool reconnect backoff never doubles | `engine/src/invana/apps/graphs/pool.py` (`_connect_graph`) | ✅ | S | a failed attempt cancelled its own retry task and started a new one at 1s; the retry loop now connects with `retry=False`, so delays go 1 → 2 → 4 … |
 | 7 | CLI exit takes ~19s with the collector down | `core/telemetry/setup.py` (`shutdown_telemetry`) | ✅ | S | the providers' exit hooks are unregistered and shut down within the 5s budget; measured 20s → 6s (collector up: under 1s) |
-| 8 | Dev DB run `f4a26cc5-…` left crashed | dev database | 🟡 | S | ask before touching it |
-| 9 | Graph-connector metric label is the class name; `operation` is always `query` | `engine/src/invana/graph/connectors/base/connector.py` | 🟡 | S | only if a dashboard needs `neo4j` rather than `Neo4jConnector` |
+| 8 | Dev DB run `f4a26cc5-…` left crashed | dev database | ✅ | S | deleted with its step and stream rows (they cascade); the audit events that mention it stay |
+| 9 | Graph-connector metric label is the class name; `operation` is always `query` | `engine/src/invana/graph/connectors/base/connector.py` | ⏸ | S | no dashboard needs it — `Neo4jConnector` reads fine, and renaming would split the series |
 | 10 | OTLP log handler ships `trace`, `log_fields`, `trace_id`, `span_id` as redundant attributes | `engine/src/invana/core/telemetry/setup.py` | ⏸ | S | harmless; only if HyperDX looks noisy |
 | 11 | The 5xx "already logged" key is spelled in two middlewares | `core/telemetry/middleware.py` · `server/middleware.py` | ⏸ | S | `server/` cannot import the optional telemetry module |
 | 12 | The graph page's main-region boundary does not reset on a tab switch | `studio/src/pages/graphs-detail/GraphDetailPage.tsx` | ⏸ | S | resetting would remount the tab strip; leaving the screen recovers it |
