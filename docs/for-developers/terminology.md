@@ -19,7 +19,24 @@ implementation and the description said the product.
 | Or a **plain statement of the moment** | *When it cannot answer* · *Inspect what landed* · *How many run at once*. These are fine: they name a situation a person is in, not an object |
 | The **object keeps its noun here** | Envelope, budget, binding, lineage, library, projection, emission are all real things with precise meanings. They live in this file and in the code. They are just not what the feature is *called* |
 | A **defined term may keep its name** | where the noun *is* the concept and renaming it would cost precision — `Rules`, `Projections`, `Delegation`, `Stitch models`. Plainness never buys vagueness |
-| **A path follows only when the word goes** | a rename changes display names, and the slug stays: nobody reads it, and moving it breaks every link that points at it. It moves only when the product stops using the word altogether, as *roster* did ([AG12](modules/agents/features/author-an-agent.md)) — and then every link is fixed in the same commit |
+| **A feature's path follows only when the word goes** | a rename changes display names, and the feature file's slug stays: nobody reads it, and moving it breaks every link that points at it. It moves only when the product stops using the word altogether, as *roster* did ([AG12](modules/agents/features/author-an-agent.md)) — and then every link is fixed in the same commit |
+
+
+## How a module is named
+
+**A module is named for the records it holds — a plural noun — and has that one name in the docs,
+in Studio and in the engine.** `modules/<group>/<module>/` · `features/<module>/` · `apps/<module>/`
+and `server/<module>/`. The full map is [module-structure.md](module-structure.md) §2 and §3.
+
+| Rule | |
+|---|---|
+| A **plural noun** | `models` · `agents` · `runs` · `lenses` · `plans` · `projects`. Never a verb phrase — *bring data in*, *connect and model*, *operate* name what a person does, which is a feature's register, not a module's |
+| **Singular** only for one surface or a mass noun | `explorer` · `assistant` · `memory` · `setup` · `runtime` · `tooling` · `design` |
+| A **qualifier stays** where the word needs it | `graph-connectors` — *connector* alone is never ours ([§8](#8-words-we-do-not-use)). The engine's `graph/connectors/` keeps its name |
+| **One name, three layers** | a Studio folder, an engine app and a docs module that name one thing name it the same way. A band (`core`, `runtime`, `activity`) keeps its own name; a module whose records live in one takes only `server/<module>/` |
+| The **`leftNav` label may differ** | the label says what a person does there, the module names what it holds: *Govern* → `lenses`, *Library* → `plans`, *Model* → `models` |
+| A **group** orders the docs | *Data · Exploration · Answers · Work · Orchestration · Governance · Platform* — a folder level in `docs/for-developers/modules/` only |
+| A **feature number is permanent** | it moves with the feature file and is never reused — `5.1` is providers-and-models wherever it lives, like a decision ID (`SR7`) |
 
 ## 1. The overloaded word
 
@@ -39,7 +56,7 @@ implementation and the description said the product.
 | **Graph** | The bounded domain and the reasoning boundary. An agent never crosses it. One Graph binds to exactly one graph database. |
 | **Graph settings** | The Graph's own configuration, in four tabs: **Basic** · **Graph** (the connection) · **LLMs** (the providers) · **Agents** (the ceiling). Nothing else is settings. |
 | **Rule** | One statement that is always true. `invariant` on a Graph, `working` on a Project. |
-| **Library** | The **definitions** a run is built from: reusable **plans**, the closed **catalogue** of callables, and projection **templates**. One `leftNav` item, three drawers ([G41](building-studio/graph-detail-page.md)). It widens the older sense of *the library*, which named the plan list alone. Never the journal — that is **Runs**. |
+| **Library** | The **definitions** a run is built from: reusable **plans**, the closed **catalogue** of callables, and projection **templates**. One `leftNav` item, three sections ([G41](building-studio/graph-detail-page.md)). It widens the older sense of *the library*, which named the plan list alone. Never the journal — that is **Runs**. |
 | **Skill** | A playbook an agent may be offered — named, described, with a "when to use". Offered, never forced. |
 | **Graph connector** | The package that speaks to one graph database — `invana-neo4j`, `invana-janusgraph`. Always qualified. |
 | **Setup** | The *sequence* a Graph walks from created to answering — four required steps and two optional ones, derived from facts and never ticked. [13.7](modules/platform/features/setup.md) |
@@ -65,7 +82,7 @@ implementation and the description said the product.
 | **Participant** | One named member of a layer, addressed `<layer>/<sublayer>/<name>` — `llm/anthropic-prod/claude-opus-5`. |
 | **Cast** | The binding of a plan's **role** (`extract` · `decide` · `judge` · `embed`) to a model address. A resolution, not a bound — the rules are what narrow. |
 | **Touch** | One recorded engagement with a participant: address, direction, volume, and what was sent. Not a log line. |
-| **Stitch** | The act of declaring that two published models meet, and the Studio surface that holds them — a drawer in the Model panel. An anchor and a relationship link are the two kinds of stitch. **Declared stitches are read-time and write nothing**, which is what lets a [lens](#3-models-and-data) exclude them. The `stitch` *step inside an import* is a different act — it writes edges, and no lens can un-write one. |
+| **Stitch** | The act of declaring that two published models meet, and the Studio surface that holds them — a section in the Model view panel. An anchor and a relationship link are the two kinds of stitch. **Declared stitches are read-time and write nothing**, which is what lets a [lens](#3-models-and-data) exclude them. The `stitch` *step inside an import* is a different act — it writes edges, and no lens can un-write one. |
 | **Physical** | The introspected mirror of what the database actually holds. |
 | **Query shape** | A query with its literal values replaced by parameters — a thousand calls of one generated query are one shape. What the model page's Performance tab groups by. Not a saved query. |
 | **Records** | Externally produced data, conforming to exactly one model, handed to Invana. They are the model's — there is no record between the model and its data ([BD16](modules/bring-data-in/spec.md)). |
@@ -103,7 +120,8 @@ implementation and the description said the product.
 |---|---|
 | **Board** | A named, saved, versioned working surface. One flat `kind` axis of nine: `data · model · plan · workflow · envelope · lineage · run · task_run · plan_runs`. Whether it is *drawn* (on a canvas) or *declared* (panels bound to one record) is **`renders`**, a property of the kind — never a second column. The **plan** and **workflow** kinds both draw a `TaskPlan` — one for a Project's Todos, one for a plan's Tasks. Never "artboard". |
 | **Report** | A **frozen** dashboard — the panels with the numbers as they were, stored merged so it outlives its subject. One version of a board, not a kind of its own. |
-| **Panel** | The content of one shell region — `ModelPanel`, `InspectorPanel`, `AssistantPanel`. A panel is named for the **occupant**, not for its contents: the Assistant holds sessions, so it is `AssistantPanel`, not `SessionsPanel`. A panel is *what fills* a region, never a region itself, so "the panel" alone names nothing. |
+| **View panel** | The content of one shell region — `ModelViewPanel`, `InspectorViewPanel`, `AssistantViewPanel` — canvas-ui's suffix. A panel is named for the **occupant**, not for its contents: the Assistant holds sessions, so it is `AssistantViewPanel`, not `SessionsViewPanel`. A panel is *what fills* a region, never a region itself, so "the panel" alone names nothing. |
+| **Section** | One collapsible, resizable part of a stacked view panel — the kit's `PanelStackSection`, with its own header, count, search and drill-in. The Agents view panel has two: **Agents** and **LLMs**. Never a *drawer*: nothing in Studio slides over anything. |
 | **Assistant** | The one conversational surface, available everywhere, holding the current selection. Its panel is titled **Ask Assistant** — the noun is *Assistant*, the panel's name says whose. |
 | **Soul** | Who an agent is and how it speaks — Markdown on the agent, read only by the steps whose words a person reads. Never *persona*, never *character*: a soul changes words, not what runs. [5.8](modules/agents/features/soul.md) |
 | **Third-party** | Anything that is not from the Graph: from a third-party source — the **internet**, or an `api`, `app`, `db` or `agent` the Graph connects — or from the **model**'s own knowledge. Always badged `third-party · <source>` and always carrying its reference: the link for the internet, the locator for any other source. [3.13](modules/ask/features/beyond-the-graph.md) |
@@ -123,7 +141,7 @@ sub-slots, the URL params and the retired words are in
 | Region | Is |
 |---|---|
 | **`header`** | the full-width top bar — `header.left` · `header.center` · `header.right` |
-| **`leftNav`** | the icon column, one icon per feature module |
+| **`leftNav`** | the icon column — one icon per module that has a `leftSection` panel ([module-structure.md](module-structure.md) §2) |
 | **`leftSection`** | the resizable left column — holds the open panel |
 | **`mainSection`** | the open pages |
 | **`rightSection`** | the resizable right column — the Inspector, or the Assistant |
@@ -170,6 +188,7 @@ sub-slots, the URL params and the retired words are in
 | Not this | Say | Why |
 |---|---|---|
 | Mission · Atlas · Workspace | **Graph** | one container, one word |
+| Bring data in · Connect and model · Operate · Ask · Work · Workflows · Govern — as a **module** name | `imports` · `models` + `graphs` · `runs` + `events` · `assistant` · `projects` · `plans` · `lenses` | a module is named for what it holds ([§ How a module is named](#how-a-module-is-named)); a verb phrase is a feature's register. *Govern* stays the `leftNav` label |
 | Intent | **Instructions** for guidance, **understanding** for the step | the word is ambiguous between the two |
 | Instructions (as a prose blob) | **Rules** | guidance is a list of statements, not a paragraph |
 | Acceptance criteria (as prose) | **Criteria** | each one is a node with a check |
@@ -204,7 +223,7 @@ sub-slots, the URL params and the retired words are in
 | Rail · left rail · activity bar | **`leftNav`** | the kit's prop name is the word; nothing else names a region |
 | Sidebar · left panel · docked panel | **`leftSection`** | ditto |
 | Editor · main content · canvas area · workspace | **`mainSection`** | ditto |
-| Auxiliary · right panel · **drawer** | **`rightSection`** | a drawer names neither the place nor the thing |
+| Auxiliary · right panel · **drawer** | **`rightSection`** for the place · **section** for a part of a stacked view panel | a drawer names neither the place nor the thing, and nothing in Studio behaves like one |
 | Terminal · bottom panel | **`bottomSection`** | the **Console** is what fills it |
 | Status bar (as a place) | **`footer`** | the status is the occupant; the footer is the region |
 | Panel · section · pane, bare | the **region**, or the **occupant** | the bare word is the whole ambiguity |

@@ -7,7 +7,7 @@ canvas: **check here before building canvas chrome.**
 | | |
 |---|---|
 | Package | `@invana/canvas-ui` — source at `~/Projects/invana/canvas/packages/canvas-ui` |
-| Studio folders | [`features/explorer/`](code-shape.md#41c-the-two-explore-folders-file-by-file) · `features/canvases/` |
+| Studio folders | [`features/explorer/` · `features/boards/`](../module-structure.md#121-studio) |
 | Rule it enforces | CLAUDE.md › *Design rules* — anything bound to canvas state belongs to `@invana/canvas-ui`; a component the kit lacks is built **there**, with a story, not in `studio/` |
 
 ## 1. The rule

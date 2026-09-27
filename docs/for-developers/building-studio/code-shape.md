@@ -142,175 +142,119 @@ the 26 turned out to be — 16 of them were one wrong type annotation, written t
 
 ## 4. The target shape
 
-One folder per **feature module**, named after the module in
-[`docs/for-developers/modules/`](../modules/). The product's words are already the
-directory names, so a developer holding a feature file knows where the code is without being told
-(CLAUDE.md › *Use the product's words*).
+One folder per **module**, named in [module-structure.md](../module-structure.md) §2 — and the
+**same name the engine uses**: Studio `features/<m>/`, engine `apps/<m>/` where the module owns
+tables, engine `server/<m>/` for its routes ([module-structure.md](../module-structure.md) §3). A
+developer holding a module name finds its code in all three places without being told.
 
 ```
 studio/src/
-  router.tsx                  route table only
-  routes.ts                   every path as a named constant — one place a URL is written
-  App.tsx  providers.tsx  ProtectedRoute.tsx  ErrorPage.tsx
+  App.tsx  main.tsx  router.tsx  index.css
+  canvases/                   renderers more than one module draws — data, settings, templates in by props
+    model/                    GraphModelCanvas (graph-model-canvas.md)
+    taskflow/                 TaskFlowCanvas · taskFlowFromPlan (task-flow-canvas.md)
+    layered/                  LayeredCanvas — the plan, envelope and lineage boards
+  components/                 app chrome — header, theme, confirm dialog
+  ui/                         ONLY components the kit cannot own (DS2) — a domain type in the props
+  hooks/  lib/  stores/       app-wide, not a module's
+  services/api/client.ts      the HTTP client; every resource lives in its module's api.ts
   pages/
     auth/  graphs/  platform/  settings/    the routes that are not graph-scoped
     graphs-detail/
-      GraphDetailPage.tsx     the one graph-scoped page — AppLayoutV2, ten features
+      GraphDetailPage.tsx     the one graph-scoped page — AppLayoutV2
       shell/                  its regions: leftNav, the open pages, the status bar
-      features/
-        connect-and-model/    1.x — models, the model canvas, links
-        bring-data-in/        2.x — datasets, import runs
-        ask/                  3.x — the answer surface, emissions, projections, the trace
-        explorer/             4.1 · 4.3 · 4.4 — the canvas, what is selected on it, the console
-        canvases/             4.2 — the page host in `mainSection`, and the canvas behind a tab
-        agents/               5.x — agents, envelope, lineage, lifecycle, stats
-        skills/               6.x — skills, bindings, usage, rules
-        workflows/            7.x — the library, plan selection, promote
-        memory/               8.x — proposals, consolidation
-        work/                 9.x — projects, tasks, the plan, review
-        operate/              10.x — schedules, audit and activity, observability
-        graph-settings/       the Graph's own configuration — Info, Connection, LLMs
-  canvases/                   canvases more than one module renders — data, settings, templates in by props
-    taskflow/                 TaskFlowCanvas · settings.json · templates.json (task-flow-canvas.md)
-    model/                    GraphModelCanvas · settings.json · templates.json (graph-model-canvas.md)
-  shared/
-    api/                      the HTTP client and one file per engine resource
-    hooks/  lib/  stores/  types/  telemetry/
-  ui/                         ONLY components the kit cannot own (DS2) — a domain type in the props
+      shared/                 domain code two or more modules use — StackSection, RecordRow, StepRules
+      features/               one folder per module, flat — no group level
+        agents/  assistant/  boards/  events/  explorer/  graphs/  lenses/  llms/
+        models/  plans/  projections/  projects/  rules/  runs/  setup/  skills/
 ```
 
+| Module folder | `leftNav` / region | Engine |
+|---|---|---|
+| `explorer/` | Explorer · `rightSection` Inspector | `apps/explorer` |
+| `models/` | Model | `apps/models` |
+| `projects/` | Projects | `apps/projects` |
+| `runs/` | Runs | `server/runs` (records in `runtime`) |
+| `plans/` · `projections/` | Library — Plans · Catalogue · Templates | `apps/plans` · `server/projections` |
+| `lenses/` | Govern | `apps/lenses` |
+| `agents/` · `llms/` | Agents — Agents · LLMs | `apps/agents` · `apps/llms` |
+| `skills/` · `rules/` | Skills — Skills · Rules | `apps/skills` · `apps/rules` |
+| `events/` | Events | `server/events` (records in `core/events`) |
+| `graphs/` | Info · Settings | `apps/graphs` |
+| `assistant/` | `rightSection` Assistant | `apps/assistant` |
+| `boards/` | `mainSection` | `apps/boards` |
+| `setup/` | the onboarding wizard | `apps/setup` |
+
 The graph-scoped modules live **under the page that hosts them**, because that is what they are:
-ten `leftSection` components and their page kinds, composed by one `GraphDetailPage`.
-[graph-detail-page.md](graph-detail-page.md) is the contract between them — read it before moving a
-file into `features/`. Identity and access (11.x) is not graph-scoped and stays in `pages/auth/` and
-`pages/settings/`; the Graph as an object stays in `pages/graphs/`.
+`leftSection` components and their page kinds, composed by one `GraphDetailPage`.
+[graph-detail-page.md](graph-detail-page.md) is the contract between them. A module with no Studio
+surface has no folder — `imports`, `graph-connectors`, `queries` until the console (4.4) ships, `memory`, `reviews`,
+`schedules`, `runtime`, `tooling`, `design`; `accounts` is not graph-scoped and stays in
+`pages/auth/` and `pages/settings/`.
 
-`features/graph-settings/` is the one folder without a docs module of its own. Graph settings is
-[1.1](../README.md#1--connect-and-model)'s Info and Connection plus the LLM providers, and it is a
-`leftNav` item like any other, so it takes a module folder even though the docs file it against
-connect-and-model. Named exception, documented here, not a precedent.
-
-### 4.1 Inside a feature module
+### 4.1 Inside a module
 
 A **graph-scoped** module has no `routes.tsx` and no `screens/` — it has one `leftSection`
 component and the page kinds it opens, both declared in its `index.ts` as a `GraphFeature`
-([graph-detail-page.md](graph-detail-page.md) §4). The rest of this section still holds.
+([graph-detail-page.md](graph-detail-page.md) §4).
 
 ```
 features/agents/
   index.ts                    the public surface — the ONLY file another module may import
-  routes.tsx                  this module's route objects, lazy-loaded
-  api.ts                      endpoints for 5.x, on shared/api/client
-  types.ts                    the engine shapes this module reads
+  api.ts                      this module's endpoints, on services/api/client
   queries.ts                  TanStack Query hooks
-  screens/                    one file per artboard: AgentsScreen · AgentScreen · AgentStatsScreen
+  types.ts                    the engine shapes this module reads
+  AgentsViewPanel.tsx         the leftSection occupant — a PanelStack of sections
+  AgentsSection.tsx           one PanelStackSection of it
+  AgentDetail.tsx             a drill-in
+  AgentBoardPage.tsx          a mainSection page kind
+  boards/                     more page kinds and their specs, when there are several
   components/                 private. Never imported from outside this folder
-  panels/                     surfaces that render into a shell region rather than a route
 ```
 
 | Rule | Detail |
 |---|---|
-| `index.ts` is the border | A module exports its routes, its panels and its query hooks. Nothing else. A deep import into another module's `components/` is a lint error (§8) |
-| One screen file per artboard | `screens/AgentStatsScreen.tsx` ↔ `AgentStatsHiFi`. The name is the map — no index needed to find the code for a drawing |
-| `components/` is private and small | If two modules need it, it goes to `shared/` if domain-free or `@invana/ui` if domain-free *and* general (DS2). Two modules importing the same private component is the signal, every time |
-| A module owns its API calls | `features/agents/api.ts`, not a shared `services/api/work.ts` that four modules edit. Merge conflicts in a community project are mostly one shared file |
-| No module imports `app/` | Dependency direction is `app → features → shared`. A feature that needs the router takes a prop or a hook from `shared/` |
+| `index.ts` is the border | A module exports its panel, its page kinds and its query hooks. Nothing else. A deep import into another module is a lint error (§8) |
+| A module owns its API | `api.ts` · `queries.ts` · `types.ts` in the folder. A shared file that several modules edit — `services/api/work.ts`, `hooks/queries/useWork.ts` — is how a community project gets its merge conflicts |
+| `components/` is private and small | If two modules need it, it goes to `shared/` if it is domain code, or `@invana/ui` if it is domain-free *and* general (DS2). Two modules importing the same private component is the signal, every time |
+| A renderer two modules draw is a canvas | `src/canvases/<name>/`. The module keeps only its adapter — `PlanCanvas` in `projects/`, `EnvelopeCanvas` and `LineageCanvas` in `agents/` |
+| One direction inside a module | A sub-folder imports its parent's types, never the reverse. `models/model-editor/` renders `stitch/`'s block; `stitch/` imports only the selection type back |
+| No `utils/` | A file is named for what it holds — `typeColor.ts`, `propertyTypes.ts`, `runSummary.ts`. A bag named `utils/` is the shape word that hides the most |
+| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/` |
 
-### 4.1b A module's folder is its docs module; a sub-folder is one of its features
-
-A module folder big enough to need structure takes it from `docs/for-developers/modules/<m>/`, not
-from whichever of its features is most used.
-
-| Rule | Detail |
-|---|---|
-| **The folder is the module, never a feature of it** | `features/ask/`, because [Ask](../modules/ask/spec.md) is the docs module. Naming it `features/assistant/` would promote one feature (3.10) over the module's other eight, and file `TemplatesPanel` — which is projections (3.4) — under a word that does not describe it |
-| **A sub-folder is a feature, named after its file** | `ask/assistant/` ↔ `the-assistant.md` · `ask/answer-surface/` ↔ `the-answer-surface.md` · `ask/projections/` ↔ `projections.md`. A reader who knows the docs already knows the tree |
-| **Never a shape word** | `templates/`, `components/`, `renderers/`, `views/` say how the code is built. `answer-surface/` says which feature it is, and the docs page it answers to |
-| **Check the module's vocabulary before coining a folder name** | `template` was already Ask's word for a versioned, person-authored projection template ([projections.md](../modules/ask/features/projections.md) §3). `ask/templates/` holding `EmissionCard` beside `TemplatesPanel` would put two unrelated things under one word in one module |
-| **A feature every module fills is promoted to its own folder** | `features/canvases/` ↔ [boards.md](../modules/explore/features/boards.md). The page host in `mainSection` holds six kinds owned by three modules — a data canvas (Explore), a model canvas (Connect and model), four work canvases (Work). Filing it under Explore would make two other modules deep-import Explore's private tree, which §4.1's border forbids. A feature only its own module uses stays a sub-folder; one every module fills is promoted |
-| **The module folder then takes the screen's name** | `features/explorer/` ↔ [terminology.md](../terminology.md) *Explorer*. With canvases promoted out, what is left is one screen — the canvas and what is selected on it — and Explorer is the word the rail, the breadcrumb and the artboards already use for it. `explore/` named a module that no longer maps one-to-one onto a folder |
-| **A sub-folder may name a screen that spans several features** | `connect-and-model/model/` holds 1.2 · 1.3 · 1.4 · 1.5 · 1.7, because one screen — the Model panel and the model canvas — draws all five, and `ModelPanel` assembles them in one file. Four sub-folders named after four feature files would split one screen four ways and put its assembler in whichever one won. The test is the screen, not the file count: `stitch/` is its own folder because [stitch-models](../modules/connect-and-model/features/stitch-models.md) is a different subject with its own page kind, not because it is a different docs row |
-
-The last one is the general rule and the cheapest check there is: a folder name is a product word, so
-[terminology.md](../terminology.md) and the module spec's Vocabulary table decide it, not the shape
-of the files going in.
-
-### 4.1c The two Explore folders, file by file
-
-Explore is two folders, and the line between them is **subject, not shape**: `explorer/` is what is
-drawn and what is selected on it; `canvases/` is the host that mounts it and the saved record behind
-the tab ([boards.md](../modules/explore/features/boards.md) CV7 · CV8).
-
-```
-features/
-  explorer/                      4.1 graph-canvas · 4.3 selection-and-the-panel · 4.4 the-console
-    index.ts                     the border — canvases/ imports only from here
-    ExplorerCanvas.tsx           the canvas + ExplorerHeaderToolbar
-    ExplorerTypesPanel.tsx       the leftSection: node types · relationships · selected
-    InspectorPanel.tsx           the ?right=inspector occupant
-    LayersPanel.tsx              CV6 card — what is painted        (deleted in phase 4)
-    StylingPanel.tsx             CV6 card — how it is painted
-    ExpandFineTunePanel.tsx      expand, with filters and a sort
-    useExpandNode.ts             the expand mutation
-    canvasTheme.ts               theme tokens → engine colours
-    typeColor.ts                 type → palette slot, so legend and drawing agree
-    visibility.ts                the hidden cascade            (deleted in phase 4)
-
-  canvases/                      4.2 canvases — the page host, and the record behind a tab
-    index.ts                     the border
-    BoardPages.tsx              mainSection: builds pages[], renders BoardPagesViewPanel
-    usePages.ts                  activePageId · selectPage · closePage · pageHeaderActions
-    useCanvasTabs.ts             openTabs · openCanvasTab · closeCanvasTab
-    DataBoardPage.tsx           one data canvas and its cards — the `data` page body
-    CanvasFormDialog.tsx         create / rename a canvas
-    CanvasHistoryPanel.tsx       CV6 card — the version timeline
-    useCanvasStates.ts           contents · seed · styling · selection, keyed by canvas
-    captureBanner.ts             the tab's and the version's thumbnail
-    canvasKinds.ts               the six kinds, and which two write from a gesture
-```
+### 4.1b A module's folder is its module; a sub-folder is one of its features
 
 | Rule | Detail |
 |---|---|
-| One direction | `canvases → explorer`. The host mounts the canvas; the canvas never reaches for the strip. A control on the strip that must act on a page body goes through `BoardPageHandle` ([graph-detail-page.md](graph-detail-page.md) G12), not an import |
-| No `utils/`, no `lib/` | `canvasTheme` · `typeColor` · `captureBanner` · `visibility` are engine **adapters** — PixiJS needs concrete values, not classes. Four small files at the top of the folder, because a shape-word folder is banned above and a bag named `utils/` is the shape word that hides the most |
-| The other kinds stay home | `ModelCanvas` stays in `connect-and-model/`, `WorkCanvas*` in `work/`. `canvases/` holds the **host**, not every body it can mount — it takes them as a registered page kind |
+| **The folder is the module** | Its name is the [module-structure.md](../module-structure.md) §2 name — a plural noun for the records it holds, singular only for one surface or a mass noun (`explorer`, `assistant`, `setup`). Never a verb phrase, never a feature's name, never a `leftNav` label that differs from the module (Govern → `lenses/`, Library → `plans/`) |
+| **The engine has the same name** | `features/<m>/` ↔ `apps/<m>/` ↔ `server/<m>/`. A Studio folder whose name the engine does not share is a bug in one of them |
+| **A sub-folder is a feature, named after its file** | `assistant/answer-surface/` ↔ `the-answer-surface.md` · `models/model-editor/` ↔ `model-editor.md` · `models/stitch/` ↔ `stitch-models.md`. A reader who knows the docs already knows the tree |
+| **A sub-folder may name a screen that spans several features** | `models/model-editor/` holds introspect, domain models, the editor, share and starters, because one screen — the Model panel and the model canvas — draws all five and `ModelPanel` assembles them in one file. The test is the screen, not the file count |
+| **`boards/` inside a module holds its page kinds** | `runs/boards/RunBoardPage.tsx` and its spec. It is the one shape word allowed, because *board* is the product's word for a page in `mainSection` |
+| **Never another shape word** | `templates/`, `renderers/`, `views/`, `dashboards/` say how the code is built, not which feature it is |
+| **Check the module's vocabulary before coining a name** | [terminology.md](../terminology.md) and the module's `spec.md` decide it, not the shape of the files going in |
 
-### 4.1d The two Connect-and-model folders, file by file
+### 4.1c A component's suffix is its role
 
-Connect and model is two folders, and the line is **subject** again: `model/` is a model authored on
-its own — its types, its draft, its versions, and the file it travels in; `stitch/` is what happens
-*between* two published models ([stitch-models.md](../modules/connect-and-model/features/stitch-models.md)
-ST1 · ST8 · ST11).
+One meaning per suffix, and the suffixes are the kit's words ([module-structure.md](../module-structure.md) §5).
 
-```
-features/connect-and-model/
-  index.ts                     the border — GraphDetailPage imports only from here
-  CompatibilityBanner.tsx      graph-connectors capabilities.md — neither feature's, so neither owns it
+| Suffix | Is | Example |
+|---|---|---|
+| `XViewPanel` | what fills a region, named for the occupant — canvas-ui's word (`LayersViewPanel`, `BoardPagesViewPanel`) | `RunsViewPanel` · `AssistantViewPanel` · `LensesViewPanel` |
+| `XSection` / `XSectionBody` | one `PanelStackSection` of a view panel / its `content` | `TodosSection` · `PlansSection` · `TodosSectionBody` |
+| `XList` | the rows of a list section | `RunsList` |
+| `XDetail` | a drill-in that replaces a section's body | `RunDetail` · `AgentDetail` |
+| `XBoardPage` | anything in `mainSection` | `RunBoardPage` · `RunsBoardPage` |
+| `XCard` | floats over the canvas | `LayersCard` · `StylingCard` |
+| `XWidget` | one tile on a board | `TaskFlowWidget` · `RunLensWidget` |
+| `XTab` | a tab body | `InfoTab` · `EventsTab` · `AgentSoulTab` |
+| `xRows.ts` | a row builder, not a component | `usageRows` · `growthRows` |
 
-  model/                       1.2 introspect · 1.3 domain-models · 1.4 model-editor · 1.5 share · 1.7 starters
-    ModelPanel.tsx             the leftSection occupant — the version bar, the type lists, the staged bar
-    ModelCanvas.tsx            the `model` page kind, mounted by canvases/
-    types.ts                   ModelSelection · SelectedItem · ModelEditCtx — this module's own shapes
-    propertyTypes.ts           the connector's property types, with a fallback
-    components/                private — 16 files: the canvas, the detail column, the forms, the tables
-
-  stitch/                      1.6 stitch-models
-    StitchesSection.tsx        the Stitches section of the Model panel — both kinds declared from one `add` (ST13)
-    GlobalModelPage.tsx        the `global-model` page kind — the derived union, owned by no one model
-    AllModelsCanvas.tsx        the `all-models` page kind — every model as a group frame (ST14), zoom as altitude (ST15)
-    allModels.ts               the data build: frames, members, crossings. Pure — no queries, no style
-    useAllModels.ts            the fan-out: models + each active version + model-links (ST16)
-    components/
-      DeclareStitchDialog.tsx  anchor or relationship, pre-filled from the selected type
-```
-
-| Rule | Detail |
-|---|---|
-| One direction | `model → stitch`. `ModelPanel` renders `StitchesSection`; nothing in `stitch/` imports `model/` except its `ModelSelection` type. A link is declared *from* a selected type, so the arrow points the way the gesture does |
-| The assembler is named for its region, not its folder | `ModelPanel` occupies `leftSection`, so it is a Panel (§4.1a). `StitchesSection` is a section *inside* that panel, so it is a Section — `StitchPanel` would claim a region it does not have. Not every feature folder ends in a `*Panel` |
-| `types.ts`, never `utils.ts` | The module-local shapes collect in `model/types.ts`. The connector's property-type list is `propertyTypes.ts` — named for what it holds, because §4.1c bans the bag that hides the most |
-| `hooks/` when there are hooks | `useModels` · `modelsApi` · the model shapes are still in `shared/`. They have no importer outside this module and §4.1 says they should move in, but that is its own commit — `model/hooks/` appears when it does, not as an empty folder now |
-| A banner that belongs to another module stays at the root | `CompatibilityBanner` answers to [capabilities.md](../modules/graph-connectors/features/capabilities.md) and renders in the Model panel. Filing it under `model/` would say the model owns the connection's version window. It sits at the module root until graph-connectors has a folder to take it |
+`XSection` means one thing: a `PanelStackSection`. A tab body is an `XTab`, never a `*Section`; the regions keep
+the kit's camelCase props (`leftSection`), so a component and a region never share a spelling.
+Retired: `*Drawer` (nothing in Studio is a drawer), `*StackPanel` (a stacked view panel is a `ViewPanel`),
+`*DashboardPage` (a dashboard is a board), and a bare `*Panel` for an occupant (it reads as a kit primitive —
+`PanelStack`, `PanelContent`, `TabbedPanel`).
 
 ### 4.1a How a symbol is named
 
@@ -319,11 +263,11 @@ engine has not granted.
 
 | Rule | Detail |
 |---|---|
-| **The folder is the prefix** | Inside `features/ask/assistant/`, everything is the assistant's. `AssistantSessionList` distinguishes nothing from `SessionList`; the prefix is only worth adding to a name that is ambiguous **at its call site**, not to one that is ambiguous in isolation |
+| **The folder is the prefix** | Inside `features/assistant/`, everything is the assistant's. `AssistantSessionList` distinguishes nothing from `SessionList`; the prefix is only worth adding to a name that is ambiguous **at its call site**, not to one that is ambiguous in isolation |
 | **A noun belongs to whoever the engine says owns it** | A session belongs to the *graph* — the route is `/sessions`, the client is `sessionsApi`, and the same hook serves two surfaces. So it is `useSessions`, never `useAssistantSessions`: the prefix would claim an ownership the engine does not grant, and would be wrong at one of the two call sites |
-| **A panel is named for its occupant, not its contents** | `AssistantPanel`, because the occupant of the region is the Assistant and sessions are what it holds ([the-shell.md](the-shell.md)). `SessionsPanel` named the contents, and the name stopped being true the moment the panel moved |
+| **A view panel is named for its occupant, not its contents** | `AssistantViewPanel`, because the occupant of the region is the Assistant and sessions are what it holds ([the-shell.md](the-shell.md)). `SessionsPanel` named the contents, and the name stopped being true the moment the panel moved |
 | **A name that has stopped being true is a bug** | `closeSessions` closed the *left* panel and was handed to nine panels, none of them Sessions. Rename on sight — a lying name costs more than an unfashionable one, and an unfashionable one costs nothing |
-| **A hook that names a region lives with the shell** | `useRightSection` sits in `shell/`, beside `useSettingsPanel`, not inside `features/ask/assistant/`. The region is the shell's question; the assistant is only one of the things that can answer it |
+| **A hook that names a region lives with the shell** | `useRightSection` sits in `shell/`, beside `useLeftSection`, not inside `features/assistant/`. The region is the shell's question; the assistant is only one of the things that can answer it |
 
 The test for a rename is whether the name is **false**, not whether it is **unprefixed**. Renaming
 `SessionsPanel` was worth it (the occupant is not "sessions"); renaming `SessionList` inside it
@@ -331,32 +275,8 @@ would not be.
 
 ### 4.2 Where today's files go
 
-For the graph-scoped modules this table is superseded by
-[graph-detail-page.md](graph-detail-page.md) §6, which names every file and its destination
-under `pages/graphs-detail/`.
-
-| From | To |
-|---|---|
-| `pages/graphs/explorer/components/model/*` · `pages/graphs/modeller/components/*` | `features/connect-and-model/` |
-| `pages/graphs/explorer/components/datasets/*` | `features/bring-data-in/` |
-| `pages/graphs/explorer/components/emissions/{EmissionCard,EmissionBodies,NotAnAnswer}` · `ResultBlock` · `ResultsTable` · `TraceDialog` · `lib/emissions.ts` | `features/ask/answer-surface/` |
-| `pages/graphs/explorer/components/emissions/TemplatesPanel` | `features/ask/projections/` |
-| `pages/graphs/explorer/*` (canvas, types panel, inspector, layers, styling, type colour, theme) | `features/explorer/` |
-| `pages/graphs/explorer/*` (the page host, the canvas record, its versions, its contents) | `features/canvases/` |
-| `pages/graphs/explorer/*` (sessions, assistant) | `features/ask/assistant/` — the assistant is Ask's surface on every left panel, not one of Explore's ([the-assistant.md](../modules/ask/features/the-assistant.md) AD12) |
-| `pages/graphs/work/AgentsPanel` · `AgentDetail` | `features/agents/` |
-| `pages/graphs/work/SkillsPanel` · `components/settings/sections/SkillsSection` | `features/skills/` |
-| `pages/graphs/work/WorkflowsPanel` · `PromoteDialog` | `features/workflows/` |
-| `pages/graphs/work/ProjectsPanel` · `TasksPanel` · `TaskActivityTree` · `WorkCanvas*` | `features/work/` |
-| `components/settings/sections/Events*` · `event*.ts` · `pages/platform/PlatformEventsPage` | `features/operate/` |
-| `pages/auth/LoginPage` · `pages/settings/ProfileSettingsPage` · `hooks/useAuth` · `stores/auth.store` | `features/identity-and-access/` |
-| `pages/graphs/GraphsListPage` · `GraphCreatePage` · `GraphForm` · `GraphDetail` · `components/settings/*` | `features/graphs/` |
-| `components/Theme*` · `Saturation*` · `studioThemes` · `AppVersion` | `app/shell/` |
-| `services/api/*` · `hooks/queries/*` · `lib/*` · `types/*` · `stores/*` | `shared/`, then split into each module's `api.ts` / `types.ts` as that module is touched |
-
-The last row is deliberate: `shared/api/` and `shared/types/` are a **staging area**, not the
-destination. A module moves its slice out when its screens are built. Doing all of it up front is a
-6,000-line diff nobody can review.
+[module-structure.md](../module-structure.md) §4 and §12.1 — every folder and file, today's path and
+its target, and the phases R2–R6 that move them.
 
 ### 4.3 Path alias
 
@@ -485,6 +405,7 @@ A convention a community project cannot enforce is a convention it does not have
 | No cross-feature deep imports | Biome `noRestrictedImports`: `src/features/*/!(index.ts)` is not importable from another feature |
 | No canvas-ui fork | A canvas panel, toolbar, card, menu or status strip is `@invana/canvas-ui`'s. [canvas-ui-coverage.md](canvas-ui-coverage.md) is the map, read before writing one; a surface listed there is consumed, never reimplemented |
 | No dead files | `knip` in CI |
+| Names follow modules | `scripts/check-names` — Studio `features/<m>/` ↔ engine `server/<m>/`, the §4.1c suffixes only, no retired word in an identifier ([module-structure.md](../module-structure.md) §8b) |
 | Tokens only | Extend the check script to fail on `hsl(` · `#rrggbb` · `bg-{palette}-{n}` in `src/` — the same rule `.design/board/build.mjs` enforces (§5.4) |
 | The type ladder | Fail on `text-[Npx]`. **30 sites today** — fix them in Phase 1, then the gate holds (D7 · DS13) |
 | No PixiJS | Fail on any `pixi` import in `src/` (rule 10). The `vite.config.ts` pin is exempt |

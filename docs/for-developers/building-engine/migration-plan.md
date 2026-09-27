@@ -895,6 +895,8 @@ from `fields`.
 
 Neither tree is derived from the other; this table is the join.
 
+The target names — one per module, shared with Studio — are [module-structure.md](../module-structure.md) §3 and §12.2; the rows below name the packages as they are today.
+
 | Package | Serves | Band |
 |---|---|---|
 | `graph` | [Graph connectors §12](../README.md#12--graph-connectors) | 1 |

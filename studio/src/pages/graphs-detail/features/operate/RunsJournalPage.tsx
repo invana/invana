@@ -19,11 +19,11 @@ import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
 import { usd } from "@/pages/graphs-detail/features/agents/agentDraft";
+import { RunsFilterBar } from "@/pages/graphs-detail/features/operate/RunsFilterBar";
 import {
 	elapsedOf,
 	shortRunId,
-} from "@/pages/graphs-detail/features/bring-data-in/ImportsPanel";
-import { RunsFilterBar } from "@/pages/graphs-detail/features/operate/RunsFilterBar";
+} from "@/pages/graphs-detail/features/operate/RunsList";
 import { useRunsFilters } from "@/pages/graphs-detail/features/operate/useRunsFilters";
 import { useRunsPanel } from "@/pages/graphs-detail/shell/useRunsPanel";
 import { PanelSection } from "@/ui/PanelSection";

@@ -1,5 +1,7 @@
 /**
- * Runs — the journal (docs/for-developers/modules/bring-data-in/features/inspect-what-landed.md IW7).
+ * **RunsList** — the Runs panel's body: one row per TaskRun
+ * (docs/for-developers/modules/operate/features/see-what-ran.md SR1 ·
+ * docs/for-developers/modules/bring-data-in/features/inspect-what-landed.md IW7).
  *
  * One list of runs in the Graph, newest first. **The journal is filtered, not
  * selective** (SR23): a load, an ask, a stitch commit and a bulk load are all
@@ -19,45 +21,6 @@ import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed, formatRelativeTime } from "@/lib/time";
 import { EmptyState, RunRow, Spinner } from "@invana/ui";
-
-/**
- * The journal body — the rows, and nothing else.
- *
- * It is a **drawer body**, not a panel: the Runs drawer draws the title, the
- * count, the search, the funnel and the chip row it opens above it, and the panel draws the status bar
- * below (graph-detail-page.md G32 · G33). The rows are read once, by the panel,
- * because the header count and the status bar read them too.
- *
- * Its drill-in is the URL's (`&run=`), because a drawer's detail replaces that
- * drawer's body and has to survive a reload like any other region (G31).
- */
-export interface ImportsJournalBodyProps {
-	rows: JournalRow[];
-	isLoading: boolean;
-	/** The run whose detail replaces the list, from `&run=`. */
-	runId: string | null;
-	onOpenRun: (id: string | null) => void;
-	/** A chip or the search is narrowing the list — words the empty state. */
-	narrowed: boolean;
-}
-
-export function ImportsJournalBody({
-	rows,
-	isLoading,
-	runId,
-	onOpenRun,
-	narrowed,
-}: ImportsJournalBodyProps) {
-	return (
-		<Journal
-			rows={rows}
-			isLoading={isLoading}
-			selectedId={runId}
-			narrowed={narrowed}
-			onOpenRun={onOpenRun}
-		/>
-	);
-}
 
 /**
  * The **short id** — the last eight characters, quoted the way a commit is
@@ -119,25 +82,34 @@ function runLine(row: JournalRow, now: number): string {
 }
 
 /**
- * The journal itself: one row per run, newest first.
+ * The Runs list — one row per run, newest first, and nothing else.
  *
- * The row says what ran, how far it got and when — so the list can be read
- * without opening anything, which is the whole point of an audit journal.
+ * It is a **section body**, not a view panel: the Runs section draws the title,
+ * the count, the search, the funnel and the chip row it opens above it, and the
+ * view panel draws the status bar below (graph-detail-page.md G32 · G33). The
+ * rows are read once, by the view panel, because the header count and the
+ * status bar read them too.
+ *
+ * Its drill-in is the URL's (`&run=`), because a section's detail replaces that
+ * section's body and has to survive a reload like any other region (G31).
  */
-function Journal({
-	rows,
-	isLoading,
-	selectedId,
-	narrowed,
-	onOpenRun,
-}: {
+export interface RunsListProps {
 	rows: JournalRow[];
 	isLoading: boolean;
-	selectedId: string | null;
-	/** Only to word the empty state — the controls are the chips above (G33). */
-	narrowed: boolean;
+	/** The run whose detail replaces the list, from `&run=`. */
+	runId: string | null;
 	onOpenRun: (id: string) => void;
-}) {
+	/** A chip or the search is narrowing the list — words the empty state. */
+	narrowed: boolean;
+}
+
+export function RunsList({
+	rows,
+	isLoading,
+	runId,
+	onOpenRun,
+	narrowed,
+}: RunsListProps) {
 	const live = rows.filter((row) => isLive(row.status)).length;
 	// A running run's elapsed has to move on its own — nothing refetches this
 	// list every second. No live row, no timer.
@@ -195,7 +167,7 @@ function Journal({
 						titleMono={row.isQuery}
 						address={shortRunId(row.id)}
 						meta={runLine(row, now)}
-						selected={row.id === selectedId}
+						selected={row.id === runId}
 						onSelect={() => onOpenRun(row.id)}
 					/>
 				))

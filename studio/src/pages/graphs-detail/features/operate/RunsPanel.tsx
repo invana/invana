@@ -4,7 +4,7 @@
  *
  * The journal of every TaskRun in the Graph, newest first, children nested.
  * Imports is this list with `kind in (import, bulk)` preselected, not a panel
- * and not an icon (SR7) — which is why the body is the journal that used to be
+ * and not an icon (SR7) — which is why the body, `RunsList`, is the journal that used to be
  * the Imports panel.
  *
  * **It is a list, not a stack.** The definitions a run is composed from — plans,
@@ -22,12 +22,12 @@
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
 import { useRunsJournalQuery } from "@/hooks/queries/useRuns";
 import { useAgentsQuery } from "@/hooks/queries/useWork";
-import { ImportsJournalBody } from "@/pages/graphs-detail/features/bring-data-in/ImportsPanel";
 import {
 	RunDetailDrawer,
 	runAddress,
 } from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/operate/RunsFilterBar";
+import { RunsList } from "@/pages/graphs-detail/features/operate/RunsList";
 import { useRunsFilters } from "@/pages/graphs-detail/features/operate/useRunsFilters";
 import {
 	taskDrawerSection,
@@ -188,7 +188,7 @@ export function RunsPanel({
 											onOpenLens={(lens) => reveal(lens.kind, lens.id)}
 										/>
 									) : (
-										<ImportsJournalBody
+										<RunsList
 											rows={rows}
 											isLoading={journal.isLoading}
 											runId={runId}

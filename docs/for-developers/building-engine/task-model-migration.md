@@ -547,7 +547,7 @@ No backward compatibility is kept. Each row below is removed in the slice that r
 | `thinkings` · `thinking_steps` · `thoughts` · `thought_stream` · `prompt_answers` | M3 | `task_runs` · `task_stream` · `task_prompts` |
 | `workflows` · `workflow_versions` as separate nouns | M2 | `task_plans` + `plan_versions` |
 | `TaskStatus` column | M4 | state derived from runs (a one-way door, § 9) |
-| `studio/…/features/bring-data-in/ImportsPanel.tsx` (~808 lines) | M11 | the Runs drawer, `kind = import` |
+| `studio/…/features/operate/RunsList.tsx` (was `bring-data-in/ImportsPanel.tsx`, ~808 lines) | M11 | the Runs drawer, `kind = import` |
 | `studio/…/features/workflows/WorkflowsPanel.tsx` (~500 lines) | M2 · M11 | the Plans drawer |
 | `studio/…/features/work/TasksPanel.tsx` (~798 lines) | M4 | Todos under Projects, and the Runs drawer for execution |
 | `?panel=imports` · `?panel=workflows` · `?panel=thoughts` redirects | M11 | nothing — the keys are gone, and [G31](../building-studio/graph-detail-page.md)'s read-never-written paragraph goes with them |

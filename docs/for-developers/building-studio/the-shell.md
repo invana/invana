@@ -92,8 +92,8 @@ landing the Console, not a later tidy-up.
 | Region | Type | Sub-slots | What it holds in Studio |
 |---|---|---|---|
 | `header` | `NavHorizontalProps` | `left` · `center` · `right` (+ `*NavItems`) | wordmark · breadcrumb · the camera toolbar · the onboarding cap · theme · Assistant |
-| `leftNav` | `NavVerticalProps` | `top` · `topNavItems` · `middle` · `bottom` · `bottomNavItems` | one icon per feature module, exactly one lit |
-| `leftSection` | `SectionConfig` | — | the open panel — Model · Sessions · Projects · Tasks · Agents · Workflows · Skills · Settings. **Layers is not here**: it is a canvas control on the page strip ([graph-detail-page.md](graph-detail-page.md) G18) |
+| `leftNav` | `NavVerticalProps` | `top` · `topNavItems` · `middle` · `bottom` · `bottomNavItems` | one icon per module with a `leftSection` panel, exactly one lit |
+| `leftSection` | `SectionConfig` | — | the open view panel — Info · Explorer · Model · Projects · Runs · Library · Govern · Agents · Skills · Events · Settings. **Layers is not here**: it is a canvas control on the page strip ([graph-detail-page.md](graph-detail-page.md) G18) |
 | `mainSection` | `MainSectionConfig` | — | `BoardPagesViewPanel` — the open pages |
 | `rightSection` | `SectionConfig` | — | the Inspector, or the Assistant |
 | `bottomSection` | `SectionConfig` | — | the Console |
@@ -115,7 +115,7 @@ flowchart LR
     end
     subgraph O["Occupants — what"]
         BC["Breadcrumb"]; NAV["module icons"]
-        MP["Model · Sessions · Projects · Tasks · Agents · Workflows · Skills"]
+        MP["Info · Explorer · Model · Projects · Runs · Library · Govern · Agents · Skills · Events · Settings"]
         PG["the open pages"]; INS["Inspector"]; AS["Assistant"]; CON["Console"]; ST["connection status"]
     end
     H --> BC; LN --> NAV; LS --> MP; MS --> PG
@@ -127,9 +127,11 @@ flowchart LR
 | **Region** | the seven props above | Fixed. A region is never renamed after what is currently inside it |
 | **Occupant** | a product noun from [terminology.md](../terminology.md) | Free to move between regions without being renamed |
 
-A component that is a whole region's content is `<Occupant>Panel` — `InspectorPanel`,
-`AssistantPanel`, `ModelPanel`. **"Panel" means region content.** It is never a region, so
-"the panel" alone says nothing; name the occupant or name the region.
+A component that is a whole region's content is `<Occupant>ViewPanel` — `InspectorViewPanel`,
+`AssistantViewPanel`, `ModelViewPanel` — the suffix canvas-ui gives its own (`LayersViewPanel`,
+`BoardPagesViewPanel`). **A view panel is region content.** It is never a region, so "the panel"
+alone says nothing; name the occupant or name the region. A view panel that stacks is a `PanelStack`,
+and each of its parts is a **section** (`PanelStackSection`) — never a drawer.
 
 ### Words we retire
 

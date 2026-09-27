@@ -32,6 +32,7 @@ governs.
 | Words | Pinned in [terminology.md](terminology.md). Nothing outside it is ours. |
 | **Orchestration** | [orchestration.md § 0](orchestration.md#0-the-records) — **Todo → TaskPlan → Task → TaskRun**, the model this product is moving to. A person writes a **Todo**; a **TaskPlan** (authored, generated or reused) is the flow of **Task**s that carries it out; a **TaskRun** is one execution. *Nothing a user authors is ever a Task.* A **Lens** bounds what a run may see. ⚠ **§ 0 is current; § 1–§ 3 of that file and every feature file below still describe the retired Todo · Run · Step · Workflow · Project split** |
 | **The migration** | [building-engine/task-model-migration.md](building-engine/task-model-migration.md) — eight tables → the records above, column by column, with the route changes, the slices M1–M8 and what Studio ships in lockstep. **Read this before touching anything task-shaped** |
+| **Module structure** | [module-structure.md](module-structure.md) — **decided, not started.** One name per module, shared by docs, Studio and the engine, in seven groups; feature numbers kept; the component suffix convention; the target file trees; phases R0–R6 |
 | **The runtime package** | [building-engine/the-runtime-package.md](building-engine/the-runtime-package.md) — one package walks every plan; apps reach it through protocols, never imports. The file-by-file plan, and the ~900 LOC of consolidation it pays for |
 | **The lens** | [building-engine/lens-migration.md](building-engine/lens-migration.md) — **S16's build order**, P0–P6. What already exists (`task_runs.lens_id` and `lens_snapshot` are dead columns from migration 39), what gates what, and why the connector contract is first. No decisions — those are [govern/spec.md](modules/govern/spec.md) |
 | **Governance** | [governance.md](governance.md) — **RFC, concluded.** D1–D19 settled; dispersing into [modules/govern/](modules/govern/spec.md) and the files it names. The **Lens** generalises from *which graph data* to *which participants of any layer*, addressed `layer/sublayer/name`: graph data · llm · third party · cache · human — five governed layers and one spine, plus the touch record that proves the lens held |
@@ -41,6 +42,23 @@ governs.
 | **The sequence** | [the-sequence.md](the-sequence.md) — the **build order** of everything still open, block by block, with what gates what. This file is the scope and the `Slice` column is the ship gate; that one is the order the remaining blocks are worked in |
 | Status | ✅ done · 🟡 in progress · 🖼 screen built, wired to nothing ([DS15](modules/platform/features/design-system.md)) · 🔵 designed, not started · — not applicable |
 | **Open calls** | [Open calls](#open-calls) — the decisions blocking finished code, each with two defensible answers. Read it before starting anything in §5, §14 or §10.5: a call settled there is one you do not have to make at a call site |
+
+### The modules
+
+Seven groups, 26 modules — one name each, shared by `docs/for-developers/modules/`, Studio
+`features/` and the engine's `apps/` and `server/` ([module-structure.md](module-structure.md)).
+**The sections below are still filed under the fourteen modules they had before; R1 moves them to
+this map.** Feature numbers do not change.
+
+| Group | Modules (the feature numbers they hold) |
+|---|---|
+| Data | `graphs` 1.1 · `models` 1.2–1.8 · `imports` 2.x · `graph-connectors` 12.x |
+| Exploration | `explorer` 4.1 · 4.3 · `queries` 3.1 · 4.4 · `boards` 4.2 |
+| Answers | `assistant` 3.2–3.3 · 3.5–3.8 · 3.10–3.13 · `projections` 3.4 · `memory` 8.x |
+| Work | `projects` 9.1 · 9.2 · 9.4 |
+| Orchestration | `agents` 5.2–5.8 · `llms` 5.1 · `skills` 6.1–6.3 · `rules` 6.4 · `plans` 7.x · `reviews` 9.3 · `runs` 10.3 · 10.5 · `schedules` 10.1 |
+| Governance | `lenses` 14.x · `events` 10.2 |
+| Platform | `accounts` 11.x · 10.4 · `setup` 13.7 · `runtime` 13.8 · 3.9 · `tooling` 13.3–13.6 · `design` 13.1–13.2 |
 
 ---
 
