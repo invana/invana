@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     # Telemetry (OpenTelemetry)
     telemetry_enabled: bool = True
     telemetry_otlp_endpoint: str = "http://localhost:4317"
-    # The collector's OTLP/HTTP base URL; the studio proxy posts to <base>/v1/traces and <base>/v1/metrics.
+    # The collector's OTLP/HTTP base URL; the studio proxy posts to <base>/v1/{traces,metrics,logs}.
     # A value ending in /v1/traces is read as its base, so a full traces URL still works.
     telemetry_otlp_http_endpoint: str = "http://localhost:4318"
     telemetry_service_name: str = "invana-engine"

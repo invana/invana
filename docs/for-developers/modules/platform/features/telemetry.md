@@ -100,7 +100,7 @@ flowchart TD
 | Surface | Shape |
 |---|---|
 | Studio action spans | `ui.<module>.<action>` — the module names of [module-structure.md](../../../module-structure.md) §2: `ui.assistant.ask` · `ui.assistant.rerun` · `ui.explorer.load` · `ui.runs.cancel` · `ui.plans.promote` · `ui.events.subscribe`; `ui.boards.open` lands with the Boards view panel |
-| HyperDX | one service map and one trace view across `invana-studio` and `invana-engine` |
+| HyperDX | seven dashboards seeded by `docker/hyperdx/seed-dashboards.py` (§ Dashboards) and HyperDX's own service map across `invana-studio` and `invana-engine` |
 | A run's drawer | a `trace` row in *The run* — the id, a link into the collector's trace view when `VITE_TELEMETRY_TRACE_URL` is set, plain text otherwise; an event's `trace` row reads the same |
 
 ## Engine
@@ -165,6 +165,20 @@ and logs, and per-Graph product numbers come from the record ([observability](..
 | `ui.stream.reconnects` · `ui.errors` | counter | `stream` · `module` and `source` (`uncaught` · `unhandled_rejection` · `boundary` · `route` · `query` · `mutation`) |
 | `ui.canvas.layout.duration` · `ui.canvas.render.duration` | histogram | `layout` · `size_bucket` — recorded by `@invana/canvas`, not by Studio |
 
+## Dashboards
+
+`docker/hyperdx/seed-dashboards.py` seeds them; `--check` runs every tile's SQL against ClickHouse and fails on any error.
+
+| Dashboard | Tiles | Reads |
+|---|---|---|
+| Invana — API | requests · 5xx · 5xx rate · p95; requests by status class over time; active requests; p95 and 5xx by route; each 5xx (opens its trace) | `http.server.*` · `SERVER` spans |
+| Invana — Runs | runs · failed · p95 run · mean queue wait; by outcome, kind and trigger; active runs; runs over time by outcome; slowest steps by `task_key`; each failed run with `failure_kind` (opens its trace) | `invana.runs.*` · `invana.run` / `invana.run.step` spans · run logs |
+| Invana — LLMs | calls · failed · tokens · cost; calls and mean by provider and model; tokens by model and direction; p95 over time; slowest calls (open their trace) | `invana.llms.*` · `llm.generate` spans |
+| Invana — Graph queries | queries · failed · p95; by connector, language and outcome; mean result size; p95 over time; slowest queries (open their trace) | `invana.graph_connectors.*` · `graph.query.db_execute` spans |
+| Invana — System | loop failures and mean duration by loop; pool connections by state; open streams; events by action; `system.*` / `cli.*` roots; warnings and errors by line; startups (open their trace) | `invana.system.*` · `invana.graphs.pool.connections` · `invana.assistant.streams.active` · `invana.events.emitted` · spans · logs |
+| Invana — Studio | actions · errors · p95 action; actions by name and outcome; requests by route; Web Vitals by module; errors by module and source; recent errors (open their trace) | `ui.*` · `ui.*` spans · Studio logs |
+| Invana — Trace | recent and slowest `ui.*` actions with their engine span and error counts (a row opens the whole trace); engine spans under actions by total time | spans joined on `TraceId` |
+
 ## Logs
 
 | Source | What is logged | Level |
@@ -211,6 +225,8 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE28 | Studio sends a failed query or mutation only for a network error or a 5xx. A 4xx is an outcome the screen handles and is already measured. |
 | TE29 | `ui.errors` carries `module` and `source`; a Studio error log is written in the failed request's trace when the error carries one, else in the active context. |
 | TE30 | Redaction is one rule for events and logs: a sensitive field name is dropped at any depth, a secret-typed value is masked, and message text is never parsed — code does not format a secret into it. |
+| TE31 | Dashboards read counts from metrics, which sampling does not thin; latency percentiles from span durations, which are exact and open the trace they came from; levels from each series' last value; discrete facts from logs. Engine metrics are cumulative and Studio's delta, and each count is read as its increase over the range. |
+| TE32 | The dashboards are code: one seed script, idempotent by name, and a check that runs every tile's SQL so a renamed metric fails loudly instead of drawing nothing. Studio's `ui.*` histograms carry no exemplars — the browser SDK does not record them — so Studio latency links to traces through its spans. |
 
 ## Not building
 

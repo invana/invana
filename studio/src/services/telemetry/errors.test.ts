@@ -109,6 +109,12 @@ describe("shouldReport", () => {
 
 	it("leaves a 4xx and a cancelled request to the screen", () => {
 		expect(shouldReport(new ApiError(404, "Not found"))).toBe(false);
+		// A third-party refusal, fetched outside the API client, carries its status too.
+		expect(
+			shouldReport(
+				Object.assign(new Error("GitHub API responded 403"), { status: 403 }),
+			),
+		).toBe(false);
 		expect(shouldReport(new ApiError(422, "name — Field required"))).toBe(
 			false,
 		);

@@ -12,7 +12,7 @@ Two **separate** dashboards for the `@invana/canvas` render engine's telemetry
      "braking markers": `canvas.interaction.*` with `canvas.fps.drop`) + the
      causal event loop (view mutations / scene / layout) from `otel_traces`.
 
-Same mechanics as ``seed-api-performance-dashboard.py``: idempotent (deletes any
+Same mechanics as ``seed-dashboards.py``: idempotent (deletes any
 same-named dashboard first), discovers the connection + source ids at runtime,
 every tile is a raw-SQL tile over the OTel ClickHouse tables.
 
