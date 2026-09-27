@@ -3,9 +3,6 @@ import type { CanvasConfig } from "@invana/canvas";
 /** The three templates the Detail switcher picks between (GM4). */
 export type Detail = "high" | "medium" | "low";
 
-/** The two layouts the Layout switcher picks between (GM3). */
-export type LayoutId = "elk" | "force";
-
 /** `node.type` of a model's frame. A member's `type` is its qualified name. */
 export const MODEL_FRAME_TYPE = "model";
 

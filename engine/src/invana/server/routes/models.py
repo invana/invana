@@ -8,11 +8,13 @@ CRUD) + ``Versioner``.
 
 Routes
 ------
-GET    /                                   list the graph's models
+GET    /                                   list the graph's models (archived with ?include_archived)
 POST   /                                   create a blank model (+ initial draft)
 GET    /{model_id}                         model detail (+ versions)
-PATCH  /{model_id}                         update name/description/validation_mode/status
-DELETE /{model_id}                         hard delete (cascades versions)
+PATCH  /{model_id}                         update name/description/validation_mode; status archives or restores (MP7)
+DELETE /{model_id}                         hard delete — refused once a version was published (MP7)
+
+GET    /{model_id}/draft/projection        the DDL publishing the draft would project (MP8)
 
 GET    /{model_id}/versions                list versions
 POST   /{model_id}/versions                create a draft (optional based_on)
@@ -29,15 +31,17 @@ from __future__ import annotations
 
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Path, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.compatibility import supported_property_type_values
 from invana.apps.graphs.managers import GraphManager
 from invana.apps.graphs.models import Graph, GraphMember
+from invana.apps.graphs.pool import GraphUnavailableError
 from invana.apps.modeller import starters as starter_models
 from invana.apps.modeller.json_io import SchemaExporter
+from invana.apps.modeller.managers import ModelLifecycleManager
 from invana.apps.modeller.models import GraphModel, GraphVersion
 from invana.apps.modeller.portability import (
     ImportRefused,
@@ -48,6 +52,7 @@ from invana.apps.modeller.portability import (
     unsupported_property_types,
     upgrade_model,
 )
+from invana.apps.modeller.projector import plan_projection
 from invana.apps.modeller.schemas import (
     ConstraintCreate,
     ConstraintResponse,
@@ -89,6 +94,7 @@ from invana.server.schemas import ActionResponse, action
 models_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/models", tags=["models"])
 
 _store = ModelStore()
+_lifecycle = ModelLifecycleManager()
 
 
 # ---------------------------------------------------------------------------
@@ -192,6 +198,18 @@ def _to_response(model: GraphModel) -> GraphModelResponse:
     return resp
 
 
+async def _emit_lifecycle(session: AsyncSession, act: str, model: GraphModel, graph_id: str, actor_id: str) -> None:
+    await emit_event(
+        session,
+        action=act,
+        target_kind=event_actions.TARGET_MODEL,
+        target_id=model.id,
+        graph_id=graph_id,
+        actor_id=actor_id,
+        details={"name": model.name},
+    )
+
+
 async def _get_model_or_404(session: AsyncSession, graph_id: str, model_id: str) -> GraphModel:
     model = await _store.get_graph_model(session, model_id)
     if model is None or model.graph_id != graph_id:
@@ -259,12 +277,13 @@ async def _full_version(session: AsyncSession, version_id: str) -> VersionRespon
 
 @models_router.get("", response_model=list[GraphModelSummary])
 async def list_models(
+    include_archived: bool = Query(False, description="List archived models too (Show archived, MP7)."),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
 ) -> list[GraphModelSummary]:
     models = await _store.list_graph_models(session, graph_id=graph.id)
-    return [_to_summary(m) for m in models]
+    return [_to_summary(m) for m in models if include_archived or m.status != "archived"]
 
 
 @models_router.post("", response_model=ActionResponse[GraphModelResponse], status_code=status.HTTP_201_CREATED)
@@ -390,17 +409,28 @@ async def update_model(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ActionResponse[GraphModelResponse]:
-    await _get_model_or_404(session, graph.id, model_id)
-    await _store.update_graph_model(session, model_id, **payload.model_dump(exclude_unset=True))
-    await emit_event(
-        session,
-        action=event_actions.MODEL_UPDATE,
-        target_kind=event_actions.TARGET_MODEL,
-        target_id=model_id,
-        graph_id=graph.id,
-        actor_id=user.id,
-        details=payload.model_dump(exclude_unset=True),
-    )
+    model = await _get_model_or_404(session, graph.id, model_id)
+    fields = payload.model_dump(exclude_unset=True)
+    # Status is not a field to set: archiving and restoring are acts with a
+    # refusal and an event of their own (MP7).
+    wanted = fields.pop("status", None)
+    if wanted == "archived" and model.status != "archived":
+        await _lifecycle.archive(session, model)
+        await _emit_lifecycle(session, event_actions.MODEL_ARCHIVED, model, graph.id, user.id)
+    elif wanted is not None and wanted != "archived" and model.status == "archived":
+        await _lifecycle.restore(session, model)
+        await _emit_lifecycle(session, event_actions.MODEL_RESTORED, model, graph.id, user.id)
+    if fields:
+        await _store.update_graph_model(session, model_id, **fields)
+        await emit_event(
+            session,
+            action=event_actions.MODEL_UPDATE,
+            target_kind=event_actions.TARGET_MODEL,
+            target_id=model_id,
+            graph_id=graph.id,
+            actor_id=user.id,
+            details=fields,
+        )
     await session.commit()
     model = await _store.get_graph_model(session, model_id)
     return action("Model updated.", _to_response(model))
@@ -416,6 +446,7 @@ async def delete_model(
 ) -> ActionResponse[None]:
     model = await _get_model_or_404(session, graph.id, model_id)
     name = model.name
+    await _lifecycle.ensure_deletable(session, model)
     await _store.delete_graph_model(session, model_id)
     await emit_event(
         session,
@@ -910,6 +941,46 @@ async def get_staged_set(
 ) -> StagedSet:
     draft, active = await _draft_and_active(session, graph.id, model_id)
     return collect(active, draft)
+
+
+class ProjectionOperation(BaseModel):
+    action: str
+    name: str
+    label: str
+    properties: list[str]
+    kind: str
+    statement: str
+    supported: bool
+
+
+class ProjectionPlan(BaseModel):
+    """What publishing the draft asks the database to hold (the-model-page.md MP8)."""
+
+    # ``live`` — diffed against what the database reports; ``active_version`` —
+    # against the published version, when the connector cannot list its indexes.
+    against: str
+    operations: list[ProjectionOperation]
+
+
+@models_router.get("/{model_id}/draft/projection", response_model=ProjectionPlan)
+async def get_draft_projection(
+    request: Request,
+    model_id: str = Path(...),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ProjectionPlan:
+    """The DDL the Publish confirm lists. Reads only — nothing is written."""
+    draft, active = await _draft_and_active(session, graph.id, model_id)
+    connector = None
+    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
+    manager = getattr(request.app.state, "graph_connection_manager", None)
+    if connection is not None and manager is not None:
+        try:
+            connector = manager.get_connector(connection.id)
+        except GraphUnavailableError:
+            connector = None
+    return ProjectionPlan.model_validate(await plan_projection(draft, connector=connector, baseline=active))
 
 
 @models_router.post("/{model_id}/draft/discard", response_model=ActionResponse[StagedSet])

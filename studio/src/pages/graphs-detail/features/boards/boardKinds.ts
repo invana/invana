@@ -227,7 +227,8 @@ export type DeclaredKind =
 	| "rule"
 	| "world"
 	| "guardrail"
-	| "agent";
+	| "agent"
+	| "models";
 
 export type BoardKind = CanvasKind | DeclaredKind;
 
@@ -395,6 +396,18 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		// `Open` on the Agents drawer; the list stays beside it.
 		panel: "agents",
 		subject: "an agents.id",
+	},
+	// Models, as one page (the-model-page.md MP1 · MP18). Studio-only and bound
+	// to the Graph, like `runs`: the scope is a filter in the URL, never a
+	// second board, so its tab reads `All models` or the model's name.
+	models: {
+		kind: "models",
+		renders: "dashboard",
+		label: "Models",
+		icon: Boxes,
+		// Switching the `leftNav` to Models opens it.
+		panel: "model",
+		subject: "the graph's slug",
 	},
 };
 

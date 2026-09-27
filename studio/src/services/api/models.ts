@@ -17,6 +17,7 @@ import type {
 	ModelUpgradeResult,
 	NodeTypeCreate,
 	NodeTypeUpdate,
+	ProjectionPlan,
 	PropertyKeyCreate,
 	PropertyKeyUpdate,
 	SchemaDiff,
@@ -62,7 +63,10 @@ const del = (path: string) => request<void>(path, { method: "DELETE" });
 
 export const modelsApi = {
 	// ── Models ──────────────────────────────────────────────────────────────
-	list: (u: string, g: string) => request<GraphModelSummary[]>(base(u, g)),
+	list: (u: string, g: string, opts?: { includeArchived?: boolean }) =>
+		request<GraphModelSummary[]>(
+			`${base(u, g)}${opts?.includeArchived ? "?include_archived=true" : ""}`,
+		),
 	get: (u: string, g: string, id: string) =>
 		request<GraphModelResponse>(`${base(u, g)}/${id}`),
 	create: (u: string, g: string, data: GraphModelCreate) =>
@@ -70,6 +74,10 @@ export const modelsApi = {
 	update: (u: string, g: string, id: string, data: GraphModelUpdate) =>
 		patch(`${base(u, g)}/${id}`, data) as Promise<GraphModelResponse>,
 	remove: (u: string, g: string, id: string) => del(`${base(u, g)}/${id}`),
+
+	/** The DDL publishing the draft would project — read, never written (MP20). */
+	projection: (u: string, g: string, id: string) =>
+		request<ProjectionPlan>(`${base(u, g)}/${id}/draft/projection`),
 
 	// ── Versions ────────────────────────────────────────────────────────────
 	listVersions: (u: string, g: string, id: string) =>

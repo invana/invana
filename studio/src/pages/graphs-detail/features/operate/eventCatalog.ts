@@ -85,6 +85,8 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 			{ action: "model.create", label: "Created" },
 			{ action: "model.update", label: "Updated" },
 			{ action: "model.delete", label: "Deleted" },
+			{ action: "model.archived", label: "Archived" },
+			{ action: "model.restored", label: "Restored" },
 			{ action: "model.activate", label: "Activated" },
 			{ action: "model.generate", label: "Generated" },
 			{ action: "model.commit", label: "Committed" },

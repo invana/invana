@@ -267,7 +267,8 @@ class GlobalModel(BaseModel):
 async def derive_global_model(session: AsyncSession, store: ModelStore, *, graph_id: str) -> GlobalModel:
     """Compute the union on read. There is no row behind this (ST3)."""
     models = await store.list_graph_models(session, graph_id)
-    authored = [m for m in models if m.origin != "introspected"]
+    # An archived model leaves the union; its versions still resolve (MP7).
+    authored = [m for m in models if m.origin != "introspected" and m.status != "archived"]
     # **Active only** (ST21). A staged stitch is a declaration somebody has not
     # committed; unioning it would let an uncommitted rule change an answer,
     # which is the one thing staging exists to prevent.

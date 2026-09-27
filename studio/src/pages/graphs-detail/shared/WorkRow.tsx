@@ -39,6 +39,7 @@ export function WorkRow({
 	status,
 	statusTone = "muted",
 	actions,
+	pinActions = false,
 	className,
 }: {
 	active?: boolean;
@@ -53,6 +54,8 @@ export function WorkRow({
 	statusTone?: Tone;
 	/** Hover-revealed controls, before the status badge. */
 	actions?: ReactNode;
+	/** Keep the actions shown — the selected row's `Open` (the-model-page.md MP5). */
+	pinActions?: boolean;
 	className?: string;
 }) {
 	// The row's click target is a **sibling** of its actions, not their parent.
@@ -107,7 +110,12 @@ export function WorkRow({
 				</span>
 			</Target>
 			{actions ? (
-				<span className="flex shrink-0 items-center gap-0.5 py-2 opacity-0 transition-opacity group-hover:opacity-100">
+				<span
+					className={cn(
+						"flex shrink-0 items-center gap-0.5 py-2 transition-opacity",
+						!pinActions && "opacity-0 group-hover:opacity-100",
+					)}
+				>
 					{actions}
 				</span>
 			) : null}

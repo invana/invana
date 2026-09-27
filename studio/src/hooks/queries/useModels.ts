@@ -21,11 +21,42 @@ const root = (u: string, g: string) => ["models", u, g] as const;
 
 // ── Queries ────────────────────────────────────────────────────────────────
 
-export function useModelsQuery(username?: string, graphSlug?: string) {
+export function useModelsQuery(
+	username?: string,
+	graphSlug?: string,
+	/** `Show archived` — the list with the archived models in it (MP7). */
+	opts?: { includeArchived?: boolean },
+) {
+	const includeArchived = !!opts?.includeArchived;
 	return useQuery({
-		queryKey: root(username ?? "", graphSlug ?? ""),
-		queryFn: () => modelsApi.list(username as string, graphSlug as string),
+		queryKey: includeArchived
+			? ([...root(username ?? "", graphSlug ?? ""), "with-archived"] as const)
+			: root(username ?? "", graphSlug ?? ""),
+		queryFn: () =>
+			modelsApi.list(username as string, graphSlug as string, {
+				includeArchived,
+			}),
 		enabled: !!username && !!graphSlug,
+	});
+}
+
+/** What publishing the open draft would project — the Publish confirm's DDL (MP20). */
+export function useDraftProjectionQuery(
+	username?: string,
+	graphSlug?: string,
+	modelId?: string,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: ["models", username, graphSlug, modelId, "projection"] as const,
+		queryFn: () =>
+			modelsApi.projection(
+				username as string,
+				graphSlug as string,
+				modelId as string,
+			),
+		enabled: !!username && !!graphSlug && !!modelId && enabled,
+		retry: false,
 	});
 }
 

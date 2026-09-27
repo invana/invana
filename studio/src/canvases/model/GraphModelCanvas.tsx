@@ -3,8 +3,8 @@
  * ([graph-model-canvas.md](../../../../docs/for-developers/building-studio/graph-model-canvas.md)).
  *
  * The canvas Storybook's `usecases/by-casestudies/global-model/GlobalModel`,
- * copied: the same behaviours, layouts, header, footer, Detail and Layout
- * switchers, settings and templates (GM1). What is Studio's own: the JSON names
+ * copied: the same behaviours, header, footer, Detail switcher, settings and
+ * templates (GM1) — laid out by ELK alone, opening on circles (GM3 · GM4). What is Studio's own: the JSON names
  * no model and no type, so it is filled in against the data and the live theme
  * (GM5–GM7); the colours are Studio's palette, and a frame wears its model's
  * hue (GM8); a stitch is dashed (GM9) and, where the host asks for it, declared
@@ -23,7 +23,6 @@ import { decorate } from "@/canvases/model/style";
 import type {
 	Detail,
 	GraphModelTemplates,
-	LayoutId,
 	ModelCanvasSelection,
 	ModelGraphData,
 } from "@/canvases/model/types";
@@ -33,7 +32,6 @@ import {
 	CanvasThemeSync,
 	ClickSelectBehaviour,
 	CollapseExpandBehaviour,
-	D3ForceLayout,
 	DragNodeBehaviour,
 	DragPanBehaviour,
 	DrawEdgeBehaviour,
@@ -75,6 +73,8 @@ import {
 
 export const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };
+/** The one layout every modeller canvas runs (GM3). */
+const LAYOUT = "elk";
 
 export interface GraphModelCanvasProps {
 	data: ModelGraphData;
@@ -83,7 +83,7 @@ export interface GraphModelCanvasProps {
 	title?: string;
 	/** Shown once in the message bar when the canvas is ready. */
 	message?: string;
-	/** Must match what `settings` starts on; `medium` for `settings.json`. */
+	/** The Detail the canvas opens on — circles, on every modeller canvas (GM4). */
 	initialDetail?: Detail;
 	/** The node or edge drawn selected. */
 	selected?: ModelCanvasSelection;
@@ -146,7 +146,7 @@ export function GraphModelCanvas({
 	templates,
 	title = "Global model",
 	message = "Hover an edge for its stitch rule — only stitches cross a model frame",
-	initialDetail = "medium",
+	initialDetail = "high",
 	selected = null,
 	onSelect,
 	height,
@@ -176,9 +176,6 @@ export function GraphModelCanvas({
 	const stitchRef = useRef(stitching);
 	stitchRef.current = stitching;
 	const [detail, setDetail] = useState<Detail>(initialDetail);
-	const [layout, setLayout] = useState<LayoutId>(
-		(settings.activeLayout as LayoutId | undefined) ?? "elk",
-	);
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
 	const colors = useLiveColors();
 	const selectRef = useRef(onSelect);
@@ -289,7 +286,7 @@ export function GraphModelCanvas({
 	useEffect(() => {
 		if (!canvas) return;
 		return canvas.events.on("layout:run:end", (e) => {
-			if (e.id === "elk" || e.id === "force")
+			if (e.id === LAYOUT)
 				canvas.layers.get<GraphLayerEngine>(MODEL_LAYER_ID)?.redraw();
 		});
 	}, [canvas]);
@@ -310,18 +307,18 @@ export function GraphModelCanvas({
 		return canvas.events.on("theme:change", rehue);
 	}, [canvas, drawn]);
 
-	// New data, a switch, or a new theme: patch the template and the active
-	// layout, then re-run it — a new node size needs new positions. `fitCamera`
+	// New data, a Detail switch, or a new theme: patch the template, then
+	// re-run ELK — a new node size needs new positions. `fitCamera`
 	// moves the camera with the nodes' glide, as the story does.
 	useEffect(() => {
 		if (!canvas || drawn.nodes.length === 0) return;
 		canvas.stopLayout();
 		canvas.update({
 			...detailPatch(settings, templates, detail, model, colors.hues),
-			activeLayout: layout,
+			activeLayout: LAYOUT,
 		});
-		void canvas.runLayout(layout, FIT);
-	}, [canvas, drawn, model, detail, layout, settings, templates, colors.hues]);
+		void canvas.runLayout(LAYOUT, FIT);
+	}, [canvas, drawn, model, detail, settings, templates, colors.hues]);
 
 	// `settings.json` switches node drag on, as the story's does — so the tool
 	// re-asserts itself after the config lands: while stitching a drag draws, it
@@ -409,14 +406,6 @@ export function GraphModelCanvas({
 								},
 								onChange: (v) => setDetail(v as Detail),
 							},
-							{
-								type: "select",
-								key: "layout",
-								label: "Layout",
-								value: layout,
-								options: { elk: "ELK — layered", force: "Force — d3" },
-								onChange: (v) => setLayout(v as LayoutId),
-							},
 							...dock.items.filter((item) => item.key !== STITCH_PANEL),
 							{
 								type: "toggle",
@@ -456,15 +445,14 @@ export function GraphModelCanvas({
 			) : null}
 			<HoverActivateBehaviour id="hover" targetLayerId={MODEL_LAYER_ID} />
 			<ClickSelectBehaviour id="click-select" targetLayerId={MODEL_LAYER_ID} />
-			{/* Both layouts are registered; `config.activeLayout` picks the one that runs. */}
+			{/* ELK, and only ELK (GM3). */}
 			<ElkLayout
-				id="elk"
+				id={LAYOUT}
 				targetLayerId={MODEL_LAYER_ID}
 				fitPadding={60}
 				// elkjs' worker must go through Vite's `?worker`, or it 404s.
 				options={{ workerFactory: () => new ElkWorker() }}
 			/>
-			<D3ForceLayout id="force" targetLayerId={MODEL_LAYER_ID} />
 			<CollapseExpandBehaviour
 				id="collapse-expand"
 				targetLayerId={MODEL_LAYER_ID}

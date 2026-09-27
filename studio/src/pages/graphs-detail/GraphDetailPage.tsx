@@ -55,11 +55,10 @@ import {
 	DataBoardPage,
 } from "@/pages/graphs-detail/features/boards";
 import {
-	AllModelsCanvas,
-	GlobalModelPage,
-	ModelCanvas,
 	ModelPanel,
 	type ModelSelection,
+	ModelsPage,
+	useModelsView,
 } from "@/pages/graphs-detail/features/connect-and-model";
 import { ExplorerTypesPanel } from "@/pages/graphs-detail/features/explorer";
 import {
@@ -168,12 +167,10 @@ import type {
 } from "@invana/graph";
 import { Button, EmptyState, Spinner, cn } from "@invana/ui";
 import {
-	Boxes,
 	HelpCircle,
 	History,
 	Home,
 	Layers,
-	LayoutGrid,
 	PanelRightClose,
 	PanelRightOpen,
 	Pencil,
@@ -225,12 +222,6 @@ interface OpenBoard {
 	/** Open the run with this step inside it (SR72) — written as `&step=`. */
 	stepId?: string;
 }
-
-/** The derived union (stitch-models.md ST3) — a page, owned by no model. */
-const GLOBAL_MODEL_PAGE_ID = "global-model";
-
-/** Every model on one canvas (stitch-models.md ST14) — also owned by no model. */
-const ALL_MODELS_PAGE_ID = "all-models";
 
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather
@@ -652,7 +643,6 @@ export function GraphDetailPage() {
 	// The attachment is the canvas selection until someone takes it off — asked
 	// without it, and the thread records that (AD2).
 	const [attachmentDetached, setAttachmentDetached] = useState(false);
-	const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
 	// A node carries the id of the dataset that wrote it; the inspector shows the
 	// name. One list, cached, rather than a lookup per selection.
 	// An element's provenance names the model it conforms to, so the name comes
@@ -857,30 +847,36 @@ export function GraphDetailPage() {
 	// rather than passing one.
 	const boardPageRef = useRef<BoardPageHandle>(null);
 
-	// The derived union, as a page. It belongs to no single model, so it is not a
-	// section in any model's panel (stitch-models.md · Surfaces).
-	const [globalModelOpen, setGlobalModelOpen] = useState(false);
-	// Every model on one canvas. It is not opened by a button any more: the
-	// Models panel's *list* view is the landscape, so switching the `leftNav` to
-	// Models draws it (stitch-models.md ST24).
-	const [allModelsOpen, setAllModelsOpen] = useState(false);
 	/**
-	 * **Models, with nothing selected, is the landscape** (stitch-models.md ST24).
-	 *
-	 * The same rule the work panels follow — the main area belongs to the open
-	 * panel — applied to models: the list view's canvas is *All models*, and a
-	 * model's detail view's canvas is that model. So switching the `leftNav` to
-	 * Models opens the landscape, and coming back to the list from a model
-	 * returns to it.
-	 *
-	 * It fires on the two transitions that change the answer and nothing else, so
-	 * closing the page with its X while the list is open leaves it closed — a page
-	 * that reopened itself would be a page you cannot close.
+	 * **Models is one page** (the-model-page.md MP1 · MP18): switching the
+	 * `leftNav` to Models opens the `models` board, whatever the scope. It fires
+	 * on the transition into the panel and nothing else, so closing the page with
+	 * its X while the panel is open leaves it closed — a page that reopened
+	 * itself would be a page you cannot close.
 	 */
+	const modelsView = useModelsView().view;
+	const openModelsPage = useCallback(() => {
+		if (graphSlug) openBoard({ kind: "models", subjectId: graphSlug });
+	}, [openBoard, graphSlug]);
+	// The panel brings the board forward and names it in the URL in the same
+	// write as the scope it picked, so this only touches the strip.
+	const showModelsPage = useCallback((): Record<string, string | null> => {
+		const id = graphSlug ? boardPageId("models", graphSlug) : null;
+		if (!id || !graphSlug) return {};
+		setBoards((open) =>
+			open.some((b) => b.kind === "models" && b.subjectId === graphSlug)
+				? open
+				: [...open, { kind: "models", subjectId: graphSlug }],
+		);
+		setActiveBoardId(id);
+		return { page: id, step: null };
+	}, [graphSlug]);
+	const wasModels = useRef(false);
 	useEffect(() => {
-		if (settingsSection !== "model" || selectedModelId) return;
-		setAllModelsOpen(true);
-	}, [settingsSection, selectedModelId]);
+		const isModels = settingsSection === "model";
+		if (isModels && !wasModels.current) openModelsPage();
+		wasModels.current = isModels;
+	}, [settingsSection, openModelsPage]);
 	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
 	// Version history (docs/for-developers/modules/explore/features/boards.md): capture a state after each canvas-mutating turn,
 	// and fork a chosen state into a new canvas to "go back in time".
@@ -1486,8 +1482,6 @@ export function GraphDetailPage() {
 		(sessionId: string) => {
 			setActiveBoardId(null);
 			boardPage.setPageId(null);
-			setGlobalModelOpen(false);
-			setAllModelsOpen(false);
 			setWorkKind(null);
 			const existing = openTabs.find((t) => t.sessionId === sessionId);
 			if (existing) {
@@ -2364,36 +2358,16 @@ export function GraphDetailPage() {
 	// state lives on this page rather than inside them.
 	const leftContent =
 		settingsPanel.section === "model" ? (
-			// Authoring lives here now: the Modeller's page is retired, and the
-			// model is a canvas kind opened from this panel (docs/for-developers/modules/explore/spec.md).
-			// It is a stack with no panel header above its drawers (G33 · ME17) —
-			// so it takes no `onClose`: the rail icon that opened it closes it.
+			// The panel lists; the page acts (MP4). Its selection is the page's
+			// scope, and both are the URL's — so a row picked here reads on the
+			// `models` board beside it. A stack with no panel header above its
+			// drawers (G33 · ME17), so it takes no `onClose`.
 			<ModelPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
-				selectedModelId={selectedModelId}
-				onSelectModel={(id) => {
-					setSelectedModelId(id);
-					if (!id) setWorkKind(null);
-				}}
 				selection={modelSelection}
 				onSelect={setModelSelection}
-				onOpenCanvas={(id) => {
-					setSelectedModelId(id);
-					setWorkKind("model");
-					// One model replaces the landscape it was picked from — the list
-					// view's canvas is *All models*, the detail view's is this model
-					// (ST24).
-					setAllModelsOpen(false);
-				}}
-				onOpenGlobalModel={() => {
-					setGlobalModelOpen(true);
-					// The union replaces the landscape, as one model does (ST24) —
-					// `allModelsOpen` outranks it in `activePageId`, so leaving it set
-					// added the tab and then never showed it.
-					setAllModelsOpen(false);
-				}}
-				onOpenAllModels={() => setAllModelsOpen(true)}
+				onShowPage={showModelsPage}
 			/>
 		) : settingsPanel.section === "projects" ? (
 			// **Projects owns Todos** (PT7) — two drawers, `Projects` over `Todos`,
@@ -2620,11 +2594,10 @@ export function GraphDetailPage() {
 	// ── The open pages (graph-detail-page.md G4) ───────────────────────────────
 	//
 	// One strip over every kind of page: the graph itself, a data canvas per open
-	// tab, the model, and whichever work canvas a panel drove. What used to be a
+	// tab, the declared boards, and whichever work canvas a panel drove. What used to be a
 	// four-branch ternary fighting over one slot is a list, and the branch that
 	// used to explain why the slot was empty is now the graph page — a page that
 	// is always there and cannot be closed (G6).
-	const modelPageId = selectedModelId ? `model:${selectedModelId}` : null;
 	const workPageId = workTarget
 		? `${workTarget.kind}:${
 				"projectKey" in workTarget
@@ -2654,17 +2627,11 @@ export function GraphDetailPage() {
 		? GRAPH_PAGE_ID
 		: focusedBoard
 			? focusedBoard
-			: allModelsOpen
-				? ALL_MODELS_PAGE_ID
-				: globalModelOpen
-					? GLOBAL_MODEL_PAGE_ID
-					: workKind === "model" && modelPageId
-						? modelPageId
-						: workCanvas && workPageId
-							? workPageId
-							: activeCanvasId
-								? boardPageId("data", activeCanvasId)
-								: GRAPH_PAGE_ID;
+			: workCanvas && workPageId
+				? workPageId
+				: activeCanvasId
+					? boardPageId("data", activeCanvasId)
+					: GRAPH_PAGE_ID;
 
 	const pages: BoardPageDef[] = [
 		{
@@ -2694,70 +2661,6 @@ export function GraphDetailPage() {
 			// exactly what the four-branch ternary did, minus the fighting.
 			content: activeCanvasId === tab.id ? canvasContent : null,
 		})),
-		...(allModelsOpen
-			? [
-					{
-						id: ALL_MODELS_PAGE_ID,
-						title: "All models",
-						icon: LayoutGrid,
-						content: (
-							<AllModelsCanvas
-								username={username as string}
-								graphSlug={graphSlug as string}
-								backend={backend}
-								onOpenModel={(id) => {
-									setAllModelsOpen(false);
-									setSelectedModelId(id);
-									setWorkKind("model");
-								}}
-							/>
-						),
-					},
-				]
-			: []),
-		...(globalModelOpen
-			? [
-					{
-						id: GLOBAL_MODEL_PAGE_ID,
-						title: "Global model",
-						icon: Boxes,
-						content: (
-							<GlobalModelPage
-								username={username as string}
-								graphSlug={graphSlug as string}
-							/>
-						),
-					},
-				]
-			: []),
-		...(modelPageId && selectedModelId
-			? [
-					{
-						id: modelPageId,
-						// **The model's board is named for the model** — `AirRoutes`,
-						// never `Model` (ME26), the rule a lens board already follows
-						// (WO15). Two models open side by side put two tabs on the
-						// strip, and a strip that reads `Model · Model` is one you
-						// have to click through. The name comes off the models list
-						// the panel has already read, so it costs no request; before
-						// it lands the tab falls back to the kind's label rather than
-						// to an empty one.
-						title: modelName(selectedModelId) ?? CANVAS_KINDS.model.label,
-						icon: CANVAS_KINDS.model.icon,
-						content: (
-							<ModelCanvas
-								username={username as string}
-								graphSlug={graphSlug as string}
-								modelId={selectedModelId}
-								backend={backend}
-								selection={modelSelection}
-								onSelect={setModelSelection}
-								onClose={() => setWorkKind(null)}
-							/>
-						),
-					},
-				]
-			: []),
 		// The declared boards — a run dashboard and a step's. `renders` is the
 		// only thing that picks the body (boards-migration § 5); the strip, the
 		// title and the close are the same as every other page's.
@@ -2768,24 +2671,30 @@ export function GraphDetailPage() {
 			// titled by name (WO15), and a run by its address, `run:3c414b9f`,
 			// so two open runs are two readable tabs (SR54).
 			title:
-				board.kind === "world" || board.kind === "guardrail"
-					? (lensNameById.get(board.subjectId) ?? BOARD_KINDS[board.kind].label)
-					: board.kind === "agent"
-						? (agentNameById.get(board.subjectId) ??
+				// One board, titled by its scope — `All models` or `AirRoutes` (MP18).
+				board.kind === "models"
+					? modelsView.scope
+						? (modelName(modelsView.scope) ?? BOARD_KINDS.models.label)
+						: "All models"
+					: board.kind === "world" || board.kind === "guardrail"
+						? (lensNameById.get(board.subjectId) ??
 							BOARD_KINDS[board.kind].label)
-						: board.kind === "skill"
-							? (skillNameById.get(board.subjectId) ??
+						: board.kind === "agent"
+							? (agentNameById.get(board.subjectId) ??
 								BOARD_KINDS[board.kind].label)
-							: board.kind === "run"
-								? runAddress(board.subjectId)
-								: board.kind === "plan_runs"
-									? (planRefById.get(board.subjectId) ??
-										BOARD_KINDS[board.kind].label)
-									: board.kind === "plan_versions" ||
-											board.kind === "plan_arguments" ||
-											board.kind === "plan_export"
-										? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
-										: BOARD_KINDS[board.kind].label,
+							: board.kind === "skill"
+								? (skillNameById.get(board.subjectId) ??
+									BOARD_KINDS[board.kind].label)
+								: board.kind === "run"
+									? runAddress(board.subjectId)
+									: board.kind === "plan_runs"
+										? (planRefById.get(board.subjectId) ??
+											BOARD_KINDS[board.kind].label)
+										: board.kind === "plan_versions" ||
+												board.kind === "plan_arguments" ||
+												board.kind === "plan_export"
+											? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
+											: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2988,6 +2897,18 @@ export function GraphDetailPage() {
 			);
 		}
 
+		if (board.kind === "models") {
+			return (
+				<ModelsPage
+					username={username as string}
+					graphSlug={graphSlug as string}
+					backend={backend}
+					selection={modelSelection}
+					onSelect={setModelSelection}
+				/>
+			);
+		}
+
 		if (board.kind === "agent") {
 			return (
 				<AgentBoardPage
@@ -3067,23 +2988,9 @@ export function GraphDetailPage() {
 		boardPage.setPageId(null, { step: null });
 		if (id === GRAPH_PAGE_ID) {
 			setWorkKind(null);
-			setGlobalModelOpen(false);
-			setAllModelsOpen(false);
 			backToList();
 			return;
 		}
-		if (id === ALL_MODELS_PAGE_ID) {
-			setGlobalModelOpen(false);
-			setAllModelsOpen(true);
-			return;
-		}
-		if (id === GLOBAL_MODEL_PAGE_ID) {
-			setAllModelsOpen(false);
-			setGlobalModelOpen(true);
-			return;
-		}
-		setGlobalModelOpen(false);
-		setAllModelsOpen(false);
 		const page = parseBoardPageId(id);
 		if (page?.kind === "data") {
 			setWorkKind(null);
@@ -3114,14 +3021,6 @@ export function GraphDetailPage() {
 		const page = parseBoardPageId(id);
 		if (page?.kind === "data") {
 			void closeCanvasTab(page.id);
-			return;
-		}
-		if (id === GLOBAL_MODEL_PAGE_ID) {
-			setGlobalModelOpen(false);
-			return;
-		}
-		if (id === ALL_MODELS_PAGE_ID) {
-			setAllModelsOpen(false);
 			return;
 		}
 		setWorkKind(null);

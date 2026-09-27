@@ -194,6 +194,11 @@ Legend: ✅ use as-is · 🟡 exists but needs extending · ❌ build it.
 | 50 | Canvas caption strip | `CanvasMessageBar` (canvas-ui) | ✅ | |
 | 51 | Canvas tool cluster (icon stack overlay) | `CanvasControlsToolbar` (canvas-ui) | ✅ | |
 | 52 | Subgraph preview card (thumb · `9 nodes · 12 edges` · Show) | `exportSVG` + `Card` | ❌ | `SubgraphPreview` — the card wrapper is still unbuilt. Phase 6 |
+| 52a | A record's description on one line under its header, `More` for its facts (the model page, [ME21](../modules/connect-and-model/features/model-editor.md#decisions)) | `RecordDescription` (`ui-extended`) · `header.description` + `details` (`@invana/dashboard`) | ✅ | shipped with the `Default` story |
+| 52b | The staged bar under a record's header — count · each change with its sign and `×` · `Discard all` · `⌘↵ publish` ([MP6](../modules/connect-and-model/features/the-model-page.md#decisions)) | `StagedBar` (`ui-extended`) · `staged` (`@invana/dashboard`) | ✅ | shipped with the `Default` story |
+| 52c | A tab locked until there is something to read — dimmed, with a lock | `TabSpec.locked` (`@invana/dashboard`) | ✅ | the `D14` story |
+| 52d | A canvas band that takes the height a tab has left | `RowSpec.fill` (`@invana/dashboard`) | ✅ | the model page's Model tab; the `D14` story |
+| 52e | The window greyed on a tab it does not apply to ([MP3](../modules/connect-and-model/features/the-model-page.md#decisions)) | `ActionSpec.disabled` on a segmented action | ✅ | the `D14` story |
 
 ### 2.5 The answer surface — was the biggest gap, now shipped
 

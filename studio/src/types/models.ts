@@ -212,6 +212,32 @@ export interface StagedSet {
 	reason: string | null;
 }
 
+/** One operation a projection would push (the-model-page.md MP20). */
+export interface ProjectionOperation {
+	action: "create_index" | "create_constraint";
+	name: string;
+	label: string;
+	properties: string[];
+	kind: string;
+	/** Neutral DDL — the vendor's own statement is its schema writer's. */
+	statement: string;
+	supported: boolean;
+}
+
+export interface ProjectionPlan {
+	/** `live` — against what the database reports; `active_version` — against the published version. */
+	against: "live" | "active_version";
+	operations: ProjectionOperation[];
+}
+
+/** A stitch that keeps a model from being archived (MP7). */
+export interface BindingStitch {
+	id: string;
+	kind: LinkKind;
+	source: string;
+	target: string;
+}
+
 export interface CommitResult {
 	version: import("@/types/schemas").GraphVersionResponse;
 	committed: number;

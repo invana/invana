@@ -8,7 +8,8 @@
  * of its own (ST57); it turns on the canvas's stitch gesture, and answers it
  * with the declare card docked beside the drawing (ST19, ST34). What sits above
  * the drawing is what a person has to *act* on: staged stitches to commit, and
- * stitches bound to a version no longer drawn.
+ * stitches bound to a version no longer drawn. The union reads beside it (ST6):
+ * this is the Model tab of the model page at All models (the-model-page.md).
  *
  * It does not write a model. Authoring is the model canvas, on a draft (ME1).
  */
@@ -22,6 +23,7 @@ import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
 } from "@/hooks/queries/useModels";
+import { UnionList } from "@/pages/graphs-detail/features/connect-and-model/stitch/UnionList";
 import {
 	buildAllModelsData,
 	parseMemberId,
@@ -37,11 +39,6 @@ import { useCallback, useMemo, useState } from "react";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/**
-	 * Accepted from the page host; the canvas carries no gesture that opens a
-	 * model (ST57) — the Models panel's list does.
-	 */
-	onOpenModel?: (modelId: string) => void;
 	/** The page's render backend — the canvas starts on it (GM13). */
 	backend?: CanvasBackend;
 }
@@ -178,31 +175,33 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 				</div>
 			) : null}
 
-			<div className="min-h-0 flex-1">
-				<GraphModelCanvas
-					data={build.data}
-					settings={graphModelSettings}
-					templates={graphModelTemplates}
-					initialDetail="high"
-					title="All models"
-					backend={backend}
-					stitching={{
-						onStitch,
-						onClosePanel: () => setDeclaring(null),
-						panel: declaring ? (
-							<DeclareStitchPanel
-								key={`${declaring.sourceKey}:${declaring.targetKey}`}
-								username={username}
-								graphSlug={graphSlug}
-								initialKind={declaring.kind}
-								sourceKey={declaring.sourceKey}
-								targetKey={declaring.targetKey}
-								onClose={() => setDeclaring(null)}
-								className="w-full p-3"
-							/>
-						) : null,
-					}}
-				/>
+			<div className="flex min-h-0 flex-1 gap-3">
+				<div className="min-h-0 min-w-0 flex-1">
+					<GraphModelCanvas
+						data={build.data}
+						settings={graphModelSettings}
+						templates={graphModelTemplates}
+						title="All models"
+						backend={backend}
+						stitching={{
+							onStitch,
+							onClosePanel: () => setDeclaring(null),
+							panel: declaring ? (
+								<DeclareStitchPanel
+									key={`${declaring.sourceKey}:${declaring.targetKey}`}
+									username={username}
+									graphSlug={graphSlug}
+									initialKind={declaring.kind}
+									sourceKey={declaring.sourceKey}
+									targetKey={declaring.targetKey}
+									onClose={() => setDeclaring(null)}
+									className="w-full p-3"
+								/>
+							) : null,
+						}}
+					/>
+				</div>
+				<UnionList username={username} graphSlug={graphSlug} />
 			</div>
 		</div>
 	);

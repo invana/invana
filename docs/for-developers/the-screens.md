@@ -585,17 +585,17 @@ Three more readings of a plan open from `⋯` on this page's header, each as its
 
 ## Beyond the 42 · The Model Page
 
-Nineteen artboards on their own canvas — *The Model Page* (`https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q`) — Models as one page with six tabs, **Overview · Model · Database · Usage · Performance · Growth**, read at `All models` or one model ([MP1 · MP2](modules/connect-and-model/features/the-model-page.md#decisions)). The panel lists the models; a click filters the page, `Open` drills into Node types · Edge types · Stitches, and every act on a model is on the page header ([MP4 · MP5](modules/connect-and-model/features/the-model-page.md#decisions)). The Graph is `airways` and its four models are the demo's. Generated from `.design/canvas-model-page/models.py` over the `canvas-govern-agents` kit. The name is the file, the frame title and this row. Nothing is built: the query log, count snapshots and index readers it reads are all new ([Engine](modules/connect-and-model/features/the-model-page.md#engine)).
+Nineteen artboards on their own canvas — *The Model Page* (`https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q`) — Models as one page with six tabs, **Overview · Model · Database · Usage · Performance · Growth**, read at `All models` or one model ([MP1 · MP2](modules/connect-and-model/features/the-model-page.md#decisions)). The panel lists the models; a click filters the page, `Open` drills into Node types · Edge types · Stitches, and every act on a model is on the page header ([MP4 · MP5](modules/connect-and-model/features/the-model-page.md#decisions)). The Graph is `airways` and its four models are the demo's. Generated from `.design/canvas-model-page/models.py` over the `canvas-govern-agents` kit. The name is the file, the frame title and this row. **Studio** opens it as the one `models` board beside the Models panel ([MP18](modules/connect-and-model/features/the-model-page.md#decisions)); the page, the panel, the Model tab, the Publish confirm and archive are built. The Overview reads models, types and records today; its queries, p95 and drift, and the Database, Usage, Performance and Growth tabs, wait on the query log, count snapshots and index readers ([MP22](modules/connect-and-model/features/the-model-page.md#decisions)). The read-only reading is drawn and waits on a write grant ([MP24](modules/connect-and-model/features/the-model-page.md#decisions)).
 
 | Artboard | Feature | Draws | API | Studio | Shell |
 |---|---|---|---|---|---|
-| `connect_and_model.models.overview` | 1.8 | All models — health, usage and speed per model, and what needs attention | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.overview.model` | 1.8 | One model, the same Overview filtered — a row per type, its signals | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.overview.empty` | 1.8 | No model published — what to do first, and the tabs that wait on it | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.model` | 1.8 | All models on one canvas — every frame, every stitch, the union beside it | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.model.model` | 1.8 | One model on the Model tab — cards, a type selected, its form beneath | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.model.model.drafting` | 1.8 | A draft open — the staged bar under the header, Publish v2 beside it | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.model.model.publish` | 1.8 | Publish asks first — the changes it lands, and the DDL it projects | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.overview` | 1.8 | All models — health, usage and speed per model, and what needs attention | 🟡 | 🟡 | ✅ |
+| `connect_and_model.models.overview.model` | 1.8 | One model, the same Overview filtered — a row per type, its signals | 🟡 | 🟡 | ✅ |
+| `connect_and_model.models.overview.empty` | 1.8 | No model published — what to do first, and the tabs that wait on it | ✅ | ✅ | ✅ |
+| `connect_and_model.models.model` | 1.8 | All models on one canvas — every frame, every stitch, the union beside it | ✅ | ✅ | ✅ |
+| `connect_and_model.models.model.model` | 1.8 | One model on the Model tab — circles, a type selected, its form beneath | ✅ | ✅ | ✅ |
+| `connect_and_model.models.model.model.drafting` | 1.8 | A draft open — the staged bar under the header, Publish v2 beside it | ✅ | ✅ | ✅ |
+| `connect_and_model.models.model.model.publish` | 1.8 | Publish asks first — the changes it lands, and the DDL it projects | ✅ | ✅ | ✅ |
 | `connect_and_model.models.database` | 1.8 | What the database holds — labels, types, indexes, constraints, drift marked | 🔵 | 🔵 | ✅ |
 | `connect_and_model.models.database.unsupported` | 1.8 | A connector that reports no indexes — the tab says so | 🔵 | 🔵 | ✅ |
 | `connect_and_model.models.usage` | 1.8 | Usage, all models — queries by model and caller, and the stitches queries cross | 🔵 | 🔵 | ✅ |
@@ -605,9 +605,9 @@ Nineteen artboards on their own canvas — *The Model Page* (`https://claude.ai/
 | `connect_and_model.models.performance.model.shape` | 1.8 | A shape picked — its plan, slowest calls, Add index to draft | 🔵 | 🔵 | ✅ |
 | `connect_and_model.models.growth` | 1.8 | Growth, all models — records stacked by model, each write marked on the line | 🔵 | 🔵 | ✅ |
 | `connect_and_model.models.growth.never_imported` | 1.8 | Published, nothing imported — no chart of zeros | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.archive.refused` | 1.8 | Archive refused — it names each active stitch that binds the model | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.list.archived` | 1.8 | The list with Show archived on — an archived model dimmed, with Restore | 🔵 | 🔵 | ✅ |
-| `connect_and_model.models.read_only` | 1.8 | A member without write — every tab reads, and no act to edit, publish or archive | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.archive.refused` | 1.8 | Archive refused — it names each active stitch that binds the model | ✅ | ✅ | ✅ |
+| `connect_and_model.models.list.archived` | 1.8 | The list with Show archived on — an archived model dimmed, with Restore | ✅ | ✅ | ✅ |
+| `connect_and_model.models.read_only` | 1.8 | A member without write — every tab reads, and no act to edit, publish or archive | 🟡 | 🟡 | ✅ |
 
 ## Beyond the 42 · The Agent Page
 

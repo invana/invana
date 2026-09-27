@@ -9,11 +9,12 @@
  *
  * That form spans the main column *beneath* the canvas, which is what the hi-fi
  * `Model · a type selected` draws: the drawing stays visible while the thing it
- * selected is being edited.
+ * selected is being edited. It is the model page's Model tab at one model
+ * (the-model-page.md): what the model is and whether it is drafting read on the
+ * page header, so the canvas draws and carries no header of its own.
  *
- * A published version's canvas is read-only (ME3) — no `ctx`, no tools, pan and
- * zoom only. Nothing here commits: the staged set lands as one action from the
- * panel.
+ * A published version's canvas is read-only (ME3) — no `ctx`, pan and zoom
+ * only. Nothing here commits: Publish is on the page header (MP4).
  */
 
 import {
@@ -36,8 +37,10 @@ import { EdgeTypeDetail } from "@/pages/graphs-detail/features/connect-and-model
 import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/connect-and-model/model/components/EdgeTypeFormDialog";
 import { NodeTypeDetail } from "@/pages/graphs-detail/features/connect-and-model/model/components/NodeTypeDetail";
 import { NodeTypeFormDialog } from "@/pages/graphs-detail/features/connect-and-model/model/components/NodeTypeFormDialog";
-import type { ModelSelection } from "@/pages/graphs-detail/features/connect-and-model/model/types";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/connect-and-model/model/types";
+import type {
+	ModelEditCtx,
+	ModelSelection,
+} from "@/pages/graphs-detail/features/connect-and-model/model/types";
 import {
 	buildAllModelsData,
 	memberIdOf,
@@ -46,7 +49,7 @@ import {
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
 import { Button } from "@invana/ui";
-import { Boxes, PanelBottomClose, Plus, X } from "lucide-react";
+import { PanelBottomClose } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface Props {
@@ -58,8 +61,8 @@ interface Props {
 	/** The type the panel has selected; its form spans the column below. */
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
-	/** Close the model canvas, handing the main area back. */
-	onClose?: () => void;
+	/** A member without write reads the form and never edits it (the-model-page.md seams). */
+	canWrite?: boolean;
 }
 
 export function ModelCanvas({
@@ -69,13 +72,8 @@ export function ModelCanvas({
 	backend,
 	selection,
 	onSelect,
-	onClose,
+	canWrite = true,
 }: Props) {
-	const [addingNode, setAddingNode] = useState(false);
-	const [edgePrefill, setEdgePrefill] = useState<{
-		source: string[];
-		target: string[];
-	} | null>(null);
 	// Editing a type's metadata reopens the same form the create gesture uses —
 	// the panel and the canvas never grow a second one (ME6).
 	const [editingNode, setEditingNode] = useState<NodeTypeResponse | null>(null);
@@ -104,10 +102,11 @@ export function ModelCanvas({
 	const nodeTypes = tree?.node_types ?? [];
 	const edgeTypes = tree?.edge_types ?? [];
 
-	// Editable only while a draft is open (ME3).
-	const ctx: ModelEditCtx | undefined = draft
-		? { username, graphSlug, modelId, versionId: draft.id }
-		: undefined;
+	// Editable only while a draft is open (ME3), and only by a member who writes.
+	const ctx: ModelEditCtx | undefined =
+		draft && canWrite
+			? { username, graphSlug, modelId, versionId: draft.id }
+			: undefined;
 
 	const selectedNode =
 		selection?.kind === "node_type"
@@ -140,7 +139,9 @@ export function ModelCanvas({
 						description: model?.description ?? "",
 						versionId: openVersionId ?? null,
 						versionLabel: draft
-							? `v${draft.version ?? "—"} draft`
+							? draft.version
+								? `v${draft.version} draft`
+								: "draft"
 							: active
 								? `v${active.version}`
 								: null,
@@ -192,51 +193,6 @@ export function ModelCanvas({
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">
-			{/* The canvas says what it is drawing and whether it may be drawn on —
-			    a read-only version looks identical otherwise (ME3). */}
-			<div className="flex h-9 shrink-0 items-center gap-2 border-b bg-card px-2 text-base">
-				<span className="flex h-7 items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-2">
-					<Boxes className="h-3.5 w-3.5 text-primary" />
-					<span className="font-mono">{model?.name ?? "Model"}</span>
-					<span className="text-muted-foreground">
-						{draft
-							? `v${draft.version ?? "—"} draft`
-							: active
-								? `v${active.version} read-only`
-								: "no version"}
-					</span>
-					{onClose ? (
-						<button
-							type="button"
-							onClick={onClose}
-							title="Close this canvas"
-							aria-label="Close this canvas"
-							className="ml-0.5 text-muted-foreground hover:text-foreground"
-						>
-							<X className="h-3.5 w-3.5" />
-						</button>
-					) : null}
-				</span>
-				{ctx ? (
-					<span className="ml-auto flex items-center gap-1.5">
-						<Button
-							size="sm"
-							variant="outline"
-							onClick={() => setAddingNode(true)}
-						>
-							<Plus className="mr-1 h-3.5 w-3.5" /> Node type
-						</Button>
-						<Button
-							size="sm"
-							variant="outline"
-							onClick={() => setEdgePrefill({ source: [], target: [] })}
-						>
-							<Plus className="mr-1 h-3.5 w-3.5" /> Edge type
-						</Button>
-					</span>
-				) : null}
-			</div>
-
 			<div className="min-h-0 flex-1">
 				<GraphModelCanvas
 					data={build.data}
@@ -278,7 +234,7 @@ export function ModelCanvas({
 								propertyKeys={tree?.property_keys ?? []}
 								editable={!!ctx}
 								ctx={ctx}
-								canEditViaDraft={!ctx}
+								canEditViaDraft={!ctx && canWrite}
 								creatingDraft={createDraft.isPending}
 								onEditViaDraft={openDraft}
 								onEdit={() => setEditingNode(selectedNode)}
@@ -298,7 +254,7 @@ export function ModelCanvas({
 								propertyKeys={tree?.property_keys ?? []}
 								editable={!!ctx}
 								ctx={ctx}
-								canEditViaDraft={!ctx}
+								canEditViaDraft={!ctx && canWrite}
 								creatingDraft={createDraft.isPending}
 								onEditViaDraft={openDraft}
 								onEdit={() => setEditingEdge(selectedEdge)}
@@ -315,39 +271,21 @@ export function ModelCanvas({
 				</div>
 			) : null}
 
-			{!ctx ? (
-				<div className="flex shrink-0 items-center gap-2 border-t px-4 py-1.5 text-sm text-muted-foreground">
-					<span>
-						{active
-							? `v${active.version} is published — pan and zoom only.`
-							: "Nothing published yet."}
-					</span>
-					<span className="ml-auto">Open a draft in the panel to author.</span>
-				</div>
-			) : null}
-
 			{ctx ? (
 				<>
 					<NodeTypeFormDialog
-						open={addingNode || editingNode !== null}
+						open={editingNode !== null}
 						ctx={ctx}
 						nodeType={editingNode}
 						existingNodeTypes={nodeTypes}
-						onClose={() => {
-							setAddingNode(false);
-							setEditingNode(null);
-						}}
+						onClose={() => setEditingNode(null)}
 					/>
 					<EdgeTypeFormDialog
-						open={edgePrefill !== null || editingEdge !== null}
+						open={editingEdge !== null}
 						ctx={ctx}
 						edgeType={editingEdge}
-						prefill={edgePrefill ?? undefined}
 						existingNodeTypes={nodeTypes}
-						onClose={() => {
-							setEdgePrefill(null);
-							setEditingEdge(null);
-						}}
+						onClose={() => setEditingEdge(null)}
 					/>
 					{/* A delete is staged like anything else (ME2) — the confirm says
 					    so, because "deleted" and "staged for deletion" are different
@@ -357,7 +295,7 @@ export function ModelCanvas({
 						title={`Delete ${deleting?.name ?? ""}?`}
 						description={
 							"It is staged, not gone: the draft loses it, and it leaves the " +
-							"published model when you commit. Discard the staged set to put it back."
+							"published model when you publish. Discard the staged set to put it back."
 						}
 						confirmLabel="Stage the delete"
 						destructive

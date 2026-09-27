@@ -100,6 +100,9 @@ MODEL_CREATE = "model.create"
 MODEL_UPDATE = "model.update"
 MODEL_DELETE = "model.delete"
 MODEL_ACTIVATE = "model.activate"
+# Archive and restore (docs/for-developers/modules/connect-and-model/features/the-model-page.md MP7)
+MODEL_ARCHIVED = "model.archived"
+MODEL_RESTORED = "model.restored"
 # NL → proposed model written to a draft (docs/for-developers/modules/ask/spec.md); target = session
 MODEL_GENERATE = "model.generate"
 # The staged set turned into a published version in one action

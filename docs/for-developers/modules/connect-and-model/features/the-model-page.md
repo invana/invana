@@ -8,7 +8,7 @@ one model — **the model is a filter, not a second page**.
 |---|---|
 | Index | [1.8](../../../README.md#1--connect-and-model) · Slice **S-TBD** |
 | Module | [Connect and model](../spec.md) |
-| API / CLI / Studio | 🔵 / — / 🔵 |
+| API / CLI / Studio | 🟡 / — / 🟡 — the page, the panel and the Model tab are built; Database, Usage, Performance and Growth wait on their reads (MP22) |
 | Related | [model-editor](model-editor.md) · [stitch-models](stitch-models.md) · [introspect-a-database](introspect-a-database.md) · [domain-models](domain-models.md) · [the library's plan page](../../workflows/features/the-library.md) |
 
 > **As** the person who owns a Graph's models, **I want** to see whether each model is used, how it
@@ -56,7 +56,7 @@ flowchart TD
     S -->|Open on the row| D[Panel: Node types · Edge types · Stitches<br/>Page: Model tab]
     D -->|Edit| F[A draft opens · staged bar under the header]
     F -->|Publish vN| G{Confirm card:<br/>changes + the DDL it projects}
-    G -->|publish| H[Next version active · the DDL projected as a run]
+    G -->|publish| H[Next version active · its DDL projected (CM10)]
     G -->|cancel| F
     F -->|Discard draft| D
     S -->|breadcrumb Models ›| T
@@ -130,7 +130,7 @@ The **Models** board (`board.kind = models`) — one board, whatever the scope. 
 | Tab | All models | One model |
 |---|---|---|
 | **Overview** (default) | Tiles: models (published · draft) · types · records · queries a day · p95 · drift. A row per model: version · types · records · share of queries · p95 · signal · drift. **Needs attention**: every flagged signal, each linking to its tab | Tiles: types · records · queries a day · p95 · drift · staged. A row per type: kind · records · change over the window · share of queries · p95 · signal. The same Needs attention, filtered |
-| **Model** | [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md), every model as a frame with its stitches (ST14 · ST57). The union list beside it: every type with the models contributing it (ST6). The declare card docks on the right (ST34) | The same canvas, one frame (ME26). The selected type's form beneath it (ME6 · ME19) |
+| **Model** | [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md), on circles and ELK (MP19), every model as a frame with its stitches (ST14 · ST57). The union list beside it: every type with the models contributing it (ST6). The declare card docks on the right (ST34) | The same canvas and Detail, one frame (ME26). The selected type's form beneath it (ME6 · ME19) |
 | **Database** | Four sections: Labels · Relationship types · Indexes · Constraints. Each row carries its drift mark and count; **unmodelled** labels sort first. Captured-at time and `Introspect` on the tab's own header | The same four, only this model's types. No unmodelled section |
 | **Usage** | Tiles: queries · callers · unused types · hot types. A row per model: queries touching it · share · by agent · plan · Explorer · API · last touched · signal. **Stitches crossed**: each active stitch and the queries that traversed it | Tiles, filtered. A row per type, the same columns. **Properties**: filtered · returned · ordered on, per property, with cold ones marked |
 | **Performance** | Tiles: queries · p50 · p95 · errors · slow shapes. **p95 a day**. A row per shape: shape · callers · calls · p50 · p95 · rows · types touched · advice. Picking a row opens a card: the full shape, its slowest calls (each linking to its run), the plan's summary, and the advice | The same, only shapes touching this model's types. `Add index to draft` on an advice row when the index belongs to this model |
@@ -171,9 +171,9 @@ the file, the frame title and a row in [the-screens.md](../../../the-screens.md#
 | **Count snapshots** — `type_count_snapshots` | `graph_id` · `at` · `source (introspect\|import\|stitch_commit)` · `source_id` · `kind (node\|edge)` · `type_name` · `count` · `max_degree` · `median_degree` (nodes only). Written by introspection, at the end of every import run and after every stitch commit |
 | **Physical mirror** | Adds `indexes` and `constraints` to what introspection captures. `get_indexes()` · `get_constraints()` are overridden per connector: Neo4j (`SHOW INDEXES` · `SHOW CONSTRAINTS`) and Memgraph (`SHOW INDEX INFO` · `SHOW CONSTRAINT INFO`) first; every other connector reports `unsupported` |
 | **Advice** | For the window's slowest shapes by total time, `EXPLAIN` (never `PROFILE`, which runs the query again). v1 raises `missing_index` — a label scan filtered on a property with no index — naming the label, the property and the model that owns the label. Neo4j and Memgraph only |
-| Reads | `GET …/models/insights?model=<id>\|all&window=7d\|30d\|90d` — Overview, Usage, Performance and Growth in one answer. `GET …/models/insights/shapes/{shape_hash}?model=&window=` — the shape card. `GET …/schema/physical?model=` — the Database tab |
-| Writes | none new. *Add index to draft* stages an `index_definition` through the existing `…/models/{id}/draft*` route. Archive and restore set `models.status` through `PATCH …/models/{id}` |
-| Refusals | `archive_has_active_stitches` (carrying each stitch) · `delete_has_published_version` · `advice_unsupported_by_connector` |
+| Reads | `GET …/models/insights?model=<id>\|all&window=7d\|30d\|90d` — Overview, Usage, Performance and Growth in one answer. `GET …/models/insights/shapes/{shape_hash}?model=&window=` — the shape card. `GET …/schema/physical?model=` — the Database tab. `GET …/models/{id}/draft/projection` — the Publish confirm's DDL (MP20). `GET …/models?include_archived=true` — `Show archived` |
+| Writes | none new. *Add index to draft* stages an `index` through the existing `…/models/{id}/draft*` route. Archive and restore set `models.status` through `PATCH …/models/{id}` |
+| Refusals | `archive_has_active_stitches` (409, carrying each stitch as `source` · `target` · `kind`) · `delete_has_published_version` (409) · `advice_unsupported_by_connector` |
 | Events | `model.archived · restored` |
 
 ## Decisions
@@ -192,23 +192,16 @@ the file, the frame title and a row in [the-screens.md](../../../the-screens.md#
 | MP10 | **Usage calls a type under- or over-used by fixed rules over the window**, and calls nothing when the window holds fewer than 50 queries on the Graph. **Unused**: records > 0 and no query touched it. **Empty**: published, zero records. **Cold property**: never filtered, returned or ordered on (only where the connector explains). **Hot**: touched by ≥ 25% of the window's queries. **Hot and slow**: hot, with its p95 at or above the Graph's p95 — the one signal that links to Performance. **Supernode**: a type whose `max_degree` is ≥ 100× its `median_degree` and ≥ 1,000. The rules are numbers, not a score, so a flag can be argued with. |
 | MP11 | **Usage splits every count by caller — agent · plan · Explorer · API.** A type only a person browses and a type every plan depends on are different facts, and one total hides which. |
 | MP12 | **Performance groups by query shape.** Literals are replaced by parameters and the text is hashed, so a thousand calls of one generated query are one row. What a query *touched* comes from the connector's plan when it can explain, and from the labels of what it returned when it cannot; the row says which, because the second misses a type that was only filtered on. |
-| MP13 | **Advice is a draft change, never a write.** A missing index is offered as *Add index to draft* on the model that owns the label, which stages an `index_definition`; the next publish projects it as a run (CM10). The page never runs DDL itself (module §7). v1 advises on missing indexes only; every other slow shape is shown without advice rather than with a guess. |
+| MP13 | **Advice is a draft change, never a write.** A missing index is offered as *Add index to draft* on the model that owns the label, which stages an `index`; the next publish projects it as a run (CM10). The page never runs DDL itself (module §7). v1 advises on missing indexes only; every other slow shape is shown without advice rather than with a guess. |
 | MP14 | **Growth is drawn from count snapshots written by every act that writes data** — introspection, the end of an import run, a stitch commit — not from a timer. The line changes only where something wrote, and each mark names the run that did. The window's opening value is the last snapshot at or before its start. |
 | MP15 | **The query log is Invana's own table, not read back from telemetry.** Telemetry is optional and is off in tests; a page that goes blank when HyperDX is not running is a page nobody trusts. Both are written from the same seam. |
 | MP16 | **Percentiles are computed in the engine over the window's rows**, not in SQL — SQLite has no `percentile_cont` ([LB36](../../workflows/features/the-library.md#decisions)). |
 | MP17 | **A type belongs to a model through the model's active version.** A label two models both declare counts toward both and is marked shared; a label no model declares is `database only` and reads only at All models. |
 | MP18 | **One board, `kind = models`, whatever the scope.** Its tab reads the scope's name — `All models` or `AirRoutes`. Scope is a filter, so a second model is the same board re-read, not a second tab. |
-
-## Not building
-
-| Not building | Because |
-|---|---|
-| Applying an index or constraint from the page | the modeller describes; publish projects (MP13, module §7) |
-| `PROFILE` or re-running a caller's query to measure it | it runs the query again, at the caller's cost |
-| Advice beyond missing indexes | a suggestion the engine cannot back with the plan is a guess |
-| A scheduled count sampler | data changes only when something writes it (MP14) |
-| Per-scope tab sets | MP2 — one page, one strip |
-| Comparing two models side by side | step the scope down the list instead (MP5) |
-| Alerts or notifications on a signal | the page reports; Operate owns alerting |
-| A usage score or health grade | a number built from numbers hides which one moved (MP10) |
-| Advice on Gremlin connectors | no plan worth reading comes back |
+| MP19 | **Both readings of the Model tab open on circles, laid out by ELK.** `All models` and one model draw on the same `GraphModelCanvas`, at the same opening Detail, with the one layout ([GM3 · GM4](../../../building-studio/graph-model-canvas.md#decisions)) — so narrowing the scope changes what is drawn, never how. The header carries Detail and no Layout switch. |
+| MP20 | **The Publish confirm reads a projection plan and writes nothing.** `…/draft/projection` diffs the draft's indexes and constraints against what the database reports, or against the active version when the connector cannot list them, and says which (`against: live \| active_version`). Each operation is stated in a neutral form — `CREATE RANGE INDEX airport_city ON airport(city)` — because the vendor's statement is its schema writer's, and an operation the connector lacks the capability for is listed and marked unsupported rather than hidden. Projecting is CM10's run, not this page's. |
+| MP21 | **Archive and restore are acts, not a status field.** `PATCH …/models/{id}` with `status: archived` archives (refused while an active stitch binds it) and emits `model.archived`; any other status on an archived model restores it — to `active` when it was ever published — and emits `model.restored`. A model counts as published once any version was activated. |
+| MP22 | **A tab whose reading the engine does not serve yet stays in the strip and says so.** The six tabs never change (MP2); until its read ships, Usage, Performance, Growth or Database draws *Not measured yet* naming what it waits on, and the Overview leaves that tile out rather than drawing a zero. A chart `@invana/charts` does not ship yet is a slot at the chart's real height, taking the props the chart will (`chartSlots.tsx`), so the layout is final and swapping it in is one file. |
+| MP23 | **The reading is four URL keys, written with the page in one update.** `model` is the scope and the row the panel has selected, `model_open` the panel drilled into it, `models_tab` and `models_window` the tab and the window; absent is the default — All models, Overview, 30 days. A key the panel or the page writes goes in the same update as `page` or `panel`, because two writes in one tick do not compose. |
+| MP24 | **Every member writes until membership says otherwise.** Membership is binary ([membership](../../identity-and-access/features/membership.md)), so the read-only reading — every tab reads, `Edit` · `Publish` · `Archive` absent — is the page drawn without a write grant, and it is reached when identity-and-access grants one. |
+| MP25 | **Records on the Overview are the database's own counts until count snapshots exist.** A type's records are the `count-types` read of its name; a model's are the sum over its active version's types, so a label two models declare counts toward both (MP17). A connector that cannot count shows `—`, never a zero. |

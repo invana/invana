@@ -8503,6 +8503,74 @@
         "title": "ProjectUpdate",
         "type": "object"
       },
+      "ProjectionOperation": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "supported": {
+            "title": "Supported",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "name",
+          "label",
+          "properties",
+          "kind",
+          "statement",
+          "supported"
+        ],
+        "title": "ProjectionOperation",
+        "type": "object"
+      },
+      "ProjectionPlan": {
+        "description": "What publishing the draft asks the database to hold (the-model-page.md MP8).",
+        "properties": {
+          "against": {
+            "title": "Against",
+            "type": "string"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectionOperation"
+            },
+            "title": "Operations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "against",
+          "operations"
+        ],
+        "title": "ProjectionPlan",
+        "type": "object"
+      },
       "PromoteRequest": {
         "properties": {
           "description": {
@@ -22293,6 +22361,18 @@
               "title": "Graphslug",
               "type": "string"
             }
+          },
+          {
+            "description": "List archived models too (Show archived, MP7).",
+            "in": "query",
+            "name": "include_archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "List archived models too (Show archived, MP7).",
+              "title": "Include Archived",
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -22963,6 +23043,76 @@
           }
         ],
         "summary": "Discard Staged Set",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/{model_id}/draft/projection": {
+      "get": {
+        "description": "The DDL the Publish confirm lists. Reads only \u2014 nothing is written.",
+        "operationId": "get_draft_projection_api_v1_u__username___graphSlug__models__model_id__draft_projection_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "title": "Model Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectionPlan"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Draft Projection",
         "tags": [
           "models"
         ]

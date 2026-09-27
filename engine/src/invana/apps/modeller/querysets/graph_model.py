@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from invana.apps.modeller.models import (
     GraphModel,
+    GraphVersion,
+    ModelLink,
 )
 
 if TYPE_CHECKING:
@@ -87,3 +89,35 @@ class GraphModelQuerySet(VersionScopedQuerySet):
     # ------------------------------------------------------------------
     # Version CRUD
     # ------------------------------------------------------------------
+
+    async def was_published(self, session: AsyncSession, model_id: str) -> bool:
+        """True once any version was activated — an archived version was active once."""
+        stmt = select(GraphVersion.id).where(
+            GraphVersion.model_id == model_id,
+            or_(GraphVersion.activated_at.is_not(None), GraphVersion.status.in_(("active", "archived"))),
+        )
+        return (await session.execute(stmt.limit(1))).first() is not None
+
+    async def active_stitches_binding(
+        self, session: AsyncSession, graph_id: str, model_id: str
+    ) -> list[tuple[ModelLink, str, str]]:
+        """Every active stitch with an end on one of this model's versions, with each end's model name."""
+        versions = select(GraphVersion.id).where(GraphVersion.model_id == model_id)
+        stmt = select(ModelLink).where(
+            ModelLink.graph_id == graph_id,
+            ModelLink.status == "active",
+            or_(ModelLink.source_version_id.in_(versions), ModelLink.target_version_id.in_(versions)),
+        )
+        links = list((await session.execute(stmt)).scalars().all())
+        if not links:
+            return []
+        ends = {link.source_version_id for link in links} | {link.target_version_id for link in links}
+        rows = await session.execute(
+            select(GraphVersion.id, GraphModel.name)
+            .join(GraphModel, GraphModel.id == GraphVersion.model_id)
+            .where(GraphVersion.id.in_(ends))
+        )
+        names = dict(rows.tuples().all())
+        return [
+            (link, names.get(link.source_version_id, "?"), names.get(link.target_version_id, "?")) for link in links
+        ]

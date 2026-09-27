@@ -96,6 +96,82 @@ _CONSTRAINT_TYPE_CAPABILITY: dict[str, Capability] = {
 }
 
 # ---------------------------------------------------------------------------
+# The plan — what a projection of a version would write, without writing it
+# ---------------------------------------------------------------------------
+
+
+def _statement(action: str, name: str, label: str, properties: list[str], kind: str) -> str:
+    """The operation in a neutral DDL form — the connector's own syntax is its writer's."""
+    on = f"{label}({', '.join(properties)})"
+    if action == "create_index":
+        return f"CREATE {kind.upper()} INDEX {name} ON {on}"
+    return f"CREATE CONSTRAINT {name} {kind.upper()} ON {on}"
+
+
+async def plan_projection(
+    version: GraphVersion,
+    *,
+    connector: BaseConnector | None,
+    baseline: GraphVersion | None,
+) -> dict[str, Any]:
+    """What projecting ``version`` would create (the-model-page.md MP8).
+
+    Read against the live database when the connector can list its indexes and
+    constraints; otherwise against ``baseline`` — the active version — which is
+    what the database was last asked to hold. Nothing is written.
+    """
+    # The desired-state readers need no store; nothing here is recorded.
+    projector = Projector(store=None)
+    caps = connector.capabilities() if connector is not None else set()
+    against = "active_version"
+    live_idx: set[tuple] | None = None
+    live_con: set[tuple] | None = None
+    if connector is not None:
+        try:
+            live_idx = {(i.label, tuple(i.properties), i.type) for i in await connector.schema_reader.get_indexes()}
+            live_con = {(c.label, tuple(c.properties), c.type) for c in await connector.schema_reader.get_constraints()}
+            against = "live"
+        except NotImplementedError:
+            live_idx = live_con = None
+    if live_idx is None or live_con is None:
+        live_idx = {d.key for d in projector._compute_desired_indexes(baseline, caps)} if baseline else set()
+        live_con = {d.key for d in projector._compute_desired_constraints(baseline, caps)} if baseline else set()
+
+    operations: list[dict[str, Any]] = []
+    for di in projector._compute_desired_indexes(version, caps):
+        if di.key in live_idx:
+            continue
+        cap = _INDEX_TYPE_CAPABILITY.get(di.index_type)
+        operations.append(
+            {
+                "action": "create_index",
+                "name": di.name,
+                "label": di.label,
+                "properties": di.properties,
+                "kind": di.index_type,
+                "statement": _statement("create_index", di.name, di.label, di.properties, di.index_type),
+                "supported": connector is None or cap is None or cap in caps,
+            }
+        )
+    for dc in projector._compute_desired_constraints(version, caps):
+        if dc.key in live_con:
+            continue
+        cap = _CONSTRAINT_TYPE_CAPABILITY.get(dc.constraint_type)
+        operations.append(
+            {
+                "action": "create_constraint",
+                "name": dc.name,
+                "label": dc.label,
+                "properties": dc.properties,
+                "kind": dc.constraint_type,
+                "statement": _statement("create_constraint", dc.name, dc.label, dc.properties, dc.constraint_type),
+                "supported": connector is None or cap is None or cap in caps,
+            }
+        )
+    return {"against": against, "operations": operations}
+
+
+# ---------------------------------------------------------------------------
 # Projector
 # ---------------------------------------------------------------------------
 

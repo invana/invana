@@ -50,7 +50,7 @@ It takes **no children**: a host adds nothing to the canvas but its opt-in stitc
 | `templates` | `Record<Detail, Partial<CanvasConfig>>` | ✅ | each Detail level's patch: frame padding, the `model.type` binding, ELK spacing |
 | `title` | `string` | — | the header title. `Global model` by default |
 | `message` | `string` | — | shown once in `CanvasMessageBar`. The story's by default |
-| `initialDetail` | `Detail` | — | `medium` by default. *All models* passes `high` (circles); a single model takes the default, cards (GM4) |
+| `initialDetail` | `Detail` | — | `high` by default — circles. *All models* and a single model both open on it (GM4) |
 | `selected` | `{ kind: 'node' \| 'edge', id } \| null` | — | the node or edge drawn selected |
 | `onSelect` | `(selection) => void` | — | one node or edge clicked, or `null` on an empty click |
 | `height` | `number` | — | for a host that gives no height of its own |
@@ -100,8 +100,8 @@ Everything the story renders, and nothing else:
 | Layers | `BackgroundLayer`, `GraphLayer` |
 | Theme | `ThemeBehaviour`, `CanvasThemeSync` |
 | Behaviours | pan, wheel zoom, drag node, hover activate, click select, `CollapseExpandBehaviour`, `TextResolutionLODBehaviour`, `TextLODBehaviour`, `HoverElementPreviewBehaviour` |
-| Layouts | `ElkLayout` (`elk`, the default) and `D3ForceLayout` (`force`) |
-| Header | title · `GraphControlsToolbar` (layout section off) · **Detail** · **Layout** · Settings dock · theme toggle |
+| Layouts | `ElkLayout` (`elk`) — the only one (GM3) |
+| Header | title · `GraphControlsToolbar` (layout section off) · **Detail** · Settings dock · theme toggle |
 | With `stitching` | a drag moves a type, as in the story; **Shift**-drag arms `DrawEdgeBehaviour` (its dashed rubber band) and turns node drag off while Shift is held. A **Stitch mode** toggle after the toolbar's own items makes that sticky. The declare card docks on the right when a drag is accepted, with no toggle of its own |
 | Footer | `GraphStatusBar` · `CanvasMessageBar` |
 
@@ -129,8 +129,8 @@ flowchart LR
 |---|---|
 | GM1 | **The modeller's one canvas is the global model story, copied.** Its behaviours, layouts, header, footer, hover cards, settings and templates are the story's; only the colours are Studio's (GM7, GM8). Both modeller surfaces draw on it, so a model reads the same alone and among the others |
 | GM2 | **A host adds nothing to the canvas.** No children, no toolbar items, no camera hooks. What a page needs beyond the drawing (a staged bar, a type form) sits outside the canvas, in the page's own layout. Selection is one channel in and out; the stitch gesture (GM12) is the other, and it is the canvas's own |
-| GM3 | **ELK and d3-force, as the story has them.** ELK `layered` is the default; the Layout switch offers force with the story's settings, whose frames can overlap |
-| GM4 | **Detail is High, Medium or Low, and each is a template patch.** `templates.json` is the story's `detail-templates.json`. A patch carries the frame padding, the member binding and both layouts' spacing for its node size, and the layout re-runs after it. The caller picks the opening Detail: *All models* opens on High — circles, the landscape at a glance — and a single model on Medium — cards, the story's default |
+| GM3 | **ELK, and only ELK.** `ElkLayout` `layered` lays out every modeller canvas — *All models* and a single model alike. There is no Layout switch and no d3-force layout here: force only pulls a model's types together, so its frames overlap, and a second layout is a second drawing of one model to learn |
+| GM4 | **Detail is High, Medium or Low, and each is a template patch.** `templates.json` is the story's `detail-templates.json`. A patch carries the frame padding, the member binding and the ELK spacing for its node size, and the layout re-runs after it. **Every modeller canvas opens on High — circles** — *All models* and a single model alike; cards (Medium) and schema cards (Low) are one click away in Detail |
 | GM5 | **The JSON names no model and no type.** The story binds each qualified type name. Studio's types are the user's own, so the JSON carries one placeholder binding, `model.type`, and `config.ts` expands it into one binding per `Model.Type` in the data |
 | GM6 | **Low's schema cards are built from the data.** The story writes one card per type by hand. `schemaCard()` writes the same layout from the type's own properties: a 300px card, 22px rows, the story's type chips. A card's height is its row count |
 | GM7 | **Hues are slots, read live from `--color-data-N`.** The story's colour lookups bind `data.model`; here they bind `data.hue` (`1`–`8`) and `config.ts` refills them from the tokens whenever the theme changes, because the light and dark palettes differ. **A model's slot comes from its name** (`colorSlotByString` in `@invana/styling/color`), never its place in the list, so a model keeps its hue when another is added, deleted or re-sorted; **a type's slot comes from its own name**, so it wears the colour the Explorer paints it (ST17) |
@@ -151,3 +151,4 @@ flowchart LR
 | Zoom-driven collapse or an altitude track | GM1. Detail is how the drawing changes altitude (ST15) |
 | A per-type icon chosen by the canvas | the API carries no icon for a type yet. Every type is `lucide/box` until one does |
 | The union list drawn on this canvas | it is stated, not drawn (ST6, ST16) |
+| A Layout switch, or d3-force, on a modeller canvas | ELK is the one layout; force overlaps the frames (GM3) |
