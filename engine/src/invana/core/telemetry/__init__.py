@@ -3,7 +3,7 @@
 Public API
 ----------
 setup_telemetry()       Register OTel providers (traces/metrics/logs). Idempotent.
-instrument_app()        Add FastAPI + SQLAlchemy auto-instrumentation. Call in lifespan.
+instrument_app()        Add SQLAlchemy auto-instrumentation. Call in lifespan.
 TelemetryMiddleware     Pure-ASGI middleware that spans every HTTP request.
 
 Decorators (import from invana.core.telemetry.decorators):

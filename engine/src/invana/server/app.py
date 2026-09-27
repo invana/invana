@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -18,6 +19,7 @@ from invana.core.errors import (
     PermissionDeniedError,
     ValidationError,
 )
+from invana.core.logging import RedactTokenFilter
 from invana.core.settings import settings
 from invana.server.middleware import CatchAllExceptionMiddleware
 
@@ -30,6 +32,20 @@ def _domain_error_handler(status_code: int):
         return JSONResponse(status_code=status_code, content={"detail": detail})
 
     return handler
+
+
+def _redact_access_log_tokens() -> None:
+    """
+    Keep access tokens out of uvicorn's access log.
+
+    Studio's live streams pass the token in the URL, and uvicorn logs the full
+    path. Called from ``create_app`` because uvicorn applies its own logging
+    config first, which would replace a filter attached any earlier. Adds the
+    filter once, however many times the app is built.
+    """
+    access = logging.getLogger("uvicorn.access")
+    if not any(isinstance(f, RedactTokenFilter) for f in access.filters):
+        access.addFilter(RedactTokenFilter())
 
 
 @asynccontextmanager
@@ -152,6 +168,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    _redact_access_log_tokens()
+
     # Sync engine created eagerly — starlette-admin needs it at mount time.
     app.state.sync_engine = create_sync_engine()
 
@@ -223,13 +241,12 @@ def create_app() -> FastAPI:
     app.include_router(events_router)
     app.include_router(graph_events_router)
 
-    # docs/for-developers/modules/platform/features/telemetry.md — proxy the studio's browser OTLP/HTTP span export to
-    # the collector.
-    # Always mounted (TE6): the studio exports on its own gate, so a route that
+    # Proxy the studio's browser OTLP/HTTP span export to the collector.
+    # Always mounted: the studio exports on its own gate, so a route that
     # disappears when the engine's telemetry is off answers every batch with a
     # 404 the browser console reports as an error. With telemetry off the route
-    # accepts the batch and drops it. Excluded from auto-instrumentation in
-    # telemetry/setup.py so the proxy never traces itself.
+    # accepts the batch and drops it. TelemetryMiddleware skips it, so the
+    # proxy never traces itself.
     from invana.server.routes.telemetry import telemetry_router
 
     app.include_router(telemetry_router)

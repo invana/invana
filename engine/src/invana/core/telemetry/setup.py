@@ -7,15 +7,24 @@ Two public entry points:
                         Idempotent — safe to call multiple times; initialises once.
                         Called from server lifespan when INVANA_TELEMETRY_ENABLED=true.
 
-  instrument_app()    — Adds FastAPI + SQLAlchemy auto-instrumentation.
+  instrument_app()    — Adds SQLAlchemy auto-instrumentation.
                         Call once inside the FastAPI lifespan after the DB engine exists.
 
 Instruments:
-  - FastAPI          (all routes, request/response timings)
+  - HTTP requests    (TelemetryMiddleware — the only source of request spans; it is
+                      added when the app is built, because instrumentation applied
+                      from the lifespan runs after Starlette has already built its
+                      middleware stack and never takes effect)
   - SQLAlchemy       (all app-state DB queries, trace context injected into SQL comments)
-  - Python logging   (trace_id/span_id injected into every log record)
+  - Python logging   (every record shipped over OTLP carries its span context; the
+                      console format gets trace ids from the logging filters)
   - Custom spans     (via @track decorator)
   - Custom metrics   (via @capture_metrics decorator and metrics.py instruments)
+
+Sampling:
+  Traces are sampled by trace id at ``sample_ratio`` for new root traces; a request
+  that arrives with a parent (e.g. the studio's ``traceparent``) follows the
+  parent's decision, so a distributed trace is kept or dropped as a whole.
 
 Signals exported via OTLP gRPC to any OTel-compatible backend (HyperDX, Signoz, etc.).
 """
@@ -29,7 +38,6 @@ from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
@@ -38,6 +46,7 @@ from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.trace.sampling import ParentBased, Sampler, TraceIdRatioBased
 
 logger = logging.getLogger("invana.telemetry")
 
@@ -49,6 +58,7 @@ def setup_telemetry(
     service_version: str = "0.0.0",
     otlp_endpoint: str = "http://localhost:4317",
     environment: str = "development",
+    sample_ratio: float = 1.0,
 ) -> None:
     """
     Register OTel trace / metric / log providers.
@@ -61,6 +71,8 @@ def setup_telemetry(
     service_version: Shown in service details.
     otlp_endpoint:   gRPC endpoint of the OTel collector (default: 4317).
     environment:     deployment.environment label (development / staging / production).
+    sample_ratio:    Fraction of new root traces to keep, 0.0 to 1.0 (default 1.0 = all).
+                     Traces started elsewhere follow their parent's sampling decision.
     """
     global _providers_initialised
     if _providers_initialised:
@@ -72,46 +84,41 @@ def setup_telemetry(
             SERVICE_VERSION: service_version,
             "deployment.environment": environment,
             "invana.component": "engine",
+            "invana.telemetry.sample_ratio": sample_ratio,
         }
     )
 
-    _setup_traces(resource, otlp_endpoint)
+    _setup_traces(resource, otlp_endpoint, sample_ratio)
     _setup_metrics(resource, otlp_endpoint)
     _setup_logs(resource, otlp_endpoint)
 
-    # Inject trace_id + span_id into every Python log record.
-    LoggingInstrumentor().instrument(set_logging_format=True)
-
     _providers_initialised = True
     logger.info(
-        "Telemetry initialised → %s  service=%s  env=%s",
+        "Telemetry initialised → %s  service=%s  env=%s  sample_ratio=%s",
         otlp_endpoint,
         service_name,
         environment,
+        sample_ratio,
     )
 
 
 def instrument_app(app, engine) -> None:
     """
-    Add FastAPI and SQLAlchemy auto-instrumentation.
+    Add SQLAlchemy auto-instrumentation to the app-state database engine.
 
     Call this once inside the FastAPI lifespan after the DB engine is ready.
     Requires setup_telemetry() to have been called first.
 
+    HTTP requests are not instrumented here: TelemetryMiddleware, added when the
+    app is built, is the only source of request spans. Instrumentation applied
+    from the lifespan would come after Starlette has built its middleware stack
+    and never take effect.
+
     Parameters
     ----------
-    app:    The FastAPI application instance.
+    app:    The FastAPI application instance (kept for the call site; unused).
     engine: The SQLAlchemy async engine (from create_db_engine()).
     """
-    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor  # requires --extra server
-
-    FastAPIInstrumentor.instrument_app(
-        app,
-        # ``telemetry/traces`` is the browser-span proxy (docs/for-developers/modules/platform/features/telemetry.md) —
-        # exclude it
-        # so shipping spans doesn't itself generate spans.
-        excluded_urls="health,metrics,ping,telemetry/traces",
-    )
     SQLAlchemyInstrumentor().instrument(
         engine=engine.sync_engine,
         enable_commenter=True,  # injects trace-context into SQL comments
@@ -121,9 +128,20 @@ def instrument_app(app, engine) -> None:
 # ── internals ─────────────────────────────────────────────────────────────────
 
 
-def _setup_traces(resource: Resource, endpoint: str) -> None:
+def _sampler(ratio: float) -> Sampler:
+    """Build the trace sampler for a given keep ratio.
+
+    New root traces are kept with probability ``ratio``, decided from the trace id
+    so every service reaches the same verdict. A span with a parent — local, or
+    remote via ``traceparent`` — inherits the parent's decision, so a trace is
+    never cut in half.
+    """
+    return ParentBased(TraceIdRatioBased(ratio))
+
+
+def _setup_traces(resource: Resource, endpoint: str, sample_ratio: float) -> None:
     exporter = OTLPSpanExporter(endpoint=endpoint)
-    provider = TracerProvider(resource=resource)
+    provider = TracerProvider(resource=resource, sampler=_sampler(sample_ratio))
     provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
 

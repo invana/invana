@@ -13,6 +13,11 @@
  * context manager carries the active context across Vite's native async/await
  * (zone.js only patches down-levelled awaits). See docs/for-developers/modules/platform/features/telemetry.md.
  *
+ * Sampling is parent-based on `VITE_TELEMETRY_SAMPLE_RATIO` (0–1, default 1):
+ * a new action is kept at that ratio, and the engine honours the decision the
+ * `traceparent` carries, so a kept action keeps its whole trace. The ratio is
+ * recorded on the resource so a missing trace is explainable.
+ *
  * Gated by `VITE_TELEMETRY_ENABLED` (on unless explicitly "false"). When off,
  * `setup()` is a no-op: no provider is registered, so the helpers in ./tracer
  * resolve to OTel's no-op tracer and the Explorer instrumentation costs nothing.
@@ -25,6 +30,8 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
 	BatchSpanProcessor,
+	ParentBasedSampler,
+	TraceIdRatioBasedSampler,
 	WebTracerProvider,
 } from "@opentelemetry/sdk-trace-web";
 
@@ -40,6 +47,17 @@ const ENABLED = import.meta.env.VITE_TELEMETRY_ENABLED !== "false";
 // Opt-in via VITE_TELEMETRY_DEBUG=true. Otherwise dev still surfaces warnings /
 // errors (e.g. failed exports) and prod stays silent.
 const DEBUG = import.meta.env.VITE_TELEMETRY_DEBUG === "true";
+
+/**
+ * Share of new traces to keep. Anything that is not a number between 0 and 1
+ * keeps every trace, so a typo never silently turns tracing off.
+ */
+export function sampleRatio(raw: string | undefined): number {
+	const ratio = raw?.trim() ? Number(raw) : Number.NaN;
+	return Number.isFinite(ratio) && ratio >= 0 && ratio <= 1 ? ratio : 1;
+}
+
+const SAMPLE_RATIO = sampleRatio(import.meta.env.VITE_TELEMETRY_SAMPLE_RATIO);
 
 /** Tracer name shared with ./tracer's span helpers. */
 export const SERVICE_NAME = "invana-studio";
@@ -61,6 +79,10 @@ function setup(): void {
 				"service.version": import.meta.env.VITE_APP_VERSION ?? "0.0.0",
 				"deployment.environment": import.meta.env.MODE,
 				"invana.component": "studio",
+				"invana.telemetry.sample_ratio": SAMPLE_RATIO,
+			}),
+			sampler: new ParentBasedSampler({
+				root: new TraceIdRatioBasedSampler(SAMPLE_RATIO),
 			}),
 			// OTel JS 2.x takes processors in the constructor (addSpanProcessor is gone).
 			spanProcessors: [

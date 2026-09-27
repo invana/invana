@@ -36,4 +36,5 @@ if settings.telemetry_enabled:
         service_version=settings.app_version,
         otlp_endpoint=settings.telemetry_otlp_endpoint,
         environment=settings.telemetry_environment,
+        sample_ratio=settings.telemetry_sample_ratio,
     )

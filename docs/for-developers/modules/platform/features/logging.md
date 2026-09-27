@@ -56,7 +56,9 @@ flowchart LR
 | Thing | Shape |
 |---|---|
 | Configuration | one default dictionary, overridable whole |
-| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception, `trace_id`, `span_id` |
+| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception, `trace_id`, `span_id`; plain shows `[trace_id span_id]` only inside a span |
+| Trace ids | read from the current span by a filter on the console handler; without the telemetry extra they are empty |
+| Access log | uvicorn's access log has `token` stripped from the path |
 | Levels | the lifecycle logs of [telemetry](telemetry.md) § Logs |
 | Entry point | called once by the server and by the CLI |
 

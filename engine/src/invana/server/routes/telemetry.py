@@ -7,12 +7,12 @@ collector — no parsing, so it stays agnostic to the OTLP encoding (protobuf or
 JSON). Export failures are swallowed: telemetry must never surface as a
 user-visible error.
 
-Always mounted (see server/app.py) and excluded from FastAPI
-auto-instrumentation (see core/telemetry/setup.py) so the proxy never traces itself.
+Always mounted (see server/app.py) and skipped by TelemetryMiddleware (see
+core/telemetry/middleware.py) so the proxy never traces itself.
 With ``settings.telemetry_enabled`` off there is nothing to forward to, so the
 batch is accepted and dropped — the studio runs on its own gate, and a missing
 route would answer every batch with a 404 the browser console reports as an
-error (TE6).
+error.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ async def proxy_traces(request: Request) -> Response:
     """Forward an OTLP/HTTP span export to the collector."""
     if not settings.telemetry_enabled:
         # No collector behind this engine — take the batch and drop it, rather
-        # than 404 a studio whose own gate is still on (TE6).
+        # than 404 a studio whose own gate is still on.
         return Response(status_code=HTTPStatus.ACCEPTED)
 
     body = await request.body()

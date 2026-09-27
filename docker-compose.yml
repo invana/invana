@@ -82,7 +82,10 @@ services:
       INVANA_SECRET_KEY: ${INVANA_SECRET_KEY:-}
       INVANA_ENCRYPTION_KEY: ${INVANA_ENCRYPTION_KEY:-}
       # Off by default — the OTLP collector only exists under --profile telemetry.
+      # When on, spans, metrics and logs go to that collector by service name.
       INVANA_TELEMETRY_ENABLED: ${INVANA_TELEMETRY_ENABLED:-false}
+      INVANA_TELEMETRY_OTLP_ENDPOINT: http://hyperdx:4317
+      INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT: http://hyperdx:4318/v1/traces
     volumes:
       # Whole repo, not just engine/ — engine/pyproject.toml path-depends on
       # the sibling integrations/invana-* packages (editable).
@@ -111,10 +114,9 @@ services:
       - "8300:8300"
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8200}
-      # Off by default — matches the engine's INVANA_TELEMETRY_ENABLED default
-      # above; the proxy route it would export to doesn't exist unless that's
-      # also on (and the telemetry profile is running), so flipping only this
-      # one to true just spams the browser console with 404s.
+      # Off by default, like the engine's INVANA_TELEMETRY_ENABLED above. The
+      # proxy route it exports to is always mounted: with the engine's telemetry
+      # off it accepts each batch and drops it, so the console stays clean.
       VITE_TELEMETRY_ENABLED: ${VITE_TELEMETRY_ENABLED:-false}
       # `pnpm dev` re-checks deps on start and re-installs when the mounted
       # node_modules has drifted from the bind-mounted lockfile. That install

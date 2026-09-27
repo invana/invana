@@ -3,6 +3,12 @@
 from __future__ import annotations
 
 import logging
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+try:  # OpenTelemetry is an optional extra; without it no record carries trace ids.
+    from opentelemetry import trace as _otel_trace
+except ImportError:  # pragma: no cover - exercised only without the telemetry extra
+    _otel_trace = None
 
 # Loggers whose output we suppress from the console.
 # These still propagate to root so the OTel OTLP handler can ship them
@@ -50,3 +56,92 @@ class OtlpThirdPartyFilter(logging.Filter):
         if record.name == "invana" or record.name.startswith("invana."):
             return True
         return record.levelno >= logging.WARNING
+
+
+def current_trace_ids() -> tuple[str, str]:
+    """
+    Return ``(trace_id, span_id)`` of the span that is active right now.
+
+    The ids are lower-case hex, 32 and 16 characters long — the same spelling a
+    trace backend shows, so a log line can be pasted straight into its search.
+    Both are empty strings when no valid span is active, or when OpenTelemetry
+    is not installed at all.
+    """
+    if _otel_trace is None:
+        return "", ""
+    ctx = _otel_trace.get_current_span().get_span_context()
+    if not ctx.is_valid:
+        return "", ""
+    return format(ctx.trace_id, "032x"), format(ctx.span_id, "016x")
+
+
+def trace_suffix(trace_id: str, span_id: str) -> str:
+    """Render the ids for the plain console format: `` [<trace_id> <span_id>]`` or ``""``."""
+    return f" [{trace_id} {span_id}]" if trace_id else ""
+
+
+class TraceContextFilter(logging.Filter):
+    """
+    Stamps every record with the trace it was logged under.
+
+    Sets three attributes on the record:
+
+    - ``trace_id`` / ``span_id`` — lower-hex ids of the active span, or ``""``.
+    - ``trace`` — `` [<trace_id> <span_id>]`` or ``""``, ready to drop into a
+      ``{}``-style format string such as ``"{levelname} - {asctime}{trace} : {message}"``.
+
+    The ids are read when the record is created on the logging thread, so a line
+    written inside a request carries that request's trace and can be joined to it
+    in the trace backend. Attributes already on the record (set by another filter
+    or passed through ``extra=``) are left untouched. The filter never drops a record.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if not hasattr(record, "trace_id") or not hasattr(record, "span_id"):
+            trace_id, span_id = current_trace_ids()
+            if not hasattr(record, "trace_id"):
+                record.trace_id = trace_id
+            if not hasattr(record, "span_id"):
+                record.span_id = span_id
+        if not hasattr(record, "trace"):
+            record.trace = trace_suffix(record.trace_id, record.span_id)
+        return True
+
+
+class RedactTokenFilter(logging.Filter):
+    """
+    Removes the ``token`` query parameter from uvicorn's access-log lines.
+
+    Browsers cannot set headers on an ``EventSource``, so Studio's live streams
+    carry the access token in the URL (``…/stream?token=<jwt>``). Uvicorn logs
+    every request path verbatim, which would write a working credential into the
+    console and every log sink. Attach this filter to the ``uvicorn.access``
+    logger; it rewrites the path argument without ``token`` and keeps every other
+    parameter in its original order.
+
+    Uvicorn access records carry ``args = (client_addr, method, full_path,
+    http_version, status_code)``. Records of any other shape pass through
+    unchanged, and the filter never drops a record.
+    """
+
+    PARAM = "token"
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        args = record.args
+        if isinstance(args, tuple) and len(args) >= 3 and isinstance(args[2], str):
+            redacted = self.redact(args[2])
+            if redacted is not args[2]:
+                record.args = (*args[:2], redacted, *args[3:])
+        return True
+
+    @classmethod
+    def redact(cls, path: str) -> str:
+        """Return ``path`` without the ``token`` query parameter (the same object if it had none)."""
+        if "?" not in path:
+            return path
+        parts = urlsplit(path)
+        params = parse_qsl(parts.query, keep_blank_values=True)
+        kept = [(k, v) for k, v in params if k != cls.PARAM]
+        if len(kept) == len(params):
+            return path
+        return urlunsplit(parts._replace(query=urlencode(kept)))

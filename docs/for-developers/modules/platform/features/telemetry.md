@@ -91,7 +91,7 @@ flowchart TD
 | A call with no action open | it starts its own root, so no engine span is ever an orphan |
 | Sampling on | parent-based: a sampled action keeps its whole trace, runs and streams included; the ratio is on the resource, so a missing trace is explainable |
 | Engine telemetry off, Studio's on | the browser-span proxy answers 202 and drops the batch — the console stays clean |
-| An access token in a URL | stripped before the URL is recorded — no span attribute ever holds a credential |
+| An access token in a URL | stripped before the URL is recorded — no span attribute or access-log line ever holds a credential |
 
 ## Surfaces
 
@@ -105,21 +105,21 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| Transport | OTLP gRPC; endpoint, sample ratio and resource attributes from settings |
-| HTTP | pure ASGI middleware; `traceparent` from the header, else from the `traceparent` query parameter; query string recorded with `token` removed; the browser-span proxy path not traced |
+| Transport | OTLP gRPC; `INVANA_TELEMETRY_OTLP_ENDPOINT` · `INVANA_TELEMETRY_SAMPLE_RATIO` (0–1, default 1.0) · resource attributes from settings |
+| HTTP | pure ASGI middleware; `traceparent` from the header, else from the `traceparent` query parameter; query string recorded with `token` removed; every `/api/v1/telemetry/` proxy path not traced; the only source of request spans |
 | Attributes | `enduser.id` · `invana.principal` (`user · agent · system · external · anonymous`) · `invana.on_behalf_of` · `invana.origin` (`studio · api · cli · schedule · startup · daemon`) · `invana.graph` · `invana.run_id` |
 | Runs | `invana.run` per TaskRun (`run_id` · `agent_id` · `role` · `kind`), `invana.run.step` per Task (`task_key` · `step_key`); queue wait as a span event |
 | Graph · model · SQL | `graph.query.*` · `llm.generate` · SQLAlchemy spans, nested under the step that caused them |
 | Records | `task_runs.trace_id` · `task_runs.root_span_id`; `events.trace_id` (filled by default in `emit`) · `events.span_id` |
 | Roots nobody clicked | `system.<loop>` per iteration · `system.startup` · `system.schedule` · `cli.<command>` — each a new trace (`context=Context()`), never a child of whatever scheduled it |
 | Queues | a producer's span context rides the item; the consumer's span Links to it |
-| Logs | `%(otelTraceID)s` / `%(otelSpanID)s` in the console and JSON formats |
+| Logs | a logging filter sets `trace_id` / `span_id` on every record — plain shows `[trace_id span_id]` inside a span, JSON adds both fields; uvicorn's access log has `token` stripped |
 
 ## Studio
 
 | Thing | Shape |
 |---|---|
-| Providers | traces (`WebTracerProvider`, parent-based sampler), metrics and logs — service `invana-studio`, exported through `/api/v1/telemetry/{traces,metrics,logs}` |
+| Providers | traces (`WebTracerProvider`, parent-based sampler on `VITE_TELEMETRY_SAMPLE_RATIO`), metrics and logs — service `invana-studio`, exported through `/api/v1/telemetry/{traces,metrics,logs}` |
 | Web Vitals | the `web-vitals` package, recorded as `ui.web_vitals.*` |
 | Errors | a global handler for uncaught errors and unhandled rejections, an error boundary per region, and the query client's error hook — each an OTLP log with the active trace id |
 | Actions | `startAction(module, action)` opens the root; the handle ends it on the outcome — the terminal stream frame for an ask, the response for a write |
@@ -182,8 +182,8 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE11 | Who acted is recorded, never what they sent: principal, on-behalf-of, origin, Graph and ids are attributes; record contents, prompts and answers are not. |
 | TE12 | Work nobody clicked starts its own trace, rooted per loop iteration, per startup, per schedule firing and per CLI command, with `invana.origin` saying which. |
 | TE13 | A TaskRun stores its trace id and root span id; an event stores its trace id and span id, filled by default at emit. |
-| TE14 | No credential reaches a span: `token` is stripped from recorded URLs. |
-| TE15 | Sampling is parent-based on one ratio from settings — 1.0 in dev and compose — and the ratio is on the resource. |
+| TE14 | No credential reaches a span or a log: `token` is stripped from recorded URLs and from the access log. |
+| TE15 | Sampling is parent-based on one ratio from settings — 1.0 in dev and compose — and the ratio is on the resource as `invana.telemetry.sample_ratio`. |
 | TE16 | The compose stack points both services at the bundled collector; service names are `invana-studio` and `invana-engine`. |
 | TE17 | Three signals, one job each: traces say what happened to one action, metrics say how often and how slow across all, logs record discrete facts. The trace id joins them — exemplars on metrics, fields on logs. |
 | TE18 | Metric names follow the modules (`invana.<module>.*`, `ui.*`) and OpenTelemetry semantic conventions for HTTP and databases. The per-status counters collapse into one counter with a status attribute; gremlin folds into graph-connector metrics with `connector` as an attribute; `session_*` becomes `invana.assistant.*`. |

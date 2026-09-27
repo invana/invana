@@ -14,7 +14,16 @@ Signals emitted per request
 Traces:
   span name  = "METHOD /route/template"
   attributes = method, route, url, status, duration, client_ip, user-agent,
-               request/response sizes, query params, error info on failure
+               request/response sizes, query params, error info on failure.
+               The url and query params are recorded with credentials removed:
+               a ``token`` query param (the auth token that WebSocket and
+               EventSource clients must pass in the URL) never reaches a span.
+
+Skipped requests
+----------------
+Health, metrics, docs and favicon paths are not traced, nor is anything under
+``/api/v1/telemetry/`` — that is the browser-span proxy, and tracing it would
+make every shipped batch of spans produce another span.
 
 Metrics:
   invana.api.request.duration     histogram  latency (ms)
@@ -28,8 +37,9 @@ Metrics:
   invana.api.status.2xx/4xx/5xx  counters   status-code buckets
 
 Logs:
-  one structured INFO log per completed request; trace_id is injected by
-  LoggingInstrumentor so the log links to its trace in the OTel backend.
+  one structured INFO log per completed request, emitted inside the request
+  span so the record carries its trace_id and links to the trace in the OTel
+  backend.
 """
 
 from __future__ import annotations
@@ -72,6 +82,12 @@ _SKIP_PATHS = frozenset(
     }
 )
 
+# Path prefixes that are never traced (the browser-span proxy lives here).
+_SKIP_PREFIXES = ("/api/v1/telemetry/",)
+
+# Query params that carry credentials; stripped from every recorded URL.
+_CREDENTIAL_PARAMS = frozenset({"token"})
+
 
 class TelemetryMiddleware:
     """Pure ASGI middleware that instruments every HTTP request."""
@@ -86,7 +102,8 @@ class TelemetryMiddleware:
 
         request = Request(scope, receive)
 
-        if request.url.path in _SKIP_PATHS:
+        path = request.url.path
+        if path in _SKIP_PATHS or path.startswith(_SKIP_PREFIXES):
             await self._app(scope, receive, send)
             return
 
@@ -110,14 +127,8 @@ class TelemetryMiddleware:
         raw_path = scope.get("path", "/")
         span_name = f"{method} {raw_path}"
 
-        # Adopt the caller's W3C trace context (e.g. the studio's `traceparent`,
-        # docs/for-developers/modules/platform/features/telemetry.md) so this request nests under the browser's client
-        # span as one
-        # distributed trace. Absent a header, `extract` yields an empty context
-        # and the SERVER span is a clean root. SERVER kind is the correct
-        # semantic for an inbound request (the custom middleware is the sole
-        # request-span source — FastAPIInstrumentor is a no-op here,
-        # docs/for-developers/modules/platform/features/telemetry.md).
+        # Adopt the caller's W3C `traceparent` so this request nests under the browser's
+        # span; without one the SERVER span is a root. This middleware is the only request-span source.
         parent_ctx = extract(dict(request.headers))
         with tracer.start_as_current_span(span_name, context=parent_ctx, kind=SpanKind.SERVER) as span:
             _attach_request(span, request, raw_path, method, client_ip, user_agent, req_size)
@@ -204,13 +215,14 @@ def _attach_request(
 ) -> None:
     span.set_attribute("http.method", method)
     span.set_attribute("http.route", route)
-    span.set_attribute("http.url", str(request.url))
+    span.set_attribute("http.url", str(request.url.remove_query_params(tuple(_CREDENTIAL_PARAMS))))
     span.set_attribute("http.client_ip", client_ip)
     span.set_attribute("http.user_agent", user_agent)
     span.set_attribute("http.request_size", req_size)
     span.set_attribute("invana.component", "api")
-    if request.query_params:
-        span.set_attribute("http.query_params", str(dict(request.query_params)))
+    params = {k: v for k, v in request.query_params.items() if k not in _CREDENTIAL_PARAMS}
+    if params:
+        span.set_attribute("http.query_params", str(params))
 
 
 def _attach_response(span: trace.Span, status: int, duration_ms: float, res_size: int) -> None:

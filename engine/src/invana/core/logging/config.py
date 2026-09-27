@@ -17,10 +17,18 @@ DEFAULT_LOGGING_CONFIG: dict = {
         "suppress_noisy": {
             "()": "invana.core.logging.filters.SuppressNoisyFilter",
         },
+        # Stamps each record with the active span's trace_id / span_id (and the
+        # "{trace}" suffix used below), so a console line can be found in the
+        # trace backend. Empty outside a span or without OpenTelemetry installed.
+        "trace_context": {
+            "()": "invana.core.logging.filters.TraceContextFilter",
+        },
     },
     "formatters": {
         "simple": {
-            "format": "{levelname} - {asctime} : {message}",
+            # PlainFormatter fills {trace} itself when a handler lacks trace_context.
+            "()": "invana.core.logging.formatters.PlainFormatter",
+            "format": "{levelname} - {asctime}{trace} : {message}",
             "style": "{",
         },
         "json": {
@@ -32,7 +40,7 @@ DEFAULT_LOGGING_CONFIG: dict = {
             "class": "logging.StreamHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filters": ["suppress_noisy"],
+            "filters": ["suppress_noisy", "trace_context"],
         },
     },
     "root": {
