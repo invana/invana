@@ -27,11 +27,11 @@
  * endpoint the panel uses.
  */
 
+import { readCanvasThemeConfig } from "@/canvases/theme";
 import {
 	CANVAS_KINDS,
 	type CanvasKind,
 } from "@/pages/graphs-detail/features/boards";
-import { readCanvasThemeConfig } from "@/pages/graphs-detail/features/explorer";
 import type { Tone } from "@/pages/graphs-detail/shared/statusTone";
 // The root is `<GraphCanvas>`, not `<Board>`: only it provides
 // `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to

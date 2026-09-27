@@ -26,10 +26,10 @@ import type {
 	ModelCanvasSelection,
 	ModelGraphData,
 } from "@/canvases/model/types";
+import { useStudioCanvasTheme } from "@/canvases/theme";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
-	CanvasThemeSync,
 	ClickSelectBehaviour,
 	CollapseExpandBehaviour,
 	DragNodeBehaviour,
@@ -61,7 +61,7 @@ import type {
 } from "@invana/graph";
 import { useTheme } from "@invana/themes";
 import ElkWorker from "elkjs/lib/elk-worker.min.js?worker";
-import { Link2, Moon, Settings, Sun } from "lucide-react";
+import { Link2, Settings } from "lucide-react";
 import {
 	type ReactNode,
 	useCallback,
@@ -80,6 +80,7 @@ export interface GraphModelCanvasProps {
 	data: ModelGraphData;
 	settings: CanvasConfig;
 	templates: GraphModelTemplates;
+	/** Left out, the header carries no title — a page that names the model already. */
 	title?: string;
 	/** Shown once in the message bar when the canvas is ready. */
 	message?: string;
@@ -144,7 +145,7 @@ export function GraphModelCanvas({
 	data,
 	settings,
 	templates,
-	title = "Global model",
+	title,
 	message = "Hover an edge for its stitch rule — only stitches cross a model frame",
 	initialDetail = "high",
 	selected = null,
@@ -178,6 +179,7 @@ export function GraphModelCanvas({
 	const [detail, setDetail] = useState<Detail>(initialDetail);
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
 	const colors = useLiveColors();
+	useStudioCanvasTheme(canvas);
 	const selectRef = useRef(onSelect);
 	selectRef.current = onSelect;
 	const selectedRef = useRef(selected);
@@ -368,7 +370,9 @@ export function GraphModelCanvas({
 			instanceKey={backend}
 			height={height}
 			header={{
-				title,
+				// The kit's bar height, the tab strip's; canvas-ui's own is 40px.
+				className: "!h-[30px]",
+				...(title ? { title } : { left: null }),
 				center: (
 					<GraphControlsToolbar
 						sections={{ layout: false }}
@@ -390,7 +394,7 @@ export function GraphModelCanvas({
 						}
 					/>
 				),
-				right: (ctx) => (
+				right: () => (
 					<ToolbarItems
 						orientation="horizontal"
 						items={[
@@ -407,16 +411,6 @@ export function GraphModelCanvas({
 								onChange: (v) => setDetail(v as Detail),
 							},
 							...dock.items.filter((item) => item.key !== STITCH_PANEL),
-							{
-								type: "toggle",
-								key: "theme",
-								icon: Sun,
-								activeIcon: Moon,
-								label: "Switch to dark theme",
-								activeLabel: "Switch to light theme",
-								active: ctx.themeKind === "dark",
-								onToggle: ctx.toggleTheme,
-							},
 						]}
 					/>
 				),
@@ -427,7 +421,6 @@ export function GraphModelCanvas({
 			<BackgroundLayer id="background" />
 			<GraphLayer id={MODEL_LAYER_ID} data={drawn} />
 			<ThemeBehaviour id="theme" />
-			<CanvasThemeSync />
 			<DragPanBehaviour id="pan" />
 			<WheelZoomBehaviour id="wheel" />
 			<DragNodeBehaviour

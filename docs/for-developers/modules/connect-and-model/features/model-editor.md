@@ -58,7 +58,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Canvas | The **Model** tab of [the model page](the-model-page.md), scoped to one model: [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md) — the model's types and its edge types between them, with no frame around them; a version with no types shows an empty state instead. Detail, Settings and the theme toggle ride its header; it opens on cards, laid out by ELK (ME12 · ME26) |
+| Canvas | The **Model** tab of [the model page](the-model-page.md), scoped to one model: [`GraphModelCanvas`](../../../building-studio/graph-model-canvas.md) — the model's types and its edge types between them, with no frame around them; a version with no types shows an empty state instead. Detail and Settings ride its header, and it wears Studio's theme (GM11); it opens on cards, laid out by ELK (ME12 · ME26) |
 | Panel | Two views (ME17). The **list** of models, or one model's **detail**: a `Models / <name>` crumb header with `‹`, then a `PanelStack` of three drawers — Node types · Edge types · Stitches (ME13). Nothing that acts on the model itself ([MP4](the-model-page.md#decisions)) |
 | Staged bar | Under the page header while a draft is open: count, the list, discard-one, discard-all — `⌘↵` opens the Publish confirm ([MP6](the-model-page.md#decisions)) |
 | Type detail | On the **Model tab**, beneath the canvas: the selected type's properties, with add and remove while drafting, and its constraints (ME19) |

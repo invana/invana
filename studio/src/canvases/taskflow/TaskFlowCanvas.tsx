@@ -14,10 +14,10 @@ import type {
 	TaskFlowData,
 	TaskFlowTemplates,
 } from "@/canvases/taskflow/types";
+import { useStudioCanvasTheme } from "@/canvases/theme";
 import type { CanvasConfig } from "@invana/canvas";
 import {
 	BackgroundLayer,
-	CanvasThemeSync,
 	ClickSelectBehaviour,
 	DragNodeBehaviour,
 	DragPanBehaviour,
@@ -82,6 +82,7 @@ export function TaskFlowCanvas({
 }: TaskFlowCanvasProps) {
 	const [detail, setDetail] = useState<Detail>(initialDetail);
 	const [canvas, setCanvas] = useState<GraphCanvas | null>(null);
+	useStudioCanvasTheme(canvas);
 	const applied = useRef(initialDetail);
 	const openRef = useRef(onOpenNode);
 	openRef.current = onOpenNode;
@@ -181,6 +182,8 @@ export function TaskFlowCanvas({
 			bundle={false}
 			height={height}
 			header={{
+				// The kit's bar height, the tab strip's; canvas-ui's own is 40px.
+				className: "!h-[30px]",
 				title,
 				// Read-only (SR52): no undo, edge-routing or erase — which is also
 				// what lets Detail and Settings fit at drawer width.
@@ -218,7 +221,6 @@ export function TaskFlowCanvas({
 			<BackgroundLayer id="background" />
 			<GraphLayer id="graph" data={graph} />
 			<ThemeBehaviour id="theme" />
-			<CanvasThemeSync />
 			<DragPanBehaviour id="pan" />
 			<WheelZoomBehaviour id="wheel" />
 			<DragNodeBehaviour id="drag-node" targetLayerId="graph" />

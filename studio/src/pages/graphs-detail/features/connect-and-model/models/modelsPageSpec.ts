@@ -251,6 +251,9 @@ export function modelsPageSpec(
 		id,
 		label: TAB_LABEL[id],
 		locked: locked(id),
+		// One model's canvas is the whole tab, so it meets the tab strip; All
+		// models keeps the padding for the union card beside it (MP42).
+		flush: id === "model" && data.scope !== null,
 		rows: id !== tab ? [] : tabRows(id, data, view, slots),
 	}));
 

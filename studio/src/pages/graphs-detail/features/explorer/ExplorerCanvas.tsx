@@ -11,7 +11,7 @@
 // Distinct from the Modeller's `GraphModelCanvas` (`@/canvases/model`), which
 // draws models as frames of types.
 
-import { readCanvasThemeConfig } from "@/pages/graphs-detail/features/explorer/canvasTheme";
+import { readCanvasThemeConfig } from "@/canvases/theme";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
 import {
 	type InteractionRef,

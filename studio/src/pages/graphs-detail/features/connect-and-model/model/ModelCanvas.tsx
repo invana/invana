@@ -211,7 +211,6 @@ export function ModelCanvas({
 						data={build.data}
 						settings={graphModelSettings}
 						templates={graphModelTemplates}
-						title={model?.name ?? "Model"}
 						message="Hover a type for its properties, an edge for what it connects"
 						selected={canvasSelection}
 						onSelect={onCanvasSelect}

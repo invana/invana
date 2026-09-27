@@ -13,7 +13,7 @@
  * `--color-data-1` … `--color-data-8`, one scale shared by charts, legends, list
  * dots and `@invana/canvas`. Tokens, so light and dark are each selected rather
  * than one flipped into the other, and so no hex lives in Studio. Read off the
- * live DOM the way `canvasTheme.ts` reads the rest of the theme — the canvas
+ * live DOM the way `canvases/theme.ts` reads the rest of the theme — the canvas
  * paints to a PixiJS surface and needs concrete values, not classes.
  *
  * Assignment is stable per type name, so a type keeps its colour across canvases

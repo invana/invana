@@ -38,7 +38,6 @@ export { ExpandFineTunePanel } from "@/pages/graphs-detail/features/explorer/Exp
 export { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
 
 // Engine adapters — PixiJS needs concrete values, not classes.
-export { readCanvasThemeConfig } from "@/pages/graphs-detail/features/explorer/canvasTheme";
 export {
 	typeColorNumber,
 	typeDotColor,

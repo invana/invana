@@ -75,7 +75,7 @@ studio/src/canvases/
 
 | Part | From the story | Here |
 |---|---|---|
-| `BackgroundLayer`, `GraphLayer`, `ThemeBehaviour`, `CanvasThemeSync` | ✅ | ✅ |
+| `BackgroundLayer`, `GraphLayer`, `ThemeBehaviour`, `CanvasThemeSync` | ✅ | ✅, with `useStudioCanvasTheme` in place of `CanvasThemeSync` (TF7) |
 | Pan, wheel zoom, drag node, hover activate, click select | ✅ | ✅ |
 | `TextResolutionLODBehaviour`, `TextLODBehaviour` | ✅ | ✅ |
 | `HoverElementPreviewBehaviour` (node and edge cards) | ✅ | ✅ |
@@ -84,7 +84,7 @@ studio/src/canvases/
 | Header centre: `GraphControlsToolbar` | layout section off | layout, history, style, edit and grid off: select mode, fit and lock remain (TF9) |
 | Header right: the **Detail** select (Circles · Cards) | ✅ | ✅ |
 | Header right: the Settings dock (`CanvasSettingsEditorPanel`) | ✅ | ✅ |
-| Header right: the theme toggle | ✅ | ❌. Studio's theme drives the canvas through `CanvasThemeSync` |
+| Header right: the theme toggle | ✅ | ❌. Studio's theme drives the canvas through `useStudioCanvasTheme` (TF7) |
 | Footer: `GraphStatusBar` · `CanvasMessageBar` | ✅ | ✅ |
 
 The canvas runs ELK itself whenever its data changes, and redraws the layer on `layout:run:end` (`activeLayout` alone does not lay out a graph seeded before the layout registers). elkjs' worker comes from Vite's `?worker` import, as in `AllModelsCanvas`. After a run the camera never stays past 100%: a fit would frame a five-step plan at 2x on a wide page.
@@ -132,7 +132,7 @@ real value in `data.bound`.
 | TF4 | **Detail is Circles or Cards, and each is a template patch.** `templates.json` holds both. The patch carries the node-type bindings and the ELK spacing its node size needs, then the layout re-runs. The canvas opens on Circles |
 | TF5 | **The story's settings and templates are used exactly as the story ships them, minus `force`.** That includes its numeric colour lookups. They are canvas config, which `@invana/canvas` reads as numbers. They are not Studio CSS, so the tokens-only rule covers the chrome around the canvas, not these values |
 | TF6 | **Three node types; the adapter maps to them and keeps the real value on the node.** `task.llm` · `task.graph_read` · `task.none` as in the story. The finer bound or layer stays in `data.bound` and is printed on a card. **Colour reads `data.tone`** (`llm` · `graph_read` · `none`, from `taskToneOf`), never `data.bound` — a raw layer such as `graph data` or `code` matches no lookup key and would draw the node with no border and a black icon |
-| TF7 | **No theme toggle on the canvas.** Studio has one theme, and `CanvasThemeSync` carries it into the canvas. A second toggle would let the canvas disagree with the page it sits in |
+| TF7 | **No theme toggle on the canvas, and every colour it paints is Studio's.** Studio has one theme. `useStudioCanvasTheme` (`studio/src/canvases/theme.ts`) hands the canvas's `ThemeBehaviour` one theme, `studio`, whose palette is the live tokens — backdrop `--color-background`, cards `--color-card`, text `--color-foreground`, hairlines and dots `--color-border`, rings `--color-ring`, the categorical ramp `--color-data-N` — and the resolved kind, on every theme change. `CanvasThemeSync` is not used: it picks the canvas library's palette for the family, whose navy disagrees with the page. A second toggle would let the canvas disagree with the page it sits in. The header is Studio's 30px bar (`!h-[30px]`), the height of the kit's tab strip, not canvas-ui's 40px |
 | TF8 | **A composed step is a row on its hover card, not a different drawing.** `from nl-single@1` goes in `data.rows`. The skill's **Composed** block ([SK34](../modules/skills/features/authoring-a-skill.md#decisions)) stays under the canvas, naming each plan once |
 | TF9 | **The header toolbar carries only what a read-only canvas uses.** Undo/redo, edge-routing style, erase and the grid toggle edit or restyle the drawing, which neither surface allows ([SR52](../modules/operate/features/see-what-ran.md#decisions)). Leaving them out is also what fits Detail and Settings into a 420px `leftSection` |
 

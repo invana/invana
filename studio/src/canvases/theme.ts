@@ -1,6 +1,6 @@
 // Live theme → canvas colours (docs/for-developers/modules/platform/features/theming.md).
 //
-// The Explorer/Modeller canvases can't use Tailwind classes (they paint to a
+// Studio's canvases can't use Tailwind classes (they paint to a
 // PixiJS surface), so their background / node / edge / minimap colours have to
 // be pushed to the engine as concrete values. Rather than hardcode one palette,
 // we read the *active* theme's CSS tokens at runtime — so switching theme (or
@@ -9,10 +9,14 @@
 // defines this standard token set, so the mapping works uniformly.
 //
 // `<ThemeBridge>` in ExplorerCanvas calls `readCanvasThemeConfig()`
-// whenever the theme variant changes and feeds the result to `update()`.
+// whenever the theme variant changes and feeds the result to `update()`. The
+// model and task-flow canvases paint their own nodes and edges, so they take
+// Studio's whole palette, through `useStudioCanvasTheme`.
 
 import type { CanvasProps } from "@invana/canvas-react";
-import { cssColorToNumber } from "@invana/graph";
+import { type GraphCanvas, cssColorToNumber } from "@invana/graph";
+import { useTheme } from "@invana/themes";
+import { useEffect } from "react";
 
 // `CanvasConfig` isn't re-exported by canvas-react — derive it from `<Board config>`.
 type CanvasConfig = NonNullable<CanvasProps["config"]>;
@@ -85,4 +89,59 @@ export function readCanvasThemeConfig({
 			},
 		},
 	};
+}
+
+/**
+ * Studio's theme as a canvas palette: every role the canvas paints with —
+ * backdrop, card, text, hairline, ring and the categorical ramp — read from the
+ * live tokens, so nothing on the canvas keeps its own library's colours.
+ */
+function readStudioPalette() {
+	const data = [1, 2, 3, 4, 5, 6, 7, 8].map((n) =>
+		num(`--color-data-${n}`, FALLBACK.primary),
+	);
+	return {
+		surface: num("--color-background", FALLBACK.background),
+		cardBg: num("--color-card", FALLBACK.card),
+		foreground: num("--color-foreground", FALLBACK.foreground),
+		heading: num("--color-card-foreground", FALLBACK.foreground),
+		muted: num("--color-muted-foreground", FALLBACK.edge),
+		accent: num("--color-primary", FALLBACK.primary),
+		divider: num("--color-border", FALLBACK.border),
+		stroke: num("--color-input", FALLBACK.border),
+		selectionRing: num("--color-ring", FALLBACK.primary),
+		hoverRing: num("--color-primary", FALLBACK.primary),
+		categorical: data,
+	};
+}
+
+/**
+ * Keeps a canvas on Studio's theme: its `ThemeBehaviour` (id `theme`) is handed
+ * one theme, `studio`, whose palette is the live tokens, and the resolved kind.
+ * It stands in for `CanvasThemeSync`, which would pick the canvas library's
+ * palette for the family instead. `variantId` changes on any theme/mode switch
+ * and `isDark` catches an OS flip under a `*-system` variant; the read waits a
+ * frame for the theme class to land on `<html>`.
+ */
+export function useStudioCanvasTheme(canvas: GraphCanvas | null) {
+	const { variantId, isDark } = useTheme();
+	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId is trigger-only — the read is of the live DOM tokens
+	useEffect(() => {
+		if (!canvas) return;
+		const id = requestAnimationFrame(() => {
+			const palette = readStudioPalette();
+			canvas.update({
+				behaviours: {
+					theme: {
+						themes: {
+							studio: { name: "studio", light: palette, dark: palette },
+						},
+						active: "studio",
+						mode: isDark ? "dark" : "light",
+					},
+				},
+			});
+		});
+		return () => cancelAnimationFrame(id);
+	}, [canvas, variantId, isDark]);
 }
