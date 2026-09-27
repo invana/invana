@@ -284,6 +284,27 @@ class TestRuntime:
         ]
         assert understand[1].detail == "answered with A"
 
+    async def test_a_step_names_its_rounds_and_the_bound_it_ran_out_of(
+        self, session, session_factory, graph, user, stub_tasks
+    ):
+        """A plan's page counts how often a step asked and how often it ran out
+        of rounds (the-library.md LB33) — so the row says so, rather than a
+        sentence that an unattended run would also write."""
+        runtime = TaskRuntime(session_factory=session_factory, manager=object(), encryption_key="x")
+        _, _, asking = await _open(session, graph, user, "stub-ask")
+        await _run(runtime, asking.id)
+        assert (await _steps(session, asking.id))[0].output["clarifications"] == {"round": 1, "limit": 3}
+        assert "bound" not in (await _steps(session, asking.id))[0].output
+
+        # Another stub, because each asks only on its first call.
+        _, _, spent = await _open(session, graph, user, "stub-ask-open")
+        spent.clarifications = 3
+        await session.commit()
+        await _run(runtime, spent.id)
+        step = (await _steps(session, spent.id))[0]
+        assert step.status == "succeeded" and step.output["bound"] == "max_clarifications"
+        assert step.output["clarifications"] == {"round": 3, "limit": 3}
+
     async def test_question_without_options_is_still_recorded_as_a_question(
         self, session, session_factory, graph, user, stub_tasks
     ):

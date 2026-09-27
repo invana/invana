@@ -909,6 +909,7 @@ CREATE TABLE tasks (
 	source_span TEXT, 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	source_plan_key VARCHAR(80), 
+	source_step_key VARCHAR(64), 
 	CONSTRAINT tasks_pkey1 PRIMARY KEY (id), 
 	CONSTRAINT tasks_parent_id_fkey1 FOREIGN KEY(parent_id) REFERENCES tasks (id) ON DELETE CASCADE, 
 	CONSTRAINT tasks_task_plan_id_fkey FOREIGN KEY(task_plan_id) REFERENCES task_plans (id) ON DELETE CASCADE, 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 
 class OfferedRule(BaseModel):
@@ -233,6 +233,11 @@ class SkillDraftTaskWrite(BaseModel):
     #: The sentence this step answers to, kept so the Playbook tab still maps
     #: prose to steps after a hand-edit ([C11](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     source_span: str | None = None
+    #: The step of the ``uses`` plan this row was copied from. Set by the
+    #: engine when it expands a ``uses`` row and never read from a request, so
+    #: a client cannot claim a row came from a plan it did not
+    #: ([LB36](docs/for-developers/modules/workflows/features/the-library.md)).
+    _source_step_key: str | None = PrivateAttr(default=None)
 
 
 class SkillDraftTasksWrite(BaseModel):

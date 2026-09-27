@@ -644,6 +644,12 @@ class TaskRuntime:
                         # Keep the exchange the step recorded (NL10): the
                         # prompt is the evidence for the question it asked.
                         row.output = {**(row.output or {}), "cannot_answer": reason, "question": ni.question}
+                        if not unattended:
+                            # The bound is named on the row, not left in the
+                            # sentence: a plan's page counts how often each
+                            # step ran out of rounds (the-library.md LB33).
+                            row.output["bound"] = "max_clarifications"
+                            row.output["clarifications"] = {"round": th.clarifications, "limit": limit}
                         self._record(row, ctx, v)
                         await self._drop_pending(db, th, message_id)
                         await db.commit()
@@ -656,6 +662,10 @@ class TaskRuntime:
                     row.status = RunStatus.needs_input.value
                     row.finished_at = _now()
                     row.detail = f"needs input · {_awaiting_detail(ni.options)}"
+                    row.output = {
+                        **(row.output or {}),
+                        "clarifications": {"round": th.clarifications, "limit": limit},
+                    }
                     self._record(row, ctx, v)
                     th.status = RunStatus.awaiting_input.value
                     # The cursor carries the question, not just where to resume:

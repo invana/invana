@@ -89,18 +89,28 @@ def _aware(at: datetime) -> datetime:
 class _Root:
     """One root and its step rows, with the numbers every read shares."""
 
-    def __init__(self, root: TaskRun, nodes: list[TaskRun]) -> None:
+    def __init__(self, root: TaskRun, nodes: list[TaskRun], keys: dict[str, str] | None = None) -> None:
         self.root = root
+        self.nodes = nodes
         self.at = _aware(root.queued_at)
         # Attempts of one step, in order — a *reach* is a step the run got to.
         self.reaches: dict[str, list[TaskRun]] = defaultdict(list)
         # A row that never started was not reached: when a step fails, the
         # runtime closes the steps after it as failed without running them.
         for node in nodes:
-            if node.step_key and node.started_at is not None:
+            if not node.step_key or node.started_at is None:
+                continue
+            if keys is None:
                 self.reaches[node.step_key].append(node)
+            elif node.step_key in keys:
+                self.reaches[keys[node.step_key]].append(node)
         for rows in self.reaches.values():
             rows.sort(key=lambda r: (r.iteration, r.attempt))
+
+    def through(self, keys: dict[str, str]) -> _Root:
+        """This run read as the plan it copied: only the copied rows, each under
+        the step it was copied from (LB36)."""
+        return _Root(self.root, self.nodes, keys)
 
     @property
     def failed(self) -> bool:
@@ -142,6 +152,15 @@ class _Root:
         parts = [self.step_cost(k) for k in self.reaches]
         return None if any(p is None for p in parts) else sum(p or 0 for p in parts)
 
+    def retried(self, key: str) -> bool:
+        """An attempt failed and another followed. A question answered also
+        adds an attempt, and that is not a retry."""
+        return any(r.status == RunStatus.failed.value for r in self.reaches.get(key, [])[:-1])
+
+    def asked(self, key: str) -> int:
+        """Rounds of clarification this step paused for."""
+        return sum(r.status == RunStatus.needs_input.value for r in self.reaches.get(key, []))
+
     def failed_step(self) -> TaskRun | None:
         """The step whose **last** attempt failed — a retry that recovered is not a failure."""
         for rows in self.reaches.values():
@@ -176,9 +195,15 @@ class PlanPerformanceManager:
         current = [r for r in roots if r.at >= since]
         prior = [r for r in roots if r.at < since]
         tasks = await self.plans_qs.tasks_for(session, plan_id=plan.id)
-        # A skill's copied rows carry a key of their own, so only runs of the
-        # plan by name join the per-step table (LB36).
-        direct = [r for r in current if r.root.task_plan_id not in inlining]
+        # A skill's copied rows carry a key of their own, so a skill's run joins
+        # the per-step table only through the steps its copies recorded, and a
+        # copy that recorded none stays out (LB36).
+        copies = await self.plans_qs.copied_steps(session, graph_id=plan.graph_id, ref=plan.ref)
+        stepwise = [
+            r if r.root.task_plan_id not in inlining else r.through(copies[r.root.task_plan_id])
+            for r in current
+            if r.root.task_plan_id not in inlining or r.root.task_plan_id in copies
+        ]
 
         return PlanPerformance(
             window_days=window,
@@ -206,10 +231,10 @@ class PlanPerformanceManager:
                 for v in await self.plans_qs.versions_of(session, graph_id=plan.graph_id, key=plan.key or "")
                 if _aware(v.created_at) >= since
             ],
-            steps=_steps(tasks, direct),
+            steps=_steps(tasks, stepwise),
             failures=_failures(current),
-            bounds=_bounds(tasks, direct),
-            slowest={t.key: _slowest(t.key, direct) for t in tasks},
+            bounds=_bounds(tasks, stepwise),
+            slowest={t.key: _slowest(t.key, stepwise) for t in tasks},
         )
 
     # ── Activity ──────────────────────────────────────────────────────────────
@@ -351,7 +376,7 @@ def _steps(tasks: list[Task], roots: list[_Root]) -> list[StepPerformance]:
                 p50_ms=_pct(work, 0.5),
                 p95_ms=_pct(work, 0.95),
                 failed=sum(r.reaches[t.key][-1].status == RunStatus.failed.value for r in reached),
-                retried=(sum(len(r.reaches[t.key]) > 1 for r in reached) / len(reached)) if reached else None,
+                retried=(sum(r.retried(t.key) for r in reached) / len(reached)) if reached else None,
                 cost_per_run=_mean(costs) if len(costs) == len(reached) else None,
                 share_of_work=(sum(work) / total_work) if total_work else None,
             )
@@ -373,22 +398,48 @@ def _failures(roots: list[_Root]) -> list[FailureRow]:
 
 
 def _bounds(tasks: list[Task], roots: list[_Root]) -> list[BoundUse]:
-    """The bounds a step's rows record: today, retry — the one the runtime honours per step."""
+    """The bounds a step's rows record — the ones the runtime honours today:
+    ``retry`` per step, and ``max_clarifications`` per run, counted at the step
+    that asked (LB33)."""
     out = []
     for t in tasks:
+        reached = [r for r in roots if t.key in r.reaches]
         limit = retry_limit(t.step_key or t.key, t.retry)
-        if limit <= 1:
-            continue
-        reached = [r.reaches[t.key] for r in roots if t.key in r.reaches]
-        out.append(
-            BoundUse(
-                step_key=t.key,
-                bound="retry",
-                limit=limit,
-                used=sum(len(rows) > 1 for rows in reached),
-                exhausted=sum(rows[-1].attempt >= limit for rows in reached),
+        if limit > 1:
+            out.append(
+                BoundUse(
+                    step_key=t.key,
+                    bound="retry",
+                    limit=limit,
+                    used=sum(r.retried(t.key) for r in reached),
+                    # Attempts a question added are not tries.
+                    exhausted=sum(
+                        (last := r.reaches[t.key][-1]).status == RunStatus.failed.value
+                        and last.attempt - r.asked(t.key) >= limit
+                        for r in reached
+                    ),
+                )
             )
-        )
+        # The limit is the agent's, so it is read off the rows that asked; a
+        # step that asked before the rows recorded it says nothing.
+        limits = [
+            c["limit"]
+            for r in reached
+            for row in r.reaches[t.key]
+            if isinstance(c := (row.output or {}).get("clarifications"), dict) and "limit" in c
+        ]
+        if limits:
+            out.append(
+                BoundUse(
+                    step_key=t.key,
+                    bound="max_clarifications",
+                    limit=max(limits),
+                    used=sum(r.asked(t.key) > 0 for r in reached),
+                    exhausted=sum(
+                        (r.reaches[t.key][-1].output or {}).get("bound") == "max_clarifications" for r in reached
+                    ),
+                )
+            )
     return out
 
 

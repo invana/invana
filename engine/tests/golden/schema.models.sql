@@ -899,6 +899,7 @@ CREATE TABLE tasks (
 	on_lane_failure VARCHAR(24), 
 	source_span TEXT, 
 	source_plan_key VARCHAR(80), 
+	source_step_key VARCHAR(64), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	CONSTRAINT uq_task_plan_sibling_key UNIQUE (task_plan_id, parent_id, key), 

@@ -459,6 +459,13 @@ different reason, at a different moment, with a different bound.
 | Bounded by | `task_runs.clarifications` | a deadline | **both** — `max_iterations` *and* a deadline |
 | Today | ✅ `awaiting_input` · `NeedsInput` | 🔵 | 🔵 |
 
+A clarification is built, and its record is partial: the paused step's row carries `status=needs_input`,
+its `finished_at` (the moment it paused) and `output.clarifications` (`round` · `limit`), and a step
+that ran out of rounds names `output.bound = "max_clarifications"`. Nothing goes to `events` — not the
+pause, not the resume (`run.resume` is declared and not emitted), not a decline (`cancel_waiting`
+writes no reason) — so the wait is read off the next attempt's timestamps. The events arrive with the
+approval, which needs the same three moments.
+
 **The middle row is why there are three and not two.** An approval is asked before dispatch precisely
 so that refusing costs nothing; a verdict can only be asked once the work exists, so refusing costs
 another pass. That difference is what sets the bound: an approval needs only a deadline, a verdict

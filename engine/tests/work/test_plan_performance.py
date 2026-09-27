@@ -4,8 +4,8 @@ Three claims:
 
 * a step's numbers come from the attempts that **ran** — a retry that recovered
   is not a failure, and a step closed without starting was not reached;
-* a skill that inlined the plan ran it too, and is named as its caller, but its
-  copied rows stay out of the per-step table;
+* a skill that inlined the plan ran it too, is named as its caller, and joins
+  the per-step table only through the steps its copies recorded;
 * a plan that never ran says nothing rather than zero.
 """
 
@@ -94,32 +94,91 @@ class TestPerformance:
         assert [(b.step_key, b.limit, b.used, b.exhausted) for b in perf.bounds] == [("execute", 3, 1, 1)]
         assert perf.slowest["translate"][0].run_id == bad.id
 
-    async def test_a_skill_that_inlined_it_is_a_caller_but_not_a_step(self, session: AsyncSession, graph: Graph):
+    async def test_a_skill_that_inlined_it_counts_through_the_steps_it_copied(
+        self, session: AsyncSession, graph: Graph
+    ):
         plan = await _plan(session, graph)
-        caller = TaskPlan(graph_id=graph.id, key=None, reusable=False)
+        recorded = TaskPlan(graph_id=graph.id, key=None, reusable=False)
+        # Copied before a copy recorded its source: a caller, never a step.
+        legacy = TaskPlan(graph_id=graph.id, key=None, reusable=False)
         skill = Skill(graph_id=graph.id, name="Escalate a late supplier")
-        session.add_all([caller, skill])
+        older = Skill(graph_id=graph.id, name="Brief the route desk")
+        session.add_all([recorded, legacy, skill, older])
         await session.flush()
         session.add_all(
             [
-                SkillVersion(skill_id=skill.id, version=1, plan_id=caller.id),
-                Task(task_plan_id=caller.id, key="nl_single_translate", source_plan_key="nl-single@2"),
+                SkillVersion(skill_id=skill.id, version=1, plan_id=recorded.id),
+                SkillVersion(skill_id=older.id, version=1, plan_id=legacy.id),
+                Task(
+                    task_plan_id=recorded.id,
+                    key="nl_single_translate",
+                    source_plan_key="nl-single@2",
+                    source_step_key="translate",
+                ),
+                # The skill's own step, not the plan's.
+                Task(task_plan_id=recorded.id, key="tell_desk"),
+                Task(task_plan_id=legacy.id, key="nl_single_translate", source_plan_key="nl-single@2"),
             ]
         )
-        run = _root(graph, status="succeeded", ago=timedelta(hours=3), task_plan_id=caller.id)
-        session.add(run)
+        run = _root(graph, status="succeeded", ago=timedelta(hours=3), task_plan_id=recorded.id)
+        old = _root(graph, status="succeeded", ago=timedelta(hours=4), task_plan_id=legacy.id)
+        session.add_all([run, old])
         await session.flush()
-        session.add(_step(run, "nl_single_translate", ms=50))
+        session.add_all(
+            [
+                _step(run, "nl_single_translate", ms=50),
+                _step(run, "tell_desk", ms=900),
+                _step(old, "nl_single_translate", ms=70),
+            ]
+        )
         await session.flush()
 
         manager = PlanPerformanceManager()
         perf = await manager.performance(session, plan=plan, window=7, now=NOW)
-        assert perf.tiles.runs.value == 1
-        assert all(s.ran_in is None for s in perf.steps), "a copied key is not matched by guess"
+        assert perf.tiles.runs.value == 2, "both skills ran the plan"
+        steps = {s.step_key: s for s in perf.steps}
+        assert steps["translate"].ran_in == 1.0, "the legacy copy is not matched by guess, nor counted as unreached"
+        assert steps["translate"].p50_ms == 50, "matched on what the copy recorded"
+        assert steps["translate"].share_of_work == 1.0, "the skill's own step is not the plan's work"
 
         page = await manager.runs(session, plan=plan, window=7, now=NOW)
-        assert [(r.called_by.kind, r.called_by.name) for r in page.items] == [("skill", "Escalate a late supplier")]
+        assert {(r.called_by.kind, r.called_by.name) for r in page.items} == {
+            ("skill", "Escalate a late supplier"),
+            ("skill", "Brief the route desk"),
+        }
         assert (await manager.runs(session, plan=plan, window=7, called_by="session", now=NOW)).items == []
+
+    async def test_a_question_answered_is_not_a_retry_and_rounds_are_a_bound(self, session: AsyncSession, graph: Graph):
+        plan = await _plan(session, graph)
+        answered = _root(graph, status="succeeded", ago=timedelta(days=1), plan_origin="template:nl-single@2")
+        spent = _root(graph, status="succeeded", ago=timedelta(days=2), plan_origin="template:nl-single@2")
+        session.add_all([answered, spent])
+        await session.flush()
+        rounds = {"clarifications": {"round": 1, "limit": 3}}
+        session.add_all(
+            [
+                # Asked once, answered, went on: an attempt, not a retry.
+                _step(answered, "translate", ms=10, status="needs_input", output=rounds),
+                _step(answered, "translate", ms=40, attempt=2),
+                # Asked until the agent's limit, then settled without an answer.
+                _step(spent, "translate", ms=10, status="needs_input", output=rounds),
+                _step(
+                    spent,
+                    "translate",
+                    ms=10,
+                    attempt=2,
+                    output={"bound": "max_clarifications", "clarifications": {"round": 3, "limit": 3}},
+                ),
+            ]
+        )
+        await session.flush()
+
+        perf = await PlanPerformanceManager().performance(session, plan=plan, window=7, now=NOW)
+
+        assert {s.step_key: s for s in perf.steps}["translate"].retried == 0.0
+        assert [(b.bound, b.limit, b.used, b.exhausted) for b in perf.bounds if b.step_key == "translate"] == [
+            ("max_clarifications", 3, 2, 1)
+        ]
 
     async def test_a_plan_that_never_ran_says_nothing_rather_than_zero(self, session: AsyncSession, graph: Graph):
         plan = await _plan(session, graph)

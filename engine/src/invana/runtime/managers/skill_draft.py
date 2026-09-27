@@ -500,8 +500,9 @@ class SkillDraftManager:
                 declared=declared,
                 tuned=row.uses_args or {},
             )
-            out.extend(
-                SkillDraftTaskWrite(
+            copied_from = {renamed_key: original for original, renamed_key in renamed.items()}
+            for step in steps:
+                copy = SkillDraftTaskWrite(
                     key=step["key"],
                     form=step["form"],
                     step_key=step["step_key"],
@@ -510,8 +511,10 @@ class SkillDraftManager:
                     source_span=row.source_span,
                     uses=ref,
                 )
-                for step in steps
-            )
+                # Which step of *ref* this is, so the plan's page matches a
+                # skill's run on what was recorded rather than on the prefix (LB36).
+                copy._source_step_key = copied_from[step["key"]]
+                out.append(copy)
             composed.append({"key": plan.key, "version": plan.version, "args": dict(row.uses_args or {})})
         return out, composed
 
@@ -557,6 +560,7 @@ class SkillDraftManager:
         raw_steps: list[dict] = []
         spans: dict[str, str | None] = {}
         sources: dict[str, str | None] = {}
+        source_steps: dict[str, str | None] = {}
         human: dict[str, SkillDraftTaskWrite] = {}
         order: list[str] = []
         seen: set[str] = set()
@@ -590,6 +594,7 @@ class SkillDraftManager:
             )
             spans[key] = row.source_span
             sources[key] = row.uses
+            source_steps[key] = row._source_step_key
             order.append(key)
 
         # A plan whose every row is a person's reaches the validator with nothing
@@ -622,6 +627,7 @@ class SkillDraftManager:
             if task is not None:
                 task.source_span = spans.get(key)
                 task.source_plan_key = sources.get(key)
+                task.source_step_key = source_steps.get(key)
                 rows.append(task)
                 continue
             row = human[key]
@@ -636,6 +642,7 @@ class SkillDraftManager:
                     depends_on=[],
                     source_span=row.source_span,
                     source_plan_key=row.uses,
+                    source_step_key=row._source_step_key,
                 )
             )
 

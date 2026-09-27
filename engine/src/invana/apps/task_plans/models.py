@@ -188,4 +188,9 @@ class Task(Base):
     #: for a row somebody wrote. What the Flow tab groups by, and what a
     #: re-inline replaces ([SK33](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
     source_plan_key: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    #: `translate_thought` — the key of the step this row was copied from, in
+    #: the plan `source_plan_key` names; null for a row somebody wrote. What
+    #: lets that plan's page count a skill's run step by step without reading
+    #: the copy's prefix ([LB36](docs/for-developers/modules/workflows/features/the-library.md)).
+    source_step_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)

@@ -97,6 +97,29 @@ class TaskPlanQuerySet:
         )
         return list((await session.execute(stmt)).scalars().all())
 
+    async def copied_steps(self, session: AsyncSession, *, graph_id: str, ref: str) -> dict[str, dict[str, str]]:
+        """Per plan that copied *ref*: each copied row's key → the step of *ref* it came from.
+
+        Only a plan whose **every** copied row names its source is returned. A
+        row with no ``source_step_key`` was copied before the column existed,
+        its key is not evidence, and half a copy read step by step would say
+        the other half was never reached
+        ([LB36](docs/for-developers/modules/workflows/features/the-library.md)).
+        """
+        stmt = (
+            select(Task.task_plan_id, Task.key, Task.source_step_key)
+            .join(TaskPlan, TaskPlan.id == Task.task_plan_id)
+            .where(TaskPlan.graph_id == graph_id, Task.source_plan_key == ref)
+        )
+        copies: dict[str, dict[str, str | None]] = {}
+        for plan_id, key, source in (await session.execute(stmt)).all():
+            copies.setdefault(plan_id, {})[key] = source
+        return {
+            plan_id: {key: source for key, source in rows.items() if source}
+            for plan_id, rows in copies.items()
+            if all(rows.values())
+        }
+
     async def add(self, session: AsyncSession, plan: TaskPlan) -> TaskPlan:
         session.add(plan)
         await session.flush()

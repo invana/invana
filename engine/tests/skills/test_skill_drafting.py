@@ -348,6 +348,12 @@ async def test_a_uses_row_becomes_the_plans_rows_flat_and_tuned(
     assert plan.uses == [{"key": "nl-single", "version": 2, "args": {"read_only": False}}]
     rows = await drafts.plans_qs.tasks_for(session, plan_id=plan.id)
     assert {r.source_plan_key for r in rows} == {"nl-single@2", None}
+    # Each copy names the step it came from, so the plan's page matches a
+    # skill's run on the record and not on the prefix (LB36).
+    assert {r.key: r.source_step_key for r in rows if r.source_plan_key} == {
+        f"answer_{step}": step
+        for step in ("translate_thought", "validate_query", "execute_graph_query", "shape_for_canvas", "verify_result")
+    }
     # What the Flow tab reads back: the composition, and whether the library
     # has moved past it. `@2` is the newest, so this one has not.
     [use] = read.plan.uses
