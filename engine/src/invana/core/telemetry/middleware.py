@@ -227,6 +227,9 @@ def _attach_request(
     span.set_attribute("http.user_agent", user_agent)
     span.set_attribute("http.request_size", req_size)
     span.set_attribute("invana.component", "api")
+    # Until authentication says otherwise, nobody in particular is calling.
+    span.set_attribute("invana.principal", "anonymous")
+    span.set_attribute("invana.origin", "api")
     params = {k: v for k, v in request.query_params.items() if k not in _CREDENTIAL_PARAMS}
     if params:
         span.set_attribute("http.query_params", str(params))

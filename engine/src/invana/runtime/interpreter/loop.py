@@ -19,6 +19,7 @@ import contextlib
 import logging
 import random
 import time
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -47,6 +48,7 @@ from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_message_in_flight, record_session_message
+from invana.core.telemetry.spans import add_event, current_span_context, set_current
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -76,6 +78,7 @@ from invana.runtime.interpreter.payloads import (
     _step_payload,
     message_payload,
 )
+from invana.runtime.interpreter.tracing import delegation_links, run_span, step_span
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
@@ -104,6 +107,9 @@ class TaskRuntime:
         self._manager = manager
         self._key = encryption_key
         self._tasks: dict[str, asyncio.Task] = {}
+        # Span context of every run whose span is open here, so a delegated
+        # child can link to its parent run's span.
+        self._run_span_ctx: dict[str, Any] = {}
         # The Graph's ceiling and its wait queue
         # (docs/for-developers/modules/agents/features/concurrency-and-contention.md).
         # A budget bounds one agent; this bounds the Graph.
@@ -288,18 +294,14 @@ class TaskRuntime:
             return True
 
         # Queued is a state a person can read, with what it is waiting behind.
-        await emitter.emit(
-            "run.queued",
-            {
-                "position": admission.position,
-                "ceiling": admission.ceiling,
-                "running": admission.running,
-            },
-        )
+        queued = {"position": admission.position, "ceiling": admission.ceiling, "running": admission.running}
+        await emitter.emit("run.queued", queued)
+        add_event("run.queued", queued)
         while True:
             await asyncio.sleep(0.25)
             if th.id in self._slots.snapshot(th.graph_id)["running"]:
                 await emitter.emit("run.started", {"waited": True})
+                add_event("run.admitted", {"waited": True})
                 return True
 
     async def cancel(self, run_id: str) -> bool:
@@ -366,8 +368,15 @@ class TaskRuntime:
         async with self._factory() as db:
             th = await TaskRunQuerySet().get(db, run_id)
             caller = await caller_for(db, th) if th is not None else None
-        with calling_as(caller):
-            await self._run_body(run_id)
+            links = await delegation_links(db, th, self._run_span_ctx) if th is not None else ()
+        # A run is a span of the action that started it; a missing row opens none.
+        with run_span(th, links=links) if th is not None else contextlib.nullcontext():
+            self._run_span_ctx[run_id] = current_span_context()
+            try:
+                with calling_as(caller):
+                    await self._run_body(run_id)
+            finally:
+                self._run_span_ctx.pop(run_id, None)
 
     async def _run_body(self, run_id: str) -> None:
         emitter = Emitter(self._factory, run_id)
@@ -526,6 +535,7 @@ class TaskRuntime:
                     status=status_label,
                 )
                 add_message_in_flight(-1, mode=mode, surface=surface)
+                set_current(**{"invana.outcome": status_label})
 
     async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
         """The endpoint this run calls — what it recorded, else what its lens casts.
@@ -611,7 +621,8 @@ class TaskRuntime:
                 await emitter.emit("step.started", _step_payload(row))
                 ctx = TaskContext(db=db, manager=self._manager, emitter=emitter, step=row, runtime=self)
                 try:
-                    out = await _dispatch(step.task_key, ctx, v)
+                    with step_span(row, attempt):
+                        out = await _dispatch(step.task_key, ctx, v)
                 except CannotAnswer as cannot:
                     # A legitimate outcome: the run **succeeds**, and the
                     # remaining planned rows are dropped rather than left
