@@ -28,5 +28,5 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 18 | Studio metrics lost when a Playwright context closes before `pagehide` | `studio/src/services/telemetry/setup.ts` | ❌ | — | test-harness only; a real tab close flushes |
 | 19 | Stray asyncio mark on a sync test | `engine/tests/sessions/test_services.py` | ✅ | S | the module-level mark was redundant under `asyncio_mode = "auto"`; removed |
 | 20 | Broken `guides/running-*.md` links in the public docs | `docs/docs` | ⏸ | S | unrelated to telemetry |
-| 21 | `TEST_CONNECTOR_CLASS` in the graphs test fixtures names a module that no longer exists | `engine/tests/graphs/conftest.py` | ⏸ | S | harmless while no test there connects; the backoff test names `invana_neo4j.connector.Neo4jConnector` itself |
+| 21 | `TEST_CONNECTOR_CLASS` in the graphs test fixtures names a module that no longer exists | `engine/tests/graphs/conftest.py` | ✅ | S | now `invana_neo4j.connector.Neo4jConnector`; the backoff test uses it instead of its own copy |
 | 22 | The CLI rebuilt its logging after telemetry started, dropping the OTLP log handler (so CLI logs never reached the collector) and flushing it on a non-daemon thread | `cli/main.py` · `core/logging/config.py` (`set_level`) | ✅ | S | found while fixing 7; the CLI lowers its level in place |

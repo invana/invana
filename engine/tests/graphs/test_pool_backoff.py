@@ -11,11 +11,11 @@ import asyncio
 
 from invana.apps.graphs.pool import ConnectionPool
 from invana.apps.graphs.schemas import GraphConnectionCreate
-from tests.graphs.conftest import TEST_ENCRYPTION_KEY
+from tests.graphs.conftest import TEST_CONNECTOR_CLASS, TEST_ENCRYPTION_KEY
 
 UNREACHABLE = GraphConnectionCreate(
     uri="bolt://127.0.0.1:1",
-    connector_class="invana_neo4j.connector.Neo4jConnector",
+    connector_class=TEST_CONNECTOR_CLASS,
     auth={"username": "neo4j", "password": "password"},
     read_only=False,
 )

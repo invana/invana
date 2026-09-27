@@ -26,7 +26,7 @@ from invana.core.settings import settings
 from invana.runtime.models import TaskRun  # noqa: F401
 
 TEST_ENCRYPTION_KEY = "Ry3OxpZmI9Rv1gv3T2kD1n0jY4EeKaLZwH-cFCG9hMA="
-TEST_CONNECTOR_CLASS = "invana.graph.connectors.neo4j.connector.Neo4jConnector"
+TEST_CONNECTOR_CLASS = "invana_neo4j.connector.Neo4jConnector"
 
 
 @pytest_asyncio.fixture
