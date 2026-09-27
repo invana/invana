@@ -93,7 +93,7 @@ Each needs one read against the kit before it is cut. Named so the pass is finit
 | Lines | Studio | Likely kit replacement |
 |---|---|---|
 | 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **unblocked**, canvas `0.0.12` is published |
-| 418 | `explorer/components/ExpandFineTunePanel.tsx` | `CanvasFiltersViewPanel` · `FindInCanvasViewPanel` (canvas-ui) — verify |
+| 418 | `explorer/components/ExpandFineTunePanel.tsx` | **Keep** — it fetches neighbours from the engine; the kit panels only filter what is drawn. Renamed `ExpandNeighboursDialog` ([module-structure.md](../module-structure.md) §4) |
 | 415 | `modeller/components/PropertyEditor.tsx` | `PropertiesEditor` (canvas-ui) |
 | 269 | `explorer/components/CanvasTabsBar.tsx` | `BoardPagesViewPanel` (canvas-ui) — strip **and** bodies in one column, `keepMounted` |
 | 193 | `work/WorkCanvasChrome.tsx` | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` (canvas-ui) |
@@ -406,6 +406,7 @@ A convention a community project cannot enforce is a convention it does not have
 | No canvas-ui fork | A canvas panel, toolbar, card, menu or status strip is `@invana/canvas-ui`'s. [canvas-ui-coverage.md](canvas-ui-coverage.md) is the map, read before writing one; a surface listed there is consumed, never reimplemented |
 | No dead files | `knip` in CI |
 | Names follow modules | `scripts/check-names` — Studio `features/<m>/` ↔ engine `server/<m>/`, the §4.1c suffixes only, no retired word in an identifier ([module-structure.md](../module-structure.md) §8b) |
+| Comments stay short | one or two lines; cite the decision id instead of restating the feature file; no history ([module-structure.md](../module-structure.md) §5b) |
 | Tokens only | Extend the check script to fail on `hsl(` · `#rrggbb` · `bg-{palette}-{n}` in `src/` — the same rule `.design/board/build.mjs` enforces (§5.4) |
 | The type ladder | Fail on `text-[Npx]`. **30 sites today** — fix them in Phase 1, then the gate holds (D7 · DS13) |
 | No PixiJS | Fail on any `pixi` import in `src/` (rule 10). The `vite.config.ts` pin is exempt |

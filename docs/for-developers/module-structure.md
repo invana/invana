@@ -194,15 +194,17 @@ A Studio component the kit already ships is deleted against the kit import, not 
 ([code-shape.md](building-studio/code-shape.md) §2.2). These go first (phase K), so R3 never renames
 a file that is about to be deleted.
 
-| Studio today | Kit replacement | State |
+| Studio today | Kit | Verdict |
 |---|---|---|
-| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` | unblocked — canvas `0.0.12` is published |
-| `explorer/ExpandFineTunePanel.tsx` | canvas-ui `CanvasFiltersViewPanel` · `FindInCanvasViewPanel` | verify |
-| `explorer/InspectorPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | verify — keep only what is Invana's (provenance) |
-| `shared/ListPanel.tsx` | `@invana/ui` `Item` + `FilterBar` | verify |
-| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` | verify |
+| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Replace.** A fork of the kit panel. First move `visibility.ts` onto the store's hide API (`setNodeHidden`), because `ExplorerTypesPanel` shares that hidden state |
+| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Replace.** Map `CanvasStyling.labelProperty` → the kit's `labelKey` dot path (`name` → `data.name`) in `types/board.ts`; drop Studio's own painting in `ExplorerCanvas` |
+| `explorer/InspectorPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
+| `explorer/ExpandFineTunePanel.tsx` | none — the kit panels filter what is drawn; this fetches neighbours from the engine | **Keep**, as `ExpandNeighboursDialog`. Its form moves to canvas-ui only when `GraphExpandEditorPanel` (B9) is built |
+| `shared/ListPanel.tsx` → `ListRow` | `@invana/ui` `Item size="xs"` | **Replace** (hover-only actions via an `ItemActions` option) |
+| `shared/ListPanel.tsx` → `ListPanelChrome` · `ListFilterMenu` | `PanelContent` | **Replace after extending the kit**: a searchable header and a header dropdown action on `PanelContent` |
 
-What survives a *verify* takes its §5 name in R3; what does not is deleted in K.
+A kit extension is built in `~/Projects/invana/design-kit` or `~/Projects/invana/canvas` with a story,
+before Studio uses it.
 
 ### Unused code
 
@@ -229,7 +231,7 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 | `XList` | the rows of a list section | `RunsList` (done) |
 | `XDetail` | a drill-in that replaces a section's body | `RunDetailDrawer` → `RunDetail` |
 | `XBoardPage` | anything in `mainSection` | `PlanDashboardPage` · `RunDashboardPage` · `RuleDashboardPage` · `UsageDashboardPage` → `*BoardPage` · `RunsJournalPage` → `RunsBoardPage` · `ComparePage` → `CompareBoardPage` |
-| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`; `LayersPanel` · `StylingPanel` · `ExpandFineTunePanel` → `*Card` only if they survive phase K (§4 Kit substitutions) |
+| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are replaced by the kit in phase K; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
 | `XWidget` | one tile on a board | `TaskFlowPanel` · `SkillFlowPanel` · `RunLensPanel` · `StepTouchPanel` · `BoardHistoryPanel` → `*Widget`; `shared/dashboardPanels.ts` → `dashboardWidgets.ts` |
 | `XTab` | a tab body, settings or detail | `EventsSection` → `EventsTab` · `GraphSettingsSection` → `GraphTab` · `GraphInfoPanel` → `InfoTab` |
 | `xRows.ts` | row builders, not components | `databaseTab` · `growthTab` · `performanceTab` · `usageTab` → `*Rows` |
@@ -239,6 +241,22 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 `XSection` now means one thing: a `PanelStackSection`. A tab body that was named `*Section` becomes
 `XTab`. The regions keep the kit's camelCase prop names (`leftSection`), so a component and a region
 never share a spelling.
+
+## 5b. Comments
+
+Every file a phase touches leaves with its comments trimmed. Today about 23% of the engine's
+non-blank lines and 16% of Studio's are comments, many of them multi-paragraph essays that restate a
+feature file.
+
+| Rule | Detail |
+|---|---|
+| One or two lines | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
+| Cite, don't restate | The reasoning lives in `docs/for-developers/`; a comment points at it by decision id — `# Refused before the wire (GV3).` |
+| Models and columns | A column gets a comment only when its name cannot carry its meaning — a unit, an enum's source, a nullable's meaning |
+| Querysets and managers | The class gets one line on what it owns; a method gets one only when its contract is not in its name and signature |
+| Components | One line above the export if the name is not enough. No header essays |
+| No history | Never "used to be", "was renamed from", "no longer". Git holds history |
+| Module docstring | One line naming the module and its feature file, or nothing |
 
 ## 6. Retired words still in Studio
 
@@ -253,6 +271,36 @@ never share a spelling.
 | Thinking, on the agent tab | `AgentThinkingTab` | `AgentEffortTab` |
 | Settings, meaning any `leftNav` key | `useSettingsPanel` · `SettingsSection` · `openWorkPanel` | `useLeftSection` · `LeftNavKey` · `openLeftPanel` |
 | Rail | `railItem`, and comments in `useGraphLeftNav.tsx` | `navItem` |
+
+## 6b. One vocabulary
+
+Docs, Studio and the engine use the words in [terminology.md](terminology.md) and only those. A retired
+word (§8 there) is fixed wherever it appears — prose, UI copy, identifiers, comments, API field names —
+except a stored name, which waits for its migration (§7 Stored renames).
+
+**Measured today** (raw matches; some are legitimate — see *allowed*):
+
+| Retired word | Say | Allowed where | docs | studio | engine |
+|---|---|---|---|---|---|
+| thinking · thought | TaskRun · run | — | 142 | 27 | 76 |
+| workflow | TaskPlan · plan | a **reusable** TaskPlan, and the `workflow` board kind | 513 | 199 | 191 |
+| dataset | model · records | — | 356 | 37 | 179 |
+| ingest · ingestion | import | — | 52 | 5 | 19 |
+| job | TaskRun | — | 91 | 6 | 17 |
+| pipeline | workflow · step | — | 19 | 4 | 7 |
+| drawer | section · `rightSection` | the `?drawer=` alias for one release | 399 | 366 | 31 |
+| rail · sidebar | `leftNav` · `leftSection` | — | 100 | 76 | 1 |
+| mission · atlas · workspace | Graph | — | 20 | 4 | 2 |
+| scope (for a lens) | lens | `rules.scope`, and `lenses.scope` until its migration | 116 | 209 | 109 |
+| connector, unqualified | graph connector | inside `graph/connectors/` and `invana-<db>` packages | 334 | 69 | 558 |
+| subgraph (for a narrowing) | lens · world | the subgraph **emission** | 74 | 19 | 13 |
+
+| Rule | Detail |
+|---|---|
+| One source | `terminology.md` §8 is the list. `scripts/check-names` reads its table — word, replacement, allowed contexts — so adding a row to §8 adds a check; nothing is listed twice |
+| Every layer | docs prose · Studio identifiers and UI copy · engine identifiers, docstrings, log messages, error messages · API field names (new ones only; stored ones wait for their migration) |
+| Fixed where you are | each R-phase commit fixes the words in the files it touches; phase W sweeps the rest |
+| A new word needs a row | a term that is not in terminology.md is added there, in the same commit, before it is used |
 
 ## 7. Engine
 
@@ -389,6 +437,23 @@ republished to their pinned artifact URLs.
 | `building-studio/refactor-plan.md` step 4 | module `task_plans` | `plans` |
 | Decision prefixes | `PT` is used by both work and identity-and-access; `CC` by both agents and graph-connectors | unchanged — IDs are anchors and never move |
 
+## 8c. The public docs site
+
+`docs/docs/` (MkDocs) is for people who **use** and **extend** Invana; `docs/for-developers/` stays the
+spec for people who build it. The site follows the same groups and modules, so a module has one name
+on the site, in Studio's `leftNav` and in the code.
+
+| Section | For | Contents |
+|---|---|---|
+| Get started | everyone | install (Docker · pip) · quickstart: connect a database → import a model → load records → ask · configuration |
+| Use Invana | people using Studio, the CLI or the API | one page per module, grouped as §2; each page: what it is for · in Studio · CLI · API |
+| Extend Invana | people building on it | add a graph connector · write a skill · author a plan (`manifest.yml`) · the API and the external-agent API · tracing |
+| Contribute | people changing Invana | architecture (bands, the module map, §12) · dev setup on any OS · conventions (names, suffixes, comments, the design kit) · how `docs/for-developers/` is used |
+| Reference | everyone | OpenAPI · CLI · settings · glossary (from [terminology.md](terminology.md)) |
+
+Pages describing what the [feature index](README.md) does not list — simulations, algorithms,
+ontology — are removed, not rewritten.
+
 ## 8b. Keeping the names
 
 A check in CI, so the structure cannot drift again. `scripts/check-names` (Python, no dependencies,
@@ -399,7 +464,7 @@ runs on every OS), added in R2 and tightened as each phase lands.
 | a Studio `features/<m>/` has no engine `server/<m>/`, or the reverse (bands, `auth` · `telemetry` · `admin`, and a module with no routes of its own — `setup` — excepted) | Studio · engine |
 | a docs module folder is not in the §2 table | docs |
 | a `.tsx` file under `features/` ends in a suffix outside §5 — `Drawer`, `StackPanel`, `DashboardPage`, or a bare `Panel` | Studio |
-| a retired word appears in an identifier: `Thinking`, `Thought`, `Workflow` (for a TaskPlan), `Task` for a Todo — an explicit list (`TaskStatus`, `TaskCreate`, `TaskActivity`, `useTasksQuery`, `tasksApi`, `TaskManager` …); `Task` the TaskPlan node is correct and never flagged, `Dataset`, `Ingest` | Studio · engine |
+| a retired word from [terminology.md](terminology.md) §8 appears outside its allowed contexts (§6b) — identifiers, UI copy, docstrings, docs prose. For `Task`: only its Todo sense is flagged (`TaskStatus`, `TaskCreate`, `TaskActivity`, `useTasksQuery`, `tasksApi`, `TaskManager` …); `Task` the TaskPlan node is correct | docs · Studio · engine |
 | a feature link's number differs from the README row it links to | docs |
 
 An allow-list in the script names each deliberate exception with the reason, so an exception is a
@@ -414,10 +479,14 @@ names check green before the next starts.
 |---|---|---|---|
 | R0 | Decisions into the docs | §1 → [terminology.md](terminology.md); §2–§5 → [code-shape.md](building-studio/code-shape.md) §4; the module map in the [README](README.md#the-modules); `graph/loaders` recorded (§7) | docs only |
 | R1 | Move the docs modules | `git mv` into `modules/<group>/<module>/`, split `spec.md` where a module splits, rewrite ~2,350 links **by full old file path → full new file path** (never by module prefix: `modules/work/` is a prefix of `modules/work/projects/`), from a generated mapping that refuses to run on a tree already moved; rename artboard prefixes (§8) in the-screens.md, Surfaces rows and the `.design` generators, and design-canvas page names (*Govern › Worlds — 14.1* → *Lenses › Worlds — 14.1*) with the example in CLAUDE.md; fix the §8 stale text. Feature numbers do not change | link check · no old module path left |
+| R1b | Split docs by role | `docs/for-developers/architecture/` (standing, present tense: module map, engine, studio, telemetry, design kit, screens) and `plans/` (in flight; a plan is deleted when its last phase lands, its decisions already in feature files or `architecture/`). `module-structure.md` splits into `architecture/module-map.md` (§1–§3, §5, §5b, §6b, §12) and `plans/module-refactor.md` (the rest). Delete `docs/system-design.md` and the root `HANDOFF.md`. Links by the R1 full-path mapping | link check |
+| R1c | Retire the concluded RFCs | move what is current in `orchestration.md` (§0) into the `runs` · `plans` · `projects` specs and `architecture/`, and `governance.md` into `lenses/spec.md`; then delete both. One file per commit, each reviewed | link check |
 | K | Kit substitutions | the §4 table: delete against the kit import what the kit already ships | `tsc -b`, Biome, Vitest |
-| R2–R4 | Studio, **one module per commit** | for each module, in order `models` · `runs` + `events` · `projects` · `plans` + `projections` · `lenses` · `agents` + `llms` · `skills` + `rules` · `assistant` · `explorer` · `boards` · `graphs`: its §4 folder move, §5 suffixes and §6 retired words together. `scripts/check-names` lands with the first; the `?drawer=` URL key becomes `?section=` (reading `?drawer=` as an alias for one release) with the first stacked view panel | `tsc -b`, Biome, Vitest, names check |
-| R5 | Engine packages and Python names — **after M4** | the §7 package and Python-only renames to the §12.2 tree; tests move to mirror the modules (§7); `graph/loaders` docstrings. Routes, tables and event strings unchanged | ruff, the import rule, unit tests, names check |
+| R2–R4 | Studio, **one module per commit** | for each module, in order `models` · `runs` + `events` · `projects` · `plans` + `projections` · `lenses` · `agents` + `llms` · `skills` + `rules` · `assistant` · `explorer` · `boards` · `graphs`: its §4 folder move, §5 suffixes, §6 retired words and §5b comment trim together. `scripts/check-names` lands with the first; the `?drawer=` URL key becomes `?section=` (reading `?drawer=` as an alias for one release) with the first stacked view panel | `tsc -b`, Biome, Vitest, names check |
+| R5 | Engine packages and Python names — **after M4** | the §7 package and Python-only renames to the §12.2 tree; tests move to mirror the modules (§7); the §5b comment trim on every file moved; `graph/loaders` docstrings. Routes, tables and event strings unchanged | ruff, the import rule, unit tests, names check |
 | R6 | Studio modules own their API | `services/api/*`, `hooks/queries/*` and `types/*` move into each module's `api.ts` · `queries.ts` · `types.ts` (§12.1), one module per commit | `tsc -b`, Biome, Vitest |
+| D | The public docs site | restructure `docs/docs/` and `mkdocs.yml` per §8c; one page per module; remove pages for what is not built. After R1, which fixes the module folders the site links into | `mkdocs build --strict` |
+| W | One vocabulary sweep | what the R-phases did not touch: every §6b word in docs, Studio and engine outside its allowed context; the names check turns on for words across the whole tree | names check green on the whole tree |
 | — | Stored renames | into the task-model-migration M-slices | — |
 
 Per-module commits keep each diff reviewable as one subject and let a peer session keep working in a
@@ -507,7 +576,7 @@ studio/src/
             ├── graphs/            SettingsViewPanel · InfoTab · GraphTab · ConnectionFields · PoolsTable
             ├── models/            model-editor/ · model-page/ · stitch/
             │  ── Exploration
-            ├── explorer/          ExplorerCanvas · InspectorViewPanel · LayersCard · StylingCard · ProvenanceBlock
+            ├── explorer/          ExplorerCanvas · InspectorViewPanel · ExpandNeighboursDialog · ProvenanceBlock
             ├── boards/            DataBoardPage · FrozenBoardPage · BoardHistoryWidget
             │  ── Answers
             ├── assistant/         AssistantViewPanel · Session* · answer-surface/
@@ -633,7 +702,7 @@ studio/src/
             ├── explorer/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← explorer.ts · useTypeCounts.ts · traversal.ts
             │   ├── ExplorerCanvas.tsx  ExplorerViewPanel.tsx  InspectorViewPanel.tsx   ← InspectorPanel · ExplorerTypesPanel
-            │   ├── LayersCard.tsx  StylingCard.tsx  ExpandFineTuneCard.tsx   ← *Panel.tsx
+            │   ├── ExpandNeighboursDialog.tsx   ← ExpandFineTunePanel · (LayersPanel, StylingPanel → canvas-ui in K)
             │   ├── ProvenanceBlock.tsx      ← bring-data-in/
             │   └── typeColor.ts  visibility.ts  useExpandNode.ts
             ├── lenses/                      ← govern/
