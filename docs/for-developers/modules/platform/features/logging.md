@@ -7,7 +7,7 @@ as `getLogger(__name__)` has to change.
 |---|---|
 | Index | [13.4](../../../README.md#13--platform) · Slice **S1** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | ✅ / 🔵 / — |
+| API / CLI / Studio | ✅ / ✅ / — |
 | Related | [telemetry](telemetry.md) · [command-line](command-line.md) |
 
 > **As** whoever is debugging this at two in the morning, **I want** log output that exists and is

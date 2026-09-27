@@ -9,7 +9,7 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | # | Item | Where | Status | Size | Note |
 |---|---|---|---|---|---|
 | 1 | Flip index 13.5 (API · CLI · Studio) to ✅ | `docs/for-developers/README.md` | ✅ | S | T1–T8 done; the feature file's header too |
-| 2 | Flip index 13.4 Logging (API) to ✅ | `docs/for-developers/README.md` | ✅ | S | C1–C10 built in T7; the CLI column stays 🔵 |
+| 2 | Flip index 13.4 Logging (API) to ✅ | `docs/for-developers/README.md` | ✅ | S | C1–C10 built in T7; the CLI column is ✅ too — its logging is configured at import and lowered in place by `set_level("INFO")` |
 | 3 | Telemetry back off in the dev containers | `docker compose up -d engine studio` | ✅ | S | both recreated with telemetry off; HyperDX left running with its data |
 | 4 | Merge and release design-kit `feat/error-boundary-reports` | `../design-kit` | ⏸ | S | owner's call; `ErrorBoundary` `onError` + `fallback`; Studio uses the local kit until then |
 | 5 | Push and open PRs | invana · design-kit | ⏸ | S | owner's call |
