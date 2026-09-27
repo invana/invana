@@ -14,6 +14,7 @@ import {
 	usePlanVersionQuery,
 	useWorkflowsQuery,
 } from "@/hooks/queries/useWork";
+import { useReport } from "@/pages/graphs-detail/features/boards";
 import { TaskFlowPanel } from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
 import { PLAN_CHART_PANELS } from "@/pages/graphs-detail/features/workflows/dashboards/PlanChartPanels";
 import {
@@ -110,13 +111,17 @@ export function PlanDashboardPage({
 		);
 	}, [plan.data, versions, performance.data, runs.data, view]);
 
+	// `Save report` on the header, and the act behind it (LB39 · B6). What it
+	// keeps is this reading — the version, window and tab — resolved.
+	const report = useReport(spec);
+
 	if (library.isLoading || plan.isLoading)
 		return (
 			<div className="flex h-full items-center justify-center">
 				<Spinner />
 			</div>
 		);
-	if (!opened || !spec)
+	if (!opened || !spec || !report)
 		return (
 			<EmptyState
 				className="h-full"
@@ -131,10 +136,11 @@ export function PlanDashboardPage({
 	return (
 		<Dashboard
 			className="h-full min-h-0"
-			spec={spec}
+			spec={report.spec}
 			registry={REGISTRY}
 			icons={DASHBOARD_ICONS}
 			onAction={(id, ctx) => {
+				if (report.handle(id)) return;
 				switch (id) {
 					case PLAN_ACTIONS.tab:
 						if (ctx?.option) set({ tab: ctx.option as PlanTab });

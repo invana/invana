@@ -23,6 +23,7 @@ import { RunLensPanel } from "@/pages/graphs-detail/features/govern/RunLensPanel
 import { StepTouchPanel } from "@/pages/graphs-detail/features/govern/StepTouchPanel";
 import { TaskFlowPanel } from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
 import { SkillFlowPanel } from "@/pages/graphs-detail/features/skills/dashboards/SkillFlowPanel";
+import { PLAN_CHART_PANELS } from "@/pages/graphs-detail/features/workflows/dashboards/PlanChartPanels";
 import { RUN_PANELS } from "@invana/dashboard";
 
 export const DECLARED_PANELS = {
@@ -34,6 +35,8 @@ export const DECLARED_PANELS = {
 	flow: TaskFlowPanel,
 	stepTouch: StepTouchPanel,
 	skillFlow: SkillFlowPanel,
+	// A plan's two charts — runs a day, work p50 a day (LB39).
+	...PLAN_CHART_PANELS,
 	// Named by documents frozen before the kit drew a run's lens. Live pages
 	// compose `lens`; see the note in the file.
 	runLens: RunLensPanel,
