@@ -594,7 +594,13 @@ export function GraphDetailPage() {
 	const libraryPlanId = libraryPlanKey
 		? newestPlanIdByKey.get(libraryPlanKey)?.id
 		: undefined;
+	// Once per pick, not per render: `openBoard` is new on every URL write, so
+	// keyed on it alone this would pull the plan page back to the front each
+	// time a page it opened — a run — took focus.
+	const openedPlanId = useRef<string | undefined>(undefined);
 	useEffect(() => {
+		if (openedPlanId.current === libraryPlanId) return;
+		openedPlanId.current = libraryPlanId;
 		if (libraryPlanId)
 			openBoard({ kind: "plan_runs", subjectId: libraryPlanId });
 	}, [libraryPlanId, openBoard]);

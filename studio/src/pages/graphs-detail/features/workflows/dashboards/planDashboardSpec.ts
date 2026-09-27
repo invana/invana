@@ -9,7 +9,10 @@
 
 import { formatElapsed } from "@/lib/time";
 import type { FlowOptions } from "@/pages/graphs-detail/features/operate/dashboards/TaskFlowPanel";
-import { usd } from "@/pages/graphs-detail/features/operate/dashboards/shared";
+import {
+	runAddress,
+	usd,
+} from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import type { PlanChartPanels } from "@/pages/graphs-detail/features/workflows/dashboards/PlanChartPanels";
 import { planLayerStrip } from "@/pages/graphs-detail/features/workflows/planLayers";
 import {
@@ -404,7 +407,7 @@ function stepCard(
 			options: {
 				items: slowest.map((r) => ({
 					id: r.run_id,
-					title: `run:${r.run_id.slice(0, 8)}`,
+					title: runAddress(r.run_id),
 					meta: `${ms(r.ms)} · ${when(r.when)}`,
 					mono: true,
 					action: PLAN_ACTIONS.openRun,
@@ -620,7 +623,7 @@ function activityRows(data: PlanPageData, view: PlanView) {
 function runRow(r: PlanRunRow) {
 	return {
 		id: r.run_id,
-		run: `run:${r.run_id.slice(0, 8)}`,
+		run: runAddress(r.run_id),
 		asked: r.asked || "—",
 		called_by: r.called_by.person
 			? `${r.called_by.name} · ${r.called_by.person}`

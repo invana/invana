@@ -43,6 +43,7 @@ database, and parallel files would race each other's sessions.
 |---|---|
 | `answer-surface.spec.ts` | A result renders as a `table` emission with its citation · zero rows render as the `empty` emission and no table beside it · a `subgraph` states what it added once it lands |
 | `explorer.spec.ts` | The workflow's steps paint as the run goes · a session comes back after a reload and its answer does not, which is the seam AS10 names · a rejected query is a diagnosis with no emission card beside it |
+| `plan-page.spec.ts` | A plan that has run opens as a page whose four tabs each draw, and a run row brings its run page to the front and keeps it there · a plan that has never run shows the empty Overview, with no chart of zeros |
 
 A run leaves its sessions behind in the Graph — the specs ask real questions and
 nothing cleans up after them. `metric`, `chart` and `prose` are not covered: no step produces them yet, and

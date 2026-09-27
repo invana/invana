@@ -209,9 +209,18 @@ export function GovernStackPanel({
 	// the page id worth carrying at all.
 	//
 	// `&world=new` names no record yet, so authoring opens no board.
+	//
+	// Once per drill-in, not per render: `onOpenBoard` is new on every URL
+	// write, so keyed on it alone this would pull the lens page back to the
+	// front each time another page took focus.
+	const openedLens = useRef<string | null>(null);
 	useEffect(() => {
-		if (!onOpenBoard || !focused || focused === NEW_LENS) return;
-		onOpenBoard(govern.drawer === "worlds" ? "world" : "guardrail", focused);
+		if (!onOpenBoard) return;
+		const kind = govern.drawer === "worlds" ? "world" : "guardrail";
+		const lens = focused && focused !== NEW_LENS ? `${kind}:${focused}` : null;
+		if (openedLens.current === lens) return;
+		openedLens.current = lens;
+		if (focused && lens) onOpenBoard(kind, focused);
 	}, [govern.drawer, focused, onOpenBoard]);
 
 	return (
