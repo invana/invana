@@ -9,6 +9,7 @@ import {
 	type TaskFlowEdge,
 	type TaskFlowNode,
 	taskNodeTypeOf,
+	taskToneOf,
 } from "@/canvases/taskflow";
 import type { SkillLayer, SkillPlanRead } from "@/types/skills";
 
@@ -29,6 +30,7 @@ export function taskFlowFromPlan(plan: SkillPlanRead): TaskFlowData {
 		data: {
 			title: node.label || node.task || node.id,
 			bound: node.layer,
+			tone: taskToneOf(node.layer),
 			icon: LAYER_ICON[node.layer] ?? "lucide/square-function",
 			summary: node.source_span ?? "",
 			stepKey: node.form === "human" ? "a person" : node.task,

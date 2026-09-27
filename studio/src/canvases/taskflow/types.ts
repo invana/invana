@@ -7,10 +7,15 @@ export type Detail = "circles" | "cards";
 /** The three node types `settings.json` colours (TF6). */
 export type TaskNodeType = "task.llm" | "task.graph_read" | "task.none";
 
+/** The key `settings.json`'s colour lookups read — one per node type (TF6). */
+export type TaskTone = "llm" | "graph_read" | "none";
+
 export interface TaskNodeData {
 	title: string;
 	/** The real bound or layer, printed on a card — finer than the node's type. */
 	bound: string;
+	/** What colours the node — its type's key, never the raw `bound` (TF6). */
+	tone: TaskTone;
 	/** `lucide/<name>`. */
 	icon: string;
 	summary: string;
@@ -69,4 +74,9 @@ export function taskNodeTypeOf(bound: string | null | undefined): TaskNodeType {
 		default:
 			return "task.none";
 	}
+}
+
+/** A bound or a layer, onto the tone that colours its node (TF6). */
+export function taskToneOf(bound: string | null | undefined): TaskTone {
+	return taskNodeTypeOf(bound).slice("task.".length) as TaskTone;
 }

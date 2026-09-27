@@ -12,6 +12,7 @@ import {
 	type TaskFlowEdge,
 	type TaskFlowNode,
 	taskNodeTypeOf,
+	taskToneOf,
 } from "@/canvases/taskflow";
 import { formatDuration } from "@/lib/time";
 import {
@@ -38,6 +39,7 @@ export function taskFlowFromRun(groups: TaskGroup[]): TaskFlowData {
 			data: {
 				title: group.label,
 				bound: head.bound ?? "none",
+				tone: taskToneOf(head.bound),
 				icon: iconOf(head.bound),
 				summary: head.detail,
 				stepKey: group.taskKey,

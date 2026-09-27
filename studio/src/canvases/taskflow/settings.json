@@ -21,7 +21,7 @@
 					},
 					"bgRole": "cardBg",
 					"strokeLookup": {
-						"bind": "data.bound",
+						"bind": "data.tone",
 						"map": {
 							"llm": 9133302,
 							"graph_read": 959977,
@@ -38,7 +38,7 @@
 							"size": 28,
 							"bind": "data.icon",
 							"colorLookup": {
-								"bind": "data.bound",
+								"bind": "data.tone",
 								"map": {
 									"llm": 9133302,
 									"graph_read": 959977,
@@ -80,7 +80,7 @@
 							"height": 36,
 							"cornerRadius": 8,
 							"fillLookup": {
-								"bind": "data.bound",
+								"bind": "data.tone",
 								"map": {
 									"llm": 9133302,
 									"graph_read": 959977,
@@ -97,7 +97,7 @@
 							"size": 20,
 							"bind": "data.icon",
 							"colorLookup": {
-								"bind": "data.bound",
+								"bind": "data.tone",
 								"map": {
 									"llm": 9133302,
 									"graph_read": 959977,
@@ -127,7 +127,7 @@
 							"fontWeight": 600,
 							"uppercase": true,
 							"colorLookup": {
-								"bind": "data.bound",
+								"bind": "data.tone",
 								"map": {
 									"llm": 9133302,
 									"graph_read": 959977,

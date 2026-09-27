@@ -14,6 +14,7 @@ import {
 	type TaskFlowNode,
 	type TaskFlowState,
 	taskNodeTypeOf,
+	taskToneOf,
 } from "@/canvases/taskflow";
 import { formatElapsed } from "@/lib/time";
 import { LAYER_ICON } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
@@ -65,6 +66,7 @@ export function taskFlowFromWorkflow(
 		data: {
 			title: node.label || node.task || node.id,
 			bound: node.layer,
+			tone: taskToneOf(node.layer),
 			icon: LAYER_ICON[node.layer] ?? "lucide/square-function",
 			summary: medianLine(measured.get(node.id)),
 			stepKey: node.form === "human" ? "a person" : node.task,
