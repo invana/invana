@@ -79,3 +79,46 @@ test("a plan that has never run shows an empty Overview, not a chart of zeros", 
 	await expect(page.getByText(/^Each step, across 0 runs$/)).toBeVisible();
 	await expect(page.getByText("Runs a day")).toHaveCount(0);
 });
+
+test("⋯ opens a plan's versions, arguments and export, each as its own page", async ({
+	page,
+}) => {
+	await openPlan(page, "nl-single");
+	const more = page.getByRole("button", { name: "More" });
+	await expect(more).toBeVisible({ timeout: 20_000 });
+
+	// Versions: every version with what changed, and v2's diff field by field.
+	await more.click();
+	await page.getByRole("menuitem", { name: "Versions" }).click();
+	await expect(
+		page.getByRole("tab", { name: /nl-single@2 · versions/ }),
+	).toHaveAttribute("aria-selected", "true", { timeout: 20_000 });
+	await expect(
+		page.getByText("Every version, and how each fared"),
+	).toBeVisible();
+	await expect(page.getByText("v1 → v2")).toBeVisible();
+	await expect(
+		page.getByText("args.read_only: was true, is now ${args.read_only}"),
+	).toBeVisible();
+
+	// Arguments: what it declares, and a caller that tuned it.
+	await page.getByRole("tab", { name: "nl-single@2", exact: true }).click();
+	await more.click();
+	await page.getByRole("menuitem", { name: "Arguments" }).click();
+	await expect(page.getByText("What this plan declares")).toBeVisible({
+		timeout: 20_000,
+	});
+	const caller = page.getByRole("row", { name: /Brief the route desk/ });
+	await expect(caller).toContainText("false");
+
+	// Export: the version as the engine holds it.
+	await page.getByRole("tab", { name: "nl-single@2", exact: true }).click();
+	await more.click();
+	await page.getByRole("menuitem", { name: "Export YAML" }).click();
+	await expect(page.getByRole("button", { name: "Download .yml" })).toBeVisible(
+		{
+			timeout: 20_000,
+		},
+	);
+	await expect(page.getByText("nl-single@2.yml")).toBeVisible();
+});

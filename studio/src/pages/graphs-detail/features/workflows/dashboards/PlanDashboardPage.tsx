@@ -20,6 +20,7 @@ import {
 	ALL,
 	PLAN_ACTIONS,
 	type PlanPanels,
+	type PlanReading,
 	type PlanTab,
 	type PlanView,
 	WINDOWS,
@@ -41,12 +42,15 @@ export function PlanDashboardPage({
 	graphSlug,
 	planId,
 	onOpenRun,
+	onOpenReading,
 }: {
 	username: string;
 	graphSlug: string;
 	/** The `task_plans.id` the board is keyed by. */
 	planId: string;
 	onOpenRun: (runId: string) => void;
+	/** `⋯` — a reading of the version the header names, as its own page (LB38). */
+	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
 	const library = useWorkflowsQuery(username, graphSlug);
 	const opened = library.data?.items.find((p) => p.id === planId);
@@ -163,6 +167,14 @@ export function PlanDashboardPage({
 					case PLAN_ACTIONS.agent:
 						if (ctx?.option) set({ agent: ctx.option });
 						return;
+					case PLAN_ACTIONS.reading: {
+						const shown = library.data?.items.find(
+							(p) => p.key === key && p.version === version,
+						);
+						if (ctx?.option && shown)
+							onOpenReading(ctx.option as PlanReading, shown.id);
+						return;
+					}
 					case PLAN_ACTIONS.more:
 						void runs.fetchNextPage();
 						return;

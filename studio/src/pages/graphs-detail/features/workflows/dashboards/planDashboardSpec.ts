@@ -51,7 +51,16 @@ export const PLAN_ACTIONS = {
 	calledBy: "filter-called-by",
 	agent: "filter-agent",
 	more: "show-more",
+	reading: "open-reading",
 } as const;
+
+/** What `⋯` opens, each as its own page beside the plan's (LB38). */
+export const PLAN_READINGS = {
+	versions: "Versions",
+	arguments: "Arguments",
+	export: "Export YAML",
+} as const;
+export type PlanReading = keyof typeof PLAN_READINGS;
 
 export const PLAN_TABS = ["overview", "layers", "flow", "activity"] as const;
 export type PlanTab = (typeof PLAN_TABS)[number];
@@ -134,10 +143,10 @@ export function planDashboardSpec(
 				{ label: `v${plan.version}` },
 				{ label: "published", variant: "outline" },
 			],
-			// The page reads one version; the switch is here because every tab
-			// reads the one the header names (LB34).
-			actions:
-				versions.length > 1
+			actions: [
+				// The page reads one version; the switch is here because every
+				// tab reads the one the header names (LB34).
+				...(versions.length > 1
 					? [
 							{
 								id: PLAN_ACTIONS.version,
@@ -145,7 +154,16 @@ export function planDashboardSpec(
 								value: `v${plan.version}`,
 							},
 						]
-					: undefined,
+					: []),
+				{
+					id: PLAN_ACTIONS.reading,
+					label: "More",
+					icon: "more",
+					menu: true,
+					options: Object.keys(PLAN_READINGS),
+					optionLabels: PLAN_READINGS,
+				},
+			],
 		},
 		rows: [],
 		tabs,

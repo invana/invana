@@ -31,6 +31,7 @@ import type {
 import {
 	useInfiniteQuery,
 	useMutation,
+	useQueries,
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
@@ -473,7 +474,6 @@ export function usePlanVersionQuery(
 	});
 }
 
-/** How a plan has behaved over a window (LB33 · LB36). */
 /** A published version is immutable, so its diff never goes stale. */
 export function usePlanDiffQuery(
 	username: string | undefined,
@@ -496,6 +496,53 @@ export function usePlanDiffQuery(
 	});
 }
 
+/** Every version's diff at once — the Versions page's column (LB38). */
+export function usePlanDiffsQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	versions: number[],
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQueries({
+		queries: versions.map((version) => ({
+			queryKey: workflowsKey(scope, [key, "diff", version]),
+			queryFn: () =>
+				workflowsApi.diff(
+					scope.username,
+					scope.graphSlug,
+					key as string,
+					version,
+				),
+			enabled: !!username && !!graphSlug && !!key,
+			staleTime: Number.POSITIVE_INFINITY,
+		})),
+	});
+}
+
+/** A version's YAML. Immutable, like its diff. */
+export function usePlanExportQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	version: number | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: workflowsKey(scope, [key, "export", version]),
+		queryFn: () =>
+			workflowsApi.exportText(
+				scope.username,
+				scope.graphSlug,
+				key as string,
+				version as number,
+			),
+		enabled: !!username && !!graphSlug && !!key && version != null,
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+}
+
+/** How a plan has behaved over a window (LB33 · LB36). */
 export function usePlanPerformanceQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,

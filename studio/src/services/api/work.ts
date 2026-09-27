@@ -389,6 +389,17 @@ export const workflowsApi = {
 		);
 	},
 
+	/** The version as the engine holds it, as text — `Export YAML` (LB38). */
+	exportText: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		version: number,
+	) =>
+		request<string>(
+			`${base(username, graphSlug)}/task-plans/${key}/export?version=${version}`,
+		),
+
 	exportUrl: (username: string, graphSlug: string, key: string) =>
 		`${base(username, graphSlug)}/task-plans/${key}/export`,
 

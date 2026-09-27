@@ -106,6 +106,11 @@ import {
 import { LibraryStackPanel } from "@/pages/graphs-detail/features/workflows/LibraryStackPanel";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/workflows/PlanFlowCanvas";
 import { PlanDashboardPage } from "@/pages/graphs-detail/features/workflows/dashboards/PlanDashboardPage";
+import {
+	PlanArgumentsPage,
+	PlanExportPage,
+	PlanVersionsPage,
+} from "@/pages/graphs-detail/features/workflows/dashboards/PlanRecordPages";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
@@ -2776,7 +2781,11 @@ export function GraphDetailPage() {
 								: board.kind === "plan_runs"
 									? (planRefById.get(board.subjectId) ??
 										BOARD_KINDS[board.kind].label)
-									: BOARD_KINDS[board.kind].label,
+									: board.kind === "plan_versions" ||
+											board.kind === "plan_arguments" ||
+											board.kind === "plan_export"
+										? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
+										: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -3006,6 +3015,28 @@ export function GraphDetailPage() {
 			) : null;
 		}
 
+		// What `⋯` opens on the plan page (LB38) — each a record of one
+		// version, and its crumb goes back to the plan's page.
+		if (
+			board.kind === "plan_versions" ||
+			board.kind === "plan_arguments" ||
+			board.kind === "plan_export"
+		) {
+			const RecordPage = {
+				plan_versions: PlanVersionsPage,
+				plan_arguments: PlanArgumentsPage,
+				plan_export: PlanExportPage,
+			}[board.kind];
+			return (
+				<RecordPage
+					username={username as string}
+					graphSlug={graphSlug as string}
+					planId={board.subjectId}
+					onOpenPlan={(id) => openBoard({ kind: "plan_runs", subjectId: id })}
+				/>
+			);
+		}
+
 		// The plan page (LB24) — Overview · Layers · Flow · Activity, read over
 		// a window. A row opens its run page beside it.
 		return (
@@ -3014,6 +3045,9 @@ export function GraphDetailPage() {
 				graphSlug={graphSlug as string}
 				planId={board.subjectId}
 				onOpenRun={(id) => openBoard({ kind: "run", subjectId: id, runId: id })}
+				onOpenReading={(reading, id) =>
+					openBoard({ kind: `plan_${reading}`, subjectId: id })
+				}
 			/>
 		);
 	}

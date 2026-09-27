@@ -37,14 +37,17 @@ import {
 	Bot,
 	Boxes,
 	Database,
+	FileCode,
 	GitBranch,
 	GitCompareArrows,
 	Globe,
+	History,
 	LayoutDashboard,
 	ListTree,
 	Quote,
 	Scale,
 	ShieldCheck,
+	SlidersHorizontal,
 	SquareActivity,
 	TrendingUp,
 	Workflow,
@@ -215,6 +218,9 @@ export type DeclaredKind =
 	| "run"
 	| "task_run"
 	| "plan_runs"
+	| "plan_versions"
+	| "plan_arguments"
+	| "plan_export"
 	| "compare"
 	| "skill"
 	| "skill_usage"
@@ -263,6 +269,32 @@ export const DECLARED_KINDS: Record<DeclaredKind, DeclaredKindSpec> = {
 		label: "Plan",
 		icon: LayoutDashboard,
 		// A plan in Library › Plans — its flow with per-task medians and its runs.
+		panel: "library",
+		subject: "a task_plans.id",
+	},
+	// `⋯` on the plan page (LB38) — records, not readings over a window, so
+	// Studio-only like `runs`: none offers `Save report`.
+	plan_versions: {
+		kind: "plan_versions",
+		renders: "dashboard",
+		label: "Versions",
+		icon: History,
+		panel: "library",
+		subject: "a task_plans.id",
+	},
+	plan_arguments: {
+		kind: "plan_arguments",
+		renders: "dashboard",
+		label: "Arguments",
+		icon: SlidersHorizontal,
+		panel: "library",
+		subject: "a task_plans.id",
+	},
+	plan_export: {
+		kind: "plan_export",
+		renders: "dashboard",
+		label: "Export YAML",
+		icon: FileCode,
 		panel: "library",
 		subject: "a task_plans.id",
 	},
