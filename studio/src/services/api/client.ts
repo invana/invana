@@ -7,7 +7,7 @@
  * bounces the user to /login on next render.
  */
 
-import { startClientSpan } from "@/services/telemetry/tracer";
+import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
 import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
@@ -24,6 +24,13 @@ const BASE_URL = API_BASE_URL;
 
 /** Carries the per-request telemetry span from request → response interceptor. */
 type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
+
+declare module "axios" {
+	interface AxiosRequestConfig {
+		/** The user action this call belongs to; its span parents the request's. */
+		action?: Interaction;
+	}
+}
 
 /**
  * Standard mutation envelope: `{ message, data }`. The backend owns the
@@ -115,35 +122,24 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	return config;
 });
 
-// Telemetry (docs/for-developers/modules/platform/features/telemetry.md · docs/for-developers/modules/platform/features/telemetry.md): trace the outgoing request and inject W3C
-// trace-context so the engine's request span nests under it. We propagate
-// explicitly here rather than rely on auto-XHR instrumentation, whose ambient
-// context is lost crossing TanStack Query's async hops under Vite's native
-// async/await (docs/for-developers/modules/platform/features/telemetry.md).
-//
-// Two cases produce a span: (a) an Explorer run is in flight → nests under
-// `explorer.query.run`; (b) the request targets a session/message endpoint →
-// its own one-span distributed trace, even outside a run (docs/for-developers/modules/platform/features/telemetry.md). All
-// other API calls stay untraced.
+// Telemetry: every request is a CLIENT span, parented on the action passed in
+// its config or, with none, a root of its own. `traceparent` is injected so the
+// engine's request span joins the same trace. Propagation is explicit because
+// ambient context does not survive TanStack Query's async hops.
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 	const method = (config.method ?? "get").toUpperCase();
-	// Message ops live under `…/sessions/{id}/messages…`, so `/sessions` matches
-	// both. Other routes (graphs, llm, events, …) stay untraced outside a run.
-	const standalone = (config.url ?? "").includes("/sessions");
 	const client = startClientSpan(
 		`HTTP ${method}`,
 		{
 			"http.request.method": method,
 			"url.full": `${config.baseURL ?? ""}${config.url ?? ""}`,
 		},
-		{ standalone },
+		config.action,
 	);
-	if (client) {
-		propagation.inject(client.ctx, config.headers, {
-			set: (carrier, key, value) => carrier.set(key, value),
-		});
-		(config as TracedConfig)._otelSpan = client.span;
-	}
+	propagation.inject(client.ctx, config.headers, {
+		set: (carrier, key, value) => carrier.set(key, value),
+	});
+	(config as TracedConfig)._otelSpan = client.span;
 	return config;
 });
 
@@ -280,7 +276,10 @@ apiClient.interceptors.response.use(
  * Backwards-compatible `request<T>` helper so existing services
  * (`graphs.ts`, `schemas.ts`) keep working unchanged.
  */
-export async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(
+	path: string,
+	init?: RequestInit & { action?: Interaction },
+): Promise<T> {
 	const method = (init?.method ?? "GET").toUpperCase();
 	const data =
 		init?.body != null
@@ -297,6 +296,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
 		// "stop query" control aborts the session message run). Axios raises a
 		// `CanceledError` the caller can detect via its own `signal.aborted`.
 		signal: init?.signal ?? undefined,
+		action: init?.action,
 	};
 	const res = await apiClient.request(config);
 	if (res.status === 204) return undefined as T;

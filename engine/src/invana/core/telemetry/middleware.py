@@ -19,6 +19,13 @@ Traces:
                a ``token`` query param (the auth token that WebSocket and
                EventSource clients must pass in the URL) never reaches a span.
 
+Trace context
+-------------
+The caller's W3C trace context is taken from the ``traceparent`` (and
+``tracestate``) header. When that header is absent, the ``traceparent`` and
+``tracestate`` query parameters are used instead — EventSource cannot send
+headers, so streams carry their trace context in the URL. The header always wins.
+
 Skipped requests
 ----------------
 Health, metrics, docs and favicon paths are not traced, nor is anything under
@@ -129,7 +136,7 @@ class TelemetryMiddleware:
 
         # Adopt the caller's W3C `traceparent` so this request nests under the browser's
         # span; without one the SERVER span is a root. This middleware is the only request-span source.
-        parent_ctx = extract(dict(request.headers))
+        parent_ctx = extract(_trace_carrier(request))
         with tracer.start_as_current_span(span_name, context=parent_ctx, kind=SpanKind.SERVER) as span:
             _attach_request(span, request, raw_path, method, client_ip, user_agent, req_size)
             api_requests_in_flight.add(1, {"route": raw_path, "method": method})
@@ -241,6 +248,17 @@ def _resolve_route_from_scope(scope: dict) -> str | None:
     if route and hasattr(route, "path"):
         return route.path
     return None
+
+
+def _trace_carrier(request: Request) -> dict[str, str]:
+    """Headers as a propagation carrier; the trace context falls back to query params when the header is absent."""
+    carrier = dict(request.headers)
+    if "traceparent" not in carrier:
+        for key in ("traceparent", "tracestate"):
+            value = request.query_params.get(key)
+            if value:
+                carrier[key] = value
+    return carrier
 
 
 def _get_client_ip(request: Request) -> str:

@@ -17,6 +17,7 @@ import {
 	tasksApi,
 	workflowsApi,
 } from "@/services/api/work";
+import { startAction } from "@/services/telemetry/tracer";
 import type {
 	AgentCreate,
 	AgentUpdate,
@@ -613,7 +614,22 @@ export function usePromoteWorkflowMutation(
 			key: string;
 			description?: string;
 			intents?: string[];
-		}) => workflowsApi.promote(username, graphSlug, data),
+		}) => {
+			const action = startAction("plans", "promote", {
+				"invana.graph": `${username}/${graphSlug}`,
+				"invana.run_id": data.run_id,
+			});
+			return workflowsApi.promote(username, graphSlug, data, action).then(
+				(plan) => {
+					action.end("promoted");
+					return plan;
+				},
+				(err) => {
+					action.fail(err);
+					throw err;
+				},
+			);
+		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: ["workflows", username, graphSlug] });
 			qc.invalidateQueries({ queryKey: ["runs", username, graphSlug] });

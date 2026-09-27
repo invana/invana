@@ -130,11 +130,8 @@ import { sessionsApi } from "@/services/api/sessions";
 import { workflowsApi } from "@/services/api/work";
 import {
 	type Interaction,
-	type SpanAttributes,
-	endInteraction,
 	measureSync,
-	startInteraction,
-	withInteraction,
+	startAction,
 } from "@/services/telemetry/tracer";
 import type { Board, BoardVersionCause, CanvasStyling } from "@/types/board";
 import type { LensKind } from "@/types/govern";
@@ -1835,52 +1832,19 @@ export function GraphDetailPage() {
 	// heal path (CV16) would never be reached.
 	const snapshotTriedRef = useRef<Set<string>>(new Set());
 
-	// Open one `explorer.query.run` root per user trigger (run / rerun / restore),
-	// run `work` inside its context, and paint. Graph results flow on to
-	// layout+render, where the canvas bridge closes the root after the first
-	// painted frame; everything else (errors / NL / tabular) has nothing more to
-	// paint, so we close here in `finally`. `explorer.trigger` distinguishes the
-	// three entry points in HyperDX (docs/for-developers/modules/platform/features/telemetry.md). Running `work` inside the
-	// interaction's context makes its API call — and, via traceparent, the whole
-	// engine subtree — children of this span.
-	const runTraced = useCallback(
-		async (
-			trigger: "run" | "rerun" | "restore",
-			attributes: SpanAttributes,
-			work: () => Promise<QueryResponse | null>,
-		): Promise<QueryResponse | null> => {
-			const interaction = startInteraction("explorer.query.run", {
-				"explorer.trigger": trigger,
-				...attributes,
-			});
-			runRef.current = interaction;
-			try {
-				// A query run no longer paints — its result renders inline in the
-				// thread (docs/for-developers/modules/ask/features/the-answer-surface.md). The canvas pipeline is traced separately, on Load
-				// to canvas, so the run span just covers translate + execute.
-				return await withInteraction(interaction, work);
-			} catch (err) {
-				interaction.span.recordException(err as Error);
-				throw err;
-			} finally {
-				endInteraction(runRef, interaction);
-			}
-		},
-		[],
-	);
-
 	// Explicit projection of a graph result onto the canvas (docs/for-developers/modules/ask/features/the-answer-surface.md). Opens its
 	// own canvas-render trace; the canvas bridge closes it after the painted frame
 	// (the same mechanism the old auto-paint used).
 	const handleLoadToCanvas = useCallback(
 		(result: QueryResponse) => {
-			const interaction = startInteraction("explorer.query.run", {
-				"explorer.trigger": "load",
+			// `ui.explorer.load` spans transform → adapt → layout → render; the
+			// canvas bridge ends it after the first painted frame.
+			runRef.current = startAction("explorer", "load", {
+				"invana.graph": `${username}/${graphSlug}`,
 			});
-			runRef.current = interaction;
 			paintCanvas(result);
 		},
-		[paintCanvas],
+		[paintCanvas, username, graphSlug],
 	);
 
 	// Explicit "Load to canvas" click (docs/for-developers/modules/explore/features/boards.md): paint, then log a `load` turn in
@@ -1987,29 +1951,29 @@ export function GraphDetailPage() {
 		// A run with no active session creates one; detect that so the first
 		// result paints onto the new session's canvas when it lands.
 		const priorSessionId = activeSessionId;
-		await runTraced(
-			"run",
-			{
-				"explorer.mode": payload.mode,
-				"explorer.language": payload.mode === "ql" ? payload.language : "",
-			},
-			// `send` records the ask into a session (creating + opening one when
-			// none is active) and opens a run (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md). It returns as soon as
-			// the engine has accepted the ask; the result arrives on the run's
-			// stream and is handled by `handleStreamResult`.
-			async () => {
-				const { sessionId } = await send(payload, {
-					// The session exists now — open its canvas immediately (named after
-					// the session) so it's there while the query runs, not only after.
-					onSessionCreated: (s) => void openCanvasForNewSession(s.id, null),
-				});
-				restoredRef.current = sessionId;
-				if (sessionId && sessionId !== priorSessionId) {
-					pendingNewSessionsRef.current.add(sessionId);
-				}
-				return null;
-			},
-		);
+		// One trace from this click to the run's terminal frame: `send` passes the
+		// action to its requests and to the run stream, which ends it.
+		const action = startAction("assistant", "ask", {
+			"invana.graph": `${username}/${graphSlug}`,
+			"invana.ask.mode": payload.mode,
+			...(payload.mode === "ql"
+				? { "invana.ask.language": payload.language }
+				: {}),
+		});
+		// `send` records the ask into a session (creating + opening one when none
+		// is active) and opens a run. It returns as soon as the engine has
+		// accepted the ask; the result arrives on the run's stream and is handled
+		// by `handleStreamResult`.
+		const { sessionId } = await send(payload, {
+			action,
+			// The session exists now — open its canvas immediately (named after the
+			// session) so it's there while the query runs, not only after.
+			onSessionCreated: (s) => void openCanvasForNewSession(s.id, null),
+		});
+		restoredRef.current = sessionId;
+		if (sessionId && sessionId !== priorSessionId) {
+			pendingNewSessionsRef.current.add(sessionId);
+		}
 	};
 
 	// A query result landed on a run's stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): render it inline
@@ -2035,12 +1999,13 @@ export function GraphDetailPage() {
 			// because the saved snapshot was empty, paint the re-run result onto the
 			// canvas once it lands. A manual re-run just renders inline (Load to canvas).
 			if (trigger === "restore") pendingRestorePaintRef.current.add(messageId);
-			await runTraced(trigger, {}, async () => {
-				await rerun(messageId);
-				return null;
+			const action = startAction("assistant", "rerun", {
+				"invana.graph": `${username}/${graphSlug}`,
+				"invana.ask.trigger": trigger,
 			});
+			await rerun(messageId, action);
 		},
-		[runTraced, rerun],
+		[rerun, username, graphSlug],
 	);
 
 	// Restore a session's canvas when it is opened — **from the record first**

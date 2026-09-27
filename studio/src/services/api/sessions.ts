@@ -8,6 +8,7 @@
 
 import { request } from "@/services/api/client";
 import { type ApiThinkingStep, toRunNode } from "@/services/api/runs";
+import type { Interaction } from "@/services/telemetry/tracer";
 import type { QueryLanguage } from "@/types/graphs";
 import type { QueryResponse } from "@/types/query";
 import type {
@@ -272,11 +273,13 @@ export const sessionsApi = {
 		username: string,
 		graphSlug: string,
 		body?: SessionCreateBody,
+		action?: Interaction,
 	): Promise<Session> =>
 		toDetail(
 			await request<ApiDetail>(base(username, graphSlug), {
 				method: "POST",
 				body: JSON.stringify(body ?? {}),
+				action,
 			}),
 		),
 
@@ -304,6 +307,7 @@ export const sessionsApi = {
 		id: string,
 		body: SendMessageBody,
 		signal?: AbortSignal,
+		action?: Interaction,
 	): Promise<SendMessageResult> => {
 		const data = await request<ApiSendResponse>(
 			`${base(username, graphSlug)}/${id}/messages`,
@@ -311,6 +315,7 @@ export const sessionsApi = {
 				method: "POST",
 				body: JSON.stringify(body),
 				signal,
+				action,
 			},
 		);
 		return {
@@ -329,10 +334,11 @@ export const sessionsApi = {
 		id: string,
 		messageId: string,
 		signal?: AbortSignal,
+		action?: Interaction,
 	): Promise<{ message: SessionMessage; runId: string | null }> => {
 		const data = await request<ApiRerunResponse>(
 			`${base(username, graphSlug)}/${id}/messages/${messageId}/run`,
-			{ method: "POST", signal },
+			{ method: "POST", signal, action },
 		);
 		return {
 			message: toMessage(data.message),

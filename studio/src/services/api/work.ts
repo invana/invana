@@ -1,4 +1,5 @@
 import { request } from "@/services/api/client";
+import type { Interaction } from "@/services/telemetry/tracer";
 import type { EventListResponse } from "@/types/events";
 import type {
 	Agent,
@@ -413,9 +414,11 @@ export const workflowsApi = {
 			description?: string;
 			intents?: string[];
 		},
+		action?: Interaction,
 	) =>
 		request<TaskPlanDetail>(`${base(username, graphSlug)}/task-plans/promote`, {
 			method: "POST",
 			...json(data),
+			action,
 		}),
 };

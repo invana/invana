@@ -34,6 +34,7 @@ import {
 	TraceIdRatioBasedSampler,
 	WebTracerProvider,
 } from "@opentelemetry/sdk-trace-web";
+import { sampleRatio } from "./sampling";
 
 const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
@@ -47,15 +48,6 @@ const ENABLED = import.meta.env.VITE_TELEMETRY_ENABLED !== "false";
 // Opt-in via VITE_TELEMETRY_DEBUG=true. Otherwise dev still surfaces warnings /
 // errors (e.g. failed exports) and prod stays silent.
 const DEBUG = import.meta.env.VITE_TELEMETRY_DEBUG === "true";
-
-/**
- * Share of new traces to keep. Anything that is not a number between 0 and 1
- * keeps every trace, so a typo never silently turns tracing off.
- */
-export function sampleRatio(raw: string | undefined): number {
-	const ratio = raw?.trim() ? Number(raw) : Number.NaN;
-	return Number.isFinite(ratio) && ratio >= 0 && ratio <= 1 ? ratio : 1;
-}
 
 const SAMPLE_RATIO = sampleRatio(import.meta.env.VITE_TELEMETRY_SAMPLE_RATIO);
 

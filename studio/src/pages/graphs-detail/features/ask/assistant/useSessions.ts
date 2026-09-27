@@ -11,6 +11,7 @@ import {
 	type SessionUpdateBody,
 	sessionsApi,
 } from "@/services/api/sessions";
+import { type Action, startAction } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRunStore } from "@/stores/run.store";
 import type { QueryResponse, QueryRunPayload } from "@/types/query";
@@ -196,11 +197,17 @@ export function useSessions(
 	);
 
 	const openStream = useCallback(
-		(runId: string, sessionId: string, messageId: string) => {
-			if (!accessToken || streams.current.has(runId)) return;
+		(runId: string, sessionId: string, messageId: string, action?: Action) => {
+			// The action (an ask or a re-run) ends with the stream's outcome.
+			if (!accessToken || streams.current.has(runId)) {
+				action?.end("already_streaming");
+				return;
+			}
 			seed({ id: runId, sessionId, messageId });
 			const after = useRunStore.getState().views[runId]?.seq ?? 0;
 			const settle = (status: string) => {
+				if (status === "disconnected") action?.fail(new Error("stream lost"));
+				else action?.end(status);
 				streams.current.delete(runId);
 				qc.invalidateQueries({ queryKey: detailKey(sessionId) });
 				qc.invalidateQueries({ queryKey: listPrefix });
@@ -214,6 +221,7 @@ export function useSessions(
 			const handle = runsApi.stream(u, g, runId, {
 				token: accessToken,
 				after,
+				action,
 				onFrame: (e: AskFrame) => {
 					applyFrame(runId, e);
 					if (e.kind === "result") {
@@ -335,6 +343,9 @@ export function useSessions(
 			// returns), so the caller can spin up its canvas right away rather than
 			// waiting for the first result. Not called when reusing an open session.
 			onSessionCreated?: (session: Session) => void;
+			// The ask this send belongs to. It ends when the run's stream reaches
+			// its terminal frame, or here when the POST fails or starts no run.
+			action?: Action;
 		},
 	): Promise<{
 		sessionId: string | null;
@@ -364,17 +375,23 @@ export function useSessions(
 		};
 
 		let sessionId: string | null = activeSessionId;
+		const action = hooks?.action;
 		try {
 			if (!sessionId) {
 				// No open session — create one, then drop into it right away with the
 				// optimistic pair already in place (no list→detail wait). A modeller
 				// session carries its surface + (optional) model binding (docs/for-developers/modules/ask/spec.md).
-				const created = await sessionsApi.create(u, g, {
-					surface,
-					model_id: modelId,
-					title: titleFromMessage(payload.query),
-					...(draftWorldId ? { lens_id: draftWorldId } : {}),
-				});
+				const created = await sessionsApi.create(
+					u,
+					g,
+					{
+						surface,
+						model_id: modelId,
+						title: titleFromMessage(payload.query),
+						...(draftWorldId ? { lens_id: draftWorldId } : {}),
+					},
+					action,
+				);
 				setDraftWorldId(null);
 				sessionId = created.id;
 				patchDetail(sessionId, () => ({
@@ -404,8 +421,10 @@ export function useSessions(
 				sessionId,
 				toBody(payload, override),
 				controller.signal,
+				action,
 			);
 			const sid = sessionId;
+			action?.span.setAttribute("invana.session_id", sid);
 			// Swap the optimistic pair for the recorded rows — the reply now carries
 			// its run id and the queued plan (UC1).
 			patchDetail(sid, (prev) =>
@@ -424,7 +443,9 @@ export function useSessions(
 			);
 			qc.invalidateQueries({ queryKey: listPrefix });
 			if (resp.runId) {
-				openStream(resp.runId, sid, resp.assistantMessage.id);
+				openStream(resp.runId, sid, resp.assistantMessage.id, action);
+			} else {
+				action?.end("no_run");
 			}
 			return {
 				sessionId,
@@ -460,7 +481,11 @@ export function useSessions(
 						: prev,
 				);
 			}
-			if (stopped) return { sessionId, messageId: null, runId: null };
+			if (stopped) {
+				action?.end("stopped");
+				return { sessionId, messageId: null, runId: null };
+			}
+			action?.fail(err);
 			throw err;
 		} finally {
 			abortRef.current = null;
@@ -471,9 +496,16 @@ export function useSessions(
 	// Re-run a reply's query: a new run on the same ask (docs/for-developers/modules/ask/spec.md
 	// rethink). The reply's step list is replaced by the new run's; the result
 	// arrives on `onResult` like a first run.
-	const rerun = async (messageId: string): Promise<string | null> => {
-		if (!activeSessionId) return null;
+	const rerun = async (
+		messageId: string,
+		action?: Action,
+	): Promise<string | null> => {
+		if (!activeSessionId) {
+			action?.end("no_session");
+			return null;
+		}
 		const id = activeSessionId;
+		action?.span.setAttribute("invana.session_id", id);
 		setSending(true);
 		try {
 			const { message, runId } = await sessionsApi.rerunMessage(
@@ -481,6 +513,8 @@ export function useSessions(
 				g,
 				id,
 				messageId,
+				undefined,
+				action,
 			);
 			patchDetail(id, (prev) =>
 				prev
@@ -492,8 +526,12 @@ export function useSessions(
 						}
 					: prev,
 			);
-			if (runId) openStream(runId, id, messageId);
+			if (runId) openStream(runId, id, messageId, action);
+			else action?.end("no_run");
 			return runId;
+		} catch (err) {
+			action?.fail(err);
+			throw err;
 		} finally {
 			setSending(false);
 		}
@@ -547,7 +585,15 @@ export function useSessions(
 	// aborted too.
 	const stop = () => {
 		abortRef.current?.abort();
-		if (liveRun) void runsApi.cancel(u, g, liveRun.id);
+		if (!liveRun) return;
+		const action = startAction("runs", "cancel", {
+			"invana.graph": `${u}/${g}`,
+			"invana.run_id": liveRun.id,
+		});
+		runsApi.cancel(u, g, liveRun.id, action).then(
+			() => action.end("requested"),
+			(err) => action.fail(err),
+		);
 	};
 
 	// Refetch from the engine — the list always, plus the open thread when one

@@ -9,12 +9,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { API_BASE_URL, request } from "@/services/api/client";
+import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";
 import type { Emission, EmissionKind, TemplateOffer } from "@/types/emission";
 import type { QueryResponse } from "@/types/query";
 import type { AskFrame, RunNode, RunNodeStatus, RunStatus } from "@/types/run";
 import type { SessionMessage } from "@/types/session";
 import type { OfferedRule } from "@/types/skills";
 import type { ThinkingListResponse } from "@/types/work";
+import { ROOT_CONTEXT } from "@opentelemetry/api";
 
 // ── Wire DTOs ────────────────────────────────────────────────────────────────
 
@@ -207,10 +209,15 @@ export const runsApi = {
 		}),
 
 	/** Stop run (UC9). */
-	cancel: (username: string, graphSlug: string, id: string) =>
+	cancel: (
+		username: string,
+		graphSlug: string,
+		id: string,
+		action?: Interaction,
+	) =>
 		request<{ id: string; status: RunStatus }>(
 			`${base(username, graphSlug)}/${id}/cancel`,
-			{ method: "POST" },
+			{ method: "POST", action },
 		),
 
 	/**
@@ -225,13 +232,17 @@ export const runsApi = {
 		opts: {
 			token: string;
 			after: number;
+			/** The action this tail belongs to; its trace continues on the stream. */
+			action?: Interaction;
 			onFrame: (e: AskFrame) => void;
 			onError?: () => void;
 		},
 	): ThinkingStreamHandle => {
-		const url =
+		const url = withTraceparent(
 			`${API_BASE_URL}${base(username, graphSlug)}/${id}/stream` +
-			`?after=${opts.after}&token=${encodeURIComponent(opts.token)}`;
+				`?after=${opts.after}&token=${encodeURIComponent(opts.token)}`,
+			opts.action?.ctx ?? ROOT_CONTEXT,
+		);
 		const es = new EventSource(url);
 		const handle = { close: () => es.close() };
 		const onFrame = (ev: MessageEvent<string>) => {

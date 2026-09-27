@@ -97,7 +97,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Studio action spans | `ui.<module>.<action>` — the module names of [module-structure.md](../../../module-structure.md) §2: `ui.assistant.ask` · `ui.plans.promote` · `ui.runs.cancel` · `ui.boards.open` · `ui.explorer.query` |
+| Studio action spans | `ui.<module>.<action>` — the module names of [module-structure.md](../../../module-structure.md) §2: `ui.assistant.ask` · `ui.assistant.rerun` · `ui.explorer.load` · `ui.runs.cancel` · `ui.plans.promote` · `ui.events.subscribe`; `ui.boards.open` lands with the Boards view panel |
 | HyperDX | one service map and one trace view across `invana-studio` and `invana-engine` |
 | A run's page | its trace id, opening the trace in the collector's UI |
 
@@ -106,7 +106,7 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | Transport | OTLP gRPC; `INVANA_TELEMETRY_OTLP_ENDPOINT` · `INVANA_TELEMETRY_SAMPLE_RATIO` (0–1, default 1.0) · resource attributes from settings |
-| HTTP | pure ASGI middleware; `traceparent` from the header, else from the `traceparent` query parameter; query string recorded with `token` removed; every `/api/v1/telemetry/` proxy path not traced; the only source of request spans |
+| HTTP | pure ASGI middleware; `traceparent` (and `tracestate`) from the header, else from the query parameters of the same name — the header wins; query string recorded with `token` removed; every `/api/v1/telemetry/` proxy path not traced; the only source of request spans |
 | Attributes | `enduser.id` · `invana.principal` (`user · agent · system · external · anonymous`) · `invana.on_behalf_of` · `invana.origin` (`studio · api · cli · schedule · startup · daemon`) · `invana.graph` · `invana.run_id` |
 | Runs | `invana.run` per TaskRun (`run_id` · `agent_id` · `role` · `kind`), `invana.run.step` per Task (`task_key` · `step_key`); queue wait as a span event |
 | Graph · model · SQL | `graph.query.*` · `llm.generate` · SQLAlchemy spans, nested under the step that caused them |
@@ -122,10 +122,11 @@ flowchart TD
 | Providers | traces (`WebTracerProvider`, parent-based sampler on `VITE_TELEMETRY_SAMPLE_RATIO`), metrics and logs — service `invana-studio`, exported through `/api/v1/telemetry/{traces,metrics,logs}` |
 | Web Vitals | the `web-vitals` package, recorded as `ui.web_vitals.*` |
 | Errors | a global handler for uncaught errors and unhandled rejections, an error boundary per region, and the query client's error hook — each an OTLP log with the active trace id |
-| Actions | `startAction(module, action)` opens the root; the handle ends it on the outcome — the terminal stream frame for an ask, the response for a write |
+| Actions | `startAction(module, action)` opens a new root; the handle's `end(outcome)` / `fail(err)` ends it once, recording `invana.outcome` — the terminal stream frame for an ask or a re-run (`run.done` · `run.cancelled` · `clarification.requested`; a lost stream is an error), the response for a write |
 | Requests | every API call is a client span, parented explicitly by the action passed in the request config — never by a shared "current action" slot |
-| Streams | `traceparent` appended to every `EventSource` URL |
-| Attributes | `enduser.id` · `invana.graph` · `invana.session_id` on action spans; never record contents |
+| Streams | `traceparent` appended to every `EventSource` URL — a run's tail carries its action's; the events tail, which nobody clicked, opens a `ui.events.subscribe` root that ends when the connection opens or fails |
+| Attributes | `enduser.id` · `invana.graph` (`user/graph`) · `invana.session_id` · `invana.run_id` · `invana.outcome` on action spans; never record contents |
+| Tests | Vitest in Node (`pnpm test`), spans captured by an in-memory exporter |
 
 ## Metrics
 

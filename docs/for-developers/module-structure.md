@@ -244,19 +244,18 @@ never share a spelling.
 
 ## 5b. Comments
 
-Every file a phase touches leaves with its comments trimmed. Today about 23% of the engine's
-non-blank lines and 16% of Studio's are comments, many of them multi-paragraph essays that restate a
-feature file.
+Every file a phase touches leaves its model and column comments trimmed. Module, class and method
+docstrings stay full — they are how a reader learns to use the code.
 
 | Rule | Detail |
 |---|---|
-| One or two lines | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
-| Cite, don't restate | The reasoning lives in `docs/for-developers/`; a comment points at it by decision id — `# Refused before the wire (GV3).` |
+| Inline comments | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
+| Standalone | Code documentation reads without the docs: never cite a decision id (`GV3`, `TE14`) in code or tests |
 | Models and columns | A column gets a comment only when its name cannot carry its meaning — a unit, an enum's source, a nullable's meaning |
-| Querysets and managers | The class gets one line on what it owns; a method gets one only when its contract is not in its name and signature |
-| Components | One line above the export if the name is not enough. No header essays |
+| Classes and methods | A docstring on usage and design — what it is for, how to call it, what it guarantees |
+| Components | A docblock on usage when the name and props are not enough |
 | No history | Never "used to be", "was renamed from", "no longer". Git holds history |
-| Module docstring | One line naming the module and its feature file, or nothing |
+| Module docstring | What the module does and how it is used; a design note and what it emits when that helps — `core/telemetry/middleware.py` is the model |
 
 ## 6. Retired words still in Studio
 

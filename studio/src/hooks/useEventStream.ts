@@ -12,6 +12,7 @@
  * reads that as an Authorization fallback on SSE endpoints only.
  */
 
+import { startAction, withTraceparent } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -62,7 +63,19 @@ export function useEventStream(props: Props): void {
 			scope === "graph" && username && graphSlug
 				? `/api/v1/u/${username}/${graphSlug}/events/stream`
 				: "/api/v1/events/stream";
-		const url = `${BASE_URL}${path}?token=${encodeURIComponent(accessToken)}`;
+		// Nobody clicked for this tail, so it opens its own short root: the span
+		// ends when the connection opens or fails, and the engine's stream span
+		// joins its trace through the URL's `traceparent`.
+		const subscribe = startAction("events", "subscribe", {
+			"invana.stream": "events",
+			...(username && graphSlug
+				? { "invana.graph": `${username}/${graphSlug}` }
+				: {}),
+		});
+		const url = withTraceparent(
+			`${BASE_URL}${path}?token=${encodeURIComponent(accessToken)}`,
+			subscribe.ctx,
+		);
 
 		const key =
 			scope === "graph"
@@ -75,7 +88,9 @@ export function useEventStream(props: Props): void {
 
 		es.addEventListener("row", invalidate);
 		es.addEventListener("lost", invalidate);
+		es.onopen = () => subscribe.end("open");
 		es.onerror = () => {
+			subscribe.fail(new Error("event stream error"));
 			// Browser auto-reconnects EventSource on transient drops; we leave
 			// the retry policy to it. (Future: cap retries + fallback to polling.)
 		};
@@ -84,6 +99,7 @@ export function useEventStream(props: Props): void {
 			es.removeEventListener("row", invalidate);
 			es.removeEventListener("lost", invalidate);
 			es.close();
+			subscribe.end("closed");
 		};
 	}, [enabled, accessToken, queryClient, scope, username, graphSlug]);
 }

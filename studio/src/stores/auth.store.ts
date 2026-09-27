@@ -9,6 +9,7 @@
  */
 
 import { registerAuthAccess } from "@/services/api/client";
+import { registerTelemetryUser } from "@/services/telemetry/tracer";
 import type { AuthUser } from "@/types/auth";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -60,6 +61,8 @@ export const useAuthStore = create<AuthState>()(
 
 // Wire the axios interceptors to read/refresh from this store.
 // Done at module load so it's ready before any request fires.
+registerTelemetryUser(() => useAuthStore.getState().user?.id);
+
 registerAuthAccess({
 	getAccessToken: () => useAuthStore.getState().accessToken,
 	getRefreshToken: () => useAuthStore.getState().refreshToken,
