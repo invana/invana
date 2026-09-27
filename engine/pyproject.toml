@@ -41,8 +41,9 @@ telemetry = [
     "opentelemetry-sdk>=1.25",
     "opentelemetry-exporter-otlp-proto-grpc>=1.25",
     "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
-    # Note: the browser-span proxy route (docs/for-developers/modules/platform/features/telemetry.md) forwards OTLP/HTTP via httpx,
-    # which is a core dependency (see [project].dependencies) — not repeated here.
+    # Outgoing HTTP (model providers) as client spans. httpx itself is a core
+    # dependency (see [project].dependencies) — not repeated here.
+    "opentelemetry-instrumentation-httpx>=0.46b0",
 ]
 all = [
     "invana-engine[server]",

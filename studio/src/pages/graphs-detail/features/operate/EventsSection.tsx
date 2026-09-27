@@ -253,7 +253,12 @@ function DetailsView({ event }: { event: AuditEvent }) {
 		event.trace_id
 			? {
 					label: "trace",
-					value: <TraceIdValue id={event.trace_id} />,
+					value: (
+						<TraceIdValue
+							id={event.trace_id}
+							window={{ start: event.created_at, end: event.created_at }}
+						/>
+					),
 				}
 			: {
 					label: "trace",

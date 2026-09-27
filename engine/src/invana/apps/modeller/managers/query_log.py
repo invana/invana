@@ -5,6 +5,12 @@ which only queues it. ``run`` drains the queue in batches, works out each
 query's shape and what it touched, and inserts the rows in its own session. A
 full queue drops the row; a failed batch is logged. Neither reaches the query.
 
+Each batch written is its own trace: a ``system.query_log`` root span (origin
+``daemon``) with ``invana.query_log.batch`` the batch size, linked to the span
+each query was asked in — the queue carries that context on the query, so a
+row's write is reachable from the request or run that caused it without the
+write joining that trace. A prune is a ``system.query_log.prune`` root span.
+
 A shape is explained once — the first time this process sees it, with that
 call's own parameters (MP38) — and the plan is kept for later calls of it.
 The explained row carries the plan's lines so the shape card can read them.
@@ -23,6 +29,7 @@ from typing import TYPE_CHECKING
 from invana.apps.modeller.models import GraphQueryLog
 from invana.apps.modeller.query_shapes import shape_of
 from invana.apps.modeller.querysets.graph_query_log import GraphQueryLogQuerySet
+from invana.core.telemetry.spans import mark_error, root_span
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -37,11 +44,43 @@ logger = logging.getLogger(__name__)
 RETENTION = timedelta(days=90)
 _BATCH = 200
 _PLANS_KEPT = 2000
+#: OpenTelemetry's default cap on links per span; more are dropped by the SDK.
+_LINKS_KEPT = 128
 
 ConnectorFor = Callable[[str], Awaitable["BaseConnector | None"]]
 
 
+def _distinct_links(batch: list[ObservedQuery]) -> list:
+    """The batch's producer span contexts, one per span, at most ``_LINKS_KEPT``.
+
+    A span context is not hashable (its trace state is a mapping), so it is
+    told apart by its trace and span ids.
+    """
+    seen: dict[tuple[int, int], object] = {}
+    for q in batch:
+        ctx = q.span_context
+        if ctx is not None and len(seen) < _LINKS_KEPT:
+            seen.setdefault((ctx.trace_id, ctx.span_id), ctx)
+    return list(seen.values())
+
+
 class QueryLogWriter:
+    """Queues finished queries and writes them to the query log in batches.
+
+    Usage
+    -----
+        writer = QueryLogWriter(session_factory, connector_for)
+        set_query_observer(writer.submit)        # the connector hands queries over
+        task = asyncio.create_task(writer.run())  # drains forever
+        ...
+        await writer.drain()                      # a test or caller reading rows back
+
+    ``submit`` never blocks or raises; ``write`` and ``prune`` log a failure and
+    carry on. Each write and prune opens its own root span, because the task
+    that runs them is started once and would otherwise attach every batch to
+    whatever trace was current at that moment.
+    """
+
     def __init__(
         self,
         session_factory: async_sessionmaker[AsyncSession],
@@ -85,21 +124,43 @@ class QueryLogWriter:
             await self.write(batch)
 
     async def write(self, batch: list[ObservedQuery]) -> None:
-        try:
-            rows = [await self._row(q) for q in batch]
-            async with self._factory() as session:
-                await self._log.add_many(session, rows)
-                await session.commit()
-        except Exception:
-            logger.warning("%d graph queries were not logged", len(batch), exc_info=True)
+        """Insert one batch of rows in its own session, inside its own trace.
+
+        The ``system.query_log`` root span links to the span each query was
+        asked in — the first ``_LINKS_KEPT`` distinct ones, the SDK's cap — so
+        the write can be found from the query without joining its trace. A
+        failure is logged, marks the span failed, and is not raised.
+        """
+        links = _distinct_links(batch)
+        with root_span(
+            "system.query_log",
+            origin="daemon",
+            attributes={"invana.query_log.batch": len(batch)},
+            links=links,
+        ) as s:
+            try:
+                rows = [await self._row(q) for q in batch]
+                async with self._factory() as session:
+                    await self._log.add_many(session, rows)
+                    await session.commit()
+            except Exception as exc:
+                mark_error(s, exc)
+                logger.warning("%d graph queries were not logged", len(batch), exc_info=True)
 
     async def prune(self) -> None:
-        try:
-            async with self._factory() as session:
-                await self._log.prune(session, datetime.now(UTC) - RETENTION)
-                await session.commit()
-        except Exception:
-            logger.warning("The query log was not pruned", exc_info=True)
+        """Delete rows older than ``RETENTION``, inside its own trace.
+
+        A failure is logged, marks the ``system.query_log.prune`` span failed,
+        and is not raised.
+        """
+        with root_span("system.query_log.prune", origin="daemon") as s:
+            try:
+                async with self._factory() as session:
+                    await self._log.prune(session, datetime.now(UTC) - RETENTION)
+                    await session.commit()
+            except Exception as exc:
+                mark_error(s, exc)
+                logger.warning("The query log was not pruned", exc_info=True)
 
     async def _row(self, q: ObservedQuery) -> GraphQueryLog:
         shape_hash, shape_text = shape_of(q.query)

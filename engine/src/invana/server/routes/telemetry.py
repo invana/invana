@@ -8,7 +8,10 @@ JSON). Export failures are swallowed: telemetry must never surface as a
 user-visible error.
 
 Always mounted (see server/app.py) and skipped by TelemetryMiddleware (see
-core/telemetry/middleware.py) so the proxy never traces itself.
+core/telemetry/middleware.py) so the proxy never traces itself. Its own forward
+to the collector is not traced either: it runs with instrumentation suppressed,
+or the httpx instrumentation would turn every browser batch into a root span of
+its own — telemetry about shipping telemetry.
 With ``settings.telemetry_enabled`` off there is nothing to forward to, so the
 batch is accepted and dropped — the studio runs on its own gate, and a missing
 route would answer every batch with a 404 the browser console reports as an
@@ -18,12 +21,18 @@ error.
 from __future__ import annotations
 
 import logging
+from contextlib import nullcontext
 from http import HTTPStatus
 
 import httpx
 from fastapi import APIRouter, Request, Response
 
 from invana.core.settings import settings
+
+try:
+    from opentelemetry.instrumentation.utils import suppress_instrumentation
+except ImportError:  # telemetry extra not installed — nothing to suppress
+    suppress_instrumentation = nullcontext
 
 logger = logging.getLogger("invana.telemetry")
 
@@ -48,12 +57,13 @@ async def proxy_traces(request: Request) -> Response:
 
     content_type = request.headers.get("content-type", "application/x-protobuf")
     try:
-        async with httpx.AsyncClient(timeout=_UPSTREAM_TIMEOUT_S) as client:
-            upstream = await client.post(
-                settings.telemetry_otlp_http_endpoint,
-                content=body,
-                headers={"content-type": content_type},
-            )
+        with suppress_instrumentation():
+            async with httpx.AsyncClient(timeout=_UPSTREAM_TIMEOUT_S) as client:
+                upstream = await client.post(
+                    settings.telemetry_otlp_http_endpoint,
+                    content=body,
+                    headers={"content-type": content_type},
+                )
     except httpx.HTTPError as exc:
         # Collector down / unreachable — drop the batch rather than fail the page.
         logger.warning("Telemetry proxy: collector unreachable — %s", exc)

@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 import asyncpg
 
 from invana.core.settings import settings
+from invana.core.telemetry.spans import root_span, set_current
 
 log = logging.getLogger(__name__)
 
@@ -110,7 +111,15 @@ class EventBroadcaster:
     # ── LISTEN loop ────────────────────────────────────────────────────────
 
     async def _run(self) -> None:
-        """Open a dedicated asyncpg connection, LISTEN, fan out forever."""
+        """Open a dedicated asyncpg connection, LISTEN, fan out forever.
+
+        Each connect attempt — the connect and the ``add_listener``, not the
+        park that follows nor the backoff sleep — is its own trace: a
+        ``system.events_listen`` root span (origin ``daemon``) with
+        ``invana.outcome`` ``ok`` or ``failed``. The task is started during
+        startup, so a root of its own keeps a reconnect hours later off the
+        startup trace.
+        """
         # Build a direct asyncpg DSN from the async SQLAlchemy URL. We bypass
         # SQLAlchemy here because asyncpg's LISTEN/NOTIFY is connection-scoped
         # and SQLAlchemy's session is unsuited to long-lived listeners.
@@ -121,8 +130,15 @@ class EventBroadcaster:
         backoff = 1.0
         while True:
             try:
-                self._conn = await asyncpg.connect(dsn=dsn)
-                await self._conn.add_listener("events", self._on_notify)
+                with root_span("system.events_listen", origin="daemon"):
+                    # The error itself is recorded as it leaves the span.
+                    try:
+                        self._conn = await asyncpg.connect(dsn=dsn)
+                        await self._conn.add_listener("events", self._on_notify)
+                    except Exception:
+                        set_current(**{"invana.outcome": "failed"})
+                        raise
+                    set_current(**{"invana.outcome": "ok"})
                 log.info("EventBroadcaster: LISTEN events established")
                 backoff = 1.0
                 # Stay parked here forever; the listener fires in the

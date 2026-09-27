@@ -27,6 +27,7 @@ from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
+from invana.core.telemetry.spans import add_event, mark_error, root_span, set_current
 from invana.core.utils import import_class_from_dotted_path
 from invana.graph.types.capabilities import CompatibilityStatus, Version
 
@@ -271,6 +272,13 @@ class ConnectionPool:
 
         Always re-fetches the graph from DB so it picks up any URI/auth
         changes made while the retry loop was sleeping.
+
+        Each attempt is its own trace — a ``system.graph_reconnect`` root span
+        (origin ``daemon``) opened after the sleep, carrying the Graph's and the
+        connection's ids and an ``invana.outcome`` of ``ok`` or ``failed``. The
+        task was spawned inside whatever span was current then (startup, a
+        health sweep, a request), so without a root of its own every attempt it
+        ever makes would hang off that one trace.
         """
         delay = 1
         while True:
@@ -279,64 +287,102 @@ class ConnectionPool:
             except asyncio.CancelledError:
                 return  # deregister() or reconnect() cancelled us
 
-            async with self._session_factory() as session:
-                fresh_graph = await GraphConnectionQuerySet().get(session, graph.id)
+            with root_span(
+                "system.graph_reconnect",
+                origin="daemon",
+                attributes={"invana.graph_id": graph.graph_id, "invana.connection_id": graph.id},
+            ) as attempt:
+                async with self._session_factory() as session:
+                    fresh_graph = await GraphConnectionQuerySet().get(session, graph.id)
 
-            if fresh_graph is None or fresh_graph.status == "INACTIVE":
-                self._retry_tasks.pop(graph.id, None)
-                return  # graph deleted or disabled — stop retrying
+                if fresh_graph is None or fresh_graph.status == "INACTIVE":
+                    set_current(**{"invana.outcome": "stopped"})
+                    self._retry_tasks.pop(graph.id, None)
+                    return  # graph deleted or disabled — stop retrying
 
-            try:
-                await self._connect_graph(fresh_graph)
-                self._retry_tasks.pop(graph.id, None)
-                return  # success
-            except Exception:
-                delay = min(delay * 2, settings.graph_retry_max_interval_s)
-                logger.debug("Graph %r retry in %ds.", graph.id, delay)
+                set_current(**{"invana.graph_id": fresh_graph.graph_id or graph.graph_id})
+                try:
+                    await self._connect_graph(fresh_graph)
+                    # _connect_graph records a failure itself rather than raising.
+                    if fresh_graph.id not in self._registry:
+                        raise RuntimeError("connection attempt failed")
+                    set_current(**{"invana.outcome": "ok"})
+                    self._retry_tasks.pop(graph.id, None)
+                    return  # success
+                except Exception as exc:
+                    set_current(**{"invana.outcome": "failed"})
+                    mark_error(attempt, exc)
+                    delay = min(delay * 2, settings.graph_retry_max_interval_s)
+                    logger.debug("Graph %r retry in %ds.", graph.id, delay)
 
     # -----------------------------------------------------------------------
     # Internal — health loop
     # -----------------------------------------------------------------------
 
     async def _health_loop(self) -> None:
-        """Ping all ACTIVE connectors every ``graph_health_interval_s`` seconds."""
+        """Ping all ACTIVE connectors every ``graph_health_interval_s`` seconds.
+
+        Each sweep is its own trace — a ``system.graph_health`` root span (origin
+        ``daemon``) opened after the sleep, with ``invana.graph.connections`` the
+        number of connectors checked and ``invana.outcome`` ``ok`` or ``degraded``
+        when any check failed. A failed check is an event on that span, not an
+        exception: the loop handles it (ERROR status, a backoff retry) and keeps
+        going. An empty registry opens no span, so an idle engine does not emit
+        one every interval.
+        """
         while True:
             try:
                 await asyncio.sleep(settings.graph_health_interval_s)
             except asyncio.CancelledError:
                 return  # shutdown() cancelled us
 
-            for graph_id in list(self._registry.keys()):  # snapshot to allow mid-loop mutation
-                connector = self._registry.get(graph_id)
-                if connector is None:
-                    continue
-                try:
-                    t0 = time.monotonic()
-                    # health_check() returns False (not raises) on failure — treat
-                    # an unhealthy result as an error so the connection drops to
-                    # ERROR + retry instead of wrongly staying ACTIVE.
-                    if not await connector.health_check():
-                        raise RuntimeError("connection health check reported unhealthy")
-                    latency_ms = int((time.monotonic() - t0) * 1000)
+            if not self._registry:
+                continue
+            with root_span(
+                "system.graph_health",
+                origin="daemon",
+                attributes={"invana.graph.connections": len(self._registry)},
+            ):
+                failed = await self._health_sweep()
+                set_current(**{"invana.outcome": "degraded" if failed else "ok"})
 
-                    async with self._session_factory() as session:
-                        await GraphConnectionQuerySet().set_status(session, graph_id, "ACTIVE", latency_ms=latency_ms)
-                        await session.commit()
+    async def _health_sweep(self) -> int:
+        """Check every registered connector once; return how many failed."""
+        failed = 0
+        for graph_id in list(self._registry.keys()):  # snapshot to allow mid-loop mutation
+            connector = self._registry.get(graph_id)
+            if connector is None:
+                continue
+            try:
+                t0 = time.monotonic()
+                # health_check() returns False (not raises) on failure — treat
+                # an unhealthy result as an error so the connection drops to
+                # ERROR + retry instead of wrongly staying ACTIVE.
+                if not await connector.health_check():
+                    raise RuntimeError("connection health check reported unhealthy")
+                latency_ms = int((time.monotonic() - t0) * 1000)
 
-                except Exception as exc:
-                    logger.warning("Health check failed for graph %r: %s", graph_id, exc)
-                    self._registry.pop(graph_id, None)
+                async with self._session_factory() as session:
+                    await GraphConnectionQuerySet().set_status(session, graph_id, "ACTIVE", latency_ms=latency_ms)
+                    await session.commit()
 
-                    async with self._session_factory() as session:
-                        graph = await GraphConnectionQuerySet().get(session, graph_id)
-                        await GraphConnectionQuerySet().set_status(session, graph_id, "ERROR")
-                        await session.commit()
+            except Exception as exc:
+                failed += 1
+                logger.warning("Health check failed for graph %r: %s", graph_id, exc)
+                add_event("graph.health.failed", {"invana.connection_id": graph_id, "error": type(exc).__name__})
+                self._registry.pop(graph_id, None)
 
-                    if graph:
-                        existing = self._retry_tasks.pop(graph_id, None)
-                        if existing:
-                            existing.cancel()
-                        self._retry_tasks[graph_id] = asyncio.create_task(self._backoff_retry(graph))
+                async with self._session_factory() as session:
+                    graph = await GraphConnectionQuerySet().get(session, graph_id)
+                    await GraphConnectionQuerySet().set_status(session, graph_id, "ERROR")
+                    await session.commit()
+
+                if graph:
+                    existing = self._retry_tasks.pop(graph_id, None)
+                    if existing:
+                        existing.cancel()
+                    self._retry_tasks[graph_id] = asyncio.create_task(self._backoff_retry(graph))
+        return failed
 
     # -----------------------------------------------------------------------
     # Introspection

@@ -9,7 +9,7 @@ the engine behave identically.
 |---|---|
 | Index | [13.5](../../../README.md#13--platform) · Slice **S1** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | 🟡 / 🔵 / 🔵 |
+| API / CLI / Studio | 🟡 / 🟡 / 🟡 |
 | Related | [logging](logging.md) · [observability](../../operate/features/observability.md) · [audit-and-activity](../../operate/features/audit-and-activity.md) · [runtime](runtime.md) |
 
 > **As** whoever operates this, **I want** one trace to follow a person's action from Studio through
@@ -111,9 +111,11 @@ flowchart TD
 | Who, on a request | the middleware starts every request `anonymous` from `api`; authentication sets `enduser.id` and principal `user`, with origin `studio` for a session token and `api` for a personal access token; resolving a Graph URL sets `invana.graph` and `invana.graph_id` |
 | Runs | `invana.run` per run (`invana.run_id` · `invana.agent_id` · `invana.run.role` · `invana.run.kind` · `invana.run.triggered_by` · `invana.graph_id` · principal `agent` or `user` · `invana.on_behalf_of` · `invana.outcome`); `invana.run.step` per attempt (`invana.task_key` · `invana.step_key` · `invana.run.attempt` · `invana.outcome`). Cannot-answer, conversed and needs-input are outcomes, not errors; a failed step or crashed run is an error; a cancelled run is outcome `cancelled`. Queue wait is the `run.queued` and `run.admitted` events on the run span |
 | Graph · model · SQL | `graph.query.*` · `llm.generate` · SQLAlchemy spans, nested under the step that caused them |
+| Outgoing HTTP | every httpx call is a client span under whatever caused it — a model provider's request under its step; the telemetry proxy's forward to the collector is not traced, or every browser batch would become a root |
 | Records | `task_runs.trace_id` — read off the current span at insert, else filled when the run's span opens · `task_runs.root_span_id` — the run's `invana.run` span; the first run span wins, so a resumed run keeps both; a step row has `trace_id` only. `events.trace_id` · `events.span_id` — filled by `emit` from the current span, never passed by a caller; null outside any span. `trace_id` is on `GET …/runs/{id}` and `GET …/runs/{id}/trace`, `span_id` on every event read |
-| Roots nobody clicked | `system.<loop>` per iteration · `system.startup` · `system.schedule` · `cli.<command>` — each a new trace (`context=Context()`), never a child of whatever scheduled it |
-| Queues | a producer's span context rides the item; the consumer's span Links to it |
+| Roots nobody clicked | each a new trace (`context=Context()`), never a child of whatever spawned it, principal `system` unless said: `system.startup` (origin `startup`) — connecting the Graphs, seeding, the sweep that fails runs a dead process left mid-flight · `system.graph_health` per health sweep (`invana.graph.connections`; outcome `ok` · `degraded`, a failed check an event on it; an empty registry opens none) · `system.graph_reconnect` per reconnect attempt (`invana.graph_id` · `invana.connection_id`; `ok` · `failed` · `stopped`) · `system.events_listen` per LISTEN connect · `system.query_log` per batch written and `system.query_log.prune` — all origin `daemon` · `cli.<command path>` (origin `cli`, principal `user`, `invana.cli.command`) · `system.schedule` when a scheduler fires, which lands with the scheduler |
+| CLI | the root group opens `cli.users.create` and the like — never for `start`, which traces as a server, or `--help`; SQLAlchemy is instrumented process-wide, and the three signals are flushed on exit within 5 seconds |
+| Queues | a producer's span context rides the item; the consumer's span Links to it — a logged graph query carries the span it was asked in, and `system.query_log` links to each (at most 128 per batch) |
 | Logs | a logging filter sets `trace_id` / `span_id` on every record — plain shows `[trace_id span_id]` inside a span, JSON adds both fields; uvicorn's access log has `token` stripped |
 
 ## Studio
@@ -127,7 +129,7 @@ flowchart TD
 | Requests | every API call is a client span, parented explicitly by the action passed in the request config — never by a shared "current action" slot |
 | Streams | `traceparent` appended to every `EventSource` URL — a run's tail carries its action's; the events tail, which nobody clicked, opens a `ui.events.subscribe` root that ends when the connection opens or fails |
 | Attributes | `enduser.id` · `invana.graph` (`user/graph`) · `invana.session_id` · `invana.run_id` · `invana.outcome` on action spans; never record contents |
-| Trace link | `VITE_TELEMETRY_TRACE_URL` — the collector's trace view with `{trace_id}` in it; the compose stack points it at HyperDX |
+| Trace link | `VITE_TELEMETRY_TRACE_URL` — the collector's trace view with `{trace_id}`, and optionally `{from}` · `{to}` (epoch ms): the record's time ± 15 minutes — a run's start to its finish, or to now while it runs; the last day when nothing says when. The compose stack points it at HyperDX search (`isLive=false`) |
 | Tests | Vitest in Node (`pnpm test`), spans captured by an in-memory exporter |
 
 ## Metrics
@@ -194,9 +196,9 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE20 | Studio measures Web Vitals with the `web-vitals` package. |
 | TE21 | Studio sends errors only — uncaught errors, unhandled rejections, error boundaries, failed queries. Warnings and console output stay in the browser. |
 | TE22 | The proxy has three routes — traces, metrics, logs — always mounted, each accepting and dropping when engine telemetry is off (TE6). |
-| TE23 | The CLI emits the same three signals under `cli.<command>` and flushes them before it exits. |
+| TE23 | The CLI emits the same three signals under `cli.<command>` and flushes them before it exits. The person at the shell is principal `user` with no `enduser.id` — the CLI holds no session to name them. |
 | TE24 | The seeded HyperDX dashboards are grouped like the modules — API · Runs · LLMs · Graph queries · System · Studio — with one cross-service trace view. |
-| TE25 | Studio links a trace id to the collector through one URL template, `VITE_TELEMETRY_TRACE_URL`. Without it the id is shown and not linked — Studio never guesses a collector. |
+| TE25 | Studio links a trace id to the collector through one URL template, `VITE_TELEMETRY_TRACE_URL`, opening on the record's own time range, because a collector searches a window and not all of history. Without the template the id is shown and not linked — Studio never guesses a collector. |
 
 ## Not building
 

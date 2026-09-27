@@ -19,6 +19,11 @@ Usage
         add_event("run.queued", {"position": 2})
         ...
 
+    # Work nobody clicked — a loop iteration, startup, a CLI command — starts
+    # its own trace instead of joining whatever happened to be current.
+    with root_span("system.graph_health", origin="daemon"):
+        ...
+
     # The ids a record stores so it opens the trace it was written in.
     trace_id, span_id = current_ids()
 
@@ -34,11 +39,13 @@ from typing import Any
 
 try:
     from opentelemetry import trace as _trace
+    from opentelemetry.context import Context as _Context
     from opentelemetry.trace import Link as _Link
     from opentelemetry.trace import Status as _Status
     from opentelemetry.trace import StatusCode as _StatusCode
 except ImportError:  # telemetry extra not installed
     _trace = None
+    _Context = None
     _Link = None
     _Status = None
     _StatusCode = None
@@ -76,6 +83,37 @@ def span(
         links=otel_links,
         record_exception=record_errors,
         set_status_on_exception=record_errors,
+    ) as s:
+        yield s
+
+
+@contextmanager
+def root_span(
+    name: str,
+    *,
+    origin: str,
+    principal: str = "system",
+    attributes: Mapping[str, Any] | None = None,
+    links: Sequence[Any] = (),
+) -> Iterator[Any]:
+    """Open ``name`` as the root of a **new trace** and make it current.
+
+    For work no person started in this moment: a background loop's iteration,
+    startup, a CLI command. It never becomes a child of whatever span happens to
+    be current — a loop spawned during startup would otherwise hang every
+    iteration it ever runs off the startup trace. ``origin`` (``startup`` ·
+    ``daemon`` · ``schedule`` · ``cli``) and ``principal`` are recorded as
+    ``invana.origin`` and ``invana.principal``; ``links`` relate it to the spans
+    that caused it (a queue consumer links to its producers). Errors leaving the
+    block are recorded and mark the span failed, as with ``span()``.
+    """
+    if _trace is None:
+        yield None
+        return
+    otel_links = [_Link(ctx) for ctx in links if ctx is not None]
+    attrs = {"invana.origin": origin, "invana.principal": principal, **_clean(attributes)}
+    with _trace.get_tracer(_TRACER_NAME).start_as_current_span(
+        name, context=_Context(), attributes=attrs, links=otel_links
     ) as s:
         yield s
 

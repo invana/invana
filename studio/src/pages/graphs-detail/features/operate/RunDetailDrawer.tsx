@@ -269,7 +269,8 @@ function RowValue({
 			</ClampedText>
 		);
 	}
-	if (row.kind === "trace") return <TraceIdValue id={row.value} />;
+	if (row.kind === "trace")
+		return <TraceIdValue id={row.value} window={row.window} />;
 	if (row.kind === "lens" && row.lens && onOpenLens) {
 		const lens = row.lens;
 		return (

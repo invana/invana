@@ -50,7 +50,16 @@ def _redact_access_log_tokens() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage DB engine lifecycle: migrate on startup, dispose on shutdown."""
+    """Start the app's services on startup and stop them on shutdown.
+
+    The DB engine and its instrumentation come first. Everything after — the
+    graph connection pool, the events LISTEN daemon, the built-in projections,
+    the task runtime and its sweep of runs a previous process left mid-flight,
+    and the query-log writer — runs inside one ``system.startup`` root span
+    (origin ``startup``, principal ``system``), closed before the app serves a
+    request. The background loops spawned there inherit that context, so each
+    opens its own root span per iteration and does its work inside it.
+    """
     engine = await create_db_engine()
     app.state.db_engine = engine
     session_factory = create_session_factory(engine)
@@ -61,70 +70,77 @@ async def lifespan(app: FastAPI):
 
         instrument_app(app, engine)
 
-    from invana.apps.graphs.pool import GraphConnectionManager
+    # Startup is one trace of its own. Loops started here inherit this context,
+    # so each opens a root per iteration rather than hanging off it for good.
+    from invana.core.telemetry.spans import root_span
 
-    manager = GraphConnectionManager(
-        session_factory=session_factory,
-        encryption_key=settings.encryption_key,
-    )
-    app.state.graph_connection_manager = manager
-    await manager.startup()
+    with root_span("system.startup", origin="startup"):
+        from invana.apps.graphs.pool import GraphConnectionManager
 
-    # docs/for-developers/modules/operate/features/audit-and-activity.md — per-worker LISTEN events daemon for SSE live
-    # tail. Started
-    # here so its lifecycle tracks the app's; subscribers (SSE handlers) hold
-    # references into this broadcaster's queues.
-    from invana.core.events.notify import broadcaster as event_broadcaster
+        manager = GraphConnectionManager(
+            session_factory=session_factory,
+            encryption_key=settings.encryption_key,
+        )
+        app.state.graph_connection_manager = manager
+        await manager.startup()
 
-    app.state.event_broadcaster = event_broadcaster
-    await event_broadcaster.start()
+        # docs/for-developers/modules/operate/features/audit-and-activity.md —
+        # per-worker LISTEN events daemon for SSE live tail. Started here so its
+        # lifecycle tracks the app's; subscribers (SSE handlers) hold references
+        # into this broadcaster's queues.
+        from invana.core.events.notify import broadcaster as event_broadcaster
 
-    # docs/for-developers/modules/ask/features/projections.md — the result templates
-    # shipped with the distribution. Ordinary rows with `graph_id = NULL`, seeded
-    # once, so a Graph's own template competes with them on the same terms.
-    from invana.runtime.projections import ensure_builtins
+        app.state.event_broadcaster = event_broadcaster
+        await event_broadcaster.start()
 
-    async with session_factory() as db:
-        created = await ensure_builtins(db)
-        if created:
-            await db.commit()
+        # docs/for-developers/modules/ask/features/projections.md — the result templates
+        # shipped with the distribution. Ordinary rows with `graph_id = NULL`, seeded
+        # once, so a Graph's own template competes with them on the same terms.
+        from invana.runtime.projections import ensure_builtins
 
-    # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the inline run runtime: one asyncio
-    # task per session ask.
-    # Startup fails whatever a previous process left mid-flight.
-    from invana.runtime.interpreter import TaskRuntime
+        async with session_factory() as db:
+            created = await ensure_builtins(db)
+            if created:
+                await db.commit()
 
-    task_runtime = TaskRuntime(session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key)
-    app.state.task_runtime = task_runtime
-    await task_runtime.startup()
+        # docs/for-developers/modules/ask/features/streaming-and-the-workflow.md — the inline run runtime: one asyncio
+        # task per session ask.
+        # Startup fails whatever a previous process left mid-flight.
+        from invana.runtime.interpreter import TaskRuntime
 
-    # the-model-page.md MP35 · MP36 — every query someone asked, logged by shape,
-    # off the query's path. The connector hands it over; this task writes it.
-    import asyncio
+        task_runtime = TaskRuntime(
+            session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key
+        )
+        app.state.task_runtime = task_runtime
+        await task_runtime.startup()
 
-    from invana.apps.graphs.managers import GraphManager
-    from invana.apps.graphs.pool import GraphUnavailableError
-    from invana.apps.modeller.managers import QueryLogWriter
-    from invana.core.querylog import set_query_observer
+        # the-model-page.md MP35 · MP36 — every query someone asked, logged by shape,
+        # off the query's path. The connector hands it over; this task writes it.
+        import asyncio
 
-    connections: dict[str, str] = {}
+        from invana.apps.graphs.managers import GraphManager
+        from invana.apps.graphs.pool import GraphUnavailableError
+        from invana.apps.modeller.managers import QueryLogWriter
+        from invana.core.querylog import set_query_observer
 
-    async def connector_for(graph_id: str):
-        if graph_id not in connections:
-            async with session_factory() as db:
-                connection = await GraphManager().get_graph_connection(db, graph_id=graph_id)
-            if connection is None:
+        connections: dict[str, str] = {}
+
+        async def connector_for(graph_id: str):
+            if graph_id not in connections:
+                async with session_factory() as db:
+                    connection = await GraphManager().get_graph_connection(db, graph_id=graph_id)
+                if connection is None:
+                    return None
+                connections[graph_id] = connection.id
+            try:
+                return manager.get_connector(connections[graph_id])
+            except GraphUnavailableError:
                 return None
-            connections[graph_id] = connection.id
-        try:
-            return manager.get_connector(connections[graph_id])
-        except GraphUnavailableError:
-            return None
 
-    query_log = QueryLogWriter(session_factory, connector_for)
-    app.state.query_log = query_log
-    set_query_observer(query_log.submit)
-    query_log_task = asyncio.create_task(query_log.run(), name="query-log")
+        query_log = QueryLogWriter(session_factory, connector_for)
+        app.state.query_log = query_log
+        set_query_observer(query_log.submit)
+        query_log_task = asyncio.create_task(query_log.run(), name="query-log")
 
     yield
 

@@ -21,6 +21,7 @@ import {
 	usd,
 } from "@/pages/graphs-detail/features/operate/dashboards/shared";
 import type { TraceRead } from "@/services/api/runs";
+import type { TraceWindow } from "@/services/telemetry/traceLink";
 import type { Touch, TouchesResponse } from "@/types/govern";
 import type { TouchItem } from "@invana/ui";
 
@@ -34,6 +35,8 @@ export interface SummaryRow {
 	kind?: "query" | "lens" | "trace";
 	/** The world or guardrail a `lens` row opens — absent on `Everything`. */
 	lens?: { id: string; kind: "world" | "guardrail" };
+	/** When a `trace` row's run happened, so the collector opens on it. */
+	window?: TraceWindow;
 }
 
 export interface RunSummary {
@@ -169,7 +172,14 @@ export function runSummary(
 				]
 			: []),
 		...(trace.trace_id
-			? [{ label: "trace", value: trace.trace_id, kind: "trace" as const }]
+			? [
+					{
+						label: "trace",
+						value: trace.trace_id,
+						kind: "trace" as const,
+						window: { start: originOf(trace), end: trace.finished_at },
+					},
+				]
 			: []),
 	];
 

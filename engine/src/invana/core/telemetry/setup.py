@@ -1,14 +1,23 @@
 """
 Telemetry bootstrap.
 
-Two public entry points:
+Public entry points:
 
-  setup_telemetry()   — Registers OTel providers (traces, metrics, logs).
-                        Idempotent — safe to call multiple times; initialises once.
-                        Called from server lifespan when INVANA_TELEMETRY_ENABLED=true.
+  setup_telemetry()     — Registers OTel providers (traces, metrics, logs) and instruments
+                          outgoing HTTP. Idempotent — safe to call multiple times;
+                          initialises once. Called when ``invana`` is imported with
+                          INVANA_TELEMETRY_ENABLED=true, by the server and the CLI alike.
 
-  instrument_app()    — Adds SQLAlchemy auto-instrumentation.
-                        Call once inside the FastAPI lifespan after the DB engine exists.
+  instrument_app()      — Adds SQLAlchemy auto-instrumentation to the server's engine.
+                          Call once inside the FastAPI lifespan after the DB engine exists.
+
+  instrument_process()  — Adds SQLAlchemy auto-instrumentation to every engine created
+                          afterwards, for a process with no FastAPI lifespan (the CLI).
+                          Idempotent.
+
+  flush_telemetry()     — Exports whatever the providers still hold, within a time budget.
+                          A short-lived process (a CLI command) calls it before exiting so
+                          its spans are not lost with the batch processor's queue.
 
 Instruments:
   - HTTP requests    (TelemetryMiddleware — the only source of request spans; it is
@@ -16,6 +25,9 @@ Instruments:
                       from the lifespan runs after Starlette has already built its
                       middleware stack and never takes effect)
   - SQLAlchemy       (all app-state DB queries, trace context injected into SQL comments)
+  - Outgoing HTTP    (every httpx client call — a model provider, a connector's REST
+                      API — is a client span under the span that made it; the browser
+                      telemetry proxy suppresses it for its own forward)
   - Python logging   (every record shipped over OTLP carries its span context; the
                       console format gets trace ids from the logging filters)
   - Custom spans     (via @track decorator)
@@ -32,12 +44,15 @@ Signals exported via OTLP gRPC to any OTel-compatible backend (HyperDX, Signoz, 
 from __future__ import annotations
 
 import logging
+import threading
+import time
 
 from opentelemetry import metrics, trace
-from opentelemetry._logs import set_logger_provider
+from opentelemetry._logs import get_logger_provider, set_logger_provider
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
@@ -91,6 +106,7 @@ def setup_telemetry(
     _setup_traces(resource, otlp_endpoint, sample_ratio)
     _setup_metrics(resource, otlp_endpoint)
     _setup_logs(resource, otlp_endpoint)
+    HTTPXClientInstrumentor().instrument()
 
     _providers_initialised = True
     logger.info(
@@ -123,6 +139,76 @@ def instrument_app(app, engine) -> None:
         engine=engine.sync_engine,
         enable_commenter=True,  # injects trace-context into SQL comments
     )
+
+
+def instrument_process() -> None:
+    """
+    Add SQLAlchemy auto-instrumentation to every engine this process creates from now on.
+
+    For a process with no FastAPI lifespan to hand an engine to ``instrument_app()`` —
+    the CLI, whose commands each create their own engine. Called with no engine, the
+    instrumentor wraps ``create_engine`` and ``create_async_engine`` at their modules,
+    so an engine is traced when it is created through a module-attribute lookup made
+    after this call (``invana.core.db`` looks them up that way for this reason), and
+    ``Engine.connect`` on every engine gets a ``connect`` span. Statements carry the
+    trace context in SQL comments, as on the server.
+
+    Idempotent — the instrumentor is a process-wide singleton and a second call is a
+    no-op. Requires setup_telemetry() to have been called first. Never call it in the
+    server process: it would claim the singleton and turn ``instrument_app()`` into a
+    no-op.
+    """
+    instrumentor = SQLAlchemyInstrumentor()
+    if instrumentor.is_instrumented_by_opentelemetry:
+        return
+    instrumentor.instrument(enable_commenter=True)
+
+
+def flush_telemetry(timeout_millis: int = 5000) -> None:
+    """
+    Export whatever the trace, metric and log providers still hold.
+
+    Batch processors export on a timer; a process that exits first — a CLI command
+    that ran for a second — would lose its spans. Call this once the work is done
+    and its spans have ended.
+
+    ``timeout_millis`` is the budget for all three providers together, so an
+    unreachable collector delays the caller by at most that long: the exporters
+    retry past the timeout they are handed, so the flush runs on a daemon thread
+    and is abandoned when the budget runs out. Providers that are
+    not the SDK's (telemetry never set up) are skipped. Never raises: a flush that
+    fails is logged at debug and the process carries on.
+
+    Parameters
+    ----------
+    timeout_millis: Total time to wait for the exports, in milliseconds.
+    """
+    providers = [
+        p
+        for p in (trace.get_tracer_provider(), metrics.get_meter_provider(), get_logger_provider())
+        if isinstance(p, (TracerProvider, MeterProvider, LoggerProvider))
+    ]
+    if not providers:
+        return
+    deadline = time.monotonic() + timeout_millis / 1000
+
+    def _flush_all() -> None:
+        for provider in providers:
+            remaining = int((deadline - time.monotonic()) * 1000)
+            if remaining <= 0:
+                return
+            try:
+                provider.force_flush(timeout_millis=remaining)
+            except Exception as exc:  # telemetry never breaks the caller
+                logger.debug("Telemetry flush failed for %s — %s", type(provider).__name__, exc)
+
+    # The exporters' retries do not honour the timeout they are given, so the
+    # flush runs on a daemon thread and the caller waits for the budget at most.
+    worker = threading.Thread(target=_flush_all, name="invana-telemetry-flush", daemon=True)
+    worker.start()
+    worker.join(timeout=max(deadline - time.monotonic(), 0))
+    if worker.is_alive():
+        logger.debug("Telemetry flush still running after %sms — not waiting", timeout_millis)
 
 
 # ── internals ─────────────────────────────────────────────────────────────────
