@@ -63,7 +63,7 @@ flowchart TD
 
 | Thing | Shape |
 |---|---|
-| `events` | append-only: principal, `on_behalf_of`, verb, target, payload, `parent_event_id`, time |
+| `events` | append-only: principal, `on_behalf_of`, verb, target, payload, `parent_event_id`, `trace_id`, `span_id`, time |
 | Redaction | at write, by field name and by type |
 | Activity | recursive query over events plus run steps |
 | Retention | window-based purge, itself recorded |
@@ -80,6 +80,7 @@ flowchart TD
 | AA5 | Retention removes windows, and the purge is itself an event. |
 | AA6 | Activity reads as a timeline, not a list of cards — `TimelineList variant="rail"` from `@invana/ui`, newest first. The rail's marker is a `StatusDot` toned by the event's derived outcome (`success` · `error` · `muted`), `when` carries the relative time and the actor, the verb is the entry's title, and the full record opens in place under it. `Load older` sits in the `TimelineFooter`, so the rail runs on into it — the line itself says the history continues past what is loaded. |
 | AA7 | **An event's scope is a path, not a value, and it lives in `event_scopes` — `(event_id, scope_kind, scope_id)`, one row per scope.** An event belongs to a project *and* a task *and* a run at once, so no single `(scope_kind, scope_id)` pair on the event can carry it. The join table is unbounded, so an app that wants scoped events adds rows rather than a column to `core`, and it answers *every event on this thread* in one query — which is exactly what notification fan-out asks. `graph_id` stays a column on `events`: it is tenancy, not scope, it is present on nearly every emit, and every read filters on it. The cost is one join on the activity read and 1–3 extra rows per event. |
+| AA8 | **An event carries the trace it was written in** — `trace_id` and `span_id`, filled by default at emit, so every write opens the action that caused it ([telemetry](../../platform/features/telemetry.md) TE13). A caller never passes it by hand. |
 
 ## Not building
 

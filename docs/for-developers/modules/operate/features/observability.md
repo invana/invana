@@ -75,6 +75,7 @@ flowchart TD
 | OB3 | Every figure links to the runs behind it. |
 | OB4 | Spend is shown only where pricing is known; otherwise tokens alone. |
 | OB5 | Budget headroom is shown before a ceiling is reached. |
+| OB6 | A run's figures open its trace: `task_runs.trace_id` is the join between the record and [telemetry](../../platform/features/telemetry.md) (TE13). The record answers *what it cost*; the trace answers *where the time went*. |
 
 ## Not building
 

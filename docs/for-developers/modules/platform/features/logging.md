@@ -7,7 +7,7 @@ as `getLogger(__name__)` has to change.
 |---|---|
 | Index | [13.4](../../../README.md#13--platform) · Slice **S1** |
 | Module | [Platform](../spec.md) |
-| API / CLI / Studio | ✅ / — / — |
+| API / CLI / Studio | 🟡 / 🔵 / — |
 | Related | [telemetry](telemetry.md) · [command-line](command-line.md) |
 
 > **As** whoever is debugging this at two in the morning, **I want** log output that exists and is
@@ -23,7 +23,10 @@ as `getLogger(__name__)` has to change.
 | C4 | Full override | A deployment or an integration passes its own configuration dictionary |
 | C5 | Exceptions carry their traceback | In the JSON formatter as a field, not smeared across lines |
 | C6 | Per-logger levels | The engine's own modules and noisy dependencies are set separately |
-| C7 | Ties to a request | A request id in the line, so a log and a trace are the same story |
+| C7 | Ties to a trace | `trace_id` and `span_id` in every line — plain, JSON and OTLP — so a log and a trace are the same story |
+| C8 | Lifecycle, not chatter | a run's start and end, a loop's failure, startup — the facts an operator reads; per-request noise stays at debug |
+| C9 | Redacted at write | the same field-name and type rule as events |
+| C10 | Structured context | `principal` · `origin` · `graph` as fields when the code knows them |
 
 ## Journey
 
@@ -53,7 +56,8 @@ flowchart LR
 | Thing | Shape |
 |---|---|
 | Configuration | one default dictionary, overridable whole |
-| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception |
+| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception, `trace_id`, `span_id` |
+| Levels | the lifecycle logs of [telemetry](telemetry.md) § Logs |
 | Entry point | called once by the server and by the CLI |
 
 ## Decisions
@@ -64,6 +68,9 @@ flowchart LR
 | LO2 | Configured once at startup, never at import time. |
 | LO3 | Defaults work with no arguments; the whole configuration is overridable. |
 | LO4 | JSON output is one object per line. |
+| LO5 | Every log line carries `trace_id` and `span_id` — in the plain and JSON formatters, not only in OTLP. |
+| LO6 | What is logged is set by [telemetry](telemetry.md) § Logs: lifecycle and failures at info and above, everything else at debug. |
+| LO7 | A log never carries record contents, prompts, answers or credentials; redaction is at write, as for events. |
 
 ## Not building
 
@@ -71,4 +78,4 @@ flowchart LR
 |---|---|
 | A logging framework dependency | it breaks every `getLogger(__name__)` already written |
 | Environment-driven logging settings | a constant plus an override covers it without a settings model |
-| Log shipping | that belongs to the platform running the engine |
+| Log shipping from files | OTLP export is [telemetry](telemetry.md)'s; tailing files belongs to the platform running the engine |
