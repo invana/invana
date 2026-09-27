@@ -35,6 +35,22 @@ test("a plan that has run reads across its four tabs and opens a run", async ({
 	await page.getByRole("tab", { name: "Activity" }).click();
 	const run = page.getByRole("row", { name: /run:[0-9a-f]{8}/ }).first();
 	await expect(run).toBeVisible({ timeout: 20_000 });
+
+	// The agent picker names the agents that may run the plan and filters by
+	// the one picked: another agent empties the list, the one that ran fills it.
+	const ranBy = (await run.getByRole("cell").nth(3).textContent()) ?? "";
+	const picker = page.getByRole("combobox", { name: "agent" });
+	await picker.click();
+	const other = page
+		.getByRole("option")
+		.filter({ hasNotText: new RegExp(`^(all agents|${ranBy})$`) })
+		.first();
+	await other.click();
+	await expect(page.getByText("No run matches these filters.")).toBeVisible();
+	await picker.click();
+	await page.getByRole("option", { name: ranBy, exact: true }).click();
+	await expect(run).toBeVisible();
+
 	const label = (await run.getByText(/^run:[0-9a-f]{8}$/).textContent()) ?? "";
 	await run.click();
 

@@ -68,6 +68,7 @@ export function PlanDashboardPage({
 		step: null,
 		status: ALL,
 		calledBy: ALL,
+		agent: ALL,
 	});
 
 	const plan = usePlanVersionQuery(username, graphSlug, key, version);
@@ -87,6 +88,7 @@ export function PlanDashboardPage({
 					window: view.window,
 					status: view.status === ALL ? undefined : view.status,
 					calledBy: view.calledBy === ALL ? undefined : view.calledBy,
+					agentId: view.agent === ALL ? undefined : view.agent,
 				}
 			: undefined,
 	);
@@ -157,6 +159,9 @@ export function PlanDashboardPage({
 						return;
 					case PLAN_ACTIONS.calledBy:
 						if (ctx?.option) set({ calledBy: ctx.option });
+						return;
+					case PLAN_ACTIONS.agent:
+						if (ctx?.option) set({ agent: ctx.option });
 						return;
 					case PLAN_ACTIONS.more:
 						void runs.fetchNextPage();

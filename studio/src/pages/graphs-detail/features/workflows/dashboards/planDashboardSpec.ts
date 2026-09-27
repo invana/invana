@@ -49,6 +49,7 @@ export const PLAN_ACTIONS = {
 	openRun: "open-run",
 	status: "filter-status",
 	calledBy: "filter-called-by",
+	agent: "filter-agent",
 	more: "show-more",
 } as const;
 
@@ -81,6 +82,8 @@ export interface PlanView {
 	step: string | null;
 	status: string;
 	calledBy: string;
+	/** An agent id, or `ALL`. */
+	agent: string;
 }
 
 export interface PlanPageData {
@@ -524,7 +527,13 @@ function activityRows(data: PlanPageData, view: PlanView) {
 	const live = pages[0]?.live;
 	const items = pages.flatMap((p) => p.items);
 	const callers = [ALL, ...new Set(items.map((r) => r.called_by.kind))];
-	const filtered = view.status !== ALL || view.calledBy !== ALL;
+	const filtered =
+		view.status !== ALL || view.calledBy !== ALL || view.agent !== ALL;
+	// The agents that *may* run the plan, and any seen running it — named, so
+	// the picker shows a name and filters by id (LB34).
+	const agents = new Map([[ALL, "all agents"]]);
+	for (const a of data.plan.used_by) agents.set(a.id, a.name);
+	for (const r of items) if (r.agent) agents.set(r.agent.id, r.agent.name);
 
 	const rows: TabSpec<PlanPanels>["rows"] = [
 		{
@@ -553,6 +562,18 @@ function activityRows(data: PlanPageData, view: PlanView) {
 						id: PLAN_ACTIONS.calledBy,
 						options: [...new Set([...callers, view.calledBy])],
 						value: view.calledBy,
+					},
+				]
+			: []),
+		...(agents.size > 2 || view.agent !== ALL
+			? [
+					{
+						id: PLAN_ACTIONS.agent,
+						label: "agent",
+						picker: true,
+						options: [...new Set([...agents.keys(), view.agent])],
+						optionLabels: Object.fromEntries(agents),
+						value: view.agent,
 					},
 				]
 			: []),
