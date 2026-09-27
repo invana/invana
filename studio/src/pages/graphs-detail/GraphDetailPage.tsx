@@ -128,6 +128,7 @@ import { explorerApi } from "@/services/api/explorer";
 import { runsApi } from "@/services/api/runs";
 import { sessionsApi } from "@/services/api/sessions";
 import { workflowsApi } from "@/services/api/work";
+import { reportBoundaryError } from "@/services/telemetry/errors";
 import {
 	type Interaction,
 	measureSync,
@@ -162,7 +163,7 @@ import type {
 	GraphCanvas,
 	GraphLayer,
 } from "@invana/graph";
-import { Button, EmptyState, Spinner, cn } from "@invana/ui";
+import { Button, EmptyState, ErrorBoundary, Spinner, cn } from "@invana/ui";
 import {
 	HelpCircle,
 	History,
@@ -3093,7 +3094,16 @@ export function GraphDetailPage() {
 									minSize: "240px",
 									maxSize: "900px",
 									collapsible: false,
-									content: leftContent,
+									// A broken panel shows the kit's notice in its column and
+									// is reported; opening another panel starts it afresh.
+									content: (
+										<ErrorBoundary
+											key={settingsPanel.section}
+											onError={reportBoundaryError}
+										>
+											{leftContent}
+										</ErrorBoundary>
+									),
 								}
 							: undefined
 					}
@@ -3104,59 +3114,75 @@ export function GraphDetailPage() {
 						// component, so the tabs cannot drift from what they switch
 						// (graph-detail-page.md G4, the-shell.md).
 						content: (
-							<BoardPagesViewPanel
-								pages={pages}
-								activeId={activePageId}
-								onSelect={selectPage}
-								onAdd={() => void newCanvasTab()}
-								addLabel="New canvas"
-								menuLabel="Page options"
-								// Until each canvas owns its own engine, only the active page is
-								// mounted — today's behaviour, now stated rather than emergent.
-								keepMounted={false}
-								pageMenuItems={[
-									{
-										id: "rename",
-										label: "Rename",
-										icon: Pencil,
-										disabled: (id) => parseBoardPageId(id)?.kind !== "data",
-										onSelect: (id) => {
-											const page = parseBoardPageId(id);
-											if (page) boardPageRef.current?.openRename(page.id);
+							<ErrorBoundary onError={reportBoundaryError}>
+								<BoardPagesViewPanel
+									pages={pages}
+									activeId={activePageId}
+									onSelect={selectPage}
+									onAdd={() => void newCanvasTab()}
+									addLabel="New canvas"
+									menuLabel="Page options"
+									// Until each canvas owns its own engine, only the active page is
+									// mounted — today's behaviour, now stated rather than emergent.
+									keepMounted={false}
+									pageMenuItems={[
+										{
+											id: "rename",
+											label: "Rename",
+											icon: Pencil,
+											disabled: (id) => parseBoardPageId(id)?.kind !== "data",
+											onSelect: (id) => {
+												const page = parseBoardPageId(id);
+												if (page) boardPageRef.current?.openRename(page.id);
+											},
 										},
-									},
-									{
-										id: "close",
-										label: "Close",
-										icon: X,
-										destructive: true,
-										separatorBefore: true,
-										disabled: (id) => id === GRAPH_PAGE_ID,
-										onSelect: closePage,
-									},
-								]}
-								headerActions={[
-									...pageHeaderActions,
-									{
-										id: "inspector",
-										label: right.is("inspector")
-											? "Hide inspector panel"
-											: "Show inspector panel",
-										icon: right.is("inspector")
-											? PanelRightClose
-											: PanelRightOpen,
-										onClick: toggleInspector,
-									},
-								]}
-								className="h-full"
-							/>
+										{
+											id: "close",
+											label: "Close",
+											icon: X,
+											destructive: true,
+											separatorBefore: true,
+											disabled: (id) => id === GRAPH_PAGE_ID,
+											onSelect: closePage,
+										},
+									]}
+									headerActions={[
+										...pageHeaderActions,
+										{
+											id: "inspector",
+											label: right.is("inspector")
+												? "Hide inspector panel"
+												: "Show inspector panel",
+											icon: right.is("inspector")
+												? PanelRightClose
+												: PanelRightOpen,
+											onClick: toggleInspector,
+										},
+									]}
+									className="h-full"
+								/>
+							</ErrorBoundary>
 						),
 					}}
 					// One region, one occupant, looked up by `?right=`. A third occupant
 					// is one more entry here — not another branch (graph-detail-page.md
 					// G16). Each entry carries its own size triple, because the size
 					// belongs to what is in the region rather than to the region.
-					rightSection={right.key ? rightSections[right.key] : undefined}
+					rightSection={
+						right.key
+							? {
+									...rightSections[right.key],
+									content: (
+										<ErrorBoundary
+											key={right.key}
+											onError={reportBoundaryError}
+										>
+											{rightSections[right.key].content}
+										</ErrorBoundary>
+									),
+								}
+							: undefined
+					}
 					statusMetrics={
 						// Live engine telemetry — node/edge totals, zoom, pan, pointer world
 						// position, hovered node/edge, selection counts — self-wired off the

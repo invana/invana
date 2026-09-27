@@ -154,6 +154,14 @@ function currentModule(): string {
  * where the rule applies (failed requests); this function reports what it is
  * given, except an error object it has already reported.
  */
+/**
+ * A region's error boundary hook: `<ErrorBoundary onError={reportBoundaryError}>`.
+ * Reports the caught error with source `boundary`, under the module on screen.
+ */
+export function reportBoundaryError(error: Error): void {
+	reportError(error, "boundary");
+}
+
 export function reportError(
 	error: unknown,
 	source: ErrorSource,
