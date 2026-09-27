@@ -575,11 +575,13 @@ Nine artboards on their own canvas — *The Plan Page* (`https://claude.ai/artif
 | `library.plans.detail.overview.step` | 7.1 | A step picked — its p50, p95 and failures, where it is slow, and its slowest runs | ✅ | ✅ | ✅ |
 | `library.plans.detail.overview.never_run` | 7.1 | Never run — no numbers to fake, and the steps listed with nothing measured | ✅ | ✅ | ✅ |
 | `library.plans.detail.layers` | 7.1 | Layers — every band the plan declares, its steps in order, the gate across them | 🟡 | ✅ | ✅ |
-| `library.plans.detail.flow` | 7.1 | Flow — the plan on TaskFlowCanvas, read-only, each step carrying its medians | ✅ | 🟡 | ✅ |
+| `library.plans.detail.flow` | 7.1 | Flow — the plan on TaskFlowCanvas, read-only, each step carrying its medians | ✅ | ✅ | ✅ |
 | `library.plans.detail.flow.step` | 7.1 | A step picked on the flow — its contract and how it has performed, beside the drawing | ✅ | ✅ | ✅ |
 | `library.plans.detail.activity` | 7.1 | Activity — every run that used this plan: what it was asked, by whom, and how it ended | ✅ | ✅ | ✅ |
 | `library.plans.detail.activity.failed` | 7.1 | Activity, filtered to failed — each run says which step it failed at, and why | ✅ | ✅ | ✅ |
 | `library.plans.detail.activity.empty` | 7.1 | Activity with no runs — what would put a row here, and who may run it | ✅ | ✅ | ✅ |
+
+Three more readings of a plan open from `⋯` on this page's header, each as its own page beside it ([LB38](modules/workflows/features/the-library.md)): `library.plans.detail.versions` · `library.plans.detail.arguments` · `library.plans.detail.export`, drawn on *Govern, Agents and Skills* and listed under `Library › Plans` above — all three built, API and Studio. The page also keeps a reading as a report ([LB39](modules/workflows/features/the-library.md)). Layers stays 🟡 on the API: brackets and seams wait on the runtime executing `loop` and on the approval gate ([LB31](modules/workflows/features/the-library.md)).
 
 ## Beyond the 42 · The Model Page
 
