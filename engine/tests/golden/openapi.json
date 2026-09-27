@@ -17814,6 +17814,26 @@
         ]
       }
     },
+    "/api/v1/telemetry/logs": {
+      "post": {
+        "description": "Forward an OTLP/HTTP log export \u2014 the studio's error logs \u2014 to the collector.",
+        "operationId": "proxy_logs_api_v1_telemetry_logs_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Proxy Logs",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
     "/api/v1/telemetry/metrics": {
       "post": {
         "description": "Forward an OTLP/HTTP metric export to the collector.",

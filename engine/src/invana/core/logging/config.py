@@ -23,12 +23,16 @@ DEFAULT_LOGGING_CONFIG: dict = {
         "trace_context": {
             "()": "invana.core.logging.filters.TraceContextFilter",
         },
+        # Drops credentials from a record's fields, by the same rule as events.
+        "redact": {
+            "()": "invana.core.logging.filters.RedactFilter",
+        },
     },
     "formatters": {
         "simple": {
-            # PlainFormatter fills {trace} itself when a handler lacks trace_context.
+            # PlainFormatter fills {trace} and {log_fields} itself when a handler lacks trace_context.
             "()": "invana.core.logging.formatters.PlainFormatter",
-            "format": "{levelname} - {asctime}{trace} : {message}",
+            "format": "{levelname} - {asctime}{trace}{log_fields} : {message}",
             "style": "{",
         },
         "json": {
@@ -40,7 +44,7 @@ DEFAULT_LOGGING_CONFIG: dict = {
             "class": "logging.StreamHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filters": ["suppress_noisy", "trace_context"],
+            "filters": ["suppress_noisy", "trace_context", "redact"],
         },
     },
     "root": {

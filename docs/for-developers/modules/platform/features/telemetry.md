@@ -92,6 +92,8 @@ flowchart TD
 | Sampling on | parent-based: a sampled action keeps its whole trace, runs and streams included; the ratio is on the resource, so a missing trace is explainable |
 | Engine telemetry off, Studio's on | the browser-span proxy answers 202 and drops the batch — the console stays clean |
 | An access token in a URL | stripped before the URL is recorded — no span attribute or access-log line ever holds a credential |
+| A 5xx | one error line, whichever middleware sees it — with the route template and the trace when telemetry is on, from the catch-all when it is off |
+| A 4xx in Studio | not sent as an error log — the screen handles it, and `ui.request.duration` counts it |
 
 ## Surfaces
 
@@ -106,7 +108,7 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | Transport | OTLP gRPC; `INVANA_TELEMETRY_OTLP_ENDPOINT` · `INVANA_TELEMETRY_SAMPLE_RATIO` (0–1, default 1.0) · resource attributes from settings |
-| Studio's proxy | `INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT` is the collector's OTLP/HTTP **base** URL (`http://hyperdx:4318` in compose); `POST /api/v1/telemetry/traces` forwards to `<base>/v1/traces` and `…/metrics` to `<base>/v1/metrics` |
+| Studio's proxy | `INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT` is the collector's OTLP/HTTP **base** URL (`http://hyperdx:4318` in compose); `POST /api/v1/telemetry/{traces,metrics,logs}` forwards to `<base>/v1/{traces,metrics,logs}` |
 | Metrics | exported every few seconds; histograms carry exemplars from sampled spans (trace-based filter), so a slow bucket opens one of its traces |
 | HTTP | pure ASGI middleware; `traceparent` (and `tracestate`) from the header, else from the query parameters of the same name — the header wins; query string recorded with `token` removed; every `/api/v1/telemetry/` proxy path not traced; the only source of request spans |
 | Attributes | `enduser.id` · `invana.principal` (`user · agent · system · external · anonymous`) · `invana.on_behalf_of` · `invana.origin` (`studio · api · cli · schedule · startup · daemon`) · `invana.graph` (`user/graph`) · `invana.graph_id` · `invana.run_id` · `invana.outcome` |
@@ -118,7 +120,8 @@ flowchart TD
 | Roots nobody clicked | each a new trace (`context=Context()`), never a child of whatever spawned it, principal `system` unless said: `system.startup` (origin `startup`) — connecting the Graphs, seeding, the sweep that fails runs a dead process left mid-flight · `system.graph_health` per health sweep (`invana.graph.connections`; outcome `ok` · `degraded`, a failed check an event on it; an empty registry opens none) · `system.graph_reconnect` per reconnect attempt (`invana.graph_id` · `invana.connection_id`; `ok` · `failed` · `stopped`) · `system.events_listen` per LISTEN connect · `system.query_log` per batch written and `system.query_log.prune` — all origin `daemon` · `cli.<command path>` (origin `cli`, principal `user`, `invana.cli.command`) · `system.schedule` when a scheduler fires, which lands with the scheduler |
 | CLI | the root group opens `cli.users.create` and the like — never for `start`, which traces as a server, or `--help`; SQLAlchemy is instrumented process-wide, and the three signals are flushed on exit within 5 seconds |
 | Queues | a producer's span context rides the item; the consumer's span Links to it — a logged graph query carries the span it was asked in, and `system.query_log` links to each (at most 128 per batch) |
-| Logs | a logging filter sets `trace_id` / `span_id` on every record — plain shows `[trace_id span_id]` inside a span, JSON adds both fields; uvicorn's access log has `token` stripped |
+| Logs | a logging filter sets `trace_id` / `span_id` and the bound `principal` · `origin` · `graph_id` on every record — plain shows `[trace_id span_id] principal=… origin=… graph_id=…`, JSON and OTLP add them as fields; the fields are bound by the same `spans` helpers that set `invana.principal` · `invana.origin` · `invana.graph_id`, so a line and its span agree, with or without the extra. A redaction filter on every handler applies the events rule to a record's fields. uvicorn's access log has `token` stripped; the per-request line is debug |
+| Log lines | `run started` · `run finished` · `run paused for a person` · `run cancelled` (info) · `run failed` (error, `failure_kind` = `class·cause`; an escaped exception once, with its traceback, as `defect·internal`) — each inside the run span, with `run_id` · `run_kind` · `run_role` · `run_triggered_by` · `run_outcome` · `run_duration_s` · `graph went down` (warning) · `graph came back` (info) · `startup finished` (info) · a 5xx (error: method, route template, status, duration; never the body) |
 
 ## Studio
 
@@ -126,7 +129,7 @@ flowchart TD
 |---|---|
 | Providers | traces (`WebTracerProvider`, parent-based sampler on `VITE_TELEMETRY_SAMPLE_RATIO`), metrics and logs — service `invana-studio`, exported through `/api/v1/telemetry/{traces,metrics,logs}` |
 | Web Vitals | the `web-vitals` package, recorded as `ui.web_vitals.*` |
-| Errors | a global handler for uncaught errors and unhandled rejections, an error boundary per region, and the query client's error hook — each an OTLP log with the active trace id |
+| Errors | `reportError(error, source)` — one OTLP log (severity error; `exception.type` · `exception.message` · `exception.stacktrace` · `module` · `ui.error.source`) in the failed request's trace when it has one, else the active one, and one `ui.errors`. Sources: the window's `error` and `unhandledrejection` handlers, the query and mutation caches' `onError` (network errors and 5xx only), the router's error page (not a 404), and an error boundary per region — which lands when the kit's `ErrorBoundary` takes `onError` |
 | Actions | `startAction(module, action)` opens a new root; the handle's `end(outcome)` / `fail(err)` ends it once, recording `invana.outcome` — the terminal stream frame for an ask or a re-run (`run.done` · `run.cancelled` · `clarification.requested`; a lost stream is an error), the response for a write |
 | Requests | every API call is a client span, parented explicitly by the action passed in the request config — never by a shared "current action" slot |
 | Streams | `traceparent` appended to every `EventSource` URL — a run's tail carries its action's; the events tail, which nobody clicked, opens a `ui.events.subscribe` root that ends when the connection opens or fails |
@@ -159,20 +162,20 @@ and logs, and per-Graph product numbers come from the record ([observability](..
 | `ui.action.duration` | histogram | `module` · `action` · `outcome` |
 | `ui.request.duration` | histogram | `http.route` · `outcome` |
 | `ui.web_vitals.{lcp,inp,cls,ttfb}` | histogram | `module` |
-| `ui.stream.reconnects` · `ui.errors` | counter | `stream` · `module` — `ui.errors` lands with Studio's error logs |
+| `ui.stream.reconnects` · `ui.errors` | counter | `stream` · `module` and `source` (`uncaught` · `unhandled_rejection` · `boundary` · `route` · `query` · `mutation`) |
 | `ui.canvas.layout.duration` · `ui.canvas.render.duration` | histogram | `layout` · `size_bucket` — recorded by `@invana/canvas`, not by Studio |
 
 ## Logs
 
 | Source | What is logged | Level |
 |---|---|---|
-| Engine, every record | `trace_id` · `span_id` in console, JSON and OTLP; `principal` · `origin` · `graph` as fields when known | — |
+| Engine, every record | `trace_id` · `span_id` in console, JSON and OTLP; `principal` · `origin` · `graph_id` as fields when known | — |
 | Run lifecycle | started · finished · failed (with failure kind) · cancelled · paused for a person | info · error |
 | System work | a loop iteration that failed; startup and its sweep; a graph pool going down or coming back | warning · error · info |
-| Requests | a 5xx, with its route and trace — never the body | error |
-| Studio | uncaught errors, unhandled rejections, React error boundaries, failed queries — through `POST /api/v1/telemetry/logs` | error |
+| Requests | a 5xx, with its route and trace — never the body; every other request at debug | error |
+| Studio | uncaught errors, unhandled rejections, the router's error page, failed queries and mutations (network or 5xx), React error boundaries — through `POST /api/v1/telemetry/logs` | error |
 
-Redaction happens at write, by field name and type, the same rule as events ([audit-and-activity](../../operate/features/audit-and-activity.md) AA4).
+Redaction happens at write, by field name and type, the same rule as events ([audit-and-activity](../../operate/features/audit-and-activity.md) AA4): one rule, `core/redaction.py`, applied to an event's details and to every log record's fields.
 
 ## Decisions
 
@@ -203,6 +206,11 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE23 | The CLI emits the same three signals under `cli.<command>` and flushes them before it exits. The person at the shell is principal `user` with no `enduser.id` — the CLI holds no session to name them. |
 | TE24 | The seeded HyperDX dashboards are grouped like the modules — API · Runs · LLMs · Graph queries · System · Studio — with one cross-service trace view. |
 | TE25 | Studio links a trace id to the collector through one URL template, `VITE_TELEMETRY_TRACE_URL`, opening on the record's own time range, because a collector searches a window and not all of history. Without the template the id is shown and not linked — Studio never guesses a collector. |
+| TE26 | A log line's `principal` · `origin` · `graph_id` are bound by the span helpers that set the matching attributes, so the two never disagree; a root span starts from none. The Graph is its id — the only form every source has. |
+| TE27 | A request is logged at debug; a 5xx is logged once at error, by the request middleware inside its span when telemetry is on and by the catch-all when it is off. |
+| TE28 | Studio sends a failed query or mutation only for a network error or a 5xx. A 4xx is an outcome the screen handles and is already measured. |
+| TE29 | `ui.errors` carries `module` and `source`; a Studio error log is written in the failed request's trace when the error carries one, else in the active context. |
+| TE30 | Redaction is one rule for events and logs: a sensitive field name is dropped at any depth, a secret-typed value is masked, and message text is never parsed — code does not format a secret into it. |
 
 ## Not building
 

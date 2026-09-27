@@ -48,13 +48,39 @@ opens, which also fills ``trace_id`` for a run queued outside any span (a
 schedule). The first run span wins: a resumed run's second span overwrites
 neither.
 
+Logs
+----
+A run writes its lifecycle to the ``invana.runtime.interpreter.tracing`` logger,
+always from inside its ``invana.run`` span, so each line carries the run's trace
+id and the principal · origin · Graph the span bound:
+
+=============================  ========  ==========================================
+Line                           Level     When
+=============================  ========  ==========================================
+``run started``                info      the row is marked running
+``run finished``               info      outcome ``ok`` · ``conversed`` · ``cannot_answer``
+``run paused for a person``    info      outcome ``clarify`` — it waits on an answer
+``run cancelled``              info      someone pressed stop
+``run failed``                 error     outcome ``error``, or an exception escaped
+=============================  ========  ==========================================
+
+Each pass writes exactly one ending line. Every line names the run in bounded
+``extra=`` fields — ``run_id``, ``run_kind``, ``run_role``,
+``run_triggered_by`` and, on an ending, ``run_outcome`` and ``run_duration_s``;
+a failure adds ``failure_kind`` as ``<cls>·<cause>``. Nothing the run read or
+wrote — records, prompts, answers — goes into a log line. An exception escaping
+the run is logged once, with its traceback, by ``run_span`` (``failure_kind``
+``defect·internal``); the loop then writes no ending line for that pass.
+
 Everything here goes through ``invana.core.telemetry.spans``, so without the
 ``telemetry`` extra each helper is a no-op and a run behaves exactly the same.
+The log lines are written either way.
 """
 
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
@@ -66,6 +92,15 @@ from invana.core.telemetry.recorders import record_run_step
 from invana.core.telemetry.spans import mark_error, span
 from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, TaskFailure
 from invana.runtime.models import TaskRun
+
+log = logging.getLogger(__name__)
+
+# How a pass ended → the line it writes and that line's level.
+_ENDINGS: dict[str, tuple[int, str]] = {
+    "clarify": (logging.INFO, "run paused for a person"),
+    "cancelled": (logging.INFO, "run cancelled"),
+    "error": (logging.ERROR, "run failed"),
+}
 
 # A step that raised one of these ended as the product intends — not an error.
 _STEP_OUTCOMES: tuple[tuple[type[BaseException], str], ...] = (
@@ -94,6 +129,77 @@ def run_attributes(th: TaskRun) -> dict[str, Any]:
     }
 
 
+def _run_fields(th: TaskRun) -> dict[str, Any]:
+    return {
+        "run_id": th.id,
+        "run_kind": th.ask_kind or "todo",
+        "run_role": th.role,
+        "run_triggered_by": th.triggered_by,
+    }
+
+
+def _failure_kind(th: TaskRun) -> str:
+    error = th.error or {}
+    return f"{error.get('cls') or 'defect'}·{error.get('cause') or 'internal'}"
+
+
+def log_run_started(th: TaskRun) -> None:
+    """Write ``run started`` for *th*, once its row is marked running.
+
+    Called from inside the ``invana.run`` span, so the line carries the run's
+    trace id. A resumed run writes it again: each pass is started and ended.
+    """
+    log.info("run started", extra=_run_fields(th))
+
+
+def log_run_ended(th: TaskRun, outcome: str, duration_s: float) -> None:
+    """Write the one ending line of a pass of *th* that ended with *outcome*.
+
+    ``clarify`` is ``run paused for a person``, ``cancelled`` is
+    ``run cancelled`` and ``error`` is ``run failed`` at ERROR with
+    ``failure_kind`` read from ``th.error`` (``<cls>·<cause>``); every other
+    outcome is ``run finished``. *duration_s* is the pass's working time, rounded
+    to milliseconds. Not for an exception escaping the run — ``run_span`` logs
+    that one with its traceback.
+    """
+    level, message = _ENDINGS.get(outcome, (logging.INFO, "run finished"))
+    extra = {**_run_fields(th), "run_outcome": outcome, "run_duration_s": round(duration_s, 3)}
+    if outcome == "error":
+        extra["failure_kind"] = _failure_kind(th)
+    log.log(level, message, extra=extra)
+
+
+# Set on an exception once ``log_run_crashed`` has written it.
+_CRASH_LOGGED = "_invana_crash_logged"
+
+
+def log_run_crashed(th: TaskRun, exc: BaseException, duration_s: float) -> None:
+    """Write ``run failed`` at ERROR, with *exc*'s traceback, for a run that crashed.
+
+    An exception escaped the run body, so nothing settled the row yet; the kind is
+    always ``defect·internal``, which is what the runtime's crash handler then
+    writes on the row.
+    """
+    extra = {
+        **_run_fields(th),
+        "run_outcome": "error",
+        "run_duration_s": round(duration_s, 3),
+        "failure_kind": "defect·internal",
+    }
+    log.error("run failed", extra=extra, exc_info=exc)
+    setattr(exc, _CRASH_LOGGED, True)
+
+
+def crash_logged(exc: BaseException) -> bool:
+    """Whether *exc* was already logged by ``log_run_crashed``.
+
+    A crash raised before the run span opened — loading the row, resolving the
+    caller — never reaches ``log_run_crashed``; the runtime's crash handler asks
+    this to log that one itself, so every crash is one line and never two.
+    """
+    return getattr(exc, _CRASH_LOGGED, False)
+
+
 @contextmanager
 def run_span(th: TaskRun, *, links: tuple[Any, ...] = ()) -> Iterator[Any]:
     """Open the ``invana.run`` span for *th* and make it current.
@@ -103,7 +209,12 @@ def run_span(th: TaskRun, *, links: tuple[Any, ...] = ()) -> Iterator[Any]:
     (``cancelled``, not an error) and an exception escaping the run
     (``error``, recorded on the span). Both are re-raised — the runtime's own
     handlers still settle the row.
+
+    The escaping exception is also the one place a crash is logged: one
+    ``run failed`` line with its traceback, written while the span is still
+    current so it carries the run's trace id (see ``log_run_crashed``).
     """
+    started = time.perf_counter()
     with span("invana.run", run_attributes(th), links=links, record_errors=False) as s:
         try:
             yield s
@@ -113,6 +224,7 @@ def run_span(th: TaskRun, *, links: tuple[Any, ...] = ()) -> Iterator[Any]:
         except Exception as exc:
             _set_outcome(s, "error")
             mark_error(s, exc)
+            log_run_crashed(th, exc, time.perf_counter() - started)
             raise
 
 

@@ -6,7 +6,9 @@ import json
 import logging
 from datetime import datetime
 
-from .filters import current_trace_ids, trace_suffix
+from invana.core.logging import context as _log_context
+
+from .filters import current_trace_ids, fields_suffix, trace_suffix
 
 
 def _record_trace_ids(record: logging.LogRecord) -> tuple[str, str]:
@@ -20,17 +22,20 @@ def _record_trace_ids(record: logging.LogRecord) -> tuple[str, str]:
 
 class PlainFormatter(logging.Formatter):
     """
-    The console formatter: a ``{}``-style format string that may use ``{trace}``.
+    The console formatter: a ``{}``-style format string that may use ``{trace}`` and ``{log_fields}``.
 
-    ``TraceContextFilter`` normally sets ``record.trace``. A handler configured
-    without that filter (for example in a user-supplied logging config that reuses
-    this formatter) would otherwise fail on the missing field, so the formatter
-    fills ``trace`` itself from the active span when the record lacks it.
+    ``TraceContextFilter`` normally sets ``record.trace`` and ``record.log_fields``.
+    A handler configured without that filter (for example in a user-supplied
+    logging config that reuses this formatter) would otherwise fail on the
+    missing fields, so the formatter fills them itself — ``trace`` from the
+    active span, ``log_fields`` from whatever the record carries.
     """
 
     def format(self, record: logging.LogRecord) -> str:
         if not hasattr(record, "trace"):
             record.trace = trace_suffix(*_record_trace_ids(record))
+        if not hasattr(record, "log_fields"):
+            record.log_fields = fields_suffix(record)
         return super().format(record)
 
 
@@ -40,7 +45,8 @@ class JSONFormatter(logging.Formatter):
 
     When the record was logged inside an active span, ``trace_id`` and ``span_id``
     (lower-hex) are added so a log line can be joined to its trace; outside any
-    span the two keys are left out.
+    span the two keys are left out. ``principal``, ``origin`` and ``graph_id`` are
+    added when the record carries them (see ``TraceContextFilter``).
     """
 
     def format(self, record: logging.LogRecord) -> str:
@@ -57,6 +63,10 @@ class JSONFormatter(logging.Formatter):
         if trace_id:
             log_data["trace_id"] = trace_id
             log_data["span_id"] = span_id
+        for name in _log_context.FIELDS:
+            value = getattr(record, name, None)
+            if value:
+                log_data[name] = value
         if record.exc_info:
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__ if record.exc_info[0] else None,

@@ -19,6 +19,14 @@ Metrics
 - ``invana.system.loop.*`` — each health sweep is one ``graph_health``
   iteration, each reconnect attempt one ``graph_reconnect`` iteration, a
   failure when a check or the attempt failed.
+
+Logs
+----
+A Graph's connection changing state is one line each way: ``graph went down``
+(warning) when a health sweep finds a connected Graph failing, and
+``graph came back`` (info) when a reconnect attempt after that succeeds. Both
+carry ``graph_id`` and ``connection_id`` in ``extra=``; the warning adds the
+error's type and a short message. Each retry in between logs at debug only.
 """
 
 from __future__ import annotations
@@ -100,8 +108,12 @@ class ConnectionPool:
     # Lifecycle — called from FastAPI lifespan only
     # -----------------------------------------------------------------------
 
-    async def startup(self) -> None:
-        """Load all non-INACTIVE graphs from DB and connect them concurrently."""
+    async def startup(self) -> int:
+        """Load all non-INACTIVE graphs from DB and connect them concurrently.
+
+        Returns how many connections it started connecting. The connects run in
+        the background, so none of them has necessarily finished on return.
+        """
         async with self._session_factory() as session:
             graphs = await GraphConnectionQuerySet().list_active(session)
 
@@ -111,6 +123,7 @@ class ConnectionPool:
         self._health_task = asyncio.create_task(self._health_loop())
         self._observe()
         logger.info("GraphConnectionManager started. Connecting %d graph(s).", len(graphs))
+        return len(graphs)
 
     async def shutdown(self) -> None:
         """Cancel background tasks and disconnect all connectors gracefully."""
@@ -372,6 +385,10 @@ class ConnectionPool:
                         raise RuntimeError("connection attempt failed")
                     set_current(**{"invana.outcome": "ok"})
                     record_loop(loop="graph_reconnect", duration_s=time.perf_counter() - started, failed=False)
+                    logger.info(
+                        "graph came back",
+                        extra={"graph_id": fresh_graph.graph_id or graph.graph_id, "connection_id": graph.id},
+                    )
                     self._retry_tasks.pop(graph.id, None)
                     return  # success
                 except Exception as exc:
@@ -436,7 +453,6 @@ class ConnectionPool:
 
             except Exception as exc:
                 failed += 1
-                logger.warning("Health check failed for graph %r: %s", graph_id, exc)
                 add_event("graph.health.failed", {"invana.connection_id": graph_id, "error": type(exc).__name__})
                 self._registry.pop(graph_id, None)
 
@@ -444,6 +460,15 @@ class ConnectionPool:
                     graph = await GraphConnectionQuerySet().get(session, graph_id)
                     await GraphConnectionQuerySet().set_status(session, graph_id, "ERROR")
                     await session.commit()
+                logger.warning(
+                    "graph went down",
+                    extra={
+                        "graph_id": graph.graph_id if graph else None,
+                        "connection_id": graph_id,
+                        "error_type": type(exc).__name__,
+                        "error": str(exc)[:200],
+                    },
+                )
 
                 if graph:
                     existing = self._retry_tasks.pop(graph_id, None)

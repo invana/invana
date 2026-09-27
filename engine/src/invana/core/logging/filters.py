@@ -5,6 +5,9 @@ from __future__ import annotations
 import logging
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from invana.core.logging import context as _log_context
+from invana.core.redaction import is_sensitive, redact
+
 try:  # OpenTelemetry is an optional extra; without it no record carries trace ids.
     from opentelemetry import trace as _otel_trace
 except ImportError:  # pragma: no cover - exercised only without the telemetry extra
@@ -80,20 +83,31 @@ def trace_suffix(trace_id: str, span_id: str) -> str:
     return f" [{trace_id} {span_id}]" if trace_id else ""
 
 
+def fields_suffix(record: logging.LogRecord) -> str:
+    """Render the record's context fields inline: `` principal=user origin=studio`` or ``""``."""
+    parts = [f"{name}={getattr(record, name)}" for name in _log_context.FIELDS if getattr(record, name, None)]
+    return " " + " ".join(parts) if parts else ""
+
+
 class TraceContextFilter(logging.Filter):
     """
-    Stamps every record with the trace it was logged under.
+    Stamps every record with the trace it was logged under, and who it was for.
 
-    Sets three attributes on the record:
+    Sets these attributes on the record:
 
     - ``trace_id`` / ``span_id`` — lower-hex ids of the active span, or ``""``.
     - ``trace`` — `` [<trace_id> <span_id>]`` or ``""``, ready to drop into a
       ``{}``-style format string such as ``"{levelname} - {asctime}{trace} : {message}"``.
+    - ``principal`` · ``origin`` · ``graph_id`` — the fields bound in
+      ``invana.core.logging.context`` right now, each only when bound.
+    - ``log_fields`` — those fields rendered inline (`` principal=user origin=studio``)
+      or ``""``, for the plain format string.
 
-    The ids are read when the record is created on the logging thread, so a line
-    written inside a request carries that request's trace and can be joined to it
-    in the trace backend. Attributes already on the record (set by another filter
-    or passed through ``extra=``) are left untouched. The filter never drops a record.
+    The ids and fields are read when the record is created on the logging thread,
+    so a line written inside a request carries that request's trace and caller
+    and can be joined to it in the trace backend. Attributes already on the record
+    (set by another filter or passed through ``extra=``) are left untouched. The
+    filter never drops a record.
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -105,6 +119,51 @@ class TraceContextFilter(logging.Filter):
                 record.span_id = span_id
         if not hasattr(record, "trace"):
             record.trace = trace_suffix(record.trace_id, record.span_id)
+        for name, value in _log_context.current().items():
+            if not hasattr(record, name):
+                setattr(record, name, value)
+        if not hasattr(record, "log_fields"):
+            record.log_fields = fields_suffix(record)
+        return True
+
+
+# Attributes every LogRecord has, plus those the filters above add — not a caller's fields.
+_RECORD_ATTRS = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
+    "message",
+    "asctime",
+    "trace",
+    "trace_id",
+    "span_id",
+    "log_fields",
+    "taskName",
+}
+
+
+class RedactFilter(logging.Filter):
+    """
+    Keeps credentials out of every log handler, by the same rule as events.
+
+    A caller's structured fields — anything passed through ``extra=`` — are
+    checked by name: a sensitive one (``password``, ``api_key``, ``secret``,
+    ``token``, ``*_hash``, ``*_encrypted``) is removed from the record, and every
+    other value has sensitive keys dropped at any depth and secret-typed values
+    masked (``invana.core.redaction``). Mapping or container ``args`` are redacted
+    the same way before the message is formatted. The message text itself is not
+    parsed: code never formats a secret into it.
+
+    Attach it to each handler (the console handler in ``DEFAULT_LOGGING_CONFIG``,
+    the OTLP handler in telemetry setup) — a filter on a logger does not see the
+    records its children propagate. The filter never drops a record.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        for key in [k for k in record.__dict__ if k not in _RECORD_ATTRS]:
+            if is_sensitive(key):
+                delattr(record, key)
+            else:
+                record.__dict__[key] = redact(record.__dict__[key])
+        if isinstance(record.args, (dict, tuple)) and record.args:
+            record.args = redact(record.args)
         return True
 
 

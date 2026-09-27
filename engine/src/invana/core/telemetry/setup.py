@@ -261,6 +261,10 @@ def _setup_logs(resource: Resource, endpoint: str) -> None:
 
     Console suppression of noisy libs is handled separately by SuppressNoisyFilter
     on the console handler, so OTel still sees their records for debugging.
+
+    The handler stamps ``principal`` · ``origin`` · ``graph_id`` on each record
+    (they become log attributes) and redacts a record's fields by the same rule
+    as the console handler.
     """
     # Local import avoids circular dependency at module load time.
     from opentelemetry.sdk._logs import LoggingHandler
@@ -270,8 +274,11 @@ def _setup_logs(resource: Resource, endpoint: str) -> None:
     provider.add_log_record_processor(BatchLogRecordProcessor(exporter))
     set_logger_provider(provider)
 
-    from invana.core.logging.filters import OtlpThirdPartyFilter
+    from invana.core.logging.filters import OtlpThirdPartyFilter, RedactFilter, TraceContextFilter
 
     otlp_handler = LoggingHandler(level=logging.NOTSET, logger_provider=provider)
     otlp_handler.addFilter(OtlpThirdPartyFilter())
+    # Who acted and from where become record attributes; credentials never do.
+    otlp_handler.addFilter(TraceContextFilter())
+    otlp_handler.addFilter(RedactFilter())
     logging.getLogger().addHandler(otlp_handler)

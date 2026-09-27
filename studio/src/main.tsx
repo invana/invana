@@ -1,9 +1,15 @@
 import { SaturationBridge } from "@/components/SaturationBridge";
 import { ThemeSyncBridge } from "@/components/ThemeSyncBridge";
 import { router } from "@/router";
+import { reportError, shouldReport } from "@/services/telemetry/errors";
 import { ThemeProvider } from "@invana/themes";
 import { Toaster, TooltipProvider } from "@invana/ui";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+	MutationCache,
+	QueryCache,
+	QueryClient,
+	QueryClientProvider,
+} from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
@@ -15,7 +21,19 @@ import "@/services/telemetry/setup";
 import "@/stores/auth.store";
 import "./index.css";
 
+// A query or mutation that failed on the network or with a 5xx is logged as an
+// error; a 4xx is the screen's to explain, and is not.
 const queryClient = new QueryClient({
+	queryCache: new QueryCache({
+		onError: (error) => {
+			if (shouldReport(error)) reportError(error, "query");
+		},
+	}),
+	mutationCache: new MutationCache({
+		onError: (error) => {
+			if (shouldReport(error)) reportError(error, "mutation");
+		},
+	}),
 	defaultOptions: {
 		queries: {
 			retry: 1,

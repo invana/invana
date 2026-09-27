@@ -56,8 +56,10 @@ flowchart LR
 | Thing | Shape |
 |---|---|
 | Configuration | one default dictionary, overridable whole |
-| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception, `trace_id`, `span_id`; plain shows `[trace_id span_id]` only inside a span |
-| Trace ids | read from the current span by a filter on the console handler; without the telemetry extra they are empty |
+| Formatters | plain and JSON — timestamp, level, logger, module, function, line, message, exception, `trace_id`, `span_id`, `principal`, `origin`, `graph_id`; plain shows `[trace_id span_id]` only inside a span and the fields inline (`principal=user origin=studio`) only when bound |
+| Trace ids | read from the current span by a filter on the console and OTLP handlers; without the telemetry extra they are empty |
+| Structured context | `principal` · `origin` · `graph_id` from a context variable the span helpers bind (`core/logging/context.py`); present without the telemetry extra |
+| Redaction | a filter on every handler drops sensitive `extra=` fields and redacts mapping arguments by the events rule (`core/redaction.py`) |
 | Access log | uvicorn's access log has `token` stripped from the path |
 | Levels | the lifecycle logs of [telemetry](telemetry.md) § Logs |
 | Entry point | called once by the server and by the CLI |
@@ -73,6 +75,8 @@ flowchart LR
 | LO5 | Every log line carries `trace_id` and `span_id` — in the plain and JSON formatters, not only in OTLP. |
 | LO6 | What is logged is set by [telemetry](telemetry.md) § Logs: lifecycle and failures at info and above, everything else at debug. |
 | LO7 | A log never carries record contents, prompts, answers or credentials; redaction is at write, as for events. |
+| LO8 | Structured context is bound, never passed: code logs `log.info(..., extra={...})` with its own ids, and who, from where and which Graph arrive from the context the span helpers bound. |
+| LO9 | Redaction is a filter on each handler, not on a logger — a logger's filter never sees the records its children propagate. |
 
 ## Not building
 

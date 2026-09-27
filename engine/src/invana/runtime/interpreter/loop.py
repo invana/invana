@@ -79,7 +79,14 @@ from invana.runtime.interpreter.payloads import (
     _step_payload,
     message_payload,
 )
-from invana.runtime.interpreter.tracing import delegation_links, run_span, step_span
+from invana.runtime.interpreter.tracing import (
+    crash_logged,
+    delegation_links,
+    log_run_ended,
+    log_run_started,
+    run_span,
+    step_span,
+)
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
@@ -134,13 +141,15 @@ class TaskRuntime:
 
     # ── lifecycle ─────────────────────────────────────────────────────────────
 
-    async def startup(self) -> None:
+    async def startup(self) -> int:
         """Fail whatever was mid-flight when the process died — nothing streams forever.
 
         A database that hasn't had migration 28 applied yet has no ``runs``
         table; that must not take the whole API down, so the sweep logs the fix
         (``invana migrate``) and steps aside. The run routes will fail until
         the migration runs; everything else boots.
+
+        Returns how many stale runs it failed — 0 when the run tables are missing.
         """
         try:
             async with self._factory() as db:
@@ -162,9 +171,10 @@ class TaskRuntime:
                 "session asks will fail until the run tables exist.",
                 type(exc.orig).__name__ if exc.orig else type(exc).__name__,
             )
-            return
+            return 0
         if stuck:
             log.warning("run: failed %d stale run(s) left over from a previous run", len(stuck))
+        return len(stuck)
 
     async def shutdown(self) -> None:
         for task in list(self._tasks.values()):
@@ -352,7 +362,9 @@ class TaskRuntime:
                 task.uncancel()
             await self._on_cancelled(run_id)
         except Exception as exc:
-            log.exception("run %s crashed", run_id)
+            # Normally logged inside the run's span; a crash before it opened is logged here.
+            if not crash_logged(exc):
+                log.error("run failed", exc_info=exc, extra={"run_id": run_id, "failure_kind": "defect·internal"})
             await self._on_crash(run_id, exc)
         finally:
             # The slot goes back whatever happened, and the next in line takes it
@@ -418,6 +430,11 @@ class TaskRuntime:
         recorded once on ``invana.runs.count`` / ``invana.runs.duration`` with
         its outcome (the loop's label, ``cancelled`` or ``error``). A run
         refused a slot never worked and records neither.
+
+        **Logs.** The same span brackets two lines: ``run started`` once the row
+        is running, and one ending line named for the outcome (see
+        ``invana.runtime.interpreter.tracing``). An exception escaping the pass
+        writes no ending line here — the run span logs it, once.
         """
         emitter = Emitter(self._factory, run_id)
         async with self._factory() as db:
@@ -548,7 +565,9 @@ class TaskRuntime:
             th.cursor = None
             await db.commit()
             add_run_active(1, **labels)
+            log_run_started(th)
             outcome = "error"
+            crashed = False
             try:
                 await emitter.emit(
                     "run.started",
@@ -566,10 +585,17 @@ class TaskRuntime:
             except asyncio.CancelledError:
                 outcome = "cancelled"
                 raise
+            except Exception:
+                crashed = True
+                raise
             finally:
+                duration_s = time.perf_counter() - started
                 add_run_active(-1, **labels)
-                record_run(**labels, outcome=outcome, duration_s=time.perf_counter() - started)
+                record_run(**labels, outcome=outcome, duration_s=duration_s)
                 set_current(**{"invana.outcome": outcome})
+                # A crash is logged once, by the run span, with its traceback.
+                if not crashed:
+                    log_run_ended(th, outcome, duration_s)
 
     async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
         """The endpoint this run calls — what it recorded, else what its lens casts.

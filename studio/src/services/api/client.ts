@@ -9,7 +9,12 @@
 
 import { recordRequest } from "@/services/telemetry/metrics";
 import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
-import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
+import {
+	type Span,
+	type SpanContext,
+	SpanStatusCode,
+	propagation,
+} from "@opentelemetry/api";
 import axios, {
 	type AxiosError,
 	type AxiosInstance,
@@ -90,10 +95,24 @@ export class ApiError extends Error {
 		 * surface that has something better to draw than a toast.
 		 */
 		public readonly detail?: unknown,
+		/**
+		 * How the request ended, beyond its status: the client span it was sent
+		 * under, so an error report joins that request's trace, and whether the
+		 * caller cancelled it — a cancellation is not a failure.
+		 */
+		options: { spanContext?: SpanContext; cancelled?: boolean } = {},
 	) {
 		super(message);
 		this.name = "ApiError";
+		this.spanContext = options.spanContext;
+		this.cancelled = options.cancelled ?? false;
 	}
+
+	/** The request's client span, when the request was traced. */
+	public readonly spanContext?: SpanContext;
+
+	/** True when the request was cancelled rather than answered. */
+	public readonly cancelled: boolean;
 }
 
 interface AuthAccess {
@@ -261,6 +280,10 @@ apiClient.interceptors.response.use(
 			| (InternalAxiosRequestConfig & { _retried?: boolean })
 			| undefined;
 		const status = error.response?.status;
+		// Read before the span is ended and cleared, so the error can name it.
+		const spanContext = (
+			config as TracedConfig | undefined
+		)?._otelSpan?.spanContext();
 		endRequestSpan(config as TracedConfig | undefined, status);
 		// Only the token endpoints themselves must skip the refresh-retry —
 		// refreshing on their own 401 would loop. Every other `/auth/*` route is
@@ -286,6 +309,7 @@ apiClient.interceptors.response.use(
 			status ?? 0,
 			formatErrorDetail(error),
 			(error.response?.data as { detail?: unknown } | undefined)?.detail,
+			{ spanContext, cancelled: axios.isCancel(error) },
 		);
 	},
 );

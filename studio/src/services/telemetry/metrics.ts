@@ -9,6 +9,7 @@
  * recordRequest("/api/v1/u/foo/bar/runs/42", "ok", 0.08);  // done by the API client
  * recordWebVital("lcp", 1830, "explorer");             // done by ./setup
  * recordStreamReconnect("run");                        // done by the stream clients
+ * recordError("explorer", "query");                    // done by ./errors' reportError
  * ```
  *
  * Instruments:
@@ -20,6 +21,7 @@
  * | `ui.web_vitals.lcp` · `.inp` · `.ttfb` | histogram | ms | `module` |
  * | `ui.web_vitals.cls` | histogram | 1 | `module` |
  * | `ui.stream.reconnects` | counter | 1 | `stream` |
+ * | `ui.errors` | counter | 1 | `module` · `source` |
  *
  * Design: every attribute is drawn from a small, bounded set, so a metric's
  * series count never grows with the people, Graphs or runs using Studio. That
@@ -55,12 +57,21 @@ const CLS_BUCKETS = [0.01, 0.05, 0.1, 0.15, 0.25, 0.5, 1];
 
 export type WebVital = "lcp" | "inp" | "cls" | "ttfb";
 export type StreamKind = "run" | "events";
+/** Where an error was caught — the `source` of a `ui.errors` point. */
+export type ErrorSource =
+	| "uncaught"
+	| "unhandled_rejection"
+	| "boundary"
+	| "route"
+	| "query"
+	| "mutation";
 
 interface Instruments {
 	action: Histogram;
 	request: Histogram;
 	vitals: Record<WebVital, Histogram>;
 	reconnects: Counter;
+	errors: Counter;
 }
 
 let cached: { meter: Meter; instruments: Instruments } | null = null;
@@ -102,6 +113,10 @@ function instruments(): Instruments {
 			unit: "1",
 			description: "Times a live stream dropped and the browser reconnected.",
 		}),
+		errors: meter.createCounter("ui.errors", {
+			unit: "1",
+			description: "Errors a person hit in Studio, by module and where caught.",
+		}),
 	};
 	cached = { meter, instruments: made };
 	return made;
@@ -141,6 +156,11 @@ export function recordWebVital(
 /** Count one drop of a live stream that the browser is reconnecting. */
 export function recordStreamReconnect(stream: StreamKind): void {
 	instruments().reconnects.add(1, { stream });
+}
+
+/** Count one error Studio reported, by the module on screen and where it was caught. */
+export function recordError(module: string, source: ErrorSource): void {
+	instruments().errors.add(1, { module, source });
 }
 
 /**

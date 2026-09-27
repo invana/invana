@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -22,6 +23,8 @@ from invana.core.errors import (
 from invana.core.logging import RedactTokenFilter
 from invana.core.settings import settings
 from invana.server.middleware import CatchAllExceptionMiddleware
+
+log = logging.getLogger(__name__)
 
 
 def _domain_error_handler(status_code: int):
@@ -59,6 +62,10 @@ async def lifespan(app: FastAPI):
     (origin ``startup``, principal ``system``), closed before the app serves a
     request. The background loops spawned there inherit that context, so each
     opens its own root span per iteration and does its work inside it.
+
+    The span ends with one ``startup finished`` info line inside it, carrying
+    ``graphs`` (connections the pool began connecting), ``stale_runs`` (runs
+    the sweep failed) and ``startup_duration_s``.
     """
     engine = await create_db_engine()
     app.state.db_engine = engine
@@ -75,6 +82,7 @@ async def lifespan(app: FastAPI):
     from invana.core.telemetry.spans import root_span
 
     with root_span("system.startup", origin="startup"):
+        started = time.perf_counter()
         from invana.apps.graphs.pool import GraphConnectionManager
 
         manager = GraphConnectionManager(
@@ -82,7 +90,7 @@ async def lifespan(app: FastAPI):
             encryption_key=settings.encryption_key,
         )
         app.state.graph_connection_manager = manager
-        await manager.startup()
+        graphs = await manager.startup()
 
         # docs/for-developers/modules/operate/features/audit-and-activity.md —
         # per-worker LISTEN events daemon for SSE live tail. Started here so its
@@ -112,7 +120,7 @@ async def lifespan(app: FastAPI):
             session_factory=session_factory, manager=manager, encryption_key=settings.encryption_key
         )
         app.state.task_runtime = task_runtime
-        await task_runtime.startup()
+        stale_runs = await task_runtime.startup()
 
         # the-model-page.md MP35 · MP36 — every query someone asked, logged by shape,
         # off the query's path. The connector hands it over; this task writes it.
@@ -141,6 +149,14 @@ async def lifespan(app: FastAPI):
         app.state.query_log = query_log
         set_query_observer(query_log.submit)
         query_log_task = asyncio.create_task(query_log.run(), name="query-log")
+        log.info(
+            "startup finished",
+            extra={
+                "graphs": graphs,
+                "stale_runs": stale_runs,
+                "startup_duration_s": round(time.perf_counter() - started, 3),
+            },
+        )
 
     yield
 

@@ -1,6 +1,6 @@
 """Browser telemetry proxy (docs/for-developers/modules/platform/features/telemetry.md).
 
-The studio exports its OpenTelemetry spans and metrics over OTLP/HTTP (browsers
+The studio exports its OpenTelemetry spans, metrics and error logs over OTLP/HTTP (browsers
 can't speak OTLP gRPC), and we keep the collector off the public network. This
 thin proxy accepts the studio's export and forwards it **verbatim** to the
 configured collector — no parsing, so it stays agnostic to the OTLP encoding
@@ -11,11 +11,12 @@ Routes
 ------
   POST /api/v1/telemetry/traces    →  <base>/v1/traces
   POST /api/v1/telemetry/metrics   →  <base>/v1/metrics
+  POST /api/v1/telemetry/logs      →  <base>/v1/logs
 
 ``<base>`` is ``settings.telemetry_otlp_http_endpoint``, the collector's
 OTLP/HTTP base URL. A value that still ends in ``/v1/traces`` is read as its
 base, so an environment written for a traces-only proxy keeps working (see
-``collector_url``). Both routes share one forward and behave the same way:
+``collector_url``). All three routes share one forward and behave the same way:
 
 - ``settings.telemetry_enabled`` off: there is nothing to forward to, so the
   batch is accepted and dropped (202) — the studio runs on its own gate, and a
@@ -53,13 +54,13 @@ logger = logging.getLogger("invana.telemetry")
 
 telemetry_router = APIRouter(prefix="/api/v1/telemetry", tags=["telemetry"])
 
-# A browser span batch is small; anything larger is misconfigured or abusive.
+# A browser batch is small; anything larger is misconfigured or abusive.
 _MAX_BODY_BYTES = 1_000_000
 _UPSTREAM_TIMEOUT_S = 5.0
 
 
 def collector_url(signal: str) -> str:
-    """The collector URL for one OTLP signal (``traces`` · ``metrics``).
+    """The collector URL for one OTLP signal (``traces`` · ``metrics`` · ``logs``).
 
     Joins ``/v1/<signal>`` onto the configured base, after dropping a trailing
     slash and a trailing ``/v1/traces`` so a full traces URL is read as its base.
@@ -115,3 +116,9 @@ async def proxy_traces(request: Request) -> Response:
 async def proxy_metrics(request: Request) -> Response:
     """Forward an OTLP/HTTP metric export to the collector."""
     return await _forward(request, "metrics")
+
+
+@telemetry_router.post("/logs")
+async def proxy_logs(request: Request) -> Response:
+    """Forward an OTLP/HTTP log export — the studio's error logs — to the collector."""
+    return await _forward(request, "logs")

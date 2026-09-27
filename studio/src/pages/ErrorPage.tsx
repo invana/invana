@@ -1,5 +1,7 @@
+import { reportError } from "@/services/telemetry/errors";
 import { Button } from "@invana/ui";
 import { ArrowLeft, Home, RefreshCw } from "lucide-react";
+import { useEffect } from "react";
 import {
 	isRouteErrorResponse,
 	useNavigate,
@@ -15,6 +17,12 @@ export function ErrorPage() {
 	// 2. As the `path: "*"` catch-all element — no router error, so `error`
 	//    is null. That means no route matched the URL, i.e. 404.
 	const is404 = !error || (isRouteErrorResponse(error) && error.status === 404);
+
+	// A route that threw is an error a person hit; a URL nothing matches is not.
+	useEffect(() => {
+		if (!is404) reportError(error, "route");
+	}, [error, is404]);
+
 	const title = is404 ? "404 — Page not found" : "Something went wrong";
 	const description = is404
 		? "The page you're looking for doesn't exist or has been moved."

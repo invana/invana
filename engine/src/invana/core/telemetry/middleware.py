@@ -45,10 +45,29 @@ Metrics (OpenTelemetry HTTP semantic conventions, seconds):
   request that raises is recorded with status 500. The duration histogram keeps
   exemplars from sampled spans, so a slow bucket leads to one of its requests.
 
-Logs:
-  one structured INFO log per completed request, emitted inside the request
-  span so the record carries its trace_id and links to the trace in the OTel
-  backend.
+Logs
+----
+Before the request runs, the log fields the span starts with are bound too —
+``principal=anonymous`` and ``origin=api`` — so every line the request writes
+says who it was for; authentication replaces them once it knows the caller.
+They are bound for this request only and restored when it finishes.
+
+The per-request access line (method, route template, status, duration) is
+DEBUG: a request that went well is noise at any higher level.
+
+A 5xx is exactly one ERROR line — whether the route returned it or raised it:
+method, route template, status and duration, with the traceback when it was
+raised, and the same values as ``http.*`` fields. It is written while the
+request span is still current, so it carries the trace_id and span_id that
+lead to the trace. It never carries the request body or query parameters, and
+never a raw path, which would carry ids: a request no route matched is logged
+as ``unmatched``.
+
+Having logged it, the middleware marks the request's ASGI scope
+(``scope["invana.error_logged"]``). ``CatchAllExceptionMiddleware``
+(``invana.server.middleware``), which sits outside this one and is mounted
+even when telemetry is off, logs a 5xx only when that mark is absent — so each
+one is logged once, with or without telemetry.
 """
 
 from __future__ import annotations
@@ -63,6 +82,7 @@ from starlette.requests import Request
 from starlette.routing import Match
 from starlette.types import ASGIApp, Receive, Scope, Send
 
+from invana.core.logging import context as log_context
 from invana.core.telemetry.metrics import http_server_active, http_server_duration
 
 logger = logging.getLogger("invana.api")
@@ -89,9 +109,20 @@ _CREDENTIAL_PARAMS = frozenset({"token"})
 # The ``http.route`` metric value for a request no route matched (a raw path would carry ids).
 _UNMATCHED = "unmatched"
 
+# Scope key set once a 5xx is logged; CatchAllExceptionMiddleware reads the same key.
+ERROR_LOGGED = "invana.error_logged"
+
 
 class TelemetryMiddleware:
-    """Pure ASGI middleware that instruments every HTTP request."""
+    """Pure ASGI middleware that instruments every HTTP request.
+
+    Wraps the app: each request that is not skipped runs inside one SERVER span,
+    is counted on the HTTP metrics, and is logged — at DEBUG when it succeeds,
+    as one ERROR line when it ends in a 5xx (see the module docstring). Mounted
+    only when telemetry is enabled, and inside ``CatchAllExceptionMiddleware``,
+    so an exception a route raises passes through here — recorded and logged —
+    before it becomes a 500 response.
+    """
 
     def __init__(self, app: ASGIApp) -> None:
         self._app = app
@@ -131,7 +162,10 @@ class TelemetryMiddleware:
         # Adopt the caller's W3C `traceparent` so this request nests under the browser's
         # span; without one the SERVER span is a root. This middleware is the only request-span source.
         parent_ctx = extract(_trace_carrier(request))
-        with tracer.start_as_current_span(span_name, context=parent_ctx, kind=SpanKind.SERVER) as span:
+        with (
+            tracer.start_as_current_span(span_name, context=parent_ctx, kind=SpanKind.SERVER) as span,
+            log_context.fields(principal="anonymous", origin="api"),
+        ):
             _attach_request(span, request, raw_path, method, client_ip, user_agent, req_size)
             active_labels = {"http.request.method": method, "http.route": _match_route(scope)}
             http_server_active.add(1, active_labels)
@@ -144,30 +178,34 @@ class TelemetryMiddleware:
                 res_size = res_size_holder[0]
 
                 # After routing, the matched route template is available in scope.
-                route = _resolve_route_from_scope(scope) or raw_path
-                if route != raw_path:
-                    span.update_name(f"{method} {route}")
-                    span.set_attribute("http.route", route)
+                template = _resolve_route_from_scope(scope)
+                if template and template != raw_path:
+                    span.update_name(f"{method} {template}")
+                    span.set_attribute("http.route", template)
+                route = template or active_labels["http.route"]
 
                 _attach_response(span, status, duration_ms, res_size)
                 _record_duration(scope, active_labels, status, duration_ms)
 
-                logger.info(
-                    "%s %s %s  %.2fms",
-                    method,
-                    route,
-                    status,
-                    duration_ms,
-                    extra={
-                        "http.method": method,
-                        "http.route": route,
-                        "http.status_code": status,
-                        "http.duration_ms": round(duration_ms, 3),
-                        "http.res_bytes": res_size,
-                        "http.req_bytes": req_size,
-                        "http.client_ip": client_ip,
-                    },
-                )
+                if status >= 500:
+                    _log_server_error(scope, method, route, status, duration_ms)
+                else:
+                    logger.debug(
+                        "%s %s %s  %.2fms",
+                        method,
+                        route,
+                        status,
+                        duration_ms,
+                        extra={
+                            "http.method": method,
+                            "http.route": route,
+                            "http.status_code": status,
+                            "http.duration_ms": round(duration_ms, 3),
+                            "http.res_bytes": res_size,
+                            "http.req_bytes": req_size,
+                            "http.client_ip": client_ip,
+                        },
+                    )
 
             except Exception as exc:
                 duration_ms = (time.perf_counter() - start) * 1000
@@ -177,7 +215,8 @@ class TelemetryMiddleware:
                 span.set_attribute("invana.error.type", type(exc).__name__)
                 span.set_attribute("invana.error.message", str(exc))
                 _record_duration(scope, active_labels, 500, duration_ms)
-                logger.exception("%s %s 500  %.2fms  %s", method, raw_path, duration_ms, exc)
+                route = _resolve_route_from_scope(scope) or active_labels["http.route"]
+                _log_server_error(scope, method, route, 500, duration_ms, exc_info=True)
                 raise
 
             finally:
@@ -185,6 +224,31 @@ class TelemetryMiddleware:
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
+
+
+def _log_server_error(
+    scope: Scope, method: str, route: str, status: int, duration_ms: float, *, exc_info: bool = False
+) -> None:
+    """Write the one ERROR line for a 5xx and mark the scope so no outer middleware repeats it.
+
+    Called while the request span is current, so the record carries its trace.
+    ``route`` is a template or ``unmatched``; the body and query never reach the line.
+    """
+    logger.error(
+        "%s %s %s  %.2fms",
+        method,
+        route,
+        status,
+        duration_ms,
+        exc_info=exc_info,
+        extra={
+            "http.method": method,
+            "http.route": route,
+            "http.status_code": status,
+            "http.duration_ms": round(duration_ms, 3),
+        },
+    )
+    scope[ERROR_LOGGED] = True
 
 
 def _record_duration(scope: Scope, active_labels: dict[str, str], status: int, duration_ms: float) -> None:

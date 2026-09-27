@@ -7,39 +7,13 @@ kinds — that is what keeps a feature shipping without touching `core`.
 
 from __future__ import annotations
 
-from typing import Any
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.core.events.models import ActorKind, Event
 from invana.core.events.querysets import EventQuerySet
+from invana.core.redaction import redact
 from invana.core.telemetry.recorders import record_event
 from invana.core.telemetry.spans import current_ids
-
-# Never stored, whatever a caller passes.
-_REDACT_SUFFIXES: tuple[str, ...] = (
-    "_hash",
-    "_encrypted",
-    "password",
-    "api_key",
-    "secret",
-    "token",
-)
-
-
-def _is_sensitive(key: str) -> bool:
-    k = key.lower()
-    return any(k == s or k.endswith(s) for s in _REDACT_SUFFIXES)
-
-
-def _redact(value: Any) -> Any:
-    """Recursively drop sensitive keys from dicts; pass other shapes through."""
-    if isinstance(value, dict):
-        return {k: _redact(v) for k, v in value.items() if not _is_sensitive(k)}
-    if isinstance(value, list):
-        return [_redact(item) for item in value]
-    return value
-
 
 # ── emit_event ───────────────────────────────────────────────────────────────
 
@@ -110,7 +84,7 @@ class EventManager:
                 "Pass the human at the root of the chain."
             )
 
-        safe_details = _redact(details or {})
+        safe_details = redact(details or {})
         trace_id, span_id = current_ids()
 
         event = Event(

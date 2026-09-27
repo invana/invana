@@ -28,9 +28,18 @@
  * the Studio module on screen; the other instruments are fed where they happen
  * (see ./metrics).
  *
+ * Errors ride as logs: a LoggerProvider with the same resource batches ERROR
+ * records to the engine's `/api/v1/telemetry/logs` proxy, flushed on the same
+ * hide-or-unload moment as the metrics. Only errors are sent — warnings and
+ * console output stay in the browser. This module listens for the two errors
+ * nothing else catches, the window's `error` (an uncaught exception) and
+ * `unhandledrejection` (a promise nobody awaited); the query client's error
+ * hook and the router's error page report the rest (see ./errors). Each record
+ * is emitted in the active context, so it carries the trace it happened in.
+ *
  * Gated by `VITE_TELEMETRY_ENABLED` (on unless explicitly "false"). When off,
- * `setup()` is a no-op: no provider is registered, so the helpers in ./tracer
- * and ./metrics resolve to OTel's no-ops and the instrumentation costs nothing.
+ * `setup()` is a no-op: no provider is registered, so the helpers in ./tracer,
+ * ./metrics and ./errors resolve to OTel's no-ops and the instrumentation costs nothing.
  *
  * Imported for side-effect from main.tsx before the app renders.
  */
@@ -40,13 +49,19 @@ import {
 	diag,
 	metrics,
 } from "@opentelemetry/api";
+import { logs } from "@opentelemetry/api-logs";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import {
 	AggregationTemporalityPreference,
 	OTLPMetricExporter,
 } from "@opentelemetry/exporter-metrics-otlp-http";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
+import {
+	BatchLogRecordProcessor,
+	LoggerProvider,
+} from "@opentelemetry/sdk-logs";
 import {
 	MeterProvider,
 	PeriodicExportingMetricReader,
@@ -58,6 +73,7 @@ import {
 	WebTracerProvider,
 } from "@opentelemetry/sdk-trace-web";
 import { onCLS, onINP, onLCP, onTTFB } from "web-vitals";
+import { reportError, shouldReport } from "./errors";
 import { type WebVital, moduleOf, recordWebVital } from "./metrics";
 import { sampleRatio } from "./sampling";
 
@@ -85,10 +101,13 @@ const TRACES_URL = `${API_BASE_URL}/api/v1/telemetry/traces`;
 /** Full URL of the engine's browser-metrics proxy. */
 const METRICS_URL = `${API_BASE_URL}/api/v1/telemetry/metrics`;
 
+/** Full URL of the engine's browser-logs proxy. */
+const LOGS_URL = `${API_BASE_URL}/api/v1/telemetry/logs`;
+
 /** How often pending metric points are exported. */
 const METRIC_EXPORT_INTERVAL_MS = 30_000;
 
-/** Who is reporting — shared by traces and metrics, so the two join. */
+/** Who is reporting — shared by traces, metrics and logs, so the three join. */
 function studioResource() {
 	return resourceFromAttributes({
 		"service.name": SERVICE_NAME,
@@ -118,13 +137,8 @@ function setupMetrics(resource: ReturnType<typeof studioResource>): void {
 		],
 	});
 	metrics.setGlobalMeterProvider(provider);
-
-	const flush = () => {
+	onPageLeave(() => {
 		provider.forceFlush().catch(() => undefined);
-	};
-	window.addEventListener("pagehide", flush);
-	document.addEventListener("visibilitychange", () => {
-		if (document.visibilityState === "hidden") flush();
 	});
 
 	const report =
@@ -139,6 +153,41 @@ function setupMetrics(resource: ReturnType<typeof studioResource>): void {
 	onINP(report("inp"));
 	onCLS(report("cls"));
 	onTTFB(report("ttfb"));
+}
+
+/** Flush `flush` whenever the tab may be about to go — hidden or unloaded. */
+function onPageLeave(flush: () => void): void {
+	window.addEventListener("pagehide", flush);
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "hidden") flush();
+	});
+}
+
+/**
+ * Register the global LoggerProvider, flush it whenever the tab may be about
+ * to go, and report the window's uncaught errors and unhandled rejections.
+ */
+function setupLogs(resource: ReturnType<typeof studioResource>): void {
+	const provider = new LoggerProvider({
+		resource,
+		processors: [
+			new BatchLogRecordProcessor(new OTLPLogExporter({ url: LOGS_URL })),
+		],
+	});
+	logs.setGlobalLoggerProvider(provider);
+	onPageLeave(() => {
+		provider.forceFlush().catch(() => undefined);
+	});
+
+	window.addEventListener("error", (event) => {
+		// A cross-origin script's error arrives with no `error`, only a message.
+		const error = event.error ?? event.message;
+		if (shouldReport(error)) reportError(error, "uncaught");
+	});
+	window.addEventListener("unhandledrejection", (event) => {
+		if (shouldReport(event.reason))
+			reportError(event.reason, "unhandled_rejection");
+	});
 }
 
 function setup(): void {
@@ -180,11 +229,12 @@ function setup(): void {
 		provider.register({ contextManager: new ZoneContextManager() });
 
 		setupMetrics(resource);
+		setupLogs(resource);
 
 		if (import.meta.env.DEV) {
 			// eslint-disable-next-line no-console
 			console.info(
-				`[telemetry] studio telemetry on → spans to ${TRACES_URL}, metrics to ${METRICS_URL}`,
+				`[telemetry] studio telemetry on → spans to ${TRACES_URL}, metrics to ${METRICS_URL}, errors to ${LOGS_URL}`,
 			);
 		}
 	} catch (err) {

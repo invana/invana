@@ -29,6 +29,16 @@ Usage
 
 Attribute values follow OpenTelemetry's rules: ``None`` values are dropped
 rather than recorded, so callers can pass optional ids without checking them.
+
+Log fields
+----------
+Who acted is also what a log line should say. ``span``, ``root_span`` and
+``set_current`` bind ``invana.principal``, ``invana.origin`` and
+``invana.graph_id`` as the log fields ``principal``, ``origin`` and ``graph_id``
+(``invana.core.logging.context``) — for the span's block, or for the rest of the
+task with ``set_current``. ``root_span`` starts from no fields, as it starts from
+no parent. This happens with or without the extra, so a log line carries who it
+was for even when nothing is traced.
 """
 
 from __future__ import annotations
@@ -36,6 +46,8 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from typing import Any
+
+from invana.core.logging import context as _log_context
 
 try:
     from opentelemetry import trace as _trace
@@ -53,8 +65,16 @@ except ImportError:  # telemetry extra not installed
 _TRACER_NAME = "invana.engine"
 
 
+# Span attribute → log field, for the attributes a log line also carries.
+_LOG_FIELDS = {"invana.principal": "principal", "invana.origin": "origin", "invana.graph_id": "graph_id"}
+
+
 def _clean(attributes: Mapping[str, Any] | None) -> dict[str, Any]:
     return {k: v for k, v in (attributes or {}).items() if v is not None}
+
+
+def _log_fields(attributes: Mapping[str, Any]) -> dict[str, Any]:
+    return {field: attributes[key] for key, field in _LOG_FIELDS.items() if attributes.get(key) is not None}
 
 
 @contextmanager
@@ -73,18 +93,20 @@ def span(
     error — for callers that treat some exceptions as outcomes and set the
     status themselves.
     """
-    if _trace is None:
-        yield None
-        return
-    otel_links = [_Link(ctx) for ctx in links if ctx is not None]
-    with _trace.get_tracer(_TRACER_NAME).start_as_current_span(
-        name,
-        attributes=_clean(attributes),
-        links=otel_links,
-        record_exception=record_errors,
-        set_status_on_exception=record_errors,
-    ) as s:
-        yield s
+    attrs = _clean(attributes)
+    with _log_context.fields(**_log_fields(attrs)):
+        if _trace is None:
+            yield None
+            return
+        otel_links = [_Link(ctx) for ctx in links if ctx is not None]
+        with _trace.get_tracer(_TRACER_NAME).start_as_current_span(
+            name,
+            attributes=attrs,
+            links=otel_links,
+            record_exception=record_errors,
+            set_status_on_exception=record_errors,
+        ) as s:
+            yield s
 
 
 @contextmanager
@@ -107,24 +129,33 @@ def root_span(
     that caused it (a queue consumer links to its producers). Errors leaving the
     block are recorded and mark the span failed, as with ``span()``.
     """
-    if _trace is None:
-        yield None
-        return
-    otel_links = [_Link(ctx) for ctx in links if ctx is not None]
     attrs = {"invana.origin": origin, "invana.principal": principal, **_clean(attributes)}
-    with _trace.get_tracer(_TRACER_NAME).start_as_current_span(
-        name, context=_Context(), attributes=attrs, links=otel_links
-    ) as s:
-        yield s
+    with _log_context.fields(fresh=True, **_log_fields(attrs)):
+        if _trace is None:
+            yield None
+            return
+        otel_links = [_Link(ctx) for ctx in links if ctx is not None]
+        with _trace.get_tracer(_TRACER_NAME).start_as_current_span(
+            name, context=_Context(), attributes=attrs, links=otel_links
+        ) as s:
+            yield s
 
 
 def set_current(**attributes: Any) -> None:
-    """Set attributes on the current span, if one is recording."""
+    """Set attributes on the current span, if one is recording.
+
+    Principal, origin and Graph id among them are also bound as log fields for
+    the rest of the current task, recording or not.
+    """
+    attrs = _clean(attributes)
+    fields = _log_fields(attrs)
+    if fields:
+        _log_context.bind(**fields)
     if _trace is None:
         return
     current = _trace.get_current_span()
     if current.is_recording():
-        current.set_attributes(_clean(attributes))
+        current.set_attributes(attrs)
 
 
 def add_event(name: str, attributes: Mapping[str, Any] | None = None) -> None:
