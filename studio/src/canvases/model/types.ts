@@ -47,6 +47,7 @@ export interface ModelTypeData {
 	label: string;
 	/** The model's name. */
 	model: string;
+	/** `1`–`8`, the slot the type's own name hashes to (ST17). */
 	hue: number;
 	description: string;
 	/** `lucide/<name>`. */

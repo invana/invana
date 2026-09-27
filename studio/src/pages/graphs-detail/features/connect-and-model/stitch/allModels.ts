@@ -30,6 +30,7 @@ import {
 } from "@/canvases/model";
 import type { ModelLink } from "@/types/models";
 import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
+import { colorSlotByString } from "@invana/styling/color";
 
 /** One model, with the published version that is drawn. */
 export interface ModelFrame {
@@ -231,7 +232,9 @@ export function buildAllModelsData(
 				data: {
 					label: n.name,
 					model: t.name,
-					hue: t.hue,
+					// The type's own colour, the one the Explorer paints it (ST17);
+					// the frame around it carries the model's.
+					hue: colorSlotByString(n.name),
 					description: n.description ?? "",
 					icon: TYPE_ICON,
 					propertyCount: properties.length,
