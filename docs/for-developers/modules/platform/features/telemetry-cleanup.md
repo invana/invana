@@ -14,7 +14,7 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 4 | Merge and release design-kit `feat/error-boundary-reports` | `../design-kit` | 🟡 | S | `ErrorBoundary` `onError` + `fallback`; Studio uses the local kit until then |
 | 5 | Push and open PRs | invana · design-kit | 🟡 | S | owner's call |
 | 6 | Pool reconnect backoff never doubles | `engine/src/invana/apps/graphs/pool.py` (`_connect_graph`) | ✅ | S | a failed attempt cancelled its own retry task and started a new one at 1s; the retry loop now connects with `retry=False`, so delays go 1 → 2 → 4 … |
-| 7 | CLI exit takes ~19s with the collector down | OpenTelemetry SDK shutdown at process exit | 🟡 | S | the CLI's own flush is capped at 5s; bound the SDK shutdown or accept it |
+| 7 | CLI exit takes ~19s with the collector down | `core/telemetry/setup.py` (`shutdown_telemetry`) | ✅ | S | the providers' exit hooks are unregistered and shut down within the 5s budget; measured 20s → 6s (collector up: under 1s) |
 | 8 | Dev DB run `f4a26cc5-…` left crashed | dev database | 🟡 | S | ask before touching it |
 | 9 | Graph-connector metric label is the class name; `operation` is always `query` | `engine/src/invana/graph/connectors/base/connector.py` | 🟡 | S | only if a dashboard needs `neo4j` rather than `Neo4jConnector` |
 | 10 | OTLP log handler ships `trace`, `log_fields`, `trace_id`, `span_id` as redundant attributes | `engine/src/invana/core/telemetry/setup.py` | ⏸ | S | harmless; only if HyperDX looks noisy |
@@ -29,3 +29,4 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 19 | Stray asyncio mark on a sync test | `engine/tests/sessions/test_services.py` | ✅ | S | the module-level mark was redundant under `asyncio_mode = "auto"`; removed |
 | 20 | Broken `guides/running-*.md` links in the public docs | `docs/docs` | ⏸ | S | unrelated to telemetry |
 | 21 | `TEST_CONNECTOR_CLASS` in the graphs test fixtures names a module that no longer exists | `engine/tests/graphs/conftest.py` | ⏸ | S | harmless while no test there connects; the backoff test names `invana_neo4j.connector.Neo4jConnector` itself |
+| 22 | The CLI rebuilt its logging after telemetry started, dropping the OTLP log handler (so CLI logs never reached the collector) and flushing it on a non-daemon thread | `cli/main.py` · `core/logging/config.py` (`set_level`) | ✅ | S | found while fixing 7; the CLI lowers its level in place |

@@ -5,7 +5,7 @@ Public API
 setup_telemetry()       Register OTel providers (traces/metrics/logs). Idempotent.
 instrument_app()        Add SQLAlchemy auto-instrumentation. Call in lifespan.
 instrument_process()    Instrument every engine created afterwards (the CLI). Idempotent.
-flush_telemetry()       Export what the providers still hold, within a time budget.
+shutdown_telemetry()    Export what the providers hold and shut them down, within a budget.
 TelemetryMiddleware     Pure-ASGI middleware that spans every HTTP request.
 
 Metrics are recorded through ``invana.core.telemetry.recorders`` (no-op-safe
@@ -19,10 +19,10 @@ not pull in OpenTelemetry — the optional ``telemetry`` extra
 
 __all__ = [
     "TelemetryMiddleware",
-    "flush_telemetry",
     "instrument_app",
     "instrument_process",
     "setup_telemetry",
+    "shutdown_telemetry",
 ]
 
 
@@ -31,7 +31,7 @@ def __getattr__(name: str):
         from invana.core.telemetry.middleware import TelemetryMiddleware
 
         return TelemetryMiddleware
-    if name in ("flush_telemetry", "instrument_app", "instrument_process", "setup_telemetry"):
+    if name in ("instrument_app", "instrument_process", "setup_telemetry", "shutdown_telemetry"):
         from invana.core.telemetry import setup
 
         return getattr(setup, name)

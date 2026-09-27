@@ -91,3 +91,28 @@ def configure_logging(level: str = "INFO", config: dict | None = None) -> None:
         cfg["loggers"]["invana"]["level"] = level
         config = cfg
     logging.config.dictConfig(config)
+
+
+def set_level(level: str) -> None:
+    """
+    Change the level of the pipeline ``configure_logging()`` built, in place.
+
+    For an entry point that wants a different level after startup — the CLI
+    prints at ``INFO`` whatever the configured level is. It sets the root
+    logger, the ``invana`` logger and the ``console`` handler, the three places
+    ``configure_logging(level=...)`` sets, and touches nothing else.
+
+    Calling ``configure_logging()`` a second time would not do: ``dictConfig``
+    closes and flushes **every** handler first, the OTLP log handler that
+    telemetry added among them, so the process would stop shipping logs and an
+    unreachable collector would hold its exit up on that flush.
+
+    Examples::
+
+        set_level("INFO")
+    """
+    logging.getLogger().setLevel(level)
+    logging.getLogger("invana").setLevel(level)
+    for handler in logging.getLogger().handlers:
+        if handler.get_name() == "console":
+            handler.setLevel(level)

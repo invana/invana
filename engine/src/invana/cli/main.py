@@ -20,9 +20,10 @@ Two runs are not traced: ``invana start`` (it runs the server, which traces its
 own startup and requests) and any ``--help`` (nothing happens worth a trace).
 
 With telemetry enabled the group also instruments SQLAlchemy for the process —
-there is no FastAPI lifespan here to hand an engine to — and flushes the
-providers once the span has ended, so a command that runs for a second still
-ships its spans. Tracing never breaks a command: a failure anywhere in it is
+there is no FastAPI lifespan here to hand an engine to — and flushes and shuts
+down the providers once the span has ended, within five seconds, so a command
+that runs for a second still ships its spans and a collector that is down cannot
+hold its exit up. Tracing never breaks a command: a failure anywhere in it is
 logged at debug and the command runs untraced.
 """
 
@@ -43,7 +44,7 @@ from invana.cli.commands.records import records_cmd
 from invana.cli.commands.start import start_cmd
 from invana.cli.commands.stitches import stitches_cmd
 from invana.cli.commands.users import users_cmd
-from invana.core.logging import configure_logging
+from invana.core.logging import set_level
 from invana.core.settings import settings
 from invana.core.telemetry.spans import mark_error, root_span
 
@@ -61,7 +62,7 @@ class TracedGroup(click.Group):
     """
 
     def invoke(self, ctx: click.Context) -> Any:
-        """Run the command inside its root span, then flush telemetry."""
+        """Run the command inside its root span, then flush and shut telemetry down."""
         tokens = [*_protected_args(ctx), *ctx.args]
         path = self._traced_path(ctx, tokens)
         if path is None:
@@ -164,21 +165,23 @@ def _set(target: Any, key: str, value: str) -> None:
 
 
 def _flush() -> None:
-    """Ship the command's spans before the process exits; never raises."""
+    """Ship the command's signals and shut the providers down, within five seconds; never raises."""
     if not settings.telemetry_enabled:
         return
     try:
-        from invana.core.telemetry import flush_telemetry
+        from invana.core.telemetry import shutdown_telemetry
 
-        flush_telemetry()
+        shutdown_telemetry()
     except Exception as exc:  # telemetry never breaks the caller
-        logger.debug("Telemetry flush skipped — %s", exc)
+        logger.debug("Telemetry shutdown skipped — %s", exc)
 
 
 @click.group(cls=TracedGroup)
 def app() -> None:
     """Invana — Graph Intelligence Platform."""
-    configure_logging()
+    # Importing invana configured logging (and telemetry's OTLP handler on top);
+    # the CLI only lowers the chatter to INFO, in place.
+    set_level("INFO")
 
 
 @app.command("version")

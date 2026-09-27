@@ -1,6 +1,6 @@
 """Invana logging — configure once, use logging.getLogger(__name__) everywhere."""
 
-from .config import DEFAULT_LOGGING_CONFIG, configure_logging
+from .config import DEFAULT_LOGGING_CONFIG, configure_logging, set_level
 from .filters import (
     OtlpThirdPartyFilter,
     RedactFilter,
@@ -17,4 +17,5 @@ __all__ = [
     "SuppressNoisyFilter",
     "TraceContextFilter",
     "configure_logging",
+    "set_level",
 ]

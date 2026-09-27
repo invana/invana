@@ -62,7 +62,7 @@ flowchart LR
 | Redaction | a filter on every handler drops sensitive `extra=` fields and redacts mapping arguments by the events rule (`core/redaction.py`) |
 | Access log | uvicorn's access log has `token` stripped from the path |
 | Levels | the lifecycle logs of [telemetry](telemetry.md) § Logs |
-| Entry point | called once by the server and by the CLI |
+| Entry point | called once, when `invana` is imported — the server and the CLI alike; the CLI then lowers the level to INFO with `set_level`, in place |
 
 ## Decisions
 
@@ -77,6 +77,7 @@ flowchart LR
 | LO7 | A log never carries record contents, prompts, answers or credentials; redaction is at write, as for events. |
 | LO8 | Structured context is bound, never passed: code logs `log.info(..., extra={...})` with its own ids, and who, from where and which Graph arrive from the context the span helpers bound. |
 | LO9 | Redaction is a filter on each handler, not on a logger — a logger's filter never sees the records its children propagate. |
+| LO10 | After startup, a level changes in place (`set_level`); the configuration is never rebuilt, because rebuilding closes every handler — telemetry's OTLP handler with them. |
 
 ## Not building
 

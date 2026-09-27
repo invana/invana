@@ -15,9 +15,10 @@ Public entry points:
                           afterwards, for a process with no FastAPI lifespan (the CLI).
                           Idempotent.
 
-  flush_telemetry()     — Exports whatever the providers still hold, within a time budget.
-                          A short-lived process (a CLI command) calls it before exiting so
-                          its spans are not lost with the batch processor's queue.
+  shutdown_telemetry()  — Exports what the providers still hold and shuts them down, within
+                          a time budget. A short-lived process (a CLI command) calls it
+                          before exiting, so its spans are not lost with the batch queue and
+                          an unreachable collector cannot hold the exit up.
 
 Instruments:
   - HTTP requests    (TelemetryMiddleware — the only source of request spans; it is
@@ -45,9 +46,9 @@ Signals exported via OTLP gRPC to any OTel-compatible backend (HyperDX, Signoz, 
 
 from __future__ import annotations
 
+import atexit
 import logging
 import threading
-import time
 
 from opentelemetry import metrics, trace
 from opentelemetry._logs import get_logger_provider, set_logger_provider
@@ -166,54 +167,71 @@ def instrument_process() -> None:
     instrumentor.instrument(enable_commenter=True)
 
 
-def flush_telemetry(timeout_millis: int = 5000) -> None:
+def shutdown_telemetry(timeout_millis: int = 5000) -> None:
     """
-    Export whatever the trace, metric and log providers still hold.
+    Export what the trace, metric and log providers still hold, then shut them down, within a budget.
 
-    Batch processors export on a timer; a process that exits first — a CLI command
-    that ran for a second — would lose its spans. Call this once the work is done
-    and its spans have ended.
+    For a short-lived process about to exit — a CLI command. Batch processors
+    export on a timer, so a command that ran for a second would lose its spans;
+    and the SDK's own exit hook shuts each provider down with no bound on how
+    long an unreachable collector can hold it (an exporter retries for about
+    twenty seconds). This does both jobs once, within ``timeout_millis`` for all
+    three providers together:
 
-    ``timeout_millis`` is the budget for all three providers together, so an
-    unreachable collector delays the caller by at most that long: the exporters
-    retry past the timeout they are handed, so the flush runs on a daemon thread
-    and is abandoned when the budget runs out. Providers that are
-    not the SDK's (telemetry never set up) are skipped. Never raises: a flush that
-    fails is logged at debug and the process carries on.
+    - Each provider's exit hook is unregistered, so interpreter exit does not
+      run a second, unbounded shutdown.
+    - ``shutdown()`` — which flushes first — runs for each provider on a daemon
+      thread, and the caller waits for the budget at most. What is still
+      exporting when it runs out is abandoned with the process.
+
+    Providers that are not the SDK's (telemetry never set up) are skipped.
+    Never raises: a shutdown that fails is logged at debug and the process
+    carries on. The server does not call this; its providers shut down with it.
 
     Parameters
     ----------
-    timeout_millis: Total time to wait for the exports, in milliseconds.
+    timeout_millis: Total time to wait, in milliseconds.
     """
     providers = [
         p
         for p in (trace.get_tracer_provider(), metrics.get_meter_provider(), get_logger_provider())
         if isinstance(p, (TracerProvider, MeterProvider, LoggerProvider))
     ]
-    if not providers:
-        return
-    deadline = time.monotonic() + timeout_millis / 1000
-
-    def _flush_all() -> None:
-        for provider in providers:
-            remaining = int((deadline - time.monotonic()) * 1000)
-            if remaining <= 0:
-                return
-            try:
-                provider.force_flush(timeout_millis=remaining)
-            except Exception as exc:  # telemetry never breaks the caller
-                logger.debug("Telemetry flush failed for %s — %s", type(provider).__name__, exc)
-
-    # The exporters' retries do not honour the timeout they are given, so the
-    # flush runs on a daemon thread and the caller waits for the budget at most.
-    worker = threading.Thread(target=_flush_all, name="invana-telemetry-flush", daemon=True)
-    worker.start()
-    worker.join(timeout=max(deadline - time.monotonic(), 0))
-    if worker.is_alive():
-        logger.debug("Telemetry flush still running after %sms — not waiting", timeout_millis)
+    _shutdown_within(providers, timeout_millis)
 
 
 # ── internals ─────────────────────────────────────────────────────────────────
+
+
+# Where each provider keeps the handler it registered with ``atexit``.
+_EXIT_HOOK_ATTRS = ("_atexit_handler", "_at_exit_handler")
+
+
+def _shutdown_within(providers: list, timeout_millis: int) -> None:
+    """Shut *providers* down on a daemon thread, waiting at most *timeout_millis*."""
+    if not providers:
+        return
+    for provider in providers:
+        for attr in _EXIT_HOOK_ATTRS:
+            hook = getattr(provider, attr, None)
+            if hook is not None:
+                atexit.unregister(hook)
+                setattr(provider, attr, None)
+
+    def _shutdown_all() -> None:
+        for provider in providers:
+            try:
+                provider.shutdown()
+            except Exception as exc:  # telemetry never breaks the caller
+                logger.debug("Telemetry shutdown failed for %s — %s", type(provider).__name__, exc)
+
+    # The exporters' retries do not honour a timeout, so the shutdown runs on a
+    # daemon thread and the caller waits for the budget at most.
+    worker = threading.Thread(target=_shutdown_all, name="invana-telemetry-shutdown", daemon=True)
+    worker.start()
+    worker.join(timeout=timeout_millis / 1000)
+    if worker.is_alive():
+        logger.debug("Telemetry shutdown still running after %sms — not waiting", timeout_millis)
 
 
 def _sampler(ratio: float) -> Sampler:
