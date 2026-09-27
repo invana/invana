@@ -183,12 +183,36 @@
 					"bindings": {}
 				}
 			},
+			"node": {
+				"state": {
+					"wide": {
+						"decorations": [
+							{
+								"kind": "ring",
+								"id": "emphasis-wide",
+								"color": 13534473,
+								"width": 3,
+								"gap": 4,
+								"alpha": 1
+							}
+						]
+					},
+					"rare": {
+						"bgAlpha": 0.35
+					}
+				}
+			},
 			"edge": {
 				"style": {
 					"strokeWidth": 1.5,
 					"strokeAlpha": 0.85,
 					"arrowTargetShape": "triangle",
 					"arrowTargetSize": 6
+				},
+				"state": {
+					"rare": {
+						"strokeAlpha": 0.2
+					}
 				}
 			}
 		}

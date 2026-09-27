@@ -25,10 +25,19 @@ export interface TaskEdgeData {
 	description: string;
 }
 
+/**
+ * A step's emphasis, drawn by the node and edge states `settings.json`
+ * declares: `wide` rings a step whose spread is wide in the kit's `--warning`
+ * (`38 92% 42%`, as a number because the canvas takes numbers), `rare` dims a
+ * step few runs take and the edges that reach it (LB35).
+ */
+export type TaskFlowState = "wide" | "rare";
+
 export interface TaskFlowNode {
 	id: string;
 	type: TaskNodeType;
 	data: TaskNodeData;
+	states?: TaskFlowState[];
 }
 
 export interface TaskFlowEdge {
@@ -36,6 +45,7 @@ export interface TaskFlowEdge {
 	source: string;
 	target: string;
 	data: TaskEdgeData;
+	states?: TaskFlowState[];
 }
 
 export interface TaskFlowData {

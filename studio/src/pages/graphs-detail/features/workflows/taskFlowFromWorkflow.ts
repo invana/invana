@@ -12,6 +12,7 @@ import {
 	type TaskFlowData,
 	type TaskFlowEdge,
 	type TaskFlowNode,
+	type TaskFlowState,
 	taskNodeTypeOf,
 } from "@/canvases/taskflow";
 import { formatElapsed } from "@/lib/time";
@@ -24,6 +25,23 @@ const ms = (v: number) => formatElapsed(Math.round(v));
 
 /** A p95 this far over its p50 makes a step unpredictable (LB33). */
 export const WIDE_SPREAD = 4;
+/** A step fewer than this share of runs take is a branch, and is dim (LB35). */
+export const RARE_BRANCH = 0.25;
+
+const isWide = (step: StepMeasures) =>
+	step.p50_ms != null &&
+	step.p95_ms != null &&
+	step.p95_ms >= WIDE_SPREAD * step.p50_ms;
+const isRare = (step: StepMeasures) =>
+	step.ran_in != null && step.ran_in < RARE_BRANCH;
+
+function statesOf(step: StepMeasures | undefined): TaskFlowState[] {
+	if (!step) return [];
+	return [
+		...(isWide(step) ? (["wide"] as const) : []),
+		...(isRare(step) ? (["rare"] as const) : []),
+	];
+}
 
 function medianLine(step: StepMeasures | undefined): string {
 	if (!step || step.p50_ms == null) return "";
@@ -31,8 +49,7 @@ function medianLine(step: StepMeasures | undefined): string {
 	if (step.ran_in != null && step.ran_in < 1)
 		facts.push(`runs in ${Math.round(step.ran_in * 100)}%`);
 	if (step.failed > 0) facts.push(`${step.failed} failed`);
-	if (step.p95_ms != null && step.p95_ms >= WIDE_SPREAD * step.p50_ms)
-		facts.push(`p95 ${ms(step.p95_ms)}`);
+	if (isWide(step) && step.p95_ms != null) facts.push(`p95 ${ms(step.p95_ms)}`);
 	return facts.join(" · ");
 }
 
@@ -44,6 +61,7 @@ export function taskFlowFromWorkflow(
 	const nodes: TaskFlowNode[] = plan.nodes.map((node, i) => ({
 		id: node.id,
 		type: taskNodeTypeOf(node.layer),
+		states: statesOf(measured.get(node.id)),
 		data: {
 			title: node.label || node.task || node.id,
 			bound: node.layer,
@@ -65,6 +83,9 @@ export function taskFlowFromWorkflow(
 		},
 	}));
 
+	const rare = new Set(
+		nodes.filter((n) => n.states?.includes("rare")).map((n) => n.id),
+	);
 	const edges: TaskFlowEdge[] = plan.edges.map((edge, i) => ({
 		id: `${edge.kind}:${edge.source}->${edge.target}:${i}`,
 		source: edge.source,
@@ -73,6 +94,7 @@ export function taskFlowFromWorkflow(
 			kind: edge.kind === "binding" ? "binding" : "require",
 			description: edge.label,
 		},
+		states: rare.has(edge.source) || rare.has(edge.target) ? ["rare"] : [],
 	}));
 
 	return { nodes, edges };
