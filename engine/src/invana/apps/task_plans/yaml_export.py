@@ -56,8 +56,13 @@ def to_yaml(plan: TaskPlan, tasks: Sequence[Task]) -> str:
         "kind": plan.kind,
         "origin": plan.origin,
         "intent": list(plan.intent or []),
-        "steps": steps_of(tasks),
     }
+    # What the plan **declares** a caller may tune (LB19). Top-level `args`,
+    # beside each step's own: without it the export is a different document
+    # from the plan — the steps' `${args.x}` would name nothing.
+    if plan.args_schema:
+        doc["args"] = dict(plan.args_schema)
+    doc["steps"] = steps_of(tasks)
     return _emit(doc, 0).rstrip() + "\n"
 
 
@@ -70,6 +75,9 @@ def _emit(value: Any, indent: int) -> str:
         for key, item in value.items():
             if isinstance(item, dict | list) and item:
                 out += f"{pad}{key}:\n{_emit(item, indent + 1)}"
+            elif isinstance(item, dict | list):
+                # An empty mapping is `{}`, not the string `"{}"`.
+                out += f"{pad}{key}: {'{}' if isinstance(item, dict) else '[]'}\n"
             else:
                 out += f"{pad}{key}: {_scalar(item)}\n"
         return out

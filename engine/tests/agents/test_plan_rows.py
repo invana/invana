@@ -85,3 +85,16 @@ def test_two_readings_of_the_graph_do_not_depend_on_each_other() -> None:
     assert {"translate_a", "translate_b"} == {t.key for t in tasks if not t.depends_on}
     # Both branches converge on the node that summarises them.
     assert {"execute_a", "execute_b"} == {s for s, t in pairs if t == "shape_for_canvas"}
+
+
+def test_the_export_declares_its_arguments_and_writes_an_empty_mapping_as_one() -> None:
+    """A step's `${args.read_only}` names the declaration above it, so the
+    declaration is in the document; and a step with no arguments says `{}`,
+    never the string `"{}"` (LB38)."""
+    template = TEMPLATES["nl-single"]
+    plan = _plan(template)
+    plan.args_schema = dict(template.args_schema)
+    text = to_yaml(plan, explode("p1", template.steps, requires=REQUIRES))
+
+    assert "\nargs:\n  read_only:\n    type: bool\n    default: true\n" in text
+    assert "    args: {}\n" in text and 'args: "{}"' not in text
