@@ -26,6 +26,6 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 16 | Fold the graph connector's and LLM client's own OpenTelemetry fallbacks into `core/telemetry/spans.py` | refactor R5 | ⏸ | M | refactor track |
 | 17 | `ui.boards.open` action span | refactor R2–R4 | ⏸ | S | lands with the Boards view panel |
 | 18 | Studio metrics lost when a Playwright context closes before `pagehide` | `studio/src/services/telemetry/setup.ts` | ❌ | — | test-harness only; a real tab close flushes |
-| 19 | Stray asyncio mark on a sync test | `engine/tests/sessions/test_services.py:339` | 🟡 | S | fold into any cleanup commit |
+| 19 | Stray asyncio mark on a sync test | `engine/tests/sessions/test_services.py` | ✅ | S | the module-level mark was redundant under `asyncio_mode = "auto"`; removed |
 | 20 | Broken `guides/running-*.md` links in the public docs | `docs/docs` | ⏸ | S | unrelated to telemetry |
 | 21 | `TEST_CONNECTOR_CLASS` in the graphs test fixtures names a module that no longer exists | `engine/tests/graphs/conftest.py` | ⏸ | S | harmless while no test there connects; the backoff test names `invana_neo4j.connector.Neo4jConnector` itself |
