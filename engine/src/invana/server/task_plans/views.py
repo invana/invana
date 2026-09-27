@@ -14,6 +14,7 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.task_plans.schemas import (
     PlanPerformance,
     PlanRunsPage,
+    PlanVersionDiff,
     PromoteRequest,
     TaskPlanDetail,
     TaskPlanListResponse,
@@ -53,6 +54,18 @@ async def get_workflow(
 ) -> TaskPlanDetail:
     workflow = await library.get(session, graph_id=graph.id, key=key, version=version)
     return await library.detail(session, workflow=workflow)
+
+
+async def plan_diff(
+    key: str = Path(...),
+    version: int | None = Query(default=None),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> PlanVersionDiff:
+    """What changed against the version before it (LB37)."""
+    workflow = await library.get(session, graph_id=graph.id, key=key, version=version)
+    return await library.diff(session, workflow=workflow)
 
 
 async def get_plan_tasks(

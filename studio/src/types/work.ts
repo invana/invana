@@ -600,6 +600,29 @@ export interface PlanRunRow {
 	failed_at: { step_key: string; cause: string; message: string } | null;
 }
 
+/** A version against the one before it (LB37). `against_version` is null for v1. */
+export interface PlanVersionDiff {
+	key: string;
+	version: number;
+	against_version: number | null;
+	/** The one line the drawer prints — `+await_reply · fetch changed`. */
+	summary: string;
+	added: string[];
+	removed: string[];
+	moved: string[];
+	changed: {
+		step_key: string;
+		fields: { field: string; before: unknown; after: unknown }[];
+	}[];
+	unchanged: string[];
+	arguments: {
+		name: string;
+		change: "added" | "removed" | "changed";
+		before: unknown;
+		after: unknown;
+	}[];
+}
+
 export interface PlanRunsPage {
 	items: PlanRunRow[];
 	next_cursor: string | null;

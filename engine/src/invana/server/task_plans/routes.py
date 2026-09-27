@@ -15,6 +15,7 @@ from fastapi import APIRouter, status
 from invana.apps.task_plans.schemas import (
     PlanPerformance,
     PlanRunsPage,
+    PlanVersionDiff,
     TaskPlanDetail,
     TaskPlanListResponse,
     TaskPlanRead,
@@ -27,6 +28,7 @@ task_plans_router = APIRouter(prefix="/api/v1/u/{username}/{graphSlug}/task-plan
 task_plans_router.get("", response_model=TaskPlanListResponse)(views.list_workflows)
 task_plans_router.get("/{key}", response_model=TaskPlanDetail)(views.get_workflow)
 task_plans_router.get("/{key}/tasks", response_model=TasksResponse)(views.get_plan_tasks)
+task_plans_router.get("/{key}/diff", response_model=PlanVersionDiff)(views.plan_diff)
 task_plans_router.get("/{key}/performance", response_model=PlanPerformance)(views.plan_performance)
 task_plans_router.get("/{key}/runs", response_model=PlanRunsPage)(views.plan_runs)
 task_plans_router.get("/{key}/export")(views.export_workflow)

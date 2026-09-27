@@ -474,6 +474,28 @@ export function usePlanVersionQuery(
 }
 
 /** How a plan has behaved over a window (LB33 · LB36). */
+/** A published version is immutable, so its diff never goes stale. */
+export function usePlanDiffQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	version: number | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: workflowsKey(scope, [key, "diff", version]),
+		queryFn: () =>
+			workflowsApi.diff(
+				scope.username,
+				scope.graphSlug,
+				key as string,
+				version as number,
+			),
+		enabled: !!username && !!graphSlug && !!key && version != null,
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+}
+
 export function usePlanPerformanceQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,

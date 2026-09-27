@@ -1505,6 +1505,36 @@
         "title": "AppliedDiffRead",
         "type": "object"
       },
+      "ArgumentChange": {
+        "description": "A declared argument, whole, before and after (LB19).",
+        "properties": {
+          "after": {
+            "title": "After"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "change": {
+            "enum": [
+              "added",
+              "removed",
+              "changed"
+            ],
+            "title": "Change",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "change"
+        ],
+        "title": "ArgumentChange",
+        "type": "object"
+      },
       "ArtefactLink": {
         "description": "A declared link, carried only when both endpoints are in the bundle (SM3).",
         "properties": {
@@ -4307,6 +4337,26 @@
           "last_run_id"
         ],
         "title": "FailureRow",
+        "type": "object"
+      },
+      "FieldChange": {
+        "description": "One field of a step, before and after \u2014 ``task`` \u00b7 ``form`` \u00b7 ``after``\n(the keys it waits on) \u00b7 ``args.<name>``.",
+        "properties": {
+          "after": {
+            "title": "After"
+          },
+          "before": {
+            "title": "Before"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "title": "FieldChange",
         "type": "object"
       },
       "FilterExpression": {
@@ -8100,6 +8150,90 @@
           "latest_version"
         ],
         "title": "PlanUseRead",
+        "type": "object"
+      },
+      "PlanVersionDiff": {
+        "description": "A version against the one before it\n([LB37](docs/for-developers/modules/workflows/features/the-library.md)).\n\n``against_version`` is null for v1: compared against nothing, which is not\nthe same as an empty diff, so every list is empty and ``summary`` says so.",
+        "properties": {
+          "added": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Added",
+            "type": "array"
+          },
+          "against_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Against Version"
+          },
+          "arguments": {
+            "items": {
+              "$ref": "#/components/schemas/ArgumentChange"
+            },
+            "title": "Arguments",
+            "type": "array"
+          },
+          "changed": {
+            "items": {
+              "$ref": "#/components/schemas/StepChange"
+            },
+            "title": "Changed",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "moved": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Moved",
+            "type": "array"
+          },
+          "removed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Removed",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "unchanged": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unchanged",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "against_version",
+          "summary",
+          "added",
+          "removed",
+          "moved",
+          "changed",
+          "unchanged",
+          "arguments"
+        ],
+        "title": "PlanVersionDiff",
         "type": "object"
       },
       "PreviewRequest": {
@@ -12311,6 +12445,27 @@
           "package_id"
         ],
         "title": "StarterSummary",
+        "type": "object"
+      },
+      "StepChange": {
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/FieldChange"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "fields"
+        ],
+        "title": "StepChange",
         "type": "object"
       },
       "StepPerformance": {
@@ -29789,6 +29944,92 @@
           }
         ],
         "summary": "Get Workflow",
+        "tags": [
+          "task-plans"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/diff": {
+      "get": {
+        "description": "What changed against the version before it (LB37).",
+        "operationId": "plan_diff_api_v1_u__username___graphSlug__task_plans__key__diff_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanVersionDiff"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Plan Diff",
         "tags": [
           "task-plans"
         ]

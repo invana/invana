@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from invana.apps.graphs.models import Graph
 from invana.apps.skills.querysets import SkillVersionQuerySet
 from invana.apps.task_plans.dag import dag_for, pinned_by
+from invana.apps.task_plans.diff import diff_arguments, diff_steps, summarise
 from invana.apps.task_plans.managers import TaskPlanManager
 from invana.apps.task_plans.managers.task_plan import explode
 from invana.apps.task_plans.models import PlanKind, PlanOrigin, TaskPlan
@@ -23,6 +24,7 @@ from invana.apps.task_plans.schemas import (
     DagNode,
     PlanCallerRead,
     PlanLayerRead,
+    PlanVersionDiff,
     TaskPlanDetail,
     TaskPlanRead,
 )
@@ -101,6 +103,41 @@ class TaskPlanRunsManager:
             _apply_stats(read, stats.get(row.ref))
             items.append(read)
         return items
+
+    async def diff(self, session: AsyncSession, *, workflow: TaskPlan) -> PlanVersionDiff:
+        """This version against the one before it (LB37)."""
+        versions = await self.workflows_qs.versions_of(session, graph_id=workflow.graph_id, key=workflow.key or "")
+        prior = max((v for v in versions if v.version < workflow.version), key=lambda v: v.version, default=None)
+        if prior is None:
+            return PlanVersionDiff(
+                key=workflow.key or "",
+                version=workflow.version,
+                against_version=None,
+                summary="the first version",
+                added=[],
+                removed=[],
+                moved=[],
+                changed=[],
+                unchanged=[],
+                arguments=[],
+            )
+        added, removed, moved, changed, unchanged = diff_steps(
+            await self.workflows_qs.tasks_for(session, plan_id=prior.id),
+            await self.workflows_qs.tasks_for(session, plan_id=workflow.id),
+        )
+        arguments = diff_arguments(dict(prior.args_schema or {}), dict(workflow.args_schema or {}))
+        return PlanVersionDiff(
+            key=workflow.key or "",
+            version=workflow.version,
+            against_version=prior.version,
+            summary=summarise(added, removed, moved, changed, arguments),
+            added=added,
+            removed=removed,
+            moved=moved,
+            changed=changed,
+            unchanged=unchanged,
+            arguments=arguments,
+        )
 
     async def detail(self, session: AsyncSession, *, workflow: TaskPlan) -> TaskPlanDetail:
         agents = await self.library.used_by(session, workflow)

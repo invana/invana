@@ -20,6 +20,7 @@
  */
 
 import {
+	usePlanDiffQuery,
 	usePlanPerformanceQuery,
 	useWorkflowQuery,
 	useWorkflowsQuery,
@@ -406,37 +407,83 @@ function TaskPlanDetailBlock({
 
 			<PlanCallers callers={workflow.callers} args={workflow.args_schema} />
 
-			<PlanVersions versions={versions} current={workflow.version} />
+			<PlanVersions
+				username={username}
+				graphSlug={graphSlug}
+				versions={versions}
+				current={workflow.version}
+			/>
 		</div>
 	);
 }
 
 /**
- * **Versions** — each published version and how it has fared (LB22). A
- * published version is immutable, so a change is a new row, never an edit.
+ * **Versions** — each published version, what changed against the one before
+ * it, and how it has fared (LB22 · LB37). A published version is immutable, so
+ * a change is a new row, never an edit.
  */
 function PlanVersions({
+	username,
+	graphSlug,
 	versions,
 	current,
-}: { versions: TaskPlanSummary[]; current: number }) {
+}: {
+	username: string;
+	graphSlug: string;
+	versions: TaskPlanSummary[];
+	current: number;
+}) {
 	const ordered = [...versions].sort((a, b) => b.version - a.version);
 	return (
 		<Band title="Versions" aside={`${ordered.length}`}>
 			<PropertyList labelWidth={86}>
 				{ordered.map((v) => (
-					<PropertyRow key={v.id} label={`v${v.version}`}>
-						{v.runs
-							? `${v.runs.toLocaleString()} run${v.runs === 1 ? "" : "s"}${
-									v.served_rate == null
-										? ""
-										: ` · ${Math.round(v.served_rate * 100)}% served`
-								}`
-							: "never run"}
-						{v.version === current ? <DetailProse>this one</DetailProse> : null}
-					</PropertyRow>
+					<PlanVersionRow
+						key={v.id}
+						username={username}
+						graphSlug={graphSlug}
+						version={v}
+						current={v.version === current}
+					/>
 				))}
 			</PropertyList>
 		</Band>
+	);
+}
+
+/** One version: the engine's one-line diff, then how that version fared. */
+function PlanVersionRow({
+	username,
+	graphSlug,
+	version: v,
+	current,
+}: {
+	username: string;
+	graphSlug: string;
+	version: TaskPlanSummary;
+	current: boolean;
+}) {
+	const diff = usePlanDiffQuery(
+		username,
+		graphSlug,
+		v.key ?? undefined,
+		v.version,
+	);
+	const fared = v.runs
+		? `${v.runs.toLocaleString()} run${v.runs === 1 ? "" : "s"}${
+				v.served_rate == null
+					? ""
+					: ` · ${Math.round(v.served_rate * 100)}% served`
+			}`
+		: "never run";
+	return (
+		<PropertyRow label={`v${v.version}`}>
+			{diff.data?.summary ?? "…"}
+			<DetailProse>
+				{fared}
+				{current ? " · this one" : ""}
+			</DetailProse>
+		</PropertyRow>
 	);
 }
 

@@ -13,6 +13,7 @@ import type {
 	LifecyclePreview,
 	PlanPerformance,
 	PlanRunsPage,
+	PlanVersionDiff,
 	PlanWindow,
 	Project,
 	ProjectAssignment,
@@ -353,6 +354,12 @@ export const workflowsApi = {
 	) =>
 		request<PlanPerformance>(
 			`${base(username, graphSlug)}/task-plans/${key}/performance?version=${q.version}&window=${q.window}`,
+		),
+
+	/** What changed against the version before it (LB37). */
+	diff: (username: string, graphSlug: string, key: string, version: number) =>
+		request<PlanVersionDiff>(
+			`${base(username, graphSlug)}/task-plans/${key}/diff?version=${version}`,
 		),
 
 	/** Every run of it, newest first — Activity (LB34). */

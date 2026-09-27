@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -253,6 +255,49 @@ class PlanRunsPage(BaseModel):
     items: list[PlanRunRow]
     next_cursor: str | None
     live: LiveTiles
+
+
+class FieldChange(BaseModel):
+    """One field of a step, before and after — ``task`` · ``form`` · ``after``
+    (the keys it waits on) · ``args.<name>``."""
+
+    field: str
+    before: Any = None
+    after: Any = None
+
+
+class StepChange(BaseModel):
+    step_key: str
+    fields: list[FieldChange]
+
+
+class ArgumentChange(BaseModel):
+    """A declared argument, whole, before and after (LB19)."""
+
+    name: str
+    change: Literal["added", "removed", "changed"]
+    before: Any = None
+    after: Any = None
+
+
+class PlanVersionDiff(BaseModel):
+    """A version against the one before it
+    ([LB37](docs/for-developers/modules/workflows/features/the-library.md)).
+
+    ``against_version`` is null for v1: compared against nothing, which is not
+    the same as an empty diff, so every list is empty and ``summary`` says so.
+    """
+
+    key: str
+    version: int
+    against_version: int | None
+    summary: str
+    added: list[str]
+    removed: list[str]
+    moved: list[str]
+    changed: list[StepChange]
+    unchanged: list[str]
+    arguments: list[ArgumentChange]
 
 
 class PromoteRequest(BaseModel):
