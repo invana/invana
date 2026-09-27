@@ -1,11 +1,11 @@
 /**
- * The four work canvases (docs/for-developers/modules/work/spec.md), each adapted onto one {@link WorkGraphCanvas}.
+ * The three work canvases (docs/for-developers/modules/work/spec.md), each adapted onto one {@link WorkGraphCanvas}.
  *
  * Every adapter answers the same two questions — what are the columns, and
  * what does an edge mean — and nothing else. Keeping them in one file makes
- * the differences visible: a `plan`'s column is a **wave**, a `workflow`'s is
- * **required order**, a `lineage`'s is **causal depth**, and an `envelope` has
- * only two (allowed and disallowed).
+ * the differences visible: a `plan`'s column is a **wave**, a `lineage`'s is
+ * **causal depth**, and an `envelope` has only two (allowed and disallowed).
+ * A library plan (`workflow`) draws on `TaskFlowCanvas` instead (LB35).
  *
  * The renderer underneath is the Explorer's and Modeller's canvas (docs/for-developers/modules/explore/features/graph-canvas.md).
  * There is no second one any more.
@@ -15,7 +15,6 @@ import {
 	useAgentLineageQuery,
 	useAgentsQuery,
 	useProjectPlanQuery,
-	useWorkflowQuery,
 } from "@/hooks/queries/useWork";
 import {
 	type WorkEdge,
@@ -88,73 +87,6 @@ export function PlanCanvas({
 			onConnect={(source, target) => onAddDependency(target, source)}
 			error={error}
 			emptyHint="No tasks in this project yet. Add one, then use Connect to say what waits on what."
-		/>
-	);
-}
-
-// ── workflow ─────────────────────────────────────────────────────────────────
-
-/**
- * The steps every plan carries whatever the ask was. They are the **frame**,
- * not the workflow — drawn quiet, so the template's own steps carry the accent
- * (docs/for-developers/modules/agents/spec.md).
- */
-const ALWAYS_PRESENT = new Set([
-	"understand_intent",
-	"understand_ask",
-	"plan_workflow",
-	"verify_result",
-]);
-
-export function WorkflowCanvas({
-	username,
-	graphSlug,
-	workflowKey,
-	selectedStepId,
-	onSelectStep,
-}: Scope & {
-	workflowKey: string;
-	selectedStepId: string | null;
-	onSelectStep: (id: string | null) => void;
-}) {
-	const workflow = useWorkflowQuery(username, graphSlug, workflowKey);
-
-	const nodes: WorkNode[] = (workflow.data?.nodes ?? []).map((step) => ({
-		id: step.id,
-		label: step.label,
-		sub: step.pinned.length
-			? // A **count**, never a claim: a pin lives on one agent's envelope and
-				// a library entry is used by N of them (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
-				`${step.task} · ${step.pinned_by_count > 1 ? `pinned by ${step.pinned_by_count}` : "pinned"}`
-			: step.task,
-		// The engine's `depth` — the longest path from a root, not the index in
-		// the stored list. Two steps share a column exactly when neither waits on
-		// the other, which is how `nl-compare`'s two readings come out as two
-		// branches instead of one false chain.
-		column: step.depth,
-		tone: ALWAYS_PRESENT.has(step.task) ? "muted" : "info",
-	}));
-
-	const edges: WorkEdge[] = (workflow.data?.edges ?? []).map((edge) => ({
-		id: `${edge.kind}:${edge.source}->${edge.target}`,
-		source: edge.source,
-		target: edge.target,
-		label: edge.label || undefined,
-		dashed: edge.kind === "binding",
-	}));
-
-	return (
-		<WorkGraphCanvas
-			kind="workflow"
-			nodes={nodes}
-			edges={edges}
-			selectedNodeId={selectedStepId}
-			onSelectNode={(id) => onSelectStep(id === selectedStepId ? null : id)}
-			emptyHint={
-				workflow.isLoading
-					? "Drawing the workflow…"
-					: "Pick a workflow from the panel to draw it."
-			}
 		/>
 	);
 }

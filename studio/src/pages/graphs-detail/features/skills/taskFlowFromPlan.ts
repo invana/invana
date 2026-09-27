@@ -12,7 +12,8 @@ import {
 } from "@/canvases/taskflow";
 import type { SkillLayer, SkillPlanRead } from "@/types/skills";
 
-const ICON: Record<SkillLayer, string> = {
+/** A layer's icon on the canvas — shared with the library's plans (LB35). */
+export const LAYER_ICON: Record<SkillLayer, string> = {
 	"graph data": "lucide/database",
 	llm: "lucide/sparkles",
 	"third party": "lucide/globe",
@@ -28,7 +29,7 @@ export function taskFlowFromPlan(plan: SkillPlanRead): TaskFlowData {
 		data: {
 			title: node.label || node.task || node.id,
 			bound: node.layer,
-			icon: ICON[node.layer] ?? "lucide/square-function",
+			icon: LAYER_ICON[node.layer] ?? "lucide/square-function",
 			summary: node.source_span ?? "",
 			stepKey: node.form === "human" ? "a person" : node.task,
 			ordinal: i,

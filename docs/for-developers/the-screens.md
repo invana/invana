@@ -240,6 +240,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | [The Assistant Speaks](https://claude.ai/artifact/HdXWfPfwoES9CKTCpQtH5J) | [5.8 Soul](modules/agents/features/soul.md) · [3.2 NL12](modules/ask/features/ask-in-natural-language.md#decisions) · [3.12](modules/ask/features/the-answer-in-words.md) · [3.13](modules/ask/features/beyond-the-graph.md) — 18 artboards | Soul · Ask in natural language · The answer, in words · Beyond the graph | **current.** [Sequence](the-sequence.md) block K; supersedes nothing |
 | [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
 | [The Run Page](https://claude.ai/artifact/QRDPZ2GHR7KKwS68vbScWR) | [10.5 See what ran](modules/operate/features/see-what-ran.md) — the run page as a report header over tabs, and a step inside its run — 8 artboards (a waterfall on the Overview and in the left panel; In order and Lens folded away) | Operate › Runs › The run page | **current.** Reframes `operate.runs.detail.*` and `operate.runs.step.*` on Govern, Agents and Skills; the bodies are theirs, captured, not redrawn |
+| [The Plan Page](https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3) | [7.1 Save a plan for reuse](modules/workflows/features/the-library.md) — a published plan as a report header over Overview · Layers · Flow · Activity, with the drawer's drill-in on the left — 9 artboards | Library › Plans › The plan page | **current.** Supersedes `library.plans.detail.overview`, `…overview.folded` and `…flow_canvas` on Govern, Agents and Skills (the two-reading `Overview ¦ Flow` switch); the draft, versions, arguments, export, retire and ceilings boards there stand |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
@@ -562,6 +563,22 @@ Eight artboards on their own canvas — *The Run Page* (`https://claude.ai/artif
 | `operate.runs.detail.step.overview.switch` | 10.5 | Another step — the crumb lists every step, with its status and time | ✅ | ✅ | ✅ |
 | `operate.runs.detail.step.touched` | 10.5 | A step inside its run, Touched — what it read, wrote, was refused and left | ✅ | ✅ | ✅ |
 | `operate.runs.detail.step.log` | 10.5 | A step inside its run, Log — its slice of the run’s stream | ✅ | ✅ | ✅ |
+
+## Beyond the 42 · The Plan Page
+
+Nine artboards on their own canvas — *The Plan Page* (`https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3`) — a published plan read the way the run page is: a report header naming the record, a tab strip under it, the tab's body under that ([LB24](modules/workflows/features/the-library.md#decisions)). Overview · Layers · Flow · Activity, with the `7 · 30 · 90 days` window on the strip. The left section is the Plans drawer's drill-in — The plan · How it has behaved · Used by · Versions ([LB22](modules/workflows/features/the-library.md#decisions)) — and the layer strip moves off it into the Layers tab. The plan drawn is `nl-query@5`, the one `run:7d3184f1` on The Run Page ran. Generated from `.design/canvas-plan-page/plan.py`, which reuses `canvas-govern-agents/rd.py`'s helpers without writing its files. The name is the file, the frame title and this row. **Studio** draws the page: picking a plan in the drawer opens `plan_runs:<plan_id>` with the four tabs and the window, the drawer keeps The plan · How it has behaved · Used by · Versions, and the layer strip is the Layers tab. The engine serves both reads — `…/task-plans/{key}/performance` and `…/task-plans/{key}/runs` ([LB36](modules/workflows/features/the-library.md#decisions)). Gate rows, budget exhaustion, the flow's spread ring and branch dimming, and the Activity agent filter are not drawn yet.
+
+| Artboard | Feature | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `library.plans.detail.overview` | 7.1 | How it performs — runs, served, time and cost, and each step across every run | ✅ | ✅ | ✅ |
+| `library.plans.detail.overview.step` | 7.1 | A step picked — its p50, p95 and failures, where it is slow, and its slowest runs | ✅ | ✅ | ✅ |
+| `library.plans.detail.overview.never_run` | 7.1 | Never run — no numbers to fake, and the steps listed with nothing measured | ✅ | ✅ | ✅ |
+| `library.plans.detail.layers` | 7.1 | Layers — every band the plan declares, its steps in order, the gate across them | 🟡 | ✅ | ✅ |
+| `library.plans.detail.flow` | 7.1 | Flow — the plan on TaskFlowCanvas, read-only, each step carrying its medians | ✅ | 🟡 | ✅ |
+| `library.plans.detail.flow.step` | 7.1 | A step picked on the flow — its contract and how it has performed, beside the drawing | ✅ | ✅ | ✅ |
+| `library.plans.detail.activity` | 7.1 | Activity — every run that used this plan: what it was asked, by whom, and how it ended | ✅ | ✅ | ✅ |
+| `library.plans.detail.activity.failed` | 7.1 | Activity, filtered to failed — each run says which step it failed at, and why | ✅ | ✅ | ✅ |
+| `library.plans.detail.activity.empty` | 7.1 | Activity with no runs — what would put a row here, and who may run it | ✅ | ✅ | ✅ |
 
 ## Beyond the 42 · The Agent Page
 

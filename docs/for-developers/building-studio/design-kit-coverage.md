@@ -187,6 +187,8 @@ Legend: ✅ use as-is · 🟡 exists but needs extending · ❌ build it.
 | 45 | Horizontal bar rows (label · track · bar · value) | `BarChartH` | ✅ | SVG/CSS only, token-driven (D4) |
 | 46 | Column chart with gridlines + axis (`accepted per week`) | `BarChartV` | ✅ | SVG/CSS only, token-driven (D4) |
 | 47 | Diverging bar (± around a baseline, `net learning weight`) | `DivergingBar` | ✅ | SVG/CSS only, token-driven (D4) |
+| 47a | Stacked columns over days (`Runs a day`, served ¦ failed) | `StackedBarChartV` | ✅ | Status tokens, 2px segment gap, per-day hover, legend at ≥ 2 series. The plan page's Overview ([LB33](../modules/workflows/features/the-library.md#decisions)) |
+| 47b | Line over days with event marks (`Work p50, a day`, a version's publish) | `LineChart` | ✅ | One series, no legend; a `null` day breaks the line; drawn at its measured width. The plan page's Overview |
 | 48 | Firing heat strip (21× 14px state squares + hour axis + legend) | `HeatStrip` | ✅ | SVG/CSS only, token-driven (D4) |
 | 49 | Legend (dot/line swatch + label rows) | `Legend` + `LegendItem` | ✅ | dot · line · dashed · arrow · ring swatches — a dashed arrow needs a dashed arrow in the legend |
 | 50 | Canvas caption strip | `CanvasMessageBar` (canvas-ui) | ✅ | |
@@ -352,6 +354,10 @@ directly labels its marks, which is how it is discharged.
 | `DivergingBar` | polarity around a real zero. Uses **status** colours, because its two directions are good and bad rather than two categories — the one place status colour belongs on a chart. One aligned value gutter, not one per side |
 | `HeatStrip` | a run of firings. Status again, so the legend is **mandatory**: a square carries no label, and without it the strip would be colour-alone |
 | `Sparkline` | 2px line, ≥8px end marker with a 2px surface ring. No axis: if a reader needs to read a value off it, it wanted to be a chart |
+| `StackedBarChartV` | counts cut into parts over days. A zero is a gap, not a sliver; only the top of a stack is rounded, so a stack reads as one count in pieces |
+| `LineChart` | one measure over time with `marks` for events. `null` breaks the line, because *nothing ran* is not *it took no time* |
+| `TabbedPanel` `headerContent` · dashboard `tabActions` | a control on the tab strip that applies to every tab — the plan page's window |
+| dashboard `TableOptions` `rowKey` / `selectAction` / `selected` | a picked row reports its key and draws selected — a step card on the plan page, a run opened from Activity |
 | `DataTable` `groupBy` / `renderGroupHeader` | presentational grouping — deliberately *not* TanStack's aggregating model. It sorts nothing and aggregates nothing, so it cannot disagree with the order the caller chose |
 | **`useCodeMirror` rebuilt on a Compartment** | the one real defect shipped earlier. Keying the mount effect on `extensions` identity meant an inline array rebuilt the editor every render, losing cursor, selection and focus mid-keystroke. "Callers are expected to memoise" is a trap, not a contract — the view now mounts once and reconfigures in place |
 | 2 stories | |

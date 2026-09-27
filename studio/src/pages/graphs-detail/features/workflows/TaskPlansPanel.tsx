@@ -19,7 +19,12 @@
  * because "which of the N?" has no honest default (D4).
  */
 
-import { useWorkflowQuery, useWorkflowsQuery } from "@/hooks/queries/useWork";
+import {
+	usePlanPerformanceQuery,
+	useWorkflowQuery,
+	useWorkflowsQuery,
+} from "@/hooks/queries/useWork";
+import { formatElapsed } from "@/lib/time";
 import { PromoteDialog } from "@/pages/graphs-detail/features/workflows/PromoteDialog";
 import {
 	AgentChipRow,
@@ -33,20 +38,17 @@ import type {
 	TaskPlanCaller,
 	TaskPlanDagNode,
 	TaskPlanDetail,
-	TaskPlanLayer,
 	TaskPlanSummary,
 } from "@/types/work";
 import { LAYER_PALETTE, layerSlug } from "@/ui/layerPalette";
 import {
 	Eyebrow,
 	type Layer,
-	type LayerBand,
 	LayerChip,
-	type LayerItem,
-	LayerStrip,
 	PropertyList,
 	PropertyRow,
 	RecordHeader,
+	Sparkline,
 	Spinner,
 } from "@invana/ui";
 import { Wand2 } from "lucide-react";
@@ -159,7 +161,13 @@ export function PlansDrawerBody({
 				onOpenAgent={onOpenAgent}
 			/>
 		) : (
-			<TaskPlanDetailBlock workflow={detail.data} onOpenAgent={onOpenAgent} />
+			<TaskPlanDetailBlock
+				username={username}
+				graphSlug={graphSlug}
+				workflow={detail.data}
+				versions={items.filter((p) => p.key === detail.data?.key)}
+				onOpenAgent={onOpenAgent}
+			/>
 		);
 	}
 
@@ -243,12 +251,31 @@ export function PlansDrawerBody({
 }
 
 function TaskPlanDetailBlock({
+	username,
+	graphSlug,
 	workflow,
+	versions,
 	onOpenAgent,
 }: {
+	username: string;
+	graphSlug: string;
 	workflow: TaskPlanDetail;
+	/** Every version of this key the library lists. */
+	versions: TaskPlanSummary[];
 	onOpenAgent?: (id: string) => void;
 }) {
+	// A short *does this work?* over the page's default window; the page's
+	// tabs are the long answer (LB22).
+	const behaved = usePlanPerformanceQuery(
+		username,
+		graphSlug,
+		workflow.key ?? undefined,
+		{
+			version: workflow.version,
+			window: "30d",
+		},
+	);
+	const daily = behaved.data?.daily ?? [];
 	// A plan **is** its nodes, so what it is made of is a count of forms, not a
 	// list: the flow on the canvas draws the steps, and repeating them here as
 	// an ordered list was the panel saying the same thing twice in two shapes.
@@ -301,6 +328,21 @@ function TaskPlanDetailBlock({
 						{`${callables} callable${callables === 1 ? "" : "s"}`}
 						{human ? `, ${human} human` : ""}
 					</PropertyRow>
+					{/* The bands it will engage, as chips. The spine is not one: the
+					    runtime dispatches the plan, it is not something a plan engages. */}
+					<PropertyRow label="engages">
+						<span className="flex flex-wrap gap-1">
+							{workflow.layers
+								.filter((layer) => layer !== "agent")
+								.map((layer) => (
+									<LayerChip
+										key={layer}
+										layer={slugOf(layer)}
+										palette={LAYER_PALETTE}
+									/>
+								))}
+						</span>
+					</PropertyRow>
 					<PropertyRow label="matches">
 						<span className="font-mono">
 							{workflow.intent.join(" · ") || "any"}
@@ -323,18 +365,20 @@ function TaskPlanDetailBlock({
 				</PropertyList>
 			</Band>
 
-			<PlanLayers layers={workflow.declared_layers} nodes={workflow.nodes} />
-
-			<PlanCallers callers={workflow.callers} args={workflow.args_schema} />
-
-			{/* **How it has behaved**, which is a different question from *what is
-			    it* (LB10). It belongs on the plan dashboard beside the flow; until
-			    that board ships this is the only place it is answered, and dropping
-			    it would lose the fact rather than move it. */}
+			{/* **How it has behaved** — a different question from *what is it*
+			    (LB10), answered short here and in full on the plan's page. */}
 			<Band
 				title="How it has behaved"
 				aside={workflow.runs ? `${workflow.runs} runs` : undefined}
 			>
+				{daily.some((d) => d.served + d.failed > 0) ? (
+					<Sparkline
+						values={daily.map((d) => d.served + d.failed)}
+						width={180}
+						height={22}
+						label="Runs a day, last 30 days"
+					/>
+				) : null}
 				<PropertyList labelWidth={86}>
 					<PropertyRow label="served">
 						{workflow.runs === 0 ? (
@@ -347,6 +391,11 @@ function TaskPlanDetailBlock({
 							`${Math.round(workflow.served_rate * 100)}% of verified runs`
 						)}
 					</PropertyRow>
+					{behaved.data?.tiles.work_p50_ms.value != null ? (
+						<PropertyRow label="work p50">
+							{formatElapsed(Math.round(behaved.data.tiles.work_p50_ms.value))}
+						</PropertyRow>
+					) : null}
 					{workflow.last_run_at ? (
 						<PropertyRow label="last run">
 							{new Date(workflow.last_run_at).toLocaleDateString()}
@@ -354,98 +403,39 @@ function TaskPlanDetailBlock({
 					) : null}
 				</PropertyList>
 			</Band>
+
+			<PlanCallers callers={workflow.callers} args={workflow.args_schema} />
+
+			<PlanVersions versions={versions} current={workflow.version} />
 		</div>
 	);
 }
 
 /**
- * **Layers it declares** — the five governed bands, and what this plan will
- * engage in each ([LB17](docs/for-developers/modules/workflows/features/the-library.md) ·
- * [LB22](docs/for-developers/modules/workflows/features/the-library.md)).
- *
- * The same five bands a world governs and a run records, read in the *declared*
- * tense — which is what makes *declared versus touched* a comparison rather
- * than two vocabularies. It is the **same component** in both tenses, on the
- * same axis: `LayerStrip` on `scale="seq"` here, on `scale="elapsed"` for a run
- * ([D20](docs/for-developers/governance.md)). A plan has no clock, so its axis
- * is its own order and `depth` is that order — two steps at the same depth wait
- * on the same thing, not on each other.
- *
- * **Every band is drawn, declared or not.** A band this plan never engages is
- * muted and carries its own `—`, because *this plan leaves the graph alone* is
- * the fact a person opening a plan they did not write is checking for
- * ([D22](docs/for-developers/governance.md)). Muting is the kit's; this file's
- * part is to pass all five bands rather than filtering to the declared ones.
- *
- * **The bands arrive shut** (LB29). A 420px drawer cannot hold a participant
- * row of mono addresses beside a track, and shut is not less information: the
- * tasks drop onto their band's own line, so the whole plan is five lines and
- * one picture ([D21](docs/for-developers/governance.md)). Opening a band is one
- * click, and the kit remembers which are open.
+ * **Versions** — each published version and how it has fared (LB22). A
+ * published version is immutable, so a change is a new row, never an edit.
  */
-function PlanLayers({
-	layers,
-	nodes,
-}: { layers: TaskPlanLayer[]; nodes: TaskPlanDagNode[] }) {
-	const declared = layers.filter((l) => l.declared).length;
-
-	// A band's participants are the catalogue entries the plan's own steps name
-	// — derived from the nodes rather than sent beside them, because the nodes
-	// are what the canvas draws and a second list would be a second truth.
-	const partsOf = (layer: SkillLayer) => {
-		const seen = new Map<string, string>();
-		for (const node of nodes) {
-			if (node.layer !== layer || !node.task) continue;
-			if (!seen.has(node.task)) seen.set(node.task, node.task);
-		}
-		return [...seen.values()].map((task) => ({ id: task, label: task }));
-	};
-
-	const bands: LayerBand[] = layers.map((band) => ({
-		layer: slugOf(band.layer),
-		// The engine phrases the summary — `2 steps` · `1 crossing` · `—` — so
-		// the band says what it declares in the same words the list row does.
-		note: band.summary,
-		parts: band.declared ? partsOf(band.layer) : [],
-	}));
-
-	const items: LayerItem[] = nodes.map((node) => ({
-		id: node.id,
-		label: node.label,
-		layer: slugOf(node.layer),
-		// A human step has no catalogue entry, so it sits on the band itself
-		// rather than inventing a participant for it.
-		part: node.task || undefined,
-		start: node.depth,
-		end: node.depth + 1,
-		// The plan tense. Every bar here is something the playbook **will**
-		// engage — what it did engage is the run's strip, and the two states are
-		// deliberately not the same word.
-		state: "declared",
-		note: node.form === "human" ? "form: human" : undefined,
-	}));
-
+function PlanVersions({
+	versions,
+	current,
+}: { versions: TaskPlanSummary[]; current: number }) {
+	const ordered = [...versions].sort((a, b) => b.version - a.version);
 	return (
-		<Band title="Layers it declares" aside={`${declared} of ${layers.length}`}>
-			<LayerStrip
-				bands={bands}
-				items={items}
-				scale="seq"
-				palette={LAYER_PALETTE}
-				defaultCollapsed={bands.map((b) => b.layer)}
-				// Tuned for the drawer, not for a page: the kit's defaults assume a
-				// main region, and 15.5rem of labels beside a 26rem track scrolls
-				// horizontally before it has drawn anything.
-				labelWidth={9}
-				minTrackWidth={13}
-				minSlotWidth={5}
-			/>
-			{/* The spine is not a band a plan declares: the runtime is what
-			    dispatches the plan, never something the plan engages. Saying so
-			    once is cheaper than a reader counting five and expecting six. */}
-			<p className="pt-1 text-sm text-muted-foreground">
-				The agent spine is not declared — it is what dispatches the rest.
-			</p>
+		<Band title="Versions" aside={`${ordered.length}`}>
+			<PropertyList labelWidth={86}>
+				{ordered.map((v) => (
+					<PropertyRow key={v.id} label={`v${v.version}`}>
+						{v.runs
+							? `${v.runs.toLocaleString()} run${v.runs === 1 ? "" : "s"}${
+									v.served_rate == null
+										? ""
+										: ` · ${Math.round(v.served_rate * 100)}% served`
+								}`
+							: "never run"}
+						{v.version === current ? <DetailProse>this one</DetailProse> : null}
+					</PropertyRow>
+				))}
+			</PropertyList>
 		</Band>
 	);
 }

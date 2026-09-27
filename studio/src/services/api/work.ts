@@ -11,6 +11,9 @@ import type {
 	CatalogueResponse,
 	LifecycleAct,
 	LifecyclePreview,
+	PlanPerformance,
+	PlanRunsPage,
+	PlanWindow,
 	Project,
 	ProjectAssignment,
 	ProjectCreate,
@@ -336,8 +339,48 @@ export const workflowsApi = {
 	list: (username: string, graphSlug: string) =>
 		request<TaskPlanListResponse>(`${base(username, graphSlug)}/task-plans`),
 
-	get: (username: string, graphSlug: string, key: string) =>
-		request<TaskPlanDetail>(`${base(username, graphSlug)}/task-plans/${key}`),
+	get: (username: string, graphSlug: string, key: string, version?: number) =>
+		request<TaskPlanDetail>(
+			`${base(username, graphSlug)}/task-plans/${key}${version ? `?version=${version}` : ""}`,
+		),
+
+	/** How it has behaved over a window — Overview · Layers · Flow (LB33 · LB36). */
+	performance: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		q: { version: number; window: PlanWindow },
+	) =>
+		request<PlanPerformance>(
+			`${base(username, graphSlug)}/task-plans/${key}/performance?version=${q.version}&window=${q.window}`,
+		),
+
+	/** Every run of it, newest first — Activity (LB34). */
+	runs: (
+		username: string,
+		graphSlug: string,
+		key: string,
+		q: {
+			version: number;
+			window: PlanWindow;
+			status?: string;
+			calledBy?: string;
+			agentId?: string;
+			cursor?: string;
+		},
+	) => {
+		const params = new URLSearchParams({
+			version: String(q.version),
+			window: q.window,
+		});
+		if (q.status) params.set("status", q.status);
+		if (q.calledBy) params.set("called_by", q.calledBy);
+		if (q.agentId) params.set("agent_id", q.agentId);
+		if (q.cursor) params.set("cursor", q.cursor);
+		return request<PlanRunsPage>(
+			`${base(username, graphSlug)}/task-plans/${key}/runs?${params}`,
+		);
+	},
 
 	exportUrl: (username: string, graphSlug: string, key: string) =>
 		`${base(username, graphSlug)}/task-plans/${key}/export`,

@@ -21,13 +21,19 @@ import type {
 	AgentCreate,
 	AgentUpdate,
 	LifecycleAct,
+	PlanWindow,
 	ProjectCreate,
 	ProjectUpdate,
 	SoulPreviewRequest,
 	TaskCreate,
 	TaskUpdate,
 } from "@/types/work";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 
 type Scope = { username: string; graphSlug: string };
 
@@ -448,6 +454,75 @@ export function useWorkflowQuery(
 		queryFn: () =>
 			workflowsApi.get(scope.username, scope.graphSlug, key as string),
 		enabled: !!username && !!graphSlug && !!key,
+	});
+}
+
+/** One version of a plan, by key — the plan page names a version, not the newest. */
+export function usePlanVersionQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	version: number | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: workflowsKey(scope, [key, version]),
+		queryFn: () =>
+			workflowsApi.get(scope.username, scope.graphSlug, key as string, version),
+		enabled: !!username && !!graphSlug && !!key && !!version,
+	});
+}
+
+/** How a plan has behaved over a window (LB33 · LB36). */
+export function usePlanPerformanceQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	q: { version: number; window: PlanWindow } | undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useQuery({
+		queryKey: workflowsKey(scope, [key, "performance", q]),
+		queryFn: () =>
+			workflowsApi.performance(
+				scope.username,
+				scope.graphSlug,
+				key as string,
+				q as {
+					version: number;
+					window: PlanWindow;
+				},
+			),
+		enabled: !!username && !!graphSlug && !!key && !!q,
+	});
+}
+
+/** Every run of a plan, 50 a page — `Show 50 more` fetches the next (LB34). */
+export function usePlanRunsQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	key: string | undefined,
+	q:
+		| {
+				version: number;
+				window: PlanWindow;
+				status?: string;
+				calledBy?: string;
+				agentId?: string;
+		  }
+		| undefined,
+) {
+	const scope = { username: username ?? "", graphSlug: graphSlug ?? "" };
+	return useInfiniteQuery({
+		queryKey: workflowsKey(scope, [key, "runs", q]),
+		queryFn: ({ pageParam }) =>
+			workflowsApi.runs(scope.username, scope.graphSlug, key as string, {
+				...(q as NonNullable<typeof q>),
+				cursor: pageParam ?? undefined,
+			}),
+		initialPageParam: null as string | null,
+		getNextPageParam: (page) => page.next_cursor,
+		enabled: !!username && !!graphSlug && !!key && !!q,
 	});
 }
 

@@ -14,7 +14,11 @@ import { useModelsQuery } from "@/hooks/queries/useModels";
 import { useActiveVersionQuery } from "@/hooks/queries/useSchema";
 import { useSkillsQuery } from "@/hooks/queries/useSkills";
 import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
-import { useAgentsQuery, useTaskMutations } from "@/hooks/queries/useWork";
+import {
+	useAgentsQuery,
+	useTaskMutations,
+	useWorkflowsQuery,
+} from "@/hooks/queries/useWork";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
 import { AgentsStackPanel } from "@/pages/graphs-detail/features/agents/AgentsStackPanel";
 import { AssistantPanel } from "@/pages/graphs-detail/features/ask/assistant/AssistantPanel";
@@ -93,7 +97,6 @@ import {
 	EnvelopeCanvas,
 	LineageCanvas,
 	PlanCanvas,
-	WorkflowCanvas,
 } from "@/pages/graphs-detail/features/work/WorkCanvas";
 import {
 	WorkCanvasHeader,
@@ -101,6 +104,8 @@ import {
 	type WorkCanvasTarget,
 } from "@/pages/graphs-detail/features/work/WorkCanvasChrome";
 import { LibraryStackPanel } from "@/pages/graphs-detail/features/workflows/LibraryStackPanel";
+import { PlanFlowCanvas } from "@/pages/graphs-detail/features/workflows/PlanFlowCanvas";
+import { PlanDashboardPage } from "@/pages/graphs-detail/features/workflows/dashboards/PlanDashboardPage";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
@@ -369,6 +374,29 @@ export function GraphDetailPage() {
 		() => new Map((skillsList.data?.items ?? []).map((s) => [s.id, s.name])),
 		[skillsList.data],
 	);
+	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
+	// titled `key@version`, and opened from the drawer by key — the newest
+	// version, which is the one the drawer reads.
+	const planLibrary = useWorkflowsQuery(username, graphSlug);
+	const planRefById = useMemo(
+		() =>
+			new Map(
+				(planLibrary.data?.items ?? []).map((p) => [
+					p.id,
+					`${p.key}@${p.version}`,
+				]),
+			),
+		[planLibrary.data],
+	);
+	const newestPlanIdByKey = useMemo(() => {
+		const out = new Map<string, { id: string; version: number }>();
+		for (const p of planLibrary.data?.items ?? []) {
+			const seen = p.key ? out.get(p.key) : undefined;
+			if (p.key && (!seen || p.version > seen.version))
+				out.set(p.key, { id: p.id, version: p.version });
+		}
+		return out;
+	}, [planLibrary.data]);
 
 	const {
 		sessions,
@@ -433,18 +461,7 @@ export function GraphDetailPage() {
 	const [selectedWorkflowKey, setSelectedWorkflowKey] = useState<string | null>(
 		null,
 	);
-	// **Picking a plan draws it** (G42). The Plans drawer already names what it
-	// drilled into in the URL, so the canvas follows `&plan=` rather than a
-	// second piece of state only *Draw the DAG* ever set — which is why a plan
-	// could be open in the drawer while `mainSection` still read *Pick a plan to
-	// draw the flow it will run*. Read here rather than reported upward by the
-	// panel, because the URL is the one home this fact has.
 	const libraryPlanKey = useLibraryPanel().planKey;
-	useEffect(() => {
-		// Only ever *set*: going back to the list clears `&plan=` and must leave
-		// the drawing where it is — a panel opens a canvas and never closes one.
-		if (libraryPlanKey) setSelectedWorkflowKey(libraryPlanKey);
-	}, [libraryPlanKey]);
 	const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
 	const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
 	const [selectedLineageEdge, setSelectedLineageEdge] =
@@ -570,6 +587,18 @@ export function GraphDetailPage() {
 	// a link to one is drawn (RU13). Narrower than `openBoard` on purpose: these
 	// three kinds bind to a record and read no trace, so there is no `runId` to
 	// forget (SD3).
+	// **Picking a plan opens its page** (G42 · LB24). The Plans drawer names
+	// what it drilled into in the URL, so the page follows `&plan=`. Only ever
+	// *opens*: going back to the list clears `&plan=` and leaves the page where
+	// it is — a panel opens a page and never closes one.
+	const libraryPlanId = libraryPlanKey
+		? newestPlanIdByKey.get(libraryPlanKey)?.id
+		: undefined;
+	useEffect(() => {
+		if (libraryPlanId)
+			openBoard({ kind: "plan_runs", subjectId: libraryPlanId });
+	}, [libraryPlanId, openBoard]);
+
 	const openRecordBoard = useCallback(
 		(kind: RecordBoardKind, subjectId: string) =>
 			openBoard({ kind, subjectId }),
@@ -692,12 +721,10 @@ export function GraphDetailPage() {
 			// project or one of its Todos is what was picked (PT7).
 			settingsSection === "projects" && selectedProjectKey
 				? "plan"
-				: // Library owns the Plans drawer, so the plan flow is its canvas (G41).
-					settingsSection === "library" && selectedWorkflowKey
-					? "workflow"
-					: settingsSection === "agents" && selectedAgentId
-						? "lineage"
-						: null;
+				: // Library's plan opens as a page, not a canvas (LB24).
+					settingsSection === "agents" && selectedAgentId
+					? "lineage"
+					: null;
 		if (!own) return;
 		setWorkKind((current) => {
 			if (!current) return own;
@@ -706,12 +733,7 @@ export function GraphDetailPage() {
 			const owner = CANVAS_KINDS[current].panel;
 			return owner === settingsSection ? current : own;
 		});
-	}, [
-		settingsSection,
-		selectedProjectKey,
-		selectedWorkflowKey,
-		selectedAgentId,
-	]);
+	}, [settingsSection, selectedProjectKey, selectedAgentId]);
 	// The inspector is an occupant of the right side, not a flag on it: showing
 	// it *is* `?right=inspector`, and hiding it closes the region.
 	const closeInspector = right.close;
@@ -2551,7 +2573,7 @@ export function GraphDetailPage() {
 				error={planError}
 			/>
 		) : workKind === "workflow" && selectedWorkflowKey ? (
-			<WorkflowCanvas
+			<PlanFlowCanvas
 				username={username as string}
 				graphSlug={graphSlug as string}
 				workflowKey={selectedWorkflowKey}
@@ -2745,7 +2767,10 @@ export function GraphDetailPage() {
 								BOARD_KINDS[board.kind].label)
 							: board.kind === "run"
 								? runAddress(board.subjectId)
-								: BOARD_KINDS[board.kind].label,
+								: board.kind === "plan_runs"
+									? (planRefById.get(board.subjectId) ??
+										BOARD_KINDS[board.kind].label)
+									: BOARD_KINDS[board.kind].label,
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2975,15 +3000,14 @@ export function GraphDetailPage() {
 			) : null;
 		}
 
-		// `plan_runs` — declared in the registry, with no body yet (34o). It was
-		// the only kind left falling through, so it drew a step dashboard and
-		// read as a defect in that composer rather than as a board nobody has
-		// written. It says which it is (B17).
+		// The plan page (LB24) — Overview · Layers · Flow · Activity, read over
+		// a window. A row opens its run page beside it.
 		return (
-			<EmptyState
-				className="h-full"
-				title="The plan dashboard is not built yet"
-				description="A plan's runs — its flow with per-task medians, its arguments and the runs themselves — is a declared kind waiting for its panels."
+			<PlanDashboardPage
+				username={username as string}
+				graphSlug={graphSlug as string}
+				planId={board.subjectId}
+				onOpenRun={(id) => openBoard({ kind: "run", subjectId: id, runId: id })}
 			/>
 		);
 	}

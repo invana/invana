@@ -527,6 +527,85 @@ export interface TaskPlanDetail extends TaskPlanSummary {
 	args_schema: Record<string, PlanArg>;
 }
 
+// ── How a plan has behaved (LB33 · LB34 · LB36) ─────────────────────────────
+
+/** The plan page's three windows — every number on it is read over one. */
+export type PlanWindow = "7d" | "30d" | "90d";
+
+/** A number over the window, beside the same number over the window before. */
+export interface Measure {
+	value: number | null;
+	prior: number | null;
+}
+
+export interface PlanPerformance {
+	window_days: number;
+	version: number;
+	tiles: {
+		runs: Measure;
+		/** Of verified runs; `null` when none was verified. */
+		served: Measure;
+		elapsed_p50_ms: Measure;
+		work_p50_ms: Measure;
+		/** `null` when no run is priced — unknown, never free. */
+		cost_per_run: Measure;
+		failed: Measure;
+	};
+	daily: {
+		date: string;
+		served: number;
+		failed: number;
+		work_p50_ms: number | null;
+	}[];
+	publishes: { version: number; published_at: string }[];
+	/** In plan order. Measures are `null` when the step was never reached. */
+	steps: {
+		step_key: string;
+		layer: SkillLayer;
+		ran_in: number | null;
+		p50_ms: number | null;
+		p95_ms: number | null;
+		failed: number;
+		retried: number | null;
+		cost_per_run: number | null;
+		share_of_work: number | null;
+	}[];
+	failures: {
+		step_key: string;
+		cause: string;
+		count: number;
+		last_run_id: string;
+	}[];
+	bounds: {
+		step_key: string;
+		bound: string;
+		limit: number;
+		used: number;
+		exhausted: number;
+	}[];
+	slowest: Record<string, { run_id: string; ms: number; when: string }[]>;
+}
+
+export interface PlanRunRow {
+	run_id: string;
+	/** The run page's words: `running` · `succeeded` · `failed` · `at a gate` · `cancelled`. */
+	status: string;
+	when: string;
+	asked: string;
+	called_by: { kind: string; name: string; person: string | null };
+	agent: AgentChip | null;
+	version: number | null;
+	elapsed_ms: number | null;
+	cost: number | null;
+	failed_at: { step_key: string; cause: string; message: string } | null;
+}
+
+export interface PlanRunsPage {
+	items: PlanRunRow[];
+	next_cursor: string | null;
+	live: { running: number; at_gate: number; called_by: number; agents: number };
+}
+
 export interface TaskPlanListResponse {
 	items: TaskPlanSummary[];
 	total: number;
