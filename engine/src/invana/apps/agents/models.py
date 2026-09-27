@@ -275,3 +275,15 @@ class Agent(Base):
     def is_available(self) -> bool:
         """Whether a new run may open under this agent."""
         return self.status == AgentStatus.active.value
+
+    @property
+    def answers_asks(self) -> bool:
+        """Whether an Explorer ask may run through this agent (WQ5 · AG3).
+
+        An ask is answered from the graph, so the envelope must allow the step
+        that reads it. The seeded modeller's does not: its steps propose a
+        model, and an ask sent through it would draft one instead of answering.
+        """
+        spec = self.workflow_spec or {}
+        allowed = set(spec.get("allow") or [s.get("task") for s in spec.get("steps") or [] if isinstance(s, dict)])
+        return "execute_graph_query" in allowed

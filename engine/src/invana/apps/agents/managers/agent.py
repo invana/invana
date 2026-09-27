@@ -177,7 +177,9 @@ class AgentManager:
         key = SURFACE_DEFAULT_AGENT.get(surface, "explorer")
         if key == "explorer" and graph.default_agent_id:
             agent = await self.agents_qs.get(session, graph.default_agent_id)
-            if agent is not None and agent.graph_id == graph.id and agent.is_available:
+            # A default that cannot answer asks is passed over, not obeyed: the
+            # session would draft a model instead of answering (AG3 · WQ5).
+            if agent is not None and agent.graph_id == graph.id and agent.is_available and agent.answers_asks:
                 return agent
         return await self.agents_qs.get_by_key(session, graph_id=graph.id, key=key)
 
@@ -404,6 +406,10 @@ class AgentManager:
     async def set_default_agent(self, session: AsyncSession, *, graph: Graph, agent: Agent, actor: User) -> Graph:
         if not agent.is_available:
             raise ConflictError(f"'{agent.name}' is {agent.status}; a paused or retired agent cannot be the default.")
+        if not agent.answers_asks:
+            # The default answers every Explorer ask that names no agent, so it
+            # must be able to read the graph (AG3 · WQ5).
+            raise ConflictError(f"'{agent.name}' cannot answer questions on the graph, so it cannot be the default.")
         graph.default_agent_id = agent.id
         await emit_event(
             session,

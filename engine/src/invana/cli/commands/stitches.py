@@ -303,7 +303,7 @@ def list_cmd(graph_ref: str, status: str | None) -> None:
 
     async def work(session, graph, _actor_id):
         rows = []
-        for link in await link_service.list_links(session, graph.id, status=status):
+        for link in await link_service.list_links(session, graph.id, status=status, current=True):
             names = []
             for side in ("source", "target"):
                 version = await _store.get_version(session, getattr(link, f"{side}_version_id"))

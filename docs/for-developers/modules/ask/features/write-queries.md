@@ -75,6 +75,7 @@ flowchart TD
 | WQ2 | Validation runs before execution and names what is wrong in the model's terms. |
 | WQ3 | Read-only connections refuse write clauses before dispatch. |
 | WQ4 | Results render through the same answer surface as any other ask. |
+| WQ5 | **A query-language ask runs through an agent that reads the graph, and never drafts a model.** An agent answers asks when its envelope allows `execute_graph_query`; the seeded Modeller's does not. An Explorer session bound to one that cannot answer is refused with a 422 that names the agent — never silently re-routed, and never run, because its steps would propose a model named after the query. A stored default that cannot answer is passed over for the seeded Explorer ([AG3](../../agents/features/author-an-agent.md#decisions)). |
 
 ## Not building
 

@@ -191,7 +191,8 @@ export function AgentDetail({
 					) : (
 						<>
 							{previewButton}
-							{!isDefault && agent.status === "active" ? (
+							{/* Only an agent that answers asks can be the default (AG3). */}
+							{!isDefault && agent.status === "active" && agent.answers_asks ? (
 								<Button size="sm" variant="ghost" onClick={onSetDefault}>
 									<Star /> Make default
 								</Button>

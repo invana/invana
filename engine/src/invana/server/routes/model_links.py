@@ -151,8 +151,9 @@ async def list_model_links(
 ) -> list[LinkResponse]:
     """Every stitch touching this Graph. Staged ones are listed beside the active
     ones rather than hidden — a staged set nobody can see is a staged set nobody
-    reviews (ST21)."""
-    links = await link_service.list_links(session, graph.id, status=status_filter)
+    reviews (ST21). Only links between active versions are listed; an older
+    version's links are history (ST58)."""
+    links = await link_service.list_links(session, graph.id, status=status_filter, current=True)
     return [await _decorate(session, link) for link in links]
 
 

@@ -180,11 +180,22 @@ async def declare(
     return link
 
 
-async def list_links(session: AsyncSession, graph_id: str, *, status: str | None = None) -> list[ModelLink]:
-    """Every link touching this Graph, newest last. ``status`` narrows to one set."""
+async def list_links(
+    session: AsyncSession, graph_id: str, *, status: str | None = None, current: bool = False
+) -> list[ModelLink]:
+    """Every link touching this Graph, newest last. ``status`` narrows to one set.
+
+    ``current`` keeps only links whose both ends are a model's **active**
+    version (ST58). A republish carries a model's stitches onto its new version,
+    and the old version's links stay behind as history — counted, they read as
+    every stitch twice.
+    """
     stmt = select(ModelLink).where(ModelLink.graph_id == graph_id)
     if status is not None:
         stmt = stmt.where(ModelLink.status == status)
+    if current:
+        active = select(GraphVersion.id).where(GraphVersion.status == "active")
+        stmt = stmt.where(ModelLink.source_version_id.in_(active), ModelLink.target_version_id.in_(active))
     stmt = stmt.order_by(ModelLink.created_at)
     return list((await session.execute(stmt)).scalars().all())
 

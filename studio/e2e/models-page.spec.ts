@@ -6,6 +6,7 @@
  * refusal changes nothing — an archive refused leaves the model where it was.
  */
 import { type Page, expect, test } from "@playwright/test";
+import { ask } from "./explorer";
 
 const GRAPH = process.env.E2E_GRAPH_PATH ?? "/u/admin/airways";
 
@@ -188,4 +189,77 @@ test("Usage calls nothing unused below 50 queries", async ({ page }) => {
 	} else {
 		await expect(unused).toContainText(/\d/);
 	}
+});
+
+// ── D · Advice ───────────────────────────────────────────────────────────────
+//
+// Advice is read off logged query-language asks, so each test asks first. The
+// asks leave their sessions behind, as the Explorer specs' do.
+
+/** Ask in query language, then open the Performance card of that shape. */
+async function adviceFor(page: Page, query: string, shape: RegExp) {
+	await ask(page, query);
+	await expect(page.getByText(/\d+ rows?/).last()).toBeVisible({
+		timeout: 60_000,
+	});
+	// The log is written off the query's path (MP36), so the shape may land a
+	// beat after the reply.
+	await expect(async () => {
+		await page.goto(`${GRAPH}?panel=model&models_tab=performance`);
+		await expect(page.getByText(shape).first()).toBeVisible({
+			timeout: 5_000,
+		});
+	}).toPass({ timeout: 30_000 });
+	await page.getByText(shape).first().click();
+	const card = page.getByRole("dialog", { name: "A query shape" });
+	await expect(card).toBeVisible({ timeout: 20_000 });
+	return card;
+}
+
+test("Add index to draft stages the index on the model that declares the label", async ({
+	page,
+}) => {
+	const card = await adviceFor(
+		page,
+		"MATCH (a:airport) WHERE a.city = 'Austin' RETURN a.code",
+		/a\.city = \$p0/,
+	);
+	await expect(card.getByText("airport.city has no index.")).toBeVisible();
+	await card.getByRole("button", { name: "Add index to draft" }).click();
+
+	// The page is scoped to the model, with the index staged on its draft (MP13).
+	await expect(page.getByRole("tab", { name: "AirRoutes" })).toBeVisible();
+	const chip = page.getByText("airport_city", { exact: true });
+	await expect(chip).toBeVisible({ timeout: 20_000 });
+
+	// Publishing would create it — the confirm says so, and is cancelled.
+	await page.getByRole("button", { name: "Publish", exact: true }).click();
+	const confirm = page.getByRole("dialog", { name: "Publish AirRoutes" });
+	await expect(
+		confirm.getByText("CREATE RANGE INDEX airport_city ON airport(city)"),
+	).toBeVisible();
+	await confirm.getByRole("button", { name: "Cancel" }).click();
+
+	// Only what this test staged is discarded; the draft is left as it was found.
+	await page.getByRole("button", { name: "Discard this change" }).click();
+	await expect(chip).toHaveCount(0);
+});
+
+test("advice on a label no model declares names it and offers nothing", async ({
+	page,
+}) => {
+	const card = await adviceFor(
+		page,
+		"MATCH (g:E2eUnmodelled) WHERE g.name = 'A1' RETURN g",
+		/g:E2eUnmodelled/,
+	);
+	await expect(
+		card.getByText("E2eUnmodelled.name has no index."),
+	).toBeVisible();
+	await expect(
+		card.getByText("No model declares E2eUnmodelled."),
+	).toBeVisible();
+	await expect(
+		card.getByRole("button", { name: "Add index to draft" }),
+	).toHaveCount(0);
 });

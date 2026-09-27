@@ -117,7 +117,8 @@ export interface ModelsPageData {
 	/** Each model's active version's types — the Overview's counts. */
 	frames: ModelFrame[];
 	counts: TypeCountsResponse | undefined;
-	links: ModelLink[];
+	/** Stitches between active versions (ST58); undefined while they load. */
+	links: ModelLink[] | undefined;
 	/** The mirror, drift marked, at the page's scope (MP9). */
 	physical: PhysicalSchema | undefined;
 	physicalLoading: boolean;
@@ -281,7 +282,8 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 	if (!scope) {
 		const drafts = data.models.filter((m) => !m.active_version).length;
 		const published = data.models.length - drafts;
-		const stitches = data.links.filter((l) => l.status === "active").length;
+		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched (ST58).
+		const stitches = data.links?.filter((l) => l.status === "active").length;
 		return {
 			crumbs: ["All models"],
 			chips: published
@@ -291,7 +293,7 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 							variant: "outline",
 						},
 						{
-							label: `${stitches} ${stitches === 1 ? "stitch" : "stitches"}`,
+							label: `${stitches ?? "—"} ${stitches === 1 ? "stitch" : "stitches"}`,
 							variant: "outline",
 						},
 					]

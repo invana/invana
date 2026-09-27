@@ -355,8 +355,11 @@ export function ShapeSheet({
 											<strong>
 												{a.label}.{a.property} has no index.
 											</strong>{" "}
-											{fmtNum(a.calls)} calls filtered on it — an index lets
-											them seek instead of scan.
+											{fmtNum(a.calls)}{" "}
+											{a.calls === 1
+												? "call filtered on it — an index lets it seek"
+												: "calls filtered on it — an index lets them seek"}{" "}
+											instead of scan.
 										</span>
 										{canWrite && a.model_id ? (
 											<>

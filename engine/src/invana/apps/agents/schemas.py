@@ -72,6 +72,9 @@ class AgentRead(BaseModel):
     #: run reads, with the one-release fallbacks filled in (EB9).
     effort: dict[str, Any]
     effective_effort: dict[str, int]
+    #: Whether an Explorer ask may run through it — what decides whether
+    #: *Make default* is offered (AG3 · WQ5). Read off the envelope, never set.
+    answers_asks: bool
     policy: dict[str, Any]
     soul: str
     soul_traits: dict[str, str]

@@ -14,8 +14,11 @@ properties here append rows through the store directly.
 from __future__ import annotations
 
 import pytest
+from fastapi import HTTPException
 from sqlalchemy import func, select
 
+from invana.apps.agents.managers import AgentManager
+from invana.apps.modeller.models import GraphModel
 from invana.apps.sessions import transcript
 from invana.apps.sessions.managers import SessionManager
 from invana.apps.sessions.models import (
@@ -25,8 +28,9 @@ from invana.apps.sessions.models import (
 )
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.schemas import RecordOperation, SendMessage, SessionMessageRead
-from invana.core.errors import NotFoundError, ValidationError
+from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.runtime import services as run_services
+from invana.runtime.models import TaskRun
 
 sessions = SessionManager()
 
@@ -176,6 +180,54 @@ class TestSessionPersistence:
         seqs = sorted(m.seq for m in await sessions.list_messages(session, sess=sess))
         assert seqs == [1, 2, 3, 4]
         assert sess.message_count == 4
+
+
+class TestQueryLanguageAsksAnswer:
+    """A query-language ask reads the graph and never drafts a model
+    (docs/for-developers/modules/ask/features/write-queries.md · WQ5 ·
+    docs/for-developers/modules/agents/features/author-an-agent.md · AG3)."""
+
+    async def test_a_ql_ask_runs_through_an_agent_that_reads_the_graph(self, session, graph, user):
+        agents = AgentManager()
+        await agents.seed_agents(session, graph=graph)
+        modeller = await agents.agents_qs.get_by_key(session, graph_id=graph.id, key="modeller")
+        # The state the airways graph was left in: a default that cannot answer.
+        graph.default_agent_id = modeller.id
+        sess = await sessions.create_session(session, graph=graph, user_id=user.id, title=None)
+
+        _, _, th = await run_services.open_turn(
+            session,
+            sess=sess,
+            graph=graph,
+            payload=SendMessage(content="MATCH (a:airport) RETURN a.code", mode="ql"),
+            actor_id=user.id,
+        )
+        steps = (await session.execute(select(TaskRun.task_key).where(TaskRun.parent_run_id == th.id))).scalars()
+        assert th.workflow_key == "ql-query"
+        assert th.agent_id != modeller.id
+        assert not {"understand_ask", "propose_model", "validate_proposal"} & set(steps)
+
+    async def test_an_agent_that_cannot_answer_is_refused_not_run(self, session, graph, user):
+        agents = AgentManager()
+        await agents.seed_agents(session, graph=graph)
+        modeller = await agents.agents_qs.get_by_key(session, graph_id=graph.id, key="modeller")
+        with pytest.raises(ConflictError):
+            await agents.set_default_agent(session, graph=graph, agent=modeller, actor=user)
+
+        sess = await sessions.create_session(session, graph=graph, user_id=user.id, title=None)
+        sess.agent_id = modeller.id
+        with pytest.raises(HTTPException) as exc:
+            await run_services.open_turn(
+                session,
+                sess=sess,
+                graph=graph,
+                payload=SendMessage(content="MATCH (a:airport) RETURN a.code", mode="ql"),
+                actor_id=user.id,
+            )
+        assert exc.value.status_code == 422
+        assert "Modeller" in exc.value.detail
+        assert await _message_count(session, sess.id) == 0
+        assert (await session.execute(select(func.count()).select_from(GraphModel))).scalar_one() == 0
 
 
 class TestFriendlyQueryError:

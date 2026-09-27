@@ -46,6 +46,8 @@ export interface Agent {
 	 */
 	effort: Partial<Record<EffortKey, number>>;
 	effective_effort: Record<EffortKey, number>;
+	/** Whether an Explorer ask may run through it — decides *Make default* (AG3). */
+	answers_asks: boolean;
 	policy: Record<string, boolean>;
 	/** Markdown. Empty is Invana's default voice, never no voice (SO3). */
 	soul: string;

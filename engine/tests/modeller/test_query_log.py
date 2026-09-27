@@ -61,6 +61,9 @@ def test_the_caller_is_read_off_the_run():
     assert classify(run(triggered_by="canvas")).kind == "explorer"
     assert classify(run(ask_kind="nl")).kind == "agent"
     assert classify(run(ask_kind="ql")).kind == "api"
+    # A typed query is the person's, even through the agent every session binds.
+    assert classify(run(ask_kind="ql", agent_id="explorer")).kind == "api"
+    assert classify(run(agent_id="explorer")).kind == "agent"
     assert classify(run(workflow_key="route-planner@2")).kind == "plan"
     # Writes and the platform's own runs ask for no one.
     assert classify(run(workflow_key="model-import@1")) is None

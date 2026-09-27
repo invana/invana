@@ -175,6 +175,34 @@ class TestDeclaring:
         assert link.source_model_id is None
         assert (link.source_property, link.target_property) == ("instrument_isin", "isin")
 
+    async def test_a_republished_version_leaves_its_old_links_out_of_the_listing(self, session, store, graph_id):
+        """ST58: the links on a replaced version are history, not current stitches."""
+        news_model, news = await _published(session, store, name="News3", graph_id=graph_id, types=["Company"])
+        _, market = await _published(session, store, name="Market3", graph_id=graph_id, types=["Stock"])
+        link = await declare(
+            session,
+            store,
+            graph_id=graph_id,
+            kind="anchor",
+            source_version_id=news.id,
+            source_type="Company",
+            target_version_id=market.id,
+            target_type="Stock",
+            source_property="ticker",
+            target_property="nse_symbol",
+        )
+        assert [row.id for row in await list_links(session, graph_id, current=True)] == [link.id]
+
+        # Publishing News3 again archives the version the link binds.
+        draft = await store.create_version(session, model_id=news_model.id)
+        await store.create_node_type(session, version_id=draft.id, name="Company")
+        await session.flush()
+        await Versioner(store).activate(session, version_id=draft.id)
+        await session.flush()
+
+        assert await list_links(session, graph_id, current=True) == []
+        assert [row.id for row in await list_links(session, graph_id)] == [link.id]
+
 
 @pytest.mark.asyncio
 class TestGlobalModel:

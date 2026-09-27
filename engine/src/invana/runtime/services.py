@@ -160,6 +160,13 @@ async def open_turn(
     # sends one; a session bound before agents existed falls back to its
     # surface's seeded agent rather than failing.
     agent = await _session_agent(db, sess=sess, graph=graph)
+    if not is_modeller and agent is not None and not agent.answers_asks:
+        # Refused, never swapped: running the ask through a different agent than
+        # the header names is worse than saying so (WQ5).
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=f"'{agent.name}' cannot answer questions on the graph. Pick another agent for this session.",
+        )
     # One composition, read twice: the lens this run is frozen under is the same
     # lens its model is cast by, so *which model answered* and *what it was
     # allowed to see* cannot disagree ([PM14](docs/for-developers/modules/agents/features/providers-and-models.md)).

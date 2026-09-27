@@ -105,7 +105,7 @@ export function ModelsPage({
 			),
 		[models.data],
 	);
-	const { frames, links } = useAllModels(username, graphSlug);
+	const { frames } = useAllModels(username, graphSlug);
 	const allLinks = useModelLinksQuery(username, graphSlug);
 	const counts = useTypeCountsQuery(username, graphSlug);
 	const connection = useGraphConnectionQuery(username, graphSlug);
@@ -234,7 +234,7 @@ export function ModelsPage({
 			models: authored,
 			frames,
 			counts: counts.data,
-			links: allLinks.data ?? links,
+			links: allLinks.data,
 			physical: physical.data,
 			physicalLoading: physical.isLoading,
 			insights: insights.data,

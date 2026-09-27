@@ -202,7 +202,7 @@ Full schema: [building-engine/govern-and-agents-data-model.md](../../../building
 |---|---|
 | AG1 | Every agent is authored from a template, and every template carries an envelope. |
 | AG2 | **An agent binds no provider and no world.** It carries **standing limits** — an envelope, effort, a budget, reach — and optionally a guardrail of its own. What a run may see, use and send, and the `cast` that names its models, come with the work that starts it ([AG24](#decisions) · [PM1](providers-and-models.md) · [GV10](../../govern/spec.md)). |
-| AG3 | One default agent per Graph, always set. |
+| AG3 | **One default agent per Graph, always set, and it answers asks.** The default is what every Explorer session that names no agent binds, so it must be an agent whose envelope allows `execute_graph_query`; making the Modeller the default is refused with a 409. A default that cannot answer, however it was stored, is passed over for the seeded Explorer ([WQ5](../../ask/features/write-queries.md#decisions)). |
 | AG4 | Skills reach an agent only through a binding. |
 | AG5 | **Work that names no world runs in *Everything*, never in a blank.** *Nothing set* and *nothing permitted* must never look alike ([GR6](../../govern/features/guardrails.md)), and the widest state is still inside the guardrails — the Graph's and the agent's own. |
 | AG6 | **A refusal names which side bound it** — the agent's standing limits, the work's world, or a guardrail. Effective bounds are the three intersected, so a refusal that named only the result would not say whom to ask. |

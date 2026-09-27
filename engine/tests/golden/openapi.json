@@ -1073,6 +1073,10 @@
       },
       "AgentRead": {
         "properties": {
+          "answers_asks": {
+            "title": "Answers Asks",
+            "type": "boolean"
+          },
           "budget": {
             "additionalProperties": true,
             "title": "Budget",
@@ -1250,6 +1254,7 @@
           "budget",
           "effort",
           "effective_effort",
+          "answers_asks",
           "policy",
           "soul",
           "soul_traits",
@@ -23202,7 +23207,7 @@
     },
     "/api/v1/u/{username}/{graphSlug}/model-links": {
       "get": {
-        "description": "Every stitch touching this Graph. Staged ones are listed beside the active\nones rather than hidden \u2014 a staged set nobody can see is a staged set nobody\nreviews (ST21).",
+        "description": "Every stitch touching this Graph. Staged ones are listed beside the active\nones rather than hidden \u2014 a staged set nobody can see is a staged set nobody\nreviews (ST21). Only links between active versions are listed; an older\nversion's links are history (ST58).",
         "operationId": "list_model_links_api_v1_u__username___graphSlug__model_links_get",
         "parameters": [
           {

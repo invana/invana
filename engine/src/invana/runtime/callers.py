@@ -1,8 +1,8 @@
 """Who a run asks the graph for — read off the run, never guessed (the-model-page.md MP35).
 
-A canvas run is the **Explorer**; a run with an agent, or a question in
-language, is an **agent**; a query sent in a query language is the **API**;
-any other library plan is a **plan**. The builtins that write data and the
+A canvas run is the **Explorer**; a query sent in a query language is the
+**API**, whichever agent carried it; any other run with an agent, or a question
+in language, is an **agent**; any other library plan is a **plan**. The builtins that write data and the
 platform's own runs ask for no one, so their queries are not logged — what
 they did is Growth's to show, not Usage's.
 
@@ -51,10 +51,12 @@ def classify(root: TaskRun) -> QueryCaller | None:
         return None
     if root.triggered_by == TriggeredBy.canvas.value:
         kind, caller_id = "explorer", root.author_id
+    elif root.ask_kind == "ql":
+        # Read before the agent: every session binds one, but a typed query is
+        # the person's, and the agent only carried it.
+        kind, caller_id = "api", root.author_id
     elif root.agent_id or root.ask_kind == "nl":
         kind, caller_id = "agent", root.agent_id or root.author_id
-    elif root.ask_kind == "ql":
-        kind, caller_id = "api", root.author_id
     else:
         kind, caller_id = "plan", plan_key or None
     return QueryCaller(graph_id=root.graph_id, kind=kind, caller_id=caller_id, task_run_id=root.id)
