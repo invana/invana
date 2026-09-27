@@ -183,6 +183,7 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 					data={build.data}
 					settings={graphModelSettings}
 					templates={graphModelTemplates}
+					initialDetail="high"
 					title="All models"
 					backend={backend}
 					stitching={{

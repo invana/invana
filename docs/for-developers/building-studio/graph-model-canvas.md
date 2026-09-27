@@ -50,7 +50,7 @@ It takes **no children**: a host adds nothing to the canvas but its opt-in stitc
 | `templates` | `Record<Detail, Partial<CanvasConfig>>` | ✅ | each Detail level's patch: frame padding, the `model.type` binding, ELK spacing |
 | `title` | `string` | — | the header title. `Global model` by default |
 | `message` | `string` | — | shown once in `CanvasMessageBar`. The story's by default |
-| `initialDetail` | `Detail` | — | `medium` by default, which is what `settings.json` starts on |
+| `initialDetail` | `Detail` | — | `medium` by default. *All models* passes `high` (circles); a single model takes the default, cards (GM4) |
 | `selected` | `{ kind: 'node' \| 'edge', id } \| null` | — | the node or edge drawn selected |
 | `onSelect` | `(selection) => void` | — | one node or edge clicked, or `null` on an empty click |
 | `height` | `number` | — | for a host that gives no height of its own |
@@ -130,7 +130,7 @@ flowchart LR
 | GM1 | **The modeller's one canvas is the global model story, copied.** Its behaviours, layouts, header, footer, hover cards, settings and templates are the story's; only the colours are Studio's (GM7, GM8). Both modeller surfaces draw on it, so a model reads the same alone and among the others |
 | GM2 | **A host adds nothing to the canvas.** No children, no toolbar items, no camera hooks. What a page needs beyond the drawing (a staged bar, a type form) sits outside the canvas, in the page's own layout. Selection is one channel in and out; the stitch gesture (GM12) is the other, and it is the canvas's own |
 | GM3 | **ELK and d3-force, as the story has them.** ELK `layered` is the default; the Layout switch offers force with the story's settings, whose frames can overlap |
-| GM4 | **Detail is High, Medium or Low, and each is a template patch.** `templates.json` is the story's `detail-templates.json`. A patch carries the frame padding, the member binding and both layouts' spacing for its node size, and the layout re-runs after it. The canvas opens on Medium, as the story does |
+| GM4 | **Detail is High, Medium or Low, and each is a template patch.** `templates.json` is the story's `detail-templates.json`. A patch carries the frame padding, the member binding and both layouts' spacing for its node size, and the layout re-runs after it. The caller picks the opening Detail: *All models* opens on High — circles, the landscape at a glance — and a single model on Medium — cards, the story's default |
 | GM5 | **The JSON names no model and no type.** The story binds each qualified type name. Studio's types are the user's own, so the JSON carries one placeholder binding, `model.type`, and `config.ts` expands it into one binding per `Model.Type` in the data |
 | GM6 | **Low's schema cards are built from the data.** The story writes one card per type by hand. `schemaCard()` writes the same layout from the type's own properties: a 300px card, 22px rows, the story's type chips. A card's height is its row count |
 | GM7 | **Hues are slots, read live from `--color-data-N`.** The story's colour lookups bind `data.model`; here they bind `data.hue` (`1`–`8`) and `config.ts` refills them from the tokens whenever the theme changes, because the light and dark palettes differ |
