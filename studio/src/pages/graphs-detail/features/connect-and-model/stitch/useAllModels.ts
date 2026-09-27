@@ -13,7 +13,7 @@
  * the models would put a territory on the canvas nobody can stitch (spec.md §2).
  */
 
-import { hueSlotForIndex } from "@/canvases/model";
+import { hueSlotForName } from "@/canvases/model";
 import { useModelLinksQuery, useModelsQuery } from "@/hooks/queries/useModels";
 import type { ModelFrame } from "@/pages/graphs-detail/features/connect-and-model/stitch/allModels";
 import { modelsApi } from "@/services/api/models";
@@ -85,8 +85,8 @@ export function useAllModels(
 	// walked with their own cursor rather than a shared index.
 	const frames = useMemo(() => {
 		let cursor = 0;
-		return domains.map((model, i): ModelFrame => {
-			const hue = hueSlotForIndex(i);
+		return domains.map((model): ModelFrame => {
+			const hue = hueSlotForName(model.name);
 			if (!model.active_version) {
 				return {
 					modelId: model.id,

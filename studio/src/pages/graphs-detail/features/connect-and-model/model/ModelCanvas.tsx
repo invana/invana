@@ -21,7 +21,7 @@ import {
 	type ModelCanvasSelection,
 	graphModelSettings,
 	graphModelTemplates,
-	hueSlotForIndex,
+	hueSlotForName,
 } from "@/canvases/model";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
@@ -130,7 +130,6 @@ export function ModelCanvas({
 
 	// One model on the same canvas as All models: its frame, its types, its own
 	// edge types (ME26). The version drawn is the draft while one is open.
-	const modelIndex = (models.data ?? []).findIndex((m) => m.id === modelId);
 	const build = useMemo(
 		() =>
 			buildAllModelsData(
@@ -145,23 +144,14 @@ export function ModelCanvas({
 							: active
 								? `v${active.version}`
 								: null,
-						hue: hueSlotForIndex(Math.max(modelIndex, 0)),
+						hue: hueSlotForName(model?.name ?? "Model"),
 						nodeTypes,
 						edgeTypes,
 					},
 				],
 				[],
 			),
-		[
-			modelId,
-			model,
-			openVersionId,
-			draft,
-			active,
-			modelIndex,
-			nodeTypes,
-			edgeTypes,
-		],
+		[modelId, model, openVersionId, draft, active, nodeTypes, edgeTypes],
 	);
 
 	// The panel selects by name; the canvas by id.

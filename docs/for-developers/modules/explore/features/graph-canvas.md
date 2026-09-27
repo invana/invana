@@ -95,7 +95,7 @@ sequenceDiagram
 | GC1 | Drawing adds to the canvas; it never replaces what is there. |
 | GC2 | Selection is one concept across every canvas kind. |
 | GC3 | Expansion states the count before it draws. |
-| GC4 | Colour by type comes from the model, not from per-node styling. |
+| GC4 | Colour by type comes from the model, not from per-node styling. Every node **and relationship** type has a default colour — the `--color-data-N` slot its name hashes to (`colorByString` in `@invana/styling/color`) — which an explicit per-type colour overrides. The canvas and the Types panel's dots read the same function, so the panel always matches the drawing. |
 | GC5 | A missing element is shown as missing. |
 | GC6 | **An expansion is a TaskRun.** Expanding a node dispatches `expand_neighbours` (bound `graph_read`) through the interpreter like every other read — not a direct query from the canvas ([orchestration § 4.1a](../../../orchestration.md#41a-nothing-executes-outside-the-runtime)). What a person saw, and therefore reasoned from, is recorded; a Graph whose reads are invisible cannot explain an answer that came out of one. |
 | GC7 | **Interactive runs do not flood the journal.** An expansion carries `trigger = canvas`, is filtered out of Runs by default, and has its own retention ([§ 4.1b](../../../orchestration.md#41b-interactive-runs)). The count-before-it-draws promise of GC3 is the run's own estimate step, so the ceiling that refuses a 40,000-node expansion is the envelope's, not a number in the UI. |

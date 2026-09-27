@@ -45,6 +45,7 @@ const designKitAlias: Record<string, string> = designKitRoot
 				"packages/styling/src/themes.config.ts",
 			),
 			"@invana/styling/themes": dk("packages/styling/src/themes"),
+			"@invana/styling/color": dk("packages/styling/src/color.ts"),
 			"@invana/styling": dk("packages/styling/src/index.css"),
 			"@invana/ui/styles.css": dk("packages/ui/dist/styles.css"),
 			"@invana/ui/lib/utils": dk("packages/ui/dist/index.js"),

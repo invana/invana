@@ -52,8 +52,13 @@ function num(varName: string, fallback: number): number {
  * Build a canvas colour patch from the currently-applied theme's CSS tokens.
  * Call it after the theme class is on `document.documentElement` (see the
  * `requestAnimationFrame` in the canvases' `<ThemeBridge>`).
+ *
+ * `edgeColor: false` leaves edge colour out, for a canvas that colours each
+ * relationship by its type — a flat theme colour pushed here would paint over it.
  */
-export function readCanvasThemeConfig(): CanvasConfig {
+export function readCanvasThemeConfig({
+	edgeColor = true,
+}: { edgeColor?: boolean } = {}): CanvasConfig {
 	// Background is a CSS string on the layer; the rest are PixiJS numbers.
 	const background = resolveVar("--color-background") ?? "#181a1b";
 	const grid = resolveVar("--color-border") ?? "#35383b";
@@ -66,7 +71,9 @@ export function readCanvasThemeConfig(): CanvasConfig {
 			background: { backgroundColor: background, color: grid },
 			graph: {
 				node: { style: { labelColor: foreground, bgStrokeColor: bg } },
-				edge: { style: { strokeColor: edge, arrowTargetColor: edge } },
+				...(edgeColor
+					? { edge: { style: { strokeColor: edge, arrowTargetColor: edge } } }
+					: {}),
 			},
 			minimap: {
 				backgroundColor: num("--color-card", FALLBACK.card),

@@ -182,7 +182,6 @@ const HIDDEN_EDGE_STATE = {
 // Defaults applied only once the user has styled *some* type (so an unstyled
 // canvas keeps the theme defaults untouched).
 const DEFAULT_NODE_SIZE = 16;
-const DEFAULT_EDGE_COLOR = 0x94a3b8;
 const DEFAULT_EDGE_WIDTH = 1.5;
 
 // Forces for the registered active layout (run on every query repaint by
@@ -819,7 +818,9 @@ function ThemeBridge() {
 	const update = useGraphCanvasUpdate();
 	// biome-ignore lint/correctness/useExhaustiveDependencies: variantId/isDark are trigger-only — the effect re-reads the live DOM tokens on any theme/mode change
 	useEffect(() => {
-		const id = requestAnimationFrame(() => update(readCanvasThemeConfig()));
+		const id = requestAnimationFrame(() =>
+			update(readCanvasThemeConfig({ edgeColor: false })),
+		);
 		return () => cancelAnimationFrame(id);
 	}, [variantId, isDark, update]);
 	return null;
@@ -885,7 +886,6 @@ export function ExplorerCanvas({
 		const nt = styling?.nodeTypes ?? {};
 		const et = styling?.edgeTypes ?? {};
 		const hasNodeSize = Object.values(nt).some((s) => s?.size != null);
-		const hasEdgeColor = Object.values(et).some((s) => !!s?.color);
 		const hasEdgeWidth = Object.values(et).some((s) => s?.width != null);
 		const nodeStyle = {
 			// Explicit styling first, then the shared data-palette slot — the same
@@ -907,17 +907,13 @@ export function ExplorerCanvas({
 					}
 				: {}),
 		};
+		// Every relationship type has a colour by default, the same one its row's
+		// dot shows in the Types panel — explicit styling first, palette after.
+		const edgeColor = (e: graph.GraphEdge) =>
+			typeColorNumber(String(e.type ?? ""), et[String(e.type ?? "")]?.color);
 		const edgeStyle = {
-			...(hasEdgeColor
-				? {
-						strokeColor: (e: graph.GraphEdge) => {
-							const set = et[String(e.type ?? "")]?.color;
-							return set
-								? typeColorNumber(String(e.type ?? ""), set)
-								: DEFAULT_EDGE_COLOR;
-						},
-					}
-				: {}),
+			strokeColor: edgeColor,
+			arrowTargetColor: edgeColor,
 			...(hasEdgeWidth
 				? {
 						strokeWidth: (e: graph.GraphEdge) =>

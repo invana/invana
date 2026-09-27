@@ -5,7 +5,9 @@
  * The Explorer panel's type rows are a legend (selection-and-the-panel.md), and
  * a legend whose dot is a different colour from the drawing is worse than none.
  * So both read this: an explicit style colour if the canvas has one, else a slot
- * from the categorical data palette, chosen by the type's name.
+ * from the categorical data palette, chosen by the type's name — through
+ * `@invana/styling/color`'s `colorByString`, the one hash every surface shares
+ * (nodes, relationships, model hues).
  *
  * **The palette is `@invana/styling`'s, not ours** (design-kit-coverage.md D2):
  * `--color-data-1` … `--color-data-8`, one scale shared by charts, legends, list
@@ -24,70 +26,15 @@
  */
 
 import { cssColorToNumber } from "@invana/graph";
-
-/** How many slots the data palette defines. */
-const SLOTS = 8;
-
-/**
- * Neutral stand-in for a slot that will not resolve — an older `@invana/styling`
- * without the palette, or a probe taken before the theme class is applied. A
- * token, so it still follows the theme.
- */
-const FALLBACK_VAR = "--color-muted-foreground";
+import { colorByString, colorSlotByString } from "@invana/styling/color";
 
 /** The palette slot a type name lands in. Same name, same slot, always. */
-export function slotForType(type: string | undefined): number {
-	if (!type) return 1;
-	let h = 0;
-	for (let i = 0; i < type.length; i++) h = (h * 31 + type.charCodeAt(i)) >>> 0;
-	return (h % SLOTS) + 1;
-}
-
-/**
- * Resolved colours, keyed by the root's theme stamp. The node style function
- * asks once per node on every restyle, and each probe forces a full-document
- * style recalc — uncached, that was most of a 60-node load and the jank on every
- * hover and zoom. The theme lives on the root's class and inline style, so a
- * theme or mode switch changes the stamp and the next read re-resolves.
- */
-let cacheStamp = "";
-const cache = new Map<string, string | undefined>();
-
-/** Resolve a CSS custom property to a concrete `rgb(...)` the browser computed. */
-function resolveVar(varName: string, fallbackVar?: string): string | undefined {
-	if (typeof document === "undefined") return undefined;
-	const root = document.documentElement;
-	const stamp = `${root.className}|${root.getAttribute("style") ?? ""}`;
-	if (stamp !== cacheStamp) {
-		cacheStamp = stamp;
-		cache.clear();
-	}
-	const key = `${varName}|${fallbackVar ?? ""}`;
-	if (cache.has(key)) return cache.get(key);
-	const rgb = probeVar(varName, fallbackVar);
-	cache.set(key, rgb);
-	return rgb;
-}
-
-function probeVar(varName: string, fallbackVar?: string): string | undefined {
-	const probe = document.createElement("span");
-	probe.style.color = fallbackVar
-		? `var(${varName}, var(${fallbackVar}))`
-		: `var(${varName})`;
-	probe.style.display = "none";
-	document.documentElement.appendChild(probe);
-	const rgb = getComputedStyle(probe).color;
-	probe.remove();
-	return rgb || undefined;
-}
+export const slotForType = (type: string | undefined): number =>
+	colorSlotByString(type);
 
 /** The CSS colour for a type's dot: explicit style first, palette slot after. */
 export function typeDotColor(type: string, explicit?: string): string {
-	if (explicit) return explicit;
-	return (
-		resolveVar(`--color-data-${slotForType(type)}`, FALLBACK_VAR) ??
-		`var(${FALLBACK_VAR})`
-	);
+	return colorByString(type, explicit);
 }
 
 /** The same colour as a PixiJS number, for the canvas. */

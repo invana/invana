@@ -8,7 +8,7 @@ export {
 	MODEL_LAYER_ID,
 } from "@/canvases/model/GraphModelCanvas";
 export type { GraphModelCanvasProps } from "@/canvases/model/GraphModelCanvas";
-export { HUE_COUNT, hueSlotForIndex } from "@/canvases/model/config";
+export { HUE_COUNT, hueSlotForName } from "@/canvases/model/config";
 export * from "@/canvases/model/types";
 
 // JSON import widens string-literal unions to `string`; the files are a

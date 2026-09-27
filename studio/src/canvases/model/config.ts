@@ -21,6 +21,7 @@ import {
 } from "@/canvases/model/types";
 import type { CanvasConfig } from "@invana/canvas";
 import { cssColorToNumber } from "@invana/graph";
+import { colorSlotByString } from "@invana/styling/color";
 
 /** `@invana/styling`'s `--color-data-1…8`, used only when a token cannot be read. */
 const FALLBACK_HUES = [
@@ -30,8 +31,11 @@ const FALLBACK_HUES = [
 
 export const HUE_COUNT = FALLBACK_HUES.length;
 
-/** A model's slot in the palette, `1`–`8`, by its index in the list. */
-export const hueSlotForIndex = (i: number): number => (i % HUE_COUNT) + 1;
+/**
+ * A model's slot in the palette, `1`–`8`, by its name — so a model keeps its
+ * hue when another is added, deleted or the list is re-sorted (GM7).
+ */
+export const hueSlotForName = (name: string): number => colorSlotByString(name);
 
 function readToken(name: string): number | undefined {
 	if (typeof document === "undefined") return undefined;
