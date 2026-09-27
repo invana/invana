@@ -34,7 +34,7 @@ from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, Event
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 
 def _utcnow() -> datetime:
@@ -110,7 +110,6 @@ class TaskManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"title": task.title},
-            trace_id=current_trace_id(),
         )
         if payload.assignee_kind and payload.assignee_id:
             await self.assign(
@@ -151,7 +150,6 @@ class TaskManager:
                 task_id=task.id,
                 actor_id=actor.id,
                 details={"changed": changed},
-                trace_id=current_trace_id(),
             )
 
         if payload.assignee_kind == "none":
@@ -217,7 +215,6 @@ class TaskManager:
                 "assignee_id": assignee_id,
                 "assignee_name": agent.name if agent else None,
             },
-            trace_id=current_trace_id(),
         )
 
         if agent is not None and not blockers:
@@ -243,7 +240,6 @@ class TaskManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"was": previous},
-            trace_id=current_trace_id(),
         )
         return task
 
@@ -287,7 +283,6 @@ class TaskManager:
             on_behalf_of_user_id=on_behalf_of,
             parent_event_id=cause.id if cause else None,
             details={"actor_name": agent.name, "run_id": run.id},
-            trace_id=current_trace_id(),
         )
 
     async def post_result(
@@ -330,7 +325,6 @@ class TaskManager:
             actor_id=actor_id,
             on_behalf_of_user_id=on_behalf_of_user_id,
             details={"summary": payload.summary[:500], "actor_name": actor_name},
-            trace_id=current_trace_id(),
         )
         return task
 
@@ -355,7 +349,6 @@ class TaskManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"title": task.title},
-            trace_id=current_trace_id(),
         )
         await self._lifecycle().retire_ephemeral_for_task(session, task_id=task.id, graph_id=graph.id)
         await self.unblock_dependants(session, graph=graph, task=task, cause=accept_event)
@@ -376,7 +369,6 @@ class TaskManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"note": note[:1000]},
-            trace_id=current_trace_id(),
         )
         task.status = TaskStatus.assigned.value
         task.result = None
@@ -408,7 +400,6 @@ class TaskManager:
                     on_behalf_of_user_id=actor.id,
                     parent_event_id=reject_event.id,
                     details={"actor_name": agent.name, "rework": True},
-                    trace_id=current_trace_id(),
                 )
         return task
 
@@ -425,7 +416,6 @@ class TaskManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"title": task.title},
-            trace_id=current_trace_id(),
         )
         await self._lifecycle().retire_ephemeral_for_task(session, task_id=task.id, graph_id=graph.id)
         return task
@@ -465,7 +455,6 @@ class TaskManager:
                     "status": {"before": TaskStatus.blocked.value, "after": dependant.status},
                     "cause": f"task.done {task.id}",
                 },
-                trace_id=current_trace_id(),
             )
             if dependant.assignee_kind == "agent" and dependant.assignee_id:
                 agent = await session.get(Agent, dependant.assignee_id)

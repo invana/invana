@@ -164,6 +164,7 @@ CREATE TABLE events (
 	target_id VARCHAR(36), 
 	details JSON NOT NULL, 
 	trace_id VARCHAR(32), 
+	span_id VARCHAR(16), 
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE SET NULL
@@ -823,6 +824,8 @@ CREATE TABLE task_runs (
 	agent_version INTEGER, 
 	triggered_by VARCHAR(16) NOT NULL, 
 	on_behalf_of_user_id VARCHAR(36), 
+	trace_id VARCHAR(32), 
+	root_span_id VARCHAR(16), 
 	status VARCHAR(16) NOT NULL, 
 	outcome VARCHAR(16), 
 	assistant_message_id VARCHAR(36), 

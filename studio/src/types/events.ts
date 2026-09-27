@@ -34,6 +34,8 @@ export interface AuditEvent {
 	target_id: string | null;
 	details: Record<string, unknown>;
 	trace_id: string | null;
+	/** The span that recorded this event, inside `trace_id`. */
+	span_id: string | null;
 	created_at: string;
 }
 

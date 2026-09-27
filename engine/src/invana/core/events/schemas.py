@@ -62,6 +62,7 @@ class EventRead(BaseModel):
     target_id: str | None
     details: dict
     trace_id: str | None
+    span_id: str | None = None
     created_at: datetime
 
 

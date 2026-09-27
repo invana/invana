@@ -59,6 +59,8 @@ class TaskRunRead(BaseModel):
     finished_at: datetime | None = None
     error: dict | None = None
     stream_seq: int
+    #: The trace the run was started in — opens it in the collector's UI.
+    trace_id: str | None = None
     steps: list[RunNodeRead] = []
 
 
@@ -252,6 +254,8 @@ class TraceRead(BaseModel):
     plan_revision: int = 0
     #: What opened the run — ``user`` · ``schedule`` · ``task`` · ``delegation``.
     triggered_by: str = "user"
+    #: The trace the run was started in — opens it in the collector's UI.
+    trace_id: str | None = None
     #: The person it ran for, by username — the one on whose behalf it ran, else
     #: its author. ``None`` when no person is on the record (a schedule).
     opened_by: str | None = None

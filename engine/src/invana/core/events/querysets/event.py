@@ -160,6 +160,7 @@ class EventQuerySet:
                     target_id=event.target_id,
                     details=event.details,
                     trace_id=event.trace_id,
+                    span_id=event.span_id,
                     created_at=event.created_at,
                 ),
             )

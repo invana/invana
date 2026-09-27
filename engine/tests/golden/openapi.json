@@ -4123,6 +4123,17 @@
             "title": "Skill Ids",
             "type": "array"
           },
+          "span_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Span Id"
+          },
           "target_id": {
             "anyOf": [
               {
@@ -14780,6 +14791,17 @@
             "title": "Stream Seq",
             "type": "integer"
           },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
+          },
           "workflow_key": {
             "title": "Workflow Key",
             "type": "string"
@@ -15818,6 +15840,17 @@
             "default": 0,
             "title": "Tokens Out",
             "type": "integer"
+          },
+          "trace_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Id"
           },
           "triggered_by": {
             "default": "user",

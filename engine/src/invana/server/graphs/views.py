@@ -34,7 +34,7 @@ from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.core.settings import settings
 from invana.graph.types.capabilities import CompatibilityStatus, Version
 from invana.graph.types.constants import Capability
@@ -223,7 +223,6 @@ async def acknowledge_connection_version(
             "server_version": connection.server_version,
             "compatibility_status": connection.compatibility_status,
         },
-        trace_id=current_trace_id(),
     )
     await session.commit()
     await session.refresh(connection)
@@ -261,7 +260,6 @@ async def declare_connection_version(
         graph_id=graph.id,
         actor_id=user.id,
         details={"server_version": payload.server_version, "compatibility_status": new_status.value},
-        trace_id=current_trace_id(),
     )
     await session.commit()
     connection = await connections_qs.get(session, connection.id)
@@ -314,7 +312,6 @@ async def test_connection(
             "database": payload.database,
             **result,
         },
-        trace_id=current_trace_id(),
     )
     await session.commit()
     return result

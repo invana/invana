@@ -19,7 +19,7 @@ from invana.core.auth.models import User
 from invana.core.auth.querysets import UserQuerySet
 from invana.core.errors import ConflictError, NotFoundError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 _SLUG_STRIP = re.compile(r"[^a-z0-9]+")
 
@@ -96,7 +96,6 @@ class ProjectManager:
             project_id=project.id,
             actor_id=actor.id,
             details={"key": project.key, "name": project.name},
-            trace_id=current_trace_id(),
         )
         return project
 
@@ -126,7 +125,6 @@ class ProjectManager:
                 project_id=project.id,
                 actor_id=actor.id,
                 details={"key": project.key, "changed": changed},
-                trace_id=current_trace_id(),
             )
         return project
 
@@ -145,5 +143,4 @@ class ProjectManager:
             graph_id=graph_id,
             actor_id=actor.id,
             details={"key": key},
-            trace_id=current_trace_id(),
         )

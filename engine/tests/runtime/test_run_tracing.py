@@ -24,6 +24,7 @@ from invana.runtime import workflows
 from invana.runtime.catalogue import CannotAnswer, Out, TaskFailure
 from invana.runtime.interpreter import TaskRuntime
 from invana.runtime.models import RunStatus, TaskRun
+from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.workflows import Step, Workflow
 
 pytestmark = pytest.mark.asyncio
@@ -167,3 +168,37 @@ class TestRunSpans:
         ]
         assert child.parent.span_id == delegating.context.span_id
         assert [link.context.span_id for link in child.links] == [parent.context.span_id]
+
+
+class TestRunRecordsItsTrace:
+    async def test_the_row_carries_its_trace_and_run_span(
+        self, session, session_factory, graph, user, stub_tasks, exporter
+    ):
+        # Opened inside a request's span, as Studio's action would be.
+        with spans.span("request"):
+            th = await _open(session, graph, user, "stub-ok")
+            await _run(session_factory, th.id)
+
+        [run] = _named(exporter, "invana.run")
+        row = await session.get(TaskRun, th.id, populate_existing=True)
+        assert row.trace_id == format(run.context.trace_id, "032x")
+        assert row.root_span_id == format(run.context.span_id, "016x")
+        steps = (await session.execute(select(TaskRun).where(TaskRun.parent_run_id == th.id))).scalars().all()
+        assert steps and all(s.trace_id == row.trace_id and s.root_span_id is None for s in steps)
+
+    async def test_a_run_queued_outside_a_span_takes_its_own_and_keeps_the_first(
+        self, session, session_factory, graph, user, stub_tasks, exporter
+    ):
+        th = await _open(session, graph, user, "stub-ok")
+        assert th.trace_id is None and th.root_span_id is None
+
+        await _run(session_factory, th.id)
+        [run] = _named(exporter, "invana.run")
+        first = (format(run.context.trace_id, "032x"), format(run.context.span_id, "016x"))
+
+        # A resumed run opens a second span; the row keeps the first.
+        stamped = await TaskRunQuerySet().stamp_trace(session, th.id, trace_id="f" * 32, span_id="e" * 16)
+        await session.commit()
+        row = await session.get(TaskRun, th.id, populate_existing=True)
+        assert stamped is False
+        assert (row.trace_id, row.root_span_id) == first

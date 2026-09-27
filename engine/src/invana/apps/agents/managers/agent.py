@@ -34,7 +34,7 @@ from invana.core.auth.models import User
 from invana.core.errors import ConflictError, NotFoundError, ValidationError
 from invana.core.events import actions
 from invana.core.events.models import ActorKind
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 """Service layer for agents — the agents, the lifecycle, and lineage."""
 
@@ -278,7 +278,6 @@ class AgentManager:
             graph_id=graph.id,
             actor_id=actor.id,
             details={"name": agent.name, "kind": agent.kind},
-            trace_id=current_trace_id(),
         )
         return agent
 
@@ -324,7 +323,6 @@ class AgentManager:
                     graph_id=agent.graph_id,
                     actor_id=actor.id,
                     details={"name": agent.name, "changed": rest, "version": agent.version},
-                    trace_id=current_trace_id(),
                 )
             if voice:
                 await emit_event(
@@ -344,7 +342,6 @@ class AgentManager:
                         "soul_traits": agent.soul_traits,
                         "soul_chars": len(agent.soul or ""),
                     },
-                    trace_id=current_trace_id(),
                 )
         return agent
 
@@ -361,7 +358,6 @@ class AgentManager:
             graph_id=agent.graph_id,
             actor_id=actor.id,
             details={"name": agent.name},
-            trace_id=current_trace_id(),
         )
         return agent
 
@@ -399,7 +395,6 @@ class AgentManager:
                 "open_tasks": [t.id for t in tasks],
                 "reassigned_to": reassign_to_id,
             },
-            trace_id=current_trace_id(),
         )
         return agent
 
@@ -419,7 +414,6 @@ class AgentManager:
             graph_id=graph.id,
             actor_id=actor.id,
             details={"name": agent.name},
-            trace_id=current_trace_id(),
         )
         return graph
 

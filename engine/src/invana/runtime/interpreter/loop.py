@@ -48,7 +48,7 @@ from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_message_in_flight, record_session_message
-from invana.core.telemetry.spans import add_event, current_span_context, set_current
+from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
@@ -373,10 +373,27 @@ class TaskRuntime:
         with run_span(th, links=links) if th is not None else contextlib.nullcontext():
             self._run_span_ctx[run_id] = current_span_context()
             try:
+                await self._stamp_trace(run_id)
                 with calling_as(caller):
                     await self._run_body(run_id)
             finally:
                 self._run_span_ctx.pop(run_id, None)
+
+    async def _stamp_trace(self, run_id: str) -> None:
+        """Write the open run span's ids onto the run row, so the run opens its trace.
+
+        Called once the ``invana.run`` span is current. It sets ``root_span_id``
+        and fills ``trace_id`` only when the insert found no trace (a run queued
+        outside any span). The first run span wins: a resumed run opens a second
+        span and leaves both ids as they were. Without telemetry there is no span
+        and nothing is written.
+        """
+        trace_id, span_id = current_ids()
+        if span_id is None:
+            return
+        async with self._factory() as db:
+            await TaskRunQuerySet().stamp_trace(db, run_id, trace_id=trace_id, span_id=span_id)
+            await db.commit()
 
     async def _run_body(self, run_id: str) -> None:
         emitter = Emitter(self._factory, run_id)

@@ -24,7 +24,7 @@ from invana.apps.setup.sections import _mark_section
 from invana.core.auth.models import User
 from invana.core.errors import ConflictError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, diff_changed_fields, emit_event
+from invana.core.events.services import diff_changed_fields, emit_event
 
 
 class GraphManager:
@@ -79,7 +79,6 @@ class GraphManager:
             graph_id=graph.id,
             actor_id=owner.id,
             details={"slug": graph.slug, "name": graph.name},
-            trace_id=current_trace_id(),
         )
         # Implicit member.add of the owner — surfaces as a parallel event so the
         # graph's audit trail shows who joined and when.
@@ -91,7 +90,6 @@ class GraphManager:
             graph_id=graph.id,
             actor_id=owner.id,
             details={"via": "graph.create"},
-            trace_id=current_trace_id(),
         )
 
         return graph
@@ -141,7 +139,6 @@ class GraphManager:
                 graph_id=graph.id,
                 actor_id=actor_id,
                 details={"changed": changed, "name": graph.name},
-                trace_id=current_trace_id(),
             )
         if instructions_completed:
             await emit_event(
@@ -152,7 +149,6 @@ class GraphManager:
                 graph_id=graph.id,
                 actor_id=actor_id,
                 details={"section": "instructions", "via": "graph.update"},
-                trace_id=current_trace_id(),
             )
         return graph
 
@@ -176,7 +172,6 @@ class GraphManager:
             graph_id=graph.id,
             actor_id=actor_id,
             details={"slug": graph.slug, "name": graph.name},
-            trace_id=current_trace_id(),
         )
         await session.delete(graph)
         await session.flush()
@@ -217,7 +212,6 @@ class GraphManager:
                     "database": connection.database,
                     "read_only": connection.read_only,
                 },
-                trace_id=current_trace_id(),
             )
             return connection, True
 
@@ -271,7 +265,6 @@ class GraphManager:
                 graph_id=graph.id,
                 actor_id=actor_id,
                 details={"changed": changed, "uri": existing.uri},
-                trace_id=current_trace_id(),
             )
         return existing, False
 
@@ -303,7 +296,6 @@ class GraphManager:
             graph_id=graph.id,
             actor_id=actor_id,
             details=snapshot,
-            trace_id=current_trace_id(),
         )
         return connection
 

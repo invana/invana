@@ -118,6 +118,11 @@ services:
       # proxy route it exports to is always mounted: with the engine's telemetry
       # off it accepts each batch and drops it, so the console stays clean.
       VITE_TELEMETRY_ENABLED: ${VITE_TELEMETRY_ENABLED:-false}
+      # Where a run's trace id links to: HyperDX's search, filtered to that
+      # trace. Written out rather than `${VAR:-…}`, because compose ends a
+      # default at its first `}` and `{trace_id}` carries one. HyperDX opens on
+      # its last 15 minutes; widen the range there for an older run.
+      VITE_TELEMETRY_TRACE_URL: "http://localhost:8080/search?whereLanguage=sql&where=TraceId%3D%27{trace_id}%27"
       # `pnpm dev` re-checks deps on start and re-installs when the mounted
       # node_modules has drifted from the bind-mounted lockfile. That install
       # sometimes needs to purge node_modules first, which pnpm asks to confirm

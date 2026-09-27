@@ -30,7 +30,7 @@ from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager, GraphUnavailableError
 from invana.apps.graphs.schemas import QueryResponse
 from invana.core.events import actions as event_actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.graph.types.constants import Capability, QueryLanguage
 from invana.graph.types.data_elements import GraphResponse
@@ -111,7 +111,6 @@ async def execute_query(
                 "error_code": getattr(exc, "code", None),
                 "error_category": category,
             },
-            trace_id=current_trace_id(),
         )
         raise QueryExecutionError(str(exc), category=category) from exc
 
@@ -129,7 +128,6 @@ async def execute_query(
             "row_count": response.row_count,
             "result_type": response.result_type,
         },
-        trace_id=current_trace_id(),
     )
     return response
 

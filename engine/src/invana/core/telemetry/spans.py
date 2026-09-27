@@ -4,12 +4,12 @@ Span helpers that work with or without OpenTelemetry installed.
 OpenTelemetry is the optional ``telemetry`` extra, so code outside this package
 must import cleanly without it. These helpers give that code one way to open a
 span, stamp the current one, add an event or read its context. Without the extra
-every helper is a no-op: ``span()`` yields ``None``, the setters do nothing and
-``current_span_context()`` returns ``None``.
+every helper is a no-op: ``span()`` yields ``None``, the setters do nothing,
+``current_span_context()`` returns ``None`` and ``current_ids()`` two ``None``s.
 
 Usage
 -----
-    from invana.core.telemetry.spans import add_event, set_current, span
+    from invana.core.telemetry.spans import add_event, current_ids, set_current, span
 
     # Who acted, on the span already open (e.g. the request's SERVER span).
     set_current(**{"enduser.id": user.id, "invana.principal": "user"})
@@ -18,6 +18,9 @@ Usage
     with span("invana.run", {"invana.run_id": run.id}) as s:
         add_event("run.queued", {"position": 2})
         ...
+
+    # The ids a record stores so it opens the trace it was written in.
+    trace_id, span_id = current_ids()
 
 Attribute values follow OpenTelemetry's rules: ``None`` values are dropped
 rather than recorded, so callers can pass optional ids without checking them.
@@ -110,3 +113,17 @@ def current_span_context() -> Any:
         return None
     ctx = _trace.get_current_span().get_span_context()
     return ctx if ctx.is_valid else None
+
+
+def current_ids() -> tuple[str | None, str | None]:
+    """The current span's ``(trace_id, span_id)`` as lower-case hex, for a record.
+
+    The ids are 32 and 16 characters — the spelling a trace backend shows, so a
+    row's ids can be pasted straight into its search. Both are ``None`` with no
+    valid span open, or without the telemetry extra, so a record written outside
+    any trace stores nulls rather than zeros.
+    """
+    ctx = current_span_context()
+    if ctx is None:
+        return None, None
+    return format(ctx.trace_id, "032x"), format(ctx.span_id, "016x")

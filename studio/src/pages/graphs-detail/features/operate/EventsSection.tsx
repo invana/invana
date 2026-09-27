@@ -1,6 +1,7 @@
 import { useGraphEventsQuery } from "@/hooks/queries/useEvents";
 import { useEventStream } from "@/hooks/useEventStream";
 import { EventTypeFilter } from "@/pages/graphs-detail/features/operate/EventTypeFilter";
+import { TraceIdValue } from "@/pages/graphs-detail/features/operate/TraceIdValue";
 import { matchesEventSearch } from "@/pages/graphs-detail/features/operate/eventSearch";
 import {
 	type EventStatus,
@@ -252,9 +253,7 @@ function DetailsView({ event }: { event: AuditEvent }) {
 		event.trace_id
 			? {
 					label: "trace",
-					value: (
-						<code className="font-mono">{event.trace_id.slice(0, 16)}…</code>
-					),
+					value: <TraceIdValue id={event.trace_id} />,
 				}
 			: {
 					label: "trace",

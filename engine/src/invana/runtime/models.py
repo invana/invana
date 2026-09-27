@@ -25,6 +25,7 @@ from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from invana.core.models import Base
+from invana.core.telemetry.spans import current_ids
 
 
 def _utcnow() -> datetime:
@@ -33,6 +34,10 @@ def _utcnow() -> datetime:
 
 def _new_id() -> str:
     return str(uuid.uuid4())
+
+
+def _current_trace_id() -> str | None:
+    return current_ids()[0]
 
 
 class TriggeredBy(enum.StrEnum):
@@ -207,6 +212,12 @@ class TaskRun(Base):
     agent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
     triggered_by: Mapped[str] = mapped_column(String(16), default=TriggeredBy.user.value, nullable=False)
     on_behalf_of_user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+    # ── where it was traced ──────────────────────────────────────────────────
+    #: The trace current when the row was inserted, else the run span's own.
+    trace_id: Mapped[str | None] = mapped_column(String(32), nullable=True, default=_current_trace_id)
+    #: The run's own ``invana.run`` span — null on a step row.
+    root_span_id: Mapped[str | None] = mapped_column(String(16), nullable=True)
 
     # ── state ────────────────────────────────────────────────────────────────
     status: Mapped[str] = mapped_column(String(16), default=RunStatus.queued.value, nullable=False, index=True)

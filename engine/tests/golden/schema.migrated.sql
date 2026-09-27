@@ -170,6 +170,7 @@ CREATE TABLE events (
 	run_id VARCHAR(36), 
 	node_run_id VARCHAR(36), 
 	skill_ids JSON DEFAULT '[]'::json NOT NULL, 
+	span_id VARCHAR(16), 
 	CONSTRAINT events_pkey PRIMARY KEY (id), 
 	CONSTRAINT events_graph_id_fkey FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE SET NULL
 );
@@ -856,6 +857,8 @@ CREATE TABLE task_runs (
 	cost_usd DOUBLE PRECISION, 
 	rules_offered JSON DEFAULT '[]'::json NOT NULL, 
 	rules_cited JSON DEFAULT '[]'::json NOT NULL, 
+	trace_id VARCHAR(32), 
+	root_span_id VARCHAR(16), 
 	CONSTRAINT task_runs_pkey PRIMARY KEY (id), 
 	CONSTRAINT task_runs_assistant_message_id_fkey FOREIGN KEY(assistant_message_id) REFERENCES session_messages (id) ON DELETE SET NULL, 
 	CONSTRAINT task_runs_author_id_fkey FOREIGN KEY(author_id) REFERENCES users (id) ON DELETE SET NULL, 

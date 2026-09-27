@@ -99,7 +99,7 @@ flowchart TD
 |---|---|
 | Studio action spans | `ui.<module>.<action>` — the module names of [module-structure.md](../../../module-structure.md) §2: `ui.assistant.ask` · `ui.assistant.rerun` · `ui.explorer.load` · `ui.runs.cancel` · `ui.plans.promote` · `ui.events.subscribe`; `ui.boards.open` lands with the Boards view panel |
 | HyperDX | one service map and one trace view across `invana-studio` and `invana-engine` |
-| A run's page | its trace id, opening the trace in the collector's UI |
+| A run's drawer | a `trace` row in *The run* — the id, a link into the collector's trace view when `VITE_TELEMETRY_TRACE_URL` is set, plain text otherwise; an event's `trace` row reads the same |
 
 ## Engine
 
@@ -111,7 +111,7 @@ flowchart TD
 | Who, on a request | the middleware starts every request `anonymous` from `api`; authentication sets `enduser.id` and principal `user`, with origin `studio` for a session token and `api` for a personal access token; resolving a Graph URL sets `invana.graph` and `invana.graph_id` |
 | Runs | `invana.run` per run (`invana.run_id` · `invana.agent_id` · `invana.run.role` · `invana.run.kind` · `invana.run.triggered_by` · `invana.graph_id` · principal `agent` or `user` · `invana.on_behalf_of` · `invana.outcome`); `invana.run.step` per attempt (`invana.task_key` · `invana.step_key` · `invana.run.attempt` · `invana.outcome`). Cannot-answer, conversed and needs-input are outcomes, not errors; a failed step or crashed run is an error; a cancelled run is outcome `cancelled`. Queue wait is the `run.queued` and `run.admitted` events on the run span |
 | Graph · model · SQL | `graph.query.*` · `llm.generate` · SQLAlchemy spans, nested under the step that caused them |
-| Records | `task_runs.trace_id` · `task_runs.root_span_id`; `events.trace_id` (filled by default in `emit`) · `events.span_id` |
+| Records | `task_runs.trace_id` — read off the current span at insert, else filled when the run's span opens · `task_runs.root_span_id` — the run's `invana.run` span; the first run span wins, so a resumed run keeps both; a step row has `trace_id` only. `events.trace_id` · `events.span_id` — filled by `emit` from the current span, never passed by a caller; null outside any span. `trace_id` is on `GET …/runs/{id}` and `GET …/runs/{id}/trace`, `span_id` on every event read |
 | Roots nobody clicked | `system.<loop>` per iteration · `system.startup` · `system.schedule` · `cli.<command>` — each a new trace (`context=Context()`), never a child of whatever scheduled it |
 | Queues | a producer's span context rides the item; the consumer's span Links to it |
 | Logs | a logging filter sets `trace_id` / `span_id` on every record — plain shows `[trace_id span_id]` inside a span, JSON adds both fields; uvicorn's access log has `token` stripped |
@@ -127,6 +127,7 @@ flowchart TD
 | Requests | every API call is a client span, parented explicitly by the action passed in the request config — never by a shared "current action" slot |
 | Streams | `traceparent` appended to every `EventSource` URL — a run's tail carries its action's; the events tail, which nobody clicked, opens a `ui.events.subscribe` root that ends when the connection opens or fails |
 | Attributes | `enduser.id` · `invana.graph` (`user/graph`) · `invana.session_id` · `invana.run_id` · `invana.outcome` on action spans; never record contents |
+| Trace link | `VITE_TELEMETRY_TRACE_URL` — the collector's trace view with `{trace_id}` in it; the compose stack points it at HyperDX |
 | Tests | Vitest in Node (`pnpm test`), spans captured by an in-memory exporter |
 
 ## Metrics
@@ -183,7 +184,7 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE10 | A run is a child span of the request that started it and may outlive it; each Task is a child of its run; a delegated child run is a child span with a Link to its parent run. |
 | TE11 | Who acted is recorded, never what they sent: principal, on-behalf-of, origin, Graph and ids are attributes; record contents, prompts and answers are not. |
 | TE12 | Work nobody clicked starts its own trace, rooted per loop iteration, per startup, per schedule firing and per CLI command, with `invana.origin` saying which. |
-| TE13 | A TaskRun stores its trace id and root span id; an event stores its trace id and span id, filled by default at emit. |
+| TE13 | A TaskRun stores its trace id and root span id; an event stores its trace id and span id, filled at emit from the current span — no caller passes them. A run's trace id is read at insert, else from its own run span; the first run span wins. |
 | TE14 | No credential reaches a span or a log: `token` is stripped from recorded URLs and from the access log. |
 | TE15 | Sampling is parent-based on one ratio from settings — 1.0 in dev and compose — and the ratio is on the resource as `invana.telemetry.sample_ratio`. |
 | TE16 | The compose stack points both services at the bundled collector; service names are `invana-studio` and `invana-engine`. |
@@ -195,6 +196,7 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE22 | The proxy has three routes — traces, metrics, logs — always mounted, each accepting and dropping when engine telemetry is off (TE6). |
 | TE23 | The CLI emits the same three signals under `cli.<command>` and flushes them before it exits. |
 | TE24 | The seeded HyperDX dashboards are grouped like the modules — API · Runs · LLMs · Graph queries · System · Studio — with one cross-service trace view. |
+| TE25 | Studio links a trace id to the collector through one URL template, `VITE_TELEMETRY_TRACE_URL`. Without it the id is shown and not linked — Studio never guesses a collector. |
 
 ## Not building
 

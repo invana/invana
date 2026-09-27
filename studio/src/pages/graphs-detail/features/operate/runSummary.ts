@@ -27,8 +27,11 @@ import type { TouchItem } from "@invana/ui";
 export interface SummaryRow {
 	label: string;
 	value: string;
-	/** `query` draws a `ql` run's asked clamped and monospace; `lens` links to the world it names. */
-	kind?: "query" | "lens";
+	/**
+	 * `query` draws a `ql` run's asked clamped and monospace; `lens` links to
+	 * the world it names; `trace` is a trace id, linked to the collector's view.
+	 */
+	kind?: "query" | "lens" | "trace";
 	/** The world or guardrail a `lens` row opens — absent on `Everything`. */
 	lens?: { id: string; kind: "world" | "guardrail" };
 }
@@ -164,6 +167,9 @@ export function runSummary(
 							: formatElapsed(elapsed),
 					},
 				]
+			: []),
+		...(trace.trace_id
+			? [{ label: "trace", value: trace.trace_id, kind: "trace" as const }]
 			: []),
 	];
 

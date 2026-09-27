@@ -20,6 +20,7 @@
 
 import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
 import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { TraceIdValue } from "@/pages/graphs-detail/features/operate/TraceIdValue";
 import { waterfallTasks } from "@/pages/graphs-detail/features/operate/dashboards/runDashboardSpec";
 import {
 	groupSteps,
@@ -268,6 +269,7 @@ function RowValue({
 			</ClampedText>
 		);
 	}
+	if (row.kind === "trace") return <TraceIdValue id={row.value} />;
 	if (row.kind === "lens" && row.lens && onOpenLens) {
 		const lens = row.lens;
 		return (

@@ -52,6 +52,8 @@ interface ApiThinking {
 	started_at?: string | null;
 	finished_at?: string | null;
 	error?: Record<string, unknown> | null;
+	/** The trace the run recorded under; null when telemetry was off. */
+	trace_id?: string | null;
 	stream_seq: number;
 	steps: ApiThinkingStep[];
 }
@@ -469,6 +471,8 @@ export interface TraceRead {
 	lens_ref: { id: string; kind: "world" | "guardrail" } | null;
 	/** Whether the run froze a lens. `false` — nothing it engaged was recorded (SR68). */
 	governed: boolean;
+	/** The trace the run recorded under; null when telemetry was off. */
+	trace_id?: string | null;
 	started_at: string | null;
 	finished_at: string | null;
 	duration_ms: number | null;

@@ -39,6 +39,15 @@ the run that asked for it even when the two are drawn far apart. The link needs
 the parent run's span context, which the runtime keeps in a dict keyed by run id
 while each run span is open (see ``delegation_links``).
 
+Records
+-------
+The run row stores ``trace_id`` and ``root_span_id`` so the run page can open
+its trace. ``trace_id`` is the column default — the trace current when the row
+was inserted — and ``root_span_id`` is stamped once the ``invana.run`` span
+opens, which also fills ``trace_id`` for a run queued outside any span (a
+schedule). The first run span wins: a resumed run's second span overwrites
+neither.
+
 Everything here goes through ``invana.core.telemetry.spans``, so without the
 ``telemetry`` extra each helper is a no-op and a run behaves exactly the same.
 """

@@ -17,7 +17,7 @@ from invana.apps.work.schemas import DependencyCreate
 from invana.core.auth.models import User
 from invana.core.errors import NotFoundError, ValidationError
 from invana.core.events import actions
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 
 
 class DependencyManager:
@@ -69,7 +69,6 @@ class DependencyManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"depends_on_id": other.id, "depends_on_title": other.title},
-            trace_id=current_trace_id(),
         )
         return row
 
@@ -95,5 +94,4 @@ class DependencyManager:
             task_id=task.id,
             actor_id=actor.id,
             details={"depends_on_id": depends_on_id},
-            trace_id=current_trace_id(),
         )

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Text, func, or_, select
+from sqlalchemy import Text, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -20,6 +20,28 @@ from invana.runtime.models import RunRole, RunStatus, TaskRun
 class TaskRunQuerySet:
     async def get(self, session: AsyncSession, run_id: str) -> TaskRun | None:
         return await session.get(TaskRun, run_id)
+
+    async def stamp_trace(self, session: AsyncSession, run_id: str, *, trace_id: str | None, span_id: str) -> bool:
+        """Record the run's own span, and its trace when the row has none yet.
+
+        Called once the ``invana.run`` span is open, so the run page can open the
+        run's trace in the collector. ``root_span_id`` is set only while it is
+        still null, which makes the first run span win: a resumed run opens a
+        second span and must not move the row away from the first. ``trace_id``
+        normally arrived at insert from the column default (the request's
+        trace); it is filled here only for a run queued outside any span, such
+        as a schedule, and never overwritten.
+
+        One conditional ``UPDATE``, so two workers stamping the same row cannot
+        interleave. The caller commits. Returns whether the row was stamped.
+        """
+        result = await session.execute(
+            update(TaskRun)
+            .where(TaskRun.id == run_id, TaskRun.root_span_id.is_(None))
+            .values(root_span_id=span_id, trace_id=func.coalesce(TaskRun.trace_id, trace_id))
+            .execution_options(synchronize_session=False)
+        )
+        return bool(result.rowcount)
 
     # ── what an agent has spent ──────────────────────────────────────────────
 

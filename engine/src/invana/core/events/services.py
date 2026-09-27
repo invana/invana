@@ -1,4 +1,4 @@
-"""Service layer for emitting domain audit events (docs/for-developers/modules/operate/features/audit-and-activity.md).
+"""Service layer for emitting domain audit events.
 
 The single entry point for any service-layer function that wants to record
 an event. Inserts into the same SQLAlchemy session as the state change so
@@ -94,24 +94,3 @@ def diff_changed_fields(
         if b != a:
             out[f] = {"before": b, "after": a}
     return out
-
-
-# ── OTel trace_id resolver ───────────────────────────────────────────────────
-
-
-def current_trace_id() -> str | None:
-    """Pull the OTel trace_id (hex) off the active span if telemetry is up.
-
-    Returns None when telemetry isn't initialised or there's no active span.
-    Safe to call from any service — never raises.
-    """
-    try:
-        from opentelemetry import trace
-
-        span = trace.get_current_span()
-        ctx = span.get_span_context()
-        if not ctx or not ctx.is_valid:
-            return None
-        return f"{ctx.trace_id:032x}"
-    except Exception:
-        return None

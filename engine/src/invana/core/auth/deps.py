@@ -27,7 +27,7 @@ from invana.core.auth.tokens import (
 from invana.core.db import get_session
 from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.core.telemetry.spans import set_current
 
 _bearer_scheme = HTTPBearer(auto_error=False)
@@ -131,7 +131,6 @@ async def _user_from_personal_access_token(request: Request, session: AsyncSessi
             target_kind=event_actions.TARGET_TOKEN,
             actor_type=ActorType.anonymous,
             details={"reason": refusal.reason},
-            trace_id=current_trace_id(),
         )
         await session.commit()
         raise _unauthorized(refusal.detail) from refusal

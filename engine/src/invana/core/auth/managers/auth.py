@@ -57,7 +57,7 @@ from invana.core.errors import (
 )
 from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
-from invana.core.events.services import current_trace_id, emit_event
+from invana.core.events.services import emit_event
 from invana.core.settings import settings
 
 # One message for "no such user" and "wrong password" alike — telling them
@@ -218,7 +218,6 @@ class AuthManager:
             target_id=user.id,
             actor_id=actor_id,
             details={"email": user.email, "username": user.username, "via": "superuser.provision"},
-            trace_id=current_trace_id(),
         )
         return await self._user_out(session, user=user)
 
@@ -235,7 +234,6 @@ class AuthManager:
                 action=event_actions.AUTH_LOGIN_FAILED,
                 actor_type=ActorType.anonymous,
                 details={"identifier": payload.identifier, "reason": "unknown_or_inactive"},
-                trace_id=current_trace_id(),
             )
             await session.commit()  # failed-login event isn't tied to a returning state change
             raise _GENERIC_AUTH_FAILURE
@@ -247,7 +245,6 @@ class AuthManager:
                 target_id=user.id,
                 actor_type=ActorType.anonymous,
                 details={"identifier": payload.identifier, "reason": "bad_password"},
-                trace_id=current_trace_id(),
             )
             await session.commit()
             raise _GENERIC_AUTH_FAILURE
@@ -259,7 +256,6 @@ class AuthManager:
             target_id=user.id,
             actor_id=user.id,
             details={"username": user.username},
-            trace_id=current_trace_id(),
         )
         return response
 
@@ -278,7 +274,6 @@ class AuthManager:
             target_kind=event_actions.TARGET_SESSION,
             actor_id=user.id,
             details={},
-            trace_id=current_trace_id(),
         )
         return response
 
@@ -293,7 +288,6 @@ class AuthManager:
             actor_id=actor_id,
             actor_type=ActorType.user if actor_id else ActorType.anonymous,
             details={},
-            trace_id=current_trace_id(),
         )
 
     async def me_payload(self, session: AsyncSession, *, user: User) -> UserOut:
@@ -342,7 +336,6 @@ class AuthManager:
                         "username": {"before": username_changed_from, "after": user.username},
                     },
                 },
-                trace_id=current_trace_id(),
             )
         return await self._user_out(session, user=user)
 
@@ -361,7 +354,6 @@ class AuthManager:
             target_id=user.id,
             actor_id=user.id,
             details={},
-            trace_id=current_trace_id(),
         )
 
     async def delete_me(self, session: AsyncSession, *, user: User, payload: DeleteMeRequest) -> None:
@@ -484,7 +476,6 @@ class AuthManager:
             target_id=user.id,
             actor_type=ActorType.system,
             details={"email": user.email, "username": user.username, "via": "cli"},
-            trace_id=current_trace_id(),
         )
         return user
 
@@ -503,7 +494,6 @@ class AuthManager:
             target_id=user.id,
             actor_type=ActorType.system,
             details={"via": "cli"},
-            trace_id=current_trace_id(),
         )
 
     async def _live_tokens(self, session: AsyncSession, *, user_id: str) -> list[PersonalAccessToken]:
@@ -561,7 +551,6 @@ class AuthManager:
             target_id=row.id,
             actor_id=user.id,
             details={"name": row.name, "expires_at": expires_at.isoformat() if expires_at else None},
-            trace_id=current_trace_id(),
         )
         return PersonalAccessTokenCreated(token=_token_out(row), secret=secret)
 
@@ -579,5 +568,4 @@ class AuthManager:
             target_id=row.id,
             actor_id=user.id,
             details={"name": row.name},
-            trace_id=current_trace_id(),
         )
