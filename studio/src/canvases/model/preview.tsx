@@ -28,7 +28,7 @@ export function renderModelNode(node: GraphNode) {
 		<NodePreviewCard
 			title={d.label}
 			subtitle={d.description || undefined}
-			tags={[d.model]}
+			tags={d.frame ? [d.frame] : undefined}
 			rows={rows}
 		/>
 	);
@@ -40,7 +40,12 @@ export function renderModelEdge(edge: GraphEdge) {
 	const rows: PreviewCardRow[] = [
 		{
 			label: "kind",
-			value: d.kind === "edge" ? `${d.model} edge type` : d.kind,
+			value:
+				d.kind === "edge"
+					? d.model
+						? `${d.model} edge type`
+						: "edge type"
+					: d.kind,
 		},
 		...(d.staged ? [{ label: "status", value: "staged" }] : []),
 		...(d.rule ? [{ label: "rule", value: d.rule, mono: true }] : []),

@@ -233,7 +233,9 @@ export function schemaCard(name: string, d: ModelTypeData) {
 				type: "text",
 				x: 48,
 				y: 17,
-				text: "{data.model} · {data.stitchCount} stitches",
+				text: d.frame
+					? "{data.frame} · {data.stitchCount} stitches"
+					: "{data.stitchCount} stitches",
 				fontSize: 10,
 				fontWeight: 600,
 				uppercase: true,

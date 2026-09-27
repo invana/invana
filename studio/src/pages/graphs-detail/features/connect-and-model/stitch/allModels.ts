@@ -128,6 +128,11 @@ interface TypeStitches {
 export function buildAllModelsData(
 	frames: readonly ModelFrame[],
 	links: readonly ModelLink[],
+	/**
+	 * `false` draws the types with no frame around them — the model canvas,
+	 * where the page is already the model and a group would say it twice (ME26).
+	 */
+	{ framed = true }: { framed?: boolean } = {},
 ): AllModelsBuild {
 	const nodes: (ModelFrameNode | ModelTypeNode)[] = [];
 	const edges: ModelGraphEdge[] = [];
@@ -200,16 +205,17 @@ export function buildAllModelsData(
 
 	for (const t of frames) {
 		// A model with nothing drawn is a sized frame, not a group (ST29).
-		nodes.push({
-			id: frameIdOf(t.modelId),
-			type: t.nodeTypes.length === 0 ? MODEL_EMPTY_TYPE : MODEL_FRAME_TYPE,
-			data: {
-				name: t.name,
-				description: t.description,
-				version: t.versionLabel,
-				hue: t.hue,
-			},
-		});
+		if (framed)
+			nodes.push({
+				id: frameIdOf(t.modelId),
+				type: t.nodeTypes.length === 0 ? MODEL_EMPTY_TYPE : MODEL_FRAME_TYPE,
+				data: {
+					name: t.name,
+					description: t.description,
+					version: t.versionLabel,
+					hue: t.hue,
+				},
+			});
 
 		const own = new Set(t.nodeTypes.map((n) => n.name));
 		for (const n of t.nodeTypes) {
@@ -228,10 +234,11 @@ export function buildAllModelsData(
 			nodes.push({
 				id,
 				type: `${t.name}.${n.name}`,
-				parentId: frameIdOf(t.modelId),
+				...(framed ? { parentId: frameIdOf(t.modelId) } : {}),
 				data: {
 					label: n.name,
 					model: t.name,
+					...(framed ? { frame: t.name } : {}),
 					// The type's own colour, the one the Explorer paints it (ST17);
 					// the frame around it carries the model's.
 					hue: colorSlotByString(n.name),
@@ -259,8 +266,11 @@ export function buildAllModelsData(
 						type: e.name,
 						data: {
 							kind: "edge",
-							title: `${t.name}.${src} -[${e.name}]-> ${t.name}.${tgt}`,
-							model: t.name,
+							// One model's page already names it, so nothing repeats it (ME26).
+							title: framed
+								? `${t.name}.${src} -[${e.name}]-> ${t.name}.${tgt}`
+								: `${src} -[${e.name}]-> ${tgt}`,
+							...(framed ? { model: t.name } : {}),
 							description: e.description,
 						},
 					});

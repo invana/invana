@@ -4,7 +4,7 @@
  *
  * The canvas Storybook's `usecases/by-casestudies/global-model/GlobalModel`,
  * copied: the same behaviours, header, footer, Detail switcher, settings and
- * templates (GM1) — laid out by ELK alone, opening on circles (GM3 · GM4). What is Studio's own: the JSON names
+ * templates (GM1) — laid out by ELK alone, opening on circles unless told otherwise (GM3 · GM4). What is Studio's own: the JSON names
  * no model and no type, so it is filled in against the data and the live theme
  * (GM5–GM7); the colours are Studio's palette, and a frame wears its model's
  * hue (GM8); a stitch is dashed (GM9) and, where the host asks for it, declared
@@ -83,7 +83,7 @@ export interface GraphModelCanvasProps {
 	title?: string;
 	/** Shown once in the message bar when the canvas is ready. */
 	message?: string;
-	/** The Detail the canvas opens on — circles, on every modeller canvas (GM4). */
+	/** The Detail the canvas opens on — circles for All models, cards for one model (GM4). */
 	initialDetail?: Detail;
 	/** The node or edge drawn selected. */
 	selected?: ModelCanvasSelection;

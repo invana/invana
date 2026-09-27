@@ -44,6 +44,12 @@ export interface ModelTypeData {
 	label: string;
 	/** The model's name. */
 	model: string;
+	/**
+	 * The model's name when the type sits in its frame — what the card and hover
+	 * card print under the type. Absent on the unframed one-model canvas, where
+	 * the page already names the model (ME26).
+	 */
+	frame?: string;
 	/** `1`–`8`, the slot the type's own name hashes to (ST17). */
 	hue: number;
 	description: string;
@@ -63,7 +69,7 @@ export interface ModelEdgeData {
 	kind: "edge" | "anchor" | "relationship";
 	/** The hover card's title — `Model.Type ≡ Model.Type` for a stitch. */
 	title: string;
-	/** The model an edge type belongs to. */
+	/** The model an edge type belongs to. Absent on the unframed one-model canvas (ME26). */
 	model?: string;
 	/** Declared, not committed (ST21). */
 	staged?: boolean;
@@ -84,7 +90,8 @@ export interface ModelTypeNode {
 	id: string;
 	/** `Model.Type` — the key the expanded bindings are written under. */
 	type: string;
-	parentId: string;
+	/** The model's frame. Absent on the model canvas, which draws one model unframed (ME26). */
+	parentId?: string;
 	data: ModelTypeData;
 }
 

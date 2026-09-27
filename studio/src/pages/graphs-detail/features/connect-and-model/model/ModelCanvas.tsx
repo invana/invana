@@ -48,7 +48,7 @@ import {
 } from "@/pages/graphs-detail/features/connect-and-model/stitch/allModels";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
-import { Button } from "@invana/ui";
+import { Button, EmptyState } from "@invana/ui";
 import { PanelBottomClose } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -127,8 +127,8 @@ export function ModelCanvas({
 		onSelect(next);
 	};
 
-	// One model on the same canvas as All models: its frame, its types, its own
-	// edge types (ME26). The version drawn is the draft while one is open.
+	// One model on the same canvas as All models: its types and its own edge
+	// types, with no frame — the page is already the model (ME26). The version drawn is the draft while one is open.
 	const build = useMemo(
 		() =>
 			buildAllModelsData(
@@ -151,6 +151,7 @@ export function ModelCanvas({
 					},
 				],
 				[],
+				{ framed: false },
 			),
 		[modelId, model, openVersionId, draft, active, nodeTypes, edgeTypes],
 	);
@@ -194,16 +195,30 @@ export function ModelCanvas({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<div className="min-h-0 flex-1">
-				<GraphModelCanvas
-					data={build.data}
-					settings={graphModelSettings}
-					templates={graphModelTemplates}
-					title={model?.name ?? "Model"}
-					message="Hover a type for its properties, an edge for what it connects"
-					selected={canvasSelection}
-					onSelect={onCanvasSelect}
-					backend={backend}
-				/>
+				{/* No frame to size, so a model with no types says so instead (ME26). */}
+				{tree && nodeTypes.length === 0 ? (
+					<EmptyState
+						className="h-full"
+						title="No types yet"
+						description={
+							ctx
+								? "Add a node type to start drawing this model."
+								: "This version declares no types."
+						}
+					/>
+				) : (
+					<GraphModelCanvas
+						data={build.data}
+						settings={graphModelSettings}
+						templates={graphModelTemplates}
+						title={model?.name ?? "Model"}
+						message="Hover a type for its properties, an edge for what it connects"
+						selected={canvasSelection}
+						onSelect={onCanvasSelect}
+						backend={backend}
+						initialDetail="medium"
+					/>
+				)}
 			</div>
 
 			{/* ME6 — the selected type's form spans the main column, under the drawing. */}
