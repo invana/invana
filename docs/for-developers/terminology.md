@@ -67,6 +67,7 @@ implementation and the description said the product.
 | **Touch** | One recorded engagement with a participant: address, direction, volume, and what was sent. Not a log line. |
 | **Stitch** | The act of declaring that two published models meet, and the Studio surface that holds them — a drawer in the Model panel. An anchor and a relationship link are the two kinds of stitch. **Declared stitches are read-time and write nothing**, which is what lets a [lens](#3-models-and-data) exclude them. The `stitch` *step inside an import* is a different act — it writes edges, and no lens can un-write one. |
 | **Physical** | The introspected mirror of what the database actually holds. |
+| **Query shape** | A query with its literal values replaced by parameters — a thousand calls of one generated query are one shape. What the model page's Performance tab groups by. Not a saved query. |
 | **Records** | Externally produced data, conforming to exactly one model, handed to Invana. They are the model's — there is no record between the model and its data ([BD16](modules/bring-data-in/spec.md)). |
 | **Import run** | One load of a dataset — a **TaskRun** of a TaskPlan with `kind = import`. It inherits the runtime, trace, retries and failure vocabulary. |
 | **Bulk run** | One `invana loader` load — a TaskRun of a `kind = bulk` plan with a single `bulk_write` Task. Validated per record and traceable to a source record is what an **import** is; a bulk run is neither, and the kind is what says so. |

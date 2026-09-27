@@ -54,7 +54,7 @@ flowchart TD
 |---|---|
 | Settings → Connection | `Introspect` beside `Test connection` |
 | Modeller | The draft it seeded, ready to edit |
-| Drift | Model versus physical, side by side, with what differs named |
+| Drift | The **Database** tab of [the model page](the-model-page.md): labels, relationship types, indexes and constraints, each marked `in both` · `model only` · `database only` ([MP9](the-model-page.md#decisions)) |
 
 ## Engine
 

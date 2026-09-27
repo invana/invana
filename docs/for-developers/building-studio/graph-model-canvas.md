@@ -150,4 +150,4 @@ flowchart LR
 | Writing a model from a canvas gesture — drag-to-connect an edge type, add on the canvas, a context menu | GM2. The model canvas's bar and form write (ME1). The stitch drag declares a stitch, not a model (GM12) |
 | Zoom-driven collapse or an altitude track | GM1. Detail is how the drawing changes altitude (ST15) |
 | A per-type icon chosen by the canvas | the API carries no icon for a type yet. Every type is `lucide/box` until one does |
-| The global-model *page* drawn on this canvas | it is stated, not drawn (ST6, ST16) |
+| The union list drawn on this canvas | it is stated, not drawn (ST6, ST16) |

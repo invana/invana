@@ -241,6 +241,7 @@ whole feature; a feature drawn only on its happy path is not drawn. The rules ar
 | [The Agent Page](https://claude.ai/artifact/1wpT5nPzJ9QKCFrtK16Lza) | [5.2 Author an agent](modules/agents/features/author-an-agent.md) — the agent's one page, one artboard per tab, and [3.10](modules/ask/features/the-assistant.md)'s session world — 10 artboards | Agents › Agent · Ask › The session’s world | **current.** Supersedes the *agents* page's A1 · A2 on Govern, Agents and Skills, and adds the dials to the Soul tab |
 | [The Run Page](https://claude.ai/artifact/QRDPZ2GHR7KKwS68vbScWR) | [10.5 See what ran](modules/operate/features/see-what-ran.md) — the run page as a report header over tabs, and a step inside its run — 8 artboards (a waterfall on the Overview and in the left panel; In order and Lens folded away) | Operate › Runs › The run page | **current.** Reframes `operate.runs.detail.*` and `operate.runs.step.*` on Govern, Agents and Skills; the bodies are theirs, captured, not redrawn |
 | [The Plan Page](https://claude.ai/artifact/Pt7EHjT74GcDxpiQ3LDwy3) | [7.1 Save a plan for reuse](modules/workflows/features/the-library.md) — a published plan as a report header over Overview · Layers · Flow · Activity, with the drawer's drill-in on the left — 9 artboards | Library › Plans › The plan page | **current.** Supersedes `library.plans.detail.overview`, `…overview.folded` and `…flow_canvas` on Govern, Agents and Skills (the two-reading `Overview ¦ Flow` switch); the draft, versions, arguments, export, retire and ceilings boards there stand |
+| [The Model Page](https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q) | [1.8 The model page](modules/connect-and-model/features/the-model-page.md) — Models as one page, Overview · Model · Database · Usage · Performance · Growth, with the model as a filter — 19 artboards | Models › The model page | **current.** Supersedes *All models* and *Global model* as separate destinations on *Modeller and Stitching* (T1 · T4); that canvas's declare, refusal, staged and remove boards stand, drawn on what is now the Model tab |
 | [The Undrawn Features](https://claude.ai/artifact/26QSEwgdJh6xiHr3xJJ4Wn) | the nine features nothing else drew — 11 artboards | D · F · G · J · A, by [sequence](the-sequence.md) block | current. **Its pages are blocks, not features** — the one canvas that predates the rule, and the next pass on any of its features re-pages it |
 | *Governance · the lens in the UI* (`8591piJHezfLsUoSZXn3z8`) | Govern, first pass — 7 artboards | one | **superseded.** Kept so the D1 option comparison can be re-read |
 | *Skills · and the left rail* (`7c565h2z9irbFBwu1S1ebH`) | [6 Skills](modules/skills/spec.md), the Library panel and the rail — 6 artboards | one | **superseded for 6.1–6.4.** Its `Library` and `RailMap` artboards are still the reference for [7.1](modules/workflows/features/the-library.md) and the rail itself |
@@ -269,7 +270,7 @@ be re-read.
 | T1 | `Main` | every model, one canvas | Explorer › All models | [1.6](modules/connect-and-model/features/stitch-models.md) ST14 · ST17 · ST18 · ST22 | ✅ | ✅ | ❌ |
 | T2 | `Constellation` | every frame closed — the altitude | Explorer › All models | ST15 · ST20 · ST23 | ✅ | ✅ | ❌ |
 | T3 | `InsideAModel` | one open, the rest closed — a port | Explorer › All models | ST15 | ✅ | ✅ | ❌ |
-| T4 | `GlobalModel` | the union, stated not drawn | Explorer › Global model | ST3 · ST6 · ST16 | ✅ | ✅ | ❌ |
+| T4 | `GlobalModel` | the union, stated not drawn | Models › Model tab, All models | ST3 · ST6 · ST16 | ✅ | ✅ | ❌ |
 | T5 | `Declare` | drag a type onto another frame | Explorer › All models | C1 · C2 · C3 · C7 · ST11 · ST19 · ST26 · ST34 · ST35 | ✅ | ✅ | ❌ |
 | T6 | `Refused` | a rule matching nothing, a pair already stitched | Explorer › All models | seams · ST1 · ST36 | ✅ | ✅ | ❌ |
 | T7 | `Staged` | declared, not yet in the union | Explorer › All models | C8 · ST21 | ✅ | ✅ | ❌ |
@@ -579,6 +580,32 @@ Nine artboards on their own canvas — *The Plan Page* (`https://claude.ai/artif
 | `library.plans.detail.activity` | 7.1 | Activity — every run that used this plan: what it was asked, by whom, and how it ended | ✅ | ✅ | ✅ |
 | `library.plans.detail.activity.failed` | 7.1 | Activity, filtered to failed — each run says which step it failed at, and why | ✅ | ✅ | ✅ |
 | `library.plans.detail.activity.empty` | 7.1 | Activity with no runs — what would put a row here, and who may run it | ✅ | ✅ | ✅ |
+
+## Beyond the 42 · The Model Page
+
+Nineteen artboards on their own canvas — *The Model Page* (`https://claude.ai/artifact/VjqhkUx3sYHJqM3FccEt9q`) — Models as one page with six tabs, **Overview · Model · Database · Usage · Performance · Growth**, read at `All models` or one model ([MP1 · MP2](modules/connect-and-model/features/the-model-page.md#decisions)). The panel lists the models; a click filters the page, `Open` drills into Node types · Edge types · Stitches, and every act on a model is on the page header ([MP4 · MP5](modules/connect-and-model/features/the-model-page.md#decisions)). The Graph is `airways` and its four models are the demo's. Generated from `.design/canvas-model-page/models.py` over the `canvas-govern-agents` kit. The name is the file, the frame title and this row. Nothing is built: the query log, count snapshots and index readers it reads are all new ([Engine](modules/connect-and-model/features/the-model-page.md#engine)).
+
+| Artboard | Feature | Draws | API | Studio | Shell |
+|---|---|---|---|---|---|
+| `connect_and_model.models.overview` | 1.8 | All models — health, usage and speed per model, and what needs attention | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.overview.model` | 1.8 | One model, the same Overview filtered — a row per type, its signals | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.overview.empty` | 1.8 | No model published — what to do first, and the tabs that wait on it | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.model` | 1.8 | All models on one canvas — every frame, every stitch, the union beside it | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.model.model` | 1.8 | One model on the Model tab — cards, a type selected, its form beneath | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.model.model.drafting` | 1.8 | A draft open — the staged bar under the header, Publish v2 beside it | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.model.model.publish` | 1.8 | Publish asks first — the changes it lands, and the DDL it projects | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.database` | 1.8 | What the database holds — labels, types, indexes, constraints, drift marked | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.database.unsupported` | 1.8 | A connector that reports no indexes — the tab says so | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.usage` | 1.8 | Usage, all models — queries by model and caller, and the stitches queries cross | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.usage.model` | 1.8 | One model — each type, and a type’s properties by use | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.usage.too_few` | 1.8 | Too few queries — counts without signals, and the number that turns them on | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.performance` | 1.8 | Performance, all models — query shapes by total time, p95 a day, advice | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.performance.model.shape` | 1.8 | A shape picked — its plan, slowest calls, Add index to draft | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.growth` | 1.8 | Growth, all models — records stacked by model, each write marked on the line | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.growth.never_imported` | 1.8 | Published, nothing imported — no chart of zeros | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.archive.refused` | 1.8 | Archive refused — it names each active stitch that binds the model | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.list.archived` | 1.8 | The list with Show archived on — an archived model dimmed, with Restore | 🔵 | 🔵 | ✅ |
+| `connect_and_model.models.read_only` | 1.8 | A member without write — every tab reads, and no act to edit, publish or archive | 🔵 | 🔵 | ✅ |
 
 ## Beyond the 42 · The Agent Page
 
