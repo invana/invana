@@ -82,6 +82,11 @@ class SessionQuerySet:
         stmt = select(Session).where(Session.id == session_id)
         return (await session.execute(stmt)).scalar_one_or_none()
 
+    async def titles_by_ids(self, session: AsyncSession, ids: list[str]) -> dict[str, str]:
+        if not ids:
+            return {}
+        return dict((await session.execute(select(Session.id, Session.title).where(Session.id.in_(ids)))).all())
+
     async def add(self, session: AsyncSession, obj: Session | SessionMessage) -> None:
         session.add(obj)
         await session.flush()

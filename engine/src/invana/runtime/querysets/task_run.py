@@ -433,6 +433,25 @@ class TaskRunQuerySet:
         )
         return list((await session.execute(stmt)).scalars().all())
 
+    async def roots_for_plan(
+        self, session: AsyncSession, *, graph_id: str, origin: str, plan_ids: list[str], since: datetime
+    ) -> list[TaskRun]:
+        """The roots that executed one library plan since *since*, newest first.
+
+        Two ways in, because a plan is run two ways: by name (``plan_origin``)
+        and inlined into a skill's plan (``task_plan_id`` of a plan that copied
+        its rows) — [LB36](docs/for-developers/modules/workflows/features/the-library.md).
+        """
+        by = TaskRun.plan_origin == origin
+        if plan_ids:
+            by = or_(by, TaskRun.task_plan_id.in_(plan_ids))
+        stmt = (
+            select(TaskRun)
+            .where(TaskRun.graph_id == graph_id, TaskRun.parent_run_id.is_(None), TaskRun.queued_at >= since, by)
+            .order_by(TaskRun.queued_at.desc())
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
     async def add(self, session: AsyncSession, run: TaskRun) -> TaskRun:
         session.add(run)
         await session.flush()

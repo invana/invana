@@ -2575,6 +2575,68 @@
         "title": "BoardVersionSummary",
         "type": "object"
       },
+      "BoundUse": {
+        "properties": {
+          "bound": {
+            "title": "Bound",
+            "type": "string"
+          },
+          "exhausted": {
+            "title": "Exhausted",
+            "type": "integer"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          },
+          "used": {
+            "title": "Used",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "step_key",
+          "bound",
+          "limit",
+          "used",
+          "exhausted"
+        ],
+        "title": "BoundUse",
+        "type": "object"
+      },
+      "CalledBy": {
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "person": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ],
+        "title": "CalledBy",
+        "type": "object"
+      },
       "CancelResponse": {
         "properties": {
           "id": {
@@ -3231,6 +3293,41 @@
           "args"
         ],
         "title": "DagNode",
+        "type": "object"
+      },
+      "DailyRow": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "served": {
+            "title": "Served",
+            "type": "integer"
+          },
+          "work_p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work P50 Ms"
+          }
+        },
+        "required": [
+          "date",
+          "served",
+          "failed",
+          "work_p50_ms"
+        ],
+        "title": "DailyRow",
         "type": "object"
       },
       "DeclaredAxes": {
@@ -4159,6 +4256,57 @@
           "vertex_id"
         ],
         "title": "ExpandNeighborsRequest",
+        "type": "object"
+      },
+      "FailedAt": {
+        "properties": {
+          "cause": {
+            "title": "Cause",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "cause",
+          "message"
+        ],
+        "title": "FailedAt",
+        "type": "object"
+      },
+      "FailureRow": {
+        "properties": {
+          "cause": {
+            "title": "Cause",
+            "type": "string"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "last_run_id": {
+            "title": "Last Run Id",
+            "type": "string"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "cause",
+          "count",
+          "last_run_id"
+        ],
+        "title": "FailureRow",
         "type": "object"
       },
       "FilterExpression": {
@@ -6518,6 +6666,34 @@
         "title": "LinkResponse",
         "type": "object"
       },
+      "LiveTiles": {
+        "properties": {
+          "agents": {
+            "title": "Agents",
+            "type": "integer"
+          },
+          "at_gate": {
+            "title": "At Gate",
+            "type": "integer"
+          },
+          "called_by": {
+            "title": "Called By",
+            "type": "integer"
+          },
+          "running": {
+            "title": "Running",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "running",
+          "at_gate",
+          "called_by",
+          "agents"
+        ],
+        "title": "LiveTiles",
+        "type": "object"
+      },
       "LogicalOp": {
         "description": "Logical operators for combining filter conditions.",
         "enum": [
@@ -6613,6 +6789,39 @@
           }
         },
         "title": "MePatchRequest",
+        "type": "object"
+      },
+      "Measure": {
+        "description": "One number over the window, and the same number over the window before.",
+        "properties": {
+          "prior": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "prior"
+        ],
+        "title": "Measure",
         "type": "object"
       },
       "ModelArtefact-Input": {
@@ -7305,6 +7514,38 @@
         "title": "ParticipantRead",
         "type": "object"
       },
+      "PerformanceTiles": {
+        "properties": {
+          "cost_per_run": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "elapsed_p50_ms": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "failed": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "runs": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "served": {
+            "$ref": "#/components/schemas/Measure"
+          },
+          "work_p50_ms": {
+            "$ref": "#/components/schemas/Measure"
+          }
+        },
+        "required": [
+          "runs",
+          "served",
+          "elapsed_p50_ms",
+          "work_p50_ms",
+          "cost_per_run",
+          "failed"
+        ],
+        "title": "PerformanceTiles",
+        "type": "object"
+      },
       "PersonalAccessTokenCreateRequest": {
         "properties": {
           "expires_in_days": {
@@ -7527,6 +7768,202 @@
           "summary"
         ],
         "title": "PlanLayerRead",
+        "type": "object"
+      },
+      "PlanPerformance": {
+        "description": "Everything the Overview, Layers and Flow tabs read \u2014 one window, one version.",
+        "properties": {
+          "bounds": {
+            "items": {
+              "$ref": "#/components/schemas/BoundUse"
+            },
+            "title": "Bounds",
+            "type": "array"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DailyRow"
+            },
+            "title": "Daily",
+            "type": "array"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/FailureRow"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "publishes": {
+            "items": {
+              "$ref": "#/components/schemas/PublishMark"
+            },
+            "title": "Publishes",
+            "type": "array"
+          },
+          "slowest": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/SlowRun"
+              },
+              "type": "array"
+            },
+            "title": "Slowest",
+            "type": "object"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepPerformance"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "tiles": {
+            "$ref": "#/components/schemas/PerformanceTiles"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "window_days": {
+            "title": "Window Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_days",
+          "version",
+          "tiles",
+          "daily",
+          "publishes",
+          "steps",
+          "failures",
+          "bounds",
+          "slowest"
+        ],
+        "title": "PlanPerformance",
+        "type": "object"
+      },
+      "PlanRunRow": {
+        "properties": {
+          "agent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentChip"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "asked": {
+            "title": "Asked",
+            "type": "string"
+          },
+          "called_by": {
+            "$ref": "#/components/schemas/CalledBy"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elapsed Ms"
+          },
+          "failed_at": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailedAt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "when": {
+            "title": "When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "status",
+          "when",
+          "asked",
+          "called_by",
+          "agent",
+          "version",
+          "elapsed_ms",
+          "cost",
+          "failed_at"
+        ],
+        "title": "PlanRunRow",
+        "type": "object"
+      },
+      "PlanRunsPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PlanRunRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "live": {
+            "$ref": "#/components/schemas/LiveTiles"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "next_cursor",
+          "live"
+        ],
+        "title": "PlanRunsPage",
         "type": "object"
       },
       "PlanTaskRead": {
@@ -8141,6 +8578,24 @@
           }
         },
         "title": "PropertyKeyUpdate",
+        "type": "object"
+      },
+      "PublishMark": {
+        "properties": {
+          "published_at": {
+            "title": "Published At",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "published_at"
+        ],
+        "title": "PublishMark",
         "type": "object"
       },
       "QueryLanguage": {
@@ -9123,48 +9578,6 @@
           "status"
         ],
         "title": "RunNodeRead",
-        "type": "object"
-      },
-      "RunRow": {
-        "properties": {
-          "run_id": {
-            "title": "Run Id",
-            "type": "string"
-          },
-          "served": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Served"
-          },
-          "started_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Started At"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "run_id",
-          "status",
-          "served",
-          "started_at"
-        ],
-        "title": "RunRow",
         "type": "object"
       },
       "SchemaDiff": {
@@ -11619,6 +12032,29 @@
         "title": "SkillVersionRead",
         "type": "object"
       },
+      "SlowRun": {
+        "properties": {
+          "ms": {
+            "title": "Ms",
+            "type": "number"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "when": {
+            "title": "When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "ms",
+          "when"
+        ],
+        "title": "SlowRun",
+        "type": "object"
+      },
       "SortDirection": {
         "description": "Sort direction for a single property.",
         "enum": [
@@ -11875,6 +12311,101 @@
           "package_id"
         ],
         "title": "StarterSummary",
+        "type": "object"
+      },
+      "StepPerformance": {
+        "properties": {
+          "cost_per_run": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Per Run"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "layer": {
+            "title": "Layer",
+            "type": "string"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          },
+          "ran_in": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ran In"
+          },
+          "retried": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retried"
+          },
+          "share_of_work": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Of Work"
+          },
+          "step_key": {
+            "title": "Step Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_key",
+          "layer",
+          "ran_in",
+          "p50_ms",
+          "p95_ms",
+          "failed",
+          "retried",
+          "cost_per_run",
+          "share_of_work"
+        ],
+        "title": "StepPerformance",
         "type": "object"
       },
       "StitchPreview": {
@@ -29347,9 +29878,10 @@
         ]
       }
     },
-    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/runs": {
+    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/performance": {
       "get": {
-        "operationId": "workflow_runs_api_v1_u__username___graphSlug__task_plans__key__runs_get",
+        "description": "How the plan has behaved \u2014 the Overview, Layers and Flow tabs (LB33 \u00b7 LB36).",
+        "operationId": "plan_performance_api_v1_u__username___graphSlug__task_plans__key__performance_get",
         "parameters": [
           {
             "in": "path",
@@ -29400,14 +29932,12 @@
           },
           {
             "in": "query",
-            "name": "limit",
+            "name": "window",
             "required": false,
             "schema": {
-              "default": 25,
-              "maximum": 100,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
+              "default": "30d",
+              "title": "Window",
+              "type": "string"
             }
           }
         ],
@@ -29416,11 +29946,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RunRow"
-                  },
-                  "title": "Response Workflow Runs Api V1 U  Username   Graphslug  Task Plans  Key  Runs Get",
-                  "type": "array"
+                  "$ref": "#/components/schemas/PlanPerformance"
                 }
               }
             },
@@ -29442,7 +29968,179 @@
             "HTTPBearer": []
           }
         ],
-        "summary": "Workflow Runs",
+        "summary": "Plan Performance",
+        "tags": [
+          "task-plans"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/task-plans/{key}/runs": {
+      "get": {
+        "description": "Every run of the plan, newest first \u2014 the Activity tab (LB34).",
+        "operationId": "plan_runs_api_v1_u__username___graphSlug__task_plans__key__runs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Version"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "title": "Window",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "called_by",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Called By"
+            }
+          },
+          {
+            "in": "query",
+            "name": "agent_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanRunsPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Plan Runs",
         "tags": [
           "task-plans"
         ]

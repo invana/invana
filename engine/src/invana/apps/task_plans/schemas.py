@@ -139,11 +139,120 @@ class TasksResponse(BaseModel):
     edges: list[DagEdge] = []
 
 
-class RunRow(BaseModel):
+# ── How a plan has behaved (LB33 · LB34 · LB36) ─────────────────────────────
+
+
+class Measure(BaseModel):
+    """One number over the window, and the same number over the window before."""
+
+    value: float | None
+    prior: float | None
+
+
+class PerformanceTiles(BaseModel):
+    runs: Measure
+    served: Measure
+    elapsed_p50_ms: Measure
+    work_p50_ms: Measure
+    cost_per_run: Measure
+    failed: Measure
+
+
+class DailyRow(BaseModel):
+    date: str
+    served: int
+    failed: int
+    work_p50_ms: float | None
+
+
+class PublishMark(BaseModel):
+    version: int
+    published_at: str
+
+
+class StepPerformance(BaseModel):
+    step_key: str
+    layer: str
+    ran_in: float | None
+    p50_ms: float | None
+    p95_ms: float | None
+    failed: int
+    retried: float | None
+    cost_per_run: float | None
+    share_of_work: float | None
+
+
+class FailureRow(BaseModel):
+    step_key: str
+    cause: str
+    count: int
+    last_run_id: str
+
+
+class BoundUse(BaseModel):
+    step_key: str
+    bound: str
+    limit: int
+    used: int
+    exhausted: int
+
+
+class SlowRun(BaseModel):
+    run_id: str
+    ms: float
+    when: str
+
+
+class PlanPerformance(BaseModel):
+    """Everything the Overview, Layers and Flow tabs read — one window, one version."""
+
+    window_days: int
+    version: int
+    tiles: PerformanceTiles
+    daily: list[DailyRow]
+    publishes: list[PublishMark]
+    steps: list[StepPerformance]
+    failures: list[FailureRow]
+    bounds: list[BoundUse]
+    slowest: dict[str, list[SlowRun]]
+
+
+class CalledBy(BaseModel):
+    kind: str
+    name: str
+    person: str | None = None
+
+
+class FailedAt(BaseModel):
+    step_key: str
+    cause: str
+    message: str
+
+
+class PlanRunRow(BaseModel):
     run_id: str
     status: str
-    served: str | None
-    started_at: str | None
+    when: str
+    asked: str
+    called_by: CalledBy
+    agent: AgentChip | None
+    version: int | None
+    elapsed_ms: float | None
+    cost: float | None
+    failed_at: FailedAt | None
+
+
+class LiveTiles(BaseModel):
+    running: int
+    at_gate: int
+    called_by: int
+    agents: int
+
+
+class PlanRunsPage(BaseModel):
+    items: list[PlanRunRow]
+    next_cursor: str | None
+    live: LiveTiles
 
 
 class PromoteRequest(BaseModel):

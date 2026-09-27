@@ -46,6 +46,22 @@ class Workflow:
 
 _EXECUTE_RETRY = Retry(max_attempts=3, on=frozenset({"transient"}))
 
+#: The fallback for a planned step with no static definition, keyed by what the
+#: task is — the same policy expressed one level up.
+RETRY_BY_TASK: dict[str, Retry] = {"execute_graph_query": _EXECUTE_RETRY}
+
+
+def retry_limit(task_key: str, declared: dict | None) -> int:
+    """The attempts a plan's step may spend — its own policy, else the task's default.
+
+    What a plan's *Bounds it reaches* reads its limit from, so the page and the
+    interpreter cannot name two different ceilings for one step.
+    """
+    if isinstance(declared, dict) and isinstance(declared.get("max_attempts"), int):
+        return declared["max_attempts"]
+    return RETRY_BY_TASK.get(task_key, Retry()).max_attempts
+
+
 NL_QUERY = Workflow(
     key="nl-query",
     steps=(

@@ -12,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.task_plans.schemas import (
+    PlanPerformance,
+    PlanRunsPage,
     PromoteRequest,
-    RunRow,
     TaskPlanDetail,
     TaskPlanListResponse,
     TaskPlanRead,
@@ -23,12 +24,15 @@ from invana.apps.task_plans.yaml_export import to_yaml
 from invana.core.auth.deps import get_current_user
 from invana.core.auth.models import User
 from invana.core.db import get_session
+from invana.core.errors import ValidationError
 from invana.core.events import actions
 from invana.core.events.services import current_trace_id, emit_event
-from invana.runtime.managers import TaskPlanRunsManager
+from invana.runtime.managers import PlanPerformanceManager, TaskPlanRunsManager
+from invana.runtime.managers.plan_performance import WINDOWS
 from invana.server.graphs.deps import require_graph_member, resolve_graph_by_username_slug
 
 library = TaskPlanRunsManager()
+behaviour = PlanPerformanceManager()
 
 
 async def list_workflows(
@@ -64,16 +68,52 @@ async def get_plan_tasks(
     return TasksResponse(nodes=detail.nodes, edges=detail.edges)
 
 
-async def workflow_runs(
+def _window(window: str) -> int:
+    """``7d`` · ``30d`` · ``90d`` — the plan page's three windows, and no others."""
+    days = int(window[:-1]) if window.endswith("d") and window[:-1].isdigit() else 0
+    if days not in WINDOWS:
+        raise ValidationError(f"window must be one of {', '.join(f'{d}d' for d in WINDOWS)}.")
+    return days
+
+
+async def plan_performance(
     key: str = Path(...),
     version: int | None = Query(default=None),
-    limit: int = Query(default=25, ge=1, le=100),
+    window: str = Query(default="30d"),
     _: GraphMember = Depends(require_graph_member),
     graph: Graph = Depends(resolve_graph_by_username_slug),
     session: AsyncSession = Depends(get_session),
-) -> list[RunRow]:
+) -> PlanPerformance:
+    """How the plan has behaved — the Overview, Layers and Flow tabs (LB33 · LB36)."""
     workflow = await library.get(session, graph_id=graph.id, key=key, version=version)
-    return await library.recent_runs(session, workflow=workflow, limit=limit)
+    return await behaviour.performance(session, plan=workflow, window=_window(window))
+
+
+async def plan_runs(
+    key: str = Path(...),
+    version: int | None = Query(default=None),
+    window: str = Query(default="30d"),
+    status: str | None = Query(default=None),
+    called_by: str | None = Query(default=None),
+    agent_id: str | None = Query(default=None),
+    cursor: str | None = Query(default=None),
+    limit: int = Query(default=50, ge=1, le=200),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> PlanRunsPage:
+    """Every run of the plan, newest first — the Activity tab (LB34)."""
+    workflow = await library.get(session, graph_id=graph.id, key=key, version=version)
+    return await behaviour.runs(
+        session,
+        plan=workflow,
+        window=_window(window),
+        status=status,
+        called_by=called_by,
+        agent_id=agent_id,
+        cursor=cursor,
+        limit=limit,
+    )
 
 
 async def export_workflow(

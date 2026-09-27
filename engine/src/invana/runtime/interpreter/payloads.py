@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 
 from invana.apps.sessions.models import SessionMessage
 from invana.runtime.models import TaskRun
-from invana.runtime.workflows import Retry
+from invana.runtime.workflows import RETRY_BY_TASK, Retry
 
 log = logging.getLogger(__name__)
 
@@ -26,15 +26,6 @@ def _ms(start: datetime | None, end: datetime | None) -> int | None:
     if start is None or end is None:
         return None
     return round((end - start).total_seconds() * 1000)
-
-
-# **The spec declares, the runtime executes** (docs/for-developers/modules/ask/features/when-it-cannot-answer.md). A
-# static
-# workflow declares retry on its own step, and that still wins. A *planned*
-# step has no static definition, so the fallback is keyed by what the task is —
-# which is the same policy expressed one level up.
-_TRANSIENT_RETRY = Retry(max_attempts=3, on=frozenset({"transient"}))
-_RETRY_BY_TASK: dict[str, Retry] = {"execute_graph_query": _TRANSIENT_RETRY}
 
 
 def _retry_from_plan(plan: dict | None, row: TaskRun) -> Retry | None:
@@ -77,7 +68,7 @@ def _retry_for(wf, row: TaskRun, plan: dict | None = None) -> Retry:
     declared = next((s for s in getattr(wf, "steps", ()) if s.task_key == row.task_key), None)
     if declared is not None:
         return declared.retry
-    return _RETRY_BY_TASK.get(row.task_key, Retry())
+    return RETRY_BY_TASK.get(row.task_key, Retry())
 
 
 def _awaiting_detail(options: list[str]) -> str:

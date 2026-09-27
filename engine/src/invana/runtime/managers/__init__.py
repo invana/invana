@@ -3,6 +3,7 @@
 from invana.runtime.managers.agent_capabilities import AgentCapabilitiesManager
 from invana.runtime.managers.agent_lifecycle import AgentLifecycleManager
 from invana.runtime.managers.catalogue import CatalogueManager
+from invana.runtime.managers.plan_performance import PlanPerformanceManager
 from invana.runtime.managers.rule_citations import RuleCitationManager
 from invana.runtime.managers.skill_bind import SkillBindManager
 from invana.runtime.managers.skill_draft import SkillDraftManager
@@ -15,6 +16,7 @@ __all__ = [
     "AgentLifecycleManager",
     "BuiltinSkillSeeder",
     "CatalogueManager",
+    "PlanPerformanceManager",
     "RuleCitationManager",
     "SkillBindManager",
     "SkillDraftManager",

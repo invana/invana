@@ -23,7 +23,6 @@ from invana.apps.task_plans.schemas import (
     DagNode,
     PlanCallerRead,
     PlanLayerRead,
-    RunRow,
     TaskPlanDetail,
     TaskPlanRead,
 )
@@ -171,25 +170,6 @@ class TaskPlanRunsManager:
                 )
             )
         return sorted(out, key=lambda c: c.name.lower())
-
-    async def recent_runs(self, session: AsyncSession, *, workflow: TaskPlan, limit: int) -> list[RunRow]:
-        ref = f"template:{workflow.ref}"
-        stmt = (
-            select(TaskRun)
-            .where(TaskRun.graph_id == workflow.graph_id, TaskRun.plan_origin == ref)
-            .order_by(TaskRun.queued_at.desc())
-            .limit(limit)
-        )
-        rows = list((await session.execute(stmt)).scalars().all())
-        return [
-            RunRow(
-                run_id=t.id,
-                status=t.status,
-                served=((t.plan or {}).get("served")),
-                started_at=t.started_at.isoformat() if t.started_at else None,
-            )
-            for t in rows
-        ]
 
     async def run_stats(self, session: AsyncSession, *, graph_id: str, refs: list[str]) -> dict[str, dict]:
         """How often each library entry ran, and how often it **served**.

@@ -83,6 +83,20 @@ class TaskPlanQuerySet:
         )
         return (await session.execute(stmt)).scalar_one_or_none()
 
+    async def versions_of(self, session: AsyncSession, *, graph_id: str, key: str) -> list[TaskPlan]:
+        stmt = select(TaskPlan).where(TaskPlan.graph_id == graph_id, TaskPlan.key == key).order_by(TaskPlan.version)
+        return list((await session.execute(stmt)).scalars().all())
+
+    async def plans_inlining(self, session: AsyncSession, *, graph_id: str, ref: str) -> list[str]:
+        """The plans that copied *ref*'s rows — ``tasks.source_plan_key`` names it."""
+        stmt = (
+            select(Task.task_plan_id)
+            .join(TaskPlan, TaskPlan.id == Task.task_plan_id)
+            .where(TaskPlan.graph_id == graph_id, Task.source_plan_key == ref)
+            .distinct()
+        )
+        return list((await session.execute(stmt)).scalars().all())
+
     async def add(self, session: AsyncSession, plan: TaskPlan) -> TaskPlan:
         session.add(plan)
         await session.flush()
