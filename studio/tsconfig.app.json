@@ -18,7 +18,8 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"react": ["./node_modules/@types/react"],
-			"react/*": ["./node_modules/@types/react/*"]
+			"react/*": ["./node_modules/@types/react/*"],
+			"react-hook-form": ["./node_modules/react-hook-form"]
 		}
 	},
 	"include": ["src"]

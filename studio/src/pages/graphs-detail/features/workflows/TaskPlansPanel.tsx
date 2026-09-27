@@ -42,6 +42,7 @@ import type {
 	TaskPlanSummary,
 } from "@/types/work";
 import { LAYER_PALETTE, layerSlug } from "@/ui/layerPalette";
+import { Sparkline } from "@invana/charts";
 import {
 	Eyebrow,
 	type Layer,
@@ -49,7 +50,6 @@ import {
 	PropertyList,
 	PropertyRow,
 	RecordHeader,
-	Sparkline,
 	Spinner,
 } from "@invana/ui";
 import { Wand2 } from "lucide-react";

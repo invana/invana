@@ -13,15 +13,19 @@ import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
 import {
 	useCommitDraftMutation,
 	useCreateDraftMutation,
+	useCreateIndexMutation,
 	useDiscardStagedChangeMutation,
 	useDiscardStagedSetMutation,
+	useModelInsightsQuery,
 	useModelLinksQuery,
 	useModelQuery,
 	useModelVersionsQuery,
 	useModelsQuery,
+	useShapeQuery,
 	useStagedSetQuery,
 	useUpdateModelMutation,
 } from "@/hooks/queries/useModels";
+import { usePhysicalSchemaQuery } from "@/hooks/queries/useSchema";
 import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
 import { ModelCanvas } from "@/pages/graphs-detail/features/connect-and-model/model/ModelCanvas";
 import { DeleteModelDialog } from "@/pages/graphs-detail/features/connect-and-model/model/components/DeleteModelDialog";
@@ -35,10 +39,10 @@ import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { ApiError } from "@/services/api/client";
 import { graphsApi } from "@/services/api/graphs";
 import { modelsApi } from "@/services/api/models";
-import type { BindingStitch, GraphModelSummary } from "@/types/models";
+import type { Advice, BindingStitch, GraphModelSummary } from "@/types/models";
 import { Dashboard } from "@invana/dashboard";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Boxes, Check, Lock, Plus, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -51,20 +55,19 @@ import {
 	modelsPageSpec,
 	windowOf,
 } from "./modelsPageSpec";
+import { ShapeSheet } from "./performanceTab";
 import { type ModelsTab, useModelsView } from "./useModelsView";
 
 const ICONS = { ...DASHBOARD_ICONS, plus: Plus, upload: Upload, check: Check };
 
 /** What each tab waits on until its read ships (MP22). */
 const WAITS_ON: Partial<Record<ModelsTab, string>> = {
-	database:
-		"The Database tab reads the physical mirror — labels, relationship types, indexes and constraints, each marked against the model. It arrives with the mirror's index and constraint readers.",
 	usage:
-		"Usage counts who asked about each type and property, from the query log. It arrives with the log.",
+		"Usage counts who asked about each type and property, from the query log. This engine does not keep one.",
 	performance:
-		"Performance groups every query by its shape, with p50, p95 and advice. It arrives with the query log.",
+		"Performance groups every query by its shape, with p50, p95 and advice, from the query log. This engine does not keep one.",
 	growth:
-		"Growth draws records over time, from the count taken whenever something writes data. It arrives with those counts.",
+		"Growth draws records over time, from the count taken whenever something writes data. This engine does not take them.",
 };
 
 /** `invana_neo4j.connector.Neo4jConnector` → `Neo4j`. */
@@ -79,6 +82,7 @@ export function ModelsPage({
 	selection,
 	onSelect,
 	canWrite = true,
+	onOpenRun,
 }: {
 	username: string;
 	graphSlug: string;
@@ -88,8 +92,11 @@ export function ModelsPage({
 	onSelect: (selection: ModelSelection | null) => void;
 	/** Membership is binary today, so every member writes (MP23). */
 	canWrite?: boolean;
+	/** A Growth mark's run, opened as a board beside this one. */
+	onOpenRun?: (runId: string) => void;
 }) {
 	const { view, set } = useModelsView();
+	const queryClient = useQueryClient();
 	const models = useModelsQuery(username, graphSlug);
 	const authored = useMemo(
 		() =>
@@ -104,6 +111,60 @@ export function ModelsPage({
 	const connection = useGraphConnectionQuery(username, graphSlug);
 
 	const scoped = authored.find((m) => m.id === view.scope) ?? null;
+	const physical = usePhysicalSchemaQuery(
+		username,
+		graphSlug,
+		scoped?.id ?? null,
+	);
+	const insights = useModelInsightsQuery(
+		username,
+		graphSlug,
+		scoped?.id ?? null,
+		view.window,
+	);
+	// A picked shape is a reading of the page, not a place — it does not go in
+	// the URL (MP23 names the four keys that do).
+	const [shape, setShape] = useState<string | null>(null);
+	const shapeCard = useShapeQuery(username, graphSlug, shape, view.window);
+	const createIndex = useCreateIndexMutation(username, graphSlug);
+	const [staging, setStaging] = useState(false);
+
+	/** Advice is a draft change, never a write (MP13): open the owner's draft if it has none, then stage. */
+	const stageIndex = async (advice: Advice) => {
+		if (!advice.model_id) return;
+		setStaging(true);
+		try {
+			const owned = await modelsApi.listVersions(
+				username,
+				graphSlug,
+				advice.model_id,
+			);
+			const draftVersion =
+				owned.find((v) => v.status === "draft") ??
+				(await createDraft.mutateAsync({
+					modelId: advice.model_id,
+					basedOn: owned.find((v) => v.status === "active")?.version ?? null,
+				}));
+			await createIndex.mutateAsync({
+				modelId: advice.model_id,
+				versionId: draftVersion.id,
+				data: {
+					name: `${advice.label}_${advice.property}`.toLowerCase(),
+					target_kind: "node_type",
+					target_label: advice.label,
+					properties: [advice.property],
+					index_type: "range",
+				},
+			});
+			toast.success(
+				`Staged an index on ${advice.label}.${advice.property} in ${advice.model_name} — publishing creates it.`,
+			);
+			setShape(null);
+			set({ scope: advice.model_id });
+		} finally {
+			setStaging(false);
+		}
+	};
 	const detail = useModelQuery(username, graphSlug, scoped?.id);
 	const versions = useModelVersionsQuery(username, graphSlug, scoped?.id);
 	const draft = versions.data?.find((v) => v.status === "draft") ?? null;
@@ -117,6 +178,10 @@ export function ModelsPage({
 	const update = useUpdateModelMutation(username, graphSlug);
 	const introspect = useMutation({
 		mutationFn: () => graphsApi.introspectConnection(username, graphSlug),
+		onSettled: () =>
+			queryClient.invalidateQueries({
+				queryKey: ["schemas", username, graphSlug, "physical"],
+			}),
 		onSuccess: () =>
 			toast.success(
 				"Reading what the database holds — the mirror refreshes when it lands.",
@@ -170,6 +235,10 @@ export function ModelsPage({
 			frames,
 			counts: counts.data,
 			links: allLinks.data ?? links,
+			physical: physical.data,
+			physicalLoading: physical.isLoading,
+			insights: insights.data,
+			insightsLoading: insights.isLoading,
 			scope,
 			canWrite,
 			loading: models.isLoading,
@@ -200,6 +269,20 @@ export function ModelsPage({
 					description={WAITS_ON[tab]}
 				/>
 			),
+			performance: { selected: shape, onSelect: setShape },
+			onTab: (tab) => set({ tab }),
+			growth: {
+				canWrite,
+				// A load is a run, so it lands on the Runs journal (SR7).
+				onBringDataIn: () => set({}, { panel: "runs" }),
+				onSeeTypes: () => set({ tab: "model", open: true }),
+				onOpenRun: (runId) => onOpenRun?.(runId),
+			},
+			database: {
+				canWrite,
+				introspecting: introspect.isPending,
+				onIntrospect: () => introspect.mutate(),
+			},
 			emptyOverview: (
 				<EmptyState
 					className="py-10"
@@ -405,6 +488,17 @@ export function ModelsPage({
 					onClose={() => setPublishing(false)}
 				/>
 			) : null}
+			<ShapeSheet
+				open={!!shape}
+				card={shapeCard.data}
+				loading={shapeCard.isLoading}
+				connector={connectorName(connection.data?.connector_class)}
+				canWrite={canWrite}
+				staging={staging}
+				onStage={(a) => void stageIndex(a)}
+				onOpenRun={(runId) => onOpenRun?.(runId)}
+				onClose={() => setShape(null)}
+			/>
 			<ArchiveRefused
 				modelName={refused?.name ?? null}
 				stitches={refused?.stitches ?? []}

@@ -5,6 +5,8 @@ from invana.graph.connectors.cypher.querysets.schema_reader import OpenCypherSch
 class Neo4jSchemaReaderQuerySet(OpenCypherSchemaReaderQuerySet):
     """Neo4j-specific schema reader using SHOW INDEXES / SHOW CONSTRAINTS (Neo4j 4.x+)."""
 
+    lists_schema = True
+
     _TYPE_MAP = {
         "RANGE": "btree",
         "BTREE": "btree",

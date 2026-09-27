@@ -82,8 +82,38 @@ async def lifespan(app: FastAPI):
     app.state.task_runtime = task_runtime
     await task_runtime.startup()
 
+    # the-model-page.md MP35 · MP36 — every query someone asked, logged by shape,
+    # off the query's path. The connector hands it over; this task writes it.
+    import asyncio
+
+    from invana.apps.graphs.managers import GraphManager
+    from invana.apps.graphs.pool import GraphUnavailableError
+    from invana.apps.modeller.managers import QueryLogWriter
+    from invana.core.querylog import set_query_observer
+
+    connections: dict[str, str] = {}
+
+    async def connector_for(graph_id: str):
+        if graph_id not in connections:
+            async with session_factory() as db:
+                connection = await GraphManager().get_graph_connection(db, graph_id=graph_id)
+            if connection is None:
+                return None
+            connections[graph_id] = connection.id
+        try:
+            return manager.get_connector(connections[graph_id])
+        except GraphUnavailableError:
+            return None
+
+    query_log = QueryLogWriter(session_factory, connector_for)
+    app.state.query_log = query_log
+    set_query_observer(query_log.submit)
+    query_log_task = asyncio.create_task(query_log.run(), name="query-log")
+
     yield
 
+    set_query_observer(None)
+    query_log_task.cancel()
     await task_runtime.shutdown()
     await event_broadcaster.stop()
     await manager.shutdown()

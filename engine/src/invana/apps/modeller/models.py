@@ -26,12 +26,14 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Integer,
     String,
     Text,
     UniqueConstraint,
 )
+from sqlalchemy import Index as sa_Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from invana.core.models import Base
@@ -459,3 +461,76 @@ class ModelLink(Base):
     description: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+# ---------------------------------------------------------------------------
+# Count snapshot — one type's count at one moment (the-model-page.md MP14)
+# ---------------------------------------------------------------------------
+
+
+class TypeCountSnapshot(Base):
+    """The count of one type, written by the act that changed it — never on a timer.
+
+    ``source`` says which act: ``introspect`` · ``import`` · ``stitch_commit``, and
+    ``source_id`` names the run or the mirror version that wrote it, so a mark on
+    the Growth line can open what moved it (MP14 · MP30).
+    """
+
+    __tablename__ = "type_count_snapshots"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    source: Mapped[str] = mapped_column(
+        Enum("introspect", "import", "stitch_commit", name="count_snapshot_source_enum"), nullable=False
+    )
+    source_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    kind: Mapped[str] = mapped_column(Enum("node", "edge", name="count_snapshot_kind_enum"), nullable=False)
+    type_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    count: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Nodes only, and only where the act scanned for it (MP30 · MP31).
+    max_degree: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    median_degree: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    __table_args__ = (sa_Index("ix_type_count_snapshots_graph_at", "graph_id", "at"),)
+
+
+# ---------------------------------------------------------------------------
+# Query log — every logged graph query, by shape (the-model-page.md MP12 · MP15)
+# ---------------------------------------------------------------------------
+
+
+class GraphQueryLog(Base):
+    """One graph query someone asked, written after it answered (MP35 · MP36).
+
+    Invana's own table, not read back from telemetry (MP15). ``types_touched`` is
+    ``{"nodes": [...], "edges": [...]}``; ``properties_touched`` is only where the
+    connector explains, and ``touched_from`` says which (MP12 · MP38).
+    """
+
+    __tablename__ = "graph_query_log"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    graph_id: Mapped[str] = mapped_column(ForeignKey("graphs.id", ondelete="CASCADE"), nullable=False)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    shape_hash: Mapped[str] = mapped_column(String(16), nullable=False)
+    shape_text: Mapped[str] = mapped_column(Text, nullable=False)
+    language: Mapped[str] = mapped_column(String(16), nullable=False)
+    caller_kind: Mapped[str] = mapped_column(
+        Enum("agent", "plan", "explorer", "api", name="query_caller_kind_enum"), nullable=False
+    )
+    caller_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    task_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    duration_ms: Mapped[float] = mapped_column(Float, nullable=False)
+    rows: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    ok: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    types_touched: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    properties_touched: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    touched_from: Mapped[str] = mapped_column(
+        Enum("plan", "results", name="query_touched_from_enum"), nullable=False, default="results"
+    )
+
+    __table_args__ = (
+        sa_Index("ix_graph_query_log_graph_at", "graph_id", "at"),
+        sa_Index("ix_graph_query_log_graph_shape", "graph_id", "shape_hash"),
+    )

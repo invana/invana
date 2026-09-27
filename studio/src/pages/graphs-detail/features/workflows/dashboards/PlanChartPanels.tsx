@@ -8,8 +8,12 @@
  */
 
 import { formatElapsed } from "@/lib/time";
+import {
+	LineChart,
+	type LineChartMark,
+	StackedBarChartV,
+} from "@invana/charts";
 import type { PanelRendererProps } from "@invana/dashboard";
-import { LineChart, type LineChartMark, StackedBarChartV } from "@invana/ui";
 
 export interface DailyRunsOptions {
 	days: { label: string; served: number; failed: number }[];

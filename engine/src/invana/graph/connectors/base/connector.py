@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from contextlib import nullcontext
 from typing import Any, ClassVar
 
+from invana.core.querylog import ObservedQuery, observe
 from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 from invana.graph.connectors.base.exceptions import ConnectionError
 from invana.graph.connectors.base.lens import LensCompiler, UnsupportedLensCompiler
@@ -26,6 +27,7 @@ from invana.graph.types.capabilities import (
 from invana.graph.types.constants import Capability, PropertyType
 from invana.graph.types.data_elements import GraphResponse
 from invana.graph.types.lens import ComposedQuery, QueryLens
+from invana.graph.types.plan import ExplainedPlan
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
 # docs/for-developers/modules/platform/features/telemetry.md). Core
@@ -213,13 +215,25 @@ class BaseConnector(ABC):
                     # failed — record the real error here so it's visible in OTel.
                     _record_span_exception(span, exc)
                     category = getattr(exc, "category", None)
+                    failed_ms = (time.perf_counter() - start) * 1000
                     record_graph_query(
                         language=language,
                         backend=backend,
-                        duration_ms=(time.perf_counter() - start) * 1000,
+                        duration_ms=failed_ms,
                         status="failed",
                         error_type=type(exc).__name__,
                         error_category=str(category) if category else None,
+                    )
+                    observe(
+                        lambda caller: ObservedQuery(
+                            caller=caller,
+                            query=query,
+                            parameters=dict(parameters or {}),
+                            language=language,
+                            duration_ms=failed_ms,
+                            rows=0,
+                            ok=False,
+                        )
                     )
                     raise
             duration_ms = (time.perf_counter() - start) * 1000
@@ -239,9 +253,31 @@ class BaseConnector(ABC):
                 status="success",
                 result_size=node_count + edge_count,
             )
+            # After the answer, and never in its way (the-model-page.md MP36).
+            observe(
+                lambda caller: ObservedQuery(
+                    caller=caller,
+                    query=query,
+                    parameters=dict(parameters or {}),
+                    language=language,
+                    duration_ms=duration_ms,
+                    rows=len(response.records) or node_count + edge_count,
+                    ok=True,
+                    node_labels={n.label for n in response.nodes},
+                    edge_labels={e.label for e in response.edges},
+                )
+            )
             return response
         finally:
             add_graph_query_in_flight(-1, language=language, backend=backend)
+
+    async def explain(self, query: str, parameters: dict | None = None) -> ExplainedPlan | None:
+        """The plan ``query`` would run, without running it — or ``None`` where this vendor cannot say.
+
+        Never ``PROFILE``, which runs the query again (the-model-page.md MP13).
+        Not logged: an explanation is the platform reading, not anyone asking.
+        """
+        return None
 
     @abstractmethod
     async def health_check(self) -> bool:

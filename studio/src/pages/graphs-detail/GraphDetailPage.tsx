@@ -2905,6 +2905,9 @@ export function GraphDetailPage() {
 					backend={backend}
 					selection={modelSelection}
 					onSelect={setModelSelection}
+					onOpenRun={(runId) =>
+						openBoard({ kind: "run", subjectId: runId, runId })
+					}
 				/>
 			);
 		}

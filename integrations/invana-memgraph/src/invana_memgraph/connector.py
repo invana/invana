@@ -20,8 +20,11 @@ from invana.graph.connectors.base.exceptions import QueryErrorCategory
 from invana.graph.connectors.cypher.connector import CYPHER_PROFILE, OpenCypherConnector
 from invana.graph.connectors.cypher.query_builder import OpenCypherQueryBuilder
 from invana.graph.types.capabilities import Version
+from invana.graph.types.plan import ExplainedPlan
 
+from invana_memgraph.explain import reduce_plan
 from invana_memgraph.query_builder import MemgraphQueryBuilder
+from invana_memgraph.querysets.schema_reader import MemgraphSchemaReaderQuerySet
 
 # Memgraph reports its own version through ``SHOW VERSION``, which the openCypher
 # connector already falls back to when ``dbms.components()`` is absent.
@@ -36,6 +39,17 @@ class MemgraphConnector(OpenCypherConnector):
 
     _capability_profile = MEMGRAPH_PROFILE
     query_builder: ClassVar[type[OpenCypherQueryBuilder]] = MemgraphQueryBuilder
+
+    def _init_querysets(self) -> None:
+        super()._init_querysets()
+        self.schema_reader = MemgraphSchemaReaderQuerySet(self)
+
+    async def explain(self, query: str, parameters: dict | None = None) -> ExplainedPlan | None:
+        """``EXPLAIN`` on the driver, with the call's own values — Memgraph needs them (MP38)."""
+        async with self._driver.session(database=self._database) as session:
+            result = await session.run(f"EXPLAIN {query}", parameters or {})
+            rows = [record["QUERY PLAN"] async for record in result]
+        return reduce_plan(rows) if rows else None
 
     def classify_error(self, code: str | None, message: str) -> str:
         """Memgraph returns one code for everything, so the message is what carries it.

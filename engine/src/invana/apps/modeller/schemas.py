@@ -469,3 +469,258 @@ class SchemaExport(BaseModel):
     edge_types: list[EdgeTypeCreate] = []
     constraints: list[ConstraintCreate] = []
     indexes: list[IndexCreate] = []
+
+
+# ---------------------------------------------------------------------------
+# The physical read — the model page's Database tab (the-model-page.md MP9)
+# ---------------------------------------------------------------------------
+
+Drift = Literal["in_both", "model_only", "database_only"]
+
+
+class PhysicalType(BaseModel):
+    """A label or relationship type, and which models declare it (MP17)."""
+
+    name: str
+    models: list[str] = []
+    #: Live, from ``count-types`` (MP28); ``None`` where the connector cannot count.
+    count: int | None = None
+    drift: Drift
+
+
+class PhysicalRule(BaseModel):
+    """An index or a constraint, matched by what it covers (MP27)."""
+
+    name: str
+    label: str
+    properties: list[str]
+    type: str
+    models: list[str] = []
+    drift: Drift
+
+
+class PhysicalSchema(BaseModel):
+    #: When the mirror was captured; ``None`` — never introspected.
+    captured_at: datetime | None
+    #: An import counted after the mirror was captured (MP34).
+    stale: bool = False
+    connector: str | None
+    #: Whether the connector lists its indexes and constraints (MP26).
+    lists_schema: bool
+    #: What the scope's models declare — said even where nothing can be checked.
+    declared_indexes: int = 0
+    declared_constraints: int = 0
+    labels: list[PhysicalType] = []
+    relationship_types: list[PhysicalType] = []
+    indexes: list[PhysicalRule] = []
+    constraints: list[PhysicalRule] = []
+
+
+# ---------------------------------------------------------------------------
+# Insights — the model page's measured tabs (the-model-page.md MP33)
+# ---------------------------------------------------------------------------
+
+
+class WrittenBy(BaseModel):
+    source: Literal["introspect", "import", "stitch_commit"]
+    source_id: str | None
+    at: datetime
+
+
+class GrowthSeries(BaseModel):
+    key: str
+    name: str
+    kind: Literal["model", "node", "edge"]
+    #: One per day of the window; ``None`` before anything was counted (MP32).
+    values: list[int | None]
+
+
+class GrowthMark(BaseModel):
+    #: The day of the window the write fell on.
+    index: int
+    source: Literal["import", "stitch_commit"]
+    source_id: str | None
+    at: datetime
+
+
+class GrowthRow(BaseModel):
+    key: str
+    name: str
+    kind: Literal["model", "node", "edge"]
+    start: int | None
+    now: int | None
+    change: int | None
+    last: WrittenBy | None
+
+
+class GrowthWrites(BaseModel):
+    imports: int = 0
+    stitch_commits: int = 0
+
+
+class Growth(BaseModel):
+    labels: list[str]
+    series: list[GrowthSeries]
+    marks: list[GrowthMark]
+    rows: list[GrowthRow]
+    writes: GrowthWrites
+    #: Anything in scope was ever counted — else the never-imported state.
+    counted: bool
+
+
+CallerKind = Literal["agent", "plan", "explorer", "api"]
+SignalKind = Literal["unused", "empty", "hot", "hot_and_slow", "supernode", "cold"]
+
+
+class Signal(BaseModel):
+    """A fixed rule that fired, and what it fired on (MP10)."""
+
+    signal: SignalKind
+    #: The type (or ``type.property``) it names.
+    subject: str
+    why: str
+
+
+class CallerDay(BaseModel):
+    label: str
+    counts: dict[str, int]
+
+
+class DayValue(BaseModel):
+    label: str
+    value: float | None
+
+
+class OverviewRow(BaseModel):
+    key: str
+    share: float
+    p95: float | None
+    signals: list[Signal] = []
+
+
+class Attention(BaseModel):
+    signal: str
+    subject: str
+    why: str
+    tab: Literal["usage", "performance", "growth", "database"]
+
+
+class Overview(BaseModel):
+    queries_a_day: float
+    p50: float | None
+    p95: float | None
+    #: The Graph's p95, the line a scope's is read against.
+    graph_p95: float | None
+    by_caller_by_day: list[CallerDay]
+    p95_by_day: list[DayValue]
+    rows: list[OverviewRow]
+    attention: list[Attention]
+
+
+class UsageRow(BaseModel):
+    key: str
+    name: str
+    kind: Literal["model", "node", "edge"]
+    queries: int
+    share: float
+    by_caller: dict[str, int]
+    last_touched: datetime | None
+    signals: list[Signal] = []
+
+
+class StitchUse(BaseModel):
+    id: str
+    pair: str
+    kind: str
+    queries: int
+    share: float
+    last_crossed: datetime | None
+
+
+class PropertyUse(BaseModel):
+    type: str
+    property: str
+    filtered: int
+    returned: int
+    ordered: int
+    cold: bool
+
+
+class Usage(BaseModel):
+    total: int
+    #: Fewer than 50 queries on the Graph: counts, never signals (MP10).
+    too_few: bool
+    callers: dict[str, int]
+    rows: list[UsageRow]
+    stitches: list[StitchUse] = []
+    properties: list[PropertyUse] = []
+    #: Some query in the window was explained — properties are known (MP12).
+    explains: bool
+
+
+class ShapeRow(BaseModel):
+    hash: str
+    text: str
+    callers: list[str]
+    calls: int
+    p50: float | None
+    p95: float | None
+    rows: float | None
+    types: list[str]
+    touched_from: Literal["plan", "results"]
+    has_advice: bool
+
+
+class Performance(BaseModel):
+    total: int
+    p50: float | None
+    p95: float | None
+    errors: int
+    slow_shapes: int
+    p95_by_day: list[DayValue]
+    shapes: list[ShapeRow]
+
+
+class Insights(BaseModel):
+    window: Literal["7d", "30d", "90d"]
+    #: ``None`` — the engine does not measure this slice (MP33).
+    growth: Growth | None = None
+    overview: Overview | None = None
+    usage: Usage | None = None
+    performance: Performance | None = None
+
+
+class SlowCall(BaseModel):
+    at: datetime
+    duration_ms: float
+    caller_kind: CallerKind
+    caller_id: str | None
+    task_run_id: str | None
+
+
+class Advice(BaseModel):
+    kind: Literal["missing_index"]
+    label: str
+    property: str
+    #: The model whose active version declares the label — where the index is staged (MP13).
+    model_id: str | None
+    model_name: str | None
+    #: Calls in the window that filtered on it.
+    calls: int
+
+
+class ShapeCard(BaseModel):
+    hash: str
+    text: str
+    language: str
+    calls: int
+    p50: float | None
+    p95: float | None
+    callers: dict[str, int]
+    types: list[str]
+    touched_from: Literal["plan", "results"]
+    plan: list[str]
+    slowest: list[SlowCall]
+    advice: list[Advice]
+    #: False — this connector cannot explain, and advice is *not available* (MP39).
+    explains: bool

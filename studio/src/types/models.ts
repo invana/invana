@@ -399,3 +399,188 @@ export interface GlobalModel {
 	/** What the database actually holds — beside the derived counts, never in them (ST7). */
 	mirror_label_count: number;
 }
+
+// ── Insights — the model page's measured tabs (the-model-page.md MP33) ─────
+
+export type InsightsWindow = "7d" | "30d" | "90d";
+export type WriteSource = "introspect" | "import" | "stitch_commit";
+
+export interface WrittenBy {
+	source: WriteSource;
+	source_id: string | null;
+	at: string;
+}
+
+export interface GrowthSeries {
+	key: string;
+	name: string;
+	kind: "model" | "node" | "edge";
+	/** One per day; `null` before anything was counted (MP32). */
+	values: (number | null)[];
+}
+
+export interface GrowthMark {
+	index: number;
+	source: Exclude<WriteSource, "introspect">;
+	source_id: string | null;
+	at: string;
+}
+
+export interface GrowthRow {
+	key: string;
+	name: string;
+	kind: "model" | "node" | "edge";
+	start: number | null;
+	now: number | null;
+	change: number | null;
+	last: WrittenBy | null;
+}
+
+export interface Growth {
+	/** ISO days, oldest first. */
+	labels: string[];
+	series: GrowthSeries[];
+	marks: GrowthMark[];
+	rows: GrowthRow[];
+	writes: { imports: number; stitch_commits: number };
+	/** Anything in scope was ever counted — else the never-imported state. */
+	counted: boolean;
+}
+
+export type CallerKind = "agent" | "plan" | "explorer" | "api";
+export type SignalKind =
+	| "unused"
+	| "empty"
+	| "hot"
+	| "hot_and_slow"
+	| "supernode"
+	| "cold";
+
+/** A fixed rule that fired (MP10). */
+export interface Signal {
+	signal: SignalKind;
+	subject: string;
+	why: string;
+}
+
+export interface DayValue {
+	label: string;
+	value: number | null;
+}
+
+export interface Overview {
+	queries_a_day: number;
+	p50: number | null;
+	p95: number | null;
+	graph_p95: number | null;
+	by_caller_by_day: { label: string; counts: Record<CallerKind, number> }[];
+	p95_by_day: DayValue[];
+	rows: { key: string; share: number; p95: number | null; signals: Signal[] }[];
+	attention: {
+		signal: string;
+		subject: string;
+		why: string;
+		tab: "usage" | "performance" | "growth" | "database";
+	}[];
+}
+
+export interface UsageRow {
+	key: string;
+	name: string;
+	kind: "model" | "node" | "edge";
+	queries: number;
+	share: number;
+	by_caller: Record<CallerKind, number>;
+	last_touched: string | null;
+	signals: Signal[];
+}
+
+export interface Usage {
+	total: number;
+	/** Fewer than 50 queries on the Graph — counts, never signals (MP10). */
+	too_few: boolean;
+	callers: Record<CallerKind, number>;
+	rows: UsageRow[];
+	stitches: {
+		id: string;
+		pair: string;
+		kind: string;
+		queries: number;
+		share: number;
+		last_crossed: string | null;
+	}[];
+	properties: {
+		type: string;
+		property: string;
+		filtered: number;
+		returned: number;
+		ordered: number;
+		cold: boolean;
+	}[];
+	explains: boolean;
+}
+
+export interface ShapeRow {
+	hash: string;
+	text: string;
+	callers: CallerKind[];
+	calls: number;
+	p50: number | null;
+	p95: number | null;
+	rows: number | null;
+	types: string[];
+	touched_from: "plan" | "results";
+	has_advice: boolean;
+}
+
+export interface Performance {
+	total: number;
+	p50: number | null;
+	p95: number | null;
+	errors: number;
+	slow_shapes: number;
+	p95_by_day: DayValue[];
+	shapes: ShapeRow[];
+}
+
+export interface Insights {
+	window: InsightsWindow;
+	/** `null` — the engine does not measure this slice (MP33). */
+	growth: Growth | null;
+	overview: Overview | null;
+	usage: Usage | null;
+	performance: Performance | null;
+}
+
+/** An index the plan says is missing, and the model it would be staged on (MP13 · MP39). */
+export interface Advice {
+	kind: "missing_index";
+	label: string;
+	property: string;
+	model_id: string | null;
+	model_name: string | null;
+	calls: number;
+}
+
+export interface ShapeCard {
+	hash: string;
+	text: string;
+	language: string;
+	calls: number;
+	p50: number | null;
+	p95: number | null;
+	callers: Partial<Record<CallerKind, number>>;
+	types: string[];
+	touched_from: "plan" | "results";
+	plan: string[];
+	slowest: {
+		at: string;
+		duration_ms: number;
+		caller_kind: CallerKind;
+		caller_id: string | null;
+		task_run_id: string | null;
+	}[];
+	advice: Advice[];
+	/** False — this connector cannot explain; advice is not available (MP39). */
+	explains: boolean;
+}

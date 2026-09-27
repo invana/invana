@@ -56,6 +56,7 @@ const designKitAlias: Record<string, string> = designKitRoot
 			"@invana/tables": dk("packages/tables/dist/index.js"),
 			"@invana/dashboard": dk("packages/dashboard/dist/index.js"),
 			"@invana/editor": dk("packages/editor/dist/index.js"),
+			"@invana/charts": dk("packages/charts/dist/index.js"),
 		}
 	: {};
 
@@ -140,10 +141,9 @@ const pixiPin: Record<string, string> = canvasRoot
 // POSIX-separated so the rewrite reads the same on every OS.
 const scannedLinkedPackages: Array<[pkg: string, dist: string]> = [
 	...(designKitRoot
-		? ["forms", "dashboard", "editor"].map((pkg): [string, string] => [
-				pkg,
-				dk(`packages/${pkg}/dist`),
-			])
+		? ["forms", "dashboard", "editor", "charts"].map(
+				(pkg): [string, string] => [pkg, dk(`packages/${pkg}/dist`)],
+			)
 		: []),
 	...(canvasRoot
 		? [["canvas-ui", cv("packages/canvas-ui/dist")] as [string, string]]

@@ -126,7 +126,9 @@ async def plan_projection(
     against = "active_version"
     live_idx: set[tuple] | None = None
     live_con: set[tuple] | None = None
-    if connector is not None:
+    # Only a connector that lists its schema is read live; an empty answer from
+    # one that cannot would diff the draft against nothing (MP26).
+    if connector is not None and connector.schema_reader.lists_schema:
         try:
             live_idx = {(i.label, tuple(i.properties), i.type) for i in await connector.schema_reader.get_indexes()}
             live_con = {(c.label, tuple(c.properties), c.type) for c in await connector.schema_reader.get_constraints()}

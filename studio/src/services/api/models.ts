@@ -10,6 +10,8 @@ import type {
 	GraphModelSummary,
 	GraphModelUpdate,
 	IndexCreate,
+	Insights,
+	InsightsWindow,
 	ModelArtefact,
 	ModelImportResult,
 	ModelLink,
@@ -21,6 +23,7 @@ import type {
 	PropertyKeyCreate,
 	PropertyKeyUpdate,
 	SchemaDiff,
+	ShapeCard,
 	StagedSet,
 	StarterSummary,
 	StitchPreview,
@@ -74,6 +77,23 @@ export const modelsApi = {
 	update: (u: string, g: string, id: string, data: GraphModelUpdate) =>
 		patch(`${base(u, g)}/${id}`, data) as Promise<GraphModelResponse>,
 	remove: (u: string, g: string, id: string) => del(`${base(u, g)}/${id}`),
+
+	/** The page's measured tabs, over a window, at All models or one (MP33). */
+	insights: (
+		u: string,
+		g: string,
+		model: string | null,
+		window: InsightsWindow,
+	) =>
+		request<Insights>(
+			`${base(u, g)}/insights?model=${encodeURIComponent(model ?? "all")}&window=${window}`,
+		),
+
+	/** One query shape: its calls, its plan, its advice (MP12 · MP39). */
+	shape: (u: string, g: string, hash: string, window: InsightsWindow) =>
+		request<ShapeCard>(
+			`${base(u, g)}/insights/shapes/${hash}?window=${window}`,
+		),
 
 	/** The DDL publishing the draft would project — read, never written (MP20). */
 	projection: (u: string, g: string, id: string) =>

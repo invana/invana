@@ -13,10 +13,12 @@ import type { ModelFrame } from "@/pages/graphs-detail/features/connect-and-mode
 import type {
 	GraphModelResponse,
 	GraphModelSummary,
+	Insights,
 	ModelLink,
 	StagedSet,
 	VersionSummary,
 } from "@/types/models";
+import type { PhysicalSchema } from "@/types/schemas";
 import type { TypeCountsResponse } from "@/types/traversal";
 import type {
 	ActionSpec,
@@ -27,6 +29,16 @@ import type {
 	TabSpec,
 } from "@invana/dashboard";
 import type { ReactNode } from "react";
+import {
+	type DatabaseTabOptions,
+	databaseRows,
+	driftCount,
+} from "./databaseTab";
+import { type GrowthTabOptions, growthRows } from "./growthTab";
+import { fmtMs, fmtPct } from "./insightParts";
+import { attentionPanel, callersPanel, p95Panel } from "./overviewParts";
+import { type PerformanceTabOptions, performanceRows } from "./performanceTab";
+import { usageRows } from "./usageTab";
 import {
 	MODELS_TABS,
 	MODELS_WINDOWS,
@@ -106,6 +118,12 @@ export interface ModelsPageData {
 	frames: ModelFrame[];
 	counts: TypeCountsResponse | undefined;
 	links: ModelLink[];
+	/** The mirror, drift marked, at the page's scope (MP9). */
+	physical: PhysicalSchema | undefined;
+	physicalLoading: boolean;
+	/** The measured tabs over the window (MP33); a `null` slice is not measured. */
+	insights: Insights | undefined;
+	insightsLoading: boolean;
 	scope: ModelsScope | null;
 	canWrite: boolean;
 	loading: boolean;
@@ -118,6 +136,78 @@ export interface ModelsPageSlots {
 	notMeasured: (tab: ModelsTab) => ReactNode;
 	/** The Overview when nothing is published. */
 	emptyOverview: ReactNode;
+	database: Omit<DatabaseTabOptions, "scopeName">;
+	growth: Pick<
+		GrowthTabOptions,
+		"canWrite" | "onBringDataIn" | "onSeeTypes" | "onOpenRun"
+	>;
+	performance: Pick<PerformanceTabOptions, "selected" | "onSelect">;
+	/** A Needs-attention row's link to its tab. */
+	onTab: (tab: ModelsTab) => void;
+}
+
+/** One tab's rows — only the open tab is composed. */
+function tabRows(
+	id: ModelsTab,
+	data: ModelsPageData,
+	view: ModelsView,
+	slots: ModelsPageSlots,
+): RowSpec[] {
+	const scopeName = data.scope?.model.name ?? null;
+	const days = Number.parseInt(view.window, 10);
+	const measured = (slice: keyof Insights) =>
+		data.insightsLoading || (data.insights?.[slice] ?? null) !== null;
+	switch (id) {
+		case "overview":
+			return overviewRows(data, view, slots);
+		case "model":
+			return [
+				{
+					fill: true,
+					panels: [
+						{ kind: "text", options: { text: "" }, render: slots.modelTab },
+					],
+				},
+			];
+		case "database":
+			return databaseRows(data.physical, data.physicalLoading, {
+				...slots.database,
+				scopeName,
+			});
+		case "growth":
+			return measured("growth")
+				? growthRows(data.insights?.growth, data.insightsLoading, {
+						...slots.growth,
+						scopeName,
+						scopeVersion: data.scope?.active
+							? `v${data.scope.active.version}`
+							: null,
+						hueOf: (m) => data.frames.find((f) => f.modelId === m)?.hue,
+						days,
+					})
+				: [notMeasuredRow(slots, id)];
+		case "usage":
+			return measured("usage")
+				? usageRows(data.insights?.usage, data.insightsLoading, {
+						scopeName,
+						days,
+					})
+				: [notMeasuredRow(slots, id)];
+		case "performance":
+			return measured("performance")
+				? performanceRows(
+						data.insights?.performance,
+						data.insights?.overview?.graph_p95 ?? null,
+						data.insightsLoading,
+						{
+							...slots.performance,
+							scopeName,
+							days,
+							marks: data.insights?.growth?.marks ?? [],
+						},
+					)
+				: [notMeasuredRow(slots, id)];
+	}
 }
 
 type Panel = PanelSpec;
@@ -160,25 +250,7 @@ export function modelsPageSpec(
 		id,
 		label: TAB_LABEL[id],
 		locked: locked(id),
-		rows:
-			id !== tab
-				? []
-				: id === "overview"
-					? overviewRows(data, slots)
-					: id === "model"
-						? [
-								{
-									fill: true,
-									panels: [
-										{
-											kind: "text",
-											options: { text: "" },
-											render: slots.modelTab,
-										},
-									],
-								},
-							]
-						: [notMeasuredRow(slots, id)],
+		rows: id !== tab ? [] : tabRows(id, data, view, slots),
 	}));
 
 	return {
@@ -351,7 +423,11 @@ function staged(data: ModelsPageData): StagedSpec | undefined {
 
 // ── Overview ────────────────────────────────────────────────────────────────
 
-function overviewRows(data: ModelsPageData, slots: ModelsPageSlots): RowSpec[] {
+function overviewRows(
+	data: ModelsPageData,
+	view: ModelsView,
+	slots: ModelsPageSlots,
+): RowSpec[] {
 	if (data.loading)
 		return [
 			{
@@ -377,11 +453,18 @@ function overviewRows(data: ModelsPageData, slots: ModelsPageSlots): RowSpec[] {
 				],
 			},
 		];
-	return data.scope ? overviewOne(data, data.scope) : overviewAll(data);
+	return data.scope
+		? overviewOne(data, data.scope, view, slots)
+		: overviewAll(data, view, slots);
 }
 
-function overviewAll(data: ModelsPageData): RowSpec[] {
+function overviewAll(
+	data: ModelsPageData,
+	view: ModelsView,
+	slots: ModelsPageSlots,
+): RowSpec[] {
 	const records = recordsOf(data.counts);
+	const measured = measuredOf(data.insights);
 	const rows = data.models.map((m) => {
 		const frame = data.frames.find((f) => f.modelId === m.id);
 		const types =
@@ -398,6 +481,8 @@ function overviewAll(data: ModelsPageData): RowSpec[] {
 			version: versionLabel(m),
 			types,
 			records: records.counted ? num(total) : "—",
+			...measured(m.id, false),
+			drift: modelDrift(data.physical, m.name),
 		};
 	});
 	const nodeTypes = data.frames.reduce((a, f) => a + f.nodeTypes.length, 0);
@@ -429,9 +514,11 @@ function overviewAll(data: ModelsPageData): RowSpec[] {
 					label: "Records",
 					value: records.counted ? num(recordTotal) : "—",
 					caption: records.counted
-						? "nodes and relationships"
+						? (grewBy(data.insights) ?? "nodes and relationships")
 						: "this database does not count",
 				},
+				...queryTiles(data.insights, false),
+				...driftTile(data.physical),
 			],
 		},
 	};
@@ -446,30 +533,53 @@ function overviewAll(data: ModelsPageData): RowSpec[] {
 				{ key: "version", label: "version" },
 				{ key: "types", label: "types", mono: true, align: "right" },
 				{ key: "records", label: "records", mono: true, align: "right" },
+				...MEASURED_COLUMNS,
+				{ key: "drift", label: "drift" },
 			],
 			rows,
 			rowKey: "id",
 			selectAction: MODELS_ACTIONS.selectModel,
 		},
 	};
-	return [{ panels: [tiles] }, { panels: [table] }];
+	return [
+		{ panels: [tiles] },
+		{ panels: [table] },
+		...lowerRow(data, view, slots, false),
+	];
 }
 
-function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
+function overviewOne(
+	data: ModelsPageData,
+	scope: ModelsScope,
+	view: ModelsView,
+	slots: ModelsPageSlots,
+): RowSpec[] {
+	const measured = measuredOf(data.insights);
 	const records = recordsOf(data.counts);
 	const frame = data.frames.find((f) => f.modelId === scope.model.id);
 	const nodeTypes = frame?.nodeTypes ?? [];
 	const edgeTypes = frame?.edgeTypes ?? [];
+	const changed = new Map(
+		(data.insights?.growth?.rows ?? []).map((r) => [r.key, r.change]),
+	);
+	const change = (kind: string, name: string) => {
+		const v = changed.get(`${kind}:${name}`);
+		return v ? `${v > 0 ? "+" : "−"}${nf.format(Math.abs(v))}` : "—";
+	};
 	const rows = [
 		...nodeTypes.map((t) => ({
 			type: t.name,
 			kind: "node",
 			records: records.counted ? num(records.nodes.get(t.name)) : "—",
+			change: change("node", t.name),
+			...measured(`node:${t.name}`, true),
 		})),
 		...edgeTypes.map((t) => ({
 			type: t.name,
 			kind: "edge",
 			records: records.counted ? num(records.edges.get(t.name)) : "—",
+			change: change("edge", t.name),
+			...measured(`edge:${t.name}`, true),
 		})),
 	];
 	const total = sum(
@@ -490,10 +600,14 @@ function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
 				{
 					label: "Records",
 					value: records.counted ? num(total) : "—",
-					caption: scope.active
-						? `v${scope.active.version} active`
-						: "never published",
+					caption:
+						grewBy(data.insights) ??
+						(scope.active
+							? `v${scope.active.version} active`
+							: "never published"),
 				},
+				...queryTiles(data.insights, true),
+				...driftTile(data.physical),
 				{
 					label: "Staged",
 					value: scope.draft ? String(scope.staged?.count ?? 0) : "—",
@@ -514,13 +628,158 @@ function overviewOne(data: ModelsPageData, scope: ModelsScope): RowSpec[] {
 				{ key: "type", label: "type", mono: true },
 				{ key: "kind", label: "kind" },
 				{ key: "records", label: "records", mono: true, align: "right" },
+				{ key: "change", label: "change", mono: true, align: "right" },
+				...MEASURED_COLUMNS,
 			],
 			rows,
 			rowKey: "type",
 			selectAction: MODELS_ACTIONS.selectType,
 		},
 	};
-	return [{ panels: [tiles] }, { panels: [table] }];
+	return [
+		{ panels: [tiles] },
+		{ panels: [table] },
+		...lowerRow(data, view, slots, true),
+	];
+}
+
+const MEASURED_COLUMNS = [
+	{
+		key: "share",
+		label: "share of queries",
+		mono: true,
+		align: "right" as const,
+	},
+	{ key: "p95", label: "p95", mono: true, align: "right" as const },
+	{ key: "signal", label: "signal" },
+];
+
+const SIGNAL_TEXT: Record<string, string> = {
+	hot_and_slow: "▲ hot and slow",
+	hot: "▲ hot",
+	supernode: "◆ supernode",
+	unused: "○ unused",
+	empty: "○ empty",
+	cold: "○ cold",
+};
+
+/** A row's share, p95 and signals — `—` until the log has measured them (MP22). */
+function measuredOf(insights: Insights | undefined) {
+	const rows = new Map((insights?.overview?.rows ?? []).map((r) => [r.key, r]));
+	return (key: string, one: boolean) => {
+		const r = rows.get(key);
+		if (!insights?.overview || !r) return { share: "—", p95: "—", signal: "—" };
+		return {
+			share: fmtPct(r.share),
+			p95: fmtMs(r.p95),
+			signal:
+				r.signals
+					.map((s) =>
+						one
+							? SIGNAL_TEXT[s.signal]
+							: `${SIGNAL_TEXT[s.signal]} ${s.subject.split(".").pop()}`,
+					)
+					.join(" · ") || "—",
+		};
+	};
+}
+
+/** Queries a day and p95 — left out, never zero, until the log has any (MP22). */
+function queryTiles(insights: Insights | undefined, one: boolean) {
+	const o = insights?.overview;
+	if (!o) return [];
+	return [
+		{
+			label: "Queries a day",
+			// Under ten a day, the tenth is the reading — `0.1`, never a rounded `0`.
+			value:
+				o.queries_a_day < 10
+					? o.queries_a_day.toFixed(1)
+					: fmtNum(o.queries_a_day),
+			caption: one
+				? "touching this model"
+				: `over ${insights?.window.replace("d", " days")}`,
+		},
+		{
+			label: "p95",
+			value: fmtMs(o.p95),
+			caption: one
+				? `the Graph's is ${fmtMs(o.graph_p95)}`
+				: `p50 ${fmtMs(o.p50)}`,
+			tone:
+				one && o.p95 != null && o.graph_p95 != null && o.p95 > o.graph_p95
+					? ("warning" as const)
+					: undefined,
+		},
+	];
+}
+
+/** Needs attention, beside queries by caller (All) or p95 a day (one). */
+function lowerRow(
+	data: ModelsPageData,
+	view: ModelsView,
+	slots: ModelsPageSlots,
+	one: boolean,
+): RowSpec[] {
+	const o = data.insights?.overview;
+	if (!o) return [];
+	const days = Number.parseInt(view.window, 10);
+	return [
+		{
+			panels: [
+				attentionPanel(o, data.physical, one, days, slots.onTab),
+				one
+					? p95Panel(o, data.insights?.growth?.marks ?? [])
+					: callersPanel(o, days),
+			],
+		},
+	];
+}
+
+const fmtNum = (v: number) => nf.format(Math.round(v));
+
+/** `↑ 6.2% in 30 days` — the Records tile's caption once Growth has counted (MP22). */
+function grewBy(insights: Insights | undefined): string | null {
+	const growth = insights?.growth;
+	if (!insights || !growth?.counted) return null;
+	const start = growth.rows.reduce((a, r) => a + (r.start ?? 0), 0);
+	const now = growth.rows.reduce((a, r) => a + (r.now ?? 0), 0);
+	const days = Number.parseInt(insights.window, 10);
+	// Nothing counted before the window: a rise from nothing is not growth.
+	if (!growth.rows.some((r) => r.start != null)) return null;
+	if (now === start) return `unchanged in ${days} days`;
+	const by = start
+		? `${Math.abs(((now - start) / start) * 100).toFixed(1)}%`
+		: nf.format(Math.abs(now - start));
+	return `${now > start ? "↑" : "↓"} ${by} in ${days} days`;
+}
+
+/** Rows that disagree with the models, left out until a mirror exists (MP22). */
+function driftTile(physical: PhysicalSchema | undefined) {
+	const drift = driftCount(physical);
+	if (!drift) return [];
+	return [
+		{
+			label: "Drift",
+			value: String(drift.total),
+			caption: drift.total
+				? `${drift.labels} ${drift.labels === 1 ? "type" : "types"} · ${drift.rules} ${drift.rules === 1 ? "index or constraint" : "indexes and constraints"}`
+				: "in sync with the database",
+			tone: drift.total ? ("warning" as const) : undefined,
+		},
+	];
+}
+
+/** `in sync`, or how many of the model's rows the database lacks (MP9). */
+function modelDrift(physical: PhysicalSchema | undefined, model: string) {
+	if (!physical?.captured_at) return "—";
+	const off = [
+		...physical.labels,
+		...physical.relationship_types,
+		...physical.indexes,
+		...physical.constraints,
+	].filter((r) => r.models.includes(model) && r.drift !== "in_both").length;
+	return off ? `◐ ${off} model only` : "● in sync";
 }
 
 function notMeasuredRow(slots: ModelsPageSlots, tab: ModelsTab): RowSpec {

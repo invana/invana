@@ -99,3 +99,44 @@ export interface GraphVersionResponse {
 	constraints: ConstraintResponse[];
 	indexes: IndexResponse[];
 }
+
+// ── The physical read — the model page's Database tab (MP9) ───────────────
+
+/** How a row stands against the models (the-model-page.md MP9). */
+export type Drift = "in_both" | "model_only" | "database_only";
+
+/** A label or relationship type, and which models declare it (MP17). */
+export interface PhysicalType {
+	name: string;
+	models: string[];
+	/** Live; `null` where the connector cannot count (MP28). */
+	count: number | null;
+	drift: Drift;
+}
+
+/** An index or constraint, matched by what it covers (MP27). */
+export interface PhysicalRule {
+	name: string;
+	label: string;
+	properties: string[];
+	type: string;
+	models: string[];
+	drift: Drift;
+}
+
+export interface PhysicalSchema {
+	/** `null` — never introspected. */
+	captured_at: string | null;
+	/** An import counted after the mirror was captured (MP34). */
+	stale: boolean;
+	connector: string | null;
+	/** Whether the connector lists its indexes and constraints (MP26). */
+	lists_schema: boolean;
+	/** What the scope's models declare — said even where nothing can check them. */
+	declared_indexes: number;
+	declared_constraints: number;
+	labels: PhysicalType[];
+	relationship_types: PhysicalType[];
+	indexes: PhysicalRule[];
+	constraints: PhysicalRule[];
+}

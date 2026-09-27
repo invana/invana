@@ -30,6 +30,7 @@ POST/DELETE       …/edge-types · …/property-keys · …/constraints · …/
 from __future__ import annotations
 
 from http import HTTPStatus
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from pydantic import BaseModel
@@ -41,7 +42,7 @@ from invana.apps.graphs.models import Graph, GraphMember
 from invana.apps.graphs.pool import GraphUnavailableError
 from invana.apps.modeller import starters as starter_models
 from invana.apps.modeller.json_io import SchemaExporter
-from invana.apps.modeller.managers import ModelLifecycleManager
+from invana.apps.modeller.managers import InsightsManager, ModelLifecycleManager
 from invana.apps.modeller.models import GraphModel, GraphVersion
 from invana.apps.modeller.portability import (
     ImportRefused,
@@ -65,6 +66,7 @@ from invana.apps.modeller.schemas import (
     GraphModelUpdate,
     IndexCreate,
     IndexResponse,
+    Insights,
     NodeTypeCreate,
     NodeTypeResponse,
     NodeTypeUpdate,
@@ -72,6 +74,7 @@ from invana.apps.modeller.schemas import (
     PropertyKeyResponse,
     PropertyKeyUpdate,
     SchemaDiff,
+    ShapeCard,
     VersionActivate,
     VersionCreate,
     VersionResponse,
@@ -331,6 +334,56 @@ async def list_starters(
 ) -> list[starter_models.StarterSummary]:
     """The starters shipped with this distribution. Ordinary artefacts (SR1)."""
     return starter_models.summaries()
+
+
+@models_router.get("/insights", response_model=Insights)
+async def get_insights(
+    request: Request,
+    model: str = Query("all", description="A model's id, or `all`"),
+    window: Literal["7d", "30d", "90d"] = Query("30d"),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> Insights:
+    """The model page's measured tabs in one read; a slice it cannot measure is null (the-model-page.md MP33)."""
+    return await InsightsManager().read(
+        session,
+        graph_id=graph.id,
+        model_id=None if model == "all" else model,
+        window=window,
+        connector=await _live_connector(request, session, graph),
+    )
+
+
+@models_router.get("/insights/shapes/{shape_hash}", response_model=ShapeCard)
+async def get_shape(
+    request: Request,
+    shape_hash: str = Path(..., pattern=r"^[0-9a-f]{16}$"),
+    window: Literal["7d", "30d", "90d"] = Query("30d"),
+    _: GraphMember = Depends(require_graph_member),
+    graph: Graph = Depends(resolve_graph_by_username_slug),
+    session: AsyncSession = Depends(get_session),
+) -> ShapeCard:
+    """One query shape: its calls, its plan and the advice read off it (the-model-page.md MP12 · MP39)."""
+    return await InsightsManager().shape(
+        session,
+        graph_id=graph.id,
+        shape_hash=shape_hash,
+        window=window,
+        connector=await _live_connector(request, session, graph),
+    )
+
+
+async def _live_connector(request: Request, session: AsyncSession, graph: Graph):
+    """The Graph's pooled connector, or ``None`` when it is not connected — a read never fails for it."""
+    connection = await GraphManager().get_graph_connection(session, graph_id=graph.id)
+    pool = getattr(request.app.state, "graph_connection_manager", None)
+    if connection is None or pool is None:
+        return None
+    try:
+        return pool.get_connector(connection.id)
+    except GraphUnavailableError:
+        return None
 
 
 @models_router.post(

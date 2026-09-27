@@ -3,7 +3,9 @@ from __future__ import annotations
 from invana.graph.connectors.cypher.connector import CYPHER_PROFILE, OpenCypherConnector
 from invana.graph.types.capabilities import Supports, Version, always
 from invana.graph.types.constants import Capability
+from invana.graph.types.plan import ExplainedPlan
 
+from invana_neo4j.explain import reduce_plan
 from invana_neo4j.querysets.algorithms import Neo4jAlgorithmsQuerySet
 from invana_neo4j.querysets.schema_reader import Neo4jSchemaReaderQuerySet
 from invana_neo4j.querysets.schema_writer import Neo4jSchemaWriterQuerySet
@@ -40,3 +42,10 @@ class Neo4jConnector(OpenCypherConnector):
         self.schema_reader = Neo4jSchemaReaderQuerySet(self)
         self.schema_writer = Neo4jSchemaWriterQuerySet(self)
         self.algorithms = Neo4jAlgorithmsQuerySet(self)
+
+    async def explain(self, query: str, parameters: dict | None = None) -> ExplainedPlan | None:
+        """``EXPLAIN`` straight on the driver — never ``execute``, so it is not logged (MP38)."""
+        async with self._driver.session(database=self._database) as session:
+            result = await session.run(f"EXPLAIN {query}", parameters or {})
+            summary = await result.consume()
+        return reduce_plan(summary.plan) if summary.plan else None

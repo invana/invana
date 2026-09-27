@@ -30,6 +30,7 @@ from invana.apps.graphs.models import Graph
 from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
 from invana.apps.llm.voice import voice_for
+from invana.apps.modeller.managers import CountSnapshotManager
 from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.transcript import (
@@ -44,7 +45,9 @@ from invana.apps.work.models import Task as Todo
 from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
+from invana.core.querylog import calling_as
 from invana.core.telemetry.recorders import add_message_in_flight, record_session_message
+from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
     CannotAnswer,
     Converse,
@@ -57,6 +60,7 @@ from invana.runtime.catalogue import (
     load_global_model,
     load_grounding,
 )
+from invana.runtime.catalogue.records import LoadRefused, connector_for
 from invana.runtime.contention import AgentAtCeiling, AgentSlots, GraphSlots, PoolSlots, Refused
 from invana.runtime.delegation import cost_rollup, descendants
 from invana.runtime.diagnosis import diagnose, internal_failure
@@ -76,9 +80,12 @@ from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.planning import plan_payload, queue_plan_steps
 from invana.runtime.querysets import TaskRunQuerySet
 from invana.runtime.results import run_result, step_result
-from invana.runtime.services import endpoint_for_run
+from invana.runtime.services import BULK_PLAN_KEY, LOAD_PLAN_KEY, endpoint_for_run
 from invana.runtime.stream import Emitter, broadcaster
 from invana.runtime.workflows import WORKFLOWS, Step
+
+#: The plans whose end leaves a count snapshot behind (the-model-page.md MP30).
+_IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 
 log = logging.getLogger(__name__)
 
@@ -354,6 +361,15 @@ class TaskRuntime:
             self._pools.release_run(graph_id=th.graph_id, run_id=run_id)
 
     async def _run_inner(self, run_id: str) -> None:
+        # Every query this run asks is asked for someone — or for no one, and then
+        # it is not logged (the-model-page.md MP35).
+        async with self._factory() as db:
+            th = await TaskRunQuerySet().get(db, run_id)
+            caller = await caller_for(db, th) if th is not None else None
+        with calling_as(caller):
+            await self._run_body(run_id)
+
+    async def _run_body(self, run_id: str) -> None:
         emitter = Emitter(self._factory, run_id)
         started = time.perf_counter()
         async with self._factory() as db:
@@ -1003,6 +1019,8 @@ class TaskRuntime:
             },
             **agent_kwargs,
         )
+        if status is RunStatus.succeeded:
+            await self._count_after_import(db, th)
         await db.commit()
         if th.todo_id and status is RunStatus.succeeded and th.parent_run_id is None:
             await self._settle_task(db, th, v)
@@ -1050,6 +1068,28 @@ class TaskRuntime:
             details={"question": question[:500]},
         )
         await db.commit()
+
+    async def _count_after_import(self, db: AsyncSession, th: TaskRun) -> None:
+        """An import that wrote records leaves a count behind — the Growth line's point (MP14 · MP30).
+
+        Only the root run of `model-import` or `bulk-load`, and only once it has
+        succeeded. The snapshot never fails the run: the records already landed.
+        """
+        if th.parent_run_id is not None or (th.workflow_key or "").split("@")[0] not in _IMPORT_PLAN_KEYS:
+            return
+        try:
+            connector = await connector_for(db, th.graph_id)
+        except LoadRefused:
+            return
+        try:
+            await connector.connect()
+            await CountSnapshotManager().take(
+                db, graph_id=th.graph_id, connector=connector, source="import", source_id=th.id, degrees=True
+            )
+        except Exception:
+            log.warning("No count after import run %s — the database did not answer", th.id, exc_info=True)
+        finally:
+            await connector.disconnect()
 
     async def _settle_task(self, db: AsyncSession, th: TaskRun, v: RunVars) -> None:
         """A finished task run posts a **result**, never `done`.

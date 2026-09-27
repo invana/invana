@@ -148,3 +148,40 @@ class SchemaProjectionView(ModelView):
         "errors",
         "projected_at",
     ]
+
+
+class TypeCountSnapshotView(ModelView):
+    fields = [
+        "id",
+        "graph_id",
+        "at",
+        StringField("source", label="Source"),
+        "source_id",
+        StringField("kind", label="Kind"),
+        "type_name",
+        "count",
+        "max_degree",
+        "median_degree",
+    ]
+    search_fields = ["type_name"]
+
+
+class GraphQueryLogView(ModelView):
+    fields = [
+        "id",
+        "graph_id",
+        "at",
+        "shape_hash",
+        "shape_text",
+        "language",
+        StringField("caller_kind", label="Caller"),
+        "caller_id",
+        "task_run_id",
+        "duration_ms",
+        "rows",
+        "ok",
+        "types_touched",
+        "properties_touched",
+        StringField("touched_from", label="Touched from"),
+    ]
+    search_fields = ["shape_text"]

@@ -17,8 +17,10 @@ enough to read on its own: `records.py` for validating and writing records,
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
+from invana.apps.modeller.managers import CountSnapshotManager
 from invana.graph.loaders import CSVLoader, LoaderConfig
 from invana.runtime.catalogue import stitching
 from invana.runtime.catalogue.contract import Out, RunVars, TaskContext, TaskFailure, Writes
@@ -30,6 +32,8 @@ from invana.runtime.catalogue.records import (
     connector_for,
 )
 from invana.runtime.catalogue.registry import Arg, Bound, Entry, Type, build
+
+logger = logging.getLogger(__name__)
 
 
 def _load(v: RunVars):
@@ -218,6 +222,22 @@ async def commit_stitches(ctx: TaskContext, v: RunVars) -> Out:
             if link.target_version_id != link.source_version_id:
                 writes.wrote(link.target_version_id, edges=done.written)
     await writes.close()
+    if committed.links:
+        # What the commit wrote is a point on the Growth line, named by its run (MP30).
+        try:
+            await connector.connect()
+            await CountSnapshotManager().take(
+                ctx.db,
+                graph_id=ctx.step.graph_id,
+                connector=connector,
+                source="stitch_commit",
+                source_id=_run_id(ctx),
+                degrees=False,
+            )
+        except Exception:
+            logger.warning("No count after stitch commit %s — the database did not answer", _run_id(ctx), exc_info=True)
+        finally:
+            await connector.disconnect()
     return Out(
         detail=f"{committed.written} written · {committed.rejected} rejected",
         input={},

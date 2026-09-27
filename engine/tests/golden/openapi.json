@@ -577,6 +577,59 @@
         "title": "ActorRef",
         "type": "object"
       },
+      "Advice": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "kind": {
+            "const": "missing_index",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "property",
+          "model_id",
+          "model_name",
+          "calls"
+        ],
+        "title": "Advice",
+        "type": "object"
+      },
       "AgentCallableRow": {
         "description": "One callable the envelope allows (C12).",
         "properties": {
@@ -1697,6 +1750,40 @@
         "title": "AssignmentRead",
         "type": "object"
       },
+      "Attention": {
+        "properties": {
+          "signal": {
+            "title": "Signal",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "tab": {
+            "enum": [
+              "usage",
+              "performance",
+              "growth",
+              "database"
+            ],
+            "title": "Tab",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "signal",
+          "subject",
+          "why",
+          "tab"
+        ],
+        "title": "Attention",
+        "type": "object"
+      },
       "AuthResponse": {
         "properties": {
           "access_token": {
@@ -2667,6 +2754,27 @@
         "title": "CalledBy",
         "type": "object"
       },
+      "CallerDay": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "counts"
+        ],
+        "title": "CallerDay",
+        "type": "object"
+      },
       "CancelResponse": {
         "properties": {
           "id": {
@@ -3358,6 +3466,31 @@
           "work_p50_ms"
         ],
         "title": "DailyRow",
+        "type": "object"
+      },
+      "DayValue": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "label",
+          "value"
+        ],
+        "title": "DayValue",
         "type": "object"
       },
       "DeclaredAxes": {
@@ -5305,6 +5438,229 @@
         "title": "GraphUpdate",
         "type": "object"
       },
+      "Growth": {
+        "properties": {
+          "counted": {
+            "title": "Counted",
+            "type": "boolean"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "marks": {
+            "items": {
+              "$ref": "#/components/schemas/GrowthMark"
+            },
+            "title": "Marks",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/GrowthRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/GrowthSeries"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "writes": {
+            "$ref": "#/components/schemas/GrowthWrites"
+          }
+        },
+        "required": [
+          "labels",
+          "series",
+          "marks",
+          "rows",
+          "writes",
+          "counted"
+        ],
+        "title": "Growth",
+        "type": "object"
+      },
+      "GrowthMark": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "import",
+              "stitch_commit"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          }
+        },
+        "required": [
+          "index",
+          "source",
+          "source_id",
+          "at"
+        ],
+        "title": "GrowthMark",
+        "type": "object"
+      },
+      "GrowthRow": {
+        "properties": {
+          "change": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "model",
+              "node",
+              "edge"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WrittenBy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "now": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Now"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "kind",
+          "start",
+          "now",
+          "change",
+          "last"
+        ],
+        "title": "GrowthRow",
+        "type": "object"
+      },
+      "GrowthSeries": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "model",
+              "node",
+              "edge"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "kind",
+          "values"
+        ],
+        "title": "GrowthSeries",
+        "type": "object"
+      },
+      "GrowthWrites": {
+        "properties": {
+          "imports": {
+            "default": 0,
+            "title": "Imports",
+            "type": "integer"
+          },
+          "stitch_commits": {
+            "default": 0,
+            "title": "Stitch Commits",
+            "type": "integer"
+          }
+        },
+        "title": "GrowthWrites",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -5546,6 +5902,64 @@
           }
         },
         "title": "InlinablePlanListResponse",
+        "type": "object"
+      },
+      "Insights": {
+        "properties": {
+          "growth": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Growth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Overview"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "performance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Performance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Usage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "window": {
+            "enum": [
+              "7d",
+              "30d",
+              "90d"
+            ],
+            "title": "Window",
+            "type": "string"
+          }
+        },
+        "required": [
+          "window"
+        ],
+        "title": "Insights",
         "type": "object"
       },
       "LLMCredentialKind": {
@@ -7514,6 +7928,125 @@
         "title": "OperationResponse",
         "type": "object"
       },
+      "Overview": {
+        "properties": {
+          "attention": {
+            "items": {
+              "$ref": "#/components/schemas/Attention"
+            },
+            "title": "Attention",
+            "type": "array"
+          },
+          "by_caller_by_day": {
+            "items": {
+              "$ref": "#/components/schemas/CallerDay"
+            },
+            "title": "By Caller By Day",
+            "type": "array"
+          },
+          "graph_p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Graph P95"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "p95_by_day": {
+            "items": {
+              "$ref": "#/components/schemas/DayValue"
+            },
+            "title": "P95 By Day",
+            "type": "array"
+          },
+          "queries_a_day": {
+            "title": "Queries A Day",
+            "type": "number"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "queries_a_day",
+          "p50",
+          "p95",
+          "graph_p95",
+          "by_caller_by_day",
+          "p95_by_day",
+          "rows",
+          "attention"
+        ],
+        "title": "Overview",
+        "type": "object"
+      },
+      "OverviewRow": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          },
+          "signals": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Signal"
+            },
+            "title": "Signals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "share",
+          "p95"
+        ],
+        "title": "OverviewRow",
+        "type": "object"
+      },
       "ParticipantRead": {
         "properties": {
           "address": {
@@ -7562,6 +8095,69 @@
           "label"
         ],
         "title": "ParticipantRead",
+        "type": "object"
+      },
+      "Performance": {
+        "properties": {
+          "errors": {
+            "title": "Errors",
+            "type": "integer"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "p95_by_day": {
+            "items": {
+              "$ref": "#/components/schemas/DayValue"
+            },
+            "title": "P95 By Day",
+            "type": "array"
+          },
+          "shapes": {
+            "items": {
+              "$ref": "#/components/schemas/ShapeRow"
+            },
+            "title": "Shapes",
+            "type": "array"
+          },
+          "slow_shapes": {
+            "title": "Slow Shapes",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "p50",
+          "p95",
+          "errors",
+          "slow_shapes",
+          "p95_by_day",
+          "shapes"
+        ],
+        "title": "Performance",
         "type": "object"
       },
       "PerformanceTiles": {
@@ -7730,6 +8326,184 @@
           "expired"
         ],
         "title": "PersonalAccessTokenOut",
+        "type": "object"
+      },
+      "PhysicalRule": {
+        "description": "An index or a constraint, matched by what it covers (MP27).",
+        "properties": {
+          "drift": {
+            "enum": [
+              "in_both",
+              "model_only",
+              "database_only"
+            ],
+            "title": "Drift",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "models": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "properties",
+          "type",
+          "drift"
+        ],
+        "title": "PhysicalRule",
+        "type": "object"
+      },
+      "PhysicalSchema": {
+        "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "connector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connector"
+          },
+          "constraints": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PhysicalRule"
+            },
+            "title": "Constraints",
+            "type": "array"
+          },
+          "declared_constraints": {
+            "default": 0,
+            "title": "Declared Constraints",
+            "type": "integer"
+          },
+          "declared_indexes": {
+            "default": 0,
+            "title": "Declared Indexes",
+            "type": "integer"
+          },
+          "indexes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PhysicalRule"
+            },
+            "title": "Indexes",
+            "type": "array"
+          },
+          "labels": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PhysicalType"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "lists_schema": {
+            "title": "Lists Schema",
+            "type": "boolean"
+          },
+          "relationship_types": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PhysicalType"
+            },
+            "title": "Relationship Types",
+            "type": "array"
+          },
+          "stale": {
+            "default": false,
+            "title": "Stale",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "captured_at",
+          "connector",
+          "lists_schema"
+        ],
+        "title": "PhysicalSchema",
+        "type": "object"
+      },
+      "PhysicalType": {
+        "description": "A label or relationship type, and which models declare it (MP17).",
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "drift": {
+            "enum": [
+              "in_both",
+              "model_only",
+              "database_only"
+            ],
+            "title": "Drift",
+            "type": "string"
+          },
+          "models": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "drift"
+        ],
+        "title": "PhysicalType",
         "type": "object"
       },
       "PlanCallerRead": {
@@ -8780,6 +9554,44 @@
           }
         },
         "title": "PropertyKeyUpdate",
+        "type": "object"
+      },
+      "PropertyUse": {
+        "properties": {
+          "cold": {
+            "title": "Cold",
+            "type": "boolean"
+          },
+          "filtered": {
+            "title": "Filtered",
+            "type": "integer"
+          },
+          "ordered": {
+            "title": "Ordered",
+            "type": "integer"
+          },
+          "property": {
+            "title": "Property",
+            "type": "string"
+          },
+          "returned": {
+            "title": "Returned",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "property",
+          "filtered",
+          "returned",
+          "ordered",
+          "cold"
+        ],
+        "title": "PropertyUse",
         "type": "object"
       },
       "PublishMark": {
@@ -11051,6 +11863,233 @@
         "title": "SetupSectionUpdate",
         "type": "object"
       },
+      "ShapeCard": {
+        "properties": {
+          "advice": {
+            "items": {
+              "$ref": "#/components/schemas/Advice"
+            },
+            "title": "Advice",
+            "type": "array"
+          },
+          "callers": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Callers",
+            "type": "object"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "explains": {
+            "title": "Explains",
+            "type": "boolean"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "plan": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Plan",
+            "type": "array"
+          },
+          "slowest": {
+            "items": {
+              "$ref": "#/components/schemas/SlowCall"
+            },
+            "title": "Slowest",
+            "type": "array"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "touched_from": {
+            "enum": [
+              "plan",
+              "results"
+            ],
+            "title": "Touched From",
+            "type": "string"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Types",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hash",
+          "text",
+          "language",
+          "calls",
+          "p50",
+          "p95",
+          "callers",
+          "types",
+          "touched_from",
+          "plan",
+          "slowest",
+          "advice",
+          "explains"
+        ],
+        "title": "ShapeCard",
+        "type": "object"
+      },
+      "ShapeRow": {
+        "properties": {
+          "callers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Callers",
+            "type": "array"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "has_advice": {
+            "title": "Has Advice",
+            "type": "boolean"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "rows": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rows"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "touched_from": {
+            "enum": [
+              "plan",
+              "results"
+            ],
+            "title": "Touched From",
+            "type": "string"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Types",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hash",
+          "text",
+          "callers",
+          "calls",
+          "p50",
+          "p95",
+          "rows",
+          "types",
+          "touched_from",
+          "has_advice"
+        ],
+        "title": "ShapeRow",
+        "type": "object"
+      },
+      "Signal": {
+        "description": "A fixed rule that fired, and what it fired on (MP10).",
+        "properties": {
+          "signal": {
+            "enum": [
+              "unused",
+              "empty",
+              "hot",
+              "hot_and_slow",
+              "supernode",
+              "cold"
+            ],
+            "title": "Signal",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "signal",
+          "subject",
+          "why"
+        ],
+        "title": "Signal",
+        "type": "object"
+      },
       "SkillAgentStanding": {
         "description": "Where this skill stands with one agent \u2014 the Bindings tab's three sections.\n\n``refusal`` is the refusal the bind **would** raise, run as a dry run rather\nthan predicted by the surface\n([BN10](docs/for-developers/modules/skills/features/bindings.md)): a second\nreading of the same rules in TypeScript is a copy to keep in step, and the\ncopy is what goes stale. It is null for an agent already bound \u2014 a bind that\nhappened is not re-litigated by a later guardrail; unbinding is.",
         "properties": {
@@ -12234,6 +13273,60 @@
         "title": "SkillVersionRead",
         "type": "object"
       },
+      "SlowCall": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "caller_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caller Id"
+          },
+          "caller_kind": {
+            "enum": [
+              "agent",
+              "plan",
+              "explorer",
+              "api"
+            ],
+            "title": "Caller Kind",
+            "type": "string"
+          },
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "number"
+          },
+          "task_run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Run Id"
+          }
+        },
+        "required": [
+          "at",
+          "duration_ms",
+          "caller_kind",
+          "caller_id",
+          "task_run_id"
+        ],
+        "title": "SlowCall",
+        "type": "object"
+      },
       "SlowRun": {
         "properties": {
           "ms": {
@@ -12679,6 +13772,52 @@
           }
         },
         "title": "StitchPreview",
+        "type": "object"
+      },
+      "StitchUse": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_crossed": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Crossed"
+          },
+          "pair": {
+            "title": "Pair",
+            "type": "string"
+          },
+          "queries": {
+            "title": "Queries",
+            "type": "integer"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "pair",
+          "kind",
+          "queries",
+          "share",
+          "last_crossed"
+        ],
+        "title": "StitchUse",
         "type": "object"
       },
       "SwitchTemplate": {
@@ -15084,6 +16223,128 @@
         "title": "TypePropertyMappingResponse",
         "type": "object"
       },
+      "Usage": {
+        "properties": {
+          "callers": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Callers",
+            "type": "object"
+          },
+          "explains": {
+            "title": "Explains",
+            "type": "boolean"
+          },
+          "properties": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PropertyUse"
+            },
+            "title": "Properties",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/UsageRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "stitches": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StitchUse"
+            },
+            "title": "Stitches",
+            "type": "array"
+          },
+          "too_few": {
+            "title": "Too Few",
+            "type": "boolean"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "too_few",
+          "callers",
+          "rows",
+          "explains"
+        ],
+        "title": "Usage",
+        "type": "object"
+      },
+      "UsageRow": {
+        "properties": {
+          "by_caller": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Caller",
+            "type": "object"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "model",
+              "node",
+              "edge"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_touched": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Touched"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "queries": {
+            "title": "Queries",
+            "type": "integer"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          },
+          "signals": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Signal"
+            },
+            "title": "Signals",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "kind",
+          "queries",
+          "share",
+          "by_caller",
+          "last_touched"
+        ],
+        "title": "UsageRow",
+        "type": "object"
+      },
       "UserOut": {
         "description": "Returned by /auth/login, /auth/register, /auth/refresh, /auth/me.",
         "properties": {
@@ -15658,6 +16919,42 @@
           "summary"
         ],
         "title": "WorldImpactRead",
+        "type": "object"
+      },
+      "WrittenBy": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "introspect",
+              "import",
+              "stitch_commit"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          }
+        },
+        "required": [
+          "source",
+          "source_id",
+          "at"
+        ],
+        "title": "WrittenBy",
         "type": "object"
       }
     },
@@ -22551,6 +23848,180 @@
         ]
       }
     },
+    "/api/v1/u/{username}/{graphSlug}/models/insights": {
+      "get": {
+        "description": "The model page's measured tabs in one read; a slice it cannot measure is null (the-model-page.md MP33).",
+        "operationId": "get_insights_api_v1_u__username___graphSlug__models_insights_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "A model's id, or `all`",
+            "in": "query",
+            "name": "model",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "description": "A model's id, or `all`",
+              "title": "Model",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Insights"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Insights",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/models/insights/shapes/{shape_hash}": {
+      "get": {
+        "description": "One query shape: its calls, its plan and the advice read off it (the-model-page.md MP12 \u00b7 MP39).",
+        "operationId": "get_shape_api_v1_u__username___graphSlug__models_insights_shapes__shape_hash__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "shape_hash",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f]{16}$",
+              "title": "Shape Hash",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "title": "Window",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShapeCard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Shape",
+        "tags": [
+          "models"
+        ]
+      }
+    },
     "/api/v1/u/{username}/{graphSlug}/models/starters": {
       "get": {
         "description": "The starters shipped with this distribution. Ordinary artefacts (SR1).",
@@ -27590,6 +29061,85 @@
           }
         ],
         "summary": "Get Active Version",
+        "tags": [
+          "schemas"
+        ]
+      }
+    },
+    "/api/v1/u/{username}/{graphSlug}/schema/physical": {
+      "get": {
+        "description": "The Database tab: the mirror, each row marked against the models (the-model-page.md MP9).",
+        "operationId": "get_physical_schema_api_v1_u__username___graphSlug__schema_physical_get",
+        "parameters": [
+          {
+            "description": "Owner username from the URL prefix.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "description": "Owner username from the URL prefix.",
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Graph slug, unique per owner.",
+            "in": "path",
+            "name": "graphSlug",
+            "required": true,
+            "schema": {
+              "description": "Graph slug, unique per owner.",
+              "title": "Graphslug",
+              "type": "string"
+            }
+          },
+          {
+            "description": "A model's id; absent reads every model",
+            "in": "query",
+            "name": "model",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A model's id; absent reads every model",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhysicalSchema"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Physical Schema",
         "tags": [
           "schemas"
         ]

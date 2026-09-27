@@ -102,12 +102,16 @@ class GraphModelQuerySet(VersionScopedQuerySet):
         self, session: AsyncSession, graph_id: str, model_id: str
     ) -> list[tuple[ModelLink, str, str]]:
         """Every active stitch with an end on one of this model's versions, with each end's model name."""
-        versions = select(GraphVersion.id).where(GraphVersion.model_id == model_id)
-        stmt = select(ModelLink).where(
-            ModelLink.graph_id == graph_id,
-            ModelLink.status == "active",
-            or_(ModelLink.source_version_id.in_(versions), ModelLink.target_version_id.in_(versions)),
-        )
+        return await self.active_stitches(session, graph_id, model_id=model_id)
+
+    async def active_stitches(
+        self, session: AsyncSession, graph_id: str, *, model_id: str | None = None
+    ) -> list[tuple[ModelLink, str, str]]:
+        """The Graph's active stitches — or only those binding ``model_id`` — with each end's model name."""
+        stmt = select(ModelLink).where(ModelLink.graph_id == graph_id, ModelLink.status == "active")
+        if model_id is not None:
+            versions = select(GraphVersion.id).where(GraphVersion.model_id == model_id)
+            stmt = stmt.where(or_(ModelLink.source_version_id.in_(versions), ModelLink.target_version_id.in_(versions)))
         links = list((await session.execute(stmt)).scalars().all())
         if not links:
             return []

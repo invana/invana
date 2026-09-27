@@ -68,6 +68,15 @@ class OpenCypherSchemaReaderQuerySet(BaseSchemaReaderQuerySet):
             {r["label"]: int(r["count"]) for r in edges.records},
         )
 
+    async def get_degree_histogram(self, label: str) -> dict[int, int] | None:
+        # A pattern comprehension, not `size((n)--())` (gone in Neo4j 5) nor
+        # `COUNT {}` (not Memgraph's) — the one spelling both answer.
+        label = label.replace("`", "``")
+        response = await self._connector.execute(
+            f"MATCH (n:`{label}`) WITH size([(n)--() | 1]) AS d RETURN d, count(*) AS c"
+        )
+        return {int(r["d"]): int(r["c"]) for r in response.records}
+
     async def get_property_keys(self, label: str) -> list[str]:
         query, params = self._connector.query_builder.get_property_keys(label)
         response = await self._connector.execute(query, params)

@@ -7,6 +7,7 @@ import type {
 	GraphModelUpdate,
 	IdentityMatch,
 	IndexCreate,
+	InsightsWindow,
 	ModelArtefact,
 	ModelLinkDeclare,
 	NodeTypeCreate,
@@ -37,6 +38,62 @@ export function useModelsQuery(
 				includeArchived,
 			}),
 		enabled: !!username && !!graphSlug,
+	});
+}
+
+/** The model page's measured tabs — Overview, Usage, Performance, Growth (MP33). */
+export function useModelInsightsQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	model: string | null,
+	window: InsightsWindow,
+	enabled = true,
+) {
+	return useQuery({
+		queryKey: [
+			"models",
+			username,
+			graphSlug,
+			"insights",
+			model,
+			window,
+		] as const,
+		queryFn: () =>
+			modelsApi.insights(
+				username as string,
+				graphSlug as string,
+				model,
+				window,
+			),
+		enabled: !!username && !!graphSlug && enabled,
+	});
+}
+
+/** The shape card — read when a shape is picked on the Performance tab. */
+export function useShapeQuery(
+	username: string | undefined,
+	graphSlug: string | undefined,
+	hash: string | null,
+	window: InsightsWindow,
+) {
+	return useQuery({
+		queryKey: [
+			"models",
+			username,
+			graphSlug,
+			"insights",
+			"shape",
+			hash,
+			window,
+		] as const,
+		queryFn: () =>
+			modelsApi.shape(
+				username as string,
+				graphSlug as string,
+				hash as string,
+				window,
+			),
+		enabled: !!username && !!graphSlug && !!hash,
 	});
 }
 

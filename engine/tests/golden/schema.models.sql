@@ -240,6 +240,30 @@ CREATE INDEX ix_graph_models_graph_id ON graph_models (graph_id);
 
 CREATE INDEX ix_graph_models_package_id ON graph_models (package_id);
 
+CREATE TABLE graph_query_log (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	shape_hash VARCHAR(16) NOT NULL, 
+	shape_text TEXT NOT NULL, 
+	language VARCHAR(16) NOT NULL, 
+	caller_kind query_caller_kind_enum NOT NULL, 
+	caller_id VARCHAR(64), 
+	task_run_id VARCHAR(36), 
+	duration_ms FLOAT NOT NULL, 
+	rows INTEGER NOT NULL, 
+	ok BOOLEAN NOT NULL, 
+	types_touched JSON NOT NULL, 
+	properties_touched JSON, 
+	touched_from query_touched_from_enum NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_graph_query_log_graph_at ON graph_query_log (graph_id, at);
+
+CREATE INDEX ix_graph_query_log_graph_shape ON graph_query_log (graph_id, shape_hash);
+
 CREATE TABLE graph_versions (
 	id VARCHAR(36) NOT NULL, 
 	model_id VARCHAR(36) NOT NULL, 
@@ -966,6 +990,23 @@ CREATE INDEX ix_todos_parent_id ON todos (parent_id);
 CREATE INDEX ix_todos_project_id ON todos (project_id);
 
 CREATE INDEX ix_todos_status ON todos (status);
+
+CREATE TABLE type_count_snapshots (
+	id VARCHAR(36) NOT NULL, 
+	graph_id VARCHAR(36) NOT NULL, 
+	at TIMESTAMP WITH TIME ZONE NOT NULL, 
+	source count_snapshot_source_enum NOT NULL, 
+	source_id VARCHAR(36), 
+	kind count_snapshot_kind_enum NOT NULL, 
+	type_name VARCHAR(255) NOT NULL, 
+	count INTEGER NOT NULL, 
+	max_degree INTEGER, 
+	median_degree INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(graph_id) REFERENCES graphs (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_type_count_snapshots_graph_at ON type_count_snapshots (graph_id, at);
 
 CREATE TABLE type_property_mappings (
 	id VARCHAR(36) NOT NULL, 

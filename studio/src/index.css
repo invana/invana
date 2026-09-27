@@ -56,6 +56,8 @@
    code block its `code` panel renders through) — dist JS only, no CSS. */
 @source "../node_modules/@invana/dashboard/dist";
 @source "../node_modules/@invana/editor/dist";
+/* And @invana/charts — the chart frames and in-row marks. */
+@source "../node_modules/@invana/charts/dist";
 /* And @invana/canvas-ui — the canvas chrome (notices, status bar, panels). */
 @source "../node_modules/@invana/canvas-ui/dist";
 

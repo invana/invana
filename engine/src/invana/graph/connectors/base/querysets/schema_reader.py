@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import ClassVar
 
 from invana.graph.connectors.base.exceptions import LensViolationError
 from invana.graph.connectors.base.lens import admit_structured
@@ -19,6 +20,11 @@ from invana.graph.types.schema_elements import (
 
 class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
     """Abstract interface for inspecting database schema."""
+
+    # Whether ``get_indexes`` and ``get_constraints`` read the database. False
+    # means an empty answer is *not reported*, never *none* (the-model-page.md
+    # MP26); a reader that runs the vendor's own listing sets it True.
+    lists_schema: ClassVar[bool] = False
 
     @abstractmethod
     async def get_node_labels(self) -> list[str]:
@@ -72,6 +78,15 @@ class BaseSchemaReaderQuerySet(BaseQuerySet, ABC):
         """Return ``{label: count}`` for every edge label, or ``None``.
 
         See :meth:`get_node_label_counts`.
+        """
+        return None
+
+    async def get_degree_histogram(self, label: str) -> dict[int, int] | None:
+        """``{degree: how many nodes of label have it}``, or ``None`` where this vendor cannot say.
+
+        A histogram, not a percentile: the caller reduces it to a max and a
+        median (the-model-page.md MP31), and every vendor can group and count
+        where not every one has ``percentileDisc``.
         """
         return None
 

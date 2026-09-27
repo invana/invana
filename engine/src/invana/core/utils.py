@@ -35,3 +35,18 @@ def import_class_from_dotted_path(dotted: str) -> type:
         return getattr(module, cls_name)
     except AttributeError as exc:
         raise AttributeError(f"Module {module_path!r} has no attribute {cls_name!r}.") from exc
+
+
+def percentile(values: list[float], q: float) -> float | None:
+    """Linear-interpolated percentile; ``None`` over nothing.
+
+    Computed here rather than in SQL — SQLite has no ``percentile_cont``
+    (the-library.md LB36 · the-model-page.md MP16).
+    """
+    if not values:
+        return None
+    ordered = sorted(values)
+    at = (len(ordered) - 1) * q
+    lo = int(at)
+    hi = min(lo + 1, len(ordered) - 1)
+    return ordered[lo] + (ordered[hi] - ordered[lo]) * (at - lo)

@@ -19,6 +19,7 @@ from gremlin_python.driver.driver_remote_connection import DriverRemoteConnectio
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 
+from invana.core.querylog import ObservedQuery, observe
 from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
 from invana.graph.connectors.base.connector import (
     BaseConnector,
@@ -369,12 +370,25 @@ class GremlinConnector(BaseConnector):
                         error_category=exc.category,
                     )
                     raise exc from e
+            duration_ms = (time.perf_counter() - start) * 1000
             record_graph_query(
                 language=language,
                 backend=backend,
-                duration_ms=(time.perf_counter() - start) * 1000,
+                duration_ms=duration_ms,
                 status="success",
                 result_size=len(results),
+            )
+            # A traversal's shape is its bytecode's text (the-model-page.md MP37).
+            observe(
+                lambda caller: ObservedQuery(
+                    caller=caller,
+                    query=str(getattr(traversal_obj, "bytecode", traversal_obj)),
+                    parameters={},
+                    language=language,
+                    duration_ms=duration_ms,
+                    rows=len(results),
+                    ok=True,
+                )
             )
             return results
         finally:

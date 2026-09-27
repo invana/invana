@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
+from invana.apps.modeller.managers.count_snapshots import CountSnapshotManager
 from invana.graph.types.constants import Capability
 
 if TYPE_CHECKING:
@@ -111,8 +112,9 @@ class Introspector:
                 property_mappings=property_mappings,
             )
 
-        # 4. Discover indexes
-        indexes = await reader.get_indexes()
+        # 4. Discover indexes — only where the connector lists them (MP26); an
+        #    empty list from one that cannot is not the database's answer.
+        indexes = await reader.get_indexes() if reader.lists_schema else []
         discovered["indexes"] = len(indexes)
 
         for idx in indexes:
@@ -131,7 +133,7 @@ class Introspector:
                 logger.warning("Failed to import index %s", idx.name, exc_info=True)
 
         # 5. Discover constraints and persist as ConstraintDefinition records
-        constraints = await reader.get_constraints()
+        constraints = await reader.get_constraints() if reader.lists_schema else []
         discovered["constraints"] = len(constraints)
 
         for constraint in constraints:
@@ -160,6 +162,19 @@ class Introspector:
             change_summary="Auto-introspected from live database",
         )
         await session.flush()
+
+        # The mirror is a count too: the Growth line's first point, and the
+        # degrees the supernode signal reads (the-model-page.md MP30).
+        mirror = await self._store.get_graph_model(session, model_id)
+        if mirror is not None and mirror.graph_id:
+            await CountSnapshotManager().take(
+                session,
+                graph_id=mirror.graph_id,
+                connector=connector,
+                source="introspect",
+                source_id=version.id,
+                degrees=True,
+            )
 
         return {
             "version_id": version.id,

@@ -39,6 +39,7 @@ from invana.apps.task_plans.schemas import (
 )
 from invana.apps.work.querysets import TaskQuerySet as TodoQuerySet
 from invana.core.auth.querysets import UserQuerySet
+from invana.core.utils import percentile
 from invana.runtime.layers import layer_for
 from invana.runtime.models import RunStatus, TaskRun
 from invana.runtime.querysets import TaskRunQuerySet
@@ -67,15 +68,7 @@ def _ms(start: datetime | None, end: datetime | None) -> float | None:
     return (end - start).total_seconds() * 1000
 
 
-def _pct(values: list[float], q: float) -> float | None:
-    """Linear-interpolated percentile; ``None`` over nothing."""
-    if not values:
-        return None
-    ordered = sorted(values)
-    at = (len(ordered) - 1) * q
-    lo = int(at)
-    hi = min(lo + 1, len(ordered) - 1)
-    return ordered[lo] + (ordered[hi] - ordered[lo]) * (at - lo)
+_pct = percentile
 
 
 def _mean(values: list[float]) -> float | None:
