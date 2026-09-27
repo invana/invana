@@ -1,123 +1,185 @@
-"""Metric recorders for hot paths whose emit-point can't use ``@capture_metrics``
-(docs/for-developers/modules/operate/features/observability.md).
+"""
+Metric recorders — the one way code outside ``core/telemetry`` records a metric.
 
-The decorator assumes a bound ``self`` and a fixed 4-instrument shape
-(duration/count/errors/in_flight). Three domains don't fit that:
+OpenTelemetry is the optional ``telemetry`` extra, so a connector, the LLM
+client or the runtime must import cleanly without it. Every function here is a
+**no-op when the extra is absent** and never raises, so a metric can never
+fail the work it measures. Durations are passed in seconds.
 
-  - **LLM** (``invana.apps.llm.*``) — ``llm.client.complete_tool`` is a module-level
-    function, and LLM adds token counters.
-  - **Graph query** (``invana.query.graph.*``) — emitted from the connector
-    round-trip, unified across Cypher + Gremlin, with a result-size histogram.
-  - **Session message** (``invana.session.message.*``) — wraps the whole
-    ``send_message`` orchestration.
+Usage
+-----
+    from invana.core.telemetry.recorders import record_graph_query
 
-Every function is a **no-op when the optional ``telemetry`` extra is absent**, so
-engine core (connectors, the LLM client) imports cleanly without OpenTelemetry —
-mirroring the lazy-tracer pattern in those modules.
+    record_graph_query(
+        connector="neo4j", language="cypher", operation="read",
+        outcome="ok", duration_s=0.012, result_size=40,
+    )
+
+Attributes are bounded (see ``metrics.py``): pass kinds, keys and outcomes —
+never a user, run or Graph id. Each recorder names exactly the attributes its
+instrument carries, so a call site cannot widen one by accident.
+
+The instruments are read off ``metrics`` at call time, not bound at import, so
+a test can point one at a local ``MeterProvider`` with ``monkeypatch.setattr``
+and exercise the real recorder against real SDK instruments.
 """
 
 from __future__ import annotations
 
+import logging
+from collections.abc import Callable, Mapping
+
 try:
+    from opentelemetry.metrics import CallbackOptions, Observation
+
     from invana.core.telemetry import metrics as _m
 
     _ENABLED = True
 except ImportError:  # telemetry extra not installed
     _ENABLED = False
 
+logger = logging.getLogger("invana.telemetry")
 
-# ── LLM ───────────────────────────────────────────────────────────────────────
 
-
-def add_llm_in_flight(delta: int, *, provider: str, model_id: str, operation: str) -> None:
-    """Increment (+1) / decrement (-1) the concurrent-LLM-calls gauge."""
+def _safe(record: Callable[[], None]) -> None:
     if not _ENABLED:
         return
-    _m.llm_requests_in_flight.add(delta, {"provider": provider, "model_id": model_id, "operation": operation})
+    try:
+        record()
+    except Exception:
+        logger.debug("A metric could not be recorded", exc_info=True)
+
+
+# ── Runs ─────────────────────────────────────────────────────────────────────
+
+
+def add_run_active(delta: int, *, kind: str, role: str, triggered_by: str) -> None:
+    """+1 when a run is admitted and starts working, -1 when it settles."""
+    _safe(lambda: _m.runs_active.add(delta, {"kind": kind, "role": role, "triggered_by": triggered_by}))
+
+
+def record_run_admitted(*, kind: str, role: str, triggered_by: str, queue_wait_s: float) -> None:
+    """How long a run waited for a slot before it was admitted."""
+    labels = {"kind": kind, "role": role, "triggered_by": triggered_by}
+    _safe(lambda: _m.runs_queue_wait.record(queue_wait_s, labels))
+
+
+def record_run(*, kind: str, role: str, triggered_by: str, outcome: str, duration_s: float) -> None:
+    """One settled run: its working time and one count, by outcome."""
+    labels = {"kind": kind, "role": role, "triggered_by": triggered_by, "outcome": outcome}
+
+    def _record() -> None:
+        _m.runs_duration.record(duration_s, labels)
+        _m.runs_count.add(1, labels)
+
+    _safe(_record)
+
+
+def record_run_step(*, step_key: str, outcome: str, duration_s: float) -> None:
+    """One attempt of one step."""
+    _safe(lambda: _m.runs_step_duration.record(duration_s, {"step_key": step_key, "outcome": outcome}))
+
+
+# ── LLMs ─────────────────────────────────────────────────────────────────────
 
 
 def record_llm_request(
     *,
     provider: str,
-    model_id: str,
-    operation: str,
-    duration_ms: float,
-    status: str,
+    model: str,
+    role: str,
+    outcome: str,
+    duration_s: float,
     input_tokens: int = 0,
     output_tokens: int = 0,
-    error_type: str | None = None,
+    cost_usd: float | None = None,
 ) -> None:
-    """Record one LLM provider call: duration + count always; tokens on success,
-    error counter on failure."""
-    if not _ENABLED:
-        return
-    labels = {"provider": provider, "model_id": model_id, "operation": operation, "status": status}
-    if error_type:
-        labels["error_type"] = error_type
-    _m.llm_request_duration.record(round(duration_ms, 3), labels)
-    _m.llm_request_count.add(1, labels)
-    if status == "failed":
-        _m.llm_request_errors.add(1, labels)
-    else:
-        token_labels = {"provider": provider, "model_id": model_id, "operation": operation}
-        _m.llm_tokens_input.add(input_tokens, token_labels)
-        _m.llm_tokens_output.add(output_tokens, token_labels)
+    """One model provider call: duration and count always; tokens and cost when known.
+
+    ``role`` is what the call was for in the run (the client's operation, e.g.
+    planning or answering). Cost is counted only when the call had a price, so
+    a free local model adds tokens but no spend.
+    """
+
+    def _record() -> None:
+        labels = {"provider": provider, "model": model, "role": role, "outcome": outcome}
+        _m.llms_request_duration.record(duration_s, labels)
+        _m.llms_request_count.add(1, labels)
+        base = {"provider": provider, "model": model}
+        if input_tokens:
+            _m.llms_tokens.add(input_tokens, {**base, "direction": "input"})
+        if output_tokens:
+            _m.llms_tokens.add(output_tokens, {**base, "direction": "output"})
+        if cost_usd:
+            _m.llms_cost.add(cost_usd, base)
+
+    _safe(_record)
 
 
-# ── Graph query (unified: Cypher + Gremlin) ───────────────────────────────────
-
-
-def add_graph_query_in_flight(delta: int, *, language: str, backend: str) -> None:
-    """Increment (+1) / decrement (-1) the concurrent-graph-queries gauge."""
-    if not _ENABLED:
-        return
-    _m.graph_queries_in_flight.add(delta, {"language": language, "backend": backend})
+# ── Graph connectors ─────────────────────────────────────────────────────────
 
 
 def record_graph_query(
     *,
+    connector: str,
     language: str,
-    backend: str,
-    duration_ms: float,
-    status: str,
-    result_size: int = 0,
-    error_type: str | None = None,
-    error_category: str | None = None,
+    operation: str,
+    outcome: str,
+    duration_s: float,
+    result_size: int | None = None,
 ) -> None:
-    """Record one graph query round-trip: duration + count always; result_size on
-    success, error counter on failure."""
-    if not _ENABLED:
-        return
-    labels: dict[str, str] = {"language": language, "backend": backend, "status": status}
-    if error_type:
-        labels["error_type"] = error_type
-    if error_category:
-        labels["error_category"] = error_category
-    _m.graph_query_duration.record(round(duration_ms, 3), labels)
-    _m.graph_query_count.add(1, labels)
-    if status == "failed":
-        _m.graph_query_errors.add(1, labels)
-    else:
-        _m.graph_query_result_size.record(result_size, {"language": language, "backend": backend, "status": status})
+    """One graph query round-trip, Cypher or Gremlin; the result size on success."""
+
+    def _record() -> None:
+        labels = {"connector": connector, "language": language, "operation": operation, "outcome": outcome}
+        _m.graph_query_duration.record(duration_s, labels)
+        _m.graph_query_count.add(1, labels)
+        if result_size is not None:
+            _m.graph_query_result_size.record(result_size, labels)
+
+    _safe(_record)
 
 
-# ── Session message ───────────────────────────────────────────────────────────
+# ── Streams · events · loops ─────────────────────────────────────────────────
 
 
-def add_message_in_flight(delta: int, *, mode: str, surface: str) -> None:
-    """Increment (+1) / decrement (-1) the concurrent-messages gauge."""
-    if not _ENABLED:
-        return
-    _m.session_messages_in_flight.add(delta, {"mode": mode, "surface": surface})
+def add_stream(delta: int, *, stream: str) -> None:
+    """+1 when a server-sent event stream opens, -1 when it closes (``run`` · ``events``)."""
+    _safe(lambda: _m.assistant_streams_active.add(delta, {"stream": stream}))
 
 
-def record_session_message(*, mode: str, surface: str, duration_ms: float, status: str) -> None:
-    """Record one session message round-trip: duration + count always; error
-    counter when ``status == "error"``."""
-    if not _ENABLED:
-        return
-    labels = {"mode": mode, "surface": surface, "status": status}
-    _m.session_message_duration.record(round(duration_ms, 3), labels)
-    _m.session_message_count.add(1, labels)
-    if status == "error":
-        _m.session_message_errors.add(1, labels)
+def record_event(*, action: str) -> None:
+    """One audit event written."""
+    _safe(lambda: _m.events_emitted.add(1, {"action": action}))
+
+
+def record_loop(*, loop: str, duration_s: float, failed: bool) -> None:
+    """One iteration of a background loop, and a failure count when it failed."""
+
+    def _record() -> None:
+        _m.system_loop_duration.record(duration_s, {"loop": loop})
+        if failed:
+            _m.system_loop_failures.add(1, {"loop": loop})
+
+    _safe(_record)
+
+
+# ── Graph connection pool ────────────────────────────────────────────────────
+
+
+def observe_pool(read: Callable[[], Mapping[str, int]]) -> None:
+    """Register the pool gauge; ``read`` returns ``{state: count}`` when collected.
+
+    States are ``healthy`` · ``backoff`` · ``down``. Call once, from the pool's
+    startup. ``read`` runs on the exporter's thread, so it must only read
+    in-memory state — no I/O, no awaiting.
+    """
+
+    def _callback(_options: CallbackOptions):
+        try:
+            return [Observation(n, {"state": state}) for state, n in read().items()]
+        except Exception:
+            logger.debug("The pool gauge could not be read", exc_info=True)
+            return []
+
+    _safe(lambda: _m.meter.create_observable_gauge(_m.POOL_CONNECTIONS, callbacks=[_callback], unit="{connection}"))

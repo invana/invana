@@ -19,6 +19,7 @@ import contextlib
 import logging
 import random
 import time
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -32,7 +33,7 @@ from invana.apps.graphs.pool import GraphConnectionManager
 from invana.apps.llm.pricing import cost_usd
 from invana.apps.llm.voice import voice_for
 from invana.apps.modeller.managers import CountSnapshotManager
-from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus, SessionSurface
+from invana.apps.sessions.models import Session, SessionMessage, SessionMessageStatus
 from invana.apps.sessions.querysets import SessionMessageQuerySet
 from invana.apps.sessions.transcript import (
     _HISTORY_TURNS,
@@ -47,7 +48,7 @@ from invana.core.events import actions
 from invana.core.events.models import ActorKind, ActorType
 from invana.core.events.services import emit_event
 from invana.core.querylog import calling_as
-from invana.core.telemetry.recorders import add_message_in_flight, record_session_message
+from invana.core.telemetry.recorders import add_run_active, record_run, record_run_admitted
 from invana.core.telemetry.spans import add_event, current_ids, current_span_context, set_current
 from invana.runtime.callers import caller_for
 from invana.runtime.catalogue import (
@@ -91,6 +92,15 @@ from invana.runtime.workflows import WORKFLOWS, Step
 _IMPORT_PLAN_KEYS = frozenset({LOAD_PLAN_KEY, BULK_PLAN_KEY})
 
 log = logging.getLogger(__name__)
+
+
+def _seconds_since(then: datetime | None) -> float:
+    """Seconds from *then* to now, never negative; a naive time is read as UTC."""
+    if then is None:
+        return 0.0
+    if then.tzinfo is None:
+        then = then.replace(tzinfo=UTC)
+    return max((_now() - then).total_seconds(), 0.0)
 
 
 class TaskRuntime:
@@ -396,8 +406,20 @@ class TaskRuntime:
             await db.commit()
 
     async def _run_body(self, run_id: str) -> None:
+        """Work one pass of a run: take a slot, build its vars, run the loop, settle.
+
+        **Metrics.** The run's labels are those of its span — ``kind``
+        (``ask_kind``, else ``todo``), ``role`` and ``triggered_by``. The first
+        admission records the wait since the run was queued on
+        ``invana.runs.queue_wait``; a resumed pass, whose row waited on a person
+        rather than a slot, records none. From the moment the row is marked
+        running the pass counts on ``invana.runs.active``, and when it ends —
+        settled, paused for input, cancelled or crashed — it is taken off and
+        recorded once on ``invana.runs.count`` / ``invana.runs.duration`` with
+        its outcome (the loop's label, ``cancelled`` or ``error``). A run
+        refused a slot never worked and records neither.
+        """
         emitter = Emitter(self._factory, run_id)
-        started = time.perf_counter()
         async with self._factory() as db:
             th = await TaskRunQuerySet().get(db, run_id)
             if th is None or th.status not in {RunStatus.queued.value, RunStatus.running.value}:
@@ -407,6 +429,10 @@ class TaskRuntime:
             # (docs/for-developers/modules/agents/features/concurrency-and-contention.md).
             if not await self._await_slot(db, th, emitter):
                 return
+            labels = {"kind": th.ask_kind or "todo", "role": th.role, "triggered_by": th.triggered_by}
+            if th.started_at is None:
+                record_run_admitted(**labels, queue_wait_s=_seconds_since(th.queued_at))
+            started = time.perf_counter()
             # The ask is the run's own columns — there is no second row.
             run_ask = th
             graph = await db.get(Graph, th.graph_id)
@@ -443,11 +469,6 @@ class TaskRuntime:
             answering = cursor.get("question")
             params = run_ask.params or {}
             mode = run_ask.ask_kind
-            surface = (
-                (sess.surface.value if isinstance(sess.surface, SessionSurface) else str(sess.surface))
-                if sess is not None
-                else "task"
-            )
 
             agent = await db.get(Agent, th.agent_id) if th.agent_id else None
             provider = await self._provider_for(db, th=run_ask)
@@ -526,33 +547,29 @@ class TaskRuntime:
             th.started_at = _now()
             th.cursor = None
             await db.commit()
-            add_message_in_flight(1, mode=mode, surface=surface)
-            await emitter.emit(
-                "run.started",
-                {
-                    "run_id": th.id,
-                    "message_id": assistant.id if assistant else None,
-                    "workflow": th.workflow_key,
-                    "agent_id": th.agent_id,
-                    "agent": agent.name if agent else None,
-                    "task_id": th.todo_id,
-                    "started_at": th.started_at,
-                },
-            )
-
-            status_label = "error"
+            add_run_active(1, **labels)
+            outcome = "error"
             try:
-                outcome = await self._loop(db, emitter, th, wf, v, assistant, start_index)
-                status_label = outcome
-            finally:
-                record_session_message(
-                    mode=mode,
-                    surface=surface,
-                    duration_ms=(time.perf_counter() - started) * 1000,
-                    status=status_label,
+                await emitter.emit(
+                    "run.started",
+                    {
+                        "run_id": th.id,
+                        "message_id": assistant.id if assistant else None,
+                        "workflow": th.workflow_key,
+                        "agent_id": th.agent_id,
+                        "agent": agent.name if agent else None,
+                        "task_id": th.todo_id,
+                        "started_at": th.started_at,
+                    },
                 )
-                add_message_in_flight(-1, mode=mode, surface=surface)
-                set_current(**{"invana.outcome": status_label})
+                outcome = await self._loop(db, emitter, th, wf, v, assistant, start_index)
+            except asyncio.CancelledError:
+                outcome = "cancelled"
+                raise
+            finally:
+                add_run_active(-1, **labels)
+                record_run(**labels, outcome=outcome, duration_s=time.perf_counter() - started)
+                set_current(**{"invana.outcome": outcome})
 
     async def _provider_for(self, db: AsyncSession, *, th: TaskRun):
         """The endpoint this run calls — what it recorded, else what its lens casts.

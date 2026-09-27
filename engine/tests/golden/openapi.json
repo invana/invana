@@ -17814,6 +17814,26 @@
         ]
       }
     },
+    "/api/v1/telemetry/metrics": {
+      "post": {
+        "description": "Forward an OTLP/HTTP metric export to the collector.",
+        "operationId": "proxy_metrics_api_v1_telemetry_metrics_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Proxy Metrics",
+        "tags": [
+          "telemetry"
+        ]
+      }
+    },
     "/api/v1/telemetry/traces": {
       "post": {
         "description": "Forward an OTLP/HTTP span export to the collector.",

@@ -7,6 +7,7 @@
  * bounces the user to /login on next render.
  */
 
+import { recordRequest } from "@/services/telemetry/metrics";
 import { type Interaction, startClientSpan } from "@/services/telemetry/tracer";
 import { type Span, SpanStatusCode, propagation } from "@opentelemetry/api";
 import axios, {
@@ -22,8 +23,11 @@ export const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8200";
 const BASE_URL = API_BASE_URL;
 
-/** Carries the per-request telemetry span from request → response interceptor. */
-type TracedConfig = InternalAxiosRequestConfig & { _otelSpan?: Span };
+/** Carries the per-request telemetry span and its start from request → response interceptor. */
+type TracedConfig = InternalAxiosRequestConfig & {
+	_otelSpan?: Span;
+	_otelStart?: number;
+};
 
 declare module "axios" {
 	interface AxiosRequestConfig {
@@ -140,20 +144,34 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 		set: (carrier, key, value) => carrier.set(key, value),
 	});
 	(config as TracedConfig)._otelSpan = client.span;
+	(config as TracedConfig)._otelStart = performance.now();
 	return config;
 });
 
-/** End the request's telemetry span (if any), stamping the HTTP status. */
+/**
+ * End the request's telemetry span (if any), stamping the HTTP status, and
+ * record its `ui.request.duration` under the route template — an error when
+ * the status is 400 or above, or there is none (the request never answered).
+ */
 function endRequestSpan(
 	config: TracedConfig | undefined,
 	status?: number,
 ): void {
 	const span = config?._otelSpan;
 	if (!span) return;
+	const failed = !status || status >= 400;
 	if (status) span.setAttribute("http.response.status_code", status);
-	if (!status || status >= 400) span.setStatus({ code: SpanStatusCode.ERROR });
+	if (failed) span.setStatus({ code: SpanStatusCode.ERROR });
 	span.end();
+	if (config._otelStart !== undefined) {
+		recordRequest(
+			config.url ?? "",
+			failed ? "error" : "ok",
+			(performance.now() - config._otelStart) / 1000,
+		);
+	}
 	config._otelSpan = undefined; // a 401 retry re-runs the interceptor → fresh span
+	config._otelStart = undefined;
 }
 
 // Single-flight refresh: concurrent 401s coalesce onto one /auth/refresh call.

@@ -10,6 +10,8 @@ Each batch written is its own trace: a ``system.query_log`` root span (origin
 each query was asked in — the queue carries that context on the query, so a
 row's write is reachable from the request or run that caused it without the
 write joining that trace. A prune is a ``system.query_log.prune`` root span.
+Each write and each prune is also one iteration on the loop metrics
+(``query_log`` · ``query_log.prune``), a failure when it raised.
 
 A shape is explained once — the first time this process sees it, with that
 call's own parameters (MP38) — and the plan is kept for later calls of it.
@@ -21,6 +23,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import time
 from collections import OrderedDict
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
@@ -29,6 +32,7 @@ from typing import TYPE_CHECKING
 from invana.apps.modeller.models import GraphQueryLog
 from invana.apps.modeller.query_shapes import shape_of
 from invana.apps.modeller.querysets.graph_query_log import GraphQueryLogQuerySet
+from invana.core.telemetry.recorders import record_loop
 from invana.core.telemetry.spans import mark_error, root_span
 
 if TYPE_CHECKING:
@@ -138,14 +142,17 @@ class QueryLogWriter:
             attributes={"invana.query_log.batch": len(batch)},
             links=links,
         ) as s:
+            started, failed = time.perf_counter(), False
             try:
                 rows = [await self._row(q) for q in batch]
                 async with self._factory() as session:
                     await self._log.add_many(session, rows)
                     await session.commit()
             except Exception as exc:
+                failed = True
                 mark_error(s, exc)
                 logger.warning("%d graph queries were not logged", len(batch), exc_info=True)
+            record_loop(loop="query_log", duration_s=time.perf_counter() - started, failed=failed)
 
     async def prune(self) -> None:
         """Delete rows older than ``RETENTION``, inside its own trace.
@@ -154,13 +161,16 @@ class QueryLogWriter:
         and is not raised.
         """
         with root_span("system.query_log.prune", origin="daemon") as s:
+            started, failed = time.perf_counter(), False
             try:
                 async with self._factory() as session:
                     await self._log.prune(session, datetime.now(UTC) - RETENTION)
                     await session.commit()
             except Exception as exc:
+                failed = True
                 mark_error(s, exc)
                 logger.warning("The query log was not pruned", exc_info=True)
+            record_loop(loop="query_log.prune", duration_s=time.perf_counter() - started, failed=failed)
 
     async def _row(self, q: ObservedQuery) -> GraphQueryLog:
         shape_hash, shape_text = shape_of(q.query)

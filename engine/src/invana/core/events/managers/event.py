@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from invana.core.events.models import ActorKind, Event
 from invana.core.events.querysets import EventQuerySet
+from invana.core.telemetry.recorders import record_event
 from invana.core.telemetry.spans import current_ids
 
 # Never stored, whatever a caller passes.
@@ -92,6 +93,10 @@ class EventManager:
         any code path opens the exact step that wrote it in the trace backend.
         Outside any span both are null.
 
+        **Each row counts on ``invana.events.emitted``**, by action, once it is
+        added to the session — the count is of rows written, and a row the
+        caller later rolls back has still been counted.
+
         Sensitive fields in ``details`` (keys matching ``*_hash``, ``*_encrypted``,
         ``password``, ``api_key``, ``secret``, ``token``) are stripped before
         storage. Callers don't need to pre-filter, but they should avoid
@@ -126,4 +131,6 @@ class EventManager:
             trace_id=trace_id,
             span_id=span_id,
         )
-        return await self.events_qs.add(session, event)
+        added = await self.events_qs.add(session, event)
+        record_event(action=action)
+        return added

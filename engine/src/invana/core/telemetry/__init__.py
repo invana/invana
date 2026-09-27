@@ -8,9 +8,8 @@ instrument_process()    Instrument every engine created afterwards (the CLI). Id
 flush_telemetry()       Export what the providers still hold, within a time budget.
 TelemetryMiddleware     Pure-ASGI middleware that spans every HTTP request.
 
-Decorators (import from invana.core.telemetry.decorators):
-  @track()              Wrap any async/sync method in an OTel span.
-  @capture_metrics()    Record domain-specific metrics per method call.
+Metrics are recorded through ``invana.core.telemetry.recorders`` (no-op-safe
+functions over the instrument catalogue in ``metrics.py``).
 
 Everything here is resolved lazily via ``__getattr__`` so that importing the
 package (e.g. ``invana.telemetry.recorders`` from the connector / LLM client) does

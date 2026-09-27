@@ -24,6 +24,7 @@ from contextlib import nullcontext
 from invana.apps.graphs.encryption import decrypt_credentials
 from invana.apps.llm.defaults import DEFAULT_MODEL_ID
 from invana.apps.llm.errors import LLMError
+from invana.apps.llm.pricing import cost_usd
 from invana.apps.llm.providers import anthropic as anthropic_provider
 from invana.apps.llm.providers import claude_agent_sdk as claude_agent_sdk_provider
 from invana.apps.llm.providers import ollama as ollama_provider
@@ -31,7 +32,7 @@ from invana.apps.llm.providers import openai as openai_provider
 from invana.apps.llm.schemas import Exchange, TokenUsage, ToolResult
 from invana.apps.llm_providers.endpoint import LLMEndpoint
 from invana.apps.llm_providers.models import LLMProviderKind
-from invana.core.telemetry.recorders import add_llm_in_flight, record_llm_request
+from invana.core.telemetry.recorders import record_llm_request
 
 # OpenTelemetry lives in the optional ``telemetry`` extra (docs/for-developers/modules/platform/features/telemetry.md ·
 # docs/for-developers/modules/platform/features/telemetry.md); the LLM
@@ -84,8 +85,8 @@ async def complete_tool(
 ) -> ToolResult:
     """Force a schema-valid structured object from ``provider``.
 
-    ``operation`` labels the calling surface (``translate`` / ``propose``) on the
-    ``invana.apps.llm.*`` metrics (docs/for-developers/modules/operate/features/observability.md); it doesn't affect
+    ``operation`` labels the calling surface (``translate`` / ``propose``) as the
+    ``role`` attribute on the ``invana.llms.*`` metrics; it doesn't affect
     behaviour.
 
     Raises ``LLMError`` (user-facing message) on config, transport, or
@@ -109,7 +110,6 @@ async def complete_tool(
     # Accumulate wall-clock across both the initial call and any repair retry, so
     # the reported LLM time covers everything the turn actually spent talking to
     # the provider — not just the last attempt.
-    provider_name = provider.provider.value
     start = time.perf_counter()
     obj, usage = await _invoke(
         dispatch,
@@ -122,7 +122,7 @@ async def complete_tool(
         tool_name,
         timeout_s,
         credential_kind=credential_kind,
-        provider_name=provider_name,
+        endpoint=provider,
         operation=operation,
     )
     if _valid(obj, required):
@@ -153,7 +153,7 @@ async def complete_tool(
         tool_name,
         timeout_s,
         credential_kind=credential_kind,
-        provider_name=provider_name,
+        endpoint=provider,
         operation=operation,
     )
     usage = TokenUsage(
@@ -212,15 +212,34 @@ async def _invoke(
     timeout_s: float,
     *,
     credential_kind: str | None,
-    provider_name: str,
+    endpoint: LLMEndpoint,
     operation: str,
 ) -> tuple[dict | None, TokenUsage]:
-    # One provider round-trip = one span + one metric sample. The corrective
-    # retry is a second call here, so it lands as a second sample — keeping the
-    # ``invana.apps.llm.request.duration`` histogram aligned with the ``llm.generate``
-    # span (docs/for-developers/modules/operate/features/observability.md).
-    add_llm_in_flight(1, provider=provider_name, model_id=model_id, operation=operation)
+    """One provider round-trip: one ``llm.generate`` span and one metric sample.
+
+    The corrective retry is a second call here, so it lands as a second sample,
+    keeping ``invana.llms.request.duration`` aligned with the span count. The
+    sample carries provider · model · role (``operation``) · outcome; on success
+    it adds the tokens by direction and, when the endpoint has a known rate, the
+    spend.
+    """
+    provider_name = endpoint.provider.value
     start = time.perf_counter()
+
+    def _record(outcome: str, usage: TokenUsage | None = None) -> None:
+        tokens_in = usage.input_tokens if usage else 0
+        tokens_out = usage.output_tokens if usage else 0
+        record_llm_request(
+            provider=provider_name,
+            model=model_id,
+            role=operation,
+            outcome=outcome,
+            duration_s=time.perf_counter() - start,
+            input_tokens=tokens_in,
+            output_tokens=tokens_out,
+            cost_usd=cost_usd(endpoint, tokens_in, tokens_out) if usage else None,
+        )
+
     with _llm_span("llm.generate") as span:
         if span is not None:
             span.set_attribute("invana.llm.model_id", model_id)
@@ -237,39 +256,15 @@ async def _invoke(
                 credential_kind=credential_kind,
             )
         except LLMError:
-            record_llm_request(
-                provider=provider_name,
-                model_id=model_id,
-                operation=operation,
-                duration_ms=(time.perf_counter() - start) * 1000,
-                status="failed",
-                error_type="LLMError",
-            )
+            _record("failed")
             raise
         except Exception as exc:  # normalize transport/SDK failures
-            record_llm_request(
-                provider=provider_name,
-                model_id=model_id,
-                operation=operation,
-                duration_ms=(time.perf_counter() - start) * 1000,
-                status="failed",
-                error_type=type(exc).__name__,
-            )
+            _record("failed")
             raise LLMError(f"The LLM provider call failed: {exc}") from exc
-        finally:
-            add_llm_in_flight(-1, provider=provider_name, model_id=model_id, operation=operation)
         if span is not None:
             span.set_attribute("invana.llm.input_tokens", usage.input_tokens)
             span.set_attribute("invana.llm.output_tokens", usage.output_tokens)
-        record_llm_request(
-            provider=provider_name,
-            model_id=model_id,
-            operation=operation,
-            duration_ms=(time.perf_counter() - start) * 1000,
-            status="success",
-            input_tokens=usage.input_tokens,
-            output_tokens=usage.output_tokens,
-        )
+        _record("ok", usage)
         return obj, usage
 
 

@@ -12,6 +12,7 @@
  * reads that as an Authorization fallback on SSE endpoints only.
  */
 
+import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { startAction, withTraceparent } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
@@ -92,7 +93,9 @@ export function useEventStream(props: Props): void {
 		es.onerror = () => {
 			subscribe.fail(new Error("event stream error"));
 			// Browser auto-reconnects EventSource on transient drops; we leave
-			// the retry policy to it. (Future: cap retries + fallback to polling.)
+			// the retry policy to it, and count each drop it is retrying.
+			if (es.readyState === EventSource.CONNECTING)
+				recordStreamReconnect("events");
 		};
 
 		return () => {

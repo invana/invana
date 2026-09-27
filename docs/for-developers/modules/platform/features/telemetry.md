@@ -106,6 +106,8 @@ flowchart TD
 | Thing | Shape |
 |---|---|
 | Transport | OTLP gRPC; `INVANA_TELEMETRY_OTLP_ENDPOINT` · `INVANA_TELEMETRY_SAMPLE_RATIO` (0–1, default 1.0) · resource attributes from settings |
+| Studio's proxy | `INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT` is the collector's OTLP/HTTP **base** URL (`http://hyperdx:4318` in compose); `POST /api/v1/telemetry/traces` forwards to `<base>/v1/traces` and `…/metrics` to `<base>/v1/metrics` |
+| Metrics | exported every few seconds; histograms carry exemplars from sampled spans (trace-based filter), so a slow bucket opens one of its traces |
 | HTTP | pure ASGI middleware; `traceparent` (and `tracestate`) from the header, else from the query parameters of the same name — the header wins; query string recorded with `token` removed; every `/api/v1/telemetry/` proxy path not traced; the only source of request spans |
 | Attributes | `enduser.id` · `invana.principal` (`user · agent · system · external · anonymous`) · `invana.on_behalf_of` · `invana.origin` (`studio · api · cli · schedule · startup · daemon`) · `invana.graph` (`user/graph`) · `invana.graph_id` · `invana.run_id` · `invana.outcome` |
 | Who, on a request | the middleware starts every request `anonymous` from `api`; authentication sets `enduser.id` and principal `user`, with origin `studio` for a session token and `api` for a personal access token; resolving a Graph URL sets `invana.graph` and `invana.graph_id` |
@@ -134,7 +136,9 @@ flowchart TD
 
 ## Metrics
 
-Names follow the modules and, for HTTP and databases, the OpenTelemetry semantic conventions.
+Names follow the modules and, for HTTP and databases, the OpenTelemetry semantic conventions. Durations
+are histograms in seconds. The engine defines every instrument in `core/telemetry/metrics.py` and records
+through `core/telemetry/recorders.py`, whose functions are no-ops without the telemetry extra.
 Attributes are bounded: a metric never carries a user id, a run id or a Graph id — those are on spans
 and logs, and per-Graph product numbers come from the record ([observability](../../operate/features/observability.md) OB1).
 
@@ -142,21 +146,21 @@ and logs, and per-Graph product numbers come from the record ([observability](..
 |---|---|---|
 | `http.server.request.duration` | histogram | `http.request.method` · `http.route` · `http.response.status_code` |
 | `http.server.active_requests` | up-down counter | `http.request.method` · `http.route` |
-| `invana.runs.duration` · `invana.runs.queue_wait` | histogram | `kind` · `role` · `outcome` · `origin` |
-| `invana.runs.count` · `invana.runs.active` | counter · up-down counter | `kind` · `role` · `outcome` · `origin` |
-| `invana.runs.step.duration` | histogram | `step_key` · `outcome` |
+| `invana.runs.duration` · `invana.runs.queue_wait` | histogram | `kind` · `role` · `triggered_by` · `outcome` (duration only) |
+| `invana.runs.count` · `invana.runs.active` | counter · up-down counter | `kind` · `role` · `triggered_by` · `outcome` (count only) |
+| `invana.runs.step.duration` | histogram | `step_key` (the catalogue's task key — a plan's own step ids are unbounded) · `outcome` |
 | `invana.llms.request.duration` · `invana.llms.request.count` | histogram · counter | `provider` · `model` · `role` · `outcome` |
-| `invana.llms.tokens` · `invana.llms.cost` | counter | `provider` · `model` · `direction` (`input · output`) |
-| `invana.graph_connectors.query.duration` · `.count` · `.result_size` | histogram · counter | `connector` · `language` · `operation` · `outcome` |
+| `invana.llms.tokens` · `invana.llms.cost` | counter | `provider` · `model` · `direction` (`input · output`, tokens only) |
+| `invana.graph_connectors.query.duration` · `.count` · `.result_size` | histogram · counter | `connector` (the connector class) · `language` · `operation` (`query`) · `outcome` |
 | `invana.assistant.streams.active` | up-down counter | `stream` (`run · events`) |
 | `invana.events.emitted` | counter | `action` |
 | `invana.system.loop.duration` · `.failures` | histogram · counter | `loop` |
-| `invana.graphs.pool.connections` | observable gauge | `state` (`healthy · backoff · down`) |
+| `invana.graphs.pool.connections` | observable gauge | `state` (`healthy · backoff · down`) — connected · a retry is running · the retry ended without connecting |
 | `ui.action.duration` | histogram | `module` · `action` · `outcome` |
 | `ui.request.duration` | histogram | `http.route` · `outcome` |
 | `ui.web_vitals.{lcp,inp,cls,ttfb}` | histogram | `module` |
-| `ui.stream.reconnects` · `ui.errors` | counter | `stream` · `module` |
-| `ui.canvas.layout.duration` · `ui.canvas.render.duration` | histogram | `layout` · `size_bucket` |
+| `ui.stream.reconnects` · `ui.errors` | counter | `stream` · `module` — `ui.errors` lands with Studio's error logs |
+| `ui.canvas.layout.duration` · `ui.canvas.render.duration` | histogram | `layout` · `size_bucket` — recorded by `@invana/canvas`, not by Studio |
 
 ## Logs
 
@@ -191,8 +195,8 @@ Redaction happens at write, by field name and type, the same rule as events ([au
 | TE15 | Sampling is parent-based on one ratio from settings — 1.0 in dev and compose — and the ratio is on the resource as `invana.telemetry.sample_ratio`. |
 | TE16 | The compose stack points both services at the bundled collector; service names are `invana-studio` and `invana-engine`. |
 | TE17 | Three signals, one job each: traces say what happened to one action, metrics say how often and how slow across all, logs record discrete facts. The trace id joins them — exemplars on metrics, fields on logs. |
-| TE18 | Metric names follow the modules (`invana.<module>.*`, `ui.*`) and OpenTelemetry semantic conventions for HTTP and databases. The per-status counters collapse into one counter with a status attribute; gremlin folds into graph-connector metrics with `connector` as an attribute; `session_*` becomes `invana.assistant.*`. |
-| TE19 | A metric's attributes are bounded. User id, run id and Graph id are never metric attributes. |
+| TE18 | Metric names follow the modules (`invana.<module>.*`, `ui.*`) and OpenTelemetry semantic conventions for HTTP and databases. The per-status counters collapse into one counter with a status attribute; gremlin folds into graph-connector metrics with `connector` as an attribute; an ask is a run, so a session message is measured by `invana.runs.*` and `invana.assistant.*` holds the streams. The engine's unused method-level decorators and their instruments are not kept. |
+| TE19 | A metric's attributes are bounded. User id, run id and Graph id are never metric attributes. A run's metrics use `triggered_by` (`user · schedule · task · delegation`), which the row records; the request's `origin` is on its span. HTTP metrics use the route template — an unmatched path is one fixed value, never the raw path. |
 | TE20 | Studio measures Web Vitals with the `web-vitals` package. |
 | TE21 | Studio sends errors only — uncaught errors, unhandled rejections, error boundaries, failed queries. Warnings and console output stay in the browser. |
 | TE22 | The proxy has three routes — traces, metrics, logs — always mounted, each accepting and dropping when engine telemetry is off (TE6). |

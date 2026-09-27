@@ -8,7 +8,7 @@ from contextlib import nullcontext
 from typing import Any, ClassVar
 
 from invana.core.querylog import ObservedQuery, observe
-from invana.core.telemetry.recorders import add_graph_query_in_flight, record_graph_query
+from invana.core.telemetry.recorders import record_graph_query
 from invana.graph.connectors.base.exceptions import ConnectionError
 from invana.graph.connectors.base.lens import LensCompiler, UnsupportedLensCompiler
 from invana.graph.connectors.base.querysets.algorithms import BaseAlgorithmsQuerySet
@@ -184,8 +184,10 @@ class BaseConnector(ABC):
         the raw
         driver round-trip (``graph.query.db_execute``) from result
         deserialisation (``graph.query.serialize``) — the same FE→BE→FE trace
-        the studio joins via W3C trace-context propagation. Also emits the unified
-        ``invana.query.graph.*`` metrics (docs/for-developers/modules/operate/features/observability.md).
+        the studio joins via W3C trace-context propagation. Also records one
+        ``invana.graph_connectors.query.*`` sample per round-trip, labelled by
+        connector class · language · operation (``query``) · outcome, with the
+        result size (nodes + edges) on success.
         """
         # Time the driver round-trip so the result carries a real duration. The
         # serializers don't populate it (the vendor result summary isn't uniform
@@ -193,8 +195,8 @@ class BaseConnector(ABC):
         # studio shows "0ms" (docs/for-developers/modules/platform/features/telemetry.md). Measure the raw execute only
         # — serialise
         # is our own work and traced separately by the spans below.
-        # Refused here, before the wire and before anything is counted as in
-        # flight: a lens violation is not a query that failed, it is a query that
+        # Refused here, before the wire and before anything is counted: a lens
+        # violation is not a query that failed, it is a query that
         # never ran.
         composed = (
             ComposedQuery.unchanged(query, parameters)
@@ -203,73 +205,68 @@ class BaseConnector(ABC):
         )
 
         language = self._query_language_label()
-        backend = type(self).__name__
-        add_graph_query_in_flight(1, language=language, backend=backend)
+        connector = type(self).__name__
         start = time.perf_counter()
-        try:
-            with _query_span("graph.query.db_execute") as span:
-                try:
-                    raw = await self._execute_raw(composed.executed, composed.parameters, timeout_s=timeout_s)
-                except Exception as exc:
-                    # The span otherwise closes "ok" even though the driver round-trip
-                    # failed — record the real error here so it's visible in OTel.
-                    _record_span_exception(span, exc)
-                    category = getattr(exc, "category", None)
-                    failed_ms = (time.perf_counter() - start) * 1000
-                    record_graph_query(
-                        language=language,
-                        backend=backend,
-                        duration_ms=failed_ms,
-                        status="failed",
-                        error_type=type(exc).__name__,
-                        error_category=str(category) if category else None,
-                    )
-                    observe(
-                        lambda caller: ObservedQuery(
-                            caller=caller,
-                            query=query,
-                            parameters=dict(parameters or {}),
-                            language=language,
-                            duration_ms=failed_ms,
-                            rows=0,
-                            ok=False,
-                        )
-                    )
-                    raise
-            duration_ms = (time.perf_counter() - start) * 1000
-            with _query_span("graph.query.serialize") as span:
-                response = self._serializer.deserialize_graph_response(raw)
-                response.metadata.duration_ms = duration_ms
-                response.metadata.composed = composed
-                node_count = len(response.nodes)
-                edge_count = len(response.edges)
-                if span is not None:
-                    span.set_attribute("invana.graph.node_count", node_count)
-                    span.set_attribute("invana.graph.edge_count", edge_count)
-            record_graph_query(
-                language=language,
-                backend=backend,
-                duration_ms=duration_ms,
-                status="success",
-                result_size=node_count + edge_count,
-            )
-            # After the answer, and never in its way (the-model-page.md MP36).
-            observe(
-                lambda caller: ObservedQuery(
-                    caller=caller,
-                    query=query,
-                    parameters=dict(parameters or {}),
+        with _query_span("graph.query.db_execute") as span:
+            try:
+                raw = await self._execute_raw(composed.executed, composed.parameters, timeout_s=timeout_s)
+            except Exception as exc:
+                # The span otherwise closes "ok" even though the driver round-trip
+                # failed — record the real error here so it's visible in OTel.
+                _record_span_exception(span, exc)
+                failed_ms = (time.perf_counter() - start) * 1000
+                record_graph_query(
+                    connector=connector,
                     language=language,
-                    duration_ms=duration_ms,
-                    rows=len(response.records) or node_count + edge_count,
-                    ok=True,
-                    node_labels={n.label for n in response.nodes},
-                    edge_labels={e.label for e in response.edges},
+                    operation="query",
+                    outcome="failed",
+                    duration_s=failed_ms / 1000,
                 )
+                observe(
+                    lambda caller: ObservedQuery(
+                        caller=caller,
+                        query=query,
+                        parameters=dict(parameters or {}),
+                        language=language,
+                        duration_ms=failed_ms,
+                        rows=0,
+                        ok=False,
+                    )
+                )
+                raise
+        duration_ms = (time.perf_counter() - start) * 1000
+        with _query_span("graph.query.serialize") as span:
+            response = self._serializer.deserialize_graph_response(raw)
+            response.metadata.duration_ms = duration_ms
+            response.metadata.composed = composed
+            node_count = len(response.nodes)
+            edge_count = len(response.edges)
+            if span is not None:
+                span.set_attribute("invana.graph.node_count", node_count)
+                span.set_attribute("invana.graph.edge_count", edge_count)
+        record_graph_query(
+            connector=connector,
+            language=language,
+            operation="query",
+            outcome="ok",
+            duration_s=duration_ms / 1000,
+            result_size=node_count + edge_count,
+        )
+        # After the answer, and never in its way (the-model-page.md MP36).
+        observe(
+            lambda caller: ObservedQuery(
+                caller=caller,
+                query=query,
+                parameters=dict(parameters or {}),
+                language=language,
+                duration_ms=duration_ms,
+                rows=len(response.records) or node_count + edge_count,
+                ok=True,
+                node_labels={n.label for n in response.nodes},
+                edge_labels={e.label for e in response.edges},
             )
-            return response
-        finally:
-            add_graph_query_in_flight(-1, language=language, backend=backend)
+        )
+        return response
 
     async def explain(self, query: str, parameters: dict | None = None) -> ExplainedPlan | None:
         """The plan ``query`` would run, without running it — or ``None`` where this vendor cannot say.

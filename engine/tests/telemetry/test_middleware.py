@@ -1,19 +1,24 @@
 """TelemetryMiddleware tests: credentials never reach a span, the proxy is not traced,
-and the caller's trace context is adopted from the header or, failing that, the URL.
+the caller's trace context is adopted from the header or, failing that, the URL,
+and every request is one HTTP semantic-convention sample on its route template.
 
 A tiny Starlette app is wrapped in the real middleware and driven over ASGI with
 httpx. The middleware's tracer is pointed at a local provider that keeps spans in
-memory, so the test reads exactly what would have been exported.
+memory, so the test reads exactly what would have been exported; the metric test
+points the middleware's HTTP instruments at a local provider the same way.
 """
 
 from __future__ import annotations
 
 import httpx
 import pytest
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import InMemoryMetricReader
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 from starlette.responses import PlainTextResponse
 from starlette.routing import Route
 
@@ -93,3 +98,35 @@ async def test_traceparent_header_wins_over_query_param(exporter: InMemorySpanEx
 
     (span,) = exporter.get_finished_spans()
     assert span.context.trace_id == int(header_trace, 16)
+
+
+async def test_request_records_duration_on_the_route_template(exporter, monkeypatch) -> None:
+    """The duration and active-request samples carry the route template, never the raw path."""
+    reader = InMemoryMetricReader()
+    meter = MeterProvider(metric_readers=[reader]).get_meter("test.invana.api")
+    monkeypatch.setattr(_mw, "http_server_duration", meter.create_histogram("http.server.request.duration"))
+    monkeypatch.setattr(_mw, "http_server_active", meter.create_up_down_counter("http.server.active_requests"))
+
+    async def ok(request):
+        return PlainTextResponse("ok")
+
+    app = Starlette(routes=[Route("/runs/{run_id}", ok)], middleware=[Middleware(TelemetryMiddleware)])
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        assert (await client.get("/runs/r-123")).status_code == 200
+
+    points = {
+        m.name: list(m.data.data_points)
+        for rm in reader.get_metrics_data().resource_metrics
+        for sm in rm.scope_metrics
+        for m in sm.metrics
+    }
+    (duration,) = points["http.server.request.duration"]
+    assert dict(duration.attributes) == {
+        "http.request.method": "GET",
+        "http.route": "/runs/{run_id}",
+        "http.response.status_code": 200,
+    }
+    assert duration.count == 1
+    (active,) = points["http.server.active_requests"]
+    assert active.attributes["http.route"] == "/runs/{run_id}"
+    assert active.value == 0

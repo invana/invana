@@ -9,6 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { API_BASE_URL, request } from "@/services/api/client";
+import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";
 import type { Emission, EmissionKind, TemplateOffer } from "@/types/emission";
 import type { QueryResponse } from "@/types/query";
@@ -261,7 +262,9 @@ export const runsApi = {
 		es.onerror = () => {
 			// CLOSED means the browser stopped retrying (or the server ended the
 			// stream without a terminal frame we saw); CONNECTING is a transient
-			// drop it will recover from with Last-Event-ID.
+			// drop it will recover from with Last-Event-ID, counted as a reconnect.
+			if (es.readyState === EventSource.CONNECTING)
+				recordStreamReconnect("run");
 			if (es.readyState === EventSource.CLOSED) opts.onError?.();
 		};
 		return handle;

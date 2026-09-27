@@ -40,8 +40,10 @@
 		"@invana/ui": "^0.0.31",
 		"@opentelemetry/api": "1.9.1",
 		"@opentelemetry/context-zone": "2.8.0",
+		"@opentelemetry/exporter-metrics-otlp-http": "0.219.0",
 		"@opentelemetry/exporter-trace-otlp-http": "0.219.0",
 		"@opentelemetry/resources": "2.8.0",
+		"@opentelemetry/sdk-metrics": "2.8.0",
 		"@opentelemetry/sdk-trace-web": "2.8.0",
 		"@tanstack/react-query": "^5.0.0",
 		"axios": "^1.7.0",
@@ -54,6 +56,7 @@
 		"react-hook-form": "^7.0.0",
 		"react-router-dom": "^7.0.0",
 		"sonner": "^2.0.7",
+		"web-vitals": "6.2.2",
 		"zustand": "^5.0.0"
 	},
 	"devDependencies": {

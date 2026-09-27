@@ -10,6 +10,15 @@ Responsibilities
 
 All internal state (``_registry``, ``_retry_tasks``) is private — routes must not
 access these directly.
+
+Metrics
+-------
+- ``invana.graphs.pool.connections`` — an observable gauge by state (healthy ·
+  backoff · down), read off the pool's memory when the exporter collects. It is
+  registered once per process; the pool started last is the one it reads.
+- ``invana.system.loop.*`` — each health sweep is one ``graph_health``
+  iteration, each reconnect attempt one ``graph_reconnect`` iteration, a
+  failure when a check or the attempt failed.
 """
 
 from __future__ import annotations
@@ -27,6 +36,7 @@ from invana.core.events import actions as event_actions
 from invana.core.events.models import ActorType
 from invana.core.events.services import emit_event
 from invana.core.settings import settings
+from invana.core.telemetry.recorders import observe_pool, record_loop
 from invana.core.telemetry.spans import add_event, mark_error, root_span, set_current
 from invana.core.utils import import_class_from_dotted_path
 from invana.graph.types.capabilities import CompatibilityStatus, Version
@@ -41,6 +51,15 @@ if TYPE_CHECKING:
     from invana.graph.connectors.base.connector import BaseConnector
 
 logger = logging.getLogger(__name__)
+
+# The pool the connections gauge reads, and whether the gauge is registered.
+_gauge_pool: ConnectionPool | None = None
+_gauge_registered = False
+
+
+def _read_gauge_pool() -> dict[str, int]:
+    pool = _gauge_pool
+    return pool._pool_states() if pool is not None else {}
 
 
 class GraphUnavailableError(Exception):
@@ -90,10 +109,14 @@ class ConnectionPool:
             self._spawn(self._connect_graph(graph))
 
         self._health_task = asyncio.create_task(self._health_loop())
+        self._observe()
         logger.info("GraphConnectionManager started. Connecting %d graph(s).", len(graphs))
 
     async def shutdown(self) -> None:
         """Cancel background tasks and disconnect all connectors gracefully."""
+        global _gauge_pool  # noqa: PLW0603 — the gauge's one reference to the live pool
+        if _gauge_pool is self:
+            _gauge_pool = None
         if self._health_task:
             self._health_task.cancel()
 
@@ -109,6 +132,46 @@ class ConnectionPool:
         self._registry.clear()
         self._retry_tasks.clear()
         logger.info("GraphConnectionManager shut down.")
+
+    # -----------------------------------------------------------------------
+    # Metrics
+    # -----------------------------------------------------------------------
+
+    def _observe(self) -> None:
+        """Point the connections gauge at this pool, registering it on first use.
+
+        The gauge is registered once per process, so a second pool (a test's)
+        does not add a second callback; it only becomes the pool that is read.
+        """
+        global _gauge_pool, _gauge_registered  # noqa: PLW0603 — one gauge per process
+        _gauge_pool = self
+        if not _gauge_registered:
+            observe_pool(_read_gauge_pool)
+            _gauge_registered = True
+
+    def _pool_states(self) -> dict[str, int]:
+        """Connections by state, read from memory only (the exporter's thread calls it).
+
+        - ``healthy`` — connectors in the registry: connected and passing checks.
+        - ``backoff`` — connections not in the registry whose retry task is still
+          alive: waiting to try again.
+        - ``down`` — connections not in the registry whose retry task has ended
+          without connecting (it died on an error before it could reschedule):
+          nothing is retrying them until a reconnect or a restart.
+
+        A connection whose first connect is still in flight is in none of them.
+        """
+        registry = self._registry
+        healthy = len(registry)
+        backoff = down = 0
+        for graph_id, task in tuple(self._retry_tasks.items()):
+            if graph_id in registry:
+                continue
+            if task.done():
+                down += 1
+            else:
+                backoff += 1
+        return {"healthy": healthy, "backoff": backoff, "down": down}
 
     # -----------------------------------------------------------------------
     # Public API — used by route handlers
@@ -292,6 +355,7 @@ class ConnectionPool:
                 origin="daemon",
                 attributes={"invana.graph_id": graph.graph_id, "invana.connection_id": graph.id},
             ) as attempt:
+                started = time.perf_counter()
                 async with self._session_factory() as session:
                     fresh_graph = await GraphConnectionQuerySet().get(session, graph.id)
 
@@ -307,10 +371,12 @@ class ConnectionPool:
                     if fresh_graph.id not in self._registry:
                         raise RuntimeError("connection attempt failed")
                     set_current(**{"invana.outcome": "ok"})
+                    record_loop(loop="graph_reconnect", duration_s=time.perf_counter() - started, failed=False)
                     self._retry_tasks.pop(graph.id, None)
                     return  # success
                 except Exception as exc:
                     set_current(**{"invana.outcome": "failed"})
+                    record_loop(loop="graph_reconnect", duration_s=time.perf_counter() - started, failed=True)
                     mark_error(attempt, exc)
                     delay = min(delay * 2, settings.graph_retry_max_interval_s)
                     logger.debug("Graph %r retry in %ds.", graph.id, delay)
@@ -343,8 +409,10 @@ class ConnectionPool:
                 origin="daemon",
                 attributes={"invana.graph.connections": len(self._registry)},
             ):
+                started = time.perf_counter()
                 failed = await self._health_sweep()
                 set_current(**{"invana.outcome": "degraded" if failed else "ok"})
+                record_loop(loop="graph_health", duration_s=time.perf_counter() - started, failed=failed > 0)
 
     async def _health_sweep(self) -> int:
         """Check every registered connector once; return how many failed."""

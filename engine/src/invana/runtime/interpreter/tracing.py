@@ -55,12 +55,14 @@ Everything here goes through ``invana.core.telemetry.spans``, so without the
 from __future__ import annotations
 
 import asyncio
+import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from invana.core.telemetry.recorders import record_run_step
 from invana.core.telemetry.spans import mark_error, span
 from invana.runtime.catalogue import CannotAnswer, Converse, NeedsInput, TaskFailure
 from invana.runtime.models import TaskRun
@@ -123,6 +125,10 @@ def step_span(row: TaskRun, attempt: int) -> Iterator[Any]:
     never errors), ``failed`` for a ``TaskFailure``, ``error`` for anything
     else, ``cancelled`` on stop — and always re-raises, so the loop's own
     ``except`` clauses settle the row exactly as before.
+
+    The same attempt is one point on ``invana.runs.step.duration`` with that
+    outcome. Its ``step_key`` label is the row's catalogue ``task_key``: a
+    plan's own step ids are written by the planner and would not stay bounded.
     """
     attributes = {
         "invana.run_id": row.parent_run_id,
@@ -131,20 +137,23 @@ def step_span(row: TaskRun, attempt: int) -> Iterator[Any]:
         "invana.step_key": row.step_key,
         "invana.run.attempt": attempt,
     }
+    outcome = "ok"
+    started = time.perf_counter()
     with span("invana.run.step", attributes, record_errors=False) as s:
         try:
             yield s
         except asyncio.CancelledError:
-            _set_outcome(s, "cancelled")
+            outcome = "cancelled"
             raise
         except Exception as exc:
             outcome = next((label for cls, label in _STEP_OUTCOMES if isinstance(exc, cls)), None)
             if outcome is None:
                 outcome = "failed" if isinstance(exc, TaskFailure) else "error"
                 mark_error(s, exc)
-            _set_outcome(s, outcome)
             raise
-        _set_outcome(s, "ok")
+        finally:
+            _set_outcome(s, outcome)
+            record_run_step(step_key=row.task_key, outcome=outcome, duration_s=time.perf_counter() - started)
 
 
 async def delegation_links(db: AsyncSession, th: TaskRun, open_runs: Mapping[str, Any]) -> tuple[Any, ...]:

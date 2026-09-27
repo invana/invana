@@ -37,6 +37,7 @@ import {
 	propagation,
 	trace,
 } from "@opentelemetry/api";
+import { recordAction } from "./metrics";
 
 export type SpanAttributes = Record<string, string | number | boolean>;
 
@@ -81,6 +82,10 @@ function tracer() {
  * Open the root span for a user action, `ui.<module>.<action>`. It starts a new
  * trace — never a child of whatever else is on screen — and stays open until
  * the handle's `end` or `fail` is called.
+ *
+ * Ending the handle also records one `ui.action.duration` point, labelled with
+ * the module, the action and the outcome (`ok` when none is given, `error` on
+ * `fail`) — so action latency is a metric even where the trace was sampled out.
  */
 export function startAction(
 	module: string,
@@ -100,12 +105,19 @@ export function startAction(
 		},
 		ROOT_CONTEXT,
 	);
+	const started = performance.now();
 	let ended = false;
 	const end = (outcome?: string) => {
 		if (ended) return;
 		ended = true;
 		if (outcome) span.setAttribute("invana.outcome", outcome);
 		span.end();
+		recordAction(
+			module,
+			action,
+			outcome ?? "ok",
+			(performance.now() - started) / 1000,
+		);
 	};
 	return {
 		span,

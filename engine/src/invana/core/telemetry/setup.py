@@ -30,8 +30,10 @@ Instruments:
                       telemetry proxy suppresses it for its own forward)
   - Python logging   (every record shipped over OTLP carries its span context; the
                       console format gets trace ids from the logging filters)
-  - Custom spans     (via @track decorator)
-  - Custom metrics   (via @capture_metrics decorator and metrics.py instruments)
+  - Metrics          (the catalogue in metrics.py, recorded by the middleware and,
+                      everywhere else, through the no-op-safe recorders.py; every
+                      histogram point keeps exemplars from sampled spans, so a
+                      slow bucket links to a trace that filled it)
 
 Sampling:
   Traces are sampled by trace id at ``sample_ratio`` for new root traces; a request
@@ -56,7 +58,7 @@ from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics import MeterProvider, TraceBasedExemplarFilter
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.sdk.trace import TracerProvider
@@ -233,9 +235,19 @@ def _setup_traces(resource: Resource, endpoint: str, sample_ratio: float) -> Non
 
 
 def _setup_metrics(resource: Resource, endpoint: str) -> None:
+    """Export metrics every five seconds, with exemplars taken only from sampled spans.
+
+    The trace-based filter keeps an exemplar when the measurement was made
+    inside a sampled span, so an exemplar always points at a trace the backend
+    actually has.
+    """
     exporter = OTLPMetricExporter(endpoint=endpoint)
     reader = PeriodicExportingMetricReader(exporter, export_interval_millis=5_000)
-    provider = MeterProvider(resource=resource, metric_readers=[reader])
+    provider = MeterProvider(
+        resource=resource,
+        metric_readers=[reader],
+        exemplar_filter=TraceBasedExemplarFilter(),
+    )
     metrics.set_meter_provider(provider)
 
 

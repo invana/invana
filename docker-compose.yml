@@ -85,7 +85,7 @@ services:
       # When on, spans, metrics and logs go to that collector by service name.
       INVANA_TELEMETRY_ENABLED: ${INVANA_TELEMETRY_ENABLED:-false}
       INVANA_TELEMETRY_OTLP_ENDPOINT: http://hyperdx:4317
-      INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT: http://hyperdx:4318/v1/traces
+      INVANA_TELEMETRY_OTLP_HTTP_ENDPOINT: http://hyperdx:4318
     volumes:
       # Whole repo, not just engine/ — engine/pyproject.toml path-depends on
       # the sibling integrations/invana-* packages (editable).
