@@ -48,6 +48,7 @@ export type {
 	ClickBehaviour,
 	DeclaredKind,
 	DeclaredKindSpec,
+	OpenBoard,
 } from "@/pages/graphs-detail/features/boards/boardKinds";
 
 // A report — the act that keeps a live dashboard's numbers, and the page that

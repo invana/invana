@@ -25,6 +25,7 @@ import {
 	type CanvasKind,
 	DECLARED_KINDS,
 	type DeclaredKind,
+	type OpenBoard,
 	boardPageId,
 	declaredPage,
 	parseBoardPageId,
@@ -66,7 +67,13 @@ import {
 } from "@/pages/graphs-detail/features/explorer";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
-import { useExpandNode } from "@/pages/graphs-detail/features/explorer";
+import {
+	adaptItems,
+	expandRefusal,
+	isCanvasStateSnapshot,
+	resultToItems,
+	useExpandNode,
+} from "@/pages/graphs-detail/features/explorer";
 import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 import type {
@@ -152,7 +159,6 @@ import type {
 	QueryResultItem,
 	QueryRunPayload,
 } from "@/types/query";
-import type { CanvasStateSnapshot } from "@invana/canvas";
 import { CanvasContext, canUseWebGPU } from "@invana/canvas-react";
 import {
 	type BoardHeaderAction,
@@ -161,11 +167,7 @@ import {
 	CanvasMessageBar,
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
-import type {
-	GraphData as EngineGraphData,
-	GraphCanvas,
-	GraphLayer,
-} from "@invana/graph";
+import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import { Button, EmptyState, ErrorBoundary, Spinner, cn } from "@invana/ui";
 import {
 	HelpCircle,
@@ -188,42 +190,6 @@ import { toast } from "sonner";
 /** The page that is always open and can never be closed (graph-detail-page.md G6). */
 const GRAPH_PAGE_ID = "graph";
 
-/**
- * A declared board the tab strip is holding open.
- *
- * `subjectId` is the record every panel on it binds to — a run's id, one
- * attempt of a task, a skill, a rule. `runId` is the trace the three
- * trace-reading kinds share, which is why a step board carries it rather than
- * fetching its own (see-what-ran.md SR30 · SR36).
- *
- * **It is optional, because a skill has no run** (skills-dashboards.md SD3).
- * Carrying a placeholder one would put a fact on the record that nothing wrote
- * and something would eventually read.
- */
-interface OpenBoard {
-	kind: DeclaredKind;
-	subjectId: string;
-	runId?: string;
-	/**
-	 * Set when the page is a **report** — a frozen reading of this board
-	 * ([B12](../../../docs/for-developers/building-engine/boards-migration.md)).
-	 * `kind:id` is live, `kind:id@version` is frozen: one parser, and the page
-	 * id carries which you are looking at rather than a flag beside it.
-	 */
-	versionId?: string;
-	/**
-	 * A step board opened **cold** — a reload, or a link — while it reads which
-	 * run it belongs to ([SR44](../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
-	 * The tab is there immediately and says it is loading; without the flag the
-	 * page would draw [B17](../../../docs/for-developers/building-engine/boards-migration.md)'s
-	 * refusal for the half-second before the answer arrives, which is a refusal
-	 * that is not true yet.
-	 */
-	resolvingRun?: boolean;
-	/** Open the run with this step inside it (SR72) — written as `&step=`. */
-	stepId?: string;
-}
-
 // Fallback when the engine hasn't reported any query languages yet (e.g. the
 // connector class couldn't be loaded server-side). Studio shows both rather
 // than blocking the user.
@@ -232,23 +198,6 @@ const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
 	"gremlin",
 ];
 
-/**
- * A saved canvas state, as the engine will accept it. `canvas_states.snapshot`
- * is `Record<string, unknown>` on the wire, so this is the one place the shape
- * is established — the envelope only, since the engine validates the rest.
- */
-function isCanvasStateSnapshot(
-	value: Record<string, unknown>,
-): value is Record<string, unknown> & CanvasStateSnapshot {
-	return (
-		typeof value.version === "number" &&
-		typeof value.view === "object" &&
-		value.view !== null &&
-		typeof value.data === "object" &&
-		value.data !== null
-	);
-}
-
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
 
@@ -256,66 +205,6 @@ const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
 // fresh capture per this window. Also the cadence of the periodic autosave that
 // keeps the sessions-list preview current (docs/for-developers/modules/explore/features/boards.md Part A).
 const BANNER_MIN_INTERVAL_MS = 10_000;
-
-// Map query-result items (vertices / edges) to the canvas engine's GraphData
-// shape: the label rides as `type` (colour-by-label + the Inspector's Type row)
-// and the properties as `data`. Shared by the full-paint seed and the
-// incremental node-expand append (docs/for-developers/modules/explore/features/graph-canvas.md).
-function adaptItems(items: QueryResultItem[]): EngineGraphData {
-	const nodes: EngineGraphData["nodes"] = [];
-	const edges: EngineGraphData["edges"] = [];
-	for (const item of items) {
-		if (item.type === "vertex") {
-			nodes.push({
-				id: String(item.id),
-				type: item.label,
-				data: item.properties,
-			});
-		} else if (item.type === "edge") {
-			edges.push({
-				id: String(item.id),
-				source: String(item.source),
-				target: String(item.target),
-				type: item.label,
-				data: item.properties,
-			});
-		}
-	}
-	return { nodes, edges };
-}
-
-// Dedupe a graph query result into canvas items (vertices + edges), keeping the
-// first occurrence of each id — the same normalization `paintCanvas` does, reused
-// to seed a new canvas's snapshot. Empty for a non-graph / null result.
-function resultToItems(result: QueryResponse | null): QueryResultItem[] {
-	if (result?.result_type !== "graph" || !result.data) return [];
-	const nodeMap = new Map<string, QueryResultItem>();
-	for (const n of result.data.nodes) {
-		const id = String(n.id);
-		if (!nodeMap.has(id)) nodeMap.set(id, { ...n, type: "vertex" });
-	}
-	const edgeMap = new Map<string, QueryResultItem>();
-	for (const e of result.data.edges) {
-		const id = String(e.id);
-		if (!edgeMap.has(id)) edgeMap.set(id, { ...e, type: "edge" });
-	}
-	return [...nodeMap.values(), ...edgeMap.values()];
-}
-
-/**
- * What a failed expansion says. A refusal names what the world lacks, and a
- * queued run says so — neither is "failed" (graph-canvas.md GC13).
- */
-function expandRefusal(err: unknown): string {
-	const detail =
-		err instanceof ApiError && err.status === 409
-			? (err.detail as { error?: string; message?: string } | undefined)
-			: undefined;
-	if (detail?.error === "outside_lens" && detail.message) return detail.message;
-	if (detail?.error === "expand_queued")
-		return "This graph is busy — the expansion is queued behind other runs.";
-	return "Failed to load neighbours.";
-}
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{

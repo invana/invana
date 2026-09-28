@@ -37,6 +37,14 @@ export type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer/Styl
 export { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer/ExpandNeighboursDialog";
 export { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
 
+// Query results as canvas items, and a saved state as the engine reads it.
+export {
+	adaptItems,
+	expandRefusal,
+	isCanvasStateSnapshot,
+	resultToItems,
+} from "@/pages/graphs-detail/features/explorer/canvasItems";
+
 // Engine adapters — PixiJS needs concrete values, not classes.
 export {
 	typeColorNumber,

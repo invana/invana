@@ -199,24 +199,34 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 | 4 | `agents` · `skills` · `task_plans` · `work` | The `work/` panels, one module each. Already near-separable |
 | 5 | `bring-data-in` · `connect-and-model` | The model canvas is the risk here — move it with its components in one commit |
 | 6 | `ask` | The answer surface. Substituted in Phase 2, so it moves as kit compositions rather than as 1,700 lines |
-| 7 | `explore` | Last, and biggest. `ExplorerPage.tsx` is decomposed *as* it moves — see below |
+| 7 | `explore` | Last, and biggest. `GraphDetailPage.tsx` is decomposed *as* it moves — see below |
 | 8 | `graphs` | The shell that hosts the rest; correct once its tenants have left |
 
-### 3.2 Decomposing `ExplorerPage.tsx`
+### 3.2 Decomposing `GraphDetailPage.tsx`
 
-2,222 lines is the hardest single file. It is not refactored in place — it is **emptied by the
-phases before it**:
+**Status: open.** 3,214 lines, almost all of it one component. It is cut by moves, not rewritten: each
+piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
+way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
-| What leaves it | To | When |
+| Piece | To | Kind |
 |---|---|---|
-| Canvas tab state and the strip | the strip is `BoardPagesViewPanel` (done); the state goes to `features/canvases/{usePages,useCanvasTabs}` | Phase 2 |
-| The five work panels it imports and switches on | their own modules, reached by route | Phase 4 |
-| Panel/region layout | `AppLayoutV2` regions via `app/shell/` | Phase 5 |
-| Canvas wiring | `features/explorer/` (already separate) | Phase 3 |
-| Session/assistant state | `features/ask/assistant/` (already separate) | Phase 3 |
+| Canvas item mapping — `adaptItems` · `resultToItems` · `expandRefusal` · `isCanvasStateSnapshot` | `features/explorer/canvasItems.ts` | pure functions |
+| `OpenBoard`, the record behind a declared tab | `features/boards/boardKinds.ts` | type |
+| The declared board body (one branch per kind) and its tab title | `shell/declaredBoardBody.tsx` | function over a deps object |
+| The assistant occupant — setup locks, `AssistantViewPanel`, `WorldPicker` | `shell/AssistantHost.tsx` | component |
+| The selection the panels and the layered canvases share, and `workKind` | `shell/useLayeredCanvas.ts` | hook |
+| The `leftSection` occupant, one branch per `?panel` key | `shell/LeftSectionContent.tsx` | component |
+| The layered canvas in `mainSection` and its empty hint | `shell/LayeredCanvasPage.tsx` | component |
+| Open declared boards — the cold-link restore, `openBoard`, the plan page following `&plan=` | `shell/useOpenBoards.ts` | hook |
+| The data canvases — engine, tabs, autosave, history, expand, the ask and its stream | `shell/useDataBoards.ts` | hook |
+| The page list, the active page, select, close, the strip's actions | `shell/useOpenPages.ts` | hook |
+| The `rightSection` occupants and their sizes | `shell/rightSections.tsx` | function |
 
-What should remain is a screen that composes: a canvas, a left panel, an inspector, a console. If it
-is still over 400 lines at the end, something in the list above did not actually leave.
+Everything lands in `shell/` except what reads no region: a module never imports the shell
+([code-shape.md](code-shape.md) §4). The stream callback `useSessions` takes stays a ref on the page,
+so the data-canvas hook assigns it rather than the page reordering its hooks. Each cut is one commit,
+with `check-types` and the e2e specs run before it lands. If the page is still over 400 lines at the
+end, something in the table did not actually leave.
 
 ---
 

@@ -502,3 +502,39 @@ export function declaredPage(
 		? { kind: page.kind as DeclaredKind, subjectId: page.id }
 		: null;
 }
+
+/**
+ * A declared board the tab strip is holding open.
+ *
+ * `subjectId` is the record every panel on it binds to — a run's id, one
+ * attempt of a task, a skill, a rule. `runId` is the trace the three
+ * trace-reading kinds share, which is why a step board carries it rather than
+ * fetching its own (see-what-ran.md SR30 · SR36).
+ *
+ * **It is optional, because a skill has no run** (skills-dashboards.md SD3).
+ * Carrying a placeholder one would put a fact on the record that nothing wrote
+ * and something would eventually read.
+ */
+export interface OpenBoard {
+	kind: DeclaredKind;
+	subjectId: string;
+	runId?: string;
+	/**
+	 * Set when the page is a **report** — a frozen reading of this board
+	 * ([B12](../../../docs/for-developers/building-engine/boards-migration.md)).
+	 * `kind:id` is live, `kind:id@version` is frozen: one parser, and the page
+	 * id carries which you are looking at rather than a flag beside it.
+	 */
+	versionId?: string;
+	/**
+	 * A step board opened **cold** — a reload, or a link — while it reads which
+	 * run it belongs to ([SR44](../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+	 * The tab is there immediately and says it is loading; without the flag the
+	 * page would draw [B17](../../../docs/for-developers/building-engine/boards-migration.md)'s
+	 * refusal for the half-second before the answer arrives, which is a refusal
+	 * that is not true yet.
+	 */
+	resolvingRun?: boolean;
+	/** Open the run with this step inside it (SR72) — written as `&step=`. */
+	stepId?: string;
+}
