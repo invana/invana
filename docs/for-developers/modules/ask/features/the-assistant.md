@@ -152,6 +152,6 @@ now reads *assistant decision*.
 | | |
 |---|---|
 | Studio | `src/pages/graphs-detail/features/ask/assistant/` — `AssistantViewPanel` and its `Session*` parts |
-| The region | `src/pages/graphs-detail/shell/useRightSection.ts` — who holds `rightSection`, which is the shell's question, not the assistant's |
+| The region | `src/pages/graphs-detail/shared/useRightSection.ts` — who holds `rightSection`, which is the region's question, not the assistant's |
 | Siblings | `features/ask/answer-surface/` (what a reply renders) and `features/ask/projections/` (the Templates panel). One module, one sub-folder per feature |
 | Not | `features/explore/` — it was there, and that was the filing mistake AD12 names |

@@ -5,8 +5,8 @@ import {
 } from "@/pages/graphs-detail/features/agents";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects";
+import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
 import { ApiError } from "@/services/api/client";
 
 /**

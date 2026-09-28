@@ -35,9 +35,12 @@ import {
 	declaredPage,
 	parseBoardPageId,
 } from "@/pages/graphs-detail/features/boards";
+import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
+import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
+import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import {
 	type BoardTitleNames,
 	boardTitle,
@@ -48,10 +51,7 @@ import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { canvasEmptyHint } from "@/pages/graphs-detail/shell/layeredCanvasBody";
 import type { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import type { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
-import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 
 /** The page that is always open and can never be closed (graph-detail-page.md G6). */
 const GRAPH_PAGE_ID = "graph";

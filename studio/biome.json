@@ -82,6 +82,10 @@
 											"!@/pages/graphs-detail/features/agents/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -105,6 +109,10 @@
 											"!@/pages/graphs-detail/features/assistant/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -128,6 +136,10 @@
 											"!@/pages/graphs-detail/features/boards/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -151,6 +163,10 @@
 											"!@/pages/graphs-detail/features/events/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -174,6 +190,10 @@
 											"!@/pages/graphs-detail/features/explorer/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -197,6 +217,10 @@
 											"!@/pages/graphs-detail/features/graphs/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -220,6 +244,10 @@
 											"!@/pages/graphs-detail/features/lenses/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -243,6 +271,10 @@
 											"!@/pages/graphs-detail/features/llms/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -266,6 +298,10 @@
 											"!@/pages/graphs-detail/features/models/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -289,6 +325,10 @@
 											"!@/pages/graphs-detail/features/plans/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -312,6 +352,10 @@
 											"!@/pages/graphs-detail/features/projections/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -335,6 +379,10 @@
 											"!@/pages/graphs-detail/features/projects/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -358,6 +406,10 @@
 											"!@/pages/graphs-detail/features/rules/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -381,6 +433,10 @@
 											"!@/pages/graphs-detail/features/runs/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -404,6 +460,10 @@
 											"!@/pages/graphs-detail/features/setup/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}
@@ -427,6 +487,34 @@
 											"!@/pages/graphs-detail/features/skills/**"
 										],
 										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/graphs-detail/shared/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": ["@/pages/graphs-detail/features/*/**"],
+										"message": "Import another module through its index.ts (code-shape.md §4.1)."
+									},
+									{
+										"group": ["@/pages/graphs-detail/shell/**"],
+										"message": "Only the page imports the shell — shell → features → shared (code-shape.md §4)."
 									}
 								]
 							}

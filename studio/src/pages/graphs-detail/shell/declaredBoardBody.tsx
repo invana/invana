@@ -8,6 +8,7 @@ import {
 	type OpenBoard,
 } from "@/pages/graphs-detail/features/boards";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
+import type { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import {
 	CompareBoardPage,
 	LensBoardPage,
@@ -34,9 +35,8 @@ import {
 	SkillBoardPage,
 	UsageBoardPage,
 } from "@/pages/graphs-detail/features/skills";
+import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 
 /** What a declared board's body reads from the page that hosts it. */
 export interface DeclaredBoardDeps {

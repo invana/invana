@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useStackSections } from "@/pages/graphs-detail/shell/useStackSections";
+import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections";
 
 // **Projects owns Todos** (projects-and-tasks.md PT7). A Todo without its
 // project is a to-do list, and the project is the thing it is for — so the

@@ -2,7 +2,7 @@ import type {
 	SetupGate,
 	SetupSection,
 } from "@/pages/graphs-detail/features/graphs";
-import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
+import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * What each setup step is called, why it is there, and where it is done

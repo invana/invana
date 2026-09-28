@@ -7,12 +7,12 @@ import {
 	SettingsViewPanel,
 	useGraphConnectionQuery,
 } from "@/pages/graphs-detail/features/graphs";
-import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
-import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 import {
 	type LeftNavKey,
 	useLeftSection,
-} from "@/pages/graphs-detail/shell/useLeftSection";
+} from "@/pages/graphs-detail/shared/useLeftSection";
+import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
+import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 
 // The shell's own section shapes. Re-declared rather than imported because
 // `@invana/themes` does not export them at the top level; they are the same

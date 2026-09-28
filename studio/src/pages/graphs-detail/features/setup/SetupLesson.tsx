@@ -20,7 +20,7 @@ import {
 	SETUP_STEP_BY_KEY,
 	setupCommand,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * One step, taught (setup.md 7.1 · 7.2).

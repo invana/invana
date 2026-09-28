@@ -27,7 +27,7 @@ import type {
 	Graph,
 	GraphUpdate,
 } from "@/pages/graphs-detail/features/graphs/types";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /** The tabs, in strip order. `?tab=` carries the open one. */
 export const SETTINGS_TABS = ["basic", "graph", "agents"] as const;

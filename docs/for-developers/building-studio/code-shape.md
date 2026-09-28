@@ -220,7 +220,7 @@ features/agents/
 | A renderer two modules draw is a canvas | `src/canvases/<name>/`. The module keeps only its adapter — `PlanCanvas` in `projects/`, `EnvelopeCanvas` and `LineageCanvas` in `agents/` |
 | One direction inside a module | A sub-folder imports its parent's types, never the reverse. `models/model-editor/` renders `stitch/`'s block; `stitch/` imports only the selection type back |
 | No `utils/` | A file is named for what it holds — `typeColor.ts`, `propertyTypes.ts`, `runSummary.ts`. A bag named `utils/` is the shape word that hides the most |
-| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/` |
+| No module imports the shell | Dependency direction is `shell → features → shared`. A feature that needs the router takes a prop or a hook from `shared/`. Biome `noRestrictedImports` fails a `features/` or `shared/` file that imports `shell/**` |
 
 ### 4.1b A module's folder is its module; a sub-folder is one of its features
 
@@ -267,7 +267,7 @@ engine has not granted.
 | **A noun belongs to whoever the engine says owns it** | A session belongs to the *graph* — the route is `/sessions`, the client is `sessionsApi`, and the same hook serves two surfaces. So it is `useSessions`, never `useAssistantSessions`: the prefix would claim an ownership the engine does not grant, and would be wrong at one of the two call sites |
 | **A view panel is named for its occupant, not its contents** | `AssistantViewPanel`, because the occupant of the region is the Assistant and sessions are what it holds ([the-shell.md](the-shell.md)). `SessionsPanel` named the contents, and the name stopped being true the moment the panel moved |
 | **A name that has stopped being true is a bug** | `closeSessions` closed the *left* panel and was handed to nine panels, none of them Sessions. Rename on sight — a lying name costs more than an unfashionable one, and an unfashionable one costs nothing |
-| **A hook that names a region lives with the shell** | `useRightSection` sits in `shell/`, beside `useLeftSection`, not inside `features/assistant/`. The region is the shell's question; the assistant is only one of the things that can answer it |
+| **A hook that names a region lives in `shared/`** | `useLeftSection` · `useRightSection` · `useOpenSessionRequest` sit in `pages/graphs-detail/shared/`, beside `useStackSections`: the shell and the occupants both read them, and the direction is shell → features → shared, so neither side can own them. They never live inside an occupant — the region is not the assistant's question. A panel's own URL keys (`useAgentsViewPanel`, `useLensesViewPanel`, …) are its module's |
 
 The test for a rename is whether the name is **false**, not whether it is **unprefixed**. Renaming
 `SessionsPanel` was worth it (the occupant is not "sessions"); renaming `SessionList` inside it

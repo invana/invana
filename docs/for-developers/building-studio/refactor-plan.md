@@ -354,7 +354,7 @@ no consumer impact.
 | | `statusMetrics` | `footerMetrics` |
 | | `headerPanelControls` | dropped — the toggles move to `BoardPagesViewPanel`'s `headerActions` ([the-shell.md](the-shell.md)) |
 | `shell/ConnectionStatusBar.tsx` | `ConnectionStatusBar` | `ConnectionStatus` — the `footer` *is* the bar |
-| `features/explore/assistant/` → **`features/ask/assistant/`** | `AssistantDrawer` · `AssistantDrawerShell` · `useAssistantDrawer` | ✅ done — the shell is **deleted** (its attachment chip belongs to the composer, AD10) and the hook is `shell/useRightSection`. A region hook lives with the region, beside `useSettingsPanel`, not inside one of its occupants |
+| `features/explore/assistant/` → **`features/ask/assistant/`** | `AssistantDrawer` · `AssistantDrawerShell` · `useAssistantDrawer` | ✅ done — the shell is **deleted** (its attachment chip belongs to the composer, AD10) and the hook is `shared/useRightSection`. A region hook lives beside `useLeftSection`, not inside one of the region's occupants |
 | `components/header/UserMenu.tsx` | "rail" | `leftNav` |
 
 ### 7.3a The two params that are not renames

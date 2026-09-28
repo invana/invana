@@ -17,3 +17,5 @@ export {
 	useTaskPlanQuery,
 	useTaskPlansQuery,
 } from "@/pages/graphs-detail/features/plans/queries";
+
+export { useLibraryViewPanel } from "@/pages/graphs-detail/features/plans/useLibraryViewPanel";

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import type { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * Rewrites an old `?panel=sessions` link to where the sessions live now — the

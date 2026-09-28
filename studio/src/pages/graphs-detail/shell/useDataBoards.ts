@@ -35,9 +35,9 @@ import {
 	useCanvasExpand,
 } from "@/pages/graphs-detail/features/explorer";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import { useOpenSessionRequest } from "@/pages/graphs-detail/shared/useOpenSessionRequest";
+import type { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
-import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { type Interaction, measureSync } from "@/services/telemetry/tracer";
 import type { QueryResponse, QueryResultItem } from "@/types/query";
 

@@ -6,7 +6,7 @@ import {
 	type SetupGate,
 } from "@/pages/graphs-detail/features/graphs";
 import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 const GATE_SENTENCE: Record<SetupGate, string> = {
 	connected: "a database is connected",

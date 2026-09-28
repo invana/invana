@@ -17,7 +17,7 @@ import {
 	SETUP_STEPS,
 	type SetupStepMeta,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 interface Props {
 	graph: Graph;

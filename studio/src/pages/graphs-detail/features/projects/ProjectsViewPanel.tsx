@@ -21,11 +21,11 @@ import {
 	useTodosQuery,
 } from "@/pages/graphs-detail/features/projects/queries";
 import { TodosSectionBody } from "@/pages/graphs-detail/features/projects/TodosSection";
+import { useProjectsViewPanel } from "@/pages/graphs-detail/features/projects/useProjectsViewPanel";
 import {
 	stackSection,
 	useStackSectionUi,
 } from "@/pages/graphs-detail/shared/StackSection";
-import { useProjectsViewPanel } from "@/pages/graphs-detail/shell/useProjectsViewPanel";
 
 export interface ProjectsViewPanelProps {
 	username: string;

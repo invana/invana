@@ -16,7 +16,7 @@ import { UserMenu } from "@/components/header/UserMenu";
 import {
 	type LeftNavKey,
 	useLeftSection,
-} from "@/pages/graphs-detail/shell/useLeftSection";
+} from "@/pages/graphs-detail/shared/useLeftSection";
 
 interface SectionMeta {
 	key: LeftNavKey;

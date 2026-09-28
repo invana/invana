@@ -41,3 +41,5 @@ export type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
+
+export { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses/useLensesViewPanel";

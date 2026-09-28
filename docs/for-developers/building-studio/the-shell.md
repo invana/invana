@@ -177,7 +177,7 @@ occupant ([graph-detail-page.md](graph-detail-page.md) G16):
 |---|---|---|---|
 | `?left=` | `leftSection` | the open panel key | **`?panel=`**, with `?settings=` read as a legacy alias. A rename |
 | `?main=` | `mainSection` | the active page id | **nothing.** `activePageId` is *derived* from four unrelated pieces of local state — `globalModelOpen`, `workKind`, `workCanvas`, `activeCanvasId` — and `selectPage` dispatches back into all four. Not a rename: a new single source of truth |
-| `?right=` | `rightSection` | `assistant` · `inspector` · absent | ✅ **shipped** — `shell/useRightSection.ts` is the one owner. `?ai=` and `?inspector=open` are read as legacy aliases and normalised away on the next write |
+| `?right=` | `rightSection` | `assistant` · `inspector` · absent | ✅ **shipped** — `shared/useRightSection.ts` is the one owner. `?ai=` and `?inspector=open` are read as legacy aliases and normalised away on the next write |
 | `?bottom=` | `bottomSection` | `console` · absent | nothing — the Console is not wired |
 
 Only `?left=` is a rename. The other three are the point of doing this: naming the region forces

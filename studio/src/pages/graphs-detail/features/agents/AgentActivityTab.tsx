@@ -40,7 +40,7 @@ import type {
 } from "@/pages/graphs-detail/features/agents/types";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { PanelSection } from "@/ui/PanelSection";
 
 /** How a run ended, in the reader's words and tone (CA8). */

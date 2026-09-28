@@ -398,7 +398,7 @@ flowchart TD
 | `explorer/components/{ExplorerCanvas,ExplorerTypesPanel,InspectorPanel,LayersPanel,ExpandFineTunePanel,StylingPanel}` · `hooks/useExpandNode` · `lib/{canvasTheme,typeColor,visibility}` | `explorer/` — what is drawn, and what is selected on it |
 | `explorer/pages/CanvasPage` · `components/{CanvasHistoryPanel,CanvasFormDialog}` · `hooks/useCanvasStates` · `lib/captureBanner` · `canvasKinds` · the `pages[]` / `activePageId` / `selectPage` / `closePage` block in `shell/useOpenPages.tsx` | `boards/` — the page host, and the board record behind a tab |
 | `explorer/components/Session*` · `SessionsPanel` → **`AssistantPanel`** · `sessionCapabilities` · `hooks/useSessions` | `ask/assistant/` — the assistant is Ask's surface on every left panel, not one of Explore's ([the-assistant.md](../modules/ask/features/the-assistant.md) AD12) |
-| `hooks/useAssistantDrawer` → `useRightSection` | `shell/useRightSection.ts` — it names a **region**, so it lives with the shell beside `useLeftSection`, not inside one of the region's occupants |
+| `hooks/useAssistantDrawer` → `useRightSection` | `shared/useRightSection.ts` — it names a **region**, so it lives beside `useLeftSection`, not inside one of the region's occupants |
 | `work/{AgentsPanel,AgentDetail}` · `WorkCanvas`'s `EnvelopeCanvas` + `LineageCanvas` | `agents/` |
 | `work/SkillsPanel` · `components/settings/sections/SkillsSection` | `skills/` |
 | `work/{WorkflowsPanel,PromoteDialog}` · `WorkCanvas`'s `WorkflowCanvas` | `workflows/` |

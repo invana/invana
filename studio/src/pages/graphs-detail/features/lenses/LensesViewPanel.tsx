@@ -52,14 +52,14 @@ import type {
 	Refusal,
 } from "@/pages/graphs-detail/features/lenses/types";
 import {
+	type GovernSectionKey,
+	useLensesViewPanel,
+} from "@/pages/graphs-detail/features/lenses/useLensesViewPanel";
+import {
 	NEW_LENS,
 	worldsSection,
 } from "@/pages/graphs-detail/features/lenses/WorldsSection";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
-import {
-	type GovernSectionKey,
-	useLensesViewPanel,
-} from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { ApiError } from "@/services/api/client";
 
 export interface LensesViewPanelProps {

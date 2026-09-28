@@ -187,8 +187,8 @@ Feature modules under `studio/src/pages/graphs-detail/features/`, following
 | `graph-settings/LLMsPanel.tsx` (733 lines) | **deleted.** `LlmsSection` · `ProviderDetail` · `ProviderForm` replace it, and none of them is a tab of Settings ([PM6](../modules/agents/features/providers-and-models.md)) |
 | `agents/AgentDetail.tsx` | *Bindings → LLM* is *Bounds → Works in*, with the cast read **through** the lens; *Budget*'s five inputs are the ten-row ceilings table |
 | `features/llms/queries.ts` | a provider holds models; `setDefault` is gone and `addModel` · `removeModel` answer in its place |
-| `shell/useAgentsViewPanel.ts` | new — `?section=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
-| `shell/useLeftSection.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
+| `features/agents/useAgentsViewPanel.ts` | new — `?section=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
+| `shared/useLeftSection.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
 
 ---
 

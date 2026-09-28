@@ -6,7 +6,7 @@ import {
 	type CanvasKind,
 } from "@/pages/graphs-detail/features/boards";
 import { useTodoMutations } from "@/pages/graphs-detail/features/projects";
-import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
+import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * The selection the `leftSection` panels and the layered canvases share, and

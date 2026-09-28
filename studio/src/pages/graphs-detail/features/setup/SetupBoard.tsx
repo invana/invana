@@ -34,7 +34,7 @@ import {
 	setupCommand,
 	WHAT_NEXT,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * Setup as one column — three gate cards, six step rows and the offers below

@@ -6,11 +6,11 @@ import {
 	PANEL_PARAM,
 	STACK_PARAMS,
 	TAB_PARAM,
-} from "@/pages/graphs-detail/shell/useLeftSection";
+} from "@/pages/graphs-detail/shared/useLeftSection";
 import {
 	SECTION_PARAM,
 	useStackSections,
-} from "@/pages/graphs-detail/shell/useStackSections";
+} from "@/pages/graphs-detail/shared/useStackSections";
 
 // **Govern** is one rail icon over a stack of two sections
 // (govern/spec.md GV17, graph-detail-page.md G32 · G33). A guardrail belongs

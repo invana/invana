@@ -30,16 +30,16 @@ import {
 } from "@/pages/graphs-detail/features/agents/AgentsSection";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
+import {
+	type AgentsSectionKey,
+	useAgentsViewPanel,
+} from "@/pages/graphs-detail/features/agents/useAgentsViewPanel";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import {
 	llmsSection,
 	useLLMProvidersQuery,
 } from "@/pages/graphs-detail/features/llms";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
-import {
-	type AgentsSectionKey,
-	useAgentsViewPanel,
-} from "@/pages/graphs-detail/shell/useAgentsViewPanel";
 
 export interface AgentsViewPanelProps {
 	username: string;

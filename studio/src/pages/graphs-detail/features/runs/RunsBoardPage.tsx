@@ -45,7 +45,7 @@ import {
 	shortRunId,
 } from "@/pages/graphs-detail/features/runs/RunsList";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
-import { useRunsViewPanel } from "@/pages/graphs-detail/shell/useRunsViewPanel";
+import { useRunsViewPanel } from "@/pages/graphs-detail/features/runs/useRunsViewPanel";
 import { PanelSection } from "@/ui/PanelSection";
 
 const LIVE = ["queued", "running", "awaiting_input", "awaiting_approval"];

@@ -11,11 +11,14 @@ import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 } from "@/pages/graphs-detail/features/graphs";
+import { useLensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models";
 import { useRunStep } from "@/pages/graphs-detail/features/runs";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
+import { useRightSection } from "@/pages/graphs-detail/shared/useRightSection";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
@@ -23,13 +26,10 @@ import { leftSection } from "@/pages/graphs-detail/shell/leftSectionContent";
 import { rightSection } from "@/pages/graphs-detail/shell/rightSections";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useLegacySessionsLink } from "@/pages/graphs-detail/shell/useLegacySessionsLink";
-import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { useModelsPage } from "@/pages/graphs-detail/shell/useModelsPage";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
 import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
-import { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResponse } from "@/types/query";
 

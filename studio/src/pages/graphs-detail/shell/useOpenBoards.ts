@@ -8,10 +8,12 @@ import {
 	type RecordBoardKind,
 } from "@/pages/graphs-detail/features/boards";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses";
-import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans";
+import {
+	useLibraryViewPanel,
+	useTaskPlansQuery,
+} from "@/pages/graphs-detail/features/plans";
 import { runsApi } from "@/pages/graphs-detail/features/runs";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import { useLibraryViewPanel } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
 
 /**
  * The declared boards open in `mainSection`, and which one is in front.

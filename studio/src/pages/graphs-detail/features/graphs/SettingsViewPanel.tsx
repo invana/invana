@@ -14,7 +14,7 @@ import { InfoTab } from "@/pages/graphs-detail/features/graphs/InfoTab";
 import {
 	type LeftNavKey,
 	useLeftSection,
-} from "@/pages/graphs-detail/shell/useLeftSection";
+} from "@/pages/graphs-detail/shared/useLeftSection";
 
 interface Props {
 	username: string;

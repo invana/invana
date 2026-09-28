@@ -14,7 +14,7 @@ import {
 	isSetupComplete,
 } from "@/pages/graphs-detail/features/graphs";
 import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
  * The offers, in the pane the lessons use (setup.md SU4).
