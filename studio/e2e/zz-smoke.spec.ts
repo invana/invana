@@ -24,9 +24,9 @@ test("every panel renders with no module or runtime error", async ({
 	await page.goto(
 		"/u/admin/airways?panel=library&section=plans&plan=nl-single",
 	);
-	await expect(
-		page.getByTestId("graph-detail-editor-panel").getByText("nl-single@"),
-	).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByText(/^Each step, across \d+ runs?$/)).toBeVisible({
+		timeout: 30_000,
+	});
 
 	await page.goto("/u/admin/airways?panel=skills");
 	await page
