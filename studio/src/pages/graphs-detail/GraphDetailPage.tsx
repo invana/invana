@@ -8,13 +8,11 @@ import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCa
 import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
-import { AssistantViewPanel } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
 } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
-import { WorldPicker } from "@/pages/graphs-detail/features/assistant/WorldPicker";
 import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
 import type { SessionMessage } from "@/pages/graphs-detail/features/assistant/types";
 import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
@@ -108,10 +106,10 @@ import { useTodoMutations } from "@/pages/graphs-detail/features/projects/querie
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
-import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
+import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import {
@@ -2085,21 +2083,15 @@ export function GraphDetailPage() {
 		/>
 	);
 
-	// The assistant, as the right side's `assistant` occupant. Its sessions live
-	// on the RIGHT and nowhere else (the-assistant.md AD1/AD6, and the
-	// `Explorer · …` hi-fi artboards all draw it there): the left rail is for the
-	// page's own panels, and asking never costs you the one you had open. Its
-	// close closes the region.
-	const assistantContent = connectionMissing ? (
-		<SetupLock
+	// The assistant, as the right side's `assistant` occupant. Its close closes
+	// the region.
+	const assistantContent = (
+		<AssistantHost
+			connectionMissing={connectionMissing}
+			cannotAnswer={cannotAnswer}
 			graph={graphContainer}
-			gate="connected"
-			surface="The Assistant"
-		/>
-	) : cannotAnswer ? (
-		<SetupLock graph={graphContainer} gate="answering" surface="Ask" />
-	) : (
-		<AssistantViewPanel
+			world={world}
+			onManageWorlds={() => settingsPanel.setSection("govern")}
 			availableLanguages={availableLanguages}
 			defaultLanguage={defaultLanguage}
 			llmProviders={llmProviders}
@@ -2131,19 +2123,6 @@ export function GraphDetailPage() {
 			onShowArchivedChange={setShowArchived}
 			onPin={setPinned}
 			onArchive={setArchived}
-			// C8 · AD15 — the world is the thread's, set where it asks.
-			worldControl={
-				<WorldPicker
-					username={username}
-					graphSlug={graphSlug}
-					lensId={world.lensId}
-					missing={world.missing}
-					nextAskOnly={world.nextAskOnly}
-					onPick={world.pick}
-					onNextAskOnly={world.setNextAskOnly}
-					onManage={() => settingsPanel.setSection("govern")}
-				/>
-			}
 			onSetSpendPerRun={setSpendPerRun}
 		/>
 	);
