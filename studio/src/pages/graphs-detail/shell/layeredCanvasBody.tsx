@@ -1,6 +1,6 @@
 import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents";
 import { LineageCanvas } from "@/pages/graphs-detail/features/agents";
-import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
+import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";

@@ -19,7 +19,7 @@ import type {
 	AgentCallableRow,
 	AgentSkillRow,
 } from "@/pages/graphs-detail/features/agents/types";
-import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans/queries";
+import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import type { Skill } from "@/pages/graphs-detail/features/skills/types";
 import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";

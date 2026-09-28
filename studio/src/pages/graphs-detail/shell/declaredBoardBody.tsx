@@ -16,12 +16,12 @@ import {
 	ModelsPage,
 	type useModelsView,
 } from "@/pages/graphs-detail/features/models";
-import { PlanBoardPage } from "@/pages/graphs-detail/features/plans/boards/PlanBoardPage";
+import { PlanBoardPage } from "@/pages/graphs-detail/features/plans";
 import {
 	PlanArgumentsPage,
 	PlanExportPage,
 	PlanVersionsPage,
-} from "@/pages/graphs-detail/features/plans/boards/PlanRecordPages";
+} from "@/pages/graphs-detail/features/plans";
 import { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
 import { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
 import { RunBoardPage } from "@/pages/graphs-detail/features/runs/boards";

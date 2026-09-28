@@ -9,8 +9,8 @@ import {
 	type ModelSelection,
 	ModelViewPanel,
 } from "@/pages/graphs-detail/features/models";
-import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans/LibraryViewPanel";
-import { taskPlansApi } from "@/pages/graphs-detail/features/plans/api";
+import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans";
+import { taskPlansApi } from "@/pages/graphs-detail/features/plans";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
