@@ -3,7 +3,7 @@ import {
 	SETUP_SKIPPABLE,
 	type SetupSection,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
 import {
 	SETUP_GATE_META,

@@ -1,7 +1,7 @@
 import type {
 	SetupGate,
 	SetupSection,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
 
 /**

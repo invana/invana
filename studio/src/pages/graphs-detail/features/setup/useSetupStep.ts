@@ -4,7 +4,7 @@ import {
 	SETUP_SKIPPABLE,
 	type SetupSection,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { SETUP_STEPS } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";

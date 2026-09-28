@@ -1,12 +1,12 @@
 import {
 	useDeleteGraphMutation,
 	useGraphsQuery,
-} from "@/pages/graphs-detail/features/graphs/queries";
+} from "@/pages/graphs-detail/features/graphs";
 import {
 	type Graph,
 	SETUP_REQUIRED,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import {
 	Button,
 	Dialog,

@@ -1,4 +1,4 @@
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs/queries";
+import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -8,7 +8,7 @@ import {
 	isGateOpen,
 	isSetupComplete,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
 import {
 	SETUP_GATE_META,

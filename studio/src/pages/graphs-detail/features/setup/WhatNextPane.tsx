@@ -1,7 +1,7 @@
 import {
 	type Graph,
 	isSetupComplete,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {

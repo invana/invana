@@ -1,4 +1,4 @@
-import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
 import { propertyTypeOptions } from "@/pages/graphs-detail/features/models/model-editor/propertyTypes";
 import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {

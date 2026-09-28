@@ -11,8 +11,8 @@
 
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer";
-import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
-import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import { graphsApi } from "@/pages/graphs-detail/features/graphs";
+import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
 import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import { ModelCanvas } from "@/pages/graphs-detail/features/models/model-editor/ModelCanvas";
 import { DeleteModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/DeleteModelDialog";

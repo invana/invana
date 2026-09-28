@@ -5,7 +5,7 @@ import {
 	isGateOpen,
 	isSetupComplete,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { SetupBoard } from "@/pages/graphs-detail/features/setup/SetupBoard";
 import { SetupLesson } from "@/pages/graphs-detail/features/setup/SetupLesson";
 import { SetupStepper } from "@/pages/graphs-detail/features/setup/SetupStepper";

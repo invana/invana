@@ -9,7 +9,7 @@
 // (docs/for-developers/modules/ask/spec.md); only message metadata is stored, never result payloads.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { RunNode } from "@/pages/graphs-detail/features/runs/types";
 import type { QueryMode } from "@/types/query";
 

@@ -21,8 +21,8 @@
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
-} from "@/pages/graphs-detail/features/graphs/queries";
-import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
+import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs";
 import { OnboardingWizard } from "@/pages/graphs-detail/features/setup/OnboardingWizard";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
 import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";

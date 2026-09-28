@@ -2,7 +2,7 @@ import {
 	type Graph,
 	type SetupGate,
 	missingForGate,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";

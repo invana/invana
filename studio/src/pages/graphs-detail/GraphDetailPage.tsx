@@ -3,11 +3,11 @@ import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
-} from "@/pages/graphs-detail/features/graphs/queries";
+} from "@/pages/graphs-detail/features/graphs";
 import {
 	hasOutstandingSetup,
 	isGateOpen,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";

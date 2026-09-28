@@ -21,7 +21,7 @@ import {
 	isCanvasStateSnapshot,
 } from "@/pages/graphs-detail/features/explorer";
 import { explorerApi } from "@/pages/graphs-detail/features/explorer";
-import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
 import { type Interaction, measureSync } from "@/services/telemetry/tracer";

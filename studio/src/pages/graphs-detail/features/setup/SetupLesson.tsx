@@ -1,11 +1,11 @@
-import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs/queries";
+import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs";
 import {
 	type Graph,
 	SETUP_REQUIRED,
 	SETUP_SKIPPABLE,
 	type SetupSection,
 	setupSectionStatus,
-} from "@/pages/graphs-detail/features/graphs/types";
+} from "@/pages/graphs-detail/features/graphs";
 import {
 	SETUP_GATE_META,
 	SETUP_STEP_BY_KEY,

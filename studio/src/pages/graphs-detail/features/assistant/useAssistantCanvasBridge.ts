@@ -10,8 +10,8 @@ import {
 	type CanvasBackend,
 	resultToItems,
 } from "@/pages/graphs-detail/features/explorer";
-import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import { type Interaction, startAction } from "@/services/telemetry/tracer";
 import type {
 	QueryResponse,

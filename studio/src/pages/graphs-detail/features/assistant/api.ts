@@ -11,7 +11,7 @@ import type {
 	SessionContextTurn,
 	SessionMessage,
 } from "@/pages/graphs-detail/features/assistant/types";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import {
 	type ApiTaskRunStep,
 	toRunNode,

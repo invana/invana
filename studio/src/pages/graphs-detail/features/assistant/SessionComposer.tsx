@@ -1,5 +1,5 @@
 import type { Session } from "@/pages/graphs-detail/features/assistant/types";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
 import type {
 	QueryMode,
