@@ -14,7 +14,7 @@ import type {
 	NeighborExpandResponse,
 } from "@/pages/graphs-detail/features/explorer/types";
 import { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
-import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models/queries";
+import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models";
 import type { QueryResultItem } from "@/types/query";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import { useCallback, useMemo } from "react";

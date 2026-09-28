@@ -15,3 +15,8 @@ export type {
 	ModelSelection,
 	SelectedItem,
 } from "@/pages/graphs-detail/features/models/model-editor/types";
+
+export {
+	useActiveVersionQuery,
+	useModelsQuery,
+} from "@/pages/graphs-detail/features/models/queries";

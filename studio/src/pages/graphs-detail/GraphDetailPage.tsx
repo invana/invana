@@ -10,7 +10,7 @@ import {
 } from "@/pages/graphs-detail/features/graphs";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
-import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
+import { useModelsQuery } from "@/pages/graphs-detail/features/models";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
