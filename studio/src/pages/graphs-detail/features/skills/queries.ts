@@ -4,7 +4,6 @@ import type {
 	RuleUpdate,
 	SkillCreate,
 	SkillDraftTaskWrite,
-	SkillUpdate,
 	SkillVersionPublish,
 } from "@/pages/graphs-detail/features/skills/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -229,51 +228,11 @@ export function useAnswerClarificationMutation(
 	});
 }
 
-/**
- * Create **and publish** v1, for a surface with no authoring flow of its own.
- *
- * `POST …/skills` leaves a draft, because the section's *New skill* opens the
- * editor and the person publishes when the flow is drawn (SK20). A plain form
- * that says *Skill added* and leaves an unpublished row would be telling the
- * user something that is not true, so it publishes what it just wrote.
- */
-export function useCreatePublishedSkillMutation(
-	username: string,
-	graphSlug: string,
-) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: async (data: SkillCreate) => {
-			const skill = await skillsApi.create(username, graphSlug, data);
-			await skillsApi.publish(username, graphSlug, skill.id, {});
-			return skill;
-		},
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
-		},
-	});
-}
-
 export function useCreateSkillMutation(username: string, graphSlug: string) {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (data: SkillCreate) =>
 			skillsApi.create(username, graphSlug, data),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
-		},
-	});
-}
-
-/**
- * Text that changed publishes the next version, so the version list and the
- * usage counts both move — invalidate the whole subtree, not just the list.
- */
-export function useUpdateSkillMutation(username: string, graphSlug: string) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: ({ id, data }: { id: string; data: SkillUpdate }) =>
-			skillsApi.update(username, graphSlug, id, data),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
 		},
@@ -288,16 +247,6 @@ export function usePublishSkillVersionMutation(
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: SkillVersionPublish }) =>
 			skillsApi.publish(username, graphSlug, id, data),
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
-		},
-	});
-}
-
-export function useDeleteSkillMutation(username: string, graphSlug: string) {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (id: string) => skillsApi.remove(username, graphSlug, id),
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: key(username, graphSlug) });
 		},

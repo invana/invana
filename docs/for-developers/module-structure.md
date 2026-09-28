@@ -212,12 +212,12 @@ before Studio uses it.
 
 ### Unused code
 
-**Status: done**, except `skills/SkillsSection.tsx`: `SettingsViewPanel` still imports and renders it in a switch branch, so removing it is a code change, not a deletion. `PropertyKeyFormDialog.tsx` was deleted with them — its only importer was `PropertyKeyTable`.
+**Status: done.** `PropertyKeyFormDialog.tsx` was deleted with them — its only importer was `PropertyKeyTable`. `SkillsSection.tsx` went with the three skill mutations only it called (`useCreatePublishedSkillMutation` · `useUpdateSkillMutation` · `useDeleteSkillMutation`).
 
 | File | Evidence | Action |
 |---|---|---|
 | `shell/useTasksPanel.ts` | zero importers; the Tasks stack is retired (G31 · G41) | delete |
-| `skills/SkillsSection.tsx` | unreachable — `skills` is in `PAGE_OWNED_SECTIONS` | delete |
+| `skills/SkillsSection.tsx` | reached only through a gap — `skills` was page-owned but not native, so an expanded Settings drew it in `mainSection` beside the Skills panel; `skills` is now in both lists (G19) | delete |
 | `connect-and-model/CompatibilityBanner.tsx` | zero importers | delete |
 | `model/components/DetailPanel.tsx` + `ModelOverview`, `NoSelectionPlaceholder`, `PropertyKeyTable` | no importers; the three are `@deprecated` and used only by `DetailPanel` | delete |
 

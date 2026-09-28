@@ -1,7 +1,6 @@
 import { EventsTab } from "@/pages/graphs-detail/features/events/EventsTab";
 import { GraphTab } from "@/pages/graphs-detail/features/graphs/GraphTab";
 import { InfoTab } from "@/pages/graphs-detail/features/graphs/InfoTab";
-import { SkillsSection } from "@/pages/graphs-detail/features/skills/SkillsSection";
 import {
 	type LeftNavKey,
 	useLeftSection,
@@ -13,7 +12,6 @@ import {
 	Info,
 	Maximize2,
 	Minimize2,
-	Wand2,
 	X,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -128,6 +126,7 @@ type SingleTabSection = Exclude<
 	| "library"
 	| "govern"
 	| "agents"
+	| "skills"
 >;
 function isSingleTabSection(s: LeftNavKey): s is SingleTabSection {
 	return s in SINGLE_TAB_SECTIONS;
@@ -138,7 +137,6 @@ const SINGLE_TAB_SECTIONS: Record<
 	{ label: string; icon: typeof Database }
 > = {
 	info: { label: "Info", icon: Info },
-	skills: { label: "Skills", icon: Wand2 },
 	events: { label: "Events", icon: Activity },
 };
 
@@ -154,8 +152,6 @@ function SectionContent({
 	switch (section) {
 		case "info":
 			return <InfoTab username={username} graphSlug={graphSlug} />;
-		case "skills":
-			return <SkillsSection username={username} graphSlug={graphSlug} />;
 		case "events":
 			return <EventsTab username={username} graphSlug={graphSlug} />;
 	}

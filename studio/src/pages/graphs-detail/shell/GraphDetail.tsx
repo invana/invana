@@ -110,6 +110,7 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"library",
 	"govern",
 	"agents",
+	"skills",
 ];
 
 /**
