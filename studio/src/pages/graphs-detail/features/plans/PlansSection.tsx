@@ -1,13 +1,12 @@
-// **Plans** — the first section of the Library stack (graph-detail-page.md §3a ·
-// G41).
+// **Plans** — the first section of the Library stack (graph-detail-page.md §3a).
 //
 // A plan is what can be run, and the two sections under it are what it is made
 // of: the catalogue it may name, and the template that renders what it produced.
-// The journal of what actually ran is **Runs**, its own panel (SR1).
+// The journal of what actually ran is **Runs**, its own panel.
 //
 // The library lists **reusable plans only**, with origin as a badge
-// (the-library.md LB5–LB7) — a workflow is a reusable TaskPlan, not a kind
-// (SR5), so there is no Workflows icon any more (G30).
+// (the-library.md) — a workflow is a reusable TaskPlan, not a kind,
+// so there is no Workflows icon any more.
 
 import {
 	DropdownMenuLabel,
@@ -80,7 +79,7 @@ export function plansSection({
 			trail: planKey ?? undefined,
 			onBack: () => onOpenPlan(null),
 			// The list's one write, in the slot every section puts its own act in —
-			// and gone while drilled in, because it acts on the list (G43 · SK27).
+			// and gone while drilled in, because it acts on the list.
 			headerActions: [
 				{
 					key: "promote",
@@ -89,7 +88,7 @@ export function plansSection({
 					onClick: () => onPromoting(true),
 				},
 			],
-			// An act on the record on screen, beside `‹ Back` (G43).
+			// An act on the record on screen, beside `‹ Back`.
 			detailActions:
 				planKey && exportUrl
 					? [
@@ -162,7 +161,7 @@ export function plansSection({
  * `6 · 3 builtin` — what the section header carries beside its label, as the
  * artboard draws it. The total is *how much there is to pick from*; the builtin
  * share is *how much of it came with Invana*, which is the one split a reader
- * asks about before they have authored anything (LB5).
+ * asks about before they have authored anything.
  */
 function PlansCount({
 	username,

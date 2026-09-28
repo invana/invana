@@ -1,15 +1,15 @@
 /**
- * W1 · the worlds a question can be asked under, W2 · one of them read in full,
- * W3 · authoring one, and W4 · the ladder that publishes and promotes it.
+ * the worlds a question can be asked under · one of them read in full,
+ * authoring one, and · the ladder that publishes and promotes it.
  *
  * *As someone about to ask a question of this Graph, I want to see which worlds
  * I can put it under and what each one narrows, so that picking a bound is a
  * comparison rather than a memory test.*
  *
  * It **leads the stack**, and carries the ceiling with it: the guardrails are a
- * locked strip at the top of the list (W4), so every world is read as *narrower
+ * locked strip at the top of the list, so every world is read as *narrower
  * than this* rather than as the whole bound. The Guardrails section below is
- * where those rules are read in full (GV17).
+ * where those rules are read in full.
  *
  * **Authoring opens inside the section, not over it.** `&world=new` is the
  * drill-in like any other, so the ceiling stays a scroll away and the run that
@@ -49,14 +49,14 @@ export interface WorldsSectionProps {
 	worldId: string | null;
 	onOpenWorld: (id: string | null) => void;
 	/**
-	 * `More` on the drill-in header — reopens this world's board (WO15). The
+	 * `More` on the drill-in header — reopens this world's board. The
 	 * drill-in opens it already; this is the way back after the tab is closed,
 	 * and it is absent on a surface with no page host.
 	 */
 	onOpenBoard?: (id: string) => void;
 	/** Give the Guardrails section the height — the strip's one control. */
 	onReadGuardrails: () => void;
-	/** Whether the promote control is drawn at all (GV22 · GR5). */
+	/** Whether the promote control is drawn at all. */
 	mayEditGuardrails: boolean;
 	/** Which world is being edited in place, and how to say so. */
 	editingId: string | null;
@@ -104,7 +104,7 @@ export function worldsSection({
 				onEdit(null);
 				onOpenWorld(null);
 			},
-			// An act on the one record on screen (G43) — the board this drill-in
+			// An act on the one record on screen — the board this drill-in
 			// already opened, found again after its tab was closed.
 			detailActions:
 				drilled && onOpenBoard
@@ -117,7 +117,7 @@ export function worldsSection({
 							},
 						]
 					: undefined,
-			// The one thing this section creates, in the section that owns it (G3).
+			// The one thing this section creates, in the section that owns it.
 			headerActions: [
 				{
 					key: "new",
@@ -172,7 +172,7 @@ export function worldsSection({
 
 				return (
 					<div className="flex min-w-0 flex-col">
-						{/* The strip shows even when there are no worlds (W1's empty
+						{/* The strip shows even when there are no worlds ('s empty
 						    seam): what is in force does not depend on anyone having
 						    written a world. It is absent only when the Graph has no
 						    guardrail at all, which the Guardrails section states in a

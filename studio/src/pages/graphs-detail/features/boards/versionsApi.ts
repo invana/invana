@@ -21,7 +21,7 @@ interface ApiVersionSummary {
 	board_id: string;
 	created_by_id: string;
 	message_id: string | null;
-	/** `cause` on the wire — two `kind` columns in one module was the bug B7 renamed away. */
+	/** `cause` on the wire — two `kind` columns in one module was the bug renamed away. */
 	cause: BoardVersionCause;
 	label: string;
 	node_count: number;

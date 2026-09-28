@@ -1,18 +1,18 @@
 import { type ColumnDef, DataTable } from "@invana/tables";
 /**
- * A4 · what pausing or retiring would do to an agent's open work — **item by
+ * what pausing or retiring would do to an agent's open work — **item by
  * item, never a count alone**
- * ([LC6](../../../../../docs/for-developers/modules/agents/features/lifecycle.md)).
+ * ([lifecycle.md](../../../../../docs/for-developers/modules/agents/features/lifecycle.md)).
  *
  * > **As** someone whose agent is behaving badly, **I want** to see what
  * > stopping it disturbs, **so that** I find out before the click rather than
  * > from the task that went quiet.
  *
- * One dialog for both acts ([LC8](../../../../../docs/for-developers/modules/agents/features/lifecycle.md)):
+ * One dialog for both acts ([lifecycle.md](../../../../../docs/for-developers/modules/agents/features/lifecycle.md)):
  * the work is the same list either way and only the **effects** differ — a todo
  * in review is untouched by a pause and blocked by a retire, which is the one
  * thing two counts could never say. Resume opens nothing: it takes nothing
- * away (LC10).
+ * away.
  */
 import {
 	AlertDialog,

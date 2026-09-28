@@ -14,7 +14,7 @@ import type {
 
 /**
  * One governed band, and what a plan declares in it — the panel's *Layers it
- * declares* ([LB22](docs/for-developers/modules/workflows/features/the-library.md)).
+ * declares* ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * All five arrive, touched or not: *this plan reads no graph data* is the fact
  * a reader is checking for, and a band that vanished when empty would be
@@ -28,14 +28,14 @@ interface TaskPlanLayer {
 	summary: string;
 }
 
-/** A caller that inlined this plan, and what it tuned (LB19). */
+/** A caller that inlined this plan, and what it tuned. */
 export interface TaskPlanCaller {
 	/** `skill` when a skill version owns the calling plan, `plan` when none does. */
 	kind: string;
 	name: string;
 	skill_id: string | null;
 	/** The version of *this* plan it inlined — below the current one means the
-	 *  library has moved on, which the panel says and never acts on (SK32). */
+	 *  library has moved on, which the panel says and never acts on. */
 	version: number;
 	args: Record<string, unknown>;
 }
@@ -52,7 +52,7 @@ export interface TaskPlanSummary {
 	/**
 	 * How the plan got here. `builtin · authored · promoted` are the library's
 	 * badge; `generated` is never listed — a one-off belongs to its Todo
-	 * (the-library.md LB5 · LB6).
+	 * (the-library.md).
 	 */
 	origin: "builtin" | "authored" | "generated" | "promoted";
 	intent: string[];
@@ -118,11 +118,11 @@ export interface TaskPlanDetail extends TaskPlanSummary {
 	declared_layers: TaskPlanLayer[];
 	/** Who inlines it, and what each tuned. */
 	callers: TaskPlanCaller[];
-	/** What a caller may tune (LB20). */
+	/** What a caller may tune. */
 	args_schema: Record<string, PlanArg>;
 }
 
-// ── How a plan has behaved (LB33 · LB34 · LB36) ─────────────────────────────
+// ── How a plan has behaved ─────────────────────────────
 
 /** The plan page's three windows — every number on it is read over one. */
 export type PlanWindow = "7d" | "30d" | "90d";
@@ -195,7 +195,7 @@ export interface PlanRunRow {
 	failed_at: { step_key: string; cause: string; message: string } | null;
 }
 
-/** A version against the one before it (LB37). `against_version` is null for v1. */
+/** A version against the one before it. `against_version` is null for v1. */
 export interface PlanVersionDiff {
 	key: string;
 	version: number;
@@ -243,11 +243,11 @@ interface CatalogueArg {
 interface CatalogueOutput {
 	name: string;
 	type: string;
-	/** How lanes roll up on a fan-out; `null` — per lane only (C3). */
+	/** How lanes roll up on a fan-out; `null` — per lane only. */
 	rollup: "sum" | "concat" | null;
 }
 
-/** One entry, rendered from `runtime/catalogue/registry.py` — never re-described (CA2). */
+/** One entry, rendered from `runtime/catalogue/registry.py` — never re-described. */
 export interface CatalogueEntry {
 	step_key: string;
 	bound: string;
@@ -255,12 +255,12 @@ export interface CatalogueEntry {
 	args: CatalogueArg[];
 	outputs: CatalogueOutput[];
 	requires: string[];
-	/** Reusable plans in this Graph naming it (C9). */
+	/** Reusable plans in this Graph naming it. */
 	used_by: number;
 }
 
 export interface CatalogueResponse {
-	/** Grouped by bound in the runtime's order, then by key (CA3). */
+	/** Grouped by bound in the runtime's order, then by key. */
 	items: CatalogueEntry[];
 	total: number;
 }

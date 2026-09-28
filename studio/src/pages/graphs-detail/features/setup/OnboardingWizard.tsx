@@ -23,14 +23,14 @@ import { WhatNextPane } from "@/pages/graphs-detail/features/setup/WhatNextPane"
  * (docs/for-developers/modules/platform/features/setup.md §7).
  *
  * An **island**: one card centred on the board, with the board visible around
- * it (SU16). The margin is what says the graph page is still underneath — a
- * region filled edge to edge would read as a takeover, and this is not a modal
- * (SU7). Inside it, the stepper says what is left and the lesson teaches the
+ * it. The margin is what says the graph page is still underneath — a
+ * region filled edge to edge would read as a takeover, and this is not a modal.
+ * Inside it, the stepper says what is left and the lesson teaches the
  * step you are on; below 640px of island the two stack into the gate-card
  * board, which is the same rows in one column.
  *
  * It invents nothing. Done, required, blocked and broken are read off what the
- * engine derived (SU1), so a step finished at a terminal or by another member
+ * engine derived, so a step finished at a terminal or by another member
  * is finished here without being told.
  */
 export function OnboardingWizard({
@@ -51,7 +51,7 @@ export function OnboardingWizard({
 
 	// Only one step is ever "next": the first required one still to do, and the
 	// first optional one only once the required set is closed. A blocked step is
-	// never it (SU12).
+	// never it.
 	const ready = isSetupComplete(graph);
 	const outstanding = (s: (typeof SETUP_REQUIRED)[number]) =>
 		setupSectionStatus(graph.setup_state?.[s]) === "todo" &&
@@ -71,7 +71,7 @@ export function OnboardingWizard({
 							<p className="whitespace-nowrap text-sm text-muted-foreground">
 								{doneRequired} of {SETUP_REQUIRED.length} required steps
 							</p>
-							{/* A ready Graph shows the identity card, not the wizard (G26),
+							{/* A ready Graph shows the identity card, not the wizard,
 							    so one opened from the cap needs a way back. While a step is
 							    still outstanding there is nothing to close *to*: the wizard
 							    is the page. */}

@@ -1,18 +1,18 @@
 /**
- * A6 · configuring one endpoint — **a name somebody chose, a vendor kind, a
- * base URL and one credential** ([PM9](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
+ * configuring one endpoint — **a name somebody chose, a vendor kind, a
+ * base URL and one credential** ([providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
  *
  * *As the person who pays for the models, I want to configure an endpoint by a
  * name I will recognise in a refusal, so that a rule names a word rather than a
  * uuid.*
  *
- * **The name is the address segment** (PM10). `llm/anthropic-prod/*` is what a
+ * **The name is the address segment**. `llm/anthropic-prod/*` is what a
  * rule is written against and what a ledger line carries, so it is a slug and
  * the field says so — `anthropic-prod` and `anthropic-research` are two
  * participants with two keys, which is the whole reason the row is not a model.
  *
  * **There is no default switch.** `is_default` is gone: the lens `cast` answers
- * *which model when nobody said* (PM4), and a second mechanism picking a model
+ * *which model when nobody said*, and a second mechanism picking a model
  * is the duplication Govern exists to remove.
  *
  * On create the form takes the first model with the endpoint, so configuring
@@ -74,7 +74,7 @@ export function ProviderForm({
 	const [nameUntouched, setNameUntouched] = useState(!isEdit);
 	const [modelId, setModelId] = useState("");
 	const [apiKey, setApiKey] = useState("");
-	// claude_agent_sdk only (PM2) — which env var the credential becomes.
+	// claude_agent_sdk only — which env var the credential becomes.
 	const [credentialKind, setCredentialKind] = useState<LLMCredentialKind>(
 		existing?.credential_kind ?? "api_key",
 	);
@@ -138,7 +138,7 @@ export function ProviderForm({
 				...shared,
 				provider: providerKind,
 				// One round trip configures an endpoint that can answer: a provider
-				// row offering nothing answers nothing (PM9).
+				// row offering nothing answers nothing.
 				models: [{ model_id: modelId.trim() }],
 			},
 			{
@@ -203,7 +203,7 @@ export function ProviderForm({
 				</p>
 				{isEdit ? (
 					// Renaming moves `llm/<name>/*` in one write, so it is refused while
-					// a world names it and the refusal says which (PM18). Saying so here
+					// a world names it and the refusal says which. Saying so here
 					// is cheaper than finding out at save.
 					<p className="text-sm text-muted-foreground">
 						Renaming moves every address under this endpoint. It is refused

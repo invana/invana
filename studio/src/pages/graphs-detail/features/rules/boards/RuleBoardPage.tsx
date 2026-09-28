@@ -4,7 +4,7 @@
  *
  * The rule itself comes from the Graph's list — one read the section has
  * already made — and the counts from its citations, which is the one read only
- * this page needs ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * this page needs ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
 import { Dashboard } from "@invana/dashboard";
@@ -48,7 +48,7 @@ export function RuleBoardPage({
 		[rule, citations.data, view],
 	);
 
-	// `Save report` on the header, and the act behind it (B6). The document
+	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved — never the subject.
 	const report = useReport(spec);
 

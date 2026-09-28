@@ -1,13 +1,13 @@
 /**
  * A skill's page — `skill:<id>` in `mainSection`, the Skills list beside it
- * ([SK17 · SK36](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  *
  * *As someone writing playbooks, I want one skill in full width — its prose,
  * its flow, who carries it, whether it is applied and what it used to say — so
  * that I can author and judge it without a 420px column cutting each answer
  * into a scroll.*
  *
- * A record header over five tabs, the agent page's shape (AG38):
+ * A record header over five tabs, the agent page's shape:
  * `Playbook · Flow · Bindings · Usage · Versions`. It authors — edit and
  * publish on Playbook, bind and unbind on Bindings.
  *
@@ -19,7 +19,7 @@
  * | **applied** | the model says it followed it | the model's own claim, and nothing more |
  *
  * Nothing here says *used*. There is no way to verify that a model followed
- * prose, so a word implying we did would be a lie told in a badge (US4).
+ * prose, so a word implying we did would be a lie told in a badge.
  */
 
 import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
@@ -63,11 +63,11 @@ export function SkillDetail({
 	editing: boolean;
 	onEditing: (editing: boolean) => void;
 	onOpenAgent?: (id: string) => void;
-	/** `Usage…` — opens `skill_usage:<id>` beside this page (SD2). */
+	/** `Usage…` — opens `skill_usage:<id>` beside this page. */
 	onOpenUsageDashboard?: (skillId: string) => void;
 }) {
 	const [tab, setTab] = useState<SkillTab>("playbook");
-	// The **current** version's plan: what a step is offered today (SK5 — a
+	// The **current** version's plan: what a step is offered today (a
 	// plan hangs off the version, never off the skill).
 	const plan = useSkillPlaybookQuery(
 		username,
@@ -76,7 +76,7 @@ export function SkillDetail({
 		skill.is_draft ? null : skill.version,
 	);
 	// A draft has no published plan, so its Flow tab draws the draft's own.
-	// Read only for a draft: `GET …/draft` opens one when none is open (SK20).
+	// Read only for a draft: `GET …/draft` opens one when none is open.
 	const draft = useSkillDraftQuery(username, graphSlug, skill.id, {
 		enabled: skill.is_draft,
 	});
@@ -176,7 +176,7 @@ export function SkillDetail({
 }
 
 /**
- * The versions this playbook has been through — the Versions tab (SK38). A
+ * The versions this playbook has been through — the Versions tab. A
  * published version is immutable, so this is a history rather than a list of
  * things to edit — the one editable row is the draft, on Playbook.
  */
@@ -310,17 +310,17 @@ function VersionDiff({
 
 /**
  * **Bound · refused · not bound** — the three sections, now that both halves of
- * the check run ([BN10](docs/for-developers/modules/skills/features/bindings.md)).
+ * the check run ([bindings.md](docs/for-developers/modules/skills/features/bindings.md)).
  *
  * The **envelope** half refuses a skill whose plan names a `step_key` the agent
  * may never call; the **lens** half refuses one whose plan reaches a band the
  * agent's guardrails have shut. Which ran is stated on the card, because a bind
  * is never refused on grounds it did not check
- * ([BN7](docs/for-developers/modules/skills/features/bindings.md)).
+ * ([bindings.md](docs/for-developers/modules/skills/features/bindings.md)).
  *
  * The refusals are the engine's, run as a dry run and read with the bindings —
  * Studio never predicts one. A refusal that arrives from a *click* is still
- * drawn where the click was (BN8), and it agrees with the section because both
+ * drawn where the click was, and it agrees with the section because both
  * are the same check.
  */
 function BindingsTab({
@@ -339,7 +339,7 @@ function BindingsTab({
 	const items = standings.data?.items ?? [];
 	const busy = mutations.bindSkill.isPending || mutations.unbindSkill.isPending;
 	// The refusal belongs against the agent whose bind raised it — a message
-	// floating above the list could not say which row it was about (BN8).
+	// floating above the list could not say which row it was about.
 	const [refusedFor, setRefusedFor] = useState<string | null>(null);
 	const clicked = asBindRefusal(mutations.bindSkill.error);
 
@@ -577,7 +577,7 @@ function Tile({
 
 /**
  * Below the engine's floor there is no ratio to state — *offered 3, applied 1*
- * is three runs, not 33% (US6). The engine decides where that line is so every
+ * is three runs, not 33%. The engine decides where that line is so every
  * surface draws it in the same place.
  */
 function gapLabel(row: SkillUsageVersion): string {

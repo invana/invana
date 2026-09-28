@@ -6,7 +6,7 @@
 // resolve. What a reply *does* carry is the query result the Execute step
 // returned, and that already knows its own shape. So Studio folds one emission
 // out of it: `tabular` is a table, `graph` is a subgraph, and either at zero
-// records is the empty emission (AS7).
+// records is the empty emission.
 //
 // This is the seam that goes when the engine emits: `emissionsFromResult` is
 // replaced by reading the emissions off the run, and every component below
@@ -16,7 +16,7 @@ import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-s
 import type { QueryResponse } from "@/types/query";
 
 /** Worded as an answer, not as a count — the engine will carry its own
- *  sentence once emissions are real (AS7). */
+ *  sentence once emissions are real. */
 const NOTHING_HELD = "The graph does not hold records for this question.";
 
 export function emissionsFromResult(
@@ -45,7 +45,7 @@ export function emissionsFromResult(
 				data,
 				onCanvas,
 				// The records behind the emission are the rows the query returned
-				// (AS3) — not the nodes and edges the projection folded them into,
+				// — not the nodes and edges the projection folded them into,
 				// which the body states in its own words.
 				citation: { recordCount: result.row_count || count },
 			},

@@ -125,7 +125,7 @@ export function SessionThread({
 				if (hiddenLoadIds.has(message.id)) return null;
 				const prev = idx > 0 ? session.messages[idx - 1] : undefined;
 				if (message.role === "user") {
-					// A turn says what it ran in (AD17): the reply's frozen world,
+					// A turn says what it ran in: the reply's frozen world,
 					// so a thread that moved between worlds reads honestly.
 					const reply = session.messages[idx + 1];
 					const ranIn =

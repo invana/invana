@@ -1,6 +1,6 @@
 /**
  * The Usage tab — is each model, type and property used, and by whom
- * (the-model-page.md MP10 · MP11 · MP41).
+ * (the-model-page.md).
  *
  * Every count is split by caller. Below 50 queries on the Graph the counts
  * are drawn and nothing is called unused or hot; the tab says how many there

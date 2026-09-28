@@ -13,17 +13,17 @@ import {
 } from "@/pages/graphs-detail/shared/useStackSections";
 
 // **Govern** is one rail icon over a stack of two sections
-// (govern/spec.md GV17, graph-detail-page.md G32 · G33). A guardrail belongs
+// (govern/spec.md graph-detail-page.md). A guardrail belongs
 // beside the worlds it bounds, and the two are one record separated by `kind`
-// (GV1) — so they are two sections of one panel rather than two panels, and
+// — so they are two sections of one panel rather than two panels, and
 // neither is a tab of Graph settings.
 //
 // **Worlds leads**, as the stack's rule says: the top section is the question a
 // person arrives with, and they arrive at Govern to see which world a question
 // can go under. The ceiling still reads first — it is the locked strip at the
-// top of the Worlds section (W1 · W4), which states what the guardrails narrow
+// top of the Worlds section, which states what the guardrails narrow
 // without spending a section's height on one or two rows. The Guardrails section
-// below it is where those rules are read in full (G1).
+// below it is where those rules are read in full.
 export type GovernSectionKey = "worlds" | "guardrails";
 
 const GOVERN_SECTION_KEYS: readonly GovernSectionKey[] = [
@@ -56,7 +56,7 @@ export function useLensesViewPanel() {
 	});
 	const [, setParams] = useSearchParams();
 
-	// **`Edit` on a lens board, in one write** (WO16). The panel, the section and
+	// **`Edit` on a lens board, in one write**. The panel, the section and
 	// the drill-in are three keys and one act, and writing them as two calls
 	// would have the second read the URL as it was before the first — the panel
 	// would open on the list rather than on the record `Edit` was pressed on.

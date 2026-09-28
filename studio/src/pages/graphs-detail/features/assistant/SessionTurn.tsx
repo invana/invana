@@ -68,7 +68,7 @@ export function PromptTurn({
 	ranIn,
 }: {
 	message: SessionMessage;
-	/** The world this ask's run was frozen with (AD17) — *Everything* when it
+	/** The world this ask's run was frozen with — *Everything* when it
 	 *  ran in none; undefined when no run answered it. */
 	ranIn?: string;
 }) {
@@ -192,7 +192,7 @@ function RunningTurn({
 						)}
 					/>
 					{/* The proposed query is viewable the moment Understand settles,
-					    not only when the reply does (UC3). */}
+					    not only when the reply does. */}
 					{view?.query && (
 						<ChatSessionDisclosure
 							label={view.query.language || "query"}
@@ -510,11 +510,11 @@ function SettledTurn({
 							Interrupted · ask again, or narrow the question
 						</ChatSessionActivitySubLine>
 					)}
-					{/* Four outcomes, four surfaces (CA1). A cannot-answer is an
+					{/* Four outcomes, four surfaces. A cannot-answer is an
 					    answer — the graph saying what it does not hold — so it is
 					    drawn calmly and apart from a failure, which is drawn as a
-					    fault with its evidence (CA6). Retry and repair appear on the
-					    step rows above, never here (CA7). */}
+					    fault with its evidence. Retry and repair appear on the
+					    step rows above, never here. */}
 					{view?.cannotAnswer && (
 						<RunCannotAnswer
 							reason={view.cannotAnswer.reason}
@@ -549,7 +549,7 @@ function SettledTurn({
 						/>
 					)}
 					{/* The reply's emissions. A landed subgraph says so here — it is
-					    the emission's own line, not a sub-line beside it (AS5, AS8). */}
+					    the emission's own line, not a sub-line beside it. */}
 					<ResultBlock
 						result={result}
 						onCanvas={loaded}

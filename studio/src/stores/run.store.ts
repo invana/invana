@@ -78,8 +78,8 @@ function fold(view: RunView, e: AskFrame): RunView {
 		case "result":
 			return { ...v, result: p.result as QueryResponse };
 		case "emission": {
-			// Emissions paint as they arrive rather than at the end of the run
-			// (SW1). They are re-read from the record once it settles (AS10);
+			// Emissions paint as they arrive rather than at the end of the run.
+			// They are re-read from the record once it settles;
 			// this is the live copy, and the seq keeps their order.
 			const arriving = p as unknown as {
 				id: string;
@@ -100,7 +100,7 @@ function fold(view: RunView, e: AskFrame): RunView {
 		}
 		case "cannot_answer":
 			// Not a diagnosis: the graph is telling you what it does not hold,
-			// which is an answer (CA1). Rendering it beside "the graph timed out"
+			// which is an answer. Rendering it beside "the graph timed out"
 			// would put two different things in one shape.
 			return {
 				...v,
@@ -127,7 +127,7 @@ function fold(view: RunView, e: AskFrame): RunView {
 /**
  * One arriving emission frame, as the card reads it.
  *
- * The kind comes off the frame — the producing step declared it (AS2) — so this
+ * The kind comes off the frame — the producing step declared it — so this
  * never inspects the payload to decide what it is looking at.
  */
 function foldEmission(frame: {

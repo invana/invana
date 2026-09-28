@@ -2,13 +2,13 @@ import { usd } from "@/lib/format";
 
 /**
  * A run, as the section reads it — **five sections off two reads**
- * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
+ * ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
  * `The run` · `What it cost` · `What it touched` · `Bounds reached` ·
  * `Refused`, derived from the trace (`GET …/runs/{id}/trace`) and the ledger
  * (`GET …/runs/{id}/touches`). This file derives; the section only lays it out.
  *
- * **A row nobody recorded is absent, never zero** (SR34). A run with no price
+ * **A row nobody recorded is absent, never zero**. A run with no price
  * has no cost row, a run with no agent has no ceiling to read `of` against, and
  * a bound the runtime does not have yet — an approval gate — draws no row
  * rather than `0 of 0`.
@@ -221,7 +221,7 @@ export function runSummary(
 
 	const ledger = touches?.items ?? [];
 	// A run that froze no lens recorded nothing — absent, not six muted lines
-	// saying it touched nothing (SR34 · SR68).
+	// saying it touched nothing.
 	const touched: TouchItem[] = !trace.governed
 		? []
 		: BANDS.map((layer) => {
@@ -231,7 +231,7 @@ export function runSummary(
 					layer,
 					note: touchNote(layer, rows),
 					refused,
-					// A layer nothing reached for is muted, never dropped (D22).
+					// A layer nothing reached for is muted, never dropped.
 					dim: !refused && !rows.some((t) => t.direction !== "skipped"),
 				};
 			});

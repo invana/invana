@@ -18,9 +18,9 @@ function base(username: string, graphSlug: string): string {
  * The endpoints a Graph is configured with, and the models each one offers.
  *
  * **There is no `setDefault`.** `POST …/{id}/set-default` is retired: the lens
- * `cast` answers *which model when nobody said* (PM4), so a default here would
+ * `cast` answers *which model when nobody said*, so a default here would
  * be a second mechanism picking a model. Removing a model a cast names is
- * refused by the engine, naming the worlds (PM11).
+ * refused by the engine, naming the worlds.
  */
 export const llmProvidersApi = {
 	list: (username: string, graphSlug: string) =>
@@ -70,7 +70,7 @@ export const llmProvidersApi = {
 			body: JSON.stringify(data),
 		}),
 
-	/** Refused while a world casts it — the refusal names the worlds (PM11). */
+	/** Refused while a world casts it — the refusal names the worlds. */
 	removeModel: (
 		username: string,
 		graphSlug: string,

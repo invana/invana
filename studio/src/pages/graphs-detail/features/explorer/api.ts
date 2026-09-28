@@ -42,12 +42,12 @@ export const explorerApi = {
 
 	/**
 	 * Node and edge types with graph-wide counts — the Explorer panel's legend
-	 * (selection-and-the-panel.md SP6/SP8).
+	 * (selection-and-the-panel.md).
 	 *
 	 * Graph-wide, not canvas-wide: the panel answers "what does this graph hold",
 	 * the status bar answers "what am I looking at". Under a world (`lensId`)
-	 * a type the world denies is absent and every count is taken inside it
-	 * (SP11). `counted: false` means the vendor cannot count and every `count`
+	 * a type the world denies is absent and every count is taken inside it.
+	 * `counted: false` means the vendor cannot count and every `count`
 	 * is null.
 	 */
 	typeCounts: (username: string, graphSlug: string, lensId?: string | null) =>
@@ -59,7 +59,7 @@ export const explorerApi = {
 
 	/**
 	 * Which of a reopened canvas's elements the graph still holds, under the
-	 * picked world (GC5 · GC14).
+	 * picked world.
 	 *
 	 * One request for the whole drawing, on hydrate. What comes back missing is
 	 * **kept and marked**; what the world excludes is in neither list and is not

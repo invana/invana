@@ -1,15 +1,15 @@
 /**
  * A report, opened — `kind:{subjectId}@{versionId}`
- * ([B16 · § 6.4](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([ · § 6.4](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * **One body for every declared kind**, because a frozen reading has no kind to
  * branch on: the stored blob *is* the document, so there is nothing left for a
  * composer to do. The subject is never read — that is what makes it a report,
- * and what lets it outlive a pruned `result.json` (B13).
+ * and what lets it outlive a pruned `result.json`.
  *
  * Nothing is re-merged against today's builder either. Re-merging would give
- * panels the data has nothing for, and data for panels that no longer exist
- * (B16), so the blob renders through the same `<Dashboard>` as it was written.
+ * panels the data has nothing for, and data for panels that no longer exist,
+ * so the blob renders through the same `<Dashboard>` as it was written.
  */
 
 import { Dashboard, type DashboardSpec } from "@invana/dashboard";
@@ -90,7 +90,7 @@ export function FrozenBoardPage({
 					className="h-full min-h-0"
 					spec={spec}
 					// Every registered kind, not this page's — a report has no
-					// composer to tell it which it needs (B19). All of them are
+					// composer to tell it which it needs. All of them are
 					// pure, so nothing here re-reads the subject.
 					registry={DECLARED_WIDGETS}
 					icons={DASHBOARD_ICONS}

@@ -1,15 +1,14 @@
 /**
- * The Models panel — the list, and a model's three sections (the-model-page.md
- * MP4 · MP5).
+ * The Models panel — the list, and a model's three sections (the-model-page.md).
  *
  * **The panel lists; the page acts.** The list view is only the models: a click
  * **selects** — it sets the page's scope and keeps its tab, so stepping down the
  * list compares models on one reading — and `Open` drills in. Drilled in, the
- * panel is a `PanelStack` (ME17) of **Node types · Edge types · Stitches** under
+ * panel is a `PanelStack` of **Node types · Edge types · Stitches** under
  * the `MODELS / <name>` crumb, and nothing acts on the model itself: `Edit`,
  * `Publish`, `Rename`, `Export`, `Archive` and `Introspect` are on the page
  * header, because they act on what the page shows. The staged set is the bar
- * under that header (MP6), not a section.
+ * under that header, not a section.
  *
  * ```
  * ‹  MODELS / AirRoutes
@@ -69,7 +68,7 @@ import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The type the Model tab has selected — the sections light it (ME6). */
+	/** The type the Model tab has selected — the sections light it. */
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
 	/**
@@ -77,7 +76,7 @@ interface Props {
 	 * the URL keys that name the page, written with the scope in one update.
 	 */
 	onShowPage: () => Record<string, string | null>;
-	/** Membership is binary today, so every member writes (MP23). */
+	/** Membership is binary today, so every member writes. */
 	canWrite?: boolean;
 }
 
@@ -127,7 +126,7 @@ export function ModelViewPanel({
 			isLoading={models.isLoading}
 			selectedModelId={scoped?.id ?? null}
 			onSelectModel={(id) => {
-				// A click selects and keeps the tab (MP5).
+				// A click selects and keeps the tab.
 				onSelect(null);
 				set({ scope: id }, onShowPage());
 			}}
@@ -406,7 +405,7 @@ function ModelDetail({
 	model: GraphModelSummary;
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
-	/** Back to the list, the row still selected — the crumb's chevron (MP5). */
+	/** Back to the list, the row still selected — the crumb's chevron. */
 	onBack: () => void;
 	canWrite: boolean;
 }) {
@@ -423,7 +422,7 @@ function ModelDetail({
 	);
 	const staged = useStagedSetQuery(username, graphSlug, model.id, !!draft);
 
-	// Adding is authoring, and authoring is on a draft (ME3): `+ add` is on the
+	// Adding is authoring, and authoring is on a draft: `+ add` is on the
 	// two type sections while one is open, and `Edit` on the page opens one.
 	const ctx: ModelEditCtx | undefined =
 		draft && canWrite
@@ -449,7 +448,7 @@ function ModelDetail({
 	);
 
 	// Stitch hands the model a section and a dialog; the model places both
-	// (stitch-models.md ST12). One direction — `model → stitch`, never back.
+	// (stitch-models.md). One direction — `model → stitch`, never back.
 	const { section: stitchesSection, dialog: stitchesDialog } =
 		useStitchesSection({
 			username,
@@ -460,9 +459,9 @@ function ModelDetail({
 
 	const sections: PanelStackSection[] = [
 		{
-			// The drill-in is the first section (ME17 · G33): `MODELS / AirRoutes`
+			// The drill-in is the first section: `MODELS / AirRoutes`
 			// is its header and the chevron the way back. Its body is empty — what
-			// the model *is* reads on the page header (ME21).
+			// the model *is* reads on the page header.
 			id: "model",
 			title: (
 				<span className="flex min-w-0 items-center gap-1">
@@ -562,7 +561,7 @@ function ModelDetail({
 				</div>
 			),
 		},
-		// Closed until asked for (ME15); declaring starts from a selected type.
+		// Closed until asked for; declaring starts from a selected type.
 		{ ...stitchesSection, defaultCollapsed: true },
 	];
 
@@ -646,7 +645,7 @@ function TypeRow({
 	);
 }
 
-/** The chip that marks a row as not-yet-published (ME5). */
+/** The chip that marks a row as not-yet-published. */
 function StagedChip() {
 	return (
 		<span className="border border-primary/25 bg-primary/15 px-1.5 py-0.5 text-sm font-semibold uppercase leading-none text-primary">
@@ -661,7 +660,7 @@ interface NamedType {
 	property_mappings?: unknown[];
 }
 
-/** ME5 — staged rows sort first, then the rest alphabetically. */
+/** — staged rows sort first, then the rest alphabetically. */
 function sortStagedFirst<T extends NamedType>(
 	types: T[],
 	stagedNames: Set<string>,

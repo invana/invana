@@ -11,7 +11,7 @@
  * narrow. The same one refused repeatedly is *widen, or accept cannot answer
  * deliberately*. Neither reading exists if the surface shows only what
  * happened, which is why a refusal is struck in place rather than hidden
- * ([SR53](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
+ * ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
  * **Grouped by layer, not by verdict.** The drawing is one `LayerSection` per
  * layer with a `ParticipantRow` inside it — so *the llm layer was fully spent
@@ -20,7 +20,7 @@
  * the `lens` panel that draws them; this file only maps the ledger onto them.
  *
  * **`allowed` is the lens the run froze**, not the lens as it stands now
- * ([GR3](../../../../../docs/for-developers/modules/govern/features/guardrails.md)):
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)):
  * a guardrail tightened since must not rewrite what a past answer was allowed
  * to rest on. That is the server's doing; this file's part is to pass it
  * through unedited.
@@ -44,7 +44,7 @@ import type {
 } from "@/pages/graphs-detail/features/lenses/types";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 
-/** `graph_data/model/Routes@v4` → `graph_data`. The engine's own split (GV20). */
+/** `graph_data/model/Routes@v4` → `graph_data`. The engine's own split. */
 function layerOf(address: string): Layer {
 	return address.split("/", 1)[0] as Layer;
 }
@@ -139,7 +139,7 @@ export function runLensOptions(
 
 	// Every band, in the order the strip reads them — a layer the world allowed
 	// nothing on is dim rather than dropped, because *nothing was permitted
-	// here* is a fact about the world and not an absence of one (D22).
+	// here* is a fact about the world and not an absence of one.
 	const sections: LensSectionSpec[] = BANDS.filter(
 		(layer) => layer !== "agent",
 	).map((layer) => {

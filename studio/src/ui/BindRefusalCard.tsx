@@ -6,9 +6,9 @@ import type { BindRefusal } from "@/pages/graphs-detail/features/skills";
  *
  * A bind can be refused from either side: the Bindings tab, against an agent's
  * row, and the agent panel's picker, beneath the skill's chip
- * ([BN8](docs/for-developers/modules/skills/features/bindings.md)). Both draw
+ * ([bindings.md](docs/for-developers/modules/skills/features/bindings.md)). Both draw
  * this, from the engine's payload, so the two surfaces cannot drift into saying
- * different things about one refusal ([BN11](docs/for-developers/modules/skills/features/bindings.md)).
+ * different things about one refusal ([bindings.md](docs/for-developers/modules/skills/features/bindings.md)).
  *
  * Nothing here composes a sentence of its own. The engine sends the facts
  * unflattened — the envelope half names a `step_key` and its `bound`, the lens
@@ -48,13 +48,13 @@ export function BindRefusalCard({
 					 * Every band the plan declares, the shut one struck. Naming only
 					 * the closed band says what was shut and not what the skill
 					 * needed, so a plan touching four bands and refused on one would
-					 * read like a plan that only ever wanted that band (BN13). The
+					 * read like a plan that only ever wanted that band. The
 					 * strip is the reading the check already made — Studio strikes,
 					 * and computes nothing.
 					 *
 					 * An envelope refusal carries no strip: it is about a `step_key`
 					 * and read no bands, and a strip beside it would suggest grounds
-					 * it did not check (BN7).
+					 * it did not check.
 					 */}
 					{refusal.layers?.length ? (
 						<div className="mt-1 flex flex-wrap gap-1">

@@ -1,6 +1,6 @@
 /**
  * The chrome around a work canvas — the tab that names it, and the status line
- * that counts it (`studio.md` § 6.26, docs/for-developers/modules/explore/features/selection-and-the-panel.md F4).
+ * that counts it (`studio.md` § 6.26, docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  *
  * A work canvas takes the same slot as the Explorer's data canvas, and until
  * now it took it *bare*: no tab, no title, no footer, and no way back to the

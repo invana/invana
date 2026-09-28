@@ -25,7 +25,7 @@ export function PanelSection({
 	hint?: ReactNode;
 	action?: ReactNode;
 	/** A bordered card with an eyebrow title, as a page draws its sections —
-	 *  the agent's page (AG38). Without it, a band in a scrolling panel. */
+	 *  the agent's page. Without it, a band in a scrolling panel. */
 	card?: boolean;
 	children: ReactNode;
 }) {

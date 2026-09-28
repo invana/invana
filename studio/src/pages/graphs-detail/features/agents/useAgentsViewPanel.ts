@@ -3,8 +3,8 @@ import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections"
 
 // **Agents** is one rail icon over a stack of two sections — the list, and the
 // endpoints its casts resolve against
-// ([PM6](docs/for-developers/modules/agents/features/providers-and-models.md) ·
-// [GV18](docs/for-developers/modules/govern/spec.md)). A provider is what an
+// ([providers-and-models.md](docs/for-developers/modules/agents/features/providers-and-models.md) ·
+// [spec.md](docs/for-developers/modules/govern/spec.md)). A provider is what an
 // agent's cast resolves against, so it is read where agents are rather than in
 // a tab of Graph settings.
 //
@@ -17,7 +17,7 @@ const AGENTS_SECTION_KEYS: readonly AgentsSectionKey[] = ["agents", "llms"];
 
 // One key per section, named for the record rather than for the section, so a
 // link says what it opens. `agent` is read only — an old link to the drill-in
-// the agent's page used to be; the page is `?page=agent:<id>` now (AG34) — and
+// the agent's page used to be; the page is `?page=agent:<id>` now — and
 // `provider` is one configured endpoint and the models it offers.
 const AGENTS_DETAIL_PARAM: Record<AgentsSectionKey, string> = {
 	agents: "agent",

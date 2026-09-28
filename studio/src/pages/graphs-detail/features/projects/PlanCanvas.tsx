@@ -4,7 +4,7 @@
  * makes — dragging card to card adds a dependency.
  *
  * `EnvelopeCanvas` and `LineageCanvas` in `features/agents/` are the other two
- * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead (LB35).
+ * adapters on the same renderer. A library plan draws on `TaskFlowCanvas` instead.
  */
 
 import { useMemo } from "react";

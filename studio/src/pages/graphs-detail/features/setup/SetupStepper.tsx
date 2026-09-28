@@ -22,7 +22,7 @@ import {
  * It shows **what is left** while the lesson beside it teaches **the step you
  * are on** — that pairing is the whole reason the wizard has two panes. Every
  * row stays selectable in any order, so this is navigation and not a sequence
- * being enforced (SU16).
+ * being enforced.
  *
  * It renders no actions: skipping, opening and undoing all live in the lesson,
  * because a rail that both navigates and acts makes one click mean two things.
@@ -95,7 +95,7 @@ export function SetupStepper({
 						"bg-accent font-semibold shadow-[inset_2px_0_0_0_var(--primary)]",
 				)}
 			>
-				{/* No dot. It is not a step and nothing about it is owed (SU4), and a
+				{/* No dot. It is not a step and nothing about it is owed, and a
 				    dot is the thing that would say otherwise. */}
 				<span className="size-3.5 shrink-0" />
 				<span className="min-w-0 truncate">What next</span>

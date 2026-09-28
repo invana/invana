@@ -8,8 +8,8 @@
  * The two type lists are the **canvas legend as well as a list**: every row's
  * dot is the colour the canvas paints that type with, so reading the drawing and
  * reading the list are the same act. The eye hides that type on the open canvas
- * and nothing else — no query re-runs, and the count on the row does not move
- * (SP7), because the count is graph-wide (SP6).
+ * and nothing else — no query re-runs, and the count on the row does not move,
+ * because the count is graph-wide.
  */
 
 import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
@@ -65,7 +65,7 @@ interface Props {
 	selected: QueryResultItem | null;
 	/** Per-type colours the canvas was styled with; the dots follow them. */
 	styling?: CanvasStyling;
-	/** The open thread's world (AS5); null is *Everything*. */
+	/** The open thread's world; null is *Everything*. */
 	lensId: string | null;
 	/** The open canvas's name, stated in the footer beside the totals. */
 	canvasName?: string;
@@ -87,7 +87,7 @@ export function ExplorerViewPanel({
 	onClose,
 }: Props) {
 	// The legend is the thread's world's: denied types are absent, counts are
-	// taken inside it (selection-and-the-panel.md SP11).
+	// taken inside it (selection-and-the-panel.md).
 	const counts = useTypeCountsQuery(username, graphSlug, lensId);
 	const hidden = useHiddenTypes(canvas);
 	const store = graphStoreOf(canvas);
@@ -260,7 +260,7 @@ function TypeList({
 							{row.name}
 						</span>
 						<span className="ml-auto flex items-center gap-2 text-sm text-muted-foreground tabular-nums">
-							{/* A vendor that cannot count still names its types (SP8) — the
+							{/* A vendor that cannot count still names its types — the
 							    row shows a dash rather than a made-up zero. */}
 							{row.count === null ? "—" : row.count.toLocaleString()}
 							{togglable ? (
@@ -298,7 +298,7 @@ function TypeList({
 
 /**
  * Id, a summary of its telling properties, its relationship chips, and where it
- * came from. The full property table is `InspectorViewPanel` (SP9) — this
+ * came from. The full property table is `InspectorViewPanel` — this
  * says which thing is selected, not everything about it.
  */
 function SelectedBlock({

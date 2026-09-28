@@ -1,28 +1,28 @@
 /**
- * One rule, built by picking — the control set **W3 and G2 share**.
+ * One rule, built by picking — the control set ** and share**.
  *
  * *As someone narrowing what a run may engage, I want every part of a rule to
  * be a choice over what this Graph already declares, so that a rule I save is
  * one I can be sure bites something.*
  *
  * A world's rules and a guardrail's rules are **one grammar over five layers**
- * ([GR8](../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
  * so they are one builder. Two would be two places for the grammar to drift,
  * and the two screens would start disagreeing about what `**` means.
  *
  * Three things here are the design, not the layout:
  *
- * - **Nothing is free text** ([WO7](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * - **Nothing is free text** ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  *   Layer, sublayer and name are three pickers over the live catalogue, and the
  *   wildcards are options inside them. A typo cannot become a rule that
  *   silently matches nothing, because there is no key to mistype.
  * - **The preview shows near-misses greyed rather than filtering them**
- *   ([GR9](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ *   ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  *   A list of hits alone cannot distinguish *precise* from *wrong*: `Deals@1.0.0`
  *   and `Deals@*` both show one hit, and only the greyed second version says
  *   which of them survives the next publish.
- * - **`properties` and `select` are absent off `graph_data`**, not disabled
- *   (GR8). They are legal on that layer alone; a greyed control would promise a
+ * - **`properties` and `select` are absent off `graph_data`**, not disabled.
+ * They are legal on that layer alone; a greyed control would promise a
  *   narrowing the save would refuse, naming the layer.
  */
 
@@ -67,7 +67,7 @@ import type {
 } from "@/pages/graphs-detail/features/lenses/types";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 
-/** What may accompany a call across the boundary. The closed set (GV11 · GV12). */
+/** What may accompany a call across the boundary. The closed set. */
 const EGRESS_CLASSES: { value: EgressClass; label: string }[] = [
 	{ value: "type_names", label: "type names" },
 	{ value: "property_names", label: "property names" },
@@ -84,7 +84,7 @@ export interface RuleBuilderProps {
 	onChange: (rule: GovernRule) => void;
 	onCommit: () => void;
 	onCancel: () => void;
-	/** The live catalogue — resolved, never stored (GV21). */
+	/** The live catalogue — resolved, never stored. */
 	catalogue?: CatalogueResponse;
 	isLoading?: boolean;
 	/** `Add rule` on a new one, `Save rule` on one being edited. */
@@ -259,7 +259,7 @@ export function RuleBuilder({
 				</RadioGroup>
 				{value.allow ? null : (
 					// The one thing about this grammar that surprises people, said where
-					// they are about to rely on it (GV5).
+					// they are about to rely on it.
 					<p className="text-sm text-muted-foreground">
 						Deny wins at any specificity — nothing narrower can punch through
 						it.
@@ -267,7 +267,7 @@ export function RuleBuilder({
 				)}
 			</div>
 
-			{/* ── graph data alone carries a projection and a slice (GR8) ───── */}
+			{/* ── graph data alone carries a projection and a slice ───── */}
 			{isGraphData ? (
 				<>
 					<PropertyExcluder
@@ -293,7 +293,7 @@ export function RuleBuilder({
 				</Eyebrow>
 			)}
 
-			{/* ── egress, per destination (GV12) ────────────────────────────── */}
+			{/* ── egress, per destination ────────────────────────────── */}
 			{value.allow ? (
 				<EgressPicker
 					may_send={value.egress?.may_send ?? []}
@@ -319,7 +319,7 @@ export function RuleBuilder({
 }
 
 /**
- * *Decide without seeing price* — structural, not an instruction (C4).
+ * *Decide without seeing price* — structural, not an instruction.
  *
  * **Exclusion is the only form.** An allow-list would silently drop a property
  * somebody adds to the model tomorrow, which is a bound that stops applying
@@ -368,7 +368,7 @@ function PropertyExcluder({
 }
 
 /**
- * A slice, along the axes the matched model **declared** (C3 · GV14).
+ * A slice, along the axes the matched model **declared**.
  *
  * The axes come from the participant, so an axis the model never declared is
  * not offered — that refusal exists for a rule that arrived another way (the
@@ -503,7 +503,7 @@ function SliceControls({
 }
 
 /**
- * What may accompany a call to **this** destination (GV12).
+ * What may accompany a call to **this** destination.
  *
  * Declared per rule rather than per run: a run-wide setting would have to be
  * the strictest of its destinations, which is the least useful one. Nothing

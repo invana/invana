@@ -9,7 +9,7 @@
  *
  * The dependency runs one way: `canvases → explorer`. The host mounts the
  * canvas; the canvas never reaches for the strip. A strip control that must act
- * on a page body goes through `BoardPageHandle` (graph-detail-page.md G12).
+ * on a page body goes through `BoardPageHandle` (graph-detail-page.md).
  */
 
 export { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
@@ -31,8 +31,8 @@ export {
 } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 export { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer/ExplorerViewPanel";
 export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/InspectorViewPanel";
-// The two CV6 cards whose subject is what is drawn — Layers and Styling
-// (boards.md CV8). History and Rename describe the record, so they are
+// The two cards whose subject is what is drawn — Layers and Styling
+// (boards.md). History and Rename describe the record, so they are
 // Canvases'.
 export { LayersPanel } from "@/pages/graphs-detail/features/explorer/LayersPanel";
 export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";

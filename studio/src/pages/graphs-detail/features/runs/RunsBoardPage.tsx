@@ -2,8 +2,7 @@ import { usd } from "@/lib/format";
 
 /**
  * **Runs, drawn wide** — the journal as a page in `mainSection`, opened from
- * `Dashboard` on the Runs panel's header (see-what-ran.md SR70 ·
- * `operate.runs.list`).
+ * `Dashboard` on the Runs panel's header (see-what-ran.md * `operate.runs.list`).
  *
  * The panel and this page read **one query under one set of chips**, so the
  * list beside it and the table here never disagree. What the page adds is
@@ -88,7 +87,7 @@ function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
 	const succeeded = today.filter((r) => r.status === "succeeded").length;
 	const cannot = today.filter((r) => r.run.outcome === "cannot_answer").length;
 
-	// Absent is not zero: a day with no priced run draws a dash (AG11).
+	// Absent is not zero: a day with no priced run draws a dash.
 	const priced = today.filter((r) => r.run.cost_usd != null);
 	const spent = priced.reduce((sum, r) => sum + (r.run.cost_usd ?? 0), 0);
 

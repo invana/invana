@@ -153,7 +153,7 @@ export function GraphCreatePage() {
 							// `Control` is invariant in its field-values parameter — so a real
 							// `Control<CreateGraphForm>` will not assign to it. The fix belongs in
 							// `@invana/forms` (make `ObjectField` generic in `TFieldValues`);
-							// until that ships, this is the one place Studio says so (DS3).
+							// until that ships, this is the one place Studio says so.
 							control={form.control as unknown as Control<FieldValues>}
 							name="graph"
 							fields={fields}

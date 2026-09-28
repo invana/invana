@@ -1,15 +1,15 @@
 /**
  * Import a model — from a file, or from a starter shipped with the distribution.
  *
- * Both are the same path (starter-models.md SR1): a starter is an ordinary
+ * Both are the same path (starter-models.md): a starter is an ordinary
  * artefact, so it lands as a **draft**, is renamed on arrival, and upgrades
  * later like anything else. Nothing in the product reads a starter's type names.
  *
  * The two seams the dialog has to state rather than swallow:
  *
- * - **A name already in use is named, never merged** (share-a-model.md C6). The
+ * - **A name already in use is named, never merged** (share-a-model.md). The
  *   engine refuses with the clashing model, and the dialog offers a new name.
- * - **A type this database cannot hold arrives anyway** (SM4), listed, with
+ * - **A type this database cannot hold arrives anyway**, listed, with
  *   publishing blocked until it is resolved — not refused, not degraded.
  */
 

@@ -10,12 +10,12 @@ import {
 import { SETUP_STEPS } from "@/pages/graphs-detail/features/setup/setupSteps";
 
 // Which step the onboarding wizard is showing, carried in the URL so a step can
-// be handed to a teammate (setup.md SU16). One param per axis of the page
-// (graph-detail-page.md G16); this is the wizard's.
+// be handed to a teammate (setup.md). One param per axis of the page
+// (graph-detail-page.md); this is the wizard's.
 const STEP_PARAM = "step";
 
 /** *What next* is the last thing in the rail, and it is not a step — it is the
- *  offers (SU4). It selects like one so the rail keeps one meaning: clicking a
+ *  offers. It selects like one so the rail keeps one meaning: clicking a
  *  row changes what the pane beside it shows, and never does anything. */
 export const WHAT_NEXT_KEY = "what-next" as const;
 
@@ -28,7 +28,7 @@ const ORDER: readonly SetupStepKey[] = [
 
 /** The first step still to do: required before optional, in sequence order.
  *  Blocked steps are skipped over — landing on one would open a lesson whose
- *  action cannot run (SU12). */
+ *  action cannot run. */
 function firstOutstanding(graph: Graph | undefined): SetupStepKey {
 	const outstanding = (section: SetupSection) => {
 		const state = graph?.setup_state?.[section];
@@ -48,12 +48,12 @@ function firstOutstanding(graph: Graph | undefined): SetupStepKey {
  *                  the first outstanding step otherwise, so a fresh arrival
  *                  lands on the thing to do rather than on step one.
  * - `select(k)`  — writes `?step=k`.
- * - `next` · `previous` — move along the sequence. **Navigation, not a gate**
- *                  (SU16): every step stays selectable in any order, which is
- *                  what keeps this a page and not the modal wizard SU7 refuses.
+ * - `next` · `previous` — move along the sequence. **Navigation, not a gate**:
+ * every step stays selectable in any order, which is
+ *                  what keeps this a page and not the modal wizard refuses.
  *
  * Selecting a step never *does* it. The lesson's primary action opens the panel
- * that owns the field, exactly as the rows always did (SU2).
+ * that owns the field, exactly as the rows always did.
  */
 export function useSetupStep(graph: Graph | undefined) {
 	const [params, setParams] = useSearchParams();

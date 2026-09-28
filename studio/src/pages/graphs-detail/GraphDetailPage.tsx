@@ -48,18 +48,18 @@ export function GraphDetailPage() {
 	// (409 graph_setup_incomplete, naming the gate). Mirror that here so we never
 	// let the user fire a question that is guaranteed to bounce — and gate on the
 	// one gate the surface needs rather than on the whole sequence
-	// (setup.md SU3), so a graph with no data can still be explored and queried.
+	// (setup.md), so a graph with no data can still be explored and queried.
 	const { data: graphContainer } = useGraphQuery(username, graphSlug);
 	const cannotAnswer =
 		!!graphContainer && !isGateOpen(graphContainer, "answering");
 
-	// The graph page is the setup board until the Graph is ready (G26), so the
+	// The graph page is the setup board until the Graph is ready, so the
 	// page strip and the breadcrumb name what is on it rather than the graph it
 	// belongs to.
 	const setupOutstanding = hasOutstandingSetup(graphContainer);
 
 	// The Govern panel's own URL keys — `Edit` on a lens board puts the section
-	// back on that lens in one write (WO16).
+	// back on that lens in one write.
 	const governPanel = useLensesViewPanel();
 	const sessionState = useSessions(username, graphSlug, {
 		onResult: ({ sessionId, messageId, result }) =>
@@ -78,7 +78,7 @@ export function GraphDetailPage() {
 		openSession,
 		backToList,
 	} = sessionState;
-	// The canvas works in the open thread's world (AS5 · AD15): its restore
+	// The canvas works in the open thread's world: its restore
 	// check, its expansions and its legend read what the thread asks in. No
 	// thread open is *Everything*.
 	const threadWorldId = world.threadLensId;
@@ -89,8 +89,7 @@ export function GraphDetailPage() {
 	// with something selected, so navigating here never opens it.
 	const right = useRightSection();
 	// The left rail's single-open param. Sessions is no longer one of its keys —
-	// it is the `assistant` occupant of the right side (the-assistant.md
-	// AD1/AD7).
+	// it is the `assistant` occupant of the right side (the-assistant.md).
 	const { isOpen: onboardingOpen } = useOnboarding();
 	const settingsPanel = useLeftSection();
 	const closeLeftPanel = settingsPanel.close;
@@ -110,20 +109,20 @@ export function GraphDetailPage() {
 		openLensBoard,
 		planRefById,
 	} = openBoards;
-	// `&step=` — the task open inside the focused run page (SR72).
+	// `&step=` — the task open inside the focused run page.
 	const runStep = useRunStep().stepId;
 
 	// Which model the Model panel has open, and which of its types is selected —
-	// the selection drives the form that spans the main column (model-editor.md ME6).
+	// the selection drives the form that spans the main column (model-editor.md).
 	useLegacySessionsLink(settingsPanel);
 	// The attachment is the canvas selection until someone takes it off — asked
-	// without it, and the thread records that (AD2).
+	// without it, and the thread records that.
 	const [attachmentDetached, setAttachmentDetached] = useState(false);
 	// A node carries the id of the dataset that wrote it; the inspector shows the
 	// name. One list, cached, rather than a lookup per selection.
 	// An element's provenance names the model it conforms to, so the name comes
 	// from the models list — there is no second record between a model and its
-	// records (BD16).
+	// records.
 	const modelList = useModelsQuery(username, graphSlug);
 	const modelName = useCallback(
 		(id: string) => modelList.data?.find((m) => m.id === id)?.name,
@@ -140,7 +139,7 @@ export function GraphDetailPage() {
 		[settingsPanel],
 	);
 
-	// The agent's page is a declared board in `mainSection` (AG34); the Agents
+	// The agent's page is a declared board in `mainSection`; the Agents
 	// list stays in `leftSection` with the agent selected beside it. **Stable**:
 	// the Agents panel calls it from an effect when an old `&agent=` link lands.
 	const openAgentPage = useCallback(
@@ -317,16 +316,16 @@ export function GraphDetailPage() {
 		<CanvasContext.Provider value={canvas}>
 			{/* *Open this board* — for the surfaces that draw a link to one and sit
 			    too deep to be handed a callback: a statement in a trace dialog is
-			    five components under an assistant turn (RU13). Only the kinds whose
+			    five components under an assistant turn. Only the kinds whose
 			    whole address is their subject, because the two that read a trace
-			    need a `runId` this signature cannot carry (SD3 · B17). */}
+			    need a `runId` this signature cannot carry. */}
 			<OpenBoardContext.Provider value={openRecordBoard}>
 				<GraphDetail
 					// The last crumb is what is open — the canvas you are looking at,
 					// named by its session: `ravi › finance › Defence theme — Sep 2026`.
 					// There is no screen crumb before it. `Explorer` used to sit there,
 					// which named the page after one of its eight `leftNav` items
-					// (graph-detail-page.md G15).
+					// (graph-detail-page.md).
 					objectLabel={
 						activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
 					}
@@ -337,7 +336,7 @@ export function GraphDetailPage() {
 						minSize: "300px",
 						// One host for every kind of page — the strip and the bodies in one
 						// component, so the tabs cannot drift from what they switch
-						// (graph-detail-page.md G4, the-shell.md).
+						// (graph-detail-page.md the-shell.md).
 						content: (
 							<ErrorBoundary onError={reportBoundaryError}>
 								<BoardPagesViewPanel

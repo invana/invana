@@ -1,6 +1,6 @@
 /**
  * What the Overview, Usage and Performance tabs share: the four callers as one
- * series set (MP11), a signal as a mark that is never colour alone (MP10), and
+ * series set, a signal as a mark that is never colour alone, and
  * how a duration and a share are written.
  */
 
@@ -11,7 +11,7 @@ import type {
 	SignalKind,
 } from "@/pages/graphs-detail/features/models/types";
 
-/** The callers, in a fixed order, as their own categorical set (MP11). */
+/** The callers, in a fixed order, as their own categorical set. */
 export const CALLER_SERIES: {
 	key: CallerKind;
 	label: string;

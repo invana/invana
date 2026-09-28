@@ -1,5 +1,5 @@
 /**
- * Projects, and the **Plan** tab (docs/for-developers/modules/work/spec.md, § 6.2a — journeys J1 and J1a).
+ * Projects, and the **Plan** tab (docs/for-developers/modules/work/spec.md, § 6.2a).
  *
  * The Plan tab is the panel half of the `plan` canvas: the same one call feeds
  * both, because a list and a DAG disagreeing about what comes next is worse
@@ -17,14 +17,14 @@
  * switching between them is how a project is read.
  *
  * *Who is on it* is not among them: the Staffed strip under the Todos answers
- * that beside the assignments it is derived from (PT14). Nor is there a footer
+ * that beside the assignments it is derived from. Nor is there a footer
  * — a row of buttons acting on four things the tab above was not showing. Each
- * lives where its subject is now (PT13).
+ * lives where its subject is now.
  *
  * Above the tabs sits the heading — the name, who wrote it and when, and the
  * purpose clamped to three lines. There is no second `← Projects` row: the
  * panel breadcrumb is the only way back, and the row it replaced cost the
- * project its title (PT8 · PT9, docs/for-developers/modules/work/features/projects-and-tasks.md).
+ * project its title (docs/for-developers/modules/work/features/projects-and-tasks.md).
  */
 
 import { Input, Label, Textarea } from "@invana/forms";
@@ -95,7 +95,7 @@ const STATUS_OPTIONS = [
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The section header's live search string (G33) — this body owns no chrome. */
+	/** The section header's live search string — this body owns no chrome. */
 	search: string;
 	/** Opens the new-project form, which the section header's `+` toggles. */
 	creating: boolean;
@@ -255,7 +255,7 @@ export function ProjectsSectionBody({
 										key={project.id}
 										active={project.key === selectedProjectKey}
 										onClick={() => onSelectProject(project.key)}
-										// Archived rides on the name, not in the counts (PT12):
+										// Archived rides on the name, not in the counts:
 										// it is the fact that changes what the row means, and a
 										// state folded into a sentence of counts is read last.
 										title={
@@ -402,7 +402,7 @@ function ProjectDetail({
 	return (
 		<div className="flex min-h-0 flex-1 flex-col">
 			{/*
-			 * The heading: the project, not the way back (PT8). The panel
+			 * The heading: the project, not the way back. The panel
 			 * breadcrumb above already says `Projects › hey` and is clickable, so a
 			 * second `← Projects` row spent the one line the title wanted.
 			 */}
@@ -427,7 +427,7 @@ function ProjectDetail({
 				</div>
 				{/* The goal, in the author's words — the thing every agent on this
 				    project plans from, so it sits above the tabs rather than inside
-				    one, and clamped so the Todos under it survive (PT9). */}
+				    one, and clamped so the Todos under it survive. */}
 				{project.description ? (
 					<ClampedText className="mt-1.5 text-base text-foreground">
 						{project.description}
@@ -748,7 +748,7 @@ function ProjectDetail({
 }
 
 /**
- * **Details** — what the project *is*, and the only place it is edited (PT10).
+ * **Details** — what the project *is*, and the only place it is edited.
  *
  * Read mode is the detail grammar: labelled rows of fact, no containers, so
  * nothing reads as a disabled form. `Edit` swaps the two fields that are
@@ -878,7 +878,7 @@ function ProjectDetailsTab({
 				</PropertyRow>
 			</PropertyList>
 			{/*
-			 * The project's own actions, with the project's own state (PT13). They
+			 * The project's own actions, with the project's own state. They
 			 * were a footer under every tab, acting on something the tab above was
 			 * not showing.
 			 */}
@@ -918,9 +918,9 @@ function ProjectDetailsTab({
 			</div>
 			{/*
 			 * What is always true of this work, under what is always true of the
-			 * Graph (RU8). It is a section here rather than a fifth tab because a
+			 * Graph. It is a section here rather than a fifth tab because a
 			 * rule is part of what the project *is* — and this is where the
-			 * project's own acts already live (PT13).
+			 * project's own acts already live.
 			 */}
 			<div className="-mx-3 -mb-3 border-t">
 				<ProjectRules

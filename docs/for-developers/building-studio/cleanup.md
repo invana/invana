@@ -23,7 +23,6 @@ Items 7–12 are independent of that chain and can land in any order.
 |---|---|---|---|---|
 | 5 | Kit swaps with no kit change: `StylingPanel` → `StylingViewPanel`, `LayersPanel` → `LayersViewPanel` | 2 files; no e2e covers either | [module-structure.md](../module-structure.md) §4 | **yes** — swatches and sliders; Layers gains Groups and loses Refresh |
 | 6 | Kit swaps that need kit work: `ListRow` → `Item size="xs"`, `ListPanelChrome` · `ListFilterMenu` → `PanelContent`, `InspectorViewPanel` → `ElementInspectorViewPanel` | three kit extensions with stories, then a release | [module-structure.md](../module-structure.md) §4 | **yes** — row density; the Inspector reads the canvas |
-| 7 | Decision ids in code comments and docstrings | about 1,100 in `src/` | CLAUDE.md rule 12 · [module-structure.md](../module-structure.md) §5b | no |
 | 8 | Guardrails §8 names that do not exist: `scripts/check-kit-overlap.mjs`, the tokens-only check, the no-PixiJS check | 10 `hsl(` or hex literals in `src/` today | [code-shape.md](code-shape.md) §8 | no — clear the 10 literals, then add the checks to `check-names.mjs` |
 | 9 | Control heights hard-coded instead of read from the density tokens | 54 `h-7` · `h-8` · `h-9`, some of them icon sizes | Design rules — *density is a token* | visual only |
 | 10 | No coverage gate on Studio's unit tests | 20 tests; CI runs `--coverage` without a threshold | CLAUDE.md rule 6 (80%) | no — needs tests before a gate |
@@ -35,7 +34,6 @@ Items 7–12 are independent of that chain and can land in any order.
 |---|---|
 | 2 | count `from "@/pages/graphs-detail/features/<m>/…"` outside `<m>`, excluding `<m>` and `<m>/index` |
 | 3 | `grep -rl 'graphs-detail/shell/' src/pages/graphs-detail/features` |
-| 7 | `grep -rEc '\b(G\|SR\|AD\|WO\|LB\|MP\|SK\|SD\|RU\|PT\|AG\|GV\|B\|CV\|GC\|DS)[0-9]{1,3}\b' src` |
 | 8 | `grep -rEo 'hsl\(\|#[0-9a-fA-F]{6}\b' src` |
 | 9 | `grep -rEo '\bh-(7\|8\|9)\b' src` |
 

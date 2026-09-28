@@ -1,5 +1,5 @@
 /**
- * The activity tree for one task (docs/for-developers/modules/work/spec.md, journey J2).
+ * The activity tree for one task (docs/for-developers/modules/work/spec.md).
  *
  * *Who did what, for whom, caused by what.* Two things make this readable
  * rather than a log dump:
@@ -10,7 +10,7 @@
  * - **Skills and rules are labelled by certainty.** *offered* is a fact about
  *   the prompt; *reported* / *cited* is the model's own claim, and the badge
  *   says so. Nothing here says "used" (docs/for-developers/modules/work/spec.md).
- *   A rule is drawn as its statement and opens its board (RU12).
+ *   A rule is drawn as its statement and opens its board.
  */
 
 import { cn } from "@invana/ui";
@@ -22,7 +22,7 @@ import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 
 export interface TodoActivityTreeProps {
 	nodes: ActivityNode[];
-	/** A cited statement opens its rule's board (RU11 · RU12). */
+	/** A cited statement opens its rule's board. */
 	onOpenRule?: (ruleId: string) => void;
 }
 
@@ -149,7 +149,7 @@ function Row({
 						</div>
 					) : null}
 
-					{/* The other pair, and the same two certainties (RU12). */}
+					{/* The other pair, and the same two certainties. */}
 					<StepRules
 						offered={node.rules_offered}
 						cited={node.rules_cited}

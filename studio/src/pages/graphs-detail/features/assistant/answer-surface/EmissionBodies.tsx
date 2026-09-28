@@ -2,11 +2,11 @@
  * One body per emission kind
  * (docs/for-developers/modules/ask/features/the-answer-surface.md · "The kinds").
  *
- * A body is what sits under the emission header, never a block of its own
- * (AS8), so none of these draws a border or a title — the card owns both. They
+ * A body is what sits under the emission header, never a block of its own,
+ * so none of these draws a border or a title — the card owns both. They
  * take their own payload type and nothing else: no session, no message, no
  * store. That is what lets the same body render in the thread, on a task result
- * and in a scheduled answer (Ask K8).
+ * and in a scheduled answer (Ask).
  *
  * `metric`, `chart` and `prose` have no producer yet — the engine's project step
  * emits a query result, not typed emissions (3.3 API is not built). They are
@@ -29,7 +29,7 @@ export function TableEmissionBody({ emission }: { emission: TableEmission }) {
 	return <ResultsTable rows={emission.rows} />;
 }
 
-/** What landed on the canvas. A subgraph adds; it never replaces (AS5). */
+/** What landed on the canvas. A subgraph adds; it never replaces. */
 export function SubgraphBody({ emission }: { emission: SubgraphEmission }) {
 	const { nodes, edges } = emission.data;
 	const summary = `${nodes.length.toLocaleString()} ${nodes.length === 1 ? "node" : "nodes"} · ${edges.length.toLocaleString()} ${edges.length === 1 ? "edge" : "edges"}`;
@@ -99,7 +99,7 @@ export function ChartBody({ emission }: { emission: ChartEmission }) {
 	);
 }
 
-/** A statement the records support — and the records it stands on (AS4). */
+/** A statement the records support — and the records it stands on. */
 export function ProseBody({ emission }: { emission: ProseEmission }) {
 	return (
 		<div className="px-[9px] py-2 text-sm">
@@ -113,7 +113,7 @@ export function ProseBody({ emission }: { emission: ProseEmission }) {
 	);
 }
 
-/** Zero records, worded as an answer rather than drawn as a blank table (AS7). */
+/** Zero records, worded as an answer rather than drawn as a blank table. */
 export function EmptyBody({ emission }: { emission: EmptyEmission }) {
 	return (
 		<div className="px-[9px] py-2 text-sm text-muted-foreground">

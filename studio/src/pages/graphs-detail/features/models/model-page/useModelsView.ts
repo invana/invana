@@ -1,5 +1,5 @@
 /**
- * The model page's reading, in the URL (the-model-page.md MP5 · MP23).
+ * The model page's reading, in the URL (the-model-page.md).
  *
  * Scope and panel are one state: `&model=` is the scope the page reads *and*
  * the row the panel has selected, and `&model_open=1` is the panel drilled into

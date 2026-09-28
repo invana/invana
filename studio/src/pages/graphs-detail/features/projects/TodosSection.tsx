@@ -1,5 +1,5 @@
 /**
- * The graph-wide task list and the task detail (docs/for-developers/modules/work/spec.md J1, J2).
+ * The graph-wide task list and the task detail (docs/for-developers/modules/work/spec.md).
  *
  * The detail is where the governance seam is visible: an agent posts a result
  * and the task sits in **review** until a person accepts it. Accept is offered
@@ -89,7 +89,7 @@ type TaskTab = "work" | "activity" | "runs";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The section header's live search string (G33) — this body owns no chrome. */
+	/** The section header's live search string — this body owns no chrome. */
 	search: string;
 	/** Opens the new-Todo form, which the section header's `+` toggles. */
 	creating: boolean;
@@ -99,7 +99,7 @@ interface Props {
 	/** Prefill a new task into this project. */
 	projectKey?: string | null;
 	onOpenAgent?: (agentId: string) => void;
-	/** A statement on a step row opens that rule's board (RU12). */
+	/** A statement on a step row opens that rule's board. */
 	onOpenRule?: (ruleId: string) => void;
 	/**
 	 * The selected task's project, reported up as soon as the detail loads.

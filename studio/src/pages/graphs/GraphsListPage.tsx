@@ -49,7 +49,7 @@ function formatRelative(iso: string): string {
 }
 
 /** How far along a graph is, counted over the **required** steps only
- *  (setup.md SU15): an optional step that drags the number down turns an offer
+ *  (setup.md): an optional step that drags the number down turns an offer
  *  into a debt. */
 function setupProgress(graph: Graph): { done: number; total: number } {
 	const done = SETUP_REQUIRED.filter(

@@ -97,7 +97,7 @@ export function DetailStatus({
 /**
  * An agent chip. Plural by construction — which is the point: a pin lives on
  * one agent's envelope and a library entry is used by N, so the answer to
- * *whose* is a list, never a link to "the" agent (docs/for-developers/modules/explore/features/selection-and-the-panel.md, D4).
+ * *whose* is a list, never a link to "the" agent (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  */
 export function AgentChipRow({
 	agents,

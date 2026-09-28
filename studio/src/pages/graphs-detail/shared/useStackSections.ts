@@ -3,12 +3,12 @@ import { useSearchParams } from "react-router-dom";
 
 // A **stacked panel** says which section holds the column's height through
 // `?section=`, and what is drilled into through one key per record
-// (graph-detail-page.md G31 · G33).
+// (graph-detail-page.md).
 //
 // Two panels are stacks today — **Library** (Plans · Catalogue · Templates) and
 // **Projects** (Projects · Todos) — and they share this hook rather than one
 // each, so the param vocabulary is described once. **Runs is not one of them**:
-// it is a list, so it carries `&run=` and no `?section=` (G33). Only one panel is
+// it is a list, so it carries `&run=` and no `?section=`. Only one panel is
 // open at a time (`?panel=` is single-open), so `?section=` never has two owners;
 // the per-record keys are named for the record rather than for the section, so a
 // link says what it opens.
@@ -91,7 +91,7 @@ export function useStackSections<D extends string>({
 
 	// Drilling in focuses the section it happened in: the detail replaces that
 	// section's body, so the section needs the height to show it. The other
-	// sections keep their place, which is the thing the stack buys (G33).
+	// sections keep their place, which is the thing the stack buys.
 	const open = useCallback(
 		(d: D, value: string | null) => {
 			setParams(

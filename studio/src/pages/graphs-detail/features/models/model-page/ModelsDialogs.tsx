@@ -1,6 +1,5 @@
 /**
- * The two cards the model page's header opens: the Publish confirm (MP8 ·
- * MP20) and the archive refusal (MP7). Both are composed from the kit —
+ * The two cards the model page's header opens: the Publish confirm and the archive refusal. Both are composed from the kit —
  * `Dialog`, `DiffList`, `RefusalCard` — and carry only what a person reads
  * before they act.
  */
@@ -32,7 +31,7 @@ const OP: Record<string, "add" | "remove" | "change"> = {
 	modified: "change",
 };
 
-/** Publishing asks, and says what it will write (MP8). */
+/** Publishing asks, and says what it will write. */
 export function PublishConfirm({
 	open,
 	username,
@@ -141,7 +140,7 @@ export function PublishConfirm({
 	);
 }
 
-/** Archive refused, naming each active stitch that binds the model (MP7). */
+/** Archive refused, naming each active stitch that binds the model. */
 export function ArchiveRefused({
 	modelName,
 	stitches,

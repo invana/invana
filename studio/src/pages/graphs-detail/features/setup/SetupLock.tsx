@@ -26,7 +26,7 @@ interface Props {
 
 /**
  * A surface that is not open yet, and the gate that opens it
- * (setup.md SU13 · graph-detail-page.md G28).
+ * (setup.md graph-detail-page.md).
  *
  * It replaced one banner that could only say the graph was not ready and never
  * what for. `EmptyState`'s `locks` is the point: naming the step that unlocks a

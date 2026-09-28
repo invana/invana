@@ -5,7 +5,7 @@
  * (canvasKinds.ts), and it writes only three things: **add** a node type,
  * **connect** two into an edge type, **delete**. Everything else about a type —
  * its properties, keys, constraints — is edited in the form, never in a modal
- * over the drawing (model-editor.md ME6).
+ * over the drawing (model-editor.md).
  *
  * That form spans the main column *beneath* the canvas, which is what the hi-fi
  * `Model · a type selected` draws: the drawing stays visible while the thing it
@@ -13,8 +13,8 @@
  * (the-model-page.md): what the model is and whether it is drafting read on the
  * page header, so the canvas draws and carries no header of its own.
  *
- * A published version's canvas is read-only (ME3) — no `ctx`, pan and zoom
- * only. Nothing here commits: Publish is on the page header (MP4).
+ * A published version's canvas is read-only — no `ctx`, pan and zoom
+ * only. Nothing here commits: Publish is on the page header.
  */
 
 import { Button, EmptyState } from "@invana/ui";
@@ -59,7 +59,7 @@ interface Props {
 	username: string;
 	graphSlug: string;
 	modelId: string;
-	/** The page's render backend — the canvas starts on it (GM13). */
+	/** The page's render backend — the canvas starts on it. */
 	backend?: CanvasBackend;
 	/** The type the panel has selected; its form spans the column below. */
 	selection: ModelSelection | null;
@@ -78,7 +78,7 @@ export function ModelCanvas({
 	canWrite = true,
 }: Props) {
 	// Editing a type's metadata reopens the same form the create gesture uses —
-	// the panel and the canvas never grow a second one (ME6).
+	// the panel and the canvas never grow a second one.
 	const [editingNode, setEditingNode] = useState<NodeTypeResponse | null>(null);
 	const [editingEdge, setEditingEdge] = useState<EdgeTypeResponse | null>(null);
 	const [deleting, setDeleting] = useState<{
@@ -105,7 +105,7 @@ export function ModelCanvas({
 	const nodeTypes = tree?.node_types ?? [];
 	const edgeTypes = tree?.edge_types ?? [];
 
-	// Editable only while a draft is open (ME3), and only by a member who writes.
+	// Editable only while a draft is open, and only by a member who writes.
 	const ctx: ModelEditCtx | undefined =
 		draft && canWrite
 			? { username, graphSlug, modelId, versionId: draft.id }
@@ -131,7 +131,7 @@ export function ModelCanvas({
 	};
 
 	// One model on the same canvas as All models: its types and its own edge
-	// types, with no frame — the page is already the model (ME26). The version drawn is the draft while one is open.
+	// types, with no frame — the page is already the model. The version drawn is the draft while one is open.
 	const build = useMemo(
 		() =>
 			buildAllModelsData(
@@ -190,7 +190,7 @@ export function ModelCanvas({
 	// `NodeTypeDetail` and `EdgeTypeDetail` already carry a "Create draft to edit"
 	// affordance for exactly this case — it just needs somewhere to go. Without it
 	// the form renders read-only with no way out, which reads as "editing is not
-	// built" rather than "this version is published" (ME11).
+	// built" rather than "this version is published".
 	const createDraft = useCreateDraftMutation(username, graphSlug);
 	const openDraft = () =>
 		createDraft.mutate({ modelId, basedOn: active?.version ?? null });
@@ -198,7 +198,7 @@ export function ModelCanvas({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			<div className="min-h-0 flex-1">
-				{/* No frame to size, so a model with no types says so instead (ME26). */}
+				{/* No frame to size, so a model with no types says so instead. */}
 				{tree && nodeTypes.length === 0 ? (
 					<EmptyState
 						className="h-full"
@@ -223,7 +223,7 @@ export function ModelCanvas({
 				)}
 			</div>
 
-			{/* ME6 — the selected type's form spans the main column, under the drawing. */}
+			{/* — the selected type's form spans the main column, under the drawing. */}
 			{selection && (selectedNode || selectedEdge) ? (
 				<div className="max-h-[45%] shrink-0 overflow-y-auto border-t bg-background">
 					<div className="flex items-center justify-between border-b px-4 py-1.5">
@@ -304,7 +304,7 @@ export function ModelCanvas({
 						existingNodeTypes={nodeTypes}
 						onClose={() => setEditingEdge(null)}
 					/>
-					{/* A delete is staged like anything else (ME2) — the confirm says
+					{/* A delete is staged like anything else — the confirm says
 					    so, because "deleted" and "staged for deletion" are different
 					    promises. */}
 					<ConfirmDialog

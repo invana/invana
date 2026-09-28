@@ -1,11 +1,11 @@
 import { usd } from "@/lib/format";
 
 /**
- * A step dashboard, composed — artboards **D2 · D3 · D4** ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
+ * A step dashboard, composed — artboards ([34l–34n](../../../../../../docs/for-developers/the-screens.md)).
  *
  * **One shell for every task kind, and Output is the only branch**
- * ([SR18](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
- * [SR31](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
+ * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * breadcrumb · tiles · Input · `result.json` · Output · Artifacts · Log · where
  * it sits, identical for `import_dataset`, `execute_graph_query` and
  * `understand_intent`. The Output panel is picked from **the shape the step
@@ -62,11 +62,11 @@ export const STEP_ACTIONS = {
 	openArtifact: "open-artifact",
 	/** The step crumb's picker — another task of the same run, by step id. */
 	openStep: "open-step",
-	/** The tab strip under the header (SR55). */
+	/** The tab strip under the header. */
 	tab: "tab",
 } as const;
 
-/** A step's tabs, in order (SR55). */
+/** A step's tabs, in order. */
 const STEP_TABS = ["overview", "touched", "log"] as const;
 export type StepTab = (typeof STEP_TABS)[number];
 
@@ -75,7 +75,7 @@ export interface StepBoardView {
 	/** The active tab — kept as the reader walks from one step to the next. */
 	tab: StepTab;
 	/**
-	 * What this step engaged — R2
+	 * What this step engaged
 	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
 	 *
 	 * The run's whole ledger; this composer picks out the rows for this step.
@@ -123,7 +123,7 @@ export function stepBoardSpec(
 
 	const header: DashboardSpec<StepPanels>["header"] = {
 		tone: toneOf(step.status),
-		// The run's header, kept: the step is one crumb deeper (SR72). The run
+		// The run's header, kept: the step is one crumb deeper. The run
 		// crumb is the way back; the step crumb opens every task of the run.
 		crumbs: [
 			runAddress(trace.run_id),
@@ -185,7 +185,7 @@ export function stepBoardSpec(
 }
 
 /**
- * The three tabs (SR55). **Overview** — what it was asked after binding, what
+ * The three tabs. **Overview** — what it was asked after binding, what
  * it returned, its clock, where it sits; **Touched** — what it engaged and the
  * files it left; **Log** — its slice of the stream.
  */
@@ -214,7 +214,7 @@ function stepTabs(
 			id: "touched",
 			label: "Touched",
 			rows: omit([
-				// R2 · generated vs executed, the slice that was composed in, and
+				// generated vs executed, the slice that was composed in, and
 				// what egress cut — the evidence for the output, read on its own.
 				engaged.length
 					? {
@@ -304,8 +304,8 @@ function tiles(trace: TraceRead, group: TaskGroup): PanelSpec {
 						}
 					: null,
 				// The ceiling belongs to the run, not to one of its tasks — so a
-				// step's spend is drawn as its share of the run's (SR41), and is
-				// absent entirely when the model had no published rate (SR40).
+				// step's spend is drawn as its share of the run's, and is
+				// absent entirely when the model had no published rate.
 				step.cost_usd != null
 					? {
 							label: "Cost",
@@ -360,7 +360,7 @@ function readCaption(out: Record<string, unknown>): string | undefined {
 // ── Input · result.json ─────────────────────────────────────────────────────
 
 /**
- * The request as it actually ran — `args`, after `${…}` binding (SR33).
+ * The request as it actually ran — `args`, after `${…}` binding.
  *
  * `input` is the digest a step chose to record about itself; `args` is what it
  * was asked to do. The design's band is the second, and it falls back to the
@@ -390,7 +390,7 @@ function input(step: TraceStepRead): PanelSpec | null {
  * The **Input** band prints the request as the plan resolved it — which, under
  * a world that slices, is not the query that produced the row count beside it.
  * A reader who copies that query out gets a different answer, so when the two
- * differ the band shows both and says which ran (GV34). Equal digests record no
+ * differ the band shows both and says which ran. Equal digests record no
  * text and draw no band: there, the resolved request *is* what ran.
  */
 function executedQuery(step: TraceStepRead): PanelSpec | null {
@@ -429,7 +429,7 @@ function resultJson(step: TraceStepRead): PanelSpec | null {
 	};
 }
 
-// ── Output — the one band that differs (SR31) ───────────────────────────────
+// ── Output — the one band that differs ───────────────────────────────
 
 function output(step: TraceStepRead): PanelSpec | null {
 	const out = outputs(step);
@@ -601,7 +601,7 @@ function log(trace: TraceRead, group: TaskGroup): PanelSpec {
 	};
 }
 
-/** The files it read and wrote — from `result.artifacts`, or absent (SR34). */
+/** The files it read and wrote — from `result.artifacts`, or absent. */
 function artifacts(step: TraceStepRead): PanelSpec | null {
 	const listed = step.result?.artifacts;
 	if (!Array.isArray(listed) || !listed.length) return null;

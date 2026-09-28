@@ -77,7 +77,7 @@ export const modelsApi = {
 		patch(`${base(u, g)}/${id}`, data) as Promise<GraphModelResponse>,
 	remove: (u: string, g: string, id: string) => del(`${base(u, g)}/${id}`),
 
-	/** The page's measured tabs, over a window, at All models or one (MP33). */
+	/** The page's measured tabs, over a window, at All models or one. */
 	insights: (
 		u: string,
 		g: string,
@@ -88,13 +88,13 @@ export const modelsApi = {
 			`${base(u, g)}/insights?model=${encodeURIComponent(model ?? "all")}&window=${window}`,
 		),
 
-	/** One query shape: its calls, its plan, its advice (MP12 · MP39). */
+	/** One query shape: its calls, its plan, its advice. */
 	shape: (u: string, g: string, hash: string, window: InsightsWindow) =>
 		request<ShapeCard>(
 			`${base(u, g)}/insights/shapes/${hash}?window=${window}`,
 		),
 
-	/** The DDL publishing the draft would project — read, never written (MP20). */
+	/** The DDL publishing the draft would project — read, never written. */
 	projection: (u: string, g: string, id: string) =>
 		request<ProjectionPlan>(`${base(u, g)}/${id}/draft/projection`),
 
@@ -314,7 +314,7 @@ export const modelsApi = {
 			`${graphBase(u, g)}/model-links/preview`,
 			data,
 		) as Promise<StitchPreview>,
-	/** Flip every staged stitch to active, in one action (ST21). */
+	/** Flip every staged stitch to active, in one action. */
 	commitStitches: (u: string, g: string) =>
 		post(`${graphBase(u, g)}/model-links/commit`, {}) as Promise<unknown>,
 	/** Drop the staged set, or one stitch out of it. */
@@ -331,7 +331,7 @@ export const schemasApi = {
 		request<GraphVersionResponse>(
 			`/api/v1/u/${username}/${graphSlug}/schema/active-version`,
 		),
-	/** What the database holds, marked against the models (MP9). */
+	/** What the database holds, marked against the models. */
 	getPhysical: (username: string, graphSlug: string, model?: string | null) =>
 		request<PhysicalSchema>(
 			`/api/v1/u/${username}/${graphSlug}/schema/physical${model ? `?model=${encodeURIComponent(model)}` : ""}`,

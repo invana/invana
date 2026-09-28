@@ -69,10 +69,10 @@ export function useLayeredCanvas(
 		// The kind this panel would draw, given what is selected in it.
 		const own: CanvasKind | null =
 			// Projects owns both sections, so it owns the `plan` canvas whether the
-			// project or one of its Todos is what was picked (PT7).
+			// project or one of its Todos is what was picked.
 			settingsSection === "projects" && selectedProjectKey
 				? "plan"
-				: // Library's plan opens as a page, not a canvas (LB24).
+				: // Library's plan opens as a page, not a canvas.
 					settingsSection === "agents" && selectedAgentId
 					? "lineage"
 					: null;

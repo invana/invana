@@ -4,13 +4,13 @@
  *
  * This file is the border (code-shape.md §4.1). The host in `mainSection` is one
  * `BoardPagesViewPanel`, and the nine kinds in it are owned by four modules
- * (boards.md CV7) — so this folder exports the host and the `data` page body,
+ * (boards.md) — so this folder exports the host and the `data` page body,
  * and takes the others as page kinds rather than importing them.
  */
 
 export { boardsApi } from "@/pages/graphs-detail/features/boards/api";
-// The two CV6 cards whose subject is the record — History and Rename
-// (boards.md CV8).
+// The two cards whose subject is the record — History and Rename
+// (boards.md).
 
 export type {
 	CanvasKind,
@@ -32,10 +32,10 @@ export {
 export type { BoardPageHandle } from "@/pages/graphs-detail/features/boards/DataBoardPage";
 export { DataBoardPage } from "@/pages/graphs-detail/features/boards/DataBoardPage";
 // The wrapper the host mounts every declared page inside — the two acts, and
-// the card one of them opens (boards-migration.md B21).
+// the card one of them opens (boards-migration.md).
 export { DeclaredBoard } from "@/pages/graphs-detail/features/boards/DeclaredBoard";
 // A report — the act that keeps a live dashboard's numbers, and the page that
-// reads one back (boards-migration.md B6).
+// reads one back (boards-migration.md).
 export { FrozenBoardPage } from "@/pages/graphs-detail/features/boards/FrozenBoardPage";
 export {
 	useCanvasBannerQuery,
@@ -57,7 +57,7 @@ export type { OpenCanvasTab } from "@/pages/graphs-detail/features/boards/useCan
 export { useCanvasTabs } from "@/pages/graphs-detail/features/boards/useCanvasTabs";
 export type { RecordBoardKind } from "@/pages/graphs-detail/features/boards/useOpenBoard";
 // *Open this board*, published by the host for the surfaces that draw a link
-// to one (rules.md RU13).
+// to one (rules.md).
 export {
 	OpenBoardContext,
 	useOpenBoard,

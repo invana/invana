@@ -1,17 +1,17 @@
 /**
  * **Working rules** — a Project's own statements, under the Graph invariants it
- * inherits ([RU8](docs/for-developers/modules/skills/features/rules.md#decisions),
+ * inherits ([rules.md](docs/for-developers/modules/skills/features/rules.md#decisions),
  * drawn as `RulesProject`).
  *
  * It sits in the project's **Details** tab rather than a fifth tab of its own:
  * a rule that is always true of this work is part of what the project *is*,
- * which is where the project's own acts already live (PT13).
+ * which is where the project's own acts already live.
  *
  * ## Two lists, in the order a step is given them
  *
  * The response returns the inherited invariants beside the project's own rather
  * than merged, and this draws them the same way round as assembly does — the
- * Graph's first, then the Project's (C3 · RU2). Merging them would make an
+ * Graph's first, then the Project's. Merging them would make an
  * invariant look editable from a project that only inherits it, and reordering
  * them would be a third opinion about a context nobody else assembles.
  *
@@ -139,7 +139,7 @@ function Inherited({ items }: { items: Rule[] }) {
  * One of the project's own — rewordable in place, and stoppable.
  *
  * There is no delete: deactivating is how a rule stops applying, and the past
- * citations stay (RU4).
+ * citations stay.
  */
 function OwnRule({
 	username,

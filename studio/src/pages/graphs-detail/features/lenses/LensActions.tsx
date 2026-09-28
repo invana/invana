@@ -1,5 +1,5 @@
 /**
- * W4 · the ladder — **one rung, one edit**.
+ * the ladder — **one rung, one edit**.
  *
  * *As someone whose narrowing turned out to be right, I want naming it, sharing
  * it and making it a standard to be three small acts rather than three
@@ -9,14 +9,14 @@
  * unnamed lens --name it--> world --promote--> guardrail
  * ```
  *
- * ([GV3](../../../../../docs/for-developers/modules/govern/spec.md)). Each arrow
+ * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)). Each arrow
  * is a single field change on one row, which is the whole reason a guardrail
  * and a world are one record: promotion is not a migration, and demotion is the
  * same edit backwards.
  *
  * **Every refusal here names what is holding it.** Deleting a world a schedule
  * fires into or an agent carries is refused naming them
- * ([WO6](../../../../../docs/for-developers/modules/govern/features/worlds.md))
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md))
  * — a cron with no lens is a run with no circumstances, and *not permitted*
  * with nothing named is not something anybody can act on.
  */
@@ -50,7 +50,7 @@ export interface LensActionsProps {
 	username?: string;
 	graphSlug?: string;
 	lens: Lens;
-	/** Absent, every write control is absent with it (GR5). */
+	/** Absent, every write control is absent with it. */
 	mayEditGuardrails: boolean;
 	onEdit: () => void;
 	/** Where to go once this row stops being the thing on screen. */
@@ -90,8 +90,8 @@ export function LensActions({
 		);
 
 	const isGuardrail = lens.kind === "guardrail";
-	// A guardrail's every write is the one field-level permission in the product
-	// (GV22). A world's are not — anyone who may read the Graph may make one.
+	// A guardrail's every write is the one field-level permission in the product.
+	// A world's are not — anyone who may read the Graph may make one.
 	const mayWrite = !isGuardrail || mayEditGuardrails;
 
 	if (!mayWrite) {
@@ -100,7 +100,7 @@ export function LensActions({
 				<Eyebrow>Editing</Eyebrow>
 				{/* Absent, never disabled: a greyed button promises a screen this
 				    person cannot reach, and a bound nobody may read is a bound
-				    nobody can work within (GR5). */}
+				    nobody can work within. */}
 				<p className="pt-1 text-sm text-muted-foreground">
 					The rules above are in force on every run and are readable by every
 					member. Changing them is a permission somebody in this Graph holds.

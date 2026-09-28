@@ -6,7 +6,7 @@
  * wanted tiles and a log, so it arrives as a **registry entry** instead. This
  * is Studio's, registered as `flow`, and it renders `TaskFlowCanvas` with the
  * data `taskFlowFromRun` built
- * ([SR32](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
 import type { PanelRendererProps } from "@invana/dashboard";
@@ -86,7 +86,7 @@ const BELOW_BOX = 14;
  * The height from this element's top to the bottom of the page's scroller —
  * the dashboard body, the nearest ancestor that scrolls — never less than
  * `least`. The flow is the whole tab, so it takes the whole page: the kit pins
- * a row in px and has no way to say *the rest* (SR32).
+ * a row in px and has no way to say *the rest*.
  */
 function useFillHeight(
 	ref: React.RefObject<HTMLDivElement | null>,

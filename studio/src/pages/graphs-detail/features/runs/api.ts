@@ -53,7 +53,7 @@ interface ApiTaskRun {
 	run_id: string;
 	graph_id: string;
 	workflow_key: string;
-	/** The run this row is a step of; null on a root (SR44). */
+	/** The run this row is a step of; null on a root. */
 	parent_run_id?: string | null;
 	status: RunStatus;
 	assistant_message_id?: string | null;
@@ -74,7 +74,7 @@ export interface TaskRun {
 	assistantMessageId?: string;
 	streamSeq: number;
 	steps: RunNode[];
-	/** The run this row is a step of; absent on a root (SR44). */
+	/** The run this row is a step of; absent on a root. */
 	parentRunId?: string;
 }
 
@@ -139,7 +139,7 @@ const EMISSION_KINDS = [
 	"clarification.requested",
 	"result",
 	// One per engagement, carrying the whole touch — the ledger row
-	// `run_touches` projects (GV28). The boards read the projection through
+	// `run_touches` projects. The boards read the projection through
 	// `…/runs/{id}/touches`; this is the live copy, and the fold ignores it.
 	"touch",
 	"diagnosis",
@@ -203,12 +203,12 @@ export const runsApi = {
 			steps: d.steps.map(toRunNode),
 			// `task_runs` is one table, so this is how a **step** names the run
 			// whose trace it is in — the one read a step board opened cold makes
-			// before it reads anything else (SR44).
+			// before it reads anything else.
 			parentRunId: d.parent_run_id ?? undefined,
 		};
 	},
 
-	/** Answer a clarification — the same run continues (UC7). */
+	/** Answer a clarification — the same run continues. */
 	resume: (username: string, graphSlug: string, id: string, answer: string) =>
 		request<{
 			run_id: string;
@@ -219,7 +219,7 @@ export const runsApi = {
 			body: JSON.stringify({ answer }),
 		}),
 
-	/** Stop run (UC9). */
+	/** Stop run. */
 	cancel: (
 		username: string,
 		graphSlug: string,
@@ -337,7 +337,7 @@ interface ApiEmission {
  * Fold the engine's row into the emission the card renders.
  *
  * The kind comes from the row, never from the payload's shape: the producing
- * step declared it (AS2), and re-deriving it here would be a second opinion.
+ * step declared it, and re-deriving it here would be a second opinion.
  */
 function toEmission(row: ApiEmission): Emission {
 	const offers: TemplateOffer[] = row.templates.map((t) => ({
@@ -359,7 +359,7 @@ function toEmission(row: ApiEmission): Emission {
 			executionTimeMs: row.citation.execution_time_ms ?? undefined,
 		},
 		// Absent until a projection chose the rendering — never defaulted in so
-		// the header looks complete (AS9).
+		// the header looks complete.
 		template: chosen
 			? { id: chosen.templateId, name: chosen.name, version: chosen.version }
 			: undefined,
@@ -408,7 +408,7 @@ function toEmission(row: ApiEmission): Emission {
 }
 
 export const emissionsApi = {
-	/** The answer this run produced — records, so it survives a reload (AS10). */
+	/** The answer this run produced — records, so it survives a reload. */
 	list: async (
 		username: string,
 		graphSlug: string,
@@ -420,7 +420,7 @@ export const emissionsApi = {
 		return rows.map(toEmission);
 	},
 
-	/** Re-render the same records through another template — never a re-run (P5). */
+	/** Re-render the same records through another template — never a re-run. */
 	switchTemplate: async (
 		username: string,
 		graphSlug: string,
@@ -437,7 +437,7 @@ export const emissionsApi = {
 };
 
 export const traceApi = {
-	/** The whole run, after the fact — part of the answer, not an admin view (RT1). */
+	/** The whole run, after the fact — part of the answer, not an admin view. */
 	get: (username: string, graphSlug: string, runId: string) =>
 		request<TraceRead>(`${base(username, graphSlug)}/${runId}/trace`),
 };
@@ -451,7 +451,7 @@ export interface TraceRead {
 	ask_kind: string | null;
 	/** What it was about, in the words the opener wrote — the dashboard's crumb. */
 	body: string | null;
-	/** The run's own `result.json` — null until the runtime writes one (SR34). */
+	/** The run's own `result.json` — null until the runtime writes one. */
 	result: Record<string, unknown> | null;
 	outcome: string | null;
 	agent_id: string | null;
@@ -463,22 +463,22 @@ export interface TraceRead {
 	triggered_by: string;
 	/** The person it ran for, by username; `null` when no person is on record. */
 	opened_by: string | null;
-	/** Questions asked and re-plans spent — read against `budget` (SR67). */
+	/** Questions asked and re-plans spent — read against `budget`. */
 	clarifications: number;
 	replans: number;
 	/**
-	 * The world this run was asked under, and its name **as frozen** (SR36).
+	 * The world this run was asked under, and its name **as frozen**.
 	 *
 	 * Both `null` reads `Everything`, which is a real world and the default one
 	 * — never a blank, which would read as *not recorded*. The name comes from
 	 * `lens_snapshot`, so renaming a world does not change what a run that
-	 * already happened says it ran under (GR3).
+	 * already happened says it ran under.
 	 */
 	lens_id: string | null;
 	lens_name: string | null;
-	/** The record `lens_name` was read from — what the name opens (SR67). */
+	/** The record `lens_name` was read from — what the name opens. */
 	lens_ref: { id: string; kind: "world" | "guardrail" } | null;
-	/** Whether the run froze a lens. `false` — nothing it engaged was recorded (SR68). */
+	/** Whether the run froze a lens. `false` — nothing it engaged was recorded. */
 	governed: boolean;
 	/** The trace the run recorded under; null when telemetry was off. */
 	trace_id?: string | null;
@@ -487,9 +487,9 @@ export interface TraceRead {
 	duration_ms: number | null;
 	tokens_in: number;
 	tokens_out: number;
-	/** The run's spend — `null` when no step had a published rate (SR40). */
+	/** The run's spend — `null` when no step had a published rate. */
 	cost_usd: number | null;
-	/** The ceiling it ran under, so spend draws against it (SR41 · SR20). */
+	/** The ceiling it ran under, so spend draws against it. */
 	budget: RunBudget | null;
 	steps: TraceStepRead[];
 	emissions: ApiEmission[];
@@ -514,11 +514,11 @@ export interface TraceStepRead {
 	input: Record<string, unknown> | null;
 	output: Record<string, unknown> | null;
 	error: Record<string, unknown> | null;
-	/** The arguments this attempt ran with, after `${…}` binding (SR33). */
+	/** The arguments this attempt ran with, after `${…}` binding. */
 	args: Record<string, unknown> | null;
 	/** What it spends, from the catalogue entry its `task_key` names. */
 	bound: string | null;
-	/** The attempts this step was allowed — what `attempts 2 of 3` reads against (SR67). */
+	/** The attempts this step was allowed — what `attempts 2 of 3` reads against. */
 	max_attempts: number;
 	/** The plan's own id for this node, and the lane it ran in. */
 	step_key: string | null;
@@ -527,7 +527,7 @@ export interface TraceStepRead {
 	result: Record<string, unknown> | null;
 	skills_offered: string[];
 	skills_applied: string[];
-	/** The statements this step was offered, and the ones it claims it cited (RU12). */
+	/** The statements this step was offered, and the ones it claims it cited. */
 	rules_offered: OfferedRule[];
 	rules_cited: OfferedRule[];
 	/**
@@ -540,10 +540,10 @@ export interface TraceStepRead {
 }
 
 /**
- * The agent's effective ceiling, as the trace carries it (SR41).
+ * The agent's effective ceiling, as the trace carries it.
  *
  * Either half may be `null`: a bound nobody set has no meter, and a meter
- * against a ceiling that does not exist is the thing [SR20] warns about.
+ * against a ceiling that does not exist is the thing [ ] warns about.
  */
 interface RunBudget {
 	max_tokens: number | null;
@@ -566,7 +566,7 @@ export interface ProjectionTemplateRead {
 	intent: string;
 	version: number;
 	status: "draft" | "published";
-	/** How many emissions it rendered — what a promotion is argued from (P7). */
+	/** How many emissions it rendered — what a promotion is argued from. */
 	used: number;
 	/** Ships with Invana: belongs to every Graph, editable by none. */
 	shipped: boolean;

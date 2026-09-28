@@ -63,7 +63,7 @@ function isActionEnvelope(body: unknown): body is ActionEnvelope {
 }
 
 // `suppressActionToast` raises this depth for the duration of a client-orchestrated
-// gesture (docs/for-developers/modules/platform/spec.md PL8) so its sub-requests' envelopes don't each fire a
+// gesture (docs/for-developers/modules/platform/spec.md) so its sub-requests' envelopes don't each fire a
 // toast — the gesture shows its own single summary instead.
 let toastSuppressDepth = 0;
 

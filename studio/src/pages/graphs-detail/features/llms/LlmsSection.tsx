@@ -1,21 +1,21 @@
 /**
- * A6 · **LLMs is a section of the Agents panel**, not a tab of Graph settings
- * ([PM6](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md) ·
- * [GV18](../../../../../docs/for-developers/modules/govern/spec.md)).
+ * **LLMs is a section of the Agents panel**, not a tab of Graph settings
+ * ([providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md) ·
+ * [spec.md](../../../../../docs/for-developers/modules/govern/spec.md)).
  *
  * *As someone reading an agent's cast, I want the endpoints it resolves against
  * one section away, so that "which model answers this" and "what is configured"
  * are one reading.*
  *
- * **An endpoint is a group and its models are the rows under it** (PM9). The
+ * **An endpoint is a group and its models are the rows under it**. The
  * old panel drew one row per provider because one row *was* one model; now the
  * address has two segments and the list has two levels, so what a rule names —
  * `llm/anthropic-prod/claude-opus-5` — is visible without opening anything.
  *
  * **Nothing here is a default.** `is_default` and its star are gone: the lens
- * `cast` answers *which model when nobody said* (PM4). What a row states
+ * `cast` answers *which model when nobody said*. What a row states
  * instead is who casts it, which is the fact that decides whether it can be
- * removed at all (PM11).
+ * removed at all.
  */
 
 import {
@@ -67,7 +67,7 @@ export interface LlmsSectionProps {
 	items: LLMProvider[];
 	isLoading: boolean;
 	error: unknown;
-	/** Worlds and guardrails, for *who casts this model* (PM11). */
+	/** Worlds and guardrails, for *who casts this model*. */
 	lenses: Lens[];
 	providerId: string | null;
 	onOpenProvider: (id: string | null) => void;
@@ -192,7 +192,7 @@ export function llmsSection({
 /**
  * One endpoint and what it offers. The header opens it; the model rows read
  * their address and who casts them, because that is what decides whether a
- * model can stop being offered (PM11).
+ * model can stop being offered.
  */
 function ProviderGroup({
 	provider,

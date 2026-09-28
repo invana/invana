@@ -14,7 +14,7 @@ interface Props {
 
 /**
  * The graph info panel — which graph am I in, and is it ready?
- * (graph-detail-page.md G20.)
+ * (graph-detail-page.md.)
  *
  * Three bands and nothing else:
  *
@@ -25,7 +25,7 @@ interface Props {
  *    `ConnectionStatusBar`, which is on screen whatever panel is open, and
  *    whether a database is attached at all is the setup timeline's first step.
  * 2. **Setup** — only while the required steps are unfinished, drawn as a
- *    timeline off what the engine derived (connect-and-model/spec.md CM8). It
+ *    timeline off what the engine derived (connect-and-model/spec.md). It
  *    disappears the moment the graph is ready.
  * 3. **Recent sessions** — what has been happening here.
  *

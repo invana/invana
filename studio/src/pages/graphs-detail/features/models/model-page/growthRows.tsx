@@ -1,6 +1,5 @@
 /**
- * The Growth tab — records over time, from count snapshots (the-model-page.md
- * MP14 · MP32).
+ * The Growth tab — records over time, from count snapshots (the-model-page.md).
  *
  * Stacked by model at All models and by type at one model. The line moves only
  * on a day something wrote, and each write is a mark naming its source. A scope
@@ -24,7 +23,7 @@ export interface GrowthRowsOptions {
 	/** One model's name, and its version readout, when scoped. */
 	scopeName: string | null;
 	scopeVersion: string | null;
-	/** `--color-data-N` slot per model id (ST17). */
+	/** `--color-data-N` slot per model id. */
 	hueOf: (modelId: string) => number | undefined;
 	days: number;
 	canWrite: boolean;

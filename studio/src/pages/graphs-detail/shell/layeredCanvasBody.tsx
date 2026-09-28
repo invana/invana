@@ -110,7 +110,7 @@ export function layeredCanvasBody(
 			onSelectAgent={setSelectedAgentId}
 			onSelectEdge={setSelectedLineageEdge}
 			onOpenTask={(id) => {
-				// A Todo lives under Projects (PT7); the rail's Tasks icon is
+				// A Todo lives under Projects; the rail's Tasks icon is
 				// execution only.
 				setSelectedTaskId(id);
 				openWorkPanel("projects");

@@ -20,7 +20,7 @@ import type { PanelSpec } from "@invana/dashboard";
  *
  * A composer builds every optional tile, panel and row as `x ?? null` and
  * passes the list through here, so **a band with no record is absent, not
- * zero** ([SR34](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md))
+ * zero** ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md))
  * is one filter rather than a condition spelled out at each of fifty call
  * sites.
  */
@@ -33,7 +33,7 @@ export function count(n: number): string {
 	return n.toLocaleString();
 }
 
-/** The `Dashboard ¦ spec.json` switch every declared board carries ([SR37](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
+/** The `Dashboard ¦ spec.json` switch every declared board carries ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)). */
 export const VIEW_ACTION = "view";
 export const VIEW_DASHBOARD = "Dashboard";
 export const VIEW_SPEC = "spec.json";

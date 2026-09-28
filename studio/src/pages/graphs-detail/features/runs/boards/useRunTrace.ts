@@ -1,5 +1,5 @@
 /**
- * The one request both dashboards read ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * The one request both dashboards read ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  *
  * A run dashboard and a step dashboard are two renderings of the same
  * document, so they share a query key: opening a task from the flow paints
@@ -7,7 +7,7 @@
  * came from already had.
  *
  * It polls while the run is in flight — a run in flight and a run that
- * finished are the same bands, climbing ([SR16](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * finished are the same bands, climbing ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  * The tail is SSE for a session ask; a dashboard is opened deliberately on any
  * kind of run, including ones with no stream open, so it asks.
  */

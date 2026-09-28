@@ -15,15 +15,15 @@
  * open canvas, and it is deliberately the next step rather than this one.
  *
  * **The strip is not here.** `mainSection` is `BoardPagesViewPanel`
- * (`docs/for-developers/building-studio/graph-detail-page.md` G4), which owns the
+ * (`docs/for-developers/building-studio/graph-detail-page.md`), which owns the
  * tabs for every open page — a canvas, a model, a plan. This page is one body
  * inside it. The five controls that act on *this* canvas — help, layers,
  * styling, history, rename — reach it through {@link BoardPageHandle}, because
- * `BoardHeaderAction` is strip-level and carries no page id (G12).
+ * `BoardHeaderAction` is strip-level and carries no page id.
  *
  * Layers, Styling and History are **one at a time**: all three are cards pinned
  * to the canvas's top-right corner, so opening one closes the other
- * (`docs/for-developers/modules/explore/features/boards.md` CV6).
+ * (`docs/for-developers/modules/explore/features/boards.md`).
  */
 
 import { RendererCapabilityBanner } from "@invana/canvas-ui";
@@ -154,7 +154,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 		ref,
 	) {
 		// Overlays. Each is about this canvas, so each lives with it. The three
-		// corner cards share one slot — they share the corner (CV6).
+		// corner cards share one slot — they share the corner.
 		const [overlay, setOverlay] = useState<
 			"layers" | "styling" | "history" | null
 		>(null);
@@ -188,7 +188,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 		);
 
 		// The strip's five canvas controls. `BoardHeaderAction.onClick` takes no
-		// page id (G12), so the shell cannot address this page by argument — it holds
+		// page id, so the shell cannot address this page by argument — it holds
 		// the handle instead and calls straight into it.
 		useImperativeHandle(
 			ref,

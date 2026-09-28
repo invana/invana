@@ -1,10 +1,10 @@
 // Boards — saved working surfaces (docs/for-developers/modules/explore/features/boards.md).
 //
 // A board's columns are grouped by **lifetime**, not by structure-vs-data
-// (boards-migration.md B14): `styling` and `settings` are the RULES and survive
+// (boards-migration.md): `styling` and `settings` are the RULES and survive
 // a re-query; `snapshot` and `positions` are the DATA and are replaced by it.
 // Boards are shared across every graph member; a `data` board is additionally
-// backed by the session it was drawn from — provenance, not identity (B4).
+// backed by the session it was drawn from — provenance, not identity.
 
 import type { QueryResultItem } from "@/types/query";
 
@@ -75,7 +75,7 @@ export interface Board extends BoardSummary {
  */
 /**
  * Why a version exists. `report` is the declared half — the act that keeps a
- * live dashboard's numbers ([B6](../../../docs/for-developers/building-engine/boards-migration.md)) —
+ * live dashboard's numbers ([boards-migration.md](../../../docs/for-developers/building-engine/boards-migration.md)) —
  * and the other four are a drawn board autosaving.
  */
 export type BoardVersionCause =
@@ -113,8 +113,8 @@ export interface BoardVersionSummary {
 /**
  * A frozen, immutable reading of a board (docs/for-developers/modules/explore/features/boards.md).
  *
- * `snapshot` is the **resolved document**, stored merged and never re-merged
- * (B16): `canvas.exportState()` on a drawn board — restored by handing it back
+ * `snapshot` is the **resolved document**, stored merged and never re-merged:
+ * `canvas.exportState()` on a drawn board — restored by handing it back
  * to `canvas.importState()` — or the `DashboardSpec` with its numbers already
  * in it on a declared one, which is what a **report** is.
  */

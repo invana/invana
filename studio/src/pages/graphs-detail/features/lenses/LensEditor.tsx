@@ -1,5 +1,5 @@
 /**
- * W3 · authoring a world, and G2 · authoring a guardrail — **one editor**.
+ * authoring a world, and · authoring a guardrail — **one editor**.
  *
  * *As someone deciding what a question may rest on, I want to say it by picking
  * from what this Graph declares and be told what a save would be refused for
@@ -7,14 +7,14 @@
  * than discovering one at run time.*
  *
  * A guardrail and a world are one record separated by `kind`
- * ([GV1](../../../../../docs/for-developers/modules/govern/spec.md)), so they
+ * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)), so they
  * are one form. `kind` changes four things and nothing else: the word on the
  * header, whether the name field publishes, whether the save asks for the
  * impact first, and whether the `cast` section is drawn.
  *
  * **Validation is the design, not a nicety.** A world is checked against the
  * guardrails **at save**, not at run
- * ([WO3](../../../../../docs/for-developers/modules/govern/features/worlds.md))
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md))
  * — a world that cannot legally run is a world nobody should be able to save
  * and then wonder about. This form asks the same question on every edit, so the
  * two refusals the design draws land on the rule that caused them:
@@ -115,7 +115,7 @@ export function LensEditor({
 
 	const catalogue = useParticipantsQuery(username, graphSlug);
 	// A cast resolves to an **llm** address and to nothing else, so the picker
-	// offers that layer of the catalogue and no other (WO7).
+	// offers that layer of the catalogue and no other.
 	const models = useMemo(
 		() => (catalogue.data?.items ?? []).filter((p) => p.layer === "llm"),
 		[catalogue.data],
@@ -146,7 +146,7 @@ export function LensEditor({
 
 	const isNamed = Boolean(lens?.is_named);
 	// A guardrail is never unnamed — it is the object an auditor is handed, and
-	// an anonymous one is not (GR1).
+	// an anonymous one is not.
 	const nameRequired = kind === "guardrail";
 	const canSave =
 		!isSaving && refusals.length === 0 && (!nameRequired || draft.name.trim());
@@ -175,7 +175,7 @@ export function LensEditor({
 						placeholder={kind === "world" ? "EU · H1 2026" : "Graph guardrails"}
 						onChange={(e) => setDraft({ ...draft, name: e.target.value })}
 					/>
-					{/* The field says what it does (WO2). Somebody labelling a past run
+					{/* The field says what it does. Somebody labelling a past run
 					    for their own memory must not publish it without being told. */}
 					<p className="text-sm text-muted-foreground">
 						{kind === "guardrail"
@@ -299,7 +299,7 @@ export function LensEditor({
 				</div>
 			</section>
 
-			{/* ── closing a layer is a stated field, never inferred (GV23) ──── */}
+			{/* ── closing a layer is a stated field, never inferred ──── */}
 			<section className="flex min-w-0 flex-col gap-1">
 				<Eyebrow aside="what is not named is out">Closed layers</Eyebrow>
 				<div className="flex flex-col gap-1.5 pt-1">
@@ -363,7 +363,7 @@ export function LensEditor({
 				</div>
 			</section>
 
-			{/* ── transaction time (C12 · WO9) ──────────────────────────────── */}
+			{/* ── transaction time ──────────────────────────────── */}
 			<section className="flex min-w-0 flex-col gap-1">
 				<Eyebrow aside={draft.as_of ? undefined : "now"}>As of</Eyebrow>
 				<div className="flex min-w-0 flex-col gap-1 pt-1">
@@ -461,7 +461,7 @@ export function LensEditor({
  * `CannotAnswerCard` is the shape — *the bound named, plus what would change
  * the answer* — and a refusal with no next step is a dead end that leaves the
  * reader unable to tell *never* from *not yet*
- * ([GR4](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 function RefusalCard({ refusal }: { refusal: Refusal }) {
 	return (
@@ -482,7 +482,7 @@ function RefusalCard({ refusal }: { refusal: Refusal }) {
  * One role, bound to a model — by picking from the configured providers.
  *
  * A plan names a **role** and the cast resolves it
- * ([GV10](../../../../../docs/for-developers/modules/govern/spec.md)): `decide`
+ * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)): `decide`
  * says *how much this matters*, which stays true when the model line-up moves.
  * That is why this offers the role's meaning beside the model and not a bare
  * dropdown of ids.

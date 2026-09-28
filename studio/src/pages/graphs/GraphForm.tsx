@@ -21,7 +21,7 @@ import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs";
 interface GraphFormValues {
 	uri: string;
 	connector_class: string;
-	/** Which database on the server to read. Blank = the connector's default (docs/for-developers/modules/connect-and-model/features/connect-a-database.md CD8). */
+	/** Which database on the server to read. Blank = the connector's default (docs/for-developers/modules/connect-and-model/features/connect-a-database.md). */
 	database: string;
 	username: string;
 	password: string;
@@ -206,7 +206,7 @@ export function GraphForm({
 			uri: v.uri,
 			connector_class: v.connector_class,
 			// Blank clears the stored name back to "the connector's default" — the
-			// "blank means keep" rule belongs to credentials alone (CD8).
+			// "blank means keep" rule belongs to credentials alone.
 			database: v.database.trim() || null,
 			auth:
 				isEdit && !credsTouched
@@ -283,7 +283,7 @@ export function GraphForm({
 					// `Control` is invariant in its field-values parameter — so a real
 					// `Control<FormShape>` will not assign to it. The fix belongs in
 					// `@invana/forms` (make `ObjectField` generic in `TFieldValues`);
-					// until that ships, this is the one place Studio says so (DS3).
+					// until that ships, this is the one place Studio says so.
 					control={form.control as unknown as Control<FieldValues>}
 					name="connection"
 					fields={fields}

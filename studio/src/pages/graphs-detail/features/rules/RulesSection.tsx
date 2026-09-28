@@ -1,16 +1,16 @@
 /**
- * Rules — the second section of the Skills stack (G33).
+ * Rules — the second section of the Skills stack.
  *
  * **The statement is the row.** A rule is one sentence that is always true in
  * its scope, so the row shows the sentence itself and puts kind, scope and how
  * often it was cited underneath
  * ([RulesPanel](docs/for-developers/modules/skills/features/rules.md)).
  *
- * A rule is **offered and cited, never enforced** (RU5). Nothing on this
+ * A rule is **offered and cited, never enforced**. Nothing on this
  * surface says a run was stopped by one, because none ever is — a rule that
  * must be enforced is an envelope bound or a criterion.
  *
- * **Deactivating is not deleting** (RU4). An inactive rule stays in place,
+ * **Deactivating is not deleting**. An inactive rule stays in place,
  * dimmed, with its past citations still counted: those steps read it, and that
  * does not stop being true. There is no delete control.
  */

@@ -1,6 +1,6 @@
 /**
  * The hand-edit — the correction the prose cannot make
- * ([SK7](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  *
  * A drawn plan is usually corrected by rewriting the sentence and drawing
  * again. This is for the two cases where that cannot work: the prose is right
@@ -15,7 +15,7 @@
  * node's `${steps.X.y}` bindings and the catalogue's `requires`, so an order
  * nobody reviewed is never written down. Authoring a reusable plan is Library ›
  * Plans' surface, and keeping them apart is what stops this growing into a
- * second plan editor ([SK18](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * second plan editor ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  *
  * ## What bounds it
  *
@@ -23,20 +23,20 @@
  * read, because a list of step keys written in TypeScript would be a second
  * copy of a closed set Studio cannot see. *May **this** agent call **this**
  * step* is checked where the agent is known: at bind time
- * ([SK28](docs/for-developers/modules/skills/features/authoring-a-skill.md) ·
- * [BN5](docs/for-developers/modules/skills/features/bindings.md)).
+ * ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md) ·
+ * [bindings.md](docs/for-developers/modules/skills/features/bindings.md)).
  *
  * ## Inlining a library plan
  *
  * A row may name a **plan** instead of a step: its rows are copied in when the
  * edit is saved, flat, each carrying the plan version it came from
- * ([SK32 · SK33](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
+ * ([authoring-a-skill.md](docs/for-developers/modules/skills/features/authoring-a-skill.md)).
  * Reading one back, the consecutive rows sharing a `source_plan_key` collapse
  * into that single row again — otherwise editing a skill that inlined five
  * steps would quietly turn them into five steps somebody wrote, and the plan
  * would stop knowing what it composed. The arguments the plan declares are
  * tuned here, because picking and tuning are one act
- * ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)).
  */
 
 import {
@@ -329,7 +329,7 @@ export function SkillPlaybookEditor({
  *
  * Tuning is a property of the **call** — two skills may inline one plan with
  * different values and neither is a fork, and neither edits the plan
- * ([LB19](docs/for-developers/modules/workflows/features/the-library.md)). An
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)). An
  * argument left alone is left *absent* rather than written as a copy of the
  * default: the default belongs to the plan, and copying it here would freeze a
  * value the plan could later change for everyone.

@@ -1,19 +1,19 @@
 /**
- * **Govern** — one rail icon, one panel, two sections (GV17 · G32 · G33).
+ * **Govern** — one rail icon, one panel, two sections.
  *
  * `Worlds` over `Guardrails`, stacked, with no panel header above them: the
  * first section header is the top of the column, and the breadcrumb already says
- * which panel is open (G16).
+ * which panel is open.
  *
  * **Worlds leads and carries the ceiling with it.** A person arrives at Govern
  * to see which world a question can go under, so that list is on top; the
- * guardrails ride above it as a locked strip (W4), which states what is in
+ * guardrails ride above it as a locked strip, which states what is in
  * force without spending a section's height on one or two rows. The Guardrails
- * section below is where those rules are read in full (G1), and the strip's one
+ * section below is where those rules are read in full, and the strip's one
  * control is the way down to it.
  *
  * **One query, split by `kind`.** A guardrail and a world are one record
- * separated by `kind` (GV1), so both sections read one list rather than two
+ * separated by `kind`, so both sections read one list rather than two
  * endpoints — a second fetch would be the second enforcement path this module
  * exists not to have. The same response carries `may_edit_guardrails`, which is
  * why the permission never lands at a different moment from the rules it
@@ -21,15 +21,15 @@
  *
  * **The panel owns the write.** Both sections author the same record through the
  * same two mutations, and the guardrail save is the one that has to ask what it
- * would cost first (GR2) — so the impact dialog lives here, above both, rather
+ * would cost first — so the impact dialog lives here, above both, rather
  * than inside the section that raised it.
  *
  * It opens no canvas. A world is the bound the *other* panels run inside, so it
  * hangs over whatever is already drawn.
  *
  * **A drill-in opens the record's board beside the section**
- * ([WO15](../../../../../docs/for-developers/modules/govern/features/worlds.md) ·
- * [GR14](../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md) ·
+ * [guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
  * titled with the lens's own name. The section stays the **picking** reading —
  * 420px of rules, with the run that prompted the narrowing still open — and the
  * board is the **auditing** one, which is the reading `Save report` can keep.
@@ -66,7 +66,7 @@ export interface LensesViewPanelProps {
 	username?: string;
 	graphSlug?: string;
 	/**
-	 * Open this lens as a page — `world:<id>` or `guardrail:<id>` (WO15 · GR14).
+	 * Open this lens as a page — `world:<id>` or `guardrail:<id>`.
 	 * Absent on a surface with no page host, and then a drill-in is the section
 	 * alone rather than a control that fails.
 	 */
@@ -171,7 +171,7 @@ export function LensesViewPanel({
 
 	// The section named by `?section=` opens with more of the column, and the other
 	// keeps enough to read its list. `PanelStack` reads `defaultSize` at
-	// **mount**, so this is the opening split only (G35) — after that it is the
+	// **mount**, so this is the opening split only — after that it is the
 	// reader's.
 	//
 	// **A Graph has one or two guardrails and several worlds**, so the split is
@@ -187,7 +187,7 @@ export function LensesViewPanel({
 
 	// A drill-in expands the section holding it — the URL now names something to
 	// look at, and rendering it into a section that was collapsed makes the click
-	// look like it did nothing (G35).
+	// look like it did nothing.
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
 		govern.sectionKey === "worlds" ? govern.worldId : govern.guardrailId;
@@ -198,7 +198,7 @@ export function LensesViewPanel({
 		stackRef.current?.expand(govern.sectionKey);
 	}, [govern.sectionKey, focused]);
 
-	// **What is drilled into is what is on the board** (WO15 · GR14).
+	// **What is drilled into is what is on the board**.
 	//
 	// It is an effect and not the row's click handler because opening the board
 	// writes `?page=`, drilling in writes `?world=`, and the two hooks hold

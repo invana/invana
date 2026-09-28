@@ -1,8 +1,8 @@
 /**
  * The `skillFlow` panel kind — kept for **reports**. `skill:<id>` is now the
- * skill's page, not a board (SK36), so nothing live composes this panel; a
+ * skill's page, not a board, so nothing live composes this panel; a
  * reading saved from the retired skill board still names it, and a frozen
- * document renders whatever it names ([B16](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * document renders whatever it names ([boards-migration.md](../../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 
 import type { PanelRendererProps } from "@invana/dashboard";

@@ -1,5 +1,5 @@
 /**
- * W4 · the guardrails, locked above the worlds list.
+ * the guardrails, locked above the worlds list.
  *
  * *As someone picking a world, I want the ceiling in view while I pick, so that
  * I read each world as **narrower than this** rather than as the whole bound.*
@@ -12,7 +12,7 @@
  * would say it is one of the things you choose between. The one control is the
  * way to the section that holds the rules, because a bound nobody may read is a
  * bound nobody can work within
- * ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
 import { Button, Eyebrow, type Layer, LayerChip } from "@invana/ui";

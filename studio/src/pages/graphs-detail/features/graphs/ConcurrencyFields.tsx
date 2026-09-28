@@ -12,7 +12,7 @@
  * 08:00 is a question about this Graph, not about any one agent.
  *
  * The live counts sit under the fields rather than on a dashboard elsewhere:
- * contention has to be visible where the number that causes it is set (C8).
+ * contention has to be visible where the number that causes it is set.
  */
 
 import {
@@ -122,8 +122,8 @@ export function ConcurrencyFields({ username, graphSlug }: Props) {
 							</span>
 						) : null}
 					</p>
-					{/* A5 — the pools, busy or quiet, where the ceiling that causes the
-					    contention is set (CC8 · C8). The running count alone cannot say
+					{/* — the pools, busy or quiet, where the ceiling that causes the
+					    contention is set. The running count alone cannot say
 					    a Graph is stalled on `graphdb` with two runs going. */}
 					<PoolsTable contention={contention.data} />
 				</>

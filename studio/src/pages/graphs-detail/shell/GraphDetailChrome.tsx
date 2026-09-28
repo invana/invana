@@ -42,7 +42,7 @@ export function graphDetailChrome(deps: GraphDetailChromeDeps) {
 	const { canvas, magnet, toggleMagnet, backend, setBackend } = dataBoards;
 
 	return {
-		// One assistant, reachable from every surface (AD1). The trigger sits
+		// One assistant, reachable from every surface. The trigger sits
 		// in the header's panel controls, after fullscreen — a persistent
 		// control, so it keeps one name wherever you are.
 		headerPanelControls: (

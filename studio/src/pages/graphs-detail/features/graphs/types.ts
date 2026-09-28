@@ -10,21 +10,21 @@ type GraphContainerStatus = "active" | "archived";
 export interface SetupSectionState {
 	/** Whether the thing the step asks for exists. The engine reads this off the
 	 *  facts, not off a stored checklist
-	 *  (docs/for-developers/modules/platform/features/setup.md SU1). */
+	 *  (docs/for-developers/modules/platform/features/setup.md). */
 	done: boolean;
 	/** When the fact came into being, where a timestamp exists — the connection
 	 *  row, the first published version, the first succeeded import. Null when
 	 *  the schema records no time for it (instructions written before the stamp
 	 *  existed). */
 	completed_at?: string | null;
-	/** Set only on an optional step a person chose to pass over (CM9). */
+	/** Set only on an optional step a person chose to pass over. */
 	skipped_at?: string | null;
 	/** Whether the Graph is unready without it. The engine owns the answer;
 	 *  Studio never re-decides which steps are required. */
 	required?: boolean;
-	/** Which gate this step holds shut — `null` on an optional one (SU3). */
+	/** Which gate this step holds shut — `null` on an optional one. */
 	gate?: SetupGate | null;
-	/** The step that has to land first, when this one cannot be started (SU12).
+	/** The step that has to land first, when this one cannot be started.
 	 *  `datasets` waits on `model`, because every import path names one. */
 	blocked_by?: SetupSection | null;
 	/** A step that was done and stopped being true — an unreachable database, a
@@ -61,7 +61,7 @@ export interface Graph {
 	updated_at: string;
 }
 
-/** What is running in a Graph and what is waiting behind it (C8). */
+/** What is running in a Graph and what is waiting behind it. */
 export interface GraphContention {
 	ceiling: number;
 	policy: "queue" | "refuse";
@@ -75,7 +75,7 @@ export interface GraphContention {
 	running_count: number;
 	queued_count: number;
 	/**
-	 * Each **configured** pool, its size and what is in it right now (CC8).
+	 * Each **configured** pool, its size and what is in it right now.
 	 * Configured on the Graph, in use in the process — so a pool nobody has
 	 * touched still lists, with `in_use: 0`. The run ceiling says how many runs
 	 * may proceed; these say how many crossings may be in flight.
@@ -140,7 +140,7 @@ export const SETUP_SKIPPABLE: readonly SetupSection[] = [
 	"skills",
 ] as const;
 
-/** Setup is three gates, not one list (SU3). A gate is named for what it
+/** Setup is three gates, not one list. A gate is named for what it
  *  unlocks, so a surface waits on the one it needs rather than on all of them. */
 export type SetupGate = "connected" | "grounded" | "answering";
 
@@ -155,7 +155,7 @@ const SETUP_GATES: readonly {
 
 /** Where one setup step stands. `blocked` and `broken` are the two the engine
  *  now distinguishes: one has not been started because something else has to
- *  land first (SU12), the other was done and stopped being true. */
+ *  land first, the other was done and stopped being true. */
 export type SetupSectionStatus =
 	| "done"
 	| "broken"
@@ -196,7 +196,7 @@ export function isGateOpen(graph: Graph, gate: SetupGate): boolean {
  *
  * It is the *whole* sequence, not the required half: the board holds while an
  * optional step is outstanding, because skipping is how an offer is resolved and
- * a skip needs somewhere to be taken back (SU15 · G26).
+ * a skip needs somewhere to be taken back.
  */
 export function hasOutstandingSetup(graph: Graph | undefined): boolean {
 	if (!graph) return false;
@@ -207,7 +207,7 @@ export function hasOutstandingSetup(graph: Graph | undefined): boolean {
 }
 
 /** The sections a gate is still waiting on — what a lock names back to the
- *  reader (SU13). */
+ *  reader. */
 export function missingForGate(graph: Graph, gate: SetupGate): SetupSection[] {
 	const entry = SETUP_GATES.find((g) => g.gate === gate);
 	return (entry?.sections ?? []).filter((s) => !graph.setup_state?.[s]?.done);
@@ -253,7 +253,7 @@ export interface GraphConnectionRead {
 	graph_id: string | null;
 	uri: string;
 	connector_class: string;
-	// Which database on the server this Graph reads (docs/for-developers/modules/connect-and-model/features/connect-a-database.md CD8).
+	// Which database on the server this Graph reads (docs/for-developers/modules/connect-and-model/features/connect-a-database.md).
 	// Null means the connector's own default — never an invented name.
 	database: string | null;
 	read_only: boolean;
@@ -288,7 +288,7 @@ export interface GraphConnectionCreate {
 	uri: string;
 	connector_class: string;
 	// Blank/null means "the connector's default". Unlike `auth`, a blank value is
-	// never read as "unchanged" — it clears the stored name (CD8).
+	// never read as "unchanged" — it clears the stored name.
 	database?: string | null;
 	// Empty object means "keep existing credentials" on PUT-edit (server treats
 	// falsy auth as no-op). On create, send {username, password}.

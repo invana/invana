@@ -1,12 +1,12 @@
 /**
- * Picking the second run — the way into R3.
+ * Picking the second run — the way into.
  *
  * *As someone who re-asked a question in a different world, I want to put the
  * two runs beside each other, so that the difference in the answers has a
  * reason I can read.*
  *
  * **Compare is two runs, not a diff engine**
- * ([WO4](../../../../../docs/for-developers/modules/govern/features/worlds.md)),
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)),
  * so this picks a run that already happened. There is nothing to configure and
  * nothing to launch: a comparison of two runs that do not exist would have to
  * invent one of them.

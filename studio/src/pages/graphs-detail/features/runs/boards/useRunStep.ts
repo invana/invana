@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
-// `&step=` — the task open inside the focused run page (SR72). It rides beside
+// `&step=` — the task open inside the focused run page. It rides beside
 // `?page=run:<id>` rather than inside it: the page is the run, and a step is a
 // reading of it, so a reload lands on the step and the tab strip keeps one tab.
 const STEP_PARAM = "step";

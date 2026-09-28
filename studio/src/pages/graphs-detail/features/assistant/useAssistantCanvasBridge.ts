@@ -137,7 +137,7 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 	// Sessions whose board we have already tried to paint from. The restore
 	// effect below opens the board first and re-runs only when that left the
 	// canvas empty; without this the same tab would be opened forever and the
-	// heal path (CV16) would never be reached.
+	// heal path would never be reached.
 	const snapshotTriedRef = useRef<Set<string>>(new Set());
 
 	// Explicit projection of a graph result onto the canvas (docs/for-developers/modules/ask/features/the-answer-surface.md). Opens its
@@ -237,7 +237,7 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 	const handleRun = async (incoming: QueryRunPayload) => {
 		// The attachment goes into the ask itself, in words, rather than as a
 		// hidden context field: what the thread records has to be what was asked
-		// (docs/for-developers/modules/ask/features/the-assistant.md AD2).
+		// (docs/for-developers/modules/ask/features/the-assistant.md).
 		// Removing the chip removes the line — asked without it, and the thread
 		// shows that too.
 		const attached =
@@ -316,11 +316,11 @@ export function useAssistantCanvasBridge(deps: AssistantCanvasBridgeDeps) {
 	);
 
 	// Restore a session's canvas when it is opened — **from the record first**
-	// (docs/for-developers/modules/ask/features/the-answer-surface.md AS13): the
+	// (docs/for-developers/modules/ask/features/the-answer-surface.md): the
 	// board's snapshot is what was drawn, and the reply's emissions are what was
 	// answered, so a reload renders both without asking the graph anything. A
 	// re-run is the fallback for a board with no snapshot to paint
-	// (docs/for-developers/modules/explore/features/boards.md CV16) — a board
+	// (docs/for-developers/modules/explore/features/boards.md) — a board
 	// saved before autosave existed — and never what a refresh does.
 	useEffect(() => {
 		if (!activeSession) {

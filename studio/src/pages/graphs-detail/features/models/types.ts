@@ -179,7 +179,7 @@ export interface IndexCreate {
 
 // ── The staged set (docs/for-developers/modules/connect-and-model/features/model-editor.md) ──
 //
-// The draft *is* the staged set (ME2, ME4): what is staged is the difference
+// The draft *is* the staged set: what is staged is the difference
 // between the draft and the version it replaces, which is why it survives a
 // reload and reads the same to everyone who opens the model.
 
@@ -212,7 +212,7 @@ export interface StagedSet {
 	reason: string | null;
 }
 
-/** One operation a projection would push (the-model-page.md MP20). */
+/** One operation a projection would push (the-model-page.md). */
 interface ProjectionOperation {
 	action: "create_index" | "create_constraint";
 	name: string;
@@ -230,7 +230,7 @@ export interface ProjectionPlan {
 	operations: ProjectionOperation[];
 }
 
-/** A stitch that keeps a model from being archived (MP7). */
+/** A stitch that keeps a model from being archived. */
 export interface BindingStitch {
 	id: string;
 	kind: LinkKind;
@@ -257,7 +257,7 @@ export interface ModelArtefact {
 	links: unknown[];
 }
 
-/** A property type the bound database cannot hold — named, never dropped (SM4). */
+/** A property type the bound database cannot hold — named, never dropped. */
 interface UnsupportedPropertyType {
 	property_key: string;
 	type: string;
@@ -303,7 +303,7 @@ export interface StarterSummary {
 // ── Links and the global model (stitch-models.md) ───────────────────────────
 
 export type LinkKind = "anchor" | "relationship";
-/** A stitch is declared staged and reaches the union on a commit (ST21). */
+/** A stitch is declared staged and reaches the union on a commit. */
 type LinkStatus = "staged" | "active";
 export type IdentityMatch = "exact" | "case_insensitive";
 
@@ -319,16 +319,16 @@ export interface ModelLink {
 	target_type: string;
 	target_model: string | null;
 	target_version: string | null;
-	/** A key on each side (ST26) — the two models rarely spell the fact alike. */
+	/** A key on each side — the two models rarely spell the fact alike. */
 	source_property: string | null;
 	target_property: string | null;
 	identity_match: IdentityMatch;
 	edge_type: string | null;
-	/** Relationship only — the model whose records ship this edge's rows (ST27). */
+	/** Relationship only — the model whose records ship this edge's rows. */
 	source_model_id: string | null;
-	/** Where it came from — a bundle applied by the CLI says so here (ST50). */
+	/** Where it came from — a bundle applied by the CLI says so here. */
 	description: string;
-	/** What committing this stitch wrote. Present on a commit's reply only (ST44). */
+	/** What committing this stitch wrote. Present on a commit's reply only. */
 	edges_written?: number | null;
 }
 
@@ -346,7 +346,7 @@ export interface ModelLinkDeclare {
 	description?: string;
 }
 
-/** Where a relationship's endpoints come from — one or the other, never both (ST27). */
+/** Where a relationship's endpoints come from — one or the other, never both. */
 export type EndpointSource = "keys" | "records";
 
 /** How many the rule resolves, counted *before* the stitch is declared. */
@@ -385,7 +385,7 @@ export interface GlobalType {
 	anchored: boolean;
 }
 
-/** The union of the Graph's published models plus its links — derived on read (ST3). */
+/** The union of the Graph's published models plus its links — derived on read. */
 export interface GlobalModel {
 	node_types: GlobalType[];
 	edge_types: GlobalType[];
@@ -396,11 +396,11 @@ export interface GlobalModel {
 	/** Declared but not committed — counted beside the union, never into it. */
 	staged_count: number;
 	collapsed: string[];
-	/** What the database actually holds — beside the derived counts, never in them (ST7). */
+	/** What the database actually holds — beside the derived counts, never in them. */
 	mirror_label_count: number;
 }
 
-// ── Insights — the model page's measured tabs (the-model-page.md MP33) ─────
+// ── Insights — the model page's measured tabs (the-model-page.md) ─────
 
 export type InsightsWindow = "7d" | "30d" | "90d";
 type WriteSource = "introspect" | "import" | "stitch_commit";
@@ -415,7 +415,7 @@ interface GrowthSeries {
 	key: string;
 	name: string;
 	kind: "model" | "node" | "edge";
-	/** One per day; `null` before anything was counted (MP32). */
+	/** One per day; `null` before anything was counted. */
 	values: (number | null)[];
 }
 
@@ -456,7 +456,7 @@ export type SignalKind =
 	| "supernode"
 	| "cold";
 
-/** A fixed rule that fired (MP10). */
+/** A fixed rule that fired. */
 export interface Signal {
 	signal: SignalKind;
 	subject: string;
@@ -497,7 +497,7 @@ export interface UsageRow {
 
 export interface Usage {
 	total: number;
-	/** Fewer than 50 queries on the Graph — counts, never signals (MP10). */
+	/** Fewer than 50 queries on the Graph — counts, never signals. */
 	too_few: boolean;
 	callers: Record<CallerKind, number>;
 	rows: UsageRow[];
@@ -545,14 +545,14 @@ export interface Performance {
 
 export interface Insights {
 	window: InsightsWindow;
-	/** `null` — the engine does not measure this slice (MP33). */
+	/** `null` — the engine does not measure this slice. */
 	growth: Growth | null;
 	overview: Overview | null;
 	usage: Usage | null;
 	performance: Performance | null;
 }
 
-/** An index the plan says is missing, and the model it would be staged on (MP13 · MP39). */
+/** An index the plan says is missing, and the model it would be staged on. */
 export interface Advice {
 	kind: "missing_index";
 	label: string;
@@ -581,7 +581,7 @@ export interface ShapeCard {
 		task_run_id: string | null;
 	}[];
 	advice: Advice[];
-	/** False — this connector cannot explain; advice is not available (MP39). */
+	/** False — this connector cannot explain; advice is not available. */
 	explains: boolean;
 }
 
@@ -687,21 +687,21 @@ export interface GraphVersionResponse {
 	indexes: IndexResponse[];
 }
 
-// ── The physical read — the model page's Database tab (MP9) ───────────────
+// ── The physical read — the model page's Database tab ───────────────
 
-/** How a row stands against the models (the-model-page.md MP9). */
+/** How a row stands against the models (the-model-page.md). */
 export type Drift = "in_both" | "model_only" | "database_only";
 
-/** A label or relationship type, and which models declare it (MP17). */
+/** A label or relationship type, and which models declare it. */
 export interface PhysicalType {
 	name: string;
 	models: string[];
-	/** Live; `null` where the connector cannot count (MP28). */
+	/** Live; `null` where the connector cannot count. */
 	count: number | null;
 	drift: Drift;
 }
 
-/** An index or constraint, matched by what it covers (MP27). */
+/** An index or constraint, matched by what it covers. */
 export interface PhysicalRule {
 	name: string;
 	label: string;
@@ -714,10 +714,10 @@ export interface PhysicalRule {
 export interface PhysicalSchema {
 	/** `null` — never introspected. */
 	captured_at: string | null;
-	/** An import counted after the mirror was captured (MP34). */
+	/** An import counted after the mirror was captured. */
 	stale: boolean;
 	connector: string | null;
-	/** Whether the connector lists its indexes and constraints (MP26). */
+	/** Whether the connector lists its indexes and constraints. */
 	lists_schema: boolean;
 	/** What the scope's models declare — said even where nothing can check them. */
 	declared_indexes: number;

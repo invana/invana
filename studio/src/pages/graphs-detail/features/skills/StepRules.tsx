@@ -1,15 +1,15 @@
 /**
  * The rules a step row shows — offered, with the cited ones marked
- * ([RU12](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * The same two certainties as a skill, drawn the same way so a reader does not
  * have to learn a second convention: **offered** is a fact about the prompt,
- * **cited** is the model's own claim ([RU5](../../../../../docs/for-developers/modules/skills/features/rules.md) ·
- * [RU7](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * **cited** is the model's own claim ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md) ·
+ * [rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * A statement is the row, never an id — an id names nothing a reader can judge,
  * and a rule's identity *is* its wording. Clicking one opens that rule's
- * `kind = rule` board ([RU11](../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * `kind = rule` board ([rules.md](../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
 import { cn } from "@invana/ui";

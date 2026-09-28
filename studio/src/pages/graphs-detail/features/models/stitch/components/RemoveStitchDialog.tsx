@@ -1,5 +1,5 @@
 /**
- * Removing a stitch — what the union stops spanning (the *Removing* artboard, T8).
+ * Removing a stitch — what the union stops spanning (the *Removing* artboard).
  *
  * The dialog states three things, in this order, because that is the order a
  * person needs them:
@@ -9,7 +9,7 @@
  * 2. **What stops** — a question that crossed this pair will no longer resolve,
  *    and will *say so* rather than answering from one side. That is the loss.
  * 3. **What stays** — both node types, both models, every record. An anchor
- *    links; nothing was merged, so nothing is lost by unlinking (ST2), and a
+ *    links; nothing was merged, so nothing is lost by unlinking, and a
  *    destructive-looking confirm that is in fact reversible should say so.
  *
  * It is not a `ConfirmDialog`: the header carries the stitch's kind as a badge

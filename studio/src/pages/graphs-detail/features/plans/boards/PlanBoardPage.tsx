@@ -1,6 +1,6 @@
 /**
  * The plan page — `plan_runs:<plan_id>` in `BoardPagesViewPanel`
- * ([LB24](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
+ * ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * It fetches and answers actions. It composes nothing: `planBoardSpec`
  * builds the document and `@invana/dashboard` draws it. The window, the tab,
@@ -50,7 +50,7 @@ export function PlanBoardPage({
 	/** The `task_plans.id` the board is keyed by. */
 	planId: string;
 	onOpenRun: (runId: string) => void;
-	/** `⋯` — a reading of the version the header names, as its own page (LB38). */
+	/** `⋯` — a reading of the version the header names, as its own page. */
 	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
 	const library = useTaskPlansQuery(username, graphSlug);
@@ -111,7 +111,7 @@ export function PlanBoardPage({
 		);
 	}, [plan.data, versions, performance.data, runs.data, view]);
 
-	// `Save report` on the header, and the act behind it (LB39 · B6). What it
+	// `Save report` on the header, and the act behind it. What it
 	// keeps is this reading — the version, window and tab — resolved.
 	const report = useReport(spec);
 

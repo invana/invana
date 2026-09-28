@@ -1,5 +1,5 @@
 /**
- * A5 · the pools, busy or quiet — and what is waiting behind the ceiling.
+ * the pools, busy or quiet — and what is waiting behind the ceiling.
  *
  * *As the person who set this Graph's ceiling, I want to see which pool is
  * full and who is queued behind it, so that "why is nothing moving?" has an
@@ -7,7 +7,7 @@
  *
  * **A pool that appeared only once it was busy would make *is this Graph
  * stalled on connections?* a question nobody could answer in the quiet case**
- * ([CC8](../../../../../docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
+ * ([concurrency-and-contention.md](../../../../../docs/for-developers/modules/agents/features/concurrency-and-contention.md)).
  * So every configured pool lists, `in_use: 0` included, and the table is the
  * same shape whether anything is in flight or not.
  *
@@ -18,7 +18,7 @@
  *
  * **A queued run names why it is waiting**, and *a person is waiting* is the
  * one reason that changes what anybody does about it: a person's question is
- * served before a scheduled run (CC3).
+ * served before a scheduled run.
  */
 
 import { type ColumnDef, DataTable } from "@invana/tables";

@@ -1,9 +1,9 @@
 /**
- * Thinking — the agent's focus and its effort (AG23).
+ * Thinking — the agent's focus and its effort.
  *
  * No default stance yet: it ships with stances themselves, and until they are
- * rows with an author and a version this tab carries focus and effort only
- * (AG27). Effort is `agents.effort`, edited here and nowhere else (EB9).
+ * rows with an author and a version this tab carries focus and effort only.
+ * Effort is `agents.effort`, edited here and nowhere else.
  */
 
 import { Textarea } from "@invana/forms";
@@ -22,7 +22,7 @@ export function AgentEffortTab({
 	onPatch: (next: Partial<AgentDraft>) => void;
 }) {
 	// Focus beside effort, as drawn; the stance takes the second column when
-	// stances ship (AG27 · AG38).
+	// stances ship.
 	return (
 		<div className="grid items-start gap-2.5 p-3.5 @[760px]:grid-cols-2">
 			<PanelSection card title="Focus" hint="after the Graph's instructions">
@@ -37,7 +37,7 @@ export function AgentEffortTab({
 
 			<PanelSection card title="Effort">
 				{/* The placeholder is what a run reads where this agent is silent —
-				    the default, or a number still carried on the old columns (EB11). */}
+				    the default, or a number still carried on the old columns. */}
 				<CeilingsTable
 					group="effort"
 					values={draft.effort}

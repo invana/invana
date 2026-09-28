@@ -10,7 +10,7 @@ export interface RunListRow {
 	kind: RunKind;
 	/**
 	 * What the run was about, in the words it was opened with — the question as
-	 * typed, the query text, or the records it loaded (SR45).
+	 * typed, the query text, or the records it loaded.
 	 */
 	title: string;
 	/** The title is a query, not a sentence — a `ql-*` plan ran it. */

@@ -1,5 +1,5 @@
 /**
- * The skill's page, as a page in `mainSection` (SK17 · SK36) — `skill:<id>`
+ * The skill's page, as a page in `mainSection` — `skill:<id>`
  * on the strip, the Skills list left beside it in `leftSection`.
  *
  * This is the host half: which skill, and whether its Playbook is being
@@ -50,7 +50,7 @@ export function SkillBoardPage({
 			username={username}
 			graphSlug={graphSlug}
 			skill={skill}
-			// A draft has nothing to read yet, so it opens editing (SK37).
+			// A draft has nothing to read yet, so it opens editing.
 			editing={editing || skill.is_draft}
 			onEditing={setEditing}
 			onOpenAgent={onOpenAgent}

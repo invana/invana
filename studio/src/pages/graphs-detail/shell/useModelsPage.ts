@@ -17,7 +17,7 @@ export function useModelsPage(
 	const { openBoard, setBoards, setActiveBoardId } = openBoards;
 
 	/**
-	 * **Models is one page** (the-model-page.md MP1 · MP18): switching the
+	 * **Models is one page** (the-model-page.md): switching the
 	 * `leftNav` to Models opens the `models` board, whatever the scope. It fires
 	 * on the transition into the panel and nothing else, so closing the page with
 	 * its X while the panel is open leaves it closed — a page that reopened

@@ -127,7 +127,7 @@ export const graphsApi = {
 			body: JSON.stringify(data),
 		}),
 
-	/** The Graph's ceiling, and what it is holding back right now (C8). */
+	/** The Graph's ceiling, and what it is holding back right now. */
 	contention: (username: string, graphSlug: string) =>
 		request<GraphContention>(`/api/v1/u/${username}/${graphSlug}/contention`),
 };

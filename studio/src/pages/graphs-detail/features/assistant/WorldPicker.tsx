@@ -1,23 +1,23 @@
 /**
- * C8 · the world the thread asks in — a control in the composer, between the
- * ask kind and the agent (AD15).
+ * the world the thread asks in — a control in the composer, between the
+ * ask kind and the agent.
  *
  * *As someone asking in a thread, I want to say which factors the answers may
  * rest on, for every ask or for the next one only, so that I am choosing what
  * they depend on rather than discovering it afterwards.*
  *
  * **It reads the open session**, not the page: picking a world sets it for
- * every ask in the thread (AS5), and *Next ask only* scopes the pick to one ask
- * — the trigger wears a tag until that ask is sent (AD16).
+ * every ask in the thread, and *Next ask only* scopes the pick to one ask
+ * — the trigger wears a tag until that ask is sent.
  *
  * **It reads `Everything` when nothing is picked**, which is a real world and
- * the default one ([GV7](../../../../../../docs/for-developers/modules/govern/spec.md))
+ * the default one ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md))
  * — and when the thread's world was deleted, it says so rather than reading as
- * though nobody had picked one (AD20).
+ * though nobody had picked one.
  *
  * **A world naming a version that has since been unpublished is disabled with
  * its reason** — refused before a run opens rather than after it fails
- * ([GR13](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
 import { RichSelect, type RichSelectOption } from "@invana/ui";
@@ -29,7 +29,7 @@ import {
 	useParticipantsQuery,
 } from "@/pages/graphs-detail/features/lenses";
 
-/** The rules GR13 resolves — a model version is the one participant a world can
+/** The rules resolves — a model version is the one participant a world can
  *  name that the Graph can stop publishing underneath it. */
 const MODEL_PREFIX = "graph_data/model/";
 /** RichSelect is keyed by string; *Everything* is the absence of a world. */
@@ -68,7 +68,7 @@ export function WorldPicker({
 	);
 
 	// What each world names that the Graph no longer has, resolved against the
-	// live catalogue (GV21). A wildcard is checked like any other pattern — it is
+	// live catalogue. A wildcard is checked like any other pattern — it is
 	// the *resolution* that decides — and only `graph_data/model/…` is in scope:
 	// an empty layer is not a stale world.
 	const stale = useMemo(() => {

@@ -1,5 +1,5 @@
 /**
- * Skills — a **stack**, not a list (G33): `Skills` over `Rules`.
+ * Skills — a **stack**, not a list: `Skills` over `Rules`.
  *
  * The two sections answer different questions about one subject — what a run is
  * *given* before it runs. A skill is a playbook that may be offered; a rule is
@@ -7,9 +7,9 @@
  * ids, and **neither is enforced** (skills/spec.md § 2).
  *
  * A stack has no panel header above its sections: the first section header is the
- * top of the column, and the breadcrumb already says which panel is open (G32).
+ * top of the column, and the breadcrumb already says which panel is open.
  * The Skills section is its list: selecting a row gives a quick look under it,
- * and **Open** gives the skill's page in `mainSection` (SK17 · SK37). The Rules
+ * and **Open** gives the skill's page in `mainSection`. The Rules
  * section keeps its place underneath.
  *
  * ## The canvas keeps whatever it was showing
@@ -51,7 +51,7 @@ interface Props {
 	selectedSkillId: string | null;
 	onSelectSkill: (id: string | null) => void;
 	/**
-	 * **Open** — the skill's page in `mainSection` (SK17 · SK37). The stack
+	 * **Open** — the skill's page in `mainSection`. The stack
 	 * stays where it is; the page opens beside it.
 	 */
 	onOpenSkillPage: (skillId: string) => void;
@@ -80,7 +80,7 @@ export function SkillsViewPanel({
 	/**
 	 * A new skill is a **draft** the moment it is created: the row exists, its
 	 * plan exists as one `form: human` node, and its page opens on Playbook with
-	 * the prose empty (SK20 · SK22 · SK37). Nothing is offered it until it is
+	 * the prose empty. Nothing is offered it until it is
 	 * published.
 	 */
 	const newSkill = () => {
@@ -149,8 +149,8 @@ export function SkillsViewPanel({
 		{
 			id: "skills",
 			title: <SectionTitle count={items.length}>Skills</SectionTitle>,
-			// The header's one action area carries the act the section is for
-			// (SK27). The section does not drill in — the detail is the page.
+			// The header's one action area carries the act the section is for.
+			// The section does not drill in — the detail is the page.
 			headerActions: [
 				{
 					name: "New skill",
@@ -164,7 +164,7 @@ export function SkillsViewPanel({
 		{
 			id: "rules",
 			// The drill-in **is** the header — the trail as text, and the act on
-			// the right (SK27).
+			// the right.
 			title: openRule ? (
 				<span className="flex min-w-0 items-center gap-1">
 					<span className="text-muted-foreground uppercase">Rules</span>
@@ -260,7 +260,7 @@ function SkillRow({
 				<span className="truncate text-base font-medium">{skill.name}</span>
 				{skill.is_draft ? (
 					// A draft says so: nothing is offered it, and a row that looked
-					// published would be the one lie this list can tell (SK21).
+					// published would be the one lie this list can tell.
 					<Badge variant="outline" className="shrink-0">
 						draft
 					</Badge>
@@ -290,7 +290,7 @@ function SkillRow({
 }
 
 /**
- * The selected row's quick look (SK37): which one is this, and is it used.
+ * The selected row's quick look: which one is this, and is it used.
  * Everything else is on the page, one click on by **Open**.
  */
 function SkillQuickLook({

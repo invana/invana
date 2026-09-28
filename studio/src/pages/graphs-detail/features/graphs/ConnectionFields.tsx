@@ -1,20 +1,20 @@
 /**
  * The Connection group inside the settings form (`Graph · settings` hi-fi).
  *
- * One Graph, one graph database (CD1). Five things this surface has to say out
+ * One Graph, one graph database. Five things this surface has to say out
  * loud, because each is a rule somebody would otherwise discover the hard way:
  *
  * | Rule | How it shows |
  * |---|---|
- * | Test gates Save (CD2) | the form's Save stays disabled until a test passes |
- * | The connector is fixed after the first save (CD3) | the connector field is read-only once set |
- * | A blank credential means *unchanged* (CD4) | said under the password field, not implied |
- * | Status is a fact with a time on it (C7) | `connected · Neo4j 5.26 · 0 labels · read/write` |
- * | Which database on the server (C8/CD8) | a row beside the URI, editable, blank reading as "Connector default" |
+ * | Test gates Save | the form's Save stays disabled until a test passes |
+ * | The connector is fixed after the first save | the connector field is read-only once set |
+ * | A blank credential means *unchanged* | said under the password field, not implied |
+ * | Status is a fact with a time on it | `connected · Neo4j 5.26 · 0 labels · read/write` |
+ * | Which database on the server | a row beside the URI, editable, blank reading as "Connector default" |
  *
  * `Introspect` sits beside `Test connection` because reading what the database
  * holds is the natural next question after proving you can reach it — and what
- * it returns is the **physical mirror**, never the model (introspect-a-database.md ID2).
+ * it returns is the **physical mirror**, never the model (introspect-a-database.md).
  */
 
 import { Badge, Button, Skeleton } from "@invana/ui";
@@ -166,9 +166,9 @@ export function ConnectionFields({ username, graphSlug }: Props) {
 }
 
 /**
- * The status strip, in the order CD7 fixes: connector, server version, labels,
+ * The status strip, in the order fixes: connector, server version, labels,
  * read-write. A failure keeps the last successful check's time rather than
- * going silent (C7).
+ * going silent.
  */
 function ConnectionStrip({ connection }: { connection: GraphConnectionRead }) {
 	const connected = connection.status === "ACTIVE";

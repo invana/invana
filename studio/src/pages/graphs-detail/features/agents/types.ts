@@ -26,8 +26,8 @@ export interface Agent {
 	/** The envelope: allow-list · pinned args · require · templates · budgets. */
 	workflow_spec: Record<string, unknown>;
 	/**
-	 * The agent's own guardrail, scoped `agent:<id>` (AG10 · AG26). An agent
-	 * binds no world — the world comes with the work (AG24). Null is *none of
+	 * The agent's own guardrail, scoped `agent:<id>`. An agent
+	 * binds no world — the world comes with the work. Null is *none of
 	 * its own*; the name rides with the id so a row draws it without a fetch.
 	 */
 	guardrail_id: string | null;
@@ -37,17 +37,17 @@ export interface Agent {
 	budget: Record<string, number>;
 	/**
 	 * How hard it tries — `max_steps` · `max_replans` · `max_clarifications` —
-	 * as stored; a missing key is the default (EB9). `effective_effort` is what
-	 * a run reads, defaults and the one-release fallbacks filled in (EB11).
+	 * as stored; a missing key is the default. `effective_effort` is what
+	 * a run reads, defaults and the one-release fallbacks filled in.
 	 */
 	effort: Partial<Record<EffortKey, number>>;
 	effective_effort: Record<EffortKey, number>;
-	/** Whether an Explorer ask may run through it — decides *Make default* (AG3). */
+	/** Whether an Explorer ask may run through it — decides *Make default*. */
 	answers_asks: boolean;
 	policy: Record<string, boolean>;
-	/** Markdown. Empty is Invana's default voice, never no voice (SO3). */
+	/** Markdown. Empty is Invana's default voice, never no voice. */
 	soul: string;
-	/** The voice dials; a missing key is its default (AG16). */
+	/** The voice dials; a missing key is its default. */
 	soul_traits: SoulTraits;
 	parent_agent_id: string | null;
 	spawned_in_run_id: string | null;
@@ -64,9 +64,9 @@ export interface AgentListResponse {
 	default_agent_id: string | null;
 	/**
 	 * `{agent_id: usd}` since the first of the month — what a row draws against
-	 * `max_cost_usd_month` (C10). An agent with no **priced** run is absent, not
+	 * `max_cost_usd_month`. An agent with no **priced** run is absent, not
 	 * zero: a subscription endpoint publishes no per-token rate, so *nothing
-	 * spent* and *nothing known* are different facts (OB4).
+	 * spent* and *nothing known* are different facts.
 	 */
 	spend_this_month: Record<string, number>;
 }
@@ -104,14 +104,14 @@ export interface SoulTraits {
 	greeting?: "off" | "on";
 }
 
-/** One bound skill, and the callables its current plan names (C12 · AG30). */
+/** One bound skill, and the callables its current plan names. */
 export interface AgentSkillRow {
 	skill_id: string;
 	name: string;
 	/** Null for a skill with no published version — offered nothing yet. */
 	version: number | null;
 	when_to_use: string;
-	/** Derived from the plan, `uses` inlined, in plan order (AG15). */
+	/** Derived from the plan, `uses` inlined, in plan order. */
 	needs: string[];
 	/** The library plans it inlined, `key@version`. */
 	uses: string[];
@@ -122,7 +122,7 @@ export interface AgentSkillRow {
 	enough_to_read: boolean;
 }
 
-/** One callable the envelope allows (C12). */
+/** One callable the envelope allows. */
 export interface AgentCallableRow {
 	step_key: string;
 	/** `graph_read` · `llm` · `none` … or `unknown` for a retired key. */
@@ -141,8 +141,8 @@ export interface AgentSkillsAndCallables {
 }
 
 /**
- * What the agent is using now, each beside the limit that caps it (AG31).
- * `spend_this_month` absent is *nothing priced*, never zero (AG11).
+ * What the agent is using now, each beside the limit that caps it.
+ * `spend_this_month` absent is *nothing priced*, never zero.
  */
 export interface AgentMeters {
 	agent_id: string;
@@ -169,7 +169,7 @@ export interface SoulPreviewRequest {
 	soul_traits: SoulTraits;
 }
 
-/** One ask, answered twice; neither reply read the graph (SO8). */
+/** One ask, answered twice; neither reply read the graph. */
 export interface SoulPreview {
 	ask: string;
 	current: string;
@@ -204,12 +204,12 @@ export interface AgentLineage {
 	edges: AgentEdge[];
 }
 
-/** The two acts that disturb open work. Resume takes nothing away (LC10). */
+/** The two acts that disturb open work. Resume takes nothing away. */
 export type LifecycleAct = "pause" | "retire";
 
 /**
  * What an act does to one piece of open work — a closed vocabulary, because a
- * sentence per row is a sentence nobody can compare (LC9).
+ * sentence per row is a sentence nobody can compare.
  */
 export type LifecycleEffect = "finishes" | "blocked" | "unchanged" | "refused";
 
@@ -223,7 +223,7 @@ export interface LifecycleItem {
 }
 
 /**
- * One shape for both acts (LC8): the same open work, carrying the effect *this*
+ * One shape for both acts: the same open work, carrying the effect *this*
  * act would have on it. Named, not counted — a count is not enough to decide
  * with, and a todo in review is where the two acts part.
  */

@@ -1,5 +1,5 @@
 /**
- * From the generic JSON to the config one graph needs (GM5–GM7).
+ * From the generic JSON to the config one graph needs.
  *
  * `settings.json` and `templates.json` name no model and no type — Studio's are
  * the user's own. Three things are filled in against the data and the live
@@ -31,7 +31,7 @@ const FALLBACK_HUES = [
 
 /**
  * A model's slot in the palette, `1`–`8`, by its name — so a model keeps its
- * hue when another is added, deleted or the list is re-sorted (GM7).
+ * hue when another is added, deleted or the list is re-sorted.
  */
 export const hueSlotForName = (name: string): number => colorSlotByString(name);
 
@@ -49,7 +49,7 @@ function readToken(name: string): number | undefined {
 /** What the live theme resolves for the colours the canvas paints per node. */
 export interface LiveColors {
 	hues: number[];
-	/** A staged stitch — what is about to land (ST21). */
+	/** A staged stitch — what is about to land. */
 	success: number;
 }
 
@@ -116,7 +116,7 @@ const ROW_HEIGHT = 22;
 /**
  * One type's schema card: a header, then one row per property — type chip,
  * name, `key` when a stitch keys on it, type. The story writes these out per
- * type; here the rows come from the type's own properties (GM6).
+ * type; here the rows come from the type's own properties.
  */
 function schemaCard(name: string, d: ModelTypeData) {
 	const hueLookup = { bind: "data.hue", map: {} };

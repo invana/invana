@@ -54,7 +54,7 @@ export function RecordRow({
 	statusTone?: Tone;
 	/** Hover-revealed controls, before the status badge. */
 	actions?: ReactNode;
-	/** Keep the actions shown — the selected row's `Open` (the-model-page.md MP5). */
+	/** Keep the actions shown — the selected row's `Open` (the-model-page.md). */
 	pinActions?: boolean;
 	className?: string;
 }) {

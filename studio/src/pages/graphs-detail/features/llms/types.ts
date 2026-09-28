@@ -1,13 +1,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // LLM provider types — mirrors engine/src/invana/apps/llm_providers/schemas.py
 //
-// **A provider row is a configured endpoint, not a model** (PM9): a name
+// **A provider row is a configured endpoint, not a model**: a name
 // somebody chose, a vendor kind, a base URL and one credential; `models` holds
-// what it offers. The `name` is the address segment (PM10), so it is the word a
+// what it offers. The `name` is the address segment, so it is the word a
 // rule names and a refusal reads back — never a uuid.
 //
 // There is no `is_default` anywhere here. The lens `cast` answers *which model
-// when nobody said* (PM4), and two mechanisms picking a model is the
+// when nobody said*, and two mechanisms picking a model is the
 // duplication Govern exists to remove.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -86,11 +86,11 @@ export const LLM_PROVIDER_OPTIONS: ReadonlyArray<{
 	},
 ];
 
-/** Whether this endpoint still offers the model (PM11). */
+/** Whether this endpoint still offers the model. */
 type LLMModelStatus = "active" | "removed";
 
 /**
- * What the **shipped cast** reads, and nothing a vendor merely states (PM12).
+ * What the **shipped cast** reads, and nothing a vendor merely states.
  * A model added without ranks is never auto-cast, so the section asks for them.
  */
 interface LLMModelCapabilities {
@@ -132,14 +132,14 @@ export interface LLMModelCreate {
 export interface LLMProvider {
 	id: string;
 	graph_id: string;
-	/** The address segment, chosen by a person (PM10). */
+	/** The address segment, chosen by a person. */
 	name: string;
 	provider: LLMProviderKind;
 	has_api_key: boolean;
 	credential_kind: LLMCredentialKind | null;
 	base_url: string | null;
 	guardrails: Record<string, unknown>;
-	/** A provider row alone answers nothing — these are what it offers (PM9). */
+	/** A provider row alone answers nothing — these are what it offers. */
 	models: LLMModel[];
 	created_at: string;
 	updated_at: string;
@@ -183,7 +183,7 @@ export interface LLMPingResponse {
 
 /**
  * The address segment is a slug — lowercase words, digits and hyphens — because
- * a rule is written against it and a refusal reads it back (PM10).
+ * a rule is written against it and a refusal reads it back.
  */
 export const PROVIDER_NAME_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
 

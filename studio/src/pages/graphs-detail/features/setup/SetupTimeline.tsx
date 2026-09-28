@@ -24,14 +24,14 @@ interface Props {
 }
 
 /**
- * Setup, as the sequence it actually is (graph-detail-page.md G21 · G27).
+ * Setup, as the sequence it actually is (graph-detail-page.md).
  *
  * The compact half of the pair: the board on the graph page is where a step is
  * done, this is where it is remembered. Both read `setupSteps.ts`, so the
  * sequence cannot say two different things in two places.
  *
  * It draws what the engine **derived** — a step is done when the thing it asks
- * for exists (setup.md SU1), so importing data ticks "Bring data in" without
+ * for exists (setup.md), so importing data ticks "Bring data in" without
  * anyone telling setup. That is the whole reason this replaced a checklist: the
  * old one could be honestly finished and still read as untouched.
  *
@@ -52,7 +52,7 @@ export function SetupTimeline({ graph }: Props) {
 
 	// The first step still to do is the one the user is being asked for now;
 	// everything after it waits its turn. Only one step is ever "next", and a
-	// blocked one is never it (SU12).
+	// blocked one is never it.
 	const nextKey = SETUP_STEPS.find(
 		(s) =>
 			setupSectionStatus(graph.setup_state?.[s.key]) === "todo" &&

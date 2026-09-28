@@ -115,7 +115,7 @@ export function deriveComposerConfig(
 		.find((m) => m.role === "assistant" && !m.operation && (m.mode || m.via));
 	if (!last) return null;
 	// `via` reads "<vendor kind> · <model id>", and a model is a row under the
-	// endpoint that offers it (PM9) — so the restore matches through `models`.
+	// endpoint that offers it — so the restore matches through `models`.
 	const provider = last.via?.includes(" · ")
 		? llmProviders.find((p) =>
 				p.models.some((m) => `${p.provider} · ${m.model_id}` === last.via),
@@ -142,7 +142,7 @@ export function deriveComposerConfig(
 
 /**
  * What the ask is about — the canvas selection, named
- * (docs/for-developers/modules/ask/features/the-assistant.md C2).
+ * (docs/for-developers/modules/ask/features/the-assistant.md).
  */
 export interface AssistantAttachment {
 	id: string;
@@ -150,7 +150,7 @@ export interface AssistantAttachment {
 	kind: string;
 }
 
-/** The canvas selection, as an attachment — or nothing, which is fine (C1 seam). */
+/** The canvas selection, as an attachment — or nothing, which is fine (seam). */
 export function attachmentFor(
 	selected: QueryResultItem | null,
 ): AssistantAttachment | null {
@@ -165,11 +165,11 @@ export function attachmentFor(
 /**
  * `Asking about obs_20260908_bpcl_01 · Observation`, with a remove.
  *
- * Visible and removable, both on purpose (AD2): an attachment that cannot be
+ * Visible and removable, both on purpose: an attachment that cannot be
  * seen is a hidden prompt, and one that cannot be removed makes the composer
  * useless for the next question. It sits **here**, directly above the input,
  * rather than at the top of the panel — a chip a list's length away from the
- * ask it qualifies is not attached to anything the user can see (AD10).
+ * ask it qualifies is not attached to anything the user can see.
  */
 function AttachmentChip({
 	attachment,
@@ -225,12 +225,12 @@ export interface SessionComposerProps {
 	agentName?: string | null;
 	/** `paused` / `retired` blocks the ask and points at the Agents panel. */
 	agentStatus?: string | null;
-	/** What the ask is about, drawn as a chip above the input (AD2/AD10). Null
+	/** What the ask is about, drawn as a chip above the input. Null
 	 *  when nothing is selected, or when the user took it off. */
 	attachment?: AssistantAttachment | null;
 	/** Take the attachment off — the next ask goes without it. */
 	onRemoveAttachment?: () => void;
-	/** The world picker (AD15) — placed between the ask kind and the agent. */
+	/** The world picker — placed between the ask kind and the agent. */
 	worldControl?: ReactNode;
 }
 
@@ -380,7 +380,7 @@ export function SessionComposer({
 		}
 		if (llmProviders.some((p) => p.id === llmProviderId)) return;
 		// **Nothing here is a default.** `is_default` is gone, and the lens `cast`
-		// answers *which model when nobody said* (PM4) — this only keeps a stale
+		// answers *which model when nobody said* — this only keeps a stale
 		// id from being sent after the endpoint it named was deleted.
 		setLlmProviderId(llmProviders[0]?.id ?? "");
 	}, [llmProviders, llmProviderId]);
@@ -534,7 +534,7 @@ export function SessionComposer({
 	const removeFile = (index: number) =>
 		setFiles((prev) => prev.filter((_, i) => i !== index));
 
-	// An endpoint that offers no model answers nothing (PM9), so the gate counts
+	// An endpoint that offers no model answers nothing, so the gate counts
 	// models rather than rows — the same thing `endpoint_for_run` resolves.
 	const noLlmProviders = llmProviders.every((p) => p.models.length === 0);
 
@@ -550,9 +550,9 @@ export function SessionComposer({
 	// header names the agent; a paused or retired one blocks the composer and
 	// offers the picker instead of quietly answering with a different mind.
 
-	// Every control is the kit's inline `RichSelect`, opening upward (AD18):
+	// Every control is the kit's inline `RichSelect`, opening upward:
 	// ask kind · world · (agent | query language) — the agent last, because it
-	// is who answers, and the world is where it looks (AD15).
+	// is who answers, and the world is where it looks.
 	const toolbarStart = (
 		<>
 			{/* Modeller sessions author a model — NL only, so the kind is hidden
@@ -655,7 +655,7 @@ export function SessionComposer({
 		</>
 	);
 
-	// The subject rides directly above the input, on both surfaces (AD10).
+	// The subject rides directly above the input, on both surfaces.
 	const attachmentChip =
 		attachment && onRemoveAttachment ? (
 			<AttachmentChip attachment={attachment} onRemove={onRemoveAttachment} />

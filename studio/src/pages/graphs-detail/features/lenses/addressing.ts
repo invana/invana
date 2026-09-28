@@ -1,10 +1,10 @@
 /**
  * An address, taken apart and put back together — so every control in the
  * authoring form is a **pick** rather than a field somebody types into
- * ([WO7](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  *
  * `<layer>/<sublayer>/<name>` is the only identifier a rule has
- * ([GV4](../../../../../docs/for-developers/modules/govern/spec.md)), and the
+ * ([spec.md](../../../../../docs/for-developers/modules/govern/spec.md)), and the
  * three wildcards are part of the vocabulary rather than an escape from it:
  * `*` is one segment, `**` is the rest, and a `*` **inside** a segment globs it
  * — which is how `graph_data/model/Deals@*` names a model across its versions
@@ -134,7 +134,7 @@ export function nameOptionsIn(
  * Mirrors `apps/govern/addressing.py`. It is duplicated rather than asked for
  * because the preview answers on every keystroke of a pick, and a round trip
  * per pick would make the near-misses arrive after the eye has moved on — the
- * catalogue itself is still the server's (GV21), only the matching is local.
+ * catalogue itself is still the server's, only the matching is local.
  */
 export function matches(pattern: string, address: string): boolean {
 	const p = pattern.split("/");

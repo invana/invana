@@ -122,7 +122,7 @@ export function rightSection(deps: RightSectionDeps) {
 			isRefreshing={isRefreshing}
 			onClose={right.close}
 			// The chip rides above the composer's input, not above the panel
-			// (the-assistant.md AD10).
+			// (the-assistant.md).
 			attachment={attachmentDetached ? null : attachmentFor(selected)}
 			onRemoveAttachment={() => setAttachmentDetached(true)}
 			sort={sort}
@@ -138,7 +138,7 @@ export function rightSection(deps: RightSectionDeps) {
 	// The occupants of `rightSection`, keyed by `?right=`. Inspecting and asking
 	// stopped competing for the side the moment one param named which of them
 	// holds it; closing it closes the region rather than restoring the other
-	// (the-assistant.md AD11).
+	// (the-assistant.md).
 	const rightSections: Record<
 		RightSectionKey,
 		{
@@ -170,8 +170,8 @@ export function rightSection(deps: RightSectionDeps) {
 					modelName={modelName}
 					onOpenModel={() => {
 						// A node's provenance line opens the journal that holds the run
-						// that wrote it — the Runs panel, not an Imports panel of its own
-						// (SR7 · G41). There is no model facet to narrow to: the journal
+						// that wrote it — the Runs panel, not an Imports panel of its own.
+						// There is no model facet to narrow to: the journal
 						// is filtered by kind, never by subject.
 						settingsPanel.setSection("runs");
 					}}
@@ -182,7 +182,7 @@ export function rightSection(deps: RightSectionDeps) {
 
 	// One region, one occupant, looked up by `?right=`. A third occupant
 	// is one more entry here — not another branch (graph-detail-page.md
-	// G16). Each entry carries its own size triple, because the size
+	// ). Each entry carries its own size triple, because the size
 	// belongs to what is in the region rather than to the region.
 	return right.key
 		? {

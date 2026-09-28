@@ -12,20 +12,20 @@ import type { QueryResponse } from "@/types/query";
 
 // An assistant reply's result, rendered as the emissions it is
 // (docs/for-developers/modules/ask/features/the-answer-surface.md). Every one
-// of them goes through the emission card — header over a body (AS8) — rather
+// of them goes through the emission card — header over a body — rather
 // than a bare table under the reply.
 //
 // A graph result is the one that waits: until it is on the canvas it is an
 // offer on the reply's own line (see `LoadToCanvasAction`), because the counts
 // are already in the reply sentence and the Project step above it. Once it has
-// landed, the subgraph emission states what landed and what it did not replace
-// (AS5).
-// An emission is a **record** now (AS10): given a run, this reads the
+// landed, the subgraph emission states what landed and what it did not replace.
+//
+// An emission is a **record** now: given a run, this reads the
 // emissions the `project` step wrote, so an answer survives a reload instead of
 // living in the page until someone refreshes. A reply with no run — an
 // older row, or one whose run was pruned — still falls back to folding one out of
 // the query result it carries, and says nothing it cannot back up: no template
-// name, because none chose the rendering (AS9).
+// name, because none chose the rendering.
 
 export interface ResultBlockProps {
 	result: QueryResponse | null | undefined;
@@ -42,7 +42,7 @@ export function ResultBlock({
 }: ResultBlockProps) {
 	// The citation opens the trace in place: "where did this number come from" is
 	// a question about *this* emission, so the answer opens from its own header
-	// rather than from a menu somewhere else (RT1).
+	// rather than from a menu somewhere else.
 	const [traceOpen, setTraceOpen] = useState(false);
 	// The scope comes from the route rather than from six layers of props: this
 	// card is rendered deep inside a thread, and every one of those layers would

@@ -34,9 +34,9 @@ function titleFromMessage(text: string): string {
 	return clean.length > 64 ? `${clean.slice(0, 64)}…` : clean;
 }
 
-// The world is not part of the question: an ask runs in its session's world
-// (AS5), and only *Next ask only* sends one — null included, which is
-// *Everything* for that ask (AD16 · AD19). Undefined leaves `lens_id` out.
+// The world is not part of the question: an ask runs in its session's world,
+// and only *Next ask only* sends one — null included, which is
+// *Everything* for that ask. Undefined leaves `lens_id` out.
 function toBody(
 	payload: QueryRunPayload,
 	lensId?: string | null,
@@ -66,7 +66,7 @@ function toBody(
  * The cache key for one surface's session list.
  *
  * Exported because the graph info panel reads the same list to draw its recent
- * sessions (graph-detail-page.md G20). Sharing the key rather than opening a
+ * sessions (graph-detail-page.md). Sharing the key rather than opening a
  * second query means the panel and the assistant cannot disagree about what
  * happened recently, and an invalidation from either reaches both.
  */
@@ -126,9 +126,9 @@ export function useSessions(
 	const modelId = opts?.modelId;
 	const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 	// The world picked before a thread exists — it becomes the new session's
-	// world on the first ask, and nothing else inherits it (AS5).
+	// world on the first ask, and nothing else inherits it.
 	const [draftWorldId, setDraftWorldId] = useState<string | null>(null);
-	// *Next ask only* (AD16): armed by the toggle, holding the world picked
+	// *Next ask only*: armed by the toggle, holding the world picked
 	// while armed. `undefined` is armed with no pick yet.
 	const [nextAsk, setNextAsk] = useState<{ lensId?: string | null } | null>(
 		null,
@@ -181,7 +181,7 @@ export function useSessions(
 
 	// ── Thinking streams ──────────────────────────────────────────────────────
 	// One EventSource per live run, keyed by run id. Opened on send /
-	// rerun and for any running reply the thread loads (reload mid-run, UC12);
+	// rerun and for any running reply the thread loads (reload mid-run);
 	// closed on a terminal frame. Emissions fold into the run store.
 	const streams = useRef<Map<string, RunStreamHandle>>(new Map());
 	const seed = useRunStore((s) => s.seed);
@@ -424,7 +424,7 @@ export function useSessions(
 			const sid = sessionId;
 			action?.span.setAttribute("invana.session_id", sid);
 			// Swap the optimistic pair for the recorded rows — the reply now carries
-			// its run id and the queued plan (UC1).
+			// its run id and the queued plan.
 			patchDetail(sid, (prev) =>
 				prev
 					? {
@@ -468,7 +468,7 @@ export function useSessions(
 													? "Stopped by you."
 													: ((err as Error)?.message ?? "Query failed."),
 												// A bound said no before anything ran — drawn as its
-												// own card, not as error text (AG35).
+												// own card, not as error text.
 												refusal: stopped
 													? undefined
 													: (asCastRefusal(err) ?? undefined),
@@ -578,7 +578,7 @@ export function useSessions(
 		}
 	};
 
-	// Stop run (UC9): cancel the live run on the engine; the stream's
+	// Stop run: cancel the live run on the engine; the stream's
 	// `run.cancelled` frame settles the reply. A POST still in flight is
 	// aborted too.
 	const stop = () => {
@@ -610,9 +610,9 @@ export function useSessions(
 	const renameSession = (id: string, title: string) =>
 		updateMutation.mutateAsync({ id, body: { title } });
 
-	// ── The session's bounds (AS5) ────────────────────────────────────────────
+	// ── The session's bounds ────────────────────────────────────────────
 	// The thread's world: the open session's, or the one picked before a thread
-	// exists. A world deleted since reads *Everything* (AD20).
+	// exists. A world deleted since reads *Everything*.
 	const threadWorldId = activeSession
 		? activeSession.lensMissing
 			? null
@@ -642,7 +642,7 @@ export function useSessions(
 	const setSpendPerRun = (id: string, usd: number | null) =>
 		updateMutation.mutateAsync({ id, body: { max_cost_usd_run: usd } });
 	// A thread's world and *Next ask only* belong to that thread: switching
-	// resets both, and a new thread starts in *Everything* (AS5).
+	// resets both, and a new thread starts in *Everything*.
 	const switchTo = (id: string | null) => {
 		setActiveSessionId(id);
 		setDraftWorldId(null);

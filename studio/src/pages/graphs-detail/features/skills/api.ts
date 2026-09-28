@@ -60,11 +60,11 @@ export const skillsApi = {
 	remove: (username: string, graphSlug: string, id: string) =>
 		request<void>(`${base(username, graphSlug)}/${id}`, { method: "DELETE" }),
 
-	/** The draft being written — opened if it is not open yet (SK20). */
+	/** The draft being written — opened if it is not open yet. */
 	draft: (username: string, graphSlug: string, id: string) =>
 		request<SkillDraft>(`${base(username, graphSlug)}/${id}/draft`),
 
-	/** Edit the draft's prose. A published version is never touched (SK2). */
+	/** Edit the draft's prose. A published version is never touched. */
 	saveDraft: (
 		username: string,
 		graphSlug: string,
@@ -84,8 +84,8 @@ export const skillsApi = {
 	/**
 	 * Hand-edit the draft's plan. The rows are replaced wholesale and the plan
 	 * becomes `authored`, after which redrawing from the prose is offered rather
-	 * than automatic (SK7). Bounded by the catalogue, not by an agent's envelope
-	 * — an agent refuses at bind time (SK28 · BN5).
+	 * than automatic. Bounded by the catalogue, not by an agent's envelope
+	 * — an agent refuses at bind time.
 	 */
 	writeDraftTasks: (
 		username: string,
@@ -98,7 +98,7 @@ export const skillsApi = {
 			body: JSON.stringify({ tasks }),
 		}),
 
-	/** Draw the playbook as a plan — a `role = plan` run (SK23). */
+	/** Draw the playbook as a plan — a `role = plan` run. */
 	draw: (username: string, graphSlug: string, id: string) =>
 		request<SkillDrawStarted>(`${base(username, graphSlug)}/${id}/draft/draw`, {
 			method: "POST",
@@ -117,13 +117,13 @@ export const skillsApi = {
 			{ method: "POST", body: JSON.stringify({ answer }) },
 		),
 
-	/** The library plans a skill may inline, each with what it offers (LB19). */
+	/** The library plans a skill may inline, each with what it offers. */
 	inlinable: (username: string, graphSlug: string) =>
 		request<InlinablePlanListResponse>(
 			`${base(username, graphSlug)}/inlinable`,
 		),
 
-	/** Bound, refused and not bound — the refusals are the engine's dry run (BN10). */
+	/** Bound, refused and not bound — the refusals are the engine's dry run. */
 	agents: (username: string, graphSlug: string, id: string) =>
 		request<SkillAgentsResponse>(`${base(username, graphSlug)}/${id}/agents`),
 
@@ -195,7 +195,7 @@ export const rulesApi = {
 			body: JSON.stringify(data),
 		}),
 
-	/** There is no delete: past citations must still resolve (RU4). */
+	/** There is no delete: past citations must still resolve. */
 	setActive: (
 		username: string,
 		graphSlug: string,

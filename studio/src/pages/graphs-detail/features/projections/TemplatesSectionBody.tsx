@@ -1,14 +1,14 @@
 /**
  * Projection templates — the third section of the **Library** stack
- * (projections.md § 5 · graph-detail-page.md G38 · G41).
+ * (projections.md § 5 · graph-detail-page.md).
  *
  * A projection template is to an answer what a plan is to a run: both are
- * definitions, both are promoted from what served (projections.md C7). So it
+ * definitions, both are promoted from what served (projections.md). So it
  * has no rail icon of its own and sits under `Plans` and `Catalogue` — the two
  * other things a run is composed from. What this file owns is the **body**: the
- * section draws the header, the count, the search and the `+` (G32).
+ * section draws the header, the count, the search and the `+`.
  *
- * A projection template is what stops the model from authoring markup (P1), so
+ * A projection template is what stops the model from authoring markup, so
  * it is authored here by a person and versioned like anything else that decides
  * what an answer looks like.
  *
@@ -19,7 +19,7 @@
  *   row says so instead of failing on save.
  * - **A published template is read-only.** An answer rendered with it must not
  *   change shape after the fact, so a change publishes a new version.
- * - **Usage is the argument for promoting one** (P7). `rendered 41×` is the
+ * - **Usage is the argument for promoting one**. `rendered 41×` is the
  *   whole reason a one-off becomes a default, so it is on the row.
  */
 
@@ -347,7 +347,7 @@ function TemplateRow({
 }
 
 /**
- * One template, read end to end — `&template=`, inside the section (G33).
+ * One template, read end to end — `&template=`, inside the section.
  *
  * It is a **statement of fact**, not a disabled form: a published template is
  * read-only because an answer rendered with it must not change shape after the

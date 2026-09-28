@@ -1,8 +1,8 @@
 import { usdWhole } from "@/lib/format";
 
 /**
- * C10 · a spend per run for the thread — the session's settings, opened from
- * the thread header (the-assistant.md AD18 · AD21).
+ * a spend per run for the thread — the session's settings, opened from
+ * the thread header (the-assistant.md).
  *
  * *As someone asking in a thread, I want to cap what one ask may spend, so that
  * a question that runs away cannot cost more than I meant it to.*

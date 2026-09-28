@@ -1,10 +1,10 @@
 import { usd, usdWhole } from "@/lib/format";
 
 /**
- * Overview — the agent read whole (AG23): who it is, its focus, how it thinks,
+ * Overview — the agent read whole: who it is, its focus, how it thinks,
  * what it can do, what is always in force, its limits, and the two policy
  * switches. Each summary names the tab that edits it. Two columns of cards as
- * drawn, stacking below 760px (AG38).
+ * drawn, stacking below 760px.
  */
 
 import { Switch } from "@invana/forms";
@@ -25,7 +25,7 @@ import type { Agent } from "@/pages/graphs-detail/features/agents/types";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import { PanelSection } from "@/ui/PanelSection";
 
-/** The two switches the Overview carries (AG23). Keys are the engine's. */
+/** The two switches the Overview carries. Keys are the engine's. */
 const POLICY_FIELDS: { key: string; label: string; hint: string }[] = [
 	{
 		key: "can_be_assigned",
@@ -58,8 +58,8 @@ export function AgentOverviewTab({
 	onPatch: (next: Partial<AgentDraft>) => void;
 	onGoTo: (tab: AgentTab) => void;
 }) {
-	// Every guardrail that holds on this agent's runs: the Graph's, and its own
-	// (AG7). Worlds are not here — a world comes with the work (AG24).
+	// Every guardrail that holds on this agent's runs: the Graph's, and its own.
+	// Worlds are not here — a world comes with the work.
 	const guardrails = useLensesQuery(username, graphSlug, { kind: "guardrail" });
 	const inForce = (guardrails.data?.items ?? []).filter(
 		(g) => g.scope === "graph" || g.scope === `agent:${agent.id}`,
@@ -165,9 +165,8 @@ export function AgentOverviewTab({
 
 			<div className="flex min-w-0 flex-col gap-2.5">
 				<PanelSection card title="Always in force">
-					{/* An agent binds no provider and no world (PM1 · AG24): what
-					    holds whoever asks is the Graph's guardrails and its own (AG7 ·
-					    AG10), edited in Govern › Guardrails. */}
+					{/* An agent binds no provider and no world: what
+					    holds whoever asks is the Graph's guardrails and its own, edited in Govern › Guardrails. */}
 					{inForce.length ? (
 						<ul className="divide-y">
 							{inForce.map((g) => (
@@ -254,7 +253,7 @@ export function AgentOverviewTab({
 											checked={on === true}
 											onCheckedChange={(next) => setTo(next)}
 										/>
-										{/* Unset is its own state: the Graph decides (AG38). */}
+										{/* Unset is its own state: the Graph decides. */}
 										<span className="min-w-0 flex-1 truncate text-muted-foreground">
 											{field.hint}
 											{on === undefined ? " · Graph default" : ""}

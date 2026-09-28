@@ -1,7 +1,7 @@
 /**
  * A run, read in the section — **six sections and two ways out**
- * ([SR67](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions) ·
- * [SR73](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
+ * ([see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions) ·
+ * [see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)).
  *
  * | Section | Answers |
  * |---|---|
@@ -13,7 +13,7 @@
  * | `Refused` | every address a guardrail said no to, and why |
  *
  * **It stays an overview.** The waterfall here is the compact form of the
- * run page's (SR73) — rows and bars, no card; a row is the way into that
+ * run page's — rows and bars, no card; a row is the way into that
  * task. `Open the answer` opens the page; `Compare with the plan` draws the
  * plan it ran in `mainSection`, beside the run, which stays open here.
  */
@@ -56,8 +56,8 @@ export interface RunDetailProps {
 	graphSlug: string;
 	runId: string;
 	/**
-	 * `Open the answer` — opens this run's page (SR13); with a step, that task
-	 * open inside it (SR72), which is what a waterfall row asks for.
+	 * `Open the answer` — opens this run's page; with a step, that task
+	 * open inside it, which is what a waterfall row asks for.
 	 */
 	onOpenDashboard?: (runId: string, stepId?: string) => void;
 	/** The lens row — opens that world or guardrail in Govern, in `leftSection`. */
@@ -66,7 +66,7 @@ export interface RunDetailProps {
 	onOpenPlan?: (planKey: string) => void;
 }
 
-// The address every crumb uses (SR54) — defined beside the dashboards that
+// The address every crumb uses — defined beside the dashboards that
 // share it, re-exported here for the callers that already import it from here.
 export { runAddress };
 

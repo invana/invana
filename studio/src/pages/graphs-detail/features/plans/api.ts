@@ -23,13 +23,13 @@ function base(username: string, graphSlug: string): string {
 
 const json = (body: unknown) => ({ body: JSON.stringify(body) });
 
-/** The catalogue — the closed set a plan may name, read-only (7.6 · CA1). */
+/** The catalogue — the closed set a plan may name, read-only (7.6). */
 export const catalogueApi = {
 	list: (username: string, graphSlug: string) =>
 		request<CatalogueResponse>(`${base(username, graphSlug)}/catalogue`),
 };
 
-/** The plan library — `task_plans` where `reusable` (SR5 · LB5). */
+/** The plan library — `task_plans` where `reusable`. */
 export const taskPlansApi = {
 	list: (username: string, graphSlug: string) =>
 		request<TaskPlanListResponse>(`${base(username, graphSlug)}/task-plans`),
@@ -39,7 +39,7 @@ export const taskPlansApi = {
 			`${base(username, graphSlug)}/task-plans/${key}${version ? `?version=${version}` : ""}`,
 		),
 
-	/** How it has behaved over a window — Overview · Layers · Flow (LB33 · LB36). */
+	/** How it has behaved over a window — Overview · Layers · Flow. */
 	performance: (
 		username: string,
 		graphSlug: string,
@@ -50,13 +50,13 @@ export const taskPlansApi = {
 			`${base(username, graphSlug)}/task-plans/${key}/performance?version=${q.version}&window=${q.window}`,
 		),
 
-	/** What changed against the version before it (LB37). */
+	/** What changed against the version before it. */
 	diff: (username: string, graphSlug: string, key: string, version: number) =>
 		request<PlanVersionDiff>(
 			`${base(username, graphSlug)}/task-plans/${key}/diff?version=${version}`,
 		),
 
-	/** Every run of it, newest first — Activity (LB34). */
+	/** Every run of it, newest first — Activity. */
 	runs: (
 		username: string,
 		graphSlug: string,
@@ -83,7 +83,7 @@ export const taskPlansApi = {
 		);
 	},
 
-	/** The version as the engine holds it, as text — `Export YAML` (LB38). */
+	/** The version as the engine holds it, as text — `Export YAML`. */
 	exportText: (
 		username: string,
 		graphSlug: string,

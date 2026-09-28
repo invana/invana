@@ -31,9 +31,9 @@ interface Props {
  * fine-tune panels.
  *
  * The shell and the row are `BoardHistoryCard`, shared with a declared board's
- * `Reports` ([B21](../../../../../docs/for-developers/building-engine/boards-migration.md));
+ * `Reports` ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md));
  * what belongs to *this* binding is the fetch by `board_id`, the banner, and a
- * row that forks rather than opens ([B22](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * row that forks rather than opens ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  */
 export function BoardHistoryWidget({
 	open,

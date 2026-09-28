@@ -1,23 +1,23 @@
 /**
  * The world and guardrail board, as a page — artboards `GovWorld` ·
- * `GovGuardrails` ([W2 · G1](../../../../../../docs/for-developers/the-screens.md)).
+ * `GovGuardrails` ([the-screens.md](../../../../../../docs/for-developers/the-screens.md)).
  *
  * **One page for both kinds**, because they are one record separated by `kind`
- * ([GV1](../../../../../../docs/for-developers/modules/govern/spec.md) ·
- * [WO15](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md) ·
+ * [worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  *
  * Two reads, and the page draws on the first. The detail read is what carries
  * the usage and the **resolved** cast — *innermost wins, then the address is
  * checked against the effective rules*
- * ([GV6](../../../../../../docs/for-developers/modules/govern/spec.md)) is a
+ * ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md)) is a
  * composition against the guardrails only the server can do — and the list read
  * is where `may_edit_guardrails` rides
- * ([GR11](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
+ * ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)),
  * so the permission never lands at a different moment from the rules it
  * governs.
  *
  * **The board reads; the acts stay in the section**
- * ([WO16](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * ([worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  * `Edit` puts the Govern panel back on this lens, drilled in — it is the only
  * action here that leads to a write.
  */
@@ -62,8 +62,8 @@ export function LensBoardPage({
 
 	const lens = detail.data ?? null;
 	// A world is edited by anyone who can reach the Graph; a guardrail is the
-	// product's one field-level permission (GV22), and without it the control
-	// is absent rather than greyed (GR12).
+	// product's one field-level permission, and without it the control
+	// is absent rather than greyed.
 	const mayEdit =
 		lens?.kind === "guardrail"
 			? (lenses.data?.may_edit_guardrails ?? false)
@@ -74,7 +74,7 @@ export function LensBoardPage({
 		[lens, view, mayEdit],
 	);
 
-	// `Save report` on the header, and the act behind it (B6). What it keeps is
+	// `Save report` on the header, and the act behind it. What it keeps is
 	// `spec` — this page's reading, resolved — never the lens.
 	const report = useReport(spec);
 

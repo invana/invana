@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections";
 
 // The **Library** panel is a stack of three sections, not a tabbed panel
-// (graph-detail-page.md G33 · G41). All three are on screen at once; `?section=`
+// (graph-detail-page.md). All three are on screen at once; `?section=`
 // names the one holding the column's height, and `&plan=` / `&entry=` /
 // `&template=` name the thing drilled into *inside* its own section — the other
 // two keep their place, which is the whole reason the three are stacked rather
@@ -12,10 +12,10 @@ import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections"
 // catalogue entries, and a template renders what the plan produced. Each section
 // is the definition of the one above it (§3a).
 //
-// **Runs is not here.** The journal is its own panel and holds execution alone
-// (G41); this one holds the definitions a run is built from. Nothing here reads
+// **Runs is not here.** The journal is its own panel and holds execution alone;
+// this one holds the definitions a run is built from. Nothing here reads
 // or writes `?panel=tasks` — it named a surface that no longer exists and is
-// deleted, not redirected (G31).
+// deleted, not redirected.
 export type LibrarySectionKey = "plans" | "catalogue" | "templates";
 
 const LIBRARY_SECTION_KEYS: readonly LibrarySectionKey[] = [

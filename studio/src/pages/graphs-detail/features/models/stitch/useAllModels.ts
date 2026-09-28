@@ -1,12 +1,12 @@
 /**
- * The all models fan-out (stitch-models.md ST16).
+ * The all models fan-out (stitch-models.md).
  *
  * One read of the models list, one of each model's **active version**, one of
  * `…/model-links` — and nothing of `…/global-model`, whose `GlobalType` carries
  * no endpoints. Everything the canvas needs to draw a crossing is already on
  * these payloads: an edge type names its source and target types, a link names
  * both versions and both types. So the drawn surface needs no engine change,
- * and ST6 stands — the global-model *page* is still stated, not drawn.
+ * and stands — the global-model *page* is still stated, not drawn.
  *
  * The **introspected** model is excluded. The physical mirror is what the
  * database happens to hold, not a domain anyone authored, and drawing it beside
@@ -27,7 +27,7 @@ import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
 export interface AllModelsResult {
 	frames: ModelFrame[];
 	links: ModelLink[];
-	/** Models that exist but have never published — drawn as empty frames (ST18). */
+	/** Models that exist but have never published — drawn as empty frames. */
 	unpublished: number;
 	isLoading: boolean;
 	isError: boolean;
@@ -50,7 +50,7 @@ export function useAllModels(
 	const links = useModelLinksQuery(username, graphSlug);
 
 	// Authored domains only. Order is the list's order, so a model keeps its hue
-	// across a refetch — a colour that moves is a colour that means nothing (ST17).
+	// across a refetch — a colour that moves is a colour that means nothing.
 	const domains = useMemo(
 		() => (models.data ?? []).filter((m) => m.origin !== "introspected"),
 		[models.data],
@@ -61,7 +61,7 @@ export function useAllModels(
 	 * a **new results array on every render**, and the canvas keys its data build
 	 * on what this hook returns — so the drawing was rebuilt (and `<GraphLayer
 	 * data>` *replaces* rather than patches) dozens of times a second, taking
-	 * every frame's collapsed state with it each time (ST31). A combined result
+	 * every frame's collapsed state with it each time. A combined result
 	 * is structurally shared, so it keeps its identity until a version actually
 	 * changes.
 	 */

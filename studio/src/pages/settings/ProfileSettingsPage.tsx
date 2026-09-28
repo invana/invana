@@ -43,7 +43,7 @@ type UsernameState =
 /**
  * The sections, in the order the left nav lists them. Sections are a vertical
  * strip, not a tab bar: five labels do not fit a 2xl-wide header, and Access
- * tokens needs the width the strip was eating (AC6).
+ * tokens needs the width the strip was eating.
  */
 const SECTIONS = [
 	{ key: "basic", name: "Basic info", icon: User },
@@ -62,7 +62,7 @@ export function ProfileSettingsPage() {
 
 	return (
 		// The kit sets a 13px root, so the named container steps top out near
-		// 830px — too narrow for the tokens table. The cap is explicit (AC6).
+		// 830px — too narrow for the tokens table. The cap is explicit.
 		<div className="mx-auto w-full max-w-[1200px] px-6 py-10">
 			<header className="mb-8">
 				<h1 className="text-2xl font-semibold">Account settings</h1>

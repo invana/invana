@@ -124,7 +124,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// Held per canvas by `useBoardVersions` (below), not per page — a second
 	// canvas can hold its own contents at the same time. Resolved against the
 	// active one, so every caller below reads and writes exactly as before.
-	// Elements the graph no longer holds, found when the canvas reopened (GC5).
+	// Elements the graph no longer holds, found when the canvas reopened.
 	// Kept as ids rather than removed from `canvasData`, because the point is that
 	// they are still drawn.
 
@@ -400,8 +400,8 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// mirroring the node-expand seeding path. Also restores the magnet toggle.
 	//
 	// The snapshot is checked against the graph **under the picked world** before
-	// anything is drawn (graph-canvas.md GC14). What is gone is kept and marked
-	// missing (GC5); what the world excludes comes back in neither list and is
+	// anything is drawn (graph-canvas.md). What is gone is kept and marked
+	// missing; what the world excludes comes back in neither list and is
 	// simply not drawn — the canvas is never told why. The saved snapshot is
 	// untouched, so clearing the world brings it back.
 	const paintFromCanvas = useCallback(
@@ -727,7 +727,7 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	});
 
 	// A session row in the graph info panel asks for a session by id
-	// (graph-detail-page.md G22). The panel is rendered by the shell and cannot
+	// (graph-detail-page.md). The panel is rendered by the shell and cannot
 	// reach `handleOpenSession`, so the request travels instead of the callback;
 	// the page answers it exactly as it answers a row in the assistant's own
 	// list, then clears it so one ask opens one session.

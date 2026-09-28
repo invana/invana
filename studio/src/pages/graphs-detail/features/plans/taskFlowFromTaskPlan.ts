@@ -1,6 +1,6 @@
 /**
  * A library plan as `TaskFlowCanvas` data
- * ([LB35](docs/for-developers/modules/workflows/features/the-library.md)): the
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)): the
  * plan's own nodes and edges, drawn the way a skill's plan and a run of it are.
  * `order` is drawn as `require` and `binding` stays `binding`. A node carries
  * no status, because nothing ran *here*: given the page's `steps`, its third
@@ -27,9 +27,9 @@ type StepMeasures = PlanPerformance["steps"][number];
 
 const ms = (v: number) => formatElapsed(Math.round(v));
 
-/** A p95 this far over its p50 makes a step unpredictable (LB33). */
+/** A p95 this far over its p50 makes a step unpredictable. */
 export const WIDE_SPREAD = 4;
-/** A step fewer than this share of runs take is a branch, and is dim (LB35). */
+/** A step fewer than this share of runs take is a branch, and is dim. */
 const RARE_BRANCH = 0.25;
 
 const isWide = (step: StepMeasures) =>

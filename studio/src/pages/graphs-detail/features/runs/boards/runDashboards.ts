@@ -1,12 +1,12 @@
 /**
  * What a run dashboard and a step dashboard agree on.
  *
- * Both are composed from one `GET …/runs/{id}/trace` ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
+ * Both are composed from one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
  * so the status vocabulary, the clock and the "is there a record for this?"
  * test are written once here rather than twice in two composers that would
  * drift.
  *
- * **A band with no record is absent, not zero** ([SR34](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * **A band with no record is absent, not zero** ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  * `omit` is what that reads as in code: every optional tile and panel is built
  * through it, so "the runtime has not recorded this yet" never renders as
  * `$0.00` or `{}`.
@@ -36,7 +36,7 @@ export function isLive(status: string): boolean {
  *
  * One mapping, because a Gantt row, a flow card, a header dot and a tile are
  * the same state seen four times and a second table is how they stop agreeing
- * ([SR21](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 const TONES: Record<string, StatusDotProps["tone"]> = {
 	succeeded: "success",
@@ -95,7 +95,7 @@ export function boundOf(step: TraceStepRead): Bound | undefined {
 }
 
 /** `8.2k` — a token total, which is read as a magnitude rather than a number.
- *  It lives in `@/lib/format` now, because the journal row reads it too (SR45). */
+ *  It lives in `@/lib/format` now, because the journal row reads it too. */
 export { formatCompact as compact } from "@/lib/format";
 /**
  * `omit` · `count` · the view switch · `specPanel` live in
@@ -117,7 +117,7 @@ export {
 /**
  * `0`–`1` for a value that has a real ceiling, `undefined` for one that does not.
  *
- * [SR20](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md):
+ * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md):
  * a spend without its ceiling is a number nobody can act on — so the meter is
  * drawn only when the trace carried a ceiling, and a run over its ceiling still
  * draws a full bar rather than one that overflows the tile.
@@ -169,7 +169,7 @@ export function offsetOf(
 }
 
 /** What a run is called: the words its opener wrote, else the plan that ran. */
-/** `run:7d3184f1` — the last eight characters, as every crumb addresses a run (SR54). */
+/** `run:7d3184f1` — the last eight characters, as every crumb addresses a run. */
 export function runAddress(runId: string): string {
 	return `run:${runId.slice(-8)}`;
 }

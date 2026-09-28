@@ -167,9 +167,9 @@ export interface ActivityNode {
 	skills_offered: string[];
 	/** A self-report: the model says it followed these. The badge says *reported*. */
 	skills_applied: string[];
-	/** A fact: these statements were in the prompt (RU7). */
+	/** A fact: these statements were in the prompt. */
 	rules_offered: OfferedRule[];
-	/** A self-report: the model says it followed these. A subset of the above (RU12). */
+	/** A self-report: the model says it followed these. A subset of the above. */
 	rules_cited: OfferedRule[];
 	tokens_in: number | null;
 	tokens_out: number | null;

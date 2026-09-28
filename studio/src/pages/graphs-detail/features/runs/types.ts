@@ -95,15 +95,15 @@ export interface RunView {
 	 * Kept apart from `diagnosis` on purpose: a cannot-answer is an **answer** —
 	 * the graph is telling you what it does not have — and a diagnosis is a
 	 * failure. Folding them into one field would be the first step towards
-	 * rendering them the same way (CA1).
+	 * rendering them the same way.
 	 */
 	cannotAnswer?: { reason: string; stage?: string };
 	/**
 	 * The emissions this run produced, as they stream in.
 	 *
-	 * They are read back from the record once the run settles (AS10); this is
+	 * They are read back from the record once the run settles; this is
 	 * what paints them *while* it runs, so a table appears as the next step
-	 * starts rather than at the end (SW1).
+	 * starts rather than at the end.
 	 */
 	emissions?: Emission[];
 	/** How the run ended, once it has: answered · conversed · cannot_answer · failed · cancelled. */
@@ -115,7 +115,7 @@ export interface RunView {
 /**
  * One frame of the run's stream — a step transition, a reasoning line, an
  * emission arriving. Not an `Emission`: that is the produced answer part a
- * reader sees, in `types/emission.ts` (docs/for-developers/terminology.md · Ask K9).
+ * reader sees, in `types/emission.ts` (docs/for-developers/terminology.md · Ask).
  */
 export interface AskFrame {
 	seq: number;
@@ -150,12 +150,12 @@ export interface TaskRunSummary {
 	plan_revision: number;
 	replans: number;
 	agent_id: string | null;
-	/** `execute` · `plan` · `evaluate` — what the run was for (SR10). */
+	/** `execute` · `plan` · `evaluate` — what the run was for. */
 	role: string;
 	task_id: string | null;
 	task_title: string | null;
 	queued_at: string | null;
-	/** When it actually began — what elapsed is measured from (SR45). */
+	/** When it actually began — what elapsed is measured from. */
 	started_at: string | null;
 	finished_at: string | null;
 	step_count: number;
@@ -167,10 +167,10 @@ export interface TaskRunSummary {
 	/** How it ended, once it has — answered · conversed · cannot_answer · failed · cancelled. */
 	outcome?: string | null;
 	promoted: boolean;
-	/** What the run spent, summed over its tasks (SR45). */
+	/** What the run spent, summed over its tasks. */
 	tokens_in: number;
 	tokens_out: number;
-	/** Dollars over its priced steps; absent is *unknown*, never `$0.00` (SR40). */
+	/** Dollars over its priced steps; absent is *unknown*, never `$0.00`. */
 	cost_usd?: number | null;
 }
 

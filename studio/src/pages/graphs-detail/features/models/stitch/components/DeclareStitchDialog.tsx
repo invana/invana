@@ -4,7 +4,7 @@
  *
  * *All models* floats {@link DeclareStitchCard} over the drawing, because the
  * gesture that opens it is a drag on that drawing and hiding it behind a scrim
- * would hide the two frames the stitch is about (the *Declaring* artboard, T5).
+ * would hide the two frames the stitch is about (the *Declaring* artboard).
  * Opened from a model's Stitches section there is nothing behind it worth
  * keeping in view, so it is a dialog — the same card, the same words, the same
  * counts.
@@ -15,11 +15,11 @@ import { DeclareStitchCard } from "@/pages/graphs-detail/features/models/stitch/
 import type { LinkKind } from "@/pages/graphs-detail/features/models/types";
 
 interface Props {
-	/** Non-null opens it, and is the kind the card starts on (ST11). */
+	/** Non-null opens it, and is the kind the card starts on. */
 	kind: LinkKind | null;
 	username: string;
 	graphSlug: string;
-	/** The side already selected, as `${versionId}::${typeName}` (ST19). */
+	/** The side already selected, as `${versionId}::${typeName}`. */
 	sourceKey?: string;
 	/** The other side, when the gesture named it too. */
 	targetKey?: string;

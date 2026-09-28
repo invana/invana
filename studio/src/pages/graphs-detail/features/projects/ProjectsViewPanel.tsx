@@ -1,15 +1,15 @@
 /**
- * **Projects** — one icon, one panel, two sections (projects-and-tasks.md PT7).
+ * **Projects** — one icon, one panel, two sections (projects-and-tasks.md).
  *
  * `Projects` over `Todos`. **Projects owns Todos; there is no Todos icon**: a
  * Todo without its project is a to-do list, and the project is the thing it is
  * for. With no project drilled into, the Todos section is every Todo in the
  * Graph — which *is* the **No project** bucket, because a Todo nobody filed is
  * still work somebody wrote. Drill into a project and the section narrows to its
- * Todos, while the projects list keeps its place above (G33).
+ * Todos, while the projects list keeps its place above.
  *
  * The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
- * catalogue, never Todos (PT7 · SR3).
+ * catalogue, never Todos.
  */
 
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
@@ -31,9 +31,9 @@ export interface ProjectsViewPanelProps {
 	username: string;
 	graphSlug: string;
 	onOpenAgent?: (agentId: string) => void;
-	/** A statement on a step row opens that rule's board (RU12). */
+	/** A statement on a step row opens that rule's board. */
 	onOpenRule?: (ruleId: string) => void;
-	/** Opening the Plan tab is what draws the `plan` canvas (PT13). */
+	/** Opening the Plan tab is what draws the `plan` canvas. */
 	onOpenPlanCanvas?: (projectKey: string) => void;
 	onProjectChange?: (key: string | null) => void;
 }
@@ -52,7 +52,7 @@ export function ProjectsViewPanel({
 	const [creatingTodo, setCreatingTodo] = useState(false);
 
 	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
-	// only — after that the column's shape belongs to whoever dragged it (G35).
+	// only — after that the column's shape belongs to whoever dragged it.
 	const size = (d: "projects" | "todos") =>
 		projects.sectionKey === d ? "60%" : "40%";
 
@@ -61,7 +61,7 @@ export function ProjectsViewPanel({
 	// back if the reader had collapsed it — otherwise the row lands in a shut
 	// section and nothing appears to happen. Watching the drilled-into id as well
 	// as the focus is what catches the case where `?section=` never moves and only
-	// `&todo=` does (G35).
+	// `&todo=` does.
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
 		projects.sectionKey === "projects" ? projects.projectKey : projects.todoId;
@@ -190,7 +190,7 @@ function ProjectsCount({
 
 /**
  * `12 · 3 in review`. With no project drilled into this counts every Todo in
- * the Graph — the *No project* bucket included (PT7).
+ * the Graph — the *No project* bucket included.
  */
 function TodosCount({
 	username,

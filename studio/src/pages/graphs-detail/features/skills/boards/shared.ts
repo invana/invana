@@ -5,9 +5,9 @@
  * read the same two certainties — **offered** is a fact the engine wrote when
  * it built the context, **applied** (or **cited**) is the model's own claim —
  * and the vocabulary for saying so honestly lives here rather than three times
- * ([S1](../../../../../../docs/for-developers/modules/skills/spec.md) ·
- * [US4](../../../../../../docs/for-developers/modules/skills/features/usage.md) ·
- * [RU7](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([spec.md](../../../../../../docs/for-developers/modules/skills/spec.md) ·
+ * [usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md) ·
+ * [rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * Nothing here fetches and nothing here renders: a composer is a pure function
  * of one read, which is what lets `spec.json` show the document the page is.
@@ -46,7 +46,7 @@ export const SKILL_ACTIONS = {
  * Both draw `—` on purpose: neither is a statistic, and a gap of `0` would read
  * as *applied every time* — the one claim an absent record must not make. The
  * caption is the only thing that tells them apart
- * ([US9](../../../../../../docs/for-developers/modules/skills/features/usage.md)),
+ * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)),
  * so it is never dropped.
  */
 export function gapTile(row: SkillUsageVersion | null | undefined): {
@@ -63,7 +63,7 @@ export function gapTile(row: SkillUsageVersion | null | undefined): {
  *
  * The engine owns the floor and sends `enough_to_read`, so the API, the CLI and
  * Studio all say *too few to read* at the same point instead of each picking a
- * threshold ([US6](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
+ * threshold ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  * The percentage below is a **reading of a readable bucket**, computed nowhere
  * else and never shown for one the engine called unreadable.
  */

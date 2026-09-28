@@ -11,7 +11,7 @@ export function useLegacySessionsLink(
 	settingsPanel: ReturnType<typeof useLeftSection>,
 ) {
 	// Page state lives in the URL, one param per region (graph-detail-page.md
-	// G16). `setSearchParams` is here for the one-write legacy migration below;
+	// ). `setSearchParams` is here for the one-write legacy migration below;
 	// each region reads and writes its own param through its own hook.
 	const [, setSearchParams] = useSearchParams();
 	// Sessions used to be a left-rail panel. Links carrying `?panel=sessions`

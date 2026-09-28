@@ -1,5 +1,5 @@
 /**
- * A skill's plan as `TaskFlowCanvas` data (SK16): the plan's own nodes and
+ * A skill's plan as `TaskFlowCanvas` data: the plan's own nodes and
  * edges. `order` is drawn as `require` — the canvas's word for *must settle
  * first* — and `binding` stays `binding`.
  */
@@ -16,7 +16,7 @@ import type {
 	SkillPlaybookRead,
 } from "@/pages/graphs-detail/features/skills";
 
-/** A layer's icon on the canvas — shared with the library's plans (LB35). */
+/** A layer's icon on the canvas — shared with the library's plans. */
 export const LAYER_ICON: Record<SkillLayer, string> = {
 	"graph data": "lucide/database",
 	llm: "lucide/sparkles",

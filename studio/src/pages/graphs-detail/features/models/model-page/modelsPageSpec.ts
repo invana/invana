@@ -1,12 +1,12 @@
 /**
- * The model page as a dashboard document (the-model-page.md MP1–MP6).
+ * The model page as a dashboard document (the-model-page.md).
  *
  * One header, then **Overview · Model · Database · Usage · Performance ·
  * Growth** with the `7 · 30 · 90 days` window on the right of the tab strip —
  * the plan page's layout, read at `All models` or one model. This file
  * composes; `ModelsPage` fetches and answers actions, and `@invana/dashboard`
- * draws. The tabs, their order and their columns never change with the scope
- * (MP2): what one scope lacks is a section, not a tab.
+ * draws. The tabs, their order and their columns never change with the scope:
+ * what one scope lacks is a section, not a tab.
  */
 
 import type {
@@ -94,7 +94,7 @@ const WINDOW_LABEL: Record<ModelsWindow, string> = {
 export const windowOf = (label: string): ModelsWindow | undefined =>
 	MODELS_WINDOWS.find((w) => WINDOW_LABEL[w] === label);
 
-/** A declaration and a mirror have no window (MP3). */
+/** A declaration and a mirror have no window. */
 const UNWINDOWED: ModelsTab[] = ["model", "database"];
 /** Nothing to count before a model is published (the-model-page.md seams). */
 export const LOCKED_UNTIL_PUBLISHED: ModelsTab[] = [
@@ -110,7 +110,7 @@ export interface ModelsScope {
 	active: VersionSummary | null;
 	/** The staged set while a draft is open. */
 	staged: StagedSet | null;
-	/** The active version was ever published — Archive, else Delete (MP7). */
+	/** The active version was ever published — Archive, else Delete. */
 	published: boolean;
 }
 
@@ -120,12 +120,12 @@ export interface ModelsPageData {
 	/** Each model's active version's types — the Overview's counts. */
 	frames: ModelFrame[];
 	counts: TypeCountsResponse | undefined;
-	/** Stitches between active versions (ST58); undefined while they load. */
+	/** Stitches between active versions; undefined while they load. */
 	links: ModelLink[] | undefined;
-	/** The mirror, drift marked, at the page's scope (MP9). */
+	/** The mirror, drift marked, at the page's scope. */
 	physical: PhysicalSchema | undefined;
 	physicalLoading: boolean;
-	/** The measured tabs over the window (MP33); a `null` slice is not measured. */
+	/** The measured tabs over the window; a `null` slice is not measured. */
 	insights: Insights | undefined;
 	insightsLoading: boolean;
 	scope: ModelsScope | null;
@@ -136,7 +136,7 @@ export interface ModelsPageData {
 /** What only the host can draw — the canvases, and the states it composes from kit parts. */
 export interface ModelsPageSlots {
 	modelTab: ReactNode;
-	/** A tab whose read the engine does not serve yet (MP22). */
+	/** A tab whose read the engine does not serve yet. */
 	notMeasured: (tab: ModelsTab) => ReactNode;
 	/** The Overview when nothing is published. */
 	emptyOverview: ReactNode;
@@ -255,7 +255,7 @@ export function modelsPageSpec(
 		label: TAB_LABEL[id],
 		locked: locked(id),
 		// One model's canvas is the whole tab, so it meets the tab strip; All
-		// models keeps the padding for the union card beside it (MP42).
+		// models keeps the padding for the union card beside it.
 		flush: id === "model" && data.scope !== null,
 		rows: id !== tab ? [] : tabRows(id, data, view, slots),
 	}));
@@ -268,7 +268,7 @@ export function modelsPageSpec(
 		tab,
 		tabAction: MODELS_ACTIONS.tab,
 		// The window is drawn only once there is something to read over it; on a
-		// tab that ignores it, it is greyed rather than hidden (MP3).
+		// tab that ignores it, it is greyed rather than hidden.
 		tabActions: anyPublished
 			? [
 					{
@@ -288,7 +288,7 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 	if (!scope) {
 		const drafts = data.models.filter((m) => !m.active_version).length;
 		const published = data.models.length - drafts;
-		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched (ST58).
+		// Unknown reads "—", never 0: nothing loaded yet is not nothing stitched.
 		const stitches = data.links?.filter((l) => l.status === "active").length;
 		return {
 			crumbs: ["All models"],
@@ -386,7 +386,7 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 		crumbActions: [MODELS_ACTIONS.allModels, undefined],
 		chips,
 		actions,
-		// One line; `More` for the rest (ME21).
+		// One line; `More` for the rest.
 		description: model.description || "No description.",
 		details: [
 			{
@@ -404,7 +404,7 @@ function header(data: ModelsPageData): DashboardSpec["header"] {
 function menu(items: ModelsMenuItem[]): ActionSpec {
 	return {
 		id: MODELS_ACTIONS.more,
-		// Not `More` — that is the description's own fold (ME21).
+		// Not `More` — that is the description's own fold.
 		label: "More actions",
 		icon: "more",
 		menu: true,
@@ -671,7 +671,7 @@ const SIGNAL_TEXT: Record<string, string> = {
 	cold: "○ cold",
 };
 
-/** A row's share, p95 and signals — `—` until the log has measured them (MP22). */
+/** A row's share, p95 and signals — `—` until the log has measured them. */
 function measuredOf(insights: Insights | undefined) {
 	const rows = new Map((insights?.overview?.rows ?? []).map((r) => [r.key, r]));
 	return (key: string, one: boolean) => {
@@ -692,7 +692,7 @@ function measuredOf(insights: Insights | undefined) {
 	};
 }
 
-/** Queries a day and p95 — left out, never zero, until the log has any (MP22). */
+/** Queries a day and p95 — left out, never zero, until the log has any. */
 function queryTiles(insights: Insights | undefined, one: boolean) {
 	const o = insights?.overview;
 	if (!o) return [];
@@ -746,7 +746,7 @@ function lowerRow(
 
 const fmtNum = (v: number) => nf.format(Math.round(v));
 
-/** `↑ 6.2% in 30 days` — the Records tile's caption once Growth has counted (MP22). */
+/** `↑ 6.2% in 30 days` — the Records tile's caption once Growth has counted. */
 function grewBy(insights: Insights | undefined): string | null {
 	const growth = insights?.growth;
 	if (!insights || !growth?.counted) return null;
@@ -762,7 +762,7 @@ function grewBy(insights: Insights | undefined): string | null {
 	return `${now > start ? "↑" : "↓"} ${by} in ${days} days`;
 }
 
-/** Rows that disagree with the models, left out until a mirror exists (MP22). */
+/** Rows that disagree with the models, left out until a mirror exists. */
 function driftTile(physical: PhysicalSchema | undefined) {
 	const drift = driftCount(physical);
 	if (!drift) return [];
@@ -778,7 +778,7 @@ function driftTile(physical: PhysicalSchema | undefined) {
 	];
 }
 
-/** `in sync`, or how many of the model's rows the database lacks (MP9). */
+/** `in sync`, or how many of the model's rows the database lacks. */
 function modelDrift(physical: PhysicalSchema | undefined, model: string) {
 	if (!physical?.captured_at) return "—";
 	const off = [

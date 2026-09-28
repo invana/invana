@@ -27,7 +27,7 @@ const root = (u: string, g: string) => ["models", u, g] as const;
 export function useModelsQuery(
 	username?: string,
 	graphSlug?: string,
-	/** `Show archived` — the list with the archived models in it (MP7). */
+	/** `Show archived` — the list with the archived models in it. */
 	opts?: { includeArchived?: boolean },
 ) {
 	const includeArchived = !!opts?.includeArchived;
@@ -43,7 +43,7 @@ export function useModelsQuery(
 	});
 }
 
-/** The model page's measured tabs — Overview, Usage, Performance, Growth (MP33). */
+/** The model page's measured tabs — Overview, Usage, Performance, Growth. */
 export function useModelInsightsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
@@ -99,7 +99,7 @@ export function useShapeQuery(
 	});
 }
 
-/** What publishing the open draft would project — the Publish confirm's DDL (MP20). */
+/** What publishing the open draft would project — the Publish confirm's DDL. */
 export function useDraftProjectionQuery(
 	username?: string,
 	graphSlug?: string,
@@ -421,7 +421,7 @@ export const useRemoveLinkMutation = (u: string, g: string) =>
 	useLinkMutation(u, g, (linkId: string) => modelsApi.removeLink(u, g, linkId));
 
 /** One action for the whole staged set — committing them one at a time would
- *  put the union in states nobody chose (ST21). */
+ *  put the union in states nobody chose. */
 export const useCommitStitchesMutation = (u: string, g: string) =>
 	useLinkMutation(u, g, () => modelsApi.commitStitches(u, g));
 
@@ -432,11 +432,11 @@ export const useDiscardStitchesMutation = (u: string, g: string) =>
 
 /**
  * The resolve preview — a mutation, not a query, because it runs a count on the
- * bound database (stitch-models.md C3).
+ * bound database (stitch-models.md).
  *
  * The panel fires it as soon as both keys are named, so the count is on screen
  * *before* the stitch exists rather than behind a button nobody presses. One
- * rule, one key on each side (ST26), for both kinds.
+ * rule, one key on each side, for both kinds.
  */
 export function usePreviewStitchMutation(u: string, g: string) {
 	return useMutation({
@@ -463,7 +463,7 @@ export function useActiveVersionQuery(
 	});
 }
 
-/** The Database tab: the mirror, drift marked, at All models or one (MP9). */
+/** The Database tab: the mirror, drift marked, at All models or one. */
 export function usePhysicalSchemaQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,

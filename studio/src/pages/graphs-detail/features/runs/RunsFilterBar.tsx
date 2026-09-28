@@ -1,6 +1,6 @@
 /**
  * The journal's filter chips — `kind · status · role · agent · since`
- * (see-what-ran.md C1 · SR10 · `operate.runs.list`).
+ * (see-what-ran.md `operate.runs.list`).
  *
  * One chip per dimension, each opening its own menu. A set chip carries its
  * value and a `×` that clears only that filter, so a narrowed journal says how

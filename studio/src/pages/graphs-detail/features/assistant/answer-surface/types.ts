@@ -6,7 +6,7 @@
 //
 // It is *not* a ask frame: a frame is how anything travels over the stream
 // (`step.started`, `diagnosis`, an emission arriving), an emission is the part
-// a reader sees (docs/for-developers/terminology.md · Ask K9).
+// a reader sees (docs/for-developers/terminology.md · Ask).
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { GraphData } from "@/types/query";
@@ -19,7 +19,7 @@ export type EmissionKind =
 	| "prose"
 	| "empty";
 
-/** The projection template that chose the rendering, when one did (AS9). */
+/** The projection template that chose the rendering, when one did. */
 interface EmissionTemplate {
 	id?: string;
 	name: string;
@@ -30,7 +30,7 @@ interface EmissionTemplate {
  * A template the reader could switch to.
  *
  * One that cannot render this shape is offered **disabled with its reason**
- * rather than hidden (projections.md P10) — otherwise a reader is left wondering
+ * rather than hidden (projections.md) — otherwise a reader is left wondering
  * where the chart went.
  */
 export interface TemplateOffer {
@@ -46,7 +46,7 @@ export interface TemplateOffer {
 interface EmissionCitation {
 	recordCount: number;
 	queryId?: string;
-	/** The query itself, verbatim and copyable (RT2). */
+	/** The query itself, verbatim and copyable. */
 	query?: string;
 	queryLanguage?: string;
 	executionTimeMs?: number;
@@ -60,7 +60,7 @@ export interface TableEmission {
 export interface SubgraphEmission {
 	kind: "subgraph";
 	data: GraphData;
-	/** A subgraph adds to the canvas; it never replaces it (AS5). */
+	/** A subgraph adds to the canvas; it never replaces it. */
 	onCanvas: boolean;
 }
 
@@ -81,11 +81,11 @@ export interface ChartEmission {
 export interface ProseEmission {
 	kind: "prose";
 	text: string;
-	/** Markers in `text` resolve to these records, in order (AS4). */
+	/** Markers in `text` resolve to these records, in order. */
 	citations?: string[];
 }
 
-/** Zero records, worded as an answer rather than drawn as a blank table (AS7). */
+/** Zero records, worded as an answer rather than drawn as a blank table. */
 export interface EmptyEmission {
 	kind: "empty";
 	statement: string;

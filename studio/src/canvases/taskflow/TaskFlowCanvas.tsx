@@ -3,8 +3,8 @@
  * **Cards** ([task-flow-canvas.md](../../../../docs/for-developers/building-studio/task-flow-canvas.md)).
  *
  * The canvas Storybook's `usecases/by-casestudies/workflow/WorkflowPlan`, minus
- * its layout switcher and theme toggle (TF3 · TF7). The data, the settings and
- * the templates are all props (TF2): a caller imports `settings.json` and
+ * its layout switcher and theme toggle. The data, the settings and
+ * the templates are all props: a caller imports `settings.json` and
  * `templates.json` from this folder and passes them in with its own data.
  */
 
@@ -61,7 +61,7 @@ export interface TaskFlowCanvasProps {
 	message?: string;
 	/** Must match what `settings` starts on; `circles` for `settings.json`. */
 	initialDetail?: Detail;
-	/** The node drawn selected — a ring, no drag handles (SR52). */
+	/** The node drawn selected — a ring, no drag handles. */
 	selectedId?: string | null;
 	/** A click on one node. Left out, a click only selects. */
 	onOpenNode?: (id: string) => void;
@@ -126,7 +126,7 @@ export function TaskFlowCanvas({
 	// seeded before the layout registers. **Redraw on settle**: a
 	// solve that lands in the same beat as the data flush leaves the viewport
 	// empty while the store holds the graph — `redraw()` is a pure render pass
-	// over the store (ME25).
+	// over the store.
 	useEffect(() => {
 		if (!canvas) return;
 		return canvas.events.on("layout:run:end", (e) => {
@@ -185,7 +185,7 @@ export function TaskFlowCanvas({
 				// The kit's bar height, the tab strip's; canvas-ui's own is 40px.
 				className: "!h-[30px]",
 				title,
-				// Read-only (SR52): no undo, edge-routing or erase — which is also
+				// Read-only: no undo, edge-routing or erase — which is also
 				// what lets Detail and Settings fit at section width.
 				center: (
 					<GraphControlsToolbar

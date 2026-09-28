@@ -1,16 +1,16 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
-// **Runs takes no `?section=`** — it is a list, not a stack (graph-detail-page.md
-// G31 · G33). One journal of every TaskRun in the Graph, and the definitions a
-// run is built from live in **Library** (G41), so there is no second list here
+// **Runs takes no `?section=`** — it is a list, not a stack (graph-detail-page.md).
+// One journal of every TaskRun in the Graph, and the definitions a
+// run is built from live in **Library**, so there is no second list here
 // for `?section=` to choose between.
 //
 // `&run=` is the one key it carries: the run whose detail replaces the panel
 // body, turning the header into `‹ RUNS / orders.csv`. It is dropped whenever
 // `?panel=` moves to a section that does not own it, in `useLeftSection` — a
 // run left in the URL under a different rail icon names a body that is not on
-// screen (G35).
+// screen.
 
 const RUN_PARAM = "run";
 

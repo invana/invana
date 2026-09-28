@@ -1,10 +1,9 @@
 /**
  * **RunsList** — the Runs panel's body: one row per TaskRun
- * (docs/for-developers/modules/operate/features/see-what-ran.md SR1 ·
- * docs/for-developers/modules/bring-data-in/features/inspect-what-landed.md IW7).
+ * (docs/for-developers/modules/operate/features/see-what-ran.md * docs/for-developers/modules/bring-data-in/features/inspect-what-landed.md).
  *
  * One list of runs in the Graph, newest first. **The journal is filtered, not
- * selective** (SR23): a load, an ask, a stitch commit and a bulk load are all
+ * selective**: a load, an ask, a stitch commit and a bulk load are all
  * TaskRuns, and *what kind* is a column rather than a surface of its own.
  *
  * There is no dataset facet any more, and no dataset detail. Records belong to
@@ -13,7 +12,7 @@
  * ([§ 6.7](docs/for-developers/building-engine/task-model-migration.md)). A row
  * names what the run was about, and the drill-in is the run.
  *
- * Nothing here writes (IW3). Loading is CLI and API only (BD6).
+ * Nothing here writes. Loading is CLI and API only.
  */
 
 import { EmptyState, RunRow, Spinner } from "@invana/ui";
@@ -24,7 +23,7 @@ import type { RunListRow } from "@/pages/graphs-detail/features/runs/queries";
 
 /**
  * The **short id** — the last eight characters, quoted the way a commit is
- * ([SR45](docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * ([see-what-ran.md](docs/for-developers/modules/operate/features/see-what-ran.md)).
  *
  * A run is the noun every other surface names — a log line, `GET …/runs/{id}`,
  * a support thread — so a journal nobody can quote from forces a drill-in just
@@ -35,7 +34,7 @@ export function shortRunId(id: string): string {
 }
 
 /**
- * The run's own clock, in milliseconds — `null` before it starts (SR34).
+ * The run's own clock, in milliseconds — `null` before it starts.
  *
  * Measured from `started_at`, not from `queued_at`: a run that sat in the
  * queue for a minute did not take a minute. A run still going is measured
@@ -52,8 +51,8 @@ export function elapsedOf(row: RunListRow, now: number): number | null {
  * The line under a row, after its id: the plan, what the run spent, then when
  * it was opened.
  *
- * `nl-query@5 · 2m 51s · 21.4k · 9/9 · 4 mins ago` (SR45). Each fact drops out
- * when nobody recorded it rather than reading as zero (SR34) — a load spends
+ * `nl-query@5 · 2m 51s · 21.4k · 9/9 · 4 mins ago`. Each fact drops out
+ * when nobody recorded it rather than reading as zero — a load spends
  * no tokens, and a queued run has no elapsed.
  *
  * `9/9` is a **position**, not a percentage: a plan can replan, and a count
@@ -74,7 +73,7 @@ function runLine(row: RunListRow, now: number): string {
 
 	if (t.served && t.served !== "yes") parts.push(`served ${t.served}`);
 	// A bulk load validated nothing, and the row says so rather than letting it
-	// read like a checked one (IW11).
+	// read like a checked one.
 	if (row.kind === "bulk") parts.push("bulk, unvalidated");
 
 	if (row.startedAt) parts.push(formatRelativeTime(new Date(row.startedAt)));
@@ -86,12 +85,12 @@ function runLine(row: RunListRow, now: number): string {
  *
  * It is a **section body**, not a view panel: the Runs section draws the title,
  * the count, the search, the funnel and the chip row it opens above it, and the
- * view panel draws the status bar below (graph-detail-page.md G32 · G33). The
+ * view panel draws the status bar below (graph-detail-page.md). The
  * rows are read once, by the view panel, because the header count and the
  * status bar read them too.
  *
  * Its drill-in is the URL's (`&run=`), because a section's detail replaces that
- * section's body and has to survive a reload like any other region (G31).
+ * section's body and has to survive a reload like any other region.
  */
 export interface RunsListProps {
 	rows: RunListRow[];
@@ -152,7 +151,7 @@ export function RunsList({
 				/>
 			) : (
 				rows.map((row) => (
-					// The status is the glyph, not a word (SR65). A run that
+					// The status is the glyph, not a word. A run that
 					// succeeded but served only part of an answer says so by
 					// shape as well as on line two.
 					<RunRow

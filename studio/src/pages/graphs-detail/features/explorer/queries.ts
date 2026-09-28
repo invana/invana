@@ -1,5 +1,5 @@
 // The node and edge types the picked world holds, counted inside it — the
-// Explorer panel's legend and the expand menus' vocabulary (docs/for-developers/modules/explore/features/selection-and-the-panel.md SP6).
+// Explorer panel's legend and the expand menus' vocabulary (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
 
 import { useQuery } from "@tanstack/react-query";
 import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
@@ -14,7 +14,7 @@ const TYPE_COUNTS_KEY = ["type-counts"] as const;
 export function useTypeCountsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
-	/** The picked world — counts are taken inside it (SP11). */
+	/** The picked world — counts are taken inside it. */
 	lensId?: string | null,
 ) {
 	return useQuery({

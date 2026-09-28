@@ -4,11 +4,11 @@
  *
  * The canvas Storybook's `usecases/by-casestudies/global-model/GlobalModel`,
  * copied: the same behaviours, header, footer, Detail switcher, settings and
- * templates (GM1) — laid out by ELK alone, opening on circles unless told otherwise (GM3 · GM4). What is Studio's own: the JSON names
- * no model and no type, so it is filled in against the data and the live theme
- * (GM5–GM7); the colours are Studio's palette, and a frame wears its model's
- * hue (GM8); a stitch is dashed (GM9) and, where the host asks for it, declared
- * by a drag (GM12). A host reads and drives the selection, and adds nothing
+ * templates — laid out by ELK alone, opening on circles unless told otherwise. What is Studio's own: the JSON names
+ * no model and no type, so it is filled in against the data and the live theme;
+ * the colours are Studio's palette, and a frame wears its model's
+ * hue; a stitch is dashed and, where the host asks for it, declared
+ * by a drag. A host reads and drives the selection, and adds nothing
  * else.
  */
 
@@ -73,7 +73,7 @@ import { useStudioCanvasTheme } from "@/canvases/theme";
 
 const MODEL_LAYER_ID = "graph";
 const FIT = { fitCamera: { padding: 60 } };
-/** The one layout every modeller canvas runs (GM3). */
+/** The one layout every modeller canvas runs. */
 const LAYOUT = "elk";
 
 export interface GraphModelCanvasProps {
@@ -84,7 +84,7 @@ export interface GraphModelCanvasProps {
 	title?: string;
 	/** Shown once in the message bar when the canvas is ready. */
 	message?: string;
-	/** The Detail the canvas opens on — circles for All models, cards for one model (GM4). */
+	/** The Detail the canvas opens on — circles for All models, cards for one model. */
 	initialDetail?: Detail;
 	/** The node or edge drawn selected. */
 	selected?: ModelCanvasSelection;
@@ -92,17 +92,17 @@ export interface GraphModelCanvasProps {
 	onSelect?: (selection: ModelCanvasSelection) => void;
 	/** For a host that gives no height of its own; default fills the parent. */
 	height?: number;
-	/** Declare a stitch by dragging a type onto another (GM12). Left out, the canvas has no Stitch tool. */
+	/** Declare a stitch by dragging a type onto another. Left out, the canvas has no Stitch tool. */
 	stitching?: GraphModelStitching;
 	/**
-	 * The page's render backend (GM13). Fixed at init, so a change remounts the
+	 * The page's render backend. Fixed at init, so a change remounts the
 	 * canvas. Left out, the canvas picks WebGPU where it can.
 	 */
 	backend?: RenderPreference;
 }
 
 /**
- * The stitch gesture (GM12): the Stitch tool in the header toolbar arms a drag
+ * The stitch gesture: the Stitch tool in the header toolbar arms a drag
  * from one type to another, and the declare card docks on the right.
  */
 interface GraphModelStitching {
@@ -156,7 +156,7 @@ export function GraphModelCanvas({
 }: GraphModelCanvasProps) {
 	// `select` drags a type; `stitch` drags a crossing. Both start on node
 	// pointer-down, so only one is ever on. A drag moves a type, as in the story;
-	// **Shift**-drag stitches, and the Stitch toggle makes that sticky (GM12).
+	// **Shift**-drag stitches, and the Stitch toggle makes that sticky.
 	const [tool, setTool] = useState<"select" | "stitch">("select");
 	const [shift, setShift] = useState(false);
 	useEffect(() => {
@@ -223,7 +223,7 @@ export function GraphModelCanvas({
 							icon: Link2,
 							label: "Declare a stitch",
 							// Opened by an accepted drag only — its toggle is kept out of the
-							// header, so the Stitch tool is the one link icon (GM12).
+							// header, so the Stitch tool is the one link icon.
 							render: () => stitchRef.current?.panel ?? null,
 						},
 					]
@@ -278,13 +278,13 @@ export function GraphModelCanvas({
 	// the behaviours register after the root applied `config` — they keep their
 	// constructor defaults, so `collapse-expand` never re-lays out, `hover`
 	// loses its degree and `text-lod` its band. The definition holds the right
-	// config; this hands it to the live instances (GM14).
+	// config; this hands it to the live instances.
 	useEffect(() => {
 		if (canvas) canvas.update(config);
 	}, [canvas, config]);
 
 	// Redraw on settle: a solve that lands in the same beat as the data flush
-	// leaves the viewport empty while the store holds the graph (ME25).
+	// leaves the viewport empty while the store holds the graph.
 	useEffect(() => {
 		if (!canvas) return;
 		return canvas.events.on("layout:run:end", (e) => {
@@ -296,7 +296,7 @@ export function GraphModelCanvas({
 	// A theme change writes the palette's card and divider colours over every
 	// group node's own style (`GraphLayer.applyTheme`), which would leave each
 	// frame white. Its hue goes back on after the layer's pass — this listener
-	// subscribes after the layer's, so it runs second (GM8).
+	// subscribes after the layer's, so it runs second.
 	useEffect(() => {
 		if (!canvas) return;
 		const rehue = () => {
@@ -324,7 +324,7 @@ export function GraphModelCanvas({
 
 	// `settings.json` switches node drag on, as the story's does — so the tool
 	// re-asserts itself after the config lands: while stitching a drag draws, it
-	// never moves the type (GM12).
+	// never moves the type.
 	useEffect(() => {
 		const drag = canvas?.behaviours.get("drag-node");
 		if (!drag) return;
@@ -438,7 +438,7 @@ export function GraphModelCanvas({
 			) : null}
 			<HoverActivateBehaviour id="hover" targetLayerId={MODEL_LAYER_ID} />
 			<ClickSelectBehaviour id="click-select" targetLayerId={MODEL_LAYER_ID} />
-			{/* ELK, and only ELK (GM3). */}
+			{/* ELK, and only ELK. */}
 			<ElkLayout
 				id={LAYOUT}
 				targetLayerId={MODEL_LAYER_ID}

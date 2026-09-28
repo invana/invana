@@ -1,5 +1,5 @@
 // One section of a **stacked panel** — Library, Projects, Govern, Agents, Skills
-// (graph-detail-page.md G32 · G33).
+// (graph-detail-page.md).
 //
 // **A section owns its header; the panel owns the status bar.** Each section
 // draws its own title, count, search and filter, and a drill-in stays inside it
@@ -51,7 +51,7 @@ export interface StackSectionUi {
 /**
  * Per-section search and filter state for one stack. The three lists filter on
  * different columns, so each section keeps its own — one shared bar would be
- * re-offered per list anyway (G33).
+ * re-offered per list anyway.
  */
 export function useStackSectionUi(): StackSectionUi {
 	const [state, setState] = useState<Record<string, StackSectionUiState>>({});
@@ -94,7 +94,7 @@ export interface StackSectionSpec {
 	/**
 	 * Actions before the search and filter icons — a section's own `+`, for the
 	 * one thing it creates. Every create CTA for an item happens in the section
-	 * that owns it (G3).
+	 * that owns it.
 	 */
 	headerActions?: {
 		key: string;
@@ -106,7 +106,7 @@ export interface StackSectionSpec {
 	}[];
 	/**
 	 * Actions for the **drilled-in** header, beside `‹ Back` — an act on the one
-	 * record on screen, never on the list behind it (G43). A list's own acts are
+	 * record on screen, never on the list behind it. A list's own acts are
 	 * {@link StackSectionSpec.headerActions} and are gone while drilled in.
 	 */
 	detailActions?: {
@@ -180,7 +180,7 @@ export function stackSection(
 		),
 		// The count and the two icons are chrome that must read while the section
 		// is collapsed — the quiet-header default would hide exactly the controls
-		// G33 puts in every section header.
+		// puts in every section header.
 		actionsOnHover: false,
 		defaultCollapsed: spec.defaultCollapsed,
 		defaultSize: spec.defaultSize,
@@ -247,7 +247,7 @@ function StackSectionTitle({
  * one record — offers neither: narrowing a list that is not on screen would be
  * a control with no subject. For the same reason the list's own acts go with
  * it, and what takes their place is {@link StackSectionSpec.detailActions}: the
- * acts on the record the section is now showing (G43).
+ * acts on the record the section is now showing.
  */
 function sectionActions(
 	spec: StackSectionSpec,
@@ -256,7 +256,7 @@ function sectionActions(
 ): NavHorizontalItem[] {
 	const drilled = spec.trail != null;
 	if (drilled) {
-		// Back first, then whatever acts on the record itself (G43).
+		// Back first, then whatever acts on the record itself.
 		const back: NavHorizontalItem[] = spec.onBack
 			? [
 					{

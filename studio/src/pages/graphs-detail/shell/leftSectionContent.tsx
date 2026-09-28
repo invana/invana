@@ -96,10 +96,10 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		setSelectedTaskId,
 	} = layered;
 	return settingsPanel.section === "model" ? (
-		// The panel lists; the page acts (MP4). Its selection is the page's
+		// The panel lists; the page acts. Its selection is the page's
 		// scope, and both are the URL's — so a row picked here reads on the
 		// `models` board beside it. A stack with no panel header above its
-		// sections (G33 · ME17), so it takes no `onClose`.
+		// sections, so it takes no `onClose`.
 		<ModelViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
@@ -108,7 +108,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onShowPage={showModelsPage}
 		/>
 	) : settingsPanel.section === "projects" ? (
-		// **Projects owns Todos** (PT7) — two sections, `Projects` over `Todos`,
+		// **Projects owns Todos** — two sections, `Projects` over `Todos`,
 		// the same stack shape Library takes. With no project drilled into, the
 		// Todos section is every Todo in the Graph: the *No project* bucket.
 		<ProjectsViewPanel
@@ -125,13 +125,13 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 				openWorkPanel("agents");
 			}}
 			// A statement on a step row opens the rule's board beside the
-			// section, the same way `More` does from Rules (RU11 · RU12).
+			// section, the same way `More` does from Rules.
 			onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
 		/>
 	) : settingsPanel.section === "runs" ? (
-		// **Runs is execution** — the journal, and nothing else, as one list
-		// (G41 · SR1). Todos are not here: they live under Projects, because a
-		// Todo without its project is a to-do list (PT7).
+		// **Runs is execution** — the journal, and nothing else, as one list.
+		// Todos are not here: they live under Projects, because a
+		// Todo without its project is a to-do list.
 		<RunsViewPanel
 			username={username as string}
 			graphSlug={graphSlug as string}
@@ -139,7 +139,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onOpenRunDashboard={(runId, stepId) =>
 				openBoard({ kind: "run", subjectId: runId, runId, stepId })
 			}
-			// The journal drawn wide, beside the list (SR70).
+			// The journal drawn wide, beside the list.
 			onOpenRunsBoard={() =>
 				openBoard({ kind: "runs", subjectId: graphSlug as string })
 			}
@@ -151,7 +151,7 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 		/>
 	) : settingsPanel.section === "library" ? (
 		// **Library is definition** — Plans · Catalogue · Templates, stacked,
-		// with no panel header above them (G33 · G41): what can be run, the
+		// with no panel header above them: what can be run, the
 		// closed vocabulary it is written in, and how its output renders.
 		<LibraryViewPanel
 			username={username as string}
@@ -174,12 +174,12 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			onClose={closeLeftPanel}
 			selectedSkillId={selectedSkillId}
 			onSelectSkill={setSelectedSkillId}
-			// `Open` — the skill's page, and the stack stays (SK17 · SK37).
+			// `Open` — the skill's page, and the stack stays.
 			onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
 			onOpenRuleDashboard={(id) => openBoard({ kind: "rule", subjectId: id })}
 		/>
 	) : settingsPanel.section === "govern" ? (
-		// Govern holds Worlds over Guardrails as two sections of one panel (GV17),
+		// Govern holds Worlds over Guardrails as two sections of one panel,
 		// with no panel header above them — the same stack shape Library and
 		// Projects take. It opens no canvas: a world is a bound the *other*
 		// panels run inside, so it hangs over whatever is already drawn.
@@ -187,13 +187,13 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			username={username}
 			graphSlug={graphSlug}
 			// A drill-in opens that lens as a page, titled with its own name
-			// (WO15 · GR14) — the section keeps the picking reading, the board
+			// — the section keeps the picking reading, the board
 			// carries the auditing one.
 			onOpenBoard={openLensBoard}
 		/>
 	) : settingsPanel.section === "agents" ? (
 		// Agents holds the agents over the LLMs as two sections of one panel
-		// (PM6 · GV18) — a provider is what an agent's cast resolves against,
+		// — a provider is what an agent's cast resolves against,
 		// so it is read where agents are rather than in a tab of Settings.
 		<AgentsViewPanel
 			username={username as string}
@@ -207,14 +207,14 @@ function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 			selectedEdge={selectedLineageEdge}
 			onOpenLineage={(id) => showAgentCanvas("lineage", id)}
 			onOpenTask={(id) => {
-				// A Todo lives under Projects (PT7); the rail's Tasks icon is
+				// A Todo lives under Projects; the rail's Tasks icon is
 				// execution only.
 				setSelectedTaskId(id);
 				openWorkPanel("projects");
 			}}
 		/>
 	) : settingsPanel.section === "explorer" ? (
-		// Sessions is not a left panel (AD1); the Explorer's own is the graph's
+		// Sessions is not a left panel; the Explorer's own is the graph's
 		// type list and the selection (selection-and-the-panel.md) — the legend
 		// for the drawing beside it. It is a `?panel` key like every other, so
 		// closing it leaves the column empty rather than falling back here.

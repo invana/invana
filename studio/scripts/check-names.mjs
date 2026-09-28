@@ -1,7 +1,7 @@
 /**
  * Keeps Studio's names on the module map, so the structure cannot drift again.
  *
- * Three checks over `src/`, each failing with the file and the name:
+ * Four checks over `src/`, each failing with the file and the name:
  *
  * 1. **Modules** — every `pages/graphs-detail/features/<m>/` is a module in `MODULES`,
  *    and the engine folder it maps to exists under `engine/src/invana/server/`.
@@ -11,6 +11,10 @@
  * 3. **Retired words** — no identifier contains one. Identifiers are read with the
  *    TypeScript parser, so strings, JSX text and comments (URL values, storage keys,
  *    test ids, UI copy) are never flagged.
+ * 4. **Decision ids** — no comment cites one (`G41`, `SR72`, `(AD2)`). A comment
+ *    says what the code does and why; the decision lives in its feature file, and
+ *    a doc link names the file. Code spans in a comment (`EU · H1 2026`) are
+ *    skipped, since they quote copy rather than cite a decision.
  *
  * Every exception is a line in an allow-list below, with its reason.
  *
@@ -74,6 +78,13 @@ const RETIRED_WORDS =
 	/drawer|StackPanel|DashboardPage|journal|thinking|railItem/i;
 // `file:identifier` pairs that keep a retired word, with the reason.
 const WORD_ALLOWED = {};
+
+// Every prefix a feature file or module spec numbers its decisions with.
+const DECISION_PREFIXES =
+	"G SR MP SK B ST AG GV LB SU RU PM GR C GM WO AD AS PT ME W D GC CD BN CA CV TF LC EB R US SD SO A DS SP J CC RT T IW SS UC K P F BD CM SM SW AC OB DP AA LD ID L S O PL";
+const DECISION_ID = new RegExp(
+	`(?<![\\w.\`-])(?:${DECISION_PREFIXES.split(" ").join("|")})[0-9]{1,3}[a-z]?(?![\\w-])`,
+);
 
 const errors = [];
 
@@ -147,6 +158,39 @@ function checkWords() {
 	}
 }
 
+function checkDecisionIds() {
+	for (const f of files(SRC, /\.tsx?$/)) {
+		const rel = path.relative(SRC, f).split(path.sep).join("/");
+		const text = fs.readFileSync(f, "utf8");
+		const sf = ts.createSourceFile(
+			f,
+			text,
+			ts.ScriptTarget.Latest,
+			true,
+			f.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+		);
+		const comments = new Map();
+		const visit = (node) => {
+			if (node.kind !== ts.SyntaxKind.JsxText) {
+				for (const r of ts.getLeadingCommentRanges(text, node.pos) ?? [])
+					comments.set(r.pos, r.end);
+				for (const r of ts.getTrailingCommentRanges(text, node.end) ?? [])
+					comments.set(r.pos, r.end);
+			}
+			for (const c of node.getChildren(sf)) visit(c);
+		};
+		visit(sf);
+		for (const [pos, end] of comments) {
+			const body = text.slice(pos, end).replace(/`[^`\n]*`/g, "");
+			const m = DECISION_ID.exec(body);
+			if (m) {
+				const { line } = sf.getLineAndCharacterOfPosition(pos);
+				errors.push(`${rel}:${line + 1}: comment cites decision id ${m[0]}`);
+			}
+		}
+	}
+}
+
 function dirs(root) {
 	return fs
 		.readdirSync(root, { withFileTypes: true })
@@ -167,6 +211,7 @@ function files(root, pattern) {
 checkModules();
 checkSuffixes();
 checkWords();
+checkDecisionIds();
 
 if (errors.length) {
 	console.error(
@@ -175,5 +220,5 @@ if (errors.length) {
 	process.exit(1);
 }
 console.log(
-	"check-names: modules, suffixes and identifiers follow the module map",
+	"check-names: modules, suffixes, identifiers and comments follow the module map",
 );

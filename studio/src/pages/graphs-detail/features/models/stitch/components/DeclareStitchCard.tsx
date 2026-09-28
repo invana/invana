@@ -1,23 +1,23 @@
 /**
  * Declare a stitch — one card, both kinds, the count before the fact.
  *
- * This is the artboard *Declaring* (the-screens.md T5, T9, T10) as a component.
+ * This is the artboard *Declaring* (the-screens.md) as a component.
  * Four things about it are the design, not decoration:
  *
  * - **One title, two kinds.** The card says *Declare a stitch* and the kind is a
- *   segmented control inside it (ST11). Naming the kind before the card opens
+ *   segmented control inside it. Naming the kind before the card opens
  *   makes a person choose between two words for the same act; naming it inside
  *   lets them change their mind after seeing the two types side by side.
- * - **A key on each side** (ST26). `Company.ticker = Stock.nse_symbol` is the
+ * - **A key on each side**. `Company.ticker = Stock.nse_symbol` is the
  *   ordinary stitch, not the exotic one — the two models were authored apart.
  * - **The count comes back before the stitch exists.** As soon as both keys are
  *   named the preview fires; a rule that matches nothing says the rule is wrong,
  *   not the data, and there is nothing to undo because nothing happened.
- * - **A relationship's endpoints are keys *or* a dataset** (ST27). The choice is
+ * - **A relationship's endpoints are keys *or* a dataset**. The choice is
  *   a segmented control and the other side goes dark, because one edge type with
  *   two sources of truth has no rule for which wins.
  *
- * It stages (ST21). The button says so — *Stage this stitch* — because the union
+ * It stages. The button says so — *Stage this stitch* — because the union
  * is unchanged until somebody commits, and a button that said *Declare* would be
  * promising a change that has not happened.
  */
@@ -76,9 +76,9 @@ interface TypeOption {
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** Which kind the card opens on. It is the reader's from then on (ST11). */
+	/** Which kind the card opens on. It is the reader's from then on. */
 	initialKind?: LinkKind;
-	/** The side the gesture already named, as `${versionId}::${typeName}` (ST19). */
+	/** The side the gesture already named, as `${versionId}::${typeName}`. */
 	sourceKey?: string;
 	/** The other side, when the drag named it too. */
 	targetKey?: string;
@@ -117,7 +117,7 @@ export function DeclareStitchCard({
 
 	const models = useModelsQuery(username, graphSlug);
 	// Only published versions are offered — a draft has nothing immutable to
-	// bind (ST8), so it is absent from the pickers rather than refused by them.
+	// bind, so it is absent from the pickers rather than refused by them.
 	const published = useMemo(
 		() =>
 			(models.data ?? []).filter(
@@ -132,7 +132,7 @@ export function DeclareStitchCard({
 			queryFn: () => modelsApi.getActiveVersion(username, graphSlug, model.id),
 		})),
 		// `useQueries` hands back a new array every render; combining keeps the
-		// result structurally shared, so the options below do not churn (ST31).
+		// result structurally shared, so the options below do not churn.
 		combine: (results) => results.map((r) => r.data),
 	});
 
@@ -165,7 +165,7 @@ export function DeclareStitchCard({
 	const runPreview = usePreviewStitchMutation(username, graphSlug);
 
 	// Keys are read on an anchor always, and on a relationship only while the
-	// endpoints come from them (ST27).
+	// endpoints come from them.
 	const usesKeys = kind === "anchor" || endpoints === "keys";
 	const rule =
 		usesKeys && source && target && sourceProperty && targetProperty
@@ -283,7 +283,7 @@ export function DeclareStitchCard({
 				<StitchCardHeader />
 
 				<div className="flex flex-col gap-2 p-2.5 text-sm">
-					{/* One card, two kinds (ST11). */}
+					{/* One card, two kinds. */}
 					<Tabs
 						size="sm"
 						value={kind}
@@ -378,7 +378,7 @@ export function DeclareStitchCard({
 							<div className="pt-0.5 font-medium text-foreground">
 								Endpoints
 							</div>
-							{/* Keys or a source model, never both (ST27). */}
+							{/* Keys or a source model, never both. */}
 							<Tabs
 								size="sm"
 								value={endpoints}
@@ -531,7 +531,7 @@ export function DeclareStitchCard({
 /** The card's own width and elevation — a floating panel, not a page card. */
 const STITCH_CARD = "w-[292px] rounded-none shadow-lg";
 
-/** The card's one title, over whichever kind is chosen inside it (ST11). */
+/** The card's one title, over whichever kind is chosen inside it. */
 function StitchCardHeader() {
 	return (
 		<CardHeader className="flex-row items-center gap-1.5 space-y-0 border-b px-2.5 py-2">
@@ -567,7 +567,7 @@ function Row({
  *
  * Pre-filled from the gesture it reads as a fact, not a field: the drag already
  * answered this, and re-asking it from an empty dropdown is asking someone to
- * re-answer a question they just answered (ST19).
+ * re-answer a question they just answered.
  */
 function SideRow({
 	label,
@@ -610,7 +610,7 @@ function SideRow({
 	);
 }
 
-/** The key on one side, labelled with the type that carries it (ST26). */
+/** The key on one side, labelled with the type that carries it. */
 function KeyRow({
 	type,
 	properties,
@@ -756,7 +756,7 @@ function PreviewBox({
  *
  * A pair is anchored once. The card names the rule the existing stitch carries
  * so the reader changes *that* one, rather than being told no and left to find
- * it (the *Refused* artboard, T6).
+ * it (the *Refused* artboard).
  */
 function AlreadyStitchedCard({
 	refusal,

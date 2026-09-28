@@ -37,7 +37,7 @@ const TAB_LABEL: Partial<Record<ModelsTab, string>> = {
 	database: "Database",
 };
 
-/** The drift rows, as attention items — unmodelled labels at All models, what the model lacks at one (MP9). */
+/** The drift rows, as attention items — unmodelled labels at All models, what the model lacks at one. */
 function driftAttention(
 	physical: PhysicalSchema | undefined,
 	one: boolean,

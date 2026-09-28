@@ -1,7 +1,7 @@
 /**
  * The wrapper every declared page is mounted inside — the two acts a board
  * carries, and the card one of them opens
- * ([B20 · B21](../../../../../docs/for-developers/building-engine/boards-migration.md)).
+ * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)).
  *
  * Which board a page is — its `kind` and its `subject_id` — is the host's
  * knowledge, so it is put here once rather than threaded through six
@@ -9,7 +9,7 @@
  * `useReport(spec)`: `Save report` keeps this reading, `Reports` finds a kept
  * one. They are a pair and they sit together, on the dashboard's **own**
  * header — a canvas' History is a strip control only because a canvas has no
- * header to put one on (B21).
+ * header to put one on.
  *
  * A hook cannot draw, and a composer that drew its own card would stop being
  * the pure function of one read that § 5.5 requires — so the card is rendered
@@ -30,7 +30,7 @@ export interface DeclaredBoardProps {
 	/**
 	 * Show this board's frozen reading — `kind:{subjectId}@{versionId}`. It is
 	 * one callback, because saving a report and opening one from the list are
-	 * the same move: the page becomes that reading (B12 · B22).
+	 * the same move: the page becomes that reading.
 	 */
 	onOpenVersion: (versionId: string) => void;
 	children: ReactNode;
@@ -82,7 +82,7 @@ export function DeclaredBoard({
 						fallbackLabel="Report"
 						empty="No reports of this board yet. A live dashboard re-reads its subject every time it opens — Save report keeps the numbers as they are right now."
 						// A report **opens**; it does not restore. There is nothing to
-						// fork into, because the live board is always there (B22).
+						// fork into, because the live board is always there.
 						action={(report) => ({
 							label: "Open this report",
 							onClick: () => {

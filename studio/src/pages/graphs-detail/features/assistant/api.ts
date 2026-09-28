@@ -112,9 +112,9 @@ export interface SendMessageBody {
 	/** nl only — seconds to wait on the LLM translation before giving up. */
 	timeout_s?: number;
 	/**
-	 * The world this one ask runs in — *Next ask only* (AD16).
+	 * The world this one ask runs in — *Next ask only*.
 	 *
-	 * **Omitted and null differ** (AD19): omitted is the session's world, null
+	 * **Omitted and null differ**: omitted is the session's world, null
 	 * is *Everything* for this ask only. The run freezes what this resolves to.
 	 */
 	lens_id?: string | null;
@@ -154,11 +154,11 @@ export interface SessionCreateBody {
 	surface?: "explorer" | "modeller";
 	model_id?: string;
 	/** The world a new thread starts in, when one was picked before its first
-	 *  ask (AS5). Omitted is *Everything*. */
+	 *  ask. Omitted is *Everything*. */
 	lens_id?: string;
 }
 
-/** Partial update for a session — rename, pin/archive, or its bounds (AS5).
+/** Partial update for a session — rename, pin/archive, or its bounds.
  *  For `lens_id` and `max_cost_usd_run`, null is a value: *Everything*, and
  *  *the agent's cap*. */
 export interface SessionUpdateBody {

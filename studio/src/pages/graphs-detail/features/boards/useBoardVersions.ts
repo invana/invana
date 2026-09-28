@@ -34,7 +34,7 @@ export interface BoardSlice {
 	styling: CanvasStyling;
 	/** The node or edge the inspector is reading. */
 	selectedId: string | null;
-	/** Drawn, but no longer in the graph (GC5). */
+	/** Drawn, but no longer in the graph. */
 	missingIds: Set<string>;
 }
 

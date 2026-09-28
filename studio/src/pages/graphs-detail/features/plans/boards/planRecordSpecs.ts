@@ -1,6 +1,6 @@
 /**
  * The three readings `⋯` opens on a plan's page — Versions · Arguments ·
- * Export YAML ([LB38](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
+ * Export YAML ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * Pure: each builds one `DashboardSpec` from reads the page already made, and
  * `@invana/dashboard` draws it. They are records, not readings over a window,

@@ -56,7 +56,7 @@ interface Props {
  * buffer). Pagination is append-as-you-scroll via
  * `useGraphEventsQuery.fetchNextPage`.
  *
- * The tail reads as a timeline (audit-and-activity.md AA6): `TimelineList` in
+ * The tail reads as a timeline (audit-and-activity.md): `TimelineList` in
  * its `rail` variant, because the panel is docked and narrow — a fixed `when`
  * column would eat a third of the width. `Load older` sits in the
  * `TimelineFooter` so the rail runs into it, which is what says the history

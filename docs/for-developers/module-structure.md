@@ -264,7 +264,7 @@ docstrings stay full — they are how a reader learns to use the code.
 | Rule | Detail |
 |---|---|
 | Inline comments | Say what is not obvious from the code — a constraint, a trap, a reason. Never what the next line does |
-| Standalone | Code documentation reads without the docs: never cite a decision id (`GV3`, `TE14`) in code or tests |
+| Standalone | Code documentation reads without the docs: never cite a decision id (`GV3`, `TE14`) in code or tests. A doc link names the file. In Studio, `scripts/check-names.mjs` fails a comment that cites one |
 | Models and columns | A column gets a comment only when its name cannot carry its meaning — a unit, an enum's source, a nullable's meaning |
 | Classes and methods | A docstring on usage and design — what it is for, how to call it, what it guarantees |
 | Components | A docblock on usage when the name and props are not enough |

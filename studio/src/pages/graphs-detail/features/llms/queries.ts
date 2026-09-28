@@ -63,10 +63,10 @@ export function useDeleteLLMProviderMutation(
 }
 
 /**
- * Offer one more model on an endpoint (PM9).
+ * Offer one more model on an endpoint.
  *
  * The ranks go with it: a model added with none is neither cheap nor capable
- * to `shipped_cast`, so it silently never wins a role (PM12).
+ * to `shipped_cast`, so it silently never wins a role.
  */
 export function useAddLLMModelMutation(username: string, graphSlug: string) {
 	const qc = useQueryClient();
@@ -81,7 +81,7 @@ export function useAddLLMModelMutation(username: string, graphSlug: string) {
 
 /**
  * Stop offering one. **Refused while a world casts it**, and the refusal names
- * the worlds (PM11) — the caller renders it where the click was.
+ * the worlds — the caller renders it where the click was.
  */
 export function useRemoveLLMModelMutation(username: string, graphSlug: string) {
 	const qc = useQueryClient();

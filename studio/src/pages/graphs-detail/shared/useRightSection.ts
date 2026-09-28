@@ -2,7 +2,7 @@
  * Who holds `rightSection` — the one owner of the page's right side.
  *
  * **One param per region, and its value is the occupant**
- * (docs/for-developers/building-studio/graph-detail-page.md G16). The right side
+ * (docs/for-developers/building-studio/graph-detail-page.md). The right side
  * used to have two occupants and two mechanisms: `?ai=1` opened the assistant,
  * a component-local `inspectorClosed` opened the inspector, and nothing said
  * which of them was on screen — the inspector did not even survive a reload.
@@ -11,7 +11,7 @@
  * third occupant is one more value rather than one more flag.
  *
  * Opening one replaces the other, and closing closes the region: the right side
- * keeps no memory of what was there before (the-assistant.md AD11).
+ * keeps no memory of what was there before (the-assistant.md).
  * Restoring a previous occupant needs a second piece of state to hold it, which
  * is the thing this param exists to remove.
  */

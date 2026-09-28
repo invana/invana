@@ -1,12 +1,11 @@
 /**
- * The model page — `models:<graph>` in `BoardPagesViewPanel` (the-model-page.md
- * MP1 · MP18).
+ * The model page — `models:<graph>` in `BoardPagesViewPanel` (the-model-page.md).
  *
  * One board, whatever the scope: the scope, the tab and the window are the
  * URL's (`useModelsView`), so the panel beside it and a reload read the same
  * reading. It fetches and answers actions; `modelsPageSpec` composes and
  * `@invana/dashboard` draws. Every write on a model is on this page's header,
- * never in the panel (MP4).
+ * never in the panel.
  */
 
 import { Dashboard } from "@invana/dashboard";
@@ -66,7 +65,7 @@ import { type ModelsTab, useModelsView } from "./useModelsView";
 
 const ICONS = { ...DASHBOARD_ICONS, plus: Plus, upload: Upload, check: Check };
 
-/** What each tab waits on until its read ships (MP22). */
+/** What each tab waits on until its read ships. */
 const WAITS_ON: Partial<Record<ModelsTab, string>> = {
 	usage:
 		"Usage counts who asked about each type and property, from the query log. This engine does not keep one.",
@@ -93,10 +92,10 @@ export function ModelsPage({
 	username: string;
 	graphSlug: string;
 	backend?: CanvasBackend;
-	/** The type selected on the Model tab — its form spans the column beneath (ME6). */
+	/** The type selected on the Model tab — its form spans the column beneath. */
 	selection: ModelSelection | null;
 	onSelect: (selection: ModelSelection | null) => void;
-	/** Membership is binary today, so every member writes (MP23). */
+	/** Membership is binary today, so every member writes. */
 	canWrite?: boolean;
 	/** A Growth mark's run, opened as a board beside this one. */
 	onOpenRun?: (runId: string) => void;
@@ -129,13 +128,13 @@ export function ModelsPage({
 		view.window,
 	);
 	// A picked shape is a reading of the page, not a place — it does not go in
-	// the URL (MP23 names the four keys that do).
+	// the URL (names the four keys that do).
 	const [shape, setShape] = useState<string | null>(null);
 	const shapeCard = useShapeQuery(username, graphSlug, shape, view.window);
 	const createIndex = useCreateIndexMutation(username, graphSlug);
 	const [staging, setStaging] = useState(false);
 
-	/** Advice is a draft change, never a write (MP13): open the owner's draft if it has none, then stage. */
+	/** Advice is a draft change, never a write: open the owner's draft if it has none, then stage. */
 	const stageIndex = async (advice: Advice) => {
 		if (!advice.model_id) return;
 		setStaging(true);
@@ -219,7 +218,7 @@ export function ModelsPage({
 			}
 		: null;
 
-	// ⌘↵ opens the Publish confirm, as the staged bar says (MP6).
+	// ⌘↵ opens the Publish confirm, as the staged bar says.
 	const canPublish = canWrite && !!draft && !!staged.data?.can_commit;
 	useEffect(() => {
 		if (!canPublish) return;
@@ -279,7 +278,7 @@ export function ModelsPage({
 			onTab: (tab) => set({ tab }),
 			growth: {
 				canWrite,
-				// A load is a run, so it lands on the Runs journal (SR7).
+				// A load is a run, so it lands on the Runs journal.
 				onBringDataIn: () => set({}, { panel: "runs" }),
 				onSeeTypes: () => set({ tab: "model", open: true }),
 				onOpenRun: (runId) => onOpenRun?.(runId),
@@ -393,7 +392,7 @@ export function ModelsPage({
 							onSelect(null);
 							return set({ scope: null, open: false });
 						case MODELS_ACTIONS.selectModel:
-							// A click selects and keeps the tab (MP5).
+							// A click selects and keeps the tab.
 							return ctx?.itemId && set({ scope: ctx.itemId });
 						case MODELS_ACTIONS.selectType:
 							if (!ctx?.itemId) return;
@@ -520,7 +519,7 @@ export function ModelsPage({
 
 /**
  * Export is a file, so it downloads as one. The registry is git
- * (share-a-model.md SM1) — there is nowhere to publish it to.
+ * (share-a-model.md) — there is nowhere to publish it to.
  */
 async function downloadArtefact(
 	username: string,

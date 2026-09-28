@@ -1,5 +1,5 @@
 /**
- * R2 · one step, participant by participant — **what was asked for, what was
+ * one step, participant by participant — **what was asked for, what was
  * executed, and what egress cut**.
  *
  * *As someone checking an answer, I want to see the query the model generated
@@ -93,7 +93,7 @@ export function StepTouchWidget({
 					) : null}
 
 					<PropertyList labelWidth={110}>
-						{/* WO19 — `rows` is the only count. What the query would have
+						{/* — `rows` is the only count. What the query would have
 						    returned unsliced is knowable only by running it unsliced,
 						    and that is a second execution on every governed read. What
 						    narrowed this read is below, which is the actionable half. */}
@@ -141,7 +141,7 @@ export function StepTouchWidget({
 						</p>
 					) : null}
 
-					{/* WO17 — the slice is keyed by type, because a world narrows per
+					{/* — the slice is keyed by type, because a world narrows per
 					    type. One `SliceSummary` per type, each naming the type it
 					    sliced: one summary over a merged select would say a narrowing
 					    happened without saying what it narrowed. */}

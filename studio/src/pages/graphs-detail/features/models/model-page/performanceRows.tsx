@@ -1,6 +1,6 @@
 /**
  * The Performance tab — query shapes by total time, p95 a day, and advice
- * (the-model-page.md MP12 · MP13 · MP39).
+ * (the-model-page.md).
  *
  * A shape is a query with its literals taken out, so a thousand calls of one
  * generated query are one row. Picking a row opens its card: the full shape,
@@ -272,7 +272,7 @@ export function performanceRows(
 	];
 }
 
-/** A picked shape — its plan, its slowest calls, and the index it lacks (MP13 · MP39). */
+/** A picked shape — its plan, its slowest calls, and the index it lacks. */
 export function ShapeSheet({
 	open,
 	card,

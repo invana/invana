@@ -19,7 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 interface AppHeaderOptions {
 	/** Last breadcrumb segment for the current page. Defaults to a label
 	 *  derived from the URL (Graphs, New graph, Profile, Settings). The graph
-	 *  page passes none: its URL is the graph (graph-detail-page.md G15), so
+	 *  page passes none: its URL is the graph (graph-detail-page.md), so
 	 *  `owner › graph` already names where you are. */
 	pageLabel?: string;
 	/** The object open on this screen — the canvas, the model, the agent. Drawn
@@ -67,7 +67,7 @@ export function useAppHeader(options: AppHeaderOptions = {}) {
 	const { pathname } = useLocation();
 	const { user } = useAuth();
 
-	// The onboarding cap is graph-scoped (setup.md SU19): a Graph has onboarding,
+	// The onboarding cap is graph-scoped (setup.md): a Graph has onboarding,
 	// the Graphs list does not. The route is what says which graph, so the cap is
 	// read off the same match the breadcrumb uses rather than threaded through
 	// every caller.
@@ -219,7 +219,7 @@ function graphRestSegments(
 	rest: string | undefined,
 	graphRoot: string,
 ): Segment[] {
-	// The graph's own URL *is* the page (graph-detail-page.md G15), so a missing
+	// The graph's own URL *is* the page (graph-detail-page.md), so a missing
 	// tail adds no third crumb — `owner › graph` already names where you are.
 	// The page passes a `pageLabel` override for what is open on it.
 	if (!rest) return [];

@@ -1,22 +1,21 @@
 /**
- * **Runs** — one icon, one panel, **one list** (graph-detail-page.md G33 · G41 ·
- * SR1).
+ * **Runs** — one icon, one panel, **one list** (graph-detail-page.md).
  *
  * The journal of every TaskRun in the Graph, newest first, children nested.
  * Imports is this list with `kind in (import, bulk)` preselected, not a panel
- * and not an icon (SR7) — which is why the body, `RunsList`, is the journal that used to be
+ * and not an icon — which is why the body, `RunsList`, is the journal that used to be
  * the Imports panel.
  *
  * **It is a list, not a stack.** The definitions a run is composed from — plans,
- * the catalogue, templates — are **Library** (G41), so there is no second list
+ * the catalogue, templates — are **Library**, so there is no second list
  * here for `?section=` to choose between, and the panel keeps the one-header
  * `ListPanelChrome` grammar every other list uses. A drill-in replaces the
  * panel body and turns the header into `‹ RUNS / orders.csv`; `More` opens the
- * run's dashboard as a page (SR13 · SR36).
+ * run's dashboard as a page.
  *
  * The step that crosses into Library is *run → the plan it ran*, and
  * `mainSection` carries it: `keepMounted` keeps the run open beside the plan,
- * which is the property SR12 was protecting when it asked for section adjacency.
+ * which is the property was protecting when it asked for section adjacency.
  */
 
 import { PanelStack } from "@invana/ui";
@@ -47,11 +46,11 @@ export interface RunsViewPanelProps {
 	graphSlug: string;
 	onClose?: () => void;
 	/**
-	 * `Open the answer` on a drilled-in run — opens its page (SR13); with a
-	 * step, that task inside it (SR72).
+	 * `Open the answer` on a drilled-in run — opens its page; with a
+	 * step, that task inside it.
 	 */
 	onOpenRunDashboard?: (runId: string, stepId?: string) => void;
-	/** `Dashboard` on the header — the journal drawn wide, as a page (SR70). */
+	/** `Dashboard` on the header — the journal drawn wide, as a page. */
 	onOpenRunsBoard?: () => void;
 	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */
 	onOpenPlan?: (workflowKey: string) => void;
@@ -68,7 +67,7 @@ export function RunsViewPanel({
 	// A run's lens opens where it is edited: Govern, drilled into that record.
 	const { reveal } = useLensesViewPanel();
 	const ui = useStackSectionUi();
-	// Shared with the Runs page, so the two read one journal (SR70).
+	// Shared with the Runs page, so the two read one journal.
 	const { filters, patch } = useRunsFilters();
 	const runList = useRunListQuery(username, graphSlug, filters);
 	const agents = (useAgentsQuery(username, graphSlug).data?.items ?? []).map(
@@ -94,10 +93,10 @@ export function RunsViewPanel({
 			: `${runList.total}`
 		: undefined;
 
-	// A drilled-in run is addressed, not titled: `RUNS / run:7d3184f1` (SR54).
+	// A drilled-in run is addressed, not titled: `RUNS / run:7d3184f1`.
 	const runTitle = runId ? runAddress(runId) : undefined;
 	// Drilled in, the bar counts the run's ledger rather than the journal:
-	// `9 events · 1 refusal` (SR67). Shares the section's query, so no second read.
+	// `9 events · 1 refusal`. Shares the section's query, so no second read.
 	const touchesQuery = useRunTouchesQuery(
 		username,
 		graphSlug,
@@ -180,7 +179,7 @@ export function RunsViewPanel({
 								children: () =>
 									runId ? (
 										// A drill-in replaces the section body with the run's five
-										// sections and its two ways out (SR67).
+										// sections and its two ways out.
 										<RunDetail
 											username={username}
 											graphSlug={graphSlug}

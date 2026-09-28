@@ -186,7 +186,7 @@ export function useCanvasTabs(deps: CanvasTabsDeps) {
 		],
 	);
 
-	// Opening a session opens its 1:1 canvas and makes it the active page (G45):
+	// Opening a session opens its 1:1 canvas and makes it the active page:
 	// an open tab is focused, a closed one is loaded, and a session with no canvas
 	// yet gets one created — the restore effect then paints its last query.
 	// Whatever page was in front steps behind it; nothing is closed.

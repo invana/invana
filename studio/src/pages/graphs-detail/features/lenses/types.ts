@@ -1,8 +1,8 @@
 /**
  * Govern — worlds, guardrails, the participant catalogue and what a run touched.
  *
- * A guardrail and a world are **one record separated by `kind`**
- * (GV1): one enforcement path, one document frozen onto a run, and promotion is
+ * A guardrail and a world are **one record separated by `kind`**:
+ * one enforcement path, one document frozen onto a run, and promotion is
  * a field change rather than a re-authoring. That is why there is one `Lens`
  * type here and not two.
  *
@@ -78,7 +78,7 @@ export interface Lens {
 	cast: Partial<Record<CastRole, string>>;
 	/**
 	 * The layers this lens allow-lists. A layer named here admits only what its
-	 * rules allow; one absent is permitted whole (GV23). Stated rather than
+	 * rules allow; one absent is permitted whole. Stated rather than
 	 * inferred, because an implicit allow-list is a bound an auditor cannot see.
 	 */
 	closed_layers: GovernLayer[];
@@ -92,7 +92,7 @@ export interface Lens {
 	usage?: LensUsage | null;
 	/**
 	 * The four roles resolved against this lens composed with the guardrails,
-	 * then checked (R4). Filled on the **detail** read alone — a list of twenty
+	 * then checked. Filled on the **detail** read alone — a list of twenty
 	 * lenses would compose it twenty times for a column no list shows.
 	 */
 	cast_resolved?: CastResolution[] | null;
@@ -113,12 +113,12 @@ export interface LensListResponse {
 	items: Lens[];
 	total: number;
 	/**
-	 * `graph_members.can_edit_guardrails` for whoever asked (GV22) — the one
+	 * `graph_members.can_edit_guardrails` for whoever asked — the one
 	 * field-level permission in the product. It rides on this list because the
 	 * section reads the list exactly once; a second request would let the bound
 	 * and the right to edit it arrive at different moments.
 	 *
-	 * **The rules render for everyone either way** (GR5). This decides whether
+	 * **The rules render for everyone either way**. This decides whether
 	 * the authoring controls are drawn at all — absent, never disabled.
 	 */
 	may_edit_guardrails: boolean;
@@ -205,7 +205,7 @@ export interface ImpactResponse {
 
 type TouchDirection = "out" | "in" | "refused" | "skipped";
 
-/** One engagement, projected from the ledger and carrying its `seq` (GV20). */
+/** One engagement, projected from the ledger and carrying its `seq`. */
 export interface Touch {
 	seq: number;
 	step_key: string | null;
@@ -260,14 +260,14 @@ export interface CompareResponse {
 	shared: string[];
 	/**
 	 * Keyed by address, and only the **shared** addresses the two runs narrowed
-	 * differently (WO18). Addresses alone read *shared 2 · differed 0* for two
+	 * differently. Addresses alone read *shared 2 · differed 0* for two
 	 * runs where one sliced a type and the other rewrote its projection, which
 	 * is the one sentence compare exists not to say.
 	 */
 	differed: Record<string, AppliedDiff>;
 }
 
-/** How two runs narrowed the same participant differently (WO18). */
+/** How two runs narrowed the same participant differently. */
 export interface AppliedDiff {
 	/** The fields of `applied` that are not equal — nothing else is listed. */
 	differs: AppliedField[];
@@ -280,7 +280,7 @@ export type AppliedField = keyof AppliedNarrowing;
 /**
  * What the lens did to one read, as the touch records it.
  *
- * **`select` and `properties_excluded` are keyed by type** (WO17): a world
+ * **`select` and `properties_excluded` are keyed by type**: a world
  * narrows per type, and the read's own verdict carries neither — both are read
  * off the compiled lens. A type nobody narrowed is absent, never an empty
  * entry, so *nothing was narrowed* is a missing key rather than an empty object
@@ -288,7 +288,7 @@ export type AppliedField = keyof AppliedNarrowing;
  * grounding version itself is filed under `*`.
  */
 interface AppliedNarrowing {
-	/** The authored model versions whose rules reached this read (GV33). */
+	/** The authored model versions whose rules reached this read. */
 	models?: string[];
 	/** `{ [typeName]: RuleSelect }` — the slice the connector composed. */
 	select?: Record<string, Record<string, unknown>>;

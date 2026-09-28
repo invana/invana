@@ -9,12 +9,12 @@
  * `offered` is a fact written by assembly; `cited` is the model's own claim,
  * and the difference is *never cited* — which cannot be told from *never
  * offered* unless both are read
- * ([RU7](../../../../../../docs/for-developers/modules/skills/features/rules.md) ·
- * [RU9](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md) ·
+ * [rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * **The board reads.** Deactivating keeps its dialog in the section, where *what
  * stops* and *what stays* can be read at the moment of the act
- * ([RU11](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
 import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
@@ -47,7 +47,7 @@ export interface RuleBoardView {
  * Four statements, each landing somewhere else. It is the same table on every
  * rule, and it is on the surface rather than in a doc because the mistake it
  * prevents — writing a guardrail, a criterion or a skill as a rule — is made at
- * the moment somebody is reading one ([RU5](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
+ * the moment somebody is reading one ([rules.md](../../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 const NOT_A_RULE: Array<Record<string, string>> = [
 	{
@@ -83,7 +83,7 @@ export function ruleBoardSpec(
 			{ label: rule.kind },
 			{ label: `v${rule.version}` },
 			// An inactive rule is dimmed in place, never removed: deactivating is
-			// not deleting, and its citations still resolve (RU4).
+			// not deleting, and its citations still resolve.
 			rule.active ? null : { label: "inactive", tone: "muted" as const },
 			{ label: "rule board" },
 		]),
@@ -111,12 +111,12 @@ function bands(
 	const offered = citations?.offered ?? 0;
 	const cited = citations?.total ?? rule.citations;
 	// Only a fact minus a fact. Without offers this is not a smaller number —
-	// it is not a number at all, and the tile is absent rather than zero (SD7).
+	// it is not a number at all, and the tile is absent rather than zero.
 	const neverCited = offered > 0 ? offered - cited : null;
 
 	return omit<DashboardSpec["rows"][number]>([
 		// The statement is the rule, so it is the page's first band rather than
-		// a field in a properties table (RU1).
+		// a field in a properties table.
 		{
 			panels: [
 				{
@@ -162,7 +162,7 @@ function bands(
 		},
 		// The one band that states what is derived. `scope` and `kind` are read
 		// off `project_id` and are not columns — saying so here is what keeps
-		// the surface from implying there are three axes (RU6).
+		// the surface from implying there are three axes.
 		{
 			panels: [
 				{
@@ -203,7 +203,7 @@ function bands(
 									{ key: "cited", label: "cited", align: "right" },
 								],
 								// Each count is the engine's, per wording — never
-								// tallied from the bounded list below (RU10).
+								// tallied from the bounded list below.
 								rows: citations.versions.map((v) => ({
 									version: `v${v.version}`,
 									statement: v.statement,

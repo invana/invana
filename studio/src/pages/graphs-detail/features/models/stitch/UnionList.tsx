@@ -1,6 +1,6 @@
 /**
  * The union, beside the drawing — every type the published models hold, with
- * the models contributing it (stitch-models.md ST6 · the-model-page.md Model tab).
+ * the models contributing it (stitch-models.md the-model-page.md Model tab).
  *
  * It is stated rather than drawn: a global type carries no endpoints, so the
  * drawing is the canvas next to it, and this is the list a person reads to

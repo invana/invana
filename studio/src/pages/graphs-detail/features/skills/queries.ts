@@ -67,7 +67,7 @@ export function useSkillUsageQuery(
 /**
  * The draft being written — its prose, its plan, and the question the planner
  * stopped on. Opening it opens one, which is what makes *edit* and *write the
- * next version* the same gesture (SK20).
+ * next version* the same gesture.
  */
 export function useSkillDraftQuery(
 	username: string,
@@ -105,8 +105,8 @@ export function useInlinablePlansQuery(
 /**
  * Where this skill stands with every agent — bound, refused, not bound.
  *
- * The refusals come from the engine running both bind checks as a dry run
- * (BN10), so the tab can draw the agents a skill **cannot** be offered instead
+ * The refusals come from the engine running both bind checks as a dry run,
+ * so the tab can draw the agents a skill **cannot** be offered instead
  * of finding out one click at a time.
  */
 export function useSkillAgentsQuery(
@@ -169,7 +169,7 @@ export function useDiscardDraftMutation(
  * Hand-edit the draft's plan — the correction the prose cannot make.
  *
  * The plan becomes `authored`, so the section row's origin badge moves and a
- * redraw becomes an offer that says what it discards (SK7). The whole subtree
+ * redraw becomes an offer that says what it discards. The whole subtree
  * is invalidated because the list row carries the plan summary too.
  */
 export function useWriteDraftTasksMutation(
@@ -189,8 +189,8 @@ export function useWriteDraftTasksMutation(
 
 /**
  * Draw the playbook. The run is ordinary — it takes a slot and appears in Runs
- * — so this returns its id and the caller watches the draft for what it wrote
- * (SK23).
+ * — so this returns its id and the caller watches the draft for what it wrote.
+ *
  */
 export function useDrawDraftMutation(
 	username: string,
@@ -206,7 +206,7 @@ export function useDrawDraftMutation(
 	});
 }
 
-/** Pick one of the readings. The answer is recorded, so a redraw never re-asks (SK11). */
+/** Pick one of the readings. The answer is recorded, so a redraw never re-asks. */
 export function useAnswerClarificationMutation(
 	username: string,
 	graphSlug: string,
@@ -267,7 +267,7 @@ export function useRulesQuery(
 }
 
 /**
- * A Project's working rules, and the Graph invariants it inherits ([RU8]).
+ * A Project's working rules, and the Graph invariants it inherits ([]).
  *
  * The two lists arrive together and stay apart: the inherited half is
  * read-only here, so merging them would make an invariant look editable from a
@@ -340,7 +340,7 @@ export function useUpdateRuleMutation(username: string, graphSlug: string) {
 	});
 }
 
-/** Deactivating is how a rule stops applying. There is no delete (RU4). */
+/** Deactivating is how a rule stops applying. There is no delete. */
 export function useSetRuleActiveMutation(username: string, graphSlug: string) {
 	const qc = useQueryClient();
 	return useMutation({

@@ -4,12 +4,12 @@
  *
  * The card, its header and the template picker are all `@invana/ui`
  * (`EmissionCard` · `EmissionHeader` · `TemplatePicker`). The kit takes a
- * **kind, a template name and children — never a domain object** (DS6), so what
+ * **kind, a template name and children — never a domain object**, so what
  * lives here is the one thing the kit cannot own: the mapping from Invana's
- * `Emission` onto those slots, and the body chosen by kind (AS8).
+ * `Emission` onto those slots, and the body chosen by kind.
  *
- * The template segment is absent until a projection chooses the rendering
- * (AS9). Nothing is defaulted in so the row looks complete.
+ * The template segment is absent until a projection chooses the rendering.
+ * Nothing is defaulted in so the row looks complete.
  */
 
 import {
@@ -42,10 +42,10 @@ const offerLabel = (offer: TemplateOffer) => `${offer.name}@${offer.version}`;
 /**
  * The template in use, and what else would render these same records.
  *
- * A template that cannot accept this shape is listed **with its reason** (P10)
+ * A template that cannot accept this shape is listed **with its reason**
  * rather than hidden — a reader who expected a chart should be told why there
  * isn't one. Choosing one re-renders from the records already returned; the
- * query never runs again (P5).
+ * query never runs again.
  */
 function TemplateSwitcher({
 	emission,
@@ -137,14 +137,14 @@ function AnswerEmission({
 }: {
 	emission: Emission;
 	className?: string;
-	/** Re-render these records through another template — never a re-run (P5). */
+	/** Re-render these records through another template — never a re-run. */
 	onSwitchTemplate?: (templateId: string) => void;
-	/** Open the trace at the step that produced this (AS3, RT1). */
+	/** Open the trace at the step that produced this. */
 	onOpenCitation?: () => void;
 }) {
 	const { template, citation } = emission;
 	const offers = emission.templates ?? [];
-	// Switching is a control *here*, on the header, not a setting elsewhere (P9).
+	// Switching is a control *here*, on the header, not a setting elsewhere.
 	const canSwitch = Boolean(onSwitchTemplate) && offers.length > 1;
 
 	return (
@@ -185,7 +185,7 @@ function AnswerEmission({
 	);
 }
 
-/** An answer's emissions, in the order the steps produced them (AS1, C2). */
+/** An answer's emissions, in the order the steps produced them. */
 export function EmissionList({
 	emissions,
 	onSwitchTemplate,

@@ -2,9 +2,9 @@
  * The two surfaces that must never look like an answer.
  *
  * `when-it-cannot-answer.md` names four outcomes and insists they never share a
- * shape (CA1). Two of them are ordinary — a **retry** and a **repair** — and both
+ * shape. Two of them are ordinary — a **retry** and a **repair** — and both
  * are shown where they happened, on the step row, never as a message in the
- * thread (CA7). The other two need their own surface, and this is it:
+ * thread. The other two need their own surface, and this is it:
  *
  * | Surface | Says | Looks like |
  * |---|---|---|
@@ -12,11 +12,11 @@
  * | {@link RunDiagnosis} | something broke, and here is the evidence | a fault: a destructive rule, evidence, one next step |
  *
  * Both cards are the kit's (`@invana/ui` · `CannotAnswerCard`, `DiagnosisCard`),
- * which is what guarantees the rule the kit states as DS8: a refusal and a
+ * which is what guarantees the rule the kit states as: a refusal and a
  * failure are separate components, so neither is one prop away from an answer.
  * What lives here is the mapping from Invana's `Diagnosis` onto their slots.
  *
- * Neither carries an emission header or a citation strip (CA6). That is the
+ * Neither carries an emission header or a citation strip. That is the
  * whole point: a reader scanning a thread must be able to tell at a glance that
  * this is *not* a result, without reading a word of it.
  */
@@ -27,7 +27,7 @@ import type { Diagnosis } from "@/pages/graphs-detail/features/runs";
 /**
  * The graph does not hold what was asked.
  *
- * This is an **answer** (CA3) — it says what is missing and what would change
+ * This is an **answer** — it says what is missing and what would change
  * that — so it is drawn calmly rather than as an error. Putting it next to "the
  * graph timed out" would tell a reader those are the same kind of nothing.
  */
@@ -73,8 +73,8 @@ export function RunCannotAnswer({
 /**
  * Something broke, and the evidence it was built from.
  *
- * Built from the failure itself, never invented (CA5): the cause, the step, the
- * query. The next steps are the only actions on it (CA6) — there is no "try
+ * Built from the failure itself, never invented: the cause, the step, the
+ * query. The next steps are the only actions on it — there is no "try
  * again" that quietly re-asks a different question.
  */
 export function RunDiagnosis({

@@ -83,8 +83,8 @@ export interface AssistantViewPanelProps {
 	onRefresh: () => void;
 	/** True while a refetch is in flight — spins the refresh icon. */
 	isRefreshing: boolean;
-	/** Close the assistant. Its sessions live on the RIGHT and nowhere else
-	 *  (AD1/AD6), so this closes the region — it never touches the left rail. */
+	/** Close the assistant. Its sessions live on the RIGHT and nowhere else,
+	 *  so this closes the region — it never touches the left rail. */
 	onClose: () => void;
 	/** List ordering (server-side); pinned always float to the top. */
 	sort: SessionSort;
@@ -107,13 +107,13 @@ export interface AssistantViewPanelProps {
 	/** True while a commit (activate) is in flight. */
 	isCommitting?: boolean;
 	/** What the ask is about — drawn as a chip above the composer's input
-	 *  (the-assistant.md AD2/AD10). Null when nothing is attached. */
+	 *  (the-assistant.md). Null when nothing is attached. */
 	attachment?: AssistantAttachment | null;
 	/** Take the attachment off; the next ask goes without it. */
 	onRemoveAttachment?: () => void;
-	/** The world picker, placed in the composer (AD15). */
+	/** The world picker, placed in the composer. */
 	worldControl?: ReactNode;
-	/** Set the open thread's spend per run (C10); null is the agent's cap. */
+	/** Set the open thread's spend per run; null is the agent's cap. */
 	onSetSpendPerRun?: (
 		sessionId: string,
 		usd: number | null,
@@ -129,7 +129,7 @@ export interface AssistantViewPanelProps {
 // `SessionList`, the transcript `SessionThread` (design-kit `ChatSession*`),
 // the input `SessionComposer`; this file is the chrome and the glue.
 
-/** The panel's one name, in the tab header and the breadcrumb alike (AD14). */
+/** The panel's one name, in the tab header and the breadcrumb alike. */
 const PANEL_NAME = "Ask Assistant";
 
 export function AssistantViewPanel({
@@ -173,11 +173,11 @@ export function AssistantViewPanel({
 	// Bumped to focus the composer when the user picks "let me type instead" on a
 	// clarification (docs/for-developers/modules/ask/features/clarifying-questions.md).
 	const [composerFocus, setComposerFocus] = useState(0);
-	// Chat (the transcript) or Tasks (every step of every reply) — UC11.
+	// Chat (the transcript) or Tasks (every step of every reply) —.
 	const [view, setView] = useState<"chat" | "tasks">("chat");
 	// The "what do the dots mean" legend, opened from the header help icon.
 	const [legendOpen, setLegendOpen] = useState(false);
-	// The thread's settings — its spend per run (C10), from the header.
+	// The thread's settings — its spend per run, from the header.
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	// LLM providers excluded from the list (client-side). Empty = show all.
 	// Sessions don't record their provider yet, so this filters nothing today —
@@ -189,7 +189,7 @@ export function AssistantViewPanel({
 
 	const inDetail = activeSession !== null;
 
-	// `esc` stops the run, from anywhere on the page — like a console (UC9).
+	// `esc` stops the run, from anywhere on the page — like a console.
 	useEffect(() => {
 		if (!isRunning) return;
 		const onKey = (e: KeyboardEvent) => {
@@ -209,7 +209,7 @@ export function AssistantViewPanel({
 
 	// The panel is named for the occupant, not its contents: **Ask Assistant**,
 	// because the region holds the assistant and sessions are what it holds
-	// (docs/for-developers/modules/ask/features/the-assistant.md AD14).
+	// (docs/for-developers/modules/ask/features/the-assistant.md).
 	//
 	// Inside a thread the header becomes a breadcrumb: `Ask Assistant` (click to
 	// return to the list — the tab *is* the back affordance, so there's no
@@ -284,7 +284,7 @@ export function AssistantViewPanel({
 	);
 
 	// Clicking a clarification option sends it as the answer (docs/for-developers/modules/ask/features/clarifying-questions.md): the
-	// engine resumes the waiting run with it (UC7). Reuses the session's
+	// engine resumes the waiting run with it. Reuses the session's
 	// resolved nl config (provider/timeout), like the composer would.
 	const handleSelectOption = (text: string) => {
 		const providerId =
@@ -326,7 +326,7 @@ export function AssistantViewPanel({
 		}, 50);
 	};
 
-	// ── Live turns: the pinned strip + status line (UC5, UC7) ────────────────
+	// ── Live turns: the pinned strip + status line ────────────────
 	const liveTurns = useMemo(() => {
 		if (!activeSession)
 			return [] as { message: SessionMessage; view: RunView }[];
@@ -560,7 +560,7 @@ export function AssistantViewPanel({
 										onSelect={(e) => e.preventDefault()}
 									>
 										{/* The endpoint's own name is the address segment a
-										    refusal reads back (PM10) — a filter names what a rule
+										    refusal reads back — a filter names what a rule
 										    names. */}
 										{p.name || p.provider}
 									</DropdownMenuCheckboxItem>

@@ -1,16 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Reports — a declared board's versions, addressed by what the board is *of*
-// ([B6 · B9](../../../../docs/for-developers/building-engine/boards-migration.md)).
+// ([boards-migration.md](../../../../docs/for-developers/building-engine/boards-migration.md)).
 //
 // **Beside `boardVersions`, not folded into it.** The two address different
 // things: that one takes a `board_id`, a row that exists; this one takes a
 // `(kind, subject_id)` pair, because a live dashboard has **no row** until the
 // first report creates it. Folding them together would mean a client that
 // sometimes has an id and sometimes computes one, and a caller that has to know
-// which — which is exactly the question B9 exists to stop anyone asking.
+// which — which is exactly the question exists to stop anyone asking.
 //
 // What is sent is the **resolved document** — the `DashboardSpec` with the
-// numbers already in it, never the spec plus a subject to re-read (B13). That
+// numbers already in it, never the spec plus a subject to re-read. That
 // is what lets a report outlive a pruned `result.json`.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -49,9 +49,9 @@ interface ApiReportList {
 /** What `Save report` sends: the document, and the name somebody chose. */
 export interface ReportCreateBody {
 	label: string;
-	/** The resolved `DashboardSpec` — the reading, with its numbers (B13). */
+	/** The resolved `DashboardSpec` — the reading, with its numbers. */
 	snapshot: Record<string, unknown>;
-	/** The argument that produced this reading — `{view, selectedKey}` (B15). */
+	/** The argument that produced this reading — `{view, selectedKey}`. */
 	settings?: Record<string, unknown>;
 }
 
@@ -103,7 +103,7 @@ export const boardReportsApi = {
 		return { items: data.items.map(toSummary), total: data.total };
 	},
 
-	/** One frozen reading. The subject is never read — that is what makes it a report (B13). */
+	/** One frozen reading. The subject is never read — that is what makes it a report. */
 	get: async (
 		username: string,
 		graphSlug: string,
@@ -119,7 +119,7 @@ export const boardReportsApi = {
 
 	/**
 	 * Keep this reading. Create-or-get on `(graph_id, kind, subject_id)` happens
-	 * server-side, so the client never asks whether a row exists (B9).
+	 * server-side, so the client never asks whether a row exists.
 	 */
 	create: async (
 		username: string,

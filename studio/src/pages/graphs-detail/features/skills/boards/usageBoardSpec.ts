@@ -10,10 +10,10 @@
  *
  * **The engine sends counts and says whether they are readable; this file never
  * computes a percentage from a bucket the engine called unreadable**
- * ([US6](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
+ * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  * And versions are never summed: 2,786 offers across seven texts is a number
  * drawn nowhere, because *offered 1,204, applied 1,190* is a claim about **one
- * text** ([US3](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
+ * text** ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
 import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
@@ -51,7 +51,7 @@ export interface UsageBoardView {
  * The same table on every skill, which is the argument **for** drawing it: a
  * number is only worth showing if the reader knows which of four sentences it
  * is, and a reading guide behind a hover is a guide nobody reads
- * ([US8](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
+ * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 const READINGS: Array<Record<string, string>> = [
 	{
@@ -91,7 +91,7 @@ export function usageBoardSpec(
 	const isCurrent = row?.skill_version_id === usage.current_version_id;
 	// A draft has never been published, so there is no text these counts are
 	// of. Saying `v0` would name a version that does not exist, and *an
-	// earlier text* would claim the reader moved off the current one (SD10).
+	// earlier text* would claim the reader moved off the current one.
 	const published = usage.versions.length > 0;
 
 	const header: DashboardSpec["header"] = {
@@ -168,7 +168,7 @@ function bands(
 
 	return omit<DashboardSpec["rows"][number]>([
 		{ panels: [tiles] },
-		// US4 — the number is a claim, and the surface says so where the number
+		// the number is a claim, and the surface says so where the number
 		// is read rather than in a footnote. Absent when nothing has claimed
 		// anything: there is no report to qualify.
 		row && row.applied > 0
@@ -188,7 +188,7 @@ function bands(
 		// Per version is the board's second claim, so the slot always carries
 		// something — but a draft has no published text, and a table of column
 		// headings over no rows is the empty grid this module refuses
-		// everywhere else (SD10 · SR34).
+		// everywhere else.
 		usage.versions.length === 0
 			? {
 					panels: [
@@ -223,7 +223,7 @@ function bands(
 									offered: count(v.offered),
 									applied: count(v.applied),
 									// A gap below the floor is not a gap yet — the same `—`
-									// the tile draws, for the same reason (US9).
+									// the tile draws, for the same reason.
 									gap: v.enough_to_read ? count(v.gap) : "—",
 									reads: readsAs(v),
 								})),
@@ -286,7 +286,7 @@ function bands(
 				}
 			: null,
 		// A list, not a table: these are records you scan and open, and every
-		// row opens the run it came from (C6). The counts above are **not**
+		// row opens the run it came from. The counts above are **not**
 		// taken from this window, which the aside says rather than implies.
 		//
 		// **A row is a step, so its id is the step's.** Two steps of one run are
@@ -337,7 +337,7 @@ function bands(
 			],
 		},
 		// The whole module's line, said where the move is decided: a gap is a
-		// question about a binding or a sentence, never about the model (S1).
+		// question about a binding or a sentence, never about the model.
 		{
 			panels: [
 				{

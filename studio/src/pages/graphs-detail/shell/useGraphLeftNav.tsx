@@ -30,9 +30,9 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 	// **Info is not here.** It is the first icon of the top group: it is the
 	// graph itself — name, readiness, what has been happening — not a thing you
 	// configure, and it is what a person wants on arriving (graph-detail-page.md
-	// G20). The database connection stays a *tab inside Settings* rather than an
-	// icon of its own (connect-a-database.md CD6), and so do the LLM providers
-	// (G29) — settings is four tabs: Basic, Graph, LLMs, Agents (G23). A provider
+	// ). The database connection stays a *tab inside Settings* rather than an
+	// icon of its own (connect-a-database.md), and so do the LLM providers
+	// — settings is four tabs: Basic, Graph, LLMs, Agents. A provider
 	// is the graph's configuration the same way the connection is, and the rail
 	// is for things a person goes to.
 	{ key: "skills", label: "Skills", icon: Wand2 },
@@ -43,12 +43,12 @@ const SETTINGS_SECTIONS: SectionMeta[] = [
 ];
 
 // The panels the page itself owns — the top group of the rail. Since the one page (docs/for-developers/modules/explore/spec.md)
-// O2 there is no Explorer / Modeller mode switch: the Model panel is one of
+// there is no Explorer / Modeller mode switch: the Model panel is one of
 // these, and a model draft opens as a canvas tab rather than as a different
 // page. The work surfaces (docs/for-developers/modules/work/spec.md) add four more.
 //
 // **Sessions is not here.** It is the assistant, on the right
-// (docs/for-developers/modules/ask/features/the-assistant.md AD1/AD6),
+// (docs/for-developers/modules/ask/features/the-assistant.md),
 // reached from the header's Assistant control — the one trigger, in the one
 // place, on every surface. A rail icon would be a second door onto a panel that
 // does not live in this column.
@@ -59,22 +59,22 @@ const VIEW_SECTIONS: SectionMeta[] = [
 	// panel, and the union it implies is a page because it belongs to no single
 	// model (stitch-models.md · Surfaces).
 	//
-	// **The work group is three icons: Projects, Runs and Library** (G30 · G41).
+	// **The work group is three icons: Projects, Runs and Library**.
 	// Projects owns **Todos** — what a person wrote, under a project or the *No
-	// project* bucket (PT7). Runs owns **execution**: the journal, and nothing
-	// else, as one list (SR1 · G33). Library owns **definition**: Plans ·
+	// project* bucket. Runs owns **execution**: the journal, and nothing
+	// else, as one list. Library owns **definition**: Plans ·
 	// Catalogue · Templates — what can be run, the closed vocabulary it is
 	// written in, and how its output renders.
 	{ key: "projects", label: "Projects", icon: FolderOpen },
 	{ key: "runs", label: "Runs", icon: History },
-	// **Templates has no item of its own** (G38). A projection template is to an
+	// **Templates has no item of its own**. A projection template is to an
 	// answer what a plan is to a run — both are definitions, both are promoted
 	// from what served — so it is Library's third section rather than a place you
-	// go. It is the same rule G14 applies to Stitches.
+	// go. It is the same rule applies to Stitches.
 	{ key: "library", label: "Library", icon: Library },
-	// **Govern is its own item** (GV17) — worlds and guardrails, not a tab of
+	// **Govern is its own item** — worlds and guardrails, not a tab of
 	// Settings. A guardrail belongs beside the worlds it bounds, and the two are
-	// one record (GV1); putting it in Settings would file *what may participate*
+	// one record; putting it in Settings would file *what may participate*
 	// with the connection string. It sits immediately before Agents because an
 	// agent binds a world, so the bound is read before the thing that runs
 	// inside it.
@@ -86,19 +86,19 @@ const VIEW_SECTIONS: SectionMeta[] = [
  * The one left rail (icon column). Surfaces:
  *
  * - Top: Info, then the page's own panels — Explorer · Model · Projects ·
- *   Runs · Library · Agents. **Imports and Workflows have no icons** (G30),
+ *   Runs · Library · Agents. **Imports and Workflows have no icons**,
  *   because an import is a `kind` of TaskRun and a workflow is a reusable
  *   TaskPlan, so each was an icon onto a *filter* of a list that already exists
  *   — and an icon per filter is how one journal became four panels. An import is
  *   reached in **Runs**, a workflow in **Library › Plans**. **Templates has no
- *   icon either** (G38): it is Library's third section.
+ *   icon either**: it is Library's third section.
  *   Every one is a `?panel` key, so the whole rail is a single-open accordion
  *   with one mechanism. Info
  *   is the exception that proves it: it still renders through `SettingsViewPanel`,
  *   because where a panel's *code* lives says nothing about where its icon
  *   belongs. Two things are not in this group: Sessions, which is the assistant
  *   on the right, opened from the header; and Layers, which is a control on the
- *   page strip and a card over the canvas (graph-detail-page.md G18).
+ *   page strip and a card over the canvas (graph-detail-page.md).
  * - Bottom: one icon per settings section (Skills / Events / Settings).
  * - Very bottom (`bottom` slot, below a separator): the user profile menu.
  *
@@ -110,7 +110,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
 // The rail takes no arguments. It took a username, slug and active tab before
 // the one page (docs/for-developers/modules/explore/spec.md) — all three existed
 // only to navigate between the two pages there used to be — and a `showLayers`
-// flag until Layers became a canvas control (graph-detail-page.md G18).
+// flag until Layers became a canvas control (graph-detail-page.md).
 export function useGraphLeftNav() {
 	const settingsPanel = useLeftSection();
 

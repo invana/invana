@@ -44,10 +44,10 @@ import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
  * own width, where a 248px stepper beside a lesson would leave neither enough
  * room. Same rows, same derivation, one column — `variant="stacked"` drops the standing header
  * and the outer frame, because the island already carries both. It owns **no
- * forms** (SU2): every action opens the panel that already holds that field,
+ * forms**: every action opens the panel that already holds that field,
  * with its tab named, so there is one form per fact in the whole product. And
  * it invents nothing — done, required, blocked and broken are all read off what
- * the engine derived (SU1), which is why a step finished at a terminal or by
+ * the engine derived, which is why a step finished at a terminal or by
  * another member is finished here without being told.
  *
  * The compact rendering of the same rows is `SetupTimeline`, in the Info panel.
@@ -168,7 +168,7 @@ export function SetupBoard({
 					</ItemGroup>
 				</Card>
 
-				{/* ── What next — offers, never steps (SU4) ────────────────────── */}
+				{/* ── What next — offers, never steps ────────────────────── */}
 				{ready && (
 					<Card className="overflow-hidden">
 						<SectionHeader title="What next" className="px-4" />

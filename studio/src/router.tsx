@@ -28,13 +28,13 @@ const LazyFallback = () => (
 
 /**
  * The retired screen names — `/explorer` and `/modeller` — pointing back at the
- * graph's own URL (graph-detail-page.md G15).
+ * graph's own URL (graph-detail-page.md).
  *
  * The query string is carried across, and that is the whole reason these are
  * components rather than a static `<Navigate to>`: a bookmark is a URL *plus*
  * its params, so dropping `?panel=agents` would land the reader on an empty
  * state instead of the thing the link was about. The legacy `?settings=` name
- * rides along untouched — `useLeftSection` still reads it (G16).
+ * rides along untouched — `useLeftSection` still reads it.
  */
 function RedirectToGraphRoot({ openPanel }: { openPanel?: string }) {
 	const { username, graphSlug } = useParams();
@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
 
 	// Full-page layouts — own AppLayoutV2, not nested under App shell.
 	// Graph-scoped URLs (docs/for-developers/modules/identity-and-access/spec.md).
-	// The graph's own URL is the page (graph-detail-page.md G15): everything on it
+	// The graph's own URL is the page (graph-detail-page.md): everything on it
 	// is a `leftNav` item or an open page, and both are query params.
 	{
 		path: "u/:username/:graphSlug",

@@ -1,15 +1,15 @@
 /**
- * A1 · the agents — every agent in the Graph, what bounds it, and what it is
+ * the agents — every agent in the Graph, what bounds it, and what it is
  * doing right now.
  *
  * *As a graph owner, I want to see every agent in this graph, who or what
  * created it, and what it is bound by, so that spawned agents are never
  * invisible and a refusal is predictable before it happens.*
  *
- * **An agent binds no provider** ([PM1](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
+ * **An agent binds no provider** ([providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)).
  * It carries standing limits — an envelope, a budget — and optionally a
  * guardrail of its own; the world, whose `cast` names the model, comes with
- * the work (AG24). So the row draws its guardrail, not a model id: a list that
+ * the work. So the row draws its guardrail, not a model id: a list that
  * printed a model would be printing the one thing an agent no longer decides.
  *
  * Three things this section is careful about:
@@ -24,9 +24,9 @@
  *   decide with, so the confirm lists them.
  *
  * Selecting a row gives a quick look under the list — which one is this, and
- * is it healthy (AG36); **Open** opens the agent's page in `mainSection`
- * (`agent:<id>`, AG34), and the list stays here beside it. A row carries no
- * actions: pausing and retiring are the page's (AG37).
+ * is it healthy; **Open** opens the agent's page in `mainSection`
+ * (`agent:<id>`), and the list stays here beside it. A row carries no
+ * actions: pausing and retiring are the page's.
  */
 
 import {
@@ -75,7 +75,7 @@ const STATUS_OPTIONS = ["active", "paused", "retired"].map((value) => ({
 	label: value,
 }));
 
-/** What narrows the list — behind the section's funnel (AG36). */
+/** What narrows the list — behind the section's funnel. */
 export interface AgentFilters {
 	kind: string;
 	status: string;
@@ -101,7 +101,7 @@ export interface AgentsSectionProps {
 	/** The agent the canvas is drawing, and the one the summary states. */
 	selectedAgentId: string | null;
 	onSelectAgent: (id: string | null) => void;
-	/** An edge selected on the lineage canvas — an *event*, not an agent (D7). */
+	/** An edge selected on the lineage canvas — an *event*, not an agent. */
 	selectedEdge?: AgentEdge | null;
 	onOpenLineage?: (agentId: string) => void;
 	onOpenTask?: (taskId: string) => void;
@@ -179,7 +179,7 @@ function AgentsBody({
 
 	const all = query.data?.items ?? [];
 	const defaultId = query.data?.default_agent_id ?? null;
-	// One grouped read for the whole list, on the list response (C10).
+	// One grouped read for the whole list, on the list response.
 	const spend = query.data?.spend_this_month ?? {};
 	const selected = all.find((a) => a.id === selectedAgentId) ?? null;
 
@@ -321,7 +321,7 @@ export function visibleAgents(
 	return out;
 }
 
-/** `own guardrail` · `Graph guardrails only` — what holds it besides the Graph (AG10). */
+/** `own guardrail` · `Graph guardrails only` — what holds it besides the Graph. */
 function guardrailLine(agent: Agent, byId: Map<string, Agent>): string {
 	const own = agent.guardrail_name ?? "Graph guardrails only";
 	if (agent.kind !== "spawned") return own;
@@ -331,12 +331,12 @@ function guardrailLine(agent: Agent, byId: Map<string, Agent>): string {
 
 /**
  * `$1.84 of $40.00 this month` — spend against the ceiling it is bounded by
- * ([C10](../../../../../docs/for-developers/modules/agents/features/author-an-agent.md)),
+ * ([author-an-agent.md](../../../../../docs/for-developers/modules/agents/features/author-an-agent.md)),
  * *before* the ceiling is reached rather than after.
  *
  * **Absent is not zero.** An agent with no priced run this month is not in the
  * map at all, because a subscription endpoint publishes no per-token rate and
- * *nothing spent* and *nothing known* are different facts (OB4) — so the row
+ * *nothing spent* and *nothing known* are different facts — so the row
  * says nothing rather than drawing a reassuring `$0.00`.
  */
 function spendLine(
@@ -345,7 +345,7 @@ function spendLine(
 ): { text: string; meter: number | undefined } | null {
 	const spent = spend[agent.id];
 	if (spent == null) return null;
-	// Both names for the month ceiling are read, for one release (EB8).
+	// Both names for the month ceiling are read, for one release.
 	const ceiling =
 		agent.budget?.max_cost_usd_month ?? agent.budget?.max_cost_usd;
 	return {
@@ -357,7 +357,7 @@ function spendLine(
 }
 
 /**
- * The selected row's quick look (AG36): which one is this, and is it
+ * The selected row's quick look: which one is this, and is it
  * healthy. Everything else is on the page, one click on by **Open**.
  */
 function AgentQuickLook({

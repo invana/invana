@@ -1,5 +1,5 @@
 /**
- * G1 · the guardrails in force, G2 · the rule builder, and the impact a save
+ * the guardrails in force · the rule builder, and the impact a save
  * would have on every world that narrows inside them.
  *
  * *As someone accountable for this Graph, I want to read the bound every run
@@ -7,17 +7,17 @@
  * something I can do deliberately rather than by trial and refusal.*
  *
  * **It sits under Worlds**, which is where a person arrives. The ceiling is
- * still read first — the locked strip at the top of that section states it (W4)
+ * still read first — the locked strip at the top of that section states it
  * — and this section is where its rules are read in full.
  *
  * **Readable by everyone, editable by a permission**
- * ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)):
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)):
  * a bound nobody may read is a bound nobody can work within, so the rules
  * render whatever `can_edit_guardrails` says — and every authoring control is
  * **absent**, never greyed, when it is false.
  *
  * **A save asks what it would cost first**
- * ([GR2](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  * Every world is revalidated and what each one loses is named before the write,
  * because a guardrail that silently invalidates six worlds is one whose effect
  * nobody saw at the moment they signed for it.
@@ -50,12 +50,12 @@ export interface GuardrailsSectionProps {
 	guardrailId: string | null;
 	onOpenGuardrail: (id: string | null) => void;
 	/**
-	 * `More` on the drill-in header — reopens this guardrail's board (GR14).
+	 * `More` on the drill-in header — reopens this guardrail's board.
 	 * Offered to everyone who can read the rules: the board reads, and reading
-	 * the bound is not the permission ([GR5](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+	 * the bound is not the permission ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
 	 */
 	onOpenBoard?: (id: string) => void;
-	/** The one field-level permission in the product (GV22). */
+	/** The one field-level permission in the product. */
 	mayEditGuardrails: boolean;
 	editingId: string | null;
 	onEdit: (id: string | null) => void;

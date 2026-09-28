@@ -1,22 +1,22 @@
 /**
  * One lens as a page — artboards `GovWorld` · `GovGuardrails`
- * ([W2 · G1](../../../../../../docs/for-developers/the-screens.md)).
+ * ([the-screens.md](../../../../../../docs/for-developers/the-screens.md)).
  *
  * **One composer, both kinds.** A world and a guardrail are one `lenses` row
- * separated by `kind` ([GV1](../../../../../../docs/for-developers/modules/govern/spec.md)),
+ * separated by `kind` ([spec.md](../../../../../../docs/for-developers/modules/govern/spec.md)),
  * so a second composer would be the second enforcement path this module exists
- * not to have ([GR14](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * not to have ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  * `kind` changes what the page **says** — the crumb, the usage band, whether
  * `Edit` is offered — and nothing about how it is built.
  *
  * **This is the auditing reading, not the section widened**
- * ([WO15](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * ([worlds.md](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  * The section is where a bound is picked, in a 420px column, with the run that
  * prompted the narrowing still open beside it. The board is what an auditor is
  * handed: what it narrows, how it has been used, every rule as an addressable
  * row, and the cast resolved against the effective guardrails. Only this one
  * can be **kept** — `Save report` freezes the resolved document
- * ([B6](../../../../../../docs/for-developers/building-engine/boards-migration.md)),
+ * ([boards-migration.md](../../../../../../docs/for-developers/building-engine/boards-migration.md)),
  * and *what was this world when the run happened* is the question a live section
  * cannot answer an hour later.
  *
@@ -49,7 +49,7 @@ import {
 export const LENS_ACTIONS = {
 	/** `Dashboard ¦ spec.json`. */
 	view: VIEW_ACTION,
-	/** `Edit` — puts the Govern section back on this lens, drilled in (WO16). */
+	/** `Edit` — puts the Govern section back on this lens, drilled in. */
 	edit: "edit",
 } as const;
 
@@ -69,7 +69,7 @@ export interface LensBoardView {
 	/**
 	 * Whether `Edit` is drawn at all. A guardrail's authoring controls are
 	 * **absent** without the permission, never greyed
-	 * ([GR12](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+	 * ([guardrails.md](../../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
 	 */
 	mayEdit: boolean;
 }
@@ -90,7 +90,7 @@ export function lensBoardSpec(
 				: lens.is_named
 					? null
 					: // An unnamed lens is attached to its run and private to whoever
-						// ran it (WO1) — the board says so rather than leaving a reader
+						// ran it — the board says so rather than leaving a reader
 						// to wonder why it is in no list.
 						{ label: "unnamed · private to you", tone: "muted" as const },
 			guardrail ? { label: "audited", tone: "muted" as const } : null,
@@ -167,13 +167,13 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 									? closed.map((l) => LAYER_LABEL[l]).join(" · ")
 									: "none",
 								// A layer named here admits only what its rules allow; one
-								// absent is permitted whole (GV23).
+								// absent is permitted whole.
 								caption: closed.length
 									? "admit only what a rule allows"
 									: "every layer permitted whole",
 							},
-							// **A guardrail is not picked, so it has no pick count**
-							// (GR14). Counting the runs that chose it would print `0`
+							// **A guardrail is not picked, so it has no pick count**.
+							// Counting the runs that chose it would print `0`
 							// on the one bound that is on every run.
 							guardrail
 								? {
@@ -275,7 +275,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 								rule: rule.allow ? "allow" : "deny",
 								narrows: narrows(rule),
 								// The default is `[]` — nothing. An unmatched destination
-								// sends nothing at all (GV12), so a blank here is a fact.
+								// sends nothing at all, so a blank here is a fact.
 								egress: (rule.egress?.may_send ?? []).join(" · "),
 							})),
 						},
@@ -324,7 +324,7 @@ function bands(lens: Lens): DashboardSpec["rows"] {
 					],
 				}
 			: null,
-		// R4's seam, on the page where the person who can fix it is reading:
+		// 's seam, on the page where the person who can fix it is reading:
 		// the cast resolves to a model the bound above it denies, so the run
 		// does not open.
 		...denied.map((row) => ({

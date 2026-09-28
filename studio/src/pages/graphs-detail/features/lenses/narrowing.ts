@@ -76,7 +76,7 @@ export function narrowingsOf(lens: Lens): Narrowing[] {
  *
  * **A closed layer says so**, because closing is a stated field and not
  * something inferred from *there is an allow rule in this band* — an implicit
- * allow-list is exactly the bound an auditor cannot see (GV23).
+ * allow-list is exactly the bound an auditor cannot see.
  */
 export function layerSummary(lens: Lens, layer: GovernLayer): string {
 	const rules = rulesInLayer(lens, layer);

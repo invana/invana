@@ -1,18 +1,18 @@
 /**
- * A6 · one configured endpoint, and the models it offers.
+ * one configured endpoint, and the models it offers.
  *
  * *As the person who configured this endpoint, I want to see what it offers and
  * who casts each model, so that removing one is a decision rather than a
  * surprise.*
  *
- * **A model is a row under the endpoint, not a second endpoint** (PM9): the
+ * **A model is a row under the endpoint, not a second endpoint**: the
  * address `llm/anthropic-prod/claude-opus-5` has a provider segment and a model
  * segment, and one row cannot be both. So this reads as the endpoint's own
  * fields, then its models, each with the address a rule names.
  *
  * **The safe case is visibly safe.** A model no cast names says so on its row;
  * removing one a world casts is refused, and the refusal — which names the
- * worlds (PM11) — is drawn where the click was, never as a toast that leaves
+ * worlds — is drawn where the click was, never as a toast that leaves
  * the reader looking for what it meant.
  */
 
@@ -57,7 +57,7 @@ export interface ProviderDetailProps {
 	username: string;
 	graphSlug: string;
 	provider: LLMProvider;
-	/** Worlds and guardrails that name each address in their `cast` (PM11). */
+	/** Worlds and guardrails that name each address in their `cast`. */
 	castBy: CastBy;
 	/** The endpoint is gone — the section goes back to the list. */
 	onGone: () => void;
@@ -94,7 +94,7 @@ export function ProviderDetail({
 					? { kind: "passed", latencyMs: result.latency_ms }
 					: {
 							kind: "failed",
-							// A provider's own error is shown verbatim (PM5).
+							// A provider's own error is shown verbatim.
 							error: result.error ?? "The provider rejected the credentials.",
 						},
 			),
@@ -172,7 +172,7 @@ export function ProviderDetail({
 			</div>
 
 			{/* The ping is a run, and its answer is a fact about this endpoint —
-			    so it is stated here rather than thrown as a toast (PM3). */}
+			    so it is stated here rather than thrown as a toast. */}
 			{ping.kind === "passed" ? (
 				<p className="flex items-center gap-1.5 text-sm text-success">
 					<Check className="size-3.5" />
@@ -294,7 +294,7 @@ function ModelRow({
 				{castBy.length ? (
 					<>cast by {castBy.join(" · ")}</>
 				) : (
-					// The safe case, visibly safe (PM11).
+					// The safe case, visibly safe.
 					<>named by nothing — safe to remove</>
 				)}
 				{unranked ? (
@@ -361,7 +361,7 @@ function AddModelForm({
 				value={modelId}
 				onChange={(e) => setModelId(e.target.value)}
 			/>
-			{/* The ranks are derived from the published rate at add (PM17), so the
+			{/* The ranks are derived from the published rate at add, so the
 			    form asks for the one thing only the vendor knows. */}
 			<p className="text-sm text-muted-foreground">
 				It is ranked from its published rate, and a cast can name it as{" "}

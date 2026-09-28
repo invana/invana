@@ -1,7 +1,7 @@
 import { usd } from "@/lib/format";
 
 /**
- * The plan page as a dashboard document ([LB24 · LB33–LB35](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
+ * The plan page as a dashboard document ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * A report header naming the version, then **Overview · Layers · Flow ·
  * Activity**, with the `7 · 30 · 90 days` window on the right of the tab strip —
@@ -53,7 +53,7 @@ export const PLAN_ACTIONS = {
 	reading: "open-reading",
 } as const;
 
-/** What `⋯` opens, each as its own page beside the plan's (LB38). */
+/** What `⋯` opens, each as its own page beside the plan's. */
 const PLAN_READINGS = {
 	versions: "Versions",
 	arguments: "Arguments",
@@ -144,7 +144,7 @@ export function planBoardSpec(
 			],
 			actions: [
 				// The page reads one version; the switch is here because every
-				// tab reads the one the header names (LB34).
+				// tab reads the one the header names.
 				...(versions.length > 1
 					? [
 							{
@@ -351,7 +351,7 @@ function overviewRows(data: PlanPageData, view: PlanView) {
 	return rows;
 }
 
-/** **Each step, across N runs** — the reason the tab exists (LB33). */
+/** **Each step, across N runs** — the reason the tab exists. */
 function stepsTable(data: PlanPageData, view: PlanView, ran: number): Panel {
 	const measured = new Map(data.performance?.steps.map((s) => [s.step_key, s]));
 	return {
@@ -456,7 +456,7 @@ function layersRows(plan: TaskPlanDetail, perf: PlanPerformance | undefined) {
 					aside: `${declared} of ${plan.declared_layers.length}`,
 					flush: true,
 					// The bands arrive **open**: the tab has the width the section did
-					// not (LB31).
+					// not.
 					options: { bands, items, scale: "seq", palette: LAYER_PALETTE },
 				},
 			] as Panel[],
@@ -547,7 +547,7 @@ function activityRows(data: PlanPageData, view: PlanView) {
 	const filtered =
 		view.status !== ALL || view.calledBy !== ALL || view.agent !== ALL;
 	// The agents that *may* run the plan, and any seen running it — named, so
-	// the picker shows a name and filters by id (LB34).
+	// the picker shows a name and filters by id.
 	const agents = new Map([[ALL, "all agents"]]);
 	for (const a of data.plan.used_by) agents.set(a.id, a.name);
 	for (const r of items) if (r.agent) agents.set(r.agent.id, r.agent.name);

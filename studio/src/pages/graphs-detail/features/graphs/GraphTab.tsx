@@ -48,7 +48,7 @@ interface Props {
  * |---|---|---|
  * | Basic | what is this graph called, and what is it for | name · description · instructions · archive |
  * | Graph | what database does it read | the connection |
- * | LLMs | what does it think with | the providers (G29) |
+ * | LLMs | what does it think with | the providers |
  * | Agents | how hard may they run here | concurrency |
  *
  * One flat form of everything was the earlier shape, and it read as a junk
@@ -60,12 +60,12 @@ interface Props {
  * existing. What survives of the old group header is its one-line rule, and the
  * connection's state chip beside it.
  *
- * The connection is a tab here rather than a page of its own (CD6), and it
+ * The connection is a tab here rather than a page of its own, and it
  * still carries its own state chip: the two never save together — a connection
- * has to *pass a test* before it is allowed to (connect-a-database.md CD2).
+ * has to *pass a test* before it is allowed to (connect-a-database.md).
  *
  * `@owner / slug` is not on Basic. The breadcrumb above the panel already reads
- * it (graph-detail-page.md G16), and a panel that repeats its own header is
+ * it (graph-detail-page.md), and a panel that repeats its own header is
  * saying nothing twice. Every tab's body is `p-4` — the number every other
  * docked panel uses.
  *
@@ -77,7 +77,7 @@ interface Props {
  *
  * Gone with this split: `objectives` and `success_criteria`. Those belong to a
  * Project, not a Graph — a Graph is a bounded domain and has no goals of its
- * own (objectives-and-criteria.md D1) — and both columns were written by this
+ * own (objectives-and-criteria.md) — and both columns were written by this
  * form and read by nothing. `instructions` stays: the runtime hands it to the
  * LLM as this graph's standing guidance, so it is the one field here that
  * changes what an answer looks like.
@@ -112,7 +112,7 @@ export function GraphTab({ username, graphSlug, headerActions }: Props) {
 		<div className="space-y-4 p-4">{content}</div>
 	);
 
-	// The providers are no longer here at all: `Agents › LLMs` holds them (PM6),
+	// The providers are no longer here at all: `Agents › LLMs` holds them,
 	// and `?panel=llms` is aliased onto that panel rather than onto a tab.
 	const active: SettingsTab = SETTINGS_TABS.includes(tab as SettingsTab)
 		? (tab as SettingsTab)

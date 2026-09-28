@@ -1,21 +1,21 @@
 /**
  * The all models data build — every published model on one canvas.
  *
- * A model is a **group frame** (stitch-models.md ST14): a `model` node that
+ * A model is a **group frame** (stitch-models.md): a `model` node that
  * `GraphModelCanvas` styles as a group, with its node types pointing at it
  * through `parentId`. That is
  * `@invana/graph`'s own group concept, not a drawing convention, which is what
- * buys the rest of it — ELK packs members inside the frame (ST20), and a
+ * buys the rest of it — ELK packs members inside the frame, and a
  * collapsed frame renders as one node with every stitch re-routed onto it, so
- * the constellation and the detail are the same data at two altitudes (ST15).
+ * the constellation and the detail are the same data at two altitudes.
  *
  * A **stitch is the only edge allowed to cross a frame**. Nothing marks one as
  * such: an edge whose endpoints sit in two different groups is a stitch by
  * construction, and one inside a frame is that model's own edge type.
  *
  * This module is pure — queries live in `useAllModels`, the drawing in
- * `@/canvases/model`, the page in `AllModelsCanvas`. It reads versions and links, never `…/global-model`
- * (ST16), so the global-model page stays stated rather than drawn (ST6).
+ * `@/canvases/model`, the page in `AllModelsCanvas`. It reads versions and links, never `…/global-model`,
+ * so the global-model page stays stated rather than drawn.
  */
 
 import { colorSlotByString } from "@invana/styling/color";
@@ -40,10 +40,10 @@ export interface ModelFrame {
 	modelId: string;
 	name: string;
 	description: string;
-	/** The published version drawn. `null` ⇒ nothing published yet (ST18). */
+	/** The published version drawn. `null` ⇒ nothing published yet. */
 	versionId: string | null;
 	versionLabel: string | null;
-	/** `1`–`8`, the `--color-data-N` slot (ST17). */
+	/** `1`–`8`, the `--color-data-N` slot. */
 	hue: number;
 	nodeTypes: NodeTypeResponse[];
 	edgeTypes: EdgeTypeResponse[];
@@ -74,8 +74,8 @@ export const stitchPair = (link: ModelLink, qualified = true): string => {
 /**
  * Where its endpoints come from, in one line.
  *
- * A key on each side reads as the rule itself (ST26); rows that are their own
- * fact read as the model that ships them (ST27). An anchor adds how the two
+ * A key on each side reads as the rule itself; rows that are their own
+ * fact read as the model that ships them. An anchor adds how the two
  * compare, because *exact* and *case insensitive* are different claims about
  * the same pair of columns.
  */
@@ -104,7 +104,7 @@ export const parseMemberId = (
 
 export interface AllModelsBuild {
 	data: ModelGraphData;
-	/** Declared but not committed — drawn, and counted beside the union (ST21). */
+	/** Declared but not committed — drawn, and counted beside the union. */
 	stagedCount: number;
 	/** Stitches whose endpoint version is not the one drawn — stated, not dropped silently. */
 	unresolvedStitches: number;
@@ -125,7 +125,7 @@ interface TypeStitches {
  * Ids are namespaced by model because two domains may both own a `Company` and
  * they are different types until an anchor says otherwise (domain-models.md
  * DM4) — collapsing them onto one node here would draw the merge the product
- * refuses to perform (ST2). A member's `type` is `Model.Type`, the key the
+ * refuses to perform. A member's `type` is `Model.Type`, the key the
  * canvas binds its look under.
  */
 export function buildAllModelsData(
@@ -133,7 +133,7 @@ export function buildAllModelsData(
 	links: readonly ModelLink[],
 	/**
 	 * `false` draws the types with no frame around them — the model canvas,
-	 * where the page is already the model and a group would say it twice (ME26).
+	 * where the page is already the model and a group would say it twice.
 	 */
 	{ framed = true }: { framed?: boolean } = {},
 ): AllModelsBuild {
@@ -207,7 +207,7 @@ export function buildAllModelsData(
 	}
 
 	for (const t of frames) {
-		// A model with nothing drawn is a sized frame, not a group (ST29).
+		// A model with nothing drawn is a sized frame, not a group.
 		if (framed)
 			nodes.push({
 				id: frameIdOf(t.modelId),
@@ -242,7 +242,7 @@ export function buildAllModelsData(
 					label: n.name,
 					model: t.name,
 					...(framed ? { frame: t.name } : {}),
-					// The type's own colour, the one the Explorer paints it (ST17);
+					// The type's own colour, the one the Explorer paints it;
 					// the frame around it carries the model's.
 					hue: colorSlotByString(n.name),
 					description: n.description ?? "",
@@ -269,7 +269,7 @@ export function buildAllModelsData(
 						type: e.name,
 						data: {
 							kind: "edge",
-							// One model's page already names it, so nothing repeats it (ME26).
+							// One model's page already names it, so nothing repeats it.
 							title: framed
 								? `${t.name}.${src} -[${e.name}]-> ${t.name}.${tgt}`
 								: `${src} -[${e.name}]-> ${tgt}`,

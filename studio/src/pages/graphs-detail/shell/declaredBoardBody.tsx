@@ -83,11 +83,11 @@ export function declaredBoardContent(
 		setModelSelection,
 	} = deps;
 
-	// A task opens inside its run (SR72): the page stays, `&step=` moves.
+	// A task opens inside its run: the page stays, `&step=` moves.
 	const openStep = (stepId: string | null) =>
 		setPageId(boardPageId(board.kind, board.subjectId), { step: stepId });
 
-	// **A frozen reading branches before the kind does** (B16). The stored
+	// **A frozen reading branches before the kind does**. The stored
 	// blob is the document, so there is nothing for a composer to do and no
 	// kind to pick a body by — one page renders every report.
 	if (board.versionId) {
@@ -104,7 +104,7 @@ export function declaredBoardContent(
 	}
 
 	if (board.kind === "run" || board.kind === "task_run") {
-		// A step board opened cold is still reading which run it is in (SR44).
+		// A step board opened cold is still reading which run it is in.
 		// It has no run *yet*, which is not the same as having none.
 		if (board.resolvingRun) {
 			return (
@@ -114,9 +114,9 @@ export function declaredBoardContent(
 			);
 		}
 		// The two bodies that read a trace. `runId` is optional on the record
-		// because a skill has no run (SD3), so they **check** it rather than
+		// because a skill has no run, so they **check** it rather than
 		// cast it — a fifth kind that forgot to pass one refuses here instead
-		// of crashing inside the composer (B17).
+		// of crashing inside the composer.
 		const runId = board.runId;
 		if (!runId) {
 			return (
@@ -148,7 +148,7 @@ export function declaredBoardContent(
 				}
 				// `Retune` — the run stays in `mainSection` while Govern opens
 				// beside it, which is the whole reason the section is a stack
-				// (SR12 · worlds.md Journey 2).
+				// (worlds.md Journey 2).
 				onRetune={() => settingsPanel.setSection("govern")}
 				// The pair is the subject, and the first half is this run —
 				// `compare:<a>:<b>`, which the id parser splits on the first colon.
@@ -163,8 +163,8 @@ export function declaredBoardContent(
 		);
 	}
 
-	// The skill's page (SK17 · SK36) — it authors, like the agent's, and
-	// reads no trace, so it takes no `board.runId` (SD3). Its usage and a
+	// The skill's page — it authors, like the agent's, and
+	// reads no trace, so it takes no `board.runId`. Its usage and a
 	// rule are readings, and stay boards.
 	if (board.kind === "skill") {
 		return (
@@ -212,8 +212,8 @@ export function declaredBoardContent(
 	}
 
 	// One page for both kinds, because they are one record separated by
-	// `kind` (GV1 · WO15 · GR14). Neither reads a trace, so neither takes
-	// `board.runId` (SD3).
+	// `kind`. Neither reads a trace, so neither takes
+	// `board.runId`.
 	if (board.kind === "world" || board.kind === "guardrail") {
 		return (
 			<LensBoardPage
@@ -222,15 +222,15 @@ export function declaredBoardContent(
 				kind={board.kind}
 				lensId={board.subjectId}
 				// `Edit` puts the Govern panel back on this lens, drilled in —
-				// the board reads and the acts stay in the section (WO16).
+				// the board reads and the acts stay in the section.
 				onEdit={(kind, lensId) => governPanel.reveal(kind, lensId)}
 			/>
 		);
 	}
 
-	// The agent's page (AG23 · AG34) — the one declared page that edits. It
-	// reads no trace, so it takes no `board.runId` (SD3).
-	// The journal drawn wide (SR70). It binds to the Graph, not to a run,
+	// The agent's page — the one declared page that edits. It
+	// reads no trace, so it takes no `board.runId`.
+	// The journal drawn wide. It binds to the Graph, not to a run,
 	// so it takes no `board.runId`.
 	if (board.kind === "runs") {
 		return (
@@ -281,7 +281,7 @@ export function declaredBoardContent(
 		) : null;
 	}
 
-	// What `⋯` opens on the plan page (LB38) — each a record of one
+	// What `⋯` opens on the plan page — each a record of one
 	// version, and its crumb goes back to the plan's page.
 	if (
 		board.kind === "plan_versions" ||
@@ -303,7 +303,7 @@ export function declaredBoardContent(
 		);
 	}
 
-	// The plan page (LB24) — Overview · Layers · Flow · Activity, read over
+	// The plan page — Overview · Layers · Flow · Activity, read over
 	// a window. A row opens its run page beside it.
 	return (
 		<PlanBoardPage
@@ -344,7 +344,7 @@ export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 		planRefById,
 	} = names;
 	return (
-		// One board, titled by its scope — `All models` or `AirRoutes` (MP18).
+		// One board, titled by its scope — `All models` or `AirRoutes`.
 		board.kind === "models"
 			? modelsView.scope
 				? (modelName(modelsView.scope) ?? BOARD_KINDS.models.label)

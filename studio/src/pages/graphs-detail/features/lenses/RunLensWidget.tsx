@@ -3,13 +3,13 @@
  *
  * A run's lens is drawn by the kit's `lens` panel now: one `LayerSection` per
  * layer with a `ParticipantRow` inside it, which is the drawing
- * [SR53](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)
+ * [see-what-ran.md](../../../../../docs/for-developers/modules/operate/features/see-what-ran.md#decisions)
  * asks for and this panel's three verdict buckets never were. Live pages
  * compose it through [`runLensOptions`](./runLens.ts); nothing new should
  * register `runLens`.
  *
  * It stays because a **frozen report** renders whatever document was kept
- * ([B16](../../../../../docs/for-developers/building-engine/boards-migration.md)),
+ * ([boards-migration.md](../../../../../docs/for-developers/building-engine/boards-migration.md)),
  * and a report frozen before the swap carries `kind: "runLens"` with these
  * options. Deleting the renderer would draw *No renderer for panel kind
  * `runLens`* where a reader's saved reading of a run used to be — a report is

@@ -1,5 +1,5 @@
 /**
- * A run's tasks as `TaskFlowCanvas` data (SR32): one node per task group, keyed
+ * A run's tasks as `TaskFlowCanvas` data: one node per task group, keyed
  * by the head step's id so a click opens that step.
  *
  * A `TaskRun` records order and a lane, not dependencies, so the edges are

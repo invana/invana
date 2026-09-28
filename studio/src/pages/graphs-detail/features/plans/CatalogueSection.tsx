@@ -6,8 +6,8 @@
 // produced — which is why the three are stacked rather than given three icons.
 //
 // The list renders `runtime/catalogue/registry.py` through `GET …/catalogue`,
-// never a second copy of the declaration (CA2). Read-only: nothing here adds,
-// edits or disables an entry (CA1).
+// never a second copy of the declaration. Read-only: nothing here adds,
+// edits or disables an entry.
 
 import {
 	BoundChip,
@@ -31,7 +31,7 @@ export interface CatalogueSectionProps {
 	username: string;
 	graphSlug: string;
 	ui: StackSectionUi;
-	/** `&entry=` — the entry whose detail replaces this section's body (CA6). */
+	/** `&entry=` — the entry whose detail replaces this section's body. */
 	entryKey: string | null;
 	onOpenEntry: (key: string | null) => void;
 	defaultSize?: number | string;
@@ -128,7 +128,7 @@ function CatalogueSectionBody({
 		);
 	}
 
-	// Search reads key, summary and bound (C8); the groups stay the navigation.
+	// Search reads key, summary and bound; the groups stay the navigation.
 	const q = search.toLowerCase();
 	const rows = items.filter((e) =>
 		[e.step_key, e.summary, e.bound].some((s) => s.toLowerCase().includes(q)),
@@ -141,7 +141,7 @@ function CatalogueSectionBody({
 		);
 
 	// Grouped by bound in the order the engine sends — the group a person scans
-	// is the group the envelope ceilings (CA3).
+	// is the group the envelope ceilings.
 	const groups = new Map<string, CatalogueEntry[]>();
 	for (const e of rows)
 		groups.set(e.bound, [...(groups.get(e.bound) ?? []), e]);
@@ -173,7 +173,7 @@ function CatalogueSectionBody({
 	);
 }
 
-/** The contract — bound · args · outputs · requires (C2–C4), in the section only (CA6). */
+/** The contract — bound · args · outputs · requires, in the section only. */
 function EntryDetail({
 	entry,
 	onOpenEntry,

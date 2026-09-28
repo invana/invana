@@ -157,7 +157,7 @@ export function useCreateCanvasStateMutation(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Reports — a **declared** board's kept readings, addressed by what the board
-// is of (boards-migration.md B18 · B21).
+// is of (boards-migration.md).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const REPORTS_KEY = ["boardReports"] as const;
@@ -172,7 +172,7 @@ export const boardReportsKey = (
  * Every report kept of one subject, newest first.
  *
  * An empty list is the honest answer for a board nobody ever saved a reading
- * of — there is no row until the first report creates one (B9), and the list
+ * of — there is no row until the first report creates one, and the list
  * route says so rather than 404ing.
  */
 export function useBoardReportsQuery(

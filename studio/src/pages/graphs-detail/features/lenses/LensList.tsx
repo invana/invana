@@ -3,10 +3,10 @@
  * them: loading, failed, and nothing set.
  *
  * Both sections list the same record — a guardrail and a world are one row
- * separated by `kind` (GV1) — so they list it the same way. What differs is the
+ * separated by `kind` — so they list it the same way. What differs is the
  * sentence each shows when the list is empty, which is why that is a prop: *no
  * guardrails* and *no worlds* are different facts about a Graph, and neither is
- * an empty table ([GR6](../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * an empty table ([guardrails.md](../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  */
 
 import { EmptyState, LensRow, Spinner } from "@invana/ui";
@@ -60,7 +60,7 @@ export function LensList({
 		);
 	}
 
-	// A sentence, never an empty table (GR6). An empty table says *the columns
+	// A sentence, never an empty table. An empty table says *the columns
 	// are here and the rows are missing*; what is true is that nobody has set
 	// one, and what that means for a run is the half worth printing.
 	if (!items.length) {

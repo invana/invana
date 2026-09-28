@@ -171,9 +171,9 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 	const expand = useExpandNode(username, graphSlug);
 	const runExpand = useCallback(
 		async (req: ExpandRequest): Promise<NeighborExpandResponse | null> => {
-			// An expansion is a run under the canvas's lens (graph-canvas.md GC6 ·
-			// GC11): the picked world rides along exactly as it does on an ask, and
-			// the active session makes the run a turn in its thread (GC12).
+			// An expansion is a run under the canvas's lens (graph-canvas.md ·
+			// ): the picked world rides along exactly as it does on an ask, and
+			// the active session makes the run a turn in its thread.
 			const tagged = {
 				...req,
 				body: {
@@ -212,7 +212,7 @@ export function useCanvasExpand(deps: CanvasExpandDeps) {
 	);
 
 	// The expand submenus and the fine-tune pickers offer only what the picked
-	// world holds (graph-canvas.md GC13): node types from the world's own type
+	// world holds (graph-canvas.md): node types from the world's own type
 	// counts, and edge types the world allows whose both ends it allows too. The
 	// active model supplies each edge's endpoints. The Model panel loads its own
 	// version, because it may be looking at a draft.

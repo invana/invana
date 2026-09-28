@@ -35,7 +35,7 @@ interface MainSectionConfig {
 interface GraphDetailProps {
 	/** The object open on this screen — drawn as the last breadcrumb crumb,
 	 *  after `owner › graph › panel`. Omitted when nothing is open. There is no
-	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md G15),
+	 *  *screen* crumb: the graph's URL is the page (graph-detail-page.md),
 	 *  so what follows the graph is the open panel, then what it opened. */
 	objectLabel?: string;
 	/** Page-side left panel. Shown only while a page-owned `?settings` key is
@@ -72,7 +72,7 @@ interface GraphDetailProps {
 // and never reach here.
 //
 // `sessions` is deliberately absent: it is the assistant, on the right
-// (the-assistant.md AD1). It stays in ALL_NATIVE_SECTIONS below so a
+// (the-assistant.md). It stays in ALL_NATIVE_SECTIONS below so a
 // stale `?panel=sessions` link is still recognised as page-owned — the page
 // answers it by opening the assistant — rather than docking the SettingsViewPanel.
 //
@@ -88,12 +88,12 @@ const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
-	// **Execution and definition are two panels** (G41). `runs` is the journal as
+	// **Execution and definition are two panels**. `runs` is the journal as
 	// one list; `library` is the three-section stack — Plans · Catalogue ·
 	// Templates. `imports`, `workflows` and `templates` are gone from this list
 	// because they are gone from the product: an import is a `kind` of TaskRun, a
 	// workflow is a reusable TaskPlan, and a projection template is Library's
-	// third section (G30 · G38).
+	// third section.
 	"runs",
 	"library",
 	"govern",
@@ -117,7 +117,7 @@ const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 
 /**
  * The shell for the graph page — one page, at the graph's own URL
- * (graph-detail-page.md G1 · G15). Owns:
+ * (graph-detail-page.md). Owns:
  *
  * - The breadcrumb header (`useAppHeader`) and left rail (`useGraphLeftNav`).
  * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
@@ -151,7 +151,7 @@ export function GraphDetail({
 	// graph and the open panel; the view crumb follows the rail, so it answers
 	// "where am I?" without being a second way to navigate.
 	// `owner › graph › panel › object`. The panel crumb is the `?panel` value
-	// verbatim (G16), so the breadcrumb is a literal reading of the URL — the two
+	// verbatim, so the breadcrumb is a literal reading of the URL — the two
 	// crumbs before it are identifiers too, the username and the slug.
 	const header = useAppHeader({
 		pageLabel: settingsPanel.isOpen ? settingsPanel.section : undefined,
@@ -213,7 +213,7 @@ export function GraphDetail({
 
 	const effectiveRightSection = settingsExpanded ? undefined : rightSection;
 
-	// The shell owns the layout (DS12). It keeps `mainSection` mounted at a
+	// The shell owns the layout. It keeps `mainSection` mounted at a
 	// stable position with each side region as a conditional sibling, so opening
 	// a panel never remounts the canvas — a property of the shell since
 	// `@invana/themes` 0.0.23, not something a page re-implements to protect

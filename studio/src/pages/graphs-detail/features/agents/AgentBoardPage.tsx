@@ -1,11 +1,11 @@
 /**
- * The agent's page, as a page in `mainSection` (AG34) — `agent:<id>` on the
+ * The agent's page, as a page in `mainSection` — `agent:<id>` on the
  * strip, the Agents list left beside it in `leftSection`.
  *
  * This is the host half: which agent, whether it is the Graph default, and the
  * writes — Save, bind, pause, resume, retire, make default. {@link AgentDetail}
  * is the page itself. Pause and Retire go through the same confirm the section
- * uses, naming the open work they would disturb (LC9 · LC10).
+ * uses, naming the open work they would disturb.
  */
 
 import { EmptyState, Spinner } from "@invana/ui";
@@ -81,7 +81,7 @@ export function AgentBoardPage({
 				onOpenEnvelope={() => onOpenEnvelope(agent.id)}
 				onBindSkill={(skillId) => {
 					// Cleared first, so the card under the skill is this pick's
-					// refusal and never the last one's (BN11).
+					// refusal and never the last one's.
 					mutations.bindSkill.reset();
 					mutations.bindSkill.mutate({ id: agent.id, skillId });
 				}}

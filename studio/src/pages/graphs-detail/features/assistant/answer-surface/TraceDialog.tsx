@@ -1,7 +1,7 @@
 /**
  * The reasoning trace — the whole run, after the fact.
  *
- * This is **part of the answer, not an admin view** (reasoning-trace.md RT1): if
+ * This is **part of the answer, not an admin view** (reasoning-trace.md): if
  * you can see the answer you can see how it was reached. It opens from an
  * emission's own citation, because "where did this come from" is a question about
  * a specific number, not about the session.
@@ -9,16 +9,16 @@
  * Steps stack on the left, the selected step's detail sits beside them, and two
  * things are deliberately never merged:
  *
- * - **Offered and applied stay two lists** (RT3). `offered` is a fact about the
+ * - **Offered and applied stay two lists**. `offered` is a fact about the
  *   prompt; `applied` is the model's own report. Showing one number would be a
  *   claim we cannot make. Rules carry the same pair, drawn as the statements
- *   themselves rather than as counts — a rule is only readable as its wording
- *   (RU12). A statement links to its rule's board, and because this is a modal
+ *   themselves rather than as counts — a rule is only readable as its wording.
+ * A statement links to its rule's board, and because this is a modal
  *   the act is **close the trace, then open the board** — a board opened behind
  *   a dialog is a page nobody can see, and dropping the link would make the
- *   answer surface the one place a rule cannot be reached (RU13). The trace is
+ *   answer surface the one place a rule cannot be reached. The trace is
  *   one click away again on the same citation chip.
- * - **The generated query is verbatim and copyable** (RT2), so the check on the
+ * - **The generated query is verbatim and copyable**, so the check on the
  *   answer is running the query yourself, not trusting the prose around it.
  */
 
@@ -71,7 +71,7 @@ export function TraceDialog({
 }: Props) {
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	// Null outside the page host — a statement then reads as text rather than as
-	// a link that fails (RU13).
+	// a link that fails.
 	const openBoard = useOpenBoard();
 	const openRule = openBoard
 		? (ruleId: string) => {
@@ -178,7 +178,7 @@ function StepDetail({
 	step: TraceStepRead;
 	username: string;
 	graphSlug: string;
-	/** Close the trace and open the rule's board (RU13). */
+	/** Close the trace and open the rule's board. */
 	onOpenRule?: (ruleId: string) => void;
 }) {
 	const query =
@@ -202,7 +202,7 @@ function StepDetail({
 
 			{query ? <QueryBlock query={query} /> : null}
 
-			{/* Two lists, two certainties (RT3). Never one number. */}
+			{/* Two lists, two certainties. Never one number. */}
 			<Section title="Skills">
 				{step.skills_offered.length === 0 &&
 				step.skills_applied.length === 0 ? (
@@ -229,7 +229,7 @@ function StepDetail({
 				)}
 			</Section>
 
-			{/* The other pair, and the wording rather than a count (RU12). */}
+			{/* The other pair, and the wording rather than a count. */}
 			<Section title="Rules">
 				{step.rules_offered.length === 0 ? (
 					<p className="text-sm text-muted-foreground">
@@ -260,7 +260,7 @@ function StepDetail({
 				</Section>
 			) : null}
 
-			{/* A delegated run nests under the step that spawned it (RT4), collapsed
+			{/* A delegated run nests under the step that spawned it, collapsed
 			    by default: the parent's trace is the subject, and the child is a
 			    detail of one of its steps rather than a second story beside it. */}
 			{step.child_run_id ? (
@@ -344,7 +344,7 @@ function ChildTrace({
 	);
 }
 
-/** The query, verbatim, copyable — the check on the answer is running it (RT2). */
+/** The query, verbatim, copyable — the check on the answer is running it. */
 function QueryBlock({ query }: { query: string }) {
 	const [copied, setCopied] = useState(false);
 	return (

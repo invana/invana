@@ -1,9 +1,9 @@
 /**
- * The journal's chips, shared by the Runs panel and the Runs page (SR70).
+ * The journal's chips, shared by the Runs panel and the Runs page.
  *
  * The page and the list beside it read one query under one set of chips, so
  * the two never show different journals. A filter narrows a list, and a
- * narrowed list is not a place — so it is in memory, not a URL key (G31).
+ * narrowed list is not a place — so it is in memory, not a URL key.
  */
 
 import { create } from "zustand";

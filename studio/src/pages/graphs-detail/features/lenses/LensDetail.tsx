@@ -1,20 +1,20 @@
 /**
- * W2 · one lens, read as one object — which is what an auditor is handed — and
- * R4 · the cast it would actually get.
+ * one lens, read as one object — which is what an auditor is handed — and
+ * the cast it would actually get.
  *
  * *As someone who has to answer for a run, I want to read what a world allowed
  * in one place, so that "what was this run allowed to see" is a document rather
  * than a composition I compute.*
  *
  * Five layer bands, the cast, and the transaction time — the record in its own
- * order ([WO8](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * order ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  * The same shape whether it is a world or a guardrail, because they **are** one
- * record separated by `kind` (GV1); a second layout would be the second
+ * record separated by `kind`; a second layout would be the second
  * enforcement path this module exists not to have.
  *
  * **The body renders from the row the list already holds; the resolved cast
  * arrives after.** *Innermost wins, then the address is checked against the
- * effective rules* (GV6) is a composition against the guardrails, and only the
+ * effective rules* is a composition against the guardrails, and only the
  * server can do it — so it is a second read, and the drill-in does not wait on
  * it. A `CastTable` with `resolved` absent still reads correctly: it says what
  * this lens **casts**, rather than what a run would **get**.
@@ -147,7 +147,7 @@ export function LensDetail({
 						resolved={resolved}
 						readOnly
 					/>
-					{/* R4's seam: the cast resolves to a model the bound above it
+					{/* 's seam: the cast resolves to a model the bound above it
 					    denies, so the run does not open. It is named here rather than
 					    at run time, because the person reading the world is the person
 					    who can fix it. */}

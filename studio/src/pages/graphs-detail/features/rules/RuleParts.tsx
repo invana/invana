@@ -11,9 +11,9 @@
  * Neither piece knows which scope it is drawing. The form takes an
  * `onSubmit` rather than a mutation, because *which list a new rule joins* is
  * the caller's fact — a Graph's invariants or one Project's working rules
- * ([RU2](docs/for-developers/modules/skills/features/rules.md#decisions)) — and
+ * ([rules.md](docs/for-developers/modules/skills/features/rules.md#decisions)) — and
  * the row takes `readOnly` for the same reason: an inherited invariant is not
- * editable from the project that inherits it ([RU8](docs/for-developers/modules/skills/features/rules.md#decisions)).
+ * editable from the project that inherits it ([rules.md](docs/for-developers/modules/skills/features/rules.md#decisions)).
  */
 
 import { Textarea } from "@invana/forms";
@@ -21,7 +21,7 @@ import { Badge, Button } from "@invana/ui";
 import { useState } from "react";
 import type { Rule } from "@/pages/graphs-detail/features/skills";
 
-/** Past which length a statement reads as two rules (RU1). Nudged, never refused. */
+/** Past which length a statement reads as two rules. Nudged, never refused. */
 const LONG = 160;
 
 /** The statement is the row; everything else is underneath it. */
@@ -33,7 +33,7 @@ export function RuleStatementRow({
 }: {
 	rule: Rule;
 	onClick?: () => void;
-	/** Drawn as inherited: dimmed, and not a control (RU8). */
+	/** Drawn as inherited: dimmed, and not a control. */
 	readOnly?: boolean;
 	trailing?: React.ReactNode;
 }) {
@@ -86,7 +86,7 @@ export function RuleStatementRow({
 	);
 }
 
-/** One statement. If it needs a paragraph it is two rules (RU1). */
+/** One statement. If it needs a paragraph it is two rules. */
 export function RuleStatementForm({
 	existing,
 	pending,

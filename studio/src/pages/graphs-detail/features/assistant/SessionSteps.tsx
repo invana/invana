@@ -106,7 +106,7 @@ export function OptionRow({
 
 export interface StepListProps {
 	steps: RunNode[];
-	/** The model's rationale streamed under the running Understand step (UC2). */
+	/** The model's rationale streamed under the running Understand step. */
 	reasoning?: string;
 	/** Rows are clickable when a trace can open. */
 	onOpenTrace?: (step: RunNode) => void;
@@ -293,7 +293,7 @@ function TraceGroup({
 }
 
 /**
- * A step's trace (UC10): input digests, output, error, attempt and tokens —
+ * A step's trace: input digests, output, error, attempt and tokens —
  * the audit trail at task resolution, as a console disclosure.
  */
 export function StepTrace({
@@ -347,7 +347,7 @@ export function StepTrace({
 // ── Collapsed summary ─────────────────────────────────────────────────────────
 
 /**
- * The one line a settled reply keeps (UC6): `✻ Ask for 2.4s · 4 of 4 steps`.
+ * The one line a settled reply keeps: `✻ Ask for 2.4s · 4 of 4 steps`.
  * Click to reopen the list.
  */
 export function StepsSummary({

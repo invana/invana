@@ -1,11 +1,11 @@
 /**
- * A plan's `LayerStrip`, in the plan tense ([LB31](docs/for-developers/modules/workflows/features/the-library.md)).
+ * A plan's `LayerStrip`, in the plan tense ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * The same component a run draws on `scale="elapsed"`, here on `scale="seq"`:
  * a plan has no clock, so its axis is its own order and a node's `depth` is
  * that order — two steps at the same depth wait on the same thing, not on each
  * other. Every governed band is passed, declared or not, because *this plan
- * leaves the graph alone* is the fact a reader is checking for (D22).
+ * leaves the graph alone* is the fact a reader is checking for.
  */
 
 import type { LayerBand, LayerItem } from "@invana/ui";

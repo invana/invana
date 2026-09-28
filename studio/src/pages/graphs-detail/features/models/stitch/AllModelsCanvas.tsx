@@ -1,17 +1,17 @@
 /**
- * All models — every published model on one canvas (stitch-models.md ST14).
+ * All models — every published model on one canvas (stitch-models.md).
  *
  * The drawing is `GraphModelCanvas` (graph-model-canvas.md), the canvas
  * Storybook's GlobalModel story: a model is a group frame, its node types are
  * the members, and a **stitch is the only edge allowed to cross a frame** —
- * dashed, so it never reads as a traversal (GM9). The page adds no behaviour
- * of its own (ST57); it turns on the canvas's stitch gesture, and answers it
- * with the declare card docked beside the drawing (ST19, ST34). What sits above
+ * dashed, so it never reads as a traversal. The page adds no behaviour
+ * of its own; it turns on the canvas's stitch gesture, and answers it
+ * with the declare card docked beside the drawing. What sits above
  * the drawing is what a person has to *act* on: staged stitches to commit, and
- * stitches bound to a version no longer drawn. The union reads beside it (ST6):
+ * stitches bound to a version no longer drawn. The union reads beside it:
  * this is the Model tab of the model page at All models (the-model-page.md).
  *
- * It does not write a model. Authoring is the model canvas, on a draft (ME1).
+ * It does not write a model. Authoring is the model canvas, on a draft.
  */
 
 import { Button, EmptyState, Spinner } from "@invana/ui";
@@ -39,7 +39,7 @@ import type { LinkKind } from "@/pages/graphs-detail/features/models/types";
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The page's render backend — the canvas starts on it (GM13). */
+	/** The page's render backend — the canvas starts on it. */
 	backend?: CanvasBackend;
 }
 
@@ -68,7 +68,7 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 		return out;
 	}, [frames]);
 
-	/** The drag names both ends (ST19); the card declares, the drag never does. */
+	/** The drag names both ends; the card declares, the drag never does. */
 	const onStitch = useCallback(
 		(source: string, target: string): string | null => {
 			const from = parseMemberId(source);
@@ -76,11 +76,11 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 			if (!from || !to)
 				return "A stitch joins two node types — drag from one type onto another.";
 			if (from.modelId === to.modelId)
-				// Inside one frame this would be an edge type, authored on its draft (ME1).
+				// Inside one frame this would be an edge type, authored on its draft.
 				return "Both types are in the same model. A stitch crosses a boundary — an edge inside one is that model's own edge type, authored on its draft.";
 			const sourceVersion = versionOf.get(from.modelId);
 			const targetVersion = versionOf.get(to.modelId);
-			// ST8 — a draft has nothing immutable to bind.
+			// a draft has nothing immutable to bind.
 			if (!sourceVersion || !targetVersion)
 				return "A stitch binds published versions. One of these models has nothing published yet.";
 			setDeclaring({
@@ -160,7 +160,7 @@ export function AllModelsCanvas({ username, graphSlug, backend }: Props) {
 				</div>
 			) : null}
 
-			{/* Not a stitch that vanished — one whose version needs reviewing (ST16). */}
+			{/* Not a stitch that vanished — one whose version needs reviewing. */}
 			{build.unresolvedStitches > 0 ? (
 				<div className="flex shrink-0 items-center gap-2 border-b border-warning/35 bg-warning/10 px-3 py-1.5 text-sm">
 					<span className="size-1.5 rounded-full bg-warning" />

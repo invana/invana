@@ -24,9 +24,9 @@ export interface Skill {
 	when_to_use: string;
 	created_at: string;
 	updated_at: string;
-	/** `builtin` ships with Invana: editable, re-seeded by name, never deleted (SK25). */
+	/** `builtin` ships with Invana: editable, re-seeded by name, never deleted. */
 	origin: string;
-	/** Never published — nothing is offered it, and the section says so (SK21). */
+	/** Never published — nothing is offered it, and the section says so. */
 	is_draft: boolean;
 	/** An unpublished row waiting to be published, head or no head. */
 	draft_version_id: string | null;
@@ -43,7 +43,7 @@ export interface SkillCreate {
 
 /**
  * A rename, a republish, or both. Changing any text field publishes the next
- * version; changing only the name does not (SK2).
+ * version; changing only the name does not.
  */
 export interface SkillUpdate {
 	name?: string;
@@ -60,7 +60,7 @@ export interface SkillListResponse {
 // ── the plan a version owns ─────────────────────────────────────────────────
 
 /** The six bands a playbook can touch. `cache` is drawn dark — no catalogue
- *  entry spends it yet (SK16). */
+ *  entry spends it yet. */
 export type SkillLayer =
 	| "graph data"
 	| "llm"
@@ -72,7 +72,7 @@ export type SkillLayer =
 /** What the section row and the Flow tab's badge need without a second call. */
 interface SkillPlaybookSummary {
 	plan_id: string;
-	/** `generated` when the planner drew it, `authored` after a hand-edit (SK7). */
+	/** `generated` when the planner drew it, `authored` after a hand-edit. */
 	origin: string;
 	step_count: number;
 	layers: SkillLayer[];
@@ -88,12 +88,12 @@ export interface SkillPlaybookNode {
 	/** `callable` · `composite` · `human` */
 	form: string;
 	layer: SkillLayer;
-	/** The sentence this step was drawn from (C11). */
+	/** The sentence this step was drawn from. */
 	source_span: string | null;
 	/**
 	 * `nl-single@1` when this row was inlined from a library plan, null when
 	 * somebody wrote it. What the editor groups consecutive rows by, so five
-	 * inlined steps read as the one plan they came from (SK33).
+	 * inlined steps read as the one plan they came from.
 	 */
 	source_plan_key: string | null;
 }
@@ -112,7 +112,7 @@ export interface SkillPlaybookRead {
 	nodes: SkillPlaybookNode[];
 	edges: SkillPlaybookEdge[];
 	layers: SkillLayer[];
-	/** The library plans this plan inlined, and what it tuned on each (LB19). */
+	/** The library plans this plan inlined, and what it tuned on each. */
 	uses: PlanUse[];
 }
 
@@ -124,12 +124,12 @@ export interface PlanUse {
 	/**
 	 * The newest version of that key the Graph holds. Greater than `version`
 	 * means the library has moved on — which the Flow tab **says** and never
-	 * acts on: re-inlining is a thing somebody asks for (SK32).
+	 * acts on: re-inlining is a thing somebody asks for.
 	 */
 	latest_version: number;
 }
 
-/** A library plan a skill may inline, and what it offers a caller (LB19). */
+/** A library plan a skill may inline, and what it offers a caller. */
 export interface InlinablePlan {
 	key: string;
 	version: number;
@@ -177,7 +177,7 @@ export interface SkillClarification {
 /**
  * One step a hand-edit may name. The engine sends the set with the draft: the
  * catalogue is closed and Studio cannot see it, so a list of step keys written
- * here would be a second copy to keep in step (SK28).
+ * here would be a second copy to keep in step.
  */
 export interface SkillStepChoice {
 	step_key: string;
@@ -196,15 +196,15 @@ export interface SkillStepChoice {
 export interface SkillDraftTaskWrite {
 	key?: string | null;
 	/**
-	 * `callable` names a catalogue entry; `human` names none (SK15); `uses`
+	 * `callable` names a catalogue entry; `human` names none; `uses`
 	 * names a library **plan**, whose rows the engine copies in before it
-	 * validates anything (SK32).
+	 * validates anything.
 	 */
 	form: "callable" | "human" | "uses";
 	step_key?: string | null;
 	title?: string;
 	args?: Record<string, unknown>;
-	/** Kept so the Playbook tab still maps prose to steps after an edit (C11). */
+	/** Kept so the Playbook tab still maps prose to steps after an edit. */
 	source_span?: string | null;
 	/** `uses` rows only: which plan, and what this composition tunes. */
 	uses?: string | null;
@@ -213,7 +213,7 @@ export interface SkillDraftTaskWrite {
 
 /**
  * The version being written, the plan being drawn, and the question waiting on
- * an answer. A draft is a version row with no `published_at` (SK20).
+ * an answer. A draft is a version row with no `published_at`.
  */
 export interface SkillDraft {
 	version: SkillVersion;
@@ -222,12 +222,12 @@ export interface SkillDraft {
 	open_clarification: SkillClarification | null;
 	drawing_run_id: string | null;
 	/**
-	 * Why the last draw wrote nothing. A refusal settles rather than fails
-	 * (SK31), so it is read here — where the flow would have been — and not in
+	 * Why the last draw wrote nothing. A refusal settles rather than fails,
+	 * so it is read here — where the flow would have been — and not in
 	 * a run that died. The next draw that writes rows clears it.
 	 */
 	refusal: SkillDrawRefusal | null;
-	/** What a hand-edit may name — the catalogue, in the section's words (SK28). */
+	/** What a hand-edit may name — the catalogue, in the section's words. */
 	vocabulary: SkillStepChoice[];
 }
 
@@ -235,7 +235,7 @@ export interface SkillDraft {
  * Where this skill stands with one agent — the Bindings tab's three sections.
  *
  * `refusal` is the refusal a bind **would** raise, run as a dry run by the
- * engine (BN10). Studio never re-reads the rules to predict one: a second
+ * engine. Studio never re-reads the rules to predict one: a second
  * reading of a bound is a copy to keep in step, and the copy goes stale.
  */
 export interface SkillAgentStanding {
@@ -251,7 +251,7 @@ export interface SkillAgentStanding {
  * The engine sends the facts unflattened, so the card draws them rather than
  * printing a sentence. The envelope half names a `step_key` and its `bound`;
  * the lens half names the `layer`, one `participant` it checked and the `rule`
- * that denied it (BN10).
+ * that denied it.
  */
 export interface BindRefusal {
 	check: string;
@@ -265,7 +265,7 @@ export interface BindRefusal {
 	layer?: string;
 	/**
 	 * Every band the version's plan declares, in the plan's own order — the
-	 * strip the card draws with `layer` struck through (BN13). Absent on an
+	 * strip the card draws with `layer` struck through. Absent on an
 	 * envelope refusal, which is about a `step_key` and read no bands.
 	 */
 	layers?: string[];
@@ -274,7 +274,7 @@ export interface BindRefusal {
 	rule?: string | null;
 }
 
-/** What the last draw refused, in the validator's own words (SK31). */
+/** What the last draw refused, in the validator's own words. */
 export interface SkillDrawRefusal {
 	run_id: string;
 	reasons: string[];
@@ -297,9 +297,9 @@ export interface SkillVersion {
 	content: string;
 	when_to_use: string;
 	published_by_id: string | null;
-	/** **Null is the draft** — the one mutable version row (SK20). */
+	/** **Null is the draft** — the one mutable version row. */
 	published_at: string | null;
-	/** One version, exactly one plan (SK13). Never null. */
+	/** One version, exactly one plan. Never null. */
 	plan_id: string;
 	is_draft: boolean;
 }
@@ -335,7 +335,7 @@ export interface SkillVersionDiff {
 
 /**
  * `enough_to_read` is false below a floor the engine owns. Below it the surface
- * says *too few to read* rather than drawing a percentage (US6).
+ * says *too few to read* rather than drawing a percentage.
  */
 export interface SkillUsageVersion {
 	skill_version_id: string;
@@ -390,7 +390,7 @@ export interface SkillUsageResponse {
 
 /**
  * One statement that is always true in its scope. `scope` and `kind` are
- * derived from `project_id` by the engine, never stored twice (RU6).
+ * derived from `project_id` by the engine, never stored twice.
  */
 export interface Rule {
 	id: string;
@@ -413,7 +413,7 @@ export interface Rule {
 
 /**
  * One rule as it reached a step — the wording, and the rule to open
- * ([RU12](../../../docs/for-developers/modules/skills/features/rules.md)).
+ * ([rules.md](../../../docs/for-developers/modules/skills/features/rules.md)).
  *
  * `statement` is the **version's** wording, resolved by the engine from the
  * `rule_version_id` the step recorded, so rewording the rule never rewrites
@@ -438,7 +438,7 @@ export interface RuleUpdate {
 export interface RuleListResponse {
 	items: Rule[];
 	total: number;
-	/** On a Project's list: the Graph invariants it inherits, read-only (C3). */
+	/** On a Project's list: the Graph invariants it inherits, read-only. */
 	inherited: Rule[];
 }
 
@@ -473,7 +473,7 @@ interface RuleCitation {
  *
  * Counted by the engine, never tallied from `items` — that list is a bounded,
  * newest-first window, and a total taken from a page is a different number
- * wearing the same label (RU10).
+ * wearing the same label.
  */
 interface RuleVersionCitations {
 	rule_version_id: string;
@@ -488,7 +488,7 @@ interface RuleVersionCitations {
  *
  * `offered` is a fact written by assembly; `total` is the model's own claim,
  * and the difference is *never cited* — which cannot be told from *never
- * offered* unless both are sent (RU7 · RU9).
+ * offered* unless both are sent.
  */
 export interface RuleCitationsResponse {
 	rule_id: string;
@@ -499,7 +499,7 @@ export interface RuleCitationsResponse {
 	items: RuleCitation[];
 }
 
-/** The Bindings tab's one read (BN10). */
+/** The Bindings tab's one read. */
 export interface SkillAgentsResponse {
 	items: SkillAgentStanding[];
 }

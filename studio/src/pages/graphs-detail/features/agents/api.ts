@@ -105,7 +105,7 @@ export const agentsApi = {
 
 	/**
 	 * What the act would do — the confirm dialog names the open work item by
-	 * item, and the effects are what differ between the two acts (LC8).
+	 * item, and the effects are what differ between the two acts.
 	 */
 	lifecyclePreview: (
 		username: string,
@@ -131,13 +131,13 @@ export const agentsApi = {
 	lineage: (username: string, graphSlug: string, id: string) =>
 		request<AgentLineage>(`${base(username, graphSlug)}/agents/${id}/lineage`),
 
-	/** Both tables of *What this agent can do*, in one read (AG30). */
+	/** Both tables of *What this agent can do*, in one read. */
 	skillsAndCallables: (username: string, graphSlug: string, id: string) =>
 		request<AgentSkillsAndCallables>(
 			`${base(username, graphSlug)}/agents/${id}/skills-and-callables`,
 		),
 
-	/** What it is using now, beside the limits that cap it (AG31). */
+	/** What it is using now, beside the limits that cap it. */
 	meters: (username: string, graphSlug: string, id: string) =>
 		request<AgentMeters>(`${base(username, graphSlug)}/agents/${id}/meters`),
 
@@ -147,7 +147,7 @@ export const agentsApi = {
 			`${base(username, graphSlug)}/agents/${id}/activity`,
 		),
 
-	/** One ask in the current voice and the draft's — not a run (SO8). */
+	/** One ask in the current voice and the draft's — not a run. */
 	previewSoul: (
 		username: string,
 		graphSlug: string,

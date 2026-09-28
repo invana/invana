@@ -1,6 +1,6 @@
 /**
  * A library plan's flow on `TaskFlowCanvas`
- * ([LB35](docs/for-developers/modules/workflows/features/the-library.md)).
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * The same canvas a skill's Flow tab and a run's Flow tab draw on, so a plan,
  * a skill that inlines it and a run of it read as one drawing. Read-only:

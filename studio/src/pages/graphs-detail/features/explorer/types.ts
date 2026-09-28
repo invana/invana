@@ -50,7 +50,7 @@ interface ExpandBase {
 	 *  the expand as a turn in that session's thread. */
 	session_id?: string;
 	/** The world the canvas has picked, exactly as an ask's `lens_id` — the
-	 *  expansion runs under it (graph-canvas.md GC11). */
+	 *  expansion runs under it (graph-canvas.md). */
 	lens_id?: string;
 }
 
@@ -71,7 +71,7 @@ export interface NeighborExpandResponse {
 	limit: number;
 	returned: number;
 	has_more: boolean;
-	/** The `expand-neighbours@1` run this answer came from (GC12). */
+	/** The `expand-neighbours@1` run this answer came from. */
 	run_id?: string | null;
 }
 
@@ -82,7 +82,7 @@ export type ExpandRequest =
 	| { kind: "by-node-type"; body: ExpandByNodeTypeRequest };
 
 /** One type and how many of it the graph holds; `count` is null when the
- *  vendor cannot count (selection-and-the-panel.md SP8). */
+ *  vendor cannot count (selection-and-the-panel.md). */
 export interface TypeCount {
 	name: string;
 	count: number | null;

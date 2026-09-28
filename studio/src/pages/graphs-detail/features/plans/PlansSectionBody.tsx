@@ -1,5 +1,5 @@
 /**
- * The workflow library (docs/for-developers/modules/agents/spec.md, journey J6).
+ * The workflow library (docs/for-developers/modules/agents/spec.md).
  *
  * **Read-only, and it says so.** Authoring a workflow is out of MVP — a spec
  * drives dispatch, so authoring is an execution surface and needs its own
@@ -7,7 +7,7 @@
  * a threat model
  * (docs/for-developers/modules/explore/features/selection-and-the-panel.md).
  *
- * **The section's chrome is the section's** (G43). This body is the list, or —
+ * **The section's chrome is the section's**. This body is the list, or —
  * drilled in — the one record, and nothing else: the header carries the trail,
  * the search, the filter and the acts, and the status bar belongs to the panel.
  *
@@ -15,8 +15,8 @@
  * not a disabled input — and a pin is drawn as a **count**, never as a claim,
  * because a pin lives on one agent's envelope while a library entry is used by
  * N (docs/for-developers/modules/explore/features/selection-and-the-panel.md). The `pinned by` row of agent chips is the precise answer, and
- * it is plural by construction (D3); there is no `Open envelope ›` link,
- * because "which of the N?" has no honest default (D4).
+ * it is plural by construction; there is no `Open envelope ›` link,
+ * because "which of the N?" has no honest default.
  */
 
 import { Sparkline } from "@invana/charts";
@@ -89,10 +89,10 @@ function Band({
 	);
 }
 
-/** A plan's origin — what put it in the library (LB5).
+/** A plan's origin — what put it in the library.
  *
  * `generated` is not here: a one-off plan belongs to its Todo and is never
- * listed, so filtering by it would offer an always-empty list (LB6). */
+ * listed, so filtering by it would offer an always-empty list. */
 export const PLAN_SOURCES = ["builtin", "authored", "promoted"] as const;
 
 /** The intent family a plan's key names. */
@@ -101,22 +101,22 @@ export const PLAN_KINDS = ["nl", "ql"] as const;
 interface Props {
 	username: string;
 	graphSlug: string;
-	/** The section header's live search string (G33) — this body owns no chrome. */
+	/** The section header's live search string — this body owns no chrome. */
 	search: string;
-	/** The section funnel's filters (G33). The body reads them, never owns them. */
+	/** The section funnel's filters. The body reads them, never owns them. */
 	kindFilter: string;
 	sourceFilter: string;
 	selectedKey: string | null;
 	onSelectKey: (key: string | null) => void;
-	/** The step selected on the DAG — the panel's detail swaps to it (D1). */
+	/** The step selected on the DAG — the panel's detail swaps to it. */
 	selectedStepId: string | null;
 	/**
 	 * Promoting is the list's one write, and its control is the section's header
-	 * action — so the flag is the panel's, and this only draws the dialog (G43).
+	 * action — so the flag is the panel's, and this only draws the dialog.
 	 */
 	promoting: boolean;
 	onPromoting: (v: boolean) => void;
-	/** The agent chips *are* the way out (D4). */
+	/** The agent chips *are* the way out. */
 	onOpenAgent?: (agentId: string) => void;
 	exportUrl?: (key: string) => string;
 }
@@ -144,7 +144,7 @@ export function PlansSectionBody({
 	const items = list.data?.items ?? [];
 	const step = detail.data?.nodes.find((n) => n.id === selectedStepId) ?? null;
 
-	// **Drilled in, the body is the record** (G43). The list is not drawn under
+	// **Drilled in, the body is the record**. The list is not drawn under
 	// it, and neither is the list's footer: the section header already reads
 	// `‹ PLANS / nl-single`, and repeating the nine rows beneath the one that was
 	// asked for is what made the detail the last thing in a scrolling column.
@@ -177,7 +177,7 @@ export function PlansSectionBody({
 			{(() => {
 				// The library is reusable plans only, and a reusable plan always has
 				// a key — `key` is null exactly for the generated one-offs this
-				// list never shows (LB6).
+				// list never shows.
 				const rows = items.filter(
 					(w) =>
 						(w.key ?? "").toLowerCase().includes(search.toLowerCase()) &&
@@ -243,7 +243,7 @@ export function PlansSectionBody({
 				open={promoting}
 				onOpenChange={onPromoting}
 				// Land on what you just made: selecting it opens its detail and
-				// draws its flow in one gesture (G42), so a promotion ends by
+				// draws its flow in one gesture, so a promotion ends by
 				// showing the thing it created.
 				onPromoted={onSelectKey}
 			/>
@@ -266,7 +266,7 @@ function TaskPlanDetailBlock({
 	onOpenAgent?: (id: string) => void;
 }) {
 	// A short *does this work?* over the page's default window; the page's
-	// tabs are the long answer (LB22).
+	// tabs are the long answer.
 	const behaved = usePlanPerformanceQuery(
 		username,
 		graphSlug,
@@ -292,7 +292,7 @@ function TaskPlanDetailBlock({
 			{/* **The record names itself first.** The section's trail says the key
 			    and nothing else; the version and the fact that it is published are
 			    what a reader has to know before reading a single row under them —
-			    a published version is immutable (LB1), so *which one am I reading*
+			    a published version is immutable, so *which one am I reading*
 			    is the question the rest of the panel is an answer to. */}
 			<RecordHeader
 				crumbs={[`${workflow.key}@${workflow.version}`]}
@@ -300,7 +300,7 @@ function TaskPlanDetailBlock({
 					<>
 						<DetailStatus>v{workflow.version}</DetailStatus>
 						{/* Every version the library lists is published — a draft is
-						    not selected, not startable and not listed (LB6 · LB8). */}
+						    not selected, not startable and not listed. */}
 						<DetailStatus>published</DetailStatus>
 					</>
 				}
@@ -366,8 +366,7 @@ function TaskPlanDetailBlock({
 				</PropertyList>
 			</Band>
 
-			{/* **How it has behaved** — a different question from *what is it*
-			    (LB10), answered short here and in full on the plan's page. */}
+			{/* **How it has behaved** — a different question from *what is it*, answered short here and in full on the plan's page. */}
 			<Band
 				title="How it has behaved"
 				aside={workflow.runs ? `${workflow.runs} runs` : undefined}
@@ -419,7 +418,7 @@ function TaskPlanDetailBlock({
 
 /**
  * **Versions** — each published version, what changed against the one before
- * it, and how it has fared (LB22 · LB37). A published version is immutable, so
+ * it, and how it has fared. A published version is immutable, so
  * a change is a new row, never an edit.
  */
 function PlanVersions({
@@ -489,7 +488,7 @@ function PlanVersionRow({
 
 /**
  * **Used by** — the callers that inline this plan, and what each tuned
- * ([LB19](docs/for-developers/modules/workflows/features/the-library.md)).
+ * ([the-library.md](docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * Two skills may inline one plan with different arguments and **neither is a
  * fork** — so the value a caller set is the thing worth showing beside its

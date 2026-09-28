@@ -17,7 +17,7 @@ import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 
 /**
- * The offers, in the pane the lessons use (setup.md SU4).
+ * The offers, in the pane the lessons use (setup.md).
  *
  * Setup ends at the first answer — but the answers worth having come from the
  * surfaces below it: an agent that knows the domain, a workflow that pins down

@@ -1,6 +1,6 @@
 /**
  * The Database tab — what the database holds, each row marked against the
- * models (the-model-page.md MP9 · MP26–MP28).
+ * models (the-model-page.md).
  *
  * The rows are the mirror's and the counts are live. Unmodelled rows sort
  * first (the engine's order). A connector that cannot list its indexes says so
@@ -280,7 +280,7 @@ export function databaseRows(
 	];
 }
 
-/** Rows that disagree with the models — the Overview's drift tile (MP9). */
+/** Rows that disagree with the models — the Overview's drift tile. */
 export function driftCount(physical: PhysicalSchema | undefined) {
 	if (!physical?.captured_at) return null;
 	const rows = [

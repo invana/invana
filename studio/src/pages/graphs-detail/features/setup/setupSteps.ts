@@ -11,12 +11,12 @@ import type { LeftNavKey } from "@/pages/graphs-detail/shared/useLeftSection";
  * One list, two renderings: the board on the graph page and the timeline in the
  * Info panel read the same rows, so the sequence cannot say two different things
  * in two places. The engine owns every *fact* about a step — done, required,
- * blocked, broken — and this file owns only the words and the destination (SU2):
+ * blocked, broken — and this file owns only the words and the destination:
  * setup has no forms of its own, so a step opens the panel that already owns
  * that field, with its tab named.
  */
 /** The one Invana idea a step depends on, taught where it is about to be used
- *  (setup.md SU17). Required steps carry one; optional steps do not — a concept
+ *  (setup.md). Required steps carry one; optional steps do not — a concept
  *  is taught at the step that needs it, or not at all. */
 interface SetupConcept {
 	title: string;
@@ -31,21 +31,21 @@ export interface SetupStepMeta {
 	/** One sentence: what the Graph gains by doing this (setup.md 7.1). */
 	why: string;
 	/** Two or three moves, each naming a surface that already exists. Never a
-	 *  form of setup's own (SU2). */
+	 *  form of setup's own. */
 	how: readonly string[];
 	/** The fact that proves the step landed — what to look at, not a button to
-	 *  press. Setup is derived, so there is no "I've done it" (SU1). */
+	 *  press. Setup is derived, so there is no "I've done it". */
 	looksRight: string;
-	/** The product lesson (SU17). Required steps only. */
+	/** The product lesson. Required steps only. */
 	concept?: SetupConcept;
 	/** The docked panel it opens. Switched in place via
 	 *  `useLeftSection().setSection` rather than navigated to: the step lives
 	 *  inside the page, so this is not navigation. */
 	settingsSection: LeftNavKey;
-	/** The tab inside that panel, where it has more than one (G24). */
+	/** The tab inside that panel, where it has more than one. */
 	settingsTab?: string;
-	/** The command that does the same thing at a terminal, where one exists
-	 *  (SU6). `{graph}` is replaced with `owner/slug`. Importing has no Studio
+	/** The command that does the same thing at a terminal, where one exists.
+	 * `{graph}` is replaced with `owner/slug`. Importing has no Studio
 	 *  write path at all, which is why the row carries it. */
 	command?: string;
 }
@@ -124,7 +124,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 	{
 		// The step keeps the `datasets` key — it is a persisted `setup_state`
 		// field — but it opens the Imports journal, which is where a load shows up
-		// (inspect-what-landed.md IW7).
+		// (inspect-what-landed.md).
 		key: "datasets",
 		label: "Bring data in",
 		description: "Import records against a published model.",
@@ -140,7 +140,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "Every answer traces back LLM \u2192 query \u2192 record \u2192 dataset. Nothing is invented to fill a gap — when the graph cannot answer, Invana says so.",
 		},
 		// A load is a TaskRun, so the step lands on the journal that lists them —
-		// the Runs panel, not an Imports panel (SR7 · G30 · G41).
+		// the Runs panel, not an Imports panel.
 		settingsSection: "runs",
 		// Copied and run as-is, so it is the command's real signature: the group
 		// is `records` (a Dataset is not a container, so the group names the
@@ -165,7 +165,7 @@ export const SETUP_STEPS: readonly SetupStepMeta[] = [
 			body: "Invana sends the question and the schema, never the database. The provider writes a query; the engine runs it against your records.",
 		},
 		// `Agents › LLMs` — the providers left Settings when an agent stopped
-		// binding one (PM6). A stacked panel takes a section where a tabbed one
+		// binding one. A stacked panel takes a section where a tabbed one
 		// takes a tab, and `settingsTab` names whichever that section has.
 		settingsSection: "agents",
 		settingsTab: "llms",
@@ -214,7 +214,7 @@ export function setupCommand(
 }
 
 /**
- * What comes after ready — offers, not steps (SU4). None of these carries a
+ * What comes after ready — offers, not steps. None of these carries a
  * status: a product that opens with nine unfinished obligations reads as
  * homework.
  *
@@ -244,7 +244,7 @@ export const WHAT_NEXT: readonly {
 		label: "Build a plan",
 		description:
 			"Name the tasks a good answer takes, so the next one takes them too.",
-		// A workflow is a reusable TaskPlan, listed in Library › Plans (SR5 · G41).
+		// A workflow is a reusable TaskPlan, listed in Library › Plans.
 		settingsSection: "library",
 	},
 	{

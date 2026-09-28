@@ -1,12 +1,12 @@
 /**
- * R3 · two runs, one question, two worlds — **the diff is the deliverable**.
+ * two runs, one question, two worlds — **the diff is the deliverable**.
  *
  * *As someone whose answer changed when the world changed, I want to see what
  * the second run read that the first did not, so that I know why the answers
  * differ rather than guessing from two pieces of prose.*
  *
  * **Compare is two runs, not a diff engine**
- * ([WO4](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
+ * ([worlds.md](../../../../../docs/for-developers/modules/govern/features/worlds.md)).
  * Both runs happened for real, under their own lenses, and their traces are
  * placed side by side. Nothing here is simulated and no answer is synthesised
  * from another — which is also why comparing costs money, and why the page
@@ -134,7 +134,7 @@ export function CompareBoardPage({
 					value={String(shared.length)}
 					caption="read by both"
 				/>
-				{/* WO18 — two counts, because they are two facts. *Only one reached
+				{/* — two counts, because they are two facts. *Only one reached
 				    it* and *both reached it and read it differently* are different
 				    findings, and one number covering both is how *differed 0* got
 				    printed for two runs that narrowed the same model two ways. */}
@@ -208,7 +208,7 @@ export function CompareBoardPage({
 
 /**
  * One participant both runs reached — and, where they narrowed it differently,
- * what each one did to it (WO18).
+ * what each one did to it.
  *
  * The chip alone is the honest drawing when the two runs read it the same way:
  * there is nothing more to say, and a row of empty diffs under every shared
@@ -268,7 +268,7 @@ function describeApplied(field: AppliedField, value: unknown): string {
 	if (typeof value === "object") {
 		const entries = Object.entries(value as Record<string, unknown>);
 		if (!entries.length) return "nothing";
-		// Keyed by type for `select` and `properties_excluded` (WO17), so the
+		// Keyed by type for `select` and `properties_excluded`, so the
 		// type is named rather than left for the reader to infer from the shape.
 		return entries
 			.map(([type, detail]) =>

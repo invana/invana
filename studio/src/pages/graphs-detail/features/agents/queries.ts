@@ -57,7 +57,7 @@ export function useAgentLineageQuery(
 
 /**
  * What pausing or retiring would do to this agent's open work. One hook for
- * both acts (LC8) — the act is part of the key, so switching between them
+ * both acts — the act is part of the key, so switching between them
  * refetches rather than showing the other act's effects.
  */
 export function useLifecyclePreviewQuery(
@@ -80,7 +80,7 @@ export function useLifecyclePreviewQuery(
 	});
 }
 
-/** Skills and callables, both tables (AG30). */
+/** Skills and callables, both tables. */
 export function useAgentSkillsAndCallablesQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
@@ -99,7 +99,7 @@ export function useAgentSkillsAndCallablesQuery(
 	});
 }
 
-/** The meters — every number derived on read (AG31). */
+/** The meters — every number derived on read. */
 export function useAgentMetersQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
@@ -116,7 +116,7 @@ export function useAgentMetersQuery(
 
 /**
  * The caller's own sessions bound to this agent. Sessions stay private to
- * whoever opened them; the Graph-wide number is `meters.sessions` (AG31).
+ * whoever opened them; the Graph-wide number is `meters.sessions`.
  */
 export function useAgentSessionsQuery(
 	username: string | undefined,
@@ -138,7 +138,7 @@ export function useAgentSessionsQuery(
 
 /**
  * The soul preview. A mutation, not a query: it is two model calls the author
- * asks for, never something a re-render may fire (SO8).
+ * asks for, never something a re-render may fire.
  */
 export function useSoulPreviewMutation(
 	username: string,
@@ -159,7 +159,7 @@ export function useAgentMutations(username: string, graphSlug: string) {
 		qc.invalidateQueries({ queryKey: ["agents", username, graphSlug] });
 		qc.invalidateQueries({ queryKey: ["tasks", username, graphSlug] });
 		// A binding change moves rows between the skill's bound / refused / not
-		// bound sections, and those come from the skill's own read (BN10).
+		// bound sections, and those come from the skill's own read.
 		qc.invalidateQueries({ queryKey: ["skills", username, graphSlug] });
 	};
 

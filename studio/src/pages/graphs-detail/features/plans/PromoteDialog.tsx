@@ -1,6 +1,5 @@
 /**
- * **Promote a plan** — the workflow library's only write (docs/for-developers/modules/agents/spec.md,
- * journey J6).
+ * **Promote a plan** — the workflow library's only write (docs/for-developers/modules/agents/spec.md).
  *
  * Authoring a workflow from scratch is post-MVP, because a spec drives dispatch
  * and authoring one is therefore an execution surface with its own threat

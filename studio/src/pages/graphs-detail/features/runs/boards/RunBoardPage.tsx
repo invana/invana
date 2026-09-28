@@ -1,6 +1,6 @@
 /**
  * The run page — a report header over tabs, and a step opened **inside** it
- * ([SR71 · SR72](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  *
  * One page in `BoardPagesViewPanel`, `run:<id>`. Without a step it reads the
  * run: `Overview · Layers · Flow · Touched`. With `?step=` it keeps the run's
@@ -11,7 +11,7 @@
  * The page fetches and answers actions. It composes nothing and renders no
  * panel: the two composers build the document, `@invana/dashboard` draws it,
  * and everything a person can do arrives back here as one `onAction(id, ctx)`
- * because a function is not JSON ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * because a function is not JSON ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
 import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
@@ -53,11 +53,11 @@ export interface RunBoardPageProps {
 	runId: string;
 	/** The step open inside the run, from `?step=`, or `null` for the run. */
 	stepId: string | null;
-	/** Open a task inside this run — `null` returns to the run (SR72). */
+	/** Open a task inside this run — `null` returns to the run. */
 	onOpenStep: (stepId: string | null) => void;
 	/**
 	 * `Retune` — open Govern beside the run, without closing it
-	 * ([SR12](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+	 * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
 	 */
 	onRetune?: () => void;
 	/** Open `compare:<this>:<that>` as a page once the second run is picked. */
@@ -84,7 +84,7 @@ export function RunBoardPage({
 }: RunBoardPageProps) {
 	const trace = useRunTrace(username, graphSlug, runId);
 	// A **second** read beside the trace. `run_touches` is a projection of the
-	// ledger rather than part of it (GV20), and a run that opened before its
+	// ledger rather than part of it, and a run that opened before its
 	// Graph had a lens has a trace and no touches.
 	const touches = useRunTouchesQuery(username, graphSlug, runId);
 	const client = useQueryClient();
@@ -94,7 +94,7 @@ export function RunBoardPage({
 	const [runTab, setRunTab] = useState<RunTab>("overview");
 	const [stepTab, setStepTab] = useState<StepTab>("overview");
 	const [comparing, setComparing] = useState(false);
-	// The layer strip's `Fit` — a view of this page, not a place a link carries (SR69).
+	// The layer strip's `Fit` — a view of this page, not a place a link carries.
 	const [layersFit, setLayersFit] = useState(true);
 
 	const engaged = touches.data?.total ? touches.data : undefined;
@@ -126,7 +126,7 @@ export function RunBoardPage({
 		return composed as unknown as DashboardSpec<PagePanels>;
 	}, [trace.data, context, view, stepTab, runTab, engaged, layersFit]);
 
-	// `Save report` on the header, and the act behind it (B6). The document
+	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved, every tab included.
 	const report = useReport(spec);
 
@@ -186,7 +186,7 @@ export function RunBoardPage({
 								return;
 							default:
 								// `open-artifact` has nowhere to go until artifacts are
-								// stored (SR34); the row is still listed.
+								// stored; the row is still listed.
 								return;
 						}
 					}

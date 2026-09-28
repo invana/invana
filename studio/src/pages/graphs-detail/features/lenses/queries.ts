@@ -1,7 +1,7 @@
 /**
  * Govern queries — worlds, guardrails and the participant catalogue.
  *
- * The catalogue is **resolved, never stored** (GV21): it is a view over the
+ * The catalogue is **resolved, never stored**: it is a view over the
  * Graph's published model versions, its stitches and its configured providers,
  * so a cached copy goes stale the moment a model publishes. That is why the
  * catalogue queries carry a short `staleTime` and every lens mutation

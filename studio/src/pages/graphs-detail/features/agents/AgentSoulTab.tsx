@@ -1,11 +1,11 @@
 /**
  * Soul — who the agent is and how it speaks (5.8): four voice dials beside the
  * Markdown, and a preview that answers one ask in the current voice and in the
- * draft (SO7 · SO8).
+ * draft.
  *
- * The dials and the soul reach only the steps a person reads (SO2), so nothing
+ * The dials and the soul reach only the steps a person reads, so nothing
  * here can change what the agent may do. An empty soul is Invana's default
- * voice, never no voice (SO3) — the editor shows it as its placeholder and the
+ * voice, never no voice — the editor shows it as its placeholder and the
  * tab says so.
  */
 

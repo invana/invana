@@ -104,7 +104,7 @@ export function usePlanDiffQuery(
 	});
 }
 
-/** Every version's diff at once — the Versions page's column (LB38). */
+/** Every version's diff at once — the Versions page's column. */
 export function usePlanDiffsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
@@ -150,7 +150,7 @@ export function usePlanExportQuery(
 	});
 }
 
-/** How a plan has behaved over a window (LB33 · LB36). */
+/** How a plan has behaved over a window. */
 export function usePlanPerformanceQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,
@@ -174,7 +174,7 @@ export function usePlanPerformanceQuery(
 	});
 }
 
-/** Every run of a plan, 50 a page — `Show 50 more` fetches the next (LB34). */
+/** Every run of a plan, 50 a page — `Show 50 more` fetches the next. */
 export function usePlanRunsQuery(
 	username: string | undefined,
 	graphSlug: string | undefined,

@@ -1,15 +1,15 @@
 import { useCallback } from "react";
 import { useStackSections } from "@/pages/graphs-detail/shared/useStackSections";
 
-// **Projects owns Todos** (projects-and-tasks.md PT7). A Todo without its
+// **Projects owns Todos** (projects-and-tasks.md). A Todo without its
 // project is a to-do list, and the project is the thing it is for — so the
 // panel is a stack of two sections, `Projects` over `Todos`, the same shape the
-// Tasks panel takes (G33). With no project selected the Todos section is every
+// Tasks panel takes. With no project selected the Todos section is every
 // Todo in the Graph, which is the *No project* bucket: a Todo nobody filed is
 // still work somebody wrote.
 //
 // The rail's **Tasks** icon is execution only — `TaskRun`s, `TaskPlan`s and the
-// catalogue, never Todos (PT7 · SR3).
+// catalogue, never Todos.
 export type ProjectsSectionKey = "projects" | "todos";
 
 const PROJECTS_SECTION_KEYS: readonly ProjectsSectionKey[] = [

@@ -1,7 +1,7 @@
 /**
  * `plan_versions` · `plan_arguments` · `plan_export` — what `⋯` opens on a
  * plan's page, each as its own page beside it
- * ([LB38](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
+ * ([the-library.md](../../../../../../../docs/for-developers/modules/workflows/features/the-library.md)).
  *
  * They fetch and answer actions; `planRecordSpecs` builds each document.
  */

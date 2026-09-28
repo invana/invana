@@ -185,7 +185,7 @@ const DEFAULT_NODE_SIZE = 16;
 const DEFAULT_EDGE_WIDTH = 1.5;
 
 // Forces for the registered active layout (run on every query repaint by
-// `<AutoLayoutBridge>` and on every node-expand). `animate: false` (GC8): the
+// `<AutoLayoutBridge>` and on every node-expand). `animate: false`: the
 // sim solves off-screen and the graph is drawn once, at its settled positions —
 // no per-tick repaint, and nothing drifts out from under the cursor.
 //
@@ -751,7 +751,7 @@ function AutoLayoutBridge({
 	// the data it lays out, so the layer's placement gate lifts against a flush
 	// that has already happened and no shape is installed — the store and the
 	// minimap hold the graph, the viewport stays empty. `redraw()` is a pure
-	// render pass over the store (same fix as GraphModelCanvas, ME25).
+	// render pass over the store (same fix as GraphModelCanvas).
 	useCanvasEvent("layout:run:end", (e) => {
 		if (e.id !== ACTIVE_LAYOUT_ID || !canvas) return;
 		canvas.layers.get<graph.GraphLayer>("graph")?.redraw();

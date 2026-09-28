@@ -8,7 +8,7 @@
  *
  * Two panels hide things — the Layers tree, one element at a time, and the
  * Explorer panel's type rows, a whole type at a time
- * (selection-and-the-panel.md SP7). One mechanism serves both, so the pending
+ * (selection-and-the-panel.md). One mechanism serves both, so the pending
  * canvas-API cleanup lands in one place and the two never disagree about what
  * "hidden" means.
  */
@@ -50,7 +50,7 @@ export function setNodeHidden(
 /**
  * Hide/show every node of one type, in one batch.
  *
- * A type row's eye is a canvas control, not a query (SP7): nothing re-runs, and
+ * A type row's eye is a canvas control, not a query: nothing re-runs, and
  * the graph-wide count on the row does not move — only the footer's totals,
  * which count what is shown.
  */

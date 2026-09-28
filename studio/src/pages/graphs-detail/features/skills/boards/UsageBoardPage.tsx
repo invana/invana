@@ -5,7 +5,7 @@
  * One read, one document. The version picked in the header is **state on the
  * page, not an address**: every published version comes back in the same
  * response, so moving between them redraws rather than opening a tab
- * ([US7](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
+ * ([usage.md](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
 import { Dashboard } from "@invana/dashboard";
@@ -28,7 +28,7 @@ export interface UsageBoardPageProps {
 	skillId: string;
 	/** `The skill` — back to what the numbers are about. */
 	onOpenSkill: (skillId: string) => void;
-	/** A step row — opens the run that step came from (C6). */
+	/** A step row — opens the run that step came from. */
 	onOpenRun?: (runId: string) => void;
 }
 
@@ -53,7 +53,7 @@ export function UsageBoardPage({
 		[skill, usage.data, view, version],
 	);
 
-	// `Save report` on the header, and the act behind it (B6). The document
+	// `Save report` on the header, and the act behind it. The document
 	// it keeps is `spec` — this page's reading, resolved — never the subject.
 	const report = useReport(spec);
 

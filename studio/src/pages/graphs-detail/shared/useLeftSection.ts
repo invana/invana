@@ -18,7 +18,7 @@ import { LEGACY_SECTION_PARAM, SECTION_PARAM } from "./useStackSections";
 // separate Modeller page is retired, so `schema` redirects onto `model` and
 // `messages` onto `sessions`.
 //
-// **`tasks` and `templates` are gone** (graph-detail-page.md G31 · G38 · G41).
+// **`tasks` and `templates` are gone** (graph-detail-page.md).
 // Execution and definition are two panels — `runs` (the journal, a list) and
 // `library` (Plans · Catalogue · Templates, a stack) — and Templates has no icon
 // of its own any more. Both old keys name surfaces that no longer exist and are
@@ -44,7 +44,7 @@ export type LeftNavKey =
 
 const DEFAULT_SECTION: LeftNavKey = "info";
 
-// One param per axis of the page (graph-detail-page.md G16):
+// One param per axis of the page (graph-detail-page.md):
 //
 //   ?panel=  the left column's open section — this hook
 //   ?page=   what fills mainSection (the canvas pages strip)
@@ -59,9 +59,9 @@ export const PANEL_PARAM = "panel";
 export const LEGACY_PANEL_PARAM = "settings";
 
 // A stacked panel's own keys (useStackSections): which section holds the height,
-// and what is drilled into inside it (G31 · G35). **Library** (Plans ·
+// and what is drilled into inside it. **Library** (Plans ·
 // Catalogue · Templates) and **Projects** (Projects · Todos) are the two stacks;
-// **Runs** is a list, so it carries `run` and no `sectionKey` (G33). These are
+// **Runs** is a list, so it carries `run` and no `sectionKey`. These are
 // dropped whenever the section changes, exactly as `?tab=` is — a run left in
 // the URL under a different rail icon names a body that is not on screen.
 export const STACK_PARAMS = [
@@ -87,13 +87,13 @@ const STACK_KEYS_OF: Partial<Record<LeftNavKey, readonly string[]>> = {
 	runs: ["run"],
 	library: [SECTION_PARAM, "plan", "entry", "template"],
 	projects: [SECTION_PARAM, "project", "todo"],
-	// **Govern** is the third stack — Worlds over Guardrails (GV17). Both keys
+	// **Govern** is the third stack — Worlds over Guardrails. Both keys
 	// name a `Lens` id, because a guardrail and a world are one record separated
-	// by `kind` (GV1); they are two keys because reading the ceiling is not
+	// by `kind`; they are two keys because reading the ceiling is not
 	// reading the world drawn inside it.
 	govern: [SECTION_PARAM, "world", "guardrail"],
-	// **Agents** is the fourth stack — Agents over the LLMs
-	// (PM6 · GV18). `agent` is an agent's own surface, `provider` one
+	// **Agents** is the fourth stack — Agents over the LLMs.
+	// `agent` is an agent's own surface, `provider` one
 	// configured endpoint and the models it offers.
 	agents: [SECTION_PARAM, "agent", "provider"],
 };
@@ -136,7 +136,7 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 // **`tasks`, `templates`, `imports`, `workflows` and `datasets` are not here,
 // and never will be.** They name surfaces that no longer exist, and the flows
 // behind them are folded into `runs` and `library` in the same slice their
-// panels are deleted — so they are **deleted, not redirected** (G31). A stale
+// panels are deleted — so they are **deleted, not redirected**. A stale
 // link lands on the graph page, which is what an unknown `?panel` has always
 // done. No backward compatibility is kept anywhere in this refactor; a redirect
 // table is a second vocabulary to maintain for links that are weeks old.
@@ -146,7 +146,7 @@ const KNOWN_SECTIONS: readonly LeftNavKey[] = [
 const ALIASES: Partial<Record<string, LeftNavKey>> = {
 	schema: "model",
 	// The providers left Graph settings: a provider is what an agent's cast
-	// resolves against, so it is read where agents are (PM6 · GV18). The old key
+	// resolves against, so it is read where agents are. The old key
 	// lands on the panel that holds them, whose LLMs section is one click down.
 	llms: "agents",
 	// Stitching moved into the Model panel and the union became a page
@@ -155,11 +155,11 @@ const ALIASES: Partial<Record<string, LeftNavKey>> = {
 	links: "model",
 	messages: "sessions",
 	// Layers left the left column: it is a canvas control on the page strip
-	// (graph-detail-page.md G18). A bookmark lands on the Explorer's type list —
+	// (graph-detail-page.md). A bookmark lands on the Explorer's type list —
 	// the other panel that reads the canvas beside it.
 	layers: "explorer",
 	// The connection is a field group in the one settings form, not a page of its
-	// own (docs/for-developers/modules/connect-and-model/features/connect-a-database.md CD6).
+	// own (docs/for-developers/modules/connect-and-model/features/connect-a-database.md).
 	// The key stays as an alias so a bookmark lands on the group rather than 404ing.
 	connection: "settings",
 };

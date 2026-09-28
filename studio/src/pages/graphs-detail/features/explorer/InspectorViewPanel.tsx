@@ -20,7 +20,7 @@ interface InspectorViewPanelProps {
 	/**
 	 * Elements the graph no longer holds, found when the canvas reopened.
 	 *
-	 * They stay drawn and are **marked** here (graph-canvas.md GC5) — a canvas
+	 * They stay drawn and are **marked** here (graph-canvas.md) — a canvas
 	 * that quietly dropped them would be claiming the exploration went differently
 	 * than it did.
 	 */
@@ -104,7 +104,7 @@ export function InspectorViewPanel({
 					)}
 
 					{/* Where it came from, before what it says — a value you cannot
-					    trace is a value you cannot use (IW1). */}
+					    trace is a value you cannot use. */}
 					<ProvenanceBlock
 						provenance={readProvenance(item.properties)}
 						modelName={(() => {

@@ -67,7 +67,7 @@ export function resultToItems(result: QueryResponse | null): QueryResultItem[] {
 
 /**
  * What a failed expansion says. A refusal names what the world lacks, and a
- * queued run says so — neither is "failed" (graph-canvas.md GC13).
+ * queued run says so — neither is "failed" (graph-canvas.md).
  */
 export function expandRefusal(err: unknown): string {
 	const detail =

@@ -1,21 +1,21 @@
 /**
  * **Agents** — one rail icon, one panel, two sections
- * ([PM6](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md) ·
- * [GV18](../../../../../docs/for-developers/modules/govern/spec.md) · G32 · G33).
+ * ([providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md) ·
+ * [spec.md](../../../../../docs/for-developers/modules/govern/spec.md)).
  *
  * `Agents` over `LLMs`, stacked, with no panel header above them: the first
  * section header is the top of the column, and the breadcrumb already says which
- * panel is open (G16).
+ * panel is open.
  *
  * **The agents lead, and the endpoints are one section down.** A person arrives
  * at Agents to see who is working; they reach the LLMs section from a cast that
  * names an endpoint, or from a refusal saying the Graph offers no model. The
  * providers were a tab of Graph settings while an agent bound one — an agent
- * binds no provider now ([PM1](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)),
+ * binds no provider now ([providers-and-models.md](../../../../../docs/for-developers/modules/agents/features/providers-and-models.md)),
  * and what it resolves against belongs beside it.
  *
  * **The lenses are read here, once.** The LLMs section needs *who casts this
- * model* to say whether removing one is safe (PM11), and that is the same list
+ * model* to say whether removing one is safe, and that is the same list
  * Govern draws — one query, read where it is needed, never a counter on the
  * model row.
  */
@@ -47,7 +47,7 @@ export interface AgentsViewPanelProps {
 	/** The agent the canvas is drawing. Selection, not the drill-in. */
 	selectedAgentId: string | null;
 	onSelectAgent: (id: string | null) => void;
-	/** Opens the agent's page in `mainSection` (AG34). */
+	/** Opens the agent's page in `mainSection`. */
 	onOpenAgentPage: (id: string) => void;
 	selectedEdge?: AgentEdge | null;
 	onOpenLineage?: (agentId: string) => void;
@@ -72,7 +72,7 @@ export function AgentsViewPanel({
 	const lenses = useLensesQuery(username, graphSlug);
 	// Held here, not in the list: the funnel in the section's header and the
 	// rows under it read the same filters, and the count beside the title is
-	// the rows they leave (AG36).
+	// the rows they leave.
 	const [filters, setFilters] = useState<AgentFilters>(NO_AGENT_FILTERS);
 	const agentList = useAgentsQuery(username, graphSlug, {
 		includeEphemeral: true,
@@ -83,7 +83,7 @@ export function AgentsViewPanel({
 		: undefined;
 
 	// `PanelStack` reads `defaultSize` at **mount**, so this is the opening split
-	// only (G35) — after that it is the reader's. **A Graph has many agents and
+	// only — after that it is the reader's. **A Graph has many agents and
 	// two or three endpoints**, so the split is not even.
 	const size = (d: AgentsSectionKey) =>
 		d === "agents"
@@ -96,7 +96,7 @@ export function AgentsViewPanel({
 
 	// A drill-in expands the section holding it — the URL now names something to
 	// look at, and rendering it into a collapsed section makes the click look
-	// like it did nothing (G35).
+	// like it did nothing.
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
 		agents.sectionKey === "agents" ? agents.agentId : agents.providerId;
@@ -109,13 +109,13 @@ export function AgentsViewPanel({
 
 	// `&agent=` was the drill-in when the page lived in this section. A link that
 	// still carries it opens the page, and the key is dropped — read, never
-	// written (AG34).
+	// written.
 	//
 	// **Two writes, one after the other.** Dropping `&agent=` and opening the
 	// page (`?page=`) are two writers of one query string; in one tick the
 	// second is composed against the string as it was before the first, and
 	// `?page=` is lost. So the key is dropped first, and the page opens once that
-	// write has landed — the same order Govern's drill-in keeps (WO15).
+	// write has landed — the same order Govern's drill-in keeps.
 	const legacyAgentId = agents.agentId;
 	const { openAgent } = agents;
 	const pendingPage = useRef<string | null>(null);

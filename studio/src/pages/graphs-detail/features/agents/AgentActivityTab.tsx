@@ -1,13 +1,13 @@
 import { usd, usdWhole } from "@/lib/format";
 
 /**
- * Activity — what the agent is using and has done (AG23): the meters, each
+ * Activity — what the agent is using and has done: the meters, each
  * beside the limit that caps it, its runs, its sessions, its lineage and its
  * event feed.
  *
  * **Sessions are private to whoever opened them.** The Graph-wide number is a
  * count, `meters.sessions`, which names no thread; the list under it is the
- * reader's own (AG31 · AG32).
+ * reader's own.
  */
 
 import {
@@ -43,7 +43,7 @@ import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
 import { useLeftSection } from "@/pages/graphs-detail/shared/useLeftSection";
 import { PanelSection } from "@/ui/PanelSection";
 
-/** How a run ended, in the reader's words and tone (CA8). */
+/** How a run ended, in the reader's words and tone. */
 function outcomeOf(run: TaskRunSummary): { text: string; tone: string } {
 	if (!run.finished_at && run.status !== "failed" && run.status !== "cancelled")
 		return {
@@ -95,7 +95,7 @@ function Meters({ m }: { m: AgentMeters }) {
 				value={m.sessions.toLocaleString()}
 				caption="asking through it"
 			/>
-			{/* Absent is not zero (AG11): a month with no priced run draws a dash,
+			{/* Absent is not zero: a month with no priced run draws a dash,
 			    never a reassuring $0.00. */}
 			<MetricTile
 				label="Spent"
@@ -140,7 +140,7 @@ export function AgentActivityTab({
 	const sessions = useAgentSessionsQuery(username, graphSlug, agent.id);
 	const lineage = useAgentLineageQuery(username, graphSlug, agent.id);
 	const runsPanel = useLeftSection();
-	// Limits read as text until Edit, as drawn (AG38).
+	// Limits read as text until Edit, as drawn.
 	const [editingLimits, setEditingLimits] = useState(false);
 	const m = meters.data;
 	const children = (lineage.data?.nodes ?? []).filter(
@@ -148,7 +148,7 @@ export function AgentActivityTab({
 	);
 	const mine = sessions.data?.items ?? [];
 	// What a run reads where the agent is silent: the meters carry every
-	// effective ceiling (AG31), so the page shows the Graph's number, not a dash.
+	// effective ceiling, so the page shows the Graph's number, not a dash.
 	const ceilings = m
 		? Object.fromEntries(
 				Object.entries(m).filter(

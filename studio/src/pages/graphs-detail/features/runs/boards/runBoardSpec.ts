@@ -1,20 +1,20 @@
 import { usd } from "@/lib/format";
 
 /**
- * The run dashboard, composed — artboard **D1** ([34k](../../../../../../docs/for-developers/the-screens.md)).
+ * The run dashboard, composed — artboard ([34k](../../../../../../docs/for-developers/the-screens.md)).
  *
- * A pure function of one `GET …/runs/{id}/trace` ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
+ * A pure function of one `GET …/runs/{id}/trace` ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * tiles · the flow with status on it · the Gantt · what opened the run and
  * `result.json` · the log. Nothing here fetches, nothing here renders — the
  * page does the first and `@invana/dashboard` does the second, and this file is
  * the whole of what the two have to agree on.
  *
  * Bands with nothing behind them are **absent, not empty**
- * ([SR34](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
+ * ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)):
  * a run whose model has no published rate draws no Cost tile, and a run with no
  * agent draws its spend with no meter — because a spend without its ceiling is
- * a number nobody can act on ([SR20](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
- * [SR41](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
+ * a number nobody can act on ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md) ·
+ * [see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
 import type {
@@ -67,23 +67,23 @@ import { LAYER_PALETTE } from "@/ui/layerPalette";
 export const RUN_ACTIONS = {
 	view: VIEW_ACTION,
 	cancel: "cancel",
-	/** A waterfall row — opens that task inside the run (SR72), by group key. */
+	/** A waterfall row — opens that task inside the run, by group key. */
 	selectTask: "select-task",
-	/** A flow card — opens that task inside the run (SR72), by step id. */
+	/** A flow card — opens that task inside the run, by step id. */
 	openStep: "open-step",
 	/** A column of the layer strip — opens that task inside the run, by group key. */
 	selectTouchStep: "select-touch-step",
-	/** The tab strip under the header (SR71). */
+	/** The tab strip under the header. */
 	tab: "tab",
-	/** *This run's lens* → the Govern panel, without closing the run (SR12). */
+	/** *This run's lens* → the Govern panel, without closing the run. */
 	retune: "retune",
-	/** Pick the second run, and open `compare:<a>:<b>` as a page (R3 · WO4). */
+	/** Pick the second run, and open `compare:<a>:<b>` as a page. */
 	compare: "compare",
-	/** The layer strip's `Fit` switch — on fits the panel, off scrolls (SR69). */
+	/** The layer strip's `Fit` switch — on fits the panel, off scrolls. */
 	layersFit: "layers-fit",
 } as const;
 
-/** The run page's tabs, in order (SR71). */
+/** The run page's tabs, in order. */
 const RUN_TABS = ["overview", "layers", "flow", "touched"] as const;
 export type RunTab = (typeof RUN_TABS)[number];
 
@@ -95,11 +95,11 @@ export interface RunBoardView {
 	/** The task picked on the waterfall or the strip, by group key. */
 	selectedKey: string | null;
 	/**
-	 * What the run engaged — R1's two bands
+	 * What the run engaged — 's two bands
 	 * ([14.1](../../../../../../docs/for-developers/modules/govern/features/worlds.md)).
 	 *
 	 * A **second** read beside the trace, because it is a projection of the
-	 * ledger rather than part of it (GV20) and a run opened before its Graph had
+	 * ledger rather than part of it and a run opened before its Graph had
 	 * a lens has a trace and no touches. Absent, the two bands are **absent** —
 	 * never an empty grid, which would say the run touched nothing.
 	 */
@@ -138,7 +138,7 @@ export function runBoardSpec(
 
 	const header: DashboardSpec<RunPanels>["header"] = {
 		tone: toneOf(trace.status),
-		// Addressed, not titled (SR54): what was asked is the Overview's first row.
+		// Addressed, not titled: what was asked is the Overview's first row.
 		crumbs: [runAddress(trace.run_id)],
 		chips: omit([
 			trace.ask_kind ? { label: trace.ask_kind } : null,
@@ -163,7 +163,7 @@ export function runBoardSpec(
 						variant: "ghost" as const,
 					},
 			// Narrowing opens Govern beside the run rather than inside a band
-			// (SR12) — it acts on the next run, not on this reading of this one,
+			// — it acts on the next run, not on this reading of this one,
 			// which is why it sits with the page's other acts. Absent when
 			// nothing was recorded: there is no gap to act on.
 			touches
@@ -173,7 +173,7 @@ export function runBoardSpec(
 						variant: "ghost" as const,
 					}
 				: null,
-			// Cancel is the one thing this surface writes (SR8), and only while
+			// Cancel is the one thing this surface writes, and only while
 			// there is something to stop.
 			live
 				? {
@@ -204,14 +204,14 @@ export function runBoardSpec(
 
 	// `spec.json` renders the document it is inside — the same spec, in one code
 	// panel — which is what makes "a dashboard is data" checkable rather than
-	// claimed ([CV13](../../../../../../docs/for-developers/modules/explore/features/boards.md)).
+	// claimed ([boards.md](../../../../../../docs/for-developers/modules/explore/features/boards.md)).
 	return view === VIEW_SPEC
 		? { ...spec, tabs: undefined, rows: [{ panels: [specPanel(spec)] }] }
 		: spec;
 }
 
 /**
- * The four tabs (SR71). **Overview** reads the run at a glance — tiles, the
+ * The four tabs. **Overview** reads the run at a glance — tiles, the
  * waterfall, what it touched, what opened it and what it returned, its log;
  * **Layers** is the strip on the run's clock; **Flow** the plan with status on
  * it; **Touched** every participant the world allowed, and what became of it.
@@ -292,7 +292,7 @@ function runTabs(
 	];
 }
 
-/** A tab whose record nobody wrote says so, rather than drawing an empty box (SR34). */
+/** A tab whose record nobody wrote says so, rather than drawing an empty box. */
 function notRecorded(title: string): PanelSpec<RunPanels> {
 	return {
 		kind: "text",
@@ -305,7 +305,7 @@ function notRecorded(title: string): PanelSpec<RunPanels> {
 }
 
 /**
- * R1 · the six bands as a gantt — time across, refusals struck in place.
+ * the six bands as a gantt — time across, refusals struck in place.
  *
  * The trace goes in beside the ledger because a touch has no clock of its own:
  * its bar is the window of the step it belongs to, and without that the strip
@@ -323,7 +323,7 @@ function layerStrip(
 			selectAction: RUN_ACTIONS.selectTouchStep,
 		}),
 		// On, every step stays in the panel's width as it is resized; off, the
-		// bars keep a measurable width and the strip scrolls (SR69).
+		// bars keep a measurable width and the strip scrolls.
 		fit: layersFit,
 	};
 
@@ -335,8 +335,8 @@ function layerStrip(
 		flush: true,
 		// Not an empty track. *Nothing was recorded* and *nothing was touched*
 		// are different facts, and an empty axis says the second while meaning
-		// the first — so the band says which one it is (SR34).
-		// Told apart by the lens, not the count (SR68): a governed run with no
+		// the first — so the band says which one it is.
+		// Told apart by the lens, not the count: a governed run with no
 		// touches engaged nothing, and its six bands draw muted.
 		absent: trace.governed
 			? undefined
@@ -348,17 +348,17 @@ function layerStrip(
 	};
 }
 
-/** R1 · the counts the retune rests on — allowed · touched · never · refused. */
+/** · the counts the retune rests on — allowed · touched · never · refused. */
 function lensTiles(touches: TouchesResponse): PanelSpec<RunPanels> {
 	return { kind: "metrics", options: { tiles: lensSummary(touches) } };
 }
 
 /**
- * R1 · *This run's lens* — every participant the world allowed, under its layer.
+ * *This run's lens* — every participant the world allowed, under its layer.
  *
  * `Everything` is a real world and the default one, so an unnamed lens says so
  * on the box rather than leaving a blank, which would read as *not recorded*.
- * The world is frozen with the plan ([SR11](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
+ * The world is frozen with the plan ([see-what-ran.md](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)),
  * hence *as frozen at open* — never *as set*.
  */
 function runLens(
@@ -412,7 +412,7 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 							caption: live ? "still running" : `${total} tasks`,
 						},
 				// `8.2k of 40k`, with the meter — and a bare `8.2k` when the run
-				// had no agent, because the ceiling is the agent's (SR41).
+				// had no agent, because the ceiling is the agent's.
 				tokens
 					? {
 							label: "Tokens",
@@ -424,7 +424,7 @@ function tiles(trace: TraceRead, groups: TaskGroup[]): PanelSpec<RunPanels> {
 						}
 					: null,
 				// Absent when nothing this run ran had a published rate — never
-				// `$0.00`, which would claim the run was free (SR40 · OB4).
+				// `$0.00`, which would claim the run was free.
 				trace.cost_usd != null
 					? {
 							label: "Cost",
@@ -483,7 +483,7 @@ function flow(
 }
 
 /**
- * The waterfall's rows — one per task, on the run's clock (SR73). Shared by
+ * The waterfall's rows — one per task, on the run's clock. Shared by
  * the Overview and the section, so the two draw one chart.
  */
 export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
@@ -495,7 +495,7 @@ export function waterfallTasks(groups: TaskGroup[]): TaskGanttTask[] {
 			status: ganttStatusOf(group.head.status),
 			startedAt: group.head.started_at ?? undefined,
 			finishedAt: group.head.finished_at ?? undefined,
-			// A retry is segments to the left of the bar that stuck (SR21).
+			// A retry is segments to the left of the bar that stuck.
 			attempts: earlier.length ? earlier.map(segmentOf) : undefined,
 			log: group.head.detail || undefined,
 			result: group.head.result ?? group.head.output ?? undefined,
@@ -607,7 +607,7 @@ function input(trace: TraceRead): PanelSpec<RunPanels> {
 /**
  * `result.json`, when there is one.
  *
- * The column is declared and the runtime does not write it yet (SR17 · SR34),
+ * The column is declared and the runtime does not write it yet,
  * so this returns nothing rather than an empty document — and the Input panel
  * takes the whole row, which is the honest drawing of a run with no result.
  */
@@ -623,9 +623,9 @@ function resultJson(trace: TraceRead): PanelSpec<RunPanels> | null {
 }
 
 /**
- * The log — one line per task, which is what a run records today (SR35).
+ * The log — one line per task, which is what a run records today.
  *
- * Picking a Gantt row filters it to that task (SR15); the lines a run wrote
+ * Picking a Gantt row filters it to that task; the lines a run wrote
  * about itself are not that task's lines, so they go with the filter.
  */
 function log(

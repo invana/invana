@@ -1,7 +1,7 @@
 /**
  * An ask a bound refused **before it ran** — drawn as *This ask was not run*,
  * naming the world it was asked in, the role, the model the world cast, and
- * whose guardrail said no (AG6 · AG35).
+ * whose guardrail said no.
  *
  * The engine answers the send with a `422` whose body carries these facts
  * beside the sentence (`error: "cast_refused"`); nothing is written, so there

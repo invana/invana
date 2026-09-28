@@ -1,14 +1,13 @@
-// **Templates** — the third section of the Library stack (graph-detail-page.md
-// G38 · G41).
+// **Templates** — the third section of the Library stack (graph-detail-page.md).
 //
 // A projection template is to an answer what a plan is to a run: both are
-// definitions, both are promoted from what served (projections.md C7). So it has
+// definitions, both are promoted from what served (projections.md). So it has
 // no `leftNav` item of its own and sits under `Plans` and `Catalogue`, which are
-// the other two things a run is composed from — the same rule G14 applies to
+// the other two things a run is composed from — the same rule applies to
 // Stitches: a library you open while authoring is not a place you go.
 //
 // The section owns the header — label, count, search, filter and the `+` that
-// authors one (G32 · G3). The body is `TemplatesSectionBody`.
+// authors one. The body is `TemplatesSectionBody`.
 
 import {
 	DropdownMenuLabel,
@@ -45,7 +44,7 @@ export interface TemplatesSectionProps {
 	/** `&template=` — the template whose detail replaces this section's body. */
 	templateId: string | null;
 	onOpenTemplate: (id: string | null) => void;
-	/** The section's `+` — authoring happens in the section that owns it (G3). */
+	/** The section's `+` — authoring happens in the section that owns it. */
 	authoring: boolean;
 	onAuthoring: (v: boolean) => void;
 	kindFilter: string;

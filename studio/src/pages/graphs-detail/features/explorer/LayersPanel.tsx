@@ -1,6 +1,6 @@
 // The Explorer's canvas Layers browser, a card floating over the canvas, opened
-// from the page strip beside Help · Styling · History (graph-detail-page.md G18,
-// boards.md CV6). Lists every layer registered on the live `GraphCanvas`
+// from the page strip beside Help · Styling · History (graph-detail-page.md,
+// boards.md). Lists every layer registered on the live `GraphCanvas`
 // (background / graph / minimap …) as a file-tree, top layer first. The Graph
 // layer expands into its painted contents grouped by node/edge type with live
 // counts; each type expands into its individual elements. Each layer row carries
@@ -607,8 +607,8 @@ function LayersPanelBody({ canvas, onClose }: Omit<Props, "open">) {
 
 	return (
 		// Floats over the canvas, top right, like Styling and History — `Panel`
-		// pins to the canvas host (`relative`) and `PanelContent` is the card
-		// (CV6). The canvas chrome is canvas-ui's; this file only builds the tree.
+		// pins to the canvas host (`relative`) and `PanelContent` is the card.
+		// The canvas chrome is canvas-ui's; this file only builds the tree.
 		<Panel position="top-right" offset={12} zIndex={20}>
 			<PanelContent
 				width={320}

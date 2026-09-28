@@ -1,10 +1,9 @@
 /**
- * **Library** — one icon, one panel, three sections (graph-detail-page.md G33 ·
- * G41). Drawn as `L1 · Library` on the *Skills and the left rail* canvas.
+ * **Library** — one icon, one panel, three sections (graph-detail-page.md). Drawn as `L1 · Library` on the *Skills and the left rail* canvas.
  *
  * `Plans` · `Catalogue` · `Templates`, stacked, **with no panel header above
  * them**: the first section header is the top of the column, and the breadcrumb
- * already says which panel is open (G16 · G32). Each section carries its own
+ * already says which panel is open. Each section carries its own
  * search and filter, because the three lists filter on different columns.
  *
  * Read it as one sentence going down the page — a plan is a composition of
@@ -12,14 +11,14 @@
  * is the definition of the one above it, which is why they are stacked in one
  * column rather than given three icons.
  *
- * **Runs is not here.** Execution is its own panel and holds the journal alone
- * (G41 · SR1). The step that crosses the two is *run → the plan it ran*, and
+ * **Runs is not here.** Execution is its own panel and holds the journal alone.
+ * The step that crosses the two is *run → the plan it ran*, and
  * `mainSection` carries it: a run's detail is a page, a plan's main view is a
  * canvas page, and `keepMounted` keeps the run open beside it — which is better
- * than the section adjacency SR12 asked for, because the two are side by side
+ * than the section adjacency asked for, because the two are side by side
  * rather than stacked in a 420px column.
  *
- * **Picking a plan draws it** (G42). This panel opens no canvas of its own: the
+ * **Picking a plan draws it**. This panel opens no canvas of its own: the
  * Plans section names what it drilled into in `&plan=`, and the page reads that.
  *
  * **The status bar is the panel's, and it carries no count.** Every stacked
@@ -69,22 +68,22 @@ export function LibraryViewPanel({
 
 	// Filters are per section and in-memory: they narrow a list, and a narrowed
 	// list is not a place — `?section=` and the drill-in keys are what a link
-	// carries (G31).
+	// carries.
 	const [planKind, setPlanKind] = useState("");
 	const [planSource, setPlanSource] = useState("");
 	const [templateKind, setTemplateKind] = useState("");
 	const [templateSurface, setTemplateSurface] = useState("");
 	// Authoring a template is a body this section shows, not a record the URL
-	// names — so it is local, and a reload lands on the list (G3).
+	// names — so it is local, and a reload lands on the list.
 	const [authoringTemplate, setAuthoringTemplate] = useState(false);
 	// Promoting is a dialog the Plans section opens from its header action, so
-	// the flag sits here beside the header that raises it (G43).
+	// the flag sits here beside the header that raises it.
 	const [promotingPlan, setPromotingPlan] = useState(false);
 
 	// The section named by `?section=` opens with the height; the other two sit
 	// with a little of their list showing, which is what makes the stack read as
 	// three lists rather than as an accordion. `PanelStack` reads `defaultSize`
-	// at **mount**, so this is the opening split only (G35).
+	// at **mount**, so this is the opening split only.
 	const size = (d: LibrarySectionKey) =>
 		library.sectionKey === d ? "60%" : "20%";
 
@@ -95,7 +94,7 @@ export function LibraryViewPanel({
 	// ago and the click appears to have done nothing. So the focused section is
 	// expanded whenever the focus moves *or* what it is drilled into changes —
 	// the second half matters because arriving at a plan from the canvas leaves
-	// `?section=plans` untouched and only `&plan=` moves (G35).
+	// `?section=plans` untouched and only `&plan=` moves.
 	const stackRef = useRef<PanelStackHandle>(null);
 	const focused =
 		library.sectionKey === "plans"

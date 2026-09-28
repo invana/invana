@@ -2,12 +2,12 @@
  * Where this element came from — model · file · record · run.
  *
  * Every element an import writes carries its source record on itself
- * (docs/for-developers/modules/bring-data-in/features/load-data.md LD4), so this
+ * (docs/for-developers/modules/bring-data-in/features/load-data.md), so this
  * block needs no request: it reads `_inv_model_id`, `_inv_file`,
  * `_inv_record_id` and `_inv_run_id` off the node the inspector already has.
  *
  * That is the whole point of stamping them. "Where did this number come from"
- * ends at a record rather than at a shrug (IW1), and it ends there even when the
+ * ends at a record rather than at a shrug, and it ends there even when the
  * run that wrote it was months ago.
  *
  * A node with no stamps is not an error: it was written by `invana loader`, the

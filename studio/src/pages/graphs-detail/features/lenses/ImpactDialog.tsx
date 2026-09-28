@@ -1,6 +1,6 @@
 /**
  * What a guardrail save would cost — **read before the write**
- * ([GR2](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
+ * ([guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)).
  *
  * *As someone about to tighten what every run in this Graph may do, I want to
  * see which worlds stop fitting and what each one loses, so that I take
@@ -14,7 +14,7 @@
  * **The diff list is what changes; the untouched worlds are a sentence under
  * it, by name.** *Nothing changes* and *this world was not checked* must not
  * look alike — the same argument
- * [GR6](../../../../../docs/for-developers/modules/govern/features/guardrails.md)
+ * [guardrails.md](../../../../../docs/for-developers/modules/govern/features/guardrails.md)
  * makes for the empty state — but a world that loses nothing is not a diff row
  * either: every glyph a diff list has means *something happened here*, and the
  * kit's neutral row does not exist. Naming them in prose says *checked, and
@@ -104,7 +104,7 @@ export function ImpactDialog({
 							</DiffRow>
 						))}
 						{impact && !impact.worlds.length ? (
-							// A sentence, never an empty list (GR6).
+							// A sentence, never an empty list.
 							<p className="px-1 py-2 text-sm text-muted-foreground">
 								No worlds have been written yet, so there is nothing for this to
 								narrow. Every question runs inside it from now on.

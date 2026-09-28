@@ -44,20 +44,20 @@ function HighlightOnMount({
 
 /**
  * One model's stitches, as a section in the Model panel's stack, and the dialog
- * that declares another (stitch-models.md ST12).
+ * that declares another (stitch-models.md).
  *
- * The surface is **Stitches**; the record is a link (ST13). A person stitches
+ * The surface is **Stitches**; the record is a link. A person stitches
  * two models together, and `model_links` is what the engine stores once they
  * have — so the section, its header and its copy say stitch, while the wire
  * format, the routes and the events keep saying link.
  *
  * A link joins **two** models, so this lists every link that touches the one on
- * screen — from either side — rather than pretending the model owns them (ST10).
+ * screen — from either side — rather than pretending the model owns them.
  * What the model *does* own is the starting point: `add` is offered only while
  * a node type is selected, and the dialog opens with that type already filled in
- * as the source (ST1 — declared, never inferred, and never re-asked).
+ * as the source (— declared, never inferred, and never re-asked).
  *
- * **Both kinds are declared from here** (ST11), and from one control. `add`
+ * **Both kinds are declared from here**, and from one control. `add`
  * opens the declare card, which carries the kind as a segmented control of its
  * own — *Anchor — same entity* or *Relationship*. A menu that asked for the kind
  * first made a person choose between two words before seeing the two types the
@@ -77,7 +77,7 @@ export function useStitchesSection({
 }: {
 	username: string;
 	graphSlug: string;
-	/** The published version whose types can be linked. Drafts cannot (ST8). */
+	/** The published version whose types can be linked. Drafts cannot. */
 	versionId: string | null;
 	selection: ModelSelection | null;
 	onOpenGlobalModel?: () => void;
@@ -85,7 +85,7 @@ export function useStitchesSection({
 	 * `model` (the default) lists the stitches touching `versionId` — one
 	 * model's view of them. `graph` lists every stitch in the Graph, which is
 	 * what the *All models* panel wants: there is no model selected there, and
-	 * the staged set is the Graph's anyway (ST21, ST22).
+	 * the staged set is the Graph's anyway.
 	 */
 	scope?: "model" | "graph";
 }): {
@@ -113,7 +113,7 @@ export function useStitchesSection({
 	const discard = useDiscardStitchesMutation(username, graphSlug);
 
 	// Both directions. `Article ≡ Stock` is the same fact whether you are looking
-	// at the news model or the market one (ST10).
+	// at the news model or the market one.
 	const touching =
 		scope === "graph"
 			? (links.data ?? [])
@@ -122,14 +122,14 @@ export function useStitchesSection({
 						l.source_version_id === versionId ||
 						l.target_version_id === versionId,
 				);
-	// Staged first, as every type list already sorts them (model-editor.md ME5):
+	// Staged first, as every type list already sorts them (model-editor.md):
 	// what is about to land reads before what already has.
 	const mine = [
 		...touching.filter((l) => l.status === "staged"),
 		...touching.filter((l) => l.status !== "staged"),
 	];
 	// The staged set is the Graph's, not this model's — committing flips every
-	// staged stitch in one action (ST21), so the count that drives the control
+	// staged stitch in one action, so the count that drives the control
 	// is the whole set rather than the slice on screen.
 	const stagedCount = (links.data ?? []).filter(
 		(l: ModelLink) => l.status === "staged",
@@ -137,7 +137,7 @@ export function useStitchesSection({
 
 	// A selection prefills the source; it is not what makes declaring possible.
 	// The dialog asks for both ends, so the only real precondition is that this
-	// Graph has something published to bind to (ST8).
+	// Graph has something published to bind to.
 	const hasPublished =
 		scope === "graph" ? (links.data ?? []).length > 0 || true : !!versionId;
 	const prefilled =
@@ -167,7 +167,7 @@ export function useStitchesSection({
 					]
 				: []),
 			// One control, one word. The kind is a segmented control *inside* the
-			// card (ST11), so a person picks between two types they can see rather
+			// card, so a person picks between two types they can see rather
 			// than between two words in a menu.
 			...(canDeclare
 				? [
@@ -224,7 +224,7 @@ export function useStitchesSection({
 								// The rule, the state, and — when something other than
 								// this section declared it — where it came from, so a
 								// stitch applied from a bundle on the command line is
-								// not an anonymous row nobody remembers making (ST50).
+								// not an anonymous row nobody remembers making.
 								subtitle={`${stitchRule(link, sourceModelName(link))} · ${
 									link.status === "staged"
 										? "staged · not in the union yet"

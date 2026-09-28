@@ -10,7 +10,7 @@
  * `layers` panel and `@invana/ui` ships `LayerStrip`, so Studio's job is the
  * one thing neither of them can know: how a `TouchesResponse` and a trace
  * become bands and bars. A renderer here would be a second drawing of the same
- * data, which is what [DS17](../../../../../docs/for-developers/modules/platform/features/design-system.md)
+ * data, which is what [design-system.md](../../../../../docs/for-developers/modules/platform/features/design-system.md)
  * exists to stop.
  *
  * Three things here are the design:
@@ -18,10 +18,10 @@
  * - **A refusal is struck in place, never filtered out.** It keeps its position
  *   on the axis, so a gap still means *nothing reached for this layer here* and
  *   cannot be mistaken for a denial. That is the kit's own behaviour
- *   ([D20](../../../../../docs/for-developers/governance.md)); this file's part
+ *   ([governance.md](../../../../../docs/for-developers/governance.md)); this file's part
  *   is to pass refusals through rather than dropping them on the way in.
  * - **A layer nothing touched is muted, never dropped**
- *   ([D22](../../../../../docs/for-developers/governance.md)). All six bands
+ *   ([governance.md](../../../../../docs/for-developers/governance.md)). All six bands
  *   are always passed, because *the run never went near a third party* and
  *   *this surface does not show third parties* are different facts about a run.
  * - **The axis is the trace's clock, or it is the ledger's order — never a
@@ -30,7 +30,7 @@
  *   `GET …/runs/{id}/trace`. If any touch cannot be placed on that clock the
  *   whole strip falls back to `seq`, because a drawing half on a wall clock and
  *   half on an ordinal is a drawing that lies about both
- *   ([DS15](../../../../../docs/for-developers/modules/platform/features/design-system.md)).
+ *   ([design-system.md](../../../../../docs/for-developers/modules/platform/features/design-system.md)).
  *
  * The spine is a band like the rest and says so: `agent` is the runtime doing
  * the participating rather than being a participant, so its wire runs the whole
@@ -77,7 +77,7 @@ function windowOf(
  * participant it spent.
  *
  * Bars are derived from the touches rather than from the trace's tasks: a touch
- * carries the `seq` it was projected from (GV20) and the address it engaged,
+ * carries the `seq` it was projected from and the address it engaged,
  * and a step that engaged nothing has nothing to draw. The trace is read only
  * for *when* — which step ran between which two moments.
  */

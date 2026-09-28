@@ -28,7 +28,7 @@ interface Props {
 }
 
 /**
- * The last few sessions, in the graph info panel (graph-detail-page.md G20).
+ * The last few sessions, in the graph info panel (graph-detail-page.md).
  *
  * It is the third band because it is the honest answer to "what was happening
  * here?" — a graph with three questions asked of it yesterday is a different

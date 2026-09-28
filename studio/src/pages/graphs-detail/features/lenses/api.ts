@@ -2,7 +2,7 @@
  * Govern — the nine routes under `…/govern/*`.
  *
  * A guardrail and a world are one record separated by `kind`, so `list` filters
- * rather than two paths doing it (GV1). Two endpoints would be the second
+ * rather than two paths doing it. Two endpoints would be the second
  * enforcement path the module exists not to have.
  */
 
@@ -44,7 +44,7 @@ export const governApi = {
 	/**
 	 * `kind` filters; omitted returns both. `includeUnnamed` brings in the
 	 * lenses attached to a run and private to whoever ran it — off by default,
-	 * because naming is what puts one in the Graph's Worlds list (GV2).
+	 * because naming is what puts one in the Graph's Worlds list.
 	 */
 	listLenses: (
 		u: string,
@@ -64,7 +64,7 @@ export const governApi = {
 	createLens: (u: string, g: string, data: LensCreate) =>
 		post(`${base(u, g)}/lenses`, data) as Promise<Lens>,
 
-	/** Naming an unnamed lens publishes it — the first naming only (GV19). */
+	/** Naming an unnamed lens publishes it — the first naming only. */
 	updateLens: (u: string, g: string, id: string, data: LensUpdate) =>
 		request<Lens>(`${base(u, g)}/lenses/${id}`, {
 			method: "PATCH",
@@ -74,14 +74,14 @@ export const governApi = {
 	deleteLens: (u: string, g: string, id: string) =>
 		request<void>(`${base(u, g)}/lenses/${id}`, { method: "DELETE" }),
 
-	/** World → guardrail. One field, never a re-authoring (GV3). */
+	/** World → guardrail. One field, never a re-authoring. */
 	promoteLens: (u: string, g: string, id: string, scope = "graph") =>
 		post(`${base(u, g)}/lenses/${id}/promote`, { scope }) as Promise<Lens>,
 
 	duplicateLens: (u: string, g: string, id: string) =>
 		post(`${base(u, g)}/lenses/${id}/duplicate`, {}) as Promise<Lens>,
 
-	/** What a save would be refused for, before the save (WO3). */
+	/** What a save would be refused for, before the save. */
 	validateLens: (
 		u: string,
 		g: string,
@@ -104,11 +104,11 @@ export const governApi = {
 		},
 	) => post(`${base(u, g)}/lenses/impact`, data) as Promise<ImpactResponse>,
 
-	// ── The catalogue — resolved, never stored (GV21) ────────────────────────
+	// ── The catalogue — resolved, never stored ────────────────────────
 	/**
 	 * What this Graph can address; with `match`, what a rule would bite right
 	 * now. The rule builder reads this as the pattern is typed, which is what
-	 * makes *narrowing is picking, not writing* enforceable (WO7).
+	 * makes *narrowing is picking, not writing* enforceable.
 	 */
 	participants: (
 		u: string,
