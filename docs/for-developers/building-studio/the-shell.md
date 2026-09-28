@@ -365,7 +365,7 @@ the 2,245-line file is the bill.
 | 4 | `mainSection` becomes `BoardPagesViewPanel` over those pages. `CanvasTabsBar` is deleted |
 | 5 | Each page publishes its engine when active; the lifted `CanvasContext` provides the active one, so the header toolbar and inspector keep resolving *the* canvas |
 
-What `ExplorerPage` keeps is what is genuinely cross-page: sessions, the assistant, `leftNav`, the
+What `GraphDetailPage` keeps is what is genuinely cross-page: sessions, the assistant, `leftNav`, the
 console. It should land near 300 lines.
 
 ### The one thing that needs deciding

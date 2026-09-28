@@ -34,7 +34,6 @@ Items 7–12 are independent of that chain and can land in any order.
 | 9 | Control heights hard-coded instead of read from the density tokens | 54 `h-7` · `h-8` · `h-9`, some of them icon sizes | Design rules — *density is a token* | visual only |
 | 10 | No coverage gate on Studio's unit tests | 20 tests; CI runs `--coverage` without a threshold | CLAUDE.md rule 6 (80%) | no — needs tests before a gate |
 | 11 | e2e does not run in CI | the specs need the live stack | — | no |
-| 12 | Docs that still name `ExplorerPage` | 5 files in `docs/for-developers/` | phase W | no |
 
 ## How to measure
 

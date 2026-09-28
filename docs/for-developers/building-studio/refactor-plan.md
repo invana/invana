@@ -39,7 +39,7 @@ Bigger on paper than in the editor: 16 of them were one wrong type annotation, t
 | 2 | `SessionTasksView.tsx` | `Turn.clarifications` was annotated singular while its producer (`Timeline`) and consumer (`StepList`) are both plural — a stale annotation, and the only genuine defect in the 26. Corrected to the plural |
 | 2 | `GraphCreatePage.tsx` · `GraphForm.tsx` | `react-hook-form`'s `Control` is invariant in its field-values parameter, so `Control<FormShape>` will not assign to `ObjectFieldProps`' `Control<any>`. **The real fix is in `@invana/forms`** — make `ObjectField` generic in `TFieldValues`. Until it ships (DS3), one cast at each of the two call sites, each carrying that sentence |
 | 1 | `useEventStream.ts` | `useAuth()` reads the token but does not return it. Now read from `auth.store` with a selector, rather than widening `useAuth`'s surface for one caller |
-| 1 | `ExplorerPage.tsx` | The `Record<string, unknown>` → `CanvasStateSnapshot` cast is now an `isCanvasStateSnapshot` guard. A state written by an older engine is refused with a toast instead of throwing inside the renderer |
+| 1 | `shell/useDataBoards.ts` | The `Record<string, unknown>` → `CanvasStateSnapshot` cast is now an `isCanvasStateSnapshot` guard. A state written by an older engine is refused with a toast instead of throwing inside the renderer |
 | 1 | `WorkGraphCanvas.tsx` | `layers.get()` is typed `ILayer`; only a world layer has an extent. Narrowed with `instanceof WorldLayer`, which is how the engine duck-types it |
 | 1 | `CanvasesPanel.tsx` | Dead file — deleted, error went with it |
 
@@ -110,7 +110,7 @@ hooks roots on `<GraphCanvas>`.
 `BoardPagesViewPanel` is the one to study — [the-shell.md](the-shell.md) is the contract it fixes.** It renders the tab strip *and* the page bodies as one
 column, and `keepMounted` means a tab switch is visibility, not a remount — each board keeps its
 camera, layout and selection. It replaces `CanvasTabsBar` *and* the canvas-tab state in
-`ExplorerPage`. The reference is `canvas-ui/apps/AppLayoutV2` in the canvas Storybook: the canvas-side
+`useCanvasTabs`. The reference is `canvas-ui/apps/AppLayoutV2` in the canvas Storybook: the canvas-side
 twin of `Themes/AppV2 › ExplorerShell`.
 
 ### 2.3 The rule for every substitution
@@ -253,7 +253,7 @@ The structural rules are in recommendation.md §4.1. These are about the code in
 |---|---|
 | **A component renders; a hook decides** | Data fetching, URL sync and derived state live in `queries.ts` or a hook. A screen file that contains a `useEffect` chain is a hook that has not been extracted yet |
 | **Props take what the component shows, not where it came from** | `<AgentRow agent={a} />`, not `<AgentRow agentId={id} />` with a fetch inside. One fetch per screen, at the top |
-| **No `any`, and no `as` across a real boundary** | A cast at an API edge is a missing type guard. `ExplorerPage`'s `CanvasStateSnapshot` cast is the example to not repeat |
+| **No `any`, and no `as` across a real boundary** | A cast at an API edge is a missing type guard. A `Record<string, unknown>` cast to `CanvasStateSnapshot` is the example to not repeat; `isCanvasStateSnapshot` is the guard |
 | **Name for the domain, in the product's words** | `terminology.md` pins them. A `Run` is not a "job"; an `Emission` is not a "result card" |
 | **Comments say *why*** | The existing code does this well and it is worth keeping — the comment on `AppLayoutV2`'s stable main position is why that bug stayed fixed |
 | **Empty, loading and error are not afterruns** | Every screen renders all three, and `EmptyState` names what unlocks it (DS15). A screen that only handles the happy path is half a screen |

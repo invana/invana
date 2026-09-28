@@ -16,7 +16,7 @@ layout becomes `studio/README.md`, which is what a new contributor reads.
 
 | # | Problem | Today | After |
 |---|---|---|---|
-| 1 | **One route hosts the product** | `ExplorerPage.tsx` is 2,222 lines and renders Agents, Projects, Tasks, Skills, Workflows, Model, Links, Datasets, Templates, the canvas and the assistant. Every noun is a value in a 19-member `?panel=` union | One route per screen, one folder per feature module. No file over ~400 lines |
+| 1 | **One route hosts the product** | `GraphDetailPage.tsx` is the one route, and it renders Agents, Projects, Tasks, Skills, Workflows, Model, Links, Datasets, Templates, the canvas and the assistant. Every noun is a value in a 19-member `?panel=` union | One route per screen, one folder per feature module. No file over ~400 lines |
 | 2 | **A parallel component layer** | 20 Studio components share an exact name with a kit export; `PanelChrome` (564) · `WorkRow` (138) · `CanvasTabsBar` (269) · the answer surface (717) all predate the kit's | Deleted. `@invana/ui` is the only component layer (DS1 · DS17) |
 | 3 | **Dead code** | 2,462 lines in 9 files are unreachable from `main.tsx` — `ModellerPage.tsx` alone is 1,031 | Deleted, with a lint gate so it cannot come back |
 | 4 | **Imports are positional** | No path alias; `../../../services/api/client` appears throughout. Moving a file rewrites its neighbours | `@/` alias + a per-module public surface. A move is a move |
@@ -384,7 +384,7 @@ screens start at 5.
 |---|---|---|
 | ✅ **1 · Sweep** | Delete §2.1. Add the `@/` alias. Drop `rbush` · `d3-force` · `immer`. Clear the 26 build errors and point `check-types` at `tsc -b --noEmit` (§2.4) | **Done.** `pnpm build`, `pnpm check-types` and `pnpm lint` green; `pnpm dev` serves; −2,538 lines. Outstanding: `vitest` and `knip` are not installed, and the e2e specs need the engine to run |
 | **2 · De-duplicate** | §2.2 in one commit per row, each replacing a Studio component with a kit import at its call sites | No Studio component shares a name with a kit export. −2,180 lines |
-| **3 · Move** | §4.2 — mechanical moves, no logic changes, one commit per module. `shared/` is staging | `git log --stat` shows renames only. `ExplorerPage.tsx` is under 400 lines |
+| **3 · Move** | §4.2 — mechanical moves, no logic changes, one commit per module. `shared/` is staging | `git log --stat` shows renames only. `GraphDetailPage.tsx` is under 400 lines |
 | **4 · Route** | §5.2 — the rail drives the router; `?panel=` becomes redirects; per-module lazy routes | Every current surface has a URL; a reload lands on the same screen; the Explorer chunk shrinks |
 | **5 · Shell** | §4a A2–A4 — `GraphDetail` drives `AppLayoutV2`'s regions; the Explorer composes to the contract; the console lands | A panel toggle does not remount the canvas. S12f closes |
 | **6 · Kit gaps** | §4a A5 — `NavVertical` `active`, `TabbedPanel variant="strip"`, 38/25 defaults → release → drop the overrides both sides | No `!` override in Studio or in the `ExplorerShell` story |

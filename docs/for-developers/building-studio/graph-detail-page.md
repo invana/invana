@@ -396,7 +396,7 @@ flowchart TD
 | `explorer/components/emissions/{EmissionCard,EmissionBodies,NotAnAnswer}` · `ResultBlock` · `ResultsTable` · `TraceDialog` · `lib/emissions.ts` | `ask/answer-surface/` |
 | `explorer/components/emissions/TemplatesPanel` | `ask/projections/` |
 | `explorer/components/{ExplorerCanvas,ExplorerTypesPanel,InspectorPanel,LayersPanel,ExpandFineTunePanel,StylingPanel}` · `hooks/useExpandNode` · `lib/{canvasTheme,typeColor,visibility}` | `explorer/` — what is drawn, and what is selected on it |
-| `explorer/pages/CanvasPage` · `components/{CanvasHistoryPanel,CanvasFormDialog}` · `hooks/useCanvasStates` · `lib/captureBanner` · `canvasKinds` · the `pages[]` / `activePageId` / `selectPage` / `closePage` block in `ExplorerPage.tsx` | `boards/` — the page host, and the board record behind a tab |
+| `explorer/pages/CanvasPage` · `components/{CanvasHistoryPanel,CanvasFormDialog}` · `hooks/useCanvasStates` · `lib/captureBanner` · `canvasKinds` · the `pages[]` / `activePageId` / `selectPage` / `closePage` block in `shell/useOpenPages.tsx` | `boards/` — the page host, and the board record behind a tab |
 | `explorer/components/Session*` · `SessionsPanel` → **`AssistantPanel`** · `sessionCapabilities` · `hooks/useSessions` | `ask/assistant/` — the assistant is Ask's surface on every left panel, not one of Explore's ([the-assistant.md](../modules/ask/features/the-assistant.md) AD12) |
 | `hooks/useAssistantDrawer` → `useRightSection` | `shell/useRightSection.ts` — it names a **region**, so it lives with the shell beside `useLeftSection`, not inside one of the region's occupants |
 | `work/{AgentsPanel,AgentDetail}` · `WorkCanvas`'s `EnvelopeCanvas` + `LineageCanvas` | `agents/` |
@@ -410,7 +410,6 @@ flowchart TD
 
 | Today | Moves to `shell/` |
 |---|---|
-| `explorer/ExplorerPage.tsx` | `GraphDetailPage.tsx` — renamed |
 | `components/GraphDetail.tsx` | dissolved into it |
 | `components/GraphStatusBar.tsx` · `components/header/useAppHeader` | unchanged, moved |
 | `components/settings/useGraphLeftNav.tsx` | reads the registry instead of a section list |
