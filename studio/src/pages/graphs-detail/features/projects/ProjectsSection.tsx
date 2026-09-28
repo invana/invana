@@ -39,7 +39,7 @@ import type {
 	ProjectUpdate,
 	Todo,
 } from "@/pages/graphs-detail/features/projects/types";
-import { ProjectRules } from "@/pages/graphs-detail/features/rules/ProjectRules";
+import { ProjectRules } from "@/pages/graphs-detail/features/rules";
 import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
 import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 import {

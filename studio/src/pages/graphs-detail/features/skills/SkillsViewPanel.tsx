@@ -19,7 +19,7 @@
  * it. That is why it takes no canvas of its own.
  */
 
-import { RulesSection } from "@/pages/graphs-detail/features/rules/RulesSection";
+import { RulesSection } from "@/pages/graphs-detail/features/rules";
 import {
 	useCreateSkillMutation,
 	useRulesQuery,
