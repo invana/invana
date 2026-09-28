@@ -10,7 +10,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
-import type { RunNode } from "@/pages/graphs-detail/features/runs/types";
+import type { RunNode } from "@/pages/graphs-detail/features/runs";
 import type { QueryMode } from "@/types/query";
 
 export type SessionMessageRole = "user" | "assistant";

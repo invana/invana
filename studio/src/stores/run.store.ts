@@ -5,7 +5,7 @@
 // ride the stream, so they stay visible after the reply settles).
 
 import type { Emission } from "@/pages/graphs-detail/features/assistant";
-import { stepFromFrame } from "@/pages/graphs-detail/features/runs/api";
+import { stepFromFrame } from "@/pages/graphs-detail/features/runs";
 import type {
 	AskFrame,
 	Diagnosis,
@@ -13,7 +13,7 @@ import type {
 	RunNode,
 	RunStatus,
 	RunView,
-} from "@/pages/graphs-detail/features/runs/types";
+} from "@/pages/graphs-detail/features/runs";
 import type { QueryResponse } from "@/types/query";
 import { create } from "zustand";
 

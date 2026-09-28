@@ -41,7 +41,7 @@ import type {
 	Touch,
 	TouchesResponse,
 } from "@/pages/graphs-detail/features/lenses/types";
-import type { TraceStepRead } from "@/pages/graphs-detail/features/runs/api";
+import type { TraceStepRead } from "@/pages/graphs-detail/features/runs";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type { LayersOptions } from "@invana/dashboard";
 import type { Layer, LayerItem } from "@invana/ui";

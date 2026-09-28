@@ -8,7 +8,7 @@ import {
 } from "@/pages/graphs-detail/features/boards";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans";
-import { runsApi } from "@/pages/graphs-detail/features/runs/api";
+import { runsApi } from "@/pages/graphs-detail/features/runs";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useLibraryViewPanel } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

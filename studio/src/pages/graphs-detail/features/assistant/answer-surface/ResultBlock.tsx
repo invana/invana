@@ -2,7 +2,7 @@ import { EmissionList } from "@/pages/graphs-detail/features/assistant/answer-su
 import { TraceDialog } from "@/pages/graphs-detail/features/assistant/answer-surface/TraceDialog";
 import { emissionsFromResult } from "@/pages/graphs-detail/features/assistant/answer-surface/emissions";
 import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
-import { emissionsApi } from "@/pages/graphs-detail/features/runs/api";
+import { emissionsApi } from "@/pages/graphs-detail/features/runs";
 import type { QueryResponse } from "@/types/query";
 import { Button } from "@invana/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

@@ -9,7 +9,7 @@ import {
 } from "@/pages/graphs-detail/features/events/eventStatus";
 import { useGraphEventsQuery } from "@/pages/graphs-detail/features/events/queries";
 import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
-import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
+import { TraceIdValue } from "@/pages/graphs-detail/features/runs";
 import {
 	Badge,
 	Button,

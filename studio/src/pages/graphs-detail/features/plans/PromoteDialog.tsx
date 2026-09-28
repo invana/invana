@@ -16,8 +16,8 @@
  */
 
 import { usePromoteTaskPlanMutation } from "@/pages/graphs-detail/features/plans/queries";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import { ApiError } from "@/services/api/client";
 import {

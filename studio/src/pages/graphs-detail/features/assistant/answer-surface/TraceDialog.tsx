@@ -27,7 +27,7 @@ import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
 import {
 	type TraceStepRead,
 	traceApi,
-} from "@/pages/graphs-detail/features/runs/api";
+} from "@/pages/graphs-detail/features/runs";
 import { StepRules } from "@/pages/graphs-detail/shared/StepRules";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
 import {

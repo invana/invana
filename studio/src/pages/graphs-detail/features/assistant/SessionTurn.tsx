@@ -27,7 +27,7 @@ import {
 import {
 	LIVE_RUN_STATUSES,
 	type RunNode,
-} from "@/pages/graphs-detail/features/runs/types";
+} from "@/pages/graphs-detail/features/runs";
 import { useRunStore } from "@/stores/run.store";
 import type { QueryResponse } from "@/types/query";
 import {

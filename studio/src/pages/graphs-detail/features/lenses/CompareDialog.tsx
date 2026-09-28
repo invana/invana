@@ -18,7 +18,7 @@
  * legitimate thing to want and refusing it would be a rule nobody asked for.
  */
 
-import { useRunListQuery } from "@/pages/graphs-detail/features/runs/queries";
+import { useRunListQuery } from "@/pages/graphs-detail/features/runs";
 import {
 	Dialog,
 	DialogContent,

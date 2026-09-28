@@ -15,7 +15,7 @@
 import type {
 	TraceRead,
 	TraceStepRead,
-} from "@/pages/graphs-detail/features/runs/api";
+} from "@/pages/graphs-detail/features/runs";
 import type { ChipSpec, Tone } from "@invana/dashboard";
 import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 

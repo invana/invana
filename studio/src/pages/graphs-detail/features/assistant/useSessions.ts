@@ -14,11 +14,11 @@ import {
 	type RunStreamHandle,
 	messageFromFrame,
 	runsApi,
-} from "@/pages/graphs-detail/features/runs/api";
+} from "@/pages/graphs-detail/features/runs";
 import {
 	type AskFrame,
 	LIVE_RUN_STATUSES,
-} from "@/pages/graphs-detail/features/runs/types";
+} from "@/pages/graphs-detail/features/runs";
 import { type Action, startAction } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRunStore } from "@/stores/run.store";

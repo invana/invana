@@ -26,7 +26,7 @@
 import {
 	type ProjectionTemplateRead,
 	projectionTemplatesApi,
-} from "@/pages/graphs-detail/features/runs/api";
+} from "@/pages/graphs-detail/features/runs";
 import {
 	DetailBlock,
 	DetailStatus,

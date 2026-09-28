@@ -4,7 +4,7 @@ import { formatDuration } from "@/lib/time";
 import type {
 	RunNode,
 	RunNodeStatus,
-} from "@/pages/graphs-detail/features/runs/types";
+} from "@/pages/graphs-detail/features/runs";
 import {
 	ChatSessionActivitySubLine,
 	ChatSessionDisclosure,

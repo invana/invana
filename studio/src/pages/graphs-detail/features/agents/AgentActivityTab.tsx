@@ -21,8 +21,8 @@ import type {
 	Agent,
 	AgentMeters,
 } from "@/pages/graphs-detail/features/agents/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { PanelSection } from "@/ui/PanelSection";
 import {

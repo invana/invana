@@ -15,7 +15,7 @@ import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs";
 import {
 	type ApiTaskRunStep,
 	toRunNode,
-} from "@/pages/graphs-detail/features/runs/api";
+} from "@/pages/graphs-detail/features/runs";
 import { request } from "@/services/api/client";
 import type { Interaction } from "@/services/telemetry/tracer";
 import type { QueryResponse } from "@/types/query";

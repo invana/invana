@@ -17,7 +17,7 @@ import type {
 	TodoCreate,
 	TodoUpdate,
 } from "@/pages/graphs-detail/features/projects/types";
-import { runsApi } from "@/pages/graphs-detail/features/runs/api";
+import { runsApi } from "@/pages/graphs-detail/features/runs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Scope = { username: string; graphSlug: string };

@@ -33,9 +33,9 @@ import {
 	useTodosQuery,
 } from "@/pages/graphs-detail/features/projects/queries";
 import type { Todo } from "@/pages/graphs-detail/features/projects/types";
-import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
-import type { RunNode } from "@/pages/graphs-detail/features/runs/types";
-import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs";
+import type { RunNode } from "@/pages/graphs-detail/features/runs";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs";
 import {
 	DetailBlock,
 	DetailPlaceholder,

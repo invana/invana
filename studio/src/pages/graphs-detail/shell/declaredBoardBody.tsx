@@ -22,9 +22,9 @@ import {
 	PlanExportPage,
 	PlanVersionsPage,
 } from "@/pages/graphs-detail/features/plans";
-import { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
-import { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
-import { RunBoardPage } from "@/pages/graphs-detail/features/runs/boards";
+import { runAddress } from "@/pages/graphs-detail/features/runs";
+import { RunsBoardPage } from "@/pages/graphs-detail/features/runs";
+import { RunBoardPage } from "@/pages/graphs-detail/features/runs";
 import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 import {
 	RuleBoardPage,
