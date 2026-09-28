@@ -6,7 +6,7 @@
  * work schemas field for field.
  */
 
-import type { OfferedRule } from "@/pages/graphs-detail/features/skills/types";
+import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
 
 // ── Projects ─────────────────────────────────────────────────────────────────
 

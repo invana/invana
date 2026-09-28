@@ -16,7 +16,7 @@
  * editable from the project that inherits it ([RU8](docs/for-developers/modules/skills/features/rules.md#decisions)).
  */
 
-import type { Rule } from "@/pages/graphs-detail/features/skills/types";
+import type { Rule } from "@/pages/graphs-detail/features/skills";
 import { Textarea } from "@invana/forms";
 import { Badge, Button } from "@invana/ui";
 import { useState } from "react";

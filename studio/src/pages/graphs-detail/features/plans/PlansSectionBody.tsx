@@ -33,7 +33,7 @@ import type {
 	TaskPlanDetail,
 	TaskPlanSummary,
 } from "@/pages/graphs-detail/features/plans/types";
-import type { SkillLayer } from "@/pages/graphs-detail/features/skills/types";
+import type { SkillLayer } from "@/pages/graphs-detail/features/skills";
 import {
 	AgentChipRow,
 	DetailBlock,

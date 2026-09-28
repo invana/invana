@@ -20,8 +20,8 @@ import type {
 	AgentSkillRow,
 } from "@/pages/graphs-detail/features/agents/types";
 import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
-import type { Skill } from "@/pages/graphs-detail/features/skills/types";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
+import type { Skill } from "@/pages/graphs-detail/features/skills";
 import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
 import { Textarea } from "@invana/forms";

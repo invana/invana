@@ -1,4 +1,4 @@
-import type { BindRefusal } from "@/pages/graphs-detail/features/skills/types";
+import type { BindRefusal } from "@/pages/graphs-detail/features/skills";
 import { cn } from "@invana/ui";
 
 /**

@@ -14,7 +14,7 @@ import {
 import type {
 	SkillLayer,
 	SkillPlaybookRead,
-} from "@/pages/graphs-detail/features/skills/types";
+} from "@/pages/graphs-detail/features/skills";
 
 /** A layer's icon on the canvas — shared with the library's plans (LB35). */
 export const LAYER_ICON: Record<SkillLayer, string> = {

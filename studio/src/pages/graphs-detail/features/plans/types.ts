@@ -10,7 +10,7 @@ import type { AgentChip } from "@/pages/graphs-detail/features/agents";
 import type {
 	PlanArg,
 	SkillLayer,
-} from "@/pages/graphs-detail/features/skills/types";
+} from "@/pages/graphs-detail/features/skills";
 
 /**
  * One governed band, and what a plan declares in it — the panel's *Layers it

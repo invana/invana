@@ -21,7 +21,7 @@ import type {
 	RunStatus,
 } from "@/pages/graphs-detail/features/runs/types";
 import type { TaskRunListResponse } from "@/pages/graphs-detail/features/runs/types";
-import type { OfferedRule } from "@/pages/graphs-detail/features/skills/types";
+import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
 import { API_BASE_URL, request } from "@/services/api/client";
 import { recordStreamReconnect } from "@/services/telemetry/metrics";
 import { type Interaction, withTraceparent } from "@/services/telemetry/tracer";

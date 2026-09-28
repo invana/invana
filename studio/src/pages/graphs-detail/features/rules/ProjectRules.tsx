@@ -28,8 +28,8 @@ import {
 	useProjectRulesQuery,
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
-} from "@/pages/graphs-detail/features/skills/queries";
-import type { Rule } from "@/pages/graphs-detail/features/skills/types";
+} from "@/pages/graphs-detail/features/skills";
+import type { Rule } from "@/pages/graphs-detail/features/skills";
 import { PanelSection } from "@/ui/PanelSection";
 import { Button, Spinner } from "@invana/ui";
 import { Plus } from "lucide-react";

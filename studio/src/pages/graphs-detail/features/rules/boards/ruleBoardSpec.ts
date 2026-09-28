@@ -21,11 +21,11 @@ import {
 	SKILL_ACTIONS,
 	ruleTitle,
 	when,
-} from "@/pages/graphs-detail/features/skills/boards/shared";
+} from "@/pages/graphs-detail/features/skills";
 import type {
 	Rule,
 	RuleCitationsResponse,
-} from "@/pages/graphs-detail/features/skills/types";
+} from "@/pages/graphs-detail/features/skills";
 import {
 	VIEW_ACTION,
 	VIEW_DASHBOARD,

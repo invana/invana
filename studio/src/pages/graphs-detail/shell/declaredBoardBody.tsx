@@ -25,11 +25,11 @@ import {
 import { runAddress } from "@/pages/graphs-detail/features/runs";
 import { RunsBoardPage } from "@/pages/graphs-detail/features/runs";
 import { RunBoardPage } from "@/pages/graphs-detail/features/runs";
-import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
+import { SkillBoardPage } from "@/pages/graphs-detail/features/skills";
 import {
 	RuleBoardPage,
 	UsageBoardPage,
-} from "@/pages/graphs-detail/features/skills/boards";
+} from "@/pages/graphs-detail/features/skills";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import type { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import type { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";

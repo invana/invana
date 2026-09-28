@@ -20,7 +20,7 @@ import {
 } from "@/pages/graphs-detail/features/boards";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import {
 	type BoardTitleNames,

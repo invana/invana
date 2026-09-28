@@ -22,7 +22,7 @@
 import { RunLensWidget } from "@/pages/graphs-detail/features/lenses";
 import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans";
-import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills/boards/SkillFlowWidget";
+import { SkillFlowWidget } from "@/pages/graphs-detail/features/skills";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { RUN_PANELS } from "@invana/dashboard";
 

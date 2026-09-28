@@ -12,7 +12,7 @@
  * `kind = rule` board ([RU11](../../../../../docs/for-developers/modules/skills/features/rules.md)).
  */
 
-import type { OfferedRule } from "@/pages/graphs-detail/features/skills/types";
+import type { OfferedRule } from "@/pages/graphs-detail/features/skills";
 import { cn } from "@invana/ui";
 
 export interface StepRulesProps {
