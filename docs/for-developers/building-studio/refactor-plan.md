@@ -204,7 +204,7 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 
 ### 3.2 Decomposing `GraphDetailPage.tsx`
 
-**Status: open.** 3,214 lines, almost all of it one component. It is cut by moves, not rewritten: each
+**Status: open.** 3,214 lines at the start, almost all of it one component; 1,012 now. Every row below has left except the last two — the page list and the `rightSection` occupants — and `useDataBoards` (1,572 lines) is still one hook that the next cut splits into the tabs, the expansion and the ask. It is cut by moves, not rewritten: each
 piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
 way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
