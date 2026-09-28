@@ -5,15 +5,15 @@ import {
 	captureBanner,
 } from "@/pages/graphs-detail/features/boards";
 import { useBoardVersions } from "@/pages/graphs-detail/features/boards";
-import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
-import { useCreateCanvasStateMutation } from "@/pages/graphs-detail/features/boards/queries";
-import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards/queries";
+import { boardsApi } from "@/pages/graphs-detail/features/boards";
+import { useCreateCanvasStateMutation } from "@/pages/graphs-detail/features/boards";
+import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards";
 import type {
 	Board,
 	BoardVersionCause,
 	CanvasStyling,
-} from "@/pages/graphs-detail/features/boards/types";
-import { boardVersionsApi } from "@/pages/graphs-detail/features/boards/versionsApi";
+} from "@/pages/graphs-detail/features/boards";
+import { boardVersionsApi } from "@/pages/graphs-detail/features/boards";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
 import {

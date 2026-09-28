@@ -12,7 +12,7 @@
 // draws models as frames of types.
 
 import { readCanvasThemeConfig } from "@/canvases/theme";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
 import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
 import {

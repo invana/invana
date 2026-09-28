@@ -2,7 +2,7 @@ import type {
 	CanvasStyling,
 	EdgeTypeStyle,
 	NodeTypeStyle,
-} from "@/pages/graphs-detail/features/boards/types";
+} from "@/pages/graphs-detail/features/boards";
 import { Button, ScrollArea } from "@invana/ui";
 import { X } from "lucide-react";
 

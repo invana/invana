@@ -85,3 +85,18 @@ export type {
 	OpenBoardFn,
 	RecordBoardKind,
 } from "@/pages/graphs-detail/features/boards/useOpenBoard";
+
+export { boardsApi } from "@/pages/graphs-detail/features/boards/api";
+export {
+	useCanvasBannerQuery,
+	useCreateCanvasStateMutation,
+	useUpdateCanvasMutation,
+} from "@/pages/graphs-detail/features/boards/queries";
+export type {
+	Board,
+	BoardVersionCause,
+	CanvasStyling,
+	EdgeTypeStyle,
+	NodeTypeStyle,
+} from "@/pages/graphs-detail/features/boards/types";
+export { boardVersionsApi } from "@/pages/graphs-detail/features/boards/versionsApi";

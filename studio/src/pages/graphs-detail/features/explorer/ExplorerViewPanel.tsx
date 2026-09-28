@@ -12,7 +12,7 @@
  * (SP7), because the count is graph-wide (SP6).
  */
 
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { readProvenance } from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 import { typeDotColor } from "@/pages/graphs-detail/features/explorer/typeColor";

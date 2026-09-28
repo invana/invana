@@ -1,7 +1,7 @@
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import type { OpenBoard } from "@/pages/graphs-detail/features/boards";
-import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards";
 import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
