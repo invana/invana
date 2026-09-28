@@ -109,9 +109,6 @@ _CREDENTIAL_PARAMS = frozenset({"token"})
 # The ``http.route`` metric value for a request no route matched (a raw path would carry ids).
 _UNMATCHED = "unmatched"
 
-# Scope key set once a 5xx is logged; CatchAllExceptionMiddleware reads the same key.
-ERROR_LOGGED = "invana.error_logged"
-
 
 class TelemetryMiddleware:
     """Pure ASGI middleware that instruments every HTTP request.
@@ -248,7 +245,7 @@ def _log_server_error(
             "http.duration_ms": round(duration_ms, 3),
         },
     )
-    scope[ERROR_LOGGED] = True
+    scope[log_context.ERROR_LOGGED] = True
 
 
 def _record_duration(scope: Scope, active_labels: dict[str, str], status: int, duration_ms: float) -> None:

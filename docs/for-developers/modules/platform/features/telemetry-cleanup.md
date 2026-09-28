@@ -18,7 +18,7 @@ What is left after [telemetry](telemetry.md) (13.5) and [logging](logging.md) (1
 | 8 | Dev DB run `f4a26cc5-…` left crashed | dev database | ✅ | S | deleted with its step and stream rows (they cascade); the audit events that mention it stay |
 | 9 | Graph-connector metric label is the class name; `operation` is always `query` | `engine/src/invana/graph/connectors/base/connector.py` | ⏸ | S | no dashboard needs it — `Neo4jConnector` reads fine, and renaming would split the series |
 | 10 | OTLP log handler ships `trace`, `log_fields`, `trace_id`, `span_id` as redundant attributes | `engine/src/invana/core/telemetry/setup.py` | ✅ | S | a last filter on the OTLP handler ships a copy of the record without them; the console handler still sees them |
-| 11 | The 5xx "already logged" key is spelled in two middlewares | `core/telemetry/middleware.py` · `server/middleware.py` | ⏸ | S | `server/` cannot import the optional telemetry module |
+| 11 | The 5xx "already logged" key is spelled in two middlewares | `core/telemetry/middleware.py` · `server/middleware.py` | ✅ | S | one `ERROR_LOGGED` in `core/logging/context.py`, which imports no OpenTelemetry; both middlewares import it |
 | 12 | The graph page's main-region boundary does not reset on a tab switch | `studio/src/pages/graphs-detail/GraphDetailPage.tsx` | ⏸ | S | resetting would remount the tab strip; leaving the screen recovers it |
 | 13 | `graphs` on "startup finished" counts connections started, not connected | `engine/src/invana/server/app.py` | ⏸ | S | stated in the docs |
 | 14 | Exemplars on Studio `ui.*` histograms | browser OpenTelemetry SDK | ❌ | — | the SDK does not record them; Studio latency links through its spans |

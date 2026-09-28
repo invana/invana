@@ -51,10 +51,9 @@ import time
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-logger = logging.getLogger("invana.api")
+from invana.core.logging.context import ERROR_LOGGED
 
-# Scope key TelemetryMiddleware sets once it has logged a 5xx.
-_ERROR_LOGGED = "invana.error_logged"
+logger = logging.getLogger("invana.api")
 
 
 class CatchAllExceptionMiddleware:
@@ -110,7 +109,7 @@ class CatchAllExceptionMiddleware:
     @staticmethod
     def _log_unlogged(scope: Scope, status: int, start: float, *, exc_info: bool = False) -> None:
         """Write the ERROR line for a 5xx unless TelemetryMiddleware already wrote it."""
-        if scope.get(_ERROR_LOGGED):
+        if scope.get(ERROR_LOGGED):
             return
         method = scope.get("method", "")
         route = getattr(scope.get("route"), "path", None) or "unmatched"
@@ -129,4 +128,4 @@ class CatchAllExceptionMiddleware:
                 "http.duration_ms": round(duration_ms, 3),
             },
         )
-        scope[_ERROR_LOGGED] = True
+        scope[ERROR_LOGGED] = True

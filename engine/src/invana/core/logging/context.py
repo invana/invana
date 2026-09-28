@@ -42,6 +42,9 @@ from types import MappingProxyType
 
 FIELDS: tuple[str, ...] = ("principal", "origin", "graph_id")
 
+# ASGI scope key set once a request's 5xx has been logged, so the next middleware out does not log it again.
+ERROR_LOGGED = "invana.error_logged"
+
 _EMPTY: Mapping[str, str] = MappingProxyType({})
 _current: ContextVar[Mapping[str, str]] = ContextVar("invana_log_fields", default=_EMPTY)
 
