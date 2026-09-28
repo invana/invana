@@ -12,7 +12,7 @@ import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms";
 import type { ModelSelection } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models";
 import { useRunStep } from "@/pages/graphs-detail/features/runs";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
+import { useOnboarding } from "@/pages/graphs-detail/features/setup";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { graphDetailChrome } from "@/pages/graphs-detail/shell/GraphDetailChrome";
 import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";

@@ -4,7 +4,7 @@ import {
 } from "@/pages/graphs-detail/features/assistant";
 import { WorldPicker } from "@/pages/graphs-detail/features/assistant";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant";
-import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
+import { SetupLock } from "@/pages/graphs-detail/features/setup";
 import type { ComponentProps } from "react";
 
 interface AssistantHostProps
