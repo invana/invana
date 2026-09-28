@@ -73,12 +73,7 @@ const ENGINE_ONLY = {
 };
 
 const RETIRED_SUFFIX = /(Drawer|StackPanel|DashboardPage|(?<!View)Panel)\.tsx$/;
-const SUFFIX_ALLOWED = {
-	"explorer/LayersPanel.tsx":
-		"replaced by canvas-ui LayersViewPanel in phase K",
-	"explorer/StylingPanel.tsx":
-		"replaced by canvas-ui StylingViewPanel in phase K",
-};
+const SUFFIX_ALLOWED = {};
 
 const RETIRED_WORDS =
 	/drawer|StackPanel|DashboardPage|journal|thinking|railItem/i;
@@ -100,8 +95,6 @@ const PX_TEXT = /\btext-\[\d+(?:\.\d+)?px\]/;
 const TOKEN_ALLOWED = {
 	"components/SaturationBridge.tsx":
 		"rebuilds hsl() from the theme's own triplets at runtime",
-	"pages/graphs-detail/features/explorer/StylingPanel.tsx":
-		"a colour input's default is the hex value a user edits, not a style",
 };
 const PIXI = /^(?:pixi\.js|@pixi\/)/;
 

@@ -92,13 +92,13 @@ Each needs one read against the kit before it is cut. Named so the pass is finit
 
 | Lines | Studio | Likely kit replacement |
 |---|---|---|
-| 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **unblocked**, canvas `0.0.12` is published |
+| 646 | `explorer/components/LayersPanel.tsx` | `LayersViewPanel` (canvas-ui) — **done** |
 | 418 | `explorer/components/ExpandFineTunePanel.tsx` | **Keep** — it fetches neighbours from the engine; the kit panels only filter what is drawn. Renamed `ExpandNeighboursDialog` ([module-structure.md](../module-structure.md) §4) |
 | 415 | `modeller/components/PropertyEditor.tsx` | `PropertiesEditor` (canvas-ui) |
 | 269 | `explorer/components/CanvasTabsBar.tsx` | `BoardPagesViewPanel` (canvas-ui) — strip **and** bodies in one column, `keepMounted` |
 | 193 | `work/WorkCanvasChrome.tsx` | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` (canvas-ui) |
 | 178 | `explorer/components/InspectorPanel.tsx` | `InspectorPanel` · `NodeDetailView` · `EdgeDetailView` (canvas-ui) |
-| — | `explorer/lib/visibility.ts` | The store's native API — `hideNodes` · `showNodes` · `isNodeHidden` · `hideNodesByPredicate` · `showAllHidden` |
+| — | `explorer/lib/visibility.ts` | The store's native API — `setNodesHidden` · `hiddenNodes` — **done** |
 | 686 | `explorer/components/SessionComposer.tsx` | `ChatSessionComposer` + `ChatSessionContextChip`; the CodeMirror half → `@invana/editor` |
 | 89 fields, 11 files | hand-written form markup — ProfileSettings · LLMs · NodeType · EdgeType · Skills · PropertyKey · Model · DeclareLink · Login · CanvasForm · Concurrency | `ObjectField` from `@invana/forms`, driven by a `FieldConfig[]` (DS18). **Gated on the kit gaining field validation** — see refactor-plan §2.5 |
 | 520 | `explorer/components/SessionTurn.tsx` | `ChatSessionMessage` + `ChatSessionPromptRow` + `EmissionCard` |
@@ -408,7 +408,7 @@ A convention a community project cannot enforce is a convention it does not have
 | No dead code | `pnpm knip` (`knip --include files,exports,types`, `studio/knip.json`) in CI's Lint job — a file nothing imports, an export nobody reads and an exported type nobody names each fail the build. A module's `index.ts` re-exports only what another module imports |
 | Names follow modules | `studio/scripts/check-names.mjs`, in `pnpm lint` and CI's Lint job — every `features/<m>/` is in its module map and the engine `server/` folder it maps to exists; no `.tsx` under `features/` ends in `Drawer` · `StackPanel` · `DashboardPage` · a bare `Panel`; no identifier carries `drawer` · `StackPanel` · `DashboardPage` · `journal` · `thinking` · `railItem`. Identifiers are read with the TypeScript parser, so strings, JSX text and comments are never flagged; comments get their own check, for decision ids. Each exception is an allow-list line with its reason ([module-structure.md](../module-structure.md) §8b) |
 | Comments stay short | One or two lines on a column; full docstrings on modules, classes and methods; never a decision id — `check-names.mjs` fails a comment that cites one; no history ([module-structure.md](../module-structure.md) §5b) |
-| Tokens only | `check-names.mjs` fails on `hsl(` · `#rrggbb` in a string or a stylesheet and on a Tailwind palette class (`text-emerald-600`), read with the TypeScript parser so comments are never flagged — the same rule `.design/board/build.mjs` enforces (§5.4). Two files are allow-listed with their reason: `SaturationBridge` rebuilds `hsl()` from the theme's own triplets, and `StylingPanel`'s colour-input default is user data |
+| Tokens only | `check-names.mjs` fails on `hsl(` · `#rrggbb` in a string or a stylesheet and on a Tailwind palette class (`text-emerald-600`), read with the TypeScript parser so comments are never flagged — the same rule `.design/board/build.mjs` enforces (§5.4). One file is allow-listed with its reason: `SaturationBridge` rebuilds `hsl()` from the theme's own triplets |
 | The type ladder | `check-names.mjs` fails on `text-[Npx]`; size is `text-base` · `text-sm` · `text-xs` |
 | No PixiJS | `check-names.mjs` fails on a `pixi.js` or `@pixi/*` import in `src/` (rule 10). The `vite.config.ts` pin is outside `src/` |
 | File size | Warn over 400 lines. A warning, not an error — some canvas files earn it |

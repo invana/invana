@@ -28,10 +28,6 @@ import { readProvenance } from "@/pages/graphs-detail/features/explorer/Provenan
 import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 import { typeDotColor } from "@/pages/graphs-detail/features/explorer/typeColor";
 import type { TypeCount } from "@/pages/graphs-detail/features/explorer/types";
-import {
-	hiddenNodeTypes,
-	setNodeTypeHidden,
-} from "@/pages/graphs-detail/features/explorer/visibility";
 import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
 import type { QueryResultItem } from "@/types/query";
 
@@ -98,7 +94,13 @@ export function ExplorerViewPanel({
 	const toggle = useCallback(
 		(type: string) => {
 			if (!store) return;
-			setNodeTypeHidden(store, type, !hidden.has(type));
+			// A type row's eye is a canvas control, not a query: nothing re-runs,
+			// and the graph-wide count on the row does not move — only the
+			// footer's totals, which count what is shown.
+			const ids: string[] = [];
+			for (const node of store.nodes())
+				if (node.type === type) ids.push(String(node.id));
+			store.setNodesHidden(ids, !hidden.has(type));
 		},
 		[store, hidden],
 	);
@@ -400,6 +402,7 @@ function useHiddenTypes(canvas: GraphCanvas | null): ReadonlySet<string> {
 			"node:update",
 			"edge:add",
 			"edge:remove",
+			"node:visibility",
 		] as const;
 		const unsubs = events.map((ev) => store.events.on(ev, bump));
 		return () => {
@@ -414,6 +417,13 @@ function useHiddenTypes(canvas: GraphCanvas | null): ReadonlySet<string> {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: `rev` is the signal — the store is mutable, so re-reading it is exactly what a bump must cause.
 	return useMemo(() => {
 		const store = graphStoreOf(canvas);
-		return store ? hiddenNodeTypes(store) : new Set<string>();
+		const types = new Set<string>();
+		if (!store) return types;
+		// Wholly or in part: one hidden node marks its type.
+		for (const id of store.hiddenNodes()) {
+			const type = store.getNode(id)?.type;
+			if (type) types.add(type);
+		}
+		return types;
 	}, [canvas, rev]);
 }

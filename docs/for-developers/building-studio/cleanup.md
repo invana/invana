@@ -11,17 +11,16 @@ is done, remove its row and update the Status line in the doc it points to.
 
 ```mermaid
 flowchart LR
-    E["5 · Kit swap: Layers"] --> F["6 · Kit swaps: ListRow, ListPanel, Inspector"]
-    K["Kit branches merge"] --> F
+    K["Kit branches merge"] --> F["6 · Kit swaps: ListRow, ListPanel, Inspector"]
+    K --> H["9 · Density tokens"]
 ```
 
-Items 7–12 are independent of that chain and can land in any order.
+Items 10 and 11 are independent of that chain.
 
 ## Items
 
 | # | Cleanup | Size today | Specified in | Changes behaviour |
 |---|---|---|---|---|
-| 5 | Kit swap with no kit change: `LayersPanel` → `LayersViewPanel` | 1 file, and `visibility.ts` moves onto the store's hide API first; no e2e covers it | [module-structure.md](../module-structure.md) §4 | **yes** — Layers gains Groups and loses Refresh |
 | 6 | Kit swaps that need kit work: `ListRow` → `Item size="xs"`, `ListPanelChrome` · `ListFilterMenu` → `PanelContent`, `InspectorViewPanel` → `ElementInspectorViewPanel` | three kit extensions with stories, then a release | [module-structure.md](../module-structure.md) §4 | **yes** — row density; the Inspector reads the canvas |
 | 9 | Control heights hard-coded instead of read from the density tokens | 54 `h-7` · `h-8` · `h-9`: about 45 controls (28px buttons, inputs, triggers), the rest icon and skeleton sizes | Design rules — *density is a token* | visual only. **Blocked on the kit:** `--control-h` is not defined in `@invana/styling` yet — the kit reads it ahead of the token landing — and no kit `Button` size is 28px |
 | 10 | No coverage gate on Studio's unit tests | 20 tests; **1.37%** of statements over all of `src/` (`pnpm test --coverage`) | CLAUDE.md rule 6 (80%) | no — needs tests before a gate, and a decision on what 80% is measured over |

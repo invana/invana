@@ -199,15 +199,15 @@ A Studio component the kit already ships is deleted against the kit import, not 
 a file that is about to be deleted.
 
 **Status: open.** This table is the plan of record for phase K; where canvas-ui-coverage.md or
-refactor-plan.md say otherwise, this table wins. Styling and Layers need no kit change and go first.
+refactor-plan.md say otherwise, this table wins. Styling and Layers are done.
 `ListRow`, `ListPanelChrome` · `ListFilterMenu` and the Inspector wait for kit work, which lands after
 the open design-kit and canvas branches merge. No e2e spec covers any of these surfaces, so each swap
 lands a small spec first and runs it before and after.
 
 | Studio today | Kit | Verdict |
 |---|---|---|
-| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Replace.** A fork of the kit panel. First move `visibility.ts` onto the store's hide API (`setNodeHidden`), because `ExplorerTypesPanel` shares that hidden state |
-| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Replace**, with `apply={false}`. The kit panel paints only while it is mounted, so Studio keeps painting a board's styling in `ExplorerCanvas` and the card only edits it. The stored `labelProperty` stays a property key; the panel boundary maps it to the kit's `labelKey` dot path (`name` ↔ `data.name`). The kit's root choices, `id` and `type`, have no stored form and read back as the default label. An unstyled row's swatch shows canvas-ui's hashed colour, not the painted slot, until `typeColor` is promoted ([canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md) CU6) |
+| `explorer/LayersPanel.tsx` | canvas-ui `LayersViewPanel` (0.0.14) | **Done.** `DataBoardPage` mounts `LayersViewPanel` in `Panel` + `PanelContent`. Hidden is the store's flag (`setNodesHidden` · `hiddenNodes`), which `ExplorerViewPanel`'s type eyes set too, so Layers and the eyes read one state |
+| `explorer/StylingPanel.tsx` | canvas-ui `StylingViewPanel` (0.0.14) | **Done**, with `apply={false}`. The kit panel paints only while it is mounted, so Studio keeps painting a board's styling in `ExplorerCanvas` and the card only edits it. The stored `labelProperty` stays a property key; the panel boundary maps it to the kit's `labelKey` dot path (`name` ↔ `data.name`). The kit's root choices, `id` and `type`, have no stored form and read back as the default label. An unstyled row's swatch shows canvas-ui's hashed colour, not the painted slot, until `typeColor` is promoted ([canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md) CU6) |
 | `explorer/InspectorViewPanel.tsx` | canvas-ui `ElementInspectorViewPanel` | **Replace after extending the kit**: add `isMissing(id)` and `propertyFilter` props. Studio keeps a short `InspectorViewPanel` host that passes `renderExtra={ProvenanceBlock}` |
 | `explorer/ExpandFineTunePanel.tsx` | none — the kit panels filter what is drawn; this fetches neighbours from the engine | **Keep**, as `ExpandNeighboursDialog`. Its form moves to canvas-ui only when `GraphExpandEditorPanel` (B9) is built |
 | `shared/ListPanel.tsx` → `ListRow` | `@invana/ui` `Item size="xs"` | **Replace** (hover-only actions via an `ItemActions` option) |
@@ -229,7 +229,7 @@ before Studio uses it.
 
 ## 5. Component names — one meaning per suffix
 
-**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `LayersPanel` · `StylingPanel` · `ListPanel` (replaced by the kit in phase K). The URL key is `?section=` (`?drawer=` read as an alias for one release, [G35](building-studio/graph-detail-page.md)); its value types are `ProjectsSectionKey` · `LibrarySectionKey` · `GovernSectionKey` · `AgentsSectionKey`, and *drawer* is gone from Studio's identifiers and comments — it survives only in two lines of UI copy, which this refactor does not change (§11).
+**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `ListPanel` (replaced by the kit in phase K). The URL key is `?section=` (`?drawer=` read as an alias for one release, [G35](building-studio/graph-detail-page.md)); its value types are `ProjectsSectionKey` · `LibrarySectionKey` · `GovernSectionKey` · `AgentsSectionKey`, and *drawer* is gone from Studio's identifiers and comments — it survives only in two lines of UI copy, which this refactor does not change (§11).
 
 The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `PanelStack` and its
 `PanelStackSection`s; canvas-ui names every region occupant `*ViewPanel` (`LayersViewPanel`,
@@ -245,7 +245,7 @@ The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `Pane
 | `XList` | the rows of a list section | `RunsList` (done) |
 | `XDetail` | a drill-in that replaces a section's body | `RunDetailDrawer` → `RunDetail` |
 | `XBoardPage` | anything in `mainSection` | `PlanDashboardPage` · `RunDashboardPage` · `RuleDashboardPage` · `UsageDashboardPage` → `*BoardPage` · `RunsJournalPage` → `RunsBoardPage` · `ComparePage` → `CompareBoardPage` |
-| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are replaced by the kit in phase K; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
+| `XCard` | floats over the canvas | `DeclareStitchPanel` → `DeclareStitchCard`. `LayersPanel` and `StylingPanel` are the kit's `LayersViewPanel` and `StylingViewPanel`; `ExpandFineTunePanel` → `ExpandNeighboursDialog` |
 | `XWidget` | one tile on a board | `TaskFlowPanel` · `SkillFlowPanel` · `RunLensPanel` · `StepTouchPanel` · `BoardHistoryPanel` → `*Widget`; `shared/dashboardPanels.ts` → `dashboardWidgets.ts` |
 | `XTab` | a tab body, settings or detail | `EventsSection` → `EventsTab` · `GraphSettingsSection` → `GraphTab` · `GraphInfoPanel` → `InfoTab` |
 | `xRows.ts` | row builders, not components | `databaseTab` · `growthTab` · `performanceTab` · `usageTab` → `*Rows` |
@@ -724,9 +724,9 @@ studio/src/
             ├── explorer/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← explorer.ts · useTypeCounts.ts · traversal.ts
             │   ├── ExplorerCanvas.tsx  ExplorerViewPanel.tsx  InspectorViewPanel.tsx   ← InspectorPanel · ExplorerTypesPanel
-            │   ├── ExpandNeighboursDialog.tsx   ← ExpandFineTunePanel · (LayersPanel, StylingPanel → canvas-ui in K)
+            │   ├── ExpandNeighboursDialog.tsx   ← ExpandFineTunePanel · (LayersPanel, StylingPanel → canvas-ui)
             │   ├── ProvenanceBlock.tsx      ← bring-data-in/
-            │   └── typeColor.ts  visibility.ts  useExpandNode.ts
+            │   └── typeColor.ts  stylingPatch.ts  useExpandNode.ts
             ├── lenses/                      ← govern/
             │   ├── index.ts  api.ts  queries.ts  types.ts   ← govern.ts · useGovern.ts · types/govern.ts
             │   ├── LensesViewPanel.tsx          ← GovernStackPanel.tsx

@@ -27,6 +27,7 @@
  */
 
 import {
+	LayersViewPanel,
 	Panel,
 	PanelContent,
 	RendererCapabilityBanner,
@@ -58,7 +59,6 @@ import {
 	ExpandNeighboursDialog,
 	ExplorerCanvas,
 	fromTypeStylingPatch,
-	LayersPanel,
 	toTypeStylingPatch,
 } from "@/pages/graphs-detail/features/explorer";
 import type { InteractionRef } from "@/services/telemetry/tracer";
@@ -225,11 +225,18 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						onShowDetail={onShowDetail}
 						styling={styling}
 					/>
-					<LayersPanel
-						open={overlay === "layers"}
-						canvas={canvas}
-						onClose={() => setOverlay(null)}
-					/>
+					{overlay === "layers" && (
+						<Panel position="top-right" offset={12} zIndex={20}>
+							<PanelContent
+								width={320}
+								className="max-h-[70vh]"
+								header="Layers"
+								onClose={() => setOverlay(null)}
+							>
+								<LayersViewPanel canvas={canvas} />
+							</PanelContent>
+						</Panel>
+					)}
 					{overlay === "styling" && (
 						// The card only edits: `ExplorerCanvas` paints the styling,
 						// so a board keeps it while the card is closed.

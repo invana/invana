@@ -31,10 +31,6 @@ export {
 } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 export { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer/ExplorerViewPanel";
 export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/InspectorViewPanel";
-// The two cards whose subject is what is drawn — Layers and Styling
-// (boards.md). History and Rename describe the record, so they are
-// Canvases'.
-export { LayersPanel } from "@/pages/graphs-detail/features/explorer/LayersPanel";
 export { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 // A board's stored styling in and out of canvas-ui's `StylingViewPanel`.
 export {

@@ -49,21 +49,21 @@ Audited 2026-09-10 against `@invana/canvas-ui@0.0.14`.
 
 | Studio | Lines | canvas-ui owns it | Verdict |
 |---|---|---|---|
-| `explorer/LayersPanel.tsx` | 674 | **`LayersViewPanel`** | ❌ **Fork.** 15 identical symbols (`buildItems` · `groupByType` · `RowContent` · `VisibilityToggle` · `focusElement` · `selectElement` · …). Delete outright |
+| `explorer/LayersPanel.tsx` | 0 | **`LayersViewPanel`** | ✅ **Replaced.** `DataBoardPage` mounts the kit panel in `Panel` + `PanelContent` |
 | `explorer/ExplorerCanvas.tsx` › `ExplorerHeaderToolbar` | 284 | **`GraphControlsToolbar`** | ❌ **Fork.** Composes the same six section hooks (`useLayout` · `useViewSection` · `useSelectMode` · `useGrid` · `useStyleEditorSection` · `useHistorySection`). The magnet toggle and the WebGL/WebGPU picker are genuinely ours — they are two `extraItems` |
-| `explorer/visibility.ts` | 78 | **`GraphStore` visibility API** | ❌ **Obsolete workaround.** A sticky `hidden` state flag with a hand-rolled edge cascade, written before the engine had one. It is what forced the `LayersPanel` fork |
-| `explorer/StylingPanel.tsx` | 190 | **`StylingViewPanel`** (B1) | ❌ **Replace**, with `apply={false}` — Studio keeps painting, the card only edits ([module-structure.md](../module-structure.md) §4) |
+| `explorer/visibility.ts` | 0 | **`GraphStore` visibility API** | ✅ **Deleted.** Hidden is the store's flag; the edge cascade is the store's |
+| `explorer/StylingPanel.tsx` | 0 | **`StylingViewPanel`** (B1) | ✅ **Replaced**, with `apply={false}` — Studio keeps painting, the card only edits ([module-structure.md](../module-structure.md) §4) |
 | `canvases/CanvasHistoryPanel.tsx` | 171 | **`CanvasVersionsViewPanel`** | ⏳ **Built, awaiting a release.** B4 has shipped in canvas-ui (`view-panels/canvas-versions`, with a story) and lands here on the next canvas version. It draws the timeline; the rows, the restore and the per-row banner query stay ours — they read the engine's `canvas_states`, which canvas-ui knows nothing about (a row *is* a `CanvasStateSnapshot`; *version* is the word the user reads — [canvases.md](../modules/explore/features/boards.md) CV11) |
 | `boards/DataBoardPage.tsx` › the `overlay` union | ~40 | **`useSidePanels`** | ⚠️ **Reimplements CV6.** The hook turns a list of `SidePanelDef`s into the toggles, the open-state and the region body |
 | `explorer/InspectorViewPanel.tsx` | 178 | `DetailCard` · `PropertyDetailView` · `EdgeEndpoints` · `defaultPropertyRenderers` | ⚠️ **Partial.** Property rendering by kind is duplicated. The provenance block and the `missing` badge are ours. Carries `bg-blue-500/20` · `text-purple-400` — tokens-only violations |
 | `explorer/canvasTheme.ts` + `ExplorerCanvas` › `ThemeBridge` | 91 | **`CanvasThemeSync`** | ⚠️ **Same job, different route.** Ours reads CSS tokens off the live DOM; canvas-ui's drives the engine's `ThemeBehaviour` from `useThemeOptional`. Verify the engine path recolours everything ours does before swapping |
 | `explorer/typeColor.ts` | 74 | `view-panels/schema` › `typeColor` | ⬇️ **Promote ours.** canvas-ui hashes into a hardcoded `TYPE_PALETTE`; ours reads `--color-data-1…8` from `@invana/styling`. CU6 |
 | `explorer/ExpandNeighboursDialog.tsx` | 418 | — | ✅ **Ours.** Graph-traversal filters, sorts and limits — an engine concern, no canvas-ui analogue |
-| `explorer/ExplorerViewPanel.tsx` | 413 | — | ✅ **Ours.** The legend-and-selection panel. Its eye rows go through `visibility.ts` today and move to the store API with CU5 |
+| `explorer/ExplorerViewPanel.tsx` | 413 | — | ✅ **Ours.** The legend-and-selection panel. Its type eyes set the store's hidden flag (CU5), the same state Layers reads |
 | `explorer/RendererCapabilityBanner.tsx` | 0 | **`RendererCapabilityBanner`** | ✅ **Moved down (B5).** Studio renders canvas-ui's; the probes it calls are memoised in `renderer-pixijs`, because `hasWebGL` creates a WebGL context to answer and the browser evicts the oldest live one past ~16 |
 | `canvases/{canvasKinds,captureBanner,useCanvasStates,CanvasFormDialog}` | 384 | — | ✅ **Ours.** The canvas *record* — kinds, thumbnails, contents, CRUD. canvas-ui draws canvases; it does not persist them |
 
-**Deletable today: ~1,036 lines**, plus the two hand-rolled cards.
+**Deleted: ~940 lines** — Layers, Styling and the visibility workaround.
 
 ## 3. Not adopted yet — free surfaces
 
@@ -85,10 +85,10 @@ The visibility workaround is the keystone: it is why the Layers fork exists, so 
 
 | # | Step | Unblocks | Deletes |
 |---|---|---|---|
-| 1 | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerViewPanel`'s type-row eye loops the store API | 2 | 78 |
-| 2 | `LayersPanel` → `LayersViewPanel`, wrapped in `Panel` + `PanelContent` | — | 674 |
+| 1 ✅ | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerViewPanel`'s type-row eye loops the store API | 2 | 78 |
+| 2 ✅ | `LayersPanel` → `LayersViewPanel`, wrapped in `Panel` + `PanelContent` | — | 674 |
 | 3 | `ExplorerHeaderToolbar` → `GraphControlsToolbar` with `extraItems` for magnet + backend | — | ~284 |
-| 4 | `StylingPanel` → `StylingViewPanel` with `apply={false}`, wrapped in `Panel` + `PanelContent`; `labelProperty` ↔ `labelKey` at the panel boundary. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~190 |
+| 4 ✅ | `StylingPanel` → `StylingViewPanel` with `apply={false}`, wrapped in `Panel` + `PanelContent`; `labelProperty` ↔ `labelKey` at the panel boundary. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~190 |
 | 5 | `DataBoardPage`'s `overlay` union → `useSidePanels` | — | ~40 |
 | 6 | `InspectorViewPanel` property rendering → `DetailCard` + `PropertyDetailView`; keep provenance and the `missing` badge | — | ~80 |
 | 7 | `ThemeBridge` + `canvasTheme.ts` → `CanvasThemeSync`, once the engine path is verified equivalent | — | ~91 |
