@@ -8,6 +8,7 @@ canvas: **check here before building canvas chrome.**
 |---|---|
 | Package | `@invana/canvas-ui` — source at `~/Projects/invana/canvas/packages/canvas-ui` |
 | Studio folders | [`features/explorer/` · `features/boards/`](../module-structure.md#121-studio) |
+| Where it disagrees | [module-structure.md](../module-structure.md) §4 *Kit substitutions* is the plan of record and wins |
 | Rule it enforces | CLAUDE.md › *Design rules* — anything bound to canvas state belongs to `@invana/canvas-ui`; a component the kit lacks is built **there**, with a story, not in `studio/` |
 
 ## 1. The rule
@@ -51,7 +52,7 @@ Audited 2026-09-10 against `@invana/canvas-ui@0.0.14`.
 | `explorer/LayersPanel.tsx` | 674 | **`LayersViewPanel`** | ❌ **Fork.** 15 identical symbols (`buildItems` · `groupByType` · `RowContent` · `VisibilityToggle` · `focusElement` · `selectElement` · …). Delete outright |
 | `explorer/ExplorerCanvas.tsx` › `ExplorerHeaderToolbar` | 284 | **`GraphControlsToolbar`** | ❌ **Fork.** Composes the same six section hooks (`useLayout` · `useViewSection` · `useSelectMode` · `useGrid` · `useStyleEditorSection` · `useHistorySection`). The magnet toggle and the WebGL/WebGPU picker are genuinely ours — they are two `extraItems` |
 | `explorer/visibility.ts` | 78 | **`GraphStore` visibility API** | ❌ **Obsolete workaround.** A sticky `hidden` state flag with a hand-rolled edge cascade, written before the engine had one. It is what forced the `LayersPanel` fork |
-| `explorer/StylingPanel.tsx` | 190 | `Panel` · `PanelContent` (chrome) | ⚠️ **Chrome hand-rolled.** The per-type colour / label-property / size list is genuinely Invana's; the card around it is not. Also carries a `#9ca3af` literal — a tokens-only violation |
+| `explorer/StylingPanel.tsx` | 190 | **`StylingViewPanel`** (B1) | ❌ **Replace**, with `apply={false}` — Studio keeps painting, the card only edits ([module-structure.md](../module-structure.md) §4) |
 | `canvases/CanvasHistoryPanel.tsx` | 171 | **`CanvasVersionsViewPanel`** | ⏳ **Built, awaiting a release.** B4 has shipped in canvas-ui (`view-panels/canvas-versions`, with a story) and lands here on the next canvas version. It draws the timeline; the rows, the restore and the per-row banner query stay ours — they read the engine's `canvas_states`, which canvas-ui knows nothing about (a row *is* a `CanvasStateSnapshot`; *version* is the word the user reads — [canvases.md](../modules/explore/features/boards.md) CV11) |
 | `boards/DataBoardPage.tsx` › the `overlay` union | ~40 | **`useSidePanels`** | ⚠️ **Reimplements CV6.** The hook turns a list of `SidePanelDef`s into the toggles, the open-state and the region body |
 | `explorer/InspectorViewPanel.tsx` | 178 | `DetailCard` · `PropertyDetailView` · `EdgeEndpoints` · `defaultPropertyRenderers` | ⚠️ **Partial.** Property rendering by kind is duplicated. The provenance block and the `missing` badge are ours. Carries `bg-blue-500/20` · `text-purple-400` — tokens-only violations |
@@ -87,7 +88,7 @@ The visibility workaround is the keystone: it is why the Layers fork exists, so 
 | 1 | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerViewPanel`'s type-row eye loops the store API | 2 | 78 |
 | 2 | `LayersPanel` → `LayersViewPanel`, wrapped in `Panel` + `PanelContent` | — | 674 |
 | 3 | `ExplorerHeaderToolbar` → `GraphControlsToolbar` with `extraItems` for magnet + backend | — | ~284 |
-| 4 | `StylingPanel` chrome → `Panel` + `PanelContent`; kill the two colour literals. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~30 |
+| 4 | `StylingPanel` → `StylingViewPanel` with `apply={false}`, wrapped in `Panel` + `PanelContent`; `labelProperty` ↔ `labelKey` at the panel boundary. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~190 |
 | 5 | `DataBoardPage`'s `overlay` union → `useSidePanels` | — | ~40 |
 | 6 | `InspectorViewPanel` property rendering → `DetailCard` + `PropertyDetailView`; keep provenance and the `missing` badge | — | ~80 |
 | 7 | `ThemeBridge` + `canvasTheme.ts` → `CanvasThemeSync`, once the engine path is verified equivalent | — | ~91 |
@@ -127,7 +128,7 @@ folder, one `*ViewPanel` component, an `index.ts`.
 
 | # | `view-panels/…` | Reads | Studio gives up |
 |---|---|---|---|
-| B1 ✅ | **`styling/StylingViewPanel`** — **built**, ships in canvas-ui `0.0.14` | `useDerivedSchema` for the types on the canvas; emits a serialisable `{ nodeTypes, edgeTypes }` patch — colour, label property, size/width per type. The host persists it. Every existing style editor is per-*element* or per-*style-object*; none is per-type-on-this-canvas | `StylingPanel.tsx` — 190 → ~30 |
+| B1 ✅ | **`styling/StylingViewPanel`** — **built**, ships in canvas-ui `0.0.14` | `useDerivedSchema` for the types on the canvas; emits a serialisable `{ nodeTypes, edgeTypes }` patch — colour, label property, size/width per type. The host persists it; Studio also paints it (`apply={false}`). Every existing style editor is per-*element* or per-*style-object*; none is per-type-on-this-canvas | `StylingPanel.tsx` — 190 → 0 |
 | B2 ✅ | **`selection/SelectionViewPanel`** — **built**, ships in canvas-ui `0.0.14`; `ElementInspectorViewPanel`'s `renderExtra` is the named slot for provenance | the `ClickSelectBehaviour` selection, rendered read-only through `DetailCard` + `PropertyDetailView`, with tabs, a `missing` marking for elements no longer in the graph, and named **slots** for host-owned blocks | `InspectorViewPanel.tsx` — 178 → ~40 |
 | B3 | **`graph-types/GraphTypesViewPanel`** | `useDerivedSchema` again — every type as a row: the colour the canvas actually paints, a count, a visibility eye driving `store.setNodeHidden`. The legend and the list are one thing | `ExplorerViewPanel.tsx` — 413 → ~200 |
 | B4 ✅ | **`canvas-versions/CanvasVersionsViewPanel`** — **built**, ships on the next canvas release | nothing live — presentational. Rows grouped by day, newest first; thumbnail, what changed, who, restore. The host supplies the rows and `onRestore`, and mounts its own lazily-loading banner through the `renderThumbnail` slot; the row for `currentVersionId` is marked and not restorable. An optional `onCapture` draws the capture button. canvas-ui draws the timeline, it does not persist versions | `CanvasHistoryPanel.tsx` — 171 → ~50 |

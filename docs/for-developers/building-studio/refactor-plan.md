@@ -76,16 +76,18 @@ The refactor is mostly deletion. Each row is *delete the Studio file, import the
 Released this week, and it took the React components with it — `CanvasMessageBar`, `GraphStatusBar`,
 the three context menus, `ToolbarItem(s)` and `applyIconOverrides` left `@invana/canvas-react`.
 
+Where a row here and [module-structure.md](../module-structure.md) §4 *Kit substitutions* disagree, §4 wins.
+
 | Studio | Lines | Becomes |
 |---|---|---|
 | `explorer/LayersPanel.tsx` | 646 | `LayersViewPanel` |
-| `explorer/ExpandFineTunePanel.tsx` | 418 | `CanvasFiltersViewPanel` + `FindInCanvasViewPanel` |
+| `explorer/ExpandFineTunePanel.tsx` | 418 | Kept, as `ExpandNeighboursDialog` — it fetches neighbours from the engine; the kit panels only filter what is drawn |
 | `modeller/PropertyEditor.tsx` | 415 | `PropertiesEditor` |
 | `explorer/CanvasTabsBar.tsx` | 269 | `BoardPagesViewPanel`, and with it the four-branch ternary in `mainSection`. The layout is the small half; extracting a `DataBoardPage` that owns one board's state is the work. See [the-shell.md](the-shell.md) › *The Explorer's main region is a page host already* |
 | `work/WorkCanvasChrome.tsx` | 193 | `CanvasMessageBar` + `GraphLegendLayerEditorPanel` |
-| `explorer/InspectorPanel.tsx` | 178 | `InspectorPanel` + `NodeDetailView` + `EdgeDetailView` |
-| `explorer/StylingPanel.tsx` | — | `NodeStyleEditorPanel` + `NodeStylingEditorPanel` + `ThemeEditorPanel` |
-| `explorer/lib/visibility.ts` | — | The store: `hideNodes` · `showNodes` · `isNodeHidden` · `hideNodesByPredicate` · `showAllHidden` |
+| `explorer/InspectorViewPanel.tsx` | 178 | `ElementInspectorViewPanel`, after the kit gains `isMissing(id)` and `propertyFilter`; a short host passes `renderExtra={ProvenanceBlock}` |
+| `explorer/StylingPanel.tsx` | 190 | `StylingViewPanel` with `apply={false}` — Studio keeps painting |
+| `explorer/visibility.ts` | 78 | The store: `setNodeHidden` · `setNodesHidden` · `isNodeHidden` · `hiddenNodes` · `showAllHidden` |
 
 ****Installing canvas-ui pulls four more packages.** `canvas-react@0.0.12` statically imports
 `@invana/renderer-pixijs`, `graph-layer-d3-contour`, `graph-layer-maplibre` and
