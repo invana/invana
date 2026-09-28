@@ -166,15 +166,25 @@ test("Performance groups queries by shape, and a picked shape shows its plan", a
 	await expect(page.getByText("Query shapes")).toBeVisible({ timeout: 30_000 });
 	await expect(page.getByText("p95 a day")).toBeVisible();
 
-	await page
-		.getByText(/^MATCH /)
-		.first()
-		.click();
+	// Not every shape carries a plan — which one tops the list depends on what
+	// the Graph was asked lately — so open shapes until one does.
+	const shapes = page.getByText(/^MATCH /);
 	const card = page.getByRole("dialog", { name: "A query shape" });
-	await expect(card).toBeVisible({ timeout: 20_000 });
-	await expect(card.getByText("Slowest calls")).toBeVisible();
+	const plan = card.getByText("The plan", { exact: true });
+	const count = Math.min(await shapes.count(), 10);
+	let planned = false;
+	for (let i = 0; i < count && !planned; i++) {
+		await shapes.nth(i).click();
+		await expect(card).toBeVisible({ timeout: 20_000 });
+		await expect(card.getByText("Slowest calls")).toBeVisible();
+		planned = await plan.isVisible();
+		if (!planned) {
+			await card.getByRole("button", { name: "Close" }).click();
+			await expect(card).toBeHidden();
+		}
+	}
 	// Neo4j explains, so the plan is drawn and advice is not refused (MP38 · MP39).
-	await expect(card.getByText("The plan", { exact: true })).toBeVisible();
+	expect(planned, "no shape among the first ten carries a plan").toBe(true);
 	await expect(card.getByText(/Advice is not available/)).toHaveCount(0);
 });
 
