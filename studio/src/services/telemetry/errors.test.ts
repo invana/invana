@@ -19,7 +19,7 @@ import {
 } from "@opentelemetry/sdk-trace-web";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ApiError } from "@/services/api/client";
-import { reportError, shouldReport } from "./errors";
+import { reportBoundaryError, reportError, shouldReport } from "./errors";
 import { startAction, withInteraction } from "./tracer";
 
 const logExporter = new InMemoryLogRecordExporter();
@@ -87,6 +87,25 @@ describe("reportError", () => {
 	});
 });
 
+describe("a thrown non-Error", () => {
+	it("is still logged, named by its type, outside any page", () => {
+		reportError("plain string", "uncaught", "explorer");
+		reportError({ code: 7 }, "uncaught", "explorer");
+		reportError(null, "uncaught", "explorer");
+		reportBoundaryError(new Error("boundary caught"));
+
+		const records = logExporter.getFinishedLogRecords();
+		expect(records.map((r) => r.attributes["exception.type"])).toEqual([
+			"string",
+			"object",
+			"null",
+			"Error",
+		]);
+		expect(records[1].body).toBe('{"code":7}');
+		expect(records[3].attributes.module).toBe("other");
+	});
+});
+
 describe("a failed request", () => {
 	it("is logged in the trace of the request that failed", () => {
 		const action = startAction("assistant", "ask");
@@ -120,6 +139,13 @@ describe("shouldReport", () => {
 		);
 		expect(
 			shouldReport(new ApiError(0, "canceled", undefined, { cancelled: true })),
+		).toBe(false);
+		expect(
+			shouldReport(
+				new Error(
+					"ResizeObserver loop completed with undelivered notifications.",
+				),
+			),
 		).toBe(false);
 		expect(logExporter.getFinishedLogRecords()).toHaveLength(0);
 	});
