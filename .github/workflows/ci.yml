@@ -29,6 +29,9 @@ jobs:
       - name: Biome and names check
         run: cd studio && pnpm lint
 
+      - name: Dead files
+        run: cd studio && pnpm knip
+
       - name: TypeScript type check
         run: cd studio && pnpm tsc --noEmit
 

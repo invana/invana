@@ -136,7 +136,7 @@ the 26 turned out to be — 16 of them were one wrong type annotation, written t
 | ✅ **Removed** | `rbush` · `d3-force` · `immer` · `@types/d3-force` | Zero imports in `src/` |
 | **Keep, do not "clean up"** | `pixi.js` · `pixi-viewport` | Zero imports, but `vite.config.ts` pins them so a local canvas checkout does not load PixiJS twice (DS11). Rule 10 forbids PixiJS *code*, not the pin |
 | **Keep** | `elkjs` | Two real consumers (`ExplorerCanvas`, `WorkGraphCanvas`) |
-| **Add (dev)** | `vitest` · `@testing-library/react` · `knip` | §8 and §9 — not yet added |
+| **Add (dev)** | `vitest` · `knip` added; `@testing-library/react` | §8 and §9 — Testing Library not yet added |
 
 ---
 
@@ -404,7 +404,7 @@ A convention a community project cannot enforce is a convention it does not have
 | No component shadowing a kit export | `scripts/check-kit-overlap.mjs` — reads `@invana/ui`'s `.d.ts`, greps Studio's exported component names, fails on a collision. Runs in `pnpm lint` |
 | No cross-feature deep imports | Biome `noRestrictedImports`: `src/features/*/!(index.ts)` is not importable from another feature |
 | No canvas-ui fork | A canvas panel, toolbar, card, menu or status strip is `@invana/canvas-ui`'s. [canvas-ui-coverage.md](canvas-ui-coverage.md) is the map, read before writing one; a surface listed there is consumed, never reimplemented |
-| No dead files | `knip` in CI |
+| No dead files | `pnpm knip` (`knip --include files`, `studio/knip.json`) in CI's Lint job — a file nothing imports fails the build. Unused *exports* are not gated yet: each module's `index.ts` becomes its public surface first (§8, cross-feature imports), and until then a re-export nobody reads is not yet a finding |
 | Names follow modules | `studio/scripts/check-names.mjs`, in `pnpm lint` and CI's Lint job — every `features/<m>/` is in its module map and the engine `server/` folder it maps to exists; no `.tsx` under `features/` ends in `Drawer` · `StackPanel` · `DashboardPage` · a bare `Panel`; no identifier carries `drawer` · `StackPanel` · `DashboardPage` · `journal` · `thinking` · `railItem`. Identifiers are read with the TypeScript parser, so strings, JSX text and comments are never flagged. Each exception is an allow-list line with its reason ([module-structure.md](../module-structure.md) §8b) |
 | Comments stay short | one or two lines; cite the decision id instead of restating the feature file; no history ([module-structure.md](../module-structure.md) §5b) |
 | Tokens only | Extend the check script to fail on `hsl(` · `#rrggbb` · `bg-{palette}-{n}` in `src/` — the same rule `.design/board/build.mjs` enforces (§5.4) |
