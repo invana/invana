@@ -85,6 +85,16 @@ export type BoardVersionCause =
 	| "manual"
 	| "report";
 
+/**
+ * Captures the live canvas as a version after a turn that changed it. It waits
+ * for the layout to settle unless `immediate`, and never throws: a refusal
+ * comes back as its reason.
+ */
+export type CaptureCanvasState = (
+	kind: BoardVersionCause,
+	opts?: { messageId?: string; immediate?: boolean },
+) => Promise<{ ok: true } | { ok: false; reason: string }>;
+
 /** Timeline-row shape — omits the heavy render blobs (snapshot/positions/banner). */
 export interface BoardVersionSummary {
 	id: string;

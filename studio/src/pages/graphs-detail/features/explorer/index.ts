@@ -36,6 +36,7 @@ export type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer/Styl
 
 export { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer/ExpandNeighboursDialog";
 export { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
+export { useCanvasExpand } from "@/pages/graphs-detail/features/explorer/useCanvasExpand";
 
 // Query results as canvas items, and a saved state as the engine reads it.
 export {

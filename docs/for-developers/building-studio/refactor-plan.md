@@ -205,7 +205,7 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 
 ### 3.2 Decomposing `GraphDetailPage.tsx`
 
-**Status: open.** 3,214 lines at the start, almost all of it one component; 1,012 now. Every row below has left except the last two — the page list and the `rightSection` occupants — and `useDataBoards` (1,572 lines) is still one hook that the next cut splits into the tabs, the expansion and the ask. It is cut by moves, not rewritten: each
+**Status: open.** 3,214 lines at the start, almost all of it one component; 1,012 now. Every row below has left except the last two — the page list and the `rightSection` occupants. It is cut by moves, not rewritten: each
 piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
 way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
@@ -219,13 +219,21 @@ way it did. What remains composes — `GraphDetail`'s regions, the providers, th
 | The `leftSection` occupant, one branch per `?panel` key | `shell/leftSectionContent.tsx` | function over a deps object |
 | The layered canvas in `mainSection` and its empty hint | `shell/layeredCanvasBody.tsx` | functions |
 | Open declared boards — the cold-link restore, `openBoard`, the plan page following `&plan=` | `shell/useOpenBoards.ts` | hook |
-| The data canvases — engine, tabs, autosave, history, expand, the ask and its stream | `shell/useDataBoards.ts` | hook |
+| The data canvases — engine, contents, autosave, history; composes the three below | `shell/useDataBoards.ts` | hook |
+| Their tabs — open, new, close, a session's canvas from the list, each tab's title | `features/boards/useCanvasTabs.ts` | hook |
+| Node expansion under the thread's world, and the menus it offers | `features/explorer/useCanvasExpand.ts` | hook |
+| The ask, its stream, the inline results, the restore of a session's canvas | `features/assistant/useAssistantCanvasBridge.ts` | hook |
 | The page list, the active page, select, close, the strip's actions | `shell/useOpenPages.ts` | hook |
 | The `rightSection` occupants and their sizes | `shell/rightSections.tsx` | function |
 
 Everything lands in `shell/` except what reads no region: a module never imports the shell
 ([code-shape.md](code-shape.md) §4). The stream callback `useSessions` takes stays a ref on the page,
-so the data-canvas hook assigns it rather than the page reordering its hooks. Each cut is one commit,
+so the data-canvas hook assigns it rather than the page reordering its hooks. `useDataBoards` holds the
+tab list and the restored-session ref and hands them to its three parts: which canvas is active decides
+whose contents it resolves, and the tab actions call the save and paint that follow — so the parts share
+the same state and ref objects rather than reading each other through a bridge. It calls them in the
+order that keeps every effect where it ran before, and the one effect that answers the shell's open-session
+request stays in `shell/`. Each cut is one commit,
 with `check-types` and the e2e specs run before it lands. If the page is still over 400 lines at the
 end, something in the table did not actually leave.
 

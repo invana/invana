@@ -22,6 +22,11 @@ export { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardH
 
 export { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
 export type { BoardSlice } from "@/pages/graphs-detail/features/boards/useBoardVersions";
+export type { CaptureCanvasState } from "@/pages/graphs-detail/features/boards/types";
+
+// The data canvases' tabs, one per open session.
+export { useCanvasTabs } from "@/pages/graphs-detail/features/boards/useCanvasTabs";
+export type { OpenCanvasTab } from "@/pages/graphs-detail/features/boards/useCanvasTabs";
 
 export {
 	STATE_THUMB_MAX_EDGE,

@@ -1,6 +1,4 @@
-import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
-import type { SessionMessage } from "@/pages/graphs-detail/features/assistant/types";
 import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
 import {
 	STATE_THUMB_MAX_EDGE,
@@ -9,68 +7,36 @@ import {
 import { useBoardVersions } from "@/pages/graphs-detail/features/boards";
 import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
 import { useCreateCanvasStateMutation } from "@/pages/graphs-detail/features/boards/queries";
-import {
-	useBoardsQuery,
-	useCreateCanvasMutation,
-	useUpdateCanvasMutation,
-} from "@/pages/graphs-detail/features/boards/queries";
+import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards/queries";
 import type {
 	Board,
 	BoardVersionCause,
 	CanvasStyling,
 } from "@/pages/graphs-detail/features/boards/types";
 import { boardVersionsApi } from "@/pages/graphs-detail/features/boards/versionsApi";
-import {
-	ACTIVE_LAYOUT_ID,
-	type CanvasBackend,
-	type ExpandMenuSchema,
-} from "@/pages/graphs-detail/features/explorer";
+import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
 import {
 	adaptItems,
-	expandRefusal,
 	isCanvasStateSnapshot,
-	resultToItems,
-	useExpandNode,
 } from "@/pages/graphs-detail/features/explorer";
 import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
-import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
-import type {
-	ExpandRequest,
-	NeighborExpandResponse,
-} from "@/pages/graphs-detail/features/explorer/types";
 import type { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
-import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
-import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models/queries";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import type { useRightSection } from "@/pages/graphs-detail/shell/useRightSection";
-import { ApiError } from "@/services/api/client";
-import {
-	type Interaction,
-	measureSync,
-	startAction,
-} from "@/services/telemetry/tracer";
-import type {
-	QueryResponse,
-	QueryResultItem,
-	QueryRunPayload,
-} from "@/types/query";
+import { type Interaction, measureSync } from "@/services/telemetry/tracer";
+import type { QueryResponse, QueryResultItem } from "@/types/query";
 import { canUseWebGPU } from "@invana/canvas-react";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { useAssistantCanvasBridge } from "@/pages/graphs-detail/features/assistant/useAssistantCanvasBridge";
 import type { CanvasKind as DataBoardsCanvasKind } from "@/pages/graphs-detail/features/boards";
+import { useCanvasTabs } from "@/pages/graphs-detail/features/boards";
+import { useCanvasExpand } from "@/pages/graphs-detail/features/explorer";
 import type { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-
-// Fallback when the engine hasn't reported any query languages yet (e.g. the
-// connector class couldn't be loaded server-side). Studio shows both rather
-// than blocking the user.
-const FALLBACK_QUERY_LANGUAGES: readonly QueryLanguage[] = [
-	"cypher",
-	"gremlin",
-];
 
 // localStorage key persisting the user's render-backend choice across reloads.
 const BACKEND_STORAGE_KEY = "explorer.canvas.backend";
@@ -168,22 +134,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// whole dataset here would call the destructive `setData`, wiping every position
 	// and re-laying the graph out from the origin on each expand.
 
-	// Per-message query results (docs/for-developers/modules/ask/features/the-answer-surface.md): transient, keyed by assistant message
-	// id, populated on send/rerun and rendered inline in the thread.
-	const [resultsByMessageId, setResultsByMessageId] = useState<
-		Record<string, QueryResponse | null>
-	>({});
-	const setResultFor = useCallback(
-		(messageId: string, result: QueryResponse | null) =>
-			setResultsByMessageId((prev) => ({ ...prev, [messageId]: result })),
-		[],
-	);
-	// Sessions whose first result should open + paint their new canvas, and
-	// replies whose re-run result should repaint (the restore path). Registered
-	// when the run starts; consumed when the result lands on the stream.
-	const pendingNewSessionsRef = useRef<Set<string>>(new Set());
-	const pendingRestorePaintRef = useRef<Set<string>>(new Set());
-
 	// Root span for the in-flight query run (docs/for-developers/modules/platform/features/telemetry.md). Held in a ref so the
 	// transform / adapt / layout / render stages — which span several async
 	// renders — all attach to the same trace. Set in `handleRun`, closed by the
@@ -229,7 +179,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	const [openTabs, setOpenTabs] = useState<{ id: string; sessionId: string }[]>(
 		[],
 	);
-	const createCanvas = useCreateCanvasMutation(username ?? "", graphSlug ?? "");
 	// Version history (docs/for-developers/modules/explore/features/boards.md): capture a state after each canvas-mutating turn,
 	// and fork a chosen state into a new canvas to "go back in time".
 	const createCanvasState = useCreateCanvasStateMutation(
@@ -245,13 +194,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// reopenable from the "?" in the canvas header.
 	// Per-type styling (docs/for-developers/modules/explore/features/graph-canvas.md) for the active canvas — hydrated from it on open,
 	// edited in the StylingPanel, applied live by the renderer + persisted.
-	// Board list — used to resolve an existing session's canvas when opening it
-	// from the sessions list (`handleOpenSession`). Titles/purposes for the tabs
-	// and edit dialog come from the session + a direct canvas fetch, not this.
-	const { data: canvasList } = useBoardsQuery(username, graphSlug, {
-		limit: 100,
-		includeArchived: true,
-	});
 	const activeCanvasId =
 		openTabs.find((t) => t.sessionId === activeSessionId)?.id ?? null;
 
@@ -304,26 +246,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 	// instead of re-extracting from PixiJS on every save.
 	const lastBannerAtRef = useRef(0);
 	const lastBannerUrlRef = useRef<string | null>(null);
-	// sessionId → boardId for canvases that have a banner screenshot (docs/for-developers/modules/explore/features/graph-canvas.md),
-	// so the Sessions list can show each session's canvas preview above its title.
-	// Only bannered canvases are mapped; their rows lazy-fetch the (heavy) image.
-	const bannerCanvasIdBySession = useMemo(() => {
-		const m = new Map<string, string>();
-		for (const c of canvasList?.items ?? []) {
-			if (c.hasBanner) m.set(c.sessionId, c.id);
-		}
-		return m;
-	}, [canvasList]);
-	// A session's title is the single name for it and its 1:1 canvas (docs/for-developers/modules/explore/features/graph-canvas.md):
-	// the breadcrumb and the canvas tab show the same session title, so there's no
-	// separate canvas name to keep in sync. `activeSession` is the freshest source
-	// for the open thread (e.g. right after a rename); the list covers the rest.
-	const sessionTitleById = useMemo(() => {
-		const m = new Map<string, string>();
-		for (const s of sessions) m.set(s.id, s.title);
-		if (activeSession) m.set(activeSession.id, activeSession.title);
-		return m;
-	}, [sessions, activeSession]);
 	// The session behind the tab being edited (its title is what the edit dialog
 	// renames). Read from `openTabs` — always present for an open tab, unlike the
 	// canvas list cache which can lag a freshly created canvas.
@@ -378,16 +300,6 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		},
 		[openInspector, setSelectedId],
 	);
-
-	// The engine resolves capabilities from the live connector and returns
-	// them on the connection payload. Default to the first language it
-	// reports, fall back to allowing both while the engine is still warming
-	// up / can't resolve the connector class.
-	const availableLanguages: readonly QueryLanguage[] = graph?.query_languages
-		?.length
-		? graph.query_languages
-		: FALLBACK_QUERY_LANGUAGES;
-	const defaultLanguage: QueryLanguage = availableLanguages[0] ?? "cypher";
 
 	const paintCanvas = useCallback(
 		(result: QueryResponse | null) => {
@@ -769,124 +681,47 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		else toast.error(res.reason);
 	}, [activeCanvasId, captureCanvasState]);
 
-	// Open a canvas as a tab: save the outgoing one, hydrate this one, add the tab,
-	// and switch the active session to its backing session (queries then belong to
-	// this canvas). Paint from the snapshot — mark the session already-restored so
-	// the restore effect doesn't re-run its query over our snapshot.
-	const openCanvasTab = useCallback(
-		async (id: string) => {
-			if (id === activeCanvasId) return;
-			await persistActiveCanvas();
-			try {
-				const c = await boardsApi.get(
-					username as string,
-					graphSlug as string,
-					id,
-				);
-				const hasSnapshot = (c.snapshot?.items?.length ?? 0) > 0;
-				if (hasSnapshot) {
-					// Painted from a real snapshot → mark restored so the restore effect
-					// doesn't re-run the query over it.
-					paintFromCanvas(c);
-					restoredRef.current = c.sessionId;
-				} else {
-					// Empty snapshot: seeding the canvas empty and then repainting from
-					// the restore re-run is a double re-seed (setData([]) → setData(full))
-					// that crashes the PixiJS WebGPU renderer. Restore selection/styling
-					// only — leave the GraphLayer seed untouched — and let the restore
-					// effect paint the base query in a single pass (heals canvases saved
-					// blank before autosave existed).
-					setSelectedId(null);
-					setCanvasData([]);
-					if (typeof c.settings?.magnet === "boolean")
-						setMagnet(c.settings.magnet);
-					setStyling(c.styling ?? {});
-					restoredRef.current = null;
-				}
-				setOpenTabs((tabs) =>
-					tabs.some((t) => t.id === id)
-						? tabs
-						: [...tabs, { id, sessionId: c.sessionId }],
-				);
-				openSession(c.sessionId);
-			} catch {
-				toast.error("Failed to open canvas.");
-			}
-		},
-		[
-			activeCanvasId,
-			persistActiveCanvas,
-			username,
-			graphSlug,
-			paintFromCanvas,
-			openSession,
-			setCanvasData,
-			setStyling,
-			setSelectedId,
-		],
-	);
+	// Session whose canvas is already painted — skip the auto-restore effect for
+	// it (a fresh send already painted; reopening another session restores it).
+	const restoredRef = useRef<string | null>(null);
 
-	// Opening a session opens its 1:1 canvas and makes it the active page (G45):
-	// an open tab is focused, a closed one is loaded, and a session with no canvas
-	// yet gets one created — the restore effect then paints its last query.
-	// Whatever page was in front steps behind it; nothing is closed.
-	const handleOpenSession = useCallback(
-		(sessionId: string) => {
-			setActiveBoardId(null);
-			boardPage.setPageId(null);
-			setWorkKind(null);
-			const existing = openTabs.find((t) => t.sessionId === sessionId);
-			if (existing) {
-				if (existing.id === activeCanvasId) openSession(sessionId);
-				else void openCanvasTab(existing.id);
-				return;
-			}
-			const canvas = canvasList?.items.find((c) => c.sessionId === sessionId);
-			if (canvas) {
-				void openCanvasTab(canvas.id);
-				return;
-			}
-			void (async () => {
-				await persistActiveCanvas();
-				try {
-					const created = await createCanvas.mutateAsync({
-						session_id: sessionId,
-						snapshot: { items: [] },
-						settings: { backend, magnet },
-					});
-					setSelectedId(null);
-					setCanvasData([]);
-					setStyling({});
-					restoredRef.current = null;
-					setOpenTabs((tabs) =>
-						tabs.some((t) => t.id === created.id)
-							? tabs
-							: [...tabs, { id: created.id, sessionId }],
-					);
-				} catch {
-					toast.error("Failed to load this session's canvas.");
-				}
-				openSession(sessionId);
-			})();
-		},
-		[
-			boardPage.setPageId,
-			setWorkKind,
-			openTabs,
-			activeCanvasId,
-			canvasList,
-			openCanvasTab,
-			openSession,
-			persistActiveCanvas,
-			createCanvas,
-			backend,
-			magnet,
-			setCanvasData,
-			setStyling,
-			setSelectedId,
-			setActiveBoardId,
-		],
-	);
+	// The tabs — which canvas is open, and opening, starting and closing one.
+	const {
+		canvasList,
+		createCanvas,
+		bannerCanvasIdBySession,
+		sessionTitleById,
+		openCanvasTab,
+		handleOpenSession,
+		newCanvasTab,
+		closeCanvasTab,
+	} = useCanvasTabs({
+		username,
+		graphSlug,
+		sessions,
+		activeSession,
+		activeSessionId,
+		openSession,
+		backToList,
+		refresh,
+		openTabs,
+		setOpenTabs,
+		activeCanvasId,
+		restoredRef,
+		persistActiveCanvas,
+		paintFromCanvas,
+		setCanvasData,
+		setSeedData,
+		setStyling,
+		setSelectedId,
+		forgetCanvasState,
+		setMagnet,
+		backend,
+		magnet,
+		setActiveBoardId,
+		setBoardPageId: boardPage.setPageId,
+		setWorkKind,
+	});
 
 	// A session row in the graph info panel asks for a session by id
 	// (graph-detail-page.md G22). The panel is rendered by the shell and cannot
@@ -901,511 +736,53 @@ export function useDataBoards(deps: DataBoardsDeps) {
 		clearOpenSessionRequest();
 	}, [openSessionRequest, handleOpenSession, clearOpenSessionRequest]);
 
-	// "+" — a blank canvas: create a fresh session + a canvas backed by it, clear
-	// the painted graph, open it as the active tab, and make its session active so
-	// the composer's next query belongs to this canvas.
-	const newCanvasTab = useCallback(async () => {
-		if (!username || !graphSlug) return;
-		await persistActiveCanvas();
-		try {
-			const session = await sessionsApi.create(username, graphSlug, {});
-			const created = await createCanvas.mutateAsync({
-				session_id: session.id,
-				snapshot: { items: [] },
-				settings: { backend, magnet },
-			});
-			setCanvasData([]);
-			setSelectedId(null);
-			setSeedData({ nodes: [], edges: [] });
-			setStyling({});
-			setOpenTabs((tabs) => [
-				...tabs,
-				{ id: created.id, sessionId: session.id },
-			]);
-			restoredRef.current = session.id;
-			refresh();
-			openSession(session.id);
-		} catch (err) {
-			toast.error(
-				err instanceof ApiError ? err.message : "Failed to create canvas.",
-			);
-		}
-	}, [
-		username,
-		graphSlug,
-		persistActiveCanvas,
-		createCanvas,
-		backend,
-		magnet,
-		refresh,
-		openSession,
-		setCanvasData,
-		setSeedData,
-		setStyling,
-		setSelectedId,
-	]);
-
-	// Close a tab (does NOT delete the canvas). If it was active, save it and fall
-	// back to the last remaining tab, or clear the canvas when none are left.
-	const closeCanvasTab = useCallback(
-		async (id: string) => {
-			const tab = openTabs.find((t) => t.id === id);
-			if (!tab) return;
-			const wasActive = tab.sessionId === activeSessionId;
-			if (wasActive) await persistActiveCanvas();
-			const remaining = openTabs.filter((t) => t.id !== id);
-			setOpenTabs(remaining);
-			// The canvas is gone, so its contents are too — otherwise the record
-			// keeps every canvas the session ever opened.
-			forgetCanvasState(id);
-			if (!wasActive) return;
-			const next = remaining[remaining.length - 1];
-			if (next) {
-				void openCanvasTab(next.id);
-			} else {
-				setCanvasData([]);
-				setSelectedId(null);
-				setSeedData({ nodes: [], edges: [] });
-				backToList();
-			}
-		},
-		[
-			openTabs,
-			activeSessionId,
-			persistActiveCanvas,
-			openCanvasTab,
-			backToList,
-			forgetCanvasState,
+	// Node expansion — growing the active canvas under the thread's world.
+	const { runExpand, expandSchema, propertyKeys, expandHandlers } =
+		useCanvasExpand({
+			username,
+			graphSlug,
+			canvas,
 			setCanvasData,
-			setSeedData,
-			setSelectedId,
-		],
-	);
-
-	// ── Node expand / graph traversal (docs/for-developers/modules/explore/features/graph-canvas.md) ────────────────────────────────
-	// Append expanded neighbours straight to the live store (the non-destructive
-	// path) rather than re-feeding the whole dataset through `<GraphLayer data>`,
-	// which calls the destructive `setData` — wiping every node's position and
-	// re-laying the graph out from the origin on each expand. `store.addData`
-	// flushes once and emits `data:changed (addedNodes>0)`, which re-runs the
-	// active layout (d3-force, seeded from each node's *current* position).
-	//
-	// The catch: a brand-new node has no stored position, so it's born at the
-	// world origin (0,0). The existing graph, however, has already been laid out
-	// and framed *away* from the origin — so every new neighbour spawns in the
-	// same empty spot, and a single seeded force pass can't drag them across the
-	// canvas to their parent before it settles: they stay piled on that one point.
-	// (The canvas-react streaming-demo dodges this only because its graph lives
-	// permanently at the origin under a continuously-running live sim.)
-	//
-	// Fix: birth each new node *next to the existing node it attaches to* (an even
-	// ring around that anchor), so it spawns where it belongs. d3-force then just
-	// relaxes the ring locally — placed nodes stay put, neighbours fan out from
-	// their parent. `canvasData` (the Inspector list) is merged in parallel so the
-	// right panel sees the additions.
-	const handleExpandResult = useCallback(
-		(res: NeighborExpandResponse) => {
-			const store = canvas?.layers.get<GraphLayer>("graph")?.store;
-			// Genuinely-new items only — `store.addData` uses `addNode`, which throws
-			// on a duplicate id, so drop anything already in the store (a re-returned
-			// origin node / shared neighbour) and any id repeated within this response
-			// (path-style results echo shared endpoints).
-			const seenNodes = new Set<string>();
-			const seenEdges = new Set<string>();
-			const newNodeIds = new Set<string>();
-			const newItems: QueryResultItem[] = [];
-			for (const n of res.data.nodes) {
-				const id = String(n.id);
-				if (seenNodes.has(id) || store?.hasNode(id)) continue;
-				seenNodes.add(id);
-				newNodeIds.add(id);
-				newItems.push({ ...n, type: "vertex" });
-			}
-			for (const e of res.data.edges) {
-				const id = String(e.id);
-				if (seenEdges.has(id) || store?.hasEdge(id)) continue;
-				seenEdges.add(id);
-				newItems.push({ ...e, type: "edge" });
-			}
-			if (newItems.length === 0) return;
-			// Inspector list — additive.
-			setCanvasData((prev) => [...prev, ...newItems]);
-			// When the canvas isn't live yet there's no store; the canvasData merge
-			// above still lands and the next paint/remount seeds it.
-			if (!store) return;
-
-			// Anchor each new node to the *existing* endpoint of a connecting edge —
-			// the node it was expanded from. (Edges among the new nodes themselves
-			// are ignored here; those settle under the force pass.)
-			const anchorOf = new Map<string, string>();
-			for (const e of res.data.edges) {
-				const s = String(e.source);
-				const t = String(e.target);
-				if (newNodeIds.has(t) && !anchorOf.has(t) && store.hasNode(s))
-					anchorOf.set(t, s);
-				if (newNodeIds.has(s) && !anchorOf.has(s) && store.hasNode(t))
-					anchorOf.set(s, t);
-			}
-
-			// Birth new nodes on an even ring around their anchor's current position,
-			// distributing siblings of the same anchor around the circle so they don't
-			// stack. The ring is sized to *hold* them: a hub with many neighbours gets
-			// a wider ring (circumference ≥ one node-spacing per leaf), so a dense fan
-			// starts pre-separated and the force pass just relaxes it instead of having
-			// to shove 40 overlapping nodes apart from a tight cluster. Nodes with no
-			// resolved anchor (rare — a disconnected return) keep the default origin.
-			const MIN_RING_RADIUS = 60;
-			const NODE_SPACING = 40; // ≈ 2 × collide radius; arc length wanted per leaf
-			const ringSeen = new Map<string, number>();
-			const ringTotal = new Map<string, number>();
-			for (const id of newNodeIds) {
-				const a = anchorOf.get(id);
-				if (a) ringTotal.set(a, (ringTotal.get(a) ?? 0) + 1);
-			}
-			const seed = adaptItems(newItems);
-			for (const node of seed.nodes) {
-				const anchorId = anchorOf.get(node.id);
-				if (!anchorId) continue;
-				const base = store.getPosition(anchorId);
-				if (!base) continue;
-				const total = ringTotal.get(anchorId) ?? 1;
-				const i = ringSeen.get(anchorId) ?? 0;
-				ringSeen.set(anchorId, i + 1);
-				const radius = Math.max(
-					MIN_RING_RADIUS,
-					(NODE_SPACING * total) / (2 * Math.PI),
-				);
-				const angle = (2 * Math.PI * i) / total;
-				node.position = {
-					x: base.x + radius * Math.cos(angle),
-					y: base.y + radius * Math.sin(angle),
-				};
-			}
-
-			// Append, then relax: d3-force seeds from the ring positions we just set,
-			// so existing nodes stay put and the new neighbours spread around their
-			// anchor. (`runLayout` is explicit rather than leaning on the engine's
-			// data:changed → active-layout wiring, so the re-layout is guaranteed.)
-			store.addData(seed);
-			void canvas?.runLayout(ACTIVE_LAYOUT_ID);
-		},
-		[canvas, setCanvasData],
-	);
-
-	const expand = useExpandNode(username, graphSlug);
-	const runExpand = useCallback(
-		async (req: ExpandRequest): Promise<NeighborExpandResponse | null> => {
-			// An expansion is a run under the canvas's lens (graph-canvas.md GC6 ·
-			// GC11): the picked world rides along exactly as it does on an ask, and
-			// the active session makes the run a turn in its thread (GC12).
-			const tagged = {
-				...req,
-				body: {
-					...req.body,
-					...(activeSessionId ? { session_id: activeSessionId } : {}),
-					...(threadWorldId ? { lens_id: threadWorldId } : {}),
-				},
-			} as ExpandRequest;
-			try {
-				const res = await expand.mutateAsync(tagged);
-				handleExpandResult(res);
-				if (res.returned === 0) {
-					toast.info("No more neighbours to load.");
-				} else {
-					// The canvas grew — capture a version (docs/for-developers/modules/explore/features/boards.md).
-					void captureCanvasState("expand");
-				}
-				return res;
-			} catch (err) {
-				toast.error(expandRefusal(err));
-				return null;
-			} finally {
-				// Every expansion is a turn, an empty one and a refusal included —
-				// refetch the thread so it shows.
-				if (activeSessionId) refresh();
-			}
-		},
-		[
-			expand,
-			handleExpandResult,
+			captureCanvasState,
 			activeSessionId,
 			threadWorldId,
 			refresh,
-			captureCanvasState,
-		],
-	);
+		});
 
-	// The expand submenus and the fine-tune pickers offer only what the picked
-	// world holds (graph-canvas.md GC13): node types from the world's own type
-	// counts, and edge types the world allows whose both ends it allows too. The
-	// active model supplies each edge's endpoints. The Model panel loads its own
-	// version, because it may be looking at a draft.
-	const { data: activeVersion } = useActiveVersionQuery(username, graphSlug);
-	const { data: worldTypes } = useTypeCountsQuery(
+	// The ask — sending it, and painting and restoring what it returns.
+	const {
+		resultsByMessageId,
+		availableLanguages,
+		defaultLanguage,
+		handleLoadToCanvasClick,
+		handleRun,
+		handleRerun,
+	} = useAssistantCanvasBridge({
 		username,
 		graphSlug,
-		threadWorldId,
-	);
-	const expandSchema = useMemo<ExpandMenuSchema | null>(() => {
-		if (!activeVersion || !worldTypes) return null;
-		const nodes = new Set(worldTypes.nodes.map((t) => t.name));
-		const edges = new Set(worldTypes.edges.map((t) => t.name));
-		return {
-			nodeTypes: activeVersion.node_types
-				.map((n) => n.name)
-				.filter((n) => nodes.has(n)),
-			edgeTypes: activeVersion.edge_types
-				.filter((e) => edges.has(e.name))
-				.map((e) => ({
-					name: e.name,
-					source_node_types: e.source_node_types.filter((t) => nodes.has(t)),
-					target_node_types: e.target_node_types.filter((t) => nodes.has(t)),
-				}))
-				.filter(
-					(e) =>
-						e.source_node_types.length > 0 && e.target_node_types.length > 0,
-				),
-		};
-	}, [activeVersion, worldTypes]);
-	const propertyKeys = useMemo(
-		() => (activeVersion?.property_keys ?? []).map((p) => p.name),
-		[activeVersion],
-	);
-
-	const expandHandlers = useMemo(
-		() => ({
-			schema: expandSchema,
-			onExpand: (req: ExpandRequest) => void runExpand(req),
-		}),
-		[expandSchema, runExpand],
-	);
-
-	// Session whose canvas is already painted — skip the auto-restore effect for
-	// it (a fresh send already painted; reopening another session restores it).
-	const restoredRef = useRef<string | null>(null);
-	// Sessions whose board we have already tried to paint from. The restore
-	// effect below opens the board first and re-runs only when that left the
-	// canvas empty; without this the same tab would be opened forever and the
-	// heal path (CV16) would never be reached.
-	const snapshotTriedRef = useRef<Set<string>>(new Set());
-
-	// Explicit projection of a graph result onto the canvas (docs/for-developers/modules/ask/features/the-answer-surface.md). Opens its
-	// own canvas-render trace; the canvas bridge closes it after the painted frame
-	// (the same mechanism the old auto-paint used).
-	const handleLoadToCanvas = useCallback(
-		(result: QueryResponse) => {
-			// `ui.explorer.load` spans transform → adapt → layout → render; the
-			// canvas bridge ends it after the first painted frame.
-			runRef.current = startAction("explorer", "load", {
-				"invana.graph": `${username}/${graphSlug}`,
-			});
-			paintCanvas(result);
-		},
-		[paintCanvas, username, graphSlug],
-	);
-
-	// Explicit "Load to canvas" click (docs/for-developers/modules/explore/features/boards.md): paint, then log a `load` turn in
-	// the thread referencing the query that produced the result. Only the click
-	// logs — the automatic paints (session create / restore) call
-	// `handleLoadToCanvas` directly and stay silent.
-	const handleLoadToCanvasClick = useCallback(
-		(result: QueryResponse, message: SessionMessage) => {
-			handleLoadToCanvas(result);
-			if (result.result_type !== "graph") return;
-			void recordLoad({
-				kind: "load",
-				source_query: message.sourceQuery,
-				query_language: message.language,
-				row_count: result.row_count,
-				node_count: result.data?.nodes.length ?? 0,
-				edge_count: result.data?.edges.length ?? 0,
-				execution_time_ms: result.execution_time_ms,
-			});
-			// Capture the loaded canvas as a version (docs/for-developers/modules/explore/features/boards.md).
-			void captureCanvasState("load", { messageId: message.id });
-		},
-		[handleLoadToCanvas, recordLoad, captureCanvasState],
-	);
-
-	// Sessions we've already spun a canvas for, so the two triggers below (session
-	// created, then result returned) create exactly one canvas. A ref, not state,
-	// so the guard is synchronous across a single run's two calls.
-	const canvasedSessionsRef = useRef<Set<string>>(new Set());
-
-	// A newly-started session gets its own canvas (docs/for-developers/modules/explore/features/boards.md): create a canvas backed
-	// by that session (the engine copies its title + latest query) and open it as
-	// the active tab, then paint the result once it lands. Called first the moment
-	// the session is created — so the canvas shows up named after the session right
-	// away, before the query returns — and again when the result arrives (to paint
-	// it). Idempotent per session via `canvasedSessionsRef`. Mirrors "+" (blank
-	// canvas) for the composer-driven path — starting a session starts a canvas.
-	const openCanvasForNewSession = useCallback(
-		async (sessionId: string, result: QueryResponse | null) => {
-			if (!username || !graphSlug) return;
-			if (result) {
-				handleLoadToCanvas(result);
-				// First paint of the new session's canvas — capture it as the opening
-				// version (docs/for-developers/modules/explore/features/boards.md). The canvas tab registers below; the delayed
-				// capture reads the (by-then active) canvas from the ref.
-				void captureCanvasState("query");
-			}
-			if (canvasedSessionsRef.current.has(sessionId)) return;
-			if (openTabs.some((t) => t.sessionId === sessionId)) return;
-			canvasedSessionsRef.current.add(sessionId);
-			try {
-				const created = await createCanvas.mutateAsync({
-					session_id: sessionId,
-					snapshot: { items: resultToItems(result) },
-					settings: { backend, magnet },
-				});
-				setOpenTabs((tabs) =>
-					tabs.some((t) => t.sessionId === sessionId)
-						? tabs
-						: [...tabs, { id: created.id, sessionId }],
-				);
-			} catch {
-				// Non-fatal — e.g. the session already has a canvas (409). Drop the
-				// guard so a later trigger can retry. The thread still renders; the
-				// user can Save view manually.
-				canvasedSessionsRef.current.delete(sessionId);
-			}
-		},
-		[
-			username,
-			graphSlug,
-			handleLoadToCanvas,
-			openTabs,
-			createCanvas,
-			backend,
-			magnet,
-			captureCanvasState,
-		],
-	);
-
-	const handleRun = async (incoming: QueryRunPayload) => {
-		// The attachment goes into the ask itself, in words, rather than as a
-		// hidden context field: what the thread records has to be what was asked
-		// (docs/for-developers/modules/ask/features/the-assistant.md AD2).
-		// Removing the chip removes the line — asked without it, and the thread
-		// shows that too.
-		const attached =
-			right.is("assistant") && !attachmentDetached
-				? attachmentFor(selected)
-				: null;
-		const payload: QueryRunPayload =
-			attached && incoming.mode === "nl"
-				? {
-						...incoming,
-						query: `${incoming.query}\n\n(About ${attached.kind} ${attached.label}.)`,
-					}
-				: incoming;
-		if (cannotAnswer && incoming.mode === "nl") {
-			toast.error(
-				"This graph has no LLM provider yet — add one and ping it before asking.",
-			);
-			return;
-		}
-		// A run with no active session creates one; detect that so the first
-		// result paints onto the new session's canvas when it lands.
-		const priorSessionId = activeSessionId;
-		// One trace from this click to the run's terminal frame: `send` passes the
-		// action to its requests and to the run stream, which ends it.
-		const action = startAction("assistant", "ask", {
-			"invana.graph": `${username}/${graphSlug}`,
-			"invana.ask.mode": payload.mode,
-			...(payload.mode === "ql"
-				? { "invana.ask.language": payload.language }
-				: {}),
-		});
-		// `send` records the ask into a session (creating + opening one when none
-		// is active) and opens a run. It returns as soon as the engine has
-		// accepted the ask; the result arrives on the run's stream and is handled
-		// by `handleStreamResult`.
-		const { sessionId } = await send(payload, {
-			action,
-			// The session exists now — open its canvas immediately (named after the
-			// session) so it's there while the query runs, not only after.
-			onSessionCreated: (s) => void openCanvasForNewSession(s.id, null),
-		});
-		restoredRef.current = sessionId;
-		if (sessionId && sessionId !== priorSessionId) {
-			pendingNewSessionsRef.current.add(sessionId);
-		}
-	};
-
-	// A query result landed on a run's stream (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md): render it inline
-	// against its reply, and paint it when the run asked for that — the first
-	// result of a new session (onto the canvas created above) or a restore.
-	streamResultRef.current = (sessionId, messageId, result) => {
-		setResultFor(messageId, result);
-		if (pendingNewSessionsRef.current.delete(sessionId)) {
-			// The canvas was created on session-create; this paints the result onto
-			// it (the idempotent guard skips re-creating).
-			void openCanvasForNewSession(sessionId, result);
-			return;
-		}
-		if (pendingRestorePaintRef.current.delete(messageId)) paintCanvas(result);
-	};
-
-	// `rerun` re-issues a stored message's query — triggered by clicking a message
-	// (`rerun`) or by the session-restore effect (`restore`). Both are traced and
-	// store the result inline against that message.
-	const handleRerun = useCallback(
-		async (messageId: string, trigger: "rerun" | "restore" = "rerun") => {
-			// Opening a session should show its graph: when the restore path runs
-			// because the saved snapshot was empty, paint the re-run result onto the
-			// canvas once it lands. A manual re-run just renders inline (Load to canvas).
-			if (trigger === "restore") pendingRestorePaintRef.current.add(messageId);
-			const action = startAction("assistant", "rerun", {
-				"invana.graph": `${username}/${graphSlug}`,
-				"invana.ask.trigger": trigger,
-			});
-			await rerun(messageId, action);
-		},
-		[rerun, username, graphSlug],
-	);
-
-	// Restore a session's canvas when it is opened — **from the record first**
-	// (docs/for-developers/modules/ask/features/the-answer-surface.md AS13): the
-	// board's snapshot is what was drawn, and the reply's emissions are what was
-	// answered, so a reload renders both without asking the graph anything. A
-	// re-run is the fallback for a board with no snapshot to paint
-	// (docs/for-developers/modules/explore/features/boards.md CV16) — a board
-	// saved before autosave existed — and never what a refresh does.
-	useEffect(() => {
-		if (!activeSession) {
-			restoredRef.current = null;
-			return;
-		}
-		if (restoredRef.current === activeSession.id) return;
-		// Restore from the latest real query, skipping expand/load operation turns
-		// (they don't repaint the whole canvas — re-running one would drop the base
-		// graph, docs/for-developers/modules/explore/features/boards.md).
-		const latest = [...activeSession.messages]
-			.reverse()
-			.find((m) => m.role === "assistant" && m.sourceQuery && !m.operation);
-		if (!latest) return;
-		// Wait for the board list rather than deciding without it — a re-run
-		// started here would race the snapshot it is meant to replace.
-		if (!canvasList) return;
-		const board = canvasList.items.find(
-			(c) => c.sessionId === activeSession.id,
-		);
-		if (
-			board &&
-			!openTabs.some((t) => t.id === board.id) &&
-			!snapshotTriedRef.current.has(activeSession.id)
-		) {
-			// `openCanvasTab` paints the snapshot and marks the session restored; an
-			// empty one leaves it unmarked, and this effect then falls through to the
-			// re-run on its next pass.
-			snapshotTriedRef.current.add(activeSession.id);
-			void openCanvasTab(board.id);
-			return;
-		}
-		restoredRef.current = activeSession.id;
-		void handleRerun(latest.id, "restore");
-	}, [activeSession, canvasList, openTabs, openCanvasTab, handleRerun]);
+		graph,
+		activeSession,
+		activeSessionId,
+		send,
+		rerun,
+		recordLoad,
+		assistantOpen: right.is("assistant"),
+		attachmentDetached,
+		cannotAnswer,
+		selected,
+		streamResultRef,
+		runRef,
+		paintCanvas,
+		captureCanvasState,
+		openTabs,
+		setOpenTabs,
+		createCanvas,
+		canvasList,
+		openCanvasTab,
+		restoredRef,
+		backend,
+		magnet,
+	});
 
 	// Autosave the live canvas (snapshot + positions) shortly after it changes, so
 	// a query result and every node-expand survive a reopen — the record used to
