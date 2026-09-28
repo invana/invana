@@ -1,5 +1,5 @@
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
+import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import {
 	STATE_THUMB_MAX_EDGE,
 	captureBanner,
@@ -31,7 +31,7 @@ import type { GraphCanvas, GraphLayer } from "@invana/graph";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useAssistantCanvasBridge } from "@/pages/graphs-detail/features/assistant/useAssistantCanvasBridge";
+import { useAssistantCanvasBridge } from "@/pages/graphs-detail/features/assistant";
 import type { CanvasKind as DataBoardsCanvasKind } from "@/pages/graphs-detail/features/boards";
 import { useCanvasTabs } from "@/pages/graphs-detail/features/boards";
 import { useCanvasExpand } from "@/pages/graphs-detail/features/explorer";

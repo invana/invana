@@ -1,4 +1,4 @@
-import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
+import { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import {
 	useGraphConnectionQuery,

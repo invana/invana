@@ -23,7 +23,7 @@ import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	StepList,
 	totalDuration,
-} from "@/pages/graphs-detail/features/assistant/SessionSteps";
+} from "@/pages/graphs-detail/features/assistant";
 import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
 import {
 	useTodoActivityQuery,

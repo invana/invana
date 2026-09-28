@@ -1,9 +1,9 @@
 import {
 	AssistantViewPanel,
 	type AssistantViewPanelProps,
-} from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
-import { WorldPicker } from "@/pages/graphs-detail/features/assistant/WorldPicker";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
+} from "@/pages/graphs-detail/features/assistant";
+import { WorldPicker } from "@/pages/graphs-detail/features/assistant";
+import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
 import type { ComponentProps } from "react";
 

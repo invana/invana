@@ -12,7 +12,7 @@ import type {
 	LifecycleAct,
 	SoulPreviewRequest,
 } from "@/pages/graphs-detail/features/agents/types";
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Scope = { username: string; graphSlug: string };

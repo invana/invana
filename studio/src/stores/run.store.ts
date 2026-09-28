@@ -4,7 +4,7 @@
 // moving right now (and keeps the reasoning / diagnosis / result that only
 // ride the stream, so they stay visible after the reply settles).
 
-import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
+import type { Emission } from "@/pages/graphs-detail/features/assistant";
 import { stepFromFrame } from "@/pages/graphs-detail/features/runs/api";
 import type {
 	AskFrame,

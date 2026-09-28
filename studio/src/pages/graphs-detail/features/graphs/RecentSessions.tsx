@@ -1,7 +1,7 @@
 import { formatRelativeTime } from "@/lib/time";
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
-import type { Session } from "@/pages/graphs-detail/features/assistant/types";
-import { sessionsListKey } from "@/pages/graphs-detail/features/assistant/useSessions";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
+import type { Session } from "@/pages/graphs-detail/features/assistant";
+import { sessionsListKey } from "@/pages/graphs-detail/features/assistant";
 import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
 import { requestOpenSession } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import {

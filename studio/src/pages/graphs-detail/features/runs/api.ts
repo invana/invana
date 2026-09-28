@@ -12,8 +12,8 @@ import type {
 	Emission,
 	EmissionKind,
 	TemplateOffer,
-} from "@/pages/graphs-detail/features/assistant/answer-surface/types";
-import type { SessionMessage } from "@/pages/graphs-detail/features/assistant/types";
+} from "@/pages/graphs-detail/features/assistant";
+import type { SessionMessage } from "@/pages/graphs-detail/features/assistant";
 import type {
 	AskFrame,
 	RunNode,

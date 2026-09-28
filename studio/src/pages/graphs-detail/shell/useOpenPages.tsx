@@ -3,8 +3,8 @@ import { useAgentsQuery } from "@/pages/graphs-detail/features/agents";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
-} from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
+} from "@/pages/graphs-detail/features/assistant";
+import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import {
 	BOARD_KINDS,
 	CANVAS_KINDS,

@@ -1,5 +1,5 @@
-import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
-import type { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant";
+import type { useSessions } from "@/pages/graphs-detail/features/assistant";
 import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
 import type { CanvasKind } from "@/pages/graphs-detail/features/boards/boardKinds";
 import {

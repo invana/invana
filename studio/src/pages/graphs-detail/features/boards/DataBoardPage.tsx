@@ -26,7 +26,7 @@
  * (`docs/for-developers/modules/explore/features/boards.md` CV6).
  */
 
-import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
+import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant";
 import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
 import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
 import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
