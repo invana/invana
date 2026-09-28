@@ -1,30 +1,8 @@
-import {
-	LayeredCanvasHeader,
-	LayeredCanvasStatus,
-} from "@/canvases/layered/LayeredCanvasChrome";
-import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { LayeredCanvasStatus } from "@/canvases/layered/LayeredCanvasChrome";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
-import {
-	hasSeenSessionTutorial,
-	markSessionTutorialSeen,
-} from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
 import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
-import {
-	BOARD_KINDS,
-	CANVAS_KINDS,
-	type CanvasKind,
-	boardPageId,
-	declaredPage,
-	parseBoardPageId,
-} from "@/pages/graphs-detail/features/boards";
-import {
-	DeclaredBoard,
-	OpenBoardContext,
-} from "@/pages/graphs-detail/features/boards";
-import {
-	type BoardPageHandle,
-	DataBoardPage,
-} from "@/pages/graphs-detail/features/boards";
+import { boardPageId } from "@/pages/graphs-detail/features/boards";
+import { OpenBoardContext } from "@/pages/graphs-detail/features/boards";
 import { ExplorerHeaderToolbar } from "@/pages/graphs-detail/features/explorer";
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import {
@@ -35,7 +13,6 @@ import {
 	hasOutstandingSetup,
 	isGateOpen,
 } from "@/pages/graphs-detail/features/graphs/types";
-import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type ModelSelection,
@@ -45,26 +22,16 @@ import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
-import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
-import {
-	type BoardTitleNames,
-	type DeclaredBoardDeps,
-	boardTitle,
-	declaredBoardContent,
-} from "@/pages/graphs-detail/shell/declaredBoardBody";
-import {
-	canvasEmptyHint,
-	layeredCanvasBody,
-} from "@/pages/graphs-detail/shell/layeredCanvasBody";
+import { layeredCanvasBody } from "@/pages/graphs-detail/shell/layeredCanvasBody";
 import { leftSectionContent } from "@/pages/graphs-detail/shell/leftSectionContent";
 import { useDataBoards } from "@/pages/graphs-detail/shell/useDataBoards";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
 import { useOpenBoards } from "@/pages/graphs-detail/shell/useOpenBoards";
+import { useOpenPages } from "@/pages/graphs-detail/shell/useOpenPages";
 import {
 	type RightSectionKey,
 	useRightSection,
@@ -73,32 +40,15 @@ import { reportBoundaryError } from "@/services/telemetry/errors";
 import type { QueryResponse } from "@/types/query";
 import { CanvasContext } from "@invana/canvas-react";
 import {
-	type BoardHeaderAction,
-	type BoardPage as BoardPageDef,
 	BoardPagesViewPanel,
 	CanvasMessageBar,
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
 import { Button, ErrorBoundary, cn } from "@invana/ui";
-import {
-	HelpCircle,
-	History,
-	Home,
-	Layers,
-	PanelRightClose,
-	PanelRightOpen,
-	Pencil,
-	Route,
-	SlidersHorizontal,
-	Sparkles,
-	X,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-
-/** The page that is always open and can never be closed (graph-detail-page.md G6). */
-const GRAPH_PAGE_ID = "graph";
 
 export function GraphDetailPage() {
 	const { username, graphSlug } = useParams<{
@@ -128,32 +78,6 @@ export function GraphDetailPage() {
 	// The Govern panel's own URL keys — `Edit` on a lens board puts the section
 	// back on that lens in one write (WO16).
 	const governPanel = useLensesViewPanel();
-	// **A lens board's tab is named for the lens** — `EU · H1 2026`, never
-	// `World` (WO15): a strip of four tabs all reading `World` is a strip you
-	// have to click through to read. It comes off the list the Govern section
-	// already read, so this costs no request; a name that has not landed yet
-	// falls back to the kind's label rather than to an empty tab.
-	const lenses = useLensesQuery(username, graphSlug);
-	const lensNameById = useMemo(
-		() =>
-			new Map((lenses.data?.items ?? []).map((l) => [l.id, l.display_name])),
-		[lenses.data],
-	);
-	// An agent's page is named for the agent, for the same reason (AG34).
-	const agentsList = useAgentsQuery(username, graphSlug, {
-		includeEphemeral: true,
-		includeRetired: true,
-	});
-	const agentNameById = useMemo(
-		() => new Map((agentsList.data?.items ?? []).map((a) => [a.id, a.name])),
-		[agentsList.data],
-	);
-	// And a skill's page for the skill (SK17).
-	const skillsList = useSkillsQuery(username, graphSlug);
-	const skillNameById = useMemo(
-		() => new Map((skillsList.data?.items ?? []).map((s) => [s.id, s.name])),
-		[skillsList.data],
-	);
 	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
 	// titled `key@version`, and opened from the section by key — the newest
 	// version, which is the one the section reads.
@@ -230,25 +154,18 @@ export function GraphDetailPage() {
 	// The selection the panels and the layered canvases share, and the canvas
 	// kind `mainSection` draws — one piece of state per noun.
 	const layered = useLayeredCanvas(username, graphSlug, settingsPanel.section);
-	const {
-		setSelectedAgentId,
-		setSelectedStepId,
-		setWorkKind,
-		workTarget,
-		workPageId,
-	} = layered;
+	const { setSelectedAgentId, setSelectedStepId, setWorkKind, workTarget } =
+		layered;
 	// The declared boards open in `mainSection`, and the focused one (`?page=`).
+	const openBoards = useOpenBoards(username, graphSlug, newestPlanIdByKey);
 	const {
-		boards,
 		setBoards,
-		activeBoardId,
 		setActiveBoardId,
 		boardPage,
-		setPageId,
 		openBoard,
 		openRecordBoard,
 		openLensBoard,
-	} = useOpenBoards(username, graphSlug, newestPlanIdByKey);
+	} = openBoards;
 	// `&step=` — the task open inside the focused run page (SR72).
 	const runStep = useRunStep().stepId;
 
@@ -351,12 +268,6 @@ export function GraphDetailPage() {
 		[],
 	);
 
-	// The active canvas page's handle. The strip's help / styling / history /
-	// rename buttons act on *this* canvas, but `BoardHeaderAction` carries no
-	// page id (graph-detail-page.md G12), so the shell calls into the page
-	// rather than passing one.
-	const boardPageRef = useRef<BoardPageHandle>(null);
-
 	/**
 	 * **Models is one page** (the-model-page.md MP1 · MP18): switching the
 	 * `leftNav` to Models opens the `models` board, whatever the scope. It fires
@@ -389,47 +300,7 @@ export function GraphDetailPage() {
 	}, [settingsSection, openModelsPage]);
 
 	// The data canvases, the ask, and everything that draws on them.
-	const {
-		resultsByMessageId,
-		runRef,
-		canvas,
-		handleReady,
-		magnet,
-		toggleMagnet,
-		backend,
-		openTabs,
-		createCanvasState,
-		isRestoring,
-		activeCanvasId,
-		canvasData,
-		seedData,
-		styling,
-		missingIds,
-		setSelectedId,
-		setBackend,
-		bannerCanvasIdBySession,
-		sessionTitleById,
-		handleStylingChange,
-		styleTypes,
-		selected,
-		handleShowDetail,
-		availableLanguages,
-		defaultLanguage,
-		handleSaveState,
-		openCanvasTab,
-		handleOpenSession,
-		newCanvasTab,
-		closeCanvasTab,
-		runExpand,
-		expandSchema,
-		propertyKeys,
-		expandHandlers,
-		handleLoadToCanvasClick,
-		handleRun,
-		handleRerun,
-		handleBack,
-		handleForkState,
-	} = useDataBoards({
+	const dataBoards = useDataBoards({
 		username,
 		graphSlug,
 		graph,
@@ -452,45 +323,27 @@ export function GraphDetailPage() {
 		setWorkKind,
 		streamResultRef,
 	});
-
-	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
-	// derived `selected` (above) drives the right-side InspectorViewPanel. The strip
-	// above it belongs to `BoardPagesViewPanel` in `mainSection`
-	// (graph-detail-page.md G4), not to this page.
-	const canvasContent = (
-		<DataBoardPage
-			ref={boardPageRef}
-			username={username as string}
-			graphSlug={graphSlug as string}
-			boardId={activeCanvasId}
-			canvas={canvas}
-			sessionIdForTab={(id) =>
-				openTabs.find((t) => t.id === id)?.sessionId ?? null
-			}
-			sessionTitle={(id) => sessionTitleById.get(id) ?? ""}
-			onRenameSession={renameSession}
-			seedData={seedData}
-			magnet={magnet}
-			backend={backend}
-			styling={styling}
-			styleTypes={styleTypes}
-			onStylingChange={handleStylingChange}
-			onReady={handleReady}
-			onViewTargetChange={setSelectedId}
-			onShowDetail={handleShowDetail}
-			interactionRef={runRef}
-			expand={expandHandlers}
-			expandSchema={expandSchema}
-			propertyKeys={propertyKeys}
-			onExpand={runExpand}
-			onFork={(versionId) => void handleForkState(versionId)}
-			isForking={isRestoring}
-			onSave={() => void handleSaveState()}
-			isSaving={createCanvasState.isPending}
-			tutorialSeen={hasSeenSessionTutorial()}
-			onTutorialSeen={markSessionTutorialSeen}
-		/>
-	);
+	const {
+		resultsByMessageId,
+		canvas,
+		magnet,
+		toggleMagnet,
+		backend,
+		canvasData,
+		styling,
+		missingIds,
+		setBackend,
+		bannerCanvasIdBySession,
+		sessionTitleById,
+		selected,
+		availableLanguages,
+		defaultLanguage,
+		handleOpenSession,
+		handleLoadToCanvasClick,
+		handleRun,
+		handleRerun,
+		handleBack,
+	} = dataBoards;
 
 	// The assistant, as the right side's `assistant` occupant. Its close closes
 	// the region.
@@ -612,224 +465,33 @@ export function GraphDetailPage() {
 		openWorkPanel,
 	);
 
-	// ── The open pages (graph-detail-page.md G4) ───────────────────────────────
-	//
-	// One strip over every kind of page: the graph itself, a data canvas per open
-	// tab, the declared boards, and whichever work canvas a panel drove. What used to be a
-	// four-branch ternary fighting over one slot is a list, and the branch that
-	// used to explain why the slot was empty is now the graph page — a page that
-	// is always there and cannot be closed (G6).
-
-	// The graduation cap opens the wizard from anywhere in the Graph (setup.md
-	// SU19), and the wizard is the graph page's content — so asking for it makes
-	// the graph page active, whatever else was open. Nothing is closed: the other
-	// pages keep their state and their tabs.
-	// A focused board is the active page, the way an open wizard is (G26): it is
-	// what the reader last asked for, and every other page keeps its tab and its
-	// state behind it.
-	const focusedBoard =
-		activeBoardId &&
-		boards.some(
-			(b) => boardPageId(b.kind, b.subjectId, b.versionId) === activeBoardId,
-		)
-			? activeBoardId
-			: null;
-
-	const activePageId = onboardingOpen
-		? GRAPH_PAGE_ID
-		: focusedBoard
-			? focusedBoard
-			: workCanvas && workPageId
-				? workPageId
-				: activeCanvasId
-					? boardPageId("data", activeCanvasId)
-					: GRAPH_PAGE_ID;
-
-	const declaredDeps: DeclaredBoardDeps = {
+	// The pages open in `mainSection`, the active one, and the strip's actions.
+	const strip = useOpenPages({
 		username,
 		graphSlug,
-		openBoard,
-		setPageId,
-		runStep,
+		onboardingOpen,
+		setupOutstanding,
+		settingsSection,
 		settingsPanel,
 		governPanel,
+		openBoards,
+		layered,
+		workCanvas,
+		dataBoards,
+		runStep,
 		openWorkPanel,
 		openAgentPage,
 		showAgentCanvas,
-		backend,
 		modelSelection,
 		setModelSelection,
-	};
-	const titleNames: BoardTitleNames = {
 		modelsView,
 		modelName,
-		lensNameById,
-		agentNameById,
-		skillNameById,
 		planRefById,
-	};
-
-	const pages: BoardPageDef[] = [
-		{
-			id: GRAPH_PAGE_ID,
-			// The page says what it is *showing*. While setup is unfinished the
-			// graph page is the setup board (G26), so the strip tab and the
-			// breadcrumb's last crumb both read `Setup` — a tab named for the slug
-			// over a board of gates names the container and not the content. The id
-			// does not change with it: it is the same page, and `?page=graph` has
-			// to keep resolving.
-			title: setupOutstanding ? "Setup" : (graphSlug ?? "Graph"),
-			icon: setupOutstanding ? Route : Home,
-			content: (
-				<GraphHomePage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					hint={canvasEmptyHint(settingsSection)}
-				/>
-			),
-		},
-		...openTabs.map((tab) => ({
-			id: boardPageId("data", tab.id),
-			title: sessionTitleById.get(tab.sessionId) ?? "Board",
-			icon: CANVAS_KINDS.data.icon,
-			// `keepMounted` is off until each canvas owns its own engine
-			// (the-shell.md), so only the active page's body is mounted — which is
-			// exactly what the four-branch ternary did, minus the fighting.
-			content: activeCanvasId === tab.id ? canvasContent : null,
-		})),
-		// The declared boards — a run dashboard and a step's. `renders` is the
-		// only thing that picks the body (boards-migration § 5); the strip, the
-		// title and the close are the same as every other page's.
-		...boards.map((board) => ({
-			id: boardPageId(board.kind, board.subjectId, board.versionId),
-			title: boardTitle(board, titleNames),
-			icon: BOARD_KINDS[board.kind].icon,
-			// Which board this is belongs to the host, so every declared page can
-			// offer `Save report` and `Reports` without six components threading a
-			// `kind` and a `subjectId` they have no other use for (B6 · B21).
-			content: (
-				<DeclaredBoard
-					username={username as string}
-					graphSlug={graphSlug as string}
-					kind={board.kind}
-					subjectId={board.subjectId}
-					// Saving a reading and opening a kept one are the same move: the
-					// page becomes `kind:id@version` (B12 · B22).
-					onOpenVersion={(versionId) => openBoard({ ...board, versionId })}
-				>
-					{declaredBoardContent(board, declaredDeps)}
-				</DeclaredBoard>
-			),
-		})),
-		...(workPageId && workCanvas && workTarget
-			? [
-					{
-						id: workPageId,
-						title: CANVAS_KINDS[workTarget.kind].label,
-						icon: CANVAS_KINDS[workTarget.kind].icon,
-						content: (
-							<div className="flex h-full w-full flex-col overflow-hidden">
-								<LayeredCanvasHeader
-									username={username as string}
-									graphSlug={graphSlug as string}
-									target={workTarget}
-									onClose={() => setWorkKind(null)}
-								/>
-								<div className="min-h-0 flex-1">{workCanvas}</div>
-							</div>
-						),
-					},
-				]
-			: []),
-	];
-
-	// Selecting a tab is not "show that node" — each kind of page is reached by
-	// putting the page state that produced it back, which is why this dispatches
-	// rather than setting one id.
-	const selectPage = (id: string) => {
-		// A declared board is reached by its id alone — there is no panel state
-		// behind it to put back, which is what `subject_id` buys.
-		if (declaredPage(id)) {
-			setActiveBoardId(id);
-			boardPage.setPageId(id, { step: null });
-			return;
-		}
-		setActiveBoardId(null);
-		boardPage.setPageId(null, { step: null });
-		if (id === GRAPH_PAGE_ID) {
-			setWorkKind(null);
-			backToList();
-			return;
-		}
-		const page = parseBoardPageId(id);
-		if (page?.kind === "data") {
-			setWorkKind(null);
-			void openCanvasTab(page.id);
-			return;
-		}
-		if (page && page.kind in CANVAS_KINDS) setWorkKind(page.kind as CanvasKind);
-	};
-
-	// Closing a page is closing whatever opened it. The graph page has no close —
-	// it is the resting state of the region, not a tab (G6).
-	const closePage = (id: string) => {
-		const board = declaredPage(id);
-		if (board) {
-			// The pair again — closing the usage board must not close the skill
-			// board beside it (SD2).
-			setBoards((open) =>
-				open.filter(
-					(b) => b.kind !== board.kind || b.subjectId !== board.subjectId,
-				),
-			);
-			// Closing the focused board hands the strip back to whatever was
-			// behind it, rather than to the board's own neighbour.
-			setActiveBoardId((current) => (current === id ? null : current));
-			if (boardPage.pageId === id) boardPage.setPageId(null, { step: null });
-			return;
-		}
-		const page = parseBoardPageId(id);
-		if (page?.kind === "data") {
-			void closeCanvasTab(page.id);
-			return;
-		}
-		setWorkKind(null);
-	};
-
-	// Strip-level, and two owners: the active page's own controls first, then the
-	// shell's region toggles (G12). A model page therefore never offers
-	// "Styling", and the graph page offers none of them.
-	const isDataBoardPage = parseBoardPageId(activePageId)?.kind === "data";
-	const pageHeaderActions: BoardHeaderAction[] = isDataBoardPage
-		? [
-				{
-					id: "help",
-					label: "What can I do here?",
-					icon: HelpCircle,
-					onClick: () => boardPageRef.current?.openHelp(),
-				},
-				{
-					// Layers describes the canvas in front of you, so it is a strip
-					// control and a card over the canvas, not a `leftNav` panel (G18).
-					id: "layers",
-					label: "Layers",
-					icon: Layers,
-					onClick: () => boardPageRef.current?.toggleLayers(),
-				},
-				{
-					id: "styling",
-					label: "Styling",
-					icon: SlidersHorizontal,
-					onClick: () => boardPageRef.current?.toggleStyling(),
-				},
-				{
-					id: "history",
-					label: "History",
-					icon: History,
-					onClick: () => boardPageRef.current?.toggleHistory(),
-				},
-			]
-		: [];
+		renameSession,
+		backToList,
+		right,
+		toggleInspector,
+	});
 
 	return (
 		// Lifted context: the live engine reaches the header toolbar, which lives
@@ -917,49 +579,12 @@ export function GraphDetailPage() {
 						content: (
 							<ErrorBoundary onError={reportBoundaryError}>
 								<BoardPagesViewPanel
-									pages={pages}
-									activeId={activePageId}
-									onSelect={selectPage}
-									onAdd={() => void newCanvasTab()}
+									{...strip}
 									addLabel="New canvas"
 									menuLabel="Page options"
 									// Until each canvas owns its own engine, only the active page is
 									// mounted — today's behaviour, now stated rather than emergent.
 									keepMounted={false}
-									pageMenuItems={[
-										{
-											id: "rename",
-											label: "Rename",
-											icon: Pencil,
-											disabled: (id) => parseBoardPageId(id)?.kind !== "data",
-											onSelect: (id) => {
-												const page = parseBoardPageId(id);
-												if (page) boardPageRef.current?.openRename(page.id);
-											},
-										},
-										{
-											id: "close",
-											label: "Close",
-											icon: X,
-											destructive: true,
-											separatorBefore: true,
-											disabled: (id) => id === GRAPH_PAGE_ID,
-											onSelect: closePage,
-										},
-									]}
-									headerActions={[
-										...pageHeaderActions,
-										{
-											id: "inspector",
-											label: right.is("inspector")
-												? "Hide inspector panel"
-												: "Show inspector panel",
-											icon: right.is("inspector")
-												? PanelRightClose
-												: PanelRightOpen,
-											onClick: toggleInspector,
-										},
-									]}
 									className="h-full"
 								/>
 							</ErrorBoundary>

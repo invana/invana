@@ -205,7 +205,7 @@ Leaf-first, so a module never moves while something it owns is still elsewhere.
 
 ### 3.2 Decomposing `GraphDetailPage.tsx`
 
-**Status: open.** 3,214 lines at the start, almost all of it one component; 1,012 now. Every row below has left except the last two — the page list and the `rightSection` occupants. It is cut by moves, not rewritten: each
+**Status: open.** 3,214 lines at the start, almost all of it one component; 637 now. Every row below has left except the last — the `rightSection` occupants, with the header controls and the `footer`. It is cut by moves, not rewritten: each
 piece leaves with its state, its effects and its one-shot refs, and the page keeps calling it the
 way it did. What remains composes — `GraphDetail`'s regions, the providers, the header controls.
 
@@ -223,7 +223,7 @@ way it did. What remains composes — `GraphDetail`'s regions, the providers, th
 | Their tabs — open, new, close, a session's canvas from the list, each tab's title | `features/boards/useCanvasTabs.ts` | hook |
 | Node expansion under the thread's world, and the menus it offers | `features/explorer/useCanvasExpand.ts` | hook |
 | The ask, its stream, the inline results, the restore of a session's canvas | `features/assistant/useAssistantCanvasBridge.ts` | hook |
-| The page list, the active page, select, close, the strip's actions | `shell/useOpenPages.ts` | hook |
+| The page list, the active page, select, close, the strip's actions, and the data page's body with the handle the strip calls into | `shell/useOpenPages.tsx` | hook |
 | The `rightSection` occupants and their sizes | `shell/rightSections.tsx` | function |
 
 Everything lands in `shell/` except what reads no region: a module never imports the shell

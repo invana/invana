@@ -25,7 +25,7 @@ Items 7–12 are independent of that chain and can land in any order.
 
 | # | Cleanup | Size today | Specified in | Changes behaviour |
 |---|---|---|---|---|
-| 1 | Finish the `GraphDetailPage.tsx` cut — the page list, then the regions | page 1,012 lines (target under 400) | [refactor-plan.md](refactor-plan.md) §3.2 | no |
+| 1 | Finish the `GraphDetailPage.tsx` cut — the regions | page 637 lines (target under 400) | [refactor-plan.md](refactor-plan.md) §3.2 | no |
 | 2 | Every module gets `index.ts` as its public surface, then Biome 2 with `noRestrictedImports` on `features/*/!(index.ts)` | 207 deep cross-module imports in 96 files; 4 of 16 modules have an `index.ts` | [code-shape.md](code-shape.md) §8 | no |
 | 3 | Modules import the shell — the direction is shell → features → shared | 17 files under `features/`, most in `setup/`, plus `LibraryViewPanel`, `ProjectsViewPanel`, `AgentsViewPanel`, `AgentActivityTab` | [code-shape.md](code-shape.md) §4 | no — the hook's value is passed in as a prop |
 | 4 | knip gates unused exports and types, not only dead files | 217 | [code-shape.md](code-shape.md) §8 | no |
