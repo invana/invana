@@ -4,3 +4,4 @@
 
 export { ProjectRules } from "@/pages/graphs-detail/features/rules/ProjectRules";
 export { RulesSection } from "@/pages/graphs-detail/features/rules/RulesSection";
+export { RuleBoardPage } from "@/pages/graphs-detail/features/rules/boards/RuleBoardPage";

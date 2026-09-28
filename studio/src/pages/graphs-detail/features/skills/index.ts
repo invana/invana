@@ -9,7 +9,6 @@ export {
 } from "@/pages/graphs-detail/features/skills/boards/shared";
 export { SkillFlowWidget } from "@/pages/graphs-detail/features/skills/boards/SkillFlowWidget";
 export { UsageBoardPage } from "@/pages/graphs-detail/features/skills/boards/UsageBoardPage";
-export { RuleBoardPage } from "@/pages/graphs-detail/features/skills/boards";
 export {
 	useCreateProjectRuleMutation,
 	useCreateRuleMutation,

@@ -6,7 +6,7 @@
  */
 
 export { LensesViewPanel } from "@/pages/graphs-detail/features/lenses/LensesViewPanel";
-export { LensBoardPage } from "@/pages/graphs-detail/features/lenses/boards";
+export { LensBoardPage } from "@/pages/graphs-detail/features/lenses/boards/LensBoardPage";
 export { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
 export { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 export {
