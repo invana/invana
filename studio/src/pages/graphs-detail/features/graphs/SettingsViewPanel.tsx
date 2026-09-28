@@ -1,4 +1,4 @@
-import { EventsTab } from "@/pages/graphs-detail/features/events/EventsTab";
+import { EventsTab } from "@/pages/graphs-detail/features/events";
 import { GraphTab } from "@/pages/graphs-detail/features/graphs/GraphTab";
 import { InfoTab } from "@/pages/graphs-detail/features/graphs/InfoTab";
 import {

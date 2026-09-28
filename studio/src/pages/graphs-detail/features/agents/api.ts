@@ -18,7 +18,7 @@ import type {
 	SoulPreview,
 	SoulPreviewRequest,
 } from "@/pages/graphs-detail/features/agents/types";
-import type { EventListResponse } from "@/pages/graphs-detail/features/events/types";
+import type { EventListResponse } from "@/pages/graphs-detail/features/events";
 import { request } from "@/services/api/client";
 
 function base(username: string, graphSlug: string): string {

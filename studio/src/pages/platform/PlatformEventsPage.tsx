@@ -1,13 +1,13 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useEventStream } from "@/hooks/useEventStream";
-import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
-import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
+import { EventTypeFilter } from "@/pages/graphs-detail/features/events";
+import { matchesEventSearch } from "@/pages/graphs-detail/features/events";
 import {
 	StatusFilter,
 	matchesStatusFilter,
-} from "@/pages/graphs-detail/features/events/eventStatus";
-import { useGlobalEventsQuery } from "@/pages/graphs-detail/features/events/queries";
-import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
+} from "@/pages/graphs-detail/features/events";
+import { useGlobalEventsQuery } from "@/pages/graphs-detail/features/events";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events";
 import { Input } from "@invana/forms";
 import {
 	Button,
