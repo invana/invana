@@ -120,8 +120,8 @@ flowchart LR
 
 | Surface | File | Around the canvas, never on it |
 |---|---|---|
-| *All models* | `connect-and-model/stitch/AllModelsCanvas.tsx` | a staged bar with **Commit** / **Discard**, and a bar for stitches bound to an older version. It turns `stitching` on, refuses a drag inside one model or onto a model with nothing published, and docks `DeclareStitchPanel` |
-| Model canvas | `connect-and-model/model/ModelCanvas.tsx` | the model bar (**Node type**, **Edge type**), the selected type's form beneath, the read-only footer |
+| *All models* | `models/stitch/AllModelsCanvas.tsx` | a staged bar with **Commit** / **Discard**, and a bar for stitches bound to an older version. It turns `stitching` on, refuses a drag inside one model or onto a model with nothing published, and docks `DeclareStitchCard` |
+| Model canvas | `models/model-editor/ModelCanvas.tsx` | the model bar (**Node type**, **Edge type**), the selected type's form beneath, the read-only footer |
 
 ## Decisions
 

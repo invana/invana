@@ -3,7 +3,7 @@
  * (4.1 [graph-canvas], 4.3 [selection-and-the-panel], 4.4 [the-console]).
  *
  * This file is the border (code-shape.md §4.1). `features/boards/` mounts the
- * canvas through it, and `connect-and-model/` and `work/` reach the two things
+ * canvas through it, and `models/` and `projects/` reach the two things
  * every canvas kind shares — the backend and the theme adapter. Nothing outside
  * this folder imports one of its files directly.
  *
@@ -24,8 +24,8 @@ export type {
 	ExpandMenuSchema,
 } from "@/pages/graphs-detail/features/explorer/ExplorerCanvas";
 
-export { ExplorerTypesPanel } from "@/pages/graphs-detail/features/explorer/ExplorerTypesPanel";
-export { InspectorPanel } from "@/pages/graphs-detail/features/explorer/InspectorPanel";
+export { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer/ExplorerViewPanel";
+export { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer/InspectorViewPanel";
 
 // The two CV6 cards whose subject is what is drawn — Layers and Styling
 // (boards.md CV8). History and Rename describe the record, so they are
@@ -34,7 +34,7 @@ export { LayersPanel } from "@/pages/graphs-detail/features/explorer/LayersPanel
 export { StylingPanel } from "@/pages/graphs-detail/features/explorer/StylingPanel";
 export type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer/StylingPanel";
 
-export { ExpandFineTunePanel } from "@/pages/graphs-detail/features/explorer/ExpandFineTunePanel";
+export { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer/ExpandNeighboursDialog";
 export { useExpandNode } from "@/pages/graphs-detail/features/explorer/useExpandNode";
 
 // Engine adapters — PixiJS needs concrete values, not classes.

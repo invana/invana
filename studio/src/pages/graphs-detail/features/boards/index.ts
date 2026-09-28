@@ -18,7 +18,7 @@ export { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardForm
 
 // The two CV6 cards whose subject is the record — History and Rename
 // (boards.md CV8).
-export { BoardHistoryPanel } from "@/pages/graphs-detail/features/boards/BoardHistoryPanel";
+export { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
 
 export { useBoardVersions } from "@/pages/graphs-detail/features/boards/useBoardVersions";
 export type { BoardSlice } from "@/pages/graphs-detail/features/boards/useBoardVersions";

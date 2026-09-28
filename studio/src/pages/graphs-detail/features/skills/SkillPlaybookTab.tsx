@@ -33,7 +33,7 @@ import {
 	useSkillDraftQuery,
 	useWriteDraftTasksMutation,
 } from "@/hooks/queries/useSkills";
-import { SkillPlanEditor } from "@/pages/graphs-detail/features/skills/SkillPlanEditor";
+import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
 import type {
 	Skill,
 	SkillClarification,
@@ -251,7 +251,7 @@ export function SkillPlaybookTab({
 						}
 					/>
 				) : editingPlan && drawn ? (
-					<SkillPlanEditor
+					<SkillPlaybookEditor
 						plan={drawn}
 						vocabulary={draft.data.vocabulary ?? []}
 						inlinable={inlinable.data?.items ?? []}

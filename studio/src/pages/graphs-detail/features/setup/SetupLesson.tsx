@@ -4,7 +4,7 @@ import {
 	SETUP_STEP_BY_KEY,
 	setupCommand,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -69,7 +69,7 @@ export function SetupLesson({
 			? `step ${requiredIndex + 1} of ${SETUP_REQUIRED.length}`
 			: "optional";
 
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const setupMutation = useSetupSectionMutation();
 	const act = (action: "skip" | "reset") =>
 		setupMutation.mutate(

@@ -1,5 +1,5 @@
 import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { type Graph, isSetupComplete } from "@/types/graphs";
 import {
 	Button,
@@ -26,7 +26,7 @@ import { ArrowRight } from "lucide-react";
  * there is no dot in the rail beside this row, and none on any row here.
  */
 export function WhatNextPane({ graph }: { graph: Graph }) {
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const ready = isSetupComplete(graph);
 
 	return (

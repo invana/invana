@@ -14,7 +14,7 @@
 
 import { formatRelativeTime } from "@/lib/time";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import { DECLARED_PANELS } from "@/pages/graphs-detail/shared/dashboardPanels";
+import { DECLARED_WIDGETS } from "@/pages/graphs-detail/shared/dashboardWidgets";
 import { boardReportsApi } from "@/services/api/boardReports";
 import { Dashboard, type DashboardSpec } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
@@ -92,7 +92,7 @@ export function FrozenBoardPage({
 					// Every registered kind, not this page's — a report has no
 					// composer to tell it which it needs (B19). All of them are
 					// pure, so nothing here re-reads the subject.
-					registry={DECLARED_PANELS}
+					registry={DECLARED_WIDGETS}
 					icons={DASHBOARD_ICONS}
 				/>
 			</div>

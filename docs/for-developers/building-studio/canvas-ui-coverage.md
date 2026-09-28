@@ -54,11 +54,11 @@ Audited 2026-09-10 against `@invana/canvas-ui@0.0.14`.
 | `explorer/StylingPanel.tsx` | 190 | `Panel` · `PanelContent` (chrome) | ⚠️ **Chrome hand-rolled.** The per-type colour / label-property / size list is genuinely Invana's; the card around it is not. Also carries a `#9ca3af` literal — a tokens-only violation |
 | `canvases/CanvasHistoryPanel.tsx` | 171 | **`CanvasVersionsViewPanel`** | ⏳ **Built, awaiting a release.** B4 has shipped in canvas-ui (`view-panels/canvas-versions`, with a story) and lands here on the next canvas version. It draws the timeline; the rows, the restore and the per-row banner query stay ours — they read the engine's `canvas_states`, which canvas-ui knows nothing about (a row *is* a `CanvasStateSnapshot`; *version* is the word the user reads — [canvases.md](../modules/explore/features/boards.md) CV11) |
 | `boards/DataBoardPage.tsx` › the `overlay` union | ~40 | **`useSidePanels`** | ⚠️ **Reimplements CV6.** The hook turns a list of `SidePanelDef`s into the toggles, the open-state and the region body |
-| `explorer/InspectorPanel.tsx` | 178 | `DetailCard` · `PropertyDetailView` · `EdgeEndpoints` · `defaultPropertyRenderers` | ⚠️ **Partial.** Property rendering by kind is duplicated. The provenance block and the `missing` badge are ours. Carries `bg-blue-500/20` · `text-purple-400` — tokens-only violations |
+| `explorer/InspectorViewPanel.tsx` | 178 | `DetailCard` · `PropertyDetailView` · `EdgeEndpoints` · `defaultPropertyRenderers` | ⚠️ **Partial.** Property rendering by kind is duplicated. The provenance block and the `missing` badge are ours. Carries `bg-blue-500/20` · `text-purple-400` — tokens-only violations |
 | `explorer/canvasTheme.ts` + `ExplorerCanvas` › `ThemeBridge` | 91 | **`CanvasThemeSync`** | ⚠️ **Same job, different route.** Ours reads CSS tokens off the live DOM; canvas-ui's drives the engine's `ThemeBehaviour` from `useThemeOptional`. Verify the engine path recolours everything ours does before swapping |
 | `explorer/typeColor.ts` | 74 | `view-panels/schema` › `typeColor` | ⬇️ **Promote ours.** canvas-ui hashes into a hardcoded `TYPE_PALETTE`; ours reads `--color-data-1…8` from `@invana/styling`. CU6 |
-| `explorer/ExpandFineTunePanel.tsx` | 418 | — | ✅ **Ours.** Graph-traversal filters, sorts and limits — an engine concern, no canvas-ui analogue |
-| `explorer/ExplorerTypesPanel.tsx` | 413 | — | ✅ **Ours.** The legend-and-selection panel. Its eye rows go through `visibility.ts` today and move to the store API with CU5 |
+| `explorer/ExpandNeighboursDialog.tsx` | 418 | — | ✅ **Ours.** Graph-traversal filters, sorts and limits — an engine concern, no canvas-ui analogue |
+| `explorer/ExplorerViewPanel.tsx` | 413 | — | ✅ **Ours.** The legend-and-selection panel. Its eye rows go through `visibility.ts` today and move to the store API with CU5 |
 | `explorer/RendererCapabilityBanner.tsx` | 0 | **`RendererCapabilityBanner`** | ✅ **Moved down (B5).** Studio renders canvas-ui's; the probes it calls are memoised in `renderer-pixijs`, because `hasWebGL` creates a WebGL context to answer and the browser evicts the oldest live one past ~16 |
 | `canvases/{canvasKinds,captureBanner,useCanvasStates,CanvasFormDialog}` | 384 | — | ✅ **Ours.** The canvas *record* — kinds, thumbnails, contents, CRUD. canvas-ui draws canvases; it does not persist them |
 
@@ -84,12 +84,12 @@ The visibility workaround is the keystone: it is why the Layers fork exists, so 
 
 | # | Step | Unblocks | Deletes |
 |---|---|---|---|
-| 1 | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerTypesPanel`'s type-row eye loops the store API | 2 | 78 |
+| 1 | `visibility.ts` → `store.setNodeHidden` / `isNodeHidden` / `hiddenNodes`; drop `HIDDEN_STATE_NAME` and its registration in `ExplorerCanvas`; `ExplorerViewPanel`'s type-row eye loops the store API | 2 | 78 |
 | 2 | `LayersPanel` → `LayersViewPanel`, wrapped in `Panel` + `PanelContent` | — | 674 |
 | 3 | `ExplorerHeaderToolbar` → `GraphControlsToolbar` with `extraItems` for magnet + backend | — | ~284 |
 | 4 | `StylingPanel` chrome → `Panel` + `PanelContent`; kill the two colour literals. `CanvasHistoryPanel` skips this step — it goes straight to `CanvasVersionsViewPanel` on the next canvas release (B4) | — | ~30 |
 | 5 | `DataBoardPage`'s `overlay` union → `useSidePanels` | — | ~40 |
-| 6 | `InspectorPanel` property rendering → `DetailCard` + `PropertyDetailView`; keep provenance and the `missing` badge | — | ~80 |
+| 6 | `InspectorViewPanel` property rendering → `DetailCard` + `PropertyDetailView`; keep provenance and the `missing` badge | — | ~80 |
 | 7 | `ThemeBridge` + `canvasTheme.ts` → `CanvasThemeSync`, once the engine path is verified equivalent | — | ~91 |
 | 8 | Promote `typeColor.ts` into canvas-ui, with a story; consume it here | — | 74 |
 
@@ -128,8 +128,8 @@ folder, one `*ViewPanel` component, an `index.ts`.
 | # | `view-panels/…` | Reads | Studio gives up |
 |---|---|---|---|
 | B1 ✅ | **`styling/StylingViewPanel`** — **built**, ships in canvas-ui `0.0.14` | `useDerivedSchema` for the types on the canvas; emits a serialisable `{ nodeTypes, edgeTypes }` patch — colour, label property, size/width per type. The host persists it. Every existing style editor is per-*element* or per-*style-object*; none is per-type-on-this-canvas | `StylingPanel.tsx` — 190 → ~30 |
-| B2 ✅ | **`selection/SelectionViewPanel`** — **built**, ships in canvas-ui `0.0.14`; `ElementInspectorViewPanel`'s `renderExtra` is the named slot for provenance | the `ClickSelectBehaviour` selection, rendered read-only through `DetailCard` + `PropertyDetailView`, with tabs, a `missing` marking for elements no longer in the graph, and named **slots** for host-owned blocks | `InspectorPanel.tsx` — 178 → ~40 |
-| B3 | **`graph-types/GraphTypesViewPanel`** | `useDerivedSchema` again — every type as a row: the colour the canvas actually paints, a count, a visibility eye driving `store.setNodeHidden`. The legend and the list are one thing | `ExplorerTypesPanel.tsx` — 413 → ~200 |
+| B2 ✅ | **`selection/SelectionViewPanel`** — **built**, ships in canvas-ui `0.0.14`; `ElementInspectorViewPanel`'s `renderExtra` is the named slot for provenance | the `ClickSelectBehaviour` selection, rendered read-only through `DetailCard` + `PropertyDetailView`, with tabs, a `missing` marking for elements no longer in the graph, and named **slots** for host-owned blocks | `InspectorViewPanel.tsx` — 178 → ~40 |
+| B3 | **`graph-types/GraphTypesViewPanel`** | `useDerivedSchema` again — every type as a row: the colour the canvas actually paints, a count, a visibility eye driving `store.setNodeHidden`. The legend and the list are one thing | `ExplorerViewPanel.tsx` — 413 → ~200 |
 | B4 ✅ | **`canvas-versions/CanvasVersionsViewPanel`** — **built**, ships on the next canvas release | nothing live — presentational. Rows grouped by day, newest first; thumbnail, what changed, who, restore. The host supplies the rows and `onRestore`, and mounts its own lazily-loading banner through the `renderThumbnail` slot; the row for `currentVersionId` is marked and not restorable. An optional `onCapture` draws the capture button. canvas-ui draws the timeline, it does not persist versions | `CanvasHistoryPanel.tsx` — 171 → ~50 |
 
 B1 and B3 share `useDerivedSchema`, which is the reason they are two panels and not one: the same
@@ -152,7 +152,7 @@ a helper, and an `editor-panels/` form. B1–B4 are in the table above — they 
 | B6 | `renderer` + `neighbours` sections on `GraphControlsToolbar`. Neighbours self-wires through the new `useHoverNeighbours`; the renderer picker is host-owned (`{ value, onChange }`) because switching backends remounts the canvas — `GraphCanvasApp` gained `preference` to make that possible, and `ToolbarSelectItem` gained `disabledOptions` so an unavailable backend states why | `toolbars/` | ~60 of `ExplorerHeaderToolbar` |
 | B7 | `ThemeBehaviour` reads the themed document itself (`data-theme` carries family + kind), replacing `CanvasThemeSync`. **Gated on CU8**: it must not change the bundled default | `@invana/graph` | `canvasTheme.ts` + `ThemeBridge` — 91 → 0 |
 | B8 | `typeColor` to read `--color-data-1…8`, cached per document and cleared by `CanvasThemeSync` on a theme flip; the old hard-coded hues remain as the no-tokens fallback. CU6: ours moved **down**, it was not deleted | `view-panels/schema/` | `typeColor.ts` — 74 → 0 |
-| B9 | `GraphExpandEditorPanel` — direction · relationship · neighbour type · filter rows · sort · limit against a supplied `GraphExpandSchema`, emitting a `GraphExpandSpec`. `expandToForm` / `formToExpand` are the mapping; `offset` rides through so editing the narrowing does not reset the host's page | `editor-panels/graph-expand/` | `ExpandFineTunePanel.tsx` — 418 → ~150 |
+| B9 | `GraphExpandEditorPanel` — direction · relationship · neighbour type · filter rows · sort · limit against a supplied `GraphExpandSchema`, emitting a `GraphExpandSpec`. `expandToForm` / `formToExpand` are the mapping; `offset` rides through so editing the narrowing does not reset the host's page | `editor-panels/graph-expand/` | `ExpandNeighboursDialog.tsx` — 418 → ~150 |
 
 ### What Studio keeps, and why
 

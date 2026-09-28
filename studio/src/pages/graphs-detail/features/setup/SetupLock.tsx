@@ -1,5 +1,5 @@
 import { SETUP_STEP_BY_KEY } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { type Graph, type SetupGate, missingForGate } from "@/types/graphs";
 import { Button, EmptyState, EmptyStateLock } from "@invana/ui";
 import { ArrowRight, Lock } from "lucide-react";
@@ -30,7 +30,7 @@ interface Props {
  * panel that owns that step rather than on "setup" in general.
  */
 export function SetupLock({ graph, gate, surface }: Props) {
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const missing = graph ? missingForGate(graph, gate) : [];
 	const first = missing[0];
 	const firstMeta = first ? SETUP_STEP_BY_KEY[first] : undefined;

@@ -27,7 +27,7 @@ specific things, each of them checkable:
 | What `❌` is counting | Where it stands |
 |---|---|
 | The screen fills `AppLayoutV2`'s `leftSection` · `mainSection` · `rightSection` · `bottomSection` · `footer` ([DS12](modules/platform/features/design-system.md)) | ✅ **Done.** `App.tsx` for the four non-graph routes, and `GraphDetail` for the 36 graph-scoped ones — its hand-built `ResizablePanelGroup` is gone. Verified in the browser: a panel toggle holds the canvas's camera, which is the property the workaround existed to protect |
-| Nothing on the screen is a Studio component that shadows a kit one ([DS17](modules/platform/features/design-system.md)) | 8 files still do: `PanelChrome` · `WorkRow` · `EmissionCard` · `NotAnAnswer` · `TraceDialog` · `EventsSection` · `PlatformEventsPage` · `WorkGraphCanvas` |
+| Nothing on the screen is a Studio component that shadows a kit one ([DS17](modules/platform/features/design-system.md)) | 8 files still do: `PanelChrome` · `RecordRow` · `EmissionCard` · `NotAnAnswer` · `TraceDialog` · `EventsTab` · `PlatformEventsPage` · `LayeredCanvas` |
 | Canvas chrome comes from `@invana/canvas-ui` rather than being re-grown | 3 files import it, and only for what moved there in the 0.0.12 bump. `LayersViewPanel`, `BoardPagesViewPanel`, `InspectorPanel` and `PropertiesEditor` are all still hand-written in Studio |
 
 Two kit packages are not installed at all: `@invana/tables` (`DataTable`, which batches 3–7 are
@@ -168,7 +168,7 @@ composed from is [building-studio/design-kit-coverage.md](building-studio/design
 **Row 31 is superseded, and its Studio cell is `—` rather than 🟡.** `SkillsHiFi` drew one screen for
 two features at once, and its Surface cell named `work/SkillsPanel`, a path that no longer exists —
 so every 🟡 that traced to it was reporting a gap that had already been filled somewhere else. The
-live drawings are the *Govern, Agents and Skills* canvas's `SkillsPanel` · `SkillAuthor` ·
+live drawings are the *Govern, Agents and Skills* canvas's `SkillsViewPanel` · `SkillAuthor` ·
 `SkillFlow` · `SkillUsesPlan` · `SkillVersions`, and rows 34r · 34r.1 · 34s · 34s.1 for the boards
 they open.
 
@@ -319,7 +319,7 @@ reconciles against. `U4` is 🟡 because only the Assistant carries a lock so fa
 panel and Imports still render their own empty states.
 
 The Info panel's setup band is **already built** and needs no artboard of its own — it is the
-compact rendering of U1, and `GraphInfoPanel` draws it today (G20 · G21).
+compact rendering of U1, and `InfoTab` draws it today (G20 · G21).
 
 ---
 
@@ -431,7 +431,7 @@ title, character for character** — the canvas and this table are one string, n
 | Agents › Agents | [5.2](modules/agents/features/author-an-agent.md)–[5.7](modules/agents/features/concurrency-and-contention.md) | `AgentsList` · `AgentEnvelope` · `AgentLineage` · `AgentLifecycle` · `AgentConcurrency` |
 | Agents › LLMs | [5.1](modules/agents/features/providers-and-models.md) | `AgentsLlms` |
 | Library › Plans | [7.1](modules/workflows/features/the-library.md) · [7.6](modules/workflows/features/the-catalogue.md) · [7.7](modules/workflows/features/draft-a-plan.md) | **22 artboards** — named `module.feature.surface.variant`, one row per name prefix, no annotation cards. Listed one by one in [the table below](#library--plans--the-22-artboards) |
-| Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning what it declares — built on `SkillPlanEditor`'s rows) · `SkillVersions` (seven versions, immutable, the v4→v5 diff, a hand-edit flipping `origin`) |
+| Skills › Skills | [6.1](modules/skills/features/authoring-a-skill.md) | `SkillsViewPanel` (the panel, and the skill/rule line) · `SkillAuthor` (four fields, and the sentence `draft_plan` stops and asks about) · `SkillFlow` (**the plan in its six layers** — the only flow view, [SK16](modules/skills/features/authoring-a-skill.md)) · `SkillUsesPlan` (inlining a library plan with `uses`, and tuning what it declares — built on `SkillPlaybookEditor`'s rows) · `SkillVersions` (seven versions, immutable, the v4→v5 diff, a hand-edit flipping `origin`) |
 | Skills › Bindings | [6.2](modules/skills/features/bindings.md) | `SkillBindings` (bound, refused, and the world that changes which model decides) · `BindRefusals` (both halves run; the plan's declared bands with the shut one struck, and the three readings that shut one [BN13](modules/skills/features/bindings.md)) · `BindFromAgent` (the agent's side — it binds as you click, the refusal under the chip, the draft chip, and what the bindings cost in characters [BN11](modules/skills/features/bindings.md) · [BN14](modules/skills/features/bindings.md) · [BN15](modules/skills/features/bindings.md)) · `SkillOffer` (the fixed assembly order, discrete items with ids, what the record holds after) · `BindSeams` (a draft · unbound · in flight · refused · read-only) · `BindStanding` (the row's world as context, and the writer it does not have yet [BN12](modules/skills/features/bindings.md)) |
 | Skills › Usage | [6.3](modules/skills/features/usage.md) | `SkillUsage` (per version, by agent, by run outcome) · `UsageVersions` (every version with `enough_to_read`, and the v1 migration) · `UsageReadings` (four readings, and the move each names) · `UsageSeams` (too few · none yet · purged · self-reported) |
 | Skills › Rules | [6.4](modules/skills/features/rules.md) | `RulesPanel` (one statement, cited by 214 steps — and the four statements that are **not** rules) · `RuleAuthor` (the scope choice, and the nudge that it is two rules) · `RuleCited` (offered against cited, and what deactivating keeps) · `RulesProject` (a Project's working rules, the invariants read-only above) |
@@ -509,7 +509,7 @@ Six artboards on a fourth canvas — *Skills · and the left rail*
 
 | Artboard | Draws | API | Studio | Shell |
 |---|---|---|---|---|
-| `Main` (SkillsPanel) | Skills › Skills · Rules, and the skill/rule line | 🟡 | 🟡 | ✅ |
+| `Main` (SkillsViewPanel) | Skills › Skills · Rules, and the skill/rule line | 🟡 | 🟡 | ✅ |
 | `SkillFlow` | a skill's **Flow** tab — the plan canvas, every step naming its sentence | 🟡 | 🔵 | ✅ |
 | `SkillAuthor` | authoring — the clarification that pauses instead of guessing ([§0.8](orchestration.md#08-a-skill-drawn-as-a-flow)) | 🔵 | 🔵 | ✅ |
 | `SkillBindings` | agent · skill · plan, and the bind-time refusal | ✅ | ✅ | ✅ |
@@ -694,7 +694,7 @@ So a feature file can be opened next to the drawing that shows it.
 | 5.4 | Delegation | ✅ | ✅ | S12d | `AgentsLineageHiFi` | ✅ |
 | 5.5 | Lifecycle | ✅ | ✅ | S12c | `AgentPausedHiFi` | 🔵 |
 | 5.6 | Lineage | ✅ | ✅ | S12c | `AgentsLineageHiFi` | ✅ |
-| 6.1 | Authoring a skill | ✅ | ✅ | S5 | `SkillsPanel` · `SkillAuthor` · `SkillFlow` · `SkillUsesPlan` · `SkillVersions` · `SkillDash` · `SkillDashDraft` (superseding `SkillsHiFi`) | ✅ |
+| 6.1 | Authoring a skill | ✅ | ✅ | S5 | `SkillsViewPanel` · `SkillAuthor` · `SkillFlow` · `SkillUsesPlan` · `SkillVersions` · `SkillDash` · `SkillDashDraft` (superseding `SkillsHiFi`) | ✅ |
 | 6.2 | Bindings | ✅ | ✅ | S12c | `SkillBindings` · `BindRefusals` · `BindFromAgent` · `SkillOffer` · `BindSeams` · `BindStanding` | ✅ |
 | 6.3 | Usage | ✅ | ✅ | S12c | `SkillUsage` · `UsageVersions` · `UsageDash` · `UsageDashStates` (superseding `SkillsHiFi`) | ✅ |
 | 6.4 | Rules | ✅ | ✅ | S12b | `RulesPanel` · `RuleAuthor` · `RuleCited` · `RulesProject` (superseding `RulesHiFi`) | ✅ |

@@ -26,10 +26,10 @@
  * (`docs/for-developers/modules/explore/features/boards.md` CV6).
  */
 
-import { SessionTutorialModal } from "@/pages/graphs-detail/features/ask/assistant/SessionTutorialModal";
+import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
 import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
-import { BoardHistoryPanel } from "@/pages/graphs-detail/features/boards/BoardHistoryPanel";
-import { ExpandFineTunePanel } from "@/pages/graphs-detail/features/explorer";
+import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
+import { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer";
 import type {
 	CanvasBackend,
 	ExpandMenuHandlers,
@@ -234,7 +234,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						styling={styling}
 						onChange={onStylingChange}
 					/>
-					<BoardHistoryPanel
+					<BoardHistoryWidget
 						open={overlay === "history"}
 						onClose={() => setOverlay(null)}
 						username={username}
@@ -246,7 +246,7 @@ export const DataBoardPage = forwardRef<BoardPageHandle, BoardPageProps>(
 						isSaving={isSaving}
 					/>
 					{fineTuneVertex && (
-						<ExpandFineTunePanel
+						<ExpandNeighboursDialog
 							open
 							vertexId={fineTuneVertex}
 							schema={expandSchema}

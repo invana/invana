@@ -2,8 +2,8 @@
  * What every declared board agrees on, whichever module owns it.
  *
  * Four surfaces compose a `DashboardSpec` now — a run and a task run
- * ([Operate](../features/operate/dashboards)), and a skill, its usage and a
- * rule ([Skills](../features/skills/dashboards)) — and these five helpers were
+ * ([Runs](../features/runs/boards)), and a skill, its usage and a
+ * rule ([Skills](../features/skills/boards) · [Rules](../features/rules/boards)) — and these five helpers were
  * the part of the vocabulary that has nothing to do with runs. Two modules
  * needing the same domain-free helper is the signal that it belongs in
  * `shared/` ([code-shape §4.1](../../../../../docs/for-developers/building-studio/code-shape.md)),

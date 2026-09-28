@@ -1,13 +1,13 @@
 import { AppVersion } from "@/components/AppVersion";
 import { useAppHeader } from "@/components/header/useAppHeader";
 import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
-import { SettingsPanel } from "@/pages/graphs-detail/features/graph-settings/SettingsPanel";
+import { SettingsViewPanel } from "@/pages/graphs-detail/features/graphs/SettingsViewPanel";
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 import {
-	type SettingsSection,
-	useSettingsPanel,
-} from "@/pages/graphs-detail/shell/useSettingsPanel";
+	type LeftNavKey,
+	useLeftSection,
+} from "@/pages/graphs-detail/shell/useLeftSection";
 import { AppLayoutV2 } from "@invana/themes";
 import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
@@ -37,10 +37,10 @@ interface GraphDetailProps {
 	 *  so what follows the graph is the open panel, then what it opened. */
 	objectLabel?: string;
 	/** Page-side left panel. Shown only while a page-owned `?settings` key is
-	 *  open; a settings section docks the SettingsPanel here instead, and
+	 *  open; a settings section docks the SettingsViewPanel here instead, and
 	 *  nothing open means no left column. */
 	leftSection?: SectionConfig;
-	/** Main content. Replaced by SettingsPanel when settings is expanded. */
+	/** Main content. Replaced by SettingsViewPanel when settings is expanded. */
 	mainSection: MainSectionConfig;
 	/** Right auxiliary panel (e.g. Inspector / DetailPanel). Hidden when
 	 *  settings is expanded so the panel owns the full content width. */
@@ -61,18 +61,18 @@ interface GraphDetailProps {
 }
 
 // The page-owned panels keyed into the shared `?settings` param. These open via
-// the page's own `leftSection` instead of rendering a SettingsPanel tab — so the
+// the page's own `leftSection` instead of rendering a SettingsViewPanel tab — so the
 // whole rail stays one single-open accordion.
 //
 // There is one page (docs/for-developers/modules/explore/spec.md), so there is one list: Model
 // plus the work surfaces (docs/for-developers/modules/work/spec.md). The Modeller's `schema` and
-// `messages` keys are aliased onto `model` / `sessions` by `useSettingsPanel`
+// `messages` keys are aliased onto `model` / `sessions` by `useLeftSection`
 // and never reach here.
 //
 // `sessions` is deliberately absent: it is the assistant, on the right
 // (the-assistant.md AD1). It stays in ALL_NATIVE_SECTIONS below so a
 // stale `?panel=sessions` link is still recognised as page-owned — the page
-// answers it by opening the assistant — rather than docking the SettingsPanel.
+// answers it by opening the assistant — rather than docking the SettingsViewPanel.
 //
 // `skills` is page-owned rather than a settings section. That is deliberate: a
 // skill is *configured* like a connection but *read* like work — "is this prose
@@ -82,7 +82,7 @@ interface GraphDetailProps {
 // This used to be a record keyed by a `GraphDetailSection` ("overview" |
 // "explorer" | "modeller") with one key filled in. There is one page, so it is
 // one list.
-const PAGE_OWNED_SECTIONS: SettingsSection[] = [
+const PAGE_OWNED_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"model",
 	"projects",
@@ -98,7 +98,7 @@ const PAGE_OWNED_SECTIONS: SettingsSection[] = [
 	"agents",
 	"skills",
 ];
-const ALL_NATIVE_SECTIONS: SettingsSection[] = [
+const ALL_NATIVE_SECTIONS: LeftNavKey[] = [
 	"explorer",
 	"sessions",
 	"schema",
@@ -117,7 +117,7 @@ const ALL_NATIVE_SECTIONS: SettingsSection[] = [
  * (graph-detail-page.md G1 · G15). Owns:
  *
  * - The breadcrumb header (`useAppHeader`) and left rail (`useGraphLeftNav`).
- * - SettingsPanel takeover: docked replaces `leftSection`; expanded replaces
+ * - SettingsViewPanel takeover: docked replaces `leftSection`; expanded replaces
  *   `mainSection` and hides both `leftSection` and `rightSection`.
  * - Footer with the shared `ConnectionStatusBar` (connection chip + page metrics)
  *   and a right cluster (extras + `AppVersion`).
@@ -141,7 +141,7 @@ export function GraphDetail({
 	}>();
 
 	const { data: connection } = useGraphConnectionQuery(username, graphSlug);
-	const settingsPanel = useSettingsPanel();
+	const settingsPanel = useLeftSection();
 	const leftNav = useGraphLeftNav();
 
 	// **No mode switch** (docs/for-developers/modules/explore/spec.md). The header is a breadcrumb naming the
@@ -159,8 +159,8 @@ export function GraphDetail({
 	});
 
 	// The whole left rail shares one `?settings` param. This view's own panel
-	// (AssistantPanel / SchemaNav) opens under its native key; every other value
-	// is a bottom-rail settings section that renders the SettingsPanel. A value
+	// (AssistantViewPanel / SchemaNav) opens under its native key; every other value
+	// is a bottom-rail settings section that renders the SettingsViewPanel. A value
 	// belonging to the *other* view's native key shows nothing here.
 	const nativeKeys = PAGE_OWNED_SECTIONS;
 	const sectionIsNative = ALL_NATIVE_SECTIONS.includes(settingsPanel.section);
@@ -172,7 +172,7 @@ export function GraphDetail({
 	const settingsDocked = settingsOpen && !settingsPanel.expanded;
 
 	// Native panel open → render the page's own leftSection. Settings docked →
-	// render SettingsPanel with panel-sized constraints (independent of the
+	// render SettingsViewPanel with panel-sized constraints (independent of the
 	// page's own sizing). Settings expanded → drop leftSection so the panel can
 	// own main width. **Nothing open → no left column**: every panel here,
 	// the Explorer's own included, is a `?panel` key, so closing one leaves the
@@ -188,7 +188,7 @@ export function GraphDetail({
 						maxSize: "640px",
 						collapsible: false,
 						content: (
-							<SettingsPanel
+							<SettingsViewPanel
 								username={username as string}
 								graphSlug={graphSlug as string}
 							/>
@@ -200,7 +200,7 @@ export function GraphDetail({
 		? {
 				...mainSection,
 				content: (
-					<SettingsPanel
+					<SettingsViewPanel
 						username={username as string}
 						graphSlug={graphSlug as string}
 					/>

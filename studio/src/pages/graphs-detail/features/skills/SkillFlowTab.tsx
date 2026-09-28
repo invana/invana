@@ -27,7 +27,7 @@ import {
 	taskFlowSettings,
 	taskFlowTemplates,
 } from "@/canvases/taskflow";
-import { taskFlowFromPlan } from "@/pages/graphs-detail/features/skills/taskFlowFromPlan";
+import { taskFlowFromPlan } from "@/canvases/taskflow/taskFlowFromPlan";
 import type { PlanUse, SkillPlanNode, SkillPlanRead } from "@/types/skills";
 import { Badge, EmptyState, Spinner } from "@invana/ui";
 import { Workflow } from "lucide-react";

@@ -351,7 +351,7 @@ the test for every part of a board:
 
 ### 5.5 The rule for a spec builder
 
-`runDashboardSpec(trace, { view, selectedKey })` has exactly two arguments, and that is the whole
+`runBoardSpec(trace, { view, selectedKey })` has exactly two arguments, and that is the whole
 answer:
 
 | The argument | What it is | Where it belongs |
@@ -459,7 +459,7 @@ sequenceDiagram
     PG->>PG: BOARD_KINDS[kind].renders === "dashboard"
     PG->>RT: GET /runs/{subjectId}/trace
     RT-->>PG: steps · budget · result.json · log
-    PG->>PG: runDashboardSpec(trace, {view, selectedKey})
+    PG->>PG: runBoardSpec(trace, {view, selectedKey})
     PG-->>U: panels, laid out by the document
     U->>PG: switch view · filter the log to a task
     PG->>PG: rebuild the document — the same trace, a different reading
@@ -554,7 +554,7 @@ sequenceDiagram
 | Studio hooks | `useCanvases` · `useCanvasStates` | `useBoards` · `useBoardVersions` |
 | Studio feature | `features/canvases/` | `features/boards/` |
 | Studio registry | `canvasKinds.ts` · `CanvasKind` · `CANVAS_KINDS` · `specFor` | **`boardKinds.ts`** · `BoardKind` · `BOARD_KINDS` · `specFor` — same file, four rows and one `renders` field longer |
-| Studio files | `CanvasFormDialog` · `CanvasHistoryPanel` · `DataCanvasPage` | `BoardFormDialog` · `BoardHistoryPanel` · `DataBoardPage` |
+| Studio files | `CanvasFormDialog` · `CanvasHistoryPanel` · `DataCanvasPage` | `BoardFormDialog` · `BoardHistoryWidget` · `DataBoardPage` |
 | Studio reports | *(none)* | `FrozenBoardPage` — one body for every frozen reading ([B19](#9-decisions)) · `useReport` + `DeclaredBoard` — the two acts, given to a page by the host ([B20](#9-decisions) · [B21](#9-decisions)) · `BoardHistoryCard` — one card, two bindings ([B21](#9-decisions)) |
 | Docs | `modules/explore/features/boards.md` | `modules/explore/features/boards.md` |
 
@@ -596,7 +596,7 @@ B5 lands the live reading; B6 lands the kept one. What a dashboard panel *is* st
 | B12 | **A frozen reading is a page id, not a mode flag.** `kind:id` is live, `kind:id@version` is frozen, one parser, and the URL carries which you are looking at. A `?frozen=true` beside the id would be the same fact in two places, and the two would disagree the first time a link was shared. |
 | B13 | **The frozen document is the resolved one.** A report stores the spec **with the numbers in it**, not the spec plus a subject id to re-read — re-reading is what makes it live. That is also what lets a report outlive its run's pruned `result.json`, which is the reason to keep one. |
 | B14 | **A board is split by lifetime, not by structure vs data.** In a `DashboardSpec` the data *is* the structure — a panel's numbers are its `options` — so cutting the two apart needs a parallel key space and a merge that renders an empty panel when a key goes missing. The seam that pays is the one the canvas already draws: `styling` is its own column because a re-query must replace every node and keep the colours. One test for every part: *does this survive the next time the data is replaced?* ([§ 5.4](#54-what-is-stored--three-lifetimes-not-two-halves)) |
-| B15 | **Whatever the spec builder takes besides the subject is `settings`.** `runDashboardSpec(trace, {view, selectedKey})` has two arguments and they are the two lifetimes: the subject is fetched and never stored, the reading is stored and never fetched. A new *hide this panel* is one more field in that argument, not one more column — and nothing else about a live dashboard is persisted at all. |
+| B15 | **Whatever the spec builder takes besides the subject is `settings`.** `runBoardSpec(trace, {view, selectedKey})` has two arguments and they are the two lifetimes: the subject is fetched and never stored, the reading is stored and never fetched. A new *hide this panel* is one more field in that argument, not one more column — and nothing else about a live dashboard is persisted at all. |
 | B16 | **A frozen reading is stored merged and never re-merged.** Re-merging a report against today's builder gives panels the data has nothing for, and data for panels that no longer exist. A version is one blob; the `styling` and `settings` beside it on `board_versions` are a deliberate copy so a version lists and reads without its board, not a split of the blob. |
 | B17 | **The host's dashboard branch is exhaustive, and a kind with no body refuses by name.** `renders` picks the branch ([B3](#9-decisions)) and inside it the kind picks the body — so the last `return` must belong to *one* named kind, never be the fall-through for the rest. A declared kind whose body has not been built (`plan_runs`, [34o](../the-screens.md)) drew the body that happened to be last, which reads as a defect in that body's composer rather than as a kind nobody has written yet. It says what it is instead. The same rule covers the optional trace: `runId` is absent on the four kinds that bind to a record rather than to a run ([SD3](../building-studio/skills-dashboards.md)), so the two bodies that read one **check** it — a cast that is true by construction is a crash the day a fifth kind forgets. |
 

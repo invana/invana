@@ -115,8 +115,8 @@ thing the run dashboard does.
 
 | Change | Where |
 |---|---|
-| The `+` moves into the drawer header's right, as a `headerActions` item ([SK27](../modules/skills/features/authoring-a-skill.md#decisions)) | `SkillsPanel.tsx` — `PanelStackSection.headerActions`, which the kit already takes. **Rules follows it** |
-| The drill-in crumb **is** the drawer header — `‹ SKILLS / <name>` as the section `title`; the in-body header rows go | `SkillsPanel.tsx` · `SkillDetail.tsx` · the skill form |
+| The `+` moves into the drawer header's right, as a `headerActions` item ([SK27](../modules/skills/features/authoring-a-skill.md#decisions)) | `SkillsViewPanel.tsx` — `PanelStackSection.headerActions`, which the kit already takes. **Rules follows it** |
+| The drill-in crumb **is** the drawer header — `‹ SKILLS / <name>` as the section `title`; the in-body header rows go | `SkillsViewPanel.tsx` · `SkillDetail.tsx` · the skill form |
 | **Playbook** tab: the prose one sentence per line, each showing the step it produced; unmapped sentences marked | `SkillDetail.tsx` |
 | **Flow** tab: the plan in six layers, from `/versions/{v}/tasks` | new `SkillFlowTab.tsx` |
 | The draft banner, *Draw this*, and the clarification card — the sentence quoted, the readings as options, each naming the step it would write | new `SkillDraft.tsx` |

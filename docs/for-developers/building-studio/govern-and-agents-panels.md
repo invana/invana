@@ -32,10 +32,10 @@ flowchart LR
     subgraph Shell["AppLayoutV2"]
         N[leftNav] --> G["Govern<br/>?panel=govern"]
         N --> A["Agents<br/>?panel=agents"]
-        G --> GW["drawer=worlds<br/>WorldsDrawer"]
-        G --> GG["drawer=guardrails<br/>GuardrailsDrawer"]
-        A --> AR["drawer=agents<br/>AgentsDrawer"]
-        A --> AL["drawer=llms<br/>LlmsDrawer"]
+        G --> GW["drawer=worlds<br/>WorldsSection"]
+        G --> GG["drawer=guardrails<br/>GuardrailsSection"]
+        A --> AR["drawer=agents<br/>AgentsSection"]
+        A --> AL["drawer=llms<br/>LlmsSection"]
         GW -->|world=id| WD[LensDetail]
         GW -->|world=new| WE[LensEditor]
         GG -->|guardrail=id| GD[LensDetail]
@@ -160,35 +160,35 @@ Feature modules under `studio/src/pages/graphs-detail/features/`, following
 
 | Screen | Studio file | Composes | Reads |
 |---|---|---|---|
-| W1 Worlds drawer | `govern/WorldsDrawer.tsx` ✅ | `GuardrailsStrip` (the locked strip) · `LensRow` · `EmptyState` | `useLensesQuery()`, split by `kind` — **one query, not two** (GV1) |
-| W2 A world | `govern/LensDetail.tsx` ✅ — **one body for both kinds** (GV1), so a guardrail and a world are never two layouts | `PanelBox` · `LayerSection` · `RuleRow` · `CastTable` | the row already in the list; no second fetch |
-| W3 Authoring | `govern/LensEditor.tsx` ✅ — **one editor for both kinds** ([WO10](../modules/govern/features/worlds.md)), with `govern/RuleBuilder.tsx` as the control set and `govern/addressing.ts` composing the three picks into one pattern | `Input` · `Checkbox` · `RichSelect` · `SliceSummary` · `CannotAnswerCard` | `useParticipantsQuery()` · `useValidateLensMutation()` |
-| W4 The ladder | The locked strip is `govern/GuardrailsStrip.tsx` ✅; the rungs are `govern/LensActions.tsx` ✅ — name · rename · duplicate · promote · delete, each refusal naming what holds it | `PanelBox` · `LayerChip` · `AlertDialog` · `CannotAnswerCard` | `useUpdateLensMutation` · `usePromoteLensMutation` · `useDuplicateLensMutation` · `useDeleteLensMutation` |
+| W1 Worlds drawer | `lenses/WorldsSection.tsx` ✅ | `GuardrailsStrip` (the locked strip) · `LensRow` · `EmptyState` | `useLensesQuery()`, split by `kind` — **one query, not two** (GV1) |
+| W2 A world | `lenses/LensDetail.tsx` ✅ — **one body for both kinds** (GV1), so a guardrail and a world are never two layouts | `PanelBox` · `LayerSection` · `RuleRow` · `CastTable` | the row already in the list; no second fetch |
+| W3 Authoring | `lenses/LensEditor.tsx` ✅ — **one editor for both kinds** ([WO10](../modules/govern/features/worlds.md)), with `lenses/RuleBuilder.tsx` as the control set and `lenses/addressing.ts` composing the three picks into one pattern | `Input` · `Checkbox` · `RichSelect` · `SliceSummary` · `CannotAnswerCard` | `useParticipantsQuery()` · `useValidateLensMutation()` |
+| W4 The ladder | The locked strip is `lenses/GuardrailsStrip.tsx` ✅; the rungs are `lenses/LensActions.tsx` ✅ — name · rename · duplicate · promote · delete, each refusal naming what holds it | `PanelBox` · `LayerChip` · `AlertDialog` · `CannotAnswerCard` | `useUpdateLensMutation` · `usePromoteLensMutation` · `useDuplicateLensMutation` · `useDeleteLensMutation` |
 | The chip | `govern/WorldChip.tsx` — moves from `headerRightExtras` into the composer as an inline `RichSelect` ([AD18](../modules/ask/features/the-assistant.md#decisions)), bound to the open session's `lens_id` ([WO5](../modules/govern/features/worlds.md#decisions) · [WO11](../modules/govern/features/worlds.md#decisions)). Reads `Everything` when none is set, and refuses a world naming an unpublished version |
-| G1 Guardrails | `govern/GuardrailsDrawer.tsx` ✅ — readable by everyone, authoring absent without the permission ([GR12](../modules/govern/features/guardrails.md)). The impact confirm is `govern/ImpactDialog.tsx` ✅, owned by the panel because it stands in front of the save | `LensList` · `LensDetail` · `AlertDialog` · `DiffList` | the same one query, which also carries `may_edit_guardrails` ([GR11](../modules/govern/features/guardrails.md)) · `useGuardrailImpactMutation` |
-| G2 Add rule | `govern/RuleBuilder.tsx` ✅ — **the same builder W3 uses** (GR8: one grammar over five layers) | `Select` · `RadioGroup` · `MatchPreview` · `SliceSummary` · `EgressList` | `useParticipantsQuery()`, matched locally so the preview answers per pick |
-| R1 The run's layers | `govern/runLayers.ts` ✅ — a **composer, not a panel**: the kit's `layers` panel draws it (`RUN_PANELS`), and this file is the one thing the kit cannot know — how a `TouchesResponse` and a trace become bands and bars. Govern owns what a touch means; Operate hosts the band; neither draws a strip of its own | the kit's `layers` panel → `LayerStrip` | `useRunTouchesQuery(runId)`, read by `RunDashboardPage` |
-| R1 This run's lens | `govern/runLens.ts` ✅ — a composer for the kit's `lens` panel: **one section per layer, a `ParticipantRow` per address**, which is what [SR53](../modules/operate/features/see-what-ran.md#decisions) draws and three verdict buckets never were. The layer is the address's first segment, so a participant allowed and never touched — which has no ledger row — still lands in its band. `Retune` is a **header** act now, not a control inside the band: it opens `?panel=govern` and acts on the next run. `govern/RunLensPanel.tsx` survives as a **legacy renderer for frozen reports** that already name `runLens` | the kit's `lens` panel → `LayerSection` · `ParticipantRow` | the same query, plus `trace.lens_name` — the name **as frozen** ([GV27](../modules/govern/spec.md)) |
-| R2 One step | `govern/StepTouchPanel.tsx` ✅ — registered as `stepTouch` on the step dashboard; generated vs executed digests, the slice composed in, and what egress cut | `PropertyList` · `SliceSummary` · `EgressList` · `CannotAnswerCard` | the run's whole ledger, keyed on `step_key` |
-| R3 Compare | `govern/ComparePage.tsx` ✅ — a **page kind**, `compare:<a>:<b>`; reached by `Compare…` on a finished run ([WO13](../modules/govern/features/worlds.md)), picked in `govern/CompareDialog.tsx` | `DiffList` · `AddressChip` · `MetricTile` · `RecordHeader` | `useCompareRunsQuery(a, b)` |
+| G1 Guardrails | `lenses/GuardrailsSection.tsx` ✅ — readable by everyone, authoring absent without the permission ([GR12](../modules/govern/features/guardrails.md)). The impact confirm is `lenses/ImpactDialog.tsx` ✅, owned by the panel because it stands in front of the save | `LensList` · `LensDetail` · `AlertDialog` · `DiffList` | the same one query, which also carries `may_edit_guardrails` ([GR11](../modules/govern/features/guardrails.md)) · `useGuardrailImpactMutation` |
+| G2 Add rule | `lenses/RuleBuilder.tsx` ✅ — **the same builder W3 uses** (GR8: one grammar over five layers) | `Select` · `RadioGroup` · `MatchPreview` · `SliceSummary` · `EgressList` | `useParticipantsQuery()`, matched locally so the preview answers per pick |
+| R1 The run's layers | `lenses/runLayers.ts` ✅ — a **composer, not a panel**: the kit's `layers` panel draws it (`RUN_PANELS`), and this file is the one thing the kit cannot know — how a `TouchesResponse` and a trace become bands and bars. Govern owns what a touch means; Operate hosts the band; neither draws a strip of its own | the kit's `layers` panel → `LayerStrip` | `useRunTouchesQuery(runId)`, read by `RunBoardPage` |
+| R1 This run's lens | `lenses/runLens.ts` ✅ — a composer for the kit's `lens` panel: **one section per layer, a `ParticipantRow` per address**, which is what [SR53](../modules/operate/features/see-what-ran.md#decisions) draws and three verdict buckets never were. The layer is the address's first segment, so a participant allowed and never touched — which has no ledger row — still lands in its band. `Retune` is a **header** act now, not a control inside the band: it opens `?panel=govern` and acts on the next run. `lenses/RunLensWidget.tsx` survives as a **legacy renderer for frozen reports** that already name `runLens` | the kit's `lens` panel → `LayerSection` · `ParticipantRow` | the same query, plus `trace.lens_name` — the name **as frozen** ([GV27](../modules/govern/spec.md)) |
+| R2 One step | `lenses/StepTouchWidget.tsx` ✅ — registered as `stepTouch` on the step dashboard; generated vs executed digests, the slice composed in, and what egress cut | `PropertyList` · `SliceSummary` · `EgressList` · `CannotAnswerCard` | the run's whole ledger, keyed on `step_key` |
+| R3 Compare | `lenses/CompareBoardPage.tsx` ✅ — a **page kind**, `compare:<a>:<b>`; reached by `Compare…` on a finished run ([WO13](../modules/govern/features/worlds.md)), picked in `lenses/CompareDialog.tsx` | `DiffList` · `AddressChip` · `MetricTile` · `RecordHeader` | `useCompareRunsQuery(a, b)` |
 | R4 The cast | part of `LensDetail` ✅ — the resolved cast is a **second read** ([WO12](../modules/govern/features/worlds.md)), so the record never waits on it | `CastTable` · `CannotAnswerCard` | `useLensQuery(id)` → `cast_resolved` |
-| A1 Agents · agent | `agents/AgentsStackPanel.tsx` (the panel) · `agents/AgentsDrawer.tsx` · `AgentDetail.tsx` ✅ — the row draws its **lens chip**, not a model; the detail's *Bindings* is *Bounds*, and the cast is read **through** the lens | `LensChip` · `CastTable` | `useAgentsQuery` · `useLensesQuery` · `useLensQuery(agent.lens_id)` |
+| A1 Agents · agent | `agents/AgentsViewPanel.tsx` (the panel) · `agents/AgentsSection.tsx` · `AgentDetail.tsx` ✅ — the row draws its **lens chip**, not a model; the detail's *Bindings* is *Bounds*, and the cast is read **through** the lens | `LensChip` · `CastTable` | `useAgentsQuery` · `useLensesQuery` · `useLensQuery(agent.lens_id)` |
 | A2 Ceilings | `agents/CeilingsTable.tsx` ✅ — inside `AgentDetail`'s *Ceilings* section rather than a section of its own: the envelope's allow-list is already there, and a second surface would split the three bounds ([AG6](../modules/agents/features/author-an-agent.md)) | `DataTable` | the agent's own `budget` |
 | A3 Lineage | `agents/LineagePage.tsx` | `TreeView` · `AgentChip` | `useAgentLineageQuery` — **exists** |
 | A4 Lifecycle | `agents/LifecycleDialog.tsx` | `AlertDialog` · `DataTable` (what pausing would do) | `useRetirePreviewQuery` — **exists**, needs a pause twin |
-| A5 Concurrency | `agents/PoolsTable.tsx` ✅ — rendered by `graph-settings/ConcurrencyFields.tsx`, **where the ceiling that causes the contention is set** ([C8](../modules/agents/features/concurrency-and-contention.md)); no page kind of its own | `DataTable` | `GET …/contention`, polled while the tab is open |
-| A6 LLMs | `agents/LlmsDrawer.tsx` ✅ · `ProviderDetail.tsx` ✅ · `ProviderForm.tsx` ✅ | `StatusDot` · `AddressChip` · `PropertyList` · `CannotAnswerCard` | `useLLMProvidersQuery` · `useLensesQuery` (who casts each address) |
+| A5 Concurrency | `graphs/PoolsTable.tsx` ✅ — rendered by `graphs/ConcurrencyFields.tsx`, **where the ceiling that causes the contention is set** ([C8](../modules/agents/features/concurrency-and-contention.md)); no page kind of its own | `DataTable` | `GET …/contention`, polled while the tab is open |
+| A6 LLMs | `llms/LlmsSection.tsx` ✅ · `ProviderDetail.tsx` ✅ · `ProviderForm.tsx` ✅ | `StatusDot` · `AddressChip` · `PropertyList` · `CannotAnswerCard` | `useLLMProvidersQuery` · `useLensesQuery` (who casts each address) |
 
 ### What changed shape, and what was deleted
 
 | File | Change |
 |---|---|
-| `agents/AgentsPanel.tsx` | **deleted.** Its body is `agents/AgentsDrawer.tsx`, a drawer of the stack; a panel that drew its own `ListPanelChrome` cannot be one of two in a column |
-| `graph-settings/LLMsPanel.tsx` (733 lines) | **deleted.** `LlmsDrawer` · `ProviderDetail` · `ProviderForm` replace it, and none of them is a tab of Settings ([PM6](../modules/agents/features/providers-and-models.md)) |
+| `agents/AgentsPanel.tsx` | **deleted.** Its body is `agents/AgentsSection.tsx`, a drawer of the stack; a panel that drew its own `ListPanelChrome` cannot be one of two in a column |
+| `graph-settings/LLMsPanel.tsx` (733 lines) | **deleted.** `LlmsSection` · `ProviderDetail` · `ProviderForm` replace it, and none of them is a tab of Settings ([PM6](../modules/agents/features/providers-and-models.md)) |
 | `agents/AgentDetail.tsx` | *Bindings → LLM* is *Bounds → Works in*, with the cast read **through** the lens; *Budget*'s five inputs are the ten-row ceilings table |
 | `hooks/queries/useLLMProviders.ts` | a provider holds models; `setDefault` is gone and `addModel` · `removeModel` answer in its place |
-| `shell/useAgentsPanel.ts` | new — `?drawer=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
-| `shell/useSettingsPanel.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
+| `shell/useAgentsViewPanel.ts` | new — `?drawer=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
+| `shell/useLeftSection.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
 
 ---
 

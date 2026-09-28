@@ -157,6 +157,8 @@ The Studio and engine trees, file by file, are [§12](#12-target-code-structure)
 
 ### Folder moves
 
+**Status: done.** Every row below is moved; `features/` holds `agents · assistant · boards · events · explorer · graphs · lenses · llms · models · plans · projections · projects · rules · runs · setup · skills`.
+
 | Today | Target | Files | Action |
 |---|---|---|---|
 | `connect-and-model/` | `models/` | 40 | rename |
@@ -171,6 +173,8 @@ The Studio and engine trees, file by file, are [§12](#12-target-code-structure)
 | `bring-data-in/ImportsPanel.tsx` (`ImportsJournalBody`) | `operate/RunsList.tsx` (`RunsList`) → `runs/` in R2 | 1 | **done** |
 
 ### Files in the wrong folder
+
+**Status: done**, except `usd` → `lib/format` (still in `agents/agentDraft.ts`). `WorkCanvas.tsx` is split: `projects/PlanCanvas.tsx`, `agents/EnvelopeCanvas.tsx`, `agents/LineageCanvas.tsx`.
 
 Evidence is the import graph: each file below is imported only from the folder it moves to.
 
@@ -208,6 +212,8 @@ before Studio uses it.
 
 ### Unused code
 
+**Status: done**, except `skills/SkillsSection.tsx`: `SettingsViewPanel` still imports and renders it in a switch branch, so removing it is a code change, not a deletion. `PropertyKeyFormDialog.tsx` was deleted with them — its only importer was `PropertyKeyTable`.
+
 | File | Evidence | Action |
 |---|---|---|
 | `shell/useTasksPanel.ts` | zero importers; the Tasks stack is retired (G31 · G41) | delete |
@@ -216,6 +222,8 @@ before Studio uses it.
 | `model/components/DetailPanel.tsx` + `ModelOverview`, `NoSelectionPlaceholder`, `PropertyKeyTable` | no importers; the three are `@deprecated` and used only by `DetailPanel` | delete |
 
 ## 5. Component names — one meaning per suffix
+
+**Status: done** for every file and component row below, and for the shell hooks and shared builders. Still open: `LayersPanel` · `StylingPanel` · `ListPanel` (replaced by the kit in phase K), and the `?drawer=` value types `ProjectsDrawer` · `LibraryDrawer` · `GovernDrawer`, which rename with the `?drawer=` → `?section=` key.
 
 The suffixes are the kit's words. `@invana/ui` builds a stacked panel from `PanelStack` and its
 `PanelStackSection`s; canvas-ui names every region occupant `*ViewPanel` (`LayersViewPanel`,
@@ -258,6 +266,8 @@ docstrings stay full — they are how a reader learns to use the code.
 | Module docstring | What the module does and how it is used; a design note and what it emits when that helps — `core/telemetry/middleware.py` is the model |
 
 ## 6. Retired words still in Studio
+
+**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `SkillPlaybookEditor`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. Still open: the type, hook and API names in `types/*`, `hooks/queries/*` and `services/api/*` (`Task*` → `Todo*`, `Thinking` → `TaskRun`, `SkillPlan*`, `useWork` split, `railItem`), which move with R6.
 
 | Word | Where | Becomes |
 |---|---|---|

@@ -121,7 +121,7 @@ draws before any of it is built ([README › How a module gets built](../../READ
 
 | Artboard | What it shows | Settles |
 |---|---|---|
-| `SkillsPanel` | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
+| `SkillsViewPanel` | the two drawers, and the skill/rule line as a table | § 2 — a playbook has steps, a statement never does |
 | `SkillAuthor` | the **Playbook** tab: each sentence showing the step it produced, and `draft_plan` asking which of two readings sentence 2 means | C10 · SK6 — it never guesses; nothing is written until it is answered |
 | `SkillFlow` | the **Flow** tab: the plan in the **six layers** it will touch | SK16 — one flow view, and it is the layer one |
 | `SkillUsesPlan` | a skill inlining the library's `nl-single@2` with `uses`, tuning the one argument it declares, and the two tunings its declaration refuses | SK18 · SK32 · SK33 · LB18 · LB19 · LB20 |

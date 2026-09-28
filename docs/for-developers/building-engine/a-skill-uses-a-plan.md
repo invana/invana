@@ -115,7 +115,7 @@ Expansion is not its own route: inlining is an edit to the draft's rows, and it 
 |---|---|---|
 | **S4a** ✅ | The migration, `args_schema`'s shape, `${args.N}` in the grammar, and `nl-single@1` declaring `read_only` | **Done.** A reusable plan declares an argument, its row binds it, a plan selected directly resolves it to the declared default before anything validates, and an undeclared name is refused by name |
 | **S4b** ✅ | Expansion — a `uses` row becomes the inlined steps, flat, each carrying `source_plan_key`, validated as one graph | **Done.** Hand-editing a draft to `uses: nl-single@1` writes five rows keyed `answer_*`, the tuned `read_only` lands on `execute_graph_query`, the copied plan's own bindings follow the copies, and `task_plans.uses` records the act |
-| **S4c** ✅ | `GET …/skills/inlinable`, and Studio's picker + argument tuning in `SkillPlanEditor` | **Done.** The picker lists the eight reusable plans with their bands, step counts and what each offers; inlining `nl-single@2` and tuning `read_only` writes five rows and records the composition; re-opening the editor collapses those five back into the one row that wrote them |
+| **S4c** ✅ | `GET …/skills/inlinable`, and Studio's picker + argument tuning in `SkillPlaybookEditor` | **Done.** The picker lists the eight reusable plans with their bands, step counts and what each offers; inlining `nl-single@2` and tuning `read_only` writes five rows and records the composition; re-opening the editor collapses those five back into the one row that wrote them |
 
 ## 8. Not in this pass
 

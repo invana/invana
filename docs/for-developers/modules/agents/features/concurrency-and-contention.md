@@ -65,7 +65,7 @@ flowchart TD
 
 | Surface | Shape |
 |---|---|
-| Graph settings | The ceiling and its policy, beside the connection — **and the pools beneath them**, busy or quiet, because contention has to be visible where the number that causes it is set (C8). `agents/PoolsTable.tsx`, rendered by `ConcurrencyFields`; A5 is not a page of its own |
+| Graph settings | The ceiling and its policy, beside the connection — **and the pools beneath them**, busy or quiet, because contention has to be visible where the number that causes it is set (C8). `graphs/PoolsTable.tsx`, rendered by `ConcurrencyFields`; A5 is not a page of its own |
 | The Graph's activity | Running · queued · waiting on a provider, with counts |
 | A queued task | Its position and what it waits behind |
 

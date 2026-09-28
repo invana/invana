@@ -20,7 +20,7 @@ import {
 	type AgentDraft,
 	usd,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import type { Agent, AgentMeters, TaskRunSummary } from "@/types/work";
 import { PanelSection } from "@/ui/PanelSection";
 import {
@@ -136,7 +136,7 @@ export function AgentActivityTab({
 	});
 	const sessions = useAgentSessionsQuery(username, graphSlug, agent.id);
 	const lineage = useAgentLineageQuery(username, graphSlug, agent.id);
-	const runsPanel = useSettingsPanel();
+	const runsPanel = useLeftSection();
 	// Limits read as text until Edit, as drawn (AG38).
 	const [editingLimits, setEditingLimits] = useState(false);
 	const m = meters.data;

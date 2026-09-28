@@ -25,7 +25,7 @@ export type RightSectionKey = "assistant" | "inspector";
 const RIGHT_PARAM = "right";
 
 // Read once, normalised away on the next write — the same one-way alias shape
-// `useSettingsPanel` applies to `?settings=`. `?ai=` carried the assistant as a
+// `useLeftSection` applies to `?settings=`. `?ai=` carried the assistant as a
 // boolean (and, in dead code, a session id); `?inspector=open` carried the
 // inspector. Neither is ever written again.
 const LEGACY_ASSISTANT_PARAM = "ai";

@@ -977,7 +977,7 @@ export function ExplorerCanvas({
 			<LassoSelectBehaviour id="lasso-select" targetLayerId="graph" />
 
 			{/* Click-to-view — no `panel`; the bridge feeds the right-side
-			    InspectorPanel instead of a floating viewer. */}
+			    InspectorViewPanel instead of a floating viewer. */}
 			<ClickViewBehaviour id="click-view" targetLayerId="graph" />
 
 			<TextResolutionLODBehaviour id="label-lod" targetLayerId="graph" />

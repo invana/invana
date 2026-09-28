@@ -1,12 +1,12 @@
 import { useGlobalEventsQuery } from "@/hooks/queries/useEvents";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventStream } from "@/hooks/useEventStream";
-import { EventTypeFilter } from "@/pages/graphs-detail/features/operate/EventTypeFilter";
-import { matchesEventSearch } from "@/pages/graphs-detail/features/operate/eventSearch";
+import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
+import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
 import {
 	StatusFilter,
 	matchesStatusFilter,
-} from "@/pages/graphs-detail/features/operate/eventStatus";
+} from "@/pages/graphs-detail/features/events/eventStatus";
 import type { AuditEvent } from "@/types/events";
 import { Input } from "@invana/forms";
 import {
@@ -22,7 +22,7 @@ import { Link, Navigate } from "react-router-dom";
 
 /**
  * Platform-wide events view (docs/for-developers/modules/operate/features/audit-and-activity.md) — superuser-only. Mirrors the per-graph
- * EventsSection layout but operates over the global `/api/v1/events`
+ * EventsTab layout but operates over the global `/api/v1/events`
  * endpoint and adds a graph filter dropdown.
  */
 export function PlatformEventsPage() {

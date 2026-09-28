@@ -1,8 +1,8 @@
 import { UserMenu } from "@/components/header/UserMenu";
 import {
-	type SettingsSection,
-	useSettingsPanel,
-} from "@/pages/graphs-detail/shell/useSettingsPanel";
+	type LeftNavKey,
+	useLeftSection,
+} from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Activity,
 	Bot,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 interface SectionMeta {
-	key: SettingsSection;
+	key: LeftNavKey;
 	label: string;
 	icon: typeof Database;
 }
@@ -94,7 +94,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
  *   icon either** (G38): it is Library's third drawer.
  *   Every one is a `?panel` key, so the whole rail is a single-open accordion
  *   with one mechanism. Info
- *   is the exception that proves it: it still renders through `SettingsPanel`,
+ *   is the exception that proves it: it still renders through `SettingsViewPanel`,
  *   because where a panel's *code* lives says nothing about where its icon
  *   belongs. Two things are not in this group: Sessions, which is the assistant
  *   on the right, opened from the header; and Layers, which is a control on the
@@ -112,7 +112,7 @@ const VIEW_SECTIONS: SectionMeta[] = [
 // only to navigate between the two pages there used to be — and a `showLayers`
 // flag until Layers became a canvas control (graph-detail-page.md G18).
 export function useGraphLeftNav() {
-	const settingsPanel = useSettingsPanel();
+	const settingsPanel = useLeftSection();
 
 	// `my-1.5` adds breathing room between rail items — the theme's own
 	// section wrapper only gives them `gap-1`, which reads as crowded.
@@ -131,7 +131,7 @@ export function useGraphLeftNav() {
 
 	// One toggle for every icon — open the section, or close it if it's already
 	// the open one (identical to the bottom-rail behaviour below).
-	const toggleSection = (key: SettingsSection) =>
+	const toggleSection = (key: LeftNavKey) =>
 		settingsPanel.isOpen && settingsPanel.section === key
 			? settingsPanel.close()
 			: settingsPanel.setSection(key);

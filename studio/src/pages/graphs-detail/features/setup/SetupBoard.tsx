@@ -7,7 +7,7 @@ import {
 	WHAT_NEXT,
 	setupCommand,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -216,7 +216,7 @@ function SetupRow({
 	const state = graph.setup_state?.[section];
 	const status = setupSectionStatus(state);
 	const optional = SETUP_SKIPPABLE.includes(section);
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	const setupMutation = useSetupSectionMutation();
 	const command = setupCommand(meta, username, graphSlug);
 
@@ -307,7 +307,7 @@ function WhatNextRow({
 }: {
 	offer: (typeof WHAT_NEXT)[number];
 }) {
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 	return (
 		<Item variant="muted">
 			<ItemContent>

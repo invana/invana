@@ -1,3 +1,8 @@
+import {
+	LayeredCanvasHeader,
+	LayeredCanvasStatus,
+	type LayeredCanvasTarget,
+} from "@/canvases/layered/LayeredCanvasChrome";
 import { useCreateCanvasStateMutation } from "@/hooks/queries/useBoardVersions";
 import {
 	useBoardsQuery,
@@ -20,15 +25,17 @@ import {
 	useWorkflowsQuery,
 } from "@/hooks/queries/useWork";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
-import { AgentsStackPanel } from "@/pages/graphs-detail/features/agents/AgentsStackPanel";
-import { AssistantPanel } from "@/pages/graphs-detail/features/ask/assistant/AssistantPanel";
-import { attachmentFor } from "@/pages/graphs-detail/features/ask/assistant/SessionComposer";
+import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents/AgentsViewPanel";
+import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
+import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
+import { AssistantViewPanel } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
+import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
 	hasSeenSessionTutorial,
 	markSessionTutorialSeen,
-} from "@/pages/graphs-detail/features/ask/assistant/SessionTutorialModal";
-import { WorldPicker } from "@/pages/graphs-detail/features/ask/assistant/WorldPicker";
-import { useSessions } from "@/pages/graphs-detail/features/ask/assistant/useSessions";
+} from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
+import { WorldPicker } from "@/pages/graphs-detail/features/assistant/WorldPicker";
+import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
 import {
 	BOARD_KINDS,
 	CANVAS_KINDS,
@@ -54,73 +61,64 @@ import {
 	type BoardPageHandle,
 	DataBoardPage,
 } from "@/pages/graphs-detail/features/boards";
-import {
-	ModelPanel,
-	type ModelSelection,
-	ModelsPage,
-	useModelsView,
-} from "@/pages/graphs-detail/features/connect-and-model";
-import { ExplorerTypesPanel } from "@/pages/graphs-detail/features/explorer";
+import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import {
 	ACTIVE_LAYOUT_ID,
 	type CanvasBackend,
 	type ExpandMenuSchema,
 	ExplorerHeaderToolbar,
 } from "@/pages/graphs-detail/features/explorer";
-import { InspectorPanel } from "@/pages/graphs-detail/features/explorer";
+import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
 import { useExpandNode } from "@/pages/graphs-detail/features/explorer";
 import {
-	ComparePage,
-	GovernStackPanel,
+	CompareBoardPage,
 	LensBoardPage,
+	LensesViewPanel,
 	parseComparePair,
-} from "@/pages/graphs-detail/features/govern";
-import { runAddress } from "@/pages/graphs-detail/features/operate/RunDetailDrawer";
-import { RunsJournalPage } from "@/pages/graphs-detail/features/operate/RunsJournalPage";
-import { RunsPanel } from "@/pages/graphs-detail/features/operate/RunsPanel";
+} from "@/pages/graphs-detail/features/lenses";
 import {
-	RunDashboardPage,
-	useRunStep,
-} from "@/pages/graphs-detail/features/operate/dashboards";
-import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
-import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
-import { SkillsPanel } from "@/pages/graphs-detail/features/skills/SkillsPanel";
-import {
-	RuleDashboardPage,
-	UsageDashboardPage,
-} from "@/pages/graphs-detail/features/skills/dashboards";
-import { ProjectsStackPanel } from "@/pages/graphs-detail/features/work/ProjectsStackPanel";
-import {
-	EnvelopeCanvas,
-	LineageCanvas,
-	PlanCanvas,
-} from "@/pages/graphs-detail/features/work/WorkCanvas";
-import {
-	WorkCanvasHeader,
-	WorkCanvasStatus,
-	type WorkCanvasTarget,
-} from "@/pages/graphs-detail/features/work/WorkCanvasChrome";
-import { LibraryStackPanel } from "@/pages/graphs-detail/features/workflows/LibraryStackPanel";
-import { PlanFlowCanvas } from "@/pages/graphs-detail/features/workflows/PlanFlowCanvas";
-import { PlanDashboardPage } from "@/pages/graphs-detail/features/workflows/dashboards/PlanDashboardPage";
+	type ModelSelection,
+	ModelViewPanel,
+	ModelsPage,
+	useModelsView,
+} from "@/pages/graphs-detail/features/models";
+import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans/LibraryViewPanel";
+import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
+import { PlanBoardPage } from "@/pages/graphs-detail/features/plans/boards/PlanBoardPage";
 import {
 	PlanArgumentsPage,
 	PlanExportPage,
 	PlanVersionsPage,
-} from "@/pages/graphs-detail/features/workflows/dashboards/PlanRecordPages";
+} from "@/pages/graphs-detail/features/plans/boards/PlanRecordPages";
+import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
+import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
+import { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
+import { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
+import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
+import {
+	RunBoardPage,
+	useRunStep,
+} from "@/pages/graphs-detail/features/runs/boards";
+import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
+import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
+import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
+import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
+import {
+	RuleBoardPage,
+	UsageBoardPage,
+} from "@/pages/graphs-detail/features/skills/boards";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
-import { useGovernPanel } from "@/pages/graphs-detail/shell/useGovernPanel";
-import { useLibraryPanel } from "@/pages/graphs-detail/shell/useLibraryPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
+import { useLibraryViewPanel } from "@/pages/graphs-detail/shell/useLibraryViewPanel";
 import { useOpenSessionRequest } from "@/pages/graphs-detail/shell/useOpenSessionRequest";
 import {
 	type RightSectionKey,
 	useRightSection,
 } from "@/pages/graphs-detail/shell/useRightSection";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
 import { boardVersionsApi } from "@/services/api/boardVersions";
 import { boardsApi } from "@/services/api/boards";
 import { ApiError } from "@/services/api/client";
@@ -341,7 +339,7 @@ export function GraphDetailPage() {
 
 	// The Govern panel's own URL keys — `Edit` on a lens board puts the drawer
 	// back on that lens in one write (WO16).
-	const governPanel = useGovernPanel();
+	const governPanel = useLensesViewPanel();
 	// **A lens board's tab is named for the lens** — `EU · H1 2026`, never
 	// `World` (WO15): a strip of four tabs all reading `World` is a strip you
 	// have to click through to read. It comes off the list the Govern drawer
@@ -438,7 +436,7 @@ export function GraphDetailPage() {
 	// it is the `assistant` occupant of the right side (the-assistant.md
 	// AD1/AD7).
 	const { isOpen: onboardingOpen } = useOnboarding();
-	const settingsPanel = useSettingsPanel();
+	const settingsPanel = useLeftSection();
 	const closeLeftPanel = settingsPanel.close;
 
 	// ── S12 surfaces (docs/for-developers/modules/work/spec.md) ────────────────────────────────────────────────
@@ -455,7 +453,7 @@ export function GraphDetailPage() {
 	const [selectedWorkflowKey, setSelectedWorkflowKey] = useState<string | null>(
 		null,
 	);
-	const libraryPlanKey = useLibraryPanel().planKey;
+	const libraryPlanKey = useLibraryViewPanel().planKey;
 	const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
 	const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
 	const [selectedLineageEdge, setSelectedLineageEdge] =
@@ -2173,7 +2171,7 @@ export function GraphDetailPage() {
 	);
 
 	// Clicking a node/edge feeds `selectedId` via <InspectorSelectionBridge>; the
-	// derived `selected` (above) drives the right-side InspectorPanel. The strip
+	// derived `selected` (above) drives the right-side InspectorViewPanel. The strip
 	// above it belongs to `BoardPagesViewPanel` in `mainSection`
 	// (graph-detail-page.md G4), not to this page.
 	const canvasContent = (
@@ -2225,7 +2223,7 @@ export function GraphDetailPage() {
 	) : cannotAnswer ? (
 		<SetupLock graph={graphContainer} gate="answering" surface="Ask" />
 	) : (
-		<AssistantPanel
+		<AssistantViewPanel
 			availableLanguages={availableLanguages}
 			defaultLanguage={defaultLanguage}
 			llmProviders={llmProviders}
@@ -2301,7 +2299,7 @@ export function GraphDetailPage() {
 			maxSize: "360px",
 			collapsible: false,
 			content: (
-				<InspectorPanel
+				<InspectorViewPanel
 					selected={selected}
 					allItems={canvasData}
 					missingIds={missingIds}
@@ -2328,7 +2326,7 @@ export function GraphDetailPage() {
 			// scope, and both are the URL's — so a row picked here reads on the
 			// `models` board beside it. A stack with no panel header above its
 			// drawers (G33 · ME17), so it takes no `onClose`.
-			<ModelPanel
+			<ModelViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				selection={modelSelection}
@@ -2339,7 +2337,7 @@ export function GraphDetailPage() {
 			// **Projects owns Todos** (PT7) — two drawers, `Projects` over `Todos`,
 			// the same stack shape Library takes. With no project drilled into, the
 			// Todos drawer is every Todo in the Graph: the *No project* bucket.
-			<ProjectsStackPanel
+			<ProjectsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				onProjectChange={(key) => {
@@ -2360,7 +2358,7 @@ export function GraphDetailPage() {
 			// **Runs is execution** — the journal, and nothing else, as one list
 			// (G41 · SR1). Todos are not here: they live under Projects, because a
 			// Todo without its project is a to-do list (PT7).
-			<RunsPanel
+			<RunsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				onClose={closeLeftPanel}
@@ -2381,7 +2379,7 @@ export function GraphDetailPage() {
 			// **Library is definition** — Plans · Catalogue · Templates, stacked,
 			// with no panel header above them (G33 · G41): what can be run, the
 			// closed vocabulary it is written in, and how its output renders.
-			<LibraryStackPanel
+			<LibraryViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				selectedStepId={selectedStepId}
@@ -2396,7 +2394,7 @@ export function GraphDetailPage() {
 		) : settingsPanel.section === "skills" ? (
 			// A skill is a setting that hangs over the work, so its panel opens
 			// beside whatever canvas is already there — it takes no kind of its own.
-			<SkillsPanel
+			<SkillsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				onClose={closeLeftPanel}
@@ -2411,7 +2409,7 @@ export function GraphDetailPage() {
 			// with no panel header above them — the same stack shape Library and
 			// Projects take. It opens no canvas: a world is a bound the *other*
 			// panels run inside, so it hangs over whatever is already drawn.
-			<GovernStackPanel
+			<LensesViewPanel
 				username={username}
 				graphSlug={graphSlug}
 				// A drill-in opens that lens as a page, titled with its own name
@@ -2423,7 +2421,7 @@ export function GraphDetailPage() {
 			// Agents holds the agents over the LLMs as two drawers of one panel
 			// (PM6 · GV18) — a provider is what an agent's cast resolves against,
 			// so it is read where agents are rather than in a tab of Settings.
-			<AgentsStackPanel
+			<AgentsViewPanel
 				username={username as string}
 				graphSlug={graphSlug as string}
 				selectedAgentId={selectedAgentId}
@@ -2446,7 +2444,7 @@ export function GraphDetailPage() {
 			// type list and the selection (selection-and-the-panel.md) — the legend
 			// for the drawing beside it. It is a `?panel` key like every other, so
 			// closing it leaves the column empty rather than falling back here.
-			<ExplorerTypesPanel
+			<ExplorerViewPanel
 				username={username}
 				graphSlug={graphSlug}
 				canvas={canvas}
@@ -2466,7 +2464,7 @@ export function GraphDetailPage() {
 	// there, and switching back to Sessions leaves them behind.
 	// What the open work canvas is drawing — the one value the tab strip and the
 	// status line both need (`studio.md` § 6.26).
-	const workTarget: WorkCanvasTarget | null =
+	const workTarget: LayeredCanvasTarget | null =
 		workKind === "plan" && selectedProjectKey
 			? { kind: "plan", projectKey: selectedProjectKey }
 			: workKind === "workflow" && selectedWorkflowKey
@@ -2687,7 +2685,7 @@ export function GraphDetailPage() {
 						icon: CANVAS_KINDS[workTarget.kind].icon,
 						content: (
 							<div className="flex h-full w-full flex-col overflow-hidden">
-								<WorkCanvasHeader
+								<LayeredCanvasHeader
 									username={username as string}
 									graphSlug={graphSlug as string}
 									target={workTarget}
@@ -2750,7 +2748,7 @@ export function GraphDetailPage() {
 				);
 			}
 			return (
-				<RunDashboardPage
+				<RunBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					runId={runId}
@@ -2807,7 +2805,7 @@ export function GraphDetailPage() {
 
 		if (board.kind === "skill_usage") {
 			return (
-				<UsageDashboardPage
+				<UsageBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					skillId={board.subjectId}
@@ -2821,7 +2819,7 @@ export function GraphDetailPage() {
 
 		if (board.kind === "rule") {
 			return (
-				<RuleDashboardPage
+				<RuleBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					ruleId={board.subjectId}
@@ -2856,7 +2854,7 @@ export function GraphDetailPage() {
 		// so it takes no `board.runId`.
 		if (board.kind === "runs") {
 			return (
-				<RunsJournalPage
+				<RunsBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 				/>
@@ -2893,7 +2891,7 @@ export function GraphDetailPage() {
 		if (board.kind === "compare") {
 			const pair = parseComparePair(board.subjectId);
 			return pair ? (
-				<ComparePage
+				<CompareBoardPage
 					username={username as string}
 					graphSlug={graphSlug as string}
 					runA={pair.runA}
@@ -2930,7 +2928,7 @@ export function GraphDetailPage() {
 		// The plan page (LB24) — Overview · Layers · Flow · Activity, read over
 		// a window. A row opens its run page beside it.
 		return (
-			<PlanDashboardPage
+			<PlanBoardPage
 				username={username as string}
 				graphSlug={graphSlug as string}
 				planId={board.subjectId}
@@ -3190,7 +3188,7 @@ export function GraphDetailPage() {
 						// A work canvas has no engine, so it states what it *is* instead:
 						// `LIBRARY · 8 steps · 3 agents`.
 						workCanvas && workTarget ? (
-							<WorkCanvasStatus
+							<LayeredCanvasStatus
 								username={username as string}
 								graphSlug={graphSlug as string}
 								target={workTarget}

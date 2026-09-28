@@ -34,7 +34,7 @@ const LazyFallback = () => (
  * components rather than a static `<Navigate to>`: a bookmark is a URL *plus*
  * its params, so dropping `?panel=agents` would land the reader on an empty
  * state instead of the thing the link was about. The legacy `?settings=` name
- * rides along untouched — `useSettingsPanel` still reads it (G16).
+ * rides along untouched — `useLeftSection` still reads it (G16).
  */
 function RedirectToGraphRoot({ openPanel }: { openPanel?: string }) {
 	const { username, graphSlug } = useParams();

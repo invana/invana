@@ -1,4 +1,4 @@
-import type { SettingsSection } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
 import type { SetupGate, SetupSection } from "@/types/graphs";
 
 /**
@@ -36,9 +36,9 @@ export interface SetupStepMeta {
 	/** The product lesson (SU17). Required steps only. */
 	concept?: SetupConcept;
 	/** The docked panel it opens. Switched in place via
-	 *  `useSettingsPanel().setSection` rather than navigated to: the step lives
+	 *  `useLeftSection().setSection` rather than navigated to: the step lives
 	 *  inside the page, so this is not navigation. */
-	settingsSection: SettingsSection;
+	settingsSection: LeftNavKey;
 	/** The tab inside that panel, where it has more than one (G24). */
 	settingsTab?: string;
 	/** The command that does the same thing at a terminal, where one exists
@@ -224,7 +224,7 @@ export function setupCommand(
 export const WHAT_NEXT: readonly {
 	label: string;
 	description: string;
-	settingsSection: SettingsSection;
+	settingsSection: LeftNavKey;
 }[] = [
 	{
 		label: "Ask a question",

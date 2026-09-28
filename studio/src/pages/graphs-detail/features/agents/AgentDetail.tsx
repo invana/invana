@@ -20,13 +20,13 @@
  */
 
 import { AgentActivityTab } from "@/pages/graphs-detail/features/agents/AgentActivityTab";
+import { AgentEffortTab } from "@/pages/graphs-detail/features/agents/AgentEffortTab";
 import { AgentOverviewTab } from "@/pages/graphs-detail/features/agents/AgentOverviewTab";
 import { AgentSkillsTab } from "@/pages/graphs-detail/features/agents/AgentSkillsTab";
 import {
 	AgentSoulTab,
 	useSoulPreview,
 } from "@/pages/graphs-detail/features/agents/AgentSoulTab";
-import { AgentThinkingTab } from "@/pages/graphs-detail/features/agents/AgentThinkingTab";
 import {
 	type AgentDraft,
 	changesOf,
@@ -271,7 +271,7 @@ export function AgentDetail({
 						value: "thinking",
 						label: "Thinking",
 						content: (
-							<AgentThinkingTab agent={agent} draft={draft} onPatch={patch} />
+							<AgentEffortTab agent={agent} draft={draft} onPatch={patch} />
 						),
 					},
 					{

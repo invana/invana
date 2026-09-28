@@ -6,7 +6,7 @@ import {
 	SETUP_STEP_BY_KEY,
 	type SetupStepMeta,
 } from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useSettingsPanel } from "@/pages/graphs-detail/shell/useSettingsPanel";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -40,11 +40,11 @@ interface Props {
  * schema records one, and the step's standing where it does not.
  *
  * The card is not rendered at all once the required steps are done — see
- * `GraphInfoPanel`. A finished checklist is the one kind worth removing.
+ * `InfoTab`. A finished checklist is the one kind worth removing.
  */
 export function SetupTimeline({ graph }: Props) {
 	const setupMutation = useSetupSectionMutation();
-	const { setSection } = useSettingsPanel();
+	const { setSection } = useLeftSection();
 
 	const done = SETUP_REQUIRED.filter(
 		(s) => setupSectionStatus(graph.setup_state?.[s]) !== "todo",

@@ -803,7 +803,7 @@ phases 5–7.
 | # | Work | Done when |
 |---|---|---|
 | ✅ **A0** | The `^0.0.23` pin; `@import "@invana/styling"`; Studio's ladder deleted (D7 · DS13) | Studio renders at 13/12px and nothing else moved |
-| ✅ **A1 · Delete the parallel layer** | ✅ `PanelChrome` **deleted** (§6a) · `WorkRow` → `Item size="xs"` + `StatusDot` + `Badge tone` · `CanvasTabsBar` → `TabbedPanel variant="strip"` · `GraphStatusBar` → `AppStatusBar` · `emissions/EmissionCard` → `EmissionCard` + `EmissionHeader` · `NotAnAnswer` → `CannotAnswerCard` + `DiagnosisCard` · `TemplatePicker` · and the eleven shadows §6c names (DS17) | ✅ `grep` finds no Studio component that shadows a kit export |
+| ✅ **A1 · Delete the parallel layer** | ✅ `PanelChrome` **deleted** (§6a) · `RecordRow` → `Item size="xs"` + `StatusDot` + `Badge tone` · `CanvasTabsBar` → `TabbedPanel variant="strip"` · `GraphStatusBar` → `AppStatusBar` · `emissions/EmissionCard` → `EmissionCard` + `EmissionHeader` · `NotAnAnswer` → `CannotAnswerCard` + `DiagnosisCard` · `TemplatePicker` · and the eleven shadows §6c names (DS17) | ✅ `grep` finds no Studio component that shadows a kit export |
 | **A2 · The shell** | `GraphDetail` deletes its `ResizablePanelGroup` and drives `leftSection` · `mainSection` · `rightSection` · `bottomSection` · `footer` (DS12) | A panel toggle does not remount the canvas — the reason the workaround existed. ~90 lines of layout gone |
 | **A3 · Explorer composes to the contract** | Types panel → `TabbedPanel` + `PanelStack`; inspector → `PropertyList`; header centre → `centerNavItems`; rail one-key-one-column (DS16) | `ExplorerPage.tsx` composes; no hand-written panel chrome |
 | **A4 · The console** | `bottomSection` + `ContextBar`, per [explore 4.5](../modules/explore/features/the-console.md) | Records and query readable under the canvas; `?console=` survives reload. Closes S12f |
@@ -985,10 +985,10 @@ declares is also a name the kit exports.
 | `answer-surface/AnswerEmission` › `EmissionHeader` | the kit's, through `EmissionCard`'s slots | one header wherever an emission appears, or the two drift |
 | `answer-surface/AnswerEmission` › `TemplatePicker` | `TemplatePicker` in a `Popover` | the kit's picker is the list; the trigger is the header's template segment |
 | `useAppHeader` › `Breadcrumb` | `Breadcrumb` + `BreadcrumbList`/`Item`/`Link`/`Page`/`Separator` | the last crumb is a `BreadcrumbPage`, so it carries `aria-current`, which the hand-rolled one never did |
-| `DeclareStitchPanel` › `Card`/`CardHeader`/`CardFooter` | `Card` + `CardHeader` + `CardTitle` + `CardFooter` | three local names that shadowed the kit's; the card's width and elevation are two constants now |
+| `DeclareStitchCard` › `Card`/`CardHeader`/`CardFooter` | `Card` + `CardHeader` + `CardTitle` + `CardFooter` | three local names that shadowed the kit's; the card's width and elevation are two constants now |
 | `SessionTurn` › `Spinner` | `Spinner` | a hand-spun border-ring where the kit ships one |
-| `PlatformEventsPage` · `EventsSection` › `EmptyState`, `NoMatches`, `FilterBar` | `EmptyState` (`title` + `description`) · `FilterBar` (`summary`) | both pages are list surfaces, and the kit says every list surface carries one filter row and one empty state |
-| `WorkGraphCanvas` › `Legend`/`LegendItem` | `Legend` + `LegendItem` (`kind` + `color`) | the swatch was hand-drawn per key; `swatchKind`/`swatchColour` map a `LegendKey` onto the kit's |
+| `PlatformEventsPage` · `EventsTab` › `EmptyState`, `NoMatches`, `FilterBar` | `EmptyState` (`title` + `description`) · `FilterBar` (`summary`) | both pages are list surfaces, and the kit says every list surface carries one filter row and one empty state |
+| `LayeredCanvas` › `Legend`/`LegendItem` | `Legend` + `LegendItem` (`kind` + `color`) | the swatch was hand-drawn per key; `swatchKind`/`swatchColour` map a `LegendKey` onto the kit's |
 
 ### What did not move, and why
 
@@ -1109,7 +1109,7 @@ when what was being marked is that they repeated.
 |---|---|---|---|
 | `TraceList` · `TraceStep` · `TraceLoop` · `TraceGate` | the `In order` reading. A row is a step: layer stripe · seq · key + description · mark · layer + role · duration + note. `depth` nests a delegated run's steps under the step that spawned it; `live · queued · dim · struck · selected` are its states. A loop is a **box around** its rounds; a gate is a **rule between** rows, its chip on the side the cost falls on | in_order · in_order.card · in_order.states | [SR47](../modules/operate/features/see-what-ran.md#decisions) · [SR48](../modules/operate/features/see-what-ran.md#decisions) |
 | `TouchStrip` | one cell per layer — dot, name, count — struck when refused, dim when allowed and never touched; header states `declared 4 · touched 4 · refused 1`. The summary question that stopped costing an axis | in_order · in_order.card · the run drawer (`orientation="column"`: one line per layer, note right) | [SR47](../modules/operate/features/see-what-ran.md#decisions) · [SR67](../modules/operate/features/see-what-ran.md#decisions) |
-| `RunRow` · `StatusIcon` | the journal row in `leftSection`: status glyph · what it was about (mono for a query) · mono id · plan · meta, `depth` for a child run, no badge | every board (the panel) · list | [SR45](../modules/operate/features/see-what-ran.md#decisions) · [SR65](../modules/operate/features/see-what-ran.md#decisions) · retires Studio's `WorkRow` in the journal (DS17) |
+| `RunRow` · `StatusIcon` | the journal row in `leftSection`: status glyph · what it was about (mono for a query) · mono id · plan · meta, `depth` for a child run, no badge | every board (the panel) · list | [SR45](../modules/operate/features/see-what-ran.md#decisions) · [SR65](../modules/operate/features/see-what-ran.md#decisions) · retires Studio's `RecordRow` in the journal (DS17) |
 | `KindChip` | `ask · import · bulk · stitch · enrich` — the one vocabulary the journal filters on | list · list.states | [SR7](../modules/operate/features/see-what-ran.md#decisions) — one journal, never a panel per kind |
 | `MarkChip` | the micro-mark a row carries: `↺ 2 of 3` · `⏸ 1 of 3` · `↳ delegates` · `live` · `no answer` · `stopped`. Mono, outlined, toned | in_order · in_order.states | a *run-time* mark, where `BoundChip` draws a **declared** bound |
 | `AttemptClock` | `queued · attempt 1 · attempt 2 · settled`, each with started · took · what happened, the timed-out attempt **struck in place**, and `elapsed against working` on the side | step · step.states · step.exchange | [SR56](../modules/operate/features/see-what-ran.md#decisions) — `RetryNote` is one line on an emission, not a step's clock |
@@ -1173,16 +1173,16 @@ canvas.
 ### 7.7 What Studio composes, now the kit ships the panels
 
 The kit's run panels reach Studio as **`RUN_PANELS`**, merged into three registries: the run page,
-the step page, and `shared/dashboardPanels.ts` — the last because a **frozen report** renders
+the step page, and `shared/dashboardWidgets.ts` — the last because a **frozen report** renders
 whatever document was kept and needs every renderer a document could name
 ([B16](../building-engine/boards-migration.md)).
 
 | Kind | Drawn by | Composed by | Note |
 |---|---|---|---|
-| `layers` | the kit | `govern/runLayers.ts` | the composer stays in Studio: how a `TouchesResponse` and a trace become bands and bars is not something `@invana/dashboard` can know. A run with no ledger draws `absent: unrecorded`, never an empty axis ([SR34](../modules/operate/features/see-what-ran.md#decisions)) |
-| `lens` | the kit | `govern/runLens.ts` | one section per layer, a `ParticipantRow` per address ([SR53](../modules/operate/features/see-what-ran.md#decisions)). The layer is the **address's first segment**, the engine's own split, so an allowed-and-never-touched participant still bands correctly |
-| `flow` | Studio | `operate/dashboards/TaskFlowPanel.tsx` | the one kind Studio still owns — a plan on a canvas is `@invana/canvas`, which a dashboard package does not depend on |
-| `stepTouch` | Studio | `govern/StepTouchPanel.tsx` | **not** the kit's `touched`: that is `TouchStrip`, the run's summary strip. This is the step's forensic reading — generated vs executed digests, the slice composed in, what egress cut — and the kit ships no kind for it |
+| `layers` | the kit | `lenses/runLayers.ts` | the composer stays in Studio: how a `TouchesResponse` and a trace become bands and bars is not something `@invana/dashboard` can know. A run with no ledger draws `absent: unrecorded`, never an empty axis ([SR34](../modules/operate/features/see-what-ran.md#decisions)) |
+| `lens` | the kit | `lenses/runLens.ts` | one section per layer, a `ParticipantRow` per address ([SR53](../modules/operate/features/see-what-ran.md#decisions)). The layer is the **address's first segment**, the engine's own split, so an allowed-and-never-touched participant still bands correctly |
+| `flow` | Studio | `shared/dashboards/TaskFlowWidget.tsx` | the one kind Studio still owns — a plan on a canvas is `@invana/canvas`, which a dashboard package does not depend on |
+| `stepTouch` | Studio | `lenses/StepTouchWidget.tsx` | **not** the kit's `touched`: that is `TouchStrip`, the run's summary strip. This is the step's forensic reading — generated vs executed digests, the slice composed in, what egress cut — and the kit ships no kind for it |
 | `runLens` | Studio, legacy | — | kept **only** for reports frozen before the swap. Nothing new registers it; delete the file once no stored board names the kind |
 
 Two Studio names shadowed kit exports and are gone: the `RunRow` **type** in `hooks/queries/useRuns.ts`

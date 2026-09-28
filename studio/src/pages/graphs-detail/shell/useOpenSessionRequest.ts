@@ -4,7 +4,7 @@
  * A session row in the graph info panel has to do exactly what the same row in
  * the assistant's own list does: make that session active and give the right
  * side to the assistant (graph-detail-page.md G22). The panel cannot call
- * `handleOpenSession` — `SettingsPanel` is rendered by the *shell*, which knows
+ * `handleOpenSession` — `SettingsViewPanel` is rendered by the *shell*, which knows
  * nothing of the page's session state — so the request travels instead of the
  * callback.
  *
@@ -14,7 +14,7 @@
  * in-memory, unlike the region params. Asking again after a reload would reopen
  * a session the user had closed.
  *
- * Same shape `useSettingsPanel` uses for `expanded`: one module-level value and
+ * Same shape `useLeftSection` uses for `expanded`: one module-level value and
  * a set of listeners, read through `useSyncExternalStore`.
  */
 
