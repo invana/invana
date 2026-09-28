@@ -2,9 +2,6 @@ import {
 	LayeredCanvasHeader,
 	LayeredCanvasStatus,
 } from "@/canvases/layered/LayeredCanvasChrome";
-import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents/AgentsViewPanel";
-import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
-import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
 import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
@@ -52,7 +49,6 @@ import type {
 	CanvasStyling,
 } from "@/pages/graphs-detail/features/boards/types";
 import { boardVersionsApi } from "@/pages/graphs-detail/features/boards/versionsApi";
-import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import {
 	ACTIVE_LAYOUT_ID,
 	type CanvasBackend,
@@ -83,28 +79,19 @@ import {
 	hasOutstandingSetup,
 	isGateOpen,
 } from "@/pages/graphs-detail/features/graphs/types";
-import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type ModelSelection,
-	ModelViewPanel,
 	useModelsView,
 } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
 import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models/queries";
-import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans/LibraryViewPanel";
-import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
-import { taskPlansApi } from "@/pages/graphs-detail/features/plans/api";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
-import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
-import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
-import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { AssistantHost } from "@/pages/graphs-detail/shell/AssistantHost";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
@@ -115,6 +102,11 @@ import {
 	boardTitle,
 	declaredBoardContent,
 } from "@/pages/graphs-detail/shell/declaredBoardBody";
+import {
+	canvasEmptyHint,
+	layeredCanvasBody,
+} from "@/pages/graphs-detail/shell/layeredCanvasBody";
+import { leftSectionContent } from "@/pages/graphs-detail/shell/leftSectionContent";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
@@ -313,29 +305,14 @@ export function GraphDetailPage() {
 
 	// The selection the panels and the layered canvases share, and the canvas
 	// kind `mainSection` draws — one piece of state per noun.
+	const layered = useLayeredCanvas(username, graphSlug, settingsPanel.section);
 	const {
-		selectedProjectKey,
-		setSelectedProjectKey,
-		selectedTaskId,
-		setSelectedTaskId,
-		selectedAgentId,
 		setSelectedAgentId,
-		selectedWorkflowKey,
-		setSelectedWorkflowKey,
-		selectedStepId,
 		setSelectedStepId,
-		selectedSkillId,
-		setSelectedSkillId,
-		selectedLineageEdge,
-		setSelectedLineageEdge,
-		workKind,
 		setWorkKind,
-		planError,
-		setPlanError,
-		taskMutations,
 		workTarget,
 		workPageId,
-	} = useLayeredCanvas(username, graphSlug, settingsPanel.section);
+	} = layered;
 	const libraryPlanKey = useLibraryViewPanel().planKey;
 	// The **declared** boards that are open — a run dashboard, and a step's
 	// (see-what-ran.md SR36). They are pages like any other, keyed
@@ -2129,229 +2106,36 @@ export function GraphDetailPage() {
 		},
 	};
 
-	// One rail, one page (docs/for-developers/modules/explore/spec.md). Every panel below is a `?settings` key,
-	// and each one owns the canvas kind it opens — which is why the selection
-	// state lives on this page rather than inside them.
-	const leftContent =
-		settingsPanel.section === "model" ? (
-			// The panel lists; the page acts (MP4). Its selection is the page's
-			// scope, and both are the URL's — so a row picked here reads on the
-			// `models` board beside it. A stack with no panel header above its
-			// sections (G33 · ME17), so it takes no `onClose`.
-			<ModelViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				selection={modelSelection}
-				onSelect={setModelSelection}
-				onShowPage={showModelsPage}
-			/>
-		) : settingsPanel.section === "projects" ? (
-			// **Projects owns Todos** (PT7) — two sections, `Projects` over `Todos`,
-			// the same stack shape Library takes. With no project drilled into, the
-			// Todos section is every Todo in the Graph: the *No project* bucket.
-			<ProjectsViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				onProjectChange={(key) => {
-					setSelectedProjectKey(key);
-					if (!key) setWorkKind(null);
-				}}
-				onOpenPlanCanvas={() => setWorkKind("plan")}
-				onOpenAgent={(id) => {
-					setSelectedAgentId(id);
-					setWorkKind("lineage");
-					openWorkPanel("agents");
-				}}
-				// A statement on a step row opens the rule's board beside the
-				// section, the same way `More` does from Rules (RU11 · RU12).
-				onOpenRule={(ruleId) => openBoard({ kind: "rule", subjectId: ruleId })}
-			/>
-		) : settingsPanel.section === "runs" ? (
-			// **Runs is execution** — the journal, and nothing else, as one list
-			// (G41 · SR1). Todos are not here: they live under Projects, because a
-			// Todo without its project is a to-do list (PT7).
-			<RunsViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				onClose={closeLeftPanel}
-				onOpenRunDashboard={(runId, stepId) =>
-					openBoard({ kind: "run", subjectId: runId, runId, stepId })
-				}
-				// The journal drawn wide, beside the list (SR70).
-				onOpenRunsBoard={() =>
-					openBoard({ kind: "runs", subjectId: graphSlug as string })
-				}
-				// The run stays in the section; the plan it ran is drawn beside it.
-				onOpenPlan={(key) => {
-					setSelectedWorkflowKey(key);
-					setWorkKind("workflow");
-				}}
-			/>
-		) : settingsPanel.section === "library" ? (
-			// **Library is definition** — Plans · Catalogue · Templates, stacked,
-			// with no panel header above them (G33 · G41): what can be run, the
-			// closed vocabulary it is written in, and how its output renders.
-			<LibraryViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				selectedStepId={selectedStepId}
-				onOpenAgent={(id) => {
-					openWorkPanel("agents");
-					openAgentPage(id);
-				}}
-				planExportUrl={(key) =>
-					taskPlansApi.exportUrl(username as string, graphSlug as string, key)
-				}
-			/>
-		) : settingsPanel.section === "skills" ? (
-			// A skill is a setting that hangs over the work, so its panel opens
-			// beside whatever canvas is already there — it takes no kind of its own.
-			<SkillsViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				onClose={closeLeftPanel}
-				selectedSkillId={selectedSkillId}
-				onSelectSkill={setSelectedSkillId}
-				// `Open` — the skill's page, and the stack stays (SK17 · SK37).
-				onOpenSkillPage={(id) => openBoard({ kind: "skill", subjectId: id })}
-				onOpenRuleDashboard={(id) => openBoard({ kind: "rule", subjectId: id })}
-			/>
-		) : settingsPanel.section === "govern" ? (
-			// Govern holds Worlds over Guardrails as two sections of one panel (GV17),
-			// with no panel header above them — the same stack shape Library and
-			// Projects take. It opens no canvas: a world is a bound the *other*
-			// panels run inside, so it hangs over whatever is already drawn.
-			<LensesViewPanel
-				username={username}
-				graphSlug={graphSlug}
-				// A drill-in opens that lens as a page, titled with its own name
-				// (WO15 · GR14) — the section keeps the picking reading, the board
-				// carries the auditing one.
-				onOpenBoard={openLensBoard}
-			/>
-		) : settingsPanel.section === "agents" ? (
-			// Agents holds the agents over the LLMs as two sections of one panel
-			// (PM6 · GV18) — a provider is what an agent's cast resolves against,
-			// so it is read where agents are rather than in a tab of Settings.
-			<AgentsViewPanel
-				username={username as string}
-				graphSlug={graphSlug as string}
-				selectedAgentId={selectedAgentId}
-				onSelectAgent={(id) => {
-					setSelectedAgentId(id);
-					setSelectedLineageEdge(null);
-				}}
-				onOpenAgentPage={openAgentPage}
-				selectedEdge={selectedLineageEdge}
-				onOpenLineage={(id) => showAgentCanvas("lineage", id)}
-				onOpenTask={(id) => {
-					// A Todo lives under Projects (PT7); the rail's Tasks icon is
-					// execution only.
-					setSelectedTaskId(id);
-					openWorkPanel("projects");
-				}}
-			/>
-		) : settingsPanel.section === "explorer" ? (
-			// Sessions is not a left panel (AD1); the Explorer's own is the graph's
-			// type list and the selection (selection-and-the-panel.md) — the legend
-			// for the drawing beside it. It is a `?panel` key like every other, so
-			// closing it leaves the column empty rather than falling back here.
-			<ExplorerViewPanel
-				username={username}
-				graphSlug={graphSlug}
-				canvas={canvas}
-				selected={selected}
-				styling={styling}
-				lensId={threadWorldId}
-				canvasName={
-					activeSessionId ? sessionTitleById.get(activeSessionId) : undefined
-				}
-				modelName={modelName}
-				onClose={closeLeftPanel}
-			/>
-		) : null;
+	// One rail, one page: the `leftSection` occupant for the open `?panel` key.
+	const leftContent = leftSectionContent({
+		username,
+		graphSlug,
+		settingsPanel,
+		closeLeftPanel,
+		layered,
+		openBoard,
+		openLensBoard,
+		openWorkPanel,
+		openAgentPage,
+		showAgentCanvas,
+		modelSelection,
+		setModelSelection,
+		showModelsPage,
+		modelName,
+		canvas,
+		selected,
+		styling,
+		threadWorldId,
+		activeSessionId,
+		sessionTitleById,
+	});
 
-	/**
-	 * What the main area says when it has nothing to draw.
-	 *
-	 * Every work panel owns a canvas kind, and selecting a row opens it — so the
-	 * only honest empty state is *which row to pick*, phrased in the vocabulary
-	 * of the panel you are actually looking at.
-	 */
-	const canvasEmptyHint =
-		settingsSection === "model"
-			? "Pick a model to draw it — its types as nodes, its edge types as the edges between them."
-			: settingsSection === "projects"
-				? "Pick a project to draw its plan — todos as cards, dependencies left to right."
-				: settingsSection === "runs"
-					? "Pick a run to read it — what it cost, what it touched and what was refused. `Compare with the plan` draws the plan it ran here."
-					: settingsSection === "library"
-						? "Pick a plan to draw the flow it will run. A template decides what its answer looks like; the catalogue is what it may name at all."
-						: settingsSection === "agents"
-							? "Pick an agent to draw who created it and what it has worked on."
-							: settingsSection === "skills"
-								? "A skill has no canvas of its own — open a session, project or agent and the skill panel stays beside it."
-								: settingsSection === "govern"
-									? "A world has no canvas of its own — it is the bound whatever you open next runs inside."
-									: "Open a session or start a new one to see its canvas.";
-
-	const workCanvas =
-		workKind === "plan" && selectedProjectKey ? (
-			<PlanCanvas
-				username={username as string}
-				graphSlug={graphSlug as string}
-				projectKey={selectedProjectKey}
-				selectedTaskId={selectedTaskId}
-				onSelectTask={setSelectedTaskId}
-				onAddDependency={(taskId, dependsOnId) => {
-					setPlanError(null);
-					taskMutations.addDependency.mutate(
-						{ id: taskId, dependsOnId },
-						{
-							onError: (err) =>
-								setPlanError(
-									err instanceof ApiError
-										? err.message
-										: "That dependency could not be added.",
-								),
-						},
-					);
-				}}
-				error={planError}
-			/>
-		) : workKind === "workflow" && selectedWorkflowKey ? (
-			<PlanFlowCanvas
-				username={username as string}
-				graphSlug={graphSlug as string}
-				workflowKey={selectedWorkflowKey}
-				selectedStepId={selectedStepId}
-				onSelectStep={setSelectedStepId}
-			/>
-		) : workKind === "envelope" && selectedAgentId ? (
-			<EnvelopeCanvas
-				username={username as string}
-				graphSlug={graphSlug as string}
-				agentId={selectedAgentId}
-				selectedStepId={selectedStepId}
-				onSelectStep={setSelectedStepId}
-			/>
-		) : workKind === "lineage" && selectedAgentId ? (
-			<LineageCanvas
-				username={username as string}
-				graphSlug={graphSlug as string}
-				agentId={selectedAgentId}
-				selectedNodeId={selectedAgentId}
-				selectedEdgeId={selectedLineageEdge?.id ?? null}
-				onSelectAgent={setSelectedAgentId}
-				onSelectEdge={setSelectedLineageEdge}
-				onOpenTask={(id) => {
-					// A Todo lives under Projects (PT7); the rail's Tasks icon is
-					// execution only.
-					setSelectedTaskId(id);
-					openWorkPanel("projects");
-				}}
-			/>
-		) : null;
+	const workCanvas = layeredCanvasBody(
+		layered,
+		username,
+		graphSlug,
+		openWorkPanel,
+	);
 
 	// ── The open pages (graph-detail-page.md G4) ───────────────────────────────
 	//
@@ -2425,7 +2209,7 @@ export function GraphDetailPage() {
 				<GraphHomePage
 					username={username as string}
 					graphSlug={graphSlug as string}
-					hint={canvasEmptyHint}
+					hint={canvasEmptyHint(settingsSection)}
 				/>
 			),
 		},

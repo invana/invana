@@ -215,8 +215,8 @@ way it did. What remains composes — `GraphDetail`'s regions, the providers, th
 | The declared board body (one branch per kind) and its tab title | `shell/declaredBoardBody.tsx` | function over a deps object |
 | The assistant occupant — setup locks, `AssistantViewPanel`, `WorldPicker` | `shell/AssistantHost.tsx` | component |
 | The selection the panels and the layered canvases share, and `workKind` | `shell/useLayeredCanvas.ts` | hook |
-| The `leftSection` occupant, one branch per `?panel` key | `shell/LeftSectionContent.tsx` | component |
-| The layered canvas in `mainSection` and its empty hint | `shell/LayeredCanvasPage.tsx` | component |
+| The `leftSection` occupant, one branch per `?panel` key | `shell/leftSectionContent.tsx` | function over a deps object |
+| The layered canvas in `mainSection` and its empty hint | `shell/layeredCanvasBody.tsx` | functions |
 | Open declared boards — the cold-link restore, `openBoard`, the plan page following `&plan=` | `shell/useOpenBoards.ts` | hook |
 | The data canvases — engine, tabs, autosave, history, expand, the ask and its stream | `shell/useDataBoards.ts` | hook |
 | The page list, the active page, select, close, the strip's actions | `shell/useOpenPages.ts` | hook |
