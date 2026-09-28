@@ -3,7 +3,6 @@ import {
 	LayeredCanvasStatus,
 	type LayeredCanvasTarget,
 } from "@/canvases/layered/LayeredCanvasChrome";
-import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents/AgentsViewPanel";
 import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
 import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
@@ -37,7 +36,6 @@ import {
 import { useBoardVersions } from "@/pages/graphs-detail/features/boards";
 import {
 	DeclaredBoard,
-	FrozenBoardPage,
 	OpenBoardContext,
 	type RecordBoardKind,
 } from "@/pages/graphs-detail/features/boards";
@@ -89,19 +87,13 @@ import {
 	hasOutstandingSetup,
 	isGateOpen,
 } from "@/pages/graphs-detail/features/graphs/types";
-import {
-	CompareBoardPage,
-	LensBoardPage,
-	LensesViewPanel,
-	parseComparePair,
-} from "@/pages/graphs-detail/features/lenses";
+import { LensesViewPanel } from "@/pages/graphs-detail/features/lenses";
 import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
 import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type ModelSelection,
 	ModelViewPanel,
-	ModelsPage,
 	useModelsView,
 } from "@/pages/graphs-detail/features/models";
 import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
@@ -109,35 +101,25 @@ import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models/que
 import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans/LibraryViewPanel";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
 import { taskPlansApi } from "@/pages/graphs-detail/features/plans/api";
-import { PlanBoardPage } from "@/pages/graphs-detail/features/plans/boards/PlanBoardPage";
-import {
-	PlanArgumentsPage,
-	PlanExportPage,
-	PlanVersionsPage,
-} from "@/pages/graphs-detail/features/plans/boards/PlanRecordPages";
 import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
 import { useTodoMutations } from "@/pages/graphs-detail/features/projects/queries";
-import { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
-import { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { runsApi } from "@/pages/graphs-detail/features/runs/api";
-import {
-	RunBoardPage,
-	useRunStep,
-} from "@/pages/graphs-detail/features/runs/boards";
+import { useRunStep } from "@/pages/graphs-detail/features/runs/boards";
 import { SetupLock } from "@/pages/graphs-detail/features/setup/SetupLock";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { SkillBoardPage } from "@/pages/graphs-detail/features/skills/SkillBoardPage";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
-import {
-	RuleBoardPage,
-	UsageBoardPage,
-} from "@/pages/graphs-detail/features/skills/boards";
 import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
+import {
+	type BoardTitleNames,
+	type DeclaredBoardDeps,
+	boardTitle,
+	declaredBoardContent,
+} from "@/pages/graphs-detail/shell/declaredBoardBody";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useLensesViewPanel } from "@/pages/graphs-detail/shell/useLensesViewPanel";
@@ -168,7 +150,7 @@ import {
 	GraphStatusBar as CanvasStatusBar,
 } from "@invana/canvas-ui";
 import type { GraphCanvas, GraphLayer } from "@invana/graph";
-import { Button, EmptyState, ErrorBoundary, Spinner, cn } from "@invana/ui";
+import { Button, ErrorBoundary, cn } from "@invana/ui";
 import {
 	HelpCircle,
 	History,
@@ -2491,6 +2473,30 @@ export function GraphDetailPage() {
 					? boardPageId("data", activeCanvasId)
 					: GRAPH_PAGE_ID;
 
+	const declaredDeps: DeclaredBoardDeps = {
+		username,
+		graphSlug,
+		openBoard,
+		setPageId,
+		runStep,
+		settingsPanel,
+		governPanel,
+		openWorkPanel,
+		openAgentPage,
+		showAgentCanvas,
+		backend,
+		modelSelection,
+		setModelSelection,
+	};
+	const titleNames: BoardTitleNames = {
+		modelsView,
+		modelName,
+		lensNameById,
+		agentNameById,
+		skillNameById,
+		planRefById,
+	};
+
 	const pages: BoardPageDef[] = [
 		{
 			id: GRAPH_PAGE_ID,
@@ -2524,35 +2530,7 @@ export function GraphDetailPage() {
 		// title and the close are the same as every other page's.
 		...boards.map((board) => ({
 			id: boardPageId(board.kind, board.subjectId, board.versionId),
-			// Every other declared kind is titled by its kind — one skill board,
-			// and the crumb inside says which record. A lens and an agent are
-			// titled by name (WO15), and a run by its address, `run:3c414b9f`,
-			// so two open runs are two readable tabs (SR54).
-			title:
-				// One board, titled by its scope — `All models` or `AirRoutes` (MP18).
-				board.kind === "models"
-					? modelsView.scope
-						? (modelName(modelsView.scope) ?? BOARD_KINDS.models.label)
-						: "All models"
-					: board.kind === "world" || board.kind === "guardrail"
-						? (lensNameById.get(board.subjectId) ??
-							BOARD_KINDS[board.kind].label)
-						: board.kind === "agent"
-							? (agentNameById.get(board.subjectId) ??
-								BOARD_KINDS[board.kind].label)
-							: board.kind === "skill"
-								? (skillNameById.get(board.subjectId) ??
-									BOARD_KINDS[board.kind].label)
-								: board.kind === "run"
-									? runAddress(board.subjectId)
-									: board.kind === "plan_runs"
-										? (planRefById.get(board.subjectId) ??
-											BOARD_KINDS[board.kind].label)
-										: board.kind === "plan_versions" ||
-												board.kind === "plan_arguments" ||
-												board.kind === "plan_export"
-											? `${planRefById.get(board.subjectId) ?? "plan"} · ${BOARD_KINDS[board.kind].label.toLowerCase()}`
-											: BOARD_KINDS[board.kind].label,
+			title: boardTitle(board, titleNames),
 			icon: BOARD_KINDS[board.kind].icon,
 			// Which board this is belongs to the host, so every declared page can
 			// offer `Save report` and `Reports` without six components threading a
@@ -2567,7 +2545,7 @@ export function GraphDetailPage() {
 					// page becomes `kind:id@version` (B12 · B22).
 					onOpenVersion={(versionId) => openBoard({ ...board, versionId })}
 				>
-					{declaredBoardContent(board)}
+					{declaredBoardContent(board, declaredDeps)}
 				</DeclaredBoard>
 			),
 		})),
@@ -2592,247 +2570,6 @@ export function GraphDetailPage() {
 				]
 			: []),
 	];
-
-	// **`renders` is the only thing the host branches on** (boards-migration §5),
-	// and inside `dashboard` the kind picks the body. Hoisted out of the page
-	// list so the branch reads as one place rather than as a nested ternary.
-	function declaredBoardContent(board: OpenBoard) {
-		// A task opens inside its run (SR72): the page stays, `&step=` moves.
-		const openStep = (stepId: string | null) =>
-			setPageId(boardPageId(board.kind, board.subjectId), { step: stepId });
-
-		// **A frozen reading branches before the kind does** (B16). The stored
-		// blob is the document, so there is nothing for a composer to do and no
-		// kind to pick a body by — one page renders every report.
-		if (board.versionId) {
-			return (
-				<FrozenBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					kind={board.kind}
-					subjectId={board.subjectId}
-					versionId={board.versionId}
-					onOpenLive={() => openBoard({ ...board, versionId: undefined })}
-				/>
-			);
-		}
-
-		if (board.kind === "run" || board.kind === "task_run") {
-			// A step board opened cold is still reading which run it is in (SR44).
-			// It has no run *yet*, which is not the same as having none.
-			if (board.resolvingRun) {
-				return (
-					<div className="flex h-full items-center justify-center">
-						<Spinner />
-					</div>
-				);
-			}
-			// The two bodies that read a trace. `runId` is optional on the record
-			// because a skill has no run (SD3), so they **check** it rather than
-			// cast it — a fifth kind that forgot to pass one refuses here instead
-			// of crashing inside the composer (B17).
-			const runId = board.runId;
-			if (!runId) {
-				return (
-					<EmptyState
-						className="h-full"
-						title="This board arrived without a run"
-						description="A run and a step dashboard both read one trace. Open it again from the Runs panel."
-					/>
-				);
-			}
-			return (
-				<RunBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					runId={runId}
-					// A live `task_run` board only exists for the moment a cold link
-					// takes to resolve; if it is drawn, it draws its step inside.
-					stepId={board.kind === "task_run" ? board.subjectId : runStep}
-					onOpenStep={
-						board.kind === "task_run"
-							? (id) =>
-									openBoard({
-										kind: "run",
-										subjectId: runId,
-										runId,
-										stepId: id ?? undefined,
-									})
-							: openStep
-					}
-					// `Retune` — the run stays in `mainSection` while Govern opens
-					// beside it, which is the whole reason the section is a stack
-					// (SR12 · worlds.md Journey 2).
-					onRetune={() => settingsPanel.setSection("govern")}
-					// The pair is the subject, and the first half is this run —
-					// `compare:<a>:<b>`, which the id parser splits on the first colon.
-					onCompare={(other) =>
-						openBoard({
-							kind: "compare",
-							subjectId: `${runId}:${other}`,
-							runId,
-						})
-					}
-				/>
-			);
-		}
-
-		// The skill's page (SK17 · SK36) — it authors, like the agent's, and
-		// reads no trace, so it takes no `board.runId` (SD3). Its usage and a
-		// rule are readings, and stay boards.
-		if (board.kind === "skill") {
-			return (
-				<SkillBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					skillId={board.subjectId}
-					onOpenAgent={(id) => {
-						openWorkPanel("agents");
-						openAgentPage(id);
-					}}
-					onOpenUsageDashboard={(id) =>
-						openBoard({ kind: "skill_usage", subjectId: id })
-					}
-				/>
-			);
-		}
-
-		if (board.kind === "skill_usage") {
-			return (
-				<UsageBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					skillId={board.subjectId}
-					onOpenSkill={(id) => openBoard({ kind: "skill", subjectId: id })}
-					onOpenRun={(runId) =>
-						openBoard({ kind: "run", subjectId: runId, runId })
-					}
-				/>
-			);
-		}
-
-		if (board.kind === "rule") {
-			return (
-				<RuleBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					ruleId={board.subjectId}
-					onEdit={() => settingsPanel.setSection("skills")}
-					onOpenRun={(runId) =>
-						openBoard({ kind: "run", subjectId: runId, runId })
-					}
-				/>
-			);
-		}
-
-		// One page for both kinds, because they are one record separated by
-		// `kind` (GV1 · WO15 · GR14). Neither reads a trace, so neither takes
-		// `board.runId` (SD3).
-		if (board.kind === "world" || board.kind === "guardrail") {
-			return (
-				<LensBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					kind={board.kind}
-					lensId={board.subjectId}
-					// `Edit` puts the Govern panel back on this lens, drilled in —
-					// the board reads and the acts stay in the section (WO16).
-					onEdit={(kind, lensId) => governPanel.reveal(kind, lensId)}
-				/>
-			);
-		}
-
-		// The agent's page (AG23 · AG34) — the one declared page that edits. It
-		// reads no trace, so it takes no `board.runId` (SD3).
-		// The journal drawn wide (SR70). It binds to the Graph, not to a run,
-		// so it takes no `board.runId`.
-		if (board.kind === "runs") {
-			return (
-				<RunsBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-				/>
-			);
-		}
-
-		if (board.kind === "models") {
-			return (
-				<ModelsPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					backend={backend}
-					selection={modelSelection}
-					onSelect={setModelSelection}
-					onOpenRun={(runId) =>
-						openBoard({ kind: "run", subjectId: runId, runId })
-					}
-				/>
-			);
-		}
-
-		if (board.kind === "agent") {
-			return (
-				<AgentBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					agentId={board.subjectId}
-					onOpenLineage={(id) => showAgentCanvas("lineage", id)}
-					onOpenEnvelope={(id) => showAgentCanvas("envelope", id)}
-				/>
-			);
-		}
-
-		if (board.kind === "compare") {
-			const pair = parseComparePair(board.subjectId);
-			return pair ? (
-				<CompareBoardPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					runA={pair.runA}
-					runB={pair.runB}
-					onOpenRun={(id) =>
-						openBoard({ kind: "run", subjectId: id, runId: id })
-					}
-				/>
-			) : null;
-		}
-
-		// What `⋯` opens on the plan page (LB38) — each a record of one
-		// version, and its crumb goes back to the plan's page.
-		if (
-			board.kind === "plan_versions" ||
-			board.kind === "plan_arguments" ||
-			board.kind === "plan_export"
-		) {
-			const RecordPage = {
-				plan_versions: PlanVersionsPage,
-				plan_arguments: PlanArgumentsPage,
-				plan_export: PlanExportPage,
-			}[board.kind];
-			return (
-				<RecordPage
-					username={username as string}
-					graphSlug={graphSlug as string}
-					planId={board.subjectId}
-					onOpenPlan={(id) => openBoard({ kind: "plan_runs", subjectId: id })}
-				/>
-			);
-		}
-
-		// The plan page (LB24) — Overview · Layers · Flow · Activity, read over
-		// a window. A row opens its run page beside it.
-		return (
-			<PlanBoardPage
-				username={username as string}
-				graphSlug={graphSlug as string}
-				planId={board.subjectId}
-				onOpenRun={(id) => openBoard({ kind: "run", subjectId: id, runId: id })}
-				onOpenReading={(reading, id) =>
-					openBoard({ kind: `plan_${reading}`, subjectId: id })
-				}
-			/>
-		);
-	}
 
 	// Selecting a tab is not "show that node" — each kind of page is reached by
 	// putting the page state that produced it back, which is why this dispatches
