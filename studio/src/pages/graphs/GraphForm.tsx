@@ -294,7 +294,7 @@ export function GraphForm({
 
 				{/* Test status banner */}
 				{testState.kind === "passed" && (
-					<div className="flex items-center gap-2 text-green-500">
+					<div className="flex items-center gap-2 text-success">
 						<CheckCircle2 className="w-4 h-4" />
 						<span>
 							Connection works
@@ -317,7 +317,7 @@ export function GraphForm({
 				{testState.kind === "passed" &&
 					testState.compatibilityStatus &&
 					testState.compatibilityStatus !== "supported" && (
-						<p className="text-amber-600 dark:text-amber-400">
+						<p className="text-warning">
 							{testState.compatibilityStatus === "unsupported"
 								? "This version is below Invana's supported range — the connection will be read-only."
 								: testState.compatibilityStatus === "untested"

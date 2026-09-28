@@ -83,7 +83,7 @@ export function RemoveStitchDialog({
 								from one side.
 							</p>
 							<div className="flex flex-col gap-1 border bg-background p-2">
-								<div className="font-semibold text-[10.5px] text-muted-foreground uppercase tracking-wide">
+								<div className="font-semibold text-xs text-muted-foreground uppercase tracking-wide">
 									What stays
 								</div>
 								<p className="text-muted-foreground">

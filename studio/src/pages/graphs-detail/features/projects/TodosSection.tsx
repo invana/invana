@@ -446,10 +446,8 @@ function TaskDetail({
 					className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-2.5"
 				>
 					{task.status === "needs_input" && task.blocked_reason ? (
-						<div className="rounded-sm border border-amber-500/40 p-2 text-base">
-							<div className="font-medium text-amber-600 dark:text-amber-400">
-								Waiting on you
-							</div>
+						<div className="rounded-sm border border-warning/40 p-2 text-base">
+							<div className="font-medium text-warning">Waiting on you</div>
 							<p className="mt-0.5 text-muted-foreground">
 								{task.blocked_reason}
 							</p>

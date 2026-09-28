@@ -586,9 +586,7 @@ export function SessionComposer({
 						<Bot className="h-3.5 w-3.5 shrink-0" />
 						<span className="truncate text-foreground">{agentName}</span>
 						{agentStatus && agentStatus !== "active" ? (
-							<span className="shrink-0 text-amber-600 dark:text-amber-400">
-								· {agentStatus}
-							</span>
+							<span className="shrink-0 text-warning">· {agentStatus}</span>
 						) : null}
 					</span>
 				) : (

@@ -139,7 +139,7 @@ function Row({
 									>
 										{skill}
 										{reported ? (
-											<span className="ml-0.5 text-base text-emerald-600 dark:text-emerald-400">
+											<span className="ml-0.5 text-base text-success">
 												✓reported
 											</span>
 										) : null}
@@ -175,9 +175,9 @@ function Row({
 function toneClass(tone: string): string {
 	return (
 		{
-			success: "text-emerald-600 dark:text-emerald-400",
+			success: "text-success",
 			danger: "text-destructive",
-			warning: "text-amber-600 dark:text-amber-400",
+			warning: "text-warning",
 			primary: "text-primary",
 			muted: "text-muted-foreground",
 		}[tone] ?? "text-muted-foreground"

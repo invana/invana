@@ -353,11 +353,7 @@ function UsernameStatus({
 		return <p className="text-base text-muted-foreground">Checking…</p>;
 	}
 	if (state.kind === "available") {
-		return (
-			<p className="text-base text-emerald-600 dark:text-emerald-400">
-				Username available.
-			</p>
-		);
+		return <p className="text-base text-success">Username available.</p>;
 	}
 	if (state.kind === "unavailable") {
 		const message =

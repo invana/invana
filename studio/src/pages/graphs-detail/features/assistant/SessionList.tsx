@@ -279,10 +279,10 @@ function SessionRow({
 				<>
 					{hasCounts && (
 						<>
-							<span className="text-blue-400" title="nodes">
+							<span className="text-data-1" title="nodes">
 								{session.nodeCount}
 							</span>
-							<span className="text-purple-400" title="relationships">
+							<span className="text-data-7" title="relationships">
 								{session.edgeCount}
 							</span>
 							<span>·</span>

@@ -55,9 +55,7 @@ export function StepRules({ offered, cited, onOpenRule }: StepRulesProps) {
 							{rule.statement}
 							<span className="shrink-0">”</span>
 							{wasCited ? (
-								<span className="ml-1 text-base text-emerald-600 dark:text-emerald-400">
-									✓cited
-								</span>
+								<span className="ml-1 text-base text-success">✓cited</span>
 							) : null}
 						</span>
 					</button>

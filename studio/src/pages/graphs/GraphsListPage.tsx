@@ -100,7 +100,7 @@ function GraphRow({
 		<div className="flex items-center gap-3 py-1.5 group">
 			<div
 				className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-					setupDone ? "bg-green-500" : "bg-muted-foreground/40"
+					setupDone ? "bg-success" : "bg-muted-foreground/40"
 				}`}
 			/>
 			<button

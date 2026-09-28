@@ -26,11 +26,11 @@ export function ConnectionStatusBar({ graph, metrics }: Props) {
 			<div className="flex items-center gap-2">
 				<span
 					className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-						isActive ? "bg-green-500" : "bg-destructive animate-pulse"
+						isActive ? "bg-success" : "bg-destructive animate-pulse"
 					}`}
 				/>
 				{graph ? (
-					<span className={isActive ? "text-green-500" : "text-destructive"}>
+					<span className={isActive ? "text-success" : "text-destructive"}>
 						{isActive ? "ACTIVE" : graph.status}
 					</span>
 				) : (

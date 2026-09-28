@@ -1,7 +1,7 @@
 /**
  * Keeps Studio's names on the module map, so the structure cannot drift again.
  *
- * Four checks over `src/`, each failing with the file and the name:
+ * Six checks over `src/`, each failing with the file and the name:
  *
  * 1. **Modules** — every `pages/graphs-detail/features/<m>/` is a module in `MODULES`,
  *    and the engine folder it maps to exists under `engine/src/invana/server/`.
@@ -15,6 +15,12 @@
  *    says what the code does and why; the decision lives in its feature file, and
  *    a doc link names the file. Code spans in a comment (`EU · H1 2026`) are
  *    skipped, since they quote copy rather than cite a decision.
+ * 5. **Tokens only** — no `hsl(` or `#rrggbb` in a string or a stylesheet, no
+ *    Tailwind palette class (`text-emerald-600`), no arbitrary `text-[Npx]` size.
+ *    Colour comes from `@invana/styling` tokens and size from the type ladder.
+ *    Strings are read with the TypeScript parser, so comments are never flagged.
+ * 6. **No PixiJS** — nothing in `src/` imports `pixi.js` or `@pixi/*`; graphs
+ *    are drawn through `@invana/canvas`.
  *
  * Every exception is a line in an allow-list below, with its reason.
  *
@@ -85,6 +91,19 @@ const DECISION_PREFIXES =
 const DECISION_ID = new RegExp(
 	`(?<![\\w.\`-])(?:${DECISION_PREFIXES.split(" ").join("|")})[0-9]{1,3}[a-z]?(?![\\w-])`,
 );
+
+const COLOUR_LITERAL = /hsl\(|#[0-9a-fA-F]{6}\b/;
+const PALETTE_CLASS =
+	/\b(?:bg|text|border|ring|fill|stroke|from|to|via|outline|divide|decoration|shadow|accent|caret)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black)(?:-\d{2,3})?\b/;
+const PX_TEXT = /\btext-\[\d+(?:\.\d+)?px\]/;
+// Files whose colour strings are not styling, with the reason.
+const TOKEN_ALLOWED = {
+	"components/SaturationBridge.tsx":
+		"rebuilds hsl() from the theme's own triplets at runtime",
+	"pages/graphs-detail/features/explorer/StylingPanel.tsx":
+		"a colour input's default is the hex value a user edits, not a style",
+};
+const PIXI = /^(?:pixi\.js|@pixi\/)/;
 
 const errors = [];
 
@@ -191,6 +210,63 @@ function checkDecisionIds() {
 	}
 }
 
+function checkTokensAndPixi() {
+	for (const f of files(SRC, /\.(tsx?|css)$/)) {
+		const rel = path.relative(SRC, f).split(path.sep).join("/");
+		const text = fs.readFileSync(f, "utf8");
+		if (f.endsWith(".css")) {
+			const css = text.replace(/\/\*[\s\S]*?\*\//g, "");
+			const m = COLOUR_LITERAL.exec(css);
+			if (m) errors.push(`${rel}: colour literal ${m[0]} — use a token`);
+			continue;
+		}
+		const sf = ts.createSourceFile(
+			f,
+			text,
+			ts.ScriptTarget.Latest,
+			true,
+			f.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+		);
+		const visit = (node) => {
+			if (
+				ts.isImportDeclaration(node) &&
+				PIXI.test(node.moduleSpecifier.text)
+			) {
+				errors.push(
+					`${rel}: imports ${node.moduleSpecifier.text} — draw through @invana/canvas`,
+				);
+			}
+			if (
+				ts.isStringLiteral(node) ||
+				ts.isNoSubstitutionTemplateLiteral(node) ||
+				ts.isTemplateHead(node) ||
+				ts.isTemplateMiddle(node) ||
+				ts.isTemplateTail(node)
+			) {
+				const value = node.text;
+				const { line } = sf.getLineAndCharacterOfPosition(node.getStart(sf));
+				const colour = COLOUR_LITERAL.exec(value);
+				if (colour && !(rel in TOKEN_ALLOWED))
+					errors.push(
+						`${rel}:${line + 1}: colour literal ${colour[0]} — use a token`,
+					);
+				const palette = PALETTE_CLASS.exec(value);
+				if (palette)
+					errors.push(
+						`${rel}:${line + 1}: palette class ${palette[0]} — use a token`,
+					);
+				const px = PX_TEXT.exec(value);
+				if (px)
+					errors.push(
+						`${rel}:${line + 1}: ${px[0]} — use text-base · text-sm · text-xs`,
+					);
+			}
+			ts.forEachChild(node, visit);
+		};
+		visit(sf);
+	}
+}
+
 function dirs(root) {
 	return fs
 		.readdirSync(root, { withFileTypes: true })
@@ -212,6 +288,7 @@ checkModules();
 checkSuffixes();
 checkWords();
 checkDecisionIds();
+checkTokensAndPixi();
 
 if (errors.length) {
 	console.error(
@@ -220,5 +297,5 @@ if (errors.length) {
 	process.exit(1);
 }
 console.log(
-	"check-names: modules, suffixes, identifiers and comments follow the module map",
+	"check-names: modules, suffixes, identifiers, comments and tokens follow the rules",
 );

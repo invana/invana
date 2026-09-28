@@ -58,8 +58,8 @@ export function InspectorViewPanel({
 							<span
 								className={`text-sm font-medium uppercase px-1.5 py-0.5 rounded ${
 									item.type === "vertex"
-										? "bg-blue-500/20 text-blue-400"
-										: "bg-purple-500/20 text-purple-400"
+										? "bg-data-1/20 text-data-1"
+										: "bg-data-7/20 text-data-7"
 								}`}
 							>
 								{item.type}

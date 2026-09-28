@@ -607,7 +607,7 @@ function ProjectDetail({
 													</span>
 													{task.critical ? (
 														<span
-															className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"
+															className="h-1.5 w-1.5 shrink-0 rounded-full bg-success"
 															title="On the critical path"
 														/>
 													) : null}
