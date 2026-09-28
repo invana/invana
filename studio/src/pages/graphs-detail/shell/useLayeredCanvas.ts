@@ -4,7 +4,7 @@ import {
 	CANVAS_KINDS,
 	type CanvasKind,
 } from "@/pages/graphs-detail/features/boards";
-import { useTodoMutations } from "@/pages/graphs-detail/features/projects/queries";
+import { useTodoMutations } from "@/pages/graphs-detail/features/projects";
 import type { LeftNavKey } from "@/pages/graphs-detail/shell/useLeftSection";
 import { useEffect, useState } from "react";
 

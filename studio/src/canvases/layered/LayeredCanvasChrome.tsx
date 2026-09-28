@@ -18,7 +18,7 @@ import {
 } from "@/pages/graphs-detail/features/agents";
 import { CANVAS_KINDS } from "@/pages/graphs-detail/features/boards";
 import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans";
-import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
+import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects";
 import { cn } from "@invana/ui";
 import { X } from "lucide-react";
 

@@ -11,7 +11,7 @@ import {
 } from "@/pages/graphs-detail/features/models";
 import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans";
 import { taskPlansApi } from "@/pages/graphs-detail/features/plans";
-import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
+import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
 import { SkillsViewPanel } from "@/pages/graphs-detail/features/skills/SkillsViewPanel";
 import type { useLayeredCanvas } from "@/pages/graphs-detail/shell/useLayeredCanvas";
