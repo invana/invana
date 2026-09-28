@@ -428,7 +428,7 @@ specs already cover.
 
 | Layer | What is tested | Not tested |
 |---|---|---|
-| Vitest (`pnpm test --coverage`, in CI's Studio Tests job) | The logic subset named in `studio/vitest.config.ts`: `lib/`, the auth and appearance stores, `services/telemetry/` (not its SDK boot, `setup.ts`), and the pure modules under `features/` — `agentDraft` · `emissions` · `boardKinds` · `eventSearch` · `canvasItems` · `stylingPatch` · `addressing`. Statements, branches, functions and lines each fail the build under 80% | Hooks, the API client and screens — they are I/O, and the e2e specs cover them. A logic module that cannot load under Node because it reaches a component barrel (`run.store`, `runSummary`, the `taskFlowFrom*` adapters) stays out until it can |
+| Vitest (`pnpm test --coverage`, in CI's Studio Tests job) | The logic subset named in `studio/vitest.config.ts`: `lib/`, `stores/`, `services/telemetry/` (not its SDK boot, `setup.ts`), and the pure modules under `features/` and `canvases/` — `agentDraft` · `emissions` · `boardKinds` · `eventSearch` · `canvasItems` · `addressing` · `runSummary` · the three `taskFlowFrom*` adapters. Statements, branches, functions and lines each fail the build under 80%. A module that reaches another module's barrel loads the kit from `node_modules`, transformed by Vitest | Hooks, the API client and screens — they are I/O, and the e2e specs cover them |
 | Playwright | The read-only journeys against a live engine and graph database | Every screen |
 | The guardrails in §8 | Structure — which is where a 42-screen codebase actually rots | |
 
