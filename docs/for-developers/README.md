@@ -438,7 +438,8 @@ The artboard → route → feature map, the order, and what each screen still ne
 [building-studio/refactor-plan.md](building-studio/refactor-plan.md); what each screen composes from is
 [building-studio/design-kit-coverage.md](building-studio/design-kit-coverage.md); what every **canvas**
 surface composes from is [building-studio/canvas-ui-coverage.md](building-studio/canvas-ui-coverage.md);
-and every screen's own status is [the-screens.md](the-screens.md).
+and every screen's own status is [the-screens.md](the-screens.md). What the code cleanup still owes is
+[building-studio/cleanup.md](building-studio/cleanup.md).
 
 | Rule | Detail |
 |---|---|

@@ -4,6 +4,7 @@ The *what* is [`code-shape.md`](code-shape.md): feature modules, the deletion li
 route map, the guardrails. This is the *how* — the mechanics of getting there without breaking a
 product that has no unit tests, and the substitution table for the components `@invana/ui@0.0.23`
 and `@invana/canvas-ui@0.0.14` now own.
+What has not moved yet, with its size today, is [cleanup.md](cleanup.md).
 
 ---
 
