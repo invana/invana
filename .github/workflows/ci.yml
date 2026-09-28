@@ -32,8 +32,9 @@ jobs:
       - name: Dead files
         run: cd studio && pnpm knip
 
+      # Bare `tsc` checks nothing: tsconfig.json is references only.
       - name: TypeScript type check
-        run: cd studio && pnpm tsc --noEmit
+        run: cd studio && pnpm check-types
 
   # docs/for-developers/building-engine/refactor-plan.md §1 — the golden guards.
   # An empty diff here is the promise that Studio cannot tell a refactor happened.

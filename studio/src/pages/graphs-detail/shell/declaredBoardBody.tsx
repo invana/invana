@@ -57,9 +57,9 @@ export interface DeclaredBoardDeps {
 }
 
 /**
- * The body of one declared page. **`renders` is the only thing the host
- * branches on** (boards-migration §5), and inside `dashboard` the kind picks the
- * body — one place, rather than a nested ternary inside the page list.
+ * The body of one declared page. A frozen reading branches first, and then
+ * the board's kind picks the body — one place, rather than a nested ternary
+ * inside the page list.
  */
 export function declaredBoardContent(
 	board: OpenBoard,
@@ -329,8 +329,8 @@ export interface BoardTitleNames {
 /**
  * A declared tab's title. Most kinds are titled by their kind — one skill
  * board, and the crumb inside says which record. A lens and an agent are titled
- * by name (WO15), and a run by its address, `run:3c414b9f`, so two open runs are
- * two readable tabs (SR54).
+ * by name, and a run by its address, `run:3c414b9f`, so two open runs are two
+ * readable tabs.
  */
 export function boardTitle(board: OpenBoard, names: BoardTitleNames): string {
 	const {

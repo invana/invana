@@ -49,9 +49,9 @@ export interface LeftSectionDeps {
 }
 
 /**
- * One rail, one page (docs/for-developers/modules/explore/spec.md). Every panel below is a `?settings` key,
- * and each one owns the canvas kind it opens — which is why the selection
- * state lives on this page rather than inside them.
+ * The `leftSection` occupant for the open `?panel` key, or null when the page
+ * draws nothing there. Each panel owns the canvas kind it opens, which is why
+ * the selection it drives lives above it, in `useLayeredCanvas`.
  */
 export function leftSectionContent(deps: LeftSectionDeps): ReactNode {
 	const {

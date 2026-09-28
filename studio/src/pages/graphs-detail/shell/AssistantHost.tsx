@@ -23,10 +23,10 @@ interface AssistantHostProps
 /**
  * The assistant, as the right side's `assistant` occupant.
  *
- * Its sessions live on the RIGHT and nowhere else (the-assistant.md AD1/AD6):
- * the left rail is for the page's own panels, and asking never costs you the
- * one you had open. Until the Graph is connected and can answer, the region
- * holds the setup lock that names the missing step instead of the panel.
+ * Its sessions live on the right and nowhere else: the left rail is for the
+ * page's own panels, and asking never costs you the one you had open. Until
+ * the Graph is connected and can answer, the region holds the setup lock that
+ * names the missing step instead of the panel.
  */
 export function AssistantHost({
 	connectionMissing,
@@ -43,7 +43,7 @@ export function AssistantHost({
 	return (
 		<AssistantViewPanel
 			{...panel}
-			// C8 · AD15 — the world is the thread's, set where it asks.
+			// The world is the thread's, set where it asks.
 			worldControl={
 				<WorldPicker
 					username={panel.username}

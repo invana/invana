@@ -115,7 +115,7 @@ Two findings from the `0.0.12` bump, both pre-existing and neither caused by it.
 
 | Finding | Detail |
 |---|---|
-| `pnpm check-types` compiles nothing | `tsconfig.json` carries `"files": []` and two `references`. `tsc --noEmit` with no `-b` honours that literally and checks zero files, so the script has always passed |
+| `pnpm check-types` compiles nothing | `tsconfig.json` carries `"files": []` and two `references`. `tsc --noEmit` with no `-b` honours that literally and checks zero files, so the script has always passed. The script is `tsc -b --noEmit`, and CI's type-check step runs the script rather than bare `tsc` |
 | `pnpm build` (`tsc -b`) has 26 errors | 15 are canvas API drift never followed through (style props that no longer take functions, `GraphStore.getNodes` → `nodes`, `ILayer.getBounds`), 8 are Studio bugs (`run.store.ts` duplicate spread keys, a `Map<string, X>` / `Map<string, X[]>` mismatch, `useAuth().accessToken`), 3 are `react-hook-form` `Control<T>` variance |
 
 **Both are fixed** (Phase 1): the 26 are cleared and `check-types` is `tsc -b --noEmit`, verified by
