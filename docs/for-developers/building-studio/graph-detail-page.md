@@ -86,7 +86,7 @@ region; only `mainSection` changes.
 | `header.left` | wordmark · `Separator` · `Breadcrumb` — `ravi-merugu › stock-market-graph › Explorer` | unchanged; the last crumb is the **active page's** title |
 | `header.centerNavItems` | the camera toolbar — zoom out · level · zoom in · fit · centre · magnet | supplied by the **active page**, absent when it is not a canvas. It reads the live camera, which is why it sits in the header and not in the strip |
 | `header.rightNavItems` | nodes-in-view readout · `ThemeMenu` · **Assistant** | unchanged; the readout comes from the active page, and Assistant toggles `rightSection` |
-| `leftNav` | `railItem()` × 10 top · 5 bottom · avatar at `bottom` | the same helper, its items read from the registry; the avatar is `UserMenu` |
+| `leftNav` | `navItem()` × 10 top · 5 bottom · avatar at `bottom` | the same helper, its items read from the registry; the avatar is `UserMenu` |
 | `leftSection` | `TabbedPanel` wrapping `PanelStack` — *Node types · Relationships · Selected* — with a summary line at the bottom and `headerActions` refresh · search · collapse | this **is** Explore's `leftSection`. Every other module composes the same way: one `TabbedPanel`, `PanelStack` sections, its own `headerActions` |
 | **`mainSection`** | a 30px `TabbedPanel` strip with `bodyClassName="hidden"`, and the canvas as a **sibling** below it | **`BoardPagesViewPanel`** — strip and bodies in one component, `keepMounted` |
 | `rightSection` | `TabbedPanel` — *Properties · Design* | the Inspector; the Assistant replaces it while open (G5) |

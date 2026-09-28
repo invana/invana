@@ -37,8 +37,11 @@
  * axis and it is never drawn as unspent.
  */
 
-import type { TraceStepRead } from "@/services/api/runs";
-import type { Touch, TouchesResponse } from "@/types/govern";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
+import type { TraceStepRead } from "@/pages/graphs-detail/features/runs/api";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type { LayersOptions } from "@invana/dashboard";
 import type { Layer, LayerItem } from "@invana/ui";

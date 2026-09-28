@@ -21,7 +21,7 @@
  * this is *not* a result, without reading a word of it.
  */
 
-import type { Diagnosis } from "@/types/run";
+import type { Diagnosis } from "@/pages/graphs-detail/features/runs/types";
 import { Button, CannotAnswerCard, DiagnosisCard } from "@invana/ui";
 
 /**

@@ -12,7 +12,10 @@
  * `$0.00` or `{}`.
  */
 
-import type { TraceRead, TraceStepRead } from "@/services/api/runs";
+import type {
+	TraceRead,
+	TraceStepRead,
+} from "@/pages/graphs-detail/features/runs/api";
 import type { ChipSpec, Tone } from "@invana/dashboard";
 import type { Bound, StatusDotProps, TaskGanttStatus } from "@invana/ui";
 

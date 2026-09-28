@@ -16,8 +16,11 @@
 import {
 	useImportModelMutation,
 	useStartersQuery,
-} from "@/hooks/queries/useModels";
-import type { ModelArtefact, ModelImportResult } from "@/types/models";
+} from "@/pages/graphs-detail/features/models/queries";
+import type {
+	ModelArtefact,
+	ModelImportResult,
+} from "@/pages/graphs-detail/features/models/types";
 import { Input } from "@invana/forms";
 import {
 	Button,

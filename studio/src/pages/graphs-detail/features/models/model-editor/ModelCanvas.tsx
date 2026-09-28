@@ -25,14 +25,6 @@ import {
 	hueSlotForName,
 } from "@/canvases/model";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import {
-	useCreateDraftMutation,
-	useDeleteEdgeTypeMutation,
-	useDeleteNodeTypeMutation,
-	useModelVersionQuery,
-	useModelVersionsQuery,
-	useModelsQuery,
-} from "@/hooks/queries/useModels";
 import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import { EdgeTypeDetail } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeDetail";
 import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeFormDialog";
@@ -43,11 +35,22 @@ import type {
 	ModelSelection,
 } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
+	useCreateDraftMutation,
+	useDeleteEdgeTypeMutation,
+	useDeleteNodeTypeMutation,
+	useModelVersionQuery,
+	useModelVersionsQuery,
+	useModelsQuery,
+} from "@/pages/graphs-detail/features/models/queries";
+import {
 	buildAllModelsData,
 	memberIdOf,
 	parseMemberId,
 } from "@/pages/graphs-detail/features/models/stitch/allModels";
-import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
+import type {
+	EdgeTypeResponse,
+	NodeTypeResponse,
+} from "@/pages/graphs-detail/features/models/types";
 import { Button, EmptyState } from "@invana/ui";
 import { PanelBottomClose } from "lucide-react";
 import { useMemo, useState } from "react";

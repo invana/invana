@@ -33,7 +33,11 @@ import {
 	useAgentMetersQuery,
 	useAgentSkillsAndCallablesQuery,
 	useAgentsQuery,
-} from "@/hooks/queries/useWork";
+} from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	AgentEdge,
+} from "@/pages/graphs-detail/features/agents/types";
 import {
 	AgentChipRow,
 	DetailBlock,
@@ -46,7 +50,6 @@ import {
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
 import { agentTone } from "@/pages/graphs-detail/shared/statusTone";
-import type { Agent, AgentEdge } from "@/types/work";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import {

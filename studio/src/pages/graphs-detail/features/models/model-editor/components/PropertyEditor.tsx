@@ -1,18 +1,18 @@
-import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
+import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import { propertyTypeOptions } from "@/pages/graphs-detail/features/models/model-editor/propertyTypes";
+import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCreatePropertyKeyMutation,
 	useUpdateEdgeTypeMutation,
 	useUpdateNodeTypeMutation,
 	useUpdatePropertyKeyMutation,
-} from "@/hooks/queries/useModels";
-import { propertyTypeOptions } from "@/pages/graphs-detail/features/models/model-editor/propertyTypes";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
-import { ApiError, suppressActionToast } from "@/services/api/client";
-import type { TypePropertyMappingCreate } from "@/types/models";
+} from "@/pages/graphs-detail/features/models/queries";
+import type { TypePropertyMappingCreate } from "@/pages/graphs-detail/features/models/types";
 import type {
 	PropertyKeyResponse,
 	TypePropertyMappingResponse,
-} from "@/types/schemas";
+} from "@/pages/graphs-detail/features/models/types";
+import { ApiError, suppressActionToast } from "@/services/api/client";
 import {
 	Input,
 	Select,

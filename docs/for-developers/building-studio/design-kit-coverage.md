@@ -819,7 +819,7 @@ A gap shows up in the story as an `!`-override. Porting one into Studio makes it
 
 | Gap | In the story | Also in Studio | Fix |
 |---|---|---|---|
-| Rail active state | `railItem`'s `!bg-primary/15 !text-primary !ring-primary/25` and the hover re-assertion | `useGraphLeftNav.tsx:107` `activeClass` — the same eight classes, copied | `NavVertical` item takes `active`; the highlight is a prop, not an override |
+| Rail active state | `navItem`'s `!bg-primary/15 !text-primary !ring-primary/25` and the hover re-assertion | `useGraphLeftNav.tsx:107` `activeClass` — the same eight classes, copied | `NavVertical` item takes `active`; the highlight is a prop, not an override |
 | Header-only tab strip | `className="[&>div]:border-x-0 [&>div]:border-t-0"` + `bodyClassName="hidden"` on the canvas tabs | `explorer/CanvasTabsBar.tsx` | `TabbedPanel variant="strip"` — a strip that owns no body, so the canvas below stays mounted |
 | Bar heights | `header.className: '!h-[38px]'`, `footer.className: '!h-[25px]'` | `useAppHeader` · `GraphDetail` | The shell owns 38 and 25. A caller that has to say it in `!` is being told the wrong default |
 
@@ -1185,7 +1185,7 @@ whatever document was kept and needs every renderer a document could name
 | `stepTouch` | Studio | `lenses/StepTouchWidget.tsx` | **not** the kit's `touched`: that is `TouchStrip`, the run's summary strip. This is the step's forensic reading — generated vs executed digests, the slice composed in, what egress cut — and the kit ships no kind for it |
 | `runLens` | Studio, legacy | — | kept **only** for reports frozen before the swap. Nothing new registers it; delete the file once no stored board names the kind |
 
-Two Studio names shadowed kit exports and are gone: the `RunRow` **type** in `hooks/queries/useRuns.ts`
-is `JournalRow` (the kit's `RunRow` is the journal row *component*, which the list will draw), and
+Two Studio names shadowed kit exports and are gone: the `RunRow` **type** in `features/runs/queries.ts`
+is `RunListRow` (the kit's `RunRow` is the journal row *component*, which the list will draw), and
 `LayersOptions` · `RunLensOptions` are the kit's own option types now
 ([DS17](../modules/platform/features/design-system.md)).

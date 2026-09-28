@@ -20,7 +20,10 @@ import {
 	SubgraphBody,
 	TableEmissionBody,
 } from "@/pages/graphs-detail/features/assistant/answer-surface/EmissionBodies";
-import type { Emission, TemplateOffer } from "@/types/emission";
+import type {
+	Emission,
+	TemplateOffer,
+} from "@/pages/graphs-detail/features/assistant/answer-surface/types";
 import {
 	EmissionCard,
 	type EmissionKind,

@@ -8,7 +8,7 @@ import type {
 	EdgeTypeResponse,
 	IndexResponse,
 	PropertyKeyResponse,
-} from "@/types/schemas";
+} from "@/pages/graphs-detail/features/models/types";
 import { Badge, Button, Separator } from "@invana/ui";
 import { Pencil, Trash2 } from "lucide-react";
 

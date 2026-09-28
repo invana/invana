@@ -3,13 +3,16 @@ import {
 	StepList,
 	totalDuration,
 } from "@/pages/graphs-detail/features/assistant/SessionSteps";
-import { useRunStore } from "@/stores/run.store";
-import type { RunNode, RunView } from "@/types/run";
 import {
 	type Session,
 	type SessionMessage,
 	isClarification,
-} from "@/types/session";
+} from "@/pages/graphs-detail/features/assistant/types";
+import type {
+	RunNode,
+	RunView,
+} from "@/pages/graphs-detail/features/runs/types";
+import { useRunStore } from "@/stores/run.store";
 import { ChatSession, ChatSessionTaskGroup } from "@invana/ui";
 import { useMemo } from "react";
 
@@ -153,12 +156,12 @@ export function SessionStepsTimeline({
 		// that ask's group instead of starting a second one headed by the
 		// mid-run answer — one run is one row, its steps one continuous
 		// timeline, no matter how many times it paused for input.
-		const seenThinking = new Set<string>();
+		const seenRun = new Set<string>();
 		session.messages.forEach((m, i) => {
 			if (m.role !== "assistant") return;
 			if (m.runId) {
-				if (seenThinking.has(m.runId)) return;
-				seenThinking.add(m.runId);
+				if (seenRun.has(m.runId)) return;
+				seenRun.add(m.runId);
 			}
 			const view = m.runId ? views[m.runId] : undefined;
 			const { steps, clarifications } = timelineFor(session.messages, m, view);

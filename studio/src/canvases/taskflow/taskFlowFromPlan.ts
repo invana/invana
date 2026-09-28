@@ -11,7 +11,10 @@ import {
 	taskNodeTypeOf,
 	taskToneOf,
 } from "@/canvases/taskflow";
-import type { SkillLayer, SkillPlanRead } from "@/types/skills";
+import type {
+	SkillLayer,
+	SkillPlaybookRead,
+} from "@/pages/graphs-detail/features/skills/types";
 
 /** A layer's icon on the canvas — shared with the library's plans (LB35). */
 export const LAYER_ICON: Record<SkillLayer, string> = {
@@ -23,7 +26,7 @@ export const LAYER_ICON: Record<SkillLayer, string> = {
 	agent: "lucide/square-function",
 };
 
-export function taskFlowFromPlan(plan: SkillPlanRead): TaskFlowData {
+export function taskFlowFromPlan(plan: SkillPlaybookRead): TaskFlowData {
 	const nodes: TaskFlowNode[] = plan.nodes.map((node, i) => ({
 		id: node.id,
 		type: taskNodeTypeOf(node.layer),

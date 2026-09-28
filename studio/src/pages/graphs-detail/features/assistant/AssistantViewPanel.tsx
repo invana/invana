@@ -12,21 +12,21 @@ import {
 	stepsFor,
 } from "@/pages/graphs-detail/features/assistant/SessionStepsTimeline";
 import { SessionThread } from "@/pages/graphs-detail/features/assistant/SessionThread";
-import {
-	ListFilterMenu,
-	ListPanelChrome,
-} from "@/pages/graphs-detail/shared/ListPanel";
-import type { SessionSort } from "@/services/api/sessions";
-import { useRunStore } from "@/stores/run.store";
-import type { QueryLanguage } from "@/types/graphs";
-import type { LLMProvider } from "@/types/llm";
-import type { QueryResponse, QueryRunPayload } from "@/types/query";
-import type { RunView } from "@/types/run";
+import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
 import type {
 	Session,
 	SessionContextTurn,
 	SessionMessage,
-} from "@/types/session";
+} from "@/pages/graphs-detail/features/assistant/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
+import type { RunView } from "@/pages/graphs-detail/features/runs/types";
+import {
+	ListFilterMenu,
+	ListPanelChrome,
+} from "@/pages/graphs-detail/shared/ListPanel";
+import { useRunStore } from "@/stores/run.store";
+import type { QueryResponse, QueryRunPayload } from "@/types/query";
 import {
 	Button,
 	ChatSessionStatusBar,
@@ -333,10 +333,7 @@ export function AssistantViewPanel({
 		// One row per *run*, not per reply: a run resumed after a
 		// clarification spans two replies (docs/for-developers/modules/ask/features/streaming-and-the-workflow.md), and messages are in
 		// order, so the last one wins — the reply the run is writing now.
-		const byThinking = new Map<
-			string,
-			{ message: SessionMessage; view: RunView }
-		>();
+		const byRun = new Map<string, { message: SessionMessage; view: RunView }>();
 		for (const m of activeSession.messages) {
 			const v = m.runId ? runViews[m.runId] : undefined;
 			if (
@@ -346,10 +343,10 @@ export function AssistantViewPanel({
 					v.status === "run" ||
 					v.status === "awaiting_input")
 			) {
-				byThinking.set(m.runId, { message: m, view: v });
+				byRun.set(m.runId, { message: m, view: v });
 			}
 		}
-		return [...byThinking.values()];
+		return [...byRun.values()];
 	}, [activeSession, runViews]);
 
 	const strip =

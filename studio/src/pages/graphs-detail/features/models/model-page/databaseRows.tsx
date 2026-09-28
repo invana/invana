@@ -14,7 +14,7 @@ import type {
 	PhysicalRule,
 	PhysicalSchema,
 	PhysicalType,
-} from "@/types/schemas";
+} from "@/pages/graphs-detail/features/models/types";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import {

@@ -15,13 +15,11 @@
  * would quietly turn this into the authoring surface MVP does not have.
  */
 
-import {
-	usePromoteWorkflowMutation,
-	useRunsQuery,
-} from "@/hooks/queries/useWork";
+import { usePromoteTaskPlanMutation } from "@/pages/graphs-detail/features/plans/queries";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import { ApiError } from "@/services/api/client";
-import type { TaskRunSummary } from "@/types/work";
 import {
 	Button,
 	Dialog,
@@ -62,7 +60,7 @@ export function PromoteDialog({
 		{ candidates: true, limit: 25 },
 		open,
 	);
-	const promote = usePromoteWorkflowMutation(username, graphSlug);
+	const promote = usePromoteTaskPlanMutation(username, graphSlug);
 
 	const items = candidates.data?.items ?? [];
 	const keyValid = KEY_PATTERN.test(key);

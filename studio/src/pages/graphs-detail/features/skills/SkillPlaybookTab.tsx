@@ -23,6 +23,7 @@
  * throw away a correction somebody made deliberately.
  */
 
+import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
 import {
 	useAnswerClarificationMutation,
 	useDiscardDraftMutation,
@@ -32,15 +33,14 @@ import {
 	useSaveDraftMutation,
 	useSkillDraftQuery,
 	useWriteDraftTasksMutation,
-} from "@/hooks/queries/useSkills";
-import { SkillPlaybookEditor } from "@/pages/graphs-detail/features/skills/SkillPlaybookEditor";
+} from "@/pages/graphs-detail/features/skills/queries";
 import type {
 	Skill,
 	SkillClarification,
 	SkillDrawRefusal,
-	SkillPlanNode,
-	SkillPlanRead,
-} from "@/types/skills";
+	SkillPlaybookNode,
+	SkillPlaybookRead,
+} from "@/pages/graphs-detail/features/skills/types";
 import { PanelSection } from "@/ui/PanelSection";
 import { Input, Label, Textarea } from "@invana/forms";
 import { Badge, Button, Spinner } from "@invana/ui";
@@ -59,8 +59,8 @@ function sentences(content: string): string[] {
  *  *ask which* qualifies *turn it into a query* rather than adding a step. */
 function stepFor(
 	sentence: string,
-	nodes: SkillPlanNode[],
-): SkillPlanNode | undefined {
+	nodes: SkillPlaybookNode[],
+): SkillPlaybookNode | undefined {
 	return nodes.find((n) => (n.source_span ?? "").includes(sentence));
 }
 
@@ -75,7 +75,7 @@ export function SkillPlaybookTab({
 	username: string;
 	graphSlug: string;
 	skill: Skill;
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	editing: boolean;
 	onEditing: (editing: boolean) => void;
 }) {
@@ -341,7 +341,7 @@ function Published({
 	onEdit,
 }: {
 	skill: Skill;
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	onEdit: () => void;
 }) {
 	const nodes = plan?.nodes ?? [];
@@ -597,7 +597,7 @@ function DrawnSteps({
 	plan,
 	drawing,
 }: {
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	drawing: boolean;
 }) {
 	if (drawing)

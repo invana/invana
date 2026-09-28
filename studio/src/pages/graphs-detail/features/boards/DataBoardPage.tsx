@@ -29,6 +29,7 @@
 import { SessionTutorialModal } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
 import { BoardFormDialog } from "@/pages/graphs-detail/features/boards/BoardFormDialog";
 import { BoardHistoryWidget } from "@/pages/graphs-detail/features/boards/BoardHistoryWidget";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
 import { ExpandNeighboursDialog } from "@/pages/graphs-detail/features/explorer";
 import type {
 	CanvasBackend,
@@ -41,9 +42,11 @@ import {
 	type StyleTypeInfo,
 	StylingPanel,
 } from "@/pages/graphs-detail/features/explorer";
+import type {
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@/pages/graphs-detail/features/explorer/types";
 import type { InteractionRef } from "@/services/telemetry/tracer";
-import type { CanvasStyling } from "@/types/board";
-import type { ExpandRequest, NeighborExpandResponse } from "@/types/traversal";
 import { RendererCapabilityBanner } from "@invana/canvas-ui";
 import type {
 	GraphCanvas as GraphCanvasEngine,

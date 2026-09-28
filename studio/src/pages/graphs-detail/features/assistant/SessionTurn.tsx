@@ -19,14 +19,17 @@ import {
 	ResultBlock,
 	loadableGraph,
 } from "@/pages/graphs-detail/features/assistant/answer-surface/ResultBlock";
-import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse } from "@/types/query";
-import { LIVE_THINKING_STATUSES, type RunNode } from "@/types/run";
 import {
 	type SessionContextTurn,
 	type SessionMessage,
 	isClarification,
-} from "@/types/session";
+} from "@/pages/graphs-detail/features/assistant/types";
+import {
+	LIVE_RUN_STATUSES,
+	type RunNode,
+} from "@/pages/graphs-detail/features/runs/types";
+import { useRunStore } from "@/stores/run.store";
+import type { QueryResponse } from "@/types/query";
 import {
 	ChatSessionActivityRow,
 	type ChatSessionActivityStatus,
@@ -139,7 +142,7 @@ export function AssistantTurn(props: AssistantTurnProps) {
 	const view = useRunStore((s) =>
 		message.runId ? s.views[message.runId] : undefined,
 	);
-	const live = !!view && LIVE_THINKING_STATUSES.has(view.status);
+	const live = !!view && LIVE_RUN_STATUSES.has(view.status);
 	if (message.status === "running" || live) {
 		return <RunningTurn {...props} />;
 	}

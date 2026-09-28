@@ -1,20 +1,23 @@
+import type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
 	useModelLinksQuery,
 	useModelsQuery,
 	useRemoveLinkMutation,
-} from "@/hooks/queries/useModels";
-import type { ModelSelection } from "@/pages/graphs-detail/features/models/model-editor/types";
+} from "@/pages/graphs-detail/features/models/queries";
 import {
 	stitchPair,
 	stitchRule,
 } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import { DeclareStitchDialog } from "@/pages/graphs-detail/features/models/stitch/components/DeclareStitchDialog";
 import { RemoveStitchDialog } from "@/pages/graphs-detail/features/models/stitch/components/RemoveStitchDialog";
+import type {
+	LinkKind,
+	ModelLink,
+} from "@/pages/graphs-detail/features/models/types";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import type { LinkKind, ModelLink } from "@/types/models";
 import { Button, type PanelStackSection } from "@invana/ui";
 import { Check, Link2, Plus, Trash2, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";

@@ -20,22 +20,22 @@
  * model row.
  */
 
-import { useLensesQuery } from "@/hooks/queries/useGovern";
-import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
-import { useAgentsQuery } from "@/hooks/queries/useWork";
 import {
 	type AgentFilters,
 	NO_AGENT_FILTERS,
 	agentsSection,
 	visibleAgents,
 } from "@/pages/graphs-detail/features/agents/AgentsSection";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import { llmsSection } from "@/pages/graphs-detail/features/llms/LlmsSection";
+import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import { useStackSectionUi } from "@/pages/graphs-detail/shared/StackSection";
 import {
 	type AgentsSectionKey,
 	useAgentsViewPanel,
 } from "@/pages/graphs-detail/shell/useAgentsViewPanel";
-import type { AgentEdge } from "@/types/work";
 import { PanelStack, type PanelStackHandle } from "@invana/ui";
 import { useEffect, useRef, useState } from "react";
 

@@ -17,6 +17,11 @@ import {
 	type WithStepTouch,
 	touchesOfStepKey,
 } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses/types";
+import type {
+	TraceRead,
+	TraceStepRead,
+} from "@/pages/graphs-detail/features/runs/api";
 import {
 	type TaskGroup,
 	VIEW_ACTION,
@@ -40,8 +45,6 @@ import {
 	toneOf,
 	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import type { TraceRead, TraceStepRead } from "@/services/api/runs";
-import type { TouchesResponse } from "@/types/govern";
 import type {
 	DashboardSpec,
 	PanelSpec,

@@ -21,7 +21,7 @@
  * unaffected* without borrowing a mark that means the opposite.
  */
 
-import type { ImpactResponse } from "@/types/govern";
+import type { ImpactResponse } from "@/pages/graphs-detail/features/lenses/types";
 import {
 	AlertDialog,
 	AlertDialogAction,

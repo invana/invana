@@ -14,10 +14,13 @@
  */
 
 import { hueSlotForName } from "@/canvases/model";
-import { useModelLinksQuery, useModelsQuery } from "@/hooks/queries/useModels";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
+import {
+	useModelLinksQuery,
+	useModelsQuery,
+} from "@/pages/graphs-detail/features/models/queries";
 import type { ModelFrame } from "@/pages/graphs-detail/features/models/stitch/allModels";
-import { modelsApi } from "@/services/api/models";
-import type { ModelLink } from "@/types/models";
+import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
 

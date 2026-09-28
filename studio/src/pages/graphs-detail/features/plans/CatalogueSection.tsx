@@ -9,13 +9,13 @@
 // never a second copy of the declaration (CA2). Read-only: nothing here adds,
 // edits or disables an entry (CA1).
 
-import { useCatalogueQuery } from "@/hooks/queries/useWork";
+import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans/queries";
+import type { CatalogueEntry } from "@/pages/graphs-detail/features/plans/types";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { CatalogueEntry } from "@/types/work";
 import {
 	BoundChip,
 	EmptyState,

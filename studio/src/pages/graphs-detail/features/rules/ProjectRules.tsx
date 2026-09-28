@@ -20,16 +20,16 @@
  */
 
 import {
+	RuleStatementForm,
+	RuleStatementRow,
+} from "@/pages/graphs-detail/features/rules/RuleParts";
+import {
 	useCreateProjectRuleMutation,
 	useProjectRulesQuery,
 	useSetRuleActiveMutation,
 	useUpdateRuleMutation,
-} from "@/hooks/queries/useSkills";
-import {
-	RuleStatementForm,
-	RuleStatementRow,
-} from "@/pages/graphs-detail/features/rules/RuleParts";
-import type { Rule } from "@/types/skills";
+} from "@/pages/graphs-detail/features/skills/queries";
+import type { Rule } from "@/pages/graphs-detail/features/skills/types";
 import { PanelSection } from "@/ui/PanelSection";
 import { Button, Spinner } from "@invana/ui";
 import { Plus } from "lucide-react";

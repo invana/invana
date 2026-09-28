@@ -8,10 +8,13 @@
  * ([US7](../../../../../../docs/for-developers/modules/skills/features/usage.md)).
  */
 
-import { useSkillUsageQuery, useSkillsQuery } from "@/hooks/queries/useSkills";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { SKILL_ACTIONS } from "@/pages/graphs-detail/features/skills/boards/shared";
 import { usageBoardSpec } from "@/pages/graphs-detail/features/skills/boards/usageBoardSpec";
+import {
+	useSkillUsageQuery,
+	useSkillsQuery,
+} from "@/pages/graphs-detail/features/skills/queries";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
 import { Dashboard } from "@invana/dashboard";

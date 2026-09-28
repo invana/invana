@@ -42,9 +42,9 @@
 import type {
 	InlinablePlan,
 	SkillDraftTaskWrite,
-	SkillPlanRead,
+	SkillPlaybookRead,
 	SkillStepChoice,
-} from "@/types/skills";
+} from "@/pages/graphs-detail/features/skills/types";
 import {
 	Input,
 	Select,
@@ -85,7 +85,7 @@ function uid(): string {
 	return `row-${seq}`;
 }
 
-function rowsOf(plan: SkillPlanRead): Row[] {
+function rowsOf(plan: SkillPlaybookRead): Row[] {
 	const tuned = new Map<string, Record<string, unknown>>(
 		plan.uses.map((u) => [`${u.key}@${u.version}`, u.args]),
 	);
@@ -157,7 +157,7 @@ export function SkillPlaybookEditor({
 	onSave,
 	onCancel,
 }: {
-	plan: SkillPlanRead;
+	plan: SkillPlaybookRead;
 	vocabulary: SkillStepChoice[];
 	inlinable: InlinablePlan[];
 	saving: boolean;

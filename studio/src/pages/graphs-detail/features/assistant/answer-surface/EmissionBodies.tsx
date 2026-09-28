@@ -22,7 +22,7 @@ import type {
 	ProseEmission,
 	SubgraphEmission,
 	TableEmission,
-} from "@/types/emission";
+} from "@/pages/graphs-detail/features/assistant/answer-surface/types";
 
 /** Rows of records — windowed, so a large result never bloats the thread. */
 export function TableEmissionBody({ emission }: { emission: TableEmission }) {

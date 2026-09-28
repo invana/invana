@@ -24,8 +24,8 @@
  * card it opens is drawn by `DeclaredBoard`, because a hook cannot draw.
  */
 
-import { boardReportsKey } from "@/hooks/queries/useBoardVersions";
-import { boardReportsApi } from "@/services/api/boardReports";
+import { boardReportsKey } from "@/pages/graphs-detail/features/boards/queries";
+import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import type { DashboardSpec, ExtraPanels } from "@invana/dashboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext } from "react";

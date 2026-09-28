@@ -13,17 +13,20 @@
  * bar against a made-up ceiling would both be claims the record cannot back.
  */
 
-import { type JournalRow, useRunsJournalQuery } from "@/hooks/queries/useRuns";
-import { useAgentsQuery } from "@/hooks/queries/useWork";
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
 import { usd } from "@/pages/graphs-detail/features/agents/agentDraft";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
 import {
 	elapsedOf,
 	shortRunId,
 } from "@/pages/graphs-detail/features/runs/RunsList";
+import {
+	type RunListRow,
+	useRunListQuery,
+} from "@/pages/graphs-detail/features/runs/queries";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
 import { useRunsViewPanel } from "@/pages/graphs-detail/shell/useRunsViewPanel";
 import { PanelSection } from "@/ui/PanelSection";
@@ -48,7 +51,7 @@ const LIVE = ["queued", "running", "awaiting_input", "awaiting_approval"];
 const WAITING = ["awaiting_input", "awaiting_approval"];
 
 /** How a run stands, in the engine's word and the tone that word carries. */
-function statusOf(row: JournalRow): { text: string; tone: string } {
+function statusOf(row: RunListRow): { text: string; tone: string } {
 	const t = row.run;
 	if (t.outcome === "cannot_answer")
 		return { text: "cannot_answer", tone: "text-warning" };
@@ -73,7 +76,7 @@ function startOfToday(): number {
 	return d.getTime();
 }
 
-function Tiles({ rows, now }: { rows: JournalRow[]; now: number }) {
+function Tiles({ rows, now }: { rows: RunListRow[]; now: number }) {
 	const inFlight = rows.filter((r) => LIVE.includes(r.status));
 	const waiting = inFlight.filter((r) => WAITING.includes(r.status)).length;
 
@@ -88,7 +91,7 @@ function Tiles({ rows, now }: { rows: JournalRow[]; now: number }) {
 	const priced = today.filter((r) => r.run.cost_usd != null);
 	const spent = priced.reduce((sum, r) => sum + (r.run.cost_usd ?? 0), 0);
 
-	let slowest: { row: JournalRow; ms: number } | null = null;
+	let slowest: { row: RunListRow; ms: number } | null = null;
 	for (const row of today) {
 		const ms = elapsedOf(row, now);
 		if (ms !== null && (!slowest || ms > slowest.ms)) slowest = { row, ms };
@@ -141,10 +144,10 @@ export interface RunsBoardPageProps {
 export function RunsBoardPage({ username, graphSlug }: RunsBoardPageProps) {
 	const { runId, openRun } = useRunsViewPanel();
 	const { filters, patch } = useRunsFilters();
-	const journal = useRunsJournalQuery(username, graphSlug, filters);
+	const journal = useRunListQuery(username, graphSlug, filters);
 	// The tiles read the whole fetched journal — the same query key, so no
 	// second request — while the table reads what the chips leave.
-	const all = useRunsJournalQuery(username, graphSlug);
+	const all = useRunListQuery(username, graphSlug);
 	const agentList = useAgentsQuery(username, graphSlug).data?.items ?? [];
 	const agentName = new Map(agentList.map((a) => [a.id, a.name]));
 	// A running row's elapsed moves; the ticker keeps it honest.

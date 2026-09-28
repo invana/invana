@@ -1,5 +1,8 @@
-import { explorerApi } from "@/services/api/explorer";
-import type { ExpandRequest, NeighborExpandResponse } from "@/types/traversal";
+import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
+import type {
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@/pages/graphs-detail/features/explorer/types";
 import { useMutation } from "@tanstack/react-query";
 
 /**

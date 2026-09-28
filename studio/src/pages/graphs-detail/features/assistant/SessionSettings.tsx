@@ -11,7 +11,7 @@
  * Empty is *the agent's cap*.
  */
 
-import type { Session } from "@/types/session";
+import type { Session } from "@/pages/graphs-detail/features/assistant/types";
 import { Input } from "@invana/forms";
 import {
 	Button,

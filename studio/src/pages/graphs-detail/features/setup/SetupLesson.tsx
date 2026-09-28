@@ -1,17 +1,17 @@
-import { useSetupSectionMutation } from "@/hooks/queries/useGraphs";
-import {
-	SETUP_GATE_META,
-	SETUP_STEP_BY_KEY,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	type Graph,
 	SETUP_REQUIRED,
 	SETUP_SKIPPABLE,
 	type SetupSection,
 	setupSectionStatus,
-} from "@/types/graphs";
+} from "@/pages/graphs-detail/features/graphs/types";
+import {
+	SETUP_GATE_META,
+	SETUP_STEP_BY_KEY,
+	setupCommand,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Button,
 	ButtonGroup,

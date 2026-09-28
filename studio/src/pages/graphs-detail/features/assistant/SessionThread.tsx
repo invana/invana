@@ -4,14 +4,14 @@ import {
 	AssistantTurn,
 	PromptTurn,
 } from "@/pages/graphs-detail/features/assistant/SessionTurn";
-import { useRunStore } from "@/stores/run.store";
-import type { QueryResponse } from "@/types/query";
 import {
 	type Session,
 	type SessionContextTurn,
 	type SessionMessage,
 	isClarification,
-} from "@/types/session";
+} from "@/pages/graphs-detail/features/assistant/types";
+import { useRunStore } from "@/stores/run.store";
+import type { QueryResponse } from "@/types/query";
 import { ChatSession } from "@invana/ui";
 import { useMemo } from "react";
 

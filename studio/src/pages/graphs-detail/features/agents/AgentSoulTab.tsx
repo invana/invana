@@ -9,14 +9,17 @@
  * tab says so.
  */
 
-import { useSoulPreviewMutation } from "@/hooks/queries/useWork";
 import { formatRelativeTime } from "@/lib/time";
 import {
 	type AgentDraft,
 	DEFAULT_VOICE,
 	DIALS,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Agent, SoulTraits } from "@/types/work";
+import { useSoulPreviewMutation } from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	SoulTraits,
+} from "@/pages/graphs-detail/features/agents/types";
 import { PanelSection } from "@/ui/PanelSection";
 import { MarkdownEditorBlock } from "@invana/editor";
 import { Input } from "@invana/forms";

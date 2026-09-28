@@ -3,31 +3,12 @@ import {
 	LayeredCanvasStatus,
 	type LayeredCanvasTarget,
 } from "@/canvases/layered/LayeredCanvasChrome";
-import { useCreateCanvasStateMutation } from "@/hooks/queries/useBoardVersions";
-import {
-	useBoardsQuery,
-	useCreateCanvasMutation,
-	useUpdateCanvasMutation,
-} from "@/hooks/queries/useBoards";
-import { useLensesQuery } from "@/hooks/queries/useGovern";
-import {
-	useGraphConnectionQuery,
-	useGraphQuery,
-} from "@/hooks/queries/useGraphs";
-import { useLLMProvidersQuery } from "@/hooks/queries/useLLMProviders";
-import { useModelsQuery } from "@/hooks/queries/useModels";
-import { useActiveVersionQuery } from "@/hooks/queries/useSchema";
-import { useSkillsQuery } from "@/hooks/queries/useSkills";
-import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
-import {
-	useAgentsQuery,
-	useTaskMutations,
-	useWorkflowsQuery,
-} from "@/hooks/queries/useWork";
 import { AgentBoardPage } from "@/pages/graphs-detail/features/agents/AgentBoardPage";
 import { AgentsViewPanel } from "@/pages/graphs-detail/features/agents/AgentsViewPanel";
 import { EnvelopeCanvas } from "@/pages/graphs-detail/features/agents/EnvelopeCanvas";
 import { LineageCanvas } from "@/pages/graphs-detail/features/agents/LineageCanvas";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
 import { AssistantViewPanel } from "@/pages/graphs-detail/features/assistant/AssistantViewPanel";
 import { attachmentFor } from "@/pages/graphs-detail/features/assistant/SessionComposer";
 import {
@@ -35,6 +16,8 @@ import {
 	markSessionTutorialSeen,
 } from "@/pages/graphs-detail/features/assistant/SessionTutorialModal";
 import { WorldPicker } from "@/pages/graphs-detail/features/assistant/WorldPicker";
+import { sessionsApi } from "@/pages/graphs-detail/features/assistant/api";
+import type { SessionMessage } from "@/pages/graphs-detail/features/assistant/types";
 import { useSessions } from "@/pages/graphs-detail/features/assistant/useSessions";
 import {
 	BOARD_KINDS,
@@ -61,6 +44,19 @@ import {
 	type BoardPageHandle,
 	DataBoardPage,
 } from "@/pages/graphs-detail/features/boards";
+import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
+import { useCreateCanvasStateMutation } from "@/pages/graphs-detail/features/boards/queries";
+import {
+	useBoardsQuery,
+	useCreateCanvasMutation,
+	useUpdateCanvasMutation,
+} from "@/pages/graphs-detail/features/boards/queries";
+import type {
+	Board,
+	BoardVersionCause,
+	CanvasStyling,
+} from "@/pages/graphs-detail/features/boards/types";
+import { boardVersionsApi } from "@/pages/graphs-detail/features/boards/versionsApi";
 import { ExplorerViewPanel } from "@/pages/graphs-detail/features/explorer";
 import {
 	ACTIVE_LAYOUT_ID,
@@ -71,31 +67,55 @@ import {
 import { InspectorViewPanel } from "@/pages/graphs-detail/features/explorer";
 import type { StyleTypeInfo } from "@/pages/graphs-detail/features/explorer";
 import { useExpandNode } from "@/pages/graphs-detail/features/explorer";
+import { explorerApi } from "@/pages/graphs-detail/features/explorer/api";
+import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
+import type {
+	ExpandRequest,
+	NeighborExpandResponse,
+} from "@/pages/graphs-detail/features/explorer/types";
+import {
+	useGraphConnectionQuery,
+	useGraphQuery,
+} from "@/pages/graphs-detail/features/graphs/queries";
+import {
+	type QueryLanguage,
+	hasOutstandingSetup,
+	isGateOpen,
+} from "@/pages/graphs-detail/features/graphs/types";
 import {
 	CompareBoardPage,
 	LensBoardPage,
 	LensesViewPanel,
 	parseComparePair,
 } from "@/pages/graphs-detail/features/lenses";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
+import { useLLMProvidersQuery } from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type ModelSelection,
 	ModelViewPanel,
 	ModelsPage,
 	useModelsView,
 } from "@/pages/graphs-detail/features/models";
+import { useModelsQuery } from "@/pages/graphs-detail/features/models/queries";
+import { useActiveVersionQuery } from "@/pages/graphs-detail/features/models/queries";
 import { LibraryViewPanel } from "@/pages/graphs-detail/features/plans/LibraryViewPanel";
 import { PlanFlowCanvas } from "@/pages/graphs-detail/features/plans/PlanFlowCanvas";
+import { taskPlansApi } from "@/pages/graphs-detail/features/plans/api";
 import { PlanBoardPage } from "@/pages/graphs-detail/features/plans/boards/PlanBoardPage";
 import {
 	PlanArgumentsPage,
 	PlanExportPage,
 	PlanVersionsPage,
 } from "@/pages/graphs-detail/features/plans/boards/PlanRecordPages";
+import { useTaskPlansQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { PlanCanvas } from "@/pages/graphs-detail/features/projects/PlanCanvas";
 import { ProjectsViewPanel } from "@/pages/graphs-detail/features/projects/ProjectsViewPanel";
+import { useTodoMutations } from "@/pages/graphs-detail/features/projects/queries";
 import { runAddress } from "@/pages/graphs-detail/features/runs/RunDetail";
 import { RunsBoardPage } from "@/pages/graphs-detail/features/runs/RunsBoardPage";
 import { RunsViewPanel } from "@/pages/graphs-detail/features/runs/RunsViewPanel";
+import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import {
 	RunBoardPage,
 	useRunStep,
@@ -108,6 +128,7 @@ import {
 	RuleBoardPage,
 	UsageBoardPage,
 } from "@/pages/graphs-detail/features/skills/boards";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
 import { GraphDetail } from "@/pages/graphs-detail/shell/GraphDetail";
 import { GraphHomePage } from "@/pages/graphs-detail/shell/GraphHomePage";
 import { useBoardPage } from "@/pages/graphs-detail/shell/useBoardPage";
@@ -119,34 +140,18 @@ import {
 	type RightSectionKey,
 	useRightSection,
 } from "@/pages/graphs-detail/shell/useRightSection";
-import { boardVersionsApi } from "@/services/api/boardVersions";
-import { boardsApi } from "@/services/api/boards";
 import { ApiError } from "@/services/api/client";
-import { explorerApi } from "@/services/api/explorer";
-import { runsApi } from "@/services/api/runs";
-import { sessionsApi } from "@/services/api/sessions";
-import { workflowsApi } from "@/services/api/work";
 import { reportBoundaryError } from "@/services/telemetry/errors";
 import {
 	type Interaction,
 	measureSync,
 	startAction,
 } from "@/services/telemetry/tracer";
-import type { Board, BoardVersionCause, CanvasStyling } from "@/types/board";
-import type { LensKind } from "@/types/govern";
-import {
-	type QueryLanguage,
-	hasOutstandingSetup,
-	isGateOpen,
-} from "@/types/graphs";
 import type {
 	QueryResponse,
 	QueryResultItem,
 	QueryRunPayload,
 } from "@/types/query";
-import type { SessionMessage } from "@/types/session";
-import type { ExpandRequest, NeighborExpandResponse } from "@/types/traversal";
-import type { AgentEdge } from "@/types/work";
 import type { CanvasStateSnapshot } from "@invana/canvas";
 import { CanvasContext, canUseWebGPU } from "@invana/canvas-react";
 import {
@@ -369,7 +374,7 @@ export function GraphDetailPage() {
 	// And the plan page for a library plan (LB24): keyed by `task_plans.id`,
 	// titled `key@version`, and opened from the section by key — the newest
 	// version, which is the one the section reads.
-	const planLibrary = useWorkflowsQuery(username, graphSlug);
+	const planLibrary = useTaskPlansQuery(username, graphSlug);
 	const planRefById = useMemo(
 		() =>
 			new Map(
@@ -655,7 +660,7 @@ export function GraphDetailPage() {
 	// A dependency that would close a loop comes back as a 422 naming it; the
 	// canvas shows that rather than drawing anything (docs/for-developers/modules/work/spec.mda).
 	const [planError, setPlanError] = useState<string | null>(null);
-	const taskMutations = useTaskMutations(username ?? "", graphSlug ?? "");
+	const taskMutations = useTodoMutations(username ?? "", graphSlug ?? "");
 
 	const openWorkPanel = useCallback(
 		(section: "projects" | "runs" | "library" | "agents" | "skills") => {
@@ -2366,7 +2371,7 @@ export function GraphDetailPage() {
 					openBoard({ kind: "run", subjectId: runId, runId, stepId })
 				}
 				// The journal drawn wide, beside the list (SR70).
-				onOpenJournal={() =>
+				onOpenRunsBoard={() =>
 					openBoard({ kind: "runs", subjectId: graphSlug as string })
 				}
 				// The run stays in the section; the plan it ran is drawn beside it.
@@ -2388,7 +2393,7 @@ export function GraphDetailPage() {
 					openAgentPage(id);
 				}}
 				planExportUrl={(key) =>
-					workflowsApi.exportUrl(username as string, graphSlug as string, key)
+					taskPlansApi.exportUrl(username as string, graphSlug as string, key)
 				}
 			/>
 		) : settingsPanel.section === "skills" ? (

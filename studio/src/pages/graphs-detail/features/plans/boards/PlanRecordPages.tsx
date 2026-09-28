@@ -7,19 +7,19 @@
  */
 
 import {
-	usePlanDiffsQuery,
-	usePlanExportQuery,
-	usePlanVersionQuery,
-	useWorkflowsQuery,
-} from "@/hooks/queries/useWork";
-import {
 	RECORD_ACTIONS,
 	planArgumentsSpec,
 	planExportSpec,
 	planVersionsSpec,
 } from "@/pages/graphs-detail/features/plans/boards/planRecordSpecs";
+import {
+	usePlanDiffsQuery,
+	usePlanExportQuery,
+	usePlanVersionQuery,
+	useTaskPlansQuery,
+} from "@/pages/graphs-detail/features/plans/queries";
+import type { TaskPlanSummary } from "@/pages/graphs-detail/features/plans/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
-import type { TaskPlanSummary } from "@/types/work";
 import { Dashboard, type DashboardSpec } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { type ReactNode, useMemo, useState } from "react";
@@ -35,7 +35,7 @@ interface RecordPageProps {
 
 /** The version the board names, and every version of its key. */
 function usePlanRecord(username: string, graphSlug: string, planId: string) {
-	const library = useWorkflowsQuery(username, graphSlug);
+	const library = useTaskPlansQuery(username, graphSlug);
 	const plan = library.data?.items.find((p) => p.id === planId);
 	const versions = useMemo(
 		() => (library.data?.items ?? []).filter((p) => plan && p.key === plan.key),

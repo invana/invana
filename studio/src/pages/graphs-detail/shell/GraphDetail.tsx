@@ -1,7 +1,7 @@
 import { AppVersion } from "@/components/AppVersion";
 import { useAppHeader } from "@/components/header/useAppHeader";
-import { useGraphConnectionQuery } from "@/hooks/queries/useGraphs";
 import { SettingsViewPanel } from "@/pages/graphs-detail/features/graphs/SettingsViewPanel";
+import { useGraphConnectionQuery } from "@/pages/graphs-detail/features/graphs/queries";
 import { ConnectionStatusBar } from "@/pages/graphs-detail/shell/ConnectionStatusBar";
 import { useGraphLeftNav } from "@/pages/graphs-detail/shell/useGraphLeftNav";
 import {

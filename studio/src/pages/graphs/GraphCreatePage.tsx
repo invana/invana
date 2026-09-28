@@ -1,5 +1,5 @@
 import { FormError } from "@/components/forms/FormError";
-import { useCreateGraphMutation } from "@/hooks/queries/useGraphs";
+import { useCreateGraphMutation } from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	type Control,
 	type FieldConfig,

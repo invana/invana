@@ -1,6 +1,6 @@
 import { FormError } from "@/components/forms/FormError";
-import { CONNECTOR_OPTIONS } from "@/types/graphs";
-import type { GraphConnectionCreate } from "@/types/graphs";
+import { CONNECTOR_OPTIONS } from "@/pages/graphs-detail/features/graphs/types";
+import type { GraphConnectionCreate } from "@/pages/graphs-detail/features/graphs/types";
 import {
 	type Control,
 	type FieldConfig,

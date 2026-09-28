@@ -1,11 +1,11 @@
-import type { QueryLanguage } from "@/types/graphs";
-import type { LLMProvider } from "@/types/llm";
+import type { Session } from "@/pages/graphs-detail/features/assistant/types";
+import type { QueryLanguage } from "@/pages/graphs-detail/features/graphs/types";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
 import type {
 	QueryMode,
 	QueryResultItem,
 	QueryRunPayload,
 } from "@/types/query";
-import type { Session } from "@/types/session";
 import { defaultKeymap, insertNewlineAndIndent } from "@codemirror/commands";
 import { StreamLanguage } from "@codemirror/language";
 import { cypher } from "@codemirror/legacy-modes/mode/cypher";

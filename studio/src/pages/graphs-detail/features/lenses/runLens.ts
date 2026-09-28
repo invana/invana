@@ -32,7 +32,10 @@
  */
 
 import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
-import type { Touch, TouchesResponse } from "@/types/govern";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
 	LensOptions,

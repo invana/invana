@@ -1,4 +1,4 @@
-import type { SessionContextTurn } from "@/types/session";
+import type { SessionContextTurn } from "@/pages/graphs-detail/features/assistant/types";
 import { Button, ChatSessionDisclosure } from "@invana/ui";
 import { Copy } from "lucide-react";
 import { useEffect, useState } from "react";

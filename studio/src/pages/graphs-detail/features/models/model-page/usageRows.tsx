@@ -8,7 +8,10 @@
  */
 
 import { formatRelativeTime } from "@/lib/time";
-import type { Usage, UsageRow } from "@/types/models";
+import type {
+	Usage,
+	UsageRow,
+} from "@/pages/graphs-detail/features/models/types";
 import { InlineMeter, SegmentedBar, SegmentedBarLegend } from "@invana/charts";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";

@@ -1,3 +1,9 @@
+import {
+	type Graph,
+	SETUP_SKIPPABLE,
+	type SetupSection,
+	setupSectionStatus,
+} from "@/pages/graphs-detail/features/graphs/types";
 import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
 import {
 	SETUP_GATE_META,
@@ -7,12 +13,6 @@ import {
 	type SetupStepKey,
 	WHAT_NEXT_KEY,
 } from "@/pages/graphs-detail/features/setup/useSetupStep";
-import {
-	type Graph,
-	SETUP_SKIPPABLE,
-	type SetupSection,
-	setupSectionStatus,
-} from "@/types/graphs";
 import { Eyebrow, cn } from "@invana/ui";
 
 /**

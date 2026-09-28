@@ -15,14 +15,17 @@
 import { formatCompact } from "@/lib/format";
 import { formatElapsed } from "@/lib/time";
 import { BANDS } from "@/pages/graphs-detail/features/lenses/runLayers";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
+import type { TraceRead } from "@/pages/graphs-detail/features/runs/api";
 import {
 	durationMs,
 	originOf,
 	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import type { TraceRead } from "@/services/api/runs";
 import type { TraceWindow } from "@/services/telemetry/traceLink";
-import type { Touch, TouchesResponse } from "@/types/govern";
 import type { TouchItem } from "@invana/ui";
 
 export interface SummaryRow {

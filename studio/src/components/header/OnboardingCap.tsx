@@ -1,6 +1,6 @@
-import { useGraphQuery } from "@/hooks/queries/useGraphs";
+import { useGraphQuery } from "@/pages/graphs-detail/features/graphs/queries";
+import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs/types";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { hasOutstandingSetup } from "@/types/graphs";
 import { ButtonWithTooltip, cn } from "@invana/ui";
 import { GraduationCap } from "lucide-react";
 

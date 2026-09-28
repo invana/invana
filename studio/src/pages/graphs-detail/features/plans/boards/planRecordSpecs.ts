@@ -7,12 +7,12 @@
  * so none carries a window switch or `Save report`.
  */
 
-import type { PlanArg } from "@/types/skills";
 import type {
 	PlanVersionDiff,
 	TaskPlanCaller,
 	TaskPlanSummary,
-} from "@/types/work";
+} from "@/pages/graphs-detail/features/plans/types";
+import type { PlanArg } from "@/pages/graphs-detail/features/skills/types";
 import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 export const RECORD_ACTIONS = {

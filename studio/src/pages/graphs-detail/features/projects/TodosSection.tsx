@@ -18,21 +18,24 @@
  * purpose: a step row must mean one thing in Studio, not two.
  */
 
-import {
-	useAgentsQuery,
-	useRunsQuery,
-	useTaskActivityQuery,
-	useTaskMutations,
-	useTaskQuery,
-	useTaskThinkingsQuery,
-	useTasksQuery,
-} from "@/hooks/queries/useWork";
 import { formatDuration } from "@/lib/time";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 import {
 	StepList,
 	totalDuration,
 } from "@/pages/graphs-detail/features/assistant/SessionSteps";
 import { TodoActivityTree } from "@/pages/graphs-detail/features/projects/TodoActivityTree";
+import {
+	useTodoActivityQuery,
+	useTodoMutations,
+	useTodoQuery,
+	useTodoRunsQuery,
+	useTodosQuery,
+} from "@/pages/graphs-detail/features/projects/queries";
+import type { Todo } from "@/pages/graphs-detail/features/projects/types";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
+import type { RunNode } from "@/pages/graphs-detail/features/runs/types";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -41,8 +44,6 @@ import {
 } from "@/pages/graphs-detail/shared/DetailRows";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
-import type { RunNode } from "@/types/run";
-import type { Task, TaskRunSummary } from "@/types/work";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PrincipalChip } from "@/ui/PrincipalChip";
@@ -128,11 +129,11 @@ export function TodosSectionBody({
 	const [statusFilter, setStatusFilter] = useState("");
 	const [assigneeFilter, setAssigneeFilter] = useState("");
 
-	const list = useTasksQuery(username, graphSlug, {
+	const list = useTodosQuery(username, graphSlug, {
 		project: projectKey ?? undefined,
 	});
-	const detail = useTaskQuery(username, graphSlug, selectedTaskId ?? undefined);
-	const mutations = useTaskMutations(username, graphSlug);
+	const detail = useTodoQuery(username, graphSlug, selectedTaskId ?? undefined);
+	const mutations = useTodoMutations(username, graphSlug);
 	const agents = useAgentsQuery(username, graphSlug);
 	// Where each task's run has got to, for the row subline. One list, indexed.
 	const runs = useRunsQuery(username, graphSlug, { limit: 200 });
@@ -332,20 +333,20 @@ function TaskDetail({
 }: {
 	username: string;
 	graphSlug: string;
-	task: Task;
+	task: Todo;
 	agents: { id: string; name: string; status: string }[];
 	onBack: () => void;
 	onOpenAgent?: (id: string) => void;
 	onOpenRule?: (ruleId: string) => void;
-	mutations: ReturnType<typeof useTaskMutations>;
+	mutations: ReturnType<typeof useTodoMutations>;
 }) {
 	const [tab, setTab] = useState<TaskTab>("work");
 	const [note, setNote] = useState("");
 	const [rejecting, setRejecting] = useState(false);
 	const [reassigning, setReassigning] = useState(false);
 
-	const activity = useTaskActivityQuery(username, graphSlug, task.id);
-	const runs = useTaskThinkingsQuery(username, graphSlug, task.run_ids);
+	const activity = useTodoActivityQuery(username, graphSlug, task.id);
+	const runs = useTodoRunsQuery(username, graphSlug, task.run_ids);
 
 	const stepCount = useMemo(
 		() =>
@@ -728,7 +729,7 @@ function TodoRunsBlock({
  * lifted into a tile — a reviewer checks the figure first and reads the
  * sentence second, and a paragraph makes them hunt.
  */
-function ResultBlock({ task }: { task: Task }) {
+function ResultBlock({ task }: { task: Todo }) {
 	const emitted = task.result?.emitted ?? [];
 	const kinds = [...new Set(emitted.map((e) => e.kind))];
 	return (

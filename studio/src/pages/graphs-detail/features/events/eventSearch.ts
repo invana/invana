@@ -4,7 +4,7 @@
  * a reader would scan for: action, actor, target, and the payload JSON.
  */
 
-import type { AuditEvent } from "@/types/events";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
 
 export function matchesEventSearch(event: AuditEvent, query: string): boolean {
 	const q = query.trim().toLowerCase();

@@ -17,18 +17,18 @@
  * it returns is the **physical mirror**, never the model (introspect-a-database.md ID2).
  */
 
+import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 	usePutGraphConnectionMutation,
-} from "@/hooks/queries/useGraphs";
-import { GraphForm } from "@/pages/graphs/GraphForm";
-import { graphsApi } from "@/services/api/graphs";
+} from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	CONNECTOR_OPTIONS,
 	type GraphConnectionCreate,
 	type GraphConnectionRead,
-} from "@/types/graphs";
+} from "@/pages/graphs-detail/features/graphs/types";
+import { GraphForm } from "@/pages/graphs/GraphForm";
 import { Badge, Button, Skeleton } from "@invana/ui";
 import { Pencil, Sparkles } from "lucide-react";
 import { useState } from "react";

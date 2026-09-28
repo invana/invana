@@ -8,20 +8,24 @@
  * reader's own (AG31 · AG32).
  */
 
-import {
-	useAgentLineageQuery,
-	useAgentMetersQuery,
-	useAgentSessionsQuery,
-	useRunsQuery,
-} from "@/hooks/queries/useWork";
 import { formatRelativeTime } from "@/lib/time";
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import {
 	type AgentDraft,
 	usd,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
+import {
+	useAgentLineageQuery,
+	useAgentMetersQuery,
+	useAgentSessionsQuery,
+} from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	AgentMeters,
+} from "@/pages/graphs-detail/features/agents/types";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import type { Agent, AgentMeters, TaskRunSummary } from "@/types/work";
 import { PanelSection } from "@/ui/PanelSection";
 import {
 	Button,

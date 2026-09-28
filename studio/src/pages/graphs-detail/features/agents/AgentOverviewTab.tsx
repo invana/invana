@@ -5,11 +5,6 @@
  * drawn, stacking below 760px (AG38).
  */
 
-import { useLensesQuery } from "@/hooks/queries/useGovern";
-import {
-	useAgentMetersQuery,
-	useAgentSkillsAndCallablesQuery,
-} from "@/hooks/queries/useWork";
 import type { AgentTab } from "@/pages/graphs-detail/features/agents/AgentDetail";
 import {
 	type AgentDraft,
@@ -17,7 +12,12 @@ import {
 	usd,
 	voiceSummary,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Agent } from "@/types/work";
+import {
+	useAgentMetersQuery,
+	useAgentSkillsAndCallablesQuery,
+} from "@/pages/graphs-detail/features/agents/queries";
+import type { Agent } from "@/pages/graphs-detail/features/agents/types";
+import { useLensesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import { PanelSection } from "@/ui/PanelSection";
 import { Switch } from "@invana/forms";
 import { Button, Progress, PropertyList, PropertyRow } from "@invana/ui";

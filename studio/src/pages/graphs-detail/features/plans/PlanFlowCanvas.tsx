@@ -13,7 +13,7 @@ import {
 	taskFlowSettings,
 	taskFlowTemplates,
 } from "@/canvases/taskflow";
-import { useWorkflowQuery } from "@/hooks/queries/useWork";
+import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans/queries";
 import { taskFlowFromTaskPlan } from "@/pages/graphs-detail/features/plans/taskFlowFromTaskPlan";
 import { EmptyState, Spinner } from "@invana/ui";
 import { Workflow } from "lucide-react";
@@ -32,7 +32,7 @@ export function PlanFlowCanvas({
 	selectedStepId: string | null;
 	onSelectStep: (id: string | null) => void;
 }) {
-	const workflow = useWorkflowQuery(username, graphSlug, workflowKey);
+	const workflow = useTaskPlanQuery(username, graphSlug, workflowKey);
 	const data = useMemo(
 		() => (workflow.data ? taskFlowFromTaskPlan(workflow.data) : null),
 		[workflow.data],

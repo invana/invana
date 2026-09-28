@@ -23,7 +23,7 @@ import { FormError } from "@/components/forms/FormError";
 import {
 	useCreateLLMProviderMutation,
 	useUpdateLLMProviderMutation,
-} from "@/hooks/queries/useLLMProviders";
+} from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type LLMCredentialKind,
 	type LLMProvider,
@@ -31,7 +31,7 @@ import {
 	LLM_PROVIDER_OPTIONS,
 	PROVIDER_NAME_PATTERN,
 	suggestProviderName,
-} from "@/types/llm";
+} from "@/pages/graphs-detail/features/llms/types";
 import {
 	Input,
 	Label,

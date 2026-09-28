@@ -21,6 +21,11 @@ import {
 	lensSummary,
 	runLensOptions,
 } from "@/pages/graphs-detail/features/lenses/runLens";
+import type { TouchesResponse } from "@/pages/graphs-detail/features/lenses/types";
+import type {
+	TraceRead,
+	TraceStepRead,
+} from "@/pages/graphs-detail/features/runs/api";
 import { taskFlowFromRun } from "@/pages/graphs-detail/features/runs/boards/taskFlowFromRun";
 import { runSummary } from "@/pages/graphs-detail/features/runs/runSummary";
 import type { WithFlow } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
@@ -47,8 +52,6 @@ import {
 	toneOf,
 	usd,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import type { TraceRead, TraceStepRead } from "@/services/api/runs";
-import type { TouchesResponse } from "@/types/govern";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
 	DashboardSpec,

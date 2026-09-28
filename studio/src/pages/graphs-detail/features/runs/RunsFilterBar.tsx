@@ -7,7 +7,10 @@
  * it was narrowed while it scrolls — a funnel alone would hide that.
  */
 
-import type { RunsFilters, RunsSince } from "@/hooks/queries/useRuns";
+import type {
+	RunsFilters,
+	RunsSince,
+} from "@/pages/graphs-detail/features/runs/queries";
 import {
 	DropdownMenu,
 	DropdownMenuContent,

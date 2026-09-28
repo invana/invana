@@ -1,22 +1,28 @@
 import { asCastRefusal } from "@/pages/graphs-detail/features/assistant/CastRefusal";
 import {
-	type ThinkingStreamHandle,
-	messageFromFrame,
-	runsApi,
-} from "@/services/api/runs";
-import {
 	type RecordOperationBody,
 	type SendMessageBody,
 	type SessionSort,
 	type SessionUpdateBody,
 	sessionsApi,
-} from "@/services/api/sessions";
+} from "@/pages/graphs-detail/features/assistant/api";
+import type {
+	Session,
+	SessionMessage,
+} from "@/pages/graphs-detail/features/assistant/types";
+import {
+	type RunStreamHandle,
+	messageFromFrame,
+	runsApi,
+} from "@/pages/graphs-detail/features/runs/api";
+import {
+	type AskFrame,
+	LIVE_RUN_STATUSES,
+} from "@/pages/graphs-detail/features/runs/types";
 import { type Action, startAction } from "@/services/telemetry/tracer";
 import { useAuthStore } from "@/stores/auth.store";
 import { useRunStore } from "@/stores/run.store";
 import type { QueryResponse, QueryRunPayload } from "@/types/query";
-import { type AskFrame, LIVE_THINKING_STATUSES } from "@/types/run";
-import type { Session, SessionMessage } from "@/types/session";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -95,7 +101,7 @@ export interface UseSessionsOptions {
 		result: QueryResponse;
 	}) => void;
 	/** A run reached a terminal state (done / cancelled / needs input). */
-	onThinkingSettled?: (info: {
+	onRunSettled?: (info: {
 		sessionId: string;
 		messageId: string;
 		runId: string;
@@ -179,7 +185,7 @@ export function useSessions(
 	// One EventSource per live run, keyed by run id. Opened on send /
 	// rerun and for any running reply the thread loads (reload mid-run, UC12);
 	// closed on a terminal frame. Emissions fold into the run store.
-	const streams = useRef<Map<string, ThinkingStreamHandle>>(new Map());
+	const streams = useRef<Map<string, RunStreamHandle>>(new Map());
 	const seed = useRunStore((s) => s.seed);
 	const applyFrame = useRunStore((s) => s.apply);
 	const views = useRunStore((s) => s.views);
@@ -211,7 +217,7 @@ export function useSessions(
 				streams.current.delete(runId);
 				qc.invalidateQueries({ queryKey: detailKey(sessionId) });
 				qc.invalidateQueries({ queryKey: listPrefix });
-				optsRef.current?.onThinkingSettled?.({
+				optsRef.current?.onRunSettled?.({
 					sessionId,
 					messageId,
 					runId,
@@ -300,8 +306,7 @@ export function useSessions(
 		return (
 			Object.values(views).find(
 				(v) =>
-					v.sessionId === activeSessionId &&
-					LIVE_THINKING_STATUSES.has(v.status),
+					v.sessionId === activeSessionId && LIVE_RUN_STATUSES.has(v.status),
 			) ?? null
 		);
 	}, [views, activeSessionId]);

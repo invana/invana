@@ -1,3 +1,4 @@
+import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
 import {
 	LEGACY_PANEL_PARAM,
 	PANEL_PARAM,
@@ -8,7 +9,6 @@ import {
 	SECTION_PARAM,
 	useStackSections,
 } from "@/pages/graphs-detail/shell/useStackSections";
-import type { LensKind } from "@/types/govern";
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 

@@ -31,10 +31,17 @@ import {
 	useProjectMutations,
 	useProjectPlanQuery,
 	useProjectsQuery,
-	useRunsQuery,
-	useTasksQuery,
-} from "@/hooks/queries/useWork";
+	useTodosQuery,
+} from "@/pages/graphs-detail/features/projects/queries";
+import type {
+	PlanTodo,
+	Project,
+	ProjectUpdate,
+	Todo,
+} from "@/pages/graphs-detail/features/projects/types";
 import { ProjectRules } from "@/pages/graphs-detail/features/rules/ProjectRules";
+import { useRunsQuery } from "@/pages/graphs-detail/features/runs/queries";
+import type { TaskRunSummary } from "@/pages/graphs-detail/features/runs/types";
 import {
 	DetailBlock,
 	DetailPlaceholder,
@@ -44,13 +51,6 @@ import {
 import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { humanStatus, taskTone } from "@/pages/graphs-detail/shared/statusTone";
-import type {
-	PlanTask,
-	Project,
-	ProjectUpdate,
-	Task,
-	TaskRunSummary,
-} from "@/types/work";
 import { FilterSelect } from "@/ui/FilterSelect";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { PrincipalChip } from "@/ui/PrincipalChip";
@@ -139,7 +139,7 @@ export function ProjectsSectionBody({
 	);
 	// The Tasks tab needs the full task rows — assignee kind, sub-tasks, the
 	// blocked reason — which the plan projection deliberately drops.
-	const tasks = useTasksQuery(username, graphSlug, {
+	const tasks = useTodosQuery(username, graphSlug, {
 		project: selectedProjectKey ?? undefined,
 		enabled: selectedProjectKey !== null,
 	});
@@ -316,15 +316,15 @@ function ProjectDetail({
 	project: Project;
 	plan:
 		| {
-				tasks: PlanTask[];
+				tasks: PlanTodo[];
 				critical_path: string[];
 				edges?: { source: string; target: string }[];
 		  }
 		| undefined;
-	tasks: Task[];
+	tasks: Todo[];
 	isLoading: boolean;
 	selectedTaskId: string | null;
-	planTask: PlanTask | null;
+	planTask: PlanTodo | null;
 	runByTask: Map<string, TaskRunSummary>;
 	onSelectTask: (id: string | null) => void;
 	onOpenTask?: (id: string) => void;
@@ -941,8 +941,8 @@ function ProjectDetailsTab({
  * worse than no bar.
  */
 function taskProgress(
-	full: Task | undefined,
-	task: PlanTask,
+	full: Todo | undefined,
+	task: PlanTodo,
 	run: TaskRunSummary | undefined,
 ): string {
 	const bits: string[] = [];
@@ -975,7 +975,7 @@ function taskProgress(
  * Naming the wave instead ("after wave 1") answers neither: it tells you the
  * column the card is in, which you can already see.
  */
-function subline(task: PlanTask, byId: Map<string, PlanTask>): string {
+function subline(task: PlanTodo, byId: Map<string, PlanTodo>): string {
 	const bits: string[] = [];
 	if (task.assignee_name) bits.push(task.assignee_name);
 	if (task.due_at)
@@ -985,7 +985,7 @@ function subline(task: PlanTask, byId: Map<string, PlanTask>): string {
 
 	const deps = task.blocked_by
 		.map((id) => byId.get(id))
-		.filter(Boolean) as PlanTask[];
+		.filter(Boolean) as PlanTodo[];
 	const numbers = deps.map((d) => `#${d.order}`).join(", ");
 	const unmet = deps.filter(
 		(d) => d.status !== "done" && d.status !== "cancelled",
@@ -1007,9 +1007,9 @@ function PlanTaskDetail({
 	plan,
 	onOpenTask,
 }: {
-	task: PlanTask;
+	task: PlanTodo;
 	plan:
-		| { tasks: PlanTask[]; edges?: { source: string; target: string }[] }
+		| { tasks: PlanTodo[]; edges?: { source: string; target: string }[] }
 		| undefined;
 	onOpenTask?: (id: string) => void;
 }) {
@@ -1017,7 +1017,7 @@ function PlanTaskDetail({
 	const blocks = (plan?.edges ?? [])
 		.filter((e) => e.source === task.id)
 		.map((e) => byId.get(e.target))
-		.filter(Boolean) as PlanTask[];
+		.filter(Boolean) as PlanTodo[];
 
 	return (
 		<DetailBlock title={task.title} subtitle={`wave ${task.wave}`}>

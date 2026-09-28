@@ -19,7 +19,7 @@ import type {
 	Skill,
 	SkillUsageResponse,
 	SkillUsageVersion,
-} from "@/types/skills";
+} from "@/pages/graphs-detail/features/skills/types";
 
 /** Action ids the three pages answer. The spec carries the string; the page carries the behaviour. */
 export const SKILL_ACTIONS = {

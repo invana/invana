@@ -1,7 +1,10 @@
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompactCount } from "@/lib/format";
 import { formatDuration } from "@/lib/time";
-import type { RunNode, RunNodeStatus } from "@/types/run";
+import type {
+	RunNode,
+	RunNodeStatus,
+} from "@/pages/graphs-detail/features/runs/types";
 import {
 	ChatSessionActivitySubLine,
 	ChatSessionDisclosure,

@@ -9,7 +9,7 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@/canvases/layered/LayeredCanvas";
-import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
 
 interface Scope {
 	username: string;

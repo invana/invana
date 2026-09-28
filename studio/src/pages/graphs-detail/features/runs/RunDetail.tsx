@@ -18,8 +18,8 @@
  * plan it ran in `mainSection`, beside the run, which stays open here.
  */
 
-import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
-import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
 import { waterfallTasks } from "@/pages/graphs-detail/features/runs/boards/runBoardSpec";
 import { useRunTrace } from "@/pages/graphs-detail/features/runs/boards/useRunTrace";

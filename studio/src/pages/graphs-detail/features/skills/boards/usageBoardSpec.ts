@@ -24,6 +24,10 @@ import {
 	versionRow,
 	when,
 } from "@/pages/graphs-detail/features/skills/boards/shared";
+import type {
+	Skill,
+	SkillUsageResponse,
+} from "@/pages/graphs-detail/features/skills/types";
 import {
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
@@ -32,7 +36,6 @@ import {
 	omit,
 	specPanel,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { Skill, SkillUsageResponse } from "@/types/skills";
 import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 export interface UsageBoardView {

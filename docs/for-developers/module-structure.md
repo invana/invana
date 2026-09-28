@@ -267,7 +267,7 @@ docstrings stay full — they are how a reader learns to use the code.
 
 ## 6. Retired words still in Studio
 
-**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `SkillPlaybookEditor`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. Still open: the type, hook and API names in `types/*`, `hooks/queries/*` and `services/api/*` (`Task*` → `Todo*`, `Thinking` → `TaskRun`, `SkillPlan*`, `useWork` split, `railItem`), which move with R6.
+**Status: file and component names done** — `TodoActivityTree`, `TodoRunsBlock`, `LayeredCanvas*`, `RecordRow`, `PlanTrendWidget`, `taskFlowFromTaskPlan`, `SkillPlaybookEditor`, `AgentEffortTab`, `useLeftSection` · `LeftNavKey`. The type, hook and API names are done too — `Todo*` · `todosApi` · `useTodosQuery` · `useTodoRunsQuery`, `TaskRun` · `RunStreamHandle` · `RunState` · `LIVE_RUN_STATUSES`, `useTaskPlansQuery` · `taskPlansApi`, `SkillPlaybook*`, `navItem`. **Journal:** the journal hook is `useRunListQuery` and its row `RunListRow`; `useRunsQuery` keeps its name, because it is a different read — the raw list with server-side filters, where the journal shapes and filters rows client-side — and both live in `runs/queries.ts`. Only a *Todo* retires *Task*: `TaskFlowCanvas`, `TaskGroup`, `TaskPlan*` and `TaskRun` name the runtime step and keep it. UI copy keeps its words (§11) — the Todos section still labels its runs *Thoughts*.
 
 | Word | Where | Becomes |
 |---|---|---|
@@ -647,6 +647,8 @@ engine/src/invana/
 ```
 
 ### 12.1 Studio
+
+**Status: R6 done.** Every module owns its `api.ts` · `queries.ts` · `types.ts`; what is left in `services/api/`, `hooks/queries/` and `types/` is app-wide — the client, `auth`, `health` (the header's version), `useAppVersion`, `useGitHubStars`, `types/query`. Two differences from the tree below: `health.ts` stays in `services/api/` because the app header reads it, not a Graph; and `boards/` keeps three API files — `api.ts` · `versionsApi.ts` · `reportsApi.ts` — because each has its own private `base` and summary mapper.
 
 ```text
 studio/src/

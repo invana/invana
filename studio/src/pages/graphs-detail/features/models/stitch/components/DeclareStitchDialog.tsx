@@ -11,7 +11,7 @@
  */
 
 import { DeclareStitchCard } from "@/pages/graphs-detail/features/models/stitch/components/DeclareStitchCard";
-import type { LinkKind } from "@/types/models";
+import type { LinkKind } from "@/pages/graphs-detail/features/models/types";
 import { Dialog, DialogContent, DialogTitle } from "@invana/ui";
 
 interface Props {

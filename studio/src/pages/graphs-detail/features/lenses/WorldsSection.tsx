@@ -22,11 +22,15 @@ import { LensActions } from "@/pages/graphs-detail/features/lenses/LensActions";
 import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
 import { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 import { LensList } from "@/pages/graphs-detail/features/lenses/LensList";
+import type {
+	Lens,
+	LensCreate,
+	Refusal,
+} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { Lens, LensCreate, Refusal } from "@/types/govern";
 import type { PanelStackSection } from "@invana/ui";
 import { Globe, Maximize2, Plus } from "lucide-react";
 

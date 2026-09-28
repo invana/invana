@@ -21,10 +21,10 @@
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
-} from "@/hooks/queries/useGraphs";
+} from "@/pages/graphs-detail/features/graphs/queries";
+import { hasOutstandingSetup } from "@/pages/graphs-detail/features/graphs/types";
 import { OnboardingWizard } from "@/pages/graphs-detail/features/setup/OnboardingWizard";
 import { useOnboarding } from "@/pages/graphs-detail/features/setup/useOnboarding";
-import { hasOutstandingSetup } from "@/types/graphs";
 import { PropertyList, PropertyRow, StatusDot } from "@invana/ui";
 
 interface GraphHomePageProps {

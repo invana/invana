@@ -16,18 +16,18 @@
  * the reader looking for what it meant.
  */
 
+import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
+import { llmProvidersApi } from "@/pages/graphs-detail/features/llms/api";
 import {
 	useAddLLMModelMutation,
 	useDeleteLLMProviderMutation,
 	useRemoveLLMModelMutation,
-} from "@/hooks/queries/useLLMProviders";
-import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
-import { llmProvidersApi } from "@/services/api/llm";
+} from "@/pages/graphs-detail/features/llms/queries";
 import {
 	type LLMModel,
 	type LLMProvider,
 	LLM_PROVIDER_OPTIONS,
-} from "@/types/llm";
+} from "@/pages/graphs-detail/features/llms/types";
 import { Input, Label } from "@invana/forms";
 import {
 	AddressChip,

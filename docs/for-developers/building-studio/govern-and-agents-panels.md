@@ -186,7 +186,7 @@ Feature modules under `studio/src/pages/graphs-detail/features/`, following
 | `agents/AgentsPanel.tsx` | **deleted.** Its body is `agents/AgentsSection.tsx`, a drawer of the stack; a panel that drew its own `ListPanelChrome` cannot be one of two in a column |
 | `graph-settings/LLMsPanel.tsx` (733 lines) | **deleted.** `LlmsSection` · `ProviderDetail` · `ProviderForm` replace it, and none of them is a tab of Settings ([PM6](../modules/agents/features/providers-and-models.md)) |
 | `agents/AgentDetail.tsx` | *Bindings → LLM* is *Bounds → Works in*, with the cast read **through** the lens; *Budget*'s five inputs are the ten-row ceilings table |
-| `hooks/queries/useLLMProviders.ts` | a provider holds models; `setDefault` is gone and `addModel` · `removeModel` answer in its place |
+| `features/llms/queries.ts` | a provider holds models; `setDefault` is gone and `addModel` · `removeModel` answer in its place |
 | `shell/useAgentsViewPanel.ts` | new — `?section=agents\|llms`, `&agent=`, `&provider=`, the same grammar Govern's two drawers use |
 | `shell/useLeftSection.ts` | `agents` is a stack; `llms` is an **alias** onto it rather than a section; and `setSection(s, t)` names a *drawer* where the section is stacked and a *tab* where it is not |
 
@@ -269,7 +269,7 @@ move — so the staleness is only visible once a database has been migrated.
 | `SendMessage.llm_provider_id` | picked the provider | ignored, kept for one release. `llm_model_id` is an explicit pick, and it still does not bypass the lens |
 | `AgentRead.llm_config_id` | the agent's model | **gone.** An agent binds no provider ([PM1](../modules/agents/features/providers-and-models.md)); A1 draws `lens_id` as the third bound instead |
 
-The files: `studio/src/types/llm.ts`, `studio/src/services/api/llm.ts`,
+The files: `studio/src/pages/graphs-detail/features/llms/types.ts`, `studio/src/pages/graphs-detail/features/llms/api.ts`,
 `studio/src/pages/graphs-detail/features/graph-settings/LLMsPanel.tsx` (733 lines, and A6 is where
 it moves into the Agents stack), plus `AgentDetail.tsx` and `SessionComposer.tsx`.
 

@@ -1,4 +1,3 @@
-import { useGraphEventsQuery } from "@/hooks/queries/useEvents";
 import { useEventStream } from "@/hooks/useEventStream";
 import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
 import { matchesEventSearch } from "@/pages/graphs-detail/features/events/eventSearch";
@@ -8,8 +7,9 @@ import {
 	eventStatus,
 	matchesStatusFilter,
 } from "@/pages/graphs-detail/features/events/eventStatus";
+import { useGraphEventsQuery } from "@/pages/graphs-detail/features/events/queries";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
 import { TraceIdValue } from "@/pages/graphs-detail/features/runs/TraceIdValue";
-import type { AuditEvent } from "@/types/events";
 import {
 	Badge,
 	Button,

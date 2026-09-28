@@ -22,24 +22,24 @@
  * prose, so a word implying we did would be a lie told in a badge (US4).
  */
 
+import { useAgentMutations } from "@/pages/graphs-detail/features/agents/queries";
+import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
+import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
 import {
 	useSkillAgentsQuery,
 	useSkillDiffQuery,
 	useSkillDraftQuery,
-	useSkillPlanQuery,
+	useSkillPlaybookQuery,
 	useSkillUsageQuery,
 	useSkillVersionsQuery,
-} from "@/hooks/queries/useSkills";
-import { useAgentMutations } from "@/hooks/queries/useWork";
-import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
-import { SkillPlaybookTab } from "@/pages/graphs-detail/features/skills/SkillPlaybookTab";
-import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
+} from "@/pages/graphs-detail/features/skills/queries";
 import type {
 	BindRefusal,
 	Skill,
 	SkillAgentStanding,
 	SkillUsageVersion,
-} from "@/types/skills";
+} from "@/pages/graphs-detail/features/skills/types";
+import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
 import { Badge, Button, RecordHeader, Spinner, TabbedPanel } from "@invana/ui";
@@ -69,7 +69,7 @@ export function SkillDetail({
 	const [tab, setTab] = useState<SkillTab>("playbook");
 	// The **current** version's plan: what a step is offered today (SK5 — a
 	// plan hangs off the version, never off the skill).
-	const plan = useSkillPlanQuery(
+	const plan = useSkillPlaybookQuery(
 		username,
 		graphSlug,
 		skill.id,

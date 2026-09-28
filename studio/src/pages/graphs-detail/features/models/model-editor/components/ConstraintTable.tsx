@@ -1,4 +1,4 @@
-import type { ConstraintResponse } from "@/types/schemas";
+import type { ConstraintResponse } from "@/pages/graphs-detail/features/models/types";
 import {
 	Table,
 	TableBody,

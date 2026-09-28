@@ -24,14 +24,14 @@
  */
 
 import {
+	type ProjectionTemplateRead,
+	projectionTemplatesApi,
+} from "@/pages/graphs-detail/features/runs/api";
+import {
 	DetailBlock,
 	DetailStatus,
 } from "@/pages/graphs-detail/shared/DetailRows";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import {
-	type ProjectionTemplateRead,
-	projectionTemplatesApi,
-} from "@/services/api/runs";
 import { PanelSection } from "@/ui/PanelSection";
 import {
 	Input,

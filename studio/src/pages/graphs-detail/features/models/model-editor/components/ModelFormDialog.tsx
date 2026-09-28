@@ -1,11 +1,11 @@
 import { FormError } from "@/components/forms/FormError";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import {
 	useCreateModelMutation,
 	useUpdateModelMutation,
-} from "@/hooks/queries/useModels";
+} from "@/pages/graphs-detail/features/models/queries";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
 import { ApiError } from "@/services/api/client";
-import { modelsApi } from "@/services/api/models";
-import type { GraphModelSummary } from "@/types/models";
 import {
 	Input,
 	Label,

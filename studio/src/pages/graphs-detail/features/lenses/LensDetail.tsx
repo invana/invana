@@ -20,13 +20,16 @@
  * this lens **casts**, rather than what a run would **get**.
  */
 
-import { useLensQuery } from "@/hooks/queries/useGovern";
 import {
 	GOVERNED_LAYERS,
 	layerSummary,
 	rulesInLayer,
 } from "@/pages/graphs-detail/features/lenses/narrowing";
-import type { GovernRule, Lens } from "@/types/govern";
+import { useLensQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import type {
+	GovernRule,
+	Lens,
+} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	CannotAnswerCard,
 	type CastResolution,

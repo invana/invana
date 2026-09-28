@@ -8,14 +8,14 @@
  * uses, naming the open work they would disturb (LC9 · LC10).
  */
 
+import { AgentDetail } from "@/pages/graphs-detail/features/agents/AgentDetail";
+import { LifecycleDialog } from "@/pages/graphs-detail/features/agents/LifecycleDialog";
 import {
 	useAgentMutations,
 	useAgentsQuery,
 	useLifecyclePreviewQuery,
-} from "@/hooks/queries/useWork";
-import { AgentDetail } from "@/pages/graphs-detail/features/agents/AgentDetail";
-import { LifecycleDialog } from "@/pages/graphs-detail/features/agents/LifecycleDialog";
-import type { LifecycleAct } from "@/types/work";
+} from "@/pages/graphs-detail/features/agents/queries";
+import type { LifecycleAct } from "@/pages/graphs-detail/features/agents/types";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useState } from "react";
 

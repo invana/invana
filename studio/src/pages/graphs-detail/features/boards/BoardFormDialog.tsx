@@ -1,6 +1,6 @@
 import { FormError } from "@/components/forms/FormError";
-import { useUpdateCanvasMutation } from "@/hooks/queries/useBoards";
-import { boardsApi } from "@/services/api/boards";
+import { boardsApi } from "@/pages/graphs-detail/features/boards/api";
+import { useUpdateCanvasMutation } from "@/pages/graphs-detail/features/boards/queries";
 import { ApiError } from "@/services/api/client";
 import { Input, Label, Textarea } from "@invana/forms";
 import {

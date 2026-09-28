@@ -139,7 +139,7 @@ Each of these named a region. They are gone from code, docs, artboards and comme
 
 | Not this | Say | Was in |
 |---|---|---|
-| rail · left rail · `railItem` · activity bar · icon column | `leftNav` · **leftNav item** | Studio ×104, docs ×19, kit JSDoc |
+| rail · left rail · `navItem` · activity bar · icon column | `leftNav` · **leftNav item** | Studio ×104, docs ×19, kit JSDoc |
 | sidebar · `sidebar-panel` · left panel · docked panel | `leftSection` | kit panel id, Studio |
 | editor · `editor-panel` · `editor-area` · main content · `mainContent` · canvas area · workspace | `mainSection` | kit panel ids |
 | auxiliary · `auxiliary-panel` · right panel · **drawer** | `rightSection` | kit panel id, Studio ×46 |

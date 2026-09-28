@@ -9,8 +9,8 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@/canvases/layered/LayeredCanvas";
-import { useAgentLineageQuery } from "@/hooks/queries/useWork";
-import type { AgentEdge } from "@/types/work";
+import { useAgentLineageQuery } from "@/pages/graphs-detail/features/agents/queries";
+import type { AgentEdge } from "@/pages/graphs-detail/features/agents/types";
 import { useMemo } from "react";
 
 interface Scope {

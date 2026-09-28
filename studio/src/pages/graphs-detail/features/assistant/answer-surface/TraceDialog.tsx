@@ -24,9 +24,12 @@
 
 import { formatDuration } from "@/lib/time";
 import { useOpenBoard } from "@/pages/graphs-detail/features/boards";
+import {
+	type TraceStepRead,
+	traceApi,
+} from "@/pages/graphs-detail/features/runs/api";
 import { StepRules } from "@/pages/graphs-detail/shared/StepRules";
 import { stepTone } from "@/pages/graphs-detail/shared/statusTone";
-import { type TraceStepRead, traceApi } from "@/services/api/runs";
 import {
 	Button,
 	Dialog,

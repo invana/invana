@@ -17,7 +17,7 @@
  */
 
 import { formatRelativeTime } from "@/lib/time";
-import type { BoardVersionSummary } from "@/types/board";
+import type { BoardVersionSummary } from "@/pages/graphs-detail/features/boards/types";
 import { Button, ScrollArea } from "@invana/ui";
 import { History, X } from "lucide-react";
 import type { ReactNode } from "react";

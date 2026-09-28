@@ -13,9 +13,9 @@
  */
 
 import { formatRelativeTime } from "@/lib/time";
+import { boardReportsApi } from "@/pages/graphs-detail/features/boards/reportsApi";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { DECLARED_WIDGETS } from "@/pages/graphs-detail/shared/dashboardWidgets";
-import { boardReportsApi } from "@/services/api/boardReports";
 import { Dashboard, type DashboardSpec } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQuery } from "@tanstack/react-query";

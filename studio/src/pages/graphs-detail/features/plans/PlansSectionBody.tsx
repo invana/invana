@@ -19,14 +19,21 @@
  * because "which of the N?" has no honest default (D4).
  */
 
+import { formatElapsed } from "@/lib/time";
+import { PromoteDialog } from "@/pages/graphs-detail/features/plans/PromoteDialog";
 import {
 	usePlanDiffQuery,
 	usePlanPerformanceQuery,
-	useWorkflowQuery,
-	useWorkflowsQuery,
-} from "@/hooks/queries/useWork";
-import { formatElapsed } from "@/lib/time";
-import { PromoteDialog } from "@/pages/graphs-detail/features/plans/PromoteDialog";
+	useTaskPlanQuery,
+	useTaskPlansQuery,
+} from "@/pages/graphs-detail/features/plans/queries";
+import type {
+	TaskPlanCaller,
+	TaskPlanDagNode,
+	TaskPlanDetail,
+	TaskPlanSummary,
+} from "@/pages/graphs-detail/features/plans/types";
+import type { SkillLayer } from "@/pages/graphs-detail/features/skills/types";
 import {
 	AgentChipRow,
 	DetailBlock,
@@ -34,13 +41,6 @@ import {
 	DetailStatus,
 } from "@/pages/graphs-detail/shared/DetailRows";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
-import type { SkillLayer } from "@/types/skills";
-import type {
-	TaskPlanCaller,
-	TaskPlanDagNode,
-	TaskPlanDetail,
-	TaskPlanSummary,
-} from "@/types/work";
 import { LAYER_PALETTE, layerSlug } from "@/ui/layerPalette";
 import { Sparkline } from "@invana/charts";
 import {
@@ -134,8 +134,8 @@ export function PlansSectionBody({
 	onPromoting,
 	onOpenAgent,
 }: Props) {
-	const list = useWorkflowsQuery(username, graphSlug);
-	const detail = useWorkflowQuery(
+	const list = useTaskPlansQuery(username, graphSlug);
+	const detail = useTaskPlanQuery(
 		username,
 		graphSlug,
 		selectedKey ?? undefined,

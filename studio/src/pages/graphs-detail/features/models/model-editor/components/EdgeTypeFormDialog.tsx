@@ -1,12 +1,15 @@
 import { FormError } from "@/components/forms/FormError";
+import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
 import {
 	useCreateEdgeTypeMutation,
 	useUpdateEdgeTypeMutation,
-} from "@/hooks/queries/useModels";
-import type { ModelEditCtx } from "@/pages/graphs-detail/features/models/model-editor/types";
+} from "@/pages/graphs-detail/features/models/queries";
+import type { Multiplicity } from "@/pages/graphs-detail/features/models/types";
+import type {
+	EdgeTypeResponse,
+	NodeTypeResponse,
+} from "@/pages/graphs-detail/features/models/types";
 import { ApiError, suppressActionToast } from "@/services/api/client";
-import type { Multiplicity } from "@/types/models";
-import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
 import {
 	Checkbox,
 	Input,

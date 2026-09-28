@@ -12,8 +12,8 @@
  * kind of run, including ones with no stream open, so it asks.
  */
 
+import { traceApi } from "@/pages/graphs-detail/features/runs/api";
 import { isLive } from "@/pages/graphs-detail/shared/dashboards/shared";
-import { traceApi } from "@/services/api/runs";
 import { useQuery } from "@tanstack/react-query";
 
 const LIVE_POLL_MS = 2000;

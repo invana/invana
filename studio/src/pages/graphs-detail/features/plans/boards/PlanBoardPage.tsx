@@ -8,12 +8,6 @@
  * here, never in the URL, because a link to a plan is a link to the plan.
  */
 
-import {
-	usePlanPerformanceQuery,
-	usePlanRunsQuery,
-	usePlanVersionQuery,
-	useWorkflowsQuery,
-} from "@/hooks/queries/useWork";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { PLAN_CHART_WIDGETS } from "@/pages/graphs-detail/features/plans/boards/PlanChartWidgets";
 import {
@@ -26,6 +20,12 @@ import {
 	WINDOWS,
 	planBoardSpec,
 } from "@/pages/graphs-detail/features/plans/boards/planBoardSpec";
+import {
+	usePlanPerformanceQuery,
+	usePlanRunsQuery,
+	usePlanVersionQuery,
+	useTaskPlansQuery,
+} from "@/pages/graphs-detail/features/plans/queries";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { TaskFlowWidget } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
 import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
@@ -53,7 +53,7 @@ export function PlanBoardPage({
 	/** `⋯` — a reading of the version the header names, as its own page (LB38). */
 	onOpenReading: (reading: PlanReading, planId: string) => void;
 }) {
-	const library = useWorkflowsQuery(username, graphSlug);
+	const library = useTaskPlansQuery(username, graphSlug);
 	const opened = library.data?.items.find((p) => p.id === planId);
 	const key = opened?.key ?? undefined;
 	const versions = useMemo(

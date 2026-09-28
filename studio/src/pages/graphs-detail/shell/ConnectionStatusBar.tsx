@@ -1,4 +1,4 @@
-import type { GraphConnectionRead } from "@/types/graphs";
+import type { GraphConnectionRead } from "@/pages/graphs-detail/features/graphs/types";
 import type { ReactNode } from "react";
 
 interface Props {

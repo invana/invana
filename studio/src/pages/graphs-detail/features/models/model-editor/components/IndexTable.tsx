@@ -1,4 +1,4 @@
-import type { IndexResponse } from "@/types/schemas";
+import type { IndexResponse } from "@/pages/graphs-detail/features/models/types";
 import {
 	Table,
 	TableBody,

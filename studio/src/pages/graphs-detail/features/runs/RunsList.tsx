@@ -16,10 +16,10 @@
  * Nothing here writes (IW3). Loading is CLI and API only (BD6).
  */
 
-import type { JournalRow } from "@/hooks/queries/useRuns";
 import { useTicker } from "@/hooks/useTicker";
 import { formatCompact } from "@/lib/format";
 import { formatElapsed, formatRelativeTime } from "@/lib/time";
+import type { RunListRow } from "@/pages/graphs-detail/features/runs/queries";
 import { EmptyState, RunRow, Spinner } from "@invana/ui";
 
 /**
@@ -41,7 +41,7 @@ export function shortRunId(id: string): string {
  * queue for a minute did not take a minute. A run still going is measured
  * against `now`, which is why the journal holds a ticker.
  */
-export function elapsedOf(row: JournalRow, now: number): number | null {
+export function elapsedOf(row: RunListRow, now: number): number | null {
 	const started = row.run.started_at;
 	if (!started) return null;
 	const end = row.run.finished_at ? Date.parse(row.run.finished_at) : now;
@@ -60,7 +60,7 @@ export function elapsedOf(row: JournalRow, now: number): number | null {
  * that goes backwards is worse than no count. The step's *label* is not here —
  * *which* step it is on is what the drill-in answers.
  */
-function runLine(row: JournalRow, now: number): string {
+function runLine(row: RunListRow, now: number): string {
 	const t = row.run;
 	const parts: string[] = [row.plan];
 
@@ -94,7 +94,7 @@ function runLine(row: JournalRow, now: number): string {
  * section's body and has to survive a reload like any other region (G31).
  */
 export interface RunsListProps {
-	rows: JournalRow[];
+	rows: RunListRow[];
 	isLoading: boolean;
 	/** The run whose detail replaces the list, from `&run=`. */
 	runId: string | null;

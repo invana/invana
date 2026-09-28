@@ -1,4 +1,4 @@
-import type { TypePropertyMappingResponse } from "@/types/schemas";
+import type { TypePropertyMappingResponse } from "@/pages/graphs-detail/features/models/types";
 import {
 	Table,
 	TableBody,

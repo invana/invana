@@ -8,7 +8,7 @@
 
 import { CeilingsTable } from "@/pages/graphs-detail/features/agents/CeilingsTable";
 import type { AgentDraft } from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Agent } from "@/types/work";
+import type { Agent } from "@/pages/graphs-detail/features/agents/types";
 import { PanelSection } from "@/ui/PanelSection";
 import { Textarea } from "@invana/forms";
 

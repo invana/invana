@@ -4,8 +4,11 @@ import {
 	useDeleteSkillMutation,
 	useSkillsQuery,
 	useUpdateSkillMutation,
-} from "@/hooks/queries/useSkills";
-import type { Skill, SkillCreate } from "@/types/skills";
+} from "@/pages/graphs-detail/features/skills/queries";
+import type {
+	Skill,
+	SkillCreate,
+} from "@/pages/graphs-detail/features/skills/types";
 import { Input, Label, Textarea } from "@invana/forms";
 import { Button, Skeleton } from "@invana/ui";
 import { Plus, Trash2, Wand2 } from "lucide-react";

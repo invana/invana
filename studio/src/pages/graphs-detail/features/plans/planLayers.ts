@@ -8,7 +8,7 @@
  * leaves the graph alone* is the fact a reader is checking for (D22).
  */
 
-import type { TaskPlanDetail } from "@/types/work";
+import type { TaskPlanDetail } from "@/pages/graphs-detail/features/plans/types";
 import { layerSlug } from "@/ui/layerPalette";
 import type { LayerBand, LayerItem } from "@invana/ui";
 

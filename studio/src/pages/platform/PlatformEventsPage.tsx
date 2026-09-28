@@ -1,4 +1,3 @@
-import { useGlobalEventsQuery } from "@/hooks/queries/useEvents";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventStream } from "@/hooks/useEventStream";
 import { EventTypeFilter } from "@/pages/graphs-detail/features/events/EventTypeFilter";
@@ -7,7 +6,8 @@ import {
 	StatusFilter,
 	matchesStatusFilter,
 } from "@/pages/graphs-detail/features/events/eventStatus";
-import type { AuditEvent } from "@/types/events";
+import { useGlobalEventsQuery } from "@/pages/graphs-detail/features/events/queries";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
 import { Input } from "@invana/forms";
 import {
 	Button,

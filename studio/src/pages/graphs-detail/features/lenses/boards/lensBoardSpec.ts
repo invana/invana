@@ -30,6 +30,11 @@ import {
 	rulesInLayer,
 	since,
 } from "@/pages/graphs-detail/features/lenses/narrowing";
+import type {
+	GovernLayer,
+	GovernRule,
+	Lens,
+} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	VIEW_ACTION,
 	VIEW_DASHBOARD,
@@ -38,7 +43,6 @@ import {
 	omit,
 	specPanel,
 } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { GovernLayer, GovernRule, Lens } from "@/types/govern";
 import type { DashboardSpec, PanelSpec } from "@invana/dashboard";
 
 /** Action ids this page answers. The spec carries the string; the page the behaviour. */

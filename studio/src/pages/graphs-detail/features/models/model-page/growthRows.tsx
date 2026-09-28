@@ -9,7 +9,11 @@
 
 import { formatRelativeTime } from "@/lib/time";
 import { slotForType } from "@/pages/graphs-detail/features/explorer/typeColor";
-import type { Growth, GrowthRow, WrittenBy } from "@/types/models";
+import type {
+	Growth,
+	GrowthRow,
+	WrittenBy,
+} from "@/pages/graphs-detail/features/models/types";
 import { StackedAreaChart } from "@invana/charts";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";

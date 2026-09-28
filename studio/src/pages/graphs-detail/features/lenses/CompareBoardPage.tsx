@@ -21,8 +21,12 @@
  * two runs themselves.
  */
 
-import { useCompareRunsQuery } from "@/hooks/queries/useGovern";
-import type { AppliedDiff, AppliedField, CompareSide } from "@/types/govern";
+import { useCompareRunsQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import type {
+	AppliedDiff,
+	AppliedField,
+	CompareSide,
+} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	AddressChip,
 	Button,

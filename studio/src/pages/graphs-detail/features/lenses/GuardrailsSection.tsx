@@ -28,11 +28,15 @@ import { LensDetail } from "@/pages/graphs-detail/features/lenses/LensDetail";
 import { LensEditor } from "@/pages/graphs-detail/features/lenses/LensEditor";
 import { LensList } from "@/pages/graphs-detail/features/lenses/LensList";
 import { NEW_LENS } from "@/pages/graphs-detail/features/lenses/WorldsSection";
+import type {
+	Lens,
+	LensCreate,
+	Refusal,
+} from "@/pages/graphs-detail/features/lenses/types";
 import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { Lens, LensCreate, Refusal } from "@/types/govern";
 import type { PanelStackSection } from "@invana/ui";
 import { Maximize2, Plus, ShieldCheck } from "lucide-react";
 

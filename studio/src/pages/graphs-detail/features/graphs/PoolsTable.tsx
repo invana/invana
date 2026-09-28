@@ -21,7 +21,7 @@
  * served before a scheduled run (CC3).
  */
 
-import type { GraphContention } from "@/types/graphs";
+import type { GraphContention } from "@/pages/graphs-detail/features/graphs/types";
 import { type ColumnDef, DataTable } from "@invana/tables";
 import { useMemo } from "react";
 

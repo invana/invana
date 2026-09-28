@@ -8,7 +8,7 @@ import type {
 	NeighborExpandResponse,
 	SortDirection,
 	SortSpec,
-} from "@/types/traversal";
+} from "@/pages/graphs-detail/features/explorer/types";
 import {
 	Input,
 	Label,

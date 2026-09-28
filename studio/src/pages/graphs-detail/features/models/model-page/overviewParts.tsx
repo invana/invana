@@ -4,8 +4,11 @@
  * at All models, p95 against the Graph's at one (the-model-page.md · The tabs).
  */
 
-import type { GrowthMark, Overview } from "@/types/models";
-import type { PhysicalSchema } from "@/types/schemas";
+import type {
+	GrowthMark,
+	Overview,
+} from "@/pages/graphs-detail/features/models/types";
+import type { PhysicalSchema } from "@/pages/graphs-detail/features/models/types";
 import { StackedBarChartV } from "@invana/charts";
 import type { PanelSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";

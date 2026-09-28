@@ -4,9 +4,8 @@
 // moving right now (and keeps the reasoning / diagnosis / result that only
 // ride the stream, so they stay visible after the reply settles).
 
-import { stepFromFrame } from "@/services/api/runs";
-import type { Emission } from "@/types/emission";
-import type { QueryResponse } from "@/types/query";
+import type { Emission } from "@/pages/graphs-detail/features/assistant/answer-surface/types";
+import { stepFromFrame } from "@/pages/graphs-detail/features/runs/api";
 import type {
 	AskFrame,
 	Diagnosis,
@@ -14,10 +13,11 @@ import type {
 	RunNode,
 	RunStatus,
 	RunView,
-} from "@/types/run";
+} from "@/pages/graphs-detail/features/runs/types";
+import type { QueryResponse } from "@/types/query";
 import { create } from "zustand";
 
-interface ThinkingState {
+interface RunState {
 	views: Record<string, RunView>;
 	/** Register a run before its stream opens (or from a session detail). */
 	seed: (
@@ -194,7 +194,7 @@ function freshView(): Pick<RunView, "status" | "steps" | "seq"> {
 	return { status: "queued", steps: [], seq: 0 };
 }
 
-export const useRunStore = create<ThinkingState>((set) => ({
+export const useRunStore = create<RunState>((set) => ({
 	views: {},
 	seed: (view) =>
 		set((state) => ({

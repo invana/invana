@@ -21,7 +21,7 @@ import {
 	stitchPair,
 	stitchRule,
 } from "@/pages/graphs-detail/features/models/stitch/allModels";
-import type { ModelLink } from "@/types/models";
+import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
 import {
 	AlertDialog,
 	AlertDialogAction,

@@ -19,11 +19,11 @@ import {
 	graphModelSettings,
 	graphModelTemplates,
 } from "@/canvases/model";
+import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
 import {
 	useCommitStitchesMutation,
 	useDiscardStitchesMutation,
-} from "@/hooks/queries/useModels";
-import type { CanvasBackend } from "@/pages/graphs-detail/features/explorer";
+} from "@/pages/graphs-detail/features/models/queries";
 import { UnionList } from "@/pages/graphs-detail/features/models/stitch/UnionList";
 import {
 	buildAllModelsData,
@@ -31,7 +31,7 @@ import {
 } from "@/pages/graphs-detail/features/models/stitch/allModels";
 import { DeclareStitchCard } from "@/pages/graphs-detail/features/models/stitch/components/DeclareStitchCard";
 import { useAllModels } from "@/pages/graphs-detail/features/models/stitch/useAllModels";
-import type { LinkKind } from "@/types/models";
+import type { LinkKind } from "@/pages/graphs-detail/features/models/types";
 import { Button, EmptyState, Spinner } from "@invana/ui";
 import { AlertTriangle, Boxes, Check } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";

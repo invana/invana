@@ -12,7 +12,7 @@ import {
 	type LayeredEdge,
 	type LayeredNode,
 } from "@/canvases/layered/LayeredCanvas";
-import { useProjectPlanQuery } from "@/hooks/queries/useWork";
+import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
 import { taskTone } from "@/pages/graphs-detail/shared/statusTone";
 import { useMemo } from "react";
 

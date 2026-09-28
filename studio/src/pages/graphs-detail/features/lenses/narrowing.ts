@@ -6,7 +6,12 @@
  * graph_data` in a terminal must not read as something else on screen.
  */
 
-import type { CastRole, GovernLayer, GovernRule, Lens } from "@/types/govern";
+import type {
+	CastRole,
+	GovernLayer,
+	GovernRule,
+	Lens,
+} from "@/pages/graphs-detail/features/lenses/types";
 import type { Narrowing } from "@invana/ui";
 
 /** The five layers a rule may govern. The spine is not one of them. */

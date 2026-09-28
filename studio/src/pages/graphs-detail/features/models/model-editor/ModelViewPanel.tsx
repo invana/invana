@@ -23,13 +23,7 @@
  * selected here is the scope the page reads, so a reload lands on both.
  */
 
-import {
-	useModelVersionQuery,
-	useModelVersionsQuery,
-	useModelsQuery,
-	useStagedSetQuery,
-	useUpdateModelMutation,
-} from "@/hooks/queries/useModels";
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import { EdgeTypeFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/EdgeTypeFormDialog";
 import { ImportModelDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ImportModelDialog";
 import { ModelFormDialog } from "@/pages/graphs-detail/features/models/model-editor/components/ModelFormDialog";
@@ -39,11 +33,17 @@ import type {
 	ModelSelection,
 } from "@/pages/graphs-detail/features/models/model-editor/types";
 import { useModelsView } from "@/pages/graphs-detail/features/models/model-page/useModelsView";
+import {
+	useModelVersionQuery,
+	useModelVersionsQuery,
+	useModelsQuery,
+	useStagedSetQuery,
+	useUpdateModelMutation,
+} from "@/pages/graphs-detail/features/models/queries";
 import { useStitchesSection } from "@/pages/graphs-detail/features/models/stitch/useStitchesSection";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
 import { RecordRow } from "@/pages/graphs-detail/shared/RecordRow";
 import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import { modelsApi } from "@/services/api/models";
-import type { GraphModelSummary } from "@/types/models";
 import { PanelStatusBar, StatusCount, StatusCrumb } from "@/ui/PanelStatusBar";
 import { Switch } from "@invana/forms";
 import {

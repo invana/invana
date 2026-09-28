@@ -18,17 +18,17 @@
  * removed at all (PM11).
  */
 
+import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
 import {
 	ProviderDetail,
 	providerLabel,
 } from "@/pages/graphs-detail/features/llms/ProviderDetail";
 import { ProviderForm } from "@/pages/graphs-detail/features/llms/ProviderForm";
+import type { LLMProvider } from "@/pages/graphs-detail/features/llms/types";
 import {
 	type StackSectionUi,
 	stackSection,
 } from "@/pages/graphs-detail/shared/StackSection";
-import type { Lens } from "@/types/govern";
-import type { LLMProvider } from "@/types/llm";
 import {
 	AddressChip,
 	EmptyState,

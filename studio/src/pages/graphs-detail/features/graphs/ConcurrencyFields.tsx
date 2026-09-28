@@ -15,12 +15,12 @@
  * contention has to be visible where the number that causes it is set (C8).
  */
 
+import { PoolsTable } from "@/pages/graphs-detail/features/graphs/PoolsTable";
+import { graphsApi } from "@/pages/graphs-detail/features/graphs/api";
 import {
 	useGraphQuery,
 	useUpdateGraphMutation,
-} from "@/hooks/queries/useGraphs";
-import { PoolsTable } from "@/pages/graphs-detail/features/graphs/PoolsTable";
-import { graphsApi } from "@/services/api/graphs";
+} from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	Input,
 	Label,

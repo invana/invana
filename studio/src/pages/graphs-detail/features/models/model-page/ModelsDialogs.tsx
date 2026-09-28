@@ -5,8 +5,11 @@
  * before they act.
  */
 
-import { useDraftProjectionQuery } from "@/hooks/queries/useModels";
-import type { BindingStitch, StagedSet } from "@/types/models";
+import { useDraftProjectionQuery } from "@/pages/graphs-detail/features/models/queries";
+import type {
+	BindingStitch,
+	StagedSet,
+} from "@/pages/graphs-detail/features/models/types";
 import {
 	Button,
 	Dialog,

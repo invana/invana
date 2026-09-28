@@ -12,9 +12,12 @@
  * catalogue, never Todos (PT7 · SR3).
  */
 
-import { useProjectsQuery, useTasksQuery } from "@/hooks/queries/useWork";
 import { ProjectsSectionBody } from "@/pages/graphs-detail/features/projects/ProjectsSection";
 import { TodosSectionBody } from "@/pages/graphs-detail/features/projects/TodosSection";
+import {
+	useProjectsQuery,
+	useTodosQuery,
+} from "@/pages/graphs-detail/features/projects/queries";
 import {
 	stackSection,
 	useStackSectionUi,
@@ -198,7 +201,7 @@ function TodosCount({
 	graphSlug: string;
 	projectKey: string | null;
 }) {
-	const list = useTasksQuery(username, graphSlug, {
+	const list = useTodosQuery(username, graphSlug, {
 		project: projectKey ?? undefined,
 	});
 	const items = list.data?.items ?? [];

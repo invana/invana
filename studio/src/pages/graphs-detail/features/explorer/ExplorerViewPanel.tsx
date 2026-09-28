@@ -12,17 +12,17 @@
  * (SP7), because the count is graph-wide (SP6).
  */
 
-import { useTypeCountsQuery } from "@/hooks/queries/useTypeCounts";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
 import { readProvenance } from "@/pages/graphs-detail/features/explorer/ProvenanceBlock";
+import { useTypeCountsQuery } from "@/pages/graphs-detail/features/explorer/queries";
 import { typeDotColor } from "@/pages/graphs-detail/features/explorer/typeColor";
+import type { TypeCount } from "@/pages/graphs-detail/features/explorer/types";
 import {
 	hiddenNodeTypes,
 	setNodeTypeHidden,
 } from "@/pages/graphs-detail/features/explorer/visibility";
 import { ListPanelChrome } from "@/pages/graphs-detail/shared/ListPanel";
-import type { CanvasStyling } from "@/types/board";
 import type { QueryResultItem } from "@/types/query";
-import type { TypeCount } from "@/types/traversal";
 import type { GraphCanvas, GraphLayer, GraphStore } from "@invana/graph";
 import { PanelStack, ScrollArea, cn } from "@invana/ui";
 import { Compass, Eye, EyeOff } from "lucide-react";

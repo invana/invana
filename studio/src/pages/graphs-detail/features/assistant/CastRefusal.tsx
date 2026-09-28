@@ -8,7 +8,7 @@
  * is no run to open and no step to retry.
  */
 
-import type { CastRefusal } from "@/types/session";
+import type { CastRefusal } from "@/pages/graphs-detail/features/assistant/types";
 import { RefusalCard } from "@invana/ui";
 
 /** The refusal in a failed send's body, or null for any other failure. */

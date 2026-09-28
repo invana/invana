@@ -19,15 +19,15 @@
  * which is the property SR12 was protecting when it asked for section adjacency.
  */
 
-import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
-import { useRunsJournalQuery } from "@/hooks/queries/useRuns";
-import { useAgentsQuery } from "@/hooks/queries/useWork";
+import { useAgentsQuery } from "@/pages/graphs-detail/features/agents/queries";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
 import {
 	RunDetail,
 	runAddress,
 } from "@/pages/graphs-detail/features/runs/RunDetail";
 import { RunsFilterBar } from "@/pages/graphs-detail/features/runs/RunsFilterBar";
 import { RunsList } from "@/pages/graphs-detail/features/runs/RunsList";
+import { useRunListQuery } from "@/pages/graphs-detail/features/runs/queries";
 import { useRunsFilters } from "@/pages/graphs-detail/features/runs/useRunsFilters";
 import {
 	stackSection,
@@ -50,7 +50,7 @@ export interface RunsViewPanelProps {
 	 */
 	onOpenRunDashboard?: (runId: string, stepId?: string) => void;
 	/** `Dashboard` on the header — the journal drawn wide, as a page (SR70). */
-	onOpenJournal?: () => void;
+	onOpenRunsBoard?: () => void;
 	/** `Compare with the plan` — draws the plan a run ran in `mainSection`. */
 	onOpenPlan?: (workflowKey: string) => void;
 }
@@ -59,7 +59,7 @@ export function RunsViewPanel({
 	username,
 	graphSlug,
 	onOpenRunDashboard,
-	onOpenJournal,
+	onOpenRunsBoard,
 	onOpenPlan,
 }: RunsViewPanelProps) {
 	const { runId, openRun } = useRunsViewPanel();
@@ -68,7 +68,7 @@ export function RunsViewPanel({
 	const ui = useStackSectionUi();
 	// Shared with the Runs page, so the two read one journal (SR70).
 	const { filters, patch } = useRunsFilters();
-	const journal = useRunsJournalQuery(username, graphSlug, filters);
+	const journal = useRunListQuery(username, graphSlug, filters);
 	const agents = (useAgentsQuery(username, graphSlug).data?.items ?? []).map(
 		(a) => ({ id: a.id, name: a.name }),
 	);
@@ -142,13 +142,13 @@ export function RunsViewPanel({
 											: undefined,
 										onClick: () => void journal.refetch(),
 									},
-									...(onOpenJournal
+									...(onOpenRunsBoard
 										? [
 												{
 													key: "dashboard",
 													name: "Dashboard",
 													icon: LayoutDashboard,
-													onClick: onOpenJournal,
+													onClick: onOpenRunsBoard,
 												},
 											]
 										: []),

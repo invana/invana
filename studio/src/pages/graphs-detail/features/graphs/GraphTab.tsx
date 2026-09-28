@@ -1,13 +1,16 @@
 import { FormError } from "@/components/forms/FormError";
+import { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";
+import { ConnectionFields } from "@/pages/graphs-detail/features/graphs/ConnectionFields";
 import {
 	useGraphConnectionQuery,
 	useGraphQuery,
 	useUpdateGraphMutation,
-} from "@/hooks/queries/useGraphs";
-import { ConcurrencyFields } from "@/pages/graphs-detail/features/graphs/ConcurrencyFields";
-import { ConnectionFields } from "@/pages/graphs-detail/features/graphs/ConnectionFields";
+} from "@/pages/graphs-detail/features/graphs/queries";
+import type {
+	Graph,
+	GraphUpdate,
+} from "@/pages/graphs-detail/features/graphs/types";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import type { Graph, GraphUpdate } from "@/types/graphs";
 import { Form, FormField, InputField, TextareaField } from "@invana/forms";
 import {
 	Button,

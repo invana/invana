@@ -8,18 +8,20 @@
  * redraws the tables after Save, not while it is typed.
  */
 
-import { useSkillsQuery } from "@/hooks/queries/useSkills";
-import {
-	useAgentSkillsAndCallablesQuery,
-	useCatalogueQuery,
-} from "@/hooks/queries/useWork";
 import { ALL_TASKS } from "@/pages/graphs-detail/features/agents/AgentDetail";
 import type {
 	AgentDraft,
 	Envelope,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
-import type { Skill } from "@/types/skills";
-import type { Agent, AgentCallableRow, AgentSkillRow } from "@/types/work";
+import { useAgentSkillsAndCallablesQuery } from "@/pages/graphs-detail/features/agents/queries";
+import type {
+	Agent,
+	AgentCallableRow,
+	AgentSkillRow,
+} from "@/pages/graphs-detail/features/agents/types";
+import { useCatalogueQuery } from "@/pages/graphs-detail/features/plans/queries";
+import { useSkillsQuery } from "@/pages/graphs-detail/features/skills/queries";
+import type { Skill } from "@/pages/graphs-detail/features/skills/types";
 import { BindRefusalCard, asBindRefusal } from "@/ui/BindRefusalCard";
 import { PanelSection } from "@/ui/PanelSection";
 import { Textarea } from "@invana/forms";

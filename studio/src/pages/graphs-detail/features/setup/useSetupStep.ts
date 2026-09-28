@@ -1,11 +1,11 @@
-import { SETUP_STEPS } from "@/pages/graphs-detail/features/setup/setupSteps";
 import {
 	type Graph,
 	SETUP_REQUIRED,
 	SETUP_SKIPPABLE,
 	type SetupSection,
 	setupSectionStatus,
-} from "@/types/graphs";
+} from "@/pages/graphs-detail/features/graphs/types";
+import { SETUP_STEPS } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 

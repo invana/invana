@@ -28,7 +28,11 @@ import {
 	taskFlowTemplates,
 } from "@/canvases/taskflow";
 import { taskFlowFromPlan } from "@/canvases/taskflow/taskFlowFromPlan";
-import type { PlanUse, SkillPlanNode, SkillPlanRead } from "@/types/skills";
+import type {
+	PlanUse,
+	SkillPlaybookNode,
+	SkillPlaybookRead,
+} from "@/pages/graphs-detail/features/skills/types";
 import { Badge, EmptyState, Spinner } from "@invana/ui";
 import { Workflow } from "lucide-react";
 import { useMemo } from "react";
@@ -38,7 +42,7 @@ export function SkillFlowTab({
 	loading,
 	empty,
 }: {
-	plan: SkillPlanRead | undefined;
+	plan: SkillPlaybookRead | undefined;
 	loading: boolean;
 	/**
 	 * What to say when there is no plan, for a caller that knows **why**.
@@ -69,7 +73,7 @@ export function SkillFlowTab({
 	return <SkillFlow plan={plan} />;
 }
 
-function SkillFlow({ plan }: { plan: SkillPlanRead }) {
+function SkillFlow({ plan }: { plan: SkillPlaybookRead }) {
 	const data = useMemo(() => taskFlowFromPlan(plan), [plan]);
 	const declared = new Set(plan.nodes.map((n) => n.layer));
 
@@ -114,7 +118,7 @@ function Composed({
 	nodes,
 }: {
 	uses: PlanUse[];
-	nodes: SkillPlanNode[];
+	nodes: SkillPlaybookNode[];
 }) {
 	if (uses.length === 0) return null;
 

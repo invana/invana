@@ -1,6 +1,9 @@
+import {
+	type Graph,
+	isSetupComplete,
+} from "@/pages/graphs-detail/features/graphs/types";
 import { WHAT_NEXT } from "@/pages/graphs-detail/features/setup/setupSteps";
 import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
-import { type Graph, isSetupComplete } from "@/types/graphs";
 import {
 	Button,
 	Eyebrow,

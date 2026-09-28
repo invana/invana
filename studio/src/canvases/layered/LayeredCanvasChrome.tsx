@@ -15,10 +15,10 @@
 import {
 	useAgentLineageQuery,
 	useAgentsQuery,
-	useProjectPlanQuery,
-	useWorkflowQuery,
-} from "@/hooks/queries/useWork";
+} from "@/pages/graphs-detail/features/agents/queries";
 import { CANVAS_KINDS } from "@/pages/graphs-detail/features/boards";
+import { useTaskPlanQuery } from "@/pages/graphs-detail/features/plans/queries";
+import { useProjectPlanQuery } from "@/pages/graphs-detail/features/projects/queries";
 import { cn } from "@invana/ui";
 import { X } from "lucide-react";
 
@@ -43,7 +43,7 @@ function useSubject({ username, graphSlug, target }: Scope): {
 	title: string;
 	metrics: string[];
 } {
-	const workflow = useWorkflowQuery(
+	const workflow = useTaskPlanQuery(
 		username,
 		graphSlug,
 		target.kind === "workflow" ? target.workflowKey : undefined,

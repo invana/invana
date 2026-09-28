@@ -7,7 +7,7 @@
  * buffer, like the search bar.
  */
 
-import type { AuditEvent } from "@/types/events";
+import type { AuditEvent } from "@/pages/graphs-detail/features/events/types";
 import { RichSelect, type RichSelectOption } from "@invana/ui";
 import { CircleCheck, CircleSlash, CircleX } from "lucide-react";
 

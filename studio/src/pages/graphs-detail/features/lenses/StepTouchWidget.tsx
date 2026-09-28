@@ -18,7 +18,10 @@
  * and `EgressList` reads the two differently because they are different claims.
  */
 
-import type { Touch, TouchesResponse } from "@/types/govern";
+import type {
+	Touch,
+	TouchesResponse,
+} from "@/pages/graphs-detail/features/lenses/types";
 import type { PanelRendererProps } from "@invana/dashboard";
 import {
 	AddressChip,

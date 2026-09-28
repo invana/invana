@@ -1,4 +1,4 @@
-import type { setupSectionStatus } from "@/types/graphs";
+import type { setupSectionStatus } from "@/pages/graphs-detail/features/graphs/types";
 import { StatusDot } from "@invana/ui";
 import { Check } from "lucide-react";
 

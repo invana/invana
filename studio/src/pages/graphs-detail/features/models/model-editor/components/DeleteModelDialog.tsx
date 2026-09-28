@@ -1,6 +1,6 @@
-import { useDeleteModelMutation } from "@/hooks/queries/useModels";
+import { useDeleteModelMutation } from "@/pages/graphs-detail/features/models/queries";
+import type { GraphModelSummary } from "@/pages/graphs-detail/features/models/types";
 import { ApiError } from "@/services/api/client";
-import type { GraphModelSummary } from "@/types/models";
 import {
 	AlertDialog,
 	AlertDialogAction,

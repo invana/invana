@@ -549,8 +549,8 @@ sequenceDiagram
 | Engine registry | *(none)* | `apps/boards/kinds.py` — the nine rows |
 | Routes | `…/canvases` · `…/canvases/{id}/states` | `…/boards` · `…/boards/{id}/versions` · `…/boards/{kind}/{subjectId}/versions` (create-or-get, § 6.3) |
 | Tests | `engine/tests/canvases/` | `engine/tests/boards/` |
-| Studio types | `studio/src/types/canvas.ts` | `studio/src/types/board.ts` |
-| Studio API | `services/api/canvases.ts` · `canvasStates.ts` | `services/api/boards.ts` · `boardVersions.ts` · **`boardReports.ts`** — the declared routes, beside the drawn ones rather than folded in ([B18](#9-decisions)) |
+| Studio types | `studio/src/types/canvas.ts` | `studio/src/pages/graphs-detail/features/boards/types.ts` |
+| Studio API | `services/api/canvases.ts` · `canvasStates.ts` | `features/boards/api.ts` · `versionsApi.ts` · **`reportsApi.ts`** — the declared routes, beside the drawn ones rather than folded in ([B18](#9-decisions)) |
 | Studio hooks | `useCanvases` · `useCanvasStates` | `useBoards` · `useBoardVersions` |
 | Studio feature | `features/canvases/` | `features/boards/` |
 | Studio registry | `canvasKinds.ts` · `CanvasKind` · `CANVAS_KINDS` · `specFor` | **`boardKinds.ts`** · `BoardKind` · `BOARD_KINDS` · `specFor` — same file, four rows and one `renders` field longer |

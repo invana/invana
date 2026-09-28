@@ -136,7 +136,7 @@ export function useGraphLeftNav() {
 			? settingsPanel.close()
 			: settingsPanel.setSection(key);
 
-	const railItem = (meta: SectionMeta) => {
+	const navItem = (meta: SectionMeta) => {
 		const active = settingsPanel.isOpen && settingsPanel.section === meta.key;
 		return {
 			name: meta.label,
@@ -155,9 +155,9 @@ export function useGraphLeftNav() {
 	// click that opens it closes it. With nothing open the left column is gone
 	// and no rail icon is lit.
 	const topNavItems = [
-		railItem({ key: "info", label: "Info", icon: Info }),
-		railItem({ key: "explorer", label: "Explorer", icon: Compass }),
-		...VIEW_SECTIONS.map(railItem),
+		navItem({ key: "info", label: "Info", icon: Info }),
+		navItem({ key: "explorer", label: "Explorer", icon: Compass }),
+		...VIEW_SECTIONS.map(navItem),
 	];
 
 	// Each section icon is a toggle: clicking the open section closes the panel,

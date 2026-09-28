@@ -7,7 +7,11 @@
  * change nobody made.
  */
 
-import type { Agent, AgentUpdate, SoulTraits } from "@/types/work";
+import type {
+	Agent,
+	AgentUpdate,
+	SoulTraits,
+} from "@/pages/graphs-detail/features/agents/types";
 
 /** The envelope, as this page reads and writes it. */
 export interface Envelope {

@@ -22,20 +22,20 @@
  * promising a change that has not happened.
  */
 
+import { modelsApi } from "@/pages/graphs-detail/features/models/api";
 import {
 	useDeclareLinkMutation,
 	useModelsQuery,
 	usePreviewStitchMutation,
-} from "@/hooks/queries/useModels";
-import { ApiError } from "@/services/api/client";
-import { modelsApi } from "@/services/api/models";
+} from "@/pages/graphs-detail/features/models/queries";
 import type {
 	AlreadyStitched,
 	EndpointSource,
 	IdentityMatch,
 	LinkKind,
 	StitchPreview,
-} from "@/types/models";
+} from "@/pages/graphs-detail/features/models/types";
+import { ApiError } from "@/services/api/client";
 import {
 	Input,
 	Select,

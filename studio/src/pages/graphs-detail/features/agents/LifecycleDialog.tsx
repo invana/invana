@@ -3,7 +3,7 @@ import type {
 	LifecycleAct,
 	LifecycleEffect,
 	LifecycleItem,
-} from "@/types/work";
+} from "@/pages/graphs-detail/features/agents/types";
 import { type ColumnDef, DataTable } from "@invana/tables";
 /**
  * A4 · what pausing or retiring would do to an agent's open work — **item by

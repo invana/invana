@@ -43,7 +43,7 @@ import type {
 	GovernLayer,
 	GovernRule,
 	Participant,
-} from "@/types/govern";
+} from "@/pages/graphs-detail/features/lenses/types";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import {
 	Checkbox,

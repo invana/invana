@@ -22,15 +22,18 @@
  * action here that leads to a write.
  */
 
-import { useLensQuery, useLensesQuery } from "@/hooks/queries/useGovern";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import {
 	LENS_ACTIONS,
 	lensBoardSpec,
 } from "@/pages/graphs-detail/features/lenses/boards/lensBoardSpec";
+import {
+	useLensQuery,
+	useLensesQuery,
+} from "@/pages/graphs-detail/features/lenses/queries";
+import type { LensKind } from "@/pages/graphs-detail/features/lenses/types";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/shared/dashboardIcons";
 import { VIEW_DASHBOARD } from "@/pages/graphs-detail/shared/dashboardSpec";
-import type { LensKind } from "@/types/govern";
 import { Dashboard } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useMemo, useState } from "react";

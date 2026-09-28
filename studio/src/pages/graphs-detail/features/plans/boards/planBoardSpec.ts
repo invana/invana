@@ -14,11 +14,6 @@ import {
 	WIDE_SPREAD,
 	taskFlowFromTaskPlan,
 } from "@/pages/graphs-detail/features/plans/taskFlowFromTaskPlan";
-import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
-import {
-	runAddress,
-	usd,
-} from "@/pages/graphs-detail/shared/dashboards/shared";
 import type {
 	Measure,
 	PlanPerformance,
@@ -26,7 +21,12 @@ import type {
 	PlanRunsPage,
 	PlanWindow,
 	TaskPlanDetail,
-} from "@/types/work";
+} from "@/pages/graphs-detail/features/plans/types";
+import type { FlowOptions } from "@/pages/graphs-detail/shared/dashboards/TaskFlowWidget";
+import {
+	runAddress,
+	usd,
+} from "@/pages/graphs-detail/shared/dashboards/shared";
 import { LAYER_PALETTE } from "@/ui/layerPalette";
 import type {
 	DashboardSpec,

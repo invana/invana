@@ -18,7 +18,7 @@
  * legitimate thing to want and refusing it would be a rule nobody asked for.
  */
 
-import { useRunsJournalQuery } from "@/hooks/queries/useRuns";
+import { useRunListQuery } from "@/pages/graphs-detail/features/runs/queries";
 import {
 	Dialog,
 	DialogContent,
@@ -56,7 +56,7 @@ export function CompareDialog({
 	question,
 	onPick,
 }: CompareDialogProps) {
-	const journal = useRunsJournalQuery(username, graphSlug);
+	const journal = useRunListQuery(username, graphSlug);
 
 	const { sameQuestion, others } = useMemo(() => {
 		const rows = journal.rows.filter((r) => r.id !== runId);

@@ -1,8 +1,8 @@
-import { useCanvasBannerQuery } from "@/hooks/queries/useBoards";
 import { formatRelativeTime } from "@/lib/time";
+import type { SessionSort } from "@/pages/graphs-detail/features/assistant/api";
+import type { Session } from "@/pages/graphs-detail/features/assistant/types";
+import { useCanvasBannerQuery } from "@/pages/graphs-detail/features/boards/queries";
 import { ListRow } from "@/pages/graphs-detail/shared/ListPanel";
-import type { SessionSort } from "@/services/api/sessions";
-import type { Session } from "@/types/session";
 import { Button, ScrollArea } from "@invana/ui";
 import { Archive, ArchiveRestore, MessageSquare, Pin } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

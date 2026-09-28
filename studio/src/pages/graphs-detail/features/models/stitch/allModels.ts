@@ -28,8 +28,11 @@ import {
 	type ModelProperty,
 	type ModelTypeNode,
 } from "@/canvases/model";
-import type { ModelLink } from "@/types/models";
-import type { EdgeTypeResponse, NodeTypeResponse } from "@/types/schemas";
+import type { ModelLink } from "@/pages/graphs-detail/features/models/types";
+import type {
+	EdgeTypeResponse,
+	NodeTypeResponse,
+} from "@/pages/graphs-detail/features/models/types";
 import { colorSlotByString } from "@invana/styling/color";
 
 /** One model, with the published version that is drawn. */

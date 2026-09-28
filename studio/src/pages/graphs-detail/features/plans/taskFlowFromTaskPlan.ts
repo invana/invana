@@ -18,7 +18,10 @@ import {
 } from "@/canvases/taskflow";
 import { LAYER_ICON } from "@/canvases/taskflow/taskFlowFromPlan";
 import { formatElapsed } from "@/lib/time";
-import type { PlanPerformance, TaskPlanDetail } from "@/types/work";
+import type {
+	PlanPerformance,
+	TaskPlanDetail,
+} from "@/pages/graphs-detail/features/plans/types";
 
 type StepMeasures = PlanPerformance["steps"][number];
 

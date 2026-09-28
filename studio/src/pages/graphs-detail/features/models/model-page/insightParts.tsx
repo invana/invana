@@ -4,7 +4,11 @@
  * how a duration and a share are written.
  */
 
-import type { CallerKind, Signal, SignalKind } from "@/types/models";
+import type {
+	CallerKind,
+	Signal,
+	SignalKind,
+} from "@/pages/graphs-detail/features/models/types";
 import { MarkChip, type MarkTone } from "@invana/ui";
 
 /** The callers, in a fixed order, as their own categorical set (MP11). */

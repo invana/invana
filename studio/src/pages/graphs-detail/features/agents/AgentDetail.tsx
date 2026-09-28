@@ -32,12 +32,15 @@ import {
 	changesOf,
 	draftOf,
 } from "@/pages/graphs-detail/features/agents/agentDraft";
+import type {
+	Agent,
+	AgentUpdate,
+} from "@/pages/graphs-detail/features/agents/types";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import {
 	agentTone,
 	humanStatus,
 } from "@/pages/graphs-detail/shared/statusTone";
-import type { Agent, AgentUpdate } from "@/types/work";
 import { Button, RecordHeader, TabbedPanel } from "@invana/ui";
 import { Eye, Lock, Play, Save, Star } from "lucide-react";
 import { useMemo, useState } from "react";

@@ -1,13 +1,4 @@
-import { useSetupSectionMutation } from "@/hooks/queries/useGraphs";
-import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
-import {
-	SETUP_GATE_META,
-	SETUP_STEPS,
-	SETUP_STEP_BY_KEY,
-	WHAT_NEXT,
-	setupCommand,
-} from "@/pages/graphs-detail/features/setup/setupSteps";
-import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
+import { useSetupSectionMutation } from "@/pages/graphs-detail/features/graphs/queries";
 import {
 	type Graph,
 	SETUP_REQUIRED,
@@ -17,7 +8,16 @@ import {
 	isGateOpen,
 	isSetupComplete,
 	setupSectionStatus,
-} from "@/types/graphs";
+} from "@/pages/graphs-detail/features/graphs/types";
+import { SetupMarker } from "@/pages/graphs-detail/features/setup/SetupMarker";
+import {
+	SETUP_GATE_META,
+	SETUP_STEPS,
+	SETUP_STEP_BY_KEY,
+	WHAT_NEXT,
+	setupCommand,
+} from "@/pages/graphs-detail/features/setup/setupSteps";
+import { useLeftSection } from "@/pages/graphs-detail/shell/useLeftSection";
 import {
 	Button,
 	Card,

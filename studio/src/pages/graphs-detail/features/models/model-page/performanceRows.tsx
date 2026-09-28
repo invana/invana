@@ -14,7 +14,7 @@ import type {
 	Performance,
 	ShapeCard,
 	ShapeRow,
-} from "@/types/models";
+} from "@/pages/graphs-detail/features/models/types";
 import { LineChart } from "@invana/charts";
 import type { RowSpec } from "@invana/dashboard";
 import { type ColumnDef, DataTable } from "@invana/tables";

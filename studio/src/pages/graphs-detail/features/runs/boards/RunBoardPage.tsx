@@ -14,10 +14,11 @@
  * because a function is not JSON ([SR30](../../../../../../docs/for-developers/modules/operate/features/see-what-ran.md)).
  */
 
-import { useRunTouchesQuery } from "@/hooks/queries/useGovern";
 import { useReport } from "@/pages/graphs-detail/features/boards";
 import { CompareDialog } from "@/pages/graphs-detail/features/lenses/CompareDialog";
 import { StepTouchWidget } from "@/pages/graphs-detail/features/lenses/StepTouchWidget";
+import { useRunTouchesQuery } from "@/pages/graphs-detail/features/lenses/queries";
+import { runsApi } from "@/pages/graphs-detail/features/runs/api";
 import { DASHBOARD_ICONS } from "@/pages/graphs-detail/features/runs/boards/icons";
 import {
 	RUN_ACTIONS,
@@ -38,7 +39,6 @@ import {
 	VIEW_DASHBOARD,
 	groupSteps,
 } from "@/pages/graphs-detail/shared/dashboards/shared";
-import { runsApi } from "@/services/api/runs";
 import { Dashboard, type DashboardSpec, RUN_PANELS } from "@invana/dashboard";
 import { EmptyState, Spinner } from "@invana/ui";
 import { useQueryClient } from "@tanstack/react-query";

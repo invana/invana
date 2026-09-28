@@ -1,3 +1,11 @@
+import {
+	type Graph,
+	SETUP_REQUIRED,
+	SETUP_SKIPPABLE,
+	isGateOpen,
+	isSetupComplete,
+	setupSectionStatus,
+} from "@/pages/graphs-detail/features/graphs/types";
 import { SetupBoard } from "@/pages/graphs-detail/features/setup/SetupBoard";
 import { SetupLesson } from "@/pages/graphs-detail/features/setup/SetupLesson";
 import { SetupStepper } from "@/pages/graphs-detail/features/setup/SetupStepper";
@@ -7,14 +15,6 @@ import {
 	WHAT_NEXT_KEY,
 	useSetupStep,
 } from "@/pages/graphs-detail/features/setup/useSetupStep";
-import {
-	type Graph,
-	SETUP_REQUIRED,
-	SETUP_SKIPPABLE,
-	isGateOpen,
-	isSetupComplete,
-	setupSectionStatus,
-} from "@/types/graphs";
 import { Button, Progress } from "@invana/ui";
 import { X } from "lucide-react";
 

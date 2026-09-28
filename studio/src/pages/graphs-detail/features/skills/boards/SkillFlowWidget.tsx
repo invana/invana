@@ -6,11 +6,11 @@
  */
 
 import { SkillFlowTab } from "@/pages/graphs-detail/features/skills/SkillFlowTab";
-import type { SkillPlanRead } from "@/types/skills";
+import type { SkillPlaybookRead } from "@/pages/graphs-detail/features/skills/types";
 import type { PanelRendererProps } from "@invana/dashboard";
 
 export interface SkillFlowOptions {
-	plan: SkillPlanRead | null;
+	plan: SkillPlaybookRead | null;
 	loading: boolean;
 	/** What the band says when the skill has no published version to draw. */
 	empty?: { title: string; description: string };

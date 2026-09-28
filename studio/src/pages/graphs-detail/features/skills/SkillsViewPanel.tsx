@@ -19,17 +19,17 @@
  * it. That is why it takes no canvas of its own.
  */
 
+import { RulesSection } from "@/pages/graphs-detail/features/rules/RulesSection";
 import {
 	useCreateSkillMutation,
 	useRulesQuery,
 	useSkillAgentsQuery,
 	useSkillUsageQuery,
 	useSkillsQuery,
-} from "@/hooks/queries/useSkills";
-import { RulesSection } from "@/pages/graphs-detail/features/rules/RulesSection";
+} from "@/pages/graphs-detail/features/skills/queries";
+import type { Skill } from "@/pages/graphs-detail/features/skills/types";
 import { DetailStatus } from "@/pages/graphs-detail/shared/DetailRows";
 import { SectionTitle } from "@/pages/graphs-detail/shared/SectionTitle";
-import type { Skill } from "@/types/skills";
 import { PanelStatusBar, StatusCrumb } from "@/ui/PanelStatusBar";
 import {
 	Badge,

@@ -12,14 +12,14 @@
 // draws models as frames of types.
 
 import { readCanvasThemeConfig } from "@/canvases/theme";
+import type { CanvasStyling } from "@/pages/graphs-detail/features/boards/types";
 import { typeColorNumber } from "@/pages/graphs-detail/features/explorer/typeColor";
+import type { ExpandRequest } from "@/pages/graphs-detail/features/explorer/types";
 import {
 	type InteractionRef,
 	endInteraction,
 	startChild,
 } from "@/services/telemetry/tracer";
-import type { CanvasStyling } from "@/types/board";
-import type { ExpandRequest } from "@/types/traversal";
 // The root is `<GraphCanvas>`, not `<Board>`: only it provides
 // `GraphCanvasContext`, which every `useGraphCanvas()` below depends on. Up to
 // canvas 0.0.11 `<Board>` provided it too, so this reads like a free swap —

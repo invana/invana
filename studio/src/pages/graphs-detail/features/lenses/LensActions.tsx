@@ -26,9 +26,9 @@ import {
 	useDuplicateLensMutation,
 	usePromoteLensMutation,
 	useUpdateLensMutation,
-} from "@/hooks/queries/useGovern";
+} from "@/pages/graphs-detail/features/lenses/queries";
+import type { Lens } from "@/pages/graphs-detail/features/lenses/types";
 import { ApiError } from "@/services/api/client";
-import type { Lens } from "@/types/govern";
 import { Input } from "@invana/forms";
 import {
 	AlertDialog,
